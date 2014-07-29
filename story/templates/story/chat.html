@@ -1,0 +1,35 @@
+{% extends "story/base.html" %}
+
+{% block head %}
+	{% load drealtimetags %}
+	{% ishout_js %}
+	{% load staticfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}" />
+	<script src="{% static "js/chat.js"  %}"> </script>
+	<audio id="chatIncoming" src="{% static 'sounds/ChatIncoming.wav'  %}" preload="auto"> </audio> 
+	<audio id="chatOutgoing" src="{% static 'sounds/ChatOutgoing.wav'  %}" preload="auto">  </audio> 
+	{% block childhead %}
+	{% endblock childhead %}
+{% endblock head %}
+
+{% block content %}
+<div id="wrapper" align="justify"
+	style="width: 100%; height: 100%">
+	<div id="chatbox" style="width: 90%; height: 80%; vertical-align: top;">
+		<script type="text/javascript"> 
+	 		{% for message in messages %}
+				printMessage( {{message | safe}}, $("#chatbox") );
+			{% endfor %}
+		</script>
+	</div>
+	<table style="width: 100%; height: 100%; vertical-align: bottom">
+		<tr>
+			<td><input name="usermsg" type="text" id="usermsg" width="100%" /></td>
+			<td><input type="button" id="sendButton"
+				onclick="sendMessage(document.getElementById('usermsg').value);"
+				value="Send" /></td>
+		</tr>
+	</table>
+</div>
+{% endblock %}
+

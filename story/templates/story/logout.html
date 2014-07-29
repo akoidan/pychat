@@ -1,0 +1,9 @@
+ {% extends "story/chat.html" %}
+ {% block navbar %} 
+  <div id="menu">
+ 		<input type='hidden' id='username' value='{{username}}' />
+        <p class="welcome">  <span class="glyphicon glyphicon-user yellow"></span>:  <b>{{username}}</b></p>     
+        <p class="logout"><a id="exit" rel="nofollow" href="logout"><span class="glyphicon glyphicon-off red"></span></p>
+        <div style="clear:both"></div>
+ </div>
+ {%endblock navbar %}

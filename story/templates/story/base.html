@@ -1,0 +1,38 @@
+<html>
+<head>
+<title>Simle web chat</title> {% load staticfiles %}
+
+<!--main -->
+<script src="{% static "js/jquery.js"  %}"> </script>
+<script src="{% static "js/crsf.js"  %}"> </script>
+
+<!--bootstrap -->
+<link rel="stylesheet" type="text/css"
+	href="{% static 'css/bootstrap.min.css' %}" >
+<link rel="stylesheet" type="text/css"
+	href="{% static 'css/bootstrap-theme.min.css' %}" >
+<script src="{% static "js/bootstrap.min.js"  %}"> </script>
+<!--slider -->
+<script src="{% static "js/bootstrap-slider.js"  %}"> </script>
+<link rel="stylesheet" type="text/css"
+	href="{% static 'css/slider.css' %}" />
+{% block head %} {% endblock head %}
+</head>
+<body>
+	<header>
+		<nav class="navbar navbar-default" role="navigation">
+			<button class="btn btn-default btn-lg" id="muteBtn" onclick="mute();">
+				<script>
+					mute();
+				</script>
+			</button>
+			<button action="." class="btn btn-default btn-lg" id="muteBtn" >
+				<a href="home"><span class="glyphicon glyphicon glyphicon-home"></span> </a>
+			</button>	
+			{% block navbar %} {% endblock navbar %}
+			<!-- /.container-fluid -->
+			<div>
+	</nav>
+	{% block content %} {% endblock %} {% csrf_token %}
+<body>
+</html>

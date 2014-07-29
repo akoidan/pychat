@@ -1,0 +1,15 @@
+</head>
+<body>
+	<header>
+		<div>
+			<button class="btn btn-default btn-lg" id="muteBtn" onclick="mute();">
+				<script>
+					mute();
+				</script>
+			</button>
+			{% block navbar %} {% endblock navbar %}
+			<!-- /.container-fluid -->
+			<div>
+	</header>
+	{% block content %} {% endblock %} {% csrf_token %}
+<body>

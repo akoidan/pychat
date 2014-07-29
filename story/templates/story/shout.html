@@ -1,0 +1,17 @@
+{% extends "story/base.html" %} 
+{% block head %} 
+	{% load drealtimetags %}
+	{% ishout_js %}
+	<script type="text/javascript"> 
+		//use .on() to add a listener. you can add as many listeners as you want.
+		ishout.on('notifications', function (data){
+			alert (data);
+		});
+		//.init() will authenticate against the ishout.js server, and open the WebSocket connection.
+		ishout.init();
+	</script>
+{% endblock head %}
+ 
+{% block content %} 
+	shout page 
+{% endblock content%}
