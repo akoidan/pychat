@@ -16,3 +16,7 @@
 .black {
     color: black;
 }
+
+@media (max-width: 300)  {
+	
+}
