@@ -1,14 +1,27 @@
-<html>
-<head>
-<title>Simle web chat</title> {% load staticfiles %}
-
 </head>
 <body>
-{%block h2 %} 1h2{% endblock h2 %}
-{%block h1 %} 1h1{% endblock h1 %}
+	<header>
+		<nav class="navbar navbar-default" role="navigation">
+			<button action="." class="btn btn-default btn-lg">
+				<a href="home"><span class="glyphicon glyphicon glyphicon-home"></span>
+				</a>
+			</button>
 
-	
-{% csrf_token %}
-	
-</body>
+			<div class="collapse navbar-collapse"
+				id="bs-example-navbar-collapse-1">
+
+				<button class="btn btn-default btn-lg" id="muteBtn"
+					onclick="mute();">
+					<script>
+					mute();
+				</script>
+				</button>
+
+				{% block navbar %} {% endblock navbar %}
+			</div>
+			<!-- /.container-fluid -->
+		</nav>
+	</header>
+	{% block content %} {% endblock %} {% csrf_token %}
+<body>
 </html>
