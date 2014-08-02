@@ -1,40 +1,32 @@
+<!DOCTYPE html>
 <html>
 <head>
-<title>Simle web chat</title> {% load staticfiles %}
-<!--main -->
-<script src="{% static "js/jquery.js"  %}"> </script>
-<script src="{% static "js/crsf.js"  %}"> </script>
-
-<!--bootstrap -->
-<link rel="stylesheet" type="text/css"
-	href="{% static 'css/bootstrap.css' %}" >
-<link rel="stylesheet" type="text/css"
-	href="{% static 'css/bootstrap-theme.css' %}" >
-	<link rel="stylesheet" type="text/css"
-	href="{% static 'css/chat.css' %}" >
-<script src="{% static "js/bootstrap.js"  %}"> </script>
-
-{% block head %} {% endblock head %}
+	<title>Simle web chat</title> {% load staticfiles %}
+	<script src="{% static "js/jquery.js"  %}"> </script>
+	<script src="{% static "js/crsf.js"  %}"> </script>
+	<!--<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}" >
+	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-theme.css' %}" >
+	<script src="{% static "js/bootstrap.js"  %}"> </script> -->
+	<link href="{% static 'css/bootstrap-glyphicons.css' %}" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}">
+	{% block head %} {% endblock head %}
 </head>
 <body>
 	<header>
-		<nav class="navbar navbar-default" role="navigation">
-			<button action="." class="btn btn-default btn-lg">
-				<a href="home"><span class="glyphicon glyphicon glyphicon-home"></span>
-				</a>
-			</button>
-
-			<div class="collapse navbar-collapse mynavbar" >
-
-				<button class="btn btn-default btn-lg" id="muteBtn"
-					onclick="mute();">
-					<script>
+		<nav class="mymenu navbar-default"> 
+			<u1 class="navbarList">
+			<li>
+				<a href="home" ><span class="glyphicon glyphicon-home blue"></span></a>
+			</li>
+			{% block navbar %} {% endblock navbar %}
+			<li >
+			<span id="muteBtn" class="blue"	onclick="mute();"></span>
+				<script>
 					mute();
 				</script>
-				</button>
-				{% block navbar %} {% endblock navbar %}
-			</div>
-			<!-- /.container-fluid -->
+			</li>
+			</u1>
+		</div>
 		</nav>
 	</header>
 	{% block content %} {% endblock %} {% csrf_token %}

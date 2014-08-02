@@ -1,15 +1,21 @@
-{% extends "story/chat.html" %}
-{% block childhead %}
-{% load staticfiles %}
-<script src="{% static "js/login.js"  %}"> </script>
-{% endblock childhead %}
-
-{% block navbar %}
-<form>  
-<input type="text" name="username" value="" id="username" placeholder="Username" class="form-control" />
-<input type="password" name="password" value="" id="password" placeholder="Password" class="form-control"  />
-<button type="button" onclick="login();" value="Sign in" class="btn btn-default"> <span class="glyphicon glyphicon-log-in green"></span></button>
-<button type="button" onclick="register();" value="Register" class="btn btn-default">  
-<span class=" glyphicon glyphicon-registration-mark black"></span></button>
-</form>
+ {% extends "story/chat.html" %} {% block childhead %} {% load staticfiles %}
+<script src="{% static "js/login.js"  %}"></script>
+{% endblock childhead %} {% block navbar %}
+  <li ><span class="glyphicon glyphicon-log-in green" TITTLE="Sign in" id="showLogin">
+  	<div>
+  		<ul class="navbarVert" id="loginMenu" >
+			<li><input type="text" name="username" value="" id="username"
+				placeholder="Username" /></li>
+			<li><input  type="password" name="password"
+				value="" id="password" placeholder="Password" /></li>
+			<li>
+				<span class="glyphicon glyphicon-log-in green" onclick="login();"></span>
+			</li>
+		</ul>
+		</div>
+		</span>
+	</li>
+	<li><a  value="Register" href="/register"><span
+	 class=" glyphicon glyphicon-registration-mark 
+	 black"></span></a></li>
 {% endblock navbar %}

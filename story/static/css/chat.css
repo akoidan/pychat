@@ -1,5 +1,5 @@
 .blue {
-    color: blue;
+    color: MidnightBlue;
 }
 
 .green {
@@ -13,10 +13,57 @@
 .red {
     color: red;
 }
-.black {
+.black {a
     color: black;
 }
 
-@media (max-width: 300)  {
-	
+span:hover {
+	text-shadow:2px 2px #DDDDDD;
+	cursor: pointer;
 }
+
+#showLogin:hover div {
+	display: block;
+}
+
+#showLogin div{
+	display: none;
+}
+
+.navbarVert {
+	list-style-type: none;
+}
+
+.navbarList {
+	 list-style-type: none;
+}
+
+.navbarList > li {
+	 display: inline;
+	 font-size: 35px;
+	 padding: 10px;
+}
+
+.navbarList > li > input {
+	 display: inline;
+	 font-size: 25px;
+}
+
+.mymenu {
+	 padding: 8px; 
+	 padding-bottom: 0px;
+}
+
+.navbar-default {
+  background-image: -webkit-linear-gradient(top, #fff 0%, #f8f8f8 100%);
+  background-image:      -o-linear-gradient(top, #fff 0%, #f8f8f8 100%);
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#f8f8f8));
+  background-image:         linear-gradient(to bottom, #fff 0%, #f8f8f8 100%);
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff8f8f8', GradientType=0);
+  filter: progid:DXImageTransform.Microsoft.gradient(enabled = false);
+  background-repeat: repeat-x;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 5px rgba(0, 0, 0, .075);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 5px rgba(0, 0, 0, .075);
+}
+
