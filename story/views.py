@@ -1,5 +1,5 @@
+# -*- encoding: utf-8 -*-
 from django.shortcuts import render_to_response
-
 from django.http import HttpResponse
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
@@ -13,7 +13,7 @@ import random
 from django.http import Http404
 import string
 from drealtime import iShoutClient
-
+from django.utils.encoding import smart_unicode
 
 
 def validateEmail( email ):
@@ -50,6 +50,9 @@ def bs(request):
 def myshout(request):
 	return render_to_response("story/shout.html" )
 
+def repr_dict(d):
+	return '{%s}' % ', '.join("'%s': '%s'" % pair for pair in d.iteritems())
+
 	
 def home(request, page):
 	c = {}
@@ -74,11 +77,11 @@ def home(request, page):
 			passedMessages= []
 			for singleMess in reversed(messages):
 				dict = {}
-				dict['hour']= singleMess.time.hour;
-				dict['minute']= singleMess.time.minute;
-				dict['content']= singleMess.content.encode('ascii');
-				dict['user']= User.objects.get_by_natural_key(singleMess.userid).username.encode('ascii');
-				passedMessages.append(dict)
+				dict['hour']= singleMess.time.hour
+				dict['minute']= singleMess.time.minute
+				dict['content']= singleMess.content
+				dict['user']= User.objects.get_by_natural_key(singleMess.userid).username
+				passedMessages.append(repr_dict(dict))
 			page = "story/logout.html"
 			mylist = {'username' :  request.user.username }
 			mylist['messages'] = passedMessages

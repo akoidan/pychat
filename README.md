@@ -2,7 +2,8 @@ Very simple chat written in django with drealtime
 ==========
 To run this you need:
 
-sh:
+python2 # drealtime has some issues with sockets on py3
+
 redis-server 
 node node_modules/ishout.js/server.js
-mysqld # edit setting.py for sqlite or use syncdb.sh
+mysqld # use syncdb.sh to create appropriate DB ( previously configured with django)
