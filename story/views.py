@@ -13,14 +13,14 @@ import random
 from django.http import Http404
 import string
 from drealtime import iShoutClient
-from django.utils.encoding import smart_unicode
 
 
-def validateEmail( email ):
+def validateEmail(email):
 	from django.core.validators import validate_email
 	from django.core.exceptions import ValidationError
+
 	try:
-		validate_email( email )
+		validate_email(email)
 	except ValidationError:
 		return "Email is not correct"
 	try:
@@ -29,66 +29,72 @@ def validateEmail( email ):
 	except User.DoesNotExist:
 		return False
 
+
 def validateUser(username):
 	if (username == None or username == ''):
 		return "User name can't be empty"
-	try: 
+	try:
 		User.objects.get(username=username)
 		return 'This user name already registered'
 	except User.DoesNotExist:
 		return False
-	
+
+
 def shout(request):
 	ishout_client = iShoutClient()
 	ishout_client.broadcast(
-	channel ='notifications',
-	data={ 'data' : 'it works'})
-	
+		channel='notifications',
+		data={'data': 'it works'})
+
+
 def bs(request):
-	return render_to_response("story/bootstrap.html" )
-	
+	return render_to_response("story/bootstrap.html")
+
+
 def myshout(request):
-	return render_to_response("story/shout.html" )
+	return render_to_response("story/shout.html")
+
 
 def repr_dict(d):
-	return '{%s}' % ', '.join("'%s': '%s'" % pair for pair in d.iteritems())
+	return '{%s}' % ', '.join("'%s': '%s'" % pair for pair in d.items())
 
-	
+
 def home(request, page):
 	c = {}
 	c.update(csrf(request))
 	if request.user.is_authenticated():
 		if (request.method == 'POST' ):
-			content= request.POST.get('message', '')
-			message = Messages(userid = request.user , content= content)
+			content = request.POST.get('message', '')
+			message = Messages(userid=request.user, content=content)
 			message.save()
 			ishout_client = iShoutClient()
 			ishout_client.broadcast(
-				channel ='notifications',
-				data={	'user' : request.user.username,
-						'content' : message.content, 
-					 	'hour': message.time.hour, 
-					 	'minute' : message.time.minute}
+				channel='notifications',
+				data={'user': request.user.username,
+										'content': message.content,
+										'hour': message.time.hour,
+										'minute': message.time.minute}
 			)
 			message = 'message delivered'
 			return HttpResponse(message, content_type='text/plain')
 		else:
 			messages = Messages.objects.all().order_by('pk').reverse()[:20]
-			passedMessages= []
+			passedMessages = []
 			for singleMess in reversed(messages):
 				dict = {}
-				dict['hour']= singleMess.time.hour
-				dict['minute']= singleMess.time.minute
-				dict['content']= singleMess.content
-				dict['user']= User.objects.get_by_natural_key(singleMess.userid).username
+				dict['hour'] = singleMess.time.hour
+				dict['minute'] = singleMess.time.minute
+				dict['content'] = singleMess.content
+				dict['user'] = User.objects.get_by_natural_key(singleMess.userid).username
 				passedMessages.append(repr_dict(dict))
 			page = "story/logout.html"
-			mylist = {'username' :  request.user.username }
+			mylist = {'username': request.user.username}
 			mylist['messages'] = passedMessages
 			c.update(mylist)
 	else:
 		page = 'story/login.html'
-	return render_to_response(page, c )
+	return render_to_response(page, c)
+
 
 def logout(request):
 	djangologout(request)
@@ -99,70 +105,71 @@ def test(request):
 	return render_to_response("story/3.html")
 
 
-
 def auth(request):
-	username=request.POST['username']
-	password=request.POST['password']
+	username = request.POST['username']
+	password = request.POST['password']
 	user = authenticate(username=username, password=password)
 	if (user != None):
-		djangologin (request, user)
+		djangologin(request, user)
 		message = "update"
 	else:
 		message = "Login or password is wrong"
 	return HttpResponse(message, content_type='text/plain')
 
+
 def confirmemail(request):
 	if request.method == 'GET':
-		code= request.GET.get('code', False)
-		message='verifying mail'
+		code = request.GET.get('code', False)
 		try:
 			u = UserProfile.objects.get(verify_code=code)
-			if u.email_verified == False:	
+			if u.email_verified == False:
 				u.email_verified = True
 				u.save()
-				message='verification code accepted'
+				message = 'verification code accepted'
 			else:
-				message='This code already accepted'			
+				message = 'This code already accepted'
 		except UserProfile.DoesNotExist:
 			raise Http404
-	return render_to_response("story/confirm_mail.html",{'message': message })
+	return render_to_response("story/confirm_mail.html", {'message': message})
 
 
 def id_generator(size=16, chars=string.ascii_letters + string.digits):
-	return ''.join(random.choice(chars) for _ in range(size))		
-	
-def register (request):
+	return ''.join(random.choice(chars) for _ in range(size))
+
+
+def register(request):
 	if request.is_ajax():
-		username=request.POST['username']
-		password=request.POST['password']
-		verify_email= request.POST.get('mailbox', False)
-		email=request.POST['email']
-		message= False
-		if password == None or password =='':
-			message = "Password can't be empty" 
-		if not message :
-			message=validateEmail(email)	
+		username = request.POST['username']
+		password = request.POST['password']
+		verify_email = request.POST.get('mailbox', False)
+		email = request.POST['email']
+		message = False
+		if password == None or password == '':
+			message = "Password can't be empty"
 		if not message:
-			message=validateUser(username)
-		if not message:		
-			User.objects.create_user(username, email, password)		
+			message = validateEmail(email)
+		if not message:
+			message = validateUser(username)
+		if not message:
+			User.objects.create_user(username, email, password)
 			user = authenticate(username=username, password=password)
-			profile=user.get_profile()
-			profile.verify_code= id_generator()
+			profile = user.get_profile()
+			profile.verify_code = id_generator()
 			profile.save()
 			if verify_email:
-				site='http://193.105.201.235'
-				code='/confirm_email?code='+profile.verify_code
-				text='Hi %s, you have registered on %s. To complete your registration click on the url bellow: %s%s'  %(username, site, site, code)
-				mailthread=Thread(target=user.email_user, args=("Confirm chat registration", text))
+				site = 'http://193.105.201.235'
+				code = '/confirm_email?code=' + profile.verify_code
+				text = 'Hi %s, you have registered on %s. To complete your registration click on the url bellow: %s%s' % (
+				username, site, site, code)
+				mailthread = Thread(target=user.email_user, args=("Confirm chat registration", text))
 				mailthread.start()
-			djangologin (request, user)
+			djangologin(request, user)
 			message = 'account created'
 		return HttpResponse(message, content_type='text/plain')
 	else:
 		c = {}
 		mycrsf = csrf(request)
 		c.update(mycrsf)
-		c.update({'errorcode': "wellcome to register page" })
-		return render_to_response("story/register.html", c )
+		c.update({'errorcode': "wellcome to register page"})
+		return render_to_response("story/register.html", c)
 

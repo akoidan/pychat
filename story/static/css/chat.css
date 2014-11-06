@@ -115,5 +115,11 @@ html *{
 }
 
 .wrapper {
-	max-height: 200px;
+    overflow-y: hidden;
+    height: 100%;
+}
+.chatbox {
+    height: 80%;
+    overflow-y: scroll;
+    /* overflow-y: auto; */
 }

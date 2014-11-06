@@ -69,10 +69,14 @@ WSGI_APPLICATION = 'Chat.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+    'NAME': 'django',
+        'ENGINE': 'mysql.connector.django',
+        'USER': 'root',
+        'default-character-set' : 'utf8',
         'OPTIONS': {
-            'read_default_file': '/home/andrew/workspace/MYsql/MYsql/dbsettings.cnf',
-        }
+          'autocommit': True,
+
+        },
     }
 }
 
