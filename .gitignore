@@ -1,3 +1,5 @@
+.*
+!/.gitignore
 *.pyc
 .project
 .pydevproject
@@ -5,4 +7,3 @@
 dump.rdb
 npm-debug.log
 node_modules
-.*
