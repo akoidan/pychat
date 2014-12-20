@@ -70,7 +70,7 @@ WSGI_APPLICATION = 'Chat.wsgi.application'
 DATABASES = {
     'default': {
     'NAME': 'django',
-        'ENGINE': 'mysql.connector.django',
+        'ENGINE': 'mysql.connector.django', # django.db.backends.sqlite3
         'USER': 'root',
         'default-character-set' : 'utf8',
         'OPTIONS': {

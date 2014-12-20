@@ -5,7 +5,7 @@ python2 or python3
 
 pip packages:
 django-realtime #
-PyMySQL
+PyMySQL # SQLite
 simplejson
 
 redis-server # pacman -S community/redis 
