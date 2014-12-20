@@ -5,7 +5,7 @@ import datetime
 
 class UserProfile(models.Model):
 	user = models.OneToOneField(User)  
-	email_verified = models.BooleanField()
+	email_verified = models.BooleanField(default=False)
 	verify_code=models.CharField(max_length=17)
 
 	def __str__(self):  
