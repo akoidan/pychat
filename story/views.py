@@ -70,10 +70,10 @@ def home(request):
 			ishout_client = iShoutClient()
 			ishout_client.broadcast(
 				channel='notifications',
-					data={'user': request.user.username,
-						'content': message.content,
-						'hour': message.time.hour,
-						'minute': message.time.minute}
+				data={'user': request.user.username,
+					'content': message.content,
+					'hour': message.time.hour,
+					'minute': message.time.minute}
 			)
 			message = 'message delivered'
 			return HttpResponse(message, content_type='text/plain')
@@ -81,16 +81,14 @@ def home(request):
 			messages = Messages.objects.all().order_by('pk').reverse()[:20]
 			passed_messages = []
 			for singleMess in reversed(messages):
-				dict = {}
-				dict['hour'] = singleMess.time.hour
-				dict['minute'] = singleMess.time.minute
-				dict['content'] = singleMess.content
-				dict['user'] = User.objects.get_by_natural_key(singleMess.userid).username
+				dict = {'hour': singleMess.time.hour,
+						'minute': singleMess.time.minute,
+						'content': singleMess.content,
+						'user': User.objects.get_by_natural_key(singleMess.userid).username}
 				passed_messages.append(repr_dict(dict))
 			page = "story/logout.html"
-			mylist = {'username': request.user.username}
-			mylist['messages'] = passed_messages
-			c.update(mylist)
+			my_list = {'username': request.user.username, 'messages': passed_messages}
+			c.update(my_list)
 	else:
 		page = 'story/login.html'
 	return render_to_response(page, c)

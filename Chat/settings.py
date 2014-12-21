@@ -12,8 +12,8 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 import story as project_module
 
-
 from os.path import join
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -29,35 +29,35 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
-#TEMPLATE_DIRS = [BASE_DIR+'/templates']
+# TEMPLATE_DIRS = [BASE_DIR+'/templates']
 TEMPLATE_DIRS = (
-    join(BASE_DIR,  'templates'),
-		)
+	join(BASE_DIR, 'templates'),
+)
 
 # Application definition
 
 INSTALLED_APPS = (
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django.db.migrations',
-    # 'south',
-    'drealtime',
-    'story',
-    'simplejson',
+	'django.contrib.admin',
+	'django.contrib.auth',
+	'django.contrib.contenttypes',
+	'django.contrib.sessions',
+	'django.contrib.messages',
+	'django.contrib.staticfiles',
+	'django.db.migrations',
+	# 'south',
+	'drealtime',
+	'story',
+	'simplejson',
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'drealtime.middleware.iShoutCookieMiddleware',                  
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'django.middleware.csrf.CsrfViewMiddleware',
+	'drealtime.middleware.iShoutCookieMiddleware',
+	'django.contrib.sessions.middleware.SessionMiddleware',
+	'django.middleware.common.CommonMiddleware',
+	'django.contrib.auth.middleware.AuthenticationMiddleware',
+	'django.contrib.messages.middleware.MessageMiddleware',
+	'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'Chat.urls'
@@ -65,28 +65,27 @@ ROOT_URLCONF = 'Chat.urls'
 WSGI_APPLICATION = 'Chat.wsgi.application'
 
 
-
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
 # DATABASES = {
-#     'default': {
-#     'NAME': 'django',
-#         'ENGINE': 'mysql.connector.django', # django.db.backends.sqlite3
-#         'USER': 'root',
-#         'default-character-set' : 'utf8',
-#         'OPTIONS': {
-#           'autocommit': True,
+# 	'default': {
+# 		'NAME': 'django',
+# 		'ENGINE': 'mysql.connector.django',  # django.db.backends.sqlite3
+# 		'USER': 'root',
+# 		'default-character-set': 'utf8',
+# 		'OPTIONS': {
+# 			'autocommit': True,
 #
-#         },
-#     }
+# 		},
+# 	}
 # }
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'django.db',
-    }
+	'default': {
+		'ENGINE': 'django.db.backends.sqlite3',
+		'NAME': 'django.db',
+	}
 }
 
 # Internationalization
@@ -111,22 +110,14 @@ STATIC_URL = '/static/'
 PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
 STATICFILES_DIRS = (
-  os.path.join(PROJECT_DIR, 'static'),
+	os.path.join(PROJECT_DIR, 'static'),
 )
 
-AUTH_PROFILE_MODULE='story.UserProfile'
+AUTH_PROFILE_MODULE = 'story.UserProfile'
 
-#for gmail or google apps
+# for gmail or google apps
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'chat.django@gmail.com'
 EMAIL_HOST_PASSWORD = 'Ilovepython'
-
-
-
-
-
-
-
-
