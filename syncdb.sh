@@ -12,5 +12,6 @@
 
 python manage.py makemigrations story
 python manage.py migrate story
+python manage.py syncdb
 
 #MYSQL - CREATE DATABASE `django` /*!40100 DEFAULT CHARACTER SET utf8 */;

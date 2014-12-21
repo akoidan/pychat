@@ -17,4 +17,7 @@ To run this you need:
 4. Database server # Chat uses SQLite by default. Check DATABASES in Chat/settings.py 
  1. Using MySQL: Create db `mysql -u root` `CREATE DATABASE 'django'; exit;` `mysql -u root < ./mysqldumb.sql`
  2. Using SQLite `syncdb.sh`
-3. run chat `start.sh`
+3. Start chat 
+ 1. `redis-server` 
+ 2. `node ./node_modules/ishout.js/server.js || nodejs ./node_modules/ishout.js/server.js` # npm's ishout.js folder
+ 3. `python manage.py runserver`
