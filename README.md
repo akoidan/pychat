@@ -13,7 +13,7 @@ To run this you need:
 3. linux packages
  1. redis-server # `pacman -S community/redis`
  2. nodejs # `pacman -S community/nodejs`
- 3. ishout.js # `wget https://inzane@bitbucket.org/inzane/ishout/get/77c5c2b0e615.zip ;echo 'https://www.npmjs.org/package/ishout.js'`
+ 3. ishout.js # `wget https://inzane@bitbucket.org/inzane/ishout/get/77c5c2b0e615.zip || echo 'link is broken download it manually https://www.npmjs.org/package/ishout.js'`
 4. Database server # Chat uses mysql by default. If you consider to use another one - change DATABASES in Chat/settings.py  and use syncdb.sh to create DB
  1. Using mysql
   1. Install mysql server. I use mariadb # `pacman -S mariadb`
