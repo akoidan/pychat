@@ -15,7 +15,7 @@ import string
 from drealtime import iShoutClient
 
 
-def validateEmail(email):
+def validate_email(email):
 	from django.core.validators import validate_email
 	from django.core.exceptions import ValidationError
 
@@ -30,8 +30,8 @@ def validateEmail(email):
 		return False
 
 
-def validateUser(username):
-	if (username == None or username == ''):
+def validate_user(username):
+	if username is None or username == '':
 		return "User name can't be empty"
 	try:
 		User.objects.get(username=username)
@@ -59,37 +59,37 @@ def repr_dict(d):
 	return '{%s}' % ', '.join("'%s': '%s'" % pair for pair in d.items())
 
 
-def home(request, page):
+def home(request):
 	c = {}
 	c.update(csrf(request))
 	if request.user.is_authenticated():
-		if (request.method == 'POST' ):
+		if request.method == 'POST':
 			content = request.POST.get('message', '')
 			message = Messages(userid=request.user, content=content)
 			message.save()
 			ishout_client = iShoutClient()
 			ishout_client.broadcast(
 				channel='notifications',
-				data={'user': request.user.username,
-										'content': message.content,
-										'hour': message.time.hour,
-										'minute': message.time.minute}
+					data={'user': request.user.username,
+						'content': message.content,
+						'hour': message.time.hour,
+						'minute': message.time.minute}
 			)
 			message = 'message delivered'
 			return HttpResponse(message, content_type='text/plain')
 		else:
 			messages = Messages.objects.all().order_by('pk').reverse()[:20]
-			passedMessages = []
+			passed_messages = []
 			for singleMess in reversed(messages):
 				dict = {}
 				dict['hour'] = singleMess.time.hour
 				dict['minute'] = singleMess.time.minute
 				dict['content'] = singleMess.content
 				dict['user'] = User.objects.get_by_natural_key(singleMess.userid).username
-				passedMessages.append(repr_dict(dict))
+				passed_messages.append(repr_dict(dict))
 			page = "story/logout.html"
 			mylist = {'username': request.user.username}
-			mylist['messages'] = passedMessages
+			mylist['messages'] = passed_messages
 			c.update(mylist)
 	else:
 		page = 'story/login.html'
@@ -98,7 +98,7 @@ def home(request, page):
 
 def logout(request):
 	djangologout(request)
-	return home(request, None)
+	return home(request)
 
 
 def test(request):
@@ -109,7 +109,7 @@ def auth(request):
 	username = request.POST['username']
 	password = request.POST['password']
 	user = authenticate(username=username, password=password)
-	if (user != None):
+	if user is not None:
 		djangologin(request, user)
 		message = "update"
 	else:
@@ -122,7 +122,7 @@ def confirmemail(request):
 		code = request.GET.get('code', False)
 		try:
 			u = UserProfile.objects.get(verify_code=code)
-			if u.email_verified == False:
+			if u.email_verified is False:
 				u.email_verified = True
 				u.save()
 				message = 'verification code accepted'
@@ -144,12 +144,12 @@ def register(request):
 		verify_email = request.POST.get('mailbox', False)
 		email = request.POST['email']
 		message = False
-		if password == None or password == '':
+		if password is None or password == '':
 			message = "Password can't be empty"
 		if not message:
-			message = validateEmail(email)
+			message = validate_email(email)
 		if not message:
-			message = validateUser(username)
+			message = validate_user(username)
 		if not message:
 			User.objects.create_user(username, email, password)
 			user = authenticate(username=username, password=password)
@@ -160,7 +160,7 @@ def register(request):
 				site = 'http://193.105.201.235'
 				code = '/confirm_email?code=' + profile.verify_code
 				text = 'Hi %s, you have registered on %s. To complete your registration click on the url bellow: %s%s' % (
-				username, site, site, code)
+					username, site, site, code)
 				mailthread = Thread(target=user.email_user, args=("Confirm chat registration", text))
 				mailthread.start()
 			djangologin(request, user)
