@@ -153,7 +153,7 @@ def register(request):
 		if not message:
 			User.objects.create_user(username, email, password)
 			user = authenticate(username=username, password=password)
-			profile = user.get_profile()
+			profile = user.profile
 			profile.verify_code = id_generator()
 			profile.save()
 			if verify_email:

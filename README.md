@@ -17,7 +17,8 @@ To run this you need:
 4. Database server # Chat uses mysql by default. If you consider to use another one - change DATABASES in Chat/settings.py  and use syncdb.sh to create DB
  1. Using mysql
   1. Install mysql server. I use mariadb # `pacman -S mariadb`
-  2. Create database using `syncdb.sh init` or `mysqldumb.sql`
+  2. Create database using `syncdb.sh init`
+  3. Alternative way: Type `mysql -u root` `CREATE DATABASE 'django'; exit;` `mysql -u root < ./mysqldumb.sql`
  2. Using SQLite
   1. Use `syncdb.sh init`
 3. run `start.sh`
