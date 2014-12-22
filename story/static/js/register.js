@@ -13,7 +13,7 @@ function register() {
 		url: document.URL,
 		data: datad,
 		success: function (data) {
-			if (data == 'account created') {
+			if (data == 'Account created') {
 				window.location.href = '/';
 			} else {
 				alert(data);
@@ -30,9 +30,11 @@ function validatePassword() {
 	if (password.length < 3) {
 		document.getElementById("password_check").style.color = "Red";
 		document.getElementById("password_check").innerHTML = "Password should be at least 3 character";
+		return false;
 	} else {
 		document.getElementById("password_check").style.color = "Green";
 		document.getElementById("password_check").innerHTML = "Password is fine";
+		return true;
 	}
 }
 
@@ -49,9 +51,11 @@ function validateUser() {
 			if (data == 'False') {
 				document.getElementById("username_check").style.color = "Green";
 				document.getElementById("username_check").innerHTML = "Username is fine";
+				return true;
 			} else {
 				document.getElementById("username_check").style.color = "Red";
 				document.getElementById("username_check").innerHTML = data;
+				return false;
 			}
 		},
 		failure: function (data) {
@@ -72,9 +76,11 @@ function validateEmail() {
 			if (data == 'False') {
 				document.getElementById("email_check").style.color = "Green";
 				document.getElementById("email_check").innerHTML = "Email is fine";
+				return true;
 			} else {
 				document.getElementById("email_check").style.color = "Red";
 				document.getElementById("email_check").innerHTML = data;
+				return false;
 			}
 		},
 		failure: function (data) {

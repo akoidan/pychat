@@ -99,18 +99,14 @@ def confirm_email(request):
 			if u.email_verified is False:
 				u.email_verified = True
 				u.save()
-				message = 'verification code accepted'
+				message = 'verification code is accepted'
 			else:
-				message = 'This code already accepted'
+				message = 'This code is already accepted'
 		except UserProfile.DoesNotExist:
 			raise Http404
 	else:
 		message = "invalid request"
 	return render_to_response("story/confirm_mail.html", {'message': message})
-
-
-def id_generator(size=16, chars=string.ascii_letters + string.digits):
-	return ''.join(random.choice(chars) for _ in range(size))
 
 
 def register(request):
@@ -123,6 +119,7 @@ def register(request):
 		)
 		if registration_result['message'] is False:
 			djangologin(request, registration_result['user'])
+			# register,js redirect if message = 'Account created'
 			registration_result['message'] = 'Account created'
 		return HttpResponse(registration_result['message'], content_type='text/plain')
 	else:

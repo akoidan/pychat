@@ -14,6 +14,7 @@ def validate_email(email):
 	except ValidationError:
 		return "Email is not correct"
 	try:
+		# theoretically can throw returning 'more than 1' error
 		User.objects.get(email=email)
 		return "This email is already registered"
 	except User.DoesNotExist:
@@ -24,6 +25,7 @@ def validate_user(username):
 	if username is None or username == '':
 		return "User name can't be empty"
 	try:
+		# theoretically can throw returning 'more than 1' error
 		User.objects.get(username=username)
 		return 'This user name already registered'
 	except User.DoesNotExist:
@@ -39,11 +41,11 @@ def register_user(username, password, email, verify_email):
 	user = None
 	if password is None or password == '':
 		message = "Password can't be empty"
-	if not message:
+	if message is False:
 		message = validate_email(email)
-	if not message:
+	if message is False:
 		message = validate_user(username)
-	if not message:
+	if message is False:
 		User.objects.create_user(username, email, password)
 		user = authenticate(username=username, password=password)
 		profile = user.profile
