@@ -19,8 +19,9 @@ def create_user_profile(sender, instance, created, **kwargs):
 
 post_save.connect(create_user_profile, sender=User)
 
+
 class Messages(models.Model):
-	userid =  models.ForeignKey(User) 
+	userid = models.ForeignKey(User)
 	time = models.TimeField(default=datetime.datetime.now())
 	content = models.CharField(max_length=255)
 

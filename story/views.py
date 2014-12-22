@@ -47,14 +47,6 @@ def shout(request):
 		data={'data': 'it works'})
 
 
-def bs(request):
-	return render_to_response("story/bootstrap.html")
-
-
-def myshout(request):
-	return render_to_response("story/shout.html")
-
-
 def repr_dict(d):
 	return '{%s}' % ', '.join("'%s': '%s'" % pair for pair in d.items())
 
@@ -70,7 +62,8 @@ def home(request):
 			ishout_client = iShoutClient()
 			ishout_client.broadcast(
 				channel='notifications',
-				data={'user': request.user.username,
+				data={
+					'user': request.user.username,
 					'content': message.content,
 					'hour': message.time.hour,
 					'minute': message.time.minute}
@@ -81,11 +74,12 @@ def home(request):
 			messages = Messages.objects.all().order_by('pk').reverse()[:20]
 			passed_messages = []
 			for singleMess in reversed(messages):
-				dict = {'hour': singleMess.time.hour,
-						'minute': singleMess.time.minute,
-						'content': singleMess.content,
-						'user': User.objects.get_by_natural_key(singleMess.userid).username}
-				passed_messages.append(repr_dict(dict))
+				messages = {
+					'hour': singleMess.time.hour,
+					'minute': singleMess.time.minute,
+					'content': singleMess.content,
+					'user': User.objects.get_by_natural_key(singleMess.userid).username}
+				passed_messages.append(repr_dict(messages))
 			page = "story/logout.html"
 			my_list = {'username': request.user.username, 'messages': passed_messages}
 			c.update(my_list)
@@ -97,10 +91,6 @@ def home(request):
 def logout(request):
 	djangologout(request)
 	return home(request)
-
-
-def test(request):
-	return render_to_response("story/3.html")
 
 
 def auth(request):
@@ -115,7 +105,7 @@ def auth(request):
 	return HttpResponse(message, content_type='text/plain')
 
 
-def confirmemail(request):
+def confirm_email(request):
 	if request.method == 'GET':
 		code = request.GET.get('code', False)
 		try:
@@ -170,4 +160,3 @@ def register(request):
 		c.update(mycrsf)
 		c.update({'errorcode': "wellcome to register page"})
 		return render_to_response("story/register.html", c)
-
