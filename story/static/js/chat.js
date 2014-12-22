@@ -9,7 +9,7 @@ var sound = true;
 
 function printMessage(data, div) {
 	message = '(' + data.hour + ':' + data.minute + ') <b>' + data.user
-			+ '</b> : ' + data.content;
+	+ '</b> : ' + data.content;
 	div.append("<p>" + message + "</p>");
 }
 
@@ -19,10 +19,9 @@ function mute() {
 	if (sound) {
 		btn.innerHTML = '<span class="glyphicon glyphicon-volume-up"></span>';
 	} else {
-		btn.innerHTML = '<span class="glyphicon glyphicon-volume-off"></span>' ;
+		btn.innerHTML = '<span class="glyphicon glyphicon-volume-off"></span>';
 	}
 }
-
 
 
 function appendMessage(data) {
@@ -36,7 +35,7 @@ function appendMessage(data) {
 	var newscrollHeight = div[0].scrollHeight;
 	if (newscrollHeight > oldscrollHeight) {
 		div.animate({
-			scrollTop : newscrollHeight
+			scrollTop: newscrollHeight
 		}, 'normal'); // Autoscroll to bottom of div
 	}
 	if (sound) {
@@ -54,19 +53,19 @@ function sendMessage(usermsg) {
 		return;
 	}
 	$.ajax({
-		type : 'POST',
-		url : document.URL,
-		data : {
-			message : usermsg
+		type: 'POST',
+		url: document.URL,
+		data: {
+			message: usermsg
 		},
-		failure : function(data) {
+		failure: function (data) {
 			alert('Got an error dude');
 		}
 	});
 }
 
-$(document).ready(function() {
-	$("#usermsg").keypress(function(event) {
+$(document).ready(function () {
+	$("#usermsg").keypress(function (event) {
 		if (event.keyCode == 13) {
 			$("#sendButton").click();
 		}

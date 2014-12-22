@@ -1,4 +1,3 @@
-
 function register() {
 
 	var password = document.getElementById("password").value;
@@ -10,17 +9,17 @@ function register() {
 
 	var datad = $('form').serialize();
 	$.ajax({
-		type : 'POST',
-		url : document.URL,
-		data : datad,
-		success : function(data) {
+		type: 'POST',
+		url: document.URL,
+		data: datad,
+		success: function (data) {
 			if (data == 'account created') {
 				window.location.href = '/';
 			} else {
 				alert(data);
 			}
 		},
-		failure : function(data) {
+		failure: function (data) {
 			alert('Got an error dude');
 		}
 	});

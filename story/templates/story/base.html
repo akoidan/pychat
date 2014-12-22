@@ -17,7 +17,7 @@
 	<nav class="navbar-default">
 		<ul class="navbarList">
 			<li>
-				<a href="home"><span class="glyphicon glyphicon-home blue"></span></a>
+				<a href="{% url 'story.views.home' %}"><span class="glyphicon glyphicon-home blue"></span></a>
 			</li>
 			{% block navbar %} {% endblock navbar %}
 			<li>
