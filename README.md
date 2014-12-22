@@ -19,3 +19,5 @@ To run this you need:
  1. `redis-server` 
  2. ArchLinux `node ./node_modules/ishout.js/server.js` Ubuntu `nodejs ./node_modules/ishout.js/server.js` # npm's ishout.js directory
  3. `python manage.py runserver`
+
+#TODO  user profile, no selectable navbar, mute button error on the register page
