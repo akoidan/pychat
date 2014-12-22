@@ -1,10 +1,10 @@
- {% extends "story/chat.html" %} {% block navbar %}
-<input type='hidden' id='username' value='{{username}}'></input>
-<li>
-<a  >
-		<span class="glyphicon glyphicon-user yellow"></span>: <b>{{username}}</b> </a>
-</li>
-<li>
-		<a id="exit" rel="nofollow" href="logout"><span	class="glyphicon glyphicon-off red"></span></a>
-</li>
-{%endblock navbar %}
+{% extends "story/chat.html" %} {% block navbar %}
+	<input type='hidden' id='username' value='{{ username }}'></input>
+	<li>
+		<a>
+			<span class="glyphicon glyphicon-user yellow"></span>: <b>{{ username }}</b> </a>
+	</li>
+	<li>
+		<a id="exit" rel="nofollow" href="{%  url 'story.views.logout' %}"><span class="glyphicon glyphicon-off red"></span></a>
+	</li>
+{% endblock navbar %}

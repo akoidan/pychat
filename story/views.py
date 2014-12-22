@@ -118,6 +118,8 @@ def confirm_email(request):
 				message = 'This code already accepted'
 		except UserProfile.DoesNotExist:
 			raise Http404
+	else:
+		message = "invalid request"
 	return render_to_response("story/confirm_mail.html", {'message': message})
 
 
@@ -158,5 +160,5 @@ def register(request):
 		c = {}
 		mycrsf = csrf(request)
 		c.update(mycrsf)
-		c.update({'errorcode': "wellcome to register page"})
+		c.update({'error code': "welcome to register page"})
 		return render_to_response("story/register.html", c)

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>Simle web chat</title> {% load staticfiles %}
-	<script src="{% static "js/jquery.js"  %}"> </script>
-	<script src="{% static "js/crsf.js"  %}"> </script>
+	<script src="{% static "js/jquery.js" %}"></script>
+	<script src="{% static "js/crsf.js" %}"></script>
 	<!--<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}" >
 	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap-theme.css' %}" >
 	<script src="{% static "js/bootstrap.js"  %}"> </script> -->
@@ -13,23 +13,23 @@
 	{% block head %} {% endblock head %}
 </head>
 <body>
-	<header>
-		<nav class="navbar-default"> 
-			<ul class="navbarList">
+<header>
+	<nav class="navbar-default">
+		<ul class="navbarList">
 			<li>
-				<a href="home" ><span class="glyphicon glyphicon-home blue"></span></a>
+				<a href="home"><span class="glyphicon glyphicon-home blue"></span></a>
 			</li>
 			{% block navbar %} {% endblock navbar %}
-			<li >
-			<span id="muteBtn" class="blue"	onclick="mute();"></span>
+			<li>
+				<span id="muteBtn" class="blue" onclick="mute();"></span>
 				<script>
 					mute();
 				</script>
 			</li>
-			</ul>
+		</ul>
 		</div>
-		</nav>
-	</header>
-	{% block content %} {% endblock %} {% csrf_token %}
+	</nav>
+</header>
+{% block content %} {% endblock %} {% csrf_token %}
 </body>
 </html>

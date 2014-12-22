@@ -13,5 +13,4 @@ urlpatterns = patterns(
 	url(r'^register$', 'story.views.register'),
 	url(r'^alert$', 'story.views.shout'),
 	url(r'^confirm_email$', 'story.views.confirm_email'),
-	url(r'^test$', 'story.views.test'),
 )
