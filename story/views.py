@@ -7,37 +7,23 @@ from django.contrib.auth import logout as djangologout
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from story.models import UserProfile
-from threading import Thread
 from .models import Messages
 import random
 from django.http import Http404
 import string
 from drealtime import iShoutClient
+import registration_utils
 
 
-def validate_email(email):
-	from django.core.validators import validate_email
-	from django.core.exceptions import ValidationError
+def validate_email(request):
+	email = request.POST['email']
+	response = registration_utils.validate_email(email)
+	return HttpResponse(response, content_type='text/plain')
 
-	try:
-		validate_email(email)
-	except ValidationError:
-		return "Email is not correct"
-	try:
-		User.objects.get(email=email)
-		return "This email is already registered"
-	except User.DoesNotExist:
-		return False
-
-
-def validate_user(username):
-	if username is None or username == '':
-		return "User name can't be empty"
-	try:
-		User.objects.get(username=username)
-		return 'This user name already registered'
-	except User.DoesNotExist:
-		return False
+def validate_user(request):
+	username = request.POST['username']
+	response = registration_utils.validate_user(username)
+	return HttpResponse(response, content_type='text/plain')
 
 
 def shout(request):
@@ -80,7 +66,7 @@ def home(request):
 					'content': singleMess.content,
 					'user': User.objects.get_by_natural_key(singleMess.userid).username}
 				passed_messages.append(repr_dict(messages))
-			page = "story/logout.html"
+			page = 'story/logout.html'
 			my_list = {'username': request.user.username, 'messages': passed_messages}
 			c.update(my_list)
 	else:
@@ -129,33 +115,16 @@ def id_generator(size=16, chars=string.ascii_letters + string.digits):
 
 def register(request):
 	if request.is_ajax():
-		username = request.POST['username']
-		password = request.POST['password']
-		verify_email = request.POST.get('mailbox', False)
-		email = request.POST['email']
-		message = False
-		if password is None or password == '':
-			message = "Password can't be empty"
-		if not message:
-			message = validate_email(email)
-		if not message:
-			message = validate_user(username)
-		if not message:
-			User.objects.create_user(username, email, password)
-			user = authenticate(username=username, password=password)
-			profile = user.profile
-			profile.verify_code = id_generator()
-			profile.save()
-			if verify_email:
-				site = 'http://193.105.201.235'
-				code = '/confirm_email?code=' + profile.verify_code
-				text = 'Hi %s, you have registered on %s. To complete your registration click on the url bellow: %s%s' % (
-					username, site, site, code)
-				mailthread = Thread(target=user.email_user, args=("Confirm chat registration", text))
-				mailthread.start()
-			djangologin(request, user)
-			message = 'account created'
-		return HttpResponse(message, content_type='text/plain')
+		registration_result = registration_utils.register_user(
+			request.POST['username'],
+			request.POST['password'],
+			request.POST['email'],
+			request.POST.get('mailbox', False)
+		)
+		if registration_result['message'] is False:
+			djangologin(request, registration_result['user'])
+			registration_result['message'] = 'Account created'
+		return HttpResponse(registration_result['message'], content_type='text/plain')
 	else:
 		c = {}
 		mycrsf = csrf(request)

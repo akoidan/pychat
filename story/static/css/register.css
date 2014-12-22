@@ -1,0 +1,17 @@
+.register-table > tbody > tr > td:nth-child(3) {
+	padding-left: 10px;
+
+}
+
+.register-table > tbody > tr > td:nth-child(1) {
+	padding-left: 20px;
+	width: 200px;
+}
+
+.register-table > tbody > tr > td:nth-child(2) {
+	width: 200px;
+}
+
+.register-table {
+	width: 100%;
+}

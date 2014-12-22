@@ -50,6 +50,10 @@ INSTALLED_APPS = (
 	'simplejson',
 )
 
+STATICFILES_DIRS = (
+	'story/static'
+)
+
 MIDDLEWARE_CLASSES = (
 	'django.middleware.csrf.CsrfViewMiddleware',
 	'drealtime.middleware.iShoutCookieMiddleware',

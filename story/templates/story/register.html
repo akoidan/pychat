@@ -1,34 +1,36 @@
 {% extends "story/base.html" %} {% block head %} {% load static %}
 	<script src="{% static "js/jquery.js" %}"></script>
 	<script src="{% static "js/register.js" %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/register.css' %}">
 {% endblock head %} {% block content %}
 	<h1 align="center">{{ errorcode }}</h1>
 	<form>
-		<table width=100%>
+		<table class="register-table">
 			<tr>
-				<td width="200px"><label for="username">User name</label></td>
-				<td><input type="text" name="username" value="" id="username"/>
-				</td>
+				<td ><label for="username">User name</label></td>
+				<td ><input type="text" name="username" value="" id="username" onchange="validateUser()"/></td>
+				<td ><label id="username_check">Your login is unique from all users</label></td>
 			</tr>
 			<tr>
 				<td><label for="password">Password</label></td>
 				<td><input type="password" name="password" value=""
-							  id="password"/></td>
+							  id="password" onchange="validatePassword(); passwordsMatch();"/></td>
+				<td><label id="password_check">At least 6 characters</label></td>
 			</tr>
 			<tr>
 				<td><label for="repeatpassword">Repeat the password</label></td>
 				<td><input type="password" name="repeatpassword" value=""
-							  id="repeatpassword"/></td>
+							  id="repeatpassword" onchange="passwordsMatch();"/></td>
+				<td><label id="repeatpassword_check">You should repeat you password in order to register</label></td>
 			</tr>
 			<tr>
 				<td><label for="email">email</label></td>
-				<td><input type="email" name="email" value="" id="email"/></td>
+				<td><input type="email" name="email" value="" id="email" onchange="validateEmail();"/></td>
+				<td><label id="email_check">Enter a valid email, you will proceed with activation link</label></td>
 			</tr>
 			<tr>
-				<td><a id="exit" rel="nofollow" href='{% url "story.views.home" %}'>Home
-					Page</a></td>
-				<td><input type="button" onclick="register();" value="register"/>
-				</td>
+				<td><a id="exit" rel="nofollow" href='{% url "story.views.home" %}'>Home Page</a></td>
+				<td><input type="button" onclick="register();" value="register"/></td>
 			</tr>
 		</table>
 	</form>
