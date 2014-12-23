@@ -10,6 +10,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import socket
 import story as project_module
 
 from os.path import join
@@ -53,6 +54,12 @@ INSTALLED_APPS = (
 STATICFILES_DIRS = (
 	'story/static'
 )
+
+HOST_IP = socket.gethostbyname(socket.gethostname())
+
+SERVER_PORT = '8000'
+
+ISHOUT_CLIENT_ADDR = HOST_IP + ':5500'
 
 MIDDLEWARE_CLASSES = (
 	'django.middleware.csrf.CsrfViewMiddleware',

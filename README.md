@@ -21,3 +21,4 @@ To run this you need:
  3. `python manage.py runserver`
 
 #TODO  user profile, no selectable navbar, mute button error on the register page
+#TODO add chat rooms, implement 

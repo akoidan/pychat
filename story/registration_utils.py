@@ -2,6 +2,7 @@ __author__ = 'andrew'
 from django.contrib.auth.models import User
 from threading import Thread
 from django.contrib.auth import authenticate
+from django.conf import settings
 import random
 import string
 
@@ -52,7 +53,7 @@ def register_user(username, password, email, verify_email):
 		profile.verify_code = id_generator()
 		profile.save()
 		if verify_email:
-			site = 'http://193.105.201.235'
+			site = 'http://'+getattr(settings, 'HOST_IP') + ':' + getattr(settings, 'SERVER_PORT')
 			code = '/confirm_email?code=' + profile.verify_code
 			text = 'Hi %s, you have registered on %s. To complete your registration click on the url bellow: %s%s' % (
 				username, site, site, code)
