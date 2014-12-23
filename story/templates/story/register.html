@@ -24,13 +24,15 @@
 				<td><label id="repeatpassword_check">You should repeat you password in order to register</label></td>
 			</tr>
 			<tr>
-				<td><label for="email">email</label></td>
+				<td><label for="email">Email</label></td>
 				<td><input type="email" name="email" value="" id="email" onchange="validateEmail();"/></td>
 				<td><label id="email_check">Enter a valid email, you will proceed with activation link</label></td>
 			</tr>
 			<tr>
-				<td><a id="exit" rel="nofollow" href='{% url "story.views.home" %}'>Home Page</a></td>
-				<td><input type="button" onclick="register();" value="register"/></td>
+				<td><label for="email">send email</label></td>
+				<td><input type="checkbox" name="mailbox" id="mailbox"></td>
+			</tr>
+			<tr><td colspan="2" align="center"><input type="button" class="register-button" onclick="register();" value="Sing Up"/></td>
 			</tr>
 		</table>
 	</form>
