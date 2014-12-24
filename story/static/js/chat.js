@@ -18,7 +18,6 @@ function appendMessage(data) {
 	div = $("#chatbox");
 	var oldscrollHeight = div[0].scrollHeight;
 	printMessage(data, div);
-	$("#usermsg").val("");
 	var newscrollHeight = div[0].scrollHeight;
 	if (newscrollHeight > oldscrollHeight) {
 		div.animate({
@@ -44,6 +43,9 @@ function sendMessage(usermsg) {
 		url: document.URL,
 		data: {
 			message: usermsg
+		},
+		success: function (data) {
+			$("#usermsg").val("");
 		},
 		failure: function (data) {
 			alert('Got an error dude');

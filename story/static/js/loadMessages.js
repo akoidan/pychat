@@ -14,6 +14,7 @@ $.ajax({
 		result.forEach(function(message) {
 			printMessage(eval('('+message+')'), $("#chatbox"));
 		});
+		$("#chatbox").scrollTop($('#chatbox')[0].scrollHeight);
 	},
 	failure: function (data) {
 		alert('Got an error dude');
