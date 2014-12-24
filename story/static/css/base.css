@@ -69,9 +69,12 @@ span:hover {
 	cursor: pointer;
 }
 
-html * {
+html, body {
 	text-shadow: none;
 	cursor: auto;
+	margin: 0;
+	height: 100%;
+	width: 100%;
 }
 
 #showMenu:hover div {
@@ -108,15 +111,4 @@ html * {
 	/* W3C Markup, IE10 Release Preview */
 	background-image: linear-gradient(to bottom left, #8C8C8C 0%, #D4D4D4 100%);
 
-}
-
-.wrapper {
-	overflow-y: hidden;
-	height: 100%;
-}
-
-.chatbox {
-	height: 80%;
-	overflow-y: scroll;
-	/* overflow-y: auto; */
 }

@@ -20,5 +20,4 @@ To run this you need:
  2. ArchLinux `node ./node_modules/ishout.js/server.js` Ubuntu `nodejs ./node_modules/ishout.js/server.js` # npm's ishout.js directory
  3. `python manage.py runserver`
 
-#TODO  user profile, no selectable navbar, mute button error on the register page
-#TODO add chat rooms, implement 
+#TODO  user profile, no selectable navbar add chat rooms, implement smiles and special characters such as <b> etc 
