@@ -21,4 +21,4 @@ To run this you need:
  3. `python manage.py runserver`
 
 #TODO  user profile, no selectable navbar add chat rooms, implement smiles and special characters such as <b> etc 
-change scroll bar of chatbox
+change scroll bar of chatbox, Add all users to right panel in the current room
