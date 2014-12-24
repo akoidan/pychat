@@ -7,7 +7,7 @@ ishout.init();
 
 function printMessage(data, div) {
 	message = '(' + data.hour + ':' + data.minute + ') <b>' + data.user
-	+ '</b> : ' + data.content;
+	+ '</b> : ' + he.encode(data.content);
 	div.append("<p>" + message + "</p>");
 }
 

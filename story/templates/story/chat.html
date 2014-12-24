@@ -5,6 +5,7 @@
 	{% ishout_js %}
 	{% load staticfiles %}
 	<script src="{% static "js/chat.js" %}"></script>
+	<script src="{% static "js/he.js" %}"></script>
 	<audio id="chatIncoming" src="{% static 'sounds/ChatIncoming.wav' %}" preload="auto"></audio>
 	<audio id="chatOutgoing" src="{% static 'sounds/ChatOutgoing.wav' %}" preload="auto"></audio>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}">
@@ -15,11 +16,6 @@
 {% block content %}
 	<div class="wrapper">
 		<div id="chatbox" style="float: left">
-			<script type="text/javascript">
-				{% for message in messages %}
-					printMessage({{ message | safe }}, $("#chatbox"));
-				{% endfor %}
-			</script>
 		</div>
 		<div class="create-messsage-wrapper" >
 			<div class="inputsdiv">
@@ -33,5 +29,6 @@
 			</div>
 		</div>
 	</div>
+	<script src="{% static "js/loadMessages.js" %}"></script>
 {% endblock %}
 

@@ -11,7 +11,7 @@ from .models import Messages
 from django.http import Http404
 from drealtime import iShoutClient
 import registration_utils
-
+import json
 
 def validate_email(request):
 	email = request.POST['email']
@@ -36,6 +36,23 @@ def repr_dict(d):
 	return '{%s}' % ', '.join("'%s': '%s'" % pair for pair in d.items())
 
 
+def get_messages(request):
+	if request.user.is_authenticated() and request.method == 'POST':
+		messages = Messages.objects.all().order_by('pk').reverse()[:20]
+		passed_messages = []
+		for singleMess in reversed(messages):
+			messages = {
+			'hour': singleMess.time.hour,
+			'minute': singleMess.time.minute,
+			'content': singleMess.content,
+			'user': User.objects.get_by_natural_key(singleMess.userid).username}
+			passed_messages.append(repr_dict(messages))
+		response = json.dumps(passed_messages)
+	else:
+		response = "can't get messages for noauthorized user"
+	return HttpResponse(response, content_type='text/plain')
+
+
 def home(request):
 	c = {}
 	c.update(csrf(request))
@@ -56,18 +73,9 @@ def home(request):
 			message = 'message delivered'
 			return HttpResponse(message, content_type='text/plain')
 		else:
-			messages = Messages.objects.all().order_by('pk').reverse()[:20]
-			passed_messages = []
-			for singleMess in reversed(messages):
-				messages = {
-					'hour': singleMess.time.hour,
-					'minute': singleMess.time.minute,
-					'content': singleMess.content,
-					'user': User.objects.get_by_natural_key(singleMess.userid).username}
-				passed_messages.append(repr_dict(messages))
 			page = 'story/logout.html'
-			my_list = {'username': request.user.username, 'messages': passed_messages}
-			c.update(my_list)
+			response = {'username': request.user.username}
+			c.update(response)
 	else:
 		page = 'story/login.html'
 	return render_to_response(page, c)
