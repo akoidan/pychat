@@ -3,7 +3,7 @@ function register() {
 	var password = document.getElementById("password").value;
 	var repeatpassword = document.getElementById("repeatpassword").value;
 	if (password != repeatpassword) {
-		alert('Password doesnt match')
+		alert("Passwords don't match")
 		return;
 	}
 
@@ -28,7 +28,7 @@ function register() {
 function validatePassword() {
 	var password = document.getElementById("password").value;
 	if (password.length < 3) {
-		document.getElementById("password_check").style.color = "Red";
+		document.getElementById("password_check").style.color = "#dd4b39";
 		document.getElementById("password_check").innerHTML = "Password should be at least 3 character";
 		return false;
 	} else {
@@ -53,7 +53,7 @@ function validateUser() {
 				document.getElementById("username_check").innerHTML = "Username is fine";
 				return true;
 			} else {
-				document.getElementById("username_check").style.color = "Red";
+				document.getElementById("username_check").style.color = "#dd4b39";
 				document.getElementById("username_check").innerHTML = data;
 				return false;
 			}
@@ -78,7 +78,7 @@ function validateEmail() {
 				document.getElementById("email_check").innerHTML = "Email is fine";
 				return true;
 			} else {
-				document.getElementById("email_check").style.color = "Red";
+				document.getElementById("email_check").style.color = "#dd4b39";
 				document.getElementById("email_check").innerHTML = data;
 				return false;
 			}
@@ -93,7 +93,7 @@ function passwordsMatch() {
 	var password = document.getElementById("password").value;
 	var repeatpassword = document.getElementById("repeatpassword").value;
 	if (repeatpassword != password ) {
-		document.getElementById("repeatpassword_check").style.color = "Red";
+		document.getElementById("repeatpassword_check").style.color = "#dd4b39";
 		document.getElementById("repeatpassword_check").innerHTML = "Passwords don't match";
 	} else {
 		document.getElementById("repeatpassword_check").style.color = "Green";

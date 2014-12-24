@@ -4,7 +4,7 @@
 {% endblock childhead %} {% block navbar %}
 	<li>
 		<form id="showMenu">
-			<span class="glyphicon glyphicon-log-in green" TITTLE="Sign in"></span>
+			<span class="glyphicon glyphicon-log-in green" ></span>
 
 			<div> <!--this div is for hiding and showing submenu-->
 				<ul class="credentialList" id="loginMenu">
@@ -19,7 +19,7 @@
 			</div>
 		</form>
 	</li>
-	<li><a value="Register" href="{% url 'story.views.register' %}"><span
+	<li><a href="{% url 'story.views.register' %}"><span
 			class="glyphicon glyphicon-registration-mark
 	 black"></span></a></li>
 {% endblock navbar %}

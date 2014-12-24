@@ -8,9 +8,7 @@ from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from story.models import UserProfile
 from .models import Messages
-import random
 from django.http import Http404
-import string
 from drealtime import iShoutClient
 import registration_utils
 
@@ -19,6 +17,7 @@ def validate_email(request):
 	email = request.POST['email']
 	response = registration_utils.validate_email(email)
 	return HttpResponse(response, content_type='text/plain')
+
 
 def validate_user(request):
 	username = request.POST['username']

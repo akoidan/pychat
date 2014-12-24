@@ -17,7 +17,7 @@ def validate_email(email):
 	try:
 		# theoretically can throw returning 'more than 1' error
 		User.objects.get(email=email)
-		return "This email is already registered"
+		return "This email is already used"
 	except User.DoesNotExist:
 		return False
 
@@ -28,7 +28,7 @@ def validate_user(username):
 	try:
 		# theoretically can throw returning 'more than 1' error
 		User.objects.get(username=username)
-		return 'This user name already registered'
+		return 'This user name already used'
 	except User.DoesNotExist:
 		return False
 
