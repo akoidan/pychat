@@ -11,13 +11,15 @@ To run this you need:
 3. Linux packages
  1. redis-server # ArchLinux `pacman -S community/redis`, Ubuntu `add-apt-repository -y ppa:rwky/redis` `apt-get install -y redis-server`
  2. nodejs and npm# ArchLinux `pacman -S community/nodejs` Ubuntu `apt-get install nodejs` `apt-get install npm`
- 3. ishout.js # use python2 to install if 3rd fails `ln -sf $(which python2) $(which python)` `npm install ishout.js` switch it back if necessary
-4. Database server # Chat uses SQLite by default. Check DATABASES in Chat/settings.py 
- 1. Using MySQL: Create db `mysql -u root` `CREATE DATABASE 'django'; exit;` `mysql -u root < ./mysqldumb.sql`
- 2. Using SQLite `./syncdb.sh`
-3. Start the chat 
+4. Database server 
+ 1. Chat uses SQLite by default. # change DATABASES in Chat/settings.py to use another one
+ 1. Run `./syncdb.sh` to create database
+5. Download static content and IShout.js
+ 1. `sh download_content.sh` 
+ 2. if it fails download the resources manually from link specified in it
+5. Start the chat 
  1. `redis-server` 
  2. ArchLinux `node ./node_modules/ishout.js/server.js` Ubuntu `nodejs ./node_modules/ishout.js/server.js` # npm's ishout.js directory
- 3. `python manage.py runserver`
+ 3. `python manage.py runserver 0.0.0.0:80000`
 
 #TODO  user profile, no selectable navbar add chat rooms, implement smiles change scroll bar of chatbox, Add all users to right panel in the current room. Add loading old messages on mouse scrolling up
