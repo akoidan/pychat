@@ -22,4 +22,4 @@ To run this you need:
  2. ArchLinux `node ./node_modules/ishout.js/server.js` Ubuntu `nodejs ./node_modules/ishout.js/server.js` # npm's ishout.js directory
  3. `python manage.py runserver 0.0.0.0:80000`
 
-#TODO  user profile, no selectable navbar add chat rooms, implement smiles change scroll bar of chatbox, Add all users to right panel in the current room. Add loading old messages on mouse scrolling up
+#TODO  user profile, no selectable navbar add chat rooms, implement smiles change scroll bar of chatbox, Add all users to right panel in the current room. Add loading old messages on mouse scrolling up add color for message if userid=id 

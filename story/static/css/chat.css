@@ -9,7 +9,8 @@
 	overflow-y: scroll;
 	padding-left: 15px;
 	width: 100%;
-	float: left
+	float: left;
+	word-wrap:break-word;
 }
 
 #sendButton {
