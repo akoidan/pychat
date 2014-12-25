@@ -9,3 +9,7 @@ npm-debug.log
 node_modules
 django.db
 story/migrations
+story/static/sounds/*
+story/static/fonts/*
+story/static/css/bootstrap-glyphicons.css
+story/static/css/confirm-email.css
