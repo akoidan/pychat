@@ -1,6 +1,7 @@
 Very simple chat written in django with drealtime
 ==========
 To run this you need:
+
 1. Python3 or Python2, both are supported
 2. pip packages # `pip install packagename` # python-pip 
  1. django
