@@ -8,6 +8,7 @@
 	height: calc(100% - 50px) ;
 	overflow-y: scroll;
 	padding-left: 15px;
+	padding-right: 5px;
 	width: 100%;
 	float: left;
 	word-wrap:break-word;

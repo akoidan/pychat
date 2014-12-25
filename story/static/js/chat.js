@@ -6,9 +6,13 @@ ishout.on('notifications', appendMessage);
 ishout.init();
 
 function printMessage(data, div) {
-	message = '(' + data.hour + ':' + data.minute + ') <b>' + data.user
-	+ '</b> : ' + he.encode(data.content);
-	div.append("<p>" + message + "</p>");
+	messageHeader = '(' + data.hour + ':' + data.minute + ') <b>' + data.user + '</b> : ';
+	if (data.user == username.value) {
+		message = '<p> <font color="blue">' + messageHeader + '</font>' + he.encode(data.content) + "</p>";
+	} else {
+		message = '<p> <font color="brown">' + messageHeader + '</font>' + he.encode(data.content) + "</p>";
+	}
+	div.append(message);
 }
 
 function appendMessage(data) {
