@@ -65,8 +65,41 @@ $(document).ready(function () {
 	});
 });
 
-$(function() {
-    $('#chatbox').on('mousewheel', function(event, delta) {
-        console.log("wheel");
+$(function () {
+	var div = $('#chatbox');
+	div.bind('mousewheel DOMMouseScroll', function (event, delta) {
+
+		if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) { // Scroll top
+			loadUpHistory(5);
+		//} else { // Scroll bottom
+		//	loadDownHistory();
+		}
+	});
+
+	 $(document).keydown(function(e) {
+        if(e.which == 33 ) {    // page up
+			  loadUpHistory(15);
+		  } else if (e.which == 38) { // up
+			   loadUpHistory(3);
+		  } else if (e.ctrlKey && e.which == 36) {
+			loadUpHistory(25);
+		  }
     });
 });
+
+
+
+function loadUpHistory(elements) {
+	var div = $('#chatbox');
+	if (div.scrollTop() == 0) {
+		console.log("Reached the top!");
+	}
+}
+
+
+//function loadDownHistory(elements) {
+//	var div = $('#chatbox');
+//	if (div[0].scrollHeight - div.scrollTop() < div.height() + 2) {
+//		console.log("Reached the bottom!");
+//	}
+//}

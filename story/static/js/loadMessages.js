@@ -2,7 +2,6 @@
  * Created by andrew on 12/24/14.
  */
 
-
 $.ajax({
 	beforeSend: function (xhr, settings) {
 		xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
