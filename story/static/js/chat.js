@@ -61,9 +61,8 @@ $(document).ready(function () {
 	});
 });
 
-
-
-
-
-
-
+$(function() {
+    $('#chatbox').on('mousewheel', function(event, delta) {
+        console.log("wheel");
+    });
+});

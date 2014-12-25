@@ -47,16 +47,10 @@ ul {
 }
 
 .navbar-default {
-	background-image: -webkit-linear-gradient(top, #fff 0%, #f8f8f8 100%);
-	background-image: -o-linear-gradient(top, #fff 0%, #f8f8f8 100%);
-	background-image: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#f8f8f8));
-	background-image: linear-gradient(to bottom, #fff 0%, #f8f8f8 100%);
-	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff8f8f8', GradientType=0);
-	filter: progid:DXImageTransform.Microsoft.gradient(enabled=false);
+	background-image: linear-gradient(to bottom, #FFF 0%, #F8F8F8 100%);
 	background-repeat: repeat-x;
 	border-radius: 4px;
-	-webkit-box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 5px rgba(0, 0, 0, .075);
-	box-shadow: inset 0 1px 0 rgba(255, 255, 255, .15), 0 1px 5px rgba(0, 0, 0, .075);
+	box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.15) inset, 0px 1px 5px rgba(0, 0, 0, 0.075);
 }
 
 .credentials {
@@ -92,23 +86,6 @@ html, body {
 	border-width: 1px;
 	box-shadow: 3px 3px 7px #888888;
 	border-radius: 5px;
-
-	/* IE10 Consumer Preview */
-	background-image: -ms-linear-gradient(top right, #8C8C8C 0%, #D4D4D4 100%);
-
-	/* Mozilla Firefox */
-	background-image: -moz-linear-gradient(top right, #8C8C8C 0%, #D4D4D4 100%);
-
-	/* Opera */
-	background-image: -o-linear-gradient(top right, #8C8C8C 0%, #D4D4D4 100%);
-
-	/* Webkit (Safari/Chrome 10) */
-	background-image: -webkit-gradient(linear, right top, left bottom, color-stop(0, #8C8C8C), color-stop(1, #D4D4D4));
-
-	/* Webkit (Chrome 11+) */
-	background-image: -webkit-linear-gradient(top right, #8C8C8C 0%, #D4D4D4 100%);
-
-	/* W3C Markup, IE10 Release Preview */
 	background-image: linear-gradient(to bottom left, #8C8C8C 0%, #D4D4D4 100%);
 
 }
