@@ -9,4 +9,3 @@ npm-debug.log
 node_modules
 django.db
 story/migrations
-story/static/fonts
