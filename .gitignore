@@ -13,5 +13,6 @@ story/static/sounds/*
 story/static/fonts/*
 story/static/css/bootstrap-glyphicons.css
 story/static/css/confirm-email.css
-story/static/sounds/ChatIncoming.wav
-story/static/sounds/ChatOutgoing.wav
+story/static/js/bootstrap.js
+story/static/js/he.js
+story/static/js/jquery.js
