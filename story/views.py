@@ -10,8 +10,9 @@ from story.models import UserProfile
 from .models import Messages
 from django.http import Http404
 from drealtime import iShoutClient
-import registration_utils
+from story import registration_utils
 import json
+
 
 def validate_email(request):
 	email = request.POST['email']
@@ -42,10 +43,11 @@ def get_messages(request):
 		passed_messages = []
 		for singleMess in reversed(messages):
 			messages = {
-			'hour': singleMess.time.hour,
-			'minute': singleMess.time.minute,
-			'content': singleMess.content,
-			'user': User.objects.get_by_natural_key(singleMess.userid).username}
+				'hour': singleMess.time.hour,
+				'minute': singleMess.time.minute,
+				'content': singleMess.content,
+				'user': User.objects.get_by_natural_key(singleMess.userid).username
+			}
 			passed_messages.append(repr_dict(messages))
 		response = json.dumps(passed_messages)
 	else:
@@ -68,7 +70,8 @@ def home(request):
 					'user': request.user.username,
 					'content': message.content,
 					'hour': message.time.hour,
-					'minute': message.time.minute}
+					'minute': message.time.minute
+				}
 			)
 			message = 'message delivered'
 			return HttpResponse(message, content_type='text/plain')
