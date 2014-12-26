@@ -6,7 +6,7 @@ from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
-from story.models import UserProfile
+from story.models import UserProfile, UserSettings
 from .models import Messages
 from django.http import Http404
 from drealtime import iShoutClient
@@ -160,19 +160,22 @@ def register(request):
 
 
 def profile(request):
-	if request.method == 'GET':
-		form = UserSettingsForm()
-		c = {}
-		my_crsf = csrf(request)
-		c['form'] = form
-		c.update(my_crsf)
-		create_nav_page(request, c)
-		return render_to_response("story/profile.html", c)
-	else:
-		form = UserSettingsForm(request.POST)
-		if form.is_valid():
-			form.id = request.user.id
-			form.save()
-		return HttpResponseRedirect('/')
+	user = request.user
+	if user.is_authenticated():
+		if request.method == 'GET':
+			user_settings = UserSettings.objects.get(pk=user.id)
+			form = UserSettingsForm(instance=user_settings)
+			c = {}
+			c['form'] = form
+			my_crsf = csrf(request)
+			c.update(my_crsf)
+			create_nav_page(request, c)
+			return render_to_response("story/profile.html", c)
+		else:
+			form = UserSettingsForm(request.POST)
+			if form.is_valid():
+				form.id = request.user.id
+				form.save()
+			return HttpResponseRedirect('/')
 
 

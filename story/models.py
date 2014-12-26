@@ -29,8 +29,8 @@ class Messages(models.Model):
 
 
 class UserSettings(models.Model):
-	user = models.OneToOneField(User, related_name='settings', primary_key=True)
-	text_color = models.CharField(max_length=7)
-	self_text_color = models.CharField(max_length=7)
-	others_text_color = models.CharField(max_length=7)
-	private_text_color = models.CharField(max_length=7)
+	user = models.OneToOneField(User, related_name='user_id', primary_key=True)
+	text_color = models.CharField(max_length=7, null=True)
+	self_text_color = models.CharField(max_length=7, null=True)
+	others_text_color = models.CharField(max_length=7, null=True)
+	private_text_color = models.CharField(max_length=7, null=True)
