@@ -24,3 +24,5 @@ To run this you need:
 
 #TODO  
 user profile, no selectable navbar add chat rooms, implement smiles, Add all users to right panel in the current room.
+ set username and colors response.set_cookie('color', red) request.session['color'] = red. Add languages for menu. Todo Add id to form
+ 

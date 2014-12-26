@@ -1,39 +1,11 @@
 {% extends "story/base.html" %} {% block head %} {% load static %}
 {% endblock head %} {% block content %}
 	<h1 align="center">{{ errorcode }}</h1>
-	<form class="profile-form">
-		<div class="register-border-div">
-			<table class="register-table">
-				<tr>
-					<td><input type="text" placeholder="text" name="username" value="" id="username"
-								  onchange="validateUser()"/></td>
-					<td><label id="username_check">Your login is unique from all users</label></td>
-				</tr>
-				<tr>
-					<td><input type="password" name="password" value=""
-								  id="password" placeholder="Password" onchange="validatePassword(); passwordsMatch();"/></td>
-					<td><label id="password_check">At least 6 characters</label></td>
-				</tr>
-				<tr>
-					<td><input type="password" placeholder="Repeat password" name="repeatpassword" value=""
-								  id="repeatpassword" onchange="passwordsMatch();"/></td>
-					<td><label id="repeatpassword_check">You should repeat you password in order to register</label></td>
-				</tr>
-				<tr>
-					<td><input type="email" placeholder="Email" name="email" value="" id="email"
-								  onchange="validateEmail();"/></td>
-					<td><label id="email_check">Enter a valid email, you will proceed with activation link</label></td>
-				</tr>
-				<tr>
-					<td><input type="checkbox" name="mailbox" id="mailbox"></td>
-					<td><label for="email">send email</label></td>
-				</tr>
-				<tr>
-					<td colspan="2" class="register-button-tr">
-						<input type="button" class="register-button" onclick="register();" value="Sing Up"/>
-					</td>
-				</tr>
-			</table>
-		</div>
+	<form class="profile-form" action="{% url 'story.views.profile' %}" method="post">
+		<ul>
+			{{  form.as_ul }}
+		</ul>
+		<input type="submit" name="submit" value="Save">
+	 {% csrf_token %}
 	</form>
 {% endblock %}

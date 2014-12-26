@@ -11,6 +11,8 @@ from .models import Messages
 from django.http import Http404
 from drealtime import iShoutClient
 from story import registration_utils
+from story.forms import UserSettingsForm
+from django.http import HttpResponseRedirect
 import json
 
 
@@ -39,13 +41,13 @@ def repr_dict(d):
 
 def get_messages(request):
 	if request.user.is_authenticated() and request.method == 'POST':
-		headerId = request.POST.get('headerId', -1)
-		count = int (request.POST.get('count', 10))
+		header_id = request.POST.get('header_id', -1)
+		count = int(request.POST.get('count', 10))
 		# TODO SECURITY BREACH with count -> infinity
-		if headerId == -1:
+		if header_id == -1:
 			messages = Messages.objects.all().order_by('pk').reverse()[:count]
 		else:
-			messages = Messages.objects.filter(id__lt=headerId).order_by('pk').reverse()[:count]
+			messages = Messages.objects.filter(id__lt=header_id).order_by('pk').reverse()[:count]
 		passed_messages = []
 		for singleMess in reversed(messages):
 			messages = {
@@ -131,6 +133,7 @@ def confirm_email(request):
 			raise Http404
 	else:
 		message = "invalid request"
+	# TODO csrf?
 	return render_to_response('story/confirm_mail.html', {'message': message})
 
 
@@ -158,9 +161,18 @@ def register(request):
 
 def profile(request):
 	if request.method == 'GET':
+		form = UserSettingsForm()
 		c = {}
+		my_crsf = csrf(request)
+		c['form'] = form
+		c.update(my_crsf)
 		create_nav_page(request, c)
 		return render_to_response("story/profile.html", c)
-	elif request.method == 'GET':
-		pass
+	else:
+		form = UserSettingsForm(request.POST)
+		if form.is_valid():
+			form.id = request.user.id
+			form.save()
+		return HttpResponseRedirect('/')
+
 

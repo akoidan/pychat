@@ -1,7 +1,9 @@
 from django import forms
-from django.contrib.auth.models import User
+from story.models import UserSettings
 
 
-class UserForm(forms.ModelForm):
+class UserSettingsForm(forms.ModelForm):
+
 	class Meta:
-		model = User
+		model = UserSettings
+		fields = ('text_color', 'self_text_color', 'others_text_color')
