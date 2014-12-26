@@ -1,4 +1,3 @@
-{% extends "story/chat.html" %} {% block navbar %}
 	{% load staticfiles %}
 	<input type='hidden' id='username' value='{{ username }}'></input>
 	<li>
@@ -10,4 +9,3 @@
 				class="glyphicon glyphicon-off red"></span></a>
 	</li>
 	<script src="{% static "js/loadMessages.js" %}"></script>
-{% endblock navbar %}

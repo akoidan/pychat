@@ -63,7 +63,7 @@ def get_messages(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
-#TODO сombine duplicate of code with message somehow... response = json.dumps(passed_messages)
+# TODO сombine duplicate of code with message somehow... response = json.dumps(passed_messages)
 def home(request):
 	c = {}
 	c.update(csrf(request))
@@ -87,12 +87,18 @@ def home(request):
 			message = 'message delivered'
 			return HttpResponse(message, content_type='text/plain')
 		else:
-			page = 'story/logout.html'
 			response = {'username': request.user.username}
 			c.update(response)
+	create_nav_page(request, c)
+	return render_to_response('story/chat.html', c)
+
+
+def create_nav_page(request, c):
+	if request.user.is_authenticated():
+		page = 'story/logout.html'
 	else:
 		page = 'story/login.html'
-	return render_to_response(page, c)
+	c.update({'navbar_page': page})
 
 
 def logout(request):
@@ -127,7 +133,7 @@ def confirm_email(request):
 			raise Http404
 	else:
 		message = "invalid request"
-	return render_to_response("story/confirm_mail.html", {'message': message})
+	return render_to_response('story/confirm_mail.html', {'message': message})
 
 
 def register(request):
@@ -148,4 +154,5 @@ def register(request):
 		mycrsf = csrf(request)
 		c.update(mycrsf)
 		c.update({'error code': "welcome to register page"})
+		create_nav_page(request, c)
 		return render_to_response("story/register.html", c)

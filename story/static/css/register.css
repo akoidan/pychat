@@ -41,7 +41,7 @@
 	vertical-align: middle;
 }
 
-input[type=text], input[type=password], input[type=email] {
+.register-table > tbody > tr > td > input:not([type=button]) {
 	padding: 8px 10px;
 	margin: 5px 10px;
 	border-radius: 5px;
