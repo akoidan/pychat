@@ -63,6 +63,7 @@ def get_messages(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
+#TODO сombine duplicate of code with message somehow... response = json.dumps(passed_messages)
 def home(request):
 	c = {}
 	c.update(csrf(request))
