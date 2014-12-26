@@ -1,6 +1,6 @@
 function login() {
 	var username = document.getElementById("lusername").value;
-	var password = document.getElementById("password").value;
+	var password = document.getElementById("lpassword").value;
 	$.ajax({
 		url: 'auth',
 		type: 'POST',

@@ -27,4 +27,10 @@ class Messages(models.Model):
 	content = models.CharField(max_length=255)
 	id = models.AutoField(primary_key=True)
 
-	# Create your models here.
+
+class UserSettings(models.Model):
+	user = models.OneToOneField(User, related_name='settings', primary_key=True)
+	text_color = models.CharField(max_length=7)
+	self_text_color = models.CharField(max_length=7)
+	others_text_color = models.CharField(max_length=7)
+	private_text_color = models.CharField(max_length=7)

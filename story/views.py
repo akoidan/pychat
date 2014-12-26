@@ -86,9 +86,6 @@ def home(request):
 			)
 			message = 'message delivered'
 			return HttpResponse(message, content_type='text/plain')
-		else:
-			response = {'username': request.user.username}
-			c.update(response)
 	create_nav_page(request, c)
 	return render_to_response('story/chat.html', c)
 
@@ -96,6 +93,7 @@ def home(request):
 def create_nav_page(request, c):
 	if request.user.is_authenticated():
 		page = 'story/logout.html'
+		c.update({'username': request.user.username})
 	else:
 		page = 'story/login.html'
 	c.update({'navbar_page': page})
@@ -156,3 +154,13 @@ def register(request):
 		c.update({'error code': "welcome to register page"})
 		create_nav_page(request, c)
 		return render_to_response("story/register.html", c)
+
+
+def profile(request):
+	if request.method == 'GET':
+		c = {}
+		create_nav_page(request, c)
+		return render_to_response("story/profile.html", c)
+	elif request.method == 'GET':
+		pass
+

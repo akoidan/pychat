@@ -1,7 +1,7 @@
 	{% load staticfiles %}
 	<input type='hidden' id='username' value='{{ username }}'></input>
 	<li>
-		<a>	<span class="glyphicon glyphicon-user green"></span></a>
+		<a href="{% url 'story.views.profile' %}"><span class="glyphicon glyphicon-user green"></span></a>
 		<b>{{ username }}</b>
 	</li>
 	<li>
