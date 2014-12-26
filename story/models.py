@@ -25,5 +25,6 @@ class Messages(models.Model):
 	userid = models.ForeignKey(User)
 	time = models.TimeField(default=datetime.datetime.now())
 	content = models.CharField(max_length=255)
+	id = models.AutoField(primary_key=True)
 
 	# Create your models here.

@@ -5,14 +5,28 @@ ishout.on('notifications', appendMessage);
 // WebSocket connection.
 ishout.init();
 
-function printMessage(data, div) {
-	messageHeader = '(' + data.hour + ':' + data.minute + ') <b>' + data.user + '</b> : ';
+var headerId;
+
+function printMessage(data, div, isTopDirection) {
+	messageHeader = '(' + data.hour + ':' + data.minute + ':' + data.second +') <b>' + data.user + '</b> : ';
 	if (data.user == username.value) {
 		message = '<p> <font color="blue">' + messageHeader + '</font>' + he.encode(data.content) + "</p>";
 	} else {
 		message = '<p> <font color="brown">' + messageHeader + '</font>' + he.encode(data.content) + "</p>";
 	}
-	div.append(message);
+	if (isTopDirection) {
+		div.prepend(message);
+	} else {
+		var oldscrollHeight = div[0].scrollHeight;
+		div.append(message);
+		var newscrollHeight = div[0].scrollHeight;
+		if (newscrollHeight > oldscrollHeight) {
+			div.animate({
+				scrollTop: newscrollHeight
+			}, 'normal'); // Autoscroll to bottom of div
+		}
+
+	}
 }
 
 function appendMessage(data) {
@@ -20,14 +34,7 @@ function appendMessage(data) {
 	var chatIncoming = document.getElementById("chatIncoming");
 	var chatOutgoing = document.getElementById("chatOutgoing");
 	div = $("#chatbox");
-	var oldscrollHeight = div[0].scrollHeight;
-	printMessage(data, div);
-	var newscrollHeight = div[0].scrollHeight;
-	if (newscrollHeight > oldscrollHeight) {
-		div.animate({
-			scrollTop: newscrollHeight
-		}, 'normal'); // Autoscroll to bottom of div
-	}
+	printMessage(data, div, false);
 	if (sound) {
 		if (loggedUser === data.user) {
 			chatOutgoing.currentTime = 0;
@@ -68,7 +75,6 @@ $(document).ready(function () {
 $(function () {
 	var div = $('#chatbox');
 	div.bind('mousewheel DOMMouseScroll', function (event, delta) {
-
 		if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) { // Scroll top
 			loadUpHistory(5);
 		//} else { // Scroll bottom
@@ -92,7 +98,7 @@ $(function () {
 function loadUpHistory(elements) {
 	var div = $('#chatbox');
 	if (div.scrollTop() == 0) {
-		console.log("Reached the top!");
+		loadMessages(elements, true);
 	}
 }
 

@@ -56,6 +56,7 @@ STATICFILES_DIRS = (
 )
 
 HOST_IP = socket.gethostbyname(socket.gethostname())
+#HOST_IP = '193.105.201.235'
 
 SERVER_PORT = '8000'
 

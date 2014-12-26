@@ -39,14 +39,22 @@ def repr_dict(d):
 
 def get_messages(request):
 	if request.user.is_authenticated() and request.method == 'POST':
-		messages = Messages.objects.all().order_by('pk').reverse()[:20]
+		headerId = request.POST.get('headerId', -1)
+		count = int (request.POST.get('count', 10))
+		# TODO SECURITY BREACH with count -> infinity
+		if headerId == -1:
+			messages = Messages.objects.all().order_by('pk').reverse()[:count]
+		else:
+			messages = Messages.objects.filter(id__lt=headerId).order_by('pk').reverse()[:count]
 		passed_messages = []
 		for singleMess in reversed(messages):
 			messages = {
 				'hour': singleMess.time.hour,
 				'minute': singleMess.time.minute,
+				'second': singleMess.time.second,
 				'content': singleMess.content,
-				'user': User.objects.get_by_natural_key(singleMess.userid).username
+				'user': User.objects.get_by_natural_key(singleMess.userid).username,
+				'id': singleMess.id
 			}
 			passed_messages.append(repr_dict(messages))
 		response = json.dumps(passed_messages)
@@ -70,7 +78,9 @@ def home(request):
 					'user': request.user.username,
 					'content': message.content,
 					'hour': message.time.hour,
-					'minute': message.time.minute
+					'minute': message.time.minute,
+					'second': message.time.second,
+					'id': message.id
 				}
 			)
 			message = 'message delivered'
