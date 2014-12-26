@@ -23,4 +23,4 @@ To run this you need:
  3. `python manage.py runserver 0.0.0.0:80000`
 
 #TODO  
-user profile, no selectable navbar add chat rooms, implement smiles, Add all users to right panel in the current room. Fix wrong type on messages.
+user profile, no selectable navbar add chat rooms, implement smiles, Add all users to right panel in the current room.

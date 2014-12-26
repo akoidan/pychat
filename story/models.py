@@ -23,7 +23,7 @@ post_save.connect(create_user_profile, sender=User)
 
 class Messages(models.Model):
 	userid = models.ForeignKey(User)
-	time = models.TimeField(default=datetime.datetime.now())
+	time = models.TimeField(default=datetime.datetime.now)
 	content = models.CharField(max_length=255)
 	id = models.AutoField(primary_key=True)
 
