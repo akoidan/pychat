@@ -3,4 +3,4 @@ from .models import *
 
 admin.site.register(UserProfile)
 admin.site.register(Messages)
-# Register your models here.
+admin.site.register(UserSettings)

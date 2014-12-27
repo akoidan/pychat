@@ -1,0 +1,8 @@
+<data>
+	<colors>
+		<item text_color="black"></item>
+		<item self_text_color="blue"></item>
+		<item others_text_color="brown"></item>
+		<item private_text_color="green"></item>
+	</colors>
+</data>

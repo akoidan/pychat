@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.contrib.auth import authenticate
@@ -6,6 +7,7 @@ from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
+from story.apps import DefaultSettingsConfig
 from story.models import UserProfile, UserSettings
 from .models import Messages
 from django.http import Http404
@@ -163,7 +165,12 @@ def profile(request):
 	user = request.user
 	if user.is_authenticated():
 		if request.method == 'GET':
-			user_settings = UserSettings.objects.get(pk=user.id)
+			try:
+				user_settings = UserSettings.objects.get(pk=user.id)
+			except ObjectDoesNotExist:
+				# TODO load default colors from xml
+				DefaultSettingsConfig.name
+				pass
 			form = UserSettingsForm(instance=user_settings)
 			c = {}
 			c['form'] = form
@@ -177,5 +184,7 @@ def profile(request):
 				form.id = request.user.id
 				form.save()
 			return HttpResponseRedirect('/')
+	else:
+		raise PermissionDenied
 
 
