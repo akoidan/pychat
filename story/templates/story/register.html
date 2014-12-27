@@ -8,17 +8,17 @@
 		<div class="register-border-div">
 			<table class="register-table">
 				<tr>
-					<td><input type="text" placeholder="Username" name="username" value="" id="username"
+					<td>*<input type="text" placeholder="Username" name="username" value="" id="username"
 								  onchange="validateUser()"/></td>
 					<td><label id="username_check">Your login is unique from all users</label></td>
 				</tr>
 				<tr>
-					<td><input type="password" name="password" value=""
+					<td>*<input type="password" name="password" value=""
 								  id="password" placeholder="Password" onchange="validatePassword(); passwordsMatch();"/></td>
 					<td><label id="password_check">At least 6 characters</label></td>
 				</tr>
 				<tr>
-					<td><input type="password" placeholder="Repeat password" name="repeatpassword" value=""
+					<td>*<input type="password" placeholder="Repeat password" name="repeatpassword" value=""
 								  id="repeatpassword" onchange="passwordsMatch();"/></td>
 					<td><label id="repeatpassword_check">You should repeat you password in order to register</label></td>
 				</tr>

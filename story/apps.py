@@ -1,14 +1,18 @@
-__author__ = 'andrew'
+
 from django.apps import AppConfig
-from xml.dom import minidom
 from Chat.settings import BASE_DIR
+import xml.etree.ElementTree as etree
+__author__ = 'andrew'
+
 
 class DefaultSettingsConfig(AppConfig):
 	name = 'story'
-	verbose_name = "djangochat"
+	verbose_name = 'djangochat'
+
+	colors = {}
 
 	def ready(self):
-		xmldoc = minidom.parse(BASE_DIR + '/story/DefaultScheme.xml')
-		itemlist = xmldoc.getElementsByTagName('colors')
-		# print (itemlist[0].attributes['self_text_color'].value)
-
+		tree = etree.parse(BASE_DIR + '/Chat/DefaultScheme.xml')
+		root = tree.getroot().find('colors')
+		for child in root:
+			self.colors[child.tag] =child.text

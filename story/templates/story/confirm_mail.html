@@ -1,40 +1,26 @@
 {% extends "story/base.html" %}
 {% block head %}
 	{% load staticfiles %}
+	<link href="{% static 'css/confirm-email.css' %}" rel="stylesheet">
 	<script type="text/javascript">
 		var a = "{{message}}"
-		if (a == 'verification code accepted') {
+		if (a == 'verification code is accepted') {
+			alert(a);
 			redirectTime = "3000";
 			redirectURL = "/";
 			setTimeout("location.href = redirectURL;", redirectTime);
 		}
 	</script>
-	<link rel="stylesheet" type="text/css" href="{% static 'css/confirm-email.css' %}"/>
 {% endblock head %}
 
 {% block content %}
-	<h1>
-		{{ message }}
-	</h1>
-	{% if message == 'verification code accepted' %}
-
-		<div id="floatingCirclesG">
-			<div class="f_circleG" id="frotateG_01">
-			</div>
-			<div class="f_circleG" id="frotateG_02">
-			</div>
-			<div class="f_circleG" id="frotateG_03">
-			</div>
-			<div class="f_circleG" id="frotateG_04">
-			</div>
-			<div class="f_circleG" id="frotateG_05">
-			</div>
-			<div class="f_circleG" id="frotateG_06">
-			</div>
-			<div class="f_circleG" id="frotateG_07">
-			</div>
-			<div class="f_circleG" id="frotateG_08">
-			</div>
-		</div> <h2> redirecting to home page </h2>
+	{% if message == "verification code is accepted" %}
+		<div class="message">
+			You're redirected to the main page now!
+		</div>
+	{% else %}
+		<div class="message">
+			{{ message }}
+		</div>
 	{% endif %}
 {% endblock %}

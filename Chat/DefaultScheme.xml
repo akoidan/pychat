@@ -1,0 +1,8 @@
+<data>
+	<colors>
+		<text_color>black</text_color>
+		<self_text_color>blue</self_text_color>
+		<others_text_color>brown</others_text_color>
+		<private_text_color>green</private_text_color>
+	</colors>
+</data>

@@ -25,7 +25,7 @@ wget http://code.jquery.com/jquery-2.1.3.min.js -O $PROJECT_ROOT/story/static/js
 
 # CSS
 wget https://raw.githubusercontent.com/marcoceppi/bootstrap-glyphicons/master/css/bootstrap.icon-large.css -O $PROJECT_ROOT/story/static/css/bootstrap-glyphicons.css
-wget https://raw.githubusercontent.com/mzyy94/HONDA-3D-WebGL-demo/master/stylesheets/cssload.css -O $PROJECT_ROOT/story/static/css/confirm-email.css
+#wget https://raw.githubusercontent.com/mzyy94/HONDA-3D-WebGL-demo/master/stylesheets/cssload.css -O $PROJECT_ROOT/story/static/css/confirm-email.css
 
 # Sounds
 mkdir $PROJECT_ROOT/story/static/sounds

@@ -74,7 +74,7 @@ $(document).ready(function () {
 
 $(function () {
 	var div = $('#chatbox');
-	div.bind('mousewheel DOMMouseScroll', function (event, delta) {
+	div.bind('mousewheel DOMMouseScroll', function (event) {
 		if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) { // Scroll top
 			loadUpHistory(5);
 		//} else { // Scroll bottom
@@ -82,17 +82,16 @@ $(function () {
 		}
 	});
 
-	 $(document).keydown(function(e) {
-        if(e.which == 33 ) {    // page up
-			  loadUpHistory(15);
-		  } else if (e.which == 38) { // up
-			   loadUpHistory(3);
-		  } else if (e.ctrlKey && e.which == 36) {
+	$(document).keydown(function (e) {
+		if (e.which == 33) {    // page up
+			loadUpHistory(15);
+		} else if (e.which == 38) { // up
+			loadUpHistory(3);
+		} else if (e.ctrlKey && e.which == 36) {
 			loadUpHistory(25);
-		  }
-    });
+		}
+	});
 });
-
 
 
 function loadUpHistory(elements) {
@@ -113,7 +112,6 @@ function loadUpHistory(elements) {
 
 function loadMessages(count, isTop) {
 	var d = new Date();
-	var t = d.getTime();
 	console.log(d + ': Requesting ' + count + ' messages from server');
 	$.ajax({
 		// TODO why beforesend is not called by other setup
@@ -147,7 +145,7 @@ function loadMessages(count, isTop) {
 				$("#chatbox").scrollTop($('#chatbox')[0].scrollHeight);
 			}
 		},
-		failure: function (data) {
+		failure: function () {
 			alert('Got an error dude');
 		}
 	});

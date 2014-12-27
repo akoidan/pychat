@@ -43,7 +43,7 @@ def repr_dict(d):
 
 def get_messages(request):
 	if request.user.is_authenticated() and request.method == 'POST':
-		header_id = request.POST.get('header_id', -1)
+		header_id = request.POST.get('headerId', -1)
 		count = int(request.POST.get('count', 10))
 		# TODO SECURITY BREACH with count -> infinity
 		if header_id == -1:
@@ -135,8 +135,9 @@ def confirm_email(request):
 			raise Http404
 	else:
 		message = "invalid request"
-	# TODO csrf?
-	return render_to_response('story/confirm_mail.html', {'message': message})
+	response = {'message': message}
+	create_nav_page(request, response)
+	return render_to_response('story/confirm_mail.html', response)
 
 
 def register(request):
@@ -167,11 +168,9 @@ def profile(request):
 		if request.method == 'GET':
 			try:
 				user_settings = UserSettings.objects.get(pk=user.id)
+				form = UserSettingsForm(instance=user_settings)
 			except ObjectDoesNotExist:
-				# TODO load default colors from xml
-				DefaultSettingsConfig.name
-				pass
-			form = UserSettingsForm(instance=user_settings)
+				form = UserSettingsForm(DefaultSettingsConfig.colors)
 			c = {}
 			c['form'] = form
 			my_crsf = csrf(request)

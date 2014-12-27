@@ -42,7 +42,7 @@ def register_user(username, password, email, verify_email):
 	user = None
 	if password is None or password == '':
 		message = "Password can't be empty"
-	if message is False:
+	if message is False and verify_email:
 		message = validate_email(email)
 	if message is False:
 		message = validate_user(username)

@@ -1,0 +1,10 @@
+.message {
+
+	text-align: center;
+	font-size: 30px;
+	font-family: monospace
+	display: table;
+	width: 100%;
+	vertical-align:middle;
+	margin-top: 15%;
+}
