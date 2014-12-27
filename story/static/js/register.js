@@ -7,12 +7,16 @@ function register() {
 		return;
 	}
 
+	var d = new Date();
 	var datad = $('form').serialize();
+	console.log(d + "Sending registering request to server, data:" + datad);
 	$.ajax({
 		type: 'POST',
 		url: document.URL,
 		data: datad,
 		success: function (data) {
+			var datad = $('form').serialize();
+			console.log(d + "Register server response:" + data);
 			if (data == 'Account created') {
 				window.location.href = '/';
 			} else {
@@ -20,7 +24,8 @@ function register() {
 			}
 		},
 		failure: function (data) {
-			alert('Got an error dude');
+			var d = new Date();
+			console.log(d + "Register server has failed, response: " + data);
 		}
 	});
 }
@@ -41,6 +46,8 @@ function validatePassword() {
 
 function validateUser() {
 	var username = document.getElementById("username").value;
+	var d = new Date();
+	console.log(d + "Sending validate user request: " + username);
 	$.ajax({
 		type: 'POST',
 		url: "/validate_user",
@@ -48,6 +55,7 @@ function validateUser() {
 			username: username
 		},
 		success: function (data) {
+			console.log(d + "Validate user response: " + data);
 			if (data == 'False') {
 				document.getElementById("username_check").style.color = "Green";
 				document.getElementById("username_check").innerHTML = "Username is fine";
@@ -59,13 +67,16 @@ function validateUser() {
 			}
 		},
 		failure: function (data) {
-			alert('Got an error dude');
+			var d = new Date();
+			console.log(d + "can't validate user, response: " + data);
 		}
 	});
 }
 
 function validateEmail() {
 	var email = document.getElementById("email").value;
+	var d = new Date();
+	console.log(d + "Sending validate email request: " + email);
 	$.ajax({
 		type: 'POST',
 		url: "/validate_email",
@@ -73,6 +84,7 @@ function validateEmail() {
 			email: email
 		},
 		success: function (data) {
+			console.log(d + "Validate email response: " + data);
 			if (data == 'False') {
 				document.getElementById("email_check").style.color = "Green";
 				document.getElementById("email_check").innerHTML = "Email is fine";
@@ -84,7 +96,8 @@ function validateEmail() {
 			}
 		},
 		failure: function (data) {
-			alert('Got an error dude');
+			var d = new Date();
+			console.log(d + "can't validate email, response: " + data);
 		}
 	});
 }

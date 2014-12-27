@@ -14,6 +14,7 @@ from django.http import Http404
 from drealtime import iShoutClient
 from story import registration_utils
 from story.forms import UserSettingsForm
+from django.forms.models import model_to_dict
 from django.http import HttpResponseRedirect
 import json
 
@@ -69,29 +70,29 @@ def get_messages(request):
 
 # TODO сombine duplicate of code with message somehow... response = json.dumps(passed_messages)
 def home(request):
-	c = {}
-	c.update(csrf(request))
-	if request.user.is_authenticated():
-		if request.method == 'POST':
-			content = request.POST.get('message', '')
-			message = Messages(userid=request.user, content=content)
-			message.save()
-			ishout_client = iShoutClient()
-			ishout_client.broadcast(
-				channel='notifications',
-				data={
-					'user': request.user.username,
-					'content': message.content,
-					'hour': message.time.hour,
-					'minute': message.time.minute,
-					'second': message.time.second,
-					'id': message.id
-				}
-			)
-			message = 'message delivered'
-			return HttpResponse(message, content_type='text/plain')
-	create_nav_page(request, c)
-	return render_to_response('story/chat.html', c)
+	if request.user.is_authenticated() and request.method == 'POST':
+		content = request.POST.get('message', '')
+		message = Messages(userid=request.user, content=content)
+		message.save()
+		ishout_client = iShoutClient()
+		ishout_client.broadcast(
+			channel='notifications',
+			data={
+				'user': request.user.username,
+				'content': message.content,
+				'hour': message.time.hour,
+				'minute': message.time.minute,
+				'second': message.time.second,
+				'id': message.id
+			}
+		)
+		message = 'message delivered'
+		return HttpResponse(message, content_type='text/plain')
+	else:
+		c = get_user_settings(request.user)
+		c.update(csrf(request))
+		create_nav_page(request, c)
+		return render_to_response('story/chat.html', c)
 
 
 def create_nav_page(request, c):
@@ -154,12 +155,19 @@ def register(request):
 			registration_result['message'] = 'Account created'
 		return HttpResponse(registration_result['message'], content_type='text/plain')
 	else:
-		c = {}
-		mycrsf = csrf(request)
-		c.update(mycrsf)
+		c = csrf(request)
 		c.update({'error code': "welcome to register page"})
 		create_nav_page(request, c)
 		return render_to_response("story/register.html", c)
+
+
+def get_user_settings(user):
+	if user.is_authenticated():
+		try:
+			return model_to_dict(UserSettings.objects.get(pk=user.id))
+		except ObjectDoesNotExist:
+			pass
+	return DefaultSettingsConfig.colors
 
 
 def profile(request):
@@ -171,17 +179,14 @@ def profile(request):
 				form = UserSettingsForm(instance=user_settings)
 			except ObjectDoesNotExist:
 				form = UserSettingsForm(DefaultSettingsConfig.colors)
-			c = {}
+			c = csrf(request)
 			c['form'] = form
-			my_crsf = csrf(request)
-			c.update(my_crsf)
 			create_nav_page(request, c)
 			return render_to_response("story/profile.html", c)
 		else:
 			form = UserSettingsForm(request.POST)
-			if form.is_valid():
-				form.id = request.user.id
-				form.save()
+			form.instance.pk = request.user.id
+			form.save()
 			return HttpResponseRedirect('/')
 	else:
 		raise PermissionDenied

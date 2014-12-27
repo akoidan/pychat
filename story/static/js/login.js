@@ -1,14 +1,17 @@
 function login() {
-	var username = document.getElementById("lusername").value;
-	var password = document.getElementById("lpassword").value;
+	var d = new Date();
+	var credentials = {
+			username: document.getElementById("lusername").value,
+			password: document.getElementById("lpassword").value
+	}
+	console.log(d + "Attempting to login, credentials: " + credentials);
 	$.ajax({
 		url: 'auth',
 		type: 'POST',
-		data: {
-			username: username,
-			password: password
-		},
+		data: credentials,
 		success: function (data) {
+			var d = new Date();
+			console.log(d + "Server response success:" + data);
 			if (data == 'update') {
 				window.location.href = '/';
 			} else {
@@ -16,7 +19,8 @@ function login() {
 			}
 		},
 		failure: function (data) {
-			alert('Got an error dude');
+			var d = new Date();
+			console.log(d + "can't login into system, response: " + data);
 		}
 	});
 

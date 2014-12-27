@@ -7,13 +7,23 @@ loadMessages(5, false);
 
 var headerId;
 
+var selfHeader = '<font class="message_header_self">';
+var privateHeader = '<font class="message_header_private">';
+var othersHeader = '<font class="message_header_others">';
+var endHeader = '</font>';
+var contentStyle = '<font class="message_text_style"/>';
+
 function printMessage(data, div, isTopDirection) {
-	messageHeader = '(' + data.hour + ':' + data.minute + ':' + data.second +') <b>' + data.user + '</b> : ';
+	var headerStyle;
 	if (data.user == username.value) {
-		message = '<p> <font color="blue">' + messageHeader + '</font>' + he.encode(data.content) + "</p>";
+		headerStyle = selfHeader;
 	} else {
-		message = '<p> <font color="brown">' + messageHeader + '</font>' + he.encode(data.content) + "</p>";
+		headerStyle = othersHeader;
 	}
+	messageHeader = headerStyle + ' (' + data.hour + ':' + data.minute + ':' + data.second +
+	') <b>' + data.user + '</b> :' + endHeader;
+	messageContent = contentStyle + he.encode(data.content) + endHeader;
+	message = '<p>' + messageHeader + messageContent + "</p>";
 	if (isTopDirection) {
 		div.prepend(message);
 	} else {
@@ -59,7 +69,8 @@ function sendMessage(usermsg) {
 			$("#usermsg").val("");
 		},
 		failure: function (data) {
-			alert('Got an error dude');
+			var d = new Date();
+			console.log(d + "can't send message, response: " + data);
 		}
 	});
 }
@@ -145,8 +156,9 @@ function loadMessages(count, isTop) {
 				$("#chatbox").scrollTop($('#chatbox')[0].scrollHeight);
 			}
 		},
-		failure: function () {
-			alert('Got an error dude');
+		failure: function (data) {
+			var d = new Date();
+			console.log(d+'can not load messages, response:', data);
 		}
 	});
 }
