@@ -47,3 +47,4 @@ class UserSettings(models.Model):
 	self_text_color = models.CharField(max_length=7, null=True)
 	others_text_color = models.CharField(max_length=7, null=True)
 	private_text_color = models.CharField(max_length=7, null=True)
+	background_color = models.CharField(max_length=7, null=True)

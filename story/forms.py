@@ -12,4 +12,5 @@ class UserSettingsForm(forms.ModelForm):
 			'private_text_color': forms.TextInput(attrs={'class': 'color'}),
 			'others_text_color': forms.TextInput(attrs={'class': 'color'}),
 			'self_text_color': forms.TextInput(attrs={'class': 'color'}),
+			'background_color': forms.TextInput(attrs={'class': 'color'}),
 		}
