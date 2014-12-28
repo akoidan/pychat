@@ -11,7 +11,7 @@ var selfHeader = '<font class="message_header_self">';
 var privateHeader = '<font class="message_header_private">';
 var othersHeader = '<font class="message_header_others">';
 var endHeader = '</font>';
-var contentStyle = '<font class="message_text_style"/>';
+var contentStyle = '<font class="message_text_style">';
 
 function printMessage(data, div, isTopDirection) {
 	var headerStyle;
@@ -140,14 +140,14 @@ function loadMessages(count, isTop) {
 			console.log(d + ': Fetched ' + result.length + ' messages from server');
 			firstMessage = result[0];
 			if (firstMessage != null) {
-				headerId = eval('(' + firstMessage + ')').id;
+				headerId = eval(firstMessage).id;
 			}
 			if (!isTop) {
 				// appending to top last message first, so it goes down with every iteraction
 				result = result.reverse();
 			}
 			result.forEach(function (message) {
-				realMessage = eval('(' + message + ')');
+				realMessage = eval(message );
 				printMessage(realMessage, $("#chatbox"), isTop);
 			});
 
