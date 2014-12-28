@@ -13,6 +13,11 @@ var othersHeader = '<font class="message_header_others">';
 var endHeader = '</font>';
 var contentStyle = '<font class="message_text_style">';
 
+
+function encodeHTML( html ) {
+    return document.createElement( 'div' ).appendChild( document.createTextNode( html ) ).parentNode.innerHTML;
+}
+
 function printMessage(data, div, isTopDirection) {
 	var headerStyle;
 	if (data.user == username.value) {
@@ -22,7 +27,7 @@ function printMessage(data, div, isTopDirection) {
 	}
 	messageHeader = headerStyle + ' (' + data.hour + ':' + data.minute + ':' + data.second +
 	') <b>' + data.user + '</b>: ' + endHeader;
-	messageContent = contentStyle + he.encode(data.content) + endHeader;
+	messageContent = contentStyle + encodeHTML(data.content) + endHeader;
 	message = '<p>' + messageHeader + messageContent + "</p>";
 	if (isTopDirection) {
 		div.prepend(message);
