@@ -23,9 +23,22 @@ post_save.connect(create_user_profile, sender=User)
 
 class Messages(models.Model):
 	userid = models.ForeignKey(User)
+	#DateField.auto_now¶
 	time = models.TimeField(default=datetime.datetime.now)
 	content = models.CharField(max_length=255)
 	id = models.AutoField(primary_key=True)
+
+	# def __repr__(self):
+	# 	return repr(
+	# 		dict(
+	# 			user=User.objects.get_by_natural_key(self.userid).username,
+	# 			content=self.content,
+	# 			hour=self.time.hour,
+	# 			minute=self.time.minute,
+	# 			second=self.time.second,
+	# 			id=self.id,
+	# 		)
+	# 	)
 
 
 class UserSettings(models.Model):

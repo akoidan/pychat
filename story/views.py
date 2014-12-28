@@ -16,6 +16,7 @@ from story import registration_utils
 from story.forms import UserSettingsForm
 from django.forms.models import model_to_dict
 from django.http import HttpResponseRedirect
+from django.core import serializers
 import json
 
 
@@ -40,6 +41,20 @@ def shout(request):
 
 def repr_dict(d):
 	return '{%s}' % ', '.join("'%s': '%s'" % pair for pair in d.items())
+
+
+# def get_messages(request):
+# 	if request.user.is_authenticated() and request.method == 'POST':
+# 		header_id = request.POST.get('headerId', -1)
+# 		count = int(request.POST.get('count', 10))
+# 		if header_id == -1:
+# 			messages = Messages.objects.all().order_by('-pk')[:1]
+# 		else:
+# 			messages = Messages.objects.filter(id__lt=header_id).order_by('-pk')[:count]
+# 		response = serializers.serialize("json", messages)
+# 	else:
+# 		response = "can't get messages for noauthorized user"
+# 	return HttpResponse(response, content_type='text/plain')
 
 
 def get_messages(request):
@@ -80,7 +95,7 @@ def home(request):
 		ishout_client = iShoutClient()
 		ishout_client.broadcast(
 			channel='notifications',
-			data = get_message(message)
+			data=get_message(message)
 		)
 		message = 'message delivered'
 		return HttpResponse(message, content_type='text/plain')
@@ -186,5 +201,3 @@ def profile(request):
 			return HttpResponseRedirect('/')
 	else:
 		raise PermissionDenied
-
-

@@ -21,7 +21,7 @@ function printMessage(data, div, isTopDirection) {
 		headerStyle = othersHeader;
 	}
 	messageHeader = headerStyle + ' (' + data.hour + ':' + data.minute + ':' + data.second +
-	') <b>' + data.user + '</b> :' + endHeader;
+	') <b>' + data.user + '</b>: ' + endHeader;
 	messageContent = contentStyle + he.encode(data.content) + endHeader;
 	message = '<p>' + messageHeader + messageContent + "</p>";
 	if (isTopDirection) {

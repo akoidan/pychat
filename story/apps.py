@@ -15,4 +15,4 @@ class DefaultSettingsConfig(AppConfig):
 		tree = etree.parse(BASE_DIR + '/Chat/DefaultScheme.xml')
 		root = tree.getroot().find('colors')
 		for child in root:
-			self.colors[child.tag] =child.text
+			self.colors[child.tag] = child.text
