@@ -52,23 +52,25 @@ def get_messages(request):
 		else:
 			messages = Messages.objects.filter(id__lt=header_id).order_by('pk').reverse()[:count]
 		passed_messages = []
-		for singleMess in reversed(messages):
-			messages = {
-				'hour': singleMess.time.hour,
-				'minute': singleMess.time.minute,
-				'second': singleMess.time.second,
-				'content': singleMess.content,
-				'user': User.objects.get_by_natural_key(singleMess.userid).username,
-				'id': singleMess.id
-			}
-			passed_messages.append(repr_dict(messages))
+		for singleMess in messages:
+			passed_messages.append(repr_dict(get_message(singleMess)))
 		response = json.dumps(passed_messages)
 	else:
 		response = "can't get messages for noauthorized user"
 	return HttpResponse(response, content_type='text/plain')
 
 
-# TODO сombine duplicate of code with message somehow... response = json.dumps(passed_messages)
+def get_message(message):
+	return {
+		'user': User.objects.get_by_natural_key(message.userid).username,
+		'content': message.content,
+		'hour': message.time.hour,
+		'minute': message.time.minute,
+		'second': message.time.second,
+		'id': message.id
+	}
+
+
 def home(request):
 	if request.user.is_authenticated() and request.method == 'POST':
 		content = request.POST.get('message', '')
@@ -77,14 +79,7 @@ def home(request):
 		ishout_client = iShoutClient()
 		ishout_client.broadcast(
 			channel='notifications',
-			data={
-				'user': request.user.username,
-				'content': message.content,
-				'hour': message.time.hour,
-				'minute': message.time.minute,
-				'second': message.time.second,
-				'id': message.id
-			}
+			data = get_message(message)
 		)
 		message = 'message delivered'
 		return HttpResponse(message, content_type='text/plain')

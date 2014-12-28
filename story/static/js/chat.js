@@ -142,7 +142,7 @@ function loadMessages(count, isTop) {
 			if (firstMessage != null) {
 				headerId = eval('(' + firstMessage + ')').id;
 			}
-			if (isTop) {
+			if (!isTop) {
 				// appending to top last message first, so it goes down with every iteraction
 				result = result.reverse();
 			}
