@@ -19,9 +19,10 @@ wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-reg
 wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.woff -P $PROJECT_ROOT/story/static/fonts/
 
 # JavaScript
-wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/js/bootstrap.js -P $PROJECT_ROOT/story/static/js/
+#wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/js/bootstrap.js -P $PROJECT_ROOT/story/static/js/
 wget https://raw.githubusercontent.com/mathiasbynens/he/master/he.js -P $PROJECT_ROOT/story/static/js/
 wget http://code.jquery.com/jquery-2.1.3.min.js -O $PROJECT_ROOT/story/static/js/jquery.js
+wget http://jscolor.com/release/jscolor-1.4.4.zip -P /tmp && unzip /tmp/jscolor-1.4.4.zip  -d $PROJECT_ROOT/story/static/js/
 
 # CSS
 wget https://raw.githubusercontent.com/marcoceppi/bootstrap-glyphicons/master/css/bootstrap.icon-large.css -O $PROJECT_ROOT/story/static/css/bootstrap-glyphicons.css
@@ -36,7 +37,7 @@ folders[2]="$PROJECT_ROOT/story/static/fonts/glyphicons-halflings-regular.eot"
 folders[3]="$PROJECT_ROOT/story/static/fonts/glyphicons-halflings-regular.ttf"
 folders[4]="$PROJECT_ROOT/story/static/fonts/glyphicons-halflings-regular.woff"
 folders[5]="$PROJECT_ROOT/story/static/js/jquery.js"
-folders[6]="$PROJECT_ROOT/story/static/js/bootstrap.js"
+folders[6]="$PROJECT_ROOT/story/static/js/jscolor/jscolor.js"
 folders[7]="$PROJECT_ROOT/story/static/js/he.js"
 folders[8]="$PROJECT_ROOT/story/static/css/confirm-email.css"
 folders[9]="$PROJECT_ROOT/story/static/css/bootstrap-glyphicons.css"
