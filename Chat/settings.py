@@ -35,6 +35,10 @@ TEMPLATE_DIRS = (
 	join(BASE_DIR, 'templates'),
 )
 
+STATICFILES_DIRS = (
+	'story/static'
+)
+
 # Application definition
 
 INSTALLED_APPS = (
@@ -52,7 +56,7 @@ INSTALLED_APPS = (
 )
 
 HOST_IP = socket.gethostbyname(socket.gethostname())
-#HOST_IP = '193.105.201.235'
+# HOST_IP = '193.105.201.235'
 
 SERVER_PORT = '8000'
 

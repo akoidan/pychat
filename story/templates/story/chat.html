@@ -14,28 +14,34 @@
 
 {% block content %}
 	<style>
+		.message_header_self {
+			color: # {{ self_text_color }};
+		}
 
-.message_header_self {
-	color: #{{ self_text_color }} ;
-}
-.message_header_private {
-	color: #{{ private_text_color }} ;
-}
-.message_header_others {
-	color: #{{ others_text_color }} ;
-}
-.message_text_style {
-	color: #{{ text_color }} ;
-}
-.background-color {
-	background-color: #{{ background_color }};
-}
+		.message_header_private {
+			color: # {{ private_text_color }};
+		}
 
+		.message_header_others {
+			color: # {{ others_text_color }};
+		}
+
+		.message_text_style {
+			color: # {{ text_color }};
+		}
+
+		.background-color {
+			background-color: # {{ background_color }};
+		}
 	</style>
 	<div class="wrapper">
-		<div id="chatbox">
+		{#		<div class="fadeout"></div>#}
+		<div class="chat-wrapper">
+			<div id="chatbox">
+			</div>
+			<div id="chatrooms">asdf</div>
 		</div>
-		<div class="create-message-wrapper" >
+		<div class="create-message-wrapper">
 			<div class="inputsdiv">
 				<input name="usermsg" type="text" class="inputs background-color message_text_style" style="" id="usermsg"/>
 			</div>
