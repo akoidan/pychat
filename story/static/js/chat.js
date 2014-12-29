@@ -71,6 +71,7 @@ function sendMessage(usermsg) {
 			message: usermsg
 		},
 		success: function (data) {
+			console.log(new Date() + "Response: " + data);
 			$("#usermsg").val("");
 		},
 		failure: function (data) {
@@ -141,8 +142,8 @@ function loadMessages(count, isTop) {
 		},
 		url: "/get_messages",
 		success: function (data) {
+			console.log(new Date() +  ': Response ' + data);
 			var result = eval(data);
-			console.log(d + ': Fetched ' + result.length + ' messages from server');
 			firstMessage = result[0];
 			if (firstMessage != null) {
 				headerId = eval(firstMessage).id;

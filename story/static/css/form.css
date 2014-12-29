@@ -2,6 +2,10 @@
 	text-align: right;
 }
 
+.border-table > tbody > tr > th >  label {
+	margin-left: 5px;
+}
+
 .border-table > tbody > tr > td:nth-child(2) {
 	text-align: left;
 }

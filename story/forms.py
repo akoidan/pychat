@@ -4,13 +4,11 @@ from story.models import UserSettings
 
 class UserSettingsForm(forms.ModelForm):
 
+	def __init__(self, *args, **kwargs):
+		super(UserSettingsForm, self).__init__(*args, **kwargs)
+		for field in self:
+			field.field.widget.attrs['class'] = 'color'
+
 	class Meta:
 		model = UserSettings
 		exclude = ('user',)
-		widgets = {
-			'text_color': forms.TextInput(attrs={'class': 'color'}),
-			'private_text_color': forms.TextInput(attrs={'class': 'color'}),
-			'others_text_color': forms.TextInput(attrs={'class': 'color'}),
-			'self_text_color': forms.TextInput(attrs={'class': 'color'}),
-			'background_color': forms.TextInput(attrs={'class': 'color'}),
-		}

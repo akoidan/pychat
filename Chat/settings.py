@@ -51,10 +51,6 @@ INSTALLED_APPS = (
 	'simplejson',
 )
 
-STATICFILES_DIRS = (
-	'story/static'
-)
-
 HOST_IP = socket.gethostbyname(socket.gethostname())
 #HOST_IP = '193.105.201.235'
 
@@ -97,6 +93,12 @@ DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.sqlite3',
 		'NAME': 'django.db',
+	}
+}
+
+CACHES = {
+	'default': {
+		'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
 	}
 }
 

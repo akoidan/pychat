@@ -27,7 +27,7 @@
 .message_text_style {
 	color: #{{ text_color }} ;
 }
-html, body {
+.background-color {
 	background-color: #{{ background_color }};
 }
 
@@ -35,9 +35,9 @@ html, body {
 	<div class="wrapper">
 		<div id="chatbox">
 		</div>
-		<div class="create-messsage-wrapper" >
+		<div class="create-message-wrapper" >
 			<div class="inputsdiv">
-				<input name="usermsg" type="text" class="inputs" id="usermsg"/>
+				<input name="usermsg" type="text" class="inputs background-color message_text_style" style="" id="usermsg"/>
 			</div>
 			<div style="float: right">
 				<input

@@ -24,5 +24,5 @@ To run this you need:
 
 #TODO  
 no selectable navbar add chat rooms, implement smiles, Add all users to right panel in the current room. Add languages for menu. 
-Remove applying widgets by 1 for fields in forms.py. Remove bootsrap glyphicons.
+Remove applying widgets by 1 for fields in forms.py. Remove bootsrap glyphicons. Gradient text disappear on top
  
