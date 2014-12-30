@@ -32,5 +32,5 @@ def refresh_user_list(sender, user, request, **kwargs):
 	logged_users = User.objects.filter(id__in=uid_list)
 	ishout_client.broadcast(
 		channel='refresh_users',
-		data=get_message(logged_users)
+		data=logged_users
 	)

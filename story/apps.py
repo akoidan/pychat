@@ -12,6 +12,7 @@ class DefaultSettingsConfig(AppConfig):
 	colors = {}
 
 	def ready(self):
+		import story.signals
 		tree = etree.parse(BASE_DIR + '/Chat/DefaultScheme.xml')
 		root = tree.getroot().find('colors')
 		for child in root:
