@@ -5,18 +5,16 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
-from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from story.apps import DefaultSettingsConfig
 from story.models import UserProfile, UserSettings
 from .models import Messages
 from django.http import Http404
-from drealtime import iShoutClient
 from story import registration_utils
 from story.forms import UserSettingsForm
 from django.forms.models import model_to_dict
 from django.http import HttpResponseRedirect
-from django.core import serializers
+from story.logic import get_message
 import json
 
 
@@ -30,13 +28,6 @@ def validate_user(request):
 	username = request.POST['username']
 	response = registration_utils.validate_user(username)
 	return HttpResponse(response, content_type='text/plain')
-
-
-def shout(request):
-	ishout_client = iShoutClient()
-	ishout_client.broadcast(
-		channel='notifications',
-		data={'data': 'it works'})
 
 
 def repr_dict(d):
@@ -76,27 +67,11 @@ def get_messages(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
-def get_message(message):
-	return {
-		'user': User.objects.get_by_natural_key(message.userid).username,
-		'content': message.content,
-		'hour': message.time.hour,
-		'minute': message.time.minute,
-		'second': message.time.second,
-		'id': message.id
-	}
-
-
 def home(request):
 	if request.user.is_authenticated() and request.method == 'POST':
 		content = request.POST.get('message', '')
 		message = Messages(userid=request.user, content=content)
 		message.save()
-		ishout_client = iShoutClient()
-		ishout_client.broadcast(
-			channel='notifications',
-			data=get_message(message)
-		)
 		message = 'message delivered'
 		return HttpResponse(message, content_type='text/plain')
 	else:

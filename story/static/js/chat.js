@@ -1,5 +1,6 @@
 //use .on() to add a listener. you can add as many listeners as you want.
 ishout.on('notifications', appendMessage);
+ishout.on('refresh_users', loadUsers);
 // .init() will authenticate against the ishout.js server, and open the
 // WebSocket connection.
 ishout.init();
@@ -16,6 +17,13 @@ var contentStyle = '<font class="message_text_style">';
 
 function encodeHTML( html ) {
     return document.createElement( 'div' ).appendChild( document.createTextNode( html ) ).parentNode.innerHTML;
+}
+
+function loadUsers(data){
+	for (var userId in data) {
+		console.log(data);
+  // do something with key
+}
 }
 
 function printMessage(data, div, isTopDirection) {

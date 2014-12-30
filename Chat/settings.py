@@ -35,10 +35,6 @@ TEMPLATE_DIRS = (
 	join(BASE_DIR, 'templates'),
 )
 
-STATICFILES_DIRS = (
-	'story/static'
-)
-
 # Application definition
 
 INSTALLED_APPS = (

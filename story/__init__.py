@@ -1,1 +1,2 @@
 default_app_config = 'story.apps.DefaultSettingsConfig'
+import story.signals

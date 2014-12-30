@@ -11,7 +11,6 @@ urlpatterns = patterns(
 	url(r'^logout$', 'story.views.logout'),
 	url(r'^auth$', 'story.views.auth'),
 	url(r'^register$', 'story.views.register'),
-	url(r'^alert$', 'story.views.shout'),
 	url(r'^confirm_email$', 'story.views.confirm_email'),
 	# story/register.js uses link below
 	url(r'^validate_user$', 'story.views.validate_user'),
