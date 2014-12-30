@@ -1,5 +1,4 @@
 .wrapper {
-	display: inline-block;
 	height: calc(100% - 64px);
 	width: 100%;
 }
@@ -12,17 +11,23 @@
 
 #chatbox {
 	height: 100% ;
-	width: 80% ;
 /*calc(100% - 400px)*/
 	overflow-y: scroll;
 	padding-left: 15px;
 	padding-right: 5px;
-	float: left;
 	word-wrap:break-word;
 }
 
 #chatrooms {
 	display: inline-block;
+	float: right;
+	margin-left: 5px;
+	height: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+	min-width: 100px;
+	max-width: 300px;
+	text-overflow: ellipsis;
 }
 
 #sendButton {
