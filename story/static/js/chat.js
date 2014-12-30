@@ -168,3 +168,9 @@ function loadMessages(count, isTop) {
 		}
 	});
 }
+
+
+function toggleRoom() {
+	var div = $('#chatrooms');
+	div.toggle()
+}
