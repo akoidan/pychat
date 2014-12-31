@@ -5,12 +5,12 @@ from django.contrib.sessions.models import Session
 
 ishout_client = iShoutClient()
 
-def printMessages(message):
+def send_message(message):
+	ishout_client.get_room_status('notifications')
 	ishout_client.broadcast(
 		channel='notifications',
 		data=get_message(message)
 	)
-
 
 def get_message(message):
 	return {
@@ -22,7 +22,15 @@ def get_message(message):
 		'id': message.id
 	}
 
-def refresh_user_list(sender, user, request, **kwargs):
+def get_users(users):
+	result = {}
+	for user in users:
+		result[user.id] = user.username
+	return result
+
+
+
+def refresh_user_list(**kwargs):
 	sessions = Session.objects.filter(expire_date__gte=datetime.now())
 	uid_list = []  # Build a list of user ids from that query
 	for session in sessions:
@@ -32,5 +40,5 @@ def refresh_user_list(sender, user, request, **kwargs):
 	logged_users = User.objects.filter(id__in=uid_list)
 	ishout_client.broadcast(
 		channel='refresh_users',
-		data=logged_users
+		data=get_users(logged_users)
 	)

@@ -6,6 +6,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 from django.core.context_processors import csrf
+from drealtime import iShoutClient
 from story.apps import DefaultSettingsConfig
 from story.models import UserProfile, UserSettings
 from .models import Messages
@@ -14,7 +15,7 @@ from story import registration_utils
 from story.forms import UserSettingsForm
 from django.forms.models import model_to_dict
 from django.http import HttpResponseRedirect
-from story.logic import get_message
+from story.logic import get_message, send_message
 import json
 
 
@@ -28,10 +29,6 @@ def validate_user(request):
 	username = request.POST['username']
 	response = registration_utils.validate_user(username)
 	return HttpResponse(response, content_type='text/plain')
-
-
-def repr_dict(d):
-	return '{%s}' % ', '.join("'%s': '%s'" % pair for pair in d.items())
 
 
 # def get_messages(request):
@@ -52,7 +49,6 @@ def get_messages(request):
 	if request.user.is_authenticated() and request.method == 'POST':
 		header_id = request.POST.get('headerId', -1)
 		count = int(request.POST.get('count', 10))
-		# TODO SECURITY BREACH with count -> infinity
 		if header_id == -1:
 			messages = Messages.objects.all().order_by('pk').reverse()[:count]
 		else:
@@ -72,8 +68,9 @@ def home(request):
 		content = request.POST.get('message', '')
 		message = Messages(userid=request.user, content=content)
 		message.save()
-		message = 'message delivered'
-		return HttpResponse(message, content_type='text/plain')
+		send_message(message)
+		response = 'message delivered'
+		return HttpResponse(response, content_type='text/plain')
 	else:
 		c = get_user_settings(request.user)
 		c.update(csrf(request))
