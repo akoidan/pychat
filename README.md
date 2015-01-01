@@ -1,4 +1,4 @@
-Very simple chat written in django with drealtime
+Very simple chat written in django with drealtime, visit http://193.105.201.235
 ==========
 To run this you need:
 
