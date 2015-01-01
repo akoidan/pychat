@@ -30,9 +30,7 @@ def get_message(message):
 	return {
 		'user': User.objects.get_by_natural_key(message.userid).username,
 		'content': message.content,
-		'hour': message.time.hour,
-		'minute': message.time.minute,
-		'second': message.time.second,
+		'time': message.time.strftime("%H:%M:%S"),
 		'id': message.id
 	}
 

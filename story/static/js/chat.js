@@ -55,8 +55,7 @@ function printMessage(data, div, isTopDirection) {
 	} else {
 		headerStyle = othersHeader;
 	}
-	messageHeader = headerStyle + ' (' + data.hour + ':' + data.minute + ':' + data.second +
-	') <b>' + data.user + '</b>: ' + endHeader;
+	messageHeader = headerStyle + ' (' + data.time + ') <b>' + data.user + '</b>: ' + endHeader;
 	messageContent = contentStyle + encodeHTML(data.content) + endHeader;
 	message = '<p>' + messageHeader + messageContent + "</p>";
 	if (isTopDirection) {
@@ -138,10 +137,6 @@ function loadUpHistory(elements) {
 function loadMessages(count, isTop) {
 	console.log(new Date() + ': Requesting ' + count + ' messages from server');
 	$.ajax({
-		// TODO why beforesend is not called by other setup
-		beforeSend: function (xhr, settings) {
-			xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
-		},
 		type: 'POST',
 		data: {
 			headerId: headerId,

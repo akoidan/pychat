@@ -1,4 +1,3 @@
-
 from django.apps import AppConfig
 from Chat.settings import BASE_DIR
 import xml.etree.ElementTree as etree
