@@ -1,16 +1,30 @@
 from datetime import datetime
 from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from django.forms import model_to_dict
 from drealtime import iShoutClient
 from django.contrib.sessions.models import Session
+from story.apps import DefaultSettingsConfig
+from story.models import UserSettings
 
 ishout_client = iShoutClient()
 
+def renew_room_status(room):
+	a = ishout_client.get_room_status()
+
 def send_message(message):
-	ishout_client.get_room_status('notifications')
 	ishout_client.broadcast(
 		channel='notifications',
 		data=get_message(message)
 	)
+
+def send_user_list():
+	room_status = ishout_client.get_room_status('main')
+	ishout_client.broadcast(
+		channel='refresh_users',
+		data=room_status
+	)
+
 
 def get_message(message):
 	return {
@@ -29,16 +43,10 @@ def get_users(users):
 	return result
 
 
-
-def refresh_user_list(**kwargs):
-	sessions = Session.objects.filter(expire_date__gte=datetime.now())
-	uid_list = []  # Build a list of user ids from that query
-	for session in sessions:
-		data = session.get_decoded()
-		uid_list.append(data.get('_auth_user_id', None))
-	# Query all logged in users based on id list
-	logged_users = User.objects.filter(id__in=uid_list)
-	ishout_client.broadcast(
-		channel='refresh_users',
-		data=get_users(logged_users)
-	)
+def get_user_settings(user):
+	if user.is_authenticated():
+		try:
+			return model_to_dict(UserSettings.objects.get(pk=user.id))
+		except ObjectDoesNotExist:
+			pass
+	return DefaultSettingsConfig.colors

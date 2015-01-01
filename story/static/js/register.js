@@ -1,11 +1,11 @@
 function register() {
-
 	var password = document.getElementById("password").value;
 	var repeatpassword = document.getElementById("repeatpassword").value;
 	if (password != repeatpassword) {
 		alert("Passwords don't match")
 		return;
 	}
+
 
 	var d = new Date();
 	var datad = $('form').serialize();
@@ -29,6 +29,7 @@ function register() {
 		}
 	});
 }
+
 
 function validatePassword() {
 	var password = document.getElementById("password").value;
@@ -73,6 +74,7 @@ function validateUser() {
 	});
 }
 
+
 function validateEmail() {
 	var email = document.getElementById("email").value;
 	var d = new Date();
@@ -102,10 +104,11 @@ function validateEmail() {
 	});
 }
 
+
 function passwordsMatch() {
 	var password = document.getElementById("password").value;
 	var repeatpassword = document.getElementById("repeatpassword").value;
-	if (repeatpassword != password ) {
+	if (repeatpassword != password) {
 		document.getElementById("repeatpassword_check").style.color = "#dd4b39";
 		document.getElementById("repeatpassword_check").innerHTML = "Passwords don't match";
 	} else {

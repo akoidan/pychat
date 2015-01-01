@@ -15,7 +15,7 @@ from story import registration_utils
 from story.forms import UserSettingsForm
 from django.forms.models import model_to_dict
 from django.http import HttpResponseRedirect
-from story.logic import get_message, send_message
+from story.logic import get_message, send_message, send_user_list, get_user_settings
 import json
 
 
@@ -29,20 +29,6 @@ def validate_user(request):
 	username = request.POST['username']
 	response = registration_utils.validate_user(username)
 	return HttpResponse(response, content_type='text/plain')
-
-
-# def get_messages(request):
-# 	if request.user.is_authenticated() and request.method == 'POST':
-# 		header_id = request.POST.get('headerId', -1)
-# 		count = int(request.POST.get('count', 10))
-# 		if header_id == -1:
-# 			messages = Messages.objects.all().order_by('-pk')[:1]
-# 		else:
-# 			messages = Messages.objects.filter(id__lt=header_id).order_by('-pk')[:count]
-# 		response = serializers.serialize("json", messages)
-# 	else:
-# 		response = "can't get messages for noauthorized user"
-# 	return HttpResponse(response, content_type='text/plain')
 
 
 def get_messages(request):
@@ -98,6 +84,7 @@ def auth(request):
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		djangologin(request, user)
+		send_user_list()
 		message = "update"
 	else:
 		message = "Login or password is wrong"
@@ -142,15 +129,6 @@ def register(request):
 		c.update({'error code': "welcome to register page"})
 		create_nav_page(request, c)
 		return render_to_response("story/register.html", c)
-
-
-def get_user_settings(user):
-	if user.is_authenticated():
-		try:
-			return model_to_dict(UserSettings.objects.get(pk=user.id))
-		except ObjectDoesNotExist:
-			pass
-	return DefaultSettingsConfig.colors
 
 
 def profile(request):
