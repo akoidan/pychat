@@ -153,5 +153,5 @@ def profile(request):
 		raise PermissionDenied
 
 
-def get_user_list(request):
+def refresh_user_list(request):
 	send_user_list()

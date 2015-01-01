@@ -17,4 +17,5 @@ urlpatterns = patterns(
 	url(r'^validate_email$', 'story.views.validate_email'),
 	url(r'^get_messages$', 'story.views.get_messages'),
 	url(r'^profile$', 'story.views.profile'),
+	url(r'^refresh_user_list', 'story.views.refresh_user_list'),
 )

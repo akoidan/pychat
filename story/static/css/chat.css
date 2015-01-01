@@ -57,14 +57,12 @@
 
 .create-message-wrapper {
 	padding: 0px 10px 3px 10px ;
-	float: left;
-	clear: left;
+	display: inline-flex;
 	width: 100%;
-	display: inline;
+	flex-direction: row;
 }
 .inputsdiv {
-	width: calc(100% - 130px);
-	float: left;
+	flex-grow : 1;
 }
 
 

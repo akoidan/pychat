@@ -40,7 +40,7 @@ function encodeHTML(html) {
 
 
 function loadUsers(data) {
-	console.log(new Date() + "Load user content:" + data);
+	console.log(new Date() + "Load user content:" + data.members);
 	chatRoomsDiv.empty();
 	for (member in data.members) {
 		chatRoomsDiv.append('<p>' + data.members[member] + '</p>');
@@ -172,5 +172,9 @@ function loadMessages(count, isTop) {
 
 
 function toggleRoom() {
-	chatRoomsDiv.toggle()
+	//chatRoomsDiv.toggle()
+	$.ajax({
+		type: 'POST',
+		url: "/refresh_user_list"
+	});
 }
