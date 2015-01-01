@@ -1,6 +1,5 @@
 {% extends "story/base.html" %}
 {% block head %}
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	{% load drealtimetags %}
 	{% ishout_js %}
 	{% load staticfiles %}
@@ -8,8 +7,6 @@
 	<audio id="chatIncoming" src="{% static 'sounds/ChatIncoming.wav' %}" preload="auto"></audio>
 	<audio id="chatOutgoing" src="{% static 'sounds/ChatOutgoing.wav' %}" preload="auto"></audio>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}">
-	{% block childhead %}
-	{% endblock childhead %}
 {% endblock head %}
 
 {% block content %}
@@ -17,19 +14,15 @@
 		.message_header_self {
 			color: #{{ self_text_color }};
 		}
-
 		.message_header_private {
 			color: #{{ private_text_color }};
 		}
-
 		.message_header_others {
 			color: #{{ others_text_color }};
 		}
-
 		.message_text_style {
 			color: #{{ text_color }};
 		}
-
 		.background-color {
 			background-color: #{{ background_color }};
 		}
