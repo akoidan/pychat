@@ -3,7 +3,7 @@ function login() {
 	var credentials = {
 			username: document.getElementById("lusername").value,
 			password: document.getElementById("lpassword").value
-	}
+	};
 	console.log(d + "Attempting to login, credentials: " + credentials);
 	$.ajax({
 		url: 'auth',

@@ -11,11 +11,12 @@ urlpatterns = patterns(
 	url(r'^logout$', 'story.views.logout'),
 	url(r'^auth$', 'story.views.auth'),
 	url(r'^register$', 'story.views.register'),
-	url(r'^alert$', 'story.views.shout'),
 	url(r'^confirm_email$', 'story.views.confirm_email'),
 	# story/register.js uses link below
 	url(r'^validate_user$', 'story.views.validate_user'),
 	url(r'^validate_email$', 'story.views.validate_email'),
 	url(r'^get_messages$', 'story.views.get_messages'),
 	url(r'^profile$', 'story.views.profile'),
+	url(r'^refresh_user_list', 'story.views.refresh_user_list'),
+	url(r'^send_message', 'story.views.send_message'),
 )

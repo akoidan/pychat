@@ -1,17 +1,43 @@
 .wrapper {
-	display: inline-block;
 	height: calc(100% - 64px);
 	width: 100%;
 }
 
-#chatbox {
+.chat-wrapper {
+	display: inline-block;
 	height: calc(100% - 50px) ;
+	width: 100%;
+}
+
+#chatbox {
+	height: 100% ;
+/*calc(100% - 400px)*/
 	overflow-y: scroll;
 	padding-left: 15px;
 	padding-right: 5px;
-	width: 100%;
-	float: left;
 	word-wrap:break-word;
+}
+
+#chatrooms {
+	display: inline-block;
+	float: right;
+	margin-left: 5px;
+	height: 100%;
+	overflow-y: auto;
+	overflow-x: hidden;
+	min-width: 50px;
+	max-width: 300px;
+	font-size: 20px;
+	text-overflow: ellipsis;
+}
+
+#chatrooms > ul > li:hover {
+	cursor: pointer;
+}
+
+#chatrooms > ul  {
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 
 #sendButton {
@@ -30,7 +56,7 @@
 
 .inputs {
 	width: 100%;
-	margin-top: 2px;
+	margin-top: 1px;
 	padding: 8px 10px;
 	border-radius: 5px;
 	font-size: 18px;
@@ -40,17 +66,43 @@
 }
 
 .create-message-wrapper {
-	padding: 0px 10px 3px 10px ;
-	float: left;
-	clear: left;
+	padding: 0px 10px 3px 0px ;
+	display: inline-flex;
 	width: 100%;
-	display: inline;
+	flex-direction: row;
 }
 .inputsdiv {
-	width: calc(100% - 130px);
-	float: left;
+	flex-grow : 1;
+	padding-left: 8px;
 }
 
+#userSendMessageTo {
+	/*sets also in chat.js on username click*/
+	display: inline-flex;
+	justify-content: center;
+	align-content: center;
+	flex-direction: row;
+	align-items: center;
+	font-size: 17px;
+	box-shadow: 0px 2px 2px rgba(6, 3, 8, 0.77);
+	border-radius: 2px;
+	padding: 5px 5px 5px 5px;
+	margin-left: 8px;
+}
+
+#receiverId {
+	padding-right: 5px;
+}
+
+/*.fadeout {*/
+	/*height: 10px;*/
+	/*width: 100%;*/
+	/*position: absolute;*/
+	/*background-image: -webkit-linear-gradient(*/
+			/*rgba(255, 255, 255, 1) 100%,*/
+			/*rgba(255, 255, 255, 0.5) 0%*/
+	/*);*/
+/*}*/
 /*#userMsg, input, select, textarea {*/
 	/*background-color : #7ea6bd;*/
 /*}*/

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import socket
+from datetime import timedelta
 import story as project_module
 
 from os.path import join
@@ -51,11 +52,15 @@ INSTALLED_APPS = (
 	'simplejson',
 )
 
-HOST_IP = socket.gethostbyname(socket.gethostname())
-#HOST_IP = '193.105.201.235'
+# HOST_IP = socket.gethostbyname(socket.gethostname())
+HOST_IP = '193.105.201.235'
+
+
+# SESSION_COOKIE_AGE = 10
+# SESSION_SAVE_EVERY_REQUEST = True
+# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SERVER_PORT = '8000'
-
 ISHOUT_CLIENT_ADDR = HOST_IP + ':5500'
 
 MIDDLEWARE_CLASSES = (

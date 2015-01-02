@@ -1,4 +1,3 @@
-
 from django.apps import AppConfig
 from Chat.settings import BASE_DIR
 import xml.etree.ElementTree as etree
@@ -12,6 +11,7 @@ class DefaultSettingsConfig(AppConfig):
 	colors = {}
 
 	def ready(self):
+		import story.signals
 		tree = etree.parse(BASE_DIR + '/Chat/DefaultScheme.xml')
 		root = tree.getroot().find('colors')
 		for child in root:

@@ -2,8 +2,8 @@
 	<colors>
 		<text_color>000000</text_color>
 		<self_text_color>1D2BAB</self_text_color>
-		<others_text_color>024D2F</others_text_color>
-		<private_text_color>403C00</private_text_color>
+		<others_text_color>107800</others_text_color>
+		<private_text_color>B01313</private_text_color>
 		<background_color>FFFFFF</background_color>
 	</colors>
 </data>

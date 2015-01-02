@@ -34,3 +34,7 @@ $(function () {
 		}
 	});
 });
+
+$(document).ready(function () {
+	mute();
+});

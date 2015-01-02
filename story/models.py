@@ -22,7 +22,25 @@ post_save.connect(create_user_profile, sender=User)
 
 
 class Messages(models.Model):
+	"""
+	Contains all public messages
+	"""
 	userid = models.ForeignKey(User)
+	#DateField.auto_now¶
+	time = models.TimeField(default=datetime.datetime.now)
+	content = models.CharField(max_length=255)
+	id = models.AutoField(primary_key=True)
+
+
+
+
+class PrivateMessages(models.Model):
+	"""
+	Contains all private messages. Don't want to inherit it
+	from Messages class to simplify DataBase view
+	"""
+	addressee = models.ForeignKey(User, related_name='receiver')
+	userid = models.ForeignKey(User, related_name='sender')
 	#DateField.auto_now¶
 	time = models.TimeField(default=datetime.datetime.now)
 	content = models.CharField(max_length=255)
@@ -42,6 +60,9 @@ class Messages(models.Model):
 
 
 class UserSettings(models.Model):
+	"""
+	Contains information about user customizable color settings
+	"""
 	user = models.OneToOneField(User, related_name='user_id', primary_key=True)
 	text_color = models.CharField(max_length=6, null=True)
 	self_text_color = models.CharField(max_length=6, null=True)
