@@ -1,22 +1,19 @@
-from datetime import datetime
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import model_to_dict
 from drealtime import iShoutClient
-from django.contrib.sessions.models import Session
 from story.apps import DefaultSettingsConfig
 from story.models import UserSettings
 
 ishout_client = iShoutClient()
 
-def renew_room_status(room):
-	a = ishout_client.get_room_status()
 
 def broadcast_message(message):
 	ishout_client.broadcast(
 		channel='notifications',
 		data=get_message(message)
 	)
+
 
 def send_message_to_user(message, user):
 	# send to receiver
@@ -28,7 +25,7 @@ def send_message_to_user(message, user):
 		data=message_context
 	)
 	# send to sender if it's not himself
-	if (user.id != message.userid.id):
+	if user.id != message.userid.id:
 		message_context['private'] = user.username
 		ishout_client.emit(
 			user_id=message.userid,
@@ -38,9 +35,10 @@ def send_message_to_user(message, user):
 
 def send_user_list():
 	room_status = ishout_client.get_room_status('main')
+	user_names = generate_user_name_list(room_status['members'])
 	ishout_client.broadcast(
 		channel='refresh_users',
-		data=room_status
+		data=user_names
 	)
 
 
@@ -52,6 +50,13 @@ def get_message(message):
 		'id': message.id
 	}
 
+
+def generate_user_name_list(user_ids) -> list:
+	result = []
+	users = User.objects.filter(id__in=user_ids)
+	for user in users:
+		result.append(user.username)
+	return result
 
 def get_users(users):
 	result = {}

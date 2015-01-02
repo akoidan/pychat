@@ -42,13 +42,13 @@ function encodeHTML(html) {
 }
 
 
-function loadUsers(data) {
-	console.log(new Date() + "Load user content:" + data.members);
+function loadUsers(usernames) {
+	console.log(new Date() + "Load usernames :" + usernames);
 	chatRoomsDiv.empty();
 	var allUsers = '<ul class="message_header_others">';
-	for (member in data.members) {
+	for (index in usernames) {
 		allUsers += '<li id="showUserButton" onclick="showUserSendMess($(this).text());">'
-		+ data.members[member] + '</li>';
+		+ usernames[index] + '</li>';
 	}
 	allUsers += ('</ul>');
 		chatRoomsDiv.append(allUsers);
