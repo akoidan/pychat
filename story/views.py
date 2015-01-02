@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
@@ -8,7 +9,7 @@ from django.contrib.auth import logout as djangologout
 from django.core.context_processors import csrf
 from story.apps import DefaultSettingsConfig
 from story.models import UserProfile, UserSettings
-from .models import Messages
+from .models import Messages, PrivateMessages
 from django.http import Http404
 from story import registration_utils
 from story.forms import UserSettingsForm
@@ -74,12 +75,14 @@ def send_message(request):
 	if request.user.is_authenticated() and request.method == 'POST':
 		content = request.POST.get('message', '')
 		addressee = request.POST.get('addressee', '')
-		message = Messages(userid=request.user, content=content)
-		message.save()
 		if addressee:
-			user_id = UserSettings.objects.get(username=addressee).id
-			send_message_to_user(message, user_id)
+			receiver = User.objects.get(username=addressee)
+			message = PrivateMessages(userid=request.user, content=content, addressee=receiver)
+			message.save()
+			send_message_to_user(message, receiver)
 		else:
+			message = Messages(userid=request.user, content=content)
+			message.save()
 			broadcast_message(message)
 		response = 'message delivered'
 		return HttpResponse(response, content_type='text/plain')

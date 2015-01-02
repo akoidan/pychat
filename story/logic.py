@@ -18,13 +18,23 @@ def broadcast_message(message):
 		data=get_message(message)
 	)
 
-
-def send_message_to_user(message, username):
-	ishout_client.broadcast(
+def send_message_to_user(message, user):
+	# send to receiver
+	message_context = get_message(message)
+	message_context['private'] = True
+	ishout_client.emit(
+		user_id=user,
 		channel='notifications',
-		data=get_message(message)
+		data=message_context
 	)
-
+	# send to sender if it's not himself
+	if (user.id != message.userid.id):
+		message_context['private'] = user.username
+		ishout_client.emit(
+			user_id=message.userid,
+			channel='notifications',
+			data=message_context
+		)
 
 def send_user_list():
 	room_status = ishout_client.get_room_status('main')
@@ -41,6 +51,7 @@ def get_message(message):
 		'time': message.time.strftime("%H:%M:%S"),
 		'id': message.id
 	}
+
 
 def get_users(users):
 	result = {}

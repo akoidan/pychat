@@ -26,6 +26,7 @@ $(document).ready(function () {
 	chatIncoming = document.getElementById("chatIncoming");
 	chatOutgoing = document.getElementById("chatOutgoing");
 	loggedUser = $("input#username").val();
+	userSendMessageTo.hide();
 	userMessage.keypress(function (event) {
 		if (event.keyCode == 13) {
 			$("#sendButton").click();
@@ -51,16 +52,23 @@ function loadUsers(data) {
 
 function showUserSendMess(username) {
 	userSendMessageTo.empty();
+	userSendMessageTo.show();
 	userSendMessageTo.append(username);
 	userSendMessageTo.click(function(){
 		userSendMessageTo.empty();
+		userSendMessageTo.hide();
 	});
 }
 
 
-function printMessage(data, div, isTopDirection) {
+function printMessage(data, isTopDirection) {
 	var headerStyle;
-	if (data.user == username.value) {
+	var private = data.private;
+	if (typeof private == 'string') {
+		headerStyle = privateHeader + private + '>>';
+	} else if (typeof private == 'boolean' ) {
+		headerStyle = privateHeader;
+	} else if (data.user == username.value) {
 		headerStyle = selfHeader;
 	} else {
 		headerStyle = othersHeader;
@@ -69,13 +77,13 @@ function printMessage(data, div, isTopDirection) {
 	messageContent = contentStyle + encodeHTML(data.content) + endHeader;
 	message = '<p>' + messageHeader + messageContent + "</p>";
 	if (isTopDirection) {
-		div.prepend(message);
+		chatBoxDiv.prepend(message);
 	} else {
 		var oldscrollHeight = chatBoxDiv[0].scrollHeight;
 		chatBoxDiv.append(message);
 		var newscrollHeight = chatBoxDiv[0].scrollHeight;
 		if (newscrollHeight > oldscrollHeight) {
-			div.animate({
+			chatBoxDiv.animate({
 				scrollTop: newscrollHeight
 			}, 'normal'); // Autoscroll to bottom of div
 		}
@@ -85,7 +93,7 @@ function printMessage(data, div, isTopDirection) {
 
 
 function appendMessage(data) {
-	printMessage(data, chatBoxDiv, false);
+	printMessage(data, false);
 	if (sound) {
 		if (loggedUser === data.user) {
 			chatOutgoing.currentTime = 0;
@@ -167,7 +175,7 @@ function loadMessages(count, isTop) {
 			}
 			result.forEach(function (message) {
 				realMessage = eval(message);
-				printMessage(realMessage, chatBoxDiv, isTop);
+				printMessage(realMessage, isTop);
 			});
 
 			if (!isTop) {
