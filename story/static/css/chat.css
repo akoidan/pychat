@@ -25,9 +25,19 @@
 	height: 100%;
 	overflow-y: auto;
 	overflow-x: hidden;
-	min-width: 100px;
+	min-width: 50px;
 	max-width: 300px;
+	font-size: 20px;
 	text-overflow: ellipsis;
+}
+
+#chatrooms > ul > li:hover {
+	cursor: pointer;
+}
+
+#chatrooms > ul  {
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
 
 #sendButton {
@@ -56,22 +66,32 @@
 }
 
 .create-message-wrapper {
-	padding: 0px 10px 3px 10px ;
+	padding: 0px 10px 3px 0px ;
 	display: inline-flex;
 	width: 100%;
 	flex-direction: row;
 }
 .inputsdiv {
 	flex-grow : 1;
+	padding-left: 8px;
 }
 
 #userSendMessageTo {
-	display: flex;
-	padding-right: 10px;
+	/*sets also in chat.js on username click*/
+	display: inline-flex;
 	justify-content: center;
 	align-content: center;
-	flex-direction: column;
+	flex-direction: row;
+	align-items: center;
+	font-size: 17px;
+	box-shadow: 0px 2px 2px rgba(6, 3, 8, 0.77);
+	border-radius: 2px;
+	padding: 5px 5px 5px 5px;
+	margin-left: 8px;
+}
 
+#receiverId {
+	padding-right: 5px;
 }
 
 /*.fadeout {*/

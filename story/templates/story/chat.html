@@ -32,18 +32,20 @@
 		<div class="chat-wrapper">
 			<div id="chatrooms" class="message_text_style">
 			</div>
-			<div id="chatbox">
-			</div>
+			<div id="chatbox"></div>
 		</div>
 		<div class="create-message-wrapper message_text_style">
-			<div id="userSendMessageTo"></div>
+			<div id="userSendMessageTo">
+				<div id="receiverId"></div>
+				<span class="glyphicon glyphicon-remove-sign" onclick="hideUserSendToName();"></span>
+			</div>
 			<div class="inputsdiv">
 				<input name="usermsg" type="text" class="inputs background-color message_text_style" style="" id="usermsg"/>
 			</div>
 			<div>
 				<input
 						type="button" id="sendButton"
-						onclick="sendMessage(userMessage.val(), userSendMessageTo.text());"
+						onclick="sendMessage(userMessage.val(), receiverId.text());"
 						value="Send"/>
 			</div>
 		</div>

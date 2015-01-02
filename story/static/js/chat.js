@@ -27,6 +27,7 @@ $(document).ready(function () {
 	chatOutgoing = document.getElementById("chatOutgoing");
 	loggedUser = $("input#username").val();
 	userSendMessageTo.hide();
+	receiverId = $('#receiverId');
 	userMessage.keypress(function (event) {
 		if (event.keyCode == 13) {
 			$("#sendButton").click();
@@ -44,20 +45,21 @@ function encodeHTML(html) {
 function loadUsers(data) {
 	console.log(new Date() + "Load user content:" + data.members);
 	chatRoomsDiv.empty();
+	var allUsers = '<ul class="message_header_others">';
 	for (member in data.members) {
-		chatRoomsDiv.append('<button id="showUserButton" onclick="showUserSendMess($(this).text());">'
-		+ data.members[member] + '</button>');
+		allUsers += '<li id="showUserButton" onclick="showUserSendMess($(this).text());">'
+		+ data.members[member] + '</li>';
 	}
+	allUsers += ('</ul>');
+		chatRoomsDiv.append(allUsers);
 }
 
 function showUserSendMess(username) {
-	userSendMessageTo.empty();
 	userSendMessageTo.show();
-	userSendMessageTo.append(username);
-	userSendMessageTo.click(function(){
-		userSendMessageTo.empty();
-		userSendMessageTo.hide();
-	});
+	// Empty sets display to none
+	userSendMessageTo.css("display","flex");
+	receiverId.empty();
+	receiverId.append(username);
 }
 
 
@@ -95,8 +97,8 @@ function printMessage(data, isTopDirection) {
 function appendMessage(data) {
 	printMessage(data, false);
 	if (sound) {
+		chatOutgoing.currentTime = 0;
 		if (loggedUser === data.user) {
-			chatOutgoing.currentTime = 0;
 			chatOutgoing.play();
 		} else {
 			chatIncoming.play();
@@ -191,9 +193,18 @@ function loadMessages(count, isTop) {
 
 
 function toggleRoom() {
-	//chatRoomsDiv.toggle()
+	chatRoomsDiv.toggle();
+	$("#refresh").toggle();
+}
+
+function refreshUserList(){
 	$.ajax({
 		type: 'POST',
 		url: "/refresh_user_list"
 	});
+}
+
+function hideUserSendToName() {
+	receiverId.empty();
+	userSendMessageTo.hide();
 }
