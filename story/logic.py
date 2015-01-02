@@ -12,11 +12,19 @@ ishout_client = iShoutClient()
 def renew_room_status(room):
 	a = ishout_client.get_room_status()
 
-def send_message(message):
+def broadcast_message(message):
 	ishout_client.broadcast(
 		channel='notifications',
 		data=get_message(message)
 	)
+
+
+def send_message_to_user(message, username):
+	ishout_client.broadcast(
+		channel='notifications',
+		data=get_message(message)
+	)
+
 
 def send_user_list():
 	room_status = ishout_client.get_room_status('main')

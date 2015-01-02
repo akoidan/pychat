@@ -18,4 +18,5 @@ urlpatterns = patterns(
 	url(r'^get_messages$', 'story.views.get_messages'),
 	url(r'^profile$', 'story.views.profile'),
 	url(r'^refresh_user_list', 'story.views.refresh_user_list'),
+	url(r'^send_message', 'story.views.send_message'),
 )

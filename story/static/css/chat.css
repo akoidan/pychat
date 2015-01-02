@@ -65,6 +65,14 @@
 	flex-grow : 1;
 }
 
+#userSendMessageTo {
+	display: flex;
+	padding-right: 10px;
+	justify-content: center;
+	align-content: center;
+	flex-direction: column;
+
+}
 
 /*.fadeout {*/
 	/*height: 10px;*/

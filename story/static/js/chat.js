@@ -22,6 +22,7 @@ $(document).ready(function () {
 	chatBoxDiv = $('#chatbox');
 	userMessage = $("#usermsg");
 	chatRoomsDiv = $('#chatrooms');
+	userSendMessageTo = $('#userSendMessageTo');
 	chatIncoming = document.getElementById("chatIncoming");
 	chatOutgoing = document.getElementById("chatOutgoing");
 	loggedUser = $("input#username").val();
@@ -43,8 +44,17 @@ function loadUsers(data) {
 	console.log(new Date() + "Load user content:" + data.members);
 	chatRoomsDiv.empty();
 	for (member in data.members) {
-		chatRoomsDiv.append('<p>' + data.members[member] + '</p>');
+		chatRoomsDiv.append('<button id="showUserButton" onclick="showUserSendMess($(this).text());">'
+		+ data.members[member] + '</button>');
 	}
+}
+
+function showUserSendMess(username) {
+	userSendMessageTo.empty();
+	userSendMessageTo.append(username);
+	userSendMessageTo.click(function(){
+		userSendMessageTo.empty();
+	});
 }
 
 
@@ -87,15 +97,16 @@ function appendMessage(data) {
 }
 
 
-function sendMessage(usermsg) {
+function sendMessage(usermsg, username) {
 	if (usermsg == null || usermsg == '') {
 		return;
 	}
 	$.ajax({
 		type: 'POST',
-		url: document.URL,
+		url: document.URL + 'send_message',
 		data: {
-			message: usermsg
+			message: usermsg,
+			addressee: username
 		},
 		success: function (data) {
 			console.log(new Date() + "Response: " + data);

@@ -6,32 +6,39 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 from django.core.context_processors import csrf
-from drealtime import iShoutClient
 from story.apps import DefaultSettingsConfig
 from story.models import UserProfile, UserSettings
 from .models import Messages
 from django.http import Http404
 from story import registration_utils
 from story.forms import UserSettingsForm
-from django.forms.models import model_to_dict
 from django.http import HttpResponseRedirect
-from story.logic import get_message, send_message, send_user_list, get_user_settings
+from story.logic import get_message, broadcast_message, send_user_list, get_user_settings, send_message_to_user
 import json
 
 
 def validate_email(request):
+	"""
+	POST only, validates email during registration
+	"""
 	email = request.POST['email']
 	response = registration_utils.validate_email(email)
 	return HttpResponse(response, content_type='text/plain')
 
 
 def validate_user(request):
+	"""
+	POST only, validates user during registration
+	"""
 	username = request.POST['username']
 	response = registration_utils.validate_user(username)
 	return HttpResponse(response, content_type='text/plain')
 
 
 def get_messages(request):
+	"""
+	POST only, returns all public messages started from ID
+	"""
 	if request.user.is_authenticated() and request.method == 'POST':
 		header_id = request.POST.get('headerId', -1)
 		count = int(request.POST.get('count', 10))
@@ -50,21 +57,40 @@ def get_messages(request):
 
 
 def home(request):
+	"""
+	GET only, returns main Chat page.
+	Login or logout navbar is creates by means of create_nav_page
+	"""
+	c = get_user_settings(request.user)
+	c.update(csrf(request))
+	create_nav_page(request, c)
+	return render_to_response('story/chat.html', c)
+
+
+def send_message(request):
+	"""
+	POST only, sends messages via Ishout
+	"""
 	if request.user.is_authenticated() and request.method == 'POST':
 		content = request.POST.get('message', '')
+		addressee = request.POST.get('addressee', '')
 		message = Messages(userid=request.user, content=content)
 		message.save()
-		send_message(message)
+		if addressee:
+			user_id = UserSettings.objects.get(username=addressee).id
+			send_message_to_user(message, user_id)
+		else:
+			broadcast_message(message)
 		response = 'message delivered'
 		return HttpResponse(response, content_type='text/plain')
-	else:
-		c = get_user_settings(request.user)
-		c.update(csrf(request))
-		create_nav_page(request, c)
-		return render_to_response('story/chat.html', c)
+
 
 
 def create_nav_page(request, c):
+	"""
+	GET only, returns main Chat page.
+	Login or logout navbar is creates by means of create_nav_page
+	"""
 	if request.user.is_authenticated():
 		page = 'story/logout.html'
 		c.update({'username': request.user.username})
@@ -74,11 +100,17 @@ def create_nav_page(request, c):
 
 
 def logout(request):
+	"""
+	POST. Logs out into system.
+	"""
 	djangologout(request)
 	return home(request)
 
 
 def auth(request):
+	"""
+	POST only. Logs in into system.
+	"""
 	username = request.POST['username']
 	password = request.POST['password']
 	user = authenticate(username=username, password=password)
@@ -92,6 +124,9 @@ def auth(request):
 
 
 def confirm_email(request):
+	"""
+	GET only. Acceps the verification code sent to email
+	"""
 	if request.method == 'GET':
 		code = request.GET.get('code', False)
 		try:
@@ -112,6 +147,10 @@ def confirm_email(request):
 
 
 def register(request):
+	"""
+	GET and POST. Returns the registration p age
+	Registrate a new user from a submit form.
+	"""
 	if request.is_ajax():
 		registration_result = registration_utils.register_user(
 			request.POST['username'],
@@ -132,6 +171,9 @@ def register(request):
 
 
 def profile(request):
+	"""
+	GET and POST. Take care about User customizable colors via django.forms,
+	"""
 	user = request.user
 	if user.is_authenticated():
 		if request.method == 'GET':
@@ -155,3 +197,4 @@ def profile(request):
 
 def refresh_user_list(request):
 	send_user_list()
+	return HttpResponse('request has been sent', content_type='text/plain')

@@ -35,14 +35,15 @@
 			<div id="chatbox">
 			</div>
 		</div>
-		<div class="create-message-wrapper">
+		<div class="create-message-wrapper message_text_style">
+			<div id="userSendMessageTo"></div>
 			<div class="inputsdiv">
 				<input name="usermsg" type="text" class="inputs background-color message_text_style" style="" id="usermsg"/>
 			</div>
 			<div>
 				<input
 						type="button" id="sendButton"
-						onclick="sendMessage(document.getElementById('usermsg').value);"
+						onclick="sendMessage(userMessage.val(), userSendMessageTo.text());"
 						value="Send"/>
 			</div>
 		</div>
