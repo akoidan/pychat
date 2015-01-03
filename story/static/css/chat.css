@@ -41,6 +41,13 @@
 	margin-bottom: 5px;
 }
 
+#chatrooms > ul >li:hover {
+	border-style: solid;
+	border-width: 2px;
+	border-radius: 5px;
+	padding-left: 3px;
+}
+
 #sendButton {
 	color: #FFF;
 	background: linear-gradient(#3d6980, #121F31);
