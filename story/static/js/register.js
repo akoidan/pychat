@@ -34,7 +34,7 @@ function register() {
 function validatePassword() {
 	var password = document.getElementById("password").value;
 	if (password.length < 3) {
-		document.getElementById("password_check").style.color = "#dd4b39";
+		document.getElementById("password_check").style.color = "black";
 		document.getElementById("password_check").innerHTML = "Password should be at least 3 character";
 		return false;
 	} else {
