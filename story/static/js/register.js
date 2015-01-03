@@ -5,8 +5,6 @@ function register() {
 		alert("Passwords don't match")
 		return;
 	}
-
-
 	var d = new Date();
 	var datad = $('form').serialize();
 	console.log(d + "Sending registering request to server, data:" + datad);
@@ -92,7 +90,11 @@ function validateEmail() {
 				document.getElementById("email_check").innerHTML = "Email is fine";
 				return true;
 			} else {
-				document.getElementById("email_check").style.color = "Black";
+				if ($("#mailbox").prop('checked')) {
+					document.getElementById("email_check").style.color = "#dd4b39";
+				} else {
+					document.getElementById("email_check").style.color = "black";
+				}
 				document.getElementById("email_check").innerHTML = data;
 				return false;
 			}
