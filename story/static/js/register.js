@@ -92,7 +92,7 @@ function validateEmail() {
 				document.getElementById("email_check").innerHTML = "Email is fine";
 				return true;
 			} else {
-				document.getElementById("email_check").style.color = "#dd4b39";
+				document.getElementById("email_check").style.color = "Black";
 				document.getElementById("email_check").innerHTML = data;
 				return false;
 			}

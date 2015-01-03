@@ -48,7 +48,7 @@
 
 .border-table > tbody > tr > td > input:not([type=button]):not([type=submit]) {
 	padding: 8px;
-	margin: 5px 10px 5px 7px;
+	margin: 5px 10px 5px 0;
 	border-radius: 5px;
 	font-size: 18px;
 	border: 1px;

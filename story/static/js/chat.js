@@ -47,7 +47,7 @@ function loadUsers(usernames) {
 	chatRoomsDiv.empty();
 	var allUsers = '<ul class="message_header_others">';
 	for (index in usernames) {
-		allUsers += '<li id="showUserButton" onclick="showUserSendMess($(this).text());">'
+		allUsers += '<li onclick="showUserSendMess($(this).text());">'
 		+ usernames[index] + '</li>';
 	}
 	allUsers += ('</ul>');

@@ -1,3 +1,5 @@
+import re
+
 __author__ = 'andrew'
 from django.contrib.auth.models import User
 from threading import Thread
@@ -25,6 +27,10 @@ def validate_email(email):
 def validate_user(username):
 	if username is None or username == '':
 		return "User name can't be empty"
+	elif len(username) > 16:
+		return "User is too long. Max 16 symbols"
+	if not re.match('^[A-Za-z0-9-_]*$',username):
+		return "Only letters, numbers, dashes or underlines"
 	try:
 		# theoretically can throw returning 'more than 1' error
 		User.objects.get(username=username)
