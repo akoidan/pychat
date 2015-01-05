@@ -47,11 +47,7 @@ def get_messages(request):
 			messages = Messages.objects.all().order_by('pk').reverse()[:count]
 		else:
 			messages = Messages.objects.filter(id__lt=header_id).order_by('pk').reverse()[:count]
-		passed_messages = []
-		# TODO print (messages.values()) get rid of get_message
-		for singleMess in messages:
-			passed_messages.append(singleMess.json)
-		response = json.dumps(passed_messages)
+		response = json.dumps([message.json for message in messages])
 	else:
 		response = "can't get messages for noauthorized user"
 	return HttpResponse(response, content_type='text/plain')
