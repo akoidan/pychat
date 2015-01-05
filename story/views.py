@@ -159,7 +159,9 @@ def register(request):
 			request.POST['username'],
 			request.POST['password'],
 			request.POST['email'],
-			request.POST.get('mailbox', False)
+			request.POST.get('mailbox', False),
+			request.POST['first_name'],
+			request.POST['last_name'],
 		)
 		if registration_result['message'] is False:
 			djangologin(request, registration_result['user'])

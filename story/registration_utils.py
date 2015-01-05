@@ -43,7 +43,7 @@ def id_generator(size=16, chars=string.ascii_letters + string.digits):
 	return ''.join(random.choice(chars) for _ in range(size))
 
 
-def register_user(username, password, email, verify_email):
+def register_user(username, password, email, verify_email, first_name, last_name):
 	message = False
 	user = None
 	if password is None or password == '':
@@ -53,7 +53,10 @@ def register_user(username, password, email, verify_email):
 	if message is False:
 		message = validate_user(username)
 	if message is False:
-		User.objects.create_user(username, email, password)
+		user = User.objects.create_user(username, email, password)
+		user.first_name = first_name
+		user.last_name = last_name
+		user.save()
 		user = authenticate(username=username, password=password)
 		profile = user.profile
 		profile.verify_code = id_generator()

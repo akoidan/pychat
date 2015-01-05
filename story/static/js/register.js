@@ -1,20 +1,38 @@
+	var password;
+	var userName;
+	var repeatPassword;
+	var passwordCheck;
+	var userNameCheck;
+	var emailCheck;
+	var email;
+	var repeatPasswordCheck;
+
+
+$(document).ready(function () {
+	password = document.getElementById("password");
+	userName = document.getElementById("username");
+	repeatPassword = document.getElementById("repeatpassword");
+	passwordCheck = document.getElementById("password_check");
+	userNameCheck = document.getElementById("username_check");
+	emailCheck = document.getElementById("email_check");
+	email =  document.getElementById("email");
+	repeatPasswordCheck = document.getElementById("repeatpassword_check");
+});
+
 function register() {
-	var password = document.getElementById("password").value;
-	var repeatpassword = document.getElementById("repeatpassword").value;
-	if (password != repeatpassword) {
-		alert("Passwords don't match")
+	if (password.value != repeatPassword.value) {
+		alert("Passwords don't match");
 		return;
 	}
-	var d = new Date();
 	var datad = $('form').serialize();
-	console.log(d + "Sending registering request to server, data:" + datad);
+	console.log(new Date() + "Sending registering request to server, data:" + datad);
 	$.ajax({
 		type: 'POST',
 		url: document.URL,
 		data: datad,
 		success: function (data) {
 			var datad = $('form').serialize();
-			console.log(d + "Register server response:" + data);
+			console.log(new Date() + "Register server response:" + data);
 			if (data == 'Account created') {
 				window.location.href = '/';
 			} else {
@@ -30,21 +48,22 @@ function register() {
 
 
 function validatePassword() {
-	var password = document.getElementById("password").value;
-	if (password.length < 3) {
-		document.getElementById("password_check").style.color = "black";
-		document.getElementById("password_check").innerHTML = "Password should be at least 3 character";
-		return false;
+	var pswd = password.value;
+	if (pswd.length == 0) {
+		passwordCheck.style.color = "#dd4b39";
+		passwordCheck.innerHTML = "Password can't be empty";
+	} else if (pswd.length < 3) {
+		passwordCheck.style.color = "black";
+		passwordCheck.innerHTML = "Password should be at least 3 character";
 	} else {
-		document.getElementById("password_check").style.color = "Green";
-		document.getElementById("password_check").innerHTML = "Password is fine";
-		return true;
+		passwordCheck.style.color = "Green";
+		passwordCheck.innerHTML = "Password is fine";
 	}
 }
 
 
 function validateUser() {
-	var username = document.getElementById("username").value;
+	var username = userName.value;
 	var d = new Date();
 	console.log(d + "Sending validate user request: " + username);
 	$.ajax({
@@ -56,46 +75,42 @@ function validateUser() {
 		success: function (data) {
 			console.log(d + "Validate user response: " + data);
 			if (data == 'False') {
-				document.getElementById("username_check").style.color = "Green";
-				document.getElementById("username_check").innerHTML = "Username is fine";
-				return true;
+				userNameCheck.style.color = "Green";
+				userNameCheck.innerHTML = "Username is fine";
 			} else {
-				document.getElementById("username_check").style.color = "#dd4b39";
-				document.getElementById("username_check").innerHTML = data;
-				return false;
+				userNameCheck.style.color = "#dd4b39";
+				userNameCheck.innerHTML = data;
 			}
 		},
 		failure: function (data) {
-			var d = new Date();
-			console.log(d + "can't validate user, response: " + data);
+			console.log(new Date() + "can't validate user, response: " + data);
 		}
 	});
 }
 
 
 function validateEmail() {
-	var email = document.getElementById("email").value;
-	var d = new Date();
-	console.log(d + "Sending validate email request: " + email);
+	var mail = email.value;
+	console.log(new Date() + "Sending validate email request: " + mail);
 	$.ajax({
 		type: 'POST',
 		url: "/validate_email",
 		data: {
-			email: email
+			email: mail
 		},
 		success: function (data) {
-			console.log(d + "Validate email response: " + data);
+			console.log(new Date() + "Validate email response: " + data);
 			if (data == 'False') {
-				document.getElementById("email_check").style.color = "Green";
-				document.getElementById("email_check").innerHTML = "Email is fine";
+				emailCheck.style.color = "Green";
+				emailCheck.innerHTML = "Email is fine";
 				return true;
 			} else {
 				if ($("#mailbox").prop('checked')) {
-					document.getElementById("email_check").style.color = "#dd4b39";
+					emailCheck.style.color = "#dd4b39";
 				} else {
-					document.getElementById("email_check").style.color = "black";
+					emailCheck.style.color = "black";
 				}
-				document.getElementById("email_check").innerHTML = data;
+				emailCheck.innerHTML = data;
 				return false;
 			}
 		},
@@ -108,13 +123,13 @@ function validateEmail() {
 
 
 function passwordsMatch() {
-	var password = document.getElementById("password").value;
-	var repeatpassword = document.getElementById("repeatpassword").value;
-	if (repeatpassword != password) {
-		document.getElementById("repeatpassword_check").style.color = "#dd4b39";
-		document.getElementById("repeatpassword_check").innerHTML = "Passwords don't match";
+	var pswd = password.value;
+	var repeatpassword = repeatPassword.value;
+	if (repeatpassword != pswd) {
+		repeatPasswordCheck.style.color = "#dd4b39";
+		repeatPasswordCheck.innerHTML = "Passwords don't match";
 	} else {
-		document.getElementById("repeatpassword_check").style.color = "Green";
-		document.getElementById("repeatpassword_check").innerHTML = "Passwords match";
+		repeatPasswordCheck.style.color = "Green";
+		repeatPasswordCheck.innerHTML = "Passwords match";
 	}
 }

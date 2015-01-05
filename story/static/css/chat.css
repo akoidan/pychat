@@ -13,7 +13,7 @@
 	height: 100% ;
 /*calc(100% - 400px)*/
 	overflow-y: scroll;
-	padding-left: 15px;
+	padding-left: 8px;
 	padding-right: 5px;
 	word-wrap:break-word;
 }

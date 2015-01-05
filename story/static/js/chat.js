@@ -33,6 +33,21 @@ $(document).ready(function () {
 			$("#sendButton").click();
 		}
 	});
+	chatBoxDiv.bind('mousewheel DOMMouseScroll', function (event) {
+		if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) { // Scroll top
+			loadUpHistory(5);
+		}
+	});
+
+	$(document).keydown(function (e) {
+		if (e.which == 33) {    // page up
+			loadUpHistory(15);
+		} else if (e.which == 38) { // up
+			loadUpHistory(3);
+		} else if (e.ctrlKey && e.which == 36) {
+			loadUpHistory(25);
+		}
+	});
 	loadMessages(10, false);
 });
 
@@ -129,25 +144,6 @@ function sendMessage(usermsg, username) {
 }
 
 
-$(function () {
-	chatBoxDiv.bind('mousewheel DOMMouseScroll', function (event) {
-		if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) { // Scroll top
-			loadUpHistory(5);
-		}
-	});
-
-	$(document).keydown(function (e) {
-		if (e.which == 33) {    // page up
-			loadUpHistory(15);
-		} else if (e.which == 38) { // up
-			loadUpHistory(3);
-		} else if (e.ctrlKey && e.which == 36) {
-			loadUpHistory(25);
-		}
-	});
-});
-
-
 function loadUpHistory(elements) {
 	if (chatBoxDiv.scrollTop() == 0) {
 		loadMessages(elements, true);
@@ -158,6 +154,7 @@ function loadUpHistory(elements) {
 function loadMessages(count, isTop) {
 	console.log(new Date() + ': Requesting ' + count + ' messages from server');
 	$.ajax({
+		async: false,
 		type: 'POST',
 		data: {
 			headerId: headerId,
@@ -167,7 +164,7 @@ function loadMessages(count, isTop) {
 		success: function (data) {
 			console.log(new Date() + ': Response ' + data);
 			var result = eval(data);
-			firstMessage = result[0];
+			firstMessage = result[result.length-1];
 			if (firstMessage != null) {
 				headerId = eval(firstMessage).id;
 			}
