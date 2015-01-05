@@ -33,22 +33,15 @@ def send_message_to_user(message, user):
 			data=message_context
 		)
 
+
 def send_user_list():
 	room_status = ishout_client.get_room_status('main')
-	user_names = generate_user_name_list(room_status['members'])
+	users = User.objects.filter(id__in=room_status['members'])
 	ishout_client.broadcast(
 		channel='refresh_users',
-		data=user_names
+		data=[user.username for user in users]
 	)
 
-
-def generate_user_name_list(user_ids) -> list:
-	result = []
-	users = User.objects.filter(id__in=user_ids)
-	for user in users:
-		# result[user.username] = user.profile.is_male
-		result.append(user.username)
-	return result
 
 def get_users(users):
 	result = {}

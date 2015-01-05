@@ -46,7 +46,6 @@ class Messages(models.Model):
 		}
 
 
-
 class PrivateMessages(models.Model):
 	"""
 	Contains all private messages. Don't want to inherit it
@@ -58,19 +57,6 @@ class PrivateMessages(models.Model):
 	time = models.TimeField(default=datetime.datetime.now)
 	content = models.CharField(max_length=255)
 	id = models.AutoField(primary_key=True)
-
-	# def __repr__(self):
-	# 	return repr(
-	# 		dict(
-	# 			user=User.objects.get_by_natural_key(self.userid).username,
-	# 			content=self.content,
-	# 			hour=self.time.hour,
-	# 			minute=self.time.minute,
-	# 			second=self.time.second,
-	# 			id=self.id,
-	# 		)
-	# 	)
-
 
 class UserSettings(models.Model):
 	"""
