@@ -1,6 +1,5 @@
-import re
-
 __author__ = 'andrew'
+import re
 from django.contrib.auth.models import User
 from threading import Thread
 from django.contrib.auth import authenticate
@@ -39,11 +38,7 @@ def validate_user(username):
 		return False
 
 
-def id_generator(size=16, chars=string.ascii_letters + string.digits):
-	return ''.join(random.choice(chars) for _ in range(size))
-
-
-def register_user(username, password, email, verify_email, first_name, last_name):
+def register_user(username, password, email, verify_email, first_name, last_name, sex):
 	message = False
 	user = None
 	if password is None or password == '':
@@ -59,13 +54,27 @@ def register_user(username, password, email, verify_email, first_name, last_name
 		user.save()
 		user = authenticate(username=username, password=password)
 		profile = user.profile
-		profile.verify_code = id_generator()
+		if sex == 'male':
+			profile.is_male = True
+		elif sex == 'female':
+			profile.is_male = False
 		profile.save()
 		if verify_email:
-			site = 'http://'+getattr(settings, 'HOST_IP') + ':' + getattr(settings, 'SERVER_PORT')
-			code = '/confirm_email?code=' + profile.verify_code
-			text = 'Hi %s, you have registered on %s. To complete your registration click on the url bellow: %s%s' % (
-				username, site, site, code)
-			mail_thread = Thread(target=user.email_user, args=("Confirm chat registration", text))
-			mail_thread.start()
+			send_email_verification(user)
 	return {'user': user, 'message': message}
+
+
+def id_generator(size=16, chars=string.ascii_letters + string.digits):
+	return ''.join(random.choice(chars) for _ in range(size))
+
+
+def send_email_verification(user):
+	if user.email is not None:
+		user.profile.verify_code = id_generator()
+		user.prifle.save()
+		site = 'http://' + getattr(settings, 'HOST_IP') + ':' + getattr(settings, 'SERVER_PORT')
+		code = '/confirm_email?code=' + user.profile.verify_code
+		text = 'Hi %s, you have registered on %s. To complete your registration click on the url bellow: %s%s' % (
+		user.username, site, site, code)
+		mail_thread = Thread(target=user.email_user, args=("Confirm chat registration", text))
+		mail_thread.start()

@@ -2,6 +2,7 @@
 	<script src="{% static "js/jquery.js" %}"></script>
 	<script src="{% static "js/register.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/form.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/register.css' %}">
 {% endblock head %} {% block content %}
 	<h1 align="center">{{ errorcode }}</h1>
 	<form class="border-form">
@@ -38,8 +39,14 @@
 					<td><label id="last_name">User info</label></td>
 				</tr>
 				<tr>
-					<td><input type="checkbox" name="mailbox" id="mailbox" onchange="validateEmail();"></td>
-					<td><label for="email">send email</label></td>
+					<td class="checkboxes-td">
+						<div class="checkboxes-div">
+							<input type="radio" name="sex" value="male">Male<br>
+							<input type="radio" name="sex" value="female">Female
+						</div>
+						</td>
+					<td><input type="checkbox" name="mailbox" id="mailbox" onchange="validateEmail();">
+						<label for="email">send email</label></td>
 				</tr>
 				<tr>
 					<td colspan="2" class="border-button-tr">

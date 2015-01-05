@@ -1,7 +1,3 @@
-.border-table > tbody > tr > td:nth-child(1):not(.border-button-tr) {
-	text-align: right;
-}
-
 .border-table > tbody > tr > th >  label {
 	margin-left: 5px;
 }

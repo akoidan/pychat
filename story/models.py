@@ -8,6 +8,7 @@ class UserProfile(models.Model):
 	user = models.OneToOneField(User, related_name='profile')
 	email_verified = models.BooleanField(default=False)
 	verify_code = models.CharField(max_length=17)
+	is_male = models.NullBooleanField()
 
 	def __str__(self):
 		return "%s's profile" % self.user
