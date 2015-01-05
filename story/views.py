@@ -14,7 +14,7 @@ from django.http import Http404
 from story import registration_utils
 from story.forms import UserSettingsForm
 from django.http import HttpResponseRedirect
-from story.logic import get_message, broadcast_message, send_user_list, get_user_settings, send_message_to_user
+from story.logic import broadcast_message, send_user_list, get_user_settings, send_message_to_user
 import json
 
 
@@ -50,7 +50,7 @@ def get_messages(request):
 		passed_messages = []
 		# TODO print (messages.values()) get rid of get_message
 		for singleMess in messages:
-			passed_messages.append(get_message(singleMess))
+			passed_messages.append(singleMess.json)
 		response = json.dumps(passed_messages)
 	else:
 		response = "can't get messages for noauthorized user"

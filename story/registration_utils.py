@@ -54,10 +54,7 @@ def register_user(username, password, email, verify_email, first_name, last_name
 		user.save()
 		user = authenticate(username=username, password=password)
 		profile = user.profile
-		if sex == 'male':
-			profile.is_male = True
-		elif sex == 'female':
-			profile.is_male = False
+		profile.gender = sex
 		profile.save()
 		if verify_email:
 			send_email_verification(user)

@@ -8,7 +8,11 @@ class UserProfile(models.Model):
 	user = models.OneToOneField(User, related_name='profile')
 	email_verified = models.BooleanField(default=False)
 	verify_code = models.CharField(max_length=17)
-	is_male = models.NullBooleanField()
+	GENDER_CHOICES = (
+		(True, 'Male'),
+		(False, 'Female'),
+	)
+	gender = models.NullBooleanField(choices=GENDER_CHOICES)
 
 	def __str__(self):
 		return "%s's profile" % self.user
@@ -32,6 +36,14 @@ class Messages(models.Model):
 	content = models.CharField(max_length=255)
 	id = models.AutoField(primary_key=True)
 
+	@property
+	def json(self):
+		return {
+		'user': User.objects.get_by_natural_key(self.userid).username,
+		'content': self.content,
+		'time': self.time.strftime("%H:%M:%S"),
+		'id': self.id
+		}
 
 
 

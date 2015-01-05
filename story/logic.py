@@ -11,13 +11,13 @@ ishout_client = iShoutClient()
 def broadcast_message(message):
 	ishout_client.broadcast(
 		channel='notifications',
-		data=get_message(message)
+		data=message.json
 	)
 
 
 def send_message_to_user(message, user):
 	# send to receiver
-	message_context = get_message(message)
+	message_context = message.json
 	message_context['private'] = True
 	ishout_client.emit(
 		user_id=user,
@@ -42,19 +42,11 @@ def send_user_list():
 	)
 
 
-def get_message(message):
-	return {
-		'user': User.objects.get_by_natural_key(message.userid).username,
-		'content': message.content,
-		'time': message.time.strftime("%H:%M:%S"),
-		'id': message.id
-	}
-
-
 def generate_user_name_list(user_ids) -> list:
 	result = []
 	users = User.objects.filter(id__in=user_ids)
 	for user in users:
+		# result[user.username] = user.profile.is_male
 		result.append(user.username)
 	return result
 
