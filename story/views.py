@@ -9,7 +9,7 @@ from django.contrib.auth import logout as djangologout
 from django.core.context_processors import csrf
 from story.apps import DefaultSettingsConfig
 from story.models import UserProfile, UserSettings
-from .models import Messages, PrivateMessages
+from .models import Messages
 from django.http import Http404
 from story import registration_utils
 from story.forms import UserSettingsForm
@@ -44,9 +44,9 @@ def get_messages(request):
 		header_id = request.POST.get('headerId', -1)
 		count = int(request.POST.get('count', 10))
 		if header_id == -1:
-			messages = Messages.objects.all().order_by('pk').reverse()[:count]
+			messages = Messages.objects.filter(receiver=None).order_by('pk').reverse()[:count]
 		else:
-			messages = Messages.objects.filter(id__lt=header_id).order_by('pk').reverse()[:count]
+			messages = Messages.objects.filter(id__lt=header_id, receiver=None).order_by('pk').reverse()[:count]
 		response = json.dumps([message.json for message in messages])
 	else:
 		response = "can't get messages for noauthorized user"
@@ -73,11 +73,11 @@ def send_message(request):
 		addressee = request.POST.get('addressee', '')
 		if addressee:
 			receiver = User.objects.get(username=addressee)
-			message = PrivateMessages(userid=request.user, content=content, addressee=receiver)
+			message = Messages(sender=request.user, content=content, receiver=receiver)
 			message.save()
 			send_message_to_user(message, receiver)
 		else:
-			message = Messages(userid=request.user, content=content)
+			message = Messages(sender=request.user, content=content)
 			message.save()
 			broadcast_message(message)
 		response = 'message delivered'

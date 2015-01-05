@@ -25,10 +25,10 @@ def send_message_to_user(message, user):
 		data=message_context
 	)
 	# send to sender if it's not himself
-	if user.id != message.userid.id:
+	if user.id != message.sender.id:
 		message_context['private'] = user.username
 		ishout_client.emit(
-			user_id=message.userid,
+			user_id=message.sender,
 			channel='notifications',
 			data=message_context
 		)

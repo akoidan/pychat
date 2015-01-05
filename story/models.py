@@ -30,33 +30,22 @@ class Messages(models.Model):
 	"""
 	Contains all public messages
 	"""
-	userid = models.ForeignKey(User)
+	sender = models.ForeignKey(User, related_name='sender')
 	#DateField.auto_now¶
 	time = models.TimeField(default=datetime.datetime.now)
 	content = models.CharField(max_length=255)
 	id = models.AutoField(primary_key=True)
+	receiver = models.ForeignKey(User, null=True, related_name='receiver')
 
 	@property
 	def json(self):
 		return {
-		'user': User.objects.get_by_natural_key(self.userid).username,
+		'user': User.objects.get_by_natural_key(self.sender).username,
 		'content': self.content,
 		'time': self.time.strftime("%H:%M:%S"),
 		'id': self.id
 		}
 
-
-class PrivateMessages(models.Model):
-	"""
-	Contains all private messages. Don't want to inherit it
-	from Messages class to simplify DataBase view
-	"""
-	addressee = models.ForeignKey(User, related_name='receiver')
-	userid = models.ForeignKey(User, related_name='sender')
-	#DateField.auto_now¶
-	time = models.TimeField(default=datetime.datetime.now)
-	content = models.CharField(max_length=255)
-	id = models.AutoField(primary_key=True)
 
 
 class UserSettings(models.Model):
