@@ -58,6 +58,7 @@ class PrivateMessages(models.Model):
 	content = models.CharField(max_length=255)
 	id = models.AutoField(primary_key=True)
 
+
 class UserSettings(models.Model):
 	"""
 	Contains information about user customizable color settings

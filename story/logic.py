@@ -37,9 +37,10 @@ def send_message_to_user(message, user):
 def send_user_list():
 	room_status = ishout_client.get_room_status('main')
 	users = User.objects.filter(id__in=room_status['members'])
+	# list of dictionaries { Monika : Female, Andrew : Male }
 	ishout_client.broadcast(
 		channel='refresh_users',
-		data=[user.username for user in users]
+		data={user.username: user.profile.get_gender_display() for user in users}
 	)
 
 

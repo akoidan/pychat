@@ -61,12 +61,20 @@ function loadUsers(usernames) {
 	console.log(new Date() + "Load usernames :" + usernames);
 	chatRoomsDiv.empty();
 	var allUsers = '<ul class="message_header_others">';
-	for (index in usernames) {
+	var icon;
+	for (username in usernames) {
+		if (usernames[username] == "Male") {
+			icon = '<span class="glyphicon icon-user green"/>'
+		} else if (usernames[username] == "Female") {
+			icon = '<span class="glyphicon icon-girl green"/>'
+		} else {
+			icon = '<span class="glyphicon icon-dog green"/>';
+		}
 		allUsers += '<li onclick="showUserSendMess($(this).text());">'
-		+ usernames[index] + '</li>';
+		+ username + icon + '</li>';
 	}
 	allUsers += ('</ul>');
-		chatRoomsDiv.append(allUsers);
+	chatRoomsDiv.append(allUsers);
 }
 
 function showUserSendMess(username) {
