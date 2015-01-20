@@ -13,9 +13,9 @@ curl -L -o ishout.js.zip https://www.dropbox.com/sh/m0np8p9f7c9cf3k/AACGEDrkpspb
 
 # Fonts
 mkdir $PROJECT_ROOT/story/static/fonts/
-wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.eot -P $PROJECT_ROOT/story/static/fonts/
-wget https://raw.githubusercontent.com/twbs/bootstrap/master/fonts/glyphicons-halflings-regular.svg -P $PROJECT_ROOT/story/static/fonts/
-wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.ttf -P $PROJECT_ROOT/story/static/fonts/
+#wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.eot -P $PROJECT_ROOT/story/static/fonts/
+#wget https://raw.githubusercontent.com/twbs/bootstrap/master/fonts/glyphicons-halflings-regular.svg -P $PROJECT_ROOT/story/static/fonts/
+#wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.ttf -P $PROJECT_ROOT/story/static/fonts/
 wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.woff -P $PROJECT_ROOT/story/static/fonts/
 
 # JavaScript
@@ -32,9 +32,9 @@ wget https://raw.githubusercontent.com/marcoceppi/bootstrap-glyphicons/master/cs
 mkdir $PROJECT_ROOT/story/static/sounds
 curl -L -o /tmp/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip /tmp/sounds.zip -d $PROJECT_ROOT/story/static/sounds/
 
-folders[1]="$PROJECT_ROOT/story/static/fonts/glyphicons-halflings-regular.svg"
-folders[2]="$PROJECT_ROOT/story/static/fonts/glyphicons-halflings-regular.eot"
-folders[3]="$PROJECT_ROOT/story/static/fonts/glyphicons-halflings-regular.ttf"
+#folders[1]="$PROJECT_ROOT/story/static/fonts/glyphicons-halflings-regular.svg"
+#folders[2]="$PROJECT_ROOT/story/static/fonts/glyphicons-halflings-regular.eot"
+#folders[3]="$PROJECT_ROOT/story/static/fonts/glyphicons-halflings-regular.ttf"
 folders[4]="$PROJECT_ROOT/story/static/fonts/glyphicons-halflings-regular.woff"
 folders[5]="$PROJECT_ROOT/story/static/js/jquery.js"
 folders[6]="$PROJECT_ROOT/story/static/js/jscolor/jscolor.js"

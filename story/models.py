@@ -31,7 +31,7 @@ class Messages(models.Model):
 	Contains all public messages
 	"""
 	sender = models.ForeignKey(User, related_name='sender')
-	#DateField.auto_now¶
+	#DateField.auto_now
 	time = models.TimeField(default=datetime.datetime.now)
 	content = models.CharField(max_length=255)
 	id = models.AutoField(primary_key=True)
