@@ -44,9 +44,9 @@ def get_messages(request):
 		header_id = request.POST.get('headerId', -1)
 		count = int(request.POST.get('count', 10))
 		if header_id == -1:
-			messages = Messages.objects.filter(receiver=None).order_by('pk').reverse()[:count]
+			messages = Messages.objects.filter(receiver=None).order_by('-pk')[:count]
 		else:
-			messages = Messages.objects.filter(id__lt=header_id, receiver=None).order_by('pk').reverse()[:count]
+			messages = Messages.objects.filter(id__lt=header_id, receiver=None).order_by('-pk')[:count]
 		response = json.dumps([message.json for message in messages])
 	else:
 		response = "can't get messages for noauthorized user"
