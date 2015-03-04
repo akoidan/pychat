@@ -24,7 +24,6 @@ To run this you need:
  3. `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
-=====
 * add chat rooms
 * implement smiles
 * Add languages for menu.
