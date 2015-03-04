@@ -25,4 +25,5 @@ To run this you need:
 
 #TODO  
 add chat rooms, implement smiles,  Add languages for menu. Remove bootsrap glyphicons. Gradient text disappear on top, Add info icon on navbar for troubles and offerings
- 
+
+ add photo to user profile, change default user to myUser with custom fields, write template tag that adds top navbar page to every context.
