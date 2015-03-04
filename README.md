@@ -23,7 +23,14 @@ To run this you need:
  2. ArchLinux `node ./node_modules/ishout.js/server.js` Ubuntu `nodejs ./node_modules/ishout.js/server.js` # npm's ishout.js directory
  3. `python manage.py runserver 0.0.0.0:80000`
 
-#TODO  
-add chat rooms, implement smiles,  Add languages for menu. Remove bootsrap glyphicons. Gradient text disappear on top, Add info icon on navbar for troubles and offerings
-
- add photo to user profile, change default user to myUser with custom fields, write template tag that adds top navbar page to every context.
+#TODO
+=====
+* add chat rooms
+* implement smiles
+* Add languages for menu.
+* Remove bootsrap glyphicons
+* Gradient text disappear on top
+* Add info icon on navbar for troubles and offerings
+* add photo to user profile
+* change default user to myUser with custom fields
+* write context_processors that adds top navbar page to every context.
