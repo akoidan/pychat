@@ -53,7 +53,7 @@ INSTALLED_APPS = (
 )
 
 # HOST_IP = socket.gethostbyname(socket.gethostname())
-HOST_IP = '193.105.201.235'
+HOST_IP = '127.0.0.1'
 
 
 # SESSION_COOKIE_AGE = 10
