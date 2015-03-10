@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.shortcuts import render_to_response
@@ -20,6 +21,7 @@ import json
 from story.registration_utils import validate_password, check_email, send_email_verification, check_user
 
 
+@require_http_methods(["POST"])
 def validate_email(request):
 	"""
 	POST only, validates email during registration
@@ -29,7 +31,7 @@ def validate_email(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
-@require_http_methods(["POST"])
+@require_http_methods("POST")
 def validate_user(request):
 	"""
 	Validates user during registration
@@ -43,20 +45,19 @@ def validate_user(request):
 	return HttpResponse(message, content_type='text/plain')
 
 
+@require_http_methods("POST")
+@login_required
 def get_messages(request):
 	"""
-	POST only, returns all public messages started from ID
+	Returns all public messages started from ID
 	"""
-	if request.user.is_authenticated() and request.method == 'POST':
-		header_id = request.POST.get('headerId', -1)
-		count = int(request.POST.get('count', 10))
-		if header_id == -1:
-			messages = Messages.objects.filter(receiver=None).order_by('-pk')[:count]
-		else:
-			messages = Messages.objects.filter(id__lt=header_id, receiver=None).order_by('-pk')[:count]
-		response = json.dumps([message.json for message in messages])
+	header_id = request.POST.get('headerId', -1)
+	count = int(request.POST.get('count', 10))
+	if header_id == -1:
+		messages = Messages.objects.filter(receiver=None).order_by('-pk')[:count]
 	else:
-		response = "can't get messages for noauthorized user"
+		messages = Messages.objects.filter(id__lt=header_id, receiver=None).order_by('-pk')[:count]
+	response = json.dumps([message.json for message in messages])
 	return HttpResponse(response, content_type='text/plain')
 
 
@@ -71,24 +72,25 @@ def home(request):
 	return render_to_response('story/chat.html', c)
 
 
+@require_http_methods("POST")
+@login_required
 def send_message(request):
 	"""
-	POST only, sends messages via Ishout
+	Emits messages via Ishout
 	"""
-	if request.user.is_authenticated() and request.method == 'POST':
-		content = request.POST.get('message', '')
-		addressee = request.POST.get('addressee', '')
-		if addressee:
-			receiver = User.objects.get(username=addressee)
-			message = Messages(sender=request.user, content=content, receiver=receiver)
-			message.save()
-			send_message_to_user(message, receiver)
-		else:
-			message = Messages(sender=request.user, content=content)
-			message.save()
-			broadcast_message(message)
-		response = 'message delivered'
-		return HttpResponse(response, content_type='text/plain')
+	content = request.POST.get('message', '')
+	addressee = request.POST.get('addressee', '')
+	if addressee:
+		receiver = User.objects.get(username=addressee)
+		message = Messages(sender=request.user, content=content, receiver=receiver)
+		message.save()
+		send_message_to_user(message, receiver)
+	else:
+		message = Messages(sender=request.user, content=content)
+		message.save()
+		broadcast_message(message)
+	response = 'message delivered'
+	return HttpResponse(response, content_type='text/plain')
 
 
 def create_nav_page(request, c):
@@ -104,6 +106,7 @@ def create_nav_page(request, c):
 	c.update({'navbar_page': page})
 
 
+@login_required()
 def logout(request):
 	"""
 	POST. Logs out into system.
@@ -129,27 +132,25 @@ def auth(request):
 	return HttpResponse(message, content_type='text/plain')
 
 
+@require_http_methods("GET")
 def confirm_email(request):
 	"""
-	GET only. Acceps the verification code sent to email
+	Accept the verification code sent to email
 	"""
-	if request.method == 'GET':
-		code = request.GET.get('code', False)
-		try:
-			u = UserProfile.objects.get(verify_code=code)
-			if u.email_verified is False:
-				u.email_verified = True
-				u.save()
-				message = 'verification code is accepted'
-			else:
-				message = 'This code is already accepted'
-		except UserProfile.DoesNotExist:
-			raise Http404
-	else:
-		message = "invalid request"
-	response = {'message': message}
-	create_nav_page(request, response)
-	return render_to_response('story/confirm_mail.html', response)
+	code = request.GET.get('code', False)
+	try:
+		u = UserProfile.objects.get(verify_code=code)
+		if u.email_verified is False:
+			u.email_verified = True
+			u.save()
+			message = 'verification code is accepted'
+		else:
+			message = 'This code is already accepted'
+		response = {'message': message}
+		create_nav_page(request, response)
+		return render_to_response('story/confirm_mail.html', response)
+	except UserProfile.DoesNotExist:
+		raise Http404
 
 
 def register(request):
@@ -157,6 +158,7 @@ def register(request):
 	GET and POST. Returns the registration p age
 	Registrate a new user from a submit form.
 	"""
+	# TODO move to separate methods post and get
 	if request.method == 'POST':
 		username = request.POST['username']
 		password = request.POST['password']
@@ -165,7 +167,6 @@ def register(request):
 		first_name = request.POST['first_name']
 		last_name = request.POST['last_name']
 		sex = request.POST.get('sex', None)
-		user = None
 		try:
 			check_user(username)
 			validate_password(password)
