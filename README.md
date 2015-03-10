@@ -1,3 +1,4 @@
+![python](https://img.shields.io/badge/python-3.4-blue.svg) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master)
 Very simple chat written in django with drealtime, visit http://193.105.201.235
 ==========
 To run this you need:
