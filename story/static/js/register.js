@@ -53,7 +53,7 @@ function validatePassword() {
 		passwordCheck.style.color = "#dd4b39";
 		passwordCheck.innerHTML = "Password can't be empty";
 	} else if (pswd.length < 3) {
-		passwordCheck.style.color = "black";
+		passwordCheck.style.color = "#dd4b39";
 		passwordCheck.innerHTML = "Password should be at least 3 character";
 	} else {
 		passwordCheck.style.color = "Green";
@@ -74,7 +74,8 @@ function validateUser() {
 		},
 		success: function (data) {
 			console.log(d + "Validate user response: " + data);
-			if (data == 'False') {
+			// hardcoded ok
+			if (data == 'ok') {
 				userNameCheck.style.color = "Green";
 				userNameCheck.innerHTML = "Username is fine";
 			} else {

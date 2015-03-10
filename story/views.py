@@ -1,12 +1,13 @@
 # -*- encoding: utf-8 -*-
 from django.contrib.auth.models import User
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 from django.core.context_processors import csrf
+from django.views.decorators.http import require_http_methods
 from story.apps import DefaultSettingsConfig
 from story.models import UserProfile, UserSettings
 from .models import Messages
@@ -16,6 +17,7 @@ from story.forms import UserSettingsForm
 from django.http import HttpResponseRedirect
 from story.logic import broadcast_message, send_user_list, get_user_settings, send_message_to_user
 import json
+from story.registration_utils import validate_password, check_email, send_email_verification, check_user
 
 
 def validate_email(request):
@@ -27,13 +29,18 @@ def validate_email(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
+@require_http_methods(["POST"])
 def validate_user(request):
 	"""
-	POST only, validates user during registration
+	Validates user during registration
 	"""
-	username = request.POST['username']
-	response = registration_utils.validate_user(username)
-	return HttpResponse(response, content_type='text/plain')
+	try:
+		registration_utils.check_user(request.POST['username'])
+		# hardcoded ok check in register.js
+		message = 'ok'
+	except ValidationError as e:
+		message = e.message
+	return HttpResponse(message, content_type='text/plain')
 
 
 def get_messages(request):
@@ -84,7 +91,6 @@ def send_message(request):
 		return HttpResponse(response, content_type='text/plain')
 
 
-
 def create_nav_page(request, c):
 	"""
 	GET only, returns main Chat page.
@@ -106,9 +112,10 @@ def logout(request):
 	return home(request)
 
 
+@require_http_methods(["POST"])
 def auth(request):
 	"""
-	POST only. Logs in into system.
+	Logs in into system.
 	"""
 	username = request.POST['username']
 	password = request.POST['password']
@@ -150,21 +157,36 @@ def register(request):
 	GET and POST. Returns the registration p age
 	Registrate a new user from a submit form.
 	"""
-	if request.is_ajax():
-		registration_result = registration_utils.register_user(
-			request.POST['username'],
-			request.POST['password'],
-			request.POST['email'],
-			request.POST.get('mailbox', False),
-			request.POST['first_name'],
-			request.POST['last_name'],
-			request.POST.get('sex', None)
-		)
-		if registration_result['message'] is False:
-			djangologin(request, registration_result['user'])
+	if request.method == 'POST':
+		username = request.POST['username']
+		password = request.POST['password']
+		email = request.POST['email']
+		verify_email = request.POST.get('mailbox', False)
+		first_name = request.POST['first_name']
+		last_name = request.POST['last_name']
+		sex = request.POST.get('sex', None)
+		user = None
+		try:
+			check_user(username)
+			validate_password(password)
+			user = User.objects.create_user(username, email, password)
+			if verify_email:
+				check_email(email)
+				send_email_verification(user)
+			user.first_name = first_name
+			user.last_name = last_name
+			user.save()
+			user = authenticate(username=username, password=password)
+			profile = user.profile
+			# TODO BUG only MALE
+			profile.gender = sex
+			profile.save()
+			djangologin(request, user)
 			# register,js redirect if message = 'Account created'
-			registration_result['message'] = 'Account created'
-		return HttpResponse(registration_result['message'], content_type='text/plain')
+			message = 'Account created'
+		except ValidationError as e:
+			message = e.message
+		return HttpResponse(message, content_type='text/plain')
 	else:
 		c = csrf(request)
 		c.update({'error code': "welcome to register page"})

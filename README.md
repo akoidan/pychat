@@ -3,15 +3,11 @@ Very simple chat written in django with drealtime, visit http://193.105.201.235
 To run this you need:
 
 1. Python3 or Python2, both are supported
-2. pip packages # `pip install packagename` # python-pip 
- 1. django
- 2. django-realtime # via pip, or `git clone https://github.com/anishmenon/django-realtime && cd django-realtime && python setup.py install`
- 3. simplejson
- 4. celery
- 5. PyMySQL and mysql-connector-python # only if you're using MySQL, the last one to migrate
+2. Python packages 
+ 1. `pip install -r requirements.txt`
 3. Linux packages
  1. redis-server # ArchLinux `pacman -S community/redis`, Ubuntu `add-apt-repository -y ppa:rwky/redis` `apt-get install -y redis-server`
- 2. nodejs and npm# ArchLinux `pacman -S community/nodejs` Ubuntu `apt-get install nodejs` `apt-get install npm`
+ 2. nodejs and npm # ArchLinux `pacman -S community/nodejs` Ubuntu `apt-get install nodejs` `apt-get install npm`
 4. Configure server  
  1. Choose DATABASES in Chat/settings.py if needed and run `sh syncdb.sh` #Chat uses SQLite by default
  2. Change HOST_IP in Chat/settings.py to yours, It's important since it tells where messages should go from a client
