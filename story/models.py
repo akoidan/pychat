@@ -14,8 +14,23 @@ class UserProfile(models.Model):
 	)
 	gender = models.NullBooleanField(choices=GENDER_CHOICES)
 
-	def __str__(self):
-		return "%s's profile" % self.user
+			#TODO
+			# # ISO/IEC 5218 1 male, 2 - female
+			# GENDER_VALUES = {'Male': 1, 'Female': 2}
+			# sex = models.SmallIntegerField()
+			#
+			# def __str__(self):
+			# 	return "%s's profile" % self.user
+			#
+			#
+			#
+			# @property
+			# def gender(self):
+			# 	return self.GENDER_VALUES[self.sex.value]
+			#
+			# @gender.setter
+			# def gender(self, value):
+			# 	sex = self.GENDER_VALUES.get(self.sex.value)
 
 
 def create_user_profile(sender, instance, created, **kwargs):
@@ -40,12 +55,11 @@ class Messages(models.Model):
 	@property
 	def json(self):
 		return {
-		'user': User.objects.get_by_natural_key(self.sender).username,
-		'content': self.content,
-		'time': self.time.strftime("%H:%M:%S"),
-		'id': self.id
+			'user': User.objects.get_by_natural_key(self.sender).username,
+			'content': self.content,
+			'time': self.time.strftime("%H:%M:%S"),
+			'id': self.id
 		}
-
 
 
 class UserSettings(models.Model):

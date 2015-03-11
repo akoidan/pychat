@@ -23,11 +23,15 @@ from story.registration_utils import validate_password, check_email, send_email_
 
 @require_http_methods(["POST"])
 def validate_email(request):
-	"""
+	"""d@
 	POST only, validates email during registration
 	"""
 	email = request.POST['email']
-	response = registration_utils.validate_email(email)
+	try:
+		registration_utils.validate_email(email)
+		response = 'ok'
+	except ValidationError as e:
+		response = e.message
 	return HttpResponse(response, content_type='text/plain')
 
 

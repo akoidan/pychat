@@ -101,7 +101,7 @@ function validateEmail() {
 		},
 		success: function (data) {
 			console.log(new Date() + "Validate email response: " + data);
-			if (data == 'False') {
+			if (data == 'ok') {
 				emailCheck.style.color = "Green";
 				emailCheck.innerHTML = "Email is fine";
 				return true;
