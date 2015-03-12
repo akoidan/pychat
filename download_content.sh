@@ -4,10 +4,10 @@ PROJECT_ROOT='.'
 cd $PROJECT_ROOT
 
 # IShout.js
-realPython=$(readlink -f $(which python))
-(sudo ln -sf $(which python2) $(which python) &&
+
+(alias python='python2' &&
 sudo npm install ishout.js
-sudo ln -sf $realPython $(which python)) ||
+unalias python) ||
 curl -L -o ishout.js.zip https://www.dropbox.com/sh/m0np8p9f7c9cf3k/AACGEDrkpspbSocyQP0SaVk-a?dl=1 && unzip ishout.js.zip -d $PROJECT_ROOT/node_modules
 
 

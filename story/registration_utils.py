@@ -6,48 +6,60 @@ from django.contrib.auth import authenticate
 from django.conf import settings
 import random
 import string
-from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
 
+def validate_email(email):
+	from django.core.validators import validate_email
+	from django.core.exceptions import ValidationError
 
-def check_email(email):
-	validate_email(email)
+	try:
+		validate_email(email)
+	except ValidationError:
+		return "Email is not correct"
 	try:
 		# theoretically can throw returning 'more than 1' error
 		User.objects.get(email=email)
-		raise ValidationError('This email is already used')
+		return "This email is already used"
 	except User.DoesNotExist:
-		pass
+		return False
 
 
-def check_user(username):
-	"""
-	Checks if specified username is free to register
-	:raises ValidationError exception if username is not valid
-	"""
+def validate_user(username):
 	if username is None or username == '':
-		raise ValidationError("User name can't be empty")
-	if len(username) > 16:
-		raise ValidationError("User is too long. Max 16 symbols")
-	if not re.match('^[A-Za-z0-9-_]*$', username):
-		raise ValidationError("Only letters, numbers, dashes or underlines")
+		return "User name can't be empty"
+	elif len(username) > 16:
+		return "User is too long. Max 16 symbols"
+	if not re.match('^[A-Za-z0-9-_]*$',username):
+		return "Only letters, numbers, dashes or underlines"
 	try:
 		# theoretically can throw returning 'more than 1' error
 		User.objects.get(username=username)
-		raise ValidationError("This user name already used")
+		return 'This user name already used'
 	except User.DoesNotExist:
-		pass
+		return False
 
 
-def validate_password(password):
-	"""
-	Checks if password is secure
-	:raises ValidationError exception if password is not valid
-	"""
+def register_user(username, password, email, verify_email, first_name, last_name, sex):
+	message = False
+	user = None
 	if password is None or password == '':
-		raise ValidationError("password can't be empty")
-	if len(password) < 3:
-		raise ValidationError("password should be at least 3 symbols")
+		message = "Password can't be empty"
+	if message is False and verify_email:
+		message = validate_email(email)
+	if message is False:
+		message = validate_user(username)
+	if message is False:
+		user = User.objects.create_user(username, email, password)
+		user.first_name = first_name
+		user.last_name = last_name
+		user.save()
+		user = authenticate(username=username, password=password)
+		profile = user.profile
+		# TODO BUG always true
+		profile.gender = sex
+		profile.save()
+		if verify_email:
+			send_email_verification(user)
+	return {'user': user, 'message': message}
 
 
 def id_generator(size=16, chars=string.ascii_letters + string.digits):

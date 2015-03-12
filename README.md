@@ -1,17 +1,15 @@
-![python](https://img.shields.io/badge/python-3.4-blue.svg) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/djangochat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/djangochat/master)
-A simple chat written in django with drealtime
+Very simple chat written in django with drealtime
 ==========
 To run this you need:
 
 1. Python3 or Python2, both are supported
-2. Python packages 
- 1. `pip install -r requirements.txt`
+2. sudo pip install -r requirements.txt 
 3. Linux packages
  1. redis-server # ArchLinux `pacman -S community/redis`, Ubuntu `add-apt-repository -y ppa:rwky/redis` `apt-get install -y redis-server`
- 2. nodejs and npm # ArchLinux `pacman -S community/nodejs` Ubuntu `apt-get install nodejs` `apt-get install npm`
+ 2. nodejs and npm# ArchLinux `pacman -S community/nodejs` Ubuntu `apt-get install nodejs` `apt-get install npm`
 4. Configure server  
  1. Choose DATABASES in Chat/settings.py if needed and run `sh syncdb.sh` #Chat uses SQLite by default
- 2. Change HOST_IP in Chat/settings.py to yours, It's important since it tells where messages should go from a client
+ 2. **Change HOST_IP in Chat/settings.py to yours **, it tells where messages should go from a client
 5. Download static content and IShout.js
  1. `sh download_content.sh` 
  2. if it fails download the resources manually from link specified in it

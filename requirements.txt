@@ -1,7 +1,6 @@
 django>1.7.0
-django-realtime #git clone https://github.com/anishmenon/django-realtime && cd django-realtime && python setup.py install`
+django-realtime
 simplejson
 celery
-## Uncomment lines below if you decide to use mysql
-#PyMySQL
-#mysql-connector-python # only for migration
+# PyMySQL
+# mysql-connector-python
