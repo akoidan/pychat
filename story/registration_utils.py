@@ -1,12 +1,13 @@
-__author__ = 'andrew'
 import re
-from django.contrib.auth.models import User
 from threading import Thread
-from django.conf import settings
 import random
 import string
+
+from django.conf import settings
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+
+from story.models import UserProfile
 
 
 def check_password(password):
@@ -27,9 +28,9 @@ def check_email(email):
 	validate_email(email)
 	try:
 		# theoretically can throw returning 'more than 1' error
-		User.objects.get(email=email)
+		UserProfile.objects.get(email=email)
 		raise ValidationError('This email is already used')
-	except User.DoesNotExist:
+	except UserProfile.DoesNotExist:
 		pass
 
 
@@ -46,9 +47,9 @@ def check_user(username):
 		raise ValidationError("Only letters, numbers, dashes or underlines")
 	try:
 		# theoretically can throw returning 'more than 1' error
-		User.objects.get(username=username)
+		UserProfile.objects.get(username=username)
 		raise ValidationError("This user name already used")
-	except User.DoesNotExist:
+	except UserProfile.DoesNotExist:
 		pass
 
 

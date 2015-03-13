@@ -1,9 +1,8 @@
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.forms import model_to_dict
 from drealtime import iShoutClient
 from story.apps import DefaultSettingsConfig
-from story.models import UserSettings
+from story.models import UserSettings, UserProfile
 
 ishout_client = iShoutClient()
 
@@ -36,7 +35,7 @@ def send_message_to_user(message, user):
 
 def send_user_list():
 	room_status = ishout_client.get_room_status('main')
-	users = User.objects.filter(id__in=room_status['members'])
+	users = UserProfile.objects.filter(id__in=room_status['members'])
 	# list of dictionaries { Monika : Female, Andrew : Male }
 	ishout_client.broadcast(
 		channel='refresh_users',

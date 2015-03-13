@@ -1,5 +1,7 @@
 from django.conf.urls import patterns, include, url
+from django.conf.urls.static import static
 from django.contrib import admin
+import settings
 
 admin.autodiscover()
 urlpatterns = patterns(
@@ -19,4 +21,4 @@ urlpatterns = patterns(
 	url(r'^profile$', 'story.views.profile'),
 	url(r'^refresh_user_list', 'story.views.refresh_user_list'),
 	url(r'^send_message', 'story.views.send_message'),
-)
+) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

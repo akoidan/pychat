@@ -77,6 +77,7 @@ ROOT_URLCONF = 'Chat.urls'
 
 WSGI_APPLICATION = 'Chat.wsgi.application'
 
+AUTH_USER_MODEL = 'story.UserProfile'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
@@ -132,7 +133,7 @@ STATICFILES_DIRS = (
 	os.path.join(PROJECT_DIR, 'static'),
 )
 
-AUTH_PROFILE_MODULE = 'story.UserProfile'
+# AUTH_PROFILE_MODULE = 'story.UserProfile'
 
 # for gmail or google apps
 EMAIL_USE_TLS = True
@@ -140,3 +141,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'chat.django@gmail.com'
 EMAIL_HOST_PASSWORD = 'Ilovepython'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
+
+MEDIA_URL = "photo/"

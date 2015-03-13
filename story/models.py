@@ -1,62 +1,74 @@
-from django.db import models
-from django.contrib.auth.models import User
-from django.db.models.signals import post_save
+import uuid
 import datetime
 
+from django.db import models
+from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.db.models import ImageField, CharField, DateField, TextField
 
-class UserProfile(models.Model):
-	user = models.OneToOneField(User, related_name='profile')
+
+class UserProfile(AbstractBaseUser):
+	def get_short_name(self):
+		return self.name
+
+	def get_file_path(self, filename):
+		"""
+		:param filename base string for generated name
+		:return: a unique string filename
+		"""
+		ext = filename.split('.')[-1]
+		return "%s.%s" % (uuid.uuid4(), ext)
+
+	def get_full_name(self):
+		return '%s %s' % (self.name, self.surname)
+
+	@property
+	def is_staff(self):
+		# every registered user can edit database
+		return False  # self.pk == DEFAULT_PROFILE_ID
+
+	def has_perm(self, perm, obj=None):
+		return self.is_staff
+
+	def has_module_perms(self, app_label):
+		return self.is_staff
+
+	username = CharField(max_length=30, blank=True, unique=True)
+	name = CharField(max_length=30, blank=True, null=True)
+	surname = CharField(max_length=30, blank=True)
+	email = models.EmailField(blank=True)
+
+	# specifies a custom create_user method
+	# objects = MyUserManager()
+
+	birth_date = DateField(null=True, blank=True)
+	contacts = CharField(null=True, max_length=100)
+	bio = TextField(null=True)
+	# fileField + <img instead of ImageField (removes preview link)
+	photo = ImageField(upload_to=get_file_path)
+
+	USERNAME_FIELD = 'username'
+
 	email_verified = models.BooleanField(default=False)
 	verify_code = models.CharField(max_length=17)
-	GENDER_CHOICES = (
-		(True, 'Male'),
-		(False, 'Female'),
-	)
-	gender = models.NullBooleanField(choices=GENDER_CHOICES)
-
-	#TODO
-	# # ISO/IEC 5218 1 male, 2 - female
-	# GENDER_VALUES = {'Male': 1, 'Female': 2}
-	# sex = models.SmallIntegerField()
-	#
-	# def __str__(self):
-	# 	return "%s's profile" % self.user
-	#
-	#
-	#
-	# @property
-	# def gender(self):
-	# 	return self.GENDER_VALUES[self.sex.value]
-	#
-	# @gender.setter
-	# def gender(self, value):
-	# 	sex = self.GENDER_VALUES.get(self.sex.value)
-
-
-#todo use AUTH_MODEL
-def create_user_profile(sender, instance, created, **kwargs):
-	if created:
-		profile, created = UserProfile.objects.get_or_create(user=instance, email_verified=False)
-
-
-post_save.connect(create_user_profile, sender=User)
+	# ISO/IEC 5218 1 male, 2 - female
+	sex = models.SmallIntegerField()
 
 
 class Messages(models.Model):
 	"""
 	Contains all public messages
 	"""
-	sender = models.ForeignKey(User, related_name='sender')
+	sender = models.ForeignKey(UserProfile, related_name='sender')
 	#DateField.auto_now
 	time = models.TimeField(default=datetime.datetime.now)
 	content = models.CharField(max_length=255)
 	id = models.AutoField(primary_key=True)
-	receiver = models.ForeignKey(User, null=True, related_name='receiver')
+	receiver = models.ForeignKey(UserProfile, null=True, related_name='receiver')
 
 	@property
 	def json(self):
 		return {
-			'user': User.objects.get_by_natural_key(self.sender).username,
+			'user': UserProfile.objects.get_by_natural_key(self.sender).username,
 			'content': self.content,
 			'time': self.time.strftime("%H:%M:%S"),
 			'id': self.id
@@ -67,7 +79,7 @@ class UserSettings(models.Model):
 	"""
 	Contains information about user customizable color settings
 	"""
-	user = models.OneToOneField(User, related_name='user_id', primary_key=True)
+	user = models.OneToOneField(UserProfile, related_name='user_id', primary_key=True)
 	text_color = models.CharField(max_length=6, null=True)
 	self_text_color = models.CharField(max_length=6, null=True)
 	others_text_color = models.CharField(max_length=6, null=True)

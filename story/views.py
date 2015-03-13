@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
+import json
+
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
@@ -9,15 +10,15 @@ from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 from django.core.context_processors import csrf
 from django.views.decorators.http import require_http_methods
+from django.http import Http404
+from django.http import HttpResponseRedirect
+
 from story.apps import DefaultSettingsConfig
 from story.models import UserProfile, UserSettings
 from .models import Messages
-from django.http import Http404
 from story import registration_utils
 from story.forms import UserSettingsForm
-from django.http import HttpResponseRedirect
 from story.logic import broadcast_message, send_user_list, get_user_settings, send_message_to_user
-import json
 from story.registration_utils import check_email, send_email_verification, check_user, check_password
 
 
@@ -86,7 +87,7 @@ def send_message(request):
 	content = request.POST.get('message', '')
 	addressee = request.POST.get('addressee', '')
 	if addressee:
-		receiver = User.objects.get(username=addressee)
+		receiver = UserProfile.objects.get(username=addressee)
 		message = Messages(sender=request.user, content=content, receiver=receiver)
 		message.save()
 		send_message_to_user(message, receiver)
@@ -98,6 +99,7 @@ def send_message(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
+@require_http_methods("GET")
 def create_nav_page(request, c):
 	"""
 	GET only, returns main Chat page.
@@ -169,30 +171,23 @@ def get_register_page(request):
 @require_http_methods("POST")
 def register(request):
 	try:
-		username = request.POST.get('username')
-		password = request.POST.get('password')
-		email = request.POST.get('email')
-		verify_email = request.POST.get('mailbox', False)
-		first_name = request.POST.get('first_name')
-		last_name = request.POST.get('last_name')
-		sex = request.POST.get('sex')
+		rp = request.POST
+		(username, password, email, verify_email) = (
+				rp.get('username'), rp.get('password'), rp.get('email'), rp.get('mailbox'))
 		check_user(username)
 		check_password(password)
-		user = User.objects.create_user(username, email, password)
 		if verify_email:
 			check_email(email)
-			send_email_verification(user)
-		user.first_name = first_name
-		user.last_name = last_name
+		get = rp.get('sex')
+
+		user = UserProfile(username=username, email=email, sex=1 if rp.get('sex') == 'Male' else 2)
+		user.set_password(password)
 		user.save()
-		user = authenticate(username=username, password=password)
-		profile = user.profile
-		# TODO BUG only MALE
-		profile.gender = sex
-		profile.save()
 		djangologin(request, user)
 		# register,js redirect if message = 'Account created'
 		message = 'Account created'
+		if verify_email:
+			send_email_verification(user)
 	except ValidationError as e:
 		message = e.message
 	return HttpResponse(message, content_type='text/plain')
