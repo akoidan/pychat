@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
 from django.contrib.auth import authenticate
@@ -26,7 +26,7 @@ def validate_email(request):
 	"""
 	POST only, validates email during registration
 	"""
-	email = request.POST['email']
+	email = request.POST.get('email')
 	try:
 		registration_utils.validate_email(email)
 		response = 'ok'
@@ -41,7 +41,7 @@ def validate_user(request):
 	Validates user during registration
 	"""
 	try:
-		registration_utils.check_user(request.POST['username'])
+		registration_utils.check_user(request.POST.get('username'))
 		# hardcoded ok check in register.js
 		message = 'ok'
 	except ValidationError as e:
@@ -125,8 +125,8 @@ def auth(request):
 	"""
 	Logs in into system.
 	"""
-	username = request.POST['username']
-	password = request.POST['password']
+	username = request.POST.get('username')
+	password = request.POST.get('password')
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		djangologin(request, user)
@@ -169,13 +169,13 @@ def get_register_page(request):
 @require_http_methods("POST")
 def register(request):
 	try:
-		username = request.POST['username']
-		password = request.POST['password']
-		email = request.POST['email']
+		username = request.POST.get('username')
+		password = request.POST.get('password')
+		email = request.POST.get('email')
 		verify_email = request.POST.get('mailbox', False)
-		first_name = request.POST['first_name']
-		last_name = request.POST['last_name']
-		sex = request.POST.get('sex', None)
+		first_name = request.POST.get('first_name')
+		last_name = request.POST.get('last_name')
+		sex = request.POST.get('sex')
 		check_user(username)
 		check_password(password)
 		user = User.objects.create_user(username, email, password)
@@ -195,10 +195,7 @@ def register(request):
 		message = 'Account created'
 	except ValidationError as e:
 		message = e.message
-	except Exception as e2:
-		message = e2
 	return HttpResponse(message, content_type='text/plain')
-
 
 
 @login_required()

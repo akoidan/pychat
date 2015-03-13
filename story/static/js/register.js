@@ -28,7 +28,7 @@ function register() {
 	console.log(new Date() + "Sending registering request to server, data:" + datad);
 	$.ajax({
 		type: 'POST',
-		url: document.URL,
+		url: '/register',
 		data: datad,
 		success: function (data) {
 			var datad = $('form').serialize();

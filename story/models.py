@@ -14,25 +14,26 @@ class UserProfile(models.Model):
 	)
 	gender = models.NullBooleanField(choices=GENDER_CHOICES)
 
-			#TODO
-			# # ISO/IEC 5218 1 male, 2 - female
-			# GENDER_VALUES = {'Male': 1, 'Female': 2}
-			# sex = models.SmallIntegerField()
-			#
-			# def __str__(self):
-			# 	return "%s's profile" % self.user
-			#
-			#
-			#
-			# @property
-			# def gender(self):
-			# 	return self.GENDER_VALUES[self.sex.value]
-			#
-			# @gender.setter
-			# def gender(self, value):
-			# 	sex = self.GENDER_VALUES.get(self.sex.value)
+	#TODO
+	# # ISO/IEC 5218 1 male, 2 - female
+	# GENDER_VALUES = {'Male': 1, 'Female': 2}
+	# sex = models.SmallIntegerField()
+	#
+	# def __str__(self):
+	# 	return "%s's profile" % self.user
+	#
+	#
+	#
+	# @property
+	# def gender(self):
+	# 	return self.GENDER_VALUES[self.sex.value]
+	#
+	# @gender.setter
+	# def gender(self, value):
+	# 	sex = self.GENDER_VALUES.get(self.sex.value)
 
 
+#todo use AUTH_MODEL
 def create_user_profile(sender, instance, created, **kwargs):
 	if created:
 		profile, created = UserProfile.objects.get_or_create(user=instance, email_verified=False)

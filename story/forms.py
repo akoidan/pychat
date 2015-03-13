@@ -9,6 +9,6 @@ class UserSettingsForm(forms.ModelForm):
 		for field in self:
 			field.field.widget.attrs['class'] = 'color'
 
-	class Meta:
+	class Meta:  # pylint: disable=C1001
 		model = UserSettings
 		exclude = ('user',)
