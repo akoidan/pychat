@@ -18,12 +18,12 @@ from story.forms import UserSettingsForm
 from django.http import HttpResponseRedirect
 from story.logic import broadcast_message, send_user_list, get_user_settings, send_message_to_user
 import json
-from story.registration_utils import validate_password, check_email, send_email_verification, check_user
+from story.registration_utils import check_email, send_email_verification, check_user, check_password
 
 
 @require_http_methods(["POST"])
 def validate_email(request):
-	"""d@
+	"""
 	POST only, validates email during registration
 	"""
 	email = request.POST['email']
@@ -65,6 +65,7 @@ def get_messages(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
+@require_http_methods("GET")
 def home(request):
 	"""
 	GET only, returns main Chat page.
@@ -157,13 +158,17 @@ def confirm_email(request):
 		raise Http404
 
 
+@require_http_methods("GET")
+def get_register_page(request):
+	c = csrf(request)
+	c.update({'error code': "welcome to register page"})
+	create_nav_page(request, c)
+	return render_to_response("story/register.html", c)
+
+
+@require_http_methods("POST")
 def register(request):
-	"""
-	GET and POST. Returns the registration p age
-	Registrate a new user from a submit form.
-	"""
-	# TODO move to separate methods post and get
-	if request.method == 'POST':
+	try:
 		username = request.POST['username']
 		password = request.POST['password']
 		email = request.POST['email']
@@ -171,57 +176,51 @@ def register(request):
 		first_name = request.POST['first_name']
 		last_name = request.POST['last_name']
 		sex = request.POST.get('sex', None)
-		try:
-			check_user(username)
-			validate_password(password)
-			user = User.objects.create_user(username, email, password)
-			if verify_email:
-				check_email(email)
-				send_email_verification(user)
-			user.first_name = first_name
-			user.last_name = last_name
-			user.save()
-			user = authenticate(username=username, password=password)
-			profile = user.profile
-			# TODO BUG only MALE
-			profile.gender = sex
-			profile.save()
-			djangologin(request, user)
-			# register,js redirect if message = 'Account created'
-			message = 'Account created'
-		except ValidationError as e:
-			message = e.message
-		return HttpResponse(message, content_type='text/plain')
-	else:
-		c = csrf(request)
-		c.update({'error code': "welcome to register page"})
-		create_nav_page(request, c)
-		return render_to_response("story/register.html", c)
+		check_user(username)
+		check_password(password)
+		user = User.objects.create_user(username, email, password)
+		if verify_email:
+			check_email(email)
+			send_email_verification(user)
+		user.first_name = first_name
+		user.last_name = last_name
+		user.save()
+		user = authenticate(username=username, password=password)
+		profile = user.profile
+		# TODO BUG only MALE
+		profile.gender = sex
+		profile.save()
+		djangologin(request, user)
+		# register,js redirect if message = 'Account created'
+		message = 'Account created'
+	except ValidationError as e:
+		message = e.message
+	except Exception as e2:
+		message = e2
+	return HttpResponse(message, content_type='text/plain')
 
 
+
+@login_required()
 def profile(request):
 	"""
 	GET and POST. Take care about User customizable colors via django.forms,
 	"""
-	user = request.user
-	if user.is_authenticated():
-		if request.method == 'GET':
-			try:
-				user_settings = UserSettings.objects.get(pk=user.id)
-				form = UserSettingsForm(instance=user_settings)
-			except ObjectDoesNotExist:
-				form = UserSettingsForm(DefaultSettingsConfig.colors)
-			c = csrf(request)
-			c['form'] = form
-			create_nav_page(request, c)
-			return render_to_response("story/profile.html", c)
-		else:
-			form = UserSettingsForm(request.POST)
-			form.instance.pk = request.user.id
-			form.save()
-			return HttpResponseRedirect('/')
+	if request.method == 'GET':
+		try:
+			user_settings = UserSettings.objects.get(pk=request.user.id)
+			form = UserSettingsForm(instance=user_settings)
+		except ObjectDoesNotExist:
+			form = UserSettingsForm(DefaultSettingsConfig.colors)
+		c = csrf(request)
+		c['form'] = form
+		create_nav_page(request, c)
+		return render_to_response("story/profile.html", c)
 	else:
-		raise PermissionDenied
+		form = UserSettingsForm(request.POST)
+		form.instance.pk = request.user.id
+		form.save()
+		return HttpResponseRedirect('/')
 
 
 def refresh_user_list(request):
