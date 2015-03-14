@@ -1,17 +1,13 @@
 {% load staticfiles %}
 <input type='hidden' id='username' value='{{ username }}'/>
-<li>
-	<a href="{% url 'story.views.profile' %}"><span class="glyphicon glyphicon-cog green"></span></a>
+<li><a href="{% url 'story.views.settings' %}"><span class="glyphicon glyphicon-cog green"
+																	title="Change settings"></span></a>
 	<b>{{ username }}</b>
 </li>
-<li>
-	{% comment "Optional note" %}
+<li>{% comment "Optional note" %}
     there should be to spaces after span in a
 {% endcomment %}
 	<a id="exit" rel="nofollow" href="{% url 'story.views.logout' %}"><span
-			class="glyphicon glyphicon-off red"></span></a>
-	<a rel="nofollow" id="hide" ><span
-			class="glyphicon glyphicon-user brown" onclick="toggleRoom();"></span></a>
-		<a rel="nofollow" id="refresh" ><span
-				class="glyphicon glyphicon-refresh green" onclick="refreshUserList();"></span></a>
-</li>
+			class="glyphicon glyphicon-off red" title="Sign out"></span></a></li>
+		<li><a href="{% url 'story.views.profile' %}" id="hide"><span
+			class="glyphicon glyphicon-user" title="Show all users"></span></a></li>

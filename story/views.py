@@ -9,6 +9,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 from django.core.context_processors import csrf
+from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.http import HttpResponseRedirect
@@ -22,7 +23,7 @@ from story.logic import broadcast_message, send_user_list, get_user_settings, se
 from story.registration_utils import check_email, send_email_verification, check_user, check_password
 
 
-@require_http_methods(["POST"])
+@require_http_methods(['POST'])
 def validate_email(request):
 	"""
 	POST only, validates email during registration
@@ -36,7 +37,7 @@ def validate_email(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
-@require_http_methods("POST")
+@require_http_methods('POST')
 def validate_user(request):
 	"""
 	Validates user during registration
@@ -50,7 +51,7 @@ def validate_user(request):
 	return HttpResponse(message, content_type='text/plain')
 
 
-@require_http_methods("POST")
+@require_http_methods('POST')
 @login_required
 def get_messages(request):
 	"""
@@ -66,7 +67,7 @@ def get_messages(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
-@require_http_methods("GET")
+@require_http_methods('GET')
 def home(request):
 	"""
 	GET only, returns main Chat page.
@@ -74,11 +75,10 @@ def home(request):
 	"""
 	c = get_user_settings(request.user)
 	c.update(csrf(request))
-	create_nav_page(request, c)
-	return render_to_response('story/chat.html', c)
+	return render_to_response('story/chat.html', c,  context_instance=RequestContext(request))
 
 
-@require_http_methods("POST")
+@require_http_methods('POST')
 @login_required
 def send_message(request):
 	"""
@@ -99,20 +99,6 @@ def send_message(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
-@require_http_methods("GET")
-def create_nav_page(request, c):
-	"""
-	GET only, returns main Chat page.
-	Login or logout navbar is creates by means of create_nav_page
-	"""
-	if request.user.is_authenticated():
-		page = 'story/logout.html'
-		c.update({'username': request.user.username})
-	else:
-		page = 'story/login.html'
-	c.update({'navbar_page': page})
-
-
 @login_required()
 def logout(request):
 	"""
@@ -122,7 +108,7 @@ def logout(request):
 	return home(request)
 
 
-@require_http_methods(["POST"])
+@require_http_methods(['POST'])
 def auth(request):
 	"""
 	Logs in into system.
@@ -133,13 +119,13 @@ def auth(request):
 	if user is not None:
 		djangologin(request, user)
 		send_user_list()
-		message = "update"
+		message = 'update'
 	else:
-		message = "Login or password is wrong"
+		message = 'Login or password is wrong'
 	return HttpResponse(message, content_type='text/plain')
 
 
-@require_http_methods("GET")
+@require_http_methods('GET')
 def confirm_email(request):
 	"""
 	Accept the verification code sent to email
@@ -154,36 +140,35 @@ def confirm_email(request):
 		else:
 			message = 'This code is already accepted'
 		response = {'message': message}
-		create_nav_page(request, response)
-		return render_to_response('story/confirm_mail.html', response)
+		return render_to_response('story/confirm_mail.html', response,  context_instance=RequestContext(request))
 	except UserProfile.DoesNotExist:
 		raise Http404
 
 
-@require_http_methods("GET")
+@require_http_methods('GET')
 def get_register_page(request):
 	c = csrf(request)
 	c.update({'error code': "welcome to register page"})
-	create_nav_page(request, c)
-	return render_to_response("story/register.html", c)
+	return render_to_response("story/register.html", c,  context_instance=RequestContext(request))
 
 
-@require_http_methods("POST")
+@require_http_methods('POST')
 def register(request):
 	try:
 		rp = request.POST
 		(username, password, email, verify_email) = (
-				rp.get('username'), rp.get('password'), rp.get('email'), rp.get('mailbox'))
+			rp.get('username'), rp.get('password'), rp.get('email'), rp.get('mailbox'))
 		check_user(username)
 		check_password(password)
 		if verify_email:
 			check_email(email)
-		get = rp.get('sex')
-
+		# TODO
 		user = UserProfile(username=username, email=email, sex=1 if rp.get('sex') == 'Male' else 2)
 		user.set_password(password)
 		user.save()
-		djangologin(request, user)
+		# You must call authenticate before you can call login
+		auth_user = authenticate(username=username, password=password)
+		djangologin(request, auth_user)
 		# register,js redirect if message = 'Account created'
 		message = 'Account created'
 		if verify_email:
@@ -195,6 +180,11 @@ def register(request):
 
 @login_required()
 def profile(request):
+	return render_to_response('story/profile.html', context_instance=RequestContext(request))
+
+
+@login_required()
+def settings(request):
 	"""
 	GET and POST. Take care about User customizable colors via django.forms,
 	"""
@@ -206,8 +196,7 @@ def profile(request):
 			form = UserSettingsForm(DefaultSettingsConfig.colors)
 		c = csrf(request)
 		c['form'] = form
-		create_nav_page(request, c)
-		return render_to_response("story/profile.html", c)
+		return render_to_response('story/settings.html', c,  context_instance=RequestContext(request))
 	else:
 		form = UserSettingsForm(request.POST)
 		form.instance.pk = request.user.id

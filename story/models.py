@@ -37,8 +37,8 @@ class UserProfile(AbstractBaseUser):
 	surname = CharField(max_length=30, blank=True)
 	email = models.EmailField(blank=True)
 
-	# specifies a custom create_user method
-	# objects = MyUserManager()
+	# specifies auth, create email, etc methods
+	objects = BaseUserManager()
 
 	birth_date = DateField(null=True, blank=True)
 	contacts = CharField(null=True, max_length=100)

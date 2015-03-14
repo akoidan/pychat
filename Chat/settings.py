@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 import socket
 from datetime import timedelta
+from django.conf import global_settings
 import story as project_module
 
 from os.path import join
@@ -34,6 +35,10 @@ ALLOWED_HOSTS = []
 # TEMPLATE_DIRS = [BASE_DIR+'/templates']
 TEMPLATE_DIRS = (
 	join(BASE_DIR, 'templates'),
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+	'story.context_processors.create_nav_page',
 )
 
 # Application definition

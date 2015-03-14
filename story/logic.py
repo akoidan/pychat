@@ -39,7 +39,7 @@ def send_user_list():
 	# list of dictionaries { Monika : Female, Andrew : Male }
 	ishout_client.broadcast(
 		channel='refresh_users',
-		data={user.username: user.profile.get_gender_display() for user in users}
+		data={user.username: user.sex for user in users}
 	)
 
 

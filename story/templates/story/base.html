@@ -14,15 +14,19 @@
 	<nav class="navbar-default">
 		<ul class="navbarList">
 			<li>
-				<a href="{% url 'story.views.home' %}"><span class="glyphicon glyphicon-home blue"></span></a>
+				<a href="{% url 'story.views.home' %}"><span title="Go to the home page"
+																			class="glyphicon glyphicon-home blue"></span></a>
 			</li>
 			{% include navbar_page %}
 			<li>
-				<span id="muteBtn" class="blue" onclick="mute();"></span>
+				<span id="muteBtn" class="blue" title="Turn on or off sounds" onclick="mute();"></span>
 			</li>
 			<li>
-				<a href="https://github.com/Deathangel908/djangochat/issues/new"><span style="color: #860707" class="glyphicon glyphicon glyphicon-info-sign red"></span></a>
+				<a href="https://github.com/Deathangel908/djangochat/issues/new"><span
+						style="color: #860707" title="Report an issue"
+						class="glyphicon glyphicon glyphicon-info-sign red"></span></a>
 			</li>
+			{% block navbar %} {% endblock navbar %}
 		</ul>
 	</nav>
 </header>

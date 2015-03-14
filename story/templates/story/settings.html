@@ -1,0 +1,20 @@
+{% extends "story/base.html" %} {% block head %} {% load static %}
+	<link href="{% static 'css/form.css' %}" rel="stylesheet">
+	<link href="{% static 'css/profile.css' %}" rel="stylesheet">
+	<script src="{% static "js/jscolor/jscolor.js" %}"></script>
+{% endblock head %} {% block content %}
+	<h1 align="center">{{ errorcode }}</h1>
+	<form class="border-form" action="{% url 'story.views.settings' %}" method="post">
+		<div class="border-div">
+			<table class="border-table">
+				{{ form.as_table }}
+				<tr>
+					<td colspan="2" class="border-button-tr">
+						<input type="submit" class="border-button" value="Save"/>
+					</td>
+				</tr>
+			</table>
+			{% csrf_token %}
+		</div>
+	</form>
+{% endblock %}

@@ -3,7 +3,7 @@
 <link href="{% static 'css/login.css' %}" rel="stylesheet">
 <li>
 	<form id="showMenu">
-		<span class="glyphicon glyphicon-log-in green"></span>
+		<span class="glyphicon glyphicon-log-in green" title="Sign in"></span>
 		<div> <!--this div is for hiding and showing submenu-->
 			<ul class="credentialList" id="loginMenu">
 				<li><input class="credentials" type="text" autocomplete="off" name="username" value="" id="lusername"
@@ -18,5 +18,5 @@
 	</form>
 </li>
 <li><a href="{% url 'story.views.get_register_page' %}"><span
-		class="glyphicon glyphicon-registration-mark
-	 black"></span></a></li>
+		class="glyphicon glyphicon-registration-mark  black"
+		title="Sign up"></span></a></li>
