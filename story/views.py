@@ -18,7 +18,7 @@ from story.apps import DefaultSettingsConfig
 from story.models import UserProfile, UserSettings
 from .models import Messages
 from story import registration_utils
-from story.forms import UserSettingsForm
+from story.forms import UserSettingsForm, UserProfileForm
 from story.logic import broadcast_message, send_user_list, get_user_settings, send_message_to_user
 from story.registration_utils import check_email, send_email_verification, check_user, check_password
 
@@ -180,7 +180,19 @@ def register(request):
 
 @login_required()
 def profile(request):
-	return render_to_response('story/profile.html', context_instance=RequestContext(request))
+	if request.method == 'GET':
+		user_profile = UserProfile.objects.get(pk=request.user.id)
+		form = UserProfileForm(instance=user_profile)
+		c = csrf(request)
+		c['form'] = form
+		return render_to_response('story/profile.html', c,  context_instance=RequestContext(request))
+	elif request.method == 'POST':
+		form = UserProfileForm(request.POST)
+		form.instance.pk = request.user.id
+		form.save()
+		return HttpResponseRedirect('/')
+	else:
+		raise PermissionError
 
 
 @login_required()
@@ -197,11 +209,13 @@ def settings(request):
 		c = csrf(request)
 		c['form'] = form
 		return render_to_response('story/settings.html', c,  context_instance=RequestContext(request))
-	else:
+	elif request.method == 'POST':
 		form = UserSettingsForm(request.POST)
 		form.instance.pk = request.user.id
 		form.save()
 		return HttpResponseRedirect('/')
+	else:
+		raise PermissionError
 
 
 def refresh_user_list(request):

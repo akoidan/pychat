@@ -51,7 +51,8 @@ class UserProfile(AbstractBaseUser):
 	email_verified = models.BooleanField(default=False)
 	verify_code = models.CharField(max_length=17)
 	# ISO/IEC 5218 1 male, 2 - female
-	sex = models.SmallIntegerField()
+	GENDER_CHOICES = ((1, 'Male'), (2, 'Female'))
+	sex = models.SmallIntegerField(choices=GENDER_CHOICES)
 
 
 class Messages(models.Model):

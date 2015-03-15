@@ -10,7 +10,7 @@ To run this you need:
  2. nodejs and npm# ArchLinux `pacman -S community/nodejs` Ubuntu `apt-get install nodejs` `apt-get install npm`
 4. Configure server  
  1. Choose DATABASES in Chat/settings.py if needed and run `sh syncdb.sh` #Chat uses SQLite by default
- 2. **Change HOST_IP in Chat/settings.py to yours **, it tells where messages should go from a client
+ 2. **Change HOST_IP in Chat/settings.py to yours**, it tells where messages should go from a client
 5. Download static content and IShout.js
  1. `sh download_content.sh` 
  2. if it fails download the resources manually from link specified in it
@@ -30,3 +30,4 @@ To run this you need:
 * change default user to myUser with custom fields
 * write context_processors that adds top navbar page to every context.
 * move download_content and smiles to manage.py command
+* add check whether redis and nodejs are running 

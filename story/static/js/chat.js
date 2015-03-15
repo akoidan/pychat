@@ -88,10 +88,10 @@ function showUserSendMess(username) {
 
 function printMessage(data, isTopDirection) {
 	var headerStyle;
-	var private = data.private;
-	if (typeof private == 'string') {
-		headerStyle = privateHeader + private + '>>';
-	} else if (typeof private == 'boolean' ) {
+	var private_data = data.private;
+	if (typeof private_data == 'string') {
+		headerStyle = privateHeader + private_data + '>>';
+	} else if (typeof private_data == 'boolean' ) {
 		headerStyle = privateHeader;
 	} else if (data.user == username.value) {
 		headerStyle = selfHeader;
@@ -142,7 +142,7 @@ function sendMessage(usermsg, username) {
 			addressee: username
 		},
 		success: function (data) {
-			console.log(new Date() + "Response: " + data);
+			console.log(new Date() + "Send response: " + data);
 			userMessage.val("");
 		},
 		failure: function (data) {
