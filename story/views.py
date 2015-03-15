@@ -189,7 +189,10 @@ def profile(request):
 	elif request.method == 'POST':
 		form = UserProfileForm(request.POST)
 		form.instance.pk = request.user.id
-		form.save()
+		if form.is_valid():
+			form.save()
+		else:
+			return render_to_response('story/response.html', {'message': form.errors}, context_instance=RequestContext(request))
 		return HttpResponseRedirect('/')
 	else:
 		raise PermissionError

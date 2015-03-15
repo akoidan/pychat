@@ -1,0 +1,9 @@
+{% extends "story/base.html" %}
+{% load staticfiles %}
+{% block head %}
+	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+{% endblock head %}
+{% block content %}
+	{{ message }}
+{% endblock content %}

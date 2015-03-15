@@ -55,11 +55,13 @@ INSTALLED_APPS = (
 	'drealtime',
 	'story',
 	'simplejson',
+	'crispy_forms',
 )
 
 # HOST_IP = socket.gethostbyname(socket.gethostname())
 HOST_IP = '127.0.0.1'
 
+CRISPY_TEMPLATE_PACK = 'bootstrap'
 
 # SESSION_COOKIE_AGE = 10
 # SESSION_SAVE_EVERY_REQUEST = True

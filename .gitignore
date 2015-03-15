@@ -16,3 +16,7 @@ story/static/js/bootstrap.js
 story/static/js/jquery.js
 story/static/js/jscolor/*
 story/static/js/socket.io.min.js
+story/static/js/bootstrap-datepicker.min.js
+story/static/css/bootstrap-datepicker.min.css
+story/static/css/bootstrap.min.css
+story/static/js/bootstrap.min.js

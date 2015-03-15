@@ -17,17 +17,16 @@ mkdir $STATIC_DIR/fonts/
 #wget https://raw.githubusercontent.com/twbs/bootstrap/master/fonts/glyphicons-halflings-regular.svg -P $STATIC_DIR/fonts/
 #wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.ttf -P $STATIC_DIR/fonts/
 wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.woff -P $STATIC_DIR/fonts/
-wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/js/bootstrap.min.js -P $STATIC_DIR/static/
-wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/css/bootstrap.min.css -P $STATIC_DIR/static/
-wget http://code.jquery.com/jquery-2.1.3.min.js -O $STATIC_DIR/static/jquery.js
-wget https://github.com/eternicode/bootstrap-datepicker/blob/master/dist/css/bootstrap-datepicker.min.css#L8 -P $STATIC_DIR/static/
-wget https://raw.githubusercontent.com/eternicode/bootstrap-datepicker/master/dist/js/bootstrap-datepicker.min.js -P $STATIC_DIR/static/
+wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/js/bootstrap.min.js -P $STATIC_DIR/js/
+wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/css/bootstrap.min.css -P $STATIC_DIR/css/
+wget https://github.com/eternicode/bootstrap-datepicker/blob/master/dist/css/bootstrap-datepicker.min.css#L8 -P $STATIC_DIR/css/
+wget https://raw.githubusercontent.com/eternicode/bootstrap-datepicker/master/dist/js/bootstrap-datepicker.min.js -P $STATIC_DIR/js/
 
 # JavaScript
 #wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/js/bootstrap.js -P $STATIC_DIR/js/
 #wget https://raw.githubusercontent.com/mathiasbynens/he/master/he.js -P $STATIC_DIR/js/
 wget http://code.jquery.com/jquery-2.1.3.min.js -O $STATIC_DIR/js/jquery.js
-wget http://jscolor.com/release/jscolor-1.4.4.zip -P /tmp && unzip /tmp/jscolor-1.4.4.zip  -d $STATIC_DIR/js/
+wget http://jscolor.com/release/jscolor-1.4.4.zip -P /tmp && unzip /tmp/jscolor-1.4.4.zip -d $STATIC_DIR/js/
 
 # CSS
 wget https://raw.githubusercontent.com/marcoceppi/bootstrap-glyphicons/master/css/bootstrap.icon-large.css -O $STATIC_DIR/css/bootstrap-glyphicons.css
@@ -48,7 +47,11 @@ folders[8]="$STATIC_DIR/css/confirm-email.css"
 folders[9]="$STATIC_DIR/css/bootstrap-glyphicons.css"
 folders[10]="$STATIC_DIR/sounds/ChatOutgoing.wav"
 folders[11]="$STATIC_DIR/sounds/ChatIncoming.wav"
-folders[12]="$PROJECT_ROOT/node_modules/ishout.js/server.js"
+folders[12]="$STATIC_DIR/css/bootstrap-datepicker.min.css"
+folders[13]="$STATIC_DIR/js/bootstrap-datepicker.min.js"
+folders[14]="$STATIC_DIR/css/bootstrap.min.css"
+folders[15]="$STATIC_DIR/js/bootstrap.min.js"
+folders[16]="$PROJECT_ROOT/node_modules/ishout.js/server.js"
 
 status="ok"
 for path in "${folders[@]}" ; do

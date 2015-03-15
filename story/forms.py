@@ -1,5 +1,9 @@
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Submit
+
 from django import forms
-from django.forms import ImageField, CharField
+from django.forms import ImageField
+
 from story.models import UserSettings, UserProfile
 
 
@@ -23,4 +27,19 @@ class UserProfileForm(forms.ModelForm):
 
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
-		exclude = ('email_verified', 'verify_code', 'password')
+		fields = ('username', 'name', 'surname', 'email', 'birthday', 'contacts', 'sex')
+
+	def __init__(self, *args, **kwargs):
+		"""
+		Creates the entire form for changing UserProfile.
+		"""
+		super(UserProfileForm, self).__init__(*args, **kwargs)
+
+		# TODO
+		# for field in self.fields:
+		# 	field.required = False
+
+		self.helper = FormHelper()
+
+		self.helper.add_input(Submit('Save', 'Save'))
+		super(UserProfileForm, self).__init__(*args, **kwargs)
