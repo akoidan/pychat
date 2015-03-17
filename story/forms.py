@@ -33,7 +33,6 @@ class UserProfileForm(forms.ModelForm):
 		"""
 		Creates the entire form for changing UserProfile.
 		"""
-		super(UserProfileForm, self).__init__(*args, **kwargs)
 
 		# TODO
 		# for field in self.fields:
