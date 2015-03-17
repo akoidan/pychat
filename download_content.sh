@@ -5,10 +5,9 @@ PROJECT_ROOT=`pwd`
 STATIC_DIR="$PROJECT_ROOT/story/static/"
 cd $PROJECT_ROOT
 
+export PYTHON=python2
 # IShout.js
-(alias python='python2' &&
 sudo npm install ishout.js
-unalias python) ||
 curl -L -o ishout.js.zip https://www.dropbox.com/sh/m0np8p9f7c9cf3k/AACGEDrkpspbSocyQP0SaVk-a?dl=1 && unzip ishout.js.zip -d $PROJECT_ROOT/node_modules
 
 #Bootsrap
@@ -16,25 +15,26 @@ mkdir $STATIC_DIR/fonts/
 #wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.eot -P $STATIC_DIR/fonts/
 #wget https://raw.githubusercontent.com/twbs/bootstrap/master/fonts/glyphicons-halflings-regular.svg -P $STATIC_DIR/fonts/
 #wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.ttf -P $STATIC_DIR/fonts/
-wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.woff -P $STATIC_DIR/fonts/
-wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/js/bootstrap.min.js -P $STATIC_DIR/js/
-wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/css/bootstrap.min.css -P $STATIC_DIR/css/
-wget https://github.com/eternicode/bootstrap-datepicker/blob/master/dist/css/bootstrap-datepicker.min.css#L8 -P $STATIC_DIR/css/
-wget https://raw.githubusercontent.com/eternicode/bootstrap-datepicker/master/dist/js/bootstrap-datepicker.min.js -P $STATIC_DIR/js/
+wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.woff -O $STATIC_DIR/fonts/glyphicons-halflings-regular.woff
+wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/js/bootstrap.min.js -O $STATIC_DIR/js/bootstrap.min.js
+wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/css/bootstrap.min.css -O $STATIC_DIR/css/bootstrap.min.css
+wget https://github.com/eternicode/bootstrap-datepicker/blob/master/dist/css/bootstrap-datepicker.min.css#L8 -O $STATIC_DIR/css/bootstrap-datepicker.min.css
+wget https://raw.githubusercontent.com/eternicode/bootstrap-datepicker/master/dist/js/bootstrap-datepicker.min.js -O $STATIC_DIR/js/bootstrap-datepicker.min.js
+wget https://raw.githubusercontent.com/marcoceppi/bootstrap-glyphicons/master/css/bootstrap.icon-large.css -O $STATIC_DIR/css/bootstrap-glyphicons.css
 
 # JavaScript
 #wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/js/bootstrap.js -P $STATIC_DIR/js/
 #wget https://raw.githubusercontent.com/mathiasbynens/he/master/he.js -P $STATIC_DIR/js/
 wget http://code.jquery.com/jquery-2.1.3.min.js -O $STATIC_DIR/js/jquery.js
-wget http://jscolor.com/release/jscolor-1.4.4.zip -P /tmp && unzip /tmp/jscolor-1.4.4.zip -d $STATIC_DIR/js/
+#rm -rf $STATIC_DIR/js/jscolor
+wget http://jscolor.com/release/jscolor-1.4.4.zip -P /tmp && unzip /tmp/jscolor-1.4.4.zip -df $STATIC_DIR/js/
 
 # CSS
-wget https://raw.githubusercontent.com/marcoceppi/bootstrap-glyphicons/master/css/bootstrap.icon-large.css -O $STATIC_DIR/css/bootstrap-glyphicons.css
 #wget https://raw.githubusercontent.com/mzyy94/HONDA-3D-WebGL-demo/master/stylesheets/cssload.css -O $STATIC_DIR/css/confirm-email.css
 
 # Sounds
 mkdir $STATIC_DIR/sounds
-curl -L -o /tmp/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip /tmp/sounds.zip -d $STATIC_DIR/sounds/
+curl -L -o /tmp/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip /tmp/sounds.zip -df $STATIC_DIR/sounds/
 
 # Check if all content is loaded
 #folders[1]="$STATIC_DIR/fonts/glyphicons-halflings-regular.svg"
