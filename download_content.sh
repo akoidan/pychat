@@ -5,9 +5,18 @@ PROJECT_ROOT=`pwd`
 STATIC_DIR="$PROJECT_ROOT/story/static/"
 cd $PROJECT_ROOT
 
-export PYTHON=python2
 # IShout.js
-sudo npm install ishout.js
+export PYTHON=python2
+npm install ishout.js
+npm_exit_status=$?
+# The common issue when access denied for ~/.npm directory
+if [[ $npm_exit_status == 3 ]] ; then
+  echo "Seems like you don't have permissions to ~/.npm directory, trying to change it"
+  sudo chown -R $(whoami) ~/.npm
+  npm install ishout.js
+fi;
+unset PYTHON
+
 curl -L -o ishout.js.zip https://www.dropbox.com/sh/m0np8p9f7c9cf3k/AACGEDrkpspbSocyQP0SaVk-a?dl=1 && unzip ishout.js.zip -d $PROJECT_ROOT/node_modules
 
 #Bootsrap
