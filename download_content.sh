@@ -6,6 +6,7 @@ STATIC_DIR="$PROJECT_ROOT/story/static/"
 cd $PROJECT_ROOT
 
 # IShout.js
+echo "Installing ishout.js, this can take a while"
 export PYTHON=python2
 npm install ishout.js
 npm_exit_status=$?
@@ -35,15 +36,18 @@ wget https://raw.githubusercontent.com/marcoceppi/bootstrap-glyphicons/master/cs
 #wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/js/bootstrap.js -P $STATIC_DIR/js/
 #wget https://raw.githubusercontent.com/mathiasbynens/he/master/he.js -P $STATIC_DIR/js/
 wget http://code.jquery.com/jquery-2.1.3.min.js -O $STATIC_DIR/js/jquery.js
-#rm -rf $STATIC_DIR/js/jscolor
-wget http://jscolor.com/release/jscolor-1.4.4.zip -P /tmp && unzip /tmp/jscolor-1.4.4.zip -df $STATIC_DIR/js/
+
+
+rm -rf $STATIC_DIR/js/jscolor
+wget http://jscolor.com/release/jscolor-1.4.4.zip -P /tmp && unzip /tmp/jscolor-1.4.4.zip -d $STATIC_DIR/js/
 
 # CSS
 #wget https://raw.githubusercontent.com/mzyy94/HONDA-3D-WebGL-demo/master/stylesheets/cssload.css -O $STATIC_DIR/css/confirm-email.css
 
 # Sounds
+rm -rf $STATIC_DIR/sounds
 mkdir $STATIC_DIR/sounds
-curl -L -o /tmp/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip /tmp/sounds.zip -df $STATIC_DIR/sounds/
+curl -L -o /tmp/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip /tmp/sounds.zip -d $STATIC_DIR/sounds/
 
 # Check if all content is loaded
 #folders[1]="$STATIC_DIR/fonts/glyphicons-halflings-regular.svg"
