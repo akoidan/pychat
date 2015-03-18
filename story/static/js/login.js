@@ -25,3 +25,10 @@ function login() {
 	});
 
 }
+
+$(document).ready(function () {
+		//Handles menu drop down
+	$('.dropdown-menu').click(function (e) {
+		e.stopPropagation();
+	});
+});

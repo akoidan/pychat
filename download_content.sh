@@ -17,20 +17,23 @@ if [[ $npm_exit_status == 3 ]] ; then
   npm install ishout.js
 fi;
 unset PYTHON
+rm -rf $PROJECT_ROOT/ishout.js.zip
 
 curl -L -o ishout.js.zip https://www.dropbox.com/sh/m0np8p9f7c9cf3k/AACGEDrkpspbSocyQP0SaVk-a?dl=1 && unzip ishout.js.zip -d $PROJECT_ROOT/node_modules
 
 #Bootsrap
+mkdir /tmp/bootsrap
 mkdir $STATIC_DIR/fonts/
-#wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.eot -P $STATIC_DIR/fonts/
-#wget https://raw.githubusercontent.com/twbs/bootstrap/master/fonts/glyphicons-halflings-regular.svg -P $STATIC_DIR/fonts/
-#wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.ttf -P $STATIC_DIR/fonts/
-wget https://github.com/twbs/bootstrap/raw/master/fonts/glyphicons-halflings-regular.woff -O $STATIC_DIR/fonts/glyphicons-halflings-regular.woff
-wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/js/bootstrap.min.js -O $STATIC_DIR/js/bootstrap.min.js
-wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/css/bootstrap.min.css -O $STATIC_DIR/css/bootstrap.min.css
+wget https://github.com/twbs/bootstrap/releases/download/v3.3.4/bootstrap-3.3.4-dist.zip -O /tmp/bootsrap/bootsrap.zip &&
+unzip /tmp/bootsrap/bootsrap.zip -d /tmp/bootsrap/
+cp /tmp/bootsrap/bootstrap-3.3.4-dist/css/bootstrap.min.css $STATIC_DIR/css/bootstrap.min.css
+cp /tmp/bootsrap/bootstrap-3.3.4-dist/fonts/glyphicons-halflings-regular.woff $STATIC_DIR/fonts/glyphicons-halflings-regular.woff
+cp /tmp/bootsrap/bootstrap-3.3.4-dist/fonts/glyphicons-halflings-regular.woff2 $STATIC_DIR/fonts/glyphicons-halflings-regular.woff2
+cp /tmp/bootsrap/bootstrap-3.3.4-dist/js/bootstrap.min.js $STATIC_DIR/js/bootstrap.min.js
+#datepicker
 wget https://github.com/eternicode/bootstrap-datepicker/blob/master/dist/css/bootstrap-datepicker.min.css#L8 -O $STATIC_DIR/css/bootstrap-datepicker.min.css
 wget https://raw.githubusercontent.com/eternicode/bootstrap-datepicker/master/dist/js/bootstrap-datepicker.min.js -O $STATIC_DIR/js/bootstrap-datepicker.min.js
-wget https://raw.githubusercontent.com/marcoceppi/bootstrap-glyphicons/master/css/bootstrap.icon-large.css -O $STATIC_DIR/css/bootstrap-glyphicons.css
+
 
 # JavaScript
 #wget https://raw.githubusercontent.com/twbs/bootstrap/master/dist/js/bootstrap.js -P $STATIC_DIR/js/
@@ -57,7 +60,6 @@ folders[4]="$STATIC_DIR/fonts/glyphicons-halflings-regular.woff"
 folders[5]="$STATIC_DIR/js/jquery.js"
 folders[6]="$STATIC_DIR/js/jscolor/jscolor.js"
 folders[8]="$STATIC_DIR/css/confirm-email.css"
-folders[9]="$STATIC_DIR/css/bootstrap-glyphicons.css"
 folders[10]="$STATIC_DIR/sounds/ChatOutgoing.wav"
 folders[11]="$STATIC_DIR/sounds/ChatIncoming.wav"
 folders[12]="$STATIC_DIR/css/bootstrap-datepicker.min.css"

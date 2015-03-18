@@ -38,7 +38,7 @@ TEMPLATE_DIRS = (
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
-	'story.context_processors.create_nav_page',
+	'story.context_processors.add_user_name',
 )
 
 # Application definition

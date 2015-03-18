@@ -3,31 +3,40 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>Simle web chat</title> {% load staticfiles %}
+	<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
 	<script src="{% static "js/jquery.js" %}"></script>
 	<script src="{% static "js/base.js" %}"></script>
-	<link href="{% static 'css/bootstrap-glyphicons.css' %}" rel="stylesheet">
-	<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
+	<script src="{% static "js/bootstrap.min.js" %}"></script>
 	{% block head %} {% endblock head %}
 </head>
-<body class="background-color">
+<body>
 <header>
 	<nav class="navbar-default">
-		<ul class="navbarList">
-			<li>
-				<a href="{% url 'story.views.home' %}"><span title="Go to the home page"
-																			class="glyphicon glyphicon-home blue"></span></a>
-			</li>
-			{% include navbar_page %}
-			<li>
-				<span id="muteBtn" class="blue" title="Turn on or off sounds" onclick="mute();"></span>
-			</li>
-			<li>
-				<a href="https://github.com/Deathangel908/djangochat/issues/new"><span
-						style="color: #860707" title="Report an issue"
-						class="glyphicon glyphicon glyphicon-info-sign red"></span></a>
-			</li>
-			{% block navbar %} {% endblock navbar %}
-		</ul>
+	<div class="navbar-inner">
+		<div class="container-fluid">
+			<ul class="nav navbar-nav">
+				<li>
+					<a href="{% url 'story.views.home' %}"><span title="Go to the home page"
+						class="glyphicon glyphicon-home blue"></span></a>
+				</li>
+				<li><a href=""><span id="muteBtn" class="blue" title="Turn on or off sounds" onclick="mute();"></span></a>
+				</li>
+				<li>
+					<a href="https://github.com/Deathangel908/djangochat/issues/new"><span
+							style="color: #860707" title="Report an issue"
+							class="glyphicon glyphicon glyphicon-info-sign red"></span></a>
+				</li>
+				{% block navbar %} {% endblock navbar %}
+			</ul>
+			{% if username %}
+					{% include "story/logout.html" %}
+			{% else %}
+				{% include "story/login.html" %}
+			{% endif %}
+		</div>
+		</div>
+		<!-- /.container-fluid -->
 	</nav>
 </header>
 {% block content %} {% endblock %} {% csrf_token %}

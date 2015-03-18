@@ -1,22 +1,18 @@
 {% load staticfiles %}
 <script src="{% static "js/login.js" %}"></script>
-<link href="{% static 'css/login.css' %}" rel="stylesheet">
-<li>
-	<form id="showMenu">
-		<span class="glyphicon glyphicon-log-in green" title="Sign in"></span>
-		<div> <!--this div is for hiding and showing submenu-->
-			<ul class="credentialList" id="loginMenu">
-				<li><input class="credentials" type="text" autocomplete="off" name="username" value="" id="lusername"
-							  placeholder="Username"/></li>
-				<li><input class="credentials" type="password" autocomplete="off" name="password"
-							  value="" id="lpassword" placeholder="Password"/></li>
-				<li>
-					<button type="button" onclick="login();">Log in</button>
-				</li>
-			</ul>
+
+<ul class="nav  navbar-nav pull-right">
+	<li><a href="{% url 'story.views.get_register_page' %}"><span
+			class="glyphicon glyphicon-registration-mark  black"
+			title="Sign up"></span></a></li>
+	<li class="dropdown">
+		<a class="" href="#" data-toggle="dropdown"><span class="glyphicon glyphicon-log-in green dropdown-toggle"
+																		  title="Sign in"></span></a>
+		<div class="dropdown-menu" style="padding: 15px; right: 0px; left: auto">
+				<input style="margin-bottom: 15px; right: 0px" type="text" placeholder="Username" id="lusername">
+				<input style="margin-bottom: 15px;" type="password" placeholder="Password" id="lpassword">
+				<input class="btn btn-primary btn-block" type="button" onclick="login();" value="Sign In">
+				{% csrf_token %}
 		</div>
-	</form>
-</li>
-<li><a href="{% url 'story.views.get_register_page' %}"><span
-		class="glyphicon glyphicon-registration-mark  black"
-		title="Sign up"></span></a></li>
+	</li>
+</ul>

@@ -23,37 +23,11 @@ ul {
 	padding-left: 0px;
 }
 
-.navbarList {
-	list-style-type: none; /* remove bullest*/
-	/* prevent navbar from margin top*/
-	margin-top: 0px;
-	margin-bottom: 0px;
-	padding-top: 8px;
-	padding-left: 5px;
-}
-
-.navbarList > li {
-	display: inline-block;
-	font-size: 35px;
-	padding-left: 12px; /* get rid parent 35px font*/
-}
-
 .navbar-default {
-	background-image: linear-gradient(to bottom, #FBFBFB 0%, #CCCCCC 100%);
-	background-repeat: repeat-x;
-	border-radius: 4px;
-	box-shadow: 0px 1px 0px rgba(255, 255, 255, 0.15) inset, 0px 1px 5px rgba(0, 0, 0, 0.11);
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
+	font-size: 25px;
 }
-
 span:hover {
 	text-shadow: 2px 2px #989898;
-	cursor: pointer;
 }
 
 html, body {
@@ -64,21 +38,21 @@ html, body {
 	width: 100%;
 }
 
-#showMenu:hover div {
-	display: block;
-}
+/*#showMenu:hover div {*/
+	/*display: block;*/
+/*}*/
 
-#showMenu > div {
-	display: none;
-	position: absolute;
-}
+/*#showMenu > div {*/
+	/*display: none;*/
+	/*position: absolute;*/
+/*}*/
 
-#showMenu > div {
-	border-style: solid;
-	border-color: #8C8C8C;
-	border-width: 1px;
-	box-shadow: 3px 3px 7px #888888;
-	border-radius: 5px;
-	background-image: linear-gradient(to bottom left, #8C8C8C 0%, #D4D4D4 100%);
+/*#showMenu > div {*/
+	/*border-style: solid;*/
+	/*border-color: #8C8C8C;*/
+	/*border-width: 1px;*/
+	/*box-shadow: 3px 3px 7px #888888;*/
+	/*border-radius: 5px;*/
+	/*background-image: linear-gradient(to bottom left, #8C8C8C 0%, #D4D4D4 100%);*/
 
-}
+/*}*/
