@@ -187,8 +187,8 @@ def profile(request):
 		c['form'] = form
 		return render_to_response('story/profile.html', c,  context_instance=RequestContext(request))
 	elif request.method == 'POST':
-		form = UserProfileForm(request.POST)
-		form.instance.pk = request.user.id
+		user_profile = UserProfile.objects.get(pk=request.user.id)
+		form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 		if form.is_valid():
 			form.save()
 		else:

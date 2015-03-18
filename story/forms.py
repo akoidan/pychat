@@ -27,18 +27,18 @@ class UserProfileForm(forms.ModelForm):
 
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
-		fields = ('username', 'name', 'surname', 'email', 'birthday', 'contacts', 'sex')
+		fields = ('username', 'name', 'surname', 'email', 'birthday', 'contacts', 'sex', 'photo')
 
 	def __init__(self, *args, **kwargs):
 		"""
 		Creates the entire form for changing UserProfile.
 		"""
 
-		# TODO
-		# for field in self.fields:
-		# 	field.required = False
-
 		self.helper = FormHelper()
 
 		self.helper.add_input(Submit('Save', 'Save'))
 		super(UserProfileForm, self).__init__(*args, **kwargs)
+
+		for key in self.fields:
+			if key != 'username':
+				self.fields[key].required = False

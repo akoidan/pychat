@@ -35,7 +35,7 @@ class UserProfile(AbstractBaseUser):
 	username = CharField(max_length=30, null=False, unique=True)
 	name = CharField(max_length=30, null=True)
 	surname = CharField(max_length=30, null=True)
-	email = models.EmailField(null=True, unique=True)
+	email = models.EmailField(null=True, unique=True, blank=True)
 
 	# specifies auth, create email, etc methods
 	objects = BaseUserManager()
@@ -53,6 +53,15 @@ class UserProfile(AbstractBaseUser):
 	GENDER_CHOICES = ((1, 'Male'), (2, 'Female'))
 	sex = models.SmallIntegerField(choices=GENDER_CHOICES, null=False)
 
+	def save(self, *args, **kwargs):
+		"""
+		http://stackoverflow.com/questions/15422606/django-model-email-field-unique-if-not-null-blank
+		"""
+		# self.email = self.email.lower().strip()  # Hopefully reduces junk to ""
+		# TODO
+		if self.email == "":
+			self.email = None
+		super(UserProfile, self).save(*args, **kwargs)
 
 class Messages(models.Model):
 	"""

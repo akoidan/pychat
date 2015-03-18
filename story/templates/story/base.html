@@ -13,28 +13,29 @@
 <body>
 <header>
 	<nav class="navbar-default">
-	<div class="navbar-inner">
-		<div class="container-fluid">
-			<ul class="nav navbar-nav">
-				<li>
-					<a href="{% url 'story.views.home' %}"><span title="Go to the home page"
-						class="glyphicon glyphicon-home blue"></span></a>
-				</li>
-				<li><a href=""><span id="muteBtn" class="blue" title="Turn on or off sounds" onclick="mute();"></span></a>
-				</li>
-				<li>
-					<a href="https://github.com/Deathangel908/djangochat/issues/new"><span
-							style="color: #860707" title="Report an issue"
-							class="glyphicon glyphicon glyphicon-info-sign red"></span></a>
-				</li>
-				{% block navbar %} {% endblock navbar %}
-			</ul>
-			{% if username %}
+		<div class="navbar-inner">
+			<div class="container-fluid">
+				<ul class="nav navbar-nav">
+					<li>
+						<a href="{% url 'story.views.home' %}"><span
+								title="Go to the home page" class="glyphicon glyphicon-home blue"></span></a>
+					</li>
+					<li><a href=""><span id="muteBtn" class="blue" title="Turn on or off sounds"
+												onclick="mute();"></span></a>
+					</li>
+					<li>
+						<a href="https://github.com/Deathangel908/djangochat/issues/new"><span
+								style="color: #860707" title="Report an issue"
+								class="glyphicon glyphicon glyphicon-info-sign red"></span></a>
+					</li>
+					{% block navbar %} {% endblock navbar %}
+				</ul>
+				{% if username %}
 					{% include "story/logout.html" %}
-			{% else %}
-				{% include "story/login.html" %}
-			{% endif %}
-		</div>
+				{% else %}
+					{% include "story/login.html" %}
+				{% endif %}
+			</div>
 		</div>
 		<!-- /.container-fluid -->
 	</nav>
