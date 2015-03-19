@@ -1,38 +1,21 @@
-.blue {
-	color: MidnightBlue;
-}
-
-.green {
-	color: green;
-}
-
-.yellow {
-	color: yellow;
-}
-
-.red {
-	color: red;
-}
-
-.black {
-	color: black;
-}
-
 ul {
-	/* remove browser default left padding 40px*/
+	 /*remove browser default left padding 40px and bullets*/
 	padding-left: 0px;
 }
 
 .navbar-default {
+	/*Icons navbar size*/
 	font-size: 25px;
 }
 span:hover {
+	/*Hand and shadow on hover on navbar elements*/
+	cursor: pointer;
 	text-shadow: 2px 2px #989898;
 }
 
 html, body {
 	text-shadow: none;
-	cursor: auto;
+	/*cursor: auto;*/
 	margin: 0;
 	height: 100%;
 	width: 100%;

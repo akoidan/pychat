@@ -86,6 +86,8 @@ WSGI_APPLICATION = 'Chat.wsgi.application'
 
 AUTH_USER_MODEL = 'story.UserProfile'
 
+LOGIN_URL = '/'
+
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 

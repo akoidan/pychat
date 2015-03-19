@@ -57,10 +57,10 @@ class UserProfile(AbstractBaseUser):
 		"""
 		http://stackoverflow.com/questions/15422606/django-model-email-field-unique-if-not-null-blank
 		"""
-		# self.email = self.email.lower().strip()  # Hopefully reduces junk to ""
-		# TODO
-		if self.email == "":
-			self.email = None
+		if self.email is not None:
+			self.email.lower().strip()  # Hopefully reduces junk to ""
+			if self.email == "":
+				self.email = None
 		super(UserProfile, self).save(*args, **kwargs)
 
 class Messages(models.Model):

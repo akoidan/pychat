@@ -3,14 +3,14 @@
 
 <ul class="nav  navbar-nav pull-right">
 	<li><a href="{% url 'story.views.get_register_page' %}"><span
-			class="glyphicon glyphicon-registration-mark  black"
+			class="glyphicon glyphicon-registration-mark text-info"
 			title="Sign up"></span></a></li>
 	<li class="dropdown">
-		<a class="" href="#" data-toggle="dropdown"><span class="glyphicon glyphicon-log-in green dropdown-toggle"
-																		  title="Sign in"></span></a>
-		<div class="dropdown-menu" style="padding: 15px; right: 0px; left: auto">
-				<input style="margin-bottom: 15px; right: 0px" type="text" placeholder="Username" id="lusername">
-				<input style="margin-bottom: 15px;" type="password" placeholder="Password" id="lpassword">
+		<a class="" href="#" data-toggle="dropdown"><span class="glyphicon
+		 glyphicon-log-in text-success dropdown-toggle" title="Sign in"></span></a>
+		<div class="dropdown-menu container" style="padding: 15px; right: 0px; left: auto">
+				<input class="form-control" type="text" placeholder="Username" id="lusername">
+				<input  type="password" class="form-control" placeholder="Password" id="lpassword">
 				<input class="btn btn-primary btn-block" type="button" onclick="login();" value="Sign In">
 				{% csrf_token %}
 		</div>
