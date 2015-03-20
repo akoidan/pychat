@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 import json
 
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.shortcuts import render_to_response
 from django.http import HttpResponse
@@ -15,6 +15,7 @@ from django.http import Http404
 from django.http import HttpResponseRedirect
 
 from story.apps import DefaultSettingsConfig
+from story.decorators import login_required_no_redirect
 from story.models import UserProfile, UserSettings
 from .models import Messages
 from story import registration_utils
@@ -52,7 +53,7 @@ def validate_user(request):
 
 
 @require_http_methods('POST')
-@login_required
+@permission_required(None, raise_exception=True)
 def get_messages(request):
 	"""
 	Returns all public messages started from ID
@@ -79,7 +80,7 @@ def home(request):
 
 
 @require_http_methods('POST')
-@login_required
+@permission_required(None, raise_exception=True)
 def send_message(request):
 	"""
 	Emits messages via Ishout
@@ -99,7 +100,7 @@ def send_message(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
-@login_required()
+@permission_required(None, raise_exception=True)
 def logout(request):
 	"""
 	POST. Logs out into system.
@@ -178,7 +179,7 @@ def register(request):
 	return HttpResponse(message, content_type='text/plain')
 
 
-@login_required()
+@permission_required(None, raise_exception=True)
 def profile(request):
 	if request.method == 'GET':
 		user_profile = UserProfile.objects.get(pk=request.user.id)
@@ -198,7 +199,7 @@ def profile(request):
 		raise PermissionError
 
 
-@login_required()
+@permission_required(None, raise_exception=True)
 def settings(request):
 	"""
 	GET and POST. Take care about User customizable colors via django.forms,

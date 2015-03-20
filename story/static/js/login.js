@@ -28,7 +28,9 @@ function login() {
 
 $(document).ready(function () {
 		//Handles menu drop down
-	$('.dropdown-menu').click(function (e) {
-		e.stopPropagation();
+	$('login-form').click(function (e) {
+		alert('sadasd')
+		console.log('Dropdown menu clicked');
+		//e.stopPropagation();
 	});
 });
