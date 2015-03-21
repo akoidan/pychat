@@ -22,5 +22,6 @@ urlpatterns = patterns(
 	url(r'^settings$', 'story.views.settings'),
 	url(r'^refresh_user_list$', 'story.views.refresh_user_list'),
 	url(r'^send_message$', 'story.views.send_message'),
-	url(r'^profile$', 'story.views.profile'),
+	url(r'^profile$', 'story.views.get_profile'),
+	url(r'^change_profile$', 'story.views.change_profile'),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

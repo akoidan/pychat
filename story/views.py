@@ -53,7 +53,7 @@ def validate_user(request):
 
 
 @require_http_methods('POST')
-@permission_required(None, raise_exception=True)
+@login_required_no_redirect
 def get_messages(request):
 	"""
 	Returns all public messages started from ID
@@ -80,7 +80,7 @@ def home(request):
 
 
 @require_http_methods('POST')
-@permission_required(None, raise_exception=True)
+@login_required_no_redirect
 def send_message(request):
 	"""
 	Emits messages via Ishout
@@ -100,7 +100,7 @@ def send_message(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
-@permission_required(None, raise_exception=True)
+@login_required_no_redirect
 def logout(request):
 	"""
 	POST. Logs out into system.
@@ -179,27 +179,29 @@ def register(request):
 	return HttpResponse(message, content_type='text/plain')
 
 
-@permission_required(None, raise_exception=True)
-def profile(request):
-	if request.method == 'GET':
-		user_profile = UserProfile.objects.get(pk=request.user.id)
-		form = UserProfileForm(instance=user_profile)
-		c = csrf(request)
-		c['form'] = form
-		return render_to_response('story/profile.html', c,  context_instance=RequestContext(request))
-	elif request.method == 'POST':
-		user_profile = UserProfile.objects.get(pk=request.user.id)
-		form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
-		if form.is_valid():
-			form.save()
-		else:
-			return render_to_response('story/response.html', {'message': form.errors}, context_instance=RequestContext(request))
-		return HttpResponseRedirect('/')
+@require_http_methods('GET')
+@login_required_no_redirect
+def get_profile(request):
+	user_profile = UserProfile.objects.get(pk=request.user.id)
+	form = UserProfileForm(instance=user_profile)
+	c = csrf(request)
+	c['form'] = form
+	return render_to_response('story/profile.html', c,  context_instance=RequestContext(request))
+
+
+@require_http_methods('POST')
+@login_required_no_redirect
+def change_profile(request):
+	user_profile = UserProfile.objects.get(pk=request.user.id)
+	form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+	if form.is_valid():
+		form.save()
 	else:
-		raise PermissionError
+		return render_to_response('story/response.html', {'message': form.errors}, context_instance=RequestContext(request))
+	return HttpResponseRedirect('/')
 
 
-@permission_required(None, raise_exception=True)
+@login_required_no_redirect
 def settings(request):
 	"""
 	GET and POST. Take care about User customizable colors via django.forms,
