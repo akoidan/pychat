@@ -27,11 +27,6 @@ To run this you need:
 * add chat rooms
 * implement smiles
 * Add languages for menu.
-* Remove bootsrap glyphicons
 * Gradient text disappear on top
-* Add info icon on navbar for troubles and offerings
-* add photo to user profile
-* change default user to myUser with custom fields
-* write context_processors that adds top navbar page to every context.
 * move download_content and smiles to manage.py command
 * add check whether redis and nodejs are running 
