@@ -41,7 +41,7 @@ mkdir $FONTS_DIR
 if [ -d "$TMP_DIR" ]; then
     clean_tmp_dir=0;
   else
-    mkdir $TMP_DIR
+    mkdir -p $TMP_DIR
     clean_tmp_dir=1;
 fi
 
@@ -69,13 +69,13 @@ if [ ! -f "$PROJECT_ROOT/node_modules/ishout.js/server.js" ]; then
 fi
 
 
-# Bootsrap
-wget https://github.com/twbs/bootstrap/releases/download/v3.3.4/bootstrap-3.3.4-dist.zip -O $TMP_DIR/bootsrap/bootsrap.zip &&
-unzip $TMP_DIR/bootsrap/bootsrap.zip -d $TMP_DIR/bootsrap/
-cp $TMP_DIR/bootsrap/bootstrap-3.3.4-dist/css/bootstrap.min.css $CSS_DIR/bootstrap.min.css
-cp $TMP_DIR/bootsrap/bootstrap-3.3.4-dist/fonts/glyphicons-halflings-regular.woff $FONTS_DIR/glyphicons-halflings-regular.woff
-cp $TMP_DIR/bootsrap/bootstrap-3.3.4-dist/fonts/glyphicons-halflings-regular.woff2 $FONTS_DIR/glyphicons-halflings-regular.woff2
-cp $TMP_DIR/bootsrap/bootstrap-3.3.4-dist/js/bootstrap.min.js $JS_DIR/bootstrap.min.js
+# bootstrap
+wget https://github.com/twbs/bootstrap/releases/download/v3.3.4/bootstrap-3.3.4-dist.zip -O $TMP_DIR/bootstrap.zip &&
+unzip $TMP_DIR/bootstrap.zip -d $TMP_DIR/bootstrap/
+cp $TMP_DIR/bootstrap/bootstrap-3.3.4-dist/css/bootstrap.min.css $CSS_DIR/bootstrap.min.css
+cp $TMP_DIR/bootstrap/bootstrap-3.3.4-dist/fonts/glyphicons-halflings-regular.woff $FONTS_DIR/glyphicons-halflings-regular.woff
+cp $TMP_DIR/bootstrap/bootstrap-3.3.4-dist/fonts/glyphicons-halflings-regular.woff2 $FONTS_DIR/glyphicons-halflings-regular.woff2
+cp $TMP_DIR/bootstrap/bootstrap-3.3.4-dist/js/bootstrap.min.js $JS_DIR/bootstrap.min.js
 #datepicker
 wget https://github.com/eternicode/bootstrap-datepicker/blob/master/dist/css/bootstrap-datepicker.min.css#L8 -O $CSS_DIR/bootstrap-datepicker.min.css
 wget https://raw.githubusercontent.com/eternicode/bootstrap-datepicker/master/dist/js/bootstrap-datepicker.min.js -O $JS_DIR/bootstrap-datepicker.min.js
