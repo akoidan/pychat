@@ -56,11 +56,11 @@ command -v npm && {
   npm_exit_status=$? ;
   # The common issue when access denied for ~/.npm directory
   if [[ $npm_exit_status == 3 ]] ; then
-    echo "Seems like you don't have permissions to ~/.npm directory, trying to change it"
-    sudo chown -R $(whoami) ~/.npm
-    npm install ishout.js
+    echo "Seems like you don't have permissions to ~/.npm directory, trying to change it";
+    sudo chown -R $(whoami) ~/.npm ;
+    npm install ishout.js ;
   fi;
-  unset PYTHON
+  unset PYTHON ;
 }
 if [ ! -f "$PROJECT_ROOT/node_modules/ishout.js/server.js" ]; then
     echo 'Installing ishout.js has failed, trying to install it manualy'
