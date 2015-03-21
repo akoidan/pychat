@@ -22,6 +22,8 @@ To run this you need:
 
 #TODO
 * login dropdown is broken
+* add space beetween elements in row dropdown
+* check profile save button uses only bootsrap
 * add chat rooms
 * implement smiles
 * Add languages for menu.

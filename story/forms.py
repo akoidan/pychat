@@ -2,7 +2,6 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 from django.forms import ImageField
-from django.template.defaulttags import url
 
 from story.models import UserSettings, UserProfile
 
@@ -37,7 +36,8 @@ class UserProfileForm(forms.ModelForm):
 		self.helper = FormHelper()
 
 		self.helper.add_input(Submit('Save', 'Save'))
-		self.helper.form_action = '/profile'
+		# fixme hardcoded url
+		self.helper.form_action = '/change_profile'
 		super(UserProfileForm, self).__init__(*args, **kwargs)
 
 		for key in self.fields:
