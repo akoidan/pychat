@@ -2,12 +2,12 @@
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
-TMP_DIR="/tmp/loaded content/"
-STATIC_DIR="$PROJECT_ROOT/story/static/"
-JS_DIR="$STATIC_DIR/js/"
-CSS_DIR="$STATIC_DIR/css/"
-SOUNDS_DIR="$STATIC_DIR/sounds/"
-FONTS_DIR="$STATIC_DIR/fonts/"
+TMP_DIR="/tmp/loaded_content"
+STATIC_DIR="$PROJECT_ROOT/story/static"
+JS_DIR="$STATIC_DIR/js"
+CSS_DIR="$STATIC_DIR/css"
+SOUNDS_DIR="$STATIC_DIR/sounds"
+FONTS_DIR="$STATIC_DIR/fonts"
 NODE_DIR="$PROJECT_ROOT/node_modules"
 
 
@@ -22,7 +22,6 @@ files[7]="$CSS_DIR/bootstrap-datepicker.min.css"
 files[8]="$JS_DIR/bootstrap-datepicker.min.js"
 files[9]="$CSS_DIR/bootstrap.min.css"
 files[10]="$JS_DIR/bootstrap.min.js"
-files[11]="$PROJECT_ROOT/node_modules/ishout.js/server.js"
 
 
 # Deleting all content creating empty dirs
@@ -62,11 +61,6 @@ command -v npm && {
   fi;
   unset PYTHON ;
 }
-if [ ! -f "$PROJECT_ROOT/node_modules/ishout.js/server.js" ]; then
-    echo 'Installing ishout.js has failed, trying to install it manualy'
-    rm -rf $NODE_DIR
-    curl -L -o $TMP_DIR/ishout.js.zip https://www.dropbox.com/sh/m0np8p9f7c9cf3k/AACGEDrkpspbSocyQP0SaVk-a?dl=1 && unzip $TMP_DIR/ishout.js.zip -d $NODE_DIR
-fi
 
 
 # bootstrap
@@ -85,32 +79,55 @@ wget https://raw.githubusercontent.com/eternicode/bootstrap-datepicker/master/di
 #wget https://raw.githubusercontent.com/mathiasbynens/he/master/he.js -P $JS_DIR/
 wget http://code.jquery.com/jquery-2.1.3.min.js -O $JS_DIR/jquery.js
 rm -rf $JS_DIR/jscolor
-wget http://jscolor.com/release/jscolor-1.4.4.zip -P /tmp && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR
+wget http://jscolor.com/release/jscolor-1.4.4.zip -P $TMP_DIR && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR
 
 
 # Sounds
 curl -L -o $TMP_DIR/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip $TMP_DIR/sounds.zip -d $SOUNDS_DIR
 
 
+if [ ! -f "NODE_DIR/ishout.js/server.js" ]; then
+    echo 'Installing ishout.js has failed, fetching it from dropbox'
+    rm -rf $NODE_DIR
+    curl -L -o $TMP_DIR/ishout.js.zip https://www.dropbox.com/sh/m0np8p9f7c9cf3k/AACGEDrkpspbSocyQP0SaVk-a?dl=1 && unzip $TMP_DIR/ishout.js.zip -d $NODE_DIR
+fi
+
+
 # Checking if all files are loaded
-status="ok"
+failed_count=0
 for path in "${files[@]}" ; do
   if [ ! -f $path ]; then
-    status="fail"
-    echo "installing $path has failed, download it manually"
+    ((failed_count++))
+    failed_items[$failed_count]=$path
   fi
 done
 
+failed_count_second_attempt=0
+if [[ $failed_count > 0 ]]; then
+  echo "Some links have been broken, fetching resources from dropbox"
+  wget https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1 -O $TMP_DIR/static.zip &&
+  unzip $TMP_DIR/static.zip -d $TMP_DIR/static
+  for path_failed in "${failed_items[@]}" ; do
+    dropbox_path="${path_failed#$STATIC_DIR}"
+    tmp_fetched_db_file="$TMP_DIR/static/$dropbox_path"
+    cp $tmp_fetched_db_file $path_failed
+    if [ ! -f $path_failed ]; then
+      ((failed_count_second_attempt++))
+      failed_items_second_attempt[$failed_count_second_attempt]=$dropbox_path
+    fi
+  done
+fi
 
 if [ $clean_tmp_dir -eq 1 ] ; then
   rm -rf $TMP_DIR
 fi
 
-
-if [[ $status == "ok" ]] ; then
-  echo "Installation succeded"
-else
-  echo "Some files haven't been installed, try to install it manually from from https://www.dropbox.com/sh/tr5fr7rl93aghfm/AAAb9obWh6yerSEcmqnGF0NBa?dl=0"
+if [[ $failed_count_second_attempt > 0 ]]; then
+  for path_failed2 in "${failed_items_second_attempt[@]}" ; do
+    echo "$path_failed2 wasn't found in dropbox directory"
+  done
+  echo "Please report for missing files at https://github.com/Deathangel908/djangochat/issues/new"
   exit 1
+else
+  echo "Installation succeeded"
 fi
-
