@@ -10,7 +10,7 @@ ul {
 span:hover {
 	/*Hand and shadow on hover on navbar elements*/
 	cursor: pointer;
-	text-shadow: 2px 2px #989898;
+	text-shadow: 4px 4px #000000;
 }
 
 html, body {
@@ -18,7 +18,23 @@ html, body {
 	/*cursor: auto;*/
 	margin: 0;
 	height: 100%;
-	width: 100%;
+	background-color: #272c2d !important;
+	color: #babdb6 !important;
+	/*color: #ffffff;*/
+}
+.button-lor {
+	background-color: #3E413A  !important;
+}
+::-webkit-scrollbar {
+    height: 12px;
+    width: 6px;
+    background: #222;;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3E4654;
+    -webkit-border-radius: 1ex;
+
 }
 
 /*#showMenu:hover div {*/

@@ -17,23 +17,6 @@
 	</li>
 {% endblock navbar %}
 {% block content %}
-	<style>
-		.message_header_self {
-			color: #{{ self_text_color }};
-		}
-		.message_header_private {
-			color: #{{ private_text_color }};
-		}
-		.message_header_others {
-			color: #{{ others_text_color }};
-		}
-		.message_text_style {
-			color: #{{ text_color }};
-		}
-		.background-color {
-			background-color: #{{ background_color }};
-		}
-	</style>
 	<div class="wrapper message_text_style">
 		{#		<div class="fadeout"></div>#}
 		<div class="chat-wrapper">
@@ -46,11 +29,11 @@
 				<span class="glyphicon glyphicon-remove-circle" onclick="hideUserSendToName();"></span>
 			</div>
 			<div class="inputsdiv">
-				<input name="usermsg" type="text" class="inputs background-color message_text_style" style="" id="usermsg"/>
+				<input name="usermsg" type="text" class="inputs message_text_style" style="" id="usermsg"/>
 			</div>
 			<div>
 				<input
-						type="button" id="sendButton" class="btn btn-primary"
+						type="button" id="sendButton" class="btn button-lor "
 						onclick="sendMessage(userMessage.val(), receiverId.text());"
 						value="Send"/>
 			</div>

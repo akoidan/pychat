@@ -1,9 +1,9 @@
 var headerId;
-var selfHeader = '<font class="message_header_self">';
-var privateHeader = '<font class="message_header_private">';
-var othersHeader = '<font class="message_header_others">';
+var selfHeader = '<font class="message-header-self">';
+var privateHeader = '<font class="message-header-private">';
+var othersHeader = '<font class="message-header-others">';
 var endHeader = '</font>';
-var contentStyle = '<font class="message_text_style">';
+var contentStyle = '<font class="message-text-style">';
 var chatBoxDiv;
 var chatIncoming;
 var chatOutgoing;
