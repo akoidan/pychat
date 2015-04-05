@@ -109,7 +109,7 @@ function validateEmail() {
 				if ($("#mailbox").prop('checked')) {
 					emailCheck.style.color = "#dd4b39";
 				} else {
-					emailCheck.style.color = "black";
+					emailCheck.style.color = "";
 				}
 				emailCheck.innerHTML = data;
 				return false;

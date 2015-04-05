@@ -106,7 +106,7 @@ def logout(request):
 	POST. Logs out into system.
 	"""
 	djangologout(request)
-	return home(request)
+	return HttpResponseRedirect('/')
 
 
 @require_http_methods(['POST'])

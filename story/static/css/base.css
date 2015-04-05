@@ -18,13 +18,44 @@ html, body {
 	/*cursor: auto;*/
 	margin: 0;
 	height: 100%;
-	background-color: #272c2d !important;
-	color: #babdb6 !important;
-	/*color: #ffffff;*/
 }
-.button-lor {
-	background-color: #3E413A  !important;
+.color-lor {
+	background-color: #272c2d;
+	color: #babdb6;
 }
+
+.color-lor input[type=text], input[type=password], input[type=email] {
+	background-color: #272c2d;
+	border: 1px solid rgba(96, 90, 90, 0.31);
+	color: #C7C7C7;
+}
+
+.color-lor input:focus {
+	outline: none !important;
+	border: 1px solid #5e5e60;
+	box-shadow: 0 0 10px #5C6268;
+	color: #dddddd;
+}
+
+/*Override BS white background*/
+.dropdown-menu  {
+	background-color: #262425 !important;
+}
+
+/*add space between elements in login dropdown */
+.dropdown-menu input[type=text], input[type=password]{
+	margin-bottom: 15px;
+}
+
+.color-lor input[type=button], input[type=submit]{
+	background-color: #3E413A ;
+}
+.color-lor input[type=button], input[type=submit]:hover {
+	color: #dddddd;
+	border: 1px solid #48484a;
+	box-shadow: 0 0 10px #55585b;
+}
+
 ::-webkit-scrollbar {
     height: 12px;
     width: 6px;

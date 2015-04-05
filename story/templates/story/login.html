@@ -8,10 +8,10 @@
 	<li class="dropdown">
 		<a class="" href="#" data-toggle="dropdown"><span class="glyphicon
 		 glyphicon-log-in text-success dropdown-toggle" title="Sign in"></span></a>
-		<div class="dropdown-menu container" id="login-form" style="padding: 15px; right: 0px; left: auto">
+		<div class="dropdown-menu container color-lor" id="login-form" style="padding: 15px; right: 0px; left: auto">
 				<input class="form-control" type="text" placeholder="Username" id="lusername">
 				<input  type="password" class="form-control" placeholder="Password" id="lpassword">
-				<input class="btn btn-primary btn-block" type="button" onclick="login();" value="Sign In">
+				<input class="btn btn-block" type="button" onclick="login();" value="Sign In">
 				{% csrf_token %}
 		</div>
 	</li>
