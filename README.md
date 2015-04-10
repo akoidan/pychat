@@ -21,6 +21,7 @@ To run this you need:
  3. `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* gender check
 * login dropdown is broken
 * add space beetween elements in row dropdown
 * check profile save button uses only bootsrap

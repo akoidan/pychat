@@ -10,7 +10,7 @@ ul {
 span:hover {
 	/*Hand and shadow on hover on navbar elements*/
 	cursor: pointer;
-	text-shadow: 4px 4px #000000;
+	text-shadow: 0 0 0.2em #87F, 0 0 0.2em #87F;
 }
 
 html, body {

@@ -53,8 +53,26 @@ class UserProfile(AbstractBaseUser):
 	email_verified = models.BooleanField(default=False, null=False)
 	verify_code = models.CharField(max_length=17, null=True)
 	# ISO/IEC 5218 1 male, 2 - female
-	GENDER_CHOICES = ((1, 'Male'), (2, 'Female'))
-	sex = models.SmallIntegerField(choices=GENDER_CHOICES, null=False)
+
+	sex = models.SmallIntegerField(null=False)
+
+	@property
+	def sex_str(self):
+		return {
+			1: 'Female',
+			2: 'Male',
+			0: None
+		}[self.sex]
+
+	@sex_str.setter
+	def sex_str(self, sex):
+		if sex == 'Male':
+			self.sex = 1
+		elif sex == 'Female':
+			self.sex = 2
+		else:
+			self.sex = 0
+
 
 	def save(self, *args, **kwargs):
 		"""

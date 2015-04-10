@@ -163,7 +163,7 @@ def register(request):
 		if verify_email:
 			check_email(email)
 		# TODO
-		user = UserProfile(username=username, email=email, sex=1 if rp.get('sex') == 'Male' else 2)
+		user = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
 		user.set_password(password)
 		user.save()
 		# You must call authenticate before you can call login
