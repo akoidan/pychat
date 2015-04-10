@@ -15,7 +15,7 @@ def check_password(password):
 	Checks if password is secure
 	:raises ValidationError exception if password is not valid
 	"""
-	if password is None or password == '':
+	if not password.strip():
 		raise ValidationError("password can't be empty")
 	if len(password) < 3:
 		raise ValidationError("password should be at least 3 symbols")
@@ -39,7 +39,7 @@ def check_user(username):
 	Checks if specified username is free to register
 	:raises ValidationError exception if username is not valid
 	"""
-	if username is None or username == '':
+	if not username.strip():
 		raise ValidationError("User name can't be empty")
 	if len(username) > 16:
 		raise ValidationError("User is too long. Max 16 symbols")
