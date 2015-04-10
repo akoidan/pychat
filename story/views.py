@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 -*-
 import json
 
-from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.shortcuts import render_to_response
 from django.http import HttpResponse

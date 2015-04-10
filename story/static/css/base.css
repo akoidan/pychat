@@ -30,10 +30,10 @@ html, body {
 	color: #C7C7C7;
 }
 
-.color-lor input:focus {
+.color-lor input[type=text]:focus, input[type=password]:focus, input[type=email]:focus {
 	outline: none !important;
 	border: 1px solid #5e5e60;
-	box-shadow: 0 0 10px #5C6268;
+	box-shadow: 0 0 10px #55585b;
 	color: #dddddd;
 }
 
@@ -50,8 +50,8 @@ html, body {
 .color-lor input[type=button], input[type=submit]{
 	background-color: #3E413A ;
 }
-.color-lor input[type=button], input[type=submit]:hover {
-	color: #dddddd;
+.color-lor input[type=button]:hover, input[type=submit]:hover {
+	color: #eaeaea;
 	border: 1px solid #48484a;
 	box-shadow: 0 0 10px #55585b;
 }
