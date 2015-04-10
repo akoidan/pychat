@@ -68,6 +68,17 @@ html, body {
 
 }
 
+/*::-moz-selection {  Code for Firefox*/
+    /*color: red;*/
+    /*background: yellow;*/
+/*}*/
+
+
+/*::selection {*/
+    /*text-shadow:1px 1px #c7c8c2;*/
+    /*background: rgba(0, 0, 0, 0.81);*/
+/*}*/
+
 /*#showMenu:hover div {*/
 	/*display: block;*/
 /*}*/
