@@ -21,7 +21,7 @@ $(document).ready(function () {
 });
 
 function register() {
-	if (password.value != repeatPassword.value) {
+	if (password.value !== repeatPassword.value) {
 		alert("Passwords don't match");
 		return;
 	}
@@ -32,9 +32,8 @@ function register() {
 		url: '/register',
 		data: datad,
 		success: function (data) {
-			var datad = $('form').serialize();
 			console.log(new Date() + "Register server response:" + data);
-			if (data == 'Account created') {
+			if (data === 'Account created') {
 				window.location.href = '/';
 			} else {
 				alert(data);
@@ -63,7 +62,7 @@ function validatePassword() {
 function validateUser() {
 	userName.value = userName.value.trim();
 	var username = userName.value;
-	if(username == "") {
+	if(username === "") {
 		setError(userNameCheck, "Error: Username cannot be blank!");
 		return;
 	}

@@ -95,7 +95,7 @@ function printMessage(data, isTopDirection) {
 		headerStyle = privateHeader + private_data + '>>';
 	} else if (typeof private_data === 'boolean' ) {
 		headerStyle = privateHeader;
-	} else if (data.user == username.value) {
+	} else if (data.user === username.value) {
 		headerStyle = selfHeader;
 	} else {
 		headerStyle = othersHeader;
@@ -144,11 +144,11 @@ function sendMessage(usermsg, username) {
 			addressee: username
 		},
 		success: function (data) {
-			console.log(new Date() + "Send response: " + data);
+			console.log(new Date() +  "Send \"" +usermsg+ "\" response: " + data);
 			userMessage.val("");
 		},
 		failure: function (data) {
-			console.log(new Date() + "can't send message, response: " + data);
+			console.log(new Date() + "can't send \"" +usermsg+ "\", response: " + data);
 		}
 	});
 }
@@ -162,7 +162,6 @@ function loadUpHistory(elements) {
 
 
 function loadMessages(count, isTop) {
-	console.log(new Date() + ': Requesting ' + count + ' messages from server');
 	$.ajax({
 		async: false,
 		type: 'POST',
@@ -172,7 +171,7 @@ function loadMessages(count, isTop) {
 		},
 		url: "/get_messages",
 		success: function (data) {
-			console.log(new Date() + ': Response ' + data);
+			console.log(new Date() + ': Requesting messages response ' + data);
 			var result = JSON.parse(data);
 			var firstMessage = result[result.length-1];
 			if (firstMessage != null) {
