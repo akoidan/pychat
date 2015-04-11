@@ -10,14 +10,21 @@ from django.core.exceptions import ValidationError
 from story.models import UserProfile
 
 
+def is_blank(myString):
+	if myString and myString.strip():
+		return False
+	else:
+		return True
+
+
 def check_password(password):
 	"""
 	Checks if password is secure
 	:raises ValidationError exception if password is not valid
 	"""
-	if not password.strip():
+	if is_blank(password):
 		raise ValidationError("password can't be empty")
-	if len(password) < 3:
+	if not re.match(u'^\S.+\S$', password):
 		raise ValidationError("password should be at least 3 symbols")
 
 
@@ -39,11 +46,11 @@ def check_user(username):
 	Checks if specified username is free to register
 	:raises ValidationError exception if username is not valid
 	"""
-	if not username.strip():
+	if is_blank(username):
 		raise ValidationError("User name can't be empty")
 	if len(username) > 16:
 		raise ValidationError("User is too long. Max 16 symbols")
-	if not re.match('^[A-Za-z0-9-_]*$', username):
+	if not re.match('^\w+$', username):
 		raise ValidationError("Only letters, numbers, dashes or underlines")
 	try:
 		# theoretically can throw returning 'more than 1' error
@@ -63,7 +70,7 @@ def send_email_verification(user):
 		user.prifle.save()
 		site = 'http://' + getattr(settings, 'HOST_IP') + ':' + getattr(settings, 'SERVER_PORT')
 		code = '/confirm_email?code=' + user.profile.verify_code
-		text = 'Hi %s, you have registered on %s. To complete your registration click on the url bellow: %s%s' % (
-		user.username, site, site, code)
+		text = 'Hi %s, you have registered on %s. To complete your registration click on the url bellow: %s%s' %\
+			(user.username, site, site, code)
 		mail_thread = Thread(target=user.email_user, args=("Confirm chat registration", text))
 		mail_thread.start()

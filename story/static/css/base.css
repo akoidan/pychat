@@ -1,6 +1,6 @@
 ul {
 	 /*remove browser default left padding 40px and bullets*/
-	padding-left: 0px;
+	padding-left: 0;
 }
 
 .navbar-default {

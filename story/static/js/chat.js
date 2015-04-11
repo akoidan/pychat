@@ -9,7 +9,9 @@ var chatIncoming;
 var chatOutgoing;
 var loggedUser;
 var chatRoomsDiv;
-
+var userMessage;
+var  userSendMessageTo;
+var receiverId;
 
 $(document).ready(function () {
 	//use .on() to add a listener. you can add as many listeners as you want.
@@ -29,7 +31,7 @@ $(document).ready(function () {
 	userSendMessageTo.hide();
 	receiverId = $('#receiverId');
 	userMessage.keypress(function (event) {
-		if (event.keyCode == 13) {
+		if (event.keyCode === 13) {
 			$("#sendButton").click();
 		}
 	});
@@ -40,11 +42,11 @@ $(document).ready(function () {
 	});
 
 	$(document).keydown(function (e) {
-		if (e.which == 33) {    // page up
+		if (e.which === 33) {    // page up
 			loadUpHistory(15);
-		} else if (e.which == 38) { // up
+		} else if (e.which === 38) { // up
 			loadUpHistory(3);
-		} else if (e.ctrlKey && e.which == 36) {
+		} else if (e.ctrlKey && e.which === 36) {
 			loadUpHistory(25);
 		}
 	});
@@ -62,10 +64,10 @@ function loadUsers(usernames) {
 	chatRoomsDiv.empty();
 	var allUsers = '<ul class="message_header_others">';
 	var icon;
-	for (username in usernames) {
-		if (usernames[username] == "Male") {
+	for (var username in usernames) {
+		if (usernames[username] === "Male") {
 			icon = '<span class="glyphicon icon-user green"/>'
-		} else if (usernames[username] == "Female") {
+		} else if (usernames[username] === "Female") {
 			icon = '<span class="glyphicon icon-girl green"/>'
 		} else {
 			icon = '<span class="glyphicon icon-dog green"/>';
@@ -89,18 +91,18 @@ function showUserSendMess(username) {
 function printMessage(data, isTopDirection) {
 	var headerStyle;
 	var private_data = data.private;
-	if (typeof private_data == 'string') {
+	if (typeof private_data === 'string') {
 		headerStyle = privateHeader + private_data + '>>';
-	} else if (typeof private_data == 'boolean' ) {
+	} else if (typeof private_data === 'boolean' ) {
 		headerStyle = privateHeader;
 	} else if (data.user == username.value) {
 		headerStyle = selfHeader;
 	} else {
 		headerStyle = othersHeader;
 	}
-	messageHeader = headerStyle + ' (' + data.time + ') <b>' + data.user + '</b>: ' + endHeader;
-	messageContent = contentStyle + encodeHTML(data.content) + endHeader;
-	message = '<p>' + messageHeader + messageContent + "</p>";
+	var messageHeader = headerStyle + ' (' + data.time + ') <b>' + data.user + '</b>: ' + endHeader;
+	var messageContent = contentStyle + encodeHTML(data.content) + endHeader;
+	var message = '<p>' + messageHeader + messageContent + "</p>";
 	if (isTopDirection) {
 		chatBoxDiv.prepend(message);
 	} else {
@@ -131,7 +133,7 @@ function appendMessage(data) {
 
 
 function sendMessage(usermsg, username) {
-	if (usermsg == null || usermsg == '') {
+	if (usermsg == null || usermsg === '') {
 		return;
 	}
 	$.ajax({
@@ -153,7 +155,7 @@ function sendMessage(usermsg, username) {
 
 
 function loadUpHistory(elements) {
-	if (chatBoxDiv.scrollTop() == 0) {
+	if (chatBoxDiv.scrollTop() === 0) {
 		loadMessages(elements, true);
 	}
 }
@@ -172,7 +174,7 @@ function loadMessages(count, isTop) {
 		success: function (data) {
 			console.log(new Date() + ': Response ' + data);
 			var result = eval(data);
-			firstMessage = result[result.length-1];
+			var firstMessage = result[result.length-1];
 			if (firstMessage != null) {
 				headerId = eval(firstMessage).id;
 			}
@@ -181,8 +183,7 @@ function loadMessages(count, isTop) {
 				result = result.reverse();
 			}
 			result.forEach(function (message) {
-				realMessage = eval(message);
-				printMessage(realMessage, isTop);
+				printMessage(eval(message), isTop);
 			});
 
 			if (!isTop) {

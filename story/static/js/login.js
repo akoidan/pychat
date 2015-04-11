@@ -12,7 +12,7 @@ function login() {
 		success: function (data) {
 			var d = new Date();
 			console.log(d + "Server response success:" + data);
-			if (data == 'update') {
+			if (data === 'update') {
 				window.location.href = '/';
 			} else {
 				alert(data);

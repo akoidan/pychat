@@ -201,6 +201,7 @@ def change_profile(request):
 
 
 @login_required_no_redirect
+@require_http_methods(['POST', 'GET'])
 def settings(request):
 	"""
 	GET and POST. Take care about User customizable colors via django.forms,
@@ -219,8 +220,6 @@ def settings(request):
 		form.instance.pk = request.user.id
 		form.save()
 		return HttpResponseRedirect('/')
-	else:
-		raise PermissionError
 
 
 def refresh_user_list(request):
