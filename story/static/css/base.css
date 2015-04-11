@@ -13,6 +13,13 @@ span:hover {
 	text-shadow: 0 0 0.2em #87F, 0 0 0.2em #87F;
 }
 
+
+/*Remove annoying chromium autofill yellow background*/
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0 1000px #30302A inset !important;
+	-webkit-text-fill-color: #CCCBDF;
+}
+
 html, body {
 	text-shadow: none;
 	/*cursor: auto;*/
