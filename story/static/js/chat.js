@@ -173,17 +173,17 @@ function loadMessages(count, isTop) {
 		url: "/get_messages",
 		success: function (data) {
 			console.log(new Date() + ': Response ' + data);
-			var result = eval(data);
+			var result = JSON.parse(data);
 			var firstMessage = result[result.length-1];
 			if (firstMessage != null) {
-				headerId = eval(firstMessage).id;
+				headerId = firstMessage.id;
 			}
 			if (!isTop) {
 				// appending to top last message first, so it goes down with every iteraction
 				result = result.reverse();
 			}
 			result.forEach(function (message) {
-				printMessage(eval(message), isTop);
+				printMessage(message, isTop);
 			});
 
 			if (!isTop) {
