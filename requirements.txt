@@ -1,5 +1,5 @@
 django>1.7.0
-django-realtime
+git+https://github.com/anishmenon/django-realtime
 simplejson
 celery
 Pillow>=2.7.0
