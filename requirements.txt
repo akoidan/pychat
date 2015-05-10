@@ -1,7 +1,7 @@
 django>1.7.0
-django-realtime
+django-redis-sessions
 simplejson
-celery
+
 Pillow>=2.7.0
 django-crispy-forms
 # PyMySQL

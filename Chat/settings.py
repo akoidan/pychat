@@ -50,7 +50,6 @@ INSTALLED_APPS = (
 	'django.contrib.staticfiles',
 	'django.db.migrations',
 	# 'south',
-	'drealtime',
 	'story',
 	'simplejson',
 	'crispy_forms',
@@ -66,11 +65,9 @@ CRISPY_TEMPLATE_PACK = 'bootstrap'
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 SERVER_PORT = '8000'
-ISHOUT_CLIENT_ADDR = HOST_IP + ':5500'
 
 MIDDLEWARE_CLASSES = (
 	'django.middleware.csrf.CsrfViewMiddleware',
-	'drealtime.middleware.iShoutCookieMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
 	'django.middleware.common.CommonMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -101,6 +98,9 @@ LOGIN_URL = '/'
 # 		},
 # 	}
 # }
+
+
+SESSION_ENGINE = 'redis_sessions.session'
 
 DATABASES = {
 	'default': {
@@ -152,3 +152,10 @@ EMAIL_HOST_PASSWORD = 'Ilovepython'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 
 MEDIA_URL = "photo/"
+
+
+# TORNADO SETTINGS
+
+API_KEY = 'S2nPkJmTlx1nI35aQ5Xsr2k5OeOzutmv' #< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;
+
+SEND_MESSAGE_API_URL = 'http://127.0.0.1:8000/messages/send_message_api'
