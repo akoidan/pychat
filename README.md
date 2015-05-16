@@ -18,6 +18,7 @@ To run this you need:
  3. `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* timezone
 * gender check
 * login dropdown is broken
 * add space beetween elements in row dropdown
