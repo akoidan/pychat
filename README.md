@@ -1,14 +1,13 @@
 ![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/djangochat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/djangochat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/djangochat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/djangochat)
 
-A simple chat written in django with drealtime
+A simple chat written in django via WebsSockets
 ==========
 To run this you need:
 
 1. Install dependencies:
  1. python packages: `pip install -r requirements.txt`
  2. redis-server: archLinux `pacman -S community/redis`, Ubuntu `add-apt-repository -y ppa:rwky/redis` `apt-get install -y redis-server`
- 3. nodejs and npm: archLinux `pacman -S community/nodejs`, Ubuntu `apt-get install nodejs` `apt-get install npm`
- 4. static content and IShout.js: `sh download_content.sh`
+ 3. static content and IShout.js: `sh download_content.sh`
 2. Configure server  
  1. Choose DATABASES in Chat/settings.py if needed and run `sh syncdb.sh` #Chat uses SQLite by default
  2. Change HOST_IP in Chat/settings.py to yours, it tells where messages should go from a client

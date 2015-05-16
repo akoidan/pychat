@@ -1,6 +1,7 @@
 django>1.7.0
 simplejson
 Pillow>=2.7.0
+tornado
 tornado-redis
 django-redis-sessions
 #redis

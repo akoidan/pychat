@@ -52,7 +52,6 @@ def validate_user(request):
 
 
 @require_http_methods('POST')
-@login_required_no_redirect
 def get_messages(request):
 	"""
 	Returns all public messages started from ID
@@ -78,27 +77,6 @@ def home(request):
 	return render_to_response('story/chat.html', c,  context_instance=RequestContext(request))
 
 
-@require_http_methods('POST')
-@login_required_no_redirect
-def send_message(request):
-	"""
-	Emits messages via Ishout
-	"""
-	content = request.POST.get('message', '')
-	addressee = request.POST.get('addressee', '')
-	if addressee:
-		receiver = UserProfile.objects.get(username=addressee)
-		message = Messages(sender=request.user, content=content, receiver=receiver)
-		message.save()
-		send_message_to_user(message, receiver)
-	else:
-		message = Messages(sender=request.user, content=content)
-		message.save()
-		broadcast_message(message)
-	response = 'message delivered'
-	return HttpResponse(response, content_type='text/plain')
-
-
 @login_required_no_redirect
 def logout(request):
 	"""
@@ -118,7 +96,6 @@ def auth(request):
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		djangologin(request, user)
-		send_user_list()
 		message = 'update'
 	else:
 		message = 'Login or password is wrong'
@@ -220,8 +197,3 @@ def settings(request):
 		form.instance.pk = request.user.id
 		form.save()
 		return HttpResponseRedirect('/')
-
-
-def refresh_user_list(request):
-	send_user_list()
-	return HttpResponse('request has been sent', content_type='text/plain')

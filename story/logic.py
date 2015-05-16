@@ -44,10 +44,7 @@ def send_user_list():
 
 
 def get_users(users):
-	result = {}
-	for user in users:
-		result[user.id] = user.username
-	return result
+	return {user.id: user.username for user in users}
 
 
 def get_user_settings(user):
