@@ -1,11 +1,10 @@
 django>1.7.0
 simplejson
 Pillow>=2.7.0
-
+tornado-redis
 django-redis-sessions
 #redis
 #django-redis-cache
-
 django-crispy-forms
 # PyMySQL
 # mysql-connector-python
