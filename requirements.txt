@@ -3,6 +3,11 @@ git+https://github.com/anishmenon/django-realtime
 simplejson
 celery
 Pillow>=2.7.0
+
+django-redis-sessions
+#redis
+#django-redis-cache
+
 django-crispy-forms
 # PyMySQL
-# mysql-connector-python
+# mysql-connector-pythonv
