@@ -55,6 +55,8 @@ INSTALLED_APPS = (
 	'crispy_forms',
 )
 
+SESSION_ENGINE = 'redis_sessions.session'
+
 # HOST_IP = socket.gethostbyname(socket.gethostname())
 HOST_IP = '127.0.0.1'
 

@@ -2,7 +2,13 @@ import os
 import xml.etree.ElementTree as etree
 from subprocess import call
 import socket
-from builtins import FileNotFoundError
+
+#python2\3
+try:
+	from builtins import FileNotFoundError
+except ImportError :
+	FileNotFoundError = IOError
+
 from django.apps import AppConfig
 from django.core.exceptions import MiddlewareNotUsed
 
