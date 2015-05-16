@@ -59,14 +59,14 @@ SESSION_ENGINE = 'redis_sessions.session'
 
 # HOST_IP = socket.gethostbyname(socket.gethostname())
 HOST_IP = '127.0.0.1'
+SERVER_PORT = '8000'
+SEND_MESSAGE_API_URL = 'http://%s:%s/messages/send_message_api' % (HOST_IP, SERVER_PORT)
 
 CRISPY_TEMPLATE_PACK = 'bootstrap'
 
 # SESSION_COOKIE_AGE = 10
 # SESSION_SAVE_EVERY_REQUEST = True
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-SERVER_PORT = '8000'
 
 MIDDLEWARE_CLASSES = (
 	'django.middleware.csrf.CsrfViewMiddleware',
@@ -159,5 +159,3 @@ MEDIA_URL = "photo/"
 # TORNADO SETTINGS
 
 API_KEY = 'S2nPkJmTlx1nI35aQ5Xsr2k5OeOzutmv' #< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;
-
-SEND_MESSAGE_API_URL = 'http://127.0.0.1:8000/messages/send_message_api'
