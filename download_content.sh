@@ -8,8 +8,6 @@ JS_DIR="$STATIC_DIR/js"
 CSS_DIR="$STATIC_DIR/css"
 SOUNDS_DIR="$STATIC_DIR/sounds"
 FONTS_DIR="$STATIC_DIR/fonts"
-NODE_DIR="$PROJECT_ROOT/node_modules"
-
 
 # Implementing installed files
 files[1]="$FONTS_DIR/glyphicons-halflings-regular.woff"
@@ -22,11 +20,11 @@ files[7]="$CSS_DIR/bootstrap-datepicker.min.css"
 files[8]="$JS_DIR/bootstrap-datepicker.min.js"
 files[9]="$CSS_DIR/bootstrap.min.css"
 files[10]="$JS_DIR/bootstrap.min.js"
+files[11]="$JS_DIR/jquery.cookie.js"
 
 
 # Deleting all content creating empty dirs
 rm -rf $SOUNDS_DIR
-rm -rf $NODE_DIR
 rm -rf $FONTS_DIR
 for path in "${files[@]}" ; do
   if [ -f $path ]; then
@@ -47,21 +45,6 @@ fi
 cd $PROJECT_ROOT
 
 
-# IShout.js
-command -v npm && {
-  echo "Installing ishout.js, this can take a while" ;
-  export PYTHON=python2 ;
-  npm install ishout.js ;
-  npm_exit_status=$? ;
-  # The common issue when access denied for ~/.npm directory
-  if [[ $npm_exit_status == 3 ]] ; then
-    echo "Seems like you don't have permissions to ~/.npm directory, trying to change it";
-    sudo chown -R $(whoami) ~/.npm ;
-    npm install ishout.js ;
-  fi;
-  unset PYTHON ;
-}
-
 
 # bootstrap
 wget https://github.com/twbs/bootstrap/releases/download/v3.3.4/bootstrap-3.3.4-dist.zip -O $TMP_DIR/bootstrap.zip &&
@@ -80,17 +63,10 @@ wget https://raw.githubusercontent.com/eternicode/bootstrap-datepicker/master/di
 wget http://code.jquery.com/jquery-2.1.3.min.js -O $JS_DIR/jquery.js
 rm -rf $JS_DIR/jscolor
 wget http://jscolor.com/release/jscolor-1.4.4.zip -P $TMP_DIR && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR
-
+wget https://raw.githubusercontent.com/carhartl/jquery-cookie/master/src/jquery.cookie.js -d $JS_DIR/
 
 # Sounds
 curl -L -o $TMP_DIR/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip $TMP_DIR/sounds.zip -d $SOUNDS_DIR
-
-
-if [ ! -f "NODE_DIR/ishout.js/server.js" ]; then
-    echo 'Installing ishout.js has failed, fetching it from dropbox'
-    rm -rf $NODE_DIR
-    curl -L -o $TMP_DIR/ishout.js.zip https://www.dropbox.com/sh/m0np8p9f7c9cf3k/AACGEDrkpspbSocyQP0SaVk-a?dl=1 && unzip $TMP_DIR/ishout.js.zip -d $NODE_DIR
-fi
 
 
 # Checking if all files are loaded
@@ -102,6 +78,7 @@ for path in "${files[@]}" ; do
   fi
 done
 
+# Fetch files from dropbox if link failed
 failed_count_second_attempt=0
 if [[ $failed_count > 0 ]]; then
   echo "Some links have been broken, fetching resources from dropbox"

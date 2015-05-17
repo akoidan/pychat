@@ -10,24 +10,22 @@ var chatOutgoing;
 var loggedUser;
 var chatRoomsDiv;
 var userMessage;
-var  userSendMessageTo;
+var userSendMessageTo;
 var receiverId;
+var ws;
+
 
 $(document).ready(function () {
-	//use .on() to add a listener. you can add as many listeners as you want.
-	ishout.on('notifications', appendMessage);
-	ishout.on('refresh_users', loadUsers);
-	// .init() will authenticate against the ishout.js server, and open the
-	// WebSocket connection.
-	ishout.init();
-	ishout.joinRoom('main');
+
+	start_chat_ws();
+
 	chatBoxDiv = $('#chatbox');
 	userMessage = $("#usermsg");
 	chatRoomsDiv = $('#chatrooms');
 	userSendMessageTo = $('#userSendMessageTo');
 	chatIncoming = document.getElementById("chatIncoming");
 	chatOutgoing = document.getElementById("chatOutgoing");
-	loggedUser = $("input#username").val();
+	loggedUser = $.cookie("user");
 	userSendMessageTo.hide();
 	receiverId = $('#receiverId');
 	userMessage.keypress(function (event) {
@@ -52,6 +50,30 @@ $(document).ready(function () {
 	});
 	loadMessages(10, false);
 });
+
+
+//var timezone = getCookie('timezone');
+
+// TODO
+//if (timezone == null) {
+//	setCookie("timezone", jstz.determine().name());
+//}
+
+
+function start_chat_ws() {
+	ws = new WebSocket($.cookie('api'));
+	ws.onmessage = webSocketMessage;
+	ws.onclose = function () {
+		console.log(new Date() + "Connection to WebSocket is lost, trying to reconnect");
+		// Try to reconnect in 5 seconds
+		setTimeout(function () {
+			start_chat_ws()
+		}, 5000);
+	};
+	ws.onopen = function() {
+		console.log(new Date() + "Connection to WebSocket established");
+	}
+}
 
 
 function encodeHTML(html) {
@@ -82,7 +104,7 @@ function loadUsers(usernames) {
 function showUserSendMess(username) {
 	userSendMessageTo.show();
 	// Empty sets display to none
-	userSendMessageTo.css("display","flex");
+	userSendMessageTo.css("display", "flex");
 	receiverId.empty();
 	receiverId.append(username);
 }
@@ -90,17 +112,22 @@ function showUserSendMess(username) {
 
 function printMessage(data, isTopDirection) {
 	var headerStyle;
-	var private_data = data.private;
-	if (typeof private_data === 'string') {
-		headerStyle = privateHeader + private_data + '>>';
-	} else if (typeof private_data === 'boolean' ) {
+	var receiver = data.receiver;
+	var displayedUsername = data.sender;
+	//private message
+	if (receiver != null) {
 		headerStyle = privateHeader;
-	} else if (data.user === username.value) {
+		if (receiver !== loggedUser) {
+			displayedUsername = data.receiver
+			headerStyle+= '>>'
+		}
+	// public message
+	}	else if (data.sender === loggedUser) {
 		headerStyle = selfHeader;
 	} else {
 		headerStyle = othersHeader;
 	}
-	var messageHeader = headerStyle + ' (' + data.time + ') <b>' + data.user + '</b>: ' + endHeader;
+	var messageHeader = headerStyle + ' (' + data.time + ') <b>' + displayedUsername + '</b>: ' + endHeader;
 	var messageContent = contentStyle + encodeHTML(data.content) + endHeader;
 	var message = '<p>' + messageHeader + messageContent + "</p>";
 	if (isTopDirection) {
@@ -118,6 +145,14 @@ function printMessage(data, isTopDirection) {
 	}
 }
 
+function webSocketMessage(message) {
+	var data = JSON.parse(message.data);
+	if (data.onlineUsers) {
+		loadUsers(data.onlineUsers)
+	} else {
+		appendMessage(data);
+	}
+}
 
 function appendMessage(data) {
 	printMessage(data, false);
@@ -136,21 +171,18 @@ function sendMessage(usermsg, username) {
 	if (usermsg == null || usermsg === '') {
 		return;
 	}
-	$.ajax({
-		type: 'POST',
-		url: document.URL + 'send_message',
-		data: {
-			message: usermsg,
-			addressee: username
-		},
-		success: function (data) {
-			console.log(new Date() +  "Send \"" +usermsg+ "\" response: " + data);
-			userMessage.val("");
-		},
-		failure: function (data) {
-			console.log(new Date() + "can't send \"" +usermsg+ "\", response: " + data);
-		}
-	});
+	if (ws.readyState != WebSocket.OPEN) {
+		console.log(new Date() + "Web socket is closed. Can't send message: " + usermsg);
+		return false;
+	}
+	var messageRequest = {};
+	messageRequest.message = usermsg;
+	messageRequest.receiver = username;
+
+	var jsonRequest = JSON.stringify(messageRequest);
+
+	ws.send(jsonRequest);
+	userMessage.val("");
 }
 
 
@@ -173,7 +205,7 @@ function loadMessages(count, isTop) {
 		success: function (data) {
 			console.log(new Date() + ': Requesting messages response ' + data);
 			var result = JSON.parse(data);
-			var firstMessage = result[result.length-1];
+			var firstMessage = result[result.length - 1];
 			if (firstMessage != null) {
 				headerId = firstMessage.id;
 			}
@@ -199,14 +231,6 @@ function loadMessages(count, isTop) {
 
 function toggleRoom() {
 	chatRoomsDiv.toggle();
-	$("#refresh").toggle();
-}
-
-function refreshUserList(){
-	$.ajax({
-		type: 'POST',
-		url: "/refresh_user_list"
-	});
 }
 
 function hideUserSendToName() {

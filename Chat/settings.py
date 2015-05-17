@@ -50,7 +50,6 @@ INSTALLED_APPS = (
 	'django.contrib.staticfiles',
 	'django.db.migrations',
 	# 'south',
-	'drealtime',
 	'story',
 	'simplejson',
 	'crispy_forms',
@@ -59,7 +58,9 @@ INSTALLED_APPS = (
 SESSION_ENGINE = 'redis_sessions.session'
 
 # HOST_IP = socket.gethostbyname(socket.gethostname())
-HOST_IP = '127.0.0.1'
+
+API_PORT = '8888'
+API_LISTEN = '0.0.0.0'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap'
 
@@ -67,16 +68,13 @@ CRISPY_TEMPLATE_PACK = 'bootstrap'
 # SESSION_SAVE_EVERY_REQUEST = True
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-SERVER_PORT = '8000'
-ISHOUT_CLIENT_ADDR = HOST_IP + ':5500'
-
 MIDDLEWARE_CLASSES = (
 	'django.middleware.csrf.CsrfViewMiddleware',
-	'drealtime.middleware.iShoutCookieMiddleware',
 	'django.contrib.sessions.middleware.SessionMiddleware',
 	'django.middleware.common.CommonMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
+	'story.cookies_middleware.UserCookieMiddleWare',
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
@@ -154,3 +152,11 @@ EMAIL_HOST_PASSWORD = 'Ilovepython'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 
 MEDIA_URL = "photo/"
+
+USER_COOKIE_NAME = 'user'
+
+WS_ADDRESS_COOKIE_NAME = 'api'
+
+# TORNADO SETTINGS
+
+API_KEY = 'S2nPkJmTlx1nI35aQ5Xsr2k5OeOzutmv' #< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;

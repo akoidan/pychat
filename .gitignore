@@ -20,3 +20,4 @@ story/static/js/bootstrap-datepicker.min.js
 story/static/css/bootstrap-datepicker.min.css
 story/static/css/bootstrap.min.css
 story/static/js/bootstrap.min.js
+story/static/js/jquery.cookie.js

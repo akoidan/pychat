@@ -1,13 +1,11 @@
 django>1.7.0
-git+https://github.com/anishmenon/django-realtime
 simplejson
-celery
 Pillow>=2.7.0
-
+tornado
+tornado-redis
 django-redis-sessions
 #redis
 #django-redis-cache
-
 django-crispy-forms
 # PyMySQL
-# mysql-connector-pythonv
+# mysql-connector-python

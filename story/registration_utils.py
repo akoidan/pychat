@@ -64,13 +64,12 @@ def id_generator(size=16, chars=string.ascii_letters + string.digits):
 	return ''.join(random.choice(chars) for _ in range(size))
 
 
-def send_email_verification(user):
+def send_email_verification(user, address):
 	if user.email is not None:
 		user.profile.verify_code = id_generator()
 		user.prifle.save()
-		site = 'http://' + getattr(settings, 'HOST_IP') + ':' + getattr(settings, 'SERVER_PORT')
 		code = '/confirm_email?code=' + user.profile.verify_code
 		text = 'Hi %s, you have registered on %s. To complete your registration click on the url bellow: %s%s' %\
-			(user.username, site, site, code)
+			(user.username, address, address, code)
 		mail_thread = Thread(target=user.email_user, args=("Confirm chat registration", text))
 		mail_thread.start()

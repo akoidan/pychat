@@ -98,10 +98,20 @@ class Messages(models.Model):
 	@property
 	def json(self):
 		return {
-			'user': UserProfile.objects.get_by_natural_key(self.sender).username,
+			'sender': self.sender.username,
+			'receiver': None if self.receiver is None else self.receiver.username,
 			'content': self.content,
 			'time': self.time.strftime("%H:%M:%S"),
 			'id': self.id
+		}
+
+	@staticmethod
+	def json_anonymous(sender_anonymous, content, receiver_anonymous):
+		return {
+			'sender': sender_anonymous,
+			'receiver': receiver_anonymous,
+			'content': content,
+			'time': datetime.datetime.now().strftime("%H:%M:%S"),
 		}
 
 
