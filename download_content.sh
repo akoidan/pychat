@@ -44,8 +44,6 @@ fi
 
 cd $PROJECT_ROOT
 
-
-
 # bootstrap
 wget https://github.com/twbs/bootstrap/releases/download/v3.3.4/bootstrap-3.3.4-dist.zip -O $TMP_DIR/bootstrap.zip &&
 unzip $TMP_DIR/bootstrap.zip -d $TMP_DIR/bootstrap/
@@ -63,7 +61,7 @@ wget https://raw.githubusercontent.com/eternicode/bootstrap-datepicker/master/di
 wget http://code.jquery.com/jquery-2.1.3.min.js -O $JS_DIR/jquery.js
 rm -rf $JS_DIR/jscolor
 wget http://jscolor.com/release/jscolor-1.4.4.zip -P $TMP_DIR && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR
-wget https://raw.githubusercontent.com/carhartl/jquery-cookie/master/src/jquery.cookie.js -d $JS_DIR/
+wget https://raw.githubusercontent.com/carhartl/jquery-cookie/master/src/jquery.cookie.js -P $JS_DIR/
 
 # Sounds
 curl -L -o $TMP_DIR/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip $TMP_DIR/sounds.zip -d $SOUNDS_DIR
