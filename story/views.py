@@ -154,7 +154,7 @@ def register(request):
 		# register,js redirect if message = 'Account created'
 		message = 'Account created'
 		if verify_email:
-			send_email_verification(user)
+			send_email_verification(user, request.build_absolute_uri())
 	except ValidationError as e:
 		message = e.message
 	return HttpResponse(message, content_type='text/plain')
