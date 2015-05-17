@@ -31,7 +31,7 @@ def validate_email(request):
 	"""
 	email = request.POST.get('email')
 	try:
-		registration_utils.validate_email(email)
+		registration_utils.check_email(email)
 		response = 'ok'
 	except ValidationError as e:
 		response = e.message
@@ -154,7 +154,7 @@ def register(request):
 		# register,js redirect if message = 'Account created'
 		message = 'Account created'
 		if verify_email:
-			send_email_verification(user, request.build_absolute_uri())
+			send_email_verification(user, request.get_host())
 	except ValidationError as e:
 		message = e.message
 	return HttpResponse(message, content_type='text/plain')

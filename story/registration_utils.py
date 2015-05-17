@@ -3,7 +3,7 @@ from threading import Thread
 import random
 import string
 
-from django.conf import settings
+from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
@@ -66,10 +66,11 @@ def id_generator(size=16, chars=string.ascii_letters + string.digits):
 
 def send_email_verification(user, address):
 	if user.email is not None:
-		user.profile.verify_code = id_generator()
-		user.prifle.save()
-		code = '/confirm_email?code=' + user.profile.verify_code
-		text = 'Hi %s, you have registered on %s. To complete your registration click on the url bellow: %s%s' %\
-			(user.username, address, address, code)
-		mail_thread = Thread(target=user.email_user, args=("Confirm chat registration", text))
+		user.verify_code = id_generator()
+		user.save()
+		code = '/confirm_email?code=' + user.verify_code
+		text = 'Hi %s, you have registered on chat. To complete your registration click on the url bellow: http://%s%s' %\
+			(user.username, address, code)
+		mail_thread = Thread(target=send_mail, args=("Confirm chat registration", text, address,
+			[user.email]))
 		mail_thread.start()
