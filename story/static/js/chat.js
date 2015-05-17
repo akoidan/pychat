@@ -2,6 +2,7 @@ var headerId;
 var selfHeader = '<font class="message-header-self">';
 var privateHeader = '<font class="message-header-private">';
 var othersHeader = '<font class="message-header-others">';
+var systemHeader = '<font class="message-header-system">';
 var endHeader = '</font>';
 var contentStyle = '<font class="message-text-style">';
 var chatBoxDiv;
@@ -25,6 +26,8 @@ $(document).ready(function () {
 	userSendMessageTo = $('#userSendMessageTo');
 	chatIncoming = document.getElementById("chatIncoming");
 	chatOutgoing = document.getElementById("chatOutgoing");
+	chatLogin = document.getElementById("chatLogin");
+	chatLogout = document.getElementById("chatLogout");
 	loggedUser = $.cookie("user");
 	userSendMessageTo.hide();
 	receiverId = $('#receiverId');
@@ -118,7 +121,7 @@ function printMessage(data, isTopDirection) {
 	if (receiver != null) {
 		headerStyle = privateHeader;
 		if (receiver !== loggedUser) {
-			displayedUsername = data.receiver
+			displayedUsername = data.receiver;
 			headerStyle+= '>>'
 		}
 	// public message
@@ -145,10 +148,31 @@ function printMessage(data, isTopDirection) {
 	}
 }
 
+function refreshOnlineUsers(data) {
+	loadUsers(data.onlineUsers);
+	if (sound) {
+		if (data.action === 'login') {
+			chatLogin.currentTime = 0;
+			chatLogin.play();
+		} else if (data.action === 'logout') {
+			chatLogout.currentTime = 0;
+			chatLogout.play();
+		}
+	}
+	var oldscrollHeight = chatBoxDiv[0].scrollHeight;
+	chatBoxDiv.append(systemHeader + '<p>(' + data.time + ') <b>' + data.user + '</b> ' + data.action + ' the chat </p>' + endHeader);
+	var newscrollHeight = chatBoxDiv[0].scrollHeight;
+	if (newscrollHeight > oldscrollHeight) {
+		chatBoxDiv.animate({
+			scrollTop: newscrollHeight
+		}, 'normal'); // Autoscroll to bottom of div
+	}
+}
+
 function webSocketMessage(message) {
 	var data = JSON.parse(message.data);
 	if (data.onlineUsers) {
-		loadUsers(data.onlineUsers)
+		refreshOnlineUsers(data);
 	} else {
 		appendMessage(data);
 	}
@@ -157,10 +181,11 @@ function webSocketMessage(message) {
 function appendMessage(data) {
 	printMessage(data, false);
 	if (sound) {
-		chatOutgoing.currentTime = 0;
-		if (loggedUser === data.user) {
+		if (loggedUser === data.sender) {
+			chatOutgoing.currentTime = 0;
 			chatOutgoing.play();
 		} else {
+			chatIncoming.currentTime = 0;
 			chatIncoming.play();
 		}
 	}
@@ -210,7 +235,7 @@ function loadMessages(count, isTop) {
 				headerId = firstMessage.id;
 			}
 			if (!isTop) {
-				// appending to top last message first, so it goes down with every iteraction
+				// appending to top last message first, so it goes down with every iteration
 				result = result.reverse();
 			}
 			result.forEach(function (message) {
@@ -221,9 +246,6 @@ function loadMessages(count, isTop) {
 				//scroll to bottom if new messages have been already sent
 				chatBoxDiv.scrollTop(chatBoxDiv[0].scrollHeight);
 			}
-		},
-		failure: function (data) {
-			console.log(new Date() + 'can not load messages, response:', data);
 		}
 	});
 }

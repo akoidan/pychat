@@ -52,7 +52,7 @@ def check_user(username):
 		raise ValidationError("User name can't be empty")
 	if len(username) > 16:
 		raise ValidationError("User is too long. Max 16 symbols")
-	if not re.match('^\w+$', username):
+	if not re.match('^[a-zA-Z-_0-9]{1,16}$', username):
 		raise ValidationError("Only letters, numbers, dashes or underlines")
 	try:
 		# theoretically can throw returning 'more than 1' error

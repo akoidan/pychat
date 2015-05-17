@@ -127,3 +127,7 @@
 .message-header-self{
 	color: #e29722;
 }
+
+.message-header-system{
+	color: #9DD3DD;
+}

@@ -21,6 +21,8 @@ files[8]="$JS_DIR/bootstrap-datepicker.min.js"
 files[9]="$CSS_DIR/bootstrap.min.css"
 files[10]="$JS_DIR/bootstrap.min.js"
 files[11]="$JS_DIR/jquery.cookie.js"
+files[5]="$SOUNDS_DIR/ChatLogin.wav"
+files[6]="$SOUNDS_DIR/ChatLogout.wav"
 
 
 # Deleting all content creating empty dirs

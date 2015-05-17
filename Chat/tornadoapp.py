@@ -10,12 +10,11 @@ from django.utils.importlib import import_module
 import tornadoredis
 
 from story.models import UserProfile, Messages
-from story.registration_utils import is_blank, id_generator
+from story.registration_utils import is_blank
 
 
 session_engine = import_module(settings.SESSION_ENGINE)
 
-from django.contrib.auth.models import User
 
 class MessagesHandler(tornado.websocket.WebSocketHandler):
 
@@ -30,9 +29,15 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 		if receiver_name != self.sender_name:
 			self.connections[receiver_name].write_message(message)
 
-	def refresh_online_user_list(self):
-		user_names = {user_name : self.connections[user_name].sex for user_name in self.connections.keys()}
-		self.emit({'onlineUsers': user_names})
+	def refresh_online_user_list(self, action):
+		user_names = {user_name: self.connections[user_name].sex for user_name in self.connections.keys()}
+		refresh_message = {
+			'onlineUsers': user_names,
+			'action': action,
+			'user': self.sender_name,
+			'time': datetime.datetime.now().strftime("%H:%M:%S")
+		}
+		self.emit(refresh_message)
 
 	def __init__(self, *args, **kwargs):
 		super(MessagesHandler, self).__init__(*args, **kwargs)
@@ -51,7 +56,7 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 			user_db = UserProfile.objects.get(id=self.user_id)
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
-		except (KeyError, User.DoesNotExist):
+		except (KeyError, UserProfile.DoesNotExist):
 			# Anonymous
 			self.user_id = 0
 			self.sex = None
@@ -62,7 +67,7 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 		self.client.subscribe(self.channel)
 		self.thread_id = thread_id
 		self.client.listen(self.show_new_message)
-		self.refresh_online_user_list()
+		self.refresh_online_user_list('joined')
 
 	def handle_request(self, response):
 		pass
@@ -79,7 +84,7 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 		save_to_db = False
 		receiver = None
 		send_to_all = is_blank(receiver_name)
-		if (send_to_all):
+		if send_to_all:
 			receiver_name = None
 
 		if self.user_id != 0:
@@ -110,9 +115,9 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 	def on_close(self):
 		try:
 			del self.connections[self.sender_name]
+			self.refresh_online_user_list('has left')
 		except AttributeError:
 			pass
-		self.refresh_online_user_list()
 
 		def check():
 			if self.client.connection.in_progress:

@@ -19,7 +19,7 @@ from story.models import UserProfile, UserSettings
 from .models import Messages
 from story import registration_utils
 from story.forms import UserSettingsForm, UserProfileForm
-from story.registration_utils import check_email, send_email_verification, check_user, check_password, get_user_settings
+from story.registration_utils import check_email, send_email_verification, check_user, check_password
 from Chat import settings
 
 
@@ -187,8 +187,8 @@ def user_settings(request):
 	"""
 	if request.method == 'GET':
 		try:
-			user_settings = UserSettings.objects.get(pk=request.user.id)
-			form = UserSettingsForm(instance=user_settings)
+			colored_settings = UserSettings.objects.get(pk=request.user.id)
+			form = UserSettingsForm(instance=colored_settings)
 		except ObjectDoesNotExist:
 			form = UserSettingsForm(DefaultSettingsConfig.colors)
 		c = csrf(request)
