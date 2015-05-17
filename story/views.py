@@ -19,8 +19,7 @@ from story.models import UserProfile, UserSettings
 from .models import Messages
 from story import registration_utils
 from story.forms import UserSettingsForm, UserProfileForm
-from story.logic import get_user_settings
-from story.registration_utils import check_email, send_email_verification, check_user, check_password
+from story.registration_utils import check_email, send_email_verification, check_user, check_password, get_user_settings
 from Chat import settings
 
 
@@ -73,9 +72,7 @@ def home(request):
 	GET only, returns main Chat page.
 	Login or logout navbar is creates by means of create_nav_page
 	"""
-	c = get_user_settings(request.user)
-	c.update(csrf(request))
-	return render_to_response('story/chat.html', c,  context_instance=RequestContext(request))
+	return render_to_response('story/chat.html', csrf(request),  context_instance=RequestContext(request))
 
 
 @login_required_no_redirect

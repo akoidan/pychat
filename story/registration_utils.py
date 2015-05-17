@@ -5,9 +5,11 @@ import string
 
 from django.core.mail import send_mail
 from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.forms import model_to_dict
+from story.apps import DefaultSettingsConfig
 
-from story.models import UserProfile
+from story.models import UserProfile, UserSettings
 
 
 def is_blank(myString):
@@ -64,13 +66,22 @@ def id_generator(size=16, chars=string.ascii_letters + string.digits):
 	return ''.join(random.choice(chars) for _ in range(size))
 
 
-def send_email_verification(user, address):
+def send_email_verification(user, site_address):
 	if user.email is not None:
 		user.verify_code = id_generator()
 		user.save()
 		code = '/confirm_email?code=' + user.verify_code
 		text = 'Hi %s, you have registered on chat. To complete your registration click on the url bellow: http://%s%s' %\
-			(user.username, address, code)
-		mail_thread = Thread(target=send_mail, args=("Confirm chat registration", text, address,
+			(user.username, site_address, code)
+		mail_thread = Thread(target=send_mail, args=("Confirm chat registration", text, site_address,
 			[user.email]))
 		mail_thread.start()
+
+
+def get_user_settings(user):
+	if user.is_authenticated():
+		try:
+			return model_to_dict(UserSettings.objects.get(pk=user.id))
+		except ObjectDoesNotExist:
+			pass
+	return DefaultSettingsConfig.colors
