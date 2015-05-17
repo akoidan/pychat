@@ -4,12 +4,12 @@ import time
 import tornado.httpserver
 import tornado.ioloop
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from Chat.tornadoapp import application
+from django.conf import settings
 
 
 class Command(BaseCommand):
-	args = '[port_number]'
 	help = 'Starts the Tornado application for message handling.'
 
 	def sig_handler(self, sig, frame):
@@ -24,16 +24,10 @@ class Command(BaseCommand):
 		io_loop.add_timeout(time.time() + 2, io_loop.stop)
 
 	def handle(self, *args, **options):
-		if len(args) == 1:
-			try:
-				port = int(args[0])
-			except ValueError:
-				raise CommandError('Invalid port number specified')
-		else:
-			port = 8888
-
+		api_port = settings.API_PORT
+		api_addr = settings.API_LISTEN
 		self.http_server = tornado.httpserver.HTTPServer(application)
-		self.http_server.listen(port, address="127.0.0.1")
+		self.http_server.listen(api_port, address=api_addr)
 
 		# Init signals handler
 		signal.signal(signal.SIGTERM, self.sig_handler)

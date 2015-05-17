@@ -20,6 +20,7 @@ files[7]="$CSS_DIR/bootstrap-datepicker.min.css"
 files[8]="$JS_DIR/bootstrap-datepicker.min.js"
 files[9]="$CSS_DIR/bootstrap.min.css"
 files[10]="$JS_DIR/bootstrap.min.js"
+files[11]="$JS_DIR/jquery.cookie.js"
 
 
 # Deleting all content creating empty dirs
@@ -62,7 +63,7 @@ wget https://raw.githubusercontent.com/eternicode/bootstrap-datepicker/master/di
 wget http://code.jquery.com/jquery-2.1.3.min.js -O $JS_DIR/jquery.js
 rm -rf $JS_DIR/jscolor
 wget http://jscolor.com/release/jscolor-1.4.4.zip -P $TMP_DIR && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR
-
+wget https://raw.githubusercontent.com/carhartl/jquery-cookie/master/src/jquery.cookie.js -d $JS_DIR/
 
 # Sounds
 curl -L -o $TMP_DIR/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip $TMP_DIR/sounds.zip -d $SOUNDS_DIR

@@ -1,7 +1,6 @@
 {% load staticfiles %}
-<input type='hidden' id='username' value='{{ username }}'/>
 <ul class="nav  navbar-nav pull-right">
-<li><a href="{% url 'story.views.settings' %}"><span class="glyphicon glyphicon-cog text-warning"
+<li><a href="{% url 'story.views.user_settings' %}"><span class="glyphicon glyphicon-cog text-warning"
 																	title="Change settings"></span></a>
 </li>
 		<li><a href="{% url 'story.views.get_profile' %}" id="hide"><span

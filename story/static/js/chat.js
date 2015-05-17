@@ -17,12 +17,7 @@ var ws;
 
 $(document).ready(function () {
 
-	if ("WebSocket" in window) {
-		start_chat_ws();
-	} else {
-		alert("Your browser doesn't support websockets, chat functions won't work");
-		return false;
-	}
+	start_chat_ws();
 
 	chatBoxDiv = $('#chatbox');
 	userMessage = $("#usermsg");
@@ -30,7 +25,7 @@ $(document).ready(function () {
 	userSendMessageTo = $('#userSendMessageTo');
 	chatIncoming = document.getElementById("chatIncoming");
 	chatOutgoing = document.getElementById("chatOutgoing");
-	loggedUser = $("input#username").val();
+	loggedUser = $.cookie("user");
 	userSendMessageTo.hide();
 	receiverId = $('#receiverId');
 	userMessage.keypress(function (event) {
@@ -66,7 +61,7 @@ $(document).ready(function () {
 
 
 function start_chat_ws() {
-	ws = new WebSocket("ws://127.0.0.1:8888/" + 1 + "/");
+	ws = new WebSocket($.cookie('api'));
 	ws.onmessage = webSocketMessage;
 	ws.onclose = function () {
 		console.log(new Date() + "Connection to WebSocket is lost, trying to reconnect");
@@ -117,17 +112,22 @@ function showUserSendMess(username) {
 
 function printMessage(data, isTopDirection) {
 	var headerStyle;
-	var private_data = data.private;
-	if (typeof private_data === 'string') {
-		headerStyle = privateHeader + private_data + '>>';
-	} else if (typeof private_data === 'boolean') {
+	var receiver = data.receiver;
+	var displayedUsername = data.sender;
+	//private message
+	if (receiver != null) {
 		headerStyle = privateHeader;
-	} else if (data.user === loggedUser) {
+		if (receiver !== loggedUser) {
+			displayedUsername = data.receiver
+			headerStyle+= '>>'
+		}
+	// public message
+	}	else if (data.sender === loggedUser) {
 		headerStyle = selfHeader;
 	} else {
 		headerStyle = othersHeader;
 	}
-	var messageHeader = headerStyle + ' (' + data.time + ') <b>' + data.user + '</b>: ' + endHeader;
+	var messageHeader = headerStyle + ' (' + data.time + ') <b>' + displayedUsername + '</b>: ' + endHeader;
 	var messageContent = contentStyle + encodeHTML(data.content) + endHeader;
 	var message = '<p>' + messageHeader + messageContent + "</p>";
 	if (isTopDirection) {
@@ -146,7 +146,12 @@ function printMessage(data, isTopDirection) {
 }
 
 function webSocketMessage(message) {
-	appendMessage(JSON.parse(message.data))
+	var data = JSON.parse(message.data);
+	if (data.onlineUsers) {
+		loadUsers(data.onlineUsers)
+	} else {
+		appendMessage(data);
+	}
 }
 
 function appendMessage(data) {

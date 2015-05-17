@@ -58,9 +58,9 @@ INSTALLED_APPS = (
 SESSION_ENGINE = 'redis_sessions.session'
 
 # HOST_IP = socket.gethostbyname(socket.gethostname())
-HOST_IP = '127.0.0.1'
-SERVER_PORT = '8000'
-SEND_MESSAGE_API_URL = 'http://%s:%s/messages/send_message_api' % (HOST_IP, SERVER_PORT)
+
+API_PORT = '8888'
+API_LISTEN = '0.0.0.0'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap'
 
@@ -74,6 +74,7 @@ MIDDLEWARE_CLASSES = (
 	'django.middleware.common.CommonMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
+	'story.cookies_middleware.UserCookieMiddleWare',
 	'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
@@ -100,9 +101,6 @@ LOGIN_URL = '/'
 # 		},
 # 	}
 # }
-
-
-SESSION_ENGINE = 'redis_sessions.session'
 
 DATABASES = {
 	'default': {
@@ -155,6 +153,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 
 MEDIA_URL = "photo/"
 
+USER_COOKIE_NAME = 'user'
+
+WS_ADDRESS_COOKIE_NAME = 'api'
 
 # TORNADO SETTINGS
 

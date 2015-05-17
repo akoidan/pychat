@@ -20,7 +20,7 @@ urlpatterns = patterns(
 	url(r'^validate_user$', 'story.views.validate_user'),
 	url(r'^validate_email$', 'story.views.validate_email'),
 	url(r'^get_messages$', 'story.views.get_messages'),
-	url(r'^settings$', 'story.views.settings'),
+	url(r'^settings$', 'story.views.user_settings'),
 	url(r'^profile$', 'story.views.get_profile'),
 	url(r'^change_profile$', 'story.views.change_profile'),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -19,8 +19,9 @@ from story.models import UserProfile, UserSettings
 from .models import Messages
 from story import registration_utils
 from story.forms import UserSettingsForm, UserProfileForm
-from story.logic import broadcast_message, send_user_list, get_user_settings, send_message_to_user
+from story.logic import get_user_settings
 from story.registration_utils import check_email, send_email_verification, check_user, check_password
+from Chat import settings
 
 
 @require_http_methods(['POST'])
@@ -59,9 +60,9 @@ def get_messages(request):
 	header_id = request.POST.get('headerId', -1)
 	count = int(request.POST.get('count', 10))
 	if header_id == -1:
-		messages = Messages.objects.filter(receiver=None).order_by('-pk')[:count]
+		messages = Messages.objects.order_by('-pk')[:count]
 	else:
-		messages = Messages.objects.filter(id__lt=header_id, receiver=None).order_by('-pk')[:count]
+		messages = Messages.objects.filter(id__lt=header_id).order_by('-pk')[:count]
 	response = json.dumps([message.json for message in messages])
 	return HttpResponse(response, content_type='text/plain')
 
@@ -83,7 +84,9 @@ def logout(request):
 	POST. Logs out into system.
 	"""
 	djangologout(request)
-	return HttpResponseRedirect('/')
+	response = HttpResponseRedirect('/')
+	response.delete_cookie(settings.USER_COOKIE_NAME)
+	return response
 
 
 @require_http_methods(['POST'])
@@ -99,7 +102,9 @@ def auth(request):
 		message = 'update'
 	else:
 		message = 'Login or password is wrong'
-	return HttpResponse(message, content_type='text/plain')
+	response = HttpResponse(message, content_type='text/plain')
+	response.delete_cookie(settings.USER_COOKIE_NAME)
+	return response
 
 
 @require_http_methods('GET')
@@ -179,7 +184,7 @@ def change_profile(request):
 
 @login_required_no_redirect
 @require_http_methods(['POST', 'GET'])
-def settings(request):
+def user_settings(request):
 	"""
 	GET and POST. Take care about User customizable colors via django.forms,
 	"""

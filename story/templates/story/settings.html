@@ -4,7 +4,7 @@
 	<script src="{% static "js/jscolor/jscolor.js" %}"></script>
 {% endblock head %} {% block content %}
 	<h1 align="center">{{ errorcode }}</h1>
-	<form class="border-form" action="{% url 'story.views.settings' %}" method="post">
+	<form class="border-form" action="{% url 'story.views.user_settings' %}" method="post">
 		<div class="border-div">
 			<table class="border-table">
 				{{ form.as_table }}
