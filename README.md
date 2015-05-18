@@ -16,6 +16,11 @@ To run this you need:
 
 #TODO
 * tornadoi2
+* add logger
+* deploy on server
+* registration fails with 500
+* don't clear cookie on browser close
+* on start 10 messages includes foreign private ones 
 * timezone
 * gender check
 * add space beetween elements in row dropdown
