@@ -24,10 +24,9 @@ class Command(BaseCommand):
 		io_loop.add_timeout(time.time() + 2, io_loop.stop)
 
 	def handle(self, *args, **options):
-		api_port = settings.API_PORT
-		api_addr = settings.API_LISTEN
+
 		self.http_server = tornado.httpserver.HTTPServer(application)
-		self.http_server.listen(api_port, address=api_addr)
+		self.http_server.listen(settings.API_PORT)
 
 		# Init signals handler
 		signal.signal(signal.SIGTERM, self.sig_handler)

@@ -18,6 +18,7 @@ To run this you need:
 * tornadoi2
 * add logger
 * deploy on server
+* right room width (add space to roght size from scroll if userdlist is closed)
 * registration fails with 500
 * don't clear cookie on browser close
 * on start 10 messages includes foreign private ones 

@@ -12,9 +12,10 @@ import tornadoredis
 from story.models import UserProfile, Messages
 from story.registration_utils import is_blank
 
-
 session_engine = import_module(settings.SESSION_ENGINE)
 
+c = tornadoredis.Client()
+c.connect()
 
 class MessagesHandler(tornado.websocket.WebSocketHandler):
 
@@ -66,7 +67,7 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 		self.channel = "".join(['thread_', thread_id, '_messages'])
 		self.client.subscribe(self.channel)
 		self.thread_id = thread_id
-		self.client.listen(self.show_new_message)
+		c.listen(self.show_new_message)
 		self.refresh_online_user_list('joined')
 
 	def handle_request(self, response):
@@ -79,6 +80,8 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 			return
 		message = json.loads(json_message)
 		# dont save message if user is anonymous
+		c.publish(self.channel, 'it works')
+
 		receiver_name = message['receiver']
 		content = message['message']
 		save_to_db = False

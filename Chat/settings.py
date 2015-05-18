@@ -60,7 +60,6 @@ SESSION_ENGINE = 'redis_sessions.session'
 # HOST_IP = socket.gethostbyname(socket.gethostname())
 
 API_PORT = '8888'
-API_LISTEN = '0.0.0.0'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap'
 
