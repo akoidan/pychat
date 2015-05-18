@@ -28,7 +28,14 @@ function login() {
 
 $(document).ready(function () {
 		//Handles menu drop down
-	$('#login-form').click(function (e) {
+	var loginForm = $('#login-form');
+	loginForm.click(function (e) {
 		e.stopPropagation();
+	});
+	// login by enter
+	loginForm.keypress(function (event) {
+		if (event.keyCode === 13) {
+			login();
+		}
 	});
 });

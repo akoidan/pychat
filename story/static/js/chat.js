@@ -13,6 +13,8 @@ var chatRoomsDiv;
 var userMessage;
 var userSendMessageTo;
 var receiverId;
+var chatLogin;
+var chatLogout;
 var ws;
 
 
