@@ -115,7 +115,7 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 	def on_close(self):
 		try:
 			del self.connections[self.sender_name]
-			self.refresh_online_user_list('has left')
+			self.refresh_online_user_list('left')
 		except AttributeError:
 			pass
 

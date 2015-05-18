@@ -153,16 +153,16 @@ function printMessage(data, isTopDirection) {
 function refreshOnlineUsers(data) {
 	loadUsers(data.onlineUsers);
 	if (sound) {
-		if (data.action === 'login') {
+		if (data.action === 'joined') {
 			chatLogin.currentTime = 0;
 			chatLogin.play();
-		} else if (data.action === 'logout') {
+		} else if (data.action === 'left') {
 			chatLogout.currentTime = 0;
 			chatLogout.play();
 		}
 	}
 	var oldscrollHeight = chatBoxDiv[0].scrollHeight;
-	chatBoxDiv.append(systemHeader + '<p>(' + data.time + ') <b>' + data.user + '</b> ' + data.action + ' the chat </p>' + endHeader);
+	chatBoxDiv.append(systemHeader + '<p>(' + data.time + ') <b>' + data.user + '</b> has ' + data.action + ' the chat </p>' + endHeader);
 	var newscrollHeight = chatBoxDiv[0].scrollHeight;
 	if (newscrollHeight > oldscrollHeight) {
 		chatBoxDiv.animate({
