@@ -5,21 +5,17 @@ import tornado.web
 import tornado.websocket
 import tornado.ioloop
 import tornado.httpclient
-from django.conf import settings
 from django.utils.importlib import import_module
-import tornadoredis
 
+from django.conf import settings
+user_cookie_name = settings.USER_COOKIE_NAME
 from story.models import UserProfile, Messages
-from story.registration_utils import is_blank
+from story.registration_utils import is_blank, id_generator
 
 session_engine = import_module(settings.SESSION_ENGINE)
 
-c = tornadoredis.Client()
-c.connect()
-
 class MessagesHandler(tornado.websocket.WebSocketHandler):
 
-	# TODO not threadsafe
 	connections = {}
 
 	def emit(self, message):
@@ -40,15 +36,10 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 		}
 		self.emit(refresh_message)
 
-	def __init__(self, *args, **kwargs):
-		super(MessagesHandler, self).__init__(*args, **kwargs)
-		self.client = tornadoredis.Client()
-		self.client.connect()
-
 	def check_origin(self, origin):
 		return True
 
-	def open(self, thread_id):
+	def open(self):
 
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
 		session = session_engine.SessionStore(session_key)
@@ -60,15 +51,11 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 		except (KeyError, UserProfile.DoesNotExist):
 			# Anonymous
 			self.user_id = 0
+			self.sender_name = id_generator(8)
 			self.sex = None
-			# TODO insecure method of passing username from django to tornado via cookies
-			self.sender_name = self.get_cookie(settings.USER_COOKIE_NAME)
 		self.connections[self.sender_name] = self
-		self.channel = "".join(['thread_', thread_id, '_messages'])
-		self.client.subscribe(self.channel)
-		self.thread_id = thread_id
-		c.listen(self.show_new_message)
 		self.refresh_online_user_list('joined')
+		self.write_message({'me': self.sender_name})
 
 	def handle_request(self, response):
 		pass
@@ -79,8 +66,6 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 		if len(json_message) > 10000:
 			return
 		message = json.loads(json_message)
-		# dont save message if user is anonymous
-		c.publish(self.channel, 'it works')
 
 		receiver_name = message['receiver']
 		content = message['message']
@@ -112,8 +97,6 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 		else:
 			self.emit_to_user(prepared_message, receiver_name)
 
-	def show_new_message(self, result):
-		self.write_message(str(result.body))
 
 	def on_close(self):
 		try:
@@ -122,21 +105,7 @@ class MessagesHandler(tornado.websocket.WebSocketHandler):
 		except AttributeError:
 			pass
 
-		def check():
-			if self.client.connection.in_progress:
-				tornado.ioloop.IOLoop.instance().add_timeout(
-					datetime.timedelta(0.00001),
-					check
-				)
-			else:
-				self.client.disconnect()
-
-		tornado.ioloop.IOLoop.instance().add_timeout(
-			datetime.timedelta(0.00001),
-			check
-		)
-
 
 application = tornado.web.Application([
-	(r'/(?P<thread_id>\d+)/', MessagesHandler),
+	(r'.*', MessagesHandler),
 ])

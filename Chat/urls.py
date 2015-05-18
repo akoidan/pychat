@@ -11,7 +11,6 @@ def check_redis_running():
 	try:
 		result = call(["redis-cli", "ping"])
 		if result != 0:
-			print("Redis server is not running, trying to start in manually")
 			# spout redis in background, shell= true finds command in PATH
 			# subprocess.Popen(["redis"], shell=True)
 			raise MiddlewareNotUsed("Can't establish connection with redis server. Please run `redis-server` command")

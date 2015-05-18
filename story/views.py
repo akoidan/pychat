@@ -82,7 +82,6 @@ def logout(request):
 	"""
 	djangologout(request)
 	response = HttpResponseRedirect('/')
-	response.delete_cookie(settings.USER_COOKIE_NAME)
 	return response
 
 
@@ -100,7 +99,6 @@ def auth(request):
 	else:
 		message = 'Login or password is wrong'
 	response = HttpResponse(message, content_type='text/plain')
-	response.delete_cookie(settings.USER_COOKIE_NAME)
 	return response
 
 

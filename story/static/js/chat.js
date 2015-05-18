@@ -30,7 +30,6 @@ $(document).ready(function () {
 	chatOutgoing = document.getElementById("chatOutgoing");
 	chatLogin = document.getElementById("chatLogin");
 	chatLogout = document.getElementById("chatLogout");
-	loggedUser = $.cookie("user");
 	userSendMessageTo.hide();
 	receiverId = $('#receiverId');
 	userMessage.keypress(function (event) {
@@ -175,7 +174,9 @@ function webSocketMessage(message) {
 	var data = JSON.parse(message.data);
 	if (data.onlineUsers) {
 		refreshOnlineUsers(data);
-	} else {
+	} else if (data.me) {
+		loggedUser = data.me
+	}else {
 		appendMessage(data);
 	}
 }
