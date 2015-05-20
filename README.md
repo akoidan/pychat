@@ -15,6 +15,9 @@ To run this you need:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* move all constant depending js code to settings file (e.g. 'joined', 'left')
+* show if user's reconnecting
+* since post to 10 getmessages loads 1st, username is not set and self messages writes as others colors
 * tornadoi2
 * add logger
 * deploy on server
