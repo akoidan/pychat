@@ -6,6 +6,7 @@ from django.core.exceptions import MiddlewareNotUsed
 
 from Chat import settings
 
+
 def check_redis_running():
 	""":raise error if redis is not running"""
 	try:

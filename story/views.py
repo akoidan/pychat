@@ -31,7 +31,7 @@ def validate_email(request):
 	email = request.POST.get('email')
 	try:
 		registration_utils.check_email(email)
-		response = 'ok'
+		response = settings.VALIDATION_IS_OK
 	except ValidationError as e:
 		response = e.message
 	return HttpResponse(response, content_type='text/plain')
@@ -45,7 +45,7 @@ def validate_user(request):
 	try:
 		registration_utils.check_user(request.POST.get('username'))
 		# hardcoded ok check in register.js
-		message = 'ok'
+		message = settings.VALIDATION_IS_OK
 	except ValidationError as e:
 		message = e.message
 	return HttpResponse(message, content_type='text/plain')
@@ -95,7 +95,7 @@ def auth(request):
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		djangologin(request, user)
-		message = 'update'
+		message = settings.UPDATE_PAGE_EVENT
 	else:
 		message = 'Login or password is wrong'
 	response = HttpResponse(message, content_type='text/plain')
@@ -147,7 +147,7 @@ def register(request):
 		auth_user = authenticate(username=username, password=password)
 		djangologin(request, auth_user)
 		# register,js redirect if message = 'Account created'
-		message = 'Account created'
+		message = settings.ACCOUNT_CREATED_EVENT
 		if verify_email:
 			send_email_verification(user, request.get_host())
 	except ValidationError as e:

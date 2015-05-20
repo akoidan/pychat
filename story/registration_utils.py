@@ -12,8 +12,8 @@ from story.apps import DefaultSettingsConfig
 from story.models import UserProfile, UserSettings
 
 
-def is_blank(myString):
-	if myString and myString.strip():
+def is_blank(check_str):
+	if check_str and check_str.strip():
 		return False
 	else:
 		return True
@@ -73,8 +73,9 @@ def send_email_verification(user, site_address):
 		code = '/confirm_email?code=' + user.verify_code
 		text = 'Hi %s, you have registered on chat. To complete your registration click on the url bellow: http://%s%s' %\
 			(user.username, site_address, code)
-		mail_thread = Thread(target=send_mail, args=("Confirm chat registration", text, site_address,
-			[user.email]))
+		mail_thread = Thread(
+			target=send_mail,
+			args=("Confirm chat registration", text, site_address, [user.email]))
 		mail_thread.start()
 
 

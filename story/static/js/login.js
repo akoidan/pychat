@@ -1,8 +1,8 @@
 function login() {
 	var d = new Date();
 	var credentials = {
-			username: document.getElementById("lusername").value,
-			password: document.getElementById("lpassword").value
+			username: document.getElementById("username").value,
+			password: document.getElementById("password").value
 	};
 	console.log(d + "Attempting to login, credentials: " + credentials);
 	$.ajax({

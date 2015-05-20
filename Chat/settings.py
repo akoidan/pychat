@@ -159,3 +159,11 @@ WS_ADDRESS_COOKIE_NAME = 'api'
 # TORNADO SETTINGS
 
 API_KEY = 'S2nPkJmTlx1nI35aQ5Xsr2k5OeOzutmv' #< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;
+
+
+######### JAVASCRIPT CONSTANTS #############
+LOGIN_EVENT = 'joined'
+LOGOUT_EVENT = 'left'
+ACCOUNT_CREATED_EVENT = 'Account created'
+UPDATE_PAGE_EVENT = 'update'
+VALIDATION_IS_OK = 'ok'

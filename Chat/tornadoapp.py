@@ -22,9 +22,7 @@ c = tornadoredis.Client()
 c.connect()
 
 
-
 class MessagesHandler(WebSocketHandler):
-
 	connections = {}
 
 	MAIN_CHANNEL = 'main'
@@ -56,9 +54,8 @@ class MessagesHandler(WebSocketHandler):
 			self.sender_name = id_generator(8)
 			self.sex = None
 		self.connections[self.sender_name] = self
-		self.refresh_online_user_list('joined')
+		self.refresh_online_user_list(settings.LOGIN_EVENT)
 		self.write_message({'me': self.sender_name})
-
 
 	def emit(self, message):
 		c.publish(self.MAIN_CHANNEL, json.dumps(message))
@@ -120,14 +117,13 @@ class MessagesHandler(WebSocketHandler):
 		else:
 			self.emit_to_user(prepared_message, receiver_name)
 
-
 	def on_close(self):
 		if self.client.subscribed:
 			self.client.unsubscribe(self.MAIN_CHANNEL)
 			self.client.disconnect()
 		try:
 			del self.connections[self.sender_name]
-			self.refresh_online_user_list('left')
+			self.refresh_online_user_list(settings.LOGOUT_EVENT)
 		except AttributeError:
 			pass
 

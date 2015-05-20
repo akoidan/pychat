@@ -1,5 +1,6 @@
 __author__ = 'andrew'
 
+
 def add_user_name(request):
 	"""
 	GET only, returns main Chat page.

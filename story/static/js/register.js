@@ -10,8 +10,8 @@
 	var userRegex = /^[a-zA-Z-_0-9]{1,16}$/;
 
 $(document).ready(function () {
-	password = document.getElementById("password");
-	userName = document.getElementById("username");
+	password = document.getElementById("rpassword");
+	userName = document.getElementById("rusername");
 	repeatPassword = document.getElementById("repeatpassword");
 	passwordCheck = document.getElementById("password_check");
 	userNameCheck = document.getElementById("username_check");
@@ -64,36 +64,31 @@ function validateUser() {
 	var username = userName.value;
 	if(username === "") {
 		setError(userNameCheck, "Error: Username cannot be blank!");
-		return;
-	}
-
-	if (!userRegex.test(username)) {
+	} else if (!userRegex.test(username)) {
 		setError(userNameCheck, "only letters, numbers and underscores!");
-		return;
-	}
+	}	else {
+		console.log(new Date() + "Sending validate user request: " + username);
+		$.ajax({
+			type: 'POST',
+			url: "/validate_user",
+			data: {
+				username: username
+			},
+			success: function (data) {
+				console.log(new Date() + "Validate user response: " + data);
+				// hardcoded ok
+				if (data === 'ok') {
+					setSuccess(userNameCheck);
+				} else {
+					setError(userNameCheck, data)
 
-	var d = new Date();
-	console.log(d + "Sending validate user request: " + username);
-	$.ajax({
-		type: 'POST',
-		url: "/validate_user",
-		data: {
-			username: username
-		},
-		success: function (data) {
-			console.log(d + "Validate user response: " + data);
-			// hardcoded ok
-			if (data === 'ok') {
-				setSuccess(userNameCheck);
-			} else {
-				setError(userNameCheck, data)
-
+				}
+			},
+			failure: function (data) {
+				console.log(new Date() + "can't validate user, response: " + data);
 			}
-		},
-		failure: function (data) {
-			console.log(new Date() + "can't validate user, response: " + data);
-		}
-	});
+		});
+	}
 }
 
 function setError(element, errorText) {
@@ -101,7 +96,7 @@ function setError(element, errorText) {
 	element.innerHTML = errorText;
 }
 
-function setSuccess(element, errorText) {
+function setSuccess(element) {
 	element.style.color = "Green";
 	element.innerHTML = "ok!";
 }

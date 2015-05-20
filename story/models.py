@@ -73,7 +73,6 @@ class UserProfile(AbstractBaseUser):
 		else:
 			self.sex = 0
 
-
 	def save(self, *args, **kwargs):
 		"""
 		http://stackoverflow.com/questions/15422606/django-model-email-field-unique-if-not-null-blank
@@ -84,12 +83,13 @@ class UserProfile(AbstractBaseUser):
 				self.email = None
 		super(UserProfile, self).save(*args, **kwargs)
 
+
 class Messages(models.Model):
 	"""
 	Contains all public messages
 	"""
 	sender = models.ForeignKey(UserProfile, related_name='sender')
-	#DateField.auto_now
+	# DateField.auto_now
 	time = models.TimeField(default=datetime.datetime.now)
 	content = models.CharField(max_length=255)
 	id = models.AutoField(primary_key=True)
