@@ -56,8 +56,8 @@ INSTALLED_APPS = (
 )
 
 SESSION_ENGINE = 'redis_sessions.session'
-
-# HOST_IP = socket.gethostbyname(socket.gethostname())
+# create session for anonymous
+SESSION_SAVE_EVERY_REQUEST = True
 
 API_PORT = '8888'
 

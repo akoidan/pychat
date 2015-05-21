@@ -51,7 +51,12 @@ class MessagesHandler(WebSocketHandler):
 		except (KeyError, UserProfile.DoesNotExist):
 			# Anonymous
 			self.user_id = 0
-			self.sender_name = id_generator(8)
+			try:
+				self.sender_name = session['user_name']
+			except KeyError:
+				self.sender_name = id_generator(8)
+				session['user_name'] = self.sender_name
+				session.save()
 			self.sex = None
 		self.connections[self.sender_name] = self
 		self.refresh_online_user_list(settings.LOGIN_EVENT)
@@ -124,7 +129,7 @@ class MessagesHandler(WebSocketHandler):
 		try:
 			del self.connections[self.sender_name]
 			self.refresh_online_user_list(settings.LOGOUT_EVENT)
-		except AttributeError:
+		except (AttributeError, KeyError):
 			pass
 
 
