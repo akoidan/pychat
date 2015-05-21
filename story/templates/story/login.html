@@ -1,7 +1,6 @@
 {% load staticfiles %}
 <script src="{% static "js/login.js" %}"></script>
 
-<ul class="nav  navbar-nav pull-right">
 	<li><a href="{% url 'story.views.get_register_page' %}"><span
 			class="glyphicon glyphicon-registration-mark text-info"
 			title="Sign up"></span></a></li>
@@ -15,4 +14,3 @@
 				{% csrf_token %}
 		</form>
 	</li>
-</ul>

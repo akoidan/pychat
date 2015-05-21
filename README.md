@@ -15,6 +15,8 @@ To run this you need:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* show system messages on navbar
+* allow to edit username for anonymous
 * don't refresh userlist on closing tab if there's an open tab 
 * remove connections set, there's a lot of issues like when user close a single tab, and there're still open websockets but the user is missing frm list already
 * user private messages sent only to single websocket got by username, thus a user missed messages if there're 2+ tabs

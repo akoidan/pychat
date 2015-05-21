@@ -121,6 +121,7 @@ class MessagesHandler(WebSocketHandler):
 		if self.user_id != 0:
 			if not send_to_all:
 				try:
+					# TODO is that really necessary to fetch username from db on message event
 					receiver = UserProfile.objects.get(username=receiver_name)
 					save_to_db = True
 				except UserProfile.DoesNotExist:

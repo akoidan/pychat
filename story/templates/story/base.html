@@ -22,7 +22,7 @@
 								title="Go to the home page" class="glyphicon glyphicon-home text-primary"></span></a>
 					</li>
 					<li><a rel="nofollow"><span id="muteBtn" class="text-warning" title="Turn on or off sounds"
-												onclick="mute();"></span></a>
+														 onclick="mute();"></span></a>
 					</li>
 					<li>
 						<a href="https://github.com/Deathangel908/djangochat/issues/new"><span
@@ -31,11 +31,14 @@
 					</li>
 					{% block navbar %} {% endblock navbar %}
 				</ul>
-				{% if username %}
-					{% include "story/logout.html" %}
-				{% else %}
-					{% include "story/login.html" %}
-				{% endif %}
+				<ul class="nav  navbar-nav pull-right">
+					<li >	<a id="exit " rel="nofollow" style="font-size: 20px; margin-top: 2px">Hello, <b>{{ username }}</b></a></li>
+					{% if username %}
+						{% include "story/logout.html" %}
+					{% else %}
+						{% include "story/login.html" %}
+					{% endif %}
+				</ul>
 			</div>
 		</div>
 		<!-- /.container-fluid -->
