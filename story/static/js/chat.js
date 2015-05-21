@@ -74,7 +74,7 @@ function start_chat_ws() {
 			start_chat_ws()
 		}, 5000);
 	};
-	ws.onopen = function() {
+	ws.onopen = function () {
 		console.log(new Date() + "Connection to WebSocket established");
 	}
 }
@@ -114,26 +114,11 @@ function showUserSendMess(username) {
 }
 
 
-function printMessage(data, isTopDirection) {
-	var headerStyle;
-	var receiver = data.receiver;
-	var displayedUsername = data.sender;
-	//private message
-	if (receiver != null) {
-		headerStyle = privateHeader;
-		if (receiver !== loggedUser) {
-			displayedUsername = data.receiver;
-			headerStyle+= '>>'
-		}
-	// public message
-	}	else if (data.sender === loggedUser) {
-		headerStyle = selfHeader;
-	} else {
-		headerStyle = othersHeader;
-	}
-	var messageHeader = headerStyle + ' (' + data.time + ') <b>' + displayedUsername + '</b>: ' + endHeader;
-	var messageContent = contentStyle + encodeHTML(data.content) + endHeader;
+function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayedUsername, isTopDirection) {
+	var messageHeader = headerStyle + ' (' + time + ') <b>' + displayedUsername + '</b>: ' + endHeader;
+	var messageContent = contentStyle + htmlEncodedContent + endHeader;
 	var message = '<p>' + messageHeader + messageContent + "</p>";
+
 	if (isTopDirection) {
 		chatBoxDiv.prepend(message);
 	} else {
@@ -145,12 +130,31 @@ function printMessage(data, isTopDirection) {
 				scrollTop: newscrollHeight
 			}, 'normal'); // Autoscroll to bottom of div
 		}
-
 	}
 }
 
+function printMessage(data, isTopDirection) {
+	var headerStyle;
+	var receiver = data.receiver;
+	var displayedUsername = data.sender;
+	//private message
+	if (receiver != null) {
+		headerStyle = privateHeader;
+		if (receiver !== loggedUser) {
+			displayedUsername = data.receiver;
+			headerStyle += '>>'
+		}
+		// public message
+	} else if (data.sender === loggedUser) {
+		headerStyle = selfHeader;
+	} else {
+		headerStyle = othersHeader;
+	}
+	displayPreparedMessage(headerStyle, data.time, encodeHTML(data.content), displayedUsername, isTopDirection);
+}
+
 function refreshOnlineUsers(data) {
-	loadUsers(data.onlineUsers);
+	loadUsers(data.content);
 	if (sound) {
 		if (data.action === 'joined') {
 			chatLogin.currentTime = 0;
@@ -158,25 +162,22 @@ function refreshOnlineUsers(data) {
 		} else if (data.action === 'left') {
 			chatLogout.currentTime = 0;
 			chatLogout.play();
-		}
+		} // else ifdo nothing
 	}
-	var oldscrollHeight = chatBoxDiv[0].scrollHeight;
-	chatBoxDiv.append(systemHeader + '<p>(' + data.time + ') <b>' + data.user + '</b> has ' + data.action + ' the chat </p>' + endHeader);
-	var newscrollHeight = chatBoxDiv[0].scrollHeight;
-	if (newscrollHeight > oldscrollHeight) {
-		chatBoxDiv.animate({
-			scrollTop: newscrollHeight
-		}, 'normal'); // Autoscroll to bottom of div
+	if (data.action !== 'online_users') {
+		displayPreparedMessage(systemHeader, data.time, '<b> '+ data.user + '</b> has ' + data.action + ' the chat ', 'System', false);
 	}
 }
 
 function webSocketMessage(message) {
 	var data = JSON.parse(message.data);
-	if (data.onlineUsers) {
+	if (data.action === 'joined' || data.action === 'left' || data.action === 'online_users') {
 		refreshOnlineUsers(data);
-	} else if (data.me) {
-		loggedUser = data.me
-	}else {
+	} else if (data.action === 'me') {
+		loggedUser = data.content
+	} else if (data.action === 'system') {
+		displayPreparedMessage(systemHeader, data.time, data.content, 'System', false);
+	} else {
 		appendMessage(data);
 	}
 }

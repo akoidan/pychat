@@ -8,7 +8,7 @@ To run this you need:
  1. python packages: `pip install -r requirements.txt`
  2. redis-server: archLinux `pacman -S community/redis`, Ubuntu `add-apt-repository -y ppa:rwky/redis` `apt-get install -y redis-server`
  3. static content: `sh download_content.sh`
- 4. create database: `python manage.py init_db`
+ 4. create the database: `python manage.py init_db`
 2. Start the chat 
  1. Start session holder: `redis-server`
  2. Start WebSocket listener: `python manage.py start_server`
@@ -32,4 +32,3 @@ To run this you need:
 * add chat rooms
 * implement smiles
 * Gradient text disappear on top
-* move download_content and smiles to manage.py command

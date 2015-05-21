@@ -139,7 +139,6 @@ def register(request):
 		check_password(password)
 		if verify_email:
 			check_email(email)
-		# TODO
 		user = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
 		user.set_password(password)
 		user.save()
