@@ -15,13 +15,15 @@ To run this you need:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* don't refresh userlist on closing tab if there's an open tab 
+* remove connections set, there's a lot of issues like when user close a single tab, and there're still open websockets but the user is missing frm list already
+* user private messages sent only to single websocket got by username, thus a user missed messages if there're 2+ tabs
 * show if user's reconnecting
 * since post to 10 getmessages loads 1st, username is not set and self messages writes as others colors
 * tornadoi2
 * add logger
 * deploy on server
 * right room width (add space to roght size from scroll if userdlist is closed)
-* don't clear cookie on browser close
 * on start 10 messages includes foreign private ones 
 * timezone
 * show gender icon in userlist 
