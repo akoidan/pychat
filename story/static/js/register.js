@@ -52,7 +52,7 @@ function validatePassword() {
 	if (pswd.length === 0) {
 		setError(passwordCheck, "Password can't be empty");
 	} else if (!passRegex.test(pswd)) {
-		setError(passwordCheck, "Password should be at least 3 character");
+		setError(passwordCheck, "Password should be at least 3 character with no spaces");
 	} else {
 		setSuccess(passwordCheck);
 	}
@@ -64,6 +64,8 @@ function validateUser() {
 	var username = userName.value;
 	if(username === "") {
 		setError(userNameCheck, "Error: Username cannot be blank!");
+	} else if(username.length > 16) {
+		setError(userNameCheck, "Username shouldn't be longer than 16 symbols");
 	} else if (!userRegex.test(username)) {
 		setError(userNameCheck, "only letters, numbers and underscores!");
 	}	else {

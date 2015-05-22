@@ -15,6 +15,7 @@ To run this you need:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* USE init or on_open
 * show system messages on navbar
 * allow to edit username for anonymous
 * don't refresh userlist on closing tab if there's an open tab 

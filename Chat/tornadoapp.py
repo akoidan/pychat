@@ -52,6 +52,9 @@ class MessagesHandler(WebSocketHandler):
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
+		if session_key is None:
+			self.close()
+			# TODO unsubscribe here
 		session = session_engine.SessionStore(session_key)
 		try:
 			self.user_id = session["_auth_user_id"]
