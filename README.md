@@ -1,15 +1,42 @@
 ![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/djangochat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/djangochat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/djangochat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/djangochat)
+Web chat based on WebSockets.
+================================================
 
-A simple chat written in django via WebsSockets
-==========
-To run this you need:
+Basically written in **Python** with [django](https://www.djangoproject.com/) it uses asynchronous web framework [Tornado](http://www.tornadoweb.org/) for handling realtime messages. Broadcasting messages are being sent by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using Python [tornado-redis](https://github.com/leporo/tornado-redis) backend. It can be run on both **Windows** and **Linux** and tested on **Python 2.7** and **Python 3.x**
 
-1. Install dependencies:
- 1. python packages: `pip install -r requirements.txt`
- 2. redis-server: archLinux `pacman -S community/redis`, Ubuntu `add-apt-repository -y ppa:rwky/redis` `apt-get install -y redis-server`
- 3. static content: `sh download_content.sh`
- 4. create the database: `python manage.py init_db`
-2. Start the chat 
+Get dependencies:
+================
+ 1. *Python2.7* or *Python 3.x* both are supported
+ 2. *pip* for getting dependencies
+ 3. *redis* for holding session and pubsub messages
+ 3. Download static content such as jquery...
+ 4. Create the database
+
+Windows:
+ 1. Install python with pip https://www.python.org/downloads/
+ 2. Add pip and python to PATH variable
+ 3. Open cmd as Administrator and run `pip install -r requirements.txt`
+ 4. Install redis from https://github.com/rgl/redis/downloads
+ 5. Unzip static content to story/static directory https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1
+ 6. Open cmd and run `python manage.py init_db` from project directory
+
+Ubuntu:
+ 1. `apt-get install python`
+ 2. `apt-get install pip`
+ 3. `add-apt-repository -y ppa:rwky/redis` `apt-get install -y redis-server`
+
+Archlinux:
+ 1. `pacman -S python`
+ 2. `pacman -S pip`
+ 3. `pacman -S community/redis`
+
+Next steps are common for Linux:
+ 4. `pip install -r requirements.txt`
+ 5. `sh download_content.sh`
+ 6. `python manage.py init_db`
+
+Start the chat:
+==============
  1. Start session holder: `redis-server`
  2. Start WebSocket listener: `python manage.py start_server`
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`

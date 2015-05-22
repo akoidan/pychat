@@ -16,8 +16,7 @@ def check_redis_running():
 			# subprocess.Popen(["redis"], shell=True)
 			raise MiddlewareNotUsed("Can't establish connection with redis server. Please run `redis-server` command")
 	except FileNotFoundError:
-		raise MiddlewareNotUsed(
-			"Can't find redis-cli. Probably redis in not installed or redis-cli is not in the PATH")
+		print("Can't find redis-cli. Probably redis in not installed or redis-cli is not in the PATH")
 
 # check redis in url for lazy init and running only once and not in test or custom command
 check_redis_running()
