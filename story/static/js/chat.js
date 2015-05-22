@@ -108,7 +108,7 @@ function loadUsers(usernames) {
 function showUserSendMess(username) {
 	userSendMessageTo.show();
 	// Empty sets display to none
-	userSendMessageTo.css("display", "flex");
+	userSendMessageTo.css("display", "table-cell");
 	receiverId.empty();
 	receiverId.append(username);
 }

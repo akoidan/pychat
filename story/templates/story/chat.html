@@ -22,13 +22,13 @@
 		</div>
 		<div class="create-message-wrapper">
 			<div id="userSendMessageTo">
-				<div id="receiverId"></div>
-				<span class="glyphicon glyphicon-remove-circle" onclick="hideUserSendToName();"></span>
+				<div id="receiverId" class="inputsdiv"></div>
+				<span class="glyphicon glyphicon-remove-circle inputsdiv" onclick="hideUserSendToName();"></span>
+			</div>
+			<div class="inputsdiv" style="width: 100%;">
+				<input name="usermsg" type="text" class="inputs" id="usermsg"/>
 			</div>
 			<div class="inputsdiv">
-				<input name="usermsg" type="text" class="inputs" style="" id="usermsg"/>
-			</div>
-			<div>
 				<input
 						type="button" id="sendButton" class="btn button-lor "
 						onclick="sendMessage(userMessage.val(), receiverId.text());"
