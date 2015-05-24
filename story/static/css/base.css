@@ -1,5 +1,5 @@
 ul {
-	 /*remove browser default left padding 40px and bullets*/
+	/*remove browser default left padding 40px and bullets*/
 	padding-left: 0;
 }
 
@@ -7,12 +7,12 @@ ul {
 	/*Icons navbar size*/
 	font-size: 25px;
 }
+
 span:hover {
 	/*Hand and shadow on hover on navbar elements*/
 	cursor: pointer;
 	text-shadow: 0 0 0.2em #87F, 0 0 0.2em #87F;
 }
-
 
 /*Remove annoying chromium autofill yellow background*/
 input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
@@ -26,6 +26,7 @@ html, body {
 	margin: 0;
 	height: 100%;
 }
+
 .color-lor {
 	background-color: #272c2d;
 	color: #babdb6;
@@ -45,18 +46,19 @@ html, body {
 }
 
 /*Override BS white background*/
-.dropdown-menu  {
+.dropdown-menu {
 	background-color: #262425 !important;
 }
 
 /*add space between elements in login dropdown */
-.dropdown-menu input[type=text], input[type=password]{
+.dropdown-menu input[type=text], input[type=password] {
 	margin-bottom: 15px;
 }
 
-.color-lor input[type=button], input[type=submit]{
-	background-color: #3E413A ;
+.color-lor input[type=button], input[type=submit] {
+	background-color: #3E413A;
 }
+
 .color-lor input[type=button]:hover, input[type=submit]:hover {
 	color: #eaeaea;
 	border: 1px solid #48484a;
@@ -64,43 +66,47 @@ html, body {
 }
 
 ::-webkit-scrollbar {
-    height: 12px;
-    width: 6px;
-    background: #222;;
+	height: 12px;
+	width: 6px;
+	background: #222;;
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #3E4654;
-    -webkit-border-radius: 1ex;
+	background: #3E4654;
+	-webkit-border-radius: 1ex;
+}
 
+.userNameInput {
+	background: rgba(0, 0, 0, 0);
+	border: none !important;
+	margin: 0 0;
 }
 
 /*::-moz-selection {  Code for Firefox*/
-    /*color: red;*/
-    /*background: yellow;*/
+/*color: red;*/
+/*background: yellow;*/
 /*}*/
 
-
 /*::selection {*/
-    /*text-shadow:1px 1px #c7c8c2;*/
-    /*background: rgba(0, 0, 0, 0.81);*/
+/*text-shadow:1px 1px #c7c8c2;*/
+/*background: rgba(0, 0, 0, 0.81);*/
 /*}*/
 
 /*#showMenu:hover div {*/
-	/*display: block;*/
+/*display: block;*/
 /*}*/
 
 /*#showMenu > div {*/
-	/*display: none;*/
-	/*position: absolute;*/
+/*display: none;*/
+/*position: absolute;*/
 /*}*/
 
 /*#showMenu > div {*/
-	/*border-style: solid;*/
-	/*border-color: #8C8C8C;*/
-	/*border-width: 1px;*/
-	/*box-shadow: 3px 3px 7px #888888;*/
-	/*border-radius: 5px;*/
-	/*background-image: linear-gradient(to bottom left, #8C8C8C 0%, #D4D4D4 100%);*/
+/*border-style: solid;*/
+/*border-color: #8C8C8C;*/
+/*border-width: 1px;*/
+/*box-shadow: 3px 3px 7px #888888;*/
+/*border-radius: 5px;*/
+/*background-image: linear-gradient(to bottom left, #8C8C8C 0%, #D4D4D4 100%);*/
 
 /*}*/

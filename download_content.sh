@@ -81,7 +81,7 @@ done
 # Fetch files from dropbox if link failed
 failed_count_second_attempt=0
 if [[ $failed_count > 0 ]]; then
-  echo "Some links have been broken, fetching resources from dropbox"
+  >&2 echo "Some links have been broken, fetching resources from dropbox"
   wget https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1 -O $TMP_DIR/static.zip &&
   unzip $TMP_DIR/static.zip -d $TMP_DIR/static
   for path_failed in "${failed_items[@]}" ; do
@@ -101,9 +101,9 @@ fi
 
 if [[ $failed_count_second_attempt > 0 ]]; then
   for path_failed2 in "${failed_items_second_attempt[@]}" ; do
-    echo "$path_failed2 wasn't found in dropbox directory"
+    >&2 echo "$path_failed2 wasn't found in dropbox directory"
   done
-  echo "Please report for missing files at https://github.com/Deathangel908/djangochat/issues/new"
+  >&2 echo "Please report for missing files at https://github.com/Deathangel908/djangochat/issues/new"
   exit 1
 else
   echo "Installation succeeded"

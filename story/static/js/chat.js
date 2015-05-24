@@ -15,16 +15,15 @@ var userSendMessageTo;
 var receiverId;
 var chatLogin;
 var chatLogout;
+var userNameLabel;
 var ws;
 
 
 $(document).ready(function () {
-
-	start_chat_ws();
-
 	chatBoxDiv = $('#chatbox');
 	userMessage = $("#usermsg");
 	chatRoomsDiv = $('#chatrooms');
+	userNameLabel = $("#userNameLabel");
 	userSendMessageTo = $('#userSendMessageTo');
 	chatIncoming = document.getElementById("chatIncoming");
 	chatOutgoing = document.getElementById("chatOutgoing");
@@ -52,6 +51,7 @@ $(document).ready(function () {
 			loadUpHistory(25);
 		}
 	});
+	start_chat_ws();
 	loadMessages(10, false);
 });
 
@@ -86,20 +86,22 @@ function encodeHTML(html) {
 
 
 function loadUsers(usernames) {
-	console.log(new Date() + "Load usernames :" + usernames);
+	console.log(new Date() + "Load user names: " + Object.keys(usernames));
 	chatRoomsDiv.empty();
-	var allUsers = '<ul class="message_header_others">';
+	var allUsers = '<ul >';
 	var icon;
 	for (var username in usernames) {
-		if (usernames[username] === "Male") {
-			icon = '<span class="glyphicon icon-user green"/>'
-		} else if (usernames[username] === "Female") {
-			icon = '<span class="glyphicon icon-girl green"/>'
-		} else {
-			icon = '<span class="glyphicon icon-dog green"/>';
+		if (usernames.hasOwnProperty(username)) {
+			if (usernames[username] === "Male") {
+				icon = '<span class="glyphicon icon-user green"/>'
+			} else if (usernames[username] === "Female") {
+				icon = '<span class="glyphicon icon-girl green"/>'
+			} else {
+				icon = '<span class="glyphicon icon-dog green"/>';
+			}
+			allUsers += '<li onclick="showUserSendMess($(this).text());">'
+			+ username + icon + '</li>';
 		}
-		allUsers += '<li onclick="showUserSendMess($(this).text());">'
-		+ username + icon + '</li>';
 	}
 	allUsers += ('</ul>');
 	chatRoomsDiv.append(allUsers);
@@ -153,29 +155,50 @@ function printMessage(data, isTopDirection) {
 	displayPreparedMessage(headerStyle, data.time, encodeHTML(data.content), displayedUsername, isTopDirection);
 }
 
-function refreshOnlineUsers(data) {
-	loadUsers(data.content);
+function playSound(action) {
 	if (sound) {
-		if (data.action === 'joined') {
+		if (action === 'joined' && chatLogin.readyState ) {
 			chatLogin.currentTime = 0;
 			chatLogin.play();
-		} else if (data.action === 'left') {
+		} else if (action === 'left' && chatLogout.readyState) {
 			chatLogout.currentTime = 0;
 			chatLogout.play();
 		} // else ifdo nothing
 	}
-	if (data.action !== 'online_users') {
-		displayPreparedMessage(systemHeader, data.time, '<b> '+ data.user + '</b> has ' + data.action + ' the chat ', 'System', false);
+}
+
+function checkAndPlay(element) {
+	if (element.readyState) {
+		element.currentTime = 0;
+		element.play();
 	}
+}
+function refreshOnlineUsers(data) {
+	loadUsers(data.content);
+	var action = data.action;
+	if (action === 'changed') {
+		displayPreparedMessage(systemHeader, data.time, ' Anonymous <b> ' + data.oldName +
+		'</b> has changed nickname to <b>' + data.user + '  </b> ', 'System', false);
+	} else if (action !== 'online_users') {
+		playSound(action);
+		displayPreparedMessage(systemHeader, data.time, '<b> '+ data.user + '</b> has ' + action + ' the chat ', 'System', false);
+	}
+}
+
+function setUsername(data) {
+	console.log(new Date() + "UserName has been set to " + data.content);
+	loggedUser = data.content;
+	userNameLabel.text(loggedUser);
 }
 
 function webSocketMessage(message) {
 	var data = JSON.parse(message.data);
-	if (data.action === 'joined' || data.action === 'left' || data.action === 'online_users') {
+	var action = data.action;
+	if (action === 'joined' || action === 'left' || action === 'online_users' || action === 'changed') {
 		refreshOnlineUsers(data);
-	} else if (data.action === 'me') {
-		loggedUser = data.content
-	} else if (data.action === 'system') {
+	} else if (action === 'me') {
+		setUsername(data);
+	} else if (action === 'system') {
 		displayPreparedMessage(systemHeader, data.time, data.content, 'System', false);
 	} else {
 		appendMessage(data);
@@ -186,11 +209,9 @@ function appendMessage(data) {
 	printMessage(data, false);
 	if (sound) {
 		if (loggedUser === data.sender) {
-			chatOutgoing.currentTime = 0;
-			chatOutgoing.play();
+			checkAndPlay(chatOutgoing);
 		} else {
-			chatIncoming.currentTime = 0;
-			chatIncoming.play();
+			checkAndPlay(chatIncoming);
 		}
 	}
 }

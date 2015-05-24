@@ -6,8 +6,8 @@
 	var emailCheck;
 	var email;
 	var repeatPasswordCheck;
-   var passRegex = /^\S.+\S$/;
-	var userRegex = /^[a-zA-Z-_0-9]{1,16}$/;
+	var passRegex = /^\S.+\S$/;
+
 
 $(document).ready(function () {
 	password = document.getElementById("rpassword");

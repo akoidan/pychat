@@ -1,4 +1,5 @@
-var sound = true;
+var sound = false;
+var userRegex = /^[a-zA-Z-_0-9]{1,16}$/;
 
 function mute() {
 	sound = !sound;

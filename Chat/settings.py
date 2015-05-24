@@ -26,10 +26,9 @@ SECRET_KEY = '8ou!cqb1yd)6c4h0i-cxjo&@@+04%4np6od8qn+z@5b=6)!v(o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 TEMPLATE_DEBUG = True
+ALLOWED_HOSTS = ["127.0.0.1", ]
 
-ALLOWED_HOSTS = []
 # TEMPLATE_DIRS = [BASE_DIR+'/templates']
 TEMPLATE_DIRS = (
 	join(BASE_DIR, 'templates'),
@@ -141,6 +140,28 @@ STATICFILES_DIRS = (
 
 # AUTH_PROFILE_MODULE = 'story.UserProfile'
 
+
+LOGGING = {
+	'version': 1,
+	'disable_existing_loggers': False,
+	'handlers': {
+		'file': {
+			'level': 'DEBUG',
+			'class': 'logging.FileHandler',
+			'filename': join(BASE_DIR, 'chat.log'),
+		},
+	},
+	'loggers': {
+		'django.request': {
+			'handlers': ['file'],
+			'level': 'DEBUG',
+			'propagate': True,
+		},
+	},
+}
+
+
+
 # for gmail or google apps
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
@@ -156,14 +177,9 @@ USER_COOKIE_NAME = 'user'
 
 WS_ADDRESS_COOKIE_NAME = 'api'
 
-# TORNADO SETTINGS
-
-API_KEY = 'S2nPkJmTlx1nI35aQ5Xsr2k5OeOzutmv' #< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;
-
-
 ######### JAVASCRIPT CONSTANTS #############
-LOGIN_EVENT = 'joined'
-LOGOUT_EVENT = 'left'
 ACCOUNT_CREATED_EVENT = 'Account created'
 UPDATE_PAGE_EVENT = 'update'
 VALIDATION_IS_OK = 'ok'
+MAX_USERNAME_LENGTH = 16
+MAX_MESSAGE_SIZE = 10000

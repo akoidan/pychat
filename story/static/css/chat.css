@@ -20,8 +20,8 @@
 #chatrooms {
 	display: inline-block;
 	float: right;
-	margin-left: 5px;
-	margin-right: 5px;
+	margin-left: 2px;
+	margin-right: 2px;
 	height: 100%;
 	overflow-y: auto;
 	overflow-x: hidden;
@@ -31,20 +31,23 @@
 	text-overflow: ellipsis;
 }
 
-#chatrooms > ul > li:hover {
-	cursor: pointer;
-}
-
 #chatrooms > ul {
 	margin-top: 5px;
 	margin-bottom: 5px;
 }
-
-#chatrooms > ul > li:hover {
-	border-style: solid;
+#chatrooms > ul > li {
+	margin-left: 2px;
+	margin-right: 2px;
 	border-width: 2px;
 	border-radius: 5px;
-	padding-left: 3px;
+
+}
+
+#chatrooms > ul > li:hover {
+	cursor: pointer;
+	border-style: solid;
+	margin-left: 0;
+	margin-right: 0;
 }
 
 .inputs {

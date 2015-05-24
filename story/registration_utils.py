@@ -8,8 +8,10 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.forms import model_to_dict
 from story.apps import DefaultSettingsConfig
-
+from Chat import settings
 from story.models import UserProfile, UserSettings
+
+USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
 
 
 def is_blank(check_str):
@@ -48,12 +50,9 @@ def check_user(username):
 	Checks if specified username is free to register
 	:raises ValidationError exception if username is not valid
 	"""
-	if is_blank(username):
-		raise ValidationError("User name can't be empty")
-	if len(username) > 16:
-		raise ValidationError("User is too long. Max 16 symbols")
-	if not re.match('^[a-zA-Z-_0-9]{1,16}$', username):
-		raise ValidationError("Only letters, numbers, dashes or underlines")
+	# Skip javascript validation, only summary message
+	if not re.match(USERNAME_REGEX, username):
+		raise ValidationError("User doesn't match regex " + USERNAME_REGEX)
 	try:
 		# theoretically can throw returning 'more than 1' error
 		UserProfile.objects.get(username=username)

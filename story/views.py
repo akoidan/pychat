@@ -69,8 +69,8 @@ def get_messages(request):
 @require_http_methods('GET')
 def home(request):
 	"""
-	GET only, returns main Chat page.
 	Login or logout navbar is creates by means of create_nav_page
+	@return:  the x intercept of the line M{y=m*x+b}.
 	"""
 	return render_to_response('story/chat.html', csrf(request),  context_instance=RequestContext(request))
 
