@@ -134,7 +134,7 @@ function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayed
 		if (newscrollHeight > oldscrollHeight) {
 			chatBoxDiv.animate({
 				scrollTop: newscrollHeight
-			}, 'normal'); // Autoscroll to bottom of div
+			}, 1); // Autoscroll to bottom of div immediately
 		}
 	}
 }
