@@ -12,7 +12,7 @@ from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.http import HttpResponseRedirect
-
+from django.db.models import Q
 from story.apps import DefaultSettingsConfig
 from story.decorators import login_required_no_redirect
 from story.models import UserProfile, UserSettings
@@ -59,9 +59,18 @@ def get_messages(request):
 	header_id = request.POST.get('headerId', -1)
 	count = int(request.POST.get('count', 10))
 	if header_id == -1:
-		messages = Messages.objects.order_by('-pk')[:count]
+		messages = Messages.objects.filter(
+			Q(receiver=None)  # Only public
+			| Q(sender=request.user.id) # private s
+			| Q(receiver=request.user.id) # and private
+		).order_by('-pk')[:count]
 	else:
-		messages = Messages.objects.filter(id__lt=header_id).order_by('-pk')[:count]
+		messages = Messages.objects.filter(
+			Q(id__lt=header_id),
+			Q(receiver=None)
+			| Q(sender=request.user.id)
+			| Q(receiver=request.user.id)
+		).order_by('-pk')[:count]
 	response = json.dumps([message.json for message in messages])
 	return HttpResponse(response, content_type='text/plain')
 

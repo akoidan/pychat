@@ -31,6 +31,10 @@ $(document).ready(function () {
 	chatLogout = document.getElementById("chatLogout");
 	userSendMessageTo.hide();
 	receiverId = $('#receiverId');
+	if (!"WebSocket" in window) {
+		chatBoxDiv.html("<h1>Your browser doesn't support Web socket, chat options will be unavalible<h1>");
+		return;
+	}
 	userMessage.keypress(function (event) {
 		if (event.keyCode === 13) {
 			$("#sendButton").click();
@@ -168,7 +172,7 @@ function playSound(action) {
 }
 
 function checkAndPlay(element) {
-	if (element.readyState) {
+	if (element.readyState && sound) {
 		element.currentTime = 0;
 		element.play();
 	}
@@ -207,12 +211,10 @@ function webSocketMessage(message) {
 
 function appendMessage(data) {
 	printMessage(data, false);
-	if (sound) {
-		if (loggedUser === data.sender) {
-			checkAndPlay(chatOutgoing);
-		} else {
-			checkAndPlay(chatIncoming);
-		}
+	if (loggedUser === data.sender) {
+		checkAndPlay(chatOutgoing);
+	} else {
+		checkAndPlay(chatIncoming);
 	}
 }
 

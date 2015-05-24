@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 
 import tornado.web
 import tornado.websocket
@@ -10,7 +11,9 @@ from django.utils.importlib import import_module
 import tornado.gen
 from django.conf import settings
 import tornadoredis
+
 from Chat.settings import MAX_MESSAGE_SIZE
+
 
 SESSION_USER_VAR_NAME = 'user_name'
 USER_VAR_NAME = 'user'
@@ -25,7 +28,6 @@ LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
 
-
 user_cookie_name = settings.USER_COOKIE_NAME
 from story.models import UserProfile, Messages
 from story.registration_utils import is_blank, id_generator
@@ -36,6 +38,7 @@ session_engine = import_module(settings.SESSION_ENGINE)
 c = tornadoredis.Client()
 c.connect()
 
+logger = logging.getLogger(__name__)
 
 class MessagesHandler(WebSocketHandler):
 
@@ -125,7 +128,11 @@ class MessagesHandler(WebSocketHandler):
 
 	def new_message(self, message):
 		if type(message.body) is str:
-			self.write_message(message.body)
+			try:
+				self.write_message(message.body)
+			except tornado.websocket.WebSocketClosedError:
+				logger.error('Socket closed bug, this' + self.sender_name + 'connections:', self.connections)
+
 
 	def detect_message_type(self, receiver_name):
 		save_to_db = False
