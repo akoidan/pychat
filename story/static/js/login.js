@@ -55,7 +55,7 @@ $(document).ready(function () {
 				return;
 			}
 			if (newUsername !== oldUsername) {
-				var jsonRequest = JSON.stringify({me: newUsername});
+				var jsonRequest = JSON.stringify({me: newUsername, action: 'me'});
 				console.log(new Date + "Sending change username request from " + oldUsername + " to " + newUsername);
 				ws.send(jsonRequest);
 			}

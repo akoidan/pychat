@@ -1,10 +1,11 @@
-var headerId;
 var selfHeader = '<font class="message-header-self">';
 var privateHeader = '<font class="message-header-private">';
 var othersHeader = '<font class="message-header-others">';
 var systemHeader = '<font class="message-header-system">';
 var endHeader = '</font>';
 var contentStyle = '<font class="message-text-style">';
+var lockPostGetMessage = false;
+var headerId;
 var chatBoxDiv;
 var chatIncoming;
 var chatOutgoing;
@@ -16,12 +17,10 @@ var receiverId;
 var chatLogin;
 var chatLogout;
 var userNameLabel;
-var lockPostGetMessage;
 var ws;
 
 
 $(document).ready(function () {
-	lockPostGetMessage = false;
 	chatBoxDiv = $('#chatbox');
 	userMessage = $("#usermsg");
 	chatRoomsDiv = $('#chatrooms');
@@ -58,7 +57,6 @@ $(document).ready(function () {
 		}
 	});
 	start_chat_ws();
-	loadMessages(10, false);
 });
 
 
@@ -113,6 +111,7 @@ function loadUsers(usernames) {
 	chatRoomsDiv.append(allUsers);
 }
 
+
 function showUserSendMess(username) {
 	userSendMessageTo.show();
 	// Empty sets display to none
@@ -134,12 +133,11 @@ function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayed
 		chatBoxDiv.append(message);
 		var newscrollHeight = chatBoxDiv[0].scrollHeight;
 		if (newscrollHeight > oldscrollHeight) {
-			chatBoxDiv.animate({
-				scrollTop: newscrollHeight
-			}, 1); // Autoscroll to bottom of div immediately
+			chatBoxDiv.scrollTop(newscrollHeight);
 		}
 	}
 }
+
 
 function printMessage(data, isTopDirection) {
 	var headerStyle;
@@ -161,6 +159,7 @@ function printMessage(data, isTopDirection) {
 	displayPreparedMessage(headerStyle, data.time, encodeHTML(data.content), displayedUsername, isTopDirection);
 }
 
+
 function playSound(action) {
 	if (sound) {
 		if (action === 'joined' && chatLogin.readyState ) {
@@ -173,12 +172,15 @@ function playSound(action) {
 	}
 }
 
+
 function checkAndPlay(element) {
 	if (element.readyState && sound) {
 		element.currentTime = 0;
 		element.play();
 	}
 }
+
+
 function refreshOnlineUsers(data) {
 	loadUsers(data.content);
 	var action = data.action;
@@ -191,16 +193,40 @@ function refreshOnlineUsers(data) {
 	}
 }
 
+
 function setUsername(data) {
 	console.log(new Date() + "UserName has been set to " + data.content);
 	loggedUser = data.content;
 	userNameLabel.text(loggedUser);
 }
 
+
+function handleGetMessages(message) {
+	console.log(new Date() + ': appending messages to top');
+	if (message.length === 0) {
+		// TODO remove keydown event
+		console.log(new Date() + ': Requesting messages has reached the top, lock acquired');
+		lockPostGetMessage = true;
+		return;
+	}
+	var firstMessage = message[message.length - 1];
+	if (firstMessage != null) {
+		headerId = firstMessage.id;
+	}
+
+	message.forEach(function (message) {
+		printMessage(message, true);
+	});
+}
+
+
 function webSocketMessage(message) {
+	console.log(new Date() + message.data);
 	var data = JSON.parse(message.data);
 	var action = data.action;
-	if (action === 'joined' || action === 'left' || action === 'online_users' || action === 'changed') {
+	if (action === 'messages') {
+		handleGetMessages(data.content);
+	} else  if (action === 'joined' || action === 'left' || action === 'online_users' || action === 'changed') {
 		refreshOnlineUsers(data);
 	} else if (action === 'me') {
 		setUsername(data);
@@ -210,6 +236,7 @@ function webSocketMessage(message) {
 		appendMessage(data);
 	}
 }
+
 
 function appendMessage(data) {
 	printMessage(data, false);
@@ -232,6 +259,7 @@ function sendMessage(usermsg, username) {
 	var messageRequest = {};
 	messageRequest.message = usermsg;
 	messageRequest.receiver = username;
+	messageRequest.action = 'send';
 
 	var jsonRequest = JSON.stringify(messageRequest);
 
@@ -247,46 +275,17 @@ function loadUpHistory(elements) {
 }
 
 
-function loadMessages(count, isTop) {
+function loadMessages(count) {
 	if (lockPostGetMessage) {
 		console.log(new Date() + ': Post get messages Locked, no request sent');
 		return;
 	}
-	$.ajax({
-		async: false,
-		type: 'POST',
-		data: {
-			headerId: headerId,
-			count: count
-		},
-		url: "/get_messages",
-		success: function (data) {
-			console.log(new Date() + ': Requesting messages response ' + data);
-			var result = JSON.parse(data);
-			if (result.length === 0) {
-				// TODO remove keydown event
-				console.log(new Date() + ': Requesting messages has reached the top, lock acquired');
-				lockPostGetMessage = true;
-				return;
-			}
-			var firstMessage = result[result.length - 1];
-			if (firstMessage != null) {
-				headerId = firstMessage.id;
-			}
-			if (!isTop) {
-				// appending to top last message first, so it goes down with every iteration
-				result = result.reverse();
-			}
-			result.forEach(function (message) {
-				printMessage(message, isTop);
-			});
-
-			if (!isTop) {
-				//scroll to bottom if new messages have been already sent
-				chatBoxDiv.scrollTop(chatBoxDiv[0].scrollHeight);
-			}
-		}
-	});
+	var getMessageRequest = {};
+	getMessageRequest.headerId = headerId;
+	getMessageRequest.count = count;
+	getMessageRequest.action = 'messages';
+	var jsonRequest = JSON.stringify(getMessageRequest);
+	ws.send(jsonRequest);
 }
 
 

@@ -51,30 +51,6 @@ def validate_user(request):
 	return HttpResponse(message, content_type='text/plain')
 
 
-@require_http_methods('POST')
-def get_messages(request):
-	"""
-	Returns all public messages started from ID
-	"""
-	header_id = request.POST.get('headerId', -1)
-	count = int(request.POST.get('count', 10))
-	if header_id == -1:
-		messages = Messages.objects.filter(
-			Q(receiver=None)  # Only public
-			| Q(sender=request.user.id) # private s
-			| Q(receiver=request.user.id) # and private
-		).order_by('-pk')[:count]
-	else:
-		messages = Messages.objects.filter(
-			Q(id__lt=header_id),
-			Q(receiver=None)
-			| Q(sender=request.user.id)
-			| Q(receiver=request.user.id)
-		).order_by('-pk')[:count]
-	response = json.dumps([message.json for message in messages])
-	return HttpResponse(response, content_type='text/plain')
-
-
 @require_http_methods('GET')
 def home(request):
 	"""

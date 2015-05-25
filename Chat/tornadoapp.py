@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 
+from django.db.models import Q
 import tornado.web
 import tornado.websocket
 from tornado.websocket import WebSocketHandler
@@ -15,6 +16,8 @@ import tornadoredis
 from Chat.settings import MAX_MESSAGE_SIZE
 
 
+COUNT_VAR_NAME = 'count'
+HEADER_ID_VAR_NAME = 'headerId'
 SESSION_USER_VAR_NAME = 'user_name'
 USER_VAR_NAME = 'user'
 TIME_VAR_NAME = 'time'
@@ -23,10 +26,13 @@ CONTENT_VAR_NAME = 'content'
 EVENT_VAR_NAME = 'action'
 REFRESH_USER_EVENT = 'online_users'
 SYSTEM_MESSAGE_EVENT = 'system'
+GET_MESSAGES_EVENT = 'messages'
 GET_MINE_USERNAME_EVENT = 'me'
 LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
+SEND_MESSAGE_EVENT = 'send'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
+MAIN_CHANNEL = 'main'
 
 user_cookie_name = settings.USER_COOKIE_NAME
 from story.models import UserProfile, Messages
@@ -40,12 +46,11 @@ c.connect()
 
 logger = logging.getLogger(__name__)
 
+
 class MessagesHandler(WebSocketHandler):
 
 	# Dist of set : {user_name : [Socket1, Socket2] }
 	connections = {}
-
-	MAIN_CHANNEL = 'main'
 
 	def __init__(self, *args, **kwargs):
 		super(MessagesHandler, self).__init__(*args, **kwargs)
@@ -55,11 +60,12 @@ class MessagesHandler(WebSocketHandler):
 
 	@tornado.gen.engine
 	def listen(self):
-		yield tornado.gen.Task(self.client.subscribe, self.MAIN_CHANNEL)
+		yield tornado.gen.Task(self.client.subscribe, MAIN_CHANNEL)
 		self.client.listen(self.new_message)
 
 	def refresh_client_username(self):
-		message = {EVENT_VAR_NAME: GET_MINE_USERNAME_EVENT, CONTENT_VAR_NAME: self.sender_name}
+		# TODO why send to all when only get on load page for yourself?
+		message = self.create_default_message(self.sender_name, GET_MINE_USERNAME_EVENT)
 		self.emit_to_user(message)
 
 	def open(self):
@@ -84,10 +90,10 @@ class MessagesHandler(WebSocketHandler):
 				session.save()
 			self.sex = None
 		self.connections.setdefault(self.sender_name, set()).add(self)
-		# send login action only if there's 1 tab open = 1 just added web socket
+		#  send login action only if there's 1 tab open = 1 just added web socket
 		if len(self.connections[self.sender_name]) == 1:
 			self.refresh_online_user_list(LOGIN_EVENT)
-		else: # if a new tab has been opened
+		else:  # if a new tab has been opened
 			self.write_message(self.create_online_user_names_message(REFRESH_USER_EVENT))
 		self.refresh_client_username()
 
@@ -103,7 +109,7 @@ class MessagesHandler(WebSocketHandler):
 		return True
 
 	def emit(self, message):
-		c.publish(self.MAIN_CHANNEL, json.dumps(message))
+		c.publish(MAIN_CHANNEL, json.dumps(message))
 
 	def emit_to_user(self, message, receiver_name=None):
 		"""
@@ -122,26 +128,29 @@ class MessagesHandler(WebSocketHandler):
 			# if user left the chat ( all ws are closed)
 			except KeyError:
 				self.emit_to_user(
-					create_default_message("Can't send the message, User has left the chat."),
+					self.create_default_message("Can't send the message, User has left the chat."),
 				)
 		self.emit_to_user(message)
 
 	def new_message(self, message):
-		if type(message.body) is str:
+		if type(message.body) is not int:  # subscribe event
 			self.safe_write(self, message.body)
 
 	@staticmethod
 	def safe_write(socket, message):
 		"""
 		Tries to send message, doesn't throw exception outside
-		:type socket: WebSocketHandler
+		:type socket: MessagesHandler
 		"""
 		try:
 			socket.write_message(message)
 		except tornado.websocket.WebSocketClosedError:
-			logger.error('Socket closed bug, this "' + socket.sender_name + '" connections:' + socket.connections)
+			logger.error('Socket closed bug, this "' + socket.sender_name + '" connections:' + str(socket.connections))
 
 	def detect_message_type(self, receiver_name):
+		"""
+		:type receiver_name: str
+		"""
 		save_to_db = False
 		receiver = None
 		send_to_all = is_blank(receiver_name)
@@ -159,7 +168,10 @@ class MessagesHandler(WebSocketHandler):
 				save_to_db = True
 		return receiver, receiver_name, save_to_db, send_to_all
 
-	def process_message(self, message):
+	def process_send_message(self, message):
+		"""
+		:type message: dict
+		"""
 		receiver_name = message['receiver']
 		content = message['message']
 		receiver, receiver_name, save_to_db, send_to_all = self.detect_message_type(receiver_name)
@@ -175,6 +187,9 @@ class MessagesHandler(WebSocketHandler):
 			self.emit_to_user_and_self(prepared_message, receiver_name)
 
 	def change_username(self, message):
+		"""
+		:type message: dict
+		"""
 		new_username = message[GET_MINE_USERNAME_EVENT]
 		if len(new_username) > 16:
 			return
@@ -197,14 +212,19 @@ class MessagesHandler(WebSocketHandler):
 		if len(json_message) > MAX_MESSAGE_SIZE:
 			return
 		message = json.loads(json_message)
-		if GET_MINE_USERNAME_EVENT in message:
+		action = message.get(EVENT_VAR_NAME)
+		if action == GET_MINE_USERNAME_EVENT:
 			self.change_username(message)
+		elif action == GET_MESSAGES_EVENT:
+			self.process_get_messages(message)
+		elif action == SEND_MESSAGE_EVENT:  # None
+			self.process_send_message(message)
 		else:
-			self.process_message(message)
+			raise Exception('unclassified message type:'+ json_message)
 
 	def on_close(self):
 		if self.client.subscribed:
-			self.client.unsubscribe(self.MAIN_CHANNEL)
+			self.client.unsubscribe(MAIN_CHANNEL)
 			self.client.disconnect()
 		try:
 			self.connections[self.sender_name].discard(self)
@@ -217,9 +237,32 @@ class MessagesHandler(WebSocketHandler):
 		except KeyError:
 			pass
 
+	def process_get_messages(self, data):
+		"""
+		:type data: dict
+		"""
+		header_id = data.get(HEADER_ID_VAR_NAME, None)
+		count = int(data.get(COUNT_VAR_NAME, 10))
+		if header_id is None:
+			messages = Messages.objects.filter(
+				Q(receiver=None)  # Only public
+				| Q(sender=self.user_id)  # private s
+				| Q(receiver=self.user_id)  # and private
+			).order_by('-pk')[:count]
+		else:
+			messages = Messages.objects.filter(
+				Q(id__lt=header_id),
+				Q(receiver=None)
+				| Q(sender=self.user_id)
+				| Q(receiver=self.user_id)
+			).order_by('-pk')[:count]
+		content = [message.json for message in messages]
+		response = self.create_default_message(content, GET_MESSAGES_EVENT)
+		self.safe_write(self, response)
+
 	# MESSAGES
 	def create_online_user_names_message(self, action):
-		default_message = create_default_message(self.get_online_usernames_sex_dict(), action)
+		default_message = self.create_default_message(self.get_online_usernames_sex_dict(), action)
 		default_message.update({
 			USER_VAR_NAME: self.sender_name
 		})
@@ -230,13 +273,12 @@ class MessagesHandler(WebSocketHandler):
 		default_message.update({OLD_NAME_VAR_NAME: old_nickname})
 		return default_message
 
-def create_default_message(content, event=SYSTEM_MESSAGE_EVENT):
-	return {
-		EVENT_VAR_NAME: event,
-		CONTENT_VAR_NAME: content,
-		TIME_VAR_NAME: datetime.datetime.now().strftime("%H:%M:%S")
-	}
-
+	def create_default_message(self, content, event=SYSTEM_MESSAGE_EVENT):
+		return {
+			EVENT_VAR_NAME: event,
+			CONTENT_VAR_NAME: content,
+			TIME_VAR_NAME: datetime.datetime.now().strftime("%H:%M:%S")
+		}
 
 application = tornado.web.Application([
 	(r'.*', MessagesHandler),
