@@ -16,10 +16,12 @@ var receiverId;
 var chatLogin;
 var chatLogout;
 var userNameLabel;
+var lockPostGetMessage;
 var ws;
 
 
 $(document).ready(function () {
+	lockPostGetMessage = false;
 	chatBoxDiv = $('#chatbox');
 	userMessage = $("#usermsg");
 	chatRoomsDiv = $('#chatrooms');
@@ -246,6 +248,10 @@ function loadUpHistory(elements) {
 
 
 function loadMessages(count, isTop) {
+	if (lockPostGetMessage) {
+		console.log(new Date() + ': Post get messages Locked, no request sent');
+		return;
+	}
 	$.ajax({
 		async: false,
 		type: 'POST',
@@ -257,6 +263,12 @@ function loadMessages(count, isTop) {
 		success: function (data) {
 			console.log(new Date() + ': Requesting messages response ' + data);
 			var result = JSON.parse(data);
+			if (result.length === 0) {
+				// TODO remove keydown event
+				console.log(new Date() + ': Requesting messages has reached the top, lock acquired');
+				lockPostGetMessage = true;
+				return;
+			}
 			var firstMessage = result[result.length - 1];
 			if (firstMessage != null) {
 				headerId = firstMessage.id;
