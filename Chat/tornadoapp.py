@@ -113,7 +113,7 @@ class MessagesHandler(WebSocketHandler):
 		if receiver_name is None:
 			receiver_name = self.sender_name
 		for socket in self.connections[receiver_name]:
-			socket.write_message(message)
+			self.safe_write(socket, message)
 
 	def emit_to_user_and_self(self, message, receiver_name):
 		if receiver_name != self.sender_name:
@@ -128,11 +128,18 @@ class MessagesHandler(WebSocketHandler):
 
 	def new_message(self, message):
 		if type(message.body) is str:
-			try:
-				self.write_message(message.body)
-			except tornado.websocket.WebSocketClosedError:
-				logger.error('Socket closed bug, this' + self.sender_name + 'connections:', self.connections)
+			self.safe_write(self, message.body)
 
+	@staticmethod
+	def safe_write(socket, message):
+		"""
+		Tries to send message, doesn't throw exception outside
+		:type socket: WebSocketHandler
+		"""
+		try:
+			socket.write_message(message)
+		except tornado.websocket.WebSocketClosedError:
+			logger.error('Socket closed bug, this "' + socket.sender_name + '" connections:' + socket.connections)
 
 	def detect_message_type(self, receiver_name):
 		save_to_db = False
