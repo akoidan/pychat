@@ -189,7 +189,11 @@ function refreshOnlineUsers(data) {
 		'</b> has changed nickname to <b>' + data.user + '  </b> ', 'System', false);
 	} else if (action !== 'online_users') {
 		playSound(action);
-		displayPreparedMessage(systemHeader, data.time, '<b> '+ data.user + '</b> has ' + action + ' the chat ', 'System', false);
+		var userType = "";
+		if (data.sex === 'alien') {
+			userType = ' Anonymous ';
+		}
+		displayPreparedMessage(systemHeader, data.time, userType+'<b> '+ data.user + '</b> has ' + action + ' the chat ', 'System', false);
 	}
 }
 
@@ -241,6 +245,7 @@ function webSocketMessage(message) {
 function appendMessage(data) {
 	printMessage(data, false);
 	if (loggedUser === data.sender) {
+		// TODO not always plays
 		checkAndPlay(chatOutgoing);
 	} else {
 		checkAndPlay(chatIncoming);

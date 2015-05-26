@@ -1,6 +1,7 @@
 import datetime
 import json
 import logging
+from django.core.exceptions import ValidationError
 
 from django.db.models import Q
 import tornado.web
@@ -15,6 +16,7 @@ import tornadoredis
 
 from Chat.settings import MAX_MESSAGE_SIZE
 
+ANONYMOUS_GENDER = 'alien'
 
 COUNT_VAR_NAME = 'count'
 HEADER_ID_VAR_NAME = 'headerId'
@@ -24,6 +26,7 @@ TIME_VAR_NAME = 'time'
 OLD_NAME_VAR_NAME = 'oldName'
 CONTENT_VAR_NAME = 'content'
 EVENT_VAR_NAME = 'action'
+GENDER_VAR_NAME = 'sex'
 REFRESH_USER_EVENT = 'online_users'
 SYSTEM_MESSAGE_EVENT = 'system'
 GET_MESSAGES_EVENT = 'messages'
@@ -36,7 +39,7 @@ MAIN_CHANNEL = 'main'
 
 user_cookie_name = settings.USER_COOKIE_NAME
 from story.models import UserProfile, Messages
-from story.registration_utils import is_blank, id_generator
+from story.registration_utils import is_blank, id_generator, check_user
 
 session_engine = import_module(settings.SESSION_ENGINE)
 
@@ -88,7 +91,7 @@ class MessagesHandler(WebSocketHandler):
 				self.sender_name = id_generator(8)
 				session['user_name'] = self.sender_name
 				session.save()
-			self.sex = None
+			self.sex = ANONYMOUS_GENDER
 		self.connections.setdefault(self.sender_name, set()).add(self)
 		#  send login action only if there's 1 tab open = 1 just added web socket
 		if len(self.connections[self.sender_name]) == 1:
@@ -145,7 +148,8 @@ class MessagesHandler(WebSocketHandler):
 		try:
 			socket.write_message(message)
 		except tornado.websocket.WebSocketClosedError:
-			logger.error('Socket closed bug, this "' + socket.sender_name + '" connections:' + str(socket.connections))
+			logger.error('Socket' + str(socket) + ' closed bug, this "' + socket.sender_name + '" connections:' + str(
+				socket.connections))
 
 	def detect_message_type(self, receiver_name):
 		"""
@@ -191,20 +195,24 @@ class MessagesHandler(WebSocketHandler):
 		:type message: dict
 		"""
 		new_username = message[GET_MINE_USERNAME_EVENT]
-		if len(new_username) > 16:
-			return
-		# replace username in dict usernames
-		self.connections[new_username] = self.connections.pop(self.sender_name)
-		# change sender_name
-		old_username, self.sender_name = self.sender_name, new_username
+		try:
+			check_user(new_username)
+			if new_username in self.connections.keys():
+				raise ValidationError('Anonymous already has this name')
+			# replace username in dict usernames
+			self.connections[new_username] = self.connections.pop(self.sender_name)
+			# change sender_name
+			old_username, self.sender_name = self.sender_name, new_username
 
-		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
-		session = session_engine.SessionStore(session_key)
-		session[SESSION_USER_VAR_NAME] = new_username
-		session.save()
-		message = self.create_change_user_nickname_message(old_username)
-		self.emit(message)
-		self.refresh_client_username()
+			session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
+			session = session_engine.SessionStore(session_key)
+			session[SESSION_USER_VAR_NAME] = new_username
+			session.save()
+			message = self.create_change_user_nickname_message(old_username)
+			self.emit(message)
+			self.refresh_client_username()
+		except ValidationError as e:
+			self.safe_write(self, self.create_default_message(str(e.message)))
 
 	def on_message(self, json_message):
 		if not json_message:
@@ -264,7 +272,8 @@ class MessagesHandler(WebSocketHandler):
 	def create_online_user_names_message(self, action):
 		default_message = self.create_default_message(self.get_online_usernames_sex_dict(), action)
 		default_message.update({
-			USER_VAR_NAME: self.sender_name
+			USER_VAR_NAME: self.sender_name,
+			GENDER_VAR_NAME: self.sex
 		})
 		return default_message
 

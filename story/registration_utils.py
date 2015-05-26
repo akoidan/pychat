@@ -48,6 +48,7 @@ def check_email(email):
 def check_user(username):
 	"""
 	Checks if specified username is free to register
+	:type username str
 	:raises ValidationError exception if username is not valid
 	"""
 	# Skip javascript validation, only summary message
