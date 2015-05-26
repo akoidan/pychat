@@ -160,21 +160,9 @@ function printMessage(data, isTopDirection) {
 }
 
 
-function playSound(action) {
-	if (sound) {
-		if (action === 'joined' && chatLogin.readyState ) {
-			chatLogin.currentTime = 0;
-			chatLogin.play();
-		} else if (action === 'left' && chatLogout.readyState) {
-			chatLogout.currentTime = 0;
-			chatLogout.play();
-		} // else ifdo nothing
-	}
-}
-
-
 function checkAndPlay(element) {
 	if (element.readyState && sound) {
+		// TODO currentType is not set sometimes
 		element.currentTime = 0;
 		element.play();
 	}
@@ -188,7 +176,11 @@ function refreshOnlineUsers(data) {
 		displayPreparedMessage(systemHeader, data.time, ' Anonymous <b> ' + data.oldName +
 		'</b> has changed nickname to <b>' + data.user + '  </b> ', 'System', false);
 	} else if (action !== 'online_users') {
-		playSound(action);
+		if (action === 'joined') {
+			checkAndPlay(chatLogin);
+		} else if (action === 'left') {
+			checkAndPlay(chatLogout);
+		} // else ifdo nothing
 		var userType = "";
 		if (data.sex === 'alien') {
 			userType = ' Anonymous ';

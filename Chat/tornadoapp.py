@@ -228,7 +228,7 @@ class MessagesHandler(WebSocketHandler):
 		elif action == SEND_MESSAGE_EVENT:  # None
 			self.process_send_message(message)
 		else:
-			raise Exception('unclassified message type:'+ json_message)
+			raise Exception('unclassified message type:' + json_message)
 
 	def on_close(self):
 		if self.client.subscribed:
