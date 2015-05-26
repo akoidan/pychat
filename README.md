@@ -42,7 +42,6 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
-* Add tab visual notification on message like in slack
 * USE init or on_open
 * show system messages on navbar
 * allow to edit username for anonymous

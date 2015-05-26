@@ -5,6 +5,8 @@ var systemHeader = '<font class="message-header-system">';
 var endHeader = '</font>';
 var contentStyle = '<font class="message-text-style">';
 var lockPostGetMessage = false;
+var newMessagesCount = 0;
+var isCurrentTabActive = true;
 var headerId;
 var chatBoxDiv;
 var chatIncoming;
@@ -59,6 +61,26 @@ $(document).ready(function () {
 	start_chat_ws();
 });
 
+
+$(window).on("blur focus", function (e) {
+	var prevType = $(this).data("prevType");
+
+	if (prevType != e.type) {   //  reduce double fire issues
+		switch (e.type) {
+			case "focus":
+				// do work
+				isCurrentTabActive = true;
+				newMessagesCount = 0;
+				document.title = 'Chat';
+				break;
+			case "blur":
+				isCurrentTabActive = false;
+
+		}
+	}
+
+	$(this).data("prevType", e.type);
+});
 
 //var timezone = getCookie('timezone');
 
@@ -125,7 +147,10 @@ function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayed
 	var messageHeader = headerStyle + ' (' + time + ') <b>' + displayedUsername + '</b>: ' + endHeader;
 	var messageContent = contentStyle + htmlEncodedContent + endHeader;
 	var message = '<p>' + messageHeader + messageContent + "</p>";
-
+	if (!isCurrentTabActive) {
+		newMessagesCount++;
+		document.title = newMessagesCount + " new message";
+	}
 	if (isTopDirection) {
 		chatBoxDiv.prepend(message);
 	} else {
@@ -162,6 +187,7 @@ function printMessage(data, isTopDirection) {
 
 function checkAndPlay(element) {
 	if (element.readyState && sound) {
+		element.pause();
 		// TODO currentType is not set sometimes
 		element.currentTime = 0;
 		element.play();
