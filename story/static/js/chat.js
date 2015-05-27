@@ -1,25 +1,53 @@
+// html for messages
 var selfHeader = '<font class="message-header-self">';
 var privateHeader = '<font class="message-header-private">';
 var othersHeader = '<font class="message-header-others">';
 var systemHeader = '<font class="message-header-system">';
 var endHeader = '</font>';
 var contentStyle = '<font class="message-text-style">';
-var lockLoadMessagesTop = false;
-var lockLoadMessage = false;
+
+// browser tab notification
 var newMessagesCount = 0;
 var isCurrentTabActive = true;
+
+//localStorage  key
+var STORAGE_NAME = 'main';
+
+//current top message id for detecting from what
 var headerId;
+
+//  div that contains messages
 var chatBoxDiv;
+
+//sound
 var chatIncoming;
 var chatOutgoing;
-var loggedUser;
-var chatRoomsDiv;
-var userMessage;
-var userSendMessageTo;
-var receiverId;
 var chatLogin;
 var chatLogout;
+
+// current username
+var loggedUser;
+
+// div for user list appending
+var chatRoomsDiv;
+
+// input type that contains text for sending message
+var userMessage;
+
+// div that contains receiver id, icons, etc
+var userSendMessageTo;
+
+//user to send message input type text
+var receiverId;
+
+// navbar label with current user name
 var userNameLabel;
+
+// keyboard and mouse handlers for loadUpHistory
+var keyDownLoadUpFunction;
+var mouseWheelLoadUpFunction;
+
+//main single socket for handling realtime messages
 var ws;
 
 
@@ -44,13 +72,17 @@ $(document).ready(function () {
 			$("#sendButton").click();
 		}
 	});
-	chatBoxDiv.bind('mousewheel DOMMouseScroll', function (event) {
+
+	// Those events are removed when loadUpHistory() reaches top
+	mouseWheelLoadUpFunction = function (event) {
 		if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) { // Scroll top
 			loadUpHistory(5);
 		}
-	});
+	};
+	chatBoxDiv.bind('mousewheel DOMMouseScroll', mouseWheelLoadUpFunction);
 
-	$(document).keydown(function (e) {
+	// Those events are removed when loadUpHistory() reaches top
+	keyDownLoadUpFunction = function (e) {
 		if (e.which === 33) {    // page up
 			loadUpHistory(15);
 		} else if (e.which === 38) { // up
@@ -58,29 +90,32 @@ $(document).ready(function () {
 		} else if (e.ctrlKey && e.which === 36) {
 			loadUpHistory(25);
 		}
-	});
-	start_chat_ws();
-});
+	};
 
+	$(document).keydown(keyDownLoadUpFunction);
+	$(window).on("blur focus", function (e) {
+		var prevType = $(this).data("prevType");
 
-$(window).on("blur focus", function (e) {
-	var prevType = $(this).data("prevType");
+		if (prevType != e.type) {   //  reduce double fire issues
+			switch (e.type) {
+				case "focus":
+					// do work
+					isCurrentTabActive = true;
+					newMessagesCount = 0;
+					document.title = 'Chat';
+					break;
+				case "blur":
+					isCurrentTabActive = false;
 
-	if (prevType != e.type) {   //  reduce double fire issues
-		switch (e.type) {
-			case "focus":
-				// do work
-				isCurrentTabActive = true;
-				newMessagesCount = 0;
-				document.title = 'Chat';
-				break;
-			case "blur":
-				isCurrentTabActive = false;
-
+			}
 		}
-	}
 
-	$(this).data("prevType", e.type);
+		$(this).data("prevType", e.type);
+	});
+
+	loadMessagesFromLocalStorage();
+	start_chat_ws();
+
 });
 
 //var timezone = getCookie('timezone');
@@ -90,6 +125,17 @@ $(window).on("blur focus", function (e) {
 //	setCookie("timezone", jstz.determine().name());
 //}
 
+
+// TODO too many json parses
+function loadMessagesFromLocalStorage() {
+	var jsonData =  localStorage.getItem(STORAGE_NAME);
+	if (jsonData != null) {
+		var parsedData = JSON.parse(jsonData);
+		for (var i = 0; i < parsedData.length; i++) {
+			handlePreparedWSMessage(parsedData[i]);
+		}
+	}
+}
 
 function start_chat_ws() {
 	ws = new WebSocket($.cookie('api'));
@@ -226,39 +272,63 @@ function setUsername(data) {
 
 function handleGetMessages(message) {
 	console.log(new Date() + ': appending messages to top');
+
+	// This check should fire only once, because requests aren't being sent when there are no event for them, thus no responses
 	if (message.length === 0) {
-		// TODO remove keydown event
-		console.log(new Date() + ': Requesting messages has reached the top, lock acquired');
-		lockLoadMessagesTop = true;
+		console.log(new Date() + ': Requesting messages has reached the top, removing loadUpHistoryEvent handlers');
+		$(document).off('keydown', keyDownLoadUpFunction);
+		chatBoxDiv.off('mousewheel DOMMouseScroll', mouseWheelLoadUpFunction);
 		return;
 	}
 	var firstMessage = message[message.length - 1];
-	if (firstMessage != null) {
-		headerId = firstMessage.id;
-	}
+	headerId = firstMessage.id;
 
 	message.forEach(function (message) {
 		printMessage(message, true);
 	});
 }
 
-
-function webSocketMessage(message) {
-	console.log(new Date() + message.data);
-	var data = JSON.parse(message.data);
-	var action = data['action'];
-	if (action === 'messages') {
-		lockLoadMessage = false;
-		handleGetMessages(data['content']);
-	} else  if (action === 'joined' || action === 'left' || action === 'online_users' || action === 'changed') {
-		refreshOnlineUsers(data);
-	} else if (action === 'me') {
-		setUsername(data);
-	} else if (action === 'system') {
-		displayPreparedMessage(systemHeader, data['time'], data['content'], 'System', false);
-	} else {
-		appendMessage(data);
+// TODO too many json parses
+function saveMessageToStorage(newItem) {
+	var jsonMessages = localStorage.getItem(STORAGE_NAME);
+	if (jsonMessages == null) {
+		jsonMessages = '[]';
 	}
+	var messages = JSON.parse(jsonMessages);
+	messages.push(newItem);
+	var newArray = JSON.stringify(messages);
+
+	localStorage.setItem(STORAGE_NAME, newArray);
+}
+
+function handlePreparedWSMessage(data) {
+	switch (data['action']) {
+		case 'messages':
+			handleGetMessages(data['content']);
+			break;
+		case 'joined':
+		case 'left':
+		case 'online_users':
+		case 'changed':
+			refreshOnlineUsers(data);
+			saveToDB = true;
+			break;
+		case 'me':
+			setUsername(data);
+			break;
+		case 'system':
+			displayPreparedMessage(systemHeader, data['time'], data['content'], 'System', false);
+			break;
+		default:
+			appendMessage(data);
+	}
+}
+function webSocketMessage(message) {
+	var jsonData = message.data;
+	console.log(new Date() + jsonData);
+	var data = JSON.parse(jsonData);
+	saveMessageToStorage(data);
+	handlePreparedWSMessage(data);
 }
 
 
@@ -272,45 +342,42 @@ function appendMessage(data) {
 }
 
 
+function sendToServer(messageRequest) {
+	var jsonRequest = JSON.stringify(messageRequest);
+	if (ws.readyState != WebSocket.OPEN) {
+		console.log(new Date() + "Web socket is closed. Can't send message: " + jsonRequest);
+		return false;
+	} else {
+		ws.send(jsonRequest);
+		return true;
+	}
+}
+
 function sendMessage(usermsg, username) {
 	if (usermsg == null || usermsg === '') {
 		return;
 	}
-	if (ws.readyState != WebSocket.OPEN) {
-		console.log(new Date() + "Web socket is closed. Can't send message: " + usermsg);
-		return false;
+	var messageRequest = {
+		content: usermsg,
+		receiver:  username,
+		action:  'send'
+	};
+
+	if (sendToServer(messageRequest)) {
+		userMessage.val("");
 	}
-	var messageRequest = {};
-	messageRequest['content'] = usermsg;
-	messageRequest['receiver'] = username;
-	messageRequest['action'] = 'send';
-
-	var jsonRequest = JSON.stringify(messageRequest);
-
-	ws.send(jsonRequest);
-	userMessage.val("");
 }
 
 
-function loadUpHistory(elements) {
+function loadUpHistory(count) {
 	if (chatBoxDiv.scrollTop() === 0) {
-		loadMessages(elements, true);
+		var getMessageRequest = {
+			headerId : headerId,
+			count: count,
+			action: 'messages'
+		};
+		sendToServer(getMessageRequest);
 	}
-}
-
-
-function loadMessages(count) {
-	if (lockLoadMessagesTop || lockLoadMessage) {
-		console.log(new Date() + ': Post get messages Locked, no request sent');
-		return;
-	}
-	var getMessageRequest = {};
-	getMessageRequest['headerId'] = headerId;
-	getMessageRequest['count'] = count;
-	getMessageRequest['action'] = 'messages';
-	var jsonRequest = JSON.stringify(getMessageRequest);
-	ws.send(jsonRequest);
-	lockLoadMessage = true;
 }
 
 
