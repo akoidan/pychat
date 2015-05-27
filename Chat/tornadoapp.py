@@ -16,8 +16,9 @@ import tornadoredis
 
 from Chat.settings import MAX_MESSAGE_SIZE
 
-ANONYMOUS_GENDER = 'alien'
+RECEIVER_USERNAME_VAR_NAME = 'receiver'
 
+ANONYMOUS_GENDER = 'alien'
 COUNT_VAR_NAME = 'count'
 HEADER_ID_VAR_NAME = 'headerId'
 SESSION_USER_VAR_NAME = 'user_name'
@@ -86,10 +87,10 @@ class MessagesHandler(WebSocketHandler):
 			# Anonymous
 			self.user_id = 0
 			try:
-				self.sender_name = session['user_name']
+				self.sender_name = session[SESSION_USER_VAR_NAME]
 			except KeyError:
 				self.sender_name = id_generator(8)
-				session['user_name'] = self.sender_name
+				session[SESSION_USER_VAR_NAME] = self.sender_name
 				session.save()
 			self.sex = ANONYMOUS_GENDER
 		self.connections.setdefault(self.sender_name, set()).add(self)
@@ -176,8 +177,8 @@ class MessagesHandler(WebSocketHandler):
 		"""
 		:type message: dict
 		"""
-		receiver_name = message['receiver']
-		content = message['message']
+		receiver_name = message[RECEIVER_USERNAME_VAR_NAME]
+		content = message[CONTENT_VAR_NAME]
 		receiver, receiver_name, save_to_db, send_to_all = self.detect_message_type(receiver_name)
 		if save_to_db:
 			message_db = Messages(sender_id=self.user_id, content=content, receiver=receiver)

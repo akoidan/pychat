@@ -4,7 +4,8 @@ var othersHeader = '<font class="message-header-others">';
 var systemHeader = '<font class="message-header-system">';
 var endHeader = '</font>';
 var contentStyle = '<font class="message-text-style">';
-var lockPostGetMessage = false;
+var lockLoadMessagesTop = false;
+var lockLoadMessage = false;
 var newMessagesCount = 0;
 var isCurrentTabActive = true;
 var headerId;
@@ -133,7 +134,7 @@ function loadUsers(usernames) {
 	chatRoomsDiv.append(allUsers);
 }
 
-
+// Used by {@link loadUsers}
 function showUserSendMess(username) {
 	userSendMessageTo.show();
 	// Empty sets display to none
@@ -166,22 +167,22 @@ function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayed
 
 function printMessage(data, isTopDirection) {
 	var headerStyle;
-	var receiver = data.receiver;
-	var displayedUsername = data.sender;
+	var receiver = data['receiver'];
+	var displayedUsername = data['sender'];
 	//private message
 	if (receiver != null) {
 		headerStyle = privateHeader;
 		if (receiver !== loggedUser) {
-			displayedUsername = data.receiver;
+			displayedUsername = data['receiver'];
 			headerStyle += '>>'
 		}
 		// public message
-	} else if (data.sender === loggedUser) {
+	} else if (data['sender'] === loggedUser) {
 		headerStyle = selfHeader;
 	} else {
 		headerStyle = othersHeader;
 	}
-	displayPreparedMessage(headerStyle, data.time, encodeHTML(data.content), displayedUsername, isTopDirection);
+	displayPreparedMessage(headerStyle, data['time'], encodeHTML(data['content']), displayedUsername, isTopDirection);
 }
 
 
@@ -196,11 +197,11 @@ function checkAndPlay(element) {
 
 
 function refreshOnlineUsers(data) {
-	loadUsers(data.content);
-	var action = data.action;
+	loadUsers(data['content']);
+	var action = data['action'];
 	if (action === 'changed') {
-		displayPreparedMessage(systemHeader, data.time, ' Anonymous <b> ' + data.oldName +
-		'</b> has changed nickname to <b>' + data.user + '  </b> ', 'System', false);
+		displayPreparedMessage(systemHeader, data['time'], ' Anonymous <b> ' + data['oldName'] +
+		'</b> has changed nickname to <b>' + data['user'] + '  </b> ', 'System', false);
 	} else if (action !== 'online_users') {
 		if (action === 'joined') {
 			checkAndPlay(chatLogin);
@@ -208,17 +209,17 @@ function refreshOnlineUsers(data) {
 			checkAndPlay(chatLogout);
 		} // else ifdo nothing
 		var userType = "";
-		if (data.sex === 'alien') {
+		if (data['sex'] === 'alien') {
 			userType = ' Anonymous ';
 		}
-		displayPreparedMessage(systemHeader, data.time, userType+'<b> '+ data.user + '</b> has ' + action + ' the chat ', 'System', false);
+		displayPreparedMessage(systemHeader, data['time'], userType+'<b> '+ data['user'] + '</b> has ' + action + ' the chat ', 'System', false);
 	}
 }
 
 
 function setUsername(data) {
-	console.log(new Date() + "UserName has been set to " + data.content);
-	loggedUser = data.content;
+	console.log(new Date() + "UserName has been set to " + data['content']);
+	loggedUser = data['content'];
 	userNameLabel.text(loggedUser);
 }
 
@@ -228,7 +229,7 @@ function handleGetMessages(message) {
 	if (message.length === 0) {
 		// TODO remove keydown event
 		console.log(new Date() + ': Requesting messages has reached the top, lock acquired');
-		lockPostGetMessage = true;
+		lockLoadMessagesTop = true;
 		return;
 	}
 	var firstMessage = message[message.length - 1];
@@ -245,15 +246,16 @@ function handleGetMessages(message) {
 function webSocketMessage(message) {
 	console.log(new Date() + message.data);
 	var data = JSON.parse(message.data);
-	var action = data.action;
+	var action = data['action'];
 	if (action === 'messages') {
-		handleGetMessages(data.content);
+		lockLoadMessage = false;
+		handleGetMessages(data['content']);
 	} else  if (action === 'joined' || action === 'left' || action === 'online_users' || action === 'changed') {
 		refreshOnlineUsers(data);
 	} else if (action === 'me') {
 		setUsername(data);
 	} else if (action === 'system') {
-		displayPreparedMessage(systemHeader, data.time, data.content, 'System', false);
+		displayPreparedMessage(systemHeader, data['time'], data['content'], 'System', false);
 	} else {
 		appendMessage(data);
 	}
@@ -262,8 +264,7 @@ function webSocketMessage(message) {
 
 function appendMessage(data) {
 	printMessage(data, false);
-	if (loggedUser === data.sender) {
-		// TODO not always plays
+	if (loggedUser === data['sender']) {
 		checkAndPlay(chatOutgoing);
 	} else {
 		checkAndPlay(chatIncoming);
@@ -280,9 +281,9 @@ function sendMessage(usermsg, username) {
 		return false;
 	}
 	var messageRequest = {};
-	messageRequest.message = usermsg;
-	messageRequest.receiver = username;
-	messageRequest.action = 'send';
+	messageRequest['content'] = usermsg;
+	messageRequest['receiver'] = username;
+	messageRequest['action'] = 'send';
 
 	var jsonRequest = JSON.stringify(messageRequest);
 
@@ -299,16 +300,17 @@ function loadUpHistory(elements) {
 
 
 function loadMessages(count) {
-	if (lockPostGetMessage) {
+	if (lockLoadMessagesTop || lockLoadMessage) {
 		console.log(new Date() + ': Post get messages Locked, no request sent');
 		return;
 	}
 	var getMessageRequest = {};
-	getMessageRequest.headerId = headerId;
-	getMessageRequest.count = count;
-	getMessageRequest.action = 'messages';
+	getMessageRequest['headerId'] = headerId;
+	getMessageRequest['count'] = count;
+	getMessageRequest['action'] = 'messages';
 	var jsonRequest = JSON.stringify(getMessageRequest);
 	ws.send(jsonRequest);
+	lockLoadMessage = true;
 }
 
 

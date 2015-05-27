@@ -42,19 +42,20 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* change anonymous message color
+* Use `localStorage` to store messages and don't load it twice and check if there are new messages after connection lost
+ also check id when appedning message to top to prevent double fire issue
+* select user in userlist by changing its color to yellow - itself, anonymous ...
 * USE init or on_open
 * show system messages on navbar
-* allow to edit username for anonymous
 * don't refresh userlist on closing tab if there's an open tab 
-* remove connections set, there's a lot of issues like when user close a single tab, and there're still open websockets but the user is missing frm list already
-* user private messages sent only to single websocket got by username, thus a user missed messages if there're 2+ tabs
+* replace tornadoapp.connections set of list with redis backend
 * show if user's reconnecting
 * since post to 10 getmessages loads 1st, username is not set and self messages writes as others colors
 * tornadoi2
 * add logger
 * deploy on server
-* right room width (add space to roght size from scroll if userdlist is closed)
-* on start 10 messages includes foreign private ones 
+* right room width (add space to right size from scroll if userdlist is closed)
 * timezone
 * show gender icon in userlist 
 * make login dropdown smaller
