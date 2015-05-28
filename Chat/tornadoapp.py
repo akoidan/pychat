@@ -16,9 +16,10 @@ import tornadoredis
 
 from Chat.settings import MAX_MESSAGE_SIZE
 
-RECEIVER_USERNAME_VAR_NAME = 'receiver'
 
 ANONYMOUS_GENDER = 'alien'
+MESSAGE_ID_VAR_NAME = 'id'
+RECEIVER_USERNAME_VAR_NAME = 'receiver'
 COUNT_VAR_NAME = 'count'
 HEADER_ID_VAR_NAME = 'headerId'
 SESSION_USER_VAR_NAME = 'user_name'
@@ -31,6 +32,7 @@ GENDER_VAR_NAME = 'sex'
 REFRESH_USER_EVENT = 'online_users'
 SYSTEM_MESSAGE_EVENT = 'system'
 GET_MESSAGES_EVENT = 'messages'
+SEMD_MESSAGE_EVENT = 'message'
 GET_MINE_USERNAME_EVENT = 'me'
 LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
@@ -183,9 +185,9 @@ class MessagesHandler(WebSocketHandler):
 		if save_to_db:
 			message_db = Messages(sender_id=self.user_id, content=content, receiver=receiver)
 			message_db.save()
-			prepared_message = message_db.json
+			prepared_message = self.create_send_message(message_db)
 		else:
-			prepared_message = Messages.json_anonymous(self.sender_name, content, receiver_name)
+			prepared_message = self.create_send_anonymous_message(self.sender_name, content, receiver_name)
 		if send_to_all:
 			self.emit(prepared_message)
 		else:
@@ -289,6 +291,29 @@ class MessagesHandler(WebSocketHandler):
 			CONTENT_VAR_NAME: content,
 			TIME_VAR_NAME: datetime.datetime.now().strftime("%H:%M:%S")
 		}
+
+
+	def create_send_message(self, message):
+		"""
+		:type message: Messages
+		"""
+		return {
+			USER_VAR_NAME: message.sender.username,
+			RECEIVER_USERNAME_VAR_NAME: None if message.receiver is None else message.receiver.username,
+			CONTENT_VAR_NAME: message.content,
+			TIME_VAR_NAME: message.time.strftime("%H:%M:%S"),
+			MESSAGE_ID_VAR_NAME: message.id,
+			EVENT_VAR_NAME: SEMD_MESSAGE_EVENT
+		}
+
+	def create_send_anonymous_message(self, sender_anonymous, content, receiver_anonymous):
+		default_message = self.create_default_message(content, SEMD_MESSAGE_EVENT)
+		default_message.update({
+			USER_VAR_NAME: sender_anonymous,
+			RECEIVER_USERNAME_VAR_NAME: receiver_anonymous,
+		})
+		return default_message
+
 
 application = tornado.web.Application([
 	(r'.*', MessagesHandler),

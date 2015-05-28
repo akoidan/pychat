@@ -95,25 +95,6 @@ class Messages(models.Model):
 	id = models.AutoField(primary_key=True)
 	receiver = models.ForeignKey(UserProfile, null=True, related_name='receiver')
 
-	@property
-	def json(self):
-		return {
-			'sender': self.sender.username,
-			'receiver': None if self.receiver is None else self.receiver.username,
-			'content': self.content,
-			'time': self.time.strftime("%H:%M:%S"),
-			'id': self.id
-		}
-
-	@staticmethod
-	def json_anonymous(sender_anonymous, content, receiver_anonymous):
-		return {
-			'sender': sender_anonymous,
-			'receiver': receiver_anonymous,
-			'content': content,
-			'time': datetime.datetime.now().strftime("%H:%M:%S"),
-		}
-
 
 class UserSettings(models.Model):
 	"""

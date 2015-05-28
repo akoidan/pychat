@@ -145,7 +145,7 @@ function start_chat_ws() {
 	ws = new WebSocket($.cookie('api'));
 	ws.onmessage = webSocketMessage;
 	ws.onclose = function () {
-		console.log(new Date() + "Connection to WebSocket is lost, trying to reconnect");
+		console.error(new Date() + "Connection to WebSocket is lost, trying to reconnect");
 		// Try to reconnect in 5 seconds
 		setTimeout(function () {
 			start_chat_ws()
@@ -218,7 +218,7 @@ function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayed
 function printMessage(data, isTopDirection) {
 	var headerStyle;
 	var receiver = data['receiver'];
-	var displayedUsername = data['sender'];
+	var displayedUsername = data['user'];
 	//private message
 	if (receiver != null) {
 		headerStyle = privateHeader;
@@ -227,7 +227,7 @@ function printMessage(data, isTopDirection) {
 			headerStyle += '>>'
 		}
 		// public message
-	} else if (data['sender'] === loggedUser) {
+	} else if (data['user'] === loggedUser) {
 		headerStyle = selfHeader;
 	} else {
 		headerStyle = othersHeader;
@@ -330,22 +330,32 @@ function handlePreparedWSMessage(data) {
 		case 'system':
 			displayPreparedMessage(systemHeader, data['time'], data['content'], 'System', false);
 			break;
-		default:
+		case 'message':
 			appendMessage(data);
+			break;
+		default:
+			console.error('<< Unknown message type');
 	}
 }
 function webSocketMessage(message) {
 	var jsonData = message.data;
 	console.log(new Date() + jsonData);
 	var data = JSON.parse(jsonData);
-	saveMessageToStorage(data);
+
+	//cache some messages to localStorage
+	//var loggedMessageTypes = ['system', 'joined', 'messages', 'changed', 'left' ];
+	var loggedMessageTypes = ['system', 'joined', 'messages', 'changed', 'left' ];
+	if (loggedMessageTypes.indexOf(data['action']) > -1 ) {
+		saveMessageToStorage(data);
+	}
+
 	handlePreparedWSMessage(data);
 }
 
 
 function appendMessage(data) {
 	printMessage(data, false);
-	if (loggedUser === data['sender']) {
+	if (loggedUser === data['user']) {
 		checkAndPlay(chatOutgoing);
 	} else {
 		checkAndPlay(chatIncoming);
