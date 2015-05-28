@@ -255,22 +255,24 @@ function refreshOnlineUsers(data) {
 		if (data['oldName'] == loggedUser || data['user'] == loggedUser) {
 			message = 'You have changed nickname to <b>' + data['user'] + '</b> ';
 		} else {
-			message = 'Anonymous <b>' +  data['oldName'] + '</b> has changed nickname to <b>' + data['user'] + '  </b> ';
+			message = 'Anonymous <b>' + data['oldName'] + '</b> has changed nickname to <b>' + data['user'] + '  </b> ';
 		}
 	} else if (action !== 'online_users') {
 		if (data['user'] == loggedUser) {
 			message = 'You have ' + action + ' the chat';
 		} else if (data['sex'] == 'alien') {
-			message = 'Anonymous <b>' +  data['user'] + '</b> has ' + action + ' the chat.';
+			message = 'Anonymous <b>' + data['user'] + '</b> has ' + action + ' the chat.';
 		} else {
-			message = 'User <b>' +  data['user'] + '</b> has ' + action + ' the chat.';
+			message = 'User <b>' + data['user'] + '</b> has ' + action + ' the chat.';
 		}
 		if (action === 'joined') {
 			checkAndPlay(chatLogin);
 		} else if (action === 'left') {
 			checkAndPlay(chatLogout);
+		}
+	} else {
+		return;
 	}
-	} // else ifdo nothing
 	displayPreparedMessage(systemHeader, data['time'], message, 'System', false);
 }
 

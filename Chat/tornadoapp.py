@@ -267,6 +267,7 @@ class MessagesHandler(WebSocketHandler):
 				| Q(sender=self.user_id)
 				| Q(receiver=self.user_id)
 			).order_by('-pk')[:count]
+			# TODO no json attribute
 		content = [message.json for message in messages]
 		response = self.create_default_message(content, GET_MESSAGES_EVENT)
 		self.safe_write(self, response)
@@ -291,7 +292,6 @@ class MessagesHandler(WebSocketHandler):
 			CONTENT_VAR_NAME: content,
 			TIME_VAR_NAME: datetime.datetime.now().strftime("%H:%M:%S")
 		}
-
 
 	def create_send_message(self, message):
 		"""
