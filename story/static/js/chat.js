@@ -131,9 +131,13 @@ function loadMessagesFromLocalStorage() {
 	var jsonData =  localStorage.getItem(STORAGE_NAME);
 	if (jsonData != null) {
 		var parsedData = JSON.parse(jsonData);
+		// don't make sound on loadHistory
+		var savedSoundStatus = sound;
+		sound = false;
 		for (var i = 0; i < parsedData.length; i++) {
 			handlePreparedWSMessage(parsedData[i]);
 		}
+		sound = savedSoundStatus;
 	}
 }
 
@@ -244,22 +248,30 @@ function checkAndPlay(element) {
 
 function refreshOnlineUsers(data) {
 	loadUsers(data['content']);
+	var message;
 	var action = data['action'];
 	if (action === 'changed') {
-		displayPreparedMessage(systemHeader, data['time'], ' Anonymous <b> ' + data['oldName'] +
-		'</b> has changed nickname to <b>' + data['user'] + '  </b> ', 'System', false);
+		// if userName label already changed or still
+		if (data['oldName'] == loggedUser || data['user'] == loggedUser) {
+			message = 'You have changed nickname to <b>' + data['user'] + '</b> ';
+		} else {
+			message = 'Anonymous <b>' +  data['oldName'] + '</b> has changed nickname to <b>' + data['user'] + '  </b> ';
+		}
 	} else if (action !== 'online_users') {
+		if (data['user'] == loggedUser) {
+			message = 'You have ' + action + ' the chat';
+		} else if (data['sex'] == 'alien') {
+			message = 'Anonymous <b>' +  data['user'] + '</b> has ' + action + ' the chat.';
+		} else {
+			message = 'User <b>' +  data['user'] + '</b> has ' + action + ' the chat.';
+		}
 		if (action === 'joined') {
 			checkAndPlay(chatLogin);
 		} else if (action === 'left') {
 			checkAndPlay(chatLogout);
-		} // else ifdo nothing
-		var userType = "";
-		if (data['sex'] === 'alien') {
-			userType = ' Anonymous ';
-		}
-		displayPreparedMessage(systemHeader, data['time'], userType+'<b> '+ data['user'] + '</b> has ' + action + ' the chat ', 'System', false);
 	}
+	} // else ifdo nothing
+	displayPreparedMessage(systemHeader, data['time'], message, 'System', false);
 }
 
 
@@ -311,7 +323,6 @@ function handlePreparedWSMessage(data) {
 		case 'online_users':
 		case 'changed':
 			refreshOnlineUsers(data);
-			saveToDB = true;
 			break;
 		case 'me':
 			setUsername(data);

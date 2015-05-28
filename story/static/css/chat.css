@@ -45,9 +45,7 @@
 
 #chatrooms > ul > li:hover {
 	cursor: pointer;
-	border-style: solid;
-	margin-left: 0;
-	margin-right: 0;
+	color: rgb(205, 200, 107);
 }
 
 .inputs {

@@ -44,7 +44,7 @@ Start the chat:
 #TODO
 * change anonymous message color
 * Use `localStorage` to store messages and don't load it twice and check if there are new messages after connection lost
- also check id when appedning message to top to prevent double fire issue
+ also check id when appedning message to top to prevent double fire issue, append message to bottom if user went offline
 * select user in userlist by changing its color to yellow - itself, anonymous ...
 * USE init or on_open
 * show system messages on navbar
