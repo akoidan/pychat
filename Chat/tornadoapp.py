@@ -32,7 +32,6 @@ GENDER_VAR_NAME = 'sex'
 REFRESH_USER_EVENT = 'online_users'
 SYSTEM_MESSAGE_EVENT = 'system'
 GET_MESSAGES_EVENT = 'messages'
-SEMD_MESSAGE_EVENT = 'message'
 GET_MINE_USERNAME_EVENT = 'me'
 LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
@@ -49,9 +48,9 @@ session_engine = import_module(settings.SESSION_ENGINE)
 # global connection to publishing messages
 c = tornadoredis.Client()
 c.connect()
+sessionStore = session_engine.SessionStore()
 
 logger = logging.getLogger(__name__)
-
 
 class MessagesHandler(WebSocketHandler):
 
@@ -76,9 +75,10 @@ class MessagesHandler(WebSocketHandler):
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
-		if session_key is None:
-			self.close()
-			# TODO unsubscribe here
+		if session_key is None or not sessionStore.exists(session_key):
+			logger.warn('SessionKey ' + session_key + ' is absent')
+			self.close(403, "Session key is empty or session doesn't exist")
+			return
 		session = session_engine.SessionStore(session_key)
 		try:
 			self.user_id = session["_auth_user_id"]
@@ -267,9 +267,7 @@ class MessagesHandler(WebSocketHandler):
 				| Q(sender=self.user_id)
 				| Q(receiver=self.user_id)
 			).order_by('-pk')[:count]
-			# TODO no json attribute
-		content = [message.json for message in messages]
-		response = self.create_default_message(content, GET_MESSAGES_EVENT)
+		response = self.create_get_messages(messages)
 		self.safe_write(self, response)
 
 	# MESSAGES
@@ -297,17 +295,32 @@ class MessagesHandler(WebSocketHandler):
 		"""
 		:type message: Messages
 		"""
+		result = self.create_get_message(message)
+		result.update({
+			EVENT_VAR_NAME: SEND_MESSAGE_EVENT
+		})
+		return result
+
+	def create_get_message(self, message):
 		return {
 			USER_VAR_NAME: message.sender.username,
 			RECEIVER_USERNAME_VAR_NAME: None if message.receiver is None else message.receiver.username,
 			CONTENT_VAR_NAME: message.content,
 			TIME_VAR_NAME: message.time.strftime("%H:%M:%S"),
 			MESSAGE_ID_VAR_NAME: message.id,
-			EVENT_VAR_NAME: SEMD_MESSAGE_EVENT
+		}
+
+	def create_get_messages(self, messages):
+		"""
+		:type messages: list[Messages]
+		"""
+		return {
+			CONTENT_VAR_NAME: [self.create_send_message(message) for message in messages],
+			EVENT_VAR_NAME: GET_MESSAGES_EVENT
 		}
 
 	def create_send_anonymous_message(self, sender_anonymous, content, receiver_anonymous):
-		default_message = self.create_default_message(content, SEMD_MESSAGE_EVENT)
+		default_message = self.create_default_message(content, SEND_MESSAGE_EVENT)
 		default_message.update({
 			USER_VAR_NAME: sender_anonymous,
 			RECEIVER_USERNAME_VAR_NAME: receiver_anonymous,

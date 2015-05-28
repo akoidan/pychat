@@ -332,7 +332,7 @@ function handlePreparedWSMessage(data) {
 		case 'system':
 			displayPreparedMessage(systemHeader, data['time'], data['content'], 'System', false);
 			break;
-		case 'message':
+		case 'send':
 			appendMessage(data);
 			break;
 		default:
@@ -346,7 +346,7 @@ function webSocketMessage(message) {
 
 	//cache some messages to localStorage
 	//var loggedMessageTypes = ['system', 'joined', 'messages', 'changed', 'left' ];
-	var loggedMessageTypes = ['system', 'joined', 'messages', 'changed', 'left' ];
+	var loggedMessageTypes = ['system', 'joined', 'messages', 'changed', 'left', 'send' ];
 	if (loggedMessageTypes.indexOf(data['action']) > -1 ) {
 		saveMessageToStorage(data);
 	}

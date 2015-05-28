@@ -10,10 +10,13 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import logging.config
+from os.path import join
+
 from django.conf import global_settings
+
 import story as project_module
 
-from os.path import join
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -25,6 +28,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 SECRET_KEY = '8ou!cqb1yd)6c4h0i-cxjo&@@+04%4np6od8qn+z@5b=6)!v(o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
+LOGGING_CONFIG = None
 DEBUG = True
 TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = ["127.0.0.1", ]
@@ -48,7 +53,6 @@ INSTALLED_APPS = (
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
 	'django.db.migrations',
-	# 'south',
 	'story',
 	'simplejson',
 	'crispy_forms',
@@ -143,23 +147,41 @@ STATICFILES_DIRS = (
 
 LOGGING = {
 	'version': 1,
-	'disable_existing_loggers': False,
+	'disable_existing_loggers': True,
 	'handlers': {
 		'file': {
 			'level': 'DEBUG',
-			'class': 'logging.FileHandler',
+			'class': 'Chat.logger_handlers.RequestRotatingFileLogger',
 			'filename': join(BASE_DIR, 'chat.log'),
+			'formatter': 'verbose',
+		},
+		'console': {
+			'level': 'DEBUG',
+			'class': 'logging.StreamHandler',
+			'formatter': 'verbose',
 		},
 	},
 	'loggers': {
+		# root logger
+		'': {
+			'handlers': ['file'],
+		},
 		'django.request': {
 			'handlers': ['file'],
 			'level': 'DEBUG',
-			'propagate': True,
+			'propagate': False,
+		},
+	},
+
+	'formatters': {
+	'verbose': {
+			'format':  '[%(asctime)s %(levelname)s]: %(message)s',
+			'datefmt': '%H:%M:%S',
 		},
 	},
 }
 
+logging.config.dictConfig(LOGGING)
 
 
 # for gmail or google apps

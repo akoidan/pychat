@@ -42,6 +42,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* logger
 * change anonymous message color
 * Use `localStorage` to store messages and don't load it twice and check if there are new messages after connection lost
  also check id when appedning message to top to prevent double fire issue, append message to bottom if user went offline
