@@ -59,15 +59,15 @@ logger = logging.getLogger(__name__)
 class MessagesCreator:
 
 	@staticmethod
-	def get_online_usernames_sex_dict():
+	def online_usernames_sex_dict():
 		return {user_name: next(iter(connections[user_name])).sex for user_name in connections.keys()}
 
 	@classmethod
-	def create_online_user_names_message(cls, action, sender_name, sex):
+	def online_user_names(cls, action, sender_name, sex):
 		"""
 		"""
-		user_names = cls.get_online_usernames_sex_dict()
-		default_message = cls.create_default_message(user_names, action)
+		user_names = cls.online_usernames_sex_dict()
+		default_message = cls.default(user_names, action)
 		default_message.update({
 			USER_VAR_NAME: sender_name,
 			GENDER_VAR_NAME: sex
@@ -75,13 +75,13 @@ class MessagesCreator:
 		return default_message
 
 	@classmethod
-	def create_change_user_nickname_message(cls, old_nickname, new_nickname):
-		default_message = cls.create_online_user_names_message(CHANGE_ANONYMOUS_NAME_EVENT, new_nickname, ANONYMOUS_GENDER)
+	def change_user_nickname(cls, old_nickname, new_nickname):
+		default_message = cls.online_user_names(CHANGE_ANONYMOUS_NAME_EVENT, new_nickname, ANONYMOUS_GENDER)
 		default_message.update({OLD_NAME_VAR_NAME: old_nickname})
 		return default_message
 
 	@staticmethod
-	def create_default_message(content, event=SYSTEM_MESSAGE_EVENT):
+	def default(content, event=SYSTEM_MESSAGE_EVENT):
 		return {
 			EVENT_VAR_NAME: event,
 			CONTENT_VAR_NAME: content,
@@ -93,14 +93,14 @@ class MessagesCreator:
 		"""
 		:type message: Messages
 		"""
-		result = cls.create_get_message(message)
+		result = cls.get_message(message)
 		result.update({
 			EVENT_VAR_NAME: SEND_MESSAGE_EVENT
 		})
 		return result
 
 	@staticmethod
-	def create_get_message(message):
+	def get_message(message):
 		return {
 			USER_VAR_NAME: message.sender.username,
 			RECEIVER_USERNAME_VAR_NAME: None if message.receiver is None else message.receiver.username,
@@ -110,7 +110,7 @@ class MessagesCreator:
 		}
 
 	@classmethod
-	def create_get_messages(cls, messages):
+	def get_messages(cls, messages):
 		"""
 		:type messages: list[Messages]
 		"""
@@ -120,8 +120,8 @@ class MessagesCreator:
 		}
 
 	@classmethod
-	def create_send_anonymous_message(cls, sender_anonymous, content, receiver_anonymous):
-		default_message = cls.create_default_message(content, SEND_MESSAGE_EVENT)
+	def send_anonymous(cls, sender_anonymous, content, receiver_anonymous):
+		default_message = cls.default(content, SEND_MESSAGE_EVENT)
 		default_message.update({
 			USER_VAR_NAME: sender_anonymous,
 			RECEIVER_USERNAME_VAR_NAME: receiver_anonymous,
@@ -150,7 +150,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	def refresh_client_username(self):
 		# TODO why send to all when only get on load page for yourself?
-		message = MessagesCreator.create_default_message(self.sender_name, GET_MINE_USERNAME_EVENT)
+		message = MessagesCreator.default(self.sender_name, GET_MINE_USERNAME_EVENT)
 		self.emit_to_user(message)
 
 	def open(self):
@@ -178,13 +178,13 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		if len(connections[self.sender_name]) == 1:
 			self.refresh_online_user_list(LOGIN_EVENT)
 		else:  # if a new tab has been opened
-			online_user_names = MessagesCreator.create_online_user_names_message(REFRESH_USER_EVENT, self.sender_name, self.sex)
+			online_user_names = MessagesCreator.online_user_names(REFRESH_USER_EVENT, self.sender_name, self.sex)
 			self.write_message(online_user_names)
 		self.refresh_client_username()
 
 	def refresh_online_user_list(self, action):
 		# Creates dict { username: sex, }
-		message = MessagesCreator.create_online_user_names_message(
+		message = MessagesCreator.online_user_names(
 			action,
 			self.sender_name,
 			self.sex)
@@ -214,7 +214,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			# if user left the chat ( all ws are closed)
 			except KeyError:
 				self.emit_to_user(
-					MessagesCreator.create_default_message("Can't send the message, User has left the chat."),
+					MessagesCreator.default("Can't send the message, User has left the chat."),
 				)
 		self.emit_to_user(message)
 
@@ -271,7 +271,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			message_db.save()
 			prepared_message = MessagesCreator.create_send_message(message_db)
 		else:
-			prepared_message = MessagesCreator.create_send_anonymous_message(self.sender_name, content, receiver_name)
+			prepared_message = MessagesCreator.send_anonymous(self.sender_name, content, receiver_name)
 		if send_to_all:
 			self.emit(prepared_message)
 		else:
@@ -295,11 +295,11 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			session = session_engine.SessionStore(session_key)
 			session[SESSION_USER_VAR_NAME] = new_username
 			session.save()
-			message = MessagesCreator.create_change_user_nickname_message(old_username, new_username)
+			message = MessagesCreator.change_user_nickname(old_username, new_username)
 			self.emit(message)
 			self.refresh_client_username()
 		except ValidationError as e:
-			self.safe_write(self, self.create_default_message(str(e.message)))
+			self.safe_write(self, self.default(str(e.message)))
 
 	def on_message(self, json_message):
 		if not json_message:
@@ -351,7 +351,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				| Q(sender=self.user_id)
 				| Q(receiver=self.user_id)
 			).order_by('-pk')[:count]
-		response = self.create_get_messages(messages)
+		response = self.get_messages(messages)
 		self.safe_write(self, response)
 
 
