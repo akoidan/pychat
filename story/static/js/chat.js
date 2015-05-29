@@ -304,11 +304,18 @@ function handleGetMessages(message) {
 
 // TODO too many json parses
 function saveMessageToStorage(newItem) {
-	var jsonMessages = localStorage.getItem(STORAGE_NAME);
-	if (jsonMessages == null) {
-		jsonMessages = '[]';
+	var loggedMessageTypes = ['system', 'joined', 'messages', 'changed', 'left', 'send', 'me' ];
+	if (loggedMessageTypes.indexOf(newItem['action']) < 0 ) {
+		return
 	}
-	var messages = JSON.parse(jsonMessages);
+
+	var jsonMessages = localStorage.getItem(STORAGE_NAME);
+	var messages;
+	if (jsonMessages != null) {
+		messages = JSON.parse(jsonMessages);
+	} else {
+		messages = [];
+	}
 	messages.push(newItem);
 	var newArray = JSON.stringify(messages);
 
@@ -345,11 +352,7 @@ function webSocketMessage(message) {
 	var data = JSON.parse(jsonData);
 
 	//cache some messages to localStorage
-	//var loggedMessageTypes = ['system', 'joined', 'messages', 'changed', 'left' ];
-	var loggedMessageTypes = ['system', 'joined', 'messages', 'changed', 'left', 'send' ];
-	if (loggedMessageTypes.indexOf(data['action']) > -1 ) {
-		saveMessageToStorage(data);
-	}
+	saveMessageToStorage(data);
 
 	handlePreparedWSMessage(data);
 }
