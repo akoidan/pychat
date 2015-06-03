@@ -1,3 +1,4 @@
+from abc import abstractmethod, abstractproperty
 import datetime
 import json
 import logging
@@ -56,27 +57,28 @@ sessionStore = session_engine.SessionStore()
 logger = logging.getLogger(__name__)
 
 
-class MessagesCreator:
+class MessagesCreator(object):
+
+	def __init__(self):
+		self.sex = ANONYMOUS_GENDER
+		self.sender_name = ''
+		self.user_id = 0
 
 	@staticmethod
 	def online_usernames_sex_dict():
 		return {user_name: next(iter(connections[user_name])).sex for user_name in connections.keys()}
 
-	@classmethod
-	def online_user_names(cls, action, sender_name, sex):
-		"""
-		"""
-		user_names = cls.online_usernames_sex_dict()
-		default_message = cls.default(user_names, action)
+	def online_user_names(self, action):
+		user_names = self.online_usernames_sex_dict()
+		default_message = self.default(user_names, action)
 		default_message.update({
-			USER_VAR_NAME: sender_name,
-			GENDER_VAR_NAME: sex
+			USER_VAR_NAME: self.sender_name,
+			GENDER_VAR_NAME: self.sex
 		})
 		return default_message
 
-	@classmethod
-	def change_user_nickname(cls, old_nickname, new_nickname):
-		default_message = cls.online_user_names(CHANGE_ANONYMOUS_NAME_EVENT, new_nickname, ANONYMOUS_GENDER)
+	def change_user_nickname(self, old_nickname):
+		default_message = self.online_user_names(CHANGE_ANONYMOUS_NAME_EVENT)
 		default_message.update({OLD_NAME_VAR_NAME: old_nickname})
 		return default_message
 
@@ -88,12 +90,11 @@ class MessagesCreator:
 			TIME_VAR_NAME: datetime.datetime.now().strftime("%H:%M:%S")
 		}
 
-	@classmethod
-	def create_send_message(cls, message):
+	def create_send_message(self, message):
 		"""
 		:type message: Messages
 		"""
-		result = cls.get_message(message)
+		result = self.get_message(message)
 		result.update({
 			EVENT_VAR_NAME: SEND_MESSAGE_EVENT
 		})
@@ -109,21 +110,19 @@ class MessagesCreator:
 			MESSAGE_ID_VAR_NAME: message.id,
 		}
 
-	@classmethod
-	def get_messages(cls, messages):
+	def get_messages(self, messages):
 		"""
 		:type messages: list[Messages]
 		"""
 		return {
-			CONTENT_VAR_NAME: [cls.create_send_message(message) for message in messages],
+			CONTENT_VAR_NAME: [self.create_send_message(message) for message in messages],
 			EVENT_VAR_NAME: GET_MESSAGES_EVENT
 		}
 
-	@classmethod
-	def send_anonymous(cls, sender_anonymous, content, receiver_anonymous):
-		default_message = cls.default(content, SEND_MESSAGE_EVENT)
+	def send_anonymous(self, content, receiver_anonymous):
+		default_message = self.default(content, SEND_MESSAGE_EVENT)
 		default_message.update({
-			USER_VAR_NAME: sender_anonymous,
+			USER_VAR_NAME: self.sender_name,
 			RECEIVER_USERNAME_VAR_NAME: receiver_anonymous,
 		})
 		return default_message
@@ -139,9 +138,6 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		self.client = tornadoredis.Client()
 		self.client.connect()
 		self.listen()
-		self.sex = ANONYMOUS_GENDER
-		self.sender_name = ''
-		self.user_id = 0
 
 	@tornado.gen.engine
 	def listen(self):
@@ -150,7 +146,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	def refresh_client_username(self):
 		# TODO why send to all when only get on load page for yourself?
-		message = MessagesCreator.default(self.sender_name, GET_MINE_USERNAME_EVENT)
+		message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
 		self.emit_to_user(message)
 
 	def open(self):
@@ -178,16 +174,14 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		if len(connections[self.sender_name]) == 1:
 			self.refresh_online_user_list(LOGIN_EVENT)
 		else:  # if a new tab has been opened
-			online_user_names = MessagesCreator.online_user_names(REFRESH_USER_EVENT, self.sender_name, self.sex)
+			online_user_names = self.online_user_names(REFRESH_USER_EVENT)
 			self.write_message(online_user_names)
 		self.refresh_client_username()
 
 	def refresh_online_user_list(self, action):
 		# Creates dict { username: sex, }
-		message = MessagesCreator.online_user_names(
-			action,
-			self.sender_name,
-			self.sex)
+		message = self.online_user_names(
+			action)
 		self.emit(message)
 
 	def check_origin(self, origin):
@@ -214,7 +208,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			# if user left the chat ( all ws are closed)
 			except KeyError:
 				self.emit_to_user(
-					MessagesCreator.default("Can't send the message, User has left the chat."),
+					self.default("Can't send the message, User has left the chat."),
 				)
 		self.emit_to_user(message)
 
@@ -269,9 +263,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		if save_to_db:
 			message_db = Messages(sender_id=self.user_id, content=content, receiver=receiver)
 			message_db.save()
-			prepared_message = MessagesCreator.create_send_message(message_db)
+			prepared_message = self.create_send_message(message_db)
 		else:
-			prepared_message = MessagesCreator.send_anonymous(self.sender_name, content, receiver_name)
+			prepared_message = self.send_anonymous(content, receiver_name)
 		if send_to_all:
 			self.emit(prepared_message)
 		else:
@@ -295,7 +289,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			session = session_engine.SessionStore(session_key)
 			session[SESSION_USER_VAR_NAME] = new_username
 			session.save()
-			message = MessagesCreator.change_user_nickname(old_username, new_username)
+			message = self.change_user_nickname(old_username)
 			self.emit(message)
 			self.refresh_client_username()
 		except ValidationError as e:

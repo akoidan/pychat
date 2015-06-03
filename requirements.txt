@@ -1,6 +1,5 @@
 django>1.7.0
 simplejson
-Pillow>=2.7.0
 redis
 tornado
 tornado-redis

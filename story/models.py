@@ -3,7 +3,7 @@ import datetime
 
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-from django.db.models import ImageField, CharField, DateField
+from django.db.models import CharField, DateField, FileField
 
 
 class UserProfile(AbstractBaseUser):
@@ -46,7 +46,7 @@ class UserProfile(AbstractBaseUser):
 	birthday = DateField(null=True)
 	contacts = CharField(max_length=100, null=True)
 	# fileField + <img instead of ImageField (removes preview link)
-	photo = ImageField(upload_to=get_file_path, null=True)
+	photo = FileField(upload_to=get_file_path, null=True)
 
 	USERNAME_FIELD = 'username'
 

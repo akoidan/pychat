@@ -164,7 +164,7 @@ LOGGING = {
 	'loggers': {
 		# root logger
 		'': {
-			'handlers': ['file'],
+			'handlers': ['console'],
 		},
 		'django.request': {
 			'handlers': ['file'],

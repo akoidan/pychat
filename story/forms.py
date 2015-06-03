@@ -1,7 +1,7 @@
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
-from django.forms import ImageField
+from django.forms import FileField
 
 from story.models import UserSettings, UserProfile
 
@@ -22,7 +22,7 @@ class UserProfileForm(forms.ModelForm):
 	A form that provides a way to edit UserProfile
 	"""
 	# the widget gets rid of <a href=
-	photo = ImageField(widget=forms.FileInput)
+	photo = FileField(widget=forms.FileInput)
 
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile

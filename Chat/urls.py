@@ -8,22 +8,7 @@ from django.core.exceptions import MiddlewareNotUsed
 
 from Chat import settings
 
-
 logger = logging.getLogger(__name__)
-
-def check_redis_running():
-	""":raise error if redis is not running"""
-	try:
-		result = call(["redis-cli", "ping"])
-		if result != 0:
-			# spout redis in background, shell= true finds command in PATH
-			# subprocess.Popen(["redis"], shell=True)
-			raise MiddlewareNotUsed("Can't establish connection with redis server. Please run `redis-server` command")
-	except FileNotFoundError:
-		logger.error("Can't find redis-cli. Probably redis in not installed or redis-cli is not in the PATH")
-
-# check redis in url for lazy init and running only once and not in test or custom command
-check_redis_running()
 
 admin.autodiscover()
 urlpatterns = patterns(
