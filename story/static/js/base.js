@@ -1,4 +1,4 @@
-var sound = false;
+var sound = true;
 var userRegex = /^[a-zA-Z-_0-9]{1,16}$/;
 
 function mute() {
@@ -21,4 +21,15 @@ $(function () {
 
 $(document).ready(function () {
 	mute();
+	// TODO
+	//var fileref = document.createElement("link");
+	//fileref.setAttribute("rel", "stylesheet");
+	//fileref.setAttribute("type", "text/css");
+	//fileref.setAttribute("href", '/static/css/testDynamicLoad.css');
+	//document.getElementsByTagName("head")[0].appendChild(fileref);
+	//
+	//
+	//$('#chatbox').perfectScrollbar('update')
+
+
 });
