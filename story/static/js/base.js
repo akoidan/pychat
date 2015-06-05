@@ -21,15 +21,9 @@ $(function () {
 
 $(document).ready(function () {
 	mute();
-	// TODO
-	//var fileref = document.createElement("link");
-	//fileref.setAttribute("rel", "stylesheet");
-	//fileref.setAttribute("type", "text/css");
-	//fileref.setAttribute("href", '/static/css/testDynamicLoad.css');
-	//document.getElementsByTagName("head")[0].appendChild(fileref);
-	//
-	//
-	//$('#chatbox').perfectScrollbar('update')
 
+	if (typeof InstallTrigger !== 'undefined') {
+		console.log("Ops there's no scrollbar for firefox, so it looks a bit ugly")
+	}
 
 });

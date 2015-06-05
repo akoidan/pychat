@@ -126,7 +126,6 @@ $(document).ready(function () {
 //}
 
 
-// TODO too many json parses
 function loadMessagesFromLocalStorage() {
 	var jsonData =  localStorage.getItem(STORAGE_NAME);
 	if (jsonData != null) {
