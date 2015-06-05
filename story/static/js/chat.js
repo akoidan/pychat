@@ -126,7 +126,6 @@ $(document).ready(function () {
 //}
 
 
-// TODO too many json parses
 function loadMessagesFromLocalStorage() {
 	var jsonData =  localStorage.getItem(STORAGE_NAME);
 	if (jsonData != null) {
@@ -409,6 +408,11 @@ function loadUpHistory(count) {
 
 function toggleRoom() {
 	chatRoomsDiv.toggle();
+}
+
+function clearLocalHistory() {
+	localStorage.removeItem(STORAGE_NAME);
+	chatBoxDiv.html('');
 }
 
 function hideUserSendToName() {

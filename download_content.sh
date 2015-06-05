@@ -68,7 +68,6 @@ wget https://raw.githubusercontent.com/carhartl/jquery-cookie/master/src/jquery.
 # Sounds
 curl -L -o $TMP_DIR/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip $TMP_DIR/sounds.zip -d $SOUNDS_DIR
 
-
 # Checking if all files are loaded
 failed_count=0
 for path in "${files[@]}" ; do

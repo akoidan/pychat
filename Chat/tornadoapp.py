@@ -113,6 +113,7 @@ class MessagesCreator(object):
 	def get_messages(self, messages):
 		"""
 		:type messages: list[Messages]
+		:type messages: QuerySet[Messages]
 		"""
 		return {
 			CONTENT_VAR_NAME: [self.create_send_message(message) for message in messages],
