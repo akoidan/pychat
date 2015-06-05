@@ -25,6 +25,14 @@ html, body {
 	/*cursor: auto;*/
 	margin: 0;
 	height: 100%;
+
+	/*IE scroll*/
+	scrollbar-base-color: #3E4654;
+	scrollbar-3dlight-color: #7dc071;
+	scrollbar-highlight-color: #c08b00;
+	scrollbar-track-color: #222;
+	scrollbar-arrow-color: #3c763d;
+
 }
 
 .color-lor {
