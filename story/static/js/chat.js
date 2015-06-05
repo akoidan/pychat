@@ -411,6 +411,11 @@ function toggleRoom() {
 	chatRoomsDiv.toggle();
 }
 
+function clearLocalHistory() {
+	localStorage.removeItem(STORAGE_NAME);
+	chatBoxDiv.html('');
+}
+
 function hideUserSendToName() {
 	receiverId.empty();
 	userSendMessageTo.hide();
