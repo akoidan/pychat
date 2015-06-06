@@ -1,7 +1,10 @@
-from abc import abstractmethod, abstractproperty
 import datetime
 import json
 import logging
+try:
+	from urllib.parse import urlparse  # py2
+except ImportError:
+	from urlparse import urlparse  # py3
 
 from django.core.exceptions import ValidationError
 from django.db.models import Q
@@ -137,8 +140,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 	def __init__(self, *args, **kwargs):
 		super(MessagesHandler, self).__init__(*args, **kwargs)
 		self.client = tornadoredis.Client()
-		self.client.connect()
-		self.listen()
+
 
 	@tornado.gen.engine
 	def listen(self):
@@ -153,9 +155,11 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
 		if session_key is None or not sessionStore.exists(session_key):
-			logger.warn('SessionKey ' + session_key + ' is absent')
+			logger.warn('Incorrect session id: %s' % session_key)
 			self.close(403, "Session key is empty or session doesn't exist")
 			return
+		self.client.connect()
+		self.listen()
 		session = session_engine.SessionStore(session_key)
 		try:
 			self.user_id = session["_auth_user_id"]
@@ -176,7 +180,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.refresh_online_user_list(LOGIN_EVENT)
 		else:  # if a new tab has been opened
 			online_user_names = self.online_user_names(REFRESH_USER_EVENT)
-			self.write_message(online_user_names)
+			self.safe_write(online_user_names)
 		self.refresh_client_username()
 
 	def refresh_online_user_list(self, action):
@@ -186,7 +190,15 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		self.emit(message)
 
 	def check_origin(self, origin):
-		return True
+		"""
+		check whether browser set domain matches origin
+		"""
+		parsed_origin = urlparse(origin)
+		origin = parsed_origin.netloc
+		origin_domain = origin.split(':')[0].lower()
+		browser_set = self.request.headers.get("Host")
+		browser_domain = browser_set.split(':')[0]
+		return browser_domain == origin_domain
 
 	@staticmethod
 	def emit(message):
@@ -200,7 +212,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		if receiver_name is None:
 			receiver_name = self.sender_name
 		for socket in connections[receiver_name]:
-			self.safe_write(socket, message)
+			socket.safe_write(message)
 
 	def emit_to_user_and_self(self, message, receiver_name):
 		if receiver_name != self.sender_name:
@@ -215,21 +227,20 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	def new_message(self, message):
 		if type(message.body) is not int:  # subscribe event
-			self.safe_write(self, message.body)
+			self.safe_write(message.body)
 
-	@staticmethod
-	def safe_write(socket, message):
+	def safe_write(self, message):
 		"""
 		Tries to send message, doesn't throw exception outside
-		:type socket: MessagesHandler
+		:type self: MessagesHandler
 		"""
 		try:
-			socket.write_message(message)
+			self.write_message(message)
 		except tornado.websocket.WebSocketClosedError:
 			logger.error(
 				'Socket "{0}" closed bug, this "{1}" connections: "{2}" message: "{3}"'.format(
-					str(socket),
-					socket.sender_name,
+					str(self),
+					self.sender_name,
 					str(connections),
 					str(message)))
 
@@ -294,7 +305,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.emit(message)
 			self.refresh_client_username()
 		except ValidationError as e:
-			self.safe_write(self, self.default(str(e.message)))
+			self.safe_write(self.default(str(e.message)))
 
 	def on_message(self, json_message):
 		if not json_message:
@@ -316,6 +327,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		if self.client.subscribed:
 			self.client.unsubscribe(MAIN_CHANNEL)
 			self.client.disconnect()
+		if not self.sender_name:
+			return
 		try:
 			connections[self.sender_name].discard(self)
 			# if set is empty = last web socket is gone
@@ -347,7 +360,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				| Q(receiver=self.user_id)
 			).order_by('-pk')[:count]
 		response = self.get_messages(messages)
-		self.safe_write(self, response)
+		self.safe_write(response)
 
 
 application = tornado.web.Application([
