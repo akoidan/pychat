@@ -1,12 +1,13 @@
 import datetime
 import json
 import logging
+import redis
+
 try:
 	from urllib.parse import urlparse  # py2
 except ImportError:
 	from urlparse import urlparse  # py3
 
-from django.core.exceptions import ValidationError
 from django.db.models import Q
 import tornado.web
 import tornado.websocket
@@ -20,7 +21,7 @@ import tornadoredis
 
 from Chat.settings import MAX_MESSAGE_SIZE
 from story.models import UserProfile, Messages
-from story.registration_utils import is_blank, id_generator, check_user
+from story.registration_utils import is_blank, id_generator
 
 
 session_engine = import_module(settings.SESSION_ENGINE)
@@ -46,19 +47,22 @@ LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
 SEND_MESSAGE_EVENT = 'send'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
-MAIN_CHANNEL = 'main'
+REDIS_MAIN_CHANNEL = 'main'
+REDIS_USER_CHANNEL_PREFIX = 'user%s'
+REDIS_ONLINE_USERS = "online_users"
 
 
 # global connection to publishing messages
-c = tornadoredis.Client()
-c.connect()
+sync_redis = redis.StrictRedis()
 
-# Dist of set : {user_name : [Socket1, Socket2] }
-connections = {}
 sessionStore = session_engine.SessionStore()
 
 logger = logging.getLogger(__name__)
 
+# TODO https://github.com/leporo/tornado-redis#connection-pool-support
+CONNECTION_POOL = tornadoredis.ConnectionPool(
+	max_connections=500,
+	wait_for_available=True)
 
 class MessagesCreator(object):
 
@@ -67,13 +71,17 @@ class MessagesCreator(object):
 		self.sender_name = ''
 		self.user_id = 0
 
-	@staticmethod
-	def online_usernames_sex_dict():
-		return {user_name: next(iter(connections[user_name])).sex for user_name in connections.keys()}
+	def parse_redis_users(self, user_names):
+		user_sex_dict = {}
+		for a in user_names:
+			b = a.split(':')
+			user_sex_dict[b[0]] = b[1]
+		return user_sex_dict
 
-	def online_user_names(self, action):
-		user_names = self.online_usernames_sex_dict()
-		default_message = self.default(user_names, action)
+	def online_user_names(self, action, user_names=set(sync_redis.hvals(REDIS_ONLINE_USERS))):
+
+		user_sex_dict = self.parse_redis_users(user_names)# no place for set(None) coz at least 1 user has been added on join
+		default_message = self.default(user_sex_dict, action)
 		default_message.update({
 			USER_VAR_NAME: self.sender_name,
 			GENDER_VAR_NAME: self.sex
@@ -139,27 +147,47 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	def __init__(self, *args, **kwargs):
 		super(MessagesHandler, self).__init__(*args, **kwargs)
-		self.client = tornadoredis.Client()
-
+		self.async_redis = tornadoredis.Client()
+		self.process_message = {
+			GET_MINE_USERNAME_EVENT: self.change_username,
+			GET_MESSAGES_EVENT: self.process_get_messages,
+			SEND_MESSAGE_EVENT: self.process_send_message,
+		}
 
 	@tornado.gen.engine
 	def listen(self):
-		yield tornado.gen.Task(self.client.subscribe, MAIN_CHANNEL)
-		self.client.listen(self.new_message)
+		yield tornado.gen.Task(self.async_redis.subscribe, REDIS_MAIN_CHANNEL)
+		self.async_redis.listen(self.new_message)
 
-	def refresh_client_username(self):
-		# TODO why send to all when only get on load page for yourself?
-		message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
-		self.emit_to_user(message)
+	@tornado.gen.engine
+	def listen_private(self):
+		yield tornado.gen.Task(self.async_redis.subscribe, REDIS_USER_CHANNEL_PREFIX % self.sender_name)
+		self.async_redis.listen(self.new_message)
 
-	def open(self):
-		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
-		if session_key is None or not sessionStore.exists(session_key):
-			logger.warn('Incorrect session id: %s' % session_key)
-			self.close(403, "Session key is empty or session doesn't exist")
-			return
-		self.client.connect()
-		self.listen()
+	@property
+	def online_entry(self):
+		return '%s:%s' % (self.sender_name, self.sex)
+
+	def add_online_user(self):
+		online = sync_redis.hvals(REDIS_ONLINE_USERS)
+		self.async_redis.hset(REDIS_ONLINE_USERS, id(self), self.online_entry) # TODO check if it works
+		first_tab = False
+		if not online:  # if he's the only user online
+			online = [self.online_entry,]
+		elif self.sender_name not in online:  # if a new tab has been opened
+			online.add(self.online_entry)
+			first_tab = True
+
+		if first_tab:  # Login event, sent user names to all
+			online_user_names_mes = self.online_user_names(LOGIN_EVENT, online)
+			self.publish(online_user_names_mes)
+		else:  # Send user names to self
+			online_user_names_mes = self.online_user_names(REFRESH_USER_EVENT, online)
+			self.safe_write(online_user_names_mes)
+		# send username
+		self.safe_write(self.default(self.sender_name, GET_MINE_USERNAME_EVENT))
+
+	def set_username(self, session_key):
 		session = session_engine.SessionStore(session_key)
 		try:
 			self.user_id = session["_auth_user_id"]
@@ -174,20 +202,18 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				self.sender_name = id_generator(8)
 				session[SESSION_USER_VAR_NAME] = self.sender_name
 				session.save()
-		connections.setdefault(self.sender_name, set()).add(self)
-		#  send login action only if there's 1 tab open = 1 just added web socket
-		if len(connections[self.sender_name]) == 1:
-			self.refresh_online_user_list(LOGIN_EVENT)
-		else:  # if a new tab has been opened
-			online_user_names = self.online_user_names(REFRESH_USER_EVENT)
-			self.safe_write(online_user_names)
-		self.refresh_client_username()
 
-	def refresh_online_user_list(self, action):
-		# Creates dict { username: sex, }
-		message = self.online_user_names(
-			action)
-		self.emit(message)
+	def open(self):
+		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
+		if sessionStore.exists(session_key):
+			self.async_redis.connect()
+			self.set_username(session_key)
+			self.listen()
+			self.listen_private()
+			self.add_online_user()
+		else:
+			logger.warn('Incorrect session id: %s' % session_key)
+			self.close(403, "Session key is empty or session doesn't exist")
 
 	def check_origin(self, origin):
 		"""
@@ -200,9 +226,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		browser_domain = browser_set.split(':')[0]
 		return browser_domain == origin_domain
 
-	@staticmethod
-	def emit(message):
-		c.publish(MAIN_CHANNEL, json.dumps(message))
+	def publish(self, message, channel=REDIS_MAIN_CHANNEL):
+		self.async_redis.publish(channel, json.dumps(message)) # TODO why did I choose static??? global connection publish
 
 	def emit_to_user(self, message, receiver_name=None):
 		"""
@@ -211,8 +236,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		if receiver_name is None:
 			receiver_name = self.sender_name
-		for socket in connections[receiver_name]:
-			socket.safe_write(message)
+		self.publish(message, REDIS_USER_CHANNEL_PREFIX % self.sender_name)
 
 	def emit_to_user_and_self(self, message, receiver_name):
 		if receiver_name != self.sender_name:
@@ -238,10 +262,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.write_message(message)
 		except tornado.websocket.WebSocketClosedError:
 			logger.error(
-				'Socket "{0}" closed bug, this "{1}" connections: "{2}" message: "{3}"'.format(
+				'Socket "{0}" closed bug, this "{1}" message: "{2}"'.format(
 					str(self),
 					self.sender_name,
-					str(connections),
 					str(message)))
 
 	def detect_message_type(self, receiver_name):
@@ -279,7 +302,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		else:
 			prepared_message = self.send_anonymous(content, receiver_name)
 		if send_to_all:
-			self.emit(prepared_message)
+			self.publish(prepared_message)
 		else:
 			self.emit_to_user_and_self(prepared_message, receiver_name)
 
@@ -287,58 +310,43 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		:type message: dict
 		"""
-		new_username = message[GET_MINE_USERNAME_EVENT]
-		try:
-			check_user(new_username)
-			if new_username in connections.keys():
-				raise ValidationError('Anonymous already has this name')
-			# replace username in dict usernames
-			connections[new_username] = connections.pop(self.sender_name)
-			# change sender_name
-			old_username, self.sender_name = self.sender_name, new_username
-
-			session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
-			session = session_engine.SessionStore(session_key)
-			session[SESSION_USER_VAR_NAME] = new_username
-			session.save()
-			message = self.change_user_nickname(old_username)
-			self.emit(message)
-			self.refresh_client_username()
-		except ValidationError as e:
-			self.safe_write(self.default(str(e.message)))
+		logger.warn("not supported change username yet") # TODO
+		# new_username = message[GET_MINE_USERNAME_EVENT]
+		# try:
+		# 	check_user(new_username)
+		# 	if new_username in connections.keys():
+		# 		raise ValidationError('Anonymous already has this name')
+		# 	# replace username in dict usernames
+		# 	connections[new_username] = connections.pop(self.sender_name)
+		# 	# change sender_name
+		# 	old_username, self.sender_name = self.sender_name, new_username
+		#
+		# 	session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
+		# 	session = session_engine.SessionStore(session_key)
+		# 	session[SESSION_USER_VAR_NAME] = new_username
+		# 	session.save()
+		# 	message = self.change_user_nickname(old_username)
+		# 	self.publish(message)
+		# 	message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
+		# 	self.emit_to_user(message)
+		# except ValidationError as e:
+		# 	self.safe_write(self.default(str(e.message)))
 
 	def on_message(self, json_message):
-		if not json_message:
-			return
-		if len(json_message) > MAX_MESSAGE_SIZE:
-			return
-		message = json.loads(json_message)
-		action = message.get(EVENT_VAR_NAME)
-		if action == GET_MINE_USERNAME_EVENT:
-			self.change_username(message)
-		elif action == GET_MESSAGES_EVENT:
-			self.process_get_messages(message)
-		elif action == SEND_MESSAGE_EVENT:  # None
-			self.process_send_message(message)
-		else:
-			raise Exception('unclassified message type:' + json_message)
+		if json_message and len(json_message) < MAX_MESSAGE_SIZE:
+			message = json.loads(json_message)
+			self.process_message[message.get(EVENT_VAR_NAME)](message)
 
 	def on_close(self):
-		if self.client.subscribed:
-			self.client.unsubscribe(MAIN_CHANNEL)
-			self.client.disconnect()
-		if not self.sender_name:
-			return
 		try:
-			connections[self.sender_name].discard(self)
-			# if set is empty = last web socket is gone
-			if not connections[self.sender_name]:
-				# set is empty but the key is still in dict, so username present in list
-				del connections[self.sender_name]
-				self.refresh_online_user_list(LOGOUT_EVENT)
-		# if dict doesn't have element
-		except KeyError:
-			pass
+			sync_redis.hdel(REDIS_ONLINE_USERS, id(self))
+			message = self.online_user_names(LOGOUT_EVENT)
+			self.publish(message)
+		finally:
+			if self.async_redis.subscribed:
+				self.async_redis.unsubscribe(REDIS_MAIN_CHANNEL)
+				self.async_redis.unsubscribe(REDIS_USER_CHANNEL_PREFIX % self.sender_name)
+			self.async_redis.disconnect()
 
 	def process_get_messages(self, data):
 		"""

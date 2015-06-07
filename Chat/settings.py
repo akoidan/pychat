@@ -152,7 +152,7 @@ LOGGING = {
 		'file': {
 			'level': 'DEBUG',
 			'class': 'Chat.logger_handlers.RequestRotatingFileLogger',
-			'filename': join(BASE_DIR, 'chat.log'),
+			'filename': join(BASE_DIR, 'log/', 'chat.log'),
 			'formatter': 'verbose',
 		},
 		'console': {
