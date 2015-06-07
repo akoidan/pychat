@@ -52,8 +52,11 @@ REDIS_USER_CHANNEL_PREFIX = 'user%s'
 REDIS_ONLINE_USERS = "online_users"
 
 
-# global connection to publishing messages
+# global connection to read synchronously
 sync_redis = redis.StrictRedis()
+# Redis connection cannot be shared between publishers and subscribers.
+async_redis_publisher = tornadoredis.Client()
+async_redis_publisher.connect()
 
 sessionStore = session_engine.SessionStore()
 
@@ -64,6 +67,7 @@ CONNECTION_POOL = tornadoredis.ConnectionPool(
 	max_connections=500,
 	wait_for_available=True)
 
+
 class MessagesCreator(object):
 
 	def __init__(self):
@@ -73,14 +77,17 @@ class MessagesCreator(object):
 
 	def parse_redis_users(self, user_names):
 		user_sex_dict = {}
-		for a in user_names:
-			b = a.split(':')
-			user_sex_dict[b[0]] = b[1]
+		if user_names is not None:
+			for a in user_names:
+				b = a.split(':')
+				user_sex_dict[b[0]] = b[1]
+		else:
+			raise NotImplementedError("Usernames in None")  # TODO
 		return user_sex_dict
 
 	def online_user_names(self, action, user_names=set(sync_redis.hvals(REDIS_ONLINE_USERS))):
 
-		user_sex_dict = self.parse_redis_users(user_names)# no place for set(None) coz at least 1 user has been added on join
+		user_sex_dict = self.parse_redis_users(user_names)
 		default_message = self.default(user_sex_dict, action)
 		default_message.update({
 			USER_VAR_NAME: self.sender_name,
@@ -170,17 +177,17 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	def add_online_user(self):
 		online = sync_redis.hvals(REDIS_ONLINE_USERS)
-		self.async_redis.hset(REDIS_ONLINE_USERS, id(self), self.online_entry) # TODO check if it works
+		self.async_redis.hset(REDIS_ONLINE_USERS, id(self), self.online_entry)  # TODO check if it works
 		first_tab = False
 		if not online:  # if he's the only user online
-			online = [self.online_entry,]
+			online = [self.online_entry, ]
 		elif self.sender_name not in online:  # if a new tab has been opened
 			online.add(self.online_entry)
 			first_tab = True
 
 		if first_tab:  # Login event, sent user names to all
 			online_user_names_mes = self.online_user_names(LOGIN_EVENT, online)
-			self.publish(online_user_names_mes)
+			async_redis_publisher.publish(REDIS_MAIN_CHANNEL, online_user_names_mes)
 		else:  # Send user names to self
 			online_user_names_mes = self.online_user_names(REFRESH_USER_EVENT, online)
 			self.safe_write(online_user_names_mes)
@@ -226,8 +233,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		browser_domain = browser_set.split(':')[0]
 		return browser_domain == origin_domain
 
-	def publish(self, message, channel=REDIS_MAIN_CHANNEL):
-		self.async_redis.publish(channel, json.dumps(message)) # TODO why did I choose static??? global connection publish
+	@staticmethod
+	def publish(message, channel=REDIS_MAIN_CHANNEL):
+		async_redis_publisher.publish(channel, json.dumps(message))
 
 	def emit_to_user(self, message, receiver_name=None):
 		"""
@@ -247,6 +255,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				self.emit_to_user(
 					self.default("Can't send the message, User has left the chat."),
 				)
+		# TODO send message to myself doesn't work
 		self.emit_to_user(message)
 
 	def new_message(self, message):
@@ -310,7 +319,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		:type message: dict
 		"""
-		logger.warn("not supported change username yet") # TODO
+		logger.warn("not supported change username yet")  # TODO
 		# new_username = message[GET_MINE_USERNAME_EVENT]
 		# try:
 		# 	check_user(new_username)

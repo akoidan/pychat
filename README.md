@@ -42,6 +42,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* create tornado class in tornadoapp, put there all tornado logic
 * logger
 * change anonymous message color
 * Use `localStorage` to store messages and don't load it twice and check if there are new messages after connection lost
