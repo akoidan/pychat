@@ -49,6 +49,7 @@ SEND_MESSAGE_EVENT = 'send'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
 REDIS_MAIN_CHANNEL = 'main'
 REDIS_USER_CHANNEL_PREFIX = 'user:%s'
+REDIS_USER_FORMAT = '%s:%s'
 REDIS_ONLINE_USERS = "online_users"
 
 
@@ -75,20 +76,14 @@ class MessagesCreator(object):
 		self.sender_name = ''
 		self.user_id = 0
 
-	def parse_redis_users(self, user_names):
-		user_sex_dict = {}
-		if user_names is not None:
-			for a in user_names:
-				b = a.split(':')
-				user_sex_dict[b[0]] = b[1]
-		else:
-			raise NotImplementedError("Usernames in None")  # TODO
-		return user_sex_dict
-
-	def online_user_names(self, action, user_names=set(sync_redis.hvals(REDIS_ONLINE_USERS))):
-
-		user_sex_dict = self.parse_redis_users(user_names)
-		default_message = self.default(user_sex_dict, action)
+	def online_user_names(self, action, user_names_dict=None):
+		"""
+		:user_names - fetches from redis if None
+		:type user_names_dict: dict
+		"""
+		if user_names_dict is None:
+			user_names_dict = MessagesHandler.get_online_from_redis()  # TODO WTF OOP??
+		default_message = self.default(user_names_dict, action)
 		default_message.update({
 			USER_VAR_NAME: self.sender_name,
 			GENDER_VAR_NAME: self.sex
@@ -97,7 +92,7 @@ class MessagesCreator(object):
 
 	def change_user_nickname(self, old_nickname):
 		default_message = self.online_user_names(CHANGE_ANONYMOUS_NAME_EVENT)
-		default_message.update({OLD_NAME_VAR_NAME: old_nickname})
+		default_message[OLD_NAME_VAR_NAME] = old_nickname
 		return default_message
 
 	@staticmethod
@@ -108,14 +103,13 @@ class MessagesCreator(object):
 			TIME_VAR_NAME: datetime.datetime.now().strftime("%H:%M:%S")
 		}
 
-	def create_send_message(self, message):
+	@classmethod
+	def create_send_message(cls, message):
 		"""
 		:type message: Messages
 		"""
-		result = self.get_message(message)
-		result.update({
-			EVENT_VAR_NAME: SEND_MESSAGE_EVENT
-		})
+		result = cls.get_message(message)
+		result[EVENT_VAR_NAME] = SEND_MESSAGE_EVENT
 		return result
 
 	@staticmethod
@@ -128,13 +122,14 @@ class MessagesCreator(object):
 			MESSAGE_ID_VAR_NAME: message.id,
 		}
 
-	def get_messages(self, messages):
+	@classmethod
+	def get_messages(cls, messages):
 		"""
 		:type messages: list[Messages]
 		:type messages: QuerySet[Messages]
 		"""
 		return {
-			CONTENT_VAR_NAME: [self.create_send_message(message) for message in messages],
+			CONTENT_VAR_NAME: [cls.create_send_message(message) for message in messages],
 			EVENT_VAR_NAME: GET_MESSAGES_EVENT
 		}
 
@@ -163,21 +158,31 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	@tornado.gen.engine
 	def listen(self):
-		yield tornado.gen.Task(self.async_redis.subscribe, [REDIS_MAIN_CHANNEL, REDIS_USER_CHANNEL_PREFIX % self.sender_name])
+		yield tornado.gen.Task(
+			self.async_redis.subscribe, [
+				REDIS_MAIN_CHANNEL,
+				REDIS_USER_CHANNEL_PREFIX % self.sender_name
+			])
 		self.async_redis.listen(self.new_message)
 
-	@property
-	def online_entry(self):
-		return '%s:%s' % (self.sender_name, self.sex)
+	@staticmethod
+	def get_online_from_redis():
+		online = sync_redis.hvals(REDIS_ONLINE_USERS)
+		result = {}
+		if online:
+			for a in online:
+				b = a.decode('utf-8').split(':')
+				result[b[0]] = b[1]
+		return result
+
 
 	def add_online_user(self):
-		online = sync_redis.hvals(REDIS_ONLINE_USERS)
-		self.async_redis.hset(REDIS_ONLINE_USERS, id(self), self.online_entry)  # TODO check if it works
+		online = self.get_online_from_redis()
+		stringified_user = REDIS_USER_FORMAT % (self.sender_name, self.sex)
+		async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), stringified_user)  # TODO async doesn't work
 		first_tab = False
-		if not online:  # if he's the only user online
-			online = [self.online_entry, ]
-		elif self.sender_name not in online:  # if a new tab has been opened
-			online.add(self.online_entry)
+		if self.sender_name not in online:  # if a new tab has been opened
+			online[self.sender_name] = self.sex
 			first_tab = True
 
 		if first_tab:  # Login event, sent user names to all
@@ -187,7 +192,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			online_user_names_mes = self.online_user_names(REFRESH_USER_EVENT, online)
 			self.safe_write(online_user_names_mes)
 		# send username
-		self.safe_write(self.default(self.sender_name, GET_MINE_USERNAME_EVENT))
+		prepared_message = json.dumps(self.default(self.sender_name, GET_MINE_USERNAME_EVENT))
+		self.safe_write(prepared_message)
 
 	def set_username(self, session_key):
 		session = session_engine.SessionStore(session_key)
