@@ -48,7 +48,7 @@ LOGOUT_EVENT = 'left'
 SEND_MESSAGE_EVENT = 'send'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
 REDIS_MAIN_CHANNEL = 'main'
-REDIS_USER_CHANNEL_PREFIX = 'user%s'
+REDIS_USER_CHANNEL_PREFIX = 'user:%s'
 REDIS_ONLINE_USERS = "online_users"
 
 
@@ -219,7 +219,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.listen_private()
 			self.add_online_user()
 		else:
-			logger.warn('Incorrect session id: %s' % session_key)
+			logger.warn('Incorrect session id: %s', session_key)
 			self.close(403, "Session key is empty or session doesn't exist")
 
 	def check_origin(self, origin):
@@ -271,10 +271,10 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.write_message(message)
 		except tornado.websocket.WebSocketClosedError:
 			logger.error(
-				'Socket "{0}" closed bug, this "{1}" message: "{2}"'.format(
-					str(self),
-					self.sender_name,
-					str(message)))
+				'Socket "%s" closed bug, this "%s" message: "%s"',
+				str(self),
+				self.sender_name,
+				str(message))
 
 	def detect_message_type(self, receiver_name):
 		"""

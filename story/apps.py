@@ -1,11 +1,5 @@
 import xml.etree.ElementTree as etree
 
-#python2\3
-try:
-	from builtins import FileNotFoundError
-except ImportError :
-	FileNotFoundError = IOError
-
 from django.apps import AppConfig
 
 from Chat.settings import BASE_DIR
