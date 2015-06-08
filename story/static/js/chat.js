@@ -95,7 +95,7 @@ $(document).ready(function () {
 	$(document).keydown(keyDownLoadUpFunction);
 	$(window).on("blur focus", function (e) {
 		var prevType = $(this).data("prevType");
-
+		// TODO not enought event type, when user switch tab and doesn't focus the window event won't fire
 		if (prevType != e.type) {   //  reduce double fire issues
 			switch (e.type) {
 				case "focus":
