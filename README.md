@@ -42,6 +42,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* 
 * create tornado class in tornadoapp, put there all tornado logic
 * logger
 * change anonymous message color

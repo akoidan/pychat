@@ -192,7 +192,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			online_user_names_mes = self.online_user_names(REFRESH_USER_EVENT, online)
 			self.safe_write(online_user_names_mes)
 		# send username
-		prepared_message = json.dumps(self.default(self.sender_name, GET_MINE_USERNAME_EVENT))
+		prepared_message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
 		self.safe_write(prepared_message)
 
 	def set_username(self, session_key):
@@ -244,7 +244,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		if receiver_name is None:
 			receiver_name = self.sender_name
-		self.publish(message, REDIS_USER_CHANNEL_PREFIX % self.sender_name)
+		self.publish(message, REDIS_USER_CHANNEL_PREFIX % receiver_name)
 
 	def emit_to_user_and_self(self, message, receiver_name):
 		if receiver_name != self.sender_name:
@@ -268,6 +268,10 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		:type self: MessagesHandler
 		"""
 		try:
+			if type(message) is dict:
+				message = json.dumps(message)
+			if type(message) is not str:
+				raise ValueError('Wrong message type : %s' % str(message))
 			self.write_message(message)
 		except tornado.websocket.WebSocketClosedError:
 			logger.error(
