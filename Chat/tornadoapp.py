@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 import sys
+from django.core.exceptions import ValidationError
 
 import redis
 from django.db.models import Q
@@ -22,7 +23,7 @@ except ImportError:
 
 from Chat.settings import MAX_MESSAGE_SIZE
 from story.models import UserProfile, Messages
-from story.registration_utils import is_blank, id_generator
+from story.registration_utils import is_blank, id_generator, check_user
 
 PY3 = sys.version > '3'
 
@@ -97,7 +98,7 @@ class MessagesCreator(object):
 		:type old_nickname: str
 		:type online: dict
 		"""
-		default_message = self.online_user_names(CHANGE_ANONYMOUS_NAME_EVENT, online)
+		default_message = self.online_user_names(online, CHANGE_ANONYMOUS_NAME_EVENT)
 		default_message[OLD_NAME_VAR_NAME] = old_nickname
 		return default_message
 
@@ -271,11 +272,16 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				self.emit_to_user(
 					self.default("Can't send the message, User has left the chat."),
 				)
-		# TODO send message to myself doesn't work
 		self.emit_to_user(message)
 
 	def new_message(self, message):
 		if type(message.body) is not int:  # subscribe event
+			if self.sex == ANONYMOUS_GENDER:
+				parsed_message = json.loads(message.body) # TODO really parse every single message for 1 action?
+				if parsed_message[EVENT_VAR_NAME] == GET_MINE_USERNAME_EVENT:
+					self.sender_name = parsed_message[CONTENT_VAR_NAME]
+					stringified_user = REDIS_USER_FORMAT % (self.sender_name, self.sex)
+					async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), stringified_user)
 			self.safe_write(message.body)
 
 	def safe_write(self, message):
@@ -339,25 +345,24 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		:type message: dict
 		"""
-		logger.warn("not supported change username yet")  # TODO
 		new_username = message[GET_MINE_USERNAME_EVENT]
 		try:
 			check_user(new_username)
-			if new_username in connections.keys():
+			online = self.get_online_from_redis()
+			if new_username in online:
 				raise ValidationError('Anonymous already has this name')
-			# replace username in dict usernames
-			connections[new_username] = connections.pop(self.sender_name)
-			# change sender_name
-			old_username, self.sender_name = self.sender_name, new_username
-
 			session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
 			session = session_engine.SessionStore(session_key)
 			session[SESSION_USER_VAR_NAME] = new_username
 			session.save()
-			message = self.change_user_nickname(old_username)
-			self.publish(message)
-			message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
-			self.emit_to_user(message)
+
+			del online[self.sender_name]
+			online[new_username] = self.sex
+			message_all = self.change_user_nickname(self.sender_name, online)
+			message_me = self.default(new_username, GET_MINE_USERNAME_EVENT)
+
+			self.publish(message_all)
+			self.emit_to_user(message_me)
 		except ValidationError as e:
 			self.safe_write(self.default(str(e.message)))
 
