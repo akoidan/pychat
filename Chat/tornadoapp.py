@@ -187,7 +187,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 		if first_tab:  # Login event, sent user names to all
 			online_user_names_mes = self.online_user_names(LOGIN_EVENT, online)
-			async_redis_publisher.publish(REDIS_MAIN_CHANNEL, online_user_names_mes)
+			self.publish(online_user_names_mes)
 		else:  # Send user names to self
 			online_user_names_mes = self.online_user_names(REFRESH_USER_EVENT, online)
 			self.safe_write(online_user_names_mes)
