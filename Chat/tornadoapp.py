@@ -163,12 +163,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	@tornado.gen.engine
 	def listen(self):
-		yield tornado.gen.Task(self.async_redis.subscribe, REDIS_MAIN_CHANNEL)
-		self.async_redis.listen(self.new_message)
-
-	@tornado.gen.engine
-	def listen_private(self):
-		yield tornado.gen.Task(self.async_redis.subscribe, REDIS_USER_CHANNEL_PREFIX % self.sender_name)
+		yield tornado.gen.Task(self.async_redis.subscribe, [REDIS_MAIN_CHANNEL, REDIS_USER_CHANNEL_PREFIX % self.sender_name])
 		self.async_redis.listen(self.new_message)
 
 	@property
@@ -216,7 +211,6 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.async_redis.connect()
 			self.set_username(session_key)
 			self.listen()
-			self.listen_private()
 			self.add_online_user()
 		else:
 			logger.warn('Incorrect session id: %s', session_key)
