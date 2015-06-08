@@ -94,6 +94,7 @@ class MessagesCreator(object):
 
 	def change_user_nickname(self, old_nickname, online):
 		"""
+		set self.sender_name to new nickname before call it
 		:return: {action : changed, content: { Nick: male, NewName: alien}, oldName : OldName, user: NewName}
 		:type old_nickname: str
 		:type online: dict
@@ -126,7 +127,8 @@ class MessagesCreator(object):
 	def get_message(message):
 		"""
 		:param message:
-		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "alien"}, "sex": "alien", "user": "tRD6emzs", "time": "20:48:57"}
+		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "alien"},
+		"sex": "alien", "user": "tRD6emzs", "time": "20:48:57"}
 		"""
 		return {
 			USER_VAR_NAME: message.sender.username,
@@ -165,7 +167,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		super(MessagesHandler, self).__init__(*args, **kwargs)
 		self.async_redis = tornadoredis.Client()
 		self.process_message = {
-			GET_MINE_USERNAME_EVENT: self.change_username,
+			GET_MINE_USERNAME_EVENT: self.process_change_username,
 			GET_MESSAGES_EVENT: self.process_get_messages,
 			SEND_MESSAGE_EVENT: self.process_send_message,
 		}
@@ -186,12 +188,12 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		online = sync_redis.hvals(REDIS_ONLINE_USERS)
 		result = {}
+		# redis stores REDIS_USER_FORMAT, so parse them
 		if online:
-			for a in online:
-				b = a.decode('utf-8').split(':')
-				result[b[0]] = b[1]
+			for raw_user_sex in online:
+				user_sex = raw_user_sex.decode('utf-8').split(':')
+				result[user_sex[0]] = user_sex[1]
 		return result
-
 
 	def add_online_user(self):
 		online = self.get_online_from_redis()
@@ -274,14 +276,20 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				)
 		self.emit_to_user(message)
 
+	# TODO really parse every single message for 1 action?
+	def check_and_finish_change_name(self, message):
+		if self.sex == ANONYMOUS_GENDER:
+			parsed_message = json.loads(message.body)
+			if parsed_message[EVENT_VAR_NAME] == GET_MINE_USERNAME_EVENT:
+				self.async_redis.unsubscribe(REDIS_USER_CHANNEL_PREFIX % self.sender_name)  # TODO is it allowed?
+				self.sender_name = parsed_message[CONTENT_VAR_NAME]
+				self.async_redis.subscribe(REDIS_USER_CHANNEL_PREFIX % self.sender_name)
+				stringified_user = REDIS_USER_FORMAT % (self.sender_name, self.sex)
+				async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), stringified_user)
+
 	def new_message(self, message):
 		if type(message.body) is not int:  # subscribe event
-			if self.sex == ANONYMOUS_GENDER:
-				parsed_message = json.loads(message.body) # TODO really parse every single message for 1 action?
-				if parsed_message[EVENT_VAR_NAME] == GET_MINE_USERNAME_EVENT:
-					self.sender_name = parsed_message[CONTENT_VAR_NAME]
-					stringified_user = REDIS_USER_FORMAT % (self.sender_name, self.sex)
-					async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), stringified_user)
+			self.check_and_finish_change_name(message)
 			self.safe_write(message.body)
 
 	def safe_write(self, message):
@@ -341,7 +349,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		else:
 			self.emit_to_user_and_self(prepared_message, receiver_name)
 
-	def change_username(self, message):
+	def process_change_username(self, message):
 		"""
 		:type message: dict
 		"""
@@ -358,7 +366,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 			del online[self.sender_name]
 			online[new_username] = self.sex
-			message_all = self.change_user_nickname(self.sender_name, online)
+			old_name = self.sender_name
+			self.sender_name = new_username  # change_user_name required new_username in sender_name
+			message_all = self.change_user_nickname(old_name, online)
 			message_me = self.default(new_username, GET_MINE_USERNAME_EVENT)
 
 			self.publish(message_all)
