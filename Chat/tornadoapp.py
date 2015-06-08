@@ -58,6 +58,7 @@ sync_redis = redis.StrictRedis()
 # Redis connection cannot be shared between publishers and subscribers.
 async_redis_publisher = tornadoredis.Client()
 async_redis_publisher.connect()
+sync_redis.delete(REDIS_ONLINE_USERS)  # TODO move it somewhere else
 
 sessionStore = session_engine.SessionStore()
 
@@ -76,13 +77,11 @@ class MessagesCreator(object):
 		self.sender_name = ''
 		self.user_id = 0
 
-	def online_user_names(self, action, user_names_dict=None):
+	def online_user_names(self, user_names_dict, action):
 		"""
 		:user_names - fetches from redis if None
 		:type user_names_dict: dict
 		"""
-		if user_names_dict is None:
-			user_names_dict = MessagesHandler.get_online_from_redis()  # TODO WTF OOP??
 		default_message = self.default(user_names_dict, action)
 		default_message.update({
 			USER_VAR_NAME: self.sender_name,
@@ -90,10 +89,10 @@ class MessagesCreator(object):
 		})
 		return default_message
 
-	def change_user_nickname(self, old_nickname):
-		default_message = self.online_user_names(CHANGE_ANONYMOUS_NAME_EVENT)
-		default_message[OLD_NAME_VAR_NAME] = old_nickname
-		return default_message
+	# def change_user_nickname(self, old_nickname):
+	# 	default_message = self.online_user_names(CHANGE_ANONYMOUS_NAME_EVENT)
+	# 	default_message[OLD_NAME_VAR_NAME] = old_nickname
+	# 	return default_message
 
 	@staticmethod
 	def default(content, event=SYSTEM_MESSAGE_EVENT):
@@ -167,6 +166,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	@staticmethod
 	def get_online_from_redis():
+		"""
+		:rtype : dict
+		"""
 		online = sync_redis.hvals(REDIS_ONLINE_USERS)
 		result = {}
 		if online:
@@ -186,10 +188,10 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			first_tab = True
 
 		if first_tab:  # Login event, sent user names to all
-			online_user_names_mes = self.online_user_names(LOGIN_EVENT, online)
+			online_user_names_mes = self.online_user_names(online, LOGIN_EVENT)
 			self.publish(online_user_names_mes)
 		else:  # Send user names to self
-			online_user_names_mes = self.online_user_names(REFRESH_USER_EVENT, online)
+			online_user_names_mes = self.online_user_names(online, REFRESH_USER_EVENT)
 			self.safe_write(online_user_names_mes)
 		# send username
 		prepared_message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
@@ -352,9 +354,12 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	def on_close(self):
 		try:
-			sync_redis.hdel(REDIS_ONLINE_USERS, id(self))
-			message = self.online_user_names(LOGOUT_EVENT)
-			self.publish(message)
+			if self.sender_name:
+				sync_redis.hdel(REDIS_ONLINE_USERS, id(self))
+				online = self.get_online_from_redis()
+				if self.sender_name not in online:
+					message = self.online_user_names(online, LOGOUT_EVENT)
+					self.publish(message)
 		finally:
 			if self.async_redis.subscribed:
 				self.async_redis.unsubscribe(REDIS_MAIN_CHANNEL)
