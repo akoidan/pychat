@@ -1,13 +1,9 @@
 import datetime
 import json
 import logging
+import sys
+
 import redis
-
-try:
-	from urllib.parse import urlparse  # py2
-except ImportError:
-	from urlparse import urlparse  # py3
-
 from django.db.models import Q
 import tornado.web
 import tornado.websocket
@@ -19,10 +15,16 @@ import tornado.gen
 from django.conf import settings
 import tornadoredis
 
+try:
+	from urllib.parse import urlparse  # py2
+except ImportError:
+	from urlparse import urlparse  # py3
+
 from Chat.settings import MAX_MESSAGE_SIZE
 from story.models import UserProfile, Messages
 from story.registration_utils import is_blank, id_generator
 
+PY3 = sys.version > '3'
 
 session_engine = import_module(settings.SESSION_ENGINE)
 user_cookie_name = settings.USER_COOKIE_NAME
@@ -79,8 +81,8 @@ class MessagesCreator(object):
 
 	def online_user_names(self, user_names_dict, action):
 		"""
-		:user_names - fetches from redis if None
 		:type user_names_dict: dict
+		:return: { Nick: male, NewName: alien, Joana: female}
 		"""
 		default_message = self.default(user_names_dict, action)
 		default_message.update({
@@ -89,13 +91,21 @@ class MessagesCreator(object):
 		})
 		return default_message
 
-	# def change_user_nickname(self, old_nickname):
-	# 	default_message = self.online_user_names(CHANGE_ANONYMOUS_NAME_EVENT)
-	# 	default_message[OLD_NAME_VAR_NAME] = old_nickname
-	# 	return default_message
+	def change_user_nickname(self, old_nickname, online):
+		"""
+		:return: {action : changed, content: { Nick: male, NewName: alien}, oldName : OldName, user: NewName}
+		:type old_nickname: str
+		:type online: dict
+		"""
+		default_message = self.online_user_names(CHANGE_ANONYMOUS_NAME_EVENT, online)
+		default_message[OLD_NAME_VAR_NAME] = old_nickname
+		return default_message
 
 	@staticmethod
 	def default(content, event=SYSTEM_MESSAGE_EVENT):
+		"""
+		:return: {"action": event, "content": content, "time": "20:48:57"}
+		"""
 		return {
 			EVENT_VAR_NAME: event,
 			CONTENT_VAR_NAME: content,
@@ -113,6 +123,10 @@ class MessagesCreator(object):
 
 	@staticmethod
 	def get_message(message):
+		"""
+		:param message:
+		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "alien"}, "sex": "alien", "user": "tRD6emzs", "time": "20:48:57"}
+		"""
 		return {
 			USER_VAR_NAME: message.sender.username,
 			RECEIVER_USERNAME_VAR_NAME: None if message.receiver is None else message.receiver.username,
@@ -181,7 +195,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 	def add_online_user(self):
 		online = self.get_online_from_redis()
 		stringified_user = REDIS_USER_FORMAT % (self.sender_name, self.sex)
-		async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), stringified_user)  # TODO async doesn't work
+		async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), stringified_user)
 		first_tab = False
 		if self.sender_name not in online:  # if a new tab has been opened
 			online[self.sender_name] = self.sex
@@ -270,9 +284,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		:type self: MessagesHandler
 		"""
 		try:
-			if type(message) is dict:
+			if isinstance(message, dict):
 				message = json.dumps(message)
-			if type(message) is not str:
+			if not (isinstance(message, str) or (not PY3 and isinstance(message, unicode))):
 				raise ValueError('Wrong message type : %s' % str(message))
 			self.write_message(message)
 		except tornado.websocket.WebSocketClosedError:
@@ -326,26 +340,26 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		:type message: dict
 		"""
 		logger.warn("not supported change username yet")  # TODO
-		# new_username = message[GET_MINE_USERNAME_EVENT]
-		# try:
-		# 	check_user(new_username)
-		# 	if new_username in connections.keys():
-		# 		raise ValidationError('Anonymous already has this name')
-		# 	# replace username in dict usernames
-		# 	connections[new_username] = connections.pop(self.sender_name)
-		# 	# change sender_name
-		# 	old_username, self.sender_name = self.sender_name, new_username
-		#
-		# 	session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
-		# 	session = session_engine.SessionStore(session_key)
-		# 	session[SESSION_USER_VAR_NAME] = new_username
-		# 	session.save()
-		# 	message = self.change_user_nickname(old_username)
-		# 	self.publish(message)
-		# 	message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
-		# 	self.emit_to_user(message)
-		# except ValidationError as e:
-		# 	self.safe_write(self.default(str(e.message)))
+		new_username = message[GET_MINE_USERNAME_EVENT]
+		try:
+			check_user(new_username)
+			if new_username in connections.keys():
+				raise ValidationError('Anonymous already has this name')
+			# replace username in dict usernames
+			connections[new_username] = connections.pop(self.sender_name)
+			# change sender_name
+			old_username, self.sender_name = self.sender_name, new_username
+
+			session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
+			session = session_engine.SessionStore(session_key)
+			session[SESSION_USER_VAR_NAME] = new_username
+			session.save()
+			message = self.change_user_nickname(old_username)
+			self.publish(message)
+			message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
+			self.emit_to_user(message)
+		except ValidationError as e:
+			self.safe_write(self.default(str(e.message)))
 
 	def on_message(self, json_message):
 		if json_message and len(json_message) < MAX_MESSAGE_SIZE:
@@ -362,8 +376,10 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 					self.publish(message)
 		finally:
 			if self.async_redis.subscribed:
-				self.async_redis.unsubscribe(REDIS_MAIN_CHANNEL)
-				self.async_redis.unsubscribe(REDIS_USER_CHANNEL_PREFIX % self.sender_name)
+				self.async_redis.unsubscribe([
+					REDIS_MAIN_CHANNEL,
+					REDIS_USER_CHANNEL_PREFIX % self.sender_name
+				])
 			self.async_redis.disconnect()
 
 	def process_get_messages(self, data):
