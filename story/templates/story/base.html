@@ -12,38 +12,37 @@
 	{% block head %} {% endblock head %}
 </head>
 <body class="color-lor">
-<header>
-	<nav class="navbar-default navbar-inverse">
-		<div class="navbar-inner">
-			<div class="container-fluid" id = "container-fluid">
-				<ul class="nav navbar-nav">
-					<li>
-						<a href="{% url 'story.views.home' %}"><span
-								title="Go to the home page" class="glyphicon glyphicon-home text-primary"></span></a>
-					</li>
-					<li><a rel="nofollow"><span id="muteBtn" class="text-warning" title="Turn on or off sounds"
-														 onclick="mute();"></span></a>
-					</li>
-					<li>
-						<a href="https://github.com/Deathangel908/djangochat/issues/new"><span
-								title="Report an issue"
-								class="glyphicon glyphicon glyphicon-info-sign text-danger"></span></a>
-					</li>
-					{% block navbar %} {% endblock navbar %}
-				</ul>
-				<ul class="nav  navbar-nav pull-right">
-					<li >	<a rel="nofollow" style="font-size: 18px">Hello, <b><label id="userNameLabel"> {{ username }}</label></b></a></li>
-					{% if username %}
-						{% include "story/logout.html" %}
-					{% else %}
-						{% include "story/login.html" %}
-					{% endif %}
-				</ul>
-			</div>
+<nav class="navbar-default navbar-inverse">
+	<div class="navbar-inner">
+		<div class="container-fluid" id="container-fluid">
+			<ul class="nav navbar-nav">
+				<li>
+					<a href="{% url 'story.views.home' %}"><span
+							title="Go to the home page" class="glyphicon glyphicon-home text-primary"></span></a>
+				</li>
+				<li><a><span id="muteBtn" class="text-warning" title="Turn on or off sounds"
+													 onclick="mute();"></span></a>
+				</li>
+				<li>
+					<a href="https://github.com/Deathangel908/djangochat/issues/new"><span
+							title="Report an issue"
+							class="glyphicon glyphicon glyphicon-info-sign text-danger"></span></a>
+				</li>
+				{% block navbar %} {% endblock navbar %}
+			</ul>
+			<ul class="nav  navbar-nav pull-right">
+				<li><a style="font-size: 18px">Hello, <b><label
+						id="userNameLabel"> {{ username }}</label></b></a></li>
+				{% if username %}
+					{% include "story/logout.html" %}
+				{% else %}
+					{% include "story/login.html" %}
+				{% endif %}
+			</ul>
 		</div>
-		<!-- /.container-fluid -->
-	</nav>
-</header>
+	</div>
+	<!-- /.container-fluid -->
+</nav>
 {% block content %} {% endblock %} {% csrf_token %}
 </body>
 </html>

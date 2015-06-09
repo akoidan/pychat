@@ -2,21 +2,21 @@
 {% block head %}
 	{% load staticfiles %}
 	<script src="{% static "js/chat.js" %}"></script>
-	<audio id="chatIncoming" src="{% static 'sounds/ChatIncoming.wav' %}" preload="auto"></audio>
-	<audio id="chatOutgoing" src="{% static 'sounds/ChatOutgoing.wav' %}" preload="auto"></audio>
-	<audio id="chatLogin" src="{% static 'sounds/ChatLogin.wav' %}" preload="auto"></audio>
-	<audio id="chatLogout" src="{% static 'sounds/ChatLogout.wav' %}" preload="auto"></audio>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}">
 {% endblock head %}
 {% block navbar %}
-	<li><a rel="nofollow" id="hide"><span
+	<li><a><span
 			class="glyphicon glyphicon-list-alt text-info" title="Show all users"
 			onclick="toggleRoom()"></span></a></li>
-		<li><a rel="nofollow" id="hide"><span
+		<li><a><span
 			class="glyphicon glyphicon-floppy-remove" title="CLear local history"
 			onclick="clearLocalHistory()"></span></a></li>
 {% endblock navbar %}
 {% block content %}
+	<audio id="chatIncoming" src="{% static 'sounds/ChatIncoming.wav' %}" preload="auto"></audio>
+	<audio id="chatOutgoing" src="{% static 'sounds/ChatOutgoing.wav' %}" preload="auto"></audio>
+	<audio id="chatLogin" src="{% static 'sounds/ChatLogin.wav' %}" preload="auto"></audio>
+	<audio id="chatLogout" src="{% static 'sounds/ChatLogout.wav' %}" preload="auto"></audio>
 	<div class="wrapper">
 		{#		<div class="fadeout"></div>#}
 		<div class="chat-wrapper">
