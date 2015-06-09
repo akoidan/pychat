@@ -279,7 +279,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 	# TODO really parse every single message for 1 action?
 	def check_and_finish_change_name(self, message):
 		if self.sex == ANONYMOUS_GENDER:
-			parsed_message = json.loads(message.body)
+			parsed_message = json.loads(message)
 			if parsed_message[EVENT_VAR_NAME] == GET_MINE_USERNAME_EVENT:
 				self.async_redis.unsubscribe(REDIS_USER_CHANNEL_PREFIX % self.sender_name)  # TODO is it allowed?
 				self.sender_name = parsed_message[CONTENT_VAR_NAME]
@@ -289,8 +289,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	def new_message(self, message):
 		if type(message.body) is not int:  # subscribe event
-			self.check_and_finish_change_name(message)
 			self.safe_write(message.body)
+			self.check_and_finish_change_name(message.body)
 
 	def safe_write(self, message):
 		"""
@@ -371,8 +371,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			message_all = self.change_user_nickname(old_name, online)
 			message_me = self.default(new_username, GET_MINE_USERNAME_EVENT)
 
+			self.emit_to_user(message_me)  # TODO really twice???
+			self.emit_to_user(message_me, old_name)  # emit twice instead ton of checks (because of resubscribe)
 			self.publish(message_all)
-			self.emit_to_user(message_me)
 		except ValidationError as e:
 			self.safe_write(self.default(str(e.message)))
 
