@@ -5,42 +5,35 @@
 	<title>Simple web chat</title> {% load staticfiles %}
 	<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
-	<script src="{% static "js/jquery.js" %}"></script>
+{#	<script src="{% static "js/vanilla.js" %}"></script>#}
 	<script src="{% static "js/base.js" %}"></script>
-	<script src="{% static "js/jquery.cookie.js" %}"></script>
 	<script src="{% static "js/bootstrap.min.js" %}"></script>
 	{% block head %} {% endblock head %}
 </head>
 <body class="color-lor">
-<nav class="navbar-default navbar-inverse">
-	<div class="navbar-inner">
-		<div class="container-fluid" id="container-fluid">
-			<ul class="nav navbar-nav">
-				<li>
-					<a href="{% url 'story.views.home' %}"><span
-							title="Go to the home page" class="glyphicon glyphicon-home text-primary"></span></a>
-				</li>
-				<li><a><span id="muteBtn" class="text-warning" title="Turn on or off sounds"
-													 onclick="mute();"></span></a>
-				</li>
-				<li>
-					<a href="https://github.com/Deathangel908/djangochat/issues/new"><span
-							title="Report an issue"
-							class="glyphicon glyphicon glyphicon-info-sign text-danger"></span></a>
-				</li>
-				{% block navbar %} {% endblock navbar %}
-			</ul>
-			<ul class="nav  navbar-nav pull-right">
-				<li><a style="font-size: 18px">Hello, <b><label
-						id="userNameLabel"> {{ username }}</label></b></a></li>
-				{% if username %}
-					{% include "story/logout.html" %}
-				{% else %}
-					{% include "story/login.html" %}
-				{% endif %}
-			</ul>
-		</div>
-	</div>
+<nav class="navbar-default">
+	<ul class="navbarList">
+		<li>
+			<a href="{% url 'story.views.home' %}"><span
+					title="Go to the home page" class="glyphicon glyphicon-home text-primary"></span></a>
+		</li>
+		<li><a><span id="muteBtn" class="text-warning" title="Turn on or off sounds"
+						 onclick="mute();"></span></a>
+		</li>
+		<li>
+			<a href="https://github.com/Deathangel908/djangochat/issues/new"><span
+					title="Report an issue"
+					class="glyphicon glyphicon glyphicon-info-sign text-danger"></span></a>
+		</li>
+		{% block navbar %} {% endblock navbar %}
+		<li><a style="font-size: 18px">Hello, <b><label
+				id="userNameLabel"> {{ username }}</label></b></a></li>
+		{% if username %}
+			{% include "story/logout.html" %}
+		{% else %}
+			{% include "story/login.html" %}
+		{% endif %}
+	</ul>
 	<!-- /.container-fluid -->
 </nav>
 {% block content %} {% endblock %} {% csrf_token %}

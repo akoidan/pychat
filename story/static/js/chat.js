@@ -5,44 +5,33 @@ var othersHeader = '<font class="message-header-others">';
 var systemHeader = '<font class="message-header-system">';
 var endHeader = '</font>';
 var contentStyle = '<font class="message-text-style">';
-
 // browser tab notification
 var newMessagesCount = 0;
 var isCurrentTabActive = true;
-
 //localStorage  key
 var STORAGE_NAME = 'main';
-
 //current top message id for detecting from what
 var headerId;
-
 //  div that contains messages
 var chatBoxDiv;
-
 //sound
 var chatIncoming;
 var chatOutgoing;
 var chatLogin;
 var chatLogout;
-
 // current username
 var loggedUser;
-
 // div for user list appending
 var chatRoomsDiv;
-
 // input type that contains text for sending message
 var userMessage;
-
+var sendButton;
 // div that contains receiver id, icons, etc
 var userSendMessageTo;
-
 //user to send message input type text
 var receiverId;
-
 // navbar label with current user name
 var userNameLabel;
-
 // keyboard and mouse handlers for loadUpHistory
 var keyDownLoadUpFunction;
 var mouseWheelLoadUpFunction;
@@ -51,25 +40,26 @@ var mouseWheelLoadUpFunction;
 var ws;
 
 
-$(document).ready(function () {
-	chatBoxDiv = $('#chatbox');
-	userMessage = $("#usermsg");
-	chatRoomsDiv = $('#chatrooms');
-	userNameLabel = $("#userNameLabel");
-	userSendMessageTo = $('#userSendMessageTo');
+document.addEventListener("DOMContentLoaded", function() {
+	chatBoxDiv = document.getElementById("chatbox");
+	userMessage = document.getElementById("usermsg");
+	chatRoomsDiv = document.getElementById("chatrooms");
+	userNameLabel = document.getElementById("userNameLabel");
+	userSendMessageTo = document.getElementById("userSendMessageTo");
 	chatIncoming = document.getElementById("chatIncoming");
 	chatOutgoing = document.getElementById("chatOutgoing");
 	chatLogin = document.getElementById("chatLogin");
 	chatLogout = document.getElementById("chatLogout");
-	userSendMessageTo.hide();
-	receiverId = $('#receiverId');
+	sendButton = document.getElementById("sendButton");
+	userSendMessageTo.style.display = "none";
+	receiverId = document.getElementById("receiverId");
 	if (!"WebSocket" in window) {
 		chatBoxDiv.html("<h1>Your browser doesn't support Web socket, chat options will be unavalible<h1>");
 		return;
 	}
-	userMessage.keypress(function (event) {
+	userMessage.onkeypress = (function (event) {
 		if (event.keyCode === 13) {
-			$("#sendButton").click();
+			sendButton.click();
 		}
 	});
 
@@ -79,7 +69,7 @@ $(document).ready(function () {
 			loadUpHistory(5);
 		}
 	};
-	chatBoxDiv.bind('mousewheel DOMMouseScroll', mouseWheelLoadUpFunction);
+	chatBoxDiv.addEventListener('mousewheel DOMMouseScroll', mouseWheelLoadUpFunction);
 
 	// Those events are removed when loadUpHistory() reaches top
 	keyDownLoadUpFunction = function (e) {
@@ -92,8 +82,8 @@ $(document).ready(function () {
 		}
 	};
 
-	$(document).keydown(keyDownLoadUpFunction);
-	$(window).on("blur focus", function (e) {
+	document.onkeypress = keyDownLoadUpFunction;
+	window.addEventListener("blur focus", function (e) {
 		var prevType = $(this).data("prevType");
 		// TODO not enought event type, when user switch tab and doesn't focus the window event won't fire
 		if (prevType != e.type) {   //  reduce double fire issues
@@ -141,7 +131,7 @@ function loadMessagesFromLocalStorage() {
 }
 
 function start_chat_ws() {
-	ws = new WebSocket($.cookie('api'));
+	ws = new WebSocket(window.readCookie('api').replace('"', ''));
 	ws.onmessage = webSocketMessage;
 	ws.onclose = function () {
 		console.error(new Date() + "Connection to WebSocket is lost, trying to reconnect");
@@ -163,7 +153,7 @@ function encodeHTML(html) {
 
 function loadUsers(usernames) {
 	console.log(new Date() + "Load user names: " + Object.keys(usernames));
-	chatRoomsDiv.empty();
+	chatRoomsDiv.innerHTML = "";
 	var allUsers = '<ul >';
 	var icon;
 	for (var username in usernames) {
@@ -175,21 +165,20 @@ function loadUsers(usernames) {
 			} else {
 				icon = '<span class="glyphicon icon-dog green"/>';
 			}
-			allUsers += '<li onclick="showUserSendMess($(this).text());">'
+			allUsers += '<li onclick="showUserSendMess(this.innerHTML);">'
 			+ username + icon + '</li>';
 		}
 	}
 	allUsers += ('</ul>');
-	chatRoomsDiv.append(allUsers);
+	chatRoomsDiv.insertAdjacentHTML('beforeend', allUsers);
 }
 
 // Used by {@link loadUsers}
 function showUserSendMess(username) {
-	userSendMessageTo.show();
+
 	// Empty sets display to none
-	userSendMessageTo.css("display", "table-cell");
-	receiverId.empty();
-	receiverId.append(username);
+	userSendMessageTo.style.display = "table-cell";
+	receiverId.innerHTML = username;
 }
 
 
@@ -202,13 +191,13 @@ function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayed
 		document.title = newMessagesCount + " new message";
 	}
 	if (isTopDirection) {
-		chatBoxDiv.prepend(message);
+		chatBoxDiv.insertAdjacentHTML('beforebegin', message);
 	} else {
-		var oldscrollHeight = chatBoxDiv[0].scrollHeight;
-		chatBoxDiv.append(message);
-		var newscrollHeight = chatBoxDiv[0].scrollHeight;
+		var oldscrollHeight = chatBoxDiv.scrollHeight;
+		chatBoxDiv.insertAdjacentHTML('beforeend', message);
+		var newscrollHeight = chatBoxDiv.scrollHeight;
 		if (newscrollHeight > oldscrollHeight) {
-			chatBoxDiv.scrollTop(newscrollHeight);
+			chatBoxDiv.scrollTop = newscrollHeight;
 		}
 	}
 }
@@ -279,7 +268,7 @@ function refreshOnlineUsers(data) {
 function setUsername(data) {
 	console.log(new Date() + "UserName has been set to " + data['content']);
 	loggedUser = data['content'];
-	userNameLabel.text(loggedUser);
+	userNameLabel.innerHTML = loggedUser;
 }
 
 
@@ -389,7 +378,7 @@ function sendMessage(usermsg, username) {
 	};
 
 	if (sendToServer(messageRequest)) {
-		userMessage.val("");
+		userMessage.value = "";
 	}
 }
 
@@ -412,10 +401,10 @@ function toggleRoom() {
 
 function clearLocalHistory() {
 	localStorage.removeItem(STORAGE_NAME);
-	chatBoxDiv.html('');
+	chatBoxDiv.innerHTML = '';
 }
 
 function hideUserSendToName() {
-	receiverId.empty();
-	userSendMessageTo.hide();
+	receiverId.innerHTML = '';
+	userSendMessageTo.style.display = 'none';
 }
