@@ -26,18 +26,18 @@ function login() {
 
 }
 
-$(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function() {
 	//Handles menu drop down
-	var loginForm = $('#login-form');
-	loginForm.click(function (e) {
+	var loginForm = document.getElementById('login-form');
+	loginForm.onclick = function (e) { // TODO prevent login dropdown from closing
 		e.stopPropagation();
-	});
+	};
 	// login by enter
-	loginForm.keypress(function (event) {
+	loginForm.onkeypress = function (event) {
 		if (event.keyCode === 13) {
 			login();
 		}
-	});
+	};
 
 	var editUserName = function (label) {
 		label.hide();
@@ -68,8 +68,8 @@ $(document).ready(function () {
 		});
 	};
 
-	$("#userNameLabel").click(function () {
-		editUserName($(this));
-	});
+	document.getElementById("userNameLabel").onclick = function () {
+		editUserName(this);
+	};
 
 });

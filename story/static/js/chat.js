@@ -10,6 +10,7 @@ var newMessagesCount = 0;
 var isCurrentTabActive = true;
 //localStorage  key
 var STORAGE_NAME = 'main';
+var STORAGE_USER = 'user';
 //current top message id for detecting from what
 var headerId;
 //  div that contains messages
@@ -117,6 +118,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
 
 function loadMessagesFromLocalStorage() {
+	loggedUser = localStorage.getItem(STORAGE_USER);
 	var jsonData =  localStorage.getItem(STORAGE_NAME);
 	if (jsonData != null) {
 		var parsedData = JSON.parse(jsonData);
@@ -292,22 +294,23 @@ function handleGetMessages(message) {
 
 // TODO too many json parses
 function saveMessageToStorage(newItem) {
-	var loggedMessageTypes = ['system', 'joined', 'messages', 'changed', 'left', 'send', 'me' ];
-	if (loggedMessageTypes.indexOf(newItem['action']) < 0 ) {
-		return
-	}
+	var loggedMessageTypes = ['system', 'joined', 'messages', 'changed', 'left', 'send'];
+	if (loggedMessageTypes.indexOf(newItem['action']) > 0) {
 
-	var jsonMessages = localStorage.getItem(STORAGE_NAME);
-	var messages;
-	if (jsonMessages != null) {
-		messages = JSON.parse(jsonMessages);
-	} else {
-		messages = [];
-	}
-	messages.push(newItem);
-	var newArray = JSON.stringify(messages);
+		var jsonMessages = localStorage.getItem(STORAGE_NAME);
+		var messages;
+		if (jsonMessages != null) {
+			messages = JSON.parse(jsonMessages);
+		} else {
+			messages = [];
+		}
+		messages.push(newItem);
+		var newArray = JSON.stringify(messages);
 
-	localStorage.setItem(STORAGE_NAME, newArray);
+		localStorage.setItem(STORAGE_NAME, newArray);
+	} else if ( newItem['action'] == 'me') {
+		localStorage.setItem(STORAGE_USER,  newItem['content']);
+	}
 }
 
 function handlePreparedWSMessage(data) {
@@ -401,6 +404,7 @@ function toggleRoom() {
 
 function clearLocalHistory() {
 	localStorage.removeItem(STORAGE_NAME);
+	localStorage.removeItem(STORAGE_USER);
 	chatBoxDiv.innerHTML = '';
 }
 
