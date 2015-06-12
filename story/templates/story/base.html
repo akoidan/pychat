@@ -4,26 +4,23 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>Simple web chat</title> {% load staticfiles %}
 	<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
-	<link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.min.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/fontello.css' %}">
 {#	<script src="{% static "js/vanilla.js" %}"></script>#}
 	<script src="{% static "js/base.js" %}"></script>
-	<script src="{% static "js/bootstrap.min.js" %}"></script>
 	{% block head %} {% endblock head %}
 </head>
 <body class="color-lor">
+
 <nav class="navbar-default">
 	<ul class="navbarList">
 		<li>
-			<a href="{% url 'story.views.home' %}"><span
-					title="Go to the home page" class="glyphicon glyphicon-home text-primary"></span></a>
+			<a href="{% url 'story.views.home' %}"><i class="icon-home" title="Go home"></i></a>
 		</li>
-		<li><a><span id="muteBtn" class="text-warning" title="Turn on or off sounds"
-						 onclick="mute();"></span></a>
+		<li><i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds"
+						 onclick="mute();"></i>
 		</li>
 		<li>
-			<a href="https://github.com/Deathangel908/djangochat/issues/new"><span
-					title="Report an issue"
-					class="glyphicon glyphicon glyphicon-info-sign text-danger"></span></a>
+			<a href="https://github.com/Deathangel908/djangochat/issues/new"><i class="icon-help-circled"></i></a>
 		</li>
 		{% block navbar %} {% endblock navbar %}
 		<li><a style="font-size: 18px">Hello, <b><label

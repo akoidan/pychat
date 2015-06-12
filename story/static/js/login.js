@@ -5,25 +5,15 @@ function login() {
 		password: document.getElementById("password").value
 	};
 	console.log(d + "Attempting to login, credentials: " + credentials);
-	$.ajax({
-		url: 'auth',
-		type: 'POST',
-		data: credentials,
-		success: function (data) {
-			var d = new Date();
-			console.log(d + "Server response success:" + data);
-			if (data === 'update') {
-				window.location.href = '/';
-			} else {
-				alert(data);
-			}
-		},
-		failure: function (data) {
-			var d = new Date();
-			console.log(d + "can't login into system, response: " + data);
+	doPost('auth', credentials, function (data) {
+		var d = new Date();
+		console.log(d + "Server response success:" + data);
+		if (data === 'update') {
+			window.location.href = '/';
+		} else {
+			alert(data);
 		}
 	});
-
 }
 
 document.addEventListener("DOMContentLoaded", function() {

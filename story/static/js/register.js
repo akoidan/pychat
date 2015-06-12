@@ -9,7 +9,7 @@
 	var passRegex = /^\S.+\S$/;
 
 
-$(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function() {
 	password = document.getElementById("rpassword");
 	userName = document.getElementById("rusername");
 	repeatPassword = document.getElementById("repeatpassword");
@@ -25,7 +25,7 @@ function register() {
 		alert("Passwords don't match");
 		return;
 	}
-	var datad = $('form').serialize();
+	var datad = document.getElementById('register-form').serialize();
 	console.log(new Date() + "Sending registering request to server, data:" + datad);
 	$.ajax({
 		type: 'POST',

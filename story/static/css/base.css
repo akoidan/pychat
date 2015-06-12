@@ -8,6 +8,10 @@ ul {
 	font-size: 25px;
 }
 
+.navbarList > li {
+	 display:inline;
+}
+
 span:hover {
 	/*Hand and shadow on hover on navbar elements*/
 	cursor: pointer;
