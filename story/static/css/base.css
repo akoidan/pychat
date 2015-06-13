@@ -5,17 +5,22 @@ ul {
 
 .navbar-default {
 	/*Icons navbar size*/
-	font-size: 25px;
+	font-size: 35px;
 }
 
+.navbarList {
+	margin: 0;
+	padding: 10px;
+}
 .navbarList > li {
 	 display:inline;
 }
 
-span:hover {
-	/*Hand and shadow on hover on navbar elements*/
+[class*="icon-"]:hover {
 	cursor: pointer;
-	text-shadow: 0 0 0.2em #87F, 0 0 0.2em #87F;
+}
+button:hover {
+	cursor: pointer;
 }
 
 /*Remove annoying chromium autofill yellow background*/

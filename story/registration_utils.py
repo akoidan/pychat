@@ -52,6 +52,8 @@ def check_user(username):
 	:raises ValidationError exception if username is not valid
 	"""
 	# Skip javascript validation, only summary message
+	if is_blank(username):
+		raise ValidationError("User name can't be empty")
 	if not re.match(USERNAME_REGEX, username):
 		raise ValidationError("User doesn't match regex " + USERNAME_REGEX)
 	try:

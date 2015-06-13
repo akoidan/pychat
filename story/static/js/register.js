@@ -1,23 +1,24 @@
-	var password;
-	var userName;
-	var repeatPassword;
-	var passwordCheck;
-	var userNameCheck;
-	var emailCheck;
-	var email;
-	var repeatPasswordCheck;
-	var passRegex = /^\S.+\S$/;
+var password;
+var userName;
+var repeatPassword;
+var passwordCheck;
+var userNameCheck;
+var emailCheck;
+var email;
+var repeatPasswordCheck;
+var passRegex = /^\S.+\S$/;
+var mailbox;
 
-
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 	password = document.getElementById("rpassword");
 	userName = document.getElementById("rusername");
 	repeatPassword = document.getElementById("repeatpassword");
 	passwordCheck = document.getElementById("password_check");
 	userNameCheck = document.getElementById("username_check");
 	emailCheck = document.getElementById("email_check");
-	email =  document.getElementById("email");
+	email = document.getElementById("email");
 	repeatPasswordCheck = document.getElementById("repeatpassword_check");
+	mailbox = document.getElementById("mailbox");
 });
 
 function register() {
@@ -26,22 +27,11 @@ function register() {
 		return;
 	}
 	var datad = document.getElementById('register-form').serialize();
-	console.log(new Date() + "Sending registering request to server, data:" + datad);
-	$.ajax({
-		type: 'POST',
-		url: '/register',
-		data: datad,
-		success: function (data) {
-			console.log(new Date() + "Register server response:" + data);
-			if (data === 'Account created') {
-				window.location.href = '/';
-			} else {
-				alert(data);
-			}
-		},
-		failure: function (data) {
-			var d = new Date();
-			console.log(d + "Register server has failed, response: " + data);
+	doPost('/register', datad, function (data) {
+		if (data === 'Account created') {
+			window.location.href = '/';
+		} else {
+			alert(data);
 		}
 	});
 }
@@ -62,32 +52,19 @@ function validatePassword() {
 function validateUser() {
 	userName.value = userName.value.trim();
 	var username = userName.value;
-	if(username === "") {
+	if (username === "") {
 		setError(userNameCheck, "Error: Username cannot be blank!");
-	} else if(username.length > 16) {
+	} else if (username.length > 16) {
 		setError(userNameCheck, "Username shouldn't be longer than 16 symbols");
 	} else if (!userRegex.test(username)) {
 		setError(userNameCheck, "only letters, numbers and underscores!");
-	}	else {
-		console.log(new Date() + "Sending validate user request: " + username);
-		$.ajax({
-			type: 'POST',
-			url: "/validate_user",
-			data: {
-				username: username
-			},
-			success: function (data) {
-				console.log(new Date() + "Validate user response: " + data);
-				// hardcoded ok
-				if (data === 'ok') {
-					setSuccess(userNameCheck);
-				} else {
-					setError(userNameCheck, data)
-
-				}
-			},
-			failure: function (data) {
-				console.log(new Date() + "can't validate user, response: " + data);
+	} else {
+		doPost('/validate_user', {username: username}, function (data) {
+			// hardcoded ok
+			if (data === 'ok') {
+				setSuccess(userNameCheck);
+			} else {
+				setError(userNameCheck, data)
 			}
 		});
 	}
@@ -103,32 +80,19 @@ function setSuccess(element) {
 	element.innerHTML = "ok!";
 }
 
-function validateEmail() {
-	var mail = email.value;
-	console.log(new Date() + "Sending validate email request: " + mail);
-	$.ajax({
-		type: 'POST',
-		url: "/validate_email",
-		data: {
-			email: mail
-		},
-		success: function (data) {
-			console.log(new Date() + "Validate email response: " + data);
+	function validateEmail() {
+		var mail = email.value;
+		doPost('/validate_email', {email: mail} , function (data) {
 			if (data === 'ok') {
 				setSuccess(emailCheck);
 			} else {
 				setError(emailCheck, data);
-				if (!$("#mailbox").prop('checked')) {
+				if (!mailbox.checked) {
 					emailCheck.style.color = "";
 				}
 			}
-		},
-		failure: function (data) {
-			var d = new Date();
-			console.log(d + "can't validate email, response: " + data);
-		}
-	});
-}
+		});
+	}
 
 
 function passwordsMatch() {

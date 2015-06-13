@@ -1,0 +1,16 @@
+.right {
+	float:right;
+}
+
+.dropdown div {
+	position: absolute;
+	display: none;
+	float: left;
+	right: 0;
+
+}
+
+.dropdown:hover div {
+	display: block;
+	background: #000000;
+}

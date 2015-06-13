@@ -43,7 +43,8 @@ def validate_user(request):
 	Validates user during registration
 	"""
 	try:
-		registration_utils.check_user(request.POST.get('username'))
+		username = request.POST.get('username')
+		registration_utils.check_user(username)
 		# hardcoded ok check in register.js
 		message = settings.VALIDATION_IS_OK
 	except ValidationError as e:

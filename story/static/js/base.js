@@ -1,6 +1,15 @@
 var sound = 0;
 var userRegex = /^[a-zA-Z-_0-9]{1,16}$/;
 
+document.addEventListener("DOMContentLoaded", function () {
+	mute();
+	if (typeof InstallTrigger !== 'undefined') {
+		console.log("Ops there's no scrollbar for firefox, so it looks a bit ugly")
+	}
+	// xhr.setRequestHeader("X-CSRFToken", $.cookie("csrftoken")); // TODO
+});
+
+
 function mute() {
 	if (sound < 3) {
 		sound ++;
@@ -24,13 +33,6 @@ function mute() {
 	}
 }
 
-document.addEventListener("DOMContentLoaded", function () {
-	mute();
-	if (typeof InstallTrigger !== 'undefined') {
-		console.log("Ops there's no scrollbar for firefox, so it looks a bit ugly")
-	}
-	// xhr.setRequestHeader("X-CSRFToken", $.cookie("csrftoken")); // TODO
-});
 
 (function () {
 	var cookies;
@@ -50,10 +52,41 @@ document.addEventListener("DOMContentLoaded", function () {
 })();
 
 
-function doPost(url, params, callback ) {
+function doPost(url, params, callback) {
 	var r = new XMLHttpRequest();
-	r.setRequestHeader("X-CSRFToken", window.readCookie("csrftoken"));
 	r.open("POST", url, true);
-	r.onreadystatechange = callback;
-	r.send(params);
+	var data = new FormData(params);
+	for (var key in params) {
+		if (params.hasOwnProperty(key)) {
+			data.append(key, params[key]);
+		}
+	}
+	r.setRequestHeader("X-CSRFToken", window.readCookie("csrftoken"));
+	r.onreadystatechange = function () {
+		if (r.readyState == 4) {
+			if (r.status == 200) {
+				console.log(getDebugMessage("RESPONSE: {} ; response: {};", url, r.response));
+				callback(r.response);
+			} else {
+				console.error(getDebugMessage("RESPONSE: {} ; status: {} ; response: {};", url, r.response, r.status));
+			}
+		}
+	};
+	console.log(getDebugMessage("POST: {} ; params: {}", url, JSON.stringify(params)));
+	r.send(data);
+}
+
+
+/** Formats message for debug,
+ * Usage getDebugMessage("{} is {}", 'war', 'bad');
+ * out: war is bad
+ *  */
+function getDebugMessage() {
+	var now = new Date();
+	// first argument is format, others are params
+	for (var i = 1; i < arguments.length; i++) {
+		arguments[0] = arguments[0].replace('{}', arguments[i]);
+	}
+	var time = [now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds()].join(':');
+	return time + ': ' + arguments[0];
 }

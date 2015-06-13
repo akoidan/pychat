@@ -40,6 +40,8 @@ var mouseWheelLoadUpFunction;
 //main single socket for handling realtime messages
 var ws;
 
+//console.(\w+)\(new Date\(\)\s\+\s(".*")\);
+//console.$1(getDebugMessage($2);
 
 document.addEventListener("DOMContentLoaded", function() {
 	chatBoxDiv = document.getElementById("chatbox");
@@ -136,14 +138,14 @@ function start_chat_ws() {
 	ws = new WebSocket(window.readCookie('api').replace('"', ''));
 	ws.onmessage = webSocketMessage;
 	ws.onclose = function () {
-		console.error(new Date() + "Connection to WebSocket is lost, trying to reconnect");
+		console.error(getDebugMessage("Connection to WebSocket is lost, trying to reconnect"));
 		// Try to reconnect in 5 seconds
 		setTimeout(function () {
 			start_chat_ws()
 		}, 5000);
 	};
 	ws.onopen = function () {
-		console.log(new Date() + "Connection to WebSocket established");
+		console.log(getDebugMessage("Connection to WebSocket established"));
 	}
 }
 
@@ -154,21 +156,28 @@ function encodeHTML(html) {
 
 
 function loadUsers(usernames) {
-	console.log(new Date() + "Load user names: " + Object.keys(usernames));
+	console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
 	chatRoomsDiv.innerHTML = "";
 	var allUsers = '<ul >';
 	var icon;
 	for (var username in usernames) {
 		if (usernames.hasOwnProperty(username)) {
-			if (usernames[username] === "Male") {
-				icon = '<span class="glyphicon icon-user green"/>'
-			} else if (usernames[username] === "Female") {
-				icon = '<span class="glyphicon icon-girl green"/>'
-			} else {
-				icon = '<span class="glyphicon icon-dog green"/>';
+			switch (usernames[username]) {
+				case "Male":
+					icon = '<i class="icon-man"></i>';
+					break;
+				case "Female":
+					icon = '<i class="icon-girl"></i>';
+					break;
+				case "Alien":
+					icon = '<i class="icon-anonymous"></i>';
+					break;
+				default :
+					icon = '<i class="icon-user-secret"></i>';
+					break;
 			}
 			allUsers += '<li onclick="showUserSendMess(this.innerHTML);">'
-			+ username + icon + '</li>';
+			+ icon + username + '</li>';
 		}
 	}
 	allUsers += ('</ul>');
@@ -268,18 +277,18 @@ function refreshOnlineUsers(data) {
 
 
 function setUsername(data) {
-	console.log(new Date() + "UserName has been set to " + data['content']);
+	console.log(getDebugMessage("UserName has been set to {}", data['content']));
 	loggedUser = data['content'];
 	userNameLabel.innerHTML = loggedUser;
 }
 
 
 function handleGetMessages(message) {
-	console.log(new Date() + ': appending messages to top');
+	console.log(getDebugMessage('appending messages to top'));
 
 	// This check should fire only once, because requests aren't being sent when there are no event for them, thus no responses
 	if (message.length === 0) {
-		console.log(new Date() + ': Requesting messages has reached the top, removing loadUpHistoryEvent handlers');
+		console.log(getDebugMessage('Requesting messages has reached the top, removing loadUpHistoryEvent handlers'));
 		$(document).off('keydown', keyDownLoadUpFunction);
 		chatBoxDiv.off('mousewheel DOMMouseScroll', mouseWheelLoadUpFunction);
 		return;
@@ -339,7 +348,7 @@ function handlePreparedWSMessage(data) {
 }
 function webSocketMessage(message) {
 	var jsonData = message.data;
-	console.log(new Date() + jsonData);
+	console.log(getDebugMessage(jsonData));
 	var data = JSON.parse(jsonData);
 
 	//cache some messages to localStorage
@@ -362,7 +371,7 @@ function appendMessage(data) {
 function sendToServer(messageRequest) {
 	var jsonRequest = JSON.stringify(messageRequest);
 	if (ws.readyState != WebSocket.OPEN) {
-		console.log(new Date() + "Web socket is closed. Can't send message: " + jsonRequest);
+		console.log(getDebugMessage("Web socket is closed. Can't send message: " + jsonRequest));
 		return false;
 	} else {
 		ws.send(jsonRequest);

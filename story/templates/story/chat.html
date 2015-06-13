@@ -23,12 +23,12 @@
 			<div id="chatrooms"></div>
 			<div id="chatbox"></div>
 		</div>
-		<div class="create-message-wrapper">
+
 			<div id="userSendMessageTo">
 				<div id="receiverId" class="inputsdiv"></div>
-				<span class="glyphicon glyphicon-remove-circle inputsdiv" onclick="hideUserSendToName();"></span>
+				<i class="icon-cancel" onclick="hideUserSendToName();"></i>
 			</div>
-			<div class="inputsdiv" style="width: 100%;">
+			<div class="inputsdiv message-text-holder">
 				<input name="usermsg" type="text" class="inputs" id="usermsg"/>
 			</div>
 			<div class="inputsdiv">
@@ -38,6 +38,6 @@
 						value="Send"/>
 			</div>
 		</div>
-	</div>
+
 {% endblock %}
 
