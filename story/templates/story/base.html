@@ -10,7 +10,7 @@
 	{% block head %} {% endblock head %}
 </head>
 <body class="color-lor">
-
+<table></table>
 <nav class="navbar-default">
 	<ul class="navbarList">
 		<li>
@@ -23,13 +23,12 @@
 			<a href="https://github.com/Deathangel908/djangochat/issues/new"><i class="icon-help-circled"></i></a>
 		</li>
 		{% block navbar %} {% endblock navbar %}
-		<li><a style="font-size: 18px">Hello, <b><label
-				id="userNameLabel"> {{ username }}</label></b></a></li>
 		{% if username %}
 			{% include "story/logout.html" %}
 		{% else %}
 			{% include "story/login.html" %}
 		{% endif %}
+			<li class="right username">Hello, <b><label id="userNameLabel">{{ username }}  </label></b></li>
 	</ul>
 	<!-- /.container-fluid -->
 </nav>

@@ -123,7 +123,7 @@ def register(request):
 			rp.get('username'), rp.get('password'), rp.get('email'), rp.get('mailbox'))
 		check_user(username)
 		check_password(password)
-		if verify_email:
+		if verify_email == 'Y':
 			check_email(email)
 		user = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
 		user.set_password(password)
@@ -133,7 +133,7 @@ def register(request):
 		djangologin(request, auth_user)
 		# register,js redirect if message = 'Account created'
 		message = settings.ACCOUNT_CREATED_EVENT
-		if verify_email:
+		if verify_email == 'Y':
 			send_email_verification(user, request.get_host())
 	except ValidationError as e:
 		message = e.message

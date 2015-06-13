@@ -59,9 +59,9 @@ class UserProfile(AbstractBaseUser):
 	@property
 	def sex_str(self):
 		return {
-			1: 'Female',
-			2: 'Male',
-			0: None
+			0: None,
+			1: 'Male',
+			2: 'Female',
 		}[self.sex]
 
 	@sex_str.setter

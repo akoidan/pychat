@@ -1,16 +1,17 @@
-.right {
-	float:right;
-}
+
 
 .dropdown div {
 	position: absolute;
 	display: none;
 	float: left;
 	right: 0;
-
+	background: #000000;
 }
 
 .dropdown:hover div {
 	display: block;
-	background: #000000;
+}
+
+.username {
+	font-size: 26px;
 }

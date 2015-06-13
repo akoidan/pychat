@@ -5,12 +5,23 @@ ul {
 
 .navbar-default {
 	/*Icons navbar size*/
-	font-size: 35px;
+	font-size: 26px;
+	background-color: rgb(34, 34, 34);
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.right {
+	float:right;
 }
 
 .navbarList {
 	margin: 0;
-	padding: 10px;
+	padding: 6px;
 }
 .navbarList > li {
 	 display:inline;
@@ -97,6 +108,8 @@ html, body {
 	background: rgba(0, 0, 0, 0);
 	border: none !important;
 	margin: 0 0;
+	font-size: 25px; /*icons are 26 px + border, the bigger size will shit everything to bot*/
+	padding: 0;
 }
 
 /*::-moz-selection {  Code for Firefox*/

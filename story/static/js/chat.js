@@ -23,7 +23,7 @@ var chatLogout;
 // current username
 var loggedUser;
 // div for user list appending
-var chatRoomsDiv;
+var chatRoomsTable;
 // input type that contains text for sending message
 var userMessage;
 var sendButton;
@@ -46,7 +46,7 @@ var ws;
 document.addEventListener("DOMContentLoaded", function() {
 	chatBoxDiv = document.getElementById("chatbox");
 	userMessage = document.getElementById("usermsg");
-	chatRoomsDiv = document.getElementById("chatrooms");
+	chatRoomsTable = document.getElementById("chatroomtables");
 	userNameLabel = document.getElementById("userNameLabel");
 	userSendMessageTo = document.getElementById("userSendMessageTo");
 	chatIncoming = document.getElementById("chatIncoming");
@@ -56,13 +56,26 @@ document.addEventListener("DOMContentLoaded", function() {
 	sendButton = document.getElementById("sendButton");
 	userSendMessageTo.style.display = "none";
 	receiverId = document.getElementById("receiverId");
+	chatRoomsTable.onclick = function (event) {
+		event = event || window.event;
+		var target = event.target || event.srcElement;
+
+		while (target != chatRoomsTable) { // ( ** )
+			if (target.nodeName == 'TD') { // ( * )
+				if (target.cellIndex == 1) { // name is second
+					showUserSendMess(target.innerHTML);
+				}
+			}
+			target = target.parentNode
+		}
+	};
 	if (!"WebSocket" in window) {
 		chatBoxDiv.html("<h1>Your browser doesn't support Web socket, chat options will be unavalible<h1>");
 		return;
 	}
 	userMessage.onkeypress = (function (event) {
 		if (event.keyCode === 13) {
-			sendButton.click();
+			sendMessage(userMessage.value, receiverId.innerHTML);
 		}
 	});
 
@@ -126,7 +139,7 @@ function loadMessagesFromLocalStorage() {
 		var parsedData = JSON.parse(jsonData);
 		// don't make sound on loadHistory
 		var savedSoundStatus = sound;
-		sound = false;
+		sound = 0;
 		for (var i = 0; i < parsedData.length; i++) {
 			handlePreparedWSMessage(parsedData[i]);
 		}
@@ -156,9 +169,11 @@ function encodeHTML(html) {
 
 
 function loadUsers(usernames) {
+	if (!usernames) {
+		return;
+	}
 	console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
-	chatRoomsDiv.innerHTML = "";
-	var allUsers = '<ul >';
+	var allUsers = '';
 	var icon;
 	for (var username in usernames) {
 		if (usernames.hasOwnProperty(username)) {
@@ -176,25 +191,23 @@ function loadUsers(usernames) {
 					icon = '<i class="icon-user-secret"></i>';
 					break;
 			}
-			allUsers += '<li onclick="showUserSendMess(this.innerHTML);">'
-			+ icon + username + '</li>';
+			allUsers += '<tr><td>' + icon + '</td> <td>' + username + '</td><tr>';
 		}
 	}
-	allUsers += ('</ul>');
-	chatRoomsDiv.insertAdjacentHTML('beforeend', allUsers);
+	chatRoomsTable.innerHTML = allUsers;
 }
 
 // Used by {@link loadUsers}
 function showUserSendMess(username) {
 
 	// Empty sets display to none
-	userSendMessageTo.style.display = "table-cell";
+	userSendMessageTo.style.display = "inline-block";
 	receiverId.innerHTML = username;
 }
 
 
 function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayedUsername, isTopDirection) {
-	var messageHeader = headerStyle + ' (' + time + ') <b>' + displayedUsername + '</b>: ' + endHeader;
+	var messageHeader = headerStyle + '(' + time + ') <b>' + displayedUsername + '</b>: ' + endHeader;
 	var messageContent = contentStyle + htmlEncodedContent + endHeader;
 	var message = '<p>' + messageHeader + messageContent + "</p>";
 	if (!isCurrentTabActive) {
@@ -235,18 +248,7 @@ function printMessage(data, isTopDirection) {
 }
 
 
-function checkAndPlay(element) {
-	if (element.readyState && sound) {
-		element.pause();
-		// TODO currentType is not set sometimes
-		element.currentTime = 0;
-		element.play();
-	}
-}
-
-
-function refreshOnlineUsers(data) {
-	loadUsers(data['content']);
+function printRefreshUserNameToChat(data) {
 	var message;
 	var action = data['action'];
 	if (action === 'changed') {
@@ -259,7 +261,7 @@ function refreshOnlineUsers(data) {
 	} else if (action !== 'online_users') {
 		if (data['user'] == loggedUser) {
 			message = 'You have ' + action + ' the chat';
-		} else if (data['sex'] == 'alien') {
+		} else if (data['sex'] == 'Alien') {
 			message = 'Anonymous <b>' + data['user'] + '</b> has ' + action + ' the chat.';
 		} else {
 			message = 'User <b>' + data['user'] + '</b> has ' + action + ' the chat.';
@@ -303,22 +305,32 @@ function handleGetMessages(message) {
 
 // TODO too many json parses
 function saveMessageToStorage(newItem) {
-	var loggedMessageTypes = ['system', 'joined', 'messages', 'changed', 'left', 'send'];
-	if (loggedMessageTypes.indexOf(newItem['action']) > 0) {
+	switch (newItem['action']){
+		case 'me':
+			localStorage.setItem(STORAGE_USER,  newItem['content']);
+			break;
+		case 'joined':
+		case 'changed':
+		case 'left':
+			delete newItem['content']; // don't store usernames in db
+		case 'system': // continue from 3 top events:
+		case 'messages':
+		case 'send':
+			var jsonMessages = localStorage.getItem(STORAGE_NAME);
+			var messages;
+			if (jsonMessages != null) {
+				messages = JSON.parse(jsonMessages);
+			} else {
+				messages = [];
+			}
+			messages.push(newItem);
+			var newArray = JSON.stringify(messages);
 
-		var jsonMessages = localStorage.getItem(STORAGE_NAME);
-		var messages;
-		if (jsonMessages != null) {
-			messages = JSON.parse(jsonMessages);
-		} else {
-			messages = [];
-		}
-		messages.push(newItem);
-		var newArray = JSON.stringify(messages);
-
-		localStorage.setItem(STORAGE_NAME, newArray);
-	} else if ( newItem['action'] == 'me') {
-		localStorage.setItem(STORAGE_USER,  newItem['content']);
+			localStorage.setItem(STORAGE_NAME, newArray);
+			break;
+		default:
+			console.log(getDebugMessage("message won't be saved". newItem)); // TODO stringtrify?)))
+		break;
 	}
 }
 
@@ -331,7 +343,8 @@ function handlePreparedWSMessage(data) {
 		case 'left':
 		case 'online_users':
 		case 'changed':
-			refreshOnlineUsers(data);
+			printRefreshUserNameToChat(data);
+			loadUsers(data['content']);
 			break;
 		case 'me':
 			setUsername(data);
@@ -351,10 +364,10 @@ function webSocketMessage(message) {
 	console.log(getDebugMessage(jsonData));
 	var data = JSON.parse(jsonData);
 
-	//cache some messages to localStorage
-	saveMessageToStorage(data);
-
 	handlePreparedWSMessage(data);
+
+		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
+	saveMessageToStorage(data);
 }
 
 
@@ -379,13 +392,13 @@ function sendToServer(messageRequest) {
 	}
 }
 
-function sendMessage(usermsg, username) {
+function sendMessage(usermsg, receiver) {
 	if (usermsg == null || usermsg === '') {
 		return;
 	}
 	var messageRequest = {
 		content: usermsg,
-		receiver:  username,
+		receiver:  receiver,
 		action:  'send'
 	};
 
@@ -408,14 +421,21 @@ function loadUpHistory(count) {
 
 
 function toggleRoom() {
-	chatRoomsDiv.toggle();
+	if (chatRoomsTable.style.display == 'block' || chatRoomsTable.style.display == '') {
+		chatRoomsTable.style.display = 'none';
+	}
+	else {
+		chatRoomsTable.style.display = 'block';
+	}
 }
 
 function clearLocalHistory() {
 	localStorage.removeItem(STORAGE_NAME);
 	localStorage.removeItem(STORAGE_USER);
 	chatBoxDiv.innerHTML = '';
+	console.log(getDebugMessage('History has been cleared'));
 }
+
 
 function hideUserSendToName() {
 	receiverId.innerHTML = '';

@@ -33,6 +33,24 @@ function mute() {
 	}
 }
 
+function checkAndPlay(element) {
+	if (element.readyState && sound) {
+		element.pause();
+		// TODO currentType is not set sometimes
+		element.currentTime = 0;
+		switch (sound) {
+			case 1:
+				element.volume = 0.15;
+				break;
+			case 2:
+				element.volume = 0.4;
+				break;
+			case 3:
+				element.volume = 1;
+		}
+		element.play();
+	}
+}
 
 (function () {
 	var cookies;
@@ -54,24 +72,24 @@ function mute() {
 
 function doPost(url, params, callback) {
 	var r = new XMLHttpRequest();
-	r.open("POST", url, true);
-	var data = new FormData(params);
-	for (var key in params) {
-		if (params.hasOwnProperty(key)) {
-			data.append(key, params[key]);
-		}
-	}
-	r.setRequestHeader("X-CSRFToken", window.readCookie("csrftoken"));
 	r.onreadystatechange = function () {
 		if (r.readyState == 4) {
 			if (r.status == 200) {
 				console.log(getDebugMessage("RESPONSE: {} ; response: {};", url, r.response));
 				callback(r.response);
 			} else {
-				console.error(getDebugMessage("RESPONSE: {} ; status: {} ; response: {};", url, r.response, r.status));
+				console.error(getDebugMessage("RESPONSE: {} ; status: {} ; response: {};", url, r.status, r.response ));
 			}
 		}
 	};
+	var data = new FormData();
+	for (var key in params) {
+		if (params.hasOwnProperty(key)) {
+			data.append(key, params[key]);
+		}
+	}
+	r.open("POST", url, true);
+	r.setRequestHeader("X-CSRFToken", window.readCookie("csrftoken"));
 	console.log(getDebugMessage("POST: {} ; params: {}", url, JSON.stringify(params)));
 	r.send(data);
 }

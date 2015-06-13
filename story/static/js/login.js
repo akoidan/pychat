@@ -11,13 +11,31 @@ function login() {
 		}
 	});
 }
+function showLoginDropdown(e) {
+	document.getElementById("hideableDropDown").style.display = 'block';
+	e.stopPropagation();
+}
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
+
+	document.onclick = function () {
+		document.getElementById("hideableDropDown").style.display = 'none';
+	};
+
+	//document.getElementById('outer-container').onclick = function (e) {
+	//	if (e.target != document.getElementById('content-area')) {
+	//		document.getElementById('content-area').innerHTML = 'You clicked outside.';
+	//	} else {
+	//		document.getElementById('content-area').innerHTML = 'Display Contents';
+	//	}
+	//}
+
 	//Handles menu drop down
 	var loginForm = document.getElementById('login-form');
 	loginForm.onclick = function (e) { // TODO prevent login dropdown from closing
 		e.stopPropagation();
 	};
+
 	// login by enter
 	loginForm.onkeypress = function (event) {
 		if (event.keyCode === 13) {
@@ -26,15 +44,15 @@ document.addEventListener("DOMContentLoaded", function() {
 	};
 
 	var editUserName = function (label) {
-		label.hide();
-		var oldUsername = label.text();
-		label.after("<input type='text' maxlength='16' class='userNameInput' value='" + oldUsername + "' />");
-		var input = label.next();
+		label.style.display = 'none';
+		var oldUsername = label.textContent;
+		label.insertAdjacentHTML('afterend', "<input type='text' id='inputName' maxlength='16' class='userNameInput' value='" + oldUsername + "' />");
+		var input = document.getElementById('inputName');
 		input.focus();
-		var sendChangeNickname = function () {
-			var newUsername = input.val();
+		var sendChangeNickname = function (event) {
+			var newUsername = input.value;
 			input.remove();
-			label.show();
+			label.style.display = 'inline';
 			if (!userRegex.test(newUsername)) {
 				alert('Wrong username, only letters, -_');
 				label.text(oldUsername);
@@ -46,12 +64,12 @@ document.addEventListener("DOMContentLoaded", function() {
 				ws.send(jsonRequest);
 			}
 		};
-		input.focusout(sendChangeNickname);
-		input.keypress(function (e) {
+		input.onblur = sendChangeNickname;
+		input.onkeypress = function (e) {
 			if (e.which == 13) {
 				sendChangeNickname();
 			}
-		});
+		};
 	};
 
 	document.getElementById("userNameLabel").onclick = function () {

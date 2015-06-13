@@ -65,6 +65,9 @@ rm -rf $JS_DIR/jscolor
 wget http://jscolor.com/release/jscolor-1.4.4.zip -P $TMP_DIR && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR
 wget https://raw.githubusercontent.com/carhartl/jquery-cookie/master/src/jquery.cookie.js -P $JS_DIR/
 
+# fontello
+# http://www.mineks.com/assets/admin/css/fonts/glyphicons.social.pro/
+
 # Sounds
 curl -L -o $TMP_DIR/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip $TMP_DIR/sounds.zip -d $SOUNDS_DIR
 
