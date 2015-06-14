@@ -5,6 +5,5 @@ tornado
 tornado-redis
 django-redis-sessions
 #django-redis-cache
-django-crispy-forms
 # PyMySQL
 # mysql-connector-python

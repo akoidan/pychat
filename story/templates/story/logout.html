@@ -1,10 +1,2 @@
-	<li><a href="{% url 'story.views.user_settings' %}"><span class="glyphicon glyphicon-cog text-warning"
-																				 title="Change settings"></span></a>
-	</li>
-	<li><a href="{% url 'story.views.get_profile' %}" id="hide"><span
-			class="glyphicon glyphicon-user text-primary" title="Show all users"></span></a></li>
-	<li>{% comment "Optional note" %}
-    there should be to spaces after span in a
-{% endcomment %}
-		<a id="exit " rel="nofollow" href="{% url 'story.views.logout' %}"><span
-				class="glyphicon glyphicon-off text-danger" title="Sign out"></span></a></li>
+<li class="right"><a id="exit" rel="nofollow" href="{% url 'story.views.logout' %}"><i title="Sign out" class="icon-sign-out"></i></a></li>
+<li class="right"><a href="{% url 'story.views.get_profile' %}" id="hide"><i title="show all users" class="icon-wrench"></i></a></li>

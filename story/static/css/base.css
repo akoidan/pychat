@@ -5,19 +5,20 @@ ul {
 
 .navbar-default {
 	/*Icons navbar size*/
-	font-size: 25px;
+	font-size: 26px;
+	background-color: rgb(34, 34, 34);
 }
 
-span:hover {
-	/*Hand and shadow on hover on navbar elements*/
-	cursor: pointer;
-	text-shadow: 0 0 0.2em #87F, 0 0 0.2em #87F;
+.right {
+	float:right;
 }
 
-/*Remove annoying chromium autofill yellow background*/
-input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
-	-webkit-box-shadow: 0 0 0 1000px #30302A inset !important;
-	-webkit-text-fill-color: #CCCBDF;
+.navbarList {
+	margin: 0;
+	padding: 10px 4px 9px 10px;
+}
+.navbarList > li {
+	 display:inline;
 }
 
 html, body {
@@ -25,14 +26,6 @@ html, body {
 	/*cursor: auto;*/
 	margin: 0;
 	height: 100%;
-
-	/*IE scroll*/
-	scrollbar-base-color: #3E4654;
-	scrollbar-3dlight-color: #7dc071;
-	scrollbar-highlight-color: #c08b00;
-	scrollbar-track-color: #222;
-	scrollbar-arrow-color: #3c763d;
-
 }
 
 .color-lor {
@@ -40,10 +33,70 @@ html, body {
 	color: #babdb6;
 }
 
+
+/*============== ONLY LOGIN.CSS =============*/
+.userNameInput {
+	background: rgba(0, 0, 0, 0);
+	border: none !important;
+	margin: 0 0;
+	font-size: 22px; /*icons are 26 px + border, the bigger size will shit everything to bot*/
+	padding: 0;
+	width: 150px;
+}
+
+.username {
+	font-size: 22px;
+	padding-right: 10px;
+}
+/* ============= LOGIN DROPDOWN ==============*/
+#hideableDropDown {
+	border: 1px solid rgb(30, 30, 30);
+	box-shadow: 3px 3px 7px #0E1011;
+	border-radius: 2px;
+	background-color: rgb(38, 36, 37);
+}
+
+#hideableDropDown > form> input {
+	display: block;
+	margin: 13px;
+	width: 250px;
+}
+
+#hideableDropDown > form> input[type=button] {
+	width: 268px;
+}
+
+.dropdown div {
+	position: absolute;
+	display: none;
+	float: left;
+	right: 5px;
+}
+
+.dropdown:hover div {
+	display: block;
+}
+
+
+/* ================== COMMONS ======================*/
+.biginputtext input:not([type=button]):not([type=submit]) {
+	padding: 8px;
+	margin: 5px 10px 5px 0;
+	border-radius: 5px;
+	font-size: 18px;
+	font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
+}
+
+.biginputtext input[type=button], input[type=submit] {
+	width: 100%;
+}
+
+/******************** INPUTS ********************/
 .color-lor input[type=text], input[type=password], input[type=email] {
 	background-color: #272c2d;
 	border: 1px solid rgba(96, 90, 90, 0.31);
 	color: #C7C7C7;
+	padding-left: 5px;
 }
 
 .color-lor input[type=text]:focus, input[type=password]:focus, input[type=email]:focus {
@@ -53,24 +106,57 @@ html, body {
 	color: #dddddd;
 }
 
-/*Override BS white background*/
-.dropdown-menu {
-	background-color: #262425 !important;
-}
-
-/*add space between elements in login dropdown */
-.dropdown-menu input[type=text], input[type=password] {
-	margin-bottom: 15px;
-}
-
 .color-lor input[type=button], input[type=submit] {
-	background-color: #3E413A;
+	background-color: rgb(62, 65, 58);
+	color: #BABDB6;
+	border: 1px solid transparent;
+	border-radius: 3px;
+	font-size: 18px;
+	padding: 6px 12px;
+	horiz-align: center;
 }
 
 .color-lor input[type=button]:hover, input[type=submit]:hover {
-	color: #eaeaea;
+	color: #ffffff;
+	background: linear-gradient(#79BC64, #578843) repeat scroll 0 0 transparent;
 	border: 1px solid #48484a;
 	box-shadow: 0 0 10px #55585b;
+	cursor: pointer;
+}
+
+
+/*============== FONTELLO SETTINGS =================*/
+.navbar-default [class^='icon-'] {
+	margin: 2px;
+}
+[class^='icon-']:hover {
+	cursor: pointer;
+	text-shadow: 0 0 0.2em #FFF, 0 0 0.2em #3D3D3D;
+}
+[class^='icon-volume'] { color: rgb(138, 109, 59); }
+.icon-home { color: rgb(51, 122, 183); }
+.icon-pencil { color: rgb(85, 26, 139); }
+.icon-users { color: rgb(77, 111, 67); }
+.icon-login { color: rgb(60, 118, 61); }
+.icon-register { color: rgb(138, 109, 59); }
+.icon-sign-out { color: rgb(169, 68, 66); }
+.icon-wrench { color: rgb(70, 133, 117); }
+.icon-clear { color: rgb(142, 53, 84); }
+.icon-man {color: rgb(84, 151, 83)
+}
+.icon-girl { color: #bb686a; }
+.icon-anonymous { color: #C2C2C2; }
+.icon-user-secret { color: rgb(92, 148, 163); }
+
+
+/*================= SCROLLBAR ==================== */
+html, body{
+	/*IE scroll*/
+	scrollbar-base-color: #3E4654;
+	scrollbar-3dlight-color: #7dc071;
+	scrollbar-highlight-color: #c08b00;
+	scrollbar-track-color: #222;
+	scrollbar-arrow-color: #3c763d;
 }
 
 ::-webkit-scrollbar {
@@ -84,37 +170,32 @@ html, body {
 	-webkit-border-radius: 1ex;
 }
 
-.userNameInput {
-	background: rgba(0, 0, 0, 0);
-	border: none !important;
-	margin: 0 0;
+
+/*=============== BROWSER SPECIFIC ================ */
+/*Remove annoying chromium autofill yellow background*/
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0 1000px #30302A inset !important;
+	-webkit-text-fill-color: #CCCBDF;
+}
+.navbar-default {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
-/*::-moz-selection {  Code for Firefox*/
-/*color: red;*/
-/*background: yellow;*/
-/*}*/
 
-/*::selection {*/
-/*text-shadow:1px 1px #c7c8c2;*/
-/*background: rgba(0, 0, 0, 0.81);*/
-/*}*/
+/* ====================== PROFILE.CSS ================= */
+.img {
+	float: left; width: 50%;
+	height: auto;
+	padding-left: 15px;
+	padding-right: 20px;
 
-/*#showMenu:hover div {*/
-/*display: block;*/
-/*}*/
-
-/*#showMenu > div {*/
-/*display: none;*/
-/*position: absolute;*/
-/*}*/
-
-/*#showMenu > div {*/
-/*border-style: solid;*/
-/*border-color: #8C8C8C;*/
-/*border-width: 1px;*/
-/*box-shadow: 3px 3px 7px #888888;*/
-/*border-radius: 5px;*/
-/*background-image: linear-gradient(to bottom left, #8C8C8C 0%, #D4D4D4 100%);*/
-
-/*}*/
+}
+.profile {
+	margin-top: 10px;
+	position: relative;
+}

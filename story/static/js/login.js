@@ -1,54 +1,50 @@
 function login() {
-	var d = new Date();
 	var credentials = {
 		username: document.getElementById("username").value,
 		password: document.getElementById("password").value
 	};
-	console.log(d + "Attempting to login, credentials: " + credentials);
-	$.ajax({
-		url: 'auth',
-		type: 'POST',
-		data: credentials,
-		success: function (data) {
-			var d = new Date();
-			console.log(d + "Server response success:" + data);
-			if (data === 'update') {
-				window.location.href = '/';
-			} else {
-				alert(data);
-			}
-		},
-		failure: function (data) {
-			var d = new Date();
-			console.log(d + "can't login into system, response: " + data);
+	doPost('auth', credentials, function (data) {
+		if (data === 'update') {
+			window.location.href = '/';
+		} else {
+			alert(data);
 		}
 	});
-
+}
+function showLoginDropdown(e) {
+	document.getElementById("hideableDropDown").style.display = 'block';
+	e.stopPropagation();
 }
 
-$(document).ready(function () {
+document.addEventListener("DOMContentLoaded", function () {
+
+	document.onclick = function () {
+		document.getElementById("hideableDropDown").style.display = 'none';
+	};
+
 	//Handles menu drop down
-	var loginForm = $('#login-form');
-	loginForm.click(function (e) {
-		e.stopPropagation();
-	});
+	var loginForm = document.getElementById('hideableDropDown');
+	loginForm.onclick = function (e) {
+		e.stopPropagation(); // don't fire parent event when clicking on loginForm
+	};
+
 	// login by enter
-	loginForm.keypress(function (event) {
+	loginForm.onkeypress = function (event) {
 		if (event.keyCode === 13) {
 			login();
 		}
-	});
+	};
 
 	var editUserName = function (label) {
-		label.hide();
-		var oldUsername = label.text();
-		label.after("<input type='text' maxlength='16' class='userNameInput' value='" + oldUsername + "' />");
-		var input = label.next();
+		label.style.display = 'none';
+		var oldUsername = label.textContent;
+		label.insertAdjacentHTML('afterend', "<input type='text' id='inputName' maxlength='16' class='userNameInput' value='" + oldUsername + "' />");
+		var input = document.getElementById('inputName');
 		input.focus();
-		var sendChangeNickname = function () {
-			var newUsername = input.val();
+		var sendChangeNickname = function (event) {
+			var newUsername = input.value;
 			input.remove();
-			label.show();
+			label.style.display = 'inline';
 			if (!userRegex.test(newUsername)) {
 				alert('Wrong username, only letters, -_');
 				label.text(oldUsername);
@@ -60,16 +56,16 @@ $(document).ready(function () {
 				ws.send(jsonRequest);
 			}
 		};
-		input.focusout(sendChangeNickname);
-		input.keypress(function (e) {
+		input.onblur = sendChangeNickname;
+		input.onkeypress = function (e) {
 			if (e.which == 13) {
 				sendChangeNickname();
 			}
-		});
+		};
 	};
 
-	$("#userNameLabel").click(function () {
-		editUserName($(this));
-	});
+	document.getElementById("userNameLabel").onclick = function () {
+		editUserName(this);
+	};
 
 });

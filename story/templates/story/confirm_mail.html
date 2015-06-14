@@ -1,7 +1,6 @@
 {% extends "story/base.html" %}
 {% block head %}
 	{% load staticfiles %}
-	<link href="{% static 'css/confirm-email.css' %}" rel="stylesheet">
 	<script type="text/javascript">
 		var a = "{{message}}"
 		if (a == 'verification code is accepted') {
@@ -11,6 +10,17 @@
 			setTimeout("location.href = redirectURL;", redirectTime);
 		}
 	</script>
+	<style>
+		.message {
+			text-align: center;
+			font-size: 30px;
+			font-family: monospace;
+			display: table;
+			width: 100%;
+			vertical-align: middle;
+			margin-top: 15%;
+		}
+	</style>
 {% endblock head %}
 
 {% block content %}

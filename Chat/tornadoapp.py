@@ -30,7 +30,7 @@ PY3 = sys.version > '3'
 session_engine = import_module(settings.SESSION_ENGINE)
 user_cookie_name = settings.USER_COOKIE_NAME
 
-ANONYMOUS_GENDER = 'alien'
+ANONYMOUS_GENDER = 'Alien'
 MESSAGE_ID_VAR_NAME = 'id'
 RECEIVER_USERNAME_VAR_NAME = 'receiver'
 COUNT_VAR_NAME = 'count'
@@ -127,8 +127,8 @@ class MessagesCreator(object):
 	def get_message(message):
 		"""
 		:param message:
-		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "alien"},
-		"sex": "alien", "user": "tRD6emzs", "time": "20:48:57"}
+		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
+		"sex": "Alien", "user": "tRD6emzs", "time": "20:48:57"}
 		"""
 		return {
 			USER_VAR_NAME: message.sender.username,

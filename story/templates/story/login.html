@@ -1,16 +1,14 @@
 {% load staticfiles %}
 <script src="{% static "js/login.js" %}"></script>
-
-	<li><a href="{% url 'story.views.get_register_page' %}"><span
-			class="glyphicon glyphicon-registration-mark text-info"
-			title="Sign up"></span></a></li>
-	<li class="dropdown">
-		<a class="" href="#" data-toggle="dropdown"><span class="glyphicon
-		 glyphicon-log-in text-success dropdown-toggle" title="Sign in"></span></a>
-		<form class="dropdown-menu container color-lor" id="login-form" style="padding: 15px; right: 0px; left: auto">
-				<input class="form-control" type="text"	 placeholder="Username" id="username">
-				<input  type="password" class="form-control" placeholder="Password" id="password">
-				<input class="btn btn-block" type="button" onclick="login();" value="Sign In">
-				{% csrf_token %}
+<li class="right dropdown" id="dropdown">
+	<i class="icon-login" title="Sign in" onclick="showLoginDropdown(event)"></i>
+	<div id="hideableDropDown" class="biginputtext">
+		<form> {% comment %} form for saving password by browser{% endcomment %}
+			<input type="text" placeholder="Username" id="username">
+			<input type="password" placeholder="Password" id="password">
+			<input type="button" onclick="login();" value="Sign In">
 		</form>
-	</li>
+	</div>
+</li>
+<li class="right"><a href="{% url 'story.views.get_register_page' %}">
+	<i class="icon-register" title="Sign up"></i></a></li>

@@ -55,7 +55,6 @@ INSTALLED_APPS = (
 	'django.db.migrations',
 	'story',
 	'simplejson',
-	'crispy_forms',
 )
 
 SESSION_ENGINE = 'redis_sessions.session'
@@ -64,7 +63,6 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 API_PORT = '8888'
 
-CRISPY_TEMPLATE_PACK = 'bootstrap'
 
 # SESSION_COOKIE_AGE = 10
 # SESSION_SAVE_EVERY_REQUEST = True

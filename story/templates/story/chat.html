@@ -5,37 +5,31 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}">
 {% endblock head %}
 {% block navbar %}
-	<li><a><span
-			class="glyphicon glyphicon-list-alt text-info" title="Show all users"
-			onclick="toggleRoom()"></span></a></li>
-		<li><a><span
-			class="glyphicon glyphicon-floppy-remove" title="CLear local history"
-			onclick="clearLocalHistory()"></span></a></li>
+	<li><i title="Show all users"
+			onclick="toggleRoom()" class="icon-users"></i></li>
+		<li><i class="icon-clear" title="CLear local history"
+			onclick="clearLocalHistory()"></i></li>
 {% endblock navbar %}
 {% block content %}
-	<audio id="chatIncoming" src="{% static 'sounds/ChatIncoming.wav' %}" preload="auto"></audio>
-	<audio id="chatOutgoing" src="{% static 'sounds/ChatOutgoing.wav' %}" preload="auto"></audio>
-	<audio id="chatLogin" src="{% static 'sounds/ChatLogin.wav' %}" preload="auto"></audio>
-	<audio id="chatLogout" src="{% static 'sounds/ChatLogout.wav' %}" preload="auto"></audio>
+	<div id="audios">
+		<audio id="chatIncoming" src="{% static 'sounds/ChatIncoming.wav' %}" preload="auto"></audio>
+		<audio id="chatOutgoing" src="{% static 'sounds/ChatOutgoing.wav' %}" preload="auto"></audio>
+		<audio id="chatLogin" src="{% static 'sounds/ChatLogin.wav' %}" preload="auto"></audio>
+		<audio id="chatLogout" src="{% static 'sounds/ChatLogout.wav' %}" preload="auto"></audio>
+	</div>
 	<div class="wrapper">
 		{#		<div class="fadeout"></div>#}
 		<div class="chat-wrapper">
-			<div id="chatrooms"></div>
+			<div id="chatrooms"><table id="chatroomtables"><tr></tr></table></div>
 			<div id="chatbox"></div>
 		</div>
-		<div class="create-message-wrapper">
+		<div style="width: 100%;">
 			<div id="userSendMessageTo">
-				<div id="receiverId" class="inputsdiv"></div>
-				<span class="glyphicon glyphicon-remove-circle inputsdiv" onclick="hideUserSendToName();"></span>
+				<div id="receiverId"></div>
+				<i class="icon-cancel" onclick="hideUserSendToName();"></i>
 			</div>
-			<div class="inputsdiv" style="width: 100%;">
-				<input name="usermsg" type="text" class="inputs" id="usermsg"/>
-			</div>
-			<div class="inputsdiv">
-				<input
-						type="button" id="sendButton" class="btn button-lor "
-						onclick="sendMessage(userMessage.val(), receiverId.text());"
-						value="Send"/>
+			<div class="message-text-holder">
+				<input name="usermsg" type="text" class="inputs" style="width:100%" id="usermsg"/>
 			</div>
 		</div>
 	</div>
