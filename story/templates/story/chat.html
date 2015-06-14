@@ -24,12 +24,14 @@
 			<div id="chatrooms"><table id="chatroomtables"><tr></tr></table></div>
 			<div id="chatbox"></div>
 		</div>
-		<div class="bottom-message-holder">
-			<div id="userSendMessageTo" class="inline">
-				<div id="receiverId" class="inline"></div>
+		<div style="width: 100%;">
+			<div id="userSendMessageTo">
+				<div id="receiverId"></div>
 				<i class="icon-cancel" onclick="hideUserSendToName();"></i>
 			</div>
-				<input name="usermsg" type="text" class="inputs inline" id="usermsg"/>
+			<div class="message-text-holder">
+				<input name="usermsg" type="text" class="inputs" style="width:100%" id="usermsg"/>
+			</div>
 		</div>
 	</div>
 {% endblock %}
