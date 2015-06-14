@@ -1,14 +1,12 @@
 {% load staticfiles %}
 <script src="{% static "js/login.js" %}"></script>
-<link rel="stylesheet" type="text/css" href="{% static 'css/login.css' %}">
 <li class="right dropdown" id="dropdown">
 	<i class="icon-login" title="Sign in" onclick="showLoginDropdown(event)"></i>
 	<div id="hideableDropDown">
-		<form id="login-form">
-			<input class="form-control" type="text" placeholder="Username" id="username">
-			<input type="password" class="form-control" placeholder="Password" id="password">
-			<input class="btn btn-block" type="button" onclick="login();" value="Sign In">
-			{% csrf_token %}
+		<form> {% comment %} form for saving password by browser{% endcomment %}
+			<input type="text" placeholder="Username" id="username">
+			<input type="password" placeholder="Password" id="password">
+			<input type="button" onclick="login();" value="Sign In">
 		</form>
 	</div>
 </li>

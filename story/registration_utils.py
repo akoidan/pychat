@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.forms import model_to_dict
 from story.apps import DefaultSettingsConfig
 from Chat import settings
-from story.models import UserProfile, UserSettings
+from story.models import UserProfile
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
 
@@ -32,11 +32,12 @@ def check_password(password):
 		raise ValidationError("password should be at least 3 symbols")
 
 
-def check_email(email):
+def check_email(email, skip_but_used=True):
 	"""
 	:raises ValidationError if specified email is registered or not valid
 	"""
-	validate_email(email)
+	if skip_but_used:
+		validate_email(email)
 	try:
 		# theoretically can throw returning 'more than 1' error
 		UserProfile.objects.get(email=email)
@@ -79,12 +80,3 @@ def send_email_verification(user, site_address):
 			target=send_mail,
 			args=("Confirm chat registration", text, site_address, [user.email]))
 		mail_thread.start()
-
-
-def get_user_settings(user):
-	if user.is_authenticated():
-		try:
-			return model_to_dict(UserSettings.objects.get(pk=user.id))
-		except ObjectDoesNotExist:
-			pass
-	return DefaultSettingsConfig.colors

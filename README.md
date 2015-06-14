@@ -9,14 +9,15 @@ Get dependencies:
  1. *Python2.7* or *Python 3.x* both are supported
  2. *pip* for getting dependencies
  3. *redis* for holding session and pubsub messages
- 3. Download static content such as jquery...
+ 4. Get python packages
  4. Create the database
+ 6. Copy static content (audio, fonts...)
 
 Windows:
  1. Install python with pip https://www.python.org/downloads/
  2. Add pip and python to PATH variable
- 3. Open cmd as Administrator and run `pip install -r requirements.txt`
- 4. Install redis from https://github.com/rgl/redis/downloads
+ 3. Install redis from https://github.com/rgl/redis/downloads
+ 4. Open cmd as Administrator and run `pip install -r requirements.txt`
  5. Unzip static content to story/static directory https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1
  6. Open cmd and run `python manage.py init_db` from project directory
 
@@ -31,9 +32,9 @@ Archlinux:
  3. `pacman -S community/redis`
 
 Next steps are common for Linux:
- 4. `pip install -r requirements.txt`
- 5. `sh download_content.sh`
- 6. `python manage.py init_db`
+ 1. `pip install -r requirements.txt`
+ 2. `python manage.py init_db`
+ 3. `git clone https://github.com/Deathangel908/djangochat-config && cd django-config && git checkout 6ffbc85d70df76e0e59af181d0ba3da490ae4808 && cp -r ./static ../story/`
 
 Start the chat:
 ==============

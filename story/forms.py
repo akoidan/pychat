@@ -1,20 +1,7 @@
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
 from django import forms
 from django.forms import FileField
 
-from story.models import UserSettings, UserProfile
-
-
-class UserSettingsForm(forms.ModelForm):
-	def __init__(self, *args, **kwargs):
-		super(UserSettingsForm, self).__init__(*args, **kwargs)
-		for field in self:
-			field.field.widget.attrs['class'] = 'color'
-
-	class Meta:  # pylint: disable=C1001
-		model = UserSettings
-		exclude = ('user',)
+from story.models import UserProfile
 
 
 class UserProfileForm(forms.ModelForm):
@@ -32,10 +19,10 @@ class UserProfileForm(forms.ModelForm):
 		"""
 		Creates the entire form for changing UserProfile.
 		"""
-
-		self.helper = FormHelper()
-
-		self.helper.add_input(Submit('Save', 'Save'))
+		#
+		# self.helper = FormHelper()
+		#
+		# self.helper.add_input(Submit('Save', 'Save'))
 		# fixme hardcoded url
 		self.helper.form_action = '/change_profile'
 		super(UserProfileForm, self).__init__(*args, **kwargs)

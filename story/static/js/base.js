@@ -6,7 +6,6 @@ document.addEventListener("DOMContentLoaded", function () {
 	if (typeof InstallTrigger !== 'undefined') {
 		console.log("Ops there's no scrollbar for firefox, so it looks a bit ugly")
 	}
-	// xhr.setRequestHeader("X-CSRFToken", $.cookie("csrftoken")); // TODO
 });
 
 

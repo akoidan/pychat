@@ -2,25 +2,18 @@
 {% block head %}
 	{% load staticfiles %}
 	<script type="text/javascript">
-		$(document).ready(function () {
-			// auto generated id by django form
-			$('#id_birthday').datepicker({
-				format: "yyyy-mm-dd"
-			});
-		});
 	</script>
 {% endblock head %}
 {% block content %}
-	<div class="container-fluid">
+	<div>
 		{#	if photo isn't uploaded yet #}
 		{% if form.instance.photo %}
 			<div class="col-md-6">
-				<img src="{{ form.instance.photo.url }}" alt="ava" class="img-responsive">
+				<img src="{{ form.instance.photo.url }}" alt="ava">
 			</div>
 		{% endif %}
-		{% load crispy_forms_tags %}
-		<div class="col-md-6">
-			{% crispy form %}
+		<div>
+			{% form %}
 		</div>
 	</div>
 {% endblock content %}

@@ -30,9 +30,6 @@ ul {
 [class*="icon-"]:hover {
 	cursor: pointer;
 }
-button:hover {
-	cursor: pointer;
-}
 
 /*Remove annoying chromium autofill yellow background*/
 input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
@@ -52,18 +49,19 @@ html, body {
 	scrollbar-highlight-color: #c08b00;
 	scrollbar-track-color: #222;
 	scrollbar-arrow-color: #3c763d;
-
 }
 
 .color-lor {
 	background-color: #272c2d;
 	color: #babdb6;
 }
+/********************INPUTS ********************/
 
 .color-lor input[type=text], input[type=password], input[type=email] {
 	background-color: #272c2d;
 	border: 1px solid rgba(96, 90, 90, 0.31);
 	color: #C7C7C7;
+	padding-left: 5px;
 }
 
 .color-lor input[type=text]:focus, input[type=password]:focus, input[type=email]:focus {
@@ -73,25 +71,33 @@ html, body {
 	color: #dddddd;
 }
 
-/*Override BS white background*/
-.dropdown-menu {
-	background-color: #262425 !important;
-}
-
-/*add space between elements in login dropdown */
-.dropdown-menu input[type=text], input[type=password] {
-	margin-bottom: 15px;
-}
-
 .color-lor input[type=button], input[type=submit] {
-	background-color: #3E413A;
+	background-color: #555753;
+	color: #eeeeec;
+	border: 1px solid transparent;
+	border-radius: 3px;
+	font-size: 18px;
+	padding: 4px 7px 3px;
 }
 
 .color-lor input[type=button]:hover, input[type=submit]:hover {
-	color: #eaeaea;
+	color: #ffffff;
+	background: linear-gradient(#79BC64, #578843) repeat scroll 0 0 transparent;
 	border: 1px solid #48484a;
 	box-shadow: 0 0 10px #55585b;
+	cursor: pointer;
 }
+
+/* INPUT TEXT*/
+input:not([type=button]):not([type=submit]) {
+	padding: 8px;
+	margin: 5px 10px 5px 0;
+	border-radius: 5px;
+	font-size: 18px;
+	font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
+}
+
+/********************INPUTS ********************/
 
 ::-webkit-scrollbar {
 	height: 12px;
@@ -112,31 +118,32 @@ html, body {
 	padding: 0;
 }
 
-/*::-moz-selection {  Code for Firefox*/
-/*color: red;*/
-/*background: yellow;*/
-/*}*/
 
-/*::selection {*/
-/*text-shadow:1px 1px #c7c8c2;*/
-/*background: rgba(0, 0, 0, 0.81);*/
-/*}*/
+/*login.html specific*/
+#hideableDropDown {
+	border-style: solid;
+	border-color: rgb(48, 55, 57);
+	border-width: 1px;
+	box-shadow: 3px 3px 7px #0E1011;
+	border-radius: 2px;
+	background-color: rgb(46, 52, 54);;
+}
 
-/*#showMenu:hover div {*/
-/*display: block;*/
-/*}*/
+#hideableDropDown > form> input {
+	display: block;
+	margin: 10px;
+}
+.dropdown div {
+	position: absolute;
+	display: none;
+	float: left;
+	right: 5px;
+}
 
-/*#showMenu > div {*/
-/*display: none;*/
-/*position: absolute;*/
-/*}*/
+.dropdown:hover div {
+	display: block;
+}
 
-/*#showMenu > div {*/
-/*border-style: solid;*/
-/*border-color: #8C8C8C;*/
-/*border-width: 1px;*/
-/*box-shadow: 3px 3px 7px #888888;*/
-/*border-radius: 5px;*/
-/*background-image: linear-gradient(to bottom left, #8C8C8C 0%, #D4D4D4 100%);*/
-
-/*}*/
+.username {
+	font-size: 26px;
+}

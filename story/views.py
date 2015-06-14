@@ -15,10 +15,10 @@ from django.http import HttpResponseRedirect
 from django.db.models import Q
 from story.apps import DefaultSettingsConfig
 from story.decorators import login_required_no_redirect
-from story.models import UserProfile, UserSettings
+from story.models import UserProfile
 from .models import Messages
 from story import registration_utils
-from story.forms import UserSettingsForm, UserProfileForm
+from story.forms import UserProfileForm
 from story.registration_utils import check_email, send_email_verification, check_user, check_password
 from Chat import settings
 
@@ -123,8 +123,7 @@ def register(request):
 			rp.get('username'), rp.get('password'), rp.get('email'), rp.get('mailbox'))
 		check_user(username)
 		check_password(password)
-		if verify_email == 'Y':
-			check_email(email)
+		check_email(email, verify_email == 'Y')
 		user = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
 		user.set_password(password)
 		user.save()
@@ -160,25 +159,3 @@ def change_profile(request):
 	else:
 		return render_to_response('story/response.html', {'message': form.errors}, context_instance=RequestContext(request))
 	return HttpResponseRedirect('/')
-
-
-@login_required_no_redirect
-@require_http_methods(['POST', 'GET'])
-def user_settings(request):
-	"""
-	GET and POST. Take care about User customizable colors via django.forms,
-	"""
-	if request.method == 'GET':
-		try:
-			colored_settings = UserSettings.objects.get(pk=request.user.id)
-			form = UserSettingsForm(instance=colored_settings)
-		except ObjectDoesNotExist:
-			form = UserSettingsForm(DefaultSettingsConfig.colors)
-		c = csrf(request)
-		c['form'] = form
-		return render_to_response('story/settings.html', c,  context_instance=RequestContext(request))
-	elif request.method == 'POST':
-		form = UserSettingsForm(request.POST)
-		form.instance.pk = request.user.id
-		form.save()
-		return HttpResponseRedirect('/')

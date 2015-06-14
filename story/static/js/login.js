@@ -22,18 +22,10 @@ document.addEventListener("DOMContentLoaded", function () {
 		document.getElementById("hideableDropDown").style.display = 'none';
 	};
 
-	//document.getElementById('outer-container').onclick = function (e) {
-	//	if (e.target != document.getElementById('content-area')) {
-	//		document.getElementById('content-area').innerHTML = 'You clicked outside.';
-	//	} else {
-	//		document.getElementById('content-area').innerHTML = 'Display Contents';
-	//	}
-	//}
-
 	//Handles menu drop down
-	var loginForm = document.getElementById('login-form');
-	loginForm.onclick = function (e) { // TODO prevent login dropdown from closing
-		e.stopPropagation();
+	var loginForm = document.getElementById('hideableDropDown');
+	loginForm.onclick = function (e) {
+		e.stopPropagation(); // don't fire parent event when clicking on loginForm
 	};
 
 	// login by enter

@@ -94,15 +94,3 @@ class Messages(models.Model):
 	content = models.CharField(max_length=255)
 	id = models.AutoField(primary_key=True)
 	receiver = models.ForeignKey(UserProfile, null=True, related_name='receiver')
-
-
-class UserSettings(models.Model):
-	"""
-	Contains information about user customizable color settings
-	"""
-	user = models.OneToOneField(UserProfile, related_name='user_id', primary_key=True)
-	text_color = models.CharField(max_length=6, null=True)
-	self_text_color = models.CharField(max_length=6, null=True)
-	others_text_color = models.CharField(max_length=6, null=True)
-	private_text_color = models.CharField(max_length=6, null=True)
-	background_color = models.CharField(max_length=6, null=True)

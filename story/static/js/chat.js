@@ -361,7 +361,7 @@ function handlePreparedWSMessage(data) {
 }
 function webSocketMessage(message) {
 	var jsonData = message.data;
-	console.log(getDebugMessage(jsonData));
+	console.log(getDebugMessage("WS message: {}", jsonData));
 	var data = JSON.parse(jsonData);
 
 	handlePreparedWSMessage(data);
