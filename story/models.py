@@ -3,7 +3,7 @@ import datetime
 
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-from django.db.models import CharField, DateField, FileField
+from django.db.models import CharField, DateField, FileField, TextField
 
 
 class UserProfile(AbstractBaseUser):
@@ -44,7 +44,7 @@ class UserProfile(AbstractBaseUser):
 	objects = BaseUserManager()
 
 	birthday = DateField(null=True)
-	contacts = CharField(max_length=100, null=True)
+	contacts = TextField(max_length=100, null=True)
 	# fileField + <img instead of ImageField (removes preview link)
 	photo = FileField(upload_to=get_file_path, null=True)
 
@@ -54,7 +54,11 @@ class UserProfile(AbstractBaseUser):
 	verify_code = models.CharField(max_length=17, null=True)
 	# ISO/IEC 5218 1 male, 2 - female
 
-	sex = models.SmallIntegerField(null=False)
+	GENDER_CHOICES = (
+		(1, 'Male'),
+		(2, 'Female'),
+	)
+	sex = models.SmallIntegerField(null=False, choices=GENDER_CHOICES)
 
 	@property
 	def sex_str(self):

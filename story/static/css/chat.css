@@ -29,7 +29,10 @@
 
 #chatroomtables > tbody > tr :hover{
 	cursor: pointer;
-	color: #B79D21;;
+	color: #B79D21;
+}
+#chatroomtables > tbody > tr > td{
+	padding: 0;
 }
 
 .inputs {

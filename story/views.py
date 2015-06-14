@@ -146,12 +146,12 @@ def get_profile(request):
 	form = UserProfileForm(instance=user_profile)
 	c = csrf(request)
 	c['form'] = form
-	return render_to_response('story/profile.html', c,  context_instance=RequestContext(request))
+	return render_to_response('story/change_profile.html', c,  context_instance=RequestContext(request))
 
 
 @require_http_methods('POST')
 @login_required_no_redirect
-def change_profile(request):
+def save_profile(request):
 	user_profile = UserProfile.objects.get(pk=request.user.id)
 	form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 	if form.is_valid():

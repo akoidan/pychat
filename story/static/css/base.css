@@ -87,6 +87,10 @@ html, body {
 	font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
 }
 
+.biginputtext input[type=button], input[type=submit] {
+	width: 100%;
+}
+
 /******************** INPUTS ********************/
 .color-lor input[type=text], input[type=password], input[type=email] {
 	background-color: #272c2d;
@@ -122,7 +126,7 @@ html, body {
 
 
 /*============== FONTELLO SETTINGS =================*/
-[class^='icon-'] {
+.navbar-default [class^='icon-'] {
 	margin: 2px;
 }
 [class^='icon-']:hover {
@@ -138,8 +142,11 @@ html, body {
 .icon-sign-out { color: rgb(169, 68, 66); }
 .icon-wrench { color: rgb(70, 133, 117); }
 .icon-clear { color: rgb(142, 53, 84); }
-.icon-man { color: rgb(58, 46, 142); }
-.icon-girl { color: rgb(58, 46, 142); }
+.icon-man {color: rgb(84, 151, 83)
+}
+.icon-girl { color: #bb686a; }
+.icon-anonymous { color: #C2C2C2; }
+.icon-user-secret { color: rgb(92, 148, 163); }
 
 
 /*================= SCROLLBAR ==================== */
@@ -177,4 +184,18 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 	-moz-user-select: none;
 	-ms-user-select: none;
 	user-select: none;
+}
+
+
+/* ====================== PROFILE.CSS ================= */
+.img {
+	float: left; width: 50%;
+	height: auto;
+	padding-left: 15px;
+	padding-right: 20px;
+
+}
+.profile {
+	margin-top: 10px;
+	position: relative;
 }
