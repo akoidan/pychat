@@ -7,12 +7,6 @@ ul {
 	/*Icons navbar size*/
 	font-size: 26px;
 	background-color: rgb(34, 34, 34);
-	-webkit-touch-callout: none;
-	-webkit-user-select: none;
-	-khtml-user-select: none;
-	-moz-user-select: none;
-	-ms-user-select: none;
-	user-select: none;
 }
 
 .right {
@@ -21,20 +15,10 @@ ul {
 
 .navbarList {
 	margin: 0;
-	padding: 6px;
+	padding: 10px 4px 9px 10px;
 }
 .navbarList > li {
 	 display:inline;
-}
-
-[class*="icon-"]:hover {
-	cursor: pointer;
-}
-
-/*Remove annoying chromium autofill yellow background*/
-input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
-	-webkit-box-shadow: 0 0 0 1000px #30302A inset !important;
-	-webkit-text-fill-color: #CCCBDF;
 }
 
 html, body {
@@ -42,21 +26,68 @@ html, body {
 	/*cursor: auto;*/
 	margin: 0;
 	height: 100%;
-
-	/*IE scroll*/
-	scrollbar-base-color: #3E4654;
-	scrollbar-3dlight-color: #7dc071;
-	scrollbar-highlight-color: #c08b00;
-	scrollbar-track-color: #222;
-	scrollbar-arrow-color: #3c763d;
 }
 
 .color-lor {
 	background-color: #272c2d;
 	color: #babdb6;
 }
-/********************INPUTS ********************/
 
+
+/*============== ONLY LOGIN.CSS =============*/
+.userNameInput {
+	background: rgba(0, 0, 0, 0);
+	border: none !important;
+	margin: 0 0;
+	font-size: 22px; /*icons are 26 px + border, the bigger size will shit everything to bot*/
+	padding: 0;
+	width: 150px;
+}
+
+.username {
+	font-size: 22px;
+	padding-right: 10px;
+}
+/* ============= LOGIN DROPDOWN ==============*/
+#hideableDropDown {
+	border: 1px solid rgb(30, 30, 30);
+	box-shadow: 3px 3px 7px #0E1011;
+	border-radius: 2px;
+	background-color: rgb(38, 36, 37);
+}
+
+#hideableDropDown > form> input {
+	display: block;
+	margin: 13px;
+	width: 250px;
+}
+
+#hideableDropDown > form> input[type=button] {
+	width: 268px;
+}
+
+.dropdown div {
+	position: absolute;
+	display: none;
+	float: left;
+	right: 5px;
+}
+
+.dropdown:hover div {
+	display: block;
+}
+
+
+/* ================== COMMONS ======================*/
+.biginputtext input:not([type=button]):not([type=submit]) {
+	padding: 8px;
+	margin: 5px 10px 5px 0;
+	border-radius: 5px;
+	font-size: 18px;
+	font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
+}
+
+/******************** INPUTS ********************/
 .color-lor input[type=text], input[type=password], input[type=email] {
 	background-color: #272c2d;
 	border: 1px solid rgba(96, 90, 90, 0.31);
@@ -72,12 +103,13 @@ html, body {
 }
 
 .color-lor input[type=button], input[type=submit] {
-	background-color: #555753;
-	color: #eeeeec;
+	background-color: rgb(62, 65, 58);
+	color: #BABDB6;
 	border: 1px solid transparent;
 	border-radius: 3px;
 	font-size: 18px;
-	padding: 4px 7px 3px;
+	padding: 6px 12px;
+	horiz-align: center;
 }
 
 .color-lor input[type=button]:hover, input[type=submit]:hover {
@@ -88,16 +120,37 @@ html, body {
 	cursor: pointer;
 }
 
-/* INPUT TEXT*/
-input:not([type=button]):not([type=submit]) {
-	padding: 8px;
-	margin: 5px 10px 5px 0;
-	border-radius: 5px;
-	font-size: 18px;
-	font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
-}
 
-/********************INPUTS ********************/
+/*============== FONTELLO SETTINGS =================*/
+[class^='icon-'] {
+	margin: 2px;
+}
+[class^='icon-']:hover {
+	cursor: pointer;
+	text-shadow: 0 0 0.2em #FFF, 0 0 0.2em #3D3D3D;
+}
+[class^='icon-volume'] { color: rgb(138, 109, 59); }
+.icon-home { color: rgb(51, 122, 183); }
+.icon-pencil { color: rgb(85, 26, 139); }
+.icon-users { color: rgb(77, 111, 67); }
+.icon-login { color: rgb(60, 118, 61); }
+.icon-register { color: rgb(138, 109, 59); }
+.icon-sign-out { color: rgb(169, 68, 66); }
+.icon-wrench { color: rgb(70, 133, 117); }
+.icon-clear { color: rgb(142, 53, 84); }
+.icon-man { color: rgb(58, 46, 142); }
+.icon-girl { color: rgb(58, 46, 142); }
+
+
+/*================= SCROLLBAR ==================== */
+html, body{
+	/*IE scroll*/
+	scrollbar-base-color: #3E4654;
+	scrollbar-3dlight-color: #7dc071;
+	scrollbar-highlight-color: #c08b00;
+	scrollbar-track-color: #222;
+	scrollbar-arrow-color: #3c763d;
+}
 
 ::-webkit-scrollbar {
 	height: 12px;
@@ -110,40 +163,18 @@ input:not([type=button]):not([type=submit]) {
 	-webkit-border-radius: 1ex;
 }
 
-.userNameInput {
-	background: rgba(0, 0, 0, 0);
-	border: none !important;
-	margin: 0 0;
-	font-size: 25px; /*icons are 26 px + border, the bigger size will shit everything to bot*/
-	padding: 0;
-}
 
-
-/*login.html specific*/
-#hideableDropDown {
-	border-style: solid;
-	border-color: rgb(48, 55, 57);
-	border-width: 1px;
-	box-shadow: 3px 3px 7px #0E1011;
-	border-radius: 2px;
-	background-color: rgb(46, 52, 54);;
+/*=============== BROWSER SPECIFIC ================ */
+/*Remove annoying chromium autofill yellow background*/
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0 1000px #30302A inset !important;
+	-webkit-text-fill-color: #CCCBDF;
 }
-
-#hideableDropDown > form> input {
-	display: block;
-	margin: 10px;
-}
-.dropdown div {
-	position: absolute;
-	display: none;
-	float: left;
-	right: 5px;
-}
-
-.dropdown:hover div {
-	display: block;
-}
-
-.username {
-	font-size: 26px;
+.navbar-default {
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }

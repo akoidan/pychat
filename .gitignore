@@ -11,3 +11,4 @@ story/static/sounds/*
 story/static/font/*
 story/static/demo.html
 djangochat-config
+story/static/css/fontello.css
