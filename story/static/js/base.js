@@ -63,7 +63,13 @@ function checkAndPlay(element) {
 			C = c[i].split('=');
 			cookies[C[0]] = C[1];
 		}
-		return cookies[name];
+		var cookie = cookies[name];
+		var length = cookie.length -1;
+		// if cookie is wrapped with quotes (for ex api)
+		if (cookie[0] == '"' && cookie[length] == '"') {
+			cookie = cookie.substring(1, length);
+		}
+		return cookie;
 	}
 	window.readCookie = readCookie; // or expose it however you want
 })();

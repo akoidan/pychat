@@ -148,7 +148,7 @@ function loadMessagesFromLocalStorage() {
 }
 
 function start_chat_ws() {
-	ws = new WebSocket(window.readCookie('api').replace('"', ''));
+	ws = new WebSocket(window.readCookie('api'));
 	ws.onmessage = webSocketMessage;
 	ws.onclose = function () {
 		console.error(getDebugMessage("Connection to WebSocket is lost, trying to reconnect"));

@@ -53,19 +53,13 @@ Start the chat:
 * select user in userlist by changing its color to yellow - itself, anonymous ...
 * USE init or on_open
 * show system messages on navbar
-* don't refresh userlist on closing tab if there's an open tab 
-* replace tornadoapp.connections set of list with redis backend
+* don't refresh userlist on closing tab if there's an open tab
 * show if user's reconnecting
-* since post to 10 getmessages loads 1st, username is not set and self messages writes as others colors
 * tornadoi2
 * add logger
 * deploy on server
-* right room width (add space to right size from scroll if userdlist is closed)
 * timezone
-* show gender icon in userlist 
-* make login dropdown smaller
-* check profile save button uses only bootsrap
+* show gender icon in userlist
 * add chat rooms
 * implement smiles
 * Gradient text disappear on top
-* decrease volume level

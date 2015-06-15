@@ -10,9 +10,8 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-import logging.config
 from os.path import join
-
+LOGGING_CONFIG = None
 from django.conf import global_settings
 
 import story as project_module
@@ -55,6 +54,8 @@ INSTALLED_APPS = (
 	'django.db.migrations',
 	'story',
 	'simplejson',
+	'redis',
+	'tornado',
 )
 
 SESSION_ENGINE = 'redis_sessions.session'
@@ -147,7 +148,13 @@ LOGGING = {
 	'version': 1,
 	'disable_existing_loggers': True,
 	'handlers': {
-		'file': {
+		'file-tornado': {
+			'level': 'DEBUG',
+			'class': 'Chat.logger_handlers.RequestRotatingFileLogger',
+			'filename': join(BASE_DIR, 'log/', 'torado.log'),
+			'formatter': 'verbose',
+		},
+		'file-django': {
 			'level': 'DEBUG',
 			'class': 'Chat.logger_handlers.RequestRotatingFileLogger',
 			'filename': join(BASE_DIR, 'log/', 'chat.log'),
@@ -162,10 +169,10 @@ LOGGING = {
 	'loggers': {
 		# root logger
 		'': {
-			'handlers': ['console'],
+			'handlers': ['file-django'],
 		},
 		'django.request': {
-			'handlers': ['file'],
+			'handlers': ['file-django'],
 			'level': 'DEBUG',
 			'propagate': False,
 		},
@@ -179,6 +186,7 @@ LOGGING = {
 	},
 }
 
+import logging.config
 logging.config.dictConfig(LOGGING)
 
 
