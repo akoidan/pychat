@@ -80,10 +80,10 @@ function doPost(url, params, callback) {
 	r.onreadystatechange = function () {
 		if (r.readyState == 4) {
 			if (r.status == 200) {
-				console.log(getDebugMessage("RESPONSE: {} ; response: {};", url, r.response));
+				console.log(getDebugMessage("POST {} in: {};", url, r.response));
 				callback(r.response);
 			} else {
-				console.error(getDebugMessage("RESPONSE: {} ; status: {} ; response: {};", url, r.status, r.response ));
+				console.error(getDebugMessage("POST {} in: {}, status:", url, r.response, r.status));
 			}
 		}
 	};
@@ -95,7 +95,7 @@ function doPost(url, params, callback) {
 	}
 	r.open("POST", url, true);
 	r.setRequestHeader("X-CSRFToken", window.readCookie("csrftoken"));
-	console.log(getDebugMessage("POST: {} ; params: {}", url, JSON.stringify(params)));
+	console.log(getDebugMessage("POST {} out: {}", url, JSON.stringify(params)));
 	r.send(data);
 }
 

@@ -361,7 +361,7 @@ function handlePreparedWSMessage(data) {
 }
 function webSocketMessage(message) {
 	var jsonData = message.data;
-	console.log(getDebugMessage("WS message: {}", jsonData));
+	console.log(getDebugMessage("WS in: {}", jsonData));
 	var data = JSON.parse(jsonData);
 
 	handlePreparedWSMessage(data);
@@ -387,6 +387,7 @@ function sendToServer(messageRequest) {
 		console.log(getDebugMessage("Web socket is closed. Can't send message: " + jsonRequest));
 		return false;
 	} else {
+		console.log(getDebugMessage("WS out: {} ", jsonRequest));
 		ws.send(jsonRequest);
 		return true;
 	}
