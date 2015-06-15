@@ -40,9 +40,6 @@ var mouseWheelLoadUpFunction;
 //main single socket for handling realtime messages
 var ws;
 
-//console.(\w+)\(new Date\(\)\s\+\s(".*")\);
-//console.$1(getDebugMessage($2);
-
 document.addEventListener("DOMContentLoaded", function() {
 	chatBoxDiv = document.getElementById("chatbox");
 	userMessage = document.getElementById("usermsg");
@@ -329,7 +326,7 @@ function saveMessageToStorage(newItem) {
 			localStorage.setItem(STORAGE_NAME, newArray);
 			break;
 		default:
-			console.log(getDebugMessage("message won't be saved". newItem)); // TODO stringtrify?)))
+			console.log(getDebugMessage("Skipping message with type {}", newItem['action'])); // TODO stringtrify?)))
 		break;
 	}
 }
@@ -356,7 +353,7 @@ function handlePreparedWSMessage(data) {
 			appendMessage(data);
 			break;
 		default:
-			console.error('<< Unknown message type');
+			console.error(getDebugMessage('Unknown message type  {}', JSON.stringify(data)));
 	}
 }
 function webSocketMessage(message) {
@@ -384,7 +381,7 @@ function appendMessage(data) {
 function sendToServer(messageRequest) {
 	var jsonRequest = JSON.stringify(messageRequest);
 	if (ws.readyState != WebSocket.OPEN) {
-		console.log(getDebugMessage("Web socket is closed. Can't send message: " + jsonRequest));
+		console.log(getDebugMessage("Web socket is closed. Can't send {}", jsonRequest));
 		return false;
 	} else {
 		console.log(getDebugMessage("WS out: {} ", jsonRequest));
