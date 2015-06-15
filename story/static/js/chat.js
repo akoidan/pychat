@@ -288,8 +288,8 @@ function handleGetMessages(message) {
 	// This check should fire only once, because requests aren't being sent when there are no event for them, thus no responses
 	if (message.length === 0) {
 		console.log(getDebugMessage('Requesting messages has reached the top, removing loadUpHistoryEvent handlers'));
-		$(document).off('keydown', keyDownLoadUpFunction);
-		chatBoxDiv.off('mousewheel DOMMouseScroll', mouseWheelLoadUpFunction);
+		document.removeEventListener('keydown', keyDownLoadUpFunction);
+		chatBoxDiv.removeEventListener('mousewheel DOMMouseScroll', mouseWheelLoadUpFunction);
 		return;
 	}
 	var firstMessage = message[message.length - 1];
