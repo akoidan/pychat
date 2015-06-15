@@ -51,28 +51,22 @@ function checkAndPlay(element) {
 	}
 }
 
-(function () {
-	var cookies;
-	function readCookie(name, c, C, i) {
-		if (cookies) {
-			return cookies[name];
-		}
-		c = document.cookie.split('; ');
-		cookies = {};
-		for (i = c.length - 1; i >= 0; i--) {
-			C = c[i].split('=');
-			cookies[C[0]] = C[1];
-		}
-		var cookie = cookies[name];
-		var length = cookie.length -1;
-		// if cookie is wrapped with quotes (for ex api)
-		if (cookie[0] == '"' && cookie[length] == '"') {
-			cookie = cookie.substring(1, length);
-		}
-		return cookie;
+
+function readCookie(name, c, C, i) {
+	c = document.cookie.split('; ');
+	cookies = {};
+	for (i = c.length - 1; i >= 0; i--) {
+		C = c[i].split('=');
+		cookies[C[0]] = C[1];
 	}
-	window.readCookie = readCookie; // or expose it however you want
-})();
+	var cookie = cookies[name];
+	var length = cookie.length -1;
+	// if cookie is wrapped with quotes (for ex api)
+	if (cookie[0] == '"' && cookie[length] == '"') {
+		cookie = cookie.substring(1, length);
+	}
+	return cookie;
+}
 
 
 function doPost(url, params, callback) {
@@ -94,7 +88,7 @@ function doPost(url, params, callback) {
 		}
 	}
 	r.open("POST", url, true);
-	r.setRequestHeader("X-CSRFToken", window.readCookie("csrftoken"));
+	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
 	console.log(getDebugMessage("POST {} out: {}", url, JSON.stringify(params)));
 	r.send(data);
 }

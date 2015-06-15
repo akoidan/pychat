@@ -77,12 +77,14 @@ document.addEventListener("DOMContentLoaded", function() {
 	});
 
 	// Those events are removed when loadUpHistory() reaches top
-	mouseWheelLoadUpFunction = function (event) {
-		if (event.originalEvent.wheelDelta > 0 || event.originalEvent.detail < 0) { // Scroll top
+	mouseWheelLoadUpFunction = function (e) {
+		var delta = e.deltaY || e.detail || e.wheelDelta;
+		if (delta < 0 ) { // Scroll top
 			loadUpHistory(5);
 		}
 	};
-	chatBoxDiv.addEventListener('mousewheel DOMMouseScroll', mouseWheelLoadUpFunction);
+	chatBoxDiv.onwheel = mouseWheelLoadUpFunction;
+	chatBoxDiv.DOMMouseScroll = mouseWheelLoadUpFunction; // FF
 
 	// Those events are removed when loadUpHistory() reaches top
 	keyDownLoadUpFunction = function (e) {
@@ -95,9 +97,9 @@ document.addEventListener("DOMContentLoaded", function() {
 		}
 	};
 
-	document.onkeypress = keyDownLoadUpFunction;
+	chatBoxDiv.onkeydown = keyDownLoadUpFunction;
 	window.addEventListener("blur focus", function (e) {
-		var prevType = $(this).data("prevType");
+		var prevType = $(this).data("prevType"); // TODO
 		// TODO not enought event type, when user switch tab and doesn't focus the window event won't fire
 		if (prevType != e.type) {   //  reduce double fire issues
 			switch (e.type) {
@@ -145,7 +147,7 @@ function loadMessagesFromLocalStorage() {
 }
 
 function start_chat_ws() {
-	ws = new WebSocket(window.readCookie('api'));
+	ws = new WebSocket(readCookie('api'));
 	ws.onmessage = webSocketMessage;
 	ws.onclose = function () {
 		console.error(getDebugMessage("Connection to WebSocket is lost, trying to reconnect"));
@@ -212,7 +214,7 @@ function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayed
 		document.title = newMessagesCount + " new message";
 	}
 	if (isTopDirection) {
-		chatBoxDiv.insertAdjacentHTML('beforebegin', message);
+		chatBoxDiv.insertAdjacentHTML('afterbegin', message);
 	} else {
 		var oldscrollHeight = chatBoxDiv.scrollHeight;
 		chatBoxDiv.insertAdjacentHTML('beforeend', message);
@@ -288,8 +290,8 @@ function handleGetMessages(message) {
 	// This check should fire only once, because requests aren't being sent when there are no event for them, thus no responses
 	if (message.length === 0) {
 		console.log(getDebugMessage('Requesting messages has reached the top, removing loadUpHistoryEvent handlers'));
-		document.removeEventListener('keydown', keyDownLoadUpFunction);
-		chatBoxDiv.removeEventListener('mousewheel DOMMouseScroll', mouseWheelLoadUpFunction);
+		//document.removeEventListener('keydown', keyDownLoadUpFunction);
+		// TODO
 		return;
 	}
 	var firstMessage = message[message.length - 1];
@@ -407,7 +409,7 @@ function sendMessage(usermsg, receiver) {
 
 
 function loadUpHistory(count) {
-	if (chatBoxDiv.scrollTop() === 0) {
+	if (chatBoxDiv.scrollTop === 0) {
 		var getMessageRequest = {
 			headerId : headerId,
 			count: count,
@@ -428,6 +430,7 @@ function toggleRoom() {
 }
 
 function clearLocalHistory() {
+	headerId = null;
 	localStorage.removeItem(STORAGE_NAME);
 	localStorage.removeItem(STORAGE_USER);
 	chatBoxDiv.innerHTML = '';
