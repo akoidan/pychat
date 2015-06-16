@@ -92,14 +92,14 @@ html, body {
 }
 
 /******************** INPUTS ********************/
-.color-lor input[type=text], input[type=password], input[type=email] {
+.color-lor input[type=text], input[type=password], input[type=email], textarea, select {
 	background-color: #272c2d;
 	border: 1px solid rgba(96, 90, 90, 0.31);
 	color: #C7C7C7;
 	padding-left: 5px;
 }
 
-.color-lor input[type=text]:focus, input[type=password]:focus, input[type=email]:focus {
+.color-lor input[type=text]:focus, input[type=password]:focus, input[type=email]:focus, textarea:focus, select:focus  {
 	outline: none !important;
 	border: 1px solid #5e5e60;
 	box-shadow: 0 0 10px #55585b;
@@ -124,6 +124,9 @@ html, body {
 	cursor: pointer;
 }
 
+textarea {
+	border-radius: 4px;
+}
 
 /*============== FONTELLO SETTINGS =================*/
 .navbar-default [class^='icon-'] {
