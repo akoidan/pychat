@@ -10,6 +10,7 @@ chat.log
 story/static/sounds/*
 story/static/font/*
 story/static/demo.html
+story/static/favicon.ico
 djangochat-config
 story/static/css/fontello.css
 example

@@ -43,8 +43,8 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
-* file upload http://stackoverflow.com/a/14605593/3872976
 * load messages top is completely broken after removing jquery
+* file upload http://stackoverflow.com/a/14605593/3872976
 * show user profile onclick gender icon
 * add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis
 * create tornado class in tornadoapp, put there all tornado logic

@@ -5,6 +5,8 @@ var othersHeader = '<font class="message-header-others">';
 var systemHeader = '<font class="message-header-system">';
 var endHeader = '</font>';
 var contentStyle = '<font class="message-text-style">';
+
+var mouseWheelEventName=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
 var newMessagesCount = 0;
 var isCurrentTabActive = true;
@@ -33,10 +35,6 @@ var userSendMessageTo;
 var receiverId;
 // navbar label with current user name
 var userNameLabel;
-// keyboard and mouse handlers for loadUpHistory
-var keyDownLoadUpFunction;
-var mouseWheelLoadUpFunction;
-
 //main single socket for handling realtime messages
 var ws;
 
@@ -53,83 +51,92 @@ document.addEventListener("DOMContentLoaded", function() {
 	sendButton = document.getElementById("sendButton");
 	userSendMessageTo.style.display = "none";
 	receiverId = document.getElementById("receiverId");
-	chatRoomsTable.onclick = function (event) {
-		event = event || window.event;
-		var target = event.target || event.srcElement;
 
-		while (target != chatRoomsTable) { // ( ** )
-			if (target.nodeName == 'TD') { // ( * )
-				if (target.cellIndex == 1) { // name is second
-					showUserSendMess(target.innerHTML);
-				}
-			}
-			target = target.parentNode
-		}
-	};
 	if (!"WebSocket" in window) {
 		chatBoxDiv.html("<h1>Your browser doesn't support Web socket, chat options will be unavalible<h1>");
-		return;
+		throw "Browser doesn't support Web socket";
 	}
-	userMessage.onkeypress = (function (event) {
-		if (event.keyCode === 13) {
-			sendMessage(userMessage.value, receiverId.innerHTML);
-		}
-	});
 
-	// Those events are removed when loadUpHistory() reaches top
-	mouseWheelLoadUpFunction = function (e) {
-		var delta = e.deltaY || e.detail || e.wheelDelta;
-		if (delta < 0 ) { // Scroll top
-			loadUpHistory(5);
-		}
-	};
-	chatBoxDiv.onwheel = mouseWheelLoadUpFunction;
-	chatBoxDiv.DOMMouseScroll = mouseWheelLoadUpFunction; // FF
-
-	// Those events are removed when loadUpHistory() reaches top
-	keyDownLoadUpFunction = function (e) {
-		if (e.which === 33) {    // page up
-			loadUpHistory(15);
-		} else if (e.which === 38) { // up
-			loadUpHistory(3);
-		} else if (e.ctrlKey && e.which === 36) {
-			loadUpHistory(25);
-		}
-	};
-
-	chatBoxDiv.onkeydown = keyDownLoadUpFunction;
-	window.addEventListener("blur focus", function (e) {
-		var prevType = $(this).data("prevType"); // TODO
-		// TODO not enought event type, when user switch tab and doesn't focus the window event won't fire
-		if (prevType != e.type) {   //  reduce double fire issues
-			switch (e.type) {
-				case "focus":
-					// do work
-					isCurrentTabActive = true;
-					newMessagesCount = 0;
-					document.title = 'Chat';
-					break;
-				case "blur":
-					isCurrentTabActive = false;
-
-			}
-		}
-
-		$(this).data("prevType", e.type);
-	});
-
+	chatRoomsTable.addEventListener("click", chatRoomClick);
+	userMessage.addEventListener("keypress", sendMessageKeyPress);
+	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
+	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);
+	window.addEventListener("blur focus", changeTittleFunction);
 	loadMessagesFromLocalStorage();
 	start_chat_ws();
 
 });
 
-//var timezone = getCookie('timezone');
+/*==================== DOM EVENTS LISTENERS ============================*/
+// keyboard and mouse handlers for loadUpHistory
+// Those events are removed when loadUpHistory() reaches top
+function mouseWheelLoadUp(e) {
+	var delta = e.deltaY || e.detail || e.wheelDelta;
+	if (delta < 0) { // Scroll top
+		loadUpHistory(5);
+	}
+}
+
+function changeTittleFunction(e) {
+	var prevType = $(this).data("prevType"); // TODO
+	// TODO not enought event type, when user switch tab and doesn't focus the window event won't fire
+	if (prevType != e.type) {   //  reduce double fire issues
+		switch (e.type) {
+			case "focus":
+				// do work
+				isCurrentTabActive = true;
+				newMessagesCount = 0;
+				document.title = 'Chat';
+				break;
+			case "blur":
+				isCurrentTabActive = false;
+
+		}
+	}
+
+	$(this).data("prevType", e.type);
+}
+
+
+function chatRoomClick(event) {
+	event = event || window.event;
+	var target = event.target || event.srcElement;
+
+	while (target != chatRoomsTable) { // ( ** )
+		if (target.nodeName == 'TD') { // ( * )
+			if (target.cellIndex == 1) { // name is second
+				showUserSendMess(target.innerHTML);
+			}
+		}
+		target = target.parentNode
+	}
+}
+
+
+function keyDownLoadUp(e) {
+	if (e.which === 33) {    // page up
+		loadUpHistory(15);
+	} else if (e.which === 38) { // up
+		loadUpHistory(3);
+	} else if (e.ctrlKey && e.which === 36) {
+		loadUpHistory(25);
+	}
+}
+
+function sendMessageKeyPress(event) {
+	if (event.keyCode === 13) {
+		sendMessage(userMessage.value, receiverId.innerHTML);
+	}
+}
+
+/* =============================================================== */
+
 
 // TODO
+//var timezone = getCookie('timezone');
 //if (timezone == null) {
 //	setCookie("timezone", jstz.determine().name());
 //}
-
 
 function loadMessagesFromLocalStorage() {
 	loggedUser = localStorage.getItem(STORAGE_USER);
@@ -290,7 +297,7 @@ function handleGetMessages(message) {
 	// This check should fire only once, because requests aren't being sent when there are no event for them, thus no responses
 	if (message.length === 0) {
 		console.log(getDebugMessage('Requesting messages has reached the top, removing loadUpHistoryEvent handlers'));
-		//document.removeEventListener('keydown', keyDownLoadUpFunction);
+		//document.removeEventListener('keydown', keyDownLoadUp);
 		// TODO
 		return;
 	}
