@@ -34,7 +34,7 @@ Archlinux:
 Next steps are common for Linux:
  1. `pip install -r requirements.txt`
  2. `python manage.py init_db`
- 3. `git clone https://github.com/Deathangel908/djangochat-config && cd djangochat-config && git checkout ea831979d3c0d569ecb7da44eab6ea2cbebc0677 && cp -r ./static ../story/`
+ 3. `git clone https://github.com/Deathangel908/djangochat-config && cd djangochat-config && git checkout fc8c733adb45a6d2f6dc57c30a5ce868268e160f && cp -r ./static ../story/`
 
 Start the chat:
 ==============
