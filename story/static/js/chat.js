@@ -60,8 +60,10 @@ document.addEventListener("DOMContentLoaded", function() {
 	chatRoomsTable.addEventListener("click", chatRoomClick);
 	userMessage.addEventListener("keypress", sendMessageKeyPress);
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
-	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);
-	window.addEventListener("blur focus", changeTittleFunction);
+	// some browser don't fire keypress event for num keys
+	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);  // doesn't work in chromium for div
+	window.addEventListener("blur", changeTittleFunction);
+	window.addEventListener("focus", changeTittleFunction);
 	loadMessagesFromLocalStorage();
 	start_chat_ws();
 
@@ -78,23 +80,16 @@ function mouseWheelLoadUp(e) {
 }
 
 function changeTittleFunction(e) {
-	var prevType = $(this).data("prevType"); // TODO
-	// TODO not enought event type, when user switch tab and doesn't focus the window event won't fire
-	if (prevType != e.type) {   //  reduce double fire issues
-		switch (e.type) {
-			case "focus":
-				// do work
-				isCurrentTabActive = true;
-				newMessagesCount = 0;
-				document.title = 'Chat';
-				break;
-			case "blur":
-				isCurrentTabActive = false;
-
-		}
+	switch (e.type) {
+		case "focus":
+			// do work
+			isCurrentTabActive = true;
+			newMessagesCount = 0;
+			document.title = 'Chat';
+			break;
+		case "blur":
+			isCurrentTabActive = false;
 	}
-
-	$(this).data("prevType", e.type);
 }
 
 
@@ -297,8 +292,8 @@ function handleGetMessages(message) {
 	// This check should fire only once, because requests aren't being sent when there are no event for them, thus no responses
 	if (message.length === 0) {
 		console.log(getDebugMessage('Requesting messages has reached the top, removing loadUpHistoryEvent handlers'));
-		//document.removeEventListener('keydown', keyDownLoadUp);
-		// TODO
+		chatBoxDiv.removeEventListener(mouseWheelEventName, mouseWheelLoadUp);
+		chatBoxDiv.removeEventListener("keydown", keyDownLoadUp);
 		return;
 	}
 	var firstMessage = message[message.length - 1];
@@ -436,11 +431,14 @@ function toggleRoom() {
 	}
 }
 
+// OH man be carefull with this method, it should reinit history
 function clearLocalHistory() {
 	headerId = null;
 	localStorage.removeItem(STORAGE_NAME);
 	localStorage.removeItem(STORAGE_USER);
 	chatBoxDiv.innerHTML = '';
+	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp); //
+	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);
 	console.log(getDebugMessage('History has been cleared'));
 }
 

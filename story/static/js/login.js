@@ -18,9 +18,9 @@ function showLoginDropdown(e) {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-	document.onclick = function () {
+	document.addEventListener("click", function () {
 		document.getElementById("hideableDropDown").style.display = 'none';
-	};
+	});
 
 	//Handles menu drop down
 	var loginForm = document.getElementById('hideableDropDown');
@@ -48,9 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			if (!userRegex.test(newUsername)) {
 				alert('Wrong username, only letters, -_');
 				label.text(oldUsername);
-				return;
-			}
-			if (newUsername !== oldUsername) {
+			} else  if (newUsername !== oldUsername) {
 				sendToServer({me: newUsername, action: 'me'});
 			}
 		};

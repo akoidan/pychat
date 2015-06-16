@@ -26,6 +26,7 @@ html, body {
 	/*cursor: auto;*/
 	margin: 0;
 	height: 100%;
+	font-family: arial, serif;
 }
 
 .color-lor {
@@ -84,7 +85,6 @@ html, body {
 	margin: 5px 10px 5px 0;
 	border-radius: 5px;
 	font-size: 18px;
-	font-family: "lucida grande", tahoma, verdana, arial, sans-serif;
 }
 
 .biginputtext input[type=button], input[type=submit] {
