@@ -1,4 +1,10 @@
 // html for messages
+if (!("WebSocket" in window)) {
+	alert("Your browser doesn't support Web socket, chat options will be unavailable. " +
+	"Please use Chrome, Firefox, Safari, Internet Explorer 10+ or any modern browser.");
+	throw "Browser doesn't support Web socket";
+}
+
 var selfHeader = '<font class="message-header-self">';
 var privateHeader = '<font class="message-header-private">';
 var othersHeader = '<font class="message-header-others">';
@@ -52,11 +58,6 @@ document.addEventListener("DOMContentLoaded", function() {
 	userSendMessageTo.style.display = "none";
 	receiverId = document.getElementById("receiverId");
 
-	if (!"WebSocket" in window) {
-		chatBoxDiv.html("<h1>Your browser doesn't support Web socket, chat options will be unavalible<h1>");
-		throw "Browser doesn't support Web socket";
-	}
-
 	chatRoomsTable.addEventListener("click", chatRoomClick);
 	userMessage.addEventListener("keypress", sendMessageKeyPress);
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
@@ -73,8 +74,9 @@ document.addEventListener("DOMContentLoaded", function() {
 // keyboard and mouse handlers for loadUpHistory
 // Those events are removed when loadUpHistory() reaches top
 function mouseWheelLoadUp(e) {
-	var isTopDirection = (e.detail<0 || e.wheelDelta>0) ? true : -false; // TODO check all browser event name deltaY?
-	if (isTopDirection) { // Scroll top
+	// IE has inverted scroll,
+	var isTopDirection = e.detail < 0 || e.wheelDelta > 0; // TODO check all browser event name deltaY?
+	if (isTopDirection) {
 		loadUpHistory(5);
 	}
 }

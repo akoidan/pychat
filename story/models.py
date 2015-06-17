@@ -57,6 +57,7 @@ class UserProfile(AbstractBaseUser):
 	GENDER_CHOICES = (
 		(1, 'Male'),
 		(2, 'Female'),
+		(0, 'Alien'),  # TODO form displays extra "-------"
 	)
 	sex = models.SmallIntegerField(null=False, choices=GENDER_CHOICES)
 
