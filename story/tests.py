@@ -4,6 +4,8 @@ from django.test import TestCase
 from story.models import UserProfile
 from story.registration_utils import check_password, send_email_verification, check_user
 
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 
 class ModelTest(TestCase):
 
@@ -33,3 +35,14 @@ class RegisterUtilsTest(TestCase):
 		self.assertRaises(ValidationError, check_user, "d"*100)
 		self.assertRaises(ValidationError, check_user, "asdfs,+")
 		check_user("Fine")
+
+
+class SeleniumBrowserTest(TestCase):
+
+	def test_check_main_page(self):
+		driver = webdriver.Firefox()
+		driver.get("localhost:8001")  # TODO inject url
+		assert "Chat" in driver.title
+		elem = driver.find_element_by_id("userNameLabel")
+		self.assertRegexpMatches(elem.text, "^[a-zA-Z-_0-9]{1,16}$")
+		driver.close()

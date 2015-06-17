@@ -73,8 +73,8 @@ document.addEventListener("DOMContentLoaded", function() {
 // keyboard and mouse handlers for loadUpHistory
 // Those events are removed when loadUpHistory() reaches top
 function mouseWheelLoadUp(e) {
-	var delta = e.deltaY || e.detail || e.wheelDelta;
-	if (delta < 0) { // Scroll top
+	var isTopDirection = (e.detail<0 || e.wheelDelta>0) ? true : -false; // TODO check all browser event name deltaY?
+	if (isTopDirection) { // Scroll top
 		loadUpHistory(5);
 	}
 }
