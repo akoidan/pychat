@@ -1,8 +1,9 @@
 from string import Template
 
 from django import forms
-from django.forms import FileField, CharField
+from django.forms import FileField, CharField, DateField, ChoiceField
 from django.utils.safestring import mark_safe
+from Chat.settings import DATE_INPUT_FORMATS
 
 from story.models import UserProfile
 
@@ -18,6 +19,10 @@ class DateWidget(forms.widgets.Textarea):
 		""")
 		return mark_safe(html.substitute(value=value))
 
+#
+# class DateInput(DateTimeBaseInput):
+#     format_key = 'DATE_INPUT_FORMATS'
+#     input_type = 'date'
 
 class UserProfileForm(forms.ModelForm):
 	"""
@@ -25,11 +30,19 @@ class UserProfileForm(forms.ModelForm):
 	"""
 	# the widget gets rid of <a href=
 	photo = FileField(widget=forms.FileInput)
+	birthday = DateField(widget=DateWidget)
+	GENDER_CHOICES = (
+		(1, 'Male'),
+		(2, 'Female'),
+		(0, 'Alien'),
+	)
+	# implement here to set required = remove ---- choice in favor of alien
+	sex = ChoiceField(required=True, choices=GENDER_CHOICES)
 
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
 		fields = ('username', 'name', 'surname', 'email', 'birthday', 'contacts', 'sex', 'photo')
-		birthday2 = CharField(widget=DateWidget)
+
 
 	def __init__(self, *args, **kwargs):
 		"""

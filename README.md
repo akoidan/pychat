@@ -43,25 +43,20 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
-* load messages top is completely broken after removing jquery
 * file upload http://stackoverflow.com/a/14605593/3872976
 * show user profile onclick gender icon
 * add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis
 * create tornado class in tornadoapp, put there all tornado logic
-* logger
 * change anonymous message color
-* Use `localStorage` to store messages and don't load it twice and check if there are new messages after connection lost
+*  check if there are new messages after connection lost compare to `localStorage` last message?
  also check id when appedning message to top to prevent double fire issue, append message to bottom if user went offline
-* select user in userlist by changing its color to yellow - itself, anonymous ...
 * USE init or on_open
 * show system messages on navbar
-* don't refresh userlist on closing tab if there's an open tab
 * show if user's reconnecting
-* tornadoi2
 * add logger
 * deploy on server
 * timezone
-* show gender icon in userlist
 * add chat rooms
 * implement smiles
-* Gradient text disappear on top
+* check loadmessage top onkeydow
+* allow selecting username in navbar, remove slecting cursor 

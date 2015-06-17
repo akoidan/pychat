@@ -84,3 +84,10 @@
 .message-header-system {
 	color: #9DD3DD;
 }
+
+/*-webkit-background-clip: text;*/
+/*-webkit-text-fill-color: transparent;*/
+/*gradient text top disappearing */
+#chatbox {
+	-webkit-mask-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 1) 95%, rgba(0, 0, 0, 0) 100%);
+}

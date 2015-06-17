@@ -54,12 +54,7 @@ class UserProfile(AbstractBaseUser):
 	verify_code = models.CharField(max_length=17, null=True)
 	# ISO/IEC 5218 1 male, 2 - female
 
-	GENDER_CHOICES = (
-		(1, 'Male'),
-		(2, 'Female'),
-		(0, 'Alien'),  # TODO form displays extra "-------"
-	)
-	sex = models.SmallIntegerField(null=False, choices=GENDER_CHOICES)
+	sex = models.SmallIntegerField(null=False)
 
 	@property
 	def sex_str(self):

@@ -41,7 +41,7 @@ class SeleniumBrowserTest(TestCase):
 
 	def test_check_main_page(self):
 		driver = webdriver.Firefox()
-		driver.get("localhost:8001")  # TODO inject url
+		driver.get("localhost:8000")  # TODO inject url
 		assert "Chat" in driver.title
 		elem = driver.find_element_by_id("userNameLabel")
 		self.assertRegexpMatches(elem.text, "^[a-zA-Z-_0-9]{1,16}$")

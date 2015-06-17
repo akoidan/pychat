@@ -192,13 +192,18 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 
 /* ====================== PROFILE.CSS ================= */
 .img {
-	float: left; width: 50%;
+	float: left;
+	max-width: 96%;
+	min-width: 40%;
 	height: auto;
 	padding-left: 15px;
-	padding-right: 20px;
-
+	/*padding-right: 20px;*/
 }
 .profile {
 	margin-top: 10px;
 	position: relative;
+}
+
+.padded15 {
+	padding: 15px;
 }
