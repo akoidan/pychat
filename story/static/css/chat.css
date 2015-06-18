@@ -89,5 +89,6 @@
 /*-webkit-text-fill-color: transparent;*/
 /*gradient text top disappearing */
 #chatbox {
-	-webkit-mask-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 1) 95%, rgba(0, 0, 0, 0) 100%);
+	/*-webkit-mask-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 1) 95%, rgba(0, 0, 0, 0) 100%);*/
+	/*TODO login dropdown goes under scroll, FF doesn't support*/
 }

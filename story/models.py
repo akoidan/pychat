@@ -35,6 +35,7 @@ class UserProfile(AbstractBaseUser):
 	def has_module_perms(self, app_label):
 		return self.is_staff
 
+	USERNAME_FIELD = 'username'
 	username = CharField(max_length=30, null=False, unique=True)
 	name = CharField(max_length=30, null=True)
 	surname = CharField(max_length=30, null=True)
@@ -47,8 +48,6 @@ class UserProfile(AbstractBaseUser):
 	contacts = TextField(max_length=100, null=True)
 	# fileField + <img instead of ImageField (removes preview link)
 	photo = FileField(upload_to=get_file_path, null=True)
-
-	USERNAME_FIELD = 'username'
 
 	email_verified = models.BooleanField(default=False, null=False)
 	verify_code = models.CharField(max_length=17, null=True)

@@ -54,7 +54,7 @@ function checkAndPlay(element) {
 
 function readCookie(name, c, C, i) {
 	c = document.cookie.split('; ');
-	cookies = {};
+	var cookies = {};
 	for (i = c.length - 1; i >= 0; i--) {
 		C = c[i].split('=');
 		cookies[C[0]] = C[1];

@@ -1,28 +1,15 @@
-from string import Template
-
 from django import forms
-from django.forms import FileField, CharField, DateField, ChoiceField
-from django.utils.safestring import mark_safe
-from Chat.settings import DATE_INPUT_FORMATS
+from django.forms import FileField, DateField, ChoiceField
 
 from story.models import UserProfile
 
 
-class DateWidget(forms.widgets.Textarea):
+class DateWidget(forms.widgets.DateInput):
 	"""
-	The simple widget that renders the same html as the default one
+	Replace input in favor of html5 datepicker
 	"""
+	input_type = 'date'
 
-	def render(self, name, value, attrs=None):
-		html = Template("""
-			<input id="id_birthday" type="date" value="$value">
-		""")
-		return mark_safe(html.substitute(value=value))
-
-#
-# class DateInput(DateTimeBaseInput):
-#     format_key = 'DATE_INPUT_FORMATS'
-#     input_type = 'date'
 
 class UserProfileForm(forms.ModelForm):
 	"""
