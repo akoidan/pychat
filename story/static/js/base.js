@@ -107,3 +107,44 @@ function getDebugMessage() {
 	var time = [now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds()].join(':');
 	return time + ': ' + arguments[0];
 }
+
+
+// PROFILE.JS
+
+function loadjscssfile(filename, filetype, callback) {
+	var fileref = null;
+	if (filetype == "js") { //if filename is a external JavaScript file
+		fileref = document.createElement('script');
+		fileref.setAttribute("type", "text/javascript");
+		fileref.setAttribute("src", filename)
+	}
+	else if (filetype == "css") { //if filename is an external CSS file
+		fileref = document.createElement("link");
+		fileref.setAttribute("rel", "stylesheet");
+		fileref.setAttribute("type", "text/css");
+		fileref.setAttribute("href", filename)
+	}
+	if (typeof fileref != "undefined") {
+		document.getElementsByTagName("head")[0].appendChild(fileref)
+		fileref.onload = callback;
+	}
+}
+
+function isDateMissing() {
+	var input = document.createElement('input');
+	input.setAttribute('type', 'date');
+
+	var notADateValue = 'not-a-date';
+	input.setAttribute('value', notADateValue);
+
+	return input.value === notADateValue;
+}
+
+if (isDateMissing()) {
+	// TODO
+	loadjscssfile('http://dbushell.github.io/Pikaday/css/pikaday.css', 'css');
+	loadjscssfile('http://dbushell.github.io/Pikaday/pikaday.js', 'js', function () {
+		var picker = new Pikaday({ field: document.getElementById('id_birthday') });
+	});
+
+}
