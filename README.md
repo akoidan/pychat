@@ -18,8 +18,9 @@ Windows:
  2. Add pip and python to PATH variable
  3. Install redis from https://github.com/rgl/redis/downloads
  4. Open cmd as Administrator and run `pip install -r requirements.txt`
- 5. Copy https://github.com/Deathangel908/djangochat-config (see 3rd step for linux) revision static files to story/static directory
- 6. Open cmd and run `python manage.py init_db` from project directory
+ 5. Copy `static` directory from https://github.com/Deathangel908/djangochat-config to `story` project directory
+ 6. Copy `static` directory from https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1 to `story` project directory
+ 7. Open cmd and run `python manage.py init_db` from project directory
 
 Ubuntu:
  1. `apt-get install python`
@@ -34,7 +35,7 @@ Archlinux:
 Next steps are common for Linux:
  1. `pip install -r requirements.txt`
  2. `python manage.py init_db`
- 3. `git clone https://github.com/Deathangel908/djangochat-config && cd djangochat-config && git checkout fc8c733adb45a6d2f6dc57c30a5ce868268e160f && cp -r ./static ../story/`
+ 3. `sh download_content.sh`
 
 Start the chat:
 ==============
@@ -43,6 +44,8 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* https://github.com/dbushell/Pikaday/issues/319
+* local storage can store another user messasges in case of logout ?
 * file upload http://stackoverflow.com/a/14605593/3872976
 * show user profile onclick gender icon
 * add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis

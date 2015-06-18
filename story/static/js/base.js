@@ -6,6 +6,22 @@ document.addEventListener("DOMContentLoaded", function () {
 	if (typeof InstallTrigger !== 'undefined') {
 		console.warn("Ops there's no scrollbar for firefox. Use chrome for pretty UI")
 	}
+	// TODO what is this doing here being a global onload? move it to profile.js
+	if (isDateMissing()) {
+		console.warn("Browser doesn't support html5 input type date, trying to load javascript datepicker");
+		loadjscssfile('/static/css/pikaday.css', 'css');
+		loadjscssfile('/static/js/moment.js', 'js');
+		loadjscssfile('/static/js/pikaday.js', 'js', function () {
+			var picker = new Pikaday(
+				{	field: document.getElementById('id_birthday'),
+					format: "MM/DD/YYYY",
+					firstDay: 1,
+					maxDate: new Date(),
+					yearRange: [1930, 2010]
+				});
+			console.log("pikaday date picker has been loaded");
+		});
+	}
 });
 
 
@@ -138,13 +154,4 @@ function isDateMissing() {
 	input.setAttribute('value', notADateValue);
 
 	return input.value === notADateValue;
-}
-
-if (isDateMissing()) {
-	// TODO
-	loadjscssfile('http://dbushell.github.io/Pikaday/css/pikaday.css', 'css');
-	loadjscssfile('http://dbushell.github.io/Pikaday/pikaday.js', 'js', function () {
-		var picker = new Pikaday({ field: document.getElementById('id_birthday') });
-	});
-
 }

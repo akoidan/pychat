@@ -11,6 +11,11 @@ story/static/sounds/*
 story/static/font/*
 story/static/demo.html
 story/static/favicon.ico
-djangochat-config
 story/static/css/fontello.css
+story/static/css/animation.css
+story/static/css/fontello-codes.css
+story/static/css/fontello-embedded.css
+story/static/css/pikaday.css
+story/static/js/pikaday.js
+story/static/js/moment.js
 example
