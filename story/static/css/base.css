@@ -80,7 +80,7 @@ html, body {
 
 
 /* ================== COMMONS ======================*/
-.biginputtext input:not([type=button]):not([type=submit]) {
+.biginputtext input:not([type=button]):not([type=submit]), select {
 	padding: 8px;
 	margin: 5px 10px 5px 0;
 	border-radius: 5px;
@@ -193,6 +193,30 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 ::-webkit-calendar-picker-indicator { background: rgb(39, 44, 45); } /*lor background*/
 ::-webkit-inner-spin-button { display: none; }
 
+input[type=file] {
+	-webkit-appearance: textfield;
+	-webkit-box-sizing: border-box;
+	/*background-color: red;*/
+}
+
+input[type=file]::-webkit-file-upload-button {
+	background-color: rgb(62, 65, 58);
+	color: #BABDB6;
+	border: 1px solid transparent;
+	border-radius: 3px;
+	font-size: 18px;
+	padding: 6px 12px;
+	horiz-align: center;
+}
+input[type=file]::-webkit-file-upload-button:hover {
+	color: #ffffff;
+	border: 1px solid #48484a;
+	box-shadow: 0 0 10px #55585b;
+	cursor: pointer;
+}
+/* "x::-webkit-file-upload-button" forces the rules to only apply to browsers that support this pseudo-element */
+
+
 /* ====================== PROFILE.CSS ================= */
 .img {
 	float: left;
@@ -203,6 +227,7 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 	/*padding-right: 20px;*/
 }
 .profile {
+	display: block;
 	margin-top: 10px;
 	position: relative;
 }
