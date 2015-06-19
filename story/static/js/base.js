@@ -10,16 +10,19 @@ document.addEventListener("DOMContentLoaded", function () {
 	if (isDateMissing()) {
 		console.warn("Browser doesn't support html5 input type date, trying to load javascript datepicker");
 		loadjscssfile('/static/css/pikaday.css', 'css');
-		loadjscssfile('/static/js/moment.js', 'js');
-		loadjscssfile('/static/js/pikaday.js', 'js', function () {
-			var picker = new Pikaday(
-				{	field: document.getElementById('id_birthday'),
-					format: "MM/DD/YYYY",
-					firstDay: 1,
-					maxDate: new Date(),
-					yearRange: [1930, 2010]
-				});
-			console.log("pikaday date picker has been loaded");
+		loadjscssfile('/static/js/moment.js', 'js', function () {
+			// load pikaday only after moment.js
+			loadjscssfile('/static/js/pikaday.js', 'js', function () {
+				var picker = new Pikaday(
+					{
+						field: document.getElementById('id_birthday'),
+						format: "MM/DD/YYYY",
+						firstDay: 1,
+						maxDate: new Date(),
+						yearRange: [1930, 2010]
+					});
+				console.log("pikaday date picker has been loaded");
+			});
 		});
 	}
 });
@@ -128,6 +131,7 @@ function getDebugMessage() {
 // PROFILE.JS
 
 function loadjscssfile(filename, filetype, callback) {
+	// TODO load doesn't work in IE for pikaday
 	var fileref = null;
 	if (filetype == "js") { //if filename is a external JavaScript file
 		fileref = document.createElement('script');

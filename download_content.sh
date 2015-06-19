@@ -49,7 +49,7 @@ cp -r $TMP_DIR/chatconf/static $STATIC_PARENT
 
 # datepicker
 wget http://dbushell.github.io/Pikaday/css/pikaday.css -P $CSS_DIR
-wget http://dbushell.github.io/Pikaday/pikaday.js -P $JS_DIR
+wget https://raw.githubusercontent.com/IS-smcleod/Pikaday/master/pikaday.js -P $JS_DIR
 wget http://momentjs.com/downloads/moment.js -P $JS_DIR
 
 

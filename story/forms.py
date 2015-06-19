@@ -12,12 +12,9 @@ class DateWidget(forms.widgets.DateInput):
 
 
 class UserProfileForm(forms.ModelForm):
-	"""
-	A form that provides a way to edit UserProfile
-	"""
 	# the widget gets rid of <a href=
 	photo = FileField(widget=forms.FileInput)
-	birthday = DateField(widget=DateWidget)
+	birthday = DateField(widget=DateWidget)  # input_formats=settings.DATE_INPUT_FORMATS
 	GENDER_CHOICES = (
 		(1, 'Male'),
 		(2, 'Female'),

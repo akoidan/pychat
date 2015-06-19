@@ -21,6 +21,10 @@ ul {
 	 display:inline;
 }
 
+.navbarList > li > a {
+	text-decoration: none; /* remove IE underline from fonts*/
+}
+
 html, body {
 	text-shadow: none;
 	/*cursor: auto;*/
@@ -38,9 +42,8 @@ html, body {
 /*============== ONLY LOGIN.CSS =============*/
 .userNameInput {
 	background: rgba(0, 0, 0, 0);
-	border: none !important;
 	margin: 0 0;
-	font-size: 22px; /*icons are 26 px + border, the bigger size will shit everything to bot*/
+	font-size: 22px; /*icons are 26 px + border, the bigger size will shift everything to bot*/
 	padding: 0;
 	width: 150px;
 }

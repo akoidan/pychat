@@ -44,6 +44,9 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* add change password and realtime javascript to change_profile
+* html5 datepicker doesn't recognize its format
+* DATE_INPUT_FORMATS used for parsing not for rendering
 * https://github.com/dbushell/Pikaday/issues/319
 * local storage can store another user messasges in case of logout ?
 * file upload http://stackoverflow.com/a/14605593/3872976
