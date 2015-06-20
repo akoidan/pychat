@@ -4,26 +4,7 @@ var userRegex = /^[a-zA-Z-_0-9]{1,16}$/;
 document.addEventListener("DOMContentLoaded", function () {
 	mute();
 	if (typeof InstallTrigger !== 'undefined') {
-		console.warn("Ops there's no scrollbar for firefox. Use chrome for pretty UI")
-	}
-	// TODO what is this doing here being a global onload? move it to profile.js
-	if (isDateMissing()) {
-		console.warn("Browser doesn't support html5 input type date, trying to load javascript datepicker");
-		loadjscssfile('/static/css/pikaday.css', 'css');
-		loadjscssfile('/static/js/moment.js', 'js', function () {
-			// load pikaday only after moment.js
-			loadjscssfile('/static/js/pikaday.js', 'js', function () {
-				var picker = new Pikaday(
-					{
-						field: document.getElementById('id_birthday'),
-						format: "MM/DD/YYYY",
-						firstDay: 1,
-						maxDate: new Date(),
-						yearRange: [1930, 2010]
-					});
-				console.log("pikaday date picker has been loaded");
-			});
-		});
+		console.warn(getDebugMessage("Ops, there's no scrollbar for firefox"));
 	}
 });
 

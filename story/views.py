@@ -146,7 +146,16 @@ def get_profile(request):
 	form = UserProfileForm(instance=user_profile)
 	c = csrf(request)
 	c['form'] = form
+	c['date_format'] = settings.DATE_INPUT_FORMATS_JS
 	return render_to_response('story/change_profile.html', c,  context_instance=RequestContext(request))
+
+
+@require_http_methods('GET')
+@login_required_no_redirect
+def show_profile(request, profileId):
+	user_profile = UserProfile.objects.get(pk=profileId)
+	c = {'profile': user_profile}
+	return render_to_response('story/show_profile.html', c,  context_instance=RequestContext(request))
 
 
 @require_http_methods('POST')

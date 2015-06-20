@@ -1,4 +1,30 @@
 {% extends 'story/base.html' %}
+{% block head %}
+	{% load staticfiles %}
+	<script>
+	// TODO move it into a separate file
+		document.addEventListener("DOMContentLoaded", function () {
+			if (isDateMissing()) {
+				console.warn(getDebugMessage("Browser doesn't support html5 input type date, trying to load javascript datepicker"));
+				loadjscssfile("{% static 'css/pikaday.css' %}", 'css');
+				loadjscssfile("{%  static 'js/moment.js' %}", 'js', function () {
+					// load pikaday only after moment.js
+					loadjscssfile("{% static 'js/pikaday.js' %}", 'js', function () {
+						var picker = new Pikaday(
+								{
+									field: document.getElementById('id_birthday'),
+									format: '{{ date_format }}',
+									firstDay: 1,
+									maxDate: new Date(),
+									yearRange: [1930, 2010]
+								});
+						console.log(getDebugMessage("pikaday date picker has been loaded"));
+					});
+				})
+			}
+		});
+	</script>
+{% endblock head %}
 {% block content %}
 	<div>
 		{#	if photo isn't uploaded yet #}
@@ -10,7 +36,9 @@
 				{% csrf_token %}
 				<table class="biginputtext padded15">
 					{{ form.as_table }}
-					<tr> <td colspan="2"><input type="submit" value="Save"/></td></tr>
+					<tr>
+						<td colspan="2"><input type="submit" value="Save"/></td>
+					</tr>
 				</table>
 			</form>
 		</div>

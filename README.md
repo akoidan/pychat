@@ -14,12 +14,12 @@ Get dependencies:
  6. Copy static content (audio, fonts...)
 
 Windows:
- 1. Install python with pip https://www.python.org/downloads/
+ 1. Install [python](https://www.python.org/downloads/) with pip 
  2. Add pip and python to PATH variable
- 3. Install redis from https://github.com/rgl/redis/downloads
+ 3. Install [redis](https://github.com/rgl/redis/downloads) 
  4. Open cmd as Administrator and run `pip install -r requirements.txt`
- 5. Copy `static` directory from https://github.com/Deathangel908/djangochat-config to `story` project directory
- 6. Copy `static` directory from https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1 to `story` project directory
+ 5. Copy `static` directory from [djangochat-config](https://github.com/Deathangel908/djangochat-config) to `story` project directory
+ 6. Unzip `static` directory from [dropbox](https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1) to `story` project directory
  7. Open cmd and run `python manage.py init_db` from project directory
 
 Ubuntu:
@@ -40,17 +40,15 @@ Next steps are common for Linux:
 Start the chat:
 ==============
  1. Start session holder: `redis-server`
- 2. Start WebSocket listener: `python manage.py start_server`
+ 2. Start WebSocket listener: `python manage.py start_tornado`
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* add lock to loadMessages to prevent doubling getting the same message and appending it twice. 
 * add change password and realtime javascript to change_profile
-* html5 datepicker doesn't recognize its format
-* DATE_INPUT_FORMATS used for parsing not for rendering
-* https://github.com/dbushell/Pikaday/issues/319
 * local storage can store another user messasges in case of logout ?
 * file upload http://stackoverflow.com/a/14605593/3872976
-* show user profile onclick gender icon
+* !!!show user profile onclick gender icon 
 * add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis
 * create tornado class in tornadoapp, put there all tornado logic
 * change anonymous message color
@@ -65,4 +63,4 @@ Start the chat:
 * add chat rooms
 * implement smiles
 * check loadmessage top onkeydow
-* allow selecting username in navbar, remove slecting cursor 
+* allow selecting username in navbar, remove selecting cursor 

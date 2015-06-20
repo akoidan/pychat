@@ -23,5 +23,6 @@ urlpatterns = patterns(
 	url(r'^validate_user$', 'story.views.validate_user'),
 	url(r'^validate_email$', 'story.views.validate_email'),
 	url(r'^profile$', 'story.views.get_profile'),
+	url(r'^profile/(\d{1,5})$', 'story.views.show_profile'),
 	url(r'^save_profile$', 'story.views.save_profile'),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

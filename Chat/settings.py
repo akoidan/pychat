@@ -213,5 +213,6 @@ MAX_USERNAME_LENGTH = 16
 MAX_MESSAGE_SIZE = 10000
 
 #
-DATE_INPUT_FORMATS = ('%m-%d-%Y',)  # html5 input date default format, see also Pikaday in js
+DATE_INPUT_FORMATS = ('%Y-%m-%d',)  # html5 input date default format, see also Pikaday in js
+DATE_INPUT_FORMATS_JS = 'YYYY-MM-DD'  # html5 input date default format, see also Pikaday in js
 USE_L10N = False  # use DATE_INPUT_FORMATS as main format for date rendering
