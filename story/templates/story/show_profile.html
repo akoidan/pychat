@@ -1,0 +1,30 @@
+{% extends 'story/base.html' %}
+{% block content %}
+		<div class="row">
+			{% if profile.photo %}
+					<img src="{{ profile.photo.url }}" alt="ava" class="img-responsive">
+			{% endif %}
+
+			<div class="col-md-6">
+				<div>
+					<h3>{{ profile.name }} {{ profile.surname }} ({{ profile.username }}) </h3>
+				</div>
+				<div class="profile">
+					<table class="table">
+						<tr>
+							<td>birthday</td>
+							<td> {{ profile.birthday }}</td>
+						</tr>
+						<tr>
+							<td>contacts</td>
+							<td> {{ profile.contacts }}</td>
+						</tr>
+						<tr>
+							<td>email</td>
+							<td>{{ profile.email }}</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+{% endblock content %}
