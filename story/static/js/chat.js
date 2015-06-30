@@ -12,7 +12,7 @@ var systemHeader = '<font class="message-header-system">';
 var endHeader = '</font>';
 var contentStyle = '<font class="message-text-style">';
 
-var mouseWheelEventName=(/Firefox/i.test(navigator.userAgent))? "DOMMouseScroll" : "mousewheel";
+var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
 var newMessagesCount = 0;
 var isCurrentTabActive = true;
@@ -44,7 +44,7 @@ var userNameLabel;
 //main single socket for handling realtime messages
 var ws;
 
-document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function () {
 	chatBoxDiv = document.getElementById("chatbox");
 	userMessage = document.getElementById("usermsg");
 	chatRoomsTable = document.getElementById("chatroomtables");
@@ -61,8 +61,8 @@ document.addEventListener("DOMContentLoaded", function() {
 	chatRoomsTable.addEventListener("click", chatRoomClick);
 	userMessage.addEventListener("keypress", sendMessageKeyPress);
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
-	// some browser don't fire keypress event for num keys
-	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);  // doesn't work in chromium for div
+	// some browser don't fire keypress event for num keys so keydown instead of keypress
+	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);  //TODO doesn't work in chromium for div
 	window.addEventListener("blur", changeTittleFunction);
 	window.addEventListener("focus", changeTittleFunction);
 	loadMessagesFromLocalStorage();
@@ -98,14 +98,17 @@ function changeTittleFunction(e) {
 function chatRoomClick(event) {
 	event = event || window.event;
 	var target = event.target || event.srcElement;
-
 	while (target != chatRoomsTable) { // ( ** )
 		if (target.nodeName == 'TD') { // ( * )
-			if (target.cellIndex == 1) { // name is second
-				showUserSendMess(target.innerHTML);
+			switch (target.cellIndex) {
+				case 1:
+					showUserSendMess(target.innerHTML);
+					break;
+				case 0:
+					console.log("lol"); // TODO
 			}
 		}
-		target = target.parentNode
+		target = target.parentNode;
 	}
 }
 
@@ -137,7 +140,7 @@ function sendMessageKeyPress(event) {
 
 function loadMessagesFromLocalStorage() {
 	loggedUser = localStorage.getItem(STORAGE_USER);
-	var jsonData =  localStorage.getItem(STORAGE_NAME);
+	var jsonData = localStorage.getItem(STORAGE_NAME);
 	if (jsonData != null) {
 		var parsedData = JSON.parse(jsonData);
 		// don't make sound on loadHistory
@@ -308,9 +311,9 @@ function handleGetMessages(message) {
 
 // TODO too many json parses
 function saveMessageToStorage(newItem) {
-	switch (newItem['action']){
+	switch (newItem['action']) {
 		case 'me':
-			localStorage.setItem(STORAGE_USER,  newItem['content']);
+			localStorage.setItem(STORAGE_USER, newItem['content']);
 			break;
 		case 'joined':
 		case 'changed':
@@ -333,7 +336,7 @@ function saveMessageToStorage(newItem) {
 			break;
 		default:
 			console.log(getDebugMessage("Skipping message with type {}", newItem['action'])); // TODO stringtrify?)))
-		break;
+			break;
 	}
 }
 
@@ -369,7 +372,7 @@ function webSocketMessage(message) {
 
 	handlePreparedWSMessage(data);
 
-		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
+	//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
 	saveMessageToStorage(data);
 }
 
@@ -402,8 +405,8 @@ function sendMessage(usermsg, receiver) {
 	}
 	var messageRequest = {
 		content: usermsg,
-		receiver:  receiver,
-		action:  'send'
+		receiver: receiver,
+		action: 'send'
 	};
 
 	if (sendToServer(messageRequest)) {
@@ -415,7 +418,7 @@ function sendMessage(usermsg, receiver) {
 function loadUpHistory(count) {
 	if (chatBoxDiv.scrollTop === 0) {
 		var getMessageRequest = {
-			headerId : headerId,
+			headerId: headerId,
 			count: count,
 			action: 'messages'
 		};

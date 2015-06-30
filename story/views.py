@@ -151,7 +151,6 @@ def get_profile(request):
 
 
 @require_http_methods('GET')
-@login_required_no_redirect
 def show_profile(request, profileId):
 	user_profile = UserProfile.objects.get(pk=profileId)
 	c = {'profile': user_profile}

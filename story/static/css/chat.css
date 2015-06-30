@@ -1,3 +1,10 @@
+.color-lor #chatroomtables > tbody > tr :hover {color: #B79D21;}
+.color-lor .message-header-others {color: #729fcf;}
+.color-lor .message-header-private {color: #8ae234;}
+.color-lor .message-header-self {color: #e29722;}
+.color-lor .message-header-system {color: #9DD3DD;}
+.color-lor #userSendMessageTo {box-shadow: 0 2px 2px rgba(6, 3, 8, 0.77);}
+
 .wrapper {
 	height: calc(100% - 83px);
 	width: 100%;
@@ -27,20 +34,11 @@
 	text-overflow: ellipsis;
 }
 
-#chatroomtables > tbody > tr :hover{
+#chatroomtables > tbody > tr :hover {
 	cursor: pointer;
-	color: #B79D21;
 }
 #chatroomtables > tbody > tr > td{
 	padding: 0;
-}
-
-.inputs {
-	border-radius: 5px;
-	font-size: 18px;
-	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.83) inset, 0 -1px 0 rgba(0, 0, 0, 0.66) inset;
-	background-color: #272c2d;
-	padding-left: 5px;/*between text and left edge*/
 }
 
 .inline {
@@ -56,10 +54,13 @@
 	align-items: center;
 	max-width: 250px;
 	/*font-size: 17px; = inherited */
-	box-shadow: 0 2px 2px rgba(6, 3, 8, 0.77);
 	border-radius: 2px;
 	float:left;
-	padding-top: 4px;
+	padding-top: 3px;
+	padding-bottom: 2px;
+	margin-left: 5px;
+	padding-left: 2px;
+	border: 1px solid #383a3a;
 }
 #receiverId {
 	display: inline-block;
@@ -69,21 +70,6 @@
 	padding-left:5px;
 	padding-right: 12px;
 }
-.message-header-others {
-	color: #729fcf;
-}
-
-.message-header-private {
-	color: #8ae234;
-}
-
-.message-header-self {
-	color: #e29722;
-}
-
-.message-header-system {
-	color: #9DD3DD;
-}
 
 /*-webkit-background-clip: text;*/
 /*-webkit-text-fill-color: transparent;*/
@@ -91,4 +77,8 @@
 #chatbox {
 	/*-webkit-mask-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 1) 95%, rgba(0, 0, 0, 0) 100%);*/
 	/*TODO login dropdown goes under scroll, FF doesn't support*/
+}
+
+.fullwidth {
+	width: 100%;
 }
