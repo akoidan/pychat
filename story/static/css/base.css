@@ -8,12 +8,25 @@
 	background-color: rgb(34, 31, 31);
 }
 /*---------INPUT TEXT--------*/
-.color-lor input[type=text],.color-lor input[type=password],.color-lor input[type=email],.color-lor textarea,.color-lor select,.color-lor input[type=date] {
+.color-lor input[type=text],
+.color-lor input[type=password],
+.color-lor input[type=email],
+.color-lor textarea,
+.color-lor select,
+.color-lor input[type=date] {
 	background-color: #272c2d;
 	border: 1px solid rgba(96, 90, 90, 0.31);
 	color: #C7C7C7;
+}
+.color-lor .box-shadow input[type=text],
+.color-lor .box-shadow input[type=password],
+.color-lor .box-shadow textarea,
+.color-lor .box-shadow select,
+.color-lor .box-shadow input[type=date]
+{
 	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.83) inset, 0 -1px 0 rgba(0, 0, 0, 0.66) inset;
 }
+
 .color-lor input[type=text]:focus,
 .color-lor input[type=password]:focus,
 .color-lor input[type=email]:focus,
@@ -28,8 +41,8 @@
 /*-----------INPUT BUTTON -----------*/
 .color-lor input[type=button]:hover,
 .color-lor input[type=submit]:hover {
-	color: #ffffff;
-	background: linear-gradient(#79BC64, #578843) repeat scroll 0 0 transparent;
+	color: #000000;
+	background: linear-gradient(#babdb6, #abbdab) repeat scroll 0 0 transparent;
 	border: 1px solid #48484a;
 	box-shadow: 0 0 10px #55585b;
 	cursor: pointer; /*TODO */

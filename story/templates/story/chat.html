@@ -1,6 +1,5 @@
 {% extends "story/base.html" %}
-{% block head %}
-	{% load staticfiles %}
+{% block head %} {% load staticfiles %}
 	<script src="{% static "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}">
 {% endblock head %}
@@ -11,7 +10,7 @@
 			onclick="clearLocalHistory()"></i></li>
 {% endblock navbar %}
 {% block content %}
-	<div id="audios">
+	<div>
 		<audio id="chatIncoming" src="{% static 'sounds/ChatIncoming.wav' %}" preload="auto"></audio>
 		<audio id="chatOutgoing" src="{% static 'sounds/ChatOutgoing.wav' %}" preload="auto"></audio>
 		<audio id="chatLogin" src="{% static 'sounds/ChatLogin.wav' %}" preload="auto"></audio>
@@ -28,7 +27,7 @@
 				<div id="receiverId"></div>
 				<i class="icon-cancel" onclick="hideUserSendToName();"></i>
 			</div>
-			<div class="message-text-holder">
+			<div class="message-text-holder box-shadow">
 				<input name="usermsg" class="fullwidth" type="text" id="usermsg"/>
 			</div>
 		</div>
