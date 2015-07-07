@@ -31,7 +31,7 @@ var chatLogout;
 // current username
 var loggedUser;
 // div for user list appending
-var chatRoomsTable;
+var chatUsersTable;
 // input type that contains text for sending message
 var userMessage;
 var sendButton;
@@ -47,7 +47,8 @@ var ws;
 document.addEventListener("DOMContentLoaded", function () {
 	chatBoxDiv = document.getElementById("chatbox");
 	userMessage = document.getElementById("usermsg");
-	chatRoomsTable = document.getElementById("chatroomtables");
+	chatUsersTable = document.getElementById("chat-user-table");
+	chatUserRoomWrapper = document.getElementById("chat-room-users-wrapper");
 	userNameLabel = document.getElementById("userNameLabel");
 	userSendMessageTo = document.getElementById("userSendMessageTo");
 	chatIncoming = document.getElementById("chatIncoming");
@@ -58,7 +59,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	userSendMessageTo.style.display = "none";
 	receiverId = document.getElementById("receiverId");
 
-	chatRoomsTable.addEventListener("click", chatRoomClick);
+	chatUsersTable.addEventListener("click", chatRoomClick);
 	userMessage.addEventListener("keypress", sendMessageKeyPress);
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
@@ -98,7 +99,7 @@ function changeTittleFunction(e) {
 function chatRoomClick(event) {
 	event = event || window.event;
 	var target = event.target || event.srcElement;
-	while (target != chatRoomsTable) { // ( ** )
+	while (target != chatUsersTable) { // ( ** )
 		if (target.nodeName == 'TD') { // ( * )
 			switch (target.cellIndex) {
 				case 1:
@@ -200,7 +201,7 @@ function loadUsers(usernames) {
 			allUsers += '<tr><td>' + icon + '</td> <td>' + username + '</td><tr>';
 		}
 	}
-	chatRoomsTable.innerHTML = allUsers;
+	chatUsersTable.innerHTML = allUsers;
 }
 
 // Used by {@link loadUsers}
@@ -428,11 +429,10 @@ function loadUpHistory(count) {
 
 
 function toggleRoom() {
-	if (chatRoomsTable.style.display == 'block' || chatRoomsTable.style.display == '') {
-		chatRoomsTable.style.display = 'none';
-	}
-	else {
-		chatRoomsTable.style.display = 'block';
+	if (chatUserRoomWrapper.style.display == 'none' ) {
+		chatUserRoomWrapper.style.display = 'block';
+	} else {
+		chatUserRoomWrapper.style.display = 'none';
 	}
 }
 

@@ -5,9 +5,9 @@
 {% endblock head %}
 {% block navbar %}
 	<li><i title="Show all users"
-			onclick="toggleRoom()" class="icon-users"></i></li>
-		<li><i class="icon-clear" title="CLear local history"
-			onclick="clearLocalHistory()"></i></li>
+			 onclick="toggleRoom()" class="icon-users"></i></li>
+	<li><i class="icon-clear" title="CLear local history"
+			 onclick="clearLocalHistory()"></i></li>
 {% endblock navbar %}
 {% block content %}
 	<div>
@@ -17,8 +17,19 @@
 		<audio id="chatLogout" src="{% static 'sounds/ChatLogout.wav' %}" preload="auto"></audio>
 	</div>
 	<div class="wrapper">
-		<div class="chat-wrapper">
-			<div id="chatrooms"><table id="chatroomtables"><tr></tr></table></div>
+		<div class="fluid-inline">
+			<div id="chat-room-users-wrapper">
+				<div class="fluid-height-child-bot">
+					<div>
+						<table id="chat-user-table">
+							<tr></tr>
+						</table>
+					</div>
+					<div>
+						main room {% comment %}TODO when scroll appears it take the place of div {% endcomment %}
+					</div>
+				</div>
+			</div>
 			<div id="chatbox">
 			</div>
 		</div>
