@@ -40,6 +40,7 @@ class UserProfile(AbstractBaseUser):
 	name = CharField(max_length=30, null=True)
 	surname = CharField(max_length=30, null=True)
 	email = models.EmailField(null=True, unique=True, blank=True)
+	city = CharField(max_length=50, null=True)
 
 	# specifies auth, create email, etc methods
 	objects = BaseUserManager()

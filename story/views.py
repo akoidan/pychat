@@ -18,7 +18,7 @@ from story.decorators import login_required_no_redirect
 from story.models import UserProfile
 from .models import Messages
 from story import registration_utils
-from story.forms import UserProfileForm
+from story.forms import UserProfileForm, UserProfileReadOnlyForm
 from story.registration_utils import check_email, send_email_verification, check_user, check_password
 from Chat import settings
 
@@ -81,7 +81,7 @@ def auth(request):
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		djangologin(request, user)
-		message = settings.UPDATE_PAGE_EVENT
+		message = settings.VALIDATION_IS_OK
 	else:
 		message = 'Login or password is wrong'
 	response = HttpResponse(message, content_type='text/plain')
@@ -131,7 +131,7 @@ def register(request):
 		auth_user = authenticate(username=username, password=password)
 		djangologin(request, auth_user)
 		# register,js redirect if message = 'Account created'
-		message = settings.ACCOUNT_CREATED_EVENT
+		message = settings.VALIDATION_IS_OK
 		if verify_email == 'Y':
 			send_email_verification(user, request.get_host())
 	except ValidationError as e:
@@ -152,9 +152,13 @@ def get_profile(request):
 
 @require_http_methods('GET')
 def show_profile(request, profileId):
-	user_profile = UserProfile.objects.get(pk=profileId)
-	c = {'profile': user_profile}
-	return render_to_response('story/show_profile.html', c,  context_instance=RequestContext(request))
+	try:
+		user_profile = UserProfile.objects.get(pk=profileId)
+		form = UserProfileReadOnlyForm(instance=user_profile)
+		c = {'profile': form}
+		return render_to_response('story/show_profile.html', c,  context_instance=RequestContext(request))
+	except ObjectDoesNotExist:
+		raise Http404
 
 
 @require_http_methods('POST')

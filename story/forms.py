@@ -11,10 +11,7 @@ class DateWidget(forms.widgets.DateInput):
 	input_type = 'date'
 
 
-class UserProfileForm(forms.ModelForm):
-	# the widget gets rid of <a href=
-	photo = FileField(widget=forms.FileInput)
-	birthday = DateField(widget=DateWidget)  # input_formats=settings.DATE_INPUT_FORMATS
+class UserProfileReadOnlyForm(forms.ModelForm):
 	GENDER_CHOICES = (
 		(1, 'Male'),
 		(2, 'Female'),
@@ -25,7 +22,14 @@ class UserProfileForm(forms.ModelForm):
 
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
-		fields = ('username', 'name', 'surname', 'email', 'birthday', 'contacts', 'sex', 'photo')
+
+class UserProfileForm(UserProfileReadOnlyForm):
+	# the widget gets rid of <a href=
+	photo = FileField(widget=forms.FileInput)
+	birthday = DateField(widget=DateWidget)  # input_formats=settings.DATE_INPUT_FORMATS
+
+	class Meta:  # pylint: disable=C1001
+		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts', 'sex', 'photo')
 
 
 	def __init__(self, *args, **kwargs):
@@ -37,3 +41,5 @@ class UserProfileForm(forms.ModelForm):
 		for key in self.fields:
 			if key != 'username':
 				self.fields[key].required = False
+
+

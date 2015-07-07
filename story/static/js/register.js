@@ -42,7 +42,7 @@ function register() {
 		sex: sex
 	};
 	doPost('/register', datad, function (data) {
-		if (data === 'Account created') {
+		if (data === 'ok') {
 			window.location.href = '/';
 		} else {
 			alert(data);

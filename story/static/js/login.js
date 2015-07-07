@@ -3,8 +3,8 @@ function login() {
 		username: document.getElementById("username").value,
 		password: document.getElementById("password").value
 	};
-	doPost('auth', credentials, function (data) {
-		if (data === 'update') {
+	doPost('/auth', credentials, function (data) {
+		if (data === 'ok') {
 			window.location.href = '/';
 		} else {
 			alert(data);

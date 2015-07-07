@@ -1,16 +1,44 @@
 {% extends 'story/base.html' %}
 {% block content %}
-		<div class="row">
+		<div class="inline">
 			{% if profile.photo %}
 					<img src="{{ profile.photo.url }}" alt="ava" class="img-responsive">
 			{% endif %}
 
-			<div class="col-md-6">
 				<div>
-					<h3>{{ profile.name }} {{ profile.surname }} ({{ profile.username }}) </h3>
+					<h3>{{ profile.username }} </h3>
 				</div>
-				<div class="profile">
-					<table class="table">
+
+
+			{% for field in form %}
+				{{ field }}
+			{% endfor %}
+
+					<table>
+						<tr>
+							<td>
+								name
+							</td>
+							<td>
+								{{ profile.name }}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								surname
+							</td>
+							<td>
+								{{ profile.surname }}
+							</td>
+						</tr>
+						<tr>
+							<td>
+								city
+							</td>
+							<td>
+								{{ profile.city }}
+							</td>
+						</tr>
 						<tr>
 							<td>birthday</td>
 							<td> {{ profile.birthday }}</td>
@@ -24,7 +52,5 @@
 							<td>{{ profile.email }}</td>
 						</tr>
 					</table>
-				</div>
-			</div>
 		</div>
 {% endblock content %}
