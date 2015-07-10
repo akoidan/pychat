@@ -4,6 +4,7 @@ if (!("WebSocket" in window)) {
 	"Please use Chrome, Firefox, Safari, Internet Explorer 10+ or any modern browser.");
 	throw "Browser doesn't support Web socket";
 }
+var CONNECTION_RETRY_TIME = 5000;
 
 var selfHeader = '<font class="message-header-self">';
 var privateHeader = '<font class="message-header-private">';
@@ -11,6 +12,13 @@ var othersHeader = '<font class="message-header-others">';
 var systemHeader = '<font class="message-header-system">';
 var endHeader = '</font>';
 var contentStyle = '<font class="message-text-style">';
+var genderIcons = {
+		'Male': '<i class="icon-man"></i>',
+		'Female': '<i class="icon-girl"></i>',
+		'Alien': '<i class="icon-anonymous"></i>',
+		null: '<i class="icon-user-secret"></i>', // chrome
+		None: '<i class="icon-user-secret"></i>' // firefox
+	};
 
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
@@ -43,6 +51,7 @@ var receiverId;
 var userNameLabel;
 //main single socket for handling realtime messages
 var ws;
+var isWsConnected; // used for debugging info only
 
 document.addEventListener("DOMContentLoaded", function () {
 	chatBoxDiv = document.getElementById("chatbox");
@@ -67,6 +76,8 @@ document.addEventListener("DOMContentLoaded", function () {
 	window.addEventListener("blur", changeTittleFunction);
 	window.addEventListener("focus", changeTittleFunction);
 	loadMessagesFromLocalStorage();
+	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
+	isWsConnected = true;
 	start_chat_ws();
 
 });
@@ -158,13 +169,17 @@ function start_chat_ws() {
 	ws = new WebSocket(readCookie('api'));
 	ws.onmessage = webSocketMessage;
 	ws.onclose = function () {
-		console.error(getDebugMessage("Connection to WebSocket is lost, trying to reconnect"));
+		if (isWsConnected) {
+			console.error(getDebugMessage("Connection to WebSocket has failed, trying to reconnect every 5 seconds"));
+			isWsConnected = false;
+		}
 		// Try to reconnect in 5 seconds
 		setTimeout(function () {
 			start_chat_ws()
-		}, 5000);
+		}, CONNECTION_RETRY_TIME);
 	};
 	ws.onopen = function () {
+		isWsConnected = true;
 		console.log(getDebugMessage("Connection to WebSocket established"));
 	}
 }
@@ -184,19 +199,10 @@ function loadUsers(usernames) {
 	var icon;
 	for (var username in usernames) {
 		if (usernames.hasOwnProperty(username)) {
-			switch (usernames[username]) {
-				case "Male":
-					icon = '<i class="icon-man"></i>';
-					break;
-				case "Female":
-					icon = '<i class="icon-girl"></i>';
-					break;
-				case "Alien":
-					icon = '<i class="icon-anonymous"></i>';
-					break;
-				default :
-					icon = '<i class="icon-user-secret"></i>';
-					break;
+			var gender = usernames[username];
+			icon = genderIcons[gender];
+			if (icon == null) {
+				console.log(getDebugMessage('Bug, gender: {}, icon: {}', gender, icon))
 			}
 			allUsers += '<tr><td>' + icon + '</td> <td>' + username + '</td><tr>';
 		}
@@ -391,7 +397,7 @@ function appendMessage(data) {
 function sendToServer(messageRequest) {
 	var jsonRequest = JSON.stringify(messageRequest);
 	if (ws.readyState != WebSocket.OPEN) {
-		console.log(getDebugMessage("Web socket is closed. Can't send {}", jsonRequest));
+		console.warn(getDebugMessage("Web socket is closed. Can't send {}", jsonRequest));
 		return false;
 	} else {
 		console.log(getDebugMessage("WS out: {} ", jsonRequest));

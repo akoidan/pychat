@@ -29,6 +29,7 @@ class UserProfileForm(UserProfileReadOnlyForm):
 	birthday = DateField(widget=DateWidget)  # input_formats=settings.DATE_INPUT_FORMATS
 
 	class Meta:  # pylint: disable=C1001
+		model = UserProfile
 		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts', 'sex', 'photo')
 
 
