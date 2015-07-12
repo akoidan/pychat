@@ -11,10 +11,11 @@ class DateWidget(forms.widgets.DateInput):
 	"""
 	input_type = 'date'
 
+
 class OnlyTextWidget(Widget):
 	def render(self, name, value, attrs=None):
 		if name == 'sex':
-			return  GENDERS[value]
+			return GENDERS[value]
 		else:
 			return value
 

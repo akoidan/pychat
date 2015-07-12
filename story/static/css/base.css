@@ -129,6 +129,14 @@ nav {
 	font-size: 26px;
 }
 
+.fullwidth {
+	width: 100%;
+}
+
+.padding10 {
+	padding: 10px;
+}
+
 .right {
 	float:right;
 }
@@ -278,34 +286,16 @@ input[type=file]::-webkit-file-upload-button:hover {
 }
 /* "x::-webkit-file-upload-button" forces the rules to only apply to browsers that support this pseudo-element */
 
-
 /* ====================== PROFILE.CSS ================= */
-.img > img {
+
+.col1 {
+	width: 50%;
 	float: left;
-	width: 100%;
-
-	/*padding-right: 20px;*/
 }
 
-.img {
-	width: 40%;
-	/*padding-left: 15px;*/
-	/*padding-right: 15px;*/
-	/*padding-bottom: 10px;*/
-}
-
-
-.profile {
-	display: block;
-	margin-top: 10px;
-}
-
-.padded15 {
-	padding: 15px;
-}
 /*user-profile*/
-@media screen and (max-width: 55em ) {
-	.img {
+@media screen and (max-width: 50em ) {
+	.col1 {
 		width: 100%;
 	}
 	input[type=file] {
