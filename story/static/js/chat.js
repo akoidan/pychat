@@ -16,8 +16,7 @@ var genderIcons = {
 		'Male': '<i class="icon-man"></i>',
 		'Female': '<i class="icon-girl"></i>',
 		'Alien': '<i class="icon-anonymous"></i>',
-		null: '<i class="icon-user-secret"></i>', // chrome
-		None: '<i class="icon-user-secret"></i>' // firefox
+		'Secret' : '<i class="icon-user-secret"></i>'
 	};
 
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
@@ -143,6 +142,19 @@ function sendMessageKeyPress(event) {
 
 /* =============================================================== */
 
+function getWidth() {
+	if (self.innerHeight) {
+		return self.innerWidth;
+	}
+
+	if (document.documentElement && document.documentElement.clientHeight) {
+		return document.documentElement.clientWidth;
+	}
+
+	if (document.body) {
+		return document.body.clientWidth;
+	}
+}
 
 // TODO
 //var timezone = getCookie('timezone');

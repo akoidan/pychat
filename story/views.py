@@ -155,6 +155,7 @@ def show_profile(request, profileId):
 	try:
 		user_profile = UserProfile.objects.get(pk=profileId)
 		form = UserProfileReadOnlyForm(instance=user_profile)
+		form.username = user_profile.username
 		c = {'profile': form}
 		return render_to_response('story/show_profile.html', c,  context_instance=RequestContext(request))
 	except ObjectDoesNotExist:

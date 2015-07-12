@@ -85,11 +85,12 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 	-webkit-box-shadow: 0 0 0 1000px #30302A inset !important; /*important t*/
 	-webkit-text-fill-color: #CCCBDF;
 }
-.color-lor ::-webkit-scrollbar {
-	background: #222;
+/*TODO html scroll doesn't show with .color-lor class for body*/
+::-webkit-scrollbar {
+	background: #222 !important;
 }
-.color-lor ::-webkit-scrollbar-thumb {
-	background: #3E4654;
+::-webkit-scrollbar-thumb {
+	background: #3E4654 !important;;
 }
 
 /*IE scroll*/
@@ -110,6 +111,11 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 .color-lor input[type=file]::-webkit-file-upload-button {
 	background-color: rgb(62, 65, 58);
 	color: #BABDB6;
+}
+
+.color-lor .table tbody>tr>td,
+.color-lor .table tbody>tr>th{
+	border-top: 1px solid #5B6248;
 }
 /* =============== END  ===================== */
 
@@ -144,6 +150,7 @@ html, body {
 	/*cursor: auto;*/
 	margin: 0;
 	height: 100%;
+	/*width: 100% !important;*/
 	font-family: arial, serif;
 }
 
@@ -189,15 +196,17 @@ html, body {
 
 
 /* ================== COMMONS ======================*/
-.biginputtext input:not([type=button]):not([type=submit]), select {
+.biginputtext input:not([type=button]):not([type=submit]):not([type=checkbox]):not([type=radio]), select {
 	padding: 8px;
 	margin: 5px 10px 5px 0;
 	border-radius: 5px;
 	font-size: 18px;
+	width: 250px;
 }
 
 .biginputtext input[type=button], input[type=submit] {
 	width: 100%;
+	/*opacity: 0;*/
 }
 
 /******************** INPUTS ********************/
@@ -271,21 +280,55 @@ input[type=file]::-webkit-file-upload-button:hover {
 
 
 /* ====================== PROFILE.CSS ================= */
-.img {
+.img > img {
 	float: left;
-	max-width: 96%;
-	min-width: 40%;
-	height: auto;
-	padding-left: 15px;
-	padding-bottom: 10px;
+	width: 100%;
+
 	/*padding-right: 20px;*/
 }
+
+.img {
+	width: 40%;
+	/*padding-left: 15px;*/
+	/*padding-right: 15px;*/
+	/*padding-bottom: 10px;*/
+}
+
+
 .profile {
 	display: block;
 	margin-top: 10px;
-	position: relative;
 }
 
 .padded15 {
 	padding: 15px;
+}
+/*user-profile*/
+@media screen and (max-width: 55em ) {
+	.img {
+		width: 100%;
+	}
+	input[type=file] {
+		max-width: 360px;
+	}
+}
+@media screen and (max-width: 30em ) {
+	.username {
+		display: none !important;
+	}
+}
+
+@media screen and (max-width: 30em ) {
+	#chat-room-users-wrapper {
+		display: none;
+	}
+	.icon-pencil {
+		display: none;
+	}
+}
+
+@media screen and (max-height: 30em ) {
+	nav {
+		/*display: none; TODO remove css calc height*/
+	}
 }

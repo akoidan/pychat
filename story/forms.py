@@ -1,5 +1,6 @@
 from django import forms
-from django.forms import FileField, DateField, ChoiceField
+from django.forms import FileField, DateField, ChoiceField, Widget
+from Chat.settings import GENDERS
 
 from story.models import UserProfile
 
@@ -10,8 +11,30 @@ class DateWidget(forms.widgets.DateInput):
 	"""
 	input_type = 'date'
 
+class OnlyTextWidget(Widget):
+	def render(self, name, value, attrs=None):
+		if name == 'sex':
+			return  GENDERS[value]
+		else:
+			return value
+
 
 class UserProfileReadOnlyForm(forms.ModelForm):
+	def __init__(self, *args, **kwargs):
+		super(UserProfileReadOnlyForm, self).__init__(*args, **kwargs)
+		for field in self:
+				field.field.widget = OnlyTextWidget()
+
+	class Meta:  # pylint: disable=C1001
+		model = UserProfile
+		fields = ('name', 'surname', 'city',  'email', 'birthday', 'contacts', 'sex')
+
+
+class UserProfileForm(forms.ModelForm):
+	# the widget gets rid of <a href=
+	photo = FileField(widget=forms.FileInput)
+	birthday = DateField(widget=DateWidget)  # input_formats=settings.DATE_INPUT_FORMATS
+
 	GENDER_CHOICES = (
 		(1, 'Male'),
 		(2, 'Female'),
@@ -22,16 +45,7 @@ class UserProfileReadOnlyForm(forms.ModelForm):
 
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
-
-class UserProfileForm(UserProfileReadOnlyForm):
-	# the widget gets rid of <a href=
-	photo = FileField(widget=forms.FileInput)
-	birthday = DateField(widget=DateWidget)  # input_formats=settings.DATE_INPUT_FORMATS
-
-	class Meta:  # pylint: disable=C1001
-		model = UserProfile
 		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts', 'sex', 'photo')
-
 
 	def __init__(self, *args, **kwargs):
 		"""
@@ -42,5 +56,3 @@ class UserProfileForm(UserProfileReadOnlyForm):
 		for key in self.fields:
 			if key != 'username':
 				self.fields[key].required = False
-
-

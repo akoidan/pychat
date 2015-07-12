@@ -209,7 +209,7 @@ WS_ADDRESS_COOKIE_NAME = 'api'
 VALIDATION_IS_OK = 'ok'
 MAX_USERNAME_LENGTH = 16
 MAX_MESSAGE_SIZE = 10000
-
+GENDERS = {0: 'Secret', 1: 'Male', 2: 'Female', }
 #
 DATE_INPUT_FORMATS = ('%Y-%m-%d',)  # html5 input date default format, see also Pikaday in js
 DATE_INPUT_FORMATS_JS = 'YYYY-MM-DD'  # html5 input date default format, see also Pikaday in js

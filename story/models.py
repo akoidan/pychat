@@ -4,6 +4,7 @@ import datetime
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.db.models import CharField, DateField, FileField, TextField
+from Chat.settings import GENDERS
 
 
 class UserProfile(AbstractBaseUser):
@@ -46,7 +47,7 @@ class UserProfile(AbstractBaseUser):
 	objects = BaseUserManager()
 
 	birthday = DateField(null=True)
-	contacts = TextField(max_length=100, null=True)
+	contacts = CharField(max_length=100, null=True)
 	# fileField + <img instead of ImageField (removes preview link)
 	photo = FileField(upload_to=get_file_path, null=True)
 
@@ -58,11 +59,7 @@ class UserProfile(AbstractBaseUser):
 
 	@property
 	def sex_str(self):
-		return {
-			0: None,
-			1: 'Male',
-			2: 'Female',
-		}[self.sex]
+		return GENDERS[self.sex]
 
 	@sex_str.setter
 	def sex_str(self, sex):

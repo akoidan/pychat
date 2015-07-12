@@ -29,7 +29,9 @@
 	<div>
 		{#	if photo isn't uploaded yet #}
 		{% if form.instance.photo %}
-			<img src="{{ form.instance.photo.url }}" alt="ava" class="img">
+			<div class="img">
+				<img src="{{ form.instance.photo.url }}" alt="ava" class="img">
+			</div>
 		{% endif %}
 		<div class="profile">
 			<form action="{% url 'story.views.save_profile' %}" method="post" enctype="multipart/form-data">
