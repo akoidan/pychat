@@ -147,6 +147,7 @@ def get_profile(request):
 	c = csrf(request)
 	c['form'] = form
 	c['date_format'] = settings.DATE_INPUT_FORMATS_JS
+	c['readonly'] = False
 	return render_to_response('story/change_profile.html', c,  context_instance=RequestContext(request))
 
 
@@ -156,8 +157,11 @@ def show_profile(request, profileId):
 		user_profile = UserProfile.objects.get(pk=profileId)
 		form = UserProfileReadOnlyForm(instance=user_profile)
 		form.username = user_profile.username
-		c = {'profile': form}
-		return render_to_response('story/show_profile.html', c,  context_instance=RequestContext(request))
+		c = {
+			'form': form,
+			'readonly': True,
+		}
+		return render_to_response('story/change_profile.html', c,  context_instance=RequestContext(request))
 	except ObjectDoesNotExist:
 		raise Http404
 

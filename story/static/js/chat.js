@@ -13,10 +13,10 @@ var systemHeader = '<font class="message-header-system">';
 var endHeader = '</font>';
 var contentStyle = '<font class="message-text-style">';
 var genderIcons = {
-		'Male': '<i class="icon-man"></i>',
-		'Female': '<i class="icon-girl"></i>',
-		'Alien': '<i class="icon-anonymous"></i>',
-		'Secret' : '<i class="icon-user-secret"></i>'
+		'Male': 'icon-man',
+		'Female': 'icon-girl',
+		'Alien': 'icon-anonymous',
+		'Secret' : 'icon-user-secret'
 	};
 
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
@@ -111,12 +111,8 @@ function chatRoomClick(event) {
 	var target = event.target || event.srcElement;
 	while (target != chatUsersTable) { // ( ** )
 		if (target.nodeName == 'TD') { // ( * )
-			switch (target.cellIndex) {
-				case 1:
-					showUserSendMess(target.innerHTML);
-					break;
-				case 0:
-					console.log("lol"); // TODO
+			if (target.cellIndex == 1 ) {
+				showUserSendMess(target.innerHTML);
 			}
 		}
 		target = target.parentNode;
@@ -212,7 +208,7 @@ function loadUsers(usernames) {
 	for (var username in usernames) {
 		if (usernames.hasOwnProperty(username)) {
 			var gender = usernames[username];
-			icon = genderIcons[gender];
+			icon = '<a class="' + genderIcons[gender] + '" href="/profile/'+/*TODO profile ID*/'"></a>';
 			if (icon == null) {
 				console.log(getDebugMessage('Bug, gender: {}, icon: {}', gender, icon))
 			}

@@ -1,6 +1,7 @@
 {% extends 'story/base.html' %}
 {% block head %}
 	{% load staticfiles %}
+	{% if not readonly %}
 	<script>
 	// TODO move it into a separate file
 		document.addEventListener("DOMContentLoaded", function () {
@@ -24,6 +25,7 @@
 			}
 		});
 	</script>
+	{% endif %}
 {% endblock head %}
 {% block content %}
 	<div >
@@ -36,6 +38,7 @@
 			</div>
 		{% endif %}
 
+	{% if not readonly %}
 		<form  class="col1" action="{% url 'story.views.save_profile' %}" method="post" enctype="multipart/form-data">
 			{% csrf_token %}
 			<table class="biginputtext">
@@ -45,5 +48,12 @@
 				</tr>
 			</table>
 		</form>
+	{% else %}
+		<div class="col1">
+			<table class="biginputtext">
+				{{ form.as_table }}
+			</table>
+		</div>
+	{%  endif%}
 	</div>
 {% endblock content %}

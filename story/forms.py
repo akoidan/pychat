@@ -28,7 +28,7 @@ class UserProfileReadOnlyForm(forms.ModelForm):
 
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
-		fields = ('name', 'surname', 'city',  'email', 'birthday', 'contacts', 'sex')
+		fields = ('username', 'name', 'surname', 'city',  'email', 'birthday', 'contacts', 'sex')
 
 
 class UserProfileForm(forms.ModelForm):

@@ -199,7 +199,7 @@ EMAIL_HOST_PASSWORD = 'Ilovepython'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 
-MEDIA_URL = "photo/"
+MEDIA_URL = "/photo/"
 
 USER_COOKIE_NAME = 'user'
 
