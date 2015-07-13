@@ -1,4 +1,8 @@
-.color-lor #chat-user-table > tbody > tr :hover {color: #B79D21;}
+.color-lor [class='icon-girl']:hover,
+.color-lor [class='icon-man']:hover,
+.color-lor [class='icon-user-secret']:hover {
+	color: #C9C9AA;
+}
 .color-lor .message-header-others {color: #729fcf;}
 .color-lor .message-header-private {color: #8ae234;}
 .color-lor .message-header-self {color: #e29722;}
@@ -34,8 +38,10 @@
 	text-overflow: ellipsis;
 }
 
-#chat-user-table > tbody > tr :hover {
+#chat-user-table > tbody > tr > td:nth-child(2):hover {
 	cursor: pointer;
+	color: #78AEB9;
+	text-shadow: 0 0 3px #6DACA0;;
 }
 #chat-user-table > tbody > tr > td{
 	padding: 0;

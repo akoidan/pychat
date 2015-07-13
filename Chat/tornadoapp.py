@@ -37,8 +37,10 @@ COUNT_VAR_NAME = 'count'
 HEADER_ID_VAR_NAME = 'headerId'
 SESSION_USER_VAR_NAME = 'user_name'
 USER_VAR_NAME = 'user'
+USER_ID_VAR_NAME = 'id'
 TIME_VAR_NAME = 'time'
 OLD_NAME_VAR_NAME = 'oldName'
+IS_ANONYMOUS_VAR_NAME = 'anonymous'
 CONTENT_VAR_NAME = 'content'
 EVENT_VAR_NAME = 'action'
 GENDER_VAR_NAME = 'sex'
@@ -52,7 +54,6 @@ SEND_MESSAGE_EVENT = 'send'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
 REDIS_MAIN_CHANNEL = 'main'
 REDIS_USER_CHANNEL_PREFIX = 'user:%s'
-REDIS_USER_FORMAT = '%s:%s'
 REDIS_ONLINE_USERS = "online_users"
 
 
@@ -88,7 +89,7 @@ class MessagesCreator(object):
 		default_message = self.default(user_names_dict, action)
 		default_message.update({
 			USER_VAR_NAME: self.sender_name,
-			GENDER_VAR_NAME: self.sex
+			IS_ANONYMOUS_VAR_NAME: self.sex == ANONYMOUS_GENDER
 		})
 		return default_message
 
@@ -157,6 +158,17 @@ class MessagesCreator(object):
 		})
 		return default_message
 
+	@property
+	def stored_redis_user(self):
+		return '%s:%s:%d' % (self.sender_name, self.sex, self.user_id)
+
+	@staticmethod
+	def online_js_structure(sex, user_id):
+		return {
+			GENDER_VAR_NAME: sex,
+			USER_ID_VAR_NAME: user_id
+		}
+
 
 class MessagesHandler(WebSocketHandler, MessagesCreator):
 
@@ -181,8 +193,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			])
 		self.async_redis.listen(self.new_message)
 
-	@staticmethod
-	def get_online_from_redis():
+	@classmethod
+	def get_online_from_redis(cls):
 		"""
 		:rtype : dict
 		"""
@@ -191,17 +203,16 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		# redis stores REDIS_USER_FORMAT, so parse them
 		if online:
 			for raw_user_sex in online:
-				user_sex = raw_user_sex.decode('utf-8').split(':')
-				result[user_sex[0]] = user_sex[1]
+				(user, sex, user_id) = raw_user_sex.decode('utf-8').split(':')
+				result[user] = cls.online_js_structure(sex, user_id)
 		return result
 
 	def add_online_user(self):
 		online = self.get_online_from_redis()
-		stringified_user = REDIS_USER_FORMAT % (self.sender_name, self.sex)
-		async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), stringified_user)
+		async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
 		first_tab = False
 		if self.sender_name not in online:  # if a new tab has been opened
-			online[self.sender_name] = self.sex
+			online[self.sender_name] = self.online_js_structure(self.sex, self.user_id)
 			first_tab = True
 
 		if first_tab:  # Login event, sent user names to all
@@ -217,7 +228,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 	def set_username(self, session_key):
 		session = session_engine.SessionStore(session_key)
 		try:
-			self.user_id = session["_auth_user_id"]
+			self.user_id = int(session["_auth_user_id"])  # todo NPE?
 			user_db = UserProfile.objects.get(id=self.user_id)
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
@@ -284,8 +295,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				self.async_redis.unsubscribe(REDIS_USER_CHANNEL_PREFIX % self.sender_name)  # TODO is it allowed?
 				self.sender_name = parsed_message[CONTENT_VAR_NAME]
 				self.async_redis.subscribe(REDIS_USER_CHANNEL_PREFIX % self.sender_name)
-				stringified_user = REDIS_USER_FORMAT % (self.sender_name, self.sex)
-				async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), stringified_user)
+				async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
 
 	def new_message(self, message):
 		if type(message.body) is not int:  # subscribe event

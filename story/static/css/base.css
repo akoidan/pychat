@@ -54,7 +54,7 @@
 }
 
 /*-------- FONTELLO ------------*/
-.color-lor [class^='icon-']:hover {
+.color-lor [class^='icon-']:not([class='icon-anonymous']):hover {
 	text-shadow: 0 0 0.2em #FFF, 0 0 0.2em #3D3D3D;
 }
 [class^='icon-volume'] { color: rgb(138, 109, 59); }
@@ -119,6 +119,10 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 }
 /* =============== END  ===================== */
 
+a {
+	text-decoration: none;  /* remove underline from fonts*/
+}
+
 ul {
 	/*remove browser default left padding 40px and bullets*/
 	padding-left: 0;
@@ -147,10 +151,6 @@ nav {
 }
 .navbarList > li {
 	 display:inline;
-}
-
-.navbarList > li > a {
-	text-decoration: none; /* remove IE underline from fonts*/
 }
 
 html, body {
@@ -242,7 +242,7 @@ textarea {
 .navbar-default [class^='icon-'] {
 	margin: 2px;
 }
-[class^='icon-']:hover { cursor: pointer;}
+[class^='icon-']:not([class='icon-anonymous']):hover { cursor: pointer;}
 /*================= SCROLLBAR ==================== */
 
 ::-webkit-scrollbar {

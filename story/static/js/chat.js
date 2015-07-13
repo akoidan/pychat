@@ -207,8 +207,13 @@ function loadUsers(usernames) {
 	var icon;
 	for (var username in usernames) {
 		if (usernames.hasOwnProperty(username)) {
-			var gender = usernames[username];
-			icon = '<a class="' + genderIcons[gender] + '" href="/profile/'+/*TODO profile ID*/'"></a>';
+			var gender = usernames[username].sex;
+			var userId = usernames[username].id;
+			if (userId == 0) {
+				icon = '<i class="'+ genderIcons[gender] +'"></i>';
+			} else {
+				icon = '<a class="' + genderIcons[gender] + '" href="/profile/' + userId + '"></a>';
+			}
 			if (icon == null) {
 				console.log(getDebugMessage('Bug, gender: {}, icon: {}', gender, icon))
 			}
@@ -282,7 +287,7 @@ function printRefreshUserNameToChat(data) {
 	} else if (action !== 'online_users') {
 		if (data['user'] == loggedUser) {
 			message = 'You have ' + action + ' the chat';
-		} else if (data['sex'] == 'Alien') {
+		} else if (data['anonymous']) {
 			message = 'Anonymous <b>' + data['user'] + '</b> has ' + action + ' the chat.';
 		} else {
 			message = 'User <b>' + data['user'] + '</b> has ' + action + ' the chat.';
