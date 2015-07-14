@@ -53,7 +53,9 @@ LOGOUT_EVENT = 'left'
 SEND_MESSAGE_EVENT = 'send'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
 REDIS_MAIN_CHANNEL = 'main'
-REDIS_USER_CHANNEL_PREFIX = 'user:%s'
+REDIS_USERNAME_CHANNEL_PREFIX = 'u:%s'
+REDIS_USERID_CHANNEL_PREFIX = 'i:%s'
+REDIS_ROOM_CHANNEL_PREFIX = 'r:%s'
 REDIS_ONLINE_USERS = "online_users"
 
 
@@ -78,8 +80,9 @@ class MessagesCreator(object):
 
 	def __init__(self):
 		self.sex = ANONYMOUS_GENDER
-		self.sender_name = ''
-		self.user_id = 0
+		self.sender_name = None
+		self.user_id = 0  # anonymous by default
+		self.user_channel = None
 
 	def online_user_names(self, user_names_dict, action):
 		"""
@@ -188,8 +191,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 	def listen(self):
 		yield tornado.gen.Task(
 			self.async_redis.subscribe, [
-				REDIS_MAIN_CHANNEL,
-				REDIS_USER_CHANNEL_PREFIX % self.sender_name
+				REDIS_ROOM_CHANNEL_PREFIX % REDIS_MAIN_CHANNEL,
+				self.user_channel
 			])
 		self.async_redis.listen(self.new_message)
 
@@ -228,7 +231,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 	def set_username(self, session_key):
 		session = session_engine.SessionStore(session_key)
 		try:
-			self.user_id = int(session["_auth_user_id"])  # todo NPE?
+			self.user_id = int(session["_auth_user_id"])  # everything but 0 is a registered user
+			self.user_channel = REDIS_USERID_CHANNEL_PREFIX % self.user_id
 			user_db = UserProfile.objects.get(id=self.user_id)
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
@@ -240,6 +244,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				self.sender_name = id_generator(8)
 				session[SESSION_USER_VAR_NAME] = self.sender_name
 				session.save()
+			finally:
+				self.user_channel = REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
@@ -274,7 +280,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		if receiver_name is None:
 			receiver_name = self.sender_name
-		self.publish(message, REDIS_USER_CHANNEL_PREFIX % receiver_name)
+		self.publish(message, REDIS_USERNAME_CHANNEL_PREFIX % receiver_name)
 
 	def emit_to_user_and_self(self, message, receiver_name):
 		if receiver_name != self.sender_name:
@@ -292,9 +298,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		if self.sex == ANONYMOUS_GENDER:
 			parsed_message = json.loads(message)
 			if parsed_message[EVENT_VAR_NAME] == GET_MINE_USERNAME_EVENT:
-				self.async_redis.unsubscribe(REDIS_USER_CHANNEL_PREFIX % self.sender_name)  # TODO is it allowed?
+				self.async_redis.unsubscribe(REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name)  # TODO is it allowed?
 				self.sender_name = parsed_message[CONTENT_VAR_NAME]
-				self.async_redis.subscribe(REDIS_USER_CHANNEL_PREFIX % self.sender_name)
+				self.async_redis.subscribe(REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name)
 				async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
 
 	def new_message(self, message):
@@ -402,9 +408,14 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 					self.publish(message)
 		finally:
 			if self.async_redis.subscribed:
+				if self.user_id == 0:  # anonymous
+					user_channel = REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name
+				else:
+					user_channel = REDIS_USERID_CHANNEL_PREFIX % self.user_id
+
 				self.async_redis.unsubscribe([
-					REDIS_MAIN_CHANNEL,
-					REDIS_USER_CHANNEL_PREFIX % self.sender_name
+					REDIS_ROOM_CHANNEL_PREFIX % REDIS_MAIN_CHANNEL,
+					REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name
 				])
 			self.async_redis.disconnect()
 
