@@ -19,6 +19,9 @@ var genderIcons = {
 		'Secret' : 'icon-user-secret'
 	};
 
+var destinationUserName = null;
+var destinationUserId = null;
+
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
 var newMessagesCount = 0;
@@ -68,7 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	receiverId = document.getElementById("receiverId");
 
 	chatUsersTable.addEventListener("click", chatRoomClick);
-	userMessage.addEventListener("keypress", sendMessageKeyPress);
+	userMessage.addEventListener("keypress", sendMessage);
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);  //TODO doesn't work in chromium for div
@@ -112,7 +115,9 @@ function chatRoomClick(event) {
 	while (target != chatUsersTable) { // ( ** )
 		if (target.nodeName == 'TD') { // ( * )
 			if (target.cellIndex == 1 ) {
-				showUserSendMess(target.innerHTML);
+				destinationUserName = target.innerHTML;
+				destinationUserId = target.id;
+				showUserSendMess(destinationUserName);
 			}
 		}
 		target = target.parentNode;
@@ -130,9 +135,42 @@ function keyDownLoadUp(e) {
 	}
 }
 
-function sendMessageKeyPress(event) {
+function sendMessage(event) {
 	if (event.keyCode === 13) {
-		sendMessage(userMessage.value, receiverId.innerHTML);
+		var messageContent = userMessage.value;
+		if (usermsg == null || usermsg === '') {
+			return;
+		}
+		var messageRequest;
+		// anonymous is set by name, registered user is set by id.
+		switch (destinationUserId) {
+			case null: // send to room TODO is null everywhere including FF and IE (not None or undefined)
+				messageRequest = {
+					content: messageContent,
+					action: 'send'
+				};
+				break;
+			case 0: // send to anonymous
+				messageRequest = {
+					content: messageContent,
+					action: 'send',
+					receiverName:  destinationUserName
+				};
+				break;
+			default:
+				messageRequest = {
+					content: messageContent,
+					action: 'send',
+					receiverId: destinationUserId,
+					receiverName:  destinationUserName
+				};
+				break;
+		}
+
+		var sendSuccessful = sendToServer(messageRequest);
+		if (sendSuccessful) {
+			userMessage.value = "";
+		}
 	}
 }
 
@@ -217,7 +255,7 @@ function loadUsers(usernames) {
 			if (icon == null) {
 				console.log(getDebugMessage('Bug, gender: {}, icon: {}', gender, icon))
 			}
-			allUsers += '<tr><td>' + icon + '</td> <td>' + username + '</td><tr>';
+			allUsers += '<tr><td>' + icon + '</td> <td id="' + userId + '">' + username + '</td><tr>';
 		}
 	}
 	chatUsersTable.innerHTML = allUsers;
@@ -255,7 +293,7 @@ function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayed
 
 function printMessage(data, isTopDirection) {
 	var headerStyle;
-	var receiver = data['receiver'];
+	var receiver = data['receiver']; // TODO
 	var displayedUsername = data['user'];
 	//private message
 	if (receiver != null) {
@@ -419,22 +457,6 @@ function sendToServer(messageRequest) {
 	}
 }
 
-function sendMessage(usermsg, receiver) {
-	if (usermsg == null || usermsg === '') {
-		return;
-	}
-	var messageRequest = {
-		content: usermsg,
-		receiver: receiver,
-		action: 'send'
-	};
-
-	if (sendToServer(messageRequest)) {
-		userMessage.value = "";
-	}
-}
-
-
 function loadUpHistory(count) {
 	if (chatBoxDiv.scrollTop === 0) {
 		var getMessageRequest = {
@@ -468,6 +490,7 @@ function clearLocalHistory() {
 
 
 function hideUserSendToName() {
-	receiverId.innerHTML = '';
+	destinationUserId = null;
+	destinationUserName = null;
 	userSendMessageTo.style.display = 'none';
 }

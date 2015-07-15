@@ -23,7 +23,7 @@ except ImportError:
 
 from Chat.settings import MAX_MESSAGE_SIZE
 from story.models import UserProfile, Messages
-from story.registration_utils import is_blank, id_generator, check_user
+from story.registration_utils import id_generator, check_user
 
 PY3 = sys.version > '3'
 
@@ -32,7 +32,8 @@ user_cookie_name = settings.USER_COOKIE_NAME
 
 ANONYMOUS_GENDER = 'Alien'
 MESSAGE_ID_VAR_NAME = 'id'
-RECEIVER_USERNAME_VAR_NAME = 'receiver'
+RECEIVER_USERNAME_VAR_NAME = 'receiverName'
+RECEIVER_USERID_VAR_NAME = 'receiverId'
 COUNT_VAR_NAME = 'count'
 HEADER_ID_VAR_NAME = 'headerId'
 SESSION_USER_VAR_NAME = 'user_name'
@@ -82,7 +83,6 @@ class MessagesCreator(object):
 		self.sex = ANONYMOUS_GENDER
 		self.sender_name = None
 		self.user_id = 0  # anonymous by default
-		self.user_channel = None
 
 	def online_user_names(self, user_names_dict, action):
 		"""
@@ -119,11 +119,11 @@ class MessagesCreator(object):
 		}
 
 	@classmethod
-	def create_send_message(cls, message):
+	def create_send_message(cls, message, receiver_name):
 		"""
 		:type message: Messages
 		"""
-		result = cls.get_message(message)
+		result = cls.get_message(message, receiver_name)
 		result[EVENT_VAR_NAME] = SEND_MESSAGE_EVENT
 		return result
 
@@ -165,6 +165,13 @@ class MessagesCreator(object):
 	def stored_redis_user(self):
 		return '%s:%s:%d' % (self.sender_name, self.sex, self.user_id)
 
+	@property
+	def channel(self):
+		if self.user_id == 0:
+			return REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name
+		else:
+			return REDIS_USERID_CHANNEL_PREFIX % self.user_id
+
 	@staticmethod
 	def online_js_structure(sex, user_id):
 		return {
@@ -189,10 +196,13 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	@tornado.gen.engine
 	def listen(self):
+		"""
+		self.channel should been set before calling
+		"""
 		yield tornado.gen.Task(
 			self.async_redis.subscribe, [
 				REDIS_ROOM_CHANNEL_PREFIX % REDIS_MAIN_CHANNEL,
-				self.user_channel
+				self.channel
 			])
 		self.async_redis.listen(self.new_message)
 
@@ -232,7 +242,6 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		session = session_engine.SessionStore(session_key)
 		try:
 			self.user_id = int(session["_auth_user_id"])  # everything but 0 is a registered user
-			self.user_channel = REDIS_USERID_CHANNEL_PREFIX % self.user_id
 			user_db = UserProfile.objects.get(id=self.user_id)
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
@@ -244,8 +253,6 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				self.sender_name = id_generator(8)
 				session[SESSION_USER_VAR_NAME] = self.sender_name
 				session.save()
-			finally:
-				self.user_channel = REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
@@ -270,28 +277,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		return browser_domain == origin_domain
 
 	@staticmethod
-	def publish(message, channel=REDIS_MAIN_CHANNEL):
+	def publish(message, channel=REDIS_ROOM_CHANNEL_PREFIX % REDIS_MAIN_CHANNEL):
 		async_redis_publisher.publish(channel, json.dumps(message))
-
-	def emit_to_user(self, message, receiver_name=None):
-		"""
-		:param receiver_name: if None send to itself
-		:return: None
-		"""
-		if receiver_name is None:
-			receiver_name = self.sender_name
-		self.publish(message, REDIS_USERNAME_CHANNEL_PREFIX % receiver_name)
-
-	def emit_to_user_and_self(self, message, receiver_name):
-		if receiver_name != self.sender_name:
-			try:
-				self.emit_to_user(message, receiver_name)
-			# if user left the chat ( all ws are closed)
-			except KeyError:
-				self.emit_to_user(
-					self.default("Can't send the message, User has left the chat."),
-				)
-		self.emit_to_user(message)
 
 	# TODO really parse every single message for 1 action?
 	def check_and_finish_change_name(self, message):
@@ -326,44 +313,36 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				self.sender_name,
 				str(message))
 
-	def detect_message_type(self, receiver_name):
-		"""
-		:type receiver_name: str
-		"""
-		save_to_db = False
-		receiver = None
-		send_to_all = is_blank(receiver_name)
-		if send_to_all:
-			receiver_name = None
-		if self.user_id != 0:
-			if not send_to_all:
-				try:
-					# TODO is that really necessary to fetch username from db on message event
-					receiver = UserProfile.objects.get(username=receiver_name)
-					save_to_db = True
-				except UserProfile.DoesNotExist:
-					pass
-			else:
-				save_to_db = True
-		return receiver, receiver_name, save_to_db, send_to_all
-
 	def process_send_message(self, message):
 		"""
 		:type message: dict
 		"""
-		receiver_name = message[RECEIVER_USERNAME_VAR_NAME]
 		content = message[CONTENT_VAR_NAME]
-		receiver, receiver_name, save_to_db, send_to_all = self.detect_message_type(receiver_name)
-		if save_to_db:
-			message_db = Messages(sender_id=self.user_id, content=content, receiver=receiver)
+		send_to_all = False
+		receiver_id = message.get(RECEIVER_USERID_VAR_NAME)
+		receiver_name = message.get(RECEIVER_USERNAME_VAR_NAME)
+		save_to_db = True
+		if receiver_id is not None:
+			receiver_channel = REDIS_USERID_CHANNEL_PREFIX % receiver_id
+		elif receiver_name is not None:
+			receiver_channel = REDIS_USERNAME_CHANNEL_PREFIX % receiver_name
+			save_to_db = False
+		else:
+			send_to_all = True
+
+		if self.user_id != 0 and save_to_db:
+			message_db = Messages(sender_id=self.user_id, content=content, receiver_id=receiver_id)
 			message_db.save()
-			prepared_message = self.create_send_message(message_db)
+			prepared_message = self.create_send_message(message_db, receiver_name)
 		else:
 			prepared_message = self.send_anonymous(content, receiver_name)
+
 		if send_to_all:
 			self.publish(prepared_message)
 		else:
-			self.emit_to_user_and_self(prepared_message, receiver_name)
+			self.publish(prepared_message, self.channel)
+			if receiver_channel != self.channel:
+				self.publish(prepared_message, receiver_channel)
 
 	def process_change_username(self, message):
 		"""
@@ -383,12 +362,13 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			del online[self.sender_name]
 			online[new_username] = self.sex
 			old_name = self.sender_name
+			old_channel = self.channel
 			self.sender_name = new_username  # change_user_name required new_username in sender_name
 			message_all = self.change_user_nickname(old_name, online)
 			message_me = self.default(new_username, GET_MINE_USERNAME_EVENT)
-
-			self.emit_to_user(message_me)  # TODO really twice???
-			self.emit_to_user(message_me, old_name)  # emit twice instead ton of checks (because of resubscribe)
+			# TODO perform ton of checks or emit twice ?
+			self.publish(message_me, self.channel)  # to new user channel
+			self.publish(message_me, old_channel)  # to old user channel
 			self.publish(message_all)
 		except ValidationError as e:
 			self.safe_write(self.default(str(e.message)))
@@ -408,11 +388,6 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 					self.publish(message)
 		finally:
 			if self.async_redis.subscribed:
-				if self.user_id == 0:  # anonymous
-					user_channel = REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name
-				else:
-					user_channel = REDIS_USERID_CHANNEL_PREFIX % self.user_id
-
 				self.async_redis.unsubscribe([
 					REDIS_ROOM_CHANNEL_PREFIX % REDIS_MAIN_CHANNEL,
 					REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name

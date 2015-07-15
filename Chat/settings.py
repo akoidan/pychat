@@ -169,10 +169,10 @@ LOGGING = {
 	'loggers': {
 		# root logger
 		'': {
-			'handlers': ['file-django'],
+			'handlers': ['console'],
 		},
 		'django.request': {
-			'handlers': ['file-django'],
+			'handlers': ['console'],
 			'level': 'DEBUG',
 			'propagate': False,
 		},
