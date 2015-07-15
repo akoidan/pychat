@@ -55,6 +55,7 @@ var userNameLabel;
 var ws;
 var isWsConnected; // used for debugging info only
 
+
 document.addEventListener("DOMContentLoaded", function () {
 	chatBoxDiv = document.getElementById("chatbox");
 	userMessage = document.getElementById("usermsg");
@@ -84,6 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 });
 
+
 /*==================== DOM EVENTS LISTENERS ============================*/
 // keyboard and mouse handlers for loadUpHistory
 // Those events are removed when loadUpHistory() reaches top
@@ -94,6 +96,7 @@ function mouseWheelLoadUp(e) {
 		loadUpHistory(5);
 	}
 }
+
 
 function changeTittleFunction(e) {
 	switch (e.type) {
@@ -116,7 +119,7 @@ function chatRoomClick(event) {
 		if (target.nodeName == 'TD') { // ( * )
 			if (target.cellIndex == 1 ) {
 				destinationUserName = target.innerHTML;
-				destinationUserId = target.id;
+				destinationUserId = parseInt(target.id);
 				showUserSendMess(destinationUserName);
 			}
 		}
@@ -135,37 +138,20 @@ function keyDownLoadUp(e) {
 	}
 }
 
+
 function sendMessage(event) {
 	if (event.keyCode === 13) {
 		var messageContent = userMessage.value;
-		if (usermsg == null || usermsg === '') {
+		if (messageContent == null || messageContent === '') {
 			return;
 		}
-		var messageRequest;
 		// anonymous is set by name, registered user is set by id.
-		switch (destinationUserId) {
-			case null: // send to room TODO is null everywhere including FF and IE (not None or undefined)
-				messageRequest = {
-					content: messageContent,
-					action: 'send'
-				};
-				break;
-			case 0: // send to anonymous
-				messageRequest = {
-					content: messageContent,
-					action: 'send',
-					receiverName:  destinationUserName
-				};
-				break;
-			default:
-				messageRequest = {
-					content: messageContent,
-					action: 'send',
-					receiverId: destinationUserId,
-					receiverName:  destinationUserName
-				};
-				break;
-		}
+		var messageRequest = {
+			content: messageContent,
+			action: 'send',
+			receiverId: destinationUserId,
+			receiverName: destinationUserName
+		};
 
 		var sendSuccessful = sendToServer(messageRequest);
 		if (sendSuccessful) {
@@ -196,6 +182,7 @@ function getWidth() {
 //	setCookie("timezone", jstz.determine().name());
 //}
 
+
 function loadMessagesFromLocalStorage() {
 	loggedUser = localStorage.getItem(STORAGE_USER);
 	var jsonData = localStorage.getItem(STORAGE_NAME);
@@ -211,12 +198,13 @@ function loadMessagesFromLocalStorage() {
 	}
 }
 
+
 function start_chat_ws() {
 	ws = new WebSocket(readCookie('api'));
 	ws.onmessage = webSocketMessage;
 	ws.onclose = function () {
 		if (isWsConnected) {
-			console.error(getDebugMessage("Connection to WebSocket has failed, trying to reconnect every 5 seconds"));
+			console.error(getDebugMessage("Connection to WebSocket has failed, trying to reconnect every " + CONNECTION_RETRY_TIME + "ms"));
 			isWsConnected = false;
 		}
 		// Try to reconnect in 5 seconds
@@ -261,6 +249,7 @@ function loadUsers(usernames) {
 	chatUsersTable.innerHTML = allUsers;
 }
 
+
 // Used by {@link loadUsers}
 function showUserSendMess(username) {
 
@@ -293,13 +282,13 @@ function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayed
 
 function printMessage(data, isTopDirection) {
 	var headerStyle;
-	var receiver = data['receiver']; // TODO
+	var receiver = data['receiverName']; // TODO
 	var displayedUsername = data['user'];
 	//private message
 	if (receiver != null) {
 		headerStyle = privateHeader;
 		if (receiver !== loggedUser) {
-			displayedUsername = data['receiver'];
+			displayedUsername = receiver;
 			headerStyle += '>>'
 		}
 		// public message
@@ -367,6 +356,7 @@ function handleGetMessages(message) {
 	});
 }
 
+
 // TODO too many json parses
 function saveMessageToStorage(newItem) {
 	switch (newItem['action']) {
@@ -398,6 +388,7 @@ function saveMessageToStorage(newItem) {
 	}
 }
 
+
 function handlePreparedWSMessage(data) {
 	switch (data['action']) {
 		case 'messages':
@@ -417,12 +408,19 @@ function handlePreparedWSMessage(data) {
 			displayPreparedMessage(systemHeader, data['time'], data['content'], 'System', false);
 			break;
 		case 'send':
-			appendMessage(data);
+			printMessage(data, false);
+			if (loggedUser === data['user']) {
+				checkAndPlay(chatOutgoing);
+			} else {
+				checkAndPlay(chatIncoming);
+			}
 			break;
 		default:
 			console.error(getDebugMessage('Unknown message type  {}', JSON.stringify(data)));
 	}
 }
+
+
 function webSocketMessage(message) {
 	var jsonData = message.data;
 	console.log(getDebugMessage("WS in: {}", jsonData));
@@ -432,16 +430,6 @@ function webSocketMessage(message) {
 
 	//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
 	saveMessageToStorage(data);
-}
-
-
-function appendMessage(data) {
-	printMessage(data, false);
-	if (loggedUser === data['user']) {
-		checkAndPlay(chatOutgoing);
-	} else {
-		checkAndPlay(chatIncoming);
-	}
 }
 
 
@@ -456,6 +444,7 @@ function sendToServer(messageRequest) {
 		return true;
 	}
 }
+
 
 function loadUpHistory(count) {
 	if (chatBoxDiv.scrollTop === 0) {
@@ -476,6 +465,7 @@ function toggleRoom() {
 		chatUserRoomWrapper.style.display = 'none';
 	}
 }
+
 
 // OH man be carefull with this method, it should reinit history
 function clearLocalHistory() {

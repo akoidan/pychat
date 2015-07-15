@@ -128,7 +128,7 @@ class MessagesCreator(object):
 		return result
 
 	@staticmethod
-	def get_message(message):
+	def get_message(message, receiver_username):
 		"""
 		:param message:
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
@@ -136,7 +136,7 @@ class MessagesCreator(object):
 		"""
 		return {
 			USER_VAR_NAME: message.sender.username,
-			RECEIVER_USERNAME_VAR_NAME: None if message.receiver is None else message.receiver.username,
+			RECEIVER_USERNAME_VAR_NAME: receiver_username,
 			CONTENT_VAR_NAME: message.content,
 			TIME_VAR_NAME: message.time.strftime("%H:%M:%S"),
 			MESSAGE_ID_VAR_NAME: message.id,
@@ -319,16 +319,14 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		content = message[CONTENT_VAR_NAME]
 		send_to_all = False
-		receiver_id = message.get(RECEIVER_USERID_VAR_NAME)
+		receiver_id = message.get(RECEIVER_USERID_VAR_NAME)  # if receiver_id is None then its a private message
 		receiver_name = message.get(RECEIVER_USERNAME_VAR_NAME)
 		save_to_db = True
-		if receiver_id is not None:
+		if receiver_id is not None and receiver_id != 0:
 			receiver_channel = REDIS_USERID_CHANNEL_PREFIX % receiver_id
 		elif receiver_name is not None:
 			receiver_channel = REDIS_USERNAME_CHANNEL_PREFIX % receiver_name
 			save_to_db = False
-		else:
-			send_to_all = True
 
 		if self.user_id != 0 and save_to_db:
 			message_db = Messages(sender_id=self.user_id, content=content, receiver_id=receiver_id)
@@ -337,7 +335,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		else:
 			prepared_message = self.send_anonymous(content, receiver_name)
 
-		if send_to_all:
+		if receiver_id is None:
 			self.publish(prepared_message)
 		else:
 			self.publish(prepared_message, self.channel)
