@@ -53,7 +53,7 @@ LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
 SEND_MESSAGE_EVENT = 'send'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
-REDIS_MAIN_CHANNEL = 'main'
+DEFAULT_REDIS_CHANNEL = 'main'
 REDIS_USERNAME_CHANNEL_PREFIX = 'u:%s'
 REDIS_USERID_CHANNEL_PREFIX = 'i:%s'
 REDIS_ROOM_CHANNEL_PREFIX = 'r:%s'
@@ -119,16 +119,16 @@ class MessagesCreator(object):
 		}
 
 	@classmethod
-	def create_send_message(cls, message, receiver_name):
+	def create_send_message(cls, message):
 		"""
 		:type message: Messages
 		"""
-		result = cls.get_message(message, receiver_name)
+		result = cls.get_message(message)
 		result[EVENT_VAR_NAME] = SEND_MESSAGE_EVENT
 		return result
 
 	@staticmethod
-	def get_message(message, receiver_username):
+	def get_message(message):
 		"""
 		:param message:
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
@@ -136,7 +136,7 @@ class MessagesCreator(object):
 		"""
 		return {
 			USER_VAR_NAME: message.sender.username,
-			RECEIVER_USERNAME_VAR_NAME: receiver_username,
+			RECEIVER_USERNAME_VAR_NAME: None if message.receiver is None else message.receiver.username,
 			CONTENT_VAR_NAME: message.content,
 			TIME_VAR_NAME: message.time.strftime("%H:%M:%S"),
 			MESSAGE_ID_VAR_NAME: message.id,
@@ -201,7 +201,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		yield tornado.gen.Task(
 			self.async_redis.subscribe, [
-				REDIS_ROOM_CHANNEL_PREFIX % REDIS_MAIN_CHANNEL,
+				REDIS_ROOM_CHANNEL_PREFIX % DEFAULT_REDIS_CHANNEL,
 				self.channel
 			])
 		self.async_redis.listen(self.new_message)
@@ -277,7 +277,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		return browser_domain == origin_domain
 
 	@staticmethod
-	def publish(message, channel=REDIS_ROOM_CHANNEL_PREFIX % REDIS_MAIN_CHANNEL):
+	def publish(message, channel=REDIS_ROOM_CHANNEL_PREFIX % DEFAULT_REDIS_CHANNEL):
 		async_redis_publisher.publish(channel, json.dumps(message))
 
 	# TODO really parse every single message for 1 action?
@@ -318,7 +318,6 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		:type message: dict
 		"""
 		content = message[CONTENT_VAR_NAME]
-		send_to_all = False
 		receiver_id = message.get(RECEIVER_USERID_VAR_NAME)  # if receiver_id is None then its a private message
 		receiver_name = message.get(RECEIVER_USERNAME_VAR_NAME)
 		save_to_db = True
@@ -331,7 +330,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		if self.user_id != 0 and save_to_db:
 			message_db = Messages(sender_id=self.user_id, content=content, receiver_id=receiver_id)
 			message_db.save()
-			prepared_message = self.create_send_message(message_db, receiver_name)
+			prepared_message = self.create_send_message(message_db)
 		else:
 			prepared_message = self.send_anonymous(content, receiver_name)
 
@@ -387,7 +386,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		finally:
 			if self.async_redis.subscribed:
 				self.async_redis.unsubscribe([
-					REDIS_ROOM_CHANNEL_PREFIX % REDIS_MAIN_CHANNEL,
+					REDIS_ROOM_CHANNEL_PREFIX % DEFAULT_REDIS_CHANNEL,
 					REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name
 				])
 			self.async_redis.disconnect()
