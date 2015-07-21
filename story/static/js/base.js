@@ -27,7 +27,7 @@ function mute() {
 			btn.className = 'icon-volume-2';
 			break;
 		case 3:
-			btn.className = 'icon-volume-3	';
+			btn.className = 'icon-volume-3';
 			break;
 	}
 }
@@ -35,8 +35,12 @@ function mute() {
 function checkAndPlay(element) {
 	if (element.readyState && sound) {
 		element.pause();
-		// TODO currentType is not set sometimes
 		element.currentTime = 0;
+		if (element.currentTime === element.duration ){
+			// TODO currentType is not set sometimes
+			console.warn("Can't set current time for audio. Reloading it");
+			//element.src = element.src;
+		}
 		switch (sound) {
 			case 1:
 				element.volume = 0.15;
@@ -75,7 +79,11 @@ function doPost(url, params, callback) {
 		if (r.readyState == 4) {
 			if (r.status == 200) {
 				console.log(getDebugMessage("POST {} in: {};", url, r.response));
-				callback(r.response);
+				if (typeof(callback) == "function") {
+					callback(r.response);
+				} else {
+					console.warn(getDebugMessage("Skipping {} callback for POST {}", callback, url));
+				}
 			} else {
 				console.error(getDebugMessage("POST {} in: {}, status:", url, r.response, r.status));
 			}

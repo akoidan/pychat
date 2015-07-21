@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Messages, UserProfile
+from .models import Message, UserProfile
 
 admin.site.register(UserProfile)
-admin.site.register(Messages)
+admin.site.register(Message)

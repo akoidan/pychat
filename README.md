@@ -44,6 +44,9 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:80000`
 
 #TODO
+* ManyToManyRel Threads - Users
+* test audio preload on none 
+* add media query for register and usersettings to adjust for phone's width
 * add lock to loadMessages to prevent doubling getting the same message and appending it twice. 
 * add change password and realtime javascript to change_profile
 * local storage can store another user messasges in case of logout ?

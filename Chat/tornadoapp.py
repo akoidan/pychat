@@ -22,7 +22,7 @@ except ImportError:
 	from urlparse import urlparse  # py3
 
 from Chat.settings import MAX_MESSAGE_SIZE
-from story.models import UserProfile, Messages
+from story.models import UserProfile, Message
 from story.registration_utils import id_generator, check_user
 
 PY3 = sys.version > '3'
@@ -121,7 +121,7 @@ class MessagesCreator(object):
 	@classmethod
 	def create_send_message(cls, message):
 		"""
-		:type message: Messages
+		:type message: Message
 		"""
 		result = cls.get_message(message)
 		result[EVENT_VAR_NAME] = SEND_MESSAGE_EVENT
@@ -234,7 +234,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		else:  # Send user names to self
 			online_user_names_mes = self.online_user_names(online, REFRESH_USER_EVENT)
 			self.safe_write(online_user_names_mes)
-		# send username
+		# send usernamechat
 		prepared_message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
 		self.safe_write(prepared_message)
 
@@ -328,8 +328,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			save_to_db = False
 
 		if self.user_id != 0 and save_to_db:
-			message_db = Messages(sender_id=self.user_id, content=content, receiver_id=receiver_id)
-			message_db.save()
+			message_db = Message(sender_id=self.user_id, content=content, receiver_id=receiver_id)
+			message_db.save()  # exit on hacked id with exception
 			prepared_message = self.create_send_message(message_db)
 		else:
 			prepared_message = self.send_anonymous(content, receiver_name)
@@ -398,13 +398,13 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		header_id = data.get(HEADER_ID_VAR_NAME, None)
 		count = int(data.get(COUNT_VAR_NAME, 10))
 		if header_id is None:
-			messages = Messages.objects.filter(
+			messages = Message.objects.filter(
 				Q(receiver=None)  # Only public
 				| Q(sender=self.user_id)  # private s
 				| Q(receiver=self.user_id)  # and private
 			).order_by('-pk')[:count]
 		else:
-			messages = Messages.objects.filter(
+			messages = Message.objects.filter(
 				Q(id__lt=header_id),
 				Q(receiver=None)
 				| Q(sender=self.user_id)

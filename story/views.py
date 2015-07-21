@@ -16,7 +16,7 @@ from django.db.models import Q
 from story.apps import DefaultSettingsConfig
 from story.decorators import login_required_no_redirect
 from story.models import UserProfile
-from .models import Messages
+from .models import Message
 from story import registration_utils
 from story.forms import UserProfileForm, UserProfileReadOnlyForm
 from story.registration_utils import check_email, send_email_verification, check_user, check_password

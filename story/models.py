@@ -81,13 +81,19 @@ class UserProfile(AbstractBaseUser):
 		super(UserProfile, self).save(*args, **kwargs)
 
 
-class Messages(models.Model):
+class Thread(models.Model):
+	id = models.AutoField(primary_key=True)
+	name = CharField(max_length=30, null=True)
+
+
+class Message(models.Model):
 	"""
 	Contains all public messages
 	"""
 	sender = models.ForeignKey(UserProfile, related_name='sender')
+	thread = models.ForeignKey(Thread, null=True)
 	# DateField.auto_now
 	time = models.TimeField(default=datetime.datetime.now)
-	content = models.CharField(max_length=255)
+	content = models.TextField()
 	id = models.AutoField(primary_key=True)
 	receiver = models.ForeignKey(UserProfile, null=True, related_name='receiver')
