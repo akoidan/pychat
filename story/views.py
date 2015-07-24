@@ -3,7 +3,7 @@ import json
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.shortcuts import render_to_response
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseNotAllowed
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
@@ -176,3 +176,15 @@ def save_profile(request):
 	else:
 		return render_to_response('story/response.html', {'message': form.errors}, context_instance=RequestContext(request))
 	return HttpResponseRedirect('/')
+
+@require_http_methods(('POST', 'GET'))
+def report_issue(request):
+	if request.method == 'GET':
+		return render_to_response('story/issue.html', context_instance=RequestContext(request))
+	elif request.method == 'POST':
+		user_profile = UserProfile.objects.get(pk=request.user.id)
+		form = UserProfileForm(request.POST, instance=user_profile)
+		if form.is_valid():
+			form.save()
+	else:
+		raise HttpResponseNotAllowed

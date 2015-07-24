@@ -238,12 +238,12 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		prepared_message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
 		self.safe_write(prepared_message)
 
-	def set_username(self, session_key, thread_id):
+	def set_username(self, session_key):
 		session = session_engine.SessionStore(session_key)
 		try:
 			self.user_id = int(session["_auth_user_id"])  # everything but 0 is a registered user
 			user_db = UserProfile.objects.get(id=self.user_id)
-			user_db.threads  # TODO
+			# user_db.threads  # TODO
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
 		except (KeyError, UserProfile.DoesNotExist):
@@ -254,11 +254,11 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				session[SESSION_USER_VAR_NAME] = self.sender_name
 				session.save()
 
-	def open(self, thread_id):
+	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
 		if sessionStore.exists(session_key):
 			self.async_redis.connect()
-			self.set_username(session_key, thread_id)
+			self.set_username(session_key)
 			self.listen()
 			self.add_online_user()
 		else:
@@ -415,5 +415,5 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 
 application = tornado.web.Application([
-	(r'(/(?P<thread_id>\d+))?', MessagesHandler),
+	(r'.*', MessagesHandler),
 ])

@@ -97,3 +97,13 @@ class Message(models.Model):
 	content = models.TextField()
 	id = models.AutoField(primary_key=True)
 	receiver = models.ForeignKey(UserProfile, null=True, related_name='receiver')
+
+
+class IssueReport(models.Model):
+	sender = models.ForeignKey(UserProfile, null=True)
+	email = models.EmailField(null=True, unique=True, blank=True)
+	browser = models.CharField(null=True, max_length=32)
+	issue = models.TextField(null=False)
+
+	class Meta:  # pylint: disable=C1001
+		db_table = ''.join((UserProfile._meta.app_label, '_issue_report'))

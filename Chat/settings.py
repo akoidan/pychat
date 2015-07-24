@@ -76,7 +76,7 @@ MIDDLEWARE_CLASSES = (
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'story.cookies_middleware.UserCookieMiddleWare',
-	'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	# 'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'Chat.urls'

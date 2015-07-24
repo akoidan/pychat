@@ -2,7 +2,7 @@ from django import forms
 from django.forms import FileField, DateField, ChoiceField, Widget
 from Chat.settings import GENDERS
 
-from story.models import UserProfile
+from story.models import UserProfile, IssueReport
 
 
 class DateWidget(forms.widgets.DateInput):
@@ -57,3 +57,9 @@ class UserProfileForm(forms.ModelForm):
 		for key in self.fields:
 			if key != 'username':
 				self.fields[key].required = False
+
+
+class IssueReportForm(forms.ModelForm):
+
+	class Meta:  # pylint: disable=C1001
+		model = IssueReport
