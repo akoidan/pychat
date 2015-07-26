@@ -20,7 +20,7 @@
 						 onclick="mute();"></i>
 		</li>
 		<li>
-			<a href="https://github.com/Deathangel908/djangochat/issues/new"><i class="icon-pencil" title="report an issue"></i></a>
+			<a href="{% url 'story.views.report_issue' %}"><i class="icon-pencil" title="report an issue"></i></a>
 		</li>
 		{% block navbar %} {% endblock navbar %}
 		{% if username %}
@@ -32,6 +32,6 @@
 	</ul>
 	<!-- /.container-fluid -->
 </nav>
-{% block content %} {% endblock %} {% csrf_token %}
+{% block content %} {% endblock %}
 </body>
 </html>

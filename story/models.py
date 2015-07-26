@@ -100,10 +100,11 @@ class Message(models.Model):
 
 
 class IssueReport(models.Model):
-	sender = models.ForeignKey(UserProfile, null=True)
-	email = models.EmailField(null=True, unique=True, blank=True)
-	browser = models.CharField(null=True, max_length=32)
+	sender = models.ForeignKey(UserProfile, null=True, blank=True)
+	email = models.EmailField(null=True, blank=True)
+	browser = models.CharField(null=False, max_length=32)
 	issue = models.TextField(null=False)
+	time = models.TimeField(default=datetime.datetime.now, blank=True)  # TODO default value doesn't work
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((UserProfile._meta.app_label, '_issue_report'))

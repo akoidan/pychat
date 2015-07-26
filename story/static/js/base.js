@@ -38,7 +38,11 @@ function checkAndPlay(element) {
 		element.currentTime = 0;
 		if (element.currentTime === element.duration ){
 			// TODO currentType is not set sometimes
-			// TODO post error
+			var params = {
+				browser : getBrowserVersion(),
+				issue : "html5 audio currentTime set doesn't work"
+			};
+			doPost('/report_issue', params, null);
 			console.warn(getDebugMessage("Can't set current time for audio on browser {}. Reloading it"), getBrowserVersion());
 		}
 		switch (sound) {

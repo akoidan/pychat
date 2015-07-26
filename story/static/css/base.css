@@ -212,7 +212,8 @@ html, body {
 	width: 250px;
 }
 
-.biginputtext input[type=button], input[type=submit] {
+.biginputtext input[type=button],
+.biginputtext input[type=submit] {
 	width: 100%;
 	/*opacity: 0;*/
 }

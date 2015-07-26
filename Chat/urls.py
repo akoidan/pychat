@@ -25,4 +25,5 @@ urlpatterns = patterns(
 	url(r'^profile$', 'story.views.get_profile'),
 	url(r'^profile/(\d{1,5})$', 'story.views.show_profile'),
 	url(r'^save_profile$', 'story.views.save_profile'),
+	url(r'^report_issue$', 'story.views.report_issue'),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

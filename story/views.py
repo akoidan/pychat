@@ -15,10 +15,10 @@ from django.http import HttpResponseRedirect
 from django.db.models import Q
 from story.apps import DefaultSettingsConfig
 from story.decorators import login_required_no_redirect
-from story.models import UserProfile
+from story.models import UserProfile, IssueReport
 from .models import Message
 from story import registration_utils
-from story.forms import UserProfileForm, UserProfileReadOnlyForm
+from story.forms import UserProfileForm, UserProfileReadOnlyForm, IssueReportForm
 from story.registration_utils import check_email, send_email_verification, check_user, check_password
 from Chat import settings
 
@@ -152,9 +152,9 @@ def get_profile(request):
 
 
 @require_http_methods('GET')
-def show_profile(request, profileId):
+def show_profile(request, profile_id):
 	try:
-		user_profile = UserProfile.objects.get(pk=profileId)
+		user_profile = UserProfile.objects.get(pk=profile_id)
 		form = UserProfileReadOnlyForm(instance=user_profile)
 		form.username = user_profile.username
 		c = {
@@ -177,14 +177,27 @@ def save_profile(request):
 		return render_to_response('story/response.html', {'message': form.errors}, context_instance=RequestContext(request))
 	return HttpResponseRedirect('/')
 
+
 @require_http_methods(('POST', 'GET'))
 def report_issue(request):
 	if request.method == 'GET':
-		return render_to_response('story/issue.html', context_instance=RequestContext(request))
+		return render_to_response(
+			'story/issue.html',  # getattr for anonymous.email
+			{'form': IssueReportForm(), 'email': getattr(request.user, 'email', '')},
+			context_instance=RequestContext(request)
+		)
 	elif request.method == 'POST':
-		user_profile = UserProfile.objects.get(pk=request.user.id)
-		form = UserProfileForm(request.POST, instance=user_profile)
+		# TODO model time
+		form = IssueReportForm(request.POST)
+		form.sender = request.user
 		if form.is_valid():
 			form.save()
+			message = settings.VALIDATION_IS_OK
+		else:
+			message = form.errors
+		if request.is_ajax():
+			return HttpResponse(message, content_type='text/plain')
+		else:
+			return render_to_response('story/response.html', {'message': message}, context_instance=RequestContext(request))
 	else:
 		raise HttpResponseNotAllowed

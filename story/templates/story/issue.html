@@ -1,11 +1,31 @@
 {% extends "story/base.html" %}
 {% block head %}
-	{% load staticfiles %}
-
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			document.getElementById("version").value =  getBrowserVersion();
+		});
+	</script>
 {% endblock head %}
 
-<table>
-	{{ form.as_table }}
-</table>
 {% block content %}
+	<form method="post">
+		<table>
+			<tr>
+				<td><label for="email">your email</label> </td>
+				<td><input type="email" id="email" name="email" value="{{ email }}"/></td>
+			</tr>
+			<tr>
+				<td><label for="issue">The problem you discovered</label></td>
+				<td><textarea id="issue" name="issue"></textarea></td>
+			</tr>
+			<tr>
+				<td><label for="version">Affected browser</label></td>
+				<td><input type="text" name="browser" id="version"/> </td>
+			</tr>
+			<tr>
+				<td><input type="submit" value="sumbit"></td>
+			</tr>
+		</table>
+	{% csrf_token %}
+	</form>
 {% endblock %}
