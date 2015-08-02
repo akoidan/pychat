@@ -40,7 +40,8 @@ function checkAndPlay(element) {
 			// TODO currentType is not set sometimes
 			var params = {
 				browser : getBrowserVersion(),
-				issue : "html5 audio currentTime set doesn't work"
+				issue : "html5 audio currentTime",
+				ajax: true
 			};
 			doPost('/report_issue', params, null);
 			console.warn(getDebugMessage("Can't set current time for audio on browser {}. Reloading it"), getBrowserVersion());
@@ -85,10 +86,12 @@ function readCookie(name, c, C, i) {
 		cookies[C[0]] = C[1];
 	}
 	var cookie = cookies[name];
-	var length = cookie.length -1;
-	// if cookie is wrapped with quotes (for ex api)
-	if (cookie[0] == '"' && cookie[length] == '"') {
-		cookie = cookie.substring(1, length);
+	if (cookie != null) {
+		var length = cookie.length - 1;
+		// if cookie is wrapped with quotes (for ex api)
+		if (cookie[0] == '"' && cookie[length] == '"') {
+			cookie = cookie.substring(1, length);
+		}
 	}
 	return cookie;
 }

@@ -57,6 +57,9 @@ var isWsConnected; // used for debugging info only
 
 
 document.addEventListener("DOMContentLoaded", function () {
+	//	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+	//		alert('you can download app'); TODO android app
+	//}
 	chatBoxDiv = document.getElementById("chatbox");
 	userMessage = document.getElementById("usermsg");
 	chatUsersTable = document.getElementById("chat-user-table");

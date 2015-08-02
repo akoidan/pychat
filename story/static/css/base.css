@@ -176,32 +176,21 @@ html, body {
 	padding-right: 10px;
 }
 /* ============= LOGIN DROPDOWN ==============*/
-#hideableDropDown {
-	border: 1px solid;
-	border-radius: 2px;
-}
 
-#hideableDropDown > form> input {
+#hideableDropDown > form> * {
 	display: block;
 	margin: 13px;
-	width: 250px;
 }
 
-#hideableDropDown > form> input[type=button] {
-	width: 268px;
-}
-
-.dropdown div {
+#hideableDropDown {
 	position: absolute;
 	display: none;
 	float: left;
 	right: 5px;
+	border: 1px solid;
+	border-radius: 2px;
+	margin-top: 8px; /* = navbarList bottom margin */
 }
-
-.dropdown:hover div {
-	display: block;
-}
-
 
 /* ================== COMMONS ======================*/
 .biginputtext input:not([type=button]):not([type=submit]):not([type=checkbox]):not([type=radio]), select {
@@ -209,14 +198,9 @@ html, body {
 	margin: 5px 10px 5px 0;
 	border-radius: 5px;
 	font-size: 18px;
-	width: 250px;
+	width: 210px;
 }
 
-.biginputtext input[type=button],
-.biginputtext input[type=submit] {
-	width: 100%;
-	/*opacity: 0;*/
-}
 
 /******************** INPUTS ********************/
 
@@ -309,17 +293,14 @@ input[type=file]::-webkit-file-upload-button:hover {
 	}
 }
 
-@media screen and (max-width: 30em ) {
-	#chat-room-users-wrapper {
-		display: none;
-	}
-	.icon-pencil {
-		display: none;
-	}
-}
-
 @media screen and (max-height: 30em ) {
 	nav {
 		/*display: none; TODO remove css calc height*/
 	}
+}
+
+@media screen and (max-height: 35em ) {
+ .mText {
+	 display: none;
+ }
 }

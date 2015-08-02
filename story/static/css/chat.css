@@ -47,11 +47,6 @@
 	padding: 0;
 }
 
-.inline {
-	display: inline-block;
-	vertical-align: middle;
-}
-
 #userSendMessageTo {
 	/*sets also in chat.js on username click*/
 	justify-content: center;
@@ -98,4 +93,13 @@
 
 .fluid-height-child-bot > div:first-child {
 	height: 100%;
+}
+
+@media screen and (max-width: 30em ) {
+	#chat-room-users-wrapper {
+		display: none;
+	}
+	.icon-pencil {
+		display: none;
+	}
 }
