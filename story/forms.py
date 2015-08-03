@@ -57,9 +57,3 @@ class UserProfileForm(forms.ModelForm):
 		for key in self.fields:
 			if key != 'username':
 				self.fields[key].required = False
-
-
-class IssueReportForm(forms.ModelForm):
-
-	class Meta:  # pylint: disable=C1001
-		model = IssueReport

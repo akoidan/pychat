@@ -18,8 +18,8 @@ from story.decorators import login_required_no_redirect
 from story.models import UserProfile, IssueReport
 from .models import Message
 from story import registration_utils
-from story.forms import UserProfileForm, UserProfileReadOnlyForm, IssueReportForm
-from story.registration_utils import check_email, send_email_verification, check_user, check_password
+from story.forms import UserProfileForm, UserProfileReadOnlyForm
+from story.registration_utils import check_email, send_email_verification, check_user, check_password, is_blank
 from Chat import settings
 
 
@@ -183,21 +183,24 @@ def report_issue(request):
 	if request.method == 'GET':
 		return render_to_response(
 			'story/issue.html',  # getattr for anonymous.email
-			{'form': IssueReportForm(), 'email': getattr(request.user, 'email', '')},
+			{'email': getattr(request.user, 'email', '')},
 			context_instance=RequestContext(request)
 		)
 	elif request.method == 'POST':
-		# TODO model time
-		form = IssueReportForm(request.POST)
-		form.sender = request.user
-		if form.is_valid():
-			form.save()
-			message = settings.VALIDATION_IS_OK
+		issue = IssueReport(
+			sender_id=request.user.id,
+			browser=request.POST['browser'],
+			issue=request.POST['issue'],
+			email=request.POST['email']
+		)
+		issue.save()
+		if request.POST.get('ajax') is True:
+			HttpResponse('ok', content_type='text/plain')
 		else:
-			message = form.errors
-		if request.is_ajax():
-			return HttpResponse(message, content_type='text/plain')
-		else:
-			return render_to_response('story/response.html', {'message': message}, context_instance=RequestContext(request))
+			return render_to_response(
+				'story/response.html',
+				{'message': settings.VALIDATION_IS_OK},
+				context_instance=RequestContext(request)
+			)
 	else:
 		raise HttpResponseNotAllowed

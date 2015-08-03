@@ -14,13 +14,13 @@
 <nav>
 	<ul class="navbarList">
 		<li>
-			<a href="{% url 'story.views.home' %}"><i class="icon-home" title="Go home"></i></a>
+			<a href="{% url 'story.views.home' %}"><i class="icon-home" title="Go home"><span class="mText">home</span></i></a>
 		</li>
 		<li><i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds"
-						 onclick="mute();"></i>
+						 onclick="mute();"><span class="mText">volume</span></i>
 		</li>
 		<li>
-			<a href="{% url 'story.views.report_issue' %}"><i class="icon-pencil" title="report an issue"></i></a>
+			<a href="{% url 'story.views.report_issue' %}"><i class="icon-pencil" title="report an issue"><span class="mText">issue</span></i></a>
 		</li>
 		{% block navbar %} {% endblock navbar %}
 		{% if username %}
@@ -28,7 +28,7 @@
 		{% else %}
 			{% include "story/login.html" %}
 		{% endif %}
-			<li class="right username">Hello, <b><label id="userNameLabel">{{ username }}  </label></b></li>
+			<li class="right username">Hello, <b><label id="userNameLabel">{{ username }}</label></b></li>
 	</ul>
 	<!-- /.container-fluid -->
 </nav>
