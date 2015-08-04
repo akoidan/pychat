@@ -49,7 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
 				alert('Wrong username, only letters, -_');
 				label.textContent =oldUsername;
 			} else  if (newUsername !== oldUsername) {
-				sendToServer({me: newUsername, action: 'me'});
+				sendToServer({content: newUsername, action: 'me'});
 			}
 		};
 		input.onblur = sendChangeNickname;

@@ -173,11 +173,17 @@ class MessagesCreator(object):
 			return REDIS_USERID_CHANNEL_PREFIX % self.user_id
 
 	@staticmethod
-	def online_js_structure(sex, user_id):
+	def online_js_structure(name, sex, user_id):
 		return {
-			GENDER_VAR_NAME: sex,
-			USER_ID_VAR_NAME: user_id
+			name: {
+				GENDER_VAR_NAME: sex,
+				USER_ID_VAR_NAME: user_id
+			}
 		}
+
+	@property
+	def online_self_js_structure(self):
+		return self.online_js_structure(self.sender_name, self.sex, self.user_id)
 
 
 class MessagesHandler(WebSocketHandler, MessagesCreator):
@@ -216,8 +222,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		# redis stores REDIS_USER_FORMAT, so parse them
 		if online:
 			for raw_user_sex in online:
-				(user, sex, user_id) = raw_user_sex.decode('utf-8').split(':')
-				result[user] = cls.online_js_structure(sex, user_id)
+				(name, sex, user_id) = raw_user_sex.decode('utf-8').split(':')
+				result.update(cls.online_js_structure(name, sex, user_id))
 		return result
 
 	def add_online_user(self):
@@ -225,7 +231,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
 		first_tab = False
 		if self.sender_name not in online:  # if a new tab has been opened
-			online[self.sender_name] = self.online_js_structure(self.sex, self.user_id)
+			online.update(self.online_self_js_structure)
 			first_tab = True
 
 		if first_tab:  # Login event, sent user names to all
@@ -345,7 +351,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		:type message: dict
 		"""
-		new_username = message[GET_MINE_USERNAME_EVENT]
+		new_username = message[CONTENT_VAR_NAME]
 		try:
 			check_user(new_username)
 			online = self.get_online_from_redis()
@@ -357,10 +363,10 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			session.save()
 
 			del online[self.sender_name]
-			online[new_username] = self.sex
 			old_name = self.sender_name
 			old_channel = self.channel
 			self.sender_name = new_username  # change_user_name required new_username in sender_name
+			online.update(self.online_self_js_structure)
 			message_all = self.change_user_nickname(old_name, online)
 			message_me = self.default(new_username, GET_MINE_USERNAME_EVENT)
 			# TODO perform ton of checks or emit twice ?
