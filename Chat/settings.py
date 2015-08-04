@@ -96,7 +96,7 @@ LOGIN_URL = '/'
 DATABASES = {
 	'default': {
 		'NAME': 'django',
-		'ENGINE': 'mysql.connector.django',  # django.db.backends.sqlite3
+		'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
 		'USER': 'root',
 		'default-character-set': 'utf8',
 		'OPTIONS': {

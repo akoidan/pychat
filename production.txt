@@ -33,3 +33,5 @@ server {
 
 
 10. add file Chat/production.py , place SECRET_KEY there
+
+11. echo "create database django" | mysql
