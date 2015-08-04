@@ -151,11 +151,14 @@ function sendMessage(event) {
 		// anonymous is set by name, registered user is set by id.
 		var messageRequest = {
 			content: messageContent,
-			action: 'send',
-			receiverId: destinationUserId,
-			receiverName: destinationUserName
+			action: 'send'
 		};
-
+		if (destinationUserId != null) {
+			messageRequest['receiverId'] = destinationUserId;
+		}
+		if (destinationUserName != null) {
+			messageRequest['receiverName'] = destinationUserName;
+		}
 		var sendSuccessful = sendToServer(messageRequest);
 		if (sendSuccessful) {
 			userMessage.value = "";
