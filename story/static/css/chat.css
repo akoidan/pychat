@@ -14,6 +14,17 @@
 	width: 100%;
 }
 
+@media screen and (max-height: 15em ) {
+	nav {
+		display: none;
+	}
+
+	.wrapper {
+		height: calc(100% - 33px);
+		width: 100%;
+	}
+}
+
 .fluid-inline {
 	display: inline-block;
 	height: 100%;

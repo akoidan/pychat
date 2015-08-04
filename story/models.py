@@ -104,7 +104,7 @@ class IssueReport(models.Model):
 	email = models.EmailField(null=True, blank=True)
 	browser = models.CharField(null=False, max_length=32)
 	issue = models.TextField(null=False)
-	time = models.TimeField(default=datetime.datetime.now, blank=True)  # TODO default value doesn't work
+	time = models.TimeField(default=datetime.datetime.now, blank=True)
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((UserProfile._meta.app_label, '_issue_report'))
