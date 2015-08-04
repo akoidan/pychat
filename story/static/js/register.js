@@ -43,7 +43,7 @@ function register() {
 	};
 	doPost('/register', datad, function (data) {
 		if (data === 'ok') {
-			window.location.href = '/';
+			window.location.href = '/profile';
 		} else {
 			alert(data);
 		}
