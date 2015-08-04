@@ -33,6 +33,9 @@ function mute() {
 }
 
 function checkAndPlay(element) {
+	if (!element.readyState) {
+		element.load();
+	}
 	if (element.readyState && sound) {
 		element.pause();
 		element.currentTime = 0;

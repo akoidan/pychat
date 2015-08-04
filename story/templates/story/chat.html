@@ -11,10 +11,10 @@
 {% endblock navbar %}
 {% block content %}
 	<div>
-		<audio id="chatIncoming" src="{% static 'sounds/ChatIncoming.wav' %}" preload="auto" {% comment %}controls="" {% endcomment %}type="audio/mpeg"></audio>
-		<audio id="chatOutgoing" src="{% static 'sounds/ChatOutgoing.wav' %}" preload="auto" {% comment %}controls=""{% endcomment %} type="audio/mpeg"></audio>
-		<audio id="chatLogin" src="{% static 'sounds/ChatLogin.wav' %}" preload="auto" type="audio/mpeg"></audio>
-		<audio id="chatLogout" src="{% static 'sounds/ChatLogout.wav' %}" preload="auto" type="audio/mpeg"></audio>
+		<audio id="chatIncoming" src="{% static 'sounds/ChatIncoming.wav' %}" preload="none"></audio>
+		<audio id="chatOutgoing" src="{% static 'sounds/ChatOutgoing.wav' %}" preload="none"></audio>
+		<audio id="chatLogin" src="{% static 'sounds/ChatLogin.wav' %}" preload="none" ></audio>
+		<audio id="chatLogout" src="{% static 'sounds/ChatLogout.wav' %}" preload="none"></audio>
 	</div>
 	<div class="wrapper">
 		<div class="fluid-inline">
