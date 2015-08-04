@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
 			label.style.display = 'inline';
 			if (!userRegex.test(newUsername)) {
 				alert('Wrong username, only letters, -_');
-				label.text(oldUsername);
+				label.textContent =oldUsername;
 			} else  if (newUsername !== oldUsername) {
 				sendToServer({me: newUsername, action: 'me'});
 			}
