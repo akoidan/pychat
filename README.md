@@ -32,6 +32,7 @@ Archlinux:
  2. `pacman -S pip`
  3. `pacman -S community/redis`
 
+
 Next steps are common for Linux:
  1. `pip install -r requirements.txt`
  2. `python manage.py init_db`

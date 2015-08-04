@@ -93,25 +93,25 @@ LOGIN_URL = '/'
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 
-# DATABASES = {
-# 	'default': {
-# 		'NAME': 'django',
-# 		'ENGINE': 'mysql.connector.django',  # django.db.backends.sqlite3
-# 		'USER': 'root',
-# 		'default-character-set': 'utf8',
-# 		'OPTIONS': {
-# 			'autocommit': True,
-#
-# 		},
-# 	}
-# }
-
 DATABASES = {
 	'default': {
-		'ENGINE': 'django.db.backends.sqlite3',
-		'NAME': 'django.db',
+		'NAME': 'django',
+		'ENGINE': 'mysql.connector.django',  # django.db.backends.sqlite3
+		'USER': 'root',
+		'default-character-set': 'utf8',
+		'OPTIONS': {
+			'autocommit': True,
+
+		},
 	}
 }
+
+#DATABASES = {
+#	'default': {
+#		'ENGINE': 'django.db.backends.sqlite3',
+#		'NAME': 'django.db',
+#	}
+#}
 
 CACHES = {
 	'default': {

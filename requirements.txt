@@ -6,5 +6,4 @@ tornado-redis
 django-redis-sessions
 selenium # optional for testing, comment this if you don't go for tests
 #django-redis-cache
-# PyMySQL
-# mysql-connector-python
+mysqlclient
