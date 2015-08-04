@@ -31,7 +31,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-LOGGING_CONFIG = None
+
 DEBUG = True
 TEMPLATE_DEBUG = True
 ALLOWED_HOSTS = ["127.0.0.1", ]
@@ -79,7 +79,7 @@ MIDDLEWARE_CLASSES = (
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'story.cookies_middleware.UserCookieMiddleWare',
-	# 'django.middleware.clickjacking.XFrameOptionsMiddleware',
+	'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'Chat.urls'
