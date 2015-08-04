@@ -134,13 +134,15 @@ class MessagesCreator(object):
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
 		"sex": "Alien", "user": "tRD6emzs", "time": "20:48:57"}
 		"""
-		return {
+		result = {
 			USER_VAR_NAME: message.sender.username,
-			RECEIVER_USERNAME_VAR_NAME: None if message.receiver is None else message.receiver.username,
 			CONTENT_VAR_NAME: message.content,
 			TIME_VAR_NAME: message.time.strftime("%H:%M:%S"),
 			MESSAGE_ID_VAR_NAME: message.id,
 		}
+		if message.receiver is not None:
+			result[RECEIVER_USERNAME_VAR_NAME] = message.receiver.username
+		return result
 
 	@classmethod
 	def get_messages(cls, messages):
@@ -155,10 +157,9 @@ class MessagesCreator(object):
 
 	def send_anonymous(self, content, receiver_anonymous):
 		default_message = self.default(content, SEND_MESSAGE_EVENT)
-		default_message.update({
-			USER_VAR_NAME: self.sender_name,
-			RECEIVER_USERNAME_VAR_NAME: receiver_anonymous,
-		})
+		default_message[USER_VAR_NAME] = self.sender_name
+		if receiver_anonymous is not None:
+			default_message[RECEIVER_USERNAME_VAR_NAME] = receiver_anonymous
 		return default_message
 
 	@property
