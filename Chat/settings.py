@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import os
 from os.path import join
 LOGGING_CONFIG = None
+try:
+	from Chat.production import * 
+except ImportError:
+	pass
 from django.conf import global_settings
 
 import story as project_module
@@ -24,7 +28,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8ou!cqb1yd)6c4h0i-cxjo&@@+04%4np6od8qn+z@5b=6)!v(o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
@@ -169,10 +172,10 @@ LOGGING = {
 	'loggers': {
 		# root logger
 		'': {
-			'handlers': ['console'],
+			'handlers': ['file-django'],
 		},
 		'django.request': {
-			'handlers': ['console'],
+			'handlers': ['file-django'],
 			'level': 'DEBUG',
 			'propagate': False,
 		},
