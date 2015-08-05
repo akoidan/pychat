@@ -32,9 +32,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
-DEBUG = True
-TEMPLATE_DEBUG = True
-ALLOWED_HOSTS = ["127.0.0.1", ]
+DEBUG = False
+TEMPLATE_DEBUG = False
+#ALLOWED_HOSTS = ["127.0.0.1", ]
 
 # TEMPLATE_DIRS = [BASE_DIR+'/templates']
 TEMPLATE_DIRS = (
@@ -192,13 +192,6 @@ LOGGING = {
 import logging.config
 logging.config.dictConfig(LOGGING)
 
-
-# for gmail or google apps
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'chat.django@gmail.com'
-EMAIL_HOST_PASSWORD = 'Ilovepython'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 

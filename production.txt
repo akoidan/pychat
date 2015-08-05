@@ -35,3 +35,6 @@ server {
 10. add file Chat/production.py , place SECRET_KEY there
 
 11. echo "create database django" | mysql
+
+12. echo "wait_timeout = 31536000
+interactive_timeout = 31536000" >> /etc/my.cnf
