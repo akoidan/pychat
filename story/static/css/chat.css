@@ -110,6 +110,11 @@
 	#chat-room-users-wrapper {
 		display: none;
 	}
+
+	.timeMess{
+		display: none;
+	}
+
 	.icon-pencil {
 		display: none;
 	}
