@@ -6,12 +6,14 @@ if (!("WebSocket" in window)) {
 }
 var CONNECTION_RETRY_TIME = 5000;
 
-var selfHeader = '<font class="message-header-self">';
-var privateHeader = '<font class="message-header-private">';
-var othersHeader = '<font class="message-header-others">';
-var systemHeader = '<font class="message-header-system">';
-var endHeader = '</font>';
-var contentStyle = '<font class="message-text-style">';
+var selfHeader = '<span class="message-header-self">';
+var privateHeader = '<span class="message-header-private">';
+var othersHeader = '<span class="message-header-others">';
+var systemHeader = '<span class="message-header-system">';
+var endHeader = '</span>';
+var timeDiv = '<span class="timeMess">(';
+var timeDivEnd = ') </span>';
+var contentStyle = '<span class="message-text-style">';
 var genderIcons = {
 		'Male': 'icon-man',
 		'Female': 'icon-girl',
@@ -266,7 +268,8 @@ function showUserSendMess(username) {
 
 
 function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayedUsername, isTopDirection) {
-	var messageHeader = headerStyle + '(' + time + ') <b>' + displayedUsername + '</b>: ' + endHeader;
+
+	var messageHeader = headerStyle + timeDiv + time + timeDivEnd + displayedUsername + '</b>: ' + endHeader;
 	var messageContent = contentStyle + htmlEncodedContent + endHeader;
 	var message = '<p>' + messageHeader + messageContent + "</p>";
 	if (!isCurrentTabActive) {

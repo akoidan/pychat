@@ -45,6 +45,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
+* http://stackoverflow.com/a/14268418/3872976
 * ManyToManyRel Threads - Users
 * test audio preload on none 
 * add media query for register and usersettings to adjust for phone's width
