@@ -1,40 +1,15 @@
 1. yum install nginx
 2. yum install uWSGI
-3.  `echo ' [taafs]
- name = TAAFS repository
- baseurl = http://178.63.64.17:8080/
- enabled=1
- gpgcheck=0' > /etc/yum.repos.d/taafs.repo`
+3. copy rootfs to /
 4. `yum install pip3`
 5. `yum install redis`
 6. `yum install python34u-pip`
 7. `yum install mysql-server, mysql-devel`
 
-8. echo 'upstream django {
-    server unix:///tmp/uwsgi.sock;
-}
-
-server {
-    listen      80;
-    server_name pychat.org;
-    charset     utf-8;
-    client_max_body_size 75M;
-    location /media  {
-        alias /root/djangochat/photos;
-    }
-    location /static {
-        alias /root/djangochat/story/static;
-    }
-    location / {
-        uwsgi_pass django;
-        include /etc/nginx/uwsgi_params;
-    }
-}' > /etc/nginx/conf.d/default.conf
-
-
 10. add file Chat/production.py , place SECRET_KEY there
 
 11. echo "create database django" | mysql
-
-12. echo "wait_timeout = 31536000
-interactive_timeout = 31536000" >> /etc/my.cnf
+12 . chkconfig --add redis ; chkconfig redis on
+12 . chkconfig --add mysqld ; chkconfig mysqld on
+12 . chkconfig --add uwsgi ; chkconfig uwsgi on
+12 . chkconfig --add tornado ; chkconfig tornado on

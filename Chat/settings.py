@@ -33,6 +33,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 DEBUG = False
+ALLOWED_HOSTS = ["pychat.org", ]
 TEMPLATE_DEBUG = False
 #ALLOWED_HOSTS = ["127.0.0.1", ]
 

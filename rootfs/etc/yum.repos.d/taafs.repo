@@ -1,0 +1,9 @@
+[taafs]
+
+name = TAAFS repository
+
+baseurl = http://178.63.64.17:8080/
+
+enabled=1
+
+gpgcheck=0
