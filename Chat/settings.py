@@ -204,6 +204,7 @@ MEDIA_URL = "/photo/"
 USER_COOKIE_NAME = 'user'
 
 WS_ADDRESS_COOKIE_NAME = 'api'
+DEFAULT_REDIS_CHANNEL = 'main'
 
 ######### JAVASCRIPT CONSTANTS #############
 VALIDATION_IS_OK = 'ok'

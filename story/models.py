@@ -83,7 +83,8 @@ class UserProfile(AbstractBaseUser):
 
 class Thread(models.Model):
 	id = models.AutoField(primary_key=True)
-	name = CharField(max_length=30, null=True)
+	name = CharField(max_length=30, null=True, unique=True)
+	users = models.ManyToManyField(UserProfile, related_name='threads')
 
 
 class Message(models.Model):

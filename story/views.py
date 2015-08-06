@@ -1,5 +1,4 @@
 # -*- encoding: utf-8 -*-
-import json
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.shortcuts import render_to_response
@@ -12,14 +11,13 @@ from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.http import HttpResponseRedirect
-from django.db.models import Q
-from story.apps import DefaultSettingsConfig
+from Chat.settings import DEFAULT_REDIS_CHANNEL
+
 from story.decorators import login_required_no_redirect
-from story.models import UserProfile, IssueReport
-from .models import Message
+from story.models import UserProfile, IssueReport, Thread
 from story import registration_utils
 from story.forms import UserProfileForm, UserProfileReadOnlyForm
-from story.registration_utils import check_email, send_email_verification, check_user, check_password, is_blank
+from story.registration_utils import check_email, send_email_verification, check_user, check_password
 from Chat import settings
 
 
@@ -126,7 +124,9 @@ def register(request):
 		check_email(email, verify_email == 'Y')
 		user = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
 		user.set_password(password)
-		user.save()
+		thread = Thread(name=DEFAULT_REDIS_CHANNEL)
+		user.threads.add(thread)
+		user.save()  # TODO
 		# You must call authenticate before you can call login
 		auth_user = authenticate(username=username, password=password)
 		djangologin(request, auth_user)

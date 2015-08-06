@@ -2,7 +2,6 @@ import datetime
 import json
 import logging
 import sys
-import django
 from django.core.exceptions import ValidationError
 
 import redis
@@ -24,7 +23,7 @@ try:
 except ImportError:
 	from urlparse import urlparse  # py3
 
-from Chat.settings import MAX_MESSAGE_SIZE
+from Chat.settings import MAX_MESSAGE_SIZE, DEFAULT_REDIS_CHANNEL
 from story.models import UserProfile, Message
 from story.registration_utils import id_generator, check_user, is_blank
 
@@ -56,7 +55,7 @@ LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
 SEND_MESSAGE_EVENT = 'send'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
-DEFAULT_REDIS_CHANNEL = 'main'
+REGISTERED_REDIS_CHANNEL = 'reg'
 REDIS_USERNAME_CHANNEL_PREFIX = 'u:%s'
 REDIS_USERID_CHANNEL_PREFIX = 'i:%s'
 REDIS_ROOM_CHANNEL_PREFIX = 'r:%s'
@@ -218,11 +217,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		self.channel should been set before calling
 		"""
+		channels = [REDIS_ROOM_CHANNEL_PREFIX % DEFAULT_REDIS_CHANNEL, self.channel]
 		yield tornado.gen.Task(
-			self.async_redis.subscribe, [
-				REDIS_ROOM_CHANNEL_PREFIX % DEFAULT_REDIS_CHANNEL,
-				self.channel
-			])
+			self.async_redis.subscribe, channels)
 		self.async_redis.listen(self.new_message)
 
 	@classmethod
