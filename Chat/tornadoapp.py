@@ -55,7 +55,6 @@ LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
 SEND_MESSAGE_EVENT = 'send'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
-REGISTERED_REDIS_CHANNEL = 'reg'
 REDIS_USERNAME_CHANNEL_PREFIX = 'u:%s'
 REDIS_USERID_CHANNEL_PREFIX = 'i:%s'
 REDIS_ROOM_CHANNEL_PREFIX = 'r:%s'
@@ -213,11 +212,11 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		}
 
 	@tornado.gen.engine
-	def listen(self):
+	def listen(self, channels):
 		"""
 		self.channel should been set before calling
 		"""
-		channels = [REDIS_ROOM_CHANNEL_PREFIX % DEFAULT_REDIS_CHANNEL, self.channel]
+		channels.append(self.channel)
 		yield tornado.gen.Task(
 			self.async_redis.subscribe, channels)
 		self.async_redis.listen(self.new_message)
@@ -255,14 +254,21 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		self.safe_write(prepared_message)
 
 	def set_username(self, session_key):
+		"""
+		Case registered: Fetch userName and its channels from database. returns them
+		Case anonymous: generates a new name and saves it to session. returns default channel
+		:return: channels user should subscribe
+		"""
 		session = session_engine.SessionStore(session_key)
 		try:
 			self.user_id = int(session["_auth_user_id"])
 			user_db = self.do_db(UserProfile.objects.get, id=self.user_id) # everything but 0 is a registered user
-			# user_db.threads  # TODO
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
 			logger.debug("User %s has logged in with session key %s" % (self.sender_name, session_key))
+			threads = user_db.threads.all()
+			logger.debug('fetched %s for user %s' % (threads, user_db.username))
+			return [REDIS_ROOM_CHANNEL_PREFIX % thread.name for thread in threads]
 		except (KeyError, UserProfile.DoesNotExist):
 			# Anonymous
 			self.sender_name = session.get(SESSION_USER_VAR_NAME)
@@ -273,13 +279,14 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				logger.debug("Generated %s  name for new anonymous session %s" % (self.sender_name, session_key))
 			else:
 				logger.debug("Anonymous %s has logged in with session key %s" % (self.sender_name, session_key))
+			return [REDIS_ROOM_CHANNEL_PREFIX % DEFAULT_REDIS_CHANNEL, ]
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
 		if sessionStore.exists(session_key):
 			self.async_redis.connect()
-			self.set_username(session_key)
-			self.listen()
+			channels = self.set_username(session_key)
+			self.listen(channels)
 			self.add_online_user()
 		else:
 			logger.warn('Incorrect session id: %s', session_key)
