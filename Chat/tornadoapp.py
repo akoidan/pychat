@@ -265,6 +265,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			# user_db.threads  # TODO
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
+			logger.debug("User %s has logged in with session key %s" % (self.sender_name, session_key))
 		except (KeyError, UserProfile.DoesNotExist):
 			# Anonymous
 			self.sender_name = session.get(SESSION_USER_VAR_NAME)
@@ -272,6 +273,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				self.sender_name = id_generator(8)
 				session[SESSION_USER_VAR_NAME] = self.sender_name
 				session.save()
+				logger.debug("Generated %s  name for new anonymous session %s" % (self.sender_name, session_key))
+			else:
+				logger.debug("Anonymous %s has logged in with session key %s" % (self.sender_name, session_key))
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
