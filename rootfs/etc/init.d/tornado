@@ -29,20 +29,19 @@ prog="tornado"
 lockfile=/var/lock/subsys/$prog
 
 start() {
-    cd /root/djangochat/
-    nohup python3 manage.py start_tornado  > /root/djangochat/log/tornado.log 2>&1 &
-
+    nohup python3 /root/djangochat/manage.py start_tornado  > /root/djangochat/log/tornado.log 2>&1 &
+    pid=$!
     echo -n $"Starting $prog: "
     # if not running, start it up here, usually something like "daemon $exec"
     retval=$?
     echo
-    [ $retval -eq 0 ] && touch $lockfile
+    [ $retval -eq 0 ] && echo $pid > $lockfile
     return $retval
 }
 
 stop() {
     echo -n $"Stopping $prog: "
-    killproc $prog
+    kill -9 `cat $lockfile`
     retval=$?
     echo
     [ $retval -eq 0 ] && rm -f $lockfile
@@ -78,7 +77,7 @@ case "$1" in
         $1
         ;;
     stop)
-        rh_status_q || exit 0
+        #rh_status_q || exit 0
         $1
         ;;
     restart)
