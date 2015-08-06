@@ -45,6 +45,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
+* story/views.py:127 TODO
 * http://stackoverflow.com/a/14268418/3872976
 * ManyToManyRel Threads - Users
 * test audio preload on none 

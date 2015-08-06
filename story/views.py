@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
-import json
 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.db import transaction
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseNotAllowed
 from django.contrib.auth import authenticate
@@ -12,15 +12,17 @@ from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.http import HttpResponseRedirect
-from django.db.models import Q
-from story.apps import DefaultSettingsConfig
+
+from Chat.settings import DEFAULT_REDIS_CHANNEL, REGISTERED_REDIS_CHANNEL, logging
 from story.decorators import login_required_no_redirect
-from story.models import UserProfile, IssueReport
-from .models import Message
+from story.models import UserProfile, IssueReport, Thread
 from story import registration_utils
 from story.forms import UserProfileForm, UserProfileReadOnlyForm
-from story.registration_utils import check_email, send_email_verification, check_user, check_password, is_blank
+from story.registration_utils import check_email, send_email_verification, check_user, check_password
 from Chat import settings
+
+
+logger = logging.getLogger(__name__)
 
 
 @require_http_methods(['POST'])
@@ -114,7 +116,7 @@ def get_register_page(request):
 	c.update({'error code': "welcome to register page"})
 	return render_to_response("story/register.html", c,  context_instance=RequestContext(request))
 
-
+@transaction.atomic
 @require_http_methods('POST')
 def register(request):
 	try:
@@ -126,7 +128,13 @@ def register(request):
 		check_email(email, verify_email == 'Y')
 		user = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
 		user.set_password(password)
+		default_thread, created_default = Thread.objects.get_or_create(name=DEFAULT_REDIS_CHANNEL)
+		registered_only, created_registered = Thread.objects.get_or_create(name=REGISTERED_REDIS_CHANNEL)
 		user.save()
+		user.threads.add(default_thread)
+		user.threads.add(registered_only)
+		user.save()
+		logger.info('Signed up new user %s, subscribed for channels %S', user, user.threads)
 		# You must call authenticate before you can call login
 		auth_user = authenticate(username=username, password=password)
 		djangologin(request, auth_user)
