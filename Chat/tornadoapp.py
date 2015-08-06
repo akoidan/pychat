@@ -2,6 +2,7 @@ import datetime
 import json
 import logging
 import sys
+import django
 from django.core.exceptions import ValidationError
 
 import redis
@@ -15,6 +16,8 @@ from django.utils.importlib import import_module
 import tornado.gen
 from django.conf import settings
 import tornadoredis
+from django.db import connection, OperationalError, InterfaceError
+
 
 try:
 	from urllib.parse import urlparse  # py2
@@ -189,6 +192,15 @@ class MessagesCreator(object):
 
 class MessagesHandler(WebSocketHandler, MessagesCreator):
 
+	@staticmethod
+	def do_db(callback, **args):
+		try:
+			return callback(**args)
+		except (OperationalError, InterfaceError) as e:  # Connection has gone away
+			logger.warn('%s, reconnecting' % e)
+			connection.close()
+			return callback(**args)
+
 	def data_received(self, chunk):
 		pass
 
@@ -248,8 +260,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 	def set_username(self, session_key):
 		session = session_engine.SessionStore(session_key)
 		try:
-			self.user_id = int(session["_auth_user_id"])  # everything but 0 is a registered user
-			user_db = UserProfile.objects.get(id=self.user_id)
+			self.user_id = int(session["_auth_user_id"])
+			user_db = self.do_db(UserProfile.objects.get, id=self.user_id) # everything but 0 is a registered user
 			# user_db.threads  # TODO
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
@@ -336,7 +348,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 		if self.user_id != 0 and save_to_db:
 			message_db = Message(sender_id=self.user_id, content=content, receiver_id=receiver_id)
-			message_db.save()  # exit on hacked id with exception
+			self.do_db(message_db.save)  # exit on hacked id with exception
 			prepared_message = self.create_send_message(message_db)
 		else:
 			prepared_message = self.send_anonymous(content, receiver_name)
