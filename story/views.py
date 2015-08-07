@@ -203,7 +203,7 @@ def report_issue(request):
 		)
 		issue.save()
 		if request.POST.get('ajax') is True:
-			HttpResponse('ok', content_type='text/plain')
+			return HttpResponse('ok', content_type='text/plain')
 		else:
 			return render_to_response(
 				'story/response.html',
