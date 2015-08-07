@@ -23,7 +23,7 @@ try:
 except ImportError:
 	from urlparse import urlparse  # py3
 
-from Chat.settings import MAX_MESSAGE_SIZE, DEFAULT_REDIS_CHANNEL
+from Chat.settings import MAX_MESSAGE_SIZE, ANONYMOUS_REDIS_CHANNEL
 from story.models import UserProfile, Message
 from story.registration_utils import id_generator, check_user, is_blank
 
@@ -51,6 +51,7 @@ REFRESH_USER_EVENT = 'online_users'
 SYSTEM_MESSAGE_EVENT = 'system'
 GET_MESSAGES_EVENT = 'messages'
 GET_MINE_USERNAME_EVENT = 'me'
+THREADS_EVENT = 'threads'  # thread ex "main" , channel ex. 'r:main', "i:3"
 LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
 SEND_MESSAGE_EVENT = 'send'
@@ -187,9 +188,6 @@ class MessagesCreator(object):
 	def online_self_js_structure(self):
 		return self.online_js_structure(self.sender_name, self.sex, self.user_id)
 
-
-class MessagesHandler(WebSocketHandler, MessagesCreator):
-
 	@staticmethod
 	def do_db(callback, **args):
 		try:
@@ -198,6 +196,10 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			logger.warn('%s, reconnecting' % e)
 			connection.close()
 			return callback(**args)
+
+
+class MessagesHandler(WebSocketHandler, MessagesCreator):
+
 
 	def data_received(self, chunk):
 		pass
@@ -216,7 +218,6 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		self.channel should been set before calling
 		"""
-		channels.append(self.channel)
 		yield tornado.gen.Task(
 			self.async_redis.subscribe, channels)
 		self.async_redis.listen(self.new_message)
@@ -250,8 +251,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			online_user_names_mes = self.online_user_names(online, REFRESH_USER_EVENT)
 			self.safe_write(online_user_names_mes)
 		# send usernamechat
-		prepared_message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
-		self.safe_write(prepared_message)
+		username_message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
+		self.safe_write(username_message)
 
 	def set_username(self, session_key):
 		"""
@@ -266,9 +267,12 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
 			logger.debug("User %s has logged in with session key %s" % (self.sender_name, session_key))
-			threads = user_db.threads.all()
+			threads = user_db.threads.all()  # do_db is used already
 			logger.debug('fetched %s for user %s' % (threads, user_db.username))
-			return [REDIS_ROOM_CHANNEL_PREFIX % thread.name for thread in threads]
+			room_names = [thread.name for thread in threads]
+			channels = [REDIS_ROOM_CHANNEL_PREFIX % room for room in room_names]
+			channels.append(self.channel)
+			threads_message = self.default(room_names, THREADS_EVENT)
 		except (KeyError, UserProfile.DoesNotExist):
 			# Anonymous
 			self.sender_name = session.get(SESSION_USER_VAR_NAME)
@@ -279,7 +283,11 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				logger.debug("Generated %s  name for new anonymous session %s" % (self.sender_name, session_key))
 			else:
 				logger.debug("Anonymous %s has logged in with session key %s" % (self.sender_name, session_key))
-			return [REDIS_ROOM_CHANNEL_PREFIX % DEFAULT_REDIS_CHANNEL, ]
+			channels = [REDIS_ROOM_CHANNEL_PREFIX % ANONYMOUS_REDIS_CHANNEL, self.channel]
+			threads_message = self.default([ANONYMOUS_REDIS_CHANNEL, ], THREADS_EVENT)
+		finally:
+			self.safe_write(threads_message)
+			return channels
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
@@ -304,7 +312,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		return browser_domain == origin_domain
 
 	@staticmethod
-	def publish(message, channel=REDIS_ROOM_CHANNEL_PREFIX % DEFAULT_REDIS_CHANNEL):
+	def publish(message, channel=REDIS_ROOM_CHANNEL_PREFIX % ANONYMOUS_REDIS_CHANNEL):
 		async_redis_publisher.publish(channel, json.dumps(message))
 
 	# TODO really parse every single message for 1 action?
@@ -413,7 +421,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		finally:
 			if self.async_redis.subscribed:
 				self.async_redis.unsubscribe([
-					REDIS_ROOM_CHANNEL_PREFIX % DEFAULT_REDIS_CHANNEL,
+					REDIS_ROOM_CHANNEL_PREFIX % ANONYMOUS_REDIS_CHANNEL,
 					REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name
 				])
 			self.async_redis.disconnect()

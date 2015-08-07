@@ -13,7 +13,7 @@ from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.http import HttpResponseRedirect
 
-from Chat.settings import DEFAULT_REDIS_CHANNEL, REGISTERED_REDIS_CHANNEL, logging
+from Chat.settings import ANONYMOUS_REDIS_CHANNEL, REGISTERED_REDIS_CHANNEL, logging
 from story.decorators import login_required_no_redirect
 from story.models import UserProfile, IssueReport, Thread
 from story import registration_utils
@@ -128,7 +128,7 @@ def register(request):
 		check_email(email, verify_email == 'Y')
 		user = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
 		user.set_password(password)
-		default_thread, created_default = Thread.objects.get_or_create(name=DEFAULT_REDIS_CHANNEL)
+		default_thread, created_default = Thread.objects.get_or_create(name=ANONYMOUS_REDIS_CHANNEL)
 		registered_only, created_registered = Thread.objects.get_or_create(name=REGISTERED_REDIS_CHANNEL)
 		user.save()
 		user.threads.add(default_thread)

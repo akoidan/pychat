@@ -53,6 +53,7 @@ var userSendMessageTo;
 var receiverId;
 // navbar label with current user name
 var userNameLabel;
+var charRooms;
 //main single socket for handling realtime messages
 var ws;
 var isWsConnected; // used for debugging info only
@@ -75,6 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	sendButton = document.getElementById("sendButton");
 	userSendMessageTo.style.display = "none";
 	receiverId = document.getElementById("receiverId");
+	charRooms = document.getElementById("rooms");
 
 	chatUsersTable.addEventListener("click", chatRoomClick);
 	userMessage.addEventListener("keypress", sendMessage);
@@ -424,11 +426,22 @@ function handlePreparedWSMessage(data) {
 				checkAndPlay(chatIncoming);
 			}
 			break;
+		case 'threads':
+			setupChannels(data['content']);
+			break;
 		default:
 			console.error(getDebugMessage('Unknown message type  {}', JSON.stringify(data)));
 	}
 }
 
+function setupChannels(channels) {
+	var text = '';
+	// TODO add ids to channels
+	for (var i = 0; i < channels.length; i++) {
+		text += channels[i] + '; ';
+	}
+	charRooms.innerHTML = text;
+}
 
 function webSocketMessage(message) {
 	var jsonData = message.data;
