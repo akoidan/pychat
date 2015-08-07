@@ -197,9 +197,9 @@ def report_issue(request):
 	elif request.method == 'POST':
 		issue = IssueReport(
 			sender_id=request.user.id,
-			browser=request.POST['browser'],
+			browser=request.POST.get('browser'),
 			issue=request.POST['issue'],
-			email=request.POST['email']
+			email=request.POST.get('email')
 		)
 		issue.save()
 		if request.POST.get('ajax') is True:
