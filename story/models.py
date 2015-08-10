@@ -3,7 +3,7 @@ import datetime
 
 from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-from django.db.models import CharField, DateField, FileField, TextField
+from django.db.models import CharField, DateField, FileField, TextField, BooleanField
 from Chat.settings import GENDERS
 
 
@@ -81,10 +81,11 @@ class UserProfile(AbstractBaseUser):
 		super(UserProfile, self).save(*args, **kwargs)
 
 
-class Thread(models.Model):
+class Room(models.Model):
 	id = models.AutoField(primary_key=True)
 	name = CharField(max_length=30, null=True, unique=True)
-	users = models.ManyToManyField(UserProfile, related_name='threads')
+	users = models.ManyToManyField(UserProfile, related_name='rooms')
+	is_private = BooleanField(default=True)
 
 
 class Message(models.Model):
@@ -92,7 +93,7 @@ class Message(models.Model):
 	Contains all public messages
 	"""
 	sender = models.ForeignKey(UserProfile, related_name='sender')
-	thread = models.ForeignKey(Thread, null=True)
+	room = models.ForeignKey(Room, null=True)
 	# DateField.auto_now
 	time = models.TimeField(default=datetime.datetime.now)
 	content = models.TextField()

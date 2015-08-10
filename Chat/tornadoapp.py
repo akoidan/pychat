@@ -23,8 +23,8 @@ try:
 except ImportError:
 	from urlparse import urlparse  # py3
 
-from Chat.settings import MAX_MESSAGE_SIZE, ANONYMOUS_REDIS_CHANNEL
-from story.models import UserProfile, Message
+from Chat.settings import MAX_MESSAGE_SIZE, ANONYMOUS_REDIS_ROOM
+from story.models import UserProfile, Message, Room
 from story.registration_utils import id_generator, check_user, is_blank
 
 PY3 = sys.version > '3'
@@ -58,7 +58,7 @@ SEND_MESSAGE_EVENT = 'send'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
 REDIS_USERNAME_CHANNEL_PREFIX = 'u:%s'
 REDIS_USERID_CHANNEL_PREFIX = 'i:%s'
-REDIS_ROOM_CHANNEL_PREFIX = 'r:%s'
+REDIS_ROOM_CHANNEL_PREFIX = 'r:%d'
 REDIS_ONLINE_USERS = "online_users"
 
 
@@ -67,7 +67,11 @@ sync_redis = redis.StrictRedis()
 # Redis connection cannot be shared between publishers and subscribers.
 async_redis_publisher = tornadoredis.Client()
 async_redis_publisher.connect()
-sync_redis.delete(REDIS_ONLINE_USERS)  # TODO move it somewhere else
+sync_redis.flushall()  # TODO move it somewhere else
+
+anonymous_default_room = Room.objects.get(name=ANONYMOUS_REDIS_ROOM)
+ANONYMOUS_REDIS_CHANNEL = REDIS_ROOM_CHANNEL_PREFIX % anonymous_default_room.id
+ANONYMOUS_ROOM_NAMES = {anonymous_default_room.id: anonymous_default_room.name}
 
 sessionStore = session_engine.SessionStore()
 
@@ -269,9 +273,11 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			logger.debug("User %s has logged in with session key %s" % (self.sender_name, session_key))
 			threads = user_db.threads.all()  # do_db is used already
 			logger.debug('fetched %s for user %s' % (threads, user_db.username))
-			room_names = [thread.name for thread in threads]
-			channels = [REDIS_ROOM_CHANNEL_PREFIX % room for room in room_names]
-			channels.append(self.channel)
+			room_names = {}
+			channels = [self.channel, ]
+			for thread in threads:
+				room_names[thread.id] = thread.name
+				channels.append(REDIS_ROOM_CHANNEL_PREFIX % thread.id)
 			threads_message = self.default(room_names, THREADS_EVENT)
 		except (KeyError, UserProfile.DoesNotExist):
 			# Anonymous
@@ -283,8 +289,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				logger.debug("Generated %s  name for new anonymous session %s" % (self.sender_name, session_key))
 			else:
 				logger.debug("Anonymous %s has logged in with session key %s" % (self.sender_name, session_key))
-			channels = [REDIS_ROOM_CHANNEL_PREFIX % ANONYMOUS_REDIS_CHANNEL, self.channel]
-			threads_message = self.default([ANONYMOUS_REDIS_CHANNEL, ], THREADS_EVENT)
+			channels = [ANONYMOUS_REDIS_CHANNEL, self.channel]
+			threads_message = self.default(ANONYMOUS_ROOM_NAMES, THREADS_EVENT)
 		finally:
 			self.safe_write(threads_message)
 			return channels
@@ -312,7 +318,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		return browser_domain == origin_domain
 
 	@staticmethod
-	def publish(message, channel=REDIS_ROOM_CHANNEL_PREFIX % ANONYMOUS_REDIS_CHANNEL):
+	def publish(message, channel=ANONYMOUS_REDIS_CHANNEL):
 		async_redis_publisher.publish(channel, json.dumps(message))
 
 	# TODO really parse every single message for 1 action?
@@ -420,8 +426,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 					self.publish(message)
 		finally:
 			if self.async_redis.subscribed:
+				#  TODO unsubscribe of all subscribed                  !IMPORTANT
 				self.async_redis.unsubscribe([
-					REDIS_ROOM_CHANNEL_PREFIX % ANONYMOUS_REDIS_CHANNEL,
+					REDIS_ROOM_CHANNEL_PREFIX % ANONYMOUS_REDIS_ROOM,
 					REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name
 				])
 			self.async_redis.disconnect()

@@ -57,6 +57,7 @@ var charRooms;
 //main single socket for handling realtime messages
 var ws;
 var isWsConnected; // used for debugging info only
+var chatUserRoomWrapper; // for hiddding users
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -78,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
 	receiverId = document.getElementById("receiverId");
 	charRooms = document.getElementById("rooms");
 
-	chatUsersTable.addEventListener("click", chatRoomClick);
+	chatUsersTable.addEventListener("click", userClick);
 	userMessage.addEventListener("keypress", sendMessage);
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
@@ -119,19 +120,12 @@ function changeTittleFunction(e) {
 }
 
 
-function chatRoomClick(event) {
+function userClick(event) {
 	event = event || window.event;
 	var target = event.target || event.srcElement;
-	while (target != chatUsersTable) { // ( ** )
-		if (target.nodeName == 'TD') { // ( * )
-			if (target.cellIndex == 1 ) {
-				destinationUserName = target.innerHTML;
-				destinationUserId = parseInt(target.id);
-				showUserSendMess(destinationUserName);
-			}
-		}
-		target = target.parentNode;
-	}
+	destinationUserName = target.innerHTML;
+	destinationUserId = parseInt(target.attributes.name.value);
+	showUserSendMess(destinationUserName);
 }
 
 
@@ -234,6 +228,7 @@ function encodeHTML(html) {
 }
 
 
+// TODO threadid
 function loadUsers(usernames) {
 	if (!usernames) {
 		return;
@@ -253,7 +248,7 @@ function loadUsers(usernames) {
 			if (icon == null) {
 				console.log(getDebugMessage('Bug, gender: {}, icon: {}', gender, icon))
 			}
-			allUsers += '<tr><td>' + icon + '</td> <td id="' + userId + '">' + username + '</td><tr>';
+			allUsers += '<tr><td>' + icon + '</td> <td name="' + userId + '">' + username + '</td><tr>';
 		}
 	}
 	chatUsersTable.innerHTML = allUsers;
@@ -435,11 +430,12 @@ function handlePreparedWSMessage(data) {
 }
 
 function setupChannels(channels) {
-	var text = '';
-	// TODO add ids to channels
-	for (var i = 0; i < channels.length; i++) {
-		text += channels[i] + '; ';
+	for (var key in channels) {
+		if (channels.hasOwnProperty(key)) {
+			text += '<li name="' + key + '">' + channels[key] + '</li>';
+		}
 	}
+	text+='</ul>';
 	charRooms.innerHTML = text;
 }
 
