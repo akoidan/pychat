@@ -212,3 +212,8 @@ def report_issue(request):
 			)
 	else:
 		raise HttpResponseNotAllowed
+
+
+@require_http_methods('GET')
+def hack(request):
+	return render_to_response('story/')
