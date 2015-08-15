@@ -1,12 +1,16 @@
+import base64
+from io import BytesIO
 import re
 from threading import Thread
 import random
 import string
+from django.core.files.uploadedfile import InMemoryUploadedFile
 
 from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.forms import model_to_dict
+import sys
 from story.apps import DefaultSettingsConfig
 from Chat import settings
 from story.models import UserProfile
@@ -80,3 +84,16 @@ def send_email_verification(user, site_address):
 			target=send_mail,
 			args=("Confirm chat registration", text, site_address, [user.email]))
 		mail_thread.start()
+
+
+def extract_photo(image_base64):
+	image_data = re.search(r'base64,(.*)', image_base64).group(1)
+	file = BytesIO(base64.b64decode(image_data))
+	image = InMemoryUploadedFile(
+		file,
+		field_name='photo',
+		name='sdf',
+		content_type="image/jpeg",
+		size=sys.getsizeof(file),
+		charset=None)
+	return image

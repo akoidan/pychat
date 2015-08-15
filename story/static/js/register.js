@@ -26,22 +26,8 @@ function register() {
 		alert("Passwords don't match");
 		return;
 	}
-	var sex;
-	if (document.getElementById("rmale").checked) {
-		sex = 'Male';
-	} else if (document.getElementById("rfemale").checked) {
-		sex = 'Female';
-	} else {
-		sex = 'Alien';
-	}
-	var datad = {
-		username: userName.value,
-		password: password.value,
-		email: email.value,
-		mailbox: mailbox.checked ? 'Y' : 'N',
-		sex: sex
-	};
-	doPost('/register', datad, function (data) {
+	var form = document.getElementById('register-form');
+	doPost('/register', form, function (data) {
 		if (data === 'ok') {
 			window.location.href = '/profile';
 		} else {

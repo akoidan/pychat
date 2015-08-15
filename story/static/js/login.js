@@ -1,9 +1,5 @@
 function login() {
-	var credentials = {
-		username: document.getElementById("username").value,
-		password: document.getElementById("password").value
-	};
-	doPost('/auth', credentials, function (data) {
+	doPost('/auth', document.getElementById('loginForm'), function (data) {
 		if (data === 'ok') {
 			window.location.href = '/';
 		} else {

@@ -271,14 +271,14 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
 			logger.debug("User %s has logged in with session key %s" % (self.sender_name, session_key))
-			threads = user_db.threads.all()  # do_db is used already
-			logger.debug('fetched %s for user %s' % (threads, user_db.username))
+			rooms = user_db.rooms.all()  # do_db is used already
+			logger.debug('fetched %s for user %s' % (rooms, user_db.username))
 			room_names = {}
 			channels = [self.channel, ]
-			for thread in threads:
-				room_names[thread.id] = thread.name
-				channels.append(REDIS_ROOM_CHANNEL_PREFIX % thread.id)
-			threads_message = self.default(room_names, THREADS_EVENT)
+			for room in rooms:
+				room_names[room.id] = room.name
+				channels.append(REDIS_ROOM_CHANNEL_PREFIX % room.id)
+			rooms_message = self.default(room_names, THREADS_EVENT)
 		except (KeyError, UserProfile.DoesNotExist):
 			# Anonymous
 			self.sender_name = session.get(SESSION_USER_VAR_NAME)
@@ -290,9 +290,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			else:
 				logger.debug("Anonymous %s has logged in with session key %s" % (self.sender_name, session_key))
 			channels = [ANONYMOUS_REDIS_CHANNEL, self.channel]
-			threads_message = self.default(ANONYMOUS_ROOM_NAMES, THREADS_EVENT)
+			rooms_message = self.default(ANONYMOUS_ROOM_NAMES, THREADS_EVENT)
 		finally:
-			self.safe_write(threads_message)
+			self.safe_write(rooms_message)
 			return channels
 
 	def open(self):
@@ -428,8 +428,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			if self.async_redis.subscribed:
 				#  TODO unsubscribe of all subscribed                  !IMPORTANT
 				self.async_redis.unsubscribe([
-					REDIS_ROOM_CHANNEL_PREFIX % ANONYMOUS_REDIS_ROOM,
-					REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name
+					ANONYMOUS_REDIS_CHANNEL,
+					self.channel
 				])
 			self.async_redis.disconnect()
 

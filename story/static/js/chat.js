@@ -389,7 +389,7 @@ function saveMessageToStorage(newItem) {
 			localStorage.setItem(STORAGE_NAME, newArray);
 			break;
 		default:
-			console.log(getDebugMessage("Skipping message with type {}", newItem['action'])); // TODO stringtrify?)))
+			console.log(getDebugMessage("Skipping saving message with type {}", newItem['action'])); // TODO stringtrify?)))
 			break;
 	}
 }
@@ -430,6 +430,7 @@ function handlePreparedWSMessage(data) {
 }
 
 function setupChannels(channels) {
+	var text = '<ul>';
 	for (var key in channels) {
 		if (channels.hasOwnProperty(key)) {
 			text += '<li name="' + key + '">' + channels[key] + '</li>';

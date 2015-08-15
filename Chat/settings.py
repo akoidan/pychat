@@ -214,5 +214,5 @@ MAX_MESSAGE_SIZE = 10000
 GENDERS = {0: 'Secret', 1: 'Male', 2: 'Female', }
 #
 DATE_INPUT_FORMATS = ('%Y-%m-%d',)  # html5 input date default format, see also Pikaday in js
-DATE_INPUT_FORMATS_JS = 'YYYY-MM-DD'  # html5 input date default format, see also Pikaday in js
+DATE_INPUT_FORMATS_JS = 'YYYY-MM-DD'  # html5 input date default format, see also Pikaday in js, TODO webrtc.js
 USE_L10N = False  # use DATE_INPUT_FORMATS as main format for date rendering
