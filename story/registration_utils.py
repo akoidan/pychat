@@ -87,13 +87,14 @@ def send_email_verification(user, site_address):
 
 
 def extract_photo(image_base64):
-	image_data = re.search(r'base64,(.*)', image_base64).group(1)
+	base64_type_data = re.search(r'data:(\w+\/(\w+));base64,(.*)$', image_base64)
+	image_data = base64_type_data.group(3)
 	file = BytesIO(base64.b64decode(image_data))
 	image = InMemoryUploadedFile(
 		file,
 		field_name='photo',
-		name='sdf',
-		content_type="image/jpeg",
+		name=base64_type_data.group(2),
+		content_type=base64_type_data.group(1),
 		size=sys.getsizeof(file),
 		charset=None)
 	return image

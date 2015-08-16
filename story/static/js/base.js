@@ -1,7 +1,18 @@
 var sound = 0;
 var userRegex = /^[a-zA-Z-_0-9]{1,16}$/;
 
-document.addEventListener("DOMContentLoaded", function () {
+
+var $ = function(id) {
+	return document.getElementById(id);
+};
+
+
+function onDocLoad(onload) {
+	return document.addEventListener("DOMContentLoaded", onload);
+}
+
+
+onDocLoad(function () {
 	mute();
 	if (typeof InstallTrigger !== 'undefined') {
 		console.warn(getDebugMessage("Ops, there's no scrollbar for firefox"));
@@ -15,7 +26,7 @@ function mute() {
 	} else {
 		sound = 0
 	}
-	var btn = document.getElementById("muteBtn");
+	var btn = $("muteBtn");
 	switch (sound) {
 		case 0:
 			btn.className = 'icon-volume-off';
@@ -43,8 +54,7 @@ function checkAndPlay(element) {
 			// TODO currentType is not set sometimes
 			var params = {
 				browser : getBrowserVersion(),
-				issue : "html5 audio currentTime",
-				ajax: true
+				issue : "html5 audio currentTime"
 			};
 			doPost('/report_issue', params, null);
 			console.warn(getDebugMessage("Can't set current time for audio on browser {}. Reloading it"), getBrowserVersion());

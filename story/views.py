@@ -15,7 +15,7 @@ from django.http import HttpResponseRedirect
 
 from Chat.settings import ANONYMOUS_REDIS_ROOM, REGISTERED_REDIS_ROOM, logging
 from story.decorators import login_required_no_redirect
-from story.models import UserProfile, IssueReport, Room
+from story.models import UserProfile, Issue, Room, IssueDetails
 from story import registration_utils
 from story.forms import UserProfileForm, UserProfileReadOnlyForm
 from story.registration_utils import check_email, send_email_verification, check_user, check_password, extract_photo
@@ -193,6 +193,7 @@ def save_profile(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
+@transaction.atomic
 @require_http_methods(('POST', 'GET'))
 def report_issue(request):
 	if request.method == 'GET':
@@ -202,13 +203,15 @@ def report_issue(request):
 			context_instance=RequestContext(request)
 		)
 	elif request.method == 'POST':
-		issue = IssueReport(
+		issue, created = Issue.objects.get_or_create(content=request.POST['issue'])
+		issue_details = IssueDetails(
 			sender_id=request.user.id,
+			email=request.POST.get('email'),
 			browser=request.POST.get('browser'),
-			issue=request.POST['issue'],
-			email=request.POST.get('email')
+			issue=issue
 		)
-		issue.save()
+		issue_details.save()
+
 		return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 	else:
 		raise HttpResponseNotAllowed

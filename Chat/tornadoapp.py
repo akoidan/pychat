@@ -67,7 +67,7 @@ sync_redis = redis.StrictRedis()
 # Redis connection cannot be shared between publishers and subscribers.
 async_redis_publisher = tornadoredis.Client()
 async_redis_publisher.connect()
-sync_redis.flushall()  # TODO move it somewhere else
+sync_redis.delete(REDIS_ONLINE_USERS)  # TODO move it somewhere else
 
 anonymous_default_room = Room.objects.get(name=ANONYMOUS_REDIS_ROOM)
 ANONYMOUS_REDIS_CHANNEL = REDIS_ROOM_CHANNEL_PREFIX % anonymous_default_room.id
@@ -267,7 +267,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		session = session_engine.SessionStore(session_key)
 		try:
 			self.user_id = int(session["_auth_user_id"])
-			user_db = self.do_db(UserProfile.objects.get, id=self.user_id) # everything but 0 is a registered user
+			user_db = self.do_db(UserProfile.objects.get, id=self.user_id)  # everything but 0 is a registered user
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
 			logger.debug("User %s has logged in with session key %s" % (self.sender_name, session_key))

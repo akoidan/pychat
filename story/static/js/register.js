@@ -9,16 +9,16 @@ var repeatPasswordCheck;
 var passRegex = /^\S.+\S$/;
 var mailbox;
 
-document.addEventListener("DOMContentLoaded", function () {
-	password = document.getElementById("rpassword");
-	userName = document.getElementById("rusername");
-	repeatPassword = document.getElementById("repeatpassword");
-	passwordCheck = document.getElementById("password_check");
-	userNameCheck = document.getElementById("username_check");
-	emailCheck = document.getElementById("email_check");
-	email = document.getElementById("email");
-	repeatPasswordCheck = document.getElementById("repeatpassword_check");
-	mailbox = document.getElementById("mailbox");
+onDocLoad(function () {
+	password = $("rpassword");
+	userName = $("rusername");
+	repeatPassword = $("repeatpassword");
+	passwordCheck = $("password_check");
+	userNameCheck = $("username_check");
+	emailCheck = $("email_check");
+	email = $("email");
+	repeatPasswordCheck = $("repeatpassword_check");
+	mailbox = $("mailbox");
 });
 
 function register() {
@@ -26,7 +26,7 @@ function register() {
 		alert("Passwords don't match");
 		return;
 	}
-	var form = document.getElementById('register-form');
+	var form = $('register-form');
 	doPost('/register', form, function (data) {
 		if (data === 'ok') {
 			window.location.href = '/profile';

@@ -170,6 +170,12 @@ LOGGING = {
 		# root logger
 		'': {
 			'handlers': ['console'],
+			'level': 'DEBUG',
+		},
+		'Chat.tornadoapp': {
+			'handlers': ['console'],
+			'level': 'DEBUG',
+			'propagate': False,
 		},
 		'django.request': {
 			'handlers': ['console'],
@@ -180,7 +186,7 @@ LOGGING = {
 
 	'formatters': {
 	'verbose': {
-			'format':  '[%(asctime)s %(levelname)s]: %(message)s',
+			'format':  '[%(asctime)s %(levelname)s] [%(module)s:%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},

@@ -1,11 +1,11 @@
 {% extends "story/base.html" %}
 {% block head %}
 	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			document.getElementById("version").value =  getBrowserVersion();
+		onDocLoad(function () {
+			$("version").value =  getBrowserVersion();
 		});
 	function sendIssue() {
-		var form = document.getElementById('issueForm');
+		var form = $('issueForm');
 		doPost('', form, alert);
 	}
 	</script>
