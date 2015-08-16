@@ -135,7 +135,7 @@ def register(request):
 		user.rooms.add(default_thread)
 		user.rooms.add(registered_only)
 		user.save()
-		logger.info('Signed up new user %s, subscribed for channels %S', user, user.rooms)
+		logger.info('Signed up new user %s, subscribed for channels %s', user, user.rooms)
 		# You must call authenticate before you can call login
 		auth_user = authenticate(username=username, password=password)
 		djangologin(request, auth_user)
