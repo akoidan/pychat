@@ -29,7 +29,7 @@ prog="tornado"
 lockfile=/var/lock/subsys/$prog
 
 start() {
-    nohup python3 /root/djangochat/manage.py start_tornado  > /root/djangochat/log/tornado.log 2>&1 &
+    nohup python3 /root/djangochat/manage.py start_tornado  > /root/djangochat/log/tornadoST.log 2>&1 &
     pid=$!
     echo -n $"Starting $prog: "
     # if not running, start it up here, usually something like "daemon $exec"

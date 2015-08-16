@@ -13,12 +13,12 @@ from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.http import HttpResponseRedirect
 
-from Chat.settings import DEFAULT_REDIS_CHANNEL, REGISTERED_REDIS_CHANNEL, logging
+from Chat.settings import ANONYMOUS_REDIS_ROOM, REGISTERED_REDIS_ROOM, logging
 from story.decorators import login_required_no_redirect
-from story.models import UserProfile, IssueReport, Thread
+from story.models import UserProfile, Issue, Room, IssueDetails
 from story import registration_utils
 from story.forms import UserProfileForm, UserProfileReadOnlyForm
-from story.registration_utils import check_email, send_email_verification, check_user, check_password
+from story.registration_utils import check_email, send_email_verification, check_user, check_password, extract_photo
 from Chat import settings
 
 
@@ -116,6 +116,7 @@ def get_register_page(request):
 	c.update({'error code': "welcome to register page"})
 	return render_to_response("story/register.html", c,  context_instance=RequestContext(request))
 
+
 @transaction.atomic
 @require_http_methods('POST')
 def register(request):
@@ -125,16 +126,16 @@ def register(request):
 			rp.get('username'), rp.get('password'), rp.get('email'), rp.get('mailbox'))
 		check_user(username)
 		check_password(password)
-		check_email(email, verify_email == 'Y')
+		check_email(email, verify_email == 'on')
 		user = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
 		user.set_password(password)
-		default_thread, created_default = Thread.objects.get_or_create(name=DEFAULT_REDIS_CHANNEL)
-		registered_only, created_registered = Thread.objects.get_or_create(name=REGISTERED_REDIS_CHANNEL)
+		default_thread, created_default = Room.objects.get_or_create(name=ANONYMOUS_REDIS_ROOM)
+		registered_only, created_registered = Room.objects.get_or_create(name=REGISTERED_REDIS_ROOM)
 		user.save()
-		user.threads.add(default_thread)
-		user.threads.add(registered_only)
+		user.rooms.add(default_thread)
+		user.rooms.add(registered_only)
 		user.save()
-		logger.info('Signed up new user %s, subscribed for channels %S', user, user.threads)
+		logger.info('Signed up new user %s, subscribed for channels %S', user, user.rooms)
 		# You must call authenticate before you can call login
 		auth_user = authenticate(username=username, password=password)
 		djangologin(request, auth_user)
@@ -149,13 +150,12 @@ def register(request):
 
 @require_http_methods('GET')
 @login_required_no_redirect
-def get_profile(request):
+def change_profile(request):
 	user_profile = UserProfile.objects.get(pk=request.user.id)
 	form = UserProfileForm(instance=user_profile)
 	c = csrf(request)
 	c['form'] = form
 	c['date_format'] = settings.DATE_INPUT_FORMATS_JS
-	c['readonly'] = False
 	return render_to_response('story/change_profile.html', c,  context_instance=RequestContext(request))
 
 
@@ -165,11 +165,11 @@ def show_profile(request, profile_id):
 		user_profile = UserProfile.objects.get(pk=profile_id)
 		form = UserProfileReadOnlyForm(instance=user_profile)
 		form.username = user_profile.username
-		c = {
-			'form': form,
-			'readonly': True,
-		}
-		return render_to_response('story/change_profile.html', c,  context_instance=RequestContext(request))
+		return render_to_response(
+			'story/show_profile.html',
+			{'form': form},
+			context_instance=RequestContext(request)
+		)
 	except ObjectDoesNotExist:
 		raise Http404
 
@@ -178,14 +178,22 @@ def show_profile(request, profile_id):
 @login_required_no_redirect
 def save_profile(request):
 	user_profile = UserProfile.objects.get(pk=request.user.id)
+	image_base64 = request.POST.get('base64_image')
+
+	if image_base64 is not None:
+		image = extract_photo(image_base64)
+		request.FILES['photo'] = image
+
 	form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 	if form.is_valid():
 		form.save()
+		response = settings.VALIDATION_IS_OK
 	else:
-		return render_to_response('story/response.html', {'message': form.errors}, context_instance=RequestContext(request))
-	return HttpResponseRedirect('/')
+		response = form.errors
+	return HttpResponse(response, content_type='text/plain')
 
 
+@transaction.atomic
 @require_http_methods(('POST', 'GET'))
 def report_issue(request):
 	if request.method == 'GET':
@@ -195,20 +203,20 @@ def report_issue(request):
 			context_instance=RequestContext(request)
 		)
 	elif request.method == 'POST':
-		issue = IssueReport(
+		issue, created = Issue.objects.get_or_create(content=request.POST['issue'])
+		issue_details = IssueDetails(
 			sender_id=request.user.id,
-			browser=request.POST['browser'],
-			issue=request.POST['issue'],
-			email=request.POST['email']
+			email=request.POST.get('email'),
+			browser=request.POST.get('browser'),
+			issue=issue
 		)
-		issue.save()
-		if request.POST.get('ajax') is True:
-			HttpResponse('ok', content_type='text/plain')
-		else:
-			return render_to_response(
-				'story/response.html',
-				{'message': settings.VALIDATION_IS_OK},
-				context_instance=RequestContext(request)
-			)
+		issue_details.save()
+
+		return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 	else:
 		raise HttpResponseNotAllowed
+
+
+@require_http_methods('GET')
+def hack(request):
+	return render_to_response('story/')

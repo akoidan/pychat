@@ -278,6 +278,9 @@ input[type=file]::-webkit-file-upload-button:hover {
 	float: left;
 }
 
+video {
+	cursor: pointer;
+}
 /*user-profile*/
 @media screen and (max-width: 50em ) {
 	.col1 {

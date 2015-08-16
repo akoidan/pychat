@@ -45,6 +45,11 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
+* add 
+* automatic sign up anonymous users with session ID password??
+* webrtc
+* vlc
+* save base64 taken photo on server
 * story/views.py:127 TODO
 * http://stackoverflow.com/a/14268418/3872976
 * ManyToManyRel Threads - Users

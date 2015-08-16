@@ -44,7 +44,7 @@ fi
 cd $PROJECT_ROOT
 
 git clone https://github.com/Deathangel908/djangochat-config $TMP_DIR/chatconf
-git --git-dir=$TMP_DIR/chatconf/.git --work-tree=$TMP_DIR/chatconf/  checkout fc8c733adb45a6d2f6dc57c30a5ce868268e160f
+git --git-dir=$TMP_DIR/chatconf/.git --work-tree=$TMP_DIR/chatconf/  checkout bd955eb579b56e97c9011df6eb68a1c623374dd5
 cp -r $TMP_DIR/chatconf/static $STATIC_PARENT
 
 # datepicker

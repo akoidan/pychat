@@ -174,6 +174,12 @@ LOGGING = {
 		# root logger
 		'': {
 			'handlers': ['file-django'],
+			'level': 'DEBUG',
+		},
+		'Chat.tornadoapp': {
+			'handlers': ['file-tornado'],
+			'level': 'DEBUG',
+			'propagate': False,
 		},
 		'django.request': {
 			'handlers': ['file-django'],
@@ -184,7 +190,7 @@ LOGGING = {
 
 	'formatters': {
 	'verbose': {
-			'format':  '[%(asctime)s %(levelname)s]: %(message)s',
+			'format':  '[%(asctime)s %(levelname)s] [%(module)s:%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},
@@ -201,8 +207,8 @@ MEDIA_URL = "/photo/"
 USER_COOKIE_NAME = 'user'
 
 WS_ADDRESS_COOKIE_NAME = 'api'
-DEFAULT_REDIS_CHANNEL = 'main'
-REGISTERED_REDIS_CHANNEL = 'reg'
+ANONYMOUS_REDIS_ROOM = 'all'
+REGISTERED_REDIS_ROOM = 'signed'
 
 ######### JAVASCRIPT CONSTANTS #############
 VALIDATION_IS_OK = 'ok'
@@ -211,5 +217,5 @@ MAX_MESSAGE_SIZE = 10000
 GENDERS = {0: 'Secret', 1: 'Male', 2: 'Female', }
 #
 DATE_INPUT_FORMATS = ('%Y-%m-%d',)  # html5 input date default format, see also Pikaday in js
-DATE_INPUT_FORMATS_JS = 'YYYY-MM-DD'  # html5 input date default format, see also Pikaday in js
+DATE_INPUT_FORMATS_JS = 'YYYY-MM-DD'  # html5 input date default format, see also Pikaday in js, TODO webrtc.js
 USE_L10N = False  # use DATE_INPUT_FORMATS as main format for date rendering

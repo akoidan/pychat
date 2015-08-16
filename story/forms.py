@@ -2,7 +2,7 @@ from django import forms
 from django.forms import FileField, DateField, ChoiceField, Widget
 from Chat.settings import GENDERS
 
-from story.models import UserProfile, IssueReport
+from story.models import UserProfile
 
 
 class DateWidget(forms.widgets.DateInput):

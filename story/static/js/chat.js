@@ -53,30 +53,33 @@ var userSendMessageTo;
 var receiverId;
 // navbar label with current user name
 var userNameLabel;
+var charRooms;
 //main single socket for handling realtime messages
 var ws;
 var isWsConnected; // used for debugging info only
+var chatUserRoomWrapper; // for hiddding users
 
 
-document.addEventListener("DOMContentLoaded", function () {
+onDocLoad(function () {
 	//	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
 	//		alert('you can download app');
 	//}
-	chatBoxDiv = document.getElementById("chatbox");
-	userMessage = document.getElementById("usermsg");
-	chatUsersTable = document.getElementById("chat-user-table");
-	chatUserRoomWrapper = document.getElementById("chat-room-users-wrapper");
-	userNameLabel = document.getElementById("userNameLabel");
-	userSendMessageTo = document.getElementById("userSendMessageTo");
-	chatIncoming = document.getElementById("chatIncoming");
-	chatOutgoing = document.getElementById("chatOutgoing");
-	chatLogin = document.getElementById("chatLogin");
-	chatLogout = document.getElementById("chatLogout");
-	sendButton = document.getElementById("sendButton");
+	chatBoxDiv = $("chatbox");
+	userMessage = $("usermsg");
+	chatUsersTable = $("chat-user-table");
+	chatUserRoomWrapper = $("chat-room-users-wrapper");
+	userNameLabel = $("userNameLabel");
+	userSendMessageTo = $("userSendMessageTo");
+	chatIncoming = $("chatIncoming");
+	chatOutgoing = $("chatOutgoing");
+	chatLogin = $("chatLogin");
+	chatLogout = $("chatLogout");
+	sendButton = $("sendButton");
 	userSendMessageTo.style.display = "none";
-	receiverId = document.getElementById("receiverId");
+	receiverId = $("receiverId");
+	charRooms = $("rooms");
 
-	chatUsersTable.addEventListener("click", chatRoomClick);
+	chatUsersTable.addEventListener("click", userClick);
 	userMessage.addEventListener("keypress", sendMessage);
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
@@ -117,19 +120,12 @@ function changeTittleFunction(e) {
 }
 
 
-function chatRoomClick(event) {
+function userClick(event) {
 	event = event || window.event;
 	var target = event.target || event.srcElement;
-	while (target != chatUsersTable) { // ( ** )
-		if (target.nodeName == 'TD') { // ( * )
-			if (target.cellIndex == 1 ) {
-				destinationUserName = target.innerHTML;
-				destinationUserId = parseInt(target.id);
-				showUserSendMess(destinationUserName);
-			}
-		}
-		target = target.parentNode;
-	}
+	destinationUserName = target.innerHTML;
+	destinationUserId = parseInt(target.attributes.name.value);
+	showUserSendMess(destinationUserName);
 }
 
 
@@ -232,6 +228,7 @@ function encodeHTML(html) {
 }
 
 
+// TODO threadid
 function loadUsers(usernames) {
 	if (!usernames) {
 		return;
@@ -251,7 +248,7 @@ function loadUsers(usernames) {
 			if (icon == null) {
 				console.log(getDebugMessage('Bug, gender: {}, icon: {}', gender, icon))
 			}
-			allUsers += '<tr><td>' + icon + '</td> <td id="' + userId + '">' + username + '</td><tr>';
+			allUsers += '<tr><td>' + icon + '</td> <td name="' + userId + '">' + username + '</td><tr>';
 		}
 	}
 	chatUsersTable.innerHTML = allUsers;
@@ -392,7 +389,7 @@ function saveMessageToStorage(newItem) {
 			localStorage.setItem(STORAGE_NAME, newArray);
 			break;
 		default:
-			console.log(getDebugMessage("Skipping message with type {}", newItem['action'])); // TODO stringtrify?)))
+			console.log(getDebugMessage("Skipping saving message with type {}", newItem['action'])); // TODO stringtrify?)))
 			break;
 	}
 }
@@ -424,11 +421,24 @@ function handlePreparedWSMessage(data) {
 				checkAndPlay(chatIncoming);
 			}
 			break;
+		case 'threads':
+			setupChannels(data['content']);
+			break;
 		default:
 			console.error(getDebugMessage('Unknown message type  {}', JSON.stringify(data)));
 	}
 }
 
+function setupChannels(channels) {
+	var text = '<ul>';
+	for (var key in channels) {
+		if (channels.hasOwnProperty(key)) {
+			text += '<li name="' + key + '">' + channels[key] + '</li>';
+		}
+	}
+	text+='</ul>';
+	charRooms.innerHTML = text;
+}
 
 function webSocketMessage(message) {
 	var jsonData = message.data;

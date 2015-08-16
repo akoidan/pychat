@@ -1,9 +1,5 @@
 function login() {
-	var credentials = {
-		username: document.getElementById("username").value,
-		password: document.getElementById("password").value
-	};
-	doPost('/auth', credentials, function (data) {
+	doPost('/auth', $('loginForm'), function (data) {
 		if (data === 'ok') {
 			window.location.href = '/';
 		} else {
@@ -12,18 +8,18 @@ function login() {
 	});
 }
 function showLoginDropdown(e) {
-	document.getElementById("hideableDropDown").style.display = 'block';
+	$("hideableDropDown").style.display = 'block';
 	e.stopPropagation();
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+onDocLoad(function () {
 
 	document.addEventListener("click", function () {
-		document.getElementById("hideableDropDown").style.display = 'none';
+		$("hideableDropDown").style.display = 'none';
 	});
 
 	//Handles menu drop down
-	var loginForm = document.getElementById('hideableDropDown');
+	var loginForm = $('hideableDropDown');
 	loginForm.onclick = function (e) {
 		e.stopPropagation(); // don't fire parent event when clicking on loginForm
 	};
@@ -39,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		label.style.display = 'none';
 		var oldUsername = label.textContent;
 		label.insertAdjacentHTML('afterend', "<input type='text' id='inputName' maxlength='16' class='userNameInput' value='" + oldUsername + "' />");
-		var input = document.getElementById('inputName');
+		var input = $('inputName');
 		input.focus();
 		var sendChangeNickname = function (event) {
 			var newUsername = input.value;
@@ -60,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
 		};
 	};
 
-	document.getElementById("userNameLabel").onclick = function () {
+	$("userNameLabel").onclick = function () {
 		editUserName(this);
 	};
 

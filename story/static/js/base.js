@@ -1,7 +1,18 @@
 var sound = 0;
 var userRegex = /^[a-zA-Z-_0-9]{1,16}$/;
 
-document.addEventListener("DOMContentLoaded", function () {
+
+var $ = function(id) {
+	return document.getElementById(id);
+};
+
+
+function onDocLoad(onload) {
+	return document.addEventListener("DOMContentLoaded", onload);
+}
+
+
+onDocLoad(function () {
 	mute();
 	if (typeof InstallTrigger !== 'undefined') {
 		console.warn(getDebugMessage("Ops, there's no scrollbar for firefox"));
@@ -15,7 +26,7 @@ function mute() {
 	} else {
 		sound = 0
 	}
-	var btn = document.getElementById("muteBtn");
+	var btn = $("muteBtn");
 	switch (sound) {
 		case 0:
 			btn.className = 'icon-volume-off';
@@ -43,8 +54,7 @@ function checkAndPlay(element) {
 			// TODO currentType is not set sometimes
 			var params = {
 				browser : getBrowserVersion(),
-				issue : "html5 audio currentTime",
-				ajax: true
+				issue : "html5 audio currentTime"
 			};
 			doPost('/report_issue', params, null);
 			console.warn(getDebugMessage("Can't set current time for audio on browser {}. Reloading it"), getBrowserVersion());
@@ -99,8 +109,13 @@ function readCookie(name, c, C, i) {
 	return cookie;
 }
 
-
-function doPost(url, params, callback) {
+/**
+ * @param params : map dict of params or DOM form
+ * @param callback : function calls on response
+ * @param url : string url to post
+ * @param image : string base64 text image
+ * */
+function doPost(url, params, callback, image) {
 	var r = new XMLHttpRequest();
 	r.onreadystatechange = function () {
 		if (r.readyState == 4) {
@@ -116,20 +131,33 @@ function doPost(url, params, callback) {
 			}
 		}
 	};
-	var data = new FormData();
-	for (var key in params) {
-		if (params.hasOwnProperty(key)) {
-			data.append(key, params[key]);
+	var data;
+	var debugOutData;
+	if ((params || {}).tagName == 'FORM') {
+		data =  new FormData(params);
+		debugOutData = 'FormData';
+	} else {
+		data = new FormData();
+		for (var key in params) {
+			if (params.hasOwnProperty(key)) {
+				data.append(key, params[key]);
+			}
 		}
+		debugOutData = JSON.stringify(params);
+	}
+	if (image) {
+		data.append('base64_image', image);
 	}
 	r.open("POST", url, true);
 	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
-	console.log(getDebugMessage("POST {} out: {}", url, JSON.stringify(params)));
+	console.log(getDebugMessage("POST {} out: {}", url, debugOutData));
 	r.send(data);
 }
 
 
-/** Formats message for debug,
+/**
+ *
+ * Formats message for debug,
  * Usage getDebugMessage("{} is {}", 'war', 'bad');
  * out: war is bad
  *  */
@@ -141,37 +169,4 @@ function getDebugMessage() {
 	}
 	var time = [now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds()].join(':');
 	return time + ': ' + arguments[0];
-}
-
-
-// PROFILE.JS
-
-function loadjscssfile(filename, filetype, callback) {
-	// TODO load doesn't work in IE for pikaday
-	var fileref = null;
-	if (filetype == "js") { //if filename is a external JavaScript file
-		fileref = document.createElement('script');
-		fileref.setAttribute("type", "text/javascript");
-		fileref.setAttribute("src", filename)
-	}
-	else if (filetype == "css") { //if filename is an external CSS file
-		fileref = document.createElement("link");
-		fileref.setAttribute("rel", "stylesheet");
-		fileref.setAttribute("type", "text/css");
-		fileref.setAttribute("href", filename)
-	}
-	if (typeof fileref != "undefined") {
-		document.getElementsByTagName("head")[0].appendChild(fileref)
-		fileref.onload = callback;
-	}
-}
-
-function isDateMissing() {
-	var input = document.createElement('input');
-	input.setAttribute('type', 'date');
-
-	var notADateValue = 'not-a-date';
-	input.setAttribute('value', notADateValue);
-
-	return input.value === notADateValue;
 }
