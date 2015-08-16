@@ -44,7 +44,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
-* add 
+* fix log messages, check production
 * automatic sign up anonymous users with session ID password??
 * webrtc
 * vlc
