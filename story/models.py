@@ -96,7 +96,7 @@ class Message(models.Model):
 	room = models.ForeignKey(Room, null=True)
 	# DateField.auto_now
 	time = models.TimeField(default=datetime.datetime.now)
-	content = models.TextField()
+	content = models.TextField(max_length=2048)
 	id = models.AutoField(primary_key=True)
 	receiver = models.ForeignKey(UserProfile, null=True, related_name='receiver')
 
