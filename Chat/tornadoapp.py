@@ -16,6 +16,7 @@ import tornado.gen
 from django.conf import settings
 import tornadoredis
 from django.db import connection, OperationalError, InterfaceError
+from Chat.log_filters import id_generator
 
 
 try:
@@ -25,7 +26,7 @@ except ImportError:
 
 from Chat.settings import MAX_MESSAGE_SIZE, ANONYMOUS_REDIS_ROOM
 from story.models import UserProfile, Message, Room
-from story.registration_utils import id_generator, check_user, is_blank
+from story.registration_utils import check_user
 
 PY3 = sys.version > '3'
 
@@ -51,7 +52,7 @@ REFRESH_USER_EVENT = 'online_users'
 SYSTEM_MESSAGE_EVENT = 'system'
 GET_MESSAGES_EVENT = 'messages'
 GET_MINE_USERNAME_EVENT = 'me'
-THREADS_EVENT = 'threads'  # thread ex "main" , channel ex. 'r:main', "i:3"
+ROOMS_EVENT = 'rooms'  # thread ex "main" , channel ex. 'r:main', "i:3"
 LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
 SEND_MESSAGE_EVENT = 'send'
@@ -192,18 +193,16 @@ class MessagesCreator(object):
 	def online_self_js_structure(self):
 		return self.online_js_structure(self.sender_name, self.sex, self.user_id)
 
-	@staticmethod
-	def do_db(callback, **args):
+	def do_db(self, callback, **args):
 		try:
 			return callback(**args)
 		except (OperationalError, InterfaceError) as e:  # Connection has gone away
-			logger.warn('%s, reconnecting' % e)
+			self.logger.warn('%s, reconnecting' % e)  # TODO
 			connection.close()
 			return callback(**args)
 
 
 class MessagesHandler(WebSocketHandler, MessagesCreator):
-
 
 	def data_received(self, chunk):
 		pass
@@ -216,6 +215,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			GET_MESSAGES_EVENT: self.process_get_messages,
 			SEND_MESSAGE_EVENT: self.process_send_message,
 		}
+		self.logger = None
 
 	@tornado.gen.engine
 	def listen(self, channels):
@@ -226,21 +226,27 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.async_redis.subscribe, channels)
 		self.async_redis.listen(self.new_message)
 
-	@classmethod
-	def get_online_from_redis(cls):
+
+	def get_online_from_redis(self):
 		"""
 		:rtype : dict
 		"""
 		online = sync_redis.hvals(REDIS_ONLINE_USERS)
+		self.logger.debug('!! redis online: %s', online)
 		result = {}
 		# redis stores REDIS_USER_FORMAT, so parse them
 		if online:
 			for raw_user_sex in online:
 				(name, sex, user_id) = raw_user_sex.decode('utf-8').split(':')
-				result.update(cls.online_js_structure(name, sex, user_id))
+				result.update(self.online_js_structure(name, sex, user_id))
 		return result
 
 	def add_online_user(self):
+		"""
+		adds to redis
+		online_users = { connection_hash1 = stored_redis_user1, connection_hash_2 = stored_redis_user2 }
+		:return:
+		"""
 		online = self.get_online_from_redis()
 		async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
 		first_tab = False
@@ -270,15 +276,14 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			user_db = self.do_db(UserProfile.objects.get, id=self.user_id)  # everything but 0 is a registered user
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
-			logger.debug("User %s has logged in with session key %s" % (self.sender_name, session_key))
 			rooms = user_db.rooms.all()  # do_db is used already
-			logger.debug('fetched %s for user %s' % (rooms, user_db.username))
 			room_names = {}
 			channels = [self.channel, ]
 			for room in rooms:
 				room_names[room.id] = room.name
 				channels.append(REDIS_ROOM_CHANNEL_PREFIX % room.id)
-			rooms_message = self.default(room_names, THREADS_EVENT)
+			rooms_message = self.default(room_names, ROOMS_EVENT)
+			self.logger.info("!! User %s subscribes for %s", self.sender_name, room_names)
 		except (KeyError, UserProfile.DoesNotExist):
 			# Anonymous
 			self.sender_name = session.get(SESSION_USER_VAR_NAME)
@@ -286,24 +291,28 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				self.sender_name = id_generator(8)
 				session[SESSION_USER_VAR_NAME] = self.sender_name
 				session.save()
-				logger.debug("Generated %s  name for new anonymous session %s" % (self.sender_name, session_key))
+				self.logger.info("!! Generated %s  name for new anonymous session %s" % (self.sender_name, session_key))
 			else:
-				logger.debug("Anonymous %s has logged in with session key %s" % (self.sender_name, session_key))
+				self.logger.info("!! Anonymous %s has logged in with session key %s" % (self.sender_name, session_key))
 			channels = [ANONYMOUS_REDIS_CHANNEL, self.channel]
-			rooms_message = self.default(ANONYMOUS_ROOM_NAMES, THREADS_EVENT)
+			rooms_message = self.default(ANONYMOUS_ROOM_NAMES, ROOMS_EVENT)
 		finally:
 			self.safe_write(rooms_message)
 			return channels
 
-	def open(self):
+	def open(self, *args, **kargs):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
+		log_id = id_generator(4)
 		if sessionStore.exists(session_key):
+			self.logger = logging.LoggerAdapter(logger, {'username': session_key[-8:], 'id': log_id})
+			self.logger.debug("!! Processing a new connection for session %s", session_key[:5])
 			self.async_redis.connect()
 			channels = self.set_username(session_key)
+			self.logger = logging.LoggerAdapter(logger, {'username': self.sender_name.rjust(8), 'id': log_id})
 			self.listen(channels)
 			self.add_online_user()
 		else:
-			logger.warn('Incorrect session id: %s', session_key)
+			self.logger.warning('!! Session key %s has been rejected', session_key)
 			self.close(403, "Session key is empty or session doesn't exist")
 
 	def check_origin(self, origin):
@@ -317,9 +326,10 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		browser_domain = browser_set.split(':')[0]
 		return browser_domain == origin_domain
 
-	@staticmethod
-	def publish(message, channel=ANONYMOUS_REDIS_CHANNEL):
-		async_redis_publisher.publish(channel, json.dumps(message))
+	def publish(self, message, channel=ANONYMOUS_REDIS_CHANNEL):
+		jsoned_mess = json.dumps(message)
+		self.logger.debug('<> %s', jsoned_mess)
+		async_redis_publisher.publish(channel, jsoned_mess)
 
 	# TODO really parse every single message for 1 action?
 	def check_and_finish_change_name(self, message):
@@ -346,9 +356,10 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				message = json.dumps(message)
 			if not (isinstance(message, str) or (not PY3 and isinstance(message, unicode))):
 				raise ValueError('Wrong message type : %s' % str(message))
+			self.logger.debug(">> %s", message)
 			self.write_message(message)
 		except tornado.websocket.WebSocketClosedError:
-			logger.error(
+			self.logger.error(
 				'Socket "%s" closed bug, this "%s" message: "%s"',
 				str(self),
 				self.sender_name,
@@ -413,6 +424,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	def on_message(self, json_message):
 		if json_message and len(json_message) < MAX_MESSAGE_SIZE:
+			self.logger.debug('<< %s', json_message)
 			message = json.loads(json_message)
 			self.process_message[message.get(EVENT_VAR_NAME)](message)
 

@@ -421,7 +421,7 @@ function handlePreparedWSMessage(data) {
 				checkAndPlay(chatIncoming);
 			}
 			break;
-		case 'threads':
+		case 'rooms':
 			setupChannels(data['content']);
 			break;
 		default:

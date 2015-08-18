@@ -45,7 +45,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
-* fix log messages, check production
+* fix log messages, check production, django request doesn't use logger settings
 * automatic sign up anonymous users with session ID password??
 * webrtc
 * vlc
@@ -68,7 +68,6 @@ Start the chat:
 * USE init or on_open
 * show system messages on navbar
 * show if user's reconnecting
-* add logger
 * deploy on server
 * timezone
 * add chat rooms
