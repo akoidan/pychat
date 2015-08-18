@@ -1,75 +1,39 @@
 {% extends 'story/base.html' %}
 {% block head %}
 	{% load staticfiles %}
-	{% if not readonly %}
-		<script src="{% static 'js/webrtc.js' %}"></script>
-		<script>
 
-			if (hasGetUserMedia()) {
-				//todo
-			} else {
-				console.warn(getDebugMessage('Browser doesnt support capturing video, skipping photo snapshot'));
-			}
-			// TODO move it into a separate file
-			document.addEventListener("DOMContentLoaded", function () {
-
-				if (isDateMissing()) {
-					console.warn(getDebugMessage("Browser doesn't support html5 input type date, trying to load javascript datepicker"));
-					loadjscssfile("{% static 'css/pikaday.css' %}", 'css');
-					loadjscssfile("{%  static 'js/moment.js' %}", 'js', function () {
-						// load pikaday only after moment.js
-						loadjscssfile("{% static 'js/pikaday.js' %}", 'js', function () {
-							var picker = new Pikaday(
-									{
-										field: document.getElementById('id_birthday'),
-										format: '{{ date_format }}',
-										firstDay: 1,
-										maxDate: new Date(),
-										yearRange: [1930, 2010]
-									});
-							console.log(getDebugMessage("pikaday date picker has been loaded"));
-						});
-					})
-				}
-				photo = document.getElementById('photoImg');
-			});
-		</script>
-
-	{% endif %}
-
+	<script src="{% static 'js/webrtc.js' %}"></script>
 {% endblock head %}
+
 {% block content %}
+	<canvas style="display:none;"></canvas>
 	<div>
 		{#	if photo isn't uploaded yet #}
-		{% if form.instance.photo %}
 			<div class="col1" style="text-align: center">
 				<div class="padding10">
-					<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
-					<video autoplay style="display: none;" class="fullwidth"></video>
+					{% if form.instance.photo %}
+						<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
+					{% else %}
+						<img src="{% static 'no_ava.png' %}" alt="ava" id='photoImg' class="fullwidth">
+					{% endif %}
 				</div>
-			<input type="button" value="Take a photo" onclick="startCapturingVideo(this)" style="horiz-align: center"/>
+				<input type="button" value="Take a photo" onclick="startCapturingVideo(this)"/>
 			</div>
 
-			<img src="" style="display: none;">
-			<canvas style="display:none;"></canvas>
-		{% endif %}
 
-		{% if not readonly %}
-			<form class="col1" action="{% url 'story.views.save_profile' %}" method="post" enctype="multipart/form-data">
-				{% csrf_token %}
-				<table class="biginputtext">
+		<form class="col1" action="{% url 'story.views.save_profile' %}" method="post" enctype="multipart/form-data">
+			{% csrf_token %}
+			<div class="padding10">
+				<video autoplay style="display: none;" class="fullwidth"></video>
+
+				<table class="biginputtext" id="userProfileData">
 					{{ form.as_table }}
 					<tr>
-						<td colspan="2"><input type="submit" value="Save"/></td>
+						<td colspan="2"><input type="button" value="Save" onclick="saveProfile()"/></td>
 					</tr>
 				</table>
-			</form>
-		{% else %}
-			<div class="col1">
-				<table class="biginputtext">
-					{{ form.as_table }}
-				</table>
 			</div>
-		{% endif %}
+		</form>
+
 	</div>
 {% endblock content %}

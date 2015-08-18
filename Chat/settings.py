@@ -170,6 +170,12 @@ LOGGING = {
 		# root logger
 		'': {
 			'handlers': ['console'],
+			'level': 'DEBUG',
+		},
+		'Chat.tornadoapp': {
+			'handlers': ['console'],
+			'level': 'DEBUG',
+			'propagate': False,
 		},
 		'django.request': {
 			'handlers': ['console'],
@@ -180,7 +186,7 @@ LOGGING = {
 
 	'formatters': {
 	'verbose': {
-			'format':  '[%(asctime)s %(levelname)s]: %(message)s',
+			'format':  '[%(asctime)s %(levelname)s] [%(module)s:%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},
@@ -214,5 +220,5 @@ MAX_MESSAGE_SIZE = 10000
 GENDERS = {0: 'Secret', 1: 'Male', 2: 'Female', }
 #
 DATE_INPUT_FORMATS = ('%Y-%m-%d',)  # html5 input date default format, see also Pikaday in js
-DATE_INPUT_FORMATS_JS = 'YYYY-MM-DD'  # html5 input date default format, see also Pikaday in js
+DATE_INPUT_FORMATS_JS = 'YYYY-MM-DD'  # html5 input date default format, see also Pikaday in js, TODO webrtc.js
 USE_L10N = False  # use DATE_INPUT_FORMATS as main format for date rendering

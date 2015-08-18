@@ -51,7 +51,7 @@ REFRESH_USER_EVENT = 'online_users'
 SYSTEM_MESSAGE_EVENT = 'system'
 GET_MESSAGES_EVENT = 'messages'
 GET_MINE_USERNAME_EVENT = 'me'
-ROOMS_EVENT = 'rooms'  # thread ex "main" , channel ex. 'r:main', "i:3"
+THREADS_EVENT = 'threads'  # thread ex "main" , channel ex. 'r:main', "i:3"
 LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
 SEND_MESSAGE_EVENT = 'send'
@@ -267,7 +267,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		session = session_engine.SessionStore(session_key)
 		try:
 			self.user_id = int(session["_auth_user_id"])
-			user_db = self.do_db(UserProfile.objects.get, id=self.user_id) # everything but 0 is a registered user
+			user_db = self.do_db(UserProfile.objects.get, id=self.user_id)  # everything but 0 is a registered user
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
 			logger.debug("User %s has logged in with session key %s" % (self.sender_name, session_key))
@@ -275,10 +275,10 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			logger.debug('fetched %s for user %s' % (rooms, user_db.username))
 			room_names = {}
 			channels = [self.channel, ]
-			for thread in rooms:
-				room_names[thread.id] = thread.name
-				channels.append(REDIS_ROOM_CHANNEL_PREFIX % thread.id)
-			rooms_message = self.default(room_names, ROOMS_EVENT)
+			for room in rooms:
+				room_names[room.id] = room.name
+				channels.append(REDIS_ROOM_CHANNEL_PREFIX % room.id)
+			rooms_message = self.default(room_names, THREADS_EVENT)
 		except (KeyError, UserProfile.DoesNotExist):
 			# Anonymous
 			self.sender_name = session.get(SESSION_USER_VAR_NAME)
@@ -290,7 +290,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			else:
 				logger.debug("Anonymous %s has logged in with session key %s" % (self.sender_name, session_key))
 			channels = [ANONYMOUS_REDIS_CHANNEL, self.channel]
-			rooms_message = self.default(ANONYMOUS_ROOM_NAMES, ROOMS_EVENT)
+			rooms_message = self.default(ANONYMOUS_ROOM_NAMES, THREADS_EVENT)
 		finally:
 			self.safe_write(rooms_message)
 			return channels
@@ -428,8 +428,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			if self.async_redis.subscribed:
 				#  TODO unsubscribe of all subscribed                  !IMPORTANT
 				self.async_redis.unsubscribe([
-					REDIS_ROOM_CHANNEL_PREFIX % ANONYMOUS_REDIS_ROOM,
-					REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name
+					ANONYMOUS_REDIS_CHANNEL,
+					self.channel
 				])
 			self.async_redis.disconnect()
 

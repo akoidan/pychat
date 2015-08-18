@@ -60,24 +60,24 @@ var isWsConnected; // used for debugging info only
 var chatUserRoomWrapper; // for hiddding users
 
 
-document.addEventListener("DOMContentLoaded", function () {
+onDocLoad(function () {
 	//	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
 	//		alert('you can download app');
 	//}
-	chatBoxDiv = document.getElementById("chatbox");
-	userMessage = document.getElementById("usermsg");
-	chatUsersTable = document.getElementById("chat-user-table");
-	chatUserRoomWrapper = document.getElementById("chat-room-users-wrapper");
-	userNameLabel = document.getElementById("userNameLabel");
-	userSendMessageTo = document.getElementById("userSendMessageTo");
-	chatIncoming = document.getElementById("chatIncoming");
-	chatOutgoing = document.getElementById("chatOutgoing");
-	chatLogin = document.getElementById("chatLogin");
-	chatLogout = document.getElementById("chatLogout");
-	sendButton = document.getElementById("sendButton");
+	chatBoxDiv = $("chatbox");
+	userMessage = $("usermsg");
+	chatUsersTable = $("chat-user-table");
+	chatUserRoomWrapper = $("chat-room-users-wrapper");
+	userNameLabel = $("userNameLabel");
+	userSendMessageTo = $("userSendMessageTo");
+	chatIncoming = $("chatIncoming");
+	chatOutgoing = $("chatOutgoing");
+	chatLogin = $("chatLogin");
+	chatLogout = $("chatLogout");
+	sendButton = $("sendButton");
 	userSendMessageTo.style.display = "none";
-	receiverId = document.getElementById("receiverId");
-	charRooms = document.getElementById("rooms");
+	receiverId = $("receiverId");
+	charRooms = $("rooms");
 
 	chatUsersTable.addEventListener("click", userClick);
 	userMessage.addEventListener("keypress", sendMessage);
@@ -389,7 +389,7 @@ function saveMessageToStorage(newItem) {
 			localStorage.setItem(STORAGE_NAME, newArray);
 			break;
 		default:
-			console.log(getDebugMessage("Skipping message with type {}", newItem['action'])); // TODO stringtrify?)))
+			console.log(getDebugMessage("Skipping saving message with type {}", newItem['action'])); // TODO stringtrify?)))
 			break;
 	}
 }
@@ -430,6 +430,7 @@ function handlePreparedWSMessage(data) {
 }
 
 function setupChannels(channels) {
+	var text = '<ul>';
 	for (var key in channels) {
 		if (channels.hasOwnProperty(key)) {
 			text += '<li name="' + key + '">' + channels[key] + '</li>';

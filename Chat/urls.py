@@ -22,7 +22,7 @@ urlpatterns = patterns(
 	# story/register.js uses link below
 	url(r'^validate_user$', 'story.views.validate_user'),
 	url(r'^validate_email$', 'story.views.validate_email'),
-	url(r'^profile$', 'story.views.get_profile'),
+	url(r'^profile$', 'story.views.change_profile'),
 	url(r'^profile/(\d{1,5})$', 'story.views.show_profile'),
 	url(r'^save_profile$', 'story.views.save_profile'),
 	url(r'^report_issue$', 'story.views.report_issue'),

@@ -101,12 +101,16 @@ class Message(models.Model):
 	receiver = models.ForeignKey(UserProfile, null=True, related_name='receiver')
 
 
-class IssueReport(models.Model):
+class Issue(models.Model):
+	content = models.TextField(null=False, unique=True)
+
+
+class IssueDetails(models.Model):
 	sender = models.ForeignKey(UserProfile, null=True, blank=True)
 	email = models.EmailField(null=True, blank=True)
 	browser = models.CharField(null=False, max_length=32)
-	issue = models.TextField(null=False)
 	time = models.TimeField(default=datetime.datetime.now, blank=True)
+	issue = models.ForeignKey(Issue, related_name='issue')
 
 	class Meta:  # pylint: disable=C1001
-		db_table = ''.join((UserProfile._meta.app_label, '_issue_report'))
+		db_table = ''.join((UserProfile._meta.app_label, '_issue_detail'))

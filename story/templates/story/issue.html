@@ -1,14 +1,18 @@
 {% extends "story/base.html" %}
 {% block head %}
 	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			document.getElementById("version").value =  getBrowserVersion();
+		onDocLoad(function () {
+			$("version").value =  getBrowserVersion();
 		});
+	function sendIssue() {
+		var form = $('issueForm');
+		doPost('', form, alert);
+	}
 	</script>
 {% endblock head %}
 
 {% block content %}
-	<form method="post">
+	<form method="post" id="issueForm">
 		<table>
 			<tr>
 				<td><label for="email">your email</label> </td>
@@ -23,7 +27,7 @@
 				<td><input type="text" name="browser" id="version"/> </td>
 			</tr>
 			<tr>
-				<td><input type="submit" value="sumbit"></td>
+				<td><input type="button" value="sumbit" onclick="sendIssue()"></td>
 			</tr>
 		</table>
 	{% csrf_token %}
