@@ -51,7 +51,7 @@ REFRESH_USER_EVENT = 'online_users'
 SYSTEM_MESSAGE_EVENT = 'system'
 GET_MESSAGES_EVENT = 'messages'
 GET_MINE_USERNAME_EVENT = 'me'
-THREADS_EVENT = 'threads'  # thread ex "main" , channel ex. 'r:main', "i:3"
+ROOMS_EVENT = 'rooms'  # thread ex "main" , channel ex. 'r:main', "i:3"
 LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
 SEND_MESSAGE_EVENT = 'send'
@@ -67,7 +67,7 @@ sync_redis = redis.StrictRedis()
 # Redis connection cannot be shared between publishers and subscribers.
 async_redis_publisher = tornadoredis.Client()
 async_redis_publisher.connect()
-sync_redis.flushall()  # TODO move it somewhere else
+sync_redis.delete(REDIS_ONLINE_USERS)  # TODO move it somewhere else
 
 anonymous_default_room = Room.objects.get(name=ANONYMOUS_REDIS_ROOM)
 ANONYMOUS_REDIS_CHANNEL = REDIS_ROOM_CHANNEL_PREFIX % anonymous_default_room.id
@@ -271,14 +271,14 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
 			logger.debug("User %s has logged in with session key %s" % (self.sender_name, session_key))
-			threads = user_db.threads.all()  # do_db is used already
-			logger.debug('fetched %s for user %s' % (threads, user_db.username))
+			rooms = user_db.rooms.all()  # do_db is used already
+			logger.debug('fetched %s for user %s' % (rooms, user_db.username))
 			room_names = {}
 			channels = [self.channel, ]
-			for thread in threads:
+			for thread in rooms:
 				room_names[thread.id] = thread.name
 				channels.append(REDIS_ROOM_CHANNEL_PREFIX % thread.id)
-			threads_message = self.default(room_names, THREADS_EVENT)
+			rooms_message = self.default(room_names, ROOMS_EVENT)
 		except (KeyError, UserProfile.DoesNotExist):
 			# Anonymous
 			self.sender_name = session.get(SESSION_USER_VAR_NAME)
@@ -290,9 +290,9 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			else:
 				logger.debug("Anonymous %s has logged in with session key %s" % (self.sender_name, session_key))
 			channels = [ANONYMOUS_REDIS_CHANNEL, self.channel]
-			threads_message = self.default(ANONYMOUS_ROOM_NAMES, THREADS_EVENT)
+			rooms_message = self.default(ANONYMOUS_ROOM_NAMES, ROOMS_EVENT)
 		finally:
-			self.safe_write(threads_message)
+			self.safe_write(rooms_message)
 			return channels
 
 	def open(self):
