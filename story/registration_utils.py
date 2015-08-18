@@ -4,16 +4,17 @@ import re
 from threading import Thread
 import random
 import string
-from django.core.files.uploadedfile import InMemoryUploadedFile
+import sys
 
+from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.forms import model_to_dict
-import sys
-from story.apps import DefaultSettingsConfig
+from django.core.exceptions import ValidationError
+
 from Chat import settings
+from Chat.log_filters import id_generator
 from story.models import UserProfile
+
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
 
@@ -67,10 +68,6 @@ def check_user(username):
 		raise ValidationError("This user name already used")
 	except UserProfile.DoesNotExist:
 		pass
-
-
-def id_generator(size=16, chars=string.ascii_letters + string.digits):
-	return ''.join(random.choice(chars) for _ in range(size))
 
 
 def send_email_verification(user, site_address):

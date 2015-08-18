@@ -9,6 +9,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+from logging.handlers import RotatingFileHandler
 import os
 from os.path import join
 LOGGING_CONFIG = None
@@ -147,46 +148,64 @@ STATICFILES_DIRS = (
 LOGGING = {
 	'version': 1,
 	'disable_existing_loggers': True,
+	'filters': {
+		'id': {
+			'()': 'Chat.log_filters.ContextFilter',
+		}
+	},
 	'handlers': {
 		'file-tornado': {
 			'level': 'DEBUG',
-			'class': 'Chat.logger_handlers.RequestRotatingFileLogger',
+			'class': 'logging.handlers.RotatingFileHandler',
 			'filename': join(BASE_DIR, 'log/', 'torado.log'),
-			'formatter': 'verbose',
+			'formatter': 'tornado',
 		},
 		'file-django': {
 			'level': 'DEBUG',
-			'class': 'Chat.logger_handlers.RequestRotatingFileLogger',
+			'class': 'logging.handlers.RotatingFileHandler',
 			'filename': join(BASE_DIR, 'log/', 'chat.log'),
-			'formatter': 'verbose',
+			'formatter': 'django',
+			'filters': ['id', ]
 		},
-		'console': {
+		'django-console': {
 			'level': 'DEBUG',
 			'class': 'logging.StreamHandler',
-			'formatter': 'verbose',
+			'formatter': 'django',
+			'filters': ['id', ]
+		},
+		'tornado-console': {
+			'level': 'DEBUG',
+			'class': 'logging.StreamHandler',
+			'formatter': 'tornado',
 		},
 	},
 	'loggers': {
 		# root logger
 		'': {
-			'handlers': ['console'],
+			'handlers': ['django-console'],
 			'level': 'DEBUG',
+			'propagate': False,
 		},
 		'Chat.tornadoapp': {
-			'handlers': ['console'],
+			'handlers': ['tornado-console'],
 			'level': 'DEBUG',
 			'propagate': False,
 		},
 		'django.request': {
-			'handlers': ['console'],
+			'handlers': ['django-console'],
 			'level': 'DEBUG',
 			'propagate': False,
 		},
 	},
 
 	'formatters': {
-	'verbose': {
-			'format':  '[%(asctime)s %(levelname)s] [%(module)s:%(lineno)s]: %(message)s',
+
+	'tornado': {
+			'format':  '%(id)s [%(asctime)s=%(lineno)s [%(username)s]: %(message)s',
+			'datefmt': '%H:%M:%S',
+		},
+	'django': {
+			'format':  '%(id)s} [%(asctime)s %(module)s:%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},
