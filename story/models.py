@@ -102,7 +102,7 @@ class Message(models.Model):
 
 
 class Issue(models.Model):
-	content = models.TextField(null=False, unique=True)
+	content = models.TextField(null=False)  # add unique =True , mysql bug
 
 
 class IssueDetails(models.Model):

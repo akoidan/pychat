@@ -34,7 +34,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 DEBUG = False
-ALLOWED_HOSTS = ["pychat.org", ]
+ALLOWED_HOSTS = ["pychat.org", "45.58.48.122"]
 TEMPLATE_DEBUG = False
 #ALLOWED_HOSTS = ["127.0.0.1", ]
 
@@ -161,13 +161,13 @@ LOGGING = {
 		'file-tornado': {
 			'level': 'DEBUG',
 			'class': 'logging.handlers.RotatingFileHandler',
-			'filename': join(BASE_DIR, 'log/', 'torado.log'),
+			'filename': '/tmp/torado.log',
 			'formatter': 'tornado',
 		},
 		'file-django': {
 			'level': 'DEBUG',
 			'class': 'logging.handlers.RotatingFileHandler',
-			'filename': join(BASE_DIR, 'log/', 'chat.log'),
+			'filename': '/tmp/chat.log',
 			'formatter': 'django',
 			'filters': ['id', ]
 		},
