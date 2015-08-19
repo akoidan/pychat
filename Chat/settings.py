@@ -191,11 +191,6 @@ LOGGING = {
 			'level': 'DEBUG',
 			'propagate': False,
 		},
-		'django.request': {
-			'handlers': ['django-console'],
-			'level': 'DEBUG',
-			'propagate': False,
-		},
 	},
 
 	'formatters': {
@@ -205,7 +200,7 @@ LOGGING = {
 			'datefmt': '%H:%M:%S',
 		},
 	'django': {
-			'format':  '%(id)s} [%(asctime)s %(module)s:%(lineno)s]: %(message)s',
+			'format':  '%(id)s [%(asctime)s %(module)s:%(lineno)s  [%(username)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},
