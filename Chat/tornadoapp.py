@@ -256,11 +256,11 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 		if first_tab:  # Login event, sent user names to all
 			online_user_names_mes = self.online_user_names(online, LOGIN_EVENT)
-			self.logger.info('First tab, sending refresh online for all')
+			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes)
 		else:  # Send user names to self
 			online_user_names_mes = self.online_user_names(online, REFRESH_USER_EVENT)
-			self.logger.info('Second tab, retrieving online for self')
+			self.logger.info('!! Second tab, retrieving online for self')
 			self.safe_write(online_user_names_mes)
 		# send usernamechat
 		username_message = self.default(self.sender_name, GET_MINE_USERNAME_EVENT)
@@ -374,7 +374,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		content = message[CONTENT_VAR_NAME]
 		receiver_id = message.get(RECEIVER_USERID_VAR_NAME)  # if receiver_id is None then its a private message
 		receiver_name = message.get(RECEIVER_USERNAME_VAR_NAME)
-		self.logger.info('Sending message %s to username:%s, id:%s', content, receiver_name, receiver_id)
+		self.logger.info('!! Sending message %s to username:%s, id:%s', content, receiver_name, receiver_id)
 		save_to_db = True
 		if receiver_id is not None and receiver_id != 0:
 			receiver_channel = REDIS_USERID_CHANNEL_PREFIX % receiver_id
@@ -383,20 +383,20 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			save_to_db = False
 
 		if self.user_id != 0 and save_to_db:
-			self.logger.debug('Saving it to db')
+			self.logger.debug('!! Saving it to db')
 			message_db = Message(sender_id=self.user_id, content=content, receiver_id=receiver_id)
 			self.do_db(message_db.save)  # exit on hacked id with exception
 			prepared_message = self.create_send_message(message_db)
 		else:
-			self.logger.debug('NOT saving it')
+			self.logger.debug('!! NOT saving it')
 			prepared_message = self.send_anonymous(content, receiver_name)
 
 		if receiver_id is None:
-			self.logger.debug('Detected as public')
+			self.logger.debug('!! Detected as public')
 			self.publish(prepared_message)
 		else:
 			self.publish(prepared_message, self.channel)
-			self.logger.debug('Detected as private, channel %s', receiver_channel)
+			self.logger.debug('!! Detected as private, channel %s', receiver_channel)
 			if receiver_channel != self.channel:
 				self.publish(prepared_message, receiver_channel)
 
@@ -404,13 +404,13 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		:type message: dict
 		"""
-		self.logger.info('Changing username to %s', message[CONTENT_VAR_NAME])
+		self.logger.info('!! Changing username to %s', message[CONTENT_VAR_NAME])
 		new_username = message[CONTENT_VAR_NAME]
 		try:
 			check_user(new_username)
 			online = self.get_online_from_redis()
 			if new_username in online:
-				self.logger.info('This name is already used')
+				self.logger.info('!! This name is already used')
 				raise ValidationError('Anonymous already has this name')
 			session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
 			session = session_engine.SessionStore(session_key)
@@ -442,11 +442,13 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			if self.sender_name:
 				sync_redis.hdel(REDIS_ONLINE_USERS, id(self))
 				online = self.get_online_from_redis()
-				self.logger.info('Closing connection, sending online for all %s', online)
+				self.logger.info('!! Closing connection, redis current online %s', online)
 				if self.sender_name not in online:
 					message = self.online_user_names(online, LOGOUT_EVENT)
-					self.logger.debug('User closed the last tab refreshing online for all')
+					self.logger.debug('!! User closed the last tab refreshing online for all')
 					self.publish(message)
+				else:
+					self.logger.debug('!! User is still online in other tabs')
 		finally:
 			if self.async_redis.subscribed:
 				#  TODO unsubscribe of all subscribed                  !IMPORTANT
@@ -462,7 +464,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		"""
 		header_id = data.get(HEADER_ID_VAR_NAME, None)
 		count = int(data.get(COUNT_VAR_NAME, 10))
-		self.logger.info('Fetching %d messages starting from %s', count, header_id)
+		self.logger.info('!! Fetching %d messages starting from %s', count, header_id)
 		if header_id is None:
 			messages = Message.objects.filter(
 				Q(receiver=None)  # Only public
