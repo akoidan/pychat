@@ -1,19 +1,20 @@
+from random import random
+from random import randint
 from threading import Thread
-from django.core.exceptions import ValidationError
-from django.test import TestCase
 import subprocess
-import sys
+from time import sleep
+
+from django.core.exceptions import ValidationError
+
+from django.test import TestCase
 from websocket import create_connection
 from django.conf import settings
+from django.core.management import call_command
+from selenium import webdriver
+
 from Chat.settings import ANONYMOUS_REDIS_ROOM
 from story.models import UserProfile, Room
 from story.registration_utils import check_password, send_email_verification, check_user
-from django.core.management import call_command
-from subprocess import call
-from time import sleep
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-
 
 
 class ModelTest(TestCase):
@@ -72,8 +73,8 @@ class WebSocketLoadTest(TestCase):
 	def threaded_function(self, session):
 		cookies = '%s=%s;' % (settings.SESSION_COOKIE_NAME, session)
 		ws = create_connection("ws://%s" % self.SITE_TO_SPAM, cookie=cookies)
-		for i in range(20):
-			sleep(1)
+		for i in range(randint(0, 15)):
+			sleep(random()*10)
 			ws.send('{"content":"%d","action":"send"}' % i)
 
 	def read_session(self):
@@ -84,6 +85,6 @@ class WebSocketLoadTest(TestCase):
 
 	def test_simple(self):
 		for session in self.read_session():
-			for i in range(3):
+			for i in range(randint(1, 3)):
 				thread = Thread(target = self.threaded_function, args=(session, ))
 				thread.start()
