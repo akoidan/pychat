@@ -209,13 +209,15 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	def __init__(self, *args, **kwargs):
 		super(MessagesHandler, self).__init__(*args, **kwargs)
+		self.connected = False
+		self.log_id = str(id(self) % 10000).rjust(4, '0')
+		self.logger = logging.LoggerAdapter(logger, {'username': '00000000', 'id': self.log_id})
 		self.async_redis = tornadoredis.Client()
 		self.process_message = {
 			GET_MINE_USERNAME_EVENT: self.process_change_username,
 			GET_MESSAGES_EVENT: self.process_get_messages,
 			SEND_MESSAGE_EVENT: self.process_send_message,
 		}
-		self.logger = None
 
 	@tornado.gen.engine
 	def listen(self, channels):
@@ -304,15 +306,14 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	def open(self, *args, **kargs):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
-		log_id = str(id(self) % 10000).rjust(4, '0')
-		self.logger = logging.LoggerAdapter(logger, {'username': str(session_key)[-8:], 'id': log_id})
 		if sessionStore.exists(session_key):
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, id(self))
 			self.async_redis.connect()
 			channels = self.set_username(session_key)
-			self.logger = logging.LoggerAdapter(logger, {'username': self.sender_name.rjust(8), 'id': log_id})
+			self.logger = logging.LoggerAdapter(logger, {'username': self.sender_name.rjust(8), 'id': self.log_id})
 			self.listen(channels)
 			self.add_online_user()
+			self.connected = True
 		else:
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key is empty or session doesn't exist")
@@ -432,7 +433,13 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.safe_write(self.default(str(e.message)))
 
 	def on_message(self, json_message):
-		if json_message and len(json_message) < MAX_MESSAGE_SIZE:
+		if not self.connected:
+			self.logger.warning('Skipping message %s, as websocket is not initialized yet', json_message)
+		elif not json_message:
+			self.logger.warning('Skipping null message')
+		elif len(json_message) > MAX_MESSAGE_SIZE:
+			self.logger.warning('Skipping message, as its too long (%d) %s', len(json_message), json_message[:50])
+		else:
 			self.logger.debug('<< %s', json_message)
 			message = json.loads(json_message)
 			self.process_message[message.get(EVENT_VAR_NAME)](message)

@@ -60,7 +60,7 @@ class SeleniumBrowserTest(TestCase):
 
 class WebSocketLoadTest(TestCase):
 
-	SITE_TO_SPAM = "pychat.org:8888"
+	SITE_TO_SPAM = "127.0.0.1:8888"
 
 	def setUp(self):
 		pass
@@ -83,8 +83,5 @@ class WebSocketLoadTest(TestCase):
 			return lines
 
 
-	def test_simple(self):
-		for session in self.read_session():
-			for i in range(randint(1, 3)):
-				thread = Thread(target = self.threaded_function, args=(session, ))
-				thread.start()
+	def test_one(self):
+		self.threaded_function('DDDDDDDDDDDDD')
