@@ -5,8 +5,8 @@ Web chat based on WebSockets.
 
 Basically written in **Python** with [django](https://www.djangoproject.com/) it uses asynchronous web framework [Tornado](http://www.tornadoweb.org/) for handling realtime messages. Broadcasting messages are being sent by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using Python [tornado-redis](https://github.com/leporo/tornado-redis) backend. It can be run on both **Windows** and **Linux** and tested on **Python 2.7** and **Python 3.x**
 
- To run chat on CentOS 6:
- ==============
+To run chat on CentOS 6:
+===============
  (See master branch readme for other os support)
  
  1. Run from your pc, Add ssh without authorize`cat .ssh/id_rsa.pub | ssh -p 666 root@ip 'mkdir -p .ssh; cat >> .ssh/authorized_keys'`
@@ -17,7 +17,7 @@ Basically written in **Python** with [django](https://www.djangoproject.com/) it
  6. Install db for session and pubsub `yum install redis`
  7. Install main db `yum install mysql-server, mysql-devel`
  8. Copy config files to rootfs `cp rootfs / -r `
- 9. add file `Chat/production.py` , place SECRET_KEY there
+ 9. add file `Chat/production.py` , place `SECRET_KEY` there
  10. Create database in mysql `echo "create database django CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`
  11.  Create redis service. `chkconfig --add redis `. Add it to autostart (optional) `chkconfig redis on`
  12.  Create mysqld service `chkconfig --add mysqld`  Add it to autostart (optional) `chkconfig mysqld on`
