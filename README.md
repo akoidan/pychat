@@ -44,6 +44,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
+* add antiflood settings to nginx
 * tornado redis connection reset prevents user from deleting its entry in online_users
 * saving all messages in localstorage slows browser repsonsivness 
 * run tornado via nginx http://tornado.readthedocs.org/en/latest/guide/running.html
