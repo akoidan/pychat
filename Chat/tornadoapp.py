@@ -305,8 +305,8 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 	def open(self, *args, **kargs):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
 		log_id = str(id(self) % 10000).rjust(4, '0')
+		self.logger = logging.LoggerAdapter(logger, {'username': str(session_key)[-8:], 'id': log_id})
 		if sessionStore.exists(session_key):
-			self.logger = logging.LoggerAdapter(logger, {'username': session_key[-8:], 'id': log_id})
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, id(self))
 			self.async_redis.connect()
 			channels = self.set_username(session_key)
@@ -314,7 +314,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.listen(channels)
 			self.add_online_user()
 		else:
-			self.logger.warning('!! Session key %s has been rejected', session_key)
+			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key is empty or session doesn't exist")
 
 	def check_origin(self, origin):

@@ -1,8 +1,14 @@
+from threading import Thread
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-
-from story.models import UserProfile
+import subprocess
+import sys
+from websocket import create_connection
+from Chat.settings import ANONYMOUS_REDIS_ROOM
+from story.models import UserProfile, Room
 from story.registration_utils import check_password, send_email_verification, check_user
+from django.core.management import call_command
+from subprocess import call
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -46,3 +52,19 @@ class SeleniumBrowserTest(TestCase):
 		elem = driver.find_element_by_id("userNameLabel")
 		self.assertRegexpMatches(elem.text, "^[a-zA-Z-_0-9]{1,16}$")
 		driver.close()
+
+class WebSocketLoadTest(TestCase):
+
+	def setUp(self):
+		pass
+		# Room.objects.create(name=ANONYMOUS_REDIS_ROOM)
+		# subprocess.Popen("/usr/bin/redis-server")
+		# thread = Thread(target=call_command, args=('start_tornado',))
+		# thread.start()
+
+
+	def test_simple(self):
+		ws = create_connection("ws://127.0.0.1:8888")
+		ws.send("Hello, World")
+		result = ws.recv()
+		ws.close()
