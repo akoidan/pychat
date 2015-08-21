@@ -45,21 +45,21 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
-* fix log messages, check production, django request doesn't use logger settings
-* automatic sign up anonymous users with session ID password??
-* webrtc
-* vlc
-* save base64 taken photo on server
-* story/views.py:127 TODO
-* http://stackoverflow.com/a/14268418/3872976
-* ManyToManyRel Threads - Users
+* startup loading messages in a separate thread (JS )
+* move loading messages on startup to single function? 
+* add antiflood settings to nginx
+* tornado redis connection reset prevents user from deleting its entry in online_users
+* saving all messages in localstorage slows browser repsonsivness 
+* run tornado via nginx http://tornado.readthedocs.org/en/latest/guide/running.html
+* fixme tornado logs messages to chat.log when messages don't belong to tornadoapp.p
+* force users to register
+* webrtc -> vlc
 * test audio preload on none 
 * add media query for register and usersettings to adjust for phone's width
 * add lock to loadMessages to prevent doubling getting the same message and appending it twice. 
 * add change password and realtime javascript to change_profile
 * local storage can store another user messasges in case of logout ?
 * file upload http://stackoverflow.com/a/14605593/3872976
-* !!!show user profile onclick gender icon 
 * add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis
 * create tornado class in tornadoapp, put there all tornado logic
 * change anonymous message color

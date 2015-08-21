@@ -1,17 +1,21 @@
+from random import random
+from random import randint
 from threading import Thread
-from django.core.exceptions import ValidationError
-from django.test import TestCase
 import subprocess
-import sys
+from time import sleep
+
+from django.core.exceptions import ValidationError
+
+from django.test import TestCase
 from websocket import create_connection
+from django.conf import settings
+from django.core.management import call_command
+from selenium import webdriver
+
 from Chat.settings import ANONYMOUS_REDIS_ROOM
 from story.models import UserProfile, Room
 from story.registration_utils import check_password, send_email_verification, check_user
-from django.core.management import call_command
-from subprocess import call
 
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 
 class ModelTest(TestCase):
 
@@ -53,7 +57,10 @@ class SeleniumBrowserTest(TestCase):
 		self.assertRegexpMatches(elem.text, "^[a-zA-Z-_0-9]{1,16}$")
 		driver.close()
 
+
 class WebSocketLoadTest(TestCase):
+
+	SITE_TO_SPAM = "127.0.0.1:8888"
 
 	def setUp(self):
 		pass
@@ -63,8 +70,18 @@ class WebSocketLoadTest(TestCase):
 		# thread.start()
 
 
-	def test_simple(self):
-		ws = create_connection("ws://127.0.0.1:8888")
-		ws.send("Hello, World")
-		result = ws.recv()
-		ws.close()
+	def threaded_function(self, session):
+		cookies = '%s=%s;' % (settings.SESSION_COOKIE_NAME, session)
+		ws = create_connection("ws://%s" % self.SITE_TO_SPAM, cookie=cookies)
+		for i in range(randint(0, 15)):
+			sleep(random()*10)
+			ws.send('{"content":"%d","action":"send"}' % i)
+
+	def read_session(self):
+		with open('sessionsids.txt') as f:
+			lines =f.read().splitlines()
+			return lines
+
+
+	def test_one(self):
+		self.threaded_function('DDDDDDDDDDDDD')
