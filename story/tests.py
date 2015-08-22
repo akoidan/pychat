@@ -60,7 +60,7 @@ class SeleniumBrowserTest(TestCase):
 
 class WebSocketLoadTest(TestCase):
 
-	SITE_TO_SPAM = "127.0.0.1:8888"
+	SITE_TO_SPAM = "pychat.org:8888"
 
 	def setUp(self):
 		pass
@@ -69,12 +69,11 @@ class WebSocketLoadTest(TestCase):
 		# thread = Thread(target=call_command, args=('start_tornado',))
 		# thread.start()
 
-
 	def threaded_function(self, session):
 		cookies = '%s=%s;' % (settings.SESSION_COOKIE_NAME, session)
 		ws = create_connection("ws://%s" % self.SITE_TO_SPAM, cookie=cookies)
-		for i in range(randint(0, 15)):
-			sleep(random()*10)
+		for i in range(randint(30, 50)):
+			sleep(random())
 			ws.send('{"content":"%d","action":"send"}' % i)
 
 	def read_session(self):
@@ -83,5 +82,8 @@ class WebSocketLoadTest(TestCase):
 			return lines
 
 
-	def test_one(self):
-		self.threaded_function('DDDDDDDDDDDDD')
+	def test_simple(self):
+		for session in self.read_session():
+			for i in range(randint(1, 5)):
+				thread = Thread(target=self.threaded_function, args=(session, ))
+				thread.start()
