@@ -28,4 +28,4 @@ class Command(BaseCommand):
 	def handle(self, *args, **options):
 		values = self.get_values_from_redis()
 		for value in values:
-			print(value[1])
+			print(value[0])

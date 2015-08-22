@@ -442,7 +442,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		else:
 			self.logger.debug('<< %s', json_message)
 			message = json.loads(json_message)
-			self.process_message[message.get(EVENT_VAR_NAME)](message)
+			self.process_message[message[EVENT_VAR_NAME]](message)
 
 	def on_close(self):
 		try:
@@ -485,7 +485,7 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				| Q(sender=self.user_id)
 				| Q(receiver=self.user_id)
 			).order_by('-pk')[:count]
-		response = self.get_messages(messages)
+		response = self.do_db(self.get_messages, messages)
 		self.safe_write(response)
 
 
