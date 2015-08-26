@@ -229,19 +229,26 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		self.async_redis.listen(self.new_message)
 
 
-	def get_online_from_redis(self):
+	def get_online_from_redis(self, check_name=None, check_id = None):
 		"""
 		:rtype : dict
+		returns (dict, bool) if check_type is present
 		"""
-		online = sync_redis.hvals(REDIS_ONLINE_USERS)
+		online = sync_redis.hgetall(REDIS_ONLINE_USERS)
 		self.logger.debug('!! redis online: %s', online)
 		result = {}
+		user_is_online = False
 		# redis stores REDIS_USER_FORMAT, so parse them
 		if online:
-			for raw_user_sex in online:
+			for key, raw_user_sex in online.items():  # py2 iteritems
 				(name, sex, user_id) = raw_user_sex.decode('utf-8').split(':')
+				if name == check_name and check_id != int(key.decode('utf-8')):
+					user_is_online = True
 				result.update(self.online_js_structure(name, sex, user_id))
-		return result
+		if check_id:
+			return result, user_is_online
+		else:
+			return result
 
 	def add_online_user(self):
 		"""
@@ -446,16 +453,21 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 
 	def on_close(self):
 		try:
-			if self.sender_name:
-				sync_redis.hdel(REDIS_ONLINE_USERS, id(self))
-				online = self.get_online_from_redis()
+			self_id = id(self)
+			async_redis_publisher.hdel(REDIS_ONLINE_USERS, self_id)
+			if self.connected:
+				# seems like async solves problem with connection lost and wrong data status
+				# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
+				online, is_online = self.get_online_from_redis(self.sender_name, self_id)
 				self.logger.info('!! Closing connection, redis current online %s', online)
-				if self.sender_name not in online:
+				if not is_online:
 					message = self.online_user_names(online, LOGOUT_EVENT)
-					self.logger.debug('!! User closed the last tab refreshing online for all')
+					self.logger.debug('!! User closed the last tab, refreshing online for all')
 					self.publish(message)
 				else:
 					self.logger.debug('!! User is still online in other tabs')
+			else:
+				self.logger.warning('Dropping connection for not connected user yet')
 		finally:
 			if self.async_redis.subscribed:
 				#  TODO unsubscribe of all subscribed                  !IMPORTANT
