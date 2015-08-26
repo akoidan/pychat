@@ -86,7 +86,8 @@ CONNECTION_POOL = tornadoredis.ConnectionPool(
 
 class MessagesCreator(object):
 
-	def __init__(self):
+	def __init__(self, *args, **kwargs):
+		super(MessagesCreator, self).__init__(*args, **kwargs)
 		self.sex = ANONYMOUS_GENDER
 		self.sender_name = None
 		self.user_id = 0  # anonymous by default
@@ -202,14 +203,10 @@ class MessagesCreator(object):
 			return callback(**args)
 
 
-class MessagesHandler(WebSocketHandler, MessagesCreator):
-
-	def data_received(self, chunk):
-		pass
+class MessagesHandler(MessagesCreator):
 
 	def __init__(self, *args, **kwargs):
 		super(MessagesHandler, self).__init__(*args, **kwargs)
-		self.connected = False
 		self.log_id = str(id(self) % 10000).rjust(4, '0')
 		self.logger = logging.LoggerAdapter(logger, {'username': '00000000', 'id': self.log_id})
 		self.async_redis = tornadoredis.Client()
@@ -311,30 +308,6 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 			self.safe_write(rooms_message)
 			return channels
 
-	def open(self, *args, **kargs):
-		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
-		if sessionStore.exists(session_key):
-			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, id(self))
-			self.async_redis.connect()
-			channels = self.set_username(session_key)
-			self.logger = logging.LoggerAdapter(logger, {'username': self.sender_name.rjust(8), 'id': self.log_id})
-			self.listen(channels)
-			self.add_online_user()
-			self.connected = True
-		else:
-			self.logger.warning('!! Session key %s has been rejected', str(session_key))
-			self.close(403, "Session key is empty or session doesn't exist")
-
-	def check_origin(self, origin):
-		"""
-		check whether browser set domain matches origin
-		"""
-		parsed_origin = urlparse(origin)
-		origin = parsed_origin.netloc
-		origin_domain = origin.split(':')[0].lower()
-		browser_set = self.request.headers.get("Host")
-		browser_domain = browser_set.split(':')[0]
-		return browser_domain == origin_domain
 
 	def publish(self, message, channel=ANONYMOUS_REDIS_CHANNEL):
 		jsoned_mess = json.dumps(message)
@@ -439,6 +412,40 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 		except ValidationError as e:
 			self.safe_write(self.default(str(e.message)))
 
+
+	def process_get_messages(self, data):
+		"""
+		:type data: dict
+		"""
+		header_id = data.get(HEADER_ID_VAR_NAME, None)
+		count = int(data.get(COUNT_VAR_NAME, 10))
+		self.logger.info('!! Fetching %d messages starting from %s', count, header_id)
+		if header_id is None:
+			messages = Message.objects.filter(
+				Q(receiver=None)  # Only public
+				| Q(sender=self.user_id)  # private s
+				| Q(receiver=self.user_id)  # and private
+			).order_by('-pk')[:count]
+		else:
+			messages = Message.objects.filter(
+				Q(id__lt=header_id),
+				Q(receiver=None)
+				| Q(sender=self.user_id)
+				| Q(receiver=self.user_id)
+			).order_by('-pk')[:count]
+		response = self.do_db(self.get_messages, messages)
+		self.safe_write(response)
+
+
+class TornadoHandler(MessagesHandler, WebSocketHandler):
+
+	def __init__(self, *args, **kwargs):
+		super(TornadoHandler, self).__init__(*args, **kwargs)
+		self.connected = False
+
+	def data_received(self, chunk):
+		pass
+
 	def on_message(self, json_message):
 		if not self.connected:
 			self.logger.warning('Skipping message %s, as websocket is not initialized yet', json_message)
@@ -477,30 +484,32 @@ class MessagesHandler(WebSocketHandler, MessagesCreator):
 				])
 			self.async_redis.disconnect()
 
-	def process_get_messages(self, data):
-		"""
-		:type data: dict
-		"""
-		header_id = data.get(HEADER_ID_VAR_NAME, None)
-		count = int(data.get(COUNT_VAR_NAME, 10))
-		self.logger.info('!! Fetching %d messages starting from %s', count, header_id)
-		if header_id is None:
-			messages = Message.objects.filter(
-				Q(receiver=None)  # Only public
-				| Q(sender=self.user_id)  # private s
-				| Q(receiver=self.user_id)  # and private
-			).order_by('-pk')[:count]
+	def open(self, *args, **kargs):
+		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
+		if sessionStore.exists(session_key):
+			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, id(self))
+			self.async_redis.connect()
+			channels = self.set_username(session_key)
+			self.logger = logging.LoggerAdapter(logger, {'username': self.sender_name.rjust(8), 'id': self.log_id})
+			self.listen(channels)
+			self.add_online_user()
+			self.connected = True
 		else:
-			messages = Message.objects.filter(
-				Q(id__lt=header_id),
-				Q(receiver=None)
-				| Q(sender=self.user_id)
-				| Q(receiver=self.user_id)
-			).order_by('-pk')[:count]
-		response = self.do_db(self.get_messages, messages)
-		self.safe_write(response)
+			self.logger.warning('!! Session key %s has been rejected', str(session_key))
+			self.close(403, "Session key is empty or session doesn't exist")
+
+	def check_origin(self, origin):
+		"""
+		check whether browser set domain matches origin
+		"""
+		parsed_origin = urlparse(origin)
+		origin = parsed_origin.netloc
+		origin_domain = origin.split(':')[0].lower()
+		browser_set = self.request.headers.get("Host")
+		browser_domain = browser_set.split(':')[0]
+		return browser_domain == origin_domain
 
 
 application = tornado.web.Application([
-	(r'.*', MessagesHandler),
+	(r'.*', TornadoHandler),
 ])
