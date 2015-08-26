@@ -194,14 +194,6 @@ class MessagesCreator(object):
 	def online_self_js_structure(self):
 		return self.online_js_structure(self.sender_name, self.sex, self.user_id)
 
-	def do_db(self, callback, **args):
-		try:
-			return callback(**args)
-		except (OperationalError, InterfaceError) as e:  # Connection has gone away
-			self.logger.warn('%s, reconnecting' % e)  # TODO
-			connection.close()
-			return callback(**args)
-
 
 class MessagesHandler(MessagesCreator):
 
@@ -216,17 +208,15 @@ class MessagesHandler(MessagesCreator):
 			SEND_MESSAGE_EVENT: self.process_send_message,
 		}
 
-	@tornado.gen.engine
-	def listen(self, channels):
-		"""
-		self.channel should been set before calling
-		"""
-		yield tornado.gen.Task(
-			self.async_redis.subscribe, channels)
-		self.async_redis.listen(self.new_message)
+	def do_db(self, callback, **args):
+		try:
+			return callback(**args)
+		except (OperationalError, InterfaceError) as e:  # Connection has gone away
+			self.logger.warning('%s, reconnecting' % e)  # TODO
+			connection.close()
+			return callback(**args)
 
-
-	def get_online_from_redis(self, check_name=None, check_id = None):
+	def get_online_from_redis(self, check_name=None, check_id=None):
 		"""
 		:rtype : dict
 		returns (dict, bool) if check_type is present
@@ -329,24 +319,9 @@ class MessagesHandler(MessagesCreator):
 			self.safe_write(message.body)
 			self.check_and_finish_change_name(message.body)
 
+
 	def safe_write(self, message):
-		"""
-		Tries to send message, doesn't throw exception outside
-		:type self: MessagesHandler
-		"""
-		try:
-			if isinstance(message, dict):
-				message = json.dumps(message)
-			if not (isinstance(message, str) or (not PY3 and isinstance(message, unicode))):
-				raise ValueError('Wrong message type : %s' % str(message))
-			self.logger.debug(">> %s", message)
-			self.write_message(message)
-		except tornado.websocket.WebSocketClosedError:
-			self.logger.error(
-				'Socket "%s" closed bug, this "%s" message: "%s"',
-				str(self),
-				self.sender_name,
-				str(message))
+		raise NotImplementedError('WebSocketHandler implements')
 
 	def process_send_message(self, message):
 		"""
@@ -412,7 +387,6 @@ class MessagesHandler(MessagesCreator):
 		except ValidationError as e:
 			self.safe_write(self.default(str(e.message)))
 
-
 	def process_get_messages(self, data):
 		"""
 		:type data: dict
@@ -437,11 +411,20 @@ class MessagesHandler(MessagesCreator):
 		self.safe_write(response)
 
 
-class TornadoHandler(MessagesHandler, WebSocketHandler):
+class TornadoHandler(WebSocketHandler, MessagesHandler):
 
 	def __init__(self, *args, **kwargs):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
 		self.connected = False
+
+	@tornado.gen.engine
+	def listen(self, channels):
+		"""
+		self.channel should been set before calling
+		"""
+		yield tornado.gen.Task(
+			self.async_redis.subscribe, channels)
+		self.async_redis.listen(self.new_message)
 
 	def data_received(self, chunk):
 		pass
@@ -509,6 +492,24 @@ class TornadoHandler(MessagesHandler, WebSocketHandler):
 		browser_domain = browser_set.split(':')[0]
 		return browser_domain == origin_domain
 
+	def safe_write(self, message):
+		"""
+		Tries to send message, doesn't throw exception outside
+		:type self: MessagesHandler
+		"""
+		try:
+			if isinstance(message, dict):
+				message = json.dumps(message)
+			if not (isinstance(message, str) or (not PY3 and isinstance(message, unicode))):
+				raise ValueError('Wrong message type : %s' % str(message))
+			self.logger.debug(">> %s", message)
+			self.write_message(message)
+		except tornado.websocket.WebSocketClosedError:
+			self.logger.error(
+				'Socket "%s" closed bug, this "%s" message: "%s"',
+				str(self),
+				self.sender_name,
+				str(message))
 
 application = tornado.web.Application([
 	(r'.*', TornadoHandler),
