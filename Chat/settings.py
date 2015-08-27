@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 from logging.handlers import RotatingFileHandler
 import os
 from os.path import join
+import sys
+
 LOGGING_CONFIG = None
 try:
 	from Chat.production import * 
@@ -148,6 +150,10 @@ STATICFILES_DIRS = (
 
 # AUTH_PROFILE_MODULE = 'story.UserProfile'
 
+if 'start_tornado' in sys.argv:
+	log_file_name = 'tornado.log'
+else:
+	log_file_name = 'chat.log'
 
 LOGGING = {
 	'version': 1,
@@ -161,13 +167,13 @@ LOGGING = {
 		'file-tornado': {
 			'level': 'DEBUG',
 			'class': 'logging.handlers.RotatingFileHandler',
-			'filename': '/tmp/torado.log',
+			'filename': join(BASE_DIR, 'log/', log_file_name),
 			'formatter': 'tornado',
 		},
-		'file-django': {
+		'file': {
 			'level': 'DEBUG',
 			'class': 'logging.handlers.RotatingFileHandler',
-			'filename': '/tmp/chat.log',
+			'filename': join(BASE_DIR, 'log/', log_file_name),
 			'formatter': 'django',
 			'filters': ['id', ]
 		},
@@ -186,7 +192,7 @@ LOGGING = {
 	'loggers': {
 		# root logger
 		'': {
-			'handlers': ['file-django'],
+			'handlers': ['file'],
 			'level': 'DEBUG',
 			'propagate': False,
 		},
