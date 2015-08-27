@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 from logging.handlers import RotatingFileHandler
 import os
 from os.path import join
+import sys
+
 LOGGING_CONFIG = None
 from django.conf import global_settings
 
@@ -144,6 +146,10 @@ STATICFILES_DIRS = (
 
 # AUTH_PROFILE_MODULE = 'story.UserProfile'
 
+if 'start_tornado' in sys.argv:
+	log_file_name = 'tornado.log'
+else:
+	log_file_name = 'chat.log'
 
 LOGGING = {
 	'version': 1,
@@ -157,13 +163,13 @@ LOGGING = {
 		'file-tornado': {
 			'level': 'DEBUG',
 			'class': 'logging.handlers.RotatingFileHandler',
-			'filename': join(BASE_DIR, 'log/', 'torado.log'),
+			'filename': join(BASE_DIR, 'log/', log_file_name),
 			'formatter': 'tornado',
 		},
-		'file-django': {
+		'file': {
 			'level': 'DEBUG',
 			'class': 'logging.handlers.RotatingFileHandler',
-			'filename': join(BASE_DIR, 'log/', 'chat.log'),
+			'filename': join(BASE_DIR, 'log/', log_file_name),
 			'formatter': 'django',
 			'filters': ['id', ]
 		},
@@ -182,12 +188,12 @@ LOGGING = {
 	'loggers': {
 		# root logger
 		'': {
-			'handlers': ['django-console'],
+			'handlers': ['file'],
 			'level': 'DEBUG',
 			'propagate': False,
 		},
 		'Chat.tornadoapp': {
-			'handlers': ['tornado-console'],
+			'handlers': ['file-tornado'],
 			'level': 'DEBUG',
 			'propagate': False,
 		},
