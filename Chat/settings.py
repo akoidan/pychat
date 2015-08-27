@@ -192,12 +192,12 @@ LOGGING = {
 	'loggers': {
 		# root logger
 		'': {
-			'handlers': ['file'],
+			'handlers': ['django-console'],
 			'level': 'DEBUG',
 			'propagate': False,
 		},
 		'Chat.tornadoapp': {
-			'handlers': ['file-tornado'],
+			'handlers': ['tornado-console'],
 			'level': 'DEBUG',
 			'propagate': False,
 		},

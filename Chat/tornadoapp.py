@@ -208,13 +208,13 @@ class MessagesHandler(MessagesCreator):
 			SEND_MESSAGE_EVENT: self.process_send_message,
 		}
 
-	def do_db(self, callback, **args):
+	def do_db(self, callback, *arg, **args):
 		try:
-			return callback(**args)
+			return callback(*arg, **args)
 		except (OperationalError, InterfaceError) as e:  # Connection has gone away
 			self.logger.warning('%s, reconnecting' % e)  # TODO
 			connection.close()
-			return callback(**args)
+			return callback( *arg, **args)
 
 	def get_online_from_redis(self, check_name=None, check_id=None):
 		"""
