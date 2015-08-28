@@ -504,12 +504,8 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				raise ValueError('Wrong message type : %s' % str(message))
 			self.logger.debug(">> %s", message)
 			self.write_message(message)
-		except tornado.websocket.WebSocketClosedError:
-			self.logger.error(
-				'Socket "%s" closed bug, this "%s" message: "%s"',
-				str(self),
-				self.sender_name,
-				str(message))
+		except tornado.websocket.WebSocketClosedError as e:
+			self.logger.error("%s. Can't send << %s >> message", e, str(message))
 
 application = tornado.web.Application([
 	(r'.*', TornadoHandler),
