@@ -9,7 +9,8 @@ To run chat on CentOS 6:
 ===============
  (See master branch readme for other os support)
  
- 1. Run from your pc, Add ssh without authorize`cat .ssh/id_rsa.pub | ssh -p 666 root@ip 'mkdir -p .ssh; cat >> .ssh/authorized_keys'`
+ 0. Run from your pc, Add ssh without authorize`cat .ssh/id_rsa.pub | ssh -p 666 root@ip 'mkdir -p .ssh; cat >> .ssh/authorized_keys'`
+ 1. add `alias yum="python2 $(which yum)"` to /etc/bashrc if you use python3
  2. Install nginx`yum install nginx`
  3. Install python3 `yum install python34u`
  4. Install python server `yum install uWSGI`
