@@ -145,11 +145,11 @@ nav {
 	float:right;
 }
 
-.navbarList {
+#navbarList {
 	margin: 0;
 	padding: 10px 4px 9px 10px;
 }
-.navbarList > li {
+#navbarList > li {
 	 display:inline;
 }
 

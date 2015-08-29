@@ -44,6 +44,10 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
+* add logger
+* add WebWorker
+* allow new line in messages http://www.w3schools.com/html/html5_webworkers.asp to load message
+* clicable links in messages
 * startup loading messages in a separate thread (JS )
 * move loading messages on startup to single function? 
 * add antiflood settings to nginx

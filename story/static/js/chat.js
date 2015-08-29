@@ -35,6 +35,8 @@ var STORAGE_USER = 'user';
 var headerId;
 //  div that contains messages
 var chatBoxDiv;
+var navbarList;
+var chatBoxWrapper;
 //sound
 var chatIncoming;
 var chatOutgoing;
@@ -78,9 +80,10 @@ onDocLoad(function () {
 	userSendMessageTo.style.display = "none";
 	receiverId = $("receiverId");
 	charRooms = $("rooms");
+	navbarList = $('navbarList');
+	chatBoxWrapper = $('wrapper');
 
 	chatUsersTable.addEventListener("click", userClick);
-	userMessage.addEventListener("keypress", sendMessage);
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);  //TODO doesn't work in chromium for div
@@ -90,8 +93,50 @@ onDocLoad(function () {
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	isWsConnected = true;
 	start_chat_ws();
-
+	addTextAreaEvents();
 });
+
+
+function addTextAreaEvents() {
+	function delayedResize() {
+		/* 0-timeout to get the already changed text */
+		//adjustUserMessageWidth();
+		window.setTimeout(adjustUserMessageWidth, 0);
+	}
+	userMessage.addEventListener('keypress', sendMessage);
+	userMessage.addEventListener('change', adjustUserMessageWidth);
+	var events = ['cut', 'paste', 'drop', 'keydown'];
+	for (var i=0; i< events.length; i++) {
+		userMessage.addEventListener(events[i], delayedResize);
+	}
+	adjustUserMessageWidth();
+
+
+	var mql = window.matchMedia("(max-height: 15em)");
+	mql.addListener(adjustUserMessageWidth);
+}
+
+
+function adjustUserMessageWidth(mql) {
+	if (mql != null) {
+		console.log(getDebugMessage('Running adjust TextArea For mediaQuery'));
+	}
+	// http://stackoverflow.com/a/5346855/3872976
+	userMessage.style.height = 'auto';
+	var textAreaHeight = userMessage.scrollHeight;
+	var bodyRawHeight = window.getComputedStyle(document.body)['height'];
+	var maxHeight = parseInt(bodyRawHeight.substr(0, bodyRawHeight.length-2))/3;
+	if (textAreaHeight > maxHeight) {
+		textAreaHeight = maxHeight; // same that on top
+	}
+	userMessage.style.height = (textAreaHeight - 4) + 'px'; // 5px is probably borders
+
+	var navH = navbarList.clientHeight;
+
+	var newHeight = textAreaHeight + navH + 12;
+	//console.log(getDebugMessage('newH {}; textAr {}, navH {} ', newHeight, textAreaHeight, navH));
+	chatBoxWrapper.style.height = 'calc(100% - ' + newHeight + 'px)';
+}
 
 
 /*==================== DOM EVENTS LISTENERS ============================*/
@@ -141,9 +186,15 @@ function keyDownLoadUp(e) {
 
 
 function sendMessage(event) {
-	if (event.keyCode === 13) {
+	if (event.keyCode !== 13) {
+		return;
+	}
+	if (!event.shiftKey) {
+		// http://stackoverflow.com/questions/6014702/how-do-i-detect-shiftenter-and-generate-a-new-line-in-textarea
+		// Since messages are sent by pressing enter, enter goes inside of textarea after sending
+		event.preventDefault();
 		var messageContent = userMessage.value;
-		if (messageContent == null || messageContent === '') {
+		if (/^\s*$/.test(messageContent)) {
 			return;
 		}
 		// anonymous is set by name, registered user is set by id.
@@ -186,12 +237,55 @@ function getWidth() {
 //	setCookie("timezone", jstz.determine().name());
 //}
 
+//// add var if doesnt work fixme
+//function loadMessagesFromLocalStorage(jsonData) {
+//	if (jsonData != null) {
+//		var parsedData = JSON.parse(jsonData);
+//		// don't make sound on loadHistory
+//		var savedSoundStatus = sound;
+//		sound = 0;
+//		for (var i = 0; i < parsedData.length; i++) {
+//			handlePreparedWSMessage(parsedData[i]);
+//		}
+//		sound = savedSoundStatus;
+//	}
+//}
+//
+//
+//// duplicate this? fixme
+//function loadMessagesFromLocalStorageWebWorker() {
+//	onmessage = function(e) {
+//    loadMessagesFromLocalStorage(e);
+//	};
+//}
+//
+//
+//function loadLocalStorage() {
+//	loggedUser = localStorage.getItem(STORAGE_USER);
+//	var jsonData = localStorage.getItem(STORAGE_NAME);
+//	if (true) { //len(jsonData) > 1000
+//		// Build a worker from an anonymous function body
+//		// JSON.load huge localStorage string in background for responsive interface
+//		// http://stackoverflow.com/a/19201292/3872976
+//		var blobURL = URL.createObjectURL(new Blob(['(',
+//			loadMessagesFromLocalStorageWebWorker.toString(),
+//			')()'], {type: 'application/javascript'}));
+//
+//		var worker = new Worker(blobURL);
+//		worker.postMessage(jsonData);
+//
+//		// Won't be needing this anymore
+//		URL.revokeObjectURL(blobURL);
+//	}
+//}
+
 
 function loadMessagesFromLocalStorage() {
 	loggedUser = localStorage.getItem(STORAGE_USER);
 	var jsonData = localStorage.getItem(STORAGE_NAME);
 	if (jsonData != null) {
 		var parsedData = JSON.parse(jsonData);
+		console.log(getDebugMessage('Loading {} messages from localstorage', parsedData.length));
 		// don't make sound on loadHistory
 		var savedSoundStatus = sound;
 		sound = 0;
@@ -208,7 +302,9 @@ function start_chat_ws() {
 	ws.onmessage = webSocketMessage;
 	ws.onclose = function () {
 		if (isWsConnected) {
-			console.error(getDebugMessage("Connection to WebSocket has failed, trying to reconnect every " + CONNECTION_RETRY_TIME + "ms"));
+			console.error(getDebugMessage(
+				"Connection to WebSocket has failed, trying to reconnect every {}ms",
+				 CONNECTION_RETRY_TIME));
 			isWsConnected = false;
 		}
 		// Try to reconnect in 5 seconds
@@ -224,7 +320,8 @@ function start_chat_ws() {
 
 
 function encodeHTML(html) {
-	return document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
+	var innerHTML = document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
+	return innerHTML.replace(/\n/g, '<br>');
 }
 
 
@@ -303,7 +400,8 @@ function printMessage(data, isTopDirection) {
 	} else {
 		headerStyle = othersHeader;
 	}
-	displayPreparedMessage(headerStyle, data['time'], encodeHTML(data['content']), displayedUsername, isTopDirection);
+	var preparedHtml = encodeHTML(data['content']);
+	displayPreparedMessage(headerStyle, data['time'], preparedHtml, displayedUsername, isTopDirection);
 }
 
 
@@ -363,33 +461,38 @@ function handleGetMessages(message) {
 }
 
 
-// TODO too many json parses
-function saveMessageToStorage(newItem) {
-	switch (newItem['action']) {
+function fastAddToStorage(text) {
+	var storageData = localStorage.getItem(STORAGE_NAME);
+	var newStorageData;
+	if (storageData) {
+		// insert new text before "]" symbol and add it manually
+		var copyUntil = storageData.length-1;
+		newStorageData = storageData.substr(0, copyUntil) +',' + text + ']';
+	} else {
+		newStorageData = '[' + text + ']';
+	}
+	localStorage.setItem(STORAGE_NAME, newStorageData);
+}
+
+
+// Use both json and object repr for less JSON actions
+function saveMessageToStorage(objectItem, jsonItem) {
+	switch (objectItem['action']) {
 		case 'me':
-			localStorage.setItem(STORAGE_USER, newItem['content']);
+			localStorage.setItem(STORAGE_USER, objectItem['content']);
 			break;
 		case 'joined':
 		case 'changed':
 		case 'left':
-			delete newItem['content']; // don't store usernames in db
+			delete objectItem['content']; // don't store usernames in db
+			jsonItem = JSON.stringify(objectItem);
 		case 'system': // continue from 3 top events:
 		case 'messages':
 		case 'send':
-			var jsonMessages = localStorage.getItem(STORAGE_NAME);
-			var messages;
-			if (jsonMessages != null) {
-				messages = JSON.parse(jsonMessages);
-			} else {
-				messages = [];
-			}
-			messages.push(newItem);
-			var newArray = JSON.stringify(messages);
-
-			localStorage.setItem(STORAGE_NAME, newArray);
+			fastAddToStorage(jsonItem);
 			break;
 		default:
-			console.log(getDebugMessage("Skipping saving message with type {}", newItem['action'])); // TODO stringtrify?)))
+			console.log(getDebugMessage("Skipping saving message {}", jsonItem)); // TODO stringtrify?)))
 			break;
 	}
 }
@@ -448,7 +551,7 @@ function webSocketMessage(message) {
 	handlePreparedWSMessage(data);
 
 	//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
-	saveMessageToStorage(data);
+	saveMessageToStorage(data, jsonData);
 }
 
 
