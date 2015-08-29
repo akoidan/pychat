@@ -9,19 +9,14 @@
 .color-lor .message-header-system {color: #9DD3DD;}
 .color-lor #userSendMessageTo {box-shadow: 0 2px 2px rgba(6, 3, 8, 0.77);}
 
-.wrapper {
-	height: calc(100% - 83px);
-	width: 100%;
-}
+/*#wrapper {*/
+	/*height: calc(100% - 83px); /!* leave fail handler here *!/*/
+	/*width: 100%;*/
+/*}*/
 
-@media screen and (max-height: 15em ) {
+@media screen and (max-height: 15em) {
 	nav {
 		display: none;
-	}
-
-	.wrapper {
-		height: calc(100% - 33px);
-		width: 100%;
 	}
 }
 
