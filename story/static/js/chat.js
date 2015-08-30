@@ -31,6 +31,7 @@ var isCurrentTabActive = true;
 //localStorage  key
 var STORAGE_NAME = 'main';
 var STORAGE_USER = 'user';
+var DISABLE_NAV_HEIGHT = 240;
 //current top message id for detecting from what
 var headerId;
 //  div that contains messages
@@ -98,34 +99,35 @@ onDocLoad(function () {
 
 
 function addTextAreaEvents() {
-	function delayedResize() {
-		/* 0-timeout to get the already changed text */
-		//adjustUserMessageWidth();
-		window.setTimeout(adjustUserMessageWidth, 0);
-	}
 	userMessage.addEventListener('keypress', sendMessage);
-	userMessage.addEventListener('change', adjustUserMessageWidth);
-	var events = ['cut', 'paste', 'drop', 'keydown'];
-	for (var i=0; i< events.length; i++) {
-		userMessage.addEventListener(events[i], delayedResize);
-	}
-	adjustUserMessageWidth();
-
-
-	var mql = window.matchMedia("(max-height: 15em)");
+	userMessage.addEventListener('input', function () {
+		adjustUserMessageWidth(); // pass 1st argument as null instead of Event
+	});
+	var mql = window.matchMedia(
+		"(min-height: " + DISABLE_NAV_HEIGHT + "px)" +
+		" and (max-height: " + (DISABLE_NAV_HEIGHT * 2) + "px)"
+	);
 	mql.addListener(adjustUserMessageWidth);
+	adjustUserMessageWidth(true);
 }
 
 
 function adjustUserMessageWidth(mql) {
-	if (mql != null) {
-		console.log(getDebugMessage('Running adjust TextArea For mediaQuery'));
+	var bodyRawHeight = window.getComputedStyle(document.body)['height'];
+	var bodyHeight = parseInt(bodyRawHeight.substr(0, bodyRawHeight.length - 2));
+	if (mql) { // if not an event instance
+		console.log(getDebugMessage('MediaQuery with height {} has been triggered', bodyRawHeight));
+		if (bodyHeight < DISABLE_NAV_HEIGHT) {
+			document.querySelector('nav').style.display = 'none';
+		} else {
+			document.querySelector('nav').style.display = 'block';
+		}
 	}
 	// http://stackoverflow.com/a/5346855/3872976
 	userMessage.style.height = 'auto';
 	var textAreaHeight = userMessage.scrollHeight;
-	var bodyRawHeight = window.getComputedStyle(document.body)['height'];
-	var maxHeight = parseInt(bodyRawHeight.substr(0, bodyRawHeight.length-2))/3;
+
+	var maxHeight = bodyHeight/3;
 	if (textAreaHeight > maxHeight) {
 		textAreaHeight = maxHeight; // same that on top
 	}
@@ -217,19 +219,20 @@ function sendMessage(event) {
 
 /* =============================================================== */
 
-function getWidth() {
-	if (self.innerHeight) {
-		return self.innerWidth;
-	}
-
-	if (document.documentElement && document.documentElement.clientHeight) {
-		return document.documentElement.clientWidth;
-	}
-
-	if (document.body) {
-		return document.body.clientWidth;
-	}
-}
+// todo delete this if no errors
+//function getWidth() {
+//	if (self.innerHeight) {
+//		return self.innerWidth;
+//	}
+//
+//	if (document.documentElement && document.documentElement.clientHeight) {
+//		return document.documentElement.clientWidth;
+//	}
+//
+//	if (document.body) {
+//		return document.body.clientWidth;
+//	}
+//}
 
 // TODO
 //var timezone = getCookie('timezone');
