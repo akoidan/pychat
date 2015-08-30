@@ -3,6 +3,8 @@ from subprocess import call
 
 from django.core.management import BaseCommand
 
+SMILES_DIR = "/tmp/smiles"
+
 
 class Command(BaseCommand):
 	help = 'Just loads smiles files from custon site'
@@ -14,6 +16,7 @@ class Command(BaseCommand):
 		html_file = open('/tmp/smiles.html', 'r')
 		file_content = html_file.read()
 		result_regex = re.findall(p, file_content)
-		call(["mkdir", "-p", "/tmp/smiles"])
+		call(["mkdir", "-p", SMILES_DIR])
 		for url in result_regex:
-			call(["wget", url, "-P", "/tmp/smiles"])
+			call(["wget", url, "-P", SMILES_DIR])
+		print('Saving smiles to %s' % SMILES_DIR)

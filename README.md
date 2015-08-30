@@ -44,6 +44,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
+* add antispam system
 * add WebWorker http://www.w3schools.com/html/html5_webworkers.asp to load message
 * startup loading messages in a separate thread (JS )
 * move loading messages on startup to single function? 
