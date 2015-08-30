@@ -116,11 +116,17 @@ function addTextAreaEvents() {
 }
 
 
+function extractHeight(element) {
+	var rawHeight = window.getComputedStyle(element)['height'];
+	var height = parseInt(rawHeight.substr(0, rawHeight.length - 2)) ; // remove px suffix , 1 for round up
+	return height;
+}
+
+
 function adjustUserMessageWidth(mql) {
-	var bodyRawHeight = window.getComputedStyle(document.body)['height'];
-	var bodyHeight = parseInt(bodyRawHeight.substr(0, bodyRawHeight.length - 2));
+	var bodyHeight = extractHeight(document.body);
 	if (mql) { // if not an event instance
-		console.log(getDebugMessage('MediaQuery with height {} has been triggered', bodyRawHeight));
+		console.log(getDebugMessage('MediaQuery with height {}px, has been triggered', bodyHeight));
 		if (bodyHeight < DISABLE_NAV_HEIGHT) {
 			document.querySelector('nav').style.display = 'none';
 		} else {
@@ -128,20 +134,25 @@ function adjustUserMessageWidth(mql) {
 		}
 	}
 	// http://stackoverflow.com/a/5346855/3872976
+	userMessage.style.overflow = 'hidden'; // fix Firefox big 1 row textarea
 	userMessage.style.height = 'auto';
 	var textAreaHeight = userMessage.scrollHeight;
+	userMessage.style.overflow = 'auto';
 
-	var maxHeight = bodyHeight/3;
+	var maxHeight = bodyHeight / 3;
 	if (textAreaHeight > maxHeight) {
-		textAreaHeight = maxHeight; // same that on top
+		textAreaHeight = maxHeight;
 	}
-	userMessage.style.height = (textAreaHeight - 4) + 'px'; // 5px is probably borders
+	userMessage.style.height = textAreaHeight + 1 + 'px'; // 1 in case of wrong calculations
 
 	var navH = navbarList.clientHeight;
 
-	var newHeight = textAreaHeight + navH + 12;
-	//console.log(getDebugMessage('newH {}; textAr {}, navH {} ', newHeight, textAreaHeight, navH));
-	chatBoxWrapper.style.height = 'calc(100% - ' + newHeight + 'px)';
+	// 5 is some kind of magical browser paddings
+	// 5 are padding + borders, 1 is top added height
+	var allButChatSpaceHeight = textAreaHeight + navH + 5 + 5 +1 ;
+
+	//console.log(getDebugMessage('bodyH {}; newH {}; textAr {}; navH {} ', bodyHeight, allButChatSpaceHeight, textAreaHeight, navH));
+	chatBoxWrapper.style.height = 'calc(100% - ' + allButChatSpaceHeight + 'px)';
 }
 
 

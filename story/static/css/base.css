@@ -165,6 +165,9 @@ html, body {
 textarea {
 	resize: none;
 	font-family: arial, serif;
+	border: 0 none white; /*Remove as it distorts behaviour of  adjustUserMessageWidth in Firefox */
+	padding: 0;
+	outline: none;
 }
 
 /*============== ONLY LOGIN.CSS =============*/
