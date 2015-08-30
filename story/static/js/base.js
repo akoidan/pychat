@@ -1,7 +1,7 @@
 var sound = 0;
 var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var HISTORY_STORAGE_NAME = 'history';
-var MAX_STORAGE_LENGTH = 10000;
+var MAX_STORAGE_LENGTH = 3000;
 
 var $ = function(id) {
 	return document.getElementById(id);
