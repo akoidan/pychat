@@ -148,8 +148,8 @@ function adjustUserMessageWidth(mql) {
 	var navH = navbarList.clientHeight;
 
 	// 5 is some kind of magical browser paddings
-	// 5 are padding + borders, 1 is top added height
-	var allButChatSpaceHeight = textAreaHeight + navH + 5 + 5 +1 ;
+	// 6 are padding + borders, 1 is top added height
+	var allButChatSpaceHeight = textAreaHeight + navH + 5 + 6 +1 ;
 
 	//console.log(getDebugMessage('bodyH {}; newH {}; textAr {}; navH {} ', bodyHeight, allButChatSpaceHeight, textAreaHeight, navH));
 	chatBoxWrapper.style.height = 'calc(100% - ' + allButChatSpaceHeight + 'px)';
