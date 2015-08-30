@@ -14,11 +14,6 @@
 	/*width: 100%;*/
 /*}*/
 
-@media screen and (max-height: 15em) {
-	nav {
-		display: none;
-	}
-}
 
 .fluid-inline {
 	display: inline-block;
@@ -113,4 +108,9 @@
 	.icon-pencil {
 		display: none;
 	}
+}
+
+#usermsg {
+	resize: none;
+	font-family: arial, serif;
 }
