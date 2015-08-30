@@ -1,9 +1,8 @@
 import base64
 from io import BytesIO
+import logging
 import re
 from threading import Thread
-import random
-import string
 import sys
 
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -13,10 +12,12 @@ from django.core.exceptions import ValidationError
 
 from Chat import settings
 from Chat.log_filters import id_generator
+from Chat.settings import ISSUES_REPORT_LINK
 from story.models import UserProfile
 
-
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
+
+logger = logging.getLogger(__name__)
 
 
 def is_blank(check_str):
@@ -75,23 +76,32 @@ def send_email_verification(user, site_address):
 		user.verify_code = id_generator()
 		user.save()
 		code = '/confirm_email?code=' + user.verify_code
-		text = 'Hi %s, you have registered on chat. To complete your registration click on the url bellow: http://%s%s' %\
-			(user.username, site_address, code)
+
+		text = 'Hi %s, you have registered on our %s.' \
+			'\nTo complete your registration click on the url bellow: http://%s%s .' \
+			'\n\n If you have any questions or suggestion, please post them here %s' %\
+			(user.username, site_address, site_address,  code, ISSUES_REPORT_LINK)
+
 		mail_thread = Thread(
 			target=send_mail,
 			args=("Confirm chat registration", text, site_address, [user.email]))
+		logger.info('Sending verification email to userId %s (email %s)', user.id, user.email)
 		mail_thread.start()
 
 
 def extract_photo(image_base64):
-	base64_type_data = re.search(r'data:(\w+\/(\w+));base64,(.*)$', image_base64)
+	base64_type_data = re.search(r'data:(\w+/(\w+));base64,(.*)$', image_base64)
+	logger.debug('Parsing base64 image')
 	image_data = base64_type_data.group(3)
 	file = BytesIO(base64.b64decode(image_data))
+	content_type = base64_type_data.group(1)
+	name = base64_type_data.group(2)
+	logger.debug('Base64 filename extension %s, content_type %s', name, content_type)
 	image = InMemoryUploadedFile(
 		file,
 		field_name='photo',
-		name=base64_type_data.group(2),
-		content_type=base64_type_data.group(1),
+		name=name,
+		content_type=content_type,
 		size=sys.getsizeof(file),
 		charset=None)
 	return image

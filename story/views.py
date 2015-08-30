@@ -13,7 +13,7 @@ from django.views.decorators.http import require_http_methods
 from django.http import Http404
 from django.http import HttpResponseRedirect
 
-from Chat.settings import ANONYMOUS_REDIS_ROOM, REGISTERED_REDIS_ROOM, logging
+from Chat.settings import ANONYMOUS_REDIS_ROOM, REGISTERED_REDIS_ROOM, logging, VALIDATION_IS_OK
 from story.decorators import login_required_no_redirect
 from story.models import UserProfile, Issue, Room, IssueDetails
 from story import registration_utils
@@ -86,6 +86,7 @@ def auth(request):
 		message = settings.VALIDATION_IS_OK
 	else:
 		message = 'Login or password is wrong'
+	logger.debug('Auth request %s ; Response: %s', request.POST, message)
 	response = HttpResponse(message, content_type='text/plain')
 	return response
 
@@ -98,15 +99,19 @@ def confirm_email(request):
 	code = request.GET.get('code', False)
 	try:
 		u = UserProfile.objects.get(verify_code=code)
+		logger.debug('Processing email confirm (code %s) for user %s', code, u)
 		if u.email_verified is False:
 			u.email_verified = True
 			u.save()
-			message = 'verification code is accepted'
+			message = VALIDATION_IS_OK
+			logger.info('Email verification code has been accepted')
 		else:
 			message = 'This code is already accepted'
+			logger.debug(message)
 		response = {'message': message}
 		return render_to_response('story/confirm_mail.html', response,  context_instance=RequestContext(request))
 	except UserProfile.DoesNotExist:
+		logger.debug('Rejecting verification code %s', code)
 		raise Http404
 
 
@@ -122,6 +127,7 @@ def get_register_page(request):
 def register(request):
 	try:
 		rp = request.POST
+		logger.info('Got register request %s', rp)
 		(username, password, email, verify_email) = (
 			rp.get('username'), rp.get('password'), rp.get('email'), rp.get('mailbox'))
 		check_user(username)
@@ -135,16 +141,20 @@ def register(request):
 		user.rooms.add(default_thread)
 		user.rooms.add(registered_only)
 		user.save()
-		logger.info('Signed up new user %s, subscribed for channels %s', user, user.rooms)
+		logger.info(
+			'Signed up new user %s, subscribed for channels %s, %s',
+			user, registered_only.name, default_thread.name
+		)
 		# You must call authenticate before you can call login
 		auth_user = authenticate(username=username, password=password)
 		djangologin(request, auth_user)
 		# register,js redirect if message = 'Account created'
 		message = settings.VALIDATION_IS_OK
-		if verify_email == 'Y':
+		if verify_email == 'on':
 			send_email_verification(user, request.get_host())
 	except ValidationError as e:
 		message = e.message
+		logger.debug('Rejecting request, reason: %s', message)
 	return HttpResponse(message, content_type='text/plain')
 
 
@@ -177,6 +187,7 @@ def show_profile(request, profile_id):
 @require_http_methods('POST')
 @login_required_no_redirect
 def save_profile(request):
+	logger.info('Saving profile: %s', request.POST)
 	user_profile = UserProfile.objects.get(pk=request.user.id)
 	image_base64 = request.POST.get('base64_image')
 
@@ -203,12 +214,14 @@ def report_issue(request):
 			context_instance=RequestContext(request)
 		)
 	elif request.method == 'POST':
+		logger.info('Saving issue: %s', request.POST)
 		issue, created = Issue.objects.get_or_create(content=request.POST['issue'])
 		issue_details = IssueDetails(
 			sender_id=request.user.id,
 			email=request.POST.get('email'),
 			browser=request.POST.get('browser'),
-			issue=issue
+			issue=issue,
+			log=request.POST.get('log')
 		)
 		issue_details.save()
 

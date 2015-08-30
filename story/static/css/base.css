@@ -162,6 +162,11 @@ html, body {
 	font-family: arial, serif;
 }
 
+textarea {
+	resize: none;
+	font-family: arial, serif;
+}
+
 /*============== ONLY LOGIN.CSS =============*/
 .userNameInput {
 	background: rgba(0, 0, 0, 0);

@@ -27,13 +27,14 @@ function register() {
 		return;
 	}
 	var form = $('register-form');
-	doPost('/register', form, function (data) {
+	var callback = function (data) {
 		if (data === 'ok') {
 			window.location.href = '/profile';
 		} else {
 			alert(data);
 		}
-	});
+	};
+	doPost('/register', null, callback, form);
 }
 
 
@@ -56,17 +57,18 @@ function validateUser() {
 		setError(userNameCheck, "Error: Username cannot be blank!");
 	} else if (username.length > 16) {
 		setError(userNameCheck, "Username shouldn't be longer than 16 symbols");
-	} else if (!userRegex.test(username)) {
+	} else if (!USER_REGEX.test(username)) {
 		setError(userNameCheck, "only letters, numbers and underscores!");
 	} else {
-		doPost('/validate_user', {username: username}, function (data) {
+		var callback = function (data) {
 			// hardcoded ok
 			if (data === 'ok') {
 				setSuccess(userNameCheck);
 			} else {
 				setError(userNameCheck, data)
 			}
-		});
+		};
+		doPost('/validate_user', {username: username}, callback, null);
 	}
 }
 
@@ -82,7 +84,7 @@ function setSuccess(element) {
 
 	function validateEmail() {
 		var mail = email.value;
-		doPost('/validate_email', {email: mail} , function (data) {
+		var callback = function (data) {
 			if (data === 'ok') {
 				setSuccess(emailCheck);
 			} else {
@@ -91,7 +93,8 @@ function setSuccess(element) {
 					emailCheck.style.color = "";
 				}
 			}
-		});
+		};
+		doPost('/validate_email', {email: mail} , callback, null);
 	}
 
 

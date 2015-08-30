@@ -1,11 +1,12 @@
 function login() {
-	doPost('/auth', $('loginForm'), function (data) {
+	var callback = function (data) {
 		if (data === 'ok') {
 			window.location.href = '/';
 		} else {
 			alert(data);
 		}
-	});
+	};
+	doPost('/auth', null, callback, $('loginForm'));
 }
 function showLoginDropdown(e) {
 	$("hideableDropDown").style.display = 'block';
@@ -41,7 +42,7 @@ onDocLoad(function () {
 			var newUsername = input.value;
 			input.remove();
 			label.style.display = 'inline';
-			if (!userRegex.test(newUsername)) {
+			if (!USER_REGEX.test(newUsername)) {
 				alert('Wrong username, only letters, -_');
 				label.textContent =oldUsername;
 			} else  if (newUsername !== oldUsername) {

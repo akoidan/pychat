@@ -223,6 +223,8 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'chat.django@gmail.com'
 EMAIL_HOST_PASSWORD = 'Ilovepython'
 
+ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/djangochat/issues/new'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 
 MEDIA_URL = "/photo/"

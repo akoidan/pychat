@@ -457,7 +457,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				else:
 					self.logger.debug('!! User is still online in other tabs')
 			else:
-				self.logger.warning('Dropping connection for not connected user yet')
+				self.logger.warning('Dropping connection for not connected user')
 		finally:
 			if self.async_redis.subscribed:
 				#  TODO unsubscribe of all subscribed                  !IMPORTANT

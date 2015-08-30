@@ -111,6 +111,7 @@ class IssueDetails(models.Model):
 	browser = models.CharField(null=False, max_length=32)
 	time = models.TimeField(default=datetime.datetime.now, blank=True)
 	issue = models.ForeignKey(Issue, related_name='issue')
+	log = models.TextField(null=True)
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((UserProfile._meta.app_label, '_issue_detail'))
