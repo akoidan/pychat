@@ -28,6 +28,9 @@
 	word-wrap: break-word;
 	margin-right: 2px; /*shift scrollbar from right side*/
 }
+#chatbox a:hover{
+	text-decoration: underline;
+}
 
 #chat-room-users-wrapper {
 	float: right;

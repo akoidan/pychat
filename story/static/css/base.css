@@ -38,6 +38,14 @@
 	box-shadow: 0 0 10px #55585b;
 	color: #dddddd;
 }
+.color-lor :link {
+	color: #729fcf;
+}
+
+.color-lor :visited {
+	color: #7572CF;
+}
+
 /*-----------INPUT BUTTON -----------*/
 .color-lor input[type=button]:hover,
 .color-lor input[type=submit]:hover {
