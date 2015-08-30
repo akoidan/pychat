@@ -219,6 +219,7 @@ LOGGING = {
 import logging.config
 logging.config.dictConfig(LOGGING)
 
+ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/djangochat/issues/new'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 

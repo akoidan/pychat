@@ -2,9 +2,9 @@
 {% block head %}
 	{% load staticfiles %}
 	<script type="text/javascript">
-		var a = "{{message}}"
-		if (a == 'verification code is accepted') {
-			alert(a);
+		var a = "{{message}}";
+		if (a == 'ok' ) {
+			alert('verification code is accepted');
 			redirectTime = "3000";
 			redirectURL = "/";
 			setTimeout("location.href = redirectURL;", redirectTime);
@@ -24,7 +24,7 @@
 {% endblock head %}
 
 {% block content %}
-	{% if message == "verification code is accepted" %}
+	{% if message == "ok" %}
 		<div class="message">
 			You're redirected to the main page now!
 		</div>

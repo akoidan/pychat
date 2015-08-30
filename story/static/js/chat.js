@@ -62,6 +62,10 @@ var ws;
 var isWsConnected; // used for debugging info only
 var chatUserRoomWrapper; // for hiddding users
 
+window.onerror = function (msg, url, linenumber) {
+	alert('Error message: ' + msg + '\nURL: ' + url + '\nLine Number: ' + linenumber);
+	return true;
+};
 
 onDocLoad(function () {
 	//	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -213,6 +217,7 @@ function sendMessage(event) {
 		var sendSuccessful = sendToServer(messageRequest);
 		if (sendSuccessful) {
 			userMessage.value = "";
+			adjustUserMessageWidth();
 		}
 	}
 }

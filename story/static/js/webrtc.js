@@ -77,10 +77,12 @@ function startCapturingVideo(button) {
 function saveProfile() {
 	var form = document.querySelector('form');
 	var image = null;
+	var params = null;
 	if (snapshot) {
 		image = canvas.toDataURL("image/png");
+		params = {base64_image: image};
 	}
-	doPost('/save_profile', form, alert, image);
+	doPost('/save_profile', params, alert, form);
 }
 
 
