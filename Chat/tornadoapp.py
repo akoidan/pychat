@@ -1,4 +1,5 @@
 import datetime
+import time
 import json
 import logging
 import sys
@@ -298,7 +299,6 @@ class MessagesHandler(MessagesCreator):
 			self.safe_write(rooms_message)
 			return channels
 
-
 	def publish(self, message, channel=ANONYMOUS_REDIS_CHANNEL):
 		jsoned_mess = json.dumps(message)
 		self.logger.debug('<%s> %s', channel, jsoned_mess)
@@ -318,7 +318,6 @@ class MessagesHandler(MessagesCreator):
 		if type(message.body) is not int:  # subscribe event
 			self.safe_write(message.body)
 			self.check_and_finish_change_name(message.body)
-
 
 	def safe_write(self, message):
 		raise NotImplementedError('WebSocketHandler implements')
@@ -411,11 +410,33 @@ class MessagesHandler(MessagesCreator):
 		self.safe_write(response)
 
 
+class AntiSpam:
+
+	def __init__(self):
+		self.spammed = 0
+		self.info = {}
+
+	def check_spam(self, json_message):
+		message_length = len(json_message)
+		info_key = int(round(time.time() * 100))
+		self.info[info_key] = message_length
+		if message_length > MAX_MESSAGE_SIZE:
+			self.spammed += 1
+			raise ValidationError("Message can't exceed %s symbols" % MAX_MESSAGE_SIZE)
+		self.check_timed_spam()
+
+	def check_timed_spam(self):
+		# TODO implement me
+		pass
+		# raise ValidationError("You're chatting too much, calm down a bit!")
+
+
 class TornadoHandler(WebSocketHandler, MessagesHandler):
 
 	def __init__(self, *args, **kwargs):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
 		self.connected = False
+		self.anti_spam = AntiSpam()
 
 	@tornado.gen.engine
 	def listen(self, channels):
@@ -430,16 +451,18 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		pass
 
 	def on_message(self, json_message):
-		if not self.connected:
-			self.logger.warning('Skipping message %s, as websocket is not initialized yet', json_message)
-		elif not json_message:
-			self.logger.warning('Skipping null message')
-		elif len(json_message) > MAX_MESSAGE_SIZE:
-			self.logger.warning('Skipping message, as its too long (%d) %s', len(json_message), json_message[:50])
-		else:
+		try:
+			if not self.connected:
+				raise ValidationError('Skipping message %s, as websocket is not initialized yet' % json_message)
+			if not json_message:
+				raise ValidationError('Skipping null message')
+			self.anti_spam.check_spam(json_message)
 			self.logger.debug('<< %s', json_message)
 			message = json.loads(json_message)
 			self.process_message[message[EVENT_VAR_NAME]](message)
+		except ValidationError as e:
+			logger.warning("Message won't be send. Reason: %s", e.message)
+			self.safe_write(self.default(e.message))
 
 	def on_close(self):
 		try:
