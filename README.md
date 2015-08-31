@@ -37,10 +37,9 @@ Start the chat:
  2. Start the WebSocket listener: `service tornado start`
 
 TODO
-* add logger
-* add WebWorker
 * allow new line in messages http://www.w3schools.com/html/html5_webworkers.asp to load message
 * clicable links in messages
+* add WebWorker http://www.w3schools.com/html/html5_webworkers.asp to load message
 * startup loading messages in a separate thread (JS )
 * move loading messages on startup to single function? 
 * add antiflood settings to nginx

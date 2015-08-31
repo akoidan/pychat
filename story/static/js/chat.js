@@ -339,8 +339,10 @@ function start_chat_ws() {
 
 
 function encodeHTML(html) {
-	var innerHTML = document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
-	return innerHTML.replace(/\n/g, '<br>');
+	var htmlEncoded = document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
+	var replaceNewLine = htmlEncoded.replace(/\n/g, '<br>');
+	var replaceLinks = replaceNewLine.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1">$1</a>');
+	return replaceLinks;
 }
 
 
