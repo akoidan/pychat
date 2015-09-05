@@ -124,7 +124,8 @@
 #smileParentHolder {
 	position: absolute;
 	right: 5px;
-	border-radius: 5px;
+	border: 1px #775E39 solid;
+	border-radius: 10px;
 	width: 50%;
 	background-color:rgba(34, 31, 31, 0.86);
 }
@@ -155,6 +156,7 @@
 
 #tabNames > li {
 	display: inline;
+	padding-left: 10px;
 	padding-right: 10px;
 }
 
