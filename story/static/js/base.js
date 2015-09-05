@@ -145,6 +145,9 @@ function doPost(url, params, callback, form) {
 			}
 		}
 	}
+	if (url == "") { 
+		url = window.location.href ; // f*cking IE
+	}
 	r.open("POST", url, true);
 	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
 	console.log(getDebugMessage("POST {} out: {}", url, params));
