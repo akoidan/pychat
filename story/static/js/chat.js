@@ -106,11 +106,11 @@ onDocLoad(function () {
 	window.addEventListener("blur", changeTittleFunction);
 	window.addEventListener("focus", changeTittleFunction);
 	$('tabNames').addEventListener('click', showTabByName);
-	loadMessagesFromLocalStorage();
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	isWsConnected = true;
 	start_chat_ws();
 	addTextAreaEvents();
+	//bottom call loadMessagesFromLocalStorage(); s
 	doGet(SMILEY_URL + 'info.json', loadSmileys);
 });
 
@@ -181,6 +181,7 @@ function loadSmileys(jsonData) {
 			}
 		}
 	}
+	loadMessagesFromLocalStorage();
 }
 
 
