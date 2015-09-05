@@ -243,7 +243,7 @@ textarea {
 }
 
 /*============== FONTELLO SETTINGS =================*/
-.navbar-default [class^='icon-'] {
+nav [class^='icon-'] {
 	margin: 2px;
 }
 [class^='icon-']:not([class='icon-anonymous']):hover { cursor: pointer;}
@@ -260,7 +260,7 @@ textarea {
 
 /*=============== BROWSER SPECIFIC ================ */
 /*Remove annoying chromium autofill yellow background*/
-.navbar-default {
+.noSelection {
 	-webkit-touch-callout: none;
 	-webkit-user-select: none;
 	-khtml-user-select: none;

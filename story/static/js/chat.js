@@ -192,7 +192,8 @@ function addSmile(event) {
 		return;
 	}
 	userMessage.value += smileImg.alt;
-	console.log(getDebugMessage('Added smile "{}"', smileImg.alt))
+	console.log(getDebugMessage('Added smile "{}"', smileImg.alt));
+	adjustUserMessageWidth();
 }
 
 
