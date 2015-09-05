@@ -281,8 +281,11 @@ function userClick(event) {
 	event = event || window.event;
 	var target = event.target || event.srcElement;
 	destinationUserName = target.innerHTML;
-	destinationUserId = parseInt(target.attributes.name.value);
-	showUserSendMess(destinationUserName);
+	if (target.attributes.name != null) {
+		// icon click
+		destinationUserId = parseInt(target.attributes.name.value);
+		showUserSendMess(destinationUserName);
+	}
 }
 
 
@@ -437,13 +440,11 @@ function encodeHTML(html) {
 	var htmlEncoded = document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
 	var replacedNewLine = htmlEncoded.replace(/\n/g, '<br>');
 	var replacedLinks = replacedNewLine.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1">$1</a>');
-	if (smileyDict) {
-		for (var el in smileyDict) {
-			if (smileyDict.hasOwnProperty(el)) {
-				// replace all occurences
-				// instead of replace that could generates infinitive loop
-				replacedLinks = replacedLinks.split(el).join(smileyDict[el]);
-			}
+	for (var el in smileyDict) {
+		if (smileyDict.hasOwnProperty(el)) {
+			// replace all occurences
+			// instead of replace that could generates infinitive loop
+			replacedLinks = replacedLinks.split(el).join(smileyDict[el]);
 		}
 	}
 	return replacedLinks;
