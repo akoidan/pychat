@@ -175,7 +175,10 @@ function doGet(fileUrl, callback) {
 				break;
 			case 'json':
 				var xobj = new XMLHttpRequest();
-				xobj.overrideMimeType("application/json");
+				// special for IE 
+				if (xobj.overrideMimeType) {
+					xobj.overrideMimeType("application/json");
+				}
 				xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
 				xobj.onreadystatechange = function () {
 					if (xobj.readyState == 4 && xobj.status == "200") {
