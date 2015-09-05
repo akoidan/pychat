@@ -147,7 +147,7 @@
 
 
 #chatbox img {
-	margin-top: -8px;
+	margin-top: -15px; /* remove smileys margins */
 }
 
 #tabNames {
