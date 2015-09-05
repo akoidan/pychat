@@ -44,6 +44,8 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
+* add multipart smileys
+* add canvas images 
 * add antispam system
 * add http://www.amcharts.com/download/ to chart spam or user statistic info
 * add WebWorker http://www.w3schools.com/html/html5_webworkers.asp to load message
