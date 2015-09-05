@@ -54,6 +54,7 @@
 #userSendMessageTo {
 	/*sets also in chat.js on username click*/
 	justify-content: center;
+	display: inline-block;
 	vertical-align: middle;
 	align-content: center;
 	align-items: center;
@@ -112,4 +113,55 @@
 	.icon-pencil {
 		display: none;
 	}
+}
+
+@media screen and (max-height: 300px), screen and (max-width: 600px){
+	#smileParentHolder {
+		width: 97% !important;
+	}
+}
+
+#smileParentHolder {
+	position: absolute;
+	right: 5px;
+	border-radius: 5px;
+	width: 50%;
+	background-color:rgba(34, 31, 31, 0.86);
+}
+
+#smileParentHolder img {
+	cursor: pointer;
+}
+
+
+#smileToogler {
+	display: inline-block;
+	float: right;
+	padding-right: 5px;
+	bottom: 5px;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+
+#chatbox img {
+	margin-top: -8px;
+}
+
+#tabNames {
+	margin: 0;
+	list-style-type: none;
+}
+
+
+#tabNames > li {
+	display: inline;
+	padding-right: 5px;
+}
+
+#tabNames > li:hover {
+	cursor: pointer;
+	text-decoration: underline;
 }

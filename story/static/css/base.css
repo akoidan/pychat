@@ -153,6 +153,10 @@ nav {
 	float:right;
 }
 
+.hidden {
+	display: none !important;
+}
+
 #navbarList {
 	margin: 0;
 	padding: 10px 4px 9px 10px;
@@ -200,7 +204,6 @@ textarea {
 
 #hideableDropDown {
 	position: absolute;
-	display: none;
 	float: left;
 	right: 5px;
 	border: 1px solid;

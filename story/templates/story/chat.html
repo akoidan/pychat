@@ -5,7 +5,7 @@
 {% endblock head %}
 {% block navbar %}
 	<li><i title="Show all users"
-			 onclick="toggleRoom()" class="icon-users"><span class="mText">users</span></i></li>
+			 onclick="toogleVisibility(chatUserRoomWrapper)" class="icon-users"><span class="mText">users</span></i></li>
 	<li><i class="icon-clear" title="CLear local history"
 			 onclick="clearLocalHistory()"><span class="mText">clear</span></i></li>
 {% endblock navbar %}
@@ -35,7 +35,11 @@
 				</div>
 			</div>
 		</div>
-		<div>
+		<div id="bottomWrapper">
+			<i class="icon-emo-happy" id="smileToogler" title="report an issue"></i>
+			<div id="smileParentHolder" onclick="addSmile(event);" class="padding10">
+				<ul id="tabNames"></ul>
+			</div>
 			<div id="userSendMessageTo">
 				<div id="receiverId"></div>
 				<i class="icon-cancel" onclick="hideUserSendToName();"></i>

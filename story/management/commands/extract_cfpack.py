@@ -1,4 +1,5 @@
 import json
+import re
 
 __author__ = 'bomzhe'
 # cfpack stealer cfpack_st101.zip
@@ -16,16 +17,17 @@ class Command(BaseCommand):
 		super().__init__()
 		self.pack_path = sys.argv[2]
 		gif_dir_name = os.path.basename(self.pack_path).split('.')[0]
-		self.parent_dir = os.path.dirname(sys.argv[0])
-		self.gif_dir_path = os.sep.join((self.parent_dir, gif_dir_name))
+		parent_dir = os.path.dirname(sys.argv[0])
+		self.gif_dir_path = os.sep.join((parent_dir, gif_dir_name))
 		self.ext = {
 			b'\x47\x49': 'gif',
 			b'\xff\xd8': 'jpg',
 			b'\x89\x50': 'png',
 			b'\x42\x4d': 'bmp'
 		}
+		self.smiley_pattern = re.compile(r'^:.*:$')
 
-	help = 'Extracts files from Commfort chart cfpack'
+	help = 'Extracts files from Commfort chat cfpack'
 	args = 'file_self.path'
 
 	can_import_settings = False
@@ -35,7 +37,6 @@ class Command(BaseCommand):
 
 		print('\nCFPack Stealer 1.01\n')
 
-		#   self.path = r'd:\Progs\CommFort\DefaultSmilies.cfpack'
 		if not os.path.exists(self.pack_path):
 			raise FileNotFoundError("cfpack file <<%s>> doesn't exist" % self.pack_path)
 		info = self.extract_file()
@@ -71,13 +72,17 @@ class Command(BaseCommand):
 				data = f.read(size)
 				file_ext = self.ext.get(data[:2], '')
 				file_name = '{0:04x}.{1}'.format(item, file_ext)
-				gif_file_path = os.sep.join((self.gif_dir_path, cats[cat_cur], file_name))
-				smileys[alias] = [cats[cat_cur], file_name]
+				tab = cats[cat_cur]
+				gif_file_path = os.sep.join((self.gif_dir_path, tab, file_name))
+				smileys.setdefault(tab, {})
+				if not self.smiley_pattern.match(alias):
+					alias = ":%s:" % alias
+				smileys[tab][alias] = file_name
 				with open(gif_file_path, 'wb') as gif:
 					gif.write(data)
 		return smileys
 
 	def create_json_info(self, info):
-		info_file_name = os.sep.join((self.parent_dir, 'smileysInfo.json'))
+		info_file_name = os.sep.join((self.gif_dir_path , 'info.json'))
 		with open(info_file_name, 'w', encoding='utf-8') as f:
 			f.write(json.dumps(info))

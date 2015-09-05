@@ -6,6 +6,8 @@ if (!("WebSocket" in window)) {
 }
 var CONNECTION_RETRY_TIME = 5000;
 
+var SMILEY_URL = '/static/smileys/'
+
 var selfHeader = '<span class="message-header-self">';
 var privateHeader = '<span class="message-header-private">';
 var othersHeader = '<span class="message-header-others">';
@@ -37,7 +39,12 @@ var headerId;
 //  div that contains messages
 var chatBoxDiv;
 var navbarList;
+var navbar;
+var smileToogler;
 var chatBoxWrapper;
+var smileParentHolder;
+var smileyDict = {};
+var tabNames = [];
 //sound
 var chatIncoming;
 var chatOutgoing;
@@ -82,24 +89,110 @@ onDocLoad(function () {
 	chatLogin = $("chatLogin");
 	chatLogout = $("chatLogout");
 	sendButton = $("sendButton");
-	userSendMessageTo.style.display = "none";
+	smileParentHolder =  $('smileParentHolder');
+	navbar = document.querySelector('nav');
 	receiverId = $("receiverId");
 	charRooms = $("rooms");
 	navbarList = $('navbarList');
 	chatBoxWrapper = $('wrapper');
-
+	smileToogler = $('smileToogler');
+	hideElement(userSendMessageTo);
+	hideElement(smileParentHolder);
+	addSmileysEvents();
 	chatUsersTable.addEventListener("click", userClick);
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);  //TODO doesn't work in chromium for div
 	window.addEventListener("blur", changeTittleFunction);
 	window.addEventListener("focus", changeTittleFunction);
+	$('tabNames').addEventListener('click', showTabByName);
 	loadMessagesFromLocalStorage();
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	isWsConnected = true;
 	start_chat_ws();
 	addTextAreaEvents();
+	doGet(SMILEY_URL + 'info.json', loadSmileys);
 });
+
+
+function addSmileysEvents() {
+	document.addEventListener("click", function (event) {
+		event = event || window.event;
+		var level = 0;
+		for (var element = event.target; element; element = element.parentNode) {
+			if (element.id === "bottomWrapper" || element.id === smileParentHolder.id) {
+				userMessage.focus();
+				return;
+			}
+			level++;
+		}
+		hideElement(smileParentHolder);
+	});
+	smileToogler.addEventListener('click', function (event) {
+		event.stopPropagation(); // prevent top event
+		toogleVisibility(smileParentHolder);
+	});
+}
+
+function showTabByName(event) {
+	if (event.target.tagName !== 'LI') {
+		// outer scope click
+		return;
+	}
+	var tabName = "tab-" + event.target.innerHTML;
+	for (var i = 0; i < tabNames.length; i++) {
+		hideElement($(tabNames[i]));
+	}
+	showElement($(tabName));
+}
+
+function loadSmileys(jsonData) {
+	var smileyData = JSON.parse(jsonData);
+	var index = 0;
+	for (var tab in smileyData) {
+		if (smileyData.hasOwnProperty(tab)) {
+			var tabRef = document.createElement('div');
+			tabRef.setAttribute("name", tab);
+			var tabName = document.createElement("LI");
+			var textNode = document.createTextNode(tab);
+			tabName.appendChild(textNode);
+			$("tabNames").appendChild(tabName);
+			var currentSmileyHolderId = "tab-" + tab;
+			tabRef.setAttribute("id", currentSmileyHolderId);
+			tabNames.push(currentSmileyHolderId);
+			smileParentHolder.appendChild(tabRef);
+
+			if (index != 0) {
+				hideElement(tabRef); // hide all but 1st tab
+			}
+			index++;
+
+			var tabSmileys = smileyData[tab];
+			for (var smile in tabSmileys) {
+				if (tabSmileys.hasOwnProperty(smile)) {
+					var fileRef = document.createElement('IMG');
+					var fullSmileyUrl = SMILEY_URL + tab + '/' + tabSmileys[smile];
+					fileRef.setAttribute("src", fullSmileyUrl);
+					fileRef.setAttribute("alt", smile);
+					 tabRef.appendChild(fileRef);
+					// http://stackoverflow.com/a/1750860/3872976
+					smileyDict[smile] = fileRef.outerHTML;
+				}
+			}
+		}
+	}
+}
+
+
+function addSmile(event) {
+	event = event || window.event;
+	var smileImg = event.target;
+	if (smileImg.tagName !== 'IMG') {
+		return;
+	}
+	userMessage.value += smileImg.alt;
+	console.log(getDebugMessage('Added smile "{}"', smileImg.alt))
+}
 
 
 function addTextAreaEvents() {
@@ -128,9 +221,9 @@ function adjustUserMessageWidth(mql) {
 	if (mql) { // if not an event instance
 		console.log(getDebugMessage('MediaQuery with height {}px, has been triggered', bodyHeight));
 		if (bodyHeight < DISABLE_NAV_HEIGHT) {
-			document.querySelector('nav').style.display = 'none';
+			hideElement(navbar);
 		} else {
-			document.querySelector('nav').style.display = 'block';
+			showElement(navbar);
 		}
 	}
 	// http://stackoverflow.com/a/5346855/3872976
@@ -148,11 +241,12 @@ function adjustUserMessageWidth(mql) {
 	var navH = navbarList.clientHeight;
 
 	// 5 is some kind of magical browser paddings
-	// 6 are padding + borders, 1 is top added height
-	var allButChatSpaceHeight = textAreaHeight + navH + 5 + 6 +1 ;
+	// 8 are padding + borders, 1 is top added height
+	var allButChatSpaceHeight = textAreaHeight + navH + 5 + 8 +1 ;
 
 	//console.log(getDebugMessage('bodyH {}; newH {}; textAr {}; navH {} ', bodyHeight, allButChatSpaceHeight, textAreaHeight, navH));
 	chatBoxWrapper.style.height = 'calc(100% - ' + allButChatSpaceHeight + 'px)';
+	smileParentHolder.style.bottom = textAreaHeight + 14 + 'px';
 }
 
 
@@ -340,9 +434,18 @@ function start_chat_ws() {
 
 function encodeHTML(html) {
 	var htmlEncoded = document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
-	var replaceNewLine = htmlEncoded.replace(/\n/g, '<br>');
-	var replaceLinks = replaceNewLine.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1">$1</a>');
-	return replaceLinks;
+	var replacedNewLine = htmlEncoded.replace(/\n/g, '<br>');
+	var replacedLinks = replacedNewLine.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1">$1</a>');
+	if (smileyDict) {
+		for (var el in smileyDict) {
+			if (smileyDict.hasOwnProperty(el)) {
+				// replace all occurences
+				// instead of replace that could generates infinitive loop
+				replacedLinks = replacedLinks.split(el).join(smileyDict[el]);
+			}
+		}
+	}
+	return replacedLinks;
 }
 
 
@@ -375,9 +478,10 @@ function loadUsers(usernames) {
 
 // Used by {@link loadUsers}
 function showUserSendMess(username) {
-
+	showElement(userSendMessageTo);
 	// Empty sets display to none
-	userSendMessageTo.style.display = "inline-block";
+
+	//userSendMessageTo.style.display = "inline-block";
 	receiverId.innerHTML = username;
 }
 
@@ -601,15 +705,6 @@ function loadUpHistory(count) {
 }
 
 
-function toggleRoom() {
-	if (chatUserRoomWrapper.style.display == 'none' ) {
-		chatUserRoomWrapper.style.display = 'block';
-	} else {
-		chatUserRoomWrapper.style.display = 'none';
-	}
-}
-
-
 // OH man be carefull with this method, it should reinit history
 function clearLocalHistory() {
 	headerId = null;
@@ -625,5 +720,5 @@ function clearLocalHistory() {
 function hideUserSendToName() {
 	destinationUserId = null;
 	destinationUserName = null;
-	userSendMessageTo.style.display = 'none';
+	hideElement(userSendMessageTo);
 }

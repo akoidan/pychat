@@ -98,6 +98,7 @@ class Message(models.Model):
 	time = models.TimeField(default=datetime.datetime.now)
 	content = models.TextField()
 	id = models.AutoField(primary_key=True)
+	is_raw = models.BooleanField(default=True, null=False)
 	receiver = models.ForeignKey(UserProfile, null=True, related_name='receiver')
 
 

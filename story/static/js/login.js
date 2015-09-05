@@ -1,3 +1,7 @@
+onDocLoad(function(){
+	hideElement($("hideableDropDown"));
+});
+
 function login() {
 	var callback = function (data) {
 		if (data === 'ok') {
@@ -9,14 +13,14 @@ function login() {
 	doPost('/auth', null, callback, $('loginForm'));
 }
 function showLoginDropdown(e) {
-	$("hideableDropDown").style.display = 'block';
+	showElement($("hideableDropDown"));
 	e.stopPropagation();
 }
 
 onDocLoad(function () {
 
 	document.addEventListener("click", function () {
-		$("hideableDropDown").style.display = 'none';
+		hideElement($("hideableDropDown"));
 	});
 
 	//Handles menu drop down
@@ -33,7 +37,7 @@ onDocLoad(function () {
 	};
 
 	var editUserName = function (label) {
-		label.style.display = 'none';
+		hideElement(label);
 		var oldUsername = label.textContent;
 		label.insertAdjacentHTML('afterend', "<input type='text' id='inputName' maxlength='16' class='userNameInput' value='" + oldUsername + "' />");
 		var input = $('inputName');
@@ -41,7 +45,7 @@ onDocLoad(function () {
 		var sendChangeNickname = function (event) {
 			var newUsername = input.value;
 			input.remove();
-			label.style.display = 'inline';
+			showElement(label);
 			if (!USER_REGEX.test(newUsername)) {
 				alert('Wrong username, only letters, -_');
 				label.textContent =oldUsername;

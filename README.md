@@ -44,6 +44,8 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
+* refactor set class name for css instead of settings css
+* change raw innerHtml to node.appendChild
 * add multipart smileys
 * add canvas images 
 * add antispam system
