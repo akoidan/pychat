@@ -211,21 +211,30 @@ function saveLogToStorage(result) {
 	localStorage.setItem(HISTORY_STORAGE_NAME, newStorage);
 }
 
-function hideElement(element) {
+
+function hideElement(element, className) {
+	if (className == null) {
+		className = 'hidden';
+	}
 	if (element.className == null) {
 		element.className = '';
 	}
-	if (element.className.indexOf('hidden') < 0) {
-		element.className += " hidden";
+	if (element.className.indexOf(className) < 0) {
+		element.className += " " + className;
 	}
 }
 
-function showElement(element) {
+
+function showElement(element, className) {
+	if (className == null) {
+		className = 'hidden';
+	}
 	if (element.className == null) {
 		return;
 	}
-	element.className = element.className.replace('hidden', '');
+	element.className = element.className.replace(className, '');
 }
+
 
 function toogleVisibility(element) {
 	if (element.className == null) {
@@ -237,6 +246,7 @@ function toogleVisibility(element) {
 		hideElement(element)
 	}
 }
+
 
 /**
  *
