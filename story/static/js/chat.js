@@ -135,17 +135,22 @@ function addSmileysEvents() {
 }
 
 function showTabByName(event) {
-	if (event.target.tagName !== 'LI') {
-		// outer scope click
-		return;
+	if (event.target != null) {
+		if (event.target.tagName !== 'LI') {
+			// outer scope click
+			return;
+		}
 	}
-	var tabName = "tab-" + event.target.innerHTML;
+	var tagName = event.target == null ? event : event.target.innerHTML;
 	for (var i = 0; i < tabNames.length; i++) {
-		hideElement($(tabNames[i]));
+		hideElement($("tab-"+tabNames[i])); // loadSmileys currentSmileyHolderId
+		showElement($("tab-name-"+tabNames[i]), 'activeTab');
 	}
-	showElement($(tabName));
+	showElement($("tab-" + tagName));
+	hideElement($("tab-name-" + tagName), 'activeTab');
 }
 
+// TODO refactor this, it's hard to read
 function loadSmileys(jsonData) {
 	var smileyData = JSON.parse(jsonData);
 	var index = 0;
@@ -154,18 +159,14 @@ function loadSmileys(jsonData) {
 			var tabRef = document.createElement('div');
 			tabRef.setAttribute("name", tab);
 			var tabName = document.createElement("LI");
+			tabName.setAttribute("id", "tab-name-" + tab);
 			var textNode = document.createTextNode(tab);
 			tabName.appendChild(textNode);
 			$("tabNames").appendChild(tabName);
 			var currentSmileyHolderId = "tab-" + tab;
 			tabRef.setAttribute("id", currentSmileyHolderId);
-			tabNames.push(currentSmileyHolderId);
+			tabNames.push(tab);
 			smileParentHolder.appendChild(tabRef);
-
-			if (index != 0) {
-				hideElement(tabRef); // hide all but 1st tab
-			}
-			index++;
 
 			var tabSmileys = smileyData[tab];
 			for (var smile in tabSmileys) {
@@ -181,6 +182,9 @@ function loadSmileys(jsonData) {
 			}
 		}
 	}
+
+	showTabByName(Object.keys(smileyData)[0]);
+
 	loadMessagesFromLocalStorage();
 }
 

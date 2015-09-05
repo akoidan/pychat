@@ -117,7 +117,7 @@
 
 @media screen and (max-height: 300px), screen and (max-width: 600px){
 	#smileParentHolder {
-		width: 97% !important;
+		width: 95% !important;
 	}
 }
 
@@ -144,6 +144,7 @@
 
 #chatbox img {
 	margin-top: -15px; /* remove smileys margins */
+	background-color: rgba(255, 255, 255, 0); /*remove background if someones copies smile */
 }
 
 #tabNames {
@@ -154,10 +155,14 @@
 
 #tabNames > li {
 	display: inline;
-	padding-right: 5px;
+	padding-right: 10px;
 }
 
 #tabNames > li:hover {
 	cursor: pointer;
 	text-decoration: underline;
+}
+
+.activeTab {
+	color: #fcaf3e ;
 }
