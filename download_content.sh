@@ -1,5 +1,7 @@
 #!/bin/bash
 
+CONF_VERSION = '1d66cd9185dfb2d88f8e3d386e08be1968fa476d'
+
 # defining the project structure
 PROJECT_ROOT=`pwd`
 TMP_DIR="/tmp/loaded_content"
@@ -44,7 +46,7 @@ fi
 cd $PROJECT_ROOT
 
 git clone https://github.com/Deathangel908/djangochat-config $TMP_DIR/chatconf
-git --git-dir=$TMP_DIR/chatconf/.git --work-tree=$TMP_DIR/chatconf/  checkout bd955eb579b56e97c9011df6eb68a1c623374dd5
+git --git-dir=$TMP_DIR/chatconf/.git --work-tree=$TMP_DIR/chatconf/ checkout $CONF_VERSION
 cp -r $TMP_DIR/chatconf/static $STATIC_PARENT
 
 # datepicker

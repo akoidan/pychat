@@ -133,7 +133,6 @@ function doPost(url, params, callback, form) {
 		}
 	};
 	var data;
-	var debugOutData;
 	if (form != null) {
 		data = new FormData(form);
 	} else {
@@ -148,8 +147,53 @@ function doPost(url, params, callback, form) {
 	}
 	r.open("POST", url, true);
 	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
-	console.log(getDebugMessage("POST {} out: {}", url, debugOutData));
+	console.log(getDebugMessage("POST {} out: {}", url, params));
 	r.send(data);
+}
+
+
+/**
+ * Loads file from server on runtime */
+function doGet(fileUrl, callback) {
+	// TODO load doesn't work in IE for pikaday
+	var fileTypeRegex = /\w+$/;
+	var typeRegRes = fileTypeRegex.exec(fileUrl);
+	if (typeRegRes != null) {
+		var fileType = typeRegRes[0];
+		var fileRef = null;
+		switch (fileType) {
+			case 'js':
+				fileRef = document.createElement('script');
+				fileRef.setAttribute("type", "text/javascript");
+				fileRef.setAttribute("src", fileUrl);
+				break;
+			case 'css':
+				fileRef = document.createElement("link");
+				fileRef.setAttribute("rel", "stylesheet");
+				fileRef.setAttribute("type", "text/css");
+				fileRef.setAttribute("href", fileUrl);
+				break;
+			case 'json':
+				var xobj = new XMLHttpRequest();
+				xobj.overrideMimeType("application/json");
+				xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
+				xobj.onreadystatechange = function () {
+					if (xobj.readyState == 4 && xobj.status == "200") {
+						callback(xobj.responseText);
+					}
+				};
+				xobj.send(null);
+				break;
+			default:
+				console.error(getDebugMessage('Unknown type of style {}', fileType))
+		}
+		if (fileRef) {
+			document.getElementsByTagName("head")[0].appendChild(fileRef);
+			fileRef.onload = callback;
+		}
+	} else {
+		console.error(getDebugMessage('File type regex failed for filename "{}"', fileUrl));
+	}
 }
 
 
@@ -165,6 +209,33 @@ function saveLogToStorage(result) {
 		newStorage = storageInfo + ';;;' + result;
 	}
 	localStorage.setItem(HISTORY_STORAGE_NAME, newStorage);
+}
+
+function hideElement(element) {
+	if (element.className == null) {
+		element.className = '';
+	}
+	if (element.className.indexOf('hidden') < 0) {
+		element.className += " hidden";
+	}
+}
+
+function showElement(element) {
+	if (element.className == null) {
+		return;
+	}
+	element.className = element.className.replace('hidden', '');
+}
+
+function toogleVisibility(element) {
+	if (element.className == null) {
+		element.className = '';
+	}
+	if (element.className.indexOf('hidden') > -1) {
+		showElement(element);
+	} else {
+		hideElement(element)
+	}
 }
 
 /**

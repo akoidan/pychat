@@ -7,10 +7,10 @@ var isStopped = true;
 onDocLoad(function () {
 	if (isDateMissing()) {
 		console.warn(getDebugMessage("Browser doesn't support html5 input type date, trying to load javascript datepicker"));
-		loadJsCssFile("/static/css/pikaday.css");
-		loadJsCssFile("/static/js/moment.js", function () {
+		doGet("/static/css/pikaday.css");
+		doGet("/static/js/moment.js", function () {
 			// load pikaday only after moment.js
-			loadJsCssFile("/static/js/pikaday.js", function () {
+			doGet("/static/js/pikaday.js", function () {
 				var picker = new Pikaday({
 					field: $('id_birthday'),
 					format: 'YYYY-MM-DD', // DATE_INPUT_FORMATS_JS
@@ -54,9 +54,9 @@ function startCapturingVideo(button) {
 		navigator.getUserMedia({video: true}, function (stream) {
 			video.src = window.URL.createObjectURL(stream);
 			localMediaStream = stream;
-			video.style.display = 'block';
+			showElement(video);
 			video.addEventListener('click', takeSnapshot, false);
-			$('userProfileData').style.display = 'none';
+			hideElement($('userProfileData'));
 			button.value = 'Hide video';
 			isStopped = false;
 		}, function (e) {
@@ -67,8 +67,8 @@ function startCapturingVideo(button) {
 	if (!isStopped) {
 		localMediaStream.stop();
 		button.value = 'Renew the photo';
-		video.style.display = 'none';
-		$('userProfileData').style.display = 'block';
+		hideElement(video);
+		showElement($('userProfileData'));
 		isStopped = true;
 	}
 
@@ -85,39 +85,6 @@ function saveProfile() {
 	doPost('/save_profile', params, alert, form);
 }
 
-
-/**
- * Loads file from server on runtime */
-function loadJsCssFile(filename, callback) {
-	// TODO load doesn't work in IE for pikaday
-	var fileTypeRegex = /\w+$/;
-	var typeRegRes = fileTypeRegex.exec(filename);
-	if (typeRegRes != null) {
-		var fileType = typeRegRes[0];
-		var fileRef = null;
-		switch (fileType) {
-			case 'js':
-				fileRef = document.createElement('script');
-				fileRef.setAttribute("type", "text/javascript");
-				fileRef.setAttribute("src", filename);
-				break;
-			case 'css':
-				fileRef = document.createElement("link");
-				fileRef.setAttribute("rel", "stylesheet");
-				fileRef.setAttribute("type", "text/css");
-				fileRef.setAttribute("href", filename);
-				break;
-			default:
-				console.error(getDebugMessage('Unknown type of style {}', fileType))
-		}
-		if (typeof fileRef != "undefined") {
-			document.getElementsByTagName("head")[0].appendChild(fileRef);
-			fileRef.onload = callback;
-		}
-	} else {
-		console.error(getDebugMessage('File type regex failed for filename "{}"', filename));
-	}
-}
 
 /** Check whether browser supports html5 input type date */
 function isDateMissing() {

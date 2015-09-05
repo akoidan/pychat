@@ -36,8 +36,14 @@ Start the chat:
  5. Start the Chat: `service uwsgi start`
  2. Start the WebSocket listener: `service tornado start`
 
-<<<<<<< HEAD
+=======
+#TODO
+* refactor set class name for css instead of settings css
+* change raw innerHtml to node.appendChild
+* add multipart smileys
+* add canvas images 
 * add antispam system
+* add http://www.amcharts.com/download/ to chart spam or user statistic info
 * add WebWorker http://www.w3schools.com/html/html5_webworkers.asp to load message
 * startup loading messages in a separate thread (JS )
 * move loading messages on startup to single function? 
