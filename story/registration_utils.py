@@ -35,10 +35,12 @@ def hide_fields(post, *fields, huge=False):
 	"""
 
 	if not huge:
+		# hide *fields in shallow copy
 		res = post.copy()
 		for field in fields:
 			res[field] = '****'
 	else:
+		# copy everything but *fields
 		res = {}
 		for field in post:
 			if field not in fields:

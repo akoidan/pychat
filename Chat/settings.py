@@ -165,16 +165,20 @@ LOGGING = {
 	'handlers': {
 		'file-tornado': {
 			'level': 'DEBUG',
-			'class': 'logging.handlers.RotatingFileHandler',
+			'class': 'logging.handlers.TimedRotatingFileHandler',
 			'filename': join(BASE_DIR, 'log/', log_file_name),
 			'formatter': 'tornado',
+			'when': 'midnight',
+			'interval': 1
 		},
 		'file': {
 			'level': 'DEBUG',
-			'class': 'logging.handlers.RotatingFileHandler',
+			'class': 'logging.handlers.TimedRotatingFileHandler',
 			'filename': join(BASE_DIR, 'log/', log_file_name),
 			'formatter': 'django',
-			'filters': ['id', ]
+			'filters': ['id', ],
+			'when': 'midnight',
+			'interval': 1
 		},
 		'django-console': {
 			'level': 'DEBUG',
