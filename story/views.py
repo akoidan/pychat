@@ -18,7 +18,8 @@ from story.decorators import login_required_no_redirect
 from story.models import UserProfile, Issue, Room, IssueDetails
 from story import registration_utils
 from story.forms import UserProfileForm, UserProfileReadOnlyForm
-from story.registration_utils import check_email, send_email_verification, check_user, check_password, extract_photo
+from story.registration_utils import check_email, send_email_verification, check_user, check_password, extract_photo, \
+	hide_fields
 from Chat import settings
 
 
@@ -86,7 +87,7 @@ def auth(request):
 		message = settings.VALIDATION_IS_OK
 	else:
 		message = 'Login or password is wrong'
-	logger.debug('Auth request %s ; Response: %s', request.POST, message)
+	logger.debug('Auth request %s ; Response: %s', hide_fields(request.POST, 'password'), message)
 	response = HttpResponse(message, content_type='text/plain')
 	return response
 
@@ -127,7 +128,7 @@ def get_register_page(request):
 def register(request):
 	try:
 		rp = request.POST
-		logger.info('Got register request %s', rp)
+		logger.info('Got register request %s', hide_fields(rp, 'password', 'repeatpassword'))
 		(username, password, email, verify_email) = (
 			rp.get('username'), rp.get('password'), rp.get('email'), rp.get('mailbox'))
 		check_user(username)
@@ -187,7 +188,7 @@ def show_profile(request, profile_id):
 @require_http_methods('POST')
 @login_required_no_redirect
 def save_profile(request):
-	logger.info('Saving profile: %s', request.POST)
+	logger.info('Saving profile: %s', hide_fields(request.POST, "base64_image", huge=True))
 	user_profile = UserProfile.objects.get(pk=request.user.id)
 	image_base64 = request.POST.get('base64_image')
 

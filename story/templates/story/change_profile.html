@@ -24,7 +24,7 @@
 		<form class="col1" action="{% url 'story.views.save_profile' %}" method="post" enctype="multipart/form-data">
 			{% csrf_token %}
 			<div class="padding10">
-				<video autoplay style="display: none;" class="fullwidth"></video>
+				<video autoplay class="fullwidth"></video>
 
 				<table class="biginputtext" id="userProfileData">
 					{{ form.as_table }}
