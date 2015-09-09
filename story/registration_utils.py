@@ -27,6 +27,27 @@ def is_blank(check_str):
 		return True
 
 
+def hide_fields(post, *fields, huge=False):
+	"""
+	:param post: QueryDict
+	:param fields: fields in dict to replace with ****
+	:return: a shallow copy of dictionary with replaced fields
+	"""
+
+	if not huge:
+		res = post.copy()
+		for field in fields:
+			res[field] = '****'
+	else:
+		res = {}
+		for field in post:
+			if field not in fields:
+				res[field] = post[field]
+			else:
+				res[field] = '****'
+	return res
+
+
 def check_password(password):
 	"""
 	Checks if password is secure

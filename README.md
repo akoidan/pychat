@@ -38,6 +38,7 @@ Start the chat:
 
 =======
 #TODO
+* remove password field from logs
 * refactor set class name for css instead of settings css
 * change raw innerHtml to node.appendChild
 * add multipart smileys

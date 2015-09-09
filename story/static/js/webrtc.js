@@ -30,6 +30,7 @@ onDocLoad(function () {
 	}
 	video = document.querySelector('video');
 	canvas = document.querySelector('canvas');
+	hideElement(video);
 
 });
 
