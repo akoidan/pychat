@@ -215,7 +215,7 @@ def report_issue(request):
 			context_instance=RequestContext(request)
 		)
 	elif request.method == 'POST':
-		logger.info('Saving issue: %s', request.POST)
+		logger.info('Saving issue: %s', hide_fields(request.POST, 'log', huge=True))
 		issue, created = Issue.objects.get_or_create(content=request.POST['issue'])
 		issue_details = IssueDetails(
 			sender_id=request.user.id,

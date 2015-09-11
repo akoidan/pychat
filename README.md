@@ -38,6 +38,7 @@ Start the chat:
 
 =======
 #TODO
+* http://stackoverflow.com/a/18843553/3872976
 * remove password field from logs
 * refactor set class name for css instead of settings css
 * change raw innerHtml to node.appendChild
