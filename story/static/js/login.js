@@ -44,8 +44,11 @@ onDocLoad(function () {
 		input.focus();
 		var sendChangeNickname = function (event) {
 			var newUsername = input.value;
-			// input.remove doesn't work in IE
-			input.parentNode.removeChild(input);
+			if (input.remove) {
+				input.remove(); // input.remove doesn't work in IE
+			} else {
+				input.parentNode.removeChild(input); // removeChild doesn't work in 45 chromium ??
+			}
 			showElement(label);
 			if (!USER_REGEX.test(newUsername)) {
 				alert('Wrong username, only letters, -_');
