@@ -1,5 +1,6 @@
 onDocLoad(function(){
 	hideElement($("hideableDropDown"));
+	hideElement($('inputName'));
 });
 
 function login() {
@@ -39,20 +40,16 @@ onDocLoad(function () {
 	var editUserName = function (label) {
 		hideElement(label);
 		var oldUsername = label.textContent;
-		label.insertAdjacentHTML('afterend', "<input type='text' id='inputName' maxlength='16' class='userNameInput' value='" + oldUsername + "' />");
 		var input = $('inputName');
 		input.focus();
+		showElement(input);
 		var sendChangeNickname = function (event) {
 			var newUsername = input.value;
-			if (input.remove) {
-				input.remove(); // input.remove doesn't work in IE
-			} else {
-				input.parentNode.removeChild(input); // removeChild doesn't work in 45 chromium ??
-			}
+			hideElement(input);
 			showElement(label);
 			if (!USER_REGEX.test(newUsername)) {
 				alert('Wrong username, only letters, -_');
-				label.textContent =oldUsername;
+				label.textContent = oldUsername;
 			} else  if (newUsername !== oldUsername) {
 				sendToServer({content: newUsername, action: 'me'});
 			}

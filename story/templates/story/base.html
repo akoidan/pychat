@@ -28,7 +28,14 @@
 		{% else %}
 			{% include "story/login.html" %}
 		{% endif %}
-			<li class="right username">Hello, <b><label id="userNameLabel">{{ username }}</label></b></li>
+		<li class="right username">Hello,
+			<b>
+				{% if not username %}
+					<input type='text' id='inputName' maxlength='16' class='userNameInput' value=''/>
+				{% endif %}
+				<label id="userNameLabel">{{ username }}</label>
+			</b>
+		</li>
 	</ul>
 	<!-- /.container-fluid -->
 </nav>

@@ -6,7 +6,7 @@ if (!("WebSocket" in window)) {
 }
 var CONNECTION_RETRY_TIME = 5000;
 
-var SMILEY_URL = '/static/smileys/'
+var SMILEY_URL = '/static/smileys/';
 
 var selfHeader = '<span class="message-header-self">';
 var privateHeader = '<span class="message-header-private">';
