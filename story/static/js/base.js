@@ -7,6 +7,7 @@ var $ = function(id) {
 	return document.getElementById(id);
 };
 
+var demoApp = angular.module('chat', []);
 
 function onDocLoad(onload) {
 	return document.addEventListener("DOMContentLoaded", onload);

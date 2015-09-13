@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/html">
+<html ng-app="chat">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>Chat</title> {% load staticfiles %}
@@ -7,6 +7,7 @@
 	<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/fontello.css' %}">
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<script src="{% static "js/angular.js" %}"></script>
 	<script src="{% static "js/base.js" %}"></script>
 	{% block head %} {% endblock head %}
 </head>

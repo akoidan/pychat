@@ -29,11 +29,18 @@
 					</div>
 				</div>
 			</div>
-			<div id="chatbox">
+			{% verbatim %}
+			<div id="chatbox" ng-controller="MessagesController">
 				<div>
-
+					<p ng-repeat="message in cngMessages">
+						<span class="{{ message.headerClass }}">
+							<span>({{ message.time }})</span> {{ message.sender }}:
+						</span>
+						<span class="{{ message.textClass }}">{{ message.text }}</span>
+					</p>
 				</div>
 			</div>
+			{% endverbatim %}
 		</div>
 		<div id="bottomWrapper" class="noSelection">
 			<i class="icon-emo-happy" id="smileToogler" title="report an issue"></i>
