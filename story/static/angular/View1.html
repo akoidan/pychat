@@ -1,0 +1,23 @@
+<style>
+	.custWrap input{
+		display: block;
+		margin: 5px;
+	}
+	.custWrap {
+		padding: 5px;
+		background-color: #0088cc;
+	}
+</style>
+<h1>This is View 1</h1>
+<ul>
+	<li ng-repeat="entry in names |filter:name |orderBy: 'city'">
+		{{ entry.name | uppercase }} - {{ entry.city }}</li>
+</ul>
+<div class="custWrap">
+	<input type="text" ng-model="new.name"/>
+	<input type="text" ng-model="new.city"/>
+<input type="button" value="add Customer" ng-click="addCustomer()"/>
+
+</div>
+
+<a href="#/view2">to view 2</a>

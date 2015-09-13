@@ -1,0 +1,10 @@
+{
+  "name": "djangochat",
+  "directory": "story/static/js",
+  "dependencies": {
+    "angular": "",
+    "pikaday": "",
+    "moment": ""
+  },
+  "private": true
+}

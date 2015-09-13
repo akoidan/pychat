@@ -26,6 +26,7 @@ files[9]="$FONT_DIR/fontello.eot"
 files[10]="$FONT_DIR/fontello.svg"
 files[11]="$FONT_DIR/fontello.ttf"
 files[12]="$FONT_DIR/fontello.woff"
+files[13]="$JS_DIR/angular.js"
 
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do
@@ -53,7 +54,7 @@ cp -r $TMP_DIR/chatconf/static $STATIC_PARENT
 wget http://dbushell.github.io/Pikaday/css/pikaday.css -P $CSS_DIR
 wget https://raw.githubusercontent.com/dbushell/Pikaday/master/pikaday.js -P $JS_DIR
 wget http://momentjs.com/downloads/moment.js -P $JS_DIR
-
+wget https://ajax.googleapis.com/ajax/libs/angularjs/1.4.5/angular.min.js -O $JS_DIR/angular.js
 
 #wget http://jscolor.com/release/jscolor-1.4.4.zip -P $TMP_DIR && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR
 # fontello
