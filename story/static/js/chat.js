@@ -444,7 +444,7 @@ function start_chat_ws() {
 function encodeHTML(html) {
 	var htmlEncoded = document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
 	var replacedNewLine = htmlEncoded.replace(/\n/g, '<br>');
-	var replacedLinks = replacedNewLine.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1">$1</a>');
+	var replacedLinks = replacedNewLine.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
 	for (var el in smileyDict) {
 		if (smileyDict.hasOwnProperty(el)) {
 			// replace all occurences
