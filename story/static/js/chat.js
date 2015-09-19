@@ -23,6 +23,15 @@ var genderIcons = {
 	'Secret': 'icon-user-secret'
 };
 
+var entityMap = {
+	"&": "&amp;",
+	"<": "&lt;",
+	">": "&gt;",
+	'"': '&quot;',
+	"'": '&#39;',
+	"/": '&#x2F;'
+};
+
 var destinationUserName = null;
 var destinationUserId = null;
 
@@ -337,7 +346,8 @@ controllers.MessagesController = function ($scope) {
 						fileRef.setAttribute("alt", smile);
 						tabRef.appendChild(fileRef);
 						// http://stackoverflow.com/a/1750860/3872976
-						smileyDict[smile] = fileRef.outerHTML;
+						/** encode dict key, so {@link encodeSmileys} could parse smileys after encoding */
+						smileyDict[encodeHTML(smile)] = fileRef.outerHTML;
 					}
 				}
 			}
@@ -360,27 +370,30 @@ demoApp.directive('ng-send-message', function () {
 
 });
 
+function encodeHTML(html) {
+	return html.replace(/[&<>"']/g, function (s) {
+		return entityMap[s];
+	});
+}
 
 demoApp.filter('smileys', function ($sce) {
 
-	var entityMap = {
-		"&": "&amp;",
-		"<": "&lt;",
-		">": "&gt;",
-		'"': '&quot;',
-		"'": '&#39;',
-		"/": '&#x2F;'
-	};
-
 	return function (input) {
-		input = String(input).replace(/[&<>"']/g, function (s) {
-			return entityMap[s];
-		});
+		input = encodeHTML(input);
 
-		input = input.replace(/(https?:\/\/\S+)/g, '<a href="$1">$1</a>');
-		input = input.replace(smileyPattern, function(s) {
-			return smileyDict[s] || s; // replace value to dict's one if "s" present in dict
-		});
+		input = input.replace(/(https?:\/\/\S+)/g, '<a href="$1" target="_blank">$1</a>');
+
+		//	input = input.replace(smileyPattern, function(s) {
+		//	return smileyDict[s] || s; // replace value to dict's one if "s" present in dict
+		//});
+		// this way split ensures all smileys replacement
+		for (var el in smileyDict) {
+			if (smileyDict.hasOwnProperty(el)) {
+				// replace all occurences
+				// instead of replace that could generates infinitive loop
+				input = input.split(el).join(smileyDict[el]);
+			}
+		}
 		return $sce.trustAsHtml(input);
 	};
 });
