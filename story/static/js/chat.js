@@ -17,11 +17,21 @@ var timeDiv = '<span class="timeMess">(';
 var timeDivEnd = ') </span>';
 var contentStyle = '<span class="message-text-style">';
 var genderIcons = {
-		'Male': 'icon-man',
-		'Female': 'icon-girl',
-		'Alien': 'icon-anonymous',
-		'Secret' : 'icon-user-secret'
-	};
+	'Male': 'icon-man',
+	'Female': 'icon-girl',
+	'Alien': 'icon-anonymous',
+	'Secret': 'icon-user-secret'
+};
+var entityMap = {
+	"&": "&amp;",
+	"<": "&lt;",
+	">": "&gt;",
+	'"': '&quot;',
+	"'": '&#39;',
+	"/": '&#x2F;'
+};
+
+var smileyPattern = /:\S+:/g;
 
 var destinationUserName = null;
 var destinationUserId = null;
@@ -177,7 +187,8 @@ function loadSmileys(jsonData) {
 					fileRef.setAttribute("alt", smile);
 					 tabRef.appendChild(fileRef);
 					// http://stackoverflow.com/a/1750860/3872976
-					smileyDict[smile] = fileRef.outerHTML;
+					/** encode dict key, so {@link encodeSmileys} could parse smileys after encoding */
+					smileyDict[encodeHTML(smile)] = fileRef.outerHTML;
 				}
 			}
 		}
@@ -440,19 +451,25 @@ function start_chat_ws() {
 	}
 }
 
-
 function encodeHTML(html) {
-	var htmlEncoded = document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
-	var replacedNewLine = htmlEncoded.replace(/\n/g, '<br>');
-	var replacedLinks = replacedNewLine.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+	return html.replace(/[&<>"']/g, function (s) {
+		return entityMap[s];
+	});
+}
+
+function encodeSmileys(html) {
+
+	html = encodeHTML(html);
+	html = html.replace(/\n/g, '<br>');
+	html = html.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
 	for (var el in smileyDict) {
 		if (smileyDict.hasOwnProperty(el)) {
 			// replace all occurences
 			// instead of replace that could generates infinitive loop
-			replacedLinks = replacedLinks.split(el).join(smileyDict[el]);
+			html = html.split(el).join(smileyDict[el]);
 		}
 	}
-	return replacedLinks;
+	return html;
 }
 
 
@@ -532,7 +549,7 @@ function printMessage(data, isTopDirection) {
 	} else {
 		headerStyle = othersHeader;
 	}
-	var preparedHtml = encodeHTML(data['content']);
+	var preparedHtml = encodeSmileys(data['content']);
 	displayPreparedMessage(headerStyle, data['time'], preparedHtml, displayedUsername, isTopDirection);
 }
 
