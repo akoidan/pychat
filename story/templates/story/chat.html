@@ -36,7 +36,7 @@
 						<span class="{{ message.headerClass }}">
 							<span>({{ message.time }})</span> {{ message.sender }}:
 						</span>
-						<span class="{{ message.textClass }}">{{ message.text }}</span>
+						<span class="{{ message.textClass }}" ng-bind-html="message.text |smileys "></span>
 					</p>
 				</div>
 			</div>

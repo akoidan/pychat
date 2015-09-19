@@ -8,14 +8,14 @@ var CONNECTION_RETRY_TIME = 5000;
 
 var SMILEY_URL = '/static/smileys/';
 
-var selfHeader = '<span class="message-header-self">';
-var privateHeader = '<span class="message-header-private">';
-var othersHeader = '<span class="message-header-others">';
-var systemHeader = '<span class="message-header-system">';
-var endHeader = '</span>';
-var timeDiv = '<span class="timeMess">(';
-var timeDivEnd = ') </span>';
-var contentStyle = '<span class="message-text-style">';
+const selfHeader = 'message-header-self';
+const privateHeader = 'message-header-private';
+const othersHeader = 'message-header-others';
+const systemHeader = 'message-header-system';
+var smileyPattern = /:\S+:/g;
+const timeDiv = 'timeMess';
+
+const contentStyle = 'message-text-style';
 var genderIcons = {
 	'Male': 'icon-man',
 	'Female': 'icon-girl',
@@ -184,18 +184,25 @@ controllers.MessagesController = function ($scope) {
 	}
 
 
-	function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayedUsername, isTopDirection) {
+	function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayedUsername, isTopDirection, apply) {
+		if (apply == null) {
+			apply = true;
+		}
 		var newMessage = {};
 		newMessage.headerClass = headerStyle;
 		newMessage.sender = displayedUsername;
 		newMessage.text =  htmlEncodedContent;
+		newMessage.time =  time;
 		$scope.cngMessages.push(newMessage);
-		var messageHeader = headerStyle + timeDiv + time + timeDivEnd + displayedUsername + '</b>: ' + endHeader;
-		var messageContent = contentStyle + htmlEncodedContent + endHeader;
+		var messageHeader = headerStyle + timeDiv + time + ' )' + displayedUsername + '</b>: ';
+		var messageContent = contentStyle + htmlEncodedContent;
 		var message = '<p>' + messageHeader + messageContent + "</p>";
 		if (!isCurrentTabActive) {
 			newMessagesCount++;
 			document.title = newMessagesCount + " new message";
+		}
+		if (apply) {
+			$scope.$apply();
 		}
 		//if (isTopDirection) {
 		//	chatBoxDiv.insertAdjacentHTML('afterbegin', message);
@@ -227,8 +234,7 @@ controllers.MessagesController = function ($scope) {
 		} else {
 			headerStyle = othersHeader;
 		}
-		var preparedHtml = encodeHTML(data['content']);
-		displayPreparedMessage(headerStyle, data['time'], preparedHtml, displayedUsername, isTopDirection);
+		displayPreparedMessage(headerStyle, data['time'], data['content'], displayedUsername, isTopDirection);
 	}
 
 
@@ -352,6 +358,31 @@ demoApp.directive('ng-send-message', function () {
 		userMessage.bind("keypress", sendMessage);
 	};
 
+});
+
+
+demoApp.filter('smileys', function ($sce) {
+
+	var entityMap = {
+		"&": "&amp;",
+		"<": "&lt;",
+		">": "&gt;",
+		'"': '&quot;',
+		"'": '&#39;',
+		"/": '&#x2F;'
+	};
+
+	return function (input) {
+		input = String(input).replace(/[&<>"']/g, function (s) {
+			return entityMap[s];
+		});
+
+		input = input.replace(/(https?:\/\/\S+)/g, '<a href="$1">$1</a>');
+		input = input.replace(smileyPattern, function(s) {
+			return smileyDict[s] || s; // replace value to dict's one if "s" present in dict
+		});
+		return $sce.trustAsHtml(input);
+	};
 });
 
 
@@ -536,21 +567,6 @@ function sendMessage(event) {
 			adjustUserMessageWidth();
 		}
 	}
-}
-
-
-function encodeHTML(html) {
-	var htmlEncoded = document.createElement('div').appendChild(document.createTextNode(html)).parentNode.innerHTML;
-	var replacedNewLine = htmlEncoded.replace(/\n/g, '<br>');
-	var replacedLinks = replacedNewLine.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1">$1</a>');
-	for (var el in smileyDict) {
-		if (smileyDict.hasOwnProperty(el)) {
-			// replace all occurences
-			// instead of replace that could generates infinitive loop
-			replacedLinks = replacedLinks.split(el).join(smileyDict[el]);
-		}
-	}
-	return replacedLinks;
 }
 
 
