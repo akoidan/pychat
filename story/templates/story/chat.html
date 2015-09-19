@@ -16,14 +16,14 @@
 		<audio id="chatLogin" src="{% static 'sounds/ChatLogin.wav' %}" preload="none" ></audio>
 		<audio id="chatLogout" src="{% static 'sounds/ChatLogout.wav' %}" preload="none"></audio>
 	</div>
-	<div id="wrapper">
-		<div class="fluid-inline" ng-controller="MessagesController">
+	<div id="wrapper" ng-controller="MessagesController">
+		<div class="fluid-inline">
 			{% verbatim %}
 			<div id="chat-room-users-wrapper">
 				<div class="fluid-height-child-bot">
 					<div>
 						<table id="chat-user-table">
-							<tr ng-repeat="user in users">
+							<tr ng-repeat="user in users | filter:{name:SearchUserNameTODO}">
 								<td>
 									<a ng-if="user.link" class="{{ user.icon }}" href="{{ user.link }}"></a>
 									<i ng-if="!user.link" class="{{ user.icon }}"></i>
@@ -56,7 +56,7 @@
 				<i class="icon-cancel" onclick="hideUserSendToName();"></i>
 			</div>
 			<div class="message-text-holder box-shadow">
-				<textarea name="usermsg" rows="1" class="fullwidth" id="usermsg"></textarea>
+				<textarea name="usermsg" rows="1" class="fullwidth" id="usermsg" ng-model="userMessage"></textarea>
 			</div>
 		</div>
 	</div>
