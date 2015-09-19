@@ -12,10 +12,7 @@ const selfHeader = 'message-header-self';
 const privateHeader = 'message-header-private';
 const othersHeader = 'message-header-others';
 const systemHeader = 'message-header-system';
-var smileyPattern = /:\S+:/g;
-const timeDiv = 'timeMess';
 
-const contentStyle = 'message-text-style';
 var genderIcons = {
 	'Male': 'icon-man',
 	'Female': 'icon-girl',
@@ -82,6 +79,7 @@ var chatUserRoomWrapper; // for hiddding users
 var controllers = {};
 controllers.MessagesController = function ($scope) {
 	$scope.cngMessages = [];
+	$scope.users = [];
 	start_chat_ws();
 
 	init();
@@ -203,9 +201,6 @@ controllers.MessagesController = function ($scope) {
 		newMessage.text =  htmlEncodedContent;
 		newMessage.time =  time;
 		$scope.cngMessages.push(newMessage);
-		var messageHeader = headerStyle + timeDiv + time + ' )' + displayedUsername + '</b>: ';
-		var messageContent = contentStyle + htmlEncodedContent;
-		var message = '<p>' + messageHeader + messageContent + "</p>";
 		if (!isCurrentTabActive) {
 			newMessagesCount++;
 			document.title = newMessagesCount + " new message";
@@ -247,6 +242,7 @@ controllers.MessagesController = function ($scope) {
 	}
 
 
+	// TODO find a way to bypass <b> via filter
 	function printRefreshUserNameToChat(data) {
 		var message;
 		var action = data['action'];
@@ -346,7 +342,7 @@ controllers.MessagesController = function ($scope) {
 						fileRef.setAttribute("alt", smile);
 						tabRef.appendChild(fileRef);
 						// http://stackoverflow.com/a/1750860/3872976
-						/** encode dict key, so {@link encodeSmileys} could parse smileys after encoding */
+						/** encode dict key, so angular smileys filter could parse smileys after encoding */
 						smileyDict[encodeHTML(smile)] = fileRef.outerHTML;
 					}
 				}
@@ -358,6 +354,26 @@ controllers.MessagesController = function ($scope) {
 		loadMessagesFromLocalStorage();
 	}
 
+	// TODO threadid
+	function loadUsers(usernames) {
+		if (!usernames) {
+			return;
+		}
+		for (var name in usernames) {
+			if (usernames.hasOwnProperty(name)) {
+				var newUser = {};
+				newUser.name = name;
+				newUser.id = usernames[name].id;
+				newUser.icon = genderIcons[usernames[name].sex];
+				if (newUser.id != 0) {
+					newUser.link = '/profile/' + newUser.id;
+				}
+				$scope.users.push(newUser);
+			}
+		}
+		console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
+		$scope.$apply();
+	}
 
 };
 
@@ -580,33 +596,6 @@ function sendMessage(event) {
 			adjustUserMessageWidth();
 		}
 	}
-}
-
-
-// TODO threadid
-function loadUsers(usernames) {
-	if (!usernames) {
-		return;
-	}
-	console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
-	var allUsers = '';
-	var icon;
-	for (var username in usernames) {
-		if (usernames.hasOwnProperty(username)) {
-			var gender = usernames[username].sex;
-			var userId = usernames[username].id;
-			if (userId == 0) {
-				icon = '<i class="' + genderIcons[gender] + '"></i>';
-			} else {
-				icon = '<a class="' + genderIcons[gender] + '" href="/profile/' + userId + '"></a>';
-			}
-			if (icon == null) {
-				console.log(getDebugMessage('Bug, gender: {}, icon: {}', gender, icon))
-			}
-			allUsers += '<tr><td>' + icon + '</td> <td name="' + userId + '">' + username + '</td><tr>';
-		}
-	}
-	chatUsersTable.innerHTML = allUsers;
 }
 
 

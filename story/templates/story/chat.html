@@ -17,26 +17,32 @@
 		<audio id="chatLogout" src="{% static 'sounds/ChatLogout.wav' %}" preload="none"></audio>
 	</div>
 	<div id="wrapper">
-		<div class="fluid-inline">
+		<div class="fluid-inline" ng-controller="MessagesController">
+			{% verbatim %}
 			<div id="chat-room-users-wrapper">
 				<div class="fluid-height-child-bot">
 					<div>
 						<table id="chat-user-table">
-							<tr></tr>
+							<tr ng-repeat="user in users">
+								<td>
+									<a ng-if="user.link" class="{{ user.icon }}" href="{{ user.link }}"></a>
+									<i ng-if="!user.link" class="{{ user.icon }}"></i>
+								</td>
+								<td name="{{ user.id }}">{{ user.name }}</td>
+							</tr>
 						</table>
 					</div>
 					<div id="rooms">
 					</div>
 				</div>
 			</div>
-			{% verbatim %}
-			<div id="chatbox" ng-controller="MessagesController">
+			<div id="chatbox">
 				<div>
 					<p ng-repeat="message in cngMessages">
 						<span class="{{ message.headerClass }}">
 							<span>({{ message.time }})</span> {{ message.sender }}:
 						</span>
-						<span class="{{ message.textClass }}" ng-bind-html="message.text |smileys "></span>
+						<span class="{{ message.textClass }}"  ng-bind-html="message.text | smileys "></span>
 					</p>
 				</div>
 			</div>
