@@ -52,7 +52,7 @@ function checkAndPlay(element) {
 	if (element.readyState && sound) {
 		element.pause();
 		element.currentTime = 0;
-		if (element.currentTime === element.duration ){
+		if (element.currentTime === element.duration ) {
 			// TODO currentType is not set sometimes
 			var params = {
 				browser : getBrowserVersion(),

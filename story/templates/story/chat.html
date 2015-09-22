@@ -17,8 +17,8 @@
 		<audio id="chatLogout" src="{% static 'sounds/ChatLogout.wav' %}" preload="none"></audio>
 	</div>
 	<div id="wrapper" ng-controller="MessagesController">
+		{% verbatim %}
 		<div class="fluid-inline">
-			{% verbatim %}
 			<div id="chat-room-users-wrapper">
 				<div class="fluid-height-child-bot">
 					<div>
@@ -33,6 +33,9 @@
 						</table>
 					</div>
 					<div id="rooms">
+						<ul>
+							<li ng-repeat="room in rooms" id="{{ room.id }}">{{ room.name }}</li>
+						</ul>
 					</div>
 				</div>
 			</div>
@@ -46,11 +49,17 @@
 					</p>
 				</div>
 			</div>
-			{% endverbatim %}
 		</div>
 		<div id="bottomWrapper" class="noSelection">
-			<i class="icon-emo-happy" id="smileToogler" title="report an issue"></i>
-			<div id="smileParentHolder" class="padding10" onclick="addSmile(event);"><ul id="tabNames"></ul></div>
+			<i class="icon-emo-happy" id="smileToogler" title="Smileys"></i>
+			<div id="smileParentHolder" class="padding10" onclick="addSmile(event);">
+				<ul id="tabNames">
+					<li ng-repeat="tab in smileysTabs" id="{{ tab.nameId }}">{{ tab.name }}</li>
+					<div ng-repeat="tab in smileysTabs" id="{{ tab.id }}">
+						<img ng-repeat="smiley in tab.smileys" ng-src="{{ smiley.src }}" alt="{{ smiley.alt }}"/>
+					</div>
+				</ul>
+			</div>
 			<div id="userSendMessageTo">
 				<div id="receiverId"></div>
 				<i class="icon-cancel" onclick="hideUserSendToName();"></i>
@@ -59,6 +68,7 @@
 				<textarea name="usermsg" rows="1" class="fullwidth" id="usermsg" ng-model="userMessage"></textarea>
 			</div>
 		</div>
+		{% endverbatim %}
 	</div>
 {% endblock %}
 

@@ -80,6 +80,8 @@ var controllers = {};
 controllers.MessagesController = function ($scope) {
 	$scope.cngMessages = [];
 	$scope.users = [];
+	$scope.rooms = [];
+	$scope.smileysTabs = [];
 	start_chat_ws();
 
 	init();
@@ -318,38 +320,33 @@ controllers.MessagesController = function ($scope) {
 	// TODO refactor this, it's hard to read
 	function loadSmileys(jsonData) {
 		var smileyData = JSON.parse(jsonData);
-		var index = 0;
 		for (var tab in smileyData) {
 			if (smileyData.hasOwnProperty(tab)) {
-				var tabRef = document.createElement('div');
-				tabRef.setAttribute("name", tab);
-				var tabName = document.createElement("LI");
-				tabName.setAttribute("id", "tab-name-" + tab);
-				var textNode = document.createTextNode(tab);
-				tabName.appendChild(textNode);
-				$("tabNames").appendChild(tabName);
-				var currentSmileyHolderId = "tab-" + tab;
-				tabRef.setAttribute("id", currentSmileyHolderId);
+				var smileysTab = {};
+				smileysTab.id = "tab-"+tab;
+				smileysTab.nameId = "tab-name-"+tab;
+				smileysTab.name = tab;
 				tabNames.push(tab);
-				smileParentHolder.appendChild(tabRef);
-
+				smileysTab.smileys = [];
 				var tabSmileys = smileyData[tab];
 				for (var smile in tabSmileys) {
 					if (tabSmileys.hasOwnProperty(smile)) {
-						var fileRef = document.createElement('IMG');
-						var fullSmileyUrl = SMILEY_URL + tab + '/' + tabSmileys[smile];
-						fileRef.setAttribute("src", fullSmileyUrl);
-						fileRef.setAttribute("alt", smile);
-						tabRef.appendChild(fileRef);
+						var smiley = {};
+						smiley.src  = SMILEY_URL + tab + '/' + tabSmileys[smile];
+						smiley.alt = smile;
+						smileysTab.smileys.push(smiley);
 						// http://stackoverflow.com/a/1750860/3872976
 						/** encode dict key, so angular smileys filter could parse smileys after encoding */
-						smileyDict[encodeHTML(smile)] = fileRef.outerHTML;
+						// TODO remove hardcoded img
+						smileyDict[encodeHTML(smile)] = '<img src="' + smiley.src + '" alt="' + smiley.alt + '"/>';
 					}
 				}
+				$scope.smileysTabs.push(smileysTab);
 			}
 		}
-
-		showTabByName(Object.keys(smileyData)[0]);
+		$scope.$apply();
+		// object is not created but needs to be shown
+		 showTabByName(Object.keys(smileyData)[0]);
 
 		loadMessagesFromLocalStorage();
 	}
@@ -359,6 +356,7 @@ controllers.MessagesController = function ($scope) {
 		if (!usernames) {
 			return;
 		}
+		$scope.users = []; // clear old userlist
 		for (var name in usernames) {
 			if (usernames.hasOwnProperty(name)) {
 				var newUser = {};
@@ -373,6 +371,18 @@ controllers.MessagesController = function ($scope) {
 		}
 		console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
 		$scope.$apply();
+	}
+
+	function setupChannels(channels) {
+		for (var key in channels) {
+			if (channels.hasOwnProperty(key)) {
+				var newRoom = {};
+				newRoom.id = key;
+				newRoom.name = channels[key];
+				$scope.rooms.push(newRoom);
+			}
+		}
+		//$scope.$apply(); // is not needed
 	}
 
 };
@@ -443,11 +453,11 @@ function showTabByName(event) {
 	}
 	var tagName = event.target == null ? event : event.target.innerHTML;
 	for (var i = 0; i < tabNames.length; i++) {
-		hideElement($("tab-" + tabNames[i])); // loadSmileys currentSmileyHolderId
-		showElement($("tab-name-" + tabNames[i]), 'activeTab');
+		hideElement($("tab-" + tabNames[i])); // hide smileys
+		showElement($("tab-name-" + tabNames[i]), 'activeTab'); // remove highlight
 	}
-	showElement($("tab-" + tagName));
-	hideElement($("tab-name-" + tagName), 'activeTab');
+	showElement($("tab-" + tagName)); // show smileys
+	hideElement($("tab-name-" + tagName), 'activeTab'); // hightlight active tab
 }
 
 
@@ -645,17 +655,6 @@ function saveMessageToStorage(objectItem, jsonItem) {
 	}
 }
 
-
-function setupChannels(channels) {
-	var text = '<ul>';
-	for (var key in channels) {
-		if (channels.hasOwnProperty(key)) {
-			text += '<li name="' + key + '">' + channels[key] + '</li>';
-		}
-	}
-	text += '</ul>';
-	charRooms.innerHTML = text;
-}
 
 
 function sendToServer(messageRequest) {
