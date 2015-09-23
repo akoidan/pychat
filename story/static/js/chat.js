@@ -111,6 +111,7 @@ controllers.MessagesController = function ($scope) {
 		hideElement(userSendMessageTo);
 		hideElement(smileParentHolder);
 		addSmileysEvents();
+		userMessage.addEventListener("keypress", sendMessage);
 		chatUsersTable.addEventListener("click", userClick);
 		chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 		// some browser don't fire keypress event for num keys so keydown instead of keypress
@@ -385,16 +386,41 @@ controllers.MessagesController = function ($scope) {
 		//$scope.$apply(); // is not needed
 	}
 
+	function sendMessage(event) {
+		if (event.keyCode !== 13) {
+			return;
+		}
+		if (!event.shiftKey) {
+			// http://stackoverflow.com/questions/6014702/how-do-i-detect-shiftenter-and-generate-a-new-line-in-textarea
+			// Since messages are sent by pressing enter, enter goes inside of textarea after sending
+			event.preventDefault();
+			var messageContent = userMessage.value;
+			if (/^\s*$/.test(messageContent)) {
+				return;
+			}
+			// anonymous is set by name, registered user is set by id.
+			var messageRequest = {
+				content: messageContent,
+				action: 'send'
+			};
+			if (destinationUserId != null) {
+				messageRequest['receiverId'] = destinationUserId;
+			}
+			if (destinationUserName != null) {
+				messageRequest['receiverName'] = destinationUserName;
+			}
+			var sendSuccessful = sendToServer(messageRequest);
+			if (sendSuccessful) {
+				userMessage.value = "";
+				adjustUserMessageWidth();
+			}
+		}
+	}
+
 };
 
 
 demoApp.controller(controllers);
-demoApp.directive('ng-send-message', function () {
-	return function (scope, element, attrs) {
-		userMessage.bind("keypress", sendMessage);
-	};
-
-});
 
 function encodeHTML(html) {
 	return html.replace(/[&<>"']/g, function (s) {
@@ -573,38 +599,6 @@ function keyDownLoadUp(e) {
 		loadUpHistory(3);
 	} else if (e.ctrlKey && e.which === 36) {
 		loadUpHistory(25);
-	}
-}
-
-
-function sendMessage(event) {
-	if (event.keyCode !== 13) {
-		return;
-	}
-	if (!event.shiftKey) {
-		// http://stackoverflow.com/questions/6014702/how-do-i-detect-shiftenter-and-generate-a-new-line-in-textarea
-		// Since messages are sent by pressing enter, enter goes inside of textarea after sending
-		event.preventDefault();
-		var messageContent = userMessage.value;
-		if (/^\s*$/.test(messageContent)) {
-			return;
-		}
-		// anonymous is set by name, registered user is set by id.
-		var messageRequest = {
-			content: messageContent,
-			action: 'send'
-		};
-		if (destinationUserId != null) {
-			messageRequest['receiverId'] = destinationUserId;
-		}
-		if (destinationUserName != null) {
-			messageRequest['receiverName'] = destinationUserName;
-		}
-		var sendSuccessful = sendToServer(messageRequest);
-		if (sendSuccessful) {
-			userMessage.value = "";
-			adjustUserMessageWidth();
-		}
 	}
 }
 
