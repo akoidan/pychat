@@ -86,6 +86,18 @@ controllers.MessagesController = function ($scope) {
 
 	init();
 
+	$scope.clearLocalHistory = function () { // TODO doesn;t work
+		console.log("clearing history");
+		headerId = null;
+		localStorage.removeItem(STORAGE_NAME);
+		localStorage.removeItem(STORAGE_USER);
+		$scope.users = [];
+		$scope.$apply();
+		chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp); //
+		chatBoxDiv.addEventListener("keydown", keyDownLoadUp);
+		console.log(getDebugMessage('History has been cleared'));
+	};
+
 	function init() {
 		//	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
 		//		alert('you can download app');
@@ -178,7 +190,7 @@ controllers.MessagesController = function ($scope) {
 				displayPreparedMessage(systemHeader, data['time'], data['content'], 'System', false);
 				break;
 			case 'send':
-				printMessage(data, false);
+				printMessage(data);
 				if (loggedUser === data['user']) {
 					checkAndPlay(chatOutgoing);
 				} else {
@@ -194,37 +206,36 @@ controllers.MessagesController = function ($scope) {
 	}
 
 
-	function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayedUsername, isTopDirection, apply) {
+	function displayPreparedMessage(headerStyle, time, htmlEncodedContent, displayedUsername, isTopDirection, apply, raw) {
 		if (apply == null) {
 			apply = true;
+		}
+		if (raw == null) {
+			raw = false;
+		}
+		if (isTopDirection == null) {
+			isTopDirection = false;
 		}
 		var newMessage = {};
 		newMessage.headerClass = headerStyle;
 		newMessage.sender = displayedUsername;
 		newMessage.text =  htmlEncodedContent;
+		newMessage.raw =  raw;
 		newMessage.time =  time;
-		$scope.cngMessages.push(newMessage);
+
 		if (!isCurrentTabActive) {
 			newMessagesCount++;
 			document.title = newMessagesCount + " new message";
 		}
-		if (apply) {
-			$scope.$apply();
-		}
-		//if (isTopDirection) {
-		//	chatBoxDiv.insertAdjacentHTML('afterbegin', message);
-		//} else {
-		//	var oldscrollHeight = chatBoxDiv.scrollHeight;
-		//	chatBoxDiv.insertAdjacentHTML('beforeend', message);
-		//	var newscrollHeight = chatBoxDiv.scrollHeight;
-		//	if (newscrollHeight > oldscrollHeight) {
-		//		chatBoxDiv.scrollTop = newscrollHeight;
-		//	}
-		//}
+
+		$scope.cngMessages.push(newMessage);
+		$scope.$apply();
+		chatBoxDiv.scrollTop = chatBoxDiv.scrollHeight;
+
 	}
 
 
-	function printMessage(data, isTopDirection) {
+	function printMessage(data) {
 		var headerStyle;
 		var receiver = data['receiverName']; // TODO
 		var displayedUsername = data['user'];
@@ -241,11 +252,9 @@ controllers.MessagesController = function ($scope) {
 		} else {
 			headerStyle = othersHeader;
 		}
-		displayPreparedMessage(headerStyle, data['time'], data['content'], displayedUsername, isTopDirection);
+		displayPreparedMessage(headerStyle, data['time'], data['content'], displayedUsername);
 	}
 
-
-	// TODO find a way to bypass <b> via filter
 	function printRefreshUserNameToChat(data) {
 		var message;
 		var action = data['action'];
@@ -272,7 +281,7 @@ controllers.MessagesController = function ($scope) {
 		} else {
 			return;
 		}
-		displayPreparedMessage(systemHeader, data['time'], message, 'System', false);
+		displayPreparedMessage(systemHeader, data['time'], message, 'System', false, true, true);
 	}
 
 
@@ -297,7 +306,7 @@ controllers.MessagesController = function ($scope) {
 		headerId = firstMessage.id;
 
 		message.forEach(function (message) {
-			printMessage(message, true);
+			printMessage(message);
 		});
 	}
 
@@ -375,6 +384,7 @@ controllers.MessagesController = function ($scope) {
 	}
 
 	function setupChannels(channels) {
+		$scope.rooms = [];
 		for (var key in channels) {
 			if (channels.hasOwnProperty(key)) {
 				var newRoom = {};
@@ -383,7 +393,7 @@ controllers.MessagesController = function ($scope) {
 				$scope.rooms.push(newRoom);
 			}
 		}
-		//$scope.$apply(); // is not needed
+		$scope.$apply(); // is not needed
 	}
 
 	function sendMessage(event) {
@@ -430,10 +440,14 @@ function encodeHTML(html) {
 
 demoApp.filter('smileys', function ($sce) {
 
-	return function (input) {
+	return function (input, isRaw) {
+		if (isRaw) {
+			return $sce.trustAsHtml(input);
+		}
 		input = encodeHTML(input);
 
 		input = input.replace(/(https?:\/\/\S+)/g, '<a href="$1" target="_blank">$1</a>');
+		input = input.split('\n').join('<br>');
 
 		//	input = input.replace(smileyPattern, function(s) {
 		//	return smileyDict[s] || s; // replace value to dict's one if "s" present in dict
@@ -673,18 +687,6 @@ function loadUpHistory(count) {
 		};
 		sendToServer(getMessageRequest);
 	}
-}
-
-
-// OH man be carefull with this method, it should reinit history
-function clearLocalHistory() {
-	headerId = null;
-	localStorage.removeItem(STORAGE_NAME);
-	localStorage.removeItem(STORAGE_USER);
-	chatBoxDiv.innerHTML = '';
-	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp); //
-	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);
-	console.log(getDebugMessage('History has been cleared'));
 }
 
 

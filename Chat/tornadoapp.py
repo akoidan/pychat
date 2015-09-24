@@ -1,10 +1,10 @@
-import datetime
 import time
 import json
 import logging
 import sys
-from django.core.exceptions import ValidationError
+from time import mktime
 
+from django.core.exceptions import ValidationError
 import redis
 from django.db.models import Q
 import tornado.web
@@ -17,8 +17,8 @@ import tornado.gen
 from django.conf import settings
 import tornadoredis
 from django.db import connection, OperationalError, InterfaceError
-from Chat.log_filters import id_generator
 
+from Chat.log_filters import id_generator
 
 try:
 	from urllib.parse import urlparse  # py2
@@ -116,15 +116,15 @@ class MessagesCreator(object):
 		default_message[OLD_NAME_VAR_NAME] = old_nickname
 		return default_message
 
-	@staticmethod
-	def default(content, event=SYSTEM_MESSAGE_EVENT):
+	@classmethod
+	def default(cls, content, event=SYSTEM_MESSAGE_EVENT):
 		"""
-		:return: {"action": event, "content": content, "time": "20:48:57"}
+		:return: {"action": event, "content": content, "time": "usingtimestamp"}
 		"""
 		return {
 			EVENT_VAR_NAME: event,
 			CONTENT_VAR_NAME: content,
-			TIME_VAR_NAME: datetime.datetime.now().strftime("%H:%M:%S")
+			TIME_VAR_NAME: cls.get_miliseconds()
 		}
 
 	@classmethod
@@ -137,7 +137,16 @@ class MessagesCreator(object):
 		return result
 
 	@staticmethod
-	def get_message(message):
+	def get_miliseconds(dt=None):
+		if dt is None:
+			return int(time.time()*1000)
+		if dt.time.timestamp:
+			return int(dt.time.timestamp()*1000)
+		else:
+			return mktime(dt.time.timetuple())*1000 + int(dt.time.microsecond/1000),
+
+	@classmethod
+	def get_message(cls, message):
 		"""
 		:param message:
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
@@ -146,7 +155,7 @@ class MessagesCreator(object):
 		result = {
 			USER_VAR_NAME: message.sender.username,
 			CONTENT_VAR_NAME: message.content,
-			TIME_VAR_NAME: message.time.strftime("%H:%M:%S"),
+			TIME_VAR_NAME: cls.get_miliseconds(message),
 			MESSAGE_ID_VAR_NAME: message.id,
 		}
 		if message.receiver is not None:

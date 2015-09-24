@@ -95,7 +95,7 @@ class Message(models.Model):
 	sender = models.ForeignKey(UserProfile, related_name='sender')
 	room = models.ForeignKey(Room, null=True)
 	# DateField.auto_now
-	time = models.TimeField(default=datetime.datetime.now)
+	time = models.DateTimeField(default=datetime.datetime.now)
 	content = models.TextField()
 	id = models.AutoField(primary_key=True)
 	is_raw = models.BooleanField(default=True, null=False)
@@ -110,7 +110,7 @@ class IssueDetails(models.Model):
 	sender = models.ForeignKey(UserProfile, null=True, blank=True)
 	email = models.EmailField(null=True, blank=True)
 	browser = models.CharField(null=False, max_length=32)
-	time = models.TimeField(default=datetime.datetime.now, blank=True)
+	time = models.DateTimeField(default=datetime.datetime.now, blank=True)
 	issue = models.ForeignKey(Issue, related_name='issue')
 	log = models.TextField(null=True)
 

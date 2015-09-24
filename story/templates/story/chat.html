@@ -7,7 +7,7 @@
 	<li><i title="Show all users"
 			 onclick="toogleVisibility(chatUserRoomWrapper)" class="icon-users"><span class="mText">users</span></i></li>
 	<li><i class="icon-clear" title="CLear local history"
-			 onclick="clearLocalHistory()"><span class="mText">clear</span></i></li>
+			 ng-click="clearLocalHistory()"><span class="mText">clear</span></i></li>
 {% endblock navbar %}
 {% block content %}
 	<div>
@@ -23,7 +23,7 @@
 				<div class="fluid-height-child-bot">
 					<div>
 						<table id="chat-user-table">
-							<tr ng-repeat="user in users | filter:{name:SearchUserNameTODO}">
+							<tr ng-repeat="user in users | orderBy:'name' | filter:{name:SearchUserNameTODO}">
 								<td>
 									<a ng-if="user.link" class="{{ user.icon }}" href="{{ user.link }}"></a>
 									<i ng-if="!user.link" class="{{ user.icon }}"></i>
@@ -41,11 +41,11 @@
 			</div>
 			<div id="chatbox">
 				<div>
-					<p ng-repeat="message in cngMessages">
+					<p ng-repeat="message in cngMessages | orderBy:'time'">
 						<span class="{{ message.headerClass }}">
-							<span>({{ message.time }})</span> {{ message.sender }}:
+							<span>({{ message.time | date:'HH:mm:ss' }})</span> {{ message.sender }}:
 						</span>
-						<span class="{{ message.textClass }}"  ng-bind-html="message.text | smileys "></span>
+						<span class="{{ message.textClass }}"  ng-bind-html="message.text | smileys : message.raw"></span>
 					</p>
 				</div>
 			</div>
