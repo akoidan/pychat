@@ -1,0 +1,54 @@
+<div class="fluid-inline">
+	<div id="chat-room-users-wrapper">
+		<div class="fluid-height-child-bot">
+			<div>
+				<table id="chat-user-table">
+					<tr ng-repeat="user in users | orderBy:'name' | filter:{name:SearchUserNameTODO}">
+						<td>
+							<a ng-if="user.link" class="{{ user.icon }}" href="{{ user.link }}"></a>
+							<i ng-if="!user.link" class="{{ user.icon }}"></i>
+						</td>
+						<td name="{{ user.id }}">{{ user.name }}</td>
+					</tr>
+				</table>
+			</div>
+			<div id="rooms">
+				<ul>
+					<li ng-repeat="room in rooms" id="{{ room.id }}">{{ room.name }}</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div id="chatbox">
+		<div>
+			<p ng-repeat="message in cngMessages | unique:'time' |orderBy:'time' ">
+						<span class="{{ message.headerClass }}">
+							<span>({{ message.time | date:'HH:mm:ss' }})</span> {{ message.sender }}:
+						</span>
+				<span class="{{ message.textClass }}" ng-bind-html="message.text | smileys : message.raw"></span>
+			</p>
+		</div>
+	</div>
+</div>
+<div id="bottomWrapper" class="noSelection">
+	<i class="icon-emo-happfy" id="smileToogler" title="Smileys"></i>
+
+	<div id="smileParentHolder" ng-hide="smileParentHolderIsHidden" class="padding10" onclick="addSmile(event);">
+		<ul id="tabNames">
+			<li ng-repeat="tab in smileysTabs" id="{{ tab.nameId }}">{{ tab.name }}</li>
+			<div ng-repeat="tab in smileysTabs" id="{{ tab.id }}">
+				<img ng-repeat="smiley in tab.smileys" ng-src="{{ smiley.src }}" alt="{{ smiley.alt }}"
+					  title="{{ smiley.alt }}"/>
+			</div>
+		</ul>
+	</div>
+	<div id="userSendMessageTo" ng-hide="userSendMessageToIsHidden">
+		<div id="receiverId"></div>
+		<i class="icon-cancel" onclick="hideUserSendToName();"></i>
+	</div>
+	<div class="message-text-holder box-shadow">
+		<textarea name="usermsg" rows="1" class="fullwidth" id="usermsg" ng-model="userMessage"></textarea>
+	</div>
+</div>
+
+

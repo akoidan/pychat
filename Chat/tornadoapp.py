@@ -3,6 +3,7 @@ import json
 import logging
 import sys
 from time import mktime
+from django.contrib.auth import authenticate
 
 from django.core.exceptions import ValidationError
 import redis
@@ -20,6 +21,7 @@ from django.db import connection, OperationalError, InterfaceError
 
 from Chat.log_filters import id_generator
 
+
 try:
 	from urllib.parse import urlparse  # py2
 except ImportError:
@@ -28,6 +30,7 @@ except ImportError:
 from Chat.settings import MAX_MESSAGE_SIZE, ANONYMOUS_REDIS_ROOM
 from story.models import UserProfile, Message, Room
 from story.registration_utils import check_user
+from Chat import views
 
 PY3 = sys.version > '3'
 
@@ -45,6 +48,8 @@ USER_VAR_NAME = 'user'
 USER_ID_VAR_NAME = 'id'
 TIME_VAR_NAME = 'time'
 OLD_NAME_VAR_NAME = 'oldName'
+USERNAME_VAR_NAME = "username"
+PASSWORD_VAR_NAME = "password"
 IS_ANONYMOUS_VAR_NAME = 'anonymous'
 CONTENT_VAR_NAME = 'content'
 EVENT_VAR_NAME = 'action'
@@ -57,6 +62,7 @@ ROOMS_EVENT = 'rooms'  # thread ex "main" , channel ex. 'r:main', "i:3"
 LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
 SEND_MESSAGE_EVENT = 'send'
+LOGIN_VIEW_EVENT = 'login'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
 REDIS_USERNAME_CHANNEL_PREFIX = 'u:%s'
 REDIS_USERID_CHANNEL_PREFIX = 'i:%s'
@@ -212,10 +218,12 @@ class MessagesHandler(MessagesCreator):
 		self.log_id = str(id(self) % 10000).rjust(4, '0')
 		self.logger = logging.LoggerAdapter(logger, {'username': '00000000', 'id': self.log_id})
 		self.async_redis = tornadoredis.Client()
+		self.view = views.DjangoView()
 		self.process_message = {
 			GET_MINE_USERNAME_EVENT: self.process_change_username,
 			GET_MESSAGES_EVENT: self.process_get_messages,
 			SEND_MESSAGE_EVENT: self.process_send_message,
+			LOGIN_VIEW_EVENT: self.process_login,
 		}
 
 	def do_db(self, callback, *arg, **args):
@@ -331,6 +339,21 @@ class MessagesHandler(MessagesCreator):
 	def safe_write(self, message):
 		raise NotImplementedError('WebSocketHandler implements')
 
+	def process_login(self, message):
+		user = authenticate(username=message[USERNAME_VAR_NAME], password=message[PASSWORD_VAR_NAME])
+		if user is not None:
+			online = self.get_online_from_redis()
+			session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
+			session = session_engine.SessionStore(session_key)
+			session[SESSION_USER_VAR_NAME] = user.username
+			session.save()
+			self.user_id = user.user_id
+			self.sex = user.sex
+		else:
+			message = 'Login or password is wrong'
+		response = self.default(message, LOGIN_VIEW_EVENT)
+		self.safe_write(response)
+
 	def process_send_message(self, message):
 		"""
 		:type message: dict
@@ -444,6 +467,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 
 	def __init__(self, *args, **kwargs):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
+		self.set_cookie(settings.SESSION_COOKIE_NAME, sessionStore.create) #  TODO
 		self.connected = False
 		self.anti_spam = AntiSpam()
 

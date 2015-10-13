@@ -3,11 +3,41 @@ var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var HISTORY_STORAGE_NAME = 'history';
 var MAX_STORAGE_LENGTH = 3000;
 
-var $ = function(id) {
+var $ = function (id) {
 	return document.getElementById(id);
 };
 
-var demoApp = angular.module('chat', []);
+function lol(resource) {
+	alert("ersolve");
+	var resolve = doGet(resource);
+}
+
+var demoApp = angular.module('chat', ['ngRoute']);
+
+demoApp.config(['$routeProvider', function ($routeProvider) {
+	$routeProvider
+		.when('/', {
+			controller: 'MessagesController',
+			templateUrl: '/static/html/chat.html',
+			resolve: {
+				test: function ($q) {
+					//
+				}
+			}
+		})
+		.when('/profile',
+		{
+			templateUrl: '/static/html/change_profile.html'
+		})
+		.when('/register',
+		{
+			templateUrl: '/static/html/register.html'
+		})
+		.otherwise({redirectTo: '/'});
+}]);
+
+
+console.log('config applied');
 
 function onDocLoad(onload) {
 	return document.addEventListener("DOMContentLoaded", onload);
@@ -24,7 +54,7 @@ onDocLoad(function () {
 
 function mute() {
 	if (sound < 3) {
-		sound ++;
+		sound++;
 	} else {
 		sound = 0
 	}
@@ -52,11 +82,11 @@ function checkAndPlay(element) {
 	if (element.readyState && sound) {
 		element.pause();
 		element.currentTime = 0;
-		if (element.currentTime === element.duration ) {
+		if (element.currentTime === element.duration) {
 			// TODO currentType is not set sometimes
 			var params = {
-				browser : getBrowserVersion(),
-				issue : "html5 audio currentTime"
+				browser: getBrowserVersion(),
+				issue: "html5 audio currentTime"
 			};
 			doPost('/report_issue', params, null, null);
 			console.warn(getDebugMessage("Can't set current time for audio on browser {}. Reloading it"), getBrowserVersion());
@@ -146,8 +176,8 @@ function doPost(url, params, callback, form) {
 			}
 		}
 	}
-	if (url == "") { 
-		url = window.location.href ; // f*cking IE
+	if (url == "") {
+		url = window.location.href; // f*cking IE
 	}
 	r.open("POST", url, true);
 	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
@@ -212,7 +242,7 @@ function saveLogToStorage(result) {
 	if (storageInfo == null) {
 		newStorage = result;
 	} else if (localStorage.length > MAX_STORAGE_LENGTH) {
-		var notConcatInfo = storageInfo +';;;'+ result;
+		var notConcatInfo = storageInfo + ';;;' + result;
 		newStorage = notConcatInfo.substr(notConcatInfo.length - MAX_STORAGE_LENGTH, notConcatInfo.length);
 	} else {
 		newStorage = storageInfo + ';;;' + result;
@@ -222,6 +252,10 @@ function saveLogToStorage(result) {
 
 
 function hideElement(element, className) {
+	if (element == null) {
+		console.warn(getDebugMessage("Can't hide null element"));
+		return;
+	}
 	if (className == null) {
 		className = 'hidden';
 	}
@@ -235,6 +269,10 @@ function hideElement(element, className) {
 
 
 function showElement(element, className) {
+	if (element == null) {
+		console.warn(getDebugMessage("Can't show null element"));
+		return;
+	}
 	if (className == null) {
 		className = 'hidden';
 	}
@@ -274,3 +312,48 @@ function getDebugMessage() {
 	saveLogToStorage(result);
 	return result;
 }
+
+//// ===========================================chat.js ===========================================
+
+demoApp.filter('unique', function () {
+	return function (collection, keyname) {
+		var output = [],
+			keys = [];
+
+		angular.forEach(collection, function (item) {
+			var key = item[keyname];
+			if (keys.indexOf(key) === -1) {
+				keys.push(key);
+				output.push(item);
+			}
+		});
+
+		return output;
+	};
+});
+
+angular.module('chat').filter('smileys', function ($sce) {
+
+	return function (input, isRaw) {
+		if (isRaw) {
+			return $sce.trustAsHtml(input);
+		}
+		input = encodeHTML(input);
+
+		input = input.replace(/(https?:\/\/\S+)/g, '<a href="$1" target="_blank">$1</a>');
+		input = input.split('\n').join('<br>');
+
+		//	input = input.replace(smileyPattern, function(s) {
+		//	return smileyDict[s] || s; // replace value to dict's one if "s" present in dict
+		//});
+		// this way split ensures all smileys replacement
+		for (var el in smileyDict) {
+			if (smileyDict.hasOwnProperty(el)) {
+				// replace all occurences
+				// instead of replace that could generates infinitive loop
+				input = input.split(el).join(smileyDict[el]);
+			}
+		}
+		return $sce.trustAsHtml(input);
+	};
+});

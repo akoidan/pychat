@@ -3,6 +3,10 @@
 	background-color: #272c2d;
 	color: #babdb6;
 }
+p {
+	margin-top: 12px;
+	margin-bottom: 12px;
+}
 
 .color-lor nav {
 	background-color: rgb(34, 31, 31);

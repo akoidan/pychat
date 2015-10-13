@@ -1,11 +1,5 @@
-{% extends 'story/base.html' %}
-{% block head %}
-	{% load staticfiles %}
+	<script src="/static/js/webrtc.js' %}"></script>
 
-	<script src="{% static 'js/webrtc.js' %}"></script>
-{% endblock head %}
-
-{% block content %}
 	<canvas style="display:none;"></canvas>
 	<div>
 		{#	if photo isn't uploaded yet #}
@@ -14,14 +8,14 @@
 					{% if form.instance.photo %}
 						<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
 					{% else %}
-						<img src="{% static 'no_ava.png' %}" alt="ava" id='photoImg' class="fullwidth">
+						<img src="/static/no_ava.png" alt="ava" id='photoImg' class="fullwidth">
 					{% endif %}
 				</div>
 				<input type="button" value="Take a photo" onclick="startCapturingVideo(this)"/>
 			</div>
 
 
-		<form class="col1" action="{% url 'story.views.save_profile' %}" method="post" enctype="multipart/form-data">
+		<form class="col1" method="post" enctype="multipart/form-data">
 			{% csrf_token %}
 			<div class="padding10">
 				<video autoplay class="fullwidth"></video>
@@ -36,4 +30,3 @@
 		</form>
 
 	</div>
-{% endblock content %}

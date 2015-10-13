@@ -206,11 +206,11 @@ LOGGING = {
 	'formatters': {
 
 	'tornado': {
-			'format':  '%(id)s [%(asctime)s=%(lineno)s [%(username)s]: %(message)s',
+			'format':  '%(id)s [%(asctime)s=%(filename)s:%(lineno)s [%(username)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	'django': {
-			'format':  '%(id)s [%(asctime)s %(module)s:%(lineno)s  [%(username)s]: %(message)s',
+			'format':  '%(id)s [%(asctime)s %(filename)s:%(lineno)s  [%(username)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},

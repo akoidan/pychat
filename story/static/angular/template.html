@@ -1,0 +1,9 @@
+
+<div ng-repeat="(key, value) in data">
+<h1>{{ key }}</h1>
+<ul style=" display:inline; float: left">
+	<li ng-repeat="(text, src) in value">
+		<span>{{ text }}</span> <img ng-src="/static/smileys/{{ key }}/{{ src }}"/>
+	</li>
+</ul>
+</div>

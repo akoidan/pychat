@@ -4,14 +4,13 @@ onDocLoad(function(){
 });
 
 function login() {
-	var callback = function (data) {
-		if (data === 'ok') {
-			window.location.href = '/';
-		} else {
-			alert(data);
-		}
+	var message = {
+		username: document.getElementById("username").value,
+		password: document.getElementById("password").value,
+		action: "login"
 	};
-	doPost('/auth', null, callback, $('loginForm'));
+	sendToServer(message);
+	ws.send(credentials);
 }
 function showLoginDropdown(e) {
 	showElement($("hideableDropDown"));

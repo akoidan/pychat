@@ -1,0 +1,13 @@
+<li class="right">
+	<i class="icon-login" title="Sign in" onclick="showLoginDropdown(event)"><span class="mText">sign in</span></i>
+</li>
+<div id="hideableDropDown" class="biginputtext">
+	<form id="loginForm"> <!-- form for saving password by browser -->
+		<input type="text" name="username" placeholder="Username" id="username">
+		<input type="password" name="password" placeholder="Password" id="password">
+
+		<div><input type="button" onclick="login();" value="Sign In">
+			<a href="{% url 'Chat.views.get_register_page' %}">
+				<input type="button" value="Sing Up"></a></div>
+	</form>
+</div>

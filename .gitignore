@@ -23,3 +23,5 @@ story/static/smileys
 story/static/js/angular.js
 example
 sessionsids.txt
+story/static/angular/ui-router
+story/static/js/angular-route.js

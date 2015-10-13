@@ -1,4 +1,4 @@
-var demoApp = angular.module('demoApp', ['ngRoute']);
+var demoApp = angular.module('demoApp', ['ngRoute',  'app.directives.contactCard']);
 
 //demoApp.controller('SimpleController', function ($scope) {
 //	$scope.names = [
@@ -8,13 +8,19 @@ var demoApp = angular.module('demoApp', ['ngRoute']);
 //	];
 //});
 
-var controllers = {};
-controllers.SimpleController = function ($scope, simpleFactory ) {
+
+demoApp.controller("SimpleController", function ($scope, simpleFactory, simpleService ) {
 	$scope.names = [];
+	var promise = simpleService.get();
+	promise.then(function(data) {
+		$scope.service = data.data;
+	});
+
 	init();
 	function init() {
 		$scope.names  = simpleFactory.getNames();
 	}
+
 	$scope.addCustomer = function () {
 		$scope.names.push({
 				name: $scope.new.name,
@@ -22,10 +28,8 @@ controllers.SimpleController = function ($scope, simpleFactory ) {
 			}
 		)
 
-	}
-};
-
-demoApp.controller(controllers);
+	};
+});
 
 demoApp.config(function ($routeProvider) {
 	$routeProvider
@@ -57,3 +61,14 @@ demoApp.factory('simpleFactory', function() {
 	return factory;
 });
 
+demoApp.service('simpleService', function($http, $q) {
+	var deffer = $q.defer();
+	$http.get('/static/smileys/info.json').then(function (data) {
+		deffer.resolve(data);
+	});
+
+	this.get = function() {
+		return deffer.promise;
+	}
+
+});

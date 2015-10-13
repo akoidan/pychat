@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html ng-app="chat">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>Chat</title>
+	<link rel="shortcut icon" href="/static/favicon.ico" />
+	<link rel="stylesheet" type="text/css" href="/static/css/base.css">
+	<link rel="stylesheet" type="text/css" href="/static/css/fontello.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<script src="/static/js/angular.js"></script>
+	<script src="/static/js/angular-route.js"></script>
+	<script src="/static/js/base.js"></script>
+
+	<!-- chat.html dependencies -->
+		<script src="/static/js/chat.js"></script>
+	<link rel="stylesheet" type="text/css" href="/static/css/chat.css">
+  <!-- chat.html end -->
+
+	<!-- login.html dependencies-->
+	<script src="/static/js/login.js"></script>
+	<!-- login.html end -->
+
+</head>
+<body class="color-lor" >
+	<!-- chat.html dependencies -->
+	<div>
+		<audio id="chatIncoming" src="/static/sounds/ChatIncoming.wav" preload="none"></audio>
+		<audio id="chatOutgoing" src="/static/sounds/ChatOutgoing.wav" preload="none"></audio>
+		<audio id="chatLogin" src="/static/sounds/ChatLogin.wav" preload="none" ></audio>
+		<audio id="chatLogout" src="/static/sounds/ChatLogout.wav" preload="none"></audio>
+	</div>
+	<!-- chat.html dependencies -->
+<nav class="noSelection">
+	<ul id="navbarList">
+		<li>
+			<a href="/#"><i class="icon-home" title="Go home"><span class="mText">home</span></i></a>
+		</li>
+		<li><i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds"
+						 onclick="mute();"><span class="mText">volume</span></i>
+		</li>
+		<li>
+			<a href="/#report_issue"><i class="icon-pencil" title="report an issue"><span class="mText">issue</span></i></a>
+		</li>
+		<li><i title="Show all users"
+				 onclick="toogleVisibility(chatUserRoomWrapper)" class="icon-users"><span class="mText">users</span></i>
+		</li>
+		<li>
+			<i class="icon-clear" title="CLear local history"
+				 ng-click="clearLocalHistory()"><span class="mText">clear</span>
+			</i>
+		</li>
+
+		<!--<ng-include=" 'static/login.html' " ng-if="!username"></ng-include> -->
+		<!-- <ng-include=" 'static/logout.html' " ng-if="username"></ng-include> -->
+		 <ng-include src="'/static/html/login.html'"></ng-include>
+		<li class="right username">Hello,
+			<b>
+				<!-- ng-if="!username" -->
+				<input type='text' id='inputName' maxlength='16' class='userNameInput' value=''/>
+				<label id="userNameLabel">{{ username }}</label>
+			</b>
+		</li>
+	</ul>
+</nav>
+<div ng-view id="wrapper"></div>
+</body>
+</html>

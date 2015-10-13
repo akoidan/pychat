@@ -1,4 +1,6 @@
 // html for messages
+console.log('js is loaded');
+
 if (!("WebSocket" in window)) {
 	alert("Your browser doesn't support Web socket, chat options will be unavailable. " +
 		"Please use Chrome, Firefox, Safari, Internet Explorer 10+ or any modern browser.");
@@ -120,8 +122,8 @@ controllers.MessagesController = function ($scope) {
 		navbarList = $('navbarList');
 		chatBoxWrapper = $('wrapper');
 		smileToogler = $('smileToogler');
-		hideElement(userSendMessageTo);
-		hideElement(smileParentHolder);
+		$scope.userSendMessageToIsHidden = true;
+		$scope.smileParentHolderIsHidden = true;
 		addSmileysEvents();
 		userMessage.addEventListener("keypress", sendMessage);
 		chatUsersTable.addEventListener("click", userClick);
@@ -329,36 +331,36 @@ controllers.MessagesController = function ($scope) {
 
 	// TODO refactor this, it's hard to read
 	function loadSmileys(jsonData) {
-		var smileyData = JSON.parse(jsonData);
-		for (var tab in smileyData) {
-			if (smileyData.hasOwnProperty(tab)) {
-				var smileysTab = {};
-				smileysTab.id = "tab-"+tab;
-				smileysTab.nameId = "tab-name-"+tab;
-				smileysTab.name = tab;
-				tabNames.push(tab);
-				smileysTab.smileys = [];
-				var tabSmileys = smileyData[tab];
-				for (var smile in tabSmileys) {
-					if (tabSmileys.hasOwnProperty(smile)) {
-						var smiley = {};
-						smiley.src  = SMILEY_URL + tab + '/' + tabSmileys[smile];
-						smiley.alt = smile;
-						smileysTab.smileys.push(smiley);
-						// http://stackoverflow.com/a/1750860/3872976
-						/** encode dict key, so angular smileys filter could parse smileys after encoding */
-						// TODO remove hardcoded img
-						smileyDict[encodeHTML(smile)] = '<img src="' + smiley.src + '" alt="' + smiley.alt + '"/>';
-					}
-				}
-				$scope.smileysTabs.push(smileysTab);
-			}
-		}
-		$scope.$apply();
-		// object is not created but needs to be shown
-		 showTabByName(Object.keys(smileyData)[0]);
-
-		loadMessagesFromLocalStorage();
+		//var smileyData = JSON.parse(jsonData);
+		//for (var tab in smileyData) {
+		//	if (smileyData.hasOwnProperty(tab)) {
+		//		var smileysTab = {};
+		//		smileysTab.id = "tab-"+tab;
+		//		smileysTab.nameId = "tab-name-"+tab;
+		//		smileysTab.name = tab;
+		//		tabNames.push(tab);
+		//		smileysTab.smileys = [];
+		//		var tabSmileys = smileyData[tab];
+		//		for (var smile in tabSmileys) {
+		//			if (tabSmileys.hasOwnProperty(smile)) {
+		//				var smiley = {};
+		//				smiley.src  = SMILEY_URL + tab + '/' + tabSmileys[smile];
+		//				smiley.alt = smile;
+		//				smileysTab.smileys.push(smiley);
+		//				// http://stackoverflow.com/a/1750860/3872976
+		//				/** encode dict key, so angular smileys filter could parse smileys after encoding */
+		//				// TODO remove hardcoded img
+		//				smileyDict[encodeHTML(smile)] = '<img src="' + smiley.src + '" alt="' + smiley.alt + '"/>';
+		//			}
+		//		}
+		//		$scope.smileysTabs.push(smileysTab);
+		//	}
+		//}
+		//$scope.$apply();
+		//// object is not created but needs to be shown
+		// showTabByName(Object.keys(smileyData)[0]);
+		//
+		//loadMessagesFromLocalStorage();
 	}
 
 	// TODO threadid
@@ -430,39 +432,13 @@ controllers.MessagesController = function ($scope) {
 };
 
 
-demoApp.controller(controllers);
+angular.module('chat').controller(controllers);
 
 function encodeHTML(html) {
 	return html.replace(/[&<>"']/g, function (s) {
 		return entityMap[s];
 	});
 }
-
-demoApp.filter('smileys', function ($sce) {
-
-	return function (input, isRaw) {
-		if (isRaw) {
-			return $sce.trustAsHtml(input);
-		}
-		input = encodeHTML(input);
-
-		input = input.replace(/(https?:\/\/\S+)/g, '<a href="$1" target="_blank">$1</a>');
-		input = input.split('\n').join('<br>');
-
-		//	input = input.replace(smileyPattern, function(s) {
-		//	return smileyDict[s] || s; // replace value to dict's one if "s" present in dict
-		//});
-		// this way split ensures all smileys replacement
-		for (var el in smileyDict) {
-			if (smileyDict.hasOwnProperty(el)) {
-				// replace all occurences
-				// instead of replace that could generates infinitive loop
-				input = input.split(el).join(smileyDict[el]);
-			}
-		}
-		return $sce.trustAsHtml(input);
-	};
-});
 
 
 function addSmileysEvents() {
