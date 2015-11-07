@@ -140,8 +140,9 @@ STATIC_URL = '/static/'
 
 PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
+STATICFILES_DIR = os.path.join(PROJECT_DIR, 'static')
 STATICFILES_DIRS = (
-	os.path.join(PROJECT_DIR, 'static'),
+	STATICFILES_DIR,
 )
 
 # AUTH_PROFILE_MODULE = 'story.UserProfile'

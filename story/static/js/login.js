@@ -3,19 +3,18 @@ onDocLoad(function(){
 	hideElement($('inputName'));
 });
 
-function login() {
-	var message = {
-		username: document.getElementById("username").value,
-		password: document.getElementById("password").value,
-		action: "login"
-	};
-	sendToServer(message);
-	ws.send(credentials);
-}
-function showLoginDropdown(e) {
-	showElement($("hideableDropDown"));
-	e.stopPropagation();
-}
+
+controllers.LoginController = function ($scope, $rootScope) {
+	function login() {
+		var message = {
+			username: document.getElementById("username").value,
+			password: document.getElementById("password").value,
+			action: "login"
+		};
+		sendToServer(message);
+		ws.send(credentials);
+	}
+};
 
 onDocLoad(function () {
 

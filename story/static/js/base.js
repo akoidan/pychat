@@ -2,39 +2,61 @@ var sound = 0;
 var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var HISTORY_STORAGE_NAME = 'history';
 var MAX_STORAGE_LENGTH = 3000;
+var ws;
 
 var $ = function (id) {
 	return document.getElementById(id);
 };
 
-function lol(resource) {
-	alert("ersolve");
-	var resolve = doGet(resource);
-}
+var demoApp = angular.module('chat', ['ui.router']);
 
-var demoApp = angular.module('chat', ['ngRoute']);
-
-demoApp.config(['$routeProvider', function ($routeProvider) {
-	$routeProvider
-		.when('/', {
-			controller: 'MessagesController',
-			templateUrl: '/static/html/chat.html',
-			resolve: {
-				test: function ($q) {
-					//
+demoApp.config(function ($stateProvider, $urlRouterProvider) {
+	$stateProvider
+		.state('home', {
+			url: '/',
+			views: {
+				nav: {
+					templateUrl: '/static/html/login.html',
+					controller: 'MessagesController'
+				},
+				body: {
+					templateUrl: '/static/html/chat.html',
+					controller: 'MessagesController',
+					resolve: {
+						test: function ($q) {
+							//
+						}
+					}
 				}
 			}
 		})
-		.when('/profile',
-		{
-			templateUrl: '/static/html/change_profile.html'
+		.state('profile', {
+			url: '/profile',
+			views: {
+				nav: {
+					templateUrl: '/static/html/change-profile.html',
+					controller: 'MessagesController'
+				},
+				body: {
+					templateUrl: '/static/html/login.js',
+					controller: 'MessagesController'
+				}
+			}
 		})
-		.when('/register',
-		{
-			templateUrl: '/static/html/register.html'
-		})
-		.otherwise({redirectTo: '/'});
-}]);
+		.state('register', {
+			url: '/register',
+			views: {
+				nav: {
+					templateUrl: '/static/html/register.html',
+					controller: 'MessagesController'
+				},
+				body: {
+					templateUrl: '/static/html/login.js',
+					controller: 'MessagesController'
+				}
+			}
+		});
+});
 
 
 console.log('config applied');
@@ -357,3 +379,10 @@ angular.module('chat').filter('smileys', function ($sce) {
 		return $sce.trustAsHtml(input);
 	};
 });
+
+// start login.js
+function showLoginDropdown(e) {
+	showElement($("hideableDropDown"));
+	e.stopPropagation();
+}
+//end.

@@ -467,7 +467,6 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 
 	def __init__(self, *args, **kwargs):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
-		self.set_cookie(settings.SESSION_COOKIE_NAME, sessionStore.create) #  TODO
 		self.connected = False
 		self.anti_spam = AntiSpam()
 
@@ -482,6 +481,19 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 
 	def data_received(self, chunk):
 		pass
+
+	def options(self, *args, **kwargs):
+		self.post(args, kwargs)
+
+	def post(self, *args, **kwargs):
+		"""
+		Generates new session id
+		"""
+		cookie = self.get_cookie(settings.SESSION_COOKIE_NAME)
+		if cookie is None or not sessionStore.exists(cookie):
+			newSession = session_engine.SessionStore()
+			newSession.save()
+			self.set_cookie(settings.SESSION_COOKIE_NAME, newSession.session_key)
 
 	def on_message(self, json_message):
 		try:
@@ -535,7 +547,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.connected = True
 		else:
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
-			self.close(403, "Session key is empty or session doesn't exist")
+			self.close(401, "Session key is empty or session doesn't exist")
 
 	def check_origin(self, origin):
 		"""
@@ -563,6 +575,9 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		except tornado.websocket.WebSocketClosedError as e:
 			self.logger.error("%s. Can't send << %s >> message", e, str(message))
 
+
+
 application = tornado.web.Application([
-	(r'.*', TornadoHandler),
+	(r'/static/(.*)', tornado.web.StaticFileHandler, {'path': settings.STATICFILES_DIR}),
+	(r'/', TornadoHandler),
 ])

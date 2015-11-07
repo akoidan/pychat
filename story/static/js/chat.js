@@ -73,17 +73,118 @@ var receiverId;
 var userNameLabel;
 var charRooms;
 //main single socket for handling realtime messages
-var ws;
 var isWsConnected; // used for debugging info only
 var chatUserRoomWrapper; // for hiddding users
 
+onDocLoad(function () {
+	//	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+	//		alert('you can download app');
+	//}
+	chatBoxDiv = $("chatbox");
+	userMessage = $("usermsg");
+	chatUsersTable = $("chat-user-table");
+	chatUserRoomWrapper = $("chat-room-users-wrapper");
+	userNameLabel = $("userNameLabel");
+	userSendMessageTo = $("userSendMessageTo");
+	chatIncoming = $("chatIncoming");
+	chatOutgoing = $("chatOutgoing");
+	chatLogin = $("chatLogin");
+	chatLogout = $("chatLogout");
+	sendButton = $("sendButton");
+	smileParentHolder = $('smileParentHolder');
+	navbar = document.querySelector('nav');
+	receiverId = $("receiverId");
+	charRooms = $("rooms");
+	navbarList = $('navbarList');
+	chatBoxWrapper = $('wrapper');
+	smileToogler = $('smileToogler');
+	addSmileysEvents();
+});
 
 var controllers = {};
-controllers.MessagesController = function ($scope) {
+controllers.MessagesController = function ($scope, $rootScope) {
+// login.js
+
+	$scope.login = function () {
+		var message = {
+			username: document.getElementById("username").value,
+			password: document.getElementById("password").value,
+			action: "login"
+		};
+		ws.send(message);
+	};
+
+	$rootScope.$on('$includeContentLoaded', function () {
+		onDocLoad(function () {
+			hideElement($("hideableDropDown"));
+			hideElement($('inputName'));
+		});
+
+
+
+		function showLoginDropdown(e) {
+			showElement($("hideableDropDown"));
+			e.stopPropagation();
+		}
+
+		onDocLoad(function () {
+
+			document.addEventListener("click", function () {
+				hideElement($("hideableDropDown"));
+			});
+
+			//Handles menu drop down
+			var loginForm = $('hideableDropDown');
+			loginForm.onclick = function (e) {
+				e.stopPropagation(); // don't fire parent event when clicking on loginForm
+			};
+
+			// login by enter
+			loginForm.onkeypress = function (event) {
+				if (event.keyCode === 13) {
+					login();
+				}
+			};
+
+			var editUserName = function (label) {
+				hideElement(label);
+				var oldUsername = label.textContent;
+				var input = $('inputName');
+				input.focus();
+				showElement(input);
+				var sendChangeNickname = function (event) {
+					var newUsername = input.value;
+					hideElement(input);
+					showElement(label);
+					if (!USER_REGEX.test(newUsername)) {
+						alert('Wrong username, only letters, -_');
+						label.textContent = oldUsername;
+					} else if (newUsername !== oldUsername) {
+						sendToServer({content: newUsername, action: 'me'});
+					}
+				};
+				input.onblur = sendChangeNickname;
+				input.onkeypress = function (e) {
+					if (e.which == 13) {
+						sendChangeNickname();
+					}
+				};
+			};
+
+			$("userNameLabel").onclick = function () {
+				editUserName(this);
+			};
+
+		});
+
+	});
+// end login.js
+
 	$scope.cngMessages = [];
 	$scope.users = [];
 	$scope.rooms = [];
 	$scope.smileysTabs = [];
+	auth();
 	start_chat_ws();
 
 	init();
@@ -101,30 +202,8 @@ controllers.MessagesController = function ($scope) {
 	};
 
 	function init() {
-		//	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-		//		alert('you can download app');
-		//}
-		chatBoxDiv = $("chatbox");
-		userMessage = $("usermsg");
-		chatUsersTable = $("chat-user-table");
-		chatUserRoomWrapper = $("chat-room-users-wrapper");
-		userNameLabel = $("userNameLabel");
-		userSendMessageTo = $("userSendMessageTo");
-		chatIncoming = $("chatIncoming");
-		chatOutgoing = $("chatOutgoing");
-		chatLogin = $("chatLogin");
-		chatLogout = $("chatLogout");
-		sendButton = $("sendButton");
-		smileParentHolder = $('smileParentHolder');
-		navbar = document.querySelector('nav');
-		receiverId = $("receiverId");
-		charRooms = $("rooms");
-		navbarList = $('navbarList');
-		chatBoxWrapper = $('wrapper');
-		smileToogler = $('smileToogler');
 		$scope.userSendMessageToIsHidden = true;
 		$scope.smileParentHolderIsHidden = true;
-		addSmileysEvents();
 		userMessage.addEventListener("keypress", sendMessage);
 		chatUsersTable.addEventListener("click", userClick);
 		chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
@@ -140,8 +219,13 @@ controllers.MessagesController = function ($scope) {
 		doGet(SMILEY_URL + 'info.json', loadSmileys);
 	}
 
+
+	function auth() {
+		doPost("/");
+	}
+
 	function start_chat_ws() {
-		ws = new WebSocket(readCookie('api'));
+		ws = new WebSocket("ws://"+document.location.host);
 		ws.onmessage = webSocketMessage;
 		ws.onclose = function () {
 			if (isWsConnected) {

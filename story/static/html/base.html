@@ -8,7 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="/static/css/fontello.css">
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	<script src="/static/js/angular.js"></script>
-	<script src="/static/js/angular-route.js"></script>
+	 <script src="/static/js/angular-ui-router.js"></script>
 	<script src="/static/js/base.js"></script>
 
 	<!-- chat.html dependencies -->
@@ -17,7 +17,7 @@
   <!-- chat.html end -->
 
 	<!-- login.html dependencies-->
-	<script src="/static/js/login.js"></script>
+ <!--	<script src="/static/js/login.js"></script> -->
 	<!-- login.html end -->
 
 </head>
@@ -50,18 +50,15 @@
 			</i>
 		</li>
 
-		<!--<ng-include=" 'static/login.html' " ng-if="!username"></ng-include> -->
-		<!-- <ng-include=" 'static/logout.html' " ng-if="username"></ng-include> -->
-		 <ng-include src="'/static/html/login.html'"></ng-include>
+		<div ui-view="nav"></div>
 		<li class="right username">Hello,
 			<b>
-				<!-- ng-if="!username" -->
 				<input type='text' id='inputName' maxlength='16' class='userNameInput' value=''/>
 				<label id="userNameLabel">{{ username }}</label>
 			</b>
 		</li>
 	</ul>
 </nav>
-<div ng-view id="wrapper"></div>
+<div ui-view="body"></div>
 </body>
 </html>
