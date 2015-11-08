@@ -25,7 +25,7 @@ class UserProfile(AbstractBaseUser):
 	@property
 	def is_staff(self):
 		# every registered user can edit database
-		return False  # self.pk == DEFAULT_PROFILE_ID
+		return self.pk == 1
 
 	def has_perm(self, perm, obj=None):
 		return self.is_staff
