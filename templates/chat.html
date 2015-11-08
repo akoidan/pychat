@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block head %} {% load staticfiles %}
+	<script src="{% static "js/chat.js" %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}">
+{% endblock head %}
+{% block navbar %}
+	<li><i title="Show all users"
+			 onclick="toogleVisibility(chatUserRoomWrapper)" class="icon-users"><span class="mText">users</span></i></li>
+	<li><i class="icon-clear" title="CLear local history"
+			 onclick="clearLocalHistory()"><span class="mText">clear</span></i></li>
+{% endblock navbar %}
+{% block content %}
+	<div>
+		<audio id="chatIncoming" src="{% static 'sounds/ChatIncoming.wav' %}" preload="none"></audio>
+		<audio id="chatOutgoing" src="{% static 'sounds/ChatOutgoing.wav' %}" preload="none"></audio>
+		<audio id="chatLogin" src="{% static 'sounds/ChatLogin.wav' %}" preload="none" ></audio>
+		<audio id="chatLogout" src="{% static 'sounds/ChatLogout.wav' %}" preload="none"></audio>
+	</div>
+	<div id="wrapper">
+		<div class="fluid-inline">
+			<div id="chat-room-users-wrapper">
+				<div class="fluid-height-child-bot">
+					<div>
+						<table id="chat-user-table">
+							<tr></tr>
+						</table>
+					</div>
+					<div id="rooms">
+					</div>
+				</div>
+			</div>
+			<div id="chatbox">
+				<div>
+
+				</div>
+			</div>
+		</div>
+		<div id="bottomWrapper" class="noSelection">
+			<i class="icon-emo-happy" id="smileToogler" title="report an issue"></i>
+			<div id="smileParentHolder" class="padding10" onclick="addSmile(event);"><ul id="tabNames"></ul></div>
+			<div id="userSendMessageTo">
+				<div id="receiverId"></div>
+				<i class="icon-cancel" onclick="hideUserSendToName();"></i>
+			</div>
+			<div class="message-text-holder box-shadow">
+				<textarea name="usermsg" rows="1" class="fullwidth" id="usermsg"></textarea>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
