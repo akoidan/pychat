@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block head %}
+	{% load staticfiles %}
+{% endblock head %}
+{% block content %}
+	<div>
+		{#	if photo isn't uploaded yet #}
+		{% if form.instance.photo %}
+			<div class="col1" style="text-align: center">
+				<div class="padding10">
+					<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
+				</div>
+			</div>
+
+			<img src="" style="display: none;">
+			<canvas style="display:none;"></canvas>
+		{% endif %}
+
+		<div class="col1">
+			<table class="biginputtext">
+				{{ form.as_table }}
+			</table>
+		</div>
+	</div>
+{% endblock content %}
