@@ -16,7 +16,7 @@ from os.path import join
 
 LOGGING_CONFIG = None
 try:
-	from Chat.production import * 
+	from chat.production import * 
 except ImportError:
 	pass
 from django.conf import global_settings
@@ -199,7 +199,7 @@ LOGGING = {
 			'level': 'DEBUG',
 			'propagate': False,
 		},
-		'Chat.tornadoapp': {
+		'chat.tornadoapp': {
 			'handlers': ['file-tornado'],
 			'level': 'DEBUG',
 			'propagate': False,
