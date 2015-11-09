@@ -303,7 +303,10 @@ function userClick(event) {
 	event = event || window.event;
 	var target = event.target || event.srcElement;
 	destinationUserName = target.innerHTML;
-	showUserSendMess(destinationUserName);
+	showElement(userSendMessageTo);
+	// Empty sets display to none
+	receiverId.innerHTML = destinationUserName;
+	userMessage.focus();
 	if (target.attributes.name != null) {
 		// icon click
 		destinationUserId = parseInt(target.attributes.name.value);
@@ -520,16 +523,6 @@ function loadUsers(usernames) {
 			tbody.appendChild(tr);
 		}
 	}
-}
-
-
-// Used by {@link loadUsers}
-function showUserSendMess(username) {
-	showElement(userSendMessageTo);
-	// Empty sets display to none
-
-	//userSendMessageTo.style.display = "inline-block";
-	receiverId.innerHTML = username;
 }
 
 
