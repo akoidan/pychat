@@ -515,7 +515,7 @@ function loadUsers(usernames) {
 			var tdUser = document.createElement('td');
 			tdUser.setAttribute('name', userId);
 			tdUser.className = userNameClass;
-			tdUser.innerText = username;
+			tdUser.innerHTML = username;
 			tdUser.onclick = userClick;
 			tr.appendChild(tdIcon);
 			tr.appendChild(tdUser);
@@ -558,7 +558,7 @@ function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncod
 	headSpan.appendChild(timeSpan);
 
 	var userNameA = document.createElement('span');
-	userNameA.innerText = displayedUsername;
+	userNameA.innerHTML = displayedUsername;
 	if (displayedUsername != SYSTEM_USERNAME) {
 		userNameA.className = userNameClass;
 		userNameA.onclick = userClick;
@@ -787,7 +787,7 @@ function setupChannels(channels) {
 		if (channels.hasOwnProperty(key)) {
 			var li = document.createElement('li');
 			li.setAttribute('name', key);
-			li.innerText = channels[key];
+			li.innerHTML = channels[key];
 			ul.appendChild(li);
 		}
 	}
