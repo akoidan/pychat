@@ -62,8 +62,6 @@ INSTALLED_APPS = (
 )
 
 SESSION_ENGINE = 'redis_sessions.session'
-# create session for anonymous
-SESSION_SAVE_EVERY_REQUEST = True
 
 API_PORT = '8888'
 
@@ -228,6 +226,8 @@ EMAIL_HOST_USER = 'chat.django@gmail.com'
 EMAIL_HOST_PASSWORD = 'Ilovepython'
 
 ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/djangochat/issues/new'
+
+SESSION_COOKIE_NAME="sessionid"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 

@@ -20,6 +20,10 @@ class UserCookieMiddleWare(object):
 			domain_address = request.get_host().split(':')[0]
 			api_address = "ws://%s:%s/" % (domain_address, api_port)
 			response.set_cookie(api_cookie_name, api_address)
+		# force create Session for annon
+		if hasattr(request, 'session') and not request.session.session_key:
+			request.session.save()
+			request.session.modified = True
 		return response
 
 	def process_request(self, request):
