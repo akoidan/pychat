@@ -24,3 +24,4 @@ chat/static/favicon.inco
 chat/static/js/angular*
 example
 sessionsids.txt
+djangochat-config

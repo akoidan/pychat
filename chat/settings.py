@@ -41,9 +41,9 @@ TEMPLATE_DIRS = (
 	join(BASE_DIR, 'templates'),
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + [
 	'chat.context_processors.add_user_name',
-)
+]
 
 # Application definition
 

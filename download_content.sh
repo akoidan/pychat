@@ -1,16 +1,19 @@
 #!/bin/bash
 
-CONF_VERSION = 'f0abc2b2b4aa5f8a032c984ba05824850d19754e'
+CONF_VERSION='f0abc2b2b4aa5f8a032c984ba05824850d19754e'
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
-TMP_DIR="/tmp/loaded_content"
-STATIC_PARENT="$PROJECT_ROOT/story"
+
+RANDOM_DIR=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+TMP_DIR="/tmp/$RANDOM_DIR"
+STATIC_PARENT="$PROJECT_ROOT/chat"
 STATIC_DIR="$STATIC_PARENT/static"
 JS_DIR="$STATIC_DIR/js"
 CSS_DIR="$STATIC_DIR/css"
 FONT_DIR="$STATIC_DIR/font"
 SOUNDS_DIR="$STATIC_DIR/sounds"
+SMILEYS_DIR="$STATIC_DIR/smileys"
 
 # Implementing installed files
 files[0]="$STATIC_DIR/favicon.ico"
@@ -26,22 +29,20 @@ files[9]="$FONT_DIR/fontello.eot"
 files[10]="$FONT_DIR/fontello.svg"
 files[11]="$FONT_DIR/fontello.ttf"
 files[12]="$FONT_DIR/fontello.woff"
+files[15]="$SMILEYS_DIR"
+files[14]="$SMILEYS_DIR/info.json"
+files[13]="$SMILEYS_DIR/base/0000.gif"
 
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do
   if [ -f $path ]; then
-   rm $path
+   rm -v $path
+   elif  [ -d $path ]; then
+   rm -rv $path
   fi
 done
 
-
-# remove tmp directory afterword if It didn't exist
-if [ -d "$TMP_DIR" ]; then
-    clean_tmp_dir=0;
-  else
-    mkdir -p $TMP_DIR
-    clean_tmp_dir=1;
-fi
+mkdir -pv $TMP_DIR
 
 cd $PROJECT_ROOT
 
@@ -64,7 +65,7 @@ wget http://momentjs.com/downloads/moment.js -P $JS_DIR
 # Checking if all files are loaded
 failed_count=0
 for path in "${files[@]}" ; do
-  if [ ! -f $path ]; then
+  if [ ! -f $path ] && [ ! -d $path ]; then #if doen't exist
     ((failed_count++))
      >&2 echo "Can't find file: $path"
     failed_items[$failed_count]=$path
@@ -88,9 +89,8 @@ if [[ $failed_count > 0 ]]; then
   done
 fi
 
-if [ $clean_tmp_dir -eq 1 ] ; then
-  rm -rf $TMP_DIR
-fi
+echo "removing tmp directory $TMP_DIR"
+rm -rf $TMP_DIR
 
 if [[ $failed_count_second_attempt > 0 ]]; then
   for path_failed2 in "${failed_items_second_attempt[@]}" ; do
