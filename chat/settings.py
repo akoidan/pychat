@@ -41,9 +41,16 @@ TEMPLATE_DIRS = (
 	join(BASE_DIR, 'templates'),
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + [
-	'chat.context_processors.add_user_name',
-]
+# TODO
+username_processor = 'chat.context_processors.add_user_name'
+try:
+	TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + [
+		username_processor,
+	]
+except TypeError:
+	TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+		username_processor,
+	)
 
 # Application definition
 
