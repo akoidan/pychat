@@ -442,11 +442,14 @@ function loadMessagesFromLocalStorage() {
 function start_chat_ws() {
 	ws = new WebSocket(readCookie('api'));
 	ws.onmessage = webSocketMessage;
-	ws.onclose = function () {
+	ws.onclose = function (e) {
+		if (e.code === 403) {
+
+		}
 		if (isWsConnected) {
 			console.error(getDebugMessage(
-				"Connection to WebSocket has failed, trying to reconnect every {}ms",
-				 CONNECTION_RETRY_TIME));
+				'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
+					e.reason,  CONNECTION_RETRY_TIME));
 			isWsConnected = false;
 		}
 		// Try to reconnect in 5 seconds

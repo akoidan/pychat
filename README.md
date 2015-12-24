@@ -47,7 +47,6 @@ Start the chat:
 * https://code.djangoproject.com/ticket/25489
 * http://stackoverflow.com/a/18843553/3872976
 * refactor set class name for css instead of settings css
-* change raw innerHtml to node.appendChild
 * add multipart smileys
 * add canvas images 
 * add antispam system
@@ -76,9 +75,7 @@ Start the chat:
 * USE init or on_open
 * show system messages on navbar
 * show if user's reconnecting
-* deploy on server
 * timezone
 * add chat rooms
-* implement smiles
 * check loadmessage top onkeydow
 * allow selecting username in navbar, remove selecting cursor 

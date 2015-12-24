@@ -15,7 +15,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connection, OperationalError, InterfaceError
 from django.db.models import Q
-from django.utils.importlib import import_module
+from redis_sessions.session import SessionStore
 from tornado.websocket import WebSocketHandler
 
 from chat.log_filters import id_generator
@@ -31,7 +31,6 @@ from chat.registration_utils import check_user
 
 PY3 = sys.version > '3'
 
-session_engine = import_module(settings.SESSION_ENGINE)
 user_cookie_name = settings.USER_COOKIE_NAME
 
 ANONYMOUS_GENDER = 'Alien'
@@ -84,7 +83,7 @@ except Room.DoesNotExist:
 ANONYMOUS_REDIS_CHANNEL = REDIS_ROOM_CHANNEL_PREFIX % anonymous_default_room.id
 ANONYMOUS_ROOM_NAMES = {anonymous_default_room.id: anonymous_default_room.name}
 
-sessionStore = session_engine.SessionStore()
+sessionStore = SessionStore()
 
 logger = logging.getLogger(__name__)
 
@@ -289,7 +288,7 @@ class MessagesHandler(MessagesCreator):
 		Case anonymous: generates a new name and saves it to session. returns default channel
 		:return: channels user should subscribe
 		"""
-		session = session_engine.SessionStore(session_key)
+		session = SessionStore(session_key)
 		try:
 			self.user_id = int(session["_auth_user_id"])
 			user_db = self.do_db(User.objects.get, id=self.user_id)  # everything but 0 is a registered user
@@ -388,7 +387,7 @@ class MessagesHandler(MessagesCreator):
 				self.logger.info('!! This name is already used')
 				raise ValidationError('Anonymous already has this name')
 			session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
-			session = session_engine.SessionStore(session_key)
+			session = SessionStore(session_key)
 			session[SESSION_USER_VAR_KEY] = new_username
 			session.save()
 
