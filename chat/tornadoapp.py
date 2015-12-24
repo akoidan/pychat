@@ -521,7 +521,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.connected = True
 		else:
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
-			self.close(403, "Session key is empty or session doesn't exist")
+			self.close(403, "Session key %s has been rejected" % session_key)
 
 	def check_origin(self, origin):
 		"""

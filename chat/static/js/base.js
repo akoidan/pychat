@@ -177,6 +177,7 @@ function doGet(fileUrl, callback) {
 				fileRef.setAttribute("href", fileUrl);
 				break;
 			case 'json':
+			default:
 				var xobj = new XMLHttpRequest();
 				// special for IE 
 				if (xobj.overrideMimeType) {
@@ -191,9 +192,6 @@ function doGet(fileUrl, callback) {
 					}
 				};
 				xobj.send(null);
-				break;
-			default:
-				console.error(getDebugMessage('Unknown type of style {}', fileType))
 		}
 		if (fileRef) {
 			document.getElementsByTagName("head")[0].appendChild(fileRef);
