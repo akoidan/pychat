@@ -22,6 +22,8 @@ chat/static/js/pikaday.js
 chat/static/js/moment.js
 chat/static/no_ava.png
 chat/static/smileys
+chat/static/favicon.inco
 chat/static/js/angular*
 example
 sessionsids.txt
+djangochat-config

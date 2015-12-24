@@ -45,9 +45,16 @@ TEMPLATE_DIRS = (
 	join(BASE_DIR, 'templates'),
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
-	'chat.context_processors.add_user_name',
-)
+# TODO
+username_processor = 'chat.context_processors.add_user_name'
+try:
+	TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + [
+		username_processor,
+	]
+except TypeError:
+	TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
+		username_processor,
+	)
 
 # Application definition
 
@@ -66,8 +73,6 @@ INSTALLED_APPS = (
 )
 
 SESSION_ENGINE = 'redis_sessions.session'
-# create session for anonymous
-SESSION_SAVE_EVERY_REQUEST = True
 
 API_PORT = '8888'
 
@@ -223,6 +228,8 @@ import logging.config
 logging.config.dictConfig(LOGGING)
 
 ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/djangochat/issues/new'
+
+SESSION_COOKIE_NAME="sessionid"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 

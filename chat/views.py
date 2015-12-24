@@ -37,6 +37,18 @@ def validate_email(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
+@require_http_methods(['GET'])
+def update_session_key(request):
+	"""
+	Creates a new session key, saves it to session store and to response
+	"""
+	old_key = request.session.session_key
+	request.session.create()  # updates the session_key
+	logger.info("Session key %s has been updated to %s", old_key, request.session.session_key)
+	request.session.modified = True
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+
+
 @require_http_methods('POST')
 def validate_user(request):
 	"""

@@ -21,6 +21,7 @@ urlpatterns = patterns(
 	url(r'^confirm_email$', 'chat.views.confirm_email'),
 	# story/register.js uses link below
 	url(r'^validate_user$', 'chat.views.validate_user'),
+	url(r'^update_session_key', 'chat.views.update_session_key'),
 	url(r'^validate_email$', 'chat.views.validate_email'),
 	url(r'^profile$', 'chat.views.change_profile'),
 	url(r'^profile/(\d{1,5})$', 'chat.views.show_profile'),

@@ -4,7 +4,7 @@ if (!("WebSocket" in window)) {
 	"Please use Chrome, Firefox, Safari, Internet Explorer 10+ or any modern browser.");
 	throw "Browser doesn't support Web socket";
 }
-const CONNECTION_RETRY_TIME = 5000;
+const CONNECTION_RETRY_TIME = 10000;
 
 const SMILEY_URL = '/static/smileys/';
 
@@ -442,11 +442,22 @@ function loadMessagesFromLocalStorage() {
 function start_chat_ws() {
 	ws = new WebSocket(readCookie('api'));
 	ws.onmessage = webSocketMessage;
-	ws.onclose = function () {
+	ws.onclose = function (e) {
 		if (isWsConnected) {
-			console.error(getDebugMessage(
-				"Connection to WebSocket has failed, trying to reconnect every {}ms",
-				 CONNECTION_RETRY_TIME));
+			if (e.code === 403) {
+				console.error(getDebugMessage('Server forbidden ws request because "{}". Trying to renew the session',  e.reason));
+				doGet("/update_session_key", function(response) {
+					if (response == 'ok') {
+						console.log(getDebugMessage('Session key has been successfully updated'));
+					} else {
+						console.log(getDebugMessage('Updating session key has failed. Server response: "{}"', response ));
+					}
+				})
+			} else {
+				console.error(getDebugMessage(
+						'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
+						e.reason, CONNECTION_RETRY_TIME));
+			}
 			isWsConnected = false;
 		}
 		// Try to reconnect in 5 seconds
