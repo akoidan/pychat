@@ -52,7 +52,6 @@ var headerId;
 var chatBoxDiv;
 var navbarList;
 var navbar;
-var smileToogler;
 var chatBoxWrapper;
 var smileParentHolder;
 var smileyDict = {};
@@ -111,7 +110,6 @@ onDocLoad(function () {
 	charRooms = $("rooms");
 	navbarList = $('navbarList');
 	chatBoxWrapper = $('wrapper');
-	smileToogler = $('smileToogler');
 	hideElement(userSendMessageTo);
 	hideElement(smileParentHolder);
 	addSmileysEvents();
@@ -143,11 +141,15 @@ function addSmileysEvents() {
 		}
 		hideElement(smileParentHolder);
 	});
-	smileToogler.addEventListener('click', function (event) {
-		event.stopPropagation(); // prevent top event
-		toogleVisibility(smileParentHolder);
-	});
 }
+
+
+function toggleSmileys(event) {
+	event.stopPropagation(); // prevent top event
+	toogleVisibility(smileParentHolder);
+	userMessage.focus();
+}
+
 
 function showTabByName(event) {
 	if (event.target != null) {
@@ -218,7 +220,7 @@ function addSmile(event) {
 
 
 function addTextAreaEvents() {
-	userMessage.addEventListener('keypress', sendMessage);
+	userMessage.addEventListener('keydown', sendMessage);
 	userMessage.addEventListener('input', function () {
 		adjustUserMessageWidth(); // pass 1st argument as null instead of Event
 	});
@@ -262,9 +264,9 @@ function adjustUserMessageWidth(mql) {
 
 	var navH = navbarList.clientHeight;
 
-	// 5 is some kind of magical browser paddings
+	// 10 is some kind of magical browser paddings
 	// 8 are padding + borders, 1 is top added height
-	var allButChatSpaceHeight = textAreaHeight + navH + 5 + 8 +1 ;
+	var allButChatSpaceHeight = textAreaHeight + navH + 5 + 14 +1 ;
 
 	//console.log(getDebugMessage('bodyH {}; newH {}; textAr {}; navH {} ',
 	// bodyHeight, allButChatSpaceHeight, textAreaHeight, navH));
@@ -326,6 +328,9 @@ function keyDownLoadUp(e) {
 
 
 function sendMessage(event) {
+	if (event.keyCode ==27) {
+		hideElement(smileParentHolder);
+	}
 	if (event.keyCode !== 13) {
 		return;
 	}
