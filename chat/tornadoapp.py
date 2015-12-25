@@ -27,7 +27,7 @@ except ImportError:
 
 from chat.settings import MAX_MESSAGE_SIZE, ANONYMOUS_REDIS_ROOM
 from chat.models import User, Message, Room
-from chat.registration_utils import check_user
+from chat.utils import check_user
 
 PY3 = sys.version > '3'
 
@@ -220,7 +220,12 @@ class MessagesHandler(MessagesCreator):
 	def __init__(self, *args, **kwargs):
 		super(MessagesHandler, self).__init__(*args, **kwargs)
 		self.log_id = str(id(self) % 10000).rjust(4, '0')
-		self.logger = logging.LoggerAdapter(logger, {'username': '00000000', 'id': self.log_id})
+		log_params = {
+			'username': '00000000',
+			'id': self.log_id,
+			'ip': 'initializing'
+		}
+		self.logger = logging.LoggerAdapter(logger, log_params)
 		self.async_redis = tornadoredis.Client()
 		self.process_message = {
 			GET_MINE_USERNAME_EVENT: self.process_change_username,
@@ -515,7 +520,12 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, id(self))
 			self.async_redis.connect()
 			channels = self.set_username(session_key)
-			self.logger = logging.LoggerAdapter(logger, {'username': self.sender_name.rjust(8), 'id': self.log_id})
+			log_params = {
+				'username': self.sender_name.rjust(8),
+				'id': self.log_id,
+				'ip': self.get_client_ip()
+			}
+			self.logger = logging.LoggerAdapter(logger, log_params)
 			self.listen(channels)
 			self.add_online_user()
 			self.connected = True
@@ -548,6 +558,10 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.write_message(message)
 		except tornado.websocket.WebSocketClosedError as e:
 			self.logger.error("%s. Can't send << %s >> message", e, str(message))
+
+	def get_client_ip(self):
+		x_real_ip = self.request.headers.get("X-Real-IP")
+		return x_real_ip or self.request.remote_ip
 
 application = tornado.web.Application([
 	(r'.*', TornadoHandler),

@@ -16,4 +16,5 @@ class ContextFilter(Filter):
 	def filter(self, record):
 		record.username = getattr(local, 'user', None)
 		record.id = getattr(local, 'random', None)
+		record.ip = getattr(local, 'client_ip', None)
 		return True

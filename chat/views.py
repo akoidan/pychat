@@ -13,11 +13,11 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 
-from chat import registration_utils
+from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, Room, IssueDetails
-from chat.registration_utils import *
+from chat.utils import *
 from chat.settings import ANONYMOUS_REDIS_ROOM, REGISTERED_REDIS_ROOM, logging, VALIDATION_IS_OK
 
 logger = logging.getLogger(__name__)
@@ -30,7 +30,7 @@ def validate_email(request):
 	"""
 	email = request.POST.get('email')
 	try:
-		registration_utils.check_email(email)
+		utils.check_email(email)
 		response = settings.VALIDATION_IS_OK
 	except ValidationError as e:
 		response = e.message
@@ -56,7 +56,7 @@ def validate_user(request):
 	"""
 	try:
 		username = request.POST.get('username')
-		registration_utils.check_user(username)
+		utils.check_user(username)
 		# hardcoded ok check in register.js
 		message = settings.VALIDATION_IS_OK
 	except ValidationError as e:

@@ -75,7 +75,6 @@ class UserProfile(User):
 	email_verified = models.BooleanField(default=False, null=False)
 	verify_code = models.CharField(max_length=17, null=True)
 
-
 	def save(self, *args, **kwargs):
 		"""
 		http://stackoverflow.com/questions/15422606/django-model-email-field-unique-if-not-null-blank
