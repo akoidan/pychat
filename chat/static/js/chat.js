@@ -24,16 +24,20 @@ const genderIcons = {
 	'Alien': 'icon-anonymous',
 	'Secret': 'icon-user-secret'
 };
+
 const escapeMap = {
 	"&": "&amp;",
 	"<": "&lt;",
 	">": "&gt;",
 	'"': '&quot;',
 	"'": '&#39;',
+	"\n": '<br>',
 	"/": '&#x2F;'
 };
 
+var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 var smileyPattern = /:\S+:/g;
+var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*>>>\s/;
 
 var destinationUserName = null;
 var destinationUserId = null;
@@ -224,11 +228,17 @@ function addTextAreaEvents() {
 	userMessage.addEventListener('input', function () {
 		adjustUserMessageWidth(); // pass 1st argument as null instead of Event
 	});
-	var mql = window.matchMedia(
+	var scaleFactor = 1.6;
+    var mql = window.matchMedia(
 		"(min-height: " + DISABLE_NAV_HEIGHT + "px)" +
-		" and (max-height: " + (DISABLE_NAV_HEIGHT * 2) + "px)"
+		" and (max-height: " + DISABLE_NAV_HEIGHT * Math.pow(scaleFactor, 1) + "px)"
+	);
+	var mql2 = window.matchMedia(
+		"(min-height: " + DISABLE_NAV_HEIGHT*Math.pow(scaleFactor, 2)+ "px)" +
+		" and (max-height: " + DISABLE_NAV_HEIGHT * Math.pow(scaleFactor, 3) + "px)"
 	);
 	mql.addListener(adjustUserMessageWidth);
+	mql2.addListener(adjustUserMessageWidth);
 	adjustUserMessageWidth(true);
 }
 
@@ -260,7 +270,15 @@ function adjustUserMessageWidth(mql) {
 	if (textAreaHeight > maxHeight) {
 		textAreaHeight = maxHeight;
 	}
-	userMessage.style.height = textAreaHeight + 1 + 'px'; // 1 in case of wrong calculations
+	if (textAreaHeight > 35) { // textarea has exactly 1 row
+		// 1 in case of wrong calculations
+		userMessage.style.height = textAreaHeight + 1 + 'px';
+	} else  if (browserVersion.indexOf("irefox") > 0  && textAreaHeight < 35) {
+		userMessage.style.height = '23px';
+	} else {
+		userMessage.style.height = '';
+		textAreaHeight = userMessage.clientHeight;
+	}
 
 	var navH = navbarList.clientHeight;
 
@@ -313,6 +331,15 @@ function userClick(event) {
 		// icon click
 		destinationUserId = parseInt(target.attributes.name.value);
 	}
+}
+
+
+function timeMessageClick(event) {
+	var value = userMessage.value;
+	var match = value.match(timePattern);
+	var oldText = match ? value.substr(match[0].length) : value;
+	userMessage.value = getText('{}>>> {}', event.target.parentElement.parentElement.textContent,  oldText);
+	userMessage.focus();
 }
 
 
@@ -477,15 +504,13 @@ function start_chat_ws() {
 }
 
 function encodeHTML(html) {
-	return html.replace(/[&<>"']/g, function (s) {
+	return html.replace(replaceHtmlRegex, function (s) {
 		return escapeMap[s];
 	});
 }
 
 function encodeSmileys(html) {
-
 	html = encodeHTML(html);
-	html = html.replace(/\n/g, '<br>');
 	html = html.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
 	for (var el in smileyDict) {
 		if (smileyDict.hasOwnProperty(el)) {
@@ -559,6 +584,7 @@ function getPosition(time) {
 }
 
 
+/** Creates a DOM node with attached events and all message content*/
 function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix, userId) {
 	var date = new Date(timeMillis);
 	var time =  sliceZero(date.getHours())+":"+sliceZero(date.getMinutes())+":"+sliceZero(date.getSeconds());
@@ -571,6 +597,7 @@ function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncod
 	var timeSpan = document.createElement('span');
 	timeSpan.className = timeSpanClass;
 	timeSpan.innerHTML = getText('({})', time);
+	timeSpan.onclick = timeMessageClick;
 	headSpan.appendChild(timeSpan);
 
 	var userNameA = document.createElement('span');
@@ -602,13 +629,14 @@ function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncod
 }
 
 
+/** Inserts a message to positions, saves is to variable and scrolls if required*/
 function displayPreparedMessage(headerStyle, timeMillis, htmlEncodedContent, displayedUsername, isPrefix, receiverId) {
 	var pos = null;
 
 	if (allMessages.length > 0 && !(timeMillis > allMessages[allMessages.length-1])) {
 		try {
 			pos = getPosition(timeMillis);
-		} catch (err) {
+		} catch ( err) {
 			console.warn(getDebugMessage("Skipping duplicate message, time: {}, content: <<<{}>>> ",
 				timeMillis, htmlEncodedContent));
 			return;

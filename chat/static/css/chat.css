@@ -79,6 +79,11 @@
 	padding-right: 12px;
 }
 
+.timeMess:hover{
+	cursor:  pointer;
+	color: #979797;
+}
+
 /*-webkit-background-clip: text;*/
 /*-webkit-text-fill-color: transparent;*/
 /*gradient text top disappearing */
@@ -168,4 +173,8 @@
 
 .activeTab {
 	color: #fcaf3e ;
+}
+
+#usermsg {
+	margin-left: 4px;
 }
