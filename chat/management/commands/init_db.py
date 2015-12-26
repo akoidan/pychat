@@ -12,4 +12,4 @@ class Command(BaseCommand):
 		#python manage.py migrate --fake
 		call_command('makemigrations', 'chat')
 		call_command('migrate', 'chat')
-		call_command('syncdb')
+		# call_command('syncdb')
