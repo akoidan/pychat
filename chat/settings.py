@@ -241,7 +241,7 @@ USER_COOKIE_NAME = 'user'
 if not DEBUG:
 	IP_API_URL = 'http://ip-api.com/json/%s'
 
-WS_ADDRESS_COOKIE_NAME = 'api'
+
 ANONYMOUS_REDIS_ROOM = 'all'
 REGISTERED_REDIS_ROOM = 'signed'
 

@@ -1,9 +1,5 @@
 import random
 
-from django.conf import settings
-
-api_cookie_name = settings.WS_ADDRESS_COOKIE_NAME
-api_port = settings.API_PORT
 from chat import local
 
 
@@ -15,9 +11,6 @@ class UserCookieMiddleWare(object):
 	"""
 
 	def process_response(self, request, response):
-		if not request.COOKIES.get(api_cookie_name):
-			api_address = "ws://ws.pychat.org:%s/" % api_port
-			response.set_cookie(api_cookie_name, api_address)
 		# force create Session for annon
 		if hasattr(request, 'session') and not request.session.session_key:
 			request.session.save()
