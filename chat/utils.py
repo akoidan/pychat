@@ -137,7 +137,7 @@ def extract_photo(image_base64):
 
 def save_ip(user_id, ip):
 	api_url = getattr(settings, "IP_API_URL", None)
-	if user_id or IpAddress.objects.filter(user_id=user_id, ip=ip).exists():
+	if user_id == 0 or IpAddress.objects.filter(user_id=user_id, ip=ip).exists():
 		return
 	try:
 		f = urllib.request.urlopen(api_url % ip)
