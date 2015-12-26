@@ -15,10 +15,8 @@ class UserCookieMiddleWare(object):
 	"""
 
 	def process_response(self, request, response):
-
 		if not request.COOKIES.get(api_cookie_name):
-			domain_address = request.get_host().split(':')[0]
-			api_address = "ws://%s:%s/" % (domain_address, api_port)
+			api_address = "ws://ws.pychat.org:%s/" % api_port
 			response.set_cookie(api_cookie_name, api_address)
 		# force create Session for annon
 		if hasattr(request, 'session') and not request.session.session_key:
