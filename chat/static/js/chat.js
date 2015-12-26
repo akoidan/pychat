@@ -6,7 +6,7 @@ if (!("WebSocket" in window)) {
 }
 const CONNECTION_RETRY_TIME = 10000;
 
-const SMILEY_URL = '/static/smileys/';
+const SMILEY_URL = staticUrl + 'smileys/';
 
 const selfHeaderClass = 'message-header-self';
 const privateHeaderClass = 'message-header-private';
@@ -472,12 +472,12 @@ function loadMessagesFromLocalStorage() {
 
 
 function start_chat_ws() {
-	ws = new WebSocket(readCookie('api'));
+	ws = new WebSocket(apiUrl);
 	ws.onmessage = webSocketMessage;
 	ws.onclose = function (e) {
 		if (isWsConnected) {
 			if (e.code === 403) {
-				console.error(getDebugMessage('Server forbidden ws request because "{}". Trying to renew the session',  e.reason));
+				console.error(getDebugMessage('Server forbidden ws request because "{}". Trying to update session key',  e.reason));
 				doGet("/update_session_key", function(response) {
 					if (response == 'ok') {
 						console.log(getDebugMessage('Session key has been successfully updated'));
