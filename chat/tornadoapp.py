@@ -34,6 +34,7 @@ from chat.utils import check_user
 PY3 = sys.version > '3'
 
 user_cookie_name = settings.USER_COOKIE_NAME
+api_url = getattr(settings, "IP_API_URL", None)
 
 ANONYMOUS_GENDER = 'Alien'
 SESSION_USER_VAR_KEY = 'user_name'
@@ -437,24 +438,21 @@ class MessagesHandler(MessagesCreator):
 		self.safe_write(response)
 
 	def save_ip(self):
-		ip = self.ip
 		user_id = None if self.user_id == 0 else self.user_id
 		anon_name = self.sender_name if self.user_id == 0 else None
-		api_url = getattr(settings, "IP_API_URL", None)
-		if (not api_url or  # saving turned off
-			# ip record exist for existed use
-				(user_id and self.do_db(IpAddress.objects.filter(user_id=user_id, ip=ip).exists)) or
-			# ip record exist for anonymous
-				(anon_name and self.do_db(IpAddress.objects.filter(anon_name=anon_name, ip=ip).exists))):
+		if ((user_id and self.do_db(IpAddress.objects.filter(user_id=user_id, ip=self.ip).exists)) or
+				# << ip record exist for existed user, ip record exist for anonymous >>
+				(anon_name and self.do_db(IpAddress.objects.filter(anon_name=anon_name, ip=self.ip).exists))):
 			return
 		try:
-			self.logger.debug("Creating ip record %s", ip)
-			f = urlopen(api_url % ip)
+			if not api_url:
+				raise Exception('api url is absent')
+			self.logger.debug("Creating ip record %s", self.ip)
+			f = urlopen(api_url % self.ip)
 			raw_response = f.read().decode("utf-8")
 			response = json.loads(raw_response)
 			if response['status'] != "success":
-				self.logger.warning("Creating iprecord failed, server responded: %s", raw_response)
-				raise Exception(response['message'])
+				raise Exception("Creating iprecord failed, server responded: %s" % raw_response)
 			IpAddress.objects.create(
 				isp=response['isp'],
 				country=response['country'],
@@ -462,10 +460,10 @@ class MessagesHandler(MessagesCreator):
 				city=response['city'],
 				user_id=user_id,
 				anon_name=anon_name,
-				ip=ip)
+				ip=self.ip)
 		except Exception as e:
 			self.logger.error("Error while creating ip with country info, because %s", e)
-			IpAddress.objects.create(user_id=user_id, ip=ip)
+			IpAddress.objects.create(user_id=user_id, ip=self.ip)
 
 
 class AntiSpam:
