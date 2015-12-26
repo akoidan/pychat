@@ -123,6 +123,7 @@ class IssueDetails(models.Model):
 class IpAddress(models.Model):
 	user = models.ForeignKey(User, null=True)
 	anon_name = models.CharField(null=True, max_length=32)
+	time = models.DateTimeField(default=datetime.datetime.now)
 	ip = models.CharField(null=False, max_length=32)
 	isp = models.CharField(null=True, max_length=32)
 	country = models.CharField(null=True, max_length=32)
