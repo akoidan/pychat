@@ -2,6 +2,7 @@ import json
 import logging
 import sys
 import time
+import urllib
 from time import mktime
 
 import redis
@@ -26,8 +27,8 @@ except ImportError:
 	from urlparse import urlparse  # py3
 
 from chat.settings import MAX_MESSAGE_SIZE, ANONYMOUS_REDIS_ROOM
-from chat.models import User, Message, Room
-from chat.utils import check_user, save_ip
+from chat.models import User, Message, Room, IpAddress
+from chat.utils import check_user
 
 PY3 = sys.version > '3'
 
@@ -433,6 +434,29 @@ class MessagesHandler(MessagesCreator):
 		response = self.do_db(self.get_messages, messages)
 		self.safe_write(response)
 
+	def save_ip(self, ip):
+		api_url = getattr(settings, "IP_API_URL", None)
+		if  not api_url or self.user_id == 0 or self.do_db(IpAddress.objects.filter(user_id=self.user_id, ip=ip).exists):
+			return
+		try:
+			self.logger.debug("Creating ip record %s", ip)
+			f = urllib.request.urlopen(api_url % ip)
+			raw_response = f.read().decode("utf-8")
+			response = json.loads(raw_response)
+			if response['status'] != "success":
+				self.logger.warning("Creating iprecord failed, server responded: %s", raw_response)
+				raise Exception(response['message'])
+			IpAddress.objects.update_or_create({
+				'isp': response['isp'],
+				'country': response['country'],
+				'region': response['regionName'],
+				'city': response['city']},
+				user_id=self.user_id,
+				ip=ip)
+		except Exception as e:
+			self.logger.error(e)
+			IpAddress.objects.create(user_id=self.user_id, ip=ip)
+
 
 class AntiSpam:
 
@@ -530,7 +554,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.listen(channels)
 			self.add_online_user()
 			self.connected = True
-			save_ip(self.user_id, ip )
+			self.save_ip(ip)
 		else:
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key %s has been rejected" % session_key)
