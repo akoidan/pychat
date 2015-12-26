@@ -2,8 +2,8 @@ import json
 import logging
 import sys
 import time
-import urllib
 from time import mktime
+from  urllib.request import urlopen
 
 import redis
 import tornado.gen
@@ -440,7 +440,7 @@ class MessagesHandler(MessagesCreator):
 			return
 		try:
 			self.logger.debug("Creating ip record %s", ip)
-			f = urllib.request.urlopen(api_url % ip)
+			f = urlopen(api_url % ip)
 			raw_response = f.read().decode("utf-8")
 			response = json.loads(raw_response)
 			if response['status'] != "success":
