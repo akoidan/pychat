@@ -436,7 +436,7 @@ class MessagesHandler(MessagesCreator):
 
 	def save_ip(self, ip):
 		api_url = getattr(settings, "IP_API_URL", None)
-		if  not api_url or self.user_id == 0 or self.do_db(IpAddress.objects.filter(user_id=self.user_id, ip=ip).exists):
+		if not api_url  or  self.do_db(IpAddress.objects.filter(user_id=self.user_id,  ip=ip).exists):
 			return
 		try:
 			self.logger.debug("Creating ip record %s", ip)

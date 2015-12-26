@@ -121,7 +121,7 @@ class IssueDetails(models.Model):
 
 
 class IpAddress(models.Model):
-	user = models.ForeignKey(User, null=False)
+	user = models.ForeignKey(User, null=True)
 	ip = models.CharField(null=False, max_length=32)
 	isp = models.CharField(null=True, max_length=32)
 	country = models.CharField(null=True, max_length=32)
@@ -129,5 +129,4 @@ class IpAddress(models.Model):
 	city = models.CharField(null=True, max_length=32)
 
 	class Meta:
-		unique_together = ("user", "ip")
 		db_table = ''.join((User._meta.app_label, '_ip_address'))
