@@ -97,16 +97,17 @@ LOGIN_URL = '/'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-
+#pip install PyMySQL
+# import pymysql
+# pymysql.install_as_MySQLdb()
 # DATABASES = {
 # 	'default': {
 # 		'NAME': 'django',
-# 		'ENGINE': 'mysql.connector.django',  # django.db.backends.sqlite3
+# 		'ENGINE': 'django.db.backends.mysql',  # 'mysql.conntector.django'
 # 		'USER': 'root',
 # 		'default-character-set': 'utf8',
 # 		'OPTIONS': {
 # 			'autocommit': True,
-#
 # 		},
 # 	}
 # }

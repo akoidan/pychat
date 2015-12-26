@@ -2,6 +2,7 @@ import json
 import logging
 import sys
 import time
+from threading import Thread
 from time import mktime
 from  urllib.request import urlopen
 
@@ -221,6 +222,7 @@ class MessagesHandler(MessagesCreator):
 	def __init__(self, *args, **kwargs):
 		super(MessagesHandler, self).__init__(*args, **kwargs)
 		self.log_id = str(id(self) % 10000).rjust(4, '0')
+		self.ip = None
 		log_params = {
 			'username': '00000000',
 			'id': self.log_id,
@@ -434,9 +436,16 @@ class MessagesHandler(MessagesCreator):
 		response = self.do_db(self.get_messages, messages)
 		self.safe_write(response)
 
-	def save_ip(self, ip):
+	def save_ip(self):
+		ip = self.ip
+		user_id = None if self.user_id == 0 else self.user_id
+		anon_name = self.sender_name if self.user_id == 0 else None
 		api_url = getattr(settings, "IP_API_URL", None)
-		if not api_url  or  self.do_db(IpAddress.objects.filter(user_id=self.user_id,  ip=ip).exists):
+		if (not api_url or  # saving turned off
+			# ip record exist for existed use
+				(user_id and self.do_db(IpAddress.objects.filter(user_id=user_id, ip=ip).exists)) or
+			# ip record exist for anonymous
+				(anon_name and self.do_db(IpAddress.objects.filter(anon_name=anon_name, ip=ip).exists))):
 			return
 		try:
 			self.logger.debug("Creating ip record %s", ip)
@@ -446,16 +455,17 @@ class MessagesHandler(MessagesCreator):
 			if response['status'] != "success":
 				self.logger.warning("Creating iprecord failed, server responded: %s", raw_response)
 				raise Exception(response['message'])
-			IpAddress.objects.update_or_create({
-				'isp': response['isp'],
-				'country': response['country'],
-				'region': response['regionName'],
-				'city': response['city']},
-				user_id=self.user_id,
+			IpAddress.objects.create(
+				isp=response['isp'],
+				country=response['country'],
+				region=response['regionName'],
+				city=response['city'],
+				user_id=user_id,
+				anon_name=anon_name,
 				ip=ip)
 		except Exception as e:
-			self.logger.error(e)
-			IpAddress.objects.create(user_id=self.user_id, ip=ip)
+			self.logger.error("Error while creating ip with country info, because %s", e)
+			IpAddress.objects.create(user_id=user_id, ip=ip)
 
 
 class AntiSpam:
@@ -544,17 +554,17 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, id(self))
 			self.async_redis.connect()
 			channels = self.set_username(session_key)
-			ip = self.get_client_ip()
+			self.ip = self.get_client_ip()
 			log_params = {
 				'username': self.sender_name.rjust(8),
 				'id': self.log_id,
-				'ip': ip
+				'ip': self.ip
 			}
 			self.logger = logging.LoggerAdapter(logger, log_params)
 			self.listen(channels)
 			self.add_online_user()
 			self.connected = True
-			self.save_ip(ip)
+			Thread(target=self.save_ip).start()
 		else:
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key %s has been rejected" % session_key)
