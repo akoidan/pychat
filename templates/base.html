@@ -6,6 +6,7 @@
 	<link rel="shortcut icon" href="{% static 'favicon.ico' %}?v2" />
 	<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% static 'css/fontello.css' %}">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Snowstorm/20131208/snowstorm-min.js"></script>
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	<script>
 		const staticUrl = "{% static "" %}";
@@ -27,6 +28,9 @@
 			<a href="{% url 'chat.views.report_issue' %}"><i class="icon-pencil" title="report an issue"><span class="mText">issue</span></i></a>
 		</li>
 		{% block navbar %} {% endblock navbar %}
+		<li>
+			<i class="icon-snow-heavy-inv" title="Disable or enable snowing" onclick="snowStorm.toggleSnow()"><span class="mText">snow</span></i>
+	</li>
 		{% if username %}
 			{% include "logout.html" %}
 		{% else %}

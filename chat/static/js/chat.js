@@ -243,15 +243,8 @@ function addTextAreaEvents() {
 }
 
 
-function extractHeight(element) {
-	var rawHeight = window.getComputedStyle(element)['height'];
-	var height = parseInt(rawHeight.substr(0, rawHeight.length - 2)) ; // remove px suffix , 1 for round up
-	return height;
-}
-
-
 function adjustUserMessageWidth(mql) {
-	var bodyHeight = extractHeight(document.body);
+	var bodyHeight =document.body.clientHeight;
 	if (mql) { // if not an event instance
 		console.log(getDebugMessage('MediaQuery with height {}px, has been triggered', bodyHeight));
 		if (bodyHeight < DISABLE_NAV_HEIGHT) {
