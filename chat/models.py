@@ -85,7 +85,6 @@ class UserProfile(User):
 				self.email = None
 		super(User, self).save(*args, **kwargs)
 
-
 class Room(models.Model):
 	name = CharField(max_length=30, null=True, unique=True)
 	users = models.ManyToManyField(User, related_name='rooms')
@@ -119,3 +118,16 @@ class IssueDetails(models.Model):
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((User._meta.app_label, '_issue_detail'))
+
+
+class IpAddress(models.Model):
+	user = models.ForeignKey(User, null=False)
+	ip = models.CharField(null=False, max_length=32)
+	isp = models.CharField(null=True, max_length=32)
+	country = models.CharField(null=True, max_length=32)
+	region = models.CharField(null=True, max_length=32)
+	city = models.CharField(null=True, max_length=32)
+
+	class Meta:
+		unique_together = ("user", "ip")
+		db_table = ''.join((User._meta.app_label, '_ip_address'))

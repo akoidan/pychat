@@ -237,6 +237,9 @@ MEDIA_URL = "/photo/"
 
 USER_COOKIE_NAME = 'user'
 
+# If this options is set, on every oncoming request chat will gather info about user location
+IP_API_URL = 'http://ip-api.com/json/%s'
+
 WS_ADDRESS_COOKIE_NAME = 'api'
 ANONYMOUS_REDIS_ROOM = 'all'
 REGISTERED_REDIS_ROOM = 'signed'
