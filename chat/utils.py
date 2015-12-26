@@ -1,7 +1,9 @@
 import base64
+import json
 import logging
 import re
 import sys
+import urllib
 from io import BytesIO
 from threading import Thread
 
@@ -12,7 +14,7 @@ from django.core.validators import validate_email
 
 from chat import settings
 from chat.log_filters import id_generator
-from chat.models import User, UserProfile
+from chat.models import User, UserProfile, IpAddress
 from chat.settings import ISSUES_REPORT_LINK
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
@@ -131,3 +133,24 @@ def extract_photo(image_base64):
 		size=sys.getsizeof(file),
 		charset=None)
 	return image
+
+
+def save_ip(user_id, ip):
+	api_url = getattr(settings, "IP_API_URL", None)
+	if user_id or IpAddress.objects.filter(user_id=user_id, ip=ip).exists():
+		return
+	try:
+		f = urllib.request.urlopen(api_url % ip)
+		raw_response = f.read().decode("utf-8")
+		response = json.loads(raw_response)
+		if response['status'] != "success":
+			raise Exception(response['message'])
+		IpAddress.objects.update_or_create({
+			'isp': response['isp'],
+			'country': response['country'],
+			'region': response['regionName'],
+			'city': response['city']},
+			user_id=user_id,
+			ip=ip)
+	except:
+		IpAddress.objects.create(user_id=user_id, ip=ip)

@@ -27,7 +27,7 @@ except ImportError:
 
 from chat.settings import MAX_MESSAGE_SIZE, ANONYMOUS_REDIS_ROOM
 from chat.models import User, Message, Room
-from chat.utils import check_user
+from chat.utils import check_user, save_ip
 
 PY3 = sys.version > '3'
 
@@ -520,18 +520,21 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, id(self))
 			self.async_redis.connect()
 			channels = self.set_username(session_key)
+			ip = self.get_client_ip()
 			log_params = {
 				'username': self.sender_name.rjust(8),
 				'id': self.log_id,
-				'ip': self.get_client_ip()
+				'ip': ip
 			}
 			self.logger = logging.LoggerAdapter(logger, log_params)
 			self.listen(channels)
 			self.add_online_user()
 			self.connected = True
+			save_ip(self.user_id, ip )
 		else:
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key %s has been rejected" % session_key)
+
 
 	def check_origin(self, origin):
 		"""
