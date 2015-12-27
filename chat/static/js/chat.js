@@ -648,7 +648,7 @@ function insertCurrentDay(timeMillis, pos) {
 	if (pos != null) { // position of the following message <p>
 		var prevEl = pos.previousSibling;
 		// if it's not the same day block, prevElement always exist its either fieldset  either prevmessage
-		if (prevEl.tagName == 'FIELDSET' && prevEl.innerText.trim() != innerHTML) {
+		if (prevEl.tagName == 'FIELDSET' && prevEl.textContent.trim() != innerHTML) { // TODO innerText instead for ie?
 			if (insert) chatBoxDiv.insertBefore(fieldset, prevEl);
 			result =  prevEl;
 		} else {
