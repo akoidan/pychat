@@ -63,7 +63,6 @@ Start the chat:
 * webrtc -> vlc
 * test audio preload on none 
 * add media query for register and usersettings to adjust for phone's width
-* add lock to loadMessages to prevent doubling getting the same message and appending it twice. 
 * add change password and realtime javascript to change_profile
 * local storage can store another user messasges in case of logout ?
 * file upload http://stackoverflow.com/a/14605593/3872976
@@ -75,7 +74,5 @@ Start the chat:
 * USE init or on_open
 * show system messages on navbar
 * show if user's reconnecting
-* timezone
 * add chat rooms
-* check loadmessage top onkeydow
 * allow selecting username in navbar, remove selecting cursor 

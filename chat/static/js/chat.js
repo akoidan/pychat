@@ -299,7 +299,7 @@ function mouseWheelLoadUp(e) {
 	// IE has inverted scroll,
 	var isTopDirection = e.detail < 0 || e.wheelDelta > 0; // TODO check all browser event name deltaY?
 	if (isTopDirection) {
-		loadUpHistory(5);
+		loadUpHistory(10);
 	}
 }
 
@@ -344,11 +344,11 @@ function timeMessageClick(event) {
 
 function keyDownLoadUp(e) {
 	if (e.which === 33) {    // page up
-		loadUpHistory(15);
-	} else if (e.which === 38) { // up
-		loadUpHistory(3);
-	} else if (e.ctrlKey && e.which === 36) {
 		loadUpHistory(25);
+	} else if (e.which === 38) { // up
+		loadUpHistory(10);
+	} else if (e.ctrlKey && e.which === 36) {
+		loadUpHistory(35);
 	}
 }
 
@@ -640,6 +640,7 @@ function insertCurrentDay(timeMillis, pos) {
 		allMessagesDates.push(innerHTML);
 		var fieldset = document.createElement('fieldset');
 		var legend = document.createElement('legend');
+		legend.setAttribute('align', 'center');
 		fieldset.appendChild(legend);
 		legend.innerHTML = innerHTML;
 	}
@@ -768,7 +769,6 @@ function setUsername(data) {
 
 function handleGetMessages(message) {
 	console.log(getDebugMessage('appending messages to top'));
-
 	// This check should fire only once,
 	// because requests aren't being sent when there are no event for them, thus no responses
 	if (message.length === 0) {
@@ -783,6 +783,7 @@ function handleGetMessages(message) {
 	message.forEach(function (message) {
 		printMessage(message);
 	});
+	lockLoadUpHistory = false; // allow fetching again, after new header is set
 }
 
 
@@ -905,7 +906,7 @@ function loadUpHistory(count) {
 		lockLoadUpHistory = true;
 		setTimeout(function(){
 			lockLoadUpHistory = false;
-		}, 300);
+		}, 10000); // failsafe if error
 		var getMessageRequest = {
 			headerId: headerId,
 			count: count,
