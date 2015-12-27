@@ -46,6 +46,7 @@ var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*>>>\s/;
 var destinationUserName = null;
 var destinationUserId = null;
 
+var lockLoadUpHistory = false;
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
 var newMessagesCount = 0;
@@ -897,6 +898,14 @@ function sendToServer(messageRequest) {
 
 function loadUpHistory(count) {
 	if (chatBoxDiv.scrollTop === 0) {
+		if (lockLoadUpHistory) {
+			console.log(getDebugMessage("Skipping loading message, because it's locked"));
+			return
+		}
+		lockLoadUpHistory = true;
+		setTimeout(function(){
+			lockLoadUpHistory = false;
+		}, 300);
 		var getMessageRequest = {
 			headerId: headerId,
 			count: count,
