@@ -54,6 +54,11 @@ p {
 	/*padding-top: 10px;*/
 	margin-right: 2px; /*shift scrollbar from right side*/
 }
+
+#chatbox:focus {
+    outline: none;
+}
+
 #chatbox a:hover{
 	text-decoration: underline;
 }
