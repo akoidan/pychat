@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block head %}
+	{% load static %}
+	<script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
+	<script src="https://www.amcharts.com/lib/3/pie.js"></script>
+	<script src="http://www.amcharts.com/lib/3/themes/dark.js"></script>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/statistic.css' %}">
+	<script type="text/javascript">
+		var dataProvider = {% autoescape off %} {{ dataProvider}} {% endautoescape %};
+	</script>
+	<script src="{% static "js/statistic.js" %}"></script>
+{% endblock head %}
+{% block content %}
+	<div id="chartdiv"></div>
+{% endblock %}
