@@ -309,13 +309,13 @@ video {
 		max-width: 360px;
 	}
 }
-@media screen and (max-width: 30em ) {
+@media screen and (max-width: 35em ) {
 	.username {
 		display: none !important;
 	}
 }
 
-@media screen and (max-width: 70em ) {
+@media screen and (max-width: 80em ) {
  .mText {
 	 display: none;
  }
