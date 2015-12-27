@@ -38,6 +38,7 @@ Start the chat:
 
 =======
 #TODO
+* add git ony flag to download_content.sh
 * https://code.djangoproject.com/ticket/25489
 * http://stackoverflow.com/a/18843553/3872976
 * refactor set class name for css instead of settings css
