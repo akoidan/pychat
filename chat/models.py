@@ -1,9 +1,12 @@
-import uuid
 import datetime
+import time
+import uuid
+from time import mktime
 
-from django.db import models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-from django.db.models import CharField, DateField, FileField, TextField, BooleanField
+from django.db import models
+from django.db.models import CharField, DateField, FileField, BooleanField
+
 from chat.settings import GENDERS
 
 
@@ -91,6 +94,15 @@ class Room(models.Model):
 	is_private = BooleanField(default=True)
 
 
+def get_milliseconds(dt=None):
+	if dt is None:
+		return int(time.time()*1000)
+	if dt.time.timestamp:
+		return int(dt.time.timestamp()*1000)
+	else:
+		return mktime(dt.time.timetuple()) * 1000 + int(dt.time.microsecond / 1000)
+
+
 class Message(models.Model):
 	"""
 	Contains all public messages
@@ -98,7 +110,7 @@ class Message(models.Model):
 	sender = models.ForeignKey(User, related_name='sender')
 	room = models.ForeignKey(Room, null=True)
 	# DateField.auto_now
-	time = models.DateTimeField(default=datetime.datetime.now)
+	time = models.BigIntegerField(default=get_milliseconds)
 	content = models.TextField()
 	is_raw = models.BooleanField(default=True, null=False)
 	receiver = models.ForeignKey(User, null=True, related_name='receiver')
@@ -112,7 +124,7 @@ class IssueDetails(models.Model):
 	sender = models.ForeignKey(User, null=True, blank=True)
 	email = models.EmailField(null=True, blank=True)
 	browser = models.CharField(null=False, max_length=32)
-	time = models.TimeField(default=datetime.datetime.now, blank=True)
+	time = models.DateField(default=datetime.datetime.now, blank=True)
 	issue = models.ForeignKey(Issue, related_name='issue')
 	log = models.TextField(null=True)
 
@@ -123,7 +135,7 @@ class IssueDetails(models.Model):
 class IpAddress(models.Model):
 	user = models.ForeignKey(User, null=True)
 	anon_name = models.CharField(null=True, max_length=32)
-	time = models.DateTimeField(default=datetime.datetime.now)
+	time = models.DateField(default=datetime.datetime.now)
 	ip = models.CharField(null=False, max_length=32)
 	isp = models.CharField(null=True, max_length=32)
 	country = models.CharField(null=True, max_length=32)
