@@ -97,7 +97,7 @@ LOGIN_URL = '/'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-#pip install PyMySQL
+# pip install PyMySQL
 # import pymysql
 # pymysql.install_as_MySQLdb()
 # DATABASES = {

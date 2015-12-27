@@ -8,6 +8,10 @@ const CONNECTION_RETRY_TIME = 10000;
 
 const SMILEY_URL = staticUrl + 'smileys/';
 
+const monthNames = ["January", "February", "March", "April", "May", "June",
+	"July", "August", "September", "October", "November", "December"
+];
+
 const selfHeaderClass = 'message-header-self';
 const privateHeaderClass = 'message-header-private';
 const systemHeaderClass = 'message-header-system';
@@ -86,6 +90,7 @@ var chatUserRoomWrapper; // for hiddding users
 
 //All <p> ids (every id is UTC millis). this helps to prevent duplications, and detect position
 var allMessages = [];
+var allMessagesDates = [];
 
 //
 //window.onerror = function (msg, url, linenumber) {
@@ -560,6 +565,10 @@ function loadUsers(usernames) {
 }
 
 
+/** Inserts element in the middle if it's not there
+ * @param time element
+ * @returns Node element that follows the inserted one
+ * @throws exception if element already there*/
 function getPosition(time) {
 	var lastTime = 0;
 	var arrayEl;
@@ -570,7 +579,7 @@ function getPosition(time) {
 		}
 		if (time < arrayEl) {
 			allMessages.splice(i, 0, time);
-			return arrayEl;
+			return $(arrayEl);
 		}
 	}
 	return null;
@@ -605,11 +614,7 @@ function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncod
 	headSpan.insertAdjacentHTML('beforeend', ' ');
 	headSpan.appendChild(userNameA);
 	var userSuffix;
-	if (!isPrefix) {
-		 userSuffix = ': ';
-	} else  {
-		 userSuffix = ' >> ';
-	}
+	userSuffix = isPrefix ?  ' >> ' : ': ';
 	headSpan.insertAdjacentHTML('beforeend', userSuffix);
 
 	var textSpan = document.createElement('span');
@@ -619,6 +624,40 @@ function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncod
 	p.appendChild(headSpan);
 	p.appendChild(textSpan);
 	return p;
+}
+
+/**Insert ------- Mon Dec 21 2015 ----- if required
+ * @param pos {Node} element of following message
+ * @param timeMillis {number} current message
+ * @returns Node element that follows the place where new message should be inserted
+ * */
+function insertCurrentDay(timeMillis, pos) {
+	var innerHTML = new Date(timeMillis).toDateString();
+	//do insert only if date is not in chatBoxDiv
+	var insert = allMessagesDates.indexOf(innerHTML)  < 0;
+	if (insert) {
+		allMessagesDates.push(innerHTML);
+		var fieldset = document.createElement('fieldset');
+		var legend = document.createElement('legend');
+		fieldset.appendChild(legend);
+		legend.innerHTML = innerHTML;
+	}
+	var result;
+	if (pos != null) { // position of the following message <p>
+		var prevEl = pos.previousSibling;
+		// if it's not the same day block, prevElement always exist its either fieldset  either prevmessage
+		if (prevEl.tagName == 'FIELDSET' && prevEl.innerText.trim() != innerHTML) {
+			if (insert) chatBoxDiv.insertBefore(fieldset, prevEl);
+			result =  prevEl;
+		} else {
+			if (insert) chatBoxDiv.insertBefore(fieldset, pos);
+			result =  pos;
+		}
+	} else {
+		if (insert) chatBoxDiv.appendChild(fieldset);
+		result =  null;
+	}
+	return result;
 }
 
 
@@ -645,8 +684,9 @@ function displayPreparedMessage(headerStyle, timeMillis, htmlEncodedContent, dis
 		newMessagesCount++;
 		document.title = newMessagesCount + " new messages";
 	}
+	pos = insertCurrentDay(timeMillis, pos);
 	if (pos != null) {
-		chatBoxDiv.insertBefore(p , $(pos));
+		chatBoxDiv.insertBefore(p , pos);
 	} else {
 		var oldscrollHeight = chatBoxDiv.scrollHeight;
 		chatBoxDiv.appendChild(p);
@@ -712,7 +752,6 @@ function printRefreshUserNameToChat(data) {
 	} else {
 		return;
 	}
-
 
 	displayPreparedMessage(systemHeaderClass, data['time'], message, SYSTEM_USERNAME);
 
@@ -875,6 +914,7 @@ function clearLocalHistory() {
 	localStorage.removeItem(STORAGE_USER);
 	chatBoxDiv.innerHTML = '';
 	allMessages = [];
+	allMessagesDates = [];
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp); //
 	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);
 	console.log(getDebugMessage('History has been cleared'));

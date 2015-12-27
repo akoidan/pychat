@@ -9,6 +9,31 @@
 .color-lor .message-header-system {color: #9DD3DD;}
 .color-lor #userSendMessageTo {box-shadow: 0 2px 2px rgba(6, 3, 8, 0.77);}
 
+[class^="message-header"] {
+	font-weight: bold;
+}
+
+fieldset {
+    border-top: 1px solid #aaa;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    display: block;
+    text-align: center;
+	padding: 0;
+	margin-left: 3px;
+	margin-right: 10px;
+}
+
+fieldset legend {
+    padding: 0 10px;
+	font-weight: bold;
+	color:   #9DD3DD;
+}
+p {
+	margin-top: 0.8em;
+	margin-bottom: 0.8em;
+}
 /*#wrapper {*/
 	/*height: calc(100% - 83px); /!* leave fail handler here *!/*/
 	/*width: 100%;*/
@@ -26,6 +51,7 @@
 	overflow-y: scroll;
 	padding-left: 8px;
 	word-wrap: break-word;
+	/*padding-top: 10px;*/
 	margin-right: 2px; /*shift scrollbar from right side*/
 }
 #chatbox a:hover{
