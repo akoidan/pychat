@@ -1,12 +1,11 @@
 import json
 import logging
 import sys
-import time
 from threading import Thread
-from time import mktime
 from  urllib.request import urlopen
 
 import redis
+import time
 import tornado.gen
 import tornado.httpclient
 import tornado.ioloop
@@ -28,7 +27,7 @@ except ImportError:
 	from urlparse import urlparse  # py3
 
 from chat.settings import MAX_MESSAGE_SIZE, ANONYMOUS_REDIS_ROOM
-from chat.models import User, Message, Room, IpAddress
+from chat.models import User, Message, Room, IpAddress, get_milliseconds
 from chat.utils import check_user
 
 PY3 = sys.version > '3'
@@ -135,7 +134,7 @@ class MessagesCreator(object):
 		return {
 			EVENT_VAR_NAME: event,
 			CONTENT_VAR_NAME: content,
-			TIME_VAR_NAME: cls.get_miliseconds()
+			TIME_VAR_NAME: get_milliseconds()
 		}
 
 	@classmethod
@@ -158,7 +157,7 @@ class MessagesCreator(object):
 			USER_VAR_NAME: message.sender.username,
 			USER_ID_VAR_NAME: message.sender.id,
 			CONTENT_VAR_NAME: message.content,
-			TIME_VAR_NAME: cls.get_miliseconds(message),
+			TIME_VAR_NAME: message.time,
 			MESSAGE_ID_VAR_NAME: message.id,
 		}
 		if message.receiver is not None:
@@ -207,15 +206,6 @@ class MessagesCreator(object):
 	@property
 	def online_self_js_structure(self):
 		return self.online_js_structure(self.sender_name, self.sex, self.user_id)
-
-	@staticmethod
-	def get_miliseconds(dt=None):
-		if dt is None:
-			return int(time.time()*1000)
-		if dt.time.timestamp:
-			return int(dt.time.timestamp()*1000)
-		else:
-			return mktime(dt.time.timetuple())*1000 + int(dt.time.microsecond/1000),
 
 
 class MessagesHandler(MessagesCreator):
