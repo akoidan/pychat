@@ -315,7 +315,7 @@ video {
 	}
 }
 
-@media screen and (max-width: 60em ) {
+@media screen and (max-width: 70em ) {
  .mText {
 	 display: none;
  }

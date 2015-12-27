@@ -463,7 +463,7 @@ class MessagesHandler(MessagesCreator):
 				ip=self.ip)
 		except Exception as e:
 			self.logger.error("Error while creating ip with country info, because %s", e)
-			IpAddress.objects.create(user_id=user_id, ip=self.ip)
+			IpAddress.objects.create(user_id=user_id, ip=self.ip, anon_name=anon_name)
 
 
 class AntiSpam:
