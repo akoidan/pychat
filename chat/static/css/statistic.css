@@ -3,7 +3,9 @@
   height: calc(100% - 90px);
   font-size: 14px;
 }
-
+#chartdiv a {
+  display: none !important;
+}
 .amcharts-pie-slice {
   transform: scale(1);
   transform-origin: 50% 50%;

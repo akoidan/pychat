@@ -1,32 +1,48 @@
-![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/djangochat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/djangochat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/djangochat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/djangochat)
+![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7--1.9-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/djangochat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/djangochat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/djangochat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/djangochat)
+
 
 Web chat based on WebSockets.
 ================================================
 
 Basically written in **Python** with [django](https://www.djangoproject.com/) it uses asynchronous web framework [Tornado](http://www.tornadoweb.org/) for handling realtime messages. Broadcasting messages are being sent by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using Python [tornado-redis](https://github.com/leporo/tornado-redis) backend. It can be run on both **Windows** and **Linux** and tested on **Python 2.7** and **Python 3.x**
 
-To run chat on CentOS 6:
-===============
- (See master branch readme for other os support)
- 
- 0. Run from your pc, Add ssh without authorize`cat .ssh/id_rsa.pub | ssh -p 666 root@ip 'mkdir -p .ssh; cat >> .ssh/authorized_keys'`
- 1. add `alias yum="python2 $(which yum)"` to /etc/bashrc if you use python3
- 2. Install nginx`yum install nginx`
- 3. Install python3 `yum install python34u`
- 4. Install python server `yum install uWSGI`
- 5. Install python package manager `python34u-pip`. Be careful, yum requires python2.
- 6. Install db for session and pubsub `yum install redis`
- 7. Install main db `yum install mysql-server, mysql-devel`
- 8. Copy config files to rootfs `cp rootfs / -r `
- 9. add file `Chat/production.py` , place `SECRET_KEY` there
- 10. Create database in mysql `echo "create database django CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`
- 11.  Create redis service. `chkconfig --add redis `. Add it to autostart (optional) `chkconfig redis on`
- 12.  Create mysqld service `chkconfig --add mysqld`  Add it to autostart (optional) `chkconfig mysqld on`
- 13.  Create uwsgi service `chkconfig --add uwsgi`  Add it to autostart (optional) `chkconfig uwsgi on`
- 14.  Create tornado service `chkconfig --add tornado`  Add it to autostart (optional) `chkconfig tornado o`
- 15.  Get all dependencies `pip3 install -r requirements.txt`
- 16.  Fill database with tables `python manage.py init_db`
- 17.  Download static content `sh download_content.sh`
+
+[Live demo](http://pychat.org/)
+================
+
+
+Get dependencies:
+================
+ 1. *Python2.7* or *Python 3.x* both are supported
+ 2. *pip* for getting dependencies
+ 3. *redis* for holding session and pubsub messages
+ 4. Get python packages
+ 4. Create the database
+ 6. Copy static content (audio, fonts...)
+
+Windows:
+ 1. Install [python](https://www.python.org/downloads/) with pip 
+ 2. Add pip and python to PATH variable
+ 3. Install [redis](https://github.com/rgl/redis/downloads) 
+ 4. Open cmd as Administrator and run `pip install -r requirements.txt`
+ 5. Copy `static` directory from [djangochat-config](https://github.com/Deathangel908/djangochat-config) to `story` project directory
+ 6. Unzip `static` directory from [dropbox](https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1) to `story` project directory
+ 7. Open cmd and run `python manage.py init_db` from project directory
+
+Ubuntu:
+ 1. `apt-get install python`
+ 2. `apt-get install pip`
+ 3. `add-apt-repository -y ppa:rwky/redis` `apt-get install -y redis-server`
+
+Archlinux:
+ 1. `pacman -S python`
+ 2. `pacman -S pip`
+ 3. `pacman -S community/redis`
+
+Next steps are common for Linux:
+ 1. `pip install -r requirements.txt`
+ 2. `python manage.py init_db`
+ 3. `sh download_content.sh`
 
 Start the chat:
 ==============
