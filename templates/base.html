@@ -25,7 +25,7 @@
 						 onclick="mute();"><span class="mText">volume</span></i>
 		</li>
 		<li>
-			<a href="{% url 'chat.views.report_issue' %}"><i class="icon-pencil" title="report an issue"><span class="mText">issue</span></i></a>
+			<a href="{% url 'chat.views.report_issue' %}"><i class="icon-pencil very-small-screen" title="report an issue"><span class="mText">issue</span></i></a>
 		</li>
 		{% block navbar %} {% endblock navbar %}
 		<li>
@@ -39,7 +39,7 @@
 		{% else %}
 			{% include "login.html" %}
 		{% endif %}
-		<li class="right username">Hello,
+		<li class="right username very-small-screen">Hello,
 			<b>
 				{% if not username %}
 					<input type='text' id='inputName' maxlength='16' class='userNameInput' value=''/>

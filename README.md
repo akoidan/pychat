@@ -49,6 +49,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
+* TODO add growl notifications, add "click on webcam capturing to make a photo"
 * add git ony flag to download_content.sh
 * https://code.djangoproject.com/ticket/25489
 * http://stackoverflow.com/a/18843553/3872976

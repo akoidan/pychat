@@ -76,7 +76,7 @@ function startCapturingVideo(button) {
 			showElement(video);
 			video.addEventListener('click', takeSnapshot, false);
 			hideElement($('userProfileData'));
-			button.value = 'Hide video';
+			button.value = 'Finish capturing';
 			isStopped = false;
 		}, function (e) {
 			console.error(getDebugMessage('Error while trying to capture a picture {}', e));

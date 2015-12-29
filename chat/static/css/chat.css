@@ -138,20 +138,6 @@ p {
 	height: 100%;
 }
 
-@media screen and (max-width: 30em ) {
-	#chat-room-users-wrapper {
-		display: none;
-	}
-
-	.timeMess{
-		display: none;
-	}
-
-	.icon-pencil {
-		display: none;
-	}
-}
-
 @media screen and (max-height: 300px), screen and (max-width: 600px){
 	#smileParentHolder {
 		width: 95% !important;
