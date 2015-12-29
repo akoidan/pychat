@@ -311,8 +311,9 @@ video {
 		max-width: 360px;
 	}
 }
+
 @media screen and (max-width: 35em ) {
-	.username {
+	.very-small-screen, .time-message {
 		display: none !important;
 	}
 }
