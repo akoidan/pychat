@@ -5,6 +5,8 @@ var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var HISTORY_STORAGE_NAME = 'history';
 var MAX_STORAGE_LENGTH = 3000;
 
+var loggingEnabled = true;
+
 var growlHolder;
 
 var $ = function(id) {
@@ -246,6 +248,7 @@ function doGet(fileUrl, callback) {
 
 
 function saveLogToStorage(result) {
+	if (!loggingEnabled) return;
 	var storageInfo = localStorage.getItem(HISTORY_STORAGE_NAME);
 	var newStorage;
 	if (storageInfo == null) {

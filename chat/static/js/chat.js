@@ -462,9 +462,11 @@ function loadMessagesFromLocalStorage() {
 		// don't make sound on loadHistory
 		var savedSoundStatus = sound;
 		sound = 0;
+		loggingEnabled = false;
 		for (var i = 0; i < parsedData.length; i++) {
 			handlePreparedWSMessage(parsedData[i]);
 		}
+		loggingEnabled = true;
 		sound = savedSoundStatus;
 	}
 }
