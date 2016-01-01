@@ -62,7 +62,6 @@ function validateUser() {
 		setError(userNameCheck, "only letters, numbers and underscores!");
 	} else {
 		var callback = function (data) {
-			// hardcoded ok
 			if (data === RESPONSE_SUCCESS) {
 				setSuccess(userNameCheck);
 			} else {
