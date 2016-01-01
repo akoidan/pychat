@@ -21,17 +21,18 @@ onDocLoad(function () {
 	mailbox = $("mailbox");
 });
 
-function register() {
+function register(event) {
+	event.preventDefault();
 	if (password.value !== repeatPassword.value) {
-		alert("Passwords don't match");
+		growlError("Passwords don't match");
 		return;
 	}
 	var form = $('register-form');
 	var callback = function (data) {
-		if (data === 'ok') {
+		if (data === RESPONSE_SUCCESS) {
 			window.location.href = '/profile';
 		} else {
-			alert(data);
+			growlError(data);
 		}
 	};
 	doPost('/register', null, callback, form);
@@ -62,7 +63,7 @@ function validateUser() {
 	} else {
 		var callback = function (data) {
 			// hardcoded ok
-			if (data === 'ok') {
+			if (data === RESPONSE_SUCCESS) {
 				setSuccess(userNameCheck);
 			} else {
 				setError(userNameCheck, data)
@@ -85,7 +86,7 @@ function setSuccess(element) {
 	function validateEmail() {
 		var mail = email.value;
 		var callback = function (data) {
-			if (data === 'ok') {
+			if (data === RESPONSE_SUCCESS) {
 				setSuccess(emailCheck);
 			} else {
 				setError(emailCheck, data);

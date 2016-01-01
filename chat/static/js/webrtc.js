@@ -64,6 +64,7 @@ function takeSnapshot() {
 		// Other browsers will fall back to image/png.
 		document.querySelector('img').src = canvas.toDataURL('image/webp');
 		snapshot = true;
+		growlInfo('Image has been set. Click on "Finish" to hide video');
 	}
 }
 function startCapturingVideo(button) {
@@ -76,16 +77,19 @@ function startCapturingVideo(button) {
 			showElement(video);
 			video.addEventListener('click', takeSnapshot, false);
 			hideElement($('userProfileData'));
-			button.value = 'Finish capturing';
+			button.value = 'Finish';
 			isStopped = false;
+			growlInfo("Click on your video to take a photo")
 		}, function (e) {
-			console.error(getDebugMessage('Error while trying to capture a picture {}', e));
+			console.error(getDebugMessage('Error while trying to capture a picture "{}"', e.message || e.name));
+			growlError(getText('Unable to use your webcam because "{}"', e.message || e.name ));
 		});
 	}
 
 	if (!isStopped) {
 		localMediaStream.stop();
 		button.value = 'Renew the photo';
+		growlInfo("To apply photo click on save");
 		hideElement(video);
 		showElement($('userProfileData'));
 		isStopped = true;
@@ -93,7 +97,8 @@ function startCapturingVideo(button) {
 
 }
 
-function saveProfile() {
+function saveProfile(event) {
+	event.preventDefault();
 	var form = document.querySelector('form');
 	var image = null;
 	var params = null;
@@ -101,7 +106,13 @@ function saveProfile() {
 		image = canvas.toDataURL("image/png");
 		params = {base64_image: image};
 	}
-	doPost('/save_profile', params, alert, form);
+	doPost('/save_profile', params, function(response) {
+		if (response == RESPONSE_SUCCESS) {
+			growlSuccess("Your profile has been successfully updated");
+		} else {
+			growlError(response);
+		}
+	}, form);
 }
 
 

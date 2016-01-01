@@ -10,7 +10,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	<script>
 		const staticUrl = "{% static "" %}";
-		const  apiUrl = "{{ apiUrl }}";
+		const apiUrl = "{{ apiUrl }}";
+		const RESPONSE_SUCCESS = "{{ successReponse }}";
 	</script>
 	<script src="{% static "js/base.js" %}"></script>
 	{% block head %} {% endblock head %}
@@ -52,5 +53,7 @@
 </nav>
 {% block content %} {% endblock %}
 {% csrf_token %}
+
+<div id="growlHolder"></div>
 </body>
 </html>

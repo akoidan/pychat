@@ -5,10 +5,10 @@ onDocLoad(function(){
 
 function login() {
 	var callback = function (data) {
-		if (data === 'ok') {
+		if (data === RESPONSE_SUCCESS) {
 			window.location.href = '/';
 		} else {
-			alert(data);
+			growlError(data);
 		}
 	};
 	doPost('/auth', null, callback, $('loginForm'));
@@ -48,7 +48,7 @@ onDocLoad(function () {
 			hideElement(input);
 			showElement(label);
 			if (!USER_REGEX.test(newUsername)) {
-				alert('Wrong username, only letters, -_');
+				growlError('Wrong username, only letters, -_');
 				label.textContent = oldUsername;
 			} else  if (newUsername !== oldUsername) {
 				sendToServer({content: newUsername, action: 'me'});

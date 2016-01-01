@@ -10,7 +10,8 @@ onDocLoad(function () {
 });
 
 
-function sendIssue() {
+function sendIssue(event) {
+	event.preventDefault();
 	var form = $('issueForm');
 	var params = {};
 	if ($('history').checked) {
@@ -19,5 +20,11 @@ function sendIssue() {
 			params['log'] = logs
 		}
 	}
-	doPost('', params, alert, form);
+	doPost('', params, function(response) {
+		if (response == RESPONSE_SUCCESS) {
+			growlSuccess("Your issue has been successfully submitted");
+		} else {
+			growlError(response);
+		}
+	}, form);
 }
