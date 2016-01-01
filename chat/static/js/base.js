@@ -166,13 +166,13 @@ function doPost(url, params, callback, form) {
 		if (r.readyState == 4) {
 			if (r.status == 200) {
 				console.log(getDebugMessage("POST {} in: {};", url, r.response));
-				if (typeof(callback) == "function") {
-					callback(r.response);
-				} else {
-					console.warn(getDebugMessage("Skipping {} callback for POST {}", callback, url));
-				}
 			} else {
 				console.error(getDebugMessage("POST {} in: {}, status:", url, r.response, r.status));
+			}
+			if (typeof(callback) == "function") {
+				callback(r.response);
+			} else {
+				console.warn(getDebugMessage("Skipping {} callback for POST {}", callback, url));
 			}
 		}
 	};
@@ -253,7 +253,7 @@ function saveLogToStorage(result) {
 	var newStorage;
 	if (storageInfo == null) {
 		newStorage = result;
-	} else if (localStorage.length > MAX_STORAGE_LENGTH) {
+	} else if (storageInfo.length > MAX_STORAGE_LENGTH) {
 		var notConcatInfo = storageInfo +';;;'+ result;
 		newStorage = notConcatInfo.substr(notConcatInfo.length - MAX_STORAGE_LENGTH, notConcatInfo.length);
 	} else {
