@@ -1,9 +1,8 @@
 {% extends "base.html" %}
 {% block head %}
-	{% load staticfiles %}
 	<script type="text/javascript">
 		var a = "{{message}}";
-		if (a == 'ok' ) {
+		if (a == RESPONSE_SUCCESS ) {
 			alert('verification code is accepted');
 			redirectTime = "3000";
 			redirectURL = "/";
@@ -24,7 +23,7 @@
 {% endblock head %}
 
 {% block content %}
-	{% if message == "ok" %}
+	{% if message == successReponse %}
 		<div class="message">
 			You're redirected to the main page now!
 		</div>

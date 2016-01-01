@@ -5,6 +5,8 @@ var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var HISTORY_STORAGE_NAME = 'history';
 var MAX_STORAGE_LENGTH = 3000;
 
+var growlHolder;
+
 var $ = function(id) {
 	return document.getElementById(id);
 };
@@ -16,11 +18,49 @@ function onDocLoad(onload) {
 
 
 onDocLoad(function () {
+	growlHolder = $('growlHolder');
 	mute();
 	if (typeof InstallTrigger !== 'undefined') {
 		console.warn(getDebugMessage("Ops, there's no scrollbar for firefox"));
 	}
 });
+
+function growlError(message) {
+ growl(message, 'col-error', 7000)
+}
+
+function growlSuccess(message) {
+ growl(message, 'col-success', 5000)
+}
+
+function growlInfo(message) {
+	growl(message, 'col-info', 9000);
+}
+
+
+function growl(message, growlClass, timeout) {
+	if (false) {
+		var allGrowls = document.getElementsByClassName('growl');
+		for (i=0; i< allGrowls.length; i++) {
+			growlHolder.removeChild(allGrowls[i]);
+		}
+	}
+	var growl = document.createElement('div');
+	growl.textContent = message;
+	growl.className= 'growl '+ growlClass;
+	growl.onclick = function(event) {
+		growlHolder.removeChild(event.target);
+	};
+	growlHolder.appendChild(growl);
+	growl.clientHeight; // request to paint now!
+	growl.style.opacity += 1;
+	setTimeout(function(){
+		growl.style.opacity = 0;
+		setTimeout(function () {
+			growlHolder.removeChild(growl)
+		}, 500); // 500 = $(.growl):transition 0.5s
+	}, timeout);
+}
 
 
 function mute() {

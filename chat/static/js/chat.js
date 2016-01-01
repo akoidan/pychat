@@ -324,7 +324,7 @@ function userClick(event) {
 	destinationUserName = target.innerHTML;
 	showElement(userSendMessageTo);
 	// Empty sets display to none
-	receiverId.innerHTML = destinationUserName;
+	receiverId.textContent = destinationUserName;
 	userMessage.focus();
 	if (target.attributes.name != null) {
 		// icon click
@@ -478,7 +478,7 @@ function start_chat_ws() {
 			if (e.code === 403) {
 				console.error(getDebugMessage('Server forbidden ws request because "{}". Trying to update session key',  e.reason));
 				doGet("/update_session_key", function(response) {
-					if (response == 'ok') {
+					if (response == RESPONSE_SUCCESS) {
 						console.log(getDebugMessage('Session key has been successfully updated'));
 					} else {
 						console.log(getDebugMessage('Updating session key has failed. Server response: "{}"', response ));
@@ -532,7 +532,7 @@ function loadUsers(usernames) {
 		return;
 	}
 	console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
-	chatUsersTable.innerHTML = '';
+	chatUsersTable.innerHTML = null;
 	var tbody = document.createElement('tbody');
 	chatUsersTable.appendChild(tbody);
 	for (var username in usernames) {
@@ -555,7 +555,7 @@ function loadUsers(usernames) {
 			var tdUser = document.createElement('td');
 			tdUser.setAttribute('name', userId);
 			tdUser.className = userNameClass;
-			tdUser.innerHTML = username;
+			tdUser.textContent = username;
 			tdUser.onclick = userClick;
 			tr.appendChild(tdIcon);
 			tr.appendChild(tdUser);
@@ -599,12 +599,12 @@ function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncod
 	headSpan.className = headerStyle; // note it's not appending classes, it sets all classes to specified
 	var timeSpan = document.createElement('span');
 	timeSpan.className = timeSpanClass;
-	timeSpan.innerHTML = getText('({})', time);
+	timeSpan.textContent = getText('({})', time);
 	timeSpan.onclick = timeMessageClick;
 	headSpan.appendChild(timeSpan);
 
 	var userNameA = document.createElement('span');
-	userNameA.innerHTML = displayedUsername;
+	userNameA.textContent = displayedUsername;
 	if (displayedUsername != SYSTEM_USERNAME) {
 		userNameA.className = userNameClass;
 		userNameA.onclick = userClick;
@@ -642,7 +642,7 @@ function insertCurrentDay(timeMillis, pos) {
 		var legend = document.createElement('legend');
 		legend.setAttribute('align', 'center');
 		fieldset.appendChild(legend);
-		legend.innerHTML = innerHTML;
+		legend.textContent = innerHTML;
 	}
 	var result;
 	if (pos != null) { // position of the following message <p>
@@ -763,7 +763,7 @@ function printRefreshUserNameToChat(data) {
 function setUsername(data) {
 	console.log(getDebugMessage("UserName has been set to {}", data['content']));
 	loggedUser = data['content'];
-	userNameLabel.innerHTML = loggedUser;
+	userNameLabel.textContent = loggedUser;
 }
 
 

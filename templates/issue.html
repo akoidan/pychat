@@ -5,15 +5,15 @@
 {% endblock head %}
 
 {% block content %}
-	<form method="post" id="issueForm">
+	<form method="post" id="issueForm" onsubmit="sendIssue(event)">
 		<table class="fullwidth padding10">
 			<tr>
-				<td><label for="email">your email</label> </td>
+				<td><label for="email">Your email</label> </td>
 				<td><input type="email" id="email" name="email" value="{{ email }}"/></td>
 			</tr>
 			<tr>
 				<td><label for="issue">The problem you discovered</label></td>
-				<td><textarea id="issue" class="fullwidth" name="issue" required></textarea></td>
+				<td><textarea id="issue" aria-required="true" class="fullwidth" name="issue" required></textarea></td>
 			</tr>
 			<tr>
 				<td><label for="version">Affected browser</label></td>
@@ -23,7 +23,7 @@
 				<td>
 					<label for="history">Send Logs</label>
 					<input type="checkbox" name="history" id="history" checked/></td>
-				<td><input type="button" class="fullwidth" value="sumbit" onclick="sendIssue()"></td>
+				<td><input type="submit" class="fullwidth" value="Sumbit"></td>
 			</tr>
 		</table>
 	{% csrf_token %}

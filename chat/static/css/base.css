@@ -127,6 +127,19 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 .color-lor .table tbody>tr>th{
 	border-top: 1px solid #5B6248;
 }
+
+.color-lor .col-error {
+	color: red;
+}
+
+.color-lor .col-success {
+	color: #39C03B;
+}
+
+.color-lor .col-info {
+	color: #67bdc0;;
+}
+
 /* =============== END  ===================== */
 
 a {
@@ -183,6 +196,31 @@ textarea {
 	padding: 0;
 	outline: none;
 }
+
+#growlHolder {
+	top: 60px; /*51 is nav + margin*/
+	left: 5px;
+	position: absolute;
+	max-width: 50%;
+	width: 400px;
+	max-height: calc(100% - 60px); /*55 is top, +5px bot*/
+	overflow: hidden;
+
+}
+
+.growl {;
+	padding: 7px;
+	width: calc(100% - 16px);
+	border: 1px #775E39 solid;
+	border-radius: 10px;
+	background-color: rgba(34, 31, 31, 0.86);
+	float:left;
+	word-wrap: break-word;
+	margin-bottom: 5px;
+	transition: 0.5s opacity;
+	opacity: 0;
+}
+
 
 /*============== ONLY LOGIN.CSS =============*/
 .userNameInput {
