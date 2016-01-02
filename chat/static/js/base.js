@@ -9,6 +9,23 @@ var loggingEnabled = true;
 
 var growlHolder;
 
+var infoMessages = [
+	"Did you know that you could paste multiple lines content by simply pressing shift+Enter?",
+	"You can add smileys by clicking on bottom right icon. To close the smile container click outside of it or press escape",
+	"You can send direct message to user just by clicking on username in user list or in messages. After his username appears in the left bottom " +
+			"corner and your messages become green. To send messages to all you should click on X right by username",
+	"You can also comment somebody's message. This will be shown to all users in current channel. Just click on message" +
+			"and it's content appears in message text",
+	"You have a feature to suggest or you lack some functionality? Click on purple pencil icon on top menu and write your " +
+			"suggestion there",
+	"If snowing bothers you or it eats your cpu, you can disable it by pressing on white cloud icon on top menu.",
+	"Chat uses your browser cache to store messages. If you want to clear history and all cached messages just click " +
+	"on red Floppy drive icon on the top menu",
+	"You can view userprofile by clicking on icon left by username in user list. To edit your profile you need to register" +
+	"and click on light green wrench icon on the top right corner",
+	"You can change your randomly generated username by clicking on it on top menu"
+];
+
 var $ = function(id) {
 	return document.getElementById(id);
 };
@@ -27,23 +44,25 @@ onDocLoad(function () {
 	}
 });
 
+
 function growlError(message) {
- growl(message, 'col-error', 7000)
+	growlShow(message, 'col-error')
 }
 
 function growlSuccess(message) {
- growl(message, 'col-success', 5000)
+	growlShow(message, 'col-success')
 }
 
 function growlInfo(message) {
-	growl(message, 'col-info', 9000);
+	growlShow(message, 'col-info');
 }
 
 
-function growl(message, growlClass, timeout) {
+function growlShow(message, growlClass) {
+	var timeout = 3000 + message.length * 70;
 	if (false) {
 		var allGrowls = document.getElementsByClassName('growl');
-		for (i=0; i< allGrowls.length; i++) {
+		for (var i=0; i< allGrowls.length; i++) {
 			growlHolder.removeChild(allGrowls[i]);
 		}
 	}
@@ -147,7 +166,7 @@ function readCookie(name, c, C, i) {
 	if (cookie != null) {
 		var length = cookie.length - 1;
 		// if cookie is wrapped with quotes (for ex api)
-		if (cookie[0] == '"' && cookie[length] == '"') {
+		if (cookie[0] === '"' && cookie[length] === '"') {
 			cookie = cookie.substring(1, length);
 		}
 	}
@@ -163,13 +182,13 @@ function readCookie(name, c, C, i) {
 function doPost(url, params, callback, form) {
 	var r = new XMLHttpRequest();
 	r.onreadystatechange = function () {
-		if (r.readyState == 4) {
-			if (r.status == 200) {
+		if (r.readyState === 4) {
+			if (r.status === 200) {
 				console.log(getDebugMessage("POST {} in: {};", url, r.response));
 			} else {
 				console.error(getDebugMessage("POST {} in: {}, status:", url, r.response, r.status));
 			}
-			if (typeof(callback) == "function") {
+			if (typeof(callback) === "function") {
 				callback(r.response);
 			} else {
 				console.warn(getDebugMessage("Skipping {} callback for POST {}", callback, url));
@@ -189,7 +208,7 @@ function doPost(url, params, callback, form) {
 			}
 		}
 	}
-	if (url == "") { 
+	if (url === "") {
 		url = window.location.href ; // f*cking IE
 	}
 	r.open("POST", url, true);
@@ -229,7 +248,7 @@ function doGet(fileUrl, callback) {
 				}
 				xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
 				xobj.onreadystatechange = function () {
-					if (xobj.readyState == 4 && xobj.status == "200") {
+					if (xobj.readyState === 4 && xobj.status === 200) {
 						if (callback) {
 							callback(xobj.responseText);
 						}

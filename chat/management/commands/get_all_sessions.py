@@ -1,9 +1,10 @@
 __author__ = 'andrew'
-from django.core.management import BaseCommand
-from django.db import models
 import base64
 import json
+
 import redis
+from django.core.management import BaseCommand
+
 
 class Command(BaseCommand):
 

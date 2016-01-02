@@ -8,10 +8,6 @@ const CONNECTION_RETRY_TIME = 10000;
 
 const SMILEY_URL = staticUrl + 'smileys/';
 
-const monthNames = ["January", "February", "March", "April", "May", "June",
-	"July", "August", "September", "October", "November", "December"
-];
-
 const selfHeaderClass = 'message-header-self';
 const privateHeaderClass = 'message-header-private';
 const systemHeaderClass = 'message-header-system';
@@ -40,7 +36,6 @@ const escapeMap = {
 };
 
 var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
-var smileyPattern = /:\S+:/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*>>>\s/;
 
 var destinationUserName = null;
@@ -135,7 +130,13 @@ onDocLoad(function () {
 	addTextAreaEvents();
 	//bottom call loadMessagesFromLocalStorage(); s
 	doGet(SMILEY_URL + 'info.json', loadSmileys);
+	showHelp();
 });
+
+
+function showHelp() {
+	growlInfo(infoMessages[Math.floor(Math.random() * infoMessages.length)]);
+}
 
 
 function addSmileysEvents() {
@@ -180,7 +181,6 @@ function showTabByName(event) {
 // TODO refactor this, it's hard to read
 function loadSmileys(jsonData) {
 	var smileyData = JSON.parse(jsonData);
-	var index = 0;
 	for (var tab in smileyData) {
 		if (smileyData.hasOwnProperty(tab)) {
 			var tabRef = document.createElement('div');
@@ -230,7 +230,7 @@ function addSmile(event) {
 
 
 function addTextAreaEvents() {
-	userMessage.addEventListener('keydown', sendMessage);
+	userMessage.addEventListener('keydown', checkAndSendMessage);
 	userMessage.addEventListener('input', function () {
 		adjustUserMessageWidth(); // pass 1st argument as null instead of Event
 	});
@@ -353,37 +353,39 @@ function keyDownLoadUp(e) {
 }
 
 
-function sendMessage(event) {
-	if (event.keyCode ==27) {
-		hideElement(smileParentHolder);
+function sendMessage(messageContent) {
+// anonymous is set by name, registered user is set by id.
+	var messageRequest = {
+		content: messageContent,
+		action: 'send'
+	};
+	if (destinationUserId != null) {
+		messageRequest['receiverId'] = destinationUserId;
 	}
-	if (event.keyCode !== 13) {
-		return;
+	if (destinationUserName != null) {
+		messageRequest['receiverName'] = destinationUserName;
 	}
-	if (!event.shiftKey) {
-		// http://stackoverflow.com/questions/6014702/how-do-i-detect-shiftenter-and-generate-a-new-line-in-textarea
-		// Since messages are sent by pressing enter, enter goes inside of textarea after sending
+	var sendSuccessful = sendToServer(messageRequest);
+	if (sendSuccessful) {
+		userMessage.value = "";
+		adjustUserMessageWidth();
+	}
+}
+
+
+function checkAndSendMessage(event) {
+ if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
 		event.preventDefault();
 		var messageContent = userMessage.value;
 		if (/^\s*$/.test(messageContent)) {
 			return;
 		}
-		// anonymous is set by name, registered user is set by id.
-		var messageRequest = {
-			content: messageContent,
-			action: 'send'
-		};
-		if (destinationUserId != null) {
-			messageRequest['receiverId'] = destinationUserId;
-		}
-		if (destinationUserName != null) {
-			messageRequest['receiverName'] = destinationUserName;
-		}
-		var sendSuccessful = sendToServer(messageRequest);
-		if (sendSuccessful) {
-			userMessage.value = "";
-			adjustUserMessageWidth();
-		}
+		// http://stackoverflow.com/questions/6014702/how-do-i-detect-shiftenter-and-generate-a-new-line-in-textarea
+		// Since messages are sent by pressing enter, enter goes inside of textarea after sending
+
+		sendMessage(messageContent);
+	} 	else if (event.keyCode === 27) { // 27 = escape
+		hideElement(smileParentHolder);
 	}
 }
 
@@ -480,7 +482,7 @@ function start_chat_ws() {
 			if (e.code === 403) {
 				console.error(getDebugMessage('Server forbidden ws request because "{}". Trying to update session key',  e.reason));
 				doGet("/update_session_key", function(response) {
-					if (response == RESPONSE_SUCCESS) {
+					if (response === RESPONSE_SUCCESS) {
 						console.log(getDebugMessage('Session key has been successfully updated'));
 					} else {
 						console.log(getDebugMessage('Updating session key has failed. Server response: "{}"', response ));
@@ -542,7 +544,7 @@ function loadUsers(usernames) {
 			var icon;
 			var gender = usernames[username].sex;
 			var userId = usernames[username].userId;
-			if (userId == 0) {
+			if (userId === 0) {
 				icon = document.createElement('i');
 			} else {
 				icon = document.createElement('a');
@@ -573,11 +575,10 @@ function loadUsers(usernames) {
  * @returns Node element that follows the inserted one
  * @throws exception if element already there*/
 function getPosition(time) {
-	var lastTime = 0;
 	var arrayEl;
 	for (var i = 0; i < allMessages.length; i++) {
 		arrayEl = allMessages[i];
-		if (time == arrayEl) {
+		if (time === arrayEl) {
 			throw "Already in list";
 		}
 		if (time < arrayEl) {
@@ -607,7 +608,7 @@ function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncod
 
 	var userNameA = document.createElement('span');
 	userNameA.textContent = displayedUsername;
-	if (displayedUsername != SYSTEM_USERNAME) {
+	if (displayedUsername !== SYSTEM_USERNAME) {
 		userNameA.className = userNameClass;
 		userNameA.onclick = userClick;
 	}
@@ -650,7 +651,7 @@ function insertCurrentDay(timeMillis, pos) {
 	if (pos != null) { // position of the following message <p>
 		var prevEl = pos.previousSibling;
 		// if it's not the same day block, prevElement always exist its either fieldset  either prevmessage
-		if (prevEl.tagName == 'FIELDSET' && prevEl.textContent.trim() != innerHTML) { // TODO innerText instead for ie?
+		if (prevEl.tagName === 'FIELDSET' && prevEl.textContent.trim() !== innerHTML) { // TODO innerText instead for ie?
 			if (insert) chatBoxDiv.insertBefore(fieldset, prevEl);
 			result =  prevEl;
 		} else {
@@ -731,13 +732,13 @@ function printRefreshUserNameToChat(data) {
 	var action = data['action'];
 	if (action === 'changed') {
 		// if userName label already changed or still
-		if (data['oldName'] == loggedUser || data['user'] == loggedUser) {
+		if (data['oldName'] === loggedUser || data['user'] === loggedUser) {
 			message = getText('You have changed nickname to <b>{}</b> ', data['user']);
 		} else {
 			message = getText('Anonymous <b>{}</b> has changed nickname to <b>{}</b> ', data['oldName'], data['user']) ;
 		}
 	} else if (action !== 'onlineUsers') {
-		if (data['user'] == loggedUser) {
+		if (data['user'] === loggedUser) {
 			message = 'You have ' + action + ' the chat';
 		} else {
 			var who;
@@ -888,7 +889,7 @@ function webSocketMessage(message) {
 
 function sendToServer(messageRequest) {
 	var jsonRequest = JSON.stringify(messageRequest);
-	if (ws.readyState != WebSocket.OPEN) {
+	if (ws.readyState !== WebSocket.OPEN) {
 		console.warn(getDebugMessage("Web socket is closed. Can't send {}", jsonRequest));
 		return false;
 	} else {

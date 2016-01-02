@@ -107,7 +107,7 @@ function saveProfile(event) {
 		params = {base64_image: image};
 	}
 	doPost('/save_profile', params, function(response) {
-		if (response == RESPONSE_SUCCESS) {
+		if (response === RESPONSE_SUCCESS) {
 			growlSuccess("Your profile has been successfully updated");
 		} else {
 			growlError(response);

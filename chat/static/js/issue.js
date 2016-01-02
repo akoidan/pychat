@@ -21,7 +21,7 @@ function sendIssue(event) {
 		}
 	}
 	doPost('', params, function(response) {
-		if (response == RESPONSE_SUCCESS) {
+		if (response === RESPONSE_SUCCESS) {
 			growlSuccess("Your issue has been successfully submitted");
 		} else {
 			growlError(response);

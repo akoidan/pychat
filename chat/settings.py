@@ -9,12 +9,11 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+import logging.config
 import os
 import sys
-from logging.handlers import RotatingFileHandler
 from os.path import join
 
-LOGGING_CONFIG = None
 try:
 	from chat.production import * 
 except ImportError:
@@ -23,6 +22,7 @@ from django.conf import global_settings
 
 import chat as project_module
 
+LOGGING_CONFIG = None
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
@@ -209,26 +209,25 @@ LOGGING = {
 			'propagate': False,
 		},
 	},
-
 	'formatters': {
 
-	'tornado': {
-			'format':  '%(id)s [%(asctime)s=%(lineno)s [%(username)s:%(ip)s]: %(message)s',
+		'tornado': {
+			'format': '%(id)s [%(asctime)s=%(lineno)s [%(username)s:%(ip)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
-	'django': {
-			'format':  '%(id)s [%(asctime)s %(module)s:%(lineno)s  [%(username)s:%(ip)s]: %(message)s',
+		'django': {
+			'format': '%(id)s [%(asctime)s %(module)s:%(lineno)s  [%(username)s:%(ip)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},
 }
 
-import logging.config
+
 logging.config.dictConfig(LOGGING)
 
 ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/djangochat/issues/new'
 
-SESSION_COOKIE_NAME="sessionid"
+SESSION_COOKIE_NAME = "sessionid"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 
@@ -244,7 +243,8 @@ if not DEBUG:
 ANONYMOUS_REDIS_ROOM = 'all'
 REGISTERED_REDIS_ROOM = 'signed'
 
-######### JAVASCRIPT CONSTANTS #############
+# ---------------JAVASCRIPT CONSTANTS --------------------
+
 VALIDATION_IS_OK = 'ok'
 MAX_USERNAME_LENGTH = 16
 MAX_MESSAGE_SIZE = 10000
