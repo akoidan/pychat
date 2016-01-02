@@ -112,7 +112,7 @@ function saveProfile(event) {
 	}
 	doPost('/save_profile', params, function(response) {
 		if (response === RESPONSE_SUCCESS) {
-			growlSuccess("Your profile has been successfully updated");
+			growlSuccess("Your profile has been successfully updated. Press home icon to return on main page");
 		} else {
 			growlError(response);
 		}

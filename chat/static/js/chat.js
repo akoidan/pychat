@@ -41,7 +41,7 @@ var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*>>>\s/;
 var destinationUserName = null;
 var destinationUserId = null;
 
-var lockLoadUpHistory = false;
+var lastLoadUpHistoryRequest = 0;
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
 var newMessagesCount = 0;
@@ -786,7 +786,7 @@ function handleGetMessages(message) {
 	message.forEach(function (message) {
 		printMessage(message);
 	});
-	lockLoadUpHistory = false; // allow fetching again, after new header is set
+	lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
 }
 
 
@@ -902,14 +902,13 @@ function sendToServer(messageRequest) {
 
 function loadUpHistory(count) {
 	if (chatBoxDiv.scrollTop === 0) {
-		if (lockLoadUpHistory) {
+		var currentMillis = new Date().getTime();
+		// 0 if locked, or last request was sent earlier than 3 seconds ago
+		if (lastLoadUpHistoryRequest + 3000 > currentMillis) {
 			console.log(getDebugMessage("Skipping loading message, because it's locked"));
 			return
 		}
-		lockLoadUpHistory = true;
-		setTimeout(function(){
-			lockLoadUpHistory = false;
-		}, 10000); // failsafe if error
+		lastLoadUpHistoryRequest = currentMillis;
 		var getMessageRequest = {
 			headerId: headerId,
 			count: count,
