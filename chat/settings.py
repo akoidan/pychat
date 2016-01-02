@@ -149,9 +149,8 @@ STATIC_URL = 'https://static.pychat.org/static/'
 
 PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
-STATICFILES_DIRS = (
-	os.path.join(PROJECT_DIR, 'static'),
-)
+
+STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 
 AUTH_PROFILE_MODULE = 'chat.UserProfile'
 
