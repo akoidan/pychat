@@ -87,7 +87,11 @@ function startCapturingVideo(button) {
 	}
 
 	if (!isStopped) {
-		localMediaStream.stop();
+		if (localMediaStream.stop) {
+			localMediaStream.stop();
+		} else {
+			 localMediaStream.getVideoTracks()[0].stop();
+		}
 		button.value = 'Renew the photo';
 		growlInfo("To apply photo click on save");
 		hideElement(video);
