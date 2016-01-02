@@ -1,59 +1,39 @@
 ![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7--1.9-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/djangochat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/djangochat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/djangochat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/djangochat)
 
-
 Web chat based on WebSockets.
 ================================================
 
 Basically written in **Python** with [django](https://www.djangoproject.com/) it uses asynchronous web framework [Tornado](http://www.tornadoweb.org/) for handling realtime messages. Broadcasting messages are being sent by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using Python [tornado-redis](https://github.com/leporo/tornado-redis) backend. It can be run on both **Windows** and **Linux** and tested on **Python 2.7** and **Python 3.x**
 
-
 [Live demo](http://pychat.org/)
 ================
 
-
 To run chat on CentOS 6:
 ===============
- (See master branch readme for other os support. pychat.org is mine domain, make sure you replace it with yours in all files)
+ 0. Passwordless login to ssh server (optional): run this from client `cat ~/.ssh/id_rsa.pub | ssh -p 666 root@ip 'mkdir -p .ssh; cat >> .ssh/authorized_keys'`
+ 0. Add `alias yum="python2 $(which yum)"` to /etc/bashrc if you use python3
+ 0. Install packages `yum install nginx, python34u, uWSGI, python34u-pip, redis, mysql-server, mysql-devel, postfix, mailx`
+ 0. Copy config files to rootfs `cp rootfs / -r `
+ 0. Add file `chat/production.py` , place `SECRET_KEY` there
+ 0. Create database in mysql `echo "create database django CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`
+ 0. Create services: `chkconfig --add redis; chkconfig --add mysqld; chkconfig --add uwsgi; chkconfig --add tornado; chkconfig --add postfix`
+ 0. Optional: add them to autostart: `chkconfig mysqld on; chkconfig uwsgi on; chkconfig tornado on; chkconfig redis on; chkconfig postfix on`
+ 0. Get all dependencies `pip3 install -r requirements.txt`
+ 0. Fill database with tables `python manage.py init_db`
+ 0. Download static content `sh download_content.sh`
+ 0. Place you certificate in `/etc/nginx/ssl`, you can get free one with startssl. For it start postfix service, send email validation to domain `webmaster@pychat.org` and apply verification code from `/root/Maildir/new/<<time>>`. Generate public key in `/etc/nginx/ssl/server.key` and create certificate with this key on startssl. Download the certificate from startssl and put it into `/etc/nginx/ssl/1_pychat.org_bundle.crt`
  
- 0. Run from your pc, Add ssh without authorize`cat .ssh/id_rsa.pub | ssh -p 666 root@ip 'mkdir -p .ssh; cat >> .ssh/authorized_keys'`
- 1. add `alias yum="python2 $(which yum)"` to /etc/bashrc if you use python3
- 2. Install nginx`yum install nginx`
- 3. Install python3 `yum install python34u`
- 4. Install python server `yum install uWSGI`
- 5. Install python package manager `python34u-pip`. Be careful, yum requires python2.
- 6. Install db for session and pubsub `yum install redis`
- 7. Install main db `yum install mysql-server, mysql-devel`
- 8. Copy config files to rootfs `cp rootfs / -r `
- 9. add file `Chat/production.py` , place `SECRET_KEY` there
- 10. Create database in mysql `echo "create database django CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`
- 11. Create redis service. `chkconfig --add redis `. Add it to autostart (optional) `chkconfig redis on`
- 12. Create mysqld service `chkconfig --add mysqld`  Add it to autostart (optional) `chkconfig mysqld on`
- 13. Create uwsgi service `chkconfig --add uwsgi`  Add it to autostart (optional) `chkconfig uwsgi on`
- 14. Create tornado service `chkconfig --add tornado`  Add it to autostart (optional) `chkconfig tornado o`
- 15. Get all dependencies `pip3 install -r requirements.txt`
- 16. Fill database with tables `python manage.py init_db`
- 17. Download static content `sh download_content.sh
- 
-
-Configure ssl:
-=============
- 1. Register on startssl.
- 2. Setup postfix server (configs are already in rootfs). Start it with `service postfix start`
- 3. Send email validation to domain `webmaster@pychat.org` and apply verification code from `/root/Maildir/new/<<time>>`
- 4. Generate public key in `/etc/nginx/ssl/server.key` and create certificate with this key on startssl
- 5. Download certificate from startssl and put it into `/etc/nginx/ssl/1_pychat.org_bundle.crt`
-
-
 Start the chat:
 ==============
  1. Start session holder: `service redis-server start`
- 3. Run server: `service nginx start`
- 4. Start database: `service mysqld start`
- 5. Start the Chat: `service uwsgi start`
- 2. Start the WebSocket listener: `service tornado start`
+ 1. Run server: `service nginx start`
+ 1. Start email server `service postfix start`
+ 1. Start database: `service mysqld start`
+ 1. Start the Chat: `service uwsgi start`
+ 1. Start the WebSocket listener: `service tornado start`
 
-=======
 #TODO
+==============
 * TODO add growl notifications, add "click on webcam capturing to make a photo"
 * add git ony flag to download_content.sh
 * https://code.djangoproject.com/ticket/25489

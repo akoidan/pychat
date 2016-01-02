@@ -237,6 +237,15 @@ MEDIA_URL = "https://static.pychat.org/photo/"
 
 USER_COOKIE_NAME = 'user'
 
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+DEFAULT_FROM_EMAIL = 'root root@pychat.org>'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+
 # If this options is set, on every oncoming request chat will gather info about user location
 if not DEBUG:
 	IP_API_URL = 'http://ip-api.com/json/%s'
