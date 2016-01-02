@@ -7,7 +7,6 @@ var emailCheck;
 var email;
 var repeatPasswordCheck;
 var passRegex = /^\S.+\S$/;
-var mailbox;
 
 onDocLoad(function () {
 	password = $("rpassword");
@@ -18,7 +17,6 @@ onDocLoad(function () {
 	emailCheck = $("email_check");
 	email = $("email");
 	repeatPasswordCheck = $("repeatpassword_check");
-	mailbox = $("mailbox");
 });
 
 function register(event) {
@@ -61,41 +59,41 @@ function validateUser() {
 	} else if (!USER_REGEX.test(username)) {
 		setError(userNameCheck, "only letters, numbers and underscores!");
 	} else {
-		var callback = function (data) {
+		doPost('/validate_user', {username: username}, function (data) {
 			if (data === RESPONSE_SUCCESS) {
 				setSuccess(userNameCheck);
 			} else {
 				setError(userNameCheck, data)
 			}
-		};
-		doPost('/validate_user', {username: username}, callback, null);
+		}, null);
 	}
 }
 
 function setError(element, errorText) {
 	element.style.color = "#dd4b39";
-	element.innerHTML = errorText;
+	element.textContent = errorText;
 }
 
 function setSuccess(element) {
 	element.style.color = "Green";
-	element.innerHTML = "ok!";
+	element.textContent = "ok!";
 }
 
-	function validateEmail() {
-		var mail = email.value;
-		var callback = function (data) {
+function validateEmail() {
+	var mail = email.value;
+	if (blankRegex.test(mail)) {
+		emailCheck.style.color = '';
+		emailCheck.textContent = "Enter an email for extra features"
+	} else {
+		doPost('/validate_email', {'email': mail}, function (data) {
 			if (data === RESPONSE_SUCCESS) {
 				setSuccess(emailCheck);
 			} else {
 				setError(emailCheck, data);
-				if (!mailbox.checked) {
-					emailCheck.style.color = "";
-				}
 			}
-		};
-		doPost('/validate_email', {email: mail} , callback, null);
+		}, null);
 	}
+}
 
 
 function passwordsMatch() {

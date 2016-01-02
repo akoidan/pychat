@@ -139,11 +139,10 @@ def register(request):
 	try:
 		rp = request.POST
 		logger.info('Got register request %s', hide_fields(rp, 'password', 'repeatpassword'))
-		(username, password, email, verify_email) = (
-			rp.get('username'), rp.get('password'), rp.get('email'), rp.get('mailbox'))
+		(username, password, email) = (rp.get('username').strip(), rp.get('password').strip(), rp.get('email').strip())
 		check_user(username)
 		check_password(password)
-		check_email(email, verify_email == 'on')
+		check_email(email)
 		user = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
 		user.set_password(password)
 		default_thread, created_default = Room.objects.get_or_create(name=ANONYMOUS_REDIS_ROOM)
@@ -161,11 +160,11 @@ def register(request):
 		djangologin(request, auth_user)
 		# register,js redirect if message = 'Account created'
 		message = VALIDATION_IS_OK
-		if verify_email == 'on':
+		if email:
 			send_email_verification(user, request.get_host())
 	except ValidationError as e:
 		message = e.message
-		logger.debug('Rejecting request, reason: %s', message)
+		logger.debug('Rejecting request because "%s"', message)
 	return HttpResponse(message, content_type='text/plain')
 
 
