@@ -377,7 +377,7 @@ function checkAndSendMessage(event) {
  if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
 		event.preventDefault();
 		var messageContent = userMessage.value;
-		if (/^\s*$/.test(messageContent)) {
+		if (blankRegex.test(messageContent)) {
 			return;
 		}
 		// http://stackoverflow.com/questions/6014702/how-do-i-detect-shiftenter-and-generate-a-new-line-in-textarea

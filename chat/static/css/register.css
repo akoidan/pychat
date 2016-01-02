@@ -22,15 +22,10 @@
 	text-align: left;
 }
 
-.border-button-tr {
-	text-align: center;
-}
-
 .border-form {
 	text-align: center;
 }
 
-
-.border-form {
+.border-table > tbody > tr:last-child > td {
 	text-align: center;
 }

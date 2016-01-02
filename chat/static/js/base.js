@@ -4,7 +4,7 @@ var sound = 0;
 var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var HISTORY_STORAGE_NAME = 'history';
 var MAX_STORAGE_LENGTH = 3000;
-
+var blankRegex = /^\s*$/;
 var loggingEnabled = true;
 
 var growlHolder;

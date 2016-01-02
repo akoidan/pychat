@@ -64,13 +64,14 @@ def check_password(password):
 		raise ValidationError("password should be at least 3 symbols")
 
 
-def check_email(email, skip_but_used=True):
+def check_email(email):
 	"""
 	:raises ValidationError if specified email is registered or not valid
 	"""
-	if skip_but_used:
-		validate_email(email)
+	if not email:
+		return
 	try:
+		validate_email(email)
 		# theoretically can throw returning 'more than 1' error
 		UserProfile.objects.get(email=email)
 		raise ValidationError('This email is already used')
