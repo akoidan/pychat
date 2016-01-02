@@ -56,7 +56,7 @@ onDocLoad(function () {
 		};
 		input.onblur = sendChangeNickname;
 		input.onkeypress = function (e) {
-			if (e.which == 13) {
+			if (e.which === 13) {
 				sendChangeNickname();
 			}
 		};

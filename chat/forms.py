@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import FileField, DateField, ChoiceField, Widget
 
-from chat.models import User, UserProfile
+from chat.models import UserProfile
 from chat.settings import GENDERS
 
 

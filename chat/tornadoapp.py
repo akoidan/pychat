@@ -413,16 +413,13 @@ class MessagesHandler(MessagesCreator):
 		self.logger.info('!! Fetching %d messages starting from %s', count, header_id)
 		if header_id is None:
 			messages = Message.objects.filter(
-				Q(receiver=None)  # Only public
-				| Q(sender=self.user_id)  # private s
-				| Q(receiver=self.user_id)  # and private
+				# Only public or private or private
+				Q(receiver=None) | Q(sender=self.user_id) | Q(receiver=self.user_id)
 			).order_by('-pk')[:count]
 		else:
 			messages = Message.objects.filter(
 				Q(id__lt=header_id),
-				Q(receiver=None)
-				| Q(sender=self.user_id)
-				| Q(receiver=self.user_id)
+				Q(receiver=None) | Q(sender=self.user_id) | Q(receiver=self.user_id)
 			).order_by('-pk')[:count]
 		response = self.do_db(self.get_messages, messages)
 		self.safe_write(response)
@@ -456,7 +453,7 @@ class MessagesHandler(MessagesCreator):
 			IpAddress.objects.create(user_id=user_id, ip=self.ip, anon_name=anon_name)
 
 
-class AntiSpam:
+class AntiSpam(object):
 
 	def __init__(self):
 		self.spammed = 0

@@ -86,7 +86,7 @@ class UserProfile(User):
 			self.email.lower().strip()  # Hopefully reduces junk to ""
 			if self.email == "":
 				self.email = None
-		super(User, self).save(*args, **kwargs)
+		super(UserProfile, self).save(*args, **kwargs)
 
 class Room(models.Model):
 	name = CharField(max_length=30, null=True, unique=True)

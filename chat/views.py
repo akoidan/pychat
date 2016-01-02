@@ -5,7 +5,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 from django.core.context_processors import csrf
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
 from django.http import Http404
 from django.http import HttpResponse, HttpResponseNotAllowed
@@ -17,9 +17,9 @@ from django.views.decorators.http import require_http_methods
 from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
-from chat.models import Issue, Room, IssueDetails, IpAddress
-from chat.settings import ANONYMOUS_REDIS_ROOM, REGISTERED_REDIS_ROOM, logging, VALIDATION_IS_OK
-from chat.utils import *
+from chat.models import Issue, Room, IssueDetails, IpAddress, UserProfile
+from chat.settings import ANONYMOUS_REDIS_ROOM, REGISTERED_REDIS_ROOM, VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging
+from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_email_verification
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ def validate_email(request):
 	email = request.POST.get('email')
 	try:
 		utils.check_email(email)
-		response = settings.VALIDATION_IS_OK
+		response = VALIDATION_IS_OK
 	except ValidationError as e:
 		response = e.message
 	return HttpResponse(response, content_type='text/plain')
@@ -47,7 +47,7 @@ def update_session_key(request):
 	request.session.create()  # updates the session_key
 	logger.info("Session key %s has been updated to %s", old_key, request.session.session_key)
 	request.session.modified = True
-	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+	return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
 
 
 @require_http_methods('POST')
@@ -59,7 +59,7 @@ def validate_user(request):
 		username = request.POST.get('username')
 		utils.check_user(username)
 		# hardcoded ok check in register.js
-		message = settings.VALIDATION_IS_OK
+		message = VALIDATION_IS_OK
 	except ValidationError as e:
 		message = e.message
 	return HttpResponse(message, content_type='text/plain')
@@ -94,7 +94,7 @@ def auth(request):
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		djangologin(request, user)
-		message = settings.VALIDATION_IS_OK
+		message = VALIDATION_IS_OK
 	else:
 		message = 'Login or password is wrong'
 	logger.debug('Auth request %s ; Response: %s', hide_fields(request.POST, 'password'), message)
@@ -160,7 +160,7 @@ def register(request):
 		auth_user = authenticate(username=username, password=password)
 		djangologin(request, auth_user)
 		# register,js redirect if message = 'Account created'
-		message = settings.VALIDATION_IS_OK
+		message = VALIDATION_IS_OK
 		if verify_email == 'on':
 			send_email_verification(user, request.get_host())
 	except ValidationError as e:
@@ -176,7 +176,7 @@ def change_profile(request):
 	form = UserProfileForm(instance=user_profile)
 	c = csrf(request)
 	c['form'] = form
-	c['date_format'] = settings.DATE_INPUT_FORMATS_JS
+	c['date_format'] = DATE_INPUT_FORMATS_JS
 	return render_to_response('change_profile.html', c, context_instance=RequestContext(request))
 
 
@@ -209,7 +209,7 @@ def save_profile(request):
 	form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 	if form.is_valid():
 		form.save()
-		response = settings.VALIDATION_IS_OK
+		response = VALIDATION_IS_OK
 	else:
 		response = form.errors
 	return HttpResponse(response, content_type='text/plain')
@@ -236,7 +236,7 @@ def report_issue(request):
 		)
 		issue_details.save()
 
-		return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+		return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
 	else:
 		raise HttpResponseNotAllowed
 
@@ -244,9 +244,6 @@ def report_issue(request):
 @require_http_methods('GET')
 def hack(request):
 	return render_to_response('')
-
-
-##################### charts #######################
 
 
 @require_http_methods('GET')
