@@ -75,6 +75,8 @@ INSTALLED_APPS = (
 SESSION_ENGINE = 'redis_sessions.session'
 
 API_PORT = '8888'
+CRT_PATH = '/etc/nginx/ssl/1_pychat.org_bundle.crt'
+KEY_PATH = '/etc/nginx/ssl/server.key'
 
 
 # SESSION_COOKIE_AGE = 10
@@ -143,7 +145,7 @@ DEFAULT_CHARSET = 'utf-8'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-STATIC_URL = 'http://static.pychat.org/static/'
+STATIC_URL = 'https://static.pychat.org/static/'
 
 PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
@@ -231,7 +233,7 @@ SESSION_COOKIE_NAME = "sessionid"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 
-MEDIA_URL = "http://static.pychat.org/photo/"
+MEDIA_URL = "https://static.pychat.org/photo/"
 
 USER_COOKIE_NAME = 'user'
 

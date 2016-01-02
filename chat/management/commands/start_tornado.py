@@ -24,7 +24,10 @@ class Command(BaseCommand):
 		io_loop.add_timeout(time.time() + 2, io_loop.stop)
 
 	def handle(self, *args, **options):
-		self.http_server = tornado.httpserver.HTTPServer(application)
+		self.http_server = tornado.httpserver.HTTPServer(application, ssl_options={
+			"certfile": settings.CRT_PATH,
+			"keyfile": settings.KEY_PATH
+		})
 		self.http_server.listen(settings.API_PORT)
 
 		# Init signals handler

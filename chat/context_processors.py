@@ -10,7 +10,7 @@ def add_user_name(request):
 	Login or logout navbar is creates by means of create_nav_page
 	"""
 	domain_address = request.get_host().split(':')[0]
-	api_address = "ws://%s:%s/" % (domain_address, API_PORT)
+	api_address = "wss://%s:%s/" % (domain_address, API_PORT)
 	c = {'apiUrl': api_address, 'successReponse': VALIDATION_IS_OK}
 	if request.user.is_authenticated():
 		c['username'] =request.user.username
