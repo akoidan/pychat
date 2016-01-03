@@ -196,22 +196,35 @@ LOGGING = {
 			'class': 'logging.StreamHandler',
 			'formatter': 'tornado',
 		},
+		'mail_admins': {
+			'level': 'ERROR',
+			'class': 'django.utils.log.AdminEmailHandler',
+		}
 	},
 	'loggers': {
-		# root logger
+		'django.request': {
+			'handlers': [ 'mail_admins', 'file'],
+			'level': 'ERROR',
+			'propagate': False,
+		},
 		'': {
-			'handlers': ['file'],
+			'handlers': ['file', ],
 			'level': 'DEBUG',
 			'propagate': False,
 		},
+		'tornado.application': {
+                        'handlers': ['file-tornado', 'mail_admins'],
+                        'level': 'ERROR',
+                        'propagate': True,
+                },
 		'chat.tornadoapp': {
 			'handlers': ['file-tornado'],
 			'level': 'DEBUG',
 			'propagate': False,
 		},
+
 	},
 	'formatters': {
-
 		'tornado': {
 			'format': '%(id)s [%(asctime)s=%(lineno)s [%(username)s:%(ip)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
@@ -241,9 +254,10 @@ EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = ''
-DEFAULT_FROM_EMAIL = 'root root@pychat.org>'
+#DEFAULT_FROM_EMAIL = 'root <root@pychat.org>'
+SERVER_EMAIL = 'root@pychat.org'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-
+ADMINS = [('Andrew', 'nightmare.quake@mail.ru'), ]
 
 # If this options is set, on every oncoming request chat will gather info about user location
 if not DEBUG:
