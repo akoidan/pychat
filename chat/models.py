@@ -88,6 +88,7 @@ class UserProfile(User):
 				self.email = None
 		super(UserProfile, self).save(*args, **kwargs)
 
+
 class Room(models.Model):
 	name = CharField(max_length=30, null=True, unique=True)
 	users = models.ManyToManyField(User, related_name='rooms')
@@ -117,7 +118,7 @@ class Message(models.Model):
 
 
 class Issue(models.Model):
-	content = models.TextField(null=False) # unique = true, but mysql doesnt allow unique fields for unspecified size
+	content = models.TextField(null=False)  # unique = true, but mysql doesnt allow unique fields for unspecified size
 
 
 class IssueDetails(models.Model):

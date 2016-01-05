@@ -54,6 +54,7 @@ GENDER_VAR_NAME = 'sex'
 
 REFRESH_USER_EVENT = 'onlineUsers'
 SYSTEM_MESSAGE_EVENT = 'system'
+GROWL_MESSAGE_EVENT = 'growl'
 GET_MESSAGES_EVENT = 'messages'
 GET_MINE_USERNAME_EVENT = 'me'
 ROOMS_EVENT = 'rooms'  # thread ex "main" , channel ex. 'r:main', "i:3"
@@ -384,13 +385,15 @@ class MessagesHandler(MessagesCreator):
 			online = self.get_online_from_redis()
 			if new_username in online:
 				self.logger.info('!! This name is already used')
-				raise ValidationError('Anonymous already has this name')
+				raise ValidationError('This name is already used by another anonymous!')
 			session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
 			session = SessionStore(session_key)
 			session[SESSION_USER_VAR_KEY] = new_username
 			session.save()
-
-			del online[self.sender_name]
+			try:
+				del online[self.sender_name]
+			except KeyError:  # if two or more change_username events in fast time
+				pass
 			old_name = self.sender_name
 			old_channel = self.channel
 			self.sender_name = new_username  # change_user_name required new_username in sender_name
@@ -398,11 +401,12 @@ class MessagesHandler(MessagesCreator):
 			message_all = self.change_user_nickname(old_name, online)
 			message_me = self.default(new_username, GET_MINE_USERNAME_EVENT)
 			# TODO perform ton of checks or emit twice ?
-			self.publish(message_me, self.channel)  # to new user channel
+			# TODO why the hell I would send a message to a new channel?? commented bellow
+			# self.publish(message_me, self.channel)  # to new user channel
 			self.publish(message_me, old_channel)  # to old user channel
 			self.publish(message_all)
 		except ValidationError as e:
-			self.safe_write(self.default(str(e.message)))
+			self.safe_write(self.default(str(e.message), event=GROWL_MESSAGE_EVENT))
 
 	def process_get_messages(self, data):
 		"""

@@ -856,6 +856,9 @@ function handlePreparedWSMessage(data) {
 		case 'rooms':
 			setupChannels(data['content']);
 			break;
+		case 'growl':
+			growlError(data['content']);
+			break;
 		default:
 			console.error(getDebugMessage('Unknown message type  {}', JSON.stringify(data)));
 	}
