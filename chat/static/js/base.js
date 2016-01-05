@@ -26,7 +26,7 @@ var infoMessages = [
 	"You can change your randomly generated username by clicking on it on top menu"
 ];
 
-var $ = function(id) {
+var $ = function (id) {
 	return document.getElementById(id);
 };
 
@@ -85,11 +85,9 @@ function growlShow(message, growlClass) {
 
 
 function mute() {
-	if (sound < 3) {
-		sound ++;
-	} else {
-		sound = 0
-	}
+
+	sound = (sound + 1) % 4;
+
 	var btn = $("muteBtn");
 	switch (sound) {
 		case 0:
@@ -114,11 +112,11 @@ function checkAndPlay(element) {
 	if (element.readyState && sound) {
 		element.pause();
 		element.currentTime = 0;
-		if (element.currentTime === element.duration ){
+		if (element.currentTime === element.duration) {
 			// TODO currentType is not set sometimes
 			var params = {
-				browser : getBrowserVersion(),
-				issue : "html5 audio currentTime"
+				browser: getBrowserVersion(),
+				issue: "html5 audio currentTime"
 			};
 			doPost('/report_issue', params, null, null);
 			console.warn(getDebugMessage("Can't set current time for audio on browser {}. Reloading it"), getBrowserVersion());
