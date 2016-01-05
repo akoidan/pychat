@@ -78,7 +78,9 @@ function growlShow(message, growlClass) {
 	setTimeout(function(){
 		growl.style.opacity = 0;
 		setTimeout(function () {
-			growlHolder.removeChild(growl)
+			if (growl.parentNode === growlHolder) {
+				growlHolder.removeChild(growl)
+			}
 		}, 500); // 500 = $(.growl):transition 0.5s
 	}, timeout);
 }
