@@ -234,7 +234,7 @@ class MessagesHandler(MessagesCreator):
 		except (OperationalError, InterfaceError) as e:  # Connection has gone away
 			self.logger.warning('%s, reconnecting' % e)  # TODO
 			connection.close()
-			return callback( *arg, **args)
+			return callback(*arg, **args)
 
 	def get_online_from_redis(self, check_name=None, check_id=None):
 		"""
@@ -381,7 +381,7 @@ class MessagesHandler(MessagesCreator):
 		self.logger.info('!! Changing username to %s', message[CONTENT_VAR_NAME])
 		new_username = message[CONTENT_VAR_NAME]
 		try:
-			check_user(new_username)
+			self.do_db(check_user, new_username)
 			online = self.get_online_from_redis()
 			if new_username in online:
 				self.logger.info('!! This name is already used')
