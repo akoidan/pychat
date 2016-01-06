@@ -3,8 +3,8 @@ import threading
 from os.path import join
 
 from django import template
+
 from chat.settings import STATIC_URL, STATIC_ROOT
-import base64
 
 register = template.Library()
 
@@ -19,8 +19,8 @@ class UrlCache(object):
 			return cls._md5_sum[file]
 		except KeyError:
 			with cls._counter_lock:
-				md5 = base64.urlsafe_b64encode(cls.calc_md5(file))
-				value = '%s%s?v=%s' % (STATIC_URL, file, md5.decode('utf-8'))
+				md5 = cls.calc_md5(file)
+				value = '%s%s?v=%s' % (STATIC_URL, file, md5[:8])
 				cls._md5_sum[file] = value
 				return value
 
@@ -34,7 +34,7 @@ class UrlCache(object):
 				if not data:
 					break
 				m.update(data)
-			return m.digest()
+			return m.hexdigest()
 
 
 @register.simple_tag
