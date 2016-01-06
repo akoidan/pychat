@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 {% block head %}
-	{% load staticfiles %}
+	{% load md5url %}
 
-	<script src="{% static 'js/webrtc.js' %}"></script>
+	<script src="{% md5url 'js/webrtc.js' %}"></script>
 {% endblock head %}
 
 {% block content %}
@@ -14,7 +14,7 @@
 					{% if form.instance.photo %} {% comment %}TODO{% endcomment %}
 						<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
 					{% else %}
-						<img src="{% static 'no_ava.png' %}" alt="ava" id='photoImg' class="fullwidth">
+						<img src="{% md5url 'no_ava.png' %}" alt="ava" id='photoImg' class="fullwidth">
 					{% endif %}
 				</div>
 				<input type="button" value="Make a photo from webcam" onclick="startCapturingVideo(this)"/>

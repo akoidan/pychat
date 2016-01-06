@@ -1,5 +1,5 @@
-{% load staticfiles %}
-<script src="{% static "js/login.js" %}"></script>
+{% load md5url %}
+<script src="{% md5url "js/login.js" %}"></script>
 <li class="right">
 	<i class="icon-login" title="Sign in" onclick="showLoginDropdown(event)"><span class="mText">sign in</span></i>
 </li>

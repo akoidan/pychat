@@ -49,7 +49,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
-* TODO add growl notifications, add "click on webcam capturing to make a photo"
+* # CONNECTION_MAX_AGE = 3000  # 3600 in my.cnf TODO dooesn't work
 * add git ony flag to download_content.sh
 * https://code.djangoproject.com/ticket/25489
 * http://stackoverflow.com/a/18843553/3872976
