@@ -3,9 +3,7 @@ import threading
 from os.path import join
 
 from django import template
-from django.conf import settings
-
-from settings import STATIC_URL
+from chat.settings import STATIC_URL, STATIC_ROOT
 import base64
 
 register = template.Library()
@@ -28,7 +26,7 @@ class UrlCache(object):
 
 	@classmethod
 	def calc_md5(cls, file):
-		full_path = join(settings.STATIC_ROOT, file)
+		full_path = join(STATIC_ROOT, file)
 		with open(full_path, 'rb') as fh:
 			m = hashlib.md5()
 			while True:
