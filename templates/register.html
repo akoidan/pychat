@@ -1,6 +1,6 @@
-{% extends "base.html" %} {% block head %} {% load static %}
-	<script src="{% static "js/register.js" %}"></script>
-	<link rel="stylesheet" type="text/css" href="{% static 'css/register.css' %}">
+{% extends "base.html" %} {% block head %} {% load md5url %}
+	<script src="{% md5url "js/register.js" %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% md5url 'css/register.css' %}">
 {% endblock head %} {% block content %}
 	<h1 align="center">{{ errorcode }}</h1>
 	<form class="border-form" id="register-form" onsubmit="register(event)">

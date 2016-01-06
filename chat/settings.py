@@ -149,12 +149,12 @@ STATIC_URL = 'https://static.pychat.org/static/'
 
 PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
-
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 
 AUTH_PROFILE_MODULE = 'chat.UserProfile'
 
 if 'start_tornado' in sys.argv:
+	# CONNECTION_MAX_AGE = 3000  # 3600 in my.cnf TODO dooesn't work
 	log_file_name = 'tornado.log'
 else:
 	log_file_name = 'chat.log'

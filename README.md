@@ -35,8 +35,8 @@ Start the chat:
  1. Start the WebSocket listener: `service tornado start`
 
 TODO
-==============
-* TODO add growl notifications, add "click on webcam capturing to make a photo"
+=============
+* CONNECTION_MAX_AGE = 3000  # 3600 in my.cnf TODO dooesn't work
 * add git ony flag to download_content.sh
 * https://code.djangoproject.com/ticket/25489
 * http://stackoverflow.com/a/18843553/3872976

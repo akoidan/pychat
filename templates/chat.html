@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% block head %} {% load staticfiles %}
-	<script src="{% static "js/chat.js" %}"></script>
-	<link rel="stylesheet" type="text/css" href="{% static 'css/chat.css' %}">
+{% block head %} {% load md5url %}
+	<script src="{% md5url "js/chat.js" %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}
 {% block navbar %}
 	<li><i title="Show all users"
@@ -11,10 +11,10 @@
 {% endblock navbar %}
 {% block content %}
 	<div>
-		<audio id="chatIncoming" src="{% static 'sounds/ChatIncoming.wav' %}" preload="none"></audio>
-		<audio id="chatOutgoing" src="{% static 'sounds/ChatOutgoing.wav' %}" preload="none"></audio>
-		<audio id="chatLogin" src="{% static 'sounds/ChatLogin.wav' %}" preload="none" ></audio>
-		<audio id="chatLogout" src="{% static 'sounds/ChatLogout.wav' %}" preload="none"></audio>
+		<audio id="chatIncoming" src="{% md5url 'sounds/ChatIncoming.wav' %}" preload="none"></audio>
+		<audio id="chatOutgoing" src="{% md5url 'sounds/ChatOutgoing.wav' %}" preload="none"></audio>
+		<audio id="chatLogin" src="{% md5url 'sounds/ChatLogin.wav' %}" preload="none" ></audio>
+		<audio id="chatLogout" src="{% md5url 'sounds/ChatLogout.wav' %}" preload="none"></audio>
 	</div>
 	<div id="wrapper">
 		<div class="fluid-inline">

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block head %}
-	{% load static %}
-	<script src="{% static "js/issue.js" %}"></script>
+	{% load md5url %}
+	<script src="{% md5url "js/issue.js" %}"></script>
 {% endblock head %}
 
 {% block content %}

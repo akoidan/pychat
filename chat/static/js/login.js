@@ -1,5 +1,5 @@
 var lastEditUserNameTime = 0;
-const MIN_CHANGE_USERNAME_PERIOD = 3;
+const MIN_CHANGE_USERNAME_PERIOD = 2000;
 onDocLoad(function() {
 	hideElement($("hideableDropDown"));
 	hideElement($('inputName'));
@@ -42,7 +42,7 @@ onDocLoad(function () {
 	var editUserName = function (label) {
 		var currentMillis = new Date().getTime();
 		// 0 if locked, or last request was sent earlier than 3 seconds ago
-		var timeToWait = lastEditUserNameTime + MIN_CHANGE_USERNAME_PERIOD * 1000 - currentMillis;
+		var timeToWait = lastEditUserNameTime + MIN_CHANGE_USERNAME_PERIOD - currentMillis;
 		if (timeToWait > 0) {
 			growlError(getText("Please wait {}ms to be able to change username again!", timeToWait));
 			return;
@@ -61,7 +61,7 @@ onDocLoad(function () {
 				growlError('Wrong username, only letters, -_');
 				label.textContent = oldUsername;
 			} else  if (newUsername !== oldUsername) {
-				lastEditUserNameTime = currentMillis;
+				lastEditUserNameTime = new Date().getTime();
 				sendToServer({content: newUsername, action: 'me'});
 			}
 		};
