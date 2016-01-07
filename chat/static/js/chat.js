@@ -79,7 +79,8 @@ var userNameLabel;
 var charRooms;
 //main single socket for handling realtime messages
 var ws;
-var isWsConnected; // used for debugging info only
+var wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 9 - connected;
+var sessionWasntUpdated = true; // 0 - not inited, 1 - tried to connect but failed; 9 - connected;
 var chatUserRoomWrapper; // for hiddding users
 
 //All <p> ids (every id is UTC millis). this helps to prevent duplications, and detect position
@@ -123,7 +124,7 @@ onDocLoad(function () {
 	window.addEventListener("focus", changeTittleFunction);
 	$('tabNames').addEventListener('click', showTabByName);
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
-	isWsConnected = true;
+	userMessage.focus();
 	start_chat_ws();
 	addTextAreaEvents();
 	//bottom call loadMessagesFromLocalStorage(); s
@@ -476,32 +477,41 @@ function start_chat_ws() {
 	ws = new WebSocket(API_URL);
 	ws.onmessage = webSocketMessage;
 	ws.onclose = function (e) {
-		if (isWsConnected) {
-			if (e.code === 403) {
-				console.error(getDebugMessage('Server forbidden ws request because "{}". Trying to update session key',  e.reason));
-				doGet("/update_session_key", function(response) {
-					if (response === RESPONSE_SUCCESS) {
-						console.log(getDebugMessage('Session key has been successfully updated'));
-					} else {
-						console.log(getDebugMessage('Updating session key has failed. Server response: "{}"', response ));
-					}
-				})
-			} else {
-				console.error(getDebugMessage(
-						'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
-						e.reason, CONNECTION_RETRY_TIME));
-			}
-			isWsConnected = false;
+		var reason = e.reason || e;
+		if (e.code === 403 && sessionWasntUpdated) {
+			sessionWasntUpdated = false;
+			var message = getText("Server has forbidden request because '{}'. Trying to update session key", reason);
+			growlInfo(message);
+			console.error(getDebugMessage(message));
+			doGet("/update_session_key", function (response) {
+				if (response === RESPONSE_SUCCESS) {
+					console.log(getDebugMessage('Session key has been successfully updated'));
+				} else {
+					console.error(getDebugMessage('Updating session key has failed. Server response: "{}"', response));
+				}
+			});
+		} else if (wsState == 0) {
+			growlError("Can't establish connection with chat server");
+			console.error(getText("Chat server is down becase", reason));
+		} else if (wsState == 9) {
+			growlError(getText("Connection to chat server has been lost", reason));
+			console.error(getDebugMessage(
+					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
+					e.reason, CONNECTION_RETRY_TIME));
 		}
-		// Try to reconnect in 5 seconds
+		wsState = 1;
+		// Try to reconnect in 10 seconds
 		setTimeout(function () {
 			start_chat_ws()
 		}, CONNECTION_RETRY_TIME);
 	};
 	ws.onopen = function () {
-		isWsConnected = true;
+		if (wsState == 1) { // if not inited don't growl message on page load
+			growlSuccess("Connection to server has been established");
+		}
+		wsState = 9;
 		console.log(getDebugMessage("Connection to WebSocket established"));
-	}
+	};
 }
 
 function encodeHTML(html) {

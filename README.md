@@ -67,6 +67,5 @@ TODO
  also check id when appedning message to top to prevent double fire issue, append message to bottom if user went offline
 * USE init or on_open
 * show system messages on navbar
-* show if user's reconnecting
 * add chat rooms
 * allow selecting username in navbar, remove selecting cursor 
