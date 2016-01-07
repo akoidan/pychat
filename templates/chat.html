@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% block head %} {% load md5url %}
+	<script>
+		const API_URL = "{{ apiUrl }}";
+		const SMILEYS_JSON_URL = "{% md5url 'smileys/info.json'  %}";
+		const SMILEY_URL = "{% md5url "smileys/" %}";
+	</script>
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}

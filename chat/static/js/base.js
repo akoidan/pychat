@@ -5,6 +5,7 @@ var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var HISTORY_STORAGE_NAME = 'history';
 var MAX_STORAGE_LENGTH = 3000;
 var blankRegex = /^\s*$/;
+var fileTypeRegex = /\.(\w+)(\?.*)?$/;
 var loggingEnabled = true;
 
 var growlHolder;
@@ -221,11 +222,9 @@ function doPost(url, params, callback, form) {
 /**
  * Loads file from server on runtime */
 function doGet(fileUrl, callback) {
-	// TODO load doesn't work in IE for pikaday
-	var fileTypeRegex = /\w+$/;
-	var typeRegRes = fileTypeRegex.exec(fileUrl);
-	if (typeRegRes != null) {
-		var fileType = typeRegRes[0];
+	var regexRes = fileTypeRegex.exec(fileUrl);
+	var fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
+	if (fileType != null) {
 		var fileRef = null;
 		switch (fileType) {
 			case 'js':
