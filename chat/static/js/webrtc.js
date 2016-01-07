@@ -7,10 +7,10 @@ var isStopped = true;
 onDocLoad(function () {
 	if (isDateMissing()) {
 		console.warn(getDebugMessage("Browser doesn't support html5 input type date, trying to load javascript datepicker"));
-		doGet(staticUrl+"css/pikaday.css");
-		doGet("https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js", function () {
+		doGet(PICKADAY_CSS_URL);
+		doGet(MOMENT_JS_URL, function () {
 			// load pikaday only after moment.js
-			doGet(staticUrl +"js/pikaday.js", function () {
+			doGet(PICKADAY_JS_URL, function () {
 				var picker = new Pikaday({
 					field: $('id_birthday'),
 					format: 'YYYY-MM-DD', // DATE_INPUT_FORMATS_JS

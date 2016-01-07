@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
-{% block head %}
-	{% load md5url %}
-
+{% block head %} {% load md5url %}
+	<script>
+		const PICKADAY_CSS_URL = "{% md5url 'css/pikaday.css' %}";
+		const MOMENT_JS_URL = "{% md5url 'js/moment.js' %}";
+		const PICKADAY_JS_URL = "{% md5url 'js/pikaday.js' %}";
+	</script>
 	<script src="{% md5url 'js/webrtc.js' %}"></script>
 {% endblock head %}
 

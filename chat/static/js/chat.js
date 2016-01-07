@@ -6,8 +6,6 @@ if (!("WebSocket" in window)) {
 }
 const CONNECTION_RETRY_TIME = 10000;
 
-const SMILEY_URL = staticUrl + 'smileys/';
-
 const selfHeaderClass = 'message-header-self';
 const privateHeaderClass = 'message-header-private';
 const systemHeaderClass = 'message-header-system';
@@ -129,7 +127,7 @@ onDocLoad(function () {
 	start_chat_ws();
 	addTextAreaEvents();
 	//bottom call loadMessagesFromLocalStorage(); s
-	doGet(SMILEY_URL + 'info.json', loadSmileys);
+	doGet(SMILEYS_JSON_URL, loadSmileys);
 	showHelp();
 });
 
@@ -475,7 +473,7 @@ function loadMessagesFromLocalStorage() {
 
 
 function start_chat_ws() {
-	ws = new WebSocket(apiUrl);
+	ws = new WebSocket(API_URL);
 	ws.onmessage = webSocketMessage;
 	ws.onclose = function (e) {
 		if (isWsConnected) {
