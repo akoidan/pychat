@@ -224,43 +224,39 @@ function doPost(url, params, callback, form) {
 function doGet(fileUrl, callback) {
 	var regexRes = fileTypeRegex.exec(fileUrl);
 	var fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
-	if (fileType != null) {
-		var fileRef = null;
-		switch (fileType) {
-			case 'js':
-				fileRef = document.createElement('script');
-				fileRef.setAttribute("type", "text/javascript");
-				fileRef.setAttribute("src", fileUrl);
-				break;
-			case 'css':
-				fileRef = document.createElement("link");
-				fileRef.setAttribute("rel", "stylesheet");
-				fileRef.setAttribute("type", "text/css");
-				fileRef.setAttribute("href", fileUrl);
-				break;
-			case 'json':
-			default:
-				var xobj = new XMLHttpRequest();
-				// special for IE 
-				if (xobj.overrideMimeType) {
-					xobj.overrideMimeType("application/json");
-				}
-				xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
-				xobj.onreadystatechange = function () {
-					if (xobj.readyState === 4 && xobj.status === 200) {
-						if (callback) {
-							callback(xobj.responseText);
-						}
+	var fileRef = null;
+	switch (fileType) {
+		case 'js':
+			fileRef = document.createElement('script');
+			fileRef.setAttribute("type", "text/javascript");
+			fileRef.setAttribute("src", fileUrl);
+			break;
+		case 'css':
+			fileRef = document.createElement("link");
+			fileRef.setAttribute("rel", "stylesheet");
+			fileRef.setAttribute("type", "text/css");
+			fileRef.setAttribute("href", fileUrl);
+			break;
+		case 'json':
+		default:
+			var xobj = new XMLHttpRequest();
+			// special for IE
+			if (xobj.overrideMimeType) {
+				xobj.overrideMimeType("application/json");
+			}
+			xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
+			xobj.onreadystatechange = function () {
+				if (xobj.readyState === 4 && xobj.status === 200) {
+					if (callback) {
+						callback(xobj.responseText);
 					}
-				};
-				xobj.send(null);
-		}
-		if (fileRef) {
-			document.getElementsByTagName("head")[0].appendChild(fileRef);
-			fileRef.onload = callback;
-		}
-	} else {
-		console.error(getDebugMessage('File type regex failed for filename "{}"', fileUrl));
+				}
+			};
+			xobj.send(null);
+	}
+	if (fileRef) {
+		document.getElementsByTagName("head")[0].appendChild(fileRef);
+		fileRef.onload = callback;
 	}
 }
 
