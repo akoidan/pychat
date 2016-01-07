@@ -388,71 +388,6 @@ function checkAndSendMessage(event) {
 	}
 }
 
-/* =============================================================== */
-
-// todo delete this if no errors
-//function getWidth() {
-//	if (self.innerHeight) {
-//		return self.innerWidth;
-//	}
-//
-//	if (document.documentElement && document.documentElement.clientHeight) {
-//		return document.documentElement.clientWidth;
-//	}
-//
-//	if (document.body) {
-//		return document.body.clientWidth;
-//	}
-//}
-
-// TODO
-//var timezone = getCookie('timezone');
-//if (timezone == null) {
-//	setCookie("timezone", jstz.determine().name());
-//}
-
-//// add var if doesnt work fixme
-//function loadMessagesFromLocalStorage(jsonData) {
-//	if (jsonData != null) {
-//		var parsedData = JSON.parse(jsonData);
-//		// don't make sound on loadHistory
-//		var savedSoundStatus = sound;
-//		sound = 0;
-//		for (var i = 0; i < parsedData.length; i++) {
-//			handlePreparedWSMessage(parsedData[i]);
-//		}
-//		sound = savedSoundStatus;
-//	}
-//}
-//
-//
-//// duplicate this? fixme
-//function loadMessagesFromLocalStorageWebWorker() {
-//	onmessage = function(e) {
-//    loadMessagesFromLocalStorage(e);
-//	};
-//}
-//
-//
-//function loadLocalStorage() {
-//	loggedUser = localStorage.getItem(STORAGE_USER);
-//	var jsonData = localStorage.getItem(STORAGE_NAME);
-//	if (true) { //len(jsonData) > 1000
-//		// Build a worker from an anonymous function body
-//		// JSON.load huge localStorage string in background for responsive interface
-//		// http://stackoverflow.com/a/19201292/3872976
-//		var blobURL = URL.createObjectURL(new Blob(['(',
-//			loadMessagesFromLocalStorageWebWorker.toString(),
-//			')()'], {type: 'application/javascript'}));
-//
-//		var worker = new Worker(blobURL);
-//		worker.postMessage(jsonData);
-//
-//		// Won't be needing this anymore
-//		URL.revokeObjectURL(blobURL);
-//	}
-//}
-
 
 function loadMessagesFromLocalStorage() {
 	loggedUser = localStorage.getItem(STORAGE_USER);
@@ -771,10 +706,10 @@ function printRefreshUserNameToChat(data) {
 }
 
 
-function setUsername(data) {
-	console.log(getDebugMessage("UserName has been set to {}", data['content']));
-	loggedUser = data['content'];
-	userNameLabel.textContent = loggedUser;
+function setUsername(newUserName) {
+	console.log(getDebugMessage("UserName has been set to {}", newUserName));
+	loggedUser = newUserName;
+	userNameLabel.textContent = newUserName;
 }
 
 
@@ -844,11 +779,12 @@ function handlePreparedWSMessage(data) {
 		case 'left':
 		case 'onlineUsers':
 		case 'changed':
+			if (data.oldName == loggedUser) setUsername(data.user);
 			printRefreshUserNameToChat(data);
 			loadUsers(data['content']);
 			break;
 		case 'me':
-			setUsername(data);
+			setUsername(data['content']);
 			break;
 		case 'system':
 			displayPreparedMessage(systemHeaderClass, data['time'], data['content'], SYSTEM_USERNAME);
@@ -935,12 +871,14 @@ function clearLocalHistory() {
 	headerId = null;
 	localStorage.removeItem(STORAGE_NAME);
 	localStorage.removeItem(STORAGE_USER);
+	localStorage.removeItem(HISTORY_STORAGE_NAME);
 	chatBoxDiv.innerHTML = '';
 	allMessages = [];
 	allMessagesDates = [];
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp); //
 	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);
 	console.log(getDebugMessage('History has been cleared'));
+	growlSuccess('History has been cleared');
 }
 
 

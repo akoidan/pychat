@@ -327,9 +327,10 @@ class MessagesHandler(MessagesCreator):
 	def check_and_finish_change_name(self, message):
 		if self.sex == ANONYMOUS_GENDER:
 			parsed_message = json.loads(message)
-			if parsed_message[EVENT_VAR_NAME] == GET_MINE_USERNAME_EVENT:
-				self.async_redis.unsubscribe(REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name)  # TODO is it allowed?
-				self.sender_name = parsed_message[CONTENT_VAR_NAME]
+			if parsed_message[EVENT_VAR_NAME] == CHANGE_ANONYMOUS_NAME_EVENT\
+					and parsed_message[OLD_NAME_VAR_NAME] == self.sender_name:
+				self.async_redis.unsubscribe(REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name)
+				self.sender_name = parsed_message[USER_VAR_NAME]
 				self.async_redis.subscribe(REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name)
 				async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
 
@@ -394,16 +395,12 @@ class MessagesHandler(MessagesCreator):
 				del online[self.sender_name]
 			except KeyError:  # if two or more change_username events in fast time
 				pass
-			old_name = self.sender_name
-			old_channel = self.channel
-			self.sender_name = new_username  # change_user_name required new_username in sender_name
+			old_username = self.sender_name
+			# temporary set username for creating messages with self.online_self_js_structure, change_user_nickname
+			self.sender_name = new_username
 			online.update(self.online_self_js_structure)
-			message_all = self.change_user_nickname(old_name, online)
-			message_me = self.default(new_username, GET_MINE_USERNAME_EVENT)
-			# TODO perform ton of checks or emit twice ?
-			# TODO why the hell I would send a message to a new channel?? commented bellow
-			# self.publish(message_me, self.channel)  # to new user channel
-			self.publish(message_me, old_channel)  # to old user channel
+			message_all = self.change_user_nickname(old_username, online)
+			self.sender_name = old_username  # see check_and_finish_change_name
 			self.publish(message_all)
 		except ValidationError as e:
 			self.safe_write(self.default(str(e.message), event=GROWL_MESSAGE_EVENT))
@@ -557,7 +554,6 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		else:
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key %s has been rejected" % session_key)
-
 
 	def check_origin(self, origin):
 		"""
