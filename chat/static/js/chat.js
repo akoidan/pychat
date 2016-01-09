@@ -332,6 +332,11 @@ function userClick(event) {
 }
 
 
+function createCall() {
+	alert('This function is under development!');
+}
+
+
 function timeMessageClick(event) {
 	var value = userMessage.value;
 	var match = value.match(timePattern);

@@ -17,7 +17,7 @@
 <nav class="noSelection">
 	<ul id="navbarList">
 		<li>
-			<a href="{% url 'chat.views.home' %}"><i class="icon-santa-hat" title="Go home"><span class="mText">home</span></i></a>
+			<a href="{% url 'chat.views.home' %}"><i class="icon-home" title="Go home"><span class="mText">home</span></i></a>
 		</li>
 		<li><i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds"
 						 onclick="mute();"><span class="mText">volume</span></i>
@@ -27,11 +27,8 @@
 		</li>
 		{% block navbar %} {% endblock navbar %}
 		<li>
-			<i class="icon-snow-heavy-inv" title="Disable or enable snowing" onclick="snowStorm.toggleSnow()"><span class="mText">snow</span></i>
-	</li>
-	<li>
-		<a href="{% url 'chat.views.statistics' %}"><i class="icon-chart-pie" title="Show user countries statistics"><span class="mText">statistics</span></i></a>
-	</li>
+			<a href="{% url 'chat.views.statistics' %}"><i class="icon-chart-pie" title="Show user countries statistics"><span class="mText">statistics</span></i></a>
+		</li>
 		{% if username %}
 			{% include "logout.html" %}
 		{% else %}

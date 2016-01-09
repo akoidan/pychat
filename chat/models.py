@@ -12,10 +12,10 @@ from chat.settings import GENDERS
 
 class User(AbstractBaseUser):
 	def get_short_name(self):
-		return self.name
+		return self.username
 
 	def get_full_name(self):
-		return '%s %s' % (self.name, self.surname)
+		return self.username
 
 	@property
 	def is_staff(self):
@@ -134,10 +134,7 @@ class IssueDetails(models.Model):
 
 
 class IpAddress(models.Model):
-	user = models.ForeignKey(User, null=True)
-	anon_name = models.CharField(null=True, max_length=32)
-	time = models.DateField(default=datetime.datetime.now)
-	ip = models.CharField(null=False, max_length=32)
+	ip = models.CharField(null=False, max_length=32, unique=True)
 	isp = models.CharField(null=True, max_length=32)
 	country = models.CharField(null=True, max_length=32)
 	region = models.CharField(null=True, max_length=32)
@@ -145,4 +142,14 @@ class IpAddress(models.Model):
 
 	class Meta:
 		db_table = ''.join((User._meta.app_label, '_ip_address'))
+
+
+class UserJoinedInfo(models.Model):
+	ip = models.ForeignKey(IpAddress, null=True)
+	user = models.ForeignKey(User, null=True)
+	anon_name = models.CharField(null=True, max_length=32)
+	time = models.DateField(default=datetime.datetime.now)
+
+	class Meta:
+		db_table = ''.join((User._meta.app_label, '_user_joined_info'))
 		unique_together = ("user", "ip", "anon_name")
