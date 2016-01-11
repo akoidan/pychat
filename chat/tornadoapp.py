@@ -428,40 +428,39 @@ class MessagesHandler(MessagesCreator):
 	def save_ip(self):
 		user_id = None if self.user_id == 0 else self.user_id
 		anon_name = self.sender_name if self.user_id == 0 else None
-		self.ip = '134.249.152.59'
 		if (self.do_db(UserJoinedInfo.objects.filter(
-				Q(ip__ip=self.ip) & Q(anon_name=anon_name) & Q(user_id=self.user_id)).exists)):
+				Q(ip__ip=self.ip) & Q(anon_name=anon_name) & Q(user_id=user_id)).exists)):
 			return
-		try:
-			ip_address = self.get_or_create_ip()
-			UserJoinedInfo.objects.create(
-				ip=ip_address,
-				user_id=user_id,
-				anon_name=anon_name
-			)
-		except Exception as e:
-			self.logger.error("Error while creating ip with country info, because %s", e)
-			IpAddress.objects.create(user_id=user_id, ip=self.ip, anon_name=anon_name)
+		ip_address = self.get_or_create_ip()
+		UserJoinedInfo.objects.create(
+			ip=ip_address,
+			user_id=user_id,
+			anon_name=anon_name
+		)
 
 	def get_or_create_ip(self):
 		try:
 			ip_address = IpAddress.objects.get(ip=self.ip)
 		except IpAddress.DoesNotExist:
-			if not api_url:
-				raise Exception('api url is absent')
-			self.logger.debug("Creating ip record %s", self.ip)
-			f = urlopen(api_url % self.ip)
-			raw_response = f.read().decode("utf-8")
-			response = json.loads(raw_response)
-			if response['status'] != "success":
-				raise Exception("Creating iprecord failed, server responded: %s" % raw_response)
-			ip_address = IpAddress.objects.create(
-				ip=self.ip,
-				isp=response['isp'],
-				country=response['country'],
-				region=response['regionName'],
-				city=response['city']
-			)
+			try:
+				if not api_url:
+					raise Exception('api url is absent')
+				self.logger.debug("Creating ip record %s", self.ip)
+				f = urlopen(api_url % self.ip)
+				raw_response = f.read().decode("utf-8")
+				response = json.loads(raw_response)
+				if response['status'] != "success":
+					raise Exception("Creating iprecord failed, server responded: %s" % raw_response)
+				ip_address = IpAddress.objects.create(
+					ip=self.ip,
+					isp=response['isp'],
+					country=response['country'],
+					region=response['regionName'],
+					city=response['city']
+				)
+			except Exception as e:
+				self.logger.error("Error while creating ip with country info, because %s", e)
+				ip_address = IpAddress.objects.create(ip=self.ip)
 		return ip_address
 
 
