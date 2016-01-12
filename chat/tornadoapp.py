@@ -27,7 +27,7 @@ except ImportError:
 	from urlparse import urlparse  # py3
 
 from chat.settings import MAX_MESSAGE_SIZE, ANONYMOUS_REDIS_ROOM
-from chat.models import User, Message, Room, IpAddress, get_milliseconds
+from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo
 from chat.utils import check_user
 
 PY3 = sys.version > '3'
@@ -428,30 +428,40 @@ class MessagesHandler(MessagesCreator):
 	def save_ip(self):
 		user_id = None if self.user_id == 0 else self.user_id
 		anon_name = self.sender_name if self.user_id == 0 else None
-		if ((user_id and self.do_db(IpAddress.objects.filter(user_id=user_id, ip=self.ip).exists)) or
-				# << ip record exist for existed user, ip record exist for anonymous >>
-				(anon_name and self.do_db(IpAddress.objects.filter(anon_name=anon_name, ip=self.ip).exists))):
+		if (self.do_db(UserJoinedInfo.objects.filter(
+				Q(ip__ip=self.ip) & Q(anon_name=anon_name) & Q(user_id=user_id)).exists)):
 			return
+		ip_address = self.get_or_create_ip()
+		UserJoinedInfo.objects.create(
+			ip=ip_address,
+			user_id=user_id,
+			anon_name=anon_name
+		)
+
+	def get_or_create_ip(self):
 		try:
-			if not api_url:
-				raise Exception('api url is absent')
-			self.logger.debug("Creating ip record %s", self.ip)
-			f = urlopen(api_url % self.ip)
-			raw_response = f.read().decode("utf-8")
-			response = json.loads(raw_response)
-			if response['status'] != "success":
-				raise Exception("Creating iprecord failed, server responded: %s" % raw_response)
-			IpAddress.objects.create(
-				isp=response['isp'],
-				country=response['country'],
-				region=response['regionName'],
-				city=response['city'],
-				user_id=user_id,
-				anon_name=anon_name,
-				ip=self.ip)
-		except Exception as e:
-			self.logger.error("Error while creating ip with country info, because %s", e)
-			IpAddress.objects.create(user_id=user_id, ip=self.ip, anon_name=anon_name)
+			ip_address = IpAddress.objects.get(ip=self.ip)
+		except IpAddress.DoesNotExist:
+			try:
+				if not api_url:
+					raise Exception('api url is absent')
+				self.logger.debug("Creating ip record %s", self.ip)
+				f = urlopen(api_url % self.ip)
+				raw_response = f.read().decode("utf-8")
+				response = json.loads(raw_response)
+				if response['status'] != "success":
+					raise Exception("Creating iprecord failed, server responded: %s" % raw_response)
+				ip_address = IpAddress.objects.create(
+					ip=self.ip,
+					isp=response['isp'],
+					country=response['country'],
+					region=response['regionName'],
+					city=response['city']
+				)
+			except Exception as e:
+				self.logger.error("Error while creating ip with country info, because %s", e)
+				ip_address = IpAddress.objects.create(ip=self.ip)
+		return ip_address
 
 
 class AntiSpam(object):

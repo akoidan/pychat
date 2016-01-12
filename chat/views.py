@@ -248,11 +248,8 @@ def hack(request):
 @require_http_methods('GET')
 def statistics(request):
 	pie = {}
-	found_ip = []
-	for address in IpAddress.objects.all():
-		if address.country and address.ip not in found_ip:
-			found_ip.append(address.ip)
-			pie[address.country] = pie.get(address.country, 0) + 1
+	for address in IpAddress.objects.all().filter(country__isnull=False):
+		pie[address.country] = pie.get(address.country, 0) + 1
 	pie_data = [{'country': key, "count": value} for key, value in pie.items()]
 	return render_to_response(
 		'statistic.html',
