@@ -373,6 +373,8 @@ function sendMessage(messageContent) {
 	if (sendSuccessful) {
 		userMessage.value = "";
 		adjustUserMessageWidth();
+	} else {
+		growlError("Can't send message, because connection is lost :(")
 	}
 }
 
