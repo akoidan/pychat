@@ -462,7 +462,8 @@ function encodeHTML(html) {
 
 function encodeSmileys(html) {
 	html = encodeHTML(html);
-	html = html.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+	//&#x2F;&#x2F; = // (already encoded by encodeHTML above)
+	html = html.replace(/(https?:&#x2F;&#x2F;[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
 	for (var el in smileyDict) {
 		if (smileyDict.hasOwnProperty(el)) {
 			// replace all occurences
