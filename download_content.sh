@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONF_VERSION='d4664b928094afd5d926946e32edf7a067f133cc'
+CONF_VERSION='18a348a67b5a89e66e76ed21c2f75b3ac67df756'
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
