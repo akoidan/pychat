@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/html">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<title>Chat</title> {% load md5url %}
+	<title>PyChat</title> {% load md5url %}
 	<link rel="shortcut icon" href="{% md5url 'favicon.ico' %}" />
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/base.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/fontello.css' %}">
@@ -23,7 +23,7 @@
 						 onclick="mute();"><span class="mText">volume</span></i>
 		</li>
 		<li>
-			<a href="{% url 'chat.views.report_issue' %}"><i class="icon-pencil very-small-screen" title="report an issue"><span class="mText">issue</span></i></a>
+			<a href="{% url 'issue' %}"><i class="icon-pencil very-small-screen" title="report an issue"><span class="mText">issue</span></i></a>
 		</li>
 		{% block navbar %} {% endblock navbar %}
 		<li>

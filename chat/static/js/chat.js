@@ -4,7 +4,7 @@ if (!("WebSocket" in window)) {
 	"Please use Chrome, Firefox, Safari, Internet Explorer 10+ or any modern browser.");
 	throw "Browser doesn't support Web socket";
 }
-const CONNECTION_RETRY_TIME = 10000;
+const CONNECTION_RETRY_TIME = 5000;
 
 const selfHeaderClass = 'message-header-self';
 const privateHeaderClass = 'message-header-private';
@@ -309,7 +309,7 @@ function changeTittleFunction(e) {
 			// do work
 			isCurrentTabActive = true;
 			newMessagesCount = 0;
-			document.title = 'Chat';
+			document.title = 'PyChat';
 			break;
 		case "blur":
 			isCurrentTabActive = false;

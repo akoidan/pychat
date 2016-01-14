@@ -9,11 +9,12 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
+from django.db import transaction
 
 from chat import settings
 from chat.log_filters import id_generator
-from chat.models import User, UserProfile
-from chat.settings import ISSUES_REPORT_LINK
+from chat.models import User, UserProfile, Room
+from chat.settings import ISSUES_REPORT_LINK, ANONYMOUS_REDIS_ROOM, REGISTERED_REDIS_ROOM
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
 
@@ -132,3 +133,20 @@ def extract_photo(image_base64):
 		size=sys.getsizeof(file),
 		charset=None)
 	return image
+
+
+@transaction.atomic
+def create_user(email, password, sex, username):
+	user = UserProfile(username=username, email=email, sex_str=sex)
+	user.set_password(password)
+	default_thread, created_default = Room.objects.get_or_create(name=ANONYMOUS_REDIS_ROOM)
+	registered_only, created_registered = Room.objects.get_or_create(name=REGISTERED_REDIS_ROOM)
+	user.save()
+	user.rooms.add(default_thread)
+	user.rooms.add(registered_only)
+	user.save()
+	logger.info(
+		'Signed up new user %s, subscribed for channels %s, %s',
+		user, registered_only.name, default_thread.name
+	)
+	return user

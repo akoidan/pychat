@@ -19,7 +19,6 @@ var infoMessages = [
 			"and it's content appears in message text",
 	"You have a feature to suggest or you lack some functionality? Click on purple pencil icon on top menu and write your " +
 			"suggestion there",
-	"If snowing bothers you or it eats your cpu, you can disable it by pressing on white cloud icon on top menu.",
 	"Chat uses your browser cache to store messages. If you want to clear history and all cached messages just click " +
 	"on red Floppy drive icon on the top menu",
 	"You can view userprofile by clicking on icon left by username in user list. To edit your profile you need to register" +

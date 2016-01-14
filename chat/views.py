@@ -8,18 +8,20 @@ from django.core.context_processors import csrf
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
 from django.http import Http404
-from django.http import HttpResponse, HttpResponseNotAllowed
+from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
+from django.views.generic import View
 
 from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
-from chat.models import Issue, Room, IssueDetails, IpAddress, UserProfile
-from chat.settings import ANONYMOUS_REDIS_ROOM, REGISTERED_REDIS_ROOM, VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging
-from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_email_verification
+from chat.models import Issue, IssueDetails, IpAddress, UserProfile
+from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging
+from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_email_verification, \
+	create_user
 
 logger = logging.getLogger(__name__)
 
@@ -127,59 +129,6 @@ def confirm_email(request):
 
 
 @require_http_methods('GET')
-def get_register_page(request):
-	c = csrf(request)
-	c.update({'error code': "welcome to register page"})
-	return render_to_response("register.html", c, context_instance=RequestContext(request))
-
-
-@transaction.atomic
-@require_http_methods('POST')
-def register(request):
-	try:
-		rp = request.POST
-		logger.info('Got register request %s', hide_fields(rp, 'password', 'repeatpassword'))
-		(username, password, email) = (rp.get('username').strip(), rp.get('password').strip(), rp.get('email').strip())
-		check_user(username)
-		check_password(password)
-		check_email(email)
-		user = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
-		user.set_password(password)
-		default_thread, created_default = Room.objects.get_or_create(name=ANONYMOUS_REDIS_ROOM)
-		registered_only, created_registered = Room.objects.get_or_create(name=REGISTERED_REDIS_ROOM)
-		user.save()
-		user.rooms.add(default_thread)
-		user.rooms.add(registered_only)
-		user.save()
-		logger.info(
-			'Signed up new user %s, subscribed for channels %s, %s',
-			user, registered_only.name, default_thread.name
-		)
-		# You must call authenticate before you can call login
-		auth_user = authenticate(username=username, password=password)
-		djangologin(request, auth_user)
-		# register,js redirect if message = 'Account created'
-		message = VALIDATION_IS_OK
-		if email:
-			send_email_verification(user, request.get_host())
-	except ValidationError as e:
-		message = e.message
-		logger.debug('Rejecting request because "%s"', message)
-	return HttpResponse(message, content_type='text/plain')
-
-
-@require_http_methods('GET')
-@login_required_no_redirect
-def change_profile(request):
-	user_profile = UserProfile.objects.get(pk=request.user.id)
-	form = UserProfileForm(instance=user_profile)
-	c = csrf(request)
-	c['form'] = form
-	c['date_format'] = DATE_INPUT_FORMATS_JS
-	return render_to_response('change_profile.html', c, context_instance=RequestContext(request))
-
-
-@require_http_methods('GET')
 def show_profile(request, profile_id):
 	try:
 		user_profile = UserProfile.objects.get(pk=profile_id)
@@ -192,52 +141,6 @@ def show_profile(request, profile_id):
 		)
 	except ObjectDoesNotExist:
 		raise Http404
-
-
-@require_http_methods('POST')
-@login_required_no_redirect
-def save_profile(request):
-	logger.info('Saving profile: %s', hide_fields(request.POST, "base64_image", huge=True))
-	user_profile = UserProfile.objects.get(pk=request.user.id)
-	image_base64 = request.POST.get('base64_image')
-
-	if image_base64 is not None:
-		image = extract_photo(image_base64)
-		request.FILES['photo'] = image
-
-	form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
-	if form.is_valid():
-		form.save()
-		response = VALIDATION_IS_OK
-	else:
-		response = form.errors
-	return HttpResponse(response, content_type='text/plain')
-
-
-@transaction.atomic
-@require_http_methods(('POST', 'GET'))
-def report_issue(request):
-	if request.method == 'GET':
-		return render_to_response(
-			'issue.html',  # getattr for anonymous.email
-			{'email': getattr(request.user, 'email', '')},
-			context_instance=RequestContext(request)
-		)
-	elif request.method == 'POST':
-		logger.info('Saving issue: %s', hide_fields(request.POST, 'log', huge=True))
-		issue, created = Issue.objects.get_or_create(content=request.POST['issue'])
-		issue_details = IssueDetails(
-			sender_id=request.user.id,
-			email=request.POST.get('email'),
-			browser=request.POST.get('browser'),
-			issue=issue,
-			log=request.POST.get('log')
-		)
-		issue_details.save()
-
-		return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
-	else:
-		raise HttpResponseNotAllowed
 
 
 @require_http_methods('GET')
@@ -256,3 +159,87 @@ def statistics(request):
 		{'dataProvider': json.dumps(pie_data)},
 		context_instance=RequestContext(request)
 	)
+
+
+class IssueView(View):
+
+	def get(self, request):
+		return render_to_response(
+			'issue.html',  # getattr for anonymous.email
+			{'email': getattr(request.user, 'email', '')},
+			context_instance=RequestContext(request)
+		)
+
+	@transaction.atomic
+	def post(self, request):
+		logger.info('Saving issue: %s', hide_fields(request.POST, 'log', huge=True))
+		issue, created = Issue.objects.get_or_create(content=request.POST['issue'])
+		issue_details = IssueDetails(
+			sender_id=request.user.id,
+			email=request.POST.get('email'),
+			browser=request.POST.get('browser'),
+			issue=issue,
+			log=request.POST.get('log')
+		)
+		issue_details.save()
+
+		return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
+
+
+class ProfileView(View):
+
+	@login_required_no_redirect
+	def get(self, request):
+		user_profile = UserProfile.objects.get(pk=request.user.id)
+		form = UserProfileForm(instance=user_profile)
+		c = csrf(request)
+		c['form'] = form
+		c['date_format'] = DATE_INPUT_FORMATS_JS
+		return render_to_response('change_profile.html', c, context_instance=RequestContext(request))
+
+	@login_required_no_redirect
+	def post(self, request):
+		logger.info('Saving profile: %s', hide_fields(request.POST, "base64_image", huge=True))
+		user_profile = UserProfile.objects.get(pk=request.user.id)
+		image_base64 = request.POST.get('base64_image')
+
+		if image_base64 is not None:
+			image = extract_photo(image_base64)
+			request.FILES['photo'] = image
+
+		form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
+		if form.is_valid():
+			form.save()
+			response = VALIDATION_IS_OK
+		else:
+			response = form.errors
+		return HttpResponse(response, content_type='text/plain')
+
+
+class RegisterView(View):
+
+	def get(self, request):
+		c = csrf(request)
+		c.update({'error code': "welcome to register page"})
+		return render_to_response("register.html", c, context_instance=RequestContext(request))
+
+	def post(self, request):
+		try:
+			rp = request.POST
+			logger.info('Got register request %s', hide_fields(rp, 'password', 'repeatpassword'))
+			(username, password, email) = (rp.get('username').strip(), rp.get('password').strip(), rp.get('email').strip())
+			check_user(username)
+			check_password(password)
+			check_email(email)
+			user = create_user(email, password, rp.get('sex'), username)
+			# You must call authenticate before you can call login
+			auth_user = authenticate(username=username, password=password)
+			djangologin(request, auth_user)
+			# register,js redirect if message = 'Account created'
+			message = VALIDATION_IS_OK
+			if email:
+				send_email_verification(user, request.get_host())
+		except ValidationError as e:
+			message = e.message
+			logger.debug('Rejecting request because "%s"', message)
+		return HttpResponse(message, content_type='text/plain')

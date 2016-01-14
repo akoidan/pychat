@@ -110,7 +110,7 @@ function saveProfile(event) {
 		image = canvas.toDataURL("image/png");
 		params = {base64_image: image};
 	}
-	doPost('/save_profile', params, function(response) {
+	doPost('', params, function(response) {
 		if (response === RESPONSE_SUCCESS) {
 			growlSuccess("Your profile has been successfully updated. Press home icon to return on main page");
 		} else {

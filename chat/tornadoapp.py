@@ -265,12 +265,8 @@ class MessagesHandler(MessagesCreator):
 		"""
 		online = self.get_online_from_redis()
 		async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
-		first_tab = False
 		if self.sender_name not in online:  # if a new tab has been opened
 			online.update(self.online_self_js_structure)
-			first_tab = True
-
-		if first_tab:  # Login event, sent user names to all
 			online_user_names_mes = self.online_user_names(online, LOGIN_EVENT)
 			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes)
@@ -351,12 +347,15 @@ class MessagesHandler(MessagesCreator):
 		receiver_name = message.get(RECEIVER_USERNAME_VAR_NAME)
 		self.logger.info('!! Sending message %s to username:%s, id:%s', content, receiver_name, receiver_id)
 		save_to_db = True
+		receiver_channel = None  # public by default
 		if receiver_id is not None and receiver_id != 0:
 			receiver_channel = REDIS_USERID_CHANNEL_PREFIX % receiver_id
 		elif receiver_name is not None:
 			receiver_channel = REDIS_USERNAME_CHANNEL_PREFIX % receiver_name
 			save_to_db = False
+		self.publish_messae(content, receiver_channel, receiver_id, receiver_name, save_to_db)
 
+	def publish_messae(self, content, receiver_channel, receiver_id, receiver_name, save_to_db):
 		if self.user_id != 0 and save_to_db:
 			self.logger.debug('!! Saving it to db')
 			message_db = Message(sender_id=self.user_id, content=content, receiver_id=receiver_id)
@@ -365,7 +364,6 @@ class MessagesHandler(MessagesCreator):
 		else:
 			self.logger.debug('!! NOT saving it')
 			prepared_message = self.send_anonymous(content, receiver_name, receiver_id)
-
 		if receiver_id is None:
 			self.logger.debug('!! Detected as public')
 			self.publish(prepared_message)
