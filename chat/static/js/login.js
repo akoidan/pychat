@@ -53,7 +53,7 @@ onDocLoad(function () {
 		input.focus();
 		input.value = oldUsername;
 		showElement(input);
-		var sendChangeNickname = function (event) {
+		var sendChangeNickname = function () {
 			var newUsername = input.value;
 			hideElement(input);
 			showElement(label);

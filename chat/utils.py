@@ -139,8 +139,8 @@ def extract_photo(image_base64):
 def create_user(email, password, sex, username):
 	user = UserProfile(username=username, email=email, sex_str=sex)
 	user.set_password(password)
-	default_thread, created_default = Room.objects.get_or_create(name=ANONYMOUS_REDIS_ROOM)
-	registered_only, created_registered = Room.objects.get_or_create(name=REGISTERED_REDIS_ROOM)
+	default_thread = Room.objects.get_or_create(name=ANONYMOUS_REDIS_ROOM)[0]
+	registered_only = Room.objects.get_or_create(name=REGISTERED_REDIS_ROOM)[0]
 	user.save()
 	user.rooms.add(default_thread)
 	user.rooms.add(registered_only)

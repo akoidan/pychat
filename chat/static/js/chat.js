@@ -69,7 +69,6 @@ var loggedUser;
 var chatUsersTable;
 // input type that contains text for sending message
 var userMessage;
-var sendButton;
 // div that contains receiver id, icons, etc
 var userSendMessageTo;
 //user to send message input type text
@@ -107,7 +106,6 @@ onDocLoad(function () {
 	chatOutgoing = $("chatOutgoing");
 	chatLogin = $("chatLogin");
 	chatLogout = $("chatLogout");
-	sendButton = $("sendButton");
 	smileParentHolder =  $('smileParentHolder');
 	navbar = document.querySelector('nav');
 	receiverId = $("receiverId");
@@ -403,14 +401,14 @@ function loadMessagesFromLocalStorage() {
 		var parsedData = JSON.parse(jsonData);
 		console.log(getDebugMessage('Loading {} messages from localstorage', parsedData.length));
 		// don't make sound on loadHistory
-		var savedSoundStatus = sound;
-		sound = 0;
-		loggingEnabled = false;
+		var savedSoundStatus = window.sound ;
+		window.sound = 0;
+		window.loggingEnabled = false;
 		for (var i = 0; i < parsedData.length; i++) {
 			handlePreparedWSMessage(parsedData[i]);
 		}
-		loggingEnabled = true;
-		sound = savedSoundStatus;
+		window.loggingEnabled = true;
+		window.sound = savedSoundStatus;
 	}
 }
 
@@ -432,10 +430,10 @@ function start_chat_ws() {
 					console.error(getDebugMessage('Updating session key has failed. Server response: "{}"', response));
 				}
 			});
-		} else if (wsState == 0) {
+		} else if (wsState === 0) {
 			growlError("Can't establish connection with chat server");
 			console.error(getText("Chat server is down becase", reason));
-		} else if (wsState == 9) {
+		} else if (wsState === 9) {
 			growlError(getText("Connection to chat server has been lost", reason));
 			console.error(getDebugMessage(
 					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
@@ -448,7 +446,7 @@ function start_chat_ws() {
 		}, CONNECTION_RETRY_TIME);
 	};
 	ws.onopen = function () {
-		if (wsState == 1) { // if not inited don't growl message on page load
+		if (wsState === 1) { // if not inited don't growl message on page load
 			growlSuccess("Connection to server has been established");
 		}
 		wsState = 9;
@@ -544,7 +542,7 @@ function getPosition(time) {
 /** Creates a DOM node with attached events and all message content*/
 function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix, userId) {
 	var date = new Date(timeMillis);
-	var time =  sliceZero(date.getHours())+":"+sliceZero(date.getMinutes())+":"+sliceZero(date.getSeconds());
+	var time = sliceZero(date.getHours())+":"+sliceZero(date.getMinutes())+":"+sliceZero(date.getSeconds());
 
 	var p = document.createElement('p');
 	p.setAttribute("id", timeMillis);
@@ -590,27 +588,26 @@ function insertCurrentDay(timeMillis, pos) {
 	var innerHTML = new Date(timeMillis).toDateString();
 	//do insert only if date is not in chatBoxDiv
 	var insert = allMessagesDates.indexOf(innerHTML)  < 0;
+	var fieldSet;
 	if (insert) {
 		allMessagesDates.push(innerHTML);
-		var fieldset = document.createElement('fieldset');
+		fieldSet = document.createElement('fieldset');
 		var legend = document.createElement('legend');
 		legend.setAttribute('align', 'center');
-		fieldset.appendChild(legend);
+		fieldSet.appendChild(legend);
 		legend.textContent = innerHTML;
 	}
 	var result;
 	if (pos != null) { // position of the following message <p>
 		var prevEl = pos.previousSibling;
 		// if it's not the same day block, prevElement always exist its either fieldset  either prevmessage
-		if (prevEl.tagName === 'FIELDSET' && prevEl.textContent.trim() !== innerHTML) { // TODO innerText instead for ie?
-			if (insert) chatBoxDiv.insertBefore(fieldset, prevEl);
-			result =  prevEl;
-		} else {
-			if (insert) chatBoxDiv.insertBefore(fieldset, pos);
-			result =  pos;
+		// TODO innerText instead for ie?
+		result = (prevEl.tagName === 'FIELDSET' && prevEl.textContent.trim() !== innerHTML) ? prevEl : pos;
+		if (insert) {
+			chatBoxDiv.insertBefore(fieldSet, result);
 		}
 	} else {
-		if (insert) chatBoxDiv.appendChild(fieldset);
+		if (insert) chatBoxDiv.appendChild(fieldSet);
 		result =  null;
 	}
 	return result;
@@ -678,6 +675,28 @@ function printMessage(data) {
 }
 
 
+function getJoinLeftChatMessage(data, action) {
+	var message;
+	if (data['user'] === loggedUser) {
+		message = 'You have ' + action + ' the chat';
+	} else {
+		var who;
+		if (data['anonymous']) {
+			who = 'Anonymous';
+		} else {
+			who = 'User';
+		}
+		message = getText('{} <b>{}</b> has {} the chat.', who, data['user'], action);
+	}
+	if (action === 'joined') {
+		checkAndPlay(chatLogin);
+	} else if (action === 'left') {
+		checkAndPlay(chatLogout);
+	}
+	return message;
+}
+
+
 function printRefreshUserNameToChat(data) {
 	var message;
 	var action = data['action'];
@@ -689,28 +708,12 @@ function printRefreshUserNameToChat(data) {
 			message = getText('Anonymous <b>{}</b> has changed nickname to <b>{}</b> ', data['oldName'], data['user']) ;
 		}
 	} else if (action !== 'onlineUsers') {
-		if (data['user'] === loggedUser) {
-			message = 'You have ' + action + ' the chat';
-		} else {
-			var who;
-			if (data['anonymous']) {
-				who = 'Anonymous';
-			} else {
-				who = 'User';
-			}
-			message = getText('{} <b>{}</b> has {} the chat.', who, data['user'], action);
-		}
-		if (action === 'joined') {
-			checkAndPlay(chatLogin);
-		} else if (action === 'left') {
-			checkAndPlay(chatLogout);
-		}
+		message = getJoinLeftChatMessage(data, action);
 	} else {
 		return;
 	}
 
 	displayPreparedMessage(systemHeaderClass, data['time'], message, SYSTEM_USERNAME);
-
 }
 
 
@@ -779,37 +782,39 @@ function saveMessageToStorage(objectItem, jsonItem) {
 
 
 function handlePreparedWSMessage(data) {
-	switch (data['action']) {
+	switch (data.action) {
 		case 'messages':
-			handleGetMessages(data['content']);
+			handleGetMessages(data.content);
 			break;
 		case 'joined':
 		case 'left':
 		case 'onlineUsers':
 		case 'changed':
-			if (data.oldName == loggedUser) setUsername(data.user);
+			if (data.oldName === loggedUser) {
+				setUsername(data.user);
+			}
 			printRefreshUserNameToChat(data);
-			loadUsers(data['content']);
+			loadUsers(data.content);
 			break;
 		case 'me':
-			setUsername(data['content']);
+			setUsername(data.content);
 			break;
 		case 'system':
-			displayPreparedMessage(systemHeaderClass, data['time'], data['content'], SYSTEM_USERNAME);
+			displayPreparedMessage(systemHeaderClass, data.time, data.content, SYSTEM_USERNAME);
 			break;
 		case 'send':
 			printMessage(data);
-			if (loggedUser === data['user']) {
+			if (loggedUser === data.user) {
 				checkAndPlay(chatOutgoing);
 			} else {
 				checkAndPlay(chatIncoming);
 			}
 			break;
 		case 'rooms':
-			setupChannels(data['content']);
+			setupChannels(data.content);
 			break;
 		case 'growl':
-			growlError(data['content']);
+			growlError(data.content);
 			break;
 		default:
 			console.error(getDebugMessage('Unknown message type  {}', JSON.stringify(data)));

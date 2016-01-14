@@ -173,7 +173,7 @@ class IssueView(View):
 	@transaction.atomic
 	def post(self, request):
 		logger.info('Saving issue: %s', hide_fields(request.POST, 'log', huge=True))
-		issue, created = Issue.objects.get_or_create(content=request.POST['issue'])
+		issue = Issue.objects.get_or_create(content=request.POST['issue'])[0]
 		issue_details = IssueDetails(
 			sender_id=request.user.id,
 			email=request.POST.get('email'),

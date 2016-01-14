@@ -310,9 +310,8 @@ class MessagesHandler(MessagesCreator):
 				self.logger.info("!! Anonymous with name %s has logged", self.sender_name)
 			channels = [ANONYMOUS_REDIS_CHANNEL, self.channel]
 			rooms_message = self.default(ANONYMOUS_ROOM_NAMES, ROOMS_EVENT)
-		finally:
-			self.safe_write(rooms_message)
-			return channels
+		self.safe_write(rooms_message)
+		return channels
 
 	def publish(self, message, channel=ANONYMOUS_REDIS_CHANNEL):
 		jsoned_mess = json.dumps(message)
@@ -542,7 +541,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				])
 			self.async_redis.disconnect()
 
-	def open(self, *args, **kargs):
+	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
 		if sessionStore.exists(session_key):
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, id(self))

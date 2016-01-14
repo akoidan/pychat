@@ -77,7 +77,7 @@
 .icon-wrench { color: rgb(70, 133, 117); }
 .icon-clear { color: rgb(142, 53, 84); }
 .icon-man {color: rgb(84, 151, 83) !important; } /*override .color-lor:link*/
-.icon-girl { color: #bb686a !important; } /*override .color-lor:link*/
+.icon-girl { color: #bb686a !important; } /*override .color-lor:link */
 .icon-anonymous { color: #C2C2C2 !important; } /*override .color-lor:link*/
 .icon-user-secret { color: rgb(92, 148, 163) !important; } /*override .color-lor:link*/
 .icon-phone { color: #136C00 } /*override .color-lor:link*/
@@ -93,6 +93,7 @@
 .color-lor ::-webkit-calendar-picker-indicator { background: rgb(39, 44, 45); }
 
 input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+	-moz-box-shadow: 0 0 0 1000px #30302A inset !important;
 	-webkit-box-shadow: 0 0 0 1000px #30302A inset !important; /*important t*/
 	-webkit-text-fill-color: #CCCBDF;
 }
@@ -275,7 +276,6 @@ input[type=button], input[type=submit] {
 	border-radius: 3px;
 	font-size: 18px;
 	padding: 6px 12px;
-	horiz-align: center;
 }
 
 
@@ -315,6 +315,7 @@ nav [class^='icon-'] {
 input[type=file] {
 	-webkit-appearance: textfield;
 	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
 	/*background-color: red;*/
 }
 

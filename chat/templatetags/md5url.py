@@ -1,5 +1,6 @@
 import hashlib
 import threading
+from builtins import IsADirectoryError
 from os import path
 
 from django import template
@@ -15,19 +16,19 @@ class UrlCache(object):
 	_lock = threading.Lock()
 
 	@classmethod
-	def get_md5(cls, file):
+	def get_md5(cls, file_name):
 		try:
-			return cls._md5_sum[file]
+			return cls._md5_sum[file_name]
 		except KeyError:
 			with cls._lock:
 				try:
-					md5 = cls.calc_md5(path.join(STATIC_ROOT, file))[:8]
-					value = '%s%s?v=%s' % (STATIC_URL, file, md5)
-					logger.info("Static file %s calculated md5 %s", file, md5)
+					md5 = cls.calc_md5(path.join(STATIC_ROOT, file_name))[:8]
+					value = '%s%s?v=%s' % (STATIC_URL, file_name, md5)
+					logger.info("Static file %s calculated md5 %s", file_name, md5)
 				except IsADirectoryError:
-					value = STATIC_URL + file
-					logger.debug("File %s not found, put url %s", file, value)
-				cls._md5_sum[file] = value
+					value = STATIC_URL + file_name
+					logger.debug("File %s not found, put url %s", file_name, value)
+				cls._md5_sum[file_name] = value
 				return value
 
 	@classmethod
@@ -43,5 +44,5 @@ class UrlCache(object):
 
 
 @register.simple_tag
-def md5url(model_object):
-	return UrlCache.get_md5(model_object)
+def md5url(file_name):
+	return UrlCache.get_md5(file_name)

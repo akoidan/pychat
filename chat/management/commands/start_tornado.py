@@ -12,7 +12,7 @@ from django.conf import settings
 class Command(BaseCommand):
 	help = 'Starts the Tornado application for message handling.'
 
-	def sig_handler(self, sig, frame):
+	def sig_handler(self):
 		"""Catch signal and init callback"""
 		tornado.ioloop.IOLoop.instance().add_callback(self.shutdown)
 

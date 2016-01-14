@@ -86,7 +86,7 @@ p {
 #userSendMessageTo {
 	/*sets also in chat.js on username click*/
 	justify-content: center;
-	display: inline-block;
+	display: inline;
 	vertical-align: middle;
 	align-content: center;
 	align-items: center;
@@ -110,8 +110,8 @@ p {
 	padding-right: 12px;
 }
 
-.timeMess:hover{
-	cursor:  pointer;
+.timeMess:hover {
+	cursor: pointer;
 	color: #979797;
 }
 
@@ -159,10 +159,8 @@ p {
 
 
 .icon-smile {
-	display: inline-block;
+	display: inline;
 	float: right;
-	padding-right: 5px;
-	bottom: 5px;
 }
 
 
