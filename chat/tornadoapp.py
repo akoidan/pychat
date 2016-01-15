@@ -18,6 +18,7 @@ from django.db import connection, OperationalError, InterfaceError
 from django.db.models import Q
 from redis_sessions.session import SessionStore
 from tornado.websocket import WebSocketHandler
+import os
 
 from chat.log_filters import id_generator
 
@@ -68,13 +69,6 @@ REDIS_USERID_CHANNEL_PREFIX = 'i:%s'
 REDIS_ROOM_CHANNEL_PREFIX = 'r:%d'
 REDIS_ONLINE_USERS = "online_users"
 
-
-# global connection to read synchronously
-sync_redis = redis.StrictRedis()
-# Redis connection cannot be shared between publishers and subscribers.
-async_redis_publisher = tornadoredis.Client()
-async_redis_publisher.connect()
-sync_redis.delete(REDIS_ONLINE_USERS)  # TODO move it somewhere else
 
 try:
 	anonymous_default_room = Room.objects.get(name=ANONYMOUS_REDIS_ROOM)
@@ -241,7 +235,7 @@ class MessagesHandler(MessagesCreator):
 		:rtype : dict
 		returns (dict, bool) if check_type is present
 		"""
-		online = sync_redis.hgetall(REDIS_ONLINE_USERS)
+		online = self.sync_redis.hgetall(REDIS_ONLINE_USERS)
 		self.logger.debug('!! redis online: %s', online)
 		result = {}
 		user_is_online = False
@@ -264,7 +258,7 @@ class MessagesHandler(MessagesCreator):
 		:return:
 		"""
 		online = self.get_online_from_redis()
-		async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
+		self.async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
 		if self.sender_name not in online:  # if a new tab has been opened
 			online.update(self.online_self_js_structure)
 			online_user_names_mes = self.online_user_names(online, LOGIN_EVENT)
@@ -316,7 +310,7 @@ class MessagesHandler(MessagesCreator):
 	def publish(self, message, channel=ANONYMOUS_REDIS_CHANNEL):
 		jsoned_mess = json.dumps(message)
 		self.logger.debug('<%s> %s', channel, jsoned_mess)
-		async_redis_publisher.publish(channel, jsoned_mess)
+		self.async_redis_publisher.publish(channel, jsoned_mess)
 
 	# TODO really parse every single message for 1 action?
 	def check_and_finish_change_name(self, message):
@@ -327,7 +321,7 @@ class MessagesHandler(MessagesCreator):
 				self.async_redis.unsubscribe(REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name)
 				self.sender_name = parsed_message[USER_VAR_NAME]
 				self.async_redis.subscribe(REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name)
-				async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
+				self.async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
 
 	def new_message(self, message):
 		if type(message.body) is not int:  # subscribe event
@@ -488,6 +482,9 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
 		self.connected = False
 		self.anti_spam = AntiSpam()
+		import global_redis
+		self.async_redis_publisher = global_redis.async_redis_publisher
+		self.sync_redis = global_redis.sync_redis
 
 	@tornado.gen.engine
 	def listen(self, channels):
@@ -518,7 +515,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 	def on_close(self):
 		try:
 			self_id = id(self)
-			async_redis_publisher.hdel(REDIS_ONLINE_USERS, self_id)
+			self.async_redis_publisher.hdel(REDIS_ONLINE_USERS, self_id)
 			if self.connected:
 				# seems like async solves problem with connection lost and wrong data status
 				# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
@@ -578,6 +575,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		Tries to send message, doesn't throw exception outside
 		:type self: MessagesHandler
 		"""
+		self.logger.debug('<< THREAD %s >>', os.getppid())
 		try:
 			if isinstance(message, dict):
 				message = json.dumps(message)
@@ -591,7 +589,3 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 	def get_client_ip(self):
 		x_real_ip = self.request.headers.get("X-Real-IP")
 		return x_real_ip or self.request.remote_ip
-
-application = tornado.web.Application([
-	(r'.*', TornadoHandler),
-])
