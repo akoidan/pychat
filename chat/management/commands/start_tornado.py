@@ -37,7 +37,7 @@ class Command(BaseCommand):
 
 		self.http_server.start(4)
 		# Init signals handler
-		from global_redis import sync_redis
+		from chat.global_redis import sync_redis
 		sync_redis.delete(REDIS_ONLINE_USERS)
 		signal.signal(signal.SIGTERM, self.sig_handler)
 

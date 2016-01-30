@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 from chat import settings
-from views import IssueView, RegisterView, ProfileView
+from chat.views import IssueView, RegisterView, ProfileView
 
 logger = logging.getLogger(__name__)
 

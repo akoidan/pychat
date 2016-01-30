@@ -482,7 +482,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
 		self.connected = False
 		self.anti_spam = AntiSpam()
-		import global_redis
+		from chat import global_redis
 		self.async_redis_publisher = global_redis.async_redis_publisher
 		self.sync_redis = global_redis.sync_redis
 
