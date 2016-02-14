@@ -24,7 +24,7 @@
 			</div>
 
 
-		<form class="col1" action="{% url 'chat.views.save_profile' %}" method="post" enctype="multipart/form-data" onsubmit="saveProfile(event)">
+		<form class="col1" method="post" enctype="multipart/form-data" onsubmit="saveProfile(event)">
 			{% csrf_token %}
 			<div class="padding10">
 				<video autoplay class="fullwidth"></video>

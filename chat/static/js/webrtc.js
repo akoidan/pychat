@@ -3,8 +3,11 @@ var canvas;
 var localMediaStream = null;
 var snapshot = false;
 var isStopped = true;
+var photoRegex = /^\S*\/photo\/[\w]{8}(-[\w]{4}){3}-[\w]{12}\.\w+$/;
+var photoImg;
 
 onDocLoad(function () {
+	photoImg = $('photoImg');
 	if (isDateMissing()) {
 		console.warn(getDebugMessage("Browser doesn't support html5 input type date, trying to load javascript datepicker"));
 		doGet(PICKADAY_CSS_URL);
@@ -53,7 +56,6 @@ function startSharingVideo() {
 }
 
 
-
 function takeSnapshot() {
 	if (localMediaStream) {
 		var ctx = canvas.getContext('2d');
@@ -62,7 +64,7 @@ function takeSnapshot() {
 		ctx.drawImage(video, 0, 0);
 		// "image/webp" works in Chrome.
 		// Other browsers will fall back to image/png.
-		document.querySelector('img').src = canvas.toDataURL('image/webp');
+		photoImg.src = canvas.toDataURL('image/webp');
 		snapshot = true;
 		growlInfo('Image has been set. Click on "Finish" to hide video');
 	}
@@ -110,7 +112,12 @@ function saveProfile(event) {
 		image = canvas.toDataURL("image/png");
 		params = {base64_image: image};
 	}
-	doPost('/save_profile', params, function(response) {
+	doPost('', params, function (response) {
+		if (response.match(photoRegex)) {
+			photoImg.src = response;
+			snapshot = false;
+			response = RESPONSE_SUCCESS;
+		}
 		if (response === RESPONSE_SUCCESS) {
 			growlSuccess("Your profile has been successfully updated. Press home icon to return on main page");
 		} else {

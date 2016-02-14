@@ -1,26 +1,34 @@
 import signal
 import time
 
-import tornado.httpserver
-import tornado.ioloop
-
-from django.core.management.base import BaseCommand
-from chat.tornadoapp import application
 from django.conf import settings
+from django.core.management.base import BaseCommand
+from tornado.httpserver import HTTPServer
+from tornado.ioloop import IOLoop
+from tornado.web import Application
+
+from chat.tornadoapp import TornadoHandler, REDIS_ONLINE_USERS
 
 
 class Command(BaseCommand):
+
+	def __init__(self):
+		super().__init__()
+		application = Application([
+			(r'.*', TornadoHandler),
+		], debug=False)
+		self.http_server = HTTPServer(application)
 	help = 'Starts the Tornado application for message handling.'
 
-	def sig_handler(self, sig, frame):
+	def sig_handler(self):
 		"""Catch signal and init callback"""
-		tornado.ioloop.IOLoop.instance().add_callback(self.shutdown)
+		IOLoop.instance().add_callback(self.shutdown)
 
 	def shutdown(self):
 		"""Stop server and add callback to stop i/o loop"""
 		self.http_server.stop()
 
-		io_loop = tornado.ioloop.IOLoop.instance()
+		io_loop = IOLoop.instance()
 		io_loop.add_timeout(time.time() + 2, io_loop.stop)
 
 	def handle(self, *args, **options):
@@ -30,10 +38,16 @@ class Command(BaseCommand):
 		})
 		self.http_server.listen(settings.API_PORT)
 
+		self.http_server.bind(settings.API_PORT)
+
+		#  uncomment me for multiple process
+		self.http_server.start(1)
 		# Init signals handler
+		from chat.global_redis import sync_redis
+		sync_redis.delete(REDIS_ONLINE_USERS)
 		signal.signal(signal.SIGTERM, self.sig_handler)
 
 		# This will also catch KeyboardInterrupt exception
 		signal.signal(signal.SIGINT, self.sig_handler)
 
-		tornado.ioloop.IOLoop.instance().start()
+		IOLoop.instance().start()

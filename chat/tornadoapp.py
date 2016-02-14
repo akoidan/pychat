@@ -18,6 +18,7 @@ from django.db import connection, OperationalError, InterfaceError
 from django.db.models import Q
 from redis_sessions.session import SessionStore
 from tornado.websocket import WebSocketHandler
+import os
 
 from chat.log_filters import id_generator
 
@@ -68,13 +69,6 @@ REDIS_USERID_CHANNEL_PREFIX = 'i:%s'
 REDIS_ROOM_CHANNEL_PREFIX = 'r:%d'
 REDIS_ONLINE_USERS = "online_users"
 
-
-# global connection to read synchronously
-sync_redis = redis.StrictRedis()
-# Redis connection cannot be shared between publishers and subscribers.
-async_redis_publisher = tornadoredis.Client()
-async_redis_publisher.connect()
-sync_redis.delete(REDIS_ONLINE_USERS)  # TODO move it somewhere else
 
 try:
 	anonymous_default_room = Room.objects.get(name=ANONYMOUS_REDIS_ROOM)
@@ -241,7 +235,7 @@ class MessagesHandler(MessagesCreator):
 		:rtype : dict
 		returns (dict, bool) if check_type is present
 		"""
-		online = sync_redis.hgetall(REDIS_ONLINE_USERS)
+		online = self.sync_redis.hgetall(REDIS_ONLINE_USERS)
 		self.logger.debug('!! redis online: %s', online)
 		result = {}
 		user_is_online = False
@@ -264,13 +258,9 @@ class MessagesHandler(MessagesCreator):
 		:return:
 		"""
 		online = self.get_online_from_redis()
-		async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
-		first_tab = False
+		self.async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
 		if self.sender_name not in online:  # if a new tab has been opened
 			online.update(self.online_self_js_structure)
-			first_tab = True
-
-		if first_tab:  # Login event, sent user names to all
 			online_user_names_mes = self.online_user_names(online, LOGIN_EVENT)
 			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes)
@@ -314,14 +304,13 @@ class MessagesHandler(MessagesCreator):
 				self.logger.info("!! Anonymous with name %s has logged", self.sender_name)
 			channels = [ANONYMOUS_REDIS_CHANNEL, self.channel]
 			rooms_message = self.default(ANONYMOUS_ROOM_NAMES, ROOMS_EVENT)
-		finally:
-			self.safe_write(rooms_message)
-			return channels
+		self.safe_write(rooms_message)
+		return channels
 
 	def publish(self, message, channel=ANONYMOUS_REDIS_CHANNEL):
 		jsoned_mess = json.dumps(message)
 		self.logger.debug('<%s> %s', channel, jsoned_mess)
-		async_redis_publisher.publish(channel, jsoned_mess)
+		self.async_redis_publisher.publish(channel, jsoned_mess)
 
 	# TODO really parse every single message for 1 action?
 	def check_and_finish_change_name(self, message):
@@ -332,7 +321,7 @@ class MessagesHandler(MessagesCreator):
 				self.async_redis.unsubscribe(REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name)
 				self.sender_name = parsed_message[USER_VAR_NAME]
 				self.async_redis.subscribe(REDIS_USERNAME_CHANNEL_PREFIX % self.sender_name)
-				async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
+				self.async_redis_publisher.hset(REDIS_ONLINE_USERS, id(self), self.stored_redis_user)
 
 	def new_message(self, message):
 		if type(message.body) is not int:  # subscribe event
@@ -351,12 +340,15 @@ class MessagesHandler(MessagesCreator):
 		receiver_name = message.get(RECEIVER_USERNAME_VAR_NAME)
 		self.logger.info('!! Sending message %s to username:%s, id:%s', content, receiver_name, receiver_id)
 		save_to_db = True
+		receiver_channel = None  # public by default
 		if receiver_id is not None and receiver_id != 0:
 			receiver_channel = REDIS_USERID_CHANNEL_PREFIX % receiver_id
 		elif receiver_name is not None:
 			receiver_channel = REDIS_USERNAME_CHANNEL_PREFIX % receiver_name
 			save_to_db = False
+		self.publish_messae(content, receiver_channel, receiver_id, receiver_name, save_to_db)
 
+	def publish_messae(self, content, receiver_channel, receiver_id, receiver_name, save_to_db):
 		if self.user_id != 0 and save_to_db:
 			self.logger.debug('!! Saving it to db')
 			message_db = Message(sender_id=self.user_id, content=content, receiver_id=receiver_id)
@@ -365,7 +357,6 @@ class MessagesHandler(MessagesCreator):
 		else:
 			self.logger.debug('!! NOT saving it')
 			prepared_message = self.send_anonymous(content, receiver_name, receiver_id)
-
 		if receiver_id is None:
 			self.logger.debug('!! Detected as public')
 			self.publish(prepared_message)
@@ -491,6 +482,9 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
 		self.connected = False
 		self.anti_spam = AntiSpam()
+		from chat import global_redis
+		self.async_redis_publisher = global_redis.async_redis_publisher
+		self.sync_redis = global_redis.sync_redis
 
 	@tornado.gen.engine
 	def listen(self, channels):
@@ -521,7 +515,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 	def on_close(self):
 		try:
 			self_id = id(self)
-			async_redis_publisher.hdel(REDIS_ONLINE_USERS, self_id)
+			self.async_redis_publisher.hdel(REDIS_ONLINE_USERS, self_id)
 			if self.connected:
 				# seems like async solves problem with connection lost and wrong data status
 				# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
@@ -544,7 +538,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				])
 			self.async_redis.disconnect()
 
-	def open(self, *args, **kargs):
+	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
 		if sessionStore.exists(session_key):
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, id(self))
@@ -581,6 +575,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		Tries to send message, doesn't throw exception outside
 		:type self: MessagesHandler
 		"""
+		self.logger.debug('<< THREAD %s >>', os.getppid())
 		try:
 			if isinstance(message, dict):
 				message = json.dumps(message)
@@ -594,7 +589,3 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 	def get_client_ip(self):
 		x_real_ip = self.request.headers.get("X-Real-IP")
 		return x_real_ip or self.request.remote_ip
-
-application = tornado.web.Application([
-	(r'.*', TornadoHandler),
-])

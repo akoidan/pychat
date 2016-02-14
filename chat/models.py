@@ -140,7 +140,7 @@ class IpAddress(models.Model):
 	region = models.CharField(null=True, max_length=32)
 	city = models.CharField(null=True, max_length=32)
 
-	class Meta:
+	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((User._meta.app_label, '_ip_address'))
 
 
@@ -150,6 +150,6 @@ class UserJoinedInfo(models.Model):
 	anon_name = models.CharField(null=True, max_length=32)
 	time = models.DateField(default=datetime.datetime.now)
 
-	class Meta:
+	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((User._meta.app_label, '_user_joined_info'))
 		unique_together = ("user", "ip", "anon_name")

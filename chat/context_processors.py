@@ -11,7 +11,8 @@ def add_user_name(request):
 	"""
 	domain_address = request.get_host().split(':')[0]
 	api_address = "wss://%s:%s/" % (domain_address, API_PORT)
-	c = {'apiUrl': api_address, 'successReponse': VALIDATION_IS_OK}
-	if request.user.is_authenticated():
-		c['username'] =request.user.username
-	return c
+	return {
+		'apiUrl': api_address,
+		'successReponse': VALIDATION_IS_OK,
+		'username': request.user.username if request.user.is_authenticated() else ''
+	}

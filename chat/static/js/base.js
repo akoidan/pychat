@@ -1,12 +1,12 @@
 const browserVersion = getBrowserVersion();
 
-var sound = 0;
 var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var HISTORY_STORAGE_NAME = 'history';
 var MAX_STORAGE_LENGTH = 3000;
 var blankRegex = /^\s*$/;
 var fileTypeRegex = /\.(\w+)(\?.*)?$/;
-var loggingEnabled = true;
+window.sound = 0;
+window.loggingEnabled = true;
 
 var growlHolder;
 
@@ -19,7 +19,6 @@ var infoMessages = [
 			"and it's content appears in message text",
 	"You have a feature to suggest or you lack some functionality? Click on purple pencil icon on top menu and write your " +
 			"suggestion there",
-	"If snowing bothers you or it eats your cpu, you can disable it by pressing on white cloud icon on top menu.",
 	"Chat uses your browser cache to store messages. If you want to clear history and all cached messages just click " +
 	"on red Floppy drive icon on the top menu",
 	"You can view userprofile by clicking on icon left by username in user list. To edit your profile you need to register" +
@@ -89,10 +88,10 @@ function growlShow(message, growlClass) {
 
 function mute() {
 
-	sound = (sound + 1) % 4;
+	window.sound = (window.sound + 1) % 4;
 
 	var btn = $("muteBtn");
-	switch (sound) {
+	switch (window.sound) {
 		case 0:
 			btn.className = 'icon-volume-off';
 			break;
@@ -112,7 +111,7 @@ function checkAndPlay(element) {
 	if (!element.readyState) {
 		element.load();
 	}
-	if (element.readyState && sound) {
+	if (element.readyState && window.sound) {
 		element.pause();
 		element.currentTime = 0;
 		if (element.currentTime === element.duration) {
@@ -124,7 +123,7 @@ function checkAndPlay(element) {
 			doPost('/report_issue', params, null, null);
 			console.warn(getDebugMessage("Can't set current time for audio on browser {}. Reloading it"), getBrowserVersion());
 		}
-		switch (sound) {
+		switch (window.sound) {
 			case 1:
 				element.volume = 0.15;
 				break;
@@ -148,10 +147,14 @@ function getBrowserVersion() {
 	}
 	if (M[1] === 'Chrome') {
 		tem = ua.match(/\bOPR\/(\d+)/);
-		if (tem != null) return 'Opera ' + tem[1];
+		if (tem != null) {
+			return 'Opera ' + tem[1];
+		}
 	}
 	M = M[2] ? [M[1], M[2]] : [navigator.appName, navigator.appVersion, '-?'];
-	if ((tem = ua.match(/version\/(\d+)/i)) != null) M.splice(1, 1, tem[1]);
+	if ((tem = ua.match(/version\/(\d+)/i)) != null) {
+		M.splice(1, 1, tem[1]);
+	}
 	return M.join(' ');
 }
 
@@ -262,7 +265,9 @@ function doGet(fileUrl, callback) {
 
 
 function saveLogToStorage(result) {
-	if (!loggingEnabled) return;
+	if (!window.loggingEnabled) {
+		return;
+	}
 	var storageInfo = localStorage.getItem(HISTORY_STORAGE_NAME);
 	var newStorage;
 	if (storageInfo == null) {

@@ -33,7 +33,7 @@ function register(event) {
 			growlError(data);
 		}
 	};
-	doPost('/register', null, callback, form);
+	doPost('', null, callback, form);
 }
 
 

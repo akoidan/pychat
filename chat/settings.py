@@ -159,6 +159,14 @@ if 'start_tornado' in sys.argv:
 else:
 	log_file_name = 'chat.log'
 
+if DEBUG:
+	class InvalidString(str):
+		def __mod__(self, other):
+			from django.template.base import TemplateSyntaxError
+			raise TemplateSyntaxError(
+				"Undefined variable or unknown value for: %s" % other)
+	TEMPLATE_STRING_IF_INVALID = InvalidString("%s")
+
 LOGGING = {
 	'version': 1,
 	'disable_existing_loggers': True,
