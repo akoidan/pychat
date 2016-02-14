@@ -2,10 +2,9 @@
 	<script src="{% md5url "js/register.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/register.css' %}">
 {% endblock head %} {% block content %}
-	<h1 align="center">{{ errorcode }}</h1>
-	<form class="border-form" id="register-form" onsubmit="register(event)">
-		<div class="border-div biginputtext">
-			<table class="border-table">
+	<form  id="register-form" onsubmit="register(event)">
+		<div class="biginputtext">
+			<table>
 				<tr>
 					<td><input type="text" maxlength="16" required placeholder="Username" name="username" value="" id="rusername"
 								  onchange="validateUser()"/></td>

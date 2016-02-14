@@ -122,12 +122,12 @@ onDocLoad(function () {
 	window.addEventListener("focus", changeTittleFunction);
 	$('tabNames').addEventListener('click', showTabByName);
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
-	userMessage.focus();
 	start_chat_ws();
 	addTextAreaEvents();
 	//bottom call loadMessagesFromLocalStorage(); s
 	doGet(SMILEYS_JSON_URL, loadSmileys);
 	showHelp();
+	userMessage.focus();
 });
 
 

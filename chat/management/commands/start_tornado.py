@@ -35,7 +35,8 @@ class Command(BaseCommand):
 
 		self.http_server.bind(settings.API_PORT)
 
-		self.http_server.start(4)
+		#  uncomment me for multiple process
+		self.http_server.start(1)
 		# Init signals handler
 		from chat.global_redis import sync_redis
 		sync_redis.delete(REDIS_ONLINE_USERS)

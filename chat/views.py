@@ -209,8 +209,8 @@ class ProfileView(View):
 
 		form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 		if form.is_valid():
-			form.save()
-			response = VALIDATION_IS_OK
+			profile = form.save()
+			response = profile. photo.url if 'photo' in  request.FILES else VALIDATION_IS_OK
 		else:
 			response = form.errors
 		return HttpResponse(response, content_type='text/plain')

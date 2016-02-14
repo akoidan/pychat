@@ -4,7 +4,7 @@
 	font-size: 16px;
 }
 
-.border-div {
+#register-form > div {
 	box-shadow: 0 2px 2px rgba(26, 26, 26, 0.64);
 	border-radius: 2px;
 	background-color: #222222;
@@ -14,18 +14,19 @@
 	vertical-align: middle;
 }
 
-.border-table > tbody > tr > th >  label {
+#register-form  tr > th >  label {
 	margin-left: 5px;
 }
 
-.border-table > tbody > tr > td:nth-child(2) {
+#register-form  tr > td:nth-child(2) {
 	text-align: left;
 }
 
-.border-form {
+#register-form {
 	text-align: center;
+	margin-top: 25px;
 }
 
-.border-table > tbody > tr:last-child > td {
+#register-form  tr:last-child > td {
 	text-align: center;
 }
