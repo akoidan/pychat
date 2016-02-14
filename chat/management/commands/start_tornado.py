@@ -17,7 +17,14 @@ class Command(BaseCommand):
 		application = Application([
 			(r'.*', TornadoHandler),
 		], debug=False)
-		self.http_server = HTTPServer(application)
+		try:
+			ssl_options={
+				"certfile": settings.CRT_PATH,
+				"keyfile": settings.KEY_PATH
+			}
+		except AttributeError:
+			ssl_options = None
+		self.http_server = HTTPServer(application, ssl_options=ssl_options)
 	help = 'Starts the Tornado application for message handling.'
 
 	def sig_handler(self):
@@ -32,12 +39,6 @@ class Command(BaseCommand):
 		io_loop.add_timeout(time.time() + 2, io_loop.stop)
 
 	def handle(self, *args, **options):
-		self.http_server = tornado.httpserver.HTTPServer(application, ssl_options={
-			"certfile": settings.CRT_PATH,
-			"keyfile": settings.KEY_PATH
-		})
-		self.http_server.listen(settings.API_PORT)
-
 		self.http_server.bind(settings.API_PORT)
 
 		#  uncomment me for multiple process
