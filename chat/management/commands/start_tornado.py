@@ -17,7 +17,14 @@ class Command(BaseCommand):
 		application = Application([
 			(r'.*', TornadoHandler),
 		], debug=False)
-		self.http_server = HTTPServer(application)
+		try:
+			ssl_options={
+				"certfile": settings.CRT_PATH,
+				"keyfile": settings.KEY_PATH
+			}
+		except AttributeError:
+			ssl_options = None
+		self.http_server = HTTPServer(application, ssl_options=ssl_options)
 	help = 'Starts the Tornado application for message handling.'
 
 	def sig_handler(self):

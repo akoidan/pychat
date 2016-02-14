@@ -71,7 +71,8 @@ INSTALLED_APPS = (
 SESSION_ENGINE = 'redis_sessions.session'
 
 API_PORT = '8888'
-
+WEBSOCKET_PREFIX = 'wss' if 'CRT_PATH' in locals() else 'ws'
+API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PREFIX, '://%s:', API_PORT, '/'))
 
 # SESSION_COOKIE_AGE = 10
 # SESSION_SAVE_EVERY_REQUEST = True
