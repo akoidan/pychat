@@ -8,6 +8,18 @@ var fileTypeRegex = /\.(\w+)(\?.*)?$/;
 window.sound = 0;
 window.loggingEnabled = true;
 
+const escapeMap = {
+	"&": "&amp;",
+	"<": "&lt;",
+	">": "&gt;",
+	'"': '&quot;',
+	"'": '&#39;',
+	"\n": '<br>',
+	"/": '&#x2F;'
+};
+
+var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
+
 var growlHolder;
 
 var infoMessages = [
@@ -346,4 +358,11 @@ function getDebugMessage() {
  *  */
 function sliceZero(number) {
 	return String("0" + number).slice(-2);
+}
+
+
+function encodeHTML(html) {
+	return html.replace(replaceHtmlRegex, function (s) {
+		return escapeMap[s];
+	});
 }
