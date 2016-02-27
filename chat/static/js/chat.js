@@ -229,7 +229,7 @@ function addSmile(event) {
 function addTextAreaEvents() {
 	userMessage.addEventListener('keydown', checkAndSendMessage);
 	userMessage.addEventListener('input', function () {
-		adjustUserMessageWidth(); // pass 1st argument as null instead of Event
+		//adjustUserMessageWidth(); // pass 1st argument as null instead of Event
 	});
 	var scaleFactor = 1.6;
     var mql = window.matchMedia(
