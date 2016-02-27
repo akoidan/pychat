@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONF_VERSION='18a348a67b5a89e66e76ed21c2f75b3ac67df756'
+CONF_VERSION='32fe4f6fa904060fb2ebaab25bddbf491a78cad2'
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
@@ -14,6 +14,7 @@ CSS_DIR="$STATIC_DIR/css"
 FONT_DIR="$STATIC_DIR/font"
 SOUNDS_DIR="$STATIC_DIR/sounds"
 SMILEYS_DIR="$STATIC_DIR/smileys"
+VAL_DIR="$STATIC_DIR/valentine"
 
 # Implementing installed files
 files[0]="$STATIC_DIR/favicon.ico"
@@ -32,6 +33,10 @@ files[12]="$FONT_DIR/fontello.woff"
 files[15]="$SMILEYS_DIR"
 files[14]="$SMILEYS_DIR/info.json"
 files[13]="$SMILEYS_DIR/base/0000.gif"
+files[16]="$VAL_DIR/Love_and_Passion.ttf"
+files[17]="$VAL_DIR/teddy.gif"
+files[18]="$VAL_DIR/v2.ttf"
+files[19]="$VAL_DIR/videoplayback.mp3"
 
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do

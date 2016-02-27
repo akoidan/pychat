@@ -26,4 +26,6 @@ urlpatterns = patterns(
 	url(r'^profile/(\d{1,5})$', 'chat.views.show_profile'),
 	url(r'^report_issue$', IssueView.as_view(), name='issue'),
 	url(r'^statistics$', 'chat.views.statistics'),
+	url(r'^toMyDearGirlFriend', 'chat.views.start_valentine'),
+	url(r'^ILoveYou', 'chat.views.valentine', name='continue_valentine'),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

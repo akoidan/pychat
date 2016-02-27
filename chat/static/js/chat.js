@@ -23,17 +23,6 @@ const genderIcons = {
 	'Secret': 'icon-user-secret'
 };
 
-const escapeMap = {
-	"&": "&amp;",
-	"<": "&lt;",
-	">": "&gt;",
-	'"': '&quot;',
-	"'": '&#39;',
-	"\n": '<br>',
-	"/": '&#x2F;'
-};
-
-var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*>>>\s/;
 
 var destinationUserName = null;
@@ -452,12 +441,6 @@ function start_chat_ws() {
 		wsState = 9;
 		console.log(getDebugMessage("Connection to WebSocket established"));
 	};
-}
-
-function encodeHTML(html) {
-	return html.replace(replaceHtmlRegex, function (s) {
-		return escapeMap[s];
-	});
 }
 
 function encodeSmileys(html) {
