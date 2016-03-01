@@ -60,7 +60,7 @@ TODO
 * add change password and realtime javascript to change_profile
 * local storage can store another user messasges in case of logout ?
 * file upload http://stackoverflow.com/a/14605593/3872976
-* add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis
+* add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis http://michal.karzynski.pl/blog/2014/05/18/setting-up-an-asynchronous-task-queue-for-django-using-celery-redis/
 * create tornado class in tornadoapp, put there all tornado logic
 * change anonymous message color
 *  check if there are new messages after connection lost compare to `localStorage` last message?
