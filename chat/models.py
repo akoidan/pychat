@@ -120,6 +120,9 @@ class Message(models.Model):
 class Issue(models.Model):
 	content = models.TextField(null=False)  # unique = true, but mysql doesnt allow unique fields for unspecified size
 
+	def __str__(self):
+		return self.content
+
 
 class IssueDetails(models.Model):
 	sender = models.ForeignKey(User, null=True, blank=True)
@@ -139,6 +142,9 @@ class IpAddress(models.Model):
 	country = models.CharField(null=True, max_length=32)
 	region = models.CharField(null=True, max_length=32)
 	city = models.CharField(null=True, max_length=32)
+
+	def __str__(self):
+		return self.ip
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((User._meta.app_label, '_ip_address'))
