@@ -58,7 +58,6 @@ p {
 
 #chat-room-users-wrapper {
 	float: right;
-	height: 100%;
 	max-width: 300px;
 	font-size: 24px;
 	overflow-y: auto;
@@ -188,6 +187,7 @@ p {
 
 #usermsg {
 	margin-left: 4px;
-	max-height: 30%;
+	max-height: 200px; /*fallback*/
+	max-height: 30vh;
 	overflow-y: auto;
 }
