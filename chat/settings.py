@@ -248,6 +248,7 @@ LOGGING = {
 
 logging.config.dictConfig(LOGGING)
 
+DEFAULT_PROFILE_ID = 1
 ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/djangochat/issues/new'
 
 SESSION_COOKIE_NAME = "sessionid"
