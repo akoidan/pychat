@@ -164,6 +164,11 @@ nav {
 	width: 100%;
 }
 
+.fullwidth-padded {
+	margin: 8px;
+	width: calc(100% - 16px);
+}
+
 .padding10 {
 	padding: 10px;
 }
@@ -191,6 +196,27 @@ html, body {
 	height: 100%;
 	/*width: 100% !important;*/
 	font-family: arial, serif;
+}
+
+body {
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.max-height-scrollable {
+	flex: 1;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	min-height: 0;
+}
+
+.max-height-scrollable > div {
+	overflow-y: auto;
+	float: left;
+	display: inline-block;
 }
 
 textarea, div[contenteditable] {
