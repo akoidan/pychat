@@ -232,7 +232,7 @@ LOGGING = {
 
 logging.config.dictConfig(LOGGING)
 
-
+DEFAULT_PROFILE_ID = 1
 # for gmail or google apps
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'

@@ -1,10 +1,8 @@
 from django.contrib import admin
 
-from chat.models import User, Message, IpAddress, Issue, Room, UserProfile
+from chat.models import Message, IpAddress, Issue, Room, UserProfile
 
-admin.site.register(User)
-admin.site.register(Message)
-admin.site.register(IpAddress)
-admin.site.register(Issue)
-admin.site.register(Room)
-admin.site.register(UserProfile)
+models = (Message, IpAddress, Issue, Room,UserProfile)
+for model in models:
+	fields = [field.name for field in model._meta.fields if field.name not in ("password")]
+	admin.site.register(model, type('SubClass', (admin.ModelAdmin,), {'fields': fields, 'list_display': fields}))

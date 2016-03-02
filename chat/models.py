@@ -7,7 +7,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.db import models
 from django.db.models import CharField, DateField, FileField, BooleanField
 
-from chat.settings import GENDERS
+from chat.settings import GENDERS, DEFAULT_PROFILE_ID
 
 
 class User(AbstractBaseUser):
@@ -20,7 +20,7 @@ class User(AbstractBaseUser):
 	@property
 	def is_staff(self):
 		# every registered user can edit database
-		return False  # self.pk == DEFAULT_PROFILE_ID
+		return self.pk == DEFAULT_PROFILE_ID
 
 	def has_perm(self, perm, obj=None):
 		return self.is_staff
