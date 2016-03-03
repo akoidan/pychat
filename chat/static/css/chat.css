@@ -86,13 +86,10 @@ p {
 	/*font-size: 17px; = inherited */
 	border-radius: 2px;
 	float:left;
-	padding-top: 3px;
-	padding-bottom: 2px;
-	margin-left: 5px;
-	padding-left: 2px;
+	padding: 0 2px 0 2px;
+	margin-right: 4px;
 	border: 1px solid #101D07;
-	background-color: #1B320A;
-	margin: 3px;
+	background-color: #1C221C;
 }
 #receiverId {
 	display: inline-block;

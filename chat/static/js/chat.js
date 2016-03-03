@@ -123,7 +123,7 @@ onDocLoad(function () {
 	$('tabNames').addEventListener('click', showTabByName);
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	start_chat_ws();
-	addTextAreaEvents();
+	userMessage.addEventListener('keydown', checkAndSendMessage);
 	//bottom call loadMessagesFromLocalStorage(); s
 	doGet(SMILEYS_JSON_URL, loadSmileys);
 	showHelp();
@@ -220,25 +220,9 @@ function addSmile(event) {
 	if (smileImg.tagName !== 'IMG') {
 		return;
 	}
-	userMessage.value += smileImg.alt;
+	userMessage.innerHTML += smileImg.alt;
 	console.log(getDebugMessage('Added smile "{}"', smileImg.alt));
-	adjustUserMessageWidth();
 }
-
-
-function addTextAreaEvents() {
-	userMessage.addEventListener('keydown', checkAndSendMessage);
-	var scaleFactor = 1.6;
-    var mql = window.matchMedia(
-		"(min-height: " + DISABLE_NAV_HEIGHT + "px)" +
-		" and (max-height: " + DISABLE_NAV_HEIGHT * Math.pow(scaleFactor, 1) + "px)"
-	);
-	var mql2 = window.matchMedia(
-		"(min-height: " + DISABLE_NAV_HEIGHT*Math.pow(scaleFactor, 2)+ "px)" +
-		" and (max-height: " + DISABLE_NAV_HEIGHT * Math.pow(scaleFactor, 3) + "px)"
-	);
-}
-
 
 
 /*==================== DOM EVENTS LISTENERS ============================*/
@@ -321,7 +305,7 @@ function sendMessage(messageContent) {
 	}
 	var sendSuccessful = sendToServer(messageRequest);
 	if (sendSuccessful) {
-		userMessage.value = "";
+		userMessage.innerHTML = "";
 	} else {
 		growlError("Can't send message, because connection is lost :(")
 	}
@@ -331,7 +315,7 @@ function sendMessage(messageContent) {
 function checkAndSendMessage(event) {
  if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
 		event.preventDefault();
-		var messageContent = userMessage.value;
+		var messageContent = userMessage.textContent;
 		if (blankRegex.test(messageContent)) {
 			return;
 		}
