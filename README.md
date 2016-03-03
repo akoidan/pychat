@@ -37,6 +37,7 @@ Start the chat:
 TODO
 =============
 * CONNECTION_MAX_AGE = 3000  # 3600 in my.cnf TODO dooesn't work
+* add 404page
 * add git ony flag to download_content.sh
 * https://code.djangoproject.com/ticket/25489
 * http://stackoverflow.com/a/18843553/3872976

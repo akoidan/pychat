@@ -112,7 +112,7 @@ onDocLoad(function () {
 	$('tabNames').addEventListener('click', showTabByName);
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	start_chat_ws();
-	addTextAreaEvents();
+	userMessage.addEventListener('keydown', checkAndSendMessage);
 	//bottom call loadMessagesFromLocalStorage(); s
 	doGet(SMILEYS_JSON_URL, loadSmileys);
 	showHelp();
@@ -209,72 +209,8 @@ function addSmile(event) {
 	if (smileImg.tagName !== 'IMG') {
 		return;
 	}
-	userMessage.value += smileImg.alt;
+	userMessage.innerHTML += smileImg.alt;
 	console.log(getDebugMessage('Added smile "{}"', smileImg.alt));
-	adjustUserMessageWidth();
-}
-
-
-function addTextAreaEvents() {
-	userMessage.addEventListener('keydown', checkAndSendMessage);
-	userMessage.addEventListener('input', function () {
-		adjustUserMessageWidth(); // pass 1st argument as null instead of Event
-	});
-	var scaleFactor = 1.6;
-    var mql = window.matchMedia(
-		"(min-height: " + DISABLE_NAV_HEIGHT + "px)" +
-		" and (max-height: " + DISABLE_NAV_HEIGHT * Math.pow(scaleFactor, 1) + "px)"
-	);
-	var mql2 = window.matchMedia(
-		"(min-height: " + DISABLE_NAV_HEIGHT*Math.pow(scaleFactor, 2)+ "px)" +
-		" and (max-height: " + DISABLE_NAV_HEIGHT * Math.pow(scaleFactor, 3) + "px)"
-	);
-	mql.addListener(adjustUserMessageWidth);
-	mql2.addListener(adjustUserMessageWidth);
-	adjustUserMessageWidth(true);
-}
-
-
-function adjustUserMessageWidth(mql) {
-	var bodyHeight =document.body.clientHeight;
-	if (mql) { // if not an event instance
-		console.log(getDebugMessage('MediaQuery with height {}px, has been triggered', bodyHeight));
-		if (bodyHeight < DISABLE_NAV_HEIGHT) {
-			hideElement(navbar);
-		} else {
-			showElement(navbar);
-		}
-	}
-	// http://stackoverflow.com/a/5346855/3872976
-	userMessage.style.overflow = 'hidden'; // fix Firefox big 1 row textarea
-	userMessage.style.height = 'auto';
-	var textAreaHeight = userMessage.scrollHeight;
-	userMessage.style.overflow = 'auto';
-
-	var maxHeight = bodyHeight / 3;
-	if (textAreaHeight > maxHeight) {
-		textAreaHeight = maxHeight;
-	}
-	if (textAreaHeight > 35) { // textarea has exactly 1 row
-		// 1 in case of wrong calculations
-		userMessage.style.height = textAreaHeight + 1 + 'px';
-	} else  if (browserVersion.indexOf("irefox") > 0  && textAreaHeight < 35) {
-		userMessage.style.height = '23px';
-	} else {
-		userMessage.style.height = '';
-		textAreaHeight = userMessage.clientHeight;
-	}
-
-	var navH = navbarList.clientHeight;
-
-	// 10 is some kind of magical browser paddings
-	// 8 are padding + borders, 1 is top added height
-	var allButChatSpaceHeight = textAreaHeight + navH + 5 + 14 +1 ;
-
-	//console.log(getDebugMessage('bodyH {}; newH {}; textAr {}; navH {} ',
-	// bodyHeight, allButChatSpaceHeight, textAreaHeight, navH));
-	chatBoxWrapper.style.height = 'calc(100% - ' + allButChatSpaceHeight + 'px)';
-	smileParentHolder.style.bottom = textAreaHeight + 14 + 'px';
 }
 
 
@@ -358,8 +294,7 @@ function sendMessage(messageContent) {
 	}
 	var sendSuccessful = sendToServer(messageRequest);
 	if (sendSuccessful) {
-		userMessage.value = "";
-		adjustUserMessageWidth();
+		userMessage.innerHTML = "";
 	} else {
 		growlError("Can't send message, because connection is lost :(")
 	}
@@ -369,7 +304,7 @@ function sendMessage(messageContent) {
 function checkAndSendMessage(event) {
  if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
 		event.preventDefault();
-		var messageContent = userMessage.value;
+		var messageContent = userMessage.textContent;
 		if (blankRegex.test(messageContent)) {
 			return;
 		}

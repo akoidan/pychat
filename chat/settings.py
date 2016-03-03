@@ -73,6 +73,11 @@ INSTALLED_APPS = (
 )
 
 SESSION_ENGINE = 'redis_sessions.session'
+BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
 
 API_PORT = '8888'
 CRT_PATH = '/etc/nginx/ssl/1_pychat.org_bundle.crt'
@@ -143,6 +148,8 @@ USE_L10N = True
 USE_TZ = True
 
 DEFAULT_CHARSET = 'utf-8'
+
+handler404 = 'chat.views.handler404'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/

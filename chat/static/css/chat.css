@@ -39,15 +39,8 @@ p {
 	/*width: 100%;*/
 /*}*/
 
-
-.fluid-inline {
-	display: inline-block;
-	height: 100%;
-	width: 100%;
-}
-
 #chatbox {
-	height: 100%;
+	width: 100%;
 	overflow-y: scroll;
 	padding-left: 8px;
 	word-wrap: break-word;
@@ -65,7 +58,6 @@ p {
 
 #chat-room-users-wrapper {
 	float: right;
-	height: 100%;
 	max-width: 300px;
 	font-size: 24px;
 	overflow-y: auto;
@@ -94,11 +86,10 @@ p {
 	/*font-size: 17px; = inherited */
 	border-radius: 2px;
 	float:left;
-	padding-top: 3px;
-	padding-bottom: 2px;
-	margin-left: 5px;
-	padding-left: 2px;
-	border: 1px solid #383a3a;
+	padding: 0 2px 0 2px;
+	margin-right: 4px;
+	border: 1px solid #101D07;
+	background-color: #1C221C;
 }
 #receiverId {
 	display: inline-block;
@@ -140,13 +131,14 @@ p {
 
 @media screen and (max-height: 300px), screen and (max-width: 600px){
 	#smileParentHolder {
-		width: 95% !important;
+		width: calc(100% - 30px) !important;
 	}
 }
 
 #smileParentHolder {
 	position: absolute;
 	right: 5px;
+	bottom: -2px;
 	border: 1px #775E39 solid;
 	border-radius: 10px;
 	width: 50%;
@@ -192,4 +184,7 @@ p {
 
 #usermsg {
 	margin-left: 4px;
+	max-height: 200px; /*fallback*/
+	max-height: 30vh;
+	overflow-y: auto;
 }

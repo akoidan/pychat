@@ -21,6 +21,7 @@
 .color-lor .box-shadow input[type=text],
 .color-lor .box-shadow input[type=password],
 .color-lor .box-shadow textarea,
+.color-lor .box-shadow div[contenteditable],
 .color-lor .box-shadow select,
 .color-lor .box-shadow input[type=date]
 {
@@ -31,6 +32,7 @@
 .color-lor input[type=password]:focus,
 .color-lor input[type=email]:focus,
 .color-lor textarea:focus,
+.color-lor div[contenteditable]:focus,
 .color-lor select:focus,
 .color-lor input[type=date]:focus {
 	outline: none; /*remove chrome blue border*/
@@ -92,7 +94,7 @@
 .color-lor ::-webkit-calendar-picker-indicator { background: rgb(186, 189, 182); }
 .color-lor ::-webkit-calendar-picker-indicator { background: rgb(39, 44, 45); }
 
-input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+input:-webkit-autofill, div[contenteditable]:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 	-moz-box-shadow: 0 0 0 1000px #30302A inset !important;
 	-webkit-box-shadow: 0 0 0 1000px #30302A inset !important; /*important t*/
 	-webkit-text-fill-color: #CCCBDF;
@@ -162,6 +164,11 @@ nav {
 	width: 100%;
 }
 
+.fullwidth-padded {
+	margin: 8px;
+	width: calc(100% - 16px);
+}
+
 .padding10 {
 	padding: 10px;
 }
@@ -191,7 +198,28 @@ html, body {
 	font-family: arial, serif;
 }
 
-textarea {
+body {
+	display: -ms-flexbox;
+	display: -webkit-flex;
+	flex-direction: column;
+	width: 100%;
+}
+
+.max-height-scrollable {
+	flex: 1;
+	display: -webkit-flex;
+	display: -ms-flexbox;
+	display: flex;
+	min-height: 0;
+}
+
+.max-height-scrollable > div {
+	overflow-y: auto;
+	float: left;
+	display: inline-block;
+}
+
+textarea, div[contenteditable] {
 	resize: none;
 	font-family: arial, serif;
 	border: 0 none white; /*Remove as it distorts behaviour of  adjustUserMessageWidth in Firefox */
@@ -265,7 +293,7 @@ textarea {
 
 /******************** INPUTS ********************/
 
-input[type=text], input[type=password], input[type=email], textarea, select, input[type=date] {
+input[type=text], input[type=password], input[type=email], textarea,div[contenteditable], select, input[type=date] {
 	border-radius: 5px;
 	font-size: 18px;
 	padding-left: 5px;
@@ -279,7 +307,7 @@ input[type=button], input[type=submit] {
 }
 
 
-textarea {
+textarea, div[contenteditable] {
 	border-radius: 4px;
 }
 

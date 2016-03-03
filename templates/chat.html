@@ -25,36 +25,39 @@
 		<audio id="chatLogin" src="{% md5url 'sounds/ChatLogin.wav' %}" preload="none" ></audio>
 		<audio id="chatLogout" src="{% md5url 'sounds/ChatLogout.wav' %}" preload="none"></audio>
 	</div>
-	<div id="wrapper">
-		<div class="fluid-inline">
-			<div id="chat-room-users-wrapper" class="very-small-screen">
-				<div class="fluid-height-child-bot">
-					<div>
-						<table id="chat-user-table">
-							<tr></tr>
-						</table>
-					</div>
-					<div id="rooms">
-					</div>
-				</div>
-			</div>{% comment %}tabindex allows focus, focus allows keydown binding event{% endcomment %}
-			<div id="chatbox" tabindex="0">
+	<div id="wrapper" class="max-height-scrollable" style="position: relative">
+		<div id="chatbox" tabindex="0">
+			<div>
+			</div>
+		</div>{% comment %}tabindex allows focus, focus allows keydown binding event{% endcomment %}
+		<div id="chat-room-users-wrapper" class="very-small-screen">
+			<div class="fluid-height-child-bot">
 				<div>
+					<table id="chat-user-table">
+						<tr></tr>
+					</table>
+				</div>
+				<div id="rooms">
 				</div>
 			</div>
 		</div>
-		<div id="bottomWrapper" class="noSelection">
-            {% comment %}icon-emo-happy also in chat.css{% endcomment %}
-			<i class="icon-smile"  title="Add a smile :)" onclick="toggleSmileys(event)"></i>
-			<div id="smileParentHolder" class="padding10" onclick="addSmile(event);"><ul id="tabNames"></ul></div>
-			<div id="userSendMessageTo">
-				<div id="receiverId"></div>
-				<i class="icon-cancel" onclick="hideUserSendToName();"></i>
-			</div>
-			<div class="message-text-holder box-shadow">
-				<textarea name="usermsg" rows="1" class="fullwidth" id="usermsg"></textarea>
-			</div>
+		<div id="smileParentHolder" class="padding10" onclick="addSmile(event);">
+			<ul id="tabNames"></ul>
 		</div>
 	</div>
+
+
+	<div class="fullwidth-padded box-shadow" style="position: relative">
+
+		<div id="userSendMessageTo">
+			<div id="receiverId"></div>
+			<i class="icon-cancel" onclick="hideUserSendToName();"></i>
+		</div>
+		<i class="icon-smile" title="Add a smile :)" onclick="toggleSmileys(event)"
+			style="position: absolute; right: 1px; top: 1px; height:16px"></i>
+
+		<div contenteditable="true" id="usermsg"></div>
+	</div>
+
 {% endblock %}
 

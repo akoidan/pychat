@@ -26,6 +26,11 @@ from chat.utils import hide_fields, check_user, check_password, check_email, ext
 logger = logging.getLogger(__name__)
 
 
+# TODO doesn't work
+def handler404(request):
+	return HttpResponse("Page not found", content_type='text/plain')
+
+
 @require_http_methods(['POST'])
 def validate_email(request):
 	"""

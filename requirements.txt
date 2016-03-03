@@ -1,3 +1,4 @@
+setuptools
 django>1.7.0
 simplejson
 redis
