@@ -277,6 +277,7 @@ textarea, div[contenteditable] {
 	float: left;
 	right: 5px;
 	border: 1px solid;
+	z-index: 1;
 	border-radius: 2px;
 	margin-top: 8px; /* = navbarList bottom margin */
 }
