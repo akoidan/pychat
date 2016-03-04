@@ -186,5 +186,6 @@ p {
 	margin-left: 4px;
 	max-height: 200px; /*fallback*/
 	max-height: 30vh;
+	min-height: 1em; /*Firefox*/
 	overflow-y: auto;
 }
