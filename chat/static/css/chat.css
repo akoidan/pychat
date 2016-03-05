@@ -157,7 +157,9 @@ p {
 
 
 #chatbox img {
-	margin-top: -15px; /* remove smileys margins */
+	margin-top: -3px; /* remove smileys margins */
+	margin-bottom: -2px; /* remove smileys margins */
+	height: 20px;
 	background-color: rgba(255, 255, 255, 0); /*remove background if someones copies smile */
 }
 
@@ -188,4 +190,5 @@ p {
 	max-height: 30vh;
 	min-height: 1.15em; /*Firefox*/
 	overflow-y: auto;
+	white-space:pre; /*chrome keep \n*/
 }

@@ -34,6 +34,7 @@ const escapeMap = {
 };
 
 var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
+var imgRegex = /<img[^>]*alt="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*>>>\s/;
 
 var destinationUserName = null;
@@ -220,7 +221,7 @@ function addSmile(event) {
 	if (smileImg.tagName !== 'IMG') {
 		return;
 	}
-	userMessage.innerHTML += smileImg.alt;
+	userMessage.innerHTML += smileImg.outerHTML;
 	console.log(getDebugMessage('Added smile "{}"', smileImg.alt));
 }
 
@@ -313,8 +314,9 @@ function sendMessage(messageContent) {
 
 
 function checkAndSendMessage(event) {
- if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
+	if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
 		event.preventDefault();
+		userMessage.innerHTML = userMessage.innerHTML.replace(imgRegex, "$1");
 		var messageContent = userMessage.textContent;
 		if (blankRegex.test(messageContent)) {
 			return;
@@ -323,7 +325,7 @@ function checkAndSendMessage(event) {
 		// Since messages are sent by pressing enter, enter goes inside of textarea after sending
 
 		sendMessage(messageContent);
-	} 	else if (event.keyCode === 27) { // 27 = escape
+	} else if (event.keyCode === 27) { // 27 = escape
 		hideElement(smileParentHolder);
 	}
 }
