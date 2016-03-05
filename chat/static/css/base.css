@@ -201,6 +201,7 @@ html, body {
 body {
 	display: -ms-flexbox;
 	display: -webkit-flex;
+	display: flex;
 	flex-direction: column;
 	width: 100%;
 }
