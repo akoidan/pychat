@@ -214,7 +214,7 @@ body {
 	min-height: 0;
 }
 
-.max-height-scrollable > div {
+.max-height-scrollable > * {
 	overflow-y: auto;
 	float: left;
 	display: inline-block;
@@ -364,7 +364,8 @@ input[type=file]::-webkit-file-upload-button:hover {
 
 /* ====================== PROFILE.CSS ================= */
 
-.col1 {
+
+.two-columns  > * {
 	width: 50%;
 	float: left;
 }
@@ -374,7 +375,12 @@ video {
 }
 /*user-profile*/
 @media screen and (max-width: 50em ) {
-	.col1 {
+	.two-columns {
+		display: block;
+		overflow-y: auto;
+		max-height: calc(100% - 50px);
+	}
+	.two-columns > * {
 		width: 100%;
 	}
 	input[type=file] {

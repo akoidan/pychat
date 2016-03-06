@@ -23,16 +23,6 @@ const genderIcons = {
 	'Secret': 'icon-user-secret'
 };
 
-const escapeMap = {
-	"&": "&amp;",
-	"<": "&lt;",
-	">": "&gt;",
-	'"': '&quot;',
-	"'": '&#39;',
-	"\n": '<br>',
-	"/": '&#x2F;'
-};
-
 var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 var imgRegex = /<img[^>]*alt="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*>>>\s/;

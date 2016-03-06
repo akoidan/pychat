@@ -1,9 +1,15 @@
 {% extends 'base.html' %}
 {% block head %}
-	{% load md5url %}
+    <head>
+    <style>
+        table.biginputtext  td {
+        padding: 10px;
+        }
+    </style>
+    </head>
 {% endblock head %}
 {% block content %}
-	<div>
+	<div class="max-height-scrollable two-columns">
 		{#	if photo isn't uploaded yet #}
 		{% if form.instance.photo %}
 			<div class="col1" style="text-align: center">
@@ -12,12 +18,11 @@
 				</div>
 			</div>
 
-			<img src="" style="display: none;">
 			<canvas style="display:none;"></canvas>
 		{% endif %}
 
-		<div class="col1">
-			<table class="biginputtext">
+		<div >
+			<table class="biginputtext" style="margin: 10px">
 				{{ form.as_table }}
 			</table>
 		</div>

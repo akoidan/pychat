@@ -56,9 +56,10 @@ git --git-dir=$TMP_DIR/chatconf/.git --work-tree=$TMP_DIR/chatconf/ checkout $CO
 cp -r $TMP_DIR/chatconf/static $STATIC_PARENT
 
 # datepicker
-wget http://dbushell.github.io/Pikaday/css/pikaday.css -P $CSS_DIR
-wget https://raw.githubusercontent.com/dbushell/Pikaday/master/pikaday.js -P $JS_DIR
-wget http://momentjs.com/downloads/moment.js -P $JS_DIR
+# use curl since it's part of windows git bash
+curl -X GET http://dbushell.github.io/Pikaday/css/pikaday.css -o $CSS_DIR/pikaday.css
+curl -X GET https://raw.githubusercontent.com/dbushell/Pikaday/master/pikaday.js -o $JS_DIR/pikaday.js
+curl -X GET http://momentjs.com/downloads/moment.js -o $JS_DIR/moment.js
 
 
 #wget http://jscolor.com/release/jscolor-1.4.4.zip -P $TMP_DIR && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR
@@ -81,7 +82,7 @@ done
 failed_count_second_attempt=0
 if [[ $failed_count > 0 ]]; then
   echo "Tring to fetch broken resources from dropbox"
-  wget https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1 -O $TMP_DIR/static.zip &&
+  curl -L https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1 -o $TMP_DIR/static.zip &&
   unzip $TMP_DIR/static.zip -d $TMP_DIR/static
   for path_failed in "${failed_items[@]}" ; do
     dropbox_path="${path_failed#$STATIC_DIR}"
