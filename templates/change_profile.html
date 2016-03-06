@@ -10,9 +10,9 @@
 
 {% block content %}
 	<canvas style="display:none;"></canvas>
-	<div>
+	<div class="max-height-scrollable two-columns">
 		{#	if photo isn't uploaded yet #}
-			<div class="col1" style="text-align: center">
+			<div style="text-align: center">
 				<div class="padding10">
 					{% if form.instance.photo %} {% comment %}TODO{% endcomment %}
 						<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
@@ -24,7 +24,7 @@
 			</div>
 
 
-		<form class="col1" method="post" enctype="multipart/form-data" onsubmit="saveProfile(event)">
+		<form  method="post" enctype="multipart/form-data" onsubmit="saveProfile(event)">
 			{% csrf_token %}
 			<div class="padding10">
 				<video autoplay class="fullwidth"></video>

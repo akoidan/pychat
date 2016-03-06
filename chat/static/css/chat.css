@@ -150,15 +150,13 @@ p {
 	cursor: pointer;
 }
 
-
 .icon-smile {
 	display: inline;
 	float: right;
 }
 
-
 #chatbox img, #usermsg img  {
-	margin-top: -10px;
+	margin-top: -20px;
 	margin-bottom: -10px;
 	background-color: rgba(255, 255, 255, 0); /*remove background if someones copies smile */
 	vertical-align: middle;
@@ -168,7 +166,6 @@ p {
 	margin: 0;
 	list-style-type: none;
 }
-
 
 #tabNames > li {
 	display: inline;

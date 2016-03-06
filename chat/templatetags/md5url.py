@@ -25,9 +25,9 @@ class UrlCache(object):
 					md5 = cls.calc_md5(path.join(STATIC_ROOT, file_name))[:8]
 					value = '%s%s?v=%s' % (STATIC_URL, file_name, md5)
 					logger.info("Static file %s calculated md5 %s", file_name, md5)
-				except IsADirectoryError:
+				except:
 					value = STATIC_URL + file_name
-					logger.debug("File %s not found, put url %s", file_name, value)
+					logger.error("File %s not found, put url %s", file_name, value)
 				cls._md5_sum[file_name] = value
 				return value
 
