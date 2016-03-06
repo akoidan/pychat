@@ -44,6 +44,7 @@ p {
 	overflow-y: scroll;
 	padding-left: 8px;
 	word-wrap: break-word;
+	font-size: 18px;
 	/*padding-top: 10px;*/
 	margin-right: 2px; /*shift scrollbar from right side*/
 }
@@ -156,11 +157,11 @@ p {
 }
 
 
-#chatbox img {
-	margin-top: -3px; /* remove smileys margins */
-	margin-bottom: -2px; /* remove smileys margins */
-	height: 20px;
+#chatbox img, #usermsg img  {
+	margin-top: -10px;
+	margin-bottom: -10px;
 	background-color: rgba(255, 255, 255, 0); /*remove background if someones copies smile */
+	vertical-align: middle;
 }
 
 #tabNames {
