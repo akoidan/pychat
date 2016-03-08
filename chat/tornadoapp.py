@@ -467,7 +467,7 @@ class AntiSpam(object):
 		self.info[info_key] = message_length
 		if message_length > MAX_MESSAGE_SIZE:
 			self.spammed += 1
-			raise ValidationError("Message can't exceed %s symbols" % MAX_MESSAGE_SIZE)
+			raise ValidationError("Message can't exceed %d symbols" % MAX_MESSAGE_SIZE)
 		self.check_timed_spam()
 
 	def check_timed_spam(self):
@@ -509,8 +509,8 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			message = json.loads(json_message)
 			self.process_message[message[EVENT_VAR_NAME]](message)
 		except ValidationError as e:
-			logger.warning("Message won't be send. Reason: %s", e.message)
-			self.safe_write(self.default(e.message))
+			self.logger.warning("Message won't be send. Reason: %s", e.message)
+			self.safe_write(self.default(str(e.message), event=GROWL_MESSAGE_EVENT))
 
 	def on_close(self):
 		try:
