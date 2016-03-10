@@ -112,8 +112,14 @@ function saveProfile(event) {
 		image = canvas.toDataURL("image/png");
 		params = {base64_image: image};
 	}
+	ajaxShow();
 	doPost('', params, function (response) {
 		if (response.match(photoRegex)) {
+			photoImg.onload = ajaxHide;
+			photoImg.onerror = ajaxHide;
+			if (typeof photoImg.onload != 'function' || typeof photoImg.onerror != 'function' ) {
+				ajaxHide();
+			}
 			photoImg.src = response;
 			snapshot = false;
 			response = RESPONSE_SUCCESS;
@@ -123,7 +129,7 @@ function saveProfile(event) {
 		} else {
 			growlError(response);
 		}
-	}, form);
+	}, form, true);
 }
 
 

@@ -8,6 +8,7 @@ var fileTypeRegex = /\.(\w+)(\?.*)?$/;
 window.sound = 0;
 window.loggingEnabled = true;
 
+var ajaxLoader;
 var growlHolder;
 
 var infoMessages = [
@@ -39,7 +40,8 @@ function onDocLoad(onload) {
 onDocLoad(function () {
 	growlHolder = $('growlHolder');
 	mute();
-	if (typeof InstallTrigger !== 'undefined') {
+	ajaxLoader = $("ajaxStatus");
+	if (typeof InstallTrigger !== 'undefined') { // browser = firefox
 		console.warn(getDebugMessage("Ops, there's no scrollbar for firefox"));
 	}
 });
@@ -177,8 +179,16 @@ function readCookie(name, c, C, i) {
 	return cookie;
 }
 
+function ajaxShow() {
+	ajaxLoader.className = 'show';
+}
+
+function ajaxHide() {
+	ajaxLoader.className = '';
+}
+
 /**
- * @param params : map dict of params or DOM form
+ * @param params : object dict of params or DOM form
  * @param callback : function calls on response
  * @param url : string url to post
  * @param form : form in canse form is used
