@@ -3,7 +3,7 @@ var canvas;
 var localMediaStream = null;
 var snapshot = false;
 var isStopped = true;
-var photoRegex = /^\S*\/photo\/[\w]{8}(-[\w]{4}){3}-[\w]{12}\.\w+$/;
+var photoRegex = /^\S*\/photo\/[\w]{8}(-[\w]{4}){3}-[\w]{12}\.[^\s\.]+$/;
 var photoImg;
 
 onDocLoad(function () {

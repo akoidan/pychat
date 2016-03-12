@@ -155,6 +155,10 @@ ul {
 	padding-left: 0;
 }
 
+img {
+	border-radius: 1px;
+}
+
 nav {
 	/*Icons navbar size*/
 	font-size: 26px;
@@ -289,7 +293,6 @@ textarea, div[contenteditable] {
 	margin: 5px 10px 5px 0;
 	border-radius: 5px;
 	font-size: 18px;
-	width: 210px;
 }
 
 
@@ -390,6 +393,18 @@ video {
 	bottom: 0;
 	right: 0;
 	top: 0;
+}
+#userProfileData select {
+	width: 100%;
+}
+#userProfileData input {
+	width: calc(100% - 18px)
+}
+table#userProfileData {
+	max-width: 750px; /*width of collapsed below*/
+}
+#userProfileData td { /*th - first col, td 2nd*/
+	width: 100%;
 }
 
 /*user-profile*/
