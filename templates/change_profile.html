@@ -19,8 +19,9 @@
 					{% else %}
 						<img src="{% md5url 'no_ava.png' %}" alt="ava" id='photoImg' class="fullwidth">
 					{% endif %}
+				<input type="button" value="Make a photo from webcam" style="margin-top: 10px" onclick="startCapturingVideo(this)"/>
 				</div>
-				<input type="button" value="Make a photo from webcam" onclick="startCapturingVideo(this)"/>
+
 			</div>
 
 
@@ -32,7 +33,7 @@
 				<table class="biginputtext" id="userProfileData">
 					{{ form.as_table }}
 					<tr>
-						<td colspan="2"><input type="submit" value="Save"/></td>
+						<td colspan="2" style="text-align: center"><input type="submit" value="Save"/></td>
 					</tr>
 				</table>
 			</div>

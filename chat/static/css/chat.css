@@ -63,6 +63,7 @@ p {
 	font-size: 24px;
 	overflow-y: auto;
 	overflow-x: hidden;
+	min-width: 200px;
 	text-overflow: ellipsis;
 }
 
@@ -153,6 +154,10 @@ p {
 .icon-smile {
 	display: inline;
 	float: right;
+	position: absolute;
+	right: 1px;
+	top: 1px;
+	height:16px;
 }
 
 #chatbox img, #usermsg img  {
