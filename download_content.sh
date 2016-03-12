@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONF_VERSION='9545e48023eca4a8fbdcc6370cb9bb470eb1b29c'
+CONF_VERSION=' eaac32afbda1b2c4816b5ef8e85521b282dcb3ae'
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
@@ -37,6 +37,7 @@ files[16]="$VAL_DIR/Love_and_Passion.ttf"
 files[17]="$VAL_DIR/teddy.gif"
 files[18]="$VAL_DIR/v2.ttf"
 files[19]="$VAL_DIR/videoplayback.mp3"
+files[20]="$STATIC_DIR/ajaxStatus.gif"
 
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do

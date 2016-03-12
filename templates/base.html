@@ -12,6 +12,11 @@
 	</script>
 	<script src="{% md5url "js/base.js" %}"></script>
 	{% block head %} {% endblock head %}
+<style>
+	#ajaxStatus.show {
+		background-image: url('{% md5url 'ajaxStatus.gif' %}');
+	}
+</style>
 </head>
 <body class="color-lor" >
 <nav class="noSelection">
@@ -45,6 +50,8 @@
 	</ul>
 	<!-- /.container-fluid -->
 </nav>
+<div id="ajaxStatus">
+</div>
 {% block content %} {% endblock %}
 {% csrf_token %}
 

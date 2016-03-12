@@ -373,6 +373,25 @@ input[type=file]::-webkit-file-upload-button:hover {
 video {
 	cursor: pointer;
 }
+
+#ajaxStatus {
+    display : none;
+}
+
+#ajaxStatus.show {
+	display: block;
+	position: fixed;
+	z-index: 100;
+	background-color: #666;
+	opacity: 0.4;
+	background-repeat: no-repeat;
+	background-position: center;
+	left: 0;
+	bottom: 0;
+	right: 0;
+	top: 0;
+}
+
 /*user-profile*/
 @media screen and (max-width: 50em ) {
 	.two-columns {
