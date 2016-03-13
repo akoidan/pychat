@@ -49,6 +49,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
+* transfer file to another user
 * insecure images on usermessage editable div prevent sending messages
 * add "Don't show hints anymore" option
 * smileys adding goes in line, making usermessage have horizontal scorll with overflow
