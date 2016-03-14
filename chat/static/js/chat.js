@@ -571,6 +571,9 @@ function displayPreparedMessage(headerStyle, timeMillis, htmlEncodedContent, dis
 	}
 }
 
+function vibrate() {
+	window.navigator.vibrate(200);
+}
 
 function printMessage(data) {
 	var headerStyle;
@@ -729,6 +732,7 @@ function handlePreparedWSMessage(data) {
 				checkAndPlay(chatOutgoing);
 			} else {
 				checkAndPlay(chatIncoming);
+				setTimeout(vibrate);
 			}
 			break;
 		case 'rooms':

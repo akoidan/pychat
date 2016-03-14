@@ -128,15 +128,6 @@ function checkAndPlay(element) {
 	if (element.readyState && window.sound) {
 		element.pause();
 		element.currentTime = 0;
-		if (element.currentTime === element.duration) {
-			// TODO currentType is not set sometimes
-			var params = {
-				browser: getBrowserVersion(),
-				issue: "html5 audio currentTime"
-			};
-			doPost('/report_issue', params, null, null);
-			console.warn(getDebugMessage("Can't set current time for audio on browser {}. Reloading it"), getBrowserVersion());
-		}
 		switch (window.sound) {
 			case 1:
 				element.volume = 0.15;
@@ -147,7 +138,9 @@ function checkAndPlay(element) {
 			case 3:
 				element.volume = 1;
 		}
-		element.play();
+		setTimeout(function () {
+			element.play();
+		});
 	}
 }
 

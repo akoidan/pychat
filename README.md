@@ -37,6 +37,8 @@ Start the chat:
 TODO
 =============
 * CONNECTION_MAX_AGE = 3000  # 3600 in my.cnf TODO dooesn't work
+* android play() can only be initiated by a user gesture.
+* transfer file to another user
 * insecure images on usermessage editable div prevent sending messages
 * add "Don't show hints anymore" option
 * smileys adding goes in line, making usermessage have horizontal scorll with overflow
