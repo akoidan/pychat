@@ -41,7 +41,6 @@ TODO
 * transfer file to another user
 * insecure images on usermessage editable div prevent sending messages
 * add "Don't show hints anymore" option
-* smileys adding goes in line, making usermessage have horizontal scorll with overflow
 * add 404page
 * add git ony flag to download_content.sh
 * https://code.djangoproject.com/ticket/25489

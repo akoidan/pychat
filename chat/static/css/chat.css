@@ -193,5 +193,5 @@ p {
 	max-height: 30vh;
 	min-height: 1.15em; /*Firefox*/
 	overflow-y: auto;
-	white-space:pre; /*chrome keep \n*/
+	white-space: pre-wrap; /*chrome keep \n, no horizontal scroll*/
 }
