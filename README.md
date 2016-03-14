@@ -53,7 +53,6 @@ Start the chat:
 * transfer file to another user
 * insecure images on usermessage editable div prevent sending messages
 * add "Don't show hints anymore" option
-* smileys adding goes in line, making usermessage have horizontal scorll with overflow
 * add 404page
 * # CONNECTION_MAX_AGE = 3000  # 3600 in my.cnf TODO dooesn't work
 * add git ony flag to download_content.sh
