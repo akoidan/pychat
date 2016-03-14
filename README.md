@@ -49,6 +49,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
+* android play() can only be initiated by a user gesture.
 * transfer file to another user
 * insecure images on usermessage editable div prevent sending messages
 * add "Don't show hints anymore" option
