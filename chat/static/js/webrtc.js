@@ -25,15 +25,13 @@ onDocLoad(function () {
 			});
 		})
 	}
-
-	navigator.getUserMedia =  navigator.getUserMedia|| navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 	if (!navigator.getUserMedia) {
 		console.warn(getDebugMessage('Browser doesnt support capturing video, skipping photo snapshot'));
 
 	}
 	video = document.querySelector('video');
 	canvas = document.querySelector('canvas');
-	hideElement(video);
+	CssUtils.hideElement(video);
 
 });
 
@@ -49,7 +47,7 @@ function startSharingVideo() {
 	}
 
 	function errorCallback(error) {
-		console.log("navigator.getUserMedia error: ", error);
+		console.log(getDebugMessage("navigator.getUserMedia error: {}", error));
 	}
 
 	navigator.getUserMedia(constraints, successCallback, errorCallback);
@@ -66,27 +64,26 @@ function takeSnapshot() {
 		// Other browsers will fall back to image/png.
 		photoImg.src = canvas.toDataURL('image/webp');
 		snapshot = true;
-		growlInfo('Image has been set. Click on "Finish" to hide video');
+		Growl.info('Image has been set. Click on "Finish" to hide video');
 	}
 }
 function startCapturingVideo(button) {
-
 	if (isStopped) {
 		// Not showing vendor prefixes or code that works cross-browser.
 		navigator.getUserMedia({video: true}, function (stream) {
 			video.src = window.URL.createObjectURL(stream);
 			localMediaStream = stream;
-			showElement(video);
+			CssUtils.showElement(video);
 			video.addEventListener('click', takeSnapshot, false);
-			hideElement($('userProfileData'));
+			CssUtils.hideElement($('userProfileData'));
 			button.value = 'Finish';
 			isStopped = false;
-			growlInfo("Click on your video to take a photo")
+			Growl.info("Click on your video to take a photo")
 		}, function (e) {
 			console.error(getDebugMessage('Error while trying to capture a picture "{}"', e.message || e.name));
-			growlError(getText('Unable to use your webcam because "{}"', e.message || e.name ));
+			Growl.error(getText('Unable to use your webcam because "{}"', e.message || e.name ));
 		});
-	}
+	} else
 
 	if (!isStopped) {
 		if (localMediaStream.stop) {
@@ -95,9 +92,9 @@ function startCapturingVideo(button) {
 			 localMediaStream.getVideoTracks()[0].stop();
 		}
 		button.value = 'Renew the photo';
-		growlInfo("To apply photo click on save");
-		hideElement(video);
-		showElement($('userProfileData'));
+		Growl.info("To apply photo click on save");
+		CssUtils.hideElement(video);
+		CssUtils.showElement($('userProfileData'));
 		isStopped = true;
 	}
 
@@ -123,11 +120,13 @@ function saveProfile(event) {
 			photoImg.src = response;
 			snapshot = false;
 			response = RESPONSE_SUCCESS;
+		} else {
+			ajaxHide();
 		}
 		if (response === RESPONSE_SUCCESS) {
-			growlSuccess("Your profile has been successfully updated. Press home icon to return on main page");
+			Growl.success("Your profile has been successfully updated. Press home icon to return on main page");
 		} else {
-			growlError(response);
+			Growl.error(response);
 		}
 	}, form, true);
 }

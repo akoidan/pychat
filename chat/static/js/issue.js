@@ -1,6 +1,6 @@
 var issue;
 onDocLoad(function () {
-	$("version").value = getBrowserVersion();
+	$("version").value = window.browserVersion;
 	issue = $('issue');
 	issue.addEventListener('input', function () {
 		issue.style.height = 'auto';
@@ -22,9 +22,9 @@ function sendIssue(event) {
 	}
 	doPost('', params, function(response) {
 		if (response === RESPONSE_SUCCESS) {
-			growlSuccess("Your issue has been successfully submitted");
+			Growl.success("Your issue has been successfully submitted");
 		} else {
-			growlError(response);
+			Growl.error(response);
 		}
 	}, form);
 }

@@ -10,12 +10,12 @@
 {% endblock head %}
 {% block navbar %}
 	<li><i title="Show all users"
-			 onclick="toogleVisibility(chatUserRoomWrapper)" class="icon-users very-small-screen"><span class="mText">users</span></i></li>
+			 onclick="CssUtils.toggleVisibility(chatUserRoomWrapper)" class="icon-users very-small-screen"><span class="mText">users</span></i></li>
 	<li><i class="icon-clear" title="CLear local history"
 			 onclick="clearLocalHistory()"><span class="mText">clear</span></i></li>
 	<li>
 	<i class="icon-phone" title="Make a video/mic call"
-			 onclick="createCall()"><span class="mText">Call</span></i>
+			 onclick="showCallDialog()"><span class="mText">Call</span></i>
 	</li>
 {% endblock navbar %}
 {% block content %}
@@ -48,5 +48,25 @@
 		</div>
 		<i class="icon-smile" title="Add a smile :)" onclick="toggleSmileys(event)"></i>
 		<div contenteditable="true" id="usermsg"></div>
+	</div>
+	<div id="callContainerParent" class="hidden">
+		<div id="callContainer">
+			<div class="callContainerHeader">
+				<div style="display: inline-block">Make a call</div>
+				<i class="icon-cancel" style="float: right; color: #AE0F0F"
+					onclick="CssUtils.hideElement($('callContainerParent'))"></i>
+			</div>
+			<div class="callContainerContent">
+				<ul id="callUserList">
+				</ul>
+				<div class="callContainerIcons noSelection">
+					<i class="icon-mic"
+						onclick="CssUtils.toggleClass(this, 'callActiveIcon')"></i>
+					<i class="icon-videocam"
+						onclick="CssUtils.toggleClass(this, 'callActiveIcon')"></i>
+					<i class="icon-phone-circled" onclick="createCall()"></i>
+				</div>
+			</div>
+		</div>
 	</div>
 {% endblock %}

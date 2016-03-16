@@ -251,6 +251,7 @@ textarea, div[contenteditable] {
 	background-color: rgba(34, 31, 31, 0.86);
 	float:left;
 	word-wrap: break-word;
+	white-space: pre-wrap;
 	margin-bottom: 5px;
 	transition: 0.5s opacity;
 	opacity: 0;
@@ -385,8 +386,8 @@ video {
 	display: block;
 	position: fixed;
 	z-index: 100;
-	background-color: #666;
-	opacity: 0.4;
+	background-color: #000;
+	opacity: 0.5;
 	background-repeat: no-repeat;
 	background-position: center;
 	left: 0;

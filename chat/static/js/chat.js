@@ -86,12 +86,24 @@ var chatUserRoomWrapper; // for hiddding users
 //All <p> ids (every id is UTC millis). this helps to prevent duplications, and detect position
 var allMessages = [];
 var allMessagesDates = [];
+var onlineUsers = {};
+var callUserList;
 
-//
-//window.onerror = function (msg, url, linenumber) {
-//	alert('Error message: ' + msg + '\nURL: ' + url + '\nLine Number: ' + linenumber);
-//	return true;
-//};
+var pc;
+var pc_config;
+var pc_constraints = {
+	optional: [
+		{DtlsSrtpKeyAgreement: true},
+		{RtpDataChannels: true}
+	]
+};
+
+window.onerror = function (msg, url, linenumber) {
+	var message = getText('Error occured in {}:{}\n{}', url, linenumber, msg);
+	console.error(getDebugMessage(message));
+	Growl.error(message);
+	return true;
+};
 
 onDocLoad(function () {
 	//	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -111,11 +123,13 @@ onDocLoad(function () {
 	navbar = document.querySelector('nav');
 	receiverId = $("receiverId");
 	charRooms = $("rooms");
+	callUserList = $("callUserList");
 	navbarList = $('navbarList');
 	chatBoxWrapper = $('wrapper');
-	hideElement(userSendMessageTo);
-	hideElement(smileParentHolder);
+	CssUtils.hideElement(userSendMessageTo);
+	CssUtils.hideElement(smileParentHolder);
 	addSmileysEvents();
+	callUserList.addEventListener("click", callUserListClick);
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);  //TODO doesn't work in chromium for div
@@ -129,11 +143,13 @@ onDocLoad(function () {
 	doGet(SMILEYS_JSON_URL, loadSmileys);
 	showHelp();
 	userMessage.focus();
+	var webRtcUrl = window.browserVersion.indexOf('firefox') > 0 ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
+	pc_config = {iceServers: [{url: webRtcUrl}]};
 });
 
 
 function showHelp() {
-	growlInfo(infoMessages[Math.floor(Math.random() * infoMessages.length)]);
+	Growl.info(infoMessages[Math.floor(Math.random() * infoMessages.length)]);
 }
 
 
@@ -148,14 +164,14 @@ function addSmileysEvents() {
 			}
 			level++;
 		}
-		hideElement(smileParentHolder);
+		CssUtils.hideElement(smileParentHolder);
 	});
 }
 
 
 function toggleSmileys(event) {
 	event.stopPropagation(); // prevent top event
-	toogleVisibility(smileParentHolder);
+	CssUtils.toggleVisibility(smileParentHolder);
 	userMessage.focus();
 }
 
@@ -169,11 +185,11 @@ function showTabByName(event) {
 	}
 	var tagName = event.target == null ? event : event.target.innerHTML;
 	for (var i = 0; i < tabNames.length; i++) {
-		hideElement($("tab-"+tabNames[i])); // loadSmileys currentSmileyHolderId
-		showElement($("tab-name-"+tabNames[i]), 'activeTab');
+		CssUtils.hideElement($("tab-"+tabNames[i])); // loadSmileys currentSmileyHolderId
+		CssUtils.removeClass($("tab-name-"+tabNames[i]), 'activeTab');
 	}
-	showElement($("tab-" + tagName));
-	hideElement($("tab-name-" + tagName), 'activeTab');
+	CssUtils.showElement($("tab-" + tagName));
+	CssUtils.addClass($("tab-name-" + tagName), 'activeTab');
 }
 
 // TODO refactor this, it's hard to read
@@ -256,7 +272,7 @@ function userClick(event) {
 	event = event || window.event;
 	var target = event.target || event.srcElement;
 	destinationUserName = target.innerHTML;
-	showElement(userSendMessageTo);
+	CssUtils.showElement(userSendMessageTo);
 	// Empty sets display to none
 	receiverId.textContent = destinationUserName;
 	userMessage.focus();
@@ -268,7 +284,92 @@ function userClick(event) {
 
 
 function createCall() {
-	alert('This function is under development!');
+	var constraints = {
+		/*callActive = disable*/
+		audio: document.querySelector('.callContainerIcons .icon-mic.callActiveIcon') == null,
+		video: document.querySelector('.callContainerIcons .icon-videocam.callActiveIcon') == null
+	};
+
+	if (constraints.audio || constraints.video) {
+		getUserMedia(constraints, connect, fail);
+	} else {
+
+		if (stream) {
+			pc.addStream(stream);
+			$('#local').attachStream(stream);
+		}
+
+		pc.onaddstream = function (event) {
+			$('#remote').attachStream(event.stream);
+			logStreaming(true);
+		};
+		pc.onicecandidate = function (event) {
+			if (event.candidate) {
+				ws.send(JSON.stringify(event.candidate));
+			}
+		};
+
+		if (initiator) {
+			try {
+				// Reliable data channels not supported by Chrome
+				sendChannel = pc.createDataChannel("sendDataChannel", {reliable: false});
+				sendChannel.onmessage = handleMessage;
+				trace("Created send data channel");
+			} catch (e) {
+				alert('Failed to create data channel. ' +
+						'You need Chrome M25 or later with RtpDataChannel enabled');
+				trace('createDataChannel() failed with exception: ' + e.message);
+			}
+			sendChannel.onopen = handleSendChannelStateChange;
+			sendChannel.onclose = handleSendChannelStateChange;
+
+		} else {
+			pc.ondatachannel = gotReceiveChannel;
+		}
+
+		ws.onmessage = function (event) {
+			var signal = JSON.parse(event.data);
+			if (signal.sdp) {
+				if (initiator) {
+					receiveAnswer(signal);
+				} else {
+					receiveOffer(signal);
+				}
+			} else if (signal.candidate) {
+				pc.addIceCandidate(new RTCIceCandidate(signal));
+			} else if (signal.message) {
+			}
+		};
+
+		if (initiator) {
+			createOffer();
+		} else {
+			log('waiting for offer...');
+		}
+		logStreaming(false);
+	}
+
+}
+
+
+function showCallDialog() {
+	callUserList.innerHTML = '';
+	for (var userName in onlineUsers) {
+		if (onlineUsers.hasOwnProperty(userName)) {
+			var li = document.createElement('li');
+			li.textContent = userName;
+			callUserList.appendChild(li);
+		}
+	}
+	CssUtils.showElement($('callContainerParent'));
+}
+
+
+function callUserListClick(event) {
+	if (event.target.tagName == 'LI') {
+		CssUtils.toggleClass(event.target, "active-call-user");
+	}
+	event.stopPropagation();
 }
 
 
@@ -308,7 +409,7 @@ function sendMessage(messageContent) {
 	if (sendSuccessful) {
 		userMessage.innerHTML = "";
 	} else {
-		growlError("Can't send message, because connection is lost :(")
+		Growl.error("Can't send message, because connection is lost :(")
 	}
 }
 
@@ -326,7 +427,7 @@ function checkAndSendMessage(event) {
 
 		sendMessage(messageContent);
 	} else if (event.keyCode === 27) { // 27 = escape
-		hideElement(smileParentHolder);
+		CssUtils.hideElement(smileParentHolder);
 	}
 }
 
@@ -358,7 +459,7 @@ function start_chat_ws() {
 		if (e.code === 403 && sessionWasntUpdated) {
 			sessionWasntUpdated = false;
 			var message = getText("Server has forbidden request because '{}'. Trying to update session key", reason);
-			growlInfo(message);
+			Growl.info(message);
 			console.error(getDebugMessage(message));
 			doGet("/update_session_key", function (response) {
 				if (response === RESPONSE_SUCCESS) {
@@ -368,10 +469,10 @@ function start_chat_ws() {
 				}
 			});
 		} else if (wsState === 0) {
-			growlError("Can't establish connection with chat server");
+			Growl.error("Can't establish connection with chat server");
 			console.error(getText("Chat server is down becase", reason));
 		} else if (wsState === 9) {
-			growlError(getText("Connection to chat server has been lost", reason));
+			Growl.error(getText("Connection to chat server has been lost", reason));
 			console.error(getDebugMessage(
 					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
 					e.reason, CONNECTION_RETRY_TIME));
@@ -384,7 +485,7 @@ function start_chat_ws() {
 	};
 	ws.onopen = function () {
 		if (wsState === 1) { // if not inited don't growl message on page load
-			growlSuccess("Connection to server has been established");
+			Growl.success("Connection to server has been established");
 		}
 		wsState = 9;
 		console.log(getDebugMessage("Connection to WebSocket established"));
@@ -421,6 +522,7 @@ function loadUsers(usernames) {
 	if (!usernames) {
 		return;
 	}
+	onlineUsers = usernames;
 	console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
 	chatUsersTable.innerHTML = null;
 	var tbody = document.createElement('tbody');
@@ -755,7 +857,7 @@ function handlePreparedWSMessage(data) {
 			setupChannels(data.content);
 			break;
 		case 'growl':
-			growlError(data.content);
+			Growl.error(data.content);
 			break;
 		default:
 			console.error(getDebugMessage('Unknown message type  {}', JSON.stringify(data)));
@@ -832,12 +934,12 @@ function clearLocalHistory() {
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp); //
 	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);
 	console.log(getDebugMessage('History has been cleared'));
-	growlSuccess('History has been cleared');
+	Growl.success('History has been cleared');
 }
 
 
 function hideUserSendToName() {
 	destinationUserId = null;
 	destinationUserName = null;
-	hideElement(userSendMessageTo);
+	CssUtils.hideElement(userSendMessageTo);
 }
