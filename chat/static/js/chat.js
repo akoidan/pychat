@@ -35,7 +35,7 @@ const escapeMap = {
 
 var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 var imgRegex = /<img[^>]*alt="([^"]+)"[^>]*>/g;
-var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*>>>\s/;
+var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
 var destinationUserName = null;
 var destinationUserId = null;
@@ -273,10 +273,10 @@ function createCall() {
 
 
 function timeMessageClick(event) {
-	var value = userMessage.value;
+	var value = userMessage.innerHTML;
 	var match = value.match(timePattern);
 	var oldText = match ? value.substr(match[0].length) : value;
-	userMessage.value = getText('{}>>> {}', event.target.parentElement.parentElement.textContent,  oldText);
+	userMessage.innerHTML = getText('{}>>> {}', event.target.parentElement.parentElement.textContent,  oldText);
 	userMessage.focus();
 }
 
