@@ -23,17 +23,6 @@ const genderIcons = {
 	'Secret': 'icon-user-secret'
 };
 
-const escapeMap = {
-	"&": "&amp;",
-	"<": "&lt;",
-	">": "&gt;",
-	'"': '&quot;',
-	"'": '&#39;',
-	"\n": '<br>',
-	"/": '&#x2F;'
-};
-
-var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 var imgRegex = /<img[^>]*alt="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*>>>\s/;
 
@@ -48,7 +37,6 @@ var isCurrentTabActive = true;
 //localStorage  key
 const STORAGE_NAME = 'main';
 const STORAGE_USER = 'user';
-const DISABLE_NAV_HEIGHT = 240;
 //current top message id for detecting from what
 var headerId;
 //  div that contains messages
@@ -98,12 +86,6 @@ var pc_constraints = {
 	]
 };
 
-window.onerror = function (msg, url, linenumber) {
-	var message = getText('Error occured in {}:{}\n{}', url, linenumber, msg);
-	console.error(getDebugMessage(message));
-	Growl.error(message);
-	return true;
-};
 
 onDocLoad(function () {
 	//	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
@@ -141,15 +123,16 @@ onDocLoad(function () {
 	userMessage.addEventListener('keydown', checkAndSendMessage);
 	//bottom call loadMessagesFromLocalStorage(); s
 	doGet(SMILEYS_JSON_URL, loadSmileys);
-	showHelp();
+	showHelp();-
 	userMessage.focus();
+	new Draggable($('callContainer'), $('callContainerHeader'));
 	var webRtcUrl = window.browserVersion.indexOf('firefox') > 0 ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 	pc_config = {iceServers: [{url: webRtcUrl}]};
 });
 
 
 function showHelp() {
-	Growl.info(infoMessages[Math.floor(Math.random() * infoMessages.length)]);
+	growlInfo(infoMessages[Math.floor(Math.random() * infoMessages.length)]);
 }
 
 
@@ -291,7 +274,7 @@ function createCall() {
 	};
 
 	if (constraints.audio || constraints.video) {
-		getUserMedia(constraints, connect, fail);
+		navigator.getUserMedia(constraints, connect, fail);
 	} else {
 
 		if (stream) {
@@ -409,7 +392,7 @@ function sendMessage(messageContent) {
 	if (sendSuccessful) {
 		userMessage.innerHTML = "";
 	} else {
-		Growl.error("Can't send message, because connection is lost :(")
+		growlError("Can't send message, because connection is lost :(")
 	}
 }
 
@@ -459,7 +442,7 @@ function start_chat_ws() {
 		if (e.code === 403 && sessionWasntUpdated) {
 			sessionWasntUpdated = false;
 			var message = getText("Server has forbidden request because '{}'. Trying to update session key", reason);
-			Growl.info(message);
+			growlInfo(message);
 			console.error(getDebugMessage(message));
 			doGet("/update_session_key", function (response) {
 				if (response === RESPONSE_SUCCESS) {
@@ -469,10 +452,10 @@ function start_chat_ws() {
 				}
 			});
 		} else if (wsState === 0) {
-			Growl.error("Can't establish connection with chat server");
+			growlError("Can't establish connection with chat server");
 			console.error(getText("Chat server is down becase", reason));
 		} else if (wsState === 9) {
-			Growl.error(getText("Connection to chat server has been lost", reason));
+			growlError(getText("Connection to chat server has been lost", reason));
 			console.error(getDebugMessage(
 					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
 					e.reason, CONNECTION_RETRY_TIME));
@@ -485,23 +468,16 @@ function start_chat_ws() {
 	};
 	ws.onopen = function () {
 		if (wsState === 1) { // if not inited don't growl message on page load
-			Growl.success("Connection to server has been established");
+			growlSuccess("Connection to server has been established");
 		}
 		wsState = 9;
 		console.log(getDebugMessage("Connection to WebSocket established"));
 	};
 }
 
-function encodeHTML(html) {
-	return html.replace(replaceHtmlRegex, function (s) {
-		return escapeMap[s];
-	});
-}
 
 function encodeSmileys(html) {
-	html = encodeHTML(html);
-	//&#x2F;&#x2F; = // (already encoded by encodeHTML above)
-	html = html.replace(/(https?:&#x2F;&#x2F;[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+	html = encodeAnchorsHTML(html);
 	for (var el in smileyDict) {
 		if (smileyDict.hasOwnProperty(el)) {
 			// replace all occurences
@@ -857,7 +833,7 @@ function handlePreparedWSMessage(data) {
 			setupChannels(data.content);
 			break;
 		case 'growl':
-			Growl.error(data.content);
+			growlError(data.content);
 			break;
 		default:
 			console.error(getDebugMessage('Unknown message type  {}', JSON.stringify(data)));
@@ -934,7 +910,7 @@ function clearLocalHistory() {
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp); //
 	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);
 	console.log(getDebugMessage('History has been cleared'));
-	Growl.success('History has been cleared');
+	growlSuccess('History has been cleared');
 }
 
 

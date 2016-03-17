@@ -64,7 +64,7 @@ function takeSnapshot() {
 		// Other browsers will fall back to image/png.
 		photoImg.src = canvas.toDataURL('image/webp');
 		snapshot = true;
-		Growl.info('Image has been set. Click on "Finish" to hide video');
+		growlInfo('Image has been set. Click on "Finish" to hide video');
 	}
 }
 function startCapturingVideo(button) {
@@ -78,10 +78,10 @@ function startCapturingVideo(button) {
 			CssUtils.hideElement($('userProfileData'));
 			button.value = 'Finish';
 			isStopped = false;
-			Growl.info("Click on your video to take a photo")
+			growlInfo("Click on your video to take a photo")
 		}, function (e) {
 			console.error(getDebugMessage('Error while trying to capture a picture "{}"', e.message || e.name));
-			Growl.error(getText('Unable to use your webcam because "{}"', e.message || e.name ));
+			growlError(getText('Unable to use your webcam because "{}"', e.message || e.name ));
 		});
 	} else
 
@@ -92,7 +92,7 @@ function startCapturingVideo(button) {
 			 localMediaStream.getVideoTracks()[0].stop();
 		}
 		button.value = 'Renew the photo';
-		Growl.info("To apply photo click on save");
+		growlInfo("To apply photo click on save");
 		CssUtils.hideElement(video);
 		CssUtils.showElement($('userProfileData'));
 		isStopped = true;
@@ -124,9 +124,9 @@ function saveProfile(event) {
 			ajaxHide();
 		}
 		if (response === RESPONSE_SUCCESS) {
-			Growl.success("Your profile has been successfully updated. Press home icon to return on main page");
+			growlSuccess("Your profile has been successfully updated. Press home icon to return on main page");
 		} else {
-			Growl.error(response);
+			growlError(response);
 		}
 	}, form, true);
 }

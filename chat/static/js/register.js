@@ -22,7 +22,7 @@ onDocLoad(function () {
 function register(event) {
 	event.preventDefault();
 	if (password.value !== repeatPassword.value) {
-		Growl.error("Passwords don't match");
+		growlError("Passwords don't match");
 		return;
 	}
 	var form = $('register-form');
@@ -30,7 +30,7 @@ function register(event) {
 		if (data === RESPONSE_SUCCESS) {
 			window.location.href = '/profile';
 		} else {
-			Growl.error(data);
+			growlError(data);
 		}
 	};
 	doPost('', null, callback, form);

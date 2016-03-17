@@ -10,7 +10,7 @@ function login() {
 		if (data === RESPONSE_SUCCESS) {
 			window.location.href = '/';
 		} else {
-			Growl.error(data);
+			growlError(data);
 		}
 	};
 	doPost('/auth', null, callback, $('loginForm'));
@@ -44,7 +44,7 @@ onDocLoad(function () {
 		// 0 if locked, or last request was sent earlier than 3 seconds ago
 		var timeToWait = lastEditUserNameTime + MIN_CHANGE_USERNAME_PERIOD - currentMillis;
 		if (timeToWait > 0) {
-			Growl.error(getText("Please wait {}ms to be able to change username again!", timeToWait));
+			growlError(getText("Please wait {}ms to be able to change username again!", timeToWait));
 			return;
 		}
 		CssUtils.hideElement(label);
@@ -58,7 +58,7 @@ onDocLoad(function () {
 			CssUtils.hideElement(input);
 			CssUtils.showElement(label);
 			if (!USER_REGEX.test(newUsername)) {
-				Growl.error('Wrong username, only letters, -_');
+				growlError('Wrong username, only letters, -_');
 				label.textContent = oldUsername;
 			} else  if (newUsername !== oldUsername) {
 				lastEditUserNameTime = new Date().getTime();

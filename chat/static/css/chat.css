@@ -218,16 +218,16 @@ p {
 	border-radius: 3px;
 	position: absolute;
 	background: #282923;;
-	left: 50%;
-	top: 50%;
+	left: calc(50% - 100px);
+	top: 10%;
 	box-shadow: 2px 2px 1px #1F1F27;
-	transform: translate(-50%, -50%);
 }
 
-.callContainerHeader {
+#callContainerHeader {
 	padding: 4px 0 4px 6px;
 	background-color: #42433B;
 	border-radius: 3px 3px 0 0;
+	cursor: pointer;
 }
 
 #callContainer label {

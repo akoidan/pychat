@@ -22,9 +22,9 @@ function sendIssue(event) {
 	}
 	doPost('', params, function(response) {
 		if (response === RESPONSE_SUCCESS) {
-			Growl.success("Your issue has been successfully submitted");
+			growlSuccess("Your issue has been successfully submitted");
 		} else {
-			Growl.error(response);
+			growlError(response);
 		}
 	}, form);
 }

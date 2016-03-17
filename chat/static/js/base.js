@@ -7,8 +7,20 @@ var blankRegex = /^\s*$/;
 var fileTypeRegex = /\.(\w+)(\?.*)?$/;
 window.sound = 0;
 window.loggingEnabled = true;
-
+var growlHolder;
 var ajaxLoader;
+var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|$))/g; /*http://anycharacter except end of text, <br> or space*/
+var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
+const escapeMap = {
+	"&": "&amp;",
+	"<": "&lt;",
+	">": "&gt;",
+	'"': '&quot;',
+	"'": '&#39;',
+	"\n": '<br>',
+	"/": '&#x2F;'
+};
+var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 
 var infoMessages = [
 	"Did you know that you could paste multiple lines content by simply pressing shift+Enter?",
@@ -34,6 +46,27 @@ var $ = function (id) {
 function onDocLoad(onload) {
 	return document.addEventListener("DOMContentLoaded", onload);
 }
+
+
+function encodeHTML(html) {
+	return html.replace(replaceHtmlRegex, function (s) {
+		return escapeMap[s];
+	});
+}
+
+
+function encodeAnchorsHTML(html) {
+	//&#x2F;&#x2F; = // (already encoded by encodeHTML above)
+    return encodeHTML(html).replace(linksRegex, replaceLinkPattern);
+}
+
+
+window.onerror = function (msg, url, linenumber) {
+	var message = getText('Error occured in {}:{}\n{}', url, linenumber, msg);
+	console.error(getDebugMessage(message));
+	growlError(message);
+	return true;
+};
 
 
 var CssUtils = {
@@ -74,45 +107,86 @@ var CssUtils = {
 };
 
 
-var Growl = {
-	growlHolder: "Not inited",
-	error: function (message) {
-		this.show(message, 'col-error')
-	},
-	success: function (message) {
-		this.show(message, 'col-success')
-	},
-	info: function (message) {
-		this.show(message, 'col-info');
-	},
-	show: function (message, growlClass) {
-		var timeout = 3000 + message.length * 70;
-		if (false) {
-			var allGrowls = document.getElementsByClassName('growl');
-			for (var i = 0; i < allGrowls.length; i++) {
-				Growl.growlHolder.removeChild(allGrowls[i]);
-			}
+var Growl = function (message) {
+	var self = this;
+	self.growlHolder = growlHolder;
+	self.message = message;
+	self.error = function () {
+		self.show(4000, 'col-error')
+	};
+	self.success = function () {
+		self.show(1000, 'col-success')
+	};
+	self.info = function () {
+		self.show(500, 'col-info');
+	};
+	self.hide = function () {
+		self.growl.style.opacity = 0;
+		setTimeout(self.remove, 500); // 500 = $(.growl):transition 0.5s
+	};
+	self.remove = function () {
+		if (self.growl.parentNode === self.growlHolder) {
+			self.growlHolder.removeChild(self.growl)
 		}
-		var growl = document.createElement('div');
-		growl.textContent = message;
-		growl.className = 'growl ' + growlClass;
-		Growl.growlHolder.appendChild(growl);
-		growl.clientHeight; // request to paint now!
-		growl.style.opacity += 1;
-		setTimeout(function() {
-			Growl.hide(growl);
-		}, timeout);
-	},
-	hide: function(growl) {
-		growl = growl || event.target;
-		growl.style.opacity = 0;
-		setTimeout(function () {
-			if (growl.parentNode === Growl.growlHolder) {
-				Growl.growlHolder.removeChild(growl)
-			}
-		}, 500); // 500 = $(.growl):transition 0.5s
-	}
+	};
+	self.show = function (baseTime, growlClass) {
+		var timeout = baseTime + self.message.length * 60;
+		self.growl = document.createElement('div');
+		self.growl.innerHTML = encodeAnchorsHTML(self.message);
+		self.growl.className = 'growl ' + growlClass;
+		self.growlHolder.appendChild(self.growl);
+		self.growl.clientHeight; // request to paint now!
+		self.growl.style.opacity += 1;
+		self.growl.onclick = self.hide;
+		setTimeout(self.hide, timeout);
+	};
+
 };
+
+
+function growlSuccess(message) {
+	new Growl(message).success();
+}
+
+function growlError(message) {
+	new Growl(message).error();
+}
+
+function growlInfo(message) {
+	new Growl(message).info();
+}
+
+
+// TODO replace with HTML5 if possible
+function Draggable(container, header) {
+	var self = this;
+	self.container = container;
+	self.header = header;
+	self.attached = true;
+	self.eleMouseDown = function (ev) {
+		self.leftCorrection =  container.offsetLeft - ev.pageX;
+		self.rightCorrection = container.offsetTop - ev.pageY;
+		self.maxTop = document.body.clientHeight - container.clientHeight;
+		self.maxLeft =  document.body.clientWidth - container.clientWidth;
+		document.addEventListener ("mousemove", self.eleMouseMove, false);
+	};
+	self.eleMouseMove = function (ev) {
+		var left = ev.pageX + self.leftCorrection;
+		if (left > 0 && left < self.maxLeft) self.container.style.left = left + "px";
+		var top = ev.pageY + self.rightCorrection;
+		if (top > 0 && top < self.maxTop) self.container.style.top = top + "px";
+		if (self.attached) {
+			document.addEventListener ("mouseup", self.eleMouseUp, false);
+			self.attached = false;
+		}
+	};
+	self.eleMouseUp = function () {
+		document.removeEventListener ("mousemove", self.eleMouseMove, false);
+		document.removeEventListener ("mouseup", self.eleMouseUp, false);
+		self.attached = true;
+	};
+	self.header.addEventListener ("mousedown", self.eleMouseDown, false);
+}
 
 
 onDocLoad(function () {
@@ -121,7 +195,7 @@ onDocLoad(function () {
 	if (typeof InstallTrigger !== 'undefined') { // browser = firefox
 		console.warn(getDebugMessage("Ops, there's no scrollbar for firefox"));
 	}
-	Growl.growlHolder = $('growlHolder');
+	growlHolder = $('growlHolder');
 });
 
 
