@@ -7,6 +7,7 @@ from django.contrib.auth import logout as djangologout
 from django.core.context_processors import csrf
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
+from django.db.models import Count
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -155,13 +156,10 @@ def hack(request):
 
 @require_http_methods('GET')
 def statistics(request):
-	pie = {}
-	for address in IpAddress.objects.all().filter(country__isnull=False):
-		pie[address.country] = pie.get(address.country, 0) + 1
-	pie_data = [{'country': key, "count": value} for key, value in pie.items()]
+	pie_data = IpAddress.objects.values('country').filter(country__isnull=False).annotate(count=Count("country"))
 	return render_to_response(
 		'statistic.html',
-		{'dataProvider': json.dumps(pie_data)},
+		{'dataProvider': json.dumps(list(pie_data))},
 		context_instance=RequestContext(request)
 	)
 
