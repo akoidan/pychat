@@ -815,7 +815,7 @@ var WebRtcApi = function () {
 		self.stopTrack('video');
 	};
 	self.onIncomingCall = function (message) {
-		//checkAndPlay(self.dom.callSound); TODO uncomment
+		checkAndPlay(self.dom.callSound);
 		CssUtils.showElement(self.dom.callAnswerParent);
 		self.receiverName = message.user;
 		self.receiverId = message.userId;
