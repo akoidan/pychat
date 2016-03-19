@@ -49,6 +49,7 @@ Start the chat:
  3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
 
 #TODO
+* remember if user has camera/mic and autoset values after second call
 * android play() can only be initiated by a user gesture.
 * transfer file to another user
 * insecure images on usermessage editable div prevent sending messages

@@ -161,7 +161,7 @@ p {
 }
 
 #chatbox img, #usermsg img  {
-	margin-top: -20px;
+	margin-top: -17px;
 	margin-bottom: -10px;
 	background-color: rgba(255, 255, 255, 0); /*remove background if someones copies smile */
 	vertical-align: middle;
@@ -194,4 +194,141 @@ p {
 	min-height: 1.15em; /*Firefox*/
 	overflow-y: auto;
 	white-space: pre-wrap; /*chrome keep \n, no horizontal scroll*/
+}
+
+
+/*--------------- START CALL DIALOG -----------------------*/
+.active-call-user {
+	background-color: #386D63
+}
+
+.modal-background {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: rgb(0, 0, 0);
+	background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-body {
+	border-radius: 3px;
+	position: absolute;
+	background: #282923;;
+	box-shadow: 2px 2px 1px #1F1F27;
+}
+
+.modal-draggable {
+	left: calc(50% - 100px);
+	top: 10%;
+}
+
+
+#callContainerHeader {
+	padding: 4px 0 4px 6px;
+	background-color: #42433B;
+	border-radius: 3px 3px 0 0;
+	cursor: pointer;
+}
+
+#callContainer label {
+	cursor: pointer;
+}
+
+.callContainerContent {
+	padding: 5px;
+}
+
+.callContainerIcons {
+	display: inline-block;
+	font-size: 25px;
+	width: 100%;
+	padding-top: 10px;
+	color: darkgreen;
+}
+
+#callUserList {
+	margin: 0;
+	max-height: 400px; /*fallback*/
+	max-height: calc(100vh - 180px);
+	overflow-y: auto;
+	width: 100%;
+	background-color: #343A3B;
+
+}
+.icon-phone-circled {
+	float: right;
+	color: green
+}
+
+#callUserList > li {
+	list-style-type: none;
+	border-radius: 2px;
+	margin-bottom: 2px;
+	margin-right: 3px; /*before scroll*/
+	padding-left: 3px;
+	cursor: pointer;
+}
+
+.callActiveIcon {
+	color: darkred;
+}
+
+video#remoteVideo {
+	width: 480px;
+	height: 360px;
+	background: #777;
+}
+
+video#localVideo {
+	position: absolute;
+	width: 160px;
+	height: 120px;
+	background: #555;
+	bottom: 0;
+	right: 0;
+	margin-bottom: 4px;
+}
+
+.modal-fixed {
+	left: 50%;
+	top: 45%;
+	transform: translate(-50%, -50%);
+	padding: 10px;
+	border-radius: 10px;
+}
+
+.modal-fixed span {
+	font-size: 30px;
+	margin: 10px;
+}
+
+.answerButtons {
+	padding-top: 10px;
+	text-align: center; /*collapse to center*/
+}
+
+.answerButtons > button {
+	padding: 5px 10px 0 5px !important;
+	margin-top: 5px; /* small screen collapsed distance between*/
+	border-radius: 20px;
+}
+.answerButtons div {
+	display: inline-block;
+	vertical-align: top;
+	padding-top: 5px;
+}
+.answerButtons i {
+	font-size: 30px;
+}
+
+/*--------------- END CALL DIALOG -----------------------*/
+.finish-call-icon {
+	color: #910000;
+	float:right;
+	font-size: 40px;
+	margin-bottom: -25px;
+    margin-top: -6px;
 }

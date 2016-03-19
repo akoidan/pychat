@@ -1,6 +1,6 @@
 var issue;
 onDocLoad(function () {
-	$("version").value = getBrowserVersion();
+	$("version").value = window.browserVersion;
 	issue = $('issue');
 	issue.addEventListener('input', function () {
 		issue.style.height = 'auto';

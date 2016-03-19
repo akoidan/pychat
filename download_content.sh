@@ -1,6 +1,7 @@
 #!/bin/bash
 
-CONF_VERSION=' eaac32afbda1b2c4816b5ef8e85521b282dcb3ae'
+CONF_REPOSITORY="https://github.com/Deathangel908/djangochat-config"
+CONF_VERSION='2e66b21f52fed7036f5a7bb688f0138ce1af91e5'
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
@@ -16,24 +17,7 @@ SOUNDS_DIR="$STATIC_DIR/sounds"
 SMILEYS_DIR="$STATIC_DIR/smileys"
 
 # Implementing installed files
-files[0]="$STATIC_DIR/favicon.ico"
-files[1]="$SOUNDS_DIR/ChatOutgoing.wav"
-files[2]="$SOUNDS_DIR/ChatIncoming.wav"
-files[3]="$SOUNDS_DIR/ChatLogin.wav"
-files[4]="$SOUNDS_DIR/ChatLogout.wav"
-files[5]="$CSS_DIR/pikaday.css"
-files[6]="$JS_DIR/pikaday.js"
-files[7]="$JS_DIR/moment.js"
-files[8]="$CSS_DIR/fontello.css"
-files[9]="$FONT_DIR/fontello.eot"
-files[10]="$FONT_DIR/fontello.svg"
-files[11]="$FONT_DIR/fontello.ttf"
-files[12]="$FONT_DIR/fontello.woff"
-files[15]="$SMILEYS_DIR"
-files[14]="$SMILEYS_DIR/info.json"
-files[13]="$SMILEYS_DIR/base/0000.gif"
-files[16]="$STATIC_DIR/ajaxStatus.gif"
-
+declare -a files=("$STATIC_DIR/favicon.ico" "$SOUNDS_DIR/ChatOutgoing.wav" "$SOUNDS_DIR/ChatIncoming.wav" "$SOUNDS_DIR/ChatLogin.wav" "$SOUNDS_DIR/ChatLogout.wav" "$CSS_DIR/pikaday.css" "$JS_DIR/pikaday.js" "$JS_DIR/moment.js" "$CSS_DIR/fontello.css" "$FONT_DIR/fontello.eot" "$FONT_DIR/fontello.svg" "$FONT_DIR/fontello.ttf" "$FONT_DIR/fontello.woff" "$FONT_DIR/fontello.woff2" "$SMILEYS_DIR" "$SMILEYS_DIR/info.json" "$SMILEYS_DIR/base/0000.gif" "$STATIC_DIR/ajaxStatus.gif")
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do
   if [ -f $path ]; then
@@ -47,7 +31,7 @@ mkdir -pv $TMP_DIR
 
 cd $PROJECT_ROOT
 
-git clone https://github.com/Deathangel908/djangochat-config $TMP_DIR/chatconf
+git clone "$CONF_REPOSITORY" $TMP_DIR/chatconf
 git --git-dir=$TMP_DIR/chatconf/.git --work-tree=$TMP_DIR/chatconf/ checkout $CONF_VERSION
 cp -r $TMP_DIR/chatconf/static $STATIC_PARENT
 

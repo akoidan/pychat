@@ -50,6 +50,7 @@
 
 /*-----------INPUT BUTTON -----------*/
 .color-lor input[type=button]:hover,
+.color-lor button:hover,
 .color-lor input[type=submit]:hover {
 	color: #000000;
 	background: linear-gradient(#babdb6, #abbdab) repeat scroll 0 0 transparent;
@@ -58,7 +59,7 @@
 	cursor: pointer; /*TODO */
 }
 
-.color-lor input[type=button],.color-lor input[type=submit] {
+.color-lor input[type=button],.color-lor input[type=submit], .color-lor button {
 	background-color: rgb(62, 65, 58);
 	color: #BABDB6;
 }
@@ -185,11 +186,11 @@ nav {
 	display: none !important;
 }
 
-#navbarList {
+nav > ul {
 	margin: 0;
 	padding: 10px 4px 9px 10px;
 }
-#navbarList > li {
+nav > ul > li {
 	 display:inline;
 }
 
@@ -251,6 +252,7 @@ textarea, div[contenteditable] {
 	background-color: rgba(34, 31, 31, 0.86);
 	float:left;
 	word-wrap: break-word;
+	white-space: pre-wrap;
 	margin-bottom: 5px;
 	transition: 0.5s opacity;
 	opacity: 0;
@@ -304,7 +306,7 @@ input[type=text], input[type=password], input[type=email], textarea,div[contente
 	padding-left: 5px;
 }
 
-input[type=button], input[type=submit] {
+input[type=button], input[type=submit], button {
 	border: 1px solid transparent;
 	border-radius: 3px;
 	font-size: 18px;
@@ -385,8 +387,8 @@ video {
 	display: block;
 	position: fixed;
 	z-index: 100;
-	background-color: #666;
-	opacity: 0.4;
+	background-color: #000;
+	opacity: 0.5;
 	background-repeat: no-repeat;
 	background-position: center;
 	left: 0;
