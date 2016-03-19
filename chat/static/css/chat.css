@@ -276,17 +276,13 @@ p {
 	color: darkred;
 }
 
-.videos {
-    position: relative;
-}
-
-video#remote {
+video#remoteVideo {
 	width: 480px;
 	height: 360px;
 	background: #777;
 }
 
-video#local {
+video#localVideo {
 	position: absolute;
 	width: 160px;
 	height: 120px;
@@ -329,3 +325,10 @@ video#local {
 }
 
 /*--------------- END CALL DIALOG -----------------------*/
+.finish-call-icon {
+	color: #910000;
+	float:right;
+	font-size: 40px;
+	margin-bottom: -25px;
+    margin-top: -6px;
+}

@@ -67,6 +67,8 @@ function takeSnapshot() {
 		growlInfo('Image has been set. Click on "Finish" to hide video');
 	}
 }
+
+
 function startCapturingVideo(button) {
 	if (isStopped) {
 		// Not showing vendor prefixes or code that works cross-browser.
@@ -97,8 +99,8 @@ function startCapturingVideo(button) {
 		CssUtils.showElement($('userProfileData'));
 		isStopped = true;
 	}
-
 }
+
 
 function saveProfile(event) {
 	event.preventDefault();
@@ -132,7 +134,7 @@ function saveProfile(event) {
 }
 
 
-/** Check whether browser supports html5 input type date */
+/** Checks whether browser supports html5 input type date */
 function isDateMissing() {
 	var input = document.createElement('input');
 	input.setAttribute('type', 'date');

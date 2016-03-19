@@ -62,7 +62,7 @@ function encodeAnchorsHTML(html) {
 
 
 window.onerror = function (msg, url, linenumber) {
-	var message = getText('Error occured in {}:{}\n{}', url, linenumber, msg);
+	var message = getText('Error occurred in {}:{}\n{}', url, linenumber, msg);
 	console.error(getDebugMessage(message));
 	growlError(message);
 	return true;
@@ -221,10 +221,10 @@ function mute() {
 }
 
 function checkAndPlay(element) {
-	if (!element.readyState) {
-		element.load();
+	if (!window.sound) {
+		return;
 	}
-	if (element.readyState && window.sound) {
+	try {
 		element.pause();
 		element.currentTime = 0;
 		switch (window.sound) {
@@ -237,9 +237,9 @@ function checkAndPlay(element) {
 			case 3:
 				element.volume = 1;
 		}
-		setTimeout(function () {
-			element.play();
-		});
+		element.play();
+	} catch (e) {
+		console.error(getDebugMessage("Skipping playing message, because {}", e.message || e));
 	}
 }
 

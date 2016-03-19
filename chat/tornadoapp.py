@@ -42,6 +42,7 @@ SESSION_USER_VAR_KEY = 'user_name'
 MESSAGE_ID_VAR_NAME = 'id'
 RECEIVER_USERNAME_VAR_NAME = 'receiverName'
 RECEIVER_USERID_VAR_NAME = 'receiverId'
+CALL_TYPE_VAR_NAME = 'type'
 COUNT_VAR_NAME = 'count'
 HEADER_ID_VAR_NAME = 'headerId'
 USER_VAR_NAME = 'user'
@@ -134,13 +135,16 @@ class MessagesCreator(object):
 			TIME_VAR_NAME: get_milliseconds()
 		}
 
-	def offer_call(self):
+	def offer_call(self, content, type):
 		"""
-		:return: {"action": event, "content": content, "time": "20:48:57"}
+		:return: {"action": "call", "content": content, "time": "20:48:57"}
 		"""
 		return {
 			EVENT_VAR_NAME: CALL_EVENT,
 			USER_VAR_NAME: self.sender_name,
+			USER_ID_VAR_NAME: self.user_id,
+			CONTENT_VAR_NAME: content,
+			CALL_TYPE_VAR_NAME: type
 		}
 
 	@classmethod
@@ -231,7 +235,6 @@ class MessagesHandler(MessagesCreator):
 			GET_MINE_USERNAME_EVENT: self.process_change_username,
 			GET_MESSAGES_EVENT: self.process_get_messages,
 			SEND_MESSAGE_EVENT: self.process_send_message,
-			WEBRTC_EVENT: self.process_webrtc,
 			CALL_EVENT: self.process_call
 		}
 
@@ -361,22 +364,6 @@ class MessagesHandler(MessagesCreator):
 			save_to_db = False
 		self.publish_message(content, receiver_channel, receiver_id, receiver_name, save_to_db)
 
-	def process_webrtc(self, message):
-		"""
-		:type message: dict
-		"""
-		# TODO refactor this, huge receiver channel is parsed for nothing
-		content = message[CONTENT_VAR_NAME]
-		receiver_id = message.get(RECEIVER_USERID_VAR_NAME)  # if receiver_id is None then its a private message
-		receiver_name = message.get(RECEIVER_USERNAME_VAR_NAME)
-		self.logger.info('!! Retranslating webrtc message %s to username:%s, id:%s', content, receiver_name, receiver_id)
-		receiver_channel = None  # public by default
-		if receiver_id is not None and receiver_id != 0:
-			receiver_channel = REDIS_USERID_CHANNEL_PREFIX % receiver_id
-		elif receiver_name is not None:
-			receiver_channel = REDIS_USERNAME_CHANNEL_PREFIX % receiver_name
-		self.publish(self.default(content, WEBRTC_EVENT), receiver_channel)
-
 	def process_call(self, message):
 		"""
 		:type message: dict
@@ -384,13 +371,14 @@ class MessagesHandler(MessagesCreator):
 		# TODO refactor this, duplicate code with process_webrtc and send message
 		receiver_id = message.get(RECEIVER_USERID_VAR_NAME)  # if receiver_id is None then its a private message
 		receiver_name = message.get(RECEIVER_USERNAME_VAR_NAME)
+		cal_type = message.get(CALL_TYPE_VAR_NAME)
 		self.logger.info('!! Offering a call to username:%s, id:%s', receiver_name, receiver_id)
 		receiver_channel = None  # public by default
 		if receiver_id is not None and receiver_id != 0:
 			receiver_channel = REDIS_USERID_CHANNEL_PREFIX % receiver_id
 		elif receiver_name is not None:
 			receiver_channel = REDIS_USERNAME_CHANNEL_PREFIX % receiver_name
-		self.publish(self.offer_call(), receiver_channel)
+		self.publish(self.offer_call(message.get(CONTENT_VAR_NAME), message.get(CALL_TYPE_VAR_NAME)), receiver_channel)
 
 	def publish_message(self, content, receiver_channel, receiver_id, receiver_name, save_to_db):
 		if self.user_id != 0 and save_to_db:

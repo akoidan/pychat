@@ -186,11 +186,11 @@ nav {
 	display: none !important;
 }
 
-#navbarList {
+nav > ul {
 	margin: 0;
 	padding: 10px 4px 9px 10px;
 }
-#navbarList > li {
+nav > ul > li {
 	 display:inline;
 }
 

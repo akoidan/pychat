@@ -9,13 +9,16 @@
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}
 {% block navbar %}
-	<li><i title="Show all users"
-			 onclick="CssUtils.toggleVisibility(chatUserRoomWrapper)" class="icon-users very-small-screen"><span class="mText">users</span></i></li>
-	<li><i class="icon-clear" title="CLear local history"
-			 onclick="clearLocalHistory()"><span class="mText">clear</span></i></li>
 	<li>
-	<i class="icon-phone" title="Make a video/mic call"
-			 onclick="showCallDialog()"><span class="mText">Call</span></i>
+		<i title="Show all users" onclick="CssUtils.toggleVisibility(chatUserRoomWrapper)"
+			class="icon-users very-small-screen"> <span class="mText">users</span></i>
+	</li>
+	<li>
+		<i class="icon-clear" title="CLear local history"
+			onclick="clearLocalHistory()"><span class="mText">clear</span></i></li>
+	<li>
+		<i class="icon-phone" title="Make a video/mic call"
+			onclick="webRtcApi.showCallDialog()"><span class="mText">Call</span></i>
 	</li>
 {% endblock navbar %}
 {% block content %}
@@ -24,6 +27,7 @@
 		<audio id="chatOutgoing" src="{% md5url 'sounds/ChatOutgoing.wav' %}" preload="none"></audio>
 		<audio id="chatLogin" src="{% md5url 'sounds/ChatLogin.wav' %}" preload="none" ></audio>
 		<audio id="chatLogout" src="{% md5url 'sounds/ChatLogout.wav' %}" preload="none"></audio>
+		<audio id="chatCall" src="{% md5url 'sounds/Call.mp3' %}" preload="none"></audio>
 	</div>
 	<div id="wrapper" class="max-height-scrollable" style="position: relative">
 		<div id="chatbox" tabindex="0" onkeydown="keyDownLoadUp(event)">
@@ -37,16 +41,16 @@
 			<div id="rooms">
 			</div>
 		</div>
-		<div id="smileParentHolder" class="padding10" onclick="addSmile(event);">
-			<ul id="tabNames" onclick="showTabByName(event)"></ul>
+		<div id="smileParentHolder" class="padding10 hidden" onclick="smileyUtil.addSmile(event);">
+			<ul id="tabNames" onclick="smileyUtil.showTabByName(event)"></ul>
 		</div>
 	</div>
 	<div class="fullwidth-padded box-shadow" style="position: relative">
-		<div id="userSendMessageTo">
+		<div id="userSendMessageTo" class="hidden">
 			<div id="receiverId"></div>
 			<i class="icon-cancel" onclick="hideUserSendToName();"></i>
 		</div>
-		<i class="icon-smile" title="Add a smile :)" onclick="toggleSmileys(event)"></i>
+		<i class="icon-smile" title="Add a smile :)" onclick="smileyUtil.toggleSmileys(event)"></i>
 		<div contenteditable="true" id="usermsg" onkeydown="checkAndSendMessage(event)"></div>
 	</div>
 	<div id="callContainer" class="modal-body modal-draggable hidden">
@@ -56,18 +60,18 @@
 				onclick="CssUtils.hideElement($('callContainer'))"></i>
 		</div>
 		<div class="callContainerContent">
-			<div class="videos">
-				<video id="remote" autoplay></video>
-				<video id="local" autoplay muted></video>
+			<div style="position: relative">
+				<video id="remoteVideo" autoplay></video>
+				<video id="localVideo" autoplay muted></video>
 			</div>
-			<ul id="callUserList" onclick="callUserListClick(event)">
+			<ul id="callUserList" onclick="webRtcApi.callUserListClick(event)">
 			</ul>
 			<div class="callContainerIcons noSelection">
-				<i class="icon-mic"
-					onclick="CssUtils.toggleClass(this, 'callActiveIcon')"></i>
-				<i class="icon-videocam" style="margin-left: -5px; margin-right: 15px;"
-					onclick="CssUtils.toggleClass(this, 'callActiveIcon')"></i>
-				<i class="icon-phone-circled" onclick="callPeople()"></i>
+				<i id="audioStatusIcon" class="icon-mic" onclick="webRtcApi.toggleMic()"></i>
+				<i id="videoStatusIcon" class="icon-videocam" style="margin-left: -5px; margin-right: 15px;"
+					onclick="webRtcApi.toggleVideo()"></i>
+				<i class="icon-phone-circled" id="callIcon" onclick="webRtcApi.callPeople()"></i>
+				<i class="icon-hang-up finish-call-icon" id="hangUpIcon" onclick="webRtcApi.hangUp()" ></i>
 			</div>
 		</div>
 	</div>
@@ -75,13 +79,13 @@
 		<div id="callAnswer" class="modal-body modal-fixed">
 			<span id="callAnswerText">Somebody is calling you</span>
 			<div class="answerButtons">
-				<button onclick="answerWebRtcCall()" style="background-color: #0E560C">
+				<button onclick="webRtcApi.answerWebRtcCall()" style="background-color: #0E560C">
 					<i class="icon-call-aswer"></i> <div>Answer</div>
 				</button>
-				<button onclick="videoAnswerWebRtcCall()" style="background-color: #0E560C">
+				<button onclick="webRtcApi.videoAnswerWebRtcCall()" style="background-color: #0E560C">
 					<i class="icon-videocam"></i> <div>Answer with video</div>
 				</button>
-				<button onclick="declineWebRtcCall()" style="background-color: #910000">
+				<button onclick="webRtcApi.declineWebRtcCall()" style="background-color: #910000">
 					<i class="icon-hang-up"></i> <div>Decline</div>
 				</button>
 			</div>
