@@ -62,6 +62,8 @@ ROOMS_EVENT = 'rooms'  # thread ex "main" , channel ex. 'r:main', "i:3"
 LOGIN_EVENT = 'joined'
 LOGOUT_EVENT = 'left'
 SEND_MESSAGE_EVENT = 'send'
+WEBRTC_EVENT = 'webrtc'
+CALL_EVENT = 'call'
 CHANGE_ANONYMOUS_NAME_EVENT = 'changed'
 
 REDIS_USERNAME_CHANNEL_PREFIX = 'u:%s'
@@ -130,6 +132,15 @@ class MessagesCreator(object):
 			EVENT_VAR_NAME: event,
 			CONTENT_VAR_NAME: content,
 			TIME_VAR_NAME: get_milliseconds()
+		}
+
+	def offer_call(self):
+		"""
+		:return: {"action": event, "content": content, "time": "20:48:57"}
+		"""
+		return {
+			EVENT_VAR_NAME: CALL_EVENT,
+			USER_VAR_NAME: self.sender_name,
 		}
 
 	@classmethod
@@ -220,6 +231,8 @@ class MessagesHandler(MessagesCreator):
 			GET_MINE_USERNAME_EVENT: self.process_change_username,
 			GET_MESSAGES_EVENT: self.process_get_messages,
 			SEND_MESSAGE_EVENT: self.process_send_message,
+			WEBRTC_EVENT: self.process_webrtc,
+			CALL_EVENT: self.process_call
 		}
 
 	def do_db(self, callback, *arg, **args):
@@ -346,9 +359,40 @@ class MessagesHandler(MessagesCreator):
 		elif receiver_name is not None:
 			receiver_channel = REDIS_USERNAME_CHANNEL_PREFIX % receiver_name
 			save_to_db = False
-		self.publish_messae(content, receiver_channel, receiver_id, receiver_name, save_to_db)
+		self.publish_message(content, receiver_channel, receiver_id, receiver_name, save_to_db)
 
-	def publish_messae(self, content, receiver_channel, receiver_id, receiver_name, save_to_db):
+	def process_webrtc(self, message):
+		"""
+		:type message: dict
+		"""
+		# TODO refactor this, huge receiver channel is parsed for nothing
+		content = message[CONTENT_VAR_NAME]
+		receiver_id = message.get(RECEIVER_USERID_VAR_NAME)  # if receiver_id is None then its a private message
+		receiver_name = message.get(RECEIVER_USERNAME_VAR_NAME)
+		self.logger.info('!! Retranslating webrtc message %s to username:%s, id:%s', content, receiver_name, receiver_id)
+		receiver_channel = None  # public by default
+		if receiver_id is not None and receiver_id != 0:
+			receiver_channel = REDIS_USERID_CHANNEL_PREFIX % receiver_id
+		elif receiver_name is not None:
+			receiver_channel = REDIS_USERNAME_CHANNEL_PREFIX % receiver_name
+		self.publish(self.default(content, WEBRTC_EVENT), receiver_channel)
+
+	def process_call(self, message):
+		"""
+		:type message: dict
+		"""
+		# TODO refactor this, duplicate code with process_webrtc and send message
+		receiver_id = message.get(RECEIVER_USERID_VAR_NAME)  # if receiver_id is None then its a private message
+		receiver_name = message.get(RECEIVER_USERNAME_VAR_NAME)
+		self.logger.info('!! Offering a call to username:%s, id:%s', receiver_name, receiver_id)
+		receiver_channel = None  # public by default
+		if receiver_id is not None and receiver_id != 0:
+			receiver_channel = REDIS_USERID_CHANNEL_PREFIX % receiver_id
+		elif receiver_name is not None:
+			receiver_channel = REDIS_USERNAME_CHANNEL_PREFIX % receiver_name
+		self.publish(self.offer_call(), receiver_channel)
+
+	def publish_message(self, content, receiver_channel, receiver_id, receiver_name, save_to_db):
 		if self.user_id != 0 and save_to_db:
 			self.logger.debug('!! Saving it to db')
 			message_db = Message(sender_id=self.user_id, content=content, receiver_id=receiver_id)
@@ -587,5 +631,4 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.logger.error("%s. Can't send << %s >> message", e, str(message))
 
 	def get_client_ip(self):
-		x_real_ip = self.request.headers.get("X-Real-IP")
-		return x_real_ip or self.request.remote_ip
+		return self.request.headers.get("X-Real-IP") or self.request.remote_ip

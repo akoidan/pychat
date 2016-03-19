@@ -202,26 +202,29 @@ p {
 	background-color: #386D63
 }
 
-#callContainerParent {
+.modal-background {
 	position: fixed;
-	z-index: 2;
 	left: 0;
 	top: 0;
 	width: 100%;
 	height: 100%;
 	overflow: auto;
 	background-color: rgb(0, 0, 0);
-	background-color: rgba(0, 0, 0, 0.3);
+	background-color: rgba(0, 0, 0, 0.5);
 }
 
-#callContainer {
+.modal-body {
 	border-radius: 3px;
 	position: absolute;
 	background: #282923;;
-	left: calc(50% - 100px);
-	top: 10%;
 	box-shadow: 2px 2px 1px #1F1F27;
 }
+
+.modal-draggable {
+	left: calc(50% - 100px);
+	top: 10%;
+}
+
 
 #callContainerHeader {
 	padding: 4px 0 4px 6px;
@@ -259,10 +262,7 @@ p {
 	float: right;
 	color: green
 }
-.icon-videocam {
-	margin-left: -5px;
-	margin-right: 15px;
-}
+
 #callUserList > li {
 	list-style-type: none;
 	border-radius: 2px;
@@ -274,6 +274,58 @@ p {
 
 .callActiveIcon {
 	color: darkred;
+}
+
+.videos {
+    position: relative;
+}
+
+video#remote {
+	width: 480px;
+	height: 360px;
+	background: #777;
+}
+
+video#local {
+	position: absolute;
+	width: 160px;
+	height: 120px;
+	background: #555;
+	bottom: 0;
+	right: 0;
+	margin-bottom: 4px;
+}
+
+.modal-fixed {
+	left: 50%;
+	top: 45%;
+	transform: translate(-50%, -50%);
+	padding: 10px;
+	border-radius: 10px;
+}
+
+.modal-fixed span {
+	font-size: 30px;
+	margin: 10px;
+}
+
+.answerButtons {
+	padding-top: 10px;
+	text-align: center; /*collapse to center*/
+}
+
+.answerButtons > button {
+	padding: 5px 10px 0 5px !important;
+	margin-top: 5px; /* small screen collapsed distance between*/
+	border-radius: 20px;
+}
+.answerButtons div {
+	display: inline-block;
+	vertical-align: top;
+	padding-top: 5px;
+}
+.answerButtons i {
+	font-size: 30px;
 }
 
 /*--------------- END CALL DIALOG -----------------------*/

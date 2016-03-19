@@ -238,8 +238,7 @@ class RegisterView(View):
 			# You must call authenticate before you can call login
 			auth_user = authenticate(username=username, password=password)
 			djangologin(request, auth_user)
-			# register,js redirect if message = 'Account created'
-			message = VALIDATION_IS_OK
+			message = VALIDATION_IS_OK  # redirect
 			if email:
 				send_email_verification(user, request.get_host())
 		except ValidationError as e:

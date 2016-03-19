@@ -26,7 +26,7 @@
 		<audio id="chatLogout" src="{% md5url 'sounds/ChatLogout.wav' %}" preload="none"></audio>
 	</div>
 	<div id="wrapper" class="max-height-scrollable" style="position: relative">
-		<div id="chatbox" tabindex="0">
+		<div id="chatbox" tabindex="0" onkeydown="keyDownLoadUp(event)">
 			<div>
 			</div>
 		</div>{% comment %}tabindex allows focus, focus allows keydown binding event{% endcomment %}
@@ -38,7 +38,7 @@
 			</div>
 		</div>
 		<div id="smileParentHolder" class="padding10" onclick="addSmile(event);">
-			<ul id="tabNames"></ul>
+			<ul id="tabNames" onclick="showTabByName(event)"></ul>
 		</div>
 	</div>
 	<div class="fullwidth-padded box-shadow" style="position: relative">
@@ -47,26 +47,45 @@
 			<i class="icon-cancel" onclick="hideUserSendToName();"></i>
 		</div>
 		<i class="icon-smile" title="Add a smile :)" onclick="toggleSmileys(event)"></i>
-		<div contenteditable="true" id="usermsg"></div>
+		<div contenteditable="true" id="usermsg" onkeydown="checkAndSendMessage(event)"></div>
 	</div>
-	<div id="callContainerParent" class="hidden">
-		<div id="callContainer">
-			<div id="callContainerHeader" class="noSelection">
-				<div style="display: inline-block">Make a call</div>
-				<i class="icon-cancel" style="float: right; color: #AE0F0F"
-					onclick="CssUtils.hideElement($('callContainerParent'))"></i>
+	<div id="callContainer" class="modal-body modal-draggable hidden">
+		<div id="callContainerHeader" class="noSelection">
+			<span id="callContainerHeaderText" style="display: inline-block">Make a call</span>
+			<i class="icon-cancel" style="float: right; color: rgb(177, 53, 51);"
+				onclick="CssUtils.hideElement($('callContainer'))"></i>
+		</div>
+		<div class="callContainerContent">
+			<div class="videos">
+				<video id="remote" autoplay></video>
+				<video id="local" autoplay muted></video>
 			</div>
-			<div class="callContainerContent">
-				<ul id="callUserList">
-				</ul>
-				<div class="callContainerIcons noSelection">
-					<i class="icon-mic"
-						onclick="CssUtils.toggleClass(this, 'callActiveIcon')"></i>
-					<i class="icon-videocam"
-						onclick="CssUtils.toggleClass(this, 'callActiveIcon')"></i>
-					<i class="icon-phone-circled" onclick="createCall()"></i>
-				</div>
+			<ul id="callUserList" onclick="callUserListClick(event)">
+			</ul>
+			<div class="callContainerIcons noSelection">
+				<i class="icon-mic"
+					onclick="CssUtils.toggleClass(this, 'callActiveIcon')"></i>
+				<i class="icon-videocam" style="margin-left: -5px; margin-right: 15px;"
+					onclick="CssUtils.toggleClass(this, 'callActiveIcon')"></i>
+				<i class="icon-phone-circled" onclick="callPeople()"></i>
 			</div>
 		</div>
 	</div>
+	<div class="modal-background hidden" id="callAnswerParent">
+		<div id="callAnswer" class="modal-body modal-fixed">
+			<span id="callAnswerText">Somebody is calling you</span>
+			<div class="answerButtons">
+				<button onclick="answerWebRtcCall()" style="background-color: #0E560C">
+					<i class="icon-call-aswer"></i> <div>Answer</div>
+				</button>
+				<button onclick="videoAnswerWebRtcCall()" style="background-color: #0E560C">
+					<i class="icon-videocam"></i> <div>Answer with video</div>
+				</button>
+				<button onclick="declineWebRtcCall()" style="background-color: #910000">
+					<i class="icon-hang-up"></i> <div>Decline</div>
+				</button>
+			</div>
+		</div>
+	</div>
+
 {% endblock %}

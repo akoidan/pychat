@@ -413,8 +413,13 @@ function getDebugMessage() {
 	var now = new Date();
 	// first argument is format, others are params
 	var text = getText.apply(this, arguments);
-	var time = [now.getHours(), now.getMinutes(), now.getSeconds(), now.getMilliseconds()].join(':');
-	var result = time + ': ' + text;
+	var result = getText("{}:{}:{}.{}: {}",
+			sliceZero(now.getHours()),
+			sliceZero(now.getMinutes()),
+			sliceZero(now.getSeconds()),
+			sliceZero(now.getMilliseconds(), -3),
+			text
+	);
 	saveLogToStorage(result);
 	return result;
 }
@@ -422,6 +427,6 @@ function getDebugMessage() {
 
 /** in 23 - out 23
  *  */
-function sliceZero(number) {
-	return String("0" + number).slice(-2);
+function sliceZero(number, count) {
+	return String("00" + number).slice(count || -2);
 }

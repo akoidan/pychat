@@ -78,19 +78,26 @@ var onlineUsers = {};
 var callUserList;
 
 var pc;
-var pc_config;
+var webRtcUrl = window.browserVersion.indexOf('firefox') > 0 ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
+var pc_config = {iceServers: [{url: webRtcUrl}]};
 var pc_constraints = {
 	optional: [
 		{DtlsSrtpKeyAgreement: true},
 		{RtpDataChannels: true}
 	]
 };
+// Set up audio and video regardless of what devices are present.
+var sdpConstraints = {
+	'mandatory': {
+		'OfferToReceiveAudio': true,
+		'OfferToReceiveVideo': true
+	}
+};
+
+var webRtcReceivers = {};
 
 
 onDocLoad(function () {
-	//	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-	//		alert('you can download app');
-	//}
 	chatBoxDiv = $("chatbox");
 	userMessage = $("usermsg");
 	chatUsersTable = $("chat-user-table");
@@ -111,23 +118,17 @@ onDocLoad(function () {
 	CssUtils.hideElement(userSendMessageTo);
 	CssUtils.hideElement(smileParentHolder);
 	addSmileysEvents();
-	callUserList.addEventListener("click", callUserListClick);
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
-	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);  //TODO doesn't work in chromium for div
 	window.addEventListener("blur", changeTittleFunction);
 	window.addEventListener("focus", changeTittleFunction);
-	$('tabNames').addEventListener('click', showTabByName);
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	start_chat_ws();
-	userMessage.addEventListener('keydown', checkAndSendMessage);
 	//bottom call loadMessagesFromLocalStorage(); s
 	doGet(SMILEYS_JSON_URL, loadSmileys);
-	showHelp();-
+	showHelp();
 	userMessage.focus();
 	new Draggable($('callContainer'), $('callContainerHeader'));
-	var webRtcUrl = window.browserVersion.indexOf('firefox') > 0 ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
-	pc_config = {iceServers: [{url: webRtcUrl}]};
 });
 
 
@@ -139,13 +140,11 @@ function showHelp() {
 function addSmileysEvents() {
 	document.addEventListener("click", function (event) {
 		event = event || window.event;
-		var level = 0;
 		for (var element = event.target; element; element = element.parentNode) {
 			if (element.id === "bottomWrapper" || element.id === smileParentHolder.id) {
 				userMessage.focus();
 				return;
 			}
-			level++;
 		}
 		CssUtils.hideElement(smileParentHolder);
 	});
@@ -266,72 +265,100 @@ function userClick(event) {
 }
 
 
+function sendWebRtcEvent(message) {
+	// FIXME , no selection error, more than 1 - error
+	var destinationUserName = Object.keys(webRtcReceivers)[0];
+	var destinationUserId = parseInt(webRtcReceivers[destinationUserName].userId); /* TODO why json dumped 0 as str?*/
+	sendToServer({
+		content: message,
+		action: 'webrtc',
+		receiverName: destinationUserName,
+		receiverId: destinationUserId
+	});
+}
+
+
+function connectWebRtc(stream) {
+	var RTCPeerConnection = webkitRTCPeerConnection || mozRTCPeerConnection;
+	pc = new RTCPeerConnection(pc_config, pc_constraints);
+	pc.onaddstream = function (event) {
+		$('remote').src =URL.createObjectURL(event.stream);
+		$('remote').play();
+		console.log(getDebugMessage("Stream attached"));
+	};
+	pc.onicecandidate = function (event) {
+		if (event.candidate) {
+			sendWebRtcEvent(event.candidate);
+		}
+	};
+
+	if (stream) {
+		pc.addStream(stream);
+		$('local').src = URL.createObjectURL(stream);
+		$('local').play();
+	}
+
+	//if (initiator) {
+	try {
+		// Reliable data channels not supported by Chrome
+		sendChannel = pc.createDataChannel("sendDataChannel", {reliable: false});
+		sendChannel.onmessage = function(message){
+			console.log(getDebugMessage("SC in {}",message.data));
+		};
+		console.log(getDebugMessage("Created send data channel"));
+	} catch (e) {
+		var error = getText("Failed to create data channel because {} ", e.message || e);
+		console.error(getDebugMessage(error));
+		growlError(error);
+	}
+
+	//} else {
+	//	pc.ondatachannel = gotReceiveChannel;
+	//}
+	//
+	//if (initiator) {
+	pc.createOffer(function (offer) {
+		console.log(getDebugMessage('created offer...'));
+		pc.setLocalDescription(offer, function () {
+			console.log(getDebugMessage('sending to remote...'));
+			sendWebRtcEvent(offer);
+		}, failWebRtc);
+	}, failWebRtc, sdpConstraints);
+	//}
+}
+
+
+function callPeople(message) {
+	// FIXME , no selection error, more than 1 - error
+	var destinationUserName = Object.keys(webRtcReceivers)[0];
+	var destinationUserId = parseInt(webRtcReceivers[destinationUserName].userId); /* TODO why json dumped 0 as str?*/
+	sendToServer({
+		content: message,
+		action: 'call',
+		receiverName: destinationUserName,
+		receiverId: destinationUserId
+	});
+}
+
+
 function createCall() {
 	var constraints = {
 		/*callActive = disable*/
 		audio: document.querySelector('.callContainerIcons .icon-mic.callActiveIcon') == null,
 		video: document.querySelector('.callContainerIcons .icon-videocam.callActiveIcon') == null
 	};
-
 	if (constraints.audio || constraints.video) {
-		navigator.getUserMedia(constraints, connect, fail);
+		navigator.getUserMedia(constraints, connectWebRtc, failWebRtc);
 	} else {
-
-		if (stream) {
-			pc.addStream(stream);
-			$('#local').attachStream(stream);
-		}
-
-		pc.onaddstream = function (event) {
-			$('#remote').attachStream(event.stream);
-			logStreaming(true);
-		};
-		pc.onicecandidate = function (event) {
-			if (event.candidate) {
-				ws.send(JSON.stringify(event.candidate));
-			}
-		};
-
-		if (initiator) {
-			try {
-				// Reliable data channels not supported by Chrome
-				sendChannel = pc.createDataChannel("sendDataChannel", {reliable: false});
-				sendChannel.onmessage = handleMessage;
-				trace("Created send data channel");
-			} catch (e) {
-				alert('Failed to create data channel. ' +
-						'You need Chrome M25 or later with RtpDataChannel enabled');
-				trace('createDataChannel() failed with exception: ' + e.message);
-			}
-			sendChannel.onopen = handleSendChannelStateChange;
-			sendChannel.onclose = handleSendChannelStateChange;
-
-		} else {
-			pc.ondatachannel = gotReceiveChannel;
-		}
-
-		ws.onmessage = function (event) {
-			var signal = JSON.parse(event.data);
-			if (signal.sdp) {
-				if (initiator) {
-					receiveAnswer(signal);
-				} else {
-					receiveOffer(signal);
-				}
-			} else if (signal.candidate) {
-				pc.addIceCandidate(new RTCIceCandidate(signal));
-			} else if (signal.message) {
-			}
-		};
-
-		if (initiator) {
-			createOffer();
-		} else {
-			log('waiting for offer...');
-		}
-		logStreaming(false);
+		connectWebRtc();
 	}
 
+}
+
+function failWebRtc() {
+	var text = "Error while webrtc calling: " + Array.prototype.join.call(arguments, ' ');
+	console.error(getDebugMessage(text));
+	growlError(text);
 }
 
 
@@ -344,13 +371,19 @@ function showCallDialog() {
 			callUserList.appendChild(li);
 		}
 	}
-	CssUtils.showElement($('callContainerParent'));
+	CssUtils.showElement($('callContainer'));
 }
 
 
 function callUserListClick(event) {
 	if (event.target.tagName == 'LI') {
 		CssUtils.toggleClass(event.target, "active-call-user");
+		var userName = event.target.textContent;
+		if (webRtcReceivers[userName]) {
+			delete webRtcReceivers[userName];
+		} else {
+			webRtcReceivers[userName] = onlineUsers[userName];
+		}
 	}
 	event.stopPropagation();
 }
@@ -434,38 +467,39 @@ function loadMessagesFromLocalStorage() {
 }
 
 
+function onWsClose(e) {
+	var reason = e.reason || e;
+	if (e.code === 403 && sessionWasntUpdated) {
+		sessionWasntUpdated = false;
+		var message = getText("Server has forbidden request because '{}'. Trying to update session key", reason);
+		growlInfo(message);
+		console.error(getDebugMessage(message));
+		doGet("/update_session_key", function (response) {
+			if (response === RESPONSE_SUCCESS) {
+				console.log(getDebugMessage('Session key has been successfully updated'));
+			} else {
+				console.error(getDebugMessage('Updating session key has failed. Server response: "{}"', response));
+			}
+		});
+	} else if (wsState === 0) {
+		growlError("Can't establish connection with chat server");
+		console.error(getText("Chat server is down because ", reason));
+	} else if (wsState === 9) {
+		growlError(getText("Connection to chat server has been lost", reason));
+		console.error(getDebugMessage(
+				'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
+				e.reason, CONNECTION_RETRY_TIME));
+	}
+	wsState = 1;
+	// Try to reconnect in 10 seconds
+	setTimeout(start_chat_ws, CONNECTION_RETRY_TIME);
+}
+
+
 function start_chat_ws() {
 	ws = new WebSocket(API_URL);
 	ws.onmessage = webSocketMessage;
-	ws.onclose = function (e) {
-		var reason = e.reason || e;
-		if (e.code === 403 && sessionWasntUpdated) {
-			sessionWasntUpdated = false;
-			var message = getText("Server has forbidden request because '{}'. Trying to update session key", reason);
-			growlInfo(message);
-			console.error(getDebugMessage(message));
-			doGet("/update_session_key", function (response) {
-				if (response === RESPONSE_SUCCESS) {
-					console.log(getDebugMessage('Session key has been successfully updated'));
-				} else {
-					console.error(getDebugMessage('Updating session key has failed. Server response: "{}"', response));
-				}
-			});
-		} else if (wsState === 0) {
-			growlError("Can't establish connection with chat server");
-			console.error(getText("Chat server is down becase", reason));
-		} else if (wsState === 9) {
-			growlError(getText("Connection to chat server has been lost", reason));
-			console.error(getDebugMessage(
-					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
-					e.reason, CONNECTION_RETRY_TIME));
-		}
-		wsState = 1;
-		// Try to reconnect in 10 seconds
-		setTimeout(function () {
-			start_chat_ws()
-		}, CONNECTION_RETRY_TIME);
-	};
+	ws.onclose = onWsClose;
 	ws.onopen = function () {
 		if (wsState === 1) { // if not inited don't growl message on page load
 			growlSuccess("Connection to server has been established");
@@ -557,7 +591,7 @@ function getPosition(time) {
 /** Creates a DOM node with attached events and all message content*/
 function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix, userId) {
 	var date = new Date(timeMillis);
-	var time = sliceZero(date.getHours())+":"+sliceZero(date.getMinutes())+":"+sliceZero(date.getSeconds());
+	var time = [sliceZero(date.getHours()), sliceZero(date.getMinutes()), sliceZero(date.getSeconds())].join(':');
 
 	var p = document.createElement('p');
 	p.setAttribute("id", timeMillis);
@@ -832,6 +866,12 @@ function handlePreparedWSMessage(data) {
 		case 'rooms':
 			setupChannels(data.content);
 			break;
+		case 'webrtc':
+			conntectWebrtc(data.content);
+			break;
+		case 'call':
+			showAnswerDialog(data);
+			break;
 		case 'growl':
 			growlError(data.content);
 			break;
@@ -839,6 +879,59 @@ function handlePreparedWSMessage(data) {
 			console.error(getDebugMessage('Unknown message type  {}', JSON.stringify(data)));
 	}
 }
+
+
+function conntectWebrtc(signal) {
+	var constraints = {
+		/*callActive = disable*/
+		audio: true,
+		video: true // TODO remove hardcode
+	};
+	if (constraints.audio || constraints.video) {
+		getUserMedia(constraints, connect, fail);
+	} else {
+		connect();
+	}
+
+	if (signal.sdp) {
+		pc.setRemoteDescription(new RTCSessionDescription(signal), function () {
+			console.log(getDebugMessage('creating answer...'));
+			pc.setRemoteDescription(new RTCSessionDescription(signal), function () {
+				console.log(getDebugMessage('created answer...'));
+				pc.createAnswer(function (answer) {
+					console.log(getDebugMessage('sent answer...'));
+					pc.setLocalDescription(answer, function () {
+						sendWebRtcEvent(answer);
+					}, failWebRtc);
+				}, failWebRtc, sdpConstraints);
+			}, failWebRtc);
+		});
+	} else if (signal.candidate) {
+		pc.addIceCandidate(new RTCIceCandidate(signal));
+	} else if (signal.message) {
+	}
+}
+
+
+function showAnswerDialog(message) {
+	CssUtils.showElement($('callAnswerParent'));
+	$('callAnswerText').textContent = getText("{} is calling you", message.user)
+}
+
+function answerWebRtcCall(){
+
+}
+
+
+function declineWebRtcCall(){
+	CssUtils.hideElement($('callAnswerParent'));
+}
+
+
+function videoAnswerWebRtcCall(){
+
+}
+
 
 function setupChannels(channels) {
 	charRooms.innerHTML = '';
