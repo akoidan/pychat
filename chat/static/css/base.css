@@ -65,7 +65,7 @@
 }
 
 /*-------- FONTELLO ------------*/
-.color-lor [class^='icon-']:not([class='icon-anonymous']):hover {
+.color-lor [class^='icon-']:not(.icon-anonymous):hover {
 	text-shadow: 0 0 0.2em #FFF, 0 0 0.2em #3D3D3D;
 }
 [class^='icon-volume'] { color: rgb(138, 109, 59); }
@@ -79,11 +79,11 @@
 .icon-sign-out { color: rgb(169, 68, 66); }
 .icon-wrench { color: rgb(70, 133, 117); }
 .icon-clear { color: rgb(142, 53, 84); }
-.icon-man {color: rgb(84, 151, 83) !important; } /*override .color-lor:link*/
-.icon-girl { color: #bb686a !important; } /*override .color-lor:link */
-.icon-anonymous { color: #C2C2C2 !important; } /*override .color-lor:link*/
-.icon-user-secret { color: rgb(92, 148, 163) !important; } /*override .color-lor:link*/
-.icon-phone { color: #136C00 } /*override .color-lor:link*/
+.icon-man {color: rgb(84, 151, 83) !important; } /*override .color-lor :link*/
+.icon-girl { color: #bb686a !important; } /*override .color-lor :link */
+.icon-anonymous { color: #C2C2C2 !important; } /*override .color-lor :link*/
+.icon-user-secret { color: rgb(92, 148, 163) !important; } /*override .color-lor :link*/
+.icon-phone { color: #136C00 } /*override .color-lor :link*/
 
 /*--------PAGE SPECIFIC--------------*/
 .color-lor #hideableDropDown {
@@ -102,10 +102,10 @@ input:-webkit-autofill, div[contenteditable]:-webkit-autofill, textarea:-webkit-
 }
 /*TODO html scroll doesn't show with .color-lor class for body*/
 ::-webkit-scrollbar {
-	background: #222 !important;
+	background: #222;
 }
 ::-webkit-scrollbar-thumb {
-	background: #3E4654 !important;;
+	background: #3E4654;;
 }
 
 /*IE scroll*/
@@ -160,11 +160,6 @@ img {
 	border-radius: 1px;
 }
 
-nav {
-	/*Icons navbar size*/
-	font-size: 26px;
-}
-
 .fullwidth {
 	width: 100%;
 }
@@ -186,6 +181,10 @@ nav {
 	display: none !important;
 }
 
+nav {
+	/*Icons navbar size*/
+	font-size: 26px;
+}
 nav > ul {
 	margin: 0;
 	padding: 10px 4px 9px 10px;
@@ -306,7 +305,7 @@ input[type=text], input[type=password], input[type=email], textarea,div[contente
 	padding-left: 5px;
 }
 
-input[type=button], input[type=submit], button {
+input[type=button], input[type=submit], button, input[type=file]::-webkit-file-upload-button{
 	border: 1px solid transparent;
 	border-radius: 3px;
 	font-size: 18px;
@@ -322,7 +321,11 @@ textarea, div[contenteditable] {
 nav [class^='icon-'] {
 	margin: 2px;
 }
-[class^='icon-']:not([class='icon-anonymous']):hover { cursor: pointer;}
+
+[class^='icon-']:not(.icon-anonymous):hover {
+	cursor: pointer;
+}
+
 /*================= SCROLLBAR ==================== */
 
 ::-webkit-scrollbar {
@@ -349,17 +352,10 @@ nav [class^='icon-'] {
 
 input[type=file] {
 	-webkit-appearance: textfield;
+	-moz-appearance: textfield;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	/*background-color: red;*/
-}
-
-input[type=file]::-webkit-file-upload-button {
-	border: 1px solid transparent;
-	border-radius: 3px;
-	font-size: 18px;
-	padding: 6px 12px;
-	horiz-align: center;
 }
 
 input[type=file]::-webkit-file-upload-button:hover {
@@ -368,7 +364,6 @@ input[type=file]::-webkit-file-upload-button:hover {
 /* "x::-webkit-file-upload-button" forces the rules to only apply to browsers that support this pseudo-element */
 
 /* ====================== PROFILE.CSS ================= */
-
 
 .two-columns  > * {
 	width: 50%;
@@ -382,7 +377,6 @@ video {
 #ajaxStatus {
     display : none;
 }
-
 #ajaxStatus.show {
 	display: block;
 	position: fixed;
@@ -396,13 +390,14 @@ video {
 	right: 0;
 	top: 0;
 }
+
 #userProfileData select {
 	width: 100%;
 }
 #userProfileData input {
 	width: calc(100% - 18px)
 }
-table#userProfileData {
+#userProfileData {
 	max-width: 750px; /*width of collapsed below*/
 }
 #userProfileData td { /*th - first col, td 2nd*/

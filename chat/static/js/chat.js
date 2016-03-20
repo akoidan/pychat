@@ -41,7 +41,6 @@ const STORAGE_USER = 'user';
 var headerId;
 //  div that contains messages
 var chatBoxDiv;
-var chatBoxWrapper;
 
 //sound
 var chatIncoming;
@@ -93,7 +92,6 @@ onDocLoad(function () {
 	chatLogout = $("chatLogout");
 	receiverId = $("receiverId");
 	charRooms = $("rooms");
-	chatBoxWrapper = $('wrapper');
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	window.addEventListener("blur", changeTittleFunction);
@@ -329,7 +327,7 @@ function loadMessagesFromLocalStorage() {
 		window.sound = 0;
 		window.loggingEnabled = false;
 		for (var i = 0; i < parsedData.length; i++) {
-			handlePreparedWSMessage(parsedData[i]);
+			MessagedHandler[parsedData[i].action](parsedData[i]);
 		}
 		window.loggingEnabled = true;
 		window.sound = savedSoundStatus;
@@ -688,59 +686,49 @@ function saveMessageToStorage(objectItem, jsonItem) {
 }
 
 
-function handlePreparedWSMessage(data) {
-	switch (data.action) {
-		case 'messages':
-			handleGetMessages(data.content);
-			break;
-		case 'joined':
-		case 'left':
-		case 'onlineUsers':
-		case 'changed':
-			if (data.oldName === loggedUser) {
-				setUsername(data.user);
-			}
-			printRefreshUserNameToChat(data);
-			loadUsers(data.content);
-			break;
-		case 'me':
-			setUsername(data.content);
-			break;
-		case 'system':
-			displayPreparedMessage(systemHeaderClass, data.time, data.content, SYSTEM_USERNAME);
-			break;
-		case 'send':
-			printMessage(data);
-			if (loggedUser === data.user) {
-				checkAndPlay(chatOutgoing);
-			} else {
-				checkAndPlay(chatIncoming);
-				setTimeout(vibrate);
-			}
-			break;
-		case 'rooms':
-			setupChannels(data.content);
-			break;
-		case 'call':
-			if (data.type == 'webrtc') {
-				webRtcApi.onWebRtcConnect(data.content);
-			} else if (data.type == 'offer') {
-				webRtcApi.onIncomingCall(data);
-			} else if (data.type == 'decline') {
-				webRtcApi.onDecline();
-			} else if (data.type == 'finish') {
-				webRtcApi.onFinish();
-			}  else {
-				growlError("Unknown event " + JSON.stringify(data));
-			}
-			break;
-		case 'growl':
-			growlError(data.content);
-			break;
-		default:
-			console.error(getDebugMessage('Unknown message type  {}', JSON.stringify(data)));
+function changeOnlineUsers(data) {
+	if (data.oldName === loggedUser) {
+		setUsername(data.user);
+	}
+	printRefreshUserNameToChat(data);
+	loadUsers(data.content);
+}
+
+
+function handleSendMessage(data) {
+	printMessage(data);
+	if (loggedUser === data.user) {
+		checkAndPlay(chatOutgoing);
+	} else {
+		checkAndPlay(chatIncoming);
+		setTimeout(vibrate);
 	}
 }
+
+
+var MessagedHandler = {
+	joined: changeOnlineUsers,
+	left: changeOnlineUsers,
+	onlineUsers: changeOnlineUsers,
+	changed: changeOnlineUsers,
+	messages: handleGetMessages,
+	me: function(data) {
+		setUsername(data.content);
+	},
+	system: function(data) {
+		displayPreparedMessage(systemHeaderClass, data.time, data.content, SYSTEM_USERNAME);
+	},
+	send: handleSendMessage,
+	rooms: function(data) {
+		setupChannels(data.content);
+	},
+	call: function(data) {
+		webRtcApi.onWsMessage(data);
+	},
+	growl: function (data) {
+		growlError(data.content);
+	}
+};
 
 
 var WebRtcApi = function () {
@@ -790,7 +778,7 @@ var WebRtcApi = function () {
 			if (localStreams.length > 0) {
 				var tracks = localStreams[0].getTracks();
 				for (var i = 0; i < tracks.length; i++) {
-					if (tracks[i].kind == kind) {
+					if (tracks[i].kind === kind) {
 						tracks[i].stop();
 						break;
 					}
@@ -844,7 +832,7 @@ var WebRtcApi = function () {
 		}
 		CssUtils.showElement(self.dom.callContainer);
 	};
-	self.answerWebRtcCall = function (message) {
+	self.answerWebRtcCall = function () {
 		CssUtils.hideElement(self.dom.callAnswerParent);
 		self.dom.callSound.pause();
 		self.setAudio(true);
@@ -902,6 +890,22 @@ var WebRtcApi = function () {
 		self.init();
 		self.pc.ondatachannel = self.gotReceiveChannel;
 	};
+	self.onWsMessage = function (data) {
+		switch (data.type) {
+			case 'webrtc':
+				self.onWebRtcConnect(data.content);
+				break;
+			case 'offer':
+				self.onIncomingCall(data);
+				break;
+			case 'decline':
+				self.onDecline();
+				break;
+			case 'finish':
+				self.onFinish();
+				break;
+		}
+	};
 	self.onWebRtcConnect = function (offer) {
 		if (offer.sdp) {
 			self.pc.setRemoteDescription(new RTCSessionDescription(offer), function () {
@@ -944,7 +948,11 @@ var WebRtcApi = function () {
 		};
 	};
 	self.closeEvents = function (text) {
-		self.pc.close();
+		if (self.pc.close) {
+			self.pc.close();
+		} else {
+			console.error("PC already closed");
+		}
 		if (self.localStream) {
 			var tracks = self.localStream.getTracks();
 			for (var i=0; i< tracks.length; i++) {
@@ -1003,7 +1011,7 @@ var WebRtcApi = function () {
 		console.error(getDebugMessage(text));
 	};
 	self.callUserListClick = function (event) {
-		if (event.target.tagName == 'LI') {
+		if (event.target.tagName === 'LI') {
 			CssUtils.toggleClass(event.target, "active-call-user");
 			var userName = event.target.textContent;
 			if (self.webRtcReceivers[userName]) {
@@ -1041,7 +1049,7 @@ function webSocketMessage(message) {
 	console.log(getDebugMessage("WS in: {}", jsonData));
 	var data = JSON.parse(jsonData);
 
-	handlePreparedWSMessage(data);
+	MessagedHandler[data.action](data);
 
 	//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
 	saveMessageToStorage(data, jsonData);
