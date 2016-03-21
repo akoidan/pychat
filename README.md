@@ -22,10 +22,7 @@ Windows:
  1. Install [python](https://www.python.org/downloads/) with pip 
  2. Add pip and python to PATH variable
  3. Install [redis](https://github.com/rgl/redis/downloads) 
- 4. Open cmd as Administrator and run `pip install -r requirements.txt`
- 5. Copy `static` directory from [djangochat-config](https://github.com/Deathangel908/djangochat-config) to `story` project directory
- 6. Unzip `static` directory from [dropbox](https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1) to `story` project directory
- 7. Open cmd and run `python manage.py init_db` from project directory
+ 4. Add git's bash commands (for example "C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin") to PATH variable
 
 Ubuntu:
  1. `apt-get install python`
@@ -37,7 +34,7 @@ Archlinux:
  2. `pacman -S pip`
  3. `pacman -S community/redis`
 
-Next steps are common for Linux:
+Next steps are common:
  1. `pip install -r requirements.txt`
  2. `python manage.py init_db`
  3. `sh download_content.sh`
