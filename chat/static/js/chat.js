@@ -387,6 +387,9 @@ function loadUsers(usernames) {
 		return;
 	}
 	onlineUsers = usernames;
+	if (!CssUtils.hasClass(webRtcApi.dom.callContainer, 'hidden')) {
+		webRtcApi.updateDomOnlineUsers();
+	}
 	console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
 	chatUsersTable.innerHTML = null;
 	var tbody = document.createElement('tbody');
@@ -734,6 +737,7 @@ var MessagedHandler = {
 
 var WebRtcApi = function () {
 	var self = this;
+	self.activeUserClass = "active-call-user";
 	self.dom = {
 		callContainer : $('callContainer'),
 		callAnswerParent : $('callAnswerParent'),
@@ -773,19 +777,15 @@ var WebRtcApi = function () {
 	self.webRtcReceivers = {};
 	var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
 
-	self.stopTrack = function(kind) {
-		if (self.pc) {
-			var localStreams = self.pc.getLocalStreams();
-			if (localStreams.length > 0) {
-				var tracks = localStreams[0].getTracks();
-				for (var i = 0; i < tracks.length; i++) {
-					if (tracks[i].kind === kind) {
-						tracks[i].stop();
-						break;
-					}
-				}
+	self.getTrack = function (isVideo) {
+		var track = null;
+		if (self.localStream) {
+			var tracks = isVideo ? self.localStream.getVideoTracks() : self.localStream.getAudioTracks();
+			if (tracks.length > 0) {
+				track = tracks[0]
 			}
 		}
+		return track;
 	};
 	self.setAudio = function (value) {
 		self.constraints.audio = value;
@@ -795,13 +795,26 @@ var WebRtcApi = function () {
 		self.constraints.video = value;
 		self.dom.videoStatusIcon.className = value ? "icon-videocam" : "icon-no-videocam callActiveIcon";
 	};
+	self.isActive = function () {
+		return self.localStream && self.localStream.active;
+	};
 	self.toggleMic = function () {
 		self.setAudio(!self.constraints.audio);
-		self.stopTrack('audio');
+		var audio = self.getTrack(false);
+		if (audio) {
+			audio.enabled = self.constraints.audio;
+		} else if (self.constraints.audio && self.isActive()) {
+			growlError("Unable to turn on mic");
+		}
 	};
 	self.toggleVideo = function () {
 		self.setVideo(!self.constraints.video);
-		self.stopTrack('video');
+		var video = self.getTrack(true);
+		if (video) {
+			video.enabled = self.constraints.video;
+		} else if (self.constraints.video && self.isActive()) {
+			growlError("Unable to turn on video");
+		}
 	};
 	self.onIncomingCall = function (message) {
 		checkAndPlay(self.dom.callSound);
@@ -819,17 +832,21 @@ var WebRtcApi = function () {
 			CssUtils.hideElement(self.dom.hangUpIcon);
 		}
 	};
-	self.showCallDialog = function (isCall) {
+	self.updateDomOnlineUsers = function() {
 		self.dom.callUserList.innerHTML = '';
-		self.setIconState(isCall);
-		if (!isCall) {
-			for (var userName in onlineUsers) {
+		self.receiverName = null;
+		for (var userName in onlineUsers) {
 				if (onlineUsers.hasOwnProperty(userName) && userName !== loggedUser) {
 					var li = document.createElement('li');
 					li.textContent = userName;
 					self.dom.callUserList.appendChild(li);
 				}
 			}
+	};
+	self.showCallDialog = function (isCallActive) {
+		self.setIconState(isCallActive);
+		if (!isCallActive) {
+			self.updateDomOnlineUsers();
 		}
 		CssUtils.showElement(self.dom.callContainer);
 	};
@@ -854,15 +871,20 @@ var WebRtcApi = function () {
 		self.showCallDialog(true);
 		self.createCall();
 	};
+	self.captureInput = function (callback, callIfNoSource) {
+		if (self.constraints.audio || self.constraints.video) {
+			navigator.getUserMedia(self.constraints, callback, self.failWebRtc);
+		} else if (callIfNoSource) {
+			callback();
+		}
+	};
 	self.callPeople = function (message) {
 		if (self.receiverName == null) {
 			growlError("Select exactly one user to call");
 			return;
 		}
 		self.waitForAnswer();
-		if (self.constraints.audio || self.constraints.video) {
-			navigator.getUserMedia(self.constraints, self.attachLocalStream, self.failWebRtc);
-		}
+		self.captureInput(self.attachLocalStream);
 		self.sendBaseEvent(null, 'offer');
 	};
 	self.createCallAfterCapture = function(stream) {
@@ -871,11 +893,7 @@ var WebRtcApi = function () {
 		self.connectWebRtc();
 	};
 	self.createCall = function () {
-		if (self.constraints.audio || self.constraints.video) {
-			navigator.getUserMedia(self.constraints, self.createCallAfterCapture, self.failWebRtc);
-		} else {
-			self.createCallAfterCapture();
-		}
+		self.captureInput(self.createCallAfterCapture, true);
 	};
 	self.print = function (){
 		growlInfo('something happened');
@@ -934,6 +952,8 @@ var WebRtcApi = function () {
 			self.pc.addStream(stream);
 			self.setVideoSource(self.dom.local, stream);
 		}
+		self.setVideo(self.getTrack(true) != null);
+		self.setAudio(self.getTrack(false) != null);
 	};
 	self.init = function() {
 		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
@@ -1015,17 +1035,20 @@ var WebRtcApi = function () {
 	};
 	self.callUserListClick = function (event) {
 		if (event.target.tagName === 'LI') {
-			CssUtils.toggleClass(event.target, "active-call-user");
+			var hasClass = CssUtils.hasClass(event.target, self.activeUserClass);
+			var users = self.dom.callUserList.childNodes;
+			for (var i=0; i< users.length; i++) {
+				CssUtils.removeClass(users[i], self.activeUserClass);
+			}
 			var userName = event.target.textContent;
-			if (self.webRtcReceivers[userName]) {
-				delete self.webRtcReceivers[userName];
+			if (hasClass) {
 				self.receiverName = null;
+				self.receiverId = null;
+				CssUtils.removeClass(event.target, self.activeUserClass);
 			} else {
-				// FIXME , no selection error, more than 1 - error
-				/* TODO why json dumped 0 as str?*/
-				self.webRtcReceivers[userName] = parseInt(onlineUsers[userName].userId);
 				self.receiverName = userName;
-				self.receiverId =parseInt(onlineUsers[userName].userId);
+				self.receiverId = parseInt(onlineUsers[userName].userId);
+				CssUtils.addClass(event.target, self.activeUserClass);
 			}
 		}
 		event.stopPropagation();
