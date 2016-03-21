@@ -7,5 +7,6 @@ tornado-redis
 django-redis-sessions
 selenium # optional for testing, comment this if you don't go for tests
 websocket-client
+django-sslserver # for browser access to input devices
 #django-redis-cache
 mysqlclient

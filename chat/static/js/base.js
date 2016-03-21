@@ -83,19 +83,18 @@ function encodeAnchorsHTML(html) {
 
 var CssUtils = {
 	visibilityClass: 'hidden',
+	hasClass: function(element, className){
+		return element.className != null && element.className.indexOf(className) >= 0;
+	},
 	addClass: function (element, className) {
-		if (element.className == null) {
-			element.className = '';
-		}
-		if (element.className.indexOf(className) < 0) {
+		if (!this.hasClass(element, className)) {
 			element.className += " " + className;
 		}
 	},
 	removeClass: function (element, className) {
-		if (element.className == null) {
-			return;
+		if (this.hasClass(element, className)) {
+			element.className = element.className.replace(className, '');
 		}
-		element.className = element.className.replace(className, '');
 	},
 	showElement: function (element) {
 		this.removeClass(element, this.visibilityClass)
@@ -107,10 +106,7 @@ var CssUtils = {
 		this.toggleClass(element,this.visibilityClass);
 	},
 	toggleClass: function (element, className) {
-		if (element.className == null) {
-			element.className = '';
-		}
-		if (element.className.indexOf(className) > -1) {
+		if (this.hasClass(element, className)) {
 			this.removeClass(element, className);
 		} else {
 			this.addClass(element, className);
