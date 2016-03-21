@@ -8,22 +8,22 @@
 				<tr>
 					<td><input type="text" maxlength="16" required placeholder="Username" name="username" value="" id="rusername"
 								  onchange="validateUser()"/></td>
-					<td><label id="username_check">Your login should be unique</label></td>
+					<td><label id="username_check" for="rusername">Your login should be unique</label></td>
 				</tr>
 				<tr>
 					<td><input type="password" required name="password" value=""
 								  id="rpassword" placeholder="Password" onchange="validatePassword(); passwordsMatch();"/></td>
-					<td><label id="password_check">At least 3 characters</label></td>
+					<td><label id="password_check" for="rpassword">At least 3 characters</label></td>
 				</tr>
 				<tr>
 					<td><input type="password" required placeholder="Repeat password" name="repeatpassword" value=""
 								  id="repeatpassword" onchange="passwordsMatch();"/></td>
-					<td><label id="repeatpassword_check">Repeat in case of misspelling</label></td>
+					<td><label id="repeatpassword_check" for="repeatpassword">Repeat in case of misspelling</label></td>
 				</tr>
 				<tr>
 					<td><input type="email" placeholder="Email" name="email" value="" id="email"
 								  onchange="validateEmail();"/></td>
-					<td><label id="email_check">Enter an email for extra features</label></td>
+					<td><label id="email_check" for="email">Enter an email for extra features</label></td>
 				</tr>
 				<tr>
 					<td>

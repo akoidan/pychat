@@ -36,7 +36,7 @@ Start the chat:
 
 TODO
 =============
-* CONNECTION_MAX_AGE = 3000  # 3600 in my.cnf TODO dooesn't work
+* remember if user has camera/mic and autoset values after second call
 * android play() can only be initiated by a user gesture.
 * transfer file to another user
 * insecure images on usermessage editable div prevent sending messages

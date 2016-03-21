@@ -23,7 +23,6 @@ const genderIcons = {
 	'Secret': 'icon-user-secret'
 };
 
-var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 var imgRegex = /<img[^>]*alt="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
@@ -38,17 +37,12 @@ var isCurrentTabActive = true;
 //localStorage  key
 const STORAGE_NAME = 'main';
 const STORAGE_USER = 'user';
-const DISABLE_NAV_HEIGHT = 240;
 //current top message id for detecting from what
 var headerId;
 //  div that contains messages
 var chatBoxDiv;
-var navbarList;
-var navbar;
 var chatBoxWrapper;
-var smileParentHolder;
-var smileyDict = {};
-var tabNames = [];
+
 //sound
 var chatIncoming;
 var chatOutgoing;
@@ -76,17 +70,17 @@ var chatUserRoomWrapper; // for hiddding users
 //All <p> ids (every id is UTC millis). this helps to prevent duplications, and detect position
 var allMessages = [];
 var allMessagesDates = [];
+var onlineUsers = {};
+var webRtcApi;
+var smileyUtil;
 
-//
-//window.onerror = function (msg, url, linenumber) {
-//	alert('Error message: ' + msg + '\nURL: ' + url + '\nLine Number: ' + linenumber);
-//	return true;
-//};
+var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
+if (isFirefox) {
+	RTCSessionDescription = mozRTCSessionDescription;
+	RTCIceCandidate = mozRTCIceCandidate;
+}
 
 onDocLoad(function () {
-	//	if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-	//		alert('you can download app');
-	//}
 	chatBoxDiv = $("chatbox");
 	userMessage = $("usermsg");
 	chatUsersTable = $("chat-user-table");
@@ -97,28 +91,23 @@ onDocLoad(function () {
 	chatOutgoing = $("chatOutgoing");
 	chatLogin = $("chatLogin");
 	chatLogout = $("chatLogout");
-	smileParentHolder =  $('smileParentHolder');
-	navbar = document.querySelector('nav');
 	receiverId = $("receiverId");
 	charRooms = $("rooms");
-	navbarList = $('navbarList');
 	chatBoxWrapper = $('wrapper');
-	hideElement(userSendMessageTo);
-	hideElement(smileParentHolder);
-	addSmileysEvents();
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
-	chatBoxDiv.addEventListener("keydown", keyDownLoadUp);  //TODO doesn't work in chromium for div
 	window.addEventListener("blur", changeTittleFunction);
 	window.addEventListener("focus", changeTittleFunction);
-	$('tabNames').addEventListener('click', showTabByName);
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	start_chat_ws();
-	userMessage.addEventListener('keydown', checkAndSendMessage);
 	//bottom call loadMessagesFromLocalStorage(); s
-	doGet(SMILEYS_JSON_URL, loadSmileys);
 	showHelp();
 	userMessage.focus();
+	new Draggable($('callContainer'), $('callContainerHeader'));
+	webRtcApi = new WebRtcApi();
+	smileyUtil = new SmileyUtil();
+	smileyUtil.init();
+	loadMessagesFromLocalStorage();
 });
 
 
@@ -127,93 +116,106 @@ function showHelp() {
 }
 
 
-function addSmileysEvents() {
-	document.addEventListener("click", function (event) {
+var SmileyUtil = function () {
+	var self = this;
+	self.dom = {
+		smileParentHolder : $('smileParentHolder')
+	};
+	self.tabNames = [];
+	self.smileyDict = {};
+	self.init = function () {
+		document.addEventListener("click", self.onDocClick);
+		doGet(SMILEYS_JSON_URL, self.loadSmileys);
+	};
+	self.hideSmileys = function() {
+		CssUtils.hideElement(self.dom.smileParentHolder);
+	};
+	self.onDocClick = function (event) {
 		event = event || window.event;
-		var level = 0;
 		for (var element = event.target; element; element = element.parentNode) {
-			if (element.id === "bottomWrapper" || element.id === smileParentHolder.id) {
+			if (element.id === "bottomWrapper" || element.id === self.dom.smileParentHolder.id) {
 				userMessage.focus();
 				return;
 			}
-			level++;
 		}
-		hideElement(smileParentHolder);
-	});
-}
-
-
-function toggleSmileys(event) {
-	event.stopPropagation(); // prevent top event
-	toogleVisibility(smileParentHolder);
-	userMessage.focus();
-}
-
-
-function showTabByName(event) {
-	if (event.target != null) {
-		if (event.target.tagName !== 'LI') {
-			// outer scope click
+		self.hideSmileys();
+	};
+	self.addSmile = function (event) {
+		event = event || window.event;
+		var smileImg = event.target;
+		if (smileImg.tagName !== 'IMG') {
 			return;
 		}
-	}
-	var tagName = event.target == null ? event : event.target.innerHTML;
-	for (var i = 0; i < tabNames.length; i++) {
-		hideElement($("tab-"+tabNames[i])); // loadSmileys currentSmileyHolderId
-		showElement($("tab-name-"+tabNames[i]), 'activeTab');
-	}
-	showElement($("tab-" + tagName));
-	hideElement($("tab-name-" + tagName), 'activeTab');
-}
+		userMessage.innerHTML += smileImg.outerHTML;
+		console.log(getDebugMessage('Added smile "{}"', smileImg.alt));
+	};
+	self.encodeSmileys = function (html) {
+		html = encodeAnchorsHTML(html);
+		for (var el in self.smileyDict) {
+			if (self.smileyDict.hasOwnProperty(el)) {
+				// replace all occurences
+				// instead of replace that could generates infinitive loop
+				html = html.split(el).join(self.smileyDict[el]);
+			}
+		}
+		return html;
+	};
+	self.toggleSmileys = function (event) {
+		event.stopPropagation(); // prevent top event
+		CssUtils.toggleVisibility(self.dom.smileParentHolder);
+		userMessage.focus();
+	};
+	self.showTabByName = function (event) {
+		if (event.target != null) {
+			if (event.target.tagName !== 'LI') {
+				// outer scope click
+				return;
+			}
+		}
+		var tagName = event.target == null ? event : event.target.innerHTML;
+		for (var i = 0; i < self.tabNames.length; i++) {
+			CssUtils.hideElement($("tab-" + self.tabNames[i])); // loadSmileys currentSmileyHolderId
+			CssUtils.removeClass($("tab-name-" + self.tabNames[i]), 'activeTab');
+		}
+		CssUtils.showElement($("tab-" + tagName));
+		CssUtils.addClass($("tab-name-" + tagName), 'activeTab');
+	};
 
-// TODO refactor this, it's hard to read
-function loadSmileys(jsonData) {
-	var smileyData = JSON.parse(jsonData);
-	for (var tab in smileyData) {
-		if (smileyData.hasOwnProperty(tab)) {
-			var tabRef = document.createElement('div');
-			tabRef.setAttribute("name", tab);
-			var tabName = document.createElement("LI");
-			tabName.setAttribute("id", "tab-name-" + tab);
-			var textNode = document.createTextNode(tab);
-			tabName.appendChild(textNode);
-			$("tabNames").appendChild(tabName);
-			var currentSmileyHolderId = "tab-" + tab;
-			tabRef.setAttribute("id", currentSmileyHolderId);
-			tabNames.push(tab);
-			smileParentHolder.appendChild(tabRef);
+	self.loadSmileys = function (jsonData) {
+		var smileyData = JSON.parse(jsonData);
+		for (var tab in smileyData) {
+			if (smileyData.hasOwnProperty(tab)) {
+				var tabRef = document.createElement('div');
+				tabRef.setAttribute("name", tab);
+				var tabName = document.createElement("LI");
+				tabName.setAttribute("id", "tab-name-" + tab);
+				var textNode = document.createTextNode(tab);
+				tabName.appendChild(textNode);
+				$("tabNames").appendChild(tabName);
+				var currentSmileyHolderId = "tab-" + tab;
+				tabRef.setAttribute("id", currentSmileyHolderId);
+				self.tabNames.push(tab);
+				self.dom.smileParentHolder.appendChild(tabRef);
 
-			var tabSmileys = smileyData[tab];
-			for (var smile in tabSmileys) {
-				if (tabSmileys.hasOwnProperty(smile)) {
-					var fileRef = document.createElement('IMG');
-					var fullSmileyUrl = SMILEY_URL + tab + '/' + tabSmileys[smile];
-					fileRef.setAttribute("src", fullSmileyUrl);
-					fileRef.setAttribute("alt", smile);
-					 tabRef.appendChild(fileRef);
-					// http://stackoverflow.com/a/1750860/3872976
-					/** encode dict key, so {@link encodeSmileys} could parse smileys after encoding */
-					smileyDict[encodeHTML(smile)] = fileRef.outerHTML;
+				var tabSmileys = smileyData[tab];
+				for (var smile in tabSmileys) {
+					if (tabSmileys.hasOwnProperty(smile)) {
+						var fileRef = document.createElement('IMG');
+						var fullSmileyUrl = SMILEY_URL + tab + '/' + tabSmileys[smile];
+						fileRef.setAttribute("src", fullSmileyUrl);
+						fileRef.setAttribute("alt", smile);
+						tabRef.appendChild(fileRef);
+						// http://stackoverflow.com/a/1750860/3872976
+						/** encode dict key, so {@link encodeSmileys} could parse smileys after encoding */
+						self.smileyDict[encodeHTML(smile)] = fileRef.outerHTML;
+					}
 				}
 			}
 		}
+
+		self.showTabByName(Object.keys(smileyData)[0]);
 	}
-
-	showTabByName(Object.keys(smileyData)[0]);
-
-	loadMessagesFromLocalStorage();
-}
-
-
-function addSmile(event) {
-	event = event || window.event;
-	var smileImg = event.target;
-	if (smileImg.tagName !== 'IMG') {
-		return;
-	}
-	userMessage.innerHTML += smileImg.outerHTML;
-	console.log(getDebugMessage('Added smile "{}"', smileImg.alt));
-}
+};
 
 
 /*==================== DOM EVENTS LISTENERS ============================*/
@@ -246,7 +248,7 @@ function userClick(event) {
 	event = event || window.event;
 	var target = event.target || event.srcElement;
 	destinationUserName = target.innerHTML;
-	showElement(userSendMessageTo);
+	CssUtils.showElement(userSendMessageTo);
 	// Empty sets display to none
 	receiverId.textContent = destinationUserName;
 	userMessage.focus();
@@ -254,11 +256,6 @@ function userClick(event) {
 		// icon click
 		destinationUserId = parseInt(target.attributes.name.value);
 	}
-}
-
-
-function createCall() {
-	alert('This function is under development!');
 }
 
 
@@ -316,7 +313,7 @@ function checkAndSendMessage(event) {
 
 		sendMessage(messageContent);
 	} else if (event.keyCode === 27) { // 27 = escape
-		hideElement(smileParentHolder);
+		smileyUtil.hideSmileys();
 	}
 }
 
@@ -340,38 +337,39 @@ function loadMessagesFromLocalStorage() {
 }
 
 
+function onWsClose(e) {
+	var reason = e.reason || e;
+	if (e.code === 403 && sessionWasntUpdated) {
+		sessionWasntUpdated = false;
+		var message = getText("Server has forbidden request because '{}'. Trying to update session key", reason);
+		growlInfo(message);
+		console.error(getDebugMessage(message));
+		doGet("/update_session_key", function (response) {
+			if (response === RESPONSE_SUCCESS) {
+				console.log(getDebugMessage('Session key has been successfully updated'));
+			} else {
+				console.error(getDebugMessage('Updating session key has failed. Server response: "{}"', response));
+			}
+		});
+	} else if (wsState === 0) {
+		growlError("Can't establish connection with chat server");
+		console.error(getText("Chat server is down because ", reason));
+	} else if (wsState === 9) {
+		growlError(getText("Connection to chat server has been lost", reason));
+		console.error(getDebugMessage(
+				'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
+				e.reason, CONNECTION_RETRY_TIME));
+	}
+	wsState = 1;
+	// Try to reconnect in 10 seconds
+	setTimeout(start_chat_ws, CONNECTION_RETRY_TIME);
+}
+
+
 function start_chat_ws() {
 	ws = new WebSocket(API_URL);
 	ws.onmessage = webSocketMessage;
-	ws.onclose = function (e) {
-		var reason = e.reason || e;
-		if (e.code === 403 && sessionWasntUpdated) {
-			sessionWasntUpdated = false;
-			var message = getText("Server has forbidden request because '{}'. Trying to update session key", reason);
-			growlInfo(message);
-			console.error(getDebugMessage(message));
-			doGet("/update_session_key", function (response) {
-				if (response === RESPONSE_SUCCESS) {
-					console.log(getDebugMessage('Session key has been successfully updated'));
-				} else {
-					console.error(getDebugMessage('Updating session key has failed. Server response: "{}"', response));
-				}
-			});
-		} else if (wsState === 0) {
-			growlError("Can't establish connection with chat server");
-			console.error(getText("Chat server is down becase", reason));
-		} else if (wsState === 9) {
-			growlError(getText("Connection to chat server has been lost", reason));
-			console.error(getDebugMessage(
-					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
-					e.reason, CONNECTION_RETRY_TIME));
-		}
-		wsState = 1;
-		// Try to reconnect in 10 seconds
-		setTimeout(function () {
-			start_chat_ws()
-		}, CONNECTION_RETRY_TIME);
-	};
+	ws.onclose = onWsClose;
 	ws.onopen = function () {
 		if (wsState === 1) { // if not inited don't growl message on page load
 			growlSuccess("Connection to server has been established");
@@ -379,20 +377,6 @@ function start_chat_ws() {
 		wsState = 9;
 		console.log(getDebugMessage("Connection to WebSocket established"));
 	};
-}
-
-function encodeSmileys(html) {
-	html = encodeHTML(html);
-	//&#x2F;&#x2F; = // (already encoded by encodeHTML above)
-	html = html.replace(/(https?:&#x2F;&#x2F;[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
-	for (var el in smileyDict) {
-		if (smileyDict.hasOwnProperty(el)) {
-			// replace all occurences
-			// instead of replace that could generates infinitive loop
-			html = html.split(el).join(smileyDict[el]);
-		}
-	}
-	return html;
 }
 
 
@@ -405,6 +389,7 @@ function loadUsers(usernames) {
 	if (!usernames) {
 		return;
 	}
+	onlineUsers = usernames;
 	console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
 	chatUsersTable.innerHTML = null;
 	var tbody = document.createElement('tbody');
@@ -463,7 +448,7 @@ function getPosition(time) {
 /** Creates a DOM node with attached events and all message content*/
 function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix, userId) {
 	var date = new Date(timeMillis);
-	var time = sliceZero(date.getHours())+":"+sliceZero(date.getMinutes())+":"+sliceZero(date.getSeconds());
+	var time = [sliceZero(date.getHours()), sliceZero(date.getMinutes()), sliceZero(date.getSeconds())].join(':');
 
 	var p = document.createElement('p');
 	p.setAttribute("id", timeMillis);
@@ -594,7 +579,7 @@ function printMessage(data) {
 	} else {
 		headerStyle = othersHeaderClass;
 	}
-	var preparedHtml = encodeSmileys(data['content']);
+	var preparedHtml = smileyUtil.encodeSmileys(data['content']);
 	displayPreparedMessage(headerStyle, data['time'], preparedHtml, displayedUsername, prefix, receiverId);
 }
 
@@ -698,9 +683,7 @@ function saveMessageToStorage(objectItem, jsonItem) {
 		case 'send':
 			fastAddToStorage(jsonItem);
 			break;
-		default:
-			console.log(getDebugMessage("Skipping saving message {}", jsonItem)); // TODO stringtrify?)))
-			break;
+	// everything else is not saved;
 	}
 }
 
@@ -738,6 +721,19 @@ function handlePreparedWSMessage(data) {
 		case 'rooms':
 			setupChannels(data.content);
 			break;
+		case 'call':
+			if (data.type == 'webrtc') {
+				webRtcApi.onWebRtcConnect(data.content);
+			} else if (data.type == 'offer') {
+				webRtcApi.onIncomingCall(data);
+			} else if (data.type == 'decline') {
+				webRtcApi.onDecline();
+			} else if (data.type == 'finish') {
+				webRtcApi.onFinish();
+			}  else {
+				growlError("Unknown event " + JSON.stringify(data));
+			}
+			break;
 		case 'growl':
 			growlError(data.content);
 			break;
@@ -745,6 +741,286 @@ function handlePreparedWSMessage(data) {
 			console.error(getDebugMessage('Unknown message type  {}', JSON.stringify(data)));
 	}
 }
+
+
+var WebRtcApi = function () {
+	var self = this;
+	self.dom = {
+		callContainer : $('callContainer'),
+		callAnswerParent : $('callAnswerParent'),
+		callAnswerText : $('callAnswerText'),
+		callUserList : $("callUserList"),
+		remote: $('remoteVideo'),
+		local: $('localVideo'),
+		callSound: $('chatCall'),
+		callIcon: $('callIcon'),
+		hangUpIcon: $('hangUpIcon'),
+		audioStatusIcon: $('audioStatusIcon'),
+		videoStatusIcon: $('videoStatusIcon')
+	};
+	self.dom.callSound.addEventListener("ended", function () {
+		checkAndPlay(self.dom.callSound);
+	});
+	self.pc = {};
+	self.constraints = {
+		audio: true,
+		video: true
+	};
+	var webRtcUrl = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
+	self.pc_config = {iceServers: [{url: webRtcUrl}]};
+	self.pc_constraints = {
+		optional: [
+			{DtlsSrtpKeyAgreement: true},
+			{RtpDataChannels: true}
+		]
+	};
+	// Set up audio and video regardless of what devices are present.
+	self.sdpConstraints = {
+		'mandatory': {
+			'OfferToReceiveAudio': true,
+			'OfferToReceiveVideo': true
+		}
+	};
+	self.webRtcReceivers = {};
+	var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
+
+	self.stopTrack = function(kind) {
+		if (self.pc) {
+			var localStreams = self.pc.getLocalStreams();
+			if (localStreams.length > 0) {
+				var tracks = localStreams[0].getTracks();
+				for (var i = 0; i < tracks.length; i++) {
+					if (tracks[i].kind == kind) {
+						tracks[i].stop();
+						break;
+					}
+				}
+			}
+		}
+	};
+	self.setAudio = function (value) {
+		self.constraints.audio = value;
+		self.dom.audioStatusIcon.className = value ? "icon-mic" : "icon-mute callActiveIcon";
+	};
+	self.setVideo = function (value) {
+		self.constraints.video = value;
+		self.dom.videoStatusIcon.className = value ? "icon-videocam" : "icon-no-videocam callActiveIcon";
+	};
+	self.toggleMic = function () {
+		self.setAudio(!self.constraints.audio);
+		self.stopTrack('audio');
+	};
+	self.toggleVideo = function () {
+		self.setVideo(!self.constraints.video);
+		self.stopTrack('video');
+	};
+	self.onIncomingCall = function (message) {
+		checkAndPlay(self.dom.callSound);
+		CssUtils.showElement(self.dom.callAnswerParent);
+		self.receiverName = message.user;
+		self.receiverId = message.userId;
+		self.dom.callAnswerText.textContent = getText("{} is calling you", self.receiverName)
+	};
+	self.setIconState = function(isCall) {
+		if (isCall) {
+			CssUtils.hideElement(self.dom.callIcon);
+			CssUtils.showElement(self.dom.hangUpIcon);
+		} else {
+			CssUtils.showElement(self.dom.callIcon);
+			CssUtils.hideElement(self.dom.hangUpIcon);
+		}
+	};
+	self.showCallDialog = function (isCall) {
+		self.dom.callUserList.innerHTML = '';
+		self.setIconState(isCall);
+		if (!isCall) {
+			for (var userName in onlineUsers) {
+				if (onlineUsers.hasOwnProperty(userName) && userName !== loggedUser) {
+					var li = document.createElement('li');
+					li.textContent = userName;
+					self.dom.callUserList.appendChild(li);
+				}
+			}
+		}
+		CssUtils.showElement(self.dom.callContainer);
+	};
+	self.answerWebRtcCall = function (message) {
+		CssUtils.hideElement(self.dom.callAnswerParent);
+		self.dom.callSound.pause();
+		self.setAudio(true);
+		self.setVideo(false);
+		self.showCallDialog(true);
+		self.createCall();
+	};
+	self.declineWebRtcCall = function () {
+		CssUtils.hideElement(self.dom.callAnswerParent);
+		self.dom.callSound.pause();
+		self.sendBaseEvent(null, 'decline');
+	};
+	self.videoAnswerWebRtcCall = function () {
+		CssUtils.hideElement(self.dom.callAnswerParent);
+		self.dom.callSound.pause();
+		self.setAudio(true);
+		self.setVideo(true);
+		self.showCallDialog(true);
+		self.createCall();
+	};
+	self.callPeople = function (message) {
+		if (self.receiverName == null) {
+			growlError("Select exactly one user to call");
+			return;
+		}
+		self.waitForAnswer();
+		if (self.constraints.audio || self.constraints.video) {
+			navigator.getUserMedia(self.constraints, self.attachLocalStream, self.failWebRtc);
+		}
+		self.sendBaseEvent(null, 'offer');
+	};
+	self.createCallAfterCapture = function(stream) {
+		self.init();
+		self.attachLocalStream(stream);
+		self.connectWebRtc();
+	};
+	self.createCall = function () {
+		if (self.constraints.audio || self.constraints.video) {
+			navigator.getUserMedia(self.constraints, self.createCallAfterCapture, self.failWebRtc);
+		} else {
+			self.createCallAfterCapture();
+		}
+	};
+	self.print = function (){
+		growlInfo('something happened');
+	};
+	self.gotReceiveChannel = function (event) { /* TODO is it used ? */
+		console.log(getDebugMessage('Received Channel Callback'));
+		self.sendChannel = event.channel;
+		self.sendChannel.onmessage = self.print;
+		self.sendChannel.onopen = self.print;
+		self.sendChannel.onclose = self.print;
+	};
+	self.waitForAnswer = function () {
+		self.init();
+		self.pc.ondatachannel = self.gotReceiveChannel;
+	};
+	self.onWebRtcConnect = function (offer) {
+		if (offer.sdp) {
+			self.pc.setRemoteDescription(new RTCSessionDescription(offer), function () {
+				console.log(getDebugMessage('creating answer...'));
+				self.pc.createAnswer(function (answer) {
+					console.log(getDebugMessage('sent answer...'));
+					self.pc.setLocalDescription(answer, function () {
+						self.sendWebRtcEvent(answer);
+					}, self.failWebRtc);
+				}, self.failWebRtc, self.sdpConstraints);
+			}, self.failWebRtc);
+		} else if (offer.candidate) {
+			self.pc.addIceCandidate(new RTCIceCandidate(offer));
+		} else if (offer.message) {
+			growlInfo(offer.message);
+		}
+	};
+	self.setVideoSource = function(domEl, stream) {
+		domEl.src = URL.createObjectURL(stream);
+		domEl.play();
+	};
+	self.attachLocalStream = function (stream) {
+		self.localStream = stream;
+		if (stream) {
+			self.pc.addStream(stream);
+			self.setVideoSource(self.dom.local, stream);
+		}
+	};
+	self.init = function() {
+		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
+		self.pc.onaddstream = function (event) {
+			self.setVideoSource(self.dom.remote, event.stream);
+			self.setIconState(true);
+			console.log(getDebugMessage("Stream attached"));
+		};
+		self.pc.onicecandidate = function (event) {
+			if (event.candidate) {
+				self.sendWebRtcEvent(event.candidate);
+			}
+		};
+	};
+	self.closeEvents = function (text) {
+		self.pc.close();
+		if (self.localStream) {
+			var tracks = self.localStream.getTracks();
+			for (var i=0; i< tracks.length; i++) {
+				tracks[i].stop()
+			}
+		}
+		growlInfo(text);
+		CssUtils.hideElement(self.dom.callContainer);
+	};
+	self.hangUp = function() {
+		self.sendBaseEvent(null, 'finish');
+		self.closeEvents("Call is finished.");
+	};
+	self.onDecline = function () {
+		self.closeEvents("User has declined the call");
+	};
+	self.onFinish = function() {
+		self.closeEvents("Opponent hung up. Call is finished.");
+	};
+	self.connectWebRtc = function () {
+		try {
+			// Reliable data channels not supported by Chrome
+			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
+			self.sendChannel.onmessage = function (message) {
+				console.log(getDebugMessage("SC in {}", message.data));
+			};
+			console.log(getDebugMessage("Created send data channel"));
+		} catch (e) {
+			var error = getText("Failed to create data channel because {} ", e.message || e);
+			growlError(error);
+			console.error(getDebugMessage(error));
+		}
+		self.pc.createOffer(function (offer) {
+			console.log(getDebugMessage('created offer...'));
+			self.pc.setLocalDescription(offer, function () {
+				console.log(getDebugMessage('sending to remote...'));
+				self.sendWebRtcEvent(offer);
+			}, self.failWebRtc);
+		}, self.failWebRtc, self.sdpConstraints);
+	};
+	self.sendBaseEvent = function(content, type) {
+		sendToServer({
+			content: content,
+			action: 'call',
+			type: type,
+			receiverName: self.receiverName,
+			receiverId: self.receiverId
+		});
+	};
+	self.sendWebRtcEvent = function (message) {
+		self.sendBaseEvent(message, 'webrtc');
+	};
+	self.failWebRtc = function () {
+		var text = "Error while webrtc calling: " + Array.prototype.join.call(arguments, ' ');
+		growlError(text);
+		console.error(getDebugMessage(text));
+	};
+	self.callUserListClick = function (event) {
+		if (event.target.tagName == 'LI') {
+			CssUtils.toggleClass(event.target, "active-call-user");
+			var userName = event.target.textContent;
+			if (self.webRtcReceivers[userName]) {
+				delete self.webRtcReceivers[userName];
+				self.receiverName = null;
+			} else {
+				// FIXME , no selection error, more than 1 - error
+				/* TODO why json dumped 0 as str?*/
+				self.webRtcReceivers[userName] = parseInt(onlineUsers[userName].userId);
+				self.receiverName = userName;
+				self.receiverId =parseInt(onlineUsers[userName].userId);
+			}
+		}
+		event.stopPropagation();
+	};
+};
+
 
 function setupChannels(channels) {
 	charRooms.innerHTML = '';
@@ -823,5 +1099,5 @@ function clearLocalHistory() {
 function hideUserSendToName() {
 	destinationUserId = null;
 	destinationUserName = null;
-	hideElement(userSendMessageTo);
+	CssUtils.hideElement(userSendMessageTo);
 }

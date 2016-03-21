@@ -1,8 +1,8 @@
 var lastEditUserNameTime = 0;
 const MIN_CHANGE_USERNAME_PERIOD = 2000;
 onDocLoad(function() {
-	hideElement($("hideableDropDown"));
-	hideElement($('inputName'));
+	CssUtils.hideElement($("hideableDropDown"));
+	CssUtils.hideElement($('inputName'));
 });
 
 function login() {
@@ -16,14 +16,14 @@ function login() {
 	doPost('/auth', null, callback, $('loginForm'));
 }
 function showLoginDropdown(e) {
-	showElement($("hideableDropDown"));
+	CssUtils.showElement($("hideableDropDown"));
 	e.stopPropagation();
 }
 
 onDocLoad(function () {
 
 	document.addEventListener("click", function () {
-		hideElement($("hideableDropDown"));
+		CssUtils.hideElement($("hideableDropDown"));
 	});
 
 	//Handles menu drop down
@@ -47,16 +47,16 @@ onDocLoad(function () {
 			growlError(getText("Please wait {}ms to be able to change username again!", timeToWait));
 			return;
 		}
-		hideElement(label);
+		CssUtils.hideElement(label);
 		var oldUsername = label.textContent;
 		var input = $('inputName');
 		input.focus();
 		input.value = oldUsername;
-		showElement(input);
+		CssUtils.showElement(input);
 		var sendChangeNickname = function () {
 			var newUsername = input.value;
-			hideElement(input);
-			showElement(label);
+			CssUtils.hideElement(input);
+			CssUtils.showElement(label);
 			if (!USER_REGEX.test(newUsername)) {
 				growlError('Wrong username, only letters, -_');
 				label.textContent = oldUsername;

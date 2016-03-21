@@ -20,7 +20,7 @@
 </head>
 <body class="color-lor" >
 <nav class="noSelection">
-	<ul id="navbarList">
+	<ul>
 		<li>
 			<a href="{% url 'chat.views.home' %}"><i class="icon-home" title="Go home"><span class="mText">home</span></i></a>
 		</li>
@@ -50,11 +50,9 @@
 	</ul>
 	<!-- /.container-fluid -->
 </nav>
-<div id="ajaxStatus">
-</div>
+<div id="ajaxStatus"></div>
 {% block content %} {% endblock %}
 {% csrf_token %}
-
 <div id="growlHolder"></div>
 </body>
 </html>
