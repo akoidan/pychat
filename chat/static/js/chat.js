@@ -711,7 +711,9 @@ var MessagedHandler = {
 	left: changeOnlineUsers,
 	onlineUsers: changeOnlineUsers,
 	changed: changeOnlineUsers,
-	messages: handleGetMessages,
+	messages: function (data) {
+		handleGetMessages(data.content);
+	},
 	me: function(data) {
 		setUsername(data.content);
 	},
