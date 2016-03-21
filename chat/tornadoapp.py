@@ -262,10 +262,7 @@ class MessagesHandler(MessagesCreator):
 				if name == check_name and check_id != int(key.decode('utf-8')):
 					user_is_online = True
 				result.update(self.online_js_structure(name, sex, user_id))
-		if check_id:
-			return result, user_is_online
-		else:
-			return result
+		return (result, user_is_online) if check_id else result
 
 	def add_online_user(self):
 		"""
@@ -607,7 +604,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		Tries to send message, doesn't throw exception outside
 		:type self: MessagesHandler
 		"""
-		self.logger.debug('<< THREAD %s >>', os.getppid())
+		# self.logger.debug('<< THREAD %s >>', os.getppid())
 		try:
 			if isinstance(message, dict):
 				message = json.dumps(message)

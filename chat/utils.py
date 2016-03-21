@@ -36,7 +36,6 @@ def hide_fields(post, *fields, huge=False, fill_with='****'):
 	:param huge: if true object will be cloned and then fields will be removed
 	:return: a shallow copy of dictionary without specified fields
 	"""
-
 	if not huge:
 		# hide *fields in shallow copy
 		res = post.copy()
@@ -47,10 +46,8 @@ def hide_fields(post, *fields, huge=False, fill_with='****'):
 		# copy everything but *fields
 		res = {}
 		for field in post:
-			if field not in fields:  # if this is field to remove
-				res[field] = post[field]
-			else:
-				res[field] = fill_with
+			# _______________________if this is field to remove
+			res[field] = post[field] if field not in fields else fill_with
 	return res
 
 

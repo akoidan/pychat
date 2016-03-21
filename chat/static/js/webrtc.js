@@ -116,7 +116,7 @@ function saveProfile(event) {
 		if (response.match(photoRegex)) {
 			photoImg.onload = ajaxHide;
 			photoImg.onerror = ajaxHide;
-			if (typeof photoImg.onload != 'function' || typeof photoImg.onerror != 'function' ) {
+			if (typeof photoImg.onload !== 'function' || typeof photoImg.onerror !== 'function' ) {
 				ajaxHide();
 			}
 			photoImg.src = response;

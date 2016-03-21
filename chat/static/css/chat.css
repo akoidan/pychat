@@ -1,7 +1,7 @@
-.color-lor [class='icon-girl']:hover,
-.color-lor [class='icon-man']:hover,
-.color-lor [class='icon-user-secret']:hover {
-	color: #C9C9AA;
+.color-lor .icon-girl:hover,
+.color-lor .icon-man:hover,
+.color-lor .icon-user-secret:hover {
+	color: #C9C9AA !important;
 }
 .color-lor .message-header-others {color: #729fcf;}
 .color-lor .message-header-private {color: #8ae234;}
@@ -14,12 +14,12 @@
 }
 
 fieldset {
-    border-top: 1px solid #aaa;
-    border-bottom: none;
-    border-left: none;
-    border-right: none;
-    display: block;
-    text-align: center;
+	border-top: 1px solid #aaa;
+	border-bottom: none;
+	border-left: none;
+	border-right: none;
+	display: block;
+	text-align: center;
 	padding: 0;
 	margin-left: 3px;
 	margin-right: 10px;
@@ -34,10 +34,6 @@ p {
 	margin-top: 0.8em;
 	margin-bottom: 0.8em;
 }
-/*#wrapper {*/
-	/*height: calc(100% - 83px); /!* leave fail handler here *!/*/
-	/*width: 100%;*/
-/*}*/
 
 #chatbox {
 	width: 100%;
@@ -45,7 +41,6 @@ p {
 	padding-left: 8px;
 	word-wrap: break-word;
 	font-size: 18px;
-	/*padding-top: 10px;*/
 	margin-right: 2px; /*shift scrollbar from right side*/
 }
 
@@ -93,9 +88,11 @@ p {
 	border: 1px solid #101D07;
 	background-color: #1C221C;
 }
+
 #receiverId {
 	display: inline-block;
 }
+
 .message-text-holder {
 	overflow: hidden;
 	padding-left:5px;
@@ -131,11 +128,6 @@ p {
 	height: 100%;
 }
 
-@media screen and (max-height: 300px), screen and (max-width: 600px){
-	#smileParentHolder {
-		width: calc(100% - 30px) !important;
-	}
-}
 
 #smileParentHolder {
 	position: absolute;
@@ -276,13 +268,13 @@ p {
 	color: darkred;
 }
 
-video#remoteVideo {
+#remoteVideo {
 	width: 480px;
 	height: 360px;
 	background: #777;
 }
 
-video#localVideo {
+#localVideo {
 	position: absolute;
 	width: 160px;
 	height: 120px;
@@ -323,12 +315,18 @@ video#localVideo {
 .answerButtons i {
 	font-size: 30px;
 }
-
-/*--------------- END CALL DIALOG -----------------------*/
 .finish-call-icon {
 	color: #910000;
 	float:right;
 	font-size: 40px;
 	margin-bottom: -25px;
     margin-top: -6px;
+}
+
+/*--------------- END CALL DIALOG -----------------------*/
+
+@media screen and (max-height: 300px), screen and (max-width: 600px){
+	#smileParentHolder {
+		width: calc(100% - 30px);
+	}
 }
