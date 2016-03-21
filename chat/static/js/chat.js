@@ -798,23 +798,28 @@ var WebRtcApi = function () {
 	self.isActive = function () {
 		return self.localStream && self.localStream.active;
 	};
-	self.toggleMic = function () {
-		self.setAudio(!self.constraints.audio);
-		var audio = self.getTrack(false);
-		if (audio) {
-			audio.enabled = self.constraints.audio;
-		} else if (self.constraints.audio && self.isActive()) {
-			growlError("Unable to turn on mic");
+	self.toggleInput = function(isVideo) {
+		var kind = isVideo ? 'video' : 'audio';
+		var track = self.getTrack(isVideo);
+		if (!self.isActive() || track) {
+			var newValue = !self.constraints[kind];
+			if (isVideo) {
+				self.setVideo(newValue);
+			} else {
+				self.setAudio(newValue);
+			}
+		}
+		if (track) {
+			track.enabled = self.constraints[kind];
+		} else if (self.isActive()) {
+			growlError(getText("Unable set {} while it's disabled from the start", kind));
 		}
 	};
 	self.toggleVideo = function () {
-		self.setVideo(!self.constraints.video);
-		var video = self.getTrack(true);
-		if (video) {
-			video.enabled = self.constraints.video;
-		} else if (self.constraints.video && self.isActive()) {
-			growlError("Unable to turn on video");
-		}
+		self.toggleInput(true);
+	};
+	self.toggleMic = function () {
+		self.toggleInput(false);
 	};
 	self.onIncomingCall = function (message) {
 		checkAndPlay(self.dom.callSound);
