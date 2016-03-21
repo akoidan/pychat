@@ -81,14 +81,6 @@ function encodeAnchorsHTML(html) {
 }
 
 
-window.onerror = function (msg, url, linenumber) {
-	var message = getText('Error occurred in {}:{}\n{}', url, linenumber, msg);
-	console.error(getDebugMessage(message));
-	growlError(message);
-	return true;
-};
-
-
 var CssUtils = {
 	visibilityClass: 'hidden',
 	addClass: function (element, className) {
@@ -402,11 +394,19 @@ function getText() {
 	return arguments[0]
 }
 
+
+/** in 23 - out 23
+ *  */
+function sliceZero(number, count) {
+	return String("00" + number).slice(count || -2);
+}
+
+
 /**
  *
  * Formats message for debug,
  * Usage getDebugMessage("{} is {}", 'war', 'bad');
- * @returns: "15:9:31:839: war is bad"
+ * @returns: "15:09:31:009: war is bad"
  *  */
 function getDebugMessage() {
 	var now = new Date();
@@ -424,8 +424,9 @@ function getDebugMessage() {
 }
 
 
-/** in 23 - out 23
- *  */
-function sliceZero(number, count) {
-	return String("00" + number).slice(count || -2);
-}
+window.onerror = function (msg, url, linenumber) {
+	var message = getText('Error occurred in {}:{}\n{}', url, linenumber, msg);
+	console.error(getDebugMessage(message));
+	growlError(message);
+	return true;
+};

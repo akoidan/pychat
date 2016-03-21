@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import logging.config
 import os
 import sys
+from sslserver import certs
 from os.path import join
 
 from django.conf import global_settings
@@ -66,6 +67,7 @@ INSTALLED_APPS = (
 	'simplejson',
 	'redis',
 	'tornado',
+	"sslserver"
 )
 
 SESSION_ENGINE = 'redis_sessions.session'
@@ -74,6 +76,9 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
+
+CRT_PATH = os.sep.join((certs.__path__._path[0] ,"development.crt"))
+KEY_PATH = os.sep.join((certs.__path__._path[0],"development.key"))
 
 API_PORT = '8888'
 WEBSOCKET_PREFIX = 'wss' if 'CRT_PATH' in locals() else 'ws'

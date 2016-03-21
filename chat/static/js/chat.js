@@ -105,7 +105,6 @@ onDocLoad(function () {
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
 	smileyUtil.init();
-	loadMessagesFromLocalStorage();
 });
 
 
@@ -210,8 +209,8 @@ var SmileyUtil = function () {
 				}
 			}
 		}
-
 		self.showTabByName(Object.keys(smileyData)[0]);
+		loadMessagesFromLocalStorage(); /*Smileys should be encoded by time message load, otherwise they don't display*/
 	}
 };
 
@@ -1008,7 +1007,9 @@ var WebRtcApi = function () {
 		self.sendBaseEvent(message, 'webrtc');
 	};
 	self.failWebRtc = function () {
-		var text = "Error while webrtc calling: " + Array.prototype.join.call(arguments, ' ');
+		var isError = arguments.length === 1 && (arguments[0].message || arguments[0].name);
+		var errorContext = isError ? getText("{}: {}", arguments[0].name, arguments[0].message) : Array.prototype.join.call(arguments, ' ');
+		var text = getText("Error while webrtc because {}", errorContext);
 		growlError(text);
 		console.error(getDebugMessage(text));
 	};

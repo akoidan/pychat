@@ -43,7 +43,8 @@ Start the chat:
 ==============
  1. Start session holder: `redis-server`
  2. Start WebSocket listener: `python manage.py start_tornado`
- 3. Start the Chat: `python manage.py runserver 0.0.0.0:8000`
+ 3. Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
+ 4. Open in browser http*s*://127.0.0.1:8000
 
 #TODO
 * remember if user has camera/mic and autoset values after second call
