@@ -47,6 +47,8 @@ Start the chat:
  4. Open in browser http*s*://127.0.0.1:8000
 
 #TODO
+* add file transfer
+* add image upload
 * remember if user has camera/mic and autoset values after second call
 * android play() can only be initiated by a user gesture.
 * transfer file to another user

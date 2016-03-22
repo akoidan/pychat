@@ -55,9 +55,9 @@
 	</div>
 	<div id="callContainer" class="modal-body modal-draggable hidden">
 		<div id="callContainerHeader" class="noSelection">
-			<span id="callContainerHeaderText" style="display: inline-block">Make a call</span>
+			<span id="callContainerHeaderText" style="display: inline-block"></span>
 			<i class="icon-cancel" style="float: right; color: rgb(177, 53, 51);"
-				onclick="CssUtils.hideElement($('callContainer'))"></i>
+				onclick="webRtcApi.closeDialog()"></i>
 		</div>
 		<div class="callContainerContent">
 			<div style="position: relative">
