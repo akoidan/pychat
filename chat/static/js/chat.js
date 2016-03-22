@@ -1107,17 +1107,13 @@ var WebRtcApi = function () {
 	};
 	self.callUserListClick = function (event) {
 		if (event.target.tagName === 'LI') {
-			var hasClass = CssUtils.hasClass(event.target, self.activeUserClass);
+			var wasActiveBefore = CssUtils.hasClass(event.target, self.activeUserClass);
 			var users = self.dom.callUserList.childNodes;
 			for (var i=0; i< users.length; i++) {
 				CssUtils.removeClass(users[i], self.activeUserClass);
 			}
 			var userName = event.target.textContent;
-			if (hasClass) {
-				self.receiverName = null;
-				self.receiverId = null;
-				CssUtils.removeClass(event.target, self.activeUserClass);
-			} else {
+			if (!wasActiveBefore) {
 				self.receiverName = userName;
 				self.receiverId = parseInt(onlineUsers[userName].userId);
 				CssUtils.addClass(event.target, self.activeUserClass);
