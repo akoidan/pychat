@@ -76,9 +76,8 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-
-CRT_PATH = os.sep.join((certs.__path__._path[0] ,"development.crt"))
-KEY_PATH = os.sep.join((certs.__path__._path[0],"development.key"))
+CRT_PATH = os.sep.join((certs.__path__._path[0], "development.crt"))
+KEY_PATH = os.sep.join((certs.__path__._path[0], "development.key"))
 
 API_PORT = '8888'
 WEBSOCKET_PREFIX = 'wss' if 'CRT_PATH' in locals() else 'ws'
