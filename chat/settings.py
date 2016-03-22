@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import logging.config
 import os
 import sys
-from sslserver import certs
 from os.path import join
 
 try:
@@ -71,7 +70,6 @@ INSTALLED_APPS = (
 	'simplejson',
 	'redis',
 	'tornado',
-	"sslserver"
 )
 
 SESSION_ENGINE = 'redis_sessions.session'
@@ -80,9 +78,6 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-
-CRT_PATH = os.sep.join((certs.__path__._path[0] ,"development.crt"))
-KEY_PATH = os.sep.join((certs.__path__._path[0],"development.key"))
 
 API_PORT = '8888'
 CRT_PATH = '/etc/nginx/ssl/1_pychat.org_bundle.crt'

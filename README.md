@@ -34,8 +34,9 @@ Start the chat:
  1. Start the Chat: `service uwsgi start`
  1. Start the WebSocket listener: `service tornado start`
 
-TODO
-=============
+#TODO
+* add file transfer
+* add image upload
 * remember if user has camera/mic and autoset values after second call
 * android play() can only be initiated by a user gesture.
 * transfer file to another user

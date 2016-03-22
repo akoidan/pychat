@@ -741,6 +741,7 @@ var WebRtcApi = function () {
 	self.dom = {
 		callContainer : $('callContainer'),
 		callAnswerParent : $('callAnswerParent'),
+		callContainerHeaderText: $('callContainerHeaderText'),
 		callAnswerText : $('callAnswerText'),
 		callUserList : $("callUserList"),
 		remote: $('remoteVideo'),
@@ -751,6 +752,7 @@ var WebRtcApi = function () {
 		audioStatusIcon: $('audioStatusIcon'),
 		videoStatusIcon: $('videoStatusIcon')
 	};
+	self.callTimeoutTime = 60000;
 	self.dom.callSound.addEventListener("ended", function () {
 		checkAndPlay(self.dom.callSound);
 	});
@@ -821,11 +823,25 @@ var WebRtcApi = function () {
 	self.toggleMic = function () {
 		self.toggleInput(false);
 	};
+	self.onReply = function() {
+		self.setHeaderText(getText("Waiting for {} to answer", self.receiverName))
+	};
+	self.setHeaderText = function(text) {
+		self.dom.callContainerHeaderText.innerText = text;
+	};
 	self.onIncomingCall = function (message) {
-		checkAndPlay(self.dom.callSound);
-		CssUtils.showElement(self.dom.callAnswerParent);
+		self.clearTimeout();
 		self.receiverName = message.user;
 		self.receiverId = message.userId;
+		self.sendBaseEvent(null, "reply");
+		checkAndPlay(self.dom.callSound);
+		CssUtils.showElement(self.dom.callAnswerParent);
+		self.timeoutFunnction = setTimeout(function () {
+					self.declineWebRtcCall();
+					displayPreparedMessage(systemHeaderClass, new Date().getTime(),
+							"Missed call from " + self.receiverName, SYSTEM_USERNAME);
+				}, self.callTimeoutTime
+		);
 		self.dom.callAnswerText.textContent = getText("{} is calling you", self.receiverName)
 	};
 	self.setIconState = function(isCall) {
@@ -851,7 +867,10 @@ var WebRtcApi = function () {
 	self.showCallDialog = function (isCallActive) {
 		self.setIconState(isCallActive);
 		if (!isCallActive) {
+			self.setHeaderText("Make a call");
 			self.updateDomOnlineUsers();
+		} else {
+			self.clearTimeout();
 		}
 		CssUtils.showElement(self.dom.callContainer);
 	};
@@ -861,6 +880,7 @@ var WebRtcApi = function () {
 		self.setAudio(true);
 		self.setVideo(false);
 		self.showCallDialog(true);
+		self.setHeaderText(getText("Answered for {} call with audio", self.receiverName));
 		self.createCall();
 	};
 	self.declineWebRtcCall = function () {
@@ -874,6 +894,7 @@ var WebRtcApi = function () {
 		self.setAudio(true);
 		self.setVideo(true);
 		self.showCallDialog(true);
+		self.setHeaderText(getText("Answered for {} call with video", self.receiverName));
 		self.createCall();
 	};
 	self.captureInput = function (callback, callIfNoSource) {
@@ -883,14 +904,16 @@ var WebRtcApi = function () {
 			callback();
 		}
 	};
-	self.callPeople = function (message) {
+	self.callPeople = function () {
 		if (self.receiverName == null) {
 			growlError("Select exactly one user to call");
 			return;
 		}
+		self.setHeaderText(getText("Establishing connection with {}", self.receiverName));
 		self.waitForAnswer();
 		self.captureInput(self.attachLocalStream);
 		self.sendBaseEvent(null, 'offer');
+		self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime);
 	};
 	self.createCallAfterCapture = function(stream) {
 		self.init();
@@ -900,8 +923,8 @@ var WebRtcApi = function () {
 	self.createCall = function () {
 		self.captureInput(self.createCallAfterCapture, true);
 	};
-	self.print = function (){
-		growlInfo('something happened');
+	self.print = function (message){
+		growlInfo(getText("Call message {}", JSON.stringify(message)));
 	};
 	self.gotReceiveChannel = function (event) { /* TODO is it used ? */
 		console.log(getDebugMessage('Received Channel Callback'));
@@ -925,26 +948,54 @@ var WebRtcApi = function () {
 			case 'decline':
 				self.onDecline();
 				break;
+			case 'reply':
+				self.onReply();
+				break;
 			case 'finish':
 				self.onFinish();
 				break;
 		}
 	};
+	self.clearTimeout = function () {
+		var timeoutCleaned = false;
+		if (self.timeoutFunnction) {
+			clearTimeout(self.timeoutFunnction);
+			self.timeoutFunnction = null;
+			//timeoutCleaned = true;
+		}
+		//try {
+		//	throw Error('')
+		//} catch (err) {
+		//	var caller_line = err.stack.split("\n")[3];
+		//	var index = caller_line.indexOf("at ");
+		//	var clean = caller_line.slice(index + 2, caller_line.length);
+		//	if (timeoutCleaned) {
+		//		console.error(getText("Cleaned callback from {}", clean));
+		//	} else {
+		//		console.warn(getText("NOT cleaned callback from {}", clean));
+		//	}
+		//}
+	};
 	self.onWebRtcConnect = function (offer) {
-		if (offer.sdp) {
-			self.pc.setRemoteDescription(new RTCSessionDescription(offer), function () {
-				console.log(getDebugMessage('creating answer...'));
-				self.pc.createAnswer(function (answer) {
-					console.log(getDebugMessage('sent answer...'));
-					self.pc.setLocalDescription(answer, function () {
-						self.sendWebRtcEvent(answer);
-					}, self.failWebRtc);
-				}, self.failWebRtc, self.sdpConstraints);
-			}, self.failWebRtc);
-		} else if (offer.candidate) {
-			self.pc.addIceCandidate(new RTCIceCandidate(offer));
-		} else if (offer.message) {
-			growlInfo(offer.message);
+		self.clearTimeout();
+		if (self.pc.iceConnectionState != 'closed') {
+			if (offer.sdp) {
+				self.pc.setRemoteDescription(new RTCSessionDescription(offer), function () {
+					console.log(getDebugMessage('creating answer...'));
+					self.pc.createAnswer(function (answer) {
+						console.log(getDebugMessage('sent answer...'));
+						self.pc.setLocalDescription(answer, function () {
+							self.sendWebRtcEvent(answer);
+						}, self.failWebRtc);
+					}, self.failWebRtc, self.sdpConstraints);
+				}, self.failWebRtc);
+			} else if (offer.candidate) {
+				self.pc.addIceCandidate(new RTCIceCandidate(offer));
+			} else if (offer.message) {
+				growlInfo(offer.message);
+			}
+		} else {
+			getDebugMessage(console.warn(getDebugMessage("Skipping ws message for closed connection")));
 		}
 	};
 	self.setVideoSource = function(domEl, stream) {
@@ -964,6 +1015,7 @@ var WebRtcApi = function () {
 		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
 		self.pc.onaddstream = function (event) {
 			self.setVideoSource(self.dom.remote, event.stream);
+			self.setHeaderText(getText("You're talking to {} now", self.receiverName));
 			self.setIconState(true);
 			console.log(getDebugMessage("Stream attached"));
 		};
@@ -974,10 +1026,10 @@ var WebRtcApi = function () {
 		};
 	};
 	self.closeEvents = function (text) {
-		if (self.pc.close) {
+		CssUtils.hideElement(self.dom.callContainer);
+		try {
 			self.pc.close();
-		} else {
-			console.error("PC already closed");
+		} catch (error) {
 		}
 		if (self.localStream) {
 			var tracks = self.localStream.getTracks();
@@ -986,7 +1038,6 @@ var WebRtcApi = function () {
 			}
 		}
 		growlInfo(text);
-		CssUtils.hideElement(self.dom.callContainer);
 	};
 	self.hangUp = function() {
 		self.sendBaseEvent(null, 'finish');
@@ -997,6 +1048,13 @@ var WebRtcApi = function () {
 	};
 	self.onFinish = function() {
 		self.closeEvents("Opponent hung up. Call is finished.");
+	};
+	self.closeDialog = function() {
+		if (self.isActive()) {
+			self.hangUp();
+		} else {
+			CssUtils.hideElement(self.dom.callContainer);
+		}
 	};
 	self.connectWebRtc = function () {
 		try {
@@ -1034,7 +1092,7 @@ var WebRtcApi = function () {
 	self.failWebRtc = function () {
 		var isError = arguments.length === 1 && (arguments[0].message || arguments[0].name);
 		var errorContext = isError ? getText("{}: {}", arguments[0].name, arguments[0].message) : Array.prototype.join.call(arguments, ' ');
-		var text = getText("Error while webrtc because {}", errorContext);
+		var text = getText("Error while calling because {}", errorContext);
 		growlError(text);
 		console.error(getDebugMessage(text));
 	};

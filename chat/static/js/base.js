@@ -123,10 +123,10 @@ var Growl = function (message) {
 		self.show(4000, 'col-error')
 	};
 	self.success = function () {
-		self.show(1000, 'col-success')
+		self.show(3000, 'col-success')
 	};
 	self.info = function () {
-		self.show(500, 'col-info');
+		self.show(3000, 'col-info');
 	};
 	self.hide = function () {
 		self.growl.style.opacity = 0;
@@ -138,7 +138,7 @@ var Growl = function (message) {
 		}
 	};
 	self.show = function (baseTime, growlClass) {
-		var timeout = baseTime + self.message.length * 60;
+		var timeout = baseTime + self.message.length * 50;
 		self.growl = document.createElement('div');
 		self.growl.innerHTML = encodeAnchorsHTML(self.message);
 		self.growl.className = 'growl ' + growlClass;
