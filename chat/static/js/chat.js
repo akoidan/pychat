@@ -770,9 +770,9 @@ var WebRtcApi = function () {
 	var webRtcUrl = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 	self.pc_config = {iceServers: [{url: webRtcUrl}]};
 	self.pc_constraints = {
-		optional: [
-			{DtlsSrtpKeyAgreement: true},
-			{RtpDataChannels: true}
+		optional: [ /*Firefox*/
+			/*{DtlsSrtpKeyAgreement: true},*/
+			{RtpDataChannels: false /*true*/}
 		]
 	};
 	// Set up audio and video regardless of what devices are present.
