@@ -750,7 +750,8 @@ var WebRtcApi = function () {
 		callIcon: $('callIcon'),
 		hangUpIcon: $('hangUpIcon'),
 		audioStatusIcon: $('audioStatusIcon'),
-		videoStatusIcon: $('videoStatusIcon')
+		videoStatusIcon: $('videoStatusIcon'),
+		videoContainer: $('videoContainer')
 	};
 	self.callTimeoutTime = 60000;
 	self.dom.callSound.addEventListener("ended", function () {
@@ -796,6 +797,7 @@ var WebRtcApi = function () {
 	self.setVideo = function (value) {
 		self.constraints.video = value;
 		self.dom.videoStatusIcon.className = value ? "icon-videocam" : "icon-no-videocam callActiveIcon";
+		CssUtils.setVisibility(self.dom.local, value);
 	};
 	self.isActive = function () {
 		return self.localStream && self.localStream.active;
@@ -814,7 +816,7 @@ var WebRtcApi = function () {
 		if (track) {
 			track.enabled = self.constraints[kind];
 		} else if (self.isActive()) {
-			growlError(getText("Unable set {} while it's disabled from the start", kind));
+			growlError(getText("You need to call/reply with {} to turn it on", kind));
 		}
 	};
 	self.toggleVideo = function () {
@@ -845,24 +847,21 @@ var WebRtcApi = function () {
 		self.dom.callAnswerText.textContent = getText("{} is calling you", self.receiverName)
 	};
 	self.setIconState = function(isCall) {
-		if (isCall) {
-			CssUtils.hideElement(self.dom.callIcon);
-			CssUtils.showElement(self.dom.hangUpIcon);
-		} else {
-			CssUtils.showElement(self.dom.callIcon);
-			CssUtils.hideElement(self.dom.hangUpIcon);
-		}
+		CssUtils.setVisibility(self.dom.callIcon, !isCall);
+		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
+		CssUtils.setVisibility(self.dom.callUserList, !isCall);
+		CssUtils.setVisibility(self.dom.videoContainer, isCall);
 	};
 	self.updateDomOnlineUsers = function() {
 		self.dom.callUserList.innerHTML = '';
 		self.receiverName = null;
 		for (var userName in onlineUsers) {
-				if (onlineUsers.hasOwnProperty(userName) && userName !== loggedUser) {
-					var li = document.createElement('li');
-					li.textContent = userName;
-					self.dom.callUserList.appendChild(li);
-				}
+			if (onlineUsers.hasOwnProperty(userName) && userName !== loggedUser) {
+				var li = document.createElement('li');
+				li.textContent = userName;
+				self.dom.callUserList.appendChild(li);
 			}
+		}
 	};
 	self.showCallDialog = function (isCallActive) {
 		self.setIconState(isCallActive);
@@ -872,7 +871,11 @@ var WebRtcApi = function () {
 		} else {
 			self.clearTimeout();
 		}
-		CssUtils.showElement(self.dom.callContainer);
+		if (isCallActive || Object.keys(onlineUsers).length > 1) {
+			CssUtils.showElement(self.dom.callContainer);
+		} else {
+			growlError("Nobody's online. Who are you call?");
+		}
 	};
 	self.answerWebRtcCall = function () {
 		CssUtils.hideElement(self.dom.callAnswerParent);

@@ -105,6 +105,13 @@ var CssUtils = {
 	toggleVisibility: function (element) {
 		this.toggleClass(element,this.visibilityClass);
 	},
+	setVisibility: function(element, isVisible){
+		if (isVisible) {
+			this.removeClass(element, this.visibilityClass);
+		} else {
+			this.addClass(element, this.visibilityClass);
+		}
+	},
 	toggleClass: function (element, className) {
 		if (this.hasClass(element, className)) {
 			this.removeClass(element, className);
@@ -180,9 +187,19 @@ function Draggable(container, header) {
 	};
 	self.eleMouseMove = function (ev) {
 		var left = ev.pageX + self.leftCorrection;
-		if (left > 0 && left < self.maxLeft) self.container.style.left = left + "px";
+		if (left < 0) {
+			left = 0;
+		} else if (left > self.maxLeft) {
+			left = self.maxLeft;
+		}
+		self.container.style.left = left + "px";
 		var top = ev.pageY + self.rightCorrection;
-		if (top > 0 && top < self.maxTop) self.container.style.top = top + "px";
+		if (top < 0) {
+			top = 0;
+		} else if (top > self.maxTop) {
+			top = self.maxTop;
+		}
+		self.container.style.top = top + "px";
 		if (self.attached) {
 			document.addEventListener ("mouseup", self.eleMouseUp, false);
 			self.attached = false;

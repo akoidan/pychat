@@ -224,12 +224,18 @@ p {
 	cursor: pointer;
 }
 
+#callContainer  {
+	display: inline-block;
+	max-width: 100%;
+}
+
 #callContainer label {
 	cursor: pointer;
 }
 
 .callContainerContent {
 	padding: 5px;
+	display: inline-block;
 }
 
 .callContainerIcons {
@@ -243,7 +249,7 @@ p {
 #callUserList {
 	margin: 0;
 	max-height: 400px; /*fallback*/
-	max-height: calc(100vh - 180px);
+	max-height: calc(100vh - 90px);
 	overflow-y: auto;
 	width: 100%;
 	background-color: #343A3B;
@@ -267,16 +273,25 @@ p {
 	color: darkred;
 }
 
+#videoContainer {
+	position:relative;
+	width: 100%;
+}
+
+#videoContainer video {
+	background: #272C2D;
+	border: 1px solid grey;
+}
+
 #remoteVideo {
-	width: 480px;
-	height: 360px;
-	background: #777;
+	max-height: calc(100vh - 90px);
+	max-width: 100%;
 }
 
 #localVideo {
 	position: absolute;
-	width: 160px;
-	height: 120px;
+	max-width: 35%;
+	max-height: 35%;
 	background: #555;
 	bottom: 0;
 	right: 0;
@@ -320,6 +335,18 @@ p {
 	font-size: 40px;
 	margin-bottom: -25px;
     margin-top: -6px;
+}
+
+@media screen and (max-height: 550px){
+	#callContainer {
+		top:0 !important;
+	}
+}
+
+@media screen and (max-width: 700px){
+	#callContainer {
+		left:0 !important;
+	}
 }
 
 /*--------------- END CALL DIALOG -----------------------*/
