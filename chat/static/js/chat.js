@@ -753,6 +753,11 @@ var WebRtcApi = function () {
 		videoStatusIcon: $('videoStatusIcon'),
 		videoContainer: $('videoContainer')
 	};
+	var baseMute = mute;
+	mute = function() {
+		baseMute();
+		self.dom.remote.volume = volumeProportion[window.sound];
+	};
 	self.callTimeoutTime = 60000;
 	self.dom.callSound.addEventListener("ended", function () {
 		checkAndPlay(self.dom.callSound);

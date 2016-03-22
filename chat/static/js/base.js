@@ -19,6 +19,12 @@ const escapeMap = {
 	"\n": '<br>',
 	"/": '&#x2F;'
 };
+var volumeProportion = {
+	0: 0,
+	1: 0.15,
+	2: 0.4,
+	3: 1
+};
 var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 
 var infoMessages = [
@@ -245,6 +251,7 @@ function mute() {
 	}
 }
 
+
 function checkAndPlay(element) {
 	if (!window.sound) {
 		return;
@@ -252,16 +259,7 @@ function checkAndPlay(element) {
 	try {
 		element.pause();
 		element.currentTime = 0;
-		switch (window.sound) {
-			case 1:
-				element.volume = 0.15;
-				break;
-			case 2:
-				element.volume = 0.4;
-				break;
-			case 3:
-				element.volume = 1;
-		}
+		element.volume = volumeProportion[window.sound];
 		element.play();
 	} catch (e) {
 		console.error(getDebugMessage("Skipping playing message, because {}", e.message || e));
