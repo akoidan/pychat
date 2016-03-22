@@ -187,7 +187,8 @@ function Draggable(container, header) {
 	self.eleMouseDown = function (ev) {
 		self.leftCorrection =  container.offsetLeft - ev.pageX;
 		self.rightCorrection = container.offsetTop - ev.pageY;
-		self.maxTop = document.body.clientHeight - container.clientHeight;
+		// TODO 7 is kind of magical bottom margin when source is attached to video
+		self.maxTop = document.body.clientHeight - container.clientHeight - 7;
 		self.maxLeft =  document.body.clientWidth - container.clientWidth;
 		document.addEventListener ("mousemove", self.eleMouseMove, false);
 	};

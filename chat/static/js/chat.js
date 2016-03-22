@@ -834,7 +834,7 @@ var WebRtcApi = function () {
 		self.setHeaderText(getText("Waiting for {} to answer", self.receiverName))
 	};
 	self.setHeaderText = function(text) {
-		self.dom.callContainerHeaderText.innerText = text;
+		self.dom.callContainerHeaderText.textContent = text;
 	};
 	self.onoffer = function (message) {
 		self.clearTimeout();
@@ -879,7 +879,7 @@ var WebRtcApi = function () {
 		if (isCallActive || Object.keys(onlineUsers).length > 1) {
 			CssUtils.showElement(self.dom.callContainer);
 		} else {
-			growlError("Nobody's online. Who are you call?");
+			growlError("Nobody's online. Who do you call?");
 		}
 	};
 	self.answerWebRtcCall = function () {
