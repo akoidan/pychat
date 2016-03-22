@@ -19,6 +19,12 @@ const escapeMap = {
 	"\n": '<br>',
 	"/": '&#x2F;'
 };
+var volumeProportion = {
+	0: 0,
+	1: 0.15,
+	2: 0.4,
+	3: 1
+};
 var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 
 var infoMessages = [
@@ -105,6 +111,13 @@ var CssUtils = {
 	toggleVisibility: function (element) {
 		this.toggleClass(element,this.visibilityClass);
 	},
+	setVisibility: function(element, isVisible){
+		if (isVisible) {
+			this.removeClass(element, this.visibilityClass);
+		} else {
+			this.addClass(element, this.visibilityClass);
+		}
+	},
 	toggleClass: function (element, className) {
 		if (this.hasClass(element, className)) {
 			this.removeClass(element, className);
@@ -174,15 +187,26 @@ function Draggable(container, header) {
 	self.eleMouseDown = function (ev) {
 		self.leftCorrection =  container.offsetLeft - ev.pageX;
 		self.rightCorrection = container.offsetTop - ev.pageY;
-		self.maxTop = document.body.clientHeight - container.clientHeight;
+		// TODO 7 is kind of magical bottom margin when source is attached to video
+		self.maxTop = document.body.clientHeight - container.clientHeight - 7;
 		self.maxLeft =  document.body.clientWidth - container.clientWidth;
 		document.addEventListener ("mousemove", self.eleMouseMove, false);
 	};
 	self.eleMouseMove = function (ev) {
 		var left = ev.pageX + self.leftCorrection;
-		if (left > 0 && left < self.maxLeft) self.container.style.left = left + "px";
+		if (left < 0) {
+			left = 0;
+		} else if (left > self.maxLeft) {
+			left = self.maxLeft;
+		}
+		self.container.style.left = left + "px";
 		var top = ev.pageY + self.rightCorrection;
-		if (top > 0 && top < self.maxTop) self.container.style.top = top + "px";
+		if (top < 0) {
+			top = 0;
+		} else if (top > self.maxTop) {
+			top = self.maxTop;
+		}
+		self.container.style.top = top + "px";
 		if (self.attached) {
 			document.addEventListener ("mouseup", self.eleMouseUp, false);
 			self.attached = false;
@@ -228,6 +252,7 @@ function mute() {
 	}
 }
 
+
 function checkAndPlay(element) {
 	if (!window.sound) {
 		return;
@@ -235,16 +260,7 @@ function checkAndPlay(element) {
 	try {
 		element.pause();
 		element.currentTime = 0;
-		switch (window.sound) {
-			case 1:
-				element.volume = 0.15;
-				break;
-			case 2:
-				element.volume = 0.4;
-				break;
-			case 3:
-				element.volume = 1;
-		}
+		element.volume = volumeProportion[window.sound];
 		element.play();
 	} catch (e) {
 		console.error(getDebugMessage("Skipping playing message, because {}", e.message || e));
