@@ -316,12 +316,8 @@ function doPost(url, params, callback, form) {
 			}
 		}
 	};
-	var data;
-	if (form != null) {
-		data = new FormData(form);
-	} else {
-		data = new FormData();
-	}
+	var data = new FormData(form);
+
 	if (params) {
 		for (var key in params) {
 			if (params.hasOwnProperty(key)) {
