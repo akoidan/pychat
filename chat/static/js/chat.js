@@ -1020,6 +1020,7 @@ var WebRtcApi = function () {
 		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
 		self.pc.onaddstream = function (event) {
 			self.setVideoSource(self.dom.remote, event.stream);
+			self.dom.remote.volume = volumeProportion[window.sound];
 			self.setHeaderText(getText("You're talking to {} now", self.receiverName));
 			self.setIconState(true);
 			console.log(getDebugMessage("Stream attached"));
