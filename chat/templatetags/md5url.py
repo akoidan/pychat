@@ -1,6 +1,5 @@
 import hashlib
 import threading
-from builtins import IsADirectoryError
 from os import path
 
 from django import template

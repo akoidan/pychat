@@ -139,6 +139,7 @@ class IssueDetails(models.Model):
 class IpAddress(models.Model):
 	ip = models.CharField(null=False, max_length=32, unique=True)
 	isp = models.CharField(null=True, max_length=32)
+	country_code = models.CharField(null=True, max_length=16)
 	country = models.CharField(null=True, max_length=32)
 	region = models.CharField(null=True, max_length=32)
 	city = models.CharField(null=True, max_length=32)

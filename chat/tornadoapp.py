@@ -475,7 +475,8 @@ class MessagesHandler(MessagesCreator):
 					isp=response['isp'],
 					country=response['country'],
 					region=response['regionName'],
-					city=response['city']
+					city=response['city'],
+					country_code=response['countryCode']
 				)
 			except Exception as e:
 				self.logger.error("Error while creating ip with country info, because %s", e)
