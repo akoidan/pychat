@@ -4,7 +4,10 @@ import json
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
-from django.core.context_processors import csrf
+try:
+	from django.template.context_processors import csrf
+except ImportError:
+	from django.core.context_processors import csrf
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
 from django.db.models import Count
