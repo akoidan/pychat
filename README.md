@@ -35,7 +35,6 @@ Start the chat:
  1. Start the WebSocket listener: `service tornado start`
 
 #TODO
-* add file transfer
 * add image upload
 * remember if user has camera/mic and autoset values after second call
 * android play() can only be initiated by a user gesture.
@@ -43,7 +42,6 @@ Start the chat:
 * insecure images on usermessage editable div prevent sending messages
 * add "Don't show hints anymore" option
 * add 404page
-* add git ony flag to download_content.sh
 * https://code.djangoproject.com/ticket/25489
 * http://stackoverflow.com/a/18843553/3872976
 * refactor set class name for css instead of settings css
@@ -60,8 +58,6 @@ Start the chat:
 * run tornado via nginx http://tornado.readthedocs.org/en/latest/guide/running.html
 * fixme tornado logs messages to chat.log when messages don't belong to tornadoapp.p
 * force users to register
-* webrtc -> vlc
-* test audio preload on none 
 * add media query for register and usersettings to adjust for phone's width
 * add change password and realtime javascript to change_profile
 * local storage can store another user messasges in case of logout ?
@@ -72,6 +68,5 @@ Start the chat:
 *  check if there are new messages after connection lost compare to `localStorage` last message?
  also check id when appedning message to top to prevent double fire issue, append message to bottom if user went offline
 * USE init or on_open
-* show system messages on navbar
 * add chat rooms
 * allow selecting username in navbar, remove selecting cursor 

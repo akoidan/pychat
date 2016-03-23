@@ -2,9 +2,8 @@ import json
 import logging
 import sys
 from threading import Thread
-from  urllib.request import urlopen
+from urllib.request import urlopen
 
-import redis
 import time
 import tornado.gen
 import tornado.httpclient
