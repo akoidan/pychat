@@ -18,6 +18,26 @@
 	margin-left: 5px;
 }
 
+.required {
+	position: relative;
+}
+.required:after {
+	content: " *";
+	position: absolute;
+	right: 20px;
+	top:15px;
+	font-size: 17px;
+	display: inline-block;
+	font-weight: bold;
+}
+
+.error {
+	border: 1px solid darkred;
+}
+.success {
+	border: 1px solid darkgreen;
+}
+
 #register-form  tr > td:nth-child(2) {
 	text-align: left;
 }
@@ -29,4 +49,22 @@
 
 #register-form  tr:last-child > td {
 	text-align: center;
+}
+
+#loginForm > * {
+	vertical-align: top;
+	margin-top: 3px;
+}
+
+#register-form > * {
+	display: block;
+	margin: auto;
+}
+
+#register-form > input:not([type=submit]) {
+	width: calc(100% - 18px);
+}
+
+#register-form > input[type=submit], #register-form >  select{
+	width: 100%
 }

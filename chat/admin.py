@@ -50,6 +50,7 @@ class CountryFilter(SimpleListFilter):
 class UserLocation(admin.ModelAdmin):
 	list_display = ['username', 'country', 'region', 'city', 'provider', 'time', 'ip']
 	list_filter = (RegisteredFilter, CountryFilter, 'time')
+	search_fields = ('user__username', 'anon_name')
 
 	def region(self, instance):
 		return instance.ip.region

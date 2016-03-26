@@ -10,6 +10,7 @@ var growlHolder;
 var ajaxLoader;
 var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|$))/g; /*http://anycharacter except end of text, <br> or space*/
 var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
+var muteBtn;
 const escapeMap = {
 	"&": "&amp;",
 	"<": "&lt;",
@@ -24,6 +25,12 @@ var volumeProportion = {
 	1: 0.15,
 	2: 0.4,
 	3: 1
+};
+var volumeIcons = {
+	0: 'icon-volume-off',
+	1: 'icon-volume-1',
+	2: 'icon-volume-2',
+	3: 'icon-volume-3'
 };
 var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 
@@ -222,6 +229,7 @@ function Draggable(container, header) {
 
 
 onDocLoad(function () {
+	muteBtn = $("muteBtn");
 	mute();
 	ajaxLoader = $("ajaxStatus");
 	if (typeof InstallTrigger !== 'undefined') { // browser = firefox
@@ -232,24 +240,8 @@ onDocLoad(function () {
 
 
 function mute() {
-
 	window.sound = (window.sound + 1) % 4;
-
-	var btn = $("muteBtn");
-	switch (window.sound) {
-		case 0:
-			btn.className = 'icon-volume-off';
-			break;
-		case 1:
-			btn.className = 'icon-volume-1';
-			break;
-		case 2:
-			btn.className = 'icon-volume-2';
-			break;
-		case 3:
-			btn.className = 'icon-volume-3';
-			break;
-	}
+	if (muteBtn) muteBtn.className = volumeIcons[window.sound];
 }
 
 

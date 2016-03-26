@@ -85,13 +85,13 @@ def check_user(username):
 	"""
 	# Skip javascript validation, only summary message
 	if is_blank(username):
-		raise ValidationError("User name can't be empty")
+		raise ValidationError("Username can't be empty")
 	if not re.match(USERNAME_REGEX, username):
-		raise ValidationError("User doesn't match regex " + USERNAME_REGEX)
+		raise ValidationError("Username {} doesn't match regex {}".format(username, USERNAME_REGEX))
 	try:
 		# theoretically can throw returning 'more than 1' error
 		User.objects.get(username=username)
-		raise ValidationError("This user name already used")
+		raise ValidationError("Username {} is already used".format(username))
 	except User.DoesNotExist:
 		pass
 

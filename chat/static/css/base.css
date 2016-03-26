@@ -289,7 +289,7 @@ textarea, div[contenteditable] {
 }
 
 /* ================== COMMONS ======================*/
-.biginputtext input:not([type=button]):not([type=submit]):not([type=checkbox]):not([type=radio]), select {
+.biginputtext input:not([type=button]):not([type=submit]):not([type=checkbox]):not([type=radio]),.biginputtext select {
 	padding: 8px;
 	margin: 5px 10px 5px 0;
 	border-radius: 5px;
