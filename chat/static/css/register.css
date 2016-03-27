@@ -23,12 +23,7 @@
 	margin: auto;
 	text-align: center;
 	padding: 20px;
-	max-width: 600px;
-}
-
-#loginForm > * {
-	vertical-align: top;
-	margin-top: 3px;
+	max-width: 300px;
 }
 
 #register-form > * {
@@ -38,7 +33,7 @@
 	width: 100%;
 }
 
-#register-form > div > i {
+#register-form  i {
 	position: absolute;
 	top: 15px;
 	left: 5px;
@@ -60,10 +55,6 @@
 }
 #register-form input[type=submit] {
 	margin-top: 10px;
-}
-
-::-webkit-input-placeholder { /* WebKit, Blink, Edge */
-	color: #59595a;
 }
 
 #id_sex {

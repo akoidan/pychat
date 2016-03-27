@@ -17,20 +17,6 @@ for model in model_classes:
 	admin.site.register(model, type('SubClass', (admin.ModelAdmin,), {'fields': fields, 'list_display': fields}))
 
 
-class RegisteredFilter(SimpleListFilter):
-	title = 'if registered'
-	parameter_name = 'registered'
-
-	def lookups(self, request, model_admin):
-		return ((False, ('Registered')), (True, 'Anonymous'))
-
-	def queryset(self, request, queryset):
-		if self.value():
-			return queryset.filter(user__isnull=self.value() == 'True')
-		else:
-			return queryset
-
-
 class CountryFilter(SimpleListFilter):
 	title = 'country'
 	parameter_name = 'country'
@@ -49,8 +35,8 @@ class CountryFilter(SimpleListFilter):
 @admin.register(UserJoinedInfo)
 class UserLocation(admin.ModelAdmin):
 	list_display = ['username', 'country', 'region', 'city', 'provider', 'time', 'ip']
-	list_filter = (RegisteredFilter, CountryFilter, 'time')
-	search_fields = ('user__username', 'anon_name')
+	list_filter = (CountryFilter, 'time')
+	search_fields = ('user__username',)
 
 	def region(self, instance):
 		return instance.ip.region
@@ -62,7 +48,7 @@ class UserLocation(admin.ModelAdmin):
 		return instance.ip.isp
 
 	def username(self, instance):
-		return instance.anon_name or instance.user
+		return instance.user
 
 	def country(self, instance):
 		iso2 = instance.ip.country_code if instance.ip.country_code else "None"

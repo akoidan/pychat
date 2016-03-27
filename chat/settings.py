@@ -266,8 +266,7 @@ if not DEBUG:
 	IP_API_URL = 'http://ip-api.com/json/%s'
 
 
-ANONYMOUS_REDIS_ROOM = 'all'
-REGISTERED_REDIS_ROOM = 'signed'
+ALL_REDIS_ROOM = 'all'
 
 # ---------------JAVASCRIPT CONSTANTS --------------------
 

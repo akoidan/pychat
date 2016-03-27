@@ -19,14 +19,12 @@ const SYSTEM_USERNAME = 'System';
 const genderIcons = {
 	'Male': 'icon-man',
 	'Female': 'icon-girl',
-	'Alien': 'icon-anonymous',
 	'Secret': 'icon-user-secret'
 };
 
 var imgRegex = /<img[^>]*alt="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-var destinationUserName = null;
 var destinationUserId = null;
 
 var lastLoadUpHistoryRequest = 0;
@@ -36,7 +34,6 @@ var newMessagesCount = 0;
 var isCurrentTabActive = true;
 //localStorage  key
 const STORAGE_NAME = 'main';
-const STORAGE_USER = 'user';
 //current top message id for detecting from what
 var headerId;
 //  div that contains messages
@@ -47,8 +44,6 @@ var chatIncoming;
 var chatOutgoing;
 var chatLogin;
 var chatLogout;
-// current username
-var loggedUser;
 // div for user list appending
 var chatUsersTable;
 // input type that contains text for sending message
@@ -58,7 +53,6 @@ var userSendMessageTo;
 //user to send message input type text
 var receiverId;
 // navbar label with current user name
-var userNameLabel;
 var charRooms;
 //main single socket for handling realtime messages
 var ws;
@@ -84,7 +78,6 @@ onDocLoad(function () {
 	userMessage = $("usermsg");
 	chatUsersTable = $("chat-user-table");
 	chatUserRoomWrapper = $("chat-room-users-wrapper");
-	userNameLabel = $("userNameLabel");
 	userSendMessageTo = $("userSendMessageTo");
 	chatIncoming = $("chatIncoming");
 	chatOutgoing = $("chatOutgoing");
@@ -244,10 +237,9 @@ function changeTittleFunction(e) {
 function userClick(event) {
 	event = event || window.event;
 	var target = event.target || event.srcElement;
-	destinationUserName = target.innerHTML;
 	CssUtils.showElement(userSendMessageTo);
 	// Empty sets display to none
-	receiverId.textContent = destinationUserName;
+	receiverId.textContent = target.innerHTML; //destinationUserName
 	userMessage.focus();
 	if (target.attributes.name != null) {
 		// icon click
@@ -285,9 +277,6 @@ function sendMessage(messageContent) {
 	if (destinationUserId != null) {
 		messageRequest['receiverId'] = destinationUserId;
 	}
-	if (destinationUserName != null) {
-		messageRequest['receiverName'] = destinationUserName;
-	}
 	var sendSuccessful = sendToServer(messageRequest);
 	if (sendSuccessful) {
 		userMessage.innerHTML = "";
@@ -316,7 +305,6 @@ function checkAndSendMessage(event) {
 
 
 function loadMessagesFromLocalStorage() {
-	loggedUser = localStorage.getItem(STORAGE_USER);
 	var jsonData = localStorage.getItem(STORAGE_NAME);
 	if (jsonData != null) {
 		var parsedData = JSON.parse(jsonData);
@@ -626,13 +614,6 @@ function printRefreshUserNameToChat(data) {
 }
 
 
-function setUsername(newUserName) {
-	console.log(getDebugMessage("UserName has been set to {}", newUserName));
-	loggedUser = newUserName;
-	userNameLabel.textContent = newUserName;
-}
-
-
 function handleGetMessages(message) {
 	console.log(getDebugMessage('appending messages to top'));
 	// This check should fire only once,
@@ -670,9 +651,6 @@ function fastAddToStorage(text) {
 // Use both json and object repr for less JSON actions
 function saveMessageToStorage(objectItem, jsonItem) {
 	switch (objectItem['action']) {
-		case 'me':
-			localStorage.setItem(STORAGE_USER, objectItem['content']);
-			break;
 		case 'joined':
 		case 'changed':
 		case 'left':
@@ -689,9 +667,6 @@ function saveMessageToStorage(objectItem, jsonItem) {
 
 
 function changeOnlineUsers(data) {
-	if (data.oldName === loggedUser) {
-		setUsername(data.user);
-	}
 	printRefreshUserNameToChat(data);
 	loadUsers(data.content);
 }
@@ -715,9 +690,6 @@ var MessagedHandler = {
 	changed: changeOnlineUsers,
 	messages: function (data) {
 		handleGetMessages(data.content);
-	},
-	me: function(data) {
-		setUsername(data.content);
 	},
 	system: function(data) {
 		displayPreparedMessage(systemHeaderClass, data.time, data.content, SYSTEM_USERNAME);
@@ -1091,7 +1063,6 @@ var WebRtcApi = function () {
 			content: content,
 			action: 'call',
 			type: type,
-			receiverName: self.receiverName,
 			receiverId: self.receiverId
 		});
 	};
@@ -1186,7 +1157,6 @@ function loadUpHistory(count) {
 function clearLocalHistory() {
 	headerId = null;
 	localStorage.removeItem(STORAGE_NAME);
-	localStorage.removeItem(STORAGE_USER);
 	localStorage.removeItem(HISTORY_STORAGE_NAME);
 	chatBoxDiv.innerHTML = '';
 	allMessages = [];
@@ -1200,6 +1170,5 @@ function clearLocalHistory() {
 
 function hideUserSendToName() {
 	destinationUserId = null;
-	destinationUserName = null;
 	CssUtils.hideElement(userSendMessageTo);
 }

@@ -34,12 +34,34 @@
 		<li>
 			<a href="{% url 'chat.views.statistics' %}"><i class="icon-chart-pie" title="Show user countries statistics"><span class="mText">statistics</span></i></a>
 		</li>
+	{% if username %}
 		<li class="right"><a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}">
 			<i title="Sign out" class="icon-sign-out"><span class="mText">sign out</span></i>
 		</a></li>
 		<li class="right"><a href="{% url 'profile' %}" id="hide"><i title="Settings" class="icon-wrench">
 			<span class="mText">settings</span></i></a></li>
-		<li class="right username very-small-screen">Hello, <b> {{ username }}</b></li>
+		<li class="right username very-small-screen">Hello, <b id="userNameLabel"> {{ username }}</b></li>
+	{% else %}
+		<li class="right">
+			<form id="loginForm"  onsubmit="login(event);">
+				<div class="shrink-200px">
+					<div>
+						<i class="icon-user"></i>
+						<input type="text" maxlength="16" required
+							   placeholder="Username" name="username" value="" id="username"/>
+					</div>
+					<div>
+						<i class="icon-key"></i>
+						<input type="password" name="password" placeholder="Password" id="password" required>
+					</div>
+				</div>
+				<div>
+					<i class="icon-login" title="Sign in" onclick="$('loginSubmit').click()"></i>
+					<input type="submit" id='loginSubmit' class="hidden"/>
+				</div>
+			</form>
+		</li>
+	{% endif %}
 	</ul>
 	<!-- /.container-fluid -->
 </nav>

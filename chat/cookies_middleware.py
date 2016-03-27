@@ -10,13 +10,6 @@ class UserCookieMiddleWare(object):
 	If the user is not authenticated and the cookie remains, delete it
 	"""
 
-	def process_response(self, request, response):
-		# force create Session for annon
-		if hasattr(request, 'session') and not request.session.session_key:
-			request.session.save()
-			request.session.modified = True
-		return response
-
 	def process_request(self, request):
 		try:
 			local.random

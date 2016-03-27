@@ -154,9 +154,8 @@ class IpAddress(models.Model):
 class UserJoinedInfo(models.Model):
 	ip = models.ForeignKey(IpAddress, null=True)
 	user = models.ForeignKey(User, null=True)
-	anon_name = models.CharField(null=True, max_length=32)
 	time = models.DateField(default=datetime.datetime.now)
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((User._meta.app_label, '_user_joined_info'))
-		unique_together = ("user", "ip", "anon_name")
+		unique_together = ("user", "ip")

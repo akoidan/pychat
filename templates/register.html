@@ -1,59 +1,41 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/html">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<title>PyChat</title> {% load md5url %}
-	<link rel="shortcut icon" href="{% md5url 'favicon.ico' %}"/>
-	<link rel="stylesheet" type="text/css" href="{% md5url 'css/base.css' %}">
-	<link rel="stylesheet" type="text/css" href="{% md5url 'css/fontello.css' %}">
-	<script>
-		const RESPONSE_SUCCESS = "{{ successReponse }}";
-	</script>
-	<script src="{% md5url "js/base.js" %}"></script>
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+{% extends 'base.html' %}
+{% block head %} {% load md5url %}
 	<script src="{% md5url "js/register.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/register.css' %}">
-
-</head>
-<body class="color-lor">
-<nav style="padding: 10px">
-	<form id="loginForm" class="right" onsubmit="login(event);" style="padding-top: 0">
-		<input type="text" name="username" placeholder="Username" id="username" required>
-		<input type="password" name="password" placeholder="Password" id="password" required>
-		<i class="icon-login" title="Sign in" onclick="$('loginForm').submit();"></i>
+{% endblock head%}
+{% block content %}
+{% comment %}<body class="color-lor" style="background: linear-gradient(#272C2D, #212526);">{% endcomment %}
+<div style="overflow-y: auto">
+	<form id="register-form" onsubmit="register(event)" class="black-inputs biginputtext">
+		<div class="required">
+			<i class="icon-user"></i>
+			<input type="text" maxlength="16" required
+				   placeholder="Username" name="username" value="" id="rusername"/>
+		</div>
+		<div class="required">
+			<i class="icon-lock"></i>
+			<input type="password" required name="password" value=""
+				   id="rpassword" placeholder="Password"/>
+		</div>
+		<div class="required">
+			<i class="icon-lock"></i>
+			<input type="password" required name="repeatpassword" value="" placeholder="Confirm password"
+				   id="repeatpassword"/>
+		</div>
+		<div>
+			<i class="icon-mail"></i>
+			<input type="email" placeholder="Email" name="email" value="" id="email"/>
+		</div>
+		<div>
+			<i class="icon-user-pair"></i>
+			<select id="id_sex" name="sex">
+				<option value="0" disabled selected hidden>Gender</option>
+				<option value="1">Male</option>
+				<option value="2">Female</option>
+			</select>
+		</div>
+		<input type="submit" value="Sing Up"/>
+		{% csrf_token %}
 	</form>
-</nav>
-<form id="register-form" onsubmit="register(event)" class="biginputtext">
-	<div class="required">
-		<i class="icon-user"></i>
-		<input type="text" maxlength="16" required
-			   placeholder="Username" name="username" value="" id="rusername"/>
-	</div>
-	<div class="required">
-		<i class="icon-lock"></i>
-		<input type="password" required name="password" value=""
-			   id="rpassword" placeholder="Password"/>
-	</div>
-	<div class="required">
-		<i class="icon-lock"></i>
-		<input type="password" required name="repeatpassword" value="" placeholder="Confirm password"
-			   id="repeatpassword"/>
-	</div>
-	<div>
-		<i class="icon-mail"></i>
-		<input type="email" placeholder="Email" name="email" value="" id="email"/>
-	</div>
-	<div>
-		<i class="icon-user-pair"></i>
-		<select id="id_sex" name="sex">
-			<option value="0" disabled selected hidden>Gender</option>
-			<option value="1">Male</option>
-			<option value="2">Female</option>
-		</select>
-	</div>
-	<input type="submit" value="Sing Up"/>
-	{% csrf_token %}
-</form>
-<div id="growlHolder"></div>
-</body>
-</html>
+</div>
+{% endblock content %}

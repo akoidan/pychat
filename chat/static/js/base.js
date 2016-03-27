@@ -138,7 +138,7 @@ var CssUtils = {
 var Growl = function (message) {
 	var self = this;
 	self.growlHolder = growlHolder;
-	self.message = message;
+	self.message = message.trim();
 	self.error = function () {
 		self.show(4000, 'col-error')
 	};
@@ -160,7 +160,7 @@ var Growl = function (message) {
 	self.show = function (baseTime, growlClass) {
 		var timeout = baseTime + self.message.length * 50;
 		self.growl = document.createElement('div');
-		self.growl.innerHTML = encodeAnchorsHTML(self.message);
+		self.growl.innerHTML = self.message.indexOf("<") == 0? self.message : encodeAnchorsHTML(self.message);
 		self.growl.className = 'growl ' + growlClass;
 		self.growlHolder.appendChild(self.growl);
 		self.growl.clientHeight; // request to paint now!
@@ -245,6 +245,19 @@ function mute() {
 }
 
 
+function login(event) {
+	event.preventDefault();
+	var callback = function (data) {
+		if (data === RESPONSE_SUCCESS) {
+			window.location.href = '/';
+		} else {
+			growlError(data);
+		}
+	};
+	doPost('/auth', null, callback, loginForm);
+}
+
+
 function checkAndPlay(element) {
 	if (!window.sound) {
 		return;
@@ -308,7 +321,8 @@ function doPost(url, params, callback, form) {
 			}
 		}
 	};
-	var data = new FormData(form);
+	/*Firefox doesn't accept null*/
+	var data = form == null ? new FormData() : new FormData(form);
 
 	if (params) {
 		for (var key in params) {

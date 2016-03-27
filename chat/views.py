@@ -4,6 +4,8 @@ import json
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
+from django.contrib.auth.decorators import login_required
+
 try:
 	from django.template.context_processors import csrf
 except ImportError:
@@ -77,17 +79,13 @@ def validate_user(request):
 
 
 @require_http_methods('GET')
+@login_required(login_url='/register')
 def home(request):
 	"""
 	Login or logout navbar is creates by means of create_nav_page
 	@return:  the x intercept of the line M{y=m*x+b}.
 	"""
-	if request.user.is_anonymous():
-		c = csrf(request)
-		c.update({'error code': "welcome to register page"})
-		return render_to_response("register.html", c, context_instance=RequestContext(request))
-	else:
-		return render_to_response('chat.html', csrf(request), context_instance=RequestContext(request))
+	return render_to_response('chat.html', csrf(request), context_instance=RequestContext(request))
 
 
 @login_required_no_redirect

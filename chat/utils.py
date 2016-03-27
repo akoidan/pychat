@@ -14,7 +14,7 @@ from django.db import transaction
 from chat import settings
 from chat.log_filters import id_generator
 from chat.models import User, UserProfile, Room
-from chat.settings import ISSUES_REPORT_LINK, ANONYMOUS_REDIS_ROOM, REGISTERED_REDIS_ROOM
+from chat.settings import ISSUES_REPORT_LINK, ALL_REDIS_ROOM
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
 
@@ -136,14 +136,12 @@ def extract_photo(image_base64):
 def create_user(email, password, sex, username):
 	user = UserProfile(username=username, email=email, sex_str=sex)
 	user.set_password(password)
-	default_thread = Room.objects.get_or_create(name=ANONYMOUS_REDIS_ROOM)[0]
-	registered_only = Room.objects.get_or_create(name=REGISTERED_REDIS_ROOM)[0]
+	default_thread = Room.objects.get_or_create(name=ALL_REDIS_ROOM)[0]
 	user.save()
 	user.rooms.add(default_thread)
-	user.rooms.add(registered_only)
 	user.save()
 	logger.info(
-		'Signed up new user %s, subscribed for channels %s, %s',
-		user, registered_only.name, default_thread.name
+		'Signed up new user %s, subscribed for channels %s',
+		user, default_thread.name
 	)
 	return user

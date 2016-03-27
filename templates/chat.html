@@ -7,6 +7,9 @@
 	</script>
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
+	<script>
+		const loggedUser = "{{ username }}";
+	</script>
 {% endblock head %}
 {% block navbar %}
 	<li>

@@ -1,7 +1,4 @@
-var passRegex = /^\S.+\S$/;
 var loginForm;
-var registerValidator;
-
 
 var RegisterValidator = function () {
 	var self = this;
@@ -43,11 +40,12 @@ var RegisterValidator = function () {
 	};
 	self.password = {
 		input: $("rpassword"),
+		passRegex : /^\S.+\S$/,
 		validate: function() {
 			var pswd = self.password.input.value;
 			if (pswd.length === 0) {
 				self.setError(self.password, "Password can't be empty");
-			} else if (!passRegex.test(pswd)) {
+			} else if (!self.password.passRegex.test(pswd)) {
 				self.setError(self.password, "Password should be at least 3 character length without whitespaces");
 			} else {
 				self.setSuccess(self.password);
@@ -110,7 +108,7 @@ var RegisterValidator = function () {
 };
 
 onDocLoad(function () {
-	registerValidator = new RegisterValidator();
+	var registerValidator = new RegisterValidator();
 	registerValidator.init();
 	loginForm = $('loginForm');
 });
@@ -126,16 +124,4 @@ function register(event) {
 		}
 	};
 	doPost('/register', null, callback, form);
-}
-
-function login(event) {
-	event.preventDefault();
-	var callback = function (data) {
-		if (data === RESPONSE_SUCCESS) {
-			window.location.href = '/';
-		} else {
-			growlError(data);
-		}
-	};
-	doPost('/auth', null, callback, loginForm);
 }

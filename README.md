@@ -46,7 +46,8 @@ Start the chat:
  3. Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
  4. Open in browser http*s*://127.0.0.1:8000
 
-#TODO
+# TOD
+* add email confirmation for username or password change
 * add image upload
 * remember if user has camera/mic and autoset values after second call
 * android play() can only be initiated by a user gesture.

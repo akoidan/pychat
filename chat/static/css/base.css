@@ -65,8 +65,9 @@
 }
 
 /*-------- FONTELLO ------------*/
-.color-lor [class^='icon-']:not(.icon-anonymous):hover {
+.color-lor [class^='icon-']:hover {
 	text-shadow: 0 0 0.2em #FFF, 0 0 0.2em #3D3D3D;
+	cursor: pointer;
 }
 [class^='icon-volume'] { color: rgb(138, 109, 59); }
 .icon-home { color: rgb(51, 122, 183); }
@@ -81,7 +82,6 @@
 .icon-clear { color: rgb(142, 53, 84); }
 .icon-man {color: rgb(84, 151, 83) !important; } /*override .color-lor :link*/
 .icon-girl { color: #bb686a !important; } /*override .color-lor :link */
-.icon-anonymous { color: #C2C2C2 !important; } /*override .color-lor :link*/
 .icon-user-secret { color: rgb(92, 148, 163) !important; } /*override .color-lor :link*/
 .icon-phone { color: #136C00 } /*override .color-lor :link*/
 
@@ -271,21 +271,34 @@ textarea, div[contenteditable] {
 	font-size: 22px;
 	padding-right: 10px;
 }
-/* ============= LOGIN DROPDOWN ==============*/
-
-#hideableDropDown > form> * {
-	display: block;
-	margin: 13px;
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+	color: #59595a;
 }
 
-#hideableDropDown {
+/* ============= LOGIN DROPDOWN ==============*/
+
+#loginForm > div {
+	display: inline;
+}
+#loginForm > div> * {
+	vertical-align: top;
+	margin-top: 3px;
+	display: inline-block;
+	position: relative;
+}
+
+#loginForm >div> div> i {
 	position: absolute;
-	float: left;
-	right: 5px;
-	border: 1px solid;
-	z-index: 1;
-	border-radius: 2px;
-	margin-top: 8px; /* = navbarList bottom margin */
+	top: 3px;
+	left: 0;
+	font-size: 15px;
+}
+
+#loginForm input {
+	padding-left: 25px;
+	vertical-align: top;
+	padding-right: 5px;
+	width: 150px;
 }
 
 /* ================== COMMONS ======================*/
@@ -330,10 +343,6 @@ textarea, div[contenteditable] {
 /*============== FONTELLO SETTINGS =================*/
 nav [class^='icon-'] {
 	margin: 2px;
-}
-
-[class^='icon-']:not(.icon-anonymous):hover {
-	cursor: pointer;
 }
 
 /*================= SCROLLBAR ==================== */
