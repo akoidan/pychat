@@ -305,13 +305,23 @@ input[type=text], input[type=password], input[type=email], textarea,div[contente
 	padding-left: 5px;
 }
 
-input[type=button], input[type=submit], button, input[type=file]::-webkit-file-upload-button{
+input[type=button], input[type=submit], button {
+	border: 1px solid transparent;
+	border-radius: 3px;
+	font-size: 18px;
+	padding: 6px 12px;
+} input[type=file]::-webkit-file-upload-button { /*Mozzila doesn't apply inline for others */
 	border: 1px solid transparent;
 	border-radius: 3px;
 	font-size: 18px;
 	padding: 6px 12px;
 }
 
+/*select { */
+	/*-webkit-appearance: none;*/
+	/*-moz-appearance: none;*/
+/*background: url(new_arrow.png) no-repeat right #ddd;*/
+/*}*/
 
 textarea, div[contenteditable] {
 	border-radius: 4px;

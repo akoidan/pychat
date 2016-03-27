@@ -24,19 +24,33 @@
 	</form>
 </nav>
 <form id="register-form" onsubmit="register(event)" class="biginputtext">
-	<input type="text" maxlength="16" pattern="^[a-zA-Z-_0-9]{1,16}$" required
-			 placeholder="Username" name="username" value="" id="rusername"
-			 title="Field can only contain latin letters, numbers, dashes or underscore"/>
-	<input type="password" pattern="^\S.+\S$" required name="password" value=""
-			 id="rpassword" placeholder="Password"
-			 title="Field should be at least 3 no space characters long"/>
-	<input type="password" required name="repeatpassword" value="" id="repeatpassword"/>
-	<input type="email" placeholder="Email" name="email" value="" id="email"/>
-	<select id="id_sex" name="sex" placeholder="asd">
-		<option value="0" disabled selected hidden>Gender</option>
-		<option value="1">Male</option>
-		<option value="2">Female</option>
-	</select>
+	<div class="required">
+		<i class="icon-user"></i>
+		<input type="text" maxlength="16" required
+			   placeholder="Username" name="username" value="" id="rusername"/>
+	</div>
+	<div class="required">
+		<i class="icon-lock"></i>
+		<input type="password" required name="password" value=""
+			   id="rpassword" placeholder="Password"/>
+	</div>
+	<div class="required">
+		<i class="icon-lock"></i>
+		<input type="password" required name="repeatpassword" value="" placeholder="Confirm password"
+			   id="repeatpassword"/>
+	</div>
+	<div>
+		<i class="icon-mail"></i>
+		<input type="email" placeholder="Email" name="email" value="" id="email"/>
+	</div>
+	<div>
+		<i class="icon-user-pair"></i>
+		<select id="id_sex" name="sex">
+			<option value="0" disabled selected hidden>Gender</option>
+			<option value="1">Male</option>
+			<option value="2">Female</option>
+		</select>
+	</div>
 	<input type="submit" value="Sing Up"/>
 	{% csrf_token %}
 </form>

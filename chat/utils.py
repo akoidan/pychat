@@ -72,7 +72,7 @@ def check_email(email):
 		validate_email(email)
 		# theoretically can throw returning 'more than 1' error
 		UserProfile.objects.get(email=email)
-		raise ValidationError('This email is already used')
+		raise ValidationError('Email {} is already used'.format(email))
 	except User.DoesNotExist:
 		pass
 
