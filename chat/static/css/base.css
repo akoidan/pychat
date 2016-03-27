@@ -423,6 +423,14 @@ video {
 	width: 100%;
 }
 
+input[type=range][orient=vertical] {
+	writing-mode: bt-lr; /* IE */
+	-webkit-appearance: slider-vertical; /* WebKit */
+	width: 8px;
+	height: 100px;
+	padding: 0 5px;
+}
+
 /*user-profile*/
 @media screen and (max-width: 50em ) {
 	.two-columns {

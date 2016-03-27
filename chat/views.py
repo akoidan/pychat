@@ -156,11 +156,6 @@ def show_profile(request, profile_id):
 
 
 @require_http_methods('GET')
-def hack(request):
-	return render_to_response('')
-
-
-@require_http_methods('GET')
 def statistics(request):
 	pie_data = IpAddress.objects.values('country').filter(country__isnull=False).annotate(count=Count("country"))
 	return render_to_response(

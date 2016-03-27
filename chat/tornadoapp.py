@@ -17,9 +17,6 @@ from django.db import connection, OperationalError, InterfaceError
 from django.db.models import Q
 from redis_sessions.session import SessionStore
 from tornado.websocket import WebSocketHandler
-import os
-
-from chat.log_filters import id_generator
 
 try:
 	from urllib.parse import urlparse  # py2
@@ -28,7 +25,6 @@ except ImportError:
 
 from chat.settings import MAX_MESSAGE_SIZE, ALL_REDIS_ROOM
 from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo
-from chat.utils import check_user
 
 PY3 = sys.version > '3'
 
@@ -101,12 +97,12 @@ class MessagesCreator(object):
 			TIME_VAR_NAME: get_milliseconds()
 		}
 
-	def offer_call(self, content, type):
+	def offer_call(self, content, message_type):
 		"""
 		:return: {"action": "call", "content": content, "time": "20:48:57"}
 		"""
 		message = self.default(content, CALL_EVENT)
-		message[CALL_TYPE_VAR_NAME] = type
+		message[CALL_TYPE_VAR_NAME] = message_type
 		return message
 
 	@classmethod
