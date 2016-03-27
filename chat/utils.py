@@ -103,7 +103,7 @@ def send_email_verification(user, site_address):
 		code = '/confirm_email?code=' + user.verify_code
 
 		text = 'Hi %s, you have registered on our %s.' \
-			'\nTo complete your registration click on the url bellow: http://%s%s .' \
+			'\nTo complete your registration click on the url bellow: https://%s%s .' \
 			'\n\n If you have any questions or suggestion, please post them here %s' %\
 			(user.username, site_address, site_address,  code, ISSUES_REPORT_LINK)
 
