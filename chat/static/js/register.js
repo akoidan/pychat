@@ -21,9 +21,10 @@ var RegisterValidator = function () {
 				element.input.onfocus = function() {
 					CssUtils.removeClass(element.slider, 'closed');
 				};
-				element.input.addEventListener("focusout", function() {
+				/*FF doesn't support focusout*/
+				element.input.onblur=  function() {
 					CssUtils.addClass(element.slider, 'closed');
-				});
+				};
 			})(element);
 		}
 	};
