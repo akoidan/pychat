@@ -101,7 +101,8 @@ var CssUtils = {
 	},
 	addClass: function (element, className) {
 		if (!this.hasClass(element, className)) {
-			element.className += " " + className;
+			var oldClassName = element.className;
+			element.className = getText("{} {}", oldClassName.trim(), className);
 		}
 	},
 	removeClass: function (element, className) {

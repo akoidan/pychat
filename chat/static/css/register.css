@@ -1,59 +1,108 @@
 .required {
 	position: relative;
 }
+
 .required:after {
 	content: " *";
 	position: absolute;
 	right: 7px;
-	top:17px;
+	top: 17px;
 	font-size: 17px;
 	display: inline-block;
 	font-weight: bold;
-	color: #B10000;
+	color: #6E6E6E;
 }
 
-.error {
-	color: #991515;
-}
-.success {
-	color:#1C721C;;
+@font-face {
+	font-family: 'Oswald';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Oswald Regular'), local('Oswald-Regular'), url(https://fonts.gstatic.com/s/oswald/v10/Y_TKV6o8WovbUd3m_X9aAA.ttf) format('truetype');
 }
 
-#register-form {
+@font-face {
+	font-family: 'Open Sans';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Open Sans'), local('OpenSans'), url(https://fonts.gstatic.com/s/opensans/v13/cJZKeOuBrn4kERxqtaUH3aCWcynf_cDxXwCLxiixG1c.ttf) format('truetype');
+}
+
+input, select {
+	outline: none
+}
+
+::-webkit-input-placeholder {
+	color: #6E6E6E
+}
+
+:-moz-placeholder { /* Firefox 18- */
+	color: #6E6E6E
+}
+
+::-moz-placeholder { /* Firefox 19+ */
+	color: #6E6E6E
+}
+
+:-ms-input-placeholder {
+	color: #6E6E6E
+}
+
+form {
 	margin: auto;
 	text-align: center;
-	padding: 20px;
-	max-width: 300px;
 }
 
-#register-form > * {
+.reg-log-container {
+	overflow-y: auto;
+	padding: 20px;
+	max-width: 300px;
+	margin: auto;
+}
+
+
+
+form > * {
 	display: block;
 	margin: auto;
 	position: relative;
 	width: 100%;
 }
 
-#register-form  i {
+input:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0px 1000px #242400 inset !important;
+	-webkit-text-fill-color: #C6C6B6 !important;
+	color: #C6C6B6;
+}
+
+form i {
 	position: absolute;
 	top: 15px;
+	color: #6E6E6E;
 	left: 5px;
 }
 
-#register-form input:not([type=submit]) {
+i.error {
+	color: #740F0F;
+}
+
+i.success {
+	color: #275324;;
+}
+
+form input:not([type=submit]) {
 	width: calc(100% - 58px);
 }
 
-#register-form input:not([type=submit]),#register-form  select {
+form input:not([type=submit]), form select {
 	padding-left: 35px;
 	padding-right: 22px;
-	background-color: #282828;
-	box-shadow: inset 0 0 8px 4px #151515;
 }
 
-#register-form input[type=submit], #register-form  select {
+form input[type=submit], form select {
 	width: 100%
 }
-#register-form input[type=submit] {
+
+form input[type=submit] {
 	margin-top: 10px;
 }
 
@@ -61,3 +110,126 @@
 	color: #59595a;
 }
 
+.icon-mail, .icon-user-pair {
+	font-size: 13px;
+	top: 17px !important;
+	left: 7px !important;
+}
+
+.slider {
+	font: 13px Open Sans;
+	color: #6E6E6E;
+	text-shadow: #000 0px 1px 5px;
+	margin-top: -7px;
+	margin-bottom: 7px;
+	padding-left: 10px;
+	font-size: 10px;
+	overflow-y: hidden;
+	text-align: left;
+	height: 15px; /* approximate max height */
+	transition:  1s  height 0s;
+}
+
+.slider.closed {
+	height: 0;
+}
+
+/*-----------------------------------------------------------------*/
+body {
+	background: url(http://subtlepatterns2015.subtlepatterns.netdna-cdn.com/patterns/dark_wall.png);
+}
+
+h1 {
+	text-align: $ align;
+	padding: 30px 0 30px 0;
+	font: 25px Oswald;
+	color: #FFF;
+	text-transform: uppercase;
+	text-shadow: #000 0 1px 5px;
+	margin: 0;
+
+}
+
+input[type="text"], input[type="email"], input[type="password"], select, option {
+	padding: 15px 0px 15px 8px;
+	border-radius: 5px;
+	box-shadow: inset 4px 6px 10px -4px rgba(0, 0, 0, 0.3), 0 1px 1px -1px rgba(255, 255, 255, 0.3);
+	background: rgba(0, 0, 0, 0.2);
+	outline: none;
+	border: none;
+	border: 1px solid rgba(0, 0, 0, 1);
+	margin-bottom: 10px;
+	color: #CECECE;
+	text-shadow: #000 0px 1px 5px;
+}
+
+option {
+	background-color: #1A1A1A
+}
+
+input[type="submit"] {
+	width: 100%;
+	padding: 15px;
+	border-radius: 5px;
+	outline: none;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#28D2DE), to(#1A878F));
+	background-image: -webkit-linear-gradient(#28D2DE 0%, #1A878F 100%);
+	background-image: -moz-linear-gradient(#28D2DE 0%, #1A878F 100%);
+	background-image: -o-linear-gradient(#28D2DE 0%, #1A878F 100%);
+	background-image: linear-gradient(#28D2DE 0%, #1A878F 100%);
+	font: 14px Oswald;
+	color: #FFF;
+	text-transform: uppercase;
+	text-shadow: #000 0px 1px 5px;
+	border: 1px solid #000;
+	opacity: 0.7;
+	-webkit-box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.7);
+	-moz-box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.7);
+	box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.7);
+	border-top: 1px solid rgba(255, 255, 255, 0.8) !important;
+	-webkit-box-reflect: below 0px -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255, 255, 255, 0.2)));
+}
+
+input:not([type=submit]):focus, select:focus {
+	box-shadow: inset 4px 6px 10px -4px rgba(0, 0, 0, 0.7), 0 1px 1px -1px rgba(255, 255, 255, 0.3);
+	background: rgba(0, 0, 0, 0.3);
+	-webkit-transition: 1s ease;
+	-moz-transition: 1s ease;
+	-o-transition: 1s ease;
+	-ms-transition: 1s ease;
+	transition: 1s ease;
+}
+
+input[type="submit"]:hover {
+	opacity: 1;
+	cursor: pointer;
+}
+
+.reg-log-container > input{
+	width: 50%;
+	border: 0;
+	border-radius: 0;
+}
+.hidden {
+	display: none !important;
+}
+
+.disabled {
+	background-image: none !important;
+	background-color: #434343;
+}
+
+.forg-pass {
+	text-align: right;
+	color: #249BA3;
+	font: 12px Open Sans;
+	padding-right: 10px;
+	width: inherit;
+	padding-top: 3px;
+	text-shadow: #000 0px 1px 5px;
+}
+
+.forg-pass:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}

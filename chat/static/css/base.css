@@ -173,24 +173,24 @@ img {
 	padding: 10px;
 }
 
-.right {
-	float:right;
-}
-
 .hidden {
 	display: none !important;
 }
 
+.flex-push-right {
+	margin-left: auto;
+}
 nav {
 	/*Icons navbar size*/
 	font-size: 26px;
-}
-nav > ul {
 	margin: 0;
 	padding: 10px 4px 9px 10px;
+	display: flex;
+	align-items: center;
 }
-nav > ul > li {
-	 display:inline;
+
+nav > * {
+
 }
 
 html, body {
@@ -276,21 +276,30 @@ textarea, div[contenteditable] {
 }
 
 /* ============= LOGIN DROPDOWN ==============*/
+#loginForm {
+	display: flex;
+	align-items: center;
+}
 
 #loginForm > div {
 	display: inline;
+	display: flex;
 }
-#loginForm > div> * {
+
+#loginForm input {
+	background-color: #2D312E;
+	font-family: Oswald;
+}
+.shrink-200px > div {
 	vertical-align: top;
-	margin-top: 3px;
+	padding-left: 10px;
 	display: inline-block;
 	position: relative;
 }
 
 #loginForm >div> div> i {
 	position: absolute;
-	top: 3px;
-	left: 0;
+	top:2px;
 	font-size: 15px;
 }
 
@@ -450,10 +459,13 @@ input[type=range][orient=vertical] {
 	.very-small-screen, .time-message {
 		display: none !important;
 	}
+	#hide {
+		margin-left: auto;
+	}
 }
 
 @media screen and (max-width: 80em ) {
- .mText {
-	 display: none;
- }
+	.mText {
+		display: none;
+	}
 }

@@ -1,30 +1,60 @@
-{% extends 'base.html' %}
-{% block head %} {% load md5url %}
-	<script src="{% md5url "js/register.js" %}"></script>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<title>PyChat</title> {% load md5url %}
+	<link rel="shortcut icon" href="{% md5url 'favicon.ico' %}" />
+	<link rel="stylesheet" type="text/css" href="{% md5url 'css/fontello.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/register.css' %}">
-{% endblock head%}
-{% block content %}
-{% comment %}<body class="color-lor" style="background: linear-gradient(#272C2D, #212526);">{% endcomment %}
-<div style="overflow-y: auto">
-	<form id="register-form" onsubmit="register(event)" class="black-inputs biginputtext">
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<script>
+		const RESPONSE_SUCCESS = "{{ successReponse }}";
+	</script>
+	<script src="{% md5url "js/base.js" %}"></script>
+	<script src="{% md5url "js/register.js" %}"></script>
+</head>
+<body class="color-lor" >
+<div class="reg-log-container">
+	<input type="submit" id="showRegister" value="Sign Up"/><input type="submit" class="disabled" id="showLogin" value="Log In"/>
+	<form id="loginForm" class="hidden" onsubmit="login(event);">
+		<h1>Wellcome back!</h1>
+		<div>
+			<i class="icon-user"></i>
+			<input type="text" maxlength="16" required placeholder="Username" name="username" value="" id="username"/>
+		</div>
+		<div>
+			<i class="icon-key"></i>
+			<input type="password" name="password" placeholder="Password" id="password" required/>
+		</div>
+		<div class="forg-pass" onclick='alert("TODO");'><span>Forgot Password?</span></div>
+		<div>
+			<input type="submit" value="LOG IN"/>
+		</div>
+	</form>
+	<form id="register-form" onsubmit="register(event)" class="form black-inputs biginputtext">
+		<h1>Create new account</h1>
 		<div class="required">
 			<i class="icon-user"></i>
 			<input type="text" maxlength="16" required
 				   placeholder="Username" name="username" value="" id="rusername"/>
+			<div class="slider closed"></div>
 		</div>
 		<div class="required">
 			<i class="icon-lock"></i>
 			<input type="password" required name="password" value=""
 				   id="rpassword" placeholder="Password"/>
+			<div class="slider closed"></div>
 		</div>
 		<div class="required">
 			<i class="icon-lock"></i>
 			<input type="password" required name="repeatpassword" value="" placeholder="Confirm password"
 				   id="repeatpassword"/>
+			<div class="slider closed"></div>
 		</div>
 		<div>
 			<i class="icon-mail"></i>
 			<input type="email" placeholder="Email" name="email" value="" id="email"/>
+			<div class="slider closed"></div>
 		</div>
 		<div>
 			<i class="icon-user-pair"></i>
@@ -34,8 +64,11 @@
 				<option value="2">Female</option>
 			</select>
 		</div>
-		<input type="submit" value="Sing Up"/>
+		<input type="submit" value="REGISTER"/>
 		{% csrf_token %}
 	</form>
 </div>
-{% endblock content %}
+{% csrf_token %}
+<div id="growlHolder"></div>
+</body>
+</html>

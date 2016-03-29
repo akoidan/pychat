@@ -261,6 +261,10 @@ p {
 	color: green
 }
 
+.icon-plus-squared {
+	font-size: 15px;
+}
+
 #callUserList > li {
 	list-style-type: none;
 	border-radius: 2px;

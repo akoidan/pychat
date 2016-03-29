@@ -12,13 +12,8 @@
 	</script>
 {% endblock head %}
 {% block navbar %}
-	<li>
-		<i class="icon-clear" title="CLear local history"
-			onclick="clearLocalHistory()"><span class="mText">clear</span></i></li>
-	<li>
-		<i class="icon-phone" title="Make a video/mic call"
-			onclick="webRtcApi.showCallDialog()"><span class="mText">Call</span></i>
-	</li>
+	<i class="icon-clear" title="Clear local history" onclick="clearLocalHistory()"><span class="mText">clear</span></i>
+	<i class="icon-phone" title="Make a video/mic call" onclick="webRtcApi.showCallDialog()"><span class="mText">Call</span></i>
 {% endblock navbar %}
 {% block content %}
 	<div>
@@ -37,7 +32,10 @@
 			<table id="chat-user-table">
 				<tr></tr>
 			</table>
-			<div id="rooms">
+			<div>
+				<span>#Channels <i class="icon-plus-squared" title="Create new channel" onclick="alert('not impl')"></i></span>
+				<div id="rooms">
+				</div>
 			</div>
 		</div>
 		<div id="smileParentHolder" class="padding10 hidden" onclick="smileyUtil.addSmile(event);">

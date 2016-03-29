@@ -14,10 +14,22 @@ var RegisterValidator = function () {
 			} else {
 				element.input.onchange = element.validate;
 			}
+			element.slider =  parentNode.children[parentNode.children.length-1];
+			(function(element){
+				if (element.input.id == 'id_sex') return;
+				element.slider.textContent = element.text;
+				element.input.onfocus = function() {
+					CssUtils.removeClass(element.slider, 'closed');
+				};
+				element.input.addEventListener("focusout", function() {
+					CssUtils.addClass(element.slider, 'closed');
+				});
+			})(element);
 		}
 	};
 	self.username = {
 		input: $("rusername"),
+		text: "Please select username",
 		validate: function () {
 			var input = self.username.input;
 			input.value = input.value.trim();
@@ -32,7 +44,6 @@ var RegisterValidator = function () {
 						self.setSuccess(self.username);
 					} else {
 						self.setError(self.username, data);
-						growlError(data);
 					}
 				}, null);
 			}
@@ -40,6 +51,7 @@ var RegisterValidator = function () {
 	};
 	self.password = {
 		input: $("rpassword"),
+		text: "Come up with password",
 		passRegex : /^\S.+\S$/,
 		validate: function() {
 			var pswd = self.password.input.value;
@@ -55,6 +67,7 @@ var RegisterValidator = function () {
 	};
 	self.repeatPassword = {
 		input: $("repeatpassword"),
+		text: "Repeat your password",
 		validate: function () {
 			if (self.password.input.value !== self.repeatPassword.input.value) {
 				self.setError(self.repeatPassword, "Passwords don't match");
@@ -66,28 +79,27 @@ var RegisterValidator = function () {
 	self.gender = {
 		input: $('id_sex'),
 		validate : function() {
-			self.setSuccess(self.gender);
+			CssUtils.addClass(self.gender.icon, 'success');
 			self.gender.input.style.color ='#C7C7C7'
 		}
 	};
 	self.email = {
 		input: $("email"),
+		text: "Specify your email",
 		validate: function () {
 			var input = self.email.input;
 			var mail = input.value;
 			input.setCustomValidity("");
 			if (mail.trim() == ''){
-				CssUtils.removeClass(self.email.icon, 'error');
-				CssUtils.removeClass(self.email.icon, 'success');
+				self.setSuccess(self.email);
 			} else if (!input.checkValidity()) {
-				self.setError(self.email, null, true);
+				self.setError(self.email, input.validationMessage, true);
 			} else {
 				doPost('/validate_email', {'email': mail}, function (data) {
 					if (data === RESPONSE_SUCCESS) {
 						self.setSuccess(self.email);
 					} else {
 						self.setError(self.email, data);
-						growlError(data);
 					}
 				}, null);
 			}
@@ -96,6 +108,7 @@ var RegisterValidator = function () {
 	self.setError = function (element, errorText, skipValidity) {
 		CssUtils.removeClass(element.icon, 'success');
 		CssUtils.addClass(element.icon, 'error');
+		element.slider.textContent = errorText;
 		if (!skipValidity) {
 			element.input.setCustomValidity(errorText);
 		}
@@ -104,6 +117,7 @@ var RegisterValidator = function () {
 		CssUtils.removeClass(element.icon, 'error');
 		CssUtils.addClass(element.icon, 'success');
 		element.input.setCustomValidity("");
+		element.slider.textContent = element.text;
 	};
 };
 
@@ -111,6 +125,19 @@ onDocLoad(function () {
 	var registerValidator = new RegisterValidator();
 	registerValidator.init();
 	loginForm = $('loginForm');
+	$('showRegister').onclick = function() {
+		CssUtils.showElement($('register-form'));
+		CssUtils.hideElement($('loginForm'));
+		CssUtils.removeClass($('showRegister'), 'disabled');
+		CssUtils.addClass($('showLogin'), 'disabled');
+
+	};
+	$('showLogin').onclick = function() {
+		CssUtils.hideElement($('register-form'));
+		CssUtils.showElement($('loginForm'));
+		CssUtils.removeClass($('showLogin'), 'disabled');
+		CssUtils.addClass($('showRegister'), 'disabled');
+	};
 });
 
 function register(event) {
@@ -118,7 +145,7 @@ function register(event) {
 	var form = $('register-form');
 	var callback = function (data) {
 		if (data === RESPONSE_SUCCESS) {
-			window.location.href = '/profile';
+			window.location.href = '/';
 		} else {
 			growlError(data);
 		}

@@ -91,7 +91,7 @@ def check_user(username):
 	try:
 		# theoretically can throw returning 'more than 1' error
 		User.objects.get(username=username)
-		raise ValidationError("Username {} is already used".format(username))
+		raise ValidationError("Username {} is already used. Please select another one".format(username))
 	except User.DoesNotExist:
 		pass
 
