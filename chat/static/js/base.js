@@ -76,6 +76,17 @@ window.browserVersion = (function () {
 })();
 
 
+function getUrlParam(name, url) {
+	if (!url) url = window.location.href;
+	name = name.replace(/[\[\]]/g, "\\$&");
+	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)", "i"),
+			results = regex.exec(url);
+	if (!results) return null;
+	if (!results[2]) return '';
+	return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+
 function onDocLoad(onload) {
 	return document.addEventListener("DOMContentLoaded", onload);
 }
@@ -103,6 +114,16 @@ var CssUtils = {
 		if (!this.hasClass(element, className)) {
 			var oldClassName = element.className;
 			element.className = getText("{} {}", oldClassName.trim(), className);
+		}
+	},
+	setOnOf: function(element, desiredClass, removeClasses) {
+		var className = element.className;
+		if (className == null) {
+			element.className = desiredClass;
+		} else {
+			var replaceReg = new RegExp("(" + removeClasses.join("|") + ")", "g");
+			className = className.replace(replaceReg, '');
+			element.className = className + " " + desiredClass;
 		}
 	},
 	removeClass: function (element, className) {

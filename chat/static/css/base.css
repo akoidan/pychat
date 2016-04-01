@@ -48,6 +48,16 @@
 	color: #7572CF;
 }
 
+.message {
+	text-align: center;
+	font-size: 30px;
+	font-family: monospace;
+	display: table;
+	width: 100%;
+	vertical-align: middle;
+	margin-top: 15%;
+}
+
 /*-----------INPUT BUTTON -----------*/
 .color-lor input[type=button]:hover,
 .color-lor button:hover,

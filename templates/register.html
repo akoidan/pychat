@@ -12,11 +12,43 @@
 	</script>
 	<script src="{% md5url "js/base.js" %}"></script>
 	<script src="{% md5url "js/register.js" %}"></script>
+	<style>
+		@font-face {
+			font-family: 'Oswald';
+			font-style: normal;
+			font-weight: 400;
+			src: local('Oswald Regular'), local('Oswald-Regular'), url({% md5url 'font/OpenSans.ttf' %}) format('truetype');
+		}
+		@font-face {
+			font-family: 'Open Sans';
+			font-style: normal;
+			font-weight: 400;
+			src: local('Open Sans'), local('OpenSans'), url({% md5url 'font/Oswald.ttf' %}) format('truetype');
+		}
+		body {
+			background-image: url({% md5url 'images/dark_wall.png' %});
+		}
+	</style>
 </head>
 <body class="color-lor" >
 <div class="reg-log-container">
 	<input type="submit" id="showRegister" value="Sign Up"/><input type="submit" class="disabled" id="showLogin" value="Log In"/>
-	<form id="loginForm" class="hidden" onsubmit="login(event);">
+	<form id="recoverForm" class="hidden" method="post" onsubmit="restorePassword(event);">
+		<h1>Restore password</h1>
+		<div>
+			<input type="text" style="padding-left: 10px; width: calc(100% - 35px)"
+				   required placeholder="Username or email" name="username_or_password" value="" id="username"/>
+			<div class="slider">Enter your username or email</div>
+		</div>
+		{% if captcha %}
+			<script src='https://www.google.com/recaptcha/api.js'></script>
+			<div class="g-recaptcha" data-theme="dark" data-sitekey="{{ captcha }}"></div>
+		{% endif %}
+		<div>
+			<input type="submit" value="Recover password"/>
+		</div>
+	</form>
+	<form id="loginForm" method="post" class="hidden" onsubmit="login(event);">
 		<h1>Wellcome back!</h1>
 		<div>
 			<i class="icon-user"></i>
@@ -26,12 +58,12 @@
 			<i class="icon-key"></i>
 			<input type="password" name="password" placeholder="Password" id="password" required/>
 		</div>
-		<div class="forg-pass" onclick='alert("TODO");'><span>Forgot Password?</span></div>
+		<div class="forg-pass" id="recoverPassword"><span>Forgot Password?</span></div>
 		<div>
 			<input type="submit" value="LOG IN"/>
 		</div>
 	</form>
-	<form id="register-form" onsubmit="register(event)" class="form black-inputs biginputtext">
+	<form id="register-form" method="post" onsubmit="register(event)" class="form black-inputs biginputtext">
 		<h1>Create new account</h1>
 		<div class="required">
 			<i class="icon-user"></i>
@@ -63,6 +95,7 @@
 				<option value="1">Male</option>
 				<option value="2">Female</option>
 			</select>
+			<div class="slider closed"></div>
 		</div>
 		<input type="submit" value="REGISTER"/>
 		{% csrf_token %}

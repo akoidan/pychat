@@ -16,8 +16,9 @@ var RegisterValidator = function () {
 			}
 			element.slider =  parentNode.children[parentNode.children.length-1];
 			(function(element){
-				if (element.input.id == 'id_sex') return;
-				element.slider.textContent = element.text;
+				if (element.input.id != 'id_sex') {
+					element.slider.textContent = element.text;
+				}
 				element.input.onfocus = function() {
 					CssUtils.removeClass(element.slider, 'closed');
 				};
@@ -28,17 +29,23 @@ var RegisterValidator = function () {
 			})(element);
 		}
 	};
+	self.errorCls = 'error';
+	self.successCls = 'success';
+	self.warnCls = 'warn';
+	self.allCls = [self.successCls, self.warnCls, self.errorCls];
 	self.username = {
 		input: $("rusername"),
 		text: "Please select username",
+		badUsernameText: "Username can only contain latin letters, numbers, dashes or underscore",
+		validText: "Username is fine",
 		validate: function () {
 			var input = self.username.input;
 			input.value = input.value.trim();
 			var username = input.value;
 			if (username === "") {
-				self.setError(self.username, "Username cannot be blank!");
+				self.setError(self.username, self.username.text);
 			} else if (!USER_REGEX.test(username)) {
-				self.setError(self.username, "Username can only contain latin letters, numbers, dashes or underscore");
+				self.setError(self.username, self.username.badUsernameText);
 			} else {
 				doPost('/validate_user', {username: username}, function (data) {
 					if (data === RESPONSE_SUCCESS) {
@@ -53,48 +60,66 @@ var RegisterValidator = function () {
 	self.password = {
 		input: $("rpassword"),
 		text: "Come up with password",
+		warnText: "Password is weak! Good one contains at least 5 characters, one big letter small letter and a digit",
+		validText: "Password is good!",
+		shortText: "Password is too short",
 		passRegex : /^\S.+\S$/,
+		passGoodRegex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{5,}$/,
 		validate: function() {
-			var pswd = self.password.input.value;
+			var el = self.password;
+			var pswd = el.input.value;
 			if (pswd.length === 0) {
-				self.setError(self.password, "Password can't be empty");
-			} else if (!self.password.passRegex.test(pswd)) {
-				self.setError(self.password, "Password should be at least 3 character length without whitespaces");
+				self.setError(el, el.text);
+			} else if (!el.passRegex.test(pswd)) {
+				self.setError(el, el.shortText);
+			} else if (!el.passGoodRegex.test(pswd) && pswd.length < 11) {
+				self.setWarn(el);
 			} else {
-				self.setSuccess(self.password);
+				self.setSuccess(el);
 			}
 			self.repeatPassword.validate();
 		}
 	};
 	self.repeatPassword = {
 		input: $("repeatpassword"),
+		validText: "Passwords match",
+		notMatchText: "Passwords don't match",
 		text: "Repeat your password",
 		validate: function () {
-			if (self.password.input.value !== self.repeatPassword.input.value) {
-				self.setError(self.repeatPassword, "Passwords don't match");
+			var el = self.repeatPassword;
+			var value = el.input.value;
+			if (value == "") {
+				self.setError(el, el.text);
+			} else if (value !== self.password.input.value) {
+				self.setError(el, el.notMatchText);
 			} else {
-				self.setSuccess(self.repeatPassword);
+				self.setSuccess(el);
 			}
 		}
 	};
 	self.gender = {
 		input: $('id_sex'),
 		validate : function() {
-			CssUtils.addClass(self.gender.icon, 'success');
+			CssUtils.addClass(self.gender.icon, self.successCls);
 			self.gender.input.style.color ='#C7C7C7'
 		}
 	};
 	self.email = {
 		input: $("email"),
-		text: "Specify your email",
+		validText: "Email is fine",
+		text: "Specify your email. Though email is not required it will give you a lot of privileges!",
 		validate: function () {
 			var input = self.email.input;
+			var element = self.email;
 			var mail = input.value;
 			input.setCustomValidity("");
 			if (mail.trim() == ''){
-				self.setSuccess(self.email);
+				CssUtils.removeClass(element.icon, self.errorCls);
+				CssUtils.removeClass(element.icon, self.successCls);
+				element.input.setCustomValidity("");
+				element.slider.textContent = element.text;
 			} else if (!input.checkValidity()) {
-				self.setError(self.email, input.validationMessage, true);
+				self.setError(self.email, input.validationMessage);
 			} else {
 				doPost('/validate_email', {'email': mail}, function (data) {
 					if (data === RESPONSE_SUCCESS) {
@@ -106,45 +131,68 @@ var RegisterValidator = function () {
 			}
 		}
 	};
-	self.setError = function (element, errorText, skipValidity) {
-		CssUtils.removeClass(element.icon, 'success');
-		CssUtils.addClass(element.icon, 'error');
+	self.setError = function (element, errorText) {
+		CssUtils.setOnOf(element.icon, self.errorCls, self.allCls);
 		element.slider.textContent = errorText;
-		if (!skipValidity) {
-			element.input.setCustomValidity(errorText);
-		}
+		element.input.setCustomValidity(errorText);
+	};
+	self.setWarn = function (element) {
+		CssUtils.setOnOf(element.icon, self.warnCls, self.allCls);
+		element.slider.textContent = element.warnText;
+		element.input.setCustomValidity("");
 	};
 	self.setSuccess = function (element) {
-		CssUtils.removeClass(element.icon, 'error');
-		CssUtils.addClass(element.icon, 'success');
+		CssUtils.setOnOf(element.icon, self.successCls, self.allCls);
 		element.input.setCustomValidity("");
-		element.slider.textContent = element.text;
+		element.slider.textContent = element.validText;
 	};
 };
+
+function showRegister() {
+	CssUtils.showElement($('register-form'));
+	CssUtils.hideElement($('loginForm'));
+	CssUtils.hideElement($('recoverForm'));
+	CssUtils.removeClass($('showRegister'), 'disabled');
+	CssUtils.addClass($('showLogin'), 'disabled');
+}
+
+function showLogin() {
+	CssUtils.hideElement($('register-form'));
+	CssUtils.showElement($('loginForm'));
+	CssUtils.hideElement($('recoverForm'));
+	CssUtils.removeClass($('showLogin'), 'disabled');
+	CssUtils.addClass($('showRegister'), 'disabled');
+}
+
+function showForgotPassword () {
+		CssUtils.hideElement($('register-form'));
+		CssUtils.hideElement($('loginForm'));
+		CssUtils.showElement($('recoverForm'));
+		CssUtils.addClass($('showLogin'), 'disabled');
+		CssUtils.addClass($('showRegister'), 'disabled');
+	}
 
 onDocLoad(function () {
 	var registerValidator = new RegisterValidator();
 	registerValidator.init();
 	loginForm = $('loginForm');
-	$('showRegister').onclick = function() {
-		CssUtils.showElement($('register-form'));
-		CssUtils.hideElement($('loginForm'));
-		CssUtils.removeClass($('showRegister'), 'disabled');
-		CssUtils.addClass($('showLogin'), 'disabled');
-
-	};
-	$('showLogin').onclick = function() {
-		CssUtils.hideElement($('register-form'));
-		CssUtils.showElement($('loginForm'));
-		CssUtils.removeClass($('showLogin'), 'disabled');
-		CssUtils.addClass($('showRegister'), 'disabled');
-	};
+	$('showRegister').onclick = showRegister;
+	$('showLogin').onclick = showLogin;
+	$('recoverPassword').onclick = showForgotPassword;
+	var initType = getUrlParam('type');
+	if (initType == 'login') {
+		showLogin();
+	} else if (initType == 'register') {
+		showRegister();
+	}
 });
 
 function register(event) {
 	event.preventDefault();
 	var form = $('register-form');
+	//ajaxShow(); TODO
 	var callback = function (data) {
+		//ajaxHide();
 		if (data === RESPONSE_SUCCESS) {
 			window.location.href = '/';
 		} else {
@@ -152,4 +200,24 @@ function register(event) {
 		}
 	};
 	doPost('/register', null, callback, form);
+}
+
+
+function restorePassword(event) {
+	event.preventDefault();
+	var form = $('recoverForm');
+	//ajaxShow(); TODO
+	var callback = function (data) {
+		// if captcha is turned off
+		if (typeof grecaptcha != 'undefined') {
+			grecaptcha.reset();
+		}
+		//ajaxHide();
+		if (data === RESPONSE_SUCCESS) {
+			alert("Check your email. The verification password has been sent");
+		} else {
+			growlError(data);
+		}
+	};
+	doPost('/send_restore_password', null, callback, form);
 }

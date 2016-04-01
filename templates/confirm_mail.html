@@ -4,24 +4,12 @@
 		var a = "{{message}}";
 		if (a == RESPONSE_SUCCESS ) {
 			alert('verification code is accepted');
-			redirectTime = "3000";
-			redirectURL = "/";
-			setTimeout("location.href = redirectURL;", redirectTime);
+			setTimeout(function() {
+				location.href = '/';
+			}, 5000);
 		}
 	</script>
-	<style>
-		.message {
-			text-align: center;
-			font-size: 30px;
-			font-family: monospace;
-			display: table;
-			width: 100%;
-			vertical-align: middle;
-			margin-top: 15%;
-		}
-	</style>
 {% endblock head %}
-
 {% block content %}
 	{% if message == successReponse %}
 		<div class="message">

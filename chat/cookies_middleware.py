@@ -1,6 +1,7 @@
 import random
 
 from chat import local
+from chat.utils import get_client_ip
 
 
 class UserCookieMiddleWare(object):
@@ -16,8 +17,4 @@ class UserCookieMiddleWare(object):
 		except AttributeError:
 			local.random = str(random.randint(0, 10000)).rjust(4, '0')
 			local.user = str(getattr(request.user, 'username', '')).rjust(8, ' ')
-			local.client_ip = self.get_client_ip(request)
-
-	def get_client_ip(self, request):
-		x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
-		return x_forwarded_for.split(',')[-1].strip() if x_forwarded_for else request.META.get('REMOTE_ADDR')
+			local.client_ip = get_client_ip(request)

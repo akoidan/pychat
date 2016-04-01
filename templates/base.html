@@ -14,7 +14,7 @@
 	{% block head %} {% endblock head %}
 <style>
 	#ajaxStatus.show {
-		background-image: url('{% md5url 'ajaxStatus.gif' %}');
+		background-image: url('{% md5url 'images/ajaxStatus.gif' %}');
 	}
 </style>
 </head>
@@ -31,7 +31,7 @@
 		<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}">
 			<i title="Sign out" class="icon-sign-out"><span class="mText">sign out</span></i> </a>
 	{% else %}
-		<form id="loginForm"  class="flex-push-right" onsubmit="login(event);">
+		<form id="loginForm" method="post" class="flex-push-right" onsubmit="login(event);">
 			<div class="shrink-200px">
 				<div>
 					<i class="icon-user"></i>

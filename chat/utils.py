@@ -1,20 +1,26 @@
 import base64
+import json
 import logging
 import re
 import sys
+import urllib
 from io import BytesIO
 from threading import Thread
+from urllib.parse import urlencode
+from urllib.request import urlopen, Request
 
+import requests
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.db import transaction
+from chat import local
 
 from chat import settings
 from chat.log_filters import id_generator
-from chat.models import User, UserProfile, Room
-from chat.settings import ISSUES_REPORT_LINK, ALL_REDIS_ROOM
+from chat.models import User, UserProfile, Room, Verification
+from chat.settings import ISSUES_REPORT_LINK, ALL_REDIS_ROOM, IS_HTTPS, SITE_PROTOCOL
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
 
@@ -96,16 +102,50 @@ def check_user(username):
 		pass
 
 
+def get_client_ip(request):
+	x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+	return x_forwarded_for.split(',')[-1].strip() if x_forwarded_for else request.META.get('REMOTE_ADDR')
+
+
+def check_captcha(request):
+	"""
+	:type request: WSGIRequest
+	:raises ValidationError: if captcha is not valid or not set
+	If RECAPTCHA_SECRET_KEY is enabled in settings validates request with it
+	"""
+	captcha_private_key = getattr(settings, "RECAPTCHA_SECRET_KEY", None)
+	if not captcha_private_key:
+		logger.debug('Skipping captcha validation')
+		return
+	try:
+		captcha_rs = request.POST.get('g-recaptcha-response')
+		url = "https://www.google.com/recaptcha/api/siteverify"
+		params = {
+			'secret': captcha_private_key,
+			'response': captcha_rs,
+			'remoteip': local.client_ip
+		}
+		raw_response = requests.post(url, params=params, verify=True)
+		response = raw_response.json()
+		if not response.get('success', False):
+			logger.debug('Captcha is NOT valid, response: %s', raw_response)
+			raise ValidationError(response['error-codes'] if response.get('error-codes', None) else 'This captcha already used')
+		logger.debug('Captcha is valid, response: %s', raw_response)
+	except Exception as e:
+		raise ValidationError('Unable to check captcha because {}'.format(e))
+
+
 def send_email_verification(user, site_address):
 	if user.email is not None:
-		user.verify_code = id_generator()
-		user.save()
-		code = '/confirm_email?code=' + user.verify_code
+		verification = Verification(user=user, type_enum=Verification.TypeChoices.register)
+		verification.save()
+		user.email_verification = verification
+		user.save(update_fields=['email_verification'])
 
-		text = 'Hi %s, you have registered pychat' \
-				'\nTo complete your registration click on the url bellow: https://%s%s .' \
-				'\n\n If you have any questions or suggestion, please post them here %s' % \
-				(user.username, site_address, code, ISSUES_REPORT_LINK)
+		text = ('Hi {}, you have registered pychat'
+				'\nTo complete your registration click on the url bellow: {}://{}/confirm_email?token={}'
+				'\n\nIf you find any bugs or propositions you can post them {}/report_issue or {}').format(
+				user.username, SITE_PROTOCOL, site_address, verification.token, site_address, ISSUES_REPORT_LINK)
 
 		mail_thread = Thread(
 			target=send_mail,
@@ -132,8 +172,7 @@ def extract_photo(image_base64):
 	return image
 
 
-@transaction.atomic
-def create_user(email, password, sex, username):
+def create_user_profile(email, password, sex, username):
 	user = UserProfile(username=username, email=email, sex_str=sex)
 	user.set_password(password)
 	default_thread = Room.objects.get_or_create(name=ALL_REDIS_ROOM)[0]

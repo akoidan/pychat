@@ -1,7 +1,7 @@
 #!/bin/bash
 
 CONF_REPOSITORY="https://github.com/Deathangel908/djangochat-config"
-CONF_VERSION='5a8ff414ee831d3fc1b93e0cc3da7e41a67a273f'
+CONF_VERSION='b056d8a34aec30acf99ad8d85b0e8c36e01efa4a'
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
@@ -15,31 +15,32 @@ CSS_DIR="$STATIC_DIR/css"
 FONT_DIR="$STATIC_DIR/font"
 SOUNDS_DIR="$STATIC_DIR/sounds"
 SMILEYS_DIR="$STATIC_DIR/smileys"
+IMAGES_DIR="$STATIC_DIR/images"
 
 # Implementing installed files
-declare -a files=("$STATIC_DIR/favicon.ico" "$SOUNDS_DIR/ChatOutgoing.wav" "$SOUNDS_DIR/ChatIncoming.wav" "$SOUNDS_DIR/ChatLogin.wav" "$SOUNDS_DIR/ChatLogout.wav" "$CSS_DIR/pikaday.css" "$JS_DIR/pikaday.js" "$JS_DIR/moment.js" "$CSS_DIR/fontello.css" "$FONT_DIR/fontello.eot" "$FONT_DIR/fontello.svg" "$FONT_DIR/fontello.ttf" "$FONT_DIR/fontello.woff" "$FONT_DIR/fontello.woff2" "$SMILEYS_DIR" "$SMILEYS_DIR/info.json" "$SMILEYS_DIR/base/0000.gif" "$STATIC_DIR/ajaxStatus.gif")
+declare -a files=("$STATIC_DIR/favicon.ico" "$SOUNDS_DIR/ChatOutgoing.wav" "$SOUNDS_DIR/ChatIncoming.wav" "$SOUNDS_DIR/ChatLogin.wav" "$SOUNDS_DIR/ChatLogout.wav" "$CSS_DIR/pikaday.css" "$JS_DIR/pikaday.js" "$JS_DIR/moment.js" "$CSS_DIR/fontello.css" "$FONT_DIR/fontello.eot" "$FONT_DIR/fontello.svg" "$FONT_DIR/fontello.ttf" "$FONT_DIR/fontello.woff" "$FONT_DIR/fontello.woff2" "$FONT_DIR/OpenSans.ttf" "$FONT_DIR/Oswald.ttf" "$SMILEYS_DIR" "$SMILEYS_DIR/info.json" "$SMILEYS_DIR/base/0000.gif" "$IMAGES_DIR/ajaxStatus.gif" "$IMAGES_DIR/dark_wall.png" "$IMAGES_DIR/no_ava.png" )
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do
-  if [ -f $path ]; then
-   rm -v $path
-   elif  [ -d $path ]; then
-   rm -rv $path
+  if [ -f "$path" ]; then
+   rm -v "$path"
+   elif  [ -d "$path" ]; then
+   rm -rv "$path"
   fi
 done
 
-mkdir -pv $TMP_DIR
+mkdir -pv "$TMP_DIR"
 
-cd $PROJECT_ROOT
+cd "$PROJECT_ROOT"
 
-git clone "$CONF_REPOSITORY" $TMP_DIR/chatconf
-git --git-dir=$TMP_DIR/chatconf/.git --work-tree=$TMP_DIR/chatconf/ checkout $CONF_VERSION
-cp -r $TMP_DIR/chatconf/static $STATIC_PARENT
+git clone "$CONF_REPOSITORY" "$TMP_DIR/chatconf"
+git --git-dir="$TMP_DIR/chatconf/.git" --work-tree="$TMP_DIR/chatconf/" checkout $CONF_VERSION
+cp -r "$TMP_DIR/chatconf/static" "$STATIC_PARENT"
 
 # datepicker
 # use curl since it's part of windows git bash
-curl -X GET http://dbushell.github.io/Pikaday/css/pikaday.css -o $CSS_DIR/pikaday.css
-curl -X GET https://raw.githubusercontent.com/dbushell/Pikaday/master/pikaday.js -o $JS_DIR/pikaday.js
-curl -X GET http://momentjs.com/downloads/moment.js -o $JS_DIR/moment.js
+curl -X GET http://dbushell.github.io/Pikaday/css/pikaday.css -o "$CSS_DIR/pikaday.css"
+curl -X GET https://raw.githubusercontent.com/dbushell/Pikaday/master/pikaday.js -o "$JS_DIR/pikaday.js"
+curl -X GET http://momentjs.com/downloads/moment.js -o "$JS_DIR/moment.js"
 
 
 #wget http://jscolor.com/release/jscolor-1.4.4.zip -P $TMP_DIR && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR
@@ -51,10 +52,10 @@ curl -X GET http://momentjs.com/downloads/moment.js -o $JS_DIR/moment.js
 # Checking if all files are loaded
 failed_count=0
 for path in "${files[@]}" ; do
-  if [ ! -f $path ] && [ ! -d $path ]; then #if doen't exist
+  if [ ! -f "$path" ] && [ ! -d "$path" ]; then #if doen't exist
     ((failed_count++))
      >&2 echo "Can't find file: $path"
-    failed_items[$failed_count]=$path
+    failed_items[$failed_count]="$path"
   fi
 done
 
@@ -62,21 +63,21 @@ done
 failed_count_second_attempt=0
 if [[ $failed_count > 0 ]]; then
   echo "Tring to fetch broken resources from dropbox"
-  curl -L https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1 -o $TMP_DIR/static.zip &&
-  unzip $TMP_DIR/static.zip -d $TMP_DIR/static
+  curl -L https://www.dropbox.com/sh/p9efgb46pyl3hj3/AABIDVckht4SGZUDAnU7dlD7a?dl=1 -o "$TMP_DIR/static.zip" &&
+  unzip "$TMP_DIR/static.zip" -d "$TMP_DIR/static"
   for path_failed in "${failed_items[@]}" ; do
     dropbox_path="${path_failed#$STATIC_DIR}"
     tmp_fetched_db_file="$TMP_DIR/static/$dropbox_path"
-    cp $tmp_fetched_db_file $path_failed
-    if [ ! -f $path_failed ]; then
+    cp "$tmp_fetched_db_file" "$path_failed"
+    if [ ! -f "$path_failed" ]; then
       ((failed_count_second_attempt++))
-      failed_items_second_attempt[$failed_count_second_attempt]=$dropbox_path
+      failed_items_second_attempt[$failed_count_second_attempt]="$dropbox_path"
     fi
   done
 fi
 
 echo "removing tmp directory $TMP_DIR"
-rm -rf $TMP_DIR
+rm -rf "$TMP_DIR"
 
 if [[ $failed_count_second_attempt > 0 ]]; then
   for path_failed2 in "${failed_items_second_attempt[@]}" ; do

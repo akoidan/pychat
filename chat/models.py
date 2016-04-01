@@ -1,13 +1,17 @@
 import datetime
+import inspect
 import time
 import uuid
+from enum import Enum
 from time import mktime
 
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.db import models
 from django.db.models import CharField, DateField, FileField, BooleanField
 
-from chat.settings import GENDERS, DEFAULT_PROFILE_ID
+from chat.log_filters import id_generator
+from chat.settings import GENDERS, DEFAULT_PROFILE_ID, SECRET_KEY
 
 
 class User(AbstractBaseUser):
@@ -54,6 +58,32 @@ class User(AbstractBaseUser):
 			self.sex = 0
 
 
+
+class Verification(models.Model):
+
+	class TypeChoices(Enum):
+		register = 'r'
+		password = 'p'
+
+	# a - account activation, r - recover
+	type = models.CharField(null=False, max_length=1)
+	token = models.CharField(max_length=17, null=False, default=id_generator)
+	user = models.ForeignKey(User, null=False)
+	time = models.DateTimeField(default=datetime.datetime.now)
+	verified = BooleanField(default=False)
+
+	@property
+	def type_enum(self):
+		return self.TypeChoices(self.type)
+
+	@type_enum.setter
+	def type_enum(self, p_type):
+		"""
+		:type p_type: Verification.TypeChoices
+		"""
+		self.type = p_type.value
+
+
 class UserProfile(User):
 
 	def get_file_path(self, filename):
@@ -75,8 +105,7 @@ class UserProfile(User):
 	# fileField + <img instead of ImageField (removes preview link)
 	photo = FileField(upload_to=get_file_path, null=True)
 
-	email_verified = models.BooleanField(default=False, null=False)
-	verify_code = models.CharField(max_length=17, null=True)
+	email_verification = models.ForeignKey(Verification, null=True)
 
 	def save(self, *args, **kwargs):
 		"""
