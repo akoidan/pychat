@@ -12,10 +12,10 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 import logging.config
 import os
 import sys
-from sslserver import certs
 from os.path import join
 
 from django.conf import global_settings
+from sslserver import certs
 
 import chat as project_module
 

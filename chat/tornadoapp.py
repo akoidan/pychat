@@ -1,10 +1,10 @@
 import json
 import logging
 import sys
+import time
 from threading import Thread
 from urllib.request import urlopen
 
-import time
 import tornado.gen
 import tornado.httpclient
 import tornado.ioloop

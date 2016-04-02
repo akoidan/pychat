@@ -1,17 +1,15 @@
 import datetime
-import inspect
 import time
 import uuid
 from enum import Enum
 from time import mktime
 
-from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.db import models
 from django.db.models import CharField, DateField, FileField, BooleanField
 
 from chat.log_filters import id_generator
-from chat.settings import GENDERS, DEFAULT_PROFILE_ID, SECRET_KEY
+from chat.settings import GENDERS, DEFAULT_PROFILE_ID
 
 
 class User(AbstractBaseUser):

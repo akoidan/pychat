@@ -3,10 +3,11 @@ from urllib.request import urlopen
 
 from chat import settings
 from chat.models import IpAddress
+
 api_url = getattr(settings, "IP_API_URL", "http://ip-api.com/json/%s")
 
 __author__ = 'andrew'
-from django.core.management import call_command, BaseCommand
+from django.core.management import BaseCommand
 
 
 class Command(BaseCommand):

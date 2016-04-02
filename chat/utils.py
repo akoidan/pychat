@@ -1,26 +1,20 @@
 import base64
-import json
 import logging
 import re
 import sys
-import urllib
 from io import BytesIO
 from threading import Thread
-from urllib.parse import urlencode
-from urllib.request import urlopen, Request
 
 import requests
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
-from django.db import transaction
-from chat import local
 
+from chat import local
 from chat import settings
-from chat.log_filters import id_generator
 from chat.models import User, UserProfile, Room, Verification
-from chat.settings import ISSUES_REPORT_LINK, ALL_REDIS_ROOM, IS_HTTPS, SITE_PROTOCOL
+from chat.settings import ISSUES_REPORT_LINK, ALL_REDIS_ROOM, SITE_PROTOCOL
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
 

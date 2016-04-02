@@ -15,7 +15,7 @@ except ImportError:
 	from django.core.context_processors import csrf
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q
 from django.http import Http404
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
@@ -187,7 +187,7 @@ class RestorePassword(View):
 			user.save(update_fields=('password',))
 			verification.verified = True
 			verification.save(update_fields=('verified',))
-			logger.info('Password has been change for user %s(id=%d)', token, user.username, user.id)
+			logger.info('Password has been change for token %s user %s(id=%d)', token, user.username, user.id)
 			response = VALIDATION_IS_OK
 		except ValidationError as e:
 			logger.debug('Rejecting verification token %s because %s', token, e)
