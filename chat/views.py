@@ -144,7 +144,10 @@ def send_restore_password(request):
 		message = VALIDATION_IS_OK
 		logger.debug('Verification email has been send for token %s to user %s(id=%d)',
 				verification.token, user_profile.username, user_profile.id)
-	except Exception as e:
+	except UserProfile.DoesNotExist:
+		message = "User with this email or username doesn't exist"
+		logger.debug("Skipping password recovery request for nonexisting user")
+	except (UserProfile.DoesNotExist, ValidationError) as e:
 		logger.debug('Not sending verification email because %s', e)
 		message = 'Unfortunately we were not able to send you restore password email because {}'.format(e)
 	return HttpResponse(message, content_type='text/plain')
