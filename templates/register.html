@@ -16,14 +16,12 @@
 			font-weight: 400;
 			src: local('Open Sans'), local('OpenSans'), url({% md5url 'font/Oswald.ttf' %}) format('truetype');
 		}
-		body {
-			background-image: url({% md5url 'images/dark_wall.png' %});
-		}
 	</style>
 {% endblock %}
 {% block content %}
 <div class="reg-log-container">
-	<input type="submit" id="showRegister" value="Sign Up"/><input type="submit" class="disabled" id="showLogin" value="Log In"/>
+	<input type="submit" class="blue-button" id="showRegister" value="Sign Up"/>
+	<input type="submit" class="disabled blue-button" id="showLogin" value="Log In" style="float: left"/>
 	<form id="recoverForm" class="hidden" method="post" onsubmit="restorePassword(event);">
 		<h1>Restore password</h1>
 		<div>
@@ -36,10 +34,10 @@
 			<div class="g-recaptcha" data-theme="dark" data-sitekey="{{ captcha }}"></div>
 		{% endif %}
 		<div>
-			<input type="submit" value="Recover password"/>
+			<input type="submit" class="blue-button" value="Recover password"/>
 		</div>
 	</form>
-	<form id="loginForm" method="post" class="hidden" onsubmit="login(event);">
+	<form id="regLoginForm" method="post" class="hidden" onsubmit="login(event);">
 		<h1>Wellcome back!</h1>
 		<div>
 			<i class="icon-user"></i>
@@ -51,7 +49,7 @@
 		</div>
 		<div class="forg-pass" id="recoverPassword"><span>Forgot Password?</span></div>
 		<div>
-			<input type="submit" value="LOG IN"/>
+			<input type="submit" class="blue-button" value="LOG IN"/>
 		</div>
 	</form>
 	<form id="register-form" method="post" onsubmit="register(event)" class="form black-inputs biginputtext">
@@ -88,7 +86,7 @@
 			</select>
 			<div class="slider closed"></div>
 		</div>
-		<input type="submit" value="REGISTER"/>
+		<input type="submit" class="blue-button" value="REGISTER"/>
 		{% csrf_token %}
 	</form>
 </div>

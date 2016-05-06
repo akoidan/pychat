@@ -81,12 +81,12 @@ input:not([type=submit]) {
 	width: calc(100% - 58px);
 }
 
-input, select {
+.reg-log-container input, .reg-log-container select {
 	padding-top: 15px;
 	padding-bottom: 15px;
 }
 
-input:not([type=submit]):not([type=button]), select {
+input:not([type=submit]), select {
 	padding-left: 35px;
 	padding-right: 22px;
 }
@@ -151,7 +151,7 @@ option {
 	background-color: #1A1A1A
 }
 
-input[type="submit"] {
+.blue-button {
 	margin-top: 10px;
 	width: 100%;
 	border-radius: 5px;
@@ -183,7 +183,7 @@ input:not([type=submit]):focus, select:focus {
 	transition: 1s ease;
 }
 
-input[type="submit"]:hover {
+.blue-button:hover {
 	opacity: 1;
 	cursor: pointer;
 }
@@ -215,9 +215,4 @@ input[type="submit"]:hover {
 .forg-pass:hover {
 	text-decoration: underline;
 	cursor: pointer;
-}
-
-body {
-	/*if image not loaded*/
-	background-color: #222222;
 }

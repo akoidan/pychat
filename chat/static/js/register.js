@@ -150,7 +150,7 @@ var RegisterValidator = function () {
 
 function showRegister() {
 	CssUtils.showElement($('register-form'));
-	CssUtils.hideElement($('loginForm'));
+	CssUtils.hideElement($('regLoginForm'));
 	CssUtils.hideElement($('recoverForm'));
 	CssUtils.removeClass($('showRegister'), 'disabled');
 	CssUtils.addClass($('showLogin'), 'disabled');
@@ -158,7 +158,7 @@ function showRegister() {
 
 function showLogin() {
 	CssUtils.hideElement($('register-form'));
-	CssUtils.showElement($('loginForm'));
+	CssUtils.showElement($('regLoginForm'));
 	CssUtils.hideElement($('recoverForm'));
 	CssUtils.removeClass($('showLogin'), 'disabled');
 	CssUtils.addClass($('showRegister'), 'disabled');
@@ -166,7 +166,7 @@ function showLogin() {
 
 function showForgotPassword () {
 		CssUtils.hideElement($('register-form'));
-		CssUtils.hideElement($('loginForm'));
+		CssUtils.hideElement($('regLoginForm'));
 		CssUtils.showElement($('recoverForm'));
 		CssUtils.addClass($('showLogin'), 'disabled');
 		CssUtils.addClass($('showRegister'), 'disabled');
@@ -175,7 +175,7 @@ function showForgotPassword () {
 onDocLoad(function () {
 	var registerValidator = new RegisterValidator();
 	registerValidator.init();
-	loginForm = $('loginForm');
+	loginForm = $('regLoginForm');
 	$('showRegister').onclick = showRegister;
 	$('showLogin').onclick = showLogin;
 	$('recoverPassword').onclick = showForgotPassword;

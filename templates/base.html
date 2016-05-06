@@ -4,9 +4,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>PyChat</title> {% load md5url %}
 	<link rel="shortcut icon" href="{% md5url 'favicon.ico' %}" />
-	{% if not noNav %}
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/base.css' %}">
-	{% endif %}
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/fontello.css' %}">
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	<script>
@@ -18,9 +16,13 @@
 	#ajaxStatus.show {
 		background-image: url('{% md5url 'images/ajaxStatus.gif' %}');
 	}
+	.color-reg {
+			background-image: url({% md5url 'images/dark_wall.png' %});
+		}
 </style>
 </head>
-<body class="color-lor" >
+<body class="{% if not noNav %}color-lor{% else %}color-reg
+{% endif %}">
 {% if not noNav %}
 	<nav class="noSelection">
 		<a href="{% url 'chat.views.home' %}"><i class="icon-home" title="Go home"><span class="mText">home</span></i></a>
