@@ -4,7 +4,9 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>PyChat</title> {% load md5url %}
 	<link rel="shortcut icon" href="{% md5url 'favicon.ico' %}" />
+	{% if not noNav %}
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/base.css' %}">
+	{% endif %}
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/fontello.css' %}">
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	<script>
@@ -19,36 +21,38 @@
 </style>
 </head>
 <body class="color-lor" >
-<nav class="noSelection">
-	<a href="{% url 'chat.views.home' %}"><i class="icon-home" title="Go home"><span class="mText">home</span></i></a>
-	<i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds" onclick="mute();"><span class="mText">volume</span></i>
-	<a href="{% url 'issue' %}"><i class="icon-pencil very-small-screen" title="report an issue"><span class="mText">issue</span></i></a>
-	{% block navbar %} {% endblock navbar %}
-	<a href="{% url 'chat.views.statistics' %}"><i class="icon-chart-pie" title="Show user countries statistics"><span class="mText">statistics</span></i> </a>
-	{% if username %}
-		<span class="username very-small-screen flex-push-right">Hello, <b id="userNameLabel"> {{ username }}</b></span>
-		<a href="{% url 'profile' %}" id="hide"><i title="Settings" class="icon-wrench"> <span class="mText">settings</span></i></a>
-		<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}">
-			<i title="Sign out" class="icon-sign-out"><span class="mText">sign out</span></i> </a>
-	{% else %}
-		<form id="loginForm" method="post" class="flex-push-right" onsubmit="login(event);">
-			<div class="shrink-200px">
-				<div>
-					<i class="icon-user"></i>
-					<input type="text" maxlength="16" required placeholder="Username" name="username" value="" id="username"/>
+{% if not noNav %}
+	<nav class="noSelection">
+		<a href="{% url 'chat.views.home' %}"><i class="icon-home" title="Go home"><span class="mText">home</span></i></a>
+		<i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds" onclick="mute();"><span class="mText">volume</span></i>
+		<a href="{% url 'issue' %}"><i class="icon-pencil very-small-screen" title="report an issue"><span class="mText">issue</span></i></a>
+		{% block navbar %} {% endblock navbar %}
+		<a href="{% url 'chat.views.statistics' %}"><i class="icon-chart-pie" title="Show user countries statistics"><span class="mText">statistics</span></i> </a>
+		{% if username %}
+			<span class="username very-small-screen flex-push-right">Hello, <b id="userNameLabel"> {{ username }}</b></span>
+			<a href="{% url 'profile' %}" id="hide"><i title="Settings" class="icon-wrench"> <span class="mText">settings</span></i></a>
+			<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}">
+				<i title="Sign out" class="icon-sign-out"><span class="mText">sign out</span></i> </a>
+		{% else %}
+			<form id="loginForm" method="post" class="flex-push-right" onsubmit="login(event);">
+				<div class="shrink-200px">
+					<div>
+						<i class="icon-user"></i>
+						<input type="text" maxlength="16" required placeholder="Username" name="username" value="" id="username"/>
+					</div>
+					<div>
+						<i class="icon-key"></i>
+						<input type="password" name="password" placeholder="Password" id="password" required/>
+					</div>
 				</div>
 				<div>
-					<i class="icon-key"></i>
-					<input type="password" name="password" placeholder="Password" id="password" required/>
+					<i class="icon-login" title="Sign in" onclick="$('loginSubmit').click()"></i>
+					<input type="submit" id='loginSubmit' class="hidden"/>
 				</div>
-			</div>
-			<div>
-				<i class="icon-login" title="Sign in" onclick="$('loginSubmit').click()"></i>
-				<input type="submit" id='loginSubmit' class="hidden"/>
-			</div>
-		</form>
-	{% endif %}
-</nav>
+			</form>
+		{% endif %}
+	</nav>
+{% endif %}
 <div id="ajaxStatus"></div>
 {% block content %} {% endblock %}
 {% csrf_token %}

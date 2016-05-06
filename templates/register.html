@@ -1,17 +1,8 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/html">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-	<title>PyChat</title> {% load md5url %}
-	<link rel="shortcut icon" href="{% md5url 'favicon.ico' %}" />
-	<link rel="stylesheet" type="text/css" href="{% md5url 'css/fontello.css' %}">
-	<link rel="stylesheet" type="text/css" href="{% md5url 'css/register.css' %}">
-	<meta name="viewport" content="width=device-width, initial-scale=1"/>
-	<script>
-		const RESPONSE_SUCCESS = "{{ successResponse }}";
-	</script>
-	<script src="{% md5url "js/base.js" %}"></script>
+{% extends "base.html" %}
+{% load md5url %}
+{% block head %}
 	<script src="{% md5url "js/register.js" %}"></script>
+	<link rel="stylesheet" type="text/css" href="{% md5url 'css/register.css' %}">
 	<style>
 		@font-face {
 			font-family: 'Oswald';
@@ -29,8 +20,8 @@
 			background-image: url({% md5url 'images/dark_wall.png' %});
 		}
 	</style>
-</head>
-<body class="color-lor" >
+{% endblock %}
+{% block content %}
 <div class="reg-log-container">
 	<input type="submit" id="showRegister" value="Sign Up"/><input type="submit" class="disabled" id="showLogin" value="Log In"/>
 	<form id="recoverForm" class="hidden" method="post" onsubmit="restorePassword(event);">
@@ -101,7 +92,4 @@
 		{% csrf_token %}
 	</form>
 </div>
-{% csrf_token %}
-<div id="growlHolder"></div>
-</body>
-</html>
+{% endblock content %}
