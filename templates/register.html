@@ -39,9 +39,9 @@
 			<input type="text" style="padding-left: 10px; width: calc(100% - 35px)"
 				   required placeholder="Username or email" name="username_or_password" value="" id="username"/>
 			<div class="slider">Enter your username or email</div>
-		</div>
+		</div>ama
 		{% if captcha %}
-			<script src='https://www.google.com/recaptcha/api.js'></script>
+			<script src='{{ captcha_url }}'></script>
 			<div class="g-recaptcha" data-theme="dark" data-sitekey="{{ captcha }}"></div>
 		{% endif %}
 		<div>

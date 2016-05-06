@@ -327,6 +327,7 @@ class RegisterView(View):
 	def get(self, request):
 		c = csrf(request)
 		c['captcha'] = getattr(settings, "RECAPTCHA_SITE_KEY", None)
+		c['captcha_url'] = getattr(settings, "RECAPTHCA_SITE_URL", None)
 		return render_to_response("register.html", c, context_instance=RequestContext(request))
 
 	@transaction.atomic

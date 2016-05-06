@@ -69,6 +69,7 @@
 					onclick="webRtcApi.toggleVideo()"></i>
 				<i class="icon-phone-circled" id="callIcon" onclick="webRtcApi.callPeople()"></i>
 				<i class="icon-hang-up finish-call-icon" id="hangUpIcon" onclick="webRtcApi.hangUp()" ></i>
+				<img src="{% md5url 'images/call.gif' %}" alt="call" class="hidden" id="callRing" style="width: 30px"/>
 			</div>
 		</div>
 	</div>
