@@ -64,7 +64,7 @@ Start the chat:
 * add multipart smileys
 * add canvas images 
 * add antispam system
-* add http://www.amcharts.com/download/ to chart spam or user statistic info
+* add http://www.amcharts.com/download/ to chart spam or user s  tatistic info
 * add WebWorker http://www.w3schools.com/html/html5_webworkers.asp to load message
 * startup loading messages in a separate thread (JS )
 * move loading messages on startup to single function? 

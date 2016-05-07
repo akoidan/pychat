@@ -143,10 +143,18 @@ p {
 	position: absolute;
 	right: 5px;
 	bottom: -2px;
-	border: 1px #775E39 solid;
 	border-radius: 10px;
 	width: 50%;
+}
+
+.color-lor #smileParentHolder {
+	border: 1px #775E39 solid;
 	background-color:rgba(34, 31, 31, 0.86);
+}
+
+.color-reg #smileParentHolder {
+	border: 1px #696951 solid;
+	background-color:rgba(33,33,31,0.86);
 }
 
 #smileParentHolder img {
@@ -185,8 +193,12 @@ p {
 	text-decoration: underline;
 }
 
-.activeTab {
-	color: #fcaf3e ;
+.color-lor .activeTab {
+	color: #fcaf3e;
+}
+
+.color-reg .activeTab {
+	color: #C6B955;
 }
 
 #usermsg {

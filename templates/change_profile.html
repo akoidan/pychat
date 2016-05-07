@@ -15,7 +15,7 @@
 				{% if form.instance.photo %} {% comment %}TODO{% endcomment %}
 					<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
 				{% else %}
-					<img src="{% md5url 'images/no_ava.png' %}" alt="ava" id='photoImg' class="fullwidth">
+					<img style="font-size: 500px" class="icon-boy fullwidth" id='photoImg'></img>
 				{% endif %}
 			<input type="button" value="Make a photo from webcam" style="margin-top: 10px" onclick="startCapturingVideo(this)"/>
 			</div>
