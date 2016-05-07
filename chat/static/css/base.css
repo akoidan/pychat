@@ -152,15 +152,15 @@ input:-webkit-autofill, div[contenteditable]:-webkit-autofill, textarea:-webkit-
 	border-top: 1px solid #5B6248;
 }
 
-.color-lor .col-error {
+.col-error {
 	color: red;
 }
 
-.color-lor .col-success {
+.col-success {
 	color: #39C03B;
 }
 
-.color-lor .col-info {
+.col-info {
 	color: #67bdc0;;
 }
 
@@ -221,7 +221,7 @@ html, body {
 	font-family: arial, serif;
 }
 
-body {
+body.color-lor {
 	display: -ms-flexbox;
 	display: -webkit-flex;
 	display: flex;

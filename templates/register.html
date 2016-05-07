@@ -21,7 +21,7 @@
 {% block content %}
 <div class="reg-log-container">
 	<input type="submit" class="blue-button" id="showRegister" value="Sign Up"/>
-	<input type="submit" class="disabled blue-button" id="showLogin" value="Log In" style="float: left"/>
+	<input type="submit" class="disabled blue-button" id="showLogin" value="Log In" style="float: right"/>
 	<form id="recoverForm" class="hidden" method="post" onsubmit="restorePassword(event);">
 		<h1>Restore password</h1>
 		<div>
@@ -34,7 +34,7 @@
 			<div class="g-recaptcha" data-theme="dark" data-sitekey="{{ captcha }}"></div>
 		{% endif %}
 		<div>
-			<input type="submit" class="blue-button" value="Recover password"/>
+			<input type="submit" class="blue-button submit-button" value="Recover password"/>
 		</div>
 	</form>
 	<form id="regLoginForm" method="post" class="hidden" onsubmit="login(event);">
@@ -49,10 +49,10 @@
 		</div>
 		<div class="forg-pass" id="recoverPassword"><span>Forgot Password?</span></div>
 		<div>
-			<input type="submit" class="blue-button" value="LOG IN"/>
+			<input type="submit" class="blue-button submit-button" value="LOG IN"/>
 		</div>
 	</form>
-	<form id="register-form" method="post" onsubmit="register(event)" class="form black-inputs biginputtext">
+	<form id="register-form" method="post" onsubmit="register(event)">
 		<h1>Create new account</h1>
 		<div class="required">
 			<i class="icon-user"></i>
@@ -86,7 +86,7 @@
 			</select>
 			<div class="slider closed"></div>
 		</div>
-		<input type="submit" class="blue-button" value="REGISTER"/>
+		<input type="submit" class="blue-button submit-button" value="REGISTER"/>
 		{% csrf_token %}
 	</form>
 </div>

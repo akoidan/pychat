@@ -45,6 +45,10 @@ form {
 	margin: auto;
 }
 
+#growlHolder {
+	top: 5px !important;
+}
+
 form > * {
 	display: block;
 	margin: auto;
@@ -145,16 +149,15 @@ input[type="text"], input[type="email"], input[type="password"], select {
 	margin-bottom: 10px;
 	color: #CECECE;
 	text-shadow: #000 0 1px 5px;
+	font-size: 13px;
 }
 
 option {
 	background-color: #1A1A1A
 }
 
-.blue-button {
+.color-reg .blue-button {
 	margin-top: 10px;
-	width: 100%;
-	border-radius: 5px;
 	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#28D2DE), to(#1A878F));
 	background-image: -webkit-linear-gradient(#28D2DE 0%, #1A878F 100%);
 	background-image: -moz-linear-gradient(#28D2DE 0%, #1A878F 100%);
@@ -164,13 +167,18 @@ option {
 	color: #FFF;
 	text-transform: uppercase;
 	text-shadow: #000 0 1px 5px;
-	border: 1px solid #000;
 	opacity: 0.7;
 	-webkit-box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.7);
 	-moz-box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.7);
 	box-shadow: 0 8px 6px -6px rgba(0, 0, 0, 0.7);
 	border-top: 1px solid rgba(255, 255, 255, 0.8) !important;
 	-webkit-box-reflect: below 0 -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255, 255, 255, 0.2)));
+}
+
+.color-reg .submit-button {
+	width: 100%;
+	border-radius: 5px;
+	border: 1px solid #000;
 }
 
 input:not([type=submit]):focus, select:focus {
