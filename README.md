@@ -47,6 +47,7 @@ Start the chat:
  4. Open in browser http*s*://127.0.0.1:8000
 
 # TODO
+* max-width for .reg-container doesn't set current width to max (300px) when there's enought free space
 * http://jsfiddle.net/JnrvG/1/
 * add email confirmation for username or password change
 * add image upload

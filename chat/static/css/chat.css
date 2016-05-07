@@ -7,6 +7,10 @@
 .color-lor .message-header-private {color: #8ae234;}
 .color-lor .message-header-self {color: #e29722;}
 .color-lor .message-header-system {color: #9DD3DD;}
+.color-reg .message-header-others {color: #729fcf;}
+.color-reg .message-header-private {color: #8ae234;}
+.color-reg .message-header-self {color: #e29722;}
+.color-reg .message-header-system {color: #84B7C0;}
 .color-lor #userSendMessageTo {box-shadow: 0 2px 2px rgba(6, 3, 8, 0.77);}
 
 [class^="message-header"] {
@@ -26,10 +30,17 @@ fieldset {
 }
 
 fieldset legend {
-    padding: 0 10px;
+	padding: 0 10px;
 	font-weight: bold;
-	color:   #9DD3DD;
+	color: #9DD3DD;
 }
+.color-lor fieldset legend 	{
+	color: #9DD3DD;
+}
+.color-reg fieldset legend 	{
+	color: #84B7C0;
+}
+
 p {
 	margin-top: 0.8em;
 	margin-bottom: 0.8em;

@@ -120,15 +120,22 @@ input:-webkit-autofill, div[contenteditable]:-webkit-autofill, textarea:-webkit-
 	-webkit-text-fill-color: #CCCBDF;
 }
 /*TODO html scroll doesn't show with .color-lor class for body*/
-::-webkit-scrollbar {
+.color-lor ::-webkit-scrollbar {
 	background: #222;
 }
-::-webkit-scrollbar-thumb {
+.color-lor ::-webkit-scrollbar-thumb {
 	background: #3E4654;;
 }
 
+.color-reg ::-webkit-scrollbar {
+	background: #1A1A1A;
+}
+.color-reg ::-webkit-scrollbar-thumb {
+	background: #313A3C;
+}
+
 /*IE scroll*/
-.color-lor {
+.color-lor, .color-reg {
 	scrollbar-base-color: #3E4654;
 	scrollbar-3dlight-color: #7dc071;
 	scrollbar-highlight-color: #c08b00;
@@ -221,7 +228,7 @@ html, body {
 	font-family: arial, serif;
 }
 
-body.color-lor {
+body {
 	display: -ms-flexbox;
 	display: -webkit-flex;
 	display: flex;
