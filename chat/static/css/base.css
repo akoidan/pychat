@@ -103,6 +103,16 @@
 	-webkit-text-fill-color: #CCCBDF;
 }
 
+.color-reg input:-webkit-autofill,
+.color-reg div[contenteditable]:-webkit-autofill,
+.color-reg textarea:-webkit-autofill,
+.color-reg select:-webkit-autofill {
+	-moz-box-shadow: 0 0 0 1000px #30302A inset !important;
+	-webkit-box-shadow: 0 0 0 1000px #30302A inset !important; /*important t*/
+	-webkit-text-fill-color: #9BA577;
+	text-shadow: none;
+}
+
 ::-webkit-input-placeholder { /* WebKit, Blink, Edge */
 	color: #59595a;
 }
