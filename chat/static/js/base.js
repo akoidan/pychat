@@ -86,6 +86,12 @@ function getUrlParam(name, url) {
 	return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 
+function setUrlParam(name, value) {
+	var prevValue = getUrlParam(name);
+	window.history.pushState('page2', 'Title', prevValue == null ?
+			getText(url.indexOf("?") >= 0 ? "{}&{}={}" : "{}?{}={}", window.location.href, name, value):
+			window.location.href.replace(name + "=" + prevValue, name + "=" + value));
+}
 
 function onDocLoad(onload) {
 	return document.addEventListener("DOMContentLoaded", onload);
@@ -271,7 +277,11 @@ function login(event) {
 	event.preventDefault();
 	var callback = function (data) {
 		if (data === RESPONSE_SUCCESS) {
-			window.location.href = '/';
+			var nextUrl =getUrlParam('next');
+			if (nextUrl == null) {
+				nextUrl = '/';
+			}
+			window.location.href = nextUrl;
 		} else {
 			growlError(data);
 		}

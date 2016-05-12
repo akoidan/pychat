@@ -8,7 +8,7 @@
 	<script src="{% md5url 'js/webrtc.js' %}"></script>
 {% endblock head %}
 {% block content %}
-	<canvas style="display:none;"></canvas>
+	<canvas class="hidden"></canvas>
 	<div class="max-height-scrollable two-columns">
 		<div style="text-align: center">
 			<div class="padding10">
@@ -28,7 +28,7 @@
 				<table class="biginputtext" id="userProfileData">
 					{{ form.as_table }}
 					<tr>
-						<td colspan="2" style="text-align: center"><input type="submit" value="Save"/></td>
+						<td colspan="2" style="text-align: center"><input type="submit"  value="Save"/></td>
 					</tr>
 				</table>
 			</div>

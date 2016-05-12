@@ -3,7 +3,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
 	<title>PyChat</title> {% load md5url %}
-	<link rel="shortcut icon" href="{% md5url 'images/favicon.ico' %}" />
+	<link rel="shortcut icon" href="{% md5url 'images/favicon.ico' %}"/>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/base.css' %}">
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/fontello.css' %}">
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -12,14 +12,26 @@
 	</script>
 	<script src="{% md5url "js/base.js" %}"></script>
 	{% block head %} {% endblock head %}
-<style>
-	#ajaxStatus.show {
-		background-image: url('{% md5url 'images/ajaxStatus.gif' %}');
-	}
-	.color-reg {
+	<style>
+		#ajaxStatus.show {
+			background-image: url('{% md5url 'images/ajaxStatus.gif' %}');
+		}
+		.color-reg {
 			background-image: url({% md5url 'images/dark_wall.png' %});
 		}
-</style>
+		@font-face {
+			font-family: 'Oswald';
+			font-style: normal;
+			font-weight: 400;
+			src: local('Oswald Regular'), local('Oswald-Regular'), url({% md5url 'font/OpenSans.ttf' %}) format('truetype');
+		}
+		@font-face {
+			font-family: 'Open Sans';
+			font-style: normal;
+			font-weight: 400;
+			src: local('Open Sans'), local('OpenSans'), url({% md5url 'font/Oswald.ttf' %}) format('truetype');
+		}
+	</style>
 </head>
 <body class="color-reg">
 {% if not noNav %}

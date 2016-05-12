@@ -158,6 +158,7 @@ function showRegister() {
 	CssUtils.hideElement(recoverForm);
 	CssUtils.removeClass(showRegisterEl, 'disabled');
 	CssUtils.addClass(showLoginEl, 'disabled');
+	setUrlParam('type', 'register');
 }
 
 function showLogin() {
@@ -166,15 +167,17 @@ function showLogin() {
 	CssUtils.hideElement(recoverForm);
 	CssUtils.removeClass(showLoginEl, 'disabled');
 	CssUtils.addClass(showRegisterEl, 'disabled');
+	setUrlParam('type', 'login');
 }
 
-function showForgotPassword () {
-		CssUtils.hideElement(registerForm);
-		CssUtils.hideElement(loginForm);
-		CssUtils.showElement(recoverForm);
-		CssUtils.addClass(showLoginEl, 'disabled');
-		CssUtils.addClass(showRegisterEl, 'disabled');
-	}
+function showForgotPassword() {
+	CssUtils.hideElement(registerForm);
+	CssUtils.hideElement(loginForm);
+	CssUtils.showElement(recoverForm);
+	CssUtils.addClass(showLoginEl, 'disabled');
+	CssUtils.addClass(showRegisterEl, 'disabled');
+	setUrlParam('type', 'forgot');
+}
 
 onDocLoad(function () {
 	loginForm = $('regLoginForm');
@@ -192,6 +195,8 @@ onDocLoad(function () {
 		showLogin();
 	} else if (initType == 'register') {
 		showRegister();
+	} else if (initType == 'forgot') {
+		showForgotPassword();
 	}
 });
 

@@ -3,6 +3,7 @@ import logging
 from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.auth.decorators import login_required
 
 from chat import settings
 from chat.views import IssueView, RegisterView, ProfileView, RestorePassword

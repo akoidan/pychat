@@ -40,6 +40,11 @@
 	border: 1px solid rgba(0, 0, 0, 1);
 	color: #C6C5C5;
 	text-shadow: #000 0 1px 5px;
+	font-family: Arial, serif;
+}
+
+.color-reg option {
+	background-color: #1A1A1A
 }
 
 .color-reg input,
@@ -106,6 +111,18 @@
 ::-webkit-datetime-edit-day-field:focus,
 ::-webkit-datetime-edit-year-field:focus {
 	background-color: #636b57;
+	text-shadow: none;
+}
+
+.color-reg label {
+	font: 13px Open Sans;
+	color: #6E6E6E;
+	text-shadow: #000 0 1px 5px;
+}
+
+.color-reg th {
+	text-align: right;
+	padding-right: 10px;
 }
 
 /*=================== END INPUT TEXT =================*/
@@ -132,8 +149,19 @@
 input[type=button]:hover,
 button:hover,
 input[type=submit]:hover,
-input[type=file]:hover{
+input[type=file]:hover,
+input[type=file]::-webkit-file-upload-button:hover {
 	cursor: pointer;
+}
+
+input[type=button],
+input[type=submit],
+button,
+input[type=file]::-webkit-file-upload-button {
+	border: 1px solid transparent;
+	border-radius: 3px;
+	font-size: 18px;
+	padding: 6px 12px;
 }
 
 .color-lor input[type=button]:hover,
@@ -154,6 +182,17 @@ input[type=file]:hover{
 	color: #BABDB6;
 }
 
+.color-reg input[type=button].blue-button,
+.color-reg input[type=submit].blue-button{
+	background-color: #005C64;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#28D2DE), to(#1A878F));
+	background-image: -webkit-linear-gradient(#28D2DE 0%, #1A878F 100%);
+	background-image: -moz-linear-gradient(#28D2DE 0%, #1A878F 100%);
+	background-image: -o-linear-gradient(#28D2DE 0%, #1A878F 100%);
+	background-image: linear-gradient(#28D2DE 0%, #1A878F 100%);
+	font-size: 14px;
+	text-transform: uppercase;
+}
 
 .color-reg input[type=button]:hover,
 .color-reg button:hover,
@@ -167,10 +206,44 @@ input[type=file]:hover{
 .color-reg input[type=submit],
 .color-reg button,
 .color-reg input[type=file]::-webkit-file-upload-button {
-	background-color: rgb(62, 65, 58);
+	background-color: rgb(39, 42, 35);
 	color: #BABDB6;
 	opacity: 0.7;
 	outline: none;
+	font: 12px Oswald;
+	 -webkit-box-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+	text-shadow: #000 0 1px 5px;
+	border-top: 1px solid rgba(255, 255, 255, 0.6);
+	border-left: 1px solid rgba(171, 171, 171, 0.83);
+	/* text-transform: uppercase; */
+	background-image: linear-gradient(#4B4E45 0%, #33352F 100%);
+}
+
+.color-reg input[type=button]:active,
+.color-reg input[type=submit]:active,
+.color-reg button:active,
+.color-reg input[type=file]::-webkit-file-upload-button:active {
+	text-shadow: none;
+	opacity: 1;
+	background-image: none;
+	box-shadow: 1px 1px 1px rgba(255,255,255,0.2);
+	padding: 7px 11px 5px 13px;
+	border-top: 1px inset rgba(0, 0, 0, 0.5);
+	border-left: 1px inset rgba(0, 0, 0, 0.5);
+}
+
+.color-reg .biginputtext input[type=file] {
+	font: 12px Oswald;
+}
+
+.color-reg input[type=submit] {
+	background-color: #273726;
+	background-image: linear-gradient(#457741 0%, #2A4029 100%);
+	text-shadow: #000 0 1px 5px;
+	/*-webkit-box-shadow: 1px 1px 2px 0 black;*/
+	/*-moz-box-shadow: 1px 1px 2px 0 black;*/
+	box-shadow: 1px 1px 2px 0 black;
+	-webkit-box-reflect: below 0 -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255, 255, 255, 0.2)));
 }
 
 .color-lor .growl, .color-lor #smileParentHolder {
@@ -457,13 +530,19 @@ textarea, div[contenteditable] {
 }
 
 /* ================== COMMONS ======================*/
-.biginputtext input:not([type=button]):not([type=submit]):not([type=checkbox]):not([type=radio]),.biginputtext select {
+.biginputtext input[type=email],
+.biginputtext input[type=text],
+.biginputtext input[type=date],
+.biginputtext select {
 	padding: 8px;
 	margin: 5px 10px 5px 0;
 	border-radius: 5px;
 	font-size: 18px;
 }
-
+.biginputtext input[type=file] {
+	padding-left: 0;
+	margin: 5px 10px 13px 0;
+}
 
 /******************** INPUTS ********************/
 
@@ -471,16 +550,6 @@ input[type=text], input[type=password], input[type=email], textarea,div[contente
 	border-radius: 5px;
 	font-size: 18px;
 	padding-left: 5px;
-}
-
-input[type=button],
-input[type=submit],
-button,
-input[type=file]::-webkit-file-upload-button {
-	border: 1px solid transparent;
-	border-radius: 3px;
-	font-size: 18px;
-	padding: 6px 12px;
 }
 
 /*select { */
@@ -530,9 +599,7 @@ input[type=file] {
 	/*background-color: red;*/
 }
 
-input[type=file]::-webkit-file-upload-button:hover {
-	cursor: pointer;
-}
+
 /* "x::-webkit-file-upload-button" forces the rules to only apply to browsers that support this pseudo-element */
 
 /* ====================== PROFILE.CSS ================= */
@@ -566,9 +633,20 @@ video {
 #userProfileData select {
 	width: 100%;
 }
-#userProfileData input {
+#userProfileData input:not([type=submit]) {
 	width: calc(100% - 18px)
 }
+
+#userProfileData input[type=submit] {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.color-reg #userProfileData input[type=submit]:active {
+	padding: 11px 9px 9px 11px;
+}
+
 #userProfileData {
 	max-width: 750px; /*width of collapsed below*/
 }

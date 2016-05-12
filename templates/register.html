@@ -3,20 +3,6 @@
 {% block head %}
 	<script src="{% md5url "js/register.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/register.css' %}">
-	<style>
-		@font-face {
-			font-family: 'Oswald';
-			font-style: normal;
-			font-weight: 400;
-			src: local('Oswald Regular'), local('Oswald-Regular'), url({% md5url 'font/OpenSans.ttf' %}) format('truetype');
-		}
-		@font-face {
-			font-family: 'Open Sans';
-			font-style: normal;
-			font-weight: 400;
-			src: local('Open Sans'), local('OpenSans'), url({% md5url 'font/Oswald.ttf' %}) format('truetype');
-		}
-	</style>
 {% endblock %}
 {% block content %}
 <div class="reg-log-container">

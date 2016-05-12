@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
-from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
 
 try:
@@ -82,7 +81,7 @@ def validate_user(request):
 
 
 @require_http_methods('GET')
-@login_required(login_url='/register?type=login')
+@login_required_no_redirect(False)
 def home(request):
 	"""
 	Login or logout navbar is creates by means of create_nav_page
@@ -91,7 +90,7 @@ def home(request):
 	return render_to_response('chat.html', csrf(request), context_instance=RequestContext(request))
 
 
-@login_required_no_redirect
+@login_required_no_redirect()
 def logout(request):
 	"""
 	POST. Logs out into system.
@@ -294,7 +293,7 @@ class IssueView(View):
 
 class ProfileView(View):
 
-	@login_required_no_redirect
+	@login_required_no_redirect(True)
 	def get(self, request):
 		user_profile = UserProfile.objects.get(pk=request.user.id)
 		form = UserProfileForm(instance=user_profile)
@@ -303,7 +302,7 @@ class ProfileView(View):
 		c['date_format'] = DATE_INPUT_FORMATS_JS
 		return render_to_response('change_profile.html', c, context_instance=RequestContext(request))
 
-	@login_required_no_redirect
+	@login_required_no_redirect()
 	def post(self, request):
 		logger.info('Saving profile: %s', hide_fields(request.POST, "base64_image", huge=True))
 		user_profile = UserProfile.objects.get(pk=request.user.id)
