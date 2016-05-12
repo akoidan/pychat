@@ -67,6 +67,7 @@ input:-webkit-autofill {
 	text-shadow: none;
 	cursor: auto;
 }
+
 form i {
 	position: absolute;
 	top: 15px;
@@ -178,19 +179,40 @@ input[type="text"], input[type="email"], input[type="password"], select {
 	background-color: #303030;
 }
 
+.color-lor #showRegister.disabled,
+.color-lor #showLogin.disabled
+	/*double selector to override*/ {
+	background-color: rgb(62, 65, 58);
+	color: #BABDB6;
+}
+
+.color-lor #showRegister,
+.color-lor #showLogin
+{
+	background-color: #ABBDB6;
+	color: #3E3D3D;
+}
+
+.color-lor #showRegister.disabled:hover,
+.color-lor #showLogin.disabled:hover {
+	color: black;
+}
+
 .color-reg input[type=submit].disabled:active {
 	background-image: none;
 }
 
 .forg-pass {
 	text-align: right;
-	color: #249BA3;
 	font: 12px Open Sans;
 	padding-right: 10px;
 	width: inherit;
 	padding-top: 3px;
 	padding-bottom: 5px;
 	text-shadow: #000 0 1px 5px;
+}
+.color-reg .forg-pass {
+	color: #249BA3;
 }
 
 .forg-pass:hover {

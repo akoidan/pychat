@@ -170,7 +170,6 @@ input[type=file]::-webkit-file-upload-button {
 .color-lor input[type=file]::-webkit-file-upload-button:hover {
 	color: #000000;
 	background: linear-gradient(#babdb6, #abbdab) repeat scroll 0 0 transparent;
-	border: 1px solid #48484a;
 	box-shadow: 0 0 10px #55585b;
 }
 

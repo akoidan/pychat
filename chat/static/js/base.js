@@ -259,6 +259,10 @@ function Draggable(container, header) {
 onDocLoad(function () {
 	muteBtn = $("muteBtn");
 	mute();
+	var theme = localStorage.getItem('theme');
+	if (theme != null) {
+		document.body.className = theme;
+	}
 	ajaxLoader = $("ajaxStatus");
 	if (typeof InstallTrigger !== 'undefined') { // browser = firefox
 		console.warn(getDebugMessage("Ops, there's no scrollbar for firefox"));

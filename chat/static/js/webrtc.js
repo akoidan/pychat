@@ -8,6 +8,10 @@ var photoImg;
 
 onDocLoad(function () {
 	photoImg = $('photoImg');
+	var item = localStorage.getItem('theme');
+	if (item != null) {
+		$('themeSelector').value = item; /*TODO $* to var*/
+	}
 	if (isDateMissing()) {
 		console.warn(getDebugMessage("Browser doesn't support html5 input type date, trying to load javascript datepicker"));
 		doGet(PICKADAY_CSS_URL);
@@ -102,6 +106,13 @@ function startCapturingVideo(button) {
 }
 
 
+function setColorTheme() {
+	var select = $('themeSelector');
+	var options = [];
+	localStorage.setItem('theme', select.value);
+	document.body.className = select.value;
+}
+
 function saveProfile(event) {
 	event.preventDefault();
 	var form = document.querySelector('form');
@@ -127,6 +138,7 @@ function saveProfile(event) {
 		}
 		if (response === RESPONSE_SUCCESS) {
 			growlSuccess("Your profile has been successfully updated. Press home icon to return on main page");
+			setColorTheme();
 		} else {
 			growlError(response);
 		}
