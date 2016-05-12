@@ -327,7 +327,7 @@ class RegisterView(View):
 		c = csrf(request)
 		c['noNav'] = True
 		c['captcha'] = getattr(settings, "RECAPTCHA_SITE_KEY", None)
-		logger.debug('Rendering register page with captcha site key ', c['captcha'])
+		logger.debug('Rendering register page with captcha site key %s', c['captcha'])
 		c['captcha_url'] = getattr(settings, "RECAPTHCA_SITE_URL", None)
 		return render_to_response("register.html", c, context_instance=RequestContext(request))
 
