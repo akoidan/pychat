@@ -7,7 +7,25 @@
 .color-lor .message-header-private {color: #8ae234;}
 .color-lor .message-header-self {color: #e29722;}
 .color-lor .message-header-system {color: #9DD3DD;}
-.color-lor #userSendMessageTo {box-shadow: 0 2px 2px rgba(6, 3, 8, 0.77);}
+.color-reg .message-header-others {color: #729fcf;}
+.color-reg .message-header-private {color: #84CC3D;}
+.color-reg .message-header-self {color: #e29722;}
+.color-reg .message-header-system {color: #84B7C0;}
+.color-lor #userSendMessageTo {
+	box-shadow: 0 2px 2px rgba(6, 3, 8, 0.77);
+	border: 1px solid #101D07;
+}
+.color-reg #userSendMessageTo {
+	border: 1px solid #101D07;
+	background-image: linear-gradient(#185D61 0%, #092B2E 100%);
+	text-shadow: #000 0 1px 5px;
+	color: #A2A2A2;
+}
+
+#userSendMessageTo {
+	position: relative;
+	font-size: 20px;
+}
 
 [class^="message-header"] {
 	font-weight: bold;
@@ -26,10 +44,17 @@ fieldset {
 }
 
 fieldset legend {
-    padding: 0 10px;
+	padding: 0 10px;
 	font-weight: bold;
-	color:   #9DD3DD;
+	color: #9DD3DD;
 }
+.color-lor fieldset legend 	{
+	color: #9DD3DD;
+}
+.color-reg fieldset legend 	{
+	color: #84B7C0;
+}
+
 p {
 	margin-top: 0.8em;
 	margin-bottom: 0.8em;
@@ -83,13 +108,44 @@ p {
 	/*font-size: 17px; = inherited */
 	border-radius: 2px;
 	float:left;
-	padding: 0 2px 0 2px;
+	padding: 0 2px 0 6px;
 	margin-right: 4px;
-	border: 1px solid #101D07;
+}
+
+.icon-cancel {
+	position: absolute;
+	top: 5px;
+	right: 1px;
+	font-size: 13px
+}
+.color-reg .icon-cancel:hover {
+	color: #440000;
+}
+
+.color-lor .green-btn {
+	background-color: #0E560C;
+}
+
+.color-lor .red-btn {
+	background-color: #910000;
+}
+
+.color-reg .green-btn {
+	background-image: linear-gradient(#148212 0%, #093C08 100%);
+}
+
+.color-reg .red-btn {
+	background-image: linear-gradient(#A30000 0%, #530000 100%);
+}
+
+.color-reg .answerButtons > button,
+.color-reg .answerButtons > button:hover > i /*override [class^='icon-']:hover*/{
+	text-shadow: #000 0 1px 5px;
 }
 
 #receiverId {
 	display: inline-block;
+	margin-right: 20px;
 }
 
 .message-text-holder {
@@ -132,10 +188,8 @@ p {
 	position: absolute;
 	right: 5px;
 	bottom: -2px;
-	border: 1px #775E39 solid;
 	border-radius: 10px;
 	width: 50%;
-	background-color:rgba(34, 31, 31, 0.86);
 }
 
 #smileParentHolder img {
@@ -174,8 +228,12 @@ p {
 	text-decoration: underline;
 }
 
-.activeTab {
-	color: #fcaf3e ;
+.color-lor .activeTab {
+	color: #fcaf3e;
+}
+
+.color-reg .activeTab {
+	color: #C6B955;
 }
 
 #usermsg {
@@ -189,8 +247,13 @@ p {
 
 
 /*--------------- START CALL DIALOG -----------------------*/
-.active-call-user {
+.color-lor .active-call-user {
 	background-color: #386D63
+}
+
+.color-reg .active-call-user{
+	background-image: linear-gradient(#1A747A 0%, #104B4F 100%);
+	text-shadow: #000 0 1px 5px
 }
 
 .modal-background {
@@ -207,8 +270,18 @@ p {
 .modal-body {
 	border-radius: 3px;
 	position: absolute;
-	background: #282923;;
+
 	box-shadow: 2px 2px 1px #1F1F27;
+}
+
+.color-lor .modal-body {
+	background: #282923;
+}
+
+.color-reg .modal-body {
+	border: 1px solid #414141;
+	box-shadow: 2px 2px 1px rgba(255, 255, 255, 0.05);
+	background-image: linear-gradient(rgba(42, 46, 42, 0.89) 0%, rgb(24, 27, 24) 100%);
 }
 
 .modal-draggable {
@@ -216,12 +289,20 @@ p {
 	top: 10%;
 }
 
-
 #callContainerHeader {
 	padding: 4px 0 4px 6px;
-	background-color: #42433B;
 	border-radius: 3px 3px 0 0;
 	cursor: pointer;
+}
+
+.color-lor #callContainerHeader {
+	background-color: #42433B;
+}
+
+.color-reg #callContainerHeader {
+	background: #42433B linear-gradient(#413A3A 0%, #241F1F 100%);
+	color: #9D9D9D;
+	border-bottom: 1px solid #444444;
 }
 
 #callContainer  {
@@ -233,7 +314,7 @@ p {
 	cursor: pointer;
 }
 
-.callContainerContent {
+#callContainerContent {
 	padding: 5px;
 	display: inline-block;
 }
@@ -243,6 +324,13 @@ p {
 	font-size: 25px;
 	width: 100%;
 	padding-top: 10px;
+}
+
+.color-reg .callContainerIcons {
+	color: #259BBD;
+}
+
+.color-lor .callContainerIcons {
 	color: darkgreen;
 }
 
@@ -253,19 +341,31 @@ p {
 	max-height: calc(100vh - 90px);
 	overflow-y: auto;
 	width: 100%;
-	background-color: #343A3B;
-
 }
+
+.color-lor  #callUserList {
+	background-color: #343A3B;
+}
+
+.color-reg #callUserList {
+	color: #A5A5A5;
+	background-color: #242A2A;
+}
+
 .icon-phone-circled {
 	float: right;
-	color: green
+	color:#3AC73A;
+}
+
+.icon-plus-squared {
+	font-size: 15px;
 }
 
 #callUserList > li {
 	list-style-type: none;
 	border-radius: 2px;
 	margin-bottom: 2px;
-	margin-right: 3px; /*before scroll*/
+	margin-right: 0; /* TODO was 3 px before scroll??*/
 	padding-left: 3px;
 	cursor: pointer;
 }
@@ -277,6 +377,7 @@ p {
 #videoContainer {
 	position:relative;
 	width: 100%;
+	text-align: center;
 }
 
 #videoContainer video {
@@ -331,11 +432,96 @@ p {
 	font-size: 30px;
 }
 .finish-call-icon {
-	color: #910000;
 	float:right;
 	font-size: 40px;
 	margin-bottom: -25px;
     margin-top: -6px;
+}
+
+.color-lor .finish-call-icon {
+	color: #910000;
+}
+
+.color-reg .finish-call-icon {
+	color: #BC2F2F;
+}
+
+.fullscreen#videoContainer {
+	background-color: black;
+}
+
+.fullscreen #remoteVideo {
+	max-height: 99vh;
+	height: 99vh;
+}
+
+.fullscreen#videoContainer video {
+	border-color: #272727;
+}
+#videoStatusIcon {
+	margin-left: -5px;
+	margin-right: 15px;
+}
+
+#icon-webrtc-cont {
+	display: none;
+	position: absolute;
+	bottom: 2vh;
+	left: 2vw;
+}
+.fullscreen #icon-webrtc-cont {
+	display: block;
+}
+
+#icon-webrtc-cont > i {
+	display: block;
+	font-size: 36px;
+	opacity: 1;
+}
+
+#icon-webrtc-cont > i:before {
+	border-radius: 50%;
+	width: 36px;
+	height: 36px;
+	padding: 8px;
+	background: rgba(102,102,102,0.6);
+	text-align: center;
+	box-shadow: 3px 3px 12px #444;
+	color: white;
+	margin: 7px 30px 15px 7px;
+}
+
+.icon-webrtc-fullscreen {
+	color: #6EEFFF;
+	position: absolute;
+	left: -30px;
+	font-size: 40px;
+	top: -10px;
+}
+
+#enterFullScreenHolder {
+	position: relative;
+	display: inline;
+	padding-left: 5px;
+}
+
+#icon-webrtc-cont i:hover:before,
+#icon-webrtc-cont .icon-webrtc-nomic:before,
+#icon-webrtc-cont .icon-webrtc-novideo:before{
+	background-color: rgba(88, 143, 255, 0.6);
+	opacity: 1;
+	color: white;
+	box-shadow: 6px 6px 36px #666;
+}
+
+#icon-webrtc-cont i.icon-webrtc-hangup:hover:before {
+	background: rgba(217,24,24,0.6);
+}
+
+.inactive #icon-webrtc-cont > i {
+	transform: translateX(calc(-2vw - 70px));
+	transition: all .1s;
+	transition-timing-function: ease-in-out;
 }
 
 @media screen and (max-height: 550px){

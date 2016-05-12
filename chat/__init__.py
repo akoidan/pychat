@@ -1,5 +1,7 @@
 from __future__ import absolute_import
+
 import threading
+
 default_app_config = 'chat.apps.DefaultSettingsConfig'
 
 local = threading.local()

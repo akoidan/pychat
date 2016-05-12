@@ -19,14 +19,12 @@ const SYSTEM_USERNAME = 'System';
 const genderIcons = {
 	'Male': 'icon-man',
 	'Female': 'icon-girl',
-	'Alien': 'icon-anonymous',
 	'Secret': 'icon-user-secret'
 };
 
 var imgRegex = /<img[^>]*alt="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-var destinationUserName = null;
 var destinationUserId = null;
 
 var lastLoadUpHistoryRequest = 0;
@@ -36,7 +34,6 @@ var newMessagesCount = 0;
 var isCurrentTabActive = true;
 //localStorage  key
 const STORAGE_NAME = 'main';
-const STORAGE_USER = 'user';
 //current top message id for detecting from what
 var headerId;
 //  div that contains messages
@@ -47,8 +44,6 @@ var chatIncoming;
 var chatOutgoing;
 var chatLogin;
 var chatLogout;
-// current username
-var loggedUser;
 // div for user list appending
 var chatUsersTable;
 // input type that contains text for sending message
@@ -58,7 +53,6 @@ var userSendMessageTo;
 //user to send message input type text
 var receiverId;
 // navbar label with current user name
-var userNameLabel;
 var charRooms;
 //main single socket for handling realtime messages
 var ws;
@@ -84,7 +78,6 @@ onDocLoad(function () {
 	userMessage = $("usermsg");
 	chatUsersTable = $("chat-user-table");
 	chatUserRoomWrapper = $("chat-room-users-wrapper");
-	userNameLabel = $("userNameLabel");
 	userSendMessageTo = $("userSendMessageTo");
 	chatIncoming = $("chatIncoming");
 	chatOutgoing = $("chatOutgoing");
@@ -244,10 +237,9 @@ function changeTittleFunction(e) {
 function userClick(event) {
 	event = event || window.event;
 	var target = event.target || event.srcElement;
-	destinationUserName = target.innerHTML;
 	CssUtils.showElement(userSendMessageTo);
 	// Empty sets display to none
-	receiverId.textContent = destinationUserName;
+	receiverId.textContent = target.innerHTML; //destinationUserName
 	userMessage.focus();
 	if (target.attributes.name != null) {
 		// icon click
@@ -285,9 +277,6 @@ function sendMessage(messageContent) {
 	if (destinationUserId != null) {
 		messageRequest['receiverId'] = destinationUserId;
 	}
-	if (destinationUserName != null) {
-		messageRequest['receiverName'] = destinationUserName;
-	}
 	var sendSuccessful = sendToServer(messageRequest);
 	if (sendSuccessful) {
 		userMessage.innerHTML = "";
@@ -316,7 +305,6 @@ function checkAndSendMessage(event) {
 
 
 function loadMessagesFromLocalStorage() {
-	loggedUser = localStorage.getItem(STORAGE_USER);
 	var jsonData = localStorage.getItem(STORAGE_NAME);
 	if (jsonData != null) {
 		var parsedData = JSON.parse(jsonData);
@@ -626,13 +614,6 @@ function printRefreshUserNameToChat(data) {
 }
 
 
-function setUsername(newUserName) {
-	console.log(getDebugMessage("UserName has been set to {}", newUserName));
-	loggedUser = newUserName;
-	userNameLabel.textContent = newUserName;
-}
-
-
 function handleGetMessages(message) {
 	console.log(getDebugMessage('appending messages to top'));
 	// This check should fire only once,
@@ -670,9 +651,6 @@ function fastAddToStorage(text) {
 // Use both json and object repr for less JSON actions
 function saveMessageToStorage(objectItem, jsonItem) {
 	switch (objectItem['action']) {
-		case 'me':
-			localStorage.setItem(STORAGE_USER, objectItem['content']);
-			break;
 		case 'joined':
 		case 'changed':
 		case 'left':
@@ -689,9 +667,6 @@ function saveMessageToStorage(objectItem, jsonItem) {
 
 
 function changeOnlineUsers(data) {
-	if (data.oldName === loggedUser) {
-		setUsername(data.user);
-	}
 	printRefreshUserNameToChat(data);
 	loadUsers(data.content);
 }
@@ -715,9 +690,6 @@ var MessagedHandler = {
 	changed: changeOnlineUsers,
 	messages: function (data) {
 		handleGetMessages(data.content);
-	},
-	me: function(data) {
-		setUsername(data.content);
 	},
 	system: function(data) {
 		displayPreparedMessage(systemHeaderClass, data.time, data.content, SYSTEM_USERNAME);
@@ -749,14 +721,89 @@ var WebRtcApi = function () {
 		callSound: $('chatCall'),
 		callIcon: $('callIcon'),
 		hangUpIcon: $('hangUpIcon'),
+		callContainerContent : $('callContainerContent'),
 		audioStatusIcon: $('audioStatusIcon'),
 		videoStatusIcon: $('videoStatusIcon'),
-		videoContainer: $('videoContainer')
+		videoContainer: $('videoContainer'),
+		fsContainer: $('icon-webrtc-cont'),
+		fs: { /*FullScreen*/
+			video: $('fs-video'),
+			audio: $('fs-audio'),
+			hangup: $('fs-hangup'),
+			minimize: $('fs-minimize'),
+			enterFullScreen: $('enterFullScreen')
+		}
 	};
-	var baseMute = mute;
-	mute = function() {
-		baseMute();
-		self.dom.remote.volume = volumeProportion[window.sound];
+	self.onExitFullScreen = function () {
+		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
+			CssUtils.removeClass(self.dom.videoContainer, 'fullscreen');
+			document.removeEventListener('mousemove', self.fsMouseMove, false);
+			clearInterval(self.hideContainerTimeoutRes);
+			self.dom.remote.ondblclick = self.enterFullScreenMode;
+		}
+	};
+	self.attachDomEvents = function () {
+		self.dom.videoStatusIcon.onclick = self.toggleVideo;
+		self.dom.fs.video.onclick = self.toggleVideo;
+		self.dom.callIcon.onclick = self.callPeople;
+		self.dom.hangUpIcon.onclick = self.hangUp;
+		self.dom.fs.hangup.onclick = self.hangUp;
+		self.dom.fs.audio.onclick = self.toggleMic;
+		self.dom.audioStatusIcon.onclick = self.toggleMic;
+		self.dom.callUserList.onclick = self.callUserListClick;
+		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
+		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
+			document.addEventListener(fullScreenChangeEvents[i], self.onExitFullScreen, false);
+		}
+		var elem = self.dom.videoContainer;
+		if (elem.requestFullscreen) {
+			//nothing
+		} else if (elem.msRequestFullscreen) {
+			elem.requestFullscreen = elem.msRequestFullscreen;
+			document.cancelFullScreen = document.msCancelFullScreen;
+		} else if (elem.mozRequestFullScreen) {
+			elem.requestFullscreen = elem.mozRequestFullScreen;
+			document.cancelFullScreen = document.mozCancelFullScreen;
+		} else if (elem.webkitRequestFullscreen) {
+			elem.requestFullscreen = elem.webkitRequestFullscreen;
+			document.cancelFullScreen = document.webkitCancelFullScreen;
+		} else {
+			growlError("Can't enter fullscreen")
+		}
+		self.dom.remote.ondblclick = self.enterFullScreenMode;
+		self.dom.fs.enterFullScreen.onclick = self.enterFullScreenMode;
+		self.dom.fs.minimize.onclick =  self.exitFullScreen;
+		self.idleTime = 0;
+		self.dom.fs.hangup.title = 'Hang up';
+		self.dom.hangUpIcon.title = self.dom.fs.hangup.title;
+		mute = function () {
+			self.baseMute();
+			self.dom.remote.volume = volumeProportion[window.sound];
+		};
+	};
+	self.exitFullScreen = function () {
+		document.cancelFullScreen();
+	};
+	self.baseMute = mute;
+	self.hideContainerTimeout = function () {
+		self.idleTime += 1;
+		if (self.idleTime > 6) {
+			CssUtils.addClass(self.dom.videoContainer, 'inactive');
+		}
+	};
+	self.enterFullScreenMode = function () {
+		self.dom.remote.removeEventListener('dblclick', self.enterFullScreenMode);
+		self.dom.videoContainer.requestFullscreen();
+		CssUtils.addClass(self.dom.videoContainer, 'fullscreen');
+		document.addEventListener('mousemove', self.fsMouseMove, false);
+		self.hideContainerTimeoutRes = setInterval(self.hideContainerTimeout , 1000);
+		/*to clear only function from resultOf setInterval should be passed, otherwise doesn't work*/
+	};
+	self.fsMouseMove = function () {
+		if (self.idleTime > 0) {
+			CssUtils.removeClass(self.dom.videoContainer, 'inactive');
+		}
+		self.idleTime = 0;
 	};
 	self.callTimeoutTime = 60000;
 	self.dom.callSound.addEventListener("ended", function () {
@@ -798,11 +845,19 @@ var WebRtcApi = function () {
 	self.setAudio = function (value) {
 		self.constraints.audio = value;
 		self.dom.audioStatusIcon.className = value ? "icon-mic" : "icon-mute callActiveIcon";
+		self.dom.fs.audio.className = value ? "icon-webrtc-mic" : "icon-webrtc-nomic";
+		var title = value ? "Turn off your microphone" : "Turn on your microphone";
+		self.dom.audioStatusIcon.title = title;
+		self.dom.fs.audio.title = title;
 	};
 	self.setVideo = function (value) {
 		self.constraints.video = value;
 		self.dom.videoStatusIcon.className = value ? "icon-videocam" : "icon-no-videocam callActiveIcon";
+		self.dom.fs.video.className = value ? "icon-webrtc-video" : "icon-webrtc-novideo";
 		CssUtils.setVisibility(self.dom.local, value);
+		var title = value ? "Turn off your webcamera" : "Turn on your webcamera";
+		self.dom.videoStatusIcon.title = title;
+		self.dom.fs.video.title = title;
 	};
 	self.isActive = function () {
 		return self.localStream && self.localStream.active;
@@ -1046,6 +1101,7 @@ var WebRtcApi = function () {
 			}
 		}
 		growlInfo(text);
+		self.exitFullScreen(); /*also executes removing event on exiting from fullscreen*/
 	};
 	self.hangUp = function() {
 		self.sendBaseEvent(null, 'finish');
@@ -1091,7 +1147,6 @@ var WebRtcApi = function () {
 			content: content,
 			action: 'call',
 			type: type,
-			receiverName: self.receiverName,
 			receiverId: self.receiverId
 		});
 	};
@@ -1121,6 +1176,7 @@ var WebRtcApi = function () {
 		}
 		event.stopPropagation();
 	};
+	self.attachDomEvents();
 };
 
 
@@ -1186,7 +1242,6 @@ function loadUpHistory(count) {
 function clearLocalHistory() {
 	headerId = null;
 	localStorage.removeItem(STORAGE_NAME);
-	localStorage.removeItem(STORAGE_USER);
 	localStorage.removeItem(HISTORY_STORAGE_NAME);
 	chatBoxDiv.innerHTML = '';
 	allMessages = [];
@@ -1200,6 +1255,5 @@ function clearLocalHistory() {
 
 function hideUserSendToName() {
 	destinationUserId = null;
-	destinationUserName = null;
 	CssUtils.hideElement(userSendMessageTo);
 }

@@ -1,42 +1,79 @@
-{% extends "base.html" %} {% block head %} {% load md5url %}
+{% extends "base.html" %}
+{% load md5url %}
+{% block head %}
 	<script src="{% md5url "js/register.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/register.css' %}">
-{% endblock head %} {% block content %}
-	<form  id="register-form" onsubmit="register(event)">
-		<div class="biginputtext">
-			<table>
-				<tr>
-					<td><input type="text" maxlength="16" required placeholder="Username" name="username" value="" id="rusername"
-								  onchange="validateUser()"/></td>
-					<td><label id="username_check" for="rusername">Your login should be unique</label></td>
-				</tr>
-				<tr>
-					<td><input type="password" required name="password" value=""
-								  id="rpassword" placeholder="Password" onchange="validatePassword(); passwordsMatch();"/></td>
-					<td><label id="password_check" for="rpassword">At least 3 characters</label></td>
-				</tr>
-				<tr>
-					<td><input type="password" required placeholder="Repeat password" name="repeatpassword" value=""
-								  id="repeatpassword" onchange="passwordsMatch();"/></td>
-					<td><label id="repeatpassword_check" for="repeatpassword">Repeat in case of misspelling</label></td>
-				</tr>
-				<tr>
-					<td><input type="email" placeholder="Email" name="email" value="" id="email"
-								  onchange="validateEmail();"/></td>
-					<td><label id="email_check" for="email">Enter an email for extra features</label></td>
-				</tr>
-				<tr>
-					<td>
-						<div class="checkboxes-div">
-							<input type="radio" id="rmale" name="sex" value="Male">Male<br>
-							<input type="radio" id="rfemale" name="sex" value="Female">Female
-						</div>
-						</td>
-					<td>
-						<input type="submit" value="Sing Up"/>
-					</td>
-				</tr>
-			</table>
+{% endblock %}
+{% block content %}
+<div class="reg-log-container">
+	<input type="submit" class="blue-button" id="showRegister" value="Sign Up"/>
+	<input type="submit" class="disabled blue-button" id="showLogin" value="Log In" style="float: right"/>
+	<form id="recoverForm" class="hidden" method="post" onsubmit="restorePassword(event);">
+		<h1>Restore password</h1>
+		<div>
+			<input type="text" style="padding-left: 10px; width: calc(100% - 35px)"
+				   required placeholder="Username or email" name="username_or_password" value="" id="username"/>
+			<div class="slider">Enter your username or email</div>
+		</div>
+		{% if captcha %}
+			<script src='{{ captcha_url }}'></script>
+			<div class="g-recaptcha" data-theme="dark" data-sitekey="{{ captcha }}"></div>
+		{% endif %}
+		<div>
+			<input type="submit" class="blue-button submit-button" value="Recover password"/>
 		</div>
 	</form>
-{% endblock %}
+	<form id="regLoginForm" method="post" class="hidden" onsubmit="login(event);">
+		<h1>Wellcome back!</h1>
+		<div>
+			<i class="icon-user"></i>
+			<input type="text" maxlength="16" required placeholder="Username" name="username" value="" id="username"/>
+		</div>
+		<div>
+			<i class="icon-key"></i>
+			<input type="password" name="password" placeholder="Password" id="password" required/>
+		</div>
+		<div class="forg-pass" id="recoverPassword"><span>Forgot Password?</span></div>
+		<div>
+			<input type="submit" class="blue-button submit-button" value="LOG IN"/>
+		</div>
+	</form>
+	<form id="register-form" method="post" onsubmit="register(event)">
+		<h1>Create new account</h1>
+		<div class="required">
+			<i class="icon-user"></i>
+			<input type="text" maxlength="16" required
+				   placeholder="Username" name="username" value="" id="rusername"/>
+			<div class="slider closed"></div>
+		</div>
+		<div class="required">
+			<i class="icon-lock"></i>
+			<input type="password" required name="password" value=""
+				   id="rpassword" placeholder="Password"/>
+			<div class="slider closed"></div>
+		</div>
+		<div class="required">
+			<i class="icon-lock"></i>
+			<input type="password" required name="repeatpassword" value="" placeholder="Confirm password"
+				   id="repeatpassword"/>
+			<div class="slider closed"></div>
+		</div>
+		<div>
+			<i class="icon-mail"></i>
+			<input type="email" placeholder="Email" name="email" value="" id="email"/>
+			<div class="slider closed"></div>
+		</div>
+		<div>
+			<i class="icon-user-pair"></i>
+			<select id="id_sex" name="sex">
+				<option value="0" disabled selected hidden>Gender</option>
+				<option value="1">Male</option>
+				<option value="2">Female</option>
+			</select>
+			<div class="slider closed"></div>
+		</div>
+		<input type="submit" class="blue-button submit-button" value="REGISTER"/>
+		{% csrf_token %}
+	</form>
+</div>
+{% endblock content %}

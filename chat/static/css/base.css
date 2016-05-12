@@ -1,7 +1,16 @@
-/* =============== COLOR LOR ===================== */
+/* =============== NAV ===================== */
 .color-lor {
 	background-color: #272c2d;
 	color: #babdb6;
+}
+.color-reg {
+	background-color: #222222; /*if image is nto loaded*/
+	color: #C1C1C1;
+}
+
+.color-reg nav {
+	background-image: linear-gradient(#232323 0%, #151515 100%);
+	opacity: 0.9;
 }
 
 .color-lor nav {
@@ -11,13 +20,54 @@
 .color-lor input[type=text],
 .color-lor input[type=password],
 .color-lor input[type=email],
+.color-lor input[type=date],
 .color-lor textarea,
-.color-lor select,
-.color-lor input[type=date] {
+.color-lor select {
 	background-color: #272c2d;
 	border: 1px solid rgba(96, 90, 90, 0.31);
 	color: #C7C7C7;
 }
+
+.color-reg input[type=text],
+.color-reg input[type=email],
+.color-reg input[type=password],
+.color-reg input[type=date],
+.color-reg div[contenteditable],
+.color-reg textarea,
+.color-reg select {
+	box-shadow: inset 4px 6px 10px -4px rgba(0, 0, 0, 0.3), 0 1px 1px -1px rgba(255, 255, 255, 0.3);
+	background: rgba(0, 0, 0, 0.2);
+	border: 1px solid rgba(0, 0, 0, 1);
+	color: #C6C5C5;
+	text-shadow: #000 0 1px 5px;
+	font-family: Arial, serif;
+}
+
+.color-reg option {
+	background-color: #1A1A1A
+}
+
+.color-reg input,
+.color-reg select {
+	outline: none;
+}
+
+.color-reg input[type=text]:focus,
+.color-reg input[type=email]:focus,
+.color-reg input[type=password]:focus,
+.color-reg input[type=date]:focus,
+.color-reg div[contenteditable]:focus,
+.color-reg textarea:focus,
+.color-reg select:focus {
+	box-shadow: inset 4px 6px 10px -4px rgba(0, 0, 0, 0.7), 0 1px 1px -1px rgba(255, 255, 255, 0.3);
+	background: rgba(0, 0, 0, 0.35);
+	-webkit-transition: 0.7s ease;
+	-moz-transition: 0.7s ease;
+	-o-transition: 0.7s ease;
+	-ms-transition: 0.7s ease;
+	transition: 0.7s ease;
+}
+
 .color-lor .box-shadow input[type=text],
 .color-lor .box-shadow input[type=password],
 .color-lor .box-shadow textarea,
@@ -40,50 +90,222 @@
 	box-shadow: 0 0 10px #55585b;
 	color: #dddddd;
 }
-.color-lor :link {
+
+.color-lor ::-webkit-calendar-picker-indicator { background: rgb(186, 189, 182); }
+.color-lor ::-webkit-calendar-picker-indicator { background: rgb(39, 44, 45); }
+
+.color-lor input:-webkit-autofill,
+.color-lor div[contenteditable]:-webkit-autofill,
+.color-lor textarea:-webkit-autofill,
+.color-lor select:-webkit-autofill {
+	-moz-box-shadow: 0 0 0 1000px #30302A inset !important;
+	-webkit-box-shadow: 0 0 0 1000px #30302A inset !important; /*important t*/
+	-webkit-text-fill-color: #CCCBDF;
+}
+
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+	color: #59595a;
+}
+
+::-webkit-datetime-edit-month-field:focus,
+::-webkit-datetime-edit-day-field:focus,
+::-webkit-datetime-edit-year-field:focus {
+	background-color: #636b57;
+	text-shadow: none;
+}
+
+.color-reg label {
+	font: 13px Open Sans;
+	color: #6E6E6E;
+	text-shadow: #000 0 1px 5px;
+}
+
+.color-reg th {
+	text-align: right;
+	padding-right: 10px;
+}
+
+/*=================== END INPUT TEXT =================*/
+:link {
 	color: #729fcf;
 }
 
-.color-lor :visited {
+:visited {
 	color: #7572CF;
 }
 
-/*-----------INPUT BUTTON -----------*/
-.color-lor input[type=button]:hover,
-.color-lor button:hover,
-.color-lor input[type=submit]:hover {
-	color: #000000;
-	background: linear-gradient(#babdb6, #abbdab) repeat scroll 0 0 transparent;
-	border: 1px solid #48484a;
-	box-shadow: 0 0 10px #55585b;
-	cursor: pointer; /*TODO */
+.message {
+	text-align: center;
+	font-size: 30px;
+	font-family: monospace;
+	display: table;
+	width: 100%;
+	vertical-align: middle;
+	margin-top: 15%;
 }
 
-.color-lor input[type=button],.color-lor input[type=submit], .color-lor button {
+/*----------- BUTTON -----------*/
+
+input[type=button]:hover,
+button:hover,
+input[type=submit]:hover,
+input[type=file]:hover,
+input[type=file]::-webkit-file-upload-button:hover {
+	cursor: pointer;
+}
+
+input[type=button],
+input[type=submit],
+button,
+input[type=file]::-webkit-file-upload-button {
+	border: 1px solid transparent;
+	border-radius: 3px;
+	font-size: 18px;
+	padding: 6px 12px;
+}
+
+.color-lor input[type=button]:hover,
+.color-lor button:hover,
+.color-lor input[type=submit]:hover,
+.color-lor input[type=file]::-webkit-file-upload-button:hover {
+	color: #000000;
+	background: linear-gradient(#babdb6, #abbdab) repeat scroll 0 0 transparent;
+	box-shadow: 0 0 10px #55585b;
+}
+
+.color-lor input[type=button],
+.color-lor input[type=submit],
+.color-lor button,
+.color-lor input[type=file]::-webkit-file-upload-button {
 	background-color: rgb(62, 65, 58);
 	color: #BABDB6;
 }
 
+.color-reg input[type=button].blue-button,
+.color-reg input[type=submit].blue-button{
+	background-color: #005C64;
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#28D2DE), to(#1A878F));
+	background-image: -webkit-linear-gradient(#28D2DE 0%, #1A878F 100%);
+	background-image: -moz-linear-gradient(#28D2DE 0%, #1A878F 100%);
+	background-image: -o-linear-gradient(#28D2DE 0%, #1A878F 100%);
+	background-image: linear-gradient(#28D2DE 0%, #1A878F 100%);
+	font-size: 14px;
+	text-transform: uppercase;
+}
+
+.color-reg input[type=button]:hover,
+.color-reg button:hover,
+.color-reg input[type=submit]:hover,
+.color-reg input[type=file]::-webkit-file-upload-button:hover,
+.color-reg button > i{
+	opacity: 1;
+}
+
+.color-reg input[type=button],
+.color-reg input[type=submit],
+.color-reg button,
+.color-reg input[type=file]::-webkit-file-upload-button {
+	background-color: rgb(39, 42, 35);
+	color: #BABDB6;
+	opacity: 0.7;
+	outline: none;
+	font: 12px Oswald;
+	 -webkit-box-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+	text-shadow: #000 0 1px 5px;
+	border-top: 1px solid rgba(255, 255, 255, 0.6);
+	border-left: 1px solid rgba(171, 171, 171, 0.83);
+	/* text-transform: uppercase; */
+	background-image: linear-gradient(#4B4E45 0%, #33352F 100%);
+}
+
+.color-reg input[type=button]:active,
+.color-reg input[type=submit]:active,
+.color-reg button:active,
+.color-reg input[type=file]::-webkit-file-upload-button:active {
+	text-shadow: none;
+	opacity: 1;
+	background-image: none;
+	box-shadow: 1px 1px 1px rgba(255,255,255,0.2);
+	padding: 7px 11px 5px 13px;
+	border-top: 1px inset rgba(0, 0, 0, 0.5);
+	border-left: 1px inset rgba(0, 0, 0, 0.5);
+}
+
+.color-reg .biginputtext input[type=file] {
+	font: 12px Oswald;
+}
+
+.color-reg input[type=submit] {
+	background-color: #273726;
+	background-image: linear-gradient(#457741 0%, #2A4029 100%);
+	text-shadow: #000 0 1px 5px;
+	/*-webkit-box-shadow: 1px 1px 2px 0 black;*/
+	/*-moz-box-shadow: 1px 1px 2px 0 black;*/
+	box-shadow: 1px 1px 2px 0 black;
+	-webkit-box-reflect: below 0 -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255, 255, 255, 0.2)));
+}
+
+.color-lor .growl, .color-lor #smileParentHolder {
+	background-color: rgba(34, 31, 31, 0.86);
+	border: 1px #775E39 solid;
+}
+
+.color-reg #smileParentHolder, .color-reg .growl {
+	border: 1px #696951 solid;
+	background-color:rgba(33,33,31, 0.9);
+}
+
+
 /*-------- FONTELLO ------------*/
-.color-lor [class^='icon-']:not(.icon-anonymous):hover {
+.color-reg [class^='icon-'] {
+	opacity: 0.7;
+	-webkit-mask-image: -webkit-linear-gradient(top, rgba(0,0,0,1),rgba(0,0,0,0.5));
+}
+
+[class^='icon-']:hover {
+	cursor: pointer;
+	opacity: 1;
+
+}
+.color-lor [class^='icon-']:hover {
 	text-shadow: 0 0 0.2em #FFF, 0 0 0.2em #3D3D3D;
 }
-[class^='icon-volume'] { color: rgb(138, 109, 59); }
-.icon-home { color: rgb(51, 122, 183); }
-.icon-pencil { color: rgb(85, 26, 139); }
-.icon-santa-hat { color: rgb(207, 80, 80); }
-.icon-chart-pie { color: rgb(121, 144, 15); }
-.icon-users { color: rgb(66, 148, 122) }
-.icon-login { color: rgb(60, 118, 61); }
-.icon-register { color: rgb(138, 109, 59); }
-.icon-sign-out { color: rgb(169, 68, 66); }
-.icon-wrench { color: rgb(70, 133, 117); }
-.icon-clear { color: rgb(142, 53, 84); }
-.icon-man {color: rgb(84, 151, 83) !important; } /*override .color-lor :link*/
-.icon-girl { color: #bb686a !important; } /*override .color-lor :link */
-.icon-anonymous { color: #C2C2C2 !important; } /*override .color-lor :link*/
-.icon-user-secret { color: rgb(92, 148, 163) !important; } /*override .color-lor :link*/
-.icon-phone { color: #136C00 } /*override .color-lor :link*/
+.color-reg [class^='icon-']:hover {
+	text-shadow: 0 0 0.2em #575757;
+}
+
+.color-lor [class^='icon-volume'] { color: rgb(138, 109, 59); }
+.color-lor .icon-home { color: rgb(51, 122, 183); }
+.color-lor .icon-pencil { color: rgb(85, 26, 139); }
+.color-lor .icon-santa-hat { color: rgb(207, 80, 80); }
+.color-lor .icon-chart-pie { color: rgb(121, 144, 15); }
+.color-lor .icon-users { color: rgb(66, 148, 122) }
+.color-lor .icon-login { color: rgb(60, 118, 61); }
+.color-lor .icon-register { color: rgb(138, 109, 59); }
+.color-lor .icon-sign-out { color: rgb(169, 68, 66); }
+.color-lor .icon-wrench { color: rgb(70, 133, 117); }
+.color-lor .icon-clear { color: rgb(142, 53, 84); }
+.color-lor .icon-man {color: rgb(84, 151, 83) !important; } /*override .color-lor :link*/
+.color-lor .icon-girl { color: #bb686a !important; } /*override .color-lor :link */
+.color-lor .icon-user-secret { color: rgb(92, 148, 163) !important; } /*override .color-lor :link*/
+.color-lor .icon-phone { color: #136C00 } /*override .color-lor :link*/
+
+
+.color-reg [class^='icon-volume'] { color: #DCA737; }
+.color-reg .icon-home { color: #20A0FF }
+.color-reg .icon-pencil { color: #8D28DE; }
+/*.color-reg .icon-santa-hat { color: rgb(214, 80, 80); }*/
+.color-reg .icon-chart-pie { color: #B7D710 }
+/*.color-reg .icon-users { color: rgb(67, 164, 138) }*/
+/*.color-reg .icon-login { color: rgb(71, 132, 72); }*/
+/*.color-reg .icon-register { color: rgb(152, 122, 60); }*/
+.color-reg .icon-sign-out { color: #F5504C }
+.color-reg .icon-wrench { color: #67C8B0; }
+.color-reg .icon-clear { color: #D42C5A }
+.color-reg .icon-man {color: #49B550 !important; } /*override .color-lor :link*/
+.color-reg .icon-girl { color: #cf7779 !important; } /*override .color-lor :link */
+.color-reg .icon-user-secret { color: #69C1D8 !important; } /*override .color-lor :link*/
+.color-reg .icon-phone { color: #37BB21 } /*override .color-lor :link*/
 
 /*--------PAGE SPECIFIC--------------*/
 .color-lor #hideableDropDown {
@@ -91,25 +313,24 @@
 	border-color: rgb(30, 30, 30);
 	box-shadow: 3px 3px 7px #0E1011
 }
-/*----------BROWSER SPECIFIC------------*/
-.color-lor ::-webkit-calendar-picker-indicator { background: rgb(186, 189, 182); }
-.color-lor ::-webkit-calendar-picker-indicator { background: rgb(39, 44, 45); }
+/*----------SCROLL-----------*/
 
-input:-webkit-autofill, div[contenteditable]:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
-	-moz-box-shadow: 0 0 0 1000px #30302A inset !important;
-	-webkit-box-shadow: 0 0 0 1000px #30302A inset !important; /*important t*/
-	-webkit-text-fill-color: #CCCBDF;
-}
-/*TODO html scroll doesn't show with .color-lor class for body*/
-::-webkit-scrollbar {
+.color-lor ::-webkit-scrollbar {
 	background: #222;
 }
-::-webkit-scrollbar-thumb {
+.color-lor ::-webkit-scrollbar-thumb {
 	background: #3E4654;;
 }
 
+.color-reg ::-webkit-scrollbar {
+	background: #1A1A1A;
+}
+.color-reg ::-webkit-scrollbar-thumb {
+	background: #313A3C;
+}
+
 /*IE scroll*/
-.color-lor {
+.color-lor, .color-reg {
 	scrollbar-base-color: #3E4654;
 	scrollbar-3dlight-color: #7dc071;
 	scrollbar-highlight-color: #c08b00;
@@ -117,17 +338,7 @@ input:-webkit-autofill, div[contenteditable]:-webkit-autofill, textarea:-webkit-
 	scrollbar-arrow-color: #3c763d;
 }
 
-.color-lor input[type=file]::-webkit-file-upload-button:hover {
-	color: #ffffff;
-	border: 1px solid #48484a;
-	box-shadow: 0 0 10px #55585b;
-}
-
-.color-lor input[type=file]::-webkit-file-upload-button {
-	background-color: rgb(62, 65, 58);
-	color: #BABDB6;
-}
-
+/* ------------ END SCROLL ---------------*/
 .color-lor .table tbody>tr>td,
 .color-lor .table tbody>tr>th{
 	border-top: 1px solid #5B6248;
@@ -137,8 +348,20 @@ input:-webkit-autofill, div[contenteditable]:-webkit-autofill, textarea:-webkit-
 	color: red;
 }
 
+.color-reg .col-error {
+	color: #FF3131;
+}
+
 .color-lor .col-success {
 	color: #39C03B;
+}
+
+.color-reg .col-success {
+	color: #5BC25C;
+}
+
+.color-reg .col-info {
+	color: #78CAD8;
 }
 
 .color-lor .col-info {
@@ -173,24 +396,24 @@ img {
 	padding: 10px;
 }
 
-.right {
-	float:right;
-}
-
 .hidden {
 	display: none !important;
 }
 
+.flex-push-right {
+	margin-left: auto;
+}
 nav {
 	/*Icons navbar size*/
 	font-size: 26px;
-}
-nav > ul {
 	margin: 0;
 	padding: 10px 4px 9px 10px;
+	display: flex;
+	align-items: center;
 }
-nav > ul > li {
-	 display:inline;
+
+nav > * {
+
 }
 
 html, body {
@@ -246,9 +469,7 @@ textarea, div[contenteditable] {
 .growl {;
 	padding: 7px;
 	width: calc(100% - 16px);
-	border: 1px #775E39 solid;
 	border-radius: 10px;
-	background-color: rgba(34, 31, 31, 0.86);
 	float:left;
 	word-wrap: break-word;
 	white-space: pre-wrap;
@@ -271,31 +492,56 @@ textarea, div[contenteditable] {
 	font-size: 22px;
 	padding-right: 10px;
 }
-/* ============= LOGIN DROPDOWN ==============*/
 
-#hideableDropDown > form> * {
-	display: block;
-	margin: 13px;
+/* ============= LOGIN DROPDOWN ==============*/
+#loginForm {
+	display: flex;
+	align-items: center;
 }
 
-#hideableDropDown {
+#loginForm > div {
+	display: inline;
+	display: flex;
+}
+
+#loginForm input {
+	background-color: #2D312E;
+	font-family: Oswald;
+}
+.shrink-200px > div {
+	vertical-align: top;
+	padding-left: 10px;
+	display: inline-block;
+	position: relative;
+}
+
+#loginForm >div> div> i {
 	position: absolute;
-	float: left;
-	right: 5px;
-	border: 1px solid;
-	z-index: 1;
-	border-radius: 2px;
-	margin-top: 8px; /* = navbarList bottom margin */
+	top:2px;
+	font-size: 15px;
+}
+
+#loginForm input {
+	padding-left: 25px;
+	vertical-align: top;
+	padding-right: 5px;
+	width: 150px;
 }
 
 /* ================== COMMONS ======================*/
-.biginputtext input:not([type=button]):not([type=submit]):not([type=checkbox]):not([type=radio]), select {
+.biginputtext input[type=email],
+.biginputtext input[type=text],
+.biginputtext input[type=date],
+.biginputtext select {
 	padding: 8px;
 	margin: 5px 10px 5px 0;
 	border-radius: 5px;
 	font-size: 18px;
 }
-
+.biginputtext input[type=file] {
+	padding-left: 0;
+	margin: 5px 10px 13px 0;
+}
 
 /******************** INPUTS ********************/
 
@@ -305,13 +551,11 @@ input[type=text], input[type=password], input[type=email], textarea,div[contente
 	padding-left: 5px;
 }
 
-input[type=button], input[type=submit], button, input[type=file]::-webkit-file-upload-button{
-	border: 1px solid transparent;
-	border-radius: 3px;
-	font-size: 18px;
-	padding: 6px 12px;
-}
-
+/*select { */
+	/*-webkit-appearance: none;*/
+	/*-moz-appearance: none;*/
+/*background: url(new_arrow.png) no-repeat right #ddd;*/
+/*}*/
 
 textarea, div[contenteditable] {
 	border-radius: 4px;
@@ -320,10 +564,6 @@ textarea, div[contenteditable] {
 /*============== FONTELLO SETTINGS =================*/
 nav [class^='icon-'] {
 	margin: 2px;
-}
-
-[class^='icon-']:not(.icon-anonymous):hover {
-	cursor: pointer;
 }
 
 /*================= SCROLLBAR ==================== */
@@ -358,9 +598,7 @@ input[type=file] {
 	/*background-color: red;*/
 }
 
-input[type=file]::-webkit-file-upload-button:hover {
-	cursor: pointer;
-}
+
 /* "x::-webkit-file-upload-button" forces the rules to only apply to browsers that support this pseudo-element */
 
 /* ====================== PROFILE.CSS ================= */
@@ -394,14 +632,33 @@ video {
 #userProfileData select {
 	width: 100%;
 }
-#userProfileData input {
+#userProfileData input:not([type=submit]) {
 	width: calc(100% - 18px)
 }
+
+#userProfileData input[type=submit] {
+	width: 100%;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.color-reg #userProfileData input[type=submit]:active {
+	padding: 11px 9px 9px 11px;
+}
+
 #userProfileData {
 	max-width: 750px; /*width of collapsed below*/
 }
 #userProfileData td { /*th - first col, td 2nd*/
 	width: 100%;
+}
+
+input[type=range][orient=vertical] {
+	writing-mode: bt-lr; /* IE */
+	-webkit-appearance: slider-vertical; /* WebKit */
+	width: 8px;
+	height: 100px;
+	padding: 0 5px;
 }
 
 /*user-profile*/
@@ -423,10 +680,13 @@ video {
 	.very-small-screen, .time-message {
 		display: none !important;
 	}
+	#hide {
+		margin-left: auto;
+	}
 }
 
 @media screen and (max-width: 80em ) {
- .mText {
-	 display: none;
- }
+	.mText {
+		display: none;
+	}
 }

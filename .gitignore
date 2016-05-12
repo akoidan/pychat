@@ -20,10 +20,9 @@ chat/static/css/fontello-embedded.css
 chat/static/css/pikaday.css
 chat/static/js/pikaday.js
 chat/static/js/moment.js
-chat/static/no_ava.png
+chat/static/images
 chat/static/smileys
 chat/static/flags
-chat/static/favicon.inco
 chat/static/js/angular*
 example
 sessionsids.txt
@@ -34,4 +33,3 @@ chat/static/css/fontello-ie7-codes.css
 chat/static/valentine
 redis-3.2.0-rc3
 chat/static/ajaxStatus.gif
-redis-3.2.0-rc3

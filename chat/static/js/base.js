@@ -10,6 +10,7 @@ var growlHolder;
 var ajaxLoader;
 var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|$))/g; /*http://anycharacter except end of text, <br> or space*/
 var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
+var muteBtn;
 const escapeMap = {
 	"&": "&amp;",
 	"<": "&lt;",
@@ -24,6 +25,12 @@ var volumeProportion = {
 	1: 0.15,
 	2: 0.4,
 	3: 1
+};
+var volumeIcons = {
+	0: 'icon-volume-off',
+	1: 'icon-volume-1',
+	2: 'icon-volume-2',
+	3: 'icon-volume-3'
 };
 var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 
@@ -69,6 +76,23 @@ window.browserVersion = (function () {
 })();
 
 
+function getUrlParam(name, url) {
+	if (!url) url = window.location.href;
+	name = name.replace(/[\[\]]/g, "\\$&");
+	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)", "i"),
+			results = regex.exec(url);
+	if (!results) return null;
+	if (!results[2]) return '';
+	return decodeURIComponent(results[2].replace(/\+/g, " "));
+}
+
+function setUrlParam(name, value) {
+	var prevValue = getUrlParam(name);
+	window.history.pushState('page2', 'Title', prevValue == null ?
+			getText(url.indexOf("?") >= 0 ? "{}&{}={}" : "{}?{}={}", window.location.href, name, value):
+			window.location.href.replace(name + "=" + prevValue, name + "=" + value));
+}
+
 function onDocLoad(onload) {
 	return document.addEventListener("DOMContentLoaded", onload);
 }
@@ -94,7 +118,18 @@ var CssUtils = {
 	},
 	addClass: function (element, className) {
 		if (!this.hasClass(element, className)) {
-			element.className += " " + className;
+			var oldClassName = element.className;
+			element.className = getText("{} {}", oldClassName.trim(), className);
+		}
+	},
+	setOnOf: function(element, desiredClass, removeClasses) {
+		var className = element.className;
+		if (className == null) {
+			element.className = desiredClass;
+		} else {
+			var replaceReg = new RegExp("(" + removeClasses.join("|") + ")", "g");
+			className = className.replace(replaceReg, '');
+			element.className = className + " " + desiredClass;
 		}
 	},
 	removeClass: function (element, className) {
@@ -131,7 +166,7 @@ var CssUtils = {
 var Growl = function (message) {
 	var self = this;
 	self.growlHolder = growlHolder;
-	self.message = message;
+	self.message = message.trim();
 	self.error = function () {
 		self.show(4000, 'col-error')
 	};
@@ -153,7 +188,7 @@ var Growl = function (message) {
 	self.show = function (baseTime, growlClass) {
 		var timeout = baseTime + self.message.length * 50;
 		self.growl = document.createElement('div');
-		self.growl.innerHTML = encodeAnchorsHTML(self.message);
+		self.growl.innerHTML = self.message.indexOf("<") == 0? self.message : encodeAnchorsHTML(self.message);
 		self.growl.className = 'growl ' + growlClass;
 		self.growlHolder.appendChild(self.growl);
 		self.growl.clientHeight; // request to paint now!
@@ -186,7 +221,7 @@ function Draggable(container, header) {
 	self.attached = true;
 	self.eleMouseDown = function (ev) {
 		self.leftCorrection =  container.offsetLeft - ev.pageX;
-		self.rightCorrection = container.offsetTop - ev.pageY;
+		self.topCorrection = container.offsetTop - ev.pageY;
 		// TODO 7 is kind of magical bottom margin when source is attached to video
 		self.maxTop = document.body.clientHeight - container.clientHeight - 7;
 		self.maxLeft =  document.body.clientWidth - container.clientWidth;
@@ -200,7 +235,7 @@ function Draggable(container, header) {
 			left = self.maxLeft;
 		}
 		self.container.style.left = left + "px";
-		var top = ev.pageY + self.rightCorrection;
+		var top = ev.pageY + self.topCorrection;
 		if (top < 0) {
 			top = 0;
 		} else if (top > self.maxTop) {
@@ -222,7 +257,12 @@ function Draggable(container, header) {
 
 
 onDocLoad(function () {
+	muteBtn = $("muteBtn");
 	mute();
+	var theme = localStorage.getItem('theme');
+	if (theme != null) {
+		document.body.className = theme;
+	}
 	ajaxLoader = $("ajaxStatus");
 	if (typeof InstallTrigger !== 'undefined') { // browser = firefox
 		console.warn(getDebugMessage("Ops, there's no scrollbar for firefox"));
@@ -232,24 +272,25 @@ onDocLoad(function () {
 
 
 function mute() {
-
 	window.sound = (window.sound + 1) % 4;
+	if (muteBtn) muteBtn.className = volumeIcons[window.sound];
+}
 
-	var btn = $("muteBtn");
-	switch (window.sound) {
-		case 0:
-			btn.className = 'icon-volume-off';
-			break;
-		case 1:
-			btn.className = 'icon-volume-1';
-			break;
-		case 2:
-			btn.className = 'icon-volume-2';
-			break;
-		case 3:
-			btn.className = 'icon-volume-3';
-			break;
-	}
+
+function login(event) {
+	event.preventDefault();
+	var callback = function (data) {
+		if (data === RESPONSE_SUCCESS) {
+			var nextUrl =getUrlParam('next');
+			if (nextUrl == null) {
+				nextUrl = '/';
+			}
+			window.location.href = nextUrl;
+		} else {
+			growlError(data);
+		}
+	};
+	doPost('/auth', null, callback, loginForm);
 }
 
 
@@ -316,7 +357,8 @@ function doPost(url, params, callback, form) {
 			}
 		}
 	};
-	var data = new FormData(form);
+	/*Firefox doesn't accept null*/
+	var data = form == null ? new FormData() : new FormData(form);
 
 	if (params) {
 		for (var key in params) {

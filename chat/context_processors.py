@@ -10,6 +10,6 @@ def add_user_name(request):
 	return {
 		# "wss://%s:PORT/" % domain
 		'apiUrl': API_ADDRESS_PATTERN % request.get_host().split(':')[0],
-		'successReponse': VALIDATION_IS_OK,
+		'successResponse': VALIDATION_IS_OK,
 		'username': request.user.username if request.user.is_authenticated() else ''
 	}

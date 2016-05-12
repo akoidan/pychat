@@ -1,32 +1,221 @@
-.checkboxes-div {
-	display: inline-block;
-	text-align: left;
-	font-size: 16px;
+body {
+	display: block;
+}
+.required {
+	position: relative;
 }
 
-#register-form > div {
-	box-shadow: 0 2px 2px rgba(26, 26, 26, 0.64);
-	border-radius: 2px;
-	background-color: #222222;
-	padding: 10px;
+.required:after {
+	content: " *";
+	position: absolute;
+	right: 7px;
+	top: 17px;
+	font-size: 17px;
 	display: inline-block;
+	font-weight: bold;
+	color: #6E6E6E;
+}
+
+::-webkit-input-placeholder {
+	color: #6E6E6E
+}
+
+:-moz-placeholder { /* Firefox 18- */
+	color: #6E6E6E
+}
+
+::-moz-placeholder { /* Firefox 19+ */
+	color: #6E6E6E
+}
+
+:-ms-input-placeholder {
+	color: #6E6E6E
+}
+
+form {
 	margin: auto;
-	vertical-align: middle;
+	text-align: center;
 }
 
-#register-form  tr > th >  label {
-	margin-left: 5px;
+.reg-log-container {
+	overflow-y: auto;
+	padding: 20px;
+	max-width: 300px;
+	flex-basis: 300px;
+	margin: auto;
 }
 
-#register-form  tr > td:nth-child(2) {
+#growlHolder {
+	top: 5px !important;
+}
+
+form > * {
+	display: block;
+	margin: auto;
+	position: relative;
+	width: 100%;
+}
+
+input:-webkit-autofill {
+	-webkit-box-shadow: 0 0 0 1000px #242400 inset !important;
+	-webkit-text-fill-color: #C6C6B6 !important;
+	color: #C6C6B6;
+}
+
+.color-reg .reg-log-container [class^='icon-'] {
+	opacity: 1;
+	text-shadow: none;
+	cursor: auto;
+}
+
+form i {
+	position: absolute;
+	top: 15px;
+	color: #6E6E6E;
+	left: 5px;
+}
+
+i.error {
+	color:#922727;
+}
+
+i.success {
+	color: #387933;
+}
+
+i.warn {
+	color: #6D6B2C;
+}
+
+input:not([type=submit]) {
+	width: calc(100% - 58px);
+}
+
+.reg-log-container input, .reg-log-container select {
+	padding-top: 15px;
+	padding-bottom: 15px;
+}
+
+.color-reg .reg-log-container input:active,
+.color-reg .reg-log-container select:active {
+	padding-top: 16px;
+	padding-bottom: 14px;
+}
+
+input:not([type=submit]), select {
+	padding-left: 35px;
+	padding-right: 22px;
+}
+
+input[type=submit], select {
+	width: 100%
+}
+
+#id_sex {
+	color: #59595a;
+}
+
+.icon-mail, .icon-user-pair {
+	font-size: 13px;
+	top: 17px !important;
+	left: 7px !important;
+}
+
+.slider {
+	font: 13px Open Sans;
+	color: #6E6E6E;
+	text-shadow: #000 0 1px 5px;
+	margin-top: -7px;
+	margin-bottom: 7px;
+	padding-left: 10px;
+	font-size: 10px;
+	overflow-y: hidden;
 	text-align: left;
+	height: 30px; /* approximate max height */
+	transition:  1s  height 0s;
 }
 
-#register-form {
-	text-align: center;
-	margin-top: 25px;
+.slider.closed {
+	height: 0;
 }
 
-#register-form  tr:last-child > td {
+/*-----------------------------------------------------------------*/
+
+h1 {
 	text-align: center;
+	padding: 30px 0 30px 0;
+	font: 25px Oswald;
+	color: #FFF;
+	text-transform: uppercase;
+	text-shadow: #000 0 1px 5px;
+	margin: 0;
+
+}
+
+input[type="text"], input[type="email"], input[type="password"], select {
+	border-radius: 5px;
+	margin-bottom: 10px;
+	font-size: 13px;
+}
+
+.color-reg .submit-button {
+	width: 100%;
+	border-radius: 5px;
+	border: 1px solid #000;
+}
+
+
+.reg-log-container > input{
+	width: 50%;
+	border: 0;
+	border-radius: 0;
+}
+.hidden {
+	display: none !important;
+}
+
+.color-reg input[type=submit].disabled /*double selector to override*/{
+	background-image: linear-gradient(#434343 0%, #434343 100%);
+	background-color: #303030;
+}
+
+.color-lor #showRegister.disabled,
+.color-lor #showLogin.disabled
+	/*double selector to override*/ {
+	background-color: rgb(62, 65, 58);
+	color: #BABDB6;
+}
+
+.color-lor #showRegister,
+.color-lor #showLogin
+{
+	background-color: #ABBDB6;
+	color: #3E3D3D;
+}
+
+.color-lor #showRegister.disabled:hover,
+.color-lor #showLogin.disabled:hover {
+	color: black;
+}
+
+.color-reg input[type=submit].disabled:active {
+	background-image: none;
+}
+
+.forg-pass {
+	text-align: right;
+	font: 12px Open Sans;
+	padding-right: 10px;
+	width: inherit;
+	padding-top: 3px;
+	padding-bottom: 5px;
+	text-shadow: #000 0 1px 5px;
+}
+.color-reg .forg-pass {
+	color: #249BA3;
+}
+
+.forg-pass:hover {
+	text-decoration: underline;
+	cursor: pointer;
 }

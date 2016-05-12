@@ -7,24 +7,19 @@
 	</script>
 	<script src="{% md5url 'js/webrtc.js' %}"></script>
 {% endblock head %}
-
 {% block content %}
-	<canvas style="display:none;"></canvas>
+	<canvas class="hidden"></canvas>
 	<div class="max-height-scrollable two-columns">
-		{#	if photo isn't uploaded yet #}
-			<div style="text-align: center">
-				<div class="padding10">
-					{% if form.instance.photo %} {% comment %}TODO{% endcomment %}
-						<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
-					{% else %}
-						<img src="{% md5url 'no_ava.png' %}" alt="ava" id='photoImg' class="fullwidth">
-					{% endif %}
-				<input type="button" value="Make a photo from webcam" style="margin-top: 10px" onclick="startCapturingVideo(this)"/>
-				</div>
-
+		<div style="text-align: center">
+			<div class="padding10">
+				{% if form.instance.photo %} {% comment %}TODO{% endcomment %}
+					<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
+				{% else %}
+					<img style="font-size: 500px" class="icon-boy fullwidth" id='photoImg'></img>
+				{% endif %}
+			<input type="button" class="button" value="Make a photo from webcam" style="margin-top: 10px" onclick="startCapturingVideo(this)"/>
 			</div>
-
-
+		</div>
 		<form  method="post" enctype="multipart/form-data" onsubmit="saveProfile(event)">
 			{% csrf_token %}
 			<div class="padding10">
@@ -33,13 +28,19 @@
 				<table class="biginputtext" id="userProfileData">
 					{{ form.as_table }}
 					<tr>
-						<td colspan="2" style="text-align: center"><input type="submit" value="Save"/></td>
+						<th>Theme</th>
+						<td>
+							<select id="themeSelector">
+								<option value="color-reg">Modern</option>
+								<option value="color-lor">Simple</option>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td colspan="2" style="text-align: center"><input type="submit"  value="Save"/></td>
 					</tr>
 				</table>
 			</div>
 		</form>
-
-{#	<input type="button" value="start sharing" onclick="startSharingVideo()"/>#}
-
 	</div>
 {% endblock content %}

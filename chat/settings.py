@@ -19,6 +19,7 @@ try:
 except ImportError:
 	pass
 from django.conf import global_settings
+from sslserver import certs
 
 import chat as project_module
 
@@ -72,6 +73,12 @@ INSTALLED_APPS = (
 	'tornado',
 )
 
+# TODO uncomment
+# Google recaptcha keys
+RECAPTHCA_SITE_URL = 'https://www.google.com/recaptcha/api.js'
+# RECAPTCHA_SECRET_KEY = 'REPLACE_THIS_WITH_KEY_FOR_RETRIEVING_RESULT'
+# RECAPTCHA_SITE_KEY = 'REPLACE_THIS_WITH_DATA-SITEKEY_DIV_ATTRIBUTE'
+
 SESSION_ENGINE = 'redis_sessions.session'
 BROKER_URL = 'redis://localhost:6379/0'
 CELERY_ACCEPT_CONTENT = ['json']
@@ -79,11 +86,13 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 
+IS_HTTPS = 'CRT_PATH' in locals()
 API_PORT = '8888'
 CRT_PATH = '/etc/nginx/ssl/1_pychat.org_bundle.crt'
 KEY_PATH = '/etc/nginx/ssl/server.key'
-WEBSOCKET_PREFIX = 'wss' if 'CRT_PATH' in locals() else 'ws'
-API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PREFIX, '://%s:', API_PORT, '/'))
+WEBSOCKET_PROTOCOL = 'wss' if IS_HTTPS else 'ws'
+SITE_PROTOCOL = 'https' if IS_HTTPS else 'http'
+API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/'))
 
 # SESSION_COOKIE_AGE = 10
 # SESSION_SAVE_EVERY_REQUEST = True
@@ -281,8 +290,7 @@ if not DEBUG:
 	IP_API_URL = 'http://ip-api.com/json/%s'
 
 
-ANONYMOUS_REDIS_ROOM = 'all'
-REGISTERED_REDIS_ROOM = 'signed'
+ALL_REDIS_ROOM = 'all'
 
 # ---------------JAVASCRIPT CONSTANTS --------------------
 

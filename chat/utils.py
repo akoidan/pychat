@@ -5,16 +5,16 @@ import sys
 from io import BytesIO
 from threading import Thread
 
+import requests
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
-from django.db import transaction
 
+from chat import local
 from chat import settings
-from chat.log_filters import id_generator
-from chat.models import User, UserProfile, Room
-from chat.settings import ISSUES_REPORT_LINK, ANONYMOUS_REDIS_ROOM, REGISTERED_REDIS_ROOM
+from chat.models import User, UserProfile, Room, Verification
+from chat.settings import ISSUES_REPORT_LINK, ALL_REDIS_ROOM, SITE_PROTOCOL
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
 
@@ -72,7 +72,7 @@ def check_email(email):
 		validate_email(email)
 		# theoretically can throw returning 'more than 1' error
 		UserProfile.objects.get(email=email)
-		raise ValidationError('This email is already used')
+		raise ValidationError('Email {} is already used'.format(email))
 	except User.DoesNotExist:
 		pass
 
@@ -85,27 +85,61 @@ def check_user(username):
 	"""
 	# Skip javascript validation, only summary message
 	if is_blank(username):
-		raise ValidationError("User name can't be empty")
+		raise ValidationError("Username can't be empty")
 	if not re.match(USERNAME_REGEX, username):
-		raise ValidationError("User doesn't match regex " + USERNAME_REGEX)
+		raise ValidationError("Username {} doesn't match regex {}".format(username, USERNAME_REGEX))
 	try:
 		# theoretically can throw returning 'more than 1' error
 		User.objects.get(username=username)
-		raise ValidationError("This user name already used")
+		raise ValidationError("Username {} is already used. Please select another one".format(username))
 	except User.DoesNotExist:
 		pass
 
 
+def get_client_ip(request):
+	x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+	return x_forwarded_for.split(',')[-1].strip() if x_forwarded_for else request.META.get('REMOTE_ADDR')
+
+
+def check_captcha(request):
+	"""
+	:type request: WSGIRequest
+	:raises ValidationError: if captcha is not valid or not set
+	If RECAPTCHA_SECRET_KEY is enabled in settings validates request with it
+	"""
+	captcha_private_key = getattr(settings, "RECAPTCHA_SECRET_KEY", None)
+	if not captcha_private_key:
+		logger.debug('Skipping captcha validation')
+		return
+	try:
+		captcha_rs = request.POST.get('g-recaptcha-response')
+		url = "https://www.google.com/recaptcha/api/siteverify"
+		params = {
+			'secret': captcha_private_key,
+			'response': captcha_rs,
+			'remoteip': local.client_ip
+		}
+		raw_response = requests.post(url, params=params, verify=True)
+		response = raw_response.json()
+		if not response.get('success', False):
+			logger.debug('Captcha is NOT valid, response: %s', raw_response)
+			raise ValidationError(response['error-codes'] if response.get('error-codes', None) else 'This captcha already used')
+		logger.debug('Captcha is valid, response: %s', raw_response)
+	except Exception as e:
+		raise ValidationError('Unable to check captcha because {}'.format(e))
+
+
 def send_email_verification(user, site_address):
 	if user.email is not None:
-		user.verify_code = id_generator()
-		user.save()
-		code = '/confirm_email?code=' + user.verify_code
+		verification = Verification(user=user, type_enum=Verification.TypeChoices.register)
+		verification.save()
+		user.email_verification = verification
+		user.save(update_fields=['email_verification'])
 
-		text = 'Hi %s, you have registered on our %s.' \
-			'\nTo complete your registration click on the url bellow: http://%s%s .' \
-			'\n\n If you have any questions or suggestion, please post them here %s' %\
-			(user.username, site_address, site_address,  code, ISSUES_REPORT_LINK)
+		text = ('Hi {}, you have registered pychat'
+				'\nTo complete your registration click on the url bellow: {}://{}/confirm_email?token={}'
+				'\n\nIf you find any bugs or propositions you can post them {}/report_issue or {}').format(
+				user.username, SITE_PROTOCOL, site_address, verification.token, site_address, ISSUES_REPORT_LINK)
 
 		mail_thread = Thread(
 			target=send_mail,
@@ -132,18 +166,15 @@ def extract_photo(image_base64):
 	return image
 
 
-@transaction.atomic
-def create_user(email, password, sex, username):
+def create_user_profile(email, password, sex, username):
 	user = UserProfile(username=username, email=email, sex_str=sex)
 	user.set_password(password)
-	default_thread = Room.objects.get_or_create(name=ANONYMOUS_REDIS_ROOM)[0]
-	registered_only = Room.objects.get_or_create(name=REGISTERED_REDIS_ROOM)[0]
+	default_thread = Room.objects.get_or_create(name=ALL_REDIS_ROOM)[0]
 	user.save()
 	user.rooms.add(default_thread)
-	user.rooms.add(registered_only)
 	user.save()
 	logger.info(
-		'Signed up new user %s, subscribed for channels %s, %s',
-		user, registered_only.name, default_thread.name
+		'Signed up new user %s, subscribed for channels %s',
+		user, default_thread.name
 	)
 	return user

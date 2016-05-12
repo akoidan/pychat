@@ -2,28 +2,50 @@
 {% block head %}
 	{% load md5url %}
 	<script src="{% md5url "js/issue.js" %}"></script>
-{% endblock head %}
+	<style>
+		th {
+			width: 150px;
+		}
+		td {
+			width: calc(100% - 150px);
+		}
 
+		input[type=text], textarea, input[type=email] {
+			width: calc(100% - 5px);
+		}
+	table {
+		max-width: 700px;
+		margin: auto;
+		margin-top: 10px;
+	}
+	input[type=submit] {
+		margin-top: 10px;
+		width: 100% ;
+	}
+	</style>
+{% endblock head %}
 {% block content %}
 	<form method="post" id="issueForm" onsubmit="sendIssue(event)">
 		<table class="fullwidth padding10">
 			<tr>
-				<td><label for="email">Your email</label> </td>
+				<th><label for="email">Your email</label> </th>
 				<td><input type="email" id="email" name="email" value="{{ email }}"/></td>
 			</tr>
 			<tr>
-				<td><label for="issue">The problem you discovered</label></td>
-				<td><textarea id="issue" aria-required="true" class="fullwidth" name="issue" required></textarea></td>
+				<th><label for="issue">The problem you discovered</label></th>
+				<td><textarea id="issue" aria-required="true" name="issue" required></textarea></td>
 			</tr>
 			<tr>
-				<td><label for="version">Affected browser</label></td>
+				<th><label for="version">Affected browser</label></th>
 				<td><input type="text" name="browser" id="version"/> </td>
 			</tr>
 			<tr>
-				<td>
+				<th>
 					<label for="history">Send Logs</label>
-					<input type="checkbox" name="history" id="history" checked/></td>
-				<td><input type="submit" class="fullwidth" value="Sumbit"></td>
+				</th>
+			<td><input type="checkbox" name="history" id="history" checked/></td>
+			<tr>
+				<td colspan="2"><input type="submit" value="Sumbit"></td>
 			</tr>
 		</table>
 	{% csrf_token %}
