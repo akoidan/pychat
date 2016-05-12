@@ -211,6 +211,7 @@ input[type=file]::-webkit-file-upload-button {
 	opacity: 1;
 }
 
+/*TODO http://stackoverflow.com/questions/34897085/firefox-ignores-css-comma-separated-classes*/
 .color-reg input[type=button],
 .color-reg input[type=submit],
 .color-reg button,

@@ -45,6 +45,7 @@ Start the chat:
  2. Start WebSocket listener: `python manage.py start_tornado`
  3. Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
  4. Open in browser http*s*://127.0.0.1:8000
+ 5. If you're using firefox you probably need to allow self-assigned certificate for development. Open https://localhost:8888 (8888 is API_PORT) and add security exception
 
 # TODO
 * max-width for .reg-container doesn't set current width to max (300px) when there's enought free space

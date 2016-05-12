@@ -215,7 +215,7 @@ input[type="text"], input[type="email"], input[type="password"], select {
 	color: #249BA3;
 }
 
-.forg-pass:hover {
+.forg-pass > span:hover {
 	text-decoration: underline;
 	cursor: pointer;
 }
