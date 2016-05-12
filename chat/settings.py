@@ -86,10 +86,10 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 
-IS_HTTPS = 'CRT_PATH' in locals()
 API_PORT = '8888'
 CRT_PATH = '/etc/nginx/ssl/1_pychat.org_bundle.crt'
 KEY_PATH = '/etc/nginx/ssl/server.key'
+IS_HTTPS = 'CRT_PATH' in locals()
 WEBSOCKET_PROTOCOL = 'wss' if IS_HTTPS else 'ws'
 SITE_PROTOCOL = 'https' if IS_HTTPS else 'http'
 API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/'))

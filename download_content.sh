@@ -20,7 +20,7 @@ VAL_DIR="$STATIC_DIR/valentine"
 IMAGES_DIR="$STATIC_DIR/images"
 
 # Implementing installed files
-declare -a files=("$IMAGES_DIR/favicon.ico" "$SOUNDS_DIR/ChatOutgoing.wav" "$SOUNDS_DIR/ChatIncoming.wav" "$SOUNDS_DIR/ChatLogin.wav" "$SOUNDS_DIR/ChatLogout.wav" "$CSS_DIR/pikaday.css" "$JS_DIR/pikaday.js" "$JS_DIR/moment.js" "$CSS_DIR/fontello.css" "$FONT_DIR/fontello.eot" "$FONT_DIR/fontello.svg" "$FONT_DIR/fontello.ttf" "$FONT_DIR/fontello.woff" "$FONT_DIR/fontello.woff2" "$FONT_DIR/OpenSans.ttf" "$FONT_DIR/Oswald.ttf" "$SMILEYS_DIR" "$SMILEYS_DIR/info.json" "$SMILEYS_DIR/base/0000.gif" "$IMAGES_DIR/ajaxStatus.gif" "$IMAGES_DIR/dark_wall.png" "$IMAGES_DIR/no_ava.png" $VAL_DIR/Love_and_Passion.ttf" "$VAL_DIR/teddy.gif" "$VAL_DIR/v2.ttf" "$VAL_DIR/videoplayback.mp3")
+declare -a files=("$IMAGES_DIR/favicon.ico" "$SOUNDS_DIR/ChatOutgoing.wav" "$SOUNDS_DIR/ChatIncoming.wav" "$SOUNDS_DIR/ChatLogin.wav" "$SOUNDS_DIR/ChatLogout.wav" "$CSS_DIR/pikaday.css" "$JS_DIR/pikaday.js" "$JS_DIR/moment.js" "$CSS_DIR/fontello.css" "$FONT_DIR/fontello.eot" "$FONT_DIR/fontello.svg" "$FONT_DIR/fontello.ttf" "$FONT_DIR/fontello.woff" "$FONT_DIR/fontello.woff2" "$FONT_DIR/OpenSans.ttf" "$FONT_DIR/Oswald.ttf" "$SMILEYS_DIR" "$SMILEYS_DIR/info.json" "$SMILEYS_DIR/base/0000.gif" "$IMAGES_DIR/ajaxStatus.gif" "$IMAGES_DIR/dark_wall.png" "$IMAGES_DIR/no_ava.png" "$VAL_DIR/Love_and_Passion.ttf" "$VAL_DIR/teddy.gif" "$VAL_DIR/v2.ttf" "$VAL_DIR/videoplayback.mp3")
 
 
 # Deleting all content creating empty dirs
