@@ -1,4 +1,8 @@
 var loginForm;
+var registerForm;
+var recoverForm;
+var showLoginEl;
+var showRegisterEl;
 
 var RegisterValidator = function () {
 	var self = this;
@@ -149,35 +153,39 @@ var RegisterValidator = function () {
 };
 
 function showRegister() {
-	CssUtils.showElement($('register-form'));
-	CssUtils.hideElement($('regLoginForm'));
-	CssUtils.hideElement($('recoverForm'));
-	CssUtils.removeClass($('showRegister'), 'disabled');
-	CssUtils.addClass($('showLogin'), 'disabled');
+	CssUtils.showElement(registerForm);
+	CssUtils.hideElement(loginForm);
+	CssUtils.hideElement(recoverForm);
+	CssUtils.removeClass(showRegisterEl, 'disabled');
+	CssUtils.addClass(showLoginEl, 'disabled');
 }
 
 function showLogin() {
-	CssUtils.hideElement($('register-form'));
-	CssUtils.showElement($('regLoginForm'));
-	CssUtils.hideElement($('recoverForm'));
-	CssUtils.removeClass($('showLogin'), 'disabled');
-	CssUtils.addClass($('showRegister'), 'disabled');
+	CssUtils.hideElement(registerForm);
+	CssUtils.showElement(loginForm);
+	CssUtils.hideElement(recoverForm);
+	CssUtils.removeClass(showLoginEl, 'disabled');
+	CssUtils.addClass(showRegisterEl, 'disabled');
 }
 
 function showForgotPassword () {
-		CssUtils.hideElement($('register-form'));
-		CssUtils.hideElement($('regLoginForm'));
-		CssUtils.showElement($('recoverForm'));
-		CssUtils.addClass($('showLogin'), 'disabled');
-		CssUtils.addClass($('showRegister'), 'disabled');
+		CssUtils.hideElement(registerForm);
+		CssUtils.hideElement(loginForm);
+		CssUtils.showElement(recoverForm);
+		CssUtils.addClass(showLoginEl, 'disabled');
+		CssUtils.addClass(showRegisterEl, 'disabled');
 	}
 
 onDocLoad(function () {
+	loginForm = $('regLoginForm');
+	registerForm = $('register-form');
+	recoverForm = $('recoverForm');
+	showLoginEl = $('showLogin');
+	showRegisterEl = $('showRegister');
 	var registerValidator = new RegisterValidator();
 	registerValidator.init();
-	loginForm = $('regLoginForm');
-	$('showRegister').onclick = showRegister;
-	$('showLogin').onclick = showLogin;
+	showRegisterEl.onclick = showRegister;
+	showLoginEl.onclick = showLogin;
 	$('recoverPassword').onclick = showForgotPassword;
 	var initType = getUrlParam('type');
 	if (initType == 'login') {
@@ -189,7 +197,6 @@ onDocLoad(function () {
 
 function register(event) {
 	event.preventDefault();
-	var form = $('register-form');
 	//ajaxShow(); TODO
 	var callback = function (data) {
 		//ajaxHide();
@@ -199,13 +206,13 @@ function register(event) {
 			growlError(data);
 		}
 	};
-	doPost('/register', null, callback, form);
+	doPost('/register', null, callback, registerForm);
 }
 
 
 function restorePassword(event) {
 	event.preventDefault();
-	var form = $('recoverForm');
+	var form = recoverForm;
 	//ajaxShow(); TODO
 	var callback = function (data) {
 		// if captcha is turned off

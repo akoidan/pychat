@@ -62,6 +62,11 @@ input:-webkit-autofill {
 	color: #C6C6B6;
 }
 
+.color-reg .reg-log-container [class^='icon-'] {
+	opacity: 1;
+	text-shadow: none;
+	cursor: auto;
+}
 form i {
 	position: absolute;
 	top: 15px;
@@ -70,15 +75,15 @@ form i {
 }
 
 i.error {
-	color: #7B1515;
+	color:#922727;
 }
 
 i.success {
-	color: #275324;;
+	color: #387933;
 }
 
 i.warn {
-	color: #605F29;;
+	color: #6D6B2C;
 }
 
 input:not([type=submit]) {

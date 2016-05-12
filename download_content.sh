@@ -1,7 +1,8 @@
 #!/bin/bash
 
 CONF_REPOSITORY="https://github.com/Deathangel908/djangochat-config"
-CONF_VERSION='b056d8a34aec30acf99ad8d85b0e8c36e01efa4a'
+
+CONF_VERSION='0f50b3ca6d0ff83b6d0f88d8ecd212507ebdd800'
 
 # defining the project structure
 PROJECT_ROOT=`pwd`

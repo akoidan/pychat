@@ -336,7 +336,7 @@ class RegisterView(View):
 		try:
 			rp = request.POST
 			logger.info('Got register request %s', hide_fields(rp, 'password', 'repeatpassword'))
-			(username, password, email) = (rp.get('username').strip(), rp.get('password').strip(), rp.get('email').strip())
+			(username, password, email) = (rp.get('username'), rp.get('password'), rp.get('email'))
 			check_user(username)
 			check_password(password)
 			check_email(email)
