@@ -33,6 +33,7 @@ Start the chat:
  1. Start database: `service mysqld start`
  1. Start the Chat: `service uwsgi start`
  1. Start the WebSocket listener: `service tornado start`
+ 1. Open in browser http*s*://127.0.0.1
 
 # TODO
 * max-width for .reg-container doesn't set current width to max (300px) when there's enought free space
