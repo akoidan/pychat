@@ -1,0 +1,362 @@
+@import "../partials/mixins"
+@import "../partials/variables"
+
+body
+	background: green
+
+::-webkit-input-placeholder
+	color: #59595a
+
+
+\:link
+	color: #729fcf
+
+\:visited
+	color: #7572CF
+
+.message
+	text-align: center
+	font-size: 30px
+	font-family: monospace
+	display: table
+	width: 100%
+	vertical-align: middle
+	margin-top: 15%
+
+@mixin button-style()
+	border: 1px solid transparent
+	border-radius: 3px
+	font-size: 18px
+	padding: $button-padding-top $button-padding-left
+
+	&:hover
+		cursor: pointer
+
+input[type=button],
+input[type=submit],
+button
+	@include button-style
+input[type=file]::-webkit-file-upload-button
+	@include button-style
+@-moz-document url-prefix()
+	input[type=file]
+		@include button-style
+
+
+[class^='icon-']:hover
+	cursor: pointer
+
+.color-lor, .color-reg
+	scrollbar-base-color: #3E4654
+	scrollbar-3dlight-color: #7dc071
+	scrollbar-highlight-color: #c08b00
+	scrollbar-track-color: #222
+	scrollbar-arrow-color: #3c763d
+
+a
+	/* remove underline from fonts*/
+	text-decoration: none
+
+
+ul
+	/*remove browser default left padding 40px and bullets
+	padding-left: 0
+
+img
+	border-radius: 1px
+
+.fullwidth
+	width: 100%
+
+.fullwidth-padded
+	margin: 8px
+	width: calc(100% - 16px)
+
+.padding10
+	padding: 10px
+
+.hidden
+	display: none !important
+
+.flex-push-right
+	margin-left: auto
+
+nav
+	/*Icons navbar size
+	font-size: 26px
+	margin: 0
+	padding: 10px 4px 9px 10px
+	display: flex
+	align-items: center
+
+
+html, body
+	text-shadow: none
+
+	/*cursor: auto;
+	margin: 0
+	height: 100%
+
+	/*width: 100% !important;
+	font-family: arial, serif
+
+body
+	@include display-flex
+	flex-direction: column
+	width: 100%
+
+.max-height-scrollable
+	flex: 1
+	@include display-flex
+	min-height: 0
+
+	> *
+		overflow-y: auto
+		float: left
+		display: inline-block
+
+textarea, div[contenteditable]
+	resize: none
+	font-family: arial, serif
+	border: 0 none white
+
+	/*Remove as it distorts behaviour of	adjustUserMessageWidth in Firefox
+	padding: 0
+	outline: none
+
+#growlHolder
+	top: 60px
+
+	/*51 is nav + margin
+	left: 5px
+	position: absolute
+	max-width: 50%
+	width: 400px
+	max-height: calc(100% - 60px)
+
+	/*55 is top, +5px bot
+	overflow: hidden
+
+.growl
+	padding: 7px
+	width: calc(100% - 16px)
+	border-radius: 10px
+	float: left
+	word-wrap: break-word
+	white-space: pre-wrap
+	margin-bottom: 5px
+	@include transition(0.5s opacity)
+	opacity: 0
+
+/*============== ONLY LOGIN.CSS =============
+
+.userNameInput
+	background: rgba(0, 0, 0, 0)
+	margin: 0 0
+	font-size: 22px
+
+	/*icons are 26 px + border, the bigger size will shift everything to bot
+	padding: 0
+	width: 150px
+
+.username
+	font-size: 22px
+	padding-right: 10px
+
+/* ============= LOGIN DROPDOWN ==============
+
+#loginForm
+	display: flex
+	align-items: center
+
+	> div
+		display: inline
+		@include display-flex
+
+	input
+		background-color: #2D312E
+		font-family: Oswald
+
+.shrink-200px > div
+	vertical-align: top
+	padding-left: 10px
+	display: inline-block
+	position: relative
+
+#loginForm
+	> div > div > i
+		position: absolute
+		top: 2px
+		font-size: 15px
+
+	input
+		padding-left: 25px
+		vertical-align: top
+		padding-right: 5px
+		width: 150px
+
+/* ================== COMMONS ======================
+
+.biginputtext
+	input
+		&[type=email], &[type=text], &[type=date]
+			padding: 8px
+			margin: 5px 10px 5px 0
+			border-radius: 5px
+			font-size: 18px
+
+	select
+		padding: 8px
+		margin: 5px 10px 5px 0
+		border-radius: 5px
+		font-size: 18px
+
+	input[type=file]
+		padding-left: 0
+		margin: 5px 10px 13px 0
+
+/******************** INPUTS *******************
+
+input
+	&[type=text], &[type=password], &[type=email]
+		border-radius: 5px
+		font-size: 18px
+		padding-left: 5px
+
+textarea, div[contenteditable], select, input[type=date]
+	border-radius: 5px
+	font-size: 18px
+	padding-left: 5px
+
+input[type="date"]::-webkit-calendar-picker-indicator
+	background-color: rgba(0, 0, 0, 0)
+
+select
+	-moz-appearance: none // remove right white ridge on mozilla
+/*select {
+/*-webkit-appearance: none;
+/*-moz-appearance: none;
+/*background: url(new_arrow.png) no-repeat right #ddd;
+/*}
+
+textarea, div[contenteditable]
+	border-radius: 4px
+
+/*============== FONTELLO SETTINGS =================
+
+nav [class^='icon-']
+	margin: 2px
+
+/*================= SCROLLBAR ====================
+
+\::-webkit-scrollbar
+	height: 12px
+	width: 6px
+
+\::-webkit-scrollbar-thumb
+	-webkit-border-radius: 1ex
+
+/*=============== BROWSER SPECIFIC ================
+/*Remove annoying chromium autofill yellow background
+
+.noSelection
+	@include user-select(none)
+
+/*::-webkit-inner-spin-button { display: none; }
+
+\::-webkit-inner-spin-button
+	display: none
+
+input[type=file]
+	@include appearence(textfield)
+	@include box-sizing(border-box)
+
+	/*background-color: red;
+
+/* "x::-webkit-file-upload-button" forces the rules to only apply to browsers that support this pseudo-element
+
+/* ====================== PROFILE.CSS =================
+
+.two-columns > *
+	width: 50%
+	float: left
+
+video
+	cursor: pointer
+
+#ajaxStatus
+	display: none
+
+	&.show
+		display: block
+		position: fixed
+		z-index: 100
+		background-color: #000
+		opacity: 0.5
+		background-repeat: no-repeat
+		background-position: center
+		left: 0
+		bottom: 0
+		right: 0
+		top: 0
+
+
+#userProfileData
+	select
+		width: 100%
+
+	input
+		&:not([type=submit]):not([type=file])
+			width: calc(100% - 18px)
+
+		&[type=submit]
+			width: 100%
+			padding: $userProfileData-sp
+			margin-bottom: 10px
+		&[type=file]
+			width: 100%
+
+
+#userProfileData
+	max-width: 750px
+
+	/*width of collapsed below
+
+	td
+		/*th - first col, td 2nd
+		width: 100%
+
+input[type=range][orient=vertical]
+	writing-mode: bt-lr
+
+	/* IE
+	-webkit-appearance: slider-vertical
+
+	/* WebKit
+	width: 8px
+	height: 100px
+	padding: 0 5px
+
+/*user-profile
+@media screen and (max-width: 50em)
+	.two-columns
+		display: block
+		overflow-y: auto
+		max-height: calc(100% - 50px)
+
+		> *
+			width: 100%
+
+	input[type=file]
+		max-width: 360px
+
+@media screen and (max-width: 35em)
+	.very-small-screen, .time-message
+		display: none !important
+
+	#hide
+		margin-left: auto
+
+@media screen and (max-width: 80em)
+	.mText
+		display: none

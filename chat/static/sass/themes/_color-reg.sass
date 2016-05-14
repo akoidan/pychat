@@ -1,0 +1,177 @@
+@import "../partials/mixins"
+@import "../partials/variables"
+@mixing button-style()
+
+
+.color-reg
+	background-color: #222222 /*if image is nto loaded*/
+	color: #C1C1C1
+
+	nav
+		background-image: linear-gradient(#232323 0%, #151515 100%)
+		opacity: 0.9
+
+	label
+		font: 13px Open Sans
+		color: #6E6E6E
+		text-shadow: #000 0 1px 5px
+
+	th
+		text-align: right
+		padding-right: 10px
+
+	@mixin selection
+		background-color: #973434
+		color: #6C9796
+
+	::selection
+		@include selection
+
+	::-moz-selection
+		@include selection
+
+	::-webkit-datetime-edit-month-field,
+	::-webkit-datetime-edit-day-field,
+	::-webkit-datetime-edit-year-field
+		&:focus
+			@include selection
+			background-image: none
+
+	select,
+	textarea,
+	div[contenteditable],
+	input[type=text], input[type=password],input[type=email], input[type=date]
+		@include box-shadow(inset 4px 6px 10px -4px rgba(0, 0, 0, 0.3), 0 1px 1px -1px rgba(255, 255, 255, 0.3))
+		background: rgba(0, 0, 0, 0.2)
+		border: 1px solid rgba(0, 0, 0, 1)
+		color: #C6C5C5
+		text-shadow: #000 0 1px 5px
+		font-family: Arial, serif
+
+		&:focus
+			box-shadow: inset 4px 6px 10px -4px rgba(0, 0, 0, 0.7), 0 1px 1px -1px rgba(255, 255, 255, 0.3)
+			background: rgba(0, 0, 0, 0.35)
+			@include transition("0.7s ease")
+
+		&:-webkit-autofill
+			@include box-shadow(0 0 0 1000px #30302A inset !important)
+			-webkit-text-fill-color: #9BA577
+			text-shadow: none
+
+
+	option
+		background-color: #1A1A1A
+
+	input, select
+		outline: none
+
+	input
+		&[type=button],
+		&[type=submit]
+			&.blue-button
+				background-color: #005C64
+				font-size: 14px
+				text-transform: uppercase
+				@include linear-gradient(#28D2DE, #1A878F)
+
+	button > i
+		opacity: 1
+
+	.biginputtext input[type=file]
+		font: 12px Oswald
+
+	@mixin reg-button-style()
+		background-color: rgb(39, 42, 35)
+		color: #BABDB6
+		opacity: 0.7
+		outline: none
+		font: 12px Oswald
+		@include box-shadow(1px 1px 1px rgba(0,0,0,0.2))
+		text-shadow: #000 0 1px 5px
+		border-top: 1px solid rgba(255, 255, 255, 0.6)
+		border-left: 1px solid rgba(171, 171, 171, 0.83)
+		/* text-transform: uppercase */
+		@include linear-gradient(#4B4E45, #33352F)
+		&:hover
+			opacity: 1
+
+		&:active
+			text-shadow: none
+			opacity: 1
+			background-image: none
+			@include box-shadow(1px 1px 1px rgba(255,255,255,0.2))
+			padding: $button-padding-top + 1 $button-padding-left - 1 $button-padding-top - 1 $button-padding-left + 1
+			@include top-left-border(1px inset rgba(1, 1, 1, 0.5)) // TODO why rgba(0,0,0 ) is shown as white
+
+	input[type=button], input[type=submit], button
+		@include reg-button-style
+	input[type=file]::-webkit-file-upload-button
+		@include reg-button-style
+	@-moz-document url-prefix()
+		input[type=file]
+			@include reg-button-style
+
+
+
+	input[type=submit]
+		background-color: #273726
+		@include linear-gradient(#457741, #2A4029)
+		text-shadow: #000 0 1px 5px
+		@include box-shadow(1px 1px 2px 0 black)
+		-webkit-box-reflect: below 0 -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255, 255, 255, 0.2)))
+
+	.growl, #smileParentHolder
+		background-color: rgba(33,33,31, 0.9)
+		border: 1px #696951 solid
+
+	[class^='icon-']
+		opacity: 0.7
+		-webkit-mask-image: -webkit-linear-gradient(top, rgba(0,0,0,1),rgba(0,0,0,0.5))
+		&:hover
+			text-shadow: 0 0 0.2em #575757
+			opacity: 1
+
+
+	[class^='icon-volume']
+		color: #DCA737
+	.icon-home
+		color: #20A0FF
+	.icon-pencil
+		color: #8D28DE
+	.icon-chart-pie
+		color: #B7D710
+	.icon-sign-out
+		color: #F5504C
+	.icon-wrench
+		color: #67C8B0
+	.icon-clear
+		color: #D42C5A
+	.icon-man
+		color: #49B550 !important /*override .		color-lor :link*/
+	.icon-girl
+		color: #cf7779 !important /*override .		color-lor :link */
+	.icon-user-secret
+		color: #69C1D8 !important /*override .		color-lor :link*/
+	.icon-phone
+		color: #37BB21 /*override .		color-lor :link*/
+
+	$reg-scrollbar-col: #1A1A1A
+
+
+	::-webkit-scrollbar
+		background-color: $reg-scrollbar-col
+	::-webkit-scrollbar-thumb
+		background-color: #313A3C
+	@-moz-document url-prefix()
+		#chat-room-users-wrapper
+			border-left: 4px solid $reg-scrollbar-col
+
+	.col-error
+		color: #FF3131
+	.col-success
+		color: #5BC25C
+	.col-info
+		color: #78CAD8
+
+	.color-reg #userProfileData input[type=submit]:active
+		padding: $userProfileData-sp + 1px $userProfileData-sp - 1px $userProfileData-sp - 1px $userProfileData-sp + 1px

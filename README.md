@@ -87,3 +87,32 @@ Start the chat:
 * USE init or on_open
 * add chat rooms
 * allow selecting username in navbar, remove selecting cursor 
+
+
+#SASS
+ arguments: --no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/sass.css
+ working directory: $ProjectFileDir$/sass
+ output files to refresh: $ProjectFileDir$/chat/static/css/sass.css
+ 
+# SASS  questions
+   Can I minify inputs here?
+       select,
+        textarea,
+        div[contenteditable],
+        input[type=text], input[type=password],input [type=email], input[type=date]
+   How to move selector into mixing
+        @mixin inputs()
+            select,
+            textarea,
+            div[contenteditable],
+            input[type=text], input[type=password],input [type=email], input[type=date]
+   Is there a sass workouround withotu code duplicaiton to  deal with selector that contain invalid selector for firefox:
+        button,
+        input[type=file]::-webkit-file-upload-button {
+          background:red;
+        }
+      this selector won't work even for button in firefox
+
+Sprite
+convert -layers dispose 0001.gif out1.gif
+montage temp.gif -tile x1 -geometry '1x1+0+0<' -alpha On -background "rgba(0, 0, 0, 0.0)" -quality 100 loading_1.png

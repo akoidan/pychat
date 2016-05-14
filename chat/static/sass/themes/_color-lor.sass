@@ -1,0 +1,135 @@
+@import "../partials/mixins"
+
+$default-box-shadow: 0 0 10px #55585b
+
+.color-lor
+	background-color: #272c2d
+	color: #babdb6
+
+	::-webkit-calendar-picker-indicator
+		background: rgb(186, 189, 182)
+
+	@mixin selection
+		background-color: #B5D5FF
+		color: #00060F
+
+	::selection
+		@include selection
+
+	::-moz-selection
+		@include selection
+
+	::-webkit-datetime-edit-month-field,
+	::-webkit-datetime-edit-day-field,
+	::-webkit-datetime-edit-year-field
+		&:focus
+			@include selection
+			background-image: none
+
+	nav
+		background-color: rgb(34, 31, 31)
+
+	select,
+	textarea,
+	div[contenteditable],
+	input[type=text], input[type=password], input[type=email], input[type=date]
+		background-color: #272c2d
+		border: 1px solid rgba(96, 90, 90, 0.31)
+		color: #C7C7C7
+
+		&:focus
+			outline: none /*remove chrome blue border*/
+			border: 1px solid #5e5e60
+			@include box-shadow($default-box-shadow)
+			color: #dddddd
+
+		&:-webkit-autofill
+			@include box-shadow(0 0 0 1000px #30302A inset !important)
+			-webkit-text-fill-color: #CCCBDF
+
+
+	@mixin lor-button-style()
+		color: #BABDB6
+		background-color: rgb(62, 65, 58)
+		&:hover
+			color: #000000
+			background: linear-gradient(#babdb6, #abbdab) repeat scroll 0 0 transparent
+			@include box-shadow($default-box-shadow)
+	input[type=button],
+	input[type=submit],
+	button
+		@include lor-button-style
+	input[type=file]::-webkit-file-upload-button
+		@include lor-button-style
+	@-moz-document url-prefix()
+		input[type=file]
+			@include lor-button-style
+
+
+	.box-shadow
+		textarea,
+		select,
+		div[contenteditable],
+		input[type=text], input[type=password], input[type=date]
+			@include box-shadow(0 1px 2px rgba(0, 0, 0, 0.83) inset, 0 -1px 0 rgba(0, 0, 0, 0.66) inset)
+
+	.growl, #smileParentHolder
+		background-color: rgba(34, 31, 31, 0.86)
+		border: 1px #775E39 solid
+
+	[class^='icon-']:hover
+		text-shadow: 0 0 0.2em #FFF, 0 0 0.2em #3D3D3D
+
+	[class^='icon-volume']
+		color: rgb(138, 109, 59)
+	.icon-home
+		color: rgb(51, 122, 183)
+	.icon-pencil
+		color: rgb(85, 26, 139)
+	.icon-santa-hat
+		color: rgb(207, 80, 80)
+	.icon-chart-pie
+		color: rgb(121, 144, 15)
+	.icon-users
+		color: rgb(66, 148, 122)
+	.icon-login
+		color: rgb(60, 118, 61)
+	.icon-register
+		color: rgb(138, 109, 59)
+	.icon-sign-out
+		color: rgb(169, 68, 66)
+	.icon-wrench
+		color: rgb(70, 133, 117)
+	.icon-clear
+		color: rgb(142, 53, 84)
+	.icon-man
+		color: rgb(84, 151, 83) !important /*override .color-lor :link*/
+	.icon-girl
+		color: #bb686a !important /*override .color-lor :link */
+	.icon-user-secret
+		color: rgb(92, 148, 163) !important /*override .color-lor :link*/
+	.icon-phone
+		color: #136C00 !important /*override .color-lor :link*/
+
+	// TODO uncomment
+	//#hideableDropDown
+	//	background-color: rgb(38, 36, 37)
+	//	border-color: rgb(30, 30, 30)
+	//	@include box-shadow("3px 3px 7px #0E1011")
+
+	::-webkit-scrollbar
+		background-color: #222
+	::-webkit-scrollbar-thumb
+		background-color: #3E4654
+
+	.table
+		td,
+		th
+			border-top: 1px solid #5B6248
+
+	.col-error
+		color: red
+	.col-success
+		color: #39C03B
+	.color-lor
+		color: #67bdc0

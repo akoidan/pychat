@@ -17,9 +17,9 @@ FONT_DIR="$STATIC_DIR/font"
 SOUNDS_DIR="$STATIC_DIR/sounds"
 SMILEYS_DIR="$STATIC_DIR/smileys"
 IMAGES_DIR="$STATIC_DIR/images"
-
+SASS_DIR="$STATIC_DIR/sass"
 # Implementing installed files
-declare -a files=("$IMAGES_DIR/favicon.ico" "$SOUNDS_DIR/ChatOutgoing.wav" "$SOUNDS_DIR/ChatIncoming.wav" "$SOUNDS_DIR/ChatLogin.wav" "$SOUNDS_DIR/ChatLogout.wav" "$CSS_DIR/pikaday.css" "$JS_DIR/pikaday.js" "$JS_DIR/moment.js" "$CSS_DIR/fontello.css" "$FONT_DIR/fontello.eot" "$FONT_DIR/fontello.svg" "$FONT_DIR/fontello.ttf" "$FONT_DIR/fontello.woff" "$FONT_DIR/fontello.woff2" "$FONT_DIR/OpenSans.ttf" "$FONT_DIR/Oswald.ttf" "$SMILEYS_DIR" "$SMILEYS_DIR/info.json" "$SMILEYS_DIR/base/0000.gif" "$IMAGES_DIR/ajaxStatus.gif" "$IMAGES_DIR/dark_wall.png" "$IMAGES_DIR/no_ava.png" )
+declare -a files=("$IMAGES_DIR/favicon.ico" "$SOUNDS_DIR/ChatOutgoing.wav" "$SOUNDS_DIR/ChatIncoming.wav" "$SOUNDS_DIR/ChatLogin.wav" "$SOUNDS_DIR/ChatLogout.wav" "$CSS_DIR/pikaday.css" "$JS_DIR/pikaday.js" "$JS_DIR/moment.js" "$SASS_DIR/fontello/_fontello.scss" "$FONT_DIR/fontello.eot" "$FONT_DIR/fontello.svg" "$FONT_DIR/fontello.ttf" "$FONT_DIR/fontello.woff" "$FONT_DIR/fontello.woff2" "$FONT_DIR/OpenSans.ttf" "$FONT_DIR/Oswald.ttf" "$SMILEYS_DIR" "$SMILEYS_DIR/info.json" "$SMILEYS_DIR/base/0000.gif" "$IMAGES_DIR/ajaxStatus.gif" "$IMAGES_DIR/dark_wall.png" "$IMAGES_DIR/no_ava.png" "$CSS_DIR/base.css")
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do
   if [ -f "$path" ]; then
@@ -36,6 +36,19 @@ cd "$PROJECT_ROOT"
 git clone "$CONF_REPOSITORY" "$TMP_DIR/chatconf"
 git --git-dir="$TMP_DIR/chatconf/.git" --work-tree="$TMP_DIR/chatconf/" checkout $CONF_VERSION
 cp -r "$TMP_DIR/chatconf/static" "$STATIC_PARENT"
+mv "$CSS_DIR/fontello.css" "$SASS_DIR/fontello/_fontello.scss"
+mv "$CSS_DIR/fontello-embedded.css" "$SASS_DIR/fontello/_fontello-embedded.scss"
+mv "$CSS_DIR/fontello-codes.css" "$SASS_DIR/fontello/_fontello-codes.scss"
+mv "$CSS_DIR/fontello-ie7.css" "$SASS_DIR/fontello/_fontello-ie7.scss"
+mv "$CSS_DIR/fontello-ie7-codes.css" "$SASS_DIR/fontello/_fontello-ie7-codes.scss"
+
+if ! type "sass" > /dev/null; then
+ >&2 echo "You need to install sass to be able to use stylesheets"
+ exit 1
+fi
+
+sass --no-cache --update "$SASS_DIR/base.sass":"$CSS_DIR/base.css" --style compressed
+
 
 # datepicker
 # use curl since it's part of windows git bash
