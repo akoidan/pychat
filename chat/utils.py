@@ -3,7 +3,6 @@ import logging
 import re
 import sys
 from io import BytesIO
-from threading import Thread
 
 import requests
 from django.core.exceptions import ValidationError
@@ -141,11 +140,9 @@ def send_email_verification(user, site_address):
 				'\n\nIf you find any bugs or propositions you can post them {}/report_issue or {}').format(
 				user.username, SITE_PROTOCOL, site_address, verification.token, site_address, ISSUES_REPORT_LINK)
 
-		mail_thread = Thread(
-			target=send_mail,
-			args=("Confirm chat registration", text, site_address, [user.email]))
 		logger.info('Sending verification email to userId %s (email %s)', user.id, user.email)
-		mail_thread.start()
+		send_mail("Confirm chat registration", text, site_address, [user.email, ])
+		logger.info('Email %s has been sent', user.email)
 
 
 def extract_photo(image_base64):

@@ -60,7 +60,7 @@
 
 
 	option
-		background-color: #1A1A1A
+		background-color: $mostly-black
 
 	input, select
 		outline: none
@@ -82,7 +82,7 @@
 
 	@mixin reg-button-style()
 		background-color: rgb(39, 42, 35)
-		color: #BABDB6
+		color: $grayish-green
 		opacity: 0.7
 		outline: none
 		font: 12px Oswald
@@ -131,7 +131,6 @@
 			text-shadow: 0 0 0.2em #575757
 			opacity: 1
 
-
 	[class^='icon-volume']
 		color: #DCA737
 	.icon-home
@@ -155,16 +154,13 @@
 	.icon-phone
 		color: #37BB21 /*override .		color-lor :link*/
 
-	$reg-scrollbar-col: #1A1A1A
-
-
 	::-webkit-scrollbar
-		background-color: $reg-scrollbar-col
+		background-color: $mostly-black
 	::-webkit-scrollbar-thumb
 		background-color: #313A3C
 	@-moz-document url-prefix()
 		#chat-room-users-wrapper
-			border-left: 4px solid $reg-scrollbar-col
+			border-left: 4px solid $mostly-black
 
 	.col-error
 		color: #FF3131

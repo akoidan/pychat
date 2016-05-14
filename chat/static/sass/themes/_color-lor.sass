@@ -1,10 +1,12 @@
 @import "../partials/mixins"
+@import "../partials/variables"
 
 $default-box-shadow: 0 0 10px #55585b
+$default-lor-background: #272c2d
 
 .color-lor
-	background-color: #272c2d
-	color: #babdb6
+	background-color: $default-lor-background
+	color: $grayish-green
 
 	::-webkit-calendar-picker-indicator
 		background: rgb(186, 189, 182)
@@ -33,7 +35,7 @@ $default-box-shadow: 0 0 10px #55585b
 	textarea,
 	div[contenteditable],
 	input[type=text], input[type=password], input[type=email], input[type=date]
-		background-color: #272c2d
+		background-color: $default-lor-background
 		border: 1px solid rgba(96, 90, 90, 0.31)
 		color: #C7C7C7
 
@@ -49,11 +51,11 @@ $default-box-shadow: 0 0 10px #55585b
 
 
 	@mixin lor-button-style()
-		color: #BABDB6
+		color: $grayish-green
 		background-color: rgb(62, 65, 58)
 		&:hover
 			color: #000000
-			background: linear-gradient(#babdb6, #abbdab) repeat scroll 0 0 transparent
+			background: linear-gradient($grayish-green, #abbdab) repeat scroll 0 0 transparent
 			@include box-shadow($default-box-shadow)
 	input[type=button],
 	input[type=submit],
@@ -120,7 +122,7 @@ $default-box-shadow: 0 0 10px #55585b
 	::-webkit-scrollbar
 		background-color: #222
 	::-webkit-scrollbar-thumb
-		background-color: #3E4654
+		background-color: $grayish-blue
 
 	.table
 		td,
