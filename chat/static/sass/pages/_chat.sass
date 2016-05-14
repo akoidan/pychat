@@ -1,0 +1,395 @@
+@import "../themes/color-lor-chat"
+@import "../themes/color-reg-chat"
+@import "../partials/mixins"
+
+#userSendMessageTo
+	position: relative
+	font-size: 20px
+
+[class^="message-header"]
+	font-weight: bold
+
+fieldset
+	border-top: 1px solid #aaa
+	border-bottom: none
+	border-left: none
+	border-right: none
+	display: block
+	text-align: center
+	padding: 0
+	margin-left: 3px
+	margin-right: 10px
+
+	legend
+		padding: 0 10px
+		font-weight: bold
+		color: #9DD3DD
+
+p
+	margin-top: 0.8em
+	margin-bottom: 0.8em
+
+#chatbox
+	width: 100%
+	overflow-y: scroll
+	padding-left: 8px
+	word-wrap: break-word
+	font-size: 18px
+	margin-right: 2px
+
+	/*shift scrollbar from right side
+
+	&:focus
+		outline: none
+
+	a:hover
+		text-decoration: underline
+
+#chat-room-users-wrapper
+	float: right
+	max-width: 300px
+	font-size: 24px
+	overflow-y: auto
+	overflow-x: hidden
+	min-width: 200px
+	text-overflow: ellipsis
+
+.user:hover
+	cursor: pointer
+	color: #B5B978
+	text-shadow: 0 0 3px #A2AC6D
+
+#chat-user-table > tbody > tr > td
+	padding: 0
+
+#userSendMessageTo
+	/*sets also in chat.js on username click
+	justify-content: center
+	display: inline
+	vertical-align: middle
+	align-content: center
+	align-items: center
+	max-width: 250px
+
+	/*font-size: 17px; = inherited
+	border-radius: 2px
+	float: left
+	padding: 0 2px 0 6px
+	margin-right: 4px
+
+.icon-cancel
+	position: absolute
+	top: 5px
+	right: 1px
+	font-size: 13px
+
+#receiverId
+	display: inline-block
+	margin-right: 20px
+
+.message-text-holder
+	overflow: hidden
+	padding-left: 5px
+	padding-bottom: 1px
+	padding-right: 12px
+
+.timeMess:hover
+	cursor: pointer
+	color: #979797
+
+/*-webkit-background-clip: text;
+/*-webkit-text-fill-color: transparent;
+/*gradient text top disappearing
+/*#chatbox {
+/*-webkit-mask-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 1) 95%, rgba(0, 0, 0, 0) 100%);
+/*TODO login dropdown goes under scroll, FF doesn't support
+/*}
+
+.fluid-height-child-bot
+	display: table
+	min-height: 100%
+	max-width: 300px
+
+	> div
+		display: table-row
+
+		&:first-child
+			height: 100%
+
+#smileParentHolder
+	position: absolute
+	right: 5px
+	bottom: -2px
+	border-radius: 10px
+	width: 50%
+
+	img
+		cursor: pointer
+
+.icon-smile
+	display: inline
+	float: right
+	position: absolute
+	right: 1px
+	top: 1px
+	height: 16px
+
+#chatbox img, #usermsg img
+	margin-top: -17px
+	margin-bottom: -10px
+	background-color: rgba(255, 255, 255, 0)
+
+	/*remove background if someones copies smile
+	vertical-align: middle
+
+#tabNames
+	margin: 0
+	list-style-type: none
+
+	> li
+		display: inline
+		padding-left: 10px
+		padding-right: 10px
+
+		&:hover
+			cursor: pointer
+			text-decoration: underline
+
+#usermsg
+	margin-left: 4px
+	max-height: 200px
+
+	/*fallback
+	max-height: 30vh
+	min-height: 1.15em
+
+	/*Firefox
+	overflow-y: auto
+	white-space: pre-wrap
+
+	/*chrome keep \n, no horizontal scroll
+
+/*--------------- START CALL DIALOG -----------------------
+
+.modal-background
+	position: fixed
+	left: 0
+	top: 0
+	width: 100%
+	height: 100%
+	overflow: auto
+	background-color: black
+	background-color: rgba(0, 0, 0, 0.5)
+
+.modal-body
+	border-radius: 3px
+	position: absolute
+	box-shadow: 2px 2px 1px #1F1F27
+
+
+
+.modal-draggable
+	left: calc(50% - 100px)
+	top: 10%
+
+#callContainerHeader
+	padding: 4px 0 4px 6px
+	border-radius: 3px 3px 0 0
+	cursor: pointer
+
+
+
+#callContainer
+	display: inline-block
+	max-width: 100%
+
+	label
+		cursor: pointer
+
+#callContainerContent
+	padding: 5px
+	display: inline-block
+
+.callContainerIcons
+	display: inline-block
+	font-size: 25px
+	width: 100%
+	padding-top: 10px
+
+
+
+#callUserList
+	margin: 0
+	min-width: 150px
+	max-height: 400px
+
+	/*fallback
+	max-height: calc(100vh - 90px)
+	overflow-y: auto
+	width: 100%
+
+
+
+.icon-phone-circled
+	float: right
+	color: #3AC73A
+
+.icon-plus-squared
+	font-size: 15px
+
+#callUserList > li
+	list-style-type: none
+	border-radius: 2px
+	margin-bottom: 2px
+	margin-right: 0
+
+	/* TODO was 3 px before scroll??
+	padding-left: 3px
+	cursor: pointer
+
+.callActiveIcon
+	color: darkred
+
+#videoContainer
+	position: relative
+	width: 100%
+	text-align: center
+
+	video
+		background: #272C2D
+		border: 1px solid grey
+
+#remoteVideo
+	max-height: calc(100vh - 90px)
+	max-width: 100%
+
+#localVideo
+	position: absolute
+	max-width: 35%
+	max-height: 35%
+	background: #555
+	bottom: 0
+	right: 0
+	margin-bottom: 4px
+
+.modal-fixed
+	left: 50%
+	top: 45%
+	transform: translate(-50%, -50%)
+	padding: 10px
+	border-radius: 10px
+
+	span
+		font-size: 30px
+		margin: 10px
+
+.answerButtons
+	padding-top: 10px
+	text-align: center
+
+	/*collapse to center
+
+	> button
+		padding: 5px 10px 0 5px !important
+		margin-top: 5px
+
+		/* small screen collapsed distance between
+		border-radius: 20px
+
+	div
+		display: inline-block
+		vertical-align: top
+		padding-top: 5px
+
+	i
+		font-size: 30px
+
+.finish-call-icon
+	float: right
+	font-size: 40px
+	margin-bottom: -25px
+	margin-top: -6px
+
+
+
+.fullscreen
+	&#videoContainer
+		background-color: black
+
+	#remoteVideo
+		max-height: 99vh
+		height: 99vh
+
+	&#videoContainer video
+		border-color: #272727
+
+#videoStatusIcon
+	margin-left: -5px
+	margin-right: 15px
+
+#icon-webrtc-cont
+	display: none
+	position: absolute
+	bottom: 2vh
+	left: 2vw
+
+.fullscreen #icon-webrtc-cont
+	display: block
+
+#icon-webrtc-cont > i
+	display: block
+	font-size: 36px
+	opacity: 1
+
+	&:before
+		border-radius: 50%
+		width: 36px
+		height: 36px
+		padding: 8px
+		background: rgba(102, 102, 102, 0.6)
+		text-align: center
+		box-shadow: 3px 3px 12px #444
+		color: white
+		margin: 7px 30px 15px 7px
+
+.icon-webrtc-fullscreen
+	color: #6EEFFF
+	position: absolute
+	left: -30px
+	font-size: 40px
+	top: -10px
+
+#enterFullScreenHolder
+	position: relative
+	display: inline
+	padding-left: 5px
+
+#icon-webrtc-cont
+	i:hover:before, .icon-webrtc-nomic:before, .icon-webrtc-novideo:before
+		background-color: rgba(88, 143, 255, 0.6)
+		opacity: 1
+		color: white
+		box-shadow: 6px 6px 36px #666
+
+	i.icon-webrtc-hangup:hover:before
+		background: rgba(217, 24, 24, 0.6)
+
+.inactive #icon-webrtc-cont > i
+	transform: translateX(calc(-2vw - 70px))
+	transition: all 0.1s
+	transition-timing-function: ease-in-out
+
+@media screen and (max-height: 550px)
+	#callContainer
+		top: 0 !important
+
+@media screen and (max-width: 700px)
+	#callContainer
+		left: 0 !important
+
+/*--------------- END CALL DIALOG -----------------------
+@media screen and (max-height: 300px), screen and (max-width: 600px)
+	#smileParentHolder
+		width: calc(100% - 30px)
+
+/*# sourceMappingURL=chat.css.map

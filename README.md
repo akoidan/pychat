@@ -47,8 +47,7 @@ Start the chat:
  4. Open in browser http*s*://127.0.0.1:8000
  5. If you're using firefox you probably need to allow self-assigned certificate for development. Open https://localhost:8888 (8888 is API_PORT) and add security exception
 
-# TODO
-* Reigstartion page shows that password field is too short if you type fast even if there're 3 chars/ 
+# TODO 
 * max-width for .reg-container doesn't set current width to max (300px) when there's enought free space
 * http://jsfiddle.net/JnrvG/1/
 * add email confirmation for username or password change

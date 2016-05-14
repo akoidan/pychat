@@ -1,0 +1,37 @@
+@import "../partials/mixins"
+
+.color-reg
+	.message-header-others
+		color: #729fcf
+	.message-header-private
+		color: #84CC3D
+	.message-header-self
+		color: #e29722
+	.message-header-system
+		color: #84B7C0
+
+	#userSendMessageTo
+		border: 1px solid #101D07
+		@include linear-gradient(#185D61, #092B2E)
+		text-shadow: #000 0 1px 5px
+		color: #A2A2A2
+
+	// call container
+	.modal-body
+		border: 1px solid #414141
+		box-shadow: 2px 2px 1px rgba(255, 255, 255, 0.05)
+		$start-gradient: rgba(42, 46, 42, 0.89)
+		@include linear-gradient($start-gradient, #181b18)
+	#callContainerHeader
+		background-color: #42433B
+		@include linear-gradient(#413A3A, #241F1F)
+		color: #9D9D9D
+		border-bottom: 1px solid #444444
+	.callContainerIcons
+		color: #259BBD
+	#callUserList
+		color: #A5A5A5
+		background-color: #242A2A
+	.finish-call-icon
+		color: #BC2F2F
+	// end call container

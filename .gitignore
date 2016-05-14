@@ -21,6 +21,7 @@ chat/static/flags
 chat/static/js/angular*
 example
 sessionsids.txt
+chat/static/css/base.css
 chat/static/css/variables.css
 chat/static/css/mixins.css
 chat/static/css/main.css
