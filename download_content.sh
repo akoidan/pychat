@@ -19,7 +19,7 @@ SMILEYS_DIR="$STATIC_DIR/smileys"
 IMAGES_DIR="$STATIC_DIR/images"
 SASS_DIR="$STATIC_DIR/sass"
 # Implementing installed files
-declare -a files=("$IMAGES_DIR/favicon.ico" "$SOUNDS_DIR/ChatOutgoing.wav" "$SOUNDS_DIR/ChatIncoming.wav" "$SOUNDS_DIR/ChatLogin.wav" "$SOUNDS_DIR/ChatLogout.wav" "$CSS_DIR/pikaday.css" "$JS_DIR/pikaday.js" "$JS_DIR/moment.js" "$SASS_DIR/fontello/_fontello.scss" "$FONT_DIR/fontello.eot" "$FONT_DIR/fontello.svg" "$FONT_DIR/fontello.ttf" "$FONT_DIR/fontello.woff" "$FONT_DIR/fontello.woff2" "$FONT_DIR/OpenSans.ttf" "$FONT_DIR/Oswald.ttf" "$SMILEYS_DIR" "$SMILEYS_DIR/info.json" "$SMILEYS_DIR/base/0000.gif" "$IMAGES_DIR/ajaxStatus.gif" "$IMAGES_DIR/dark_wall.png" "$IMAGES_DIR/no_ava.png" "$CSS_DIR/base.css")
+declare -a files=("$IMAGES_DIR/favicon.ico" "$SOUNDS_DIR/ChatOutgoing.wav" "$SOUNDS_DIR/ChatIncoming.wav" "$SOUNDS_DIR/ChatLogin.wav" "$SOUNDS_DIR/ChatLogout.wav" "$CSS_DIR/pikaday.css" "$JS_DIR/pikaday.js" "$JS_DIR/moment.js" "$SASS_DIR/fontello/_fontello.scss" "$FONT_DIR/fontello.eot" "$FONT_DIR/fontello.svg" "$FONT_DIR/fontello.ttf" "$FONT_DIR/fontello.woff" "$FONT_DIR/fontello.woff2" "$FONT_DIR/OpenSans.ttf" "$FONT_DIR/Oswald.ttf" "$SMILEYS_DIR" "$SMILEYS_DIR/info.json" "$SMILEYS_DIR/base/0000.gif" "$IMAGES_DIR/ajaxStatus.gif" "$IMAGES_DIR/dark_wall.png" "$IMAGES_DIR/no_ava.png" "$CSS_DIR/main.css" "$CSS_DIR/chat.css")
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do
   if [ -f "$path" ]; then
@@ -47,7 +47,8 @@ if ! type "sass" > /dev/null; then
  exit 1
 fi
 
-sass --no-cache --update "$SASS_DIR/base.sass":"$CSS_DIR/base.css" --style compressed
+sass --no-cache --update "$SASS_DIR/pages/_main.sass":"$CSS_DIR/main.css" --style compressed
+sass --no-cache --update "$SASS_DIR/pages/_chat.sass":"$CSS_DIR/chat.css" --style compressed
 
 
 # datepicker

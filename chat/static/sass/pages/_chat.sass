@@ -376,8 +376,7 @@ p
 
 .inactive #icon-webrtc-cont > i
 	transform: translateX(calc(-2vw - 70px))
-	transition: all 0.1s
-	transition-timing-function: ease-in-out
+	@include transition(all 0.1s ease-in-out)
 
 @media screen and (max-height: 550px)
 	#callContainer
