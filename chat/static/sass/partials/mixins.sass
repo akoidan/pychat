@@ -36,12 +36,12 @@
 	-ms-user-select: $value
 	user-select: $value
 
-@mixin animation($name, $steps)
-	-webkit-animation: $name .32s steps($steps) infinite
-	-moz-animation: $name .32s  steps($steps) infinite
-	-ms-animation: $name .32s  steps($steps) infinite
-	-o-animation: $name .32s  steps($steps) infinite
-	animation: $name .32s  steps($steps) infinite
+@mixin animation($name, $time , $steps)
+	-webkit-animation: $name $time steps($steps) infinite
+	-moz-animation: $name $time  steps($steps) infinite
+	-ms-animation: $name $time  steps($steps) infinite
+	-o-animation: $name $time  steps($steps) infinite
+	animation: $name $time  steps($steps) infinite
 
 @mixin appearence($value)
 	-webkit-appearance: $value
@@ -60,14 +60,14 @@
 	//#{'@' + $prefix + 'keyframes'} $name
 	@-webkit-keyframes #{$name}
 		from
-			background-position: 0 $y
+			background-position: 0 #{"-" + $y + 'px'}
 		to
-			background-position: #{ -$width*($steps) + 'px'} #{$y+'px'}
+			background-position: #{ -$width*($steps) + 'px'} #{'-' + $y+'px'}
 
-@mixin smile($name, $y, $width, $height, $steps)
+@mixin smile($name, $time, $y, $width, $height, $steps)
 	#{'.smile-' + $name}
 		width: #{$width + 'px'}
 		height: #{$height + 'px'}
 		background-image: url("/static/smileys/smilies.png?v1")
-		@include animation(#{'play-'+ $name}, $steps)
+		@include animation(#{'play-'+ $name}, $time, $steps)
 	@include play(-webkit-, #{'play-'+ $name}, $y, $width, $steps)
