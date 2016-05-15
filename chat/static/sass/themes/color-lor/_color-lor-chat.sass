@@ -1,4 +1,5 @@
-@import "../partials/mixins"
+@import "../../partials/mixins"
+@import "../../partials/mixins"
 
 .color-lor
 	.icon-girl,
@@ -19,6 +20,9 @@
 	#userSendMessageTo
 		@include box-shadow(0 2px 2px rgba(6, 3, 8, 0.77))
 		border: 1px solid #101D07
+
+	div[contenteditable]
+		@include box-shadow(0 1px 2px rgba(0,0,0,0.83) inset,0 -1px 0 rgba(0,0,0,0.66) inset)
 
 	fieldset legend
 		color: #9DD3DD
@@ -44,4 +48,7 @@
 		background-color: #343A3B
 	.finish-call-icon
 		color: #910000
+	.answerButtons div
+		padding-top: 5px
+
 	// end call container

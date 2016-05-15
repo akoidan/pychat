@@ -1,5 +1,5 @@
-@import "../partials/mixins"
-@import "../partials/variables"
+@import "../../partials/mixins"
+@import "../../partials/variables"
 
 $default-box-shadow: 0 0 10px #55585b
 $default-lor-background: #272c2d
@@ -61,19 +61,13 @@ $default-lor-background: #272c2d
 	input[type=submit],
 	button
 		@include lor-button-style
+	button:focus
+		outline: none
 	input[type=file]::-webkit-file-upload-button
 		@include lor-button-style
 	@-moz-document url-prefix()
 		input[type=file]
 			@include lor-button-style
-
-
-	.box-shadow
-		textarea,
-		select,
-		div[contenteditable],
-		input[type=text], input[type=password], input[type=date]
-			@include box-shadow(0 1px 2px rgba(0, 0, 0, 0.83) inset, 0 -1px 0 rgba(0, 0, 0, 0.66) inset)
 
 	.growl, #smileParentHolder
 		background-color: rgba(34, 31, 31, 0.86)

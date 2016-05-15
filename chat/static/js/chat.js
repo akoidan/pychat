@@ -830,7 +830,6 @@ var WebRtcApi = function () {
 		}
 	};
 	self.webRtcReceivers = {};
-	var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
 
 	self.getTrack = function (isVideo) {
 		var track = null;
@@ -1072,6 +1071,11 @@ var WebRtcApi = function () {
 		self.setAudio(self.getTrack(false) != null);
 	};
 	self.init = function() {
+		// if (typeof RTCPeerConnection  == 'undefined' && typeof mozRTCPeerConnection == 'undefined' && typeof webkitRTCPeerConnection == 'undefined') {
+		// 	growlError(getText("Unfortunately {} doesn't support webrtc. Video/audio call is unuvailable", browserVersion));
+		// 	return;
+		// }
+		var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
 		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
 		self.pc.onaddstream = function (event) {
 			self.setVideoSource(self.dom.remote, event.stream);

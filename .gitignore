@@ -29,4 +29,5 @@ chat/static/css/*.map
 chat/static/sass/.sass-cache
 chat/static/sass/partials/*.scss
 chat/static/valentine
+chat/static/css/chat.css
 redis-3.2.0-rc3

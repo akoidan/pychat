@@ -1,10 +1,6 @@
-@import "../themes/color-lor-chat"
-@import "../themes/color-reg-chat"
-@import "../partials/mixins"
-
-#userSendMessageTo
-	position: relative
-	font-size: 20px
+@import "themes/color-lor/color-lor-chat"
+@import "themes/color-reg/color-reg-chat"
+@import "partials/mixins"
 
 [class^="message-header"]
 	font-weight: bold
@@ -63,6 +59,8 @@ p
 	padding: 0
 
 #userSendMessageTo
+	position: relative
+	font-size: 20px
 	/*sets also in chat.js on username click
 	justify-content: center
 	display: inline
@@ -299,7 +297,6 @@ p
 	div
 		display: inline-block
 		vertical-align: top
-		padding-top: 5px
 
 	i
 		font-size: 30px

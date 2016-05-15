@@ -47,8 +47,8 @@ if ! type "sass" > /dev/null; then
  exit 1
 fi
 
-sass --no-cache --update "$SASS_DIR/pages/_main.sass":"$CSS_DIR/main.css" --style compressed
-sass --no-cache --update "$SASS_DIR/pages/_chat.sass":"$CSS_DIR/chat.css" --style compressed
+sass --no-cache --update "$SASS_DIR/main.sass":"$CSS_DIR/main.css" --style compressed
+sass --no-cache --update "$SASS_DIR/chat.sass":"$CSS_DIR/chat.css" --style compressed
 
 
 # datepicker

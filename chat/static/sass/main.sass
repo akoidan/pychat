@@ -1,8 +1,8 @@
-@import "../partials/mixins"
-@import "../partials/variables"
-@import "../fontello/fontello"
-@import "../themes/color-lor"
-@import "../themes/color-reg"
+@import "partials/mixins"
+@import "partials/variables"
+@import "fontello/fontello"
+@import "themes/color-lor/color-lor"
+@import "themes/color-reg/color-reg"
 
 body
 	background: green
@@ -44,7 +44,8 @@ input[type=file]::-webkit-file-upload-button
 @-moz-document url-prefix()
 	input[type=file]
 		@include button-style
-
+button
+	border-bottom: none
 
 [class^='icon-']:hover
 	cursor: pointer
