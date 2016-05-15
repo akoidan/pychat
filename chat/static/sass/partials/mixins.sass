@@ -36,6 +36,13 @@
 	-ms-user-select: $value
 	user-select: $value
 
+@mixin animation($name, $steps)
+	-webkit-animation: $name .32s steps($steps) infinite
+	-moz-animation: $name .32s  steps($steps) infinite
+	-ms-animation: $name .32s  steps($steps) infinite
+	-o-animation: $name .32s  steps($steps) infinite
+	animation: $name .32s  steps($steps) infinite
+
 @mixin appearence($value)
 	-webkit-appearance: $value
 	-moz-appearance: $value
@@ -48,3 +55,19 @@
 @mixin top-left-border($value...)
 	border-top: $value
 	border-left: $value
+
+@mixin play($prefix, $name, $y, $width, $steps)
+	//#{'@' + $prefix + 'keyframes'} $name
+	@-webkit-keyframes #{$name}
+		from
+			background-position: 0 $y
+		to
+			background-position: #{ -$width*($steps) + 'px'} #{$y+'px'}
+
+@mixin smile($name, $y, $width, $height, $steps)
+	#{'.smile-' + $name}
+		width: #{$width + 'px'}
+		height: #{$height + 'px'}
+		background-image: url("/static/smileys/smilies.png?v1")
+		@include animation(#{'play-'+ $name}, $steps)
+	@include play(-webkit-, #{'play-'+ $name}, $y, $width, $steps)
