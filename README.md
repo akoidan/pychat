@@ -48,6 +48,7 @@ Start the chat:
  5. If you're using firefox you probably need to allow self-assigned certificate for development. Open https://localhost:8888 (8888 is API_PORT) and add security exception
 
 # TODO 
+* Move clear cache icon from nav to settings
 * max-width for .reg-container doesn't set current width to max (300px) when there's enought free space
 * http://jsfiddle.net/JnrvG/1/
 * add email confirmation for username or password change
