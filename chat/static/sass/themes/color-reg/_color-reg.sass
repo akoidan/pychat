@@ -97,9 +97,10 @@
 		&:active
 			text-shadow: none
 			opacity: 1
+			color: #878787
 			background-image: none
 			@include box-shadow(1px 1px 1px rgba(255,255,255,0.2))
-			padding: $button-padding-top + 1 $button-padding-left - 1 $button-padding-top - 1 $button-padding-left + 1
+			@include drop-padding($button-padding-top, $button-padding-left)
 			@include top-left-border(1px inset rgba(1, 1, 1, 0.5)) // TODO why rgba(0,0,0 ) is shown as white
 
 	input[type=button], input[type=submit], button
@@ -171,5 +172,5 @@
 	.col-info
 		color: #78CAD8
 
-	.color-reg #userProfileData input[type=submit]:active
-		padding: $userProfileData-sp + 1px $userProfileData-sp - 1px $userProfileData-sp - 1px $userProfileData-sp + 1px
+	#userProfileData input[type=submit]:active
+		@include drop-padding($userProfileData-sp, $userProfileData-sp)

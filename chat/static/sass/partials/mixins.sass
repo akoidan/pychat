@@ -68,6 +68,9 @@
 	#{'.smile-' + $name}
 		width: #{$width + 'px'}
 		height: #{$height + 'px'}
-		background-image: url("/static/smileys/smilies.png?v1")
+		background-image: url("../smileys/smilies.png?v1")
 		@include animation(#{'play-'+ $name}, $time, $steps)
 	@include play(-webkit-, #{'play-'+ $name}, $y, $width, $steps)
+
+@mixin drop-padding($top, $left)
+	padding: $top + 1px $left - 1px $top - 1px $left + 1px
