@@ -15,6 +15,7 @@ var RegisterValidator = function () {
 			element.icon = parentNode.children[0];
 			if (element.input.getAttribute('type') === 'password') {
 				element.input.onkeyup = element.validate;
+				element.input.addEventListener('blur',  element.validate);
 			} else {
 				element.input.onchange = element.validate;
 			}
@@ -27,9 +28,9 @@ var RegisterValidator = function () {
 					CssUtils.removeClass(element.slider, 'closed');
 				};
 				/*FF doesn't support focusout*/
-				element.input.onblur=  function() {
+				element.input.addEventListener('blur', function() {
 					CssUtils.addClass(element.slider, 'closed');
-				};
+				});
 			})(element);
 		}
 	};

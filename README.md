@@ -12,7 +12,8 @@ To run chat on CentOS 6:
 ===============
  0. Passwordless login to ssh server (optional): run this from client `cat ~/.ssh/id_rsa.pub | ssh -p 666 root@ip 'mkdir -p .ssh; cat >> .ssh/authorized_keys'`
  0. Add `alias yum="python2 $(which yum)"` to /etc/bashrc if you use python3
- 0. Install packages `yum install nginx, python34u, uWSGI, python34u-pip, redis, mysql-server, mysql-devel, postfix, mailx`
+ 0. Install packages `yum install nginx, python34u, uWSGI, python34u-pip, redis, mysql-server, mysql-devel, postfix, mailx, ruby, rubygems`
+ 0. Install sass `gem install sass`
  0. Copy config files to rootfs `cp rootfs / -r `
  0. Add file `chat/production.py` , place `SECRET_KEY` there
  0. Create database in mysql `echo "create database django CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`
@@ -35,7 +36,10 @@ Start the chat:
  1. Start the WebSocket listener: `service tornado start`
  1. Open in browser http*s*://127.0.0.1
 
-# TODO
+# TODO 
+* Add multi-language support. 
+* Display current keyboard layout in upper right corner as steam
+* Move clear cache icon from nav to settings
 * max-width for .reg-container doesn't set current width to max (300px) when there's enought free space
 * http://jsfiddle.net/JnrvG/1/
 * add email confirmation for username or password change

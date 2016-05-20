@@ -2,9 +2,8 @@
 {% block head %} {% load md5url %}
 	<script>
 		const API_URL = "{{ apiUrl }}";
-		const SMILEYS_JSON_URL = "{% md5url 'smileys/info.json'  %}";
-		const SMILEY_URL = "{% md5url "smileys/" %}";
 	</script>
+	<script src="{% md5url "js/smileys_data.js" %}"></script>
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 	<script>
@@ -42,7 +41,7 @@
 			<ul id="tabNames" onclick="smileyUtil.showTabByName(event)"></ul>
 		</div>
 	</div>
-	<div class="fullwidth-padded box-shadow" style="position: relative">
+	<div class="fullwidth-padded" style="position: relative">
 		<div id="userSendMessageTo" class="hidden">
 			<div id="receiverId"></div>
 			<i class="icon-cancel" onclick="hideUserSendToName();"></i>

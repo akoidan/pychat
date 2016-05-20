@@ -2,10 +2,13 @@
 
 CONF_REPOSITORY="https://github.com/Deathangel908/djangochat-config"
 
-CONF_VERSION='0f50b3ca6d0ff83b6d0f88d8ecd212507ebdd800'
+CONF_VERSION='546113b61307fe91200d7c4607b85873d04d9b1e'
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
 
 RANDOM_DIR=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 TMP_DIR="/tmp/$RANDOM_DIR"
@@ -15,14 +18,42 @@ JS_DIR="$STATIC_DIR/js"
 CSS_DIR="$STATIC_DIR/css"
 FONT_DIR="$STATIC_DIR/font"
 SOUNDS_DIR="$STATIC_DIR/sounds"
-SMILEYS_DIR="$STATIC_DIR/smileys"
 VAL_DIR="$STATIC_DIR/valentine"
 IMAGES_DIR="$STATIC_DIR/images"
-
+SASS_DIR="$STATIC_DIR/sass"
 # Implementing installed files
-declare -a files=("$IMAGES_DIR/favicon.ico" "$SOUNDS_DIR/ChatOutgoing.wav" "$SOUNDS_DIR/ChatIncoming.wav" "$SOUNDS_DIR/ChatLogin.wav" "$SOUNDS_DIR/ChatLogout.wav" "$CSS_DIR/pikaday.css" "$JS_DIR/pikaday.js" "$JS_DIR/moment.js" "$CSS_DIR/fontello.css" "$FONT_DIR/fontello.eot" "$FONT_DIR/fontello.svg" "$FONT_DIR/fontello.ttf" "$FONT_DIR/fontello.woff" "$FONT_DIR/fontello.woff2" "$FONT_DIR/OpenSans.ttf" "$FONT_DIR/Oswald.ttf" "$SMILEYS_DIR" "$SMILEYS_DIR/info.json" "$SMILEYS_DIR/base/0000.gif" "$IMAGES_DIR/ajaxStatus.gif" "$IMAGES_DIR/dark_wall.png" "$IMAGES_DIR/no_ava.png" "$VAL_DIR/Love_and_Passion.ttf" "$VAL_DIR/teddy.gif" "$VAL_DIR/v2.ttf" "$VAL_DIR/videoplayback.mp3")
-
-
+declare -a files=(\
+    "$IMAGES_DIR/favicon.ico" \
+    "$SOUNDS_DIR/ChatOutgoing.wav" \
+    "$SOUNDS_DIR/ChatIncoming.wav" \
+    "$SOUNDS_DIR/ChatLogin.wav" \
+    "$SOUNDS_DIR/ChatLogout.wav" \
+    "$CSS_DIR/pikaday.css" \
+    "$JS_DIR/pikaday.js" \
+    "$JS_DIR/moment.js" \
+    "$SASS_DIR/fontello/_fontello.scss" \
+    "$FONT_DIR/fontello.eot" \
+    "$FONT_DIR/fontello.svg" \
+    "$FONT_DIR/fontello.ttf" \
+    "$FONT_DIR/fontello.woff" \
+    "$FONT_DIR/fontello.woff2" \
+    "$FONT_DIR/OpenSans.ttf" \
+    "$FONT_DIR/Oswald.ttf" \
+    "$JS_DIR/smileys_data.js"
+    "$IMAGES_DIR/ajaxStatus.gif" \
+    "$IMAGES_DIR/dark_wall.png" \
+    "$IMAGES_DIR/no_ava.png" \
+    "$CSS_DIR/main.css" \
+    "$CSS_DIR/chat.css"\
+    "$CSS_DIR/register.css"\
+    "$JS_DIR/amcharts.js"\
+    "$JS_DIR/amcharts-pie.js"\
+    "$JS_DIR/amcharts-dark.js"\
+    "$VAL_DIR/Love_and_Passion.ttf"\
+    "$VAL_DIR/teddy.gif"\
+    "$VAL_DIR/v2.ttf"\
+    "$VAL_DIR/videoplayback.mp3"\
+)
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do
   if [ -f "$path" ]; then
@@ -39,12 +70,33 @@ cd "$PROJECT_ROOT"
 git clone "$CONF_REPOSITORY" "$TMP_DIR/chatconf"
 git --git-dir="$TMP_DIR/chatconf/.git" --work-tree="$TMP_DIR/chatconf/" checkout $CONF_VERSION
 cp -r "$TMP_DIR/chatconf/static" "$STATIC_PARENT"
+mv "$CSS_DIR/fontello.css" "$SASS_DIR/fontello/_fontello.scss"
+mv "$CSS_DIR/fontello-embedded.css" "$SASS_DIR/fontello/_fontello-embedded.scss"
+mv "$CSS_DIR/fontello-codes.css" "$SASS_DIR/fontello/_fontello-codes.scss"
+mv "$CSS_DIR/fontello-ie7.css" "$SASS_DIR/fontello/_fontello-ie7.scss"
+mv "$CSS_DIR/fontello-ie7-codes.css" "$SASS_DIR/fontello/_fontello-ie7-codes.scss"
+
+if ! type "sass" > /dev/null; then
+ >&2 echo "You need to install sass to be able to use stylesheets"
+ exit 1
+fi
+
+sass_files=($(ls "$SASS_DIR"/*.sass))
+
+for i in "${sass_files[@]}"
+do
+    name_no_ext=$(basename $i .sass)
+    sass --no-cache --update "$i":"$CSS_DIR/$name_no_ext.css" --style compressed
+done
 
 # datepicker
 # use curl since it's part of windows git bash
 curl -X GET http://dbushell.github.io/Pikaday/css/pikaday.css -o "$CSS_DIR/pikaday.css"
 curl -X GET https://raw.githubusercontent.com/dbushell/Pikaday/master/pikaday.js -o "$JS_DIR/pikaday.js"
 curl -X GET http://momentjs.com/downloads/moment.js -o "$JS_DIR/moment.js"
+curl -X GET https://www.amcharts.com/lib/3/amcharts.js -o "$JS_DIR/amcharts.js"
+curl -X GET https://www.amcharts.com/lib/3/pie.js -o "$JS_DIR/amcharts-pie.js"
+curl -X GET https://www.amcharts.com/lib/3/themes/dark.js -o "$JS_DIR/amcharts-dark.js"
 
 
 #wget http://jscolor.com/release/jscolor-1.4.4.zip -P $TMP_DIR && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR

@@ -1,0 +1,80 @@
+@mixin border-radius($radius...)
+	-webkit-border-radius: $radius
+	-moz-border-radius: $radius
+	-ms-border-radius: $radius
+	border-radius: $radius
+
+@mixin box-shadow($text...)
+	-moz-box-shadow: $text
+	-webkit-box-shadow: $text
+	box-shadow: $text
+
+@mixin transition($text...)
+	-webkit-transition: $text
+	-moz-transition: $text
+	-o-transition: $text
+	-ms-transition: $text
+	transition: $text
+
+@mixin linear-gradient($begin, $end)
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from($begin), to($end))
+	background-image: -webkit-linear-gradient($begin 0%, $end 100%)
+	background-image: -moz-linear-gradient($begin 0%, $end 100%)
+	background-image: -o-linear-gradient($begin 0%, $end 100%)
+	background-image: linear-gradient($begin 0%, $end 100%)
+
+@mixin display-flex()
+	display: -ms-flexbox
+	display: -webkit-flex
+	display: flex
+
+@mixin user-select($value)
+	-webkit-touch-callout: $value
+	-webkit-user-select: $value
+	-khtml-user-select: $value
+	-moz-user-select: $value
+	-ms-user-select: $value
+	user-select: $value
+
+@mixin animation($name, $time , $steps)
+	-webkit-animation: $name $time steps($steps) infinite
+	-moz-animation: $name $time  steps($steps) infinite
+	-ms-animation: $name $time  steps($steps) infinite
+	-o-animation: $name $time  steps($steps) infinite
+	animation: $name $time  steps($steps) infinite
+
+@mixin appearence($value)
+	-webkit-appearance: $value
+	-moz-appearance: $value
+	appearance: $value
+
+@mixin box-sizing($value)
+	-webkit-box-sizing: $value
+	-moz-box-sizing: $value
+
+@mixin top-left-border($value...)
+	border-top: $value
+	border-left: $value
+
+@mixin right-bottom-border($value...)
+	border-right: $value
+	border-bottom: $value
+
+@mixin play($prefix, $name, $y, $width, $steps)
+	//#{'@' + $prefix + 'keyframes'} $name
+	@-webkit-keyframes #{$name}
+		from
+			background-position: 0 #{"-" + $y + 'px'}
+		to
+			background-position: #{ -$width*($steps) + 'px'} #{'-' + $y+'px'}
+
+@mixin smile($name, $time, $y, $width, $height, $steps)
+	#{'.smile-' + $name}
+		width: #{$width + 'px'}
+		height: #{$height + 'px'}
+		background-image: url("../smileys/smilies.png?v1")
+		@include animation(#{'play-'+ $name}, $time, $steps)
+	@include play(-webkit-, #{'play-'+ $name}, $y, $width, $steps)
+
+@mixin drop-padding($top, $left)
+	padding: $top + 1px $left - 1px $top - 1px $left + 1px

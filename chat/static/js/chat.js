@@ -115,7 +115,7 @@ var SmileyUtil = function () {
 	self.smileyDict = {};
 	self.init = function () {
 		document.addEventListener("click", self.onDocClick);
-		doGet(SMILEYS_JSON_URL, self.loadSmileys);
+		self.loadSmileys(window.smileys_bas64_data);
 	};
 	self.hideSmileys = function() {
 		CssUtils.hideElement(self.dom.smileParentHolder);
@@ -172,7 +172,8 @@ var SmileyUtil = function () {
 	};
 
 	self.loadSmileys = function (jsonData) {
-		var smileyData = JSON.parse(jsonData);
+		//var smileyData = JSON.parse(jsonData);
+		var smileyData = jsonData;
 		for (var tab in smileyData) {
 			if (smileyData.hasOwnProperty(tab)) {
 				var tabRef = document.createElement('div');
@@ -191,7 +192,7 @@ var SmileyUtil = function () {
 				for (var smile in tabSmileys) {
 					if (tabSmileys.hasOwnProperty(smile)) {
 						var fileRef = document.createElement('IMG');
-						var fullSmileyUrl = SMILEY_URL + tab + '/' + tabSmileys[smile];
+						var fullSmileyUrl = "data:image/gif;base64," + tabSmileys[smile];
 						fileRef.setAttribute("src", fullSmileyUrl);
 						fileRef.setAttribute("alt", smile);
 						tabRef.appendChild(fileRef);
@@ -830,7 +831,6 @@ var WebRtcApi = function () {
 		}
 	};
 	self.webRtcReceivers = {};
-	var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
 
 	self.getTrack = function (isVideo) {
 		var track = null;
@@ -1072,6 +1072,11 @@ var WebRtcApi = function () {
 		self.setAudio(self.getTrack(false) != null);
 	};
 	self.init = function() {
+		// if (typeof RTCPeerConnection  == 'undefined' && typeof mozRTCPeerConnection == 'undefined' && typeof webkitRTCPeerConnection == 'undefined') {
+		// 	growlError(getText("Unfortunately {} doesn't support webrtc. Video/audio call is unuvailable", browserVersion));
+		// 	return;
+		// }
+		var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
 		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
 		self.pc.onaddstream = function (event) {
 			self.setVideoSource(self.dom.remote, event.stream);

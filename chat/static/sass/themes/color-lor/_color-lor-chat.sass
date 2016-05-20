@@ -1,0 +1,54 @@
+@import "../../partials/mixins"
+@import "../../partials/mixins"
+
+.color-lor
+	.icon-girl,
+	.icon-man:hover,
+	.icon-user-secret
+		&:hover
+			color: #C9C9AA !important
+
+	.message-header-others 		
+		color: #729fcf
+	.message-header-private
+		color: #8ae234
+	.message-header-self
+		color: #e29722
+	.message-header-system
+		color: #9DD3DD
+
+	#userSendMessageTo
+		@include box-shadow(0 2px 2px rgba(6, 3, 8, 0.77))
+		border: 1px solid #101D07
+
+	div[contenteditable]
+		@include box-shadow(0 1px 2px rgba(0,0,0,0.83) inset,0 -1px 0 rgba(0,0,0,0.66) inset)
+
+	fieldset legend
+		color: #9DD3DD
+
+	.green-btn
+		background-color: #0E560C
+	.red-btn
+		background-color: #910000
+
+	.activeTab
+		color: #fcaf3e
+
+	// call container
+	.active-call-user
+		background-color: #386D63
+	.modal-body
+		background: #282923
+	#callContainerHeader
+		background-color: #42433B
+	.callContainerIcons
+		color: darkgreen
+	#callUserList
+		background-color: #343A3B
+	.finish-call-icon
+		color: #910000
+	.answerButtons div
+		padding-top: 5px
+
+	// end call container
