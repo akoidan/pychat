@@ -56,6 +56,10 @@
 	border-top: $value
 	border-left: $value
 
+@mixin right-bottom-border($value...)
+	border-right: $value
+	border-bottom: $value
+
 @mixin play($prefix, $name, $y, $width, $steps)
 	//#{'@' + $prefix + 'keyframes'} $name
 	@-webkit-keyframes #{$name}

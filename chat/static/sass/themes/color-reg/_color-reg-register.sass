@@ -1,0 +1,25 @@
+@import "../../partials/mixins"
+
+.color-reg
+	.forg-pass
+		color: #249BA3
+
+	input[type=submit].disabled
+		@include linear-gradient(#434343, #434343)
+		background-color: #303030
+		&:active
+			background-image: none
+
+	.submit-button
+		width: 100%
+		border-radius: 5px
+		border: 1px solid #000
+
+	.reg-log-container
+		input:active, select:active
+			padding-top: 16px
+			padding-bottom: 14px
+		[class^='icon-']
+			opacity: 1
+			text-shadow: none
+			cursor: auto
