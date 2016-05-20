@@ -14,31 +14,40 @@ Get dependencies:
  1. *Python2.7* or *Python 3.x* both are supported
  2. *pip* for getting dependencies
  3. *redis* for holding session and pubsub messages
- 4. Get python packages
- 4. Create the database
- 6. Copy static content (audio, fonts...)
+ 4. *sass* to compiling css
+ 5. Get python packages
+ 6. Create the database
+ 7. Copy static content (audio, fonts...)
 
 Windows:
  1. Install [python](https://www.python.org/downloads/) with pip 
  2. Add pip and python to PATH variable
- 3. Install [redis](https://github.com/rgl/redis/downloads) 
- 4. Add git's bash commands (for example "C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin") to PATH variable
+ 3. Install [redis](https://github.com/rgl/redis/downloads)
+ 4. Install [ruby](http://rubyinstaller.org/) and run `gem install sass` from command line as admin. Add sass command path to PATH variable
+ 5. Add git's bash commands (for example "C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin") to PATH variable
 
 Ubuntu:
  1. `apt-get install python`
  2. `apt-get install pip`
  3. `add-apt-repository -y ppa:rwky/redis` `apt-get install -y redis-server`
+ 4. `apt-get install ruby`, `gem install sass`
 
 Archlinux:
  1. `pacman -S python`
  2. `pacman -S pip`
  3. `pacman -S community/redis`
+ 4. `pacman -S ruby`, `gem install sass`
 
 Next steps are common:
  1. `pip install -r requirements.txt`
  2. `python manage.py init_db`
  3. `sh download_content.sh`
 
+To configure pycharm to autocompile css:
+ 1. arguments: --no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded
+ 2. working directory: $ProjectFileDir$/chat/static/sass
+ 3. output files to refresh: $ProjectFileDir$/chat/static/css/
+ 
 Start the chat:
 ==============
  1. Start session holder: `redis-server`
@@ -90,32 +99,3 @@ Start the chat:
 * USE init or on_open
 * add chat rooms
 * allow selecting username in navbar, remove selecting cursor 
-
-
-#SASS
- arguments: --no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/sass.css
- working directory: $ProjectFileDir$/sass
- output files to refresh: $ProjectFileDir$/chat/static/css/sass.css
- 
-# SASS  questions
-   Can I minify inputs here?
-       select,
-        textarea,
-        div[contenteditable],
-        input[type=text], input[type=password],input [type=email], input[type=date]
-   How to move selector into mixing
-        @mixin inputs()
-            select,
-            textarea,
-            div[contenteditable],
-            input[type=text], input[type=password],input [type=email], input[type=date]
-   Is there a sass workouround withotu code duplicaiton to  deal with selector that contain invalid selector for firefox:
-        button,
-        input[type=file]::-webkit-file-upload-button {
-          background:red;
-        }
-      this selector won't work even for button in firefox
-
-Sprite
-convert -layers dispose 0001.gif out1.gif
-montage temp.gif -tile x1 -geometry '1x1+0+0<' -alpha On -background "rgba(0, 0, 0, 0.0)" -quality 100 loading_1.png
