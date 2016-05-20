@@ -45,6 +45,9 @@ declare -a files=(\
     "$CSS_DIR/main.css" \
     "$CSS_DIR/chat.css"\
     "$CSS_DIR/register.css"\
+    "$JS_DIR/amcharts.js"\
+    "$JS_DIR/amcharts-pie.js"\
+    "$JS_DIR/amcharts-dark.js"\
 )
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do

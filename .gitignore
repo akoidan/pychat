@@ -23,6 +23,7 @@ example
 sessionsids.txt
 chat/static/css/base.css
 chat/static/css/variables.css
+chat/static/css/register.css
 chat/static/css/mixins.css
 chat/static/css/main.css
 chat/static/css/*.map
@@ -32,3 +33,6 @@ chat/static/valentine
 chat/static/css/chat.css
 redis-3.2.0-rc3
 chat/static/js/smileys_data.js
+chat/static/js/amcharts.js
+chat/static/js/amcharts-pie.js
+chat/static/js/amcharts-dark.js
