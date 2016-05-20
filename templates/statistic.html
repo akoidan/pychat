@@ -1,10 +1,9 @@
 {% extends "base.html" %}
 {% block head %}
 	{% load md5url %}
-	<script src="https://www.amcharts.com/lib/3/amcharts.js"></script>
-	<script src="https://www.amcharts.com/lib/3/pie.js"></script>
-	<script src="https://www.amcharts.com/lib/3/themes/dark.js"></script>
-	<link rel="stylesheet" type="text/css" href="{% md5url 'css/statistic.css' %}">
+	<script src="{% md5url 'js/amcharts.js' %}"></script>
+	<script src="{% md5url 'amcharts-pie.js' %}"></script>
+	<script src="{% md5url 'amcharts-dark.js' %}"></script>
 	<script type="text/javascript">
 		var dataProvider = {% autoescape off %} {{ dataProvider}} {% endautoescape %};
 	</script>

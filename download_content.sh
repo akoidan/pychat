@@ -87,6 +87,9 @@ done
 curl -X GET http://dbushell.github.io/Pikaday/css/pikaday.css -o "$CSS_DIR/pikaday.css"
 curl -X GET https://raw.githubusercontent.com/dbushell/Pikaday/master/pikaday.js -o "$JS_DIR/pikaday.js"
 curl -X GET http://momentjs.com/downloads/moment.js -o "$JS_DIR/moment.js"
+curl -X GET https://www.amcharts.com/lib/3/amcharts.js -o "$JS_DIR/amcharts.js"
+curl -X GET https://www.amcharts.com/lib/3/pie.js -o "$JS_DIR/amcharts-pie.js"
+curl -X GET https://www.amcharts.com/lib/3/themes/dark.js -o "$JS_DIR/amcharts-dark.js"
 
 
 #wget http://jscolor.com/release/jscolor-1.4.4.zip -P $TMP_DIR && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR
