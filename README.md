@@ -37,6 +37,7 @@ Start the chat:
  1. Open in browser http*s*://127.0.0.1
 
 # TODO 
+* shape-inside for contentteditable 
 * Disable suggestions in settings (growls)
 * Colored print in download_content.sh
 * Add multi-language support. 

@@ -478,13 +478,15 @@ function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncod
 	var userSuffix;
 	userSuffix = isPrefix ?  ' >> ' : ': ';
 	headSpan.insertAdjacentHTML('beforeend', userSuffix);
-
-	var textSpan = document.createElement('span');
-	textSpan.className = contentStyleClass;
-	textSpan.innerHTML = htmlEncodedContent;
-
 	p.appendChild(headSpan);
-	p.appendChild(textSpan);
+	if (htmlEncodedContent.indexOf("<img") == 0) {
+		p.insertAdjacentHTML('beforeend', htmlEncodedContent);
+	} else {
+		var textSpan = document.createElement('span');
+		textSpan.className = contentStyleClass;
+		textSpan.innerHTML = htmlEncodedContent;
+		p.appendChild(textSpan);
+	}
 	return p;
 }
 
