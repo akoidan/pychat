@@ -296,7 +296,7 @@ ALL_REDIS_ROOM = 'all'
 
 VALIDATION_IS_OK = 'ok'
 MAX_USERNAME_LENGTH = 16
-MAX_MESSAGE_SIZE = 10000
+MAX_MESSAGE_SIZE = 100000
 GENDERS = {0: 'Secret', 1: 'Male', 2: 'Female', }
 #
 DATE_INPUT_FORMATS = ('%Y-%m-%d',)  # html5 input date default format, see also Pikaday in js

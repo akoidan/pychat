@@ -42,6 +42,8 @@
 		</div>
 	</div>
 	<div class="fullwidth-padded" style="position: relative">
+		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
+		<i class="icon-picture" title="Add a picture" onclick="$('imgInput').click()"></i>
 		<div id="userSendMessageTo" class="hidden">
 			<div id="receiverId"></div>
 			<i class="icon-cancel" onclick="hideUserSendToName();"></i>

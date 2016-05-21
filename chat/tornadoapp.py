@@ -18,6 +18,8 @@ from django.db.models import Q
 from redis_sessions.session import SessionStore
 from tornado.websocket import WebSocketHandler
 
+from chat.utils import extract_photo
+
 try:
 	from urllib.parse import urlparse  # py2
 except ImportError:
@@ -44,6 +46,7 @@ USER_ID_VAR_NAME = 'userId'
 TIME_VAR_NAME = 'time'
 OLD_NAME_VAR_NAME = 'oldName'
 CONTENT_VAR_NAME = 'content'
+IMG_VAR_NAME = 'image'
 EVENT_VAR_NAME = 'action'
 GENDER_VAR_NAME = 'sex'
 
@@ -108,15 +111,6 @@ class MessagesCreator(object):
 	@classmethod
 	def create_send_message(cls, message):
 		"""
-		:type message: Message
-		"""
-		result = cls.get_message(message)
-		result[EVENT_VAR_NAME] = SEND_MESSAGE_EVENT
-		return result
-
-	@classmethod
-	def get_message(cls, message):
-		"""
 		:param message:
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
 		"sex": "Alien", "user": "tRD6emzs", "time": "20:48:57"}
@@ -127,7 +121,10 @@ class MessagesCreator(object):
 			CONTENT_VAR_NAME: message.content,
 			TIME_VAR_NAME: message.time,
 			MESSAGE_ID_VAR_NAME: message.id,
+			EVENT_VAR_NAME: SEND_MESSAGE_EVENT
 		}
+		if message.img.name is not None:
+			result[IMG_VAR_NAME] = message.img.url
 		if message.receiver is not None:
 			result[RECEIVER_USERID_VAR_NAME] = message.receiver.id
 			result[RECEIVER_USERNAME_VAR_NAME] = message.receiver.username
@@ -270,7 +267,13 @@ class MessagesHandler(MessagesCreator):
 		receiver_id = message.get(RECEIVER_USERID_VAR_NAME)  # if receiver_id is None then its a private message
 		self.logger.info('!! Sending message %s to user with id %s', content, receiver_id)
 		receiver_channel = REDIS_USERID_CHANNEL_PREFIX % receiver_id
-		message_db = Message(sender_id=self.user_id, content=content, receiver_id=receiver_id)
+		message_db = Message(
+			sender_id=self.user_id,
+			content=content,
+			receiver_id=receiver_id,
+		)
+		if IMG_VAR_NAME in message:
+			message_db.img = extract_photo(message[IMG_VAR_NAME])
 		self.do_db(message_db.save)  # exit on hacked id with exception
 		prepared_message = self.create_send_message(message_db)
 		if receiver_id is None:
@@ -397,12 +400,14 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				raise ValidationError('Skipping message %s, as websocket is not initialized yet' % json_message)
 			if not json_message:
 				raise ValidationError('Skipping null message')
-			self.anti_spam.check_spam(json_message)
+			# self.anti_spam.check_spam(json_message)
 			self.logger.debug('<< %s', json_message)
 			message = json.loads(json_message)
+			if not message[EVENT_VAR_NAME] in self.process_message:
+				raise ValidationError("event {} is unknown".format(message[EVENT_VAR_NAME]))
 			self.process_message[message[EVENT_VAR_NAME]](message)
 		except ValidationError as e:
-			self.logger.warning("Message won't be send. Reason: %s", e.message)
+			self.logger.warning("Message won't be send, because : %s", e.message)
 			self.safe_write(self.default(str(e.message), event=GROWL_MESSAGE_EVENT))
 
 	def on_close(self):

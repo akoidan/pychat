@@ -22,6 +22,10 @@ fieldset
 		font-weight: bold
 		color: #9DD3DD
 
+
+.message-img-holder
+	display: block
+
 p
 	margin-top: 0.8em
 	margin-bottom: 0.8em
@@ -41,6 +45,10 @@ p
 
 	a:hover
 		text-decoration: underline
+
+	img
+		max-width: 100%
+		max-height: 300px
 
 #chat-room-users-wrapper
 	float: right
@@ -133,6 +141,14 @@ p
 	top: 1px
 	height: 16px
 
+.icon-picture
+	display: inline
+	float: right
+	position: absolute
+	left: 6px
+	top: 2px
+	height: 16px
+
 #chatbox img, #usermsg img
 	margin-top: -17px
 	margin-bottom: -10px
@@ -156,6 +172,7 @@ p
 
 #usermsg
 	margin-left: 4px
+	padding-left: 25px // after pic-image
 	padding-right: 20px // before smiley
 	max-height: 200px
 

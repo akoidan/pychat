@@ -98,8 +98,26 @@ onDocLoad(function () {
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
 	smileyUtil.init();
+	$('imgInput').onchange = handleFileSelect;
 });
 
+var handleFileSelect = function (evt) {
+	var files = evt.target.files;
+	var file = files[0];
+	if (files && file) {
+		var reader = new FileReader();
+		reader.onload = function (readerEvt) {
+			var binaryString = readerEvt.target.result;
+			sendMessage({
+				image: getText("data:{};base64,{}",file.type, btoa(binaryString)),
+				content: null,
+				action: 'send'
+			});
+			$('imgInput').value = "";
+		};
+		reader.readAsBinaryString(file);
+	}
+};
 
 function showHelp() {
 	growlInfo(infoMessages[Math.floor(Math.random() * infoMessages.length)]);
@@ -266,12 +284,8 @@ function keyDownLoadUp(e) {
 }
 
 
-function sendMessage(messageContent) {
+function sendMessage(messageRequest) {
 // anonymous is set by name, registered user is set by id.
-	var messageRequest = {
-		content: messageContent,
-		action: 'send'
-	};
 	if (destinationUserId != null) {
 		messageRequest['receiverId'] = destinationUserId;
 	}
@@ -295,7 +309,10 @@ function checkAndSendMessage(event) {
 		// http://stackoverflow.com/questions/6014702/how-do-i-detect-shiftenter-and-generate-a-new-line-in-textarea
 		// Since messages are sent by pressing enter, enter goes inside of textarea after sending
 
-		sendMessage(messageContent);
+		sendMessage({
+			content: messageContent,
+			action: 'send'
+		});
 	} else if (event.keyCode === 27) { // 27 = escape
 		smileyUtil.hideSmileys();
 	}
@@ -565,7 +582,12 @@ function printMessage(data) {
 	} else {
 		headerStyle = othersHeaderClass;
 	}
-	var preparedHtml = smileyUtil.encodeSmileys(data['content']);
+	var preparedHtml;
+	if (data.image) {
+		preparedHtml = getText("<img src=\'{}\'/>", data.image);
+	} else {
+		preparedHtml = smileyUtil.encodeSmileys(data['content']);
+	}
 	displayPreparedMessage(headerStyle, data['time'], preparedHtml, displayedUsername, prefix, receiverId);
 }
 
@@ -1210,11 +1232,12 @@ function webSocketMessage(message) {
 
 function sendToServer(messageRequest) {
 	var jsonRequest = JSON.stringify(messageRequest);
+	var logEntry = jsonRequest.substring(0, 500);
 	if (ws.readyState !== WebSocket.OPEN) {
-		console.warn(getDebugMessage("Web socket is closed. Can't send {}", jsonRequest));
+		console.warn(getDebugMessage("Web socket is closed. Can't send {}", logEntry));
 		return false;
 	} else {
-		console.log(getDebugMessage("WS out: {} ", jsonRequest));
+		console.log(getDebugMessage("WS out: {} ", logEntry));
 		ws.send(jsonRequest);
 		return true;
 	}
