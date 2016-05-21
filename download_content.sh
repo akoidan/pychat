@@ -2,7 +2,7 @@
 
 CONF_REPOSITORY="https://github.com/Deathangel908/djangochat-config"
 
-CONF_VERSION='546113b61307fe91200d7c4607b85873d04d9b1e'
+CONF_VERSION='33a87eee41b1956c2a0eb3452d81a52a66b825a3'
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
@@ -80,8 +80,7 @@ sass_files=($(ls "$SASS_DIR"/*.sass))
 
 for i in "${sass_files[@]}"
 do
-    b=$(basename $i)
-    name_no_ext="${b:0:-5}"
+    name_no_ext=$(basename $i .sass)
     sass --no-cache --update "$i":"$CSS_DIR/$name_no_ext.css" --style compressed
 done
 

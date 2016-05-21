@@ -22,7 +22,7 @@ const genderIcons = {
 	'Secret': 'icon-user-secret'
 };
 
-var imgRegex = /<img[^>]*alt="([^"]+)"[^>]*>/g;
+var smileRegex = /<img[^>]*code="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
 var destinationUserId = null;
@@ -141,13 +141,9 @@ var SmileyUtil = function () {
 	};
 	self.encodeSmileys = function (html) {
 		html = encodeAnchorsHTML(html);
-		for (var el in self.smileyDict) {
-			if (self.smileyDict.hasOwnProperty(el)) {
-				// replace all occurences
-				// instead of replace that could generates infinitive loop
-				html = html.split(el).join(self.smileyDict[el]);
-			}
-		}
+		html = html.replace(window.smileUnicodeRegex, function (s) {
+			return self.smileyDict[s];
+		});
 		return html;
 	};
 	self.toggleSmileys = function (event) {
@@ -192,9 +188,10 @@ var SmileyUtil = function () {
 				for (var smile in tabSmileys) {
 					if (tabSmileys.hasOwnProperty(smile)) {
 						var fileRef = document.createElement('IMG');
-						var fullSmileyUrl = "data:image/gif;base64," + tabSmileys[smile];
+						var fullSmileyUrl = "data:image/gif;base64," + tabSmileys[smile].base64;
 						fileRef.setAttribute("src", fullSmileyUrl);
-						fileRef.setAttribute("alt", smile);
+						fileRef.setAttribute("code", smile);
+						fileRef.setAttribute("alt", tabSmileys[smile].text_alt);
 						tabRef.appendChild(fileRef);
 						// http://stackoverflow.com/a/1750860/3872976
 						/** encode dict key, so {@link encodeSmileys} could parse smileys after encoding */
@@ -290,7 +287,7 @@ function sendMessage(messageContent) {
 function checkAndSendMessage(event) {
 	if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
 		event.preventDefault();
-		userMessage.innerHTML = userMessage.innerHTML.replace(imgRegex, "$1");
+		userMessage.innerHTML = userMessage.innerHTML.replace(smileRegex, "$1");
 		var messageContent = userMessage.textContent;
 		if (blankRegex.test(messageContent)) {
 			return;
