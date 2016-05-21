@@ -403,7 +403,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			# self.anti_spam.check_spam(json_message)
 			self.logger.debug('<< %s', json_message)
 			message = json.loads(json_message)
-			if not message[EVENT_VAR_NAME] in self.process_message:
+			if message[EVENT_VAR_NAME] not in self.process_message:
 				raise ValidationError("event {} is unknown".format(message[EVENT_VAR_NAME]))
 			self.process_message[message[EVENT_VAR_NAME]](message)
 		except ValidationError as e:

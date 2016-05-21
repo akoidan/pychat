@@ -46,9 +46,11 @@ p
 	a:hover
 		text-decoration: underline
 
-	img
-		max-width: 100%
+	img:not([code])
+		max-width: calc(100% - 25px)
 		max-height: 300px
+		display: block
+		margin: 5px 0 0 15px
 
 #chat-room-users-wrapper
 	float: right
@@ -149,7 +151,7 @@ p
 	top: 2px
 	height: 16px
 
-#chatbox img, #usermsg img
+#chatbox img[code], #usermsg img[code]
 	margin-top: -17px
 	margin-bottom: -10px
 	background-color: rgba(255, 255, 255, 0)

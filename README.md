@@ -57,6 +57,7 @@ Start the chat:
  5. If you're using firefox you probably need to allow self-assigned certificate for development. Open https://localhost:8888 (8888 is API_PORT) and add security exception
 
 # TODO 
+* shape-inside for contentteditable 
 * Disable suggestions in settings (growls)
 * Colored print in download_content.sh
 * Add multi-language support. 
