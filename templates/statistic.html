@@ -2,8 +2,8 @@
 {% block head %}
 	{% load md5url %}
 	<script src="{% md5url 'js/amcharts.js' %}"></script>
-	<script src="{% md5url 'amcharts-pie.js' %}"></script>
-	<script src="{% md5url 'amcharts-dark.js' %}"></script>
+	<script src="{% md5url 'js/amcharts-pie.js' %}"></script>
+	<script src="{% md5url 'js/amcharts-dark.js' %}"></script>
 	<script type="text/javascript">
 		var dataProvider = {% autoescape off %} {{ dataProvider}} {% endautoescape %};
 	</script>
