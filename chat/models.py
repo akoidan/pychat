@@ -12,6 +12,15 @@ from chat.log_filters import id_generator
 from chat.settings import GENDERS, DEFAULT_PROFILE_ID
 
 
+def get_random_path(instance, filename):
+	"""
+	:param filename base string for generated name
+	:return: a unique string filename
+	"""
+	ext = filename.split('.')[-1]
+	return "%s.%s" % (uuid.uuid4(), ext)
+
+
 class User(AbstractBaseUser):
 	def get_short_name(self):
 		return self.username
@@ -83,15 +92,6 @@ class Verification(models.Model):
 
 
 class UserProfile(User):
-
-	def get_file_path(self, filename):
-		"""
-		:param filename base string for generated name
-		:return: a unique string filename
-		"""
-		ext = filename.split('.')[-1]
-		return "%s.%s" % (uuid.uuid4(), ext)
-
 	name = CharField(max_length=30, null=True)
 
 	surname = CharField(max_length=30, null=True)
@@ -101,7 +101,7 @@ class UserProfile(User):
 	birthday = DateField(null=True)
 	contacts = CharField(max_length=100, null=True)
 	# fileField + <img instead of ImageField (removes preview link)
-	photo = FileField(upload_to=get_file_path, null=True)
+	photo = FileField(upload_to=get_random_path, null=True)
 	# TODO, save theme in profile? theme_name = CharField(max_length=16, null=True)
 
 	email_verification = models.ForeignKey(Verification, null=True)
@@ -140,8 +140,8 @@ class Message(models.Model):
 	room = models.ForeignKey(Room, null=True)
 	# DateField.auto_now
 	time = models.BigIntegerField(default=get_milliseconds)
-	content = models.TextField()
-	is_raw = models.BooleanField(default=True, null=False)
+	content = models.TextField(null=True)
+	img = FileField(upload_to=get_random_path, null=True)
 	receiver = models.ForeignKey(User, null=True, related_name='receiver')
 
 
