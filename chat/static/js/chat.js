@@ -73,6 +73,24 @@ if (isFirefox) {
 	RTCIceCandidate = mozRTCIceCandidate;
 }
 
+var infoMessages = [
+	"Every time you join chat it will show you this help messages. You can disable them in you profile settings. To hide them just simply chlick on theirs background",
+	"You can change chat appearence in your profile. Change theme to simple if you like.",
+	"Did you know that you could paste multiple lines content by simply pressing shift+Enter?",
+	"You can add smileys by clicking on bottom right icon. To close the smile container click outside of it or press escape",
+	"You can send direct message to user just by clicking on username in user list or in messages. After his username appears in the left bottom " +
+			"corner and your messages become green. To send messages to all you should click on X right by username",
+	"You can also comment somebody's message. This will be shown to all users in current channel. Just click on message" +
+			"and it's content appears in message text",
+	"You have a feature to suggest or you lack some functionality? Click on purple pencil icon on top menu and write your " +
+			"suggestion there",
+	"Chat uses your browser cache to store messages. If you want to clear history and all cached messages just click " +
+	"on red Floppy drive icon on the top menu",
+	"You can view userprofile by clicking on icon left by username in user list. To edit your profile you need to register" +
+	"and click on light green wrench icon on the top right corner",
+	"You can change your randomly generated username by clicking on it on top menu"
+];
+
 onDocLoad(function () {
 	chatBoxDiv = $("chatbox");
 	userMessage = $("usermsg");
@@ -120,7 +138,18 @@ var handleFileSelect = function (evt) {
 };
 
 function showHelp() {
-	growlInfo(infoMessages[Math.floor(Math.random() * infoMessages.length)]);
+	if (suggestions) {
+		var index = localStorage.getItem('HelpIndex');
+		if (index == null) {
+			index = 0;
+		} else {
+			index = parseInt(index);
+		}
+		if (index < infoMessages.length) {
+			growlInfo(infoMessages[index]);
+			localStorage.setItem('HelpIndex', index + 1);
+		}
+	}
 }
 
 
@@ -1268,8 +1297,7 @@ function loadUpHistory(count) {
 // OH man be carefull with this method, it should reinit history
 function clearLocalHistory() {
 	headerId = null;
-	localStorage.removeItem(STORAGE_NAME);
-	localStorage.removeItem(HISTORY_STORAGE_NAME);
+	localStorage.clear();
 	chatBoxDiv.innerHTML = '';
 	allMessages = [];
 	allMessagesDates = [];

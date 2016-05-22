@@ -11,6 +11,7 @@ var ajaxLoader;
 var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|$))/g; /*http://anycharacter except end of text, <br> or space*/
 var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
 var muteBtn;
+var currentPlayingAudio;
 const escapeMap = {
 	"&": "&amp;",
 	"<": "&lt;",
@@ -33,22 +34,6 @@ var volumeIcons = {
 	3: 'icon-volume-3'
 };
 var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
-
-var infoMessages = [
-	"Did you know that you could paste multiple lines content by simply pressing shift+Enter?",
-	"You can add smileys by clicking on bottom right icon. To close the smile container click outside of it or press escape",
-	"You can send direct message to user just by clicking on username in user list or in messages. After his username appears in the left bottom " +
-			"corner and your messages become green. To send messages to all you should click on X right by username",
-	"You can also comment somebody's message. This will be shown to all users in current channel. Just click on message" +
-			"and it's content appears in message text",
-	"You have a feature to suggest or you lack some functionality? Click on purple pencil icon on top menu and write your " +
-			"suggestion there",
-	"Chat uses your browser cache to store messages. If you want to clear history and all cached messages just click " +
-	"on red Floppy drive icon on the top menu",
-	"You can view userprofile by clicking on icon left by username in user list. To edit your profile you need to register" +
-	"and click on light green wrench icon on the top right corner",
-	"You can change your randomly generated username by clicking on it on top menu"
-];
 
 var $ = function (id) {
 	return document.getElementById(id);

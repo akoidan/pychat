@@ -102,6 +102,7 @@ class UserProfile(User):
 	contacts = CharField(max_length=100, null=True)
 	# fileField + <img instead of ImageField (removes preview link)
 	photo = FileField(upload_to=get_random_path, null=True)
+	suggestions = BooleanField(null=False, default=True)
 	# TODO, save theme in profile? theme_name = CharField(max_length=16, null=True)
 
 	email_verification = models.ForeignKey(Verification, null=True)
