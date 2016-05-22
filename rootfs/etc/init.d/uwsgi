@@ -29,6 +29,8 @@ prog="uwsgi"
 lockfile=/var/lock/subsys/$prog
 
 start() {
+    export LC_ALL='en_US.utf8'
+    export LANG='en_US.utf8'
     nohup /usr/bin/uwsgi --ini /root/djangochat/uwsgi.ini > /root/djangochat/log/uwsgi.log 2>&1 &
     echo -n $"Starting $prog: "
     # if not running, start it up here, usually something like "daemon $exec"
