@@ -8,6 +8,7 @@
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 	<script>
 		const loggedUser = "{{ username }}";
+		var suggestions = {{ suggestions |yesno:"true,false" }};
 	</script>
 {% endblock head %}
 {% block navbar %}

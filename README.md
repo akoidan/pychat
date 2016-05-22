@@ -1,9 +1,12 @@
 ![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7--1.9-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/djangochat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/djangochat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/djangochat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/djangochat)
 
-Web chat based on WebSockets.
-================================================
+What is it?
+==============
+This is free web (browser) chat. It allows users send instant text messages or images, make video/audio calls and other useful stuff.
 
-Basically written in **Python** with [django](https://www.djangoproject.com/) it uses asynchronous web framework [Tornado](http://www.tornadoweb.org/) for handling realtime messages. Broadcasting messages are being sent by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using Python [tornado-redis](https://github.com/leporo/tornado-redis) backend. It can be run on both **Windows** and **Linux** and tested on **Python 2.7** and **Python 3.x**
+How it works?
+==============
+Chat is written in **Python** with [django](https://www.djangoproject.com/). It uses [WebSockets](https://en.wikipedia.org/wiki/WebSocket) in client (browser) and asynchronous web framework [Tornado](http://www.tornadoweb.org/) in server for handling realtime messages. Messages are being broadcast by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using Python [tornado-redis](https://github.com/leporo/tornado-redis) backend. For video call [webrtc](https://webrtc.org/) technology was used with stun server to make a connection, which means you will always get the lowest ping and the best possible connection channel. Client part (browser) doesn't use any javascript frameworks (like jquery or datatables) in order to get best performance. Css is compiled from [sass](http://sass-lang.com/guide). Server side can be run on any platform **Windows**, **Linux**, **Mac** with **Python 2.7** and **Python 3.x**, when the clients can join chat with any websocket base platform: IE11, Edge, Chrome, Firefox, Android, Opera, Safari...
 
 [Live demo](http://pychat.org/)
 ================
@@ -38,25 +41,19 @@ Start the chat:
 
 # TODO 
 * shape-inside for contentteditable 
-* Disable suggestions in settings (growls)
 * Colored print in download_content.sh
 * Add multi-language support. 
-* Display current keyboard layout in upper right corner as steam
 * Move clear cache icon from nav to settings
-* max-width for .reg-container doesn't set current width to max (300px) when there's enought free space
 * http://jsfiddle.net/JnrvG/1/
 * add email confirmation for username or password change
-* add image upload
 * remember if user has camera/mic and autoset values after second call
 * android play() can only be initiated by a user gesture.
 * transfer file to another user
 * insecure images on usermessage editable div prevent sending messages
-* add "Don't show hints anymore" option
 * add 404page
 * https://code.djangoproject.com/ticket/25489
 * http://stackoverflow.com/a/18843553/3872976
 * refactor set class name for css instead of settings css
-* add multipart smileys
 * add canvas images 
 * add antispam system
 * add http://www.amcharts.com/download/ to chart spam or user s  tatistic info
@@ -65,17 +62,14 @@ Start the chat:
 * move loading messages on startup to single function? 
 * add antiflood settings to nginx
 * tornado redis connection reset prevents user from deleting its entry in online_users
-* saving all messages in localstorage slows browser repsonsivness 
 * run tornado via nginx http://tornado.readthedocs.org/en/latest/guide/running.html
 * fixme tornado logs messages to chat.log when messages don't belong to tornadoapp.p
-* force users to register
 * add media query for register and usersettings to adjust for phone's width
 * add change password and realtime javascript to change_profile
 * local storage can store another user messasges in case of logout ?
 * file upload http://stackoverflow.com/a/14605593/3872976
 * add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis http://michal.karzynski.pl/blog/2014/05/18/setting-up-an-asynchronous-task-queue-for-django-using-celery-redis/
 * create tornado class in tornadoapp, put there all tornado logic
-* change anonymous message color
 *  check if there are new messages after connection lost compare to `localStorage` last message?
  also check id when appedning message to top to prevent double fire issue, append message to bottom if user went offline
 * USE init or on_open
