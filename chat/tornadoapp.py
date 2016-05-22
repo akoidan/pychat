@@ -123,7 +123,7 @@ class MessagesCreator(object):
 			MESSAGE_ID_VAR_NAME: message.id,
 			EVENT_VAR_NAME: SEND_MESSAGE_EVENT
 		}
-		if message.img.name is not None:
+		if message.img.name:
 			result[IMG_VAR_NAME] = message.img.url
 		if message.receiver is not None:
 			result[RECEIVER_USERID_VAR_NAME] = message.receiver.id
