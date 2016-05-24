@@ -30,8 +30,8 @@
 		</div>{% comment %}tabindex allows focus, focus allows keydown binding event{% endcomment %}
 		<div id="chat-room-users-wrapper" class="very-small-screen">
 			<ul id="user-context-menu" class="hidden">
-				<li onclick="alert('not implemented')">Call</li>
-				<li onclick="alert('not implemented')">Transfer file</li>
+				<li onclick="userTable.call()">Call</li>
+				<li onclick="growlError('not implemented')">Transfer file</li>
 				<li onclick="userTable.viewProfile()">View profile</li>
 			</ul>
 			<ul id="chat-user-table">

@@ -132,10 +132,28 @@ function UserContext() {
 	self.viewProfile = function() {
 		window.open(getText('/profile/{}', self.dom.activeUserContext.getAttribute('userid')), '_blank');
 	};
+	self.getActiveUserId = function() {
+		return self.dom.activeUserContext.getAttribute('userid');
+	};
+	self.getActiveUsername = function() {
+		return self.dom.activeUserContext.textContent;
+	};
+	self.call = function() {
+		if (self.getActiveUsername() != loggedUser) {
+			webRtcApi.showCallDialog();
+			webRtcApi.receiverId = parseInt(self.getActiveUserId());
+			webRtcApi.receiverName = self.getActiveUsername();
+			webRtcApi.callPeople();
+		} else {
+			growlError("You can't call yourself");
+		}
+	};
 	self.dom.activeUserContext = null;
 	self.showContextMenu = function (e) {
 		var li = e.target;
-		if (li.tagName != 'LI') {
+		if (li.tagName == 'I') {
+			li = li.parentElement;
+		} else if (li.tagName != 'LI') {
 			return;
 		}
 		if (self.dom.activeUserContext != null) {
