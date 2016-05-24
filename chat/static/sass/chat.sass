@@ -61,13 +61,48 @@ p
 	min-width: 200px
 	text-overflow: ellipsis
 
-.user:hover
-	cursor: pointer
-	color: #B5B978
-	text-shadow: 0 0 3px #A2AC6D
+#user-context-menu
+	position: absolute
+	@include linear-gradient(#214341 , #193237)
+	z-index: 3
+	border-radius: 5px
+	font-size: 16px
+	color: #ACACAC
+	border: 1px solid #515151
+	@include box-shadow(3px 3px 3px rgba(6, 3, 8, 0.77))
 
-#chat-user-table > tbody > tr > td
-	padding: 0
+	ul
+		margin: 0
+		padding: 2px 0
+
+		li
+			padding: 2px 5px
+			&:hover
+				cursor: pointer
+				background-color: #0F201F
+				color: #c7c7c7
+				border-radius: 3px
+
+
+
+#chat-user-table
+	width: 100%
+	tr
+		opacity: 0.8
+		[class^='icon-']
+			opacity: 1
+		&:hover
+			background-color: #454545
+			cursor: pointer
+			opacity: 1
+		&.active
+			background-color: #214340
+		td
+			padding: 0
+			&:last-child
+				width: 100%
+			&:first-child a:before
+				margin-top: 3px
 
 #userSendMessageTo
 	position: relative
@@ -161,7 +196,6 @@ p
 
 #tabNames
 	margin: 0
-	list-style-type: none
 
 	> li
 		display: inline
@@ -269,7 +303,6 @@ p
 	font-size: 15px
 
 #callUserList > li
-	list-style-type: none
 	border-radius: 2px
 	margin-bottom: 2px
 	margin-right: 0

@@ -44,6 +44,7 @@ var chatIncoming;
 var chatOutgoing;
 var chatLogin;
 var chatLogout;
+var userContextMenu;
 // div for user list appending
 var chatUsersTable;
 // input type that contains text for sending message
@@ -103,6 +104,7 @@ onDocLoad(function () {
 	chatLogout = $("chatLogout");
 	receiverId = $("receiverId");
 	charRooms = $("rooms");
+	userContextMenu = $('user-context-menu');
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	window.addEventListener("blur", changeTittleFunction);
@@ -117,7 +119,21 @@ onDocLoad(function () {
 	smileyUtil = new SmileyUtil();
 	smileyUtil.init();
 	$('imgInput').onchange = handleFileSelect;
+	chatUsersTable.addEventListener('contextmenu', showContextMenu, false);
 });
+
+function showContextMenu(e) {
+	CssUtils.showElement(userContextMenu);
+	userContextMenu.style.top = e.clientY + "px";
+	userContextMenu.style.left = e.clientX + "px";
+	document.addEventListener("click", removeContextMenu);
+	e.preventDefault();
+}
+
+function removeContextMenu() {
+	CssUtils.hideElement(userContextMenu);
+	document.removeEventListener("click", removeContextMenu);
+}
 
 var handleFileSelect = function (evt) {
 	var files = evt.target.files;
@@ -447,7 +463,6 @@ function loadUsers(usernames) {
 			tdUser.setAttribute('name', userId);
 			tdUser.className = userNameClass;
 			tdUser.textContent = username;
-			tdUser.onclick = userClick;
 			tr.appendChild(tdIcon);
 			tr.appendChild(tdUser);
 

@@ -23,6 +23,14 @@
 		<audio id="chatLogout" src="{% md5url 'sounds/ChatLogout.wav' %}" preload="none"></audio>
 		<audio id="chatCall" src="{% md5url 'sounds/Call.mp3' %}" preload="none"></audio>
 	</div>
+	<div id="user-context-menu" class="hidden">
+		<ul>
+			<li>Send message</li>
+			<li>Call</li>
+			<li>Transfer file</li>
+			<li>View profile</li>
+		</ul>
+	</div>
 	<div id="wrapper" class="max-height-scrollable" style="position: relative">
 		<div id="chatbox" tabindex="0" onkeydown="keyDownLoadUp(event)">
 			<div>
