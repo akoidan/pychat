@@ -46,17 +46,17 @@ Next steps are common:
  3. `sh download_content.sh`
 
 For developing option you can also configure pycharm filewatcher to autocompile css:
- 1. arguments: --no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded
- 2. working directory: $ProjectFileDir$/chat/static/sass
- 3. output files to refresh: $ProjectFileDir$/chat/static/css/
+ 1. arguments: `--no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded`
+ 2. working directory: `$ProjectFileDir$/chat/static/sass`
+ 3. output files to refresh: `$ProjectFileDir$/chat/static/css/`
  
 Start the chat:
 ==============
  1. Start session holder: `redis-server`
  2. Start WebSocket listener: `python manage.py start_tornado`
  3. Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
- 4. Open in browser http*s*://127.0.0.1:8000
- 5. If you're using firefox you probably need to allow self-assigned certificate for development. Open https://localhost:8888 (8888 is API_PORT) and add security exception
+ 4. Open in browser [http*s*://127.0.0.1:8000](https://127.0.0.1:8000)
+ 5. If you're using firefox you probably need to allow self-assigned certificate for development. Open [https://localhost:8888](https://localhost:8888) (8888 is `API_PORT`) and add security exception
 
 # TODO 
 * TODO move contextmenu colors to theme.sass 
