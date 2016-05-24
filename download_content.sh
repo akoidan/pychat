@@ -49,6 +49,30 @@ declare -a files=(\
     "$JS_DIR/amcharts-pie.js"\
     "$JS_DIR/amcharts-dark.js"\
 )
+
+cd "$PROJECT_ROOT"
+
+compile_sass() {
+    if ! type "sass" > /dev/null; then
+     >&2 echo "You need to install sass to be able to use stylesheets"
+     exit 1
+    fi
+    sass_files=($(ls "$SASS_DIR"/*.sass))
+    echo "Compiling sass files: $sass_files"
+    cd "$SASS_DIR"
+    for i in "${sass_files[@]}"
+    do
+        name_no_ext=$(basename $i .sass)
+        sass --no-cache --update "$i":"$CSS_DIR/$name_no_ext.css" --style compressed
+    done
+    cd "$PROJECT_ROOT"
+}
+
+if [ $1 = "sass" ]; then
+    compile_sass
+    exit 0
+fi
+
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do
   if [ -f "$path" ]; then
@@ -60,8 +84,6 @@ done
 
 mkdir -pv "$TMP_DIR"
 
-cd "$PROJECT_ROOT"
-
 git clone "$CONF_REPOSITORY" "$TMP_DIR/chatconf"
 git --git-dir="$TMP_DIR/chatconf/.git" --work-tree="$TMP_DIR/chatconf/" checkout $CONF_VERSION
 cp -r "$TMP_DIR/chatconf/static" "$STATIC_PARENT"
@@ -71,18 +93,7 @@ mv "$CSS_DIR/fontello-codes.css" "$SASS_DIR/fontello/_fontello-codes.scss"
 mv "$CSS_DIR/fontello-ie7.css" "$SASS_DIR/fontello/_fontello-ie7.scss"
 mv "$CSS_DIR/fontello-ie7-codes.css" "$SASS_DIR/fontello/_fontello-ie7-codes.scss"
 
-if ! type "sass" > /dev/null; then
- >&2 echo "You need to install sass to be able to use stylesheets"
- exit 1
-fi
-
-sass_files=($(ls "$SASS_DIR"/*.sass))
-
-for i in "${sass_files[@]}"
-do
-    name_no_ext=$(basename $i .sass)
-    sass --no-cache --update "$i":"$CSS_DIR/$name_no_ext.css" --style compressed
-done
+compile_sass
 
 # datepicker
 # use curl since it's part of windows git bash
