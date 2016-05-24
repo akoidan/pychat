@@ -10,7 +10,6 @@ Chat is written in **Python** with [django](https://www.djangoproject.com/). It 
 [Live demo](http://pychat.org/)
 ================
 
-
 Get started:
 ================
 In order to run chat on you server you will need:
@@ -46,7 +45,7 @@ Next steps are common:
  2. `python manage.py init_db`
  3. `sh download_content.sh`
 
-For developing option you can also configure pycharm to autocompile css:
+For developing option you can also configure pycharm filewatcher to autocompile css:
  1. arguments: --no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded
  2. working directory: $ProjectFileDir$/chat/static/sass
  3. output files to refresh: $ProjectFileDir$/chat/static/css/
