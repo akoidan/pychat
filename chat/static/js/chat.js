@@ -11,7 +11,6 @@ const privateHeaderClass = 'message-header-private';
 const systemHeaderClass = 'message-header-system';
 const othersHeaderClass = 'message-header-others';
 const timeSpanClass = 'timeMess';
-const userNameClass = 'user';
 const contentStyleClass = 'message-text-style';
 
 const SYSTEM_USERNAME = 'System';
@@ -46,7 +45,6 @@ var chatLogin;
 var chatLogout;
 var userContextMenu;
 // div for user list appending
-var chatUsersTable;
 // input type that contains text for sending message
 var userMessage;
 // div that contains receiver id, icons, etc
@@ -67,7 +65,7 @@ var allMessagesDates = [];
 var onlineUsers = {};
 var webRtcApi;
 var smileyUtil;
-
+var userTable;
 var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
 if (isFirefox) {
 	RTCSessionDescription = mozRTCSessionDescription;
@@ -95,7 +93,6 @@ var infoMessages = [
 onDocLoad(function () {
 	chatBoxDiv = $("chatbox");
 	userMessage = $("usermsg");
-	chatUsersTable = $("chat-user-table");
 	chatUserRoomWrapper = $("chat-room-users-wrapper");
 	userSendMessageTo = $("userSendMessageTo");
 	chatIncoming = $("chatIncoming");
@@ -110,6 +107,8 @@ onDocLoad(function () {
 	window.addEventListener("blur", changeTittleFunction);
 	window.addEventListener("focus", changeTittleFunction);
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
+	userTable = new UserContext();
+	userTable.init();
 	start_chat_ws();
 	//bottom call loadMessagesFromLocalStorage(); s
 	showHelp();
@@ -119,20 +118,68 @@ onDocLoad(function () {
 	smileyUtil = new SmileyUtil();
 	smileyUtil.init();
 	$('imgInput').onchange = handleFileSelect;
-	chatUsersTable.addEventListener('contextmenu', showContextMenu, false);
 });
 
-function showContextMenu(e) {
-	CssUtils.showElement(userContextMenu);
-	userContextMenu.style.top = e.clientY + "px";
-	userContextMenu.style.left = e.clientX + "px";
-	document.addEventListener("click", removeContextMenu);
-	e.preventDefault();
-}
-
-function removeContextMenu() {
-	CssUtils.hideElement(userContextMenu);
-	document.removeEventListener("click", removeContextMenu);
+function UserContext() {
+	var self = this;
+	self.dom = {
+		chatUsersTable: $("chat-user-table"),
+		activeUserContext: null
+	};
+	self.init = function() {
+		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);
+	};
+	self.viewProfile = function() {
+		window.open(getText('/profile/{}', self.dom.activeUserContext.getAttribute('userid')), '_blank');
+	};
+	self.dom.activeUserContext = null;
+	self.showContextMenu = function (e) {
+		var li = e.target;
+		if (li.tagName != 'LI') {
+			return;
+		}
+		if (self.dom.activeUserContext != null) {
+			CssUtils.removeClass(self.dom.activeUserContext, 'active-user');
+		}
+		self.dom.activeUserContext =  li;
+		userContextMenu.style.top = li.offsetTop + li.clientHeight + "px";
+		CssUtils.addClass(self.dom.activeUserContext, 'active-user');
+		CssUtils.showElement(userContextMenu);
+		document.addEventListener("click", self.removeContextMenu);
+		e.preventDefault();
+	};
+	self.removeContextMenu = function() {
+		CssUtils.hideElement(userContextMenu);
+		document.removeEventListener("click", self.removeContextMenu);
+		CssUtils.removeClass(self.dom.activeUserContext, 'active-user');
+	};
+	self.loadUsers = function(usernames) {
+		if (!usernames) {
+			return;
+		}
+		onlineUsers = usernames;
+		if (!CssUtils.hasClass(webRtcApi.dom.callContainer, 'hidden')) {
+			webRtcApi.updateDomOnlineUsers();
+		}
+		console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
+		self.dom.chatUsersTable.innerHTML = null;
+		for (var username in usernames) {
+			if (usernames.hasOwnProperty(username)) {
+				var icon;
+				var gender = usernames[username].sex;
+				var userId = usernames[username].userId;
+				icon = document.createElement('i');
+				icon.className = genderIcons[gender];
+				var li = document.createElement('li');
+				li.appendChild(icon);
+				li.onclick = userClick;
+				li.innerHTML += username;
+				li.setAttribute('userid', userId);
+				li.setAttribute('name', username);
+				self.dom.chatUsersTable.appendChild(li);
+			}
+		}
+	}
 }
 
 var handleFileSelect = function (evt) {
@@ -300,12 +347,9 @@ function userClick(event) {
 	var target = event.target || event.srcElement;
 	CssUtils.showElement(userSendMessageTo);
 	// Empty sets display to none
-	receiverId.textContent = target.innerHTML; //destinationUserName
+	receiverId.textContent = target.textContent; //destinationUserName
 	userMessage.focus();
-	if (target.attributes.name != null) {
-		// icon click
-		destinationUserId = parseInt(target.attributes.name.value);
-	}
+	destinationUserId = parseInt(target.attributes.userid.value);
 }
 
 
@@ -424,54 +468,6 @@ function start_chat_ws() {
 	};
 }
 
-
-function getUserUrl(userId) {
-	return getText('/profile/{}', userId);
-}
-
-
-function loadUsers(usernames) {
-	if (!usernames) {
-		return;
-	}
-	onlineUsers = usernames;
-	if (!CssUtils.hasClass(webRtcApi.dom.callContainer, 'hidden')) {
-		webRtcApi.updateDomOnlineUsers();
-	}
-	console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
-	chatUsersTable.innerHTML = null;
-	var tbody = document.createElement('tbody');
-	chatUsersTable.appendChild(tbody);
-	for (var username in usernames) {
-		if (usernames.hasOwnProperty(username)) {
-			var icon;
-			var gender = usernames[username].sex;
-			var userId = usernames[username].userId;
-			if (userId === 0) {
-				icon = document.createElement('i');
-			} else {
-				icon = document.createElement('a');
-				icon.setAttribute('target', '_blank');
-				icon.setAttribute('href', getUserUrl(userId));
-			}
-			icon.className = genderIcons[gender];
-			var tr = document.createElement('tr');
-			var tdIcon = document.createElement('td');
-			tdIcon.appendChild(icon);
-
-			var tdUser = document.createElement('td');
-			tdUser.setAttribute('name', userId);
-			tdUser.className = userNameClass;
-			tdUser.textContent = username;
-			tr.appendChild(tdIcon);
-			tr.appendChild(tdUser);
-
-			tbody.appendChild(tr);
-		}
-	}
-}
-
-
 /** Inserts element in the middle if it's not there
  * @param time element
  * @returns Node element that follows the inserted one
@@ -510,12 +506,12 @@ function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncod
 
 	var userNameA = document.createElement('span');
 	userNameA.textContent = displayedUsername;
+	userNameA.textContent = displayedUsername;
 	if (displayedUsername !== SYSTEM_USERNAME) {
-		userNameA.className = userNameClass;
 		userNameA.onclick = userClick;
 	}
 	if (userId != null) {
-		userNameA.setAttribute('name', userId);
+		userNameA.setAttribute('userid', userId);
 	}
 	headSpan.insertAdjacentHTML('beforeend', ' ');
 	headSpan.appendChild(userNameA);
@@ -734,7 +730,7 @@ function saveMessageToStorage(objectItem, jsonItem) {
 
 function changeOnlineUsers(data) {
 	printRefreshUserNameToChat(data);
-	loadUsers(data.content);
+	userTable.loadUsers(data.content);
 }
 
 

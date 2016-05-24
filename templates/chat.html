@@ -23,23 +23,19 @@
 		<audio id="chatLogout" src="{% md5url 'sounds/ChatLogout.wav' %}" preload="none"></audio>
 		<audio id="chatCall" src="{% md5url 'sounds/Call.mp3' %}" preload="none"></audio>
 	</div>
-	<div id="user-context-menu" class="hidden">
-		<ul>
-			<li>Send message</li>
-			<li>Call</li>
-			<li>Transfer file</li>
-			<li>View profile</li>
-		</ul>
-	</div>
 	<div id="wrapper" class="max-height-scrollable" style="position: relative">
 		<div id="chatbox" tabindex="0" onkeydown="keyDownLoadUp(event)">
 			<div>
 			</div>
 		</div>{% comment %}tabindex allows focus, focus allows keydown binding event{% endcomment %}
 		<div id="chat-room-users-wrapper" class="very-small-screen">
-			<table id="chat-user-table">
-				<tr></tr>
-			</table>
+			<ul id="user-context-menu" class="hidden">
+				<li onclick="alert('not implemented')">Call</li>
+				<li onclick="alert('not implemented')">Transfer file</li>
+				<li onclick="userTable.viewProfile()">View profile</li>
+			</ul>
+			<ul id="chat-user-table">
+			</ul>
 			<div>
 				<span>#Channels <i class="icon-plus-squared" title="Create new channel" onclick="alert('not impl')"></i></span>
 				<div id="rooms">
