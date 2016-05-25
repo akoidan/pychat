@@ -1,30 +1,9 @@
-{% extends 'base.html' %}
-{% block head %}
-    <head>
-    <style>
-        table.biginputtext  td {
-        padding: 10px;
-        }
-    </style>
-    </head>
-{% endblock head %}
-{% block content %}
-	<div class="max-height-scrollable two-columns">
-		{#	if photo isn't uploaded yet #}
-		{% if form.instance.photo %}
-			<div class="col1" style="text-align: center">
-				<div class="padding10">
-					<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
-				</div>
-			</div>
-
-			<canvas style="display:none;"></canvas>
-		{% endif %}
-
-		<div class="padding10">
-			<table class="biginputtext" id="userProfileData">
-				{{ form.as_table }}
-			</table>
-		</div>
-	</div>
-{% endblock content %}
+{% if form.instance.photo %}
+<div class="padding10" style="display: inline-block; max-width: 1080px; max-height: 720px" >
+	<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth"
+		 style="max-width: calc(100vw - 250px); max-height: calc(100vh - 100px)">
+</div>
+{% endif %}
+<table class="biginputtext padding10" style="display: inline-block">
+	{{ form.as_table }}
+</table>

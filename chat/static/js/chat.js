@@ -130,7 +130,11 @@ function UserContext() {
 		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);
 	};
 	self.viewProfile = function() {
-		window.open(getText('/profile/{}', self.dom.activeUserContext.getAttribute('userid')), '_blank');
+		var url = getText('/profile/{}', self.dom.activeUserContext.getAttribute('userid'));
+		doGet(url, function(html) {
+			$('userProfileBody').innerHTML = html;
+			CssUtils.showElement($('userProfile'));
+		});
 	};
 	self.getActiveUserId = function() {
 		return self.dom.activeUserContext.getAttribute('userid');
@@ -801,7 +805,6 @@ var WebRtcApi = function () {
 		callSound: $('chatCall'),
 		callIcon: $('callIcon'),
 		hangUpIcon: $('hangUpIcon'),
-		callContainerContent : $('callContainerContent'),
 		audioStatusIcon: $('audioStatusIcon'),
 		videoStatusIcon: $('videoStatusIcon'),
 		videoContainer: $('videoContainer'),

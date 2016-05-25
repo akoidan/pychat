@@ -23,10 +23,26 @@
 		<audio id="chatLogout" src="{% md5url 'sounds/ChatLogout.wav' %}" preload="none"></audio>
 		<audio id="chatCall" src="{% md5url 'sounds/Call.mp3' %}" preload="none"></audio>
 	</div>
+	<style>
+		#userProfile label, #userProfile td {
+			font-size: 20px;
+		}
+	@media screen and (max-height: 400px) {
+		#userProfile label, #userProfile td {
+			font-size: 12px;
+		}
+	}
+	</style>
+	<div id="userProfile" class="modal-body hidden" style="z-index: 3">
+		<div id="callContainerHeader" class="noSelection">
+			<span id="callContainerHeaderText" style="display: inline-block"></span>
+			<i class="icon-cancel" style="float: right; color: rgb(177, 53, 51);"
+				onclick="webRtcApi.closeDialog()"></i>
+		</div>
+		<div id="userProfileBody"></div>
+	</div>
 	<div id="wrapper" class="max-height-scrollable" style="position: relative">
 		<div id="chatbox" tabindex="0" onkeydown="keyDownLoadUp(event)">
-			<div>
-			</div>
 		</div>{% comment %}tabindex allows focus, focus allows keydown binding event{% endcomment %}
 		<div id="chat-room-users-wrapper" class="very-small-screen">
 			<ul id="user-context-menu" class="hidden">
