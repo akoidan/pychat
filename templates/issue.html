@@ -1,53 +1,25 @@
-{% extends "base.html" %}
-{% block head %}
-	{% load md5url %}
-	<script src="{% md5url "js/issue.js" %}"></script>
-	<style>
-		th {
-			width: 150px;
-		}
-		td {
-			width: calc(100% - 150px);
-		}
-
-		input[type=text], textarea, input[type=email] {
-			width: calc(100% - 5px);
-		}
-	table {
-		max-width: 700px;
-		margin: auto;
-		margin-top: 10px;
-	}
-	input[type=submit] {
-		margin-top: 10px;
-		width: 100% ;
-	}
-	</style>
-{% endblock head %}
-{% block content %}
-	<form method="post" id="issueForm" onsubmit="sendIssue(event)">
-		<table class="fullwidth padding10">
-			<tr>
-				<th><label for="email">Your email</label> </th>
-				<td><input type="email" id="email" name="email" value="{{ email }}"/></td>
-			</tr>
-			<tr>
-				<th><label for="issue">The problem you discovered</label></th>
-				<td><textarea id="issue" aria-required="true" name="issue" required></textarea></td>
-			</tr>
-			<tr>
-				<th><label for="version">Affected browser</label></th>
-				<td><input type="text" name="browser" id="version"/> </td>
-			</tr>
-			<tr>
-				<th>
-					<label for="history">Send Logs</label>
-				</th>
-			<td><input type="checkbox" name="history" id="history" checked/></td>
-			<tr>
-				<td colspan="2"><input type="submit" value="Sumbit"></td>
-			</tr>
-		</table>
-	{% csrf_token %}
-	</form>
-{% endblock %}
+<form method="post" id="issueForm" onsubmit="singlePage.sendIssue(event)">
+	<table class="fullwidth padding10">
+		<tr>
+			<th><label for="email">Your email</label> </th>
+			<td><input type="email" id="email" name="email" value="{{ email }}"/></td>
+		</tr>
+		<tr>
+			<th><label for="issue">The problem you discovered</label></th>
+			<td><textarea id="issue" aria-required="true" name="issue" required></textarea></td>
+		</tr>
+		<tr>
+			<th><label for="version">Affected browser</label></th>
+			<td><input type="text" name="browser" id="version"/> </td>
+		</tr>
+		<tr>
+			<th>
+				<label for="history">Send Logs</label>
+			</th>
+		<td><input type="checkbox" name="history" id="history" checked/></td>
+		<tr>
+			<td colspan="2"><input type="submit" value="Sumbit"></td>
+		</tr>
+	</table>
+{% csrf_token %}
+</form>

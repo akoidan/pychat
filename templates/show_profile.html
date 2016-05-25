@@ -1,9 +1,8 @@
 {% if form.instance.photo %}
-<div class="padding10" style="display: inline-block; max-width: 1080px; max-height: 720px" >
-	<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth"
-		 style="max-width: calc(100vw - 250px); max-height: calc(100vh - 100px)">
+<div class="padding10 imgWrap" >
+	<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
 </div>
 {% endif %}
-<table class="biginputtext padding10" style="display: inline-block">
+<table class="biginputtext padding10" style="display: inline-block; vertical-align: top">
 	{{ form.as_table }}
 </table>

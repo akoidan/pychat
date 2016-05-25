@@ -45,9 +45,7 @@ declare -a files=(\
     "$CSS_DIR/main.css" \
     "$CSS_DIR/chat.css"\
     "$CSS_DIR/register.css"\
-    "$JS_DIR/amcharts.js"\
-    "$JS_DIR/amcharts-pie.js"\
-    "$JS_DIR/amcharts-dark.js"\
+    "$JS_DIR/amcharts-all.js"\
 )
 
 cd "$PROJECT_ROOT"
@@ -104,6 +102,7 @@ curl -X GET https://www.amcharts.com/lib/3/amcharts.js -o "$JS_DIR/amcharts.js"
 curl -X GET https://www.amcharts.com/lib/3/pie.js -o "$JS_DIR/amcharts-pie.js"
 curl -X GET https://www.amcharts.com/lib/3/themes/dark.js -o "$JS_DIR/amcharts-dark.js"
 
+cat "$JS_DIR/amcharts.js" "$JS_DIR/amcharts-pie.js" "$JS_DIR/amcharts-dark.js" > "$JS_DIR/amcharts-all.js"
 
 #wget http://jscolor.com/release/jscolor-1.4.4.zip -P $TMP_DIR && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR
 # fontello

@@ -38,7 +38,7 @@ var data = {
         "enabled": true
     }
 };
-data.dataProvider = dataProvider;
+data.dataProvider = window.amchartJson;
 var chart = AmCharts.makeChart("chartdiv", data);
 
 chart.addListener("init", handleInit);

@@ -43,7 +43,6 @@ var chatIncoming;
 var chatOutgoing;
 var chatLogin;
 var chatLogout;
-var userContextMenu;
 // div for user list appending
 // input type that contains text for sending message
 var userMessage;
@@ -71,6 +70,7 @@ if (isFirefox) {
 	RTCSessionDescription = mozRTCSessionDescription;
 	RTCIceCandidate = mozRTCIceCandidate;
 }
+var singlePage;
 
 var infoMessages = [
 	"Every time you join chat it will show you this help messages. You can disable them in you profile settings. To hide them just simply chlick on theirs background",
@@ -101,7 +101,6 @@ onDocLoad(function () {
 	chatLogout = $("chatLogout");
 	receiverId = $("receiverId");
 	charRooms = $("rooms");
-	userContextMenu = $('user-context-menu');
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	window.addEventListener("blur", changeTittleFunction);
@@ -117,25 +116,112 @@ onDocLoad(function () {
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
 	smileyUtil.init();
+	singlePage = new SinglePage();
+	singlePage.init();
 	$('imgInput').onchange = handleFileSelect;
 });
+
+
+function SinglePage() {
+	var self = this;
+	self.dom = {
+		window : $('window'),
+		windowBody : $('windowBody'),
+		windowHeader: $('windowHeader'),
+		windowClose: document.querySelector('#windowHeader .icon-cancel'),
+		headerText: document.querySelector('#windowHeader span')
+	};
+	self.init = function () {
+		new Draggable(self.dom.window, self.dom.windowHeader);
+		self.dom.windowClose.onclick = self.closeWindow;
+	};
+	self.showIssue = function() {
+		self.dom.headerText.innerHTML = "Report issue";
+		doGet("/report_issue", function(html) {
+			self.dom.windowBody.innerHTML = html;
+			$("version").value = window.browserVersion;
+			var issue = $('issue');
+			issue.addEventListener('input', function () {
+				issue.style.height = 'auto';
+				var textAreaHeight = issue.scrollHeight;
+				issue.style.height = textAreaHeight + 'px';
+			});
+			CssUtils.showElement(self.dom.window);
+		});
+	};
+	self.sendIssue = function (event){
+		event.preventDefault();
+		var form = $('issueForm');
+		var params = {};
+		if ($('history').checked) {
+			var logs = localStorage.getItem(HISTORY_STORAGE_NAME);
+			if (logs != null) {
+				params['log'] = logs
+			}
+		}
+		doPost('/report_issue', params, function(response) {
+			if (response === RESPONSE_SUCCESS) {
+				growlSuccess("Your issue has been successfully submitted");
+				self.closeWindow();
+			} else {
+				growlError(response);
+			}
+		}, form);
+	};
+	self.setHeaderText = function(text) {
+		self.dom.headerText.innerHTML = text;
+	};
+	self.viewProfile = function(id, headerText) {
+		var url = getText('/profile/{}', id);
+		self.setHeaderText(headerText);
+		doGet(url, function(html) {
+			self.dom.windowBody.innerHTML = html;
+			CssUtils.showElement(self.dom.window);
+		});
+	};
+	self.closeWindow = function() {
+		CssUtils.hideElement(self.dom.window);
+	};
+	self.changeProfile = function() {
+		self.setHeaderText("Change profile");
+		doGet('/profile', function(html) {
+			self.dom.windowBody.innerHTML = html;
+			doGet(CHANGE_PROFILE_JS_URL, function() {
+				initChangeProfile();
+				CssUtils.showElement(self.dom.window);
+			});
+		});
+	};
+	self.showAmCharts = function() {
+		doGet(AMCHART_URL, function() {
+			self.dom.windowBody.innerHTML = "";
+			var div = document.createElement("div");
+			div.setAttribute("id", "chartdiv");
+			self.dom.windowBody.appendChild(div);
+			doGet('/statistics', function(data) {
+				window.amchartJson = JSON.parse(data);
+				doGet(STATISTICS_JS_URL, function() {
+					CssUtils.showElement(self.dom.window);
+				});
+			});
+		});
+	}
+}
 
 function UserContext() {
 	var self = this;
 	self.dom = {
 		chatUsersTable: $("chat-user-table"),
-		activeUserContext: null
+		activeUserContext: null,
+		userContextMenu: $('user-context-menu')
+	};
+	self.viewProfile = function() {
+		singlePage.viewProfile(self.getActiveUserId(), self.getActiveUsername());
 	};
 	self.init = function() {
 		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);
 	};
-	self.viewProfile = function() {
-		var url = getText('/profile/{}', self.dom.activeUserContext.getAttribute('userid'));
-		doGet(url, function(html) {
-			$('userProfileBody').innerHTML = html;
-			CssUtils.showElement($('userProfile'));
-		});
-	};
+
 	self.getActiveUserId = function() {
 		return self.dom.activeUserContext.getAttribute('userid');
 	};
@@ -164,14 +250,14 @@ function UserContext() {
 			CssUtils.removeClass(self.dom.activeUserContext, 'active-user');
 		}
 		self.dom.activeUserContext =  li;
-		userContextMenu.style.top = li.offsetTop + li.clientHeight + "px";
+		self.dom.userContextMenu.style.top = li.offsetTop + li.clientHeight + "px";
 		CssUtils.addClass(self.dom.activeUserContext, 'active-user');
-		CssUtils.showElement(userContextMenu);
+		CssUtils.showElement(self.dom.userContextMenu);
 		document.addEventListener("click", self.removeContextMenu);
 		e.preventDefault();
 	};
 	self.removeContextMenu = function() {
-		CssUtils.hideElement(userContextMenu);
+		CssUtils.hideElement(self.dom.userContextMenu);
 		document.removeEventListener("click", self.removeContextMenu);
 		CssUtils.removeClass(self.dom.activeUserContext, 'active-user');
 	};

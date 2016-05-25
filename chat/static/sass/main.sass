@@ -63,6 +63,22 @@ a
 	/* remove underline from fonts*/
 	text-decoration: none
 
+#issueForm
+	table
+		max-width: 700px
+		margin: auto
+		margin-top: 10px
+		th
+			width: 150px
+		td
+			width: calc(100% - 150px)
+
+			input[type=text], textarea, input[type=email]
+				width: calc(100% - 5px)
+
+			input[type=submit]
+				margin-top: 10px
+				width: 100%
 
 ul
 	/*remove browser default left padding 40px and bullets
@@ -137,6 +153,7 @@ textarea, div[contenteditable]
 	left: 5px
 	position: absolute
 	max-width: 50%
+	z-index: 4
 	width: 400px
 	max-height: calc(100% - 60px)
 

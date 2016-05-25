@@ -6,11 +6,12 @@ var isStopped = true;
 var photoRegex = /^\S*\/photo\/[\w]{8}(-[\w]{4}){3}-[\w]{12}\.[^\s\.]+$/;
 var photoImg;
 
-onDocLoad(function () {
+function initChangeProfile() {
 	photoImg = $('photoImg');
 	var item = localStorage.getItem('theme');
 	if (item != null) {
-		$('themeSelector').value = item; /*TODO $* to var*/
+		$('themeSelector').value = item;
+		/*TODO $* to var*/
 	}
 	if (isDateMissing()) {
 		console.warn(getDebugMessage("Browser doesn't support html5 input type date, trying to load javascript datepicker"));
@@ -37,7 +38,7 @@ onDocLoad(function () {
 	canvas = document.querySelector('canvas');
 	CssUtils.hideElement(video);
 
-});
+};
 
 
 function startSharingVideo() {
