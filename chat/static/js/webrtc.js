@@ -37,8 +37,7 @@ function initChangeProfile() {
 	video = document.querySelector('video');
 	canvas = document.querySelector('canvas');
 	CssUtils.hideElement(video);
-
-};
+}
 
 
 function startSharingVideo() {
@@ -124,7 +123,7 @@ function saveProfile(event) {
 		params = {base64_image: image};
 	}
 	ajaxShow();
-	doPost('', params, function (response) {
+	doPost('/profile', params, function (response) {
 		if (response.match(photoRegex)) {
 			photoImg.onload = ajaxHide;
 			photoImg.onerror = ajaxHide;
