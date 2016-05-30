@@ -125,7 +125,7 @@ class MessagesCreator(object):
 		}
 		if message.img.name:
 			result[IMG_VAR_NAME] = message.img.url
-		if message.receiver is not None:
+		if message.receiver_id:
 			result[RECEIVER_USERID_VAR_NAME] = message.receiver.id
 			result[RECEIVER_USERNAME_VAR_NAME] = message.receiver.username
 		return result

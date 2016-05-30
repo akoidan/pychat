@@ -6,6 +6,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
+from django.core import serializers
 from django.core.mail import send_mail
 
 try:
@@ -92,7 +93,7 @@ def home(request):
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
 
-@login_required_no_redirect()
+@login_required_no_redirect(True)
 def logout(request):
 	"""
 	POST. Logs out into system.
@@ -262,11 +263,7 @@ def show_profile(request, profile_id):
 @require_http_methods('GET')
 def statistics(request):
 	pie_data = IpAddress.objects.values('country').filter(country__isnull=False).annotate(count=Count("country"))
-	return render_to_response(
-		'statistic.html',
-		{'dataProvider': json.dumps(list(pie_data))},
-		context_instance=RequestContext(request)
-	)
+	return HttpResponse(json.dumps(list(pie_data)), content_type='application/json')
 
 
 class IssueView(View):
@@ -327,7 +324,6 @@ class RegisterView(View):
 
 	def get(self, request):
 		c = csrf(request)
-		c['noNav'] = True
 		c['captcha'] = getattr(settings, "RECAPTCHA_SITE_KEY", None)
 		logger.debug('Rendering register page with captcha site key %s', c['captcha'])
 		c['captcha_url'] = getattr(settings, "RECAPTHCA_SITE_URL", None)

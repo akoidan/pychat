@@ -102,7 +102,7 @@ var CssUtils = {
 		return element.className != null && element.className.indexOf(className) >= 0;
 	},
 	addClass: function (element, className) {
-		if (!this.hasClass(element, className)) {
+		if (!CssUtils.hasClass(element, className)) {
 			var oldClassName = element.className;
 			element.className = getText("{} {}", oldClassName.trim(), className);
 		}
@@ -118,31 +118,31 @@ var CssUtils = {
 		}
 	},
 	removeClass: function (element, className) {
-		if (this.hasClass(element, className)) {
+		if (CssUtils.hasClass(element, className)) {
 			element.className = element.className.replace(className, '');
 		}
 	},
 	showElement: function (element) {
-		this.removeClass(element, this.visibilityClass)
+		CssUtils.removeClass(element, CssUtils.visibilityClass)
 	},
 	hideElement: function (element) {
-		this.addClass(element, this.visibilityClass);
+		CssUtils.addClass(element, CssUtils.visibilityClass);
 	},
 	toggleVisibility: function (element) {
-		this.toggleClass(element,this.visibilityClass);
+		CssUtils.toggleClass(element,CssUtils.visibilityClass);
 	},
 	setVisibility: function(element, isVisible){
 		if (isVisible) {
-			this.removeClass(element, this.visibilityClass);
+			CssUtils.removeClass(element, CssUtils.visibilityClass);
 		} else {
-			this.addClass(element, this.visibilityClass);
+			CssUtils.addClass(element, CssUtils.visibilityClass);
 		}
 	},
 	toggleClass: function (element, className) {
-		if (this.hasClass(element, className)) {
-			this.removeClass(element, className);
+		if (CssUtils.hasClass(element, className)) {
+			CssUtils.removeClass(element, className);
 		} else {
-			this.addClass(element, className);
+			CssUtils.addClass(element, className);
 		}
 	}
 };
@@ -209,7 +209,7 @@ function Draggable(container, header) {
 		self.topCorrection = container.offsetTop - ev.pageY;
 		// TODO 7 is kind of magical bottom margin when source is attached to video
 		self.maxTop = document.body.clientHeight - container.clientHeight - 7;
-		self.maxLeft =  document.body.clientWidth - container.clientWidth;
+		self.maxLeft =  document.body.clientWidth - container.clientWidth - 3;
 		document.addEventListener ("mousemove", self.eleMouseMove, false);
 	};
 	self.eleMouseMove = function (ev) {
@@ -243,6 +243,12 @@ function Draggable(container, header) {
 
 onDocLoad(function () {
 	muteBtn = $("muteBtn");
+	var sound = localStorage.getItem('sound');
+	if (sound == null) {
+		window.sound = 0;
+	} else {
+		window.sound = sound - 1;
+	}
 	mute();
 	var theme = localStorage.getItem('theme');
 	if (theme != null) {
@@ -258,6 +264,7 @@ onDocLoad(function () {
 
 function mute() {
 	window.sound = (window.sound + 1) % 4;
+	localStorage.sound = window.sound;
 	if (muteBtn) muteBtn.className = volumeIcons[window.sound];
 }
 
@@ -461,7 +468,6 @@ function getDebugMessage() {
 
 window.onerror = function (msg, url, linenumber) {
 	var message = getText('Error occurred in {}:{}\n{}', url, linenumber, msg);
-	console.error(getDebugMessage(message));
 	growlError(message);
-	return true;
+	return false;
 };

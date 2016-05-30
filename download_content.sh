@@ -46,14 +46,36 @@ declare -a files=(\
     "$CSS_DIR/main.css" \
     "$CSS_DIR/chat.css"\
     "$CSS_DIR/register.css"\
-    "$JS_DIR/amcharts.js"\
-    "$JS_DIR/amcharts-pie.js"\
-    "$JS_DIR/amcharts-dark.js"\
     "$VAL_DIR/Love_and_Passion.ttf"\
     "$VAL_DIR/teddy.gif"\
     "$VAL_DIR/v2.ttf"\
     "$VAL_DIR/videoplayback.mp3"\
+    "$JS_DIR/amcharts-all.js"\
 )
+
+cd "$PROJECT_ROOT"
+
+compile_sass() {
+    if ! type "sass" > /dev/null; then
+     >&2 echo "You need to install sass to be able to use stylesheets"
+     exit 1
+    fi
+    sass_files=($(ls "$SASS_DIR"/*.sass))
+    echo "Compiling sass files: $sass_files"
+    cd "$SASS_DIR"
+    for i in "${sass_files[@]}"
+    do
+        name_no_ext=$(basename $i .sass)
+        sass --no-cache --update "$i":"$CSS_DIR/$name_no_ext.css" --style compressed
+    done
+    cd "$PROJECT_ROOT"
+}
+
+if [ $1 = "sass" ]; then
+    compile_sass
+    exit 0
+fi
+
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do
   if [ -f "$path" ]; then
@@ -65,8 +87,6 @@ done
 
 mkdir -pv "$TMP_DIR"
 
-cd "$PROJECT_ROOT"
-
 git clone "$CONF_REPOSITORY" "$TMP_DIR/chatconf"
 git --git-dir="$TMP_DIR/chatconf/.git" --work-tree="$TMP_DIR/chatconf/" checkout $CONF_VERSION
 cp -r "$TMP_DIR/chatconf/static" "$STATIC_PARENT"
@@ -76,18 +96,7 @@ mv "$CSS_DIR/fontello-codes.css" "$SASS_DIR/fontello/_fontello-codes.scss"
 mv "$CSS_DIR/fontello-ie7.css" "$SASS_DIR/fontello/_fontello-ie7.scss"
 mv "$CSS_DIR/fontello-ie7-codes.css" "$SASS_DIR/fontello/_fontello-ie7-codes.scss"
 
-if ! type "sass" > /dev/null; then
- >&2 echo "You need to install sass to be able to use stylesheets"
- exit 1
-fi
-
-sass_files=($(ls "$SASS_DIR"/*.sass))
-
-for i in "${sass_files[@]}"
-do
-    name_no_ext=$(basename $i .sass)
-    sass --no-cache --update "$i":"$CSS_DIR/$name_no_ext.css" --style compressed
-done
+compile_sass
 
 # datepicker
 # use curl since it's part of windows git bash
@@ -98,6 +107,7 @@ curl -X GET https://www.amcharts.com/lib/3/amcharts.js -o "$JS_DIR/amcharts.js"
 curl -X GET https://www.amcharts.com/lib/3/pie.js -o "$JS_DIR/amcharts-pie.js"
 curl -X GET https://www.amcharts.com/lib/3/themes/dark.js -o "$JS_DIR/amcharts-dark.js"
 
+cat "$JS_DIR/amcharts.js" "$JS_DIR/amcharts-pie.js" "$JS_DIR/amcharts-dark.js" > "$JS_DIR/amcharts-all.js"
 
 #wget http://jscolor.com/release/jscolor-1.4.4.zip -P $TMP_DIR && unzip $TMP_DIR/jscolor-1.4.4.zip -d $JS_DIR
 # fontello

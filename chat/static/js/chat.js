@@ -11,7 +11,6 @@ const privateHeaderClass = 'message-header-private';
 const systemHeaderClass = 'message-header-system';
 const othersHeaderClass = 'message-header-others';
 const timeSpanClass = 'timeMess';
-const userNameClass = 'user';
 const contentStyleClass = 'message-text-style';
 
 const SYSTEM_USERNAME = 'System';
@@ -45,7 +44,6 @@ var chatOutgoing;
 var chatLogin;
 var chatLogout;
 // div for user list appending
-var chatUsersTable;
 // input type that contains text for sending message
 var userMessage;
 // div that contains receiver id, icons, etc
@@ -66,12 +64,13 @@ var allMessagesDates = [];
 var onlineUsers = {};
 var webRtcApi;
 var smileyUtil;
-
+var userTable;
 var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
 if (isFirefox) {
 	RTCSessionDescription = mozRTCSessionDescription;
 	RTCIceCandidate = mozRTCIceCandidate;
 }
+var singlePage;
 
 var infoMessages = [
 	"Every time you join chat it will show you this help messages. You can disable them in you profile settings. To hide them just simply chlick on theirs background",
@@ -94,7 +93,6 @@ var infoMessages = [
 onDocLoad(function () {
 	chatBoxDiv = $("chatbox");
 	userMessage = $("usermsg");
-	chatUsersTable = $("chat-user-table");
 	chatUserRoomWrapper = $("chat-room-users-wrapper");
 	userSendMessageTo = $("userSendMessageTo");
 	chatIncoming = $("chatIncoming");
@@ -108,6 +106,8 @@ onDocLoad(function () {
 	window.addEventListener("blur", changeTittleFunction);
 	window.addEventListener("focus", changeTittleFunction);
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
+	userTable = new UserContext();
+	userTable.init();
 	start_chat_ws();
 	//bottom call loadMessagesFromLocalStorage(); s
 	showHelp();
@@ -116,8 +116,292 @@ onDocLoad(function () {
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
 	smileyUtil.init();
+	singlePage = new PageHandler();
 	$('imgInput').onchange = handleFileSelect;
 });
+
+
+function Page() {
+	var self = this;
+	self.dom = {
+		container: document.body,
+		el: []
+	};
+	self.parser = new DOMParser();
+	self.render  = function () {
+		doGet(self.getUrl(), self.onLoad);
+	};
+	self.onLoad = function (html) {
+		var tmpWrapper = document.createElement('div');
+		tmpWrapper.innerHTML = html;
+		var holder = tmpWrapper.firstChild;
+		self.dom.el.push(holder);
+		self.dom.container.appendChild(holder);
+	};
+	self.foreach = function (apply) {
+		for (var i = 0; i< self.dom.el.length; i++) {
+			apply(self.dom.el[i]);
+		}
+	};
+	self.show = function () {
+		self.foreach(CssUtils.showElement);
+	};
+	self.update = self.show;
+	self.hide = function () {
+		self.foreach(CssUtils.hideElement);
+	};
+	self.getUrl = function () {
+		return self.url;
+	};
+	self.getTitle = function () {
+		return self.title;
+	};
+	self.super = {
+		onLoad: self.onLoad
+	};
+	self.toString = function (event) {
+		return self.name;
+	}
+}
+
+function IssuePage() {
+	var self = this;
+	Page.call(self);
+	self.url = '/report_issue';
+	self.title = 'Report issue';
+	self.onLoad = function (html) {
+		self.super.onLoad(html);
+		$("version").value = window.browserVersion;
+		var issue = $('issue');
+		issue.addEventListener('input', function () {
+			issue.style.height = 'auto';
+			var textAreaHeight = issue.scrollHeight;
+			issue.style.height = textAreaHeight + 'px';
+		});
+	};
+	self.onSumbit = function (event) {
+		event.preventDefault();
+		var form = $('issueForm');
+		var params = {};
+		if ($('history').checked) {
+			var logs = localStorage.getItem(HISTORY_STORAGE_NAME);
+			if (logs != null) {
+				params['log'] = logs
+			}
+		}
+		doPost('/report_issue', params, function (response) {
+			if (response === RESPONSE_SUCCESS) {
+				growlSuccess("Your issue has been successfully submitted");
+				self.closeWindow();
+			} else {
+				growlError(response);
+			}
+		}, form);
+	};
+}
+
+function ViewProfilePage(userId) {
+	var self = this;
+	Page.call(self);
+	self.userId = userId;
+	self.getUrl = function () {
+		return getText('/profile/{}', self.userId);
+	};
+	self.getTitle = function () {
+		return getText("{}'s profile", self.userName);
+	}
+}
+
+function ChangeProfilePage() {
+	var self = this;
+	Page.call(self);
+	self.url = '/profile';
+	self.title = 'Change profile';
+	self.onLoad = function (html) {
+		self.super.onLoad(html);
+		doGet(CHANGE_PROFILE_JS_URL, function () {
+			initChangeProfile();
+		});
+	}
+}
+
+
+function ChatPage() {
+	var self = this;
+	Page.call(self);
+	self.url = '';
+	self.title = 'Change profile';
+	self.dom.el = [
+		$('wrapper'),
+		$('userMessageWrapper')
+	];
+	self.render = self.show;
+}
+
+function AmchartsPage() {
+	var self = this;
+	Page.call(self);
+	self.title = 'Statistics';
+	self.url = '/statistics';
+	self.render = function () {
+		doGet(AMCHART_URL, function () {
+			var holder = document.createElement("div");
+			self.dom.el.push(holder);
+			self.dom.container.appendChild(holder);
+			holder.setAttribute("id", "chartdiv");
+			doGet(self.url, function (data) {
+				window.amchartJson = JSON.parse(data);
+				doGet(STATISTICS_JS_URL);
+			});
+		});
+	};
+}
+
+var PageHandler = function () {
+	var self = this;
+	self.pages = {
+		'/report_issue': IssuePage,
+		'': ChatPage,
+		'/statistics': AmchartsPage,
+		'/profile/': ViewProfilePage,
+		'/profile': ChangeProfilePage
+	};
+	self.pageRegex = /\w\/#(\/\w+\/?)(\w?)/g;
+	self.storagePages = [];
+	self.init = function () {
+		self.onhashchange();
+		window.onhashchange = self.onhashchange;
+	};
+	self.onhashchange = function () {
+		console.log(getDebugMessage("Processing history"));
+		var currentUrl = window.location.href;
+		var match = self.pageRegex.exec(currentUrl);
+		var params;
+		var page;
+		if (match) {
+			page = match[1];
+			params = match[2]; 
+		} else {
+			page = '';
+		}
+		self.showPage(page, params, true);
+	};
+	self.getPageByUrl = function (url) {
+		for (var i = 0; i< self.storagePages.length; i++) {
+			if (self.storagePages[i].getUrl() == url) {
+				return self.storagePages[i];
+			}
+		}
+	};
+	self.showPage = function (page, params, dontHistory) {
+		console.log(getDebugMessage('Rendering page "{}"', page));
+		var newPage;
+		var storagePage = self.getPageByUrl(page);
+		if (self.currentPage) {
+			self.currentPage.hide();
+		}
+		if (storagePage) {
+			newPage = storagePage;
+			newPage.update();
+		} else {
+			newPage = new self.pages[page](params);
+			self.storagePages.push(newPage);
+			newPage.render();
+		}
+
+		self.currentPage = newPage;
+		if (!dontHistory ) {
+			window.history.pushState(newPage.getTitle(), newPage.getTitle(), self.getHistoryUrl(newPage));
+		}
+	};
+	self.getHistoryUrl = function (pageObj) {
+		return getText("#{}", pageObj.getUrl());
+	};
+	self.init();
+};
+
+
+function UserContext() {
+	var self = this;
+	self.dom = {
+		chatUsersTable: $("chat-user-table"),
+		activeUserContext: null,
+		userContextMenu: $('user-context-menu')
+	};
+	self.viewProfile = function() {
+		singlePage.showPage('/profile/', self.getActiveUserId());
+	};
+	self.init = function() {
+		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);
+	};
+
+	self.getActiveUserId = function() {
+		return self.dom.activeUserContext.getAttribute('userid');
+	};
+	self.getActiveUsername = function() {
+		return self.dom.activeUserContext.textContent;
+	};
+	self.call = function() {
+		if (self.getActiveUsername() != loggedUser) {
+			webRtcApi.showCallDialog();
+			webRtcApi.receiverId = parseInt(self.getActiveUserId());
+			webRtcApi.receiverName = self.getActiveUsername();
+			webRtcApi.callPeople();
+		} else {
+			growlError("You can't call yourself");
+		}
+	};
+	self.dom.activeUserContext = null;
+	self.showContextMenu = function (e) {
+		var li = e.target;
+		if (li.tagName == 'I') {
+			li = li.parentElement;
+		} else if (li.tagName != 'LI') {
+			return;
+		}
+		if (self.dom.activeUserContext != null) {
+			CssUtils.removeClass(self.dom.activeUserContext, 'active-user');
+		}
+		self.dom.activeUserContext =  li;
+		self.dom.userContextMenu.style.top = li.offsetTop + li.clientHeight + "px";
+		CssUtils.addClass(self.dom.activeUserContext, 'active-user');
+		CssUtils.showElement(self.dom.userContextMenu);
+		document.addEventListener("click", self.removeContextMenu);
+		e.preventDefault();
+	};
+	self.removeContextMenu = function() {
+		CssUtils.hideElement(self.dom.userContextMenu);
+		document.removeEventListener("click", self.removeContextMenu);
+		CssUtils.removeClass(self.dom.activeUserContext, 'active-user');
+	};
+	self.loadUsers = function(usernames) {
+		if (!usernames) {
+			return;
+		}
+		onlineUsers = usernames;
+		if (!CssUtils.hasClass(webRtcApi.dom.callContainer, 'hidden')) {
+			webRtcApi.updateDomOnlineUsers();
+		}
+		console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
+		self.dom.chatUsersTable.innerHTML = null;
+		for (var username in usernames) {
+			if (usernames.hasOwnProperty(username)) {
+				var icon;
+				var gender = usernames[username].sex;
+				var userId = usernames[username].userId;
+				icon = document.createElement('i');
+				icon.className = genderIcons[gender];
+				var li = document.createElement('li');
+				li.appendChild(icon);
+				li.onclick = userClick;
+				li.innerHTML += username;
+				li.setAttribute('userid', userId);
+				li.setAttribute('name', username);
+				self.dom.chatUsersTable.appendChild(li);
+			}
+		}
+	}
+}
 
 var handleFileSelect = function (evt) {
 	var files = evt.target.files;
@@ -284,12 +568,9 @@ function userClick(event) {
 	var target = event.target || event.srcElement;
 	CssUtils.showElement(userSendMessageTo);
 	// Empty sets display to none
-	receiverId.textContent = target.innerHTML; //destinationUserName
+	receiverId.textContent = target.textContent; //destinationUserName
 	userMessage.focus();
-	if (target.attributes.name != null) {
-		// icon click
-		destinationUserId = parseInt(target.attributes.name.value);
-	}
+	destinationUserId = parseInt(target.attributes.userid.value);
 }
 
 
@@ -408,55 +689,6 @@ function start_chat_ws() {
 	};
 }
 
-
-function getUserUrl(userId) {
-	return getText('/profile/{}', userId);
-}
-
-
-function loadUsers(usernames) {
-	if (!usernames) {
-		return;
-	}
-	onlineUsers = usernames;
-	if (!CssUtils.hasClass(webRtcApi.dom.callContainer, 'hidden')) {
-		webRtcApi.updateDomOnlineUsers();
-	}
-	console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
-	chatUsersTable.innerHTML = null;
-	var tbody = document.createElement('tbody');
-	chatUsersTable.appendChild(tbody);
-	for (var username in usernames) {
-		if (usernames.hasOwnProperty(username)) {
-			var icon;
-			var gender = usernames[username].sex;
-			var userId = usernames[username].userId;
-			if (userId === 0) {
-				icon = document.createElement('i');
-			} else {
-				icon = document.createElement('a');
-				icon.setAttribute('target', '_blank');
-				icon.setAttribute('href', getUserUrl(userId));
-			}
-			icon.className = genderIcons[gender];
-			var tr = document.createElement('tr');
-			var tdIcon = document.createElement('td');
-			tdIcon.appendChild(icon);
-
-			var tdUser = document.createElement('td');
-			tdUser.setAttribute('name', userId);
-			tdUser.className = userNameClass;
-			tdUser.textContent = username;
-			tdUser.onclick = userClick;
-			tr.appendChild(tdIcon);
-			tr.appendChild(tdUser);
-
-			tbody.appendChild(tr);
-		}
-	}
-}
-
-
 /** Inserts element in the middle if it's not there
  * @param time element
  * @returns Node element that follows the inserted one
@@ -495,12 +727,12 @@ function createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncod
 
 	var userNameA = document.createElement('span');
 	userNameA.textContent = displayedUsername;
+	userNameA.textContent = displayedUsername;
 	if (displayedUsername !== SYSTEM_USERNAME) {
-		userNameA.className = userNameClass;
 		userNameA.onclick = userClick;
 	}
 	if (userId != null) {
-		userNameA.setAttribute('name', userId);
+		userNameA.setAttribute('userid', userId);
 	}
 	headSpan.insertAdjacentHTML('beforeend', ' ');
 	headSpan.appendChild(userNameA);
@@ -719,7 +951,7 @@ function saveMessageToStorage(objectItem, jsonItem) {
 
 function changeOnlineUsers(data) {
 	printRefreshUserNameToChat(data);
-	loadUsers(data.content);
+	userTable.loadUsers(data.content);
 }
 
 
@@ -772,7 +1004,6 @@ var WebRtcApi = function () {
 		callSound: $('chatCall'),
 		callIcon: $('callIcon'),
 		hangUpIcon: $('hangUpIcon'),
-		callContainerContent : $('callContainerContent'),
 		audioStatusIcon: $('audioStatusIcon'),
 		videoStatusIcon: $('videoStatusIcon'),
 		videoContainer: $('videoContainer'),

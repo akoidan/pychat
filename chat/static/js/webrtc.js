@@ -5,12 +5,21 @@ var snapshot = false;
 var isStopped = true;
 var photoRegex = /^\S*\/photo\/[\w]{8}(-[\w]{4}){3}-[\w]{12}\.[^\s\.]+$/;
 var photoImg;
+var userProfileData;
+var themeSelector;
+var changeProfileForm;
 
-onDocLoad(function () {
+function initChangeProfile() {
 	photoImg = $('photoImg');
+	video = $('changeProfileVideo');
+	canvas = document.querySelector('canvas');
+	userProfileData = $('userProfileData');
+	themeSelector = $('themeSelector');
+	changeProfileForm = $('changeProfileForm');
 	var item = localStorage.getItem('theme');
 	if (item != null) {
-		$('themeSelector').value = item; /*TODO $* to var*/
+		themeSelector.value = item;
+		/*TODO $* to var*/
 	}
 	if (isDateMissing()) {
 		console.warn(getDebugMessage("Browser doesn't support html5 input type date, trying to load javascript datepicker"));
@@ -31,13 +40,9 @@ onDocLoad(function () {
 	}
 	if (!navigator.getUserMedia) {
 		console.warn(getDebugMessage('Browser doesnt support capturing video, skipping photo snapshot'));
-
 	}
-	video = document.querySelector('video');
-	canvas = document.querySelector('canvas');
 	CssUtils.hideElement(video);
-
-});
+}
 
 
 function startSharingVideo() {
@@ -45,7 +50,6 @@ function startSharingVideo() {
 
 	function successCallback(localMediaStream) {
 		window.stream = localMediaStream; // stream available to console
-		var video = document.querySelector("video");
 		video.src = window.URL.createObjectURL(localMediaStream);
 		video.play();
 	}
@@ -81,7 +85,7 @@ function startCapturingVideo(button) {
 			localMediaStream = stream;
 			CssUtils.showElement(video);
 			video.addEventListener('click', takeSnapshot, false);
-			CssUtils.hideElement($('userProfileData'));
+			CssUtils.hideElement(userProfileData);
 			button.value = 'Finish';
 			isStopped = false;
 			growlInfo("Click on your video to take a photo")
@@ -100,22 +104,21 @@ function startCapturingVideo(button) {
 		button.value = 'Renew the photo';
 		growlInfo("To apply photo click on save");
 		CssUtils.hideElement(video);
-		CssUtils.showElement($('userProfileData'));
+
+		CssUtils.showElement(userProfileData);
 		isStopped = true;
 	}
 }
 
 
 function setColorTheme() {
-	var select = $('themeSelector');
 	var options = [];
-	localStorage.setItem('theme', select.value);
-	document.body.className = select.value;
+	localStorage.setItem('theme', themeSelector.value);
+	document.body.className = themeSelector.value;
 }
 
 function saveProfile(event) {
 	event.preventDefault();
-	var form = document.querySelector('form');
 	var image = null;
 	var params = null;
 	if (snapshot) {
@@ -123,7 +126,7 @@ function saveProfile(event) {
 		params = {base64_image: image};
 	}
 	ajaxShow();
-	doPost('', params, function (response) {
+	doPost('/profile', params, function (response) {
 		if (response.match(photoRegex)) {
 			photoImg.onload = ajaxHide;
 			photoImg.onerror = ajaxHide;
@@ -142,7 +145,7 @@ function saveProfile(event) {
 		} else {
 			growlError(response);
 		}
-	}, form, true);
+	}, changeProfileForm, true);
 }
 
 
