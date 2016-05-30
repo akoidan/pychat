@@ -93,7 +93,7 @@ def home(request):
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
 
-@login_required_no_redirect()
+@login_required_no_redirect(True)
 def logout(request):
 	"""
 	POST. Logs out into system.

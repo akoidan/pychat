@@ -17,14 +17,15 @@
 {% endblock head %}
 {% block content %}
 	<nav class="noSelection">
-		<a href="{% url 'chat.views.home' %}"><i class="icon-home" title="Go home"><span class="mText">home</span></i></a>
+		<a class="icon-home" href="/" title="Go home" onclick="event.preventDefault(); singlePage.showPage('');"><span class="mText">home</span></a>
 		<i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds" onclick="mute();"><span class="mText">volume</span></i>
-		<i class="icon-pencil very-small-screen" title="report an issue" onclick="singlePage.showIssue()"><span class="mText">issue</span></i>
+		<a href="/#/report_issue" class="icon-pencil very-small-screen" title="report an issue"
+			onclick="event.preventDefault(); singlePage.showPage('/report_issue')"><span class="mText">issue</span></a>
 		<i class="icon-clear" title="Clear local history" onclick="clearLocalHistory()"><span class="mText">clear</span></i>
 		<i class="icon-phone" title="Make a video/mic call" onclick="webRtcApi.showCallDialog()"><span class="mText">Call</span></i>
-		<i class="icon-chart-pie" onclick="singlePage.showAmCharts()" title="Show user countries statistics"><span class="mText">statistics</span></i>
+		<a href="/#/statistics" class="icon-chart-pie" onclick="event.preventDefault(); singlePage.showPage('/statistics')" title="Show user countries statistics"><span class="mText">statistics</span></a>
 		<span class="username very-small-screen flex-push-right">Hello, <b id="userNameLabel"> {{ username }}</b></span>
-		<i title="Settings" onclick="singlePage.changeProfile()" class="icon-wrench"> <span class="mText">Profile</span></i>
+		<a  href="/#/profile" title="Settings" onclick="event.preventDefault(); singlePage.showPage('/profile')" class="icon-wrench"> <span class="mText">Profile</span></a>
 		<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}">
 			<i title="Sign out" class="icon-sign-out"><span class="mText">sign out</span></i> </a>
 	</nav>
@@ -52,7 +53,7 @@
 		</div>
 		<div id="windowBody"></div>
 	</div>
-	<div id="wrapper" class="max-height-scrollable" style="position: relative">
+	<div id="wrapper" class="max-height-scrollable hidden">
 		<div id="chatbox" tabindex="0" onkeydown="keyDownLoadUp(event)">
 		</div>{% comment %}tabindex allows focus, focus allows keydown binding event{% endcomment %}
 		<div id="chat-room-users-wrapper" class="very-small-screen">
@@ -73,7 +74,7 @@
 			<ul id="tabNames" onclick="smileyUtil.showTabByName(event)"></ul>
 		</div>
 	</div>
-	<div class="fullwidth-padded" style="position: relative">
+	<div id="userMessageWrapper" class="hidden" style="position: relative">
 		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
 		<i class="icon-picture" title="Add a picture" onclick="$('imgInput').click()"></i>
 		<div id="userSendMessageTo" class="hidden">

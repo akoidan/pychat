@@ -102,7 +102,7 @@ var CssUtils = {
 		return element.className != null && element.className.indexOf(className) >= 0;
 	},
 	addClass: function (element, className) {
-		if (!this.hasClass(element, className)) {
+		if (!CssUtils.hasClass(element, className)) {
 			var oldClassName = element.className;
 			element.className = getText("{} {}", oldClassName.trim(), className);
 		}
@@ -118,31 +118,31 @@ var CssUtils = {
 		}
 	},
 	removeClass: function (element, className) {
-		if (this.hasClass(element, className)) {
+		if (CssUtils.hasClass(element, className)) {
 			element.className = element.className.replace(className, '');
 		}
 	},
 	showElement: function (element) {
-		this.removeClass(element, this.visibilityClass)
+		CssUtils.removeClass(element, CssUtils.visibilityClass)
 	},
 	hideElement: function (element) {
-		this.addClass(element, this.visibilityClass);
+		CssUtils.addClass(element, CssUtils.visibilityClass);
 	},
 	toggleVisibility: function (element) {
-		this.toggleClass(element,this.visibilityClass);
+		CssUtils.toggleClass(element,CssUtils.visibilityClass);
 	},
 	setVisibility: function(element, isVisible){
 		if (isVisible) {
-			this.removeClass(element, this.visibilityClass);
+			CssUtils.removeClass(element, CssUtils.visibilityClass);
 		} else {
-			this.addClass(element, this.visibilityClass);
+			CssUtils.addClass(element, CssUtils.visibilityClass);
 		}
 	},
 	toggleClass: function (element, className) {
-		if (this.hasClass(element, className)) {
-			this.removeClass(element, className);
+		if (CssUtils.hasClass(element, className)) {
+			CssUtils.removeClass(element, className);
 		} else {
-			this.addClass(element, className);
+			CssUtils.addClass(element, className);
 		}
 	}
 };
@@ -468,7 +468,6 @@ function getDebugMessage() {
 
 window.onerror = function (msg, url, linenumber) {
 	var message = getText('Error occurred in {}:{}\n{}', url, linenumber, msg);
-	console.error(getDebugMessage(message));
 	growlError(message);
-	return true;
+	return false;
 };

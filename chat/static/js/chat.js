@@ -116,40 +116,70 @@ onDocLoad(function () {
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
 	smileyUtil.init();
-	singlePage = new SinglePage();
-	singlePage.init();
+	singlePage = new PageHandler();
 	$('imgInput').onchange = handleFileSelect;
 });
 
 
-function SinglePage() {
+function Page() {
 	var self = this;
 	self.dom = {
-		window : $('window'),
-		windowBody : $('windowBody'),
-		windowHeader: $('windowHeader'),
-		windowClose: document.querySelector('#windowHeader .icon-cancel'),
-		headerText: document.querySelector('#windowHeader span')
+		container: document.body,
+		el: []
 	};
-	self.init = function () {
-		new Draggable(self.dom.window, self.dom.windowHeader);
-		self.dom.windowClose.onclick = self.closeWindow;
+	self.parser = new DOMParser();
+	self.render  = function () {
+		doGet(self.getUrl(), self.onLoad);
 	};
-	self.showIssue = function() {
-		self.dom.headerText.innerHTML = "Report issue";
-		doGet("/report_issue", function(html) {
-			self.dom.windowBody.innerHTML = html;
-			$("version").value = window.browserVersion;
-			var issue = $('issue');
-			issue.addEventListener('input', function () {
-				issue.style.height = 'auto';
-				var textAreaHeight = issue.scrollHeight;
-				issue.style.height = textAreaHeight + 'px';
-			});
-			CssUtils.showElement(self.dom.window);
+	self.onLoad = function (html) {
+		var tmpWrapper = document.createElement('div');
+		tmpWrapper.innerHTML = html;
+		var holder = tmpWrapper.firstChild;
+		self.dom.el.push(holder);
+		self.dom.container.appendChild(holder);
+	};
+	self.foreach = function (apply) {
+		for (var i = 0; i< self.dom.el.length; i++) {
+			apply(self.dom.el[i]);
+		}
+	};
+	self.show = function () {
+		self.foreach(CssUtils.showElement);
+	};
+	self.update = self.show;
+	self.hide = function () {
+		self.foreach(CssUtils.hideElement);
+	};
+	self.getUrl = function () {
+		return self.url;
+	};
+	self.getTitle = function () {
+		return self.title;
+	};
+	self.super = {
+		onLoad: self.onLoad
+	};
+	self.toString = function (event) {
+		return self.name;
+	}
+}
+
+function IssuePage() {
+	var self = this;
+	Page.call(self);
+	self.url = '/report_issue';
+	self.title = 'Report issue';
+	self.onLoad = function (html) {
+		self.super.onLoad(html);
+		$("version").value = window.browserVersion;
+		var issue = $('issue');
+		issue.addEventListener('input', function () {
+			issue.style.height = 'auto';
+			var textAreaHeight = issue.scrollHeight;
+			issue.style.height = textAreaHeight + 'px';
 		});
 	};
-	self.sendIssue = function (event){
+	self.onSumbit = function (event) {
 		event.preventDefault();
 		var form = $('issueForm');
 		var params = {};
@@ -159,7 +189,7 @@ function SinglePage() {
 				params['log'] = logs
 			}
 		}
-		doPost('/report_issue', params, function(response) {
+		doPost('/report_issue', params, function (response) {
 			if (response === RESPONSE_SUCCESS) {
 				growlSuccess("Your issue has been successfully submitted");
 				self.closeWindow();
@@ -168,45 +198,128 @@ function SinglePage() {
 			}
 		}, form);
 	};
-	self.setHeaderText = function(text) {
-		self.dom.headerText.innerHTML = text;
+}
+
+function ViewProfilePage(userId) {
+	var self = this;
+	Page.call(self);
+	self.userId = userId;
+	self.getUrl = function () {
+		return getText('/profile/{}', self.userId);
 	};
-	self.viewProfile = function(id, headerText) {
-		var url = getText('/profile/{}', id);
-		self.setHeaderText(headerText);
-		doGet(url, function(html) {
-			self.dom.windowBody.innerHTML = html;
-			CssUtils.showElement(self.dom.window);
-		});
-	};
-	self.closeWindow = function() {
-		CssUtils.hideElement(self.dom.window);
-	};
-	self.changeProfile = function() {
-		self.setHeaderText("Change profile");
-		doGet('/profile', function(html) {
-			self.dom.windowBody.innerHTML = html;
-			doGet(CHANGE_PROFILE_JS_URL, function() {
-				initChangeProfile();
-				CssUtils.showElement(self.dom.window);
-			});
-		});
-	};
-	self.showAmCharts = function() {
-		doGet(AMCHART_URL, function() {
-			self.dom.windowBody.innerHTML = "";
-			var div = document.createElement("div");
-			div.setAttribute("id", "chartdiv");
-			self.dom.windowBody.appendChild(div);
-			doGet('/statistics', function(data) {
-				window.amchartJson = JSON.parse(data);
-				doGet(STATISTICS_JS_URL, function() {
-					CssUtils.showElement(self.dom.window);
-				});
-			});
+	self.getTitle = function () {
+		return getText("{}'s profile", self.userName);
+	}
+}
+
+function ChangeProfilePage() {
+	var self = this;
+	Page.call(self);
+	self.url = '/profile';
+	self.title = 'Change profile';
+	self.onLoad = function (html) {
+		self.super.onLoad(html);
+		doGet(CHANGE_PROFILE_JS_URL, function () {
+			initChangeProfile();
 		});
 	}
 }
+
+
+function ChatPage() {
+	var self = this;
+	Page.call(self);
+	self.url = '';
+	self.title = 'Change profile';
+	self.dom.el = [
+		$('wrapper'),
+		$('userMessageWrapper')
+	];
+	self.render = self.show;
+}
+
+function AmchartsPage() {
+	var self = this;
+	Page.call(self);
+	self.title = 'Statistics';
+	self.url = '/statistics';
+	self.render = function () {
+		doGet(AMCHART_URL, function () {
+			var holder = document.createElement("div");
+			self.dom.el.push(holder);
+			self.dom.container.appendChild(holder);
+			holder.setAttribute("id", "chartdiv");
+			doGet(self.url, function (data) {
+				window.amchartJson = JSON.parse(data);
+				doGet(STATISTICS_JS_URL);
+			});
+		});
+	};
+}
+
+var PageHandler = function () {
+	var self = this;
+	self.pages = {
+		'/report_issue': IssuePage,
+		'': ChatPage,
+		'/statistics': AmchartsPage,
+		'/profile/': ViewProfilePage,
+		'/profile': ChangeProfilePage
+	};
+	self.pageRegex = /\w\/#(\/\w+\/?)(\w?)/g;
+	self.storagePages = [];
+	self.init = function () {
+		self.onhashchange();
+		window.onhashchange = self.onhashchange;
+	};
+	self.onhashchange = function () {
+		console.log(getDebugMessage("Processing history"));
+		var currentUrl = window.location.href;
+		var match = self.pageRegex.exec(currentUrl);
+		var params;
+		var page;
+		if (match) {
+			page = match[1];
+			params = match[2]; 
+		} else {
+			page = '';
+		}
+		self.showPage(page, params, true);
+	};
+	self.getPageByUrl = function (url) {
+		for (var i = 0; i< self.storagePages.length; i++) {
+			if (self.storagePages[i].getUrl() == url) {
+				return self.storagePages[i];
+			}
+		}
+	};
+	self.showPage = function (page, params, dontHistory) {
+		console.log(getDebugMessage('Rendering page "{}"', page));
+		var newPage;
+		var storagePage = self.getPageByUrl(page);
+		if (self.currentPage) {
+			self.currentPage.hide();
+		}
+		if (storagePage) {
+			newPage = storagePage;
+			newPage.update();
+		} else {
+			newPage = new self.pages[page](params);
+			self.storagePages.push(newPage);
+			newPage.render();
+		}
+
+		self.currentPage = newPage;
+		if (!dontHistory ) {
+			window.history.pushState(newPage.getTitle(), newPage.getTitle(), self.getHistoryUrl(newPage));
+		}
+	};
+	self.getHistoryUrl = function (pageObj) {
+		return getText("#{}", pageObj.getUrl());
+	};
+	self.init();
+};
+
 
 function UserContext() {
 	var self = this;
@@ -216,7 +329,7 @@ function UserContext() {
 		userContextMenu: $('user-context-menu')
 	};
 	self.viewProfile = function() {
-		singlePage.viewProfile(self.getActiveUserId(), self.getActiveUsername());
+		singlePage.showPage('/profile/', self.getActiveUserId());
 	};
 	self.init = function() {
 		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);

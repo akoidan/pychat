@@ -1,8 +1,15 @@
-{% if form.instance.photo %}
-<div class="padding10 imgWrap" >
-	<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
+<div class="max-height-scrollable two-columns">
+	{% if form.instance.photo %}
+		<div class="col1 padding10" style="text-align: center">
+				<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
+		</div>
+
+		<canvas style="display:none;"></canvas>
+	{% endif %}
+
+	<div class="padding10">
+		<table class="biginputtext" id="userProfileData">
+			{{ form.as_table }}
+		</table>
+	</div>
 </div>
-{% endif %}
-<table class="biginputtext padding10" style="display: inline-block; vertical-align: top">
-	{{ form.as_table }}
-</table>
