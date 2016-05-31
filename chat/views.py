@@ -54,18 +54,6 @@ def validate_email(request):
 	return HttpResponse(response, content_type='text/plain')
 
 
-@require_http_methods(['GET'])
-def update_session_key(request):
-	"""
-	Creates a new session key, saves it to session store and to response
-	"""
-	old_key = request.session.session_key
-	request.session.create()  # updates the session_key
-	logger.info("Session key %s has been updated to %s", old_key, request.session.session_key)
-	request.session.modified = True
-	return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
-
-
 @require_http_methods('POST')
 def validate_user(request):
 	"""
@@ -268,7 +256,7 @@ def statistics(request):
 
 @login_required_no_redirect()
 @transaction.atomic
-def report_issue(self, request):
+def report_issue(request):
 	logger.info('Saving issue: %s', hide_fields(request.POST, 'log', huge=True))
 	issue = Issue.objects.get_or_create(content=request.POST['issue'])[0]
 	issue_details = IssueDetails(

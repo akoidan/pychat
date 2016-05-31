@@ -22,7 +22,6 @@ urlpatterns = patterns(
 	url(r'^validate_user$', 'chat.views.validate_user'),
 	url(r'^restore_password$', RestorePassword.as_view(), name='restore_pass'),
 	url(r'^send_restore_password$', 'chat.views.send_restore_password'),
-	url(r'^update_session_key', 'chat.views.update_session_key'),
 	url(r'^validate_email$', 'chat.views.validate_email'),
 	url(r'^profile$', ProfileView.as_view(), name='profile'),
 	url(r'^profile/(\d{1,5})$', 'chat.views.show_profile'),

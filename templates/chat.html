@@ -54,8 +54,6 @@
 		<div id="windowBody"></div>
 	</div>
 	<div id="wrapper" class="max-height-scrollable hidden">
-		<div id="chatbox" tabindex="0" onkeydown="keyDownLoadUp(event)">
-		</div>{% comment %}tabindex allows focus, focus allows keydown binding event{% endcomment %}
 		<div id="chat-room-users-wrapper" class="very-small-screen">
 			<ul id="user-context-menu" class="hidden">
 				<li onclick="userTable.call()">Call</li>
@@ -77,12 +75,9 @@
 	<div id="userMessageWrapper" class="hidden" style="position: relative">
 		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
 		<i class="icon-picture" title="Add a picture" onclick="$('imgInput').click()"></i>
-		<div id="userSendMessageTo" class="hidden">
-			<div id="receiverId"></div>
-			<i class="icon-cancel" onclick="hideUserSendToName();"></i>
-		</div>
 		<i class="icon-smile" title="Add a smile :)" onclick="smileyUtil.toggleSmileys(event)"></i>
-		<div contenteditable="true" id="usermsg" onkeydown="checkAndSendMessage(event)"></div>
+		<div contenteditable="true" id="usermsg" onkeydown="chatHandler.checkAndSendMessage(event)"></div>
+	{% comment %}TODO which chat variable to use?{% endcomment %}
 	</div>
 	<div id="callContainer" class="hidden">
 		<div id="callContainerContent">
@@ -122,7 +117,7 @@
 			</tr>
 			<tr>
 				<th>
-					<label for="history">Send Logs</label>
+					<label for="history">Send Lfogs</label>
 				</th>
 				<td><input type="checkbox" name="history" id="history" checked/></td>
 			<tr>
