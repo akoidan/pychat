@@ -110,6 +110,26 @@
 			</div>
 		</div>
 	</div>
+	<form method="post" id="issueForm" class="hidden">
+		<table class="fullwidth padding10">
+			<tr>
+				<th><label for="issue">The problem you discovered</label></th>
+				<td><textarea id="issue" aria-required="true" name="issue" required></textarea></td>
+			</tr>
+			<tr>
+				<th><label for="version">Affected browser</label></th>
+				<td><input type="text" name="browser" id="version"/></td>
+			</tr>
+			<tr>
+				<th>
+					<label for="history">Send Logs</label>
+				</th>
+				<td><input type="checkbox" name="history" id="history" checked/></td>
+			<tr>
+				<td colspan="2"><input type="submit" value="Sumbit"></td>
+			</tr>
+		</table>
+	</form>
 	<div class="modal-background hidden" id="callAnswerParent">
 		<div id="callAnswer" class="modal-body modal-fixed">
 			<span id="callAnswerText">Somebody is calling you</span>
@@ -126,5 +146,4 @@
 			</div>
 		</div>
 	</div>
-
 {% endblock %}

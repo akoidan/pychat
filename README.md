@@ -41,7 +41,6 @@ Start the chat:
 =======
 
 # TODO 
-* fix getUrlParam method if url has '/' char, for ex getUrlParam('next', 'https://pychat.org/register?type=login&next=/#/report_issue return') returns '/'
 * TODO move contextmenu colors to theme.sass 
 * shape-inside for contentteditable 
 * Colored print in download_content.sh
