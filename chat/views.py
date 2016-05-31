@@ -266,28 +266,19 @@ def statistics(request):
 	return HttpResponse(json.dumps(list(pie_data)), content_type='application/json')
 
 
-class IssueView(View):
-
-	def get(self, request):
-		return render_to_response(
-			'issue.html',  # getattr for anonymous.email
-			{'email': getattr(request.user, 'email', '')},
-			context_instance=RequestContext(request)
-		)
-
-	@login_required_no_redirect()
-	@transaction.atomic
-	def post(self, request):
-		logger.info('Saving issue: %s', hide_fields(request.POST, 'log', huge=True))
-		issue = Issue.objects.get_or_create(content=request.POST['issue'])[0]
-		issue_details = IssueDetails(
-			sender_id=request.user.id,
-			browser=request.POST.get('browser'),
-			issue=issue,
-			log=request.POST.get('log')
-		)
-		issue_details.save()
-		return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
+@login_required_no_redirect()
+@transaction.atomic
+def report_issue(self, request):
+	logger.info('Saving issue: %s', hide_fields(request.POST, 'log', huge=True))
+	issue = Issue.objects.get_or_create(content=request.POST['issue'])[0]
+	issue_details = IssueDetails(
+		sender_id=request.user.id,
+		browser=request.POST.get('browser'),
+		issue=issue,
+		log=request.POST.get('log')
+	)
+	issue_details.save()
+	return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
 
 
 class ProfileView(View):
