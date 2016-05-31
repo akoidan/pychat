@@ -1,4 +1,4 @@
-<div class="max-height-scrollable two-columns">
+<div class="max-height-scrollable two-columns" username="{{ form.instance.username }}">
 	{% if form.instance.photo %}
 		<div class="col1 padding10" style="text-align: center">
 				<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
