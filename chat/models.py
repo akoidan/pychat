@@ -154,8 +154,7 @@ class Issue(models.Model):
 
 
 class IssueDetails(models.Model):
-	sender = models.ForeignKey(User, null=True, blank=True)
-	email = models.EmailField(null=True, blank=True)
+	sender = models.ForeignKey(User, null=False	)
 	browser = models.CharField(null=False, max_length=32)
 	time = models.DateField(default=datetime.datetime.now, blank=True)
 	issue = models.ForeignKey(Issue, related_name='issue')

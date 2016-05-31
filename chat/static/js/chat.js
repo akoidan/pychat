@@ -173,21 +173,24 @@ function IssuePage() {
 	Page.call(self);
 	self.url = '/report_issue';
 	self.title = 'Report issue';
-	self.onLoad = function (html) {
-		self.super.onLoad(html);
-		$("version").value = window.browserVersion;
-		var issue = $('issue');
-		issue.addEventListener('input', function () {
-			issue.style.height = 'auto';
+	self.dom = {
+		issueForm:  $('issueForm'),
+		version: $("version"),
+		issue: $("issue")
+	};
+	self.dom.el = [self.dom.issueForm];
+	self.render = function () {
+		self.dom.version.value = window.browserVersion;
+		self.dom.issue.addEventListener('input', function () {
+			self.dom.issue.style.height = 'auto';
 			var textAreaHeight = issue.scrollHeight;
-			issue.style.height = textAreaHeight + 'px';
+			self.dom.issue.style.height = textAreaHeight + 'px';
 		});
-		self.issueForm = $('issueForm');
-		self.issueForm.onsubmit = self.onsubmit;
+		self.dom.issueForm.onsubmit = self.onsubmit;
+		self.show();
 	};
 	self.onsubmit = function (event) {
 		event.preventDefault();
-		var form = self.issueForm;
 		var params = {};
 		if ($('history').checked) {
 			var logs = localStorage.getItem(HISTORY_STORAGE_NAME);
@@ -202,7 +205,7 @@ function IssuePage() {
 			} else {
 				growlError(response);
 			}
-		}, form);
+		}, self.dom.issueForm);
 	};
 }
 
