@@ -1204,6 +1204,11 @@ var WebRtcApi = function () {
 		self.page.title = text;
 		self.dom.callContainerHeaderText.innerHTML = text;
 	};
+	self.oniceconnectionstatechange = function () {
+		if (self.pc.iceConnectionState == 'disconnected') {
+			self.closeEvents("Connection has been lost");
+		}
+	};
 	self.onoffer = function (message) {
 		self.clearTimeout();
 		self.receiverName = message.user;
@@ -1392,6 +1397,7 @@ var WebRtcApi = function () {
 		// }
 		var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
 		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
+		self.pc.oniceconnectionstatechange = self.oniceconnectionstatechange;
 		self.pc.onaddstream = function (event) {
 			self.setVideoSource(self.dom.remote, event.stream);
 			self.dom.remote.volume = volumeProportion[window.sound];
