@@ -59,6 +59,7 @@ Start the chat:
  5. If you're using firefox you probably need to allow self-assigned certificate for development. Open [https://localhost:8888](https://localhost:8888) (8888 is `API_PORT`) and add security exception
 
 # TODO 
+* fix getUrlParam method if url has '/' char, for ex getUrlParam('next', 'https://pychat.org/register?type=login&next=/#/report_issue return') returns '/'
 * TODO move contextmenu colors to theme.sass 
 * shape-inside for contentteditable 
 * Colored print in download_content.sh
