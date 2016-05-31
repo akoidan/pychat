@@ -182,10 +182,12 @@ function IssuePage() {
 			var textAreaHeight = issue.scrollHeight;
 			issue.style.height = textAreaHeight + 'px';
 		});
+		self.issueForm = $('issueForm');
+		self.issueForm.onsubmit = self.onsubmit;
 	};
-	self.onSumbit = function (event) {
+	self.onsubmit = function (event) {
 		event.preventDefault();
-		var form = $('issueForm');
+		var form = self.issueForm;
 		var params = {};
 		if ($('history').checked) {
 			var logs = localStorage.getItem(HISTORY_STORAGE_NAME);
@@ -196,7 +198,7 @@ function IssuePage() {
 		doPost('/report_issue', params, function (response) {
 			if (response === RESPONSE_SUCCESS) {
 				growlSuccess("Your issue has been successfully submitted");
-				self.closeWindow();
+				singlePage.showPage('');
 			} else {
 				growlError(response);
 			}
