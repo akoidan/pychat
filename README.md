@@ -41,7 +41,6 @@ Start the chat:
 =======
 
 # TODO 
-* TODO move contextmenu colors to theme.sass 
 * shape-inside for contentteditable 
 * Colored print in download_content.sh
 * Add multi-language support. 

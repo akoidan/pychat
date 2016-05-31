@@ -1,12 +1,12 @@
 @import "../../partials/mixins"
-@import "../../partials/mixins"
+@import "../../partials/variables"
 
 .color-lor
 	.icon-girl,
 	.icon-man:hover,
 	.icon-user-secret
 		&:hover
-			color: #C9C9AA !important
+			text-shadow: none
 
 	.message-header-others 		
 		color: #729fcf
@@ -17,9 +17,26 @@
 	.message-header-system
 		color: #9DD3DD
 
+	.icon-phone-circled
+		color: #509750
+
+	.icon-webrtc-fullscreen
+		color: #78C0C9
+
 	#userSendMessageTo
 		@include box-shadow(0 2px 2px rgba(6, 3, 8, 0.77))
 		border: 1px solid #101D07
+
+	#user-context-menu
+		background-color: #2C2B2A
+		li:hover
+			background-color: $color-lor-nav-color
+
+	#chat-user-table li
+		&:hover
+			background-color: #3C3F3A
+		&.active-user
+			background-color: $color-lor-nav-color
 
 	div[contenteditable]
 		@include box-shadow(0 1px 2px rgba(0,0,0,0.83) inset,0 -1px 0 rgba(0,0,0,0.66) inset)

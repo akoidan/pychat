@@ -20,8 +20,25 @@
 		text-shadow: $default-shadow
 		color: #A2A2A2
 
+	#chat-user-table li
+		&:hover
+			background-color: #454545
+		&.active-user
+			background-color: #181818
+
+	#user-context-menu
+		@include linear-gradient(#214341 , #193237)
+		li:hover
+			background-color: #0F201F
+
 	.activeTab
 		color: #C6B955
+
+	.icon-phone-circled
+		color: #3AC73A
+
+	.icon-webrtc-fullscreen
+		color: #6EEFFF
 
 	// call container
 	.modal-body
