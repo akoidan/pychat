@@ -1312,7 +1312,7 @@ var WebRtcApi = function () {
 		self.captureInput(self.createCallAfterCapture, true);
 	};
 	self.print = function (message){
-		growlInfo(getText("Call message {}", JSON.stringify(message)));
+		console.log(getDebugMessage("Call message {}", JSON.stringify(message)));
 	};
 	self.gotReceiveChannel = function (event) { /* TODO is it used ? */
 		console.log(getDebugMessage('Received Channel Callback'));
