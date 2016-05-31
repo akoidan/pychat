@@ -138,6 +138,7 @@ function Page() {
 		var holder = tmpWrapper.firstChild;
 		self.dom.el.push(holder);
 		self.dom.container.appendChild(holder);
+		headerText.innerHTML = self.getTitle();
 	};
 	self.foreach = function (apply) {
 		for (var i = 0; i< self.dom.el.length; i++) {
@@ -145,6 +146,7 @@ function Page() {
 		}
 	};
 	self.show = function () {
+		headerText.innerHTML = self.getTitle();
 		self.foreach(CssUtils.showElement);
 	};
 	self.update = self.show;
@@ -210,8 +212,9 @@ function ViewProfilePage(userId) {
 		return getText('/profile/{}', self.userId);
 	};
 	self.getTitle = function () {
-		return getText("{}'s profile", self.userName);
-	}
+		self.username = self.username || self.dom.el[0].getAttribute('username');
+		return getText("<b>{}</b>'s profile", self.username );
+	};
 }
 
 function ChangeProfilePage() {
@@ -326,10 +329,11 @@ var PageHandler = function () {
 			self.storagePages.push(newPage);
 			newPage.render();
 		}
-		headerText.innerHTML = newPage.getTitle();
 		self.currentPage = newPage;
 		if (!dontHistory ) {
-			window.history.pushState(newPage.getTitle(), newPage.getTitle(), self.getHistoryUrl(newPage));
+			var historyUrl = self.getHistoryUrl(newPage);
+			// TODO remove triple, carefull of undefined tittle in ViewProfilePage
+			window.history.pushState(historyUrl, historyUrl, historyUrl);
 		}
 	};
 	self.getHistoryUrl = function (pageObj) {
