@@ -22,7 +22,7 @@
 		<a href="/#/report_issue" class="icon-pencil very-small-screen" title="report an issue"
 			onclick="event.preventDefault(); singlePage.showPage('/report_issue')"><span class="mText">issue</span></a>
 		<i class="icon-clear" title="Clear local history" onclick="clearLocalHistory()"><span class="mText">clear</span></i>
-		<i class="icon-phone" title="Make a video/mic call" onclick="webRtcApi.showCallDialog()"><span class="mText">Call</span></i>
+		<a class="icon-phone" href="/#/call" title="Make a video/mic call" onclick="event.preventDefault(); webRtcApi.showCallDialog()"><span class="mText">Call</span></a>
 		<a href="/#/statistics" class="icon-chart-pie" onclick="event.preventDefault(); singlePage.showPage('/statistics')" title="Show user countries statistics"><span class="mText">statistics</span></a>
 		<span id='headerText' class="username very-small-screen flex-push-right"></span>
 		<a  href="/#/profile" title="Settings" onclick="event.preventDefault(); singlePage.showPage('/profile')" class="icon-wrench"> <span class="mText">Profile</span></a>
