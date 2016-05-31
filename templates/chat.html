@@ -24,7 +24,7 @@
 		<i class="icon-clear" title="Clear local history" onclick="clearLocalHistory()"><span class="mText">clear</span></i>
 		<i class="icon-phone" title="Make a video/mic call" onclick="webRtcApi.showCallDialog()"><span class="mText">Call</span></i>
 		<a href="/#/statistics" class="icon-chart-pie" onclick="event.preventDefault(); singlePage.showPage('/statistics')" title="Show user countries statistics"><span class="mText">statistics</span></a>
-		<span class="username very-small-screen flex-push-right">Hello, <b id="userNameLabel"> {{ username }}</b></span>
+		<span id='headerText' class="username very-small-screen flex-push-right"></span>
 		<a  href="/#/profile" title="Settings" onclick="event.preventDefault(); singlePage.showPage('/profile')" class="icon-wrench"> <span class="mText">Profile</span></a>
 		<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}">
 			<i title="Sign out" class="icon-sign-out"><span class="mText">sign out</span></i> </a>
@@ -84,11 +84,7 @@
 		<i class="icon-smile" title="Add a smile :)" onclick="smileyUtil.toggleSmileys(event)"></i>
 		<div contenteditable="true" id="usermsg" onkeydown="checkAndSendMessage(event)"></div>
 	</div>
-	<div id="callContainer" class="modal-body modal-draggable hidden">
-		<div id="callContainerHeader" class="noSelection windowHeader">
-			<span id="callContainerHeaderText"></span>
-			<i class="icon-cancel" onclick="webRtcApi.closeDialog()"></i>
-		</div>
+	<div id="callContainer" class="hidden">
 		<div id="callContainerContent">
 			<div id='videoContainer'>
 				<video id="remoteVideo" autoplay></video>

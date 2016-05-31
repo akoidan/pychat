@@ -52,6 +52,7 @@ var userSendMessageTo;
 var receiverId;
 // navbar label with current user name
 var charRooms;
+var headerText;
 //main single socket for handling realtime messages
 var ws;
 var wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 9 - connected;
@@ -101,6 +102,7 @@ onDocLoad(function () {
 	chatLogout = $("chatLogout");
 	receiverId = $("receiverId");
 	charRooms = $("rooms");
+	headerText = $('headerText');
 	chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	window.addEventListener("blur", changeTittleFunction);
@@ -112,11 +114,10 @@ onDocLoad(function () {
 	//bottom call loadMessagesFromLocalStorage(); s
 	showHelp();
 	userMessage.focus();
-	new Draggable($('callContainer'), $('callContainerHeader'));
+	singlePage = new PageHandler();
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
 	smileyUtil.init();
-	singlePage = new PageHandler();
 	$('imgInput').onchange = handleFileSelect;
 });
 
@@ -157,7 +158,8 @@ function Page() {
 		return self.title;
 	};
 	self.super = {
-		onLoad: self.onLoad
+		onLoad: self.onLoad,
+		hide: self.hide
 	};
 	self.toString = function (event) {
 		return self.name;
@@ -225,17 +227,33 @@ function ChangeProfilePage() {
 	}
 }
 
-
 function ChatPage() {
 	var self = this;
 	Page.call(self);
 	self.url = '';
-	self.title = 'Change profile';
+	self.title = getText("Hello, <b>{}</b>", loggedUser);
 	self.dom.el = [
 		$('wrapper'),
 		$('userMessageWrapper')
 	];
 	self.render = self.show;
+}
+
+function WebRtcPage() {
+	var self = this;
+	Page.call(self);
+	self.url = '/call';
+	self.title = 'Call';
+	self.dom.el = [
+		$('callContainer')
+	];
+	self.render = self.show;
+	self.hide = function () { // TODO remove cross object reference webRtcApi < - > WebRtcPage
+		if (webRtcApi.isActive()) {
+			growlInfo("Call is still active. Press green phone icon to move back to it");
+		}
+		self.super.hide()
+	}
 }
 
 function AmchartsPage() {
@@ -264,11 +282,13 @@ var PageHandler = function () {
 		'': ChatPage,
 		'/statistics': AmchartsPage,
 		'/profile/': ViewProfilePage,
-		'/profile': ChangeProfilePage
+		'/profile': ChangeProfilePage,
+		'/call': WebRtcPage
 	};
 	self.pageRegex = /\w\/#(\/\w+\/?)(\w?)/g;
 	self.storagePages = [];
 	self.init = function () {
+		self.storagePages.push(new self.pages['/call']());
 		self.onhashchange();
 		window.onhashchange = self.onhashchange;
 	};
@@ -297,9 +317,7 @@ var PageHandler = function () {
 		console.log(getDebugMessage('Rendering page "{}"', page));
 		var newPage;
 		var storagePage = self.getPageByUrl(page);
-		if (self.currentPage) {
-			self.currentPage.hide();
-		}
+		if (self.currentPage) self.currentPage.hide();
 		if (storagePage) {
 			newPage = storagePage;
 			newPage.update();
@@ -308,7 +326,7 @@ var PageHandler = function () {
 			self.storagePages.push(newPage);
 			newPage.render();
 		}
-
+		headerText.innerHTML = newPage.getTitle();
 		self.currentPage = newPage;
 		if (!dontHistory ) {
 			window.history.pushState(newPage.getTitle(), newPage.getTitle(), self.getHistoryUrl(newPage));
@@ -533,7 +551,7 @@ var SmileyUtil = function () {
 		}
 		self.showTabByName(Object.keys(smileyData)[0]);
 		loadMessagesFromLocalStorage(); /*Smileys should be encoded by time message load, otherwise they don't display*/
-	}
+	};
 };
 
 
@@ -566,6 +584,9 @@ function changeTittleFunction(e) {
 function userClick(event) {
 	event = event || window.event;
 	var target = event.target || event.srcElement;
+	if (target.tagName == 'I') {
+		target = target.parentNode;
+	}
 	CssUtils.showElement(userSendMessageTo);
 	// Empty sets display to none
 	receiverId.textContent = target.textContent; //destinationUserName
@@ -996,7 +1017,7 @@ var WebRtcApi = function () {
 	self.dom = {
 		callContainer : $('callContainer'),
 		callAnswerParent : $('callAnswerParent'),
-		callContainerHeaderText: $('callContainerHeaderText'),
+		callContainerHeaderText: headerText,
 		callAnswerText : $('callAnswerText'),
 		callUserList : $("callUserList"),
 		remote: $('remoteVideo'),
@@ -1016,6 +1037,7 @@ var WebRtcApi = function () {
 			enterFullScreen: $('enterFullScreen')
 		}
 	};
+	self.page = singlePage.getPageByUrl('/call');
 	self.onExitFullScreen = function () {
 		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
 			CssUtils.removeClass(self.dom.videoContainer, 'fullscreen');
@@ -1167,10 +1189,11 @@ var WebRtcApi = function () {
 		self.toggleInput(false);
 	};
 	self.onreply = function() {
-		self.setHeaderText(getText("Waiting for {} to answer", self.receiverName))
+		self.setHeaderText(getText("Waiting for <b>{}</b> to answer", self.receiverName))
 	};
 	self.setHeaderText = function(text) {
-		self.dom.callContainerHeaderText.textContent = text;
+		self.page.title = text;
+		self.dom.callContainerHeaderText.innerHTML = text;
 	};
 	self.onoffer = function (message) {
 		self.clearTimeout();
@@ -1205,17 +1228,18 @@ var WebRtcApi = function () {
 		}
 	};
 	self.showCallDialog = function (isCallActive) {
+		isCallActive = isCallActive || self.isActive();
+		if (isCallActive || Object.keys(onlineUsers).length > 1) {
+			singlePage.showPage('/call');
+		} else {
+			growlError("Nobody's online. Who do you call?");
+		}
 		self.setIconState(isCallActive);
 		if (!isCallActive) {
 			self.setHeaderText("Make a call");
 			self.updateDomOnlineUsers();
 		} else {
 			self.clearTimeout();
-		}
-		if (isCallActive || Object.keys(onlineUsers).length > 1) {
-			CssUtils.showElement(self.dom.callContainer);
-		} else {
-			growlError("Nobody's online. Who do you call?");
 		}
 	};
 	self.answerWebRtcCall = function () {
@@ -1362,7 +1386,7 @@ var WebRtcApi = function () {
 		self.pc.onaddstream = function (event) {
 			self.setVideoSource(self.dom.remote, event.stream);
 			self.dom.remote.volume = volumeProportion[window.sound];
-			self.setHeaderText(getText("You're talking to {} now", self.receiverName));
+			self.setHeaderText(getText("You're talking to <b>{}</b> now", self.receiverName));
 			self.setIconState(true);
 			console.log(getDebugMessage("Stream attached"));
 		};
@@ -1375,7 +1399,6 @@ var WebRtcApi = function () {
 	self.closeEvents = function (text) {
 		self.clearTimeout();
 		self.receiverName = null;
-		CssUtils.hideElement(self.dom.callContainer);
 		try {
 			self.pc.close();
 		} catch (error) {
@@ -1386,6 +1409,7 @@ var WebRtcApi = function () {
 				tracks[i].stop()
 			}
 		}
+		singlePage.showPage('');
 		growlInfo(text);
 		self.exitFullScreen(); /*also executes removing event on exiting from fullscreen*/
 	};
@@ -1404,7 +1428,7 @@ var WebRtcApi = function () {
 		if (self.isActive()) {
 			self.hangUp();
 		} else {
-			CssUtils.hideElement(self.dom.callContainer);
+			singlePage.showPage('');
 		}
 	};
 	self.connectWebRtc = function () {
