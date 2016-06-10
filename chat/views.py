@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
-from django.core import serializers
 from django.core.mail import send_mail
 
 try:
@@ -23,14 +22,13 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 from django.views.generic import View
-
 from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification
 from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging, SITE_PROTOCOL
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_email_verification, \
-	create_user_profile, check_captcha
+	create_user_profile, check_captcha, get_users_in_current_user_rooms
 
 logger = logging.getLogger(__name__)
 
@@ -78,6 +76,7 @@ def home(request):
 	"""
 	context = csrf(request)
 	context['suggestions'] = UserProfile.objects.get(id=request.user.id).suggestions
+	context['rooms'] = get_users_in_current_user_rooms(request.user.id)
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
 

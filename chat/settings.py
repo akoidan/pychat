@@ -275,6 +275,18 @@ if not DEBUG:
 
 
 ALL_REDIS_ROOM = 'all'
+ALL_ROOM_ID = 1
+
+USER_ROOMS_QUERY = """SELECT
+  chat_user.id,
+  chat_user.username,
+  chat_room.id as "room_id",
+  chat_room.name as "room_name"
+FROM
+  chat_user
+join chat_room_users on chat_user.id = chat_room_users.user_id
+join chat_room on chat_room_users.room_id = chat_room.id
+where chat_room_users.room_id in (select room_id from chat_room_users where user_id = %s)"""
 
 # ---------------JAVASCRIPT CONSTANTS --------------------
 

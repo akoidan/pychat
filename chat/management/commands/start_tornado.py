@@ -7,7 +7,8 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.web import Application
 
-from chat.tornadoapp import TornadoHandler, REDIS_ONLINE_USERS
+from chat.models import Room
+from chat.tornadoapp import TornadoHandler, RedisPrefix
 
 
 class Command(BaseCommand):
@@ -46,7 +47,9 @@ class Command(BaseCommand):
 		self.http_server.start(1)
 		# Init signals handler
 		from chat.global_redis import sync_redis
-		sync_redis.delete(REDIS_ONLINE_USERS)
+		rooms = Room.objects.values('id')
+		for room in rooms:
+			sync_redis.delete(RedisPrefix.ROOM_ONLINE % room['id'])
 		signal.signal(signal.SIGTERM, self.sig_handler)
 
 		# This will also catch KeyboardInterrupt exception
