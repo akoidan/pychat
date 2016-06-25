@@ -15,7 +15,7 @@ from django.db import connection
 from chat import local
 from chat import settings
 from chat.models import User, UserProfile, Room, Verification
-from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID, USER_ROOMS_QUERY
+from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID, USER_ROOMS_QUERY, GENDERS
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
 
@@ -164,24 +164,6 @@ def extract_photo(image_base64):
 		charset=None)
 	return image
 
-
-def get_users_in_current_user_rooms(request_user_id):
-	cursor = connection.cursor()
-	cursor.execute(USER_ROOMS_QUERY, [request_user_id])
-	query_res = cursor.fetchall()
-	res = {}
-	for user in query_res:
-		user_id = user[0]
-		user_name = user[1]
-		room_id = user[2]
-		room_name = user[3]
-		if room_id not in res:
-			res[room_id] = {
-				'name': room_name,
-				'users':  {}
-			}
-		res[room_id]['users'][user_id] = user_name
-	return json.dumps(res)
 
 def create_user_profile(email, password, sex, username):
 	user = UserProfile(username=username, email=email, sex_str=sex)

@@ -1,4 +1,5 @@
 @import "../../partials/mixins"
+@import "../../partials/variables"
 
 .color-reg
 	.forg-pass
@@ -16,9 +17,10 @@
 		border: 1px solid #000
 
 	.reg-log-container
-		input:active, select:active
-			padding-top: 16px
-			padding-bottom: 14px
+		input[type=button], select, input[type=submit]
+			&:active
+				padding-top: $register-buttons-vertical-pad + 1
+				padding-bottom: $register-buttons-vertical-pad - 1
 		[class^='icon-']
 			opacity: 1
 			text-shadow: none

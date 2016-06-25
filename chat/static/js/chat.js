@@ -12,7 +12,9 @@ const systemHeaderClass = 'message-header-system';
 const othersHeaderClass = 'message-header-others';
 const timeSpanClass = 'timeMess';
 const contentStyleClass = 'message-text-style';
-
+const DEFAULT_CHANNEL_NAME = 'r1';
+const USER_ID_ATTR = 'userid'; // used in ChannelsHandler and ChatHandler
+const USER_NAME_ATTR = 'username';  // used in ChannelsHandler and ChatHandler
 const SYSTEM_USERNAME = 'System';
 
 const genderIcons = {
@@ -47,9 +49,7 @@ var chatLogout;
 // input type that contains text for sending message
 var userMessage;
 // div that contains receiver id, icons, etc
-var userSendMessageTo;
 //user to send message input type text
-var receiverId;
 // navbar label with current user name
 var charRooms;
 var headerText;
@@ -58,13 +58,10 @@ var wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 9 - connect
 var chatUserRoomWrapper; // for hiddding users
 
 //All <p> ids (every id is UTC millis). this helps to prevent duplications, and detect position
-var allMessages = [];
-var allMessagesDates = [];
 var onlineUsers = {};
 var webRtcApi;
 var smileyUtil;
-var userTable;
-var chatHandler;
+var channelsHandler;
 var wsHandler;
 var storage;
 var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
@@ -95,12 +92,10 @@ var infoMessages = [
 onDocLoad(function () {
 	userMessage = $("usermsg");
 	chatUserRoomWrapper = $("chat-room-users-wrapper");
-	userSendMessageTo = $("userSendMessageTo");
 	chatIncoming = $("chatIncoming");
 	chatOutgoing = $("chatOutgoing");
 	chatLogin = $("chatLogin");
 	chatLogout = $("chatLogout");
-	receiverId = $("receiverId");
 	charRooms = $("rooms");
 	headerText = $('headerText');
 	// TODO chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
@@ -108,22 +103,21 @@ onDocLoad(function () {
 	window.addEventListener("blur", changeTittleFunction);
 	window.addEventListener("focus", changeTittleFunction);
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
-	userTable = new ChannelsHandler();
-	userTable.init();
+	channelsHandler = new ChannelsHandler();
 	showHelp();
 	userMessage.focus();
 	singlePage = new PageHandler();
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
-	chatHandler = new ChatHandler();
-	wsHandler = new  WsHandler(chatHandler);
+	wsHandler = new  WsHandler(channelsHandler);
 	//bottom call loadMessagesFromLocalStorage(); s
 	smileyUtil.init();
 	storage = new Storage();
 	storage.loadMessagesFromLocalStorage();
-	//TODO chatHandler.loadMessagesFromLocalStorage(); /*Smileys should be encoded by time message load, otherwise they don't display*/
+	//TODO channelsHandler.loadMessagesFromLocalStorage(); /*Smileys should be encoded by time message load, otherwise they don't display*/
 	wsHandler.start_chat_ws();
 	$('imgInput').onchange = handleFileSelect;
+	new Draggable($('addUserHolder'), "Add direct user channel")
 });
 
 
@@ -246,9 +240,12 @@ function ChangeProfilePage() {
 	}
 }
 
-function ChatPage() {
+function ChatPage(args, focus) {
 	var self = this;
 	Page.call(self);
+	if (args) {
+		channelsHandler.activeChannel = args[0];
+	}
 	self.url = '';
 	self.title = getText("Hello, <b>{}</b>", loggedUser);
 	self.dom = {
@@ -317,7 +314,6 @@ function PageHandler() {
 		window.onhashchange = self.showPageFromUrl;
 	};
 	self.showPageFromUrl = function () {
-		console.log(getDebugMessage("Processing history"));
 		var currentUrl = window.location.href;
 		var match = self.pageRegex.exec(currentUrl);
 		var params;
@@ -340,7 +336,7 @@ function PageHandler() {
 		}
 	};
 	self.showDefaultPage = function () {
-		self.showPage('/chat/', ['rooms', 'all']);
+		self.showPage('/chat/', [DEFAULT_CHANNEL_NAME]);
 	};
 	self.showPage = function (page, params, dontHistory) {
 		console.log(getDebugMessage('Rendering page "{}"', page));
@@ -369,29 +365,237 @@ function PageHandler() {
 }
 
 
+
 function ChannelsHandler() {
 	var self = this;
 	self.ROOM_ID_ATTR = 'roomid';
-	self.USER_ID_ATTR = 'userid';
-	self.USER_NAME_ATTR = 'userid';
-	self.currentChannel = {
-		id: null,
-		name: null
-	};
+	self.activeChannel = null;
+	self.channels = {};
 	self.dom = {
 		chatUsersTable: $("chat-user-table"),
+		rooms: $("rooms"),
 		activeUserContext: null,
-		userContextMenu: $('user-context-menu')
+		userContextMenu: $('user-context-menu'),
+		addUserHolder: $('addUserHolder'),
+		addUserList: $('addUserList'),
+		addUserInput: $('addUserInput'),
+		directUserTable: $('directUserTable')
+	};
+	self.roomClick = function (event) {
+		if (event.target.tagName == 'UL') {
+			return;
+		}
+		var roomId = event.target.getAttribute(self.ROOM_ID_ATTR);
+		if (self.activeRoomId == roomId) {
+			return;
+		}
+		self.setActiveChannel(self.generateRoomKey(roomId));
+	};
+	self.setActiveChannel = function (key) {
+		self.hideActiveChannel();
+		self.activeChannel = key;
+		self.showActiveChannel();
+	};
+	self.generateRoomKey = function (roomId) {
+		return "r" + roomId;
+	};
+	self.generateUserKey = function(userId) {
+		return "u" + userId;
+	};
+	self.showActiveChannel = function (){
+		if (self.activeChannel) {
+			self.channels[self.activeChannel].show()
+		}
+	};
+	self.hideActiveChannel = function (){
+		if (self.activeChannel) {
+			self.channels[self.activeChannel].hide()
+		}
+	};
+	self.userClick = function (event) {
+		event = event || window.event;
+		var target = event.target || event.srcElement;
+		if (target.tagName == 'I') {
+			target = target.parentNode;
+		}
+		if (target.tagName != 'LI') {
+			return;
+		}
+		var userId = event.target.getAttribute(USER_ID_ATTR);
+		var userKey = self.generateUserKey(userId);
+		if (!self.channels[userKey]) {
+			self.createNewUserChatHandler();
+		}
+		self.setActiveChannel(userKey);
+	};
+	self.sendMessage = function (messageRequest) {
+		// anonymous is set by name, registered user is set by id.
+		var sendSuccessful = wsHandler.sendToServer(messageRequest);
+		if (sendSuccessful) {
+			userMessage.innerHTML = "";
+		} else {
+			growlError("Can't send message, because connection is lost :(")
+		}
+	};
+	self.checkAndSendMessage = function (event) {
+		if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
+			event.preventDefault();
+			userMessage.innerHTML = userMessage.innerHTML.replace(smileRegex, "$1");
+			var messageContent = userMessage.textContent;
+			if (blankRegex.test(messageContent)) {
+				return;
+			}
+			self.sendMessage({
+				content: messageContent,
+				action: 'sendMessage',
+				channel: self.activeChannel
+			});
+		} else if (event.keyCode === 27) { // 27 = escape
+			smileyUtil.hideSmileys();
+		}
+	};
+	self.finishAddUser = function (event) {
+		var target = event.target;
+		if (target.tagName != 'LI') {
+			return
+		}
+		var userId = parseInt(target.getAttribute(USER_ID_ATTR));
+		var userKey = self.generateUserKey(userId);
+		if (!self.channels[userKey]) {
+			wsHandler.sendToServer({
+				action: 'direct',
+				userId: userId
+			});
+		}
+	};
+	self.showAddUser = function () {
+		CssUtils.showElement(self.dom.addUserHolder);
+		self.dom.addUserList.innerHTML = '';
+		self.addUserUsersList = {};
+		var allUsers = self.getAllUsersInfo();
+		for (var userId in allUsers) {
+			if (allUsers.hasOwnProperty(userId)) {
+				var li = document.createElement('LI');
+				var username = allUsers[userId].user;
+				self.addUserUsersList[username] = li;
+				li.innerText = username;
+				li.setAttribute(USER_ID_ATTR, userId);
+				self.dom.addUserList.appendChild(li);
+			}
+		}
+	};
+	self.getAllUsersInfo = function () {
+		return self.channels[DEFAULT_CHANNEL_NAME].allUsers;
+	};
+	self.filterAddUser = function () {
+		var filterValue = self.dom.addUserInput.value;
+		for (var userName in self.addUserUsersList) {
+			if (self.addUserUsersList.hasOwnProperty(userName)) {
+				if (userName.indexOf(filterValue) > -1) {
+					CssUtils.showElement(self.addUserUsersList[userName]);
+				} else {
+					CssUtils.hideElement(self.addUserUsersList[userName]);
+				}
+			}
+		}
+	};
+	self.dom.rooms.onclick = self.roomClick;
+	self.createNewUserChatHandler = function(roomId, allUsers) {
+		var allUsersIds = Object.keys(allUsers);
+		var anotherUserId;
+		if (allUsersIds.length == 2) {
+			anotherUserId = allUsersIds[0] == '' + loggedUserId ? allUsersIds[1] : allUsersIds[0];
+		} else {
+			anotherUserId = allUsersIds[0];
+		}
+		var li = createUserLi(anotherUserId, allUsers[anotherUserId].sex, allUsers[anotherUserId].user);
+		var roomKey = self.generateRoomKey(roomId);
+		li.setAttribute(self.ROOM_ID_ATTR, roomId);
+		self.dom.directUserTable.appendChild(li);
+		var chatHandler = new ChatHandler(li, allUsers);
+		self.channels[roomKey] = chatHandler;
+		if (self.activeChannel == roomKey) {
+			chatHandler.show();
+		}
+	};
+	self.getCurrentRoomIDs = function () {
+
+	};
+	self.setRooms = function (message) {
+		var rooms = message.content;
+		var oldRooms = [];
+		for (var channelKey in self.channels) {
+			if (self.channels.hasOwnProperty(channelKey) && channelKey.startsWith('r')) {
+				var oldRoomId = parseInt(channelKey.substring(1));
+				oldRooms.push(oldRoomId);
+				if (!rooms[oldRoomId]) {
+					self.channels[channelKey].destroy();
+				}
+			}
+		}
+		for (var roomId in rooms) {
+			// if a new room has been added while disconnected
+			if (rooms.hasOwnProperty(roomId)) {
+				var intKey = parseInt(roomId);
+				if (oldRooms.indexOf(intKey) < 0) {
+					var room = rooms[roomId];
+					if (room.name) {
+						self.createNewRoomChatHandler(roomId, room.name, room.users);
+					} else {
+						self.createNewUserChatHandler(roomId, room.users);
+					}
+				}
+			}
+		}
+	};
+	self.createNewRoomChatHandler = function(roomId, roomName, users) {
+		if (users == null) {
+			throw 'Users are empty';
+		}
+		var li = document.createElement('li');
+		var roomKey = self.generateRoomKey(roomId);
+		li.setAttribute(self.ROOM_ID_ATTR, roomId);
+		li.innerHTML = roomName;
+		self.dom.rooms.appendChild(li);
+		var chatHandler = new ChatHandler(li, users);
+		self.channels[roomKey] = chatHandler;
+
+		if (self.activeChannel == roomKey) {
+			chatHandler.show();
+		}
+	};
+	self.handle = function (message) {
+		if (message.handler == 'channels') {
+			self[message.action](message);
+		}
+		else if (message.handler == 'chat') {
+			self.channels[message.channel][message.action](message);
+		} else {
+			throw getText("Handler {} is uknown", message.handler);
+		}
+	};
+	self.direct = function(message) {
+		var users = message.users;
+		var anotherUserName = self.getAllUsersInfo();
+		var channelUsers = {};
+		channelUsers[users[1]] = anotherUserName[users[1]];
+		channelUsers[users[0]] = anotherUserName[users[0]];
+		self.createNewUserChatHandler(message.roomId, channelUsers)
 	};
 	self.viewProfile = function() {
 		singlePage.showPage('/profile/', self.getActiveUserId());
 	};
 	self.init = function() {
 		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);
+		for (var roomId in roomsUsers) {
+			if (roomsUsers.hasOwnProperty(roomId)) {
+				self.createNewRoomChatHandler(roomId, roomsUsers[roomId].name, roomsUsers[roomId].users);
+			}
+		}
 	};
 
 	self.getActiveUserId = function() {
-		return self.dom.activeUserContext.getAttribute(self.USER_ID_ATTR);
+		return self.dom.activeUserContext.getAttribute(USER_ID_ATTR);
 	};
 	self.getActiveUsername = function() {
 		return self.dom.activeUserContext.textContent;
@@ -428,59 +632,6 @@ function ChannelsHandler() {
 		CssUtils.hideElement(self.dom.userContextMenu);
 		document.removeEventListener("click", self.removeContextMenu);
 		CssUtils.removeClass(self.dom.activeUserContext, 'active-user');
-	};
-	self.loadUsers = function(usernames) {
-		if (!usernames) {
-			return;
-		}
-		onlineUsers = usernames;
-		if (!CssUtils.hasClass(webRtcApi.dom.callContainer, 'hidden')) {
-			webRtcApi.updateDomOnlineUsers();
-		}
-		console.log(getDebugMessage("Load user names: {}", Object.keys(usernames)));
-		self.dom.chatUsersTable.innerHTML = null;
-		for (var username in usernames) {
-			if (usernames.hasOwnProperty(username)) {
-				var icon;
-				var gender = usernames[username].sex;
-				var userId = usernames[username].userId;
-				icon = document.createElement('i');
-				icon.className = genderIcons[gender];
-				var li = document.createElement('li');
-				li.appendChild(icon);
-				li.onclick = self.userClick;
-				li.innerHTML += username;
-				li.setAttribute(self.USER_ID_ATTR, userId);
-				li.setAttribute(self.USER_NAME_ATTR, username);
-				self.dom.chatUsersTable.appendChild(li);
-			}
-		}
-	};
-	self.setupChannels = function (channelsParam) {
-		self.channels = channelsParam;
-		charRooms.innerHTML = '';
-		var ul = document.createElement('ul');
-		for (var key in self.channels) {
-			if (self.channels.hasOwnProperty(key)) {
-				var li = document.createElement('li');
-				li.setAttribute(self.ROOM_ID_ATTR, key);
-				li.innerHTML = self.channels[key];
-				ul.appendChild(li);
-			}
-		}
-		charRooms.appendChild(ul);
-	};
-	self.userClick = function (event) {
-		event = event || window.event;
-		var target = event.target || event.srcElement;
-		if (target.tagName == 'I') {
-			target = target.parentNode;
-		}
-		CssUtils.showElement(userSendMessageTo);
-		// Empty sets display to none
-		receiverId.textContent = target.textContent; //destinationUserName
-		userMessage.focus();
-		destinationUserId = parseInt(target.attributes.userid.value);
 	};
 }
 
@@ -662,47 +813,33 @@ function keyDownLoadUp(e) {
 	}
 }
 
-function ChatHandler() {
+function ChatHandler(li, allUsers) {
 	var self = this;
-	// TODO pas outside  for current channel
 	var wrapper = $('wrapper');
-	self.chatBoxDiv = document.createElement('div');
-	self.chatBoxDiv.className = 'chatbox';
-	wrapper.insertBefore(self.chatBoxDiv, wrapper.firstChild);
+	self.allUsers = allUsers;
+	self.dom = {};
+	self.allMessages = [];
+	self.allMessagesDates = [];
+	self.activeRoomClass = 'active-room';
+	self.dom.chatBoxDiv = document.createElement('div');
+	self.dom.userList = document.createElement('ul');
+	self.dom.roomNameLi = li;
+	self.dom.userList.className = 'hidden';
+	$('chat-user-table').appendChild(self.dom.userList);
+	self.dom.chatBoxDiv.className = 'chatbox hidden';
+	wrapper.insertBefore(self.dom.chatBoxDiv, wrapper.firstChild);
 	// tabindex allows focus, focus allows keydown binding event
-	self.chatBoxDiv.tabindex="0";
-	self.chatBoxDiv.onkeydown=keyDownLoadUp;
-
-	self.sendMessage = function (messageRequest) {
-		// anonymous is set by name, registered user is set by id.
-		if (destinationUserId != null) {
-			messageRequest['receiverId'] = destinationUserId;
-		}
-		var sendSuccessful = wsHandler.sendToServer(messageRequest);
-		if (sendSuccessful) {
-			userMessage.innerHTML = "";
-		} else {
-			growlError("Can't send message, because connection is lost :(")
-		}
+	self.dom.chatBoxDiv.tabindex="0";
+	self.dom.chatBoxDiv.onkeydown=keyDownLoadUp;
+	self.show = function () {
+		CssUtils.showElement(self.dom.chatBoxDiv);
+		CssUtils.showElement(self.dom.userList);
+		CssUtils.addClass(self.dom.roomNameLi, self.activeRoomClass);
 	};
-	self.checkAndSendMessage = function (event) {
-		if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
-			event.preventDefault();
-			userMessage.innerHTML = userMessage.innerHTML.replace(smileRegex, "$1");
-			var messageContent = userMessage.textContent;
-			if (blankRegex.test(messageContent)) {
-				return;
-			}
-			// http://stackoverflow.com/questions/6014702/how-do-i-detect-shiftenter-and-generate-a-new-line-in-textarea
-			// Since messages are sent by pressing enter, enter goes inside of textarea after sending
-
-			self.sendMessage({
-				content: messageContent,
-				action: 'send'
-			});
-		} else if (event.keyCode === 27) { // 27 = escape
-			smileyUtil.hideSmileys();
-		}
+	self.hide = function () {
+		CssUtils.hideElement(self.dom.chatBoxDiv);
+		CssUtils.hideElement(self.dom.userList);
+		CssUtils.removeClass(self.dom.roomNameLi, self.activeRoomClass);
 	};
 	/** Inserts element in the middle if it's not there
 	 * @param time element
@@ -710,20 +847,20 @@ function ChatHandler() {
 	 * @throws exception if element already there*/
 	self.getPosition = function (time) {
 		var arrayEl;
-		for (var i = 0; i < allMessages.length; i++) {
-			arrayEl = allMessages[i];
+		for (var i = 0; i < self.allMessages.length; i++) {
+			arrayEl = self.allMessages[i];
 			if (time === arrayEl) {
 				throw "Already in list";
 			}
 			if (time < arrayEl) {
-				allMessages.splice(i, 0, time);
+				self.allMessages.splice(i, 0, time);
 				return $(arrayEl);
 			}
 		}
 		return null;
 	};
 	/** Creates a DOM node with attached events and all message content*/
-	self.createMessageNode = function (timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix, userId) {
+	self.createMessageNode = function (timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix) {
 		var date = new Date(timeMillis);
 		var time = [sliceZero(date.getHours()), sliceZero(date.getMinutes()), sliceZero(date.getSeconds())].join(':');
 
@@ -740,13 +877,6 @@ function ChatHandler() {
 
 		var userNameA = document.createElement('span');
 		userNameA.textContent = displayedUsername;
-		userNameA.textContent = displayedUsername;
-		if (displayedUsername !== SYSTEM_USERNAME) {
-			userNameA.onclick = self.userClick;
-		}
-		if (userId != null) {
-			userNameA.setAttribute('userid', userId);
-		}
 		headSpan.insertAdjacentHTML('beforeend', ' ');
 		headSpan.appendChild(userNameA);
 		var userSuffix;
@@ -771,10 +901,10 @@ function ChatHandler() {
 	self.insertCurrentDay = function (timeMillis, pos) {
 		var innerHTML = new Date(timeMillis).toDateString();
 		//do insert only if date is not in chatBoxDiv
-		var insert = allMessagesDates.indexOf(innerHTML) < 0;
+		var insert = self.allMessagesDates.indexOf(innerHTML) < 0;
 		var fieldSet;
 		if (insert) {
-			allMessagesDates.push(innerHTML);
+			self.allMessagesDates.push(innerHTML);
 			fieldSet = document.createElement('fieldset');
 			var legend = document.createElement('legend');
 			legend.setAttribute('align', 'center');
@@ -788,19 +918,19 @@ function ChatHandler() {
 			// TODO innerText instead for ie?
 			result = (prevEl.tagName === 'FIELDSET' && prevEl.textContent.trim() !== innerHTML) ? prevEl : pos;
 			if (insert) {
-				self.chatBoxDiv.insertBefore(fieldSet, result);
+				self.dom.chatBoxDiv.insertBefore(fieldSet, result);
 			}
 		} else {
-			if (insert) self.chatBoxDiv.appendChild(fieldSet);
+			if (insert) self.dom.chatBoxDiv.appendChild(fieldSet);
 			result = null;
 		}
 		return result;
 	};
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
-	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, isPrefix, receiverId) {
+	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, isPrefix) {
 		var pos = null;
 
-		if (allMessages.length > 0 && !(timeMillis > allMessages[allMessages.length - 1])) {
+		if (self.allMessages.length > 0 && !(timeMillis > self.allMessages[self.allMessages.length - 1])) {
 			try {
 				pos = getPosition(timeMillis);
 			} catch (err) {
@@ -809,10 +939,10 @@ function ChatHandler() {
 				return;
 			}
 		} else {
-			allMessages.push(timeMillis);
+			self.allMessages.push(timeMillis);
 		}
 
-		var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix, receiverId);
+		var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix);
 		// every message has UTC millis ID so we can detect if message is already displayed or position to display
 
 		if (!isCurrentTabActive) {
@@ -821,80 +951,39 @@ function ChatHandler() {
 		}
 		pos = self.insertCurrentDay(timeMillis, pos);
 		if (pos != null) {
-			self.chatBoxDiv.insertBefore(p, pos);
+			self.dom.chatBoxDiv.insertBefore(p, pos);
 		} else {
-			var oldscrollHeight = self.chatBoxDiv.scrollHeight;
-			self.chatBoxDiv.appendChild(p);
-			var newscrollHeight = self.chatBoxDiv.scrollHeight;
+			var oldscrollHeight = self.dom.chatBoxDiv.scrollHeight;
+			self.dom.chatBoxDiv.appendChild(p);
+			var newscrollHeight = self.dom.chatBoxDiv.scrollHeight;
 			if (newscrollHeight > oldscrollHeight) {
-				self.chatBoxDiv.scrollTop = newscrollHeight;
+				self.dom.chatBoxDiv.scrollTop = newscrollHeight;
 			}
 		}
 	};
 	self.printMessage = function (data) {
-		var headerStyle;
-		var receiverName = data['receiverName'];
-		var receiverId = data['receiverId'];
-		var displayedUsername = data['user'];
+		var user = self.allUsers[data.userId];
+		var displayedUsername = user.user;
 		//private message
 		var prefix = false;
-		if (receiverName != null) {
-			headerStyle = privateHeaderClass;
-			if (receiverName !== loggedUser) {
-				displayedUsername = receiverName;
-				prefix = true;
-			}
-			// public message
-		} else if (data['user'] === loggedUser) {
-			headerStyle = selfHeaderClass;
-		} else {
-			headerStyle = othersHeaderClass;
-		}
+		var headerStyle = othersHeaderClass;
 		var preparedHtml;
 		if (data.image) {
 			preparedHtml = getText("<img src=\'{}\'/>", data.image);
 		} else {
 			preparedHtml = smileyUtil.encodeSmileys(data['content']);
 		}
-		self.displayPreparedMessage(headerStyle, data['time'], preparedHtml, displayedUsername, prefix, receiverId);
+		self.displayPreparedMessage(headerStyle, data['time'], preparedHtml, displayedUsername, prefix);
 	};
-	self.getJoinLeftChatMessage = function (data, action) {
+	self.getJoinLeftChatMessage = function (userId, action) {
 		var message;
-		if (data['user'] === loggedUser) {
-			message = 'You have ' + action + ' the chat';
+		var username = self.allUsers[userId].user;
+		if (username === loggedUser) {
+			message = 'You have ' + action ;
 		} else {
-			var who;
-			if (data['anonymous']) {
-				who = 'Anonymous';
-			} else {
-				who = 'User';
-			}
-			message = getText('{} <b>{}</b> has {} the chat.', who, data['user'], action);
-		}
-		if (action === 'joined') {
-			checkAndPlay(chatLogin);
-		} else if (action === 'left') {
-			checkAndPlay(chatLogout);
+			message = getText('User <b>{}</b> has {}', username, action);
 		}
 		return message;
-	};
-	self.printRefreshUserNameToChat = function(data) {
-		var message;
-		var action = data['action'];
-		if (action === 'changed') {
-			// if userName label already changed or still
-			if (data['oldName'] === loggedUser || data['user'] === loggedUser) {
-				message = getText('You have changed nickname to <b>{}</b> ', data['user']);
-			} else {
-				message = getText('Anonymous <b>{}</b> has changed nickname to <b>{}</b> ', data['oldName'], data['user']);
-			}
-		} else if (action !== 'onlineUsers') {
-			message = self.getJoinLeftChatMessage(data, action);
-		} else {
-			return;
-		}
-
-		self.displayPreparedMessage(systemHeaderClass, data['time'], message, SYSTEM_USERNAME);
 	};
 	self.handleGetMessages= function(message) {
 		console.log(getDebugMessage('appending messages to top'));
@@ -902,8 +991,8 @@ function ChatHandler() {
 		// because requests aren't being sent when there are no event for them, thus no responses
 		if (message.length === 0) {
 			console.log(getDebugMessage('Requesting messages has reached the top, removing loadUpHistoryEvent handlers'));
-			self.chatBoxDiv.removeEventListener(mouseWheelEventName, mouseWheelLoadUp);
-			self.chatBoxDiv.removeEventListener("keydown", keyDownLoadUp);
+			self.dom.chatBoxDiv.removeEventListener(mouseWheelEventName, mouseWheelLoadUp);
+			self.dom.chatBoxDiv.removeEventListener("keydown", keyDownLoadUp);
 			return;
 		}
 		var firstMessage = message[message.length - 1];
@@ -914,10 +1003,34 @@ function ChatHandler() {
 		});
 		lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
 	};
+	self.addOnlineUser = function (message) {
+		self.printChangeOnlineStatus('appeared online.', message, chatLogin);
 
-	self.changeOnlineUsers= function(data) {
-		self.printRefreshUserNameToChat(data);
-		userTable.loadUsers(data.content);
+	};
+	self.removeOnlineUser = function(message) {
+		self.printChangeOnlineStatus('has gone offline.', message, chatLogout);
+	};
+	self.printChangeOnlineStatus = function (action, message, sound) {
+		var dm = self.getJoinLeftChatMessage(message.userId, action);
+		checkAndPlay(sound);
+		self.displayPreparedMessage(systemHeaderClass, message.time, dm, SYSTEM_USERNAME);
+		self.setOnlineUsers(message);
+	};
+
+
+	self.setOnlineUsers = function(message) {
+		self.onlineUsers = message.content;
+		// if (!CssUtils.hasClass(webRtcApi.dom.callContainer, 'hidden')) {
+		// 	webRtcApi.updateDomOnlineUsers();
+		// } TODO
+		console.log(getDebugMessage("Load user names: {}", Object.keys(self.onlineUsers)));
+		self.dom.userList.innerHTML = null;
+		for (var i = 0; i < self.onlineUsers.length; i++) {
+			var userId = self.onlineUsers[i];
+			var user = self.allUsers[userId];
+			var li = createUserLi(userId, user.sex, user.user);
+			self.dom.userList.appendChild(li);
+		}
 	};
 	self.handleSendMessage = function(data) {
 		self.printMessage(data);
@@ -929,7 +1042,7 @@ function ChatHandler() {
 		}
 	};
 	self.loadUpHistory = function (count) {
-		if (self.chatBoxDiv.scrollTop === 0) {
+		if (self.dom.chatBoxDiv.scrollTop === 0) {
 			var currentMillis = new Date().getTime();
 			// 0 if locked, or last request was sent earlier than 3 seconds ago
 			if (lastLoadUpHistoryRequest + 3000 > currentMillis) {
@@ -945,7 +1058,9 @@ function ChatHandler() {
 			sendToServer(getMessageRequest);
 		}
 	};
-
+	self.destroy = function () {
+		throw  'Not implemented'; // should remove current handler with its dom
+	}
 }
 
 
@@ -1261,7 +1376,7 @@ function WebRtcApi() {
 		self.init();
 		self.pc.ondatachannel = self.gotReceiveChannel;
 	};
-	self.onWsMessage = function (data) {
+	self.handle = function (data) {
 		if (data.type != 'offer' && self.receiverName != data.user) {
 			console.warn(getDebugMessage("Skipping webrtc from '{}' as current user is '{}'", data.user,
 					self.receiverName));
@@ -1441,38 +1556,45 @@ function WebRtcApi() {
 }
 
 
-function WsHandler(chatHandler) {
+function WsHandler() {
 	var self = this;
-	self.chatHandler = chatHandler;
-	self.actions = {
-		joined: chatHandler.changeOnlineUsers,
-		left: chatHandler.changeOnlineUsers,
-		onlineUsers: chatHandler.changeOnlineUsers,
-		changed: chatHandler.changeOnlineUsers,
-		messages: function (data) {
-			chatHandler.handleGetMessages(data.content);
-		},
-		system: function (data) {
-			chatHandler.displayPreparedMessage(systemHeaderClass, data.time, data.content, SYSTEM_USERNAME);
-		},
-		send: chatHandler.handleSendMessage,
-		rooms: function (data) {
-			userTable.setupChannels(data.content);
-		},
-		call: function (data) {
-			webRtcApi.onWsMessage(data);
-		},
-		growl: function (data) {
-			growlError(data.content);
+	// self.actions = {
+	// 	addOnlineUser: chatHandler.changeOnlineUsers,
+	// 	left: chatHandler.changeOnlineUsers,
+	// 	onlineUsers: chatHandler.changeOnlineUsers,
+	// 	changed: chatHandler.changeOnlineUsers,
+	// 	messages: function (data) {
+	// 		chatHandler.handleGetMessages(data.content);
+	// 	},
+	// 	system: function (data) {
+	// 		chatHandler.displayPreparedMessage(systemHeaderClass, data.time, data.content, SYSTEM_USERNAME);
+	// 	},
+	// 	send: chatHandler.handleSendMessage,
+	// 	rooms: function (data) {
+	// 		userTable.setupChannels(data.content);
+	// 	},
+	// 	call: function (data) {
+	// 		webRtcApi.onWsMessage(data);
+	// 	},
+	// 	growl: function (data) {
+	// 		growlError(data.content);
+	// 	}
+	// };
+	self.handlers = {
+		channels: channelsHandler,
+		chat: channelsHandler,
+		webrtc: webRtcApi,
+		growl: {
+			handle: function (message) {
+				growlError(message.content);
+			}
 		}
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
 		console.log(getDebugMessage("WS in: {}", jsonData));
 		var data = JSON.parse(jsonData);
-
-		self.actions[data.action](data);
-
+		self.handlers[data.handler].handle(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
 		storage.saveMessageToStorage(data, jsonData);
 	};
@@ -1496,8 +1618,8 @@ function WsHandler(chatHandler) {
 			growlError(message);
 			console.error(getDebugMessage(message));
 		} else if (wsState === 0) {
-			growlError("Can't establish connection with chat server");
-			console.error(getText("Chat server is down because ", reason));
+			growlError("Can't establish connection with server");
+			console.error(getDebugMessage("Chat server is down because {}", reason));
 		} else if (wsState === 9) {
 			growlError(getText("Connection to chat server has been lost", reason));
 			console.error(getDebugMessage(
@@ -1506,7 +1628,7 @@ function WsHandler(chatHandler) {
 		}
 		wsState = 1;
 		// Try to reconnect in 10 seconds
-		setTimeout(start_chat_ws, CONNECTION_RETRY_TIME);
+		setTimeout(self.start_chat_ws, CONNECTION_RETRY_TIME);
 	};
 	self.start_chat_ws = function () {
 		self.ws = new WebSocket(API_URL);
@@ -1527,6 +1649,7 @@ function WsHandler(chatHandler) {
 function Storage() {
 	var self = this;
 	self.loadMessagesFromLocalStorage = function () {
+		return ; // TODO
 		var jsonData = localStorage.getItem(STORAGE_NAME);
 		if (jsonData != null) {
 			var parsedData = JSON.parse(jsonData);
@@ -1545,7 +1668,7 @@ function Storage() {
 		// Use both json and object repr for less JSON actions
 	self.saveMessageToStorage = function(objectItem, jsonItem) {
 		switch (objectItem['action']) {
-			case 'joined':
+			case 'addOnlineUser':
 			case 'changed':
 			case 'left':
 				delete objectItem['content']; // don't store usernames in db
@@ -1572,12 +1695,22 @@ function Storage() {
 	};
 }
 
+function createUserLi(userId, gender, username) {
+	var icon;
+	icon = document.createElement('i');
+	icon.className = genderIcons[gender];
+	var li = document.createElement('li');
+	li.appendChild(icon);
+	li.innerHTML += username;
+	li.setAttribute(USER_ID_ATTR, userId);
+	li.setAttribute(USER_NAME_ATTR, username);
+	return li;
+}
 
 // OH man be carefull with this method, it should reinit history
 function clearLocalHistory() {
 	headerId = null;
 	localStorage.clear();
-	allMessages = [];
 	allMessagesDates = [];
 	//TODO uncomment
 	//chatBoxDiv.innerHTML = '';

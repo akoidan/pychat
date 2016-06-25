@@ -28,7 +28,7 @@ from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification
 from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging, SITE_PROTOCOL
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_email_verification, \
-	create_user_profile, check_captcha, get_users_in_current_user_rooms
+	create_user_profile, check_captcha
 
 logger = logging.getLogger(__name__)
 
@@ -76,7 +76,6 @@ def home(request):
 	"""
 	context = csrf(request)
 	context['suggestions'] = UserProfile.objects.get(id=request.user.id).suggestions
-	context['rooms'] = get_users_in_current_user_rooms(request.user.id)
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
 

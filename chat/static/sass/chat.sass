@@ -65,6 +65,10 @@ p
 	min-width: 200px
 	text-overflow: ellipsis
 	position: relative
+	ul
+		margin-top: 5px
+		margin-bottom: 5px
+
 
 #user-context-menu
 	visibility: visible
@@ -103,9 +107,6 @@ p
 		border-radius: 3px
 		[class^='icon-']
 			opacity: 1
-		&:hover
-			cursor: pointer
-			opacity: 1
 		&.active-user
 			border: $user-context-border
 			border-radius: 5px 5px 0 0
@@ -137,6 +138,33 @@ p
 /*-webkit-mask-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 1) 95%, rgba(0, 0, 0, 0) 100%);
 /*TODO login dropdown goes under scroll, FF doesn't support
 /*}
+
+
+	border-radius: 3px
+
+#rooms li
+	border-radius: 3px
+	padding-left: 10px
+	&:not(.active-room):hover
+		cursor: pointer
+		background-color:  rgba(135, 135, 135, 0.3)
+
+.active-room
+	// TODO move colors to theme
+	background-color: rgba(33, 158, 147, 0.45)
+
+#addUserHolder
+	position: absolute
+	z-index: 1
+	left: 20vw
+	top: 20vh
+
+	#addUserList
+		max-height: calc(80vh - 100px)
+		overflow-y: scroll
+		margin: 5px 0 0
+		padding: 0 0 0 5px
+
 
 .fluid-height-child-bot
 	display: table

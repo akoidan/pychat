@@ -200,17 +200,41 @@ function growlInfo(message) {
 
 
 // TODO replace with HTML5 if possible
-function Draggable(container, header) {
+function Draggable(container, headerText) {
 	var self = this;
-	self.container = container;
-	self.header = header;
+	self.dom = {
+		container:  container
+	};
+	self.headerText = headerText;
+	self.init = function () {
+		CssUtils.addClass(self.dom.container, "modal-body");
+		CssUtils.addClass(self.dom.container, "modal-draggable");
+		self.dom.header = document.createElement('DIV');
+		self.dom.header.className = 'windowHeader noSelection';
+		self.dom.header.addEventListener ("mousedown", self.eleMouseDown, false);
+		self.dom.headerText = document.createElement('span');
+		self.dom.header.appendChild(self.dom.headerText);
+		self.dom.headerText.style = 'display: inline-block';
+		self.dom.headerText.textContent = self.headerText;
+		var iconCancel = document.createElement('i');
+		self.dom.header.appendChild(iconCancel);
+		iconCancel.style = "float: right; color: rgb(177, 53, 51)";
+		iconCancel.onclick = self.hide;
+		iconCancel.className = 'icon-cancel';
+		self.dom.body = self.dom.container.children[0];
+		CssUtils.addClass(self.dom.body, 'window-body');
+		self.dom.container.insertBefore(self.dom.header, self.dom.body);
+	};
+	self.hide = function () {
+		CssUtils.hideElement(self.dom.container);
+	};
 	self.attached = true;
 	self.eleMouseDown = function (ev) {
-		self.leftCorrection =  container.offsetLeft - ev.pageX;
-		self.topCorrection = container.offsetTop - ev.pageY;
+		self.leftCorrection =  self.dom.container.offsetLeft - ev.pageX;
+		self.topCorrection = self.dom.container.offsetTop - ev.pageY;
 		// TODO 7 is kind of magical bottom margin when source is attached to video
-		self.maxTop = document.body.clientHeight - container.clientHeight - 7;
-		self.maxLeft =  document.body.clientWidth - container.clientWidth - 3;
+		self.maxTop = document.body.clientHeight - self.dom.container.clientHeight - 7;
+		self.maxLeft =  document.body.clientWidth - self.dom.container.clientWidth - 3;
 		document.addEventListener ("mousemove", self.eleMouseMove, false);
 	};
 	self.eleMouseMove = function (ev) {
@@ -220,14 +244,14 @@ function Draggable(container, header) {
 		} else if (left > self.maxLeft) {
 			left = self.maxLeft;
 		}
-		self.container.style.left = left + "px";
+		self.dom.container.style.left = left + "px";
 		var top = ev.pageY + self.topCorrection;
 		if (top < 0) {
 			top = 0;
 		} else if (top > self.maxTop) {
 			top = self.maxTop;
 		}
-		self.container.style.top = top + "px";
+		self.dom.container.style.top = top + "px";
 		if (self.attached) {
 			document.addEventListener ("mouseup", self.eleMouseUp, false);
 			self.attached = false;
@@ -238,7 +262,7 @@ function Draggable(container, header) {
 		document.removeEventListener ("mouseup", self.eleMouseUp, false);
 		self.attached = true;
 	};
-	self.header.addEventListener ("mousedown", self.eleMouseDown, false);
+	self.init();
 }
 
 
@@ -339,9 +363,9 @@ function doPost(url, params, callback, form) {
 	r.onreadystatechange = function () {
 		if (r.readyState === 4) {
 			if (r.status === 200) {
-				console.log(getDebugMessage("POST {} in: {};", url, r.response));
+				console.log(getDebugMessage("POST in: {} ::: {};", url, r.response));
 			} else {
-				console.error(getDebugMessage("POST {} in: {}, status:", url, r.response, r.status));
+				console.error(getDebugMessage("POST in: {} ::: {}, status:", url, r.response, r.status));
 			}
 			if (typeof(callback) === "function") {
 				callback(r.response);
@@ -365,7 +389,7 @@ function doPost(url, params, callback, form) {
 	}
 	r.open("POST", url, true);
 	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
-	console.log(getDebugMessage("POST {} out: {}", url, params));
+	console.log(getDebugMessage("POST out: {} ::: {}", url, params));
 	r.send(data);
 }
 
@@ -373,6 +397,7 @@ function doPost(url, params, callback, form) {
 /**
  * Loads file from server on runtime */
 function doGet(fileUrl, callback) {
+	console.log(getDebugMessage("GET out: {}", fileUrl));
 	var regexRes = fileTypeRegex.exec(fileUrl);
 	var fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
 	var fileRef = null;
@@ -398,6 +423,7 @@ function doGet(fileUrl, callback) {
 			xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
 			xobj.onreadystatechange = function () {
 				if (xobj.readyState === 4 && xobj.status === 200) {
+					console.log(getDebugMessage('GET in: {} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100)));
 					if (callback) {
 						callback(xobj.responseText);
 					}

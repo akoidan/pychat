@@ -121,7 +121,10 @@ class UserProfile(User):
 class Room(models.Model):
 	name = CharField(max_length=30, null=True, unique=True)
 	users = models.ManyToManyField(User, related_name='rooms')
-	is_private = BooleanField(default=True)
+
+	@property
+	def is_private(self):
+		return self.name is None
 
 
 def get_milliseconds(dt=None):

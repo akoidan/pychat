@@ -49,7 +49,7 @@ class Command(BaseCommand):
 		from chat.global_redis import sync_redis
 		rooms = Room.objects.values('id')
 		for room in rooms:
-			sync_redis.delete(RedisPrefix.ROOM_ONLINE % room['id'])
+			sync_redis.delete(RedisPrefix.generate_room(room['id']))
 		signal.signal(signal.SIGTERM, self.sig_handler)
 
 		# This will also catch KeyboardInterrupt exception

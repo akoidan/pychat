@@ -9,6 +9,7 @@
 		const CHANGE_PROFILE_JS_URL = "{% md5url 'js/webrtc.js' %}";
 		const STATISTICS_JS_URL = "{% md5url "js/statistic.js" %}";
 		const loggedUser = "{{ username }}";
+		const loggedUserId = {{ userid }};
 		var suggestions = {{ suggestions |yesno:"true,false" }};
 	</script>
 	<script src="{% md5url "js/smileys_data.js" %}"></script>
@@ -46,37 +47,40 @@
 		}
 	}
 	</style>
-	<div id="window" class="modal-body hidden">
-		<div id="windowHeader" class="noSelection windowHeader">
-			<span></span>
-			<i class="icon-cancel"></i>
-		</div>
-		<div id="windowBody"></div>
-	</div>
 	<div id="wrapper" class="max-height-scrollable hidden">
 		<div id="chat-room-users-wrapper" class="very-small-screen">
 			<ul id="user-context-menu" class="hidden">
-				<li onclick="userTable.call()">Call</li>
+				<li onclick="channelsHandler.call()">Call</li>
 				<li onclick="growlError('not implemented')">Transfer file</li>
-				<li onclick="userTable.viewProfile()">View profile</li>
+				<li onclick="channelsHandler.viewProfile()">View profile</li>
 			</ul>
+			<span>#Channels<i class="icon-plus-squared" title="Create new channel" onclick="alert('not impl')"></i></span>
+			<ul id="rooms">
+			</ul>
+			<span>#Channel users<i class="icon-plus-squared" title="Create new channel" onclick="alert('not impl')"></i></span>
 			<ul id="chat-user-table">
+
 			</ul>
-			<div>
-				<span>#Channels <i class="icon-plus-squared" title="Create new channel" onclick="alert('not impl')"></i></span>
-				<div id="rooms">
-				</div>
-			</div>
+			<span>#Direct<i class="icon-plus-squared" title="Create new channel" onclick="channelsHandler.showAddUser()"></i></span>
+			<ul id="directUserTable">
+			</ul>
 		</div>
 		<div id="smileParentHolder" class="padding10 hidden" onclick="smileyUtil.addSmile(event);">
 			<ul id="tabNames" onclick="smileyUtil.showTabByName(event)"></ul>
+		</div>
+	</div>
+	<div id="addUserHolder" class="hidden">
+		<div>
+			<input type="text" placeholder="search" title="Filter by username" onkeyup="channelsHandler.filterAddUser()" id="addUserInput"/>
+			<ul id="addUserList" onclick="channelsHandler.finishAddUser(event)">
+			</ul>
 		</div>
 	</div>
 	<div id="userMessageWrapper" class="hidden" style="position: relative">
 		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
 		<i class="icon-picture" title="Add a picture" onclick="$('imgInput').click()"></i>
 		<i class="icon-smile" title="Add a smile :)" onclick="smileyUtil.toggleSmileys(event)"></i>
-		<div contenteditable="true" id="usermsg" onkeydown="chatHandler.checkAndSendMessage(event)"></div>
+		<div contenteditable="true" id="usermsg" onkeydown="channelsHandler.checkAndSendMessage(event)"></div>
 	{% comment %}TODO which chat variable to use?{% endcomment %}
 	</div>
 	<div id="callContainer" class="hidden">
@@ -117,7 +121,7 @@
 			</tr>
 			<tr>
 				<th>
-					<label for="history">Send Lfogs</label>
+					<label for="history">Send Logs</label>
 				</th>
 				<td><input type="checkbox" name="history" id="history" checked/></td>
 			<tr>
