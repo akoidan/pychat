@@ -235,11 +235,15 @@ class MessagesHandler(MessagesCreator):
 
 	@tornado.gen.engine
 	def listen(self, channels):
-		"""
-		self.channel should been set before calling
-		"""
 		yield tornado.gen.Task(
 			self.async_redis.subscribe, channels)
+		self.async_redis.listen(self.new_message)
+
+	@tornado.gen.engine
+	def add_channel(self, channel):
+		self.channels.append(channel)
+		yield tornado.gen.Task(
+			self.async_redis.subscribe, channel)
 
 	def do_db(self, callback, *arg, **args):
 		try:
@@ -249,12 +253,12 @@ class MessagesHandler(MessagesCreator):
 			connection.close()
 			return callback(*arg, **args)
 
-	def get_online_from_redis(self, room_id, check_user_id=None, check_hash=None):
+	def get_online_from_redis(self, channel, check_user_id=None, check_hash=None):
 		"""
 		:rtype : dict
 		returns (dict, bool) if check_type is present
 		"""
-		online = self.sync_redis.hgetall(RedisPrefix.generate_room(room_id))
+		online = self.sync_redis.hgetall(channel)
 		self.logger.debug('!! redis online: %s', online)
 		result = set()
 		user_is_online = False
@@ -274,8 +278,8 @@ class MessagesHandler(MessagesCreator):
 		online_users = { connection_hash1 = stored_redis_user1, connection_hash_2 = stored_redis_user2 }
 		:return:
 		"""
-		online = self.get_online_from_redis(room_id)
 		channel_key = RedisPrefix.generate_room(room_id)
+		online = self.get_online_from_redis(channel_key)
 		self.async_redis_publisher.hset(channel_key, id(self), self.stored_redis_user)
 		if self.user_id not in online:  # if a new tab has been opened
 			online.append(self.user_id)
@@ -417,7 +421,7 @@ class MessagesHandler(MessagesCreator):
 
 	def send_client_new_direct_channel(self, message):
 		channel = RedisPrefix.generate_room(message[VarNames.ROOM_ID])
-		self.listen(channel)
+		self.add_channel(channel) # TODO doesnt work if already subscribed
 
 	def process_get_messages(self, data):
 		"""
@@ -574,10 +578,10 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				if self.connected:
 					# seems like async solves problem with connection lost and wrong data status
 					# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
-					online, is_online = self.get_online_from_redis(channel, self.sender_name, self_id)
+					online, is_online = self.get_online_from_redis(channel, self.user_id, self_id)
 					self.logger.info('!! Closing connection, redis current online %s', online)
 					if not is_online:
-						message = self.default(online, Actions.LOGOUT, HandlerNames.CHAT)
+						message = self.room_online(online, Actions.LOGOUT, channel)
 						self.logger.debug('!! User closed the last tab, refreshing online for all')
 						self.publish(message, channel)
 					else:
@@ -603,7 +607,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				'ip': self.ip
 			}
 			self.logger = logging.LoggerAdapter(logger, log_params)
-			self.async_redis.listen(self.new_message)
+
 			self.listen(self.channels)
 			for room_id in self.room_names:
 				self.add_online_user(room_id)

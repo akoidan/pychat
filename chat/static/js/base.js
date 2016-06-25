@@ -230,6 +230,9 @@ function Draggable(container, headerText) {
 	};
 	self.attached = true;
 	self.eleMouseDown = function (ev) {
+		if (ev.target.tagName == 'I') {
+			return; // if close icon was clicked
+		}
 		self.leftCorrection =  self.dom.container.offsetLeft - ev.pageX;
 		self.topCorrection = self.dom.container.offsetTop - ev.pageY;
 		// TODO 7 is kind of magical bottom margin when source is attached to video

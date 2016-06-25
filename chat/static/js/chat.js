@@ -499,7 +499,6 @@ function ChannelsHandler() {
 			}
 		}
 	};
-	self.dom.rooms.onclick = self.roomClick;
 	self.createNewUserChatHandler = function(roomId, allUsers) {
 		var allUsersIds = Object.keys(allUsers);
 		var anotherUserId;
@@ -587,13 +586,10 @@ function ChannelsHandler() {
 	};
 	self.init = function() {
 		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);
-		for (var roomId in roomsUsers) {
-			if (roomsUsers.hasOwnProperty(roomId)) {
-				self.createNewRoomChatHandler(roomId, roomsUsers[roomId].name, roomsUsers[roomId].users);
-			}
-		}
+		self.dom.rooms.onclick = self.roomClick;
+		console.error('todo');
+		self.dom.directUserTable.onclick = self.roomClick;
 	};
-
 	self.getActiveUserId = function() {
 		return self.dom.activeUserContext.getAttribute(USER_ID_ATTR);
 	};
@@ -633,6 +629,7 @@ function ChannelsHandler() {
 		document.removeEventListener("click", self.removeContextMenu);
 		CssUtils.removeClass(self.dom.activeUserContext, 'active-user');
 	};
+	self.init();
 }
 
 var handleFileSelect = function (evt) {
@@ -1008,7 +1005,7 @@ function ChatHandler(li, allUsers) {
 
 	};
 	self.removeOnlineUser = function(message) {
-		self.printChangeOnlineStatus('has gone offline.', message, chatLogout);
+		self.printChangeOnlineStatus('gone offline.', message, chatLogout);
 	};
 	self.printChangeOnlineStatus = function (action, message, sound) {
 		var dm = self.getJoinLeftChatMessage(message.userId, action);
@@ -1558,28 +1555,11 @@ function WebRtcApi() {
 
 function WsHandler() {
 	var self = this;
-	// self.actions = {
-	// 	addOnlineUser: chatHandler.changeOnlineUsers,
-	// 	left: chatHandler.changeOnlineUsers,
-	// 	onlineUsers: chatHandler.changeOnlineUsers,
-	// 	changed: chatHandler.changeOnlineUsers,
-	// 	messages: function (data) {
-	// 		chatHandler.handleGetMessages(data.content);
-	// 	},
-	// 	system: function (data) {
-	// 		chatHandler.displayPreparedMessage(systemHeaderClass, data.time, data.content, SYSTEM_USERNAME);
-	// 	},
-	// 	send: chatHandler.handleSendMessage,
-	// 	rooms: function (data) {
-	// 		userTable.setupChannels(data.content);
-	// 	},
-	// 	call: function (data) {
-	// 		webRtcApi.onWsMessage(data);
-	// 	},
-	// 	growl: function (data) {
-	// 		growlError(data.content);
-	// 	}
-	// };
+	self.dom = {
+		onlineStatus: $('onlineStatus'),
+		onlineClass: 'online',
+		offlineClass: 'offline'
+	};
 	self.handlers = {
 		channels: channelsHandler,
 		chat: channelsHandler,
@@ -1611,7 +1591,12 @@ function WsHandler() {
 		}
 	};
 
+	self.setStatus = function(isOnline) {
+		var statusClass = isOnline ? self.dom.onlineClass : self.dom.offlineClass;
+		CssUtils.setOnOf(self.dom.onlineStatus, statusClass, [self.dom.onlineClass, self.dom.offlineClass]);
+	};
 	self.onWsClose = function (e) {
+		self.setStatus(false);
 		var reason = e.reason || e;
 		if (e.code === 403) {
 			var message = getText("Server has forbidden request because '{}'", reason);
@@ -1635,6 +1620,7 @@ function WsHandler() {
 		self.ws.onmessage = self.onWsMessage; // TODO
 		self.ws.onclose = self.onWsClose;
 		self.ws.onopen = function () {
+			self.setStatus(true);
 			var message = "Connection to server has been established";
 			if (wsState === 1) { // if not inited don't growl message on page load
 				growlSuccess(message);

@@ -7,6 +7,19 @@
 [class^="message-header"]
 	font-weight: bold
 
+
+@mixin hovered-user-room()
+	&:hover:not(.active-room)
+		cursor: pointer
+		background-color:  rgba(135, 135, 135, 0.3)
+		opacity: 1
+		i
+			opacity: inherit
+
+@mixin fix-user-icon-top-position()
+	i:before
+		transform: translate(0, 3px)
+
 fieldset
 	border-top: 1px solid #aaa
 	border-bottom: none
@@ -112,8 +125,16 @@ p
 			border-radius: 5px 5px 0 0
 			transition: 0.3s
 			transition-property: background-color, border
-		i:before
-			transform: translate(0, 3px)
+		@include fix-user-icon-top-position
+		i:hover
+			cursor: inherit
+
+#onlineStatus
+	padding: 0 10px
+	&.offline
+		color: red
+	&.online
+		color: green
 
 .icon-cancel
 	position: absolute
@@ -142,12 +163,11 @@ p
 
 	border-radius: 3px
 
+
 #rooms li
 	border-radius: 3px
 	padding-left: 10px
-	&:not(.active-room):hover
-		cursor: pointer
-		background-color:  rgba(135, 135, 135, 0.3)
+	@include hovered-user-room
 
 .active-room
 	// TODO move colors to theme
@@ -163,8 +183,17 @@ p
 		max-height: calc(80vh - 100px)
 		overflow-y: scroll
 		margin: 5px 0 0
-		padding: 0 0 0 5px
 
+		li
+			padding: 0 0 0 5px
+			border-radius: 2px
+			@include hovered-user-room
+
+#directUserTable li
+	@include  fix-user-icon-top-position
+	border-radius: 3px
+	&:hover
+		@include hovered-user-room
 
 .fluid-height-child-bot
 	display: table
