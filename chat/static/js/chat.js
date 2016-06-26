@@ -6,10 +6,10 @@ if (!("WebSocket" in window)) {
 }
 const CONNECTION_RETRY_TIME = 5000;
 
-const selfHeaderClass = 'message-header-self';
+
 const privateHeaderClass = 'message-header-private';
 const systemHeaderClass = 'message-header-system';
-const othersHeaderClass = 'message-header-others';
+
 const timeSpanClass = 'timeMess';
 const contentStyleClass = 'message-text-style';
 const DEFAULT_CHANNEL_NAME = 'r1';
@@ -26,8 +26,6 @@ const genderIcons = {
 var smileRegex = /<img[^>]*code="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-var destinationUserId = null;
-
 var lastLoadUpHistoryRequest = 0;
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
@@ -36,9 +34,6 @@ var isCurrentTabActive = true;
 //localStorage  key
 const STORAGE_NAME = 'main';
 //current top message id for detecting from what
-var headerId;
-//  div that contains messages
-var chatBoxDiv;
 
 //sound
 var chatIncoming;
@@ -116,7 +111,6 @@ onDocLoad(function () {
 	storage.loadMessagesFromLocalStorage();
 	//TODO channelsHandler.loadMessagesFromLocalStorage(); /*Smileys should be encoded by time message load, otherwise they don't display*/
 	wsHandler.start_chat_ws();
-	$('imgInput').onchange = handleFileSelect;
 	new Draggable($('addUserHolder'), "Add direct user channel")
 });
 
@@ -379,7 +373,8 @@ function ChannelsHandler() {
 		addUserHolder: $('addUserHolder'),
 		addUserList: $('addUserList'),
 		addUserInput: $('addUserInput'),
-		directUserTable: $('directUserTable')
+		directUserTable: $('directUserTable'),
+		imgInput: $('imgInput')
 	};
 	self.roomClick = function (event) {
 		if (event.target.tagName == 'UL') {
@@ -437,6 +432,24 @@ function ChannelsHandler() {
 			growlError("Can't send message, because connection is lost :(")
 		}
 	};
+	self.handleFileSelect = function (evt) {
+		var files = evt.target.files;
+		var file = files[0];
+		if (files && file) {
+			var reader = new FileReader();
+			reader.onload = function (readerEvt) {
+				var binaryString = readerEvt.target.result;
+				self.sendMessage({
+					image: getText("data:{};base64,{}",file.type, btoa(binaryString)),
+					content: null,
+					action: 'sendMessage',
+					channel: self.activeChannel
+				});
+				self.dom.imgInput.value = "";
+			};
+			reader.readAsBinaryString(file);
+		}
+	};
 	self.checkAndSendMessage = function (event) {
 		if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
 			event.preventDefault();
@@ -463,7 +476,7 @@ function ChannelsHandler() {
 		var userKey = self.generateUserKey(userId);
 		if (!self.channels[userKey]) {
 			wsHandler.sendToServer({
-				action: 'direct',
+				action: 'addDirectChannel',
 				userId: userId
 			});
 		}
@@ -499,23 +512,37 @@ function ChannelsHandler() {
 			}
 		}
 	};
-	self.createNewUserChatHandler = function(roomId, allUsers) {
-		var allUsersIds = Object.keys(allUsers);
+	self.getAnotherUserId = function(allUsersIds) {
 		var anotherUserId;
 		if (allUsersIds.length == 2) {
 			anotherUserId = allUsersIds[0] == '' + loggedUserId ? allUsersIds[1] : allUsersIds[0];
 		} else {
 			anotherUserId = allUsersIds[0];
 		}
-		var li = createUserLi(anotherUserId, allUsers[anotherUserId].sex, allUsers[anotherUserId].user);
+		return anotherUserId;
+	};
+	self.createChannelChatHandler = function(roomId, li, users) {
 		var roomKey = self.generateRoomKey(roomId);
 		li.setAttribute(self.ROOM_ID_ATTR, roomId);
-		self.dom.directUserTable.appendChild(li);
-		var chatHandler = new ChatHandler(li, allUsers);
+		var chatHandler = new ChatHandler(li, users);
 		self.channels[roomKey] = chatHandler;
 		if (self.activeChannel == roomKey) {
 			chatHandler.show();
 		}
+	};
+	self.createNewUserChatHandler = function(roomId, users) {
+		var allUsersIds = Object.keys(users);
+		var anotherUserId = self.getAnotherUserId(allUsersIds);
+		var li = createUserLi(anotherUserId, users[anotherUserId].sex, users[anotherUserId].user);
+		self.dom.directUserTable.appendChild(li);
+		self.createChannelChatHandler(roomId, li, users);
+		return anotherUserId;
+	};
+	self.createNewRoomChatHandler = function(roomId, roomName, users) {
+		var li = document.createElement('li');
+		self.dom.rooms.appendChild(li);
+		li.innerHTML = roomName;
+		self.createChannelChatHandler(roomId, li, users);
 	};
 	self.getCurrentRoomIDs = function () {
 
@@ -547,22 +574,6 @@ function ChannelsHandler() {
 			}
 		}
 	};
-	self.createNewRoomChatHandler = function(roomId, roomName, users) {
-		if (users == null) {
-			throw 'Users are empty';
-		}
-		var li = document.createElement('li');
-		var roomKey = self.generateRoomKey(roomId);
-		li.setAttribute(self.ROOM_ID_ATTR, roomId);
-		li.innerHTML = roomName;
-		self.dom.rooms.appendChild(li);
-		var chatHandler = new ChatHandler(li, users);
-		self.channels[roomKey] = chatHandler;
-
-		if (self.activeChannel == roomKey) {
-			chatHandler.show();
-		}
-	};
 	self.handle = function (message) {
 		if (message.handler == 'channels') {
 			self[message.action](message);
@@ -573,13 +584,14 @@ function ChannelsHandler() {
 			throw getText("Handler {} is uknown", message.handler);
 		}
 	};
-	self.direct = function(message) {
+	self.addDirectChannel = function(message) {
 		var users = message.users;
 		var anotherUserName = self.getAllUsersInfo();
 		var channelUsers = {};
 		channelUsers[users[1]] = anotherUserName[users[1]];
 		channelUsers[users[0]] = anotherUserName[users[0]];
-		self.createNewUserChatHandler(message.roomId, channelUsers)
+		var anotherUserId = self.createNewUserChatHandler(message.roomId, channelUsers);
+		growlInfo(getText('<span>Channel for user <b>{}</b> has been created</span>', anotherUserName[anotherUserId].user));
 	};
 	self.viewProfile = function() {
 		singlePage.showPage('/profile/', self.getActiveUserId());
@@ -589,6 +601,7 @@ function ChannelsHandler() {
 		self.dom.rooms.onclick = self.roomClick;
 		console.error('todo');
 		self.dom.directUserTable.onclick = self.roomClick;
+		self.dom.imgInput.onchange = self.handleFileSelect;
 	};
 	self.getActiveUserId = function() {
 		return self.dom.activeUserContext.getAttribute(USER_ID_ATTR);
@@ -631,24 +644,6 @@ function ChannelsHandler() {
 	};
 	self.init();
 }
-
-var handleFileSelect = function (evt) {
-	var files = evt.target.files;
-	var file = files[0];
-	if (files && file) {
-		var reader = new FileReader();
-		reader.onload = function (readerEvt) {
-			var binaryString = readerEvt.target.result;
-			sendMessage({
-				image: getText("data:{};base64,{}",file.type, btoa(binaryString)),
-				content: null,
-				action: 'send'
-			});
-			$('imgInput').value = "";
-		};
-		reader.readAsBinaryString(file);
-	}
-};
 
 function showHelp() {
 	if (suggestions) {
@@ -821,6 +816,8 @@ function ChatHandler(li, allUsers) {
 	self.dom.chatBoxDiv = document.createElement('div');
 	self.dom.userList = document.createElement('ul');
 	self.dom.roomNameLi = li;
+	self.SELF_HEADER_CLASS = 'message-header-self';
+	self.OTHER_HEADER_CLASS = 'message-header-others';
 	self.dom.userList.className = 'hidden';
 	$('chat-user-table').appendChild(self.dom.userList);
 	self.dom.chatBoxDiv.className = 'chatbox hidden';
@@ -963,7 +960,7 @@ function ChatHandler(li, allUsers) {
 		var displayedUsername = user.user;
 		//private message
 		var prefix = false;
-		var headerStyle = othersHeaderClass;
+		var headerStyle = data.userId  == loggedUserId ? self.SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
 		var preparedHtml;
 		if (data.image) {
 			preparedHtml = getText("<img src=\'{}\'/>", data.image);
@@ -993,7 +990,7 @@ function ChatHandler(li, allUsers) {
 			return;
 		}
 		var firstMessage = message[message.length - 1];
-		headerId = firstMessage.id;
+		self.headerId = firstMessage.id;
 
 		message.forEach(function (message) {
 			self.printMessage(message);
@@ -1048,7 +1045,7 @@ function ChatHandler(li, allUsers) {
 			}
 			lastLoadUpHistoryRequest = currentMillis;
 			var getMessageRequest = {
-				headerId: headerId,
+				headerId: self.headerId,
 				count: count,
 				action: 'messages'
 			};
@@ -1695,7 +1692,7 @@ function createUserLi(userId, gender, username) {
 
 // OH man be carefull with this method, it should reinit history
 function clearLocalHistory() {
-	headerId = null;
+	self.headerId // For all channels TODO
 	localStorage.clear();
 	allMessagesDates = [];
 	//TODO uncomment

@@ -53,7 +53,7 @@ class Actions:
 	SYSTEM_MESSAGE = 'system'
 	GROWL_MESSAGE = 'growl'
 	GET_MESSAGES = 'messages'
-	CREATE_DIRECT_CHANNEL = 'direct'
+	CREATE_DIRECT_CHANNEL = 'addDirectChannel'
 
 
 class VarNames:
@@ -408,7 +408,9 @@ class MessagesHandler(MessagesCreator):
 		room.save()
 		subscribe_message = self.subscribe_direct_message(room.id, user_id)
 		self.publish(subscribe_message, self.channel, True)
-		self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
+		other_channel = RedisPrefix.generate_user(user_id)
+		if self.channel != other_channel:
+			self.publish(subscribe_message, other_channel, True)
 
 	def create_channel(self, message):
 		"""
