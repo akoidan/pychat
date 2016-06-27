@@ -377,13 +377,19 @@ function ChannelsHandler() {
 		imgInput: $('imgInput')
 	};
 	self.roomClick = function (event) {
-		if (event.target.tagName == 'UL') {
+		var target = event.target;
+		var tagName = target.tagName;
+		if (tagName == 'UL') {
 			return;
 		}
-		var roomId = event.target.getAttribute(self.ROOM_ID_ATTR);
-		if (self.activeRoomId == roomId) {
+		if (tagName == 'SPAN') {
+			wsHandler.sendToServer({
+				action: 'deleteRoom',
+				roomId: parseInt(target.parentNode.getAttribute(self.ROOM_ID_ATTR))
+			});
 			return;
 		}
+		var roomId = target.getAttribute(self.ROOM_ID_ATTR);
 		self.setActiveChannel(self.generateRoomKey(roomId));
 	};
 	self.setActiveChannel = function (key) {
@@ -535,6 +541,9 @@ function ChannelsHandler() {
 		var anotherUserId = self.getAnotherUserId(allUsersIds);
 		var li = createUserLi(anotherUserId, users[anotherUserId].sex, users[anotherUserId].user);
 		self.dom.directUserTable.appendChild(li);
+		var i = document.createElement('span');
+		i.className = 'icon-cancel-circled-outline';
+		li.appendChild(i);
 		self.createChannelChatHandler(roomId, li, users);
 		return anotherUserId;
 	};

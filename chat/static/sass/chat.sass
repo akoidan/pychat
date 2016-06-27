@@ -192,8 +192,22 @@ p
 #directUserTable li
 	@include  fix-user-icon-top-position
 	border-radius: 3px
+	position: relative
 	&:hover
 		@include hovered-user-room
+		span
+			display: inline
+
+	span
+		display: none
+		position: absolute
+		top: 3px
+		right: 5px
+		opacity: 0.8
+		&:hover
+			opacity: 1
+			color: #ff5e5c
+
 
 .fluid-height-child-bot
 	display: table

@@ -126,6 +126,11 @@ class Room(models.Model):
 	def is_private(self):
 		return self.name is None
 
+class RoomUsers(models.Model):
+	room = models.ForeignKey(Room, null=True)
+	user = models.ForeignKey(User, related_name='sender')
+	// TODO active =
+
 
 def get_milliseconds(dt=None):
 	if dt is None:

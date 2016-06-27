@@ -54,6 +54,7 @@ class Actions:
 	GROWL_MESSAGE = 'growl'
 	GET_MESSAGES = 'messages'
 	CREATE_DIRECT_CHANNEL = 'addDirectChannel'
+	DELETE_ROOM = 'deleteRoom'
 
 
 class VarNames:
@@ -228,6 +229,7 @@ class MessagesHandler(MessagesCreator):
 			Actions.SEND_MESSAGE: self.process_send_message,
 			Actions.CALL: self.process_call,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
+			Actions.DELETE_ROOM: self.delete_channel,
 		}
 		self.post_process_message = {
 			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_direct_channel
@@ -412,6 +414,10 @@ class MessagesHandler(MessagesCreator):
 		if self.channel != other_channel:
 			self.publish(subscribe_message, other_channel, True)
 
+	def delete_channel(self, message):
+		roomId = message[VarNames.ROOM_ID]
+		self.channels
+
 	def create_channel(self, message):
 		"""
 		:type message: dict
@@ -422,8 +428,10 @@ class MessagesHandler(MessagesCreator):
 		self.publish(message, RedisPrefix.generate_user(receiver_id))
 
 	def send_client_new_direct_channel(self, message):
-		channel = RedisPrefix.generate_room(message[VarNames.ROOM_ID])
-		self.add_channel(channel) # TODO doesnt work if already subscribed
+		roomId = message[VarNames.ROOM_ID]
+		channel = RedisPrefix.generate_room(roomId)
+		self.add_channel(channel)
+		self.add_online_user(roomId)# TODO doesnt work if already subscribed
 
 	def process_get_messages(self, data):
 		"""
