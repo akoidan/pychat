@@ -65,7 +65,6 @@ class User(AbstractBaseUser):
 			self.sex = 0
 
 
-
 class Verification(models.Model):
 
 	class TypeChoices(Enum):
@@ -119,17 +118,22 @@ class UserProfile(User):
 
 
 class Room(models.Model):
-	name = CharField(max_length=30, null=True, unique=True)
-	users = models.ManyToManyField(User, related_name='rooms')
+	name = CharField(max_length=30, null=True)
+	users = models.ManyToManyField(User, related_name='rooms', through='RoomUsers')
 
 	@property
 	def is_private(self):
 		return self.name is None
 
+
 class RoomUsers(models.Model):
-	room = models.ForeignKey(Room, null=True)
-	user = models.ForeignKey(User, related_name='sender')
-	// TODO active =
+	room = models.ForeignKey(Room)
+	user = models.ForeignKey(User)
+	status = CharField(null=True, max_length=1)
+
+	class Meta:  # pylint: disable=C1001
+		unique_together = ("user", "room")
+		db_table = ''.join((User._meta.app_label, '_room_users'))
 
 
 def get_milliseconds(dt=None):

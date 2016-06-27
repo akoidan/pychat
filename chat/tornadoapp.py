@@ -26,7 +26,7 @@ except ImportError:
 	from urlparse import urlparse  # py3
 
 from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, USER_ROOMS_QUERY, GENDERS, GET_DIRECT_ROOM_ID
-from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo
+from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo, RoomUsers
 
 PY3 = sys.version > '3'
 
@@ -406,8 +406,8 @@ class MessagesHandler(MessagesCreator):
 			raise ValidationError('This room already exist')
 		room = Room(is_private=True)
 		room.save()
-		room.users.add(self.user_id, user_id)
-		room.save()
+		RoomUsers(room=room, user_id=self.user_id).save()
+		RoomUsers(room=room, user_id=user_id).save()
 		subscribe_message = self.subscribe_direct_message(room.id, user_id)
 		self.publish(subscribe_message, self.channel, True)
 		other_channel = RedisPrefix.generate_user(user_id)
