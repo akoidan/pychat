@@ -14,7 +14,7 @@ from django.db import connection
 
 from chat import local
 from chat import settings
-from chat.models import User, UserProfile, Room, Verification, RoomUsers
+from chat.models import User, UserProfile, Room, Verification
 from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID, USER_ROOMS_QUERY, GENDERS
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
@@ -169,7 +169,7 @@ def create_user_profile(email, password, sex, username):
 	user = UserProfile(username=username, email=email, sex_str=sex)
 	user.set_password(password)
 	user.save()
-	room_users = RoomUsers(room_id=ALL_ROOM_ID, user=user)
-	room_users.save()
+	user.rooms.add(ALL_ROOM_ID)
+	user.save()
 	logger.info('Signed up new user %s, subscribed for channels with id %d', user, ALL_ROOM_ID)
 	return user

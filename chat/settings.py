@@ -291,10 +291,11 @@ join chat_room_users on chat_user.id = chat_room_users.user_id
 join chat_room on chat_room_users.room_id = chat_room.id
 where
 	chat_room_users.room_id in (select room_id from chat_room_users where user_id = %s) and
-	chat_room_users.status is NULL """
+	chat_room.disabled is NULL """
 
-GET_DIRECT_ROOM_ID = """SELECT room_id, chat_room_users.status
+GET_DIRECT_ROOM_ID = """SELECT chat_room.id, chat_room.disabled
 FROM chat_room_users
+JOIN chat_room on chat_room_users.room_id = chat_room.id
 WHERE room_id IN (
   SELECT chat_room_users.room_id
   FROM chat_room_users

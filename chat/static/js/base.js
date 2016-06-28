@@ -1,6 +1,6 @@
 navigator.getUserMedia =  navigator.getUserMedia|| navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
-var HISTORY_STORAGE_NAME = 'history';
+var historyStorage;
 var MAX_STORAGE_LENGTH = 3000;
 var blankRegex = /^\s*$/;
 var fileTypeRegex = /\.(\w+)(\?.*)?$/;
@@ -97,6 +97,11 @@ function encodeAnchorsHTML(html) {
 }
 
 
+function deleteDomElement(target) {
+	target.parentNode.removeChild(target)
+}
+
+
 var CssUtils = {
 	visibilityClass: 'hidden',
 	hasClass: function(element, className){
@@ -117,6 +122,9 @@ var CssUtils = {
 			className = className.replace(replaceReg, '');
 			element.className = className + " " + desiredClass;
 		}
+	},
+	isHidden: function(element) {
+		return CssUtils.hasClass(element, CssUtils.visibilityClass);
 	},
 	removeClass: function (element, className) {
 		if (CssUtils.hasClass(element, className)) {
@@ -445,17 +453,14 @@ function saveLogToStorage(result) {
 	if (!window.loggingEnabled) {
 		return;
 	}
-	var storageInfo = localStorage.getItem(HISTORY_STORAGE_NAME);
-	var newStorage;
-	if (storageInfo == null) {
-		newStorage = result;
-	} else if (storageInfo.length > MAX_STORAGE_LENGTH) {
-		var notConcatInfo = storageInfo +';;;'+ result;
-		newStorage = notConcatInfo.substr(notConcatInfo.length - MAX_STORAGE_LENGTH, notConcatInfo.length);
+	if (historyStorage == null) {
+		historyStorage = result;
+	} else if (historyStorage.length > MAX_STORAGE_LENGTH) {
+		var notConcatInfo = historyStorage +';;;'+ result;
+		historyStorage = notConcatInfo.substr(notConcatInfo.length - MAX_STORAGE_LENGTH, notConcatInfo.length);
 	} else {
-		newStorage = storageInfo + ';;;' + result;
+		historyStorage = historyStorage + ';;;' + result;
 	}
-	localStorage.setItem(HISTORY_STORAGE_NAME, newStorage);
 }
 
 
