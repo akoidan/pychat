@@ -55,13 +55,13 @@
 				<li onclick="growlError('not implemented')">Transfer file</li>
 				<li onclick="channelsHandler.viewProfile()">View profile</li>
 			</ul>
-			<span>#Channels<i class="icon-plus-squared" title="Create new channel" onclick="alert('not impl')"></i></span>
+			<span>#Channels<i class="icon-plus-squared" title="Create new room" onclick="channelsHandler.showAddRoom()"></i></span>
 			<ul id="rooms">
 			</ul>
-			<span>#Direct<i class="icon-plus-squared" title="Create new channel" onclick="channelsHandler.showAddUser()"></i></span>
+			<span>#Direct<i class="icon-plus-squared" title="Create new direct channel" onclick="channelsHandler.showAddUser()"></i></span>
 			<ul id="directUserTable">
 			</ul>
-			<span>#Channel users<i class="icon-plus-squared" title="Create new channel" onclick="alert('not impl')"></i></span>
+			<span>#Channel users<i class="icon-plus-squared" title="Add user to current active channel" onclick="channelsHandler.showInviteUser()"></i></span>
 			<ul id="chat-user-table">
 			</ul>
 		</div>
@@ -72,8 +72,14 @@
 	<div id="addUserHolder" class="hidden">
 		<div>
 			<input type="text" placeholder="search" title="Filter by username" onkeyup="channelsHandler.filterAddUser()" id="addUserInput"/>
-			<ul id="addUserList" onclick="channelsHandler.finishAddUser(event)">
+			<ul id="addUserList" onclick="channelsHandler.addUserHolderClick(event)">
 			</ul>
+		</div>
+	</div>
+	<div id="addRoomHolder" class="hidden">
+		<div>
+			<input type="text" placeholder="Room Name" title="Filter by username" id="addRoomInput" maxlength="16"/>
+			<input type="button" value="Add" id="addRoomButton"/>
 		</div>
 	</div>
 	<div id="userMessageWrapper" class="hidden" style="position: relative">

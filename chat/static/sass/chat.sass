@@ -163,13 +163,6 @@ p
 
 	border-radius: 3px
 
-
-#rooms li
-	border-radius: 3px
-	padding-left: 10px
-	position: relative
-	@include hovered-user-room
-
 .active-room
 	// TODO move colors to theme
 	background-color: rgba(33, 158, 147, 0.45)
@@ -190,25 +183,30 @@ p
 			border-radius: 2px
 			@include hovered-user-room
 
-#directUserTable li
-	@include  fix-user-icon-top-position
-	border-radius: 3px
-	position: relative
-	&:hover
+#directUserTable,
+#rooms
+	li
+		@include  fix-user-icon-top-position
+		border-radius: 3px
+		position: relative
+		height: 30px
 		@include hovered-user-room
-		.icon-cancel-circled-outline
-			display: inline
+		&:hover
+			.icon-cancel-circled-outline
+				display: inline
 
 	.icon-cancel-circled-outline
 		display: none
 		position: absolute
-		top: 3px
+		top: 2px
 		right: 5px
 		opacity: 0.8
 		&:hover
 			opacity: 1
 			color: #ff5e5c
 
+#rooms li
+	padding-left: 10px
 
 .fluid-height-child-bot
 	display: table
@@ -405,6 +403,11 @@ p
 
 .callActiveIcon
 	color: darkred
+
+#addRoomHolder
+	input[type=text]
+		vertical-align: top // don't move with pressed button added padding
+		margin-top: 2px
 
 .newMessages
 	background-color: red

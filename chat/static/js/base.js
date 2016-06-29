@@ -223,7 +223,7 @@ function Draggable(container, headerText) {
 		self.dom.headerText = document.createElement('span');
 		self.dom.header.appendChild(self.dom.headerText);
 		self.dom.headerText.style = 'display: inline-block';
-		self.dom.headerText.textContent = self.headerText;
+		self.setHeaderText(self.headerText);
 		var iconCancel = document.createElement('i');
 		self.dom.header.appendChild(iconCancel);
 		iconCancel.style = "float: right; color: rgb(177, 53, 51)";
@@ -235,6 +235,12 @@ function Draggable(container, headerText) {
 	};
 	self.hide = function () {
 		CssUtils.hideElement(self.dom.container);
+	};
+	self.setHeaderText = function (text) {
+		self.dom.headerText.innerHTML = text;
+	};
+	self.show = function () {
+		CssUtils.showElement(self.dom.container);
 	};
 	self.attached = true;
 	self.eleMouseDown = function (ev) {

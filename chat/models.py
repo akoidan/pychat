@@ -118,7 +118,7 @@ class UserProfile(User):
 
 
 class Room(models.Model):
-	name = CharField(max_length=30, null=True)
+	name = CharField(max_length=16, null=True)
 	users = models.ManyToManyField(User, related_name='rooms')
 	disabled = NullBooleanField()
 

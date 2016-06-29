@@ -13,7 +13,7 @@ import tornado.websocket
 import tornadoredis
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import connection, OperationalError, InterfaceError
+from django.db import connection, OperationalError, InterfaceError, IntegrityError
 from django.db.models import Q
 from redis_sessions.session import SessionStore
 from tornado.websocket import WebSocketHandler
@@ -55,6 +55,8 @@ class Actions:
 	GET_MESSAGES = 'messages'
 	CREATE_DIRECT_CHANNEL = 'addDirectChannel'
 	DELETE_ROOM = 'deleteRoom'
+	CREATE_ROOM_CHANNEL = 'addRoom'
+	INVITE_USER = 'inviteUser'
 
 
 class VarNames:
@@ -189,7 +191,7 @@ class MessagesCreator(object):
 	def channel(self):
 		return RedisPrefix.generate_user(self.user_id)
 
-	def subscribe_direct_message(self, room_id, other_user_id):
+	def subscribe_direct_channel_message(self, room_id, other_user_id):
 		return {
 			VarNames.EVENT: Actions.CREATE_DIRECT_CHANNEL,
 			VarNames.ROOM_ID: room_id,
@@ -197,12 +199,33 @@ class MessagesCreator(object):
 			HandlerNames.NAME: HandlerNames.CHANNELS
 		}
 
+	def subscribe_room_channel_message(self, room_id, room_name):
+		return {
+			VarNames.EVENT: Actions.CREATE_ROOM_CHANNEL,
+			VarNames.ROOM_ID: room_id,
+			VarNames.ROOM_USERS: [self.user_id],
+			HandlerNames.NAME: HandlerNames.CHANNELS,
+			VarNames.ROOM_NAME: room_name
+		}
+
+	def invite_room_channel_message(self, room_id, user_id, room_name, users):
+		return {
+			VarNames.EVENT: Actions.INVITE_USER,
+			VarNames.ROOM_ID: room_id,
+			VarNames.USER_ID: user_id,
+			HandlerNames.NAME: HandlerNames.CHANNELS,
+			VarNames.ROOM_NAME: room_name,
+			VarNames.CONTENT: users
+
+		}
+
 	def unsubscribe_direct_message(self, room_id):
 		return {
 			VarNames.EVENT: Actions.DELETE_ROOM,
 			VarNames.ROOM_ID: room_id,
 			VarNames.USER_ID: self.user_id,
-			HandlerNames.NAME: HandlerNames.CHANNELS
+			HandlerNames.NAME: HandlerNames.CHANNELS,
+			VarNames.TIME: get_milliseconds()
 		}
 
 
@@ -231,10 +254,14 @@ class MessagesHandler(MessagesCreator):
 			Actions.CALL: self.process_call,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
 			Actions.DELETE_ROOM: self.delete_channel,
+			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
+			Actions.INVITE_USER: self.invite_user,
 		}
 		self.post_process_message = {
-			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_direct_channel,
-			Actions.DELETE_ROOM: self.send_client_delete_channel
+			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_channel,
+			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
+			Actions.DELETE_ROOM: self.send_client_delete_channel,
+			Actions.INVITE_USER: self.send_client_new_channel
 		}
 
 	@tornado.gen.engine
@@ -384,6 +411,35 @@ class MessagesHandler(MessagesCreator):
 		message = self.offer_call(message.get(VarNames.CONTENT), message.get(VarNames.CALL_TYPE))
 		self.publish(message, RedisPrefix.generate_user(receiver_id))
 
+	def create_new_room(self, message):
+		room_name = message[VarNames.ROOM_NAME]
+		if not room_name or len(room_name) > 16:
+			raise ValidationError('Incorrect room name "{}"'.format(room_name))
+		room = Room(name=room_name)
+		room.save()
+		room.users.add(self.user_id)
+		room.save()
+		subscribe_message = self.subscribe_room_channel_message(room.id, room_name)
+		self.publish(subscribe_message, self.channel, True)
+
+	def invite_user(self, message):
+		print('asd')
+		room_id = message[VarNames.ROOM_ID]
+		user_id = message[VarNames.USER_ID]
+		channel = RedisPrefix.generate_room(room_id)
+		if channel not in self.channels:
+			raise ValidationError("Access denied")
+		try:
+			Room.users.through.objects.create(room_id=room_id, user_id=user_id)
+		except IntegrityError:
+			raise ValidationError("User is already in channel")
+		users_in_room = {}
+		room = Room.objects.get(id=room_id)
+		for user in room.users.all():
+			self.set_js_user_structure(users_in_room, user.id, user.username, user.sex)
+		subscribe_message = self.invite_room_channel_message(room_id, user_id, room.name, users_in_room)
+		self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
+
 	def create_user_channel(self, message):
 		user_id = message[VarNames.USER_ID]
 		cursor = connection.cursor()
@@ -403,7 +459,7 @@ class MessagesHandler(MessagesCreator):
 			room.users.add(self.user_id, user_id)
 			room.save()
 			room_id = room.id
-		subscribe_message = self.subscribe_direct_message(room_id, user_id)
+		subscribe_message = self.subscribe_direct_channel_message(room_id, user_id)
 		self.publish(subscribe_message, self.channel, True)
 		other_channel = RedisPrefix.generate_user(user_id)
 		if self.channel != other_channel:
@@ -412,7 +468,7 @@ class MessagesHandler(MessagesCreator):
 	def delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		channel = RedisPrefix.generate_room(room_id)
-		if channel not in self.channels:
+		if channel not in self.channels or room_id == ALL_ROOM_ID:
 			raise ValidationError('You are not allowed to delete this room')
 		room = Room.objects.get(id=room_id)
 		if room.disabled is not None:
@@ -421,11 +477,14 @@ class MessagesHandler(MessagesCreator):
 			room.disabled = True
 		else: # if public -> leave the room, delete the link
 			room.users.remove(self.user_id)
+			online = self.get_online_from_redis(channel)
+			online.remove(self.user_id)
+			self.publish(self.room_online(online, Actions.LOGOUT, channel), channel)
 		room.save()
 		message = self.unsubscribe_direct_message(room_id)
 		self.publish(message, channel, True)
 
-	def send_client_new_direct_channel(self, message):
+	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		channel = RedisPrefix.generate_room(room_id)
 		self.add_channel(channel)
@@ -492,11 +551,14 @@ class MessagesHandler(MessagesCreator):
 					VarNames.ROOM_NAME: room_name,
 					VarNames.ROOM_USERS: {}
 				}
-			res[room_id][VarNames.ROOM_USERS][user_id] = {
-				VarNames.USER : user_name,
-				VarNames.GENDER: GENDERS[user_sex]
-			}
+			self.set_js_user_structure(res[room_id][VarNames.ROOM_USERS], user_id, user_name, user_sex)
 		return res
+
+	def set_js_user_structure(self, user_dict, user_id, name, sex):
+		user_dict[user_id] = {
+			VarNames.USER: name,
+			VarNames.GENDER: GENDERS[sex]
+		}
 
 	def save_ip(self):
 		if (self.do_db(UserJoinedInfo.objects.filter(

@@ -113,7 +113,6 @@ onDocLoad(function () {
 	storage.loadMessagesFromLocalStorage();
 	//TODO channelsHandler.loadMessagesFromLocalStorage(); /*Smileys should be encoded by time message load, otherwise they don't display*/
 	wsHandler.start_chat_ws();
-	new Draggable($('addUserHolder'), "Add direct user channel")
 });
 
 
@@ -372,8 +371,11 @@ function ChannelsHandler() {
 		activeUserContext: null,
 		userContextMenu: $('user-context-menu'),
 		addUserHolder: $('addUserHolder'),
+		addRoomHolder: $('addRoomHolder'),
+		addRoomInput: $('addRoomInput'),
 		addUserList: $('addUserList'),
 		addUserInput: $('addUserInput'),
+		addRoomButton: $('addRoomButton'),
 		directUserTable: $('directUserTable'),
 		imgInput: $('imgInput')
 	};
@@ -407,9 +409,6 @@ function ChannelsHandler() {
 	self.generateRoomKey = function (roomId) {
 		return "r" + roomId;
 	};
-	self.generateUserKey = function(userId) {
-		return "u" + userId;
-	};
 	self.showActiveChannel = function (){
 		if (self.activeChannel) {
 			var chatHandler = self.channels[self.activeChannel];
@@ -425,6 +424,7 @@ function ChannelsHandler() {
 		}
 	};
 	self.userClick = function (event) {
+		throw 'Deprecated';
 		event = event || window.event;
 		var target = event.target || event.srcElement;
 		if (target.tagName == 'I') {
@@ -482,22 +482,36 @@ function ChannelsHandler() {
 			smileyUtil.hideSmileys();
 		}
 	};
-	self.finishAddUser = function (event) {
+	self.addUserHolderClick = function (event) {
 		var target = event.target;
 		if (target.tagName != 'LI') {
 			return
 		}
 		var userId = parseInt(target.getAttribute(USER_ID_ATTR));
-		var userKey = self.generateUserKey(userId);
-		if (!self.channels[userKey]) {
-			wsHandler.sendToServer({
-				action: 'addDirectChannel',
-				userId: userId
-			});
+		var message = {
+			action: self.addUserHolderAction,
+			userId: userId
+		};
+		if (self.addUserHolderAction == 'inviteUser') {
+			message.roomId = self.channels[self.activeChannel].roomId;
 		}
+		wsHandler.sendToServer(message);
+		self.addUserHandler.hide();
 	};
-	self.showAddUser = function () {
-		CssUtils.showElement(self.dom.addUserHolder);
+	self.showAddRoom = function() {
+		self.addRoomHandler.show();
+		self.dom.addRoomInput.focus();
+	};
+	self.showInviteUser = function() {
+		self.fillAddUser();
+		self.addUserHandler.show();
+		self.addUserHolderAction = 'inviteUser';
+		self.addUserHandler.setHeaderText(getText("Invite user to room <b>{}</b>", self.channels[self.activeChannel].roomName));
+	};
+	self.inviteUser = function(message) {
+		self.createNewRoomChatHandler(message.roomId, message.name, message.content);
+	};
+	self.fillAddUser = function() {
 		self.dom.addUserList.innerHTML = '';
 		self.addUserUsersList = {};
 		var allUsers = self.getAllUsersInfo();
@@ -511,6 +525,12 @@ function ChannelsHandler() {
 				self.dom.addUserList.appendChild(li);
 			}
 		}
+	};
+	self.showAddUser = function () {
+		self.fillAddUser();
+		self.addUserHandler.show();
+		self.addUserHolderAction = 'addDirectChannel';
+		self.addUserHandler.setHeaderText("Create direct channel");
 	};
 	self.getAllUsersInfo = function () {
 		return self.channels[DEFAULT_CHANNEL_NAME].allUsers;
@@ -527,6 +547,21 @@ function ChannelsHandler() {
 			}
 		}
 	};
+	self.finishAddRoom = function () {
+		var roomName = self.dom.addRoomInput.value;
+		var sendSucc = wsHandler.sendToServer({
+			action: 'addRoom',
+			name: roomName
+		});
+		if (sendSucc) {
+			self.addRoomHandler.hide()
+		}
+	};
+	self.finishAddRoomOnEnter = function (event) {
+		if (event.keyCode == 13) { // enter
+			self.finishAddRoom();
+		}
+	};
 	self.getAnotherUserId = function(allUsersIds) {
 		var anotherUserId;
 		if (allUsersIds.length == 2) {
@@ -536,10 +571,13 @@ function ChannelsHandler() {
 		}
 		return anotherUserId;
 	};
-	self.createChannelChatHandler = function(roomId, li, users) {
+	self.createChannelChatHandler = function(roomId, li, users, roomName) {
+		var i = document.createElement('span');
+		i.className = CANCEL_ICON_CLASS_NAME;
+		li.appendChild(i);
 		var roomKey = self.generateRoomKey(roomId);
 		li.setAttribute(self.ROOM_ID_ATTR, roomId);
-		var chatHandler = new ChatHandler(li, users);
+		var chatHandler = new ChatHandler(li, users, roomId, roomName);
 		self.channels[roomKey] = chatHandler;
 		if (self.activeChannel == roomKey) {
 			chatHandler.show();
@@ -548,19 +586,17 @@ function ChannelsHandler() {
 	self.createNewUserChatHandler = function(roomId, users) {
 		var allUsersIds = Object.keys(users);
 		var anotherUserId = self.getAnotherUserId(allUsersIds);
-		var li = createUserLi(anotherUserId, users[anotherUserId].sex, users[anotherUserId].user);
+		var roomName = users[anotherUserId].user;
+		var li = createUserLi(anotherUserId, users[anotherUserId].sex, roomName);
 		self.dom.directUserTable.appendChild(li);
-		var i = document.createElement('span');
-		i.className = CANCEL_ICON_CLASS_NAME;
-		li.appendChild(i);
-		self.createChannelChatHandler(roomId, li, users);
+		self.createChannelChatHandler(roomId, li, users, roomName);
 		return anotherUserId;
 	};
 	self.createNewRoomChatHandler = function(roomId, roomName, users) {
 		var li = document.createElement('li');
 		self.dom.rooms.appendChild(li);
 		li.innerHTML = roomName;
-		self.createChannelChatHandler(roomId, li, users);
+		self.createChannelChatHandler(roomId, li, users, roomName);
 	};
 	self.getCurrentRoomIDs = function () {
 
@@ -618,7 +654,7 @@ function ChannelsHandler() {
 				self.setActiveChannel(DEFAULT_CHANNEL_NAME);
 			}
 		} else {
-			self.channels[channel].removeUser()
+			handler.removeUser(message)
 		}
 	};
 	self.addDirectChannel = function(message) {
@@ -630,15 +666,26 @@ function ChannelsHandler() {
 		var anotherUserId = self.createNewUserChatHandler(message.roomId, channelUsers);
 		growlInfo(getText('<span>Channel for user <b>{}</b> has been created</span>', anotherUserName[anotherUserId].user));
 	};
+	self.addRoom = function(message) {
+		var users = message.users;
+		var roomName = message.name;
+		var channelUsers = {};
+		channelUsers[users[0]] =  self.getAllUsersInfo()[users[0]];
+		self.createNewRoomChatHandler(message.roomId, roomName, channelUsers);
+		growlInfo(getText('<span>Room <b>{}</b> has been created</span>', roomName));
+	};
 	self.viewProfile = function() {
 		singlePage.showPage('/profile/', self.getActiveUserId());
 	};
 	self.init = function() {
 		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);
 		self.dom.rooms.onclick = self.roomClick;
-		console.error('todo');
 		self.dom.directUserTable.onclick = self.roomClick;
 		self.dom.imgInput.onchange = self.handleFileSelect;
+		self.dom.addRoomInput.onkeypress = self.finishAddRoomOnEnter;
+		self.dom.addRoomButton.onclick = self.finishAddRoom;
+		self.addUserHandler = new Draggable(self.dom.addUserHolder, "");
+		self.addRoomHandler = new Draggable(self.dom.addRoomHolder, "Create new room");
 	};
 	self.getActiveUserId = function() {
 		return self.dom.activeUserContext.getAttribute(USER_ID_ATTR);
@@ -842,23 +889,24 @@ function keyDownLoadUp(e) {
 	}
 }
 
-function ChatHandler(li, allUsers) {
+function ChatHandler(li, allUsers, roomId, roomName) {
 	var self = this;
 	var wrapper = $('wrapper');
 	self.allUsers = allUsers;
-	self.dom = {};
+	self.roomId = roomId;
+	self.roomName = roomName;
+	self.dom = {
+		chatBoxDiv: document.createElement('div'),
+		userList: document.createElement('ul'),
+		roomNameLi: li,
+		newMessages: document.createElement('span'),
+		deleteIcon: li.lastChild
+	};
 	self.newMessages = 0;
 	self.allMessages = [];
 	self.allMessagesDates = [];
 	self.activeRoomClass = 'active-room';
-	self.dom.chatBoxDiv = document.createElement('div');
-	self.dom.userList = document.createElement('ul');
-	self.dom.roomNameLi = li;
-	self.dom.newMessages = document.createElement('span');
 	self.dom.newMessages.className = 'newMessages hidden';
-	if (CssUtils.hasClass(li.lastChild, CANCEL_ICON_CLASS_NAME)) {
-		self.dom.deleteIcon = li.lastChild;
-	}
 	li.appendChild(self.dom.newMessages);
 	self.SELF_HEADER_CLASS = 'message-header-self';
 	self.OTHER_HEADER_CLASS = 'message-header-others';
@@ -874,9 +922,7 @@ function ChatHandler(li, allUsers) {
 		CssUtils.showElement(self.dom.userList);
 		CssUtils.addClass(self.dom.roomNameLi, self.activeRoomClass);
 		CssUtils.hideElement(self.dom.newMessages);
-		if (self.dom.deleteIcon) {
-			CssUtils.showElement(self.dom.deleteIcon);
-		}
+		CssUtils.showElement(self.dom.deleteIcon);
 	};
 	self.hide = function () {
 		CssUtils.hideElement(self.dom.chatBoxDiv);
@@ -904,11 +950,12 @@ function ChatHandler(li, allUsers) {
 		}
 		return null;
 	};
-	self.removeUser = function(userId) {
-		delete self.allUsers[userId];
-		if (self.onlineUsers.indexOf(userId)) {
-			self.printChangeOnlineStatus('has left the conversation.', message, chatLogout);
-		}
+	self.removeUser = function(message) {
+		//if (self.onlineUsers.indexOf(message.userId) >= 0) {
+		//	message.content = self.onlineUsers;
+		//	self.printChangeOnlineStatus('has left the conversation.', message, chatLogout);
+		//}
+		delete self.allUsers[message.userId];
 	};
 	/** Creates a DOM node with attached events and all message content*/
 	self.createMessageNode = function (timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix) {
@@ -1017,9 +1064,7 @@ function ChatHandler(li, allUsers) {
 			self.newMessages += 1;
 			self.dom.newMessages.textContent = self.newMessages;
 			CssUtils.showElement(self.dom.newMessages);
-			if (self.dom.deleteIcon) {
-				CssUtils.hideElement(self.dom.deleteIcon);
-			}
+			CssUtils.hideElement(self.dom.deleteIcon);
 		}
 	};
 	self.printMessage = function (data) {
