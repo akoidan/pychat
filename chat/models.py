@@ -6,7 +6,7 @@ from time import mktime
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.db import models
-from django.db.models import CharField, DateField, FileField, BooleanField
+from django.db.models import CharField, DateField, FileField, BooleanField, NullBooleanField
 
 from chat.log_filters import id_generator
 from chat.settings import GENDERS, DEFAULT_PROFILE_ID
@@ -65,7 +65,6 @@ class User(AbstractBaseUser):
 			self.sex = 0
 
 
-
 class Verification(models.Model):
 
 	class TypeChoices(Enum):
@@ -119,9 +118,13 @@ class UserProfile(User):
 
 
 class Room(models.Model):
-	name = CharField(max_length=30, null=True, unique=True)
+	name = CharField(max_length=16, null=True)
 	users = models.ManyToManyField(User, related_name='rooms')
-	is_private = BooleanField(default=True)
+	disabled = NullBooleanField()
+
+	@property
+	def is_private(self):
+		return self.name is None
 
 
 def get_milliseconds(dt=None):

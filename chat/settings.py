@@ -251,11 +251,11 @@ LOGGING = {
 	},
 	'formatters': {
 		'tornado': {
-			'format': '%(id)s [%(asctime)s=%(lineno)s [%(username)s:%(ip)s]: %(message)s',
+			'format': '%(user_id)s:%(id)s [%(asctime)s;%(ip)s;%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 		'django': {
-			'format': '%(id)s [%(asctime)s %(module)s:%(lineno)s  [%(username)s:%(ip)s]: %(message)s',
+			'format': '%(user_id)s:%(id)s [%(asctime)s;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},
@@ -291,6 +291,33 @@ if not DEBUG:
 
 
 ALL_REDIS_ROOM = 'all'
+ALL_ROOM_ID = 1
+
+
+# TODO replace for django's query language
+USER_ROOMS_QUERY = """SELECT
+  chat_user.id,
+  chat_user.username,
+  chat_user.sex,
+  chat_room.id,
+  chat_room.name
+FROM
+  chat_user
+join chat_room_users on chat_user.id = chat_room_users.user_id
+join chat_room on chat_room_users.room_id = chat_room.id
+where
+	chat_room_users.room_id in (select room_id from chat_room_users where user_id = %s) and
+	chat_room.disabled is NULL """
+
+GET_DIRECT_ROOM_ID = """SELECT chat_room.id, chat_room.disabled
+FROM chat_room_users
+JOIN chat_room on chat_room_users.room_id = chat_room.id
+WHERE room_id IN (
+  SELECT chat_room_users.room_id
+  FROM chat_room_users
+    join chat_room on chat_room_users.room_id = chat_room.id
+  WHERE (chat_room_users.user_id = %s) and (chat_room.name is NULL)
+) and user_id = %s"""
 
 # ---------------JAVASCRIPT CONSTANTS --------------------
 

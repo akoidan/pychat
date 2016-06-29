@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
-from django.core import serializers
 from django.core.mail import send_mail
 
 try:
@@ -23,7 +22,6 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 from django.views.generic import View
-
 from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
@@ -52,18 +50,6 @@ def validate_email(request):
 	except ValidationError as e:
 		response = e.message
 	return HttpResponse(response, content_type='text/plain')
-
-
-@require_http_methods(['GET'])
-def update_session_key(request):
-	"""
-	Creates a new session key, saves it to session store and to response
-	"""
-	old_key = request.session.session_key
-	request.session.create()  # updates the session_key
-	logger.info("Session key %s has been updated to %s", old_key, request.session.session_key)
-	request.session.modified = True
-	return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
 
 
 @require_http_methods('POST')
@@ -266,28 +252,19 @@ def statistics(request):
 	return HttpResponse(json.dumps(list(pie_data)), content_type='application/json')
 
 
-class IssueView(View):
-
-	def get(self, request):
-		return render_to_response(
-			'issue.html',  # getattr for anonymous.email
-			{'email': getattr(request.user, 'email', '')},
-			context_instance=RequestContext(request)
-		)
-
-	@login_required_no_redirect()
-	@transaction.atomic
-	def post(self, request):
-		logger.info('Saving issue: %s', hide_fields(request.POST, 'log', huge=True))
-		issue = Issue.objects.get_or_create(content=request.POST['issue'])[0]
-		issue_details = IssueDetails(
-			sender_id=request.user.id,
-			browser=request.POST.get('browser'),
-			issue=issue,
-			log=request.POST.get('log')
-		)
-		issue_details.save()
-		return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
+@login_required_no_redirect()
+@transaction.atomic
+def report_issue(request):
+	logger.info('Saving issue: %s', hide_fields(request.POST, 'log', huge=True))
+	issue = Issue.objects.get_or_create(content=request.POST['issue'])[0]
+	issue_details = IssueDetails(
+		sender_id=request.user.id,
+		browser=request.POST.get('browser'),
+		issue=issue,
+		log=request.POST.get('log')
+	)
+	issue_details.save()
+	return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
 
 
 class ProfileView(View):

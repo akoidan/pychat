@@ -1,4 +1,5 @@
 import base64
+import json
 import logging
 import re
 import sys
@@ -9,11 +10,12 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
+from django.db import connection
 
 from chat import local
 from chat import settings
 from chat.models import User, UserProfile, Room, Verification
-from chat.settings import ISSUES_REPORT_LINK, ALL_REDIS_ROOM, SITE_PROTOCOL
+from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID, USER_ROOMS_QUERY, GENDERS
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
 
@@ -166,12 +168,8 @@ def extract_photo(image_base64):
 def create_user_profile(email, password, sex, username):
 	user = UserProfile(username=username, email=email, sex_str=sex)
 	user.set_password(password)
-	default_thread = Room.objects.get_or_create(name=ALL_REDIS_ROOM)[0]
 	user.save()
-	user.rooms.add(default_thread)
+	user.rooms.add(ALL_ROOM_ID)
 	user.save()
-	logger.info(
-		'Signed up new user %s, subscribed for channels %s',
-		user, default_thread.name
-	)
+	logger.info('Signed up new user %s, subscribed for channels with id %d', user, ALL_ROOM_ID)
 	return user

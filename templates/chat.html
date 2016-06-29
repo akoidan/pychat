@@ -9,6 +9,7 @@
 		const CHANGE_PROFILE_JS_URL = "{% md5url 'js/webrtc.js' %}";
 		const STATISTICS_JS_URL = "{% md5url "js/statistic.js" %}";
 		const loggedUser = "{{ username }}";
+		const loggedUserId = {{ userid }};
 		var suggestions = {{ suggestions |yesno:"true,false" }};
 	</script>
 	<script src="{% md5url "js/smileys_data.js" %}"></script>
@@ -17,14 +18,15 @@
 {% endblock head %}
 {% block content %}
 	<nav class="noSelection">
-		<a class="icon-home" href="/" title="Go home" onclick="event.preventDefault(); singlePage.showPage('');"><span class="mText">home</span></a>
+		<a class="icon-home" href="/" title="Go home" onclick="event.preventDefault(); singlePage.showPage('/chat/', ['r1']);"><span class="mText">home</span></a>
 		<i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds" onclick="mute();"><span class="mText">volume</span></i>
 		<a href="/#/report_issue" class="icon-pencil very-small-screen" title="report an issue"
 			onclick="event.preventDefault(); singlePage.showPage('/report_issue')"><span class="mText">issue</span></a>
 		<i class="icon-clear" title="Clear local history" onclick="clearLocalHistory()"><span class="mText">clear</span></i>
 		<a class="icon-phone" href="/#/call" title="Make a video/mic call" onclick="event.preventDefault(); webRtcApi.showCallDialog()"><span class="mText">Call</span></a>
 		<a href="/#/statistics" class="icon-chart-pie" onclick="event.preventDefault(); singlePage.showPage('/statistics')" title="Show user countries statistics"><span class="mText">statistics</span></a>
-		<span id='headerText' class="username very-small-screen flex-push-right"></span>
+		<span id="onlineStatus" title="Online status" class="flex-push-right offline">●</span>
+		<span id='headerText' class="username very-small-screen"></span>
 		<a  href="/#/profile" title="Settings" onclick="event.preventDefault(); singlePage.showPage('/profile')" class="icon-wrench"> <span class="mText">Profile</span></a>
 		<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}">
 			<i title="Sign out" class="icon-sign-out"><span class="mText">sign out</span></i> </a>
@@ -46,43 +48,46 @@
 		}
 	}
 	</style>
-	<div id="window" class="modal-body hidden">
-		<div id="windowHeader" class="noSelection windowHeader">
-			<span></span>
-			<i class="icon-cancel"></i>
-		</div>
-		<div id="windowBody"></div>
-	</div>
 	<div id="wrapper" class="max-height-scrollable hidden">
-		<div id="chatbox" tabindex="0" onkeydown="keyDownLoadUp(event)">
-		</div>{% comment %}tabindex allows focus, focus allows keydown binding event{% endcomment %}
 		<div id="chat-room-users-wrapper" class="very-small-screen">
 			<ul id="user-context-menu" class="hidden">
-				<li onclick="userTable.call()">Call</li>
+				<li onclick="channelsHandler.call()">Call</li>
 				<li onclick="growlError('not implemented')">Transfer file</li>
-				<li onclick="userTable.viewProfile()">View profile</li>
+				<li onclick="channelsHandler.viewProfile()">View profile</li>
 			</ul>
+			<span>#Channels<i class="icon-plus-squared" title="Create new room" onclick="channelsHandler.showAddRoom()"></i></span>
+			<ul id="rooms">
+			</ul>
+			<span>#Direct<i class="icon-plus-squared" title="Create new direct channel" onclick="channelsHandler.showAddUser()"></i></span>
+			<ul id="directUserTable">
+			</ul>
+			<span>#Channel users<i class="icon-plus-squared" title="Add user to current active channel" onclick="channelsHandler.showInviteUser()"></i></span>
 			<ul id="chat-user-table">
 			</ul>
-			<div>
-				<span>#Channels <i class="icon-plus-squared" title="Create new channel" onclick="alert('not impl')"></i></span>
-				<div id="rooms">
-				</div>
-			</div>
 		</div>
 		<div id="smileParentHolder" class="padding10 hidden" onclick="smileyUtil.addSmile(event);">
 			<ul id="tabNames" onclick="smileyUtil.showTabByName(event)"></ul>
 		</div>
 	</div>
+	<div id="addUserHolder" class="hidden">
+		<div>
+			<input type="text" placeholder="search" title="Filter by username" onkeyup="channelsHandler.filterAddUser()" id="addUserInput"/>
+			<ul id="addUserList" onclick="channelsHandler.addUserHolderClick(event)">
+			</ul>
+		</div>
+	</div>
+	<div id="addRoomHolder" class="hidden">
+		<div>
+			<input type="text" placeholder="Room Name" title="Filter by username" id="addRoomInput" maxlength="16"/>
+			<input type="button" value="Add" id="addRoomButton"/>
+		</div>
+	</div>
 	<div id="userMessageWrapper" class="hidden" style="position: relative">
 		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
 		<i class="icon-picture" title="Add a picture" onclick="$('imgInput').click()"></i>
-		<div id="userSendMessageTo" class="hidden">
-			<div id="receiverId"></div>
-			<i class="icon-cancel" onclick="hideUserSendToName();"></i>
-		</div>
 		<i class="icon-smile" title="Add a smile :)" onclick="smileyUtil.toggleSmileys(event)"></i>
-		<div contenteditable="true" id="usermsg" onkeydown="checkAndSendMessage(event)"></div>
+		<div contenteditable="true" id="usermsg" onkeydown="channelsHandler.checkAndSendMessage(event)"></div>
+	{% comment %}TODO which chat variable to use?{% endcomment %}
 	</div>
 	<div id="callContainer" class="hidden">
 		<div id="callContainerContent">
