@@ -106,7 +106,7 @@ onDocLoad(function () {
 	singlePage = new PageHandler();
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
-	wsHandler = new  WsHandler(channelsHandler);
+	wsHandler = new  WsHandler();
 	//bottom call loadMessagesFromLocalStorage(); s
 	smileyUtil.init();
 	storage = new Storage();
@@ -121,6 +121,11 @@ function Page() {
 	self.dom = {
 		container: document.body,
 		el: []
+	};
+	self.setParams = function(params){
+		if (params) {
+			console.warn(getDebugMessage('Params {} are not set for {}', self.getUrl()))
+		}
 	};
 	self.parser = new DOMParser();
 	self.render  = function () {
@@ -146,6 +151,7 @@ function Page() {
 		}
 	};
 	self.show = function () {
+		self.rendered = true;
 		self.fixTittle();
 		self.foreach(CssUtils.showElement);
 	};
@@ -161,7 +167,9 @@ function Page() {
 	};
 	self.super = {
 		onLoad: self.onLoad,
-		hide: self.hide
+		hide: self.hide,
+		show: self.show,
+		dom: self.dom
 	};
 	self.toString = function (event) {
 		return self.name;
@@ -208,10 +216,9 @@ function IssuePage() {
 	};
 }
 
-function ViewProfilePage(userId) {
+function ViewProfilePage() {
 	var self = this;
 	Page.call(self);
-	self.userId = userId;
 	self.getUrl = function () {
 		return getText('/profile/{}', self.userId);
 	};
@@ -219,6 +226,9 @@ function ViewProfilePage(userId) {
 		self.username = self.username || self.dom.el[0].getAttribute('username');
 		return getText("<b>{}</b>'s profile", self.username );
 	};
+	self.setUserId = function (userId) {
+		self.userId = userId;
+	}
 }
 
 function ChangeProfilePage() {
@@ -227,32 +237,13 @@ function ChangeProfilePage() {
 	self.url = '/profile';
 	self.title = 'Change profile';
 	self.onLoad = function (html) {
+		self.rendered = true;
 		self.super.onLoad(html);
 		doGet(CHANGE_PROFILE_JS_URL, function () {
 			initChangeProfile();
 		});
 	}
 }
-
-function ChatPage(args, focus) {
-	var self = this;
-	Page.call(self);
-	if (args) {
-		channelsHandler.activeChannel = args[0];
-	}
-	self.url = '';
-	self.title = getText("Hello, <b>{}</b>", loggedUser);
-	self.dom = {
-		wrapper: $('wrapper'),
-		userMessageWrapper: $('userMessageWrapper')
-	};
-	self.dom.el = [
-		self.dom.wrapper,
-		self.dom.userMessageWrapper
-	];
-	self.render = self.show;
-}
-
 
 function WebRtcPage() {
 	var self = this;
@@ -293,19 +284,20 @@ function AmchartsPage() {
 function PageHandler() {
 	var self = this;
 	self.pages = {
-		'/report_issue': IssuePage,
-		'/chat/': ChatPage,
-		'/statistics': AmchartsPage,
-		'/profile/': ViewProfilePage,
-		'/profile': ChangeProfilePage,
-		'/call': WebRtcPage
+		'/report_issue': new IssuePage(),
+		'/chat/': channelsHandler,
+		'/statistics': new AmchartsPage(),
+		'/profile/': new ViewProfilePage(),
+		'/profile': new  ChangeProfilePage(),
+		'/call':new WebRtcPage()
 	};
 	self.pageRegex = /\w\/#(\/\w+\/?)(.*)/g;
-	self.storagePages = [];
 	self.init = function () {
-		self.storagePages.push(new self.pages['/call']());
 		self.showPageFromUrl();
 		window.onhashchange = self.showPageFromUrl;
+	};
+	self.getPage = function(url) {
+		return self.pages[url];
 	};
 	self.showPageFromUrl = function () {
 		var currentUrl = window.location.href;
@@ -314,58 +306,56 @@ function PageHandler() {
 		var page;
 		if (match) {
 			page = match[1];
+			var handler =  self.getPage(page);
 			if (match[2]) {
 				params = match[2].split('/');
 			}
-			self.showPage(page, params, true);
+			if (handler) {
+				self.showPage(page, params, true);
+			} else {
+				self.showDefaultPage();
+			}
 		} else {
 			self.showDefaultPage();
-		}
-	};
-	self.getPageByUrl = function (url) {
-		for (var i = 0; i< self.storagePages.length; i++) {
-			if (self.storagePages[i].getUrl() == url) {
-				return self.storagePages[i];
-			}
 		}
 	};
 	self.showDefaultPage = function () {
 		self.showPage('/chat/', [DEFAULT_CHANNEL_NAME]);
 	};
+	self.pushHistory = function() {
+		var historyUrl = getText("#{}", self.currentPage.getUrl());
+		// TODO remove triple, carefull of undefined tittle in ViewProfilePage
+		window.history.pushState(historyUrl, historyUrl, historyUrl);
+	};
 	self.showPage = function (page, params, dontHistory) {
 		console.log(getDebugMessage('Rendering page "{}"', page));
-		var newPage;
-		var storagePage = self.getPageByUrl(page);
 		if (self.currentPage) self.currentPage.hide();
-		if (storagePage) {
-			newPage = storagePage;
-			newPage.update();
+		self.currentPage = self.pages[page];
+		if (self.currentPage.rendered) {
+			self.currentPage.update(params);
 		} else {
-			newPage = new self.pages[page](params);
-			self.storagePages.push(newPage);
-			newPage.render();
+			self.currentPage.setParams(params);
+			self.currentPage.render();
 		}
-		self.currentPage = newPage;
-		if (!dontHistory ) {
-			var historyUrl = self.getHistoryUrl(newPage);
-			// TODO remove triple, carefull of undefined tittle in ViewProfilePage
-			window.history.pushState(historyUrl, historyUrl, historyUrl);
+		if (!dontHistory) {
+			self.pushHistory(dontHistory);
 		}
-	};
-	self.getHistoryUrl = function (pageObj) {
-		return getText("#{}", pageObj.getUrl());
 	};
 	self.init();
 }
 
-
-
 function ChannelsHandler() {
 	var self = this;
+	Page.call(self);
+	self.url = '/chat/';
+	self.title = getText("Hello, <b>{}</b>", loggedUser);
+	self.render = self.show;
 	self.ROOM_ID_ATTR = 'roomid';
-	self.activeChannel = null;
+	self.activeChannel = DEFAULT_CHANNEL_NAME;
 	self.channels = {};
-	self.dom = {
+	self.childDom = {
+		wrapper: $('wrapper'),
+		userMessageWrapper: $('userMessageWrapper'),
 		chatUsersTable: $("chat-user-table"),
 		rooms: $("rooms"),
 		activeUserContext: null,
@@ -378,6 +368,32 @@ function ChannelsHandler() {
 		addRoomButton: $('addRoomButton'),
 		directUserTable: $('directUserTable'),
 		imgInput: $('imgInput')
+	};
+	for (var attrname in self.dom) {
+		if (self.dom.hasOwnProperty(attrname)) {
+			self.childDom[attrname] = self.dom[attrname];
+		}
+	}
+	self.dom = self.childDom;
+	delete self.childDom;
+	self.dom.el = [
+		self.dom.wrapper,
+		self.dom.userMessageWrapper
+	];
+	self.getUrl = function () {
+		return self.url + self.activeChannel;
+	};
+	self.update = function (params) {
+		self.setActiveChannel(self.parseActiveChannelFromParams(params));
+		self.show();
+	};
+	self.parseActiveChannelFromParams = function (params) {
+		if (params && params.length > 0) {
+			return params[0];
+		}
+	};
+	self.setParams = function(params){
+		self.activeChannel = self.parseActiveChannelFromParams(params);
 	};
 	self.roomClick = function (event) {
 		var target = event.target;
@@ -405,6 +421,7 @@ function ChannelsHandler() {
 		self.hideActiveChannel();
 		self.activeChannel = key;
 		self.showActiveChannel();
+		singlePage.pushHistory();
 	};
 	self.generateRoomKey = function (roomId) {
 		return "r" + roomId;
@@ -413,7 +430,8 @@ function ChannelsHandler() {
 		if (self.activeChannel) {
 			var chatHandler = self.channels[self.activeChannel];
 			if (chatHandler == null) {
-				throw getText('Handler {} is unknown', self.activeChannel);
+				self.activeChannel = DEFAULT_CHANNEL_NAME;
+				chatHandler = self.channels[self.activeChannel];
 			}
 			chatHandler.show()
 		}
@@ -579,9 +597,6 @@ function ChannelsHandler() {
 		li.setAttribute(self.ROOM_ID_ATTR, roomId);
 		var chatHandler = new ChatHandler(li, users, roomId, roomName);
 		self.channels[roomKey] = chatHandler;
-		if (self.activeChannel == roomKey) {
-			chatHandler.show();
-		}
 	};
 	self.createNewUserChatHandler = function(roomId, users) {
 		var allUsersIds = Object.keys(users);
@@ -631,6 +646,7 @@ function ChannelsHandler() {
 				}
 			}
 		}
+		self.showActiveChannel();
 	};
 	self.handle = function (message) {
 		if (message.handler == 'channels') {
@@ -918,6 +934,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 	self.dom.chatBoxDiv.tabindex="0";
 	self.dom.chatBoxDiv.onkeydown=keyDownLoadUp;
 	self.show = function () {
+		self.rendered = true;
 		CssUtils.showElement(self.dom.chatBoxDiv);
 		CssUtils.showElement(self.dom.userList);
 		CssUtils.addClass(self.dom.roomNameLi, self.activeRoomClass);
@@ -1199,7 +1216,7 @@ function WebRtcApi() {
 			enterFullScreen: $('enterFullScreen')
 		}
 	};
-	self.page = singlePage.getPageByUrl('/call');
+	self.page = singlePage.getPage('/call');
 	self.onExitFullScreen = function () {
 		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
 			CssUtils.removeClass(self.dom.videoContainer, 'fullscreen');
