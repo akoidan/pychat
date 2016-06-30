@@ -1,3 +1,4 @@
+@charset "utf-8"
 @import "themes/color-lor/color-lor-chat"
 @import "themes/color-reg/color-reg-chat"
 @import "partials/mixins"
@@ -81,7 +82,31 @@ p
 	ul
 		margin-top: 5px
 		margin-bottom: 5px
+	> *
+		display: block
 
+	#channelsStateText, #directStateText, #usersStateText
+		font-size: 13px
+		font-weight: bold
+		text-transform: uppercase
+		vertical-align: middle
+
+	.icon-angle-circled-down, .icon-angle-circled-up
+		font-size: 15px
+
+	.icon-plus-squared, .icon-user-plus
+		float: right
+		margin-top: 7px
+		margin-right: 5px
+
+	span
+		background-color: #171717
+		opacity: 0.9
+		border-radius: 2px
+
+	#usersStateText:hover
+		cursor: pointer
+		color: #f1f1f1
 
 #user-context-menu
 	visibility: visible
@@ -128,6 +153,17 @@ p
 		@include fix-user-icon-top-position
 		i:hover
 			cursor: inherit
+		&:before
+			content: "●"
+			color: green
+		&.offline:before
+			color: red
+	&.hideOffline li
+		&:before
+			content: ''
+		&.offline
+			display: none
+
 
 #onlineStatus
 	padding: 0 10px
@@ -201,9 +237,15 @@ p
 		top: 2px
 		right: 5px
 		opacity: 0.8
+		background: transparent
 		&:hover
 			opacity: 1
 			color: #ff5e5c
+
+
+.icon-user-plus
+	font-size: 15px
+	margin-left: 5px
 
 #rooms li
 	padding-left: 10px

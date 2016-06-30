@@ -57,6 +57,7 @@ class Actions:
 	DELETE_ROOM = 'deleteRoom'
 	CREATE_ROOM_CHANNEL = 'addRoom'
 	INVITE_USER = 'inviteUser'
+	ADD_USER = 'addUserToAll'
 
 
 class VarNames:
@@ -216,7 +217,16 @@ class MessagesCreator(object):
 			HandlerNames.NAME: HandlerNames.CHANNELS,
 			VarNames.ROOM_NAME: room_name,
 			VarNames.CONTENT: users
+		}
 
+	def add_user_to_room(self, channel, user_id, content):
+		return {
+			VarNames.EVENT: Actions.ADD_USER,
+			VarNames.CHANNEL: channel,
+			VarNames.USER_ID: user_id,
+			HandlerNames.NAME: HandlerNames.CHAT,
+			VarNames.GENDER: content[VarNames.GENDER], # SEX: 'Alien', USER: 'Andrew'
+			VarNames.USER: content[VarNames.USER] # SEX: 'Alien', USER: 'Andrew'
 		}
 
 	def unsubscribe_direct_message(self, room_id):
@@ -437,6 +447,7 @@ class MessagesHandler(MessagesCreator):
 		room = Room.objects.get(id=room_id)
 		for user in room.users.all():
 			self.set_js_user_structure(users_in_room, user.id, user.username, user.sex)
+		self.publish(self.add_user_to_room(channel, user_id, users_in_room[user_id]), channel)
 		subscribe_message = self.invite_room_channel_message(room_id, user_id, room.name, users_in_room)
 		self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
 

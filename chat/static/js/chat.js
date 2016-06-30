@@ -102,7 +102,6 @@ onDocLoad(function () {
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	channelsHandler = new ChannelsHandler();
 	showHelp();
-	userMessage.focus();
 	singlePage = new PageHandler();
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
@@ -187,6 +186,11 @@ function IssuePage() {
 		issue: $("issue")
 	};
 	self.dom.el = [self.dom.issueForm];
+	self.show = function() {
+		self.super.show();
+		self.dom.issue.focus();
+	};
+	self.update = self.show;
 	self.render = function () {
 		self.dom.version.value = window.browserVersion;
 		self.dom.issue.addEventListener('input', function () {
@@ -367,7 +371,22 @@ function ChannelsHandler() {
 		addUserInput: $('addUserInput'),
 		addRoomButton: $('addRoomButton'),
 		directUserTable: $('directUserTable'),
-		imgInput: $('imgInput')
+		imgInput: $('imgInput'),
+		usersStateText: $('usersStateText')
+	};
+	self.childDom.minifier = {
+		channel: {
+			icon: $('channelsMinifier'),
+			body: self.childDom.rooms
+		},
+		direct: {
+			icon: $('directMinifier'),
+			body: self.childDom.directUserTable
+		},
+		user: {
+			icon: $('usersMinifier'),
+			body: self.childDom.chatUsersTable
+		}
 	};
 	for (var attrname in self.dom) {
 		if (self.dom.hasOwnProperty(attrname)) {
@@ -435,6 +454,14 @@ function ChannelsHandler() {
 			}
 			chatHandler.show()
 		}
+		userMessage.focus()
+	};
+	self.toggleChannelOfflineOnline = function() {
+		var isOnline = CssUtils.toggleClass(self.dom.chatUsersTable, 'hideOffline');
+		self.setChannelUserText(isOnline);
+	};
+	self.setChannelUserText = function(isOnline) {
+		self.dom.usersStateText.textContent = isOnline ? "Channel online" : "Channel users";
 	};
 	self.hideActiveChannel = function (){
 		if (self.activeChannel && self.channels[self.activeChannel]) {
@@ -523,6 +550,7 @@ function ChannelsHandler() {
 	self.showInviteUser = function() {
 		self.fillAddUser();
 		self.addUserHandler.show();
+		self.dom.addUserInput.focus();
 		self.addUserHolderAction = 'inviteUser';
 		self.addUserHandler.setHeaderText(getText("Invite user to room <b>{}</b>", self.channels[self.activeChannel].roomName));
 	};
@@ -549,12 +577,19 @@ function ChannelsHandler() {
 		self.addUserHandler.show();
 		self.addUserHolderAction = 'addDirectChannel';
 		self.addUserHandler.setHeaderText("Create direct channel");
+		self.dom.addUserInput.focus();
 	};
 	self.getAllUsersInfo = function () {
 		return self.channels[DEFAULT_CHANNEL_NAME].allUsers;
 	};
-	self.filterAddUser = function () {
+	self.filterAddUser = function (event) {
 		var filterValue = self.dom.addUserInput.value;
+		if (event.keyCode == 13) {
+			if (self.addUserUsersList[filterValue]) {
+				self.addUserHolderClick({target:self.addUserUsersList[filterValue]});
+				return;
+			}
+		}
 		for (var userName in self.addUserUsersList) {
 			if (self.addUserUsersList.hasOwnProperty(userName)) {
 				if (userName.indexOf(filterValue) > -1) {
@@ -595,8 +630,7 @@ function ChannelsHandler() {
 		li.appendChild(i);
 		var roomKey = self.generateRoomKey(roomId);
 		li.setAttribute(self.ROOM_ID_ATTR, roomId);
-		var chatHandler = new ChatHandler(li, users, roomId, roomName);
-		self.channels[roomKey] = chatHandler;
+		self.channels[roomKey] = new ChatHandler(li, users, roomId, roomName);
 	};
 	self.createNewUserChatHandler = function(roomId, users) {
 		var allUsersIds = Object.keys(users);
@@ -702,6 +736,20 @@ function ChannelsHandler() {
 		self.dom.addRoomButton.onclick = self.finishAddRoom;
 		self.addUserHandler = new Draggable(self.dom.addUserHolder, "");
 		self.addRoomHandler = new Draggable(self.dom.addRoomHolder, "Create new room");
+		var minifier = self.dom.minifier;
+		for (var el in minifier) {
+			if (minifier.hasOwnProperty(el)) {
+				minifier[el].icon.onclick = self.minifyList;
+			}
+		}
+		self.dom.usersStateText.onclick = self.toggleChannelOfflineOnline;
+		self.setChannelUserText(false);
+	};
+	self.minifyList = function(event) {
+		var minifier = self.dom.minifier[event.target.getAttribute('name')];
+		var visible = CssUtils.toggleVisibility(minifier.body);
+		minifier.icon.className = visible ? 'icon-angle-circled-down' :'icon-angle-circled-up';
+
 	};
 	self.getActiveUserId = function() {
 		return self.dom.activeUserContext.getAttribute(USER_ID_ATTR);
@@ -908,7 +956,6 @@ function keyDownLoadUp(e) {
 function ChatHandler(li, allUsers, roomId, roomName) {
 	var self = this;
 	var wrapper = $('wrapper');
-	self.allUsers = allUsers;
 	self.roomId = roomId;
 	self.roomName = roomName;
 	self.dom = {
@@ -946,6 +993,35 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		CssUtils.hideElement(self.dom.userList);
 		CssUtils.removeClass(self.dom.roomNameLi, self.activeRoomClass);
 	};
+	self.addUserToDom = function(message) {
+		if (!self.allUsers[message.userId]) {
+			self.allUsers[message.userId] = {
+				sex: message.sex,
+				user: message.user
+			};
+			self.addDomUserOnline(message.userId, message.sex, message.user);
+		}
+	};
+	self.addUserToAll = function(message) {
+		self.addUserToDom(message);
+	};
+	self.setDomOnlineUsers = function(users) {
+		self.dom.userList.innerHTML = null;
+		self.allUsers = users;
+		for (var userId in self.allUsers) {
+			if (self.allUsers.hasOwnProperty(userId)) {
+				var user = self.allUsers[userId];
+				self.addDomUserOnline(userId, user.sex,user.user);
+			}
+		}
+	};
+	self.addDomUserOnline = function(userId, sex, username) {
+		var li = createUserLi(userId, sex, username);
+		li.className = 'offline';
+		self.allUsers[userId].li = li;
+		self.dom.userList.appendChild(li);
+	};
+	self.setDomOnlineUsers(allUsers);
 	self.isHidden = function() {
 		return CssUtils.isHidden(self.dom.chatBoxDiv);
 	};
@@ -972,6 +1048,10 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		//	message.content = self.onlineUsers;
 		//	self.printChangeOnlineStatus('has left the conversation.', message, chatLogout);
 		//}
+		var user = self.allUsers[message.userId];
+		CssUtils.deleteElement(user.li);
+		var dm = getText('User <b>{}</b> has left the conversation', user.user);
+		self.displayPreparedMessage(systemHeaderClass, message.time, dm, SYSTEM_USERNAME);
 		delete self.allUsers[message.userId];
 	};
 	/** Creates a DOM node with attached events and all message content*/
@@ -1124,10 +1204,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
 	};
 	self.addOnlineUser = function (message) {
-		self.allUsers[message.userId] = {
-			sex: message.sex,
-			user: message.user
-		};
+		self.addUserToDom(message);
 		self.printChangeOnlineStatus('appeared online.', message, chatLogin);
 	};
 	self.removeOnlineUser = function(message) {
@@ -1151,12 +1228,15 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		// 	webRtcApi.updateDomOnlineUsers();
 		// } TODO
 		console.log(getDebugMessage("Load user names: {}", Object.keys(self.onlineUsers)));
-		self.dom.userList.innerHTML = null;
-		for (var i = 0; i < self.onlineUsers.length; i++) {
-			var userId = self.onlineUsers[i];
-			var user = self.allUsers[userId];
-			var li = createUserLi(userId, user.sex, user.user);
-			self.dom.userList.appendChild(li);
+		for (var userId in self.allUsers) {
+			if (self.allUsers.hasOwnProperty(userId)) {
+				var user = self.allUsers[userId];
+				if (self.onlineUsers.indexOf(parseInt(userId)) >= 0) {
+					CssUtils.removeClass(user.li, 'offline');
+				} else {
+					CssUtils.addClass(user.li, 'offline');
+				}
+			}
 		}
 	};
 	self.loadUpHistory = function (count) {
@@ -1173,13 +1253,13 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 				count: count,
 				action: 'messages'
 			};
-			sendToServer(getMessageRequest);
+			wsHandler.sendToServer(getMessageRequest);
 		}
 	};
 	self.destroy = function () {
 		var elements = [self.dom.chatBoxDiv, self.dom.roomNameLi, self.dom.userList];
 		for (var i = 0; i< elements.length; i++) {
-			deleteDomElement(elements[i]);
+			CssUtils.deleteElement(elements[i]);
 		}
 	}
 }
@@ -1640,7 +1720,7 @@ function WebRtcApi() {
 		}, self.failWebRtc, self.sdpConstraints);
 	};
 	self.sendBaseEvent = function(content, type) {
-		sendToServer({
+		wsHandler.sendToServer({
 			content: content,
 			action: 'call',
 			type: type,

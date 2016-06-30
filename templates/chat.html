@@ -55,13 +55,23 @@
 				<li onclick="growlError('not implemented')">Transfer file</li>
 				<li onclick="channelsHandler.viewProfile()">View profile</li>
 			</ul>
-			<span>#Channels<i class="icon-plus-squared" title="Create new room" onclick="channelsHandler.showAddRoom()"></i></span>
+			<span>
+				<span id="channelsMinifier" name="channel" class="icon-angle-circled-down"></span>
+				<span id="channelsStateText">rooms</span>
+				<i class="icon-plus-squared" title="Create new room" onclick="channelsHandler.showAddRoom()"></i></span>
 			<ul id="rooms">
 			</ul>
-			<span>#Direct<i class="icon-plus-squared" title="Create new direct channel" onclick="channelsHandler.showAddUser()"></i></span>
+			<span>
+				<span id="directMinifier" name="direct" class="icon-angle-circled-down"></span>
+				<span id="directStateText">direct  messages</span>
+				<i class="icon-plus-squared" title="Create new direct channel" onclick="channelsHandler.showAddUser()"></i></span>
 			<ul id="directUserTable">
 			</ul>
-			<span>#Channel users<i class="icon-plus-squared" title="Add user to current active channel" onclick="channelsHandler.showInviteUser()"></i></span>
+			<span>
+				<span id="usersMinifier" name="user" class="icon-angle-circled-down"></span>
+				<span id="usersStateText"></span>
+				<i class="icon-user-plus" title="Add user to current active channel" onclick="channelsHandler.showInviteUser()"></i>
+			</span>
 			<ul id="chat-user-table">
 			</ul>
 		</div>
@@ -71,14 +81,14 @@
 	</div>
 	<div id="addUserHolder" class="hidden">
 		<div>
-			<input type="text" placeholder="search" title="Filter by username" onkeyup="channelsHandler.filterAddUser()" id="addUserInput"/>
+			<input type="text" placeholder="search" title="Filter by username" onkeyup="channelsHandler.filterAddUser(event)" id="addUserInput"/>
 			<ul id="addUserList" onclick="channelsHandler.addUserHolderClick(event)">
 			</ul>
 		</div>
 	</div>
 	<div id="addRoomHolder" class="hidden">
 		<div>
-			<input type="text" placeholder="Room Name" title="Filter by username" id="addRoomInput" maxlength="16"/>
+			<input type="text" placeholder="Room Name" title="Enter new room name here" id="addRoomInput" maxlength="16"/>
 			<input type="button" value="Add" id="addRoomButton"/>
 		</div>
 	</div>
@@ -119,7 +129,7 @@
 		<table class="fullwidth padding10">
 			<tr>
 				<th><label for="issue">The problem you discovered</label></th>
-				<td><textarea id="issue" aria-required="true" name="issue" required></textarea></td>
+				<td><textarea id="issue" tabindex="-1" aria-required="true" name="issue" required></textarea></td>
 			</tr>
 			<tr>
 				<th><label for="version">Affected browser</label></th>
