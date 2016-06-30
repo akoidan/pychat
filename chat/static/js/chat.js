@@ -253,22 +253,6 @@ function ChangeProfilePage() {
 	}
 }
 
-function WebRtcPage() {
-	var self = this;
-	Page.call(self);
-	self.url = '/call';
-	self.title = 'Call';
-	self.dom.el = [
-		$('callContainer')
-	];
-	self.render = self.show;
-	self.hide = function () { // TODO remove cross object reference webRtcApi < - > WebRtcPage
-		if (webRtcApi.isActive()) {
-			growlInfo("Call is still active. Press green phone icon to move back to it");
-		}
-		self.super.hide()
-	}
-}
 
 function AmchartsPage() {
 	var self = this;
@@ -296,8 +280,7 @@ function PageHandler() {
 		'/chat/': channelsHandler,
 		'/statistics': new AmchartsPage(),
 		'/profile/': new ViewProfilePage(),
-		'/profile': new  ChangeProfilePage(),
-		'/call':new WebRtcPage()
+		'/profile': new  ChangeProfilePage()
 	};
 	self.pageRegex = /\w\/#(\/\w+\/?)(.*)/g;
 	self.init = function () {
@@ -378,6 +361,10 @@ function ChannelsHandler() {
 		imgInput: $('imgInput'),
 		usersStateText: $('usersStateText'),
 		inviteUser: $('inviteUser'),
+		navCallIcon: $('navCallIcon')
+	};
+	self.getActiveChannel = function() {
+		return self.channels[self.activeChannel];
 	};
 	self.childDom.minifier = {
 		channel: {
@@ -452,16 +439,18 @@ function ChannelsHandler() {
 	};
 	self.showActiveChannel = function (){
 		if (self.activeChannel) {
-			var chatHandler = self.channels[self.activeChannel];
+			var chatHandler = self.getActiveChannel();
 			if (chatHandler == null) {
 				self.activeChannel = DEFAULT_CHANNEL_NAME;
-				chatHandler = self.channels[self.activeChannel];
+				chatHandler = self.getActiveChannel();
 			}
 			chatHandler.show();
 			if (chatHandler.isPrivate()) {
 				CssUtils.hideElement(self.dom.inviteUser);
+				CssUtils.showElement(self.dom.navCallIcon);
 			} else {
 				CssUtils.showElement(self.dom.inviteUser);
+				CssUtils.hideElement(self.dom.navCallIcon);
 			}
 		}
 		userMessage.focus()
@@ -471,8 +460,8 @@ function ChannelsHandler() {
 		self.dom.usersStateText.textContent = isOnline ? "Channel online" : "Channel users";
 	};
 	self.hideActiveChannel = function (){
-		if (self.activeChannel && self.channels[self.activeChannel]) {
-			self.channels[self.activeChannel].hide()
+		if (self.activeChannel && self.getActiveChannel()) {
+			self.getActiveChannel().hide()
 		}
 	};
 	self.userClick = function (event) {
@@ -545,7 +534,7 @@ function ChannelsHandler() {
 			userId: userId
 		};
 		if (self.addUserHolderAction == 'inviteUser') {
-			message.roomId = self.channels[self.activeChannel].roomId;
+			message.roomId = self.getActiveChannel().roomId;
 		}
 		wsHandler.sendToServer(message);
 		self.addUserHandler.hide();
@@ -559,7 +548,7 @@ function ChannelsHandler() {
 		self.addUserHandler.show();
 		self.dom.addUserInput.focus();
 		self.addUserHolderAction = 'inviteUser';
-		self.addUserHandler.setHeaderText(getText("Invite user to room <b>{}</b>", self.channels[self.activeChannel].roomName));
+		self.addUserHandler.setHeaderText(getText("Invite user to room <b>{}</b>", self.getActiveChannel().roomName));
 	};
 	self.inviteUser = function(message) {
 		self.createNewRoomChatHandler(message.roomId, message.name, message.content);
@@ -962,7 +951,6 @@ function keyDownLoadUp(e) {
 
 function ChatHandler(li, allUsers, roomId, roomName) {
 	var self = this;
-	var wrapper = $('wrapper');
 	self.roomId = roomId;
 	self.roomName = roomName;
 	self.dom = {
@@ -970,7 +958,8 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		userList: document.createElement('ul'),
 		roomNameLi: li,
 		newMessages: document.createElement('span'),
-		deleteIcon: li.lastChild
+		deleteIcon: li.lastChild,
+		chatBoxHolder: $('chatBoxHolder')
 	};
 	self.newMessages = 0;
 	self.allMessages = [];
@@ -983,7 +972,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 	self.dom.userList.className = 'hidden';
 	channelsHandler.dom.chatUsersTable.appendChild(self.dom.userList);
 	self.dom.chatBoxDiv.className = 'chatbox hidden';
-	wrapper.insertBefore(self.dom.chatBoxDiv, wrapper.firstChild);
+	self.dom.chatBoxHolder.appendChild(self.dom.chatBoxDiv);
 	// tabindex allows focus, focus allows keydown binding event
 	self.dom.chatBoxDiv.tabindex="0";
 	self.dom.chatBoxDiv.onkeydown=keyDownLoadUp;
@@ -1002,6 +991,12 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 	};
 	self.isPrivate = function() {
 		return self.dom.roomNameLi.hasAttribute(USER_ID_ATTR);
+	};
+	self.getOpponentId = function() {
+		return self.dom.roomNameLi.getAttribute(USER_ID_ATTR);
+	};
+	self.getUserNameById = function(id) {
+		return self.allUsers[id].user;
 	};
 	self.addUserToDom = function(message) {
 		if (!self.allUsers[message.userId]) {
@@ -1234,9 +1229,6 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 	};
 	self.setOnlineUsers = function(message) {
 		self.onlineUsers = message.content;
-		// if (!CssUtils.hasClass(webRtcApi.dom.callContainer, 'hidden')) {
-		// 	webRtcApi.updateDomOnlineUsers();
-		// } TODO
 		console.log(getDebugMessage("Load user names: {}", Object.keys(self.onlineUsers)));
 		for (var userId in self.allUsers) {
 			if (self.allUsers.hasOwnProperty(userId)) {
@@ -1288,7 +1280,6 @@ function WebRtcApi() {
 		callAnswerParent : $('callAnswerParent'),
 		callContainerHeaderText: headerText,
 		callAnswerText : $('callAnswerText'),
-		callUserList : $("callUserList"),
 		remote: $('remoteVideo'),
 		local: $('localVideo'),
 		callSound: $('chatCall'),
@@ -1306,7 +1297,6 @@ function WebRtcApi() {
 			enterFullScreen: $('enterFullScreen')
 		}
 	};
-	self.page = singlePage.getPage('/call');
 	self.onExitFullScreen = function () {
 		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
 			CssUtils.removeClass(self.dom.videoContainer, 'fullscreen');
@@ -1323,7 +1313,6 @@ function WebRtcApi() {
 		self.dom.fs.hangup.onclick = self.hangUp;
 		self.dom.fs.audio.onclick = self.toggleMic;
 		self.dom.audioStatusIcon.onclick = self.toggleMic;
-		self.dom.callUserList.onclick = self.callUserListClick;
 		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
 		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
 			document.addEventListener(fullScreenChangeEvents[i], self.onExitFullScreen, false);
@@ -1461,8 +1450,7 @@ function WebRtcApi() {
 		self.setHeaderText(getText("Waiting for <b>{}</b> to answer", self.receiverName))
 	};
 	self.setHeaderText = function(text) {
-		self.page.title = text;
-		self.page.fixTittle();
+		headerText.innerHTML = text;
 	};
 	self.oniceconnectionstatechange = function () {
 		if (self.pc.iceConnectionState == 'disconnected') {
@@ -1489,31 +1477,19 @@ function WebRtcApi() {
 	self.setIconState = function(isCall) {
 		CssUtils.setVisibility(self.dom.callIcon, !isCall);
 		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
-		CssUtils.setVisibility(self.dom.callUserList, !isCall);
 		CssUtils.setVisibility(self.dom.videoContainer, isCall);
-	};
-	self.updateDomOnlineUsers = function() {
-		self.dom.callUserList.innerHTML = '';
-		self.receiverName = null;
-		for (var userName in onlineUsers) {
-			if (onlineUsers.hasOwnProperty(userName) && userName !== loggedUser) {
-				var li = document.createElement('li');
-				li.textContent = userName;
-				self.dom.callUserList.appendChild(li);
-			}
-		}
 	};
 	self.showCallDialog = function (isCallActive) {
 		isCallActive = isCallActive || self.isActive();
-		if (isCallActive || Object.keys(onlineUsers).length > 1) {
-			singlePage.showPage('/call');
+		var activeChannel = channelsHandler.getActiveChannel();
+		if (isCallActive || Object.keys(activeChannel.onlineUsers).length > 1) {
+			CssUtils.showElement(self.dom.callContainer);
 		} else {
-			growlError("Nobody's online. Who do you call?");
+			growlError(getText("<span>Can't make a call, user <b>{}</b> is not online.</span>", activeChannel.getUserNameById(activeChannel.getOpponentId())));
 		}
 		self.setIconState(isCallActive);
 		if (!isCallActive) {
 			self.setHeaderText("Make a call");
-			self.updateDomOnlineUsers();
 		} else {
 			self.clearTimeout();
 		}
@@ -1551,6 +1527,9 @@ function WebRtcApi() {
 		}
 	};
 	self.callPeople = function () {
+		var activeChannel = channelsHandler.getActiveChannel();
+		self.receiverId = activeChannel.getOpponentId();
+		self.receiverName = activeChannel.getUserNameById(self.receiverId);
 		if (self.receiverName == null) {
 			growlError("Select exactly one user to call");
 			return;
@@ -1746,22 +1725,6 @@ function WebRtcApi() {
 		var text = getText("Error while calling because {}", errorContext);
 		growlError(text);
 		console.error(getDebugMessage(text));
-	};
-	self.callUserListClick = function (event) {
-		if (event.target.tagName === 'LI') {
-			var wasActiveBefore = CssUtils.hasClass(event.target, self.activeUserClass);
-			var users = self.dom.callUserList.childNodes;
-			for (var i=0; i< users.length; i++) {
-				CssUtils.removeClass(users[i], self.activeUserClass);
-			}
-			var userName = event.target.textContent;
-			if (!wasActiveBefore) {
-				self.receiverName = userName;
-				self.receiverId = parseInt(onlineUsers[userName].userId);
-				CssUtils.addClass(event.target, self.activeUserClass);
-			}
-		}
-		event.stopPropagation();
 	};
 	self.attachDomEvents();
 }

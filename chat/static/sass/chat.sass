@@ -48,9 +48,19 @@ p
 	margin-top: 0.8em
 	margin-bottom: 0.8em
 
-.chatbox
+#wrapper
+	flex: 1
+	@include display-flex
+	min-height: 0
+
+#chatBoxHolder
+	@include display-flex
+	flex-direction: column
 	width: 100%
+
+.chatbox
 	overflow-y: scroll
+	height: 100%
 	padding-left: 8px
 	word-wrap: break-word
 	font-size: 18px
@@ -354,6 +364,7 @@ p
 			max-width: calc(100vw - 250px)
 			max-height: calc(100vh - 100px)
 
+
 .windowHeader
 	padding: 4px 0 4px 6px
 	border-radius: 3px 3px 0 0
@@ -389,6 +400,8 @@ p
 	display: inline-block
 	max-width: 100%
 	text-align: center
+	margin-right: 2px
+	@include right-bottom-border(6px solid #1a1a1a)
 
 	label
 		cursor: pointer
