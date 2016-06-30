@@ -64,4 +64,30 @@
 	.answerButtons div
 		padding-top: 5px
 
-	// end call container
+	.newMessages
+		background-color: #913d3c
+
+	#chat-room-users-wrapper > span
+		background-color: #221f1f
+		color: #8f8f8f
+
+	#directUserTable,
+	#rooms
+		.icon-cancel-circled-outline:hover
+			color: #ff8380
+
+	.active-room
+		background-color: #375a70
+
+	#chat-user-table li
+		&.offline:before
+			color: #e3403d
+		&:before
+			color: #2e9154
+
+	#onlineStatus
+		padding: 0 10px
+		&.offline
+			color: #b02e2e
+		&.online
+			color: #53a045
