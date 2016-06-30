@@ -1834,7 +1834,6 @@ function WsHandler() {
 			console.log(getDebugMessage(message));
 		};
 	};
-
 }
 
 function Storage() {
