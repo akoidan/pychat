@@ -119,8 +119,9 @@ def send_restore_password(request):
 		if not user_profile.email:
 			raise ValidationError("You didn't specify email address for this user")
 		if not user_profile.email_verification_id or not user_profile.email_verification.verified:
-			raise ValidationError("You didn't verify the email after registration. "
-					"Find you verification email and complete verification and after restore the password again")
+			send_email_verification(user_profile, request.get_host())
+			raise ValidationError("You didn't verify the email after registration. We resend you verification email,"
+					"and restore password again")
 		verification = Verification(type_enum=Verification.TypeChoices.password, user_id=user_profile.id)
 		verification.save()
 		message = "{},\n" \
