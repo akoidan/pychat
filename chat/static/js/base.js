@@ -97,11 +97,6 @@ function encodeAnchorsHTML(html) {
 }
 
 
-function deleteDomElement(target) {
-	target.parentNode.removeChild(target)
-}
-
-
 var CssUtils = {
 	visibilityClass: 'hidden',
 	hasClass: function(element, className){
@@ -112,6 +107,9 @@ var CssUtils = {
 			var oldClassName = element.className;
 			element.className = getText("{} {}", oldClassName.trim(), className);
 		}
+	},
+	deleteElement: function(target) {
+		target.parentNode.removeChild(target)
 	},
 	setOnOf: function(element, desiredClass, removeClasses) {
 		var className = element.className;
@@ -138,7 +136,7 @@ var CssUtils = {
 		CssUtils.addClass(element, CssUtils.visibilityClass);
 	},
 	toggleVisibility: function (element) {
-		CssUtils.toggleClass(element,CssUtils.visibilityClass);
+		return CssUtils.toggleClass(element,CssUtils.visibilityClass);
 	},
 	setVisibility: function(element, isVisible){
 		if (isVisible) {
@@ -150,8 +148,10 @@ var CssUtils = {
 	toggleClass: function (element, className) {
 		if (CssUtils.hasClass(element, className)) {
 			CssUtils.removeClass(element, className);
+			return false;
 		} else {
 			CssUtils.addClass(element, className);
+			return true;
 		}
 	}
 };
@@ -278,6 +278,9 @@ function Draggable(container, headerText) {
 		document.removeEventListener ("mousemove", self.eleMouseMove, false);
 		document.removeEventListener ("mouseup", self.eleMouseUp, false);
 		self.attached = true;
+	};
+	self.super = {
+		show: self.show
 	};
 	self.init();
 }
