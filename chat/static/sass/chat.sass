@@ -100,7 +100,7 @@ p
 		margin-right: 5px
 
 	> span
-		background-color: #171717
+
 		opacity: 0.9
 		border-radius: 2px
 
@@ -158,22 +158,14 @@ p
 			cursor: inherit
 		&:before
 			content: "●"
-			color: green
-		&.offline:before
-			color: red
 	&.hideOffline li
 		&:before
 			content: ''
 		&.offline
 			display: none
 
-
 #onlineStatus
 	padding: 0 10px
-	&.offline
-		color: red
-	&.online
-		color: green
 
 .icon-cancel
 	position: absolute
@@ -199,12 +191,6 @@ p
 /*TODO login dropdown goes under scroll, FF doesn't support
 /*}
 
-
-	border-radius: 3px
-
-.active-room
-	// TODO move colors to theme
-	background-color: rgba(33, 158, 147, 0.45)
 
 #addUserHolder
 	position: absolute
@@ -239,11 +225,7 @@ p
 		position: absolute
 		top: 2px
 		right: 5px
-		opacity: 0.8
 		background: transparent
-		&:hover
-			opacity: 1
-			color: #ff5e5c
 
 
 .icon-user-plus
@@ -455,7 +437,6 @@ p
 		margin-top: 2px
 
 .newMessages
-	background-color: #891313
 	color: white
 	border-radius: 5px
 	display: inline-block
