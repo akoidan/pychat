@@ -69,21 +69,22 @@ if (isFirefox) {
 var singlePage;
 
 var infoMessages = [
-	"Every time you join chat it will show you this help messages. You can disable them in you profile settings. To hide them just simply chlick on theirs background",
-	"You can change chat appearence in your profile. Change theme to simple if you like.",
-	"Did you know that you could paste multiple lines content by simply pressing shift+Enter?",
-	"You can add smileys by clicking on bottom right icon. To close the smile container click outside of it or press escape",
-	"You can send direct message to user just by clicking on username in user list or in messages. After his username appears in the left bottom " +
-			"corner and your messages become green. To send messages to all you should click on X right by username",
-	"You can also comment somebody's message. This will be shown to all users in current channel. Just click on message" +
+	"<span>Every time you join chat those help messages will be shown to you. " +
+	"You can disable them in you profile settings (<i class='icon-wrench'></i> icon). Simply click on popup to hide them</span>",
+	"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
+	"<span>Did you know that you could paste multiple lines content by simply pressing <b>shift+Enter</b>?</span>",
+	"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon. To close appeared smile container click outside of it or press <b>Esc</b></span>",
+	"You can comment somebody's message. This will be shown to all users in current channel. Just click on message time" +
 			"and it's content appears in message text",
-	"You have a feature to suggest or you lack some functionality? Click on purple pencil icon on top menu and write your " +
-			"suggestion there",
-	"Chat uses your browser cache to store messages. If you want to clear history and all cached messages just click " +
-	"on red Floppy drive icon on the top menu",
-	"You can view userprofile by clicking on icon left by username in user list. To edit your profile you need to register" +
-	"and click on light green wrench icon on the top right corner",
-	"You can change your randomly generated username by clicking on it on top menu"
+	"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
+			"suggestion there</span>",
+	"<span>Chat uses your browser cache to store messages. If you want to clear history and all cached messages just click " +
+	"<i class='icon-clear'></i> icon on the top menu</span>",
+	"You can view offline users in current channel if u click on 'CHANNEL ONLINE'",
+	"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon.<br>" +
+	" To delete created room hover mouse on its name and click on <i class='icon-cancel-circled-outline'></i> icon.</span>",
+	"<span>You can invite user to current channel by clicking on <i class='icon-user-plus'></i> icon</span>",
+	"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>"
 ];
 
 onDocLoad(function () {
@@ -461,9 +462,6 @@ function ChannelsHandler() {
 	};
 	self.toggleChannelOfflineOnline = function() {
 		var isOnline = CssUtils.toggleClass(self.dom.chatUsersTable, 'hideOffline');
-		self.setChannelUserText(isOnline);
-	};
-	self.setChannelUserText = function(isOnline) {
 		self.dom.usersStateText.textContent = isOnline ? "Channel online" : "Channel users";
 	};
 	self.hideActiveChannel = function (){
@@ -746,7 +744,7 @@ function ChannelsHandler() {
 			}
 		}
 		self.dom.usersStateText.onclick = self.toggleChannelOfflineOnline;
-		self.setChannelUserText(false);
+		self.dom.usersStateText.click()
 	};
 	self.minifyList = function(event) {
 		var minifier = self.dom.minifier[event.target.getAttribute('name')];
