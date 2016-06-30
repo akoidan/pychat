@@ -376,7 +376,8 @@ function ChannelsHandler() {
 		addRoomButton: $('addRoomButton'),
 		directUserTable: $('directUserTable'),
 		imgInput: $('imgInput'),
-		usersStateText: $('usersStateText')
+		usersStateText: $('usersStateText'),
+		inviteUser: $('inviteUser'),
 	};
 	self.childDom.minifier = {
 		channel: {
@@ -456,7 +457,12 @@ function ChannelsHandler() {
 				self.activeChannel = DEFAULT_CHANNEL_NAME;
 				chatHandler = self.channels[self.activeChannel];
 			}
-			chatHandler.show()
+			chatHandler.show();
+			if (chatHandler.isPrivate()) {
+				CssUtils.hideElement(self.dom.inviteUser);
+			} else {
+				CssUtils.showElement(self.dom.inviteUser);
+			}
 		}
 		userMessage.focus()
 	};
@@ -993,6 +999,9 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		CssUtils.hideElement(self.dom.chatBoxDiv);
 		CssUtils.hideElement(self.dom.userList);
 		CssUtils.removeClass(self.dom.roomNameLi, self.activeRoomClass);
+	};
+	self.isPrivate = function() {
+		return self.dom.roomNameLi.hasAttribute(USER_ID_ATTR);
 	};
 	self.addUserToDom = function(message) {
 		if (!self.allUsers[message.userId]) {
