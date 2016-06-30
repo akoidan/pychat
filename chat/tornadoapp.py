@@ -438,13 +438,15 @@ class MessagesHandler(MessagesCreator):
 		user_id = message[VarNames.USER_ID]
 		channel = RedisPrefix.generate_room(room_id)
 		if channel not in self.channels:
-			raise ValidationError("Access denied")
+			raise ValidationError("Access denied, only allowed for channels {}".format(self.channels))
+		room = Room.objects.get(id=room_id)
+		if room.is_private:
+			raise ValidationError("You can't add users to direct room, create a new room instead")
 		try:
 			Room.users.through.objects.create(room_id=room_id, user_id=user_id)
 		except IntegrityError:
 			raise ValidationError("User is already in channel")
 		users_in_room = {}
-		room = Room.objects.get(id=room_id)
 		for user in room.users.all():
 			self.set_js_user_structure(users_in_room, user.id, user.username, user.sex)
 		self.publish(self.add_user_to_room(channel, user_id, users_in_room[user_id]), channel)

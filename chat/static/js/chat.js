@@ -123,7 +123,7 @@ function Page() {
 	};
 	self.setParams = function(params){
 		if (params) {
-			console.warn(getDebugMessage('Params {} are not set for {}', self.getUrl()))
+			console.warn(getDebugMessage('Params are not set for {}', self.getUrl()))
 		}
 	};
 	self.parser = new DOMParser();
@@ -225,6 +225,9 @@ function ViewProfilePage() {
 	Page.call(self);
 	self.getUrl = function () {
 		return getText('/profile/{}', self.userId);
+	};
+	self.setParams = function(params) {
+		self.setUserId(params[0]);
 	};
 	self.getTitle = function () {
 		self.username = self.username || self.dom.el[0].getAttribute('username');
