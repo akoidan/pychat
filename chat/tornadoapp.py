@@ -433,7 +433,6 @@ class MessagesHandler(MessagesCreator):
 		self.publish(subscribe_message, self.channel, True)
 
 	def invite_user(self, message):
-		print('asd')
 		room_id = message[VarNames.ROOM_ID]
 		user_id = message[VarNames.USER_ID]
 		channel = RedisPrefix.generate_room(room_id)
