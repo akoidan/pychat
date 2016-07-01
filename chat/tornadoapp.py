@@ -50,7 +50,6 @@ class Actions:
 	CALL = 'call'
 	ROOMS = 'setRooms'
 	REFRESH_USER = 'setOnlineUsers'
-	SYSTEM_MESSAGE = 'system'
 	GROWL_MESSAGE = 'growl'
 	GET_MESSAGES = 'loadMessages'
 	CREATE_DIRECT_CHANNEL = 'addDirectChannel'
@@ -172,7 +171,7 @@ class MessagesCreator(object):
 		"""
 		channel = RedisPrefix.generate_room(message.room_id)
 		res = cls.create_message(message)
-		res[VarNames.EVENT] = Actions.PRINT_MESSAGE,
+		res[VarNames.EVENT] = Actions.PRINT_MESSAGE
 		res[VarNames.CHANNEL] = channel
 		res[HandlerNames.NAME] = HandlerNames.CHAT
 		return res

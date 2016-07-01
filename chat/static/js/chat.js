@@ -113,7 +113,6 @@ onDocLoad(function () {
 	//bottom call loadMessagesFromLocalStorage(); s
 	smileyUtil.init();
 	storage = new Storage();
-	storage.loadMessagesFromLocalStorage();
 	//TODO channelsHandler.loadMessagesFromLocalStorage(); /*Smileys should be encoded by time message load, otherwise they don't display*/
 	wsHandler.start_chat_ws();
 });
@@ -680,15 +679,21 @@ function ChannelsHandler() {
 			}
 		}
 		self.showActiveChannel();
+		if (!self.roomsInited) {
+			storage.loadMessagesFromLocalStorage();
+		}
+		self.roomsInited = true;
 	};
 	self.handle = function (message) {
 		if (message.handler == 'channels') {
 			self[message.action](message);
 		}
 		else if (message.handler == 'chat') {
-			self.channels[message.channel][message.action](message);
-		} else {
-			throw getText("Handler {} is uknown", message.handler);
+			var channelHandler = self.channels[message.channel];
+			if (!channelHandler) {
+				throw getText('Unknown channel {} for message ""', message.channel, JSON.stringify(message));
+			}
+			channelHandler[message.action](message);
 		}
 	};
 	self.deleteRoom = function(message) {
@@ -1767,9 +1772,12 @@ function WsHandler() {
 		var jsonData = message.data;
 		console.log(getDebugMessage("WS in: {}", jsonData));
 		var data = JSON.parse(jsonData);
-		self.handlers[data.handler].handle(data);
+		self.handleMessage(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
 		storage.saveMessageToStorage(data, jsonData);
+	};
+	self.handleMessage = function (data) {
+		self.handlers[data.handler].handle(data);
 	};
 	self.sendToServer = function (messageRequest) {
 		var jsonRequest = JSON.stringify(messageRequest);
@@ -1828,7 +1836,6 @@ function WsHandler() {
 function Storage() {
 	var self = this;
 	self.loadMessagesFromLocalStorage = function () {
-		return ; // TODO
 		var jsonData = localStorage.getItem(STORAGE_NAME);
 		if (jsonData != null) {
 			var parsedData = JSON.parse(jsonData);
@@ -1838,7 +1845,12 @@ function Storage() {
 			window.sound = 0;
 			window.loggingEnabled = false;
 			for (var i = 0; i < parsedData.length; i++) {
-				wsHandler.actions[parsedData[i].action](parsedData[i]);
+				try {
+					wsHandler.handleMessage(parsedData[i]);
+				} catch (err) {
+					console.warn(getDebugMessage("Message '{}' isn't loaded because {}",
+							JSON.stringify(parsedData[i]), err));
+				}
 			}
 			window.loggingEnabled = true;
 			window.sound = savedSoundStatus;
@@ -1847,17 +1859,10 @@ function Storage() {
 		// Use both json and object repr for less JSON actions
 	self.saveMessageToStorage = function(objectItem, jsonItem) {
 		switch (objectItem['action']) {
-			case 'addOnlineUser':
-			case 'changed':
-			case 'left':
-				delete objectItem['content']; // don't store usernames in db
-				jsonItem = JSON.stringify(objectItem);
-			case 'system': // continue from 3 top events:
-			case 'messages':
-			case 'send':
+			case 'printMessage':
+			case 'loadMessages':
 				self.fastAddToStorage(jsonItem);
 				break;
-				// everything else is not saved;
 		}
 	};
 	self.fastAddToStorage = function (text) {
@@ -1886,15 +1891,8 @@ function createUserLi(userId, gender, username) {
 	return li;
 }
 
-// OH man be carefull with this method, it should reinit history
 function clearLocalHistory() {
-	self.headerId // For all channels TODO
 	localStorage.clear();
-	allMessagesDates = [];
-	//TODO uncomment
-	//chatBoxDiv.innerHTML = '';
-	//chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp); //
-	//chatBoxDiv.addEventListener("keydown", keyDownLoadUp);
 	console.log(getDebugMessage('History has been cleared'));
 	growlSuccess('History has been cleared');
 }
