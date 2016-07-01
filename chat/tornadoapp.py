@@ -61,8 +61,6 @@ class Actions:
 
 
 class VarNames:
-	RECEIVER_ID = 'receiverId'
-	RECEIVER_NAME = 'receiverName'
 	CALL_TYPE = 'type'
 	USER = 'user'
 	USER_ID =  'userId'
@@ -395,13 +393,10 @@ class MessagesHandler(MessagesCreator):
 		"""
 		:type message: dict
 		"""
-		content = message[VarNames.CONTENT]
-		receiver_id = message.get(VarNames.RECEIVER_ID)  # if receiver_id is None then its a private message
-		self.logger.info('!! Sending message %s to user with id %s', content, receiver_id)
 		channel = message[VarNames.CHANNEL]
 		message_db = Message(
 			sender_id=self.user_id,
-			content=content
+			content=message[VarNames.CONTENT]
 		)
 		channel_id = RedisPrefix.extract_id(channel)
 		message_db.room_id = channel_id
@@ -409,14 +404,7 @@ class MessagesHandler(MessagesCreator):
 			message_db.img = extract_photo(message[VarNames.IMG])
 		self.do_db(message_db.save)  # exit on hacked id with exception
 		prepared_message = self.create_send_message(message_db)
-		if message_db.receiver_id is None:
-			self.logger.debug('!! Detected as public')
-			self.publish(prepared_message, channel)
-		else:
-			self.publish(prepared_message, self.channel)
-			self.logger.debug('!! Detected as private, channel %s', channel)
-			if channel != self.channel:
-				self.publish(prepared_message, channel)
+		self.publish(prepared_message, channel)
 
 	def process_call(self, in_message):
 		"""
