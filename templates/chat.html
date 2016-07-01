@@ -23,7 +23,7 @@
 		<a href="/#/report_issue" class="icon-pencil very-small-screen" title="report an issue"
 			onclick="event.preventDefault(); singlePage.showPage('/report_issue')"><span class="mText">issue</span></a>
 		<i class="icon-clear" title="Clear local history" onclick="clearLocalHistory()"><span class="mText">clear</span></i>
-		<a class="icon-phone" id="navCallIcon" href="/#/call" title="Make a video/mic call" onclick="event.preventDefault(); webRtcApi.showCallDialog()"><span class="mText">Call</span></a>
+		<a class="icon-phone" id="navCallIcon" href="/#/call" title="Make a video/mic call" onclick="event.preventDefault(); webRtcApi.toggleCallContainer()"><span class="mText">Call</span></a>
 		<a href="/#/statistics" class="icon-chart-pie" onclick="event.preventDefault(); singlePage.showPage('/statistics')" title="Show user countries statistics"><span class="mText">statistics</span></a>
 		<span id="onlineStatus" title="Online status" class="flex-push-right offline">●</span>
 		<span id='headerText' class="username very-small-screen"></span>
@@ -68,8 +68,8 @@
 						<div id="enterFullScreenHolder">
 							<i id="enterFullScreen" class="icon-webrtc-fullscreen" title="Fullscreen"></i>
 						</div>
-						<i class="icon-phone-circled" id="callIcon"></i>
-						<i class="icon-hang-up finish-call-icon" id="hangUpIcon"></i>
+						<i class="icon-hang-up" id="hangUpIcon"></i>
+						<i class="icon-phone-circled" id="callIcon" onclick="event.preventDefault(); webRtcApi.callPeople()"></i>
 						<img src="{% md5url 'images/call.gif' %}" alt="call" class="hidden" id="callRing"
 							 style="width: 30px"/>
 					</div>
