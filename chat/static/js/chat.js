@@ -69,21 +69,25 @@ if (isFirefox) {
 var singlePage;
 
 var infoMessages = [
-	"Every time you join chat it will show you this help messages. You can disable them in you profile settings. To hide them just simply chlick on theirs background",
-	"You can change chat appearence in your profile. Change theme to simple if you like.",
-	"Did you know that you could paste multiple lines content by simply pressing shift+Enter?",
-	"You can add smileys by clicking on bottom right icon. To close the smile container click outside of it or press escape",
-	"You can send direct message to user just by clicking on username in user list or in messages. After his username appears in the left bottom " +
-			"corner and your messages become green. To send messages to all you should click on X right by username",
-	"You can also comment somebody's message. This will be shown to all users in current channel. Just click on message" +
+	"<span>Every time you join chat those help messages will be shown to you. " +
+	"You can disable them in you profile settings (<i class='icon-wrench'></i> icon). Simply click on popup to hide them</span>",
+	"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon." +
+	" To delete created room hover mouse on its name and click on <i class='icon-cancel-circled-outline'></i> icon.</span>",
+	"<span>You can make an audio/video call. Currently pychat allows calling only one person." +
+	" To call someone you need to create ( <i class='icon-plus-squared'></i>) and join direct message," +
+	" open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> </span>",
+	"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
+	"<span>Did you know that you could paste multiple lines content by simply pressing <b>shift+Enter</b>?</span>",
+	"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon. To close appeared smile container click outside of it or press <b>Esc</b></span>",
+	"You can comment somebody's message. This will be shown to all users in current channel. Just click on message time" +
 			"and it's content appears in message text",
-	"You have a feature to suggest or you lack some functionality? Click on purple pencil icon on top menu and write your " +
-			"suggestion there",
-	"Chat uses your browser cache to store messages. If you want to clear history and all cached messages just click " +
-	"on red Floppy drive icon on the top menu",
-	"You can view userprofile by clicking on icon left by username in user list. To edit your profile you need to register" +
-	"and click on light green wrench icon on the top right corner",
-	"You can change your randomly generated username by clicking on it on top menu"
+	"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
+			"suggestion there</span>",
+	"<span>Chat uses your browser cache to store messages. If you want to clear history and all cached messages just click " +
+	"<i class='icon-clear'></i> icon on the top menu</span>",
+	"You can view offline users in current channel if u click on 'CHANNEL ONLINE'",
+	"<span>You can invite user to current room by clicking on <i class='icon-user-plus'></i> icon</span>",
+	"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>"
 ];
 
 onDocLoad(function () {
@@ -252,22 +256,6 @@ function ChangeProfilePage() {
 	}
 }
 
-function WebRtcPage() {
-	var self = this;
-	Page.call(self);
-	self.url = '/call';
-	self.title = 'Call';
-	self.dom.el = [
-		$('callContainer')
-	];
-	self.render = self.show;
-	self.hide = function () { // TODO remove cross object reference webRtcApi < - > WebRtcPage
-		if (webRtcApi.isActive()) {
-			growlInfo("Call is still active. Press green phone icon to move back to it");
-		}
-		self.super.hide()
-	}
-}
 
 function AmchartsPage() {
 	var self = this;
@@ -295,8 +283,7 @@ function PageHandler() {
 		'/chat/': channelsHandler,
 		'/statistics': new AmchartsPage(),
 		'/profile/': new ViewProfilePage(),
-		'/profile': new  ChangeProfilePage(),
-		'/call':new WebRtcPage()
+		'/profile': new  ChangeProfilePage()
 	};
 	self.pageRegex = /\w\/#(\/\w+\/?)(.*)/g;
 	self.init = function () {
@@ -375,7 +362,12 @@ function ChannelsHandler() {
 		addRoomButton: $('addRoomButton'),
 		directUserTable: $('directUserTable'),
 		imgInput: $('imgInput'),
-		usersStateText: $('usersStateText')
+		usersStateText: $('usersStateText'),
+		inviteUser: $('inviteUser'),
+		navCallIcon: $('navCallIcon')
+	};
+	self.getActiveChannel = function() {
+		return self.channels[self.activeChannel];
 	};
 	self.childDom.minifier = {
 		channel: {
@@ -450,25 +442,29 @@ function ChannelsHandler() {
 	};
 	self.showActiveChannel = function (){
 		if (self.activeChannel) {
-			var chatHandler = self.channels[self.activeChannel];
+			var chatHandler = self.getActiveChannel();
 			if (chatHandler == null) {
 				self.activeChannel = DEFAULT_CHANNEL_NAME;
-				chatHandler = self.channels[self.activeChannel];
+				chatHandler = self.getActiveChannel();
 			}
-			chatHandler.show()
+			chatHandler.show();
+			if (chatHandler.isPrivate()) {
+				CssUtils.hideElement(self.dom.inviteUser);
+				CssUtils.showElement(self.dom.navCallIcon);
+			} else {
+				CssUtils.showElement(self.dom.inviteUser);
+				CssUtils.hideElement(self.dom.navCallIcon);
+			}
 		}
 		userMessage.focus()
 	};
 	self.toggleChannelOfflineOnline = function() {
 		var isOnline = CssUtils.toggleClass(self.dom.chatUsersTable, 'hideOffline');
-		self.setChannelUserText(isOnline);
-	};
-	self.setChannelUserText = function(isOnline) {
 		self.dom.usersStateText.textContent = isOnline ? "Channel online" : "Channel users";
 	};
 	self.hideActiveChannel = function (){
-		if (self.activeChannel && self.channels[self.activeChannel]) {
-			self.channels[self.activeChannel].hide()
+		if (self.activeChannel && self.getActiveChannel()) {
+			self.getActiveChannel().hide()
 		}
 	};
 	self.userClick = function (event) {
@@ -541,7 +537,7 @@ function ChannelsHandler() {
 			userId: userId
 		};
 		if (self.addUserHolderAction == 'inviteUser') {
-			message.roomId = self.channels[self.activeChannel].roomId;
+			message.roomId = self.getActiveChannel().roomId;
 		}
 		wsHandler.sendToServer(message);
 		self.addUserHandler.hide();
@@ -555,7 +551,7 @@ function ChannelsHandler() {
 		self.addUserHandler.show();
 		self.dom.addUserInput.focus();
 		self.addUserHolderAction = 'inviteUser';
-		self.addUserHandler.setHeaderText(getText("Invite user to room <b>{}</b>", self.channels[self.activeChannel].roomName));
+		self.addUserHandler.setHeaderText(getText("Invite user to room <b>{}</b>", self.getActiveChannel().roomName));
 	};
 	self.inviteUser = function(message) {
 		self.createNewRoomChatHandler(message.roomId, message.name, message.content);
@@ -746,7 +742,7 @@ function ChannelsHandler() {
 			}
 		}
 		self.dom.usersStateText.onclick = self.toggleChannelOfflineOnline;
-		self.setChannelUserText(false);
+		self.dom.usersStateText.click()
 	};
 	self.minifyList = function(event) {
 		var minifier = self.dom.minifier[event.target.getAttribute('name')];
@@ -958,7 +954,6 @@ function keyDownLoadUp(e) {
 
 function ChatHandler(li, allUsers, roomId, roomName) {
 	var self = this;
-	var wrapper = $('wrapper');
 	self.roomId = roomId;
 	self.roomName = roomName;
 	self.dom = {
@@ -966,7 +961,8 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		userList: document.createElement('ul'),
 		roomNameLi: li,
 		newMessages: document.createElement('span'),
-		deleteIcon: li.lastChild
+		deleteIcon: li.lastChild,
+		chatBoxHolder: $('chatBoxHolder')
 	};
 	self.newMessages = 0;
 	self.allMessages = [];
@@ -979,7 +975,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 	self.dom.userList.className = 'hidden';
 	channelsHandler.dom.chatUsersTable.appendChild(self.dom.userList);
 	self.dom.chatBoxDiv.className = 'chatbox hidden';
-	wrapper.insertBefore(self.dom.chatBoxDiv, wrapper.firstChild);
+	self.dom.chatBoxHolder.appendChild(self.dom.chatBoxDiv);
 	// tabindex allows focus, focus allows keydown binding event
 	self.dom.chatBoxDiv.tabindex="0";
 	self.dom.chatBoxDiv.onkeydown=keyDownLoadUp;
@@ -990,11 +986,24 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		CssUtils.addClass(self.dom.roomNameLi, self.activeRoomClass);
 		CssUtils.hideElement(self.dom.newMessages);
 		CssUtils.showElement(self.dom.deleteIcon);
+		CssUtils.setVisibility(webRtcApi.dom.callContainer, self.callIsAttached);
 	};
 	self.hide = function () {
 		CssUtils.hideElement(self.dom.chatBoxDiv);
 		CssUtils.hideElement(self.dom.userList);
 		CssUtils.removeClass(self.dom.roomNameLi, self.activeRoomClass);
+	};
+	self.setChannelAttach = function(isAttached) {
+		self.callIsAttached = isAttached;
+	};
+	self.isPrivate = function() {
+		return self.dom.roomNameLi.hasAttribute(USER_ID_ATTR);
+	};
+	self.getOpponentId = function() {
+		return self.dom.roomNameLi.getAttribute(USER_ID_ATTR);
+	};
+	self.getUserNameById = function(id) {
+		return self.allUsers[id].user;
 	};
 	self.addUserToDom = function(message) {
 		if (!self.allUsers[message.userId]) {
@@ -1227,9 +1236,6 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 	};
 	self.setOnlineUsers = function(message) {
 		self.onlineUsers = message.content;
-		// if (!CssUtils.hasClass(webRtcApi.dom.callContainer, 'hidden')) {
-		// 	webRtcApi.updateDomOnlineUsers();
-		// } TODO
 		console.log(getDebugMessage("Load user names: {}", Object.keys(self.onlineUsers)));
 		for (var userId in self.allUsers) {
 			if (self.allUsers.hasOwnProperty(userId)) {
@@ -1281,16 +1287,15 @@ function WebRtcApi() {
 		callAnswerParent : $('callAnswerParent'),
 		callContainerHeaderText: headerText,
 		callAnswerText : $('callAnswerText'),
-		callUserList : $("callUserList"),
 		remote: $('remoteVideo'),
 		local: $('localVideo'),
 		callSound: $('chatCall'),
-		callIcon: $('callIcon'),
 		hangUpIcon: $('hangUpIcon'),
 		audioStatusIcon: $('audioStatusIcon'),
 		videoStatusIcon: $('videoStatusIcon'),
 		videoContainer: $('videoContainer'),
 		fsContainer: $('icon-webrtc-cont'),
+		callIcon: $('callIcon'),
 		fs: { /*FullScreen*/
 			video: $('fs-video'),
 			audio: $('fs-audio'),
@@ -1299,7 +1304,6 @@ function WebRtcApi() {
 			enterFullScreen: $('enterFullScreen')
 		}
 	};
-	self.page = singlePage.getPage('/call');
 	self.onExitFullScreen = function () {
 		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
 			CssUtils.removeClass(self.dom.videoContainer, 'fullscreen');
@@ -1311,12 +1315,10 @@ function WebRtcApi() {
 	self.attachDomEvents = function () {
 		self.dom.videoStatusIcon.onclick = self.toggleVideo;
 		self.dom.fs.video.onclick = self.toggleVideo;
-		self.dom.callIcon.onclick = self.callPeople;
 		self.dom.hangUpIcon.onclick = self.hangUp;
 		self.dom.fs.hangup.onclick = self.hangUp;
 		self.dom.fs.audio.onclick = self.toggleMic;
 		self.dom.audioStatusIcon.onclick = self.toggleMic;
-		self.dom.callUserList.onclick = self.callUserListClick;
 		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
 		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
 			document.addEventListener(fullScreenChangeEvents[i], self.onExitFullScreen, false);
@@ -1454,8 +1456,7 @@ function WebRtcApi() {
 		self.setHeaderText(getText("Waiting for <b>{}</b> to answer", self.receiverName))
 	};
 	self.setHeaderText = function(text) {
-		self.page.title = text;
-		self.page.fixTittle();
+		headerText.innerHTML = text;
 	};
 	self.oniceconnectionstatechange = function () {
 		if (self.pc.iceConnectionState == 'disconnected') {
@@ -1480,33 +1481,21 @@ function WebRtcApi() {
 		self.dom.callAnswerText.textContent = getText("{} is calling you", self.receiverName)
 	};
 	self.setIconState = function(isCall) {
-		CssUtils.setVisibility(self.dom.callIcon, !isCall);
 		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
-		CssUtils.setVisibility(self.dom.callUserList, !isCall);
 		CssUtils.setVisibility(self.dom.videoContainer, isCall);
+		CssUtils.setVisibility(self.dom.callIcon, !isCall);
 	};
-	self.updateDomOnlineUsers = function() {
-		self.dom.callUserList.innerHTML = '';
-		self.receiverName = null;
-		for (var userName in onlineUsers) {
-			if (onlineUsers.hasOwnProperty(userName) && userName !== loggedUser) {
-				var li = document.createElement('li');
-				li.textContent = userName;
-				self.dom.callUserList.appendChild(li);
-			}
-		}
+	self.toggleCallContainer = function () {
+		var visible = CssUtils.toggleVisibility(self.dom.callContainer);
+		self.setIconState(false);
+		channelsHandler.getActiveChannel().setChannelAttach(!visible);
 	};
 	self.showCallDialog = function (isCallActive) {
 		isCallActive = isCallActive || self.isActive();
-		if (isCallActive || Object.keys(onlineUsers).length > 1) {
-			singlePage.showPage('/call');
-		} else {
-			growlError("Nobody's online. Who do you call?");
-		}
+		var activeChannel = channelsHandler.getActiveChannel();
 		self.setIconState(isCallActive);
 		if (!isCallActive) {
 			self.setHeaderText("Make a call");
-			self.updateDomOnlineUsers();
 		} else {
 			self.clearTimeout();
 		}
@@ -1544,10 +1533,14 @@ function WebRtcApi() {
 		}
 	};
 	self.callPeople = function () {
-		if (self.receiverName == null) {
-			growlError("Select exactly one user to call");
+		var activeChannel = channelsHandler.getActiveChannel();
+		if (!(Object.keys(activeChannel.onlineUsers).length > 1)) {
+			growlError(getText("<span>Can't make a call, user <b>{}</b> is not online.</span>",
+					activeChannel.getUserNameById(activeChannel.getOpponentId())));
 			return;
 		}
+		self.receiverId = activeChannel.getOpponentId();
+		self.receiverName = activeChannel.getUserNameById(self.receiverId);
 		self.setHeaderText("Confirm browser to use your input devices for call");
 		self.waitForAnswer();
 		self.captureInput(function(stream) {
@@ -1581,9 +1574,9 @@ function WebRtcApi() {
 		self.pc.ondatachannel = self.gotReceiveChannel;
 	};
 	self.handle = function (data) {
-		if (data.type != 'offer' && self.receiverName != data.user) {
-			console.warn(getDebugMessage("Skipping webrtc from '{}' as current user is '{}'", data.user,
-					self.receiverName));
+		if (data.type != 'offer' && self.receiverId != data.userId) {
+			console.warn(getDebugMessage("Skipping webrtc because message.userId={}, and self.receiverId={}'", data.userId,
+					self.receiverId));
 			return;
 		}
 		self["on"+data.type](data);
@@ -1669,6 +1662,7 @@ function WebRtcApi() {
 	self.closeEvents = function (text) {
 		self.clearTimeout();
 		self.receiverName = null;
+		self.receiverId = null;
 		try {
 			self.pc.close();
 		} catch (error) {
@@ -1679,7 +1673,7 @@ function WebRtcApi() {
 				tracks[i].stop()
 			}
 		}
-		singlePage.showDefaultPage();
+		self.setIconState(false);
 		growlInfo(text);
 		self.exitFullScreen(); /*also executes removing event on exiting from fullscreen*/
 	};
@@ -1739,22 +1733,6 @@ function WebRtcApi() {
 		var text = getText("Error while calling because {}", errorContext);
 		growlError(text);
 		console.error(getDebugMessage(text));
-	};
-	self.callUserListClick = function (event) {
-		if (event.target.tagName === 'LI') {
-			var wasActiveBefore = CssUtils.hasClass(event.target, self.activeUserClass);
-			var users = self.dom.callUserList.childNodes;
-			for (var i=0; i< users.length; i++) {
-				CssUtils.removeClass(users[i], self.activeUserClass);
-			}
-			var userName = event.target.textContent;
-			if (!wasActiveBefore) {
-				self.receiverName = userName;
-				self.receiverId = parseInt(onlineUsers[userName].userId);
-				CssUtils.addClass(event.target, self.activeUserClass);
-			}
-		}
-		event.stopPropagation();
 	};
 	self.attachDomEvents();
 }

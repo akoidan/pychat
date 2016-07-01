@@ -142,6 +142,7 @@ class MessagesCreator(object):
 		"""
 		message = self.default(content, Actions.CALL, HandlerNames.WEBRTC)
 		message[VarNames.CALL_TYPE] = message_type
+		message[VarNames.USER] = self.sender_name
 		return message
 
 	@classmethod

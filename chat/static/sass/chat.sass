@@ -41,6 +41,14 @@ fieldset
 	margin: 8px
 	width: calc(100% - 16px)
 
+	.icon-smile
+		display: inline
+		float: right
+		position: absolute
+		right: 1px
+		top: 1px
+		height: 16px
+
 .message-img-holder
 	display: block
 
@@ -48,9 +56,19 @@ p
 	margin-top: 0.8em
 	margin-bottom: 0.8em
 
-.chatbox
+#wrapper
+	flex: 1
+	@include display-flex
+	min-height: 0
+
+#chatBoxHolder
+	@include display-flex
+	flex-direction: column
 	width: 100%
+
+.chatbox
 	overflow-y: scroll
+	height: 100%
 	padding-left: 8px
 	word-wrap: break-word
 	font-size: 18px
@@ -256,14 +274,6 @@ p
 	img
 		cursor: pointer
 
-.icon-smile
-	display: inline
-	float: right
-	position: absolute
-	right: 1px
-	top: 1px
-	height: 16px
-
 .icon-picture
 	display: inline
 	float: right
@@ -354,6 +364,7 @@ p
 			max-width: calc(100vw - 250px)
 			max-height: calc(100vh - 100px)
 
+
 .windowHeader
 	padding: 4px 0 4px 6px
 	border-radius: 3px 3px 0 0
@@ -389,6 +400,8 @@ p
 	display: inline-block
 	max-width: 100%
 	text-align: center
+	margin-right: 2px
+	@include right-bottom-border(6px solid #1a1a1a)
 
 	label
 		cursor: pointer
@@ -396,12 +409,16 @@ p
 #callContainerContent
 	padding: 5px
 	display: inline-block
+	min-width: 150px
 
 .callContainerIcons
 	display: inline-block
 	font-size: 25px
 	width: 100%
 	padding-top: 10px
+
+	.icon-phone-circled
+		float: right
 
 #callUserList
 	margin: 0
@@ -412,9 +429,6 @@ p
 	max-height: calc(100vh - 90px)
 	overflow-y: auto
 	width: 100%
-
-.icon-phone-circled
-	float: right
 
 .icon-plus-squared
 	font-size: 15px
@@ -456,7 +470,7 @@ p
 		border: 1px solid grey
 
 #remoteVideo
-	max-height: calc(100vh - 120px)
+	max-height: calc(60vh - 120px)
 	max-width: 100%
 
 #localVideo
@@ -499,12 +513,14 @@ p
 	i
 		font-size: 30px
 
-.finish-call-icon
+#hangUpIcon
 	float: right
 	font-size: 40px
 	margin-bottom: -25px
 	margin-top: -6px
 
+#callIcon
+	float: left
 
 
 .fullscreen
