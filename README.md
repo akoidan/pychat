@@ -59,6 +59,7 @@ Start the chat:
  5. If you're using firefox you probably need to allow self-assigned certificate for development. Open [https://localhost:8888](https://localhost:8888) (8888 is `API_PORT`) and add security exception
 
 # TODO
+* TODO if someone offers a new call till establishing connection for a call self.call_receiver_channel would be set to wrong
 * !!!IMPORTANT Debug call dialog by switching channels while calling and no.
 * Move javascript history to variable since we use singlepage
 * Add browser notifications like in skype/facebook
