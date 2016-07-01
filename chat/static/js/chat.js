@@ -986,7 +986,8 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		CssUtils.addClass(self.dom.roomNameLi, self.activeRoomClass);
 		CssUtils.hideElement(self.dom.newMessages);
 		CssUtils.showElement(self.dom.deleteIcon);
-		CssUtils.setVisibility(webRtcApi.dom.callContainer, self.callIsAttached);
+		var isHidden = webRtcApi.isActive() && webRtcApi.channel != webRtcApi.generateRoomKey(roomId);
+		CssUtils.setVisibility(webRtcApi.dom.callContainer, self.callIsAttached && !isHidden);
 	};
 	self.hide = function () {
 		CssUtils.hideElement(self.dom.chatBoxDiv);
@@ -1467,6 +1468,7 @@ function WebRtcApi() {
 		self.clearTimeout();
 		self.receiverName = message.user;
 		self.receiverId = message.userId;
+		self.channel = message.channel;
 		self.sendBaseEvent(null, "reply");
 		checkAndPlay(self.dom.callSound);
 		CssUtils.showElement(self.dom.callAnswerParent);
@@ -1481,11 +1483,15 @@ function WebRtcApi() {
 		self.dom.callAnswerText.textContent = getText("{} is calling you", self.receiverName)
 	};
 	self.setIconState = function(isCall) {
+		isCall = isCall || self.isActive();
 		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
 		CssUtils.setVisibility(self.dom.videoContainer, isCall);
 		CssUtils.setVisibility(self.dom.callIcon, !isCall);
 	};
 	self.toggleCallContainer = function () {
+		if (self.isActive()) {
+			return;
+		}
 		var visible = CssUtils.toggleVisibility(self.dom.callContainer);
 		self.setIconState(false);
 		channelsHandler.getActiveChannel().setChannelAttach(!visible);
@@ -1507,7 +1513,7 @@ function WebRtcApi() {
 		self.setVideo(false);
 		self.showCallDialog(true);
 		self.setHeaderText(getText("Answered for {} call with audio", self.receiverName));
-		self.createCall();
+		self.createAfterResponseCall();
 	};
 	self.declineWebRtcCall = function (dontResponde) {
 		CssUtils.hideElement(self.dom.callAnswerParent);
@@ -1523,7 +1529,7 @@ function WebRtcApi() {
 		self.setVideo(true);
 		self.showCallDialog(true);
 		self.setHeaderText(getText("Answered for {} call with video", self.receiverName));
-		self.createCall();
+		self.createAfterResponseCall();
 	};
 	self.captureInput = function (callback, callIfNoSource) {
 		if (self.constraints.audio || self.constraints.video) {
@@ -1541,6 +1547,7 @@ function WebRtcApi() {
 		}
 		self.receiverId = activeChannel.getOpponentId();
 		self.receiverName = activeChannel.getUserNameById(self.receiverId);
+		self.channel = channelsHandler.activeChannel;
 		self.setHeaderText("Confirm browser to use your input devices for call");
 		self.waitForAnswer();
 		self.captureInput(function(stream) {
@@ -1556,8 +1563,12 @@ function WebRtcApi() {
 		self.attachLocalStream(stream);
 		self.connectWebRtc();
 	};
-	self.createCall = function () {
+	self.createAfterResponseCall = function () {
 		self.captureInput(self.createCallAfterCapture, true);
+		channelsHandler.setActiveChannel(self.channel);
+		channelsHandler.getActiveChannel().setChannelAttach(true);
+		CssUtils.showElement(self.dom.callContainer);
+		self.showCallDialog(true);
 	};
 	self.print = function (message){
 		console.log(getDebugMessage("Call message {}", JSON.stringify(message)));
@@ -1721,7 +1732,7 @@ function WebRtcApi() {
 			content: content,
 			action: 'call',
 			type: type,
-			receiverId: self.receiverId
+			channel: self.channel
 		});
 	};
 	self.sendWebRtcEvent = function (message) {

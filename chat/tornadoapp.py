@@ -81,6 +81,8 @@ class VarNames:
 	#ROOM_NAME = 'roomName'
 	# ROOM_ID = 'roomId'
 
+class CallType:
+	OFFER = 'offer'
 
 class HandlerNames:
 	NAME = 'handler'
@@ -102,6 +104,10 @@ class RedisPrefix:
 	@classmethod
 	def generate_room(cls, key):
 		return cls.ROOM_CHANNEL_PREFIX + str(key)
+
+	@classmethod
+	def extract_id(cls, channel):
+		return int(channel[1:])
 
 RedisPrefix.DEFAULT_CHANNEL = RedisPrefix.generate_room(ALL_ROOM_ID)
 
@@ -257,6 +263,7 @@ class MessagesHandler(MessagesCreator):
 		self.async_redis_publisher = global_redis.async_redis_publisher
 		self.sync_redis = global_redis.sync_redis
 		self.channels = []
+		self.call_receiver_channel = None
 		self.logger = logging.LoggerAdapter(logger, log_params)
 		self.async_redis = tornadoredis.Client()
 		self.pre_process_message = {
@@ -272,7 +279,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_channel,
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
-			Actions.INVITE_USER: self.send_client_new_channel
+			Actions.INVITE_USER: self.send_client_new_channel,
+			Actions.CALL: self.set_opponent_call_channel
 		}
 
 	@tornado.gen.engine
@@ -393,13 +401,8 @@ class MessagesHandler(MessagesCreator):
 			sender_id=self.user_id,
 			content=content
 		)
-		channel_id = int(channel[1:])
-		if channel.startswith(RedisPrefix.USER_ID_CHANNEL_PREFIX):
-			message_db.receiver_id = channel_id
-		elif channel.startswith(RedisPrefix.ROOM_CHANNEL_PREFIX) and channel in self.channels:
-			message_db.room_id = channel_id
-		else:
-			raise ValidationError('Access denied for channel {}'.format(channel))
+		channel_id = RedisPrefix.extract_id(channel)
+		message_db.room_id = channel_id
 		if VarNames.IMG in message:
 			message_db.img = extract_photo(message[VarNames.IMG])
 		self.do_db(message_db.save)  # exit on hacked id with exception
@@ -413,14 +416,22 @@ class MessagesHandler(MessagesCreator):
 			if channel != self.channel:
 				self.publish(prepared_message, channel)
 
-	def process_call(self, message):
+	def process_call(self, in_message):
 		"""
-		:type message: dict
+		:type in_message: dict
 		"""
-		receiver_id = message.get(VarNames.RECEIVER_ID)  # if receiver_id is None then its a private message
-		self.logger.info('!! Offering a call to user with id %s',  receiver_id)
-		message = self.offer_call(message.get(VarNames.CONTENT), message.get(VarNames.CALL_TYPE))
-		self.publish(message, RedisPrefix.generate_user(receiver_id))
+		call_type = in_message.get(VarNames.CALL_TYPE)
+		set_opponent_channel = False
+		out_message = self.offer_call(in_message.get(VarNames.CONTENT), call_type)
+		if call_type == CallType.OFFER:
+			to_channel = in_message[VarNames.CHANNEL]
+			room_id = RedisPrefix.extract_id(to_channel)
+			user = User.rooms.through.objects.get(~Q(user_id=self.user_id), Q(room_id=room_id), Q(room__name__isnull=True))
+			self.call_receiver_channel = RedisPrefix.generate_user(user.user_id)
+			set_opponent_channel = True
+			out_message[VarNames.CHANNEL] = to_channel
+		self.logger.info('!! Offering a call to user with id %s',  self.call_receiver_channel)
+		self.publish(out_message, self.call_receiver_channel, set_opponent_channel)
 
 	def create_new_room(self, message):
 		room_name = message[VarNames.ROOM_NAME]
@@ -502,6 +513,9 @@ class MessagesHandler(MessagesCreator):
 		channel = RedisPrefix.generate_room(room_id)
 		self.add_channel(channel)
 		self.add_online_user(room_id)# TODO doesnt work if already subscribed
+
+	def set_opponent_call_channel(self, message):
+		self.call_receiver_channel = RedisPrefix.generate_user(message[VarNames.USER_ID])
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -652,6 +666,9 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			message = json.loads(json_message)
 			if message[VarNames.EVENT] not in self.pre_process_message:
 				raise ValidationError("event {} is unknown".format(message[VarNames.EVENT]))
+			channel = message.get(VarNames.CHANNEL)
+			if channel and channel not in self.channels:
+				raise ValidationError('Access denied for channel {}. Allowed channels: {}'.format(channel, self.channels ))
 			self.pre_process_message[message[VarNames.EVENT]](message)
 		except ValidationError as e:
 			error_message = self.default(str(e.message), Actions.GROWL_MESSAGE, HandlerNames.GROWL)
