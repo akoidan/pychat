@@ -28,7 +28,6 @@ const CANCEL_ICON_CLASS_NAME = 'icon-cancel-circled-outline';
 var smileRegex = /<img[^>]*code="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-var lastLoadUpHistoryRequest = 0;
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
 var newMessagesCount = 0;
@@ -83,10 +82,12 @@ var infoMessages = [
 			"and it's content appears in message text",
 	"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
 			"suggestion there</span>",
-	"<span>Chat uses your browser cache to store messages. If you want to clear history and all cached messages just click " +
+	"<span>Chat uses your browser cache to store messages. If you have some js errors try to clear cache by clicking on " +
 	"<i class='icon-clear'></i> icon on the top menu</span>",
 	"You can view offline users in current channel if u click on 'CHANNEL ONLINE'",
 	"<span>You can invite user to current room by clicking on <i class='icon-user-plus'></i> icon</span>",
+	"You can load history of current channel. For this you need to focus place with messages by simply" +
+	" clicking on it and press arrow up/page up or just scroll up with mousewheel",
 	"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>"
 ];
 
@@ -99,7 +100,6 @@ onDocLoad(function () {
 	chatLogout = $("chatLogout");
 	charRooms = $("rooms");
 	headerText = $('headerText');
-	// TODO chatBoxDiv.addEventListener(mouseWheelEventName, mouseWheelLoadUp);
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	window.addEventListener("blur", changeTittleFunction);
 	window.addEventListener("focus", changeTittleFunction);
@@ -906,19 +906,6 @@ function SmileyUtil() {
 	};
 }
 
-
-/*==================== DOM EVENTS LISTENERS ============================*/
-// keyboard and mouse handlers for loadUpHistory
-// Those events are removed when loadUpHistory() reaches top
-function mouseWheelLoadUp(e) {
-	// IE has inverted scroll,
-	var isTopDirection = e.detail < 0 || e.wheelDelta > 0; // TODO check all browser event name deltaY?
-	if (isTopDirection) {
-		loadUpHistory(10);
-	}
-}
-
-
 function changeTittleFunction(e) {
 	switch (e.type) {
 		case "focus":
@@ -941,20 +928,10 @@ function timeMessageClick(event) {
 	userMessage.focus();
 }
 
-
-function keyDownLoadUp(e) {
-	if (e.which === 33) {    // page up
-		loadUpHistory(25);
-	} else if (e.which === 38) { // up
-		loadUpHistory(10);
-	} else if (e.ctrlKey && e.which === 36) {
-		loadUpHistory(35);
-	}
-}
-
 function ChatHandler(li, allUsers, roomId, roomName) {
 	var self = this;
 	self.roomId = roomId;
+	self.channel = 'r'+roomId;
 	self.roomName = roomName;
 	self.dom = {
 		chatBoxDiv: document.createElement('div'),
@@ -965,6 +942,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		chatBoxHolder: $('chatBoxHolder')
 	};
 	self.newMessages = 0;
+	self.lastLoadUpHistoryRequest = 0;
 	self.allMessages = [];
 	self.allMessagesDates = [];
 	self.activeRoomClass = 'active-room';
@@ -977,8 +955,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 	self.dom.chatBoxDiv.className = 'chatbox hidden';
 	self.dom.chatBoxHolder.appendChild(self.dom.chatBoxDiv);
 	// tabindex allows focus, focus allows keydown binding event
-	self.dom.chatBoxDiv.tabindex="0";
-	self.dom.chatBoxDiv.onkeydown=keyDownLoadUp;
+	self.dom.chatBoxDiv.setAttribute('tabindex', '1');
 	self.show = function () {
 		self.rendered = true;
 		CssUtils.showElement(self.dom.chatBoxDiv);
@@ -986,9 +963,30 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		CssUtils.addClass(self.dom.roomNameLi, self.activeRoomClass);
 		CssUtils.hideElement(self.dom.newMessages);
 		CssUtils.showElement(self.dom.deleteIcon);
-		var isHidden = webRtcApi.isActive() && webRtcApi.channel != webRtcApi.generateRoomKey(roomId);
+		var isHidden = webRtcApi.isActive() && webRtcApi.channel != self.channel;
 		CssUtils.setVisibility(webRtcApi.dom.callContainer, self.callIsAttached && !isHidden);
 	};
+	/*==================== DOM EVENTS LISTENERS ============================*/
+// keyboard and mouse handlers for loadUpHistory
+// Those events are removed when loadUpHistory() reaches top
+	self.mouseWheelLoadUp = function (e) {
+		// IE has inverted scroll,
+		var isTopDirection = e.detail < 0 || e.wheelDelta > 0; // TODO check all browser event name deltaY?
+		if (isTopDirection) {
+			self.loadUpHistory(10);
+		}
+	};
+	self.dom.chatBoxDiv.addEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
+	self.keyDownLoadUp = function (e) {
+		if (e.which === 33) {    // page up
+			self.loadUpHistory(25);
+		} else if (e.which === 38) { // up
+			self.loadUpHistory(10);
+		} else if (e.ctrlKey && e.which === 36) {
+			self.loadUpHistory(35);
+		}
+	};
+	self.dom.chatBoxDiv.onkeydown= self.keyDownLoadUp;
 	self.hide = function () {
 		CssUtils.hideElement(self.dom.chatBoxDiv);
 		CssUtils.hideElement(self.dom.userList);
@@ -1137,10 +1135,9 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
 	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, isPrefix) {
 		var pos = null;
-
 		if (self.allMessages.length > 0 && !(timeMillis > self.allMessages[self.allMessages.length - 1])) {
 			try {
-				pos = getPosition(timeMillis);
+				pos = self.getPosition(timeMillis);
 			} catch (err) {
 				console.warn(getDebugMessage("Skipping duplicate message, time: {}, content: <<<{}>>> ",
 						timeMillis, htmlEncodedContent));
@@ -1149,10 +1146,8 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		} else {
 			self.allMessages.push(timeMillis);
 		}
-
 		var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix);
 		// every message has UTC millis ID so we can detect if message is already displayed or position to display
-
 		if (!isCurrentTabActive) {
 			newMessagesCount++;
 			document.title = newMessagesCount + " new messages";
@@ -1194,18 +1189,19 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		if (data.image) {
 			preparedHtml = getText("<img src=\'{}\'/>", data.image);
 		} else {
-			preparedHtml = smileyUtil.encodeSmileys(data['content']);
+			preparedHtml = smileyUtil.encodeSmileys(data.content);
 		}
-		self.displayPreparedMessage(headerStyle, data['time'], preparedHtml, displayedUsername, prefix);
+		self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
 	};
-	self.handleGetMessages= function(message) {
+	self.loadMessages = function (data) {
 		console.log(getDebugMessage('appending messages to top'));
 		// This check should fire only once,
 		// because requests aren't being sent when there are no event for them, thus no responses
+		var message = data.content;
 		if (message.length === 0) {
 			console.log(getDebugMessage('Requesting messages has reached the top, removing loadUpHistoryEvent handlers'));
-			self.dom.chatBoxDiv.removeEventListener(mouseWheelEventName, mouseWheelLoadUp);
-			self.dom.chatBoxDiv.removeEventListener("keydown", keyDownLoadUp);
+			self.dom.chatBoxDiv.removeEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
+			self.dom.chatBoxDiv.removeEventListener("keydown", self.keyDownLoadUp);
 			return;
 		}
 		var firstMessage = message[message.length - 1];
@@ -1214,7 +1210,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		message.forEach(function (message) {
 			self.printMessage(message);
 		});
-		lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
+		self.lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
 	};
 	self.addOnlineUser = function (message) {
 		self.addUserToDom(message);
@@ -1253,15 +1249,16 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		if (self.dom.chatBoxDiv.scrollTop === 0) {
 			var currentMillis = new Date().getTime();
 			// 0 if locked, or last request was sent earlier than 3 seconds ago
-			if (lastLoadUpHistoryRequest + 3000 > currentMillis) {
+			if (self.lastLoadUpHistoryRequest + 3000 > currentMillis) {
 				console.log(getDebugMessage("Skipping loading message, because it's locked"));
 				return
 			}
-			lastLoadUpHistoryRequest = currentMillis;
+			self.lastLoadUpHistoryRequest = currentMillis;
 			var getMessageRequest = {
 				headerId: self.headerId,
 				count: count,
-				action: 'messages'
+				action: 'loadMessages',
+				channel: self.channel
 			};
 			wsHandler.sendToServer(getMessageRequest);
 		}
