@@ -52,7 +52,7 @@ class Actions:
 	REFRESH_USER = 'setOnlineUsers'
 	SYSTEM_MESSAGE = 'system'
 	GROWL_MESSAGE = 'growl'
-	GET_MESSAGES = 'messages'
+	GET_MESSAGES = 'loadMessages'
 	CREATE_DIRECT_CHANNEL = 'addDirectChannel'
 	DELETE_ROOM = 'deleteRoom'
 	CREATE_ROOM_CHANNEL = 'addRoom'
@@ -76,6 +76,8 @@ class VarNames:
 	ROOM_ID = 'roomId'
 	ROOM_USERS = 'users'
 	CHANNEL = 'channel'
+	GET_MESSAGES_COUNT = 'count'
+	GET_MESSAGES_HEADER_ID = 'headerId'
 	CHANNEL_NAME = 'channel'
 	IS_ROOM_PRIVATE = 'private'
 	#ROOM_NAME = 'roomName'
@@ -152,43 +154,43 @@ class MessagesCreator(object):
 		return message
 
 	@classmethod
+	def create_message(cls, message):
+		res = {
+			VarNames.USER_ID: message.sender_id,
+			VarNames.CONTENT: message.content,
+			VarNames.TIME: message.time,
+			VarNames.MESSAGE_ID: message.id,
+		}
+		if message.img.name:
+			res[VarNames.IMG] = message.img.url
+		return res
+
+	@classmethod
 	def create_send_message(cls, message):
 		"""
 		:param message:
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
 		"sex": "Alien", "user": "tRD6emzs", "time": "20:48:57"}
 		"""
-		if message.receiver_id:
-			channel = RedisPrefix.generate_user(message.receiver_id)
-		elif message.room_id:
-			channel = RedisPrefix.generate_room(message.room_id)
-		else:
-			raise ValidationError('Channel is none')
-		result = {
-			VarNames.USER_ID: message.sender_id,
-			VarNames.CONTENT: message.content,
-			VarNames.TIME: message.time,
-			VarNames.MESSAGE_ID: message.id,
-			VarNames.EVENT: Actions.PRINT_MESSAGE,
-			VarNames.CHANNEL: channel,
-			HandlerNames.NAME: HandlerNames.CHAT
-		}
-		if message.img.name:
-			result[VarNames.IMG] = message.img.url
-		if message.receiver_id:
-			result[VarNames.RECEIVER_ID] = message.receiver.id
-			result[VarNames.RECEIVER_NAME] = message.receiver.username
-		return result
+		channel = RedisPrefix.generate_room(message.room_id)
+		res = cls.create_message(message)
+		res[VarNames.EVENT] = Actions.PRINT_MESSAGE,
+		res[VarNames.CHANNEL] = channel
+		res[HandlerNames.NAME] = HandlerNames.CHAT
+		return res
 
 	@classmethod
-	def get_messages(cls, messages):
+	def get_messages(cls, messages, channel):
 		"""
 		:type messages: list[Messages]
+		:type channel: str
 		:type messages: QuerySet[Messages]
 		"""
 		return {
-			VarNames.CONTENT: [cls.create_send_message(message) for message in messages],
-			VarNames.EVENT: Actions.GET_MESSAGES
+			VarNames.CONTENT: [cls.create_message(message) for message in messages],
+			VarNames.EVENT: Actions.GET_MESSAGES,
+			VarNames.CHANNEL: channel,
+			HandlerNames.NAME: HandlerNames.CHAT
 		}
 
 	@property
@@ -528,20 +530,16 @@ class MessagesHandler(MessagesCreator):
 		"""
 		:type data: dict
 		"""
-		header_id = data.get('headerId', None)
-		count = int(data.get('count', 10))
+		header_id = data.get(VarNames.GET_MESSAGES_HEADER_ID, None)
+		count = int(data.get(VarNames.GET_MESSAGES_COUNT, 10))
+		channel = data[VarNames.CHANNEL]
+		room_id = RedisPrefix.extract_id(channel)
 		self.logger.info('!! Fetching %d messages starting from %s', count, header_id)
 		if header_id is None:
-			messages = Message.objects.filter(
-				# Only public or private or private
-				Q(receiver=None) | Q(sender=self.user_id) | Q(receiver=self.user_id)
-			).order_by('-pk')[:count]
+			messages = Message.objects.filter(Q(room_id=room_id)).order_by('-pk')[:count]
 		else:
-			messages = Message.objects.filter(
-				Q(id__lt=header_id),
-				Q(receiver=None) | Q(sender=self.user_id) | Q(receiver=self.user_id)
-			).order_by('-pk')[:count]
-		response = self.do_db(self.get_messages, messages)
+			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id)).order_by('-pk')[:count]
+		response = self.do_db(self.get_messages, messages, channel)
 		self.safe_write(response)
 
 	def get_users_in_current_user_rooms(self):

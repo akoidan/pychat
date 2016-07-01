@@ -146,8 +146,6 @@ class Message(models.Model):
 	time = models.BigIntegerField(default=get_milliseconds)
 	content = models.TextField(null=True)
 	img = FileField(upload_to=get_random_path, null=True)
-	receiver = models.ForeignKey(User, null=True, related_name='receiver')
-
 
 class Issue(models.Model):
 	content = models.TextField(null=False)  # unique = true, but mysql doesnt allow unique fields for unspecified size
