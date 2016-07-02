@@ -86,7 +86,7 @@ var infoMessages = [
 			"suggestion there</span>",
 	"<span>Chat uses your browser cache to store messages. To clear current cache click on " +
 	"<i class='icon-clear'></i> icon on the top menu</span>",
-	"You can view offline users in current channel by clicking on 'CHANNEL ONLINE' text",
+	"<span>You can view offline users in current channel by clicking on <b>CHANNEL ONLINE</b> text</span>",
 	"<span>You can invite a new user to current room by clicking on <i class='icon-user-plus'></i> icon</span>",
 	"You can load history of current channel. For this you need to focus place with messages by simply" +
 	" clicking on it and press arrow up/page up or just scroll up with mousewheel",
