@@ -122,7 +122,7 @@ onDocLoad(function () {
 function NotifierHandler() {
 	self = this;
 	self.maxNotifyTime = 300;
-	self.clearNotificationTime = 1000;
+	self.clearNotificationTime = 5000;
 	self.askPermissions = function() {
 		if (notifications && Notification.permission !== "granted") {
 			Notification.requestPermission();
