@@ -10,7 +10,9 @@
 		const STATISTICS_JS_URL = "{% md5url "js/statistic.js" %}";
 		const loggedUser = "{{ username }}";
 		const loggedUserId = {{ userid }};
+		const NOTIFICATION_ICON_URL = "{% md5url 'images/favicon.ico' %}";
 		var suggestions = {{ suggestions |yesno:"true,false" }};
+		var notifications = {{ notifications |yesno:"true,false" }};
 	</script>
 	<script src="{% md5url "js/smileys_data.js" %}"></script>
 	<script src="{% md5url "js/chat.js" %}"></script>
