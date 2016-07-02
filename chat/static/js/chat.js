@@ -1718,12 +1718,26 @@ function WebRtcApi() {
 			self.setHeaderText(getText("You're talking to <b>{}</b> now", self.receiverName));
 			self.setIconState(true);
 			console.log(getDebugMessage("Stream attached"));
+			self.showPhoneIcon();
 		};
 		self.pc.onicecandidate = function (event) {
 			if (event.candidate) {
 				self.sendWebRtcEvent(event.candidate);
 			}
 		};
+	};
+	self.showPhoneIcon = function () {
+		self.hidePhoneIcon();
+		self.dom.phoneIcon = document.createElement('i');
+		self.dom.phoneIcon.className = 'icon-phone';
+		var roomNameLi = channelsHandler.channels[self.channel].dom.roomNameLi;
+		roomNameLi.insertBefore(self.dom.phoneIcon, roomNameLi.firstChild);
+	};
+	self.hidePhoneIcon = function () {
+		if (self.dom.phoneIcon) {
+			CssUtils.deleteElement(self.dom.phoneIcon);
+			delete self.dom.phoneIcon;
+		}
 	};
 	self.closeEvents = function (text) {
 		self.clearTimeout();
@@ -1741,6 +1755,7 @@ function WebRtcApi() {
 		}
 		self.setIconState(false);
 		growlInfo(text);
+		self.hidePhoneIcon();
 		self.exitFullScreen(); /*also executes removing event on exiting from fullscreen*/
 	};
 	self.hangUp = function() {
@@ -1837,7 +1852,7 @@ function WsHandler() {
 		var logEntry = jsonRequest.substring(0, 500);
 		if (self.ws.readyState !== WebSocket.OPEN) {
 			console.warn(getDebugMessage("Web socket is closed. Can't send {}", logEntry));
-			growlError("Can't send message, because connection is lost :(")
+			growlError("Can't send message, because connection is lost :(");
 			return false;
 		} else {
 			console.log(getDebugMessage("WS out: {} ", logEntry));
