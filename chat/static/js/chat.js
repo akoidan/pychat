@@ -27,7 +27,7 @@ const CANCEL_ICON_CLASS_NAME = 'icon-cancel-circled-outline';
 
 var smileRegex = /<img[^>]*code="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
-
+var notifier;
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
 var newMessagesCount = 0;
@@ -113,9 +113,57 @@ onDocLoad(function () {
 	//bottom call loadMessagesFromLocalStorage(); s
 	smileyUtil.init();
 	storage = new Storage();
+	notifier = new NotifierHandler();
 	//TODO channelsHandler.loadMessagesFromLocalStorage(); /*Smileys should be encoded by time message load, otherwise they don't display*/
 	wsHandler.start_chat_ws();
 });
+
+
+function NotifierHandler() {
+	self = this;
+	self.maxNotifyTime = 300;
+	self.clearNotificationTime = 1000;
+	self.askPermissions = function() {
+		if (notifications && Notification.permission !== "granted") {
+			Notification.requestPermission();
+		}
+	};
+	self.popedNotifQueue = [];
+	self.init = function () {
+		self.askPermissions();
+	};
+	self.init();
+	self.notificationClick = function(x){
+		window.focus();
+		this.close()
+	};
+	self.lastNotifyTime = new Date().getTime();
+	self.notify = function(title, message) {
+		var currentTime = new Date().getTime();
+		if (!notifications || currentTime - self.maxNotifyTime < self.lastNotifyTime) {
+			return
+		}
+		self.askPermissions();
+		var notification = new Notification(title, {
+			icon: NOTIFICATION_ICON_URL,
+			body: message
+		});
+		self.popedNotifQueue.push(notification);
+		self.lastNotifyTime = currentTime;
+		notification.onclick = self.notificationClick;
+		notification.onclose = function() {
+			self.popedNotifQueue.pop(this);
+		};
+		setTimeout(self.clearNotification, self.clearNotificationTime);
+	};
+	self.clearNotification = function() {
+		if (self.popedNotifQueue.length > 0) {
+			var notif = self.popedNotifQueue[0];
+			notif.close();
+			self.popedNotifQueue.shift();
+		}
+	}
+}
 
 
 function Page() {
@@ -320,6 +368,7 @@ function PageHandler() {
 		// TODO remove triple, carefull of undefined tittle in ViewProfilePage
 		window.history.pushState(historyUrl, historyUrl, historyUrl);
 	};
+	self.generatePageUrl
 	self.showPage = function (page, params, dontHistory) {
 		console.log(getDebugMessage('Rendering page "{}"', page));
 		if (self.currentPage) self.currentPage.hide();
@@ -922,6 +971,7 @@ function changeTittleFunction(e) {
 		case "blur":
 			isCurrentTabActive = false;
 	}
+	console.log(getDebugMessage('Windows is {}', isCurrentTabActive ? 'active': 'unactive'))
 }
 
 
@@ -1153,10 +1203,6 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		}
 		var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix);
 		// every message has UTC millis ID so we can detect if message is already displayed or position to display
-		if (!isCurrentTabActive) {
-			newMessagesCount++;
-			document.title = newMessagesCount + " new messages";
-		}
 		pos = self.insertCurrentDay(timeMillis, pos);
 		if (pos != null) {
 			self.dom.chatBoxDiv.insertBefore(p, pos);
@@ -1195,6 +1241,11 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 			preparedHtml = getText("<img src=\'{}\'/>", data.image);
 		} else {
 			preparedHtml = smileyUtil.encodeSmileys(data.content);
+		}
+		if (!isCurrentTabActive) {
+			newMessagesCount++;
+			document.title = newMessagesCount + " new messages";
+			notifier.notify(displayedUsername, data.content);
 		}
 		self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
 	};

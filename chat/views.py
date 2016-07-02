@@ -76,6 +76,7 @@ def home(request):
 	"""
 	context = csrf(request)
 	context['suggestions'] = UserProfile.objects.get(id=request.user.id).suggestions
+	context['notifications'] = UserProfile.objects.get(id=request.user.id).notifications
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
 
