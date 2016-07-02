@@ -597,21 +597,28 @@ function ChannelsHandler() {
 		self.dom.addRoomInput.focus();
 	};
 	self.showInviteUser = function() {
-		self.fillAddUser();
+		var activeChannel = self.getActiveChannel();
+		var exclude = activeChannel.allUsers;
+		var isEmpty = self.fillAddUser(exclude);
+		if (isEmpty) {
+			growlInfo("All users are already in the channel");
+			return;
+		}
 		self.addUserHandler.show();
 		self.dom.addUserInput.focus();
 		self.addUserHolderAction = 'inviteUser';
-		self.addUserHandler.setHeaderText(getText("Invite user to room <b>{}</b>", self.getActiveChannel().roomName));
+		self.addUserHandler.setHeaderText(getText("Invite user to room <b>{}</b>", activeChannel.roomName));
 	};
 	self.inviteUser = function(message) {
 		self.createNewRoomChatHandler(message.roomId, message.name, message.content);
 	};
-	self.fillAddUser = function() {
+	self.fillAddUser = function(excludeUsersId) {
 		self.dom.addUserList.innerHTML = '';
 		self.addUserUsersList = {};
 		var allUsers = self.getAllUsersInfo();
 		for (var userId in allUsers) {
 			if (allUsers.hasOwnProperty(userId)) {
+				if (excludeUsersId[userId]) continue;
 				var li = document.createElement('LI');
 				var username = allUsers[userId].user;
 				self.addUserUsersList[username] = li;
@@ -620,9 +627,20 @@ function ChannelsHandler() {
 				self.dom.addUserList.appendChild(li);
 			}
 		}
+		if (self.dom.addUserList.childNodes.length === 0) return true;
 	};
 	self.showAddUser = function () {
-		self.fillAddUser();
+		var els = document.querySelectorAll('#directUserTable li');
+		var exclude = {};
+		for (var i = 0; i < els.length; i++) {
+			var userId = els[i].getAttribute(USER_ID_ATTR);
+			exclude[userId] = true;
+		}
+		var isEmpty = self.fillAddUser(exclude);
+		if (isEmpty) {
+			growlInfo("You already have all users in direct channels");
+			return;
+		}
 		self.addUserHandler.show();
 		self.addUserHolderAction = 'addDirectChannel';
 		self.addUserHandler.setHeaderText("Create direct channel");
@@ -742,7 +760,7 @@ function ChannelsHandler() {
 		else if (message.handler == 'chat') {
 			var channelHandler = self.channels[message.channel];
 			if (!channelHandler) {
-				throw getText('Unknown channel {} for message ""', message.channel, JSON.stringify(message));
+				throw getText('Unknown channel {} for message "{}"', message.channel, JSON.stringify(message));
 			}
 			channelHandler[message.action](message);
 		}
@@ -1043,7 +1061,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 			self.loadUpHistory(35);
 		}
 	};
-	self.dom.chatBoxDiv.onkeydown= self.keyDownLoadUp;
+	self.dom.chatBoxDiv.addEventListener('keydown',  self.keyDownLoadUp);
 	self.hide = function () {
 		CssUtils.hideElement(self.dom.chatBoxDiv);
 		CssUtils.hideElement(self.dom.userList);
