@@ -317,6 +317,7 @@ function AmchartsPage() {
 			self.dom.el.push(holder);
 			self.dom.container.appendChild(holder);
 			holder.setAttribute("id", "chartdiv");
+			holder.className = 'max-height-scrollable';
 			doGet(self.url, function (data) {
 				window.amchartJson = JSON.parse(data);
 				doGet(STATISTICS_JS_URL);
