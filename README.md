@@ -41,6 +41,7 @@ Start the chat:
 =======
 
 # TODO
+* password reset send once, confirmation email on email change, 
 * User can't create direct group for himself if he already created groups for others  
 * TODO if someone offers a new call till establishing connection for a call self.call_receiver_channel would be set to wrong
 * !!!IMPORTANT Debug call dialog by switching channels while calling and no.
