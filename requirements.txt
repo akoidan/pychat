@@ -13,3 +13,4 @@ django-sslserver # for browser access to input devices
 #django-redis-cache
 # PyMySQL
 # mysql-connector-python
+# mysqlclient
