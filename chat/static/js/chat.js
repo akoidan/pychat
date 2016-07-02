@@ -70,6 +70,8 @@ var singlePage;
 var infoMessages = [
 	"<span>Every time you join chat those help messages will be shown to you. " +
 	"You can disable them in you profile settings (<i class='icon-wrench'></i> icon). Simply click on popup to hide them</span>",
+	"<span>Browser will notify you on incoming message every time when chat tab is not active" +
+	"You can disable this option in your profile(<i class='icon-wrench'></i> icon).</span>",
 	"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon." +
 	" To delete created room hover mouse on its name and click on <i class='icon-cancel-circled-outline'></i> icon.</span>",
 	"<span>You can make an audio/video call. Currently pychat allows calling only one person." +
