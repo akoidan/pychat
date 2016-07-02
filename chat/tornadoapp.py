@@ -80,8 +80,10 @@ class VarNames:
 	#ROOM_NAME = 'roomName'
 	# ROOM_ID = 'roomId'
 
+
 class CallType:
 	OFFER = 'offer'
+
 
 class HandlerNames:
 	NAME = 'handler'
@@ -482,7 +484,7 @@ class MessagesHandler(MessagesCreator):
 		room_id = message[VarNames.ROOM_ID]
 		channel = RedisPrefix.generate_room(room_id)
 		if channel not in self.channels or room_id == ALL_ROOM_ID:
-			raise ValidationError('You are not allowed to delete this room')
+			raise ValidationError('You are not allowed to exit this room')
 		room = Room.objects.get(id=room_id)
 		if room.disabled is not None:
 			raise ValidationError('Room is already deleted')
