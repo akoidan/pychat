@@ -466,21 +466,17 @@ function ChannelsHandler() {
 		if (tagName == 'UL') {
 			return;
 		}
-		var liEl;
-		if (tagName == 'I' || tagName == 'SPAN') {
-			liEl = target.parentNode;
-		} else {
-			liEl = target;
-		}
+		// liEl = closest parent with LI
+		var liEl = tagName == 'I' || tagName == 'SPAN' ? target.parentNode : target;
 		var roomId = parseInt(liEl.getAttribute(self.ROOM_ID_ATTR));
 		if (CssUtils.hasClass(target, CANCEL_ICON_CLASS_NAME)) {
 			wsHandler.sendToServer({
 				action: 'deleteRoom',
 				roomId: roomId
 			});
-			return;
+		} else {
+			self.setActiveChannel(self.generateRoomKey(roomId));
 		}
-		self.setActiveChannel(self.generateRoomKey(roomId));
 	};
 	self.setActiveChannel = function (key) {
 		self.hideActiveChannel();
@@ -630,13 +626,17 @@ function ChannelsHandler() {
 		}
 		if (self.dom.addUserList.childNodes.length === 0) return true;
 	};
-	self.showAddUser = function () {
+	self.getDirectMessagesUserIds = function () {
 		var els = document.querySelectorAll('#directUserTable li');
-		var exclude = {};
+		var res = {};
 		for (var i = 0; i < els.length; i++) {
 			var userId = els[i].getAttribute(USER_ID_ATTR);
-			exclude[userId] = true;
+			res[userId] = true;
 		}
+		return res;
+	};
+	self.showAddUser = function () {
+		var exclude = getDirectMessagesUserIds();
 		var isEmpty = self.fillAddUser(exclude);
 		if (isEmpty) {
 			growlInfo("You already have all users in direct channels");
@@ -666,6 +666,18 @@ function ChannelsHandler() {
 					CssUtils.hideElement(self.addUserUsersList[userName]);
 				}
 			}
+		}
+	};
+	self.createDirectChannel = function() {
+		var userId = self.getActiveUserId();
+		var exclude = self.getDirectMessagesUserIds();
+		if (exclude[userId]) {
+			document.querySelector(getText("#directUserTable li[userid='{}']", userId)).click();
+		} else {
+			wsHandler.sendToServer({
+				action: 'addDirectChannel',
+				userId: userId
+			});
 		}
 	};
 	self.finishAddRoom = function () {
@@ -788,7 +800,8 @@ function ChannelsHandler() {
 		channelUsers[users[1]] = anotherUserName[users[1]];
 		channelUsers[users[0]] = anotherUserName[users[0]];
 		var anotherUserId = self.createNewUserChatHandler(message.roomId, channelUsers);
-		growlInfo(getText('<span>Channel for user <b>{}</b> has been created</span>', anotherUserName[anotherUserId].user));
+		self.setActiveChannel(self.generateRoomKey(message.roomId));
+		growlInfo(getText('<span>Room for user <b>{}</b> has been created</span>', anotherUserName[anotherUserId].user));
 	};
 	self.addRoom = function(message) {
 		var users = message.users;
