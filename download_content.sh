@@ -2,7 +2,7 @@
 
 CONF_REPOSITORY="https://github.com/Deathangel908/djangochat-config"
 
-CONF_VERSION='6227af327737faa90327c3c1a58d7d2ca33180ae'
+CONF_VERSION='bb977b5612fe8c6100df76d3c95d8de812b11c09'
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
@@ -40,7 +40,7 @@ declare -a files=(\
     "$FONT_DIR/Oswald.ttf" \
     "$JS_DIR/smileys_data.js"
     "$IMAGES_DIR/ajaxStatus.gif" \
-    "$IMAGES_DIR/dark_wall.png" \
+    "$IMAGES_DIR/asphalt.jpg" \
     "$IMAGES_DIR/no_ava.png" \
     "$CSS_DIR/main.css" \
     "$CSS_DIR/chat.css"\
