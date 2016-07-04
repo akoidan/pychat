@@ -74,9 +74,13 @@ function getUrlParam(name, url) {
 
 function setUrlParam(name, value) {
 	var prevValue = getUrlParam(name);
-	window.history.pushState('page2', 'Title', prevValue == null ?
-			getText(url.indexOf("?") >= 0 ? "{}&{}={}" : "{}?{}={}", window.location.href, name, value):
-			window.location.href.replace(name + "=" + prevValue, name + "=" + value));
+	if (prevValue == null) {
+		var textToFormat = url.indexOf("?") >= 0 ? "{}&{}={}" : "{}?{}={}";
+		var text = textToFormat.format(window.location.href, name, value);
+	} else {
+		text = window.location.href.replace(name + "=" + prevValue, name + "=" + value);
+	}
+	window.history.pushState('page2', 'Title', text);
 }
 
 function onDocLoad(onload) {
@@ -105,7 +109,7 @@ var CssUtils = {
 	addClass: function (element, className) {
 		if (!CssUtils.hasClass(element, className)) {
 			var oldClassName = element.className;
-			element.className = getText("{} {}", oldClassName.trim(), className);
+			element.className = "{} {}".format(oldClassName.trim(), className);
 		}
 	},
 	deleteElement: function(target) {
@@ -473,12 +477,13 @@ function saveLogToStorage(result) {
 }
 
 
-function getText() {
-	for (var i = 1; i < arguments.length; i++) {
-		arguments[0] = arguments[0].replace('{}', arguments[i]);
+String.prototype.format = function() {
+	var res = this;
+	for (var i = 0; i < arguments.length; i++) {
+		res = res.replace('{}', arguments[i]);
 	}
-	return arguments[0]
-}
+	return res;
+};
 
 
 /** in 23 - out 23
@@ -497,13 +502,12 @@ function sliceZero(number, count) {
 function getDebugMessage() {
 	var now = new Date();
 	// first argument is format, others are params
-	var text = getText.apply(this, arguments);
-	var result = getText("{}:{}:{}.{}: {}",
+	var result = "{}:{}:{}.{}: {}".format(
 			sliceZero(now.getHours()),
 			sliceZero(now.getMinutes()),
 			sliceZero(now.getSeconds()),
 			sliceZero(now.getMilliseconds(), -3),
-			text
+			arguments.length > 1 ? arguments[0].format(Array.prototype.slice.call(arguments).shift()) : arguments[0]
 	);
 	saveLogToStorage(result);
 	return result;
@@ -511,7 +515,7 @@ function getDebugMessage() {
 
 
 window.onerror = function (msg, url, linenumber) {
-	var message = getText('Error occurred in {}:{}\n{}', url, linenumber, msg);
+	var message = 'Error occurred in {}:{}\n{}'.format(url, linenumber, msg);
 	growlError(message);
 	return false;
 };

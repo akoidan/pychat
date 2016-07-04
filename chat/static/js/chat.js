@@ -277,14 +277,14 @@ function ViewProfilePage() {
 	var self = this;
 	Page.call(self);
 	self.getUrl = function () {
-		return getText('/profile/{}', self.userId);
+		return '/profile/{}'.format(self.userId);
 	};
 	self.setParams = function(params) {
 		self.setUserId(params[0]);
 	};
 	self.getTitle = function () {
 		self.username = self.username || self.dom.el[0].getAttribute('username');
-		return getText("<b>{}</b>'s profile", self.username );
+		return "<b>{}</b>'s profile".format(self.username);
 	};
 	self.setUserId = function (userId) {
 		self.userId = userId;
@@ -367,7 +367,7 @@ function PageHandler() {
 		self.showPage('/chat/', [DEFAULT_CHANNEL_NAME]);
 	};
 	self.pushHistory = function() {
-		var historyUrl = getText("#{}", self.currentPage.getUrl());
+		var historyUrl = "#{}".format(self.currentPage.getUrl());
 		// TODO remove triple, carefull of undefined tittle in ViewProfilePage
 		window.history.pushState(historyUrl, historyUrl, historyUrl);
 	};
@@ -393,7 +393,7 @@ function ChannelsHandler() {
 	var self = this;
 	Page.call(self);
 	self.url = '/chat/';
-	self.title = getText("Hello, <b>{}</b>", loggedUser);
+	self.title = "Hello, <b>{}</b>".format(loggedUser);
 	self.render = self.show;
 	self.ROOM_ID_ATTR = 'roomid';
 	self.activeChannel = DEFAULT_CHANNEL_NAME;
@@ -546,7 +546,7 @@ function ChannelsHandler() {
 			reader.onload = function (readerEvt) {
 				var binaryString = readerEvt.target.result;
 				self.sendMessage({
-					image: getText("data:{};base64,{}",file.type, btoa(binaryString)),
+					image: "data:{};base64,{}".format(file.type, btoa(binaryString)),
 					content: null,
 					action: 'sendMessage',
 					channel: self.activeChannel
@@ -604,7 +604,7 @@ function ChannelsHandler() {
 		self.addUserHandler.show();
 		self.dom.addUserInput.focus();
 		self.addUserHolderAction = 'inviteUser';
-		self.addUserHandler.setHeaderText(getText("Invite user to room <b>{}</b>", activeChannel.roomName));
+		self.addUserHandler.setHeaderText("Invite user to room <b>{}</b>".format(activeChannel.roomName));
 	};
 	self.inviteUser = function(message) {
 		self.createNewRoomChatHandler(message.roomId, message.name, message.content);
@@ -672,7 +672,7 @@ function ChannelsHandler() {
 		var userId = self.getActiveUserId();
 		var exclude = self.getDirectMessagesUserIds();
 		if (exclude[userId]) {
-			document.querySelector(getText("#directUserTable li[userid='{}']", userId)).click();
+			document.querySelector("#directUserTable li[userid='{}']".format(userId)).click();
 		} else {
 			wsHandler.sendToServer({
 				action: 'addDirectChannel',
@@ -773,7 +773,7 @@ function ChannelsHandler() {
 		else if (message.handler == 'chat') {
 			var channelHandler = self.channels[message.channel];
 			if (!channelHandler) {
-				throw getText('Unknown channel {} for message "{}"', message.channel, JSON.stringify(message));
+				throw 'Unknown channel {} for message "{}"'.format(message.channel, JSON.stringify(message));
 			}
 			channelHandler[message.action](message);
 		}
@@ -785,7 +785,7 @@ function ChannelsHandler() {
 		var handler = self.channels[channel];
 		if (handler.dom.roomNameLi.getAttribute('userid') || userId == loggedUserId) {
 			self.destroyChannel(channel);
-			growlInfo(getText("<div>Channel <b>{}</b> has been deleted</div>", handler.dom.roomNameLi.textContent));
+			growlInfo("<div>Channel <b>{}</b> has been deleted</div>".format(handler.dom.roomNameLi.textContent));
 			if (self.activeChannel == channel) {
 				self.setActiveChannel(DEFAULT_CHANNEL_NAME);
 			}
@@ -801,7 +801,7 @@ function ChannelsHandler() {
 		channelUsers[users[0]] = anotherUserName[users[0]];
 		var anotherUserId = self.createNewUserChatHandler(message.roomId, channelUsers);
 		self.setActiveChannel(self.generateRoomKey(message.roomId));
-		growlInfo(getText('<span>Room for user <b>{}</b> has been created</span>', anotherUserName[anotherUserId].user));
+		growlInfo('<span>Room for user <b>{}</b> has been created</span>'.format(anotherUserName[anotherUserId].user));
 	};
 	self.addRoom = function(message) {
 		var users = message.users;
@@ -809,7 +809,7 @@ function ChannelsHandler() {
 		var channelUsers = {};
 		channelUsers[users[0]] =  self.getAllUsersInfo()[users[0]];
 		self.createNewRoomChatHandler(message.roomId, roomName, channelUsers);
-		growlInfo(getText('<span>Room <b>{}</b> has been created</span>', roomName));
+		growlInfo('<span>Room <b>{}</b> has been created</span>'.format(roomName));
 	};
 	self.viewProfile = function() {
 		singlePage.showPage('/profile/', self.getActiveUserId());
@@ -1013,7 +1013,7 @@ function timeMessageClick(event) {
 	var value = userMessage.innerHTML;
 	var match = value.match(timePattern);
 	var oldText = match ? value.substr(match[0].length) : value;
-	userMessage.innerHTML = getText('{}>>> {}', event.target.parentElement.parentElement.textContent,  oldText);
+	userMessage.innerHTML = '{}>>> {}'.format(event.target.parentElement.parentElement.textContent,  oldText);
 	userMessage.focus();
 }
 
@@ -1150,7 +1150,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		//}
 		var user = self.allUsers[message.userId];
 		CssUtils.deleteElement(user.li);
-		var dm = getText('User <b>{}</b> has left the conversation', user.user);
+		var dm = 'User <b>{}</b> has left the conversation'.format(user.user);
 		self.displayPreparedMessage(systemHeaderClass, message.time, dm, SYSTEM_USERNAME);
 		delete self.allUsers[message.userId];
 	};
@@ -1166,7 +1166,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		headSpan.className = headerStyle; // note it's not appending classes, it sets all classes to specified
 		var timeSpan = document.createElement('span');
 		timeSpan.className = timeSpanClass;
-		timeSpan.textContent = getText('({})', time);
+		timeSpan.textContent = '({})'.format(time);
 		timeSpan.onclick = timeMessageClick;
 		headSpan.appendChild(timeSpan);
 
@@ -1272,7 +1272,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		var headerStyle = data.userId  == loggedUserId ? self.SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
 		var preparedHtml;
 		if (data.image) {
-			preparedHtml = getText("<img src=\'{}\'/>", data.image);
+			preparedHtml = "<img src=\'{}\'/>".format(data.image);
 		} else {
 			preparedHtml = smileyUtil.encodeSmileys(data.content);
 		}
@@ -1315,7 +1315,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		if (message.userId == loggedUserId) {
 			dm = 'You have ' + action ;
 		} else {
-			dm = getText('User <b>{}</b> has {}', username, action);
+			dm = 'User <b>{}</b> has {}'.format(username, action);
 		}
 		checkAndPlay(sound);
 		self.displayPreparedMessage(systemHeaderClass, message.time, dm, SYSTEM_USERNAME);
@@ -1531,7 +1531,7 @@ function WebRtcApi() {
 		if (track) {
 			track.enabled = self.constraints[kind];
 		} else if (self.isActive()) {
-			growlError(getText("You need to call/reply with {} to turn it on", kind));
+			growlError("You need to call/reply with {} to turn it on".format(kind));
 		}
 	};
 	self.toggleVideo = function () {
@@ -1541,7 +1541,7 @@ function WebRtcApi() {
 		self.toggleInput(false);
 	};
 	self.onreply = function() {
-		self.setHeaderText(getText("Waiting for <b>{}</b> to answer", self.receiverName))
+		self.setHeaderText("Waiting for <b>{}</b> to answer".format(self.receiverName))
 	};
 	self.setHeaderText = function(text) {
 		headerText.innerHTML = text;
@@ -1564,10 +1564,10 @@ function WebRtcApi() {
 					// displayPreparedMessage(systemHeaderClass, new Date().getTime(),
 					//getText("You have missed a call from <b>{}</b>", self.receiverName)
 					// TODO replace growl with System message in user thread and unread
-					growlInfo(getText("<div>You have missed a call from <b>{}</b></div>", self.receiverName));
+					growlInfo("<div>You have missed a call from <b>{}</b></div>".format(self.receiverName));
 				}, self.callTimeoutTime
 		);
-		self.dom.callAnswerText.textContent = getText("{} is calling you", self.receiverName)
+		self.dom.callAnswerText.textContent = "{} is calling you".format(self.receiverName);
 	};
 	self.setIconState = function(isCall) {
 		isCall = isCall || self.isActive();
@@ -1599,7 +1599,7 @@ function WebRtcApi() {
 		self.setAudio(true);
 		self.setVideo(false);
 		self.showCallDialog(true);
-		self.setHeaderText(getText("Answered for {} call with audio", self.receiverName));
+		self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
 		self.createAfterResponseCall();
 	};
 	self.declineWebRtcCall = function (dontResponde) {
@@ -1615,7 +1615,7 @@ function WebRtcApi() {
 		self.setAudio(true);
 		self.setVideo(true);
 		self.showCallDialog(true);
-		self.setHeaderText(getText("Answered for {} call with video", self.receiverName));
+		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
 		self.createAfterResponseCall();
 	};
 	self.captureInput = function (callback, callIfNoSource) {
@@ -1628,7 +1628,7 @@ function WebRtcApi() {
 	self.callPeople = function () {
 		var activeChannel = channelsHandler.getActiveChannel();
 		if (!(Object.keys(activeChannel.onlineUsers).length > 1)) {
-			growlError(getText("<span>Can't make a call, user <b>{}</b> is not online.</span>",
+			growlError("<span>Can't make a call, user <b>{}</b> is not online.</span>".format(
 					activeChannel.getUserNameById(activeChannel.getOpponentId())));
 			return;
 		}
@@ -1639,7 +1639,7 @@ function WebRtcApi() {
 		self.waitForAnswer();
 		self.captureInput(function(stream) {
 			self.setIconState(true);
-			self.setHeaderText(getText("Establishing connection with {}", self.receiverName));
+			self.setHeaderText("Establishing connection with {}".format(self.receiverName));
 			self.attachLocalStream(stream);
 			self.sendBaseEvent(null, 'offer');
 			self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime);
@@ -1747,7 +1747,7 @@ function WebRtcApi() {
 		self.pc.onaddstream = function (event) {
 			self.setVideoSource(self.dom.remote, event.stream);
 			self.dom.remote.volume = volumeProportion[window.sound];
-			self.setHeaderText(getText("You're talking to <b>{}</b> now", self.receiverName));
+			self.setHeaderText("You're talking to <b>{}</b> now".format(self.receiverName));
 			self.setIconState(true);
 			console.log(getDebugMessage("Stream attached"));
 			self.showPhoneIcon();
@@ -1817,7 +1817,7 @@ function WebRtcApi() {
 			};
 			console.log(getDebugMessage("Created send data channel"));
 		} catch (e) {
-			var error = getText("Failed to create data channel because {} ", e.message || e);
+			var error = "Failed to create data channel because {} ".format(e.message || e);
 			growlError(error);
 			console.error(getDebugMessage(error));
 		}
@@ -1842,8 +1842,9 @@ function WebRtcApi() {
 	};
 	self.failWebRtc = function () {
 		var isError = arguments.length === 1 && (arguments[0].message || arguments[0].name);
-		var errorContext = isError ? getText("{}: {}", arguments[0].name, arguments[0].message) : Array.prototype.join.call(arguments, ' ');
-		var text = getText("Error while calling because {}", errorContext);
+		var errorContext = isError ? "{}: {}".format(arguments[0].name, arguments[0].message)
+				:Array.prototype.join.call(arguments, ' ');
+		var text = "Error while calling because {}".format(errorContext);
 		growlError(text);
 		console.error(getDebugMessage(text));
 	};
@@ -1901,14 +1902,14 @@ function WsHandler() {
 		self.setStatus(false);
 		var reason = e.reason || e;
 		if (e.code === 403) {
-			var message = getText("Server has forbidden request because '{}'", reason);
+			var message = "Server has forbidden request because '{}'".format(reason);
 			growlError(message);
 			console.error(getDebugMessage(message));
 		} else if (wsState === 0) {
 			growlError("Can't establish connection with server");
 			console.error(getDebugMessage("Chat server is down because {}", reason));
 		} else if (wsState === 9) {
-			growlError(getText("Connection to chat server has been lost", reason));
+			growlError("Connection to chat server has been lost, because {}".format(reason));
 			console.error(getDebugMessage(
 					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
 					e.reason, CONNECTION_RETRY_TIME));
