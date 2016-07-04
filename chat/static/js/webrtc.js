@@ -91,7 +91,7 @@ function startCapturingVideo(button) {
 			growlInfo("Click on your video to take a photo")
 		}, function (e) {
 			console.error(getDebugMessage('Error while trying to capture a picture "{}"', e.message || e.name));
-			growlError(getText('Unable to use your webcam because "{}"', e.message || e.name ));
+			growlError('Unable to use your webcam because "{}"'.format(e.message || e.name ));
 		});
 	} else
 

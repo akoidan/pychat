@@ -22,11 +22,11 @@
 	<nav class="noSelection">
 		<a class="icon-home" href="/" title="Go home" onclick="event.preventDefault(); singlePage.showPage('/chat/', ['r1']);"><span class="mText">home</span></a>
 		<i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds" onclick="mute();"><span class="mText">volume</span></i>
-		<a href="/#/report_issue" class="icon-pencil very-small-screen" title="report an issue"
+		<a href="/#/report_issue" class="icon-pencil hide-wide" title="report an issue"
 			onclick="event.preventDefault(); singlePage.showPage('/report_issue')"><span class="mText">issue</span></a>
-		<i class="icon-clear" title="Clear local history" onclick="clearLocalHistory()"><span class="mText">clear</span></i>
+		<i class="icon-clear hide-wide" title="Clear local history" onclick="clearLocalHistory()"><span class="mText">clear</span></i>
 		<a class="icon-phone" id="navCallIcon" href="/#/call" title="Make a video/mic call" onclick="event.preventDefault(); webRtcApi.toggleCallContainer()"><span class="mText">Call</span></a>
-		<a href="/#/statistics" class="icon-chart-pie" onclick="event.preventDefault(); singlePage.showPage('/statistics')" title="Show user countries statistics"><span class="mText">statistics</span></a>
+		<a href="/#/statistics" class="icon-chart-pie hide-wide" onclick="event.preventDefault(); singlePage.showPage('/statistics')" title="Show user countries statistics"><span class="mText">statistics</span></a>
 		<span id="onlineStatus" title="Online status" class="flex-push-right offline">●</span>
 		<span id='headerText' class="username very-small-screen"></span>
 		<a  href="/#/profile" title="Settings" onclick="event.preventDefault(); singlePage.showPage('/profile')" class="icon-wrench"> <span class="mText">Profile</span></a>
@@ -83,6 +83,7 @@
 				<li onclick="channelsHandler.call()">Call</li>
 				<li onclick="growlError('not implemented')">Transfer file</li>
 				<li onclick="channelsHandler.viewProfile()">View profile</li>
+				<li onclick="channelsHandler.createDirectChannel()">Write message </li>
 			</ul>
 			<span>
 				<span id="channelsMinifier" name="channel" class="icon-angle-circled-up"></span>
