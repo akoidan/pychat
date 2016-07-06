@@ -1263,7 +1263,6 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 			checkAndPlay(chatOutgoing);
 		} else {
 			checkAndPlay(chatIncoming);
-			setTimeout(vibrate);
 		}
 		self.increaseNewMessages();
 		var displayedUsername = user.user;
@@ -1280,6 +1279,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 			newMessagesCount++;
 			document.title = newMessagesCount + " new messages";
 			notifier.notify(displayedUsername, data.content);
+			vibrate();
 		}
 		self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
 	};
@@ -1363,7 +1363,9 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 
 
 function vibrate() {
-	window.navigator.vibrate(200);
+	if (window.navigator && window.navigator.vibrate) {
+		window.navigator.vibrate(200);
+	}
 }
 
 
