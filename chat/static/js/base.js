@@ -502,12 +502,20 @@ function sliceZero(number, count) {
 function getDebugMessage() {
 	var now = new Date();
 	// first argument is format, others are params
+	var text;
+	if (arguments.length > 1) {
+		var args = Array.prototype.slice.call(arguments);
+		args.shift();
+		text = arguments[0].format(args);
+	} else {
+		text = arguments[0];
+	}
 	var result = "{}:{}:{}.{}: {}".format(
 			sliceZero(now.getHours()),
 			sliceZero(now.getMinutes()),
 			sliceZero(now.getSeconds()),
 			sliceZero(now.getMilliseconds(), -3),
-			arguments.length > 1 ? arguments[0].format(Array.prototype.slice.call(arguments).shift()) : arguments[0]
+			text
 	);
 	saveLogToStorage(result);
 	return result;

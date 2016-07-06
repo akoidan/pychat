@@ -120,7 +120,9 @@ class UserProfile(User):
 
 class Room(models.Model):
 	name = CharField(max_length=16, null=True)
-	users = models.ManyToManyField(User, related_name='rooms')
+	users = models.ManyToManyField(User, related_name='rooms'
+											 # , through='RoomUsers'
+			)
 	disabled = NullBooleanField()
 
 	@property
@@ -147,6 +149,17 @@ class Message(models.Model):
 	time = models.BigIntegerField(default=get_milliseconds)
 	content = models.TextField(null=True)
 	img = FileField(upload_to=get_random_path, null=True)
+
+
+# class RoomUsers(models.Model):
+# 	room = models.ForeignKey(Room, null=False)
+# 	user = models.ForeignKey(User, null=False)
+# 	last_read_message = models.ForeignKey(Message, null=True)
+#
+# 	class Meta:  # pylint: disable=C1001
+# 		unique_together = ("user", "room")
+# 		db_table = ''.join((User._meta.app_label, '_room_users'))
+
 
 class Issue(models.Model):
 	content = models.TextField(null=False)  # unique = true, but mysql doesnt allow unique fields for unspecified size
