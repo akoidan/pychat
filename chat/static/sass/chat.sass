@@ -71,6 +71,7 @@ p
 	padding-left: 8px
 	word-wrap: break-word
 	font-size: 18px
+	@include flex(1) // Fix Safari's 0 height
 	margin-right: 2px
 
 	&:focus
@@ -287,9 +288,8 @@ p
 .chatbox img[code], #usermsg img[code]
 	margin-top: -17px
 	margin-bottom: -10px
-	background-color: rgba(255, 255, 255, 0)
-
 	/*remove background if someones copies smile
+	background-color: rgba(255, 255, 255, 0)
 	vertical-align: middle
 
 #tabNames
