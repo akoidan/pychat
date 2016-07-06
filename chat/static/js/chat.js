@@ -636,7 +636,7 @@ function ChannelsHandler() {
 		return res;
 	};
 	self.showAddUser = function () {
-		var exclude = getDirectMessagesUserIds();
+		var exclude = self.getDirectMessagesUserIds();
 		var isEmpty = self.fillAddUser(exclude);
 		if (isEmpty) {
 			growlInfo("You already have all users in direct channels");
