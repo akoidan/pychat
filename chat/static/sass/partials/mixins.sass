@@ -28,6 +28,11 @@
 	display: -webkit-flex
 	display: flex
 
+@mixin flex($value...)
+	-webkit-flex: $value
+	-ms-flex: $value
+	flex: $value
+
 @mixin user-select($value)
 	-webkit-touch-callout: $value
 	-webkit-user-select: $value
@@ -68,6 +73,7 @@
 		to
 			background-position: #{ -$width*($steps) + 'px'} #{'-' + $y+'px'}
 
+//Smile is deprecated
 @mixin smile($name, $time, $y, $width, $height, $steps)
 	#{'.smile-' + $name}
 		width: #{$width + 'px'}

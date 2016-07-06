@@ -53,6 +53,16 @@ button
 [class^='icon-']:hover
 	cursor: pointer
 
+// TODO
+//$safari-only: '(min-color-index:0) and(-webkit-min-device-pixel-ratio:0)'
+//
+//@media screen and #{$safari-only}
+//	body
+//		background-image: linear-gradient(green 0%, red 100%) !important
+select
+	-webkit-appearance: none // fix Safari's select
+
+
 .color-lor, .color-reg
 	scrollbar-base-color: $grayish-blue
 	scrollbar-3dlight-color: #7dc071
