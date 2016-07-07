@@ -296,13 +296,18 @@ class MessagesHandler(MessagesCreator):
 		yield tornado.gen.Task(
 			self.async_redis.subscribe, channel)
 
-	def do_db(self, callback, *arg, **args):
+	def do_db(self, callback, *args, **kwargs):
 		try:
-			return callback(*arg, **args)
+			return callback(*args, **kwargs)
 		except (OperationalError, InterfaceError) as e:  # Connection has gone away
 			self.logger.warning('%s, reconnecting' % e)  # TODO
 			connection.close()
-			return callback(*arg, **args)
+			return callback(*args, **kwargs)
+
+	def execute_query(self, query, *args, **kwargs):
+		cursor = connection.cursor()
+		cursor.execute(query, *args, **kwargs)
+		return cursor.fetchall()
 
 	def get_online_from_redis(self, channel, check_user_id=None, check_hash=None):
 		"""
@@ -429,7 +434,7 @@ class MessagesHandler(MessagesCreator):
 		if not room_name or len(room_name) > 16:
 			raise ValidationError('Incorrect room name "{}"'.format(room_name))
 		room = Room(name=room_name)
-		room.save()
+		self.do_db(room.save)
 		room.users.add(self.user_id)
 		room.save()
 		subscribe_message = self.subscribe_room_channel_message(room.id, room_name)
@@ -441,7 +446,7 @@ class MessagesHandler(MessagesCreator):
 		channel = RedisPrefix.generate_room(room_id)
 		if channel not in self.channels:
 			raise ValidationError("Access denied, only allowed for channels {}".format(self.channels))
-		room = Room.objects.get(id=room_id)
+		room = self.do_db(Room.objects.get, id=room_id)
 		if room.is_private:
 			raise ValidationError("You can't add users to direct room, create a new room instead")
 		try:
@@ -457,9 +462,7 @@ class MessagesHandler(MessagesCreator):
 
 	def create_user_channel(self, message):
 		user_id = message[VarNames.USER_ID]
-		cursor = connection.cursor()
-		cursor.execute(GET_DIRECT_ROOM_ID, [self.user_id, user_id])
-		query_res = cursor.fetchall()
+		query_res = self.do_db(self.execute_query, GET_DIRECT_ROOM_ID, [self.user_id, user_id])
 		if len(query_res) > 0:
 			result = query_res[0]
 			room_id = result[0]
@@ -485,7 +488,7 @@ class MessagesHandler(MessagesCreator):
 		channel = RedisPrefix.generate_room(room_id)
 		if channel not in self.channels or room_id == ALL_ROOM_ID:
 			raise ValidationError('You are not allowed to exit this room')
-		room = Room.objects.get(id=room_id)
+		room = self.do_db(Room.objects.get, id=room_id)
 		if room.disabled is not None:
 			raise ValidationError('Room is already deleted')
 		if room.name is None:  # if private then disable
@@ -550,9 +553,7 @@ class MessagesHandler(MessagesCreator):
 			}
 		}
 		"""
-		cursor = connection.cursor()
-		cursor.execute(USER_ROOMS_QUERY, [self.user_id])
-		query_res = cursor.fetchall()
+		query_res = self.execute_query(USER_ROOMS_QUERY, [self.user_id])
 		res = {}
 		for user in query_res:
 			user_id = user[0]
@@ -676,6 +677,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 					if not is_online:
 						message = self.room_online(online, Actions.LOGOUT, channel)
 						self.publish(message, channel)
+
 		self.logger.info("Close connection result: %s", json.dumps(log_data))
 		self.async_redis.disconnect()
 
