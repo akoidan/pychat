@@ -255,17 +255,12 @@ class MessagesHandler(MessagesCreator):
 		self.id = id(self)
 		self.log_id = str(self.id % 10000).rjust(4, '0')
 		self.ip = None
-		log_params = {
-			'user_id': '000',
-			'id': self.log_id,
-			'ip': 'initializing'
-		}
 		from chat import global_redis
 		self.async_redis_publisher = global_redis.async_redis_publisher
 		self.sync_redis = global_redis.sync_redis
 		self.channels = []
 		self.call_receiver_channel = None
-		self.logger = logging.LoggerAdapter(logger, log_params)
+		self.logger = None
 		self.async_redis = tornadoredis.Client()
 		self.pre_process_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
@@ -684,7 +679,6 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
 		if sessionStore.exists(session_key):
-			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, self.id)
 			self.ip = self.get_client_ip()
 			session = SessionStore(session_key)
 			self.user_id = int(session["_auth_user_id"])
@@ -694,6 +688,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				'ip': self.ip
 			}
 			self.logger = logging.LoggerAdapter(logger, log_params)
+			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, self.id)
 			self.async_redis.connect()
 			user_db = self.do_db(User.objects.get, id=self.user_id)  # everything but 0 is a registered user
 			self.sender_name = user_db.username
