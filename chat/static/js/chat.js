@@ -1921,8 +1921,13 @@ function WsHandler() {
 		setTimeout(self.start_chat_ws, CONNECTION_RETRY_TIME);
 	};
 	self.start_chat_ws = function () {
+		if (!window.WebSocket) {
+			growlError(getText("Your browser ({}) doesn't support webSockets. Supported browsers: " +
+					"Android, Chrome, Opera, Safari, IE11, Edge, Firefox", window.browserVersion));
+			return;
+		}
 		self.ws = new WebSocket(API_URL);
-		self.ws.onmessage = self.onWsMessage; // TODO
+		self.ws.onmessage = self.onWsMessage;
 		self.ws.onclose = self.onWsClose;
 		self.ws.onopen = function () {
 			self.setStatus(true);
