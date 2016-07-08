@@ -3,6 +3,7 @@
 @import "fontello/fontello"
 @import "themes/color-lor/color-lor"
 @import "themes/color-reg/color-reg"
+@import "themes/checkbox"
 
 li
 	list-style-type: none
@@ -82,6 +83,7 @@ a
 		th
 			width: 150px
 		td
+			height: 30px
 			width: calc(100% - 150px)
 
 			input[type=text], textarea, input[type=email]
@@ -225,12 +227,15 @@ textarea, div[contenteditable]
 			margin: 5px 10px 5px 0
 			border-radius: 5px
 			font-size: 18px
+		&[type=checkbox] + label
+			margin: 5px 10px 5px 0
 
 	select
 		padding: 8px
 		margin: 5px 10px 5px 0
 		border-radius: 5px
 		font-size: 18px
+
 
 	input[type=file]
 		padding-left: 0
@@ -334,7 +339,7 @@ video
 		width: 100%
 
 	input
-		&:not([type=submit]):not([type=file])
+		&:not([type=submit]):not([type=file]):not([type=checkbox])
 			width: calc(100% - 18px)
 
 		&[type=submit]
