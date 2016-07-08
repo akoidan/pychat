@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import FileField, DateField, ChoiceField, Widget
+from django.forms import FileField, DateField, ChoiceField, Widget, BooleanField, CheckboxInput
 
 from chat.models import UserProfile
 from chat.settings import GENDERS
@@ -31,10 +31,18 @@ class UserProfileReadOnlyForm(forms.ModelForm):
 		fields = ('username', 'name', 'surname', 'city',  'email', 'birthday', 'contacts', 'sex')
 
 
+class BooleanWidget(CheckboxInput):
+
+	def render(self, name, value, attrs=None):
+		return super(BooleanWidget, self).render(name, value, attrs) + '<label for="id_'+name+'"></label>'
+
+
 class UserProfileForm(forms.ModelForm):
 	# the widget gets rid of <a href=
 	photo = FileField(widget=forms.FileInput)
 	birthday = DateField(widget=DateWidget)  # input_formats=settings.DATE_INPUT_FORMATS
+	notifications = BooleanField(widget=BooleanWidget)
+	suggestions = BooleanField(widget=BooleanWidget)
 
 	GENDER_CHOICES = (
 		(1, 'Male'),
@@ -46,8 +54,7 @@ class UserProfileForm(forms.ModelForm):
 
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
-		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts',
-				'sex', 'photo', 'suggestions', 'notifications')
+		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts', 'sex', 'photo')
 
 	def __init__(self, *args, **kwargs):
 		"""

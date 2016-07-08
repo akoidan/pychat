@@ -105,7 +105,6 @@ onDocLoad(function () {
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	window.addEventListener("blur", changeTittleFunction);
 	window.addEventListener("focus", changeTittleFunction);
-	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	channelsHandler = new ChannelsHandler();
 	showHelp();
 	singlePage = new PageHandler();
@@ -116,7 +115,7 @@ onDocLoad(function () {
 	smileyUtil.init();
 	storage = new Storage();
 	notifier = new NotifierHandler();
-	//TODO channelsHandler.loadMessagesFromLocalStorage(); /*Smileys should be encoded by time message load, otherwise they don't display*/
+	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	wsHandler.start_chat_ws();
 });
 
@@ -132,9 +131,15 @@ function NotifierHandler() {
 	};
 	self.popedNotifQueue = [];
 	self.init = function () {
-		self.askPermissions();
+		if (!window.Notification) {
+			console.warn(getDebugMessage("Notification is not supported"));
+			self.notify = function (title, message) {
+				console.warn(getDebugMessage("Skip notification {} {}", title, message));
+			}
+		} else {
+			self.askPermissions();
+		}
 	};
-	self.init();
 	self.notificationClick = function(x){
 		window.focus();
 		this.close()
@@ -164,7 +169,8 @@ function NotifierHandler() {
 			notif.close();
 			self.popedNotifQueue.shift();
 		}
-	}
+	};
+	self.init();
 }
 
 
@@ -1106,7 +1112,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		self.addUserToDom(message);
 	};
 	self.setDomOnlineUsers = function(users) {
-		self.dom.userList.innerHTML = null;
+		self.dom.userList.innerHTML = '';
 		self.allUsers = users;
 		for (var userId in self.allUsers) {
 			if (self.allUsers.hasOwnProperty(userId)) {

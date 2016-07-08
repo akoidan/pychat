@@ -506,7 +506,7 @@ function getDebugMessage() {
 	if (arguments.length > 1) {
 		var args = Array.prototype.slice.call(arguments);
 		args.shift();
-		text = arguments[0].format(args);
+		text = String.prototype.format.apply(arguments[0], args);
 	} else {
 		text = arguments[0];
 	}

@@ -102,8 +102,8 @@
 				<span id="usersStateText"></span>
 				<i class="icon-user-plus" id="inviteUser" title="Add user to current active channel" onclick="channelsHandler.showInviteUser()"></i>
 			</span>
-			<ul id="chat-user-table">
-			</ul>
+			<div id="chat-user-table">
+			</div>
 		</div>
 		<div id="smileParentHolder" class="padding10 hidden" onclick="smileyUtil.addSmile(event);">
 			<ul id="tabNames" onclick="smileyUtil.showTabByName(event)"></ul>
@@ -143,7 +143,7 @@
 				<th>
 					<label for="history">Send Logs</label>
 				</th>
-				<td><input type="checkbox" name="history" id="history" checked/></td>
+				<td><input type="checkbox" name="history" id="history" checked/> <label for="history"></label></td>
 			<tr>
 				<td colspan="2"><input type="submit" value="Sumbit"></td>
 			</tr>
