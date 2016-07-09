@@ -54,7 +54,8 @@ class UserProfileForm(forms.ModelForm):
 
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
-		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts', 'sex', 'photo')
+		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts',
+				'sex', 'photo', 'notifications', 'suggestions')
 
 	def __init__(self, *args, **kwargs):
 		"""
