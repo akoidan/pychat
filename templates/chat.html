@@ -72,8 +72,9 @@
 						</div>
 						<i class="icon-hang-up" id="hangUpIcon"></i>
 						<i class="icon-phone-circled" id="callIcon" onclick="event.preventDefault(); webRtcApi.callPeople()"></i>
-						<img src="{% md5url 'images/call.gif' %}" alt="call" class="hidden" id="callRing"
-							 style="width: 30px"/>
+{#						<img src="{% md5url 'images/call.gif' %}" alt="call" class="hidden" id="callRing"#}
+{#							 style="width: 30px"/>#}
+						<input type="range" id="callVolume" value="100"/>
 					</div>
 				</div>
 			</div>

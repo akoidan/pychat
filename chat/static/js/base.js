@@ -11,6 +11,7 @@ var ajaxLoader;
 var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|$))/g; /*http://anycharacter except end of text, <br> or space*/
 var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
 var muteBtn;
+var inputRangeStyles = {};
 var currentPlayingAudio;
 const escapeMap = {
 	"&": "&amp;",
@@ -308,8 +309,25 @@ onDocLoad(function () {
 		console.warn(getDebugMessage("Ops, there's no scrollbar for firefox"));
 	}
 	growlHolder = $('growlHolder');
-});
+	initInputRangeTrack();
 
+});
+function fixInputRangeStyle() {
+	var id = this.getAttribute('id');
+	inputRangeStyles[id].textContent =
+			'#{}::-webkit-slider-runnable-track {background-size: {}% 100%, 100% 100%; }'
+					.format(id, this.value);
+}
+
+function initInputRangeTrack() {
+	var inputRanges = document.querySelectorAll('input[type=range]');
+	for (var i = 0; i < inputRanges.length; i++){
+		var id = inputRanges[i].getAttribute('id');
+		inputRanges[i].addEventListener('input', fixInputRangeStyle);
+		inputRangeStyles[id] = document.createElement('style');
+		document.head.appendChild(inputRangeStyles[id]);
+	}
+}
 
 function mute() {
 	window.sound = (window.sound + 1) % 4;
