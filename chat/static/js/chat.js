@@ -850,6 +850,11 @@ function ChannelsHandler() {
 	self.getActiveUsername = function() {
 		return self.dom.activeUserContext.textContent;
 	};
+	self.m2Call = function () {
+		growlError("<span>This function is not implemented yet. Use <i class='icon-phone'></i> " +
+				"icon in <b style='font-size: 13px'>DIRECT MESSAGES</b> to make a call</span>");
+		// TODO
+	};
 	self.call = function() {
 		if (self.getActiveUsername() != loggedUser) {
 			webRtcApi.showCallDialog();
