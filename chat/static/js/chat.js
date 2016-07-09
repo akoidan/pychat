@@ -1392,6 +1392,7 @@ function WebRtcApi() {
 		videoContainer: $('videoContainer'),
 		fsContainer: $('icon-webrtc-cont'),
 		callIcon: $('callIcon'),
+		callVolume: $('callVolume'),
 		fs: { /*FullScreen*/
 			video: $('fs-video'),
 			audio: $('fs-audio'),
@@ -1440,15 +1441,14 @@ function WebRtcApi() {
 		self.idleTime = 0;
 		self.dom.fs.hangup.title = 'Hang up';
 		self.dom.hangUpIcon.title = self.dom.fs.hangup.title;
-		mute = function () {
-			self.baseMute();
-			self.dom.remote.volume = volumeProportion[window.sound];
-		};
 	};
+	self.changeVolume = function () {
+		self.dom.remote.volume = self.dom.callVolume.value / 100;
+	};
+	self.dom.callVolume.addEventListener('input', self.changeVolume);
 	self.exitFullScreen = function () {
 		document.cancelFullScreen();
 	};
-	self.baseMute = mute;
 	self.hideContainerTimeout = function () {
 		self.idleTime += 1;
 		if (self.idleTime > 6) {
