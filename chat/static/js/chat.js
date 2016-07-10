@@ -1,112 +1,54 @@
-// html for messages
-if (!("WebSocket" in window)) {
-	alert("Your browser doesn't support Web socket, chat options will be unavailable. " +
-	"Please use Chrome, Firefox, Safari, Internet Explorer 10+ or any modern browser.");
-	throw "Browser doesn't support Web socket";
-}
 const CONNECTION_RETRY_TIME = 5000;
-
-
-const privateHeaderClass = 'message-header-private';
-const systemHeaderClass = 'message-header-system';
-
-const timeSpanClass = 'timeMess';
-const contentStyleClass = 'message-text-style';
+const SYSTEM_HEADER_CLASS = 'message-header-system';
+const TIME_SPAN_CLASS = 'timeMess';
+const CONTENT_STYLE_CLASS = 'message-text-style';
 const DEFAULT_CHANNEL_NAME = 'r1';
 const USER_ID_ATTR = 'userid'; // used in ChannelsHandler and ChatHandler
 const USER_NAME_ATTR = 'username';  // used in ChannelsHandler and ChatHandler
 const SYSTEM_USERNAME = 'System';
-
-const genderIcons = {
+const CANCEL_ICON_CLASS_NAME = 'icon-cancel-circled-outline';
+const GENDER_ICONS = {
 	'Male': 'icon-man',
 	'Female': 'icon-girl',
 	'Secret': 'icon-user-secret'
 };
 
-const CANCEL_ICON_CLASS_NAME = 'icon-cancel-circled-outline';
-
 var smileRegex = /<img[^>]*code="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
-var notifier;
+
+var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
+if (isFirefox) {
+	RTCSessionDescription = mozRTCSessionDescription;
+	RTCIceCandidate = mozRTCIceCandidate;
+}
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
 var newMessagesCount = 0;
 var isCurrentTabActive = true;
 //localStorage  key
 const STORAGE_NAME = 'main';
-//current top message id for detecting from what
-
-//sound
-var chatIncoming;
-var chatOutgoing;
-var chatLogin;
-var chatLogout;
-// div for user list appending
 // input type that contains text for sending message
 var userMessage;
-// div that contains receiver id, icons, etc
-//user to send message input type text
 // navbar label with current user name
-var charRooms;
 var headerText;
-//main single socket for handling realtime messages
-var wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 9 - connected;
-var chatUserRoomWrapper; // for hiddding users
 
-//All <p> ids (every id is UTC millis). this helps to prevent duplications, and detect position
-var onlineUsers = {};
+// OOP variables
+var notifier;
 var webRtcApi;
 var smileyUtil;
 var channelsHandler;
 var wsHandler;
 var storage;
-var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
-if (isFirefox) {
-	RTCSessionDescription = mozRTCSessionDescription;
-	RTCIceCandidate = mozRTCIceCandidate;
-}
 var singlePage;
 
-var infoMessages = [
-	"<span>Every time you join chat those help messages will be shown to you. " +
-	"You can disable them in you profile settings (<i class='icon-wrench'></i> icon). Simply click on popup to hide them</span>",
-	"<span>Browser will notify you on incoming message every time when chat tab is not active. " +
-	"You can disable this option in your profile(<i class='icon-wrench'></i> icon).</span>",
-	"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon." +
-	" To delete created room hover mouse on its name and click on <i class='icon-cancel-circled-outline'></i> icon.</span>",
-	"<span>You can make an audio/video call. Currently pychat allows calling only one person." +
-	" To call someone you need to create ( <i class='icon-plus-squared'></i>) and join direct message," +
-	" open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> </span>",
-	"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
-	"<span>You can write multiline message by pressing <b>shift+Enter</b></span>",
-	"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon. To close appeared smile container click outside of it or press <b>Esc</b></span>",
-	"You can comment somebody's message. This will be shown to all users in current channel. Just click on message time" +
-			"and it's content appears in message text",
-	"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
-			"suggestion there</span>",
-	"<span>Chat uses your browser cache to store messages. To clear current cache click on " +
-	"<i class='icon-clear'></i> icon on the top menu</span>",
-	"<span>You can view offline users in current channel by clicking on <b>CHANNEL ONLINE</b> text</span>",
-	"<span>You can invite a new user to current room by clicking on <i class='icon-user-plus'></i> icon</span>",
-	"You can load history of current channel. For this you need to focus place with messages by simply" +
-	" clicking on it and press arrow up/page up or just scroll up with mousewheel",
-	"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>"
-];
 
 onDocLoad(function () {
 	userMessage = $("usermsg");
-	chatUserRoomWrapper = $("chat-room-users-wrapper");
-	chatIncoming = $("chatIncoming");
-	chatOutgoing = $("chatOutgoing");
-	chatLogin = $("chatLogin");
-	chatLogout = $("chatLogout");
-	charRooms = $("rooms");
 	headerText = $('headerText');
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	window.addEventListener("blur", changeTittleFunction);
 	window.addEventListener("focus", changeTittleFunction);
 	channelsHandler = new ChannelsHandler();
-	showHelp();
 	singlePage = new PageHandler();
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
@@ -117,6 +59,7 @@ onDocLoad(function () {
 	notifier = new NotifierHandler();
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	wsHandler.start_chat_ws();
+	showHelp();
 });
 
 
@@ -893,6 +836,31 @@ function ChannelsHandler() {
 
 function showHelp() {
 	if (suggestions) {
+		var infoMessages = [
+			"<span>Every time you join chat those help messages will be shown to you. " +
+			"You can disable them in you profile settings (<i class='icon-wrench'></i> icon). Simply click on popup to hide them</span>",
+			"<span>Browser will notify you on incoming message every time when chat tab is not active. " +
+			"You can disable this option in your profile(<i class='icon-wrench'></i> icon).</span>",
+			"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon." +
+			" To delete created room hover mouse on its name and click on <i class='icon-cancel-circled-outline'></i> icon.</span>",
+			"<span>You can make an audio/video call. Currently pychat allows calling only one person." +
+			" To call someone you need to create ( <i class='icon-plus-squared'></i>) and join direct message," +
+			" open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> </span>",
+			"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
+			"<span>You can write multiline message by pressing <b>shift+Enter</b></span>",
+			"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon. To close appeared smile container click outside of it or press <b>Esc</b></span>",
+			"You can comment somebody's message. This will be shown to all users in current channel. Just click on message time" +
+			"and it's content appears in message text",
+			"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
+			"suggestion there</span>",
+			"<span>Chat uses your browser cache to store messages. To clear current cache click on " +
+			"<i class='icon-clear'></i> icon on the top menu</span>",
+			"<span>You can view offline users in current channel by clicking on <b>CHANNEL ONLINE</b> text</span>",
+			"<span>You can invite a new user to current room by clicking on <i class='icon-user-plus'></i> icon</span>",
+			"You can load history of current channel. For this you need to focus place with messages by simply" +
+			" clicking on it and press arrow up/page up or just scroll up with mousewheel",
+			"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>"
+		];
 		var index = localStorage.getItem('HelpIndex');
 		if (index == null) {
 			index = 0;
@@ -1039,7 +1007,11 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		roomNameLi: li,
 		newMessages: document.createElement('span'),
 		deleteIcon: li.lastChild,
-		chatBoxHolder: $('chatBoxHolder')
+		chatBoxHolder: $('chatBoxHolder'),
+		chatLogin: $("chatLogin"),
+		chatLogout: $("chatLogout"),
+		chatIncoming: $("chatIncoming"),
+		chatOutgoing: $("chatOutgoing")
 	};
 	self.newMessages = 0;
 	self.lastLoadUpHistoryRequest = 0;
@@ -1162,7 +1134,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		var user = self.allUsers[message.userId];
 		CssUtils.deleteElement(user.li);
 		var dm = 'User <b>{}</b> has left the conversation'.format(user.user);
-		self.displayPreparedMessage(systemHeaderClass, message.time, dm, SYSTEM_USERNAME);
+		self.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
 		delete self.allUsers[message.userId];
 	};
 	/** Creates a DOM node with attached events and all message content*/
@@ -1176,7 +1148,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		var headSpan = document.createElement('span');
 		headSpan.className = headerStyle; // note it's not appending classes, it sets all classes to specified
 		var timeSpan = document.createElement('span');
-		timeSpan.className = timeSpanClass;
+		timeSpan.className = TIME_SPAN_CLASS;
 		timeSpan.textContent = '({})'.format(time);
 		timeSpan.onclick = timeMessageClick;
 		headSpan.appendChild(timeSpan);
@@ -1193,7 +1165,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 			p.insertAdjacentHTML('beforeend', htmlEncodedContent);
 		} else {
 			var textSpan = document.createElement('span');
-			textSpan.className = contentStyleClass;
+			textSpan.className = CONTENT_STYLE_CLASS;
 			textSpan.innerHTML = htmlEncodedContent;
 			p.appendChild(textSpan);
 		}
@@ -1271,9 +1243,9 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 	self.printMessage = function (data) {
 		var user = self.allUsers[data.userId];
 		if (loggedUserId === data.userId) {
-			checkAndPlay(chatOutgoing);
+			checkAndPlay(self.dom.chatOutgoing);
 		} else {
-			checkAndPlay(chatIncoming);
+			checkAndPlay(self.dom.chatIncoming);
 		}
 		self.increaseNewMessages();
 		var displayedUsername = user.user;
@@ -1315,10 +1287,10 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 	};
 	self.addOnlineUser = function (message) {
 		self.addUserToDom(message);
-		self.printChangeOnlineStatus('appeared online.', message, chatLogin);
+		self.printChangeOnlineStatus('appeared online.', message, self.dom.chatLogin);
 	};
 	self.removeOnlineUser = function(message) {
-		self.printChangeOnlineStatus('gone offline.', message, chatLogout);
+		self.printChangeOnlineStatus('gone offline.', message, self.dom.chatLogout);
 	};
 	self.printChangeOnlineStatus = function (action, message, sound) {
 		var dm;
@@ -1329,7 +1301,7 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 			dm = 'User <b>{}</b> has {}'.format(username, action);
 		}
 		checkAndPlay(sound);
-		self.displayPreparedMessage(systemHeaderClass, message.time, dm, SYSTEM_USERNAME);
+		self.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
 		self.setOnlineUsers(message);
 	};
 	self.setOnlineUsers = function(message) {
@@ -1574,7 +1546,7 @@ function WebRtcApi() {
 		CssUtils.showElement(self.dom.callAnswerParent);
 		self.timeoutFunnction = setTimeout(function () {
 					self.declineWebRtcCall();
-					// displayPreparedMessage(systemHeaderClass, new Date().getTime(),
+					// displayPreparedMessage(SYSTEM_HEADER_CLASS, new Date().getTime(),
 					//getText("You have missed a call from <b>{}</b>", self.receiverName)
 					// TODO replace growl with System message in user thread and unread
 					growlInfo("<div>You have missed a call from <b>{}</b></div>".format(self.receiverName));
@@ -1867,6 +1839,7 @@ function WebRtcApi() {
 
 function WsHandler() {
 	var self = this;
+	self.wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 9 - connected;
 	self.dom = {
 		onlineStatus: $('onlineStatus'),
 		onlineClass: 'online',
@@ -1918,16 +1891,16 @@ function WsHandler() {
 			var message = "Server has forbidden request because '{}'".format(reason);
 			growlError(message);
 			console.error(getDebugMessage(message));
-		} else if (wsState === 0) {
+		} else if (self.wsState === 0) {
 			growlError("Can't establish connection with server");
 			console.error(getDebugMessage("Chat server is down because {}", reason));
-		} else if (wsState === 9) {
+		} else if (self.wsState === 9) {
 			growlError("Connection to chat server has been lost, because {}".format(reason));
 			console.error(getDebugMessage(
 					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
 					e.reason, CONNECTION_RETRY_TIME));
 		}
-		wsState = 1;
+		self.wsState = 1;
 		// Try to reconnect in 10 seconds
 		setTimeout(self.start_chat_ws, CONNECTION_RETRY_TIME);
 	};
@@ -1943,10 +1916,10 @@ function WsHandler() {
 		self.ws.onopen = function () {
 			self.setStatus(true);
 			var message = "Connection to server has been established";
-			if (wsState === 1) { // if not inited don't growl message on page load
+			if (self.wsState === 1) { // if not inited don't growl message on page load
 				growlSuccess(message);
 			}
-			wsState = 9;
+			self.wsState = 9;
 			console.log(getDebugMessage(message));
 		};
 	};
@@ -2001,7 +1974,7 @@ function Storage() {
 function createUserLi(userId, gender, username) {
 	var icon;
 	icon = document.createElement('i');
-	icon.className = genderIcons[gender];
+	icon.className = GENDER_ICONS[gender];
 	var li = document.createElement('li');
 	li.appendChild(icon);
 	li.innerHTML += username;
