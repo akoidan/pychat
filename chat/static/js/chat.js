@@ -563,15 +563,14 @@ function ChannelsHandler() {
 		self.addUserUsersList = {};
 		var allUsers = self.getAllUsersInfo();
 		for (var userId in allUsers) {
-			if (allUsers.hasOwnProperty(userId)) {
-				if (excludeUsersId[userId]) continue;
-				var li = document.createElement('LI');
-				var username = allUsers[userId].user;
-				self.addUserUsersList[username] = li;
-				li.innerText = username;
-				li.setAttribute(USER_ID_ATTR, userId);
-				self.dom.addUserList.appendChild(li);
-			}
+			if (!allUsers.hasOwnProperty(userId)) continue;
+			if (excludeUsersId[userId]) continue;
+			var li = document.createElement('LI');
+			var username = allUsers[userId].user;
+			self.addUserUsersList[username] = li;
+			li.innerText = username;
+			li.setAttribute(USER_ID_ATTR, userId);
+			self.dom.addUserList.appendChild(li);
 		}
 		if (self.dom.addUserList.childNodes.length === 0) return true;
 	};
@@ -608,12 +607,11 @@ function ChannelsHandler() {
 			}
 		}
 		for (var userName in self.addUserUsersList) {
-			if (self.addUserUsersList.hasOwnProperty(userName)) {
-				if (userName.indexOf(filterValue) > -1) {
-					CssUtils.showElement(self.addUserUsersList[userName]);
-				} else {
-					CssUtils.hideElement(self.addUserUsersList[userName]);
-				}
+			if (!self.addUserUsersList.hasOwnProperty(userName)) continue;
+			if (userName.indexOf(filterValue) > -1) {
+				CssUtils.showElement(self.addUserUsersList[userName]);
+			} else {
+				CssUtils.hideElement(self.addUserUsersList[userName]);
 			}
 		}
 	};
@@ -687,25 +685,23 @@ function ChannelsHandler() {
 		var rooms = message.content;
 		var oldRooms = [];
 		for (var channelKey in self.channels) {
-			if (self.channels.hasOwnProperty(channelKey) && channelKey.startsWith('r')) {
-				var oldRoomId = parseInt(channelKey.substring(1));
-				oldRooms.push(oldRoomId);
-				if (!rooms[oldRoomId]) {
-					self.destroyChannel(channelKey);
-				}
+			if (!self.channels.hasOwnProperty(channelKey) || !channelKey.startsWith('r')) continue;
+			var oldRoomId = parseInt(channelKey.substring(1));
+			oldRooms.push(oldRoomId);
+			if (!rooms[oldRoomId]) {
+				self.destroyChannel(channelKey);
 			}
 		}
 		for (var roomId in rooms) {
 			// if a new room has been added while disconnected
-			if (rooms.hasOwnProperty(roomId)) {
-				var intKey = parseInt(roomId);
-				if (oldRooms.indexOf(intKey) < 0) {
-					var room = rooms[roomId];
-					if (room.name) {
-						self.createNewRoomChatHandler(roomId, room.name, room.users);
-					} else {
-						self.createNewUserChatHandler(roomId, room.users);
-					}
+			if (!rooms.hasOwnProperty(roomId)) continue ;
+			var intKey = parseInt(roomId);
+			if (oldRooms.indexOf(intKey) < 0) {
+				var room = rooms[roomId];
+				if (room.name) {
+					self.createNewRoomChatHandler(roomId, room.name, room.users);
+				} else {
+					self.createNewUserChatHandler(roomId, room.users);
 				}
 			}
 		}
@@ -940,33 +936,31 @@ function SmileyUtil() {
 		//var smileyData = JSON.parse(jsonData);
 		var smileyData = jsonData;
 		for (var tab in smileyData) {
-			if (smileyData.hasOwnProperty(tab)) {
-				var tabRef = document.createElement('div');
-				tabRef.setAttribute("name", tab);
-				var tabName = document.createElement("LI");
-				tabName.setAttribute("id", "tab-name-" + tab);
-				var textNode = document.createTextNode(tab);
-				tabName.appendChild(textNode);
-				$("tabNames").appendChild(tabName);
-				var currentSmileyHolderId = "tab-" + tab;
-				tabRef.setAttribute("id", currentSmileyHolderId);
-				self.tabNames.push(tab);
-				self.dom.smileParentHolder.appendChild(tabRef);
+			if (!smileyData.hasOwnProperty(tab)) continue;
+			var tabRef = document.createElement('div');
+			tabRef.setAttribute("name", tab);
+			var tabName = document.createElement("LI");
+			tabName.setAttribute("id", "tab-name-" + tab);
+			var textNode = document.createTextNode(tab);
+			tabName.appendChild(textNode);
+			$("tabNames").appendChild(tabName);
+			var currentSmileyHolderId = "tab-" + tab;
+			tabRef.setAttribute("id", currentSmileyHolderId);
+			self.tabNames.push(tab);
+			self.dom.smileParentHolder.appendChild(tabRef);
 
-				var tabSmileys = smileyData[tab];
-				for (var smile in tabSmileys) {
-					if (tabSmileys.hasOwnProperty(smile)) {
-						var fileRef = document.createElement('IMG');
-						var fullSmileyUrl = "data:image/gif;base64," + tabSmileys[smile].base64;
-						fileRef.setAttribute("src", fullSmileyUrl);
-						fileRef.setAttribute("code", smile);
-						fileRef.setAttribute("alt", tabSmileys[smile].text_alt);
-						tabRef.appendChild(fileRef);
-						// http://stackoverflow.com/a/1750860/3872976
-						/** encode dict key, so {@link encodeSmileys} could parse smileys after encoding */
-						self.smileyDict[encodeHTML(smile)] = fileRef.outerHTML;
-					}
-				}
+			var tabSmileys = smileyData[tab];
+			for (var smile in tabSmileys) {
+				if (!tabSmileys.hasOwnProperty(smile)) continue;
+				var fileRef = document.createElement('IMG');
+				var fullSmileyUrl = "data:image/gif;base64," + tabSmileys[smile].base64;
+				fileRef.setAttribute("src", fullSmileyUrl);
+				fileRef.setAttribute("code", smile);
+				fileRef.setAttribute("alt", tabSmileys[smile].text_alt);
+				tabRef.appendChild(fileRef);
+				// http://stackoverflow.com/a/1750860/3872976
+				/** encode dict key, so {@link encodeSmileys} could parse smileys after encoding */
+				self.smileyDict[encodeHTML(smile)] = fileRef.outerHTML;
 			}
 		}
 		self.showTabByName(Object.keys(smileyData)[0]);
@@ -1092,10 +1086,9 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		self.dom.userList.innerHTML = '';
 		self.allUsers = users;
 		for (var userId in self.allUsers) {
-			if (self.allUsers.hasOwnProperty(userId)) {
-				var user = self.allUsers[userId];
-				self.addDomUserOnline(userId, user.sex,user.user);
-			}
+			if (!self.allUsers.hasOwnProperty(userId)) continue;
+			var user = self.allUsers[userId];
+			self.addDomUserOnline(userId, user.sex,user.user);
 		}
 	};
 	self.addDomUserOnline = function(userId, sex, username) {
@@ -1308,13 +1301,12 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		self.onlineUsers = message.content;
 		console.log(getDebugMessage("Load user names: {}", Object.keys(self.onlineUsers)));
 		for (var userId in self.allUsers) {
-			if (self.allUsers.hasOwnProperty(userId)) {
-				var user = self.allUsers[userId];
-				if (self.onlineUsers.indexOf(parseInt(userId)) >= 0) {
-					CssUtils.removeClass(user.li, 'offline');
-				} else {
-					CssUtils.addClass(user.li, 'offline');
-				}
+			if (!self.allUsers.hasOwnProperty(userId)) continue;
+			var user = self.allUsers[userId];
+			if (self.onlineUsers.indexOf(parseInt(userId)) >= 0) {
+				CssUtils.removeClass(user.li, 'offline');
+			} else {
+				CssUtils.addClass(user.li, 'offline');
 			}
 		}
 	};

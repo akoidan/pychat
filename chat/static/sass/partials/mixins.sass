@@ -21,6 +21,7 @@
 	background-image: -webkit-linear-gradient($begin 0%, $end 100%)
 	background-image: -moz-linear-gradient($begin 0%, $end 100%)
 	background-image: -o-linear-gradient($begin 0%, $end 100%)
+	background-image: -ms-linear-gradient($begin 0%, $end 100%)
 	background-image: linear-gradient($begin 0%, $end 100%)
 
 @mixin linear-double-gradient($f1, $f2, $s1, $s2)
@@ -28,6 +29,7 @@
 	background-image: -moz-linear-gradient($s1, $s2), -moz-linear-gradient($f1, $f2)
 	background-image: -o-linear-gradient($s1, $s2), -o-linear-gradient($f1, $f2)
 	background-image: linear-gradient($s1, $s2), linear-gradient($f1, $f2)
+	background-image: -ms-linear-gradient($s1, $s2), -ms-linear-gradient($f1, $f2)
 
 @mixin display-flex()
 	display: -ms-flexbox
