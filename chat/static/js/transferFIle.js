@@ -15,7 +15,7 @@ var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnecti
 function FileTransfer() {
 	var self = this;
 	self.localConnection = null;
-	self.remoteConnection = null;
+	self.sendChannel = null;
 	self.receiveChannel = null;
 	self.pcConstraint= null;
 	self.receiveBuffer = [];
@@ -44,22 +44,22 @@ function FileTransfer() {
 		self.localConnection = new RTCPeerConnection(servers, self.pcConstraint);
 		console.log(getDebugMessage('Created local peer connection object self.localConnection'));
 
-		self.remoteConnection = self.localConnection.createDataChannel('sendDataChannel');
-		self.remoteConnection.binaryType = 'arraybuffer';
+		self.sendChannel = self.localConnection.createDataChannel('sendDataChannel');
+		self.sendChannel.binaryType = 'arraybuffer';
 		console.log(getDebugMessage('Created send data channel'));
 
-		self.remoteConnection.onopen = self.remoteConnectionStateChange;
-		self.remoteConnection.onclose = self.remoteConnectionStateChange;
+		self.sendChannel.onopen = self.remoteConnectionStateChange;
+		self.sendChannel.onclose = self.remoteConnectionStateChange;
 		self.localConnection.onicecandidate = self.iceCallback1;
 
 		self.localConnection.createOffer().then(
 				self.gotDescription1,
 				self.onCreateSessionDescriptionError
 		);
-		// Add self.remoteConnection to global scope to make it visible
+		// Add self.sendChannel to global scope to make it visible
 		// from the browser console.
 		self.remoteConnection = new RTCPeerConnection(servers, self.pcConstraint);
-		console.log(getDebugMessage('Created remote peer connection object self.remoteConnection'));
+		console.log(getDebugMessage('Created remote peer connection object self.sendChannel'));
 
 		self.remoteConnection.onicecandidate = self.iceCallback2;
 		self.remoteConnection.ondatachannel = self.receiveChannelCallback;
@@ -93,7 +93,7 @@ function FileTransfer() {
 		var reader = new window.FileReader();
 		reader.onload = (function () {
 			return function (e) {
-				self.remoteConnection.send(e.target.result);
+				self.sendChannel.send(e.target.result);
 				if (self.file.size > offset + e.target.result.byteLength) {
 					window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
 				}
@@ -106,16 +106,16 @@ function FileTransfer() {
 
 	self.closeDataChannels = function() {
 		console.log(getDebugMessage('Closing data channels'));
-		self.remoteConnection.close();
-		console.log(getDebugMessage('Closed data channel with label: ' + self.remoteConnection.label));
+		self.sendChannel.close();
+		console.log(getDebugMessage('Closed data channel with label: ' + self.sendChannel.label));
 		if (self.receiveChannel)  {
 			self.receiveChannel.close();
 			console.log(getDebugMessage('Closed data channel with label: ' + self.receiveChannel.label));
 		}
 		self.localConnection.close();
-		self.remoteConnection.close();
+		self.sendChannel.close();
 		self.localConnection = null;
-		self.remoteConnection = null;
+		self.sendChannel = null;
 		console.log(getDebugMessage('Closed peer connections'));
 
 		// re-enable the file select
@@ -125,23 +125,23 @@ function FileTransfer() {
 	self.gotDescription1 = function(desc) {
 		self.localConnection.setLocalDescription(desc);
 		console.log(getDebugMessage('Offer from self.localConnection \n' + desc.sdp));
-		self.remoteConnection.setRemoteDescription(desc);
-		self.remoteConnection.createAnswer().then(
+		self.sendChannel.setRemoteDescription(desc);
+		self.sendChannel.createAnswer().then(
 				self.gotDescription2,
 				self.onCreateSessionDescriptionError
 		);
 	};
 
 	self.gotDescription2 = function(desc) {
-		self.remoteConnection.setLocalDescription(desc);
-		console.log(getDebugMessage('Answer from self.remoteConnection \n' + desc.sdp));
+		self.sendChannel.setLocalDescription(desc);
+		console.log(getDebugMessage('Answer from self.sendChannel \n' + desc.sdp));
 		self.localConnection.setRemoteDescription(desc);
 	};
 
 	self.iceCallback1 = function(event) {
 		console.log(getDebugMessage('local ice callback'));
 		if (event.candidate) {
-			self.remoteConnection.addIceCandidate(
+			self.sendChannel.addIceCandidate(
 					event.candidate
 			).then(
 					self.onAddIceCandidateSuccess,
@@ -224,7 +224,7 @@ function FileTransfer() {
 	};
 
 	self.remoteConnectionStateChange = function() {
-		var readyState = self.remoteConnection.readyState;
+		var readyState = self.sendChannel;
 		console.log(getDebugMessage('Send channel state is: ' + readyState));
 		if (readyState === 'open') {
 			self.sendData();
@@ -288,10 +288,10 @@ function FileTransfer() {
 					bitrate + ' kbits/sec';
 		};
 	self.displayStats = function() {
-		if (self.remoteConnection &&
-				self.remoteConnection.iceConnectionState === 'connected') {
+		if (self.sendChannel &&
+				self.sendChannel.iceConnectionState === 'connected') {
 			if (!isFirefox) {
-				self.remoteConnection.getStats(self.getChromeStats);
+				self.sendChannel.getStats(self.getChromeStats);
 			} else {
 				self.getFirefoxStats();
 			}
