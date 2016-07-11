@@ -41,6 +41,7 @@ Start the chat:
 =======
 
 # TODO
+* Add delete/edit message option (skype alike)
 * View profile show wrong profile
 * Show online status right of Direct user's messages besides channels' online
 * password reset send once, confirmation email on email change, 
