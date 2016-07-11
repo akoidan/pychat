@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="./js/base.js"></script>
+	<script src="./js/transferFIle.js"></script>
+</head>
+<body>
+<section>
+	<form id="fileInfo">
+		<input type="file" id="fileInput" name="files">
+	</form>
+
+	<div class="progress">
+		<div class="label">Send progress:</div>
+		<progress id="sendProgress" max="0" value="0"></progress>
+	</div>
+
+	<div class="progress">
+		<div class="label">Receive progress:</div>
+		<progress id="receiveProgress" max="0" value="0"></progress>
+	</div>
+
+	<div id="bitrate"></div>
+	<a id="download"></a>
+	<span id="status"></span>
+
+</section>
+</body>
+</html>

@@ -1362,6 +1362,7 @@ function WebRtcApi() {
 		fsContainer: $('icon-webrtc-cont'),
 		callIcon: $('callIcon'),
 		callVolume: $('callVolume'),
+		microphoneLevel: $("microphoneLevel"),
 		fs: { /*FullScreen*/
 			video: $('fs-video'),
 			audio: $('fs-audio'),
@@ -1712,6 +1713,41 @@ function WebRtcApi() {
 		}
 		self.setVideo(self.getTrack(true) != null);
 		self.setAudio(self.getTrack(false) != null);
+		self.createMicrophoneLevelVoice(stream);
+	};
+	self.createMicrophoneLevelVoice = function(stream) {
+		try {
+			var AudioContextClass = isFirefox ? AudioContext : webkitAudioContext;
+			var audioContext = new AudioContextClass();
+			var analyser = audioContext.createAnalyser();
+			var microphone = audioContext.createMediaStreamSource(stream);
+			self.javascriptNode = audioContext./*createJavaScriptNode*/createScriptProcessor(2048, 1, 1);
+			analyser.smoothingTimeConstant = 0.3;
+			analyser.fftSize = 1024;
+			microphone.connect(analyser);
+			analyser.connect(self.javascriptNode);
+			self.javascriptNode.connect(audioContext.destination);
+			self.prevVolumeValues = 0;
+			self.volumeValuesCount = 0;
+			self.javascriptNode.onaudioprocess = function () {
+				var array = new Uint8Array(analyser.frequencyBinCount);
+				analyser.getByteFrequencyData(array);
+				var values = 0;
+				var length = array.length;
+				for (var i = 0; i < length; i++) {
+					values += array[i];
+				}
+				var value = values / length;
+				self.prevVolumeValues += value;
+				self.volumeValuesCount++;
+				if (self.volumeValuesCount == 300 && self.prevVolumeValues < 10) {
+					console.error(getDebugMessage('Microphone level is too low')); // TODO
+				}
+				self.dom.microphoneLevel.value = value;
+			}
+		} catch (err) {
+			console.error(getDebugMessage("Unable to use microphone level because " + err));
+		}
 	};
 	self.init = function() {
 		// if (typeof RTCPeerConnection  == 'undefined' && typeof mozRTCPeerConnection == 'undefined' && typeof webkitRTCPeerConnection == 'undefined') {
@@ -1765,6 +1801,10 @@ function WebRtcApi() {
 		self.setIconState(false);
 		growlInfo(text);
 		self.hidePhoneIcon();
+		if (self.javascriptNode) {
+			self.javascriptNode.onaudioprocess = null;
+			self.dom.microphoneLevel.value = 0;
+		}
 		self.exitFullScreen(); /*also executes removing event on exiting from fullscreen*/
 	};
 	self.hangUp = function() {

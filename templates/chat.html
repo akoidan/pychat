@@ -74,7 +74,10 @@
 						<i class="icon-phone-circled" id="callIcon" onclick="event.preventDefault(); webRtcApi.callPeople()"></i>
 {#						<img src="{% md5url 'images/call.gif' %}" alt="call" class="hidden" id="callRing"#}
 {#							 style="width: 30px"/>#}
-						<input type="range" id="callVolume" value="100"/>
+						<div class="volumeLevelsHolder">
+							<input type="range" id="callVolume" value="100" title="Volume level"/>
+							<progress id="microphoneLevel" max="200" title="Your microphone level" value="0"></progress>
+						</div>
 					</div>
 				</div>
 			</div>
