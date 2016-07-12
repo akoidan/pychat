@@ -12,9 +12,16 @@
 var isFirefox = false;
 var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
 
+var fileTransfer;
+onDocLoad(function() {
+	fileTransfer = new FileTransfer();
+});
+
+
 function FileTransfer() {
 	var self = this;
 	self.localConnection = null;
+	self.remoteConnection = null;
 	self.sendChannel = null;
 	self.receiveChannel = null;
 	self.pcConstraint= null;
@@ -35,7 +42,7 @@ function FileTransfer() {
 		statusMessage: $('status')
 	};
 	self.createConnection = function() {
-		self.file = self.dom.fileInput[0];
+		self.file = self.dom.fileInput.files[0];
 		var servers = null;
 		self.pcConstraint= null;
 
@@ -64,7 +71,7 @@ function FileTransfer() {
 		self.remoteConnection.onicecandidate = self.iceCallback2;
 		self.remoteConnection.ondatachannel = self.receiveChannelCallback;
 
-		self.dom.fileInputdisabled = true;
+		self.dom.fileInput.disabled = true;
 	};
 	self.dom.fileInput.addEventListener('change', self.createConnection, false);
 
@@ -80,7 +87,7 @@ function FileTransfer() {
 		self.dom.statusMessage.textContent = '';
 		self.dom.downloadAnchor.textContent = '';
 		if (self.file.size === 0) {
-			self.dom.bitrateDivinnerHTML = '';
+			self.dom.bitrateDiv.innerHTML = '';
 			self.dom.statusMessage.textContent = 'File is empty, please select a non-empty file';
 			self.closeDataChannels();
 			return;
@@ -113,35 +120,35 @@ function FileTransfer() {
 			console.log(getDebugMessage('Closed data channel with label: ' + self.receiveChannel.label));
 		}
 		self.localConnection.close();
-		self.sendChannel.close();
+		self.remoteConnection.close();
 		self.localConnection = null;
-		self.sendChannel = null;
+		self.remoteConnection = null;
 		console.log(getDebugMessage('Closed peer connections'));
 
 		// re-enable the file select
-		self.dom.fileInputdisabled = false;
+		self.dom.fileInput.disabled = false;
 	};
 
 	self.gotDescription1 = function(desc) {
 		self.localConnection.setLocalDescription(desc);
 		console.log(getDebugMessage('Offer from self.localConnection \n' + desc.sdp));
-		self.sendChannel.setRemoteDescription(desc);
-		self.sendChannel.createAnswer().then(
+		self.remoteConnection.setRemoteDescription(desc);
+		self.remoteConnection.createAnswer().then(
 				self.gotDescription2,
 				self.onCreateSessionDescriptionError
 		);
 	};
 
 	self.gotDescription2 = function(desc) {
-		self.sendChannel.setLocalDescription(desc);
-		console.log(getDebugMessage('Answer from self.sendChannel \n' + desc.sdp));
+		self.remoteConnection.setLocalDescription(desc);
+		console.log(getDebugMessage('Answer from remoteConnection \n' + desc.sdp));
 		self.localConnection.setRemoteDescription(desc);
 	};
 
 	self.iceCallback1 = function(event) {
 		console.log(getDebugMessage('local ice callback'));
 		if (event.candidate) {
-			self.sendChannel.addIceCandidate(
+			self.remoteConnection.addIceCandidate(
 					event.candidate
 			).then(
 					self.onAddIceCandidateSuccess,
@@ -211,7 +218,7 @@ function FileTransfer() {
 
 			var bitrate = Math.round(self.receivedSize * 8 /
 					((new Date()).getTime() - self.timestampStart));
-			self.dom.bitrateDivinnerHTML = '<strong>Average Bitrate:</strong> ' +
+			self.dom.bitrateDiv.innerHTML = '<strong>Average Bitrate:</strong> ' +
 					bitrate + ' kbits/sec (max: ' + self.bitrateMax + ' kbits/sec)';
 
 			if (self.statsInterval) {
@@ -224,12 +231,10 @@ function FileTransfer() {
 	};
 
 	self.remoteConnectionStateChange = function() {
-		var readyState = self.sendChannel;
+		var readyState = self.sendChannel.readyState;
 		console.log(getDebugMessage('Send channel state is: ' + readyState));
 		if (readyState === 'open') {
 			self.sendData();
-		} else {
-			console.error(getDebugMessage('Not opened yet'));
 		}
 	};
 
@@ -242,8 +247,6 @@ function FileTransfer() {
 			self.statsInterval = window.setInterval(self.displayStats, 500);
 			window.setTimeout(self.displayStats, 100);
 			window.setTimeout(self.displayStats, 300);
-		} else {
-			console.error(getDebugMessage('Not opened yet'));
 		}
 	};
 	self.getChromeStats = function (stats) {
@@ -284,14 +287,14 @@ function FileTransfer() {
 		}
 	};
 	self.display = function (bitrate) {
-			self.dom.bitrateDivinnerHTML = '<strong>Current Bitrate:</strong> ' +
+			self.dom.bitrateDiv.innerHTML = '<strong>Current Bitrate:</strong> ' +
 					bitrate + ' kbits/sec';
 		};
 	self.displayStats = function() {
-		if (self.sendChannel &&
-				self.sendChannel.iceConnectionState === 'connected') {
+		if (self.remoteConnection &&
+				self.remoteConnection.iceConnectionState === 'connected') {
 			if (!isFirefox) {
-				self.sendChannel.getStats(self.getChromeStats);
+				self.remoteConnection.getStats(self.getChromeStats);
 			} else {
 				self.getFirefoxStats();
 			}
@@ -299,8 +302,3 @@ function FileTransfer() {
 	}
 
 }
-var fileTransfer;
-onDocLoad(function() {
-	fileTransfer = new FileTransfer();
-});
-
