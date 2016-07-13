@@ -15,6 +15,7 @@
 		var notifications = {{ notifications |yesno:"true,false" }};
 	</script>
 	<script src="{% md5url "js/smileys_data.js" %}"></script>
+	<script src="{% md5url "js/transferFile.js" %}"></script>
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}
@@ -53,6 +54,26 @@
 	<div id="wrapper" class="max-height-scrollable hidden">
 		<div id="chatBoxHolder" class="max-height-scrollable">
 			<div id="callContainer" class="hidden">
+				<section>
+					<form id="fileInfo">
+						<input type="file" id="fileInput" name="files">
+					</form>
+
+					<div class="progress">
+						<div class="label">Send progress:</div>
+						<progress id="sendProgress" max="0" value="0"></progress>
+					</div>
+
+					<div class="progress">
+						<div class="label">Receive progress:</div>
+						<progress id="receiveProgress" max="0" value="0"></progress>
+					</div>
+
+					<div id="bitrate"></div>
+					<a id="download"></a>
+					<span id="status"></span>
+
+				</section>
 				<div id="callContainerContent">
 					<div id='videoContainer'>
 						<video id="remoteVideo" autoplay></video>

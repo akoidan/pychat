@@ -41,10 +41,17 @@ function FileTransfer() {
 		receiveProgress: $('receiveProgress'),
 		statusMessage: $('status')
 	};
+	self.sendTransferFileEvent = function(content, type) {
+		wsHandler.sendToServer({
+			content: content,
+			action: 'file',
+			type: type,
+			channel: 'r3' // TODO
+		});
+	};
 	self.createConnection = function() {
-		self.file = self.dom.fileInput.files[0];
 		var servers = null;
-		self.pcConstraint= null;
+		self.pcConstraint = null;
 
 		// Add self.localConnection to global scope to make it visible
 		// from the browser console.
@@ -73,8 +80,31 @@ function FileTransfer() {
 
 		self.dom.fileInput.disabled = true;
 	};
-	self.dom.fileInput.addEventListener('change', self.createConnection, false);
-
+	self.handle = function (data) {
+		self["on"+data.type](data);
+	};
+	self.transferFile = function () {
+		self.file = self.dom.fileInput.files[0];
+		self.sendTransferFileEvent(
+				{
+					name: self.file.name,
+					size: self.file.size
+				},
+				'offer');
+	};
+	self.reply = function () {
+		self.sendTransferFileEvent(null, 'accept');
+	};
+	self.onaccept = function () {
+		//self.createConnection();
+		growlInfo("File is being transfered");
+	};
+	self.dom.fileInput.addEventListener('change', self.transferFile, false);
+	self.onoffer = function(message) {
+		var growl = new Growl("<div><a onclick='fileTransfer.reply()'>Accept file</a> {}, size: {} from user {} </div>".
+			format(encodeHTML(message.content.name), parseInt(message.content.size), encodeHTML(message.user)));
+		growl.show(100000, 'col-info');
+	};
 	self.onCreateSessionDescriptionError = function(error) {
 		console.log(getDebugMessage('Failed to create session description: ' + error.toString()));
 	};

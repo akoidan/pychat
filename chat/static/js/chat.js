@@ -1881,6 +1881,7 @@ function WsHandler() {
 		channels: channelsHandler,
 		chat: channelsHandler,
 		webrtc: webRtcApi,
+		file: fileTransfer,
 		growl: {
 			handle: function (message) {
 				growlError(message.content);

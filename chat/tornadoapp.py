@@ -48,6 +48,7 @@ class Actions:
 	SEND_MESSAGE = 'sendMessage'
 	PRINT_MESSAGE = 'printMessage'
 	CALL = 'call'
+	FILE = 'file'
 	ROOMS = 'setRooms'
 	REFRESH_USER = 'setOnlineUsers'
 	GROWL_MESSAGE = 'growl'
@@ -62,7 +63,7 @@ class Actions:
 class VarNames:
 	CALL_TYPE = 'type'
 	USER = 'user'
-	USER_ID =  'userId'
+	USER_ID = 'userId'
 	TIME = 'time'
 	CONTENT = 'content'
 	IMG = 'image'
@@ -83,6 +84,7 @@ class VarNames:
 
 class CallType:
 	OFFER = 'offer'
+	FILE = 'offer'
 
 
 class HandlerNames:
@@ -91,6 +93,7 @@ class HandlerNames:
 	CHAT = 'chat'
 	GROWL = 'growl'
 	WEBRTC = 'webrtc'
+	FILE = 'file'
 
 
 class RedisPrefix:
@@ -266,6 +269,7 @@ class MessagesHandler(MessagesCreator):
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
 			Actions.CALL: self.process_call,
+			Actions.FILE: self.process_call,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
 			Actions.DELETE_ROOM: self.delete_channel,
 			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
@@ -276,7 +280,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
 			Actions.INVITE_USER: self.send_client_new_channel,
-			Actions.CALL: self.set_opponent_call_channel
+			Actions.CALL: self.set_opponent_call_channel,
+			Actions.FILE: self.set_opponent_call_channel
 		}
 
 	@tornado.gen.engine
@@ -421,6 +426,9 @@ class MessagesHandler(MessagesCreator):
 			self.call_receiver_channel = RedisPrefix.generate_user(user.user_id)
 			set_opponent_channel = True
 			out_message[VarNames.CHANNEL] = to_channel
+		# TODO
+		if in_message[VarNames.EVENT] == Actions.FILE :
+			out_message[HandlerNames.NAME] = HandlerNames.FILE
 		self.logger.info('!! Offering a call to user with id %s',  self.call_receiver_channel)
 		self.publish(out_message, self.call_receiver_channel, set_opponent_channel)
 
