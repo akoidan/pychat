@@ -61,6 +61,12 @@ window.browserVersion = (function () {
 	return M.join(' ');
 })();
 
+var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
+var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
+if (isFirefox) {
+	RTCSessionDescription = mozRTCSessionDescription;
+	RTCIceCandidate = mozRTCIceCandidate;
+}
 
 function getUrlParam(name, url) {
 	if (!url) url = window.location.href;
@@ -550,6 +556,10 @@ function getDebugMessage() {
 
 window.onerror = function (msg, url, linenumber) {
 	var message = 'Error occurred in {}:{}\n{}'.format(url, linenumber, msg);
-	growlError(message);
+	if (growlHolder) {
+		growlError(message);
+	} else {
+		alert(message);
+	}
 	return false;
 };

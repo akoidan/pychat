@@ -16,11 +16,6 @@ const GENDER_ICONS = {
 var smileRegex = /<img[^>]*code="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
-if (isFirefox) {
-	RTCSessionDescription = mozRTCSessionDescription;
-	RTCIceCandidate = mozRTCIceCandidate;
-}
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
 var newMessagesCount = 0;
@@ -1785,7 +1780,6 @@ function WebRtcApi() {
 		// 	growlError(getText("Unfortunately {} doesn't support webrtc. Video/audio call is unuvailable", browserVersion));
 		// 	return;
 		// }
-		var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
 		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
 		self.pc.oniceconnectionstatechange = self.oniceconnectionstatechange;
 		self.pc.onaddstream = function (event) {
