@@ -15,6 +15,7 @@
 		var notifications = {{ notifications |yesno:"true,false" }};
 	</script>
 	<script src="{% md5url "js/smileys_data.js" %}"></script>
+	<script src="{% md5url "js/md5.js" %}"></script>
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}
@@ -54,8 +55,8 @@
 		<div id="chatBoxHolder" class="max-height-scrollable">
 			<div id="callContainer" class="hidden">
 				<section>
-					<form id="fileInfo">
-						<input type="file" id="fileInput" name="files">
+					<form id="fileInfo" class="hidden">
+						<input type="file" id="webRtcFileInput" name="files">
 					</form>
 
 					<div class="progress">
@@ -80,6 +81,7 @@
 						</div>
 					</div>
 					<div class="callContainerIcons noSelection">
+						<i class="icon-doc-inv" id="webRtcFileIcon"></i>
 						<i id="audioStatusIcon" class="icon-mic"></i>
 						<i id="videoStatusIcon" class="icon-videocam"></i>
 						<div id="enterFullScreenHolder">

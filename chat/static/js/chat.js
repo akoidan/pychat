@@ -1399,7 +1399,7 @@ function WebRtcApi() {
 		},
 		// transfer file dome
 		bitrateDiv: $('bitrate'),
-		fileInput: $('fileInput'),
+		fileInput: $('webRtcFileInput'),
 		downloadAnchor: $('download'),
 		transmitProgress: $('transmitProgress'),
 		statusMessage: $('status')
@@ -1429,6 +1429,9 @@ function WebRtcApi() {
 		self.dom.fs.hangup.onclick = self.hangUp;
 		self.dom.fs.audio.onclick = self.toggleMic;
 		self.dom.audioStatusIcon.onclick = self.toggleMic;
+		$('webRtcFileIcon').onclick = function() {
+			self.dom.fileInput.click();
+		};
 		self.dom.fileInput.addEventListener('change', self.transferFile, false);
 		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
 		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
@@ -1657,21 +1660,36 @@ function WebRtcApi() {
 			callback();
 		}
 	};
-	self.transferFile = function () {
-		self.file = self.dom.fileInput.files[0];
-		self.dom.fileInput.disabled = true;
-		self.setOpponentVariables();
+	self.sendFileOffer = function (md5) {
 		self.sendBaseEvent(
 				{
 					name: self.file.name,
-					size: self.file.size
+					size: self.file.size,
+					md5: md5
 				},
 				'offer');
 		self.isForTransferFile = true;
 		self.waitForAnswer();
 	};
+	self.transferFile = function () {
+		self.file = self.dom.fileInput.files[0];
+		//self.dom.fileInput.disabled = true;
+		self.setOpponentVariables();
+		if (self.file.size < 10000000/*10MB*/) {
+			var reader = new FileReader();
+			reader.onload = function (event) {
+				var binary = event.target.result;
+				var md5 = CryptoJS.MD5(binary).toString();
+				self.sendFileOffer(md5);
+			};
+			reader.readAsBinaryString(self.file);
+		} else {
+			self.sendFileOffer(null);
+		}
+	};
 	self.onFileOffer = function (message) {
 		self.receivedFileSize = parseInt(message.content.size);
+		self.receivedMD5 = message.content.md5;
 		self.dom.transmitProgress.max = self.receivedFileSize;
 		self.receivedFileName  = message.content.name;
 		self.lastGrowl = new Growl("<div>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>".
@@ -1974,20 +1992,41 @@ function WebRtcApi() {
 		}
 	};
 	self.concatenateFile = function () {
+		console.log(getDebugMessage('Finished receiving file{}, verifying md5...', self.receivedFileName));
 		var received = new window.Blob(self.receiveBuffer);
+		received.name = self.receivedFileName;
+		received.lastModifiedDate = new Date();
+		if (self.receivedMD5 != null) {
+			var reader = new FileReader();
+			reader.onload = function (event) {
+				var binary = event.target.result;
+				var md5 = CryptoJS.MD5(binary).toString();
+				if (md5 !== self.receivedMD5) {
+					var message = "Error verifying md5 for {}, expected {}, got {}".format(self.receivedFileName, self.receivedMD5, md5);
+					growlError(message);
+					console.warn(getDebugMessage(message));
+				} else {
+					var message2 = "File {} is received. Open dialog to download it".format(self.receivedFileName);
+					growlInfo(message2);
+					console.info(getDebugMessage(message2));
+				}
+			};
+			reader.readAsBinaryString(received);
+		} else {
+			var message2 = "File {} is received. Since huge size (over 10MB) checksum verification is skipped. Open dialog to download it".format(self.receivedFileName);
+			growlInfo(message2);
+			console.info(getDebugMessage(message2));
+		}
 		self.receiveBuffer = [];
-
 		self.dom.downloadAnchor.href = URL.createObjectURL(received);
 		self.dom.downloadAnchor.download = self.receivedFileName;
-		self.dom.downloadAnchor.textContent = 'Click to download {} {}'.format(self.receivedFileName, self.receivedFileSize);
+		self.dom.downloadAnchor.textContent = 'Click to save {}'.format(self.receivedFileName);
 		self.dom.downloadAnchor.style.display = 'block';
 
 		var bitrate = Math.round(self.receivedSize * 8 /
 				((new Date()).getTime() - self.timestampStart));
 		self.dom.bitrateDiv.innerHTML = '<strong>Average Bitrate:</strong> ' +
 				bitrate + ' kbits/sec (max: ' + self.bitrateMax + ' kbits/sec)';
-
-
 	};
 	self.closeDataChannels = function() {
 		console.log(getDebugMessage('Closing data channels'));
@@ -1995,7 +2034,7 @@ function WebRtcApi() {
 		console.log(getDebugMessage('Closed data channel with label: ' + self.sendChannel.label));
 		self.pc.close();
 		// re-enable the file select
-		self.dom.fileInput.disabled = false;
+		// self.dom.fileInput.disabled = false;
 	};
 	self.connectWebRtc = function () {
 		try {
