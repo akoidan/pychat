@@ -489,20 +489,46 @@ function ChannelsHandler() {
 	};
 	self.handleFileSelect = function (evt) {
 		var files = evt.target.files;
-		var file = files[0];
-		if (files && file) {
+		self.readDataAndSend(files[0]);
+		self.dom.imgInput.value = "";
+	};
+	self.readDataAndSend = function (file) {
+		if (!file) {
+			growlError("Context contains no files");
+		} else if (file.type.indexOf("image") < 0) {
+			growlError("<span>Invalid image type <b>{}</b></span>".format(encodeHTML(file.type)));
+		} else {
+			var fileName = file.name ? file.name : '';
+			growlInfo("<span>Sending file <b>{}</b> ({}) to server</span>".format(fileName, bytesToSize(file.size)));
 			var reader = new FileReader();
-			reader.onload = function (readerEvt) {
-				var binaryString = readerEvt.target.result;
-				self.sendMessage({
-					image: "data:{};base64,{}".format(file.type, btoa(binaryString)),
-					content: null,
-					action: 'sendMessage',
-					channel: self.activeChannel
-				});
-				self.dom.imgInput.value = "";
-			};
-			reader.readAsBinaryString(file);
+			reader.onload = self.sendImageToServer;
+			reader.readAsDataURL(file);
+		}
+	};
+	self.sendImageToServer = function (event) {
+		self.sendMessage({
+			image: event.target.result,
+			content: null,
+			action: 'sendMessage',
+			channel: self.activeChannel
+		});
+	};
+	self.preventDefault = function(e) {
+		e.preventDefault();
+	};
+	self.imageDrop = function(evt) {
+		self.preventDefault(evt);
+		self.readDataAndSend(evt.dataTransfer.files[0]);
+	};
+	self.imagePaste = function(e) {
+		if (e.clipboardData) {
+			var items = e.clipboardData.items;
+			if (items) {
+				for (var i = 0; i < items.length; i++) {
+					self.readDataAndSend(items[i].getAsFile());
+				}
+				self.preventDefault(e);
+			}
 		}
 	};
 	self.checkAndSendMessage = function (event) {
@@ -657,7 +683,11 @@ function ChannelsHandler() {
 		li.appendChild(i);
 		var roomKey = self.generateRoomKey(roomId);
 		li.setAttribute(self.ROOM_ID_ATTR, roomId);
-		self.channels[roomKey] = new ChatHandler(li, users, roomId, roomName);
+		var chatBoxDiv = document.createElement('div');
+		chatBoxDiv.onpaste = self.imagePaste;
+		chatBoxDiv.ondrop = self.imageDrop;
+		chatBoxDiv.ondragover = self.preventDefault;
+		self.channels[roomKey] = new ChatHandler(li, chatBoxDiv, users, roomId, roomName);
 	};
 	self.createNewUserChatHandler = function(roomId, users) {
 		var allUsersIds = Object.keys(users);
@@ -831,42 +861,44 @@ function ChannelsHandler() {
 }
 
 function showHelp() {
-	if (suggestions) {
-		var infoMessages = [
-			"<span>Every time you join chat those help messages will be shown to you. " +
-			"You can disable them in you profile settings (<i class='icon-wrench'></i> icon). Simply click on popup to hide them</span>",
-			"<span>Browser will notify you on incoming message every time when chat tab is not active. " +
-			"You can disable this option in your profile(<i class='icon-wrench'></i> icon).</span>",
-			"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon." +
-			" To delete created room hover mouse on its name and click on <i class='icon-cancel-circled-outline'></i> icon.</span>",
-			"<span>You can make an audio/video call. Currently pychat allows calling only one person." +
-			" To call someone you need to create ( <i class='icon-plus-squared'></i>) and join direct message," +
-			" open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> </span>",
-			"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
-			"<span>You can write multiline message by pressing <b>shift+Enter</b></span>",
-			"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon. To close appeared smile container click outside of it or press <b>Esc</b></span>",
-			"You can comment somebody's message. This will be shown to all users in current channel. Just click on message time" +
-			"and it's content appears in message text",
-			"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
-			"suggestion there</span>",
-			"<span>Chat uses your browser cache to store messages. To clear current cache click on " +
-			"<i class='icon-clear'></i> icon on the top menu</span>",
-			"<span>You can view offline users in current channel by clicking on <b>CHANNEL ONLINE</b> text</span>",
-			"<span>You can invite a new user to current room by clicking on <i class='icon-user-plus'></i> icon</span>",
-			"You can load history of current channel. For this you need to focus place with messages by simply" +
-			" clicking on it and press arrow up/page up or just scroll up with mousewheel",
-			"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>"
-		];
-		var index = localStorage.getItem('HelpIndex');
-		if (index == null) {
-			index = 0;
-		} else {
-			index = parseInt(index);
-		}
-		if (index < infoMessages.length) {
-			growlInfo(infoMessages[index]);
-			localStorage.setItem('HelpIndex', index + 1);
-		}
+	if (!suggestions) {
+		return
+	}
+	var infoMessages = [
+		"<span>Every time you join chat those help messages will be shown to you. " +
+		"You can disable them in you profile settings (<i class='icon-wrench'></i> icon). Simply click on popup to hide them</span>",
+		"<span>Browser will notify you on incoming message every time when chat tab is not active. " +
+		"You can disable this option in your profile(<i class='icon-wrench'></i> icon).</span>",
+		"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon." +
+		" To delete created room hover mouse on its name and click on <i class='icon-cancel-circled-outline'></i> icon.</span>",
+		"<span>You can make an audio/video call. Currently pychat allows calling only one person." +
+		" To call someone you need to create ( <i class='icon-plus-squared'></i>) and join direct message," +
+		" open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> </span>",
+		"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
+		"<span>You can write multiline message by pressing <b>shift+Enter</b></span>",
+		"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon. To close appeared smile container click outside of it or press <b>Esc</b></span>",
+		"You can comment somebody's message. This will be shown to all users in current channel. Just click on message time" +
+		"and it's content appears in message text",
+		"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
+		"suggestion there</span>",
+		"<span>Chat uses your browser cache to store messages. To clear current cache click on " +
+		"<i class='icon-clear'></i> icon on the top menu</span>",
+		"<span>You can view offline users in current channel by clicking on <b>CHANNEL ONLINE</b> text</span>",
+		"<span>You can invite a new user to current room by clicking on <i class='icon-user-plus'></i> icon</span>",
+		"You can load history of current channel. For this you need to focus place with messages by simply" +
+		" clicking on it and press arrow up/page up or just scroll up with mousewheel",
+		"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>",
+		"<span>To paste image from clipboard: focus box with messages (by clicking on it) and press <B>Ctrl + V</b></span>"
+	];
+	var index = localStorage.getItem('HelpIndex');
+	if (index == null) {
+		index = 0;
+	} else {
+		index = parseInt(index);
+	}
+	if (index < infoMessages.length) {
+		growlInfo(infoMessages[index]);
+		localStorage.setItem('HelpIndex', index + 1);
 	}
 }
 
@@ -990,13 +1022,13 @@ function timeMessageClick(event) {
 	userMessage.focus();
 }
 
-function ChatHandler(li, allUsers, roomId, roomName) {
+function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	var self = this;
 	self.roomId = roomId;
 	self.channel = 'r'+roomId;
 	self.roomName = roomName;
 	self.dom = {
-		chatBoxDiv: document.createElement('div'),
+		chatBoxDiv: chatboxDiv,
 		userList: document.createElement('ul'),
 		roomNameLi: li,
 		newMessages: document.createElement('span'),
@@ -1717,8 +1749,7 @@ function WebRtcApi() {
 	};
 	self.createMicrophoneLevelVoice = function(stream) {
 		try {
-			var AudioContextClass = isFirefox ? AudioContext : webkitAudioContext;
-			var audioContext = new AudioContextClass();
+			var audioContext = new AudioContext();
 			var analyser = audioContext.createAnalyser();
 			var microphone = audioContext.createMediaStreamSource(stream);
 			self.javascriptNode = audioContext./*createJavaScriptNode*/createScriptProcessor(2048, 1, 1);
