@@ -315,7 +315,6 @@ function PageHandler() {
 		// TODO remove triple, carefull of undefined tittle in ViewProfilePage
 		window.history.pushState(historyUrl, historyUrl, historyUrl);
 	};
-	self.generatePageUrl
 	self.showPage = function (page, params, dontHistory) {
 		console.log(getDebugMessage('Rendering page "{}"', page));
 		if (self.currentPage) self.currentPage.hide();
@@ -489,7 +488,7 @@ function ChannelsHandler() {
 	};
 	self.readDataAndSend = function (file) {
 		if (!file) {
-			growlError("Context contains no files");
+			console.warn(getDebugMessage("Context contains no files"));
 		} else if (file.type.indexOf("image") < 0) {
 			growlError("<span>Invalid image type <b>{}</b></span>".format(encodeHTML(file.type)));
 		} else {
@@ -817,7 +816,6 @@ function ChannelsHandler() {
 	self.m2Call = function () {
 		growlError("<span>This function is not implemented yet. Use <i class='icon-phone'></i> " +
 				"icon in <b style='font-size: 13px'>DIRECT MESSAGES</b> to make a call</span>");
-		// TODO
 	};
 	self.call = function() {
 		if (self.getActiveUsername() != loggedUser) {
@@ -1005,7 +1003,7 @@ function changeTittleFunction(e) {
 		case "blur":
 			isCurrentTabActive = false;
 	}
-	console.log(getDebugMessage('Windows is {}', isCurrentTabActive ? 'active': 'unactive'))
+	//console.log(getDebugMessage('Windows is {}', isCurrentTabActive ? 'active': 'unactive'))
 }
 
 
@@ -1374,6 +1372,8 @@ function vibrate() {
 function WebRtcApi() {
 	var self = this;
 	self.activeUserClass = "active-call-user";
+	self.isForTransferFile = false;
+	self.CHUNK_SIZE = 16384;
 	self.dom = {
 		callContainer : $('callContainer'),
 		callAnswerParent : $('callAnswerParent'),
@@ -1396,8 +1396,24 @@ function WebRtcApi() {
 			hangup: $('fs-hangup'),
 			minimize: $('fs-minimize'),
 			enterFullScreen: $('enterFullScreen')
-		}
+		},
+		// transfer file dome
+		bitrateDiv: $('bitrate'),
+		fileInput: $('fileInput'),
+		downloadAnchor: $('download'),
+		transmitProgress: $('transmitProgress'),
+		statusMessage: $('status')
+		// transfer file dome
 	};
+	//file transfer  variables
+	self.receiveBuffer = [];
+	self.receivedSize = 0;
+	self.bytesPrev = 0;
+	self.timestampPrev = 0;
+	self.timestampStart = null;
+	self.statsInterval = null;
+	self.bitrateMax = 0;
+	//file transfer  variables
 	self.onExitFullScreen = function () {
 		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
 			CssUtils.removeClass(self.dom.videoContainer, 'fullscreen');
@@ -1413,6 +1429,7 @@ function WebRtcApi() {
 		self.dom.fs.hangup.onclick = self.hangUp;
 		self.dom.fs.audio.onclick = self.toggleMic;
 		self.dom.audioStatusIcon.onclick = self.toggleMic;
+		self.dom.fileInput.addEventListener('change', self.transferFile, false);
 		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
 		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
 			document.addEventListener(fullScreenChangeEvents[i], self.onExitFullScreen, false);
@@ -1557,10 +1574,20 @@ function WebRtcApi() {
 		}
 	};
 	self.onoffer = function (message) {
-		self.clearTimeout();
+		if (message.content) {
+			self.onFileOffer(message);
+		} else {
+			self.onCallOffer(message);
+		}
+	};
+	self.setAnswerOpponentVariables = function(message){
 		self.receiverName = message.user;
 		self.receiverId = message.userId;
 		self.channel = message.channel;
+	} ;
+	self.onCallOffer = function(message) {
+		self.clearTimeout();
+		self.setAnswerOpponentVariables(message);
 		self.sendBaseEvent(null, "reply");
 		checkAndPlay(self.dom.callSound);
 		CssUtils.showElement(self.dom.callAnswerParent);
@@ -1630,25 +1657,61 @@ function WebRtcApi() {
 			callback();
 		}
 	};
-	self.callPeople = function () {
+	self.transferFile = function () {
+		self.file = self.dom.fileInput.files[0];
+		self.dom.fileInput.disabled = true;
+		self.setOpponentVariables();
+		self.sendBaseEvent(
+				{
+					name: self.file.name,
+					size: self.file.size
+				},
+				'offer');
+		self.isForTransferFile = true;
+		self.waitForAnswer();
+	};
+	self.onFileOffer = function (message) {
+		self.receivedFileSize = parseInt(message.content.size);
+		self.dom.transmitProgress.max = self.receivedFileSize;
+		self.receivedFileName  = message.content.name;
+		self.lastGrowl = new Growl("<div>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>".
+			format(encodeHTML(self.receivedFileName), bytesToSize(self.receivedFileSize), encodeHTML(message.user)));
+		self.lastGrowl.show(3600000, 'col-info');
+		self.lastGrowl.growl.addEventListener('click', self.acceptFileReply);
+		self.setAnswerOpponentVariables(message);
+	};
+	self.acceptFileReply = function () {
+		self.init();
+		self.connectWebRtc();
+		self.lastGrowl.growl.removeEventListener('click', self.acceptFileReply);
+		self.lastGrowl.hide();
+
+	};
+	self.setOpponentVariables = function () {
 		var activeChannel = channelsHandler.getActiveChannel();
 		if (!(Object.keys(activeChannel.onlineUsers).length > 1)) {
-			growlError("<span>Can't make a call, user <b>{}</b> is not online.</span>".format(
+			growlError("<span>Can't establish a connection, user <b>{}</b> is not online.</span>".format(
 					activeChannel.getUserNameById(activeChannel.getOpponentId())));
 			return;
 		}
 		self.receiverId = activeChannel.getOpponentId();
 		self.receiverName = activeChannel.getUserNameById(self.receiverId);
-		self.channel = channelsHandler.activeChannel;
+		self.channel = channelsHandler.activeChannel
+	};
+	self.callPeople = function () {
+		self.isForTransferFile = false;
+		self.setOpponentVariables();
 		self.setHeaderText("Confirm browser to use your input devices for call");
 		self.waitForAnswer();
-		self.captureInput(function(stream) {
-			self.setIconState(true);
-			self.setHeaderText("Establishing connection with {}".format(self.receiverName));
-			self.attachLocalStream(stream);
-			self.sendBaseEvent(null, 'offer');
-			self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime);
-		});
+		self.captureInput(self.captureInputStream);
+
+	};
+	self.captureInputStream = function(stream) {
+		self.setIconState(true);
+		self.setHeaderText("Establishing connection with {}".format(self.receiverName));
+		self.attachLocalStream(stream);
+		self.sendBaseEvent(null, 'offer');
+		self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime);
 	};
 	self.createCallAfterCapture = function(stream) {
 		self.init();
@@ -1665,12 +1728,47 @@ function WebRtcApi() {
 	self.print = function (message){
 		console.log(getDebugMessage("Call message {}", JSON.stringify(message)));
 	};
-	self.gotReceiveChannel = function (event) { /* TODO is it used ? */
+	self.gotReceiveChannel = function (event) {
 		console.log(getDebugMessage('Received Channel Callback'));
 		self.sendChannel = event.channel;
-		self.sendChannel.onmessage = self.print;
-		self.sendChannel.onopen = self.print;
-		self.sendChannel.onclose = self.print;
+		// self.sendChannel.onmessage = self.print;
+		self.sendChannel.onopen = self.channelOpen;
+		//self.sendChannel.onclose = self.print;
+	};
+	self.channelOpen = function () {
+		if (self.isForTransferFile) {
+			self.sendData();
+		}
+	};
+	self.sendData = function() {
+		console.log(getDebugMessage('file is ' + [self.file.name, self.file.size, self.file.type,
+					self.file.lastModifiedDate].join(' ')));
+
+		// Handle 0 size files.
+		self.dom.statusMessage.textContent = '';
+		self.dom.downloadAnchor.textContent = '';
+		if (self.file.size === 0) {
+			self.dom.bitrateDiv.innerHTML = '';
+			self.dom.statusMessage.textContent = 'File is empty, please select a non-empty file';
+			self.closeDataChannels();
+			return;
+		}
+		self.dom.transmitProgress.max = self.file.size;
+		self.sliceFile(0);
+	};
+	self.sliceFile = function (offset) {
+		var reader = new window.FileReader();
+		reader.onload = (function () {
+			return function (e) {
+				self.sendChannel.send(e.target.result);
+				if (self.file.size > offset + e.target.result.byteLength) {
+					window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
+				}
+				self.dom.transmitProgress.value = offset + e.target.result.byteLength;
+			};
+		})(self.file);
+		var slice = self.file.slice(offset, offset + self.CHUNK_SIZE);
+		reader.readAsArrayBuffer(slice);
 	};
 	self.waitForAnswer = function () {
 		self.init();
@@ -1756,6 +1854,9 @@ function WebRtcApi() {
 			self.prevVolumeValues = 0;
 			self.volumeValuesCount = 0;
 			self.javascriptNode.onaudioprocess = function () {
+				if (!self.constraints.audio) {
+					return;
+				}
 				var array = new Uint8Array(analyser.frequencyBinCount);
 				analyser.getByteFrequencyData(array);
 				var values = 0;
@@ -1766,14 +1867,18 @@ function WebRtcApi() {
 				var value = values / length;
 				self.prevVolumeValues += value;
 				self.volumeValuesCount++;
-				if (self.volumeValuesCount == 300 && self.prevVolumeValues < 10) {
-					console.error(getDebugMessage('Microphone level is too low')); // TODO
+				if (self.volumeValuesCount == 100 && self.prevVolumeValues == 0) {
+					self.showNoMicError();
 				}
 				self.dom.microphoneLevel.value = value;
 			}
 		} catch (err) {
 			console.error(getDebugMessage("Unable to use microphone level because " + err));
 		}
+	};
+	self.showNoMicError = function () {
+		var url = isChrome ? 'chrome://settings/content' : 'Your browser settings';
+		growlError('<div>Unable to capture input from microphone. Check your microphone connection or navigate to <b>{}</b> and check your microphone section there</div>'.format(url));
 	};
 	self.init = function() {
 		// if (typeof RTCPeerConnection  == 'undefined' && typeof mozRTCPeerConnection == 'undefined' && typeof webkitRTCPeerConnection == 'undefined') {
@@ -1850,13 +1955,53 @@ function WebRtcApi() {
 			singlePage.showDefaultPage();
 		}
 	};
+	self.webrtcDirectMessage = function (event) {
+		// console.log(getDebugMessage('Received Message ' + event.data.byteLength));
+		self.receiveBuffer.push(event.data);
+		self.receivedSize += event.data.byteLength;
+
+		self.dom.transmitProgress.value = self.receivedSize;
+
+		// we are assuming that our signaling protocol told
+		// about the expected file size (and name, hash, etc).
+		if (self.receivedSize === self.receivedFileSize) {
+			self.concatenateFile();
+			self.closeDataChannels();
+			if (self.statsInterval) {
+				window.clearInterval(self.statsInterval);
+				self.statsInterval = null;
+			}
+		}
+	};
+	self.concatenateFile = function () {
+		var received = new window.Blob(self.receiveBuffer);
+		self.receiveBuffer = [];
+
+		self.dom.downloadAnchor.href = URL.createObjectURL(received);
+		self.dom.downloadAnchor.download = self.receivedFileName;
+		self.dom.downloadAnchor.textContent = 'Click to download {} {}'.format(self.receivedFileName, self.receivedFileSize);
+		self.dom.downloadAnchor.style.display = 'block';
+
+		var bitrate = Math.round(self.receivedSize * 8 /
+				((new Date()).getTime() - self.timestampStart));
+		self.dom.bitrateDiv.innerHTML = '<strong>Average Bitrate:</strong> ' +
+				bitrate + ' kbits/sec (max: ' + self.bitrateMax + ' kbits/sec)';
+
+
+	};
+	self.closeDataChannels = function() {
+		console.log(getDebugMessage('Closing data channels'));
+		self.sendChannel.close();
+		console.log(getDebugMessage('Closed data channel with label: ' + self.sendChannel.label));
+		self.pc.close();
+		// re-enable the file select
+		self.dom.fileInput.disabled = false;
+	};
 	self.connectWebRtc = function () {
 		try {
 			// Reliable data channels not supported by Chrome
 			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
-			self.sendChannel.onmessage = function (message) {
-				console.log(getDebugMessage("SC in {}", message.data));
-			};
+			self.sendChannel.onmessage = self.webrtcDirectMessage;
 			console.log(getDebugMessage("Created send data channel"));
 		} catch (e) {
 			var error = "Failed to create data channel because {} ".format(e.message || e);
@@ -1906,7 +2051,6 @@ function WsHandler() {
 		channels: channelsHandler,
 		chat: channelsHandler,
 		webrtc: webRtcApi,
-		file: fileTransfer,
 		growl: {
 			handle: function (message) {
 				growlError(message.content);

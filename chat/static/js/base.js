@@ -62,6 +62,7 @@ window.browserVersion = (function () {
 })();
 
 var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
+var isChrome = window.browserVersion.indexOf('Chrome') >= 0;
 var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
 if (isFirefox) {
 	RTCSessionDescription = mozRTCSessionDescription;
@@ -198,16 +199,21 @@ var Growl = function (message) {
 			self.growlHolder.removeChild(self.growl)
 		}
 	};
-	self.show = function (baseTime, growlClass) {
-		var timeout = baseTime + self.message.length * 50;
+	self.showInfinity = function(growlClass) {
 		self.growl = document.createElement('div');
 		self.growl.innerHTML = self.message.indexOf("<") == 0? self.message : encodeAnchorsHTML(self.message);
 		self.growl.className = 'growl ' + growlClass;
 		self.growlHolder.appendChild(self.growl);
 		self.growl.clientHeight; // request to paint now!
 		self.growl.style.opacity += 1;
-		self.growl.onclick = self.hide;
-		setTimeout(self.hide, timeout);
+	};
+	self.show = function (baseTime, growlClass) {
+		self.showInfinity(growlClass);
+		if (baseTime) {
+			var timeout = baseTime + self.message.length * 50;
+			self.growl.onclick = self.hide;
+			setTimeout(self.hide, timeout);
+		}
 	};
 
 };

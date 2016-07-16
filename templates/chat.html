@@ -15,7 +15,6 @@
 		var notifications = {{ notifications |yesno:"true,false" }};
 	</script>
 	<script src="{% md5url "js/smileys_data.js" %}"></script>
-	<script src="{% md5url "js/transferFIle.js" %}"></script>
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}
@@ -31,7 +30,7 @@
 		<span id="onlineStatus" title="Online status" class="flex-push-right offline">●</span>
 		<span id='headerText' class="username very-small-screen"></span>
 		<a  href="/#/profile" title="Settings" onclick="event.preventDefault(); singlePage.showPage('/profile')" class="icon-wrench"> <span class="mText">Profile</span></a>
-		<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}">
+		<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}" onclick="clearLocalHistory()">
 			<i title="Sign out" class="icon-sign-out"><span class="mText">sign out</span></i> </a>
 	</nav>
 	<div>
@@ -60,13 +59,8 @@
 					</form>
 
 					<div class="progress">
-						<div class="label">Send progress:</div>
-						<progress id="sendProgress" max="0" value="0"></progress>
-					</div>
-
-					<div class="progress">
-						<div class="label">Receive progress:</div>
-						<progress id="receiveProgress" max="0" value="0"></progress>
+						<div class="label">Transmit progress</div>
+						<progress id="transmitProgress" max="0" value="0"></progress>
 					</div>
 
 					<div id="bitrate"></div>
