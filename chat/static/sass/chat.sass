@@ -1,5 +1,6 @@
 @charset "utf-8"
 @import "main"
+@import "themes/download-bar"
 @import "themes/color-lor/color-lor-chat"
 @import "themes/color-reg/color-reg-chat"
 @import "partials/mixins"
@@ -491,9 +492,10 @@ p
 	color: darkred
 
 #addRoomHolder
-	input[type=text]
-		vertical-align: top // don't move with pressed button added padding
-		margin-top: 2px
+	input
+		&[type=text], &[type=search]
+			vertical-align: top // don't move with pressed button added padding
+			margin: 4px 4px 0 0
 
 .newMessages
 	color: white

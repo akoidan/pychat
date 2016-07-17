@@ -59,13 +59,13 @@
 						<input type="file" id="webRtcFileInput" name="files">
 					</form>
 
-					<div class="progress">
-						<div class="label">Transmit progress</div>
-						<progress id="transmitProgress" max="0" value="0"></progress>
+					<div id="transmitProgress" class="progress-wrap">
+						<div>
+						</div>
 					</div>
 
 					<div id="bitrate"></div>
-					<a id="download"></a>
+					<a id="downloadTransferredFile" onclick="this.innerHTML = ''"></a>
 					<span id="status"></span>
 
 				</section>
@@ -109,13 +109,13 @@
 			<span>
 				<span id="channelsMinifier" name="channel" class="icon-angle-circled-up"></span>
 				<span id="channelsStateText">rooms</span>
-				<i class="icon-plus-squared" title="Create new room" onclick="channelsHandler.showAddRoom()"></i></span>
+				<i class="icon-plus-squared" title="Create New Room" onclick="channelsHandler.showAddRoom()"></i></span>
 			<ul id="rooms">
 			</ul>
 			<span>
 				<span id="directMinifier" name="direct" class="icon-angle-circled-up"></span>
 				<span id="directStateText">direct  messages</span>
-				<i class="icon-plus-squared" title="Create new direct channel" onclick="channelsHandler.showAddUser()"></i></span>
+				<i class="icon-plus-squared" title="Create New Direct Channel" onclick="channelsHandler.showAddUser()"></i></span>
 			<ul id="directUserTable">
 			</ul>
 			<span>
@@ -132,14 +132,14 @@
 	</div>
 	<div id="addUserHolder" class="hidden">
 		<div>
-			<input type="text" placeholder="search" title="Filter by username" onkeyup="channelsHandler.filterAddUser(event)" id="addUserInput"/>
+			<input type="search" placeholder="Search" title="Filter by username" onkeyup="channelsHandler.filterAddUser(event)" id="addUserInput"/>
 			<ul id="addUserList" onclick="channelsHandler.addUserHolderClick(event)">
 			</ul>
 		</div>
 	</div>
 	<div id="addRoomHolder" class="hidden">
 		<div>
-			<input type="text" placeholder="Room Name" title="Enter new room name here" id="addRoomInput" maxlength="16"/>
+			<input type="text" placeholder="Room Name" title="Enter New Room Name Here" id="addRoomInput" maxlength="16"/>
 			<input type="button" value="Add" id="addRoomButton"/>
 		</div>
 	</div>

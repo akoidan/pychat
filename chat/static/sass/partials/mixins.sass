@@ -16,13 +16,15 @@
 	-ms-transition: $text
 	transition: $text
 
+@mixin linear-gradient-values($value...)
+	background-image: -webkit-linear-gradient($value)
+	background-image: -moz-linear-gradient($value)
+	background-image: -o-linear-gradient($value)
+	background-image: -ms-linear-gradient($value)
+	background-image: linear-gradient($value)
+
 @mixin linear-gradient($begin, $end)
-	background-image: -webkit-gradient(linear, 0 0, 0 100%, from($begin), to($end))
-	background-image: -webkit-linear-gradient($begin 0%, $end 100%)
-	background-image: -moz-linear-gradient($begin 0%, $end 100%)
-	background-image: -o-linear-gradient($begin 0%, $end 100%)
-	background-image: -ms-linear-gradient($begin 0%, $end 100%)
-	background-image: linear-gradient($begin 0%, $end 100%)
+	@include linear-gradient-values($begin 0%, $end 100%)
 
 @mixin linear-double-gradient($f1, $f2, $s1, $s2)
 	background-image: -webkit-linear-gradient($s1, $s2), -webkit-linear-gradient($f1, $f2)
@@ -30,6 +32,18 @@
 	background-image: -o-linear-gradient($s1, $s2), -o-linear-gradient($f1, $f2)
 	background-image: linear-gradient($s1, $s2), linear-gradient($f1, $f2)
 	background-image: -ms-linear-gradient($s1, $s2), -ms-linear-gradient($f1, $f2)
+
+@mixin placeholder
+	\::-webkit-input-placeholder
+		@content
+	\:-moz-placeholder
+		/* Firefox 18-
+		@content
+	\::-moz-placeholder
+		/* Firefox 19+
+		@content
+	\:-ms-input-placeholder
+		@content
 
 @mixin display-flex()
 	display: -ms-flexbox
@@ -49,12 +63,15 @@
 	-ms-user-select: $value
 	user-select: $value
 
+@mixin raw-animation($values...)
+	-webkit-animation: $values
+	-moz-animation: $values
+	-ms-animation: $values
+	-o-animation: $values
+	animation: $values
+
 @mixin animation($name, $time , $steps)
-	-webkit-animation: $name $time steps($steps) infinite
-	-moz-animation: $name $time  steps($steps) infinite
-	-ms-animation: $name $time  steps($steps) infinite
-	-o-animation: $name $time  steps($steps) infinite
-	animation: $name $time  steps($steps) infinite
+	@include raw-animation($name $time steps($steps) infinite)
 
 @mixin appearance($value)
 	-webkit-appearance: $value
@@ -64,6 +81,9 @@
 @mixin box-sizing($value)
 	-webkit-box-sizing: $value
 	-moz-box-sizing: $value
+	-ms-box-sizing: $value
+	-o-box-sizing: $value
+	box-sizing: $value
 
 @mixin top-left-border($value...)
 	border-top: $value
@@ -72,6 +92,17 @@
 @mixin right-bottom-border($value...)
 	border-right: $value
 	border-bottom: $value
+
+
+@mixin keyframes($name)
+	@-moz-keyframes #{$name}
+		@content
+	@-ms-keyframes #{$name}
+		@content
+	@-webkit-keyframes #{$name}
+		@content
+	@keyframes #{$name}
+		@content
 
 @mixin play($prefix, $name, $y, $width, $steps)
 	//#{'@' + $prefix + 'keyframes'} $name

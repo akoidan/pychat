@@ -1,3 +1,20 @@
+String.prototype.format = function() {
+	var res = this;
+	for (var i = 0; i < arguments.length; i++) {
+		res = res.replace('{}', arguments[i]);
+	}
+	return res;
+};
+
+window.onerror = function (msg, url, linenumber) {
+	var message = 'Error occurred in {}:{}\n{}'.format(url, linenumber, msg);
+	if (growlHolder) {
+		growlError(message);
+	} else {
+		alert(message);
+	}
+	return false;
+};
 navigator.getUserMedia =  navigator.getUserMedia|| navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var historyStorage;
@@ -63,7 +80,7 @@ window.browserVersion = (function () {
 
 var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
 var isChrome = window.browserVersion.indexOf('Chrome') >= 0;
-var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
+var RTCPeerConnection = window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
 if (isFirefox) {
 	RTCSessionDescription = mozRTCSessionDescription;
 	RTCIceCandidate = mozRTCIceCandidate;
@@ -251,7 +268,6 @@ function Draggable(container, headerText) {
 		self.setHeaderText(self.headerText);
 		var iconCancel = document.createElement('i');
 		self.dom.header.appendChild(iconCancel);
-		iconCancel.style = "float: right; color: rgb(177, 53, 51)";
 		iconCancel.onclick = self.hide;
 		iconCancel.className = 'icon-cancel';
 		self.dom.body = self.dom.container.children[0];
@@ -515,14 +531,6 @@ function saveLogToStorage(result) {
 }
 
 
-String.prototype.format = function() {
-	var res = this;
-	for (var i = 0; i < arguments.length; i++) {
-		res = res.replace('{}', arguments[i]);
-	}
-	return res;
-};
-
 
 /** in 23 - out 23
  *  */
@@ -560,12 +568,3 @@ function getDebugMessage() {
 }
 
 
-window.onerror = function (msg, url, linenumber) {
-	var message = 'Error occurred in {}:{}\n{}'.format(url, linenumber, msg);
-	if (growlHolder) {
-		growlError(message);
-	} else {
-		alert(message);
-	}
-	return false;
-};

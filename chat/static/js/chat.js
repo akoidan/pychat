@@ -612,7 +612,7 @@ function ChannelsHandler() {
 		}
 		self.addUserHandler.show();
 		self.addUserHolderAction = 'addDirectChannel';
-		self.addUserHandler.setHeaderText("Create direct channel");
+		self.addUserHandler.setHeaderText("Create Direct Channel");
 		self.dom.addUserInput.focus();
 	};
 	self.getAllUsersInfo = function () {
@@ -791,7 +791,7 @@ function ChannelsHandler() {
 		self.dom.addRoomInput.onkeypress = self.finishAddRoomOnEnter;
 		self.dom.addRoomButton.onclick = self.finishAddRoom;
 		self.addUserHandler = new Draggable(self.dom.addUserHolder, "");
-		self.addRoomHandler = new Draggable(self.dom.addRoomHolder, "Create new room");
+		self.addRoomHandler = new Draggable(self.dom.addRoomHolder, "Create New Room");
 		var minifier = self.dom.minifier;
 		for (var el in minifier) {
 			if (minifier.hasOwnProperty(el)) {
@@ -1290,7 +1290,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		// because requests aren't being sent when there are no event for them, thus no responses
 		var message = data.content;
 		if (message.length === 0) {
-			console.log(getDebugMessage('Requesting messages has reached the top, removing loadUpHistoryEvent handlers'));
+			console.log(getDebugMessage('Requesting messages has reached the top, \
+					removing loadUpHistoryEvent handlers'));
 			self.dom.chatBoxDiv.removeEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
 			self.dom.chatBoxDiv.removeEventListener("keydown", self.keyDownLoadUp);
 			return;
@@ -1368,6 +1369,43 @@ function vibrate() {
 	}
 }
 
+function DownloadBar(stringId) {
+	var self = this;
+	self.dom = {
+		wrapper: $(stringId),
+		text: document.querySelector("#{} > div".format(stringId))
+	};
+	self.PROGRESS_CLASS = 'animated';
+	self.SUCC_CLASS = 'success';
+	self.ERR_CLASS = 'error';
+	self.setMax = function (max) {
+		self.max = max;
+		self.start();
+	};
+	self.setValue = function(value) {
+		var percent =  Math.round(value * 100 / self.max) + "%";
+		self.dom.text.style.width = percent;
+		self.dom.text.textContent = percent;
+	};
+	self.setSuccess = function() {
+		self.setResult('Complete!');
+		CssUtils.addClass(self.dom.wrapper, self.SUCC_CLASS);
+	};
+	self.setError = function(error) {
+		self.setResult(error);
+		CssUtils.addClass(self.dom.wrapper, self.ERR_CLASS);
+	};
+	self.setResult = function (result) {
+		CssUtils.removeClass(self.dom.wrapper, self.PROGRESS_CLASS);
+		self.dom.text.textContent = result;
+	};
+	self.start = function() {
+		CssUtils.removeClass(self.dom.wrapper, self.SUCC_CLASS);
+		CssUtils.removeClass(self.dom.wrapper, self.ERR_CLASS);
+		CssUtils.addClass(self.dom.wrapper, self.PROGRESS_CLASS);
+		self.setValue(0);
+	};
+}
 
 function WebRtcApi() {
 	var self = this;
@@ -1400,8 +1438,7 @@ function WebRtcApi() {
 		// transfer file dome
 		bitrateDiv: $('bitrate'),
 		fileInput: $('webRtcFileInput'),
-		downloadAnchor: $('download'),
-		transmitProgress: $('transmitProgress'),
+		downloadAnchor: $('downloadTransferredFile'),
 		statusMessage: $('status')
 		// transfer file dome
 	};
@@ -1429,6 +1466,7 @@ function WebRtcApi() {
 		self.dom.fs.hangup.onclick = self.hangUp;
 		self.dom.fs.audio.onclick = self.toggleMic;
 		self.dom.audioStatusIcon.onclick = self.toggleMic;
+		self.downloadBar = new DownloadBar('transmitProgress');
 		$('webRtcFileIcon').onclick = function() {
 			self.dom.fileInput.click();
 		};
@@ -1566,10 +1604,14 @@ function WebRtcApi() {
 		self.toggleInput(false);
 	};
 	self.onreply = function() {
-		self.setHeaderText("Waiting for <b>{}</b> to answer".format(self.receiverName))
+		self.setHeaderText("Waiting for <b>{}</b> to accept".format(self.receiverName))
 	};
 	self.setHeaderText = function(text) {
-		headerText.innerHTML = text;
+		if (self.isForTransferFile) {
+			self.downloadBar.dom.text.textContent = "Waiting_to_accept";
+		} else {
+			headerText.innerHTML = text;
+		}
 	};
 	self.oniceconnectionstatechange = function () {
 		if (self.pc.iceConnectionState == 'disconnected') {
@@ -1587,11 +1629,11 @@ function WebRtcApi() {
 		self.receiverName = message.user;
 		self.receiverId = message.userId;
 		self.channel = message.channel;
+		self.sendBaseEvent(null, "reply");
 	} ;
 	self.onCallOffer = function(message) {
 		self.clearTimeout();
 		self.setAnswerOpponentVariables(message);
-		self.sendBaseEvent(null, "reply");
 		checkAndPlay(self.dom.callSound);
 		CssUtils.showElement(self.dom.callAnswerParent);
 		self.timeoutFunnction = setTimeout(function () {
@@ -1633,7 +1675,6 @@ function WebRtcApi() {
 		self.dom.callSound.pause();
 		self.setAudio(true);
 		self.setVideo(false);
-		self.showCallDialog(true);
 		self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
 		self.createAfterResponseCall();
 	};
@@ -1649,7 +1690,6 @@ function WebRtcApi() {
 		self.dom.callSound.pause();
 		self.setAudio(true);
 		self.setVideo(true);
-		self.showCallDialog(true);
 		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
 		self.createAfterResponseCall();
 	};
@@ -1674,13 +1714,19 @@ function WebRtcApi() {
 	self.transferFile = function () {
 		self.file = self.dom.fileInput.files[0];
 		//self.dom.fileInput.disabled = true;
-		self.setOpponentVariables();
+		var username = self.setOpponentVariables();
+		if (username) {
+			growlError("<span>Can't send file because user <b>{}</b> is not online.</span>".format(username));
+			console.log(getDebugMessage('Skip call because user {} is not online', username));
+			return;
+		}
+		self.downloadBar.setMax(self.file.size);
 		if (self.file.size < 10000000/*10MB*/) {
 			var reader = new FileReader();
 			reader.onload = function (event) {
 				var binary = event.target.result;
-				var md5 = CryptoJS.MD5(binary).toString();
-				self.sendFileOffer(md5);
+				self.transferedMD5 = CryptoJS.MD5(binary).toString();
+				self.sendFileOffer(self.transferedMD5);
 			};
 			reader.readAsBinaryString(self.file);
 		} else {
@@ -1690,9 +1736,9 @@ function WebRtcApi() {
 	self.onFileOffer = function (message) {
 		self.receivedFileSize = parseInt(message.content.size);
 		self.receivedMD5 = message.content.md5;
-		self.dom.transmitProgress.max = self.receivedFileSize;
+		self.downloadBar.setMax(self.receivedFileSize);
 		self.receivedFileName  = message.content.name;
-		self.lastGrowl = new Growl("<div>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>".
+		self.lastGrowl = new Growl("<div style='cursor: pointer'>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>".
 			format(encodeHTML(self.receivedFileName), bytesToSize(self.receivedFileSize), encodeHTML(message.user)));
 		self.lastGrowl.show(3600000, 'col-info');
 		self.lastGrowl.growl.addEventListener('click', self.acceptFileReply);
@@ -1703,14 +1749,12 @@ function WebRtcApi() {
 		self.connectWebRtc();
 		self.lastGrowl.growl.removeEventListener('click', self.acceptFileReply);
 		self.lastGrowl.hide();
-
+		self.showAndAttachCallDialogOnResponse();
 	};
 	self.setOpponentVariables = function () {
 		var activeChannel = channelsHandler.getActiveChannel();
 		if (!(Object.keys(activeChannel.onlineUsers).length > 1)) {
-			growlError("<span>Can't establish a connection, user <b>{}</b> is not online.</span>".format(
-					activeChannel.getUserNameById(activeChannel.getOpponentId())));
-			return;
+			return activeChannel.getUserNameById(activeChannel.getOpponentId());
 		}
 		self.receiverId = activeChannel.getOpponentId();
 		self.receiverName = activeChannel.getUserNameById(self.receiverId);
@@ -1718,7 +1762,12 @@ function WebRtcApi() {
 	};
 	self.callPeople = function () {
 		self.isForTransferFile = false;
-		self.setOpponentVariables();
+		var username = self.setOpponentVariables();
+		if (username) {
+			growlError("<span>Can't make a call file because user <b>{}</b> is not online.</span>".format(username));
+			console.log(getDebugMessage('Skip call because user {} is not online', username));
+			return;
+		}
 		self.setHeaderText("Confirm browser to use your input devices for call");
 		self.waitForAnswer();
 		self.captureInput(self.captureInputStream);
@@ -1738,10 +1787,13 @@ function WebRtcApi() {
 	};
 	self.createAfterResponseCall = function () {
 		self.captureInput(self.createCallAfterCapture, true);
+		self.showAndAttachCallDialogOnResponse();
+		self.showCallDialog(true);
+	};
+	self.showAndAttachCallDialogOnResponse = function () {
 		channelsHandler.setActiveChannel(self.channel);
 		channelsHandler.getActiveChannel().setChannelAttach(true);
 		CssUtils.showElement(self.dom.callContainer);
-		self.showCallDialog(true);
 	};
 	self.print = function (message){
 		console.log(getDebugMessage("Call message {}", JSON.stringify(message)));
@@ -1771,7 +1823,6 @@ function WebRtcApi() {
 			self.closeDataChannels();
 			return;
 		}
-		self.dom.transmitProgress.max = self.file.size;
 		self.sliceFile(0);
 	};
 	self.sliceFile = function (offset) {
@@ -1782,7 +1833,7 @@ function WebRtcApi() {
 				if (self.file.size > offset + e.target.result.byteLength) {
 					window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
 				}
-				self.dom.transmitProgress.value = offset + e.target.result.byteLength;
+				self.downloadBar.setValue(offset + e.target.result.byteLength);
 			};
 		})(self.file);
 		var slice = self.file.slice(offset, offset + self.CHUNK_SIZE);
@@ -1895,8 +1946,12 @@ function WebRtcApi() {
 		}
 	};
 	self.showNoMicError = function () {
-		var url = isChrome ? 'chrome://settings/content' : 'Your browser settings';
-		growlError('<div>Unable to capture input from microphone. Check your microphone connection or navigate to <b>{}</b> and check your microphone section there</div>'.format(url));
+		var url = isChrome ? 'setting in chrome://settings/content' : 'your browser settings';
+		url += navigator.platform.indexOf('Linux') >= 0 ?
+				'. Open pavucontrol for more info' :
+				' . Right click on volume icon in system tray -> record devices -> input -> microphone';
+		growlError('<div>Unable to capture input from microphone. Check your microphone connection or {}'
+				.format(url));
 	};
 	self.init = function() {
 		// if (typeof RTCPeerConnection  == 'undefined' && typeof mozRTCPeerConnection == 'undefined' && typeof webkitRTCPeerConnection == 'undefined') {
@@ -1907,7 +1962,6 @@ function WebRtcApi() {
 		self.pc.oniceconnectionstatechange = self.oniceconnectionstatechange;
 		self.pc.onaddstream = function (event) {
 			self.setVideoSource(self.dom.remote, event.stream);
-			self.dom.remote.volume = volumeProportion[window.sound];
 			self.setHeaderText("You're talking to <b>{}</b> now".format(self.receiverName));
 			self.setIconState(true);
 			console.log(getDebugMessage("Stream attached"));
@@ -1937,8 +1991,10 @@ function WebRtcApi() {
 		self.receiverName = null;
 		self.receiverId = null;
 		try {
+			self.sendChannel.close();
 			self.pc.close();
 		} catch (error) {
+			console.warn(getDebugMessage('{} Error while closing channels, description {}', error.message, error,name));
 		}
 		if (self.localStream) {
 			var tracks = self.localStream.getTracks();
@@ -1947,7 +2003,9 @@ function WebRtcApi() {
 			}
 		}
 		self.setIconState(false);
-		growlInfo(text);
+		if (text) {
+			growlInfo(text);
+		}
 		self.hidePhoneIcon();
 		if (self.javascriptNode) {
 			self.javascriptNode.onaudioprocess = null;
@@ -1978,20 +2036,34 @@ function WebRtcApi() {
 		self.receiveBuffer.push(event.data);
 		self.receivedSize += event.data.byteLength;
 
-		self.dom.transmitProgress.value = self.receivedSize;
+		self.downloadBar.setValue(self.receivedSize);
 
 		// we are assuming that our signaling protocol told
 		// about the expected file size (and name, hash, etc).
 		if (self.receivedSize === self.receivedFileSize) {
-			self.concatenateFile();
-			self.closeDataChannels();
+			self.assembleFile();
+			self.closeEvents();
+
 			if (self.statsInterval) {
 				window.clearInterval(self.statsInterval);
 				self.statsInterval = null;
 			}
 		}
 	};
-	self.concatenateFile = function () {
+	self.onfileAccepted = function (message) {
+		console.log(getDebugMessage("Transfer file {} (md5={}) result : {}",
+				self.file.name, self.transferedMD5, message.content));
+		if (message.content == 'valid' || message.content == 'unknown') {
+			growlInfo('Transferring  {} is finished '.format(self.file.name));
+			self.downloadBar.setSuccess();
+		} else {
+			growlError('Transferring  {} is finished with error, expected md5 {}, resulting md5 {} '
+					.format(self.file.name, self.transferedMD5, message.content));
+			self.downloadBar.setError('Invalid checksumm');
+		}
+		self.closeEvents();
+	};
+	self.assembleFile = function () {
 		console.log(getDebugMessage('Finished receiving file{}, verifying md5...', self.receivedFileName));
 		var received = new window.Blob(self.receiveBuffer);
 		received.name = self.receivedFileName;
@@ -2002,40 +2074,41 @@ function WebRtcApi() {
 				var binary = event.target.result;
 				var md5 = CryptoJS.MD5(binary).toString();
 				if (md5 !== self.receivedMD5) {
-					var message = "Error verifying md5 for {}, expected {}, got {}".format(self.receivedFileName, self.receivedMD5, md5);
+					var message = "Error verifying md5 for {}, expected {}, got {}"
+							.format(self.receivedFileName, self.receivedMD5, md5);
 					growlError(message);
 					console.warn(getDebugMessage(message));
+					self.sendBaseEvent(md5, 'fileAccepted');
+					self.downloadBar.setError('Invalid cheksum');
 				} else {
 					var message2 = "File {} is received. Open dialog to download it".format(self.receivedFileName);
 					growlInfo(message2);
 					console.info(getDebugMessage(message2));
+					self.sendBaseEvent('valid', 'fileAccepted');
+					self.downloadBar.setSuccess();
 				}
 			};
 			reader.readAsBinaryString(received);
 		} else {
-			var message2 = "File {} is received. Since huge size (over 10MB) checksum verification is skipped. Open dialog to download it".format(self.receivedFileName);
+			var message2 = "File {} is received. Since huge size (over 10MB) checksum verification is skipped.\
+					Open dialog to download it".format(self.receivedFileName);
 			growlInfo(message2);
 			console.info(getDebugMessage(message2));
+			self.sendBaseEvent('unknown', 'fileAccepted');
+			self.downloadBar.setSuccess();
 		}
 		self.receiveBuffer = [];
+		self.receivedSize =0;
 		self.dom.downloadAnchor.href = URL.createObjectURL(received);
 		self.dom.downloadAnchor.download = self.receivedFileName;
 		self.dom.downloadAnchor.textContent = 'Click to save {}'.format(self.receivedFileName);
 		self.dom.downloadAnchor.style.display = 'block';
+		//var bitrate = Math.round(self.receivedSize * 8 /
+		//		((new Date()).getTime() - self.timestampStart));
+		//self.dom.bitrateDiv.innerHTML = '<strong>Average Bitrate:</strong> ' +
+		//		bitrate + ' kbits/sec (max: ' + self.bitrateMax + ' kbits/sec)';
+	};
 
-		var bitrate = Math.round(self.receivedSize * 8 /
-				((new Date()).getTime() - self.timestampStart));
-		self.dom.bitrateDiv.innerHTML = '<strong>Average Bitrate:</strong> ' +
-				bitrate + ' kbits/sec (max: ' + self.bitrateMax + ' kbits/sec)';
-	};
-	self.closeDataChannels = function() {
-		console.log(getDebugMessage('Closing data channels'));
-		self.sendChannel.close();
-		console.log(getDebugMessage('Closed data channel with label: ' + self.sendChannel.label));
-		self.pc.close();
-		// re-enable the file select
-		// self.dom.fileInput.disabled = false;
-	};
 	self.connectWebRtc = function () {
 		try {
 			// Reliable data channels not supported by Chrome
@@ -2060,7 +2133,7 @@ function WebRtcApi() {
 			content: content,
 			action: 'call',
 			type: type,
-			channel: self.channel
+			channel: channelsHandler.activeChannel
 		});
 	};
 	self.sendWebRtcEvent = function (message) {
