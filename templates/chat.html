@@ -15,6 +15,7 @@
 		var notifications = {{ notifications |yesno:"true,false" }};
 	</script>
 	<script src="{% md5url "js/smileys_data.js" %}"></script>
+	<script src="{% md5url "js/md5.js" %}"></script>
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}
@@ -30,7 +31,7 @@
 		<span id="onlineStatus" title="Online status" class="flex-push-right offline">●</span>
 		<span id='headerText' class="username very-small-screen"></span>
 		<a  href="/#/profile" title="Settings" onclick="event.preventDefault(); singlePage.showPage('/profile')" class="icon-wrench"> <span class="mText">Profile</span></a>
-		<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}">
+		<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}" onclick="clearLocalHistory()">
 			<i title="Sign out" class="icon-sign-out"><span class="mText">sign out</span></i> </a>
 	</nav>
 	<div>
@@ -53,6 +54,21 @@
 	<div id="wrapper" class="max-height-scrollable hidden">
 		<div id="chatBoxHolder" class="max-height-scrollable">
 			<div id="callContainer" class="hidden">
+				<section>
+					<form id="fileInfo" class="hidden">
+						<input type="file" id="webRtcFileInput" name="files">
+					</form>
+
+					<div id="transmitProgress" class="progress-wrap">
+						<div>
+						</div>
+					</div>
+
+					<div id="bitrate"></div>
+					<a id="downloadTransferredFile" onclick="this.innerHTML = ''"></a>
+					<span id="status"></span>
+
+				</section>
 				<div id="callContainerContent">
 					<div id='videoContainer'>
 						<video id="remoteVideo" autoplay></video>
@@ -65,6 +81,7 @@
 						</div>
 					</div>
 					<div class="callContainerIcons noSelection">
+						<i class="icon-doc-inv" id="webRtcFileIcon"></i>
 						<i id="audioStatusIcon" class="icon-mic"></i>
 						<i id="videoStatusIcon" class="icon-videocam"></i>
 						<div id="enterFullScreenHolder">
@@ -74,7 +91,10 @@
 						<i class="icon-phone-circled" id="callIcon" onclick="event.preventDefault(); webRtcApi.callPeople()"></i>
 {#						<img src="{% md5url 'images/call.gif' %}" alt="call" class="hidden" id="callRing"#}
 {#							 style="width: 30px"/>#}
-						<input type="range" id="callVolume" value="100"/>
+						<div class="volumeLevelsHolder">
+							<input type="range" id="callVolume" value="100" title="Volume level"/>
+							<progress id="microphoneLevel" max="200" title="Your microphone level" value="0"></progress>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -89,13 +109,13 @@
 			<span>
 				<span id="channelsMinifier" name="channel" class="icon-angle-circled-up"></span>
 				<span id="channelsStateText">rooms</span>
-				<i class="icon-plus-squared" title="Create new room" onclick="channelsHandler.showAddRoom()"></i></span>
+				<i class="icon-plus-squared" title="Create New Room" onclick="channelsHandler.showAddRoom()"></i></span>
 			<ul id="rooms">
 			</ul>
 			<span>
 				<span id="directMinifier" name="direct" class="icon-angle-circled-up"></span>
 				<span id="directStateText">direct  messages</span>
-				<i class="icon-plus-squared" title="Create new direct channel" onclick="channelsHandler.showAddUser()"></i></span>
+				<i class="icon-plus-squared" title="Create New Direct Channel" onclick="channelsHandler.showAddUser()"></i></span>
 			<ul id="directUserTable">
 			</ul>
 			<span>
@@ -112,14 +132,14 @@
 	</div>
 	<div id="addUserHolder" class="hidden">
 		<div>
-			<input type="text" placeholder="search" title="Filter by username" onkeyup="channelsHandler.filterAddUser(event)" id="addUserInput"/>
+			<input type="search" placeholder="Search" title="Filter by username" onkeyup="channelsHandler.filterAddUser(event)" id="addUserInput"/>
 			<ul id="addUserList" onclick="channelsHandler.addUserHolderClick(event)">
 			</ul>
 		</div>
 	</div>
 	<div id="addRoomHolder" class="hidden">
 		<div>
-			<input type="text" placeholder="Room Name" title="Enter new room name here" id="addRoomInput" maxlength="16"/>
+			<input type="text" placeholder="Room Name" title="Enter New Room Name Here" id="addRoomInput" maxlength="16"/>
 			<input type="button" value="Add" id="addRoomButton"/>
 		</div>
 	</div>

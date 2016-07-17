@@ -1,0 +1,55 @@
+@import "../partials/mixins"
+$height: 20px
+$stripe-size: $height * 2
+.progress-wrap
+	$border-radius: 10px
+	$padding: 2px
+	$inner-border-radius: $border-radius - $padding
+	display: block
+	width: 200px
+	margin: 0 auto
+	position: relative
+	height: $height
+	background: #1a1e22
+	border-radius: $border-radius
+	padding: $padding
+	box-shadow: inset 0 1px 1px 0 black, 0 1px 1px 0 #36393F
+	> div
+		height: 100%
+		line-height: $height
+		font-size: 14px
+		display: inline-block
+		margin: 0
+		color: #e7e7e7
+		float: left
+		border-radius: $inner-border-radius
+		position: relative
+		text-align: center
+		&:before
+			content: ""
+			position: absolute
+			border-radius: $inner-border-radius
+			height: 100%
+			width: 100%
+			left: 0
+			top: 0
+			@include linear-gradient-values(top, rgba(255, 255, 255, 0.30), rgba(0, 0, 0, 0.3))
+
+	&.animated > div
+		background: #1c3859
+		@include linear-gradient-values(135deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)
+		@include raw-animation(animate-bars 2s linear infinite)
+		background-size: $stripe-size $stripe-size
+	&.success > div
+		background-color: #18611f
+	&.error > div
+		background-color: #611c24
+
+@include keyframes(animate-bars)
+	from
+		background-position: 0 0
+	to
+		background-position: $stripe-size 0
+
+
+

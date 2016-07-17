@@ -62,7 +62,7 @@ class Actions:
 class VarNames:
 	CALL_TYPE = 'type'
 	USER = 'user'
-	USER_ID =  'userId'
+	USER_ID = 'userId'
 	TIME = 'time'
 	CONTENT = 'content'
 	IMG = 'image'
@@ -84,13 +84,13 @@ class VarNames:
 class CallType:
 	OFFER = 'offer'
 
-
 class HandlerNames:
 	NAME = 'handler'
 	CHANNELS = 'channels'
 	CHAT = 'chat'
 	GROWL = 'growl'
 	WEBRTC = 'webrtc'
+	FILE = 'file'
 
 
 class RedisPrefix:
@@ -421,6 +421,7 @@ class MessagesHandler(MessagesCreator):
 			self.call_receiver_channel = RedisPrefix.generate_user(user.user_id)
 			set_opponent_channel = True
 			out_message[VarNames.CHANNEL] = to_channel
+		# TODO
 		self.logger.info('!! Offering a call to user with id %s',  self.call_receiver_channel)
 		self.publish(out_message, self.call_receiver_channel, set_opponent_channel)
 
