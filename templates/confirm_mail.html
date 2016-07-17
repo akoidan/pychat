@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
+	{% load md5url %}<link rel="stylesheet" type="text/css" href="{% md5url 'css/main.css' %}">
 	<script type="text/javascript">
 		var a = "{{message}}";
 		if (a == RESPONSE_SUCCESS ) {

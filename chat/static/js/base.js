@@ -1,3 +1,20 @@
+String.prototype.format = function() {
+	var res = this;
+	for (var i = 0; i < arguments.length; i++) {
+		res = res.replace('{}', arguments[i]);
+	}
+	return res;
+};
+
+window.onerror = function (msg, url, linenumber) {
+	var message = 'Error occurred in {}:{}\n{}'.format(url, linenumber, msg);
+	if (growlHolder) {
+		growlError(message);
+	} else {
+		alert(message);
+	}
+	return false;
+};
 navigator.getUserMedia =  navigator.getUserMedia|| navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var historyStorage;
@@ -61,6 +78,13 @@ window.browserVersion = (function () {
 	return M.join(' ');
 })();
 
+var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
+var isChrome = window.browserVersion.indexOf('Chrome') >= 0;
+var RTCPeerConnection = window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+if (isFirefox) {
+	RTCSessionDescription = mozRTCSessionDescription;
+	RTCIceCandidate = mozRTCIceCandidate;
+}
 
 function getUrlParam(name, url) {
 	if (!url) url = window.location.href;
@@ -93,6 +117,14 @@ function encodeHTML(html) {
 	return html.replace(replaceHtmlRegex, function (s) {
 		return escapeMap[s];
 	});
+}
+
+
+function bytesToSize(bytes) {
+	var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+	if (bytes == 0) return '0 Byte';
+	var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
+	return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 }
 
 
@@ -184,16 +216,21 @@ var Growl = function (message) {
 			self.growlHolder.removeChild(self.growl)
 		}
 	};
-	self.show = function (baseTime, growlClass) {
-		var timeout = baseTime + self.message.length * 50;
+	self.showInfinity = function(growlClass) {
 		self.growl = document.createElement('div');
 		self.growl.innerHTML = self.message.indexOf("<") == 0? self.message : encodeAnchorsHTML(self.message);
 		self.growl.className = 'growl ' + growlClass;
 		self.growlHolder.appendChild(self.growl);
 		self.growl.clientHeight; // request to paint now!
 		self.growl.style.opacity += 1;
-		self.growl.onclick = self.hide;
-		setTimeout(self.hide, timeout);
+	};
+	self.show = function (baseTime, growlClass) {
+		self.showInfinity(growlClass);
+		if (baseTime) {
+			var timeout = baseTime + self.message.length * 50;
+			self.growl.onclick = self.hide;
+			setTimeout(self.hide, timeout);
+		}
 	};
 
 };
@@ -231,7 +268,6 @@ function Draggable(container, headerText) {
 		self.setHeaderText(self.headerText);
 		var iconCancel = document.createElement('i');
 		self.dom.header.appendChild(iconCancel);
-		iconCancel.style = "float: right; color: rgb(177, 53, 51)";
 		iconCancel.onclick = self.hide;
 		iconCancel.className = 'icon-cancel';
 		self.dom.body = self.dom.container.children[0];
@@ -495,14 +531,6 @@ function saveLogToStorage(result) {
 }
 
 
-String.prototype.format = function() {
-	var res = this;
-	for (var i = 0; i < arguments.length; i++) {
-		res = res.replace('{}', arguments[i]);
-	}
-	return res;
-};
-
 
 /** in 23 - out 23
  *  */
@@ -539,9 +567,3 @@ function getDebugMessage() {
 	return result;
 }
 
-
-window.onerror = function (msg, url, linenumber) {
-	var message = 'Error occurred in {}:{}\n{}'.format(url, linenumber, msg);
-	growlError(message);
-	return false;
-};

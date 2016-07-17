@@ -16,11 +16,6 @@ const GENDER_ICONS = {
 var smileRegex = /<img[^>]*code="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
-if (isFirefox) {
-	RTCSessionDescription = mozRTCSessionDescription;
-	RTCIceCandidate = mozRTCIceCandidate;
-}
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
 var newMessagesCount = 0;
@@ -320,7 +315,6 @@ function PageHandler() {
 		// TODO remove triple, carefull of undefined tittle in ViewProfilePage
 		window.history.pushState(historyUrl, historyUrl, historyUrl);
 	};
-	self.generatePageUrl
 	self.showPage = function (page, params, dontHistory) {
 		console.log(getDebugMessage('Rendering page "{}"', page));
 		if (self.currentPage) self.currentPage.hide();
@@ -489,20 +483,46 @@ function ChannelsHandler() {
 	};
 	self.handleFileSelect = function (evt) {
 		var files = evt.target.files;
-		var file = files[0];
-		if (files && file) {
+		self.readDataAndSend(files[0]);
+		self.dom.imgInput.value = "";
+	};
+	self.readDataAndSend = function (file) {
+		if (!file) {
+			console.warn(getDebugMessage("Context contains no files"));
+		} else if (file.type.indexOf("image") < 0) {
+			growlError("<span>Invalid image type <b>{}</b></span>".format(encodeHTML(file.type)));
+		} else {
+			var fileName = file.name ? file.name : '';
+			growlInfo("<span>Sending file <b>{}</b> ({}) to server</span>".format(fileName, bytesToSize(file.size)));
 			var reader = new FileReader();
-			reader.onload = function (readerEvt) {
-				var binaryString = readerEvt.target.result;
-				self.sendMessage({
-					image: "data:{};base64,{}".format(file.type, btoa(binaryString)),
-					content: null,
-					action: 'sendMessage',
-					channel: self.activeChannel
-				});
-				self.dom.imgInput.value = "";
-			};
-			reader.readAsBinaryString(file);
+			reader.onload = self.sendImageToServer;
+			reader.readAsDataURL(file);
+		}
+	};
+	self.sendImageToServer = function (event) {
+		self.sendMessage({
+			image: event.target.result,
+			content: null,
+			action: 'sendMessage',
+			channel: self.activeChannel
+		});
+	};
+	self.preventDefault = function(e) {
+		e.preventDefault();
+	};
+	self.imageDrop = function(evt) {
+		self.preventDefault(evt);
+		self.readDataAndSend(evt.dataTransfer.files[0]);
+	};
+	self.imagePaste = function(e) {
+		if (e.clipboardData) {
+			var items = e.clipboardData.items;
+			if (items) {
+				for (var i = 0; i < items.length; i++) {
+					self.readDataAndSend(items[i].getAsFile());
+				}
+				self.preventDefault(e);
+			}
 		}
 	};
 	self.checkAndSendMessage = function (event) {
@@ -592,7 +612,7 @@ function ChannelsHandler() {
 		}
 		self.addUserHandler.show();
 		self.addUserHolderAction = 'addDirectChannel';
-		self.addUserHandler.setHeaderText("Create direct channel");
+		self.addUserHandler.setHeaderText("Create Direct Channel");
 		self.dom.addUserInput.focus();
 	};
 	self.getAllUsersInfo = function () {
@@ -657,7 +677,11 @@ function ChannelsHandler() {
 		li.appendChild(i);
 		var roomKey = self.generateRoomKey(roomId);
 		li.setAttribute(self.ROOM_ID_ATTR, roomId);
-		self.channels[roomKey] = new ChatHandler(li, users, roomId, roomName);
+		var chatBoxDiv = document.createElement('div');
+		chatBoxDiv.onpaste = self.imagePaste;
+		chatBoxDiv.ondrop = self.imageDrop;
+		chatBoxDiv.ondragover = self.preventDefault;
+		self.channels[roomKey] = new ChatHandler(li, chatBoxDiv, users, roomId, roomName);
 	};
 	self.createNewUserChatHandler = function(roomId, users) {
 		var allUsersIds = Object.keys(users);
@@ -767,7 +791,7 @@ function ChannelsHandler() {
 		self.dom.addRoomInput.onkeypress = self.finishAddRoomOnEnter;
 		self.dom.addRoomButton.onclick = self.finishAddRoom;
 		self.addUserHandler = new Draggable(self.dom.addUserHolder, "");
-		self.addRoomHandler = new Draggable(self.dom.addRoomHolder, "Create new room");
+		self.addRoomHandler = new Draggable(self.dom.addRoomHolder, "Create New Room");
 		var minifier = self.dom.minifier;
 		for (var el in minifier) {
 			if (minifier.hasOwnProperty(el)) {
@@ -792,7 +816,6 @@ function ChannelsHandler() {
 	self.m2Call = function () {
 		growlError("<span>This function is not implemented yet. Use <i class='icon-phone'></i> " +
 				"icon in <b style='font-size: 13px'>DIRECT MESSAGES</b> to make a call</span>");
-		// TODO
 	};
 	self.call = function() {
 		if (self.getActiveUsername() != loggedUser) {
@@ -831,42 +854,44 @@ function ChannelsHandler() {
 }
 
 function showHelp() {
-	if (suggestions) {
-		var infoMessages = [
-			"<span>Every time you join chat those help messages will be shown to you. " +
-			"You can disable them in you profile settings (<i class='icon-wrench'></i> icon). Simply click on popup to hide them</span>",
-			"<span>Browser will notify you on incoming message every time when chat tab is not active. " +
-			"You can disable this option in your profile(<i class='icon-wrench'></i> icon).</span>",
-			"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon." +
-			" To delete created room hover mouse on its name and click on <i class='icon-cancel-circled-outline'></i> icon.</span>",
-			"<span>You can make an audio/video call. Currently pychat allows calling only one person." +
-			" To call someone you need to create ( <i class='icon-plus-squared'></i>) and join direct message," +
-			" open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> </span>",
-			"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
-			"<span>You can write multiline message by pressing <b>shift+Enter</b></span>",
-			"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon. To close appeared smile container click outside of it or press <b>Esc</b></span>",
-			"You can comment somebody's message. This will be shown to all users in current channel. Just click on message time" +
-			"and it's content appears in message text",
-			"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
-			"suggestion there</span>",
-			"<span>Chat uses your browser cache to store messages. To clear current cache click on " +
-			"<i class='icon-clear'></i> icon on the top menu</span>",
-			"<span>You can view offline users in current channel by clicking on <b>CHANNEL ONLINE</b> text</span>",
-			"<span>You can invite a new user to current room by clicking on <i class='icon-user-plus'></i> icon</span>",
-			"You can load history of current channel. For this you need to focus place with messages by simply" +
-			" clicking on it and press arrow up/page up or just scroll up with mousewheel",
-			"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>"
-		];
-		var index = localStorage.getItem('HelpIndex');
-		if (index == null) {
-			index = 0;
-		} else {
-			index = parseInt(index);
-		}
-		if (index < infoMessages.length) {
-			growlInfo(infoMessages[index]);
-			localStorage.setItem('HelpIndex', index + 1);
-		}
+	if (!suggestions) {
+		return
+	}
+	var infoMessages = [
+		"<span>Every time you join chat those help messages will be shown to you. " +
+		"You can disable them in you profile settings (<i class='icon-wrench'></i> icon). Simply click on popup to hide them</span>",
+		"<span>Browser will notify you on incoming message every time when chat tab is not active. " +
+		"You can disable this option in your profile(<i class='icon-wrench'></i> icon).</span>",
+		"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon." +
+		" To delete created room hover mouse on its name and click on <i class='icon-cancel-circled-outline'></i> icon.</span>",
+		"<span>You can make an audio/video call. Currently pychat allows calling only one person." +
+		" To call someone you need to create ( <i class='icon-plus-squared'></i>) and join direct message," +
+		" open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> </span>",
+		"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
+		"<span>You can write multiline message by pressing <b>shift+Enter</b></span>",
+		"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon. To close appeared smile container click outside of it or press <b>Esc</b></span>",
+		"You can comment somebody's message. This will be shown to all users in current channel. Just click on message time" +
+		"and it's content appears in message text",
+		"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
+		"suggestion there</span>",
+		"<span>Chat uses your browser cache to store messages. To clear current cache click on " +
+		"<i class='icon-clear'></i> icon on the top menu</span>",
+		"<span>You can view offline users in current channel by clicking on <b>CHANNEL ONLINE</b> text</span>",
+		"<span>You can invite a new user to current room by clicking on <i class='icon-user-plus'></i> icon</span>",
+		"You can load history of current channel. For this you need to focus place with messages by simply" +
+		" clicking on it and press arrow up/page up or just scroll up with mousewheel",
+		"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>",
+		"<span>To paste image from clipboard: focus box with messages (by clicking on it) and press <B>Ctrl + V</b></span>"
+	];
+	var index = localStorage.getItem('HelpIndex');
+	if (index == null) {
+		index = 0;
+	} else {
+		index = parseInt(index);
+	}
+	if (index < infoMessages.length) {
+		growlInfo(infoMessages[index]);
+		localStorage.setItem('HelpIndex', index + 1);
 	}
 }
 
@@ -978,7 +1003,7 @@ function changeTittleFunction(e) {
 		case "blur":
 			isCurrentTabActive = false;
 	}
-	console.log(getDebugMessage('Windows is {}', isCurrentTabActive ? 'active': 'unactive'))
+	//console.log(getDebugMessage('Windows is {}', isCurrentTabActive ? 'active': 'unactive'))
 }
 
 
@@ -990,13 +1015,13 @@ function timeMessageClick(event) {
 	userMessage.focus();
 }
 
-function ChatHandler(li, allUsers, roomId, roomName) {
+function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	var self = this;
 	self.roomId = roomId;
 	self.channel = 'r'+roomId;
 	self.roomName = roomName;
 	self.dom = {
-		chatBoxDiv: document.createElement('div'),
+		chatBoxDiv: chatboxDiv,
 		userList: document.createElement('ul'),
 		roomNameLi: li,
 		newMessages: document.createElement('span'),
@@ -1265,7 +1290,8 @@ function ChatHandler(li, allUsers, roomId, roomName) {
 		// because requests aren't being sent when there are no event for them, thus no responses
 		var message = data.content;
 		if (message.length === 0) {
-			console.log(getDebugMessage('Requesting messages has reached the top, removing loadUpHistoryEvent handlers'));
+			console.log(getDebugMessage('Requesting messages has reached the top, \
+					removing loadUpHistoryEvent handlers'));
 			self.dom.chatBoxDiv.removeEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
 			self.dom.chatBoxDiv.removeEventListener("keydown", self.keyDownLoadUp);
 			return;
@@ -1343,10 +1369,49 @@ function vibrate() {
 	}
 }
 
+function DownloadBar(stringId) {
+	var self = this;
+	self.dom = {
+		wrapper: $(stringId),
+		text: document.querySelector("#{} > div".format(stringId))
+	};
+	self.PROGRESS_CLASS = 'animated';
+	self.SUCC_CLASS = 'success';
+	self.ERR_CLASS = 'error';
+	self.setMax = function (max) {
+		self.max = max;
+		self.start();
+	};
+	self.setValue = function(value) {
+		var percent =  Math.round(value * 100 / self.max) + "%";
+		self.dom.text.style.width = percent;
+		self.dom.text.textContent = percent;
+	};
+	self.setSuccess = function() {
+		self.setResult('Complete!');
+		CssUtils.addClass(self.dom.wrapper, self.SUCC_CLASS);
+	};
+	self.setError = function(error) {
+		self.setResult(error);
+		CssUtils.addClass(self.dom.wrapper, self.ERR_CLASS);
+	};
+	self.setResult = function (result) {
+		CssUtils.removeClass(self.dom.wrapper, self.PROGRESS_CLASS);
+		self.dom.text.textContent = result;
+	};
+	self.start = function() {
+		CssUtils.removeClass(self.dom.wrapper, self.SUCC_CLASS);
+		CssUtils.removeClass(self.dom.wrapper, self.ERR_CLASS);
+		CssUtils.addClass(self.dom.wrapper, self.PROGRESS_CLASS);
+		self.setValue(0);
+	};
+}
 
 function WebRtcApi() {
 	var self = this;
 	self.activeUserClass = "active-call-user";
+	self.isForTransferFile = false;
+	self.CHUNK_SIZE = 16384;
 	self.dom = {
 		callContainer : $('callContainer'),
 		callAnswerParent : $('callAnswerParent'),
@@ -1369,8 +1434,23 @@ function WebRtcApi() {
 			hangup: $('fs-hangup'),
 			minimize: $('fs-minimize'),
 			enterFullScreen: $('enterFullScreen')
-		}
+		},
+		// transfer file dome
+		bitrateDiv: $('bitrate'),
+		fileInput: $('webRtcFileInput'),
+		downloadAnchor: $('downloadTransferredFile'),
+		statusMessage: $('status')
+		// transfer file dome
 	};
+	//file transfer  variables
+	self.receiveBuffer = [];
+	self.receivedSize = 0;
+	self.bytesPrev = 0;
+	self.timestampPrev = 0;
+	self.timestampStart = null;
+	self.statsInterval = null;
+	self.bitrateMax = 0;
+	//file transfer  variables
 	self.onExitFullScreen = function () {
 		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
 			CssUtils.removeClass(self.dom.videoContainer, 'fullscreen');
@@ -1386,6 +1466,11 @@ function WebRtcApi() {
 		self.dom.fs.hangup.onclick = self.hangUp;
 		self.dom.fs.audio.onclick = self.toggleMic;
 		self.dom.audioStatusIcon.onclick = self.toggleMic;
+		self.downloadBar = new DownloadBar('transmitProgress');
+		$('webRtcFileIcon').onclick = function() {
+			self.dom.fileInput.click();
+		};
+		self.dom.fileInput.addEventListener('change', self.transferFile, false);
 		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
 		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
 			document.addEventListener(fullScreenChangeEvents[i], self.onExitFullScreen, false);
@@ -1519,10 +1604,14 @@ function WebRtcApi() {
 		self.toggleInput(false);
 	};
 	self.onreply = function() {
-		self.setHeaderText("Waiting for <b>{}</b> to answer".format(self.receiverName))
+		self.setHeaderText("Waiting for <b>{}</b> to accept".format(self.receiverName))
 	};
 	self.setHeaderText = function(text) {
-		headerText.innerHTML = text;
+		if (self.isForTransferFile) {
+			self.downloadBar.dom.text.textContent = "Waiting_to_accept";
+		} else {
+			headerText.innerHTML = text;
+		}
 	};
 	self.oniceconnectionstatechange = function () {
 		if (self.pc.iceConnectionState == 'disconnected') {
@@ -1530,11 +1619,21 @@ function WebRtcApi() {
 		}
 	};
 	self.onoffer = function (message) {
-		self.clearTimeout();
+		if (message.content) {
+			self.onFileOffer(message);
+		} else {
+			self.onCallOffer(message);
+		}
+	};
+	self.setAnswerOpponentVariables = function(message){
 		self.receiverName = message.user;
 		self.receiverId = message.userId;
 		self.channel = message.channel;
 		self.sendBaseEvent(null, "reply");
+	} ;
+	self.onCallOffer = function(message) {
+		self.clearTimeout();
+		self.setAnswerOpponentVariables(message);
 		checkAndPlay(self.dom.callSound);
 		CssUtils.showElement(self.dom.callAnswerParent);
 		self.timeoutFunnction = setTimeout(function () {
@@ -1576,7 +1675,6 @@ function WebRtcApi() {
 		self.dom.callSound.pause();
 		self.setAudio(true);
 		self.setVideo(false);
-		self.showCallDialog(true);
 		self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
 		self.createAfterResponseCall();
 	};
@@ -1592,7 +1690,6 @@ function WebRtcApi() {
 		self.dom.callSound.pause();
 		self.setAudio(true);
 		self.setVideo(true);
-		self.showCallDialog(true);
 		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
 		self.createAfterResponseCall();
 	};
@@ -1603,25 +1700,85 @@ function WebRtcApi() {
 			callback();
 		}
 	};
-	self.callPeople = function () {
+	self.sendFileOffer = function (md5) {
+		self.sendBaseEvent(
+				{
+					name: self.file.name,
+					size: self.file.size,
+					md5: md5
+				},
+				'offer');
+		self.isForTransferFile = true;
+		self.waitForAnswer();
+	};
+	self.transferFile = function () {
+		self.file = self.dom.fileInput.files[0];
+		//self.dom.fileInput.disabled = true;
+		var username = self.setOpponentVariables();
+		if (username) {
+			growlError("<span>Can't send file because user <b>{}</b> is not online.</span>".format(username));
+			console.log(getDebugMessage('Skip call because user {} is not online', username));
+			return;
+		}
+		self.downloadBar.setMax(self.file.size);
+		if (self.file.size < 10000000/*10MB*/) {
+			var reader = new FileReader();
+			reader.onload = function (event) {
+				var binary = event.target.result;
+				self.transferedMD5 = CryptoJS.MD5(binary).toString();
+				self.sendFileOffer(self.transferedMD5);
+			};
+			reader.readAsBinaryString(self.file);
+		} else {
+			self.sendFileOffer(null);
+		}
+	};
+	self.onFileOffer = function (message) {
+		self.receivedFileSize = parseInt(message.content.size);
+		self.receivedMD5 = message.content.md5;
+		self.downloadBar.setMax(self.receivedFileSize);
+		self.receivedFileName  = message.content.name;
+		self.lastGrowl = new Growl("<div style='cursor: pointer'>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>".
+			format(encodeHTML(self.receivedFileName), bytesToSize(self.receivedFileSize), encodeHTML(message.user)));
+		self.lastGrowl.show(3600000, 'col-info');
+		self.lastGrowl.growl.addEventListener('click', self.acceptFileReply);
+		self.setAnswerOpponentVariables(message);
+	};
+	self.acceptFileReply = function () {
+		self.init();
+		self.connectWebRtc();
+		self.lastGrowl.growl.removeEventListener('click', self.acceptFileReply);
+		self.lastGrowl.hide();
+		self.showAndAttachCallDialogOnResponse();
+	};
+	self.setOpponentVariables = function () {
 		var activeChannel = channelsHandler.getActiveChannel();
 		if (!(Object.keys(activeChannel.onlineUsers).length > 1)) {
-			growlError("<span>Can't make a call, user <b>{}</b> is not online.</span>".format(
-					activeChannel.getUserNameById(activeChannel.getOpponentId())));
-			return;
+			return activeChannel.getUserNameById(activeChannel.getOpponentId());
 		}
 		self.receiverId = activeChannel.getOpponentId();
 		self.receiverName = activeChannel.getUserNameById(self.receiverId);
-		self.channel = channelsHandler.activeChannel;
+		self.channel = channelsHandler.activeChannel
+	};
+	self.callPeople = function () {
+		self.isForTransferFile = false;
+		var username = self.setOpponentVariables();
+		if (username) {
+			growlError("<span>Can't make a call file because user <b>{}</b> is not online.</span>".format(username));
+			console.log(getDebugMessage('Skip call because user {} is not online', username));
+			return;
+		}
 		self.setHeaderText("Confirm browser to use your input devices for call");
 		self.waitForAnswer();
-		self.captureInput(function(stream) {
-			self.setIconState(true);
-			self.setHeaderText("Establishing connection with {}".format(self.receiverName));
-			self.attachLocalStream(stream);
-			self.sendBaseEvent(null, 'offer');
-			self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime);
-		});
+		self.captureInput(self.captureInputStream);
+
+	};
+	self.captureInputStream = function(stream) {
+		self.setIconState(true);
+		self.setHeaderText("Establishing connection with {}".format(self.receiverName));
+		self.attachLocalStream(stream);
+		self.sendBaseEvent(null, 'offer');
+		self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime);
 	};
 	self.createCallAfterCapture = function(stream) {
 		self.init();
@@ -1630,20 +1787,57 @@ function WebRtcApi() {
 	};
 	self.createAfterResponseCall = function () {
 		self.captureInput(self.createCallAfterCapture, true);
+		self.showAndAttachCallDialogOnResponse();
+		self.showCallDialog(true);
+	};
+	self.showAndAttachCallDialogOnResponse = function () {
 		channelsHandler.setActiveChannel(self.channel);
 		channelsHandler.getActiveChannel().setChannelAttach(true);
 		CssUtils.showElement(self.dom.callContainer);
-		self.showCallDialog(true);
 	};
 	self.print = function (message){
 		console.log(getDebugMessage("Call message {}", JSON.stringify(message)));
 	};
-	self.gotReceiveChannel = function (event) { /* TODO is it used ? */
+	self.gotReceiveChannel = function (event) {
 		console.log(getDebugMessage('Received Channel Callback'));
 		self.sendChannel = event.channel;
-		self.sendChannel.onmessage = self.print;
-		self.sendChannel.onopen = self.print;
-		self.sendChannel.onclose = self.print;
+		// self.sendChannel.onmessage = self.print;
+		self.sendChannel.onopen = self.channelOpen;
+		//self.sendChannel.onclose = self.print;
+	};
+	self.channelOpen = function () {
+		if (self.isForTransferFile) {
+			self.sendData();
+		}
+	};
+	self.sendData = function() {
+		console.log(getDebugMessage('file is ' + [self.file.name, self.file.size, self.file.type,
+					self.file.lastModifiedDate].join(' ')));
+
+		// Handle 0 size files.
+		self.dom.statusMessage.textContent = '';
+		self.dom.downloadAnchor.textContent = '';
+		if (self.file.size === 0) {
+			self.dom.bitrateDiv.innerHTML = '';
+			self.dom.statusMessage.textContent = 'File is empty, please select a non-empty file';
+			self.closeDataChannels();
+			return;
+		}
+		self.sliceFile(0);
+	};
+	self.sliceFile = function (offset) {
+		var reader = new window.FileReader();
+		reader.onload = (function () {
+			return function (e) {
+				self.sendChannel.send(e.target.result);
+				if (self.file.size > offset + e.target.result.byteLength) {
+					window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
+				}
+				self.downloadBar.setValue(offset + e.target.result.byteLength);
+			};
+		})(self.file);
+		var slice = self.file.slice(offset, offset + self.CHUNK_SIZE);
+		reader.readAsArrayBuffer(slice);
 	};
 	self.waitForAnswer = function () {
 		self.init();
@@ -1717,8 +1911,7 @@ function WebRtcApi() {
 	};
 	self.createMicrophoneLevelVoice = function(stream) {
 		try {
-			var AudioContextClass = isFirefox ? AudioContext : webkitAudioContext;
-			var audioContext = new AudioContextClass();
+			var audioContext = new AudioContext();
 			var analyser = audioContext.createAnalyser();
 			var microphone = audioContext.createMediaStreamSource(stream);
 			self.javascriptNode = audioContext./*createJavaScriptNode*/createScriptProcessor(2048, 1, 1);
@@ -1730,6 +1923,9 @@ function WebRtcApi() {
 			self.prevVolumeValues = 0;
 			self.volumeValuesCount = 0;
 			self.javascriptNode.onaudioprocess = function () {
+				if (!self.constraints.audio) {
+					return;
+				}
 				var array = new Uint8Array(analyser.frequencyBinCount);
 				analyser.getByteFrequencyData(array);
 				var values = 0;
@@ -1740,8 +1936,8 @@ function WebRtcApi() {
 				var value = values / length;
 				self.prevVolumeValues += value;
 				self.volumeValuesCount++;
-				if (self.volumeValuesCount == 300 && self.prevVolumeValues < 10) {
-					console.error(getDebugMessage('Microphone level is too low')); // TODO
+				if (self.volumeValuesCount == 100 && self.prevVolumeValues == 0) {
+					self.showNoMicError();
 				}
 				self.dom.microphoneLevel.value = value;
 			}
@@ -1749,17 +1945,23 @@ function WebRtcApi() {
 			console.error(getDebugMessage("Unable to use microphone level because " + err));
 		}
 	};
+	self.showNoMicError = function () {
+		var url = isChrome ? 'setting in chrome://settings/content' : 'your browser settings';
+		url += navigator.platform.indexOf('Linux') >= 0 ?
+				'. Open pavucontrol for more info' :
+				' . Right click on volume icon in system tray -> record devices -> input -> microphone';
+		growlError('<div>Unable to capture input from microphone. Check your microphone connection or {}'
+				.format(url));
+	};
 	self.init = function() {
 		// if (typeof RTCPeerConnection  == 'undefined' && typeof mozRTCPeerConnection == 'undefined' && typeof webkitRTCPeerConnection == 'undefined') {
 		// 	growlError(getText("Unfortunately {} doesn't support webrtc. Video/audio call is unuvailable", browserVersion));
 		// 	return;
 		// }
-		var RTCPeerConnection = isFirefox ? mozRTCPeerConnection : webkitRTCPeerConnection;
 		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
 		self.pc.oniceconnectionstatechange = self.oniceconnectionstatechange;
 		self.pc.onaddstream = function (event) {
 			self.setVideoSource(self.dom.remote, event.stream);
-			self.dom.remote.volume = volumeProportion[window.sound];
 			self.setHeaderText("You're talking to <b>{}</b> now".format(self.receiverName));
 			self.setIconState(true);
 			console.log(getDebugMessage("Stream attached"));
@@ -1789,8 +1991,10 @@ function WebRtcApi() {
 		self.receiverName = null;
 		self.receiverId = null;
 		try {
+			self.sendChannel.close();
 			self.pc.close();
 		} catch (error) {
+			console.warn(getDebugMessage('{} Error while closing channels, description {}', error.message, error,name));
 		}
 		if (self.localStream) {
 			var tracks = self.localStream.getTracks();
@@ -1799,7 +2003,9 @@ function WebRtcApi() {
 			}
 		}
 		self.setIconState(false);
-		growlInfo(text);
+		if (text) {
+			growlInfo(text);
+		}
 		self.hidePhoneIcon();
 		if (self.javascriptNode) {
 			self.javascriptNode.onaudioprocess = null;
@@ -1825,13 +2031,89 @@ function WebRtcApi() {
 			singlePage.showDefaultPage();
 		}
 	};
+	self.webrtcDirectMessage = function (event) {
+		// console.log(getDebugMessage('Received Message ' + event.data.byteLength));
+		self.receiveBuffer.push(event.data);
+		self.receivedSize += event.data.byteLength;
+
+		self.downloadBar.setValue(self.receivedSize);
+
+		// we are assuming that our signaling protocol told
+		// about the expected file size (and name, hash, etc).
+		if (self.receivedSize === self.receivedFileSize) {
+			self.assembleFile();
+			self.closeEvents();
+
+			if (self.statsInterval) {
+				window.clearInterval(self.statsInterval);
+				self.statsInterval = null;
+			}
+		}
+	};
+	self.onfileAccepted = function (message) {
+		console.log(getDebugMessage("Transfer file {} (md5={}) result : {}",
+				self.file.name, self.transferedMD5, message.content));
+		if (message.content == 'valid' || message.content == 'unknown') {
+			growlInfo('Transferring  {} is finished '.format(self.file.name));
+			self.downloadBar.setSuccess();
+		} else {
+			growlError('Transferring  {} is finished with error, expected md5 {}, resulting md5 {} '
+					.format(self.file.name, self.transferedMD5, message.content));
+			self.downloadBar.setError('Invalid checksumm');
+		}
+		self.closeEvents();
+	};
+	self.assembleFile = function () {
+		console.log(getDebugMessage('Finished receiving file{}, verifying md5...', self.receivedFileName));
+		var received = new window.Blob(self.receiveBuffer);
+		received.name = self.receivedFileName;
+		received.lastModifiedDate = new Date();
+		if (self.receivedMD5 != null) {
+			var reader = new FileReader();
+			reader.onload = function (event) {
+				var binary = event.target.result;
+				var md5 = CryptoJS.MD5(binary).toString();
+				if (md5 !== self.receivedMD5) {
+					var message = "Error verifying md5 for {}, expected {}, got {}"
+							.format(self.receivedFileName, self.receivedMD5, md5);
+					growlError(message);
+					console.warn(getDebugMessage(message));
+					self.sendBaseEvent(md5, 'fileAccepted');
+					self.downloadBar.setError('Invalid cheksum');
+				} else {
+					var message2 = "File {} is received. Open dialog to download it".format(self.receivedFileName);
+					growlInfo(message2);
+					console.info(getDebugMessage(message2));
+					self.sendBaseEvent('valid', 'fileAccepted');
+					self.downloadBar.setSuccess();
+				}
+			};
+			reader.readAsBinaryString(received);
+		} else {
+			var message2 = "File {} is received. Since huge size (over 10MB) checksum verification is skipped.\
+					Open dialog to download it".format(self.receivedFileName);
+			growlInfo(message2);
+			console.info(getDebugMessage(message2));
+			self.sendBaseEvent('unknown', 'fileAccepted');
+			self.downloadBar.setSuccess();
+		}
+		self.receiveBuffer = [];
+		self.receivedSize =0;
+		self.dom.downloadAnchor.href = URL.createObjectURL(received);
+		self.dom.downloadAnchor.download = self.receivedFileName;
+		self.dom.downloadAnchor.textContent = 'Click to save {}'.format(self.receivedFileName);
+		self.dom.downloadAnchor.style.display = 'block';
+		//var bitrate = Math.round(self.receivedSize * 8 /
+		//		((new Date()).getTime() - self.timestampStart));
+		//self.dom.bitrateDiv.innerHTML = '<strong>Average Bitrate:</strong> ' +
+		//		bitrate + ' kbits/sec (max: ' + self.bitrateMax + ' kbits/sec)';
+	};
+
 	self.connectWebRtc = function () {
 		try {
 			// Reliable data channels not supported by Chrome
 			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
-			self.sendChannel.onmessage = function (message) {
-				console.log(getDebugMessage("SC in {}", message.data));
-			};
+			self.sendChannel.onmessage = self.webrtcDirectMessage;
 			console.log(getDebugMessage("Created send data channel"));
 		} catch (e) {
 			var error = "Failed to create data channel because {} ".format(e.message || e);
@@ -1851,7 +2133,7 @@ function WebRtcApi() {
 			content: content,
 			action: 'call',
 			type: type,
-			channel: self.channel
+			channel: channelsHandler.activeChannel
 		});
 	};
 	self.sendWebRtcEvent = function (message) {
