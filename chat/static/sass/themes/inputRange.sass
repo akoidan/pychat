@@ -31,7 +31,7 @@ $track-grad-color: top, lighten($before-color, 10%), darken($before-color, 10%)
 @function refl-l($a: 0deg, $k: 1, $refl: $thumb-refl)
 	@return linear-gradient($a, rgba($refl, 0), rgba($refl, $k), rgba($refl, 0)) 50% 50%
 
-=track-base($flag: true)
+=track-base
 	box-sizing: border-box
 	border: solid 1px
 	border-color: #0c0d0f #1b1c1e #222423
@@ -50,7 +50,7 @@ $track-grad-color: top, lighten($before-color, 10%), darken($before-color, 10%)
 	background-size: 100% .125em, 50% 50%, 50% 50%, .125em 100%, 50% 50%, 50% 50%
 
 
-input[type='range']
+#microphoneLevel
 	&,
 	&::-webkit-slider-runnable-track,
 	&::-webkit-slider-thumb
@@ -76,7 +76,7 @@ input[type='range']
 		+track-base
 
 	&::-ms-track
-		+track-base(false)
+		+track-base
 		color: transparent
 
 	&::-ms-fill-lower
