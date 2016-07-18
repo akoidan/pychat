@@ -2,7 +2,7 @@
 
 CONF_REPOSITORY="https://github.com/Deathangel908/djangochat-config"
 
-CONF_VERSION='8ee5c4b226ffa4b497d5f42342600f68ad0ca678'
+CONF_VERSION='b478d0f171ff3229e287c985bc33807b7e3f7b93'
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
@@ -45,8 +45,7 @@ declare -a files=(\
     "$CSS_DIR/main.css" \
     "$CSS_DIR/chat.css"\
     "$CSS_DIR/register.css"\
-    "$JS_DIR/amcharts-all.js"\
-    "$JS_DIR/md5.js"\
+    "$JS_DIR/amcharts-all.js"
 )
 
 cd "$PROJECT_ROOT"

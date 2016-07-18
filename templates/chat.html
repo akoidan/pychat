@@ -15,7 +15,6 @@
 		var notifications = {{ notifications |yesno:"true,false" }};
 	</script>
 	<script src="{% md5url "js/smileys_data.js" %}"></script>
-	<script src="{% md5url "js/md5.js" %}"></script>
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}
@@ -80,6 +79,7 @@
 						</div>
 					</div>
 					<div class="callContainerIcons noSelection">
+						<i class="icon-phone-circled" id="callIcon" onclick="event.preventDefault(); webRtcApi.callPeople()"></i>
 						<i class="icon-doc-inv" id="webRtcFileIcon"></i>
 						<i id="audioStatusIcon" class="icon-mic"></i>
 						<i id="videoStatusIcon" class="icon-videocam"></i>
@@ -87,7 +87,6 @@
 							<i id="enterFullScreen" class="icon-webrtc-fullscreen" title="Fullscreen"></i>
 						</div>
 						<i class="icon-hang-up" id="hangUpIcon"></i>
-						<i class="icon-phone-circled" id="callIcon" onclick="event.preventDefault(); webRtcApi.callPeople()"></i>
 {#						<img src="{% md5url 'images/call.gif' %}" alt="call" class="hidden" id="callRing"#}
 {#							 style="width: 30px"/>#}
 						<div class="volumeLevelsHolder">

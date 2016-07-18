@@ -12,7 +12,7 @@ var changeProfileForm;
 function initChangeProfile() {
 	photoImg = $('photoImg');
 	video = $('changeProfileVideo');
-	canvas = document.querySelector('canvas');
+	canvas = $('canvasBuffer');
 	userProfileData = $('userProfileData');
 	themeSelector = $('themeSelector');
 	changeProfileForm = $('changeProfileForm');

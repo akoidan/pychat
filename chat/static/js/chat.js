@@ -58,6 +58,44 @@ onDocLoad(function () {
 });
 
 
+function Painter() {
+	var self = this;
+	self.canvas = $('painter');
+	self.ctx = canvas.getContext('2d');
+
+	self.painting = document.getElementById('paint');
+	self.paint_style = getComputedStyle(self.painting);
+	self.canvas.width = parseInt(self.paint_style.getPropertyValue('width'));
+	self.canvas.height = parseInt(self.paint_style.getPropertyValue('height'));
+
+	self.mouse = {x: 0, y: 0};
+
+	self.canvas.addEventListener('mousemove', function (e) {
+		self.mouse.x = e.pageX - this.offsetLeft;
+		self.mouse.y = e.pageY - this.offsetTop;
+	}, false);
+
+	self.ctx.lineWidth = 3;
+	self.ctx.lineJoin = 'round';
+	self.ctx.lineCap = 'round';
+	self.ctx.strokeStyle = '#00CC99';
+
+	self.canvas.addEventListener('mousedown', function (e) {
+		self.ctx.beginPath();
+		self.ctx.moveTo(self.mouse.x, self.mouse.y);
+
+		self.canvas.addEventListener('mousemove', self.onPaint, false);
+	}, false);
+
+	self.canvas.addEventListener('mouseup', function () {
+		self.canvas.removeEventListener('mousemove', self.onPaint, false);
+	}, false);
+
+	self.onPaint = function () {
+		self.ctx.lineTo(self.mouse.x, self.mouse.y);
+		self.ctx.stroke();
+	};
+}
 function NotifierHandler() {
 	self = this;
 	self.maxNotifyTime = 300;
@@ -1691,12 +1729,11 @@ function WebRtcApi() {
 			callback();
 		}
 	};
-	self.sendFileOffer = function (md5) {
+	self.sendFileOffer = function () {
 		self.sendBaseEvent(
 				{
 					name: self.file.name,
-					size: self.file.size,
-					md5: md5
+					size: self.file.size
 				},
 				'offer');
 		self.isForTransferFile = true;
@@ -1712,21 +1749,10 @@ function WebRtcApi() {
 			return;
 		}
 		self.downloadBar.setMax(self.file.size);
-		if (self.file.size < 10000000/*10MB*/) {
-			var reader = new FileReader();
-			reader.onload = function (event) {
-				var binary = event.target.result;
-				self.transferedMD5 = CryptoJS.MD5(binary).toString();
-				self.sendFileOffer(self.transferedMD5);
-			};
-			reader.readAsBinaryString(self.file);
-		} else {
-			self.sendFileOffer(null);
-		}
+		self.sendFileOffer();
 	};
 	self.onFileOffer = function (message) {
 		self.receivedFileSize = parseInt(message.content.size);
-		self.receivedMD5 = message.content.md5;
 		self.downloadBar.setMax(self.receivedFileSize);
 		self.receivedFileName  = message.content.name;
 		self.lastGrowl = new Growl("<div style='cursor: pointer'>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>".
@@ -2024,60 +2050,25 @@ function WebRtcApi() {
 		}
 	};
 	self.onfileAccepted = function (message) {
-		console.log(getDebugMessage("Transfer file {} (md5={}) result : {}",
-				self.file.name, self.transferedMD5, message.content));
-		if (message.content == 'valid' || message.content == 'unknown') {
-			growlInfo('Transferring  {} is finished '.format(self.file.name));
-			self.downloadBar.setSuccess();
-			self.downloadBar.dom.text.innerHTML = 'Transferred!';
-		} else {
-			growlError('Transferring  {} is finished with error, expected md5 {}, resulting md5 {} '
-					.format(self.file.name, self.transferedMD5, message.content));
-			self.downloadBar.setError();
-			self.downloadBar.dom.text.innerHTML = "Transfered invalid checksumm";
-		}
+		console.log(getDebugMessage("Transfer file {} result : {}", self.file.name, message.content));
+		growlInfo('Transferring  {} is finished '.format(self.file.name));
+		self.downloadBar.setSuccess();
+		self.downloadBar.dom.text.innerHTML = 'Transferred!';
 		self.closeEvents();
 	};
 	self.assembleFile = function () {
-		console.log(getDebugMessage('Finished receiving file{}, verifying md5...', self.receivedFileName));
 		var received = new window.Blob(self.receiveBuffer);
-		received.name = self.receivedFileName;
-		received.lastModifiedDate = new Date();
-		if (self.receivedMD5 != null) {
-			var reader = new FileReader();
-			reader.onload = function (event) {
-				var binary = event.target.result;
-				var md5 = CryptoJS.MD5(binary).toString();
-				if (md5 !== self.receivedMD5) {
-					var message = "Error verifying md5 for {}, expected {}, got {}"
-							.format(self.receivedFileName, self.receivedMD5, md5);
-					growlError(message);
-					console.warn(getDebugMessage(message));
-					self.sendBaseEvent(md5, 'fileAccepted');
-					self.downloadBar.setError();
-				} else {
-					var message2 = "File {} is received.".format(self.receivedFileName);
-					growlInfo(message2);
-					console.info(getDebugMessage(message2));
-					self.sendBaseEvent('valid', 'fileAccepted');
-					self.downloadBar.setSuccess();
-				}
-			};
-			reader.readAsBinaryString(received);
-		} else {
-			var message2 = "File {} is received. Checksum verification is skipped.".format(self.receivedFileName);
-			growlInfo(message2);
-			console.info(getDebugMessage(message2));
-			self.sendBaseEvent('unknown', 'fileAccepted');
-			self.downloadBar.setSuccess();
-		}
+		var message = "File {} is received.".format(self.receivedFileName);
+		growlInfo(message);
+		console.info(getDebugMessage(message));
+		self.sendBaseEvent(null, 'fileAccepted');
+		self.downloadBar.setSuccess();
 		self.receiveBuffer = [];
 		self.receivedSize =0;
 		self.downloadBar.dom.text.href = URL.createObjectURL(received);
 		self.downloadBar.dom.text.download = self.receivedFileName;
-		self.downloadBar.dom.text.textContent = 'Click to save {}'.format(self.receivedFileName);
+		self.downloadBar.dom.text.textContent = 'Save {}'.format(self.receivedFileName);
 	};
-
 	self.createSendChannelAndOffer = function () {
 		self.webrtcInitiator = true;
 		try {
