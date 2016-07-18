@@ -234,7 +234,18 @@ var Growl = function (message) {
 	};
 
 };
-
+function getCallerTrace() {
+	try {
+		throw Error('')
+	} catch (err) {
+		var trace = err.stack.split("\n");
+		var caller_line = trace[4];
+		if (caller_line) {
+			var index = caller_line.indexOf("at ");
+			return caller_line.slice(index + 2, caller_line.length);
+		}
+	}
+}
 
 function growlSuccess(message) {
 	new Growl(message).success();
