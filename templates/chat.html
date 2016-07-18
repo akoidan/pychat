@@ -141,6 +141,13 @@
 			<input type="button" value="Add" id="addRoomButton"/>
 		</div>
 	</div>
+	<div id="canvasHolder" class="hidden">
+		<div>
+			<canvas id="painter"></canvas>
+			<input type="color" id="painterColorPicker" value="#ff0000" style="width: 25px;"/>
+			<input type="button" value="Send"/>
+		</div>
+	</div>
 	<div id="userMessageWrapper" class="hidden" style="position: relative">
 		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
 		<i class="icon-picture" title="Add a picture" onclick="$('imgInput').click()"></i>

@@ -35,6 +35,7 @@ var channelsHandler;
 var wsHandler;
 var storage;
 var singlePage;
+var painter;
 
 
 onDocLoad(function () {
@@ -52,6 +53,7 @@ onDocLoad(function () {
 	smileyUtil.init();
 	storage = new Storage();
 	notifier = new NotifierHandler();
+	painter = new Painter();
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	wsHandler.start_chat_ws();
 	showHelp();
@@ -60,41 +62,60 @@ onDocLoad(function () {
 
 function Painter() {
 	var self = this;
-	self.canvas = $('painter');
-	self.ctx = canvas.getContext('2d');
-
-	self.painting = document.getElementById('paint');
-	self.paint_style = getComputedStyle(self.painting);
-	self.canvas.width = parseInt(self.paint_style.getPropertyValue('width'));
-	self.canvas.height = parseInt(self.paint_style.getPropertyValue('height'));
-
+	Draggable.call(self, $('canvasHolder'), "Painter");
+	self.dom.canvas = $('painter');
+	self.dom.color = $('painterColorPicker');
+	self.dom.button = document.querySelector('#canvasHolder input[type=button]');
+	self.ctx = self.dom.canvas.getContext('2d');
 	self.mouse = {x: 0, y: 0};
-
-	self.canvas.addEventListener('mousemove', function (e) {
-		self.mouse.x = e.pageX - this.offsetLeft;
-		self.mouse.y = e.pageY - this.offsetTop;
-	}, false);
-
-	self.ctx.lineWidth = 3;
-	self.ctx.lineJoin = 'round';
-	self.ctx.lineCap = 'round';
-	self.ctx.strokeStyle = '#00CC99';
-
-	self.canvas.addEventListener('mousedown', function (e) {
+	self.mouseDown = 0;
+	self.startDraw = function (e) {
+		self.mouseDown ++;
+		var rect = painter.dom.canvas.getBoundingClientRect();
+		self.leftOffset = rect.left;
+		self.topOffset = rect.top;
 		self.ctx.beginPath();
-		self.ctx.moveTo(self.mouse.x, self.mouse.y);
-
-		self.canvas.addEventListener('mousemove', self.onPaint, false);
-	}, false);
-
-	self.canvas.addEventListener('mouseup', function () {
-		self.canvas.removeEventListener('mousemove', self.onPaint, false);
-	}, false);
-
-	self.onPaint = function () {
-		self.ctx.lineTo(self.mouse.x, self.mouse.y);
+		self.ctx.moveTo(e.pageX - self.leftOffset, e.pageY - self.topOffset);
+		self.dom.canvas.addEventListener('mousemove', self.onPaint, false);
+	};
+	self.changeColor = function(event) {
+		self.ctx.strokeStyle = event.target.value;
+	};
+	self.finishDraw = function () {
+		if (self.mouseDown > 0) {
+			self.mouseDown--;
+			self.dom.canvas.removeEventListener('mousemove', self.onPaint, false);
+		}
+	};
+	self.onPaint = function (e) {
+		self.ctx.lineTo(e.pageX - self.leftOffset, e.pageY - self.topOffset);
 		self.ctx.stroke();
 	};
+	self.sendImage = function() {
+		wsHandler.sendToServer({
+			image: self.dom.canvas.toDataURL(),
+			content: null,
+			action: 'sendMessage',
+			channel: channelsHandler.activeChannel
+		});
+	};
+	self.initChild = function () {
+		document.body.addEventListener('mouseup', self.finishDraw, false);
+		self.dom.canvas.addEventListener('mousedown', self.startDraw, false);
+		self.dom.color.addEventListener('input', self.changeColor, false);
+		self.dom.button.onclick = self.sendImage;
+		self.ctx.lineWidth = 3;
+		self.ctx.lineJoin = 'round';
+		self.ctx.lineCap = 'round';
+		self.ctx.strokeStyle = self.dom.color.value;
+	};
+	self.superShow = self.show;
+	self.show = function () {
+		self.superShow();
+		self.dom.canvas.setAttribute('width', self.dom.canvas.offsetWidth);
+		self.dom.canvas.setAttribute('height', self.dom.canvas.offsetHeight);
+	};
+	self.initChild();
 }
 function NotifierHandler() {
 	self = this;
