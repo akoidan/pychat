@@ -14,7 +14,8 @@ $stripe-size: $height * 2
 	border-radius: $border-radius
 	padding: $padding
 	box-shadow: inset 0 1px 1px 0 black, 0 1px 1px 0 #36393F
-	> div
+	> a
+		overflow: hidden
 		height: 100%
 		line-height: $height
 		font-size: 14px
@@ -35,14 +36,14 @@ $stripe-size: $height * 2
 			top: 0
 			@include linear-gradient-values(top, rgba(255, 255, 255, 0.30), rgba(0, 0, 0, 0.3))
 
-	&.animated > div
+	&.animated > a
 		background: #1c3859
 		@include linear-gradient-values(135deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)
 		@include raw-animation(animate-bars 2s linear infinite)
 		background-size: $stripe-size $stripe-size
-	&.success > div
+	&.success > a
 		background-color: #18611f
-	&.error > div
+	&.error > a
 		background-color: #700000
 
 @include keyframes(animate-bars)
