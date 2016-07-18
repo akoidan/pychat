@@ -1373,7 +1373,7 @@ function DownloadBar(stringId) {
 	var self = this;
 	self.dom = {
 		wrapper: $(stringId),
-		text: document.querySelector("#{} > div".format(stringId))
+		text: document.querySelector("#{} > a".format(stringId))
 	};
 	self.PROGRESS_CLASS = 'animated';
 	self.SUCC_CLASS = 'success';
@@ -1388,18 +1388,16 @@ function DownloadBar(stringId) {
 		self.dom.text.textContent = percent;
 	};
 	self.setSuccess = function() {
-		self.setResult('Complete!');
+		CssUtils.removeClass(self.dom.wrapper, self.PROGRESS_CLASS);
 		CssUtils.addClass(self.dom.wrapper, self.SUCC_CLASS);
 	};
-	self.setError = function(error) {
-		self.setResult(error);
+	self.setError = function() {
+		CssUtils.removeClass(self.dom.wrapper, self.PROGRESS_CLASS);
 		CssUtils.addClass(self.dom.wrapper, self.ERR_CLASS);
 	};
-	self.setResult = function (result) {
-		CssUtils.removeClass(self.dom.wrapper, self.PROGRESS_CLASS);
-		self.dom.text.textContent = result;
-	};
 	self.start = function() {
+		self.dom.text.removeAttribute('href');
+		self.dom.text.removeAttribute('download');
 		CssUtils.removeClass(self.dom.wrapper, self.SUCC_CLASS);
 		CssUtils.removeClass(self.dom.wrapper, self.ERR_CLASS);
 		CssUtils.addClass(self.dom.wrapper, self.PROGRESS_CLASS);
@@ -1437,20 +1435,12 @@ function WebRtcApi() {
 			enterFullScreen: $('enterFullScreen')
 		},
 		// transfer file dome
-		bitrateDiv: $('bitrate'),
-		fileInput: $('webRtcFileInput'),
-		downloadAnchor: $('downloadTransferredFile'),
-		statusMessage: $('status')
+		fileInput: $('webRtcFileInput')
 		// transfer file dome
 	};
 	//file transfer  variables
 	self.receiveBuffer = [];
 	self.receivedSize = 0;
-	self.bytesPrev = 0;
-	self.timestampPrev = 0;
-	self.timestampStart = null;
-	self.statsInterval = null;
-	self.bitrateMax = 0;
 	//file transfer  variables
 	self.onExitFullScreen = function () {
 		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
@@ -1814,13 +1804,8 @@ function WebRtcApi() {
 	self.sendData = function() {
 		console.log(getDebugMessage('file is ' + [self.file.name, self.file.size, self.file.type,
 					self.file.lastModifiedDate].join(' ')));
-
-		// Handle 0 size files.
-		self.dom.statusMessage.textContent = '';
-		self.dom.downloadAnchor.textContent = '';
 		if (self.file.size === 0) {
-			self.dom.bitrateDiv.innerHTML = '';
-			self.dom.statusMessage.textContent = 'File is empty, please select a non-empty file';
+			self.downloadBar.dom.text.textContent = "Can't send empty file";
 			self.closeDataChannels();
 			return;
 		}
@@ -2036,11 +2021,6 @@ function WebRtcApi() {
 		if (self.receivedSize === self.receivedFileSize) {
 			self.assembleFile();
 			self.closeEvents();
-
-			if (self.statsInterval) {
-				window.clearInterval(self.statsInterval);
-				self.statsInterval = null;
-			}
 		}
 	};
 	self.onfileAccepted = function (message) {
@@ -2049,10 +2029,12 @@ function WebRtcApi() {
 		if (message.content == 'valid' || message.content == 'unknown') {
 			growlInfo('Transferring  {} is finished '.format(self.file.name));
 			self.downloadBar.setSuccess();
+			self.downloadBar.dom.text.innerHTML = 'Transferred!';
 		} else {
 			growlError('Transferring  {} is finished with error, expected md5 {}, resulting md5 {} '
 					.format(self.file.name, self.transferedMD5, message.content));
-			self.downloadBar.setError('Invalid checksumm');
+			self.downloadBar.setError();
+			self.downloadBar.dom.text.innerHTML = "Transfered invalid checksumm";
 		}
 		self.closeEvents();
 	};
@@ -2072,7 +2054,7 @@ function WebRtcApi() {
 					growlError(message);
 					console.warn(getDebugMessage(message));
 					self.sendBaseEvent(md5, 'fileAccepted');
-					self.downloadBar.setError('Invalid cheksum');
+					self.downloadBar.setError();
 				} else {
 					var message2 = "File {} is received.".format(self.receivedFileName);
 					growlInfo(message2);
@@ -2083,8 +2065,7 @@ function WebRtcApi() {
 			};
 			reader.readAsBinaryString(received);
 		} else {
-			var message2 = "File {} is received. Since huge size (over 10MB) checksum verification is skipped.\
-					Open dialog to download it".format(self.receivedFileName);
+			var message2 = "File {} is received. Checksum verification is skipped.".format(self.receivedFileName);
 			growlInfo(message2);
 			console.info(getDebugMessage(message2));
 			self.sendBaseEvent('unknown', 'fileAccepted');
@@ -2092,14 +2073,9 @@ function WebRtcApi() {
 		}
 		self.receiveBuffer = [];
 		self.receivedSize =0;
-		self.dom.downloadAnchor.href = URL.createObjectURL(received);
-		self.dom.downloadAnchor.download = self.receivedFileName;
-		self.dom.downloadAnchor.textContent = 'Click to save {}'.format(self.receivedFileName);
-		self.dom.downloadAnchor.style.display = 'block';
-		//var bitrate = Math.round(self.receivedSize * 8 /
-		//		((new Date()).getTime() - self.timestampStart));
-		//self.dom.bitrateDiv.innerHTML = '<strong>Average Bitrate:</strong> ' +
-		//		bitrate + ' kbits/sec (max: ' + self.bitrateMax + ' kbits/sec)';
+		self.downloadBar.dom.text.href = URL.createObjectURL(received);
+		self.downloadBar.dom.text.download = self.receivedFileName;
+		self.downloadBar.dom.text.textContent = 'Click to save {}'.format(self.receivedFileName);
 	};
 
 	self.createSendChannelAndOffer = function () {
