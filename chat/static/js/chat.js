@@ -1403,6 +1403,7 @@ function DownloadBar(stringId) {
 		CssUtils.removeClass(self.dom.wrapper, self.SUCC_CLASS);
 		CssUtils.removeClass(self.dom.wrapper, self.ERR_CLASS);
 		CssUtils.addClass(self.dom.wrapper, self.PROGRESS_CLASS);
+		CssUtils.showElement(self.dom.wrapper);
 		self.setValue(0);
 	};
 }
@@ -1745,8 +1746,8 @@ function WebRtcApi() {
 		self.setAnswerOpponentVariables(message);
 	};
 	self.acceptFileReply = function () {
-		self.init();
-		self.connectWebRtc();
+		self.createPeerConnection();
+		self.createSendChannelAndOffer();
 		self.lastGrowl.growl.removeEventListener('click', self.acceptFileReply);
 		self.lastGrowl.hide();
 		self.showAndAttachCallDialogOnResponse();
@@ -1781,9 +1782,9 @@ function WebRtcApi() {
 		self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime);
 	};
 	self.createCallAfterCapture = function(stream) {
-		self.init();
+		self.createPeerConnection();
 		self.attachLocalStream(stream);
-		self.connectWebRtc();
+		self.createSendChannelAndOffer();
 	};
 	self.createAfterResponseCall = function () {
 		self.captureInput(self.createCallAfterCapture, true);
@@ -1840,7 +1841,8 @@ function WebRtcApi() {
 		reader.readAsArrayBuffer(slice);
 	};
 	self.waitForAnswer = function () {
-		self.init();
+		self.webrtcInitiator = false;
+		self.createPeerConnection();
 		self.pc.ondatachannel = self.gotReceiveChannel;
 	};
 	self.handle = function (data) {
@@ -1858,18 +1860,6 @@ function WebRtcApi() {
 			self.timeoutFunnction = null;
 			//timeoutCleaned = true;
 		}
-		//try {
-		//	throw Error('')
-		//} catch (err) {
-		//	var caller_line = err.stack.split("\n")[3];
-		//	var index = caller_line.indexOf("at ");
-		//	var clean = caller_line.slice(index + 2, caller_line.length);
-		//	if (timeoutCleaned) {
-		//		console.error(getText("Cleaned callback from {}", clean));
-		//	} else {
-		//		console.warn(getText("NOT cleaned callback from {}", clean));
-		//	}
-		//}
 	};
 	self.answerToWebrtc = function () {
 		console.log(getDebugMessage('creating answer...'));
@@ -1877,19 +1867,23 @@ function WebRtcApi() {
 			console.log(getDebugMessage('sent answer...'));
 			self.pc.setLocalDescription(answer, function () {
 				self.sendWebRtcEvent(answer);
-			}, self.failWebRtc);
-		}, self.failWebRtc, self.sdpConstraints);
+			}, self.failWebRtcP3);
+		}, self.failWebRtcP4, self.sdpConstraints);
 	};
-	self.onwebrtc = function (data) {
-		var offer = data.content;
+	self.onSuccessAnswer = function() {
+		console.log(getDebugMessage('answer received'))
+	};
+	self.onwebrtc = function (message) {
+		var data = message.content;
 		self.clearTimeout();
 		if (self.pc.iceConnectionState && self.pc.iceConnectionState != 'closed') {
-			if (offer.sdp) {
-				self.pc.setRemoteDescription(new RTCSessionDescription(offer), self.answerToWebrtc , self.failWebRtc);
-			} else if (offer.candidate) {
-				self.pc.addIceCandidate(new RTCIceCandidate(offer));
-			} else if (offer.message) {
-				growlInfo(offer.message);
+			if (data.sdp) {
+				var successCall = self.webrtcInitiator ? self.onSuccessAnswer : self.answerToWebrtc;
+				self.pc.setRemoteDescription(new RTCSessionDescription(data), successCall , self.failWebRtc);
+			} else if (data.candidate) {
+				self.pc.addIceCandidate(new RTCIceCandidate(data));
+			} else if (data.message) {
+				growlInfo(data.message);
 			}
 		} else {
 			console.warn(getDebugMessage("Skipping ws message for closed connection"));
@@ -1953,11 +1947,10 @@ function WebRtcApi() {
 		growlError('<div>Unable to capture input from microphone. Check your microphone connection or {}'
 				.format(url));
 	};
-	self.init = function() {
-		// if (typeof RTCPeerConnection  == 'undefined' && typeof mozRTCPeerConnection == 'undefined' && typeof webkitRTCPeerConnection == 'undefined') {
-		// 	growlError(getText("Unfortunately {} doesn't support webrtc. Video/audio call is unuvailable", browserVersion));
-		// 	return;
-		// }
+	self.createPeerConnection = function() {
+		if (!RTCPeerConnection) {
+			throw "Your browser doesn't support RTCPeerConnection";
+		}
 		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
 		self.pc.oniceconnectionstatechange = self.oniceconnectionstatechange;
 		self.pc.onaddstream = function (event) {
@@ -2081,7 +2074,7 @@ function WebRtcApi() {
 					self.sendBaseEvent(md5, 'fileAccepted');
 					self.downloadBar.setError('Invalid cheksum');
 				} else {
-					var message2 = "File {} is received. Open dialog to download it".format(self.receivedFileName);
+					var message2 = "File {} is received.".format(self.receivedFileName);
 					growlInfo(message2);
 					console.info(getDebugMessage(message2));
 					self.sendBaseEvent('valid', 'fileAccepted');
@@ -2109,7 +2102,8 @@ function WebRtcApi() {
 		//		bitrate + ' kbits/sec (max: ' + self.bitrateMax + ' kbits/sec)';
 	};
 
-	self.connectWebRtc = function () {
+	self.createSendChannelAndOffer = function () {
+		self.webrtcInitiator = true;
 		try {
 			// Reliable data channels not supported by Chrome
 			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
@@ -2125,8 +2119,8 @@ function WebRtcApi() {
 			self.pc.setLocalDescription(offer, function () {
 				console.log(getDebugMessage('sending to remote...'));
 				self.sendWebRtcEvent(offer);
-			}, self.failWebRtc);
-		}, self.failWebRtc, self.sdpConstraints);
+			}, self.failWebRtcP2);
+		}, self.failWebRtcP1, self.sdpConstraints);
 	};
 	self.sendBaseEvent = function(content, type) {
 		wsHandler.sendToServer({
@@ -2139,13 +2133,24 @@ function WebRtcApi() {
 	self.sendWebRtcEvent = function (message) {
 		self.sendBaseEvent(message, 'webrtc');
 	};
+	self.failWebRtcP1 = function() {
+		self.failWebRtc.apply(self, arguments);
+	};
+	self.failWebRtcP2 = function() {
+		self.failWebRtc.apply(self, arguments);
+	};
+	self.failWebRtcP3 = function() {
+		self.failWebRtc.apply(self, arguments);
+	};
+	self.failWebRtcP4 = function() {
+		self.failWebRtc.apply(self, arguments);
+	};
 	self.failWebRtc = function () {
 		var isError = arguments.length === 1 && (arguments[0].message || arguments[0].name);
 		var errorContext = isError ? "{}: {}".format(arguments[0].name, arguments[0].message)
 				:Array.prototype.join.call(arguments, ' ');
-		var text = "Error while calling because {}".format(errorContext);
-		growlError(text);
-		console.error(getDebugMessage(text));
+		growlError("An error occurred while establishing a connection: {}".format(errorContext));
+		console.error(getDebugMessage("OnError way from {}, exception: {}", getCallerTrace(), errorContext));
 	};
 	self.attachDomEvents();
 }
