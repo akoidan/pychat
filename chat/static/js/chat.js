@@ -2083,8 +2083,7 @@ function WebRtcApi() {
 			};
 			reader.readAsBinaryString(received);
 		} else {
-			var message2 = "File {} is received. Since huge size (over 10MB) checksum verification is skipped.\
-					Open dialog to download it".format(self.receivedFileName);
+			var message2 = "File {} is received. Checksum verification is skipped.".format(self.receivedFileName);
 			growlInfo(message2);
 			console.info(getDebugMessage(message2));
 			self.sendBaseEvent('unknown', 'fileAccepted');
