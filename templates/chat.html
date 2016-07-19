@@ -15,7 +15,6 @@
 		var notifications = {{ notifications |yesno:"true,false" }};
 	</script>
 	<script src="{% md5url "js/smileys_data.js" %}"></script>
-	<script src="{% md5url "js/md5.js" %}"></script>
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}
@@ -80,6 +79,7 @@
 						</div>
 					</div>
 					<div class="callContainerIcons noSelection">
+						<i class="icon-phone-circled" id="callIcon" onclick="event.preventDefault(); webRtcApi.callPeople()"></i>
 						<i class="icon-doc-inv" id="webRtcFileIcon"></i>
 						<i id="audioStatusIcon" class="icon-mic"></i>
 						<i id="videoStatusIcon" class="icon-videocam"></i>
@@ -87,7 +87,6 @@
 							<i id="enterFullScreen" class="icon-webrtc-fullscreen" title="Fullscreen"></i>
 						</div>
 						<i class="icon-hang-up" id="hangUpIcon"></i>
-						<i class="icon-phone-circled" id="callIcon" onclick="event.preventDefault(); webRtcApi.callPeople()"></i>
 {#						<img src="{% md5url 'images/call.gif' %}" alt="call" class="hidden" id="callRing"#}
 {#							 style="width: 30px"/>#}
 						<div class="volumeLevelsHolder">
@@ -142,9 +141,23 @@
 			<input type="button" value="Add" id="addRoomButton"/>
 		</div>
 	</div>
+	<div id="canvasHolder" class="hidden">
+		<div>
+			<canvas id="painter" style="background: #eee"></canvas>
+			<div style="display: block">
+				<i id="paintPen" title="Pen" class="icon-brush-1"></i>
+				<input type="color" id="paintPicker" value="#ff0000"/>
+				<i id="paintEraser" class="icon-eraser" title="Eraser"></i>
+				<input type="range" id="paintRadius" title="Line width" step="1" max="32" min="1" value="3"/>
+				<i title="Clear" id="paintClear" class="icon-trash-circled"></i>
+				<i title="Send" id="paintSend" class="icon-send"></i>
+			</div>
+		</div>
+	</div>
 	<div id="userMessageWrapper" class="hidden" style="position: relative">
 		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
-		<i class="icon-picture" title="Add a picture" onclick="$('imgInput').click()"></i>
+		<i class="icon-picture" title="Attach Image File" onclick="$('imgInput').click()"></i>
+		<i class="icon-brush" title="Draw an Image" onclick="painter.show()"></i>
 		<i class="icon-smile" title="Add a smile :)" onclick="smileyUtil.toggleSmileys(event)"></i>
 		<div contenteditable="true" id="usermsg" onkeydown="channelsHandler.checkAndSendMessage(event)"></div>
 	{% comment %}TODO which chat variable to use?{% endcomment %}

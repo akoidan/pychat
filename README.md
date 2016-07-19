@@ -2,7 +2,7 @@
 
 What is it?
 ==============
-This is free web (browser) chat. It allows users send instant text messages or images, make video/audio calls and other useful stuff.
+This is free web (browser) chat. It allows users send instant text messages or images, make video/audio calls, send files and other useful stuff.
 
 How it works?
 ==============

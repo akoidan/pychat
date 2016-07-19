@@ -35,6 +35,7 @@ var channelsHandler;
 var wsHandler;
 var storage;
 var singlePage;
+var painter;
 
 
 onDocLoad(function () {
@@ -52,12 +53,122 @@ onDocLoad(function () {
 	smileyUtil.init();
 	storage = new Storage();
 	notifier = new NotifierHandler();
+	painter = new Painter();
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
 	wsHandler.start_chat_ws();
 	showHelp();
 });
 
 
+function Painter() {
+	var self = this;
+	Draggable.call(self, $('canvasHolder'), "Painter");
+	self.dom.canvas = $('painter');
+	self.dom.color = $('paintPicker');
+	self.dom.sendButton = $('paintSend');
+	self.dom.clearButton = $('paintClear');
+	self.dom.range = $('paintRadius');
+	self.dom.pen = $('paintPen');
+	self.dom.eraser = $('paintEraser');
+	self.ctx = self.dom.canvas.getContext('2d');
+	self.mouse = {x: 0, y: 0};
+	self.serializer =  new XMLSerializer();
+	self.mouseDown = 0;
+	self.startDraw = function (e) {
+		self.mouseDown ++;
+		var rect = painter.dom.canvas.getBoundingClientRect();
+		self.leftOffset = rect.left;
+		self.topOffset = rect.top;
+		self.ctx.beginPath();
+		self.ctx.moveTo(e.pageX - self.leftOffset, e.pageY - self.topOffset);
+		self.dom.canvas.addEventListener('mousemove', self.onPaint, false);
+	};
+	self.changeColor = function(event) {
+		self.ctx.strokeStyle = event.target.value;
+		self.setPenUrl();
+	};
+	self.setPen  = function () {
+		self.mode = 'onPaintPen';
+		self.ctx.globalCompositeOperation="source-over";
+		self.setPenUrl();
+	};
+	self.setPenUrl = function() {
+		var isPaint = self.mode == 'onPaintPen';
+		var width = self.ctx.lineWidth;
+		if (width < 3) {
+			width  = 3;
+		} else if (width > 126) {
+			width = 126;
+		}
+		var fill = isPaint ? self.ctx.strokeStyle : 'white';
+		var stroke = isPaint ? '' : ' stroke="black" stroke-width="1" ';
+		var imB64 = btoa('<svg xmlns="http://www.w3.org/2000/svg" height="128" width="128"><circle cx="64" cy="64" r="{0}" fill="{1}"{2}/></svg>'.formatPos(
+			width , fill, stroke
+		));
+		self.dom.canvas.style.cursor = 'url(data:image/svg+xml;base64,{}) {} {}, auto'.format(imB64, 64, 64);
+	};
+	self.setEraser  = function () {
+		self.ctx.globalCompositeOperation="destination-out";
+		self.mode = 'onPaintEraser';
+		self.setPenUrl();
+	};
+	self.changeRadius = function (event) {
+		console.log(getDebugMessage('Current radius {}', event.target.value));
+		self.ctx.lineWidth = parseInt(event.target.value);
+		self.setPenUrl();
+	};
+	self.finishDraw = function () {
+		if (self.mouseDown > 0) {
+			self.mouseDown--;
+			self.dom.canvas.removeEventListener('mousemove', self.onPaint, false);
+		}
+	};
+	self.onPaint = function(e){
+		self[self.mode](e.pageX - self.leftOffset,  e.pageY - self.topOffset);
+	};
+	self.onPaintPen = function (x, y) {
+		self.ctx.lineTo(x, y);
+		self.ctx.stroke();
+	};
+	self.onPaintEraser = function (x, y) {
+		self.ctx.lineTo(x, y);
+		self.ctx.stroke();
+	};
+	self.clearCanvas = function () {
+		self.ctx.clearRect(0, 0, parseInt(self.dom.canvas.width), parseInt(self.dom.canvas.height));
+	};
+	self.sendImage = function () {
+		wsHandler.sendToServer({
+			image: self.dom.canvas.toDataURL(),
+			content: null,
+			action: 'sendMessage',
+			channel: channelsHandler.activeChannel
+		});
+		self.hide();
+	};
+	self.initChild = function () {
+		document.body.addEventListener('mouseup', self.finishDraw, false);
+		self.dom.canvas.addEventListener('mousedown', self.startDraw, false);
+		self.dom.color.addEventListener('input', self.changeColor, false);
+		self.dom.range.addEventListener('change', self.changeRadius, false);
+		self.dom.pen.onclick = self.setPen;
+		self.dom.eraser.onclick = self.setEraser;
+		self.dom.sendButton.onclick = self.sendImage;
+		self.dom.clearButton.onclick = self.clearCanvas;
+	};
+	self.superShow = self.show;
+	self.show = function () {
+		self.superShow();
+		self.dom.canvas.setAttribute('width', self.dom.canvas.offsetWidth);
+		self.dom.canvas.setAttribute('height', self.dom.canvas.offsetHeight);
+		self.ctx.lineWidth = 3;
+		self.ctx.lineJoin = 'round';
+		self.ctx.lineCap = 'round';
+		self.ctx.strokeStyle = self.dom.color.value;
+		self.setPen();
+	};
+	self.initChild();
+}
 function NotifierHandler() {
 	self = this;
 	self.maxNotifyTime = 300;
@@ -1290,8 +1401,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		// because requests aren't being sent when there are no event for them, thus no responses
 		var message = data.content;
 		if (message.length === 0) {
-			console.log(getDebugMessage('Requesting messages has reached the top, \
-					removing loadUpHistoryEvent handlers'));
+			console.log(getDebugMessage('Requesting messages has reached the top, removing loadUpHistoryEvent handlers'));
 			self.dom.chatBoxDiv.removeEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
 			self.dom.chatBoxDiv.removeEventListener("keydown", self.keyDownLoadUp);
 			return;
@@ -1691,12 +1801,11 @@ function WebRtcApi() {
 			callback();
 		}
 	};
-	self.sendFileOffer = function (md5) {
+	self.sendFileOffer = function () {
 		self.sendBaseEvent(
 				{
 					name: self.file.name,
-					size: self.file.size,
-					md5: md5
+					size: self.file.size
 				},
 				'offer');
 		self.isForTransferFile = true;
@@ -1712,21 +1821,10 @@ function WebRtcApi() {
 			return;
 		}
 		self.downloadBar.setMax(self.file.size);
-		if (self.file.size < 10000000/*10MB*/) {
-			var reader = new FileReader();
-			reader.onload = function (event) {
-				var binary = event.target.result;
-				self.transferedMD5 = CryptoJS.MD5(binary).toString();
-				self.sendFileOffer(self.transferedMD5);
-			};
-			reader.readAsBinaryString(self.file);
-		} else {
-			self.sendFileOffer(null);
-		}
+		self.sendFileOffer();
 	};
 	self.onFileOffer = function (message) {
 		self.receivedFileSize = parseInt(message.content.size);
-		self.receivedMD5 = message.content.md5;
 		self.downloadBar.setMax(self.receivedFileSize);
 		self.receivedFileName  = message.content.name;
 		self.lastGrowl = new Growl("<div style='cursor: pointer'>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>".
@@ -2024,60 +2122,25 @@ function WebRtcApi() {
 		}
 	};
 	self.onfileAccepted = function (message) {
-		console.log(getDebugMessage("Transfer file {} (md5={}) result : {}",
-				self.file.name, self.transferedMD5, message.content));
-		if (message.content == 'valid' || message.content == 'unknown') {
-			growlInfo('Transferring  {} is finished '.format(self.file.name));
-			self.downloadBar.setSuccess();
-			self.downloadBar.dom.text.innerHTML = 'Transferred!';
-		} else {
-			growlError('Transferring  {} is finished with error, expected md5 {}, resulting md5 {} '
-					.format(self.file.name, self.transferedMD5, message.content));
-			self.downloadBar.setError();
-			self.downloadBar.dom.text.innerHTML = "Transfered invalid checksumm";
-		}
+		console.log(getDebugMessage("Transfer file {} result : {}", self.file.name, message.content));
+		growlInfo('Transferring  {} is finished '.format(self.file.name));
+		self.downloadBar.setSuccess();
+		self.downloadBar.dom.text.innerHTML = 'Transferred!';
 		self.closeEvents();
 	};
 	self.assembleFile = function () {
-		console.log(getDebugMessage('Finished receiving file{}, verifying md5...', self.receivedFileName));
 		var received = new window.Blob(self.receiveBuffer);
-		received.name = self.receivedFileName;
-		received.lastModifiedDate = new Date();
-		if (self.receivedMD5 != null) {
-			var reader = new FileReader();
-			reader.onload = function (event) {
-				var binary = event.target.result;
-				var md5 = CryptoJS.MD5(binary).toString();
-				if (md5 !== self.receivedMD5) {
-					var message = "Error verifying md5 for {}, expected {}, got {}"
-							.format(self.receivedFileName, self.receivedMD5, md5);
-					growlError(message);
-					console.warn(getDebugMessage(message));
-					self.sendBaseEvent(md5, 'fileAccepted');
-					self.downloadBar.setError();
-				} else {
-					var message2 = "File {} is received.".format(self.receivedFileName);
-					growlInfo(message2);
-					console.info(getDebugMessage(message2));
-					self.sendBaseEvent('valid', 'fileAccepted');
-					self.downloadBar.setSuccess();
-				}
-			};
-			reader.readAsBinaryString(received);
-		} else {
-			var message2 = "File {} is received. Checksum verification is skipped.".format(self.receivedFileName);
-			growlInfo(message2);
-			console.info(getDebugMessage(message2));
-			self.sendBaseEvent('unknown', 'fileAccepted');
-			self.downloadBar.setSuccess();
-		}
+		var message = "File {} is received.".format(self.receivedFileName);
+		growlInfo(message);
+		console.info(getDebugMessage(message));
+		self.sendBaseEvent(null, 'fileAccepted');
+		self.downloadBar.setSuccess();
 		self.receiveBuffer = [];
 		self.receivedSize =0;
 		self.downloadBar.dom.text.href = URL.createObjectURL(received);
 		self.downloadBar.dom.text.download = self.receivedFileName;
-		self.downloadBar.dom.text.textContent = 'Click to save {}'.format(self.receivedFileName);
+		self.downloadBar.dom.text.textContent = 'Save {}'.format(self.receivedFileName);
 	};
-
 	self.createSendChannelAndOffer = function () {
 		self.webrtcInitiator = true;
 		try {

@@ -1,5 +1,5 @@
 <div class="max-height-scrollable two-columns">
-	<canvas class="hidden"></canvas>
+	<canvas id="canvasBuffer" class="hidden"></canvas>
 	<div style="text-align: center">
 		<div class="padding10">
 			<img {% if form.instance.photo %}  src="{{ form.instance.photo.url }}" {% endif %} alt="ava" id='photoImg' class="fullwidth">

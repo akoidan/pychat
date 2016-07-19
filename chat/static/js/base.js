@@ -15,6 +15,18 @@ window.onerror = function (msg, url, linenumber) {
 	}
 	return false;
 };
+
+
+String.prototype.formatPos = function () {
+	var args = arguments;
+	return this.replace(/{(\d+)}/g, function (match, number) {
+		return typeof args[number] != 'undefined'
+				? args[number]
+				: match
+				;
+	});
+};
+
 navigator.getUserMedia =  navigator.getUserMedia|| navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var historyStorage;
@@ -361,9 +373,10 @@ onDocLoad(function () {
 });
 function fixInputRangeStyle() {
 	var id = this.getAttribute('id');
-	inputRangeStyles[id].textContent =
+	var el = inputRangeStyles[id];
+	el.style.textContent =
 			'#{}::-webkit-slider-runnable-track {background-size: {}% 100%, 100% 100%; }'
-					.format(id, this.value);
+					.format(id, Math.round((this.value - el.minValue) / (el.diff) * 100));
 }
 
 function initInputRangeTrack() {
@@ -371,8 +384,14 @@ function initInputRangeTrack() {
 	for (var i = 0; i < inputRanges.length; i++){
 		var id = inputRanges[i].getAttribute('id');
 		inputRanges[i].addEventListener('input', fixInputRangeStyle);
-		inputRangeStyles[id] = document.createElement('style');
-		document.head.appendChild(inputRangeStyles[id]);
+		var minValue = inputRanges[i].getAttribute('min') || 0;
+		var maxValue = inputRanges[i].getAttribute('max') || 100;
+		inputRangeStyles[id] = {
+			style: document.createElement('style'),
+			diff: maxValue - minValue,
+			minValue: minValue
+		};
+		document.head.appendChild(inputRangeStyles[id].style);
 	}
 }
 

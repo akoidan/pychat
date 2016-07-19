@@ -287,6 +287,23 @@ p
 	top: 2px
 	height: 16px
 
+.icon-brush
+	display: inline
+	float: right
+	position: absolute
+	left: 28px
+	top: 2px
+	height: 16px
+
+#paintPicker
+	width: 23px
+	margin: 0
+	border: 0
+	padding: 0
+
+#paintSend
+	float: right
+	margin-top: 8px
 .chatbox img[code], #usermsg img[code]
 	margin-top: -17px
 	margin-bottom: -10px
@@ -308,7 +325,7 @@ p
 
 #usermsg
 	margin-left: 4px
-	padding-left: 25px // after pic-image
+	padding-left: 47px // after pic-image
 	padding-right: 20px // before smiley
 	max-height: 200px
 
@@ -420,9 +437,6 @@ p
 	font-size: 25px
 	width: 100%
 	padding-top: 10px
-
-	.icon-phone-circled
-		float: right
 
 .volumeLevelsHolder
 	display: inline-block
@@ -568,10 +582,6 @@ p
 	margin-bottom: -25px
 	margin-top: -6px
 
-#callIcon
-	float: left
-
-
 .fullscreen
 	&#videoContainer
 		background-color: black
@@ -617,6 +627,15 @@ p
 	left: -30px
 	font-size: 40px
 	top: -10px
+
+#painter
+	width: 400px
+	height: 300px
+	height: calc(90vh - 100px)
+	width: calc(90vh - 100px)
+
+#paintRadius::-webkit-slider-runnable-track
+	background-size: 10% 100%, 100% 100%
 
 #enterFullScreenHolder
 	position: relative
