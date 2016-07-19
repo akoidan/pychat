@@ -295,17 +295,24 @@ p
 	top: 2px
 	height: 16px
 
+#canvasHolder
+	outline: none
+
 #paintPicker
-	width: 23px
+	width: 0
 	margin: 0
 	border: 0
 	padding: 0
+	:visibility hidden
+
+#paintEraser
+	color: #ff8383
+
+.n-active-icon
+	color: $main-color !important
 
 #paintSend
 	float: right
-	background-origin: border-box
-	background-size: 120px 120px
-	display: block
 	height: 23px
 	width: 25px
 	padding-top: 6px
@@ -378,6 +385,8 @@ p
 	position: absolute
 	box-shadow: 2px 2px 1px #1F1F27
 	z-index: 3
+	&.blurred
+		opacity: 0.8
 
 .modal-draggable
 	left: calc(50% - 100px)
@@ -643,6 +652,7 @@ p
 	height: 300px
 	height: calc(90vh - 100px)
 	width: calc(90vh - 100px)
+	background: #333
 
 #paintRadius::-webkit-slider-runnable-track
 	background-size: 10% 100%, 100% 100%

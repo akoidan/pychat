@@ -275,6 +275,7 @@ function growlInfo(message) {
 // TODO replace with HTML5 if possible
 function Draggable(container, headerText) {
 	var self = this;
+	self.UNACTIVE_CLASS = 'blurred';
 	self.dom = {
 		container:  container
 	};
@@ -296,6 +297,15 @@ function Draggable(container, headerText) {
 		self.dom.body = self.dom.container.children[0];
 		CssUtils.addClass(self.dom.body, 'window-body');
 		self.dom.container.insertBefore(self.dom.header, self.dom.body);
+		self.dom.container.addEventListener('focus', self.onfocus);
+		self.dom.container.addEventListener('blur', self.onfocusout);
+		self.dom.container.setAttribute('tabindex', "-1");
+	};
+	self.onfocus = function () {
+		CssUtils.removeClass(self.dom.container, self.UNACTIVE_CLASS);
+	};
+	self.onfocusout = function() {
+		CssUtils.addClass(self.dom.container, self.UNACTIVE_CLASS);
 	};
 	self.hide = function () {
 		CssUtils.hideElement(self.dom.container);
