@@ -143,14 +143,21 @@
 	</div>
 	<div id="canvasHolder" class="hidden">
 		<div>
-			<canvas id="painter"></canvas>
-			<input type="color" id="painterColorPicker" value="#ff0000" style="width: 25px;"/>
-			<input type="button" value="Send"/>
+			<canvas id="painter" style="background: #eee"></canvas>
+			<div style="display: block">
+				<i id="paintPen" title="Pen" class="icon-brush-1"></i>
+				<input type="color" id="paintPicker" value="#ff0000"/>
+				<i id="paintEraser" class="icon-eraser" title="Eraser"></i>
+				<input type="range" id="paintRadius" title="Line width" step="1" max="32" min="1" value="3"/>
+				<i title="Clear" id="paintClear" class="icon-trash-circled"></i>
+				<i title="Send" id="paintSend" class="icon-send"></i>
+			</div>
 		</div>
 	</div>
 	<div id="userMessageWrapper" class="hidden" style="position: relative">
 		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
-		<i class="icon-picture" title="Add a picture" onclick="$('imgInput').click()"></i>
+		<i class="icon-picture" title="Attach Image File" onclick="$('imgInput').click()"></i>
+		<i class="icon-brush" title="Draw an Image" onclick="painter.show()"></i>
 		<i class="icon-smile" title="Add a smile :)" onclick="smileyUtil.toggleSmileys(event)"></i>
 		<div contenteditable="true" id="usermsg" onkeydown="channelsHandler.checkAndSendMessage(event)"></div>
 	{% comment %}TODO which chat variable to use?{% endcomment %}

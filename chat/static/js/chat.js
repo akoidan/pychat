@@ -64,10 +64,15 @@ function Painter() {
 	var self = this;
 	Draggable.call(self, $('canvasHolder'), "Painter");
 	self.dom.canvas = $('painter');
-	self.dom.color = $('painterColorPicker');
-	self.dom.button = document.querySelector('#canvasHolder input[type=button]');
+	self.dom.color = $('paintPicker');
+	self.dom.sendButton = $('paintSend');
+	self.dom.clearButton = $('paintClear');
+	self.dom.range = $('paintRadius');
+	self.dom.pen = $('paintPen');
+	self.dom.eraser = $('paintEraser');
 	self.ctx = self.dom.canvas.getContext('2d');
 	self.mouse = {x: 0, y: 0};
+	self.serializer =  new XMLSerializer();
 	self.mouseDown = 0;
 	self.startDraw = function (e) {
 		self.mouseDown ++;
@@ -80,6 +85,37 @@ function Painter() {
 	};
 	self.changeColor = function(event) {
 		self.ctx.strokeStyle = event.target.value;
+		self.setPenUrl();
+	};
+	self.setPen  = function () {
+		self.mode = 'onPaintPen';
+		self.ctx.globalCompositeOperation="source-over";
+		self.setPenUrl();
+	};
+	self.setPenUrl = function() {
+		var isPaint = self.mode == 'onPaintPen';
+		var width = self.ctx.lineWidth;
+		if (width < 3) {
+			width  = 3;
+		} else if (width > 126) {
+			width = 126;
+		}
+		var fill = isPaint ? self.ctx.strokeStyle : 'white';
+		var stroke = isPaint ? '' : ' stroke="black" stroke-width="1" ';
+		var imB64 = btoa('<svg xmlns="http://www.w3.org/2000/svg" height="128" width="128"><circle cx="64" cy="64" r="{0}" fill="{1}"{2}/></svg>'.formatPos(
+			width , fill, stroke
+		));
+		self.dom.canvas.style.cursor = 'url(data:image/svg+xml;base64,{}) {} {}, auto'.format(imB64, 64, 64);
+	};
+	self.setEraser  = function () {
+		self.ctx.globalCompositeOperation="destination-out";
+		self.mode = 'onPaintEraser';
+		self.setPenUrl();
+	};
+	self.changeRadius = function (event) {
+		console.log(getDebugMessage('Current radius {}', event.target.value));
+		self.ctx.lineWidth = parseInt(event.target.value);
+		self.setPenUrl();
 	};
 	self.finishDraw = function () {
 		if (self.mouseDown > 0) {
@@ -87,33 +123,49 @@ function Painter() {
 			self.dom.canvas.removeEventListener('mousemove', self.onPaint, false);
 		}
 	};
-	self.onPaint = function (e) {
-		self.ctx.lineTo(e.pageX - self.leftOffset, e.pageY - self.topOffset);
+	self.onPaint = function(e){
+		self[self.mode](e.pageX - self.leftOffset,  e.pageY - self.topOffset);
+	};
+	self.onPaintPen = function (x, y) {
+		self.ctx.lineTo(x, y);
 		self.ctx.stroke();
 	};
-	self.sendImage = function() {
+	self.onPaintEraser = function (x, y) {
+		self.ctx.lineTo(x, y);
+		self.ctx.stroke();
+	};
+	self.clearCanvas = function () {
+		self.ctx.clearRect(0, 0, parseInt(self.dom.canvas.width), parseInt(self.dom.canvas.height));
+	};
+	self.sendImage = function () {
 		wsHandler.sendToServer({
 			image: self.dom.canvas.toDataURL(),
 			content: null,
 			action: 'sendMessage',
 			channel: channelsHandler.activeChannel
 		});
+		self.hide();
 	};
 	self.initChild = function () {
 		document.body.addEventListener('mouseup', self.finishDraw, false);
 		self.dom.canvas.addEventListener('mousedown', self.startDraw, false);
 		self.dom.color.addEventListener('input', self.changeColor, false);
-		self.dom.button.onclick = self.sendImage;
-		self.ctx.lineWidth = 3;
-		self.ctx.lineJoin = 'round';
-		self.ctx.lineCap = 'round';
-		self.ctx.strokeStyle = self.dom.color.value;
+		self.dom.range.addEventListener('change', self.changeRadius, false);
+		self.dom.pen.onclick = self.setPen;
+		self.dom.eraser.onclick = self.setEraser;
+		self.dom.sendButton.onclick = self.sendImage;
+		self.dom.clearButton.onclick = self.clearCanvas;
 	};
 	self.superShow = self.show;
 	self.show = function () {
 		self.superShow();
 		self.dom.canvas.setAttribute('width', self.dom.canvas.offsetWidth);
 		self.dom.canvas.setAttribute('height', self.dom.canvas.offsetHeight);
+		self.ctx.lineWidth = 3;
+		self.ctx.lineJoin = 'round';
+		self.ctx.lineCap = 'round';
+		self.ctx.strokeStyle = self.dom.color.value;
+		self.setPen();
 	};
 	self.initChild();
 }
@@ -1349,8 +1401,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		// because requests aren't being sent when there are no event for them, thus no responses
 		var message = data.content;
 		if (message.length === 0) {
-			console.log(getDebugMessage('Requesting messages has reached the top, \
-					removing loadUpHistoryEvent handlers'));
+			console.log(getDebugMessage('Requesting messages has reached the top, removing loadUpHistoryEvent handlers'));
 			self.dom.chatBoxDiv.removeEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
 			self.dom.chatBoxDiv.removeEventListener("keydown", self.keyDownLoadUp);
 			return;
