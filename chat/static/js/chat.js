@@ -63,6 +63,7 @@ onDocLoad(function () {
 function Painter() {
 	var self = this;
 	Draggable.call(self, $('canvasHolder'), "Painter");
+	self.PICKED_TOOL_CLASS = 'n-active-icon';
 	self.dom.canvas = $('painter');
 	self.dom.color = $('paintPicker');
 	self.dom.sendButton = $('paintSend');
@@ -70,6 +71,7 @@ function Painter() {
 	self.dom.range = $('paintRadius');
 	self.dom.pen = $('paintPen');
 	self.dom.eraser = $('paintEraser');
+	self.dom.colorIcon = $('paintPickerIcon');
 	self.ctx = self.dom.canvas.getContext('2d');
 	self.mouse = {x: 0, y: 0};
 	self.serializer =  new XMLSerializer();
@@ -85,9 +87,15 @@ function Painter() {
 	};
 	self.changeColor = function(event) {
 		self.ctx.strokeStyle = event.target.value;
+		self.setColorStrikeColor();
 		self.setPenUrl();
 	};
+	self.setColorStrikeColor = function() {
+		self.dom.pen.style.color =  self.ctx.strokeStyle;
+	};
 	self.setPen  = function () {
+		CssUtils.removeClass(self.dom.pen, self.PICKED_TOOL_CLASS);
+		CssUtils.addClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
 		self.mode = 'onPaintPen';
 		self.ctx.globalCompositeOperation="source-over";
 		self.setPenUrl();
@@ -100,14 +108,16 @@ function Painter() {
 		} else if (width > 126) {
 			width = 126;
 		}
-		var fill = isPaint ? self.ctx.strokeStyle : 'white';
-		var stroke = isPaint ? '' : ' stroke="black" stroke-width="1" ';
+		var fill = isPaint ? self.ctx.strokeStyle : '#aaaaaa';
+		var stroke = isPaint ? '' : ' stroke="black" stroke-width="2" ';
 		var imB64 = btoa('<svg xmlns="http://www.w3.org/2000/svg" height="128" width="128"><circle cx="64" cy="64" r="{0}" fill="{1}"{2}/></svg>'.formatPos(
 			width , fill, stroke
 		));
 		self.dom.canvas.style.cursor = 'url(data:image/svg+xml;base64,{}) {} {}, auto'.format(imB64, 64, 64);
 	};
 	self.setEraser  = function () {
+		CssUtils.addClass(self.dom.pen, self.PICKED_TOOL_CLASS);
+		CssUtils.removeClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
 		self.ctx.globalCompositeOperation="destination-out";
 		self.mode = 'onPaintEraser';
 		self.setPenUrl();
@@ -146,11 +156,21 @@ function Painter() {
 		});
 		self.hide();
 	};
+	self.contKeyPress = function(event) {
+		if (event.keyCode === 13) {
+			self.sendImage();
+		}
+	};
 	self.initChild = function () {
 		document.body.addEventListener('mouseup', self.finishDraw, false);
 		self.dom.canvas.addEventListener('mousedown', self.startDraw, false);
 		self.dom.color.addEventListener('input', self.changeColor, false);
 		self.dom.range.addEventListener('change', self.changeRadius, false);
+		self.dom.container.addEventListener('keypress', self.contKeyPress, false);
+		self.dom.color.style.color =  self.ctx.strokeStyle;
+		self.dom.colorIcon.onclick = function () {
+			self.dom.color.click();
+		};
 		self.dom.pen.onclick = self.setPen;
 		self.dom.eraser.onclick = self.setEraser;
 		self.dom.sendButton.onclick = self.sendImage;
@@ -165,6 +185,7 @@ function Painter() {
 		self.ctx.lineJoin = 'round';
 		self.ctx.lineCap = 'round';
 		self.ctx.strokeStyle = self.dom.color.value;
+		self.setColorStrikeColor();
 		self.setPen();
 	};
 	self.initChild();
