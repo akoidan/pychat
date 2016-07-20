@@ -24,7 +24,7 @@
 		<i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds" onclick="mute();"><span class="mText">volume</span></i>
 		<a href="/#/report_issue" class="icon-pencil hide-wide" title="report an issue"
 			onclick="event.preventDefault(); singlePage.showPage('/report_issue')"><span class="mText">issue</span></a>
-		<i class="icon-clear hide-wide" title="Clear local history" onclick="clearLocalHistory()"><span class="mText">clear</span></i>
+		<i class="icon-clear hide-wide" title="Clear local history" onclick="channelsHandler.clearChannelHistory()"><span class="mText">clear</span></i>
 		<a class="icon-phone" id="navCallIcon" href="/#/call" title="Make a video/mic call" onclick="event.preventDefault(); webRtcApi.toggleCallContainer()"><span class="mText">Call</span></a>
 		<a href="/#/statistics" class="icon-chart-pie hide-wide" onclick="event.preventDefault(); singlePage.showPage('/statistics')" title="Show user countries statistics"><span class="mText">statistics</span></a>
 		<span id="onlineStatus" title="Online status" class="flex-push-right offline">●</span>
