@@ -1,5 +1,4 @@
 import base64
-import json
 import logging
 import re
 import sys
@@ -10,12 +9,11 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
-from django.db import connection
 
 from chat import local
 from chat import settings
-from chat.models import User, UserProfile, Room, Verification
-from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID, USER_ROOMS_QUERY, GENDERS
+from chat.models import User, UserProfile, Verification
+from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
 

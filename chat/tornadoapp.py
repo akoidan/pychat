@@ -25,7 +25,7 @@ try:
 except ImportError:
 	from urlparse import urlparse  # py3
 
-from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, USER_ROOMS_QUERY, GENDERS, GET_DIRECT_ROOM_ID
+from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, GET_DIRECT_ROOM_ID
 from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo
 
 PY3 = sys.version > '3'
@@ -463,10 +463,10 @@ class MessagesHandler(MessagesCreator):
 			result = query_res[0]
 			room_id = result[0]
 			disabled = result[1]
-			if disabled is None:
+			if not disabled:
 				raise ValidationError('This room already exist')
 			else:
-				Room.objects.filter(id=room_id).update(disabled=None)
+				Room.objects.filter(id=room_id).update(disabled=False)
 		else:
 			room = Room()
 			room.save()
@@ -485,7 +485,7 @@ class MessagesHandler(MessagesCreator):
 		if channel not in self.channels or room_id == ALL_ROOM_ID:
 			raise ValidationError('You are not allowed to exit this room')
 		room = self.do_db(Room.objects.get, id=room_id)
-		if room.disabled is not None:
+		if room.disabled:
 			raise ValidationError('Room is already deleted')
 		if room.name is None:  # if private then disable
 			room.disabled = True
@@ -549,20 +549,15 @@ class MessagesHandler(MessagesCreator):
 			}
 		}
 		"""
-		query_res = self.execute_query(USER_ROOMS_QUERY, [self.user_id])
-		res = {}
-		for user in query_res:
-			user_id = user[0]
-			user_name = user[1]
-			user_sex = user[2]
-			room_id = user[3]
-			room_name = user[4]
-			if room_id not in res:
-				res[room_id] = {
-					VarNames.ROOM_NAME: room_name,
-					VarNames.ROOM_USERS: {}
-				}
-			self.set_js_user_structure(res[room_id][VarNames.ROOM_USERS], user_id, user_name, user_sex)
+		user_rooms = Room.objects.filter(users__id=self.user_id, disabled=False).values('id', 'name')
+		res = {room['id']: {
+				VarNames.ROOM_NAME: room['name'],
+				VarNames.ROOM_USERS: {}
+			} for room in user_rooms}
+		room_ids = (room_id for room_id in res)
+		rooms_users = User.objects.filter(rooms__in=room_ids).values('id', 'username', 'sex', 'rooms__id')
+		for user in rooms_users:
+			self.set_js_user_structure(res[user['rooms__id']][VarNames.ROOM_USERS], user['id'], user['username'], user['sex'])
 		return res
 
 	def set_js_user_structure(self, user_dict, user_id, name, sex):
