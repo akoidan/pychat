@@ -48,7 +48,7 @@ onDocLoad(function () {
 	singlePage = new PageHandler();
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
-	wsHandler = new  WsHandler();
+	wsHandler = new WsHandler();
 	//bottom call loadMessagesFromLocalStorage(); s
 	smileyUtil.init();
 	storage = new Storage();
@@ -74,10 +74,10 @@ function Painter() {
 	self.dom.colorIcon = $('paintPickerIcon');
 	self.ctx = self.dom.canvas.getContext('2d');
 	self.mouse = {x: 0, y: 0};
-	self.serializer =  new XMLSerializer();
+	self.serializer = new XMLSerializer();
 	self.mouseDown = 0;
 	self.startDraw = function (e) {
-		self.mouseDown ++;
+		self.mouseDown++;
 		var rect = painter.dom.canvas.getBoundingClientRect();
 		self.leftOffset = rect.left;
 		self.topOffset = rect.top;
@@ -85,45 +85,44 @@ function Painter() {
 		self.ctx.moveTo(e.pageX - self.leftOffset, e.pageY - self.topOffset);
 		self.dom.canvas.addEventListener('mousemove', self.onPaint, false);
 	};
-	self.changeColor = function(event) {
+	self.changeColor = function (event) {
 		self.ctx.strokeStyle = event.target.value;
 		self.setColorStrikeColor();
 		self.setPenUrl();
 	};
-	self.setColorStrikeColor = function() {
-		self.dom.pen.style.color =  self.ctx.strokeStyle;
+	self.setColorStrikeColor = function () {
+		self.dom.pen.style.color = self.ctx.strokeStyle;
 	};
-	self.setPen  = function () {
+	self.setPen = function () {
 		CssUtils.removeClass(self.dom.pen, self.PICKED_TOOL_CLASS);
 		CssUtils.addClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
 		self.mode = 'onPaintPen';
-		self.ctx.globalCompositeOperation="source-over";
+		self.ctx.globalCompositeOperation = "source-over";
 		self.setPenUrl();
 	};
-	self.setPenUrl = function() {
+	self.setPenUrl = function () {
 		var isPaint = self.mode == 'onPaintPen';
 		var width = self.ctx.lineWidth;
 		if (width < 3) {
-			width  = 3;
+			width = 3;
 		} else if (width > 126) {
 			width = 126;
 		}
 		var fill = isPaint ? self.ctx.strokeStyle : '#aaaaaa';
 		var stroke = isPaint ? '' : ' stroke="black" stroke-width="2" ';
 		var imB64 = btoa('<svg xmlns="http://www.w3.org/2000/svg" height="128" width="128"><circle cx="64" cy="64" r="{0}" fill="{1}"{2}/></svg>'.formatPos(
-			width , fill, stroke
+				width, fill, stroke
 		));
 		self.dom.canvas.style.cursor = 'url(data:image/svg+xml;base64,{}) {} {}, auto'.format(imB64, 64, 64);
 	};
-	self.setEraser  = function () {
+	self.setEraser = function () {
 		CssUtils.addClass(self.dom.pen, self.PICKED_TOOL_CLASS);
 		CssUtils.removeClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
-		self.ctx.globalCompositeOperation="destination-out";
+		self.ctx.globalCompositeOperation = "destination-out";
 		self.mode = 'onPaintEraser';
 		self.setPenUrl();
 	};
 	self.changeRadius = function (event) {
-		console.log(getDebugMessage('Current radius {}', event.target.value));
 		self.ctx.lineWidth = parseInt(event.target.value);
 		self.setPenUrl();
 	};
@@ -133,8 +132,8 @@ function Painter() {
 			self.dom.canvas.removeEventListener('mousemove', self.onPaint, false);
 		}
 	};
-	self.onPaint = function(e){
-		self[self.mode](e.pageX - self.leftOffset,  e.pageY - self.topOffset);
+	self.onPaint = function (e) {
+		self[self.mode](e.pageX - self.leftOffset, e.pageY - self.topOffset);
 	};
 	self.onPaintPen = function (x, y) {
 		self.ctx.lineTo(x, y);
@@ -156,7 +155,7 @@ function Painter() {
 		});
 		self.hide();
 	};
-	self.contKeyPress = function(event) {
+	self.contKeyPress = function (event) {
 		if (event.keyCode === 13) {
 			self.sendImage();
 		}
@@ -167,7 +166,7 @@ function Painter() {
 		self.dom.color.addEventListener('input', self.changeColor, false);
 		self.dom.range.addEventListener('change', self.changeRadius, false);
 		self.dom.container.addEventListener('keypress', self.contKeyPress, false);
-		self.dom.color.style.color =  self.ctx.strokeStyle;
+		self.dom.color.style.color = self.ctx.strokeStyle;
 		self.dom.colorIcon.onclick = function () {
 			self.dom.color.click();
 		};
@@ -194,7 +193,7 @@ function NotifierHandler() {
 	self = this;
 	self.maxNotifyTime = 300;
 	self.clearNotificationTime = 5000;
-	self.askPermissions = function() {
+	self.askPermissions = function () {
 		if (notifications && Notification.permission !== "granted") {
 			Notification.requestPermission();
 		}
@@ -210,15 +209,18 @@ function NotifierHandler() {
 			self.askPermissions();
 		}
 	};
-	self.notificationClick = function(x){
+	self.notificationClick = function (x) {
 		window.focus();
 		this.close()
 	};
 	self.lastNotifyTime = new Date().getTime();
-	self.notify = function(title, message) {
+	self.notify = function (title, message) {
 		var currentTime = new Date().getTime();
 		if (!notifications || currentTime - self.maxNotifyTime < self.lastNotifyTime) {
 			return
+		}
+		if (navigator.vibrate) {
+			navigator.vibrate(200);
 		}
 		self.askPermissions();
 		var notification = new Notification(title, {
@@ -228,12 +230,12 @@ function NotifierHandler() {
 		self.popedNotifQueue.push(notification);
 		self.lastNotifyTime = currentTime;
 		notification.onclick = self.notificationClick;
-		notification.onclose = function() {
+		notification.onclose = function () {
 			self.popedNotifQueue.pop(this);
 		};
 		setTimeout(self.clearNotification, self.clearNotificationTime);
 	};
-	self.clearNotification = function() {
+	self.clearNotification = function () {
 		if (self.popedNotifQueue.length > 0) {
 			var notif = self.popedNotifQueue[0];
 			notif.close();
@@ -250,13 +252,13 @@ function Page() {
 		container: document.body,
 		el: []
 	};
-	self.setParams = function(params){
+	self.setParams = function (params) {
 		if (params) {
 			console.warn(getDebugMessage('Params are not set for {}', self.getUrl()))
 		}
 	};
 	self.parser = new DOMParser();
-	self.render  = function () {
+	self.render = function () {
 		doGet(self.getUrl(), self.onLoad);
 	};
 	self.onLoad = function (html) {
@@ -268,7 +270,7 @@ function Page() {
 		self.fixTittle();
 	};
 	self.foreach = function (apply) {
-		for (var i = 0; i< self.dom.el.length; i++) {
+		for (var i = 0; i < self.dom.el.length; i++) {
 			apply(self.dom.el[i]);
 		}
 	};
@@ -310,12 +312,12 @@ function IssuePage() {
 	self.url = '/report_issue';
 	self.title = 'Report issue';
 	self.dom = {
-		issueForm:  $('issueForm'),
+		issueForm: $('issueForm'),
 		version: $("version"),
 		issue: $("issue")
 	};
 	self.dom.el = [self.dom.issueForm];
-	self.show = function() {
+	self.show = function () {
 		self.super.show();
 		self.dom.issue.focus();
 	};
@@ -355,7 +357,7 @@ function ViewProfilePage() {
 	self.getUrl = function () {
 		return '/profile/{}'.format(self.userId);
 	};
-	self.setParams = function(params) {
+	self.setParams = function (params) {
 		self.setUserId(params[0]);
 	};
 	self.getTitle = function () {
@@ -388,6 +390,7 @@ function AmchartsPage() {
 	self.title = 'Statistics';
 	self.url = '/statistics';
 	self.render = function () {
+		self.rendered = true;
 		doGet(AMCHART_URL, function () {
 			var holder = document.createElement("div");
 			self.dom.el.push(holder);
@@ -400,7 +403,9 @@ function AmchartsPage() {
 			});
 		});
 	};
+	self.update = self.show;
 }
+
 
 function PageHandler() {
 	var self = this;
@@ -409,14 +414,14 @@ function PageHandler() {
 		'/chat/': channelsHandler,
 		'/statistics': new AmchartsPage(),
 		'/profile/': new ViewProfilePage(),
-		'/profile': new  ChangeProfilePage()
+		'/profile': new ChangeProfilePage()
 	};
 	self.pageRegex = /\w\/#(\/\w+\/?)(.*)/g;
 	self.init = function () {
 		self.showPageFromUrl();
 		window.onhashchange = self.showPageFromUrl;
 	};
-	self.getPage = function(url) {
+	self.getPage = function (url) {
 		return self.pages[url];
 	};
 	self.showPageFromUrl = function () {
@@ -426,7 +431,7 @@ function PageHandler() {
 		var page;
 		if (match) {
 			page = match[1];
-			var handler =  self.getPage(page);
+			var handler = self.getPage(page);
 			if (match[2]) {
 				params = match[2].split('/');
 			}
@@ -442,7 +447,7 @@ function PageHandler() {
 	self.showDefaultPage = function () {
 		self.showPage('/chat/', [DEFAULT_CHANNEL_NAME]);
 	};
-	self.pushHistory = function() {
+	self.pushHistory = function () {
 		var historyUrl = "#{}".format(self.currentPage.getUrl());
 		// TODO remove triple, carefull of undefined tittle in ViewProfilePage
 		window.history.pushState(historyUrl, historyUrl, historyUrl);
@@ -463,6 +468,7 @@ function PageHandler() {
 	};
 	self.init();
 }
+
 
 function ChannelsHandler() {
 	var self = this;
@@ -492,7 +498,7 @@ function ChannelsHandler() {
 		inviteUser: $('inviteUser'),
 		navCallIcon: $('navCallIcon')
 	};
-	self.getActiveChannel = function() {
+	self.getActiveChannel = function () {
 		return self.channels[self.activeChannel];
 	};
 	self.childDom.minifier = {
@@ -532,7 +538,13 @@ function ChannelsHandler() {
 			return params[0];
 		}
 	};
-	self.setParams = function(params){
+	self.clearChannelHistory = function () {
+		localStorage.clear();
+		self.getActiveChannel().clearHistory ();
+		console.log(getDebugMessage('History has been cleared'));
+		growlSuccess('History has been cleared');
+	};
+	self.setParams = function (params) {
 		self.activeChannel = self.parseActiveChannelFromParams(params);
 	};
 	self.roomClick = function (event) {
@@ -562,7 +574,7 @@ function ChannelsHandler() {
 	self.generateRoomKey = function (roomId) {
 		return "r" + roomId;
 	};
-	self.showActiveChannel = function (){
+	self.showActiveChannel = function () {
 		if (self.activeChannel) {
 			var chatHandler = self.getActiveChannel();
 			if (chatHandler == null) {
@@ -580,11 +592,11 @@ function ChannelsHandler() {
 		}
 		userMessage.focus()
 	};
-	self.toggleChannelOfflineOnline = function() {
+	self.toggleChannelOfflineOnline = function () {
 		var isOnline = CssUtils.toggleClass(self.dom.chatUsersTable, 'hideOffline');
 		self.dom.usersStateText.textContent = isOnline ? "Channel online" : "Channel users";
 	};
-	self.hideActiveChannel = function (){
+	self.hideActiveChannel = function () {
 		if (self.activeChannel && self.getActiveChannel()) {
 			self.getActiveChannel().hide()
 		}
@@ -639,14 +651,14 @@ function ChannelsHandler() {
 			channel: self.activeChannel
 		});
 	};
-	self.preventDefault = function(e) {
+	self.preventDefault = function (e) {
 		e.preventDefault();
 	};
-	self.imageDrop = function(evt) {
+	self.imageDrop = function (evt) {
 		self.preventDefault(evt);
 		self.readDataAndSend(evt.dataTransfer.files[0]);
 	};
-	self.imagePaste = function(e) {
+	self.imagePaste = function (e) {
 		if (e.clipboardData) {
 			var items = e.clipboardData.items;
 			if (items) {
@@ -690,11 +702,11 @@ function ChannelsHandler() {
 		wsHandler.sendToServer(message);
 		self.addUserHandler.hide();
 	};
-	self.showAddRoom = function() {
+	self.showAddRoom = function () {
 		self.addRoomHandler.show();
 		self.dom.addRoomInput.focus();
 	};
-	self.showInviteUser = function() {
+	self.showInviteUser = function () {
 		var activeChannel = self.getActiveChannel();
 		var exclude = activeChannel.allUsers;
 		var isEmpty = self.fillAddUser(exclude);
@@ -707,10 +719,10 @@ function ChannelsHandler() {
 		self.addUserHolderAction = 'inviteUser';
 		self.addUserHandler.setHeaderText("Invite user to room <b>{}</b>".format(activeChannel.roomName));
 	};
-	self.inviteUser = function(message) {
+	self.inviteUser = function (message) {
 		self.createNewRoomChatHandler(message.roomId, message.name, message.content);
 	};
-	self.fillAddUser = function(excludeUsersId) {
+	self.fillAddUser = function (excludeUsersId) {
 		self.dom.addUserList.innerHTML = '';
 		self.addUserUsersList = {};
 		var allUsers = self.getAllUsersInfo();
@@ -754,7 +766,7 @@ function ChannelsHandler() {
 		var filterValue = self.dom.addUserInput.value;
 		if (event.keyCode == 13) {
 			if (self.addUserUsersList[filterValue]) {
-				self.addUserHolderClick({target:self.addUserUsersList[filterValue]});
+				self.addUserHolderClick({target: self.addUserUsersList[filterValue]});
 				return;
 			}
 		}
@@ -767,7 +779,7 @@ function ChannelsHandler() {
 			}
 		}
 	};
-	self.createDirectChannel = function() {
+	self.createDirectChannel = function () {
 		var userId = self.getActiveUserId();
 		var exclude = self.getDirectMessagesUserIds();
 		if (exclude[userId]) {
@@ -794,7 +806,7 @@ function ChannelsHandler() {
 			self.finishAddRoom();
 		}
 	};
-	self.getAnotherUserId = function(allUsersIds) {
+	self.getAnotherUserId = function (allUsersIds) {
 		var anotherUserId;
 		if (allUsersIds.length == 2) {
 			anotherUserId = allUsersIds[0] == '' + loggedUserId ? allUsersIds[1] : allUsersIds[0];
@@ -803,7 +815,7 @@ function ChannelsHandler() {
 		}
 		return anotherUserId;
 	};
-	self.createChannelChatHandler = function(roomId, li, users, roomName) {
+	self.createChannelChatHandler = function (roomId, li, users, roomName) {
 		var i = document.createElement('span');
 		i.className = CANCEL_ICON_CLASS_NAME;
 		li.appendChild(i);
@@ -815,7 +827,7 @@ function ChannelsHandler() {
 		chatBoxDiv.ondragover = self.preventDefault;
 		self.channels[roomKey] = new ChatHandler(li, chatBoxDiv, users, roomId, roomName);
 	};
-	self.createNewUserChatHandler = function(roomId, users) {
+	self.createNewUserChatHandler = function (roomId, users) {
 		var allUsersIds = Object.keys(users);
 		var anotherUserId = self.getAnotherUserId(allUsersIds);
 		var roomName = users[anotherUserId].user;
@@ -824,7 +836,7 @@ function ChannelsHandler() {
 		self.createChannelChatHandler(roomId, li, users, roomName);
 		return anotherUserId;
 	};
-	self.createNewRoomChatHandler = function(roomId, roomName, users) {
+	self.createNewRoomChatHandler = function (roomId, roomName, users) {
 		var li = document.createElement('li');
 		self.dom.rooms.appendChild(li);
 		li.innerHTML = roomName;
@@ -833,7 +845,7 @@ function ChannelsHandler() {
 	self.getCurrentRoomIDs = function () {
 
 	};
-	self.destroyChannel = function(channelKey) {
+	self.destroyChannel = function (channelKey) {
 		self.channels[channelKey].destroy();
 		delete self.channels[channelKey];
 	};
@@ -850,7 +862,7 @@ function ChannelsHandler() {
 		}
 		for (var roomId in rooms) {
 			// if a new room has been added while disconnected
-			if (!rooms.hasOwnProperty(roomId)) continue ;
+			if (!rooms.hasOwnProperty(roomId)) continue;
 			var intKey = parseInt(roomId);
 			if (oldRooms.indexOf(intKey) < 0) {
 				var room = rooms[roomId];
@@ -879,7 +891,7 @@ function ChannelsHandler() {
 			channelHandler[message.action](message);
 		}
 	};
-	self.deleteRoom = function(message) {
+	self.deleteRoom = function (message) {
 		var roomId = message.roomId;
 		var userId = message.userId;
 		var channel = self.generateRoomKey(roomId);
@@ -894,7 +906,7 @@ function ChannelsHandler() {
 			handler.removeUser(message)
 		}
 	};
-	self.addDirectChannel = function(message) {
+	self.addDirectChannel = function (message) {
 		var users = message.users;
 		var anotherUserName = self.getAllUsersInfo();
 		var channelUsers = {};
@@ -904,18 +916,18 @@ function ChannelsHandler() {
 		self.setActiveChannel(self.generateRoomKey(message.roomId));
 		growlInfo('<span>Room for user <b>{}</b> has been created</span>'.format(anotherUserName[anotherUserId].user));
 	};
-	self.addRoom = function(message) {
+	self.addRoom = function (message) {
 		var users = message.users;
 		var roomName = message.name;
 		var channelUsers = {};
-		channelUsers[users[0]] =  self.getAllUsersInfo()[users[0]];
+		channelUsers[users[0]] = self.getAllUsersInfo()[users[0]];
 		self.createNewRoomChatHandler(message.roomId, roomName, channelUsers);
 		growlInfo('<span>Room <b>{}</b> has been created</span>'.format(roomName));
 	};
-	self.viewProfile = function() {
+	self.viewProfile = function () {
 		singlePage.showPage('/profile/', self.getActiveUserId());
 	};
-	self.init = function() {
+	self.init = function () {
 		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);
 		self.dom.rooms.onclick = self.roomClick;
 		self.dom.directUserTable.onclick = self.roomClick;
@@ -933,23 +945,23 @@ function ChannelsHandler() {
 		self.dom.usersStateText.onclick = self.toggleChannelOfflineOnline;
 		self.dom.usersStateText.click()
 	};
-	self.minifyList = function(event) {
+	self.minifyList = function (event) {
 		var minifier = self.dom.minifier[event.target.getAttribute('name')];
 		var visible = CssUtils.toggleVisibility(minifier.body);
-		minifier.icon.className = visible ? 'icon-angle-circled-down' :'icon-angle-circled-up';
+		minifier.icon.className = visible ? 'icon-angle-circled-down' : 'icon-angle-circled-up';
 
 	};
-	self.getActiveUserId = function() {
+	self.getActiveUserId = function () {
 		return self.dom.activeUserContext.getAttribute(USER_ID_ATTR);
 	};
-	self.getActiveUsername = function() {
+	self.getActiveUsername = function () {
 		return self.dom.activeUserContext.textContent;
 	};
 	self.m2Call = function () {
 		growlError("<span>This function is not implemented yet. Use <i class='icon-phone'></i> " +
 				"icon in <b style='font-size: 13px'>DIRECT MESSAGES</b> to make a call</span>");
 	};
-	self.call = function() {
+	self.call = function () {
 		if (self.getActiveUsername() != loggedUser) {
 			webRtcApi.showCallDialog();
 			webRtcApi.receiverId = parseInt(self.getActiveUserId());
@@ -970,14 +982,14 @@ function ChannelsHandler() {
 		if (self.dom.activeUserContext != null) {
 			CssUtils.removeClass(self.dom.activeUserContext, 'active-user');
 		}
-		self.dom.activeUserContext =  li;
+		self.dom.activeUserContext = li;
 		self.dom.userContextMenu.style.top = li.offsetTop + li.clientHeight + "px";
 		CssUtils.addClass(self.dom.activeUserContext, 'active-user');
 		CssUtils.showElement(self.dom.userContextMenu);
 		document.addEventListener("click", self.removeContextMenu);
 		e.preventDefault();
 	};
-	self.removeContextMenu = function() {
+	self.removeContextMenu = function () {
 		CssUtils.hideElement(self.dom.userContextMenu);
 		document.removeEventListener("click", self.removeContextMenu);
 		CssUtils.removeClass(self.dom.activeUserContext, 'active-user');
@@ -1031,7 +1043,7 @@ function showHelp() {
 function SmileyUtil() {
 	var self = this;
 	self.dom = {
-		smileParentHolder : $('smileParentHolder')
+		smileParentHolder: $('smileParentHolder')
 	};
 	self.tabNames = [];
 	self.smileyDict = {};
@@ -1039,7 +1051,7 @@ function SmileyUtil() {
 		document.addEventListener("click", self.onDocClick);
 		self.loadSmileys(window.smileys_bas64_data);
 	};
-	self.hideSmileys = function() {
+	self.hideSmileys = function () {
 		CssUtils.hideElement(self.dom.smileParentHolder);
 	};
 	self.onDocClick = function (event) {
@@ -1143,14 +1155,14 @@ function timeMessageClick(event) {
 	var value = userMessage.innerHTML;
 	var match = value.match(timePattern);
 	var oldText = match ? value.substr(match[0].length) : value;
-	userMessage.innerHTML = '{}>>> {}'.format(event.target.parentElement.parentElement.textContent,  oldText);
+	userMessage.innerHTML = '{}>>> {}'.format(event.target.parentElement.parentElement.textContent, oldText);
 	userMessage.focus();
 }
 
 function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	var self = this;
 	self.roomId = roomId;
-	self.channel = 'r'+roomId;
+	self.channel = 'r' + roomId;
 	self.roomName = roomName;
 	self.dom = {
 		chatBoxDiv: chatboxDiv,
@@ -1209,25 +1221,33 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.loadUpHistory(35);
 		}
 	};
-	self.dom.chatBoxDiv.addEventListener('keydown',  self.keyDownLoadUp);
+	self.clearHistory = function () {
+		self.headerId = null;
+		self.dom.chatBoxDiv.innerHTML = '';
+		self.allMessages = [];
+		self.allMessagesDates = [];
+		self.dom.chatBoxDiv.addEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
+		self.dom.chatBoxDiv.addEventListener("keydown", self.keyDownLoadUp);
+	};
+	self.dom.chatBoxDiv.addEventListener('keydown', self.keyDownLoadUp);
 	self.hide = function () {
 		CssUtils.hideElement(self.dom.chatBoxDiv);
 		CssUtils.hideElement(self.dom.userList);
 		CssUtils.removeClass(self.dom.roomNameLi, self.activeRoomClass);
 	};
-	self.setChannelAttach = function(isAttached) {
+	self.setChannelAttach = function (isAttached) {
 		self.callIsAttached = isAttached;
 	};
-	self.isPrivate = function() {
+	self.isPrivate = function () {
 		return self.dom.roomNameLi.hasAttribute(USER_ID_ATTR);
 	};
-	self.getOpponentId = function() {
+	self.getOpponentId = function () {
 		return self.dom.roomNameLi.getAttribute(USER_ID_ATTR);
 	};
-	self.getUserNameById = function(id) {
+	self.getUserNameById = function (id) {
 		return self.allUsers[id].user;
 	};
-	self.addUserToDom = function(message) {
+	self.addUserToDom = function (message) {
 		if (!self.allUsers[message.userId]) {
 			self.allUsers[message.userId] = {
 				sex: message.sex,
@@ -1236,26 +1256,26 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.addDomUserOnline(message.userId, message.sex, message.user);
 		}
 	};
-	self.addUserToAll = function(message) {
+	self.addUserToAll = function (message) {
 		self.addUserToDom(message);
 	};
-	self.setDomOnlineUsers = function(users) {
+	self.setDomOnlineUsers = function (users) {
 		self.dom.userList.innerHTML = '';
 		self.allUsers = users;
 		for (var userId in self.allUsers) {
 			if (!self.allUsers.hasOwnProperty(userId)) continue;
 			var user = self.allUsers[userId];
-			self.addDomUserOnline(userId, user.sex,user.user);
+			self.addDomUserOnline(userId, user.sex, user.user);
 		}
 	};
-	self.addDomUserOnline = function(userId, sex, username) {
+	self.addDomUserOnline = function (userId, sex, username) {
 		var li = createUserLi(userId, sex, username);
 		li.className = 'offline';
 		self.allUsers[userId].li = li;
 		self.dom.userList.appendChild(li);
 	};
 	self.setDomOnlineUsers(allUsers);
-	self.isHidden = function() {
+	self.isHidden = function () {
 		return CssUtils.isHidden(self.dom.chatBoxDiv);
 	};
 	/** Inserts element in the middle if it's not there
@@ -1276,7 +1296,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 		return null;
 	};
-	self.removeUser = function(message) {
+	self.removeUser = function (message) {
 		//if (self.onlineUsers.indexOf(message.userId) >= 0) {
 		//	message.content = self.onlineUsers;
 		//	self.printChangeOnlineStatus('has left the conversation.', message, chatLogout);
@@ -1376,13 +1396,24 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		} else {
 			var oldscrollHeight = self.dom.chatBoxDiv.scrollHeight;
 			self.dom.chatBoxDiv.appendChild(p);
-			var newscrollHeight = self.dom.chatBoxDiv.scrollHeight;
-			if (newscrollHeight > oldscrollHeight) {
-				self.dom.chatBoxDiv.scrollTop = newscrollHeight;
+			if (htmlEncodedContent.startsWith('<img')) {
+				(function (id, oldScrollHeight) {
+					document.querySelector('[id="{}"] img'.format(id)).addEventListener('load', function () {
+						self.scrollBottom(oldScrollHeight);
+					});
+				})(p.id, oldscrollHeight);
+			} else {
+				self.scrollBottom(oldscrollHeight);
 			}
 		}
 	};
-	self.increaseNewMessages = function() {
+	self.scrollBottom = function (oldscrollHeight) {
+		var newscrollHeight = self.dom.chatBoxDiv.scrollHeight;
+		if (newscrollHeight > oldscrollHeight) {
+			self.dom.chatBoxDiv.scrollTop = newscrollHeight;
+		}
+	};
+	self.increaseNewMessages = function () {
 		if (self.isHidden()) {
 			self.newMessages += 1;
 			self.dom.newMessages.textContent = self.newMessages;
@@ -1401,22 +1432,18 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var displayedUsername = user.user;
 		//private message
 		var prefix = false;
-		var headerStyle = data.userId  == loggedUserId ? self.SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
-		var preparedHtml;
-		if (data.image) {
-			preparedHtml = "<img src=\'{}\'/>".format(data.image);
-		} else {
-			preparedHtml = smileyUtil.encodeSmileys(data.content);
-		}
+		var headerStyle = data.userId == loggedUserId ? self.SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
+		var preparedHtml = data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
 		if (!isCurrentTabActive) {
 			newMessagesCount++;
 			document.title = newMessagesCount + " new messages";
-			notifier.notify(displayedUsername, data.content);
-			vibrate();
+			notifier.notify(displayedUsername, data.content || 'image');
 		}
 		self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
 	};
 	self.loadMessages = function (data) {
+		var windowsSoundState = window.sound;
+		window.sound = 0;
 		console.log(getDebugMessage('appending messages to top'));
 		// This check should fire only once,
 		// because requests aren't being sent when there are no event for them, thus no responses
@@ -1434,19 +1461,20 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.printMessage(message);
 		});
 		self.lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
+		window.sound = windowsSoundState;
 	};
 	self.addOnlineUser = function (message) {
 		self.addUserToDom(message);
 		self.printChangeOnlineStatus('appeared online.', message, self.dom.chatLogin);
 	};
-	self.removeOnlineUser = function(message) {
+	self.removeOnlineUser = function (message) {
 		self.printChangeOnlineStatus('gone offline.', message, self.dom.chatLogout);
 	};
 	self.printChangeOnlineStatus = function (action, message, sound) {
 		var dm;
 		var username = self.allUsers[message.userId].user;
 		if (message.userId == loggedUserId) {
-			dm = 'You have ' + action ;
+			dm = 'You have ' + action;
 		} else {
 			dm = 'User <b>{}</b> has {}'.format(username, action);
 		}
@@ -1454,7 +1482,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		self.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
 		self.setOnlineUsers(message);
 	};
-	self.setOnlineUsers = function(message) {
+	self.setOnlineUsers = function (message) {
 		self.onlineUsers = message.content;
 		console.log(getDebugMessage("Load user names: {}", Object.keys(self.onlineUsers)));
 		for (var userId in self.allUsers) {
@@ -1487,18 +1515,12 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.destroy = function () {
 		var elements = [self.dom.chatBoxDiv, self.dom.roomNameLi, self.dom.userList];
-		for (var i = 0; i< elements.length; i++) {
+		for (var i = 0; i < elements.length; i++) {
 			CssUtils.deleteElement(elements[i]);
 		}
 	}
 }
 
-
-function vibrate() {
-	if (window.navigator && window.navigator.vibrate) {
-		window.navigator.vibrate(200);
-	}
-}
 
 function DownloadBar(stringId) {
 	var self = this;
@@ -1513,20 +1535,20 @@ function DownloadBar(stringId) {
 		self.max = max;
 		self.start();
 	};
-	self.setValue = function(value) {
-		var percent =  Math.round(value * 100 / self.max) + "%";
+	self.setValue = function (value) {
+		var percent = Math.round(value * 100 / self.max) + "%";
 		self.dom.text.style.width = percent;
 		self.dom.text.textContent = percent;
 	};
-	self.setSuccess = function() {
+	self.setSuccess = function () {
 		CssUtils.removeClass(self.dom.wrapper, self.PROGRESS_CLASS);
 		CssUtils.addClass(self.dom.wrapper, self.SUCC_CLASS);
 	};
-	self.setError = function() {
+	self.setError = function () {
 		CssUtils.removeClass(self.dom.wrapper, self.PROGRESS_CLASS);
 		CssUtils.addClass(self.dom.wrapper, self.ERR_CLASS);
 	};
-	self.start = function() {
+	self.start = function () {
 		self.dom.text.removeAttribute('href');
 		self.dom.text.removeAttribute('download');
 		CssUtils.removeClass(self.dom.wrapper, self.SUCC_CLASS);
@@ -1543,10 +1565,10 @@ function WebRtcApi() {
 	self.isForTransferFile = false;
 	self.CHUNK_SIZE = 16384;
 	self.dom = {
-		callContainer : $('callContainer'),
-		callAnswerParent : $('callAnswerParent'),
+		callContainer: $('callContainer'),
+		callAnswerParent: $('callAnswerParent'),
 		callContainerHeaderText: headerText,
-		callAnswerText : $('callAnswerText'),
+		callAnswerText: $('callAnswerText'),
 		remote: $('remoteVideo'),
 		local: $('localVideo'),
 		callSound: $('chatCall'),
@@ -1558,7 +1580,8 @@ function WebRtcApi() {
 		callIcon: $('callIcon'),
 		callVolume: $('callVolume'),
 		microphoneLevel: $("microphoneLevel"),
-		fs: { /*FullScreen*/
+		fs: {
+			/*FullScreen*/
 			video: $('fs-video'),
 			audio: $('fs-audio'),
 			hangup: $('fs-hangup'),
@@ -1589,7 +1612,7 @@ function WebRtcApi() {
 		self.dom.fs.audio.onclick = self.toggleMic;
 		self.dom.audioStatusIcon.onclick = self.toggleMic;
 		self.downloadBar = new DownloadBar('transmitProgress');
-		$('webRtcFileIcon').onclick = function() {
+		$('webRtcFileIcon').onclick = function () {
 			self.dom.fileInput.click();
 		};
 		self.dom.fileInput.addEventListener('change', self.transferFile, false);
@@ -1614,7 +1637,7 @@ function WebRtcApi() {
 		}
 		self.dom.remote.ondblclick = self.enterFullScreenMode;
 		self.dom.fs.enterFullScreen.onclick = self.enterFullScreenMode;
-		self.dom.fs.minimize.onclick =  self.exitFullScreen;
+		self.dom.fs.minimize.onclick = self.exitFullScreen;
 		self.idleTime = 0;
 		self.dom.fs.hangup.title = 'Hang up';
 		self.dom.hangUpIcon.title = self.dom.fs.hangup.title;
@@ -1637,7 +1660,7 @@ function WebRtcApi() {
 		self.dom.videoContainer.requestFullscreen();
 		CssUtils.addClass(self.dom.videoContainer, 'fullscreen');
 		document.addEventListener('mousemove', self.fsMouseMove, false);
-		self.hideContainerTimeoutRes = setInterval(self.hideContainerTimeout , 1000);
+		self.hideContainerTimeoutRes = setInterval(self.hideContainerTimeout, 1000);
 		/*to clear only function from resultOf setInterval should be passed, otherwise doesn't work*/
 	};
 	self.fsMouseMove = function () {
@@ -1658,7 +1681,7 @@ function WebRtcApi() {
 	var webRtcUrl = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 	self.pc_config = {iceServers: [{url: webRtcUrl}]};
 	self.pc_constraints = {
-		optional: [ /*Firefox*/
+		optional: [/*Firefox*/
 			/*{DtlsSrtpKeyAgreement: true},*/
 			{RtpDataChannels: false /*true*/}
 		]
@@ -1702,7 +1725,7 @@ function WebRtcApi() {
 	self.isActive = function () {
 		return self.localStream && self.localStream.active;
 	};
-	self.toggleInput = function(isVideo) {
+	self.toggleInput = function (isVideo) {
 		var kind = isVideo ? 'video' : 'audio';
 		var track = self.getTrack(isVideo);
 		if (!self.isActive() || track) {
@@ -1725,10 +1748,10 @@ function WebRtcApi() {
 	self.toggleMic = function () {
 		self.toggleInput(false);
 	};
-	self.onreply = function() {
+	self.onreply = function () {
 		self.setHeaderText("Waiting for <b>{}</b> to accept".format(self.receiverName))
 	};
-	self.setHeaderText = function(text) {
+	self.setHeaderText = function (text) {
 		if (self.isForTransferFile) {
 			self.downloadBar.dom.text.textContent = "Waiting_to_accept";
 		} else {
@@ -1747,13 +1770,13 @@ function WebRtcApi() {
 			self.onCallOffer(message);
 		}
 	};
-	self.setAnswerOpponentVariables = function(message){
+	self.setAnswerOpponentVariables = function (message) {
 		self.receiverName = message.user;
 		self.receiverId = message.userId;
 		self.channel = message.channel;
 		self.sendBaseEvent(null, "reply");
-	} ;
-	self.onCallOffer = function(message) {
+	};
+	self.onCallOffer = function (message) {
 		self.clearTimeout();
 		self.setAnswerOpponentVariables(message);
 		checkAndPlay(self.dom.callSound);
@@ -1768,7 +1791,7 @@ function WebRtcApi() {
 		);
 		self.dom.callAnswerText.textContent = "{} is calling you".format(self.receiverName);
 	};
-	self.setIconState = function(isCall) {
+	self.setIconState = function (isCall) {
 		isCall = isCall || self.isActive();
 		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
 		CssUtils.setVisibility(self.dom.videoContainer, isCall);
@@ -1847,9 +1870,8 @@ function WebRtcApi() {
 	self.onFileOffer = function (message) {
 		self.receivedFileSize = parseInt(message.content.size);
 		self.downloadBar.setMax(self.receivedFileSize);
-		self.receivedFileName  = message.content.name;
-		self.lastGrowl = new Growl("<div style='cursor: pointer'>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>".
-			format(encodeHTML(self.receivedFileName), bytesToSize(self.receivedFileSize), encodeHTML(message.user)));
+		self.receivedFileName = message.content.name;
+		self.lastGrowl = new Growl("<div style='cursor: pointer'>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>".format(encodeHTML(self.receivedFileName), bytesToSize(self.receivedFileSize), encodeHTML(message.user)));
 		self.lastGrowl.show(3600000, 'col-info');
 		self.lastGrowl.growl.addEventListener('click', self.acceptFileReply);
 		self.setAnswerOpponentVariables(message);
@@ -1883,14 +1905,14 @@ function WebRtcApi() {
 		self.captureInput(self.captureInputStream);
 
 	};
-	self.captureInputStream = function(stream) {
+	self.captureInputStream = function (stream) {
 		self.setIconState(true);
 		self.setHeaderText("Establishing connection with {}".format(self.receiverName));
 		self.attachLocalStream(stream);
 		self.sendBaseEvent(null, 'offer');
 		self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime);
 	};
-	self.createCallAfterCapture = function(stream) {
+	self.createCallAfterCapture = function (stream) {
 		self.createPeerConnection();
 		self.attachLocalStream(stream);
 		self.createSendChannelAndOffer();
@@ -1905,7 +1927,7 @@ function WebRtcApi() {
 		channelsHandler.getActiveChannel().setChannelAttach(true);
 		CssUtils.showElement(self.dom.callContainer);
 	};
-	self.print = function (message){
+	self.print = function (message) {
 		console.log(getDebugMessage("Call message {}", JSON.stringify(message)));
 	};
 	self.gotReceiveChannel = function (event) {
@@ -1920,7 +1942,7 @@ function WebRtcApi() {
 			self.sendData();
 		}
 	};
-	self.sendData = function() {
+	self.sendData = function () {
 		console.log(getDebugMessage('file is ' + [self.file.name, self.file.size, self.file.type,
 					self.file.lastModifiedDate].join(' ')));
 		if (self.file.size === 0) {
@@ -1955,7 +1977,7 @@ function WebRtcApi() {
 					self.receiverId));
 			return;
 		}
-		self["on"+data.type](data);
+		self["on" + data.type](data);
 	};
 	self.clearTimeout = function () {
 		var timeoutCleaned = false;
@@ -1974,7 +1996,7 @@ function WebRtcApi() {
 			}, self.failWebRtcP3);
 		}, self.failWebRtcP4, self.sdpConstraints);
 	};
-	self.onSuccessAnswer = function() {
+	self.onSuccessAnswer = function () {
 		console.log(getDebugMessage('answer received'))
 	};
 	self.onwebrtc = function (message) {
@@ -1983,7 +2005,7 @@ function WebRtcApi() {
 		if (self.pc.iceConnectionState && self.pc.iceConnectionState != 'closed') {
 			if (data.sdp) {
 				var successCall = self.webrtcInitiator ? self.onSuccessAnswer : self.answerToWebrtc;
-				self.pc.setRemoteDescription(new RTCSessionDescription(data), successCall , self.failWebRtc);
+				self.pc.setRemoteDescription(new RTCSessionDescription(data), successCall, self.failWebRtc);
 			} else if (data.candidate) {
 				self.pc.addIceCandidate(new RTCIceCandidate(data));
 			} else if (data.message) {
@@ -1993,7 +2015,7 @@ function WebRtcApi() {
 			console.warn(getDebugMessage("Skipping ws message for closed connection"));
 		}
 	};
-	self.setVideoSource = function(domEl, stream) {
+	self.setVideoSource = function (domEl, stream) {
 		domEl.src = URL.createObjectURL(stream);
 		domEl.play();
 	};
@@ -2007,7 +2029,7 @@ function WebRtcApi() {
 		self.setAudio(self.getTrack(false) != null);
 		self.createMicrophoneLevelVoice(stream);
 	};
-	self.createMicrophoneLevelVoice = function(stream) {
+	self.createMicrophoneLevelVoice = function (stream) {
 		try {
 			var audioContext = new AudioContext();
 			var analyser = audioContext.createAnalyser();
@@ -2051,7 +2073,7 @@ function WebRtcApi() {
 		growlError('<div>Unable to capture input from microphone. Check your microphone connection or {}'
 				.format(url));
 	};
-	self.createPeerConnection = function() {
+	self.createPeerConnection = function () {
 		if (!RTCPeerConnection) {
 			throw "Your browser doesn't support RTCPeerConnection";
 		}
@@ -2091,11 +2113,11 @@ function WebRtcApi() {
 			self.sendChannel.close();
 			self.pc.close();
 		} catch (error) {
-			console.warn(getDebugMessage('{} Error while closing channels, description {}', error.message, error,name));
+			console.warn(getDebugMessage('{} Error while closing channels, description {}', error.message, error, name));
 		}
 		if (self.localStream) {
 			var tracks = self.localStream.getTracks();
-			for (var i=0; i< tracks.length; i++) {
+			for (var i = 0; i < tracks.length; i++) {
 				tracks[i].stop()
 			}
 		}
@@ -2108,20 +2130,21 @@ function WebRtcApi() {
 			self.javascriptNode.onaudioprocess = null;
 			self.dom.microphoneLevel.value = 0;
 		}
-		self.exitFullScreen(); /*also executes removing event on exiting from fullscreen*/
+		self.exitFullScreen();
+		/*also executes removing event on exiting from fullscreen*/
 	};
-	self.hangUp = function() {
+	self.hangUp = function () {
 		self.sendBaseEvent(null, 'finish');
 		self.closeEvents("Call is finished.");
 	};
 	self.ondecline = function () {
 		self.closeEvents("User has declined the call");
 	};
-	self.onfinish = function() {
+	self.onfinish = function () {
 		self.declineWebRtcCall(true);
 		self.closeEvents("Opponent hung up. Call is finished.");
 	};
-	self.closeDialog = function() {
+	self.closeDialog = function () {
 		if (self.isActive()) {
 			self.hangUp();
 		} else {
@@ -2157,7 +2180,7 @@ function WebRtcApi() {
 		self.sendBaseEvent(null, 'fileAccepted');
 		self.downloadBar.setSuccess();
 		self.receiveBuffer = [];
-		self.receivedSize =0;
+		self.receivedSize = 0;
 		self.downloadBar.dom.text.href = URL.createObjectURL(received);
 		self.downloadBar.dom.text.download = self.receivedFileName;
 		self.downloadBar.dom.text.textContent = 'Save {}'.format(self.receivedFileName);
@@ -2182,7 +2205,7 @@ function WebRtcApi() {
 			}, self.failWebRtcP2);
 		}, self.failWebRtcP1, self.sdpConstraints);
 	};
-	self.sendBaseEvent = function(content, type) {
+	self.sendBaseEvent = function (content, type) {
 		wsHandler.sendToServer({
 			content: content,
 			action: 'call',
@@ -2193,22 +2216,22 @@ function WebRtcApi() {
 	self.sendWebRtcEvent = function (message) {
 		self.sendBaseEvent(message, 'webrtc');
 	};
-	self.failWebRtcP1 = function() {
+	self.failWebRtcP1 = function () {
 		self.failWebRtc.apply(self, arguments);
 	};
-	self.failWebRtcP2 = function() {
+	self.failWebRtcP2 = function () {
 		self.failWebRtc.apply(self, arguments);
 	};
-	self.failWebRtcP3 = function() {
+	self.failWebRtcP3 = function () {
 		self.failWebRtc.apply(self, arguments);
 	};
-	self.failWebRtcP4 = function() {
+	self.failWebRtcP4 = function () {
 		self.failWebRtc.apply(self, arguments);
 	};
 	self.failWebRtc = function () {
 		var isError = arguments.length === 1 && (arguments[0].message || arguments[0].name);
 		var errorContext = isError ? "{}: {}".format(arguments[0].name, arguments[0].message)
-				:Array.prototype.join.call(arguments, ' ');
+				: Array.prototype.join.call(arguments, ' ');
 		growlError("An error occurred while establishing a connection: {}".format(errorContext));
 		console.error(getDebugMessage("OnError way from {}, exception: {}", getCallerTrace(), errorContext));
 	};
@@ -2259,7 +2282,7 @@ function WsHandler() {
 		}
 	};
 
-	self.setStatus = function(isOnline) {
+	self.setStatus = function (isOnline) {
 		var statusClass = isOnline ? self.dom.onlineClass : self.dom.offlineClass;
 		CssUtils.setOnOf(self.dom.onlineStatus, statusClass, [self.dom.onlineClass, self.dom.offlineClass]);
 	};
@@ -2327,8 +2350,8 @@ function Storage() {
 			window.sound = savedSoundStatus;
 		}
 	};
-		// Use both json and object repr for less JSON actions
-	self.saveMessageToStorage = function(objectItem, jsonItem) {
+	// Use both json and object repr for less JSON actions
+	self.saveMessageToStorage = function (objectItem, jsonItem) {
 		switch (objectItem['action']) {
 			case 'printMessage':
 			case 'loadMessages':
@@ -2360,10 +2383,4 @@ function createUserLi(userId, gender, username) {
 	li.setAttribute(USER_ID_ATTR, userId);
 	li.setAttribute(USER_NAME_ATTR, username);
 	return li;
-}
-
-function clearLocalHistory() {
-	localStorage.clear();
-	console.log(getDebugMessage('History has been cleared'));
-	growlSuccess('History has been cleared');
 }
