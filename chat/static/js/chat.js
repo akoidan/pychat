@@ -59,6 +59,21 @@ onDocLoad(function () {
 	showHelp();
 });
 
+function readFileAsB64(file, callback, showGrowl) {
+	if (!file) {
+		console.warn(getDebugMessage("Context contains no files"));
+	} else if (file.type.indexOf("image") < 0) {
+		growlError("<span>Invalid image type <b>{}</b></span>".format(encodeHTML(file.type)));
+	} else {
+		var fileName = file.name ? file.name : '';
+		if (showGrowl) {
+			growlInfo("<span>Sending file <b>{}</b> ({}) to server</span>".format(fileName, bytesToSize(file.size)));
+		}
+		var reader = new FileReader();
+		reader.onload = callback;
+		reader.readAsDataURL(file);
+	}
+}
 
 function Painter() {
 	var self = this;
@@ -160,9 +175,37 @@ function Painter() {
 			self.sendImage();
 		}
 	};
+	self.canvasImagePaste = function(e) {
+		if (e.clipboardData) {
+			var items = e.clipboardData.items;
+			if (items) {
+				for (var i = 0; i < items.length; i++) {
+					self.readAndPasteCanvas(items[i].getAsFile());
+				}
+				self.preventDefault(e);
+			}
+		}
+	};
+	self.canvasImageDrop = function(e) {
+		self.preventDefault(e);
+		self.readAndPasteCanvas(e.dataTransfer.files[0]);
+	};
+	self.readAndPasteCanvas = function(file) {
+		readFileAsB64(file, function(event) {
+			var pastedImage = new Image();
+			pastedImage.src = event.target.result;
+			self.ctx.drawImage(pastedImage, 0, 0);
+		});
+	};
+	self.preventDefault = function (e) {
+		e.preventDefault();
+	};
 	self.initChild = function () {
 		document.body.addEventListener('mouseup', self.finishDraw, false);
 		self.dom.canvas.addEventListener('mousedown', self.startDraw, false);
+		self.dom.container.onpaste = self.canvasImagePaste;
+		self.dom.container.ondrop = self.canvasImageDrop;
+		self.dom.container.ondragover = self.preventDefault;
 		self.dom.color.addEventListener('input', self.changeColor, false);
 		self.dom.range.addEventListener('change', self.changeRadius, false);
 		self.dom.container.addEventListener('keypress', self.contKeyPress, false);
@@ -631,25 +674,14 @@ function ChannelsHandler() {
 		self.dom.imgInput.value = "";
 	};
 	self.readDataAndSend = function (file) {
-		if (!file) {
-			console.warn(getDebugMessage("Context contains no files"));
-		} else if (file.type.indexOf("image") < 0) {
-			growlError("<span>Invalid image type <b>{}</b></span>".format(encodeHTML(file.type)));
-		} else {
-			var fileName = file.name ? file.name : '';
-			growlInfo("<span>Sending file <b>{}</b> ({}) to server</span>".format(fileName, bytesToSize(file.size)));
-			var reader = new FileReader();
-			reader.onload = self.sendImageToServer;
-			reader.readAsDataURL(file);
-		}
-	};
-	self.sendImageToServer = function (event) {
-		self.sendMessage({
-			image: event.target.result,
-			content: null,
-			action: 'sendMessage',
-			channel: self.activeChannel
-		});
+		readFileAsB64(file, function (event) {
+			self.sendMessage({
+				image: event.target.result,
+				content: null,
+				action: 'sendMessage',
+				channel: self.activeChannel
+			});
+		}, true);
 	};
 	self.preventDefault = function (e) {
 		e.preventDefault();
