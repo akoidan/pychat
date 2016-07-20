@@ -123,7 +123,7 @@ class Room(models.Model):
 	users = models.ManyToManyField(User, related_name='rooms'
 											 # , through='RoomUsers'
 			)
-	disabled = NullBooleanField()
+	disabled = BooleanField(default=False, null=False)
 
 	@property
 	def is_private(self):
