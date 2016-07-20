@@ -192,9 +192,22 @@ function Painter() {
 	};
 	self.readAndPasteCanvas = function(file) {
 		readFileAsB64(file, function(event) {
-			var pastedImage = new Image();
-			pastedImage.src = event.target.result;
-			self.ctx.drawImage(pastedImage, 0, 0);
+			var img = new Image();
+			img.src = event.target.result;
+			var cnvW = self.dom.canvas.width;
+			var cnvH = self.dom.canvas.height;
+			var imgW = img.width;
+			var imgH = img.height;
+			if (imgW > cnvW || imgH > cnvH){
+				var scaleH = imgH / cnvH;
+				var scaleW = imgW / cnvW;
+				var scale = scaleH > scaleW ? scaleH : scaleW;
+				self.ctx.drawImage(img,
+						0, 0, imgW, imgH,
+						0, 0, Math.round(imgW / scale), Math.round(imgH / scale));
+			} else {
+				self.ctx.drawImage(img, 0, 0, imgW, img.height);
+			}
 		});
 	};
 	self.preventDefault = function (e) {
