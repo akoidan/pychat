@@ -13,20 +13,13 @@ const GENDER_ICONS = {
 	'Secret': 'icon-user-secret'
 };
 
-var smileRegex = /<img[^>]*code="([^"]+)"[^>]*>/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
-
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
-var newMessagesCount = 0;
-var isCurrentTabActive = true;
-//localStorage  key
-const STORAGE_NAME = 'main';
 // input type that contains text for sending message
 var userMessage;
 // navbar label with current user name
 var headerText;
-
 // OOP variables
 var notifier;
 var webRtcApi;
@@ -37,13 +30,10 @@ var storage;
 var singlePage;
 var painter;
 
-
 onDocLoad(function () {
 	userMessage = $("usermsg");
 	headerText = $('headerText');
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
-	window.addEventListener("blur", changeTittleFunction);
-	window.addEventListener("focus", changeTittleFunction);
 	channelsHandler = new ChannelsHandler();
 	singlePage = new PageHandler();
 	webRtcApi = new WebRtcApi();
@@ -246,8 +236,11 @@ function Painter() {
 	self.initChild();
 }
 function NotifierHandler() {
-	self = this;
+	var self = this;
 	self.maxNotifyTime = 300;
+	self.currentTabId = new Date().getTime().toString();
+	/*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
+	self.LAST_TAB_ID_VARNAME = 'lastTabId';
 	self.clearNotificationTime = 5000;
 	self.askPermissions = function () {
 		if (notifications && Notification.permission !== "granted") {
@@ -256,11 +249,11 @@ function NotifierHandler() {
 	};
 	self.popedNotifQueue = [];
 	self.init = function () {
+		window.addEventListener("blur", self.onFocusOut);
+		window.addEventListener("focus", self.onFocus);
+		self.onFocus();
 		if (!window.Notification) {
 			console.warn(getDebugMessage("Notification is not supported"));
-			self.notify = function (title, message) {
-				console.warn(getDebugMessage("Skip notification {} {}", title, message));
-			}
 		} else {
 			self.askPermissions();
 		}
@@ -271,12 +264,20 @@ function NotifierHandler() {
 	};
 	self.lastNotifyTime = new Date().getTime();
 	self.notify = function (title, message) {
-		var currentTime = new Date().getTime();
-		if (!notifications || currentTime - self.maxNotifyTime < self.lastNotifyTime) {
-			return
+		if (self.isCurrentTabActive) {
+			console.log(getDebugMessage("Skip not because windows is active"));
+			return;
 		}
+		self.newMessagesCount++;
+		document.title = self.newMessagesCount + " new messages";
 		if (navigator.vibrate) {
 			navigator.vibrate(200);
+		}
+		var currentTime = new Date().getTime();
+		// last opened tab not this one, leave the oppotunity to show notification from last tab
+		if (!window.Notification || !self.isTabMain() || !notifications || currentTime - self.maxNotifyTime < self.lastNotifyTime) {
+			console.log(getDebugMessage("Skip not because tab is not last"));
+			return
 		}
 		self.askPermissions();
 		var notification = new Notification(title, {
@@ -291,12 +292,24 @@ function NotifierHandler() {
 		};
 		setTimeout(self.clearNotification, self.clearNotificationTime);
 	};
+	self.isTabMain = function() {
+		return localStorage.getItem(self.LAST_TAB_ID_VARNAME) ==  self.currentTabId;
+	};
 	self.clearNotification = function () {
 		if (self.popedNotifQueue.length > 0) {
 			var notif = self.popedNotifQueue[0];
 			notif.close();
 			self.popedNotifQueue.shift();
 		}
+	};
+	self.onFocus = function() {
+		localStorage.setItem(self.LAST_TAB_ID_VARNAME, self.currentTabId);
+		self.isCurrentTabActive = true;
+		self.newMessagesCount = 0;
+		document.title = 'PyChat';
+	};
+	self.onFocusOut = function() {
+		self.isCurrentTabActive = false
 	};
 	self.init();
 }
@@ -717,7 +730,7 @@ function ChannelsHandler() {
 	self.checkAndSendMessage = function (event) {
 		if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
 			event.preventDefault();
-			userMessage.innerHTML = userMessage.innerHTML.replace(smileRegex, "$1");
+			smileyUtil.purgeImagesFromSmileys();
 			var messageContent = userMessage.textContent;
 			if (blankRegex.test(messageContent)) {
 				return;
@@ -1090,6 +1103,7 @@ function SmileyUtil() {
 	self.dom = {
 		smileParentHolder: $('smileParentHolder')
 	};
+	self.smileRegex = /<img[^>]*code="([^"]+)"[^>]*>/g;
 	self.tabNames = [];
 	self.smileyDict = {};
 	self.init = function () {
@@ -1108,6 +1122,9 @@ function SmileyUtil() {
 			}
 		}
 		self.hideSmileys();
+	};
+	self.purgeImagesFromSmileys = function() {
+		userMessage.innerHTML = userMessage.innerHTML.replace(self.smileRegex, "$1");
 	};
 	self.addSmile = function (event) {
 		event = event || window.event;
@@ -1179,20 +1196,6 @@ function SmileyUtil() {
 		}
 		self.showTabByName(Object.keys(smileyData)[0]);
 	};
-}
-
-function changeTittleFunction(e) {
-	switch (e.type) {
-		case "focus":
-			// do work
-			isCurrentTabActive = true;
-			newMessagesCount = 0;
-			document.title = 'PyChat';
-			break;
-		case "blur":
-			isCurrentTabActive = false;
-	}
-	//console.log(getDebugMessage('Windows is {}', isCurrentTabActive ? 'active': 'unactive'))
 }
 
 
@@ -1479,11 +1482,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var prefix = false;
 		var headerStyle = data.userId == loggedUserId ? self.SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
 		var preparedHtml = data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
-		if (!isCurrentTabActive) {
-			newMessagesCount++;
-			document.title = newMessagesCount + " new messages";
-			notifier.notify(displayedUsername, data.content || 'image');
-		}
+		notifier.notify(displayedUsername, data.content || 'image');
 		self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
 	};
 	self.loadMessages = function (data) {
@@ -2374,8 +2373,9 @@ function WsHandler() {
 
 function Storage() {
 	var self = this;
+	self.STORAGE_NAME = 'main';
 	self.loadMessagesFromLocalStorage = function () {
-		var jsonData = localStorage.getItem(STORAGE_NAME);
+		var jsonData = localStorage.getItem(self.STORAGE_NAME);
 		if (jsonData != null) {
 			var parsedData = JSON.parse(jsonData);
 			console.log(getDebugMessage('Loading {} messages from localstorage', parsedData.length));
@@ -2397,6 +2397,9 @@ function Storage() {
 	};
 	// Use both json and object repr for less JSON actions
 	self.saveMessageToStorage = function (objectItem, jsonItem) {
+		if (!notifier.isTabMain()) {
+			return
+		}
 		switch (objectItem['action']) {
 			case 'printMessage':
 			case 'loadMessages':
@@ -2405,7 +2408,7 @@ function Storage() {
 		}
 	};
 	self.fastAddToStorage = function (text) {
-		var storageData = localStorage.getItem(STORAGE_NAME);
+		var storageData = localStorage.getItem(self.STORAGE_NAME);
 		var newStorageData;
 		if (storageData) {
 			// insert new text before "]" symbol and add it manually
@@ -2414,7 +2417,7 @@ function Storage() {
 		} else {
 			newStorageData = '[' + text + ']';
 		}
-		localStorage.setItem(STORAGE_NAME, newStorageData);
+		localStorage.setItem(self.STORAGE_NAME, newStorageData);
 	};
 }
 
