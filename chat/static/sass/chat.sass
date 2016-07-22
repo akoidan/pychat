@@ -384,7 +384,7 @@ p
 	position: absolute
 	box-shadow: 2px 2px 1px #1F1F27
 	z-index: 3
-	&.blurred
+	&:not(:focus):not(.blurred)
 		opacity: 0.8
 
 .modal-draggable
