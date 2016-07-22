@@ -429,21 +429,6 @@ function login(event) {
 }
 
 
-function checkAndPlay(element) {
-	if (!window.sound) {
-		return;
-	}
-	try {
-		element.pause();
-		element.currentTime = 0;
-		element.volume = volumeProportion[window.sound];
-		element.play();
-	} catch (e) {
-		console.error(getDebugMessage("Skipping playing message, because {}", e.message || e));
-	}
-}
-
-
 function readCookie(name, c, C, i) {
 	c = document.cookie.split('; ');
 	var cookies = {};
