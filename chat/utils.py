@@ -12,7 +12,7 @@ from django.core.validators import validate_email
 
 from chat import local
 from chat import settings
-from chat.models import User, UserProfile, Verification
+from chat.models import User, UserProfile, Verification, RoomUsers
 from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID
 
 USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
@@ -167,7 +167,6 @@ def create_user_profile(email, password, sex, username):
 	user = UserProfile(username=username, email=email, sex_str=sex)
 	user.set_password(password)
 	user.save()
-	user.rooms.add(ALL_ROOM_ID)
-	user.save()
+	RoomUsers(user_id=user.id, room_id=ALL_ROOM_ID).save()
 	logger.info('Signed up new user %s, subscribed for channels with id %d', user, ALL_ROOM_ID)
 	return user
