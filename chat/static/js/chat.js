@@ -87,7 +87,6 @@ function Painter() {
 		self.leftOffset = rect.left;
 		self.topOffset = rect.top;
 		self.ctx.beginPath();
-		self.ctx.moveTo(e.pageX - self.leftOffset, e.pageY - self.topOffset);
 		self.dom.canvas.addEventListener('mousemove', self.onPaint, false);
 	};
 	self.changeColor = function (event) {
@@ -137,8 +136,16 @@ function Painter() {
 			self.dom.canvas.removeEventListener('mousemove', self.onPaint, false);
 		}
 	};
+	self.getScaledOrdinate = function(ordinateName/*width*/, value) {
+		var clientOrdinateName = 'client'+ ordinateName.charAt(0).toUpperCase() + ordinateName.substr(1); /*clientWidth*/
+		var clientOrdinate =  self.dom.canvas[clientOrdinateName];
+		var ordinate = self.dom.canvas[ordinateName];
+		return ordinate == clientOrdinate ? value : Math.round(ordinate * value / clientOrdinate); // apply page zoom
+	};
 	self.onPaint = function (e) {
-		self[self.mode](e.pageX - self.leftOffset, e.pageY - self.topOffset);
+		var x = e.pageX - self.leftOffset;
+		var y = e.pageY - self.topOffset;
+		self[self.mode](self.getScaledOrdinate('width', x), self.getScaledOrdinate('height', y));
 	};
 	self.onPaintPen = function (x, y) {
 		self.ctx.lineTo(x, y);
@@ -239,7 +246,6 @@ function Painter() {
 
 function checkAndPlay(element) {
 	if (!window.sound || !notifier.isTabMain()) {
-		console.log("skip sound")
 		return;
 	}
 	try {
