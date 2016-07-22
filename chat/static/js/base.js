@@ -234,7 +234,7 @@ var Growl = function (message) {
 		self.growl.className = 'growl ' + growlClass;
 		self.growlHolder.appendChild(self.growl);
 		self.growl.clientHeight; // request to paint now!
-		self.growl.style.opacity += 1;
+		self.growl.style.opacity++;
 	};
 	self.show = function (baseTime, growlClass) {
 		self.showInfinity(growlClass);
