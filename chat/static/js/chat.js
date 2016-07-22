@@ -1493,11 +1493,13 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 	};
 	self.increaseNewMessages = function () {
-		if (self.isHidden()) {
-			self.newMessages += 1;
+		if (self.isHidden() && !window.newMessagesDisabled) {
+			self.newMessages ++;
 			self.dom.newMessages.textContent = self.newMessages;
-			CssUtils.showElement(self.dom.newMessages);
-			CssUtils.hideElement(self.dom.deleteIcon);
+			if (self.newMessages == 1) {
+				CssUtils.showElement(self.dom.newMessages);
+				CssUtils.hideElement(self.dom.deleteIcon);
+			}
 		}
 	};
 	self.printMessage = function (data) {
@@ -1725,7 +1727,7 @@ function WebRtcApi() {
 		document.cancelFullScreen();
 	};
 	self.hideContainerTimeout = function () {
-		self.idleTime += 1;
+		self.idleTime++;
 		if (self.idleTime > 6) {
 			CssUtils.addClass(self.dom.videoContainer, 'inactive');
 		}
@@ -2024,8 +2026,8 @@ function WebRtcApi() {
 		console.log(getDebugMessage('file is ' + [self.file.name, self.file.size, self.file.type,
 					self.file.lastModifiedDate].join(' ')));
 		if (self.file.size === 0) {
-			self.downloadBar.dom.text.textContent = "Can't send empty file";
-			self.closeDataChannels();
+			self.downloadBar.dom.text.textContent = "skip empty file";
+			self.closeEvents("Can't send empty file");
 			return;
 		}
 		self.sliceFile(0);
@@ -2421,6 +2423,7 @@ function Storage() {
 			var savedSoundStatus = window.sound;
 			window.sound = 0;
 			window.loggingEnabled = false;
+			window.newMessagesDisabled = true;
 			for (var i = 0; i < parsedData.length; i++) {
 				try {
 					wsHandler.handleMessage(parsedData[i]);
@@ -2430,6 +2433,7 @@ function Storage() {
 				}
 			}
 			window.loggingEnabled = true;
+			window.newMessagesDisabled = false;
 			window.sound = savedSoundStatus;
 		}
 	};

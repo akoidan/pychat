@@ -26,7 +26,7 @@ except ImportError:
 	from urlparse import urlparse  # py3
 
 from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS
-from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo
+from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo, RoomUsers
 
 PY3 = sys.version > '3'
 
@@ -431,8 +431,7 @@ class MessagesHandler(MessagesCreator):
 			raise ValidationError('Incorrect room name "{}"'.format(room_name))
 		room = Room(name=room_name)
 		self.do_db(room.save)
-		room.users.add(self.user_id)
-		room.save()
+		RoomUsers(room_id=room.id, user_id=self.user_id).save()
 		subscribe_message = self.subscribe_room_channel_message(room.id, room_name)
 		self.publish(subscribe_message, self.channel, True)
 
@@ -473,9 +472,11 @@ class MessagesHandler(MessagesCreator):
 		else:
 			room = Room()
 			room.save()
-			room.users.add(self.user_id, user_id)
-			room.save()
 			room_id = room.id
+			RoomUsers.objects.bulk_create([
+				RoomUsers(user_id=user_id, room_id=room_id),
+				RoomUsers(user_id=self.user_id, room_id=room_id),
+			])
 		subscribe_message = self.subscribe_direct_channel_message(room_id, user_id)
 		self.publish(subscribe_message, self.channel, True)
 		other_channel = RedisPrefix.generate_user(user_id)
@@ -493,7 +494,7 @@ class MessagesHandler(MessagesCreator):
 		if room.name is None:  # if private then disable
 			room.disabled = True
 		else: # if public -> leave the room, delete the link
-			room.users.remove(self.user_id)
+			RoomUsers.objects.filter(room_id=room.id, user_id=self.user_id).delete()
 			online = self.get_online_from_redis(channel)
 			online.remove(self.user_id)
 			self.publish(self.room_online(online, Actions.LOGOUT, channel), channel)
