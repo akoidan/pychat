@@ -293,18 +293,6 @@ if not DEBUG:
 ALL_REDIS_ROOM = 'all'
 ALL_ROOM_ID = 1
 
-
-# TODO replace for django's query language
-GET_DIRECT_ROOM_ID = """SELECT chat_room.id, chat_room.disabled
-FROM chat_room_users
-JOIN chat_room on chat_room_users.room_id = chat_room.id
-WHERE room_id IN (
-  SELECT chat_room_users.room_id
-  FROM chat_room_users
-    join chat_room on chat_room_users.room_id = chat_room.id
-  WHERE (chat_room_users.user_id = %s) and (chat_room.name is NULL)
-) and user_id = %s"""
-
 # ---------------JAVASCRIPT CONSTANTS --------------------
 
 VALIDATION_IS_OK = 'ok'

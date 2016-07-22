@@ -25,7 +25,7 @@ try:
 except ImportError:
 	from urlparse import urlparse  # py3
 
-from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, GET_DIRECT_ROOM_ID
+from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS
 from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo
 
 PY3 = sys.version > '3'
@@ -458,11 +458,14 @@ class MessagesHandler(MessagesCreator):
 
 	def create_user_channel(self, message):
 		user_id = message[VarNames.USER_ID]
-		query_res = self.do_db(self.execute_query, GET_DIRECT_ROOM_ID, [self.user_id, user_id])
+		# get all self private rooms ids
+		user_rooms = Room.users.through.objects.filter(user_id=self.user_id, room__name__isnull=True).values('room_id')
+		# get private room that contains another user from rooms above
+		query_res = Room.users.through.objects.filter(user_id=user_id, room__in=user_rooms).values('room__id', 'room__disabled')
 		if len(query_res) > 0:
-			result = query_res[0]
-			room_id = result[0]
-			disabled = result[1]
+			room = query_res[0]
+			room_id = room['room__id']
+			disabled = room['room__disabled']
 			if not disabled:
 				raise ValidationError('This room already exist')
 			else:
