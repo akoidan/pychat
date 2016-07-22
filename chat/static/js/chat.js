@@ -235,6 +235,23 @@ function Painter() {
 	};
 	self.initChild();
 }
+
+
+function checkAndPlay(element) {
+	if (!window.sound || !notifier.isTabMain()) {
+		console.log("skip sound")
+		return;
+	}
+	try {
+		element.pause();
+		element.currentTime = 0;
+		element.volume = volumeProportion[window.sound];
+		element.play();
+	} catch (e) {
+		console.error(getDebugMessage("Skipping playing message, because {}", e.message || e));
+	}
+}
+
 function NotifierHandler() {
 	var self = this;
 	self.maxNotifyTime = 300;
@@ -251,6 +268,8 @@ function NotifierHandler() {
 	self.init = function () {
 		window.addEventListener("blur", self.onFocusOut);
 		window.addEventListener("focus", self.onFocus);
+		window.addEventListener("beforeunload", self.onUnload);
+		window.addEventListener("unload", self.onUnload);
 		self.onFocus();
 		if (!window.Notification) {
 			console.warn(getDebugMessage("Notification is not supported"));
@@ -265,7 +284,6 @@ function NotifierHandler() {
 	self.lastNotifyTime = new Date().getTime();
 	self.notify = function (title, message) {
 		if (self.isCurrentTabActive) {
-			console.log(getDebugMessage("Skip not because windows is active"));
 			return;
 		}
 		self.newMessagesCount++;
@@ -276,7 +294,6 @@ function NotifierHandler() {
 		var currentTime = new Date().getTime();
 		// last opened tab not this one, leave the oppotunity to show notification from last tab
 		if (!window.Notification || !self.isTabMain() || !notifications || currentTime - self.maxNotifyTime < self.lastNotifyTime) {
-			console.log(getDebugMessage("Skip not because tab is not last"));
 			return
 		}
 		self.askPermissions();
@@ -293,7 +310,21 @@ function NotifierHandler() {
 		setTimeout(self.clearNotification, self.clearNotificationTime);
 	};
 	self.isTabMain = function() {
-		return localStorage.getItem(self.LAST_TAB_ID_VARNAME) ==  self.currentTabId;
+		var activeTab = localStorage.getItem(self.LAST_TAB_ID_VARNAME);
+		if (activeTab == "0") {
+			localStorage.setItem(self.LAST_TAB_ID_VARNAME, self.currentTabId);
+			activeTab = self.currentTabId;
+		}
+		return activeTab ==  self.currentTabId;
+	};
+	self.onUnload = function() {
+		if (self.unloaded) {
+			return
+		}
+		if (self.isTabMain) {
+			localStorage.setItem(self.LAST_TAB_ID_VARNAME, "0");
+		}
+		self.unloaded = true;
 	};
 	self.clearNotification = function () {
 		if (self.popedNotifQueue.length > 0) {
@@ -1825,6 +1856,7 @@ function WebRtcApi() {
 		self.setAnswerOpponentVariables(message);
 		checkAndPlay(self.dom.callSound);
 		CssUtils.showElement(self.dom.callAnswerParent);
+		notifier.notify(self.receiverName, "Calls you");
 		self.timeoutFunnction = setTimeout(function () {
 					self.declineWebRtcCall();
 					// displayPreparedMessage(SYSTEM_HEADER_CLASS, new Date().getTime(),
@@ -1915,10 +1947,12 @@ function WebRtcApi() {
 		self.receivedFileSize = parseInt(message.content.size);
 		self.downloadBar.setMax(self.receivedFileSize);
 		self.receivedFileName = message.content.name;
-		self.lastGrowl = new Growl("<div style='cursor: pointer'>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>".format(encodeHTML(self.receivedFileName), bytesToSize(self.receivedFileSize), encodeHTML(message.user)));
+		self.lastGrowl = new Growl("<div style='cursor: pointer'>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>"
+				.format(encodeHTML(self.receivedFileName), bytesToSize(self.receivedFileSize), encodeHTML(message.user)));
 		self.lastGrowl.show(3600000, 'col-info');
 		self.lastGrowl.growl.addEventListener('click', self.acceptFileReply);
 		self.setAnswerOpponentVariables(message);
+		notifier.notify(message.user, "Sends file {}".format(self.receivedFileName));
 	};
 	self.acceptFileReply = function () {
 		self.createPeerConnection();
@@ -2154,8 +2188,12 @@ function WebRtcApi() {
 		self.receiverName = null;
 		self.receiverId = null;
 		try {
-			self.sendChannel.close();
-			self.pc.close();
+			if (self.sendChannel) {
+				self.sendChannel.close();
+			}
+			if (self.pc) {
+				self.pc.close();
+			}
 		} catch (error) {
 			console.warn(getDebugMessage('{} Error while closing channels, description {}', error.message, error, name));
 		}
