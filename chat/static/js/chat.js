@@ -1252,6 +1252,7 @@ function timeMessageClick(event) {
 
 function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	var self = this;
+	self.UNREAD_MESSAGE_CLASS = 'unreadMessage';
 	self.roomId = roomId;
 	self.channel = 'r' + roomId;
 	self.roomName = roomName;
@@ -1272,7 +1273,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.allMessages = [];
 	self.allMessagesDates = [];
 	self.activeRoomClass = 'active-room';
-	self.dom.newMessages.className = 'newMessages hidden';
+	self.dom.newMessages.className = 'newMessagesCount hidden';
 	li.appendChild(self.dom.newMessages);
 	self.SELF_HEADER_CLASS = 'message-header-self';
 	self.OTHER_HEADER_CLASS = 'message-header-others';
@@ -1287,6 +1288,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		CssUtils.showElement(self.dom.chatBoxDiv);
 		CssUtils.showElement(self.dom.userList);
 		CssUtils.addClass(self.dom.roomNameLi, self.activeRoomClass);
+		self.removeNewMessages();
 		CssUtils.hideElement(self.dom.newMessages);
 		CssUtils.showElement(self.dom.deleteIcon);
 		var isHidden = webRtcApi.isActive() && webRtcApi.channel != self.channel;
@@ -1301,6 +1303,10 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		if (isTopDirection) {
 			self.loadUpHistory(10);
 		}
+	};
+	self.removeNewMessages = function() {
+		self.newMessages = 0;
+		CssUtils.hideElement(self.dom.newMessages);
 	};
 	self.dom.chatBoxDiv.addEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
 	self.keyDownLoadUp = function (e) {
@@ -1505,30 +1511,18 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.dom.chatBoxDiv.scrollTop = newscrollHeight;
 		}
 	};
-	self.increaseNewMessages = function () {
-		if (self.isHidden() && !window.newMessagesDisabled) {
-			self.newMessages ++;
-			self.dom.newMessages.textContent = self.newMessages;
-			if (self.newMessages == 1) {
-				CssUtils.showElement(self.dom.newMessages);
-				CssUtils.hideElement(self.dom.deleteIcon);
-			}
-		}
-	};
 	self.loadOfflineMessages = function(data) {
-		var messages = data.content;
-		for (var i = 0; i < messages.length; i++) {
-			var p = self.printMessage(messages[i]);
-			// TODO hightlight unread messsages
-			// p.style.backgroundColor = 'red';
-		}
+		var messages = data.content || [];
+		messages.forEach(function(message) {
+			self.printMessage(message, true);
+		});
 	};
 	self.setHeaderId = function (headerId){
 		if (!self.headerId || headerId < self.headerId) {
 			self.headerId = headerId;
 		}
 	};
-	self.printMessage = function (data) {
+	self.printMessage = function (data, isNew) {
 		self.setHeaderId(data.id);
 		var user = self.allUsers[data.userId];
 		if (loggedUserId === data.userId) {
@@ -1536,14 +1530,32 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		} else {
 			checkAndPlay(self.dom.chatIncoming);
 		}
-		self.increaseNewMessages();
 		var displayedUsername = user.user;
 		//private message
 		var prefix = false;
 		var headerStyle = data.userId == loggedUserId ? self.SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
 		var preparedHtml = data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
 		notifier.notify(displayedUsername, data.content || 'image');
-		return self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
+		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
+		var isIncreaseMessage = self.isHidden() && !window.newMessagesDisabled;
+		if (self.isHidden() && !window.newMessagesDisabled) {
+			self.newMessages++;
+			self.dom.newMessages.textContent = self.newMessages;
+			if (self.newMessages == 1) {
+				CssUtils.showElement(self.dom.newMessages);
+				CssUtils.hideElement(self.dom.deleteIcon);
+			}
+		}
+		// if counter increases the message is new anyway
+		// if tab is inactive the message is new only if flag newMessagesDisabled wasn't set to true
+		if (isIncreaseMessage || isNew || !(notifier.isCurrentTabActive || window.newMessagesDisabled)) {
+			CssUtils.addClass(p, self.UNREAD_MESSAGE_CLASS);
+			p.onmouseover = function(event){
+				var pTag = event.target;
+				pTag.onmouseover = null;
+				CssUtils.removeClass(pTag, self.UNREAD_MESSAGE_CLASS);
+			}
+		}
 	};
 	self.loadMessages = function (data) {
 		var windowsSoundState = window.sound;
@@ -1558,9 +1570,11 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.dom.chatBoxDiv.removeEventListener("keydown", self.keyDownLoadUp);
 			return;
 		}
-		message.forEach(function (message) {
+		window.newMessagesDisabled = true;
+		message.forEach(function (message) {  // dont pass function straight , foreach passes index as 2nd arg
 			self.printMessage(message);
 		});
+		window.newMessagesDisabled = false;
 		self.lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
 		window.sound = windowsSoundState;
 	};
