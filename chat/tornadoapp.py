@@ -14,7 +14,7 @@ import tornadoredis
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connection, OperationalError, InterfaceError, IntegrityError
-from django.db.models import Q
+from django.db.models import Q, F
 from redis_sessions.session import SessionStore
 from tornado.websocket import WebSocketHandler
 
@@ -25,7 +25,7 @@ try:
 except ImportError:
 	from urlparse import urlparse  # py3
 
-from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS
+from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_READ_MESSAGE
 from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo, RoomUsers
 
 PY3 = sys.version > '3'
@@ -57,6 +57,7 @@ class Actions:
 	CREATE_ROOM_CHANNEL = 'addRoom'
 	INVITE_USER = 'inviteUser'
 	ADD_USER = 'addUserToAll'
+	OFFLINE_MESSAGES = 'loadOfflineMessages'
 
 
 class VarNames:
@@ -246,6 +247,11 @@ class MessagesCreator(object):
 			VarNames.TIME: get_milliseconds()
 		}
 
+	def load_offline_message(self, offline_messages, channel_key):
+		res = self.default(offline_messages, Actions.OFFLINE_MESSAGES, HandlerNames.CHAT)
+		res[VarNames.CHANNEL] = channel_key
+		return res
+
 
 class MessagesHandler(MessagesCreator):
 
@@ -323,7 +329,7 @@ class MessagesHandler(MessagesCreator):
 		result = list(result)
 		return (result, user_is_online) if check_user_id else result
 
-	def add_online_user(self, room_id):
+	def add_online_user(self, room_id, offline_messages=None):
 		"""
 		adds to redis
 		online_users = { connection_hash1 = stored_redis_user1, connection_hash_2 = stored_redis_user2 }
@@ -341,6 +347,8 @@ class MessagesHandler(MessagesCreator):
 			)
 			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes, channel_key)
+			if offline_messages:
+				self.safe_write(self.load_offline_message(offline_messages, channel_key))
 		else:  # Send user names to self
 			online_user_names_mes = self.room_online(
 				online,
@@ -534,6 +542,16 @@ class MessagesHandler(MessagesCreator):
 		response = self.do_db(self.get_messages, messages, channel)
 		self.safe_write(response)
 
+	def get_offline_messages(self):
+		res = {}
+		offline_messages = Message.objects.filter(
+			id__gt=F('room__roomusers__last_read_message_id'),
+			room__roomusers__user_id=self.user_id
+		)
+		for message in offline_messages:
+			res.setdefault(message.room_id, []).append(self.create_message(message))
+		return res
+
 	def get_users_in_current_user_rooms(self):
 		"""
 		{
@@ -671,6 +689,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 					log_data[channel] = {'online': online, 'is_online': is_online}
 					if not is_online:
 						message = self.room_online(online, Actions.LOGOUT, channel)
+						self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 						self.publish(message, channel)
 
 		self.logger.info("Close connection result: %s", json.dumps(log_data))
@@ -695,13 +714,15 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.sex = user_db.sex_str
 			user_rooms = self.get_users_in_current_user_rooms()
 			self.safe_write(self.default(user_rooms, Actions.ROOMS, HandlerNames.CHANNELS))
+			# get all missed messages
 			self.channels.clear()
 			self.channels.append(self.channel)
 			for room_id in user_rooms:
 				self.channels.append(RedisPrefix.generate_room(room_id))
 			self.listen(self.channels)
+			off_messages = self.get_offline_messages()
 			for room_id in user_rooms:
-				self.add_online_user(room_id)
+				self.add_online_user(room_id, off_messages.get(room_id))
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
 			self.connected = True
 			Thread(target=self.save_ip).start()

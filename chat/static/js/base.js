@@ -301,12 +301,6 @@ function Draggable(container, headerText) {
 		self.dom.container.addEventListener('blur', self.onfocusout);
 		self.dom.container.setAttribute('tabindex', "-1");
 	};
-	self.onfocus = function () {
-		CssUtils.removeClass(self.dom.container, self.UNACTIVE_CLASS);
-	};
-	self.onfocusout = function() {
-		CssUtils.addClass(self.dom.container, self.UNACTIVE_CLASS);
-	};
 	self.hide = function () {
 		CssUtils.hideElement(self.dom.container);
 	};
