@@ -87,7 +87,6 @@ function Painter() {
 		self.leftOffset = rect.left;
 		self.topOffset = rect.top;
 		self.ctx.beginPath();
-		self.ctx.moveTo(e.pageX - self.leftOffset, e.pageY - self.topOffset);
 		self.dom.canvas.addEventListener('mousemove', self.onPaint, false);
 	};
 	self.changeColor = function (event) {
@@ -137,8 +136,16 @@ function Painter() {
 			self.dom.canvas.removeEventListener('mousemove', self.onPaint, false);
 		}
 	};
+	self.getScaledOrdinate = function(ordinateName/*width*/, value) {
+		var clientOrdinateName = 'client'+ ordinateName.charAt(0).toUpperCase() + ordinateName.substr(1); /*clientWidth*/
+		var clientOrdinate =  self.dom.canvas[clientOrdinateName];
+		var ordinate = self.dom.canvas[ordinateName];
+		return ordinate == clientOrdinate ? value : Math.round(ordinate * value / clientOrdinate); // apply page zoom
+	};
 	self.onPaint = function (e) {
-		self[self.mode](e.pageX - self.leftOffset, e.pageY - self.topOffset);
+		var x = e.pageX - self.leftOffset;
+		var y = e.pageY - self.topOffset;
+		self[self.mode](self.getScaledOrdinate('width', x), self.getScaledOrdinate('height', y));
 	};
 	self.onPaintPen = function (x, y) {
 		self.ctx.lineTo(x, y);
@@ -216,6 +223,12 @@ function Painter() {
 		self.dom.colorIcon.onclick = function () {
 			self.dom.color.click();
 		};
+		self.dom.range.onfocus = function () {
+			CssUtils.addClass(self.dom.container, self.UNACTIVE_CLASS);
+		};
+		self.dom.range.onblur = function () {
+			CssUtils.removeClass(self.dom.container, self.UNACTIVE_CLASS);
+		};
 		self.dom.pen.onclick = self.setPen;
 		self.dom.eraser.onclick = self.setEraser;
 		self.dom.sendButton.onclick = self.sendImage;
@@ -235,6 +248,22 @@ function Painter() {
 	};
 	self.initChild();
 }
+
+
+function checkAndPlay(element) {
+	if (!window.sound || !notifier.isTabMain()) {
+		return;
+	}
+	try {
+		element.pause();
+		element.currentTime = 0;
+		element.volume = volumeProportion[window.sound];
+		element.play();
+	} catch (e) {
+		console.error(getDebugMessage("Skipping playing message, because {}", e.message || e));
+	}
+}
+
 function NotifierHandler() {
 	var self = this;
 	self.maxNotifyTime = 300;
@@ -251,6 +280,8 @@ function NotifierHandler() {
 	self.init = function () {
 		window.addEventListener("blur", self.onFocusOut);
 		window.addEventListener("focus", self.onFocus);
+		window.addEventListener("beforeunload", self.onUnload);
+		window.addEventListener("unload", self.onUnload);
 		self.onFocus();
 		if (!window.Notification) {
 			console.warn(getDebugMessage("Notification is not supported"));
@@ -265,7 +296,6 @@ function NotifierHandler() {
 	self.lastNotifyTime = new Date().getTime();
 	self.notify = function (title, message) {
 		if (self.isCurrentTabActive) {
-			console.log(getDebugMessage("Skip not because windows is active"));
 			return;
 		}
 		self.newMessagesCount++;
@@ -276,7 +306,6 @@ function NotifierHandler() {
 		var currentTime = new Date().getTime();
 		// last opened tab not this one, leave the oppotunity to show notification from last tab
 		if (!window.Notification || !self.isTabMain() || !notifications || currentTime - self.maxNotifyTime < self.lastNotifyTime) {
-			console.log(getDebugMessage("Skip not because tab is not last"));
 			return
 		}
 		self.askPermissions();
@@ -293,7 +322,21 @@ function NotifierHandler() {
 		setTimeout(self.clearNotification, self.clearNotificationTime);
 	};
 	self.isTabMain = function() {
-		return localStorage.getItem(self.LAST_TAB_ID_VARNAME) ==  self.currentTabId;
+		var activeTab = localStorage.getItem(self.LAST_TAB_ID_VARNAME);
+		if (activeTab == "0") {
+			localStorage.setItem(self.LAST_TAB_ID_VARNAME, self.currentTabId);
+			activeTab = self.currentTabId;
+		}
+		return activeTab ==  self.currentTabId;
+	};
+	self.onUnload = function() {
+		if (self.unloaded) {
+			return
+		}
+		if (self.isTabMain) {
+			localStorage.setItem(self.LAST_TAB_ID_VARNAME, "0");
+		}
+		self.unloaded = true;
 	};
 	self.clearNotification = function () {
 		if (self.popedNotifQueue.length > 0) {
@@ -1209,6 +1252,7 @@ function timeMessageClick(event) {
 
 function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	var self = this;
+	self.UNREAD_MESSAGE_CLASS = 'unreadMessage';
 	self.roomId = roomId;
 	self.channel = 'r' + roomId;
 	self.roomName = roomName;
@@ -1229,7 +1273,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.allMessages = [];
 	self.allMessagesDates = [];
 	self.activeRoomClass = 'active-room';
-	self.dom.newMessages.className = 'newMessages hidden';
+	self.dom.newMessages.className = 'newMessagesCount hidden';
 	li.appendChild(self.dom.newMessages);
 	self.SELF_HEADER_CLASS = 'message-header-self';
 	self.OTHER_HEADER_CLASS = 'message-header-others';
@@ -1244,6 +1288,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		CssUtils.showElement(self.dom.chatBoxDiv);
 		CssUtils.showElement(self.dom.userList);
 		CssUtils.addClass(self.dom.roomNameLi, self.activeRoomClass);
+		self.removeNewMessages();
 		CssUtils.hideElement(self.dom.newMessages);
 		CssUtils.showElement(self.dom.deleteIcon);
 		var isHidden = webRtcApi.isActive() && webRtcApi.channel != self.channel;
@@ -1258,6 +1303,10 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		if (isTopDirection) {
 			self.loadUpHistory(10);
 		}
+	};
+	self.removeNewMessages = function() {
+		self.newMessages = 0;
+		CssUtils.hideElement(self.dom.newMessages);
 	};
 	self.dom.chatBoxDiv.addEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
 	self.keyDownLoadUp = function (e) {
@@ -1454,6 +1503,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 				self.scrollBottom(oldscrollHeight);
 			}
 		}
+		return p;
 	};
 	self.scrollBottom = function (oldscrollHeight) {
 		var newscrollHeight = self.dom.chatBoxDiv.scrollHeight;
@@ -1461,29 +1511,51 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.dom.chatBoxDiv.scrollTop = newscrollHeight;
 		}
 	};
-	self.increaseNewMessages = function () {
-		if (self.isHidden()) {
-			self.newMessages += 1;
-			self.dom.newMessages.textContent = self.newMessages;
-			CssUtils.showElement(self.dom.newMessages);
-			CssUtils.hideElement(self.dom.deleteIcon);
+	self.loadOfflineMessages = function(data) {
+		var messages = data.content || [];
+		messages.forEach(function(message) {
+			self.printMessage(message, true);
+		});
+	};
+	self.setHeaderId = function (headerId){
+		if (!self.headerId || headerId < self.headerId) {
+			self.headerId = headerId;
 		}
 	};
-	self.printMessage = function (data) {
+	self.printMessage = function (data, isNew) {
+		self.setHeaderId(data.id);
 		var user = self.allUsers[data.userId];
 		if (loggedUserId === data.userId) {
 			checkAndPlay(self.dom.chatOutgoing);
 		} else {
 			checkAndPlay(self.dom.chatIncoming);
 		}
-		self.increaseNewMessages();
 		var displayedUsername = user.user;
 		//private message
 		var prefix = false;
 		var headerStyle = data.userId == loggedUserId ? self.SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
 		var preparedHtml = data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
 		notifier.notify(displayedUsername, data.content || 'image');
-		self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
+		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
+		var isIncreaseMessage = self.isHidden() && !window.newMessagesDisabled;
+		if (self.isHidden() && !window.newMessagesDisabled) {
+			self.newMessages++;
+			self.dom.newMessages.textContent = self.newMessages;
+			if (self.newMessages == 1) {
+				CssUtils.showElement(self.dom.newMessages);
+				CssUtils.hideElement(self.dom.deleteIcon);
+			}
+		}
+		// if counter increases the message is new anyway
+		// if tab is inactive the message is new only if flag newMessagesDisabled wasn't set to true
+		if (isIncreaseMessage || isNew || !(notifier.isCurrentTabActive || window.newMessagesDisabled)) {
+			CssUtils.addClass(p, self.UNREAD_MESSAGE_CLASS);
+			p.onmouseover = function(event){
+				var pTag = event.target;
+				pTag.onmouseover = null;
+				CssUtils.removeClass(pTag, self.UNREAD_MESSAGE_CLASS);
+			}
+		}
 	};
 	self.loadMessages = function (data) {
 		var windowsSoundState = window.sound;
@@ -1498,12 +1570,11 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.dom.chatBoxDiv.removeEventListener("keydown", self.keyDownLoadUp);
 			return;
 		}
-		var firstMessage = message[message.length - 1];
-		self.headerId = firstMessage.id;
-
-		message.forEach(function (message) {
+		window.newMessagesDisabled = true;
+		message.forEach(function (message) {  // dont pass function straight , foreach passes index as 2nd arg
 			self.printMessage(message);
 		});
+		window.newMessagesDisabled = false;
 		self.lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
 		window.sound = windowsSoundState;
 	};
@@ -1694,7 +1765,7 @@ function WebRtcApi() {
 		document.cancelFullScreen();
 	};
 	self.hideContainerTimeout = function () {
-		self.idleTime += 1;
+		self.idleTime++;
 		if (self.idleTime > 6) {
 			CssUtils.addClass(self.dom.videoContainer, 'inactive');
 		}
@@ -1825,6 +1896,7 @@ function WebRtcApi() {
 		self.setAnswerOpponentVariables(message);
 		checkAndPlay(self.dom.callSound);
 		CssUtils.showElement(self.dom.callAnswerParent);
+		notifier.notify(self.receiverName, "Calls you");
 		self.timeoutFunnction = setTimeout(function () {
 					self.declineWebRtcCall();
 					// displayPreparedMessage(SYSTEM_HEADER_CLASS, new Date().getTime(),
@@ -1915,10 +1987,12 @@ function WebRtcApi() {
 		self.receivedFileSize = parseInt(message.content.size);
 		self.downloadBar.setMax(self.receivedFileSize);
 		self.receivedFileName = message.content.name;
-		self.lastGrowl = new Growl("<div style='cursor: pointer'>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>".format(encodeHTML(self.receivedFileName), bytesToSize(self.receivedFileSize), encodeHTML(message.user)));
+		self.lastGrowl = new Growl("<div style='cursor: pointer'>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>"
+				.format(encodeHTML(self.receivedFileName), bytesToSize(self.receivedFileSize), encodeHTML(message.user)));
 		self.lastGrowl.show(3600000, 'col-info');
 		self.lastGrowl.growl.addEventListener('click', self.acceptFileReply);
 		self.setAnswerOpponentVariables(message);
+		notifier.notify(message.user, "Sends file {}".format(self.receivedFileName));
 	};
 	self.acceptFileReply = function () {
 		self.createPeerConnection();
@@ -1990,8 +2064,8 @@ function WebRtcApi() {
 		console.log(getDebugMessage('file is ' + [self.file.name, self.file.size, self.file.type,
 					self.file.lastModifiedDate].join(' ')));
 		if (self.file.size === 0) {
-			self.downloadBar.dom.text.textContent = "Can't send empty file";
-			self.closeDataChannels();
+			self.downloadBar.dom.text.textContent = "skip empty file";
+			self.closeEvents("Can't send empty file");
 			return;
 		}
 		self.sliceFile(0);
@@ -2154,8 +2228,12 @@ function WebRtcApi() {
 		self.receiverName = null;
 		self.receiverId = null;
 		try {
-			self.sendChannel.close();
-			self.pc.close();
+			if (self.sendChannel) {
+				self.sendChannel.close();
+			}
+			if (self.pc) {
+				self.pc.close();
+			}
 		} catch (error) {
 			console.warn(getDebugMessage('{} Error while closing channels, description {}', error.message, error, name));
 		}
@@ -2383,6 +2461,7 @@ function Storage() {
 			var savedSoundStatus = window.sound;
 			window.sound = 0;
 			window.loggingEnabled = false;
+			window.newMessagesDisabled = true;
 			for (var i = 0; i < parsedData.length; i++) {
 				try {
 					wsHandler.handleMessage(parsedData[i]);
@@ -2392,6 +2471,7 @@ function Storage() {
 				}
 			}
 			window.loggingEnabled = true;
+			window.newMessagesDisabled = false;
 			window.sound = savedSoundStatus;
 		}
 	};

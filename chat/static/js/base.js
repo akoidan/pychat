@@ -234,7 +234,7 @@ var Growl = function (message) {
 		self.growl.className = 'growl ' + growlClass;
 		self.growlHolder.appendChild(self.growl);
 		self.growl.clientHeight; // request to paint now!
-		self.growl.style.opacity += 1;
+		self.growl.style.opacity++;
 	};
 	self.show = function (baseTime, growlClass) {
 		self.showInfinity(growlClass);
@@ -300,12 +300,6 @@ function Draggable(container, headerText) {
 		self.dom.container.addEventListener('focus', self.onfocus);
 		self.dom.container.addEventListener('blur', self.onfocusout);
 		self.dom.container.setAttribute('tabindex', "-1");
-	};
-	self.onfocus = function () {
-		CssUtils.removeClass(self.dom.container, self.UNACTIVE_CLASS);
-	};
-	self.onfocusout = function() {
-		CssUtils.addClass(self.dom.container, self.UNACTIVE_CLASS);
 	};
 	self.hide = function () {
 		CssUtils.hideElement(self.dom.container);
@@ -426,21 +420,6 @@ function login(event) {
 		}
 	};
 	doPost('/auth', null, callback, loginForm);
-}
-
-
-function checkAndPlay(element) {
-	if (!window.sound) {
-		return;
-	}
-	try {
-		element.pause();
-		element.currentTime = 0;
-		element.volume = volumeProportion[window.sound];
-		element.play();
-	} catch (e) {
-		console.error(getDebugMessage("Skipping playing message, because {}", e.message || e));
-	}
 }
 
 

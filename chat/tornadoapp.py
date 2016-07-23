@@ -14,7 +14,7 @@ import tornadoredis
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connection, OperationalError, InterfaceError, IntegrityError
-from django.db.models import Q
+from django.db.models import Q, F
 from redis_sessions.session import SessionStore
 from tornado.websocket import WebSocketHandler
 
@@ -25,8 +25,8 @@ try:
 except ImportError:
 	from urlparse import urlparse  # py3
 
-from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, GET_DIRECT_ROOM_ID
-from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo
+from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_READ_MESSAGE
+from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo, RoomUsers
 
 PY3 = sys.version > '3'
 
@@ -57,6 +57,7 @@ class Actions:
 	CREATE_ROOM_CHANNEL = 'addRoom'
 	INVITE_USER = 'inviteUser'
 	ADD_USER = 'addUserToAll'
+	OFFLINE_MESSAGES = 'loadOfflineMessages'
 
 
 class VarNames:
@@ -246,6 +247,11 @@ class MessagesCreator(object):
 			VarNames.TIME: get_milliseconds()
 		}
 
+	def load_offline_message(self, offline_messages, channel_key):
+		res = self.default(offline_messages, Actions.OFFLINE_MESSAGES, HandlerNames.CHAT)
+		res[VarNames.CHANNEL] = channel_key
+		return res
+
 
 class MessagesHandler(MessagesCreator):
 
@@ -323,7 +329,7 @@ class MessagesHandler(MessagesCreator):
 		result = list(result)
 		return (result, user_is_online) if check_user_id else result
 
-	def add_online_user(self, room_id):
+	def add_online_user(self, room_id, offline_messages=None):
 		"""
 		adds to redis
 		online_users = { connection_hash1 = stored_redis_user1, connection_hash_2 = stored_redis_user2 }
@@ -341,6 +347,8 @@ class MessagesHandler(MessagesCreator):
 			)
 			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes, channel_key)
+			if offline_messages:
+				self.safe_write(self.load_offline_message(offline_messages, channel_key))
 		else:  # Send user names to self
 			online_user_names_mes = self.room_online(
 				online,
@@ -431,8 +439,7 @@ class MessagesHandler(MessagesCreator):
 			raise ValidationError('Incorrect room name "{}"'.format(room_name))
 		room = Room(name=room_name)
 		self.do_db(room.save)
-		room.users.add(self.user_id)
-		room.save()
+		RoomUsers(room_id=room.id, user_id=self.user_id).save()
 		subscribe_message = self.subscribe_room_channel_message(room.id, room_name)
 		self.publish(subscribe_message, self.channel, True)
 
@@ -458,11 +465,14 @@ class MessagesHandler(MessagesCreator):
 
 	def create_user_channel(self, message):
 		user_id = message[VarNames.USER_ID]
-		query_res = self.do_db(self.execute_query, GET_DIRECT_ROOM_ID, [self.user_id, user_id])
+		# get all self private rooms ids
+		user_rooms = Room.users.through.objects.filter(user_id=self.user_id, room__name__isnull=True).values('room_id')
+		# get private room that contains another user from rooms above
+		query_res = Room.users.through.objects.filter(user_id=user_id, room__in=user_rooms).values('room__id', 'room__disabled')
 		if len(query_res) > 0:
-			result = query_res[0]
-			room_id = result[0]
-			disabled = result[1]
+			room = query_res[0]
+			room_id = room['room__id']
+			disabled = room['room__disabled']
 			if not disabled:
 				raise ValidationError('This room already exist')
 			else:
@@ -470,9 +480,11 @@ class MessagesHandler(MessagesCreator):
 		else:
 			room = Room()
 			room.save()
-			room.users.add(self.user_id, user_id)
-			room.save()
 			room_id = room.id
+			RoomUsers.objects.bulk_create([
+				RoomUsers(user_id=user_id, room_id=room_id),
+				RoomUsers(user_id=self.user_id, room_id=room_id),
+			])
 		subscribe_message = self.subscribe_direct_channel_message(room_id, user_id)
 		self.publish(subscribe_message, self.channel, True)
 		other_channel = RedisPrefix.generate_user(user_id)
@@ -490,7 +502,7 @@ class MessagesHandler(MessagesCreator):
 		if room.name is None:  # if private then disable
 			room.disabled = True
 		else: # if public -> leave the room, delete the link
-			room.users.remove(self.user_id)
+			RoomUsers.objects.filter(room_id=room.id, user_id=self.user_id).delete()
 			online = self.get_online_from_redis(channel)
 			online.remove(self.user_id)
 			self.publish(self.room_online(online, Actions.LOGOUT, channel), channel)
@@ -529,6 +541,16 @@ class MessagesHandler(MessagesCreator):
 			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id)).order_by('-pk')[:count]
 		response = self.do_db(self.get_messages, messages, channel)
 		self.safe_write(response)
+
+	def get_offline_messages(self):
+		res = {}
+		offline_messages = Message.objects.filter(
+			id__gt=F('room__roomusers__last_read_message_id'),
+			room__roomusers__user_id=self.user_id
+		)
+		for message in offline_messages:
+			res.setdefault(message.room_id, []).append(self.create_message(message))
+		return res
 
 	def get_users_in_current_user_rooms(self):
 		"""
@@ -667,6 +689,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 					log_data[channel] = {'online': online, 'is_online': is_online}
 					if not is_online:
 						message = self.room_online(online, Actions.LOGOUT, channel)
+						self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 						self.publish(message, channel)
 
 		self.logger.info("Close connection result: %s", json.dumps(log_data))
@@ -691,13 +714,15 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.sex = user_db.sex_str
 			user_rooms = self.get_users_in_current_user_rooms()
 			self.safe_write(self.default(user_rooms, Actions.ROOMS, HandlerNames.CHANNELS))
+			# get all missed messages
 			self.channels.clear()
 			self.channels.append(self.channel)
 			for room_id in user_rooms:
 				self.channels.append(RedisPrefix.generate_room(room_id))
 			self.listen(self.channels)
+			off_messages = self.get_offline_messages()
 			for room_id in user_rooms:
-				self.add_online_user(room_id)
+				self.add_online_user(room_id, off_messages.get(room_id))
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
 			self.connected = True
 			Thread(target=self.save_ip).start()

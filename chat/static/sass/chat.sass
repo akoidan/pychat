@@ -384,7 +384,7 @@ p
 	position: absolute
 	box-shadow: 2px 2px 1px #1F1F27
 	z-index: 3
-	&.blurred
+	&:not(:focus):not(.blurred)
 		opacity: 0.8
 
 .modal-draggable
@@ -531,7 +531,7 @@ p
 			vertical-align: top // don't move with pressed button added padding
 			margin: 4px 4px 0 0
 
-.newMessages
+.newMessagesCount
 	color: white
 	border-radius: 5px
 	display: inline-block
@@ -540,6 +540,18 @@ p
 	top: 5px
 	font-size: 12px
 	position: absolute
+
+.unreadMessage
+	position: relative
+	&:before
+		position: absolute
+		left: -4px
+		top: -6px
+		right: 3px
+		bottom: -6px
+		content: ''
+		background-color: rgba(240, 255, 255, 0.23)
+		border-radius: 3px
 
 #videoContainer
 	position: relative
