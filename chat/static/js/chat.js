@@ -1497,6 +1497,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 				self.scrollBottom(oldscrollHeight);
 			}
 		}
+		return p;
 	};
 	self.scrollBottom = function (oldscrollHeight) {
 		var newscrollHeight = self.dom.chatBoxDiv.scrollHeight;
@@ -1514,7 +1515,21 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			}
 		}
 	};
+	self.loadOfflineMessages = function(data) {
+		var messages = data.content;
+		for (var i = 0; i < messages.length; i++) {
+			var p = self.printMessage(messages[i]);
+			// TODO hightlight unread messsages
+			// p.style.backgroundColor = 'red';
+		}
+	};
+	self.setHeaderId = function (headerId){
+		if (!self.headerId || headerId < self.headerId) {
+			self.headerId = headerId;
+		}
+	};
 	self.printMessage = function (data) {
+		self.setHeaderId(data.id);
 		var user = self.allUsers[data.userId];
 		if (loggedUserId === data.userId) {
 			checkAndPlay(self.dom.chatOutgoing);
@@ -1528,7 +1543,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var headerStyle = data.userId == loggedUserId ? self.SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
 		var preparedHtml = data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
 		notifier.notify(displayedUsername, data.content || 'image');
-		self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
+		return self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
 	};
 	self.loadMessages = function (data) {
 		var windowsSoundState = window.sound;
@@ -1543,9 +1558,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.dom.chatBoxDiv.removeEventListener("keydown", self.keyDownLoadUp);
 			return;
 		}
-		var firstMessage = message[message.length - 1];
-		self.headerId = firstMessage.id;
-
 		message.forEach(function (message) {
 			self.printMessage(message);
 		});
