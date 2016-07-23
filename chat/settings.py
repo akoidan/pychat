@@ -118,24 +118,28 @@ LOGIN_URL = '/'
 # pip install PyMySQL
 # import pymysql
 # pymysql.install_as_MySQLdb()
+if 'DATABASES' not in locals():
+	DATABASES = {
+		'default': {
+			'NAME': 'django',
+			'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
+			'USER': 'root', # TODO put your username here
+			'PASSWORD': '', # TODO put your password here
+			'default-character-set': 'utf8',
+			'OPTIONS': {
+				'autocommit': True,
+
+			},
+		}
+	}
+
+#
 # DATABASES = {
 # 	'default': {
-# 		'NAME': 'django',
-# 		'ENGINE': 'django.db.backends.mysql',  # 'mysql.conntector.django'
-# 		'USER': 'root',
-# 		'default-character-set': 'utf8',
-# 		'OPTIONS': {
-# 			'autocommit': True,
-# 		},
+# 		'ENGINE': 'django.db.backends.sqlite3',
+# 		'NAME': 'django.db',
 # 	}
 # }
-#
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.sqlite3',
-		'NAME': 'django.db',
-	}
-}
 
 CACHES = {
 	'default': {

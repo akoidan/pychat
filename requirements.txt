@@ -13,4 +13,4 @@ django-sslserver # for browser access to input devices
 #django-redis-cache
 # PyMySQL
 # mysql-connector-python
-# mysqlclient
+mysqlclient # for windows you can install client with mysql installer or via whl file specified in readme

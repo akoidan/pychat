@@ -17,33 +17,39 @@ In order to run chat on you server you will need:
  2. *pip* for getting dependencies
  3. *redis* for holding session and pubsub messages
  4. *sass* to compiling css
- 5. Get python packages
- 6. Create the database
- 7. Copy static content (audio, fonts...)
+ 5 *mysql* database
+ 6. Get python packages
+ 7. Create the database
+ 8. Copy static content (audio, fonts...)
 
 Windows:
  1. Install [python](https://www.python.org/downloads/) with pip 
  2. Add pip and python to PATH variable
  3. Install [redis](https://github.com/rgl/redis/downloads)
  4. Install [ruby](http://rubyinstaller.org/) and run `gem install sass` from command line as admin. Add sass command path to PATH variable
- 5. Add git's bash commands (for example "C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin") to PATH variable
+ 5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use pip to install them
+ 6. To compile pip3 `mysqlclient` u need `vs2015` tools, download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator.
+ 7. Add git's bash commands (for example "C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin") to PATH variable
 
 Ubuntu:
  1. `apt-get install python`
  2. `apt-get install pip`
  3. `add-apt-repository -y ppa:rwky/redis` `apt-get install -y redis-server`
- 4. `apt-get install ruby`, `gem install sass`
+ 4  `apt-get install mysql-server`
+ 5. `apt-get install ruby`, `gem install sass`
 
 Archlinux:
  1. `pacman -S python`
  2. `pacman -S pip`
  3. `pacman -S community/redis`
- 4. `pacman -S ruby`, `gem install sass`
+ 4. `pacman -S  mariadb`. Check [wiki](https://wiki.archlinux.org/index.php/MySQL) formore info 
+ 5. `pacman -S ruby`, `gem install sass`
 
 Next steps are common:
  1. `pip install -r requirements.txt`
  2. `python manage.py init_db`
  3. `sh download_content.sh`
+ 4. open `mysql -u YOUR_USERNAME -p` and create database `create database django CHARACTER SET utf8 COLLATE utf8_general_ci`. Specify database connection options (username, password) in `chat/settings.py`
 
 For developing option you can also configure pycharm filewatcher to autocompile css:
  1. arguments: `--no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded`
@@ -51,7 +57,8 @@ For developing option you can also configure pycharm filewatcher to autocompile 
  3. output files to refresh: `$ProjectFileDir$/chat/static/css/`
  
 Start the chat:
-==============
+===============
+ 0. Start `mysql` server if it's not started. 
  1. Start session holder: `redis-server`
  2. Start WebSocket listener: `python manage.py start_tornado`
  3. Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
