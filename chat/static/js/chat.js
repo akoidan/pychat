@@ -1507,9 +1507,12 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.loadOfflineMessages = function(data) {
 		var messages = data.content || [];
+		var oldSound = window.sound;
+		window.sound = 0;
 		messages.forEach(function(message) {
 			self.printMessage(message, true);
 		});
+		window.sound = oldSound;
 	};
 	self.setHeaderId = function (headerId){
 		if (!self.headerId || headerId < self.headerId) {
@@ -1531,7 +1534,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var preparedHtml = data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
 		notifier.notify(displayedUsername, data.content || 'image');
 		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
-		var isIncreaseMessage = self.isHidden() && !window.newMessagesDisabled;
 		if (self.isHidden() && !window.newMessagesDisabled) {
 			self.newMessages++;
 			self.dom.newMessages.textContent = self.newMessages;
@@ -1540,9 +1542,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 				CssUtils.hideElement(self.dom.deleteIcon);
 			}
 		}
-		// if counter increases the message is new anyway
 		// if tab is inactive the message is new only if flag newMessagesDisabled wasn't set to true
-		if (isIncreaseMessage || isNew || !(notifier.isCurrentTabActive || window.newMessagesDisabled)) {
+		if (!window.newMessagesDisabled && (self.isHidden() || isNew || !notifier.isCurrentTabActive)) {
 			CssUtils.addClass(p, self.UNREAD_MESSAGE_CLASS);
 			p.onmouseover = function(event){
 				var pTag = event.target;
@@ -2477,6 +2478,7 @@ function Storage() {
 		switch (objectItem['action']) {
 			case 'printMessage':
 			case 'loadMessages':
+			case 'loadOfflineMessages':
 				self.fastAddToStorage(jsonItem);
 				break;
 		}
