@@ -384,8 +384,14 @@ p
 	position: absolute
 	box-shadow: 2px 2px 1px #1F1F27
 	z-index: 3
+	outline: none
 	&:not(:focus):not(.blurred)
 		opacity: 0.8
+	&.moving
+		border: 1px solid rgba(148, 202, 255, 0.5)
+		cursor: move !important
+		.windowHeader
+			cursor: move !important
 
 .modal-draggable
 	left: calc(50% - 100px)

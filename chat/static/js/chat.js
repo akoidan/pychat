@@ -223,12 +223,6 @@ function Painter() {
 		self.dom.colorIcon.onclick = function () {
 			self.dom.color.click();
 		};
-		self.dom.range.onfocus = function () {
-			CssUtils.addClass(self.dom.container, self.UNACTIVE_CLASS);
-		};
-		self.dom.range.onblur = function () {
-			CssUtils.removeClass(self.dom.container, self.UNACTIVE_CLASS);
-		};
 		self.dom.pen.onclick = self.setPen;
 		self.dom.eraser.onclick = self.setEraser;
 		self.dom.sendButton.onclick = self.sendImage;
