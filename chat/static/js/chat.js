@@ -81,6 +81,9 @@ function Painter() {
 	self.mouse = {x: 0, y: 0};
 	self.serializer = new XMLSerializer();
 	self.mouseDown = 0;
+	self.scale = 1;
+	self.originx = 0;
+	self.originy = 0;
 	self.startDraw = function (e) {
 		self.mouseDown++;
 		var rect = painter.dom.canvas.getBoundingClientRect();
@@ -210,6 +213,27 @@ function Painter() {
 	self.preventDefault = function (e) {
 		e.preventDefault();
 	};
+	self.onZoom = function(event) {
+		//var mousex = event.clientX - self.dom.canvas.offsetLeft;
+		//var mousey = event.clientY - self.dom.canvas.offsetTop;
+		var mousex = self.getScaledOrdinate('width', event.pageX - self.leftOffset);
+		var mousey = self.getScaledOrdinate('height', event.pageX - self.leftOffset);
+		var wheel = event.wheelDelta / 120;//n or -n
+		var zoom = 1 + wheel / 2;
+		self.ctx.translate(
+				self.originx,
+				self.originy
+		);
+		self.ctx.scale(zoom, zoom);
+		self.ctx.translate(
+				-( mousex / self.scale + self.originx - mousex / ( self.scale * zoom ) ),
+				-( mousey / self.scale + self.originy - mousey / ( self.scale * zoom ) )
+		);
+
+		self.originx = ( mousex / self.scale + self.originx - mousex / ( self.scale * zoom ) );
+		self.originy = ( mousey / self.scale + self.originy - mousey / ( self.scale * zoom ) );
+		self.scale *= zoom;
+	};
 	self.initChild = function () {
 		document.body.addEventListener('mouseup', self.finishDraw, false);
 		self.dom.canvas.addEventListener('mousedown', self.startDraw, false);
@@ -219,6 +243,7 @@ function Painter() {
 		self.dom.color.addEventListener('input', self.changeColor, false);
 		self.dom.range.addEventListener('change', self.changeRadius, false);
 		self.dom.container.addEventListener('keypress', self.contKeyPress, false);
+		self.dom.container.addEventListener(mouseWheelEventName, self.onZoom);
 		self.dom.color.style.color = self.ctx.strokeStyle;
 		self.dom.colorIcon.onclick = function () {
 			self.dom.color.click();

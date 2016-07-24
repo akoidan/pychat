@@ -65,6 +65,7 @@ Start the chat:
  5. If you're using firefox you probably need to allow self-assigned certificate for development. Open [https://localhost:8888](https://localhost:8888) (8888 is `API_PORT`) and add security exception
 
 # TODO
+* add scale to painter and Ctrl+Z
 * Add delete/edit message option (skype alike)
 * View profile show wrong profile
 * Show online status right of Direct user's messages besides channels' online
