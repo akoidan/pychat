@@ -8,7 +8,7 @@ from tornado.ioloop import IOLoop
 from tornado.web import Application
 
 from chat.models import Room
-from chat.tornadoapp import TornadoHandler, RedisPrefix
+from chat.tornadoapp import TornadoHandler
 
 
 class Command(BaseCommand):
@@ -49,7 +49,7 @@ class Command(BaseCommand):
 		from chat.global_redis import sync_redis
 		rooms = Room.objects.values('id')
 		for room in rooms:
-			sync_redis.delete(RedisPrefix.generate_room(room['id']))
+			sync_redis.delete(room['id'])
 		signal.signal(signal.SIGTERM, self.sig_handler)
 
 		# This will also catch KeyboardInterrupt exception
