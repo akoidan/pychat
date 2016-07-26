@@ -243,7 +243,7 @@ function Painter() {
 		self.dom.color.addEventListener('input', self.changeColor, false);
 		self.dom.range.addEventListener('change', self.changeRadius, false);
 		self.dom.container.addEventListener('keypress', self.contKeyPress, false);
-		self.dom.container.addEventListener(mouseWheelEventName, self.onZoom);
+		//self.dom.container.addEventListener(mouseWheelEventName, self.onZoom);
 		self.dom.color.style.color = self.ctx.strokeStyle;
 		self.dom.colorIcon.onclick = function () {
 			self.dom.color.click();
