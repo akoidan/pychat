@@ -958,12 +958,12 @@ function ChannelsHandler() {
 				self.destroyChannel(channelKey);
 			}
 		}
-		for (var roomId in rooms) {
+		for (var strRoomId in rooms) {
 			// if a new room has been added while disconnected
-			if (!rooms.hasOwnProperty(roomId)) continue;
-			var intKey = parseInt(roomId);
-			if (oldRooms.indexOf(intKey) < 0) {
-				var room = rooms[roomId];
+			if (!rooms.hasOwnProperty(strRoomId)) continue;
+			var roomId = parseInt(strRoomId);
+			if (oldRooms.indexOf(roomId) < 0) {
+				var room = rooms[strRoomId];
 				if (room.name) {
 					self.createNewRoomChatHandler(roomId, room.name, room.users);
 				} else {
