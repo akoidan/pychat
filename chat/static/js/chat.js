@@ -666,7 +666,8 @@ function ChannelsHandler() {
 	};
 	self.parseActiveChannelFromParams = function (params) {
 		if (params && params.length > 0) {
-			return parseInt(params[0]);
+			var res = parseInt(params[0]);
+			return isNaN(res) ? null : res;
 		}
 	};
 	self.clearChannelHistory = function () {
