@@ -40,6 +40,7 @@ Start the chat:
 =======
 
 # TODO
+* add scale to painter and Ctrl+Z
 * Add delete/edit message option (skype alike)
 * View profile show wrong profile
 * Show online status right of Direct user's messages besides channels' online
