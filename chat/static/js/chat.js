@@ -2,7 +2,7 @@ const CONNECTION_RETRY_TIME = 5000;
 const SYSTEM_HEADER_CLASS = 'message-header-system';
 const TIME_SPAN_CLASS = 'timeMess';
 const CONTENT_STYLE_CLASS = 'message-text-style';
-const DEFAULT_CHANNEL_NAME = 'r1';
+const DEFAULT_CHANNEL_NAME = 1;
 const USER_ID_ATTR = 'userid'; // used in ChannelsHandler and ChatHandler
 const USER_NAME_ATTR = 'username';  // used in ChannelsHandler and ChatHandler
 const SYSTEM_USERNAME = 'System';
@@ -641,7 +641,7 @@ function ChannelsHandler() {
 	};
 	self.parseActiveChannelFromParams = function (params) {
 		if (params && params.length > 0) {
-			return params[0];
+			return parseInt(params[0]);
 		}
 	};
 	self.clearChannelHistory = function () {
@@ -668,7 +668,7 @@ function ChannelsHandler() {
 				roomId: roomId
 			});
 		} else {
-			self.setActiveChannel(self.generateRoomKey(roomId));
+			self.setActiveChannel(roomId);
 		}
 	};
 	self.setActiveChannel = function (key) {
@@ -676,9 +676,6 @@ function ChannelsHandler() {
 		self.activeChannel = key;
 		self.showActiveChannel();
 		singlePage.pushHistory();
-	};
-	self.generateRoomKey = function (roomId) {
-		return "r" + roomId;
 	};
 	self.showActiveChannel = function () {
 		if (self.activeChannel) {
@@ -706,23 +703,6 @@ function ChannelsHandler() {
 		if (self.activeChannel && self.getActiveChannel()) {
 			self.getActiveChannel().hide()
 		}
-	};
-	self.userClick = function (event) {
-		throw 'Deprecated';
-		event = event || window.event;
-		var target = event.target || event.srcElement;
-		if (target.tagName == 'I') {
-			target = target.parentNode;
-		}
-		if (target.tagName != 'LI') {
-			return;
-		}
-		var userId = event.target.getAttribute(USER_ID_ATTR);
-		var userKey = self.generateUserKey(userId);
-		if (!self.channels[userKey]) {
-			self.createNewUserChatHandler();
-		}
-		self.setActiveChannel(userKey);
 	};
 	self.sendMessage = function (messageRequest) {
 		// anonymous is set by name, registered user is set by id.
@@ -914,13 +894,12 @@ function ChannelsHandler() {
 		var i = document.createElement('span');
 		i.className = CANCEL_ICON_CLASS_NAME;
 		li.appendChild(i);
-		var roomKey = self.generateRoomKey(roomId);
 		li.setAttribute(self.ROOM_ID_ATTR, roomId);
 		var chatBoxDiv = document.createElement('div');
 		chatBoxDiv.onpaste = self.imagePaste;
 		chatBoxDiv.ondrop = self.imageDrop;
 		chatBoxDiv.ondragover = self.preventDefault;
-		self.channels[roomKey] = new ChatHandler(li, chatBoxDiv, users, roomId, roomName);
+		self.channels[roomId] = new ChatHandler(li, chatBoxDiv, users, roomId, roomName);
 	};
 	self.createNewUserChatHandler = function (roomId, users) {
 		var allUsersIds = Object.keys(users);
@@ -948,7 +927,7 @@ function ChannelsHandler() {
 		var rooms = message.content;
 		var oldRooms = [];
 		for (var channelKey in self.channels) {
-			if (!self.channels.hasOwnProperty(channelKey) || !channelKey.startsWith('r')) continue;
+			if (!self.channels.hasOwnProperty(channelKey)) continue;
 			var oldRoomId = parseInt(channelKey.substring(1));
 			oldRooms.push(oldRoomId);
 			if (!rooms[oldRoomId]) {
@@ -989,12 +968,11 @@ function ChannelsHandler() {
 	self.deleteRoom = function (message) {
 		var roomId = message.roomId;
 		var userId = message.userId;
-		var channel = self.generateRoomKey(roomId);
-		var handler = self.channels[channel];
+		var handler = self.channels[roomId];
 		if (handler.dom.roomNameLi.getAttribute('userid') || userId == loggedUserId) {
-			self.destroyChannel(channel);
+			self.destroyChannel(roomId);
 			growlInfo("<div>Channel <b>{}</b> has been deleted</div>".format(handler.dom.roomNameLi.textContent));
-			if (self.activeChannel == channel) {
+			if (self.activeChannel == roomId) {
 				self.setActiveChannel(DEFAULT_CHANNEL_NAME);
 			}
 		} else {
@@ -1008,7 +986,7 @@ function ChannelsHandler() {
 		channelUsers[users[1]] = anotherUserName[users[1]];
 		channelUsers[users[0]] = anotherUserName[users[0]];
 		var anotherUserId = self.createNewUserChatHandler(message.roomId, channelUsers);
-		self.setActiveChannel(self.generateRoomKey(message.roomId));
+		self.setActiveChannel(message.roomId);
 		growlInfo('<span>Room for user <b>{}</b> has been created</span>'.format(anotherUserName[anotherUserId].user));
 	};
 	self.addRoom = function (message) {
@@ -1248,7 +1226,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	var self = this;
 	self.UNREAD_MESSAGE_CLASS = 'unreadMessage';
 	self.roomId = roomId;
-	self.channel = 'r' + roomId;
 	self.roomName = roomName;
 	self.dom = {
 		chatBoxDiv: chatboxDiv,
@@ -1285,7 +1262,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		self.removeNewMessages();
 		CssUtils.hideElement(self.dom.newMessages);
 		CssUtils.showElement(self.dom.deleteIcon);
-		var isHidden = webRtcApi.isActive() && webRtcApi.channel != self.channel;
+		var isHidden = webRtcApi.isActive() && webRtcApi.channel != self.roomId;
 		CssUtils.setVisibility(webRtcApi.dom.callContainer, self.callIsAttached && !isHidden);
 	};
 	/*==================== DOM EVENTS LISTENERS ============================*/
@@ -1347,9 +1324,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.addDomUserOnline(message.userId, message.sex, message.user);
 		}
 	};
-	self.addUserToAll = function (message) {
-		self.addUserToDom(message);
-	};
+	self.addUserToAll = self.addUserToDom;
 	self.setDomOnlineUsers = function (users) {
 		self.dom.userList.innerHTML = '';
 		self.allUsers = users;
@@ -1618,7 +1593,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 				headerId: self.headerId,
 				count: count,
 				action: 'loadMessages',
-				channel: self.channel
+				channel: self.roomId
 			};
 			wsHandler.sendToServer(getMessageRequest);
 		}
