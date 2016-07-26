@@ -704,7 +704,9 @@ function ChannelsHandler() {
 		singlePage.pushHistory();
 	};
 	self.showActiveChannel = function () {
-		if (self.activeChannel) {
+		if (!self.activeChannel) {
+			singlePage.showDefaultPage();
+		} else {
 			var chatHandler = self.getActiveChannel();
 			if (chatHandler == null) {
 				self.activeChannel = DEFAULT_CHANNEL_NAME;

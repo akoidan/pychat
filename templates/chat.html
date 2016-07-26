@@ -20,7 +20,7 @@
 {% endblock head %}
 {% block content %}
 	<nav class="noSelection">
-		<a class="icon-home" href="/" title="Go home" onclick="event.preventDefault(); singlePage.showPage('/chat/', ['r1']);"><span class="mText">home</span></a>
+		<a class="icon-home" href="/" title="Go home" onclick="event.preventDefault(); singlePage.showDefaultPage();"><span class="mText">home</span></a>
 		<i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds" onclick="mute();"><span class="mText">volume</span></i>
 		<a href="/#/report_issue" class="icon-pencil hide-wide" title="report an issue"
 			onclick="event.preventDefault(); singlePage.showPage('/report_issue')"><span class="mText">issue</span></a>
