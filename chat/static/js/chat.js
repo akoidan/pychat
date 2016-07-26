@@ -704,14 +704,10 @@ function ChannelsHandler() {
 		singlePage.pushHistory();
 	};
 	self.showActiveChannel = function () {
-		if (!self.activeChannel) {
+		var chatHandler = self.getActiveChannel();
+		if (chatHandler == null) {
 			singlePage.showDefaultPage();
 		} else {
-			var chatHandler = self.getActiveChannel();
-			if (chatHandler == null) {
-				self.activeChannel = DEFAULT_CHANNEL_NAME;
-				chatHandler = self.getActiveChannel();
-			}
 			chatHandler.show();
 			if (chatHandler.isPrivate()) {
 				CssUtils.hideElement(self.dom.inviteUser);
