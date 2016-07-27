@@ -1564,11 +1564,13 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.dom.chatBoxDiv.removeEventListener("keydown", self.keyDownLoadUp);
 			return;
 		}
+		// loadMessages could be called from localStorage
+		var savedNewMessagesDisabledStatus = window.newMessagesDisabled;
 		window.newMessagesDisabled = true;
 		message.forEach(function (message) {  // dont pass function straight , foreach passes index as 2nd arg
 			self.printMessage(message);
 		});
-		window.newMessagesDisabled = false;
+		window.newMessagesDisabled = savedNewMessagesDisabledStatus;
 		self.lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
 		window.sound = windowsSoundState;
 	};

@@ -664,6 +664,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		else:
 			self.logger.info("Close event, not subscribed, channels: %s", self.channels)
 		log_data = {}
+		update_last_read_message = True
 		for channel in self.channels:
 			if not isinstance(channel, int):
 				continue
@@ -675,8 +676,11 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				log_data[channel] = {'online': online, 'is_online': is_online}
 				if not is_online:
 					message = self.room_online(online, Actions.LOGOUT, channel)
-					self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 					self.publish(message, channel)
+					if update_last_read_message:
+						update_last_read_message = False
+						res = self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
+						logger.info("Updated %s last read message", res)
 
 		self.logger.info("Close connection result: %s", json.dumps(log_data))
 		self.async_redis.disconnect()
