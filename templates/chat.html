@@ -57,15 +57,12 @@
 					<form id="fileInfo" class="hidden">
 						<input type="file" id="webRtcFileInput" name="files">
 					</form>
-
 					<div id="transmitProgress" class="progress-wrap hidden">
 						<a>
 						</a>
 					</div>
-
 					<div id="bitrate"></div>
 					<span id="status"></span>
-
 				</section>
 				<div id="callContainerContent">
 					<div id='videoContainer'>
@@ -87,8 +84,6 @@
 							<i id="enterFullScreen" class="icon-webrtc-fullscreen" title="Fullscreen"></i>
 						</div>
 						<i class="icon-hang-up" id="hangUpIcon"></i>
-{#						<img src="{% md5url 'images/call.gif' %}" alt="call" class="hidden" id="callRing"#}
-{#							 style="width: 30px"/>#}
 						<div class="volumeLevelsHolder">
 							<input type="range" id="callVolume" value="100" title="Volume level"/>
 							<progress id="microphoneLevel" max="200" title="Your microphone level" value="0"></progress>

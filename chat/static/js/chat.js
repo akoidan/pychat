@@ -1670,25 +1670,46 @@ function DownloadBar(stringId) {
 	};
 }
 
-function WebRtcApi() {
+function PeerConnectionHandler() {
 	var self = this;
-	self.activeUserClass = "active-call-user";
-	self.isForTransferFile = false;
-	self.CHUNK_SIZE = 16384;
+	self.sendChannel = null;
+	self.pc = {};
+	var webRtcUrl = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
+	self.pc_config = {iceServers: [{url: webRtcUrl}]};
+	self.pc_constraints = {
+		optional: [/*Firefox*/
+			/*{DtlsSrtpKeyAgreement: true},*/
+			{RtpDataChannels: false /*true*/}
+		]
+	};
+}
+
+function FileTransferHandler() {
+	var self = this;
 	self.dom = {
-		callContainer: $('callContainer'),
+		fileInput: $('webRtcFileInput'), //
+	};
+	self.CHUNK_SIZE = 16384;
+	self.receiveBuffer = [];
+	self.receivedSize = 0;
+	PeerConnectionHandler.call(self);
+	self.sdpConstraints = {};
+}
+
+function CallHandler() {
+	var self = this;
+	PeerConnectionHandler.call(self);
+	self.dom = {
 		callAnswerParent: $('callAnswerParent'),
-		callContainerHeaderText: headerText,
 		callAnswerText: $('callAnswerText'),
-		remote: $('remoteVideo'),
-		local: $('localVideo'),
-		callSound: $('chatCall'),
-		hangUpIcon: $('hangUpIcon'),
-		audioStatusIcon: $('audioStatusIcon'),
-		videoStatusIcon: $('videoStatusIcon'),
-		videoContainer: $('videoContainer'),
-		fsContainer: $('icon-webrtc-cont'),
-		callIcon: $('callIcon'),
+		remote: $('remoteVideo'), //
+		local: $('localVideo'), //
+		callSound: $('chatCall'), //
+		hangUpIcon: $('hangUpIcon'), //
+		audioStatusIcon: $('audioStatusIcon'), //
+		videoStatusIcon: $('videoStatusIcon'), //
+		videoContainer: $('videoContainer'), //
+		callIcon: $('callIcon'), //
 		callVolume: $('callVolume'),
 		microphoneLevel: $("microphoneLevel"),
 		fs: {
@@ -1698,15 +1719,18 @@ function WebRtcApi() {
 			hangup: $('fs-hangup'),
 			minimize: $('fs-minimize'),
 			enterFullScreen: $('enterFullScreen')
-		},
-		// transfer file dome
-		fileInput: $('webRtcFileInput')
-		// transfer file dome
+		}, //
 	};
-	//file transfer  variables
-	self.receiveBuffer = [];
-	self.receivedSize = 0;
-	//file transfer  variables
+	self.constraints = {
+		audio: true,
+		video: true
+	};
+	self.sdpConstraints = {
+		'mandatory': {
+			'OfferToReceiveAudio': true,
+			'OfferToReceiveVideo': true
+		}
+	};
 	self.onExitFullScreen = function () {
 		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
 			CssUtils.removeClass(self.dom.videoContainer, 'fullscreen');
@@ -1715,7 +1739,54 @@ function WebRtcApi() {
 			self.dom.remote.ondblclick = self.enterFullScreenMode;
 		}
 	};
-	self.attachDomEvents = function () {
+	self.changeVolume = function () {
+		self.dom.remote.volume = self.dom.callVolume.value / 100;
+	};
+}
+
+function WebRtcApi() {
+	var self = this;
+	self.isForTransferFile = false;
+	self.CHUNK_SIZE = 16384;
+	self.dom = {
+		callContainer: $('callContainer'), //
+		callAnswerParent: $('callAnswerParent'),
+		callAnswerText: $('callAnswerText'), //
+		remote: $('remoteVideo'), //
+		local: $('localVideo'), //
+		callSound: $('chatCall'), //
+		hangUpIcon: $('hangUpIcon'), //
+		audioStatusIcon: $('audioStatusIcon'), //
+		videoStatusIcon: $('videoStatusIcon'), //
+		videoContainer: $('videoContainer'), //
+		callIcon: $('callIcon'), //
+		callVolume: $('callVolume'), //
+		microphoneLevel: $("microphoneLevel"), //
+		fs: {
+			/*FullScreen*/
+			video: $('fs-video'),
+			audio: $('fs-audio'),
+			hangup: $('fs-hangup'),
+			minimize: $('fs-minimize'),
+			enterFullScreen: $('enterFullScreen')
+		}, //
+		// transfer file dome
+		fileInput: $('webRtcFileInput') //
+		// transfer file dome
+	};
+	//file transfer  variables
+	self.receiveBuffer = []; //
+	self.receivedSize = 0; //
+	//file transfer  variables
+	self.onExitFullScreen = function () {
+		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
+			CssUtils.removeClass(self.dom.videoContainer, 'fullscreen');
+			document.removeEventListener('mousemove', self.fsMouseMove, false);
+			clearInterval(self.hideContainerTimeoutRes);
+			self.dom.remote.ondblclick = self.enterFullScreenMode;
+		}
+	}; //
+	self.attachDomEvents = function () { //TODO
 		self.dom.videoStatusIcon.onclick = self.toggleVideo;
 		self.dom.fs.video.onclick = self.toggleVideo;
 		self.dom.hangUpIcon.onclick = self.hangUp;
@@ -1755,7 +1826,7 @@ function WebRtcApi() {
 	};
 	self.changeVolume = function () {
 		self.dom.remote.volume = self.dom.callVolume.value / 100;
-	};
+	}; //
 	self.dom.callVolume.addEventListener('input', self.changeVolume);
 	self.exitFullScreen = function () {
 		document.cancelFullScreen();
@@ -1804,8 +1875,6 @@ function WebRtcApi() {
 			'OfferToReceiveVideo': true
 		}
 	};
-	self.webRtcReceivers = {};
-
 	self.getTrack = function (isVideo) {
 		var track = null;
 		if (self.localStream) {

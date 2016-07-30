@@ -699,7 +699,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.logger = logging.LoggerAdapter(logger, log_params)
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, self.id)
 			self.async_redis.connect()
-			user_db = self.do_db(User.objects.get, id=self.user_id)  # everything but 0 is a registered user
+			user_db = self.do_db(User.objects.get, id=self.user_id)
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
 			user_rooms = self.get_users_in_current_user_rooms()
