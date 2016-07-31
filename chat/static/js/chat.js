@@ -1166,7 +1166,8 @@ function showHelp() {
 		" open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> </span>",
 		"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
 		"<span>You can write multiline message by pressing <b>shift+Enter</b></span>",
-		"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon. To close appeared smile container click outside of it or press <b>Esc</b></span>",
+		"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon." +
+		" To close appeared smile container click outside of it or press <b>Esc</b></span>",
 		"You can comment somebody's message. This will be shown to all users in current channel. Just click on message time" +
 		"and it's content appears in message text",
 		"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
@@ -1178,7 +1179,10 @@ function showHelp() {
 		"You can load history of current channel. For this you need to focus place with messages by simply" +
 		" clicking on it and press arrow up/page up or just scroll up with mousewheel",
 		"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>",
-		"<span>To paste image from clipboard: focus box with messages (by clicking on it) and press <B>Ctrl + V</b></span>"
+		"<span>To paste image from clipboard: focus box with messages (by clicking on it) and press <B>Ctrl + V</b></span>",
+		"<span>You can edit/delete message that you have sent during one minute. Focus input text, delete its content " +
+		"and press <b>Up Arrow</b>. The edited message should become highlighted with outline. If you apply blank text the" +
+		" message will be removed.To exit the mode press <b>Esc</b></span>"
 	];
 	var index = localStorage.getItem('HelpIndex');
 	if (index == null) {
