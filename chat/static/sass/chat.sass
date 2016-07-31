@@ -559,6 +559,23 @@ p
 		background-color: rgba(240, 255, 255, 0.23)
 		border-radius: 3px
 
+.editedMessage:not(.unreadMessage)
+	position: relative
+	padding-right: 20px
+	&:before
+		@extend .icon-pencil:before
+		font-family: "fontello"
+		top: 5px
+		right: 5px
+		position: absolute
+		font-size: 10px
+		color: grey
+
+.changeMessage
+	border: 1px solid grey
+	border-radius: 3px
+	padding: 3px
+
 #videoContainer
 	position: relative
 	width: 100%

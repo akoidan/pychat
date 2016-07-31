@@ -147,6 +147,7 @@ class Message(models.Model):
 	time = models.BigIntegerField(default=get_milliseconds)
 	content = models.TextField(null=True)
 	img = FileField(upload_to=get_random_path, null=True)
+	deleted = BooleanField(default=False)
 
 
 class RoomUsers(models.Model):
