@@ -5,6 +5,7 @@ import time
 from threading import Thread
 from urllib.request import urlopen
 
+import datetime
 import tornado.gen
 import tornado.httpclient
 import tornado.ioloop
@@ -54,6 +55,8 @@ class Actions:
 	GET_MESSAGES = 'loadMessages'
 	CREATE_DIRECT_CHANNEL = 'addDirectChannel'
 	DELETE_ROOM = 'deleteRoom'
+	EDIT_MESSAGE = 'editMessage'
+	DELETE_MESSAGE = 'deleteMessage'
 	CREATE_ROOM_CHANNEL = 'addRoom'
 	INVITE_USER = 'inviteUser'
 	ADD_USER = 'addUserToAll'
@@ -157,14 +160,14 @@ class MessagesCreator(object):
 		return res
 
 	@classmethod
-	def create_send_message(cls, message):
+	def create_send_message(cls, message, event=Actions.PRINT_MESSAGE):
 		"""
 		:param message:
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
 		"sex": "Alien", "user": "tRD6emzs", "time": "20:48:57"}
 		"""
 		res = cls.create_message(message)
-		res[VarNames.EVENT] = Actions.PRINT_MESSAGE
+		res[VarNames.EVENT] = event
 		res[VarNames.CHANNEL] = message.room_id
 		res[HandlerNames.NAME] = HandlerNames.CHAT
 		return res
@@ -264,6 +267,7 @@ class MessagesHandler(MessagesCreator):
 			Actions.CALL: self.process_call,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
 			Actions.DELETE_ROOM: self.delete_channel,
+			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
 			Actions.INVITE_USER: self.invite_user,
 		}
@@ -347,9 +351,7 @@ class MessagesHandler(MessagesCreator):
 			self.logger.info('!! Second tab, retrieving online for self')
 			self.safe_write(online_user_names_mes)
 
-	def publish(self, message, channel=None, parsable=False):
-		if channel is None:
-			raise ValidationError('lolol')
+	def publish(self, message, channel, parsable=False):
 		jsoned_mess = json.dumps(message)
 		self.logger.debug('<%s> %s', channel, jsoned_mess)
 		if parsable:
@@ -495,6 +497,25 @@ class MessagesHandler(MessagesCreator):
 		message = self.unsubscribe_direct_message(room_id)
 		self.publish(message, room_id, True)
 
+	def edit_message(self, data):
+		message_id = data[VarNames.MESSAGE_ID]
+		message = Message.objects.get(id=message_id)
+		if message.sender_id != self.user_id:
+			raise ValidationError("You can only edit your messages")
+		if message.time + 60000 < get_milliseconds():
+			raise ValidationError("You can only edit messages that were send not more than 1 min ago")
+		if message.deleted:
+			raise ValidationError("Already deleted")
+		message.content = data[VarNames.CONTENT]
+		selector = Message.objects.filter(id=message_id)
+		if message.content is None:
+			selector.update(deleted=True)
+			action = Actions.DELETE_MESSAGE
+		else:
+			action = Actions.EDIT_MESSAGE
+			selector.update(content=message.content)
+		self.publish(self.create_send_message(message, action), message.room_id)
+
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		self.add_channel(room_id)
@@ -518,9 +539,9 @@ class MessagesHandler(MessagesCreator):
 		room_id = data[VarNames.CHANNEL]
 		self.logger.info('!! Fetching %d messages starting from %s', count, header_id)
 		if header_id is None:
-			messages = Message.objects.filter(Q(room_id=room_id)).order_by('-pk')[:count]
+			messages = Message.objects.filter(Q(room_id=room_id), Q(deleted=False)).order_by('-pk')[:count]
 		else:
-			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id)).order_by('-pk')[:count]
+			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id), Q(deleted=False)).order_by('-pk')[:count]
 		response = self.do_db(self.get_messages, messages, room_id)
 		self.safe_write(response)
 
@@ -528,6 +549,7 @@ class MessagesHandler(MessagesCreator):
 		res = {}
 		offline_messages = Message.objects.filter(
 			id__gt=F('room__roomusers__last_read_message_id'),
+			deleted=False,
 			room__roomusers__user_id=self.user_id
 		)
 		for message in offline_messages:
@@ -664,7 +686,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		else:
 			self.logger.info("Close event, not subscribed, channels: %s", self.channels)
 		log_data = {}
-		update_last_read_message = True
+		gone_offline = False
 		for channel in self.channels:
 			if not isinstance(channel, int):
 				continue
@@ -677,10 +699,10 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				if not is_online:
 					message = self.room_online(online, Actions.LOGOUT, channel)
 					self.publish(message, channel)
-					if update_last_read_message:
-						update_last_read_message = False
-						res = self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
-						logger.info("Updated %s last read message", res)
+					gone_offline = True
+		if gone_offline:
+			res = self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
+			logger.info("Updated %s last read message", res)
 
 		self.logger.info("Close connection result: %s", json.dumps(log_data))
 		self.async_redis.disconnect()

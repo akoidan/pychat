@@ -40,6 +40,7 @@ Start the chat:
 =======
 
 # TODO
+* Add title for room. 
 * add scale to painter and Ctrl+Z
 * Add delete/edit message option (skype alike)
 * View profile show wrong profile

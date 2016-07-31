@@ -601,6 +601,25 @@ function PageHandler() {
 }
 
 
+function placeCaretAtEnd(el) {
+	el.focus();
+	if (typeof window.getSelection != "undefined"
+			&& typeof document.createRange != "undefined") {
+		var range = document.createRange();
+		range.selectNodeContents(el);
+		range.collapse(false);
+		var sel = window.getSelection();
+		sel.removeAllRanges();
+		sel.addRange(range);
+	} else if (typeof document.body.createTextRange != "undefined") {
+		var textRange = document.body.createTextRange();
+		textRange.moveToElementText(el);
+		textRange.collapse(false);
+		textRange.select();
+	}
+}
+
+
 function ChannelsHandler() {
 	var self = this;
 	Page.call(self);
@@ -609,6 +628,7 @@ function ChannelsHandler() {
 	self.render = self.show;
 	self.ROOM_ID_ATTR = 'roomid';
 	self.activeChannel = DEFAULT_CHANNEL_NAME;
+	self.EDIT_MESSAGE_CLASS = 'changeMessage';
 	self.channels = {};
 	self.childDom = {
 		wrapper: $('wrapper'),
@@ -698,6 +718,7 @@ function ChannelsHandler() {
 		}
 	};
 	self.setActiveChannel = function (key) {
+		self.removeEditingMode();
 		self.hideActiveChannel();
 		self.activeChannel = key;
 		self.showActiveChannel();
@@ -768,21 +789,61 @@ function ChannelsHandler() {
 			}
 		}
 	};
+	self.handleEditMessage = function(event) {
+		if (!blankRegex.test(userMessage.textContent)) {
+			return;
+		}
+		var editLastMessageNode = self.getActiveChannel().lastMessage;
+		// only if message was sent 1 min ago + 2seconds for message to being processed
+		if (editLastMessageNode && editLastMessageNode.time + 58000 > new Date().getTime()) {
+			self.editLastMessageNode = editLastMessageNode;
+			self.editLastMessageNode.dom = $(editLastMessageNode.time);
+			CssUtils.addClass(self.editLastMessageNode.dom, self.EDIT_MESSAGE_CLASS);
+			var selector = '[id="{}"] .message-text-style'.format(editLastMessageNode.time);
+			userMessage.innerHTML = document.querySelector(selector).innerHTML;
+			placeCaretAtEnd(userMessage);
+			event.preventDefault();
+		}
+	};
+	self.handleSendMessage = function() {
+		smileyUtil.purgeImagesFromSmileys();
+		var messageContent = userMessage.textContent;
+		messageContent = blankRegex.test(messageContent) ? null : messageContent;
+		var message;
+		if (self.editLastMessageNode) {
+			message = {
+				id: self.editLastMessageNode.id,
+				action: 'editMessage',
+				content: messageContent
+			};
+			self.removeEditingMode();
+		} else {
+			if (!messageContent) {
+				return;
+			}
+			message = {
+				action: 'sendMessage',
+				content: messageContent,
+				channel: self.activeChannel
+			};
+		}
+		self.sendMessage(message);
+	};
 	self.checkAndSendMessage = function (event) {
 		if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
 			event.preventDefault();
-			smileyUtil.purgeImagesFromSmileys();
-			var messageContent = userMessage.textContent;
-			if (blankRegex.test(messageContent)) {
-				return;
-			}
-			self.sendMessage({
-				content: messageContent,
-				action: 'sendMessage',
-				channel: self.activeChannel
-			});
+			self.handleSendMessage();
 		} else if (event.keyCode === 27) { // 27 = escape
 			smileyUtil.hideSmileys();
+			self.removeEditingMode();
+		} else if(event.keyCode == 38) { // up arrow
+			self.handleEditMessage(event);
+		}
+	};
+	self.removeEditingMode = function() {
+		if (self.editLastMessageNode) {
+			CssUtils.removeClass(self.editLastMessageNode.dom, self.EDIT_MESSAGE_CLASS);
+			self.editLastMessageNode = null;
 		}
 	};
 	self.addUserHolderClick = function (event) {
@@ -1246,11 +1307,17 @@ function timeMessageClick(event) {
 	userMessage.focus();
 }
 
+function encodeMessage(data) {
+	return data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
+}
+
 function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	var self = this;
 	self.UNREAD_MESSAGE_CLASS = 'unreadMessage';
+	self.EDITED_MESSAGE_CLASS = 'editedMessage';
 	self.roomId = roomId;
 	self.roomName = roomName;
+	self.lastMessage = {};
 	self.dom = {
 		chatBoxDiv: chatboxDiv,
 		userList: document.createElement('ul'),
@@ -1421,14 +1488,10 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		userSuffix = isPrefix ? ' >> ' : ': ';
 		headSpan.insertAdjacentHTML('beforeend', userSuffix);
 		p.appendChild(headSpan);
-		if (htmlEncodedContent.indexOf("<img") == 0) {
-			p.insertAdjacentHTML('beforeend', htmlEncodedContent);
-		} else {
-			var textSpan = document.createElement('span');
-			textSpan.className = CONTENT_STYLE_CLASS;
-			textSpan.innerHTML = htmlEncodedContent;
-			p.appendChild(textSpan);
-		}
+		var textSpan = document.createElement('span');
+		textSpan.className = CONTENT_STYLE_CLASS;
+		textSpan.innerHTML = htmlEncodedContent;
+		p.appendChild(textSpan);
 		return p;
 	};
 	/**Insert ------- Mon Dec 21 2015 ----- if required
@@ -1518,11 +1581,35 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.headerId = headerId;
 		}
 	};
+	self.editMessage = function(data) {
+		var html = encodeMessage(data);
+		var p = $(data.time);
+		if (p != null) {
+			document.querySelector("[id='{}'] .message-text-style".format(data.time)).innerHTML = html;
+			CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
+		}
+	};
+	self.deleteMessage = function(data) {
+		var target = $(data.time);
+		if (target) {
+			CssUtils.deleteElement(target);
+			if (data.userId == loggedUserId) {
+				self.lastMessage = null;
+				if (!window.newMessagesDisabled) {
+					growlInfo("Last message has been deleted");
+				}
+			}
+		}
+	};
 	self.printMessage = function (data, isNew) {
 		self.setHeaderId(data.id);
 		var user = self.allUsers[data.userId];
 		if (loggedUserId === data.userId) {
 			checkAndPlay(self.dom.chatOutgoing);
+			self.lastMessage = {
+				id: data.id,
+				time: data.time
+			}
 		} else {
 			checkAndPlay(self.dom.chatIncoming);
 		}
@@ -1530,7 +1617,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		//private message
 		var prefix = false;
 		var headerStyle = data.userId == loggedUserId ? self.SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
-		var preparedHtml = data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
+		var preparedHtml = encodeMessage(data);
 		notifier.notify(displayedUsername, data.content || 'image');
 		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
 		if (self.isHidden() && !window.newMessagesDisabled) {
@@ -2448,6 +2535,7 @@ function WsHandler() {
 function Storage() {
 	var self = this;
 	self.STORAGE_NAME = 'main';
+	self.actionsToSave = ['printMessage', 'loadMessages', 'editMessage', 'deleteMessage', 'loadOfflineMessages'];
 	self.loadMessagesFromLocalStorage = function () {
 		var jsonData = localStorage.getItem(self.STORAGE_NAME);
 		if (jsonData != null) {
@@ -2473,15 +2561,8 @@ function Storage() {
 	};
 	// Use both json and object repr for less JSON actions
 	self.saveMessageToStorage = function (objectItem, jsonItem) {
-		if (!notifier.isTabMain()) {
-			return
-		}
-		switch (objectItem['action']) {
-			case 'printMessage':
-			case 'loadMessages':
-			case 'loadOfflineMessages':
-				self.fastAddToStorage(jsonItem);
-				break;
+		if (notifier.isTabMain() && self.actionsToSave.indexOf(objectItem.action) >= 0) {
+			self.fastAddToStorage(jsonItem);
 		}
 	};
 	self.fastAddToStorage = function (text) {
