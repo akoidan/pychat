@@ -124,8 +124,8 @@
 			<div id="chat-user-table">
 			</div>
 		</div>
-		<div id="smileParentHolder" class="padding10 hidden" onclick="smileyUtil.addSmile(event);">
-			<ul id="tabNames" onclick="smileyUtil.showTabByName(event)"></ul>
+		<div id="smileParentHolder" class="padding10 hidden" onmousedown="smileyUtil.addSmile(event);">
+			<ul id="tabNames" onmousedown="smileyUtil.showTabByName(event)"></ul>
 		</div>
 	</div>
 	<div id="addUserHolder" class="hidden">
@@ -159,7 +159,7 @@
 		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
 		<i class="icon-picture" title="Attach Image File" onclick="$('imgInput').click()"></i>
 		<i class="icon-brush" title="Draw an Image" onclick="painter.show()"></i>
-		<i class="icon-smile" title="Add a smile :)" onclick="smileyUtil.toggleSmileys(event)"></i>
+		<i class="icon-smile" title="Add a smile :)" onmousedown="smileyUtil.toggleSmileys(event)"></i>
 		<div contenteditable="true" id="usermsg" onkeydown="channelsHandler.checkAndSendMessage(event)"></div>
 	{% comment %}TODO which chat variable to use?{% endcomment %}
 	</div>

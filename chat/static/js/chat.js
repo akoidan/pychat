@@ -235,7 +235,6 @@ function Painter() {
 		self.scale *= zoom;
 	};
 	self.initChild = function () {
-		document.body.addEventListener('mouseup', self.finishDraw, false);
 		self.dom.canvas.addEventListener('mousedown', self.startDraw, false);
 		self.dom.container.onpaste = self.canvasImagePaste;
 		self.dom.container.ondrop = self.canvasImageDrop;
@@ -256,6 +255,7 @@ function Painter() {
 	self.superShow = self.show;
 	self.show = function () {
 		self.superShow();
+		document.body.addEventListener('mouseup', self.finishDraw, false);
 		self.dom.canvas.setAttribute('width', self.dom.canvas.offsetWidth);
 		self.dom.canvas.setAttribute('height', self.dom.canvas.offsetHeight);
 		self.ctx.lineWidth = 3;
@@ -264,6 +264,11 @@ function Painter() {
 		self.ctx.strokeStyle = self.dom.color.value;
 		self.setColorStrikeColor();
 		self.setPen();
+	};
+	self.superHide = self.hide;
+	self.hide = function() {
+		self.superHide();
+		document.body.removeEventListener('mouseup', self.finishDraw, false);
 	};
 	self.initChild();
 }
@@ -601,25 +606,6 @@ function PageHandler() {
 }
 
 
-function placeCaretAtEnd(el) {
-	el.focus();
-	if (typeof window.getSelection != "undefined"
-			&& typeof document.createRange != "undefined") {
-		var range = document.createRange();
-		range.selectNodeContents(el);
-		range.collapse(false);
-		var sel = window.getSelection();
-		sel.removeAllRanges();
-		sel.addRange(range);
-	} else if (typeof document.body.createTextRange != "undefined") {
-		var textRange = document.body.createTextRange();
-		textRange.moveToElementText(el);
-		textRange.collapse(false);
-		textRange.select();
-	}
-}
-
-
 function ChannelsHandler() {
 	var self = this;
 	Page.call(self);
@@ -801,9 +787,17 @@ function ChannelsHandler() {
 			CssUtils.addClass(self.editLastMessageNode.dom, self.EDIT_MESSAGE_CLASS);
 			var selector = '[id="{}"] .message-text-style'.format(editLastMessageNode.time);
 			userMessage.innerHTML = document.querySelector(selector).innerHTML;
-			placeCaretAtEnd(userMessage);
+			self.placeCaretAtEnd();
 			event.preventDefault();
 		}
+	};
+	self.placeCaretAtEnd = function() {
+		var range = document.createRange();
+		range.selectNodeContents(userMessage);
+		range.collapse(false);
+		var sel = window.getSelection();
+		sel.removeAllRanges();
+		sel.addRange(range);
 	};
 	self.handleSendMessage = function() {
 		smileyUtil.purgeImagesFromSmileys();
@@ -844,6 +838,7 @@ function ChannelsHandler() {
 		if (self.editLastMessageNode) {
 			CssUtils.removeClass(self.editLastMessageNode.dom, self.EDIT_MESSAGE_CLASS);
 			self.editLastMessageNode = null;
+			userMessage.innerHTML = "";
 		}
 	};
 	self.addUserHolderClick = function (event) {
@@ -1207,33 +1202,49 @@ function SmileyUtil() {
 	self.tabNames = [];
 	self.smileyDict = {};
 	self.init = function () {
-		document.addEventListener("click", self.onDocClick);
 		self.loadSmileys(window.smileys_bas64_data);
+		userMessage.addEventListener("mousedown", function(event) {
+			event.stopPropagation(); // Don't fire onDocClick
+		});
 	};
 	self.hideSmileys = function () {
+		document.removeEventListener("mousedown", self.onDocClick);
 		CssUtils.hideElement(self.dom.smileParentHolder);
 	};
 	self.onDocClick = function (event) {
 		event = event || window.event;
-		for (var element = event.target; element; element = element.parentNode) {
-			if (element.id === "bottomWrapper" || element.id === self.dom.smileParentHolder.id) {
-				userMessage.focus();
-				return;
-			}
-		}
+		event.preventDefault(); //don't lose focus on usermessage
 		self.hideSmileys();
 	};
 	self.purgeImagesFromSmileys = function() {
 		userMessage.innerHTML = userMessage.innerHTML.replace(self.smileRegex, "$1");
 	};
 	self.addSmile = function (event) {
-		event = event || window.event;
+		event.preventDefault(); // prevents from losing focus
+		event.stopPropagation(); // don't allow onDocClick
+		//event = event || window.event; TODO is that really needed
 		var smileImg = event.target;
 		if (smileImg.tagName !== 'IMG') {
 			return;
 		}
-		userMessage.innerHTML += smileImg.outerHTML;
+		self.pasteHtmlAtCaret(smileImg);
 		console.log(getDebugMessage('Added smile "{}"', smileImg.alt));
+	};
+	self.pasteHtmlAtCaret = function (img) {
+		var sel = window.getSelection();
+		var range = sel.getRangeAt(0);
+		range.deleteContents();
+		// Range.createContextualFragment() would be useful here but is
+		// non-standard and not supported in all browsers (IE9, for one)
+		var frag = document.createDocumentFragment(), node, lastNode;
+		frag.appendChild(img);
+		range.insertNode(frag);
+		// Preserve the selection
+		range = range.cloneRange();
+		range.setStartAfter(img);
+		range.collapse(true);
+		sel.removeAllRanges();
+		sel.addRange(range);
 	};
 	self.encodeSmileys = function (html) {
 		html = encodeAnchorsHTML(html);
@@ -1244,17 +1255,30 @@ function SmileyUtil() {
 	};
 	self.toggleSmileys = function (event) {
 		event.stopPropagation(); // prevent top event
-		CssUtils.toggleVisibility(self.dom.smileParentHolder);
-		userMessage.focus();
+		event.preventDefault();
+		var becomeHidden = CssUtils.toggleVisibility(self.dom.smileParentHolder);
+		if (becomeHidden) {
+			document.removeEventListener("mousedown", self.onDocClick);
+		} else {
+			document.addEventListener("mousedown", self.onDocClick);
+			if (document.activeElement != userMessage) {
+				userMessage.focus();
+			}
+		}
 	};
-	self.showTabByName = function (event) {
-		if (event.target != null) {
-			if (event.target.tagName !== 'LI') {
+	self.showTabByName = function (eventOrTabName) {
+		var tagName;
+		if (eventOrTabName.target) { // if called by actionListener
+			if (eventOrTabName.target.tagName !== 'LI') {
 				// outer scope click
 				return;
 			}
+			eventOrTabName.stopPropagation();
+			eventOrTabName.preventDefault();
+			tagName = eventOrTabName.target.innerHTML;
+		} else {
+			tagName = eventOrTabName;
 		}
-		var tagName = event.target == null ? event : event.target.innerHTML;
 		for (var i = 0; i < self.tabNames.length; i++) {
 			CssUtils.hideElement($("tab-" + self.tabNames[i])); // loadSmileys currentSmileyHolderId
 			CssUtils.removeClass($("tab-name-" + self.tabNames[i]), 'activeTab');
