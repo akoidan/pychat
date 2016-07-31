@@ -15,27 +15,23 @@ If you want to serve chat on your server:
 ==========================================================
 
 Instructions for *[Windows](https://www.microsoft.com/en-us/download/windows.aspx)*:
- 1. Install [python](https://www.python.org/downloads/) with pip. Any version *Python2.7* or *Python 3.x* both are supported
- 2. Add *pip* and *python* to `PATH` variable.
+ 1. Install [python](https://www.python.org/downloads/) with pip. Any version **Python2.7** or **Python 3.x** both are supported
+ 2. Add **pip** and **python** to `PATH` variable.
  3. Install [redis](https://github.com/rgl/redis/downloads).
- 4. Install [ruby](http://rubyinstaller.org/) and run `gem install sass` from command line as admin. Add *sass* command path to `PATH` variable
+ 4. Install [ruby](http://rubyinstaller.org/) and run `gem install sass` from command line as admin. Add **sass** command path to `PATH` variable
  5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector. 
- 6. You also need to install python's `mysqlclient`. If you want to compile one yourself you need to `vs2015` tools. You can downloads download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use pip to install them.
- 7. Add bash commands to PATH variable. `Cygwin` or `git's` will do find.(for example if you use only git `C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`). 
+ 6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can downloads download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
+ 7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`). 
 
 Instructions for *[Ubuntu](http://www.ubuntu.com/)*:
- 1. `apt-get install python`
- 2. `apt-get install pip`
- 3. `add-apt-repository -y ppa:rwky/redis` `apt-get install -y redis-server`
- 4  `apt-get install mysql-server`
- 5. `apt-get install ruby`, `gem install sass`
+ 1. Install required packages: `apt-get install python pip mysql-server ruby`
+ 2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
+ 3. Install **sass**: `gem install sass`
 
 Instructions for *[Archlinux](https://www.archlinux.org/)*:
- 1. `pacman -S python`
- 2. `pacman -S pip`
- 3. `pacman -S community/redis`
- 4. `pacman -S  mariadb`. Check [wiki](https://wiki.archlinux.org/index.php/MySQL) for more info 
- 5. `pacman -S ruby`, `gem install sass`
+ 1. Install required packages: `pacman -S python pip redis mariadb ruby`
+ 2. Follow the [database guide](https://wiki.archlinux.org/index.php/MySQL) to configure it if you need. 
+ 5. Install **sass**: `gem install sass`.
 
 Instructions for *[CentOs](https://www.centos.org/)* can be found in [production](https://github.com/Deathangel908/djangochat/tree/production) branch.
   
@@ -52,7 +48,7 @@ For developing you can also configure pycharm filewatcher to autocompile css:
 Afterwards to start the chat you need:
  0. Start `mysql` server if it's not started. 
  1. Start session holder: `redis-server`
- 2. Start WebSocket listener: `python manage.py start_tornado`
+ 2. Start webSocket listener: `python manage.py start_tornado`
  3. Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
  4. Open in browser [http*s*://127.0.0.1:8000](https://127.0.0.1:8000).
  5. If you get an ssl error on establishing websocket connection in browser, that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
