@@ -1227,7 +1227,7 @@ function SmileyUtil() {
 		if (smileImg.tagName !== 'IMG') {
 			return;
 		}
-		self.pasteHtmlAtCaret(smileImg);
+		self.pasteHtmlAtCaret(smileImg.cloneNode());
 		console.log(getDebugMessage('Added smile "{}"', smileImg.alt));
 	};
 	self.pasteHtmlAtCaret = function (img) {
