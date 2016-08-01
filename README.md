@@ -11,8 +11,10 @@ Chat is written in **Python** with [django](https://www.djangoproject.com/). For
 [Live demo](http://pychat.org/)
 ================
 
-To run chat on CentOS 6:
-===============
+Setup instructions for CentOS 6:
+================================
+
+Prepare system.
  0. Passwordless login to ssh server (optional): run this from client `cat ~/.ssh/id_rsa.pub | ssh -p 666 root@ip 'mkdir -p .ssh; cat >> .ssh/authorized_keys'`
  0. Add `alias yum="python2 $(which yum)"` to /etc/bashrc if you use python3
  0. Install packages `yum install nginx, python34u, uWSGI, python34u-pip, redis, mysql-server, mysql-devel, postfix, mailx, ruby, rubygems`
@@ -28,9 +30,7 @@ To run chat on CentOS 6:
  0. Place you certificate in `/etc/nginx/ssl`, you can get free one with startssl. For it start postfix service, send email validation to domain `webmaster@pychat.org` and apply verification code from `/root/Maildir/new/<<time>>`. Generate public key in `/etc/nginx/ssl/server.key` and create certificate with this key on startssl. Download the certificate from startssl and put it into `/etc/nginx/ssl/1_pychat.org_bundle.crt`
  0. Add django admin static files: `python manage.py collectstatic`
 
- 
 Start the chat:
-==============
  1. Start session holder: `service redis-server start`
  1. Run server: `service nginx start`
  1. Start email server `service postfix start`
@@ -38,9 +38,10 @@ Start the chat:
  1. Start the Chat: `service uwsgi start`
  1. Start the WebSocket listener: `service tornado start`
  1. Open in browser http*s*://127.0.0.1
-=======
 
 # TODO
+* Add title for room. 
+* add scale to painter and Ctrl+Z
 * Add delete/edit message option (skype alike)
 * View profile show wrong profile
 * Show online status right of Direct user's messages besides channels' online
@@ -48,26 +49,19 @@ Start the chat:
 * User can't create direct group for himself if he already created groups for others  
 * TODO if someone offers a new call till establishing connection for a call self.call_receiver_channel would be set to wrong
 * !!!IMPORTANT Debug call dialog by switching channels while calling and no.
-* Move javascript history to variable since we use singlepage
-* Add browser notifications like in skype/facebook
 * shape-inside for contentteditable 
 * Colored print in download_content.sh
 * Add multi-language support. 
 * Move clear cache icon from nav to settings
-* http://jsfiddle.net/JnrvG/1/
 * add email confirmation for username or password change
 * remember if user has camera/mic and autoset values after second call
 * android play() can only be initiated by a user gesture.
-* transfer file to another user
 * insecure images on usermessage editable div prevent sending messages
 * add 404page
 * https://code.djangoproject.com/ticket/25489
 * http://stackoverflow.com/a/18843553/3872976
-* refactor set class name for css instead of settings css
-* add canvas images 
 * add antispam system
 * add http://www.amcharts.com/download/ to chart spam or user s  tatistic info
-* add WebWorker http://www.w3schools.com/html/html5_webworkers.asp to load message
 * startup loading messages in a separate thread (JS )
 * move loading messages on startup to single function? 
 * add antiflood settings to nginx
@@ -76,12 +70,5 @@ Start the chat:
 * fixme tornado logs messages to chat.log when messages don't belong to tornadoapp.p
 * add media query for register and usersettings to adjust for phone's width
 * add change password and realtime javascript to change_profile
-* local storage can store another user messasges in case of logout ?
 * file upload http://stackoverflow.com/a/14605593/3872976
-* add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis http://michal.karzynski.pl/blog/2014/05/18/setting-up-an-asynchronous-task-queue-for-django-using-celery-redis/
-* create tornado class in tornadoapp, put there all tornado logic
-*  check if there are new messages after connection lost compare to `localStorage` last message?
- also check id when appedning message to top to prevent double fire issue, append message to bottom if user went offline
-* USE init or on_open
-* add chat rooms
-* allow selecting username in navbar, remove selecting cursor 
+* add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis http://michal.karzynski.pl/blog/2014/05/18/setting-up-an-asynchronous-task-queue-for-django-using-celery-redis/ 

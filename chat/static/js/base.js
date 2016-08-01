@@ -276,6 +276,7 @@ function growlInfo(message) {
 function Draggable(container, headerText) {
 	var self = this;
 	self.UNACTIVE_CLASS = 'blurred';
+	self.MOVING_CLASS = 'moving';
 	self.dom = {
 		container:  container
 	};
@@ -300,6 +301,16 @@ function Draggable(container, headerText) {
 		self.dom.container.addEventListener('focus', self.onfocus);
 		self.dom.container.addEventListener('blur', self.onfocusout);
 		self.dom.container.setAttribute('tabindex', "-1");
+		var inputs = document.querySelectorAll('#{} input'.format(container.id));
+		// typeOf(inputs) = HTMLCollection, not an array. that doesn't have forEach
+		for (var i = 0; i < inputs.length; i++) {
+			inputs[i].addEventListener('focus', function () {
+				CssUtils.addClass(self.dom.container, self.UNACTIVE_CLASS);
+			});
+			inputs[i].addEventListener('blur', function () {
+				CssUtils.removeClass(self.dom.container, self.UNACTIVE_CLASS);
+			});
+		}
 	};
 	self.hide = function () {
 		CssUtils.hideElement(self.dom.container);
@@ -310,17 +321,17 @@ function Draggable(container, headerText) {
 	self.show = function () {
 		CssUtils.showElement(self.dom.container);
 	};
-	self.attached = true;
 	self.eleMouseDown = function (ev) {
 		if (ev.target.tagName == 'I') {
 			return; // if close icon was clicked
 		}
+		CssUtils.addClass(self.dom.container, self.MOVING_CLASS);
 		self.leftCorrection =  self.dom.container.offsetLeft - ev.pageX;
 		self.topCorrection = self.dom.container.offsetTop - ev.pageY;
-		// TODO 7 is kind of magical bottom margin when source is attached to video
 		self.maxTop = document.body.clientHeight - self.dom.container.clientHeight - 7;
 		self.maxLeft =  document.body.clientWidth - self.dom.container.clientWidth - 3;
 		document.addEventListener ("mousemove", self.eleMouseMove, false);
+		document.addEventListener ("mouseup", self.eleMouseUp, false);
 	};
 	self.eleMouseMove = function (ev) {
 		var left = ev.pageX + self.leftCorrection;
@@ -337,15 +348,11 @@ function Draggable(container, headerText) {
 			top = self.maxTop;
 		}
 		self.dom.container.style.top = top + "px";
-		if (self.attached) {
-			document.addEventListener ("mouseup", self.eleMouseUp, false);
-			self.attached = false;
-		}
 	};
 	self.eleMouseUp = function () {
+		CssUtils.removeClass(self.dom.container, self.MOVING_CLASS);
 		document.removeEventListener ("mousemove", self.eleMouseMove, false);
 		document.removeEventListener ("mouseup", self.eleMouseUp, false);
-		self.attached = true;
 	};
 	self.super = {
 		show: self.show

@@ -8,6 +8,7 @@ var photoImg;
 var userProfileData;
 var themeSelector;
 var changeProfileForm;
+var notificationInput;
 
 function initChangeProfile() {
 	photoImg = $('photoImg');
@@ -16,6 +17,7 @@ function initChangeProfile() {
 	userProfileData = $('userProfileData');
 	themeSelector = $('themeSelector');
 	changeProfileForm = $('changeProfileForm');
+	notificationInput = $('id_notifications');
 	var item = localStorage.getItem('theme');
 	if (item != null) {
 		themeSelector.value = item;
@@ -111,10 +113,11 @@ function startCapturingVideo(button) {
 }
 
 
-function setColorTheme() {
+function setJsState() {
 	var options = [];
 	localStorage.setItem('theme', themeSelector.value);
 	document.body.className = themeSelector.value;
+	notifications = notificationInput.checked; // global var
 }
 
 function saveProfile(event) {
@@ -141,7 +144,7 @@ function saveProfile(event) {
 		}
 		if (response === RESPONSE_SUCCESS) {
 			growlSuccess("Your profile has been successfully updated. Press home icon to return on main page");
-			setColorTheme();
+			setJsState();
 		} else {
 			growlError(response);
 		}

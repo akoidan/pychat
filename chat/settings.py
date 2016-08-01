@@ -289,6 +289,9 @@ ADMINS = [('Andrew', 'nightmare.quake@mail.ru'), ]
 if not DEBUG:
 	IP_API_URL = 'http://ip-api.com/json/%s'
 
+ALL_REDIS_ROOM = 'all'
+ALL_ROOM_ID = 1
+
 UPDATE_LAST_READ_MESSAGE = """
 UPDATE chat_room_users out_cru
   INNER JOIN
@@ -297,13 +300,10 @@ UPDATE chat_room_users out_cru
      chat_room_users.id   rooms_users_id
    FROM chat_room_users
      JOIN chat_message ON chat_message.room_id = chat_room_users.room_id
-   WHERE chat_room_users.user_id = %s
+   WHERE chat_room_users.user_id = %s and chat_room_users.room_id != {}
    GROUP BY chat_message.room_id) last_message ON out_cru.id = last_message.rooms_users_id
 SET out_cru.last_read_message_id = last_message.message_id
-"""
-
-ALL_REDIS_ROOM = 'all'
-ALL_ROOM_ID = 1
+""".format(ALL_ROOM_ID)
 
 # ---------------JAVASCRIPT CONSTANTS --------------------
 
