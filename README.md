@@ -1,4 +1,5 @@
 ![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7--1.9-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/djangochat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/djangochat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/djangochat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/djangochat)
+
 What is it?
 ==============
 This is free web (browser) chat. It allows users send instant text messages or images, make video/audio calls, send files and other useful stuff.
@@ -10,61 +11,50 @@ Chat is written in **Python** with [django](https://www.djangoproject.com/). For
 [Live demo](http://pychat.org/)
 ================
 
-Get started:
-================
-In order to run chat on you server you will need:
- 1. *Python2.7* or *Python 3.x* both are supported
- 2. *pip* for getting dependencies
- 3. *redis* for holding session and pubsub messages
- 4. *sass* to compiling css
- 5 *mysql* database
- 6. Get python packages
- 7. Create the database
- 8. Copy static content (audio, fonts...)
+If you want to serve chat on your server:
+==========================================================
 
-Windows:
- 1. Install [python](https://www.python.org/downloads/) with pip 
- 2. Add pip and python to PATH variable
- 3. Install [redis](https://github.com/rgl/redis/downloads)
- 4. Install [ruby](http://rubyinstaller.org/) and run `gem install sass` from command line as admin. Add sass command path to PATH variable
- 5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use pip to install them
- 6. To compile pip3 `mysqlclient` u need `vs2015` tools, download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator.
- 7. Add git's bash commands (for example "C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin") to PATH variable
+Instructions for *[Windows](https://www.microsoft.com/en-us/download/windows.aspx)*:
+ 1. Install [python](https://www.python.org/downloads/) with pip. Any version **Python2.7** or **Python 3.x** both are supported
+ 2. Add **pip** and **python** to `PATH` variable.
+ 3. Install [redis](https://github.com/rgl/redis/downloads).
+ 4. Install [ruby](http://rubyinstaller.org/) and run `gem install sass` from command line as admin. Add **sass** command path to `PATH` variable
+ 5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector. 
+ 6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can downloads download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
+ 7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`). 
 
-Ubuntu:
- 1. `apt-get install python`
- 2. `apt-get install pip`
- 3. `add-apt-repository -y ppa:rwky/redis` `apt-get install -y redis-server`
- 4  `apt-get install mysql-server`
- 5. `apt-get install ruby`, `gem install sass`
+Instructions for *[Ubuntu](http://www.ubuntu.com/)*:
+ 1. Install required packages: `apt-get install python pip mysql-server ruby`
+ 2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
+ 3. Install **sass**: `gem install sass`
 
-Archlinux:
- 1. `pacman -S python`
- 2. `pacman -S pip`
- 3. `pacman -S community/redis`
- 4. `pacman -S  mariadb`. Check [wiki](https://wiki.archlinux.org/index.php/MySQL) for more info 
- 5. `pacman -S ruby`, `gem install sass`
+Instructions for *[Archlinux](https://www.archlinux.org/)*:
+ 1. Install required packages: `pacman -S python pip redis mariadb ruby`
+ 2. Follow the [database guide](https://wiki.archlinux.org/index.php/MySQL) to configure it if you need. 
+ 5. Install **sass**: `gem install sass`.
 
-Next steps are common:
- 1. `pip install -r requirements.txt`
- 2. open `mysql -u YOUR_USERNAME -p` and create database `create database django CHARACTER SET utf8 COLLATE utf8_general_ci`. Specify database connection options (username, password) in `chat/settings.py`. Next fill database with tables: `python manage.py init_db`
- 3. `sh download_content.sh`
+Instructions for *[CentOs](https://www.centos.org/)* can be found in [production](https://github.com/Deathangel908/djangochat/tree/production) branch.
+  
+After you finished installing programs and tools:
+ 1. Install python packages with `pip install -r requirements.txt`. 
+ 2. Create database. Open mysql command tool: `mysql -u YOUR_USERNAME -p` and create database `create database django CHARACTER SET utf8 COLLATE utf8_general_ci`. Specify database connection options (username, password) in `chat/settings.py`. Next fill database with tables: `python manage.py init_db`
+ 3. Static content fot chat stores in a [separate repository](https://github.com/Deathangel908/djangochat-config). To download all needed files and compile css execute: `sh download_content.sh`
 
-For developing option you can also configure pycharm filewatcher to autocompile css:
+For developing you can also configure pycharm filewatcher to autocompile css:
  1. arguments: `--no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded`
  2. working directory: `$ProjectFileDir$/chat/static/sass`
  3. output files to refresh: `$ProjectFileDir$/chat/static/css/`
  
-Start the chat:
-===============
+Afterwards to start the chat you need:
  0. Start `mysql` server if it's not started. 
  1. Start session holder: `redis-server`
- 2. Start WebSocket listener: `python manage.py start_tornado`
+ 2. Start webSocket listener: `python manage.py start_tornado`
  3. Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
- 4. Open in browser [http*s*://127.0.0.1:8000](https://127.0.0.1:8000)
- 5. If you're using firefox you probably need to allow self-assigned certificate for development. Open [https://localhost:8888](https://localhost:8888) (8888 is `API_PORT`) and add security exception
+ 4. Open in browser [http*s*://127.0.0.1:8000](https://127.0.0.1:8000).
+ 5. If you get an ssl error on establishing websocket connection in browser, that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
 
 # TODO
+* Add title for room. 
 * add scale to painter and Ctrl+Z
 * Add delete/edit message option (skype alike)
 * View profile show wrong profile
@@ -82,7 +72,6 @@ Start the chat:
 * android play() can only be initiated by a user gesture.
 * insecure images on usermessage editable div prevent sending messages
 * add 404page
-* # CONNECTION_MAX_AGE = 3000  # 3600 in my.cnf TODO dooesn't work
 * https://code.djangoproject.com/ticket/25489
 * http://stackoverflow.com/a/18843553/3872976
 * add antispam system

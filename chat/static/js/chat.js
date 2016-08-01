@@ -235,7 +235,6 @@ function Painter() {
 		self.scale *= zoom;
 	};
 	self.initChild = function () {
-		document.body.addEventListener('mouseup', self.finishDraw, false);
 		self.dom.canvas.addEventListener('mousedown', self.startDraw, false);
 		self.dom.container.onpaste = self.canvasImagePaste;
 		self.dom.container.ondrop = self.canvasImageDrop;
@@ -256,6 +255,7 @@ function Painter() {
 	self.superShow = self.show;
 	self.show = function () {
 		self.superShow();
+		document.body.addEventListener('mouseup', self.finishDraw, false);
 		self.dom.canvas.setAttribute('width', self.dom.canvas.offsetWidth);
 		self.dom.canvas.setAttribute('height', self.dom.canvas.offsetHeight);
 		self.ctx.lineWidth = 3;
@@ -264,6 +264,11 @@ function Painter() {
 		self.ctx.strokeStyle = self.dom.color.value;
 		self.setColorStrikeColor();
 		self.setPen();
+	};
+	self.superHide = self.hide;
+	self.hide = function() {
+		self.superHide();
+		document.body.removeEventListener('mouseup', self.finishDraw, false);
 	};
 	self.initChild();
 }
@@ -609,6 +614,7 @@ function ChannelsHandler() {
 	self.render = self.show;
 	self.ROOM_ID_ATTR = 'roomid';
 	self.activeChannel = DEFAULT_CHANNEL_NAME;
+	self.EDIT_MESSAGE_CLASS = 'changeMessage';
 	self.channels = {};
 	self.childDom = {
 		wrapper: $('wrapper'),
@@ -698,6 +704,7 @@ function ChannelsHandler() {
 		}
 	};
 	self.setActiveChannel = function (key) {
+		self.removeEditingMode();
 		self.hideActiveChannel();
 		self.activeChannel = key;
 		self.showActiveChannel();
@@ -768,21 +775,70 @@ function ChannelsHandler() {
 			}
 		}
 	};
+	self.handleEditMessage = function(event) {
+		if (!blankRegex.test(userMessage.textContent)) {
+			return;
+		}
+		var editLastMessageNode = self.getActiveChannel().lastMessage;
+		// only if message was sent 1 min ago + 2seconds for message to being processed
+		if (editLastMessageNode && editLastMessageNode.time + 58000 > new Date().getTime()) {
+			self.editLastMessageNode = editLastMessageNode;
+			self.editLastMessageNode.dom = $(editLastMessageNode.time);
+			CssUtils.addClass(self.editLastMessageNode.dom, self.EDIT_MESSAGE_CLASS);
+			var selector = '[id="{}"] .message-text-style'.format(editLastMessageNode.time);
+			userMessage.innerHTML = document.querySelector(selector).innerHTML;
+			self.placeCaretAtEnd();
+			event.preventDefault();
+		}
+	};
+	self.placeCaretAtEnd = function() {
+		var range = document.createRange();
+		range.selectNodeContents(userMessage);
+		range.collapse(false);
+		var sel = window.getSelection();
+		sel.removeAllRanges();
+		sel.addRange(range);
+	};
+	self.handleSendMessage = function() {
+		smileyUtil.purgeImagesFromSmileys();
+		var messageContent = userMessage.textContent;
+		messageContent = blankRegex.test(messageContent) ? null : messageContent;
+		var message;
+		if (self.editLastMessageNode) {
+			message = {
+				id: self.editLastMessageNode.id,
+				action: 'editMessage',
+				content: messageContent
+			};
+			self.removeEditingMode();
+		} else {
+			if (!messageContent) {
+				return;
+			}
+			message = {
+				action: 'sendMessage',
+				content: messageContent,
+				channel: self.activeChannel
+			};
+		}
+		self.sendMessage(message);
+	};
 	self.checkAndSendMessage = function (event) {
 		if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
 			event.preventDefault();
-			smileyUtil.purgeImagesFromSmileys();
-			var messageContent = userMessage.textContent;
-			if (blankRegex.test(messageContent)) {
-				return;
-			}
-			self.sendMessage({
-				content: messageContent,
-				action: 'sendMessage',
-				channel: self.activeChannel
-			});
+			self.handleSendMessage();
 		} else if (event.keyCode === 27) { // 27 = escape
 			smileyUtil.hideSmileys();
+			self.removeEditingMode();
+		} else if(event.keyCode == 38) { // up arrow
+			self.handleEditMessage(event);
+		}
+	};
+	self.removeEditingMode = function() {
+		if (self.editLastMessageNode) {
+			CssUtils.removeClass(self.editLastMessageNode.dom, self.EDIT_MESSAGE_CLASS);
+			self.editLastMessageNode = null;
+			userMessage.innerHTML = "";
 		}
 	};
 	self.addUserHolderClick = function (event) {
@@ -1110,7 +1166,8 @@ function showHelp() {
 		" open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> </span>",
 		"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
 		"<span>You can write multiline message by pressing <b>shift+Enter</b></span>",
-		"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon. To close appeared smile container click outside of it or press <b>Esc</b></span>",
+		"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon." +
+		" To close appeared smile container click outside of it or press <b>Esc</b></span>",
 		"You can comment somebody's message. This will be shown to all users in current channel. Just click on message time" +
 		"and it's content appears in message text",
 		"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
@@ -1122,7 +1179,10 @@ function showHelp() {
 		"You can load history of current channel. For this you need to focus place with messages by simply" +
 		" clicking on it and press arrow up/page up or just scroll up with mousewheel",
 		"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>",
-		"<span>To paste image from clipboard: focus box with messages (by clicking on it) and press <B>Ctrl + V</b></span>"
+		"<span>To paste image from clipboard: focus box with messages (by clicking on it) and press <B>Ctrl + V</b></span>",
+		"<span>You can edit/delete message that you have sent during one minute. Focus input text, delete its content " +
+		"and press <b>Up Arrow</b>. The edited message should become highlighted with outline. If you apply blank text the" +
+		" message will be removed.To exit the mode press <b>Esc</b></span>"
 	];
 	var index = localStorage.getItem('HelpIndex');
 	if (index == null) {
@@ -1146,33 +1206,49 @@ function SmileyUtil() {
 	self.tabNames = [];
 	self.smileyDict = {};
 	self.init = function () {
-		document.addEventListener("click", self.onDocClick);
 		self.loadSmileys(window.smileys_bas64_data);
+		userMessage.addEventListener("mousedown", function(event) {
+			event.stopPropagation(); // Don't fire onDocClick
+		});
 	};
 	self.hideSmileys = function () {
+		document.removeEventListener("mousedown", self.onDocClick);
 		CssUtils.hideElement(self.dom.smileParentHolder);
 	};
 	self.onDocClick = function (event) {
 		event = event || window.event;
-		for (var element = event.target; element; element = element.parentNode) {
-			if (element.id === "bottomWrapper" || element.id === self.dom.smileParentHolder.id) {
-				userMessage.focus();
-				return;
-			}
-		}
+		event.preventDefault(); //don't lose focus on usermessage
 		self.hideSmileys();
 	};
 	self.purgeImagesFromSmileys = function() {
 		userMessage.innerHTML = userMessage.innerHTML.replace(self.smileRegex, "$1");
 	};
 	self.addSmile = function (event) {
-		event = event || window.event;
+		event.preventDefault(); // prevents from losing focus
+		event.stopPropagation(); // don't allow onDocClick
+		//event = event || window.event; TODO is that really needed
 		var smileImg = event.target;
 		if (smileImg.tagName !== 'IMG') {
 			return;
 		}
-		userMessage.innerHTML += smileImg.outerHTML;
+		self.pasteHtmlAtCaret(smileImg.cloneNode());
 		console.log(getDebugMessage('Added smile "{}"', smileImg.alt));
+	};
+	self.pasteHtmlAtCaret = function (img) {
+		var sel = window.getSelection();
+		var range = sel.getRangeAt(0);
+		range.deleteContents();
+		// Range.createContextualFragment() would be useful here but is
+		// non-standard and not supported in all browsers (IE9, for one)
+		var frag = document.createDocumentFragment(), node, lastNode;
+		frag.appendChild(img);
+		range.insertNode(frag);
+		// Preserve the selection
+		range = range.cloneRange();
+		range.setStartAfter(img);
+		range.collapse(true);
+		sel.removeAllRanges();
+		sel.addRange(range);
 	};
 	self.encodeSmileys = function (html) {
 		html = encodeAnchorsHTML(html);
@@ -1183,17 +1259,30 @@ function SmileyUtil() {
 	};
 	self.toggleSmileys = function (event) {
 		event.stopPropagation(); // prevent top event
-		CssUtils.toggleVisibility(self.dom.smileParentHolder);
-		userMessage.focus();
+		event.preventDefault();
+		var becomeHidden = CssUtils.toggleVisibility(self.dom.smileParentHolder);
+		if (becomeHidden) {
+			document.removeEventListener("mousedown", self.onDocClick);
+		} else {
+			document.addEventListener("mousedown", self.onDocClick);
+			if (document.activeElement != userMessage) {
+				userMessage.focus();
+			}
+		}
 	};
-	self.showTabByName = function (event) {
-		if (event.target != null) {
-			if (event.target.tagName !== 'LI') {
+	self.showTabByName = function (eventOrTabName) {
+		var tagName;
+		if (eventOrTabName.target) { // if called by actionListener
+			if (eventOrTabName.target.tagName !== 'LI') {
 				// outer scope click
 				return;
 			}
+			eventOrTabName.stopPropagation();
+			eventOrTabName.preventDefault();
+			tagName = eventOrTabName.target.innerHTML;
+		} else {
+			tagName = eventOrTabName;
 		}
-		var tagName = event.target == null ? event : event.target.innerHTML;
 		for (var i = 0; i < self.tabNames.length; i++) {
 			CssUtils.hideElement($("tab-" + self.tabNames[i])); // loadSmileys currentSmileyHolderId
 			CssUtils.removeClass($("tab-name-" + self.tabNames[i]), 'activeTab');
@@ -1246,11 +1335,17 @@ function timeMessageClick(event) {
 	userMessage.focus();
 }
 
+function encodeMessage(data) {
+	return data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
+}
+
 function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	var self = this;
 	self.UNREAD_MESSAGE_CLASS = 'unreadMessage';
+	self.EDITED_MESSAGE_CLASS = 'editedMessage';
 	self.roomId = roomId;
 	self.roomName = roomName;
+	self.lastMessage = {};
 	self.dom = {
 		chatBoxDiv: chatboxDiv,
 		userList: document.createElement('ul'),
@@ -1421,14 +1516,10 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		userSuffix = isPrefix ? ' >> ' : ': ';
 		headSpan.insertAdjacentHTML('beforeend', userSuffix);
 		p.appendChild(headSpan);
-		if (htmlEncodedContent.indexOf("<img") == 0) {
-			p.insertAdjacentHTML('beforeend', htmlEncodedContent);
-		} else {
-			var textSpan = document.createElement('span');
-			textSpan.className = CONTENT_STYLE_CLASS;
-			textSpan.innerHTML = htmlEncodedContent;
-			p.appendChild(textSpan);
-		}
+		var textSpan = document.createElement('span');
+		textSpan.className = CONTENT_STYLE_CLASS;
+		textSpan.innerHTML = htmlEncodedContent;
+		p.appendChild(textSpan);
 		return p;
 	};
 	/**Insert ------- Mon Dec 21 2015 ----- if required
@@ -1518,11 +1609,36 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.headerId = headerId;
 		}
 	};
+	self.editMessage = function(data) {
+		var html = encodeMessage(data);
+		var p = $(data.time);
+		if (p != null) {
+			document.querySelector("[id='{}'] .message-text-style".format(data.time)).innerHTML = html;
+			CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
+		}
+	};
+	self.deleteMessage = function(data) {
+		var target = document.querySelector("[id='{}'] .message-text-style".format(data.time));
+		if (target) {
+			target.innerHTML = 'This message has been removed.';
+			CssUtils.addClass(target, 'removed-message');
+			if (data.userId == loggedUserId) {
+				self.lastMessage = null;
+				if (!window.newMessagesDisabled) {
+					growlInfo("Last message has been deleted");
+				}
+			}
+		}
+	};
 	self.printMessage = function (data, isNew) {
 		self.setHeaderId(data.id);
 		var user = self.allUsers[data.userId];
 		if (loggedUserId === data.userId) {
 			checkAndPlay(self.dom.chatOutgoing);
+			self.lastMessage = {
+				id: data.id,
+				time: data.time
+			}
 		} else {
 			checkAndPlay(self.dom.chatIncoming);
 		}
@@ -1530,7 +1646,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		//private message
 		var prefix = false;
 		var headerStyle = data.userId == loggedUserId ? self.SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
-		var preparedHtml = data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
+		var preparedHtml = encodeMessage(data);
 		notifier.notify(displayedUsername, data.content || 'image');
 		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
 		if (self.isHidden() && !window.newMessagesDisabled) {
@@ -2517,6 +2633,7 @@ function WsHandler() {
 function Storage() {
 	var self = this;
 	self.STORAGE_NAME = 'main';
+	self.actionsToSave = ['printMessage', 'loadMessages', 'editMessage', 'deleteMessage', 'loadOfflineMessages'];
 	self.loadMessagesFromLocalStorage = function () {
 		var jsonData = localStorage.getItem(self.STORAGE_NAME);
 		if (jsonData != null) {
@@ -2542,15 +2659,8 @@ function Storage() {
 	};
 	// Use both json and object repr for less JSON actions
 	self.saveMessageToStorage = function (objectItem, jsonItem) {
-		if (!notifier.isTabMain()) {
-			return
-		}
-		switch (objectItem['action']) {
-			case 'printMessage':
-			case 'loadMessages':
-			case 'loadOfflineMessages':
-				self.fastAddToStorage(jsonItem);
-				break;
+		if (notifier.isTabMain() && self.actionsToSave.indexOf(objectItem.action) >= 0) {
+			self.fastAddToStorage(jsonItem);
 		}
 	};
 	self.fastAddToStorage = function (text) {

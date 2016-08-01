@@ -40,16 +40,6 @@
 		<audio id="chatLogout" src="{% md5url 'sounds/ChatLogout.wav' %}" preload="none"></audio>
 		<audio id="chatCall" src="{% md5url 'sounds/Call.mp3' %}" preload="none"></audio>
 	</div>
-	<style>
-		#userProfile label, #userProfile td {
-			font-size: 20px;
-		}
-	@media screen and (max-height: 400px) {
-		#userProfile label, #userProfile td {
-			font-size: 12px;
-		}
-	}
-	</style>
 	<div id="wrapper" class="max-height-scrollable hidden">
 		<div id="chatBoxHolder" class="max-height-scrollable">
 			<div id="callContainer" class="hidden">
@@ -119,8 +109,8 @@
 			<div id="chat-user-table">
 			</div>
 		</div>
-		<div id="smileParentHolder" class="padding10 hidden" onclick="smileyUtil.addSmile(event);">
-			<ul id="tabNames" onclick="smileyUtil.showTabByName(event)"></ul>
+		<div id="smileParentHolder" class="padding10 hidden" onmousedown="smileyUtil.addSmile(event);">
+			<ul id="tabNames" onmousedown="smileyUtil.showTabByName(event)"></ul>
 		</div>
 	</div>
 	<div id="addUserHolder" class="hidden">
@@ -154,7 +144,7 @@
 		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
 		<i class="icon-picture" title="Attach Image File" onclick="$('imgInput').click()"></i>
 		<i class="icon-brush" title="Draw an Image" onclick="painter.show()"></i>
-		<i class="icon-smile" title="Add a smile :)" onclick="smileyUtil.toggleSmileys(event)"></i>
+		<i class="icon-smile" title="Add a smile :)" onmousedown="smileyUtil.toggleSmileys(event)"></i>
 		<div contenteditable="true" id="usermsg" onkeydown="channelsHandler.checkAndSendMessage(event)"></div>
 	{% comment %}TODO which chat variable to use?{% endcomment %}
 	</div>
@@ -162,7 +152,7 @@
 		<table class="fullwidth padding10">
 			<tr>
 				<th><label for="issue">The problem you discovered</label></th>
-				<td><textarea id="issue" tabindex="-1" aria-required="true" name="issue" required></textarea></td>
+				<td><textarea id="issue" tabindex="-1" name="issue" required></textarea></td>
 			</tr>
 			<tr>
 				<th><label for="version">Affected browser</label></th>
