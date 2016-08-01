@@ -1008,7 +1008,7 @@ function ChannelsHandler() {
 		var oldRooms = [];
 		for (var channelKey in self.channels) {
 			if (!self.channels.hasOwnProperty(channelKey)) continue;
-			var oldRoomId = parseInt(channelKey.substring(1));
+			var oldRoomId = parseInt(channelKey);
 			oldRooms.push(oldRoomId);
 			if (!rooms[oldRoomId]) {
 				self.destroyChannel(channelKey);
