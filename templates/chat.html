@@ -40,16 +40,6 @@
 		<audio id="chatLogout" src="{% md5url 'sounds/ChatLogout.wav' %}" preload="none"></audio>
 		<audio id="chatCall" src="{% md5url 'sounds/Call.mp3' %}" preload="none"></audio>
 	</div>
-	<style>
-		#userProfile label, #userProfile td {
-			font-size: 20px;
-		}
-	@media screen and (max-height: 400px) {
-		#userProfile label, #userProfile td {
-			font-size: 12px;
-		}
-	}
-	</style>
 	<div id="wrapper" class="max-height-scrollable hidden">
 		<div id="chatBoxHolder" class="max-height-scrollable">
 			<div id="callContainer" class="hidden">
@@ -167,7 +157,7 @@
 		<table class="fullwidth padding10">
 			<tr>
 				<th><label for="issue">The problem you discovered</label></th>
-				<td><textarea id="issue" tabindex="-1" aria-required="true" name="issue" required></textarea></td>
+				<td><textarea id="issue" tabindex="-1" name="issue" required></textarea></td>
 			</tr>
 			<tr>
 				<th><label for="version">Affected browser</label></th>

@@ -1618,9 +1618,10 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 	};
 	self.deleteMessage = function(data) {
-		var target = $(data.time);
+		var target = document.querySelector("[id='{}'] .message-text-style".format(data.time));
 		if (target) {
-			CssUtils.deleteElement(target);
+			target.innerHTML = 'This message has been removed.';
+			CssUtils.addClass(target, 'removed-message');
 			if (data.userId == loggedUserId) {
 				self.lastMessage = null;
 				if (!window.newMessagesDisabled) {

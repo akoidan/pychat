@@ -11,8 +11,7 @@
 	<form id="recoverForm" class="hidden" method="post" onsubmit="restorePassword(event);">
 		<h1>Restore password</h1>
 		<div>
-			<input type="text" style="padding-left: 10px; width: calc(100% - 35px)"
-				   required placeholder="Username or email" name="username_or_password" value="" id="username"/>
+			<input type="text" required placeholder="Username or email" class="username-or-pass" name="username_or_password" value="" />
 			<div class="slider">Enter your username or email</div>
 		</div>
 		{% if captcha %}
@@ -27,7 +26,7 @@
 		<h1>Wellcome back!</h1>
 		<div>
 			<i class="icon-user"></i>
-			<input type="text" maxlength="16" required placeholder="Username" name="username" value="" id="username"/>
+			<input type="text" maxlength="16" required placeholder="Username" name="username" value=""/>
 		</div>
 		<div>
 			<i class="icon-key"></i>
@@ -42,8 +41,7 @@
 		<h1>Create new account</h1>
 		<div class="required">
 			<i class="icon-user"></i>
-			<input type="text" maxlength="16" required
-				   placeholder="Username" name="username" value="" id="rusername"/>
+			<input type="text" maxlength="16" required placeholder="Username" name="username" value="" id="rusername"/>
 			<div class="slider closed"></div>
 		</div>
 		<div class="required">
