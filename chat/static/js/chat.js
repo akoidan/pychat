@@ -1346,7 +1346,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	var self = this;
 	self.UNREAD_MESSAGE_CLASS = 'unreadMessage';
 	self.EDITED_MESSAGE_CLASS = 'editedMessage';
-	self.roomId = roomId;
+	self.roomId = parseInt(roomId);
 	self.roomName = roomName;
 	self.lastMessage = {};
 	self.dom = {
