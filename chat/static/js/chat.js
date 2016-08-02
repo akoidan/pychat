@@ -45,7 +45,7 @@ onDocLoad(function () {
 	notifier = new NotifierHandler();
 	painter = new Painter();
 	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
-	wsHandler.start_chat_ws();
+	wsHandler.listenWS();
 	showHelp();
 });
 
@@ -1000,30 +1000,33 @@ function ChannelsHandler() {
 
 	};
 	self.destroyChannel = function (channelKey) {
+		console.log(getDebugMessage("Destroying channel {} while offline", channelKey));
 		self.channels[channelKey].destroy();
 		delete self.channels[channelKey];
 	};
 	self.setRooms = function (message) {
 		var rooms = message.content;
-		var oldRooms = [];
 		for (var channelKey in self.channels) {
 			if (!self.channels.hasOwnProperty(channelKey)) continue;
-			var oldRoomId = parseInt(channelKey);
-			oldRooms.push(oldRoomId);
-			if (!rooms[oldRoomId]) {
+			if (!rooms[channelKey]) {
 				self.destroyChannel(channelKey);
 			}
 		}
-		for (var strRoomId in rooms) {
+		for (var roomId in rooms) {
 			// if a new room has been added while disconnected
-			if (!rooms.hasOwnProperty(strRoomId)) continue;
-			var roomId = parseInt(strRoomId);
-			if (oldRooms.indexOf(roomId) < 0) {
-				var room = rooms[strRoomId];
-				if (room.name) {
-					self.createNewRoomChatHandler(roomId, room.name, room.users);
+			if (!rooms.hasOwnProperty(roomId)) continue;
+			var newRoom = rooms[roomId];
+			var oldRoom = self.channels[roomId];
+			var newUserList = newRoom.users;
+			if (oldRoom) {
+				oldRoom.updateAllDomUsers(newUserList);
+			} else {
+				var roomName = newRoom.name;
+				console.log(getDebugMessage("Creating new room '{}' with id {} while offline", roomName, roomId));
+				if (roomName) {
+					self.createNewRoomChatHandler(roomId, roomName, newUserList);
 				} else {
-					self.createNewUserChatHandler(roomId, room.users);
+					self.createNewUserChatHandler(roomId, newUserList);
 				}
 			}
 		}
@@ -1358,6 +1361,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		chatIncoming: $("chatIncoming"),
 		chatOutgoing: $("chatOutgoing")
 	};
+	self.dom.userList.setAttribute('roomId', roomId);
 	self.newMessages = 0;
 	self.lastLoadUpHistoryRequest = 0;
 	self.allMessages = [];
@@ -1440,26 +1444,46 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 				sex: message.sex,
 				user: message.user
 			};
-			self.addDomUserOnline(message.userId, message.sex, message.user);
+			self.addUserLi(message.userId, message.sex, message.user);
 		}
 	};
 	self.addUserToAll = self.addUserToDom;
-	self.setDomOnlineUsers = function (users) {
+	self.updateAllDomUsers = function (newUsers) {
+		for (var oldUserId in self.allUsers) {
+			if (!self.allUsers.hasOwnProperty(oldUserId)) continue;
+			if (!newUsers[oldUserId]) {
+				var oldLi = document.querySelector('ul[roomId="{}"] > li[userId="{}"]'.format(self.roomId, oldUserId));
+				CssUtils.deleteElement(oldLi);
+				console.log(getDebugMessage("User with id {} has been deleted while offline", oldUserId));
+				delete self.allUsers[oldUserId];
+			}
+		}
+		for (var newUserId in newUsers) {
+			if (!newUsers.hasOwnProperty(newUserId)) continue;
+			var newUser = newUsers[newUserId];
+			if (!self.allUsers[newUserId]) {
+				self.allUsers[newUserId] = newUser;
+				console.log(getDebugMessage("User with id {} has been signed up while offline", newUserId));
+				self.addUserLi(newUserId, newUser.sex, newUser.user);
+			}
+		}
+	};
+	self.setAllDomUsers = function (users) {
 		self.dom.userList.innerHTML = '';
 		self.allUsers = users;
 		for (var userId in self.allUsers) {
 			if (!self.allUsers.hasOwnProperty(userId)) continue;
 			var user = self.allUsers[userId];
-			self.addDomUserOnline(userId, user.sex, user.user);
+			self.addUserLi(userId, user.sex, user.user);
 		}
 	};
-	self.addDomUserOnline = function (userId, sex, username) {
+	self.addUserLi = function (userId, sex, username) {
 		var li = createUserLi(userId, sex, username);
 		li.className = 'offline';
 		self.allUsers[userId].li = li;
 		self.dom.userList.appendChild(li);
 	};
-	self.setDomOnlineUsers(allUsers);
+	self.setAllDomUsers(allUsers);
 	self.isHidden = function () {
 		return CssUtils.isHidden(self.dom.chatBoxDiv);
 	};
@@ -2538,9 +2562,9 @@ function WsHandler() {
 		}
 		self.wsState = 1;
 		// Try to reconnect in 10 seconds
-		setTimeout(self.start_chat_ws, CONNECTION_RETRY_TIME);
+		setTimeout(self.listenWS, CONNECTION_RETRY_TIME);
 	};
-	self.start_chat_ws = function () {
+	self.listenWS = function () {
 		if (!window.WebSocket) {
 			growlError(getText("Your browser ({}) doesn't support webSockets. Supported browsers: " +
 					"Android, Chrome, Opera, Safari, IE11, Edge, Firefox", window.browserVersion));
