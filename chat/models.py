@@ -49,7 +49,7 @@ class User(AbstractBaseUser):
 	objects = BaseUserManager()
 
 	# ISO/IEC 5218 1 male, 2 - female
-	sex = models.SmallIntegerField(null=False)
+	sex = models.SmallIntegerField(null=False, default=0)
 
 	@property
 	def sex_str(self):

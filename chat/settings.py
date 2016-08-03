@@ -70,11 +70,14 @@ INSTALLED_APPS = (
 	"sslserver"
 )
 
-# TODO uncomment
+# TODO replace this into your keys if you want this features to be available
 # Google recaptcha keys
 RECAPTHCA_SITE_URL = 'https://www.google.com/recaptcha/api.js'
 # RECAPTCHA_SECRET_KEY = 'REPLACE_THIS_WITH_KEY_FOR_RETRIEVING_RESULT'
 # RECAPTCHA_SITE_KEY = 'REPLACE_THIS_WITH_DATA-SITEKEY_DIV_ATTRIBUTE'
+# GOOGLE_OAUTH_2_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com'
+GOOGLE_OAUTH_2_JS_URL = 'https://apis.google.com/js/platform.js'
+# GOOGLE_OAUTH_2_HOST = 'pychat.org'
 
 SESSION_ENGINE = 'redis_sessions.session'
 BROKER_URL = 'redis://localhost:6379/0'
@@ -175,7 +178,6 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 AUTH_PROFILE_MODULE = 'chat.UserProfile'
 
 if 'start_tornado' in sys.argv:
-	# CONNECTION_MAX_AGE = 3000  # 3600 in my.cnf TODO dooesn't work
 	log_file_name = 'tornado.log'
 else:
 	log_file_name = 'chat.log'
