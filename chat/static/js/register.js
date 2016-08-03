@@ -239,48 +239,48 @@ function restorePassword(event) {
 }
 
 
-function sendGoogleTokenToServer() {
+function sendGoogleTokenToServer(token) {
 	doPost('/google-auth', {
-		token: googleToken
+		token: token
 	}, onRegisterProceed);
 }
+
+
 function onGoogleSignIn() {
 	var googleUser = auth2.currentUser.get();
 	var profile = googleUser.getBasicProfile();
 	console.log(getDebugMessage("Signed as {} with id {} and email {}  ",
 			profile.getName(), profile.getId(), profile.getEmail()));
 	googleToken = googleUser.getAuthResponse().id_token;
-	sendGoogleTokenToServer();
+	sendGoogleTokenToServer(googleToken);
 }
+
 
 function handleClientLoad(event) {
 	event.preventDefault(); // somehow button triggers sumbit
 	// Load the API client and auth library
 	if (googleToken) {
-		sendGoogleTokenToServer()
+		sendGoogleTokenToServer(googleToken)
 	} else {
-		gapi.load('client:auth2', initAuth);
+		doGet(G_OAUTH_URL, function () {
+			gapi.load('client:auth2', function () {
+			  //gapi.client.setApiKey(apiKey);
+				gapi.auth2.init().then(function () {
+					auth2 = gapi.auth2.getAuthInstance();
+					auth2.isSignedIn.listen(function (isSignedIn) {
+						if (isSignedIn) {
+							onGoogleSignIn();
+						} else {
+							console.warn(getDebugMessage("not signed"));
+						}
+					});
+					if (auth2.isSignedIn.get()) {
+						onGoogleSignIn();
+					} else {
+						auth2.signIn();
+					}
+				});
+			});
+		});
 	}
-}
-
-function updateSigninStatus(isSignedIn) {
-	if (isSignedIn) {
-		onGoogleSignIn();
-	} else {
-		console.warn(getDebugMessage("not signed"));
-	}
-}
-
-
-function initAuth() {
-  //gapi.client.setApiKey(apiKey);
-	gapi.auth2.init().then(function (lol) {
-		auth2 = gapi.auth2.getAuthInstance();
-		auth2.isSignedIn.listen(updateSigninStatus);
-		if (auth2.isSignedIn.get()) {
-			onGoogleSignIn();
-		} else {
-			auth2.signIn();
-		}
-	});
 }
