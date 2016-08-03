@@ -10,7 +10,9 @@
 	{% if oauth_token %}
 		<meta name="google-signin-scope" content="profile email">
 		<meta name="google-signin-client_id" content="{{ oauth_token }}">
-		<script src='{{ oauth_url }}'></script>
+		<script>
+			const G_OAUTH_URL = '{{oauth_url}}';
+		</script>
 	{% endif %}
 {% endblock %}
 {% block content %}
