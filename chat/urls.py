@@ -18,6 +18,7 @@ urlpatterns = patterns(
 	url(r'^auth$', 'chat.views.auth'),
 	url(r'^register$', RegisterView.as_view(), name='register'),
 	url(r'^confirm_email$', 'chat.views.confirm_email'),
+	url(r'^google-auth', 'chat.views.google_auth'),
 	# story/register.js uses link below
 	url(r'^validate_user$', 'chat.views.validate_user'),
 	url(r'^restore_password$', RestorePassword.as_view(), name='restore_pass'),

@@ -3,19 +3,27 @@ import logging
 import re
 import sys
 from io import BytesIO
+from urllib.request import urlopen as wget
 
 import requests
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
+from oauth2client import client
 
 from chat import local
 from chat import settings
+from chat.log_filters import id_generator
 from chat.models import User, UserProfile, Verification, RoomUsers
 from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID
 
-USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
+USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
+
+RECAPTCHA_SECRET_KEY = getattr(settings, "RECAPTCHA_SECRET_KEY", None)
+GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
+GOOGLE_OAUTH_2_HOST = getattr(settings, "GOOGLE_OAUTH_2_HOST", None)
 
 logger = logging.getLogger(__name__)
 
@@ -106,15 +114,14 @@ def check_captcha(request):
 	:raises ValidationError: if captcha is not valid or not set
 	If RECAPTCHA_SECRET_KEY is enabled in settings validates request with it
 	"""
-	captcha_private_key = getattr(settings, "RECAPTCHA_SECRET_KEY", None)
-	if not captcha_private_key:
+	if not RECAPTCHA_SECRET_KEY:
 		logger.debug('Skipping captcha validation')
 		return
 	try:
 		captcha_rs = request.POST.get('g-recaptcha-response')
 		url = "https://www.google.com/recaptcha/api/siteverify"
 		params = {
-			'secret': captcha_private_key,
+			'secret': RECAPTCHA_SECRET_KEY,
 			'response': captcha_rs,
 			'remoteip': local.client_ip
 		}
@@ -163,9 +170,66 @@ def extract_photo(image_base64):
 	return image
 
 
-def create_user_profile(email, password, sex, username):
-	user = UserProfile(username=username, email=email, sex_str=sex)
-	user.set_password(password)
+def get_google_user_native(token):
+	if GOOGLE_OAUTH_2_CLIENT_ID is None:
+		raise ValidationError("Auth key is not specified")
+	response = client.verify_id_token(token, None)
+	if response['aud'] != GOOGLE_OAUTH_2_CLIENT_ID:
+		raise ValidationError("Unrecognized client.")
+	if response['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+		raise ValidationError("Wrong issuer.")
+	if GOOGLE_OAUTH_2_HOST is not None and response['hd'] != GOOGLE_OAUTH_2_HOST:
+		raise ValidationError("Wrong hosted domain.")
+	if response['email'] is None:
+		raise ValidationError("Google didn't provide an email")
+	return response
+
+
+def generate_user_profile_from_gtoken(token):
+	response = get_google_user_native(token)
+	email = response['email']
+	try:
+		user_profile = UserProfile.objects.get(email=email)
+	except UserProfile.DoesNotExist:
+		try:
+			# replace all characters but a valid one with '-' and cut to 15 chars
+			username = re.sub('[^0-9a-zA-Z-_]+', '-', email.rsplit('@')[0])[:15]
+			check_user(username)
+		except ValidationError:
+			username = id_generator(8)
+		user_profile = UserProfile(
+			name=response.get('given_name'),
+			surname=response.get('family_name'),
+			email=email,
+			username=username
+		)
+		download_http_photo(response.get('picture'), user_profile)
+		user_profile.save()
+		create_user_model(user_profile)
+	return user_profile
+
+
+def download_http_photo(url, user_profile):
+	if url is not None:
+		try:
+			response = wget(url)
+			# first param for extension
+			user_profile.photo.save(url, ContentFile(response.read()))
+		except Exception as e:
+			logger.error("Unable to download photo from url %s for user %s because %s",
+					url, user_profile.username, e)
+
+
+def revoke_google_oauth(token):
+	pass
+	# params = {
+	# 	'token': token,
+	# }
+	# raw_response = requests.post(GOOGLE_REVOKE_URI, params=params, verify=True)
+	# return raw_response.json()
+
+
+def create_user_model(user):
 	user.save()
 	RoomUsers(user_id=user.id, room_id=ALL_ROOM_ID).save()
 	logger.info('Signed up new user %s, subscribed for channels with id %d', user, ALL_ROOM_ID)

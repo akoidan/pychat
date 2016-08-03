@@ -111,11 +111,13 @@ function getUrlParam(name, url) {
 
 function setUrlParam(name, value) {
 	var prevValue = getUrlParam(name);
+	var url = window.location.href;
+	var text;
 	if (prevValue == null) {
 		var textToFormat = url.indexOf("?") >= 0 ? "{}&{}={}" : "{}?{}={}";
-		var text = textToFormat.format(window.location.href, name, value);
+		text = textToFormat.format(url, name, value);
 	} else {
-		text = window.location.href.replace(name + "=" + prevValue, name + "=" + value);
+		text = url.replace(name + "=" + prevValue, name + "=" + value);
 	}
 	window.history.pushState('page2', 'Title', text);
 }

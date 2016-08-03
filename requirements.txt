@@ -1,4 +1,5 @@
 setuptools
+oauth2client
 django>1.7.0
 simplejson
 redis

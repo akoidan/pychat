@@ -3,6 +3,8 @@ var registerForm;
 var recoverForm;
 var showLoginEl;
 var showRegisterEl;
+var auth2;
+var googleToken;
 
 var RegisterValidator = function () {
 	var self = this;
@@ -201,18 +203,19 @@ onDocLoad(function () {
 	}
 });
 
+
+function onRegisterProceed(data) {
+	//ajaxHide();
+	if (data === RESPONSE_SUCCESS) {
+		window.location.href = '/';
+	} else {
+		growlError(data);
+	}
+}
+
 function register(event) {
 	event.preventDefault();
-	//ajaxShow(); TODO
-	var callback = function (data) {
-		//ajaxHide();
-		if (data === RESPONSE_SUCCESS) {
-			window.location.href = '/';
-		} else {
-			growlError(data);
-		}
-	};
-	doPost('/register', null, callback, registerForm);
+	doPost('/register', null, onRegisterProceed, registerForm);
 }
 
 
@@ -233,4 +236,51 @@ function restorePassword(event) {
 		}
 	};
 	doPost('/send_restore_password', null, callback, form);
+}
+
+
+function sendGoogleTokenToServer() {
+	doPost('/google-auth', {
+		token: googleToken
+	}, onRegisterProceed);
+}
+function onGoogleSignIn() {
+	var googleUser = auth2.currentUser.get();
+	var profile = googleUser.getBasicProfile();
+	console.log(getDebugMessage("Signed as {} with id {} and email {}  ",
+			profile.getName(), profile.getId(), profile.getEmail()));
+	googleToken = googleUser.getAuthResponse().id_token;
+	sendGoogleTokenToServer();
+}
+
+function handleClientLoad(event) {
+	event.preventDefault(); // somehow button triggers sumbit
+	// Load the API client and auth library
+	if (googleToken) {
+		sendGoogleTokenToServer()
+	} else {
+		gapi.load('client:auth2', initAuth);
+	}
+}
+
+function updateSigninStatus(isSignedIn) {
+	if (isSignedIn) {
+		onGoogleSignIn();
+	} else {
+		console.warn(getDebugMessage("not signed"));
+	}
+}
+
+
+function initAuth() {
+  //gapi.client.setApiKey(apiKey);
+	gapi.auth2.init().then(function (lol) {
+		auth2 = gapi.auth2.getAuthInstance();
+		auth2.isSignedIn.listen(updateSigninStatus);
+		if (auth2.isSignedIn.get()) {
+			onGoogleSignIn();
+		} else {
+			auth2.signIn();
+		}
+	});
 }

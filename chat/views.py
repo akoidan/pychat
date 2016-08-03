@@ -28,10 +28,13 @@ from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification
 from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging, SITE_PROTOCOL
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_email_verification, \
-	create_user_profile, check_captcha
+	create_user_model, check_captcha, revoke_google_oauth, generate_user_profile_from_gtoken
 
 logger = logging.getLogger(__name__)
-
+RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
+RECAPTHCA_SITE_URL = getattr(settings, "RECAPTHCA_SITE_URL", None)
+GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
+GOOGLE_OAUTH_2_JS_URL = getattr(settings, "GOOGLE_OAUTH_2_JS_URL", None)
 
 # TODO doesn't work
 def handler404(request):
@@ -80,14 +83,32 @@ def home(request):
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
 
+def google_auth(request):
+	try:
+		rp = request.POST
+		logger.info('Got google-auth request: %s', rp)
+		token = rp.get('token')
+		user_profile = generate_user_profile_from_gtoken(token)
+		user_profile.backend = 'django.contrib.auth.backends.ModelBackend'
+		djangologin(request, user_profile)
+		request.session.setdefault('_oauth2_token', token)
+		request.session.save()
+		return HttpResponse(content=VALIDATION_IS_OK, content_type='text/plain')
+	except ValidationError as e:
+		logger.warn("Unable to proceed google sing in because %s", e.message)
+		return HttpResponse(content="Unable to sign in via google because".format(e.message), content_type='text/plain')
+
+
 @login_required_no_redirect(True)
 def logout(request):
 	"""
 	POST. Logs out into system.
 	"""
+	g_token = request.session.get('_oauth2_token')
+	if g_token:
+		revoke_google_oauth(g_token)
 	djangologout(request)
-	response = HttpResponseRedirect('/')
-	return response
+	return HttpResponseRedirect('/')
 
 
 @require_http_methods(['POST'])
@@ -302,10 +323,15 @@ class ProfileView(View):
 class RegisterView(View):
 
 	def get(self, request):
+		logger.debug(
+			'Rendering register page with captcha site key %s and oauth key %s',
+			RECAPTCHA_SITE_KEY, GOOGLE_OAUTH_2_CLIENT_ID
+		)
 		c = csrf(request)
-		c['captcha'] = getattr(settings, "RECAPTCHA_SITE_KEY", None)
-		logger.debug('Rendering register page with captcha site key %s', c['captcha'])
-		c['captcha_url'] = getattr(settings, "RECAPTHCA_SITE_URL", None)
+		c['captcha_key'] = RECAPTCHA_SITE_KEY
+		c['captcha_url'] = RECAPTHCA_SITE_URL
+		c['oauth_url'] = GOOGLE_OAUTH_2_JS_URL
+		c['oauth_token'] = GOOGLE_OAUTH_2_CLIENT_ID
 		return render_to_response("register.html", c, context_instance=RequestContext(request))
 
 	@transaction.atomic
@@ -317,7 +343,9 @@ class RegisterView(View):
 			check_user(username)
 			check_password(password)
 			check_email(email)
-			user_profile = create_user_profile(email, password, rp.get('sex'), username)
+			user_profile = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
+			user_profile.set_password(password)
+			create_user_model(user_profile)
 			# You must call authenticate before you can call login
 			auth_user = authenticate(username=username, password=password)
 			message = VALIDATION_IS_OK  # redirect
