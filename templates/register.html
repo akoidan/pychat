@@ -1,7 +1,6 @@
 {% extends "base.html" %}
 {% load md5url %}
 {% block head %}
-
 	<script src="{% md5url "js/register.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/register.css' %}">
 	{% if captcha_key %}
@@ -12,6 +11,12 @@
 		<meta name="google-signin-client_id" content="{{ oauth_token }}">
 		<script>
 			const G_OAUTH_URL = '{{oauth_url}}';
+		</script>
+	{% endif %}
+	{% if fb_app_id %}
+		<script>
+			const FACEBOOK_APP_ID = '{{fb_app_id}}';
+			const FACEBOOK_JS_URL = '{{fb_js_url}}';
 		</script>
 	{% endif %}
 {% endblock %}
@@ -43,12 +48,19 @@
 			<input type="password" name="password" placeholder="Password" id="password" required/>
 		</div>
 		<div class="forg-pass">
-			{% if oauth_token %}
-				<button class="g-icon" title="Sign in using google account" onclick="handleClientLoad(event)">Via Google</button>
-			{% endif %}
 			<span id="recoverPassword">Forgot Password?</span>
 		</div>
 		<div>
+			{% if oauth_token %}
+				<button class="g-icon" title="Sign in using google account" onclick="googleLogin(event)">Via
+					Google
+				</button>
+			{% endif %}
+			{% if fb_app_id %}
+				<button title="Sign in using facebook account" class="f-icon" onclick="facebookLogin(event)">
+					<i class="icon-facebook-squared"></i>Via Facebook
+				</button>
+			{% endif %}
 			<input type="submit" class="blue-button submit-button" value="LOG IN"/>
 		</div>
 	</form>
@@ -86,10 +98,15 @@
 			<div class="slider closed"></div>
 		</div>
 		{% if oauth_token %}
-			<button class="g-icon" title="Sign up using google account" onclick="handleClientLoad(event)">Via Google</button>
+			<button class="g-icon" title="Sign up using google account" onclick="googleLogin(event)">Via Google</button>
+		{% endif %}
+		{% if fb_app_id %}
+			<button title="Sign in using facebook account" class="f-icon" onclick="facebookLogin(event)">
+				<i class="icon-facebook-squared"></i>Via Facebook
+			</button>
 		{% endif %}
 		<input type="submit" class="blue-button submit-button" value="REGISTER"/>
-		{% csrf_token %}
+		{% csrf_token %} {% comment %}IS csrf needed?{% endcomment %}
 	</form>
 </div>
 {% endblock content %}

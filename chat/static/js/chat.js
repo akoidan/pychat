@@ -84,7 +84,7 @@ function Painter() {
 	self.scale = 1;
 	self.originx = 0;
 	self.originy = 0;
-	self.startDraw = function (e) {
+	self.startDraw = function (e) { // TODO start draw line without moving, if user just clicks on place
 		self.mouseDown++;
 		var rect = painter.dom.canvas.getBoundingClientRect();
 		self.leftOffset = rect.left;
@@ -313,7 +313,7 @@ function NotifierHandler() {
 			self.askPermissions();
 		}
 	};
-	self.notificationClick = function (x) {
+	self.notificationClick = function () {
 		window.focus();
 		this.close()
 	};
@@ -437,7 +437,7 @@ function Page() {
 		show: self.show,
 		dom: self.dom
 	};
-	self.toString = function (event) {
+	self.toString = function () {
 		return self.name;
 	}
 }
@@ -1243,7 +1243,7 @@ function SmileyUtil() {
 		range.deleteContents();
 		// Range.createContextualFragment() would be useful here but is
 		// non-standard and not supported in all browsers (IE9, for one)
-		var frag = document.createDocumentFragment(), node, lastNode;
+		var frag = document.createDocumentFragment();
 		frag.appendChild(img);
 		range.insertNode(frag);
 		// Preserve the selection
@@ -2059,7 +2059,6 @@ function WebRtcApi() {
 	};
 	self.showCallDialog = function (isCallActive) {
 		isCallActive = isCallActive || self.isActive();
-		var activeChannel = channelsHandler.getActiveChannel();
 		self.setIconState(isCallActive);
 		if (!isCallActive) {
 			self.setHeaderText("Make a call");
@@ -2234,11 +2233,9 @@ function WebRtcApi() {
 		self["on" + data.type](data);
 	};
 	self.clearTimeout = function () {
-		var timeoutCleaned = false;
 		if (self.timeoutFunnction) {
 			clearTimeout(self.timeoutFunnction);
 			self.timeoutFunnction = null;
-			//timeoutCleaned = true;
 		}
 	};
 	self.answerToWebrtc = function () {

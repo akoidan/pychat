@@ -5,7 +5,6 @@ import time
 from threading import Thread
 from urllib.request import urlopen
 
-import datetime
 import tornado.gen
 import tornado.httpclient
 import tornado.ioloop
@@ -43,7 +42,7 @@ logger = logging.getLogger(__name__)
 #	wait_for_available=True)
 
 
-class Actions:
+class Actions(object):
 	LOGIN = 'addOnlineUser'
 	LOGOUT = 'removeOnlineUser'
 	SEND_MESSAGE = 'sendMessage'
@@ -63,7 +62,7 @@ class Actions:
 	OFFLINE_MESSAGES = 'loadOfflineMessages'
 
 
-class VarNames:
+class VarNames(object):
 	CALL_TYPE = 'type'
 	USER = 'user'
 	USER_ID = 'userId'
@@ -85,7 +84,7 @@ class VarNames:
 	# ROOM_ID = 'roomId'
 
 
-class CallType:
+class CallType(object):
 	OFFER = 'offer'
 
 class HandlerNames:

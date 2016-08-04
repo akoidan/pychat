@@ -5,6 +5,7 @@ var showLoginEl;
 var showRegisterEl;
 var auth2;
 var googleToken;
+var FBApiLoaded = false;
 
 var RegisterValidator = function () {
 	var self = this;
@@ -256,22 +257,24 @@ function onGoogleSignIn() {
 }
 
 
-function handleClientLoad(event) {
+function googleLogin(event) {
 	event.preventDefault(); // somehow button triggers sumbit
 	// Load the API client and auth library
+	growlInfo("Trying to log in via Google");
 	if (googleToken) {
 		sendGoogleTokenToServer(googleToken)
 	} else {
 		doGet(G_OAUTH_URL, function () {
 			gapi.load('client:auth2', function () {
 			  //gapi.client.setApiKey(apiKey);
+				console.log(getDebugMessage("Initing google sdk"));
 				gapi.auth2.init().then(function () {
 					auth2 = gapi.auth2.getAuthInstance();
 					auth2.isSignedIn.listen(function (isSignedIn) {
 						if (isSignedIn) {
 							onGoogleSignIn();
 						} else {
-							console.warn(getDebugMessage("not signed"));
+							console.warn(getDebugMessage("Skipping sending token because not signed in into google"));
 						}
 					});
 					if (auth2.isSignedIn.get()) {
@@ -282,5 +285,45 @@ function handleClientLoad(event) {
 				});
 			});
 		});
+	}
+}
+
+function facebookLogin(event) {
+	if (event) event.preventDefault();
+	growlInfo("Trying to log in via Facebook");
+	if (!FBApiLoaded) {
+		doGet(FACEBOOK_JS_URL);
+		FBApiLoaded = true;
+	} else {
+		FB.getLoginStatus(fbStatusChange);
+	}
+}
+
+window.fbAsyncInit = function () {
+	console.log(getDebugMessage("Initing facebook sdk..."));
+	FB.init({
+		appId: FACEBOOK_APP_ID,
+		xfbml: true,
+		version: 'v2.7'
+	});
+	FB.getLoginStatus(fbStatusChange);
+};
+
+function fbStatusChange(response) {
+	console.log(response);
+	if (response.status === 'connected') {
+		// Logged into your app and Facebook.
+		doPost('/facebook-auth', {
+			token: response.authResponse.accessToken
+		}, onRegisterProceed);
+	} else if (response.status === 'not_authorized') {
+		growlInfo("Allow facebook application to use your data");
+	} else {
+		var growl = new Growl("Login into your facebook account first and reload this page");
+		growl.info();
+		growl.growlHolder.onclick  = function() {
+			window.open('https://fb.com');
+		};
+		growl.growlHolder.style.cursor = 'pointer';
 	}
 }
