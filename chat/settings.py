@@ -282,6 +282,19 @@ if not DEBUG:
 ALL_REDIS_ROOM = 'all'
 ALL_ROOM_ID = 1
 
+SELECT_SELF_ROOM = """SELECT
+	a.id,
+	a.disabled
+FROM chat_room a
+WHERE a.id IN %s AND
+			EXISTS
+			(
+					SELECT 1
+					FROM chat_room_users b
+					WHERE a.id = b.room_id
+					HAVING COUNT(b.user_id) = 1
+			)"""
+
 UPDATE_LAST_READ_MESSAGE = """
 UPDATE chat_room_users out_cru
   INNER JOIN
