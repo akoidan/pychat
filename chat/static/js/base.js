@@ -37,7 +37,7 @@ window.sound = 0;
 window.loggingEnabled = true;
 var growlHolder;
 var ajaxLoader;
-var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|$))/g; /*http://anycharacter except end of text, <br> or space*/
+var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|&#39;|$))/g;/*http://anycharacter except end of text, <br> or space*/
 var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
 var muteBtn;
 var inputRangeStyles = {};
