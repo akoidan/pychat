@@ -415,23 +415,6 @@ function mute() {
 }
 
 
-function login(event) {
-	event.preventDefault();
-	var callback = function (data) {
-		if (data === RESPONSE_SUCCESS) {
-			var nextUrl =getUrlParam('next');
-			if (nextUrl == null) {
-				nextUrl = '/';
-			}
-			window.location.href = nextUrl;
-		} else {
-			growlError(data);
-		}
-	};
-	doPost('/auth', null, callback, loginForm);
-}
-
-
 function readCookie(name, c, C, i) {
 	c = document.cookie.split('; ');
 	var cookies = {};
@@ -528,10 +511,15 @@ function doGet(fileUrl, callback) {
 			}
 			xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
 			xobj.onreadystatechange = function () {
-				if (xobj.readyState === 4 && xobj.status === 200) {
-					console.log(getDebugMessage('GET in: {} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100)));
-					if (callback) {
-						callback(xobj.responseText);
+				if (xobj.readyState === 4) {
+					if (xobj.status === 200) {
+						console.log(getDebugMessage('GET in: {} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100)));
+						if (callback) {
+							callback(xobj.responseText);
+						}
+					} else {
+						console.error(getDebugMessage("Unable to load {}, response code is '{}', response: {}", fileUrl, xobj.status, xobj.response ));
+						growlError("<span>Unable to load {}, response code is <b>{}</b>, response: {} <span>".format(fileUrl, xobj.status, xobj.response));
 					}
 				}
 			};

@@ -6,6 +6,7 @@ var showRegisterEl;
 var auth2;
 var googleToken;
 var FBApiLoaded = false;
+var googleApiLoaded = false;
 var captchaState = 0; // 0 - not inited, 1 - initializing, 2 - loaded
 
 var RegisterValidator = function () {
@@ -190,6 +191,23 @@ function showForgotPassword() {
 	}
 }
 
+function redirectToNextPage(response) {
+	if (response === RESPONSE_SUCCESS) {
+		var nextUrl = getUrlParam('next');
+		if (nextUrl == null) {
+			nextUrl = '/';
+		}
+		window.location.href = nextUrl;
+	} else {
+		growlError(response);
+	}
+}
+
+function login(event) {
+	event.preventDefault();
+	doPost('/auth', null, redirectToNextPage, loginForm);
+}
+
 onDocLoad(function () {
 	loginForm = $('regLoginForm');
 	registerForm = $('register-form');
@@ -211,19 +229,9 @@ onDocLoad(function () {
 	}
 });
 
-
-function onRegisterProceed(data) {
-	//ajaxHide();
-	if (data === RESPONSE_SUCCESS) {
-		window.location.href = '/';
-	} else {
-		growlError(data);
-	}
-}
-
 function register(event) {
 	event.preventDefault();
-	doPost('/register', null, onRegisterProceed, registerForm);
+	doPost('/register', null, redirectToNextPage, registerForm);
 }
 
 
@@ -251,9 +259,10 @@ function restorePassword(event) {
 
 
 function sendGoogleTokenToServer(token) {
+	growlInfo("Successfully logged into google successfully, proceeding...");
 	doPost('/google-auth', {
 		token: token
-	}, onRegisterProceed);
+	}, redirectToNextPage);
 }
 
 
@@ -270,10 +279,10 @@ function onGoogleSignIn() {
 function googleLogin(event) {
 	event.preventDefault(); // somehow button triggers sumbit
 	// Load the API client and auth library
-	growlInfo("Trying to log in via Google");
 	if (googleToken) {
 		sendGoogleTokenToServer(googleToken)
-	} else {
+	} else if (!googleApiLoaded) {
+		growlInfo("Trying to log in via Google");
 		doGet(G_OAUTH_URL, function () {
 			gapi.load('client:auth2', function () {
 			  //gapi.client.setApiKey(apiKey);
@@ -295,7 +304,10 @@ function googleLogin(event) {
 				});
 			});
 		});
+	} else {
+		auth2.signIn();
 	}
+	googleApiLoaded = true;
 }
 
 function facebookLogin(event) {
@@ -323,9 +335,10 @@ function fbStatusChange(response) {
 	console.log(response);
 	if (response.status === 'connected') {
 		// Logged into your app and Facebook.
+		growlInfo("Successfully logged in into facebook, proceeding...");
 		doPost('/facebook-auth', {
 			token: response.authResponse.accessToken
-		}, onRegisterProceed);
+		}, redirectToNextPage);
 	} else if (response.status === 'not_authorized') {
 		growlInfo("Allow facebook application to use your data");
 	} else {
