@@ -31,3 +31,4 @@ chat/static/js/amcharts-dark.js
 chat/static/js/amcharts-all.js
 chat/static/js/md5.js
 lol1_files
+chat/production.py

@@ -19,6 +19,13 @@ from sslserver import certs
 
 import chat as project_module
 
+try:
+	from chat.production import *
+	print('imported production.py settings')
+except ImportError as e:
+	print('Failed to import production.py because {}'.format(e))
+	pass
+
 LOGGING_CONFIG = None
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -77,6 +84,9 @@ RECAPTHCA_SITE_URL = 'https://www.google.com/recaptcha/api.js'
 # RECAPTCHA_SITE_KEY = 'REPLACE_THIS_WITH_DATA-SITEKEY_DIV_ATTRIBUTE'
 # GOOGLE_OAUTH_2_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com'
 GOOGLE_OAUTH_2_JS_URL = 'https://apis.google.com/js/platform.js'
+FACEBOOK_JS_URL = '//connect.facebook.net/en_US/sdk.js'
+#FACEBOOK_ACCESS_TOKEN = '!6_NUMBER_APP_ID|ALPHABET_TOKEN' # https://developers.facebook.com/tools/access_token/
+#FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
 # GOOGLE_OAUTH_2_HOST = 'pychat.org'
 
 SESSION_ENGINE = 'redis_sessions.session'
@@ -282,16 +292,29 @@ if not DEBUG:
 ALL_REDIS_ROOM = 'all'
 ALL_ROOM_ID = 1
 
+SELECT_SELF_ROOM = """SELECT
+	a.id,
+	a.disabled
+FROM chat_room a
+WHERE a.id IN %s AND
+			EXISTS
+			(
+					SELECT 1
+					FROM chat_room_users b
+					WHERE a.id = b.room_id
+					HAVING COUNT(b.user_id) = 1
+			)"""
+
 UPDATE_LAST_READ_MESSAGE = """
 UPDATE chat_room_users out_cru
-  INNER JOIN
-  (SELECT
-     max(chat_message.id) message_id,
-     chat_room_users.id   rooms_users_id
-   FROM chat_room_users
-     JOIN chat_message ON chat_message.room_id = chat_room_users.room_id
-   WHERE chat_room_users.user_id = %s and chat_room_users.room_id != {}
-   GROUP BY chat_message.room_id) last_message ON out_cru.id = last_message.rooms_users_id
+	INNER JOIN
+		(SELECT
+			max(chat_message.id) message_id,
+			chat_room_users.id	 rooms_users_id
+		 FROM chat_room_users
+			JOIN chat_message ON chat_message.room_id = chat_room_users.room_id
+		WHERE chat_room_users.user_id = %s and chat_room_users.room_id != {}
+		GROUP BY chat_message.room_id) last_message ON out_cru.id = last_message.rooms_users_id
 SET out_cru.last_read_message_id = last_message.message_id
 """.format(ALL_ROOM_ID)
 
