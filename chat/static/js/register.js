@@ -329,11 +329,6 @@ function fbStatusChange(response) {
 	} else if (response.status === 'not_authorized') {
 		growlInfo("Allow facebook application to use your data");
 	} else {
-		var growl = new Growl("Login into your facebook account first and reload this page");
-		growl.info();
-		growl.growlHolder.onclick  = function() {
-			window.open('https://fb.com');
-		};
-		growl.growlHolder.style.cursor = 'pointer';
+		FB.login(fbStatusChange, {auth_type: 'reauthenticate'});
 	}
 }
