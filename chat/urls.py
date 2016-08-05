@@ -5,6 +5,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 
 from chat import settings
+from chat.socials import GoogleAuth, FacebookAuth
 from chat.views import RegisterView, ProfileView, RestorePassword
 
 logger = logging.getLogger(__name__)
@@ -18,6 +19,8 @@ urlpatterns = patterns(
 	url(r'^auth$', 'chat.views.auth'),
 	url(r'^register$', RegisterView.as_view(), name='register'),
 	url(r'^confirm_email$', 'chat.views.confirm_email'),
+	url(r'^google-auth', GoogleAuth.as_view()),
+	url(r'^facebook-auth', FacebookAuth.as_view()),
 	# story/register.js uses link below
 	url(r'^validate_user$', 'chat.views.validate_user'),
 	url(r'^restore_password$', RestorePassword.as_view(), name='restore_pass'),

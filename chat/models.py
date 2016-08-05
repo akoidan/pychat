@@ -6,7 +6,7 @@ from time import mktime
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.db import models
-from django.db.models import CharField, DateField, FileField, BooleanField, NullBooleanField
+from django.db.models import CharField, DateField, FileField, BooleanField
 
 from chat.log_filters import id_generator
 from chat.settings import GENDERS, DEFAULT_PROFILE_ID
@@ -49,7 +49,7 @@ class User(AbstractBaseUser):
 	objects = BaseUserManager()
 
 	# ISO/IEC 5218 1 male, 2 - female
-	sex = models.SmallIntegerField(null=False)
+	sex = models.SmallIntegerField(null=False, default=0)
 
 	@property
 	def sex_str(self):

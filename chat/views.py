@@ -28,10 +28,15 @@ from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification
 from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging, SITE_PROTOCOL
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_email_verification, \
-	create_user_profile, check_captcha
+	create_user_model, check_captcha
 
 logger = logging.getLogger(__name__)
-
+RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
+RECAPTHCA_SITE_URL = getattr(settings, "RECAPTHCA_SITE_URL", None)
+GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
+GOOGLE_OAUTH_2_JS_URL = getattr(settings, "GOOGLE_OAUTH_2_JS_URL", None)
+FACEBOOK_APP_ID = getattr(settings, "FACEBOOK_APP_ID", None)
+FACEBOOK_JS_URL = getattr(settings, "FACEBOOK_JS_URL", None)
 
 # TODO doesn't work
 def handler404(request):
@@ -86,8 +91,7 @@ def logout(request):
 	POST. Logs out into system.
 	"""
 	djangologout(request)
-	response = HttpResponseRedirect('/')
-	return response
+	return HttpResponseRedirect('/')
 
 
 @require_http_methods(['POST'])
@@ -191,7 +195,7 @@ class RestorePassword(View):
 		token = request.GET.get('token', False)
 		logger.debug('Rendering restore password page with token  %s', token)
 		try:
-			user, verification = self.get_user_by_code(token)
+			user = self.get_user_by_code(token)[0]
 			response = {
 				'message': VALIDATION_IS_OK,
 				'restore_user': user.username,
@@ -302,10 +306,17 @@ class ProfileView(View):
 class RegisterView(View):
 
 	def get(self, request):
+		logger.debug(
+			'Rendering register page with captcha site key %s and oauth key %s',
+			RECAPTCHA_SITE_KEY, GOOGLE_OAUTH_2_CLIENT_ID
+		)
 		c = csrf(request)
-		c['captcha'] = getattr(settings, "RECAPTCHA_SITE_KEY", None)
-		logger.debug('Rendering register page with captcha site key %s', c['captcha'])
-		c['captcha_url'] = getattr(settings, "RECAPTHCA_SITE_URL", None)
+		c['captcha_key'] = RECAPTCHA_SITE_KEY
+		c['captcha_url'] = RECAPTHCA_SITE_URL
+		c['oauth_url'] = GOOGLE_OAUTH_2_JS_URL
+		c['oauth_token'] = GOOGLE_OAUTH_2_CLIENT_ID
+		c['fb_app_id'] = FACEBOOK_APP_ID
+		c['fb_js_url'] = FACEBOOK_JS_URL
 		return render_to_response("register.html", c, context_instance=RequestContext(request))
 
 	@transaction.atomic
@@ -317,7 +328,9 @@ class RegisterView(View):
 			check_user(username)
 			check_password(password)
 			check_email(email)
-			user_profile = create_user_profile(email, password, rp.get('sex'), username)
+			user_profile = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
+			user_profile.set_password(password)
+			create_user_model(user_profile)
 			# You must call authenticate before you can call login
 			auth_user = authenticate(username=username, password=password)
 			message = VALIDATION_IS_OK  # redirect

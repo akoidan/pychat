@@ -3,19 +3,31 @@ import logging
 import re
 import sys
 from io import BytesIO
+from urllib.request import urlopen as wget
 
 import requests
+from django.contrib.auth import login as djangologin
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
+from django.http import HttpResponse
+from django.views.generic import View
+from oauth2client import client
 
 from chat import local
 from chat import settings
+from chat.log_filters import id_generator
 from chat.models import User, UserProfile, Verification, RoomUsers
-from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID
+from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID, VALIDATION_IS_OK
 
-USERNAME_REGEX = "".join(['^[a-zA-Z-_0-9]{1,', str(settings.MAX_USERNAME_LENGTH), '}$'])
+USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
+
+RECAPTCHA_SECRET_KEY = getattr(settings, "RECAPTCHA_SECRET_KEY", None)
+GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
+GOOGLE_OAUTH_2_HOST = getattr(settings, "GOOGLE_OAUTH_2_HOST", None)
+FACEBOOK_ACCESS_TOKEN = getattr(settings, "FACEBOOK_ACCESS_TOKEN", None)
 
 logger = logging.getLogger(__name__)
 
@@ -106,15 +118,14 @@ def check_captcha(request):
 	:raises ValidationError: if captcha is not valid or not set
 	If RECAPTCHA_SECRET_KEY is enabled in settings validates request with it
 	"""
-	captcha_private_key = getattr(settings, "RECAPTCHA_SECRET_KEY", None)
-	if not captcha_private_key:
+	if not RECAPTCHA_SECRET_KEY:
 		logger.debug('Skipping captcha validation')
 		return
 	try:
 		captcha_rs = request.POST.get('g-recaptcha-response')
 		url = "https://www.google.com/recaptcha/api/siteverify"
 		params = {
-			'secret': captcha_private_key,
+			'secret': RECAPTCHA_SECRET_KEY,
 			'response': captcha_rs,
 			'remoteip': local.client_ip
 		}
@@ -163,9 +174,7 @@ def extract_photo(image_base64):
 	return image
 
 
-def create_user_profile(email, password, sex, username):
-	user = UserProfile(username=username, email=email, sex_str=sex)
-	user.set_password(password)
+def create_user_model(user):
 	user.save()
 	RoomUsers(user_id=user.id, room_id=ALL_ROOM_ID).save()
 	logger.info('Signed up new user %s, subscribed for channels with id %d', user, ALL_ROOM_ID)

@@ -5,7 +5,6 @@ import time
 from threading import Thread
 from urllib.request import urlopen
 
-import datetime
 import tornado.gen
 import tornado.httpclient
 import tornado.ioloop
@@ -26,7 +25,7 @@ try:
 except ImportError:
 	from urlparse import urlparse  # py3
 
-from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_READ_MESSAGE
+from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_READ_MESSAGE, SELECT_SELF_ROOM
 from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo, RoomUsers
 
 PY3 = sys.version > '3'
@@ -35,7 +34,7 @@ api_url = getattr(settings, "IP_API_URL", None)
 
 sessionStore = SessionStore()
 
-logger = logging.getLogger(__name__)
+base_logger = logging.getLogger(__name__)
 
 # TODO https://github.com/leporo/tornado-redis#connection-pool-support
 #CONNECTION_POOL = tornadoredis.ConnectionPool(
@@ -43,7 +42,7 @@ logger = logging.getLogger(__name__)
 #	wait_for_available=True)
 
 
-class Actions:
+class Actions(object):
 	LOGIN = 'addOnlineUser'
 	LOGOUT = 'removeOnlineUser'
 	SEND_MESSAGE = 'sendMessage'
@@ -63,7 +62,7 @@ class Actions:
 	OFFLINE_MESSAGES = 'loadOfflineMessages'
 
 
-class VarNames:
+class VarNames(object):
 	CALL_TYPE = 'type'
 	USER = 'user'
 	USER_ID = 'userId'
@@ -85,7 +84,7 @@ class VarNames:
 	# ROOM_ID = 'roomId'
 
 
-class CallType:
+class CallType(object):
 	OFFER = 'offer'
 
 class HandlerNames:
@@ -451,20 +450,26 @@ class MessagesHandler(MessagesCreator):
 		subscribe_message = self.invite_room_channel_message(room_id, user_id, room.name, users_in_room)
 		self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
 
-	def create_user_channel(self, message):
-		user_id = message[VarNames.USER_ID]
-		# get all self private rooms ids
-		user_rooms = Room.users.through.objects.filter(user_id=self.user_id, room__name__isnull=True).values('room_id')
-		# get private room that contains another user from rooms above
+	def create_self_room(self, user_rooms):
+		rooms_ids = list([room['room_id'] for room in user_rooms])
+		query_res = self.execute_query(SELECT_SELF_ROOM, [rooms_ids,])
+		if len(query_res) > 0:
+			room = query_res[0]
+			room_id = room[0]
+			self.update_room(room_id, room[1])
+		else:
+			room = Room()
+			room.save()
+			room_id = room.id
+			RoomUsers(user_id=self.user_id, room_id=room_id).save()
+		return room_id
+
+	def create_other_room(self, user_rooms, user_id):
 		query_res = Room.users.through.objects.filter(user_id=user_id, room__in=user_rooms).values('room__id', 'room__disabled')
 		if len(query_res) > 0:
 			room = query_res[0]
 			room_id = room['room__id']
-			disabled = room['room__disabled']
-			if not disabled:
-				raise ValidationError('This room already exist')
-			else:
-				Room.objects.filter(id=room_id).update(disabled=False)
+			self.update_room(room_id, room['room__disabled'])
 		else:
 			room = Room()
 			room.save()
@@ -473,6 +478,23 @@ class MessagesHandler(MessagesCreator):
 				RoomUsers(user_id=user_id, room_id=room_id),
 				RoomUsers(user_id=self.user_id, room_id=room_id),
 			])
+		return room_id
+
+	def update_room(self, room_id, disabled):
+		if not disabled:
+			raise ValidationError('This room already exist')
+		else:
+			Room.objects.filter(id=room_id).update(disabled=False)
+
+	def create_user_channel(self, message):
+		user_id = message[VarNames.USER_ID]
+		# get all self private rooms ids
+		user_rooms = Room.users.through.objects.filter(user_id=self.user_id, room__name__isnull=True).values('room_id')
+		# get private room that contains another user from rooms above
+		if self.user_id == user_id:
+			room_id = self.create_self_room(user_rooms)
+		else:
+			room_id = self.create_other_room(user_rooms, user_id)
 		subscribe_message = self.subscribe_direct_channel_message(room_id, user_id)
 		self.publish(subscribe_message, self.channel, True)
 		other_channel = RedisPrefix.generate_user(user_id)
@@ -702,7 +724,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 					gone_offline = True
 		if gone_offline:
 			res = self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
-			logger.info("Updated %s last read message", res)
+			self.logger.info("Updated %s last read message", res)
 
 		self.logger.info("Close connection result: %s", json.dumps(log_data))
 		self.async_redis.disconnect()
@@ -718,7 +740,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				'id': self.log_id,
 				'ip': self.ip
 			}
-			self.logger = logging.LoggerAdapter(logger, log_params)
+			self.logger = logging.LoggerAdapter(base_logger, log_params)
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, self.id)
 			self.async_redis.connect()
 			user_db = self.do_db(User.objects.get, id=self.user_id)  # everything but 0 is a registered user

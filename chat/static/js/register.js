@@ -3,6 +3,10 @@ var registerForm;
 var recoverForm;
 var showLoginEl;
 var showRegisterEl;
+var auth2;
+var googleToken;
+var FBApiLoaded = false;
+var captchaState = 0; // 0 - not inited, 1 - initializing, 2 - loaded
 
 var RegisterValidator = function () {
 	var self = this;
@@ -178,6 +182,12 @@ function showForgotPassword() {
 	CssUtils.addClass(showLoginEl, 'disabled');
 	CssUtils.addClass(showRegisterEl, 'disabled');
 	setUrlParam('type', 'forgot');
+	if (CAPTCHA_URL && captchaState == 0) {
+		captchaState = 1;
+		doGet(CAPTCHA_URL, function() {
+			captchaState = 2;
+		});
+	}
 }
 
 onDocLoad(function () {
@@ -201,23 +211,27 @@ onDocLoad(function () {
 	}
 });
 
+
+function onRegisterProceed(data) {
+	//ajaxHide();
+	if (data === RESPONSE_SUCCESS) {
+		window.location.href = '/';
+	} else {
+		growlError(data);
+	}
+}
+
 function register(event) {
 	event.preventDefault();
-	//ajaxShow(); TODO
-	var callback = function (data) {
-		//ajaxHide();
-		if (data === RESPONSE_SUCCESS) {
-			window.location.href = '/';
-		} else {
-			growlError(data);
-		}
-	};
-	doPost('/register', null, callback, registerForm);
+	doPost('/register', null, onRegisterProceed, registerForm);
 }
 
 
 function restorePassword(event) {
 	event.preventDefault();
+	if (CAPTCHA_URL && captchaState != 2) {
+		return; // wait for captcha to load
+	}
 	var form = recoverForm;
 	//ajaxShow(); TODO
 	var callback = function (data) {
@@ -233,4 +247,93 @@ function restorePassword(event) {
 		}
 	};
 	doPost('/send_restore_password', null, callback, form);
+}
+
+
+function sendGoogleTokenToServer(token) {
+	doPost('/google-auth', {
+		token: token
+	}, onRegisterProceed);
+}
+
+
+function onGoogleSignIn() {
+	var googleUser = auth2.currentUser.get();
+	var profile = googleUser.getBasicProfile();
+	console.log(getDebugMessage("Signed as {} with id {} and email {}  ",
+			profile.getName(), profile.getId(), profile.getEmail()));
+	googleToken = googleUser.getAuthResponse().id_token;
+	sendGoogleTokenToServer(googleToken);
+}
+
+
+function googleLogin(event) {
+	event.preventDefault(); // somehow button triggers sumbit
+	// Load the API client and auth library
+	growlInfo("Trying to log in via Google");
+	if (googleToken) {
+		sendGoogleTokenToServer(googleToken)
+	} else {
+		doGet(G_OAUTH_URL, function () {
+			gapi.load('client:auth2', function () {
+			  //gapi.client.setApiKey(apiKey);
+				console.log(getDebugMessage("Initing google sdk"));
+				gapi.auth2.init().then(function () {
+					auth2 = gapi.auth2.getAuthInstance();
+					auth2.isSignedIn.listen(function (isSignedIn) {
+						if (isSignedIn) {
+							onGoogleSignIn();
+						} else {
+							console.warn(getDebugMessage("Skipping sending token because not signed in into google"));
+						}
+					});
+					if (auth2.isSignedIn.get()) {
+						onGoogleSignIn();
+					} else {
+						auth2.signIn();
+					}
+				});
+			});
+		});
+	}
+}
+
+function facebookLogin(event) {
+	if (event) event.preventDefault();
+	growlInfo("Trying to log in via Facebook");
+	if (!FBApiLoaded) {
+		doGet(FACEBOOK_JS_URL);
+		FBApiLoaded = true;
+	} else {
+		FB.getLoginStatus(fbStatusChange);
+	}
+}
+
+window.fbAsyncInit = function () {
+	console.log(getDebugMessage("Initing facebook sdk..."));
+	FB.init({
+		appId: FACEBOOK_APP_ID,
+		xfbml: true,
+		version: 'v2.7'
+	});
+	FB.getLoginStatus(fbStatusChange);
+};
+
+function fbStatusChange(response) {
+	console.log(response);
+	if (response.status === 'connected') {
+		// Logged into your app and Facebook.
+		doPost('/facebook-auth', {
+			token: response.authResponse.accessToken
+		}, onRegisterProceed);
+	} else if (response.status === 'not_authorized') {
+		growlInfo("Allow facebook application to use your data");
+	} else {
+		var growl = new Growl("Login into your facebook account first and reload this page");
+		growl.info();
+		growl.growlHolder.onclick  = function() {
+			window.open('https://fb.com');
+		};
+		growl.growlHolder.style.cursor = 'pointer';
+	}
 }
