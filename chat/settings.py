@@ -14,10 +14,6 @@ import os
 import sys
 from os.path import join
 
-try:
-	from chat.production import *
-except ImportError:
-	pass
 from django.conf import global_settings
 from sslserver import certs
 
