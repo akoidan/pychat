@@ -19,6 +19,13 @@ from sslserver import certs
 
 import chat as project_module
 
+try:
+	from chat.production import *
+	print('imported production.py settings')
+except ImportError as e:
+	print('Failed to import production.py because {}'.format(e))
+	pass
+
 LOGGING_CONFIG = None
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))

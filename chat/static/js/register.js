@@ -6,6 +6,7 @@ var showRegisterEl;
 var auth2;
 var googleToken;
 var FBApiLoaded = false;
+var captchaState = 0; // 0 - not inited, 1 - initializing, 2 - loaded
 
 var RegisterValidator = function () {
 	var self = this;
@@ -181,6 +182,12 @@ function showForgotPassword() {
 	CssUtils.addClass(showLoginEl, 'disabled');
 	CssUtils.addClass(showRegisterEl, 'disabled');
 	setUrlParam('type', 'forgot');
+	if (CAPTCHA_URL && captchaState == 0) {
+		captchaState = 1;
+		doGet(CAPTCHA_URL, function() {
+			captchaState = 2;
+		});
+	}
 }
 
 onDocLoad(function () {
@@ -222,6 +229,9 @@ function register(event) {
 
 function restorePassword(event) {
 	event.preventDefault();
+	if (CAPTCHA_URL && captchaState != 2) {
+		return; // wait for captcha to load
+	}
 	var form = recoverForm;
 	//ajaxShow(); TODO
 	var callback = function (data) {

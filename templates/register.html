@@ -3,22 +3,16 @@
 {% block head %}
 	<script src="{% md5url "js/register.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/register.css' %}">
-	{% if captcha_key %}
-		<script src='{{ captcha_url }}' async></script>
-	{% endif %}
 	{% if oauth_token %}
 		<meta name="google-signin-scope" content="profile email">
 		<meta name="google-signin-client_id" content="{{ oauth_token }}">
-		<script>
-			const G_OAUTH_URL = '{{oauth_url}}';
-		</script>
 	{% endif %}
-	{% if fb_app_id %}
-		<script>
-			const FACEBOOK_APP_ID = '{{fb_app_id}}';
-			const FACEBOOK_JS_URL = '{{fb_js_url}}';
-		</script>
-	{% endif %}
+	<script>
+		{% if captcha_key %}const CAPTCHA_URL = '{{ captcha_url }}'; {% endif %}
+		{% if oauth_token %}const G_OAUTH_URL = '{{ oauth_url }}'; {% endif %}
+		{% if fb_app_id %}const FACEBOOK_APP_ID = '{{ fb_app_id }}';
+		const FACEBOOK_JS_URL = '{{ fb_js_url }}'; {% endif %}
+	</script>
 {% endblock %}
 {% block content %}
 <div class="reg-log-container">

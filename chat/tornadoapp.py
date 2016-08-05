@@ -34,7 +34,7 @@ api_url = getattr(settings, "IP_API_URL", None)
 
 sessionStore = SessionStore()
 
-logger = logging.getLogger(__name__)
+base_logger = logging.getLogger(__name__)
 
 # TODO https://github.com/leporo/tornado-redis#connection-pool-support
 #CONNECTION_POOL = tornadoredis.ConnectionPool(
@@ -724,7 +724,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 					gone_offline = True
 		if gone_offline:
 			res = self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
-			logger.info("Updated %s last read message", res)
+			self.logger.info("Updated %s last read message", res)
 
 		self.logger.info("Close connection result: %s", json.dumps(log_data))
 		self.async_redis.disconnect()
@@ -740,7 +740,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				'id': self.log_id,
 				'ip': self.ip
 			}
-			self.logger = logging.LoggerAdapter(logger, log_params)
+			self.logger = logging.LoggerAdapter(base_logger, log_params)
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, self.id)
 			self.async_redis.connect()
 			user_db = self.do_db(User.objects.get, id=self.user_id)  # everything but 0 is a registered user
