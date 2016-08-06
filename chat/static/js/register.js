@@ -331,8 +331,7 @@ window.fbAsyncInit = function () {
 	FB.getLoginStatus(fbStatusChange);
 };
 
-function fbStatusChange(response) {
-	console.log(response);
+function fbStatusChangeIfReAuth(response) {
 	if (response.status === 'connected') {
 		// Logged into your app and Facebook.
 		growlInfo("Successfully logged in into facebook, proceeding...");
@@ -342,6 +341,13 @@ function fbStatusChange(response) {
 	} else if (response.status === 'not_authorized') {
 		growlInfo("Allow facebook application to use your data");
 	} else {
-		FB.login(fbStatusChange, {auth_type: 'reauthenticate'});
+		return true;
+	}
+}
+
+function fbStatusChange(response) {
+	console.log(response);
+	if (fbStatusChangeIfReAuth(response)) {
+		FB.login(fbStatusChangeIfReAuth, {auth_type: 'reauthenticate'});
 	}
 }
