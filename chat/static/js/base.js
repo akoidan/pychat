@@ -50,7 +50,7 @@ function enableLogs() {
 		console.log = dummyFun;
 		console.WARN = console.warn;
 		console.warn = dummyFun;
-		console.ERROR = console.error();
+		console.ERROR = console.error;
 		console.error = dummyFun;
 	} else if (console.LOG) {
 		console.log = console.LOG;
