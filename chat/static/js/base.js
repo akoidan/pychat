@@ -41,7 +41,26 @@ var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|&#39;|$))/g;/*http:/
 var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
 var muteBtn;
 var inputRangeStyles = {};
-var currentPlayingAudio;
+
+function enableLogs() {
+	if (!window.LOGS) {
+		var dummyFun = function () {
+		};
+		console.LOG = console.log;
+		console.log = dummyFun;
+		console.WARN = console.warn;
+		console.warn = dummyFun;
+		console.ERROR = console.error();
+		console.error = dummyFun;
+	} else if (console.LOG) {
+		console.log = console.LOG;
+		console.warn = console.WARN;
+		console.error = console.ERROR;
+	}
+}
+
+enableLogs();
+
 const escapeMap = {
 	"&": "&amp;",
 	"<": "&lt;",
@@ -562,6 +581,7 @@ function sliceZero(number, count) {
  * @returns: "15:09:31:009: war is bad"
  *  */
 function getDebugMessage() {
+	if (!window.LOGS) return;
 	var now = new Date();
 	// first argument is format, others are params
 	var text;

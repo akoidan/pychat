@@ -9,6 +9,7 @@ var userProfileData;
 var themeSelector;
 var changeProfileForm;
 var notificationInput;
+var logsInput;
 
 function initChangeProfile() {
 	photoImg = $('photoImg');
@@ -18,6 +19,7 @@ function initChangeProfile() {
 	themeSelector = $('themeSelector');
 	changeProfileForm = $('changeProfileForm');
 	notificationInput = $('id_notifications');
+	logsInput = $('id_logs');
 	var item = localStorage.getItem('theme');
 	if (item != null) {
 		themeSelector.value = item;
@@ -118,6 +120,8 @@ function setJsState() {
 	localStorage.setItem('theme', themeSelector.value);
 	document.body.className = themeSelector.value;
 	notifications = notificationInput.checked; // global var
+	window.LOGS = logsInput.checked; // global var
+	enableLogs();
 }
 
 function saveProfile(event) {

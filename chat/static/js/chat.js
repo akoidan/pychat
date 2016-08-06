@@ -801,7 +801,6 @@ function ChannelsHandler() {
 		var el = event.target;
 		while (el != self.dom.chatBoxDiv) {
 			if (el.tagName == 'P') {
-				console.log(el);
 				var strMessageId = el.getAttribute(MESSAGE_ID_ATTRIBUTE);
 				if (strMessageId) {
 					var messageId = parseInt(strMessageId);

@@ -43,6 +43,7 @@ class UserProfileForm(forms.ModelForm):
 	birthday = DateField(widget=DateWidget)  # input_formats=settings.DATE_INPUT_FORMATS
 	notifications = BooleanField(widget=BooleanWidget)
 	suggestions = BooleanField(widget=BooleanWidget)
+	logs = BooleanField(widget=BooleanWidget)
 
 	GENDER_CHOICES = (
 		(1, 'Male'),
@@ -55,7 +56,7 @@ class UserProfileForm(forms.ModelForm):
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
 		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts',
-				'sex', 'photo', 'notifications', 'suggestions')
+				'sex', 'photo', 'notifications', 'suggestions', 'logs')
 
 	def __init__(self, *args, **kwargs):
 		"""
