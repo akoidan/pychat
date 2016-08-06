@@ -129,20 +129,12 @@ p
 		color: #f1f1f1
 
 .removed-message
-	color: #5d5d5d
-	text-decoration: line-through
+	.message-text-style
+		color: #5d5d5d
+		text-decoration: line-through
 
-#user-context-menu
-	visibility: visible
-	opacity: 1
-	transition: visibility 0s, opacity 0.3s linear
-	position: absolute
+.context-menu
 	z-index: 3
-	right: 0
-	margin: 0
-	padding: 2px 0
-	width: calc(100% - 2px)
-	border-radius: 0 0 5px 5px
 	font-size: 16px
 	color: #ACACAC
 	border: $user-context-border
@@ -151,9 +143,26 @@ p
 		padding: 2px 5px
 		&:hover
 			cursor: pointer
-
 			color: #c7c7c7
 			border-radius: 3px
+
+#m2Message
+	@extend .context-menu
+	border-radius: 3px
+	position: fixed
+
+
+#user-context-menu
+	@extend .context-menu
+	visibility: visible
+	opacity: 1
+	transition: visibility 0s, opacity 0.3s linear
+	position: absolute
+	right: 0
+	margin: 0 !important //override #chat-room-users ul
+	padding: 2px 0
+	width: calc(100% - 2px)
+	border-radius: 0 0 5px 5px
 	&.hidden
 		display: block !important
 		visibility: hidden
@@ -575,7 +584,7 @@ p
 		font-size: 10px
 		color: grey
 
-.changeMessage
+.highLightMessage
 	border: 1px solid grey
 	border-radius: 3px
 	padding: 3px

@@ -54,6 +54,7 @@ Afterwards to start the chat you need:
  5. If you get an ssl error on establishing websocket connection in browser, that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
 
 # TODO
+* Facebook login opens to windows in case of unlogined user and on close window it opens a new one so it's impossible to close facebok login window
 * Add title for room. 
 * add scale to painter and Ctrl+Z
 * Add delete/edit message option (skype alike)
