@@ -97,7 +97,6 @@ p
 	overflow-y: auto
 	overflow-x: hidden
 	min-width: 200px
-	text-overflow: ellipsis
 	position: relative
 	ul
 		margin-top: 5px
@@ -178,9 +177,7 @@ p
 		border: 1px solid transparent
 		opacity: 0.8
 		width: 100%
-		white-space: nowrap
-		text-overflow: ellipsis
-		overflow: hidden
+		@include ellipsis
 		border-radius: 3px
 		[class^='icon-']
 			opacity: 1
@@ -248,11 +245,13 @@ p
 #rooms
 	li
 		@include  fix-user-icon-top-position
+		@include ellipsis
 		border-radius: 3px
 		position: relative
 		height: 30px
 		@include hovered-user-room
 		&:hover
+			padding-right: 30px
 			.icon-cancel-circled-outline
 				display: inline
 

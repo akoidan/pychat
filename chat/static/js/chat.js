@@ -1152,7 +1152,7 @@ function ChannelsHandler() {
 		growlInfo('<span>Room <b>{}</b> has been created</span>'.format(roomName));
 	};
 	self.viewProfile = function () {
-		singlePage.showPage('/profile/', self.getActiveUserId());
+		singlePage.showPage('/profile/', [self.getActiveUserId()]);
 	};
 	self.init = function () {
 		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);
@@ -1179,7 +1179,7 @@ function ChannelsHandler() {
 
 	};
 	self.getActiveUserId = function () {
-		return self.dom.activeUserContext.getAttribute(USER_ID_ATTR);
+		return parseInt(self.dom.activeUserContext.getAttribute(USER_ID_ATTR));
 	};
 	self.getActiveUsername = function () {
 		return self.dom.activeUserContext.textContent;
