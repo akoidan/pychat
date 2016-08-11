@@ -241,6 +241,7 @@ p
 			border-radius: 2px
 			@include hovered-user-room
 
+$padding-before-circ: 30px
 #directUserTable,
 #rooms
 	li
@@ -250,10 +251,10 @@ p
 		position: relative
 		height: 30px
 		@include hovered-user-room
+		width: $rooms-width
 		&:hover
-			$padding: 30px
-			padding-right: $padding
-			width: $rooms-width - $padding
+			padding-right: $padding-before-circ
+			width: $rooms-width - $padding-before-circ
 			.icon-cancel-circled-outline
 				display: inline
 
@@ -270,7 +271,10 @@ p
 	margin-left: 5px
 
 #rooms li
-	padding-left: 10px
+	$padding: 10px
+	padding-left: $padding
+	&:hover
+		width: $rooms-width - $padding-before-circ - $padding
 
 .fluid-height-child-bot
 	display: table
