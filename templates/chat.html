@@ -42,20 +42,21 @@
 	</div>
 	<div id="wrapper" class="max-height-scrollable hidden">
 		<div id="chatBoxHolder" class="max-height-scrollable">
+			<ul id="m2Message" class="hidden">
+				<li onclick="channelsHandler.m2EditMessage()">Edit message</li>
+				<li onclick="channelsHandler.m2DeleteMessage()">Delete message</li>
+			</ul>
 			<div id="callContainer" class="hidden">
 				<section>
 					<form id="fileInfo" class="hidden">
 						<input type="file" id="webRtcFileInput" name="files">
 					</form>
-
 					<div id="transmitProgress" class="progress-wrap hidden">
 						<a>
 						</a>
 					</div>
-
 					<div id="bitrate"></div>
 					<span id="status"></span>
-
 				</section>
 				<div id="callContainerContent">
 					<div id='videoContainer'>

@@ -53,12 +53,15 @@ class SocialAuth(View):
 			logger.info("Sign in as %s with id %s", user_profile.username, user_profile.id)
 		except UserProfile.DoesNotExist:
 			try:
-				logger.info("Creating new user with email %s, name %s, surname %s, picture %s",
-								email, name, surname, picture)
+				logger.info(
+					"Creating new user with email %s, name %s, surname %s, picture %s",
+					email, name, surname, picture
+				)
 				# replace all characters but a valid one with '-' and cut to 15 chars
 				username = re.sub('[^0-9a-zA-Z-_]+', '-', email.rsplit('@')[0])[:15]
 				check_user(username)
-			except ValidationError:
+			except ValidationError as e:
+				logger.info("Can't use username %s because %s", username, e)
 				username = id_generator(8)
 			logger.debug("Generated username: %s", username)
 			user_profile = UserProfile(

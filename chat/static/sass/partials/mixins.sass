@@ -112,15 +112,6 @@
 		to
 			background-position: #{ -$width*($steps) + 'px'} #{'-' + $y+'px'}
 
-//Smile is deprecated
-@mixin smile($name, $time, $y, $width, $height, $steps)
-	#{'.smile-' + $name}
-		width: #{$width + 'px'}
-		height: #{$height + 'px'}
-		background-image: url("../smileys/smilies.png?v1")
-		@include animation(#{'play-'+ $name}, $time, $steps)
-	@include play(-webkit-, #{'play-'+ $name}, $y, $width, $steps)
-
 @mixin drop-padding($top, $left)
 	padding: $top + 1px $left - 1px $top - 1px $left + 1px
 
@@ -132,3 +123,8 @@
 			$value: $value * $number
 
 	@return $value
+
+@mixin ellipsis
+	text-overflow: ellipsis
+	white-space: nowrap
+	overflow: hidden

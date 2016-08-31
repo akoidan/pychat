@@ -275,7 +275,7 @@ def report_issue(request):
 
 class ProfileView(View):
 
-	@login_required_no_redirect(True)
+	@login_required_no_redirect()
 	def get(self, request):
 		user_profile = UserProfile.objects.get(pk=request.user.id)
 		form = UserProfileForm(instance=user_profile)

@@ -282,6 +282,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 MEDIA_URL = "https://static.pychat.org/photo/"
 
 USER_COOKIE_NAME = 'user'
+JS_CONSOLE_LOGS = True
 
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'localhost'
