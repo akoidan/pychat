@@ -1,0 +1,15 @@
+[Unit]
+Description=Websocket server for pychat
+
+[Service]
+ExecStart=/home/andrew/python/djangochatprod/manage.py start_tornado
+SuccessExitStatus=30
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+Restart=always
+Type=simple
+NotifyAccess=all
+User=http
+
+[Install]
+WantedBy=multi-user.target

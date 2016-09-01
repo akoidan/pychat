@@ -1,6 +1,6 @@
 queue_directory = /var/spool/postfix
-command_directory = /usr/sbin
-daemon_directory = /usr/libexec/postfix
+command_directory = /usr/bin
+daemon_directory = /usr/lib/postfix/bin
 data_directory = /var/lib/postfix
 mail_owner = postfix
 myhostname = pychat.org
@@ -17,19 +17,22 @@ alias_database = hash:/etc/aliases
 home_mailbox = Maildir/
 debug_peer_level = 2
 debugger_command =
-	 PATH=/bin:/usr/bin:/usr/local/bin:/usr/X11R6/bin
-	 ddd $daemon_directory/$process_name $process_id & sleep 5
-sendmail_path = /usr/sbin/sendmail.postfix
-newaliases_path = /usr/bin/newaliases.postfix
-mailq_path = /usr/bin/mailq.postfix
+	PATH=/bin:/usr/bin:/usr/local/bin:/usr/X11R6/bin
+	ddd $daemon_directory/$process_name $process_id & sleep 5
+sendmail_path = /usr/bin/sendmail
+newaliases_path = /usr/bin/newaliases
+mailq_path = /usr/bin/mailq
 setgid_group = postdrop
 html_directory = no
 manpage_directory = /usr/share/man
-sample_directory = /usr/share/doc/postfix-2.6.6/samples
-readme_directory = /usr/share/doc/postfix-2.6.6/README_FILES
+sample_directory = /etc/postfix/sample
+readme_directory = /usr/share/doc/postfix
 ## SSL
 smtpd_use_tls = yes
 smtpd_tls_auth_only = yes
 smtpd_tls_key_file = /etc/nginx/ssl/server.key
 smtpd_tls_cert_file = /etc/nginx/ssl/1_pychat.org_bundle.crt
 smtpd_tls_loglevel = 1
+meta_directory = /etc/postfix
+shlib_directory = /usr/lib/postfix
+virtual_alias_maps = hash:/etc/postfix/virtual
