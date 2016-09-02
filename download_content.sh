@@ -56,7 +56,7 @@ declare -a files=(\
 cd "$PROJECT_ROOT"
 
 compile_sass() {
-    if ! type "sass" > /dev/null; then
+    if ! type "sass" &> /dev/null; then
      >&2 echo "You need to install sass to be able to use stylesheets"
      exit 1
     fi
