@@ -31,14 +31,14 @@ Prepare system.
  0. Place your certificate in `/etc/nginx/ssl`, you can get free one with startssl. For it start postfix service, send validation email to domain `webmaster@pychat.org` and apply verification code from `/root/Maildir/new/<<time>>` (you may also need to  disable ssl in /etc/postfix/main.cf since it's enabled by default). You can generate server.key and get certificate from  https://www.startssl.com/Certificates/ApplySSLCert . Put them into  `/etc/nginx/ssl/server.key` and `/etc/nginx/ssl/1_pychat.org_bundle.crt`. Change owner of files to http user `sudo chown -R http:http /etc/nginx/ssl/`
  0. Add django admin static files: `python manage.py collectstatic`
 
-																				Start the chat:
+Start the chat:
  1. Start session holder: `systemctl start redis`
  1. Run server: `systemctl start  nginx`
  1. Start email server `systemctl start postfix`
  1. Start database: `systemctl start mysqld`
  1. Start the Chat: `systemctl start uwsgi`
  1. Start the WebSocket listener: `systemctl start tornado`
- 1. Open in browser [http*s*://your.domain.com](https://127.0.0.1)
+ 1. Open in browser [http**s**://your.domain.com](https://127.0.0.1)
 
 # TODO
 * Add title for room. 
