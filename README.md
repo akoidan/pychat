@@ -34,6 +34,8 @@ Instructions for *[Archlinux](https://www.archlinux.org/)*:
  5. Install **sass**: `gem install sass`.
 
 Instructions for *[CentOs](https://www.centos.org/)* can be found in [production](https://github.com/Deathangel908/djangochat/tree/production) branch.
+
+You can also find full production setup for *[Archlinux](https://www.archlinux.org/)* in [prod_archlinux](https://github.com/Deathangel908/djangochat/tree/prod_archlinux) branch
   
 After you finished installing programs and tools:
  1. Install python packages with `pip install -r requirements.txt`. 
