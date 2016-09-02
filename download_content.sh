@@ -2,7 +2,7 @@
 
 CONF_REPOSITORY="https://github.com/Deathangel908/djangochat-config"
 
-CONF_VERSION='f930e519dea693c1757482c959257dc688c012d2'
+CONF_VERSION='72425f9b8e35d027cefb863f56c5ed81b4a7493b'
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
@@ -55,6 +55,20 @@ declare -a files=(\
 
 cd "$PROJECT_ROOT"
 
+minify_js() {
+    # prototype. doesn't resolve variables set through html file
+    # also doesnt give a lot of benefict because of huge smileys_data.js file
+    if ls "$PROJECT_ROOT/closure-compiler*.jar" 1> /dev/null 2>&1; then
+        echo "files do exist"
+    else
+        echo "Closure compiler wasn't found, downloading it"
+        curl -X GET https://dl.google.com/closure-compiler/compiler-latest.zip -o "$TMP_DIR/closure.zip"
+        unzip "$TMP_DIR/closure.zip" "*.jar" -d "$PROJECT_ROOT"
+    fi
+    jar_file=`ls "$PROJECT_ROOT"/closure-compiler*.jar`
+    java -jar "$jar_file"  --compilation_level ADVANCED_OPTIMIZATIONS  --js "$JS_DIR/base.js" --js "$JS_DIR/smileys_data.js" --js "$JS_DIR/chat.js" --js_output_file "$JS_DIR/chat-minified.js"
+
+}
 compile_sass() {
     if ! type "sass" &> /dev/null; then
      >&2 echo "You need to install sass to be able to use stylesheets"

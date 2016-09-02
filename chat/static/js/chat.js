@@ -45,7 +45,9 @@ onDocLoad(function () {
 	smileyUtil = new SmileyUtil();
 	wsHandler = new WsHandler();
 	//bottom call loadMessagesFromLocalStorage(); s
-	smileyUtil.init();
+	if (typeof finishInitSmile != 'undefined') {
+		finishInitSmile();
+	}
 	storage = new Storage();
 	notifier = new NotifierHandler();
 	painter = new Painter();
@@ -1279,8 +1281,13 @@ function SmileyUtil() {
 	self.smileRegex = /<img[^>]*code="([^"]+)"[^>]*>/g;
 	self.tabNames = [];
 	self.smileyDict = {};
-	self.init = function () {
-		self.loadSmileys(window.smileys_bas64_data);
+	self.inited = false;
+	self.init = function (smileys_bas64_data) {
+		if (self.inited) {
+			return;
+		}
+		self.inited = true;
+		self.loadSmileys(smileys_bas64_data);
 		userMessage.addEventListener("mousedown", function(event) {
 			event.stopPropagation(); // Don't fire onDocClick
 		});
