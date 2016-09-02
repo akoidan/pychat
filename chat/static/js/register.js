@@ -183,7 +183,7 @@ function showForgotPassword() {
 	CssUtils.addClass(showLoginEl, 'disabled');
 	CssUtils.addClass(showRegisterEl, 'disabled');
 	setUrlParam('type', 'forgot');
-	if (CAPTCHA_URL && captchaState == 0) {
+	if (typeof CAPTCHA_URL != 'undefined' && captchaState == 0) {
 		captchaState = 1;
 		doGet(CAPTCHA_URL, function() {
 			captchaState = 2;
@@ -208,7 +208,7 @@ function login(event) {
 	doPost('/auth', null, redirectToNextPage, loginForm);
 }
 
-onDocLoad(function () {
+function initRegisterPage() {
 	loginForm = $('regLoginForm');
 	registerForm = $('register-form');
 	recoverForm = $('recoverForm');
@@ -227,7 +227,7 @@ onDocLoad(function () {
 	} else if (initType == 'forgot') {
 		showForgotPassword();
 	}
-});
+}
 
 function register(event) {
 	event.preventDefault();
@@ -237,7 +237,7 @@ function register(event) {
 
 function restorePassword(event) {
 	event.preventDefault();
-	if (CAPTCHA_URL && captchaState != 2) {
+	if (typeof CAPTCHA_URL != 'undefined' && captchaState != 2) {
 		return; // wait for captcha to load
 	}
 	var form = recoverForm;

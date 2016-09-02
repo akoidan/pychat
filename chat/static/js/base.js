@@ -599,5 +599,3 @@ function getDebugMessage() {
 	saveLogToStorage(result);
 	return result;
 }
-
-

@@ -12,6 +12,7 @@
 		{% if oauth_token %}const G_OAUTH_URL = '{{ oauth_url }}'; {% endif %}
 		{% if fb_app_id %}const FACEBOOK_APP_ID = '{{ fb_app_id }}';
 		const FACEBOOK_JS_URL = '{{ fb_js_url }}'; {% endif %}
+		onDocLoad(initRegisterPage);
 	</script>
 {% endblock %}
 {% block content %}
