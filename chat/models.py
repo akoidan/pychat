@@ -9,7 +9,7 @@ from django.db import models
 from django.db.models import CharField, DateField, FileField, BooleanField
 
 from chat.log_filters import id_generator
-from chat.settings import GENDERS, DEFAULT_PROFILE_ID
+from chat.settings import GENDERS, DEFAULT_PROFILE_ID, JS_CONSOLE_LOGS
 
 
 def get_random_path(instance, filename):
@@ -103,6 +103,7 @@ class UserProfile(User):
 	photo = FileField(upload_to=get_random_path, null=True)
 	suggestions = BooleanField(null=False, default=True)
 	notifications = BooleanField(null=False, default=True)
+	logs = BooleanField(null=False, default=JS_CONSOLE_LOGS)
 	# TODO, save theme in profile? theme_name = CharField(max_length=16, null=True)
 
 	email_verification = models.ForeignKey(Verification, null=True)

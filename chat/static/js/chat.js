@@ -3,8 +3,13 @@ const SYSTEM_HEADER_CLASS = 'message-header-system';
 const TIME_SPAN_CLASS = 'timeMess';
 const CONTENT_STYLE_CLASS = 'message-text-style';
 const DEFAULT_CHANNEL_NAME = 1;
-const USER_ID_ATTR = 'userid'; // used in ChannelsHandler and ChatHandler
-const USER_NAME_ATTR = 'username';  // used in ChannelsHandler and ChatHandler
+// used in ChannelsHandler and ChatHandler
+const USER_ID_ATTR = 'userid';
+const SELF_HEADER_CLASS = 'message-header-self';
+const USER_NAME_ATTR = 'username';
+const REMOVED_MESSAGE_CLASSNAME = 'removed-message';
+const MESSAGE_ID_ATTRIBUTE = 'messageId';
+// end used
 const SYSTEM_USERNAME = 'System';
 const CANCEL_ICON_CLASS_NAME = 'icon-cancel-circled-outline';
 const GENDER_ICONS = {
@@ -12,7 +17,7 @@ const GENDER_ICONS = {
 	'Female': 'icon-girl',
 	'Secret': 'icon-user-secret'
 };
-
+var smileUnicodeRegex = /[\u3400-\u3500]/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
@@ -40,7 +45,9 @@ onDocLoad(function () {
 	smileyUtil = new SmileyUtil();
 	wsHandler = new WsHandler();
 	//bottom call loadMessagesFromLocalStorage(); s
-	smileyUtil.init();
+	if (typeof finishInitSmile != 'undefined') {
+		finishInitSmile();
+	}
 	storage = new Storage();
 	notifier = new NotifierHandler();
 	painter = new Painter();
@@ -614,7 +621,7 @@ function ChannelsHandler() {
 	self.render = self.show;
 	self.ROOM_ID_ATTR = 'roomid';
 	self.activeChannel = DEFAULT_CHANNEL_NAME;
-	self.EDIT_MESSAGE_CLASS = 'changeMessage';
+	self.HIGHLIGHT_MESSAGE_CLASS = 'highLightMessage';
 	self.channels = {};
 	self.childDom = {
 		wrapper: $('wrapper'),
@@ -633,7 +640,8 @@ function ChannelsHandler() {
 		imgInput: $('imgInput'),
 		usersStateText: $('usersStateText'),
 		inviteUser: $('inviteUser'),
-		navCallIcon: $('navCallIcon')
+		navCallIcon: $('navCallIcon'),
+		m2Message: $('m2Message')
 	};
 	self.getActiveChannel = function () {
 		return self.channels[self.activeChannel];
@@ -775,21 +783,85 @@ function ChannelsHandler() {
 			}
 		}
 	};
+	self.showM2EditMenu = function(event, el, messageId, time) {
+		event.preventDefault();
+		event.stopPropagation();
+		self.removeEditingMode();
+		CssUtils.showElement(self.dom.m2Message);
+		CssUtils.addClass(el, channelsHandler.HIGHLIGHT_MESSAGE_CLASS);
+		self.dom.m2Message.style.top = event.pageY - 20 + 'px';
+		self.dom.m2Message.style.left = event.pageX - 5 + 'px';
+		document.addEventListener('click', self.hideM2EditMessage);
+		self.editLastMessageNode = {
+			dom: el,
+			id: messageId,
+			notReady: true,
+			time: time
+		}
+	};
+	self.showM2ContextDelete = function (event) {
+		var el = event.target;
+		while (el != self.dom.chatBoxDiv) {
+			if (el.tagName == 'P') {
+				var strMessageId = el.getAttribute(MESSAGE_ID_ATTRIBUTE);
+				if (strMessageId) {
+					var messageId = parseInt(strMessageId);
+					var time = parseInt(el.id);
+					var selector = "[{}='{}']:not(.{}) .{}".format(
+							MESSAGE_ID_ATTRIBUTE,
+							strMessageId,
+							REMOVED_MESSAGE_CLASSNAME,
+							SELF_HEADER_CLASS
+					);
+					var p = document.querySelector(selector);
+					if (p && self.isMessageEditable(time)) {
+						self.showM2EditMenu(event, el, messageId, time);
+					}
+				}
+			}
+			el = el.parentNode;
+		}
+	};
+	self.hideM2EditMessage = function(){
+		self.removeEditingMode();
+		document.removeEventListener('click', self.hideM2EditMessage);
+		CssUtils.hideElement(self.dom.m2Message);
+	};
+	self.m2EditMessage = function () {
+		self.editLastMessageNode.notReady = false;
+		var selector = '[id="{}"] .{}'.format(self.editLastMessageNode.time, CONTENT_STYLE_CLASS);
+		userMessage.innerHTML = document.querySelector(selector).innerHTML;
+		self.placeCaretAtEnd();
+		event.stopPropagation();
+		document.removeEventListener('click', self.hideM2EditMessage);
+		CssUtils.hideElement(self.dom.m2Message);
+	};
+	self.m2DeleteMessage = function () {
+		wsHandler.sendToServer({
+				id: self.editLastMessageNode.id,
+				action: 'editMessage',
+				content: null
+		});
+		// eventPropagande will execute onclick on document.body that will hide contextMenu
+	};
 	self.handleEditMessage = function(event) {
 		if (!blankRegex.test(userMessage.textContent)) {
 			return;
 		}
 		var editLastMessageNode = self.getActiveChannel().lastMessage;
 		// only if message was sent 1 min ago + 2seconds for message to being processed
-		if (editLastMessageNode && editLastMessageNode.time + 58000 > new Date().getTime()) {
+		if (editLastMessageNode && self.isMessageEditable(editLastMessageNode.time)) {
 			self.editLastMessageNode = editLastMessageNode;
 			self.editLastMessageNode.dom = $(editLastMessageNode.time);
-			CssUtils.addClass(self.editLastMessageNode.dom, self.EDIT_MESSAGE_CLASS);
-			var selector = '[id="{}"] .message-text-style'.format(editLastMessageNode.time);
+			CssUtils.addClass(self.editLastMessageNode.dom, self.HIGHLIGHT_MESSAGE_CLASS);
+			var selector = '[id="{}"] .{}'.format(editLastMessageNode.time, CONTENT_STYLE_CLASS);
 			userMessage.innerHTML = document.querySelector(selector).innerHTML;
 			self.placeCaretAtEnd();
 			event.preventDefault();
 		}
+	};
+	self.isMessageEditable = function (time) {
+		return time + 58000 > new Date().getTime();
 	};
 	self.placeCaretAtEnd = function() {
 		var range = document.createRange();
@@ -804,7 +876,7 @@ function ChannelsHandler() {
 		var messageContent = userMessage.textContent;
 		messageContent = blankRegex.test(messageContent) ? null : messageContent;
 		var message;
-		if (self.editLastMessageNode) {
+		if (self.editLastMessageNode && !self.editLastMessageNode.notReady) {
 			message = {
 				id: self.editLastMessageNode.id,
 				action: 'editMessage',
@@ -836,7 +908,7 @@ function ChannelsHandler() {
 	};
 	self.removeEditingMode = function() {
 		if (self.editLastMessageNode) {
-			CssUtils.removeClass(self.editLastMessageNode.dom, self.EDIT_MESSAGE_CLASS);
+			CssUtils.removeClass(self.editLastMessageNode.dom, self.HIGHLIGHT_MESSAGE_CLASS);
 			self.editLastMessageNode = null;
 			userMessage.innerHTML = "";
 		}
@@ -980,6 +1052,7 @@ function ChannelsHandler() {
 		chatBoxDiv.ondrop = self.imageDrop;
 		chatBoxDiv.ondragover = self.preventDefault;
 		self.channels[roomId] = new ChatHandler(li, chatBoxDiv, users, roomId, roomName);
+		self.channels[roomId].dom.chatBoxDiv.oncontextmenu = self.showM2ContextDelete;
 	};
 	self.createNewUserChatHandler = function (roomId, users) {
 		var allUsersIds = Object.keys(users);
@@ -1081,7 +1154,7 @@ function ChannelsHandler() {
 		growlInfo('<span>Room <b>{}</b> has been created</span>'.format(roomName));
 	};
 	self.viewProfile = function () {
-		singlePage.showPage('/profile/', self.getActiveUserId());
+		singlePage.showPage('/profile/', [self.getActiveUserId()]);
 	};
 	self.init = function () {
 		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);
@@ -1108,7 +1181,7 @@ function ChannelsHandler() {
 
 	};
 	self.getActiveUserId = function () {
-		return self.dom.activeUserContext.getAttribute(USER_ID_ATTR);
+		return parseInt(self.dom.activeUserContext.getAttribute(USER_ID_ATTR));
 	};
 	self.getActiveUsername = function () {
 		return self.dom.activeUserContext.textContent;
@@ -1208,8 +1281,13 @@ function SmileyUtil() {
 	self.smileRegex = /<img[^>]*code="([^"]+)"[^>]*>/g;
 	self.tabNames = [];
 	self.smileyDict = {};
-	self.init = function () {
-		self.loadSmileys(window.smileys_bas64_data);
+	self.inited = false;
+	self.init = function (smileys_bas64_data) {
+		if (self.inited) {
+			return;
+		}
+		self.inited = true;
+		self.loadSmileys(smileys_bas64_data);
 		userMessage.addEventListener("mousedown", function(event) {
 			event.stopPropagation(); // Don't fire onDocClick
 		});
@@ -1255,7 +1333,7 @@ function SmileyUtil() {
 	};
 	self.encodeSmileys = function (html) {
 		html = encodeAnchorsHTML(html);
-		html = html.replace(window.smileUnicodeRegex, function (s) {
+		html = html.replace(smileUnicodeRegex, function (s) {
 			return self.smileyDict[s];
 		});
 		return html;
@@ -1369,7 +1447,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.activeRoomClass = 'active-room';
 	self.dom.newMessages.className = 'newMessagesCount hidden';
 	li.appendChild(self.dom.newMessages);
-	self.SELF_HEADER_CLASS = 'message-header-self';
 	self.OTHER_HEADER_CLASS = 'message-header-others';
 	self.dom.userList.className = 'hidden';
 	channelsHandler.dom.chatUsersTable.appendChild(self.dom.userList);
@@ -1513,17 +1590,19 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var user = self.allUsers[message.userId];
 		CssUtils.deleteElement(user.li);
 		var dm = 'User <b>{}</b> has left the conversation'.format(user.user);
-		self.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
+		displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
 		delete self.allUsers[message.userId];
 	};
 	/** Creates a DOM node with attached events and all message content*/
-	self.createMessageNode = function (timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix) {
+	self.createMessageNode = function (timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId) {
 		var date = new Date(timeMillis);
 		var time = [sliceZero(date.getHours()), sliceZero(date.getMinutes()), sliceZero(date.getSeconds())].join(':');
 
 		var p = document.createElement('p');
 		p.setAttribute("id", timeMillis);
-
+		if (messageId) {
+			p.setAttribute(MESSAGE_ID_ATTRIBUTE, messageId);
+		}
 		var headSpan = document.createElement('span');
 		headSpan.className = headerStyle; // note it's not appending classes, it sets all classes to specified
 		var timeSpan = document.createElement('span');
@@ -1536,9 +1615,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		userNameA.textContent = displayedUsername;
 		headSpan.insertAdjacentHTML('beforeend', ' ');
 		headSpan.appendChild(userNameA);
-		var userSuffix;
-		userSuffix = isPrefix ? ' >> ' : ': ';
-		headSpan.insertAdjacentHTML('beforeend', userSuffix);
+		headSpan.insertAdjacentHTML('beforeend', ': ');
 		p.appendChild(headSpan);
 		var textSpan = document.createElement('span');
 		textSpan.className = CONTENT_STYLE_CLASS;
@@ -1580,7 +1657,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		return result;
 	};
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
-	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, isPrefix) {
+	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId) {
 		var pos = null;
 		if (self.allMessages.length > 0 && !(timeMillis > self.allMessages[self.allMessages.length - 1])) {
 			try {
@@ -1593,7 +1670,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		} else {
 			self.allMessages.push(timeMillis);
 		}
-		var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, isPrefix);
+		var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId);
 		// every message has UTC millis ID so we can detect if message is already displayed or position to display
 		pos = self.insertCurrentDay(timeMillis, pos);
 		if (pos != null) {
@@ -1637,20 +1714,17 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var html = encodeMessage(data);
 		var p = $(data.time);
 		if (p != null) {
-			document.querySelector("[id='{}'] .message-text-style".format(data.time)).innerHTML = html;
+			document.querySelector("[id='{}'] .{}".format(data.time, CONTENT_STYLE_CLASS)).innerHTML = html;
 			CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
 		}
 	};
 	self.deleteMessage = function(data) {
-		var target = document.querySelector("[id='{}'] .message-text-style".format(data.time));
+		var target = document.querySelector("[id='{}'] .{}".format(data.time, CONTENT_STYLE_CLASS));
 		if (target) {
 			target.innerHTML = 'This message has been removed.';
-			CssUtils.addClass(target, 'removed-message');
+			CssUtils.addClass($(data.time), REMOVED_MESSAGE_CLASSNAME);
 			if (data.userId == loggedUserId) {
 				self.lastMessage = null;
-				if (!window.newMessagesDisabled) {
-					growlInfo("Last message has been deleted");
-				}
 			}
 		}
 	};
@@ -1668,11 +1742,10 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 		var displayedUsername = user.user;
 		//private message
-		var prefix = false;
-		var headerStyle = data.userId == loggedUserId ? self.SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
+		var headerStyle = data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
 		var preparedHtml = encodeMessage(data);
 		notifier.notify(displayedUsername, data.content || 'image');
-		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, prefix);
+		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, data.id);
 		if (self.isHidden() && !window.newMessagesDisabled) {
 			self.newMessages++;
 			self.dom.newMessages.textContent = self.newMessages;

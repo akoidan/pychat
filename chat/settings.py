@@ -284,6 +284,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 MEDIA_URL = "/photo/"
 
 USER_COOKIE_NAME = 'user'
+JS_CONSOLE_LOGS = True
 
 # If this options is set, on every oncoming request chat will gather info about user location
 if not DEBUG:

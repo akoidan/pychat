@@ -14,7 +14,7 @@
 		var suggestions = {{ suggestions |yesno:"true,false" }};
 		var notifications = {{ notifications |yesno:"true,false" }};
 	</script>
-	<script src="{% md5url "js/smileys_data.js" %}"></script>
+	<script src="{% md5url "js/smileys_data.js" %}" async></script>
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}
@@ -42,6 +42,10 @@
 	</div>
 	<div id="wrapper" class="max-height-scrollable hidden">
 		<div id="chatBoxHolder" class="max-height-scrollable">
+			<ul id="m2Message" class="hidden">
+				<li onclick="channelsHandler.m2EditMessage()">Edit message</li>
+				<li onclick="channelsHandler.m2DeleteMessage()">Delete message</li>
+			</ul>
 			<div id="callContainer" class="hidden">
 				<section>
 					<form id="fileInfo" class="hidden">

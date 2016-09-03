@@ -96,8 +96,7 @@ p
 	font-size: 24px
 	overflow-y: auto
 	overflow-x: hidden
-	min-width: 200px
-	text-overflow: ellipsis
+	min-width: $rooms-width
 	position: relative
 	ul
 		margin-top: 5px
@@ -129,20 +128,12 @@ p
 		color: #f1f1f1
 
 .removed-message
-	color: #5d5d5d
-	text-decoration: line-through
+	.message-text-style
+		color: #5d5d5d
+		text-decoration: line-through
 
-#user-context-menu
-	visibility: visible
-	opacity: 1
-	transition: visibility 0s, opacity 0.3s linear
-	position: absolute
+.context-menu
 	z-index: 3
-	right: 0
-	margin: 0
-	padding: 2px 0
-	width: calc(100% - 2px)
-	border-radius: 0 0 5px 5px
 	font-size: 16px
 	color: #ACACAC
 	border: $user-context-border
@@ -151,9 +142,26 @@ p
 		padding: 2px 5px
 		&:hover
 			cursor: pointer
-
 			color: #c7c7c7
 			border-radius: 3px
+
+#m2Message
+	@extend .context-menu
+	border-radius: 3px
+	position: fixed
+
+
+#user-context-menu
+	@extend .context-menu
+	visibility: visible
+	opacity: 1
+	transition: visibility 0s, opacity 0.3s linear
+	position: absolute
+	right: 0
+	margin: 0 !important //override #chat-room-users ul
+	padding: 2px 0
+	width: calc(100% - 2px)
+	border-radius: 0 0 5px 5px
 	&.hidden
 		display: block !important
 		visibility: hidden
@@ -169,9 +177,7 @@ p
 		border: 1px solid transparent
 		opacity: 0.8
 		width: 100%
-		white-space: nowrap
-		text-overflow: ellipsis
-		overflow: hidden
+		@include ellipsis
 		border-radius: 3px
 		[class^='icon-']
 			opacity: 1
@@ -235,15 +241,20 @@ p
 			border-radius: 2px
 			@include hovered-user-room
 
+$padding-before-circ: 30px
 #directUserTable,
 #rooms
 	li
 		@include  fix-user-icon-top-position
+		@include ellipsis
 		border-radius: 3px
 		position: relative
 		height: 30px
 		@include hovered-user-room
+		width: $rooms-width
 		&:hover
+			padding-right: $padding-before-circ
+			width: $rooms-width - $padding-before-circ
 			.icon-cancel-circled-outline
 				display: inline
 
@@ -260,7 +271,10 @@ p
 	margin-left: 5px
 
 #rooms li
-	padding-left: 10px
+	$padding: 10px
+	padding-left: $padding
+	&:hover
+		width: $rooms-width - $padding-before-circ - $padding
 
 .fluid-height-child-bot
 	display: table
@@ -575,7 +589,7 @@ p
 		font-size: 10px
 		color: grey
 
-.changeMessage
+.highLightMessage
 	border: 1px solid grey
 	border-radius: 3px
 	padding: 3px

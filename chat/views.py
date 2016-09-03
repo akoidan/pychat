@@ -123,10 +123,6 @@ def send_restore_password(request):
 		user_profile = UserProfile.objects.get(Q(username=username_or_password) | Q(email=username_or_password))
 		if not user_profile.email:
 			raise ValidationError("You didn't specify email address for this user")
-		if not user_profile.email_verification_id or not user_profile.email_verification.verified:
-			send_email_verification(user_profile, request.get_host())
-			raise ValidationError("You didn't verify the email after registration. We resend you verification email,"
-					"and restore password again")
 		verification = Verification(type_enum=Verification.TypeChoices.password, user_id=user_profile.id)
 		verification.save()
 		message = "{},\n" \
@@ -275,7 +271,7 @@ def report_issue(request):
 
 class ProfileView(View):
 
-	@login_required_no_redirect(True)
+	@login_required_no_redirect()
 	def get(self, request):
 		user_profile = UserProfile.objects.get(pk=request.user.id)
 		form = UserProfileForm(instance=user_profile)

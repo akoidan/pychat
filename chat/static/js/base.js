@@ -20,10 +20,7 @@ window.onerror = function (msg, url, linenumber) {
 String.prototype.formatPos = function () {
 	var args = arguments;
 	return this.replace(/{(\d+)}/g, function (match, number) {
-		return typeof args[number] != 'undefined'
-				? args[number]
-				: match
-				;
+		return typeof args[number] != 'undefined' ? args[number] : match;
 	});
 };
 
@@ -41,7 +38,26 @@ var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|&#39;|$))/g;/*http:/
 var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
 var muteBtn;
 var inputRangeStyles = {};
-var currentPlayingAudio;
+
+console.LOG = console.log;
+console.WARN = console.warn;
+console.ERROR = console.error;
+function dummyFun() {}
+
+function enableLogs() {
+	if (!window.LOGS) {
+		console.log = dummyFun;
+		console.warn = dummyFun;
+		console.error = dummyFun;
+	} else if (console.LOG) {
+		console.log = console.LOG;
+		console.warn = console.WARN;
+		console.error = console.ERROR;
+	}
+}
+
+enableLogs();
+
 const escapeMap = {
 	"&": "&amp;",
 	"<": "&lt;",
@@ -415,23 +431,6 @@ function mute() {
 }
 
 
-function login(event) {
-	event.preventDefault();
-	var callback = function (data) {
-		if (data === RESPONSE_SUCCESS) {
-			var nextUrl =getUrlParam('next');
-			if (nextUrl == null) {
-				nextUrl = '/';
-			}
-			window.location.href = nextUrl;
-		} else {
-			growlError(data);
-		}
-	};
-	doPost('/auth', null, callback, loginForm);
-}
-
-
 function readCookie(name, c, C, i) {
 	c = document.cookie.split('; ');
 	var cookies = {};
@@ -528,10 +527,15 @@ function doGet(fileUrl, callback) {
 			}
 			xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
 			xobj.onreadystatechange = function () {
-				if (xobj.readyState === 4 && xobj.status === 200) {
-					console.log(getDebugMessage('GET in: {} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100)));
-					if (callback) {
-						callback(xobj.responseText);
+				if (xobj.readyState === 4) {
+					if (xobj.status === 200) {
+						console.log(getDebugMessage('GET in: {} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100)));
+						if (callback) {
+							callback(xobj.responseText);
+						}
+					} else {
+						console.error(getDebugMessage("Unable to load {}, response code is '{}', response: {}", fileUrl, xobj.status, xobj.response ));
+						growlError("<span>Unable to load {}, response code is <b>{}</b>, response: {} <span>".format(fileUrl, xobj.status, xobj.response));
 					}
 				}
 			};
@@ -574,6 +578,7 @@ function sliceZero(number, count) {
  * @returns: "15:09:31:009: war is bad"
  *  */
 function getDebugMessage() {
+	if (!window.LOGS) return;
 	var now = new Date();
 	// first argument is format, others are params
 	var text;
@@ -594,5 +599,3 @@ function getDebugMessage() {
 	saveLogToStorage(result);
 	return result;
 }
-
-

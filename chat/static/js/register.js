@@ -6,6 +6,7 @@ var showRegisterEl;
 var auth2;
 var googleToken;
 var FBApiLoaded = false;
+var googleApiLoaded = false;
 var captchaState = 0; // 0 - not inited, 1 - initializing, 2 - loaded
 
 var RegisterValidator = function () {
@@ -182,7 +183,7 @@ function showForgotPassword() {
 	CssUtils.addClass(showLoginEl, 'disabled');
 	CssUtils.addClass(showRegisterEl, 'disabled');
 	setUrlParam('type', 'forgot');
-	if (CAPTCHA_URL && captchaState == 0) {
+	if (typeof CAPTCHA_URL != 'undefined' && captchaState == 0) {
 		captchaState = 1;
 		doGet(CAPTCHA_URL, function() {
 			captchaState = 2;
@@ -190,7 +191,24 @@ function showForgotPassword() {
 	}
 }
 
-onDocLoad(function () {
+function redirectToNextPage(response) {
+	if (response === RESPONSE_SUCCESS) {
+		var nextUrl = getUrlParam('next');
+		if (nextUrl == null) {
+			nextUrl = '/';
+		}
+		window.location.href = nextUrl;
+	} else {
+		growlError(response);
+	}
+}
+
+function login(event) {
+	event.preventDefault();
+	doPost('/auth', null, redirectToNextPage, loginForm);
+}
+
+function initRegisterPage() {
 	loginForm = $('regLoginForm');
 	registerForm = $('register-form');
 	recoverForm = $('recoverForm');
@@ -209,27 +227,17 @@ onDocLoad(function () {
 	} else if (initType == 'forgot') {
 		showForgotPassword();
 	}
-});
-
-
-function onRegisterProceed(data) {
-	//ajaxHide();
-	if (data === RESPONSE_SUCCESS) {
-		window.location.href = '/';
-	} else {
-		growlError(data);
-	}
 }
 
 function register(event) {
 	event.preventDefault();
-	doPost('/register', null, onRegisterProceed, registerForm);
+	doPost('/register', null, redirectToNextPage, registerForm);
 }
 
 
 function restorePassword(event) {
 	event.preventDefault();
-	if (CAPTCHA_URL && captchaState != 2) {
+	if (typeof CAPTCHA_URL != 'undefined' && captchaState != 2) {
 		return; // wait for captcha to load
 	}
 	var form = recoverForm;
@@ -251,9 +259,10 @@ function restorePassword(event) {
 
 
 function sendGoogleTokenToServer(token) {
+	growlInfo("Successfully logged into google successfully, proceeding...");
 	doPost('/google-auth', {
 		token: token
-	}, onRegisterProceed);
+	}, redirectToNextPage);
 }
 
 
@@ -270,10 +279,10 @@ function onGoogleSignIn() {
 function googleLogin(event) {
 	event.preventDefault(); // somehow button triggers sumbit
 	// Load the API client and auth library
-	growlInfo("Trying to log in via Google");
 	if (googleToken) {
 		sendGoogleTokenToServer(googleToken)
-	} else {
+	} else if (!googleApiLoaded) {
+		growlInfo("Trying to log in via Google");
 		doGet(G_OAUTH_URL, function () {
 			gapi.load('client:auth2', function () {
 			  //gapi.client.setApiKey(apiKey);
@@ -295,7 +304,10 @@ function googleLogin(event) {
 				});
 			});
 		});
+	} else {
+		auth2.signIn();
 	}
+	googleApiLoaded = true;
 }
 
 function facebookLogin(event) {
@@ -319,21 +331,23 @@ window.fbAsyncInit = function () {
 	FB.getLoginStatus(fbStatusChange);
 };
 
-function fbStatusChange(response) {
-	console.log(response);
+function fbStatusChangeIfReAuth(response) {
 	if (response.status === 'connected') {
 		// Logged into your app and Facebook.
+		growlInfo("Successfully logged in into facebook, proceeding...");
 		doPost('/facebook-auth', {
 			token: response.authResponse.accessToken
-		}, onRegisterProceed);
+		}, redirectToNextPage);
 	} else if (response.status === 'not_authorized') {
 		growlInfo("Allow facebook application to use your data");
 	} else {
-		var growl = new Growl("Login into your facebook account first and reload this page");
-		growl.info();
-		growl.growlHolder.onclick  = function() {
-			window.open('https://fb.com');
-		};
-		growl.growlHolder.style.cursor = 'pointer';
+		return true;
+	}
+}
+
+function fbStatusChange(response) {
+	console.log(response);
+	if (fbStatusChangeIfReAuth(response)) {
+		FB.login(fbStatusChangeIfReAuth, {auth_type: 'reauthenticate'});
 	}
 }

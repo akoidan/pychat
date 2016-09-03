@@ -34,6 +34,8 @@ Instructions for *[Archlinux](https://www.archlinux.org/)*:
  5. Install **sass**: `gem install sass`.
 
 Instructions for *[CentOs](https://www.centos.org/)* can be found in [production](https://github.com/Deathangel908/djangochat/tree/production) branch.
+
+You can also find full production setup for *[Archlinux](https://www.archlinux.org/)* in [prod_archlinux](https://github.com/Deathangel908/djangochat/tree/prod_archlinux) branch
   
 After you finished installing programs and tools:
  1. Install python packages with `pip install -r requirements.txt`. 
@@ -50,7 +52,7 @@ Afterwards to start the chat you need:
  1. Start session holder: `redis-server`
  2. Start webSocket listener: `python manage.py start_tornado`
  3. Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
- 4. Open in browser [http*s*://127.0.0.1:8000](https://127.0.0.1:8000).
+ 4. Open in browser [http**s**://127.0.0.1:8000](https://127.0.0.1:8000).
  5. If you get an ssl error on establishing websocket connection in browser, that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
 
 # TODO
