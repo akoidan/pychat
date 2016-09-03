@@ -2,7 +2,7 @@
 
 CONF_REPOSITORY="https://github.com/Deathangel908/djangochat-config"
 
-CONF_VERSION='7c33f387dfc1907eda6d0fc5782d9e1c52e2332e'
+CONF_VERSION=$(git ls-tree master djangochat-config  |awk '{print $3}')
 
 # defining the project structure
 PROJECT_ROOT=`pwd`
