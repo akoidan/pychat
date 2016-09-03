@@ -17,7 +17,7 @@ const GENDER_ICONS = {
 	'Female': 'icon-girl',
 	'Secret': 'icon-user-secret'
 };
-
+var smileUnicodeRegex = /[\u3400-\u3500]/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
@@ -1333,7 +1333,7 @@ function SmileyUtil() {
 	};
 	self.encodeSmileys = function (html) {
 		html = encodeAnchorsHTML(html);
-		html = html.replace(window.smileUnicodeRegex, function (s) {
+		html = html.replace(smileUnicodeRegex, function (s) {
 			return self.smileyDict[s];
 		});
 		return html;
