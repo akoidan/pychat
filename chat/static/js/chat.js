@@ -325,7 +325,7 @@ function NotifierHandler() {
 		this.close()
 	};
 	self.lastNotifyTime = new Date().getTime();
-	self.notify = function (title, message) {
+	self.notify = function (title, message, icon) {
 		if (self.isCurrentTabActive) {
 			return;
 		}
@@ -341,7 +341,7 @@ function NotifierHandler() {
 		}
 		self.askPermissions();
 		var notification = new Notification(title, {
-			icon: NOTIFICATION_ICON_URL,
+			icon: icon || NOTIFICATION_ICON_URL,
 			body: message
 		});
 		self.popedNotifQueue.push(notification);
@@ -1744,7 +1744,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		//private message
 		var headerStyle = data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
 		var preparedHtml = encodeMessage(data);
-		notifier.notify(displayedUsername, data.content || 'image');
+		notifier.notify(displayedUsername, data.content || 'image', data.image);
 		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, data.id);
 		if (self.isHidden() && !window.newMessagesDisabled) {
 			self.newMessages++;
