@@ -39,20 +39,20 @@ var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
 var muteBtn;
 var inputRangeStyles = {};
 
-console.LOG = console.log;
-console.WARN = console.warn;
-console.ERROR = console.error;
 function dummyFun() {}
+
+consoleReal = console;
+consoleDummy = {
+	log: dummyFun,
+	error: dummyFun,
+	warn: dummyFun
+};
 
 function enableLogs() {
 	if (!window.LOGS) {
-		console.log = dummyFun;
-		console.warn = dummyFun;
-		console.error = dummyFun;
-	} else if (console.LOG) {
-		console.log = console.LOG;
-		console.warn = console.WARN;
-		console.error = console.ERROR;
+		console = consoleDummy;
+	} else {
+		console = consoleReal;
 	}
 }
 
