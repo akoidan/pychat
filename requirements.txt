@@ -1,6 +1,6 @@
 setuptools
 oauth2client
-django>1.7.0
+django>=1.7.0,<1.10
 simplejson
 redis
 tornado
@@ -12,4 +12,6 @@ requests
 enum34
 django-sslserver # for browser access to input devices
 #django-redis-cache
-mysqlclient
+# PyMySQL
+# mysql-connector-python
+mysqlclient # for windows you can install client with mysql installer or via whl file specified in readme
