@@ -18,17 +18,18 @@ Though ArchLinux is not recommended as a server OS I prefer using it over other 
   
 Prepare system.
  0. Passwordless login to ssh server (optional): run this from client `cat ~/.ssh/id_rsa.pub | ssh -p 666 root@ip 'mkdir -p .ssh; cat >> .ssh/authorized_keys'`
- 0. Install packages `pacman -S  nginx, python, python-pip, redis, mariadb, mysql-python, python-mysql-connector,  postfix, ruby-sass`. You surely can install `uwsgi` and `uwsgi-plugin-python` via pacman but I found pip's package more stable so `pip install uwsgi`.
- 0. Replace all absolute paths for your one in config files `pattern="/home/andrew/python/djangochatprod" grep -rl "$pattern" ./rootfs |xargs sed -i "s#$pattern#$PWD#g"` 
- 0. Replace all occurrences of domain name `exist_domain="pychat.org"; your_domain="YOUR.DOMAIN.COM" grep -rl "$exist_domain" ./ |xargs sed -i "s#$exist_domainn#$your_domain#g"`. Change `STATIC_URL` and `MEDIA_URL` in `chat/settings.py` if needed.  
- 0  Copy config files to rootfs `cp rootfs / -r `. Change owner of project to `http` user: `chown -R http:http` 
+ 0. Install packages `pacman -S  git nginx, python, python-pip, redis, mariadb, mysql-python, python-mysql-connector,  postfix, ruby gcc`. You surely can install `uwsgi` and `uwsgi-plugin-python` via pacman but I found pip's package more stable so `pip install uwsgi`. Also you need to install sass, you can do it via aur `yaourt -S ruby-sass` or gem: `gem install sass` (don't forget to add `sass` to `PATH` variable if you install it via gem: `export PATH="$PATH:$(ls ~/.gem/ruby/*/bin/ -d)"`)
+ 0. Clone project to local filesystem: `git clone https://github.com/Deathangel908/djangochat`. Further instructions assume that working directory is project root, so `cd djangochat`. And change the branch: `git checkout -b prod_archlinux origin/prod_archlinux`
+ 0. Replace all absolute paths for your one in config files `pattern="/home/andrew/python/djangochatprod"; grep -rl "$pattern" ./rootfs |xargs sed -i "s#$pattern#$PWD#g"` 
+ 0. Replace all occurrences of domain name `exist_domain="pychat\.org"; your_domain="YOUR\.DOMAIN\.COM"; grep -rl "$exist_domain" ./ |xargs sed -i "s#$exist_domain#$your_domain#g"`. (note regex escape for dot char) Change `STATIC_URL` to `/static/` and `MEDIA_URL` to `/photo/` in `chat/settings.py` (I used subdomain)
+ 0  Copy config files to rootfs `cp rootfs / -r `. Change owner of project to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`
  0. Add file `chat/production.py`, place there `SECRET_KEY` and optional: `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`, `GOOGLE_OAUTH_2_CLIENT_ID`, `FACEBOOK_ACCESS_TOKEN`, `FACEBOOK_APP_ID`.  
- 0. Create database in mysql `echo "create database django CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`
- 0. Optional: add services to autostart  `packages=( mysqld  redis uwsgi tornado nginx postfix ) ; for package in $packages'; do systemctl enable $package; done;`
+ 0. If you just installed mariadb you need to initialize it: `mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`. Start mysql `systemctl start mysqld` and create database `echo "create database django CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`
+ 0. Optional: add services to autostart  `packages=( mysqld  redis uwsgi tornado nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`
  0. Get all dependencies `pip install -r requirements.txt`
  0. Fill database with tables `python manage.py init_db`
  0. Download static content `sh download_content.sh`
- 0. Place your certificate in `/etc/nginx/ssl`, you can get free one with startssl. For it start postfix service, send validation email to domain `webmaster@pychat.org` and apply verification code from `/root/Maildir/new/<<time>>` (you may also need to  disable ssl in /etc/postfix/main.cf since it's enabled by default). You can generate server.key and get certificate from  https://www.startssl.com/Certificates/ApplySSLCert . Put them into  `/etc/nginx/ssl/server.key` and `/etc/nginx/ssl/1_pychat.org_bundle.crt`. Change owner of files to http user `sudo chown -R http:http /etc/nginx/ssl/`
+ 0. Place your certificate in `/etc/nginx/ssl`, you can get free one with startssl. For it start postfix service, send validation email to domain `webmaster@pychat.org` and apply verification code from `/root/Maildir/new/<<time>>` (you may also need to  disable ssl in /etc/postfix/main.cf since it's enabled by default). You can generate server.key and get certificate from  https://www.startssl.com/Certificates/ApplySSLCert . Put them into  `/etc/nginx/ssl/server.key` and `/etc/nginx/ssl/1_${YOUR.DOMAIN.COM}_bundle.crt` (`YOUR.DOMAIN.COM` = `pychat.org` by default, but replaced above) (those settings are listed in `nginx.conf` and `settings.py`). (you can also create your own certificate or copy them from `/usr/lib/python*/site-packages/sslserver/certs/`). Don't forget to change owner of files to http user `chown -R http:http /etc/nginx/ssl/`
  0. Add django admin static files: `python manage.py collectstatic`
 
 Start the chat:
@@ -39,6 +40,7 @@ Start the chat:
  1. Start the Chat: `systemctl start uwsgi`
  1. Start the WebSocket listener: `systemctl start tornado`
  1. Open in browser [http**s**://your.domain.com](https://127.0.0.1)
+ 1. If something doesn't work you want to check `djangochat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
 
 # TODO
 * Add title for room. 
