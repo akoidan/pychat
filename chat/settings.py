@@ -171,7 +171,7 @@ handler404 = 'chat.views.handler404'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
-STATIC_URL = 'https://static.pychat.org/static/'
+STATIC_URL = 'https://static.pychat.org/'
 
 PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
