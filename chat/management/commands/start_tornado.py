@@ -28,6 +28,14 @@ class Command(BaseCommand):
 		self.http_server = HTTPServer(application, ssl_options=ssl_options)
 	help = 'Starts the Tornado application for message handling.'
 
+	def add_arguments(self, parser):
+		parser.add_argument(
+			'--port',
+			dest='port',
+			default=settings.API_PORT,
+			type=int,
+		)
+
 	def sig_handler(self):
 		"""Catch signal and init callback"""
 		IOLoop.instance().add_callback(self.shutdown)
@@ -40,8 +48,9 @@ class Command(BaseCommand):
 		io_loop.add_timeout(time.time() + 2, io_loop.stop)
 
 	def handle(self, *args, **options):
-		self.http_server.bind(settings.API_PORT)
 
+		self.http_server.bind(options['port'])
+		print('Listening port {}'.format(options['port']))
 		#  uncomment me for multiple process
 		self.http_server.start(1)
 		# Init signals handler
