@@ -1158,8 +1158,9 @@ function ChannelsHandler() {
 		var users = message.users;
 		var anotherUserName = self.getAllUsersInfo();
 		var channelUsers = {};
-		channelUsers[users[1]] = anotherUserName[users[1]];
-		channelUsers[users[0]] = anotherUserName[users[0]];
+		// dont assign, close the structure so changes in 1 room don't affect others
+		channelUsers[users[1]] = Object.assign({}, anotherUserName[users[1]]);
+		channelUsers[users[0]] = Object.assign({}, anotherUserName[users[0]]);
 		var anotherUserId = self.createNewUserChatHandler(message.roomId, channelUsers);
 		self.setActiveChannel(message.roomId);
 		growlInfo('<span>Room for user <b>{}</b> has been created</span>'.format(anotherUserName[anotherUserId].user));
