@@ -180,7 +180,12 @@ STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 AUTH_PROFILE_MODULE = 'chat.UserProfile'
 
 if 'start_tornado' in sys.argv:
-	log_file_name = 'tornado.log'
+	try: 
+		index_port = sys.argv.index('--port') 
+		port = sys.argv[index_port + 1] 
+	except (ValueError, IndexError): 
+		port = API_PORT 
+	log_file_name = 'tornado-{}.log'.format(port)
 else:
 	log_file_name = 'chat.log'
 

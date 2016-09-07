@@ -44,6 +44,7 @@ Start the chat:
  1. If something doesn't work you want to check `djangochat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
 
 # TODO
+* add tornado sinle log file instead of 1 per port, add port param to it
 * webrtc connection lost while transfering file causes js error
 * Add title for room. 
 * add scale to painter and Ctrl+Z
