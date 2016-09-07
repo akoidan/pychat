@@ -1,9 +1,10 @@
 [Unit]
-    Description=Start all snort instances of tornado
+    Description=Tornado supervisor
 [Service]
     Type=oneshot
-    ExecStart=/bin/true
+    ExecStart=/home/andrew/python/djangochatprod/manage.py flush_online
     RemainAfterExit=yes
+		User=http
 
 [Install]
     WantedBy=multi-user.target
