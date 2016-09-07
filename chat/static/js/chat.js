@@ -1640,7 +1640,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var user = self.allUsers[message.userId];
 		CssUtils.deleteElement(user.li);
 		var dm = 'User <b>{}</b> has left the conversation'.format(user.user);
-		displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
+		self.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
 		delete self.allUsers[message.userId];
 	};
 	/** Creates a DOM node with attached events and all message content*/
