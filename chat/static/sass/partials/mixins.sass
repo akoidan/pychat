@@ -128,3 +128,16 @@
 	text-overflow: ellipsis
 	white-space: nowrap
 	overflow: hidden
+
+@mixin scrollbar($background, $thumb, $ie-3dlight, $ie-highlight, $ie-arrow)
+	::-webkit-scrollbar
+		background-color: $background
+	::-webkit-scrollbar-thumb
+		background-color: $thumb
+
+	// IE scrollbar
+	scrollbar-base-color: $thumb
+	scrollbar-track-color: $background
+	scrollbar-3dlight-color: $ie-3dlight
+	scrollbar-highlight-color: $ie-highlight
+	scrollbar-arrow-color: $ie-arrow
