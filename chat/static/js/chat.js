@@ -1224,7 +1224,8 @@ function ChannelsHandler() {
 		var userId = self.getActiveUserId();
 		var exclude = self.getDirectMessagesUserIds();
 		if (exclude[userId]) {
-			var strRoomId = document.querySelector("#directUserTable li[userid='{}']").getAttribute(self.ROOM_ID_ATTR);
+			var selector = "#directUserTable li[userid='{}']".format(userId);
+			var strRoomId = document.querySelector(selector).getAttribute(self.ROOM_ID_ATTR);
 			self.setActiveChannel(parseInt(strRoomId));
 		} else {
 			self.actionAfterRoomCreate = userId;
