@@ -325,7 +325,7 @@ function NotifierHandler() {
 		this.close()
 	};
 	self.lastNotifyTime = new Date().getTime();
-	self.notify = function (title, message) {
+	self.notify = function (title, message, icon) {
 		if (self.isCurrentTabActive) {
 			return;
 		}
@@ -341,7 +341,7 @@ function NotifierHandler() {
 		}
 		self.askPermissions();
 		var notification = new Notification(title, {
-			icon: NOTIFICATION_ICON_URL,
+			icon: icon || NOTIFICATION_ICON_URL,
 			body: message
 		});
 		self.popedNotifQueue.push(notification);
@@ -617,7 +617,7 @@ function ChannelsHandler() {
 	var self = this;
 	Page.call(self);
 	self.url = '/chat/';
-	self.title = "Hello, <b>{}</b>".format(loggedUser);
+	//self.title = "Hello, <b>{}</b>".format(loggedUser);
 	self.render = self.show;
 	self.ROOM_ID_ATTR = 'roomid';
 	self.activeChannel = DEFAULT_CHANNEL_NAME;
@@ -645,6 +645,10 @@ function ChannelsHandler() {
 	};
 	self.getActiveChannel = function () {
 		return self.channels[self.activeChannel];
+	};
+	self.getTitle = function() {
+		var channel = self.getActiveChannel();
+		return channel != null ? channel.title : null;
 	};
 	self.childDom.minifier = {
 		channel: {
@@ -1119,6 +1123,21 @@ function ChannelsHandler() {
 				throw 'Unknown channel {} for message "{}"'.format(message.channel, JSON.stringify(message));
 			}
 			channelHandler[message.action](message);
+			self.executePostUserAction(message);
+		}
+	};
+	self.executePostUserAction = function (message) {
+		if (self.postUserAction) {
+			if (self.postUserAction.time + 30000 > new Date().getTime()) {
+				if (self.postUserAction.actionTrigger == message.action
+						&& self.postUserAction.userId == message.userId) {
+					console.log(getDebugMessage("Proceeding postUserAction {}", self.postUserAction));
+					self.postUserAction.action();
+					self.postUserAction = null;
+				}
+			} else {
+				self.postUserAction = null;
+			}
 		}
 	};
 	self.deleteRoom = function (message) {
@@ -1139,8 +1158,9 @@ function ChannelsHandler() {
 		var users = message.users;
 		var anotherUserName = self.getAllUsersInfo();
 		var channelUsers = {};
-		channelUsers[users[1]] = anotherUserName[users[1]];
-		channelUsers[users[0]] = anotherUserName[users[0]];
+		// dont assign, close the structure so changes in 1 room don't affect others
+		channelUsers[users[1]] = Object.assign({}, anotherUserName[users[1]]);
+		channelUsers[users[0]] = Object.assign({}, anotherUserName[users[0]]);
 		var anotherUserId = self.createNewUserChatHandler(message.roomId, channelUsers);
 		self.setActiveChannel(message.roomId);
 		growlInfo('<span>Room for user <b>{}</b> has been created</span>'.format(anotherUserName[anotherUserId].user));
@@ -1187,8 +1207,39 @@ function ChannelsHandler() {
 		return self.dom.activeUserContext.textContent;
 	};
 	self.m2Call = function () {
-		growlError("<span>This function is not implemented yet. Use <i class='icon-phone'></i> " +
-				"icon in <b style='font-size: 13px'>DIRECT MESSAGES</b> to make a call</span>");
+		self.showOrInviteDirectChannel(self.postCallUserAction);
+	};
+	self.postCallUserAction = function() {
+		webRtcApi.toggleCallContainer();
+		webRtcApi.callPeople();
+	};
+	self.postCallTransferFileAction = function() {
+		webRtcApi.toggleCallContainer();
+	};
+	self.m2TransferFile = function () {
+		self.showOrInviteDirectChannel(self.postCallTransferFileAction);
+		webRtcApi.dom.fileInput.click();
+	};
+	self.showOrInviteDirectChannel = function (postAction) {
+		var userId = self.getActiveUserId();
+		var exclude = self.getDirectMessagesUserIds();
+		if (exclude[userId]) {
+			var selector = "#directUserTable li[userid='{}']".format(userId);
+			var strRoomId = document.querySelector(selector).getAttribute(self.ROOM_ID_ATTR);
+			self.setActiveChannel(parseInt(strRoomId));
+		} else {
+			self.actionAfterRoomCreate = userId;
+			wsHandler.sendToServer({
+				action: 'addDirectChannel',
+				userId: userId
+			});
+		}
+		self.postUserAction = {
+			action: postAction,
+			time: new Date().getTime(),
+			userId: userId,
+			actionTrigger: 'addOnlineUser'
+		}
 	};
 	self.call = function () {
 		if (self.getActiveUsername() != loggedUser) {
@@ -1590,7 +1641,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var user = self.allUsers[message.userId];
 		CssUtils.deleteElement(user.li);
 		var dm = 'User <b>{}</b> has left the conversation'.format(user.user);
-		displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
+		self.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
 		delete self.allUsers[message.userId];
 	};
 	/** Creates a DOM node with attached events and all message content*/
@@ -1744,23 +1795,26 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		//private message
 		var headerStyle = data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
 		var preparedHtml = encodeMessage(data);
-		notifier.notify(displayedUsername, data.content || 'image');
 		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, data.id);
-		if (self.isHidden() && !window.newMessagesDisabled) {
-			self.newMessages++;
-			self.dom.newMessages.textContent = self.newMessages;
-			if (self.newMessages == 1) {
-				CssUtils.showElement(self.dom.newMessages);
-				CssUtils.hideElement(self.dom.deleteIcon);
+		if (p) { // not duplicate message
+			notifier.notify(displayedUsername, data.content || 'image', data.image);
+			if (self.isHidden() && !window.newMessagesDisabled) {
+				self.newMessages++;
+				self.dom.newMessages.textContent = self.newMessages;
+				if (self.newMessages == 1) {
+					CssUtils.showElement(self.dom.newMessages);
+					CssUtils.hideElement(self.dom.deleteIcon);
+				}
 			}
-		}
-		// if tab is inactive the message is new only if flag newMessagesDisabled wasn't set to true
-		if (!window.newMessagesDisabled && (self.isHidden() || isNew || !notifier.isCurrentTabActive)) {
-			CssUtils.addClass(p, self.UNREAD_MESSAGE_CLASS);
-			p.onmouseover = function(event){
-				var pTag = event.target;
-				pTag.onmouseover = null;
-				CssUtils.removeClass(pTag, self.UNREAD_MESSAGE_CLASS);
+			//
+			// if flag newMessagesDisabled wasn't set to true  && (...))
+			if (!window.newMessagesDisabled && (self.isHidden() || isNew || !notifier.isCurrentTabActive)) {
+				CssUtils.addClass(p, self.UNREAD_MESSAGE_CLASS);
+				p.onmouseover = function (event) {
+					var pTag = event.target;
+					pTag.onmouseover = null;
+					CssUtils.removeClass(pTag, self.UNREAD_MESSAGE_CLASS);
+				}
 			}
 		}
 	};
@@ -2573,7 +2627,7 @@ function WebRtcApi() {
 		var received = new window.Blob(self.receiveBuffer);
 		var message = "File {} is received.".format(self.receivedFileName);
 		growlInfo(message);
-		console.info(getDebugMessage(message));
+		console.log(getDebugMessage(message));
 		self.sendBaseEvent(null, 'fileAccepted');
 		self.downloadBar.setSuccess();
 		self.receiveBuffer = [];

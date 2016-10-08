@@ -6,6 +6,15 @@ String.prototype.format = function() {
 	return res;
 };
 
+if (!String.prototype.startsWith) {
+	String.prototype.startsWith = function (searchString, position) {
+		position = position || 0;
+		return this.substr(position, searchString.length) === searchString;
+	};
+}
+
+var growlHolder;
+
 window.onerror = function (msg, url, linenumber) {
 	var message = 'Error occurred in {}:{}\n{}'.format(url, linenumber, msg);
 	if (growlHolder) {
@@ -32,27 +41,26 @@ var blankRegex = /^\s*$/;
 var fileTypeRegex = /\.(\w+)(\?.*)?$/;
 window.sound = 0;
 window.loggingEnabled = true;
-var growlHolder;
 var ajaxLoader;
 var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|&#39;|$))/g;/*http://anycharacter except end of text, <br> or space*/
 var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
 var muteBtn;
 var inputRangeStyles = {};
 
-console.LOG = console.log;
-console.WARN = console.warn;
-console.ERROR = console.error;
 function dummyFun() {}
+
+consoleReal = console;
+consoleDummy = {
+	log: dummyFun,
+	error: dummyFun,
+	warn: dummyFun
+};
 
 function enableLogs() {
 	if (!window.LOGS) {
-		console.log = dummyFun;
-		console.warn = dummyFun;
-		console.error = dummyFun;
-	} else if (console.LOG) {
-		console.log = console.LOG;
-		console.warn = console.WARN;
-		console.error = console.ERROR;
+		console = consoleDummy;
+	} else {
+		console = consoleReal;
 	}
 }
 

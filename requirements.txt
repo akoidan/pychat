@@ -1,6 +1,6 @@
 setuptools
 oauth2client
-django>1.7.0
+django>=1.7.0,<1.10
 simplejson
 redis
 tornado

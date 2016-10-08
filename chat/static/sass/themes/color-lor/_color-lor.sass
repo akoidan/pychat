@@ -115,10 +115,7 @@ $default-lor-background: #272c2d
 	//	border-color: rgb(30, 30, 30)
 	//	@include box-shadow("3px 3px 7px #0E1011")
 
-	::-webkit-scrollbar
-		background-color: #222
-	::-webkit-scrollbar-thumb
-		background-color: $grayish-blue
+	@include scrollbar($color-lor-scroll, $grayish-blue, #7dc071, #c08b00,#3c763d )
 
 	.table
 		td,

@@ -328,9 +328,10 @@ class MessagesHandler(MessagesCreator):
 		online_users = { connection_hash1 = stored_redis_user1, connection_hash_2 = stored_redis_user2 }
 		:return:
 		"""
-		online = self.get_online_from_redis(room_id)
 		self.async_redis_publisher.hset(room_id, self.id, self.stored_redis_user)
-		if self.user_id not in online:  # if a new tab has been opened
+		# since we add user to online first, latest trigger will always show correct online
+		online, is_online = self.get_online_from_redis(room_id, self.user_id, self.id)
+		if not is_online:  # if a new tab has been opened
 			online.append(self.user_id)
 			online_user_names_mes = self.room_online(
 				online,
@@ -541,7 +542,7 @@ class MessagesHandler(MessagesCreator):
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		self.add_channel(room_id)
-		self.add_online_user(room_id)# TODO doesnt work if already subscribed
+		self.add_online_user(room_id)
 
 	def set_opponent_call_channel(self, message):
 		self.call_receiver_channel = RedisPrefix.generate_user(message[VarNames.USER_ID])

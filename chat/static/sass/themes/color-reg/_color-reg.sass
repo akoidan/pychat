@@ -1,5 +1,6 @@
 @import "../../partials/mixins"
 @import "../../partials/variables"
+@import "../../partials/asphalt"
 
 
 .color-reg
@@ -160,13 +161,7 @@
 	.icon-doc-inv
 		color: #ff9835
 
-	::-webkit-scrollbar
-		background-color: $mostly-black
-	::-webkit-scrollbar-thumb
-		background-color: #313A3C
-	@-moz-document url-prefix()
-		#chat-room-users-wrapper
-			border-left: 4px solid $mostly-black
+	@include scrollbar($mostly-black, #313A3C, #7dc071, #c08b00,#3c763d)
 
 	.col-error
 		color: #FF3131

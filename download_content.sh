@@ -100,6 +100,11 @@ git clone "$CONF_REPOSITORY" "$TMP_DIR/chatconf"
 git --git-dir="$TMP_DIR/chatconf/.git" --work-tree="$TMP_DIR/chatconf/" checkout $CONF_VERSION
 cp -r "$TMP_DIR/chatconf/static" "$STATIC_PARENT"
 mv "$CSS_DIR/fontello.css" "$SASS_DIR/fontello/_fontello.scss"
+if type "sed" &> /dev/null; then
+    sed -i '1i\@charset "UTF-8";' "$SASS_DIR/fontello/_fontello.scss"
+else
+    >&2 echo "WARNING: sass would be compiled w/o encoding"
+fi
 mv "$CSS_DIR/fontello-embedded.css" "$SASS_DIR/fontello/_fontello-embedded.scss"
 mv "$CSS_DIR/fontello-codes.css" "$SASS_DIR/fontello/_fontello-codes.scss"
 mv "$CSS_DIR/fontello-ie7.css" "$SASS_DIR/fontello/_fontello-ie7.scss"
