@@ -133,7 +133,7 @@ input:not([type=submit]), select
 	transition: 1s	height 0s
 
 	&.closed
-		height: 0
+		height: 2px // Chrome53 pushes block all FORM left if height is set to 0
 
 /*-----------------------------------------------------------------
 
