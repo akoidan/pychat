@@ -258,7 +258,7 @@ class MessagesHandler(MessagesCreator):
 		self.sync_redis = global_redis.sync_redis
 		self.channels = []
 		self.call_receiver_channel = None
-		self.logger = None
+		self._logger = None
 		self.async_redis = tornadoredis.Client()
 		self.pre_process_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
@@ -283,6 +283,10 @@ class MessagesHandler(MessagesCreator):
 		yield tornado.gen.Task(
 			self.async_redis.subscribe, channels)
 		self.async_redis.listen(self.new_message)
+
+	@property
+	def logger(self):
+		return self._logger if self._logger else base_logger
 
 	@tornado.gen.engine
 	def add_channel(self, channel):
@@ -741,7 +745,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				'id': self.log_id,
 				'ip': self.ip
 			}
-			self.logger = logging.LoggerAdapter(base_logger, log_params)
+			self._logger = logging.LoggerAdapter(base_logger, log_params)
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, self.id)
 			self.async_redis.connect()
 			user_db = self.do_db(User.objects.get, id=self.user_id)  # everything but 0 is a registered user
