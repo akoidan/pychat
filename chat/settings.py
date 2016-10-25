@@ -210,7 +210,7 @@ LOGGING = {
 			'level': 'DEBUG',
 			'class': 'logging.handlers.TimedRotatingFileHandler',
 			'filename': join(BASE_DIR, 'log/', log_file_name),
-			'formatter': 'tornado',
+			'formatter': 'django',
 			'when': 'midnight',
 			'interval': 1
 		},
@@ -232,7 +232,7 @@ LOGGING = {
 		'tornado-console': {
 			'level': 'DEBUG',
 			'class': 'logging.StreamHandler',
-			'formatter': 'tornado',
+			'formatter': 'django',
 		},
 		'mail_admins': {
 			'level': 'ERROR',
@@ -263,10 +263,6 @@ LOGGING = {
 
 	},
 	'formatters': {
-		'tornado': {
-			'format': '%(user_id)s:%(id)s [%(asctime)s;%(ip)s;%(lineno)s]: %(message)s',
-			'datefmt': '%H:%M:%S',
-		},
 		'django': {
 			'format': '%(user_id)s:%(id)s [%(asctime)s;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
