@@ -29,7 +29,7 @@ from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_RE
 from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo, RoomUsers
 
 PY3 = sys.version > '3'
-
+str_type = str if PY3 else basestring
 api_url = getattr(settings, "IP_API_URL", None)
 
 sessionStore = SessionStore()
@@ -375,6 +375,7 @@ class MessagesHandler(MessagesCreator):
 		"""
 		Check if message should be proccessed by server before writing to client
 		@param message: message to check
+		@type message: str
 		@return: Object structure of message if it should be processed, None if not
 		"""
 		if message.startswith(self.parsable_prefix):
@@ -382,7 +383,7 @@ class MessagesHandler(MessagesCreator):
 
 	def new_message(self, message):
 		data = message.body
-		if type(data) is not int:  # subscribe event
+		if isinstance(data, str_type):  # subscribe event
 			decoded = self.decode(data)
 			if decoded:
 				data = decoded
@@ -789,7 +790,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		try:
 			if isinstance(message, dict):
 				message = json.dumps(message)
-			if not (isinstance(message, str) or (not PY3 and isinstance(message, unicode))):
+			if not isinstance(message, str_type):
 				raise ValueError('Wrong message type : %s' % str(message))
 			self.logger.debug(">> %s", message)
 			self.write_message(message)
