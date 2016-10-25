@@ -251,7 +251,6 @@ class MessagesHandler(MessagesCreator):
 		self.parsable_prefix = 'p'
 		super(MessagesHandler, self).__init__(*args, **kwargs)
 		self.id = id(self)
-		self.log_id = str(self.id % 10000).rjust(4, '0')
 		self.ip = None
 		from chat import global_redis
 		self.async_redis_publisher = global_redis.async_redis_publisher
@@ -743,7 +742,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.user_id = int(session["_auth_user_id"])
 			log_params = {
 				'user_id': str(self.user_id).zfill(3),
-				'id': self.log_id,
+				'id': self.id,
 				'ip': self.ip
 			}
 			self._logger = logging.LoggerAdapter(base_logger, log_params)
