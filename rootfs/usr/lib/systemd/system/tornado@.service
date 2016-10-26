@@ -5,7 +5,7 @@ Before=tornado.service
 BindsTo=tornado.service
 
 [Service]
-ExecStart=/home/andrew/python/djangochatprod/manage.py start_tornado --port %I --keep_online
+ExecStart=/home/alarm/djangochat/manage.py start_tornado --port %I --keep_online
 SyslogIdentifier=tornado-%i
 SuccessExitStatus=30
 ExecReload=/bin/kill -HUP $MAINPID
