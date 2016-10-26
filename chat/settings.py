@@ -303,8 +303,8 @@ ALL_REDIS_ROOM = 'all'
 ALL_ROOM_ID = 1
 
 SELECT_SELF_ROOM = """SELECT
-	a.id,
-	a.disabled
+	a.id as room__id,
+	a.disabled as room__disabled
 FROM chat_room a
 WHERE a.id IN %s AND
 			EXISTS

@@ -304,7 +304,11 @@ class MessagesHandler(MessagesCreator):
 	def execute_query(self, query, *args, **kwargs):
 		cursor = connection.cursor()
 		cursor.execute(query, *args, **kwargs)
-		return cursor.fetchall()
+		desc = cursor.description
+		return [
+			dict(zip([col[0] for col in desc], row))
+			for row in cursor.fetchall()
+			]
 
 	def get_online_from_redis(self, channel, check_user_id=None, check_hash=None):
 		"""
@@ -455,22 +459,13 @@ class MessagesHandler(MessagesCreator):
 		subscribe_message = self.invite_room_channel_message(room_id, user_id, room.name, users_in_room)
 		self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
 
-	def create_self_room(self, user_rooms):
-		rooms_ids = list([room['room_id'] for room in user_rooms])
-		query_res = self.execute_query(SELECT_SELF_ROOM, [rooms_ids,])
-		if len(query_res) > 0:
-			room = query_res[0]
-			room_id = room[0]
-			self.update_room(room_id, room[1])
+	def create_room(self, user_rooms, user_id):
+		if self.user_id == user_id:
+			room_ids = list([room['room_id'] for room in user_rooms])
+			query_res = self.execute_query(SELECT_SELF_ROOM, [room_ids, ])
 		else:
-			room = Room()
-			room.save()
-			room_id = room.id
-			RoomUsers(user_id=self.user_id, room_id=room_id).save()
-		return room_id
-
-	def create_other_room(self, user_rooms, user_id):
-		query_res = Room.users.through.objects.filter(user_id=user_id, room__in=user_rooms).values('room__id', 'room__disabled')
+			rooms_query = Room.users.through.objects.filter(user_id=user_id, room__in=user_rooms)
+			query_res = rooms_query.values('room__id', 'room__disabled')
 		if len(query_res) > 0:
 			room = query_res[0]
 			room_id = room['room__id']
@@ -479,10 +474,13 @@ class MessagesHandler(MessagesCreator):
 			room = Room()
 			room.save()
 			room_id = room.id
-			RoomUsers.objects.bulk_create([
-				RoomUsers(user_id=user_id, room_id=room_id),
-				RoomUsers(user_id=self.user_id, room_id=room_id),
-			])
+			if self.user_id == user_id:
+				RoomUsers(user_id=self.user_id, room_id=room_id).save()
+			else:
+				RoomUsers.objects.bulk_create([
+					RoomUsers(user_id=user_id, room_id=room_id),
+					RoomUsers(user_id=self.user_id, room_id=room_id),
+				])
 		return room_id
 
 	def update_room(self, room_id, disabled):
@@ -496,10 +494,7 @@ class MessagesHandler(MessagesCreator):
 		# get all self private rooms ids
 		user_rooms = Room.users.through.objects.filter(user_id=self.user_id, room__name__isnull=True).values('room_id')
 		# get private room that contains another user from rooms above
-		if self.user_id == user_id:
-			room_id = self.create_self_room(user_rooms)
-		else:
-			room_id = self.create_other_room(user_rooms, user_id)
+		room_id = self.create_room(user_rooms, user_id)
 		subscribe_message = self.subscribe_direct_channel_message(room_id, user_id)
 		self.publish(subscribe_message, self.channel, True)
 		other_channel = RedisPrefix.generate_user(user_id)
@@ -655,6 +650,16 @@ class MessagesHandler(MessagesCreator):
 				ip_address = IpAddress.objects.create(ip=self.ip)
 		return ip_address
 
+	def publish_logout(self, channel, log_data):
+		# seems like async solves problem with connection lost and wrong data status
+		# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
+		online, is_online = self.get_online_from_redis(channel, self.user_id, self.id)
+		log_data[channel] = {'online': online, 'is_online': is_online}
+		if not is_online:
+			message = self.room_online(online, Actions.LOGOUT, channel)
+			self.publish(message, channel)
+			return True
+
 
 class AntiSpam(object):
 
@@ -719,14 +724,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				continue
 			self.sync_redis.hdel(channel, self.id)
 			if self.connected:
-				# seems like async solves problem with connection lost and wrong data status
-				# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
-				online, is_online = self.get_online_from_redis(channel, self.user_id, self.id)
-				log_data[channel] = {'online': online, 'is_online': is_online}
-				if not is_online:
-					message = self.room_online(online, Actions.LOGOUT, channel)
-					self.publish(message, channel)
-					gone_offline = True
+				gone_offline = self.publish_logout(channel, log_data) or gone_offline
 		if gone_offline:
 			res = self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
