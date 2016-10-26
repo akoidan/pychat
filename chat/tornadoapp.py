@@ -650,6 +650,16 @@ class MessagesHandler(MessagesCreator):
 				ip_address = IpAddress.objects.create(ip=self.ip)
 		return ip_address
 
+	def publish_logout(self, channel, log_data):
+		# seems like async solves problem with connection lost and wrong data status
+		# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
+		online, is_online = self.get_online_from_redis(channel, self.user_id, self.id)
+		log_data[channel] = {'online': online, 'is_online': is_online}
+		if not is_online:
+			message = self.room_online(online, Actions.LOGOUT, channel)
+			self.publish(message, channel)
+			return True
+
 
 class AntiSpam(object):
 
@@ -714,14 +724,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				continue
 			self.sync_redis.hdel(channel, self.id)
 			if self.connected:
-				# seems like async solves problem with connection lost and wrong data status
-				# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
-				online, is_online = self.get_online_from_redis(channel, self.user_id, self.id)
-				log_data[channel] = {'online': online, 'is_online': is_online}
-				if not is_online:
-					message = self.room_online(online, Actions.LOGOUT, channel)
-					self.publish(message, channel)
-					gone_offline = True
+				gone_offline = self.publish_logout(channel, log_data) or gone_offline
 		if gone_offline:
 			res = self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
