@@ -15,6 +15,6 @@ class UserCookieMiddleWare(object):
 		try:
 			local.random
 		except AttributeError:
-			local.random = str(random.randint(0, 10000)).rjust(4, '0')
+			local.random = str(random.randint(0, pow(10,10))).rjust(10, '0')
 			local.user_id = str(getattr(request.user, 'id', '000')).zfill(3)
 			local.client_ip = get_client_ip(request)

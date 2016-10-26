@@ -213,7 +213,7 @@ LOGGING = {
 			'level': 'DEBUG',
 			'class': 'logging.handlers.TimedRotatingFileHandler',
 			'filename': join(BASE_DIR, 'log/', log_file_name),
-			'formatter': 'tornado',
+			'formatter': 'django',
 			'when': 'midnight',
 			'interval': 1
 		},
@@ -235,7 +235,7 @@ LOGGING = {
 		'tornado-console': {
 			'level': 'DEBUG',
 			'class': 'logging.StreamHandler',
-			'formatter': 'tornado',
+			'formatter': 'django',
 		},
 	},
 	'loggers': {
@@ -252,11 +252,6 @@ LOGGING = {
 		},
 	},
 	'formatters': {
-
-		'tornado': {
-			'format': '%(user_id)s:%(id)s [%(asctime)s;%(ip)s;%(lineno)s]: %(message)s',
-			'datefmt': '%H:%M:%S',
-		},
 		'django': {
 			'format': '%(user_id)s:%(id)s [%(asctime)s;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
@@ -294,8 +289,8 @@ ALL_REDIS_ROOM = 'all'
 ALL_ROOM_ID = 1
 
 SELECT_SELF_ROOM = """SELECT
-	a.id,
-	a.disabled
+	a.id as room__id,
+	a.disabled as room__disabled
 FROM chat_room a
 WHERE a.id IN %s AND
 			EXISTS

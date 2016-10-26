@@ -2,6 +2,7 @@ import json
 import logging
 import sys
 import time
+from datetime import timedelta
 from threading import Thread
 from urllib.request import urlopen
 
@@ -16,6 +17,7 @@ from django.core.exceptions import ValidationError
 from django.db import connection, OperationalError, InterfaceError, IntegrityError
 from django.db.models import Q, F
 from redis_sessions.session import SessionStore
+from tornado import ioloop
 from tornado.websocket import WebSocketHandler
 
 from chat.utils import extract_photo
@@ -29,7 +31,7 @@ from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_RE
 from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo, RoomUsers
 
 PY3 = sys.version > '3'
-
+str_type = str if PY3 else basestring
 api_url = getattr(settings, "IP_API_URL", None)
 
 sessionStore = SessionStore()
@@ -251,7 +253,6 @@ class MessagesHandler(MessagesCreator):
 		self.parsable_prefix = 'p'
 		super(MessagesHandler, self).__init__(*args, **kwargs)
 		self.id = id(self)
-		self.log_id = str(self.id % 10000).rjust(4, '0')
 		self.ip = None
 		from chat import global_redis
 		self.async_redis_publisher = global_redis.async_redis_publisher
@@ -305,7 +306,11 @@ class MessagesHandler(MessagesCreator):
 	def execute_query(self, query, *args, **kwargs):
 		cursor = connection.cursor()
 		cursor.execute(query, *args, **kwargs)
-		return cursor.fetchall()
+		desc = cursor.description
+		return [
+			dict(zip([col[0] for col in desc], row))
+			for row in cursor.fetchall()
+			]
 
 	def get_online_from_redis(self, channel, check_user_id=None, check_hash=None):
 		"""
@@ -375,6 +380,7 @@ class MessagesHandler(MessagesCreator):
 		"""
 		Check if message should be proccessed by server before writing to client
 		@param message: message to check
+		@type message: str
 		@return: Object structure of message if it should be processed, None if not
 		"""
 		if message.startswith(self.parsable_prefix):
@@ -382,7 +388,7 @@ class MessagesHandler(MessagesCreator):
 
 	def new_message(self, message):
 		data = message.body
-		if type(data) is not int:  # subscribe event
+		if isinstance(data, str_type):  # subscribe event
 			decoded = self.decode(data)
 			if decoded:
 				data = decoded
@@ -455,22 +461,13 @@ class MessagesHandler(MessagesCreator):
 		subscribe_message = self.invite_room_channel_message(room_id, user_id, room.name, users_in_room)
 		self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
 
-	def create_self_room(self, user_rooms):
-		rooms_ids = list([room['room_id'] for room in user_rooms])
-		query_res = self.execute_query(SELECT_SELF_ROOM, [rooms_ids,])
-		if len(query_res) > 0:
-			room = query_res[0]
-			room_id = room[0]
-			self.update_room(room_id, room[1])
+	def create_room(self, user_rooms, user_id):
+		if self.user_id == user_id:
+			room_ids = list([room['room_id'] for room in user_rooms])
+			query_res = self.execute_query(SELECT_SELF_ROOM, [room_ids, ])
 		else:
-			room = Room()
-			room.save()
-			room_id = room.id
-			RoomUsers(user_id=self.user_id, room_id=room_id).save()
-		return room_id
-
-	def create_other_room(self, user_rooms, user_id):
-		query_res = Room.users.through.objects.filter(user_id=user_id, room__in=user_rooms).values('room__id', 'room__disabled')
+			rooms_query = Room.users.through.objects.filter(user_id=user_id, room__in=user_rooms)
+			query_res = rooms_query.values('room__id', 'room__disabled')
 		if len(query_res) > 0:
 			room = query_res[0]
 			room_id = room['room__id']
@@ -479,10 +476,13 @@ class MessagesHandler(MessagesCreator):
 			room = Room()
 			room.save()
 			room_id = room.id
-			RoomUsers.objects.bulk_create([
-				RoomUsers(user_id=user_id, room_id=room_id),
-				RoomUsers(user_id=self.user_id, room_id=room_id),
-			])
+			if self.user_id == user_id:
+				RoomUsers(user_id=self.user_id, room_id=room_id).save()
+			else:
+				RoomUsers.objects.bulk_create([
+					RoomUsers(user_id=user_id, room_id=room_id),
+					RoomUsers(user_id=self.user_id, room_id=room_id),
+				])
 		return room_id
 
 	def update_room(self, room_id, disabled):
@@ -496,10 +496,7 @@ class MessagesHandler(MessagesCreator):
 		# get all self private rooms ids
 		user_rooms = Room.users.through.objects.filter(user_id=self.user_id, room__name__isnull=True).values('room_id')
 		# get private room that contains another user from rooms above
-		if self.user_id == user_id:
-			room_id = self.create_self_room(user_rooms)
-		else:
-			room_id = self.create_other_room(user_rooms, user_id)
+		room_id = self.create_room(user_rooms, user_id)
 		subscribe_message = self.subscribe_direct_channel_message(room_id, user_id)
 		self.publish(subscribe_message, self.channel, True)
 		other_channel = RedisPrefix.generate_user(user_id)
@@ -655,6 +652,16 @@ class MessagesHandler(MessagesCreator):
 				ip_address = IpAddress.objects.create(ip=self.ip)
 		return ip_address
 
+	def publish_logout(self, channel, log_data):
+		# seems like async solves problem with connection lost and wrong data status
+		# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
+		online, is_online = self.get_online_from_redis(channel, self.user_id, self.id)
+		log_data[channel] = {'online': online, 'is_online': is_online}
+		if not is_online:
+			message = self.room_online(online, Actions.LOGOUT, channel)
+			self.publish(message, channel)
+			return True
+
 
 class AntiSpam(object):
 
@@ -719,20 +726,24 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				continue
 			self.sync_redis.hdel(channel, self.id)
 			if self.connected:
-				# seems like async solves problem with connection lost and wrong data status
-				# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
-				online, is_online = self.get_online_from_redis(channel, self.user_id, self.id)
-				log_data[channel] = {'online': online, 'is_online': is_online}
-				if not is_online:
-					message = self.room_online(online, Actions.LOGOUT, channel)
-					self.publish(message, channel)
-					gone_offline = True
+				gone_offline = self.publish_logout(channel, log_data) or gone_offline
 		if gone_offline:
 			res = self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
 
-		self.logger.info("Close connection result: %s", json.dumps(log_data))
-		self.async_redis.disconnect()
+		self.disconnect(json.dumps(log_data))
+
+	def disconnect(self, log_data, tries=0):
+		"""
+		Closes a connection if it's not in proggress, otherwice timeouts closing
+		https://github.com/evilkost/brukva/issues/25#issuecomment-9468227
+		"""
+		if self.async_redis.connection.in_progress and tries < 1000:  # failsafe eternal loop
+			self.logger.debug('Closing a connection timeouts')
+			ioloop.IOLoop.instance().add_timeout(timedelta(0.00001), self.disconnect, log_data, tries+1)
+		else:
+			self.logger.info("Close connection result: %s", log_data)
+			self.async_redis.disconnect()
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
@@ -742,7 +753,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.user_id = int(session["_auth_user_id"])
 			log_params = {
 				'user_id': str(self.user_id).zfill(3),
-				'id': self.log_id,
+				'id': self.id,
 				'ip': self.ip
 			}
 			self._logger = logging.LoggerAdapter(base_logger, log_params)
@@ -789,7 +800,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		try:
 			if isinstance(message, dict):
 				message = json.dumps(message)
-			if not (isinstance(message, str) or (not PY3 and isinstance(message, unicode))):
+			if not isinstance(message, str_type):
 				raise ValueError('Wrong message type : %s' % str(message))
 			self.logger.debug(">> %s", message)
 			self.write_message(message)

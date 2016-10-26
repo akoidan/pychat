@@ -22,6 +22,11 @@ class Command(BaseCommand):
 				if response['status'] != "success":
 					raise Exception(response['status'])
 				ip.country_code = response['countryCode']
+				ip.isp = response['isp'],
+				ip.country = response['country'],
+				ip.region = response['regionName'],
+				ip.city = response['city'],
+				ip.country_code = response['countryCode']
 				ip.save()
 			except Exception as e:
 				print("Skip %s because %s" % (ip, e))
