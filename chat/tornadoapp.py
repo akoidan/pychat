@@ -2,6 +2,7 @@ import json
 import logging
 import sys
 import time
+from datetime import timedelta
 from threading import Thread
 from urllib.request import urlopen
 
@@ -16,6 +17,7 @@ from django.core.exceptions import ValidationError
 from django.db import connection, OperationalError, InterfaceError, IntegrityError
 from django.db.models import Q, F
 from redis_sessions.session import SessionStore
+from tornado import ioloop
 from tornado.websocket import WebSocketHandler
 
 from chat.utils import extract_photo
@@ -729,8 +731,19 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			res = self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
 
-		self.logger.info("Close connection result: %s", json.dumps(log_data))
-		self.async_redis.disconnect()
+		self.disconnect(json.dumps(log_data))
+
+	def disconnect(self, log_data, tries=0):
+		"""
+		Closes a connection if it's not in proggress, otherwice timeouts closing
+		https://github.com/evilkost/brukva/issues/25#issuecomment-9468227
+		"""
+		if self.async_redis.connection.in_progress and tries < 1000:  # failsafe eternal loop
+			self.logger.debug('Closing a connection timeouts')
+			ioloop.IOLoop.instance().add_timeout(timedelta(0.00001), self.disconnect, log_data, tries+1)
+		else:
+			self.logger.info("Close connection result: %s", log_data)
+			self.async_redis.disconnect()
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
