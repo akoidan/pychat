@@ -253,7 +253,7 @@ LOGGING = {
 	},
 	'formatters': {
 		'django': {
-			'format': '%(user_id)s:%(id)s [%(asctime)s;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
+			'format': '%(user_id)s:%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},
