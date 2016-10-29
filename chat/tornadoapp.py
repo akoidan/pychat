@@ -261,6 +261,7 @@ class MessagesHandler(MessagesCreator):
 		self.call_receiver_channel = None
 		self._logger = None
 		self.async_redis = tornadoredis.Client()
+		self.patch_tornadoredis()
 		self.pre_process_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
@@ -278,6 +279,19 @@ class MessagesHandler(MessagesCreator):
 			Actions.INVITE_USER: self.send_client_new_channel,
 			Actions.CALL: self.set_opponent_call_channel
 		}
+
+	def patch_tornadoredis(self):  # TODO remove this
+		self.async_redis.connection.old_read = self.async_redis.connection.read
+		def new_read(instance, *args, **kwargs):
+			try:
+				return instance.old_read(*args, **kwargs)
+			except Exception as e:
+				current_online = self.get_online_from_redis(RedisPrefix.DEFAULT_CHANNEL)
+				self.logger.error(e)
+				self.logger.error("Current online" + str(current_online))
+				raise e
+		fabric = type(self.async_redis.connection.read)
+		self.async_redis.connection.read = fabric(new_read, self.async_redis.connection)
 
 	@tornado.gen.engine
 	def listen(self, channels):
