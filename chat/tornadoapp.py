@@ -250,6 +250,7 @@ class MessagesCreator(object):
 class MessagesHandler(MessagesCreator):
 
 	def __init__(self, *args, **kwargs):
+		self.closed_channels = None
 		self.parsable_prefix = 'p'
 		super(MessagesHandler, self).__init__(*args, **kwargs)
 		self.id = id(self)
@@ -288,10 +289,25 @@ class MessagesHandler(MessagesCreator):
 			except Exception as e:
 				current_online = self.get_online_from_redis(RedisPrefix.DEFAULT_CHANNEL)
 				self.logger.error(e)
-				self.logger.error("Current online" + str(current_online))
+				self.logger.error(
+					"Exception info: "
+					"self.connected = '%s';;; "
+					"Redis default channel online = '%s';;; "
+					"self.channels = '%s';;; "
+					"self.closed_channels  = '%s';;;",
+					self.connected, current_online, self.channels, self.closed_channels
+				)
 				raise e
 		fabric = type(self.async_redis.connection.read)
 		self.async_redis.connection.read = fabric(new_read, self.async_redis.connection)
+
+	@property
+	def connected(self):
+		raise NotImplemented
+
+	@connected.setter
+	def connected(self, value):
+		raise NotImplemented
 
 	@tornado.gen.engine
 	def listen(self, channels):
@@ -702,8 +718,16 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 
 	def __init__(self, *args, **kwargs):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
-		self.connected = False
+		self.__connected__ = False
 		self.anti_spam = AntiSpam()
+
+	@property
+	def connected(self):
+		return self.__connected__
+
+	@connected.setter
+	def connected(self, value):
+		self.__connected__ = value
 
 	def data_received(self, chunk):
 		pass
@@ -744,7 +768,6 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		if gone_offline:
 			res = self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
-
 		self.disconnect(json.dumps(log_data))
 
 	def disconnect(self, log_data, tries=0):
@@ -752,6 +775,9 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		Closes a connection if it's not in proggress, otherwice timeouts closing
 		https://github.com/evilkost/brukva/issues/25#issuecomment-9468227
 		"""
+		self.connected = False
+		self.closed_channels = self.channels
+		self.channels = []
 		if self.async_redis.connection.in_progress and tries < 1000:  # failsafe eternal loop
 			self.logger.debug('Closing a connection timeouts')
 			ioloop.IOLoop.instance().add_timeout(timedelta(0.00001), self.disconnect, log_data, tries+1)
