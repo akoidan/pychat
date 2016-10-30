@@ -2,9 +2,9 @@
     Description=Tornado supervisor
 [Service]
     Type=oneshot
-    ExecStart=/home/alarm/djangochat/manage.py flush_online
+    ExecStart=/srv/http/djangochat/manage.py flush_online
     RemainAfterExit=yes
-		User=http
+    User=http
 
 [Install]
     WantedBy=multi-user.target
