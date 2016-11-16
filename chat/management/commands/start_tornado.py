@@ -14,7 +14,7 @@ from chat.tornadoapp import TornadoHandler
 class Command(BaseCommand):
 
 	def __init__(self):
-		super().__init__()
+		super(Command, self).__init__()
 		application = Application([
 			(r'.*', TornadoHandler),
 		], debug=False)
