@@ -15,7 +15,7 @@ import sys
 from os.path import join
 
 from django.conf import global_settings
-from sslserver import certs
+import sslserver
 
 import chat as project_module
 
