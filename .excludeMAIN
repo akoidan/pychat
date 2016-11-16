@@ -1,4 +1,6 @@
 *.pyc
+.gitBU
+.excludeBU
 .project
 .pydevproject
 .idea
