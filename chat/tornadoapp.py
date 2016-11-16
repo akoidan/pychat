@@ -22,10 +22,10 @@ from tornado.websocket import WebSocketHandler
 from chat.utils import extract_photo
 
 try:  # py2
-	from urllib.parse import urlparse
+	from urlparse import urlparse
 	from urllib import urlopen
 except ImportError:  # py3
-	from urlparse import urlparse
+	from urllib.parse import urlparse
 	from urllib.request import urlopen
 
 from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_READ_MESSAGE, SELECT_SELF_ROOM
