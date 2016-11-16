@@ -4,7 +4,6 @@ import sys
 import time
 from datetime import timedelta
 from threading import Thread
-from urllib.request import urlopen
 
 import tornado.gen
 import tornado.httpclient
@@ -22,10 +21,12 @@ from tornado.websocket import WebSocketHandler
 
 from chat.utils import extract_photo
 
-try:
-	from urllib.parse import urlparse  # py2
-except ImportError:
-	from urlparse import urlparse  # py3
+try:  # py2
+	from urlparse import urlparse
+	from urllib import urlopen
+except ImportError:  # py3
+	from urllib.parse import urlparse
+	from urllib.request import urlopen
 
 from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_READ_MESSAGE, SELECT_SELF_ROOM
 from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo, RoomUsers
@@ -250,6 +251,7 @@ class MessagesCreator(object):
 class MessagesHandler(MessagesCreator):
 
 	def __init__(self, *args, **kwargs):
+		self.closed_channels = None
 		self.parsable_prefix = 'p'
 		super(MessagesHandler, self).__init__(*args, **kwargs)
 		self.id = id(self)
@@ -261,6 +263,7 @@ class MessagesHandler(MessagesCreator):
 		self.call_receiver_channel = None
 		self._logger = None
 		self.async_redis = tornadoredis.Client()
+		self.patch_tornadoredis()
 		self.pre_process_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
@@ -278,6 +281,34 @@ class MessagesHandler(MessagesCreator):
 			Actions.INVITE_USER: self.send_client_new_channel,
 			Actions.CALL: self.set_opponent_call_channel
 		}
+
+	def patch_tornadoredis(self):  # TODO remove this
+		self.async_redis.connection.old_read = self.async_redis.connection.read
+		def new_read(instance, *args, **kwargs):
+			try:
+				return instance.old_read(*args, **kwargs)
+			except Exception as e:
+				current_online = self.get_online_from_redis(RedisPrefix.DEFAULT_CHANNEL)
+				self.logger.error(e)
+				self.logger.error(
+					"Exception info: "
+					"self.connected = '%s';;; "
+					"Redis default channel online = '%s';;; "
+					"self.channels = '%s';;; "
+					"self.closed_channels  = '%s';;;",
+					self.connected, current_online, self.channels, self.closed_channels
+				)
+				raise e
+		fabric = type(self.async_redis.connection.read)
+		self.async_redis.connection.read = fabric(new_read, self.async_redis.connection)
+
+	@property
+	def connected(self):
+		raise NotImplemented
+
+	@connected.setter
+	def connected(self, value):
+		raise NotImplemented
 
 	@tornado.gen.engine
 	def listen(self, channels):
@@ -688,8 +719,16 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 
 	def __init__(self, *args, **kwargs):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
-		self.connected = False
+		self.__connected__ = False
 		self.anti_spam = AntiSpam()
+
+	@property
+	def connected(self):
+		return self.__connected__
+
+	@connected.setter
+	def connected(self, value):
+		self.__connected__ = value
 
 	def data_received(self, chunk):
 		pass
@@ -730,7 +769,6 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		if gone_offline:
 			res = self.do_db(self.execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
-
 		self.disconnect(json.dumps(log_data))
 
 	def disconnect(self, log_data, tries=0):
@@ -738,6 +776,9 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		Closes a connection if it's not in proggress, otherwice timeouts closing
 		https://github.com/evilkost/brukva/issues/25#issuecomment-9468227
 		"""
+		self.connected = False
+		self.closed_channels = self.channels
+		self.channels = []
 		if self.async_redis.connection.in_progress and tries < 1000:  # failsafe eternal loop
 			self.logger.debug('Closing a connection timeouts')
 			ioloop.IOLoop.instance().add_timeout(timedelta(0.00001), self.disconnect, log_data, tries+1)

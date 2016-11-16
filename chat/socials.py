@@ -1,6 +1,10 @@
 import logging
 import re
-from urllib.request import urlopen as wget
+
+try:
+	from urllib2 import urlopen as wget  # py2
+except ImportError:
+	from urllib.request import urlopen as wget  # py3
 
 import requests
 from django.contrib.auth import login as djangologin

@@ -822,6 +822,8 @@ function ChannelsHandler() {
 						self.showM2EditMenu(event, el, messageId, time);
 					}
 				}
+			} else if (el.tagName == 'IMG') { // show default menu on images
+				break;
 			}
 			el = el.parentNode;
 		}

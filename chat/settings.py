@@ -15,7 +15,7 @@ import sys
 from os.path import join
 
 from django.conf import global_settings
-from sslserver import certs
+import sslserver
 
 import chat as project_module
 
@@ -95,8 +95,8 @@ CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
-CRT_PATH = os.sep.join((certs.__path__._path[0], "development.crt"))
-KEY_PATH = os.sep.join((certs.__path__._path[0], "development.key"))
+CRT_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.crt"))
+KEY_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.key"))
 
 IS_HTTPS = 'CRT_PATH' in locals()
 API_PORT = '8888'
@@ -253,7 +253,7 @@ LOGGING = {
 	},
 	'formatters': {
 		'django': {
-			'format': '%(user_id)s:%(id)s [%(asctime)s;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
+			'format': '%(user_id)s:%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},
