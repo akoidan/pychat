@@ -16,8 +16,7 @@ Setup instructions for Archlinux:
 
 Though ArchLinux is not recommended as a server OS I prefer using it over other stable ones.
   
-Prepare system.
- 0. Passwordless login to ssh server (optional): run this from client `cat ~/.ssh/id_rsa.pub | ssh -p 666 root@ip 'mkdir -p .ssh; cat >> .ssh/authorized_keys'`
+Prepare the system.
  0. Install packages `pacman -S  git nginx python python-pip redis mariadb mysql-python python-mysql-connector postfix ruby gcc jansson`. You surely can install `uwsgi` and `uwsgi-plugin-python` via pacman but I found pip's package more stable so `pip install uwsgi`. Also you need to install sass, you can do it via aur `yaourt -S ruby-sass` or gem: `gem install sass` (don't forget to add `sass` to `PATH` variable if you install it via gem: `export PATH="$PATH:$(ls ~/.gem/ruby/*/bin/ -d)"`)
  0. Clone project to local filesystem (I would recommend to clone it into `/srv/http` directory): `git clone https://github.com/Deathangel908/djangochat`. Further instructions assume that working directory is project root, so `cd djangochat`. And change the branch: `git checkout -b prod_archlinux origin/prod_archlinux`
  0. If you cloned project into different directory than `/srv/http` you need to replace all absolute paths for your one in config files `pattern="/srv/http"; grep -rl "$pattern" ./rootfs |xargs sed -i "s#$pattern#$PWD#g"` 
