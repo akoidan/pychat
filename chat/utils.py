@@ -3,24 +3,17 @@ import logging
 import re
 import sys
 from io import BytesIO
-from urllib.request import urlopen as wget
 
 import requests
-from django.contrib.auth import login as djangologin
 from django.core.exceptions import ValidationError
-from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
-from django.http import HttpResponse
-from django.views.generic import View
-from oauth2client import client
 
 from chat import local
 from chat import settings
-from chat.log_filters import id_generator
 from chat.models import User, UserProfile, Verification, RoomUsers
-from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID, VALIDATION_IS_OK
+from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID
 
 USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
 
