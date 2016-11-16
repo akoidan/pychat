@@ -39,11 +39,12 @@ def is_blank(check_str):
 		return True
 
 
-def hide_fields(post, *fields, huge=False, fill_with='****'):
+def hide_fields(post, fields, huge=False, fill_with='****'):
 	"""
 	:param post: Object that will be copied
 	:type post: QueryDict
 	:param fields: fields that will be removed
+	:param fill_with: replace characters for hidden fields
 	:param huge: if true object will be cloned and then fields will be removed
 	:return: a shallow copy of dictionary without specified fields
 	"""

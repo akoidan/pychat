@@ -107,7 +107,7 @@ def auth(request):
 		message = VALIDATION_IS_OK
 	else:
 		message = 'Login or password is wrong'
-	logger.debug('Auth request %s ; Response: %s', hide_fields(request.POST, 'password'), message)
+	logger.debug('Auth request %s ; Response: %s', hide_fields(request.POST, ('password',)), message)
 	response = HttpResponse(message, content_type='text/plain')
 	return response
 
@@ -257,7 +257,7 @@ def statistics(request):
 @login_required_no_redirect()
 @transaction.atomic
 def report_issue(request):
-	logger.info('Saving issue: %s', hide_fields(request.POST, 'log', huge=True))
+	logger.info('Saving issue: %s', hide_fields(request.POST, ('log',), huge=True))
 	issue = Issue.objects.get_or_create(content=request.POST['issue'])[0]
 	issue_details = IssueDetails(
 		sender_id=request.user.id,
@@ -282,7 +282,7 @@ class ProfileView(View):
 
 	@login_required_no_redirect()
 	def post(self, request):
-		logger.info('Saving profile: %s', hide_fields(request.POST, "base64_image", huge=True))
+		logger.info('Saving profile: %s', hide_fields(request.POST, ("base64_image", ), huge=True))
 		user_profile = UserProfile.objects.get(pk=request.user.id)
 		image_base64 = request.POST.get('base64_image')
 
@@ -319,7 +319,7 @@ class RegisterView(View):
 	def post(self, request):
 		try:
 			rp = request.POST
-			logger.info('Got register request %s', hide_fields(rp, 'password', 'repeatpassword'))
+			logger.info('Got register request %s', hide_fields(rp, ('password', 'repeatpassword')))
 			(username, password, email) = (rp.get('username'), rp.get('password'), rp.get('email'))
 			check_user(username)
 			check_password(password)
