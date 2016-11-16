@@ -44,3 +44,4 @@ chat/static/sass/partials/_asphalt.sass
 chat/production.py
 backup.sh
 data.sql
+cron-bu
