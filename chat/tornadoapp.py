@@ -806,7 +806,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			user_rooms = self.get_users_in_current_user_rooms()
 			self.safe_write(self.default(user_rooms, Actions.ROOMS, HandlerNames.CHANNELS))
 			# get all missed messages
-			self.channels.clear()
+			self.channels = []  # py2 doesn't support clear()
 			self.channels.append(self.channel)
 			for room_id in user_rooms:
 				self.channels.append(room_id)
