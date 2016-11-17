@@ -33,4 +33,6 @@ urlpatterns = patterns(
 	url(r'^toMyDearGirlFriend', 'chat.views.start_valentine'),
 	url(r'^ILoveYou', 'chat.views.valentine', name='continue_valentine'),
 	url(r'^notify$', 'chat.api.notify'),
+	url(r'^25', 'chat.views.start_valentine'),
+	url(r'^HappyBirthday', 'chat.views.birthday25', name='continue_birthday'),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
