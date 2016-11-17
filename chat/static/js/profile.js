@@ -21,6 +21,7 @@ function initChangeProfile() {
 	notificationInput = $('id_notifications');
 	logsInput = $('id_logs');
 	var item = localStorage.getItem('theme');
+	video.addEventListener('click', takeSnapshot, false);
 	if (item != null) {
 		themeSelector.value = item;
 		/*TODO $* to var*/
@@ -88,8 +89,8 @@ function startCapturingVideo(button) {
 			video.src = window.URL.createObjectURL(stream);
 			localMediaStream = stream;
 			CssUtils.showElement(video);
-			video.addEventListener('click', takeSnapshot, false);
-			CssUtils.hideElement(userProfileData);
+			photoImg.addEventListener('click', takeSnapshot, false);
+			photoImg.style.cursor = 'pointer';
 			button.value = 'Finish';
 			isStopped = false;
 			growlInfo("Click on your video to take a photo")
@@ -97,14 +98,14 @@ function startCapturingVideo(button) {
 			console.error(getDebugMessage('Error while trying to capture a picture "{}"', e.message || e.name));
 			growlError('Unable to use your webcam because "{}"'.format(e.message || e.name ));
 		});
-	} else
-
-	if (!isStopped) {
+	} else if (!isStopped) {
 		if (localMediaStream.stop) {
 			localMediaStream.stop();
 		} else {
 			 localMediaStream.getVideoTracks()[0].stop();
 		}
+		photoImg.removeEventListener('click', takeSnapshot);
+		photoImg.style.cursor = '';
 		button.value = 'Renew the photo';
 		growlInfo("To apply photo click on save");
 		CssUtils.hideElement(video);

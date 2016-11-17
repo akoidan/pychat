@@ -3,7 +3,7 @@
 CONF_REPOSITORY="https://github.com/Deathangel908/djangochat-config"
 
 CONF_VERSION=$(git ls-tree HEAD djangochat-config  |awk '{print $3}')
-echo "checking out djangochat-config $CONF_VERSION"
+echo "Current config version is $CONF_VERSION"
 # defining the project structure
 PROJECT_ROOT=`pwd`
 
