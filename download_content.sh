@@ -50,6 +50,10 @@ declare -a files=(\
     "$VAL_DIR/teddy.gif"\
     "$VAL_DIR/v2.ttf"\
     "$VAL_DIR/videoplayback.mp3"\
+    "$VAL_DIR/bloone.ttf"\
+    "$VAL_DIR/cupcake.ttf"\
+    "$VAL_DIR/happyBirthdaySong.mp3"\
+    "$VAL_DIR/tedya.jpg"\
     "$JS_DIR/amcharts-all.js"
 )
 
