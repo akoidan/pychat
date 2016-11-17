@@ -551,7 +551,7 @@ function AmchartsPage() {
 			holder.className = 'max-height-scrollable';
 			doGet(self.url, function (data) {
 				window.amchartJson = JSON.parse(data);
-				doGet(STATISTICS_JS_URL);
+				doGet(STATISTICS_JS_URL, self.show);
 			});
 		});
 	};
