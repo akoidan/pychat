@@ -1,15 +1,15 @@
 <div class="max-height-scrollable two-columns">
 	<canvas id="canvasBuffer" class="hidden"></canvas>
-	<div style="text-align: center">
-		<div class="padding10">
-			<img {% if form.instance.photo %}  src="{{ form.instance.photo.url }}" {% endif %} alt="ava" id='photoImg' class="fullwidth">
+	<div style="text-align: center; ">
+		<div class="padding10" style="position: relative;">
+			<img {% if form.instance.photo %}  src="{{ form.instance.photo.url }}" {% endif %} alt="ava" id='photoImg'  class="fullwidth">
+			<video autoplay id="changeProfileVideo"></video>
 		<input type="button" class="button" value="Make a photo from webcam" style="margin-top: 10px" onclick="startCapturingVideo(this)"/>
 		</div>
 	</div>
 	<form  method="post" id="changeProfileForm" enctype="multipart/form-data" onsubmit="saveProfile(event)">
 		{% csrf_token %}
 		<div class="padding10">
-			<video autoplay class="fullwidth" id="changeProfileVideo"></video>
 			<table class="biginputtext" id="userProfileData">
 				{{ form.as_table }}
 				<tr>

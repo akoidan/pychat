@@ -10,20 +10,34 @@ $thumb-c: #cbcbcb
 $thumb-refl: #5e5858
 
 
-$bar: linear-gradient(#7d7d7d, #3c3c3c) no-repeat
 $bar-s: 0.5em
 $n-bar: 10
 $bar-offset: .25em
 $bar-h: 0em
-$bars: ()
 $bar-sizes: ()
 $track-grad-color: top, lighten($before-color, 10%), darken($before-color, 10%)
 
 @for $i from 0 to $n-bar
-	$bar-offset: $bar-offset + $bar-s
 	$bar-h: $bar-h + 0.04em
-	$bars: append($bars, $bar left $bar-offset bottom ($input-bw + 1.5 * $track-h), comma)
 	$bar-sizes: append($bar-sizes, (0.875 * $bar-s) $bar-h, comma)
+
+@mixin vol-level($max-level)
+	.vol-level-#{$max-level}
+		$bars: ()
+		@for $i from 0 to $n-bar
+			$base-color: #7d7d7d
+			@if $i < $max-level
+				$base-color: rgb(100+15*$i, 255-15*$i, 50)
+			$bar: linear-gradient($base-color, darken($base-color, 25.5%)) no-repeat
+			$bar-offset: $bar-offset + $bar-s
+			$bars: append($bars, $bar left $bar-offset bottom ($input-bw + 1.5 * $track-h), comma)
+		background: $bars
+		background-origin: border-box
+		background-size: $bar-sizes
+
+
+@for $i from 0 to $n-bar+1
+	@include vol-level($i)
 
 @function refl($pos: 50% 0, $k: 1, $refl: $thumb-refl)
 	@return radial-gradient(at #{$pos}, rgba($refl, $k), rgba($refl, 0) 71%) #{$pos}
@@ -60,12 +74,8 @@ input[type=range]
 	width: $track-w
 	height: $range-height * 0.5
 	border-radius: .25em
-	background: transparent
 	font-size: 1em
 	cursor: pointer
-	background: $bars
-	background-origin: border-box
-	background-size: $bar-sizes
 
 	&::-webkit-slider-runnable-track
 		+track-base

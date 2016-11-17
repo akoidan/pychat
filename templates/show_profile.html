@@ -1,12 +1,12 @@
 <div class="max-height-scrollable two-columns" username="{{ form.instance.username }}">
 	{% if form.instance.photo %}
-		<div class="col1 padding10" style="text-align: center">
-				<img src="{{ form.instance.photo.url }}" alt="ava" id='photoImg' class="fullwidth">
+		<div class="col1" style="text-align: center">
+				<img src="{{ form.instance.photo.url }}" alt="ava" class="padding10 fullwidth">
 		</div>
 	{% endif %}
 
-	<div class="padding10">
-		<table class="biginputtext" id="userProfileData">
+	<div>
+		<table class="biginputtext padding10" id="userProfileData">
 			{{ form.as_table }}
 		</table>
 	</div>
