@@ -410,22 +410,30 @@ function Page() {
 		var holder = tmpWrapper.firstChild;
 		self.dom.el.push(holder);
 		self.dom.container.appendChild(holder);
-		self.fixTittle();
+		self.fixTitle();
 	};
 	self.foreach = function (apply) {
 		for (var i = 0; i < self.dom.el.length; i++) {
 			apply(self.dom.el[i]);
 		}
 	};
-	self.fixTittle = function () {
+	self.setTitle = function (newTitle) {
+		self.title = newTitle;
+	};
+	self.getDefaultTitle = function () {
+		return "<b>{}</b>".format(loggedUser);
+	};
+	self.fixTitle = function () {
 		var newTittle = self.getTitle();
 		if (newTittle != null) {
 			headerText.innerHTML = newTittle;
+		} else {
+			headerText.innerHTML = self.getDefaultTitle();
 		}
 	};
 	self.show = function () {
 		self.rendered = true;
-		self.fixTittle();
+		self.fixTitle();
 		self.foreach(CssUtils.showElement);
 	};
 	self.update = self.show;
@@ -444,9 +452,10 @@ function Page() {
 		show: self.show,
 		dom: self.dom
 	};
+	self.title = self.getDefaultTitle();
 	self.toString = function () {
 		return self.name;
-	}
+	};
 }
 
 function IssuePage() {
@@ -516,7 +525,7 @@ function ChangeProfilePage() {
 	var self = this;
 	Page.call(self);
 	self.url = '/profile';
-	self.title = 'Change profile';
+	self.title = "<b>{}</b> (your) profile".format(loggedUser);
 	self.onLoad = function (html) {
 		self.rendered = true;
 		self.super.onLoad(html);
@@ -566,6 +575,9 @@ function PageHandler() {
 	};
 	self.getPage = function (url) {
 		return self.pages[url];
+	};
+	self.updateTitle = function () {
+		self.currentPage.fixTitle();
 	};
 	self.showPageFromUrl = function () {
 		var currentUrl = window.location.href;
@@ -617,7 +629,6 @@ function ChannelsHandler() {
 	var self = this;
 	Page.call(self);
 	self.url = '/chat/';
-	//self.title = "Hello, <b>{}</b>".format(loggedUser);
 	self.render = self.show;
 	self.ROOM_ID_ATTR = 'roomid';
 	self.activeChannel = DEFAULT_CHANNEL_NAME;
@@ -645,10 +656,6 @@ function ChannelsHandler() {
 	};
 	self.getActiveChannel = function () {
 		return self.channels[self.activeChannel];
-	};
-	self.getTitle = function() {
-		var channel = self.getActiveChannel();
-		return channel != null ? channel.title : null;
 	};
 	self.childDom.minifier = {
 		channel: {
@@ -1194,7 +1201,7 @@ function ChannelsHandler() {
 			}
 		}
 		self.dom.usersStateText.onclick = self.toggleChannelOfflineOnline;
-		self.dom.usersStateText.click()
+		self.dom.usersStateText.click();
 	};
 	self.minifyList = function (event) {
 		var minifier = self.dom.minifier[event.target.getAttribute('name')];
@@ -2136,7 +2143,8 @@ function WebRtcApi() {
 		if (self.isForTransferFile) {
 			self.downloadBar.dom.text.textContent = "Waiting_to_accept";
 		} else {
-			headerText.innerHTML = text;
+			channelsHandler.setTitle(text);
+			singlePage.updateTitle();
 		}
 	};
 	self.oniceconnectionstatechange = function () {
@@ -2488,7 +2496,7 @@ function WebRtcApi() {
 		self.pc.onaddstream = function (event) {
 			self.setVideoSource(self.dom.remote, event.stream);
 			self.createMicrophoneLevelVoice(event.stream, false);
-			self.setHeaderText("You're talking to <b>{}</b> now".format(self.receiverName));
+			self.setHeaderText("Talking with <b>{}</b>".format(self.receiverName));
 			self.setIconState(true);
 			console.log(getDebugMessage("Stream attached"));
 			self.showPhoneIcon();
@@ -2516,6 +2524,7 @@ function WebRtcApi() {
 		self.clearTimeout();
 		self.receiverName = null;
 		self.receiverId = null;
+		self.setHeaderText(loggedUser);
 		try {
 			if (self.sendChannel) {
 				self.sendChannel.close();
