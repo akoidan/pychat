@@ -37,6 +37,10 @@ files[16]="$VAL_DIR/Love_and_Passion.ttf"
 files[17]="$VAL_DIR/teddy.gif"
 files[18]="$VAL_DIR/v2.ttf"
 files[19]="$VAL_DIR/videoplayback.mp3"
+files[19]="$VAL_DIR/bloone.ttf"
+files[19]="$VAL_DIR/cupcake.ttf"
+files[19]="$VAL_DIR/happyBirthdaySong.mp3"
+files[19]="$VAL_DIR/teddy.gif"
 
 # Deleting all content creating empty dirs
 for path in "${files[@]}" ; do
