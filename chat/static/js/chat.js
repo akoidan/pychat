@@ -1944,6 +1944,7 @@ function WebRtcApi() {
 	self.activeUserClass = "active-call-user";
 	self.isForTransferFile = false;
 	self.CHUNK_SIZE = 16384;
+	self.audioProcessors = {};
 	self.dom = {
 		callContainer: $('callContainer'),
 		callAnswerParent: $('callAnswerParent'),
@@ -2407,40 +2408,65 @@ function WebRtcApi() {
 		}
 		self.setVideo(self.getTrack(true) != null);
 		self.setAudio(self.getTrack(false) != null);
-		self.createMicrophoneLevelVoice(stream);
+		self.createMicrophoneLevelVoice(stream, true);
 	};
-	self.createMicrophoneLevelVoice = function (stream) {
+	self.getAverageAudioLevel = function(audioProc){
+		var array = new Uint8Array(audioProc.analyser.frequencyBinCount);
+		audioProc.analyser.getByteFrequencyData(array);
+		var values = 0;
+		var length = array.length;
+		for (var i = 0; i < length; i++) {
+			values += array[i];
+		}
+		return values / length;
+	};
+	self.createMicrophoneLevelVoice = function (stream, isLocalProc) {
 		try {
-			var audioContext = new AudioContext();
-			var analyser = audioContext.createAnalyser();
-			var microphone = audioContext.createMediaStreamSource(stream);
-			self.javascriptNode = audioContext./*createJavaScriptNode*/createScriptProcessor(2048, 1, 1);
-			analyser.smoothingTimeConstant = 0.3;
-			analyser.fftSize = 1024;
-			microphone.connect(analyser);
-			analyser.connect(self.javascriptNode);
-			self.javascriptNode.connect(audioContext.destination);
-			self.prevVolumeValues = 0;
-			self.volumeValuesCount = 0;
-			self.javascriptNode.onaudioprocess = function () {
-				if (!self.constraints.audio) {
-					return;
-				}
-				var array = new Uint8Array(analyser.frequencyBinCount);
-				analyser.getByteFrequencyData(array);
-				var values = 0;
-				var length = array.length;
-				for (var i = 0; i < length; i++) {
-					values += array[i];
-				}
-				var value = values / length;
-				self.prevVolumeValues += value;
-				self.volumeValuesCount++;
-				if (self.volumeValuesCount == 100 && self.prevVolumeValues == 0) {
-					self.showNoMicError();
-				}
-				self.dom.microphoneLevel.value = value;
+			self.audioProcessors[isLocalProc] = {};
+			var audioProc = self.audioProcessors[isLocalProc];
+			audioProc.audioContext = new AudioContext();
+			audioProc.analyser = audioProc.audioContext.createAnalyser();
+			var microphone = audioProc.audioContext.createMediaStreamSource(stream);
+			audioProc.javascriptNode = audioProc.audioContext.createScriptProcessor(2048, 1, 1);
+			audioProc.analyser.smoothingTimeConstant = 0.3;
+			audioProc.analyser.fftSize = 1024;
+			microphone.connect(audioProc.analyser);
+			audioProc.analyser.connect(audioProc.javascriptNode);
+			audioProc.javascriptNode.connect(audioProc.audioContext.destination);
+			audioProc.prevVolumeValues = 0;
+			audioProc.volumeValuesCount = 0;
+			if (isLocalProc) {
+				(function (audioProc) {
+					audioProc.javascriptNode.onaudioprocess = function () {
+						if (!self.constraints.audio) {
+							return;
+						}
+						var value = self.getAverageAudioLevel(audioProc);
+						audioProc.prevVolumeValues += value;
+						audioProc.volumeValuesCount++;
+						if (audioProc.volumeValuesCount == 100 && audioProc.prevVolumeValues == 0) {
+							self.showNoMicError();
+						}
+						self.dom.microphoneLevel.value = value;
+					};
+				})(audioProc);
+			} else {
+				(function (audioProc) {
+					audioProc.javascriptNode.onaudioprocess = function () {
+						var level = self.getAverageAudioLevel(audioProc); //256 max
+						var clasNu;
+						if (level >= 162) {
+							clasNu = 10;
+						} else if (level == 0) {
+							clasNu = 0
+						} else {
+							clasNu = Math.floor(level / 18) + 1;
+						}
+						self.dom.callVolume.className = 'vol-level-{}'.format(clasNu);
+					};
+				})(audioProc);
 			}
+
 		} catch (err) {
 			console.error(getDebugMessage("Unable to use microphone level because " + err));
 		}
@@ -2461,6 +2487,7 @@ function WebRtcApi() {
 		self.pc.oniceconnectionstatechange = self.oniceconnectionstatechange;
 		self.pc.onaddstream = function (event) {
 			self.setVideoSource(self.dom.remote, event.stream);
+			self.createMicrophoneLevelVoice(event.stream, false);
 			self.setHeaderText("You're talking to <b>{}</b> now".format(self.receiverName));
 			self.setIconState(true);
 			console.log(getDebugMessage("Stream attached"));
@@ -2510,10 +2537,17 @@ function WebRtcApi() {
 			growlInfo(text);
 		}
 		self.hidePhoneIcon();
-		if (self.javascriptNode) {
-			self.javascriptNode.onaudioprocess = null;
-			self.dom.microphoneLevel.value = 0;
+
+		for (var key in self.audioProcessors) {
+			if (self.audioProcessors.hasOwnProperty(key)) {
+				var proc = self.audioProcessors[key];
+				if (proc.javascriptNode) {
+					proc.javascriptNode.onaudioprocess = null;
+				}
+			}
 		}
+		self.dom.microphoneLevel.value = 0;
+		self.dom.callVolume.className = 'vol-level-0';
 		self.exitFullScreen();
 		/*also executes removing event on exiting from fullscreen*/
 	};
