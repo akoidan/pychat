@@ -6,7 +6,7 @@ from chat.models import Room
 class Command(BaseCommand):
 
 	def __init__(self):
-		super().__init__()
+		super(Command, self).__init__()
 	help = 'Removes all room id keys from database'
 
 	def handle(self, *args, **options):
