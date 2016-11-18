@@ -1958,6 +1958,9 @@ function PeerConnectionHandler() {
 			{RtpDataChannels: false /*true*/}
 		]
 	};
+	self.isActive = function () {
+		return self.localStream && self.localStream.active;
+	};
 }
 
 function FileTransferHandler() {
@@ -2019,50 +2022,93 @@ function CallHandler() {
 	self.changeVolume = function () {
 		self.dom.remote.volume = self.dom.callVolume.value / 100;
 	};
+	self.dom.callVolume.addEventListener('input', self.changeVolume);
+	self.exitFullScreen = function () {
+		document.cancelFullScreen();
+	};
+
+	self.hideContainerTimeout = function () {
+		self.idleTime++;
+		if (self.idleTime > 6) {
+			CssUtils.addClass(self.dom.videoContainer, 'inactive');
+		}
+	};
+	self.enterFullScreenMode = function () {
+		self.dom.remote.removeEventListener('dblclick', self.enterFullScreenMode);
+		self.dom.videoContainer.requestFullscreen();
+		CssUtils.addClass(self.dom.videoContainer, 'fullscreen');
+		document.addEventListener('mousemove', self.fsMouseMove, false);
+		self.hideContainerTimeoutRes = setInterval(self.hideContainerTimeout, 1000);
+		/*to clear only function from resultOf setInterval should be passed, otherwise doesn't work*/
+	};
+	self.fsMouseMove = function () {
+		if (self.idleTime > 0) {
+			CssUtils.removeClass(self.dom.videoContainer, 'inactive');
+		}
+		self.idleTime = 0;
+	};
+	self.callTimeoutTime = 60000;
+	self.dom.callSound.addEventListener("ended", function () {
+		checkAndPlay(self.dom.callSound);
+	});
+	self.getTrack = function (isVideo) {
+		var track = null;
+		if (self.localStream) {
+			var tracks = isVideo ? self.localStream.getVideoTracks() : self.localStream.getAudioTracks();
+			if (tracks.length > 0) {
+				track = tracks[0]
+			}
+		}
+		return track;
+	};
+	self.setAudio = function (value) {
+		self.constraints.audio = value;
+		self.dom.audioStatusIcon.className = value ? "icon-mic" : "icon-mute callActiveIcon";
+		self.dom.fs.audio.className = value ? "icon-webrtc-mic" : "icon-webrtc-nomic";
+		var title = value ? "Turn off your microphone" : "Turn on your microphone";
+		self.dom.audioStatusIcon.title = title;
+		self.dom.fs.audio.title = title;
+	};
+	self.setVideo = function (value) {
+		self.constraints.video = value;
+		self.dom.videoStatusIcon.className = value ? "icon-videocam" : "icon-no-videocam callActiveIcon";
+		self.dom.fs.video.className = value ? "icon-webrtc-video" : "icon-webrtc-novideo";
+		CssUtils.setVisibility(self.dom.local, value);
+		var title = value ? "Turn off your webcamera" : "Turn on your webcamera";
+		self.dom.videoStatusIcon.title = title;
+		self.dom.fs.video.title = title;
+	};
+	self.toggleInput = function (isVideo) {
+		var kind = isVideo ? 'video' : 'audio';
+		var track = self.getTrack(isVideo);
+		if (!self.isActive() || track) {
+			var newValue = !self.constraints[kind];
+			if (isVideo) {
+				self.setVideo(newValue);
+			} else {
+				self.setAudio(newValue);
+			}
+		}
+		if (track) {
+			track.enabled = self.constraints[kind];
+		} else if (self.isActive()) {
+			growlError("You need to call/reply with {} to turn it on".format(kind));
+		}
+	};
+	self.toggleVideo = function () {
+		self.toggleInput(true);
+	};
+	self.toggleMic = function () {
+		self.toggleInput(false);
+	};
 }
 
 function WebRtcApi() {
 	var self = this;
 	self.isForTransferFile = false;
-	self.CHUNK_SIZE = 16384;
 	self.dom = {
-		callContainer: $('callContainer'), //
-		callAnswerParent: $('callAnswerParent'),
-		callAnswerText: $('callAnswerText'), //
-		remote: $('remoteVideo'), //
-		local: $('localVideo'), //
-		callSound: $('chatCall'), //
-		hangUpIcon: $('hangUpIcon'), //
-		audioStatusIcon: $('audioStatusIcon'), //
-		videoStatusIcon: $('videoStatusIcon'), //
-		videoContainer: $('videoContainer'), //
-		callIcon: $('callIcon'), //
-		callVolume: $('callVolume'), //
-		microphoneLevel: $("microphoneLevel"), //
-		fs: {
-			/*FullScreen*/
-			video: $('fs-video'),
-			audio: $('fs-audio'),
-			hangup: $('fs-hangup'),
-			minimize: $('fs-minimize'),
-			enterFullScreen: $('enterFullScreen')
-		}, //
-		// transfer file dome
-		fileInput: $('webRtcFileInput') //
-		// transfer file dome
+		callContainer: $('callContainer'),
 	};
-	//file transfer  variables
-	self.receiveBuffer = []; //
-	self.receivedSize = 0; //
-	//file transfer  variables
-	self.onExitFullScreen = function () {
-		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
-			CssUtils.removeClass(self.dom.videoContainer, 'fullscreen');
-			document.removeEventListener('mousemove', self.fsMouseMove, false);
-			clearInterval(self.hideContainerTimeoutRes);
-			self.dom.remote.ondblclick = self.enterFullScreenMode;
-		}
-	}; //
 	self.attachDomEvents = function () { //TODO
 		self.dom.videoStatusIcon.onclick = self.toggleVideo;
 		self.dom.fs.video.onclick = self.toggleVideo;
@@ -2100,110 +2146,6 @@ function WebRtcApi() {
 		self.idleTime = 0;
 		self.dom.fs.hangup.title = 'Hang up';
 		self.dom.hangUpIcon.title = self.dom.fs.hangup.title;
-	};
-	self.changeVolume = function () {
-		self.dom.remote.volume = self.dom.callVolume.value / 100;
-	}; //
-	self.dom.callVolume.addEventListener('input', self.changeVolume);
-	self.exitFullScreen = function () {
-		document.cancelFullScreen();
-	};
-	self.hideContainerTimeout = function () {
-		self.idleTime++;
-		if (self.idleTime > 6) {
-			CssUtils.addClass(self.dom.videoContainer, 'inactive');
-		}
-	};
-	self.enterFullScreenMode = function () {
-		self.dom.remote.removeEventListener('dblclick', self.enterFullScreenMode);
-		self.dom.videoContainer.requestFullscreen();
-		CssUtils.addClass(self.dom.videoContainer, 'fullscreen');
-		document.addEventListener('mousemove', self.fsMouseMove, false);
-		self.hideContainerTimeoutRes = setInterval(self.hideContainerTimeout, 1000);
-		/*to clear only function from resultOf setInterval should be passed, otherwise doesn't work*/
-	};
-	self.fsMouseMove = function () {
-		if (self.idleTime > 0) {
-			CssUtils.removeClass(self.dom.videoContainer, 'inactive');
-		}
-		self.idleTime = 0;
-	};
-	self.callTimeoutTime = 60000;
-	self.dom.callSound.addEventListener("ended", function () {
-		checkAndPlay(self.dom.callSound);
-	});
-	self.pc = {};
-	self.constraints = {
-		audio: true,
-		video: true
-	};
-	var webRtcUrl = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
-	self.pc_config = {iceServers: [{url: webRtcUrl}]};
-	self.pc_constraints = {
-		optional: [/*Firefox*/
-			/*{DtlsSrtpKeyAgreement: true},*/
-			{RtpDataChannels: false /*true*/}
-		]
-	};
-	// Set up audio and video regardless of what devices are present.
-	self.sdpConstraints = {
-		'mandatory': {
-			'OfferToReceiveAudio': true,
-			'OfferToReceiveVideo': true
-		}
-	};
-	self.getTrack = function (isVideo) {
-		var track = null;
-		if (self.localStream) {
-			var tracks = isVideo ? self.localStream.getVideoTracks() : self.localStream.getAudioTracks();
-			if (tracks.length > 0) {
-				track = tracks[0]
-			}
-		}
-		return track;
-	};
-	self.setAudio = function (value) {
-		self.constraints.audio = value;
-		self.dom.audioStatusIcon.className = value ? "icon-mic" : "icon-mute callActiveIcon";
-		self.dom.fs.audio.className = value ? "icon-webrtc-mic" : "icon-webrtc-nomic";
-		var title = value ? "Turn off your microphone" : "Turn on your microphone";
-		self.dom.audioStatusIcon.title = title;
-		self.dom.fs.audio.title = title;
-	};
-	self.setVideo = function (value) {
-		self.constraints.video = value;
-		self.dom.videoStatusIcon.className = value ? "icon-videocam" : "icon-no-videocam callActiveIcon";
-		self.dom.fs.video.className = value ? "icon-webrtc-video" : "icon-webrtc-novideo";
-		CssUtils.setVisibility(self.dom.local, value);
-		var title = value ? "Turn off your webcamera" : "Turn on your webcamera";
-		self.dom.videoStatusIcon.title = title;
-		self.dom.fs.video.title = title;
-	};
-	self.isActive = function () {
-		return self.localStream && self.localStream.active;
-	};
-	self.toggleInput = function (isVideo) {
-		var kind = isVideo ? 'video' : 'audio';
-		var track = self.getTrack(isVideo);
-		if (!self.isActive() || track) {
-			var newValue = !self.constraints[kind];
-			if (isVideo) {
-				self.setVideo(newValue);
-			} else {
-				self.setAudio(newValue);
-			}
-		}
-		if (track) {
-			track.enabled = self.constraints[kind];
-		} else if (self.isActive()) {
-			growlError("You need to call/reply with {} to turn it on".format(kind));
-		}
-	};
-	self.toggleVideo = function () {
-		self.toggleInput(true);
-	};
-	self.toggleMic = function () {
-		self.toggleInput(false);
 	};
 	self.onreply = function () {
 		self.setHeaderText("Waiting for <b>{}</b> to accept".format(self.receiverName))
