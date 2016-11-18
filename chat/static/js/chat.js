@@ -2202,6 +2202,14 @@ function FileTransferHandler() {
 		self.downloadBar.dom.text.download = self.receivedFileName;
 		self.downloadBar.dom.text.textContent = 'Save {}'.format(self.receivedFileName);
 	};
+	self.attachDomEvents = function () {
+		self.downloadBar = new DownloadBar('transmitProgress');
+		$('webRtcFileIcon').onclick = function () {
+			self.dom.fileInput.click();
+		};
+		self.dom.fileInput.addEventListener('change', self.transferFile, false);
+	};
+	self.attachDomEvents();
 }
 
 function CallHandler() {
@@ -2597,25 +2605,13 @@ function CallHandler() {
 			singlePage.showDefaultPage();
 		}
 	};
-}
-
-function WebRtcApi() {
-	var self = this;
-	self.dom = {
-		callContainer: $('callContainer'),
-	};
-	self.attachDomEvents = function () { //TODO
+	self.attachDomEvents = function () {
 		self.dom.videoStatusIcon.onclick = self.toggleVideo;
 		self.dom.fs.video.onclick = self.toggleVideo;
 		self.dom.hangUpIcon.onclick = self.hangUp;
 		self.dom.fs.hangup.onclick = self.hangUp;
 		self.dom.fs.audio.onclick = self.toggleMic;
 		self.dom.audioStatusIcon.onclick = self.toggleMic;
-		self.downloadBar = new DownloadBar('transmitProgress');
-		$('webRtcFileIcon').onclick = function () {
-			self.dom.fileInput.click();
-		};
-		self.dom.fileInput.addEventListener('change', self.transferFile, false);
 		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
 		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
 			document.addEventListener(fullScreenChangeEvents[i], self.onExitFullScreen, false);
@@ -2633,14 +2629,22 @@ function WebRtcApi() {
 			elem.requestFullscreen = elem.webkitRequestFullscreen;
 			document.cancelFullScreen = document.webkitCancelFullScreen;
 		} else {
-			growlError("Can't enter fullscreen")
+			growlError("Can't enter fullscreen");
 		}
 		self.dom.remote.ondblclick = self.enterFullScreenMode;
 		self.dom.fs.enterFullScreen.onclick = self.enterFullScreenMode;
 		self.dom.fs.minimize.onclick = self.exitFullScreen;
-		self.idleTime = 0;
 		self.dom.fs.hangup.title = 'Hang up';
 		self.dom.hangUpIcon.title = self.dom.fs.hangup.title;
+		self.idleTime = 0;
+	};
+	self.attachDomEvents();
+}
+
+function WebRtcApi() {
+	var self = this;
+	self.dom = {
+		callContainer: $('callContainer'),
 	};
 	self.onoffer = function (message) { // TODO multirtc
 		if (message.content) {
@@ -2671,7 +2675,6 @@ function WebRtcApi() {
 	self.onwebrtc = function (message) { //TODO multirtc CREATE new peerconnection obj
 
 	};
-	self.attachDomEvents();
 }
 
 
