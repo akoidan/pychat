@@ -1961,6 +1961,31 @@ function PeerConnectionHandler() {
 	self.isActive = function () {
 		return self.localStream && self.localStream.active;
 	};
+	self.setAnswerOpponentVariables = function (message) {
+		self.receiverName = message.user;
+		self.receiverId = message.userId;
+		self.channel = message.channel;
+		self.sendBaseEvent(null, "reply");
+	};
+	self.setOpponentVariables = function () {
+		var activeChannel = channelsHandler.getActiveChannel();
+		if (!(Object.keys(activeChannel.onlineUsers).length > 1)) {
+			return activeChannel.getUserNameById(activeChannel.getOpponentId());
+		}
+		self.receiverId = activeChannel.getOpponentId();
+		self.receiverName = activeChannel.getUserNameById(self.receiverId);
+		self.channel = channelsHandler.activeChannel
+	};
+	self.print = function (message) {
+		console.log(getDebugMessage("Call message {}", JSON.stringify(message)));
+	};
+	self.gotReceiveChannel = function (event) {
+		console.log(getDebugMessage('Received Channel Callback'));
+		self.sendChannel = event.channel;
+		// self.sendChannel.onmessage = self.print;
+		self.sendChannel.onopen = self.channelOpen;
+		//self.sendChannel.onclose = self.print;
+	};
 }
 
 function FileTransferHandler() {
@@ -1973,6 +1998,57 @@ function FileTransferHandler() {
 	self.receivedSize = 0;
 	PeerConnectionHandler.call(self);
 	self.sdpConstraints = {};
+	self.setHeaderText = function (text) {
+		self.downloadBar.dom.text.textContent = "Waiting_to_accept";
+	};
+	self.oniceconnectionstatechange = function () {
+		if (self.pc.iceConnectionState == 'disconnected') {
+			self.closeEvents("Connection has been lost");
+		}
+	};
+	self.sendFileOffer = function () {
+		self.sendBaseEvent(
+				{
+					name: self.file.name,
+					size: self.file.size
+				},
+				'offer');
+		self.isForTransferFile = true;
+		self.waitForAnswer();
+	};
+	self.transferFile = function () {
+		self.file = self.dom.fileInput.files[0];
+		//self.dom.fileInput.disabled = true;
+		var username = self.setOpponentVariables();
+		if (username) {
+			growlError("<span>Can't send file because user <b>{}</b> is not online.</span>".format(username));
+			console.log(getDebugMessage('Skip call because user {} is not online', username));
+			return;
+		}
+		self.downloadBar.setMax(self.file.size);
+		self.sendFileOffer();
+	};
+	self.onFileOffer = function (message) {
+		self.receivedFileSize = parseInt(message.content.size);
+		self.downloadBar.setMax(self.receivedFileSize);
+		self.receivedFileName = message.content.name;
+		self.lastGrowl = new Growl("<div style='cursor: pointer'>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>"
+				.format(encodeHTML(self.receivedFileName), bytesToSize(self.receivedFileSize), encodeHTML(message.user)));
+		self.lastGrowl.show(3600000, 'col-info');
+		self.lastGrowl.growl.addEventListener('click', self.acceptFileReply);
+		self.setAnswerOpponentVariables(message);
+		notifier.notify(message.user, "Sends file {}".format(self.receivedFileName));
+	};
+	self.acceptFileReply = function () {
+		self.createPeerConnection();
+		self.createSendChannelAndOffer();
+		self.lastGrowl.growl.removeEventListener('click', self.acceptFileReply);
+		self.lastGrowl.hide();
+		self.showAndAttachCallDialogOnResponse();
+	};
+	self.channelOpen = function () {
+		self.sendData();
+	};
 }
 
 function CallHandler() {
@@ -2101,6 +2177,108 @@ function CallHandler() {
 	self.toggleMic = function () {
 		self.toggleInput(false);
 	};
+	self.setHeaderText = function (text) { // TODO multirtc
+		channelsHandler.setTitle(text);
+		singlePage.updateTitle();
+	};
+	self.onCallOffer = function (message) {
+		self.clearTimeout();
+		self.setAnswerOpponentVariables(message);
+		checkAndPlay(self.dom.callSound);
+		CssUtils.showElement(self.dom.callAnswerParent);
+		notifier.notify(self.receiverName, "Calls you");
+		self.timeoutFunnction = setTimeout(function () {
+					self.declineWebRtcCall();
+					// displayPreparedMessage(SYSTEM_HEADER_CLASS, new Date().getTime(),
+					//getText("You have missed a call from <b>{}</b>", self.receiverName)
+					// TODO replace growl with System message in user thread and unread
+					growlInfo("<div>You have missed a call from <b>{}</b></div>".format(self.receiverName));
+				}, self.callTimeoutTime
+		);
+		self.dom.callAnswerText.textContent = "{} is calling you".format(self.receiverName);
+	};
+	self.setIconState = function (isCall) {
+		isCall = isCall || self.isActive();
+		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
+		CssUtils.setVisibility(self.dom.videoContainer, isCall);
+		CssUtils.setVisibility(self.dom.callIcon, !isCall);
+	};
+	self.showCallDialog = function (isCallActive) {
+		isCallActive = isCallActive || self.isActive();
+		self.setIconState(isCallActive);
+		if (!isCallActive) {
+			self.setHeaderText("Make a call");
+		} else {
+			self.clearTimeout();
+		}
+	};
+	self.answerWebRtcCall = function () {
+		CssUtils.hideElement(self.dom.callAnswerParent);
+		self.dom.callSound.pause();
+		self.setAudio(true);
+		self.setVideo(false);
+		self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
+		self.createAfterResponseCall();
+	};
+	self.declineWebRtcCall = function (dontResponde) {
+		CssUtils.hideElement(self.dom.callAnswerParent);
+		self.dom.callSound.pause();
+		if (!dontResponde) {
+			self.sendBaseEvent(null, 'decline');
+		}
+	};
+	self.videoAnswerWebRtcCall = function () {
+		CssUtils.hideElement(self.dom.callAnswerParent);
+		self.dom.callSound.pause();
+		self.setAudio(true);
+		self.setVideo(true);
+		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
+		self.createAfterResponseCall();
+	};
+	self.captureInput = function (callback, callIfNoSource) {
+		if (self.constraints.audio || self.constraints.video) {
+			navigator.getUserMedia(self.constraints, callback, self.failWebRtc);
+		} else if (callIfNoSource) {
+			callback();
+		}
+	};
+		self.callPeople = function () {
+		self.isForTransferFile = false;
+		var username = self.setOpponentVariables();
+		if (username) {
+			growlError("<span>Can't make a call file because user <b>{}</b> is not online.</span>".format(username));
+			console.log(getDebugMessage('Skip call because user {} is not online', username));
+			return;
+		}
+		self.setHeaderText("Confirm browser to use your input devices for call");
+		self.waitForAnswer();
+		self.captureInput(self.captureInputStream);
+	};
+	self.captureInputStream = function (stream) {
+		self.setIconState(true);
+		self.setHeaderText("Establishing connection with {}".format(self.receiverName));
+		self.attachLocalStream(stream);
+		self.sendBaseEvent(null, 'offer');
+		self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime);
+	};
+	self.createCallAfterCapture = function (stream) {
+		self.createPeerConnection();
+		self.attachLocalStream(stream);
+		self.createSendChannelAndOffer();
+	};
+	self.createAfterResponseCall = function () {
+		self.captureInput(self.createCallAfterCapture, true);
+		self.showAndAttachCallDialogOnResponse();
+		self.showCallDialog(true);
+	};
+	self.showAndAttachCallDialogOnResponse = function () {
+		channelsHandler.setActiveChannel(self.channel);
+		channelsHandler.getActiveChannel().setChannelAttach(true);
+		CssUtils.showElement(self.dom.callContainer);
+	};
+	self.channelOpen = function () {
+		console.log(getDebugMessage('Opened a new chanel'))
+	};
 }
 
 function WebRtcApi() {
@@ -2147,56 +2325,12 @@ function WebRtcApi() {
 		self.dom.fs.hangup.title = 'Hang up';
 		self.dom.hangUpIcon.title = self.dom.fs.hangup.title;
 	};
-	self.onreply = function () {
-		self.setHeaderText("Waiting for <b>{}</b> to accept".format(self.receiverName))
-	};
-	self.setHeaderText = function (text) {
-		if (self.isForTransferFile) {
-			self.downloadBar.dom.text.textContent = "Waiting_to_accept";
-		} else {
-			channelsHandler.setTitle(text);
-			singlePage.updateTitle();
-		}
-	};
-	self.oniceconnectionstatechange = function () {
-		if (self.pc.iceConnectionState == 'disconnected') {
-			self.closeEvents("Connection has been lost");
-		}
-	};
-	self.onoffer = function (message) {
+	self.onoffer = function (message) { // TODO multirtc
 		if (message.content) {
 			self.onFileOffer(message);
 		} else {
 			self.onCallOffer(message);
 		}
-	};
-	self.setAnswerOpponentVariables = function (message) {
-		self.receiverName = message.user;
-		self.receiverId = message.userId;
-		self.channel = message.channel;
-		self.sendBaseEvent(null, "reply");
-	};
-	self.onCallOffer = function (message) {
-		self.clearTimeout();
-		self.setAnswerOpponentVariables(message);
-		checkAndPlay(self.dom.callSound);
-		CssUtils.showElement(self.dom.callAnswerParent);
-		notifier.notify(self.receiverName, "Calls you");
-		self.timeoutFunnction = setTimeout(function () {
-					self.declineWebRtcCall();
-					// displayPreparedMessage(SYSTEM_HEADER_CLASS, new Date().getTime(),
-					//getText("You have missed a call from <b>{}</b>", self.receiverName)
-					// TODO replace growl with System message in user thread and unread
-					growlInfo("<div>You have missed a call from <b>{}</b></div>".format(self.receiverName));
-				}, self.callTimeoutTime
-		);
-		self.dom.callAnswerText.textContent = "{} is calling you".format(self.receiverName);
-	};
-	self.setIconState = function (isCall) {
-		isCall = isCall || self.isActive();
-		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
-		CssUtils.setVisibility(self.dom.videoContainer, isCall);
-		CssUtils.setVisibility(self.dom.callIcon, !isCall);
 	};
 	self.toggleCallContainer = function () {
 		if (self.isActive()) {
@@ -2205,144 +2339,6 @@ function WebRtcApi() {
 		var visible = CssUtils.toggleVisibility(self.dom.callContainer);
 		self.setIconState(false);
 		channelsHandler.getActiveChannel().setChannelAttach(!visible);
-	};
-	self.showCallDialog = function (isCallActive) {
-		isCallActive = isCallActive || self.isActive();
-		self.setIconState(isCallActive);
-		if (!isCallActive) {
-			self.setHeaderText("Make a call");
-		} else {
-			self.clearTimeout();
-		}
-	};
-	self.answerWebRtcCall = function () {
-		CssUtils.hideElement(self.dom.callAnswerParent);
-		self.dom.callSound.pause();
-		self.setAudio(true);
-		self.setVideo(false);
-		self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
-		self.createAfterResponseCall();
-	};
-	self.declineWebRtcCall = function (dontResponde) {
-		CssUtils.hideElement(self.dom.callAnswerParent);
-		self.dom.callSound.pause();
-		if (!dontResponde) {
-			self.sendBaseEvent(null, 'decline');
-		}
-	};
-	self.videoAnswerWebRtcCall = function () {
-		CssUtils.hideElement(self.dom.callAnswerParent);
-		self.dom.callSound.pause();
-		self.setAudio(true);
-		self.setVideo(true);
-		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
-		self.createAfterResponseCall();
-	};
-	self.captureInput = function (callback, callIfNoSource) {
-		if (self.constraints.audio || self.constraints.video) {
-			navigator.getUserMedia(self.constraints, callback, self.failWebRtc);
-		} else if (callIfNoSource) {
-			callback();
-		}
-	};
-	self.sendFileOffer = function () {
-		self.sendBaseEvent(
-				{
-					name: self.file.name,
-					size: self.file.size
-				},
-				'offer');
-		self.isForTransferFile = true;
-		self.waitForAnswer();
-	};
-	self.transferFile = function () {
-		self.file = self.dom.fileInput.files[0];
-		//self.dom.fileInput.disabled = true;
-		var username = self.setOpponentVariables();
-		if (username) {
-			growlError("<span>Can't send file because user <b>{}</b> is not online.</span>".format(username));
-			console.log(getDebugMessage('Skip call because user {} is not online', username));
-			return;
-		}
-		self.downloadBar.setMax(self.file.size);
-		self.sendFileOffer();
-	};
-	self.onFileOffer = function (message) {
-		self.receivedFileSize = parseInt(message.content.size);
-		self.downloadBar.setMax(self.receivedFileSize);
-		self.receivedFileName = message.content.name;
-		self.lastGrowl = new Growl("<div style='cursor: pointer'>Accept file <b>{}</b>, size: {} from user <b>{}</b> </div>"
-				.format(encodeHTML(self.receivedFileName), bytesToSize(self.receivedFileSize), encodeHTML(message.user)));
-		self.lastGrowl.show(3600000, 'col-info');
-		self.lastGrowl.growl.addEventListener('click', self.acceptFileReply);
-		self.setAnswerOpponentVariables(message);
-		notifier.notify(message.user, "Sends file {}".format(self.receivedFileName));
-	};
-	self.acceptFileReply = function () {
-		self.createPeerConnection();
-		self.createSendChannelAndOffer();
-		self.lastGrowl.growl.removeEventListener('click', self.acceptFileReply);
-		self.lastGrowl.hide();
-		self.showAndAttachCallDialogOnResponse();
-	};
-	self.setOpponentVariables = function () {
-		var activeChannel = channelsHandler.getActiveChannel();
-		if (!(Object.keys(activeChannel.onlineUsers).length > 1)) {
-			return activeChannel.getUserNameById(activeChannel.getOpponentId());
-		}
-		self.receiverId = activeChannel.getOpponentId();
-		self.receiverName = activeChannel.getUserNameById(self.receiverId);
-		self.channel = channelsHandler.activeChannel
-	};
-	self.callPeople = function () {
-		self.isForTransferFile = false;
-		var username = self.setOpponentVariables();
-		if (username) {
-			growlError("<span>Can't make a call file because user <b>{}</b> is not online.</span>".format(username));
-			console.log(getDebugMessage('Skip call because user {} is not online', username));
-			return;
-		}
-		self.setHeaderText("Confirm browser to use your input devices for call");
-		self.waitForAnswer();
-		self.captureInput(self.captureInputStream);
-
-	};
-	self.captureInputStream = function (stream) {
-		self.setIconState(true);
-		self.setHeaderText("Establishing connection with {}".format(self.receiverName));
-		self.attachLocalStream(stream);
-		self.sendBaseEvent(null, 'offer');
-		self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime);
-	};
-	self.createCallAfterCapture = function (stream) {
-		self.createPeerConnection();
-		self.attachLocalStream(stream);
-		self.createSendChannelAndOffer();
-	};
-	self.createAfterResponseCall = function () {
-		self.captureInput(self.createCallAfterCapture, true);
-		self.showAndAttachCallDialogOnResponse();
-		self.showCallDialog(true);
-	};
-	self.showAndAttachCallDialogOnResponse = function () {
-		channelsHandler.setActiveChannel(self.channel);
-		channelsHandler.getActiveChannel().setChannelAttach(true);
-		CssUtils.showElement(self.dom.callContainer);
-	};
-	self.print = function (message) {
-		console.log(getDebugMessage("Call message {}", JSON.stringify(message)));
-	};
-	self.gotReceiveChannel = function (event) {
-		console.log(getDebugMessage('Received Channel Callback'));
-		self.sendChannel = event.channel;
-		// self.sendChannel.onmessage = self.print;
-		self.sendChannel.onopen = self.channelOpen;
-		//self.sendChannel.onclose = self.print;
-	};
-	self.channelOpen = function () {
-		if (self.isForTransferFile) {
-			self.sendData();
-		}
 	};
 	self.sendData = function () {
 		console.log(getDebugMessage('file is ' + [self.file.name, self.file.size, self.file.type,
