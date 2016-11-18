@@ -1986,6 +1986,107 @@ function PeerConnectionHandler() {
 		self.sendChannel.onopen = self.channelOpen;
 		//self.sendChannel.onclose = self.print;
 	};
+	self.waitForAnswer = function () {
+		self.webrtcInitiator = false;
+		self.createPeerConnection();
+		self.pc.ondatachannel = self.gotReceiveChannel;
+	};
+	self.onwebrtc = function (message) {
+		var data = message.content;
+		self.clearTimeout();
+		if (self.pc.iceConnectionState && self.pc.iceConnectionState != 'closed') {
+			if (data.sdp) {
+				var successCall = self.webrtcInitiator ? self.onSuccessAnswer : self.answerToWebrtc;
+				self.pc.setRemoteDescription(new RTCSessionDescription(data), successCall, self.failWebRtc);
+			} else if (data.candidate) {
+				self.pc.addIceCandidate(new RTCIceCandidate(data));
+			} else if (data.message) {
+				growlInfo(data.message);
+			}
+		} else {
+			console.warn(getDebugMessage("Skipping ws message for closed connection"));
+		}
+	};
+	self.createPeerConnection = function () {
+		if (!RTCPeerConnection) {
+			throw "Your browser doesn't support RTCPeerConnection";
+		}
+		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
+		self.pc.oniceconnectionstatechange = self.oniceconnectionstatechange;
+		self.pc.onicecandidate = function (event) {
+			if (event.candidate) {
+				self.sendWebRtcEvent(event.candidate);
+			}
+		};
+	};
+	self.closeEvents = function (text) {
+		self.receiverName = null;
+		self.receiverId = null;
+
+		try {
+			if (self.sendChannel) {
+				self.sendChannel.close();
+			}
+			if (self.pc) {
+				self.pc.close();
+			}
+		} catch (error) {
+			console.warn(getDebugMessage('{} Error while closing channels, description {}', error.message, error, name));
+		}
+		if (text) {
+			growlInfo(text);
+		}
+	};
+	self.createSendChannelAndOffer = function () {
+		self.webrtcInitiator = true;
+		try {
+			// Reliable data channels not supported by Chrome
+			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
+			self.sendChannel.onmessage = self.webrtcDirectMessage;
+			console.log(getDebugMessage("Created send data channel"));
+		} catch (e) {
+			var error = "Failed to create data channel because {} ".format(e.message || e);
+			growlError(error);
+			console.error(getDebugMessage(error));
+		}
+		self.pc.createOffer(function (offer) {
+			console.log(getDebugMessage('created offer...'));
+			self.pc.setLocalDescription(offer, function () {
+				console.log(getDebugMessage('sending to remote...'));
+				self.sendWebRtcEvent(offer);
+			}, self.failWebRtcP2);
+		}, self.failWebRtcP1, self.sdpConstraints);
+	};
+	self.sendBaseEvent = function (content, type) {
+		wsHandler.sendToServer({
+			content: content,
+			action: 'call',
+			type: type,
+			channel: channelsHandler.activeChannel
+		});
+	};
+	self.sendWebRtcEvent = function (message) {
+		self.sendBaseEvent(message, 'webrtc');
+	};
+	self.failWebRtcP1 = function () {
+		self.failWebRtc.apply(self, arguments);
+	};
+	self.failWebRtcP2 = function () {
+		self.failWebRtc.apply(self, arguments);
+	};
+	self.failWebRtcP3 = function () {
+		self.failWebRtc.apply(self, arguments);
+	};
+	self.failWebRtcP4 = function () {
+		self.failWebRtc.apply(self, arguments);
+	};
+	self.failWebRtc = function () {
+		var isError = arguments.length === 1 && (arguments[0].message || arguments[0].name);
+		var errorContext = isError ? "{}: {}".format(arguments[0].name, arguments[0].message)
+				: Array.prototype.join.call(arguments, ' ');
+		growlError("An error occurred while establishing a connection: {}".format(errorContext));
+		console.error(getDebugMessage("OnError way from {}, exception: {}", getCallerTrace(), errorContext));
+	};
 }
 
 function FileTransferHandler() {
@@ -2013,7 +2114,6 @@ function FileTransferHandler() {
 					size: self.file.size
 				},
 				'offer');
-		self.isForTransferFile = true;
 		self.waitForAnswer();
 	};
 	self.transferFile = function () {
@@ -2047,7 +2147,60 @@ function FileTransferHandler() {
 		self.showAndAttachCallDialogOnResponse();
 	};
 	self.channelOpen = function () {
-		self.sendData();
+		console.log(getDebugMessage('file is ' + [self.file.name, self.file.size, self.file.type,
+					self.file.lastModifiedDate].join(' ')));
+		if (self.file.size === 0) {
+			self.downloadBar.dom.text.textContent = "skip empty file";
+			self.closeEvents("Can't send empty file");
+			return;
+		}
+		self.sliceFile(0);
+	};
+	self.sliceFile = function (offset) {
+		var reader = new window.FileReader();
+		reader.onload = (function () {
+			return function (e) {
+				self.sendChannel.send(e.target.result);
+				if (self.file.size > offset + e.target.result.byteLength) {
+					window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
+				}
+				self.downloadBar.setValue(offset + e.target.result.byteLength);
+			};
+		})(self.file);
+		var slice = self.file.slice(offset, offset + self.CHUNK_SIZE);
+		reader.readAsArrayBuffer(slice);
+	};
+	self.webrtcDirectMessage = function (event) {
+		// console.log(getDebugMessage('Received Message ' + event.data.byteLength));
+		self.receiveBuffer.push(event.data);
+		self.receivedSize += event.data.byteLength;
+		self.downloadBar.setValue(self.receivedSize);
+		// we are assuming that our signaling protocol told
+		// about the expected file size (and name, hash, etc).
+		if (self.receivedSize === self.receivedFileSize) {
+			self.assembleFile();
+			self.closeEvents();
+		}
+	};
+	self.onfileAccepted = function (message) {
+		console.log(getDebugMessage("Transfer file {} result : {}", self.file.name, message.content));
+		growlInfo('Transferring  {} is finished '.format(self.file.name));
+		self.downloadBar.setSuccess();
+		self.downloadBar.dom.text.innerHTML = 'Transferred!';
+		self.closeEvents();
+	};
+	self.assembleFile = function () {
+		var received = new window.Blob(self.receiveBuffer);
+		var message = "File {} is received.".format(self.receivedFileName);
+		growlInfo(message);
+		console.log(getDebugMessage(message));
+		self.sendBaseEvent(null, 'fileAccepted');
+		self.downloadBar.setSuccess();
+		self.receiveBuffer = [];
+		self.receivedSize = 0;
+		self.downloadBar.dom.text.href = URL.createObjectURL(received);
+		self.downloadBar.dom.text.download = self.receivedFileName;
+		self.downloadBar.dom.text.textContent = 'Save {}'.format(self.receivedFileName);
 	};
 }
 
@@ -2197,6 +2350,12 @@ function CallHandler() {
 		);
 		self.dom.callAnswerText.textContent = "{} is calling you".format(self.receiverName);
 	};
+	self.clearTimeout = function () {
+		if (self.timeoutFunnction) {
+			clearTimeout(self.timeoutFunnction);
+			self.timeoutFunnction = null;
+		}
+	};
 	self.setIconState = function (isCall) {
 		isCall = isCall || self.isActive();
 		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
@@ -2243,7 +2402,6 @@ function CallHandler() {
 		}
 	};
 		self.callPeople = function () {
-		self.isForTransferFile = false;
 		var username = self.setOpponentVariables();
 		if (username) {
 			growlError("<span>Can't make a call file because user <b>{}</b> is not online.</span>".format(username));
@@ -2279,110 +2437,6 @@ function CallHandler() {
 	self.channelOpen = function () {
 		console.log(getDebugMessage('Opened a new chanel'))
 	};
-}
-
-function WebRtcApi() {
-	var self = this;
-	self.isForTransferFile = false;
-	self.dom = {
-		callContainer: $('callContainer'),
-	};
-	self.attachDomEvents = function () { //TODO
-		self.dom.videoStatusIcon.onclick = self.toggleVideo;
-		self.dom.fs.video.onclick = self.toggleVideo;
-		self.dom.hangUpIcon.onclick = self.hangUp;
-		self.dom.fs.hangup.onclick = self.hangUp;
-		self.dom.fs.audio.onclick = self.toggleMic;
-		self.dom.audioStatusIcon.onclick = self.toggleMic;
-		self.downloadBar = new DownloadBar('transmitProgress');
-		$('webRtcFileIcon').onclick = function () {
-			self.dom.fileInput.click();
-		};
-		self.dom.fileInput.addEventListener('change', self.transferFile, false);
-		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
-		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
-			document.addEventListener(fullScreenChangeEvents[i], self.onExitFullScreen, false);
-		}
-		var elem = self.dom.videoContainer;
-		if (elem.requestFullscreen) {
-			//nothing
-		} else if (elem.msRequestFullscreen) {
-			elem.requestFullscreen = elem.msRequestFullscreen;
-			document.cancelFullScreen = document.msCancelFullScreen;
-		} else if (elem.mozRequestFullScreen) {
-			elem.requestFullscreen = elem.mozRequestFullScreen;
-			document.cancelFullScreen = document.mozCancelFullScreen;
-		} else if (elem.webkitRequestFullscreen) {
-			elem.requestFullscreen = elem.webkitRequestFullscreen;
-			document.cancelFullScreen = document.webkitCancelFullScreen;
-		} else {
-			growlError("Can't enter fullscreen")
-		}
-		self.dom.remote.ondblclick = self.enterFullScreenMode;
-		self.dom.fs.enterFullScreen.onclick = self.enterFullScreenMode;
-		self.dom.fs.minimize.onclick = self.exitFullScreen;
-		self.idleTime = 0;
-		self.dom.fs.hangup.title = 'Hang up';
-		self.dom.hangUpIcon.title = self.dom.fs.hangup.title;
-	};
-	self.onoffer = function (message) { // TODO multirtc
-		if (message.content) {
-			self.onFileOffer(message);
-		} else {
-			self.onCallOffer(message);
-		}
-	};
-	self.toggleCallContainer = function () {
-		if (self.isActive()) {
-			return;
-		}
-		var visible = CssUtils.toggleVisibility(self.dom.callContainer);
-		self.setIconState(false);
-		channelsHandler.getActiveChannel().setChannelAttach(!visible);
-	};
-	self.sendData = function () {
-		console.log(getDebugMessage('file is ' + [self.file.name, self.file.size, self.file.type,
-					self.file.lastModifiedDate].join(' ')));
-		if (self.file.size === 0) {
-			self.downloadBar.dom.text.textContent = "skip empty file";
-			self.closeEvents("Can't send empty file");
-			return;
-		}
-		self.sliceFile(0);
-	};
-	self.sliceFile = function (offset) {
-		var reader = new window.FileReader();
-		reader.onload = (function () {
-			return function (e) {
-				self.sendChannel.send(e.target.result);
-				if (self.file.size > offset + e.target.result.byteLength) {
-					window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
-				}
-				self.downloadBar.setValue(offset + e.target.result.byteLength);
-			};
-		})(self.file);
-		var slice = self.file.slice(offset, offset + self.CHUNK_SIZE);
-		reader.readAsArrayBuffer(slice);
-	};
-	self.waitForAnswer = function () {
-		self.webrtcInitiator = false;
-		self.createPeerConnection();
-		self.pc.ondatachannel = self.gotReceiveChannel;
-	};
-	self.handle = function (data) {
-		if (data.type != 'offer' && self.receiverId != data.userId) {
-			console.warn(getDebugMessage("Skipping webrtc because message.userId={}, and self.receiverId={}'", data.userId,
-					self.receiverId));
-			return;
-		}
-		self["on" + data.type](data);
-	};
-	self.clearTimeout = function () {
-		if (self.timeoutFunnction) {
-			clearTimeout(self.timeoutFunnction);
-			self.timeoutFunnction = null;
-		}
-	};
 	self.answerToWebrtc = function () {
 		console.log(getDebugMessage('creating answer...'));
 		self.pc.createAnswer(function (answer) {
@@ -2391,25 +2445,6 @@ function WebRtcApi() {
 				self.sendWebRtcEvent(answer);
 			}, self.failWebRtcP3);
 		}, self.failWebRtcP4, self.sdpConstraints);
-	};
-	self.onSuccessAnswer = function () {
-		console.log(getDebugMessage('answer received'))
-	};
-	self.onwebrtc = function (message) {
-		var data = message.content;
-		self.clearTimeout();
-		if (self.pc.iceConnectionState && self.pc.iceConnectionState != 'closed') {
-			if (data.sdp) {
-				var successCall = self.webrtcInitiator ? self.onSuccessAnswer : self.answerToWebrtc;
-				self.pc.setRemoteDescription(new RTCSessionDescription(data), successCall, self.failWebRtc);
-			} else if (data.candidate) {
-				self.pc.addIceCandidate(new RTCIceCandidate(data));
-			} else if (data.message) {
-				growlInfo(data.message);
-			}
-		} else {
-			console.warn(getDebugMessage("Skipping ws message for closed connection"));
-		}
 	};
 	self.setVideoSource = function (domEl, stream) {
 		domEl.src = URL.createObjectURL(stream);
@@ -2494,12 +2529,9 @@ function WebRtcApi() {
 		growlError('<div>Unable to capture input from microphone. Check your microphone connection or {}'
 				.format(url));
 	};
+	self.createPeerConnectionParent = self.createPeerConnection;
 	self.createPeerConnection = function () {
-		if (!RTCPeerConnection) {
-			throw "Your browser doesn't support RTCPeerConnection";
-		}
-		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
-		self.pc.oniceconnectionstatechange = self.oniceconnectionstatechange;
+		self.createPeerConnectionParent();
 		self.pc.onaddstream = function (event) {
 			self.setVideoSource(self.dom.remote, event.stream);
 			self.createMicrophoneLevelVoice(event.stream, false);
@@ -2507,11 +2539,6 @@ function WebRtcApi() {
 			self.setIconState(true);
 			console.log(getDebugMessage("Stream attached"));
 			self.showPhoneIcon();
-		};
-		self.pc.onicecandidate = function (event) {
-			if (event.candidate) {
-				self.sendWebRtcEvent(event.candidate);
-			}
 		};
 	};
 	self.showPhoneIcon = function () {
@@ -2527,21 +2554,10 @@ function WebRtcApi() {
 			delete self.dom.phoneIcon;
 		}
 	};
+	self.closeEventsParent = self.closeEvents;
 	self.closeEvents = function (text) {
 		self.clearTimeout();
-		self.receiverName = null;
-		self.receiverId = null;
 		self.setHeaderText(loggedUser);
-		try {
-			if (self.sendChannel) {
-				self.sendChannel.close();
-			}
-			if (self.pc) {
-				self.pc.close();
-			}
-		} catch (error) {
-			console.warn(getDebugMessage('{} Error while closing channels, description {}', error.message, error, name));
-		}
 		if (self.localStream) {
 			var tracks = self.localStream.getTracks();
 			for (var i = 0; i < tracks.length; i++) {
@@ -2549,11 +2565,7 @@ function WebRtcApi() {
 			}
 		}
 		self.setIconState(false);
-		if (text) {
-			growlInfo(text);
-		}
 		self.hidePhoneIcon();
-
 		for (var key in self.audioProcessors) {
 			if (self.audioProcessors.hasOwnProperty(key)) {
 				var proc = self.audioProcessors[key];
@@ -2585,89 +2597,79 @@ function WebRtcApi() {
 			singlePage.showDefaultPage();
 		}
 	};
-	self.webrtcDirectMessage = function (event) {
-		// console.log(getDebugMessage('Received Message ' + event.data.byteLength));
-		self.receiveBuffer.push(event.data);
-		self.receivedSize += event.data.byteLength;
+}
 
-		self.downloadBar.setValue(self.receivedSize);
-
-		// we are assuming that our signaling protocol told
-		// about the expected file size (and name, hash, etc).
-		if (self.receivedSize === self.receivedFileSize) {
-			self.assembleFile();
-			self.closeEvents();
+function WebRtcApi() {
+	var self = this;
+	self.dom = {
+		callContainer: $('callContainer'),
+	};
+	self.attachDomEvents = function () { //TODO
+		self.dom.videoStatusIcon.onclick = self.toggleVideo;
+		self.dom.fs.video.onclick = self.toggleVideo;
+		self.dom.hangUpIcon.onclick = self.hangUp;
+		self.dom.fs.hangup.onclick = self.hangUp;
+		self.dom.fs.audio.onclick = self.toggleMic;
+		self.dom.audioStatusIcon.onclick = self.toggleMic;
+		self.downloadBar = new DownloadBar('transmitProgress');
+		$('webRtcFileIcon').onclick = function () {
+			self.dom.fileInput.click();
+		};
+		self.dom.fileInput.addEventListener('change', self.transferFile, false);
+		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
+		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
+			document.addEventListener(fullScreenChangeEvents[i], self.onExitFullScreen, false);
+		}
+		var elem = self.dom.videoContainer;
+		if (elem.requestFullscreen) {
+			//nothing
+		} else if (elem.msRequestFullscreen) {
+			elem.requestFullscreen = elem.msRequestFullscreen;
+			document.cancelFullScreen = document.msCancelFullScreen;
+		} else if (elem.mozRequestFullScreen) {
+			elem.requestFullscreen = elem.mozRequestFullScreen;
+			document.cancelFullScreen = document.mozCancelFullScreen;
+		} else if (elem.webkitRequestFullscreen) {
+			elem.requestFullscreen = elem.webkitRequestFullscreen;
+			document.cancelFullScreen = document.webkitCancelFullScreen;
+		} else {
+			growlError("Can't enter fullscreen")
+		}
+		self.dom.remote.ondblclick = self.enterFullScreenMode;
+		self.dom.fs.enterFullScreen.onclick = self.enterFullScreenMode;
+		self.dom.fs.minimize.onclick = self.exitFullScreen;
+		self.idleTime = 0;
+		self.dom.fs.hangup.title = 'Hang up';
+		self.dom.hangUpIcon.title = self.dom.fs.hangup.title;
+	};
+	self.onoffer = function (message) { // TODO multirtc
+		if (message.content) {
+			self.onFileOffer(message);
+		} else {
+			self.onCallOffer(message);
 		}
 	};
-	self.onfileAccepted = function (message) {
-		console.log(getDebugMessage("Transfer file {} result : {}", self.file.name, message.content));
-		growlInfo('Transferring  {} is finished '.format(self.file.name));
-		self.downloadBar.setSuccess();
-		self.downloadBar.dom.text.innerHTML = 'Transferred!';
-		self.closeEvents();
-	};
-	self.assembleFile = function () {
-		var received = new window.Blob(self.receiveBuffer);
-		var message = "File {} is received.".format(self.receivedFileName);
-		growlInfo(message);
-		console.log(getDebugMessage(message));
-		self.sendBaseEvent(null, 'fileAccepted');
-		self.downloadBar.setSuccess();
-		self.receiveBuffer = [];
-		self.receivedSize = 0;
-		self.downloadBar.dom.text.href = URL.createObjectURL(received);
-		self.downloadBar.dom.text.download = self.receivedFileName;
-		self.downloadBar.dom.text.textContent = 'Save {}'.format(self.receivedFileName);
-	};
-	self.createSendChannelAndOffer = function () {
-		self.webrtcInitiator = true;
-		try {
-			// Reliable data channels not supported by Chrome
-			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
-			self.sendChannel.onmessage = self.webrtcDirectMessage;
-			console.log(getDebugMessage("Created send data channel"));
-		} catch (e) {
-			var error = "Failed to create data channel because {} ".format(e.message || e);
-			growlError(error);
-			console.error(getDebugMessage(error));
+	self.toggleCallContainer = function () {
+		if (self.isActive()) {
+			return;
 		}
-		self.pc.createOffer(function (offer) {
-			console.log(getDebugMessage('created offer...'));
-			self.pc.setLocalDescription(offer, function () {
-				console.log(getDebugMessage('sending to remote...'));
-				self.sendWebRtcEvent(offer);
-			}, self.failWebRtcP2);
-		}, self.failWebRtcP1, self.sdpConstraints);
+		var visible = CssUtils.toggleVisibility(self.dom.callContainer);
+		self.setIconState(false);
+		channelsHandler.getActiveChannel().setChannelAttach(!visible);
 	};
-	self.sendBaseEvent = function (content, type) {
-		wsHandler.sendToServer({
-			content: content,
-			action: 'call',
-			type: type,
-			channel: channelsHandler.activeChannel
-		});
+	self.handle = function (data) {
+		if (data.type != 'offer' && self.receiverId != data.userId) {
+			console.warn(getDebugMessage("Skipping webrtc because message.userId={}, and self.receiverId={}'", data.userId,
+					self.receiverId));
+			return;
+		}
+		self["on" + data.type](data);
 	};
-	self.sendWebRtcEvent = function (message) {
-		self.sendBaseEvent(message, 'webrtc');
+	self.onSuccessAnswer = function () {
+		console.log(getDebugMessage('answer received'))
 	};
-	self.failWebRtcP1 = function () {
-		self.failWebRtc.apply(self, arguments);
-	};
-	self.failWebRtcP2 = function () {
-		self.failWebRtc.apply(self, arguments);
-	};
-	self.failWebRtcP3 = function () {
-		self.failWebRtc.apply(self, arguments);
-	};
-	self.failWebRtcP4 = function () {
-		self.failWebRtc.apply(self, arguments);
-	};
-	self.failWebRtc = function () {
-		var isError = arguments.length === 1 && (arguments[0].message || arguments[0].name);
-		var errorContext = isError ? "{}: {}".format(arguments[0].name, arguments[0].message)
-				: Array.prototype.join.call(arguments, ' ');
-		growlError("An error occurred while establishing a connection: {}".format(errorContext));
-		console.error(getDebugMessage("OnError way from {}, exception: {}", getCallerTrace(), errorContext));
+	self.onwebrtc = function (message) { //TODO multirtc CREATE new peerconnection obj
+
 	};
 	self.attachDomEvents();
 }
