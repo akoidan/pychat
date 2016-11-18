@@ -3,6 +3,7 @@ import logging
 import sys
 import time
 from datetime import timedelta
+from numbers import Number
 from threading import Thread
 
 import tornado.gen
@@ -761,7 +762,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		log_data = {}
 		gone_offline = False
 		for channel in self.channels:
-			if not isinstance(channel, int):
+			if not isinstance(channel, Number):
 				continue
 			self.sync_redis.hdel(channel, self.id)
 			if self.connected:
