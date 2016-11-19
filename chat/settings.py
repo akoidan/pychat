@@ -306,7 +306,7 @@ UPDATE chat_room_users out_cru
 	INNER JOIN
 		(SELECT
 			max(chat_message.id) message_id,
-			chat_room_users.id	 rooms_users_id
+			chat_room_users.id rooms_users_id
 		 FROM chat_room_users
 			JOIN chat_message ON chat_message.room_id = chat_room_users.room_id
 		WHERE chat_room_users.user_id = %s and chat_room_users.room_id != {}

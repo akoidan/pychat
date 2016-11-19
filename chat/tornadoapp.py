@@ -15,6 +15,7 @@ import tornadoredis
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connection, OperationalError, InterfaceError, IntegrityError
+from django.db.models import Prefetch
 from django.db.models import Q, F
 from redis_sessions.session import SessionStore
 from tornado import ioloop
@@ -68,7 +69,8 @@ class Actions(object):
 
 
 class VarNames(object):
-	CALL_TYPE = 'type'
+	WEBRTC_TYPE = 'type'
+	WEBRTC_METHOD = 'method'
 	USER = 'user'
 	USER_ID = 'userId'
 	TIME = 'time'
@@ -88,7 +90,7 @@ class VarNames(object):
 	CONNECTION_ID = 'connId'
 
 
-class CallType(object):
+class WebrtcMethod(object):
 	OFFER = 'offer'
 	SET_CONNECTION_ID = 'createConnection'
 
@@ -147,7 +149,7 @@ class MessagesCreator(object):
 		:return: {"action": "call", "content": content, "time": "20:48:57"}
 		"""
 		message = self.default(content, Actions.WEBRTC, HandlerNames.WEBRTC)
-		message[VarNames.CALL_TYPE] = message_type
+		message[VarNames.WEBRTC_TYPE] = message_type
 		message[VarNames.USER] = self.sender_name
 		return message
 
@@ -452,23 +454,28 @@ class MessagesHandler(MessagesCreator):
 		"""
 		:type in_message: dict
 		"""
-		call_type = in_message.get(VarNames.CALL_TYPE)
+		call_type = in_message.get(VarNames.WEBRTC_METHOD)
 		set_opponent_channel = False
 		out_message = self.offer_call(in_message.get(VarNames.CONTENT), call_type)
-		if call_type == CallType.OFFER:
+		if call_type == WebrtcMethod.OFFER:
 			room_id = in_message[VarNames.CHANNEL]
 			connection_id = id_generator(6)
-			user = User.rooms.through.objects.get(~Q(user_id=self.user_id), Q(room_id=room_id), Q(room__name__isnull=True))
+			room_users = User.rooms.through.objects.filter(~Q(user_id=self.user_id), Q(room_id=room_id), Q(room__name__isnull=True)).prefetch_related(Prefetch('user', queryset=User.objects.all().only('username'))).get()
 			self.webrtc_ids[connection_id] = {
-				'status': 'offer',
-				'channel': RedisPrefix.generate_user(user.user_id)
+				VarNames.WEBRTC_METHOD: 'offer',
+				VarNames.CHANNEL: RedisPrefix.generate_user(room_users.user_id),
+				VarNames.WEBRTC_TYPE: in_message[VarNames.WEBRTC_TYPE]
 			}
 			set_opponent_channel = True
 			out_message[VarNames.CHANNEL] = room_id
 			out_message[VarNames.CONNECTION_ID] = connection_id
-			out_message[VarNames.CALL_TYPE] = CallType.SET_CONNECTION_ID
-			self.safe_write(out_message)
-			out_message[VarNames.CALL_TYPE] = call_type
+			self.safe_write({
+				VarNames.EVENT: Actions.WEBRTC,
+				VarNames.WEBRTC_METHOD: WebrtcMethod.SET_CONNECTION_ID,
+				VarNames.USER: room_users.user.username,
+				VarNames.USER_ID: room_users.user_id,
+				VarNames.WEBRTC_TYPE: in_message[VarNames.WEBRTC_TYPE]
+			})
 		else:
 			connection_id = in_message[VarNames.CONNECTION_ID]
 		self.logger.info('!! Offering a call, connection_id %s',  connection_id)
