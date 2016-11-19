@@ -20,6 +20,7 @@ from redis_sessions.session import SessionStore
 from tornado import ioloop
 from tornado.websocket import WebSocketHandler
 
+from chat.log_filters import id_generator
 from chat.utils import extract_photo
 
 try:  # py2
@@ -51,7 +52,7 @@ class Actions(object):
 	LOGOUT = 'removeOnlineUser'
 	SEND_MESSAGE = 'sendMessage'
 	PRINT_MESSAGE = 'printMessage'
-	CALL = 'call'
+	WEBRTC = 'webrtc'
 	ROOMS = 'setRooms'
 	REFRESH_USER = 'setOnlineUsers'
 	GROWL_MESSAGE = 'growl'
@@ -84,12 +85,12 @@ class VarNames(object):
 	GET_MESSAGES_HEADER_ID = 'headerId'
 	CHANNEL_NAME = 'channel'
 	IS_ROOM_PRIVATE = 'private'
-	#ROOM_NAME = 'roomName'
-	# ROOM_ID = 'roomId'
+	CONNECTION_ID = 'connId'
 
 
 class CallType(object):
 	OFFER = 'offer'
+	SET_CONNECTION_ID = 'createConnection'
 
 class HandlerNames:
 	NAME = 'handler'
@@ -145,7 +146,7 @@ class MessagesCreator(object):
 		"""
 		:return: {"action": "call", "content": content, "time": "20:48:57"}
 		"""
-		message = self.default(content, Actions.CALL, HandlerNames.WEBRTC)
+		message = self.default(content, Actions.WEBRTC, HandlerNames.WEBRTC)
 		message[VarNames.CALL_TYPE] = message_type
 		message[VarNames.USER] = self.sender_name
 		return message
@@ -256,19 +257,19 @@ class MessagesHandler(MessagesCreator):
 		self.parsable_prefix = 'p'
 		super(MessagesHandler, self).__init__(*args, **kwargs)
 		self.id = id(self)
+		self.webrtc_ids = {}
 		self.ip = None
 		from chat import global_redis
 		self.async_redis_publisher = global_redis.async_redis_publisher
 		self.sync_redis = global_redis.sync_redis
 		self.channels = []
-		self.call_receiver_channel = None
 		self._logger = None
 		self.async_redis = tornadoredis.Client()
 		self.patch_tornadoredis()
 		self.pre_process_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
-			Actions.CALL: self.process_call,
+			Actions.WEBRTC: self.process_call,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
 			Actions.DELETE_ROOM: self.delete_channel,
 			Actions.EDIT_MESSAGE: self.edit_message,
@@ -280,7 +281,7 @@ class MessagesHandler(MessagesCreator):
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
 			Actions.INVITE_USER: self.send_client_new_channel,
-			Actions.CALL: self.set_opponent_call_channel
+			Actions.WEBRTC: self.set_opponent_call_channel
 		}
 
 	def patch_tornadoredis(self):  # TODO remove this
@@ -456,13 +457,22 @@ class MessagesHandler(MessagesCreator):
 		out_message = self.offer_call(in_message.get(VarNames.CONTENT), call_type)
 		if call_type == CallType.OFFER:
 			room_id = in_message[VarNames.CHANNEL]
+			connection_id = id_generator(6)
 			user = User.rooms.through.objects.get(~Q(user_id=self.user_id), Q(room_id=room_id), Q(room__name__isnull=True))
-			self.call_receiver_channel = RedisPrefix.generate_user(user.user_id)
+			self.webrtc_ids[connection_id] = {
+				'status': 'offer',
+				'channel': RedisPrefix.generate_user(user.user_id)
+			}
 			set_opponent_channel = True
 			out_message[VarNames.CHANNEL] = room_id
-		# TODO
-		self.logger.info('!! Offering a call to user with id %s',  self.call_receiver_channel)
-		self.publish(out_message, self.call_receiver_channel, set_opponent_channel)
+			out_message[VarNames.CONNECTION_ID] = connection_id
+			out_message[VarNames.CALL_TYPE] = CallType.SET_CONNECTION_ID
+			self.safe_write(out_message)
+			out_message[VarNames.CALL_TYPE] = call_type
+		else:
+			connection_id = in_message[VarNames.CONNECTION_ID]
+		self.logger.info('!! Offering a call, connection_id %s',  connection_id)
+		self.publish(out_message, self.webrtc_ids[connection_id]['channel'], set_opponent_channel)
 
 	def create_new_room(self, message):
 		room_name = message[VarNames.ROOM_NAME]
@@ -578,7 +588,11 @@ class MessagesHandler(MessagesCreator):
 		self.add_online_user(room_id)
 
 	def set_opponent_call_channel(self, message):
-		self.call_receiver_channel = RedisPrefix.generate_user(message[VarNames.USER_ID])
+		connection_id = message[VarNames.CONNECTION_ID]
+		self.webrtc_ids[connection_id] = {
+			'status': 'offered',
+			'channel': RedisPrefix.generate_user(message[VarNames.USER_ID])
+		}
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]

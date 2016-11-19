@@ -1522,7 +1522,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		self.removeNewMessages();
 		CssUtils.hideElement(self.dom.newMessages);
 		CssUtils.showElement(self.dom.deleteIcon);
-		var isHidden = webRtcApi.isActive() && webRtcApi.channel != self.roomId;
+		// var isHidden = webRtcApi.isActive() && webRtcApi.channel != self.roomId; // TODO multirtc
+		var isHidden = true;
 		CssUtils.setVisibility(webRtcApi.dom.callContainer, self.callIsAttached && !isHidden);
 	};
 	/*==================== DOM EVENTS LISTENERS ============================*/
@@ -2108,12 +2109,12 @@ function FileTransferHandler() {
 		}
 	};
 	self.sendFileOffer = function () {
-		self.sendBaseEvent(
-				{
+		self.sendBaseEvent({
 					name: self.file.name,
 					size: self.file.size
 				},
-				'offer');
+				'offer'
+		);
 		self.waitForAnswer();
 	};
 	self.transferFile = function () {
@@ -2409,7 +2410,7 @@ function CallHandler() {
 			callback();
 		}
 	};
-		self.callPeople = function () {
+	self.callPeople = function () {
 		var username = self.setOpponentVariables();
 		if (username) {
 			growlError("<span>Can't make a call file because user <b>{}</b> is not online.</span>".format(username));
@@ -2424,7 +2425,6 @@ function CallHandler() {
 		self.setIconState(true);
 		self.setHeaderText("Establishing connection with {}".format(self.receiverName));
 		self.attachLocalStream(stream);
-		self.sendBaseEvent(null, 'offer');
 		self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime);
 	};
 	self.createCallAfterCapture = function (stream) {
@@ -2646,6 +2646,7 @@ function WebRtcApi() {
 	self.dom = {
 		callContainer: $('callContainer'),
 	};
+	self.connnections = {};
 	self.onoffer = function (message) { // TODO multirtc
 		if (message.content) {
 			self.onFileOffer(message);
@@ -2654,20 +2655,23 @@ function WebRtcApi() {
 		}
 	};
 	self.toggleCallContainer = function () {
-		if (self.isActive()) {
-			return;
-		}
+		// if (self.isActive()) { TODO multirtc
+		// 	return;
+		// }
 		var visible = CssUtils.toggleVisibility(self.dom.callContainer);
 		self.setIconState(false);
 		channelsHandler.getActiveChannel().setChannelAttach(!visible);
 	};
 	self.handle = function (data) {
-		if (data.type != 'offer' && self.receiverId != data.userId) {
-			console.warn(getDebugMessage("Skipping webrtc because message.userId={}, and self.receiverId={}'", data.userId,
-					self.receiverId));
-			return;
+		if (data.method == 'createConnection') {
+			if (data.type == 'file') {
+				self.connnections[data.connId] = new FileTransferHandler();
+			} else if (data.type == 'call') {
+				self.connnections[data.connId] = new CallHandler();
+			}
+		} else {
+			self.connnections[data.connId]["on" + data.type](data);
 		}
-		self["on" + data.type](data);
 	};
 	self.onSuccessAnswer = function () {
 		console.log(getDebugMessage('answer received'))
@@ -2675,6 +2679,14 @@ function WebRtcApi() {
 	self.onwebrtc = function (message) { //TODO multirtc CREATE new peerconnection obj
 
 	};
+	self.offerCall = function () {
+		wsHandler.sendToServer({
+			action: 'webrtc',
+			method: 'offer',
+			channel: channelsHandler.activeChannel,
+			type: 'call'
+		});
+	}
 }
 
 
