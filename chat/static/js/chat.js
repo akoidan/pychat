@@ -770,6 +770,7 @@ function ChannelsHandler() {
 		readFileAsB64(file, function (event) {
 			self.sendMessage({
 				image: event.target.result,
+				filename: file.name,
 				content: null,
 				action: 'sendMessage',
 				channel: self.activeChannel
