@@ -22,7 +22,7 @@ $track-grad-color: top, lighten($before-color, 10%), darken($before-color, 10%)
 	$bar-sizes: append($bar-sizes, (0.875 * $bar-s) $bar-h, comma)
 
 @mixin vol-level($max-level)
-	.vol-level-#{$max-level}
+	input[type=range].vol-level-#{$max-level}
 		$bars: ()
 		@for $i from 0 to $n-bar
 			$base-color: #7d7d7d
@@ -70,6 +70,7 @@ input[type=range]
 	&::-webkit-slider-thumb
 		-webkit-appearance: none
 
+	@extend .vol-level-0
 	padding: $range-height * 0.4 5px $range-height * 0.1 5px
 	width: $track-w
 	height: $range-height * 0.5
