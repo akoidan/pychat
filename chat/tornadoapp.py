@@ -80,6 +80,7 @@ class VarNames(object):
 	MESSAGE_ID = 'id'
 	GENDER = 'sex'
 	ROOM_NAME = 'name'
+	FILE_NAME = 'filename'
 	ROOM_ID = 'roomId'
 	ROOM_USERS = 'users'
 	CHANNEL = 'channel'
@@ -445,7 +446,7 @@ class MessagesHandler(MessagesCreator):
 		)
 		message_db.room_id = channel
 		if VarNames.IMG in message:
-			message_db.img = extract_photo(message[VarNames.IMG])
+			message_db.img = extract_photo(message[VarNames.IMG], message.get(VarNames.FILE_NAME))
 		self.do_db(message_db.save)  # exit on hacked id with exception
 		prepared_message = self.create_send_message(message_db)
 		self.publish(prepared_message, channel)
@@ -762,7 +763,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			if not json_message:
 				raise ValidationError('Skipping null message')
 			# self.anti_spam.check_spam(json_message)
-			self.logger.debug('<< %s', json_message)
+			self.logger.debug('<< %.1000s', json_message)
 			message = json.loads(json_message)
 			if message[VarNames.EVENT] not in self.pre_process_message:
 				raise ValidationError("event {} is unknown".format(message[VarNames.EVENT]))
@@ -865,7 +866,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 				message = json.dumps(message)
 			if not isinstance(message, str_type):
 				raise ValueError('Wrong message type : %s' % str(message))
-			self.logger.debug(">> %s", message)
+			self.logger.debug(">> %.1000s", message)
 			self.write_message(message)
 		except tornado.websocket.WebSocketClosedError as e:
 			self.logger.error("%s. Can't send << %s >> message", e, str(message))
