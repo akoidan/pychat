@@ -23,11 +23,14 @@ class Command(BaseCommand):
 			path = field.path
 			if not os.path.isfile(path):
 				return
+			print(path)
 			mime = subprocess.Popen(
 				"/usr/bin/file -b --mime-type {}".format(path),
 				shell=True,
 				stdout=subprocess.PIPE
 			).communicate()[0]
+			if isinstance(mime, bytes):  # py2 py3 support
+				mime = mime.decode('utf-8')
 			ext_base = mime.split('/')
 			if len(ext_base) == 2:
 				ext = "".join(('x.',ext_base[1].strip()))
