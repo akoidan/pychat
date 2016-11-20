@@ -1,5 +1,7 @@
 import os
 
+import subprocess
+
 from chat.models import UserProfile, get_random_path, Message
 
 __author__ = 'andrew'
@@ -21,7 +23,17 @@ class Command(BaseCommand):
 			path = field.path
 			if not os.path.isfile(path):
 				return
-			new_name = get_random_path(None, "unname")
+			mime = subprocess.Popen(
+				"/usr/bin/file -b --mime-type {}".format(path),
+				shell=True,
+				stdout=subprocess.PIPE
+			).communicate()[0]
+			ext_base = mime.split('/')
+			if len(ext_base) == 2:
+				ext = "".join(('x.',ext_base[1].strip()))
+			else:
+				ext = 'x'
+			new_name = get_random_path(None, ext)
 			new_path = os.sep.join((os.path.dirname(path), new_name))
 			os.rename(path, new_path)
 			field.name = new_name
