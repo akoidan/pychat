@@ -150,13 +150,13 @@ def send_email_verification(user, site_address):
 		logger.info('Email %s has been sent', user.email)
 
 
-def extract_photo(image_base64):
+def extract_photo(image_base64, filename=None):
 	base64_type_data = re.search(r'data:(\w+/(\w+));base64,(.*)$', image_base64)
 	logger.debug('Parsing base64 image')
 	image_data = base64_type_data.group(3)
 	file = BytesIO(base64.b64decode(image_data))
 	content_type = base64_type_data.group(1)
-	name = base64_type_data.group(2)
+	name = filename or ".{}".format(base64_type_data.group(2))
 	logger.debug('Base64 filename extension %s, content_type %s', name, content_type)
 	image = InMemoryUploadedFile(
 		file,

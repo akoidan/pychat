@@ -1,6 +1,5 @@
 import datetime
 import time
-import uuid
 from enum import Enum
 from time import mktime
 
@@ -17,8 +16,7 @@ def get_random_path(instance, filename):
 	:param filename base string for generated name
 	:return: a unique string filename
 	"""
-	ext = filename.split('.')[-1]
-	return "%s.%s" % (uuid.uuid4(), ext)
+	return "{}_{}".format(id_generator(8), filename)
 
 
 class User(AbstractBaseUser):

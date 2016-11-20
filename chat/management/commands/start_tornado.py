@@ -17,7 +17,7 @@ class Command(BaseCommand):
 		super(Command, self).__init__()
 		application = Application([
 			(r'.*', TornadoHandler),
-		], debug=False)
+		], debug=settings.DEBUG)
 		try:
 			ssl_options={
 				"certfile": settings.CRT_PATH,
