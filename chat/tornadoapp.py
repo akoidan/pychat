@@ -53,7 +53,7 @@ class Actions(object):
 	LOGOUT = 'removeOnlineUser'
 	SEND_MESSAGE = 'sendMessage'
 	PRINT_MESSAGE = 'printMessage'
-	WEBRTC = 'webrtc'
+	WEBRTC = 'sendRtcData'
 	ROOMS = 'setRooms'
 	REFRESH_USER = 'setOnlineUsers'
 	GROWL_MESSAGE = 'growl'
@@ -66,11 +66,14 @@ class Actions(object):
 	INVITE_USER = 'inviteUser'
 	ADD_USER = 'addUserToAll'
 	OFFLINE_MESSAGES = 'loadOfflineMessages'
+	SET_WEBRTC_ID = 'setConnectionId'
+	OFFER_WEBRTC_CONNECTION = 'offerWebrtc'
 
 
 class VarNames(object):
-	WEBRTC_TYPE = 'type'
 	WEBRTC_METHOD = 'method'
+	WEBRTC_TYPE = 'type'
+	WEBRTC_QUED_ID = 'id'
 	USER = 'user'
 	USER_ID = 'userId'
 	TIME = 'time'
@@ -93,7 +96,7 @@ class VarNames(object):
 
 class WebrtcMethod(object):
 	OFFER = 'offer'
-	SET_CONNECTION_ID = 'createConnection'
+
 
 class HandlerNames:
 	NAME = 'handler'
@@ -102,6 +105,7 @@ class HandlerNames:
 	GROWL = 'growl'
 	WEBRTC = 'webrtc'
 	FILE = 'file'
+	CALL = 'call'
 
 
 class RedisPrefix:
@@ -145,14 +149,24 @@ class MessagesCreator(object):
 		room_less[VarNames.GENDER] = self.sex
 		return room_less
 
-	def offer_call(self, content, message_type):
+	def offer_webrtc(self, content, channel, connection_id, type):
 		"""
 		:return: {"action": "call", "content": content, "time": "20:48:57"}
 		"""
-		message = self.default(content, Actions.WEBRTC, HandlerNames.WEBRTC)
-		message[VarNames.WEBRTC_TYPE] = message_type
+		message = self.default(content, Actions.OFFER_WEBRTC_CONNECTION, HandlerNames.WEBRTC)
 		message[VarNames.USER] = self.sender_name
+		message[VarNames.CONNECTION_ID] = connection_id
+		message[VarNames.CHANNEL] = channel
+		message[VarNames.WEBRTC_TYPE] = type
 		return message
+
+	def set_connection_id(self, qued_id, connection_id):
+		return {
+			VarNames.EVENT: Actions.SET_WEBRTC_ID,
+			HandlerNames.NAME: HandlerNames.WEBRTC,
+			VarNames.CONNECTION_ID: connection_id,
+			VarNames.WEBRTC_QUED_ID: qued_id
+		}
 
 	@classmethod
 	def create_message(cls, message):
@@ -278,13 +292,14 @@ class MessagesHandler(MessagesCreator):
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
 			Actions.INVITE_USER: self.invite_user,
+			Actions.OFFER_WEBRTC_CONNECTION: self.offer_webrtc_connection,
 		}
 		self.post_process_message = {
 			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_channel,
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
 			Actions.INVITE_USER: self.send_client_new_channel,
-			Actions.WEBRTC: self.set_opponent_call_channel
+			Actions.OFFER_WEBRTC_CONNECTION: self.set_opponent_call_channel
 		}
 
 	def patch_tornadoredis(self):  # TODO remove this
@@ -451,36 +466,41 @@ class MessagesHandler(MessagesCreator):
 		prepared_message = self.create_send_message(message_db)
 		self.publish(prepared_message, channel)
 
+	def offer_webrtc_connection(self, in_message):
+		room_id = in_message[VarNames.CHANNEL]
+		webrtc_type = in_message[HandlerNames.NAME]
+		content = in_message.get(VarNames.CONTENT)
+		connection_id = id_generator(6)
+		room_users = User.rooms.through.objects.filter(
+			~Q(user_id=self.user_id),
+			Q(room_id=room_id),
+			Q(room__name__isnull=True)
+		).prefetch_related(
+			Prefetch('user', queryset=User.objects.all().only('username'))
+		).get()
+		self.webrtc_ids[connection_id] = {
+			VarNames.WEBRTC_METHOD: 'offer',
+			VarNames.CHANNEL: RedisPrefix.generate_user(room_users.user_id),
+			HandlerNames.NAME: webrtc_type
+		}
+		opponent_message = self.offer_webrtc(content, room_id, connection_id, webrtc_type)
+		self_message = self.set_connection_id(
+			in_message[VarNames.WEBRTC_QUED_ID],
+			connection_id
+		)
+		self.safe_write(self_message)
+		self.logger.info('!! Offering a call, connection_id %s', connection_id)
+		self.publish(opponent_message, self.webrtc_ids[connection_id][VarNames.CHANNEL], True)
+
 	def process_call(self, in_message):
 		"""
 		:type in_message: dict
 		"""
-		call_type = in_message.get(VarNames.WEBRTC_METHOD)
-		set_opponent_channel = False
-		out_message = self.offer_call(in_message.get(VarNames.CONTENT), call_type)
-		if call_type == WebrtcMethod.OFFER:
-			room_id = in_message[VarNames.CHANNEL]
-			connection_id = id_generator(6)
-			room_users = User.rooms.through.objects.filter(~Q(user_id=self.user_id), Q(room_id=room_id), Q(room__name__isnull=True)).prefetch_related(Prefetch('user', queryset=User.objects.all().only('username'))).get()
-			self.webrtc_ids[connection_id] = {
-				VarNames.WEBRTC_METHOD: 'offer',
-				VarNames.CHANNEL: RedisPrefix.generate_user(room_users.user_id),
-				VarNames.WEBRTC_TYPE: in_message[VarNames.WEBRTC_TYPE]
-			}
-			set_opponent_channel = True
-			out_message[VarNames.CHANNEL] = room_id
-			out_message[VarNames.CONNECTION_ID] = connection_id
-			self.safe_write({
-				VarNames.EVENT: Actions.WEBRTC,
-				VarNames.WEBRTC_METHOD: WebrtcMethod.SET_CONNECTION_ID,
-				VarNames.USER: room_users.user.username,
-				VarNames.USER_ID: room_users.user_id,
-				VarNames.WEBRTC_TYPE: in_message[VarNames.WEBRTC_TYPE]
-			})
-		else:
-			connection_id = in_message[VarNames.CONNECTION_ID]
-		self.logger.info('!! Offering a call, connection_id %s',  connection_id)
-		self.publish(out_message, self.webrtc_ids[connection_id]['channel'], set_opponent_channel)
+		connection_id = in_message[VarNames.CONNECTION_ID]
+		channel = self.webrtc_ids[connection_id][VarNames.CHANNEL]
+		self.logger.info('!! Processing %s to channel %s', connection_id, channel)
+		self.publish(in_message, channel)
+
 
 	def create_new_room(self, message):
 		room_name = message[VarNames.ROOM_NAME]
@@ -598,8 +618,9 @@ class MessagesHandler(MessagesCreator):
 	def set_opponent_call_channel(self, message):
 		connection_id = message[VarNames.CONNECTION_ID]
 		self.webrtc_ids[connection_id] = {
-			'status': 'offered',
-			'channel': RedisPrefix.generate_user(message[VarNames.USER_ID])
+			VarNames.WEBRTC_METHOD: 'offered',
+			VarNames.CHANNEL: RedisPrefix.generate_user(message[VarNames.USER_ID]),
+			HandlerNames.NAME: message[HandlerNames.NAME]
 		}
 
 	def send_client_delete_channel(self, message):

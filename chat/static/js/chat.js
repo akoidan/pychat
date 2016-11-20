@@ -1948,10 +1948,13 @@ function DownloadBar(stringId) {
 	};
 }
 
-function PeerConnectionHandler() {
+function PeerConnectionHandler(receiverRoomId, connectionId) {
 	var self = this;
 	self.sendChannel = null;
+	self.connectionId = connectionId;
+	self.receiverRoomId = receiverRoomId;
 	self.pc = {};
+	self.fileCallType = null;
 	var webRtcUrl = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 	self.pc_config = {iceServers: [{url: webRtcUrl}]};
 	self.pc_constraints = {
@@ -1960,6 +1963,9 @@ function PeerConnectionHandler() {
 			{RtpDataChannels: false /*true*/}
 		]
 	};
+	self.setConnectionId = function (id) {
+		self.connectionId = id;
+	};
 	self.isActive = function () {
 		return self.localStream && self.localStream.active;
 	};
@@ -1967,7 +1973,7 @@ function PeerConnectionHandler() {
 		self.receiverName = message.user;
 		self.receiverId = message.userId;
 		self.channel = message.channel;
-		self.sendBaseEvent(null, "reply");
+		self.sendBaseEvent("reply");
 	};
 	self.setOpponentVariables = function () {
 		var activeChannel = channelsHandler.getActiveChannel();
@@ -1977,6 +1983,14 @@ function PeerConnectionHandler() {
 		self.receiverId = activeChannel.getOpponentId();
 		self.receiverName = activeChannel.getUserNameById(self.receiverId);
 		self.channel = channelsHandler.activeChannel
+	};
+	self.sendOffer = function (quedId) {
+		wsHandler.sendToServer({
+			action: 'offerWebrtc',
+			channel: self.receiverRoomId,
+			handler: self.fileCallType,
+			id: quedId
+		});
 	};
 	self.print = function (message) {
 		console.log(getDebugMessage("Call message {}", JSON.stringify(message)));
@@ -1995,7 +2009,7 @@ function PeerConnectionHandler() {
 	};
 	self.onwebrtc = function (message) {
 		var data = message.content;
-		self.clearTimeout();
+		//self.clearTimeout(); TODO multirtc
 		if (self.pc.iceConnectionState && self.pc.iceConnectionState != 'closed') {
 			if (data.sdp) {
 				var successCall = self.webrtcInitiator ? self.onSuccessAnswer : self.answerToWebrtc;
@@ -2059,16 +2073,17 @@ function PeerConnectionHandler() {
 			}, self.failWebRtcP2);
 		}, self.failWebRtcP1, self.sdpConstraints);
 	};
-	self.sendBaseEvent = function (content, type) {
+	self.sendBaseEvent = function (type, content) {
 		wsHandler.sendToServer({
 			content: content,
-			action: 'call',
+			action: 'sendRtcData',
 			type: type,
-			channel: channelsHandler.activeChannel
+			connId: self.connectionId,
+			handler: self.fileCallType
 		});
 	};
 	self.sendWebRtcEvent = function (message) {
-		self.sendBaseEvent(message, 'webrtc');
+		self.sendBaseEvent('webrtc', message);
 	};
 	self.failWebRtcP1 = function () {
 		self.failWebRtc.apply(self, arguments);
@@ -2091,15 +2106,16 @@ function PeerConnectionHandler() {
 	};
 }
 
-function FileTransferHandler() {
+function FileTransferHandler(receiverRoomId, connectionId) {
 	var self = this;
+	PeerConnectionHandler.call(self, receiverRoomId, connectionId);
+	self.fileCallType = 'file';
 	self.dom = {
 		fileInput: $('webRtcFileInput'), //
 	};
 	self.CHUNK_SIZE = 16384;
 	self.receiveBuffer = [];
 	self.receivedSize = 0;
-	PeerConnectionHandler.call(self);
 	self.sdpConstraints = {};
 	self.setHeaderText = function (text) {
 		self.downloadBar.dom.text.textContent = "Waiting_to_accept";
@@ -2110,11 +2126,10 @@ function FileTransferHandler() {
 		}
 	};
 	self.sendFileOffer = function () {
-		self.sendBaseEvent({
-					name: self.file.name,
-					size: self.file.size
-				},
-				'offer'
+		self.sendBaseEvent('offer', {
+				name: self.file.name,
+				size: self.file.size
+			}
 		);
 		self.waitForAnswer();
 	};
@@ -2130,7 +2145,7 @@ function FileTransferHandler() {
 		self.downloadBar.setMax(self.file.size);
 		self.sendFileOffer();
 	};
-	self.onFileOffer = function (message) {
+	self.showOffer = function (message) {
 		self.receivedFileSize = parseInt(message.content.size);
 		self.downloadBar.setMax(self.receivedFileSize);
 		self.receivedFileName = message.content.name;
@@ -2138,7 +2153,6 @@ function FileTransferHandler() {
 				.format(encodeHTML(self.receivedFileName), bytesToSize(self.receivedFileSize), encodeHTML(message.user)));
 		self.lastGrowl.show(3600000, 'col-info');
 		self.lastGrowl.growl.addEventListener('click', self.acceptFileReply);
-		self.setAnswerOpponentVariables(message);
 		notifier.notify(message.user, "Sends file {}".format(self.receivedFileName));
 	};
 	self.acceptFileReply = function () {
@@ -2196,7 +2210,7 @@ function FileTransferHandler() {
 		var message = "File {} is received.".format(self.receivedFileName);
 		growlInfo(message);
 		console.log(getDebugMessage(message));
-		self.sendBaseEvent(null, 'fileAccepted');
+		self.sendBaseEvent('fileAccepted');
 		self.downloadBar.setSuccess();
 		self.receiveBuffer = [];
 		self.receivedSize = 0;
@@ -2214,9 +2228,10 @@ function FileTransferHandler() {
 	self.attachDomEvents();
 }
 
-function CallHandler() {
+function CallHandler(receiverRoomId, connectionId) {
 	var self = this;
-	PeerConnectionHandler.call(self);
+	PeerConnectionHandler.call(self, receiverRoomId, connectionId);
+	self.fileCallType = 'call';
 	self.audioProcessors = {};
 	self.dom = {
 		callAnswerParent: $('callAnswerParent'),
@@ -2231,6 +2246,9 @@ function CallHandler() {
 		callIcon: $('callIcon'), //
 		callVolume: $('callVolume'),
 		microphoneLevel: $("microphoneLevel"),
+		answerWebRtcCall: $("answerWebRtcCall"),
+		videoAnswerWebRtcCall: $("videoAnswerWebRtcCall"),
+		declineWebRtcCall: $("declineWebRtcCall"),
 		fs: {
 			/*FullScreen*/
 			video: $('fs-video'),
@@ -2238,7 +2256,11 @@ function CallHandler() {
 			hangup: $('fs-hangup'),
 			minimize: $('fs-minimize'),
 			enterFullScreen: $('enterFullScreen')
-		}, //
+		}
+	};
+	self.setConnectionId = function (id) {
+		self.connectionId = id;
+		self.callPeople();
 	};
 	self.constraints = {
 		audio: true,
@@ -2286,7 +2308,6 @@ function CallHandler() {
 		}
 		self.idleTime = 0;
 	};
-	self.callTimeoutTime = 60000;
 	self.dom.callSound.addEventListener("ended", function () {
 		checkAndPlay(self.dom.callSound);
 	});
@@ -2344,28 +2365,7 @@ function CallHandler() {
 		channelsHandler.setTitle(text);
 		singlePage.updateTitle();
 	};
-	self.onCallOffer = function (message) {
-		self.clearTimeout();
-		self.setAnswerOpponentVariables(message);
-		checkAndPlay(self.dom.callSound);
-		CssUtils.showElement(self.dom.callAnswerParent);
-		notifier.notify(self.receiverName, "Calls you");
-		self.timeoutFunnction = setTimeout(function () {
-					self.declineWebRtcCall();
-					// displayPreparedMessage(SYSTEM_HEADER_CLASS, new Date().getTime(),
-					//getText("You have missed a call from <b>{}</b>", self.receiverName)
-					// TODO replace growl with System message in user thread and unread
-					growlInfo("<div>You have missed a call from <b>{}</b></div>".format(self.receiverName));
-				}, self.callTimeoutTime
-		);
-		self.dom.callAnswerText.textContent = "{} is calling you".format(self.receiverName);
-	};
-	self.clearTimeout = function () {
-		if (self.timeoutFunnction) {
-			clearTimeout(self.timeoutFunnction);
-			self.timeoutFunnction = null;
-		}
-	};
+
 	self.setIconState = function (isCall) {
 		isCall = isCall || self.isActive();
 		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
@@ -2378,7 +2378,7 @@ function CallHandler() {
 		if (!isCallActive) {
 			self.setHeaderText("Make a call");
 		} else {
-			self.clearTimeout();
+			// self.clearTimeout(); TODO multirtc
 		}
 	};
 	self.answerWebRtcCall = function () {
@@ -2393,7 +2393,7 @@ function CallHandler() {
 		CssUtils.hideElement(self.dom.callAnswerParent);
 		self.dom.callSound.pause();
 		if (!dontResponde) {
-			self.sendBaseEvent(null, 'decline');
+			self.sendBaseEvent('decline');
 		}
 	};
 	self.videoAnswerWebRtcCall = function () {
@@ -2412,12 +2412,6 @@ function CallHandler() {
 		}
 	};
 	self.callPeople = function () {
-		var username = self.setOpponentVariables();
-		if (username) {
-			growlError("<span>Can't make a call file because user <b>{}</b> is not online.</span>".format(username));
-			console.log(getDebugMessage('Skip call because user {} is not online', username));
-			return;
-		}
 		self.setHeaderText("Confirm browser to use your input devices for call");
 		self.waitForAnswer();
 		self.captureInput(self.captureInputStream);
@@ -2426,7 +2420,7 @@ function CallHandler() {
 		self.setIconState(true);
 		self.setHeaderText("Establishing connection with {}".format(self.receiverName));
 		self.attachLocalStream(stream);
-		self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime);
+		//self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime); TODO multirtc
 	};
 	self.createCallAfterCapture = function (stream) {
 		self.createPeerConnection();
@@ -2441,7 +2435,7 @@ function CallHandler() {
 	self.showAndAttachCallDialogOnResponse = function () {
 		channelsHandler.setActiveChannel(self.channel);
 		channelsHandler.getActiveChannel().setChannelAttach(true);
-		CssUtils.showElement(self.dom.callContainer);
+		CssUtils.showElement(webRtcApi.dom.callContainer);
 	};
 	self.channelOpen = function () {
 		console.log(getDebugMessage('Opened a new chanel'))
@@ -2565,13 +2559,16 @@ function CallHandler() {
 	};
 	self.closeEventsParent = self.closeEvents;
 	self.closeEvents = function (text) {
-		self.clearTimeout();
+		//self.clearTimeout(); TODO multirtc
 		self.setHeaderText(loggedUser);
 		if (self.localStream) {
 			var tracks = self.localStream.getTracks();
 			for (var i = 0; i < tracks.length; i++) {
 				tracks[i].stop()
 			}
+		}
+		if (text) {
+			growlInfo(text)
 		}
 		self.setIconState(false);
 		self.hidePhoneIcon();
@@ -2589,11 +2586,14 @@ function CallHandler() {
 		/*also executes removing event on exiting from fullscreen*/
 	};
 	self.hangUp = function () {
-		self.sendBaseEvent(null, 'finish');
+		self.sendBaseEvent('finish');
 		self.closeEvents("Call is finished.");
 	};
 	self.ondecline = function () {
 		self.closeEvents("User has declined the call");
+	};
+	self.onreply = function () {
+		self.setHeaderText("Waiting for <b>{}</b> to accept".format(self.receiverName))
 	};
 	self.onfinish = function () {
 		self.declineWebRtcCall(true);
@@ -2639,6 +2639,24 @@ function CallHandler() {
 		self.dom.hangUpIcon.title = self.dom.fs.hangup.title;
 		self.idleTime = 0;
 	};
+	self.declineCall = function () {
+		self.declineWebRtcCall();
+
+		// TODO multirtc clear timeout
+		// displayPreparedMessage(SYSTEM_HEADER_CLASS, new Date().getTime(),
+		//getText("You have missed a call from <b>{}</b>", self.receiverName)
+		// TODO replace growl with System message in user thread and unread
+		growlInfo("<div>You have missed a call from <b>{}</b></div>".format(self.receiverName));
+	};
+	self.showOffer = function (message) {
+		checkAndPlay(self.dom.callSound);
+		CssUtils.showElement(self.dom.callAnswerParent);
+		self.dom.declineWebRtcCall.onclick = self.declineCall;
+		self.dom.answerWebRtcCall.onclick = self.answerWebRtcCall;
+		self.dom.videoAnswerWebRtcCall.onclick = self.videoAnswerWebRtcCall;
+		notifier.notify(self.receiverName, "Calls you");
+		self.dom.callAnswerText.textContent = "{} is calling you".format(self.receiverName);
+	};
 	self.attachDomEvents();
 }
 
@@ -2647,13 +2665,15 @@ function WebRtcApi() {
 	self.dom = {
 		callContainer: $('callContainer'),
 	};
-	self.connnections = {};
-	self.onoffer = function (message) { // TODO multirtc
-		if (message.content) {
-			self.onFileOffer(message);
-		} else {
-			self.onCallOffer(message);
-		}
+	self.callTimeoutTime = 60000;
+	self.connections = {};
+	self.quedConnections = {};
+	self.quedId = 0;
+	self.createQuedId = function() {
+		return self.quedId++;
+	};
+	self.proxyHandler = function (data) {
+		self.connections[data.connId]["on" + data.type](data);
 	};
 	self.toggleCallContainer = function () {
 		// if (self.isActive()) { TODO multirtc
@@ -2663,30 +2683,51 @@ function WebRtcApi() {
 		self.setIconState(false);
 		channelsHandler.getActiveChannel().setChannelAttach(!visible);
 	};
+	self.onsetConnectionId = function (message) {
+		var el = self.quedConnections[message.id];
+		delete self.quedConnections[message.id];
+		self.connections[message.connId] = el;
+		el.setConnectionId(message.connId);
+	};
+	self.clearTimeout = function () {
+		if (self.timeoutFunnction) {
+			clearTimeout(self.timeoutFunnction);
+			self.timeoutFunnction = null;
+		}
+	};
+	self.onofferWebrtc = function (message) {
+		// if (self.timeoutFunnction) {
+		// 	wsHandler.sendToServer('busy'); // TODO multirtc
+		// }
+
+		var className = message.content ? FileTransferHandler : CallHandler;
+		var handler = new className(message.channel, message.connId);
+		self.connections[message.connId] = handler;
+		handler.setAnswerOpponentVariables(message);
+		handler.showOffer(message);
+		if (handler instanceof CallHandler) {
+			// TODO multirtc settimout
+			// self.timeoutFunnction = setTimeout(self.connections[message.connId].declineCall, self.callTimeoutTime);
+		}
+	};
 	self.handle = function (data) {
-		if (data.method == 'createConnection') {
-			if (data.type == 'file') {
-				self.connnections[data.connId] = new FileTransferHandler();
-			} else if (data.type == 'call') {
-				self.connnections[data.connId] = new CallHandler();
-			}
+		if (data.handler == 'webrtc') {
+			self["on"+data.action](data);
 		} else {
-			self.connnections[data.connId]["on" + data.type](data);
+			self.connections[data.connId]['on'+data.type](data);
 		}
 	};
 	self.onSuccessAnswer = function () {
 		console.log(getDebugMessage('answer received'))
 	};
-	self.onwebrtc = function (message) { //TODO multirtc CREATE new peerconnection obj
-
-	};
 	self.offerCall = function () {
-		wsHandler.sendToServer({
-			action: 'webrtc',
-			method: 'offer',
-			channel: channelsHandler.activeChannel,
-			type: 'call'
-		});
+		self.createWebrtcObject(CallHandler, channelsHandler.activeChannel);
+		self.cal
+	};
+	self.createWebrtcObject = function (className, channel) {
+		var newId = self.createQuedId();
+		self.quedConnections[newId] = new className(channel);
+		self.quedConnections[newId].sendOffer(newId);
 	}
 }
 
@@ -2702,6 +2743,8 @@ function WsHandler() {
 	self.handlers = {
 		channels: channelsHandler,
 		chat: channelsHandler,
+		file: webRtcApi,
+		call: webRtcApi,
 		webrtc: webRtcApi,
 		growl: {
 			handle: function (message) {
