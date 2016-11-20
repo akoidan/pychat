@@ -409,25 +409,20 @@ class MessagesHandler(MessagesCreator):
 		"""
 		return self.parsable_prefix + message
 
-	def decode(self, message):
-		"""
-		Check if message should be proccessed by server before writing to client
-		@param message: message to check
-		@type message: str
-		@return: Object structure of message if it should be processed, None if not
-		"""
+	def remove_parsable_prefix(self, message):
 		if message.startswith(self.parsable_prefix):
-			return json.loads(message[1:])
+			return message[1:]
 
 	def new_message(self, message):
 		data = message.body
 		if isinstance(data, str_type):  # subscribe event
-			decoded = self.decode(data)
-			if decoded:
-				data = decoded
-			self.safe_write(data)
-			if decoded:
-				self.post_process_message[decoded[VarNames.EVENT]](decoded)
+			prefixless_str = self.remove_parsable_prefix(data)
+			if prefixless_str:
+				self.safe_write(prefixless_str)
+				dict_message = json.loads(prefixless_str)
+				self.post_process_message[dict_message[VarNames.EVENT]](dict_message)
+			else:
+				self.safe_write(data)
 
 	def safe_write(self, message):
 		raise NotImplementedError('WebSocketHandler implements')

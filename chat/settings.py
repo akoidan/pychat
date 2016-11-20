@@ -40,9 +40,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 DEBUG = False
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["*",]
 TEMPLATE_DEBUG = False
-#ALLOWED_HOSTS = ["127.0.0.1", ]
 
 # TEMPLATE_DIRS = [BASE_DIR+'/templates']
 TEMPLATE_DIRS = (
