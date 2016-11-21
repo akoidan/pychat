@@ -55,6 +55,7 @@ class Actions(object):
 	PRINT_MESSAGE = 'printMessage'
 	WEBRTC = 'sendRtcData'
 	CLOSE_WEBRTC = 'destroyConnection'
+	ACCEPT_WEBRTC = 'acceptChannel'
 	ROOMS = 'setRooms'
 	REFRESH_USER = 'setOnlineUsers'
 	GROWL_MESSAGE = 'growl'
@@ -72,7 +73,6 @@ class Actions(object):
 
 
 class VarNames(object):
-	WEBRTC_METHOD = 'method'
 	WEBRTC_TYPE = 'type'
 	WEBRTC_QUED_ID = 'id'
 	USER = 'user'
@@ -288,7 +288,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
 			Actions.WEBRTC: self.proxy_webrtc,
-			Actions.CLOSE_WEBRTC: self.proxy_webrtc,
+			Actions.CLOSE_WEBRTC: self.close_and_proxy_connection,
+			Actions.ACCEPT_WEBRTC: self.accept_and_proxy_connection,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
 			Actions.DELETE_ROOM: self.delete_channel,
 			Actions.EDIT_MESSAGE: self.edit_message,
@@ -301,6 +302,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
 			Actions.INVITE_USER: self.send_client_new_channel,
+			Actions.ACCEPT_WEBRTC: self.accept_connection,
+			Actions.CLOSE_WEBRTC: self.close_connection,
 			Actions.OFFER_WEBRTC_CONNECTION: self.set_opponent_call_channel
 		}
 
@@ -463,17 +466,29 @@ class MessagesHandler(MessagesCreator):
 		prepared_message = self.create_send_message(message_db)
 		self.publish(prepared_message, channel)
 
-	def close_webrtc_connection(self, in_message):
+	def close_and_proxy_connection(self, in_message):
 		self.proxy_webrtc(in_message, True)
-		del self.webrtc_ids[in_message[VarNames.CONNECTION_ID]]
+		self.close_connection(in_message)
 
+	def accept_and_proxy_connection(self, in_message):
+		self.proxy_webrtc(in_message, True)
+
+	def close_connection(self, in_message):
+		conn_id = in_message[VarNames.CONNECTION_ID]
+		self.logger.debug("Deleting connection %s", conn_id)
+		del self.webrtc_ids[conn_id]
+
+	def accept_connection(self, in_message):
+		conn_id = in_message[VarNames.CONNECTION_ID]
+		self.logger.debug("Enabling connection %s", conn_id)
+		self.webrtc_ids[conn_id]['ready'] = True
 
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.CHANNEL]
 		webrtc_type = in_message[HandlerNames.NAME]
 		content = in_message.get(VarNames.CONTENT)
 		connection_id = id_generator(6)
-		room_users = User.rooms.through.objects.filter(
+		room_users = User.rooms.through.objects.filter(  # TODO if send to self this will throw  RoomUsers matching query does not exist., because of ~Q(user_id=self.user_id),
 			~Q(user_id=self.user_id),
 			Q(room_id=room_id),
 			Q(room__name__isnull=True)
@@ -481,7 +496,7 @@ class MessagesHandler(MessagesCreator):
 			Prefetch('user', queryset=User.objects.all().only('username'))
 		).get()
 		self.webrtc_ids[connection_id] = {
-			VarNames.WEBRTC_METHOD: 'offer',
+			'ready': False,
 			VarNames.CHANNEL: RedisPrefix.generate_user(room_users.user_id),
 			HandlerNames.NAME: webrtc_type
 		}
@@ -498,10 +513,17 @@ class MessagesHandler(MessagesCreator):
 		"""
 		:type in_message: dict
 		"""
+		# TODO multirtc send data only to specific tab,
+		# not to all tab opened by this user
+		# thus on response
 		connection_id = in_message[VarNames.CONNECTION_ID]
-		channel = self.webrtc_ids[connection_id][VarNames.CHANNEL]
-		self.logger.info('!! Processing %s to channel %s', connection_id, channel)
-		self.publish(in_message, channel, parsable)
+		connection_info = self.webrtc_ids[connection_id]
+		channel = connection_info[VarNames.CHANNEL]
+		if connection_info['ready']:
+			self.logger.info('!! Processing %s to channel %s', connection_id, channel)
+			self.publish(in_message, channel, parsable)
+		else:
+			raise ValidationError("Connection {} is not ready yet. Avaialbe connections are: ".format(connection_id, self.webrtc_ids))
 
 
 	def create_new_room(self, message):
@@ -620,7 +642,7 @@ class MessagesHandler(MessagesCreator):
 	def set_opponent_call_channel(self, message):
 		connection_id = message[VarNames.CONNECTION_ID]
 		self.webrtc_ids[connection_id] = {
-			VarNames.WEBRTC_METHOD: 'offered',
+			'ready': True,
 			VarNames.CHANNEL: RedisPrefix.generate_user(message[VarNames.USER_ID]),
 			HandlerNames.NAME: message[HandlerNames.NAME]
 		}

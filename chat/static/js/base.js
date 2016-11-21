@@ -1,9 +1,8 @@
 String.prototype.format = function() {
-	var res = this;
-	for (var i = 0; i < arguments.length; i++) {
-		res = res.replace('{}', arguments[i]);
-	}
-	return res;
+	var args = arguments,  replacement = 0;
+ 	return this.replace(/\{\}/g, function() {
+		return args[replacement++];
+	});
 };
 
 if (!String.prototype.startsWith) {
@@ -251,7 +250,10 @@ var Growl = function (message) {
 	};
 	self.remove = function () {
 		if (self.growl.parentNode === self.growlHolder) {
-			self.growlHolder.removeChild(self.growl)
+			self.growlHolder.removeChild(self.growl);
+			console.log(getDebugMessage("Removing growl"));
+		} else {
+			console.log(getDebugMessage("Growl is already removed"));
 		}
 	};
 	self.showInfinity = function(growlClass) {

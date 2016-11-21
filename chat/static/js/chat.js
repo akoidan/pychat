@@ -1910,23 +1910,31 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 }
 
 
-function TransferFileGrowl(fileName, fileSize, opponentName) {
+function TransferFileGrowl(fileName, fileSize, opponentName, isForSend) {
 	var self = this;
 	Growl.call(self);
 	self.showInfinity('transferFile');
 	self.dom =  {
 		growl: self.growl,
-		yes: document.createElement('INPUT'),
-		no: document.createElement('INPUT'),
 		text: document.createElement('SPAN'),
 		fileInfo: document.createElement('table'),
-		yesNoHolder: document.createElement('DIV')
-
 	};
-	self.downloadBar= new DownloadBar();
-	self.downloadBar.hide();
-	self.downloadBar.max = fileSize;
-
+	self.downloadBar = new DownloadBar();
+	self.init = function() {
+		self.insertData('Status:', 'initing', 'fileStatus');
+		self.insertData('Name:', fileName);
+		self.insertData(isForSend ? 'To:' : "From:",opponentName);
+		self.insertData('Size:', bytesToSize(fileSize));
+		self.dom.growl.appendChild(self.dom.text);
+		self.dom.text.textContent = "File transfer";
+		self.dom.growl.appendChild(self.dom.fileInfo);
+		self.dom.growl.appendChild(self.downloadBar.dom.wrapper);
+		self.downloadBar.hide();
+		self.downloadBar.setMax(fileSize);
+		if (!isForSend) {
+			self.addYesNo();
+		}
+	};
 	self.insertData = function(name, value, fieldName) {
 		var raw = self.dom.fileInfo.insertRow();
 		raw.insertCell().textContent = name;
@@ -1936,40 +1944,53 @@ function TransferFileGrowl(fileName, fileSize, opponentName) {
 			self.dom[fieldName] = valueField;
 		}
 	};
-	self.insertData('Status:', 'initing', 'fileStatus');
-	self.insertData('Name:', fileName);
-	self.insertData('From/To:',opponentName);
-	self.insertData('Size:', bytesToSize(fileSize));
-	self.dom.yes.setAttribute('type', 'button');
-	self.dom.no.setAttribute('type', 'button');
-	self.dom.yes.setAttribute('value', 'Accept');
-	self.dom.no.setAttribute('value', 'Decline');
-	self.dom.yesNoHolder.appendChild(self.dom.yes);
-	self.dom.yesNoHolder.appendChild(self.dom.no);
-	self.dom.yesNoHolder.className = 'yesNo';
-	self.dom.growl.appendChild(self.dom.text);
-	self.dom.text.textContent = "Transfer a file"
-	self.dom.growl.appendChild(self.dom.fileInfo);
-	self.dom.growl.appendChild(self.downloadBar.dom.wrapper);
-	self.dom.growl.appendChild(self.dom.yesNoHolder);
+	self.setSuccessStatus = function (html) {
+		self.setStatus(html);
+		self.dom.fileStatus.className = 'success'
+	};
+	self.setErrorStatus = function (html) {
+		self.setStatus(html);
+		self.dom.fileStatus.className = 'error'
+	};
 	self.setStatus = function(innerHtml) {
-		console.log(getDebugMessage('Transfer file status changed to {}', innerHtml));
+		console.log(getDebugMessage('Transfer file status changed to "{}"', innerHtml));
 		self.dom.fileStatus.innerHTML = innerHtml;
 	};
+	self.hideButtons = function () {
+		CssUtils.hideElement(self.dom.yesNoHolder)
+	};
 	self.yesAction = function () {
-		self.show();
+		self.hideButtons();
 		self.postYesAction();
 	};
 	self.noAction = function () {
-		self.postNoAction();
+		if (self.postNoAction) {
+			self.postNoAction();
+		} else {
+			console.warn(getDebugMessage("Skipping empty No callback"));
+		}
 		self.remove();
 	};
-	self.dom.yes.onclick = self.yesAction;
-	self.dom.no.onclick = self.noAction;
+	self.addYesNo = function () {
+		self.dom.yesNoHolder = document.createElement('DIV');
+		self.dom.yes = document.createElement('INPUT');
+		self.dom.no = document.createElement('INPUT');
+		self.dom.growl.appendChild(self.dom.yesNoHolder);
+		self.dom.yesNoHolder.appendChild(self.dom.yes);
+		self.dom.yesNoHolder.appendChild(self.dom.no);
+		self.dom.yesNoHolder.className = 'yesNo';
+		self.dom.yes.onclick = self.yesAction;
+		self.dom.no.onclick = self.noAction;
+		self.dom.yes.setAttribute('type', 'button');
+		self.dom.no.setAttribute('type', 'button');
+		self.dom.yes.setAttribute('value', 'Accept');
+		self.dom.no.setAttribute('value', 'Decline');
+	};
 	self.setButtonActions = function (yesAction, noAction) {
 		self.postYesAction = yesAction;
 		self.postNoAction = noAction;
-	}
+	};
+	self.init();
 }
 
 function DownloadBar() {
@@ -2032,8 +2053,11 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 			{RtpDataChannels: false /*true*/}
 		]
 	};
+	self.getDebugMessage = function () {
+		return getDebugMessage.apply(this, arguments) + ", connId: " +self.connectionId ;
+	};
 	self.destroy = function () {
-		console.log(getDebugMessage("Destroying obj with id {}", self.connectionId));
+		console.log(self.getDebugMessage("Destroying peer connection"));
 		delete webRtcApi.connections[self.connectionId];
 	};
 	self.setConnectionId = function (id) {
@@ -2043,10 +2067,27 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 	self.isActive = function () {
 		return self.localStream && self.localStream.active;
 	};
+	self.sendBaseEvent = function (type, content) {
+		wsHandler.sendToServer({
+			content: content,
+			action: 'sendRtcData',
+			type: type,
+			connId: self.connectionId,
+			handler: self.fileCallType
+		});
+	};
 	self.decline = function () {
 		wsHandler.sendToServer({
 			action: 'destroyConnection',
 			type: 'decline',
+			connId: self.connectionId,
+			handler: self.fileCallType
+		});
+	};
+	self.accept = function () {
+		wsHandler.sendToServer({
+			action: 'acceptChannel',
+			type: 'accept',
 			connId: self.connectionId,
 			handler: self.fileCallType
 		});
@@ -2057,7 +2098,7 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 		self.sendBaseEvent("reply");
 	};
 	self.onreply = function () {
-		self.setHeaderText("Waiting to accept".format(self.receiverName))
+		self.setHeaderText("Conn. success, wait for accept".format(self.receiverName))
 	};
 	self.setOpponentVariables = function () {
 		var activeChannel = channelsHandler.channels[self.receiverRoomId];
@@ -2068,9 +2109,9 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 		self.receiverName = activeChannel.getUserNameById(self.receiverId);
 	};
 	self.answerToWebrtc = function () {
-		console.log(getDebugMessage('creating answer...'));
+		console.log(self.getDebugMessage('creating answer...'));
 		self.pc.createAnswer(function (answer) {
-			console.log(getDebugMessage('sent answer...'));
+			console.log(self.getDebugMessage('sent answer...'));
 			self.pc.setLocalDescription(answer, function () {
 				self.sendWebRtcEvent(answer);
 			}, self.failWebRtcP3);
@@ -2089,10 +2130,10 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 		wsHandler.sendToServer(messageRequest);
 	};
 	self.print = function (message) {
-		console.log(getDebugMessage("Call message {}", JSON.stringify(message)));
+		console.log(self.getDebugMessage("Call message {}", JSON.stringify(message)));
 	};
 	self.gotReceiveChannel = function (event) {
-		console.log(getDebugMessage('Received Channel Callback'));
+		console.log(self.getDebugMessage('Received Channel Callback'));
 		self.sendChannel = event.channel;
 		// self.sendChannel.onmessage = self.print;
 		self.sendChannel.onopen = self.channelOpen;
@@ -2116,7 +2157,7 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 				growlInfo(data.message);
 			}
 		} else {
-			console.warn(getDebugMessage("Skipping ws message for closed connection"));
+			console.warn(self.getDebugMessage("Skipping ws message for closed connection"));
 		}
 	};
 	self.createPeerConnection = function () {
@@ -2134,53 +2175,48 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 	self.closeEvents = function (text) {
 		try {
 			if (self.sendChannel) {
-				console.log(getDebugMessage("Closing chanel with id {}", self.connectionId));
+				console.log(self.getDebugMessage("Closing chanel"));
 				self.sendChannel.close();
 			} else {
-				console.log(getDebugMessage("No channels to close for connectionId {}", self.connectionId));
+				console.log(self.getDebugMessage("No channels to close"));
 			}
 			if (self.pc) {
-				console.log(getDebugMessage("Closing peer connection with id {}", self.connectionId));
+				console.log(self.getDebugMessage("Closing peer connection"));
 				self.pc.close();
 			} else {
-				console.log(getDebugMessage("No peer connection to close for connectionId {}", self.connectionId));
+				console.log(self.getDebugMessage("No peer connection to close"));
 			}
 		} catch (error) {
-			console.warn(getDebugMessage('{} Error while closing channels, description {}', error.message, error, name));
+			console.error(self.getDebugMessage('{} Error while closing channels, description {}', error.message, error, name));
 		}
 		self.destroy();
 		if (text) {
 			growlInfo(text);
 		}
 	};
+	self.onreceiveChannelOpen = function () {
+		self.lastGrowl.setStatus("Receiving a file");
+	};
 	self.createSendChannelAndOffer = function () {
 		self.webrtcInitiator = true;
 		try {
 			// Reliable data channels not supported by Chrome
 			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
+			self.sendChannel.onopen = self.onreceiveChannelOpen;
 			self.sendChannel.onmessage = self.webrtcDirectMessage;
-			console.log(getDebugMessage("Created send data channel"));
+			console.log(self.getDebugMessage("Created send data channel"));
 		} catch (e) {
 			var error = "Failed to create data channel because {} ".format(e.message || e);
 			growlError(error);
-			console.error(getDebugMessage(error));
+			console.error(self.getDebugMessage(error));
 		}
 		self.pc.createOffer(function (offer) {
-			console.log(getDebugMessage('created offer...'));
+			console.log(self.getDebugMessage('created offer...'));
 			self.pc.setLocalDescription(offer, function () {
-				console.log(getDebugMessage('sending to remote...'));
+				console.log(self.getDebugMessage('sending to remote...'));
 				self.sendWebRtcEvent(offer);
 			}, self.failWebRtcP2);
 		}, self.failWebRtcP1, self.sdpConstraints);
-	};
-	self.sendBaseEvent = function (type, content) {
-		wsHandler.sendToServer({
-			content: content,
-			action: 'sendRtcData',
-			type: type,
-			connId: self.connectionId,
-			handler: self.fileCallType
-		});
 	};
 	self.sendWebRtcEvent = function (message) {
 		self.sendBaseEvent('webrtc', message);
@@ -2202,7 +2238,7 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 		var errorContext = isError ? "{}: {}".format(arguments[0].name, arguments[0].message)
 				: Array.prototype.join.call(arguments, ' ');
 		growlError("An error occurred while establishing a connection: {}".format(errorContext));
-		console.error(getDebugMessage("OnError way from {}, exception: {}", getCallerTrace(), errorContext));
+		console.error(self.getDebugMessage("OnError way from {}, exception: {}", getCallerTrace(), errorContext));
 	};
 }
 
@@ -2232,52 +2268,60 @@ function FileTransferHandler(receiverRoomId, connectionId) {
 		self.setOpponentVariables();
 		self.fileName = self.file.name;
 		self.fileSize = self.file.size;
-		self.lastGrowl = new TransferFileGrowl(self.fileName, self.fileSize, self.receiverName);
+		self.lastGrowl = new TransferFileGrowl(self.fileName, self.fileSize, self.receiverName, true);
 		self.lastGrowl.setStatus("Establishing a connection");
 		self.sendOfferParent(quedId, {
 			name: self.fileName,
 			size: self.fileSize
 		});
 	};
+	self.onaccept = function (message) {
+		self.lastGrowl.downloadBar.show();
+	};
 	self.showOffer = function (message) {
 		self.fileSize = parseInt(message.content.size);
 		self.fileName = message.content.name;
-		self.lastGrowl = new TransferFileGrowl(self.fileName, self.fileSize, self.receiverName);
-		self.lastGrowl.setStatus("User sends you a file");
+		self.lastGrowl = new TransferFileGrowl(self.fileName, self.fileSize, self.receiverName, false);
+		self.lastGrowl.setStatus("Offered you a file");
 		self.lastGrowl.setButtonActions(self.acceptFileReply, self.declineFile);
 		notifier.notify(message.user, "Sends file {}".format(self.fileName));
 	};
 	self.ondecline = function () {
-		self.lastGrowl.setStatus("Declined");
+		self.lastGrowl.setErrorStatus("Declined");
 	};
 	self.declineFile = function () {
 		self.decline();
 		self.destroy();
 	};
 	self.acceptFileReply = function () {
+		self.accept();
+		self.lastGrowl.downloadBar.show();
 		self.createPeerConnection();
 		self.createSendChannelAndOffer();
-		self.showAndAttachCallDialogOnResponse();
 	};
 	self.channelOpen = function () {
-		console.log(getDebugMessage('file is ' + [self.fileName, self.fileSize, self.file.type,
-					self.file.lastModifiedDate].join(' ')));
+		console.log(self.getDebugMessage('file is {} {} {} {}', self.fileName, self.fileSize, self.file.type, self.file.lastModifiedDate));
 		if (self.fileSize === 0) {
-			self.lastGrowl.setStatus("Can't send empty file");
+			self.lastGrowl.setErrorStatus("Can't send empty file");
 			self.closeEvents("Can't send empty file");
-			return;
+		} else {
+			self.lastGrowl.setStatus("Transferring file");
+			self.sliceFile(0);
 		}
-		self.sliceFile(0);
 	};
 	self.sliceFile = function (offset) {
 		var reader = new window.FileReader();
 		reader.onload = (function () {
 			return function (e) {
-				self.sendChannel.send(e.target.result);
-				if (self.fileSize > offset + e.target.result.byteLength) {
-					window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
+				if (self.sendChannel.readyState == 'open') {
+					self.sendChannel.send(e.target.result);
+					if (self.fileSize > offset + e.target.result.byteLength) {
+						window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
+					}
+					self.setTranseferdAmount(offset + e.target.result.byteLength);
+				} else {
+					self.lastGrowl.setErrorStatus("Lost connection");
 				}
-				self.setTranseferdAmount(offset + e.target.result.byteLength);
 			};
 		})(self.file);
 		var slice = self.file.slice(offset, offset + self.CHUNK_SIZE);
@@ -2287,10 +2331,10 @@ function FileTransferHandler(receiverRoomId, connectionId) {
 		self.lastGrowl.downloadBar.setValue(value);
 	};
 	self.webrtcDirectMessage = function (event) {
-		// console.log(getDebugMessage('Received Message ' + event.data.byteLength));
+		// console.log(self.getDebugMessage('Received Message ' + event.data.byteLength));
 		self.receiveBuffer.push(event.data);
 		self.receivedSize += event.data.byteLength;
-		self.setTranseferdAmount(value);
+		self.setTranseferdAmount(self.receivedSize);
 		// we are assuming that our signaling protocol told
 		// about the expected file size (and name, hash, etc).
 		if (self.receivedSize === self.fileSize) {
@@ -2299,24 +2343,22 @@ function FileTransferHandler(receiverRoomId, connectionId) {
 		}
 	};
 	self.onfileAccepted = function (message) {
-		console.log(getDebugMessage("Transfer file {} result : {}", self.fileName, message.content));
-		growlInfo('Transferring  {} is finished '.format(self.fileName));
-		self.lastGrowl.downloadBar.setSuccess();
-		self.downloadBar.dom.text.innerHTML = 'Transferred!';
+		console.log(self.getDebugMessage("Transfer file {} result : {}", self.fileName, message.content));
+		self.lastGrowl.setSuccessStatus("Transferred");
+		self.lastGrowl.downloadBar.hide();
 		self.closeEvents();
 	};
 	self.assembleFile = function () {
 		var received = new window.Blob(self.receiveBuffer);
-		var message = "File {} is received.".format(self.fileName);
-		growlInfo(message);
-		console.log(getDebugMessage(message));
+		console.log(self.getDebugMessage("File is received"));
 		self.sendBaseEvent('fileAccepted');
-		self.downloadBar.setSuccess();
-		self.receiveBuffer = [];
+		self.lastGrowl.downloadBar.setSuccess();
+		self.receiveBuffer = []; //clear buffer
 		self.receivedSize = 0;
-		self.downloadBar.dom.text.href = URL.createObjectURL(received);
-		self.downloadBar.dom.text.download = self.fileName;
-		self.downloadBar.dom.text.textContent = 'Save {}'.format(self.fileName);
+		self.lastGrowl.downloadBar.dom.text.href = URL.createObjectURL(received);
+		self.lastGrowl.downloadBar.dom.text.download = self.fileName;
+		self.lastGrowl.setSuccessStatus("Received");
+		self.lastGrowl.downloadBar.dom.text.textContent = 'Save'.format(self.fileName);
 	};
 }
 
@@ -2349,6 +2391,9 @@ function CallHandler(receiverRoomId, connectionId) {
 			minimize: $('fs-minimize'),
 			enterFullScreen: $('enterFullScreen')
 		}
+	};
+	self.sendAccept = function () {
+		self.sendBaseEvent()
 	};
 	self.constraints = {
 		audio: true,
@@ -2470,6 +2515,7 @@ function CallHandler(receiverRoomId, connectionId) {
 		}
 	};
 	self.answerWebRtcCall = function () {
+		self.accept();
 		CssUtils.hideElement(self.dom.callAnswerParent);
 		self.dom.callSound.pause();
 		self.setAudio(true);
@@ -2485,6 +2531,7 @@ function CallHandler(receiverRoomId, connectionId) {
 		}
 	};
 	self.videoAnswerWebRtcCall = function () {
+		self.accept();
 		CssUtils.hideElement(self.dom.callAnswerParent);
 		self.dom.callSound.pause();
 		self.setAudio(true);
@@ -2527,7 +2574,7 @@ function CallHandler(receiverRoomId, connectionId) {
 		CssUtils.showElement(webRtcApi.dom.callContainer);
 	};
 	self.channelOpen = function () {
-		console.log(getDebugMessage('Opened a new chanel'))
+		console.log(self.getDebugMessage('Opened a new chanel'))
 	};
 	self.setVideoSource = function (domEl, stream) {
 		domEl.src = URL.createObjectURL(stream);
@@ -2601,7 +2648,7 @@ function CallHandler(receiverRoomId, connectionId) {
 			}
 
 		} catch (err) {
-			console.error(getDebugMessage("Unable to use microphone level because " + err));
+			console.error(self.getDebugMessage("Unable to use microphone level because " + err));
 		}
 	};
 	self.showNoMicError = function () {
@@ -2620,7 +2667,7 @@ function CallHandler(receiverRoomId, connectionId) {
 			self.createMicrophoneLevelVoice(event.stream, false);
 			self.setHeaderText("Talking with <b>{}</b>".format(self.receiverName));
 			self.setIconState(true);
-			console.log(getDebugMessage("Stream attached"));
+			console.log(self.getDebugMessage("Stream attached"));
 			self.showPhoneIcon();
 		};
 	};
@@ -2795,12 +2842,11 @@ function WebRtcApi() {
 	self.handle = function (data) {
 		if (data.handler == 'webrtc') {
 			self["on"+data.action](data);
-		} else {
+		} else if (self.connections[data.connId]) {
 			self.connections[data.connId]['on'+data.type](data);
+		} else {
+			console.error(getDebugMessage('Connection "{}" is unknown. Availabe connections: "{}". Skipping message: "{}"', JSON.stringify(data), data.connId, JSON.stringify(self.connections)));
 		}
-	};
-	self.onSuccessAnswer = function () {
-		console.log(getDebugMessage('answer received'))
 	};
 	self.offerCall = function () {
 		self.createWebrtcObject(CallHandler);

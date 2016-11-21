@@ -733,15 +733,24 @@ p
 		padding-bottom: 10px
 	.yesNo
 		padding-top: 15px
-		float: right
-		input[type=button][value=Accept]
-			@extend .green-btn
-			margin-right: 10px
-		input[type=button][value=Decline]
-			@extend .red-btn
+		display: flex
+		justify-content: space-around
+		input[type=button]
+			width: 100%
+			&[value=Accept]
+				@extend .green-btn
+				margin-right: 10px
+			&[value=Decline]
+				@extend .red-btn
 	.progress-wrap
 		width: calc(100% - 20px)
 		margin: auto
+	.success
+		color: #5cc75c
+		font-weight: bold
+	.error
+		color: #f15e5e
+		font-weight: bold
 
 #painter
 	width: 400px
