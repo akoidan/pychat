@@ -532,8 +532,6 @@ p
 	@-moz-document url-prefix()
 		height: $height - 2px
 
-#transmitProgress
-	margin-top: 5px
 #callUserList
 	margin: 0
 	min-width: 150px
@@ -720,6 +718,30 @@ p
 	left: -30px
 	font-size: 40px
 	top: -10px
+
+.transferFile
+	table
+		td:nth-child(1)
+			color: #79aeb6
+			font-weight: bold
+	span
+		font-size: 20px
+		color: #68a55d
+		font-weight: bold
+		text-align: center
+		display: block
+		padding-bottom: 10px
+	.yesNo
+		padding-top: 15px
+		float: right
+		input[type=button][value=Accept]
+			@extend .green-btn
+			margin-right: 10px
+		input[type=button][value=Decline]
+			@extend .red-btn
+	.progress-wrap
+		width: calc(100% - 20px)
+		margin: auto
 
 #painter
 	width: 400px

@@ -54,6 +54,7 @@ class Actions(object):
 	SEND_MESSAGE = 'sendMessage'
 	PRINT_MESSAGE = 'printMessage'
 	WEBRTC = 'sendRtcData'
+	CLOSE_WEBRTC = 'destroyConnection'
 	ROOMS = 'setRooms'
 	REFRESH_USER = 'setOnlineUsers'
 	GROWL_MESSAGE = 'growl'
@@ -286,7 +287,8 @@ class MessagesHandler(MessagesCreator):
 		self.pre_process_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
-			Actions.WEBRTC: self.process_call,
+			Actions.WEBRTC: self.proxy_webrtc,
+			Actions.CLOSE_WEBRTC: self.proxy_webrtc,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
 			Actions.DELETE_ROOM: self.delete_channel,
 			Actions.EDIT_MESSAGE: self.edit_message,
@@ -461,6 +463,11 @@ class MessagesHandler(MessagesCreator):
 		prepared_message = self.create_send_message(message_db)
 		self.publish(prepared_message, channel)
 
+	def close_webrtc_connection(self, in_message):
+		self.proxy_webrtc(in_message, True)
+		del self.webrtc_ids[in_message[VarNames.CONNECTION_ID]]
+
+
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.CHANNEL]
 		webrtc_type = in_message[HandlerNames.NAME]
@@ -487,14 +494,14 @@ class MessagesHandler(MessagesCreator):
 		self.logger.info('!! Offering a call, connection_id %s', connection_id)
 		self.publish(opponent_message, self.webrtc_ids[connection_id][VarNames.CHANNEL], True)
 
-	def process_call(self, in_message):
+	def proxy_webrtc(self, in_message, parsable=False):
 		"""
 		:type in_message: dict
 		"""
 		connection_id = in_message[VarNames.CONNECTION_ID]
 		channel = self.webrtc_ids[connection_id][VarNames.CHANNEL]
 		self.logger.info('!! Processing %s to channel %s', connection_id, channel)
-		self.publish(in_message, channel)
+		self.publish(in_message, channel, parsable)
 
 
 	def create_new_room(self, message):

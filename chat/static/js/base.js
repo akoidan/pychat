@@ -235,7 +235,7 @@ var CssUtils = {
 var Growl = function (message) {
 	var self = this;
 	self.growlHolder = growlHolder;
-	self.message = message.trim();
+	self.message = message;
 	self.error = function () {
 		self.show(4000, 'col-error')
 	};
@@ -256,7 +256,10 @@ var Growl = function (message) {
 	};
 	self.showInfinity = function(growlClass) {
 		self.growl = document.createElement('div');
-		self.growl.innerHTML = self.message.indexOf("<") == 0? self.message : encodeAnchorsHTML(self.message);
+		if (self.message) {
+			self.message = self.message.trim();
+			self.growl.innerHTML = self.message.indexOf("<") == 0? self.message : encodeAnchorsHTML(self.message);
+		}
 		self.growl.className = 'growl ' + growlClass;
 		self.growlHolder.appendChild(self.growl);
 		self.growl.clientHeight; // request to paint now!
@@ -270,8 +273,8 @@ var Growl = function (message) {
 			setTimeout(self.hide, timeout);
 		}
 	};
-
 };
+
 function getCallerTrace() {
 	try {
 		throw Error('')
