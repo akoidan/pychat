@@ -590,13 +590,13 @@ class MessagesHandler(MessagesCreator):
 			room_ids = list([room['room_id'] for room in user_rooms])
 			query_res = self.execute_query(SELECT_SELF_ROOM, [room_ids, ])
 		else:
-			rooms_query = Room.users.through.objects.filter(user_id=user_id, room__in=user_rooms)
+			rooms_query = RoomUsers.objects.filter(user_id=user_id, room__in=user_rooms)
 			query_res = rooms_query.values('room__id', 'room__disabled')
-		if len(query_res) > 0:
-			room = query_res[0]
+		try:
+			room = self.do_db(query_res.get)
 			room_id = room['room__id']
 			self.update_room(room_id, room['room__disabled'])
-		else:
+		except RoomUsers.DoesNotExist:
 			room = Room()
 			room.save()
 			room_id = room.id
