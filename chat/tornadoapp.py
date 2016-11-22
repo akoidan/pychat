@@ -356,6 +356,10 @@ class MessagesHandler(MessagesCreator):
 		yield tornado.gen.Task(
 			self.async_redis.subscribe, (channel,))
 
+	def evaluate(self, query_set):
+		self.do_db(len, query_set)
+		return query_set
+
 	def do_db(self, callback, *args, **kwargs):
 		try:
 			return callback(*args, **kwargs)
@@ -590,7 +594,7 @@ class MessagesHandler(MessagesCreator):
 
 	def create_room(self, user_rooms, user_id):
 		if self.user_id == user_id:
-			room_ids = list([room['room_id'] for room in user_rooms])
+			room_ids = list([room['room_id'] for room in self.evaluate(user_rooms)])
 			query_res = self.execute_query(SELECT_SELF_ROOM, [room_ids, ])
 		else:
 			rooms_query = RoomUsers.objects.filter(user_id=user_id, room__in=user_rooms)
