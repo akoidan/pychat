@@ -322,16 +322,26 @@ function Draggable(container, headerText) {
 		self.dom.header.appendChild(self.dom.headerText);
 		self.dom.headerText.style = 'display: inline-block';
 		self.setHeaderText(self.headerText);
-		var iconCancel = document.createElement('i');
-		self.dom.header.appendChild(iconCancel);
-		iconCancel.onclick = self.hide;
-		iconCancel.className = 'icon-cancel';
+		self.dom.iconCancel = document.createElement('i');
+		self.dom.header.appendChild(self.dom.iconCancel);
+		self.dom.iconCancel.onclick = self.hide;
+		self.dom.iconCancel.className = 'icon-cancel';
 		self.dom.body = self.dom.container.children[0];
+		if (!self.dom.body) {
+			self.dom.body = document.createElement('DIV');
+			self.dom.container.appendChild(self.dom.body);
+		}
 		CssUtils.addClass(self.dom.body, 'window-body');
 		self.dom.container.insertBefore(self.dom.header, self.dom.body);
 		self.dom.container.addEventListener('focus', self.onfocus);
 		self.dom.container.addEventListener('blur', self.onfocusout);
 		self.dom.container.setAttribute('tabindex', "-1");
+		self.fixInputs();
+	};
+	self.fixInputs = function () {
+		if (!container.id) {
+			container.id = 'fileTr'+Date.now();
+		}
 		var inputs = document.querySelectorAll('#{} input'.format(container.id));
 		// typeOf(inputs) = HTMLCollection, not an array. that doesn't have forEach
 		for (var i = 0; i < inputs.length; i++) {

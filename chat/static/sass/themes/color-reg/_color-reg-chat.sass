@@ -85,7 +85,8 @@
 			left: 0
 			position: absolute
 			width: 100%
-		.icon-cancel
+		$left: 11px
+		.icon-action
 			background: radial-gradient(circle farthest-side at right bottom, #c7c8ca, #30333c)
 			border: 1px solid #22252b
 			border-radius: 50%
@@ -96,7 +97,6 @@
 			list-style-type: none
 			position: absolute
 			width: 11px
-			left: 11px
 			opacity: 1
 			-webkit-mask-image: none
 			box-sizing: border-box
@@ -111,8 +111,27 @@
 				top: 1px
 				margin: 0
 				width: 5px
+				&:hover
+					background: linear-gradient(#ffffff 1%, rgba(0, 0, 0, 0))
+		@mixin background($grad-start, $grad-end)
+			background: radial-gradient(circle farthest-side at right bottom, $grad-start, $grad-end)
+		.icon-cancel
+			@extend .icon-action
+			$grad-end: #911306
+			$grad-start: #cea29e
+			left: $left
+			@include background($grad-start, $grad-end)
 			&:hover
-				background: radial-gradient(circle farthest-side at right bottom, #cea29e, #911306)
+				@include background(lighten($grad-start, 10%), lighten($grad-end, 10%))
+		.icon-minimize
+			$grad-start: #c1bc62
+			$grad-end: #837700
+			@extend .icon-action
+			left: $left*2 + 5 // margin
+			@include background($grad-start, $grad-end)
+			&:hover
+				@include background(lighten($grad-start, 5%), lighten($grad-end, 5%))
+
 	.callContainerIcons
 		color: #259BBD
 	#callUserList

@@ -49,9 +49,14 @@
 	// call container
 	.modal-body
 		background: #282923
-		.icon-cancel
+		.icon-action
 			float: right
+		.icon-cancel
+			@extend .icon-action
 			color: rgb(177, 53, 51)
+		.icon-minimize
+			@extend .icon-action
+			color: rgb(177, 168, 0)
 	.windowHeader
 		background-color: #42433B
 	.callContainerIcons

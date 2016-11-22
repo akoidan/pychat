@@ -1910,25 +1910,25 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 }
 
 
-function TransferFileGrowl(fileName, fileSize, opponentName, isForSend) {
+function TransferFileWindow(fileName, fileSize, opponentName, isForSend) {
 	var self = this;
-	Growl.call(self);
-	self.showInfinity('transferFile');
-	self.dom =  {
-		growl: self.growl,
-		text: document.createElement('SPAN'),
-		fileInfo: document.createElement('table'),
-	};
+	Draggable.call(self, document.createElement('DIV'), "File transfer");
 	self.downloadBar = new DownloadBar();
+	self.dom.fileInfo = document.createElement('table');
 	self.init = function() {
+		document.querySelector('body').appendChild(self.dom.container);
+		CssUtils.addClass(self.dom.body, 'transferFile');
+		self.dom.iconMinimize = document.createElement('i');
+		self.dom.header.appendChild(self.dom.iconMinimize);
+		self.dom.iconMinimize.onclick = self.hide;
+		self.dom.iconMinimize.className = 'icon-minimize';
+		self.dom.iconCancel.onclick = self.noAction;
 		self.insertData('Status:', 'initing', 'fileStatus');
 		self.insertData('Name:', fileName);
 		self.insertData(isForSend ? 'To:' : "From:",opponentName);
 		self.insertData('Size:', bytesToSize(fileSize));
-		self.dom.growl.appendChild(self.dom.text);
-		self.dom.text.textContent = "File transfer";
-		self.dom.growl.appendChild(self.dom.fileInfo);
-		self.dom.growl.appendChild(self.downloadBar.dom.wrapper);
+		self.dom.body.appendChild(self.dom.fileInfo);
+		self.dom.body.appendChild(self.downloadBar.dom.wrapper);
 		self.downloadBar.hide();
 		self.downloadBar.setMax(fileSize);
 		if (!isForSend) {
@@ -1963,6 +1963,9 @@ function TransferFileGrowl(fileName, fileSize, opponentName, isForSend) {
 		self.hideButtons();
 		self.postYesAction();
 	};
+	self.remove = function () {
+		CssUtils.deleteElement(self.dom.container);
+	};
 	self.noAction = function () {
 		if (self.postNoAction) {
 			self.postNoAction();
@@ -1975,7 +1978,7 @@ function TransferFileGrowl(fileName, fileSize, opponentName, isForSend) {
 		self.dom.yesNoHolder = document.createElement('DIV');
 		self.dom.yes = document.createElement('INPUT');
 		self.dom.no = document.createElement('INPUT');
-		self.dom.growl.appendChild(self.dom.yesNoHolder);
+		self.dom.body.appendChild(self.dom.yesNoHolder);
 		self.dom.yesNoHolder.appendChild(self.dom.yes);
 		self.dom.yesNoHolder.appendChild(self.dom.no);
 		self.dom.yesNoHolder.className = 'yesNo';
@@ -1985,6 +1988,7 @@ function TransferFileGrowl(fileName, fileSize, opponentName, isForSend) {
 		self.dom.no.setAttribute('type', 'button');
 		self.dom.yes.setAttribute('value', 'Accept');
 		self.dom.no.setAttribute('value', 'Decline');
+		self.fixInputs();
 	};
 	self.setButtonActions = function (yesAction, noAction) {
 		self.postYesAction = yesAction;
@@ -2269,7 +2273,7 @@ function FileTransferHandler(receiverRoomId, connectionId) {
 		self.setOpponentVariables();
 		self.fileName = self.file.name;
 		self.fileSize = self.file.size;
-		self.lastGrowl = new TransferFileGrowl(self.fileName, self.fileSize, self.receiverName, true);
+		self.lastGrowl = new TransferFileWindow(self.fileName, self.fileSize, self.receiverName, true);
 		self.lastGrowl.setStatus("Establishing a connection");
 		self.sendOfferParent(quedId, {
 			name: self.fileName,
@@ -2282,7 +2286,7 @@ function FileTransferHandler(receiverRoomId, connectionId) {
 	self.showOffer = function (message) {
 		self.fileSize = parseInt(message.content.size);
 		self.fileName = message.content.name;
-		self.lastGrowl = new TransferFileGrowl(self.fileName, self.fileSize, self.receiverName, false);
+		self.lastGrowl = new TransferFileWindow(self.fileName, self.fileSize, self.receiverName, false);
 		self.lastGrowl.setStatus("Offered you a file");
 		self.lastGrowl.setButtonActions(self.acceptFileReply, self.declineFile);
 		notifier.notify(message.user, "Sends file {}".format(self.fileName));

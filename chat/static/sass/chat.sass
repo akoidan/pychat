@@ -206,6 +206,15 @@ p
 	right: 1px
 	font-size: 13px
 
+.icon-minimize
+	@extend .icon-cancel
+	right: 15px
+	top: -8px
+	font-size: 20px
+	&:before
+		content: '_'
+		font-weight: bolder
+
 .message-text-holder
 	overflow: hidden
 	padding-left: 5px
@@ -447,7 +456,10 @@ p
 		display: inline-block
 	.icon-cancel
 		float: right
-		color: rgb(177, 53, 51)
+		color: #b13533
+	.icon-minimize
+		float: right
+		color: #e2b500
 
 
 #chartdiv
@@ -720,17 +732,11 @@ p
 	top: -10px
 
 .transferFile
+	min-width: 200px
 	table
 		td:nth-child(1)
 			color: #79aeb6
 			font-weight: bold
-	span
-		font-size: 20px
-		color: #68a55d
-		font-weight: bold
-		text-align: center
-		display: block
-		padding-bottom: 10px
 	.yesNo
 		padding-top: 15px
 		display: flex
