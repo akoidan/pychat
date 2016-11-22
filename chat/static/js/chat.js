@@ -651,6 +651,7 @@ function ChannelsHandler() {
 		usersStateText: $('usersStateText'),
 		inviteUser: $('inviteUser'),
 		navCallIcon: $('navCallIcon'),
+		webRtcFileIcon: $('webRtcFileIcon'),
 		m2Message: $('m2Message')
 	};
 	self.getActiveChannel = function () {
@@ -737,9 +738,11 @@ function ChannelsHandler() {
 			if (chatHandler.isPrivate()) {
 				CssUtils.hideElement(self.dom.inviteUser);
 				CssUtils.showElement(self.dom.navCallIcon);
+				CssUtils.showElement(self.dom.webRtcFileIcon);
 			} else {
 				CssUtils.showElement(self.dom.inviteUser);
 				CssUtils.hideElement(self.dom.navCallIcon);
+				CssUtils.hideElement(self.dom.webRtcFileIcon);
 			}
 		}
 		userMessage.focus()
@@ -1946,10 +1949,12 @@ function TransferFileWindow(fileName, fileSize, opponentName, isForSend) {
 	};
 	self.setSuccessStatus = function (html) {
 		self.setStatus(html);
+		self.postNoAction = null;
 		self.dom.fileStatus.className = 'success'
 	};
 	self.setErrorStatus = function (html) {
 		self.setStatus(html);
+		self.postNoAction = null;
 		self.dom.fileStatus.className = 'error'
 	};
 	self.setStatus = function(innerHtml) {
@@ -1990,7 +1995,7 @@ function TransferFileWindow(fileName, fileSize, opponentName, isForSend) {
 		self.dom.no.setAttribute('value', 'Decline');
 		self.fixInputs();
 	};
-	self.setButtonActions = function (yesAction, noAction) {
+	self.setButtonActions = function (noAction,yesAction) {
 		self.postYesAction = yesAction;
 		self.postNoAction = noAction;
 	};
@@ -2046,7 +2051,7 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 	self.sendChannel = null;
 	self.connectionId = connectionId;
 	self.receiverRoomId = receiverRoomId;
-	self.pc = {};
+	self.pc = null;
 	self.fileCallType = null;
 	var webRtcUrl = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 	self.pc_config = {iceServers: [{url: webRtcUrl}]};
@@ -2086,6 +2091,14 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 		wsHandler.sendToServer({
 			action: 'destroyConnection',
 			type: 'decline',
+			connId: self.connectionId,
+			handler: self.fileCallType
+		});
+	};
+	self.finish = function () {
+		wsHandler.sendToServer({
+			action: 'destroyConnection',
+			type: 'finish',
 			connId: self.connectionId,
 			handler: self.fileCallType
 		});
@@ -2179,21 +2192,17 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 		};
 	};
 	self.closeEvents = function (text) {
-		try {
-			if (self.sendChannel) {
-				console.log(self.getDebugMessage("Closing chanel"));
-				self.sendChannel.close();
-			} else {
-				console.log(self.getDebugMessage("No channels to close"));
-			}
-			if (self.pc) {
-				console.log(self.getDebugMessage("Closing peer connection"));
-				self.pc.close();
-			} else {
-				console.log(self.getDebugMessage("No peer connection to close"));
-			}
-		} catch (error) {
-			console.error(self.getDebugMessage('{} Error while closing channels, description {}', error.message, error, name));
+		if (self.sendChannel && self.sendChannel.readyState != 'closed') {
+			console.log(self.getDebugMessage("Closing chanel"));
+			self.sendChannel.close();
+		} else {
+			console.log(self.getDebugMessage("No channels to close"));
+		}
+		if (self.pc && self.pc.signalingState != 'closed') {
+			console.log(self.getDebugMessage("Closing peer connection"));
+			self.pc.close();
+		} else {
+			console.log(self.getDebugMessage("No peer connection to close"));
 		}
 		self.destroy();
 		if (text) {
@@ -2274,11 +2283,21 @@ function FileTransferHandler(receiverRoomId, connectionId) {
 		self.fileName = self.file.name;
 		self.fileSize = self.file.size;
 		self.lastGrowl = new TransferFileWindow(self.fileName, self.fileSize, self.receiverName, true);
+		self.lastGrowl.setButtonActions(self.closeWindowClick);
 		self.lastGrowl.setStatus("Establishing a connection");
 		self.sendOfferParent(quedId, {
 			name: self.fileName,
 			size: self.fileSize
 		});
+	};
+	self.onfinish = function () {
+		self.lastGrowl.setErrorStatus("Opponent closed connection");
+		self.lastGrowl.hideButtons();
+		self.closeEvents();
+	};
+	self.closeWindowClick = function() {
+		self.finish();
+		self.closeEvents();
 	};
 	self.onaccept = function (message) {
 		self.lastGrowl.downloadBar.show();
@@ -2288,7 +2307,7 @@ function FileTransferHandler(receiverRoomId, connectionId) {
 		self.fileName = message.content.name;
 		self.lastGrowl = new TransferFileWindow(self.fileName, self.fileSize, self.receiverName, false);
 		self.lastGrowl.setStatus("Offered you a file");
-		self.lastGrowl.setButtonActions(self.acceptFileReply, self.declineFile);
+		self.lastGrowl.setButtonActions(self.declineFile, self.acceptFileReply);
 		notifier.notify(message.user, "Sends file {}".format(self.fileName));
 	};
 	self.ondecline = function () {
@@ -2322,7 +2341,12 @@ function FileTransferHandler(receiverRoomId, connectionId) {
 		reader.onload = (function () {
 			return function (e) {
 				if (self.sendChannel.readyState == 'open') {
-					self.sendChannel.send(e.target.result);
+					try {
+						self.sendChannel.send(e.target.result);
+					} catch (error) {
+						console.log(getDebugMessage(error));
+						growlError("Connection loss while sending file {} to user {}".format(self.fileName, self.receiverName));
+					}
 					if (self.fileSize > offset + e.target.result.byteLength) {
 						window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
 					}
@@ -2721,7 +2745,7 @@ function CallHandler(receiverRoomId, connectionId) {
 		/*also executes removing event on exiting from fullscreen*/
 	};
 	self.hangUp = function () {
-		self.sendBaseEvent('finish');
+		self.finish();
 		self.closeEvents("Call is finished.");
 	};
 	self.ondecline = function () {

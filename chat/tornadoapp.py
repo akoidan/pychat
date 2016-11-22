@@ -95,10 +95,6 @@ class VarNames(object):
 	CONNECTION_ID = 'connId'
 
 
-class WebrtcMethod(object):
-	OFFER = 'offer'
-
-
 class HandlerNames:
 	NAME = 'handler'
 	CHANNELS = 'channels'
@@ -468,7 +464,11 @@ class MessagesHandler(MessagesCreator):
 		self.publish(prepared_message, channel)
 
 	def close_and_proxy_connection(self, in_message):
-		self.proxy_webrtc(in_message, True)
+		conn_info = self.webrtc_ids[in_message[VarNames.CONNECTION_ID]]
+		if conn_info.get(VarNames.CONNECTION_ID):
+			self.proxy_webrtc(in_message, True)
+		else:
+			self.publish(in_message, conn_info[VarNames.CHANNEL], True)
 		self.close_connection(in_message)
 
 	def accept_and_proxy_connection(self, in_message):
@@ -486,7 +486,7 @@ class MessagesHandler(MessagesCreator):
 	def accept_connection(self, in_message):
 		conn_id = in_message[VarNames.CONNECTION_ID]
 		self.logger.debug("Enabling connection %s", conn_id)
-		self.webrtc_ids[conn_id][VarNames.CHANNEL] = in_message[VarNames.CHANNEL]
+		self.webrtc_ids[conn_id][VarNames.CONNECTION_ID] = in_message[VarNames.CHANNEL]
 
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.CHANNEL]
@@ -501,7 +501,8 @@ class MessagesHandler(MessagesCreator):
 			Prefetch('user', queryset=User.objects.all().only('username'))
 		).get()
 		self.webrtc_ids[connection_id] = {
-			VarNames.CHANNEL: None,
+			VarNames.CHANNEL: RedisPrefix.generate_user(room_users.user_id),
+			VarNames.CONNECTION_ID: None,
 			HandlerNames.NAME: webrtc_type
 		}
 		opponent_message = self.offer_webrtc(content,connection_id, webrtc_type)
@@ -511,7 +512,7 @@ class MessagesHandler(MessagesCreator):
 		)
 		self.safe_write(self_message)
 		self.logger.info('!! Offering a call, connection_id %s', connection_id)
-		self.publish(opponent_message, RedisPrefix.generate_user(room_users.user_id), True)
+		self.publish(opponent_message, self.webrtc_ids[connection_id][VarNames.CHANNEL], True)
 
 	def proxy_webrtc(self, in_message, parsable=False):
 		"""
@@ -521,12 +522,12 @@ class MessagesHandler(MessagesCreator):
 		# not to all tab opened by this user
 		# thus on response
 		connection_id = in_message[VarNames.CONNECTION_ID]
-		channel = self.webrtc_ids[connection_id].get(VarNames.CHANNEL)
+		channel = self.webrtc_ids[connection_id].get(VarNames.CONNECTION_ID)
 		if channel:
 			self.logger.info('!! Processing %s to channel %s', connection_id, channel)
 			self.publish(in_message, channel, parsable)
 		else:
-			raise ValidationError("Connection {} is not ready yet. Avaialbe connections are: ".format(connection_id, self.webrtc_ids))
+			raise Exception("Connection {} is not ready yet. Avaialbe connections are: ".format(connection_id, self.webrtc_ids))
 
 
 	def create_new_room(self, message):
@@ -645,7 +646,7 @@ class MessagesHandler(MessagesCreator):
 	def set_opponent_call_channel(self, message):
 		connection_id = message[VarNames.CONNECTION_ID]
 		self.webrtc_ids[connection_id] = {
-			VarNames.CHANNEL: message[VarNames.CHANNEL],
+			VarNames.CONNECTION_ID: message[VarNames.CHANNEL],
 			HandlerNames.NAME: message[HandlerNames.NAME]
 		}
 
