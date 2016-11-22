@@ -69,6 +69,7 @@ class Actions(object):
 	ADD_USER = 'addUserToAll'
 	OFFLINE_MESSAGES = 'loadOfflineMessages'
 	SET_WEBRTC_ID = 'setConnectionId'
+	SET_WEBRTC_ERROR = 'setError'
 	OFFER_WEBRTC_CONNECTION = 'offerWebrtc'
 
 
@@ -165,6 +166,13 @@ class MessagesCreator(object):
 			VarNames.CONNECTION_ID: connection_id,
 			VarNames.WEBRTC_QUED_ID: qued_id
 		}
+
+	def set_webrtc_error(self, error, connection_id, qued_id=None):
+		message = self.default(error, Actions.SET_WEBRTC_ERROR, HandlerNames.FILE) # TODO file/call
+		message[VarNames.CONNECTION_ID] = connection_id
+		if qued_id:
+			message[VarNames.WEBRTC_QUED_ID] = qued_id
+		return message
 
 	@classmethod
 	def create_message(cls, message):
@@ -464,8 +472,9 @@ class MessagesHandler(MessagesCreator):
 		self.publish(prepared_message, channel)
 
 	def close_and_proxy_connection(self, in_message):
-		conn_info = self.webrtc_ids[in_message[VarNames.CONNECTION_ID]]
-		if conn_info.get(VarNames.CONNECTION_ID):
+		conn_id = in_message[VarNames.CONNECTION_ID]
+		conn_info = self.webrtc_ids.get(conn_id)
+		if not conn_info or conn_info.get(VarNames.CONNECTION_ID):
 			self.proxy_webrtc(in_message, True)
 		else:
 			self.publish(in_message, conn_info[VarNames.CHANNEL], True)
@@ -492,27 +501,32 @@ class MessagesHandler(MessagesCreator):
 		room_id = in_message[VarNames.CHANNEL]
 		webrtc_type = in_message[HandlerNames.NAME]
 		content = in_message.get(VarNames.CONTENT)
+		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
 		connection_id = id_generator(6)
-		room_users = User.rooms.through.objects.filter(  # TODO if send to self this will throw  RoomUsers matching query does not exist., because of ~Q(user_id=self.user_id),
+		# TODO if send to self this will throw  RoomUsers matching query does not exist., because of ~Q(user_id=self.user_id),
+		room_users = self.do_db(RoomUsers.objects.filter(
 			~Q(user_id=self.user_id),
 			Q(room_id=room_id),
 			Q(room__name__isnull=True)
-		).prefetch_related(
-			Prefetch('user', queryset=User.objects.all().only('username'))
-		).get()
-		self.webrtc_ids[connection_id] = {
-			VarNames.CHANNEL: RedisPrefix.generate_user(room_users.user_id),
-			VarNames.CONNECTION_ID: None,
-			HandlerNames.NAME: webrtc_type
-		}
-		opponent_message = self.offer_webrtc(content,connection_id, webrtc_type)
-		self_message = self.set_connection_id(
-			in_message[VarNames.WEBRTC_QUED_ID],
-			connection_id
-		)
-		self.safe_write(self_message)
-		self.logger.info('!! Offering a call, connection_id %s', connection_id)
-		self.publish(opponent_message, self.webrtc_ids[connection_id][VarNames.CHANNEL], True)
+		).select_related('user__username').get)
+		# extra(select={'username': 'select username from chat_user where chat_user.id = user_id'}
+		if room_users.user_id not in self.get_online_from_redis(room_id):
+			self.set_webrtc_error(
+				"User {} is not online".format(room_users.username),
+				None,
+				qued_id
+			)
+		else:
+			self.webrtc_ids[connection_id] = {
+				VarNames.CHANNEL: RedisPrefix.generate_user(room_users.user_id),
+				VarNames.CONNECTION_ID: None,
+				HandlerNames.NAME: webrtc_type
+			}
+			opponent_message = self.offer_webrtc(content,connection_id, webrtc_type)
+			self_message = self.set_connection_id(qued_id, connection_id)
+			self.safe_write(self_message)
+			self.logger.info('!! Offering a call, connection_id %s', connection_id)
+			self.publish(opponent_message, self.webrtc_ids[connection_id][VarNames.CHANNEL], True)
 
 	def proxy_webrtc(self, in_message, parsable=False):
 		"""
@@ -522,12 +536,24 @@ class MessagesHandler(MessagesCreator):
 		# not to all tab opened by this user
 		# thus on response
 		connection_id = in_message[VarNames.CONNECTION_ID]
-		channel = self.webrtc_ids[connection_id].get(VarNames.CONNECTION_ID)
-		if channel:
-			self.logger.info('!! Processing %s to channel %s', connection_id, channel)
-			self.publish(in_message, channel, parsable)
+		conn_info = self.webrtc_ids.get(connection_id)
+		if conn_info:
+			channel = conn_info.get(VarNames.CONNECTION_ID)
+			if channel:
+				self.logger.info('!! Processing %s to channel %s', connection_id, channel)
+				self.publish(in_message, channel, parsable)
+			else:
+				self.safe_write(self.set_webrtc_error(
+					"Connection {} is not ready yet. Available connections are: {}".format(
+						connection_id, self.webrtc_ids),
+					connection_id)
+				)
 		else:
-			raise Exception("Connection {} is not ready yet. Avaialbe connections are: ".format(connection_id, self.webrtc_ids))
+			self.safe_write(self.set_webrtc_error(
+				"Connection {} doesnt exists yet. Available connections are: {}".format(
+					connection_id, self.webrtc_ids),
+				connection_id)
+			)
 
 
 	def create_new_room(self, message):

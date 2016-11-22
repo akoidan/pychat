@@ -2299,6 +2299,13 @@ function FileTransferHandler(receiverRoomId, connectionId) {
 		self.finish();
 		self.closeEvents();
 	};
+	self.onsetError = function(message) {
+		if (self.lastGrowl) {
+			self.lastGrowl.setErrorStatus(message.content);
+		} else {
+			console.log(self.getDebugMessage("Setting status to '{}' failed", message.content))
+		}
+	};
 	self.onaccept = function (message) {
 		self.lastGrowl.downloadBar.show();
 	};
@@ -2423,6 +2430,9 @@ function CallHandler(receiverRoomId, connectionId) {
 			minimize: $('fs-minimize'),
 			enterFullScreen: $('enterFullScreen')
 		}
+	};
+	self.onsetError = function(message) {
+		growlError(message.content)
 	};
 	self.sendAccept = function () {
 		self.sendBaseEvent()
