@@ -2033,7 +2033,6 @@ function DownloadBar() {
 		CssUtils.removeClass(self.dom.wrapper, self.SUCC_CLASS);
 		CssUtils.removeClass(self.dom.wrapper, self.ERR_CLASS);
 		CssUtils.addClass(self.dom.wrapper, self.PROGRESS_CLASS);
-		CssUtils.showElement(self.dom.wrapper);
 		self.setValue(0);
 	};
 }
@@ -2052,6 +2051,9 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 			/*{DtlsSrtpKeyAgreement: true},*/
 			{RtpDataChannels: false /*true*/}
 		]
+	};
+	self.onaccept = function (message) {
+		console.log(self.getDebugMessage("User accepted connection"));
 	};
 	self.getDebugMessage = function () {
 		return getDebugMessage.apply(this, arguments) + ", connId: " +self.connectionId ;
@@ -2195,7 +2197,6 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 		}
 	};
 	self.onreceiveChannelOpen = function () {
-		self.lastGrowl.setStatus("Receiving a file");
 	};
 	self.createSendChannelAndOffer = function () {
 		self.webrtcInitiator = true;
@@ -2298,6 +2299,9 @@ function FileTransferHandler(receiverRoomId, connectionId) {
 		self.lastGrowl.downloadBar.show();
 		self.createPeerConnection();
 		self.createSendChannelAndOffer();
+	};
+	self.onreceiveChannelOpen = function () {
+		self.lastGrowl.setStatus("Receiving a file");
 	};
 	self.channelOpen = function () {
 		console.log(self.getDebugMessage('file is {} {} {} {}', self.fileName, self.fileSize, self.file.type, self.file.lastModifiedDate));

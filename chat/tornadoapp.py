@@ -126,6 +126,7 @@ class MessagesCreator(object):
 		super(MessagesCreator, self).__init__(*args, **kwargs)
 		self.sex = None
 		self.sender_name = None
+		self.id = None  # child init
 		self.user_id = 0  # anonymous by default
 
 	def default(self, content, event, handler):
@@ -150,14 +151,14 @@ class MessagesCreator(object):
 		room_less[VarNames.GENDER] = self.sex
 		return room_less
 
-	def offer_webrtc(self, content, channel, connection_id, type):
+	def offer_webrtc(self, content, connection_id, type):
 		"""
 		:return: {"action": "call", "content": content, "time": "20:48:57"}
 		"""
 		message = self.default(content, Actions.OFFER_WEBRTC_CONNECTION, HandlerNames.WEBRTC)
 		message[VarNames.USER] = self.sender_name
 		message[VarNames.CONNECTION_ID] = connection_id
-		message[VarNames.CHANNEL] = channel
+		message[VarNames.CHANNEL] = self.id
 		message[VarNames.WEBRTC_TYPE] = type
 		return message
 
@@ -471,17 +472,21 @@ class MessagesHandler(MessagesCreator):
 		self.close_connection(in_message)
 
 	def accept_and_proxy_connection(self, in_message):
+		in_message[VarNames.CHANNEL] = self.id
 		self.proxy_webrtc(in_message, True)
 
 	def close_connection(self, in_message):
 		conn_id = in_message[VarNames.CONNECTION_ID]
-		self.logger.debug("Deleting connection %s", conn_id)
-		del self.webrtc_ids[conn_id]
+		if self.webrtc_ids.get(conn_id):
+			self.logger.debug("Deleting connection %s", conn_id)
+			del self.webrtc_ids[conn_id]
+		else:
+			self.logger.debug("Not closing connection for %s, available are %s", conn_id, self.webrtc_ids)
 
 	def accept_connection(self, in_message):
 		conn_id = in_message[VarNames.CONNECTION_ID]
 		self.logger.debug("Enabling connection %s", conn_id)
-		self.webrtc_ids[conn_id]['ready'] = True
+		self.webrtc_ids[conn_id][VarNames.CHANNEL] = in_message[VarNames.CHANNEL]
 
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.CHANNEL]
@@ -496,18 +501,17 @@ class MessagesHandler(MessagesCreator):
 			Prefetch('user', queryset=User.objects.all().only('username'))
 		).get()
 		self.webrtc_ids[connection_id] = {
-			'ready': False,
-			VarNames.CHANNEL: RedisPrefix.generate_user(room_users.user_id),
+			VarNames.CHANNEL: None,
 			HandlerNames.NAME: webrtc_type
 		}
-		opponent_message = self.offer_webrtc(content, room_id, connection_id, webrtc_type)
+		opponent_message = self.offer_webrtc(content,connection_id, webrtc_type)
 		self_message = self.set_connection_id(
 			in_message[VarNames.WEBRTC_QUED_ID],
 			connection_id
 		)
 		self.safe_write(self_message)
 		self.logger.info('!! Offering a call, connection_id %s', connection_id)
-		self.publish(opponent_message, self.webrtc_ids[connection_id][VarNames.CHANNEL], True)
+		self.publish(opponent_message, RedisPrefix.generate_user(room_users.user_id), True)
 
 	def proxy_webrtc(self, in_message, parsable=False):
 		"""
@@ -517,9 +521,8 @@ class MessagesHandler(MessagesCreator):
 		# not to all tab opened by this user
 		# thus on response
 		connection_id = in_message[VarNames.CONNECTION_ID]
-		connection_info = self.webrtc_ids[connection_id]
-		channel = connection_info[VarNames.CHANNEL]
-		if connection_info['ready']:
+		channel = self.webrtc_ids[connection_id].get(VarNames.CHANNEL)
+		if channel:
 			self.logger.info('!! Processing %s to channel %s', connection_id, channel)
 			self.publish(in_message, channel, parsable)
 		else:
@@ -642,8 +645,7 @@ class MessagesHandler(MessagesCreator):
 	def set_opponent_call_channel(self, message):
 		connection_id = message[VarNames.CONNECTION_ID]
 		self.webrtc_ids[connection_id] = {
-			'ready': True,
-			VarNames.CHANNEL: RedisPrefix.generate_user(message[VarNames.USER_ID]),
+			VarNames.CHANNEL: message[VarNames.CHANNEL],
 			HandlerNames.NAME: message[HandlerNames.NAME]
 		}
 
@@ -876,6 +878,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			# get all missed messages
 			self.channels = []  # py2 doesn't support clear()
 			self.channels.append(self.channel)
+			self.channels.append(self.id)
 			for room_id in user_rooms:
 				self.channels.append(room_id)
 			self.listen(self.channels)
