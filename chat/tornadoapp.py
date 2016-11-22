@@ -359,10 +359,13 @@ class MessagesHandler(MessagesCreator):
 	def do_db(self, callback, *args, **kwargs):
 		try:
 			return callback(*args, **kwargs)
-		except (OperationalError, InterfaceError) as e:  # Connection has gone away
-			self.logger.warning('%s, reconnecting' % e)  # TODO
-			connection.close()
-			return callback(*args, **kwargs)
+		except (OperationalError, InterfaceError) as e:
+			if 'MySQL server has gone away' in str(e):
+				self.logger.warning('%s, reconnecting' % e)
+				connection.close()
+				return callback(*args, **kwargs)
+			else:
+				raise e
 
 	def execute_query(self, query, *args, **kwargs):
 		cursor = connection.cursor()
