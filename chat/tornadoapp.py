@@ -21,6 +21,7 @@ from redis_sessions.session import SessionStore
 from tornado import ioloop
 from tornado.websocket import WebSocketHandler
 
+from chat.cookies_middleware import create_id
 from chat.log_filters import id_generator
 from chat.utils import extract_photo
 
@@ -112,9 +113,7 @@ class HandlerNames:
 class RedisPrefix:
 	USER_ID_CHANNEL_PREFIX = 'u'
 	DEFAULT_CHANNEL = ALL_ROOM_ID
-	WS_ID_USERID = 'user_id'
-	WS_ID_LENGTH = 12
-	CONNECTION_ID_LENGTH = 8
+	CONNECTION_ID_LENGTH = 8  # should be secure
 
 	@classmethod
 	def generate_user(cls, key):
@@ -225,10 +224,6 @@ class MessagesCreator(object):
 		}
 
 	@property
-	def stored_redis_user(self):
-		return self.user_id
-
-	@property
 	def channel(self):
 		return RedisPrefix.generate_user(self.user_id)
 
@@ -294,9 +289,7 @@ class WebrtcIds():
 
 	def add_connection(self, id, value):
 		self.ids[id] = value
-		self.async_redis.hset(self.ws_user_id, id, self.stringtify(value))
 
-	def add_item
 	def stringtify(self, value):
 		return json.dumps(value)
 
@@ -409,24 +402,26 @@ class MessagesHandler(MessagesCreator):
 			for row in cursor.fetchall()
 			]
 
-	def get_online_from_redis(self, channel, check_user_id=None, check_hash=None):
+	def get_online_from_redis(self, channel, check_self_online=False):
 		"""
 		:rtype : dict
 		returns (dict, bool) if check_type is present
 		"""
-		online = self.sync_redis.hgetall(channel)
+		online = self.sync_redis.smembers(channel)
 		self.logger.debug('!! channel %s redis online: %s', channel, online)
 		result = set()
 		user_is_online = False
-		# redis stores REDIS_USER_FORMAT, so parse them
+		# redis stores8 REDIS_USER_FORMAT, so parse them
 		if online:
-			for key_hash, raw_user_id in online.items():  # py2 iteritems
-				user_id = int(raw_user_id.decode('utf-8'))
-				if user_id == check_user_id and check_hash != key_hash.decode('utf-8'):
+			for raw in online:  # py2 iteritems
+				decoded = raw.decode('utf-8')
+				# : char specified in cookies_middleware.py.create_id
+				user_id = int(decoded.split(':')[0])
+				if user_id == self.user_id and decoded != self.id:
 					user_is_online = True
 				result.add(user_id)
 		result = list(result)
-		return (result, user_is_online) if check_user_id else result
+		return (result, user_is_online) if check_self_online else result
 
 	def add_online_user(self, room_id, offline_messages=None):
 		"""
@@ -434,9 +429,9 @@ class MessagesHandler(MessagesCreator):
 		online_users = { connection_hash1 = stored_redis_user1, connection_hash_2 = stored_redis_user2 }
 		:return:
 		"""
-		self.async_redis_publisher.hset(room_id, self.id, self.stored_redis_user)
+		self.async_redis_publisher.sadd(room_id, self.id)
 		# since we add user to online first, latest trigger will always show correct online
-		online, is_online = self.get_online_from_redis(room_id, self.user_id, self.id)
+		online, is_online = self.get_online_from_redis(room_id, True)
 		if not is_online:  # if a new tab has been opened
 			online.append(self.user_id)
 			online_user_names_mes = self.room_online(
@@ -542,12 +537,11 @@ class MessagesHandler(MessagesCreator):
 		content = in_message.get(VarNames.CONTENT)
 		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
 		connection_id = id_generator(RedisPrefix.CONNECTION_ID_LENGTH)
-		if len(self.get_online_from_redis(room_id)) == 1:
+		if not self.get_online_from_redis(room_id, True)[1]:
 			self.set_webrtc_error("Nobody's online", None, qued_id)
 		else:
-			self.webrtc_ids[connection_id] = {
-
-			}
+			# use list because sets dont have 1st element which is offerer
+			self.async_redis.hset(connection_id, self.id, 'sender')
 			opponents_message = self.offer_webrtc(content,connection_id, webrtc_type)
 			self_message = self.set_connection_id(qued_id, connection_id)
 			self.safe_write(self_message)
@@ -558,21 +552,18 @@ class MessagesHandler(MessagesCreator):
 		"""
 		:type in_message: dict
 		"""
-		# TODO multirtc send data only to specific tab,
-		# not to all tab opened by this user
-		# thus on response
 		connection_id = in_message[VarNames.CONNECTION_ID]
-		conn_info = self.webrtc_ids.get(connection_id)
-		if conn_info:
-			channel = next(iter(conn_info))
-			self.logger.info('!! Processing %s to channel %s', connection_id, channel)
-			self.publish(in_message, channel, parsable)
-		else:
-			self.safe_write(self.set_webrtc_error(
-				"Connection {} doesnt exists yet. Available connections are: {}".format(
-					connection_id, self.webrtc_ids),
-				connection_id)
-			)
+		channel = in_message.get(VarNames.CHANNEL)
+		self_channel_status = self.sync_redis.hget(connection_id, self.id)
+		if channel: # if I'm sender
+			opponent_channel_status = self.sync_redis.hget(connection_id, channel)
+			if opponent_channel_status == 'ready' and self_channel_status == 'sender':
+				self.logger.info('!! Processing %s to channel %s', connection_id, channel)
+				self.publish(in_message, opponent_channel_status, parsable)
+		elif self_channel_status == 'accepted':
+			res = self.sync_redis.hscan(connection_id, match='sender')
+			self.publish(in_message, res)
+
 
 
 	def create_new_room(self, message):
@@ -690,10 +681,11 @@ class MessagesHandler(MessagesCreator):
 
 	def set_opponent_call_channel(self, message):
 		connection_id = message[VarNames.CONNECTION_ID]
-		if isinstance(self.webrtc_ids.get(connection_id), set):  # if got message from self
+		# if got message from self
+		conn_status = self.sync_redis.hget(connection_id, self.id)
+		if conn_status == 'sender':
 			return True
-		self.webrtc_ids[connection_id] = set()
-		self.webrtc_ids[connection_id].add(message[VarNames.OPPONENT_THREAD_ID])
+		self.async_redis.hset(connection_id, self.id, 'offered')
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -802,7 +794,7 @@ class MessagesHandler(MessagesCreator):
 	def publish_logout(self, channel, log_data):
 		# seems like async solves problem with connection lost and wrong data status
 		# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
-		online, is_online = self.get_online_from_redis(channel, self.user_id, self.id)
+		online, is_online = self.get_online_from_redis(channel, True)
 		log_data[channel] = {'online': online, 'is_online': is_online}
 		if not is_online:
 			message = self.room_online(online, Actions.LOGOUT, channel)
@@ -879,7 +871,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		for channel in self.channels:
 			if not isinstance(channel, Number):
 				continue
-			self.sync_redis.hdel(channel, self.id)
+			self.sync_redis.srem(channel, self.id)
 			if self.connected:
 				gone_offline = self.publish_logout(channel, log_data) or gone_offline
 		if gone_offline:
@@ -907,21 +899,9 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		When user opens new tab in browser wsHandler.wsConnectionId stores Id of current ws
 		So if ws loses a connection it still can reconnect with same id,
 		and TornadoHandler can restore webrtc_connections to previous state
-
-		Redis stores 8 charcters data for
-		@see MessagesHandler.webrtc_ids
 		"""
-		given_id = self.get_argument('id')
-		rewrite_id = True
-		if given_id and len(given_id) == RedisPrefix.WS_ID_LENGTH:
-			user_id = self.sync_redis.hget(given_id, RedisPrefix.WS_ID_USERID)
-			if user_id and int(user_id.decode('utf-8')) == self.user_id:
-				self.id = given_id
-				rewrite_id = False
-		if rewrite_id:
-			self.id = id_generator(RedisPrefix.WS_ID_LENGTH)
-			self.sync_redis.hset(self.id, RedisPrefix.WS_ID_USERID, self.user_id)
-			self.safe_write(self.set_ws_id())
+		self.id = create_id(self.user_id, self.get_argument('id'))
+		self.safe_write(self.set_ws_id())
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
@@ -932,7 +912,6 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.generate_self_id()
 			self.webrtc_ids = WebrtcIds(self.id, self.async_redis_publisher, self.sync_redis)
 			log_params = {
-				'user_id': str(self.user_id).zfill(3),
 				'id': self.id,
 				'ip': self.ip
 			}
