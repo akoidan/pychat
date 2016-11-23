@@ -1,7 +1,15 @@
 import random
 
 from chat import local
+from chat.log_filters import id_generator
+from chat.settings import WS_ID_CHAR_LENGTH
 from chat.utils import get_client_ip
+
+
+def create_id(user_id=0, random=None):
+	if not random or len(random) != WS_ID_CHAR_LENGTH:
+		random = id_generator(WS_ID_CHAR_LENGTH)
+	return "{:04d}:{}".format(user_id, random)
 
 
 class UserCookieMiddleWare(object):
@@ -15,6 +23,5 @@ class UserCookieMiddleWare(object):
 		try:
 			local.random
 		except AttributeError:
-			local.random = str(random.randint(0, pow(10,10))).rjust(10, '0')
-			local.user_id = str(getattr(request.user, 'id', '000')).zfill(3)
+			local.random = create_id(getattr(request.user, 'id'))
 			local.client_ip = get_client_ip(request)

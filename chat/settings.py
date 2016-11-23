@@ -253,11 +253,13 @@ LOGGING = {
 	},
 	'formatters': {
 		'django': {
-			'format': '%(user_id)s:%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
+			'format': '%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},
 }
+
+WS_ID_CHAR_LENGTH = 4
 
 
 logging.config.dictConfig(LOGGING)
