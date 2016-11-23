@@ -1577,7 +1577,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		return self.dom.roomNameLi.getAttribute(USER_ID_ATTR);
 	};
 	self.getUserNameById = function (id) {
-		return self.allUsers[id].user;
+		return self.allUsers[id] ? self.allUsers[id].user : null;
 	};
 	self.addUserToDom = function (message) {
 		if (!self.allUsers[message.userId]) {
@@ -2887,7 +2887,7 @@ function WebRtcApi() {
 		} else if (self.connections[data.connId]) {
 			self.connections[data.connId]['on'+data.type](data);
 		} else {
-			console.error(getDebugMessage('Connection "{}" is unknown. Availabe connections: "{}". Skipping message: "{}"', JSON.stringify(data), data.connId, JSON.stringify(self.connections)));
+			console.error(getDebugMessage('Connection "{}" is unknown. Availabe connections: "{}". Skipping message:',  data.connId, Object.keys(self.connections)));
 		}
 	};
 	self.offerCall = function () {

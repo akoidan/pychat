@@ -89,6 +89,7 @@ class VarNames(object):
 	ROOM_ID = 'roomId'
 	ROOM_USERS = 'users'
 	CHANNEL = 'channel'
+	OPPONENT_THREAD_ID = 'opponentId'
 	GET_MESSAGES_COUNT = 'count'
 	GET_MESSAGES_HEADER_ID = 'headerId'
 	CHANNEL_NAME = 'channel'
@@ -157,6 +158,7 @@ class MessagesCreator(object):
 		message[VarNames.CONNECTION_ID] = connection_id
 		message[VarNames.CHANNEL] = self.id
 		message[VarNames.WEBRTC_TYPE] = type
+		message[VarNames.OPPONENT_THREAD_ID] = self.id
 		return message
 
 	def set_connection_id(self, qued_id, connection_id):
@@ -215,7 +217,7 @@ class MessagesCreator(object):
 
 	@property
 	def stored_redis_user(self):
-		return  self.user_id
+		return self.user_id
 
 	@property
 	def channel(self):
@@ -453,9 +455,10 @@ class MessagesHandler(MessagesCreator):
 		if isinstance(data, str_type):  # subscribe event
 			prefixless_str = self.remove_parsable_prefix(data)
 			if prefixless_str:
-				self.safe_write(prefixless_str)
 				dict_message = json.loads(prefixless_str)
-				self.post_process_message[dict_message[VarNames.EVENT]](dict_message)
+				res = self.post_process_message[dict_message[VarNames.EVENT]](dict_message)
+				if not res:
+					self.safe_write(prefixless_str)
 			else:
 				self.safe_write(data)
 
@@ -481,17 +484,18 @@ class MessagesHandler(MessagesCreator):
 	def close_and_proxy_connection(self, in_message):
 		conn_id = in_message[VarNames.CONNECTION_ID]
 		conn_info = self.webrtc_ids.get(conn_id)
-		if not conn_info or conn_info.get(VarNames.CONNECTION_ID):
-			self.proxy_webrtc(in_message, True)
+		if len(conn_info) > 0:
+			for conn in conn_info:
+				self.publish(in_message, conn, True)
 		else:
-			self.publish(in_message, conn_info[VarNames.CHANNEL], True)
-		self.close_connection(in_message)
+			self.proxy_webrtc(in_message, True)
+		self.close_connection(in_message, True)
 
 	def accept_and_proxy_connection(self, in_message):
 		in_message[VarNames.CHANNEL] = self.id
 		self.proxy_webrtc(in_message, True)
 
-	def close_connection(self, in_message):
+	def close_connection(self, in_message, forever=False):
 		conn_id = in_message[VarNames.CONNECTION_ID]
 		if self.webrtc_ids.get(conn_id):
 			self.logger.debug("Deleting connection %s", conn_id)
@@ -501,8 +505,9 @@ class MessagesHandler(MessagesCreator):
 
 	def accept_connection(self, in_message):
 		conn_id = in_message[VarNames.CONNECTION_ID]
-		self.logger.debug("Enabling connection %s", conn_id)
-		self.webrtc_ids[conn_id][VarNames.CONNECTION_ID] = in_message[VarNames.CHANNEL]
+		channel = in_message[VarNames.CHANNEL]
+		self.logger.debug("Adding thread %s to connection %s", channel, conn_id)
+		self.webrtc_ids[conn_id].add(channel)
 
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.CHANNEL]
@@ -510,30 +515,17 @@ class MessagesHandler(MessagesCreator):
 		content = in_message.get(VarNames.CONTENT)
 		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
 		connection_id = id_generator(6)
-		# TODO if send to self this will throw  RoomUsers matching query does not exist., because of ~Q(user_id=self.user_id),
-		room_users = self.do_db(RoomUsers.objects.filter(
-			~Q(user_id=self.user_id),
-			Q(room_id=room_id),
-			Q(room__name__isnull=True)
-		).select_related('user__username').get)
-		# extra(select={'username': 'select username from chat_user where chat_user.id = user_id'}
-		if room_users.user_id not in self.get_online_from_redis(room_id):
-			self.set_webrtc_error(
-				"User {} is not online".format(room_users.username),
-				None,
-				qued_id
-			)
+		if len(self.get_online_from_redis(room_id)) == 1:
+			self.set_webrtc_error("Nobody's online", None, qued_id)
 		else:
 			self.webrtc_ids[connection_id] = {
-				VarNames.CHANNEL: RedisPrefix.generate_user(room_users.user_id),
-				VarNames.CONNECTION_ID: None,
-				HandlerNames.NAME: webrtc_type
+
 			}
-			opponent_message = self.offer_webrtc(content,connection_id, webrtc_type)
+			opponents_message = self.offer_webrtc(content,connection_id, webrtc_type)
 			self_message = self.set_connection_id(qued_id, connection_id)
 			self.safe_write(self_message)
 			self.logger.info('!! Offering a call, connection_id %s', connection_id)
-			self.publish(opponent_message, self.webrtc_ids[connection_id][VarNames.CHANNEL], True)
+			self.publish(opponents_message, room_id, True)
 
 	def proxy_webrtc(self, in_message, parsable=False):
 		"""
@@ -545,16 +537,9 @@ class MessagesHandler(MessagesCreator):
 		connection_id = in_message[VarNames.CONNECTION_ID]
 		conn_info = self.webrtc_ids.get(connection_id)
 		if conn_info:
-			channel = conn_info.get(VarNames.CONNECTION_ID)
-			if channel:
-				self.logger.info('!! Processing %s to channel %s', connection_id, channel)
-				self.publish(in_message, channel, parsable)
-			else:
-				self.safe_write(self.set_webrtc_error(
-					"Connection {} is not ready yet. Available connections are: {}".format(
-						connection_id, self.webrtc_ids),
-					connection_id)
-				)
+			channel = next(iter(conn_info))
+			self.logger.info('!! Processing %s to channel %s', connection_id, channel)
+			self.publish(in_message, channel, parsable)
 		else:
 			self.safe_write(self.set_webrtc_error(
 				"Connection {} doesnt exists yet. Available connections are: {}".format(
@@ -678,10 +663,10 @@ class MessagesHandler(MessagesCreator):
 
 	def set_opponent_call_channel(self, message):
 		connection_id = message[VarNames.CONNECTION_ID]
-		self.webrtc_ids[connection_id] = {
-			VarNames.CONNECTION_ID: message[VarNames.CHANNEL],
-			HandlerNames.NAME: message[HandlerNames.NAME]
-		}
+		if isinstance(self.webrtc_ids.get(connection_id), set):  # if got message from self
+			return True
+		self.webrtc_ids[connection_id] = set()
+		self.webrtc_ids[connection_id].add(message[VarNames.OPPONENT_THREAD_ID])
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -842,15 +827,15 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			if not self.connected:
 				raise ValidationError('Skipping message %s, as websocket is not initialized yet' % json_message)
 			if not json_message:
-				raise ValidationError('Skipping null message')
+				raise Exception('Skipping null message')
 			# self.anti_spam.check_spam(json_message)
 			self.logger.debug('<< %.1000s', json_message)
 			message = json.loads(json_message)
 			if message[VarNames.EVENT] not in self.pre_process_message:
-				raise ValidationError("event {} is unknown".format(message[VarNames.EVENT]))
+				raise Exception("event {} is unknown".format(message[VarNames.EVENT]))
 			channel = message.get(VarNames.CHANNEL)
 			if channel and channel not in self.channels:
-				raise ValidationError('Access denied for channel {}. Allowed channels: {}'.format(channel, self.channels ))
+				raise Exception('Access denied for channel {}. Allowed channels: {}'.format(channel, self.channels ))
 			self.pre_process_message[message[VarNames.EVENT]](message)
 		except ValidationError as e:
 			error_message = self.default(str(e.message), Actions.GROWL_MESSAGE, HandlerNames.GROWL)
