@@ -2917,17 +2917,23 @@ function WsHandler() {
 		onlineClass: 'online',
 		offlineClass: 'offline'
 	};
+	self.wsConnectionId = '';
 	self.handlers = {
 		channels: channelsHandler,
 		chat: channelsHandler,
 		file: webRtcApi,
 		call: webRtcApi,
+		ws: self,
 		webrtc: webRtcApi,
 		growl: {
 			handle: function (message) {
 				growlError(message.content);
 			}
 		}
+	};
+	self.handle = function (message) {
+		self.wsConnectionId = message.content;
+		console.log(getDebugMessage("CONNECTION ID HAS BEEN SET TO {}",self.wsConnectionId))
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
@@ -2984,7 +2990,7 @@ function WsHandler() {
 					"Android, Chrome, Opera, Safari, IE11, Edge, Firefox", window.browserVersion));
 			return;
 		}
-		self.ws = new WebSocket(API_URL);
+		self.ws = new WebSocket(API_URL+self.wsConnectionId);
 		self.ws.onmessage = self.onWsMessage;
 		self.ws.onclose = self.onWsClose;
 		self.ws.onopen = function () {

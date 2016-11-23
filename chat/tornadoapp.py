@@ -50,6 +50,7 @@ base_logger = logging.getLogger(__name__)
 
 class Actions(object):
 	LOGIN = 'addOnlineUser'
+	SET_WS_ID = 'setWsId'
 	LOGOUT = 'removeOnlineUser'
 	SEND_MESSAGE = 'sendMessage'
 	PRINT_MESSAGE = 'printMessage'
@@ -105,23 +106,24 @@ class HandlerNames:
 	WEBRTC = 'webrtc'
 	FILE = 'file'
 	CALL = 'call'
+	WS = 'ws'
 
 
 class RedisPrefix:
 	USER_ID_CHANNEL_PREFIX = 'u'
-	__ROOM_ONLINE__ = 'o:{}'
+	DEFAULT_CHANNEL = ALL_ROOM_ID
+	WS_ID_USERID = 'user_id'
+	WS_ID_LENGTH = 12
+	CONNECTION_ID_LENGTH = 8
 
 	@classmethod
 	def generate_user(cls, key):
 		return cls.USER_ID_CHANNEL_PREFIX + str(key)
 
-RedisPrefix.DEFAULT_CHANNEL = ALL_ROOM_ID
-
 
 class MessagesCreator(object):
 
 	def __init__(self, *args, **kwargs):
-		super(MessagesCreator, self).__init__(*args, **kwargs)
 		self.sex = None
 		self.sender_name = None
 		self.id = None  # child init
@@ -137,6 +139,13 @@ class MessagesCreator(object):
 			VarNames.USER_ID: self.user_id,
 			VarNames.TIME: get_milliseconds(),
 			HandlerNames.NAME: handler
+		}
+
+	def set_ws_id(self):
+		return {
+			HandlerNames.NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.SET_WS_ID,
+			VarNames.CONTENT: self.id
 		}
 
 	def room_online(self, online, event, channel):
@@ -275,13 +284,29 @@ class MessagesCreator(object):
 		return res
 
 
+class WebrtcIds():
+
+	def __init__(self, ws_user_id, async_redis, sync_redis):
+		self.ids = {}
+		self.ws_user_id = ws_user_id
+		self.async_redis = async_redis
+		self.async_redis = sync_redis
+
+	def add_connection(self, id, value):
+		self.ids[id] = value
+		self.async_redis.hset(self.ws_user_id, id, self.stringtify(value))
+
+	def add_item
+	def stringtify(self, value):
+		return json.dumps(value)
+
+
 class MessagesHandler(MessagesCreator):
 
 	def __init__(self, *args, **kwargs):
 		self.closed_channels = None
 		self.parsable_prefix = 'p'
 		super(MessagesHandler, self).__init__(*args, **kwargs)
-		self.id = id(self)
 		self.webrtc_ids = {}
 		self.ip = None
 		from chat import global_redis
@@ -315,24 +340,26 @@ class MessagesHandler(MessagesCreator):
 		}
 
 	def patch_tornadoredis(self):  # TODO remove this
-		self.async_redis.connection.old_read = self.async_redis.connection.read
-		def new_read(instance, *args, **kwargs):
+		fabric = type(self.async_redis.connection.readline)
+		self.async_redis.connection.old_read = self.async_redis.connection.readline
+		def new_read(new_self, callback=None):
 			try:
-				return instance.old_read(*args, **kwargs)
+				return new_self.old_read(callback=callback)
 			except Exception as e:
 				current_online = self.get_online_from_redis(RedisPrefix.DEFAULT_CHANNEL)
 				self.logger.error(e)
 				self.logger.error(
 					"Exception info: "
+					"self.id: %s ;;; "
 					"self.connected = '%s';;; "
 					"Redis default channel online = '%s';;; "
 					"self.channels = '%s';;; "
 					"self.closed_channels  = '%s';;;",
-					self.connected, current_online, self.channels, self.closed_channels
+					self.id, self.connected, current_online, self.channels, self.closed_channels
 				)
 				raise e
-		fabric = type(self.async_redis.connection.read)
-		self.async_redis.connection.read = fabric(new_read, self.async_redis.connection)
+
+		self.async_redis.connection.readline = fabric(new_read, self.async_redis.connection)
 
 	@property
 	def connected(self):
@@ -395,7 +422,7 @@ class MessagesHandler(MessagesCreator):
 		if online:
 			for key_hash, raw_user_id in online.items():  # py2 iteritems
 				user_id = int(raw_user_id.decode('utf-8'))
-				if user_id == check_user_id and check_hash != int(key_hash.decode('utf-8')):
+				if user_id == check_user_id and check_hash != key_hash.decode('utf-8'):
 					user_is_online = True
 				result.add(user_id)
 		result = list(result)
@@ -514,7 +541,7 @@ class MessagesHandler(MessagesCreator):
 		webrtc_type = in_message[HandlerNames.NAME]
 		content = in_message.get(VarNames.CONTENT)
 		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
-		connection_id = id_generator(6)
+		connection_id = id_generator(RedisPrefix.CONNECTION_ID_LENGTH)
 		if len(self.get_online_from_redis(room_id)) == 1:
 			self.set_webrtc_error("Nobody's online", None, qued_id)
 		else:
@@ -875,12 +902,35 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.logger.info("Close connection result: %s", log_data)
 			self.async_redis.disconnect()
 
+	def generate_self_id(self):
+		"""
+		When user opens new tab in browser wsHandler.wsConnectionId stores Id of current ws
+		So if ws loses a connection it still can reconnect with same id,
+		and TornadoHandler can restore webrtc_connections to previous state
+
+		Redis stores 8 charcters data for
+		@see MessagesHandler.webrtc_ids
+		"""
+		given_id = self.get_argument('id')
+		rewrite_id = True
+		if given_id and len(given_id) == RedisPrefix.WS_ID_LENGTH:
+			user_id = self.sync_redis.hget(given_id, RedisPrefix.WS_ID_USERID)
+			if user_id and int(user_id.decode('utf-8')) == self.user_id:
+				self.id = given_id
+				rewrite_id = False
+		if rewrite_id:
+			self.id = id_generator(RedisPrefix.WS_ID_LENGTH)
+			self.sync_redis.hset(self.id, RedisPrefix.WS_ID_USERID, self.user_id)
+			self.safe_write(self.set_ws_id())
+
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
 		if sessionStore.exists(session_key):
 			self.ip = self.get_client_ip()
 			session = SessionStore(session_key)
 			self.user_id = int(session["_auth_user_id"])
+			self.generate_self_id()
+			self.webrtc_ids = WebrtcIds(self.id, self.async_redis_publisher, self.sync_redis)
 			log_params = {
 				'user_id': str(self.user_id).zfill(3),
 				'id': self.id,
