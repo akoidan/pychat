@@ -41,7 +41,11 @@ api_url = getattr(settings, "IP_API_URL", None)
 
 sessionStore = SessionStore()
 
-base_logger = logging.getLogger(__name__)
+parent_logger = logging.getLogger(__name__)
+base_logger = logging.LoggerAdapter(parent_logger, {
+	'id': 0,
+	'ip': '000.000.000.000'
+})
 
 # TODO https://github.com/leporo/tornado-redis#connection-pool-support
 #CONNECTION_POOL = tornadoredis.ConnectionPool(
@@ -91,7 +95,7 @@ class VarNames(object):
 	ROOM_ID = 'roomId'
 	ROOM_USERS = 'users'
 	CHANNEL = 'channel'
-	OPPONENT_THREAD_ID = 'opponentId'
+	WEBRTC_OPPONENT_ID = 'opponentWsId'
 	GET_MESSAGES_COUNT = 'count'
 	GET_MESSAGES_HEADER_ID = 'headerId'
 	CHANNEL_NAME = 'channel'
@@ -164,9 +168,8 @@ class MessagesCreator(object):
 		message = self.default(content, Actions.OFFER_WEBRTC_CONNECTION, HandlerNames.WEBRTC)
 		message[VarNames.USER] = self.sender_name
 		message[VarNames.CONNECTION_ID] = connection_id
-		message[VarNames.CHANNEL] = self.id
 		message[VarNames.WEBRTC_TYPE] = type
-		message[VarNames.OPPONENT_THREAD_ID] = self.id
+		message[VarNames.WEBRTC_OPPONENT_ID] = self.id
 		return message
 
 	def set_connection_id(self, qued_id, connection_id):
@@ -279,21 +282,6 @@ class MessagesCreator(object):
 		return res
 
 
-class WebrtcIds():
-
-	def __init__(self, ws_user_id, async_redis, sync_redis):
-		self.ids = {}
-		self.ws_user_id = ws_user_id
-		self.async_redis = async_redis
-		self.async_redis = sync_redis
-
-	def add_connection(self, id, value):
-		self.ids[id] = value
-
-	def stringtify(self, value):
-		return json.dumps(value)
-
-
 class MessagesHandler(MessagesCreator):
 
 	def __init__(self, *args, **kwargs):
@@ -327,8 +315,6 @@ class MessagesHandler(MessagesCreator):
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
 			Actions.INVITE_USER: self.send_client_new_channel,
-			Actions.ACCEPT_WEBRTC: self.accept_connection,
-			Actions.CLOSE_WEBRTC: self.close_connection,
 			Actions.OFFER_WEBRTC_CONNECTION: self.set_opponent_call_channel
 		}
 
@@ -504,32 +490,22 @@ class MessagesHandler(MessagesCreator):
 		self.publish(prepared_message, channel)
 
 	def close_and_proxy_connection(self, in_message):
-		conn_id = in_message[VarNames.CONNECTION_ID]
-		conn_info = self.webrtc_ids.get(conn_id)
-		if len(conn_info) > 0:
-			for conn in conn_info:
-				self.publish(in_message, conn, True)
-		else:
-			self.proxy_webrtc(in_message, True)
-		self.close_connection(in_message, True)
+		is_err = self.proxy_webrtc(in_message)
+		if not is_err:
+			self.async_redis_publisher.hset(
+				in_message[VarNames.CONNECTION_ID],
+				self.id,
+				'closed'
+			)
 
 	def accept_and_proxy_connection(self, in_message):
-		in_message[VarNames.CHANNEL] = self.id
-		self.proxy_webrtc(in_message, True)
-
-	def close_connection(self, in_message, forever=False):
-		conn_id = in_message[VarNames.CONNECTION_ID]
-		if self.webrtc_ids.get(conn_id):
-			self.logger.debug("Deleting connection %s", conn_id)
-			del self.webrtc_ids[conn_id]
-		else:
-			self.logger.debug("Not closing connection for %s, available are %s", conn_id, self.webrtc_ids)
-
-	def accept_connection(self, in_message):
-		conn_id = in_message[VarNames.CONNECTION_ID]
-		channel = in_message[VarNames.CHANNEL]
-		self.logger.debug("Adding thread %s to connection %s", channel, conn_id)
-		self.webrtc_ids[conn_id].add(channel)
+		is_err = self.proxy_webrtc(in_message)
+		if not is_err:
+			self.async_redis_publisher.hset(
+				in_message[VarNames.CONNECTION_ID],
+				self.id,
+				'accepted'
+			)
 
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.CHANNEL]
@@ -537,34 +513,43 @@ class MessagesHandler(MessagesCreator):
 		content = in_message.get(VarNames.CONTENT)
 		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
 		connection_id = id_generator(RedisPrefix.CONNECTION_ID_LENGTH)
-		if not self.get_online_from_redis(room_id, True)[1]:
+		online, is_self_online = self.get_online_from_redis(room_id, True)
+		if len(online) == 1 and not is_self_online:
 			self.set_webrtc_error("Nobody's online", None, qued_id)
 		else:
 			# use list because sets dont have 1st element which is offerer
-			self.async_redis.hset(connection_id, self.id, 'sender')
-			opponents_message = self.offer_webrtc(content,connection_id, webrtc_type)
+			# TODO use sync redis?
+			self.async_redis_publisher.hset(connection_id, self.id, 'sender')
+			opponents_message = self.offer_webrtc(content, connection_id, webrtc_type)
 			self_message = self.set_connection_id(qued_id, connection_id)
 			self.safe_write(self_message)
 			self.logger.info('!! Offering a call, connection_id %s', connection_id)
 			self.publish(opponents_message, room_id, True)
 
-	def proxy_webrtc(self, in_message, parsable=False):
+	def proxy_webrtc(self, in_message):
 		"""
 		:type in_message: dict
 		"""
 		connection_id = in_message[VarNames.CONNECTION_ID]
-		channel = in_message.get(VarNames.CHANNEL)
+		channel = in_message.get(VarNames.WEBRTC_OPPONENT_ID)
 		self_channel_status = self.sync_redis.hget(connection_id, self.id)
-		if channel: # if I'm sender
-			opponent_channel_status = self.sync_redis.hget(connection_id, channel)
-			if opponent_channel_status == 'ready' and self_channel_status == 'sender':
-				self.logger.info('!! Processing %s to channel %s', connection_id, channel)
-				self.publish(in_message, opponent_channel_status, parsable)
-		elif self_channel_status == 'accepted':
-			res = self.sync_redis.hscan(connection_id, match='sender')
-			self.publish(in_message, res)
-
-
+		opponent_channel_status = self.sync_redis.hget(connection_id, channel)
+		self_channel_status = self_channel_status.decode('utf-8') if self_channel_status else None
+		opponent_channel_status = opponent_channel_status.decode('utf-8') if opponent_channel_status else None
+		if self_channel_status and opponent_channel_status and 'sender' in (self_channel_status, opponent_channel_status):
+			in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
+			self.logger.debug("Forwarding message to channel %s, self %s, other status %s",
+				channel, self_channel_status, opponent_channel_status
+			)
+			self.publish(in_message, channel)
+		else:
+			self.safe_write(self.set_webrtc_error(
+				'Error in connection status, your status is {} while opponent is %s'.format(
+					self_channel_status, opponent_channel_status
+				),
+				connection_id)
+			)
+			return True
 
 	def create_new_room(self, message):
 		room_name = message[VarNames.ROOM_NAME]
@@ -681,11 +666,9 @@ class MessagesHandler(MessagesCreator):
 
 	def set_opponent_call_channel(self, message):
 		connection_id = message[VarNames.CONNECTION_ID]
-		# if got message from self
-		conn_status = self.sync_redis.hget(connection_id, self.id)
-		if conn_status == 'sender':
+		if message[VarNames.WEBRTC_OPPONENT_ID] == self.id:
 			return True
-		self.async_redis.hset(connection_id, self.id, 'offered')
+		self.async_redis_publisher.hset(connection_id, self.id, 'offered')
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -910,12 +893,11 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			session = SessionStore(session_key)
 			self.user_id = int(session["_auth_user_id"])
 			self.generate_self_id()
-			self.webrtc_ids = WebrtcIds(self.id, self.async_redis_publisher, self.sync_redis)
 			log_params = {
 				'id': self.id,
 				'ip': self.ip
 			}
-			self._logger = logging.LoggerAdapter(base_logger, log_params)
+			self._logger = logging.LoggerAdapter(parent_logger, log_params)
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, self.id)
 			self.async_redis.connect()
 			user_db = self.do_db(User.objects.get, id=self.user_id)

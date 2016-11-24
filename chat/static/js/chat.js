@@ -737,12 +737,13 @@ function ChannelsHandler() {
 			chatHandler.show();
 			if (chatHandler.isPrivate()) {
 				CssUtils.hideElement(self.dom.inviteUser);
-				CssUtils.showElement(self.dom.navCallIcon);
-				CssUtils.showElement(self.dom.webRtcFileIcon);
+				//CssUtils.showElement(self.dom.navCallIcon);
+				//CssUtils.showElement(self.dom.webRtcFileIcon);
 			} else {
+				//  TODO multirtc
 				CssUtils.showElement(self.dom.inviteUser);
-				CssUtils.hideElement(self.dom.navCallIcon);
-				CssUtils.hideElement(self.dom.webRtcFileIcon);
+				//CssUtils.hideElement(self.dom.navCallIcon);
+				//CssUtils.hideElement(self.dom.webRtcFileIcon);
 			}
 		}
 		userMessage.focus()
@@ -2046,8 +2047,9 @@ function DownloadBar() {
 	};
 }
 
-function PeerConnectionHandler(receiverRoomId, connectionId) {
+function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 	var self = this;
+	self.opponentWsId = opponentWsId;
 	self.sendChannel = null;
 	self.connectionId = connectionId;
 	self.receiverRoomId = receiverRoomId;
@@ -2078,46 +2080,39 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 	self.isActive = function () {
 		return self.localStream && self.localStream.active;
 	};
-	self.sendBaseEvent = function (type, content) {
+	self.defaultSendEvent = function(action, type, content) {
 		wsHandler.sendToServer({
 			content: content,
-			action: 'sendRtcData',
+			action: action,
 			type: type,
 			connId: self.connectionId,
-			handler: self.fileCallType
+			handler: self.fileCallType,
+			opponentWsId: self.opponentWsId
 		});
+	};
+	self.sendBaseEvent = function (type, content) {
+		self.defaultSendEvent('sendRtcData' ,type, content);
 	};
 	self.decline = function () {
-		wsHandler.sendToServer({
-			action: 'destroyConnection',
-			type: 'decline',
-			connId: self.connectionId,
-			handler: self.fileCallType
-		});
+		self.defaultSendEvent('destroyConnection', 'decline');
 	};
 	self.finish = function () {
-		wsHandler.sendToServer({
-			action: 'destroyConnection',
-			type: 'finish',
-			connId: self.connectionId,
-			handler: self.fileCallType
-		});
+		self.defaultSendEvent('destroyConnection', 'finish');
 	};
 	self.accept = function () {
-		wsHandler.sendToServer({
-			action: 'acceptChannel',
-			type: 'accept',
-			connId: self.connectionId,
-			handler: self.fileCallType
-		});
+		self.defaultSendEvent('acceptChannel', 'accept');
 	};
 	self.setAnswerOpponentVariables = function (message) {
 		self.receiverName = message.user;
 		self.receiverId = message.userId;
 		self.sendBaseEvent("reply");
 	};
-	self.onreply = function () {
+	self.onreply = function (message) {
+		self.opponentWsId = message.opponentWsId; // TODO multirtc
 		self.setHeaderText("Conn. success, wait for accept".format(self.receiverName))
+	};
+	self.onSuccessAnswer = function () {
+		console.log(getDebugMessage('answer received'))
 	};
 	self.setOpponentVariables = function () {
 		var activeChannel = channelsHandler.channels[self.receiverRoomId];
@@ -2256,9 +2251,9 @@ function PeerConnectionHandler(receiverRoomId, connectionId) {
 	};
 }
 
-function FileTransferHandler(receiverRoomId, connectionId) {
+function FileTransferHandler(receiverRoomId, connectionId, opponentWsId) {
 	var self = this;
-	PeerConnectionHandler.call(self, receiverRoomId, connectionId);
+	PeerConnectionHandler.call(self, receiverRoomId, connectionId, opponentWsId);
 	self.fileCallType = 'file';
 	self.dom = {
 		fileInput: $('webRtcFileInput'), //
@@ -2872,7 +2867,7 @@ function WebRtcApi() {
 		// }
 
 		var className = message.content ? FileTransferHandler : CallHandler;
-		var handler = new className(message.channel, message.connId);
+		var handler = new className(message.channel, message.connId, message.opponentWsId);
 		self.connections[message.connId] = handler;
 		handler.setAnswerOpponentVariables(message);
 		handler.showOffer(message);
