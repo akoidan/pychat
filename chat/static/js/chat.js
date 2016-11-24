@@ -1950,12 +1950,10 @@ function TransferFileWindow(fileName, fileSize, opponentName, isForSend) {
 	};
 	self.setSuccessStatus = function (html) {
 		self.setStatus(html);
-		self.postNoAction = null;
 		self.dom.fileStatus.className = 'success'
 	};
 	self.setErrorStatus = function (html) {
 		self.setStatus(html);
-		self.postNoAction = null;
 		self.dom.fileStatus.className = 'error'
 	};
 	self.setStatus = function(innerHtml) {
@@ -1963,7 +1961,9 @@ function TransferFileWindow(fileName, fileSize, opponentName, isForSend) {
 		self.dom.fileStatus.innerHTML = innerHtml;
 	};
 	self.hideButtons = function () {
-		CssUtils.hideElement(self.dom.yesNoHolder)
+		if (self.dom.yesNoHolder) {
+			CssUtils.hideElement(self.dom.yesNoHolder)
+		}
 	};
 	self.yesAction = function () {
 		self.hideButtons();
@@ -2199,7 +2199,6 @@ function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 		} else {
 			console.log(self.getDebugMessage("No peer connection to close"));
 		}
-		self.destroy();
 		if (text) {
 			growlInfo(text);
 		}
@@ -2317,7 +2316,7 @@ function FileTransferHandler(receiverRoomId, connectionId, opponentWsId) {
 	};
 	self.declineFile = function () {
 		self.decline();
-		self.destroy();
+		self.closeWindowClick();
 	};
 	self.acceptFileReply = function () {
 		self.accept();

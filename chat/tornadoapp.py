@@ -490,22 +490,20 @@ class MessagesHandler(MessagesCreator):
 		self.publish(prepared_message, channel)
 
 	def close_and_proxy_connection(self, in_message):
-		is_err = self.proxy_webrtc(in_message)
-		if not is_err:
-			self.async_redis_publisher.hset(
-				in_message[VarNames.CONNECTION_ID],
-				self.id,
-				'closed'
-			)
+		self_status, opp_status = self.proxy_webrtc(in_message)
+		self.async_redis_publisher.hset(
+			in_message[VarNames.CONNECTION_ID],
+			self.id,
+			'sender_closed' if 'sender' in self_status else 'receiver_closed'
+		)
 
 	def accept_and_proxy_connection(self, in_message):
-		is_err = self.proxy_webrtc(in_message)
-		if not is_err:
-			self.async_redis_publisher.hset(
-				in_message[VarNames.CONNECTION_ID],
-				self.id,
-				'accepted'
-			)
+		self.proxy_webrtc(in_message)
+		self.async_redis_publisher.hset(
+			in_message[VarNames.CONNECTION_ID],
+			self.id,
+			'receiver_accepted'
+		)
 
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.CHANNEL]
@@ -519,7 +517,7 @@ class MessagesHandler(MessagesCreator):
 		else:
 			# use list because sets dont have 1st element which is offerer
 			# TODO use sync redis?
-			self.async_redis_publisher.hset(connection_id, self.id, 'sender')
+			self.async_redis_publisher.hset(connection_id, self.id, 'sender_ready')
 			opponents_message = self.offer_webrtc(content, connection_id, webrtc_type)
 			self_message = self.set_connection_id(qued_id, connection_id)
 			self.safe_write(self_message)
@@ -536,20 +534,17 @@ class MessagesHandler(MessagesCreator):
 		opponent_channel_status = self.sync_redis.hget(connection_id, channel)
 		self_channel_status = self_channel_status.decode('utf-8') if self_channel_status else None
 		opponent_channel_status = opponent_channel_status.decode('utf-8') if opponent_channel_status else None
-		if self_channel_status and opponent_channel_status and 'sender' in (self_channel_status, opponent_channel_status):
+		if not (self_channel_status and opponent_channel_status):
+			raise ValidationError('Error in connection status, your status is {} while opponent is %s'.format(
+				self_channel_status, opponent_channel_status
+			))
+		if 'closed' not in opponent_channel_status:
 			in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
 			self.logger.debug("Forwarding message to channel %s, self %s, other status %s",
 				channel, self_channel_status, opponent_channel_status
 			)
 			self.publish(in_message, channel)
-		else:
-			self.safe_write(self.set_webrtc_error(
-				'Error in connection status, your status is {} while opponent is %s'.format(
-					self_channel_status, opponent_channel_status
-				),
-				connection_id)
-			)
-			return True
+		return self_channel_status, opponent_channel_status
 
 	def create_new_room(self, message):
 		room_name = message[VarNames.ROOM_NAME]
@@ -668,7 +663,7 @@ class MessagesHandler(MessagesCreator):
 		connection_id = message[VarNames.CONNECTION_ID]
 		if message[VarNames.WEBRTC_OPPONENT_ID] == self.id:
 			return True
-		self.async_redis_publisher.hset(connection_id, self.id, 'offered')
+		self.async_redis_publisher.hset(connection_id, self.id, 'receiver_offered')
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
