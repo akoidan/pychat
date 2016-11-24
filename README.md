@@ -17,7 +17,7 @@ If you want to serve chat on your server:
 Instructions for *[Windows](https://www.microsoft.com/en-us/download/windows.aspx)*:
  1. Install [python](https://www.python.org/downloads/) with pip. Any version **Python2.7** or **Python 3.x** both are supported
  2. Add **pip** and **python** to `PATH` variable.
- 3. Install [redis](https://github.com/rgl/redis/downloads).
+ 3. Install [redis](https://github.com/MSOpenTech/redis/releases). Get the newest version or at least 2.8.
  4. Install [ruby](http://rubyinstaller.org/) and run `gem install sass` from command line as admin. Add **sass** command path to `PATH` variable
  5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector. 
  6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can downloads download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
