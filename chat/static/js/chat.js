@@ -2073,10 +2073,6 @@ function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 		console.log(self.getDebugMessage("Destroying peer connection"));
 		delete webRtcApi.connections[self.connectionId];
 	};
-	self.setConnectionId = function (id) {
-		self.connectionId = id;
-		self.waitForAnswer();
-	};
 	self.isActive = function () {
 		return self.localStream && self.localStream.active;
 	};
@@ -2114,14 +2110,6 @@ function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 	self.onSuccessAnswer = function () {
 		console.log(getDebugMessage('answer received'))
 	};
-	self.setOpponentVariables = function () {
-		var activeChannel = channelsHandler.channels[self.receiverRoomId];
-		if (!(Object.keys(activeChannel.onlineUsers).length > 1)) {
-			return activeChannel.getUserNameById(activeChannel.getOpponentId());
-		}
-		self.receiverId = activeChannel.getOpponentId(); // todo multirtc why receiverId?
-		self.receiverName = activeChannel.getUserNameById(self.receiverId);
-	};
 	self.answerToWebrtc = function () {
 		console.log(self.getDebugMessage('creating answer...'));
 		self.pc.createAnswer(function (answer) {
@@ -2130,18 +2118,6 @@ function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 				self.sendWebRtcEvent(answer);
 			}, self.failWebRtcP3);
 		}, self.failWebRtcP4, self.sdpConstraints);
-	};
-	self.sendOffer = function (quedId, content) {
-		var messageRequest = {
-			action: 'offerWebrtc',
-			channel: self.receiverRoomId,
-			handler: self.fileCallType,
-			id: quedId
-		};
-		if (content) {
-			messageRequest.content = content;
-		}
-		wsHandler.sendToServer(messageRequest);
 	};
 	self.print = function (message) {
 		console.log(self.getDebugMessage("Call message {}", JSON.stringify(message)));
@@ -2250,13 +2226,73 @@ function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 	};
 }
 
-function FileTransferHandler(receiverRoomId, connectionId, opponentWsId) {
+function  BaseTransferHandler(receiverRoomId, connectionId) {
 	var self = this;
-	PeerConnectionHandler.call(self, receiverRoomId, connectionId, opponentWsId);
-	self.fileCallType = 'file';
+	self.connectionId = connectionId;
+	self.receiverRoomId = receiverRoomId;
+	self.sendOffer = function (quedId, content) {
+		var messageRequest = {
+			action: 'offerWebrtc',
+			channel: self.receiverRoomId,
+			handler: self.fileCallType,
+			id: quedId
+		};
+		if (content) {
+			messageRequest.content = content;
+		}
+		wsHandler.sendToServer(messageRequest);
+	};
+	self.setConnectionId = function (id) {
+		self.connectionId = id;
+		// self.waitForAnswer(); todo mulrirtc
+	};
+}
+
+function FileTransferHandler(receiverRoomId, connectionId) {
+	var self = this;
+	BaseTransferHandler.call(self, receiverRoomId, connectionId);
 	self.dom = {
 		fileInput: $('webRtcFileInput'), //
 	};
+	self.fileCallType = 'file';
+	self.sendOfferParent = self.sendOffer;
+	self.sendOffer = function (quedId) {
+		self.file = self.dom.fileInput.files[0];
+		//self.dom.fileInput.disabled = true;
+		self.fileName = self.file.name;
+		self.fileSize = self.file.size;
+		self.lastGrowl = new TransferFileWindow(self.fileName, self.fileSize, self.receiverName, true);
+		self.lastGrowl.setButtonActions(self.closeWindowClick);
+		self.lastGrowl.setStatus("Establishing a connection");
+		self.sendOfferParent(quedId, {
+			name: self.fileName,
+			size: self.fileSize
+		});
+	};
+	self.closeWindowClick = function() {
+		self.finish();
+		self.closeEvents();
+	};
+	self.showOffer = function (message) {
+		self.fileSize = parseInt(message.content.size);
+		self.fileName = message.content.name;
+		self.lastGrowl = new TransferFileWindow(self.fileName, self.fileSize, self.receiverName, false);
+		self.lastGrowl.setStatus("Offered you a file");
+		self.lastGrowl.setButtonActions(self.declineFile, self.acceptFileReply);
+		notifier.notify(message.user, "Sends file {}".format(self.fileName));
+	};
+	self.onaccept = function (message) {
+		self.lastGrowl.downloadBar.show();
+	};
+	self.ondecline = function () {
+		self.lastGrowl.setErrorStatus("Declined");
+	};
+}
+
+function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
+	var self = this;
+	PeerConnectionHandler.call(self, receiverRoomId, connectionId, opponentWsId);
+	self.fileCallType = 'file';
 	self.CHUNK_SIZE = 16384;
 	self.receiveBuffer = [];
 	self.receivedSize = 0;
@@ -2269,28 +2305,9 @@ function FileTransferHandler(receiverRoomId, connectionId, opponentWsId) {
 			self.closeEvents("Connection has been lost");
 		}
 	};
-	self.sendOfferParent = self.sendOffer;
-	self.sendOffer = function (quedId) {
-		self.file = self.dom.fileInput.files[0];
-		//self.dom.fileInput.disabled = true;
-		self.setOpponentVariables();
-		self.fileName = self.file.name;
-		self.fileSize = self.file.size;
-		self.lastGrowl = new TransferFileWindow(self.fileName, self.fileSize, self.receiverName, true);
-		self.lastGrowl.setButtonActions(self.closeWindowClick);
-		self.lastGrowl.setStatus("Establishing a connection");
-		self.sendOfferParent(quedId, {
-			name: self.fileName,
-			size: self.fileSize
-		});
-	};
 	self.onfinish = function () {
 		self.lastGrowl.setErrorStatus("Opponent closed connection");
 		self.lastGrowl.hideButtons();
-		self.closeEvents();
-	};
-	self.closeWindowClick = function() {
-		self.finish();
 		self.closeEvents();
 	};
 	self.onsetError = function(message) {
@@ -2299,20 +2316,6 @@ function FileTransferHandler(receiverRoomId, connectionId, opponentWsId) {
 		} else {
 			console.log(self.getDebugMessage("Setting status to '{}' failed", message.content))
 		}
-	};
-	self.onaccept = function (message) {
-		self.lastGrowl.downloadBar.show();
-	};
-	self.showOffer = function (message) {
-		self.fileSize = parseInt(message.content.size);
-		self.fileName = message.content.name;
-		self.lastGrowl = new TransferFileWindow(self.fileName, self.fileSize, self.receiverName, false);
-		self.lastGrowl.setStatus("Offered you a file");
-		self.lastGrowl.setButtonActions(self.declineFile, self.acceptFileReply);
-		notifier.notify(message.user, "Sends file {}".format(self.fileName));
-	};
-	self.ondecline = function () {
-		self.lastGrowl.setErrorStatus("Declined");
 	};
 	self.declineFile = function () {
 		self.decline();
