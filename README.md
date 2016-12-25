@@ -85,3 +85,4 @@ Afterwards to start the chat you need:
 * add change password and realtime javascript to change_profile
 * file upload http://stackoverflow.com/a/14605593/3872976
 * add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis http://michal.karzynski.pl/blog/2014/05/18/setting-up-an-asynchronous-task-queue-for-django-using-celery-redis/ 
+* youtube frame
