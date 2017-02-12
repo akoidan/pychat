@@ -1,4 +1,5 @@
 import base64
+import json
 import logging
 import re
 import sys
@@ -13,11 +14,16 @@ from django.core.validators import validate_email
 
 from chat import local
 from chat import settings
-from chat.models import User, UserProfile, Verification, RoomUsers
+from chat.models import User, UserProfile, Verification, RoomUsers, IpAddress
 from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID
 
-USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
+try:  # py2
+	from urllib import urlopen
+except ImportError:  # py3
+	from urllib.request import urlopen
 
+USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
+API_URL = getattr(settings, "IP_API_URL", None)
 RECAPTCHA_SECRET_KEY = getattr(settings, "RECAPTCHA_SECRET_KEY", None)
 GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
 GOOGLE_OAUTH_2_HOST = getattr(settings, "GOOGLE_OAUTH_2_HOST", None)
@@ -176,6 +182,38 @@ def create_user_model(user):
 	logger.info('Signed up new user %s, subscribed for channels with id %d', user, ALL_ROOM_ID)
 	return user
 
+
+def get_or_create_ip(ip, logger):
+	"""
+
+	@param ip: ip to fetch info from
+	@param logger initialized logger:
+	@type IpAddress
+	"""
+	try:
+		ip_address = IpAddress.objects.get(ip=ip)
+	except IpAddress.DoesNotExist:
+		try:
+			if not API_URL:
+				raise Exception('api url is absent')
+			logger.debug("Creating ip record %s", ip)
+			f = urlopen(API_URL % ip)
+			raw_response = f.read().decode("utf-8")
+			response = json.loads(raw_response)
+			if response['status'] != "success":
+				raise Exception("Creating iprecord failed, server responded: %s" % raw_response)
+			ip_address = IpAddress.objects.create(
+				ip=ip,
+				isp=response['isp'],
+				country=response['country'],
+				region=response['regionName'],
+				city=response['city'],
+				country_code=response['countryCode']
+			)
+		except Exception as e:
+			logger.error("Error while creating ip with country info, because %s", e)
+			ip_address = IpAddress.objects.create(ip=ip)
+	return ip_address
 
 class EmailOrUsernameModelBackend(object):
 	"""

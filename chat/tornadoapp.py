@@ -20,21 +20,19 @@ from redis_sessions.session import SessionStore
 from tornado import ioloop
 from tornado.websocket import WebSocketHandler
 
-from chat.utils import extract_photo
+from chat.utils import extract_photo, get_or_create_ip
 
 try:  # py2
 	from urlparse import urlparse
-	from urllib import urlopen
 except ImportError:  # py3
 	from urllib.parse import urlparse
-	from urllib.request import urlopen
 
 from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_READ_MESSAGE, SELECT_SELF_ROOM
-from chat.models import User, Message, Room, IpAddress, get_milliseconds, UserJoinedInfo, RoomUsers
+from chat.models import User, Message, Room, get_milliseconds, UserJoinedInfo, RoomUsers
 
 PY3 = sys.version > '3'
 str_type = str if PY3 else basestring
-api_url = getattr(settings, "IP_API_URL", None)
+
 
 sessionStore = SessionStore()
 
@@ -648,37 +646,11 @@ class MessagesHandler(MessagesCreator):
 		if (self.do_db(UserJoinedInfo.objects.filter(
 				Q(ip__ip=self.ip) & Q(user_id=self.user_id)).exists)):
 			return
-		ip_address = self.get_or_create_ip()
+		ip_address = get_or_create_ip(self.id, self.logger)
 		UserJoinedInfo.objects.create(
 			ip=ip_address,
 			user_id=self.user_id
 		)
-
-	def get_or_create_ip(self):
-		try:
-			ip_address = IpAddress.objects.get(ip=self.ip)
-		except IpAddress.DoesNotExist:
-			try:
-				if not api_url:
-					raise Exception('api url is absent')
-				self.logger.debug("Creating ip record %s", self.ip)
-				f = urlopen(api_url % self.ip)
-				raw_response = f.read().decode("utf-8")
-				response = json.loads(raw_response)
-				if response['status'] != "success":
-					raise Exception("Creating iprecord failed, server responded: %s" % raw_response)
-				ip_address = IpAddress.objects.create(
-					ip=self.ip,
-					isp=response['isp'],
-					country=response['country'],
-					region=response['regionName'],
-					city=response['city'],
-					country_code=response['countryCode']
-				)
-			except Exception as e:
-				self.logger.error("Error while creating ip with country info, because %s", e)
-				ip_address = IpAddress.objects.create(ip=self.ip)
-		return ip_address
 
 	def publish_logout(self, channel, log_data):
 		# seems like async solves problem with connection lost and wrong data status
