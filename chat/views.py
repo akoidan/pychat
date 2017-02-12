@@ -16,6 +16,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404
+from django.utils.timezone import utc
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -108,8 +109,7 @@ def auth(request):
 	else:
 		message = 'Login or password is wrong'
 	logger.debug('Auth request %s ; Response: %s', hide_fields(request.POST, ('password',)), message)
-	response = HttpResponse(message, content_type='text/plain')
-	return response
+	return HttpResponse(message, content_type='text/plain')
 
 
 def send_restore_password(request):
@@ -159,7 +159,7 @@ class RestorePassword(View):
 			if v.verified:
 				raise ValidationError("it's already used")
 			# TODO move to sql query or leave here?
-			if v.time < datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=1):
+			if v.time < datetime.datetime.utcnow().replace(tzinfo=utc) - datetime.timedelta(days=1):
 				raise ValidationError("it's expired")
 			return UserProfile.objects.get(id=v.user_id), v
 		except Verification.DoesNotExist:

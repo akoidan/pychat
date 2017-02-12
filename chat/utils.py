@@ -5,6 +5,7 @@ import sys
 from io import BytesIO
 
 import requests
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
@@ -127,7 +128,8 @@ def check_captcha(request):
 		response = raw_response.json()
 		if not response.get('success', False):
 			logger.debug('Captcha is NOT valid, response: %s', raw_response)
-			raise ValidationError(response['error-codes'] if response.get('error-codes', None) else 'This captcha already used')
+			raise ValidationError(
+				response['error-codes'] if response.get('error-codes', None) else 'This captcha already used')
 		logger.debug('Captcha is valid, response: %s', raw_response)
 	except Exception as e:
 		raise ValidationError('Unable to check captcha because {}'.format(e))
@@ -141,9 +143,9 @@ def send_email_verification(user, site_address):
 		user.save(update_fields=['email_verification'])
 
 		text = ('Hi {}, you have registered pychat'
-				'\nTo complete your registration click on the url bellow: {}://{}/confirm_email?token={}'
-				'\n\nIf you find any bugs or propositions you can post them {}/report_issue or {}').format(
-				user.username, SITE_PROTOCOL, site_address, verification.token, site_address, ISSUES_REPORT_LINK)
+				  '\nTo complete your registration click on the url bellow: {}://{}/confirm_email?token={}'
+				  '\n\nIf you find any bugs or propositions you can post them {}/report_issue or {}').format(
+			user.username, SITE_PROTOCOL, site_address, verification.token, site_address, ISSUES_REPORT_LINK)
 
 		logger.info('Sending verification email to userId %s (email %s)', user.id, user.email)
 		send_mail("Confirm chat registration", text, site_address, [user.email, ])
@@ -173,3 +175,26 @@ def create_user_model(user):
 	RoomUsers(user_id=user.id, room_id=ALL_ROOM_ID).save()
 	logger.info('Signed up new user %s, subscribed for channels with id %d', user, ALL_ROOM_ID)
 	return user
+
+
+class EmailOrUsernameModelBackend(object):
+	"""
+	This is a ModelBacked that allows authentication with either a username or an email address.
+	"""
+
+	def authenticate(self, username=None, password=None):
+		try:
+			if '@' in username:
+				user = UserProfile.objects.get(email=username)
+			else:
+				user = UserProfile.objects.get(username=username)
+			if user.check_password(password):
+				return user
+		except User.DoesNotExist:
+			return None
+
+	def get_user(self, username):
+		try:
+			return get_user_model().objects.get(pk=username)
+		except get_user_model().DoesNotExist:
+			return None

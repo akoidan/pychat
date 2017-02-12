@@ -1,4 +1,5 @@
 queue_directory = /var/spool/postfix
+mail_spool_directory = /var/spool/mail
 command_directory = /usr/bin
 daemon_directory = /usr/lib/postfix/bin
 data_directory = /var/lib/postfix

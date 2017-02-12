@@ -120,6 +120,7 @@ ROOT_URLCONF = 'chat.urls'
 WSGI_APPLICATION = 'chat.wsgi.application'
 
 AUTH_USER_MODEL = 'chat.User'
+AUTHENTICATION_BACKENDS = ['chat.utils.EmailOrUsernameModelBackend']
 
 LOGIN_URL = '/'
 
