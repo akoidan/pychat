@@ -7,6 +7,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 from django.core.mail import send_mail
+from django.template.loader import render_to_string
 
 try:
 	from django.template.context_processors import csrf
@@ -29,7 +30,7 @@ from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification
 from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging, SITE_PROTOCOL
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_email_verification, \
-	create_user_model, check_captcha
+	create_user_model, check_captcha, get_or_create_ip, get_client_ip
 
 logger = logging.getLogger(__name__)
 RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
@@ -125,12 +126,21 @@ def send_restore_password(request):
 			raise ValidationError("You didn't specify email address for this user")
 		verification = Verification(type_enum=Verification.TypeChoices.password, user_id=user_profile.id)
 		verification.save()
+		link = "{}://{}/restore_password?token={}".format(SITE_PROTOCOL, request.get_host(), verification.token)
 		message = "{},\n" \
 			"You requested to change a password on site {}.\n" \
-			"To proceed click on the link {}://{}/restore_password?token={}\n" \
+			"To proceed click on the link {}\n" \
 			"If you didn't request the password change just ignore this mail" \
-			.format(user_profile.username, request.get_host(), SITE_PROTOCOL, request.get_host(), verification.token)
-		send_mail("Change password", message, request.get_host(), (user_profile.email,), fail_silently=False)
+			.format(user_profile.username, request.get_host(), link)
+		ip_info = get_or_create_ip(get_client_ip(request), logger)
+		context = {
+			'username': user_profile.username,
+			'magicLink': link,
+			'ipInfo': ip_info.info,
+			'timeCreated': verification.time
+		}
+		html_message = render_to_string('restore_pass.html', context, context_instance=RequestContext(request))
+		send_mail("Pychat: restore password", message, request.get_host(), (user_profile.email,), fail_silently=False, html_message=html_message)
 		message = VALIDATION_IS_OK
 		logger.debug('Verification email has been send for token %s to user %s(id=%d)',
 				verification.token, user_profile.username, user_profile.id)
@@ -142,6 +152,9 @@ def send_restore_password(request):
 		message = 'Unfortunately we were not able to send you restore password email because {}'.format(e)
 	return HttpResponse(message, content_type='text/plain')
 
+
+def get_html_restore_pass():
+	""""""
 
 class RestorePassword(View):
 
