@@ -18,7 +18,7 @@ from oauth2client.crypt import AppIdentityError
 from chat import settings
 from chat.log_filters import id_generator
 from chat.models import UserProfile
-from chat.settings import VALIDATION_IS_OK
+from chat.settings import VALIDATION_IS_OK, AUTHENTICATION_BACKENDS
 from chat.utils import create_user_model, check_user
 
 GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
@@ -85,7 +85,7 @@ class SocialAuth(View):
 			logger.info('Got %s request: %s', self.instance, rp)
 			token = rp.get('token')
 			user_profile = self.generate_user_profile(token)
-			user_profile.backend = 'django.contrib.auth.backends.ModelBackend'
+			user_profile.backend = AUTHENTICATION_BACKENDS[0]
 			djangologin(request, user_profile)
 			return HttpResponse(content=VALIDATION_IS_OK, content_type='text/plain')
 		except ValidationError as e:
