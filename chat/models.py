@@ -191,9 +191,10 @@ class IpAddress(models.Model):
 	@property
 	def info(self):
 		if self.country is not None:
-			return "IP: {} {} {} {} ({})".format(self.ip, self.country, self.region, self.city, self.isp)
+			return "{} {} ({})".format(self.country, self.city, self.isp)
 		else:
-			return str(self)
+			return ""
+
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((User._meta.app_label, '_ip_address'))

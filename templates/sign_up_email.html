@@ -1,6 +1,6 @@
 <h2 style="color: #102a80">Hello, {{ username }}!</h2>
-<p>You have requested to send you a magic link to quickly restore password to <b>Pychat</b>. If it wasn't you, you can safely ignore this email.</p>
-<div style="width: 80%; max-width:  text-align: center; padding: 10px">
+<p>{{ greetings }}</p>
+<div style="width: 100%; width: calc(100% - 20px); text-align: center; margin: auto">
     <a href="{{ magicLink }}" style="font-size: 20px;
     line-height: 26px;
     border-top: 14px solid;
@@ -18,7 +18,7 @@
     font-weight: normal;
     text-decoration: none;
     border-radius: 4px">
-        Restore password
+       {{ btnText }}
     </a>
 </div>
 <div style="width: 100%; text-align: center">
@@ -35,10 +35,3 @@
         text-decoration: none;
         word-break: break-word">{{ magicLink }}</a>
 </div>
-<p>
-    <b>Note</b>: Your magic link will expire in 1 day, and can only be used one time. <br>
-</p>
-<p>
-    Link was generated at {{ timeCreated }} <br/>
-    {{ ipInfo }}
-</p>

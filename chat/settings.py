@@ -296,8 +296,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 ADMINS = [('Andrew', 'nightmare.quake@mail.ru'), ]
 
 # If this options is set, on every oncoming request chat will gather info about user location
-if not DEBUG:
-	IP_API_URL = 'http://ip-api.com/json/%s'
+
+IP_API_URL = 'http://ip-api.com/json/%s'
 
 ALL_REDIS_ROOM = 'all'
 ALL_ROOM_ID = 1
