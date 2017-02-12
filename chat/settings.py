@@ -41,24 +41,10 @@ SECRET_KEY = '8ou!cqb1yd)6c4h0i-cxjo&@@+04%4np6od8qn+z@5b=6)!v(o'
 
 
 DEBUG = True
-TEMPLATE_DEBUG = True
+
 ALLOWED_HOSTS = ["*",]
 
-# TEMPLATE_DIRS = [BASE_DIR+'/templates']
-TEMPLATE_DIRS = (
-	join(BASE_DIR, 'templates'),
-)
-
-# TODO
 username_processor = 'chat.context_processors.add_user_name'
-try:
-	TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + [
-		username_processor,
-	]
-except TypeError:
-	TEMPLATE_CONTEXT_PROCESSORS = global_settings.TEMPLATE_CONTEXT_PROCESSORS + (
-		username_processor,
-	)
 
 # Application definition
 
@@ -200,6 +186,20 @@ if DEBUG:
 			raise TemplateSyntaxError(
 				"Undefined variable or unknown value for: %s" % other)
 	TEMPLATE_STRING_IF_INVALID = InvalidString("%s")
+
+TEMPLATES = [{
+	'BACKEND': 'django.template.backends.django.DjangoTemplates',
+	'DIRS': [join(BASE_DIR, 'templates')],
+	'DEBUG': True,
+	'OPTIONS': {
+		# 'loaders': [
+		# 	('django.template.loaders.cached.Loader', [
+		# 		'django.template.loaders.filesystem.Loader',
+		# 		'django.template.loaders.app_directories.Loader',
+		# 	])],
+		'context_processors': global_settings.TEMPLATE_CONTEXT_PROCESSORS + [username_processor]
+	}
+}]
 
 LOGGING = {
 	'version': 1,
