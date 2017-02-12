@@ -11,6 +11,9 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
+from django.template import RequestContext
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
 
 from chat import local
 from chat import settings
@@ -141,21 +144,56 @@ def check_captcha(request):
 		raise ValidationError('Unable to check captcha because {}'.format(e))
 
 
-def send_email_verification(user, site_address):
+def send_sign_up_email(user, site_address, request):
 	if user.email is not None:
 		verification = Verification(user=user, type_enum=Verification.TypeChoices.register)
 		verification.save()
 		user.email_verification = verification
 		user.save(update_fields=['email_verification'])
-
+		link = "{}://{}/confirm_email?token={}".format(SITE_PROTOCOL, site_address, verification.token)
 		text = ('Hi {}, you have registered pychat'
-				  '\nTo complete your registration click on the url bellow: {}://{}/confirm_email?token={}'
-				  '\n\nIf you find any bugs or propositions you can post them {}/report_issue or {}').format(
-			user.username, SITE_PROTOCOL, site_address, verification.token, site_address, ISSUES_REPORT_LINK)
-
+				  '\nTo complete your registration please click on the url bellow: {}'
+				  '\n\nIf you find any bugs or propositions you can post them {}').format(
+			user.username, link, ISSUES_REPORT_LINK)
+		start_message = mark_safe((
+			"You have registered in <b>Pychat</b>. If you find any bugs or propositions you can post them"
+			" <a href='{}'>here</a>. To complete your registration please click on the link below.").format(
+				ISSUES_REPORT_LINK))
+		context = {
+			'username': user.username,
+			'magicLink': link,
+			'btnText': "CONFIRM SIGN UP",
+			'greetings': start_message
+		}
+		html_message = render_to_string('sign_up_email.html', context, context_instance=RequestContext(request))
 		logger.info('Sending verification email to userId %s (email %s)', user.id, user.email)
-		send_mail("Confirm chat registration", text, site_address, [user.email, ])
+		send_mail("Confirm chat registration", text, site_address, [user.email, ], html_message=html_message)
 		logger.info('Email %s has been sent', user.email)
+
+
+def send_reset_password_email(request, user_profile, verification):
+	link = "{}://{}/restore_password?token={}".format(SITE_PROTOCOL, request.get_host(), verification.token)
+	message = "{},\n" \
+				 "You requested to change a password on site {}.\n" \
+				 "To proceed click on the link {}\n" \
+				 "If you didn't request the password change just ignore this mail" \
+		.format(user_profile.username, request.get_host(), link)
+	ip_info = get_or_create_ip(get_client_ip(request), logger)
+	start_message = mark_safe(
+		"You have requested to send you a magic link to quickly restore password to <b>Pychat</b>. "
+		"If it wasn't you, you can safely ignore this email")
+	context = {
+		'username': user_profile.username,
+		'magicLink': link,
+		'ipInfo': ip_info.info,
+		'ip': ip_info.ip,
+		'btnText': "CHANGE PASSWORD",
+		'timeCreated': verification.time,
+		'greetings': start_message
+	}
+	html_message = render_to_string('reset_pass_email.html', context, context_instance=RequestContext(request))
+	send_mail("Pychat: restore password", message, request.get_host(), (user_profile.email,), fail_silently=False,
+				 html_message=html_message)
 
 
 def extract_photo(image_base64, filename=None):
@@ -214,6 +252,7 @@ def get_or_create_ip(ip, logger):
 			logger.error("Error while creating ip with country info, because %s", e)
 			ip_address = IpAddress.objects.create(ip=ip)
 	return ip_address
+
 
 class EmailOrUsernameModelBackend(object):
 	"""
