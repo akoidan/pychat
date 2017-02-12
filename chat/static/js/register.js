@@ -304,6 +304,7 @@ function googleLogin(event) {
 					if (auth2.isSignedIn.get()) {
 						onGoogleSignIn();
 					} else {
+						ajaxHide();
 						auth2.signIn();
 					}
 				});
