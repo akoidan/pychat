@@ -87,3 +87,5 @@ Afterwards to start the chat you need:
 * add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis http://michal.karzynski.pl/blog/2014/05/18/setting-up-an-asynchronous-task-queue-for-django-using-celery-redis/ 
 * youtube frame
 * add pictures preview if user post an url that's content-type =image
+* SELECT_SELF_ROOM  https://github.com/Deathangel908/djangochat/blob/master/chat/settings.py#L292-L303 doesnt work with mariadb engine 10.1
+* also admin email wasn't triggered while SELECT_SELF_ROOM has failed
