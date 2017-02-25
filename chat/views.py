@@ -6,7 +6,6 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
-from django.core.mail import send_mail
 
 try:
 	from django.template.context_processors import csrf
@@ -16,6 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404
+from django.utils.timezone import utc
 from django.http import HttpResponse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
@@ -26,9 +26,9 @@ from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification
-from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging, SITE_PROTOCOL
-from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_email_verification, \
-	create_user_model, check_captcha
+from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging
+from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
+	create_user_model, check_captcha, send_reset_password_email
 
 logger = logging.getLogger(__name__)
 RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
@@ -108,8 +108,7 @@ def auth(request):
 	else:
 		message = 'Login or password is wrong'
 	logger.debug('Auth request %s ; Response: %s', hide_fields(request.POST, ('password',)), message)
-	response = HttpResponse(message, content_type='text/plain')
-	return response
+	return HttpResponse(message, content_type='text/plain')
 
 
 def send_restore_password(request):
@@ -125,12 +124,7 @@ def send_restore_password(request):
 			raise ValidationError("You didn't specify email address for this user")
 		verification = Verification(type_enum=Verification.TypeChoices.password, user_id=user_profile.id)
 		verification.save()
-		message = "{},\n" \
-			"You requested to change a password on site {}.\n" \
-			"To proceed click on the link {}://{}/restore_password?token={}\n" \
-			"If you didn't request the password change just ignore this mail" \
-			.format(user_profile.username, request.get_host(), SITE_PROTOCOL, request.get_host(), verification.token)
-		send_mail("Change password", message, request.get_host(), (user_profile.email,), fail_silently=False)
+		send_reset_password_email(request, user_profile, verification)
 		message = VALIDATION_IS_OK
 		logger.debug('Verification email has been send for token %s to user %s(id=%d)',
 				verification.token, user_profile.username, user_profile.id)
@@ -142,6 +136,9 @@ def send_restore_password(request):
 		message = 'Unfortunately we were not able to send you restore password email because {}'.format(e)
 	return HttpResponse(message, content_type='text/plain')
 
+
+def get_html_restore_pass():
+	""""""
 
 class RestorePassword(View):
 
@@ -159,7 +156,7 @@ class RestorePassword(View):
 			if v.verified:
 				raise ValidationError("it's already used")
 			# TODO move to sql query or leave here?
-			if v.time < datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(days=1):
+			if v.time < datetime.datetime.utcnow().replace(tzinfo=utc) - datetime.timedelta(days=1):
 				raise ValidationError("it's expired")
 			return UserProfile.objects.get(id=v.user_id), v
 		except Verification.DoesNotExist:
@@ -331,7 +328,7 @@ class RegisterView(View):
 			auth_user = authenticate(username=username, password=password)
 			message = VALIDATION_IS_OK  # redirect
 			if email:
-				send_email_verification(user_profile, request.get_host())
+				send_sign_up_email(user_profile, request.get_host(), request)
 			djangologin(request, auth_user)
 		except ValidationError as e:
 			message = e.message

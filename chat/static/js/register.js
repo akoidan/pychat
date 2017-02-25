@@ -192,6 +192,7 @@ function showForgotPassword() {
 }
 
 function redirectToNextPage(response) {
+	ajaxHide();
 	if (response === RESPONSE_SUCCESS) {
 		var nextUrl = getUrlParam('next');
 		if (nextUrl == null) {
@@ -205,6 +206,7 @@ function redirectToNextPage(response) {
 
 function login(event) {
 	event.preventDefault();
+	ajaxShow();
 	doPost('/auth', null, redirectToNextPage, loginForm);
 }
 
@@ -231,6 +233,7 @@ function initRegisterPage() {
 
 function register(event) {
 	event.preventDefault();
+	ajaxShow();
 	doPost('/register', null, redirectToNextPage, registerForm);
 }
 
@@ -241,8 +244,8 @@ function restorePassword(event) {
 		return; // wait for captcha to load
 	}
 	var form = recoverForm;
-	//ajaxShow(); TODO
 	var callback = function (data) {
+		ajaxHide();
 		// if captcha is turned off
 		if (typeof grecaptcha != 'undefined') {
 			grecaptcha.reset();
@@ -254,6 +257,7 @@ function restorePassword(event) {
 			growlError(data);
 		}
 	};
+	ajaxShow();
 	doPost('/send_restore_password', null, callback, form);
 }
 
@@ -279,6 +283,7 @@ function onGoogleSignIn() {
 function googleLogin(event) {
 	event.preventDefault(); // somehow button triggers sumbit
 	// Load the API client and auth library
+	ajaxShow();
 	if (googleToken) {
 		sendGoogleTokenToServer(googleToken)
 	} else if (!googleApiLoaded) {
@@ -299,6 +304,7 @@ function googleLogin(event) {
 					if (auth2.isSignedIn.get()) {
 						onGoogleSignIn();
 					} else {
+						ajaxHide();
 						auth2.signIn();
 					}
 				});
@@ -312,6 +318,7 @@ function googleLogin(event) {
 
 function facebookLogin(event) {
 	if (event) event.preventDefault();
+	ajaxShow();
 	growlInfo("Trying to log in via Facebook");
 	if (!FBApiLoaded) {
 		doGet(FACEBOOK_JS_URL);
@@ -338,10 +345,13 @@ function fbStatusChangeIfReAuth(response) {
 		doPost('/facebook-auth', {
 			token: response.authResponse.accessToken
 		}, redirectToNextPage);
-	} else if (response.status === 'not_authorized') {
-		growlInfo("Allow facebook application to use your data");
 	} else {
-		return true;
+		ajaxHide();
+		if (response.status === 'not_authorized') {
+			growlInfo("Allow facebook application to use your data");
+		} else {
+			return true;
+		}
 	}
 }
 
