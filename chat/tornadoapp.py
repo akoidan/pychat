@@ -351,7 +351,7 @@ class MessagesHandler(MessagesCreator):
 	def listen(self, channels):
 		yield tornado.gen.Task(
 			self.async_redis.subscribe, channels)
-		self.async_redis.listen(self.new_message)
+		self.async_redis.listen(self.pub_sub_message)
 
 	@property
 	def logger(self):
@@ -427,7 +427,7 @@ class MessagesHandler(MessagesCreator):
 			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes, room_id)
 			if offline_messages:
-				self.safe_write(self.load_offline_message(offline_messages, room_id))
+				self.ws_write(self.load_offline_message(offline_messages, room_id))
 		else:  # Send user names to self
 			online_user_names_mes = self.room_online(
 				online,
@@ -435,7 +435,7 @@ class MessagesHandler(MessagesCreator):
 				room_id
 			)
 			self.logger.info('!! Second tab, retrieving online for self')
-			self.safe_write(online_user_names_mes)
+			self.ws_write(online_user_names_mes)
 
 	def publish(self, message, channel, parsable=False):
 		jsoned_mess = json.dumps(message)
@@ -457,7 +457,7 @@ class MessagesHandler(MessagesCreator):
 		if message.startswith(self.parsable_prefix):
 			return message[1:]
 
-	def new_message(self, message):
+	def pub_sub_message(self, message):
 		data = message.body
 		if isinstance(data, str_type):  # subscribe event
 			prefixless_str = self.remove_parsable_prefix(data)
@@ -465,11 +465,11 @@ class MessagesHandler(MessagesCreator):
 				dict_message = json.loads(prefixless_str)
 				res = self.post_process_message[dict_message[VarNames.EVENT]](dict_message)
 				if not res:
-					self.safe_write(prefixless_str)
+					self.ws_write(prefixless_str)
 			else:
-				self.safe_write(data)
+				self.ws_write(data)
 
-	def safe_write(self, message):
+	def ws_write(self, message):
 		raise NotImplementedError('WebSocketHandler implements')
 
 	def process_send_message(self, message):
@@ -519,7 +519,7 @@ class MessagesHandler(MessagesCreator):
 			self.async_redis_publisher.hset(connection_id, self.id, 'sender_ready')
 			opponents_message = self.offer_webrtc(content, connection_id, webrtc_type)
 			self_message = self.set_connection_id(qued_id, connection_id)
-			self.safe_write(self_message)
+			self.ws_write(self_message)
 			self.logger.info('!! Offering a call, connection_id %s', connection_id)
 			self.publish(opponents_message, room_id, True)
 
@@ -683,7 +683,7 @@ class MessagesHandler(MessagesCreator):
 		else:
 			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id), Q(deleted=False)).order_by('-pk')[:count]
 		response = self.do_db(self.get_messages, messages, room_id)
-		self.safe_write(response)
+		self.ws_write(response)
 
 	def get_offline_messages(self):
 		res = {}
@@ -809,7 +809,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.pre_process_message[message[VarNames.EVENT]](message)
 		except ValidationError as e:
 			error_message = self.default(str(e.message), Actions.GROWL_MESSAGE, HandlerNames.GROWL)
-			self.safe_write(error_message)
+			self.ws_write(error_message)
 
 	def on_close(self):
 		if self.async_redis.subscribed:
@@ -852,7 +852,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		and TornadoHandler can restore webrtc_connections to previous state
 		"""
 		self.id = create_id(self.user_id, self.get_argument('id'))
-		self.safe_write(self.set_ws_id())
+		self.ws_write(self.set_ws_id())
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
@@ -872,7 +872,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
 			user_rooms = self.get_users_in_current_user_rooms()
-			self.safe_write(self.default(user_rooms, Actions.ROOMS, HandlerNames.CHANNELS))
+			self.ws_write(self.default(user_rooms, Actions.ROOMS, HandlerNames.CHANNELS))
 			# get all missed messages
 			self.channels = []  # py2 doesn't support clear()
 			self.channels.append(self.channel)
@@ -901,7 +901,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		browser_domain = browser_set.split(':')[0]
 		return browser_domain == origin_domain
 
-	def safe_write(self, message):
+	def ws_write(self, message):
 		"""
 		Tries to send message, doesn't throw exception outside
 		:type self: MessagesHandler
