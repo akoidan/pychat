@@ -45,3 +45,8 @@ chat/production.py
 backup.sh
 data.sql
 cron-bu
+chat/static/alsa.txt
+chat/static/androidApi.txt
+chat/static/dmesg.txt
+chat/static/err.txt
+

@@ -646,7 +646,7 @@ class MessagesHandler(MessagesCreator):
 		if (self.do_db(UserJoinedInfo.objects.filter(
 				Q(ip__ip=self.ip) & Q(user_id=self.user_id)).exists)):
 			return
-		ip_address = get_or_create_ip(self.id, self.logger)
+		ip_address = get_or_create_ip(self.ip, self.logger)
 		UserJoinedInfo.objects.create(
 			ip=ip_address,
 			user_id=self.user_id
