@@ -51,14 +51,14 @@ onDocLoad(function () {
 	storage = new Storage();
 	notifier = new NotifierHandler();
 	painter = new Painter();
-	console.log(getDebugMessage("Trying to resolve WebSocket Server"));
+	logger.info("Trying to resolve WebSocket Server")();
 	wsHandler.listenWS();
 	showHelp();
 });
 
 function readFileAsB64(file, callback, showGrowl) {
 	if (!file) {
-		console.warn(getDebugMessage("Context contains no files"));
+		logger.warn("Context contains no files")();
 	} else if (file.type.indexOf("image") < 0) {
 		growlError("<span>Invalid image type <b>{}</b></span>".format(encodeHTML(file.type)));
 	} else {
@@ -291,14 +291,14 @@ function checkAndPlay(element) {
 		element.volume = volumeProportion[window.sound];
 		element.play();
 	} catch (e) {
-		console.error(getDebugMessage("Skipping playing message, because {}", e.message || e));
+		logger.error("Skipping playing message, because {}", e.message || e)();
 	}
 }
 
 function NotifierHandler() {
 	var self = this;
 	self.maxNotifyTime = 300;
-	self.currentTabId = new Date().getTime().toString();
+	self.currentTabId = Date.now().toString();
 	/*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
 	self.LAST_TAB_ID_VARNAME = 'lastTabId';
 	self.clearNotificationTime = 5000;
@@ -315,7 +315,7 @@ function NotifierHandler() {
 		window.addEventListener("unload", self.onUnload);
 		self.onFocus();
 		if (!window.Notification) {
-			console.warn(getDebugMessage("Notification is not supported"));
+			logger.warn("Notification is not supported")();
 		} else {
 			self.askPermissions();
 		}
@@ -324,7 +324,7 @@ function NotifierHandler() {
 		window.focus();
 		this.close()
 	};
-	self.lastNotifyTime = new Date().getTime();
+	self.lastNotifyTime = Date.now();
 	self.notify = function (title, message, icon) {
 		if (self.isCurrentTabActive) {
 			return;
@@ -334,7 +334,7 @@ function NotifierHandler() {
 		if (navigator.vibrate) {
 			navigator.vibrate(200);
 		}
-		var currentTime = new Date().getTime();
+		var currentTime = Date.now();
 		// last opened tab not this one, leave the oppotunity to show notification from last tab
 		if (!window.Notification || !self.isTabMain() || !notifications || currentTime - self.maxNotifyTime < self.lastNotifyTime) {
 			return
@@ -397,7 +397,7 @@ function Page() {
 	};
 	self.setParams = function (params) {
 		if (params) {
-			console.warn(getDebugMessage('Params are not set for {}', self.getUrl()))
+			logger.warn('Params are not set for {}', self.getUrl())();
 		}
 	};
 	self.render = function () {
@@ -487,8 +487,8 @@ function IssuePage() {
 		event.preventDefault();
 		var params = {};
 		if ($('history').checked) {
-			if (historyStorage != null) {
-				params['log'] = historyStorage
+			if (logger.historyStorage != null) {
+				params['log'] = logger.historyStorage
 			}
 		}
 		doPost('/report_issue', params, function (response) {
@@ -607,7 +607,7 @@ function PageHandler() {
 		window.history.pushState(historyUrl, historyUrl, historyUrl);
 	};
 	self.showPage = function (page, params, dontHistory) {
-		console.log(getDebugMessage('Rendering page "{}"', page));
+		logger.info('Rendering page "{}"', page)();
 		if (self.currentPage) self.currentPage.hide();
 		self.currentPage = self.pages[page];
 		if (self.currentPage.rendered) {
@@ -698,7 +698,7 @@ function ChannelsHandler() {
 	self.clearChannelHistory = function () {
 		localStorage.clear();
 		self.getActiveChannel().clearHistory ();
-		console.log(getDebugMessage('History has been cleared'));
+		logger.info('History has been cleared')();
 		growlSuccess('History has been cleared');
 	};
 	self.setParams = function (params) {
@@ -878,7 +878,7 @@ function ChannelsHandler() {
 		}
 	};
 	self.isMessageEditable = function (time) {
-		return time + 58000 > new Date().getTime();
+		return time + 58000 > Date.now();
 	};
 	self.placeCaretAtEnd = function() {
 		var range = document.createRange();
@@ -1090,7 +1090,7 @@ function ChannelsHandler() {
 
 	};
 	self.destroyChannel = function (channelKey) {
-		console.log(getDebugMessage("Destroying channel {} while offline", channelKey));
+		logger.info("Destroying channel {} while offline", channelKey)();
 		self.channels[channelKey].destroy();
 		delete self.channels[channelKey];
 	};
@@ -1112,7 +1112,7 @@ function ChannelsHandler() {
 				oldRoom.updateAllDomUsers(newUserList);
 			} else {
 				var roomName = newRoom.name;
-				console.log(getDebugMessage("Creating new room '{}' with id {} while offline", roomName, roomId));
+				logger.info("Creating new room '{}' with id {} while offline", roomName, roomId)();
 				if (roomName) {
 					self.createNewRoomChatHandler(roomId, roomName, newUserList);
 				} else {
@@ -1141,10 +1141,10 @@ function ChannelsHandler() {
 	};
 	self.executePostUserAction = function (message) {
 		if (self.postUserAction) {
-			if (self.postUserAction.time + 30000 > new Date().getTime()) {
+			if (self.postUserAction.time + 30000 > Date.now()) {
 				if (self.postUserAction.actionTrigger == message.action
 						&& self.postUserAction.userId == message.userId) {
-					console.log(getDebugMessage("Proceeding postUserAction {}", self.postUserAction));
+					logger.info("Proceeding postUserAction {}", self.postUserAction)();
 					self.postUserAction.action();
 					self.postUserAction = null;
 				}
@@ -1249,7 +1249,7 @@ function ChannelsHandler() {
 		}
 		self.postUserAction = {
 			action: postAction,
-			time: new Date().getTime(),
+			time: Date.now(),
 			userId: userId,
 			actionTrigger: 'addOnlineUser'
 		}
@@ -1377,7 +1377,7 @@ function SmileyUtil() {
 			return;
 		}
 		self.pasteHtmlAtCaret(smileImg.cloneNode());
-		console.log(getDebugMessage('Added smile "{}"', smileImg.alt));
+		logger.info('Added smile "{}"', smileImg.alt)();
 	};
 	self.pasteHtmlAtCaret = function (img) {
 		var sel = window.getSelection();
@@ -1596,7 +1596,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			if (!newUsers[oldUserId]) {
 				var oldLi = document.querySelector('ul[roomId="{}"] > li[userId="{}"]'.format(self.roomId, oldUserId));
 				CssUtils.deleteElement(oldLi);
-				console.log(getDebugMessage("User with id {} has been deleted while offline", oldUserId));
+				logger.info("User with id {} has been deleted while offline", oldUserId)();
 				delete self.allUsers[oldUserId];
 			}
 		}
@@ -1605,7 +1605,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			var newUser = newUsers[newUserId];
 			if (!self.allUsers[newUserId]) {
 				self.allUsers[newUserId] = newUser;
-				console.log(getDebugMessage("User with id {} has been signed up while offline", newUserId));
+				logger.info("User with id {} has been signed up while offline", newUserId)();
 				self.addUserLi(newUserId, newUser.sex, newUser.user);
 			}
 		}
@@ -1728,8 +1728,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			try {
 				pos = self.getPosition(timeMillis);
 			} catch (err) {
-				console.warn(getDebugMessage("Skipping duplicate message, time: {}, content: <<<{}>>> ",
-						timeMillis, htmlEncodedContent));
+				logger.warn("Skipping duplicate message, time: {}, content: <<<{}>>> ",
+						timeMillis, htmlEncodedContent)();
 				return;
 			}
 		} else {
@@ -1835,12 +1835,12 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.loadMessages = function (data) {
 		var windowsSoundState = window.sound;
 		window.sound = 0;
-		console.log(getDebugMessage('appending messages to top'));
+		logger.info('appending messages to top')();
 		// This check should fire only once,
 		// because requests aren't being sent when there are no event for them, thus no responses
 		var message = data.content;
 		if (message.length === 0) {
-			console.log(getDebugMessage('Requesting messages has reached the top, removing loadUpHistoryEvent handlers'));
+			logger.info('Requesting messages has reached the top, removing loadUpHistoryEvent handlers')();
 			self.dom.chatBoxDiv.removeEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
 			self.dom.chatBoxDiv.removeEventListener("keydown", self.keyDownLoadUp);
 			return;
@@ -1876,7 +1876,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.setOnlineUsers = function (message) {
 		self.onlineUsers = message.content;
-		console.log(getDebugMessage("Load user names: {}", Object.keys(self.onlineUsers)));
+		logger.info("Load user names: {}", Object.keys(self.onlineUsers))();
 		for (var userId in self.allUsers) {
 			if (!self.allUsers.hasOwnProperty(userId)) continue;
 			var user = self.allUsers[userId];
@@ -1889,10 +1889,10 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.loadUpHistory = function (count) {
 		if (self.dom.chatBoxDiv.scrollTop === 0) {
-			var currentMillis = new Date().getTime();
+			var currentMillis = Date.now();
 			// 0 if locked, or last request was sent earlier than 3 seconds ago
 			if (self.lastLoadUpHistoryRequest + 3000 > currentMillis) {
-				console.log(getDebugMessage("Skipping loading message, because it's locked"));
+				logger.info("Skipping loading message, because it's locked")();
 				return
 			}
 			self.lastLoadUpHistoryRequest = currentMillis;
@@ -1957,7 +1957,7 @@ function TransferFileWindow(fileName, fileSize, opponentName, isForSend) {
 		self.dom.fileStatus.className = 'error'
 	};
 	self.setStatus = function(innerHtml) {
-		console.log(getDebugMessage('Transfer file status changed to "{}"', innerHtml));
+		logger.info('Transfer file status changed to "{}"', innerHtml)();
 		self.dom.fileStatus.innerHTML = innerHtml;
 	};
 	self.hideButtons = function () {
@@ -1976,7 +1976,7 @@ function TransferFileWindow(fileName, fileSize, opponentName, isForSend) {
 		if (self.postNoAction) {
 			self.postNoAction();
 		} else {
-			console.warn(getDebugMessage("Skipping empty No callback"));
+			logger.warn("Skipping empty No callback")();
 		}
 		self.remove();
 	};
@@ -2064,13 +2064,13 @@ function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 		]
 	};
 	self.onaccept = function (message) {
-		console.log(self.getDebugMessage("User accepted connection"));
+		loggerInfo(self.getDebugMessage("User accepted connection"));
 	};
 	self.getDebugMessage = function () {
-		return getDebugMessage.apply(this, arguments) + ", connId: " +self.connectionId ;
+		return log.apply(this, arguments) + ", connId: " +self.connectionId ;
 	};
 	self.destroy = function () {
-		console.log(self.getDebugMessage("Destroying peer connection"));
+		loggerInfo(self.getDebugMessage("Destroying peer connection"));
 		delete webRtcApi.connections[self.connectionId];
 	};
 	self.isActive = function () {
@@ -2108,22 +2108,22 @@ function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 		self.setHeaderText("Conn. success, wait for accept".format(self.receiverName))
 	};
 	self.onSuccessAnswer = function () {
-		console.log(getDebugMessage('answer received'))
+		logger.info('answer received')();
 	};
 	self.answerToWebrtc = function () {
-		console.log(self.getDebugMessage('creating answer...'));
+		loggerInfo(self.getDebugMessage('creating answer...'));
 		self.pc.createAnswer(function (answer) {
-			console.log(self.getDebugMessage('sent answer...'));
+			loggerInfo(self.getDebugMessage('sent answer...'));
 			self.pc.setLocalDescription(answer, function () {
 				self.sendWebRtcEvent(answer);
 			}, self.failWebRtcP3);
 		}, self.failWebRtcP4, self.sdpConstraints);
 	};
 	self.print = function (message) {
-		console.log(self.getDebugMessage("Call message {}", JSON.stringify(message)));
+		loggerInfo(self.getDebugMessage("Call message {}", JSON.stringify(message)));
 	};
 	self.gotReceiveChannel = function (event) {
-		console.log(self.getDebugMessage('Received Channel Callback'));
+		loggerInfo(self.getDebugMessage('Received Channel Callback'));
 		self.sendChannel = event.channel;
 		// self.sendChannel.onmessage = self.print;
 		self.sendChannel.onopen = self.channelOpen;
@@ -2147,7 +2147,7 @@ function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 				growlInfo(data.message);
 			}
 		} else {
-			console.warn(self.getDebugMessage("Skipping ws message for closed connection"));
+			loggerWarn(self.getDebugMessage("Skipping ws message for closed connection"));
 		}
 	};
 	self.createPeerConnection = function () {
@@ -2164,16 +2164,16 @@ function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 	};
 	self.closeEvents = function (text) {
 		if (self.sendChannel && self.sendChannel.readyState != 'closed') {
-			console.log(self.getDebugMessage("Closing chanel"));
+			loggerInfo(self.getDebugMessage("Closing chanel"));
 			self.sendChannel.close();
 		} else {
-			console.log(self.getDebugMessage("No channels to close"));
+			loggerInfo(self.getDebugMessage("No channels to close"));
 		}
 		if (self.pc && self.pc.signalingState != 'closed') {
-			console.log(self.getDebugMessage("Closing peer connection"));
+			loggerInfo(self.getDebugMessage("Closing peer connection"));
 			self.pc.close();
 		} else {
-			console.log(self.getDebugMessage("No peer connection to close"));
+			loggerInfo(self.getDebugMessage("No peer connection to close"));
 		}
 		if (text) {
 			growlInfo(text);
@@ -2188,16 +2188,16 @@ function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
 			self.sendChannel.onopen = self.onreceiveChannelOpen;
 			self.sendChannel.onmessage = self.webrtcDirectMessage;
-			console.log(self.getDebugMessage("Created send data channel"));
+			loggerInfo(self.getDebugMessage("Created send data channel"));
 		} catch (e) {
 			var error = "Failed to create data channel because {} ".format(e.message || e);
 			growlError(error);
-			console.error(self.getDebugMessage(error));
+			loggerError(self.getDebugMessage(error));
 		}
 		self.pc.createOffer(function (offer) {
-			console.log(self.getDebugMessage('created offer...'));
+			loggerInfo(self.getDebugMessage('created offer...'));
 			self.pc.setLocalDescription(offer, function () {
-				console.log(self.getDebugMessage('sending to remote...'));
+				loggerInfo(self.getDebugMessage('sending to remote...'));
 				self.sendWebRtcEvent(offer);
 			}, self.failWebRtcP2);
 		}, self.failWebRtcP1, self.sdpConstraints);
@@ -2222,7 +2222,7 @@ function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 		var errorContext = isError ? "{}: {}".format(arguments[0].name, arguments[0].message)
 				: Array.prototype.join.call(arguments, ' ');
 		growlError("An error occurred while establishing a connection: {}".format(errorContext));
-		console.error(self.getDebugMessage("OnError way from {}, exception: {}", getCallerTrace(), errorContext));
+		loggerError(self.getDebugMessage("OnError way from {}, exception: {}", getCallerTrace(), errorContext));
 	};
 }
 
@@ -2314,7 +2314,7 @@ function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		if (self.lastGrowl) {
 			self.lastGrowl.setErrorStatus(message.content);
 		} else {
-			console.log(self.getDebugMessage("Setting status to '{}' failed", message.content))
+			loggerInfo(self.getDebugMessage("Setting status to '{}' failed", message.content))
 		}
 	};
 	self.declineFile = function () {
@@ -2331,7 +2331,7 @@ function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		self.lastGrowl.setStatus("Receiving a file");
 	};
 	self.channelOpen = function () {
-		console.log(self.getDebugMessage('file is {} {} {} {}', self.fileName, self.fileSize, self.file.type, self.file.lastModifiedDate));
+		loggerInfo(self.getDebugMessage('file is {} {} {} {}', self.fileName, self.fileSize, self.file.type, self.file.lastModifiedDate));
 		if (self.fileSize === 0) {
 			self.lastGrowl.setErrorStatus("Can't send empty file");
 			self.closeEvents("Can't send empty file");
@@ -2348,7 +2348,7 @@ function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
 					try {
 						self.sendChannel.send(e.target.result);
 					} catch (error) {
-						console.log(getDebugMessage(error));
+						logger.info(error)();
 						growlError("Connection loss while sending file {} to user {}".format(self.fileName, self.receiverName));
 					}
 					if (self.fileSize > offset + e.target.result.byteLength) {
@@ -2367,7 +2367,7 @@ function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		self.lastGrowl.downloadBar.setValue(value);
 	};
 	self.webrtcDirectMessage = function (event) {
-		// console.log(self.getDebugMessage('Received Message ' + event.data.byteLength));
+		// loggerInfo(self.log('Received Message ' + event.data.byteLength));
 		self.receiveBuffer.push(event.data);
 		self.receivedSize += event.data.byteLength;
 		self.setTranseferdAmount(self.receivedSize);
@@ -2379,14 +2379,14 @@ function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		}
 	};
 	self.onfileAccepted = function (message) {
-		console.log(self.getDebugMessage("Transfer file {} result : {}", self.fileName, message.content));
+		loggerInfo(self.getDebugMessage("Transfer file {} result : {}", self.fileName, message.content));
 		self.lastGrowl.setSuccessStatus("Transferred");
 		self.lastGrowl.downloadBar.hide();
 		self.closeEvents();
 	};
 	self.assembleFile = function () {
 		var received = new window.Blob(self.receiveBuffer);
-		console.log(self.getDebugMessage("File is received"));
+		loggerInfo(self.getDebugMessage("File is received"));
 		self.sendBaseEvent('fileAccepted');
 		self.lastGrowl.downloadBar.setSuccess();
 		self.receiveBuffer = []; //clear buffer
@@ -2613,7 +2613,7 @@ function CallHandler(receiverRoomId, connectionId) {
 		CssUtils.showElement(webRtcApi.dom.callContainer);
 	};
 	self.channelOpen = function () {
-		console.log(self.getDebugMessage('Opened a new chanel'))
+		loggerInfo(self.getDebugMessage('Opened a new chanel'))
 	};
 	self.setVideoSource = function (domEl, stream) {
 		domEl.src = URL.createObjectURL(stream);
@@ -2687,7 +2687,7 @@ function CallHandler(receiverRoomId, connectionId) {
 			}
 
 		} catch (err) {
-			console.error(self.getDebugMessage("Unable to use microphone level because " + err));
+			loggerError(self.getDebugMessage("Unable to use microphone level because " + err));
 		}
 	};
 	self.showNoMicError = function () {
@@ -2706,7 +2706,7 @@ function CallHandler(receiverRoomId, connectionId) {
 			self.createMicrophoneLevelVoice(event.stream, false);
 			self.setHeaderText("Talking with <b>{}</b>".format(self.receiverName));
 			self.setIconState(true);
-			console.log(self.getDebugMessage("Stream attached"));
+			loggerInfo(self.getDebugMessage("Stream attached"));
 			self.showPhoneIcon();
 		};
 	};
@@ -2806,7 +2806,7 @@ function CallHandler(receiverRoomId, connectionId) {
 		self.declineWebRtcCall();
 
 		// TODO multirtc clear timeout
-		// displayPreparedMessage(SYSTEM_HEADER_CLASS, new Date().getTime(),
+		// displayPreparedMessage(SYSTEM_HEADER_CLASS, Date.now(),
 		//getText("You have missed a call from <b>{}</b>", self.receiverName)
 		// TODO replace growl with System message in user thread and unread
 		growlInfo("<div>You have missed a call from <b>{}</b></div>".format(self.receiverName));
@@ -2884,7 +2884,7 @@ function WebRtcApi() {
 		} else if (self.connections[data.connId]) {
 			self.connections[data.connId]['on'+data.type](data);
 		} else {
-			console.error(getDebugMessage('Connection "{}" is unknown. Availabe connections: "{}". Skipping message:',  data.connId, Object.keys(self.connections)));
+			logger.error('Connection "{}" is unknown. Availabe connections: "{}". Skipping message:',  data.connId, Object.keys(self.connections))();
 		}
 	};
 	self.offerCall = function () {
@@ -2930,11 +2930,11 @@ function WsHandler() {
 	};
 	self.handle = function (message) {
 		self.wsConnectionId = message.content;
-		console.log(getDebugMessage("CONNECTION ID HAS BEEN SET TO {}",self.wsConnectionId))
+		logger.info("CONNECTION ID HAS BEEN SET TO {}",self.wsConnectionId)();
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
-		console.log(getDebugMessage("WS in: {}", jsonData));
+		logger.debug("WS_IN", jsonData)();
 		var data = JSON.parse(jsonData);
 		self.handleMessage(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
@@ -2947,11 +2947,11 @@ function WsHandler() {
 		var jsonRequest = JSON.stringify(messageRequest);
 		var logEntry = jsonRequest.substring(0, 500);
 		if (self.ws.readyState !== WebSocket.OPEN) {
-			console.warn(getDebugMessage("Web socket is closed. Can't send {}", logEntry));
+			logger.warn("Web socket is closed. Can't send {}", logEntry)();
 			growlError("Can't send message, because connection is lost :(");
 			return false;
 		} else {
-			console.log(getDebugMessage("WS out: {} ", logEntry));
+			logger.debug("WS out", logEntry)();
 			self.ws.send(jsonRequest);
 			return true;
 		}
@@ -2967,15 +2967,15 @@ function WsHandler() {
 		if (e.code === 403) {
 			var message = "Server has forbidden request because '{}'".format(reason);
 			growlError(message);
-			console.error(getDebugMessage(message));
+			logger.error(message)();
 		} else if (self.wsState === 0) {
 			growlError("Can't establish connection with server");
-			console.error(getDebugMessage("Chat server is down because {}", reason));
+			logger.error("Chat server is down because {}", reason)();
 		} else if (self.wsState === 9) {
 			growlError("Connection to chat server has been lost, because {}".format(reason));
-			console.error(getDebugMessage(
+			logger.error(
 					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
-					e.reason, CONNECTION_RETRY_TIME));
+					e.reason, CONNECTION_RETRY_TIME)();
 		}
 		self.wsState = 1;
 		// Try to reconnect in 10 seconds
@@ -2997,7 +2997,7 @@ function WsHandler() {
 				growlSuccess(message);
 			}
 			self.wsState = 9;
-			console.log(getDebugMessage(message));
+			logger.info(message)();
 		};
 	};
 }
@@ -3010,7 +3010,7 @@ function Storage() {
 		var jsonData = localStorage.getItem(self.STORAGE_NAME);
 		if (jsonData != null) {
 			var parsedData = JSON.parse(jsonData);
-			console.log(getDebugMessage('Loading {} messages from localstorage', parsedData.length));
+			logger.info('Loading {} messages from localstorage', parsedData.length)();
 			// don't make sound on loadHistory
 			var savedSoundStatus = window.sound;
 			window.sound = 0;
@@ -3020,8 +3020,8 @@ function Storage() {
 				try {
 					wsHandler.handleMessage(parsedData[i]);
 				} catch (err) {
-					console.warn(getDebugMessage("Message '{}' isn't loaded because {}",
-							JSON.stringify(parsedData[i]), err));
+					logger.warn("Message '{}' isn't loaded because {}",
+							JSON.stringify(parsedData[i]), err)();
 				}
 			}
 			window.loggingEnabled = true;

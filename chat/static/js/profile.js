@@ -27,7 +27,7 @@ function initChangeProfile() {
 		/*TODO $* to var*/
 	}
 	if (isDateMissing()) {
-		console.warn(getDebugMessage("Browser doesn't support html5 input type date, trying to load javascript datepicker"));
+		logger.warn("Browser doesn't support html5 input type date, trying to load javascript datepicker")();
 		doGet(PICKADAY_CSS_URL);
 		doGet(MOMENT_JS_URL, function () {
 			// load pikaday only after moment.js
@@ -39,12 +39,12 @@ function initChangeProfile() {
 					maxDate: new Date(),
 					yearRange: [1930, 2010]
 				});
-				console.log(getDebugMessage("pikaday date picker has been loaded"));
+				logger.info("pikaday date picker has been loaded")();
 			});
 		})
 	}
 	if (!navigator.getUserMedia) {
-		console.warn(getDebugMessage('Browser doesnt support capturing video, skipping photo snapshot'));
+		logger.warn('Browser doesnt support capturing video, skipping photo snapshot')();
 	}
 	CssUtils.hideElement(video);
 }
@@ -60,7 +60,7 @@ function startSharingVideo() {
 	}
 
 	function errorCallback(error) {
-		console.log(getDebugMessage("navigator.getUserMedia error: {}", error));
+		logger.info("navigator.getUserMedia error: {}", error)();
 	}
 
 	navigator.getUserMedia(constraints, successCallback, errorCallback);
@@ -95,7 +95,7 @@ function startCapturingVideo(button) {
 			isStopped = false;
 			growlInfo("Click on your video to take a photo")
 		}, function (e) {
-			console.error(getDebugMessage('Error while trying to capture a picture "{}"', e.message || e.name));
+			logger.error('Error while trying to capture a picture "{}"', e.message || e.name)();
 			growlError('Unable to use your webcam because "{}"'.format(e.message || e.name ));
 		});
 	} else if (!isStopped) {
@@ -121,8 +121,11 @@ function setJsState() {
 	localStorage.setItem('theme', themeSelector.value);
 	document.body.className = themeSelector.value;
 	notifications = notificationInput.checked; // global var
-	window.LOGS = logsInput.checked; // global var
-	enableLogs();
+	if (logsInput.checked) {
+		logger.enableLogs();
+	} else {
+		logger.disableLogs();
+	}
 }
 
 function saveProfile(event) {

@@ -12,6 +12,12 @@ if (!String.prototype.startsWith) {
 	};
 }
 
+/** in 23 - out 23
+ *  */
+function sliceZero(number, count) {
+	return String("00" + number).slice(count || -2);
+}
+
 var growlHolder;
 
 window.onerror = function (msg, url, linenumber) {
@@ -34,36 +40,121 @@ String.prototype.formatPos = function () {
 
 navigator.getUserMedia =  navigator.getUserMedia|| navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
-var historyStorage;
 var MAX_STORAGE_LENGTH = 3000;
 var blankRegex = /^\s*$/;
 var fileTypeRegex = /\.(\w+)(\?.*)?$/;
 window.sound = 0;
 window.loggingEnabled = true;
 var ajaxLoader;
-var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|&#39;|$))/g;/*http://anycharacter except end of text, <br> or space*/
+
+///var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|&#39;|$))/g;/*http://anycharacter except end of text, <br> or space*/ TODO is ' ( &#39; ) allowed symbol? if not this breaks https://raw.githubusercontent.com/NeverSinkDev/NeverSink-Filter/master/NeverSink's%20filter%20-%201-REGULAR.filter
+var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g;/*http://anycharacter except end of text, <br> or space*/
 var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
 var muteBtn;
 var inputRangeStyles = {};
 
-function dummyFun() {}
 
-consoleReal = console;
-consoleDummy = {
-	log: dummyFun,
-	error: dummyFun,
-	warn: dummyFun
-};
+window.logger = (function (logsEnabled) {
+	var self = this;
+	self.historyStorage = null;
+	self.styles = {
+		time: "color: blue",
+		msg: "color: black",
+		debug: "color: green; font-weight: bold"
+	};
+	self.dummyFun = function () {
+		return function () { }
+	};
+	self.disableLogs = function () {
+		self.info = dummyFun;
+		self.error = dummyFun;
+		self.debug = dummyFun;
+		self.warn = dummyFun;
+	};
+	self.enableLogs = function () {
+		self.info = self._info;
+		self.error = self._error;
+		self.warn = self._warn;
+		self.debug = self._debug;
+	};
+	self._info = function () {
+		return self.doLog(arguments, console.log);
+	};
+	self._error = function () {
+		return self.doLog(arguments, console.error);
+	};
+	self._warn = function () {
+		return self.doLog(arguments, console.warn);
+	};
+	self._debug = function () {
+		var args = Array.prototype.slice.call(arguments);
+		var initiator = args.shift();
+		var now = new Date();
+		// second argument is format, others are params
+		var text = args.length == 0 ? args[0] : String.prototype.format.apply(args.shift(), args);
+		var result = "%c{}:{}:{}.{}: %c{} %c{}".format(
+				sliceZero(now.getHours()),
+				sliceZero(now.getMinutes()),
+				sliceZero(now.getSeconds()),
+				sliceZero(now.getMilliseconds(), -3),
+				initiator,
+				text
+		);
+		saveLogToStorage(result);
+		return Function.prototype.bind.apply(console.log,
+				[window.console, result, self.styles.time, self.styles.debug, self.styles.msg]);
+	};
+	self.saveLogToStorage = function (result) {
+		if (!window.loggingEnabled) {
+			return;
+		}
+		if (self.historyStorage == null) {
+			self.historyStorage = result;
+		} else if (self.historyStorage.length > MAX_STORAGE_LENGTH) {
+			var notConcatInfo = self.historyStorage + ';;;' + result;
+			self.historyStorage = notConcatInfo.substr(notConcatInfo.length - MAX_STORAGE_LENGTH, notConcatInfo.length);
+		} else {
+			self.historyStorage = self.historyStorage + ';;;' + result;
+		}
+	};
 
-function enableLogs() {
-	if (!window.LOGS) {
-		console = consoleDummy;
+	self.doLog = function (arguments, fn) {
+		return Function.prototype.bind.apply(fn, self.log.apply(self.log, arguments));
+	};
+	/**
+	 *
+	 * Formats message for debug,
+	 * Usage log("{} is {}", 'war', 'bad');
+	 * @returns:  Array "15:09:31:009: war is bad"
+	 *  */
+	self.log = function () {
+		var now = new Date();
+		// first argument is format, others are params
+		var text;
+		if (arguments.length > 1) {
+			var args = Array.prototype.slice.call(arguments);
+			text = String.prototype.format.apply(args.shift(), args);
+		} else {
+			text = arguments[0];
+		}
+		var result = "%c{}:{}:{}.{}%c: {}".format(
+				sliceZero(now.getHours()),
+				sliceZero(now.getMinutes()),
+				sliceZero(now.getSeconds()),
+				sliceZero(now.getMilliseconds(), -3),
+				text
+		);
+		saveLogToStorage(result);
+		return [window.console, result, self.styles.time, self.styles.msg];
+	};
+	if (logsEnabled)  {
+		self.enableLogs();
 	} else {
-		console = consoleReal;
+		self.disableLogs();
 	}
-}
+	return self;
+})(window.START_WITH_LOGS);
 
-enableLogs();
 
 const escapeMap = {
 	"&": "&amp;",
@@ -235,6 +326,7 @@ var Growl = function (message) {
 	var self = this;
 	self.growlHolder = growlHolder;
 	self.message = message;
+	self.id = Date.now();
 	self.error = function () {
 		self.show(4000, 'col-error')
 	};
@@ -251,13 +343,14 @@ var Growl = function (message) {
 	self.remove = function () {
 		if (self.growl.parentNode === self.growlHolder) {
 			self.growlHolder.removeChild(self.growl);
-			console.log(getDebugMessage("Removing growl"));
+			logger.info("Removing growl #{}", self.id)();
 		} else {
-			console.log(getDebugMessage("Growl is already removed"));
+			logger.info("Growl #{} is already removed", self.id)();
 		}
 	};
 	self.showInfinity = function(growlClass) {
 		self.growl = document.createElement('div');
+		logger.info("Rendering growl #{}", self.id)();
 		if (self.message) {
 			self.message = self.message.trim();
 			self.growl.innerHTML = self.message.indexOf("<") == 0? self.message : encodeAnchorsHTML(self.message);
@@ -417,7 +510,7 @@ onDocLoad(function () {
 	}
 	ajaxLoader = $("ajaxStatus");
 	if (typeof InstallTrigger !== 'undefined') { // browser = firefox
-		console.warn(getDebugMessage("Ops, there's no scrollbar for firefox"));
+		logger.warn("Ops, there's no scrollbar for firefox")();
 	}
 	growlHolder = $('growlHolder');
 	initInputRangeTrack();
@@ -491,14 +584,14 @@ function doPost(url, params, callback, form) {
 	r.onreadystatechange = function () {
 		if (r.readyState === 4) {
 			if (r.status === 200) {
-				console.log(getDebugMessage("POST in: {} ::: {};", url, r.response));
+				logger.debug("POST in", "{} ::: {};", url, r.response)();
 			} else {
-				console.error(getDebugMessage("POST in: {} ::: {}, status:", url, r.response, r.status));
+				logger.error("POST out: {} ::: {}, status:", url, r.response, r.status)();
 			}
 			if (typeof(callback) === "function") {
 				callback(r.response);
 			} else {
-				console.warn(getDebugMessage("Skipping {} callback for POST {}", callback, url));
+				logger.warn("Skipping {} callback for POST {}", callback, url)();
 			}
 		}
 	};
@@ -517,7 +610,13 @@ function doPost(url, params, callback, form) {
 	}
 	r.open("POST", url, true);
 	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
-	console.log(getDebugMessage("POST out: {} ::: {}", url, params));
+	if (data.entries) { //es6
+		params = '';
+		for (var pair of data.entries()) {
+			params += pair[0] +'='+ pair[1] +'; ';
+		}
+	}
+	logger.debug("POST out", "{} ::: {}", url, params)();
 	r.send(data);
 }
 
@@ -525,7 +624,7 @@ function doPost(url, params, callback, form) {
 /**
  * Loads file from server on runtime */
 function doGet(fileUrl, callback) {
-	console.log(getDebugMessage("GET out: {}", fileUrl));
+	logger.debug("GET out", fileUrl)();
 	var regexRes = fileTypeRegex.exec(fileUrl);
 	var fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
 	var fileRef = null;
@@ -552,12 +651,12 @@ function doGet(fileUrl, callback) {
 			xobj.onreadystatechange = function () {
 				if (xobj.readyState === 4) {
 					if (xobj.status === 200) {
-						console.log(getDebugMessage('GET in: {} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100)));
+						logger.debug('GET in','{} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100))();
 						if (callback) {
 							callback(xobj.responseText);
 						}
 					} else {
-						console.error(getDebugMessage("Unable to load {}, response code is '{}', response: {}", fileUrl, xobj.status, xobj.response ));
+						logger.error("Unable to load {}, response code is '{}', response: {}", fileUrl, xobj.status, xobj.response )();
 						growlError("<span>Unable to load {}, response code is <b>{}</b>, response: {} <span>".format(fileUrl, xobj.status, xobj.response));
 					}
 				}
@@ -570,55 +669,3 @@ function doGet(fileUrl, callback) {
 	}
 }
 
-
-function saveLogToStorage(result) {
-	if (!window.loggingEnabled) {
-		return;
-	}
-	if (historyStorage == null) {
-		historyStorage = result;
-	} else if (historyStorage.length > MAX_STORAGE_LENGTH) {
-		var notConcatInfo = historyStorage +';;;'+ result;
-		historyStorage = notConcatInfo.substr(notConcatInfo.length - MAX_STORAGE_LENGTH, notConcatInfo.length);
-	} else {
-		historyStorage = historyStorage + ';;;' + result;
-	}
-}
-
-
-
-/** in 23 - out 23
- *  */
-function sliceZero(number, count) {
-	return String("00" + number).slice(count || -2);
-}
-
-
-/**
- *
- * Formats message for debug,
- * Usage getDebugMessage("{} is {}", 'war', 'bad');
- * @returns: "15:09:31:009: war is bad"
- *  */
-function getDebugMessage() {
-	if (!window.LOGS) return;
-	var now = new Date();
-	// first argument is format, others are params
-	var text;
-	if (arguments.length > 1) {
-		var args = Array.prototype.slice.call(arguments);
-		args.shift();
-		text = String.prototype.format.apply(arguments[0], args);
-	} else {
-		text = arguments[0];
-	}
-	var result = "{}:{}:{}.{}: {}".format(
-			sliceZero(now.getHours()),
-			sliceZero(now.getMinutes()),
-			sliceZero(now.getSeconds()),
-			sliceZero(now.getMilliseconds(), -3),
-			text
-	);
-	saveLogToStorage(result);
-	return result;
-}
