@@ -111,7 +111,7 @@ nav
 	font-size: 26px
 	margin: 0
 	padding: 10px 4px 9px 10px
-	display: flex
+	@include display-flex
 	align-items: center
 
 
@@ -127,7 +127,7 @@ html, body
 
 body
 	@include display-flex
-	flex-direction: column
+	@include flex-direction(column)
 	width: 100%
 
 
@@ -183,7 +183,7 @@ textarea, div[contenteditable]
 /* ============= LOGIN DROPDOWN ==============
 
 #loginForm
-	display: flex
+	@include display-flex
 	align-items: center
 
 	> div
