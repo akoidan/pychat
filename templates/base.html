@@ -5,6 +5,10 @@
 	<title>PyChat</title> {% load md5url %}
 	<link rel="shortcut icon" href="{% md5url 'images/favicon.ico' %}"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<meta property="og:title" content="Open Source Chat"/>
+	<meta property="og:image" content="{% md5url 'images/favicon.ico' %}"/>
+	<meta property="og:site_name" content="Pychat"/>
+	<meta property="og:description" content="Chat with your friends, make video calls or transfer files with Pychat!"/>
 	<script>
 		const RESPONSE_SUCCESS = "{{ successResponse }}";
 		window.LOGS = {{ logs |yesno:"true,false" }};

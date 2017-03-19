@@ -190,7 +190,6 @@ if DEBUG:
 TEMPLATES = [{
 	'BACKEND': 'django.template.backends.django.DjangoTemplates',
 	'DIRS': [join(BASE_DIR, 'templates')],
-	'DEBUG': True,
 	'OPTIONS': {
 		# 'loaders': [
 		# 	('django.template.loaders.cached.Loader', [

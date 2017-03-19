@@ -59,7 +59,6 @@ Afterwards to start the chat you need:
 * Add colored logs http://stackoverflow.com/questions/7505623/colors-in-javascript-console
 * replace `new Date().getTime()` with `Date.now()`
 * `'` Symbol in links breaks anchor tag. For example https://raw.githubusercontent.com/NeverSinkDev/NeverSink-Filter/master/NeverSink's%20filter%20-%201-REGULAR.filter
-* Add page preview http://ogp.me/
 * webrtc connection lost while transfering file causes js error
 * Add title for room. 
 * add scale to painter and Ctrl+Z
