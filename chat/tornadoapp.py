@@ -851,7 +851,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		So if ws loses a connection it still can reconnect with same id,
 		and TornadoHandler can restore webrtc_connections to previous state
 		"""
-		self.id = create_id(self.user_id, self.get_argument('id'))
+		self.id = create_id(self.user_id, self.get_argument('id', None))
 		self.ws_write(self.set_ws_id())
 
 	def open(self):
