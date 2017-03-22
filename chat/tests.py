@@ -62,7 +62,7 @@ class WebSocketLoadTest(TestCase):
 		# thread.start()
 
 	def threaded_function(self, session):
-		cookies = '%s=%s;' % (settings.SESSION_COOKIE_NAME, session)
+		cookies = '{}={}'.format((settings.SESSION_COOKIE_NAME, session))
 		ws = create_connection("ws://%s" % self.SITE_TO_SPAM, cookie=cookies)
 		for i in range(randint(30, 50)):
 			sleep(random())
