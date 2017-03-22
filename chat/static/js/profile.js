@@ -1,20 +1,22 @@
 var video;
 var canvas;
 var localMediaStream = null;
-var snapshot = false;
 var isStopped = true;
 var photoRegex = /^\S*\/photo\/\w{8}_.*$/;
 var photoImg;
+var photoInput;
 var userProfileData;
 var themeSelector;
 var changeProfileForm;
 var notificationInput;
 var logsInput;
+var photoSrc = null;
 
 function initChangeProfile() {
 	photoImg = $('photoImg');
 	video = $('changeProfileVideo');
 	canvas = $('canvasBuffer');
+	photoInput = $('id_photo');
 	userProfileData = $('userProfileData');
 	themeSelector = $('themeSelector');
 	changeProfileForm = $('changeProfileForm');
@@ -26,6 +28,12 @@ function initChangeProfile() {
 		themeSelector.value = item;
 		/*TODO $* to var*/
 	}
+	photoImg.addEventListener('drop', dropPhoto, false);
+	var events = ["dragenter", "dragstart", "dragend", "dragleave", "dragover", "drag", "drop"];
+	for (var i = 0, iLen = events.length; i < iLen; i++) {
+		photoImg.addEventListener(events[i], preventDefault, false);
+	}
+	photoInput.onchange = photoInputChanged;
 	if (isDateMissing()) {
 		console.warn(getDebugMessage("Browser doesn't support html5 input type date, trying to load javascript datepicker"));
 		doGet(PICKADAY_CSS_URL);
@@ -49,6 +57,36 @@ function initChangeProfile() {
 	CssUtils.hideElement(video);
 }
 
+function dropPhoto(e) {
+	e.preventDefault();
+	var ok = setPhotoFromReader(e.dataTransfer.files[0], 'drop');
+	if (ok) {
+		photoInput.value = '';
+	}
+}
+
+function photoInputChanged(e) {
+	var ok = setPhotoFromReader(e.target.files[0], 'input');
+	if (!ok) {
+		photoInput.value = '';
+	}
+}
+
+function setPhotoFromReader(file, type) {
+	if (file && file.type && file.type.match(/image.*/)) {
+		var reader = new window.FileReader();
+		reader.onload = function (e) {
+			photoImg.src = e.target.result;
+			growlSuccess("Photo has been rendered, click save to apply it");
+		};
+		reader.readAsDataURL(file);
+		photoSrc = type;
+		return true;
+	} else {
+		growlError("Invalid file type " + file.type);
+		return false;
+	}
+}
 
 function startSharingVideo() {
 	var constraints = {video: true};
@@ -76,7 +114,8 @@ function takeSnapshot() {
 		// "image/webp" works in Chrome.
 		// Other browsers will fall back to image/png.
 		photoImg.src = canvas.toDataURL('image/webp');
-		snapshot = true;
+		photoSrc = 'canvas';
+		photoInput.value = '';
 		growlInfo('Image has been set. Click on "Finish" to hide video');
 	}
 }
@@ -115,6 +154,10 @@ function startCapturingVideo(button) {
 	}
 }
 
+function preventDefault(e) {
+	 e.preventDefault();
+}
+
 
 function setJsState() {
 	var options = [];
@@ -129,8 +172,12 @@ function saveProfile(event) {
 	event.preventDefault();
 	var image = null;
 	var params = null;
-	if (snapshot) {
-		image = canvas.toDataURL("image/png");
+	if (photoSrc == 'canvas' || photoSrc == 'drop') {
+		if (photoSrc == 'canvas') {
+			image = canvas.toDataURL("image/png");
+		} else if (photoSrc == 'drop') {
+			image = photoImg.src;
+		}
 		params = {base64_image: image};
 	}
 	ajaxShow();
