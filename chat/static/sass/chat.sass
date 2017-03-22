@@ -58,13 +58,13 @@ p
 	margin-bottom: 0.8em
 
 #wrapper
-	flex: 1
+	@include flex(1)
 	@include display-flex
 	min-height: 0
 
 #chatBoxHolder
 	@include display-flex
-	flex-direction: column
+	@include flex-direction(column)
 	width: 100%
 
 .chatbox
@@ -281,12 +281,12 @@ p
 
 @media screen and (max-width: 35em)
 	#wrapper
-		flex-direction: column-reverse
+		@include flex-direction(column-reverse)
 	#chat-room-users-wrapper
 		width: 100%
 		border-bottom: 8px solid
 	#chatBoxHolder, #chat-room-users-wrapper
-		flex: 1
+		@include flex(1)
 	#chatBoxHolder
 		flex-grow: 3
 	#chat-room-users-wrapper

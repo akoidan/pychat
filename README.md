@@ -56,7 +56,6 @@ Afterwards to start the chat you need:
  5. If you get an ssl error on establishing websocket connection in browser, that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
 
 # TODO
-* Add page preview http://ogp.me/
 * webrtc connection lost while transfering file causes js error
 * Add title for room. 
 * add scale to painter and Ctrl+Z
