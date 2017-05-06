@@ -27,7 +27,8 @@ try:  # py2
 except ImportError:  # py3
 	from urllib.parse import urlparse
 
-from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_READ_MESSAGE, SELECT_SELF_ROOM
+from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_READ_MESSAGE, SELECT_SELF_ROOM, \
+	TORNADO_REDIS_PORT
 from chat.models import User, Message, Room, get_milliseconds, UserJoinedInfo, RoomUsers
 
 PY3 = sys.version > '3'
@@ -262,7 +263,7 @@ class MessagesHandler(MessagesCreator):
 		self.channels = []
 		self.call_receiver_channel = None
 		self._logger = None
-		self.async_redis = tornadoredis.Client()
+		self.async_redis = tornadoredis.Client(port=TORNADO_REDIS_PORT)
 		self.patch_tornadoredis()
 		self.pre_process_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
