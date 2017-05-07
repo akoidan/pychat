@@ -2047,7 +2047,7 @@ function DownloadBar() {
 	};
 }
 
-function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
+function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 	var self = this;
 	self.opponentWsId = opponentWsId;
 	self.sendChannel = null;
@@ -2226,10 +2226,11 @@ function PeerConnectionHandler(receiverRoomId, connectionId, opponentWsId) {
 	};
 }
 
-function  BaseTransferHandler(receiverRoomId, connectionId) {
+function BaseTransferHandler(receiverRoomId, type) {
 	var self = this;
 	self.connectionId = connectionId;
 	self.receiverRoomId = receiverRoomId;
+	self.fileCallType = type;
 	self.sendOffer = function (quedId, content) {
 		var messageRequest = {
 			action: 'offerWebrtc',
@@ -2248,16 +2249,18 @@ function  BaseTransferHandler(receiverRoomId, connectionId) {
 	};
 }
 
-function FileTransferHandler(receiverRoomId, connectionId) {
+function CallHandler(receiverRoomId) {
 	var self = this;
-	BaseTransferHandler.call(self, receiverRoomId, connectionId);
-	self.dom = {
-		fileInput: $('webRtcFileInput'), //
-	};
-	self.fileCallType = 'file';
+	BaseTransferHandler.call(self, receiverRoomId, 'call');
+
+}
+
+function FileTransferHandler(receiverRoomId, file) {
+	var self = this;
+	self.file = file;
+	BaseTransferHandler.call(self, receiverRoomId, 'file');
 	self.sendOfferParent = self.sendOffer;
 	self.sendOffer = function (quedId) {
-		self.file = self.dom.fileInput.files[0];
 		//self.dom.fileInput.disabled = true;
 		self.fileName = self.file.name;
 		self.fileSize = self.file.size;
@@ -2291,7 +2294,7 @@ function FileTransferHandler(receiverRoomId, connectionId) {
 
 function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
 	var self = this;
-	PeerConnectionHandler.call(self, receiverRoomId, connectionId, opponentWsId);
+	AbstractPeerConnection.call(self, receiverRoomId, connectionId, opponentWsId);
 	self.fileCallType = 'file';
 	self.CHUNK_SIZE = 16384;
 	self.receiveBuffer = [];
@@ -2398,9 +2401,9 @@ function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
 	};
 }
 
-function CallHandler(receiverRoomId, connectionId) {
+function CallPeerConnection(receiverRoomId, connectionId) {
 	var self = this;
-	PeerConnectionHandler.call(self, receiverRoomId, connectionId);
+	AbstractPeerConnection.call(self, receiverRoomId, connectionId);
 	self.fileCallType = 'call';
 	self.audioProcessors = {};
 	self.dom = {
@@ -2828,7 +2831,7 @@ function WebRtcApi() {
 	self.dom = {
 		callContainer: $('callContainer'),
 		webRtcFileIcon: $('webRtcFileIcon'),
-		fileInput: $('webRtcFileInput') // TODO multirtc remove duplication
+		fileInput: $('webRtcFileInput')
 	};
 	self.callTimeoutTime = 60000;
 	self.connections = {};
@@ -2868,18 +2871,18 @@ function WebRtcApi() {
 		// 	wsHandler.sendToServer('busy'); // TODO multirtc
 		// }
 
-		var className = message.content ? FileTransferHandler : CallHandler;
+		var className = message.content ? FileTransferHandler : CallPeerConnection;
 		var handler = new className(message.channel, message.connId, message.opponentWsId);
 		self.connections[message.connId] = handler;
 		handler.setAnswerOpponentVariables(message);
 		handler.showOffer(message);
-		if (handler instanceof CallHandler) {
+		if (handler instanceof CallPeerConnection) {
 			// TODO multirtc settimout
 			// self.timeoutFunnction = setTimeout(self.connections[message.connId].declineCall, self.callTimeoutTime);
 		}
 	};
 	self.handle = function (data) {
-		if (data.handler == 'webrtc') {
+		if (data.handler === 'webrtc') {
 			self["on"+data.action](data);
 		} else if (self.connections[data.connId]) {
 			self.connections[data.connId]['on'+data.type](data);
@@ -2888,14 +2891,14 @@ function WebRtcApi() {
 		}
 	};
 	self.offerCall = function () {
-		self.createWebrtcObject(CallHandler);
+		self.createWebrtcObject(CallPeerConnection);
 	};
 	self.offerFile = function () {
-		self.createWebrtcObject(FileTransferHandler)
+		self.createWebrtcObject(FileTransferHandler, self.dom.fileInput.files[0])
 	};
-	self.createWebrtcObject = function (className) {
+	self.createWebrtcObject = function (className, additionalParam) {
 		var newId = self.createQuedId();
-		self.quedConnections[newId] = new className(channelsHandler.activeChannel);
+		self.quedConnections[newId] = new className(channelsHandler.activeChannel, additionalParam);
 		self.quedConnections[newId].sendOffer(newId);
 	};
 	self.attachEvents = function() {
