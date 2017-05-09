@@ -2081,18 +2081,23 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 			{RtpDataChannels: false /*true*/}
 		]
 	};
+	self.log = function (text) {
+			return logger.webrtc("" + self.connectionId + self.opponentWsId, text);
+	};
+	self.logErr = function (text) {
+			return logger.webrtc("" + self.connectionId + self.opponentWsId, text);
+	};
 	self.defaultSendEvent = function(action, type, content) {
 		wsHandler.sendToServer({
 			content: content,
 			action: action,
 			type: type,
 			connId: self.connectionId,
-			handler: self.fileCallType,
 			opponentWsId: self.opponentWsId
 		});
 	};
 	self.onaccept = function (message) {
-		logger.info("User accepted connection")();
+		self.log("User accepted connection")();
 	};
 	self.getDebugMessage = function () {
 		return log.apply(this, arguments) + ", connId: " +self.connectionId ;
@@ -2137,6 +2142,11 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		self.createPeerConnection();
 		self.pc.ondatachannel = self.gotReceiveChannel;
 	};
+
+	self.onacceptWebrtc = function(message) {
+		self.createPeerConnection();
+		self.createSendChannelAndOffer();
+	};
 	self.onwebrtc = function (message) {
 		var data = message.content;
 		//self.clearTimeout(); TODO multirtc
@@ -2154,6 +2164,7 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		}
 	};
 	self.createPeerConnection = function () {
+		self.log("Creating RTCPeerConnection")();
 		if (!RTCPeerConnection) {
 			throw "Your browser doesn't support RTCPeerConnection";
 		}
@@ -2167,16 +2178,16 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 	};
 	self.closeEvents = function (text) {
 		if (self.sendChannel && self.sendChannel.readyState != 'closed') {
-			logger.info("Closing chanel")();
+			self.log("Closing chanel")();
 			self.sendChannel.close();
 		} else {
-			logger.info("No channels to close")();
+			self.log("No channels to close")();
 		}
 		if (self.pc && self.pc.signalingState != 'closed') {
-			logger.info("Closing peer connection")();
+			self.log("Closing peer connection")();
 			self.pc.close();
 		} else {
-			logger.info("No peer connection to close")();
+			self.log("No peer connection to close")();
 		}
 		if (text) {
 			growlInfo(text);
@@ -2191,16 +2202,16 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
 			self.sendChannel.onopen = self.onreceiveChannelOpen;
 			self.sendChannel.onmessage = self.webrtcDirectMessage;
-			logger.info("Created send data channel")();
+			self.log("Created send data channel")();
 		} catch (e) {
 			var error = "Failed to create data channel because {} ".format(e.message || e);
 			growlError(error);
-			logger.error(error)();
+			self.logErr(error)();
 		}
 		self.pc.createOffer(function (offer) {
-			logger.info('created offer...')();
+			self.log('created offer...')();
 			self.pc.setLocalDescription(offer, function () {
-				logger.info('sending to remote...')();
+				self.log('sending to remote...')();
 				self.sendWebRtcEvent(offer);
 			}, self.failWebRtcP2);
 		}, self.failWebRtcP1, self.sdpConstraints);
@@ -2225,7 +2236,7 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		var errorContext = isError ? "{}: {}".format(arguments[0].name, arguments[0].message)
 				: Array.prototype.join.call(arguments, ' ');
 		growlError("An error occurred while establishing a connection: {}".format(errorContext));
-		logger.error("OnError way from {}, exception: {}", getCallerTrace(), errorContext)();
+		self.logErr("OnError way from {}, exception: {}", getCallerTrace(), errorContext)();
 	};
 }
 
@@ -2263,6 +2274,8 @@ function BaseTransferHandler(receiverRoomId, type) {
 		var selfHandledAction = ['replyWebrtc'];
 		if (selfHandledAction.indexOf(data.action) >= 0) {
 			self['on'+data.action](data);
+		} else if (data.action === 'acceptWebrtc') {
+			self.peerConnections[data.opponentWsId]['on'+data.action](data); //TODO
 		} else {
 			self.peerConnections[data.opponentWsId]['on'+data.type](data);
 		}
@@ -2285,9 +2298,15 @@ function BaseTransferHandler(receiverRoomId, type) {
 		self.showOffer(message);
 
 	};
+	self.accept = function () {
+		wsHandler.sendToServer({
+			action: 'acceptWebrtc',
+			connId: self.offerMessage.connId
+		});
+	};
 	self.getPeerConnectionClass = function() {
 		throw 'overridden';
-	}
+	};
 }
 
 function CallHandler(receiverRoomId) {
@@ -2326,9 +2345,9 @@ function FileTransferHandler(receiverRoomId) {
 		});
 	};
 	self.onreplyWebrtc = function (message) {
-		self.peerConnections[message.connId] = new FilePeerConnection();
+		self.peerConnections[message.opponentWsId] = new FilePeerConnection(null, message.connId, message.opponentWsId);
 		var downloadBar = self.lastGrowl.addDownloadBar();
-		self.peerConnections[message.connId].setDownloadBar(downloadBar);
+		self.peerConnections[message.opponentWsId].setDownloadBar(downloadBar);
 		downloadBar.setStatus("To {}:".format(message.user));
 	};
 	self.closeWindowClick = function() {
@@ -2350,15 +2369,11 @@ function FileTransferHandler(receiverRoomId) {
 		self.decline();
 		self.closeWindowClick();
 	};
-	self.accept = function () {
-		self.defaultSendEvent('acceptChannel', 'accept');
-	};
 	self.acceptFileReply = function () {
 		self.peerConnections[self.offerMessage.opponentWsId] = new FilePeerConnection(null, self.offerMessage.connId, self.offerMessage.opponentWsId);
 		var db = self.lastGrowl.addDownloadBar();
 		self.peerConnections[self.offerMessage.opponentWsId].setDownloadBar(db);
-		self.peerConnections[self.offerMessage.opponentWsId].createPeerConnection();
-		self.peerConnections[self.offerMessage.opponentWsId].createSendChannelAndOffer();
+		self.peerConnections[self.offerMessage.opponentWsId].waitForAnswer();
 		self.accept();
 	};
 	self.ondecline = function () {
@@ -2369,6 +2384,7 @@ function FileTransferHandler(receiverRoomId) {
 function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
 	var self = this;
 	AbstractPeerConnection.call(self, receiverRoomId, connectionId, opponentWsId);
+	self.log("Created FilePeerConnection")();
 	self.fileCallType = 'file';
 	self.CHUNK_SIZE = 16384;
 	self.receiveBuffer = [];
@@ -3006,7 +3022,7 @@ function WsHandler() {
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
-		logger.debug("WS_IN", jsonData)();
+		logger.ws("WS_IN", jsonData)();
 		var data = JSON.parse(jsonData);
 		self.handleMessage(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
@@ -3023,7 +3039,7 @@ function WsHandler() {
 			growlError("Can't send message, because connection is lost :(");
 			return false;
 		} else {
-			logger.debug("WS out", logEntry)();
+			logger.ws("WS out", logEntry)();
 			self.ws.send(jsonRequest);
 			return true;
 		}

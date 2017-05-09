@@ -60,7 +60,8 @@ window.logger = (function (logsEnabled) {
 	self.styles = {
 		time: "color: blue",
 		msg: "color: black",
-		debug: "color: green; font-weight: bold"
+		ws: "color: green; font-weight: bold",
+		webrtc: "color: #960055; font-weight: bold"
 	};
 	self.dummyFun = function () {
 		return function () { }
@@ -68,14 +69,16 @@ window.logger = (function (logsEnabled) {
 	self.disableLogs = function () {
 		self.info = dummyFun;
 		self.error = dummyFun;
-		self.debug = dummyFun;
+		self.ws = dummyFun;
 		self.warn = dummyFun;
+		self.webrtc = dummyFun;
 	};
 	self.enableLogs = function () {
 		self.info = self._info;
 		self.error = self._error;
 		self.warn = self._warn;
-		self.debug = self._debug;
+		self.ws = self._ws;
+		self.webrtc = self._webrtc;
 	};
 	self._info = function () {
 		return self.doLog(arguments, console.log);
@@ -85,6 +88,14 @@ window.logger = (function (logsEnabled) {
 	};
 	self._warn = function () {
 		return self.doLog(arguments, console.warn);
+	};
+	self._webrtc = function() {
+		self.styles.debug = self.styles.webrtc;
+		return self._debug.apply(self, arguments);
+	};
+	self._ws = function() {
+		self.styles.debug = self.styles.ws;
+		return self._debug.apply(self, arguments);
 	};
 	self._debug = function () {
 		var args = Array.prototype.slice.call(arguments);

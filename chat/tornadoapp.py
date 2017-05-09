@@ -60,7 +60,7 @@ class Actions(object):
 	PRINT_MESSAGE = 'printMessage'
 	WEBRTC = 'sendRtcData'
 	CLOSE_WEBRTC = 'destroyConnection'
-	ACCEPT_WEBRTC = 'acceptChannel'
+	ACCEPT_WEBRTC = 'acceptWebrtc'
 	ROOMS = 'setRooms'
 	REFRESH_USER = 'setOnlineUsers'
 	GROWL_MESSAGE = 'growl'
@@ -499,12 +499,20 @@ class MessagesHandler(MessagesCreator):
 		)
 
 	def accept_and_proxy_connection(self, in_message):
-		self.proxy_webrtc(in_message)
-		self.async_redis_publisher.hset(
-			in_message[VarNames.CONNECTION_ID],
-			self.id,
-			'receiver_accepted'
-		)
+		connection_id = in_message[VarNames.CONNECTION_ID] # TODO accept all if call
+		sender_ws_id = self.sync_redis.hget(connection_id, 'sender_id').decode('utf-8')
+		sender_ws_status = self.sync_redis.hget(connection_id, sender_ws_id).decode('utf-8')
+		self_ws_status = self.sync_redis.hget(connection_id, self.id).decode('utf-8')
+		if sender_ws_status == 'sender_ready' and self_ws_status == 'receiver_responded':
+			self.async_redis_publisher.hset(connection_id, self.id, 'receiver_ready')
+			self.publish({
+				VarNames.EVENT: Actions.ACCEPT_WEBRTC,
+				VarNames.CONNECTION_ID: connection_id,
+				VarNames.WEBRTC_OPPONENT_ID: self.id,
+				VarNames.HANDLER_NAME: HandlerNames.FILE,  # TODO support call as well
+			}, sender_ws_id)
+		else:
+			raise ValidationError("Invalid channel status")
 
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.CHANNEL]
@@ -530,8 +538,9 @@ class MessagesHandler(MessagesCreator):
 		connection_id = in_message[VarNames.CONNECTION_ID]
 		sender_ws_id = self.sync_redis.hget(connection_id, 'sender_id').decode('utf-8')
 		sender_ws_status = self.sync_redis.hget(connection_id, sender_ws_id).decode('utf-8')
+		self_ws_status = self.sync_redis.hget(connection_id, self.id).decode('utf-8')
 		self.async_redis_publisher.hset(connection_id, self.id, 'receiver_responded')
-		if sender_ws_status == 'sender_ready':
+		if sender_ws_status == 'sender_ready' and self_ws_status == 'receiver_offered':
 			self.publish({
 				VarNames.EVENT: Actions.REPLY_WEBRTC_CONNECTION,
 				VarNames.CONNECTION_ID: connection_id,
