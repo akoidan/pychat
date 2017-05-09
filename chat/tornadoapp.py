@@ -76,6 +76,7 @@ class Actions(object):
 	SET_WEBRTC_ID = 'setConnectionId'
 	SET_WEBRTC_ERROR = 'setError'
 	OFFER_WEBRTC_CONNECTION = 'offerWebrtc'
+	REPLY_WEBRTC_CONNECTION = 'replyWebrtc'
 
 
 class VarNames(object):
@@ -100,10 +101,10 @@ class VarNames(object):
 	CHANNEL_NAME = 'channel'
 	IS_ROOM_PRIVATE = 'private'
 	CONNECTION_ID = 'connId'
+	HANDLER_NAME = 'handler'
 
 
 class HandlerNames:
-	NAME = 'handler'
 	CHANNELS = 'channels'
 	CHAT = 'chat'
 	GROWL = 'growl'
@@ -140,12 +141,12 @@ class MessagesCreator(object):
 			VarNames.CONTENT: content,
 			VarNames.USER_ID: self.user_id,
 			VarNames.TIME: get_milliseconds(),
-			HandlerNames.NAME: handler
+			VarNames.HANDLER_NAME: handler
 		}
 
 	def set_ws_id(self):
 		return {
-			HandlerNames.NAME: HandlerNames.WS,
+			VarNames.HANDLER_NAME: HandlerNames.WS,
 			VarNames.EVENT: Actions.SET_WS_ID,
 			VarNames.CONTENT: self.id
 		}
@@ -174,7 +175,7 @@ class MessagesCreator(object):
 	def set_connection_id(self, qued_id, connection_id):
 		return {
 			VarNames.EVENT: Actions.SET_WEBRTC_ID,
-			HandlerNames.NAME: HandlerNames.WEBRTC,
+			VarNames.HANDLER_NAME: HandlerNames.WEBRTC,
 			VarNames.CONNECTION_ID: connection_id,
 			VarNames.WEBRTC_QUED_ID: qued_id
 		}
@@ -208,7 +209,7 @@ class MessagesCreator(object):
 		res = cls.create_message(message)
 		res[VarNames.EVENT] = event
 		res[VarNames.CHANNEL] = message.room_id
-		res[HandlerNames.NAME] = HandlerNames.CHAT
+		res[VarNames.HANDLER_NAME] = HandlerNames.CHAT
 		return res
 
 	@classmethod
@@ -222,7 +223,7 @@ class MessagesCreator(object):
 			VarNames.CONTENT: [cls.create_message(message) for message in messages],
 			VarNames.EVENT: Actions.GET_MESSAGES,
 			VarNames.CHANNEL: channel,
-			HandlerNames.NAME: HandlerNames.CHAT
+			VarNames.HANDLER_NAME: HandlerNames.CHAT
 		}
 
 	@property
@@ -234,7 +235,7 @@ class MessagesCreator(object):
 			VarNames.EVENT: Actions.CREATE_DIRECT_CHANNEL,
 			VarNames.ROOM_ID: room_id,
 			VarNames.ROOM_USERS: [self.user_id, other_user_id],
-			HandlerNames.NAME: HandlerNames.CHANNELS
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS
 		}
 
 	def subscribe_room_channel_message(self, room_id, room_name):
@@ -242,7 +243,7 @@ class MessagesCreator(object):
 			VarNames.EVENT: Actions.CREATE_ROOM_CHANNEL,
 			VarNames.ROOM_ID: room_id,
 			VarNames.ROOM_USERS: [self.user_id],
-			HandlerNames.NAME: HandlerNames.CHANNELS,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
 			VarNames.ROOM_NAME: room_name
 		}
 
@@ -251,7 +252,7 @@ class MessagesCreator(object):
 			VarNames.EVENT: Actions.INVITE_USER,
 			VarNames.ROOM_ID: room_id,
 			VarNames.USER_ID: user_id,
-			HandlerNames.NAME: HandlerNames.CHANNELS,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
 			VarNames.ROOM_NAME: room_name,
 			VarNames.CONTENT: users
 		}
@@ -261,7 +262,7 @@ class MessagesCreator(object):
 			VarNames.EVENT: Actions.ADD_USER,
 			VarNames.CHANNEL: channel,
 			VarNames.USER_ID: user_id,
-			HandlerNames.NAME: HandlerNames.CHAT,
+			VarNames.HANDLER_NAME: HandlerNames.CHAT,
 			VarNames.GENDER: content[VarNames.GENDER], # SEX: 'Alien', USER: 'Andrew'
 			VarNames.USER: content[VarNames.USER] # SEX: 'Alien', USER: 'Andrew'
 		}
@@ -271,7 +272,7 @@ class MessagesCreator(object):
 			VarNames.EVENT: Actions.DELETE_ROOM,
 			VarNames.ROOM_ID: room_id,
 			VarNames.USER_ID: self.user_id,
-			HandlerNames.NAME: HandlerNames.CHANNELS,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
 			VarNames.TIME: get_milliseconds()
 		}
 
@@ -308,6 +309,7 @@ class MessagesHandler(MessagesCreator):
 			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
 			Actions.INVITE_USER: self.invite_user,
 			Actions.OFFER_WEBRTC_CONNECTION: self.offer_webrtc_connection,
+			Actions.REPLY_WEBRTC_CONNECTION: self.reply_webrtc_connection,
 		}
 		self.post_process_message = {
 			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_channel,
@@ -506,7 +508,7 @@ class MessagesHandler(MessagesCreator):
 
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.CHANNEL]
-		webrtc_type = in_message[HandlerNames.NAME]
+		webrtc_type = in_message[VarNames.HANDLER_NAME]
 		content = in_message.get(VarNames.CONTENT)
 		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
 		connection_id = id_generator(RedisPrefix.CONNECTION_ID_LENGTH)
@@ -517,11 +519,29 @@ class MessagesHandler(MessagesCreator):
 			# use list because sets dont have 1st element which is offerer
 			# TODO use sync redis?
 			self.async_redis_publisher.hset(connection_id, self.id, 'sender_ready')
+			self.async_redis_publisher.hset(connection_id, 'sender_id', self.id)
 			opponents_message = self.offer_webrtc(content, connection_id, webrtc_type)
 			self_message = self.set_connection_id(qued_id, connection_id)
 			self.ws_write(self_message)
 			self.logger.info('!! Offering a call, connection_id %s', connection_id)
 			self.publish(opponents_message, room_id, True)
+
+	def reply_webrtc_connection(self, in_message):
+		connection_id = in_message[VarNames.CONNECTION_ID]
+		sender_ws_id = self.sync_redis.hget(connection_id, 'sender_id').decode('utf-8')
+		sender_ws_status = self.sync_redis.hget(connection_id, sender_ws_id).decode('utf-8')
+		self.async_redis_publisher.hset(connection_id, self.id, 'receiver_responded')
+		if sender_ws_status == 'sender_ready':
+			self.publish({
+				VarNames.EVENT: Actions.REPLY_WEBRTC_CONNECTION,
+				VarNames.CONNECTION_ID: connection_id,
+				VarNames.USER_ID: self.user_id,
+				VarNames.USER: self.sender_name,
+				VarNames.WEBRTC_OPPONENT_ID: self.id,
+				VarNames.HANDLER_NAME: HandlerNames.FILE, # TODO support call as well
+			}, sender_ws_id)
+		else:
+			raise ValidationError("Invalid channel status")
 
 	def proxy_webrtc(self, in_message):
 		"""
