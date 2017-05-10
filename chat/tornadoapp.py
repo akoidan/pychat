@@ -562,16 +562,18 @@ class MessagesHandler(MessagesCreator):
 		opponent_channel_status = self.sync_redis.hget(connection_id, channel)
 		self_channel_status = self_channel_status.decode('utf-8') if self_channel_status else None
 		opponent_channel_status = opponent_channel_status.decode('utf-8') if opponent_channel_status else None
-		if not (self_channel_status and opponent_channel_status):
+		if not (self_channel_status == 'receiver_ready' and opponent_channel_status == 'sender_ready') \
+				and not (self_channel_status == 'sender_ready' and opponent_channel_status == 'receiver_ready'):
 			raise ValidationError('Error in connection status, your status is {} while opponent is %s'.format(
 				self_channel_status, opponent_channel_status
 			))
-		if 'closed' not in opponent_channel_status:
-			in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
-			self.logger.debug("Forwarding message to channel %s, self %s, other status %s",
-				channel, self_channel_status, opponent_channel_status
-			)
-			self.publish(in_message, channel)
+		# if 'closed' not in opponent_channel_status: TODO
+		in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
+		in_message[VarNames.HANDLER_NAME] = HandlerNames.FILE
+		self.logger.debug("Forwarding message to channel %s, self %s, other status %s",
+			channel, self_channel_status, opponent_channel_status
+		)
+		self.publish(in_message, channel)
 		return self_channel_status, opponent_channel_status
 
 	def create_new_room(self, message):

@@ -2103,7 +2103,7 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		return log.apply(this, arguments) + ", connId: " +self.connectionId ;
 	};
 	self.destroy = function () {
-		logger.info("Destroying peer connection")();
+		self.log("Destroying peer connection")();
 		delete webRtcApi.connections[self.connectionId];
 	};
 	self.isActive = function () {
@@ -2116,22 +2116,22 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		self.defaultSendEvent('destroyConnection', 'finish');
 	};
 	self.onSuccessAnswer = function () {
-		logger.info('answer received')();
+		self.log('answer received')();
 	};
 	self.answerToWebrtc = function () {
-		logger.info('creating answer...')();
+		self.log('creating answer...')();
 		self.pc.createAnswer(function (answer) {
-			loggerInfo(self.getDebugMessage('sent answer...'));
+			self.log('sent answer...');
 			self.pc.setLocalDescription(answer, function () {
 				self.sendWebRtcEvent(answer);
 			}, self.failWebRtcP3);
 		}, self.failWebRtcP4, self.sdpConstraints);
 	};
 	self.print = function (message) {
-		logger.info("Call message {}", JSON.stringify(message))();
+		self.log("Call message {}", JSON.stringify(message))();
 	};
 	self.gotReceiveChannel = function (event) {
-		logger.info('Received Channel Callback')();
+		self.log('Received new channel')();
 		self.sendChannel = event.channel;
 		// self.sendChannel.onmessage = self.print;
 		self.sendChannel.onopen = self.channelOpen;
@@ -2140,6 +2140,7 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 	self.waitForAnswer = function () {
 		self.webrtcInitiator = false;
 		self.createPeerConnection();
+		self.log("Waiting for rtc datachannels. webrtcInitiator is set to false")();
 		self.pc.ondatachannel = self.gotReceiveChannel;
 	};
 
@@ -2160,7 +2161,7 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 				growlInfo(data.message);
 			}
 		} else {
-			loggerWarn(self.getDebugMessage("Skipping ws message for closed connection"));
+			self.logErr("Skipping ws message for closed connection")();
 		}
 	};
 	self.createPeerConnection = function () {
@@ -2202,7 +2203,7 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
 			self.sendChannel.onopen = self.onreceiveChannelOpen;
 			self.sendChannel.onmessage = self.webrtcDirectMessage;
-			self.log("Created send data channel")();
+			self.log("Created send data channel. webrtcInitiator is set to true")();
 		} catch (e) {
 			var error = "Failed to create data channel because {} ".format(e.message || e);
 			growlError(error);
