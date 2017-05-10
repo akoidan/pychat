@@ -2065,12 +2065,48 @@ function DownloadBar(holder) {
 	};
 }
 
-function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
+function SenderPeerConnection(connectionId, opponentWsId) {
+	var self = this;
+	AbstractPeerConnection.call(self, connectionId, opponentWsId);
+	self.handleAnswer = function () {
+		self.log('answer received')();
+	};
+	self.onacceptWebrtc = function(message) {
+		self.createPeerConnection();
+		self.createSendChannelAndOffer();
+	};
+}
+
+function ReceiverPeerConnection(connectionId, opponentWsId) {
+	var self = this;
+	AbstractPeerConnection.call(self, connectionId, opponentWsId);
+	self.handleAnswer = function () {
+		self.log('Creating answer')();
+		self.pc.createAnswer(function (answer) {
+			self.log('Sending answer');
+			self.pc.setLocalDescription(answer, function () {
+				self.sendWebRtcEvent(answer);
+			}, self.failWebRtcP3);
+		}, self.failWebRtcP4, self.sdpConstraints);
+	};
+	self.waitForAnswer = function () {
+		self.createPeerConnection();
+		self.log("Waiting for rtc datachannels.")();
+		self.pc.ondatachannel = self.gotReceiveChannel;
+	};
+	self.gotReceiveChannel = function (event) {
+		self.log('Received new channel')();
+		self.sendChannel = event.channel;
+		// self.sendChannel.onmessage = self.print;
+		self.sendChannel.onopen = self.channelOpen;
+		//self.sendChannel.onclose = self.print;
+	};
+}
+
+function AbstractPeerConnection(connectionId, opponentWsId) {
 	var self = this;
 	self.opponentWsId = opponentWsId;
-	self.sendChannel = null;
 	self.connectionId = connectionId;
-	self.receiverRoomId = receiverRoomId;
 	self.pc = null;
 	self.fileCallType = null;
 	var webRtcUrl = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
@@ -2096,12 +2132,6 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 			opponentWsId: self.opponentWsId
 		});
 	};
-	self.onaccept = function (message) {
-		self.log("User accepted connection")();
-	};
-	self.getDebugMessage = function () {
-		return log.apply(this, arguments) + ", connId: " +self.connectionId ;
-	};
 	self.destroy = function () {
 		self.log("Destroying peer connection")();
 		delete webRtcApi.connections[self.connectionId];
@@ -2115,46 +2145,15 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 	self.finish = function () {
 		self.defaultSendEvent('destroyConnection', 'finish');
 	};
-	self.onSuccessAnswer = function () {
-		self.log('answer received')();
-	};
-	self.answerToWebrtc = function () {
-		self.log('creating answer...')();
-		self.pc.createAnswer(function (answer) {
-			self.log('sent answer...');
-			self.pc.setLocalDescription(answer, function () {
-				self.sendWebRtcEvent(answer);
-			}, self.failWebRtcP3);
-		}, self.failWebRtcP4, self.sdpConstraints);
-	};
 	self.print = function (message) {
 		self.log("Call message {}", JSON.stringify(message))();
-	};
-	self.gotReceiveChannel = function (event) {
-		self.log('Received new channel')();
-		self.sendChannel = event.channel;
-		// self.sendChannel.onmessage = self.print;
-		self.sendChannel.onopen = self.channelOpen;
-		//self.sendChannel.onclose = self.print;
-	};
-	self.waitForAnswer = function () {
-		self.webrtcInitiator = false;
-		self.createPeerConnection();
-		self.log("Waiting for rtc datachannels. webrtcInitiator is set to false")();
-		self.pc.ondatachannel = self.gotReceiveChannel;
-	};
-
-	self.onacceptWebrtc = function(message) {
-		self.createPeerConnection();
-		self.createSendChannelAndOffer();
 	};
 	self.onwebrtc = function (message) {
 		var data = message.content;
 		//self.clearTimeout(); TODO multirtc
 		if (self.pc.iceConnectionState && self.pc.iceConnectionState != 'closed') {
 			if (data.sdp) {
-				var successCall = self.webrtcInitiator ? self.onSuccessAnswer : self.answerToWebrtc;
-				self.pc.setRemoteDescription(new RTCSessionDescription(data), successCall, self.failWebRtc);
+				self.pc.setRemoteDescription(new RTCSessionDescription(data), self.handleAnswer, self.failWebRtc);
 			} else if (data.candidate) {
 				self.pc.addIceCandidate(new RTCIceCandidate(data));
 			} else if (data.message) {
@@ -2194,29 +2193,7 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 			growlInfo(text);
 		}
 	};
-	self.onreceiveChannelOpen = function () {
-	};
-	self.createSendChannelAndOffer = function () {
-		self.webrtcInitiator = true;
-		try {
-			// Reliable data channels not supported by Chrome
-			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
-			self.sendChannel.onopen = self.onreceiveChannelOpen;
-			self.sendChannel.onmessage = self.webrtcDirectMessage;
-			self.log("Created send data channel. webrtcInitiator is set to true")();
-		} catch (e) {
-			var error = "Failed to create data channel because {} ".format(e.message || e);
-			growlError(error);
-			self.logErr(error)();
-		}
-		self.pc.createOffer(function (offer) {
-			self.log('created offer...')();
-			self.pc.setLocalDescription(offer, function () {
-				self.log('sending to remote...')();
-				self.sendWebRtcEvent(offer);
-			}, self.failWebRtcP2);
-		}, self.failWebRtcP1, self.sdpConstraints);
-	};
+
 	self.sendWebRtcEvent = function (message) {
 		self.sendBaseEvent('webrtc', message);
 	};
@@ -2240,6 +2217,7 @@ function AbstractPeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		self.logErr("OnError way from {}, exception: {}", getCallerTrace(), errorContext)();
 	};
 }
+
 
 function BaseTransferHandler(receiverRoomId, type) {
 	var self = this;
@@ -2305,17 +2283,11 @@ function BaseTransferHandler(receiverRoomId, type) {
 			connId: self.offerMessage.connId
 		});
 	};
-	self.getPeerConnectionClass = function() {
-		throw 'overridden';
-	};
 }
 
 function CallHandler(receiverRoomId) {
 	var self = this;
 	BaseTransferHandler.call(self, receiverRoomId, 'call');
-	self.getPeerConnectionClass = function() {
-		return CallPeerConnection;
-	};
 
 	self.onreplyWebrtc = function (message) {
 		self.peerConnections[message.connId] = new CallPeerConnection();
@@ -2327,12 +2299,49 @@ function CallHandler(receiverRoomId) {
 function FileTransferHandler(receiverRoomId) {
 	var self = this;
 	BaseTransferHandler.call(self, receiverRoomId, 'file');
-	self.sendOfferParent = self.sendOffer;
-	self.getPeerConnectionClass = function() {
-		return FilePeerConnection;
-	};
 	self.setFile = function(file) {
 		self.file = file;
+	};
+	self.closeWindowClick = function() {
+		self.finish();
+		self.closeEvents();
+	};
+}
+
+
+function FileReceiver(receiverRoomId) {
+	var self = this;
+	FileTransferHandler.call(self, receiverRoomId);
+	self.showOffer = function (message) {
+		self.fileSize = parseInt(message.content.size);
+		self.fileName = message.content.name;
+		self.lastGrowl = new TransferFileWindow(self.fileName, self.fileSize, self.receiverName, false);
+		self.lastGrowl.setStatus("Offered you a file");
+		self.lastGrowl.setButtonActions(self.declineFile, self.acceptFileReply);
+		notifier.notify(message.user, "Sends file {}".format(self.fileName));
+	};
+	self.declineFile = function () {
+		self.decline();
+		self.closeWindowClick();
+	};
+	self.acceptFileReply = function () {
+		self.peerConnections[self.offerMessage.opponentWsId] = new FileReceiverPeerConnection(
+				self.offerMessage.connId,
+				self.offerMessage.opponentWsId
+		);
+		var db = self.lastGrowl.addDownloadBar();
+		self.peerConnections[self.offerMessage.opponentWsId].setDownloadBar(db);
+		self.peerConnections[self.offerMessage.opponentWsId].waitForAnswer();
+		self.accept();
+	};
+}
+
+function FileSender(receiverRoomId) {
+	var self = this;
+	FileTransferHandler.call(self, receiverRoomId);
+	self.sendOfferParent = self.sendOffer;
+	self.ondecline = function () {
+		self.lastGrowl.setErrorStatus("Declined");
 	};
 	self.sendOffer = function (quedId) {
 		//self.dom.fileInput.disabled = true;
@@ -2346,46 +2355,15 @@ function FileTransferHandler(receiverRoomId) {
 		});
 	};
 	self.onreplyWebrtc = function (message) {
-		self.peerConnections[message.opponentWsId] = new FilePeerConnection(null, message.connId, message.opponentWsId);
+		self.peerConnections[message.opponentWsId] = new FileSenderPeerConnection(message.connId, message.opponentWsId);
 		var downloadBar = self.lastGrowl.addDownloadBar();
 		self.peerConnections[message.opponentWsId].setDownloadBar(downloadBar);
 		downloadBar.setStatus("To {}:".format(message.user));
 	};
-	self.closeWindowClick = function() {
-		self.finish();
-		self.closeEvents();
-	};
-	self.showOffer = function (message) {
-		self.fileSize = parseInt(message.content.size);
-		self.fileName = message.content.name;
-		self.lastGrowl = new TransferFileWindow(self.fileName, self.fileSize, self.receiverName, false);
-		self.lastGrowl.setStatus("Offered you a file");
-		self.lastGrowl.setButtonActions(self.declineFile, self.acceptFileReply);
-		notifier.notify(message.user, "Sends file {}".format(self.fileName));
-	};
-	self.onaccept = function (message) {
-		self.lastGrowl.downloadBar.show();
-	};
-	self.declineFile = function () {
-		self.decline();
-		self.closeWindowClick();
-	};
-	self.acceptFileReply = function () {
-		self.peerConnections[self.offerMessage.opponentWsId] = new FilePeerConnection(null, self.offerMessage.connId, self.offerMessage.opponentWsId);
-		var db = self.lastGrowl.addDownloadBar();
-		self.peerConnections[self.offerMessage.opponentWsId].setDownloadBar(db);
-		self.peerConnections[self.offerMessage.opponentWsId].waitForAnswer();
-		self.accept();
-	};
-	self.ondecline = function () {
-		self.lastGrowl.setErrorStatus("Declined");
-	};
 }
 
-function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
+function FilePeerConnection() {
 	var self = this;
-	AbstractPeerConnection.call(self, receiverRoomId, connectionId, opponentWsId);
-	self.log("Created FilePeerConnection")();
 	self.fileCallType = 'file';
 	self.CHUNK_SIZE = 16384;
 	self.receiveBuffer = [];
@@ -2400,7 +2378,7 @@ function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		}
 	};
 	self.setDownloadBar = function(db) {
-		self.setDownloadBar = db;
+		self.downloadBar = db;
 	};
 	self.onfinish = function () {
 		self.lastGrowl.setErrorStatus("Opponent closed connection");
@@ -2411,44 +2389,11 @@ function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		if (self.lastGrowl) {
 			self.lastGrowl.setErrorStatus(message.content);
 		} else {
-			logger.info("Setting status to '{}' failed", message.content)();
+			self.log("Setting status to '{}' failed", message.content)();
 		}
-	};
-	self.onreceiveChannelOpen = function () {
-		self.lastGrowl.setStatus("Receiving a file");
 	};
 	self.channelOpen = function () {
-		logger.info('file is {} {} {} {}', self.fileName, self.fileSize, self.file.type, self.file.lastModifiedDate)();
-		if (self.fileSize === 0) {
-			self.lastGrowl.setErrorStatus("Can't send empty file");
-			self.closeEvents("Can't send empty file");
-		} else {
-			self.lastGrowl.setStatus("Transferring file");
-			self.sliceFile(0);
-		}
-	};
-	self.sliceFile = function (offset) {
-		var reader = new window.FileReader();
-		reader.onload = (function () {
-			return function (e) {
-				if (self.sendChannel.readyState == 'open') {
-					try {
-						self.sendChannel.send(e.target.result);
-					} catch (error) {
-						logger.info(error)();
-						growlError("Connection loss while sending file {} to user {}".format(self.fileName, self.receiverName));
-					}
-					if (self.fileSize > offset + e.target.result.byteLength) {
-						window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
-					}
-					self.setTranseferdAmount(offset + e.target.result.byteLength);
-				} else {
-					self.lastGrowl.setErrorStatus("Lost connection");
-				}
-			};
-		})(self.file);
-		var slice = self.file.slice(offset, offset + self.CHUNK_SIZE);
-		reader.readAsArrayBuffer(slice);
+		self.lastGrowl.setStatus("Receiving a file");
 	};
 	self.setTranseferdAmount = function(value) {
 		self.lastGrowl.downloadBar.setValue(value);
@@ -2465,15 +2410,18 @@ function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
 			self.closeEvents();
 		}
 	};
-	self.onfileAccepted = function (message) {
-		logger.info("Transfer file {} result : {}", self.fileName, message.content)();
-		self.lastGrowl.setSuccessStatus("Transferred");
-		self.lastGrowl.downloadBar.hide();
-		self.closeEvents();
-	};
+
+}
+
+
+function FileReceiverPeerConnection(connectionId, opponentWsId) {
+	var self = this;
+	FilePeerConnection.call(self);
+	ReceiverPeerConnection.call(self, connectionId, opponentWsId);
+	self.log("Created FileReceiverPeerConnection")();
 	self.assembleFile = function () {
 		var received = new window.Blob(self.receiveBuffer);
-		logger.info("File is received")();
+		self.log("File is received")();
 		self.sendBaseEvent('fileAccepted');
 		self.lastGrowl.downloadBar.setSuccess();
 		self.receiveBuffer = []; //clear buffer
@@ -2483,11 +2431,82 @@ function FilePeerConnection(receiverRoomId, connectionId, opponentWsId) {
 		self.lastGrowl.setSuccessStatus("Received");
 		self.lastGrowl.downloadBar.dom.text.textContent = 'Save'.format(self.fileName);
 	};
+
 }
 
-function CallPeerConnection(receiverRoomId, connectionId) {
+function FileSenderPeerConnection(connectionId, opponentWsId) {
 	var self = this;
-	AbstractPeerConnection.call(self, receiverRoomId, connectionId);
+	FilePeerConnection.call(self);
+	SenderPeerConnection.call(self, connectionId, opponentWsId);
+	self.sendChannel = null;
+	self.log("Created FileSenderPeerConnection")();
+	self.onfileAccepted = function (message) {
+		self.log("Transfer file {} result : {}", self.fileName, message.content)();
+		self.lastGrowl.setSuccessStatus("Transferred");
+		self.lastGrowl.downloadBar.hide();
+		self.closeEvents();
+	};
+	self.createSendChannelAndOffer = function () {
+
+		try {
+			// Reliable data channels not supported by Chrome
+			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
+			self.sendChannel.onopen = self.onreceiveChannelOpen;
+			self.sendChannel.onmessage = self.webrtcDirectMessage;
+			self.log("Created send data channel.")();
+		} catch (e) {
+			var error = "Failed to create data channel because {} ".format(e.message || e);
+			growlError(error);
+			self.logErr(error)();
+		}
+		self.pc.createOffer(function (offer) {
+			self.log('Creating offer')();
+			self.pc.setLocalDescription(offer, function () {
+				self.log('Sending offer  to remote')();
+				self.sendWebRtcEvent(offer);
+			}, self.failWebRtcP2);
+		}, self.failWebRtcP1, self.sdpConstraints);
+	};
+	self.onreceiveChannelOpen = function () {
+		self.log('file is {} {} {} {}', self.fileName, self.fileSize, self.file.type, self.file.lastModifiedDate)();
+		if (self.fileSize === 0) {
+			self.lastGrowl.setErrorStatus("Can't send empty file");
+			self.closeEvents("Can't send empty file");
+		} else {
+			self.lastGrowl.setStatus("Transferring file");
+			self.sliceFile(0);
+		}
+	};
+	self.sliceFile = function (offset) {
+		var reader = new window.FileReader();
+		reader.onload = (function () {
+			return function (e) {
+				if (self.sendChannel.readyState === 'open') {
+					try {
+						self.sendChannel.send(e.target.result);
+					} catch (error) {
+						self.logErr(error)();
+						growlError("Connection loss while sending file {} to user {}".format(self.fileName, self.receiverName));
+					}
+					if (self.fileSize > offset + e.target.result.byteLength) {
+						window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
+					}
+					self.setTranseferdAmount(offset + e.target.result.byteLength);
+				} else {
+					self.lastGrowl.setErrorStatus("Lost connection");
+				}
+			};
+		})(self.file);
+		var slice = self.file.slice(offset, offset + self.CHUNK_SIZE);
+		reader.readAsArrayBuffer(slice);
+	};
+}
+
+
+function CallPeerConnection(receiverRoomId, connectionId, wsOpponentId) {
+	var self = this;
+	AbstractPeerConnection.call(self, connectionId, wsOpponentId);
+	self.receiverRoomId = receiverRoomId;
 	self.fileCallType = 'call';
 	self.audioProcessors = {};
 	self.dom = {
@@ -2700,7 +2719,7 @@ function CallPeerConnection(receiverRoomId, connectionId) {
 		CssUtils.showElement(webRtcApi.dom.callContainer);
 	};
 	self.channelOpen = function () {
-		logger.info('Opened a new chanel')();
+		self.log('Opened a new chanel')();
 	};
 	self.setVideoSource = function (domEl, stream) {
 		domEl.src = URL.createObjectURL(stream);
@@ -2774,7 +2793,7 @@ function CallPeerConnection(receiverRoomId, connectionId) {
 			}
 
 		} catch (err) {
-			logger.error("Unable to use microphone level because ")();
+			self.log("Unable to use microphone level because ")();
 		}
 	};
 	self.showNoMicError = function () {
@@ -2793,7 +2812,7 @@ function CallPeerConnection(receiverRoomId, connectionId) {
 			self.createMicrophoneLevelVoice(event.stream, false);
 			self.setHeaderText("Talking with <b>{}</b>".format(self.receiverName));
 			self.setIconState(true);
-			logger.info("Stream attached")();
+			self.log("Stream attached")();
 			self.showPhoneIcon();
 		};
 	};
@@ -2955,7 +2974,7 @@ function WebRtcApi() {
 		// 	wsHandler.sendToServer('busy'); // TODO multirtc
 		// }
 
-		var className = message.content ? FileTransferHandler : CallHandler;
+		var className = message.content ? FileReceiver : CallHandler;
 		var handler = new className(message.channel);
 		self.connections[message.connId] = handler;
 		handler.initAndDisplayOffer(message);
@@ -2977,7 +2996,7 @@ function WebRtcApi() {
 		self.createWebrtcObject(CallPeerConnection);
 	};
 	self.offerFile = function () {
-		var handler = self.createWebrtcObject(FileTransferHandler, self.dom.fileInput.files[0])
+		var handler = self.createWebrtcObject(FileSender, self.dom.fileInput.files[0])
 	};
 	self.createWebrtcObject = function (className, file) {
 		var newId = self.createQuedId();
