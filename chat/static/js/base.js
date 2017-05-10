@@ -61,6 +61,7 @@ window.logger = (function (logsEnabled) {
 		time: "color: blue",
 		msg: "color: black",
 		ws: "color: green; font-weight: bold",
+		http: "color: green; font-weight: bold",
 		webrtc: "color: #960055; font-weight: bold"
 	};
 	self.dummyFun = function () {
@@ -70,6 +71,8 @@ window.logger = (function (logsEnabled) {
 		self.info = dummyFun;
 		self.error = dummyFun;
 		self.ws = dummyFun;
+		self.http = dummyFun;
+		self.httpErr = dummyFun;
 		self.warn = dummyFun;
 		self.webrtc = dummyFun;
 	};
@@ -77,7 +80,9 @@ window.logger = (function (logsEnabled) {
 		self.info = self._info;
 		self.error = self._error;
 		self.warn = self._warn;
-		self.ws = self._ws;
+		self.ws = self._http;
+		self.http = self._http;
+		self.httpErr = self._httpErr;
 		self.webrtc = self._webrtc;
 	};
 	self._info = function () {
@@ -90,15 +95,19 @@ window.logger = (function (logsEnabled) {
 		return self.doLog(arguments, console.warn);
 	};
 	self._webrtc = function() {
-		self.styles.debug = self.styles.webrtc;
-		return self._debug.apply(self, arguments);
+		return self._debug(arguments, self.styles.webrtc, console.log);
+	};
+	self._http = function() {
+		return self._debug(arguments, self.styles.http, console.log);
 	};
 	self._ws = function() {
-		self.styles.debug = self.styles.ws;
-		return self._debug.apply(self, arguments);
+		return self._debug(arguments, self.styles.ws, console.log);
 	};
-	self._debug = function () {
-		var args = Array.prototype.slice.call(arguments);
+	self._httpErr = function() {
+		return self._debug(arguments, self.styles.http, console.error);
+	};
+	self._debug = function (inArg, style, dest) {
+		var args = Array.prototype.slice.call(inArg);
 		var initiator = args.shift();
 		var now = new Date();
 		// second argument is format, others are params
@@ -112,8 +121,8 @@ window.logger = (function (logsEnabled) {
 				text
 		);
 		saveLogToStorage(result);
-		return Function.prototype.bind.apply(console.log,
-				[window.console, result, self.styles.time, self.styles.debug, self.styles.msg]);
+		return Function.prototype.bind.apply(dest,
+				[window.console, result, self.styles.time, style, self.styles.msg]);
 	};
 	self.saveLogToStorage = function (result) {
 		if (!window.loggingEnabled) {
@@ -595,9 +604,9 @@ function doPost(url, params, callback, form) {
 	r.onreadystatechange = function () {
 		if (r.readyState === 4) {
 			if (r.status === 200) {
-				logger.debug("POST in", "{} ::: {};", url, r.response)();
+				logger.http("POST in", "{} ::: {};", url, r.response)();
 			} else {
-				logger.error("POST out: {} ::: {}, status:", url, r.response, r.status)();
+				logger.httpErr("POST out: {} ::: {}, status:", url, r.response, r.status)();
 			}
 			if (typeof(callback) === "function") {
 				callback(r.response);
@@ -627,7 +636,7 @@ function doPost(url, params, callback, form) {
 			params += pair[0] +'='+ pair[1] +'; ';
 		}
 	}
-	logger.debug("POST out", "{} ::: {}", url, params)();
+	logger.http("POST out", "{} ::: {}", url, params)();
 	r.send(data);
 }
 
@@ -635,7 +644,7 @@ function doPost(url, params, callback, form) {
 /**
  * Loads file from server on runtime */
 function doGet(fileUrl, callback) {
-	logger.debug("GET out", fileUrl)();
+	logger.http("GET out", fileUrl)();
 	var regexRes = fileTypeRegex.exec(fileUrl);
 	var fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
 	var fileRef = null;
@@ -662,12 +671,12 @@ function doGet(fileUrl, callback) {
 			xobj.onreadystatechange = function () {
 				if (xobj.readyState === 4) {
 					if (xobj.status === 200) {
-						logger.debug('GET in','{} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100))();
+						logger.http('GET in','{} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100))();
 						if (callback) {
 							callback(xobj.responseText);
 						}
 					} else {
-						logger.error("Unable to load {}, response code is '{}', response: {}", fileUrl, xobj.status, xobj.response )();
+						logger._http("Unable to load {}, response code is '{}', response: {}", fileUrl, xobj.status, xobj.response )();
 						growlError("<span>Unable to load {}, response code is <b>{}</b>, response: {} <span>".format(fileUrl, xobj.status, xobj.response));
 					}
 				}
