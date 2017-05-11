@@ -2117,11 +2117,15 @@ function AbstractPeerConnection(connectionId, opponentWsId) {
 			{RtpDataChannels: false /*true*/}
 		]
 	};
-	self.log = function (text) {
-			return logger.webrtc("" + self.connectionId + self.opponentWsId, text);
+	self.log = function () {
+		var args = Array.prototype.slice.call(arguments);
+		args.unshift(self.connectionId + self.opponentWsId);
+		return logger.webrtc.apply(logger, args);
 	};
 	self.logErr = function (text) {
-			return logger.webrtc("" + self.connectionId + self.opponentWsId, text);
+		var args = Array.prototype.slice.call(arguments);
+		args.unshift(self.connectionId + self.opponentWsId);
+		return logger.webrtcErr.apply(logger, args);
 	};
 	self.defaultSendEvent = function(action, type, content) {
 		wsHandler.sendToServer({
@@ -2355,7 +2359,7 @@ function FileSender(receiverRoomId) {
 		});
 	};
 	self.onreplyWebrtc = function (message) {
-		self.peerConnections[message.opponentWsId] = new FileSenderPeerConnection(message.connId, message.opponentWsId);
+		self.peerConnections[message.opponentWsId] = new FileSenderPeerConnection(message.connId, message.opponentWsId, self.file);
 		var downloadBar = self.lastGrowl.addDownloadBar();
 		self.peerConnections[message.opponentWsId].setDownloadBar(downloadBar);
 		downloadBar.setStatus("To {}:".format(message.user));
@@ -2434,9 +2438,12 @@ function FileReceiverPeerConnection(connectionId, opponentWsId) {
 
 }
 
-function FileSenderPeerConnection(connectionId, opponentWsId) {
+function FileSenderPeerConnection(connectionId, opponentWsId, file) {
 	var self = this;
 	FilePeerConnection.call(self);
+	self.file = file;
+	self.fileName = file.name;
+	self.fileSize = file.size;
 	SenderPeerConnection.call(self, connectionId, opponentWsId);
 	self.sendChannel = null;
 	self.log("Created FileSenderPeerConnection")();

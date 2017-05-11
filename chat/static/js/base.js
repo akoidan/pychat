@@ -75,6 +75,7 @@ window.logger = (function (logsEnabled) {
 		self.httpErr = dummyFun;
 		self.warn = dummyFun;
 		self.webrtc = dummyFun;
+		self.webrtcErr = dummyFun;
 	};
 	self.enableLogs = function () {
 		self.info = self._info;
@@ -84,6 +85,7 @@ window.logger = (function (logsEnabled) {
 		self.http = self._http;
 		self.httpErr = self._httpErr;
 		self.webrtc = self._webrtc;
+		self.webrtcErr = _webrtcErr;
 	};
 	self._info = function () {
 		return self.doLog(arguments, console.log);
@@ -96,6 +98,9 @@ window.logger = (function (logsEnabled) {
 	};
 	self._webrtc = function() {
 		return self._debug(arguments, self.styles.webrtc, console.log);
+	};
+	self._webrtcErr = function() {
+		return self._debug(arguments, self.styles.webrtc, console.error);
 	};
 	self._http = function() {
 		return self._debug(arguments, self.styles.http, console.log);
@@ -111,7 +116,7 @@ window.logger = (function (logsEnabled) {
 		var initiator = args.shift();
 		var now = new Date();
 		// second argument is format, others are params
-		var text = args.length == 0 ? args[0] : String.prototype.format.apply(args.shift(), args);
+		var text = args.length > 1 ? String.prototype.format.apply(args.shift(), args) : args[0];
 		var result = "%c{}:{}:{}.{}: %c{} %c{}".format(
 				sliceZero(now.getHours()),
 				sliceZero(now.getMinutes()),
