@@ -56,6 +56,7 @@ Afterwards to start the chat you need:
  5. If you get an ssl error on establishing websocket connection in browser, that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
 
 # TODO
+* Add FileSystem api to be able to store large files https://www.html5rocks.com/en/tutorials/file/filesystem/
 * Add link to gihub in console
 * webrtc connection lost while transfering file causes js error
 * Add title for room. 

@@ -368,17 +368,17 @@ var Growl = function (message) {
 	self.remove = function () {
 		if (self.growl.parentNode === self.growlHolder) {
 			self.growlHolder.removeChild(self.growl);
-			logger.info("Removing growl #{}", self.id)();
+			// logger.info("Removing growl #{}", self.id)();
 		} else {
-			logger.info("Growl #{} is already removed", self.id)();
+			// logger.info("Growl #{} is already removed", self.id)();
 		}
 	};
 	self.showInfinity = function(growlClass) {
 		self.growl = document.createElement('div');
-		logger.info("Rendering growl #{}", self.id)();
+		// logger.info("Rendering growl #{}", self.id)();
 		if (self.message) {
 			self.message = self.message.trim();
-			self.growl.innerHTML = self.message.indexOf("<") == 0? self.message : encodeAnchorsHTML(self.message);
+			self.growl.innerHTML = self.message.indexOf("<") === 0? self.message : encodeAnchorsHTML(self.message);
 		}
 		self.growl.className = 'growl ' + growlClass;
 		self.growlHolder.appendChild(self.growl);

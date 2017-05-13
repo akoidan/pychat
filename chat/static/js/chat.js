@@ -1913,11 +1913,85 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	}
 }
 
-function TransferFileBar(opponentName) {
+
+function SendFileWindow (fileName, fileSize) {
+	var self = this;
+	TransferFileWindow.call(self, fileName, fileSize);
+	self.superInit = self.init;
+	self.init = function() {
+		self.superInit();
+	};
+	self.addDownloadBar = function() {
+		var div = document.createElement("DIV");
+		self.dom.body.appendChild(div);
+		return new SendBar(div, fileSize);
+	};
+	self.init();
 
 }
 
-function TransferFileWindow(fileName, fileSize, opponentName, isForSend) {
+function ReceiveFileWindow (fileName, fileSize, opponentName) {
+	var self = this;
+	logger.error("Oponent name {}", opponentName)();
+	TransferFileWindow.call(self, fileName, fileSize);
+	self.superInit = self.init;
+	self.init = function() {
+		self.superInit();
+		self.insertData("From:", opponentName);
+		self.addYesNo();
+	};
+	self.addDownloadBar = function() {
+		var div = document.createElement("DIV");
+		self.dom.body.appendChild(div);
+		return new ReceiveBar(div, fileSize);
+	};
+	self.init();
+}
+
+
+function SendBar(holder, fileSize) {
+	var self = this;
+	self.db = new DownloadBar(holder, fileSize);
+	self.dom = {
+		status: document.createElement('DIV')
+	};
+	self.setStatus = function (text) {
+		self.dom.status.textContent = text;
+	};
+	self.setErrorStatus = function (html) {
+		self.setStatus(html);
+		self.dom.status.className = 'error'
+	};
+	self.setSuccessStatus = function (html) {
+		self.setStatus(html);
+		self.dom.status.className = 'success'
+	};
+}
+
+function ReceiveBar(holder, fileSize) {
+	var self = this;
+	self.fileSize = fileSize;
+	self.dom = {
+		db: document.createElement('DIV'),
+		holder: holder,
+		status: document.createElement('DIV')
+	};
+	self.dom.holder.appendChild(self.dom.db);
+	self.db = new DownloadBar(self.dom.db, self.fileSize);
+	self.setStatus = function (text) {
+		self.dom.status.textContent = text;
+	};
+	self.setErrorStatus = function (html) {
+		self.setStatus(html);
+		self.dom.status.className = 'error'
+	};
+	self.setSuccessStatus = function (html) {
+		self.setStatus(html);
+		self.dom.status.className = 'success'
+	};
+}
+
+function TransferFileWindow(fileName, fileSize) {
 	var self = this;
 	Draggable.call(self, document.createElement('DIV'), "File transfer");
 	self.dom.fileInfo = document.createElement('table');
@@ -1931,22 +2005,10 @@ function TransferFileWindow(fileName, fileSize, opponentName, isForSend) {
 		self.dom.iconCancel.onclick = self.noAction;
 		self.insertData('Status:', 'initing', 'fileStatus');
 		self.insertData('Name:', fileName);
-		if (!isForSend) {
-			self.insertData("From:", opponentName);
-		}
 		self.insertData('Size:', bytesToSize(fileSize));
 		self.dom.body.appendChild(self.dom.fileInfo);
-		if (!isForSend) {
-			self.addYesNo();
-		}
 	};
 
-	self.addDownloadBar = function() {
-		var holder = self.dom.fileInfo.insertRow();
-		var downloadBar = new DownloadBar(holder);
-		downloadBar.setMax(fileSize);
-		return downloadBar;
-	};
 	self.insertData = function(name, value, fieldName) {
 		var raw = self.dom.fileInfo.insertRow();
 		var th = document.createElement('th');
@@ -1957,18 +2019,6 @@ function TransferFileWindow(fileName, fileSize, opponentName, isForSend) {
 		if (fieldName) {
 			self.dom[fieldName] = valueField;
 		}
-	};
-	self.setSuccessStatus = function (html) {
-		self.setStatus(html);
-		self.dom.fileStatus.className = 'success'
-	};
-	self.setErrorStatus = function (html) {
-		self.setStatus(html);
-		self.dom.fileStatus.className = 'error'
-	};
-	self.setStatus = function(innerHtml) {
-		logger.info('Transfer file status changed to "{}"', innerHtml)();
-		self.dom.fileStatus.innerHTML = innerHtml;
 	};
 	self.hideButtons = function () {
 		if (self.dom.yesNoHolder) {
@@ -2010,36 +2060,27 @@ function TransferFileWindow(fileName, fileSize, opponentName, isForSend) {
 		self.postYesAction = yesAction;
 		self.postNoAction = noAction;
 	};
-	self.init();
 }
 
-function DownloadBar(holder) {
+function DownloadBar(holder, fileSize) {
 	var self = this;
 	self.dom = {
 		wrapper: holder,
-		opponent: document.createElement('TH'),
-		barHolder: document.createElement('TD'),
 		text: document.createElement('A')
 	};
-	self.dom.wrapper.appendChild(self.dom.opponent);
-	self.dom.wrapper.appendChild(self.dom.barHolder);
-	self.dom.barHolder.appendChild(self.dom.text);
-	CssUtils.addClass(self.dom.opponent, 'progress-status');
-	self.dom.barHolder.className = 'progress-wrap';
+	self.max = fileSize;
+	self.dom.wrapper.className = 'progress-wrap';
+	self.dom.wrapper.appendChild(self.dom.text);
 	self.PROGRESS_CLASS = 'animated';
 	self.SUCC_CLASS = 'success';
 	self.ERR_CLASS = 'error';
-	self.setMax = function (max) {
-		self.max = max;
-		self.start();
-	};
 	self.setValue = function (value) {
 		var percent = Math.round(value * 100 / self.max) + "%";
 		self.dom.text.style.width = percent;
 		self.dom.text.textContent = percent;
 	};
-	self.setStatus = function(text) {
-		self.dom.opponent.textContent = text;
+	self.setStatusText = function(text) {
+		self.dom.text.textContent = text;
 	};
 	self.show = function () {
 		CssUtils.showElement(self.dom.wrapper);
@@ -2048,19 +2089,19 @@ function DownloadBar(holder) {
 		CssUtils.hideElement(self.dom.wrapper);
 	};
 	self.setSuccess = function () {
-		CssUtils.removeClass(self.dom.barHolder, self.PROGRESS_CLASS);
-		CssUtils.addClass(self.dom.barHolder, self.SUCC_CLASS);
+		CssUtils.removeClass(self.dom.wrapper, self.PROGRESS_CLASS);
+		CssUtils.addClass(self.dom.wrapper, self.SUCC_CLASS);
 	};
 	self.setError = function () {
-		CssUtils.removeClass(self.dom.barHolder, self.PROGRESS_CLASS);
-		CssUtils.addClass(self.dom.barHolder, self.ERR_CLASS);
+		CssUtils.removeClass(self.dom.wrapper, self.PROGRESS_CLASS);
+		CssUtils.addClass(self.dom.wrapper, self.ERR_CLASS);
 	};
 	self.start = function () {
 		self.dom.text.removeAttribute('href');
 		self.dom.text.removeAttribute('download');
-		CssUtils.removeClass(self.dom.barHolder, self.SUCC_CLASS);
-		CssUtils.removeClass(self.dom.barHolder, self.ERR_CLASS);
-		CssUtils.addClass(self.dom.barHolder, self.PROGRESS_CLASS);
+		CssUtils.removeClass(self.dom.wrapper, self.SUCC_CLASS);
+		CssUtils.removeClass(self.dom.wrapper, self.ERR_CLASS);
+		CssUtils.addClass(self.dom.wrapper, self.PROGRESS_CLASS);
 		self.setValue(0);
 	};
 }
@@ -2097,10 +2138,13 @@ function ReceiverPeerConnection(connectionId, opponentWsId) {
 	self.gotReceiveChannel = function (event) {
 		self.log('Received new channel')();
 		self.sendChannel = event.channel;
-		// self.sendChannel.onmessage = self.print;
+		self.sendChannel.onmessage = self.onChannelMessage;
 		self.sendChannel.onopen = self.channelOpen;
 		//self.sendChannel.onclose = self.print;
 	};
+	self.onChannelMessage = function (msg) {
+		self.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();
+	}
 }
 
 function AbstractPeerConnection(connectionId, opponentWsId) {
@@ -2108,6 +2152,7 @@ function AbstractPeerConnection(connectionId, opponentWsId) {
 	self.opponentWsId = opponentWsId;
 	self.connectionId = connectionId;
 	self.pc = null;
+	self.isClosed = false;
 	self.fileCallType = null;
 	var webRtcUrl = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 	self.pc_config = {iceServers: [{url: webRtcUrl}]};
@@ -2147,7 +2192,9 @@ function AbstractPeerConnection(connectionId, opponentWsId) {
 		self.defaultSendEvent('sendRtcData' ,type, content);
 	};
 	self.finish = function () {
-		self.defaultSendEvent('destroyConnection', 'finish');
+		if (!self.isClosed) {
+			self.defaultSendEvent('destroyConnection', 'finish');
+		}
 	};
 	self.print = function (message) {
 		self.log("Call message {}", JSON.stringify(message))();
@@ -2181,13 +2228,13 @@ function AbstractPeerConnection(connectionId, opponentWsId) {
 		};
 	};
 	self.closeEvents = function (text) {
-		if (self.sendChannel && self.sendChannel.readyState != 'closed') {
+		if (self.sendChannel && self.sendChannel.readyState !== 'closed') {
 			self.log("Closing chanel")();
 			self.sendChannel.close();
 		} else {
 			self.log("No channels to close")();
 		}
-		if (self.pc && self.pc.signalingState != 'closed') {
+		if (self.pc && self.pc.signalingState !== 'closed') {
 			self.log("Closing peer connection")();
 			self.pc.close();
 		} else {
@@ -2287,6 +2334,12 @@ function BaseTransferHandler(receiverRoomId, type) {
 			connId: self.offerMessage.connId
 		});
 	};
+	self.finish = function (text) {
+		for (var pc in self.peerConnections) {
+			if (!self.peerConnections.hasOwnProperty(pc)) continue;
+				self.peerConnections[pc].closeEvents();
+		}
+	}
 }
 
 function CallHandler(receiverRoomId) {
@@ -2319,9 +2372,8 @@ function FileReceiver(receiverRoomId) {
 	self.showOffer = function (message) {
 		self.fileSize = parseInt(message.content.size);
 		self.fileName = message.content.name;
-		self.lastGrowl = new TransferFileWindow(self.fileName, self.fileSize, self.receiverName, false);
-		self.lastGrowl.setStatus("Offered you a file");
-		self.lastGrowl.setButtonActions(self.declineFile, self.acceptFileReply);
+		self.transferWindow = new ReceiveFileWindow(self.fileName, self.fileSize, message.user);
+		self.transferWindow.setButtonActions(self.declineFile, self.acceptFileReply);
 		notifier.notify(message.user, "Sends file {}".format(self.fileName));
 	};
 	self.declineFile = function () {
@@ -2331,9 +2383,11 @@ function FileReceiver(receiverRoomId) {
 	self.acceptFileReply = function () {
 		self.peerConnections[self.offerMessage.opponentWsId] = new FileReceiverPeerConnection(
 				self.offerMessage.connId,
-				self.offerMessage.opponentWsId
+				self.offerMessage.opponentWsId,
+				self.fileName,
+				self.fileSize
 		);
-		var db = self.lastGrowl.addDownloadBar();
+		var db = self.transferWindow.addDownloadBar();
 		self.peerConnections[self.offerMessage.opponentWsId].setDownloadBar(db);
 		self.peerConnections[self.offerMessage.opponentWsId].waitForAnswer();
 		self.accept();
@@ -2345,14 +2399,14 @@ function FileSender(receiverRoomId) {
 	FileTransferHandler.call(self, receiverRoomId);
 	self.sendOfferParent = self.sendOffer;
 	self.ondecline = function () {
-		self.lastGrowl.setErrorStatus("Declined");
+		self.transferWindow.setErrorStatus("Declined");
 	};
 	self.sendOffer = function (quedId) {
 		//self.dom.fileInput.disabled = true;
 		self.fileName = self.file.name;
 		self.fileSize = self.file.size;
-		self.lastGrowl = new TransferFileWindow(self.fileName, self.fileSize, self.receiverName, true);
-		self.lastGrowl.setButtonActions(self.closeWindowClick);
+		self.transferWindow = new SendFileWindow(self.fileName, self.fileSize);
+		self.transferWindow.setButtonActions(self.closeWindowClick);
 		self.sendOfferParent(quedId, {
 			name: self.fileName,
 			size: self.fileSize
@@ -2360,9 +2414,9 @@ function FileSender(receiverRoomId) {
 	};
 	self.onreplyWebrtc = function (message) {
 		self.peerConnections[message.opponentWsId] = new FileSenderPeerConnection(message.connId, message.opponentWsId, self.file);
-		var downloadBar = self.lastGrowl.addDownloadBar();
+		var downloadBar = self.transferWindow.addDownloadBar();
 		self.peerConnections[message.opponentWsId].setDownloadBar(downloadBar);
-		downloadBar.setStatus("To {}:".format(message.user));
+		//downloadBar.setStatus("To {}:".format(message.user)); // TODO
 	};
 }
 
@@ -2374,7 +2428,7 @@ function FilePeerConnection() {
 	self.receivedSize = 0;
 	self.sdpConstraints = {};
 	self.setHeaderText = function (text) {
-		self.lastGrowl.setStatus(text)
+		self.downloadBar.setStatus(text)
 	};
 	self.oniceconnectionstatechange = function () {
 		if (self.pc.iceConnectionState == 'disconnected') {
@@ -2385,41 +2439,28 @@ function FilePeerConnection() {
 		self.downloadBar = db;
 	};
 	self.onfinish = function () {
-		self.lastGrowl.setErrorStatus("Opponent closed connection");
-		self.lastGrowl.hideButtons();
+		self.downloadBar.setErrorStatus("Opponent closed connection");
+		self.downloadBar.hideButtons();
 		self.closeEvents();
 	};
 	self.onsetError = function(message) {
-		if (self.lastGrowl) {
-			self.lastGrowl.setErrorStatus(message.content);
+		if (self.downloadBar) {
+			self.downloadBar.setErrorStatus(message.content);
 		} else {
 			self.log("Setting status to '{}' failed", message.content)();
 		}
 	};
-	self.channelOpen = function () {
-		self.lastGrowl.setStatus("Receiving a file");
-	};
 	self.setTranseferdAmount = function(value) {
-		self.lastGrowl.downloadBar.setValue(value);
-	};
-	self.webrtcDirectMessage = function (event) {
-		// loggerInfo(self.log('Received Message ' + event.data.byteLength));
-		self.receiveBuffer.push(event.data);
-		self.receivedSize += event.data.byteLength;
-		self.setTranseferdAmount(self.receivedSize);
-		// we are assuming that our signaling protocol told
-		// about the expected file size (and name, hash, etc).
-		if (self.receivedSize === self.fileSize) {
-			self.assembleFile();
-			self.closeEvents();
-		}
+		self.downloadBar.db.setValue(value);
 	};
 
 }
 
 
-function FileReceiverPeerConnection(connectionId, opponentWsId) {
+function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSize) {
 	var self = this;
+	self.fileSize = fileSize;
+	self.fileName = fileName;
 	FilePeerConnection.call(self);
 	ReceiverPeerConnection.call(self, connectionId, opponentWsId);
 	self.log("Created FileReceiverPeerConnection")();
@@ -2427,13 +2468,27 @@ function FileReceiverPeerConnection(connectionId, opponentWsId) {
 		var received = new window.Blob(self.receiveBuffer);
 		self.log("File is received")();
 		self.sendBaseEvent('fileAccepted');
-		self.lastGrowl.downloadBar.setSuccess();
+		self.downloadBar.db.setSuccess();
 		self.receiveBuffer = []; //clear buffer
 		self.receivedSize = 0;
-		self.lastGrowl.downloadBar.dom.text.href = URL.createObjectURL(received);
-		self.lastGrowl.downloadBar.dom.text.download = self.fileName;
-		self.lastGrowl.setSuccessStatus("Received");
-		self.lastGrowl.downloadBar.dom.text.textContent = 'Save'.format(self.fileName);
+		self.downloadBar.db.dom.text.href = URL.createObjectURL(received);
+		self.downloadBar.db.dom.text.download = self.fileName;
+		self.downloadBar.setSuccessStatus("Received");
+		self.downloadBar.db.dom.text.textContent = 'Save'.format(self.fileName);
+	};
+	self.channelOpen = function () {
+		self.downloadBar.setStatus("Receiving a file");
+	};
+	self.superOnChannelMessage = self.onChannelMessage;
+	self.onChannelMessage = function (event) {
+		self.superOnChannelMessage(event);
+		self.receiveBuffer.push(event.data);
+		self.receivedSize += event.data.byteLength;
+		self.setTranseferdAmount(self.receivedSize);
+		if (self.receivedSize === self.fileSize) {
+			self.assembleFile();
+			self.closeEvents();
+		}
 	};
 
 }
@@ -2449,8 +2504,8 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file) {
 	self.log("Created FileSenderPeerConnection")();
 	self.onfileAccepted = function (message) {
 		self.log("Transfer file {} result : {}", self.fileName, message.content)();
-		self.lastGrowl.setSuccessStatus("Transferred");
-		self.lastGrowl.downloadBar.hide();
+		self.downloadBar.setSuccessStatus("Transferred");
+		self.downloadBar.db.hide();
 		self.closeEvents();
 	};
 	self.createSendChannelAndOffer = function () {
@@ -2459,7 +2514,6 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file) {
 			// Reliable data channels not supported by Chrome
 			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
 			self.sendChannel.onopen = self.onreceiveChannelOpen;
-			self.sendChannel.onmessage = self.webrtcDirectMessage;
 			self.log("Created send data channel.")();
 		} catch (e) {
 			var error = "Failed to create data channel because {} ".format(e.message || e);
@@ -2475,12 +2529,12 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file) {
 		}, self.failWebRtcP1, self.sdpConstraints);
 	};
 	self.onreceiveChannelOpen = function () {
-		self.log('file is {} {} {} {}', self.fileName, self.fileSize, self.file.type, self.file.lastModifiedDate)();
+		self.log('Channel is open, slicing file: {} {} {} {}', self.fileName, self.fileSize, self.file.type, self.file.lastModifiedDate)();
 		if (self.fileSize === 0) {
-			self.lastGrowl.setErrorStatus("Can't send empty file");
+			self.downloadBar.setErrorStatus("Can't send empty file");
 			self.closeEvents("Can't send empty file");
 		} else {
-			self.lastGrowl.setStatus("Transferring file");
+			self.downloadBar.setStatus("Transferring file");
 			self.sliceFile(0);
 		}
 	};
@@ -2500,12 +2554,15 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file) {
 					}
 					self.setTranseferdAmount(offset + e.target.result.byteLength);
 				} else {
-					self.lastGrowl.setErrorStatus("Lost connection");
+					self.downloadBar.setErrorStatus("Lost connection");
 				}
 			};
 		})(self.file);
 		var slice = self.file.slice(offset, offset + self.CHUNK_SIZE);
 		reader.readAsArrayBuffer(slice);
+	};
+	self.channelOpen = function () {
+		self.downloadBar.setStatus("Sending a file");
 	};
 }
 
