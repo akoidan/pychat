@@ -75,8 +75,11 @@ FACEBOOK_JS_URL = '//connect.facebook.net/en_US/sdk.js'
 #FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
 # GOOGLE_OAUTH_2_HOST = 'pychat.org'
 
+REDIS_PORT = 6379
+TORNADO_REDIS_PORT = REDIS_PORT
+SESSION_REDIS_PORT = REDIS_PORT
 SESSION_ENGINE = 'redis_sessions.session'
-BROKER_URL = 'redis://localhost:6379/0'
+BROKER_URL = str(SESSION_REDIS_PORT).join(('redis://localhost:','/0'))
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'

@@ -3,7 +3,7 @@ import logging
 import redis
 import tornadoredis
 
-from chat.settings import ALL_REDIS_ROOM
+from chat.settings import ALL_REDIS_ROOM, TORNADO_REDIS_PORT
 
 logger = logging.getLogger(__name__)
 
@@ -24,9 +24,9 @@ def patch(tornado_redis):
 
 
 # # global connection to read synchronously
-sync_redis = redis.StrictRedis()
+sync_redis = redis.StrictRedis(port=TORNADO_REDIS_PORT)
 # patch(sync_redis)
 # Redis connection cannot be shared between publishers and subscribers.
-async_redis_publisher = tornadoredis.Client()
+async_redis_publisher = tornadoredis.Client(port=TORNADO_REDIS_PORT)
 patch(async_redis_publisher)
 async_redis_publisher.connect()

@@ -31,6 +31,8 @@ declare -a files=(\
     "$JS_DIR/pikaday.js" \
     "$JS_DIR/moment.js" \
     "$SASS_DIR/fontello/_fontello.scss" \
+    "$SASS_DIR/partials/_ajax-status.sass" \
+    "$SASS_DIR/partials/_asphalt.sass" \
     "$FONT_DIR/fontello.eot" \
     "$FONT_DIR/fontello.svg" \
     "$FONT_DIR/fontello.ttf" \
@@ -39,8 +41,6 @@ declare -a files=(\
     "$FONT_DIR/OpenSans.ttf" \
     "$FONT_DIR/Oswald.ttf" \
     "$JS_DIR/smileys_data.js"
-    "$IMAGES_DIR/ajaxStatus.gif" \
-    "$IMAGES_DIR/asphalt.jpg" \
     "$IMAGES_DIR/no_ava.png" \
     "$CSS_DIR/main.css" \
     "$CSS_DIR/chat.css"\

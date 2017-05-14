@@ -32,4 +32,5 @@ chat/static/js/amcharts-all.js
 chat/static/js/md5.js
 lol1_files
 chat/static/sass/partials/_asphalt.sass
+chat/static/sass/partials/_ajax-status.sass
 chat/production.py
