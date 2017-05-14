@@ -180,6 +180,12 @@ window.logger = (function (logsEnabled) {
 	return self;
 })(window.START_WITH_LOGS);
 
+function getDay(dateObj) {
+	var month = dateObj.getUTCMonth() + 1; //months from 1-12
+	var day = dateObj.getUTCDate();
+	var year = dateObj.getUTCFullYear();
+	return year + "/" + month + "/" + day;
+}
 
 const escapeMap = {
 	"&": "&amp;",
@@ -231,7 +237,8 @@ window.browserVersion = (function () {
 
 var isFirefox = window.browserVersion.indexOf('Firefox') >= 0;
 var isChrome = window.browserVersion.indexOf('Chrome') >= 0;
-var RTCPeerConnection = window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+var RTCPeerConnection = window.mozRTCPeerConnection || window.webkitRTCPeerConnection || window.RTCPeerConnection;
+var requestFileSystem  = window.webkitRequestFileSystem || window.mozRequestFileSystem || window.requestFileSystem;
 if (isFirefox) {
 	RTCSessionDescription = mozRTCSessionDescription;
 	RTCIceCandidate = mozRTCIceCandidate;

@@ -34,6 +34,7 @@ var wsHandler;
 var storage;
 var singlePage;
 var painter;
+const MAX_ACCEPT_FILE_SIZE_WO_FS_API = Math.pow(2, 28); // 256 MB
 
 onDocLoad(function () {
 	userMessage = $("usermsg");
@@ -1932,7 +1933,6 @@ function SendFileWindow (fileName, fileSize) {
 
 function ReceiveFileWindow (fileName, fileSize, opponentName) {
 	var self = this;
-	logger.error("Oponent name {}", opponentName)();
 	TransferFileWindow.call(self, fileName, fileSize);
 	self.superInit = self.init;
 	self.init = function() {
@@ -2060,6 +2060,9 @@ function TransferFileWindow(fileName, fileSize) {
 		self.postYesAction = yesAction;
 		self.postNoAction = noAction;
 	};
+	self.remove = function() {
+		document.querySelector('body').removeChild(self.dom.container);
+	}
 }
 
 function DownloadBar(holder, fileSize) {
@@ -2188,10 +2191,6 @@ function AbstractPeerConnection(connectionId, opponentWsId) {
 			opponentWsId: self.opponentWsId
 		});
 	};
-	self.destroy = function () {
-		self.log("Destroying peer connection")();
-		delete webRtcApi.connections[self.connectionId];
-	};
 	self.isActive = function () {
 		return self.localStream && self.localStream.active;
 	};
@@ -2209,7 +2208,7 @@ function AbstractPeerConnection(connectionId, opponentWsId) {
 	self.onsendRtcData = function (message) {
 		var data = message.content;
 		//self.clearTimeout(); TODO multirtc
-		if (self.pc.iceConnectionState && self.pc.iceConnectionState != 'closed') {
+		if (self.pc.iceConnectionState && self.pc.iceConnectionState !== 'closed') {
 			if (data.sdp) {
 				self.pc.setRemoteDescription(new RTCSessionDescription(data), self.handleAnswer, self.failWebRtc);
 			} else if (data.candidate) {
@@ -2282,14 +2281,16 @@ function AbstractPeerConnection(connectionId, opponentWsId) {
 }
 
 
-function BaseTransferHandler(receiverRoomId) {
+function BaseTransferHandler(removeReferenceFn) {
 	var self = this;
-	self.receiverRoomId = receiverRoomId;
+	self.removeReference = function() {
+		removeReferenceFn(self.connectionId);
+	};
 	self.peerConnections = {};
-	self.sendOffer = function (quedId, content) {
+	self.sendOffer = function (quedId, currentActiveChannel, content) {
 		var messageRequest = {
 			action: 'offerWebrtc',
-			channel: self.receiverRoomId,
+			channel: currentActiveChannel,
 			id: quedId
 		};
 		if (content) {
@@ -2322,23 +2323,18 @@ function BaseTransferHandler(receiverRoomId) {
 		// self.waitForAnswer(); todo mulrirtc
 	};
 	self.initAndDisplayOffer = function (message) {
-		self.offerMessage = {
-			opponentWsId: message.opponentWsId,
-			receiverName: message.user,
-			receiverId: message.userId,
-			connId: message.connId
-		};
+		self.offerOpponentWsId = message.opponentWsId;
+		self.connId = message.connId;
 		wsHandler.sendToServer({
 			action: 'replyWebrtc',
-			connId: message.connId
+			connId: self.connId
 		});
 		self.showOffer(message);
-
 	};
 	self.accept = function () {
 		wsHandler.sendToServer({
 			action: 'acceptWebrtc',
-			connId: self.offerMessage.connId
+			connId: self.connId
 		});
 	};
 	self.finish = function (text) {
@@ -2349,9 +2345,9 @@ function BaseTransferHandler(receiverRoomId) {
 	}
 }
 
-function CallHandler(receiverRoomId) {
+function CallHandler(removeReferenceFn) {
 	var self = this;
-	BaseTransferHandler.call(self, receiverRoomId);
+	BaseTransferHandler.call(self, removeReferenceFn);
 
 	self.onreplyWebrtc = function (message) {
 		self.peerConnections[message.connId] = new CallPeerConnection();
@@ -2360,61 +2356,77 @@ function CallHandler(receiverRoomId) {
 
 }
 
-function FileTransferHandler(receiverRoomId) {
+function FileTransferHandler(removeReferenceFn) {
 	var self = this;
-	BaseTransferHandler.call(self, receiverRoomId);
+	BaseTransferHandler.call(self, removeReferenceFn);
 	self.setFile = function(file) {
 		self.file = file;
 	};
 	self.closeWindowClick = function() {
 		self.finish();
-		self.closeEvents();
+		self.removeReference();
 	};
 }
 
 
-function FileReceiver(receiverRoomId) {
+function FileReceiver(removeReferenceFn) {
 	var self = this;
-	FileTransferHandler.call(self, receiverRoomId);
+	FileTransferHandler.call(self, removeReferenceFn);
 	self.showOffer = function (message) {
 		self.fileSize = parseInt(message.content.size);
 		self.fileName = message.content.name;
+		self.connectionId = message.connId;
 		self.transferWindow = new ReceiveFileWindow(self.fileName, self.fileSize, message.user);
 		self.transferWindow.setButtonActions(self.declineFile, self.acceptFileReply);
 		notifier.notify(message.user, "Sends file {}".format(self.fileName));
 	};
 	self.declineFile = function () {
-		self.decline();
+		wsHandler.sendToServer({
+			action: 'destroyConnection',
+			connId: self.connId,
+			content: "decline"
+		});
 		self.closeWindowClick();
 	};
 	self.acceptFileReply = function () {
-		self.peerConnections[self.offerMessage.opponentWsId] = new FileReceiverPeerConnection(
-				self.offerMessage.connId,
-				self.offerMessage.opponentWsId,
-				self.fileName,
-				self.fileSize
-		);
-		var db = self.transferWindow.addDownloadBar();
-		self.peerConnections[self.offerMessage.opponentWsId].setDownloadBar(db);
-		self.peerConnections[self.offerMessage.opponentWsId].waitForAnswer();
-		self.accept();
+		if (self.fileSize > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem) {
+			var bsize = bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API);
+			wsHandler.sendToServer({
+				action: 'destroyConnection',
+				connId: self.connId,
+				content: "User's browser doesn't support accepting files over {}"
+						.format(bsize)
+			});
+			growlError("Your browser doesn't support receiving files over {}".format(bsize))
+		} else {
+			self.peerConnections[self.offerOpponentWsId] = new FileReceiverPeerConnection(
+					self.connId,
+					self.offerOpponentWsId,
+					self.fileName,
+					self.fileSize
+			);
+			var db = self.transferWindow.addDownloadBar();
+			self.peerConnections[self.offerOpponentWsId].initFileSystemApi(self.accept);
+			self.peerConnections[self.offerOpponentWsId].setDownloadBar(db);
+			self.peerConnections[self.offerOpponentWsId].waitForAnswer();
+		}
 	};
 }
 
-function FileSender(receiverRoomId) {
+function FileSender(removeReferenceFn) {
 	var self = this;
-	FileTransferHandler.call(self, receiverRoomId);
+	FileTransferHandler.call(self, removeReferenceFn);
 	self.sendOfferParent = self.sendOffer;
 	self.ondecline = function () {
 		self.transferWindow.setErrorStatus("Declined");
 	};
-	self.sendOffer = function (quedId) {
+	self.sendOffer = function (quedId, currentActiveChannel) {
 		//self.dom.fileInput.disabled = true;
 		self.fileName = self.file.name;
 		self.fileSize = self.file.size;
 		self.transferWindow = new SendFileWindow(self.fileName, self.fileSize);
 		self.transferWindow.setButtonActions(self.closeWindowClick);
-		self.sendOfferParent(quedId, {
+		self.sendOfferParent(quedId, currentActiveChannel, {
 			name: self.fileName,
 			size: self.fileSize
 		});
@@ -2429,8 +2441,8 @@ function FileSender(receiverRoomId) {
 
 function FilePeerConnection() {
 	var self = this;
-	self.CHUNK_SIZE = 65536;
-	self.receiveBuffer = [];
+	self.CHUNK_SIZE = 16384;
+	self.MAX_BUFFER_SIZE = 256;
 	self.receivedSize = 0;
 	self.sdpConstraints = {};
 	self.setHeaderText = function (text) {
@@ -2462,25 +2474,62 @@ function FilePeerConnection() {
 
 }
 
-
 function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSize) {
 	var self = this;
 	self.fileSize = fileSize;
 	self.fileName = fileName;
+	self.blobsQueue = [];
+	self.recevedUsingFile = false;
+	self.receiveBuffer = [];
 	FilePeerConnection.call(self);
 	ReceiverPeerConnection.call(self, connectionId, opponentWsId);
 	self.log("Created FileReceiverPeerConnection")();
-	self.assembleFile = function () {
-		var received = new window.Blob(self.receiveBuffer);
-		self.log("File is received")();
-		self.sendCloseSuccess();
-		self.downloadBar.db.setSuccess();
-		self.receiveBuffer = []; //clear buffer
-		self.receivedSize = 0;
-		self.downloadBar.db.dom.text.href = URL.createObjectURL(received);
-		self.downloadBar.db.dom.text.download = self.fileName;
-		self.downloadBar.setSuccessStatus("Received");
-		self.downloadBar.db.dom.text.textContent = 'Save'.format(self.fileName);
+	self.superGotReceiveChannel = self.gotReceiveChannel;
+	self.gotReceiveChannel = function (event) {
+		self.superGotReceiveChannel(event);
+		self.downloadBar.db.start();
+	}
+	self.assembleFileIfDone = function () {
+		if (self.isDone()) {
+			var received = self.recevedUsingFile ? self.fileEntry.toURL() : URL.createObjectURL(new window.Blob(self.receiveBuffer));
+			self.log("File is received")();
+			self.sendCloseSuccess();
+			self.downloadBar.db.setSuccess();
+			self.receiveBuffer = []; //clear buffer
+			self.receivedSize = 0;
+			self.downloadBar.db.dom.text.href = received;
+			self.downloadBar.db.dom.text.download = self.fileName;
+			self.downloadBar.setSuccessStatus("Received");
+			self.downloadBar.db.dom.text.textContent = 'Save'.format(self.fileName);
+			self.closeEvents();
+		}
+	};
+	self.isDone = function() {
+		return self.receivedSize === self.fileSize;
+	};
+	self.initFileSystemApi = function (cb) {
+		self.log("Creating temp location {}", bytesToSize(self.fileSize))();
+		if (requestFileSystem) {
+			requestFileSystem(window.TEMPORARY, self.fileSize, function (fs) {
+				fs.root.getFile(self.connectionId, {create: true}, function (fileEntry) {
+					self.fileEntry = fileEntry;
+					self.fileEntry.createWriter(function (fileWriter) {
+						self.fileWriter = fileWriter;
+						self.fileWriter.WRITING = 1;
+						self.fileWriter.onwriteend = self.onWriteEnd;
+						self.log("FileWriter is created")();
+						cb();
+					}, self.fileSystemErr);
+
+				}, self.fileSystemErr)
+			}, self.fileSystemErr);
+		} else {
+			cb();
+		}
+	};
+	self.fileSystemErr = function(e) {
+		growlError("FileSystemApi Error: " + e.code || e);
+		self.logErr("FileSystemApi Error, {}", e.code || e);
 	};
 	self.channelOpen = function () {
 		self.downloadBar.setStatus("Receiving a file");
@@ -2490,13 +2539,29 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 		self.superOnChannelMessage(event);
 		self.receiveBuffer.push(event.data);
 		self.receivedSize += event.data.byteLength;
+		self.syncBufferWithFs();
 		self.setTranseferdAmount(self.receivedSize);
-		if (self.receivedSize === self.fileSize) {
-			self.assembleFile();
-			self.closeEvents();
+		self.assembleFileIfDone();
+	};
+	self.onWriteEnd = function() {
+		if (self.blobsQueue.length > 0 ) {
+			self.fileWriter.write(self.blobsQueue.shift());
+		} else {
+			self.assembleFileIfDone();
 		}
 	};
-
+	self.syncBufferWithFs = function() {
+		if ((self.receiveBuffer.length > self.MAX_BUFFER_SIZE || self.isDone) && self.fileWriter) {
+			self.recevedUsingFile = true;
+			var blob = new window.Blob(self.receiveBuffer);
+			self.receiveBuffer = [];
+			if (self.fileWriter.readyState !== self.fileWriter.WRITING) {
+				self.fileWriter.write(blob);
+			} else {
+				self.blobsQueue.push(blob);
+			}
+		}
+	}
 }
 
 function FileSenderPeerConnection(connectionId, opponentWsId, file) {
@@ -2535,7 +2600,8 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file) {
 		}, self.failWebRtcP1, self.sdpConstraints);
 	};
 	self.onreceiveChannelOpen = function () {
-		self.log('Channel is open, slicing file: {} {} {} {}', self.fileName, self.fileSize, self.file.type, self.file.lastModifiedDate)();
+		self.downloadBar.db.start();
+		self.log('Channel is open, slicing file: {} {} {} {}', self.fileName, bytesToSize(self.fileSize), self.file.type, getDay(self.file.lastModifiedDate))();
 		if (self.fileSize === 0) {
 			self.downloadBar.setErrorStatus("Can't send empty file");
 			self.closeEvents("Can't send empty file");
@@ -2576,7 +2642,6 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file) {
 function CallPeerConnection(receiverRoomId, connectionId, wsOpponentId) {
 	var self = this;
 	AbstractPeerConnection.call(self, connectionId, wsOpponentId);
-	self.receiverRoomId = receiverRoomId;
 	self.audioProcessors = {};
 	self.dom = {
 		callAnswerParent: $('callAnswerParent'),
@@ -3044,7 +3109,7 @@ function WebRtcApi() {
 		// }
 
 		var className = message.content ? FileReceiver : CallHandler;
-		var handler = new className(message.channel);
+		var handler = new className(self.removeChildReference);
 		self.connections[message.connId] = handler;
 		handler.initAndDisplayOffer(message);
 		if (handler instanceof CallPeerConnection) {
@@ -3067,11 +3132,15 @@ function WebRtcApi() {
 	self.offerFile = function () {
 		self.createWebrtcObject(FileSender, self.dom.fileInput.files[0]);
 	};
+	self.removeChildReference = function(id) {
+		logger.info("Removing transferHandler with id {}", id)();
+		delete self.connections[id];
+	};
 	self.createWebrtcObject = function (className, file) {
 		var newId = self.createQuedId();
-		self.quedConnections[newId] = new className(channelsHandler.activeChannel);
+		self.quedConnections[newId] = new className(self.removeChildReference);
 		self.quedConnections[newId].setFile(file); // todo call handler
-		self.quedConnections[newId].sendOffer(newId);
+		self.quedConnections[newId].sendOffer(newId, channelsHandler.activeChannel);
 		return self.quedConnections[newId];
 	};
 	self.attachEvents = function() {
