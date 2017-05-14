@@ -2363,6 +2363,11 @@ function FileTransferHandler(removeReferenceFn) {
 		self.file = file;
 	};
 	self.closeWindowClick = function() {
+		wsHandler.sendToServer({
+			action: 'destroyConnection',
+			connId: self.connectionId,
+			content: "decline"
+		});
 		self.finish();
 		self.removeReference();
 	};
@@ -2377,16 +2382,8 @@ function FileReceiver(removeReferenceFn) {
 		self.fileName = message.content.name;
 		self.connectionId = message.connId;
 		self.transferWindow = new ReceiveFileWindow(self.fileName, self.fileSize, message.user);
-		self.transferWindow.setButtonActions(self.declineFile, self.acceptFileReply);
+		self.transferWindow.setButtonActions(self.closeWindowClick, self.acceptFileReply);
 		notifier.notify(message.user, "Sends file {}".format(self.fileName));
-	};
-	self.declineFile = function () {
-		wsHandler.sendToServer({
-			action: 'destroyConnection',
-			connId: self.connId,
-			content: "decline"
-		});
-		self.closeWindowClick();
 	};
 	self.acceptFileReply = function () {
 		if (self.fileSize > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem) {

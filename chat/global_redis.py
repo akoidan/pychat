@@ -17,16 +17,38 @@ def new_read(instance, *args, **kwargs):
 		raise e
 
 
-def patch(tornado_redis):
+def patch_read(tornado_redis):
 	fabric = type(tornado_redis.connection.read)
 	tornado_redis.connection.old_read = tornado_redis.connection.read
 	tornado_redis.connection.read = fabric(new_read, tornado_redis.connection)
 
 
+def new_hget(instance, *args, **kwargs):
+	res = instance.hget(*args, **kwargs)
+	return res.decode('utf-8') if res else None
+
+
+def patch_hget(arg_red):
+	fabric = type(arg_red.hget)
+	arg_red.shget = fabric(new_hget, arg_red)
+
+
+def patch_hgetall(arg_red):
+	fabric = type(arg_red.hgetall)
+	arg_red.shgetall = fabric(new_hgetall, arg_red)
+
+
+def new_hgetall(instance, *args, **kwargs):
+	res = instance.hgetall(*args, **kwargs)
+	return {k.decode('utf-8'): res[k].decode('utf-8') for k in res}
+
+
 # # global connection to read synchronously
 sync_redis = redis.StrictRedis(port=TORNADO_REDIS_PORT)
+patch_hget(sync_redis)
+patch_hgetall(sync_redis)
 # patch(sync_redis)
 # Redis connection cannot be shared between publishers and subscribers.
 async_redis_publisher = tornadoredis.Client(port=TORNADO_REDIS_PORT)
-patch(async_redis_publisher)
+patch_read(async_redis_publisher)
 async_redis_publisher.connect()

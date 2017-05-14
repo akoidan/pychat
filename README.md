@@ -81,7 +81,6 @@ Afterwards to start the chat you need:
 * move loading messages on startup to single function? 
 * add antiflood settings to nginx
 * tornado redis connection reset prevents user from deleting its entry in online_users
-* run tornado via nginx http://tornado.readthedocs.org/en/latest/guide/running.html
 * fixme tornado logs messages to chat.log when messages don't belong to tornadoapp.p
 * add media query for register and usersettings to adjust for phone's width
 * add change password and realtime javascript to change_profile
