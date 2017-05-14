@@ -39,7 +39,7 @@ def patch_hgetall(arg_red):
 
 
 def new_hgetall(instance, *args, **kwargs):
-	res = instance.hgetall(*args, **kwargs)
+	res = instance.hgetall(*args, **kwargs) # neither key or value are null
 	return {k.decode('utf-8'): res[k].decode('utf-8') for k in res}
 
 
