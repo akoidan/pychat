@@ -2406,7 +2406,8 @@ function FileReceiver(removeReferenceFn) {
 					self.connId,
 					self.offerOpponentWsId,
 					self.fileName,
-					self.fileSize
+					self.fileSize,
+					self.removeChildPeerReference
 			);
 			var db = self.transferWindow.addDownloadBar();
 			self.peerConnections[self.offerOpponentWsId].initFileSystemApi(self.accept);
@@ -2473,7 +2474,7 @@ function FilePeerConnection() {
 	};
 	self.ondestroyConnection = function () {
 		self.downloadBar.setErrorStatus("Opponent closed connection");
-		self.removeChildPeerReference(self.wsConnectionId);
+		self.removeChildPeerReference(self.opponentWsId);
 		self.closeEvents();
 	};
 	self.onsetError = function (message) {
