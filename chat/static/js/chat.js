@@ -1916,40 +1916,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 }
 
 
-function SendFileWindow(fileName, fileSize) {
-	var self = this;
-	TransferFileWindow.call(self, fileName, fileSize);
-	self.superInit = self.init;
-	self.init = function () {
-		self.superInit();
-	};
-	self.addDownloadBar = function () {
-		var div = document.createElement("DIV");
-		self.dom.body.appendChild(div);
-		return new SendBar(div, fileSize);
-	};
-	self.init();
-
-}
-
-function ReceiveFileWindow(fileName, fileSize, opponentName) {
-	var self = this;
-	TransferFileWindow.call(self, fileName, fileSize);
-	self.superInit = self.init;
-	self.init = function () {
-		self.superInit();
-		self.insertData("From:", opponentName);
-		self.addYesNo();
-	};
-	self.addDownloadBar = function () {
-		var div = document.createElement("DIV");
-		self.dom.body.appendChild(div);
-		return new ReceiveBar(div, fileSize);
-	};
-	self.init();
-}
-
-
 function SendBar(holder, fileSize) {
 	var self = this;
 	self.db = new DownloadBar(holder, fileSize);
@@ -1992,79 +1958,8 @@ function ReceiveBar(holder, fileSize) {
 	};
 }
 
-function TransferFileWindow(fileName, fileSize) {
-	var self = this;
-	Draggable.call(self, document.createElement('DIV'), "File transfer");
-	self.dom.fileInfo = document.createElement('table');
-	self.init = function () {
-		document.querySelector('body').appendChild(self.dom.container);
-		CssUtils.addClass(self.dom.body, 'transferFile');
-		self.dom.iconMinimize = document.createElement('i');
-		self.dom.header.appendChild(self.dom.iconMinimize);
-		self.dom.iconMinimize.onclick = self.hide;
-		self.dom.iconMinimize.className = 'icon-minimize';
-		self.dom.iconCancel.onclick = self.noAction;
-		self.insertData('Status:', 'initing', 'fileStatus');
-		self.insertData('Name:', fileName);
-		self.insertData('Size:', bytesToSize(fileSize));
-		self.dom.body.appendChild(self.dom.fileInfo);
-	};
 
-	self.insertData = function (name, value, fieldName) {
-		var raw = self.dom.fileInfo.insertRow();
-		var th = document.createElement('th');
-		raw.appendChild(th);
-		th.textContent = name;
-		var valueField = raw.insertCell();
-		valueField.textContent = value;
-		if (fieldName) {
-			self.dom[fieldName] = valueField;
-		}
-	};
-	self.hideButtons = function () {
-		if (self.dom.yesNoHolder) {
-			CssUtils.hideElement(self.dom.yesNoHolder)
-		}
-	};
-	self.yesAction = function () {
-		self.hideButtons();
-		self.postYesAction();
-	};
-	self.remove = function () {
-		CssUtils.deleteElement(self.dom.container);
-	};
-	self.noAction = function () {
-		if (self.postNoAction) {
-			self.postNoAction();
-		} else {
-			logger.warn("Skipping empty No callback")();
-		}
-		self.remove();
-	};
-	self.addYesNo = function () {
-		self.dom.yesNoHolder = document.createElement('DIV');
-		self.dom.yes = document.createElement('INPUT');
-		self.dom.no = document.createElement('INPUT');
-		self.dom.body.appendChild(self.dom.yesNoHolder);
-		self.dom.yesNoHolder.appendChild(self.dom.yes);
-		self.dom.yesNoHolder.appendChild(self.dom.no);
-		self.dom.yesNoHolder.className = 'yesNo';
-		self.dom.yes.onclick = self.yesAction;
-		self.dom.no.onclick = self.noAction;
-		self.dom.yes.setAttribute('type', 'button');
-		self.dom.no.setAttribute('type', 'button');
-		self.dom.yes.setAttribute('value', 'Accept');
-		self.dom.no.setAttribute('value', 'Decline');
-		self.fixInputs();
-	};
-	self.setButtonActions = function (noAction, yesAction) {
-		self.postYesAction = yesAction;
-		self.postNoAction = noAction;
-	};
-	self.remove = function () {
-		document.querySelector('body').removeChild(self.dom.container);
-	}
-}
+
 
 function DownloadBar(holder, fileSize) {
 	var self = this;
@@ -2365,18 +2260,77 @@ function CallHandler(removeReferenceFn) {
 function FileTransferHandler(removeReferenceFn) {
 	var self = this;
 	BaseTransferHandler.call(self, removeReferenceFn);
-	self.setFile = function (file) {
-		self.file = file;
-	};
+	Draggable.call(self, document.createElement('DIV'), "File transfer");
 	self.closeWindowClick = function () {
 		wsHandler.sendToServer({
 			action: 'destroyConnection',
 			connId: self.connectionId,
-			content: "decline"
+			content: 'decline'
 		});
 		self.finish();
 		self.removeReference();
 	};
+	self.dom.fileInfo = document.createElement('table');
+	self.init = function () {
+		document.querySelector('body').appendChild(self.dom.container);
+		CssUtils.addClass(self.dom.body, 'transferFile');
+		self.dom.iconMinimize = document.createElement('i');
+		self.dom.header.appendChild(self.dom.iconMinimize);
+		self.dom.iconMinimize.onclick = self.hide;
+		self.dom.iconMinimize.className = 'icon-minimize';
+		self.dom.iconCancel.onclick = self.noAction;
+		self.insertData('Status:', 'initing', 'fileStatus');
+		self.insertData('Name:', self.fileName);
+		self.insertData('Size:', bytesToSize(self.fileSize));
+		self.dom.body.appendChild(self.dom.fileInfo);
+	};
+
+	self.insertData = function (name, value, fieldName) {
+		var raw = self.dom.fileInfo.insertRow();
+		var th = document.createElement('th');
+		raw.appendChild(th);
+		th.textContent = name;
+		var valueField = raw.insertCell();
+		valueField.textContent = value;
+		if (fieldName) {
+			self.dom[fieldName] = valueField;
+		}
+	};
+	self.hideButtons = function () {
+		if (self.dom.yesNoHolder) {
+			CssUtils.hideElement(self.dom.yesNoHolder)
+		}
+	};
+	self.yesAction = function () {
+		self.hideButtons();
+		self.acceptFileReply();
+	};
+	self.remove = function () {
+		CssUtils.deleteElement(self.dom.container);
+	};
+	self.noAction = function () {
+		self.closeWindowClick();
+		self.remove();
+	};
+	self.addYesNo = function () {
+		self.dom.yesNoHolder = document.createElement('DIV');
+		self.dom.yes = document.createElement('INPUT');
+		self.dom.no = document.createElement('INPUT');
+		self.dom.body.appendChild(self.dom.yesNoHolder);
+		self.dom.yesNoHolder.appendChild(self.dom.yes);
+		self.dom.yesNoHolder.appendChild(self.dom.no);
+		self.dom.yesNoHolder.className = 'yesNo';
+		self.dom.yes.onclick = self.yesAction;
+		self.dom.no.onclick = self.noAction;
+		self.dom.yes.setAttribute('type', 'button');
+		self.dom.no.setAttribute('type', 'button');
+		self.dom.yes.setAttribute('value', 'Accept');
+		self.dom.no.setAttribute('value', 'Decline');
+		self.fixInputs();
+	};
+	self.remove = function () {
+		document.querySelector('body').removeChild(self.dom.container);
+	}
 }
 
 
@@ -2387,9 +2341,11 @@ function FileReceiver(removeReferenceFn) {
 		self.fileSize = parseInt(message.content.size);
 		self.fileName = message.content.name;
 		self.connectionId = message.connId;
-		self.transferWindow = new ReceiveFileWindow(self.fileName, self.fileSize, message.user);
-		self.transferWindow.setButtonActions(self.closeWindowClick, self.acceptFileReply);
+		self.opponentName = message.user;
 		notifier.notify(message.user, "Sends file {}".format(self.fileName));
+		self.init();
+		self.insertData("From:", self.opponentName);
+		self.addYesNo();
 	};
 	self.acceptFileReply = function () {
 		if (self.fileSize > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem) {
@@ -2409,7 +2365,7 @@ function FileReceiver(removeReferenceFn) {
 					self.fileSize,
 					self.removeChildPeerReference
 			);
-			var db = self.transferWindow.addDownloadBar();
+			var db = self.addDownloadBar();
 			self.peerConnections[self.offerOpponentWsId].initFileSystemApi(self.accept);
 			self.peerConnections[self.offerOpponentWsId].setDownloadBar(db);
 			self.peerConnections[self.offerOpponentWsId].waitForAnswer();
@@ -2419,41 +2375,49 @@ function FileReceiver(removeReferenceFn) {
 		if (self.peerConnections[message.opponentWsId] ) { //todo
 			self.peerConnections[message.opponentWsId].ondestroyConnection(message);
 		} else {
-			self.transferWindow.hideButtons();
+			self.hideButtons();
 			growlInfo("TODO Opponent has closed connection"); // TODO
 		}
-	}
+	};
+	self.addDownloadBar = function () {
+		var div = document.createElement("DIV");
+		self.dom.body.appendChild(div);
+		return new ReceiveBar(div, self.fileSize);
+	};
 }
 
-function FileSender(removeReferenceFn) {
+function FileSender(removeReferenceFn, file) {
 	var self = this;
+	self.file = file;
 	FileTransferHandler.call(self, removeReferenceFn);
 	self.sendOfferParent = self.sendOffer;
-	self.ondecline = function () {
-		self.transferWindow.setErrorStatus("Declined");
-	};
 	self.sendOffer = function (quedId, currentActiveChannel) {
 		//self.dom.fileInput.disabled = true;
 		self.fileName = self.file.name;
 		self.fileSize = self.file.size;
-		self.transferWindow = new SendFileWindow(self.fileName, self.fileSize);
-		self.transferWindow.setButtonActions(self.closeWindowClick);
 		self.sendOfferParent(quedId, currentActiveChannel, {
 			name: self.fileName,
 			size: self.fileSize
 		});
+		self.init();
 	};
 	self.onreplyWebrtc = function (message) {
 		self.peerConnections[message.opponentWsId] = new FileSenderPeerConnection(message.connId, message.opponentWsId, self.file, self.removeChildPeerReference);
-		var downloadBar = self.transferWindow.addDownloadBar();
+		var downloadBar = self.addDownloadBar();
 		self.peerConnections[message.opponentWsId].setDownloadBar(downloadBar);
 		//downloadBar.setStatus("To {}:".format(message.user)); // TODO
 	};
 	self.ondestroyConnection = function (message) {
 		self.peerConnections[message.opponentWsId].ondestroyConnection(message);
 		growlInfo("TODO close here")
-	}
+	};
+	self.addDownloadBar = function () {
+		var div = document.createElement("DIV");
+		self.dom.body.appendChild(div);
+		return new SendBar(div, self.fileSize);
+	};
 }
+
 
 function FilePeerConnection() {
 	var self = this;
@@ -3154,8 +3118,7 @@ function WebRtcApi() {
 	};
 	self.createWebrtcObject = function (className, file) {
 		var newId = self.createQuedId();
-		self.quedConnections[newId] = new className(self.removeChildReference);
-		self.quedConnections[newId].setFile(file); // todo call handler
+		self.quedConnections[newId] = new className(self.removeChildReference, file);
 		self.quedConnections[newId].sendOffer(newId, channelsHandler.activeChannel);
 		return self.quedConnections[newId];
 	};
