@@ -151,11 +151,11 @@ class MessagesCreator(object):
 			VarNames.HANDLER_NAME: handler
 		}
 
-	def set_ws_id(self):
+	def set_ws_id(self, random):
 		return {
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 			VarNames.EVENT: Actions.SET_WS_ID,
-			VarNames.CONTENT: self.id
+			VarNames.CONTENT: random
 		}
 
 	def room_online(self, online, event, channel):
@@ -501,14 +501,13 @@ class MessagesHandler(MessagesCreator):
 		self_channel_status = self.sync_redis.shget(connection_id, self.id)
 		if not self_channel_status:
 			raise Exception("Access Denied")
-		if self_channel_status == 'closed':
-			raise Exception("Already closed")
-		sender_id = self.sync_redis.shget(connection_id, WebRtcRedisStates.SENDER_ID)
-		if sender_id == self.id:
-			self.close_sender(connection_id)
-		else:
-			self.close_receiver(connection_id, in_message, sender_id)
-		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.CLOSED)
+		if self_channel_status != 'closed':
+			sender_id = self.sync_redis.shget(connection_id, WebRtcRedisStates.SENDER_ID)
+			if sender_id == self.id:
+				self.close_sender(connection_id)
+			else:
+				self.close_receiver(connection_id, in_message, sender_id)
+			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.CLOSED)
 
 	def close_receiver(self, connection_id, in_message, sender_id): # TODO for call we should close all
 		sender_status = self.sync_redis.shget(connection_id, sender_id)
@@ -908,8 +907,10 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		So if ws loses a connection it still can reconnect with same id,
 		and TornadoHandler can restore webrtc_connections to previous state
 		"""
-		self.id = create_id(self.user_id, self.get_argument('id', None))
-		self.ws_write(self.set_ws_id())
+		conn_arg = self.get_argument('id', None)
+		self.id, random = create_id(self.user_id, conn_arg)
+		if random != conn_arg:
+			self.ws_write(self.set_ws_id(random))
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)

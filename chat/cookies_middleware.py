@@ -11,7 +11,7 @@ def create_id(user_id, random=None):
 		user_id = 0
 	if not random or len(random) != WS_ID_CHAR_LENGTH:
 		random = id_generator(WS_ID_CHAR_LENGTH)
-	return "{:04d}:{}".format(user_id, random)
+	return "{:04d}:{}".format(user_id, random), random
 
 
 class UserCookieMiddleWare(object):
@@ -25,5 +25,5 @@ class UserCookieMiddleWare(object):
 		try:
 			local.random
 		except AttributeError:
-			local.random = create_id(getattr(request.user, 'id'))
+			local.random = create_id(getattr(request.user, 'id'))[0]
 			local.client_ip = get_client_ip(request)

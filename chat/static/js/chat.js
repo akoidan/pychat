@@ -2469,6 +2469,12 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 		self.superGotReceiveChannel(event);
 		self.downloadBar.db.start();
 	};
+	self.superOnDestroyConnection = self.ondestroyConnection;
+	self.ondestroyConnection = function (data) {
+		self.superOnDestroyConnection(data);
+		self.downloadBar.setErrorStatus("Opponent closed connection");
+		self.closeEvents();
+	};
 	self.assembleFileIfDone = function () {
 		if (self.isDone()) {
 			var received = self.recevedUsingFile ? self.fileEntry.toURL() : URL.createObjectURL(new window.Blob(self.receiveBuffer));
@@ -2559,8 +2565,19 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 		self.downloadBar.db.hide();
 		self.closeEvents();
 	};
+	self.superOnDestroyConnection = self.ondestroyConnection;
+	self.ondestroyConnection = function (data) {
+		self.superOnDestroyConnection(data);
+		if (data.content !== 'success') {
+			self.downloadBar.db.setStatusText(data.content === 'decline' ?
+					"Opponent closed connection": "Connection error");
+			self.downloadBar.db.setError();
+		} else {
+			self.downloadBar.db.setSuccess();
+			self.downloadBar.db.setStatusText("File transferred");
+		}
+	};
 	self.createSendChannelAndOffer = function () {
-
 		try {
 			// Reliable data channels not supported by Chrome
 			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
