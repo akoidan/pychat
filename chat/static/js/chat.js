@@ -1916,56 +1916,12 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 }
 
 
-function SendBar(holder, fileSize) {
-	var self = this;
-	self.db = new DownloadBar(holder, fileSize);
-	self.dom = {
-		status: document.createElement('DIV')
-	};
-	self.setStatus = function (text) {
-		self.dom.status.textContent = text;
-	};
-	self.setErrorStatus = function (html) {
-		self.setStatus(html);
-		self.dom.status.className = 'error'
-	};
-	self.setSuccessStatus = function (html) {
-		self.setStatus(html);
-		self.dom.status.className = 'success'
-	};
-}
-
-function ReceiveBar(holder, fileSize) {
-	var self = this;
-	self.fileSize = fileSize;
-	self.dom = {
-		db: document.createElement('DIV'),
-		holder: holder,
-		status: document.createElement('DIV')
-	};
-	self.dom.holder.appendChild(self.dom.db);
-	self.db = new DownloadBar(self.dom.db, self.fileSize);
-	self.setStatus = function (text) {
-		self.dom.status.textContent = text;
-	};
-	self.setErrorStatus = function (html) {
-		self.setStatus(html);
-		self.dom.status.className = 'error'
-	};
-	self.setSuccessStatus = function (html) {
-		self.setStatus(html);
-		self.dom.status.className = 'success'
-	};
-}
-
-
-
-
-function DownloadBar(holder, fileSize) {
+function DownloadBar(holder, fileSize, statusDiv) {
 	var self = this;
 	self.dom = {
 		wrapper: holder,
-		text: document.createElement('A')
+		text: document.createElement('A'),
+		statusDiv: statusDiv
 	};
 	self.max = fileSize;
 	self.dom.wrapper.className = 'progress-wrap';
@@ -1978,8 +1934,11 @@ function DownloadBar(holder, fileSize) {
 		self.dom.text.style.width = percent;
 		self.dom.text.textContent = percent;
 	};
-	self.setStatusText = function (text) {
-		self.dom.text.textContent = text;
+	self.setStatus = function (text) {
+		self.dom.statusDiv.textContent = text;
+	};
+	self.getAnchor = function() {
+		return self.dom.text;
 	};
 	self.show = function () {
 		CssUtils.showElement(self.dom.wrapper);
@@ -1988,21 +1947,18 @@ function DownloadBar(holder, fileSize) {
 		CssUtils.hideElement(self.dom.wrapper);
 	};
 	self.setSuccess = function () {
-		CssUtils.removeClass(self.dom.wrapper, self.PROGRESS_CLASS);
-		CssUtils.addClass(self.dom.wrapper, self.SUCC_CLASS);
+		CssUtils.setOnOf(self.dom.wrapper, self.SUCC_CLASS, [self.PROGRESS_CLASS, self.ERR_CLASS]);
 	};
 	self.setError = function () {
-		CssUtils.removeClass(self.dom.wrapper, self.PROGRESS_CLASS);
-		CssUtils.addClass(self.dom.wrapper, self.ERR_CLASS);
+		CssUtils.setOnOf(self.dom.wrapper, self.ERR_CLASS, [self.PROGRESS_CLASS, self.SUCC_CLASS]);
 	};
 	self.start = function () {
 		self.dom.text.removeAttribute('href');
 		self.dom.text.removeAttribute('download');
-		CssUtils.removeClass(self.dom.wrapper, self.SUCC_CLASS);
-		CssUtils.removeClass(self.dom.wrapper, self.ERR_CLASS);
-		CssUtils.addClass(self.dom.wrapper, self.PROGRESS_CLASS);
+		CssUtils.setOnOf(self.dom.wrapper, self.PROGRESS_CLASS, [self.ERR_CLASS, self.SUCC_CLASS]);
 		self.setValue(0);
 	};
+	self.start();
 }
 
 function SenderPeerConnection(connectionId, opponentWsId, removeChildPeerReferenceFn) {
@@ -2032,6 +1988,7 @@ function ReceiverPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	self.waitForAnswer = function () {
 		self.createPeerConnection();
 		self.log("Waiting for rtc datachannels.")();
+		self.downloadBar.setStatus("Establishing connection");
 		self.pc.ondatachannel = self.gotReceiveChannel;
 	};
 	self.gotReceiveChannel = function (event) {
@@ -2143,9 +2100,6 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 		} else {
 			self.log("No peer connection to close")();
 		}
-		if (text) {
-			growlInfo(text);
-		}
 	};
 
 	self.sendWebRtcEvent = function (message) {
@@ -2224,6 +2178,7 @@ function BaseTransferHandler(removeReferenceFn) {
 		// self.waitForAnswer(); todo mulrirtc
 	};
 	self.initAndDisplayOffer = function (message) {
+		logger.info("initAndDisplayOffer")();
 		self.offerOpponentWsId = message.opponentWsId;
 		self.connId = message.connId;
 		wsHandler.sendToServer({
@@ -2279,22 +2234,19 @@ function FileTransferHandler(removeReferenceFn) {
 		self.dom.iconMinimize.onclick = self.hide;
 		self.dom.iconMinimize.className = 'icon-minimize';
 		self.dom.iconCancel.onclick = self.noAction;
-		self.insertData('Status:', 'initing', 'fileStatus');
 		self.insertData('Name:', self.fileName);
 		self.insertData('Size:', bytesToSize(self.fileSize));
 		self.dom.body.appendChild(self.dom.fileInfo);
 	};
 
-	self.insertData = function (name, value, fieldName) {
+	self.insertData = function (name, value) {
 		var raw = self.dom.fileInfo.insertRow();
 		var th = document.createElement('th');
 		raw.appendChild(th);
 		th.textContent = name;
 		var valueField = raw.insertCell();
 		valueField.textContent = value;
-		if (fieldName) {
-			self.dom[fieldName] = valueField;
-		}
+		return valueField;
 	};
 	self.hideButtons = function () {
 		if (self.dom.yesNoHolder) {
@@ -2345,6 +2297,7 @@ function FileReceiver(removeReferenceFn) {
 		notifier.notify(message.user, "Sends file {}".format(self.fileName));
 		self.init();
 		self.insertData("From:", self.opponentName);
+		self.dom.connectionStatus = self.insertData('Status:', 'Received an offer');
 		self.addYesNo();
 	};
 	self.acceptFileReply = function () {
@@ -2372,17 +2325,17 @@ function FileReceiver(removeReferenceFn) {
 		}
 	};
 	self.ondestroyConnection = function (message) {
-		if (self.peerConnections[message.opponentWsId] ) { //todo
+		if (self.peerConnections[message.opponentWsId] ) {
 			self.peerConnections[message.opponentWsId].ondestroyConnection(message);
 		} else {
 			self.hideButtons();
-			growlInfo("TODO Opponent has closed connection"); // TODO
+			self.dom.connectionStatus.textContent = "Opponent declined sending";
 		}
 	};
 	self.addDownloadBar = function () {
 		var div = document.createElement("DIV");
 		self.dom.body.appendChild(div);
-		return new ReceiveBar(div, self.fileSize);
+		return new DownloadBar(div, self.fileSize, self.dom.connectionStatus);
 	};
 }
 
@@ -2403,18 +2356,20 @@ function FileSender(removeReferenceFn, file) {
 	};
 	self.onreplyWebrtc = function (message) {
 		self.peerConnections[message.opponentWsId] = new FileSenderPeerConnection(message.connId, message.opponentWsId, self.file, self.removeChildPeerReference);
-		var downloadBar = self.addDownloadBar();
+		var downloadBar = self.addDownloadBar(message.user);
 		self.peerConnections[message.opponentWsId].setDownloadBar(downloadBar);
-		//downloadBar.setStatus("To {}:".format(message.user)); // TODO
 	};
 	self.ondestroyConnection = function (message) {
 		self.peerConnections[message.opponentWsId].ondestroyConnection(message);
-		growlInfo("TODO close here")
 	};
-	self.addDownloadBar = function () {
+	self.addDownloadBar = function (senderName) {
 		var div = document.createElement("DIV");
-		self.dom.body.appendChild(div);
-		return new SendBar(div, self.fileSize);
+		var status = self.insertData('To {}:'.format(senderName), 'Waiting to accept');
+		var raw = self.dom.fileInfo.insertRow();
+		var valueField = raw.insertCell();
+		valueField.setAttribute('colspan', 2);
+		valueField.appendChild(div);
+		return new DownloadBar(div, self.fileSize, status);
 	};
 }
 
@@ -2425,31 +2380,29 @@ function FilePeerConnection() {
 	self.MAX_BUFFER_SIZE = 256;
 	self.receivedSize = 0;
 	self.sdpConstraints = {};
-	self.setHeaderText = function (text) {
-		self.downloadBar.setStatus(text)
-	};
 	self.oniceconnectionstatechange = function () {
 		if (self.pc.iceConnectionState === 'disconnected') {
-			self.closeEvents("Connection has been lost");
+			self.closeEvents();
+			self.downloadBar.setStatus("Error: Connection has been lost")
 		}
 	};
 	self.setDownloadBar = function (db) {
 		self.downloadBar = db;
 	};
 	self.ondestroyConnection = function () {
-		self.downloadBar.setErrorStatus("Opponent closed connection");
 		self.removeChildPeerReference(self.opponentWsId);
 		self.closeEvents();
 	};
 	self.onsetError = function (message) {
 		if (self.downloadBar) {
-			self.downloadBar.setErrorStatus(message.content);
+			self.downloadBar.setStatus(message.content);
+			self.downloadBar.setError();
 		} else {
 			self.log("Setting status to '{}' failed", message.content)();
 		}
 	};
 	self.setTranseferdAmount = function (value) {
-		self.downloadBar.db.setValue(value);
+		self.downloadBar.setValue(value);
 	};
 
 }
@@ -2467,26 +2420,25 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 	self.superGotReceiveChannel = self.gotReceiveChannel;
 	self.gotReceiveChannel = function (event) {
 		self.superGotReceiveChannel(event);
-		self.downloadBar.db.start();
 	};
 	self.superOnDestroyConnection = self.ondestroyConnection;
 	self.ondestroyConnection = function (data) {
-		self.superOnDestroyConnection(data);
-		self.downloadBar.setErrorStatus("Opponent closed connection");
-		self.closeEvents();
+		self.superOnDestroyConnection();
+		self.downloadBar.setStatus("Error: Opponent closed connection");
+		self.downloadBar.setError();
 	};
 	self.assembleFileIfDone = function () {
 		if (self.isDone()) {
 			var received = self.recevedUsingFile ? self.fileEntry.toURL() : URL.createObjectURL(new window.Blob(self.receiveBuffer));
 			self.log("File is received")();
 			self.sendCloseSuccess();
-			self.downloadBar.db.setSuccess();
 			self.receiveBuffer = []; //clear buffer
 			self.receivedSize = 0;
-			self.downloadBar.db.dom.text.href = received;
-			self.downloadBar.db.dom.text.download = self.fileName;
-			self.downloadBar.setSuccessStatus("Received");
-			self.downloadBar.db.dom.text.textContent = 'Save'.format(self.fileName);
+			self.downloadBar.getAnchor().href = received;
+			self.downloadBar.getAnchor().download = self.fileName;
+			self.downloadBar.setStatus("Received");
+			self.downloadBar.setSuccess();
+			self.downloadBar.getAnchor().textContent = 'Save';
 			self.closeEvents();
 		}
 	};
@@ -2518,7 +2470,7 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 		self.logErr("FileSystemApi Error, {}", e.code || e);
 	};
 	self.channelOpen = function () {
-		self.downloadBar.setStatus("Receiving a file");
+		self.downloadBar.setStatus("Receiving file...");
 	};
 	self.superOnChannelMessage = self.onChannelMessage;
 	self.onChannelMessage = function (event) {
@@ -2537,14 +2489,14 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 		}
 	};
 	self.syncBufferWithFs = function () {
-		if ((self.receiveBuffer.length > self.MAX_BUFFER_SIZE || self.isDone) && self.fileWriter) {
+		if (self.fileWriter && (self.receiveBuffer.length > self.MAX_BUFFER_SIZE || self.isDone())) {
 			self.recevedUsingFile = true;
 			var blob = new window.Blob(self.receiveBuffer);
 			self.receiveBuffer = [];
-			if (self.fileWriter.readyState !== self.fileWriter.WRITING) {
-				self.fileWriter.write(blob);
-			} else {
+			if (self.fileWriter.readyState == self.fileWriter.WRITING) {
 				self.blobsQueue.push(blob);
+			} else {
+				self.fileWriter.write(blob);
 			}
 		}
 	}
@@ -2561,20 +2513,21 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 	self.log("Created FileSenderPeerConnection")();
 	self.onfileAccepted = function (message) {
 		self.log("Transfer file {} result : {}", self.fileName, message.content)();
-		self.downloadBar.setSuccessStatus("Transferred");
-		self.downloadBar.db.hide();
+		self.downloadBar.setStatus("Transferred");
+		self.downloadBar.setSuccess();
 		self.closeEvents();
 	};
 	self.superOnDestroyConnection = self.ondestroyConnection;
 	self.ondestroyConnection = function (data) {
-		self.superOnDestroyConnection(data);
-		if (data.content !== 'success') {
-			self.downloadBar.db.setStatusText(data.content === 'decline' ?
-					"Opponent closed connection": "Connection error");
-			self.downloadBar.db.setError();
+		self.superOnDestroyConnection();
+		if (data.content === 'success') {
+			self.downloadBar.setStatus("File transferred");
+			self.downloadBar.setSuccess();
+
 		} else {
-			self.downloadBar.db.setSuccess();
-			self.downloadBar.db.setStatusText("File transferred");
+			self.downloadBar.setStatus(data.content === 'decline' ?
+					"Declined by opponent": "Connection error");
+			self.downloadBar.setError();
 		}
 	};
 	self.createSendChannelAndOffer = function () {
@@ -2597,13 +2550,13 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 		}, self.failWebRtcP1, self.sdpConstraints);
 	};
 	self.onreceiveChannelOpen = function () {
-		self.downloadBar.db.start();
 		self.log('Channel is open, slicing file: {} {} {} {}', self.fileName, bytesToSize(self.fileSize), self.file.type, getDay(self.file.lastModifiedDate))();
 		if (self.fileSize === 0) {
-			self.downloadBar.setErrorStatus("Can't send empty file");
+			self.downloadBar.setStatus("Can't send empty file");
+			self.downloadBar.setError();
 			self.closeEvents("Can't send empty file");
 		} else {
-			self.downloadBar.setStatus("Transferring file");
+			self.downloadBar.setStatus("Sending file...");
 			self.sliceFile(0);
 		}
 	};
@@ -2623,7 +2576,8 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 					}
 					self.setTranseferdAmount(offset + e.target.result.byteLength);
 				} else {
-					self.downloadBar.setErrorStatus("Lost connection");
+					self.downloadBar.setStatus("Error: Connection has been lost");
+					self.downloadBar.setError();
 				}
 			};
 		})(self.file);
