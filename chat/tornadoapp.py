@@ -8,23 +8,21 @@ from threading import Thread
 
 import tornado.gen
 import tornado.httpclient
-import tornado.ioloop
 import tornado.web
 import tornado.websocket
 import tornadoredis
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import connection, OperationalError, InterfaceError, IntegrityError
-from django.db.models import Prefetch
 from django.db.models import Q, F
 from redis_sessions.session import SessionStore
 from tornado import ioloop
 from tornado.websocket import WebSocketHandler
 
-from chat.utils import extract_photo, get_or_create_ip
 from chat.cookies_middleware import create_id
 from chat.log_filters import id_generator
 from chat.utils import extract_photo
+from chat.utils import get_or_create_ip
 
 try:  # py2
 	from urlparse import urlparse
