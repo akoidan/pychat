@@ -2203,6 +2203,51 @@ function BaseTransferHandler(removeReferenceFn) {
 
 function CallHandler(removeReferenceFn) {
 	var self = this;
+
+	self.dom.callContainer  = $('callContainer');
+	self.dom.callContainerContent = document.createElement("DIV");
+	self.dom.callContainerContent.className = 'callContainerContent';
+	self.dom.callContainer.appendChild(self.dom.callContainerContent);
+	self.dom.videoContainer = document.createElement("DIV");
+	self.dom.videoContainer.className = 'videoContainer';
+	self.dom.local = document.createElement('video');
+	self.dom.videoContainer.appendChild(self.dom.local);
+	self.dom.local.setAttribute('muted', true);
+	self.dom.local.className = 'localVideo';
+	var iwc = document.createElement('DIV');
+	self.dom.videoContainer.appendChild(iwc);
+	iwc.className= 'icon-webrtc-cont';
+	self.dom.fs = { /*FullScreen*/
+		video: document.createElement("i"),
+		audio: document.createElement("i"),
+		hangup: document.createElement("i"),
+		minimize: document.createElement("i"),
+		enterFullScreen: document.createElement("i")
+	};
+	iwc.appendChild(self.dom.fs.video);
+	iwc.appendChild(self.dom.fs.audio);
+	iwc.appendChild(self.dom.fs.minimize);
+	iwc.appendChild(self.dom.fs.hangup);
+	self.dom.fs.minimize.className = 'icon-webrtc-minimizedscreen';
+	self.dom.fs.minimize.title = 'Exit fullscreen';
+	self.dom.fs.hangup.className = 'icon-webrtc-hangup';
+
+	var callContainerIcons = document.createElement('div');
+	callContainerIcons.className = 'callContainerIcons noSelection';
+	self.dom.videoContainer.appendChild(callContainerIcons);
+
+	self.dom.callContainerIcons.innerHTML =
+	'			<i class="icon-phone-circled" id="callIcon" onclick="event.preventDefault(); webRtcApi.offerCall()"></i>\
+			<i id="audioStatusIcon" class="icon-mic"></i>\
+			<i id="videoStatusIcon" class="icon-videocam"></i>\
+			<div id="enterFullScreenHolder">\
+				<i id="enterFullScreen" class="icon-webrtc-fullscreen" title="Fullscreen"></i>\
+			</div>\
+			<i class="icon-hang-up" id="hangUpIcon"></i>\
+			<div class="volumeLevelsHolder">\
+				<input type="range" id="callVolume" value="100" title="Volume level"/>\
+				<progress id="microphoneLevel" max="160" title="Your microphone level" value="0"></progress>\
+			';
 	BaseTransferHandler.call(self, removeReferenceFn);
 
 	self.onreplyWebrtc = function (message) {
@@ -2603,21 +2648,13 @@ function CallPeerConnection(receiverRoomId, connectionId, wsOpponentId) {
 		hangUpIcon: $('hangUpIcon'), //
 		audioStatusIcon: $('audioStatusIcon'), //
 		videoStatusIcon: $('videoStatusIcon'), //
-		videoContainer: $('videoContainer'), //
 		callIcon: $('callIcon'), //
 		callVolume: $('callVolume'),
 		microphoneLevel: $("microphoneLevel"),
 		answerWebRtcCall: $("answerWebRtcCall"),
 		videoAnswerWebRtcCall: $("videoAnswerWebRtcCall"),
 		declineWebRtcCall: $("declineWebRtcCall"),
-		fs: {
-			/*FullScreen*/
-			video: $('fs-video'),
-			audio: $('fs-audio'),
-			hangup: $('fs-hangup'),
-			minimize: $('fs-minimize'),
-			enterFullScreen: $('enterFullScreen')
-		}
+
 	};
 	self.onsetError = function (message) {
 		growlError(message.content)

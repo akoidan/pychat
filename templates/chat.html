@@ -47,44 +47,8 @@
 				<li onclick="channelsHandler.m2EditMessage()">Edit message</li>
 				<li onclick="channelsHandler.m2DeleteMessage()">Delete message</li>
 			</ul>
-			<div id="callContainer" class="hidden">
-				<section>
-					<form id="fileInfo" class="hidden">
-						<input type="file" id="webRtcFileInput" name="files">
-					</form>
-					<div id="transmitProgress" class="progress-wrap hidden">
-						<a>
-						</a>
-					</div>
-					<div id="bitrate"></div>
-					<span id="status"></span>
-				</section>
-				<div id="callContainerContent">
-					<div id='videoContainer'>
-						<video id="remoteVideo" autoplay></video>
-						<video id="localVideo" autoplay muted></video>
-						<div id="icon-webrtc-cont">
-							<i id="fs-video"></i>
-							<i id="fs-audio"></i>
-							<i id="fs-minimize" class="icon-webrtc-minimizedscreen" title="Exit fullscreen"></i>
-							<i id="fs-hangup" class="icon-webrtc-hangup"></i>
-						</div>
-					</div>
-					<div class="callContainerIcons noSelection">
-						<i class="icon-phone-circled" id="callIcon" onclick="event.preventDefault(); webRtcApi.offerCall()"></i>
-						<i id="audioStatusIcon" class="icon-mic"></i>
-						<i id="videoStatusIcon" class="icon-videocam"></i>
-						<div id="enterFullScreenHolder">
-							<i id="enterFullScreen" class="icon-webrtc-fullscreen" title="Fullscreen"></i>
-						</div>
-						<i class="icon-hang-up" id="hangUpIcon"></i>
-						<div class="volumeLevelsHolder">
-							<input type="range" id="callVolume" value="100" title="Volume level"/>
-							<progress id="microphoneLevel" max="160" title="Your microphone level" value="0"></progress>
-						</div>
-					</div>
-				</div>
-			</div>
+		<div id="callContainer" class="hidden">
+		</div>
 		</div>
 		<div id="chat-room-users-wrapper">
 			<ul id="user-context-menu" class="hidden">
@@ -171,6 +135,9 @@
 				<td colspan="2"><input type="submit" value="Sumbit"></td>
 			</tr>
 		</table>
+	</form>
+	<form id="fileInfo" class="hidden">
+		<input type="file" id="webRtcFileInput" name="files">
 	</form>
 	<div class="modal-background hidden" id="callAnswerParent">
 		<div id="callAnswer" class="modal-body modal-fixed">

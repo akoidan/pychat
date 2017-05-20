@@ -491,7 +491,7 @@ p
 	label
 		cursor: pointer
 
-#callContainerContent
+.callContainerContent
 	padding: 5px
 	display: inline-block
 	min-width: 150px
@@ -614,7 +614,7 @@ p
 	border-radius: 3px
 	padding: 3px
 
-#videoContainer
+.videoContainer
 	position: relative
 	width: 100%
 	text-align: center
@@ -623,7 +623,7 @@ p
 		background: #272C2D
 		border: 1px solid grey
 
-#remoteVideo
+.remoteVideo
 	max-height: calc(60vh - 120px)
 	max-width: 100%
 
@@ -639,7 +639,7 @@ p
 	background-color: #0c0d0f
 	min-height: 150px
 
-#localVideo
+.localVideo
 	position: absolute
 	max-width: 35%
 	max-height: 35%
@@ -686,44 +686,54 @@ p
 	margin-top: -6px
 
 .fullscreen
-	&#videoContainer
+	&.videoContainer
 		background-color: black
 
-	#remoteVideo
+	.remoteVideo
 		max-height: 99vh
 		height: 99vh
 
-	&#videoContainer video
+	&.videoContainer video
 		border-color: #272727
+	.icon-webrtc-cont
+		display: block
 
 #videoStatusIcon
 	margin-left: -5px
 	margin-right: 15px
 
-#icon-webrtc-cont
+.icon-webrtc-cont
 	display: none
 	position: absolute
 	bottom: 2vh
 	left: 2vw
-
-.fullscreen #icon-webrtc-cont
-	display: block
-
-#icon-webrtc-cont > i
-	display: block
-	font-size: 36px
-	opacity: 1
-
-	&:before
-		border-radius: 50%
-		width: 36px
-		height: 36px
-		padding: 8px
-		background: rgba(102, 102, 102, 0.6)
-		text-align: center
-		box-shadow: 3px 3px 12px #444
+	i:hover:before, .icon-webrtc-nomic:before, .icon-webrtc-novideo:before
+		background-color: rgba(88, 143, 255, 0.6)
+		opacity: 1
 		color: white
-		margin: 7px 30px 15px 7px
+		box-shadow: 6px 6px 36px #666
+
+	i.icon-webrtc-hangup:hover:before
+		background: rgba(217, 24, 24, 0.6)
+	> i
+		display: block
+		font-size: 36px
+		opacity: 1
+
+		&:before
+			border-radius: 50%
+			width: 36px
+			height: 36px
+			padding: 8px
+			background: rgba(102, 102, 102, 0.6)
+			text-align: center
+			box-shadow: 3px 3px 12px #444
+			color: white
+			margin: 7px 30px 15px 7px
+
+.inactive .icon-webrtc-cont > i
+	transform: translateX(calc(-2vw - 70px))
+	@include transition(all 0.1s ease-in-out)
 
 .icon-webrtc-fullscreen
 	position: absolute
@@ -776,20 +786,6 @@ p
 	position: relative
 	display: inline
 	padding-left: 5px
-
-#icon-webrtc-cont
-	i:hover:before, .icon-webrtc-nomic:before, .icon-webrtc-novideo:before
-		background-color: rgba(88, 143, 255, 0.6)
-		opacity: 1
-		color: white
-		box-shadow: 6px 6px 36px #666
-
-	i.icon-webrtc-hangup:hover:before
-		background: rgba(217, 24, 24, 0.6)
-
-.inactive #icon-webrtc-cont > i
-	transform: translateX(calc(-2vw - 70px))
-	@include transition(all 0.1s ease-in-out)
 
 @media screen and (max-height: 550px)
 	#callContainer
