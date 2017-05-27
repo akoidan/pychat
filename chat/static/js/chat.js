@@ -82,6 +82,7 @@ function Painter() {
 	self.dom.sendButton = $('paintSend');
 	self.dom.clearButton = $('paintClear');
 	self.dom.range = $('paintRadius');
+	self.dom.opacity = $('paintOpacity');
 	self.dom.pen = $('paintPen');
 	self.dom.eraser = $('paintEraser');
 	self.dom.colorIcon = $('paintPickerIcon');
@@ -98,8 +99,13 @@ function Painter() {
 		self.leftOffset = rect.left;
 		self.topOffset = rect.top;
 		self.ctx.beginPath();
+		var xy = self.getXY(e);
+		self.ctx.lineTo(xy.x, xy.y);
+		self.ctx.stroke();
 		self.dom.canvas.addEventListener('mousemove', self.onPaint, false);
 	};
+	self.cPushArray = [];
+	self.cStep = -1;
 	self.changeColor = function (event) {
 		self.ctx.strokeStyle = event.target.value;
 		self.setColorStrikeColor();
@@ -141,9 +147,17 @@ function Painter() {
 		self.ctx.lineWidth = parseInt(event.target.value);
 		self.setPenUrl();
 	};
+	self.changeOpacity = function (event) {
+		self.ctx.globalAlpha = parseFloat(event.target.value);
+	};
 	self.finishDraw = function () {
 		if (self.mouseDown > 0) {
 			self.mouseDown--;
+			self.cStep++;
+			if (self.cStep < self.cPushArray.length) {
+				self.cPushArray.length = self.cStep;
+			}
+			self.cPushArray.push(self.dom.canvas.toDataURL());
 			self.dom.canvas.removeEventListener('mousemove', self.onPaint, false);
 		}
 	};
@@ -155,9 +169,14 @@ function Painter() {
 		return ordinate == clientOrdinate ? value : Math.round(ordinate * value / clientOrdinate); // apply page zoom
 	};
 	self.onPaint = function (e) {
-		var x = e.pageX - self.leftOffset;
-		var y = e.pageY - self.topOffset;
-		self[self.mode](self.getScaledOrdinate('width', x), self.getScaledOrdinate('height', y));
+		var xy = self.getXY(e);
+		self[self.mode](self.getScaledOrdinate('width', xy.x), self.getScaledOrdinate('height', xy.y));
+	};
+	self.getXY = function (e) {
+		return {
+			x: self.getScaledOrdinate('width', e.pageX - self.leftOffset),
+			y: self.getScaledOrdinate('height', e.pageY - self.topOffset)
+		}
 	};
 	self.onPaintPen = function (x, y) {
 		self.ctx.lineTo(x, y);
@@ -182,6 +201,32 @@ function Painter() {
 	self.contKeyPress = function (event) {
 		if (event.keyCode === 13) {
 			self.sendImage();
+		} else if (event.keyCode === 26 && event.ctrlKey) {
+			self.undo();
+		} else if (event.keyCode === 25 && event.ctrlKey) {
+			self.redo();
+		}
+	};
+	self.undo = function () {
+		if (self.cStep > 0) {
+			self.cStep--;
+			var canvasPic = new Image();
+			canvasPic.src = self.cPushArray[self.cStep];
+			canvasPic.onload = function () {
+				self.clearCanvas();
+				self.ctx.drawImage(canvasPic, 0, 0);
+			}
+		}
+	};
+	self.redo = function () {
+		if (self.cStep < self.cPushArray.length - 1) {
+			self.cStep++;
+			var canvasPic = new Image();
+			canvasPic.src = self.cPushArray[self.cStep];
+			canvasPic.onload = function () {
+				self.clearCanvas();
+				self.ctx.drawImage(canvasPic, 0, 0);
+			}
 		}
 	};
 	self.canvasImagePaste = function (e) {
@@ -250,6 +295,7 @@ function Painter() {
 		self.dom.container.ondragover = self.preventDefault;
 		self.dom.color.addEventListener('input', self.changeColor, false);
 		self.dom.range.addEventListener('change', self.changeRadius, false);
+		self.dom.opacity.addEventListener('change', self.changeOpacity, false);
 		self.dom.container.addEventListener('keypress', self.contKeyPress, false);
 		//self.dom.container.addEventListener(mouseWheelEventName, self.onZoom);
 		self.dom.color.style.color = self.ctx.strokeStyle;
@@ -3072,11 +3118,7 @@ function WebRtcApi() {
 		self.connections[data.connId]['on' + data.type](data);
 	};
 	self.toggleCallContainer = function () {
-		// if (self.isActive()) { TODO multirtc
-		// 	return;
-		// }
 		var visible = CssUtils.toggleVisibility(self.dom.callContainer);
-		self.setIconState(false);
 		channelsHandler.getActiveChannel().setChannelAttach(!visible);
 	};
 	self.onsetConnectionId = function (message) {
