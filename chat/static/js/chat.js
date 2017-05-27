@@ -1282,6 +1282,7 @@ function ChannelsHandler() {
 	};
 	self.m2TransferFile = function () {
 		self.showOrInviteDirectChannel(self.postCallTransferFileAction);
+		webRtcApi.dom.fileInput.value = null;
 		webRtcApi.dom.fileInput.click();
 	};
 	self.showOrInviteDirectChannel = function (postAction) {
@@ -3112,6 +3113,7 @@ function WebRtcApi() {
 	self.quedConnections = {};
 	self.quedId = 0;
 	self.clickFile = function () {
+		self.dom.fileInput.value = null;
 		self.dom.fileInput.click();
 	};
 	self.createQuedId = function () {
