@@ -148,7 +148,7 @@ function Painter() {
 		self.setPenUrl();
 	};
 	self.changeOpacity = function (event) {
-		self.ctx.globalAlpha = parseFloat(event.target.value);
+		self.ctx.globalAlpha = Math.pow(parseFloat(event.target.value), 6);
 	};
 	self.finishDraw = function () {
 		if (self.mouseDown > 0) {
@@ -214,7 +214,10 @@ function Painter() {
 			canvasPic.src = self.cPushArray[self.cStep];
 			canvasPic.onload = function () {
 				self.clearCanvas();
+				self.ctx.save();
+				self.ctx.globalAlpha = 1;
 				self.ctx.drawImage(canvasPic, 0, 0);
+				self.ctx.restore();
 			}
 		}
 	};
