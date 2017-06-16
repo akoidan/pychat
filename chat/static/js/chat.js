@@ -2029,7 +2029,7 @@ function ReceiverPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	self.handleAnswer = function () {
 		self.log('Creating answer')();
 		self.pc.createAnswer(function (answer) {
-			self.log('Sending answer');
+			self.log('Sending answer')();
 			self.pc.setLocalDescription(answer, function () {
 				self.sendWebRtcEvent(answer);
 			}, self.failWebRtcP3);
@@ -2561,8 +2561,8 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 		}
 	};
 	self.fileSystemErr = function (e) {
-		growlError("FileSystemApi Error: " + e.code || e);
-		self.logErr("FileSystemApi Error, {}", e.code || e);
+		growlError("FileSystemApi Error: " + e.message || e.code || e);
+		self.logErr("FileSystemApi Error, {}", e.message || e.code || e)();
 	};
 	self.channelOpen = function () {
 		self.downloadBar.setStatus("Receiving file...");
