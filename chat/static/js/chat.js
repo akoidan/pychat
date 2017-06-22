@@ -1596,7 +1596,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		self.newMessages = 0;
 		CssUtils.hideElement(self.dom.newMessages);
 	};
-	self.dom.chatBoxDiv.addEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
+	self.dom.chatBoxDiv.addEventListener(mouseWheelEventName, self.mouseWheelLoadUp, {passive: true});
 	self.keyDownLoadUp = function (e) {
 		if (e.which === 33) {    // page up
 			self.loadUpHistory(25);
@@ -1611,7 +1611,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		self.dom.chatBoxDiv.innerHTML = '';
 		self.allMessages = [];
 		self.allMessagesDates = [];
-		self.dom.chatBoxDiv.addEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
+		self.dom.chatBoxDiv.addEventListener(mouseWheelEventName, self.mouseWheelLoadUp, {passive: true});
 		self.dom.chatBoxDiv.addEventListener("keydown", self.keyDownLoadUp);
 	};
 	self.dom.chatBoxDiv.addEventListener('keydown', self.keyDownLoadUp);
@@ -1622,6 +1622,17 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.setChannelAttach = function (isAttached) {
 		self.callIsAttached = isAttached;
+		if (isAttached) {
+			self.getCallHander().show();
+		} else {
+			self.getCallHander().hide();
+		}
+	};
+	self.getCallHander = function () {
+		if (!self.callHandler) {
+			self.callHandler = new CallWindow()
+		}
+		return self.callHandler;
 	};
 	self.isPrivate = function () {
 		return self.dom.roomNameLi.hasAttribute(USER_ID_ATTR);
@@ -1987,7 +1998,7 @@ function DownloadBar(holder, fileSize, statusDiv) {
 	self.setStatus = function (text) {
 		self.dom.statusDiv.textContent = text;
 	};
-	self.getAnchor = function() {
+	self.getAnchor = function () {
 		return self.dom.text;
 	};
 	self.show = function () {
@@ -2251,60 +2262,91 @@ function BaseTransferHandler(removeReferenceFn) {
 	}
 }
 
-function CallHandler(removeReferenceFn) {
+function CallWindow() {
 	var self = this;
-
-	self.dom.callContainer  = $('callContainer');
-	self.dom.callContainerContent = document.createElement("DIV");
-	self.dom.callContainerContent.className = 'callContainerContent';
-	self.dom.callContainer.appendChild(self.dom.callContainerContent);
-	self.dom.videoContainer = document.createElement("DIV");
-	self.dom.videoContainer.className = 'videoContainer';
-	self.dom.local = document.createElement('video');
-	self.dom.videoContainer.appendChild(self.dom.local);
-	self.dom.local.setAttribute('muted', true);
-	self.dom.local.className = 'localVideo';
-	var iwc = document.createElement('DIV');
-	self.dom.videoContainer.appendChild(iwc);
-	iwc.className= 'icon-webrtc-cont';
-	self.dom.fs = { /*FullScreen*/
-		video: document.createElement("i"),
-		audio: document.createElement("i"),
-		hangup: document.createElement("i"),
-		minimize: document.createElement("i"),
-		enterFullScreen: document.createElement("i")
+	self.dom = {
+		callContainer: $('callContainer'),
+		callContainerContent: document.createElement("DIV"),
+		videoContainer: document.createElement("DIV"),
+		local: document.createElement('video'),
+		audioStatusIcon: document.createElement('i'),
+		videoStatusIcon: document.createElement('i'),
+		hangUpIcon: document.createElement('i'),
+		callVolume: document.createElement('input'),
+		microphoneLevel: document.createElement('progress'),
+		callIcon: document.createElement('i'),
+		fs: {
+			/*FullScreen*/
+			video: document.createElement("i"),
+			audio: document.createElement("i"),
+			hangup: document.createElement("i"),
+			minimize: document.createElement("i"),
+			enterFullScreen: document.createElement("i")
+		}
 	};
-	iwc.appendChild(self.dom.fs.video);
-	iwc.appendChild(self.dom.fs.audio);
-	iwc.appendChild(self.dom.fs.minimize);
-	iwc.appendChild(self.dom.fs.hangup);
-	self.dom.fs.minimize.className = 'icon-webrtc-minimizedscreen';
-	self.dom.fs.minimize.title = 'Exit fullscreen';
-	self.dom.fs.hangup.className = 'icon-webrtc-hangup';
+	self.init = function() {
+		var iwc = document.createElement('DIV');
+		self.dom.videoContainer.appendChild(self.dom.local);
+		self.dom.local.setAttribute('muted', true);
+		self.dom.local.className = 'localVideo';
+		self.dom.videoContainer.appendChild(iwc);
+		self.dom.videoContainer.className = 'videoContainer';
+		self.dom.callContainerContent.className = 'callContainerContent';
+		self.dom.callContainerContent.appendChild(self.dom.videoContainer);
+		self.dom.callContainer.appendChild(self.dom.callContainerContent);
+		self.dom.fs.minimize.className = 'icon-webrtc-minimizedscreen';
+		self.dom.fs.minimize.title = 'Exit fullscreen';
+		self.dom.fs.hangup.className = 'icon-webrtc-hangup';
+		iwc.className = 'icon-webrtc-cont';
+		iwc.appendChild(self.dom.fs.video);
+		iwc.appendChild(self.dom.fs.audio);
+		iwc.appendChild(self.dom.fs.minimize);
+		iwc.appendChild(self.dom.fs.hangup);
+		var callContainerIcons = document.createElement('div');
+		callContainerIcons.className = 'callContainerIcons noSelection';
+		self.dom.callContainerContent.appendChild(callContainerIcons);
+		self.dom.callIcon.onclick = webRtcApi.offerCall;
+		self.dom.callIcon.className = 'icon-phone-circled';
+		self.dom.audioStatusIcon.className = 'icon-mic';
+		self.dom.videoStatusIcon.className = 'icon-videocam';
 
-	var callContainerIcons = document.createElement('div');
-	callContainerIcons.className = 'callContainerIcons noSelection';
-	self.dom.videoContainer.appendChild(callContainerIcons);
+		var enterFullScreenHolder = document.createElement('div');
+		enterFullScreenHolder.className = 'enterFullScreenHolder';
+		var enterFullScreen = document.createElement('i');
+		enterFullScreen.className = 'icon-webrtc-fullscreen';
+		enterFullScreen.title = 'Fullscreen';
+		enterFullScreenHolder.appendChild(enterFullScreen);
 
-	self.dom.callContainerIcons.innerHTML =
-	'			<i class="icon-phone-circled" id="callIcon" onclick="event.preventDefault(); webRtcApi.offerCall()"></i>\
-			<i id="audioStatusIcon" class="icon-mic"></i>\
-			<i id="videoStatusIcon" class="icon-videocam"></i>\
-			<div id="enterFullScreenHolder">\
-				<i id="enterFullScreen" class="icon-webrtc-fullscreen" title="Fullscreen"></i>\
-			</div>\
-			<i class="icon-hang-up" id="hangUpIcon"></i>\
-			<div class="volumeLevelsHolder">\
-				<input type="range" id="callVolume" value="100" title="Volume level"/>\
-				<progress id="microphoneLevel" max="160" title="Your microphone level" value="0"></progress>\
-			';
-	BaseTransferHandler.call(self, removeReferenceFn);
-
+		self.dom.hangUpIcon.className = 'icon-hang-up';
+		self.dom.hangUpIcon.title = 'Hang Up';
+		var volumeLevelsHolder = document.createElement('div');
+		volumeLevelsHolder.className = 'volumeLevelsHolder';
+		self.dom.callVolume.setAttribute("type", "range");
+		self.dom.callVolume.setAttribute("value", "100");
+		self.dom.callVolume.setAttribute("title", "Volume level");
+		self.dom.microphoneLevel.setAttribute("max", "160");
+		self.dom.microphoneLevel.setAttribute("title", "Your microphone level");
+		self.dom.microphoneLevel.className = 'microphoneLevel';
+		styleInputRange(self.dom.callVolume);
+		callContainerIcons.appendChild(self.dom.callIcon);
+		callContainerIcons.appendChild(self.dom.audioStatusIcon);
+		callContainerIcons.appendChild(self.dom.videoStatusIcon);
+		callContainerIcons.appendChild(enterFullScreenHolder);
+		callContainerIcons.appendChild(volumeLevelsHolder);
+		volumeLevelsHolder.appendChild(self.dom.callVolume);
+		volumeLevelsHolder.appendChild(self.dom.microphoneLevel);
+	};
+	self.show = function() {
+		CssUtils.showElement(self.dom.callContainerContent);
+	};
+	self.hide = function () {
+		CssUtils.showElement(self.dom.callContainerContent);
+	};
 	self.onreplyWebrtc = function (message) {
 		self.peerConnections[message.connId] = new CallPeerConnection();
 		self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
 	};
-
+	self.init();
 }
 
 function FileTransferHandler(removeReferenceFn) {
@@ -2420,7 +2462,7 @@ function FileReceiver(removeReferenceFn) {
 		}
 	};
 	self.ondestroyConnection = function (message) {
-		if (self.peerConnections[message.opponentWsId] ) {
+		if (self.peerConnections[message.opponentWsId]) {
 			self.peerConnections[message.opponentWsId].ondestroyConnection(message);
 		} else {
 			self.hideButtons();
@@ -2621,7 +2663,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 
 		} else {
 			self.downloadBar.setStatus(data.content === 'decline' ?
-					"Declined by opponent": "Connection error");
+					"Declined by opponent" : "Connection error");
 			self.downloadBar.setError();
 		}
 	};
@@ -3142,7 +3184,8 @@ function WebRtcApi() {
 		// if (self.timeoutFunnction) {
 		// 	wsHandler.sendToServer('busy'); // TODO multirtc
 		// }
-
+		//
+		var CallHandler = null; //TODO
 		var className = message.content ? FileReceiver : CallHandler;
 		var handler = new className(self.removeChildReference);
 		self.connections[message.connId] = handler;
@@ -3158,10 +3201,11 @@ function WebRtcApi() {
 		} else if (self.connections[data.connId]) {
 			self.connections[data.connId].handle(data);
 		} else {
-			logger.error('Connection "{}" is unknown. Availabe connections: "{}". Skipping message:', data.connId, Object.keys(self.connections))();
+			logger.error('Connection "{}" is unknown. Available connections: "{}". Skipping message:', data.connId, Object.keys(self.connections))();
 		}
 	};
-	self.offerCall = function () {
+	self.offerCall = function (event) {
+		event.preventDefault();
 		self.createWebrtcObject(CallPeerConnection);
 	};
 	self.offerFile = function () {

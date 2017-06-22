@@ -545,7 +545,7 @@ onDocLoad(function () {
 		logger.warn("Ops, there's no scrollbar for firefox")();
 	}
 	growlHolder = $('growlHolder');
-	initInputRangeTrack();
+	document.querySelectorAll('input[type=range]').forEach(styleInputRange);
 
 });
 function fixInputRangeStyle() {
@@ -556,20 +556,29 @@ function fixInputRangeStyle() {
 					.format(id, Math.round((this.value - el.minValue) / (el.diff) * 100));
 }
 
-function initInputRangeTrack() {
-	var inputRanges = document.querySelectorAll('input[type=range]');
-	for (var i = 0; i < inputRanges.length; i++){
-		var id = inputRanges[i].getAttribute('id');
-		inputRanges[i].addEventListener('input', fixInputRangeStyle);
-		var minValue = inputRanges[i].getAttribute('min') || 0;
-		var maxValue = inputRanges[i].getAttribute('max') || 100;
-		inputRangeStyles[id] = {
-			style: document.createElement('style'),
-			diff: maxValue - minValue,
-			minValue: minValue
-		};
-		document.head.appendChild(inputRangeStyles[id].style);
+var getRandomId = (function getRandomId() {
+	var randomId = 0;
+	return function () {
+		randomId++;
+		return 'randomId' + randomId;
 	}
+})();
+
+function styleInputRange(ir) {
+	var id = ir.getAttribute('id');
+	if (!id) {
+		id = getRandomId();
+		ir.setAttribute('id', id);
+	}
+	ir.addEventListener('input', fixInputRangeStyle);
+	var minValue = ir.getAttribute('min') || 0;
+	var maxValue = ir.getAttribute('max') || 100;
+	inputRangeStyles[id] = {
+		style: document.createElement('style'),
+		diff: maxValue - minValue,
+		minValue: minValue
+	};
+	document.head.appendChild(inputRangeStyles[id].style);
 }
 
 function mute() {
