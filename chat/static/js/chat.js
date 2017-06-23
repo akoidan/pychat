@@ -2266,6 +2266,12 @@ function CallWindow(chatHandler) {
 	var self = this;
 	self.chatHandler = chatHandler;
 	self.dom = {
+		answerWebRtcCall: $("answerWebRtcCall"),
+		videoAnswerWebRtcCall: $("videoAnswerWebRtcCall"),
+		declineWebRtcCall: $("declineWebRtcCall"),
+		callSound: $('chatCall'),
+		callAnswerParent: $('callAnswerParent'),
+		callAnswerText: $('callAnswerText'),
 		callContainer: $('callContainer'),
 		callContainerContent: document.createElement("DIV"),
 		videoContainer: document.createElement("DIV"),
@@ -2339,7 +2345,7 @@ function CallWindow(chatHandler) {
 		self.dom.callVolume.addEventListener('input', self.changeVolume);
 	};
 	self.offerCall = function() {
-		webRtcApi.offerCall(self.chatHandler.roomId);
+		webRtcApi.offerCall(self, self.chatHandler.roomId);
 	};
 	self.changeVolume = function () {
 		//TODO set all remote volume level , move it each window
@@ -2350,6 +2356,15 @@ function CallWindow(chatHandler) {
 	};
 	self.hide = function () {
 		CssUtils.showElement(self.dom.callContainerContent);
+	};
+	self.showOfferWindow = function (message) {
+		checkAndPlay(self.dom.callSound);
+		CssUtils.showElement(self.dom.callAnswerParent);
+		self.dom.declineWebRtcCall.onclick = self.declineCall;
+		self.dom.answerWebRtcCall.onclick = self.answerWebRtcCall;
+		self.dom.videoAnswerWebRtcCall.onclick = self.videoAnswerWebRtcCall;
+		notifier.notify(message.user, "Calls you");
+		self.dom.callAnswerText.textContent = "{} is calling you".format(message.user);
 	};
 	self.init();
 }
@@ -2750,20 +2765,13 @@ function CallPeerConnection() {
 	var self = this;
 	self.audioProcessors = {};
 	self.dom = {
-		callAnswerParent: $('callAnswerParent'),
-		callAnswerText: $('callAnswerText'),
 		remote: $('remoteVideo'), //
 		local: $('localVideo'), //
-		callSound: $('chatCall'), //
 		hangUpIcon: $('hangUpIcon'), //
 		audioStatusIcon: $('audioStatusIcon'), //
 		videoStatusIcon: $('videoStatusIcon'), //
 		callIcon: $('callIcon'), //
 		microphoneLevel: $("microphoneLevel"),
-		answerWebRtcCall: $("answerWebRtcCall"),
-		videoAnswerWebRtcCall: $("videoAnswerWebRtcCall"),
-		declineWebRtcCall: $("declineWebRtcCall"),
-
 	};
 	self.onsetError = function (message) {
 		growlError(message.content)
@@ -3144,20 +3152,12 @@ function CallPeerConnection() {
 		// TODO replace growl with System message in user thread and unread
 		growlInfo("<div>You have missed a call from <b>{}</b></div>".format(self.receiverName));
 	};
-	self.showOffer = function (message) {
-		checkAndPlay(self.dom.callSound);
-		CssUtils.showElement(self.dom.callAnswerParent);
-		self.dom.declineWebRtcCall.onclick = self.declineCall;
-		self.dom.answerWebRtcCall.onclick = self.answerWebRtcCall;
-		self.dom.videoAnswerWebRtcCall.onclick = self.videoAnswerWebRtcCall;
-		notifier.notify(self.receiverName, "Calls you");
-		self.dom.callAnswerText.textContent = "{} is calling you".format(self.receiverName);
-	};
 	self.attachDomEvents();
 }
 
-function CallHandler(removeChildFn) {
+function CallHandler(removeChildFn, callWindow) {
 	var self = this;
+	self.callWindow = callWindow;
 	BaseTransferHandler.call(self, removeChildFn);
 	self.removeChild = removeChildFn;
 	self.onreplyWebrtc = function (message) {
@@ -3169,6 +3169,9 @@ function CallHandler(removeChildFn) {
 		// TODO
 		//self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
 		growlInfo("User {} is called".format(message.user))
+	};
+	self.showOffer = function (message) {
+		self.callWindow.showOfferWindow(message);
 	};
 
 }
@@ -3233,8 +3236,8 @@ function WebRtcApi() {
 			logger.error('Connection "{}" is unknown. Available connections: "{}". Skipping message:', data.connId, Object.keys(self.connections))();
 		}
 	};
-	self.offerCall = function (channel) {
-		self.createWebrtcObject(CallHandler, null, channel);
+	self.offerCall = function (callwindow, channel) {
+		self.createWebrtcObject(CallHandler, callwindow, channel);
 	};
 	self.offerFile = function () {
 		self.createWebrtcObject(FileSender, self.dom.fileInput.files[0], channelsHandler.activeChannel);
@@ -3243,9 +3246,9 @@ function WebRtcApi() {
 		logger.info("Removing transferHandler with id {}", id)();
 		delete self.connections[id];
 	};
-	self.createWebrtcObject = function (className, file, channel) {
+	self.createWebrtcObject = function (className, arguments, channel) {
 		var newId = self.createQuedId();
-		self.quedConnections[newId] = new className(self.removeChildReference, file);
+		self.quedConnections[newId] = new className(self.removeChildReference, arguments);
 		self.quedConnections[newId].sendOffer(newId, channel);
 		return self.quedConnections[newId];
 	};
