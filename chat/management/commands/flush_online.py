@@ -7,7 +7,7 @@ class Command(BaseCommand):
 
 	def __init__(self):
 		super(Command, self).__init__()
-	help = 'Removes all room id keys from database'
+	help = 'Removes information about current online from redis'
 
 	def handle(self, *args, **options):
 		from chat.global_redis import sync_redis

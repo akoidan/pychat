@@ -30,7 +30,7 @@ except ImportError:  # py3
 	from urllib.parse import urlparse
 
 from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_READ_MESSAGE, SELECT_SELF_ROOM, \
-	TORNADO_REDIS_PORT
+	TORNADO_REDIS_PORT, WEBRTC_CONNECTION
 from chat.models import User, Message, Room, get_milliseconds, UserJoinedInfo, RoomUsers
 
 PY3 = sys.version > '3'
@@ -552,6 +552,7 @@ class MessagesHandler(MessagesCreator):
 		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
 		connection_id = id_generator(RedisPrefix.CONNECTION_ID_LENGTH)
 		# use list because sets dont have 1st element which is offerer
+		self.async_redis_publisher.sadd(WEBRTC_CONNECTION, connection_id)
 		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
 		self.async_redis_publisher.hset(connection_id, WebRtcRedisStates.SENDER_ID, self.id)
 		opponents_message = self.offer_webrtc(content, connection_id)

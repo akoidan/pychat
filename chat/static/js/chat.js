@@ -1630,7 +1630,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.getCallHander = function () {
 		if (!self.callHandler) {
-			self.callHandler = new CallWindow()
+			self.callHandler = new CallWindow(self)
 		}
 		return self.callHandler;
 	};
@@ -2262,8 +2262,9 @@ function BaseTransferHandler(removeReferenceFn) {
 	}
 }
 
-function CallWindow() {
+function CallWindow(chatHandler) {
 	var self = this;
+	self.chatHandler = chatHandler;
 	self.dom = {
 		callContainer: $('callContainer'),
 		callContainerContent: document.createElement("DIV"),
@@ -2305,7 +2306,7 @@ function CallWindow() {
 		var callContainerIcons = document.createElement('div');
 		callContainerIcons.className = 'callContainerIcons noSelection';
 		self.dom.callContainerContent.appendChild(callContainerIcons);
-		self.dom.callIcon.onclick = webRtcApi.offerCall;
+		self.dom.callIcon.onclick = self.offerCall;
 		self.dom.callIcon.className = 'icon-phone-circled';
 		self.dom.audioStatusIcon.className = 'icon-mic';
 		self.dom.videoStatusIcon.className = 'icon-videocam';
@@ -2335,16 +2336,20 @@ function CallWindow() {
 		callContainerIcons.appendChild(volumeLevelsHolder);
 		volumeLevelsHolder.appendChild(self.dom.callVolume);
 		volumeLevelsHolder.appendChild(self.dom.microphoneLevel);
+		self.dom.callVolume.addEventListener('input', self.changeVolume);
+	};
+	self.offerCall = function() {
+		webRtcApi.offerCall(self.chatHandler.roomId);
+	};
+	self.changeVolume = function () {
+		//TODO set all remote volume level , move it each window
+		//self.dom.remote.volume = self.dom.callVolume.value / 100;
 	};
 	self.show = function() {
 		CssUtils.showElement(self.dom.callContainerContent);
 	};
 	self.hide = function () {
 		CssUtils.showElement(self.dom.callContainerContent);
-	};
-	self.onreplyWebrtc = function (message) {
-		self.peerConnections[message.connId] = new CallPeerConnection();
-		self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
 	};
 	self.init();
 }
@@ -2727,9 +2732,22 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 }
 
 
-function CallPeerConnection(receiverRoomId, connectionId, wsOpponentId) {
+
+function CallSenderPeerConnection(connectionId, wsOpponentId) {
 	var self = this;
-	AbstractPeerConnection.call(self, connectionId, wsOpponentId);
+	SenderPeerConnection.call(self, connectionId, wsOpponentId);
+	AbstractPeerConnection.call(self);
+}
+
+
+function CallReceiverPeerConnection(connectionId, wsOpponentId) {
+	var self = this;
+	ReceiverPeerConnection.call(self, connectionId, wsOpponentId);
+	CallPeerConnection.call(self);
+}
+
+function CallPeerConnection() {
+	var self = this;
 	self.audioProcessors = {};
 	self.dom = {
 		callAnswerParent: $('callAnswerParent'),
@@ -2741,7 +2759,6 @@ function CallPeerConnection(receiverRoomId, connectionId, wsOpponentId) {
 		audioStatusIcon: $('audioStatusIcon'), //
 		videoStatusIcon: $('videoStatusIcon'), //
 		callIcon: $('callIcon'), //
-		callVolume: $('callVolume'),
 		microphoneLevel: $("microphoneLevel"),
 		answerWebRtcCall: $("answerWebRtcCall"),
 		videoAnswerWebRtcCall: $("videoAnswerWebRtcCall"),
@@ -2772,10 +2789,6 @@ function CallPeerConnection(receiverRoomId, connectionId, wsOpponentId) {
 			self.dom.remote.ondblclick = self.enterFullScreenMode;
 		}
 	};
-	self.changeVolume = function () {
-		self.dom.remote.volume = self.dom.callVolume.value / 100;
-	};
-	self.dom.callVolume.addEventListener('input', self.changeVolume);
 	self.exitFullScreen = function () {
 		document.cancelFullScreen();
 	};
@@ -3143,6 +3156,23 @@ function CallPeerConnection(receiverRoomId, connectionId, wsOpponentId) {
 	self.attachDomEvents();
 }
 
+function CallHandler(removeChildFn) {
+	var self = this;
+	BaseTransferHandler.call(self, removeChildFn);
+	self.removeChild = removeChildFn;
+	self.onreplyWebrtc = function (message) {
+		self.peerConnections[message.opponentWsId] = new CallSenderPeerConnection(
+				message.connId,
+				message.opponentWsId,
+				self.removeChildPeerReference
+		);
+		// TODO
+		//self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
+		growlInfo("User {} is called".format(message.user))
+	};
+
+}
+
 function WebRtcApi() {
 	var self = this;
 	self.dom = {
@@ -3185,7 +3215,6 @@ function WebRtcApi() {
 		// 	wsHandler.sendToServer('busy'); // TODO multirtc
 		// }
 		//
-		var CallHandler = null; //TODO
 		var className = message.content ? FileReceiver : CallHandler;
 		var handler = new className(self.removeChildReference);
 		self.connections[message.connId] = handler;
@@ -3204,21 +3233,20 @@ function WebRtcApi() {
 			logger.error('Connection "{}" is unknown. Available connections: "{}". Skipping message:', data.connId, Object.keys(self.connections))();
 		}
 	};
-	self.offerCall = function (event) {
-		event.preventDefault();
-		self.createWebrtcObject(CallPeerConnection);
+	self.offerCall = function (channel) {
+		self.createWebrtcObject(CallHandler, null, channel);
 	};
 	self.offerFile = function () {
-		self.createWebrtcObject(FileSender, self.dom.fileInput.files[0]);
+		self.createWebrtcObject(FileSender, self.dom.fileInput.files[0], channelsHandler.activeChannel);
 	};
 	self.removeChildReference = function (id) {
 		logger.info("Removing transferHandler with id {}", id)();
 		delete self.connections[id];
 	};
-	self.createWebrtcObject = function (className, file) {
+	self.createWebrtcObject = function (className, file, channel) {
 		var newId = self.createQuedId();
 		self.quedConnections[newId] = new className(self.removeChildReference, file);
-		self.quedConnections[newId].sendOffer(newId, channelsHandler.activeChannel);
+		self.quedConnections[newId].sendOffer(newId, channel);
 		return self.quedConnections[newId];
 	};
 	self.attachEvents = function () {
