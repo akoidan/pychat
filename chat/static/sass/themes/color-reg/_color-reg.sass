@@ -130,12 +130,18 @@
 		background-color: rgba(33,33,31, 0.9)
 		border: 1px #696951 solid
 
+	@mixin hover-icon
+		text-shadow: 0 0 0.2em #575757
+		opacity: 1
+
 	[class^='icon-']
 		opacity: 0.8
 		-webkit-mask-image: -webkit-linear-gradient(top, rgba(0,0,0,1),rgba(0,0,0,0.5))
 		&:hover
-			text-shadow: 0 0 0.2em #575757
-			opacity: 1
+			@include hover-icon
+
+	button:hover > [class^='icon-']
+		@include hover-icon
 
 	[class^='icon-volume']
 		color: #DCA737
