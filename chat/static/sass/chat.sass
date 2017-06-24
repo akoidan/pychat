@@ -416,6 +416,9 @@ p
 	overflow: auto
 	background-color: black
 	background-color: rgba(0, 0, 0, 0.5)
+	display: flex
+	justify-content: center
+	align-items: center
 
 .modal-body
 	border-radius: 3px
@@ -649,9 +652,6 @@ p
 	margin-bottom: 4px
 
 .modal-fixed
-	left: 50%
-	top: 45%
-	transform: translate(-50%, -50%)
 	padding: 10px
 	border-radius: 10px
 
@@ -662,6 +662,11 @@ p
 .answerButtons
 	padding-top: 10px
 	text-align: center
+
+	@media screen and (max-width: 500px)
+		button
+			display: block
+			width: 100%
 
 	/*collapse to center
 

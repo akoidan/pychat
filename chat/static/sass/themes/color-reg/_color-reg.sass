@@ -140,8 +140,10 @@
 		&:hover
 			@include hover-icon
 
-	button:hover > [class^='icon-']
-		@include hover-icon
+	button
+		&:hover, &:focus
+			> [class^='icon-']
+				@include hover-icon
 
 	[class^='icon-volume']
 		color: #DCA737

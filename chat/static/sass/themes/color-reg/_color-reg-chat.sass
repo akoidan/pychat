@@ -34,10 +34,8 @@
 
 	// call container
 	.modal-body
-		$start-gradient: rgba(42, 46, 42, 0.89)
-		@include linear-gradient($start-gradient, #181b18)
+		@include linear-gradient(#131f2b, #0f1922)
 		box-shadow: 0 5px 5px #16161f
-		background: linear-gradient(#243240, #0d1b29)
 		input[type=button]
 			background: linear-gradient(#353c4c, #101318)
 			border-radius: 4px
@@ -62,6 +60,13 @@
 			&[type=text], &[type=search]
 				&::-webkit-input-placeholder
 					color: rgba(208, 215, 231, 0.51)
+
+	.modal-fixed
+		color: darkgrey
+		opacity: 1 !important
+		box-shadow: 2px 2px 3px 4px rgba(0, 0, 0, 0.3)
+		border-top: 1px solid #385877
+		border-left: 1px solid #1d3347
 
 	.windowHeader
 		border-radius: 4px 4px 0 0
