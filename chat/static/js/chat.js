@@ -2843,7 +2843,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 function CallSenderPeerConnection(connectionId, wsOpponentId) {
 	var self = this;
 	SenderPeerConnection.call(self, connectionId, wsOpponentId);
-	AbstractPeerConnection.call(self);
+	CallPeerConnection.call(self);
 }
 
 
@@ -3196,6 +3196,9 @@ function CallPeerConnection() {
 		// TODO replace growl with System message in user thread and unread
 		growlInfo("<div>You have missed a call from <b>{}</b></div>".format(self.receiverName));
 	};
+	self.onacceptCall = function (message) {
+		console.log('todo', message);
+	};
 	self.attachDomEvents();
 }
 
@@ -3214,7 +3217,6 @@ function CallHandler(removeChildFn, callWindow) {
 		//self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
 		growlInfo("User {} is called".format(message.user))
 	};
-	self.superSendOffer = self.sendOffer;
 	self.sendOffer = function (newId, channel) {
 		var messageRequest = {
 			action: 'offerCall',
@@ -3228,14 +3230,6 @@ function CallHandler(removeChildFn, callWindow) {
 		self.connectionId = message.connId;
 		self.callWindow.showOfferWindow(message);
 	};
-	self.superInitAndDisplayOffer = self.initAndDisplayOffer;
-	self.initAndDisplayOffer = function (message) {
-		self.superInitAndDisplayOffer(message);
-		callWindow.setLastHandler(self);
-	};
-	self.onacceptCall = function (message) {
-		console.log('todo', message);
-	};
 	self.accept = function () {
 		wsHandler.sendToServer({
 			action: 'acceptCall',
@@ -3244,9 +3238,10 @@ function CallHandler(removeChildFn, callWindow) {
 	};
 	self.initAndDisplayOffer = function (message) {
 		logger.info("initAndDisplayOffer call")();
+		callWindow.setLastHandler(self);
 		wsHandler.sendToServer({
 			action: 'replyCall',
-			connId: message.connectionId
+			connId: message.connId
 		});
 		self.showOffer(message);
 	};

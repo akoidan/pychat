@@ -597,10 +597,10 @@ class MessagesHandler(MessagesCreator):
 
 	def reply_call_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
-		self_ws_status = self.sync_redis.shget(connection_id, self.id)
-		if self_ws_status == WebRtcRedisStates.OFFERED:
+		conn_users = self.sync_redis.shgetall(connection_id)
+		if conn_users[self.id] == WebRtcRedisStates.OFFERED:
 			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.RESPONDED)
-			conn_users = self.sync_redis.shgetall(connection_id)
+			del conn_users[self.id]
 			for user in conn_users:
 				if conn_users[user] != WebRtcRedisStates.CLOSED:
 					self.publish(self.default_webrtc(Actions.REPLY_CALL_CONNECTION, connection_id), user)
