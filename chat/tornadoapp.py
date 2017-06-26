@@ -59,7 +59,8 @@ class Actions(object):
 	PRINT_MESSAGE = 'printMessage'
 	WEBRTC = 'sendRtcData'
 	CLOSE_WEBRTC = 'destroyConnection'
-	ACCEPT_WEBRTC = 'acceptWebrtc'
+	ACCEPT_CALL = 'acceptCall'
+	ACCEPT_FILE = 'acceptFile'
 	ROOMS = 'setRooms'
 	REFRESH_USER = 'setOnlineUsers'
 	GROWL_MESSAGE = 'growl'
@@ -76,7 +77,8 @@ class Actions(object):
 	SET_WEBRTC_ERROR = 'setError'
 	OFFER_FILE_CONNECTION = 'offerFile'
 	OFFER_CALL_CONNECTION = 'offerCall'
-	REPLY_WEBRTC_CONNECTION = 'replyWebrtc'
+	REPLY_FILE_CONNECTION = 'replyFile'
+	REPLY_CALL_CONNECTION = 'replyCall'
 
 
 class VarNames(object):
@@ -147,6 +149,19 @@ class MessagesCreator(object):
 			VarNames.USER_ID: self.user_id,
 			VarNames.TIME: get_milliseconds(),
 			VarNames.HANDLER_NAME: handler
+		}
+
+	def default_webrtc(self, event, connection_id):
+		"""
+		:return: {"action": event, "content": content, "time": "20:48:57"}
+		"""
+		return {
+			VarNames.EVENT: event,
+			VarNames.CONNECTION_ID: connection_id,
+			VarNames.USER_ID: self.user_id,
+			VarNames.USER: self.sender_name,
+			VarNames.WEBRTC_OPPONENT_ID: self.id,
+			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
 		}
 
 	def set_ws_id(self, random):
@@ -307,7 +322,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.SEND_MESSAGE: self.process_send_message,
 			Actions.WEBRTC: self.proxy_webrtc,
 			Actions.CLOSE_WEBRTC: self.close_and_proxy_connection,
-			Actions.ACCEPT_WEBRTC: self.accept_and_proxy_connection,
+			Actions.ACCEPT_CALL: self.accept_call_and_proxy_connection,
+			Actions.ACCEPT_FILE: self.accept_file_and_proxy_connection,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
 			Actions.DELETE_ROOM: self.delete_channel,
 			Actions.EDIT_MESSAGE: self.edit_message,
@@ -315,7 +331,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.INVITE_USER: self.invite_user,
 			Actions.OFFER_FILE_CONNECTION: self.offer_webrtc_connection,
 			Actions.OFFER_CALL_CONNECTION: self.offer_webrtc_connection,
-			Actions.REPLY_WEBRTC_CONNECTION: self.reply_webrtc_connection,
+			Actions.REPLY_FILE_CONNECTION: self.reply_file_connection,
+			Actions.REPLY_CALL_CONNECTION: self.reply_call_connection,
 		}
 		self.post_process_message = {
 			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_channel,
@@ -532,7 +549,7 @@ class MessagesHandler(MessagesCreator):
 				VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
 			}, ws_id)
 
-	def accept_and_proxy_connection(self, in_message):
+	def accept_file_and_proxy_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID] # TODO accept all if call
 		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
 		sender_ws_status = self.sync_redis.shget(connection_id, sender_ws_id)
@@ -540,11 +557,27 @@ class MessagesHandler(MessagesCreator):
 		if sender_ws_status == WebRtcRedisStates.READY and self_ws_status == WebRtcRedisStates.RESPONDED:
 			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
 			self.publish({
-				VarNames.EVENT: Actions.ACCEPT_WEBRTC,
+				VarNames.EVENT: Actions.ACCEPT_FILE,
 				VarNames.CONNECTION_ID: connection_id,
 				VarNames.WEBRTC_OPPONENT_ID: self.id,
 				VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
 			}, sender_ws_id)
+		else:
+			raise ValidationError("Invalid channel status")
+
+	def accept_call_and_proxy_connection(self, in_message):
+		connection_id = in_message[VarNames.CONNECTION_ID]
+		channel_status = self.sync_redis.shgetall(connection_id)
+		if channel_status and channel_status[self.id] == WebRtcRedisStates.RESPONDED:
+			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
+			for key in channel_status:  # del channel_status[self.id] not needed as self in responded
+				if channel_status[key] == WebRtcRedisStates.READY:
+					self.publish({
+						VarNames.EVENT: Actions.ACCEPT_CALL,
+						VarNames.CONNECTION_ID: connection_id,
+						VarNames.WEBRTC_OPPONENT_ID: self.id,
+						VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
+					}, key)
 		else:
 			raise ValidationError("Invalid channel status")
 
@@ -562,21 +595,26 @@ class MessagesHandler(MessagesCreator):
 		self.logger.info('!! Offering a webrtc, connection_id %s', connection_id)
 		self.publish(opponents_message, room_id, True)
 
-	def reply_webrtc_connection(self, in_message):
+	def reply_call_connection(self, in_message):
+		connection_id = in_message[VarNames.CONNECTION_ID]
+		self_ws_status = self.sync_redis.shget(connection_id, self.id)
+		if self_ws_status == WebRtcRedisStates.OFFERED:
+			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.RESPONDED)
+			conn_users = self.sync_redis.shgetall(connection_id)
+			for user in conn_users:
+				if conn_users[user] != WebRtcRedisStates.CLOSED:
+					self.publish(self.default_webrtc(Actions.REPLY_CALL_CONNECTION, connection_id), user)
+		else:
+			raise ValidationError("Invalid channel status.")
+
+	def reply_file_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
 		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
 		sender_ws_status = self.sync_redis.shget(connection_id, sender_ws_id)
 		self_ws_status = self.sync_redis.shget(connection_id, self.id)
 		if sender_ws_status == WebRtcRedisStates.READY and self_ws_status == WebRtcRedisStates.OFFERED:
 			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.RESPONDED)
-			self.publish({
-				VarNames.EVENT: Actions.REPLY_WEBRTC_CONNECTION,
-				VarNames.CONNECTION_ID: connection_id,
-				VarNames.USER_ID: self.user_id,
-				VarNames.USER: self.sender_name,
-				VarNames.WEBRTC_OPPONENT_ID: self.id,
-				VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION, # TODO support call as well
-			}, sender_ws_id)
+			self.publish(self.default_webrtc(Actions.REPLY_FILE_CONNECTION, connection_id), sender_ws_id)
 		else:
 			raise ValidationError("Invalid channel status.")
 

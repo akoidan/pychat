@@ -2028,10 +2028,6 @@ function SenderPeerConnection(connectionId, opponentWsId, removeChildPeerReferen
 	self.handleAnswer = function () {
 		self.log('answer received')();
 	};
-	self.onacceptWebrtc = function (message) {
-		self.createPeerConnection();
-		self.createSendChannelAndOffer();
-	};
 }
 
 function ReceiverPeerConnection(connectionId, opponentWsId, removeChildPeerReferenceFn) {
@@ -2216,7 +2212,7 @@ function BaseTransferHandler(removeReferenceFn) {
 		});
 	};
 	self.handle = function (data) {
-		var selfHandledAction = ['replyWebrtc', 'destroyConnection'];
+		var selfHandledAction = ['replyFile', 'destroyConnection', 'replyCall'];
 		if (selfHandledAction.indexOf(data.action) >= 0) {
 			self['on' + data.action](data);
 		} else {
@@ -2226,22 +2222,6 @@ function BaseTransferHandler(removeReferenceFn) {
 	self.setConnectionId = function (id) {
 		self.connectionId = id;
 		// self.waitForAnswer(); todo mulrirtc
-	};
-	self.initAndDisplayOffer = function (message) {
-		logger.info("initAndDisplayOffer")();
-		self.offerOpponentWsId = message.opponentWsId;
-		self.connId = message.connId;
-		wsHandler.sendToServer({
-			action: 'replyWebrtc',
-			connId: self.connId
-		});
-		self.showOffer(message);
-	};
-	self.accept = function () {
-		wsHandler.sendToServer({
-			action: 'acceptWebrtc',
-			connId: self.connId
-		});
 	};
 	self.finish = function (text) {
 		for (var pc in self.peerConnections) {
@@ -2534,28 +2514,42 @@ function FileReceiver(removeReferenceFn) {
 		self.dom.connectionStatus = self.insertData('Status:', 'Received an offer');
 		self.addYesNo();
 	};
+	self.sendErrorFSApi = function() {
+		var bsize = bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API);
+		wsHandler.sendToServer({
+			action: 'destroyConnection',
+			connId: self.connectionId,
+			content: "User's browser doesn't support accepting files over {}"
+					.format(bsize)
+		});
+	};
 	self.acceptFileReply = function () {
 		if (self.fileSize > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem) {
-			var bsize = bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API);
-			wsHandler.sendToServer({
-				action: 'destroyConnection',
-				connId: self.connId,
-				content: "User's browser doesn't support accepting files over {}"
-						.format(bsize)
-			});
+			self.sendErrorFSApi();
 			growlError("Your browser doesn't support receiving files over {}".format(bsize))
 		} else {
 			self.peerConnections[self.offerOpponentWsId] = new FileReceiverPeerConnection(
-					self.connId,
+					self.connectionId,
 					self.offerOpponentWsId,
 					self.fileName,
 					self.fileSize,
 					self.removeChildPeerReference
 			);
 			var db = self.addDownloadBar();
-			self.peerConnections[self.offerOpponentWsId].initFileSystemApi(self.accept);
+			self.peerConnections[self.offerOpponentWsId].initFileSystemApi(self.sendAccessFileSuccess);
 			self.peerConnections[self.offerOpponentWsId].setDownloadBar(db);
+		}
+	};
+	self.sendAccessFileSuccess = function (fileSystemSucess) {
+		if (fileSystemSucess) {
 			self.peerConnections[self.offerOpponentWsId].waitForAnswer();
+			wsHandler.sendToServer({
+				action: 'acceptFile',
+				connId: self.connectionId
+			});
+		} else if (self.fileSize > MAX_ACCEPT_FILE_SIZE_WO_FS_API) {
+			self.sendErrorFSApi();
+			self.peerConnections[self.offerOpponentWsId].destroy();
 		}
 	};
 	self.ondestroyConnection = function (message) {
@@ -2570,6 +2564,15 @@ function FileReceiver(removeReferenceFn) {
 		var div = document.createElement("DIV");
 		self.dom.body.appendChild(div);
 		return new DownloadBar(div, self.fileSize, self.dom.connectionStatus);
+	};
+	self.initAndDisplayOffer = function (message) {
+		logger.info("initAndDisplayOffer file")();
+		self.offerOpponentWsId = message.opponentWsId;
+		wsHandler.sendToServer({
+			action: 'replyFile',
+			connId: message.connId
+		});
+		self.showOffer(message);
 	};
 }
 
@@ -2593,7 +2596,7 @@ function FileSender(removeReferenceFn, file) {
 		wsHandler.sendToServer(messageRequest);
 		self.init();
 	};
-	self.onreplyWebrtc = function (message) {
+	self.onreplyFile = function (message) {
 		self.peerConnections[message.opponentWsId] = new FileSenderPeerConnection(message.connId, message.opponentWsId, self.file, self.removeChildPeerReference);
 		var downloadBar = self.addDownloadBar(message.user);
 		self.peerConnections[message.opponentWsId].setDownloadBar(downloadBar);
@@ -2695,18 +2698,22 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 						self.fileWriter.WRITING = 1;
 						self.fileWriter.onwriteend = self.onWriteEnd;
 						self.log("FileWriter is created")();
-						cb();
-					}, self.fileSystemErr);
+						cb(true);
+					}, self.fileSystemErr(1, cb));
 
-				}, self.fileSystemErr)
-			}, self.fileSystemErr);
+				}, self.fileSystemErr(2, cb))
+			}, self.fileSystemErr(3, cb));
 		} else {
-			cb();
+			cb(false);
 		}
 	};
-	self.fileSystemErr = function (e) {
-		growlError("FileSystemApi Error: " + e.message || e.code || e);
-		self.logErr("FileSystemApi Error, {}", e.message || e.code || e)();
+	self.fileSystemErr = function (errN, cb) {
+		return function(e) {
+			growlError("FileSystemApi Error: " + e.message || e.code || e);
+			self.logErr("FileSystemApi Error {}, {}", errN, e.message || e.code || e)();
+			cb(false);
+		};
+
 	};
 	self.channelOpen = function () {
 		self.downloadBar.setStatus("Receiving file...");
@@ -2826,8 +2833,11 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 	self.channelOpen = function () {
 		self.downloadBar.setStatus("Sending a file");
 	};
+	self.onacceptFile = function (message) {
+		self.createPeerConnection();
+		self.createSendChannelAndOffer();
+	};
 }
-
 
 
 function CallSenderPeerConnection(connectionId, wsOpponentId) {
@@ -3194,7 +3204,7 @@ function CallHandler(removeChildFn, callWindow) {
 	self.callWindow = callWindow;
 	BaseTransferHandler.call(self, removeChildFn);
 	self.removeChild = removeChildFn;
-	self.onreplyWebrtc = function (message) {
+	self.onreplyCall = function (message) {
 		self.peerConnections[message.opponentWsId] = new CallSenderPeerConnection(
 				message.connId,
 				message.opponentWsId,
@@ -3215,13 +3225,31 @@ function CallHandler(removeChildFn, callWindow) {
 		callWindow.setLastHandler(self);
 	};
 	self.showOffer = function (message) {
+		self.connectionId = message.connId;
 		self.callWindow.showOfferWindow(message);
 	};
 	self.superInitAndDisplayOffer = self.initAndDisplayOffer;
 	self.initAndDisplayOffer = function (message) {
 		self.superInitAndDisplayOffer(message);
 		callWindow.setLastHandler(self);
-	}
+	};
+	self.onacceptCall = function (message) {
+		console.log('todo', message);
+	};
+	self.accept = function () {
+		wsHandler.sendToServer({
+			action: 'acceptCall',
+			connId: self.connectionId
+		});
+	};
+	self.initAndDisplayOffer = function (message) {
+		logger.info("initAndDisplayOffer call")();
+		wsHandler.sendToServer({
+			action: 'replyCall',
+			connId: message.connectionId
+		});
+		self.showOffer(message);
+	};
 }
 
 function WebRtcApi() {
