@@ -74,7 +74,8 @@ class Actions(object):
 	OFFLINE_MESSAGES = 'loadOfflineMessages'
 	SET_WEBRTC_ID = 'setConnectionId'
 	SET_WEBRTC_ERROR = 'setError'
-	OFFER_WEBRTC_CONNECTION = 'offerWebrtc'
+	OFFER_FILE_CONNECTION = 'offerFile'
+	OFFER_CALL_CONNECTION = 'offerCall'
 	REPLY_WEBRTC_CONNECTION = 'replyWebrtc'
 
 
@@ -165,11 +166,11 @@ class MessagesCreator(object):
 		room_less[VarNames.GENDER] = self.sex
 		return room_less
 
-	def offer_webrtc(self, content, connection_id, room_id):
+	def offer_webrtc(self, content, connection_id, room_id, action):
 		"""
 		:return: {"action": "call", "content": content, "time": "20:48:57"}
 		"""
-		message = self.default(content, Actions.OFFER_WEBRTC_CONNECTION, HandlerNames.WEBRTC)
+		message = self.default(content, action, HandlerNames.WEBRTC)
 		message[VarNames.USER] = self.sender_name
 		message[VarNames.CONNECTION_ID] = connection_id
 		message[VarNames.WEBRTC_OPPONENT_ID] = self.id
@@ -312,7 +313,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
 			Actions.INVITE_USER: self.invite_user,
-			Actions.OFFER_WEBRTC_CONNECTION: self.offer_webrtc_connection,
+			Actions.OFFER_FILE_CONNECTION: self.offer_webrtc_connection,
+			Actions.OFFER_CALL_CONNECTION: self.offer_webrtc_connection,
 			Actions.REPLY_WEBRTC_CONNECTION: self.reply_webrtc_connection,
 		}
 		self.post_process_message = {
@@ -320,7 +322,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
 			Actions.INVITE_USER: self.send_client_new_channel,
-			Actions.OFFER_WEBRTC_CONNECTION: self.set_opponent_call_channel
+			Actions.OFFER_FILE_CONNECTION: self.set_opponent_call_channel,
+			Actions.OFFER_CALL_CONNECTION: self.set_opponent_call_channel
 		}
 
 	def patch_tornadoredis(self):  # TODO remove this
@@ -553,7 +556,7 @@ class MessagesHandler(MessagesCreator):
 		# use list because sets dont have 1st element which is offerer
 		self.async_redis_publisher.hset(WEBRTC_CONNECTION, connection_id, self.id)
 		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
-		opponents_message = self.offer_webrtc(content, connection_id, room_id)
+		opponents_message = self.offer_webrtc(content, connection_id, room_id, in_message[VarNames.EVENT])
 		self_message = self.set_connection_id(qued_id, connection_id)
 		self.ws_write(self_message)
 		self.logger.info('!! Offering a webrtc, connection_id %s', connection_id)

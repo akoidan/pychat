@@ -1629,10 +1629,10 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 	};
 	self.getCallWindow = function () {
-		if (!self.callHandler) {
-			self.callHandler = new CallWindow(self)
+		if (!self.callWindow) {
+			self.callWindow = new CallWindow(self)
 		}
-		return self.callHandler;
+		return self.callWindow;
 	};
 	self.isPrivate = function () {
 		return self.dom.roomNameLi.hasAttribute(USER_ID_ATTR);
@@ -2203,17 +2203,6 @@ function BaseTransferHandler(removeReferenceFn) {
 		delete self.peerConnections[id];
 	};
 	self.peerConnections = {};
-	self.sendOffer = function (quedId, currentActiveChannel, content) {
-		var messageRequest = {
-			action: 'offerWebrtc',
-			channel: currentActiveChannel,
-			id: quedId
-		};
-		if (content) {
-			messageRequest.content = content;
-		}
-		wsHandler.sendToServer(messageRequest);
-	};
 	self.decline = function () {
 		self.defaultSendEvent('destroyConnection', 'decline');
 	};
@@ -2331,22 +2320,48 @@ function CallWindow(chatHandler) {
 			enterFullScreen: document.createElement("i")
 		}
 	};
+	self.constraints = {
+		audio: true,
+		video: true
+	};
+	self.setLastHandler = function(handler) {
+		self.lastHandler = handler;
+	};
+	self.setAudio = function (value) {
+		self.constraints.audio = value;
+		self.dom.audioStatusIcon.className = value ? "icon-mic" : "icon-mute callActiveIcon";
+		self.dom.fs.audio.className = value ? "icon-webrtc-mic" : "icon-webrtc-nomic";
+		var title = value ? "Turn off your microphone" : "Turn on your microphone";
+		self.dom.audioStatusIcon.title = title;
+		self.dom.fs.audio.title = title;
+	};
+	self.setVideo = function (value) {
+		self.constraints.video = value;
+		self.dom.videoStatusIcon.className = value ? "icon-videocam" : "icon-no-videocam callActiveIcon";
+		self.dom.fs.video.className = value ? "icon-webrtc-video" : "icon-webrtc-novideo";
+		CssUtils.setVisibility(self.dom.local, value);
+		var title = value ? "Turn off your webcamera" : "Turn on your webcamera";
+		self.dom.videoStatusIcon.title = title;
+		self.dom.fs.video.title = title;
+	};
 	self.answerWebRtcCall = function () {
-		self.accept();
+		self.lastHandler.accept();
 		self.callPopup.hide();
 		self.setAudio(true);
 		self.setVideo(false);
-		self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
-		self.createAfterResponseCall();
+		// TODO
+		// self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
+		// self.createAfterResponseCall();
 	};
 	self.declineWebRtcCall = function (dontResponde) {
-		CssUtils.hideElement(self.dom.callAnswerParent);
+		self.callPopup.hide();
 		if (!dontResponde) {
-			self.decline();
+			self.lastHandler.decline();
 		}
 	};
 	self.videoAnswerWebRtcCall = function () {
-		self.accept();
+		self.callPopup.hide();
+		self.lastHandler.accept();
 		self.setAudio(true);
 		self.setVideo(true);
 		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
@@ -2562,15 +2577,20 @@ function FileSender(removeReferenceFn, file) {
 	var self = this;
 	self.file = file;
 	FileTransferHandler.call(self, removeReferenceFn);
-	self.sendOfferParent = self.sendOffer;
 	self.sendOffer = function (quedId, currentActiveChannel) {
 		//self.dom.fileInput.disabled = true;
 		self.fileName = self.file.name;
 		self.fileSize = self.file.size;
-		self.sendOfferParent(quedId, currentActiveChannel, {
-			name: self.fileName,
-			size: self.fileSize
-		});
+		var messageRequest = {
+			action: 'offerFile',
+			channel: currentActiveChannel,
+			id: quedId,
+			content: {
+				name: self.fileName,
+				size: self.fileSize
+			}
+		};
+		wsHandler.sendToServer(messageRequest);
 		self.init();
 	};
 	self.onreplyWebrtc = function (message) {
@@ -2841,10 +2861,6 @@ function CallPeerConnection() {
 	self.sendAccept = function () {
 		self.sendBaseEvent()
 	};
-	self.constraints = {
-		audio: true,
-		video: true
-	};
 	self.sdpConstraints = {
 		'mandatory': {
 			'OfferToReceiveAudio': true,
@@ -2893,23 +2909,7 @@ function CallPeerConnection() {
 		}
 		return track;
 	};
-	self.setAudio = function (value) {
-		self.constraints.audio = value;
-		self.dom.audioStatusIcon.className = value ? "icon-mic" : "icon-mute callActiveIcon";
-		self.dom.fs.audio.className = value ? "icon-webrtc-mic" : "icon-webrtc-nomic";
-		var title = value ? "Turn off your microphone" : "Turn on your microphone";
-		self.dom.audioStatusIcon.title = title;
-		self.dom.fs.audio.title = title;
-	};
-	self.setVideo = function (value) {
-		self.constraints.video = value;
-		self.dom.videoStatusIcon.className = value ? "icon-videocam" : "icon-no-videocam callActiveIcon";
-		self.dom.fs.video.className = value ? "icon-webrtc-video" : "icon-webrtc-novideo";
-		CssUtils.setVisibility(self.dom.local, value);
-		var title = value ? "Turn off your webcamera" : "Turn on your webcamera";
-		self.dom.videoStatusIcon.title = title;
-		self.dom.fs.video.title = title;
-	};
+
 	self.toggleInput = function (isVideo) {
 		var kind = isVideo ? 'video' : 'audio';
 		var track = self.getTrack(isVideo);
@@ -3204,10 +3204,24 @@ function CallHandler(removeChildFn, callWindow) {
 		//self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
 		growlInfo("User {} is called".format(message.user))
 	};
+	self.superSendOffer = self.sendOffer;
+	self.sendOffer = function (newId, channel) {
+		var messageRequest = {
+			action: 'offerCall',
+			channel: channel,
+			id: newId
+		};
+		wsHandler.sendToServer(messageRequest);
+		callWindow.setLastHandler(self);
+	};
 	self.showOffer = function (message) {
 		self.callWindow.showOfferWindow(message);
 	};
-
+	self.superInitAndDisplayOffer = self.initAndDisplayOffer;
+	self.initAndDisplayOffer = function (message) {
+		self.superInitAndDisplayOffer(message);
+		callWindow.setLastHandler(self);
+	}
 }
 
 function WebRtcApi() {
@@ -3247,25 +3261,22 @@ function WebRtcApi() {
 			self.timeoutFunnction = null;
 		}
 	};
-	self.onofferWebrtc = function (message) {
-		//
-		//
-		var handler ;
-		if (message.content) {
-			handler = new FileReceiver(self.removeChildReference);
-		} else {
-
-			var chatHandler = channelsHandler.channels[message.channel];
-			if (!chatHandler) {
-				throw "Somebody tried to call you to nonexisted channel";
-			}
-			handler = new CallHandler(self.removeChildReference, chatHandler.getCallWindow());
-			// if (self.timeoutFunnction) {
-				// 	wsHandler.sendToServer('busy'); // TODO multirtc
-				// }
-			// TODO multirtc settimout
-			// self.timeoutFunnction = setTimeout(self.connections[message.connId].declineCall, self.callTimeoutTime);
+	self.onofferFile = function(message) {
+		var handler = new FileReceiver(self.removeChildReference);
+		self.connections[message.connId] = handler;
+		handler.initAndDisplayOffer(message);
+	};
+	self.onofferCall = function (message) {
+		var chatHandler = channelsHandler.channels[message.channel];
+		if (!chatHandler) {
+			throw "Somebody tried to call you to nonexisted channel";
 		}
+		var handler = new CallHandler(self.removeChildReference, chatHandler.getCallWindow());
+		// if (self.timeoutFunnction) {
+		// 	wsHandler.sendToServer('busy'); // TODO multirtc
+		// }
+		// TODO multirtc settimout
+		// self.timeoutFunnction = setTimeout(self.connections[message.connId].declineCall, self.callTimeoutTime);
 		self.connections[message.connId] = handler;
 		handler.initAndDisplayOffer(message);
 	};
@@ -3288,9 +3299,9 @@ function WebRtcApi() {
 		logger.info("Removing transferHandler with id {}", id)();
 		delete self.connections[id];
 	};
-	self.createWebrtcObject = function (className, arguments, channel) {
+	self.createWebrtcObject = function (ClassName, arguments, channel) {
 		var newId = self.createQuedId();
-		self.quedConnections[newId] = new className(self.removeChildReference, arguments);
+		self.quedConnections[newId] = new ClassName(self.removeChildReference, arguments);
 		self.quedConnections[newId].sendOffer(newId, channel);
 		return self.quedConnections[newId];
 	};
