@@ -2266,6 +2266,10 @@ function BaseTransferHandler(removeReferenceFn) {
 function CallPopup(answerFn, videoAnswerFn, declineFn) {
 	var self = this;
 	Draggable.call(self, document.createElement('DIV'), "Call");
+	self.dom.callSound = $('chatCall');
+	self.dom.callSound.addEventListener("ended", function () {
+		checkAndPlay(self.dom.callSound);
+	});
 	self.init = function () {
 		var answerButtons = document.createElement('div');
 		answerButtons.className = 'answerButtons noSelection';
@@ -2274,6 +2278,7 @@ function CallPopup(answerFn, videoAnswerFn, declineFn) {
 		answerButtons.appendChild(self.addButton('declineWebRtcCall', 'icon-hang-up', 'decline-btn', 'Decline', declineFn));
 		self.dom.body.appendChild(answerButtons);
 		document.querySelector('body').appendChild(self.dom.container);
+		self.fixInputs();
 	};
 	self.addButton = function (name, icon, className, text, onClickFn) {
 		var btn = document.createElement('button');
@@ -2288,10 +2293,15 @@ function CallPopup(answerFn, videoAnswerFn, declineFn) {
 		btn.appendChild(textDiv);
 		return btn;
 	};
+	self.hide = function () {
+		self.dom.callSound.pause();
+		self.super.hide();
+	};
 	self.show = function (user) {
 		var text = "{} calls".format(user);
 		self.setHeaderText(text);
 		self.super.show();
+		checkAndPlay(self.dom.callSound);
 	};
 	self.init();
 }
@@ -2301,7 +2311,6 @@ function CallWindow(chatHandler) {
 	var self = this;
 	self.chatHandler = chatHandler;
 	self.dom = {
-		callSound: $('chatCall'),
 		callAnswerText: $('callAnswerText'),
 		callContainer: $('callContainer'),
 		callContainerContent: document.createElement("DIV"),
@@ -2321,6 +2330,27 @@ function CallWindow(chatHandler) {
 			minimize: document.createElement("i"),
 			enterFullScreen: document.createElement("i")
 		}
+	};
+	self.answerWebRtcCall = function () {
+		self.accept();
+		self.callPopup.hide();
+		self.setAudio(true);
+		self.setVideo(false);
+		self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
+		self.createAfterResponseCall();
+	};
+	self.declineWebRtcCall = function (dontResponde) {
+		CssUtils.hideElement(self.dom.callAnswerParent);
+		if (!dontResponde) {
+			self.decline();
+		}
+	};
+	self.videoAnswerWebRtcCall = function () {
+		self.accept();
+		self.setAudio(true);
+		self.setVideo(true);
+		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
+		self.createAfterResponseCall();
 	};
 	self.getCallPopup = function () {
 		if (!self.callPopup) {
@@ -2395,7 +2425,6 @@ function CallWindow(chatHandler) {
 		CssUtils.showElement(self.dom.callContainerContent);
 	};
 	self.showOfferWindow = function (message) {
-		checkAndPlay(self.dom.callSound);
 		self.getCallPopup().show(message.user);
 		notifier.notify(message.user, "Calls you");
 	};
@@ -2854,9 +2883,6 @@ function CallPeerConnection() {
 		}
 		self.idleTime = 0;
 	};
-	self.dom.callSound.addEventListener("ended", function () {
-		checkAndPlay(self.dom.callSound);
-	});
 	self.getTrack = function (isVideo) {
 		var track = null;
 		if (self.localStream) {
@@ -2926,31 +2952,6 @@ function CallPeerConnection() {
 		} else {
 			// self.clearTimeout(); TODO multirtc
 		}
-	};
-	self.answerWebRtcCall = function () {
-		self.accept();
-		CssUtils.hideElement(self.dom.callAnswerParent);
-		self.dom.callSound.pause();
-		self.setAudio(true);
-		self.setVideo(false);
-		self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
-		self.createAfterResponseCall();
-	};
-	self.declineWebRtcCall = function (dontResponde) {
-		CssUtils.hideElement(self.dom.callAnswerParent);
-		self.dom.callSound.pause();
-		if (!dontResponde) {
-			self.decline();
-		}
-	};
-	self.videoAnswerWebRtcCall = function () {
-		self.accept();
-		CssUtils.hideElement(self.dom.callAnswerParent);
-		self.dom.callSound.pause();
-		self.setAudio(true);
-		self.setVideo(true);
-		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
-		self.createAfterResponseCall();
 	};
 	self.captureInput = function (callback, callIfNoSource) {
 		if (self.constraints.audio || self.constraints.video) {

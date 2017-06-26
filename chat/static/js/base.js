@@ -461,13 +461,12 @@ function Draggable(container, headerText) {
 		self.dom.container.addEventListener('focus', self.onfocus);
 		self.dom.container.addEventListener('blur', self.onfocusout);
 		self.dom.container.setAttribute('tabindex', "-1");
-		self.fixInputs();
 	};
 	self.fixInputs = function () {
 		if (!container.id) {
 			container.id = 'draggable'+getRandomId();
 		}
-		var inputs = document.querySelectorAll('#{} input'.format(container.id));
+		var inputs = document.querySelectorAll('#{0} input, #{0} button'.formatPos(container.id));
 		// typeOf(inputs) = HTMLCollection, not an array. that doesn't have forEach
 		for (var i = 0; i < inputs.length; i++) {
 			inputs[i].addEventListener('focus', function () {
@@ -521,7 +520,8 @@ function Draggable(container, headerText) {
 		document.removeEventListener ("mouseup", self.eleMouseUp, false);
 	};
 	self.super = {
-		show: self.show
+		show: self.show,
+		hide: self.hide
 	};
 	self.init();
 }
