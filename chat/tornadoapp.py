@@ -166,7 +166,7 @@ class MessagesCreator(object):
 		room_less[VarNames.GENDER] = self.sex
 		return room_less
 
-	def offer_webrtc(self, content, connection_id):
+	def offer_webrtc(self, content, connection_id, room_id):
 		"""
 		:return: {"action": "call", "content": content, "time": "20:48:57"}
 		"""
@@ -174,6 +174,7 @@ class MessagesCreator(object):
 		message[VarNames.USER] = self.sender_name
 		message[VarNames.CONNECTION_ID] = connection_id
 		message[VarNames.WEBRTC_OPPONENT_ID] = self.id
+		message[VarNames.CHANNEL] = room_id
 		return message
 
 	def set_connection_id(self, qued_id, connection_id):
@@ -555,7 +556,7 @@ class MessagesHandler(MessagesCreator):
 		self.async_redis_publisher.sadd(WEBRTC_CONNECTION, connection_id)
 		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
 		self.async_redis_publisher.hset(connection_id, WebRtcRedisStates.SENDER_ID, self.id)
-		opponents_message = self.offer_webrtc(content, connection_id)
+		opponents_message = self.offer_webrtc(content, connection_id, room_id)
 		self_message = self.set_connection_id(qued_id, connection_id)
 		self.ws_write(self_message)
 		self.logger.info('!! Offering a webrtc, connection_id %s', connection_id)

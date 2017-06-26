@@ -660,29 +660,32 @@ p
 		margin: 10px
 
 .answerButtons
-	padding-top: 10px
+	display: flex
+	justify-content: space-around
 	text-align: center
 
-	@media screen and (max-width: 500px)
-		button
-			display: block
-			width: 100%
+	//@media screen and (max-width: 500px)
+	//	button
+	//		display: block
+	//		width: 100%
 
-	/*collapse to center
+	.video-answer-btn
+		margin-left: 7px
+		margin-right: 7px
+		@extend .green-btn
 
-	> button
-		padding: 5px 10px 0 5px !important
-		margin-top: 5px
+	.answer-btn
+		@extend .green-btn
 
-		/* small screen collapsed distance between
-		border-radius: 20px
+	.decline-btn
+		@extend .red-btn
 
 	div
 		display: inline-block
 		vertical-align: top
 
 	i
-		font-size: 30px
+		font-size: 15px
 
 #hangUpIcon
 	float: right

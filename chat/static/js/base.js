@@ -465,7 +465,7 @@ function Draggable(container, headerText) {
 	};
 	self.fixInputs = function () {
 		if (!container.id) {
-			container.id = 'fileTr'+Date.now();
+			container.id = 'draggable'+getRandomId();
 		}
 		var inputs = document.querySelectorAll('#{} input'.format(container.id));
 		// typeOf(inputs) = HTMLCollection, not an array. that doesn't have forEach

@@ -1623,12 +1623,12 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.setChannelAttach = function (isAttached) {
 		self.callIsAttached = isAttached;
 		if (isAttached) {
-			self.getCallHander().show();
+			self.getCallWindow().show();
 		} else {
-			self.getCallHander().hide();
+			self.getCallWindow().hide();
 		}
 	};
-	self.getCallHander = function () {
+	self.getCallWindow = function () {
 		if (!self.callHandler) {
 			self.callHandler = new CallWindow(self)
 		}
@@ -2262,15 +2262,46 @@ function BaseTransferHandler(removeReferenceFn) {
 	}
 }
 
+
+function CallPopup(answerFn, videoAnswerFn, declineFn) {
+	var self = this;
+	Draggable.call(self, document.createElement('DIV'), "Call");
+	self.init = function () {
+		var answerButtons = document.createElement('div');
+		answerButtons.className = 'answerButtons noSelection';
+		answerButtons.appendChild(self.addButton('answerWebRtcCall', 'icon-call-aswer', 'answer-btn', 'Answer', answerFn));
+		answerButtons.appendChild(self.addButton('videoAnswerWebRtcCall', 'icon-videocam', 'video-answer-btn', 'With video', videoAnswerFn));
+		answerButtons.appendChild(self.addButton('declineWebRtcCall', 'icon-hang-up', 'decline-btn', 'Decline', declineFn));
+		self.dom.body.appendChild(answerButtons);
+		document.querySelector('body').appendChild(self.dom.container);
+	};
+	self.addButton = function (name, icon, className, text, onClickFn) {
+		var btn = document.createElement('button');
+		self.dom[name] = btn;
+		btn.className = className;
+		btn.onclick = onClickFn;
+		var iconCallAnswer = document.createElement('i');
+		iconCallAnswer.className = icon;
+		var textDiv = document.createElement('div');
+		textDiv.textContent = text;
+		btn.appendChild(iconCallAnswer);
+		btn.appendChild(textDiv);
+		return btn;
+	};
+	self.show = function (user) {
+		var text = "{} calls".format(user);
+		self.setHeaderText(text);
+		self.super.show();
+	};
+	self.init();
+}
+
+
 function CallWindow(chatHandler) {
 	var self = this;
 	self.chatHandler = chatHandler;
 	self.dom = {
-		answerWebRtcCall: $("answerWebRtcCall"),
-		videoAnswerWebRtcCall: $("videoAnswerWebRtcCall"),
-		declineWebRtcCall: $("declineWebRtcCall"),
 		callSound: $('chatCall'),
-		callAnswerParent: $('callAnswerParent'),
 		callAnswerText: $('callAnswerText'),
 		callContainer: $('callContainer'),
 		callContainerContent: document.createElement("DIV"),
@@ -2290,6 +2321,12 @@ function CallWindow(chatHandler) {
 			minimize: document.createElement("i"),
 			enterFullScreen: document.createElement("i")
 		}
+	};
+	self.getCallPopup = function () {
+		if (!self.callPopup) {
+			self.callPopup = new CallPopup(self.answerWebRtcCall, self.videoAnswerWebRtcCall, self.declineCall);
+		}
+		return self.callPopup;
 	};
 	self.init = function() {
 		var iwc = document.createElement('DIV');
@@ -2359,12 +2396,8 @@ function CallWindow(chatHandler) {
 	};
 	self.showOfferWindow = function (message) {
 		checkAndPlay(self.dom.callSound);
-		CssUtils.showElement(self.dom.callAnswerParent);
-		self.dom.declineWebRtcCall.onclick = self.declineCall;
-		self.dom.answerWebRtcCall.onclick = self.answerWebRtcCall;
-		self.dom.videoAnswerWebRtcCall.onclick = self.videoAnswerWebRtcCall;
+		self.getCallPopup().show(message.user);
 		notifier.notify(message.user, "Calls you");
-		self.dom.callAnswerText.textContent = "{} is calling you".format(message.user);
 	};
 	self.init();
 }
@@ -3214,18 +3247,26 @@ function WebRtcApi() {
 		}
 	};
 	self.onofferWebrtc = function (message) {
-		// if (self.timeoutFunnction) {
-		// 	wsHandler.sendToServer('busy'); // TODO multirtc
-		// }
 		//
-		var className = message.content ? FileReceiver : CallHandler;
-		var handler = new className(self.removeChildReference);
-		self.connections[message.connId] = handler;
-		handler.initAndDisplayOffer(message);
-		if (handler instanceof CallPeerConnection) {
+		//
+		var handler ;
+		if (message.content) {
+			handler = new FileReceiver(self.removeChildReference);
+		} else {
+
+			var chatHandler = channelsHandler.channels[message.channel];
+			if (!chatHandler) {
+				throw "Somebody tried to call you to nonexisted channel";
+			}
+			handler = new CallHandler(self.removeChildReference, chatHandler.getCallWindow());
+			// if (self.timeoutFunnction) {
+				// 	wsHandler.sendToServer('busy'); // TODO multirtc
+				// }
 			// TODO multirtc settimout
 			// self.timeoutFunnction = setTimeout(self.connections[message.connId].declineCall, self.callTimeoutTime);
 		}
+		self.connections[message.connId] = handler;
+		handler.initAndDisplayOffer(message);
 	};
 	self.handle = function (data) {
 		if (data.handler === 'webrtc') {
