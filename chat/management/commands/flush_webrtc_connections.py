@@ -11,9 +11,9 @@ class Command(BaseCommand):
 
 	def handle(self, *args, **options):
 		from chat.global_redis import sync_redis
-		webrtc_connections = sync_redis.smembers(WEBRTC_CONNECTION)
+		webrtc_connections = sync_redis.hgetall(WEBRTC_CONNECTION)
 		if webrtc_connections:
-			sync_redis.delete(*webrtc_connections)
+			sync_redis.delete(*webrtc_connections.keys())
 			sync_redis.delete(WEBRTC_CONNECTION)
 			print('Flushed webrtc connections: {}'.format(webrtc_connections))
 		else:

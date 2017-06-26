@@ -112,7 +112,6 @@ class HandlerNames:
 
 
 class WebRtcRedisStates:
-	SENDER_ID = 'sender_id'
 	RESPONDED = 'responded'
 	READY = 'ready'
 	OFFERED = 'offered'
@@ -501,7 +500,7 @@ class MessagesHandler(MessagesCreator):
 		if not self_channel_status:
 			raise Exception("Access Denied")
 		if self_channel_status != 'closed':
-			sender_id = self.sync_redis.shget(connection_id, WebRtcRedisStates.SENDER_ID)
+			sender_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
 			if sender_id == self.id:
 				self.close_sender(connection_id)
 			else:
@@ -519,7 +518,6 @@ class MessagesHandler(MessagesCreator):
 
 	def close_sender(self, connection_id):
 		values = self.sync_redis.shgetall(connection_id)
-		del values[WebRtcRedisStates.SENDER_ID]
 		del values[self.id]
 		for ws_id in values:
 			if values[ws_id] == WebRtcRedisStates.CLOSED:
@@ -533,7 +531,7 @@ class MessagesHandler(MessagesCreator):
 
 	def accept_and_proxy_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID] # TODO accept all if call
-		sender_ws_id = self.sync_redis.shget(connection_id, WebRtcRedisStates.SENDER_ID)
+		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
 		sender_ws_status = self.sync_redis.shget(connection_id, sender_ws_id)
 		self_ws_status = self.sync_redis.shget(connection_id, self.id)
 		if sender_ws_status == WebRtcRedisStates.READY and self_ws_status == WebRtcRedisStates.RESPONDED:
@@ -553,9 +551,8 @@ class MessagesHandler(MessagesCreator):
 		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
 		connection_id = id_generator(RedisPrefix.CONNECTION_ID_LENGTH)
 		# use list because sets dont have 1st element which is offerer
-		self.async_redis_publisher.sadd(WEBRTC_CONNECTION, connection_id)
+		self.async_redis_publisher.hset(WEBRTC_CONNECTION, connection_id, self.id)
 		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
-		self.async_redis_publisher.hset(connection_id, WebRtcRedisStates.SENDER_ID, self.id)
 		opponents_message = self.offer_webrtc(content, connection_id, room_id)
 		self_message = self.set_connection_id(qued_id, connection_id)
 		self.ws_write(self_message)
@@ -564,7 +561,7 @@ class MessagesHandler(MessagesCreator):
 
 	def reply_webrtc_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
-		sender_ws_id = self.sync_redis.shget(connection_id, WebRtcRedisStates.SENDER_ID)
+		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
 		sender_ws_status = self.sync_redis.shget(connection_id, sender_ws_id)
 		self_ws_status = self.sync_redis.shget(connection_id, self.id)
 		if sender_ws_status == WebRtcRedisStates.READY and self_ws_status == WebRtcRedisStates.OFFERED:
