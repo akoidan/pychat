@@ -2089,12 +2089,12 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	};
 	self.log = function () {
 		var args = Array.prototype.slice.call(arguments);
-		args.unshift(self.connectionId + self.opponentWsId);
+		args.unshift(self.connectionId + ":" + self.opponentWsId);
 		return logger.webrtc.apply(logger, args);
 	};
 	self.logErr = function (text) {
 		var args = Array.prototype.slice.call(arguments);
-		args.unshift(self.connectionId + self.opponentWsId);
+		args.unshift(self.connectionId +  ":" +self.opponentWsId);
 		return logger.webrtcErr.apply(logger, args);
 	};
 	self.defaultSendEvent = function (action, type, content) {
