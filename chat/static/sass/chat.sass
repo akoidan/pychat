@@ -680,12 +680,19 @@ p
 	.decline-btn
 		@extend .red-btn
 
-	div
-		display: inline-block
-		vertical-align: top
-
-	i
-		font-size: 15px
+	button
+		position: relative
+		i
+			top: 4px
+			left: 5px
+			position: absolute
+			font-size: 21px
+		&:active i
+			top: 5px
+		div
+			display: inline-block
+			padding-left: 25px
+			vertical-align: top
 
 #hangUpIcon
 	float: right
