@@ -664,11 +664,6 @@ p
 	justify-content: space-around
 	text-align: center
 
-	//@media screen and (max-width: 500px)
-	//	button
-	//		display: block
-	//		width: 100%
-
 	.video-answer-btn
 		margin-left: 7px
 		margin-right: 7px
@@ -693,6 +688,12 @@ p
 			display: inline-block
 			padding-left: 25px
 			vertical-align: top
+	@media screen and (max-width: 500px)
+		flex-direction: column
+		button
+			width: 100%
+			&.video-answer-btn
+				margin: 8px 0
 
 #hangUpIcon
 	float: right
