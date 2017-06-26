@@ -1178,10 +1178,9 @@ function ChannelsHandler() {
 		self.roomsInited = true;
 	};
 	self.handle = function (message) {
-		if (message.handler == 'channels') {
+		if (message.handler === 'channels') {
 			self[message.action](message);
-		}
-		else if (message.handler == 'chat') {
+		} else if (message.handler === 'chat') {
 			var channelHandler = self.channels[message.channel];
 			if (!channelHandler) {
 				throw 'Unknown channel {} for message "{}"'.format(message.channel, JSON.stringify(message));
@@ -2212,8 +2211,7 @@ function BaseTransferHandler(removeReferenceFn) {
 		});
 	};
 	self.handle = function (data) {
-		var selfHandledAction = ['replyFile', 'destroyConnection', 'replyCall'];
-		if (selfHandledAction.indexOf(data.action) >= 0) {
+		if (data.handler === 'webrtcTransfer') {
 			self['on' + data.action](data);
 		} else {
 			self.peerConnections[data.opponentWsId]['on' + data.action](data);
@@ -3196,9 +3194,6 @@ function CallPeerConnection() {
 		// TODO replace growl with System message in user thread and unread
 		growlInfo("<div>You have missed a call from <b>{}</b></div>".format(self.receiverName));
 	};
-	self.onacceptCall = function (message) {
-		console.log('todo', message);
-	};
 	self.attachDomEvents();
 }
 
@@ -3244,6 +3239,9 @@ function CallHandler(removeChildFn, callWindow) {
 			connId: message.connId
 		});
 		self.showOffer(message);
+	};
+	self.onacceptCall = function (message) {
+		console.log('todo', message);
 	};
 }
 
@@ -3348,9 +3346,10 @@ function WsHandler() {
 	self.handlers = {
 		channels: channelsHandler,
 		chat: channelsHandler,
-		peerConnection: webRtcApi,
 		ws: self,
 		webrtc: webRtcApi,
+		webrtcTransfer: webRtcApi,
+		peerConnection: webRtcApi,
 		growl: {
 			handle: function (message) {
 				growlError(message.content);
