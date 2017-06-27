@@ -1622,16 +1622,16 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.setChannelAttach = function (isAttached) {
 		self.callIsAttached = isAttached;
 		if (isAttached) {
-			self.getCallWindow().show();
+			self.getCallHandler().show();
 		} else {
-			self.getCallWindow().hide();
+			self.getCallHandler().hide();
 		}
 	};
-	self.getCallWindow = function () {
-		if (!self.callWindow) {
-			self.callWindow = new CallWindow(self)
+	self.getCallHandler = function () {
+		if (!self.callHandler) {
+			self.callHandler = new CallHandler(self.roomId)
 		}
-		return self.callWindow;
+		return self.callHandler;
 	};
 	self.isPrivate = function () {
 		return self.dom.roomNameLi.hasAttribute(USER_ID_ATTR);
@@ -2033,8 +2033,8 @@ function SenderPeerConnection(connectionId, opponentWsId, removeChildPeerReferen
 			self.pc.setLocalDescription(offer, function () {
 				self.log('Sending offer  to remote')();
 				self.sendWebRtcEvent(offer);
-			}, self.failWebRtcP2);
-		}, self.failWebRtcP1, self.sdpConstraints);
+			}, self.failWebRtc('setLocalDescription'));
+		}, self.failWebRtc('createOffer'), self.sdpConstraints);
 	};
 }
 
@@ -2047,13 +2047,12 @@ function ReceiverPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 			self.log('Sending answer')();
 			self.pc.setLocalDescription(answer, function () {
 				self.sendWebRtcEvent(answer);
-			}, self.failWebRtcP3);
-		}, self.failWebRtcP4, self.sdpConstraints);
+			}, self.failWebRtc('setLocalDescription'));
+		}, self.failWebRtc('createAnswer'), self.sdpConstraints);
 	};
 	self.waitForAnswer = function () {
 		self.createPeerConnection();
 		self.log("Waiting for rtc datachannels.")();
-		self.downloadBar.setStatus("Establishing connection");
 		self.pc.ondatachannel = self.gotReceiveChannel;
 	};
 	self.gotReceiveChannel = function (event) {
@@ -2066,6 +2065,13 @@ function ReceiverPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	self.onChannelMessage = function (msg) {
 // 		self.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();
 	}
+}
+
+function extractError(arguments) {
+	var argument = arguments[0] || arguments;
+	return arguments.length > 1  ? Array.prototype.join.call(arguments, ' ') :
+			argument.name || argument.message ? "{}: {}".format(argument.name, argument.message) :
+					JSON.stringify(arguments);
 }
 
 function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerReferenceFn) {
@@ -2129,7 +2135,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 		//self.clearTimeout(); TODO multirtc
 		if (self.pc.iceConnectionState && self.pc.iceConnectionState !== 'closed') {
 			if (data.sdp) {
-				self.pc.setRemoteDescription(new RTCSessionDescription(data), self.handleAnswer, self.failWebRtc);
+				self.pc.setRemoteDescription(new RTCSessionDescription(data), self.handleAnswer, self.failWebRtc('setRemoteDescription'));
 			} else if (data.candidate) {
 				self.pc.addIceCandidate(new RTCIceCandidate(data));
 			} else if (data.message) {
@@ -2175,24 +2181,12 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 			opponentWsId: self.opponentWsId
 		});
 	};
-	self.failWebRtcP1 = function () {
-		self.failWebRtc.apply(self, arguments);
-	};
-	self.failWebRtcP2 = function () {
-		self.failWebRtc.apply(self, arguments);
-	};
-	self.failWebRtcP3 = function () {
-		self.failWebRtc.apply(self, arguments);
-	};
-	self.failWebRtcP4 = function () {
-		self.failWebRtc.apply(self, arguments);
-	};
-	self.failWebRtc = function () {
-		var isError = arguments.length === 1 && (arguments[0].message || arguments[0].name);
-		var errorContext = isError ? "{}: {}".format(arguments[0].name, arguments[0].message)
-				: Array.prototype.join.call(arguments, ' ');
-		growlError("An error occurred while establishing a connection: {}".format(errorContext));
-		self.logErr("OnError way from {}, exception: {}", getCallerTrace(), errorContext)();
+	self.failWebRtc = function (parent) {
+		return function () {
+			var message = "An error occurred while {}: {}".format(parent, extractError(arguments));
+			growlError(message);
+			self.logErr(message)();
+		}
 	};
 }
 
@@ -2284,9 +2278,16 @@ function CallPopup(answerFn, videoAnswerFn, declineFn) {
 }
 
 
-function CallWindow(chatHandler) {
+function CallHandler(roomId) {
 	var self = this;
-	self.chatHandler = chatHandler;
+	BaseTransferHandler.call(self);
+	self.acceptedPeers = [];
+	self.removeChild = function() {};
+	self.roomId = roomId;
+	self.audioProcessors = {};
+	self.setIsReceiver = function(isReceiver) {
+		self.accepted = !isReceiver;
+	};
 	self.dom = {
 		callAnswerText: $('callAnswerText'),
 		callContainer: $('callContainer'),
@@ -2311,9 +2312,6 @@ function CallWindow(chatHandler) {
 	self.constraints = {
 		audio: true,
 		video: true
-	};
-	self.setLastHandler = function(handler) {
-		self.lastHandler = handler;
 	};
 	self.setAudio = function (value) {
 		self.constraints.audio = value;
@@ -2367,8 +2365,7 @@ function CallWindow(chatHandler) {
 		self.idleTime = 0;
 	};
 	self.answerWebRtcCall = function () {
-		self.lastHandler.accept();
-		self.callPopup.hide();
+		self.accept();
 		self.setAudio(true);
 		self.setVideo(false);
 		// TODO
@@ -2377,12 +2374,11 @@ function CallWindow(chatHandler) {
 	self.declineWebRtcCall = function (dontResponde) {
 		self.callPopup.hide();
 		if (!dontResponde) {
-			self.lastHandler.decline();
+			self.decline();
 		}
 	};
 	self.videoAnswerWebRtcCall = function () {
-		self.callPopup.hide();
-		self.lastHandler.accept();
+		self.accept();
 		self.setAudio(true);
 		self.setVideo(true);
 		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
@@ -2449,8 +2445,67 @@ function CallWindow(chatHandler) {
 		self.renderDom();
 		self.attachDomEvents();
 	};
+	self.captureInput = function (callback, callIfNoSource) {
+		if (self.constraints.audio || self.constraints.video) {
+			navigator.getUserMedia(self.constraints, callback, self.onFailedCaptureSource);
+		} else if (callIfNoSource) {
+			callback();
+		}
+	};
+	self.attachLocalStream = function (stream) {
+		self.localStream = stream;
+		if (stream) {
+			//self.pc.addStream(stream); TODO
+			setVideoSource(self.dom.local, stream);
+		}
+		self.setVideo(self.getTrack(true) != null);
+		self.setAudio(self.getTrack(false) != null);
+		self.createMicrophoneLevelVoice(stream, true);
+	};
+	self.captureInputStream = function (stream) {
+		self.setIconState(true);
+		self.setHeaderText("Establishing connection with {}".format(self.receiverName));
+		self.attachLocalStream(stream);
+		var id = webRtcApi.addCallHandler(self);
+		self.sendOffer(id);
+		//self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime); TODO multirtc
+	};
+	self.onFailedCaptureSource =  function() {
+		var what = '';
+		if (self.constraints.audio && self.constraints.audio) {
+			what = 'audio and video'
+		} else if (self.constraints.audio) {
+			what = 'audio'
+		} else {
+			what = 'video'
+		}
+		var message = "Failed to capture {} source, because {}".format(what, extractError(arguments));
+		growlError(message);
+		logger.error(message);
+	};
+	self.setIconState = function (isCall) {
+		isCall = isCall || self.isActive();
+		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
+		CssUtils.setVisibility(self.dom.videoContainer, isCall);
+		CssUtils.setVisibility(self.dom.callIcon, !isCall);
+	};
+	self.showCallDialog = function (isCallActive) {
+		isCallActive = isCallActive || self.isActive();
+		self.setIconState(isCallActive);
+		if (!isCallActive) {
+			self.setHeaderText("Make a call");
+		} else {
+			// self.clearTimeout(); TODO multirtc
+		}
+	};
+	self.setHeaderText = function (text) { // TODO multirtc
+		channelsHandler.setTitle(text);
+		singlePage.updateTitle();
+	};
 	self.offerCall = function() {
-		webRtcApi.offerCall(self, self.chatHandler.roomId);
+		self.accepted = true;
+		self.setHeaderText("Confirm browser to use your input devices for call");
+		self.captureInput(self.captureInputStream);
 	};
 	self.changeVolume = function () {
 		//TODO set all remote volume level , move it each window
@@ -2465,6 +2520,170 @@ function CallWindow(chatHandler) {
 	self.showOfferWindow = function (message) {
 		self.getCallPopup().show(message.user);
 		notifier.notify(message.user, "Calls you");
+	};
+	self.getAverageAudioLevel = function (audioProc) {
+		var array = new Uint8Array(audioProc.analyser.frequencyBinCount);
+		audioProc.analyser.getByteFrequencyData(array);
+		var values = 0;
+		var length = array.length;
+		for (var i = 0; i < length; i++) {
+			values += array[i];
+		}
+		return values / length;
+	};
+	self.createMicrophoneLevelVoice = function (stream, isLocalProc) {
+		try {
+			self.audioProcessors[isLocalProc] = {};
+			var audioProc = self.audioProcessors[isLocalProc];
+			audioProc.audioContext = new AudioContext();
+			audioProc.analyser = audioProc.audioContext.createAnalyser();
+			var microphone = audioProc.audioContext.createMediaStreamSource(stream);
+			audioProc.javascriptNode = audioProc.audioContext.createScriptProcessor(2048, 1, 1);
+			audioProc.analyser.smoothingTimeConstant = 0.3;
+			audioProc.analyser.fftSize = 1024;
+			microphone.connect(audioProc.analyser);
+			audioProc.analyser.connect(audioProc.javascriptNode);
+			audioProc.javascriptNode.connect(audioProc.audioContext.destination);
+			audioProc.prevVolumeValues = 0;
+			audioProc.volumeValuesCount = 0;
+			if (isLocalProc) {
+				(function (audioProc) {
+					audioProc.javascriptNode.onaudioprocess = function () {
+						if (!self.constraints.audio) {
+							return;
+						}
+						var value = self.getAverageAudioLevel(audioProc);
+						audioProc.prevVolumeValues += value;
+						audioProc.volumeValuesCount++;
+						if (audioProc.volumeValuesCount == 100 && audioProc.prevVolumeValues == 0) {
+							self.showNoMicError();
+						}
+						self.dom.microphoneLevel.value = value;
+					};
+				})(audioProc);
+			} else {
+				(function (audioProc) {
+					audioProc.javascriptNode.onaudioprocess = function () {
+						var level = self.getAverageAudioLevel(audioProc); //256 max
+						var clasNu;
+						if (level >= 162) {
+							clasNu = 10;
+						} else if (level == 0) {
+							clasNu = 0
+						} else {
+							clasNu = Math.floor(level / 18) + 1;
+						}
+						self.dom.callVolume.className = 'vol-level-{}'.format(clasNu);
+					};
+				})(audioProc);
+			}
+
+		} catch (err) {
+			logger.error("Unable to use microphone level because {}")(extractError(err));
+		}
+	};
+	self.createCallAfterCapture = function (stream) {
+		self.attachLocalStream(stream);
+		self.sendAcceptAndInitPeerConnections();
+	};
+	self.createAfterResponseCall = function () {
+		self.captureInput(self.createCallAfterCapture, true);
+		self.showAndAttachCallDialogOnResponse();
+		self.showCallDialog(true);
+	};
+	self.showAndAttachCallDialogOnResponse = function () {
+		channelsHandler.setActiveChannel(self.receiverRoomId);
+		channelsHandler.getActiveChannel().setChannelAttach(true);
+		CssUtils.showElement(webRtcApi.dom.callContainer);
+	};
+	self.getTrack = function (isVideo) {
+		var track = null;
+		if (self.localStream) {
+			var tracks = isVideo ? self.localStream.getVideoTracks() : self.localStream.getAudioTracks();
+			if (tracks.length > 0) {
+				track = tracks[0]
+			}
+		}
+		return track;
+	};
+	self.toggleInput = function (isVideo) {
+		var kind = isVideo ? 'video' : 'audio';
+		var track = self.getTrack(isVideo);
+		if (!self.isActive() || track) {
+			var newValue = !self.constraints[kind];
+			if (isVideo) {
+				self.setVideo(newValue);
+			} else {
+				self.setAudio(newValue);
+			}
+		}
+		if (track) {
+			track.enabled = self.constraints[kind];
+		} else if (self.isActive()) {
+			growlError("You need to call/reply with {} to turn it on".format(kind));
+		}
+	};
+	self.toggleVideo = function () {
+		self.toggleInput(true);
+	};
+	self.toggleMic = function () {
+		self.toggleInput(false);
+	};
+	self.createCallPeerConnection = function (userId, connId, opponentWsId) {
+		var PeerConnectionClass = userId > loggedUserId ? CallSenderPeerConnection : CallReceiverPeerConnection;
+		self.peerConnections[opponentWsId] = new PeerConnectionClass(
+				connId,
+				opponentWsId,
+				self.removeChildPeerReference
+		);
+	};
+	self.onreplyCall = function (message) {
+		self.createCallPeerConnection(message.userId, message.connId, message.opponentWsId);
+		//self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
+		growlInfo("User {} is called".format(message.user))
+	};
+	self.sendOffer = function (newId) {
+		var messageRequest = {
+			action: 'offerCall',
+			channel: self.roomId,
+			id: newId
+		};
+		wsHandler.sendToServer(messageRequest);
+	};
+	self.showOffer = function (message) {
+		self.connectionId = message.connId;
+		self.showOfferWindow(message);
+	};
+	self.accept = function () {
+		self.callPopup.hide();
+		self.createAfterResponseCall();
+	};
+	self.sendAcceptAndInitPeerConnections = function () {
+		wsHandler.sendToServer({
+			action: 'acceptCall',
+			connId: self.connectionId
+		});
+		self.accepted = true;
+		self.acceptedPeers.forEach(function(e) {
+			self.peerConnections[e].connectToRemote();
+		})
+	};
+	self.initAndDisplayOffer = function (message) {
+		logger.webrtc(message.connId, "CallHandler initialized")();
+		wsHandler.sendToServer({
+			action: 'replyCall',
+			connId: message.connId
+		});
+		self.acceptedPeers.push(message.opponentWsId);
+		self.createCallPeerConnection(message.userId, message.connId, message.opponentWsId);
+		self.showOffer(message);
+	};
+	self.onacceptCall = function (message) {
+		if (self.accepted) {
+			self.peerConnections[message.opponentWsId].connectToRemote();
+		} else {
+			self.acceptedPeers.push(message.opponentWsId);
+		}
 	};
 	self.init();
 }
@@ -2788,7 +3007,12 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 				self.fileWriter.write(blob);
 			}
 		}
-	}
+	};
+	self.superwaitForAnswer = self.waitForAnswer;
+	self.waitForAnswer = function () {
+		self.superwaitForAnswer();
+		self.downloadBar.setStatus("Establishing connection");
+	};
 }
 
 function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildPeerReferenceFn) {
@@ -2877,31 +3101,30 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 }
 
 
-function CallSenderPeerConnection(connectionId, wsOpponentId, removeFromParentFn, callWindow) {
+function CallSenderPeerConnection(connectionId, wsOpponentId, removeFromParentFn) {
 	var self = this;
 	SenderPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
-	CallPeerConnection.call(self, callWindow);
+	CallPeerConnection.call(self);
 	self.log("Created CallSenderPeerConnection")();
 	self.connectToRemote = function() {
-		self.createAfterResponseCall();
+		self.createPeerConnection();
+		self.createOffer();
 	}
 }
 
 
-function CallReceiverPeerConnection(connectionId, wsOpponentId, removeFromParentFn, callWindow) {
+function CallReceiverPeerConnection(connectionId, wsOpponentId, removeFromParentFn) {
 	var self = this;
 	ReceiverPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
-	CallPeerConnection.call(self, callWindow);
+	CallPeerConnection.call(self);
 	self.log("Created CallReceiverPeerConnection")();
 	self.connectToRemote = function() {
 		self.waitForAnswer();
 	}
 }
 
-function CallPeerConnection(callWindow) {
+function CallPeerConnection() {
 	var self = this;
-	self.callWindow = callWindow;
-	self.audioProcessors = {};
 	self.dom = {
 		remote: $('remoteVideo'), //
 		local: $('localVideo'), //
@@ -2955,171 +3178,8 @@ function CallPeerConnection(callWindow) {
 		}
 		self.idleTime = 0;
 	};
-	self.getTrack = function (isVideo) {
-		var track = null;
-		if (self.localStream) {
-			var tracks = isVideo ? self.localStream.getVideoTracks() : self.localStream.getAudioTracks();
-			if (tracks.length > 0) {
-				track = tracks[0]
-			}
-		}
-		return track;
-	};
-
-	self.toggleInput = function (isVideo) {
-		var kind = isVideo ? 'video' : 'audio';
-		var track = self.getTrack(isVideo);
-		if (!self.isActive() || track) {
-			var newValue = !self.constraints[kind];
-			if (isVideo) {
-				self.setVideo(newValue);
-			} else {
-				self.setAudio(newValue);
-			}
-		}
-		if (track) {
-			track.enabled = self.constraints[kind];
-		} else if (self.isActive()) {
-			growlError("You need to call/reply with {} to turn it on".format(kind));
-		}
-	};
-	self.toggleVideo = function () {
-		self.toggleInput(true);
-	};
-	self.toggleMic = function () {
-		self.toggleInput(false);
-	};
-	self.setHeaderText = function (text) { // TODO multirtc
-		channelsHandler.setTitle(text);
-		singlePage.updateTitle();
-	};
-
-	self.setIconState = function (isCall) {
-		isCall = isCall || self.isActive();
-		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
-		CssUtils.setVisibility(self.dom.videoContainer, isCall);
-		CssUtils.setVisibility(self.dom.callIcon, !isCall);
-	};
-	self.showCallDialog = function (isCallActive) {
-		isCallActive = isCallActive || self.isActive();
-		self.setIconState(isCallActive);
-		if (!isCallActive) {
-			self.setHeaderText("Make a call");
-		} else {
-			// self.clearTimeout(); TODO multirtc
-		}
-	};
-	self.captureInput = function (callback, callIfNoSource) {
-		if (self.callWindow.constraints.audio || self.callWindow.constraints.video) {
-			navigator.getUserMedia(self.callWindow.constraints, callback, self.failWebRtc);
-		} else if (callIfNoSource) {
-			callback();
-		}
-	};
-	self.setConnectionIdParent = self.setConnectionId;
-	self.setConnectionId = function (id) {
-		self.setHeaderText("Confirm browser to use your input devices for call");
-		self.setConnectionIdParent(id);
-		self.captureInput(self.captureInputStream);
-	};
-	self.captureInputStream = function (stream) {
-		self.setIconState(true);
-		self.setHeaderText("Establishing connection with {}".format(self.receiverName));
-		self.attachLocalStream(stream);
-		//self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime); TODO multirtc
-	};
-	self.createCallAfterCapture = function (stream) {
-		self.createPeerConnection();
-		self.attachLocalStream(stream);
-		self.createSendChannelAndOffer();
-	};
-	self.createAfterResponseCall = function () {
-		self.captureInput(self.createCallAfterCapture, true);
-		self.showAndAttachCallDialogOnResponse();
-		self.showCallDialog(true);
-	};
-	self.showAndAttachCallDialogOnResponse = function () {
-		channelsHandler.setActiveChannel(self.receiverRoomId);
-		channelsHandler.getActiveChannel().setChannelAttach(true);
-		CssUtils.showElement(webRtcApi.dom.callContainer);
-	};
 	self.channelOpen = function () {
 		self.log('Opened a new chanel')();
-	};
-	self.setVideoSource = function (domEl, stream) {
-		domEl.src = URL.createObjectURL(stream);
-		domEl.play();
-	};
-	self.attachLocalStream = function (stream) {
-		self.localStream = stream;
-		if (stream) {
-			self.pc.addStream(stream);
-			self.setVideoSource(self.dom.local, stream);
-		}
-		self.setVideo(self.getTrack(true) != null);
-		self.setAudio(self.getTrack(false) != null);
-		self.createMicrophoneLevelVoice(stream, true);
-	};
-	self.getAverageAudioLevel = function (audioProc) {
-		var array = new Uint8Array(audioProc.analyser.frequencyBinCount);
-		audioProc.analyser.getByteFrequencyData(array);
-		var values = 0;
-		var length = array.length;
-		for (var i = 0; i < length; i++) {
-			values += array[i];
-		}
-		return values / length;
-	};
-	self.createMicrophoneLevelVoice = function (stream, isLocalProc) {
-		try {
-			self.audioProcessors[isLocalProc] = {};
-			var audioProc = self.audioProcessors[isLocalProc];
-			audioProc.audioContext = new AudioContext();
-			audioProc.analyser = audioProc.audioContext.createAnalyser();
-			var microphone = audioProc.audioContext.createMediaStreamSource(stream);
-			audioProc.javascriptNode = audioProc.audioContext.createScriptProcessor(2048, 1, 1);
-			audioProc.analyser.smoothingTimeConstant = 0.3;
-			audioProc.analyser.fftSize = 1024;
-			microphone.connect(audioProc.analyser);
-			audioProc.analyser.connect(audioProc.javascriptNode);
-			audioProc.javascriptNode.connect(audioProc.audioContext.destination);
-			audioProc.prevVolumeValues = 0;
-			audioProc.volumeValuesCount = 0;
-			if (isLocalProc) {
-				(function (audioProc) {
-					audioProc.javascriptNode.onaudioprocess = function () {
-						if (!self.constraints.audio) {
-							return;
-						}
-						var value = self.getAverageAudioLevel(audioProc);
-						audioProc.prevVolumeValues += value;
-						audioProc.volumeValuesCount++;
-						if (audioProc.volumeValuesCount == 100 && audioProc.prevVolumeValues == 0) {
-							self.showNoMicError();
-						}
-						self.dom.microphoneLevel.value = value;
-					};
-				})(audioProc);
-			} else {
-				(function (audioProc) {
-					audioProc.javascriptNode.onaudioprocess = function () {
-						var level = self.getAverageAudioLevel(audioProc); //256 max
-						var clasNu;
-						if (level >= 162) {
-							clasNu = 10;
-						} else if (level == 0) {
-							clasNu = 0
-						} else {
-							clasNu = Math.floor(level / 18) + 1;
-						}
-						self.dom.callVolume.className = 'vol-level-{}'.format(clasNu);
-					};
-				})(audioProc);
-			}
-
-		} catch (err) {
-			self.log("Unable to use microphone level because ")();
-		}
 	};
 	self.showNoMicError = function () {
 		var url = isChrome ? 'setting in chrome://settings/content' : 'your browser settings';
@@ -3133,7 +3193,7 @@ function CallPeerConnection(callWindow) {
 	self.createPeerConnection = function () {
 		self.createPeerConnectionParent();
 		self.pc.onaddstream = function (event) {
-			self.setVideoSource(self.dom.remote, event.stream);
+			setVideoSource(self.dom.remote, event.stream);
 			self.createMicrophoneLevelVoice(event.stream, false);
 			self.setHeaderText("Talking with <b>{}</b>".format(self.receiverName));
 			self.setIconState(true);
@@ -3211,70 +3271,6 @@ function CallPeerConnection(callWindow) {
 	};
 }
 
-function CallHandler(removeChildFn, callWindow, isReceiver) {
-	var self = this;
-	self.callWindow = callWindow;
-	self.acceptedPeers = [];
-	self.accepted = !isReceiver;
-	BaseTransferHandler.call(self, removeChildFn);
-	self.removeChild = removeChildFn;
-	self.createPeerConnection = function (userId, connId, opponentWsId) {
-		var PeerConnectionClass = userId > loggedUserId ? CallSenderPeerConnection : CallReceiverPeerConnection;
-		self.peerConnections[opponentWsId] = new PeerConnectionClass(
-				connId,
-				opponentWsId,
-				self.removeChildPeerReference,
-				self.callWindow
-		);
-	};
-	self.onreplyCall = function (message) {
-		self.createPeerConnection(message.userId, message.connId, message.opponentWsId);
-		//self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
-		growlInfo("User {} is called".format(message.user))
-	};
-	self.sendOffer = function (newId, channel) {
-		var messageRequest = {
-			action: 'offerCall',
-			channel: channel,
-			id: newId
-		};
-		wsHandler.sendToServer(messageRequest);
-		callWindow.setLastHandler(self);
-	};
-	self.showOffer = function (message) {
-		self.connectionId = message.connId;
-		self.callWindow.showOfferWindow(message);
-	};
-	self.accept = function () {
-		wsHandler.sendToServer({
-			action: 'acceptCall',
-			connId: self.connectionId
-		});
-		self.accepted = true;
-		self.acceptedPeers.forEach(function(e) {
-			self.peerConnections[e].connectToRemote();
-		})
-	};
-	self.initAndDisplayOffer = function (message) {
-		logger.webrtc(message.connId, "CallHandler initialized")();
-		callWindow.setLastHandler(self);
-		wsHandler.sendToServer({
-			action: 'replyCall',
-			connId: message.connId
-		});
-		self.acceptedPeers.push(message.opponentWsId);
-		self.createPeerConnection(message.userId, message.connId, message.opponentWsId);
-		self.showOffer(message);
-	};
-	self.onacceptCall = function (message) {
-		if (self.accepted) {
-			self.peerConnections[message.opponentWsId].connectToRemote();
-		} else {
-			self.acceptedPeers.push(message.opponentWsId);
-		}
-	};
-}
-
 function WebRtcApi() {
 	var self = this;
 	self.dom = {
@@ -3322,7 +3318,8 @@ function WebRtcApi() {
 		if (!chatHandler) {
 			throw "Somebody tried to call you to nonexisted channel";
 		}
-		var handler = new CallHandler(self.removeChildReference, chatHandler.getCallWindow(), true);
+		var handler = chatHandler.getCallHandler();
+		handler.setIsReceiver(true);
 		// if (self.timeoutFunnction) {
 		// 	wsHandler.sendToServer('busy'); // TODO multirtc
 		// }
@@ -3340,21 +3337,24 @@ function WebRtcApi() {
 			logger.error('Connection "{}" is unknown. Available connections: "{}". Skipping message:', data.connId, Object.keys(self.connections))();
 		}
 	};
-	self.offerCall = function (callwindow, channel) {
-		self.createWebrtcObject(CallHandler, callwindow, channel);
+	self.addCallHandler = function (callHandler) {
+		var newId = self.createQuedId();
+		self.quedConnections[newId] = callHandler;
+		return newId;
+
 	};
 	self.offerFile = function () {
-		self.createWebrtcObject(FileSender, self.dom.fileInput.files[0], channelsHandler.activeChannel);
+		var newId = self.createQuedId();
+		self.quedConnections[newId] = new FileSender(self.removeChildReference, self.dom.fileInput.files[0]);
+		self.quedConnections[newId].sendOffer(newId, channelsHandler.activeChannel);
+		return self.quedConnections[newId];
 	};
 	self.removeChildReference = function (id) {
 		logger.info("Removing transferHandler with id {}", id)();
 		delete self.connections[id];
 	};
 	self.createWebrtcObject = function (ClassName, arguments, channel) {
-		var newId = self.createQuedId();
-		self.quedConnections[newId] = new ClassName(self.removeChildReference, arguments);
-		self.quedConnections[newId].sendOffer(newId, channel);
-		return self.quedConnections[newId];
+
 	};
 	self.attachEvents = function () {
 		self.dom.webRtcFileIcon.onclick = self.clickFile;
@@ -3518,3 +3518,8 @@ function createUserLi(userId, gender, username) {
 	li.setAttribute(USER_NAME_ATTR, username);
 	return li;
 }
+
+function setVideoSource(domEl, stream) {
+	domEl.src = URL.createObjectURL(stream);
+	domEl.play();
+};

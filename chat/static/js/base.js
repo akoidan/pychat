@@ -402,6 +402,8 @@ var Growl = function (message) {
 	};
 };
 
+
+/** TODO not used anymore*/
 function getCallerTrace() {
 	try {
 		throw Error('')

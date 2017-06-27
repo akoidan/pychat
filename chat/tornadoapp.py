@@ -323,8 +323,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.SEND_MESSAGE: self.process_send_message,
 			Actions.WEBRTC: self.proxy_webrtc,
 			Actions.CLOSE_WEBRTC: self.close_and_proxy_connection,
-			Actions.ACCEPT_CALL: self.accept_call_and_proxy_connection,
-			Actions.ACCEPT_FILE: self.accept_file_and_proxy_connection,
+			Actions.ACCEPT_CALL: self.accept_call,
+			Actions.ACCEPT_FILE: self.accept_file,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
 			Actions.DELETE_ROOM: self.delete_channel,
 			Actions.EDIT_MESSAGE: self.edit_message,
@@ -550,7 +550,7 @@ class MessagesHandler(MessagesCreator):
 				VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER,
 			}, ws_id)
 
-	def accept_file_and_proxy_connection(self, in_message):
+	def accept_file(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID] # TODO accept all if call
 		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
 		sender_ws_status = self.sync_redis.shget(connection_id, sender_ws_id)
@@ -569,7 +569,7 @@ class MessagesHandler(MessagesCreator):
 	# todo if we shgetall and only then do async hset
 	# todo we can catch an issue when 2 concurrent users accepted the call
 	# todo but we didn't  send them ACCEPT_CALL as they both were in status 'offered'
-	# def accept_call_and_proxy_connection(self, in_message):
+	# def accept_call(self, in_message):
 	# 	connection_id = in_message[VarNames.CONNECTION_ID]
 	# 	channel_status = self.sync_redis.shgetall(connection_id)
 	# 	if channel_status and channel_status[self.id] == WebRtcRedisStates.RESPONDED:
@@ -585,7 +585,7 @@ class MessagesHandler(MessagesCreator):
 	# 	else:
 	# 		raise ValidationError("Invalid channel status")
 
-	def accept_call_and_proxy_connection(self, in_message):
+	def accept_call(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
 		self_status = self.sync_redis.shget(connection_id, self.id)
 		if self_status == WebRtcRedisStates.RESPONDED:
