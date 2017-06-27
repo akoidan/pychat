@@ -3203,14 +3203,15 @@ function CallHandler(removeChildFn, callWindow) {
 	BaseTransferHandler.call(self, removeChildFn);
 	self.removeChild = removeChildFn;
 	self.onreplyCall = function (message) {
-		self.peerConnections[message.opponentWsId] = new CallSenderPeerConnection(
-				message.connId,
-				message.opponentWsId,
-				self.removeChildPeerReference
-		);
 		// TODO
-		//self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
-		growlInfo("User {} is called".format(message.user))
+		// self.peerConnections[message.opponentWsId] = new CallSenderPeerConnection(
+		// 		message.connId,
+		// 		message.opponentWsId,
+		// 		self.removeChildPeerReference
+		// );
+		// // TODO
+		// //self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
+		// growlInfo("User {} is called".format(message.user))
 	};
 	self.sendOffer = function (newId, channel) {
 		var messageRequest = {

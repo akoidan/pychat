@@ -152,7 +152,7 @@ class MessagesCreator(object):
 			VarNames.HANDLER_NAME: handler
 		}
 
-	def reply_webrtc(self, event, connection_id, handler):
+	def reply_webrtc(self, event, connection_id):
 		"""
 		:return: {"action": event, "content": content, "time": "20:48:57"}
 		"""
@@ -162,7 +162,7 @@ class MessagesCreator(object):
 			VarNames.USER_ID: self.user_id,
 			VarNames.USER: self.sender_name,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: handler,
+			VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER,
 		}
 
 	def set_ws_id(self, random):
@@ -604,7 +604,7 @@ class MessagesHandler(MessagesCreator):
 			del conn_users[self.id]
 			for user in conn_users:
 				if conn_users[user] != WebRtcRedisStates.CLOSED:
-					message = self.reply_webrtc(Actions.REPLY_CALL_CONNECTION, connection_id, HandlerNames.WEBRTC_TRANSFER)
+					message = self.reply_webrtc(Actions.REPLY_CALL_CONNECTION, connection_id)
 					self.publish(message, user)
 		else:
 			raise ValidationError("Invalid channel status.")
@@ -616,7 +616,7 @@ class MessagesHandler(MessagesCreator):
 		self_ws_status = self.sync_redis.shget(connection_id, self.id)
 		if sender_ws_status == WebRtcRedisStates.READY and self_ws_status == WebRtcRedisStates.OFFERED:
 			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.RESPONDED)
-			self.publish(self.reply_webrtc(Actions.REPLY_FILE_CONNECTION, connection_id, HandlerNames.WEBRTC), sender_ws_id)
+			self.publish(self.reply_webrtc(Actions.REPLY_FILE_CONNECTION, connection_id), sender_ws_id)
 		else:
 			raise ValidationError("Invalid channel status.")
 
