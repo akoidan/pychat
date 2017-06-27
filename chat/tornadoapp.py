@@ -566,13 +566,34 @@ class MessagesHandler(MessagesCreator):
 		else:
 			raise ValidationError("Invalid channel status")
 
+	# todo if we shgetall and only then do async hset
+	# todo we can catch an issue when 2 concurrent users accepted the call
+	# todo but we didn't  send them ACCEPT_CALL as they both were in status 'offered'
+	# def accept_call_and_proxy_connection(self, in_message):
+	# 	connection_id = in_message[VarNames.CONNECTION_ID]
+	# 	channel_status = self.sync_redis.shgetall(connection_id)
+	# 	if channel_status and channel_status[self.id] == WebRtcRedisStates.RESPONDED:
+	# 		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
+	# 		for key in channel_status:  # del channel_status[self.id] not needed as self in responded
+	# 			if channel_status[key] == WebRtcRedisStates.READY:
+	# 				self.publish({
+	# 					VarNames.EVENT: Actions.ACCEPT_CALL,
+	# 					VarNames.CONNECTION_ID: connection_id,
+	# 					VarNames.WEBRTC_OPPONENT_ID: self.id,
+	# 					VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER,
+	# 				}, key)
+	# 	else:
+	# 		raise ValidationError("Invalid channel status")
+
 	def accept_call_and_proxy_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
-		channel_status = self.sync_redis.shgetall(connection_id)
-		if channel_status and channel_status[self.id] == WebRtcRedisStates.RESPONDED:
-			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
-			for key in channel_status:  # del channel_status[self.id] not needed as self in responded
-				if channel_status[key] == WebRtcRedisStates.READY:
+		self_status = self.sync_redis.shget(connection_id, self.id)
+		if self_status == WebRtcRedisStates.RESPONDED:
+			self.sync_redis.hset(connection_id, self.id, WebRtcRedisStates.READY)
+			channel_status = self.sync_redis.shgetall(connection_id)
+			del channel_status[self.id]
+			for key in channel_status:
+				if channel_status[key] != WebRtcRedisStates.CLOSED:
 					self.publish({
 						VarNames.EVENT: Actions.ACCEPT_CALL,
 						VarNames.CONNECTION_ID: connection_id,

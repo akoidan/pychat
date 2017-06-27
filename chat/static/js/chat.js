@@ -2027,6 +2027,15 @@ function SenderPeerConnection(connectionId, opponentWsId, removeChildPeerReferen
 	self.handleAnswer = function () {
 		self.log('answer received')();
 	};
+	self.createOffer = function() {
+		self.pc.createOffer(function (offer) {
+			self.log('Creating offer')();
+			self.pc.setLocalDescription(offer, function () {
+				self.log('Sending offer  to remote')();
+				self.sendWebRtcEvent(offer);
+			}, self.failWebRtcP2);
+		}, self.failWebRtcP1, self.sdpConstraints);
+	};
 }
 
 function ReceiverPeerConnection(connectionId, opponentWsId, removeChildPeerReferenceFn) {
@@ -2219,6 +2228,7 @@ function BaseTransferHandler(removeReferenceFn) {
 	};
 	self.setConnectionId = function (id) {
 		self.connectionId = id;
+		logger.webrtc(id, "CallHandler initialized")();
 		// self.waitForAnswer(); todo mulrirtc
 	};
 	self.finish = function (text) {
@@ -2318,9 +2328,43 @@ function CallWindow(chatHandler) {
 		self.dom.videoStatusIcon.className = value ? "icon-videocam" : "icon-no-videocam callActiveIcon";
 		self.dom.fs.video.className = value ? "icon-webrtc-video" : "icon-webrtc-novideo";
 		CssUtils.setVisibility(self.dom.local, value);
-		var title = value ? "Turn off your webcamera" : "Turn on your webcamera";
+		var title = value ? "Turn off your webcam" : "Turn on your webcam";
 		self.dom.videoStatusIcon.title = title;
 		self.dom.fs.video.title = title;
+	};
+	self.attachDomEvents = function () {
+		self.dom.callVolume.addEventListener('input', self.changeVolume);
+		self.dom.videoStatusIcon.onclick = self.toggleVideo;
+		self.dom.fs.video.onclick = self.toggleVideo;
+		self.dom.hangUpIcon.onclick = self.hangUp;
+		self.dom.fs.hangup.onclick = self.hangUp;
+		self.dom.fs.audio.onclick = self.toggleMic;
+		self.dom.audioStatusIcon.onclick = self.toggleMic;
+		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
+		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
+			document.addEventListener(fullScreenChangeEvents[i], self.onExitFullScreen, false);
+		}
+		var elem = self.dom.videoContainer;
+		if (elem.requestFullscreen) {
+			//nothing
+		} else if (elem.msRequestFullscreen) {
+			elem.requestFullscreen = elem.msRequestFullscreen;
+			document.cancelFullScreen = document.msCancelFullScreen;
+		} else if (elem.mozRequestFullScreen) {
+			elem.requestFullscreen = elem.mozRequestFullScreen;
+			document.cancelFullScreen = document.mozCancelFullScreen;
+		} else if (elem.webkitRequestFullscreen) {
+			elem.requestFullscreen = elem.webkitRequestFullscreen;
+			document.cancelFullScreen = document.webkitCancelFullScreen;
+		} else {
+			growlError("Can't enter fullscreen");
+		}
+		//self.dom.remote.ondblclick = self.enterFullScreenMode; TODO
+		self.dom.fs.enterFullScreen.onclick = self.enterFullScreenMode;
+		self.dom.fs.minimize.onclick = self.exitFullScreen;
+		self.dom.fs.hangup.title = 'Hang up';
+		self.dom.hangUpIcon.title = self.dom.fs.hangup.title;
+		self.idleTime = 0;
 	};
 	self.answerWebRtcCall = function () {
 		self.lastHandler.accept();
@@ -2329,7 +2373,6 @@ function CallWindow(chatHandler) {
 		self.setVideo(false);
 		// TODO
 		// self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
-		// self.createAfterResponseCall();
 	};
 	self.declineWebRtcCall = function (dontResponde) {
 		self.callPopup.hide();
@@ -2343,7 +2386,6 @@ function CallWindow(chatHandler) {
 		self.setAudio(true);
 		self.setVideo(true);
 		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
-		self.createAfterResponseCall();
 	};
 	self.getCallPopup = function () {
 		if (!self.callPopup) {
@@ -2351,7 +2393,7 @@ function CallWindow(chatHandler) {
 		}
 		return self.callPopup;
 	};
-	self.init = function() {
+	self.renderDom = function() {
 		var iwc = document.createElement('DIV');
 		self.dom.videoContainer.appendChild(self.dom.local);
 		self.dom.local.setAttribute('muted', true);
@@ -2402,7 +2444,10 @@ function CallWindow(chatHandler) {
 		callContainerIcons.appendChild(volumeLevelsHolder);
 		volumeLevelsHolder.appendChild(self.dom.callVolume);
 		volumeLevelsHolder.appendChild(self.dom.microphoneLevel);
-		self.dom.callVolume.addEventListener('input', self.changeVolume);
+	};
+	self.init = function() {
+		self.renderDom();
+		self.attachDomEvents();
 	};
 	self.offerCall = function() {
 		webRtcApi.offerCall(self, self.chatHandler.roomId);
@@ -2785,13 +2830,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 			growlError(error);
 			self.logErr(error)();
 		}
-		self.pc.createOffer(function (offer) {
-			self.log('Creating offer')();
-			self.pc.setLocalDescription(offer, function () {
-				self.log('Sending offer  to remote')();
-				self.sendWebRtcEvent(offer);
-			}, self.failWebRtcP2);
-		}, self.failWebRtcP1, self.sdpConstraints);
+		self.createOffer();
 	};
 	self.onreceiveChannelOpen = function () {
 		self.log('Channel is open, slicing file: {} {} {} {}', self.fileName, bytesToSize(self.fileSize), self.file.type, getDay(self.file.lastModifiedDate))();
@@ -2838,21 +2877,30 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 }
 
 
-function CallSenderPeerConnection(connectionId, wsOpponentId) {
+function CallSenderPeerConnection(connectionId, wsOpponentId, removeFromParentFn, callWindow) {
 	var self = this;
-	SenderPeerConnection.call(self, connectionId, wsOpponentId);
-	CallPeerConnection.call(self);
+	SenderPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
+	CallPeerConnection.call(self, callWindow);
+	self.log("Created CallSenderPeerConnection")();
+	self.connectToRemote = function() {
+		self.createAfterResponseCall();
+	}
 }
 
 
-function CallReceiverPeerConnection(connectionId, wsOpponentId) {
+function CallReceiverPeerConnection(connectionId, wsOpponentId, removeFromParentFn, callWindow) {
 	var self = this;
-	ReceiverPeerConnection.call(self, connectionId, wsOpponentId);
-	CallPeerConnection.call(self);
+	ReceiverPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
+	CallPeerConnection.call(self, callWindow);
+	self.log("Created CallReceiverPeerConnection")();
+	self.connectToRemote = function() {
+		self.waitForAnswer();
+	}
 }
 
-function CallPeerConnection() {
+function CallPeerConnection(callWindow) {
 	var self = this;
+	self.callWindow = callWindow;
 	self.audioProcessors = {};
 	self.dom = {
 		remote: $('remoteVideo'), //
@@ -2962,8 +3010,8 @@ function CallPeerConnection() {
 		}
 	};
 	self.captureInput = function (callback, callIfNoSource) {
-		if (self.constraints.audio || self.constraints.video) {
-			navigator.getUserMedia(self.constraints, callback, self.failWebRtc);
+		if (self.callWindow.constraints.audio || self.callWindow.constraints.video) {
+			navigator.getUserMedia(self.callWindow.constraints, callback, self.failWebRtc);
 		} else if (callIfNoSource) {
 			callback();
 		}
@@ -3152,39 +3200,6 @@ function CallPeerConnection() {
 			singlePage.showDefaultPage();
 		}
 	};
-	self.attachDomEvents = function () {
-		self.dom.videoStatusIcon.onclick = self.toggleVideo;
-		self.dom.fs.video.onclick = self.toggleVideo;
-		self.dom.hangUpIcon.onclick = self.hangUp;
-		self.dom.fs.hangup.onclick = self.hangUp;
-		self.dom.fs.audio.onclick = self.toggleMic;
-		self.dom.audioStatusIcon.onclick = self.toggleMic;
-		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
-		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
-			document.addEventListener(fullScreenChangeEvents[i], self.onExitFullScreen, false);
-		}
-		var elem = self.dom.videoContainer;
-		if (elem.requestFullscreen) {
-			//nothing
-		} else if (elem.msRequestFullscreen) {
-			elem.requestFullscreen = elem.msRequestFullscreen;
-			document.cancelFullScreen = document.msCancelFullScreen;
-		} else if (elem.mozRequestFullScreen) {
-			elem.requestFullscreen = elem.mozRequestFullScreen;
-			document.cancelFullScreen = document.mozCancelFullScreen;
-		} else if (elem.webkitRequestFullscreen) {
-			elem.requestFullscreen = elem.webkitRequestFullscreen;
-			document.cancelFullScreen = document.webkitCancelFullScreen;
-		} else {
-			growlError("Can't enter fullscreen");
-		}
-		self.dom.remote.ondblclick = self.enterFullScreenMode;
-		self.dom.fs.enterFullScreen.onclick = self.enterFullScreenMode;
-		self.dom.fs.minimize.onclick = self.exitFullScreen;
-		self.dom.fs.hangup.title = 'Hang up';
-		self.dom.hangUpIcon.title = self.dom.fs.hangup.title;
-		self.idleTime = 0;
-	};
 	self.declineCall = function () {
 		self.declineWebRtcCall();
 
@@ -3194,24 +3209,28 @@ function CallPeerConnection() {
 		// TODO replace growl with System message in user thread and unread
 		growlInfo("<div>You have missed a call from <b>{}</b></div>".format(self.receiverName));
 	};
-	self.attachDomEvents();
 }
 
-function CallHandler(removeChildFn, callWindow) {
+function CallHandler(removeChildFn, callWindow, isReceiver) {
 	var self = this;
 	self.callWindow = callWindow;
+	self.acceptedPeers = [];
+	self.accepted = !isReceiver;
 	BaseTransferHandler.call(self, removeChildFn);
 	self.removeChild = removeChildFn;
+	self.createPeerConnection = function (userId, connId, opponentWsId) {
+		var PeerConnectionClass = userId > loggedUserId ? CallSenderPeerConnection : CallReceiverPeerConnection;
+		self.peerConnections[opponentWsId] = new PeerConnectionClass(
+				connId,
+				opponentWsId,
+				self.removeChildPeerReference,
+				self.callWindow
+		);
+	};
 	self.onreplyCall = function (message) {
-		// TODO
-		// self.peerConnections[message.opponentWsId] = new CallSenderPeerConnection(
-		// 		message.connId,
-		// 		message.opponentWsId,
-		// 		self.removeChildPeerReference
-		// );
-		// // TODO
-		// //self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
-		// growlInfo("User {} is called".format(message.user))
+		self.createPeerConnection(message.userId, message.connId, message.opponentWsId);
+		//self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
+		growlInfo("User {} is called".format(message.user))
 	};
 	self.sendOffer = function (newId, channel) {
 		var messageRequest = {
@@ -3231,18 +3250,28 @@ function CallHandler(removeChildFn, callWindow) {
 			action: 'acceptCall',
 			connId: self.connectionId
 		});
+		self.accepted = true;
+		self.acceptedPeers.forEach(function(e) {
+			self.peerConnections[e].connectToRemote();
+		})
 	};
 	self.initAndDisplayOffer = function (message) {
-		logger.info("initAndDisplayOffer call")();
+		logger.webrtc(message.connId, "CallHandler initialized")();
 		callWindow.setLastHandler(self);
 		wsHandler.sendToServer({
 			action: 'replyCall',
 			connId: message.connId
 		});
+		self.acceptedPeers.push(message.opponentWsId);
+		self.createPeerConnection(message.userId, message.connId, message.opponentWsId);
 		self.showOffer(message);
 	};
 	self.onacceptCall = function (message) {
-		console.log('todo', message);
+		if (self.accepted) {
+			self.peerConnections[message.opponentWsId].connectToRemote();
+		} else {
+			self.acceptedPeers.push(message.opponentWsId);
+		}
 	};
 }
 
@@ -3293,7 +3322,7 @@ function WebRtcApi() {
 		if (!chatHandler) {
 			throw "Somebody tried to call you to nonexisted channel";
 		}
-		var handler = new CallHandler(self.removeChildReference, chatHandler.getCallWindow());
+		var handler = new CallHandler(self.removeChildReference, chatHandler.getCallWindow(), true);
 		// if (self.timeoutFunnction) {
 		// 	wsHandler.sendToServer('busy'); // TODO multirtc
 		// }
