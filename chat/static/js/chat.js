@@ -2116,9 +2116,6 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 			opponentWsId: self.opponentWsId
 		});
 	};
-	self.isActive = function () {
-		return self.localStream && self.localStream.active;
-	};
 	self.sendBaseEvent = function (type, content) {
 		self.defaultSendEvent('sendRtcData', type, content);
 	};
@@ -2313,6 +2310,28 @@ function CallHandler(roomId) {
 		audio: true,
 		video: true
 	};
+	self.hidePhoneIcon = function () {
+		if (self.dom.phoneIcon) {
+			CssUtils.deleteElement(self.dom.phoneIcon);
+			delete self.dom.phoneIcon;
+		}
+	};
+	self.showPhoneIcon = function () {
+		self.hidePhoneIcon();
+		self.dom.phoneIcon = document.createElement('i');
+		self.dom.phoneIcon.className = 'icon-phone';
+		var roomNameLi = channelsHandler.channels[self.roomId].dom.roomNameLi;
+		roomNameLi.insertBefore(self.dom.phoneIcon, roomNameLi.firstChild);
+	};
+	self.isActive = function () {
+		return self.localStream && self.localStream.active;
+	};
+	self.setIconState = function (isCall) {
+		isCall = isCall || self.isActive();
+		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
+		CssUtils.setVisibility(self.dom.videoContainer, isCall);
+		CssUtils.setVisibility(self.dom.callIcon, !isCall);
+	};
 	self.setAudio = function (value) {
 		self.constraints.audio = value;
 		self.dom.audioStatusIcon.className = value ? "icon-mic" : "icon-mute callActiveIcon";
@@ -2455,12 +2474,11 @@ function CallHandler(roomId) {
 	self.attachLocalStream = function (stream) {
 		self.localStream = stream;
 		if (stream) {
-			//self.pc.addStream(stream); TODO
 			setVideoSource(self.dom.local, stream);
 		}
 		self.setVideo(self.getTrack(true) != null);
 		self.setAudio(self.getTrack(false) != null);
-		self.createMicrophoneLevelVoice(stream, true);
+		self.createMicrophoneLevelVoice(stream, false);
 	};
 	self.captureInputStream = function (stream) {
 		self.setIconState(true);
@@ -2482,12 +2500,6 @@ function CallHandler(roomId) {
 		var message = "Failed to capture {} source, because {}".format(what, extractError(arguments));
 		growlError(message);
 		logger.error(message);
-	};
-	self.setIconState = function (isCall) {
-		isCall = isCall || self.isActive();
-		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
-		CssUtils.setVisibility(self.dom.videoContainer, isCall);
-		CssUtils.setVisibility(self.dom.callIcon, !isCall);
 	};
 	self.showCallDialog = function (isCallActive) {
 		isCallActive = isCallActive || self.isActive();
@@ -2546,7 +2558,7 @@ function CallHandler(roomId) {
 			audioProc.javascriptNode.connect(audioProc.audioContext.destination);
 			audioProc.prevVolumeValues = 0;
 			audioProc.volumeValuesCount = 0;
-			if (isLocalProc) {
+			if (!isLocalProc) {
 				(function (audioProc) {
 					audioProc.javascriptNode.onaudioprocess = function () {
 						if (!self.constraints.audio) {
@@ -2592,7 +2604,7 @@ function CallHandler(roomId) {
 		self.showCallDialog(true);
 	};
 	self.showAndAttachCallDialogOnResponse = function () {
-		channelsHandler.setActiveChannel(self.receiverRoomId);
+		channelsHandler.setActiveChannel(self.roomId);
 		channelsHandler.getActiveChannel().setChannelAttach(true);
 		CssUtils.showElement(webRtcApi.dom.callContainer);
 	};
@@ -2630,12 +2642,23 @@ function CallHandler(roomId) {
 		self.toggleInput(false);
 	};
 	self.createCallPeerConnection = function (userId, connId, opponentWsId) {
+		var remoteVideo = document.createElement('video');
+		self.dom.videoContainer.appendChild(remoteVideo);
+		remoteVideo.className = 'remoteVideo';
 		var PeerConnectionClass = userId > loggedUserId ? CallSenderPeerConnection : CallReceiverPeerConnection;
 		self.peerConnections[opponentWsId] = new PeerConnectionClass(
 				connId,
 				opponentWsId,
-				self.removeChildPeerReference
+				self.removeChildPeerReference,
+				remoteVideo,
+				self.createMicrophoneLevelVoice,
+				self.onStreamAttached
 		);
+	};
+	self.onStreamAttached = function(opponentWsId) {
+		self.setHeaderText("Talking with <b>{}</b>".format(self.receiverName));
+		self.setIconState(true);
+		self.showPhoneIcon();
 	};
 	self.onreplyCall = function (message) {
 		self.createCallPeerConnection(message.userId, message.connId, message.opponentWsId);
@@ -2665,7 +2688,7 @@ function CallHandler(roomId) {
 		});
 		self.accepted = true;
 		self.acceptedPeers.forEach(function(e) {
-			self.peerConnections[e].connectToRemote();
+			self.peerConnections[e].connectToRemote(self.localStream);
 		})
 	};
 	self.initAndDisplayOffer = function (message) {
@@ -2680,7 +2703,7 @@ function CallHandler(roomId) {
 	};
 	self.onacceptCall = function (message) {
 		if (self.accepted) {
-			self.peerConnections[message.opponentWsId].connectToRemote();
+			self.peerConnections[message.opponentWsId].connectToRemote(self.localStream);
 		} else {
 			self.acceptedPeers.push(message.opponentWsId);
 		}
@@ -3101,38 +3124,46 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 }
 
 
-function CallSenderPeerConnection(connectionId, wsOpponentId, removeFromParentFn) {
+function CallSenderPeerConnection(
+		connectionId,
+		wsOpponentId,
+		removeFromParentFn,
+		remoteVideo,
+		createMicrophoneLevelVoice,
+		onStreamAttached) {
 	var self = this;
 	SenderPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
-	CallPeerConnection.call(self);
+	CallPeerConnection.call(self, remoteVideo, createMicrophoneLevelVoice, onStreamAttached);
 	self.log("Created CallSenderPeerConnection")();
-	self.connectToRemote = function() {
+	self.connectToRemote = function(stream) {
 		self.createPeerConnection();
 		self.createOffer();
+		self.pc.addStream(stream);
 	}
 }
 
 
-function CallReceiverPeerConnection(connectionId, wsOpponentId, removeFromParentFn) {
+function CallReceiverPeerConnection(
+		connectionId,
+		wsOpponentId,
+		removeFromParentFn,
+		remoteVideo,
+		createMicrophoneLevelVoice,
+		onStreamAttached) {
 	var self = this;
 	ReceiverPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
-	CallPeerConnection.call(self);
+	CallPeerConnection.call(self, remoteVideo, createMicrophoneLevelVoice, onStreamAttached);
 	self.log("Created CallReceiverPeerConnection")();
-	self.connectToRemote = function() {
+	self.connectToRemote = function(stream) {
 		self.waitForAnswer();
+		self.pc.addStream(stream);
 	}
 }
 
-function CallPeerConnection() {
+function CallPeerConnection(remoteVideo, createMicrophoneLevelVoice, onStreamAttached) {
 	var self = this;
 	self.dom = {
-		remote: $('remoteVideo'), //
-		local: $('localVideo'), //
-		hangUpIcon: $('hangUpIcon'), //
-		audioStatusIcon: $('audioStatusIcon'), //
-		videoStatusIcon: $('videoStatusIcon'), //
-		callIcon: $('callIcon'), //
-		microphoneLevel: $("microphoneLevel"),
+		remote: remoteVideo
 	};
 	self.onsetError = function (message) {
 		growlError(message.content)
@@ -3194,25 +3225,10 @@ function CallPeerConnection() {
 		self.createPeerConnectionParent();
 		self.pc.onaddstream = function (event) {
 			setVideoSource(self.dom.remote, event.stream);
-			self.createMicrophoneLevelVoice(event.stream, false);
-			self.setHeaderText("Talking with <b>{}</b>".format(self.receiverName));
-			self.setIconState(true);
+			createMicrophoneLevelVoice(event.stream, self.opponentWsId);
+			onStreamAttached(self.opponentWsId);
 			self.log("Stream attached")();
-			self.showPhoneIcon();
 		};
-	};
-	self.showPhoneIcon = function () {
-		self.hidePhoneIcon();
-		self.dom.phoneIcon = document.createElement('i');
-		self.dom.phoneIcon.className = 'icon-phone';
-		var roomNameLi = channelsHandler.channels[self.receiverRoomId].dom.roomNameLi;
-		roomNameLi.insertBefore(self.dom.phoneIcon, roomNameLi.firstChild);
-	};
-	self.hidePhoneIcon = function () {
-		if (self.dom.phoneIcon) {
-			CssUtils.deleteElement(self.dom.phoneIcon);
-			delete self.dom.phoneIcon;
-		}
 	};
 	self.closeEventsParent = self.closeEvents;
 	self.closeEvents = function (text) {
