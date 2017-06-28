@@ -2028,10 +2028,11 @@ function SenderPeerConnection(connectionId, opponentWsId, removeChildPeerReferen
 		self.log('answer received')();
 	};
 	self.createOffer = function() {
+		self.log('Creating offer...')();
 		self.pc.createOffer(function (offer) {
-			self.log('Creating offer')();
+			self.log('Created offer, setting local description')();
 			self.pc.setLocalDescription(offer, function () {
-				self.log('Sending offer  to remote')();
+				self.log('Sending offer to remote')();
 				self.sendWebRtcEvent(offer);
 			}, self.failWebRtc('setLocalDescription'));
 		}, self.failWebRtc('createOffer'), self.sdpConstraints);
@@ -2150,6 +2151,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
 		self.pc.oniceconnectionstatechange = self.oniceconnectionstatechange;
 		self.pc.onicecandidate = function (event) {
+			self.log('onicecandidate');
 			if (event.candidate) {
 				self.sendWebRtcEvent(event.candidate);
 			}
@@ -2384,11 +2386,10 @@ function CallHandler(roomId) {
 		self.idleTime = 0;
 	};
 	self.answerWebRtcCall = function () {
-		self.accept();
 		self.setAudio(true);
 		self.setVideo(false);
-		// TODO
-		// self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
+		self.accept();
+		self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
 	};
 	self.declineWebRtcCall = function (dontResponde) {
 		self.callPopup.hide();
@@ -2543,6 +2544,14 @@ function CallHandler(roomId) {
 		}
 		return values / length;
 	};
+	self.showNoMicError = function () {
+		var url = isChrome ? 'setting in chrome://settings/content' : 'your browser settings';
+		url += navigator.platform.indexOf('Linux') >= 0 ?
+				'. Open pavucontrol for more info' :
+				' . Right click on volume icon in system tray -> record devices -> input -> microphone';
+		growlError('<div>Unable to capture input from microphone. Check your microphone connection or {}'
+				.format(url));
+	};
 	self.createMicrophoneLevelVoice = function (stream, isLocalProc) {
 		try {
 			self.audioProcessors[isLocalProc] = {};
@@ -2682,14 +2691,14 @@ function CallHandler(roomId) {
 		self.createAfterResponseCall();
 	};
 	self.sendAcceptAndInitPeerConnections = function () {
+		self.accepted = true;
+		self.acceptedPeers.forEach(function(e) {
+			self.peerConnections[e].connectToRemote(self.localStream);
+		});
 		wsHandler.sendToServer({
 			action: 'acceptCall',
 			connId: self.connectionId
 		});
-		self.accepted = true;
-		self.acceptedPeers.forEach(function(e) {
-			self.peerConnections[e].connectToRemote(self.localStream);
-		})
 	};
 	self.initAndDisplayOffer = function (message) {
 		logger.webrtc(message.connId, "CallHandler initialized")();
@@ -3137,8 +3146,8 @@ function CallSenderPeerConnection(
 	self.log("Created CallSenderPeerConnection")();
 	self.connectToRemote = function(stream) {
 		self.createPeerConnection();
-		self.createOffer();
 		self.pc.addStream(stream);
+		self.createOffer();
 	}
 }
 
@@ -3212,22 +3221,14 @@ function CallPeerConnection(remoteVideo, createMicrophoneLevelVoice, onStreamAtt
 	self.channelOpen = function () {
 		self.log('Opened a new chanel')();
 	};
-	self.showNoMicError = function () {
-		var url = isChrome ? 'setting in chrome://settings/content' : 'your browser settings';
-		url += navigator.platform.indexOf('Linux') >= 0 ?
-				'. Open pavucontrol for more info' :
-				' . Right click on volume icon in system tray -> record devices -> input -> microphone';
-		growlError('<div>Unable to capture input from microphone. Check your microphone connection or {}'
-				.format(url));
-	};
 	self.createPeerConnectionParent = self.createPeerConnection;
 	self.createPeerConnection = function () {
 		self.createPeerConnectionParent();
 		self.pc.onaddstream = function (event) {
+			self.log("onaddstream")();
 			setVideoSource(self.dom.remote, event.stream);
 			createMicrophoneLevelVoice(event.stream, self.opponentWsId);
 			onStreamAttached(self.opponentWsId);
-			self.log("Stream attached")();
 		};
 	};
 	self.closeEventsParent = self.closeEvents;
