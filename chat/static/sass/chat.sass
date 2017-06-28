@@ -505,6 +505,18 @@ p
 	width: 100%
 	padding-top: 10px
 
+	.hangUpHolder
+		display: inline-block
+		position: relative
+		width: 46px
+		height: 28px
+		margin-left: 10px
+		margin-top: -7px
+		.icon-hang-up
+			position: absolute
+			font-size: 35px
+			top: 0
+			left: 0
 
 =microphone-after
 	background-color: rgb(28, 30, 29)
@@ -690,11 +702,6 @@ p
 			&.video-answer-btn
 				margin: 8px 0
 
-.icon-hang-up
-	float: right
-	font-size: 40px
-	margin: -6px 0 -25px 6px
-
 .fullscreen
 	&.videoContainer
 		background-color: black
@@ -710,12 +717,17 @@ p
 
 .micVideoWrapper
 	position: relative
-	> input
+	> div
 		position: absolute
 		bottom: 5px
 		display: none
+		z-index: 3
 		left: calc(50% - 50px)
-	&:hover input
+		$color: rgba(24, 24, 25, 0.82)
+		background-color: $color
+		border-radius: 6px
+		box-shadow: 0 0 6px 6px $color
+	&:hover div
 		display: block
 
 .icon-webrtc-cont

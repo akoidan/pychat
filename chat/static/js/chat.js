@@ -2300,6 +2300,7 @@ function CallHandler(roomId) {
 		audioStatusIcon: document.createElement('i'),
 		videoStatusIcon: document.createElement('i'),
 		hangUpIcon: document.createElement('i'),
+		hangUpHolder: document.createElement('div'),
 		microphoneLevel: document.createElement('progress'),
 		callIcon: document.createElement('i'),
 		fs: {
@@ -2333,7 +2334,7 @@ function CallHandler(roomId) {
 	};
 	self.setIconState = function (isCall) {
 		isCall = isCall || self.isActive();
-		CssUtils.setVisibility(self.dom.hangUpIcon, isCall);
+		CssUtils.setVisibility(self.dom.hangUpHolder, isCall);
 		CssUtils.setVisibility(self.dom.videoContainer, isCall);
 		CssUtils.setVisibility(self.dom.callIcon, !isCall);
 	};
@@ -2443,16 +2444,19 @@ function CallHandler(roomId) {
 		self.dom.fs.enterFullScreen.title = 'Fullscreen';
 		enterFullScreenHolder.appendChild(self.dom.fs.enterFullScreen);
 
-		self.dom.hangUpIcon.className = 'icon-hang-up ' + CssUtils.visibilityClass;
+		self.dom.hangUpHolder.className = 'hangUpHolder '+CssUtils.visibilityClass;
+		self.dom.hangUpHolder.appendChild(self.dom.hangUpIcon);
+		self.dom.hangUpIcon.className = 'icon-hang-up ';
 		self.dom.hangUpIcon.title = 'Hang Up';
 		self.dom.microphoneLevel.setAttribute("max", "160");
+		self.dom.microphoneLevel.setAttribute("value", "0");
 		self.dom.microphoneLevel.setAttribute("title", "Your microphone level");
 		self.dom.microphoneLevel.className = 'microphoneLevel';
 		callContainerIcons.appendChild(self.dom.callIcon);
 		callContainerIcons.appendChild(self.dom.audioStatusIcon);
 		callContainerIcons.appendChild(self.dom.videoStatusIcon);
 		callContainerIcons.appendChild(enterFullScreenHolder);
-		callContainerIcons.appendChild(self.dom.hangUpIcon);
+		callContainerIcons.appendChild(self.dom.hangUpHolder);
 		callContainerIcons.appendChild(self.dom.microphoneLevel);
 	};
 	self.init = function() {
@@ -3195,7 +3199,9 @@ function CallPeerConnection(videoContainer, onStreamAttached) {
 	videoContainer.appendChild(self.dom.remote);
 	self.dom.remote.className = 'remoteVideo';
 	self.dom.callVolume.addEventListener('input', self.changeVolume);
-	videoContainer.appendChild(self.dom.callVolume);
+	var colVolumeWrapper = document.createElement('div');
+	videoContainer.appendChild(colVolumeWrapper);
+	colVolumeWrapper.appendChild(self.dom.callVolume);
 	self.dom.callVolume.setAttribute("type", "range");
 	self.dom.callVolume.setAttribute("value", "100");
 	self.dom.callVolume.setAttribute("title", "Volume level");
