@@ -1,20 +1,32 @@
 ![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7--1.9-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/djangochat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/djangochat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/djangochat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/djangochat)
 
-What is it?
+[pychat.org](http://pychat.org/)
 ==============
-This is free web (browser) chat. It allows users send instant text messages or images, make video/audio calls, send files and other useful stuff.
+This is web (browser) chat. It allows users send instant text messages or images, make video/audio calls, send files and other useful stuff.
+
+Table of contents
+=================
+  * [Breaf description](#How-it-works?)
+  * [Installation](#Installation)
+    * [Windows](#Windows)
+    * [Ubuntu](#Ubuntu)
+    * [Archlinux](#Archlinux)
+    * [CentOs](#CentOs)
+    * [Production](#Production)
+  * [Initializing](#Initializing)
+  * [Running](#Running)
+  * [Jetbrains filewatcher](#Jetbrains-filewatcher)
+  * [TODO list](#TODO)
 
 How it works?
-==============
-Chat is written in **Python** with [django](https://www.djangoproject.com/). For handling realtime messages [WebSockets](https://en.wikipedia.org/wiki/WebSocket) are used: browser support on client part and asynchronous framework [Tornado](http://www.tornadoweb.org/) on server part. Messages are being broadcast by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using [tornado-redis](https://github.com/leporo/tornado-redis) backend. Redis is also used as django session backend and for storing current users online.  For video call [webrtc](https://webrtc.org/) technology was used with stun server to make a connection, which means you will always get the lowest ping and the best possible connection channel. Client part doesn't use any javascript frameworks (like jquery or datatables) in order to get best performance. Chat written as a singlePage application, so even if user navigates across different pages websocket connection doesn't break. Chat also supports OAuth2 login standard via FaceBook/Google. Css is compiled from [sass](http://sass-lang.com/guide). Server side can be run on any platform **Windows**, **Linux**, **Mac** with **Python 2.7** and **Python 3.x**.Client (users) can use the chat from any browser with websocket support: IE11, Edge, Chrome, Firefox, Android, Opera, Safari...  Wanna dive depper? WebRtc/FE UML diagrams you can find [here](https://www.draw.io/?lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=draw.io-uml_diagram.xml#Uhttps%3A%2F%2Fraw.githubusercontent.com%2FDeathangel908%2Fdjangochat-config%2Fmaster%2Fdraw.io-uml_diagram.xml). If you enable javascript [logs](https://i.snag.gy/k6wErU.jpg) in [profile](https://pychat.org/#/profile) page you will see log trace browser console about what's going o.
+=============
+Chat is written in **Python** with [django](https://www.djangoproject.com/). For handling realtime messages [WebSockets](https://en.wikipedia.org/wiki/WebSocket) are used: browser support on client part and asynchronous framework [Tornado](http://www.tornadoweb.org/) on server part. Messages are being broadcast by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using [tornado-redis](https://github.com/leporo/tornado-redis) backend. Redis is also used as django session backend and for storing current users online.  For video call [webrtc](https://webrtc.org/) technology was used with stun server to make a connection, which means you will always get the lowest ping and the best possible connection channel. Client part doesn't use any javascript frameworks (like jquery or datatables) in order to get best performance. Chat written as a singlePage application, so even if user navigates across different pages websocket connection doesn't break. Chat also supports OAuth2 login standard via FaceBook/Google. Css is compiled from [sass](http://sass-lang.com/guide). Server side can be run on any platform **Windows**, **Linux**, **Mac** with **Python 2.7** and **Python 3.x**.Client (users) can use the chat from any browser with websocket support: IE11, Edge, Chrome, Firefox, Android, Opera, Safari...
 
-[Live demo](http://pychat.org/)
-================
+Installation:
+=============
 
-If you want to serve chat on your server:
-==========================================================
-
-Instructions for *[Windows](https://www.microsoft.com/en-us/download/windows.aspx)*:
+*[Windows](https://www.microsoft.com/en-us/download/windows.aspx)*:
+-------------------------------------------------------------------
  1. Install [python](https://www.python.org/downloads/) with pip. Any version **Python2.7** or **Python 3.x** both are supported
  2. Add **pip** and **python** to `PATH` variable.
  3. Install [redis](https://github.com/MSOpenTech/redis/releases). Get the newest version or at least 2.8.
@@ -23,31 +35,34 @@ Instructions for *[Windows](https://www.microsoft.com/en-us/download/windows.asp
  6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can downloads download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
  7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`). 
 
-Instructions for *[Ubuntu](http://www.ubuntu.com/)*:
+[Ubuntu](http://www.ubuntu.com/):
+----------------------------------
  1. Install required packages: `apt-get install python pip mysql-server ruby`
  2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
  3. Install **sass**: `gem install sass`
 
-Instructions for *[Archlinux](https://www.archlinux.org/)*:
+[Archlinux](https://www.archlinux.org/):
+------------------------------------------
  1. Install required packages: `pacman -S python pip redis mariadb ruby`
  2. Follow the [database guide](https://wiki.archlinux.org/index.php/MySQL) to configure it if you need. 
  5. Install **sass**: `gem install sass`.
 
-Instructions for *[CentOs](https://www.centos.org/)* can be found in [production](https://github.com/Deathangel908/djangochat/tree/production) branch.
+[CentOs](https://www.centos.org/)
+---------------------------------------
+There's stale branch [production](https://github.com/Deathangel908/djangochat/tree/production) that was used for centos. Basic instruction you can find there.
 
+Production
+----------
 You can also find full production setup for *[Archlinux](https://www.archlinux.org/)* in [prod_archlinux](https://github.com/Deathangel908/djangochat/tree/prod_archlinux) branch
   
-After you finished installing programs and tools:
+Initializing:
+=============
  1. Install python packages with `pip install -r requirements.txt`. 
  2. Create database. Open mysql command tool: `mysql -u YOUR_USERNAME -p` and create database `create database django CHARACTER SET utf8 COLLATE utf8_general_ci`. Specify database connection options (username, password) in `chat/settings.py`. Next fill database with tables: `python manage.py init_db`. If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
  3. Static content fot chat stores in a [separate repository](https://github.com/Deathangel908/djangochat-config). To download all needed files and compile css execute: `sh download_content.sh`
-
-For developing you can also configure pycharm filewatcher to autocompile css:
- 1. arguments: `--no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded`
- 2. working directory: `$ProjectFileDir$/chat/static/sass`
- 3. output files to refresh: `$ProjectFileDir$/chat/static/css/`
  
-Afterwards to start the chat you need:
+Running:
+========
  0. Start `mysql` server if it's not started. 
  1. Start session holder: `redis-server`
  2. Start webSocket listener: `python manage.py start_tornado`
@@ -55,7 +70,18 @@ Afterwards to start the chat you need:
  4. Open in browser [http**s**://127.0.0.1:8000](https://127.0.0.1:8000).
  5. If you get an ssl error on establishing websocket connection in browser, that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
 
-# TODO
+Jetbrains filewatcher:
+=====================
+ 1. arguments: `--no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded`
+ 2. working directory: `$ProjectFileDir$/chat/static/sass`
+ 3. output files to refresh: `$ProjectFileDir$/chat/static/css/`
+ 
+Contributing:
+=============
+Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
+ 
+TODO
+====
 * Add showing time left and current send speed to file transfer dialog
 * add message queue if socketed is currently disconnected ???
 * Add FileSystem api to be able to store large files https://www.html5rocks.com/en/tutorials/file/filesystem/
