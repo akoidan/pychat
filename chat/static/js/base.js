@@ -550,7 +550,7 @@ onDocLoad(function () {
 	document.querySelectorAll('input[type=range]').forEach(styleInputRange);
 
 });
-function fixInputRangeStyle() {
+function fixInputRangeStyle() { // TODO this can be moved to element's style
 	var id = this.getAttribute('id');
 	var el = inputRangeStyles[id];
 	el.style.textContent =

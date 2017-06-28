@@ -2265,6 +2265,27 @@ function CallPopup(answerFn, videoAnswerFn, declineFn) {
 }
 
 
+function createMicrophoneLevelVoice(stream, onaudioprocess) {
+	try {
+		var audioProc = {};
+		audioProc.audioContext = new AudioContext();
+		audioProc.analyser = audioProc.audioContext.createAnalyser();
+		var microphone = audioProc.audioContext.createMediaStreamSource(stream);
+		audioProc.javascriptNode = audioProc.audioContext.createScriptProcessor(2048, 1, 1);
+		audioProc.analyser.smoothingTimeConstant = 0.3;
+		audioProc.analyser.fftSize = 1024;
+		microphone.connect(audioProc.analyser);
+		audioProc.analyser.connect(audioProc.javascriptNode);
+		audioProc.javascriptNode.connect(audioProc.audioContext.destination);
+		audioProc.prevVolumeValues = 0;
+		audioProc.volumeValuesCount = 0;
+		audioProc.javascriptNode.onaudioprocess = onaudioprocess(audioProc);
+	} catch (err) {
+		logger.error("Unable to use microphone level because {}", extractError(err))();
+	}
+}
+
+
 function CallHandler(roomId) {
 	var self = this;
 	BaseTransferHandler.call(self);
@@ -2284,7 +2305,6 @@ function CallHandler(roomId) {
 		audioStatusIcon: document.createElement('i'),
 		videoStatusIcon: document.createElement('i'),
 		hangUpIcon: document.createElement('i'),
-		callVolume: document.createElement('input'),
 		microphoneLevel: document.createElement('progress'),
 		callIcon: document.createElement('i'),
 		fs: {
@@ -2340,7 +2360,6 @@ function CallHandler(roomId) {
 		self.dom.fs.video.title = title;
 	};
 	self.attachDomEvents = function () {
-		self.dom.callVolume.addEventListener('input', self.changeVolume);
 		self.dom.videoStatusIcon.onclick = self.toggleVideo;
 		self.dom.fs.video.onclick = self.toggleVideo;
 		self.dom.hangUpIcon.onclick = self.hangUp;
@@ -2432,22 +2451,14 @@ function CallHandler(roomId) {
 
 		self.dom.hangUpIcon.className = 'icon-hang-up';
 		self.dom.hangUpIcon.title = 'Hang Up';
-		var volumeLevelsHolder = document.createElement('div');
-		volumeLevelsHolder.className = 'volumeLevelsHolder';
-		self.dom.callVolume.setAttribute("type", "range");
-		self.dom.callVolume.setAttribute("value", "100");
-		self.dom.callVolume.setAttribute("title", "Volume level");
 		self.dom.microphoneLevel.setAttribute("max", "160");
 		self.dom.microphoneLevel.setAttribute("title", "Your microphone level");
 		self.dom.microphoneLevel.className = 'microphoneLevel';
-		styleInputRange(self.dom.callVolume);
 		callContainerIcons.appendChild(self.dom.callIcon);
 		callContainerIcons.appendChild(self.dom.audioStatusIcon);
 		callContainerIcons.appendChild(self.dom.videoStatusIcon);
 		callContainerIcons.appendChild(enterFullScreenHolder);
-		callContainerIcons.appendChild(volumeLevelsHolder);
-		volumeLevelsHolder.appendChild(self.dom.callVolume);
-		volumeLevelsHolder.appendChild(self.dom.microphoneLevel);
+		callContainerIcons.appendChild(self.dom.microphoneLevel);
 	};
 	self.init = function() {
 		self.renderDom();
@@ -2467,7 +2478,21 @@ function CallHandler(roomId) {
 		}
 		self.setVideo(self.getTrack(true) != null);
 		self.setAudio(self.getTrack(false) != null);
-		self.createMicrophoneLevelVoice(stream, false);
+		createMicrophoneLevelVoice(stream, self.processAudio);
+	};
+	self.processAudio = function (audioProc) {
+		return function () {
+			if (!self.constraints.audio) {
+				return;
+			}
+			var value = self.getAverageAudioLevel(audioProc);
+			audioProc.prevVolumeValues += value;
+			audioProc.volumeValuesCount++;
+			if (audioProc.volumeValuesCount == 100 && audioProc.prevVolumeValues == 0) {
+				self.showNoMicError();
+			}
+			self.dom.microphoneLevel.value = value;
+		}
 	};
 	self.captureInputStream = function (stream) {
 		self.setIconState(true);
@@ -2508,10 +2533,6 @@ function CallHandler(roomId) {
 		self.setHeaderText("Confirm browser to use your input devices for call");
 		self.captureInput(self.captureInputStream);
 	};
-	self.changeVolume = function () {
-		//TODO set all remote volume level , move it each window
-		//self.dom.remote.volume = self.dom.callVolume.value / 100;
-	};
 	self.show = function() {
 		CssUtils.showElement(self.dom.callContainerContent);
 	};
@@ -2539,57 +2560,6 @@ function CallHandler(roomId) {
 				' . Right click on volume icon in system tray -> record devices -> input -> microphone';
 		growlError('<div>Unable to capture input from microphone. Check your microphone connection or {}'
 				.format(url));
-	};
-	self.createMicrophoneLevelVoice = function (stream, isLocalProc) {
-		try {
-			self.audioProcessors[isLocalProc] = {};
-			var audioProc = self.audioProcessors[isLocalProc];
-			audioProc.audioContext = new AudioContext();
-			audioProc.analyser = audioProc.audioContext.createAnalyser();
-			var microphone = audioProc.audioContext.createMediaStreamSource(stream);
-			audioProc.javascriptNode = audioProc.audioContext.createScriptProcessor(2048, 1, 1);
-			audioProc.analyser.smoothingTimeConstant = 0.3;
-			audioProc.analyser.fftSize = 1024;
-			microphone.connect(audioProc.analyser);
-			audioProc.analyser.connect(audioProc.javascriptNode);
-			audioProc.javascriptNode.connect(audioProc.audioContext.destination);
-			audioProc.prevVolumeValues = 0;
-			audioProc.volumeValuesCount = 0;
-			if (!isLocalProc) {
-				(function (audioProc) {
-					audioProc.javascriptNode.onaudioprocess = function () {
-						if (!self.constraints.audio) {
-							return;
-						}
-						var value = self.getAverageAudioLevel(audioProc);
-						audioProc.prevVolumeValues += value;
-						audioProc.volumeValuesCount++;
-						if (audioProc.volumeValuesCount == 100 && audioProc.prevVolumeValues == 0) {
-							self.showNoMicError();
-						}
-						self.dom.microphoneLevel.value = value;
-					};
-				})(audioProc);
-			} else {
-				(function (audioProc) {
-					audioProc.javascriptNode.onaudioprocess = function () {
-						var level = self.getAverageAudioLevel(audioProc); //256 max
-						var clasNu;
-						if (level >= 162) {
-							clasNu = 10;
-						} else if (level == 0) {
-							clasNu = 0
-						} else {
-							clasNu = Math.floor(level / 18) + 1;
-						}
-						self.dom.callVolume.className = 'vol-level-{}'.format(clasNu);
-					};
-				})(audioProc);
-			}
-
-		} catch (err) {
-			logger.error("Unable to use microphone level because {}", extractError(err))();
-		}
 	};
 	self.createCallAfterCapture = function (stream) {
 		self.attachLocalStream(stream);
@@ -2639,20 +2609,19 @@ function CallHandler(roomId) {
 		self.toggleInput(false);
 	};
 	self.createCallPeerConnection = function (userId, connId, opponentWsId) {
-		var remoteVideo = document.createElement('video');
-		self.dom.videoContainer.appendChild(remoteVideo);
-		remoteVideo.className = 'remoteVideo';
+		var videoContainer = document.createElement('div');
+		videoContainer.className = 'micVideoWrapper';
+		self.dom.videoContainer.appendChild(videoContainer);
 		var PeerConnectionClass = userId > loggedUserId ? CallSenderPeerConnection : CallReceiverPeerConnection;
 		self.peerConnections[opponentWsId] = new PeerConnectionClass(
 				connId,
 				opponentWsId,
 				self.removeChildPeerReference,
-				remoteVideo,
-				self.createMicrophoneLevelVoice,
+				videoContainer,
 				self.onStreamAttached
 		);
 	};
-	self.onStreamAttached = function(opponentWsId) {
+	self.onStreamAttached = function(opponentWsId) { // TODO this is called multiple times for each peer connection
 		self.setHeaderText("Talking with <b>{}</b>".format(self.receiverName));
 		self.setIconState(true);
 		self.showPhoneIcon();
@@ -3134,11 +3103,10 @@ function CallSenderPeerConnection(
 		wsOpponentId,
 		removeFromParentFn,
 		remoteVideo,
-		createMicrophoneLevelVoice,
 		onStreamAttached) {
 	var self = this;
 	SenderPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
-	CallPeerConnection.call(self, remoteVideo, createMicrophoneLevelVoice, onStreamAttached);
+	CallPeerConnection.call(self, remoteVideo, onStreamAttached);
 	self.log("Created CallSenderPeerConnection")();
 	self.connectToRemote = function(stream) {
 		self.createPeerConnection(stream);
@@ -3151,25 +3119,36 @@ function CallReceiverPeerConnection(
 		connectionId,
 		wsOpponentId,
 		removeFromParentFn,
-		remoteVideo,
-		createMicrophoneLevelVoice,
+		videoContainer,
 		onStreamAttached) {
 	var self = this;
 	ReceiverPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
-	CallPeerConnection.call(self, remoteVideo, createMicrophoneLevelVoice, onStreamAttached);
+	CallPeerConnection.call(self, videoContainer, onStreamAttached);
 	self.log("Created CallReceiverPeerConnection")();
 	self.connectToRemote = function(stream) {
 		self.createPeerConnection(stream);
 	}
 }
 
-function CallPeerConnection(remoteVideo, createMicrophoneLevelVoice, onStreamAttached) {
+function CallPeerConnection(videoContainer, onStreamAttached) {
 	var self = this;
 	self.dom = {
-		remote: remoteVideo
+		remote: document.createElement('video'),
+		callVolume: document.createElement('input')
 	};
+	videoContainer.appendChild(self.dom.remote);
+	self.dom.remote.className = 'remoteVideo';
+	self.dom.callVolume.addEventListener('input', self.changeVolume);
+	videoContainer.appendChild(self.dom.callVolume);
+	self.dom.callVolume.setAttribute("type", "range");
+	self.dom.callVolume.setAttribute("value", "100");
+	self.dom.callVolume.setAttribute("title", "Volume level");
+	styleInputRange(self.dom.callVolume);
 	self.onsetError = function (message) {
 		growlError(message.content)
+	};
+	self.changeVolume = function () {
+		self.dom.remote.volume = self.dom.callVolume.value / 100;
 	};
 	self.sendAccept = function () {
 		self.sendBaseEvent()
@@ -3221,10 +3200,24 @@ function CallPeerConnection(remoteVideo, createMicrophoneLevelVoice, onStreamAtt
 		self.pc.onaddstream = function (event) {
 			self.log("onaddstream")();
 			setVideoSource(self.dom.remote, event.stream);
-			createMicrophoneLevelVoice(event.stream, self.opponentWsId);
+			createMicrophoneLevelVoice(event.stream, self.processAudio);
 			onStreamAttached(self.opponentWsId);
 		};
 		self.pc.addStream(stream);
+	};
+	self.processAudio = function (audioProc) {
+		return function () {
+			var level = self.getAverageAudioLevel(audioProc); //256 max
+			var clasNu;
+			if (level >= 162) {
+				clasNu = 10;
+			} else if (level == 0) {
+				clasNu = 0
+			} else {
+				clasNu = Math.floor(level / 18) + 1;
+			}
+			self.dom.callVolume.className = 'vol-level-{}'.format(clasNu);
+		};
 	};
 	self.closeEventsParent = self.closeEvents;
 	self.closeEvents = function (text) {
