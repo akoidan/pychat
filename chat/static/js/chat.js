@@ -2051,18 +2051,6 @@ function ReceiverPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 			}, self.failWebRtc('setLocalDescription'));
 		}, self.failWebRtc('createAnswer'), self.sdpConstraints);
 	};
-	self.waitForAnswer = function () {
-		self.createPeerConnection();
-		self.log("Waiting for rtc datachannels.")();
-		self.pc.ondatachannel = self.gotReceiveChannel;
-	};
-	self.gotReceiveChannel = function (event) {
-		self.log('Received new channel')();
-		self.sendChannel = event.channel;
-		self.sendChannel.onmessage = self.onChannelMessage;
-		self.sendChannel.onopen = self.channelOpen;
-		//self.sendChannel.onclose = self.print;
-	};
 	self.onChannelMessage = function (msg) {
 // 		self.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();
 	}
@@ -2600,7 +2588,7 @@ function CallHandler(roomId) {
 			}
 
 		} catch (err) {
-			logger.error("Unable to use microphone level because {}")(extractError(err));
+			logger.error("Unable to use microphone level because {}", extractError(err))();
 		}
 	};
 	self.createCallAfterCapture = function (stream) {
@@ -3040,10 +3028,18 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 			}
 		}
 	};
-	self.superwaitForAnswer = self.waitForAnswer;
 	self.waitForAnswer = function () {
-		self.superwaitForAnswer();
+		self.createPeerConnection();
+		self.log("Waiting for rtc datachannels.")();
+		self.pc.ondatachannel = self.gotReceiveChannel;
 		self.downloadBar.setStatus("Establishing connection");
+	};
+	self.gotReceiveChannel = function (event) {
+		self.log('Received new channel')();
+		self.sendChannel = event.channel;
+		self.sendChannel.onmessage = self.onChannelMessage;
+		self.sendChannel.onopen = self.channelOpen;
+		//self.sendChannel.onclose = self.print;
 	};
 }
 
@@ -3145,8 +3141,7 @@ function CallSenderPeerConnection(
 	CallPeerConnection.call(self, remoteVideo, createMicrophoneLevelVoice, onStreamAttached);
 	self.log("Created CallSenderPeerConnection")();
 	self.connectToRemote = function(stream) {
-		self.createPeerConnection();
-		self.pc.addStream(stream);
+		self.createPeerConnection(stream);
 		self.createOffer();
 	}
 }
@@ -3164,8 +3159,7 @@ function CallReceiverPeerConnection(
 	CallPeerConnection.call(self, remoteVideo, createMicrophoneLevelVoice, onStreamAttached);
 	self.log("Created CallReceiverPeerConnection")();
 	self.connectToRemote = function(stream) {
-		self.waitForAnswer();
-		self.pc.addStream(stream);
+		self.createPeerConnection(stream);
 	}
 }
 
@@ -3222,7 +3216,7 @@ function CallPeerConnection(remoteVideo, createMicrophoneLevelVoice, onStreamAtt
 		self.log('Opened a new chanel')();
 	};
 	self.createPeerConnectionParent = self.createPeerConnection;
-	self.createPeerConnection = function () {
+	self.createPeerConnection = function (stream) {
 		self.createPeerConnectionParent();
 		self.pc.onaddstream = function (event) {
 			self.log("onaddstream")();
@@ -3230,6 +3224,7 @@ function CallPeerConnection(remoteVideo, createMicrophoneLevelVoice, onStreamAtt
 			createMicrophoneLevelVoice(event.stream, self.opponentWsId);
 			onStreamAttached(self.opponentWsId);
 		};
+		self.pc.addStream(stream);
 	};
 	self.closeEventsParent = self.closeEvents;
 	self.closeEvents = function (text) {
@@ -3435,6 +3430,7 @@ function WsHandler() {
 	self.setStatus = function (isOnline) {
 		var statusClass = isOnline ? self.dom.onlineClass : self.dom.offlineClass;
 		CssUtils.setOnOf(self.dom.onlineStatus, statusClass, [self.dom.onlineClass, self.dom.offlineClass]);
+		self.dom.onlineStatus.title = isOnline ? "Websocket connection established. You are online" : "You are offline. Connecting to server..."
 	};
 	self.onWsClose = function (e) {
 		self.setStatus(false);
