@@ -88,7 +88,7 @@ function Painter() {
 	self.dom.colorIcon = $('paintPickerIcon');
 	self.ctx = self.dom.canvas.getContext('2d');
 	self.mouse = {x: 0, y: 0};
-	self.serializer = new XMLSerializer();
+	//self.serializer = new XMLSerializer();
 	self.mouseDown = 0;
 	self.scale = 1;
 	self.originx = 0;
@@ -2145,13 +2145,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 			}
 		};
 	};
-	self.closeEvents = function (text) {
-		if (self.sendChannel && self.sendChannel.readyState !== 'closed') {
-			self.log("Closing chanel")();
-			self.sendChannel.close();
-		} else {
-			self.log("No channels to close")();
-		}
+	self.closePeerConnection = function (text) {
 		if (self.pc && self.pc.signalingState !== 'closed') {
 			self.log("Closing peer connection")();
 			self.pc.close();
@@ -2280,6 +2274,7 @@ function createMicrophoneLevelVoice(stream, onaudioprocess) {
 		audioProc.prevVolumeValues = 0;
 		audioProc.volumeValuesCount = 0;
 		audioProc.javascriptNode.onaudioprocess = onaudioprocess(audioProc);
+		return audioProc;
 	} catch (err) {
 		logger.error("Unable to use microphone level because {}", extractError(err))();
 	}
@@ -2385,7 +2380,7 @@ function CallHandler(roomId) {
 		} else {
 			growlError("Can't enter fullscreen");
 		}
-		//self.dom.remote.ondblclick = self.enterFullScreenMode; TODO
+		elem.ondblclick = self.enterFullScreenMode;
 		self.dom.fs.enterFullScreen.onclick = self.enterFullScreenMode;
 		self.dom.fs.minimize.onclick = self.exitFullScreen;
 		self.dom.fs.hangup.title = 'Hang up';
@@ -2444,12 +2439,11 @@ function CallHandler(roomId) {
 
 		var enterFullScreenHolder = document.createElement('div');
 		enterFullScreenHolder.className = 'enterFullScreenHolder';
-		var enterFullScreen = document.createElement('i');
-		enterFullScreen.className = 'icon-webrtc-fullscreen';
-		enterFullScreen.title = 'Fullscreen';
-		enterFullScreenHolder.appendChild(enterFullScreen);
+		self.dom.fs.enterFullScreen.className = 'icon-webrtc-fullscreen';
+		self.dom.fs.enterFullScreen.title = 'Fullscreen';
+		enterFullScreenHolder.appendChild(self.dom.fs.enterFullScreen);
 
-		self.dom.hangUpIcon.className = 'icon-hang-up';
+		self.dom.hangUpIcon.className = 'icon-hang-up ' + CssUtils.visibilityClass;
 		self.dom.hangUpIcon.title = 'Hang Up';
 		self.dom.microphoneLevel.setAttribute("max", "160");
 		self.dom.microphoneLevel.setAttribute("title", "Your microphone level");
@@ -2458,6 +2452,7 @@ function CallHandler(roomId) {
 		callContainerIcons.appendChild(self.dom.audioStatusIcon);
 		callContainerIcons.appendChild(self.dom.videoStatusIcon);
 		callContainerIcons.appendChild(enterFullScreenHolder);
+		callContainerIcons.appendChild(self.dom.hangUpIcon);
 		callContainerIcons.appendChild(self.dom.microphoneLevel);
 	};
 	self.init = function() {
@@ -2478,7 +2473,7 @@ function CallHandler(roomId) {
 		}
 		self.setVideo(self.getTrack(true) != null);
 		self.setAudio(self.getTrack(false) != null);
-		createMicrophoneLevelVoice(stream, self.processAudio);
+		self.audioProcessor = createMicrophoneLevelVoice(stream, self.processAudio);
 	};
 	self.processAudio = function (audioProc) {
 		return function () {
@@ -2673,6 +2668,59 @@ function CallHandler(roomId) {
 		} else {
 			self.acceptedPeers.push(message.opponentWsId);
 		}
+	};
+	self.hangUp = function () {
+		self.finish();
+		self.closeEvents("Call is finished.");
+	};
+	self.closeDialog = function () {
+		if (self.isActive()) {
+			self.hangUp();
+		} else {
+			singlePage.showDefaultPage();
+		}
+	};
+	self.closeEvents = function (text) { // TODO this should be called from every peer connection
+		if (text) {
+			growlInfo(text)
+		}
+		self.setHeaderText(loggedUser);
+		self.setIconState(false);
+		self.hidePhoneIcon();
+		self.dom.microphoneLevel.value = 0;
+		self.exitFullScreen();
+		//self.clearTimeout(); TODO multirtc
+	};
+	self.onExitFullScreen = function () {
+		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
+			CssUtils.removeClass(self.dom.videoContainer, 'fullscreen');
+			document.removeEventListener('mousemove', self.fsMouseMove, false);
+			clearInterval(self.hideContainerTimeoutRes);
+			self.dom.videoContainer.ondblclick = self.enterFullScreenMode;
+		}
+	};
+	self.exitFullScreen = function () {
+		document.cancelFullScreen();
+	};
+	self.hideContainerTimeout = function () {
+		self.idleTime++;
+		if (self.idleTime > 6) {
+			CssUtils.addClass(self.dom.videoContainer, 'inactive');
+		}
+	};
+	self.enterFullScreenMode = function () {
+		self.dom.videoContainer.removeEventListener('dblclick', self.enterFullScreenMode);
+		self.dom.videoContainer.requestFullscreen();
+		CssUtils.addClass(self.dom.videoContainer, 'fullscreen');
+		document.addEventListener('mousemove', self.fsMouseMove, false);
+		self.hideContainerTimeoutRes = setInterval(self.hideContainerTimeout, 1000);
+		/*to clear only function from resultOf setInterval should be passed, otherwise doesn't work*/
+	};
+	self.fsMouseMove = function () {
+		if (self.idleTime > 0) {
+			CssUtils.removeClass(self.dom.videoContainer, 'inactive');
+		}
+		self.idleTime = 0;
 	};
 	self.init();
 }
@@ -2897,7 +2945,15 @@ function FilePeerConnection() {
 	self.setTranseferdAmount = function (value) {
 		self.downloadBar.setValue(value);
 	};
-
+	self.closeEvents = function() {
+		self.closePeerConnection();
+		if (self.sendChannel && self.sendChannel.readyState !== 'closed') {
+			self.log("Closing chanel")();
+			self.sendChannel.close();
+		} else {
+			self.log("No channels to close")();
+		}
+	}
 }
 
 function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSize, removeChildPeerReferenceFn) {
@@ -3159,38 +3215,6 @@ function CallPeerConnection(videoContainer, onStreamAttached) {
 			'OfferToReceiveVideo': true
 		}
 	};
-	self.onExitFullScreen = function () {
-		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
-			CssUtils.removeClass(self.dom.videoContainer, 'fullscreen');
-			document.removeEventListener('mousemove', self.fsMouseMove, false);
-			clearInterval(self.hideContainerTimeoutRes);
-			self.dom.remote.ondblclick = self.enterFullScreenMode;
-		}
-	};
-	self.exitFullScreen = function () {
-		document.cancelFullScreen();
-	};
-
-	self.hideContainerTimeout = function () {
-		self.idleTime++;
-		if (self.idleTime > 6) {
-			CssUtils.addClass(self.dom.videoContainer, 'inactive');
-		}
-	};
-	self.enterFullScreenMode = function () {
-		self.dom.remote.removeEventListener('dblclick', self.enterFullScreenMode);
-		self.dom.videoContainer.requestFullscreen();
-		CssUtils.addClass(self.dom.videoContainer, 'fullscreen');
-		document.addEventListener('mousemove', self.fsMouseMove, false);
-		self.hideContainerTimeoutRes = setInterval(self.hideContainerTimeout, 1000);
-		/*to clear only function from resultOf setInterval should be passed, otherwise doesn't work*/
-	};
-	self.fsMouseMove = function () {
-		if (self.idleTime > 0) {
-			CssUtils.removeClass(self.dom.videoContainer, 'inactive');
-		}
-		self.idleTime = 0;
-	};
 	self.channelOpen = function () {
 		self.log('Opened a new chanel')();
 	};
@@ -3200,7 +3224,7 @@ function CallPeerConnection(videoContainer, onStreamAttached) {
 		self.pc.onaddstream = function (event) {
 			self.log("onaddstream")();
 			setVideoSource(self.dom.remote, event.stream);
-			createMicrophoneLevelVoice(event.stream, self.processAudio);
+			self.audioProcessor = createMicrophoneLevelVoice(event.stream, self.processAudio);
 			onStreamAttached(self.opponentWsId);
 		};
 		self.pc.addStream(stream);
@@ -3219,37 +3243,18 @@ function CallPeerConnection(videoContainer, onStreamAttached) {
 			self.dom.callVolume.className = 'vol-level-{}'.format(clasNu);
 		};
 	};
-	self.closeEventsParent = self.closeEvents;
-	self.closeEvents = function (text) {
-		//self.clearTimeout(); TODO multirtc
-		self.setHeaderText(loggedUser);
+	self.closeEvents = function () { //TODO this is called with text
+		self.closePeerConnection();
 		if (self.localStream) {
 			var tracks = self.localStream.getTracks();
 			for (var i = 0; i < tracks.length; i++) {
 				tracks[i].stop()
 			}
 		}
-		if (text) {
-			growlInfo(text)
+		if (self.audioProcessors && audioProcessors.javascriptNode) {
+			audioProcessors.javascriptNode.onaudioprocess = null;
 		}
-		self.setIconState(false);
-		self.hidePhoneIcon();
-		for (var key in self.audioProcessors) {
-			if (self.audioProcessors.hasOwnProperty(key)) {
-				var proc = self.audioProcessors[key];
-				if (proc.javascriptNode) {
-					proc.javascriptNode.onaudioprocess = null;
-				}
-			}
-		}
-		self.dom.microphoneLevel.value = 0;
-		self.dom.callVolume.className = 'vol-level-0';
-		self.exitFullScreen();
 		/*also executes removing event on exiting from fullscreen*/
-	};
-	self.hangUp = function () {
-		self.finish();
-		self.closeEvents("Call is finished.");
 	};
 	self.ondecline = function () {
 		self.closeEvents("User has declined the call");
@@ -3257,13 +3262,6 @@ function CallPeerConnection(videoContainer, onStreamAttached) {
 	self.ondestroyConnection = function () {
 		self.declineWebRtcCall(true);
 		self.closeEvents("Opponent hung up. Call is finished.");
-	};
-	self.closeDialog = function () {
-		if (self.isActive()) {
-			self.hangUp();
-		} else {
-			singlePage.showDefaultPage();
-		}
 	};
 	self.declineCall = function () {
 		self.declineWebRtcCall();
