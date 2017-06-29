@@ -90,6 +90,7 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 TODO
 ====
+* Replace opacity in css to darken and lighten color function of sass
 * file transfer - add ability to click on user on receivehandler popup (draggable)
 * Ability to restore minimized draggable
 * Add showing time left and current send speed to file transfer dialog

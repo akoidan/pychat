@@ -2492,7 +2492,8 @@ function CallHandler(roomId) {
 				message.opponentWsId,
 				self.removeChildPeerReference,
 				videoContainer,
-				self.onStreamAttached
+				self.onStreamAttached,
+				message.user
 		);
 	};
 	self.superRemoveChildPeerReference = self.removeChildPeerReference;
@@ -3072,10 +3073,11 @@ function CallSenderPeerConnection(
 		wsOpponentId,
 		removeFromParentFn,
 		remoteVideo,
-		onStreamAttached) {
+		onStreamAttached,
+		userName) {
 	var self = this;
 	SenderPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
-	CallPeerConnection.call(self, remoteVideo, onStreamAttached);
+	CallPeerConnection.call(self, remoteVideo, userName, onStreamAttached);
 	self.log("Created CallSenderPeerConnection")();
 	self.connectToRemote = function(stream) {
 		self.createPeerConnection(stream);
@@ -3089,28 +3091,32 @@ function CallReceiverPeerConnection(
 		wsOpponentId,
 		removeFromParentFn,
 		videoContainer,
-		onStreamAttached) {
+		onStreamAttached,
+		userName) {
 	var self = this;
 	ReceiverPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
-	CallPeerConnection.call(self, videoContainer, onStreamAttached);
+	CallPeerConnection.call(self, videoContainer, userName, onStreamAttached);
 	self.log("Created CallReceiverPeerConnection")();
 	self.connectToRemote = function(stream) {
 		self.createPeerConnection(stream);
 	}
 }
 
-function CallPeerConnection(videoContainer, onStreamAttached) {
+function CallPeerConnection(videoContainer, userName, onStreamAttached) {
 	var self = this;
 	self.dom = {
+		userSpan: document.createElement('span'),
 		videoContainer: videoContainer,
 		remote: document.createElement('video'),
 		callVolume: document.createElement('input')
 	};
+	self.dom.userSpan.textContent = userName;
 	self.dom.videoContainer.appendChild(self.dom.remote);
 	self.dom.callVolume.addEventListener('input', self.changeVolume);
 	var colVolumeWrapper = document.createElement('div');
 	self.dom.videoContainer.appendChild(colVolumeWrapper);
 	colVolumeWrapper.appendChild(self.dom.callVolume);
+	self.dom.videoContainer.appendChild(self.dom.userSpan);
 	self.dom.callVolume.setAttribute("type", "range");
 	self.dom.callVolume.setAttribute("value", "100");
 	self.dom.callVolume.setAttribute("title", "Volume level");

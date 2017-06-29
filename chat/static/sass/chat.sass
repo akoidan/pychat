@@ -10,7 +10,7 @@
 	font-weight: bold
 
 
-@mixin hovered-user-room()
+%hovered-user-room
 	&:hover:not(.active-room)
 		cursor: pointer
 		background-color:  rgba(135, 135, 135, 0.3)
@@ -248,7 +248,7 @@ p
 		li
 			padding: 0 0 0 5px
 			border-radius: 2px
-			@include hovered-user-room
+			@extend %hovered-user-room
 
 #directUserTable,
 #rooms
@@ -258,7 +258,7 @@ p
 		border-radius: 3px
 		position: relative
 		height: 30px
-		@include hovered-user-room
+		@extend %hovered-user-room
 		&:hover
 			padding-right: 25px
 			.icon-cancel-circled-outline
@@ -710,25 +710,35 @@ p
 	.icon-webrtc-cont
 		display: block
 
+
 .micVideoWrapper
 	display: inline-block
 	position: relative
 	margin: 1px
+	$color: rgba(24, 24, 25, 0.82)
+	%asbolute
+		z-index: 3
+		position: absolute
+		background-color: $color
+		box-shadow: 0 0 6px 6px $color
+		border-radius: 6px
+		display: none
 	video
 		max-height: calc(60vh - 120px)
 		max-width: 100%
 	> div
-		position: absolute
+		@extend %asbolute
 		bottom: 5px
-		display: none
-		z-index: 3
-		left: calc(50% - 50px)
-		$color: rgba(24, 24, 25, 0.82)
-		background-color: $color
-		border-radius: 6px
-		box-shadow: 0 0 6px 6px $color
-	&:hover div
-		display: block
+		left: calc(50% - 55px)
+	> span
+		@extend %asbolute
+		top: calc(5px + 10%)
+		font-size: 20px
+		left: 50%
+		transform: translateX(-50%)
+	&:hover
+		div, span
+			display: block
 
 @import "chat-videos"
 
