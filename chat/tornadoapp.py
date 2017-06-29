@@ -613,14 +613,16 @@ class MessagesHandler(MessagesCreator):
 			self.sync_redis.hset(connection_id, self.id, WebRtcRedisStates.READY)
 			channel_status = self.sync_redis.shgetall(connection_id)
 			del channel_status[self.id]
+			message = {
+				VarNames.EVENT: Actions.ACCEPT_CALL,
+				VarNames.USER_ID: self.user_id,
+				VarNames.CONNECTION_ID: connection_id,
+				VarNames.WEBRTC_OPPONENT_ID: self.id,
+				VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER,
+			}
 			for key in channel_status:
 				if channel_status[key] != WebRtcRedisStates.CLOSED:
-					self.publish({
-						VarNames.EVENT: Actions.ACCEPT_CALL,
-						VarNames.CONNECTION_ID: connection_id,
-						VarNames.WEBRTC_OPPONENT_ID: self.id,
-						VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER,
-					}, key)
+					self.publish(message, key)
 		else:
 			raise ValidationError("Invalid channel status")
 

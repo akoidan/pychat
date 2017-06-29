@@ -317,6 +317,11 @@ var CssUtils = {
 	deleteElement: function(target) {
 		target.parentNode.removeChild(target)
 	},
+	deleteChildren: function (el) {
+		while (el.firstChild) {
+			el.removeChild(el.firstChild);
+		}
+	},
 	setOnOf: function(element, desiredClass, removeClasses) {
 		var className = element.className;
 		if (className == null) {

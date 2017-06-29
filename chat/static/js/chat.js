@@ -2114,13 +2114,25 @@ function CallPopup(answerFn, videoAnswerFn, declineFn) {
 	});
 	self.init = function () {
 		var answerButtons = document.createElement('div');
+		self.dom.users = document.createElement('table');
+		self.dom.users.className = 'table';
 		answerButtons.className = 'answerButtons noSelection';
 		answerButtons.appendChild(self.addButton('answerWebRtcCall', 'icon-call-aswer', 'answer-btn', 'Answer', answerFn));
 		answerButtons.appendChild(self.addButton('videoAnswerWebRtcCall', 'icon-videocam', 'video-answer-btn', 'With video', videoAnswerFn));
 		answerButtons.appendChild(self.addButton('declineWebRtcCall', 'icon-hang-up', 'decline-btn', 'Decline', declineFn));
+		self.dom.body.appendChild(self.dom.users);
 		self.dom.body.appendChild(answerButtons);
 		document.querySelector('body').appendChild(self.dom.container);
 		self.fixInputs();
+	};
+	self.inserRow = function (name, value) {
+		var raw = self.dom.users.insertRow();
+		var th = document.createElement('th');
+		raw.appendChild(th);
+		th.textContent = name;
+		var valueField = raw.insertCell();
+		valueField.textContent = value;
+		return th;
 	};
 	self.addButton = function (name, icon, className, text, onClickFn) {
 		var btn = document.createElement('button');
@@ -2139,11 +2151,15 @@ function CallPopup(answerFn, videoAnswerFn, declineFn) {
 		self.dom.callSound.pause();
 		self.super.hide();
 	};
-	self.show = function (user) {
-		var text = "{} calls".format(user);
+	self.show = function (user, channelName) {
+		var text = "{} calls".format(channelName);
 		self.setHeaderText(text);
+		self.inserRow("Initiator: ", user);
 		self.super.show();
 		Utils.checkAndPlay(self.dom.callSound);
+	};
+	self.closeEvents = function() {
+		CssUtils.deleteChildren(self.dom.users);
 	};
 	self.init();
 }
@@ -2155,6 +2171,7 @@ function CallHandler(roomId) {
 	self.acceptedPeers = [];
 	self.roomId = roomId;
 	self.audioProcessors = {};
+	self.callPopupTable = {};
 	self.setIsReceiver = function(isReceiver) {
 		self.accepted = !isReceiver;
 	};
@@ -2352,7 +2369,7 @@ function CallHandler(roomId) {
 			if (!self.constraints.audio) {
 				return;
 			}
-			var value = self.getAverageAudioLevel(audioProc);
+			var value = Utils.getAverageAudioLevel(audioProc);
 			audioProc.prevVolumeValues += value;
 			audioProc.volumeValuesCount++;
 			if (audioProc.volumeValuesCount == 100 && audioProc.prevVolumeValues == 0) {
@@ -2406,19 +2423,9 @@ function CallHandler(roomId) {
 	self.hide = function () {
 		CssUtils.showElement(self.dom.callContainerContent);
 	};
-	self.showOffer = function (message) {
-		self.getCallPopup().show(message.user);
+	self.showOffer = function (message, channelName) {
+		self.getCallPopup().show(message.user, channelName);
 		notifier.notify(message.user, "Calls you");
-	};
-	self.getAverageAudioLevel = function (audioProc) {
-		var array = new Uint8Array(audioProc.analyser.frequencyBinCount);
-		audioProc.analyser.getByteFrequencyData(array);
-		var values = 0;
-		var length = array.length;
-		for (var i = 0; i < length; i++) {
-			values += array[i];
-		}
-		return values / length;
 	};
 	self.showNoMicError = function () {
 		var url = isChrome ? 'setting in chrome://settings/content' : 'your browser settings';
@@ -2475,14 +2482,14 @@ function CallHandler(roomId) {
 	self.toggleMic = function () {
 		self.toggleInput(false);
 	};
-	self.createCallPeerConnection = function (userId, connId, opponentWsId) {
+	self.createCallPeerConnection = function (message) {
 		var videoContainer = document.createElement('div');
 		videoContainer.className = 'micVideoWrapper';
 		self.dom.videoContainerForVideos.insertBefore(videoContainer, self.dom.videoContainerForVideos.firstChild);
-		var PeerConnectionClass = userId > loggedUserId ? CallSenderPeerConnection : CallReceiverPeerConnection;
-		self.peerConnections[opponentWsId] = new PeerConnectionClass(
-				connId,
-				opponentWsId,
+		var PeerConnectionClass = message.userId > loggedUserId ? CallSenderPeerConnection : CallReceiverPeerConnection;
+		self.peerConnections[message.opponentWsId] = new PeerConnectionClass(
+				message.connId,
+				message.opponentWsId,
 				self.removeChildPeerReference,
 				videoContainer,
 				self.onStreamAttached
@@ -2501,9 +2508,10 @@ function CallHandler(roomId) {
 		self.setIconState(true);
 	};
 	self.onreplyCall = function (message) {
-		self.createCallPeerConnection(message.userId, message.connId, message.opponentWsId);
-		//self.peerConnections[message.connId].setHeaderText("Conn. success, wait for accept {}".format(self.user))
-		growlInfo("User {} is called".format(message.user))
+		self.createCallPeerConnection(message);
+		if (self.callPopup) { // if we're not call initiator
+			self.callPopupTable[message.userId] = self.callPopup.inserRow("Called:", message.user);
+		}
 	};
 	self.sendOffer = function (newId) {
 		var messageRequest = {
@@ -2527,7 +2535,7 @@ function CallHandler(roomId) {
 			connId: self.connectionId
 		});
 	};
-	self.initAndDisplayOffer = function (message) {
+	self.initAndDisplayOffer = function (message, channelName) {
 		self.connectionId = message.connId;
 		self.log("CallHandler initialized")();
 		wsHandler.sendToServer({
@@ -2535,13 +2543,14 @@ function CallHandler(roomId) {
 			connId: message.connId
 		});
 		self.acceptedPeers.push(message.opponentWsId);
-		self.createCallPeerConnection(message.userId, message.connId, message.opponentWsId);
-		self.showOffer(message);
+		self.createCallPeerConnection(message);
+		self.showOffer(message, channelName);
 	};
 	self.onacceptCall = function (message) {
 		if (self.accepted) {
 			self.peerConnections[message.opponentWsId].connectToRemote(self.localStream);
 		} else {
+			self.callPopupTable[message.userId].textContent = 'Talking:';
 			self.acceptedPeers.push(message.opponentWsId);
 		}
 	};
@@ -2557,9 +2566,13 @@ function CallHandler(roomId) {
 		if (text) {
 			growlInfo(text)
 		}
-		self.callPopup && self.callPopup.hide();
+		if (self.callPopup) {
+			self.callPopup.hide();
+
+		}
 		self.setHeaderText(loggedUser);
 		self.setIconState(false);
+		self.callPopupTable = {};
 		webRtcApi.removeChildReference(self.connectionId);
 		self.dom.microphoneLevel.value = 0;
 		self.exitFullScreen();
@@ -2627,6 +2640,7 @@ function FileTransferHandler(removeReferenceFn) {
 	};
 	self.dom.fileInfo = document.createElement('table');
 	self.init = function () {
+		self.dom.fileInfo.className = 'table';
 		document.querySelector('body').appendChild(self.dom.container);
 		CssUtils.addClass(self.dom.body, 'transferFile');
 		self.dom.iconMinimize = document.createElement('i');
@@ -2638,7 +2652,6 @@ function FileTransferHandler(removeReferenceFn) {
 		self.insertData('Size:', bytesToSize(self.fileSize));
 		self.dom.body.appendChild(self.dom.fileInfo);
 	};
-
 	self.insertData = function (name, value) {
 		var raw = self.dom.fileInfo.insertRow();
 		var th = document.createElement('th');
@@ -2703,6 +2716,7 @@ function FileReceiver(removeReferenceFn) {
 		notifier.notify(message.user, "Sends file {}".format(self.fileName));
 		self.init();
 		self.insertData("From:", self.opponentName);
+		self.setHeaderText("{} sends file".format(self.opponentName));
 		self.dom.connectionStatus = self.insertData('Status:', 'Received an offer');
 		self.addYesNo();
 	};
@@ -3134,7 +3148,7 @@ function CallPeerConnection(videoContainer, onStreamAttached) {
 	};
 	self.processAudio = function (audioProc) {
 		return function () {
-			var level = self.getAverageAudioLevel(audioProc); //256 max
+			var level = Utils.getAverageAudioLevel(audioProc); //256 max
 			var clasNu;
 			if (level >= 162) {
 				clasNu = 10;
@@ -3217,7 +3231,7 @@ function WebRtcApi() {
 		// TODO multirtc settimout
 		// self.timeoutFunnction = setTimeout(self.connections[message.connId].declineCall, self.callTimeoutTime);
 		self.connections[message.connId] = handler;
-		handler.initAndDisplayOffer(message);
+		handler.initAndDisplayOffer(message, chatHandler.roomName);
 	};
 	self.handle = function (data) {
 		if (data.handler === 'webrtc') {
@@ -3464,6 +3478,16 @@ var Utils = {
 		} catch (err) {
 			logger.error("Unable to use microphone level because {}", Utils.extractError(err))();
 		}
+	},
+	getAverageAudioLevel: function (audioProc) {
+		var array = new Uint8Array(audioProc.analyser.frequencyBinCount);
+		audioProc.analyser.getByteFrequencyData(array);
+		var values = 0;
+		var length = array.length;
+		for (var i = 0; i < length; i++) {
+			values += array[i];
+		}
+		return values / length;
 	},
 	showHelp: function () {
 		if (!suggestions) {

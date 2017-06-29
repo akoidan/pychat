@@ -90,6 +90,8 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 TODO
 ====
+* file transfer - add ability to click on user on receivehandler popup (draggable)
+* Ability to restore minimized draggable
 * Add showing time left and current send speed to file transfer dialog
 * add message queue if socketed is currently disconnected ???
 * Add FileSystem api to be able to store large files https://www.html5rocks.com/en/tutorials/file/filesystem/
