@@ -54,24 +54,9 @@ onDocLoad(function () {
 	painter = new Painter();
 	logger.info("Trying to resolve WebSocket Server")();
 	wsHandler.listenWS();
-	showHelp();
+	Utils.showHelp();
 });
 
-function readFileAsB64(file, callback, showGrowl) {
-	if (!file) {
-		logger.warn("Context contains no files")();
-	} else if (file.type.indexOf("image") < 0) {
-		webRtcApi.createWebrtcObject(FileSender, file);
-	} else {
-		var fileName = file.name ? file.name : '';
-		if (showGrowl) {
-			growlInfo("<span>Sending file <b>{}</b> ({}) to server</span>".format(fileName, bytesToSize(file.size)));
-		}
-		var reader = new FileReader();
-		reader.onload = callback;
-		reader.readAsDataURL(file);
-	}
-}
 
 function Painter() {
 	var self = this;
@@ -248,7 +233,7 @@ function Painter() {
 		self.readAndPasteCanvas(e.dataTransfer.files[0]);
 	};
 	self.readAndPasteCanvas = function (file) {
-		readFileAsB64(file, function (event) {
+		Utils.readFileAsB64(file, function (event) {
 			var img = new Image();
 			img.src = event.target.result;
 			var cnvW = self.dom.canvas.width;
@@ -331,20 +316,6 @@ function Painter() {
 	self.initChild();
 }
 
-
-function checkAndPlay(element) {
-	if (!window.sound || !notifier.isTabMain()) {
-		return;
-	}
-	try {
-		element.pause();
-		element.currentTime = 0;
-		element.volume = volumeProportion[window.sound];
-		element.play();
-	} catch (e) {
-		logger.error("Skipping playing message, because {}", e.message || e)();
-	}
-}
 
 function NotifierHandler() {
 	var self = this;
@@ -821,7 +792,7 @@ function ChannelsHandler() {
 		self.dom.imgInput.value = "";
 	};
 	self.readDataAndSend = function (file) {
-		readFileAsB64(file, function (event) {
+		Utils.readFileAsB64(file, function (event) {
 			self.sendMessage({
 				image: event.target.result,
 				filename: file.name,
@@ -1126,7 +1097,7 @@ function ChannelsHandler() {
 		var allUsersIds = Object.keys(users);
 		var anotherUserId = self.getAnotherUserId(allUsersIds);
 		var roomName = users[anotherUserId].user;
-		var li = createUserLi(anotherUserId, users[anotherUserId].sex, roomName);
+		var li = Utils.createUserLi(anotherUserId, users[anotherUserId].sex, roomName);
 		self.dom.directUserTable.appendChild(li);
 		self.createChannelChatHandler(roomId, li, users, roomName);
 		return anotherUserId;
@@ -1341,52 +1312,6 @@ function ChannelsHandler() {
 	self.init();
 }
 
-function showHelp() {
-	if (!suggestions) {
-		return
-	}
-	var infoMessages = [
-		"<span>Every time you join chat those help messages will be shown to you. " +
-		"You can disable them in you profile settings (<i class='icon-wrench'></i> icon). Simply click on popup to hide them</span>",
-		"<span>Browser will notify you on incoming message every time when chat tab is not active. " +
-		"You can disable this option in your profile(<i class='icon-wrench'></i> icon).</span>",
-		"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon." +
-		" To delete created room hover mouse on its name and click on <i class='icon-cancel-circled-outline'></i> icon.</span>",
-		"<span>You can make an audio/video call. Currently pychat allows calling only one person." +
-		" To call someone you need to create ( <i class='icon-plus-squared'></i>) and join direct message," +
-		" open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> </span>",
-		"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
-		"<span>You can write multiline message by pressing <b>shift+Enter</b></span>",
-		"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon." +
-		" To close appeared smile container click outside of it or press <b>Esc</b></span>",
-		"You can comment somebody's message. This will be shown to all users in current channel. Just click on message time" +
-		"and it's content appears in message text",
-		"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
-		"suggestion there</span>",
-		"<span>Chat uses your browser cache to store messages. To clear current cache click on " +
-		"<i class='icon-clear'></i> icon on the top menu</span>",
-		"<span>You can view offline users in current channel by clicking on <b>CHANNEL ONLINE</b> text</span>",
-		"<span>You can invite a new user to current room by clicking on <i class='icon-user-plus'></i> icon</span>",
-		"You can load history of current channel. For this you need to focus place with messages by simply" +
-		" clicking on it and press arrow up/page up or just scroll up with mousewheel",
-		"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>",
-		"<span>To paste image from clipboard: focus box with messages (by clicking on it) and press <B>Ctrl + V</b></span>",
-		"<span>You can edit/delete message that you have sent during one minute. Focus input text, delete its content " +
-		"and press <b>Up Arrow</b>. The edited message should become highlighted with outline. If you apply blank text the" +
-		" message will be removed.To exit the mode press <b>Esc</b></span>"
-	];
-	var index = localStorage.getItem('HelpIndex');
-	if (index == null) {
-		index = 0;
-	} else {
-		index = parseInt(index);
-	}
-	if (index < infoMessages.length) {
-		growlInfo(infoMessages[index]);
-		localStorage.setItem('HelpIndex', index + 1);
-	}
-}
-
 
 function SmileyUtil() {
 	var self = this;
@@ -1523,18 +1448,6 @@ function SmileyUtil() {
 }
 
 
-function timeMessageClick(event) {
-	var value = userMessage.innerHTML;
-	var match = value.match(timePattern);
-	var oldText = match ? value.substr(match[0].length) : value;
-	userMessage.innerHTML = '{}>>> {}'.format(event.target.parentElement.parentElement.textContent, oldText);
-	userMessage.focus();
-}
-
-function encodeMessage(data) {
-	return data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
-}
-
 function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	var self = this;
 	self.UNREAD_MESSAGE_CLASS = 'unreadMessage';
@@ -1651,7 +1564,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.addUserLi(message.userId, message.sex, message.user);
 		}
 	};
-	self.addUserToAll = self.addUserToDom;
 	self.updateAllDomUsers = function (newUsers) {
 		for (var oldUserId in self.allUsers) {
 			if (!self.allUsers.hasOwnProperty(oldUserId)) continue;
@@ -1682,7 +1594,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 	};
 	self.addUserLi = function (userId, sex, username) {
-		var li = createUserLi(userId, sex, username);
+		var li = Utils.createUserLi(userId, sex, username);
 		li.className = 'offline';
 		self.allUsers[userId].li = li;
 		self.dom.userList.appendChild(li);
@@ -1720,6 +1632,13 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		self.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
 		delete self.allUsers[message.userId];
 	};
+	self.timeMessageClick = function (event) {
+		var value = userMessage.innerHTML;
+		var match = value.match(timePattern);
+		var oldText = match ? value.substr(match[0].length) : value;
+		userMessage.innerHTML = '{}>>> {}'.format(event.target.parentElement.parentElement.textContent, oldText);
+		userMessage.focus();
+	};
 	/** Creates a DOM node with attached events and all message content*/
 	self.createMessageNode = function (timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId) {
 		var date = new Date(timeMillis);
@@ -1735,7 +1654,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var timeSpan = document.createElement('span');
 		timeSpan.className = TIME_SPAN_CLASS;
 		timeSpan.textContent = '({})'.format(time);
-		timeSpan.onclick = timeMessageClick;
+		timeSpan.onclick = self.timeMessageClick;
 		headSpan.appendChild(timeSpan);
 
 		var userNameA = document.createElement('span');
@@ -1772,7 +1691,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		if (pos != null) { // position of the following message <p>
 			var prevEl = pos.previousSibling;
 			// if it's not the same day block, prevElement always exist its either fieldset  either prevmessage
-			// TODO innerText instead for ie?
 			result = (prevEl.tagName === 'FIELDSET' && prevEl.textContent.trim() !== innerHTML) ? prevEl : pos;
 			if (insert) {
 				self.dom.chatBoxDiv.insertBefore(fieldSet, result);
@@ -1837,8 +1755,11 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.headerId = headerId;
 		}
 	};
+	self.encodeMessage = function (data) {
+		return data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
+	};
 	self.editMessage = function (data) {
-		var html = encodeMessage(data);
+		var html = self.encodeMessage(data);
 		var p = $(data.time);
 		if (p != null) {
 			document.querySelector("[id='{}'] .{}".format(data.time, CONTENT_STYLE_CLASS)).innerHTML = html;
@@ -1859,18 +1780,18 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		self.setHeaderId(data.id);
 		var user = self.allUsers[data.userId];
 		if (loggedUserId === data.userId) {
-			checkAndPlay(self.dom.chatOutgoing);
+			Utils.checkAndPlay(self.dom.chatOutgoing);
 			self.lastMessage = {
 				id: data.id,
 				time: data.time
 			}
 		} else {
-			checkAndPlay(self.dom.chatIncoming);
+			Utils.checkAndPlay(self.dom.chatIncoming);
 		}
 		var displayedUsername = user.user;
 		//private message
 		var headerStyle = data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
-		var preparedHtml = encodeMessage(data);
+		var preparedHtml = self.encodeMessage(data);
 		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, data.id);
 		if (p) { // not duplicate message
 			notifier.notify(displayedUsername, data.content || 'image', data.image);
@@ -1932,7 +1853,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		} else {
 			dm = 'User <b>{}</b> has {}'.format(username, action);
 		}
-		checkAndPlay(sound);
+		Utils.checkAndPlay(sound);
 		self.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
 		self.setOnlineUsers(message);
 	};
@@ -2056,12 +1977,6 @@ function ReceiverPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	}
 }
 
-function extractError(arguments) {
-	var argument = arguments[0] || arguments;
-	return arguments.length > 1  ? Array.prototype.join.call(arguments, ' ') :
-			argument.name || argument.message ? "{}: {}".format(argument.name, argument.message) :
-					JSON.stringify(arguments);
-}
 
 function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerReferenceFn) {
 	var self = this;
@@ -2077,14 +1992,6 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 			/*{DtlsSrtpKeyAgreement: true},*/
 			{RtpDataChannels: false /*true*/}
 		]
-	};
-	self.sendCloseSuccess = function () {
-		wsHandler.sendToServer({
-			content: 'success',
-			action: 'destroyConnection',
-			connId: self.connectionId,
-			opponentWsId: self.opponentWsId
-		});
 	};
 	self.log = function () {
 		var args = Array.prototype.slice.call(arguments);
@@ -2164,7 +2071,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	};
 	self.failWebRtc = function (parent) {
 		return function () {
-			var message = "An error occurred while {}: {}".format(parent, extractError(arguments));
+			var message = "An error occurred while {}: {}".format(parent, Utils.extractError(arguments));
 			growlError(message);
 			self.logErr(message)();
 		}
@@ -2190,8 +2097,7 @@ function BaseTransferHandler(removeReferenceFn) {
 			content: content,
 			action: action,
 			type: type,
-			connId: self.connectionId,
-			opponentWsId: self.opponentWsId
+			connId: self.connectionId
 		});
 	};
 	self.handle = function (data) {
@@ -2220,7 +2126,7 @@ function CallPopup(answerFn, videoAnswerFn, declineFn) {
 	Draggable.call(self, document.createElement('DIV'), "Call");
 	self.dom.callSound = $('chatCall');
 	self.dom.callSound.addEventListener("ended", function () {
-		checkAndPlay(self.dom.callSound);
+		Utils.checkAndPlay(self.dom.callSound);
 	});
 	self.init = function () {
 		var answerButtons = document.createElement('div');
@@ -2253,31 +2159,9 @@ function CallPopup(answerFn, videoAnswerFn, declineFn) {
 		var text = "{} calls".format(user);
 		self.setHeaderText(text);
 		self.super.show();
-		checkAndPlay(self.dom.callSound);
+		Utils.checkAndPlay(self.dom.callSound);
 	};
 	self.init();
-}
-
-
-function createMicrophoneLevelVoice(stream, onaudioprocess) {
-	try {
-		var audioProc = {};
-		audioProc.audioContext = new AudioContext();
-		audioProc.analyser = audioProc.audioContext.createAnalyser();
-		var microphone = audioProc.audioContext.createMediaStreamSource(stream);
-		audioProc.javascriptNode = audioProc.audioContext.createScriptProcessor(2048, 1, 1);
-		audioProc.analyser.smoothingTimeConstant = 0.3;
-		audioProc.analyser.fftSize = 1024;
-		microphone.connect(audioProc.analyser);
-		audioProc.analyser.connect(audioProc.javascriptNode);
-		audioProc.javascriptNode.connect(audioProc.audioContext.destination);
-		audioProc.prevVolumeValues = 0;
-		audioProc.volumeValuesCount = 0;
-		audioProc.javascriptNode.onaudioprocess = onaudioprocess(audioProc);
-		return audioProc;
-	} catch (err) {
-		logger.error("Unable to use microphone level because {}", extractError(err))();
-	}
 }
 
 
@@ -2285,7 +2169,6 @@ function CallHandler(roomId) {
 	var self = this;
 	BaseTransferHandler.call(self);
 	self.acceptedPeers = [];
-	self.removeChild = function() {};
 	self.roomId = roomId;
 	self.audioProcessors = {};
 	self.setIsReceiver = function(isReceiver) {
@@ -2296,6 +2179,7 @@ function CallHandler(roomId) {
 		callContainer: $('callContainer'),
 		callContainerContent: document.createElement("DIV"),
 		videoContainer: document.createElement("DIV"),
+		videoContainerForVideos: document.createElement("DIV"),
 		local: document.createElement('video'),
 		audioStatusIcon: document.createElement('i'),
 		videoStatusIcon: document.createElement('i'),
@@ -2414,10 +2298,11 @@ function CallHandler(roomId) {
 	};
 	self.renderDom = function() {
 		var iwc = document.createElement('DIV');
-		self.dom.videoContainer.appendChild(self.dom.local);
+		self.dom.videoContainerForVideos.appendChild(self.dom.local);
 		self.dom.local.setAttribute('muted', true);
 		self.dom.local.className = 'localVideo';
 		self.dom.videoContainer.appendChild(iwc);
+		self.dom.videoContainer.appendChild(self.dom.videoContainerForVideos);
 		self.dom.videoContainer.className = 'videoContainer';
 		self.dom.callContainerContent.className = 'callContainerContent';
 		self.dom.callContainerContent.appendChild(self.dom.videoContainer);
@@ -2473,11 +2358,11 @@ function CallHandler(roomId) {
 	self.attachLocalStream = function (stream) {
 		self.localStream = stream;
 		if (stream) {
-			setVideoSource(self.dom.local, stream);
+			Utils.setVideoSource(self.dom.local, stream);
 		}
 		self.setVideo(self.getTrack(true) != null);
 		self.setAudio(self.getTrack(false) != null);
-		self.audioProcessor = createMicrophoneLevelVoice(stream, self.processAudio);
+		self.audioProcessor = Utils.createMicrophoneLevelVoice(stream, self.processAudio);
 	};
 	self.processAudio = function (audioProc) {
 		return function () {
@@ -2510,7 +2395,7 @@ function CallHandler(roomId) {
 		} else {
 			what = 'video'
 		}
-		var message = "Failed to capture {} source, because {}".format(what, extractError(arguments));
+		var message = "Failed to capture {} source, because {}".format(what, Utils.extractError(arguments));
 		growlError(message);
 		logger.error(message);
 	};
@@ -2610,7 +2495,7 @@ function CallHandler(roomId) {
 	self.createCallPeerConnection = function (userId, connId, opponentWsId) {
 		var videoContainer = document.createElement('div');
 		videoContainer.className = 'micVideoWrapper';
-		self.dom.videoContainer.appendChild(videoContainer);
+		self.dom.videoContainerForVideos.insertBefore(videoContainer, self.dom.videoContainerForVideos.firstChild);
 		var PeerConnectionClass = userId > loggedUserId ? CallSenderPeerConnection : CallReceiverPeerConnection;
 		self.peerConnections[opponentWsId] = new PeerConnectionClass(
 				connId,
@@ -2619,6 +2504,14 @@ function CallHandler(roomId) {
 				videoContainer,
 				self.onStreamAttached
 		);
+	};
+	self.removeChildPeerReference = function (id) {
+		if (self.localStream) { // TODO
+			var tracks = self.localStream.getTracks();
+			for (var i = 0; i < tracks.length; i++) {
+				tracks[i].stop()
+			}
+		}
 	};
 	self.onStreamAttached = function(opponentWsId) { // TODO this is called multiple times for each peer connection
 		self.setHeaderText("Talking with <b>{}</b>".format(self.receiverName));
@@ -2852,7 +2745,7 @@ function FileReceiver(removeReferenceFn) {
 			});
 		} else if (self.fileSize > MAX_ACCEPT_FILE_SIZE_WO_FS_API) {
 			self.sendErrorFSApi();
-			self.peerConnections[self.offerOpponentWsId].destroy();
+			self.peerConnections[self.offerOpponentWsId].destroy(); //TODO
 		}
 	};
 	self.ondestroyConnection = function (message) {
@@ -2984,7 +2877,12 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 		if (self.isDone()) {
 			var received = self.recevedUsingFile ? self.fileEntry.toURL() : URL.createObjectURL(new window.Blob(self.receiveBuffer));
 			self.log("File is received")();
-			self.sendCloseSuccess();
+			wsHandler.sendToServer({
+				content: 'success',
+				action: 'destroyConnection',
+				connId: self.connectionId,
+				opponentWsId: self.opponentWsId
+			});
 			self.receiveBuffer = []; //clear buffer
 			self.receivedSize = 0;
 			self.downloadBar.getAnchor().href = received;
@@ -3197,7 +3095,6 @@ function CallPeerConnection(videoContainer, onStreamAttached) {
 		callVolume: document.createElement('input')
 	};
 	videoContainer.appendChild(self.dom.remote);
-	self.dom.remote.className = 'remoteVideo';
 	self.dom.callVolume.addEventListener('input', self.changeVolume);
 	var colVolumeWrapper = document.createElement('div');
 	videoContainer.appendChild(colVolumeWrapper);
@@ -3224,13 +3121,18 @@ function CallPeerConnection(videoContainer, onStreamAttached) {
 	self.channelOpen = function () {
 		self.log('Opened a new chanel')();
 	};
+	self.oniceconnectionstatechange = function () {
+		if (self.pc.iceConnectionState === 'disconnected') {
+			self.closeEvents();
+		}
+	};
 	self.createPeerConnectionParent = self.createPeerConnection;
 	self.createPeerConnection = function (stream) {
 		self.createPeerConnectionParent();
 		self.pc.onaddstream = function (event) {
 			self.log("onaddstream")();
-			setVideoSource(self.dom.remote, event.stream);
-			self.audioProcessor = createMicrophoneLevelVoice(event.stream, self.processAudio);
+			Utils.setVideoSource(self.dom.remote, event.stream);
+			self.audioProcessor = Utils.createMicrophoneLevelVoice(event.stream, self.processAudio);
 			onStreamAttached(self.opponentWsId);
 		};
 		self.pc.addStream(stream);
@@ -3251,12 +3153,6 @@ function CallPeerConnection(videoContainer, onStreamAttached) {
 	};
 	self.closeEvents = function () { //TODO this is called with text
 		self.closePeerConnection();
-		if (self.localStream) {
-			var tracks = self.localStream.getTracks();
-			for (var i = 0; i < tracks.length; i++) {
-				tracks[i].stop()
-			}
-		}
 		if (self.audioProcessors && audioProcessors.javascriptNode) {
 			audioProcessors.javascriptNode.onaudioprocess = null;
 		}
@@ -3361,9 +3257,6 @@ function WebRtcApi() {
 	self.removeChildReference = function (id) {
 		logger.info("Removing transferHandler with id {}", id)();
 		delete self.connections[id];
-	};
-	self.createWebrtcObject = function (ClassName, arguments, channel) {
-
 	};
 	self.attachEvents = function () {
 		self.dom.webRtcFileIcon.onclick = self.clickFile;
@@ -3517,19 +3410,119 @@ function Storage() {
 	};
 }
 
-function createUserLi(userId, gender, username) {
-	var icon;
-	icon = document.createElement('i');
-	icon.className = GENDER_ICONS[gender];
-	var li = document.createElement('li');
-	li.appendChild(icon);
-	li.innerHTML += username;
-	li.setAttribute(USER_ID_ATTR, userId);
-	li.setAttribute(USER_NAME_ATTR, username);
-	return li;
-}
-
-function setVideoSource(domEl, stream) {
-	domEl.src = URL.createObjectURL(stream);
-	domEl.play();
+var Utils = {
+	createUserLi: function (userId, gender, username) {
+		var icon;
+		icon = document.createElement('i');
+		icon.className = GENDER_ICONS[gender];
+		var li = document.createElement('li');
+		li.appendChild(icon);
+		li.innerHTML += username;
+		li.setAttribute(USER_ID_ATTR, userId);
+		li.setAttribute(USER_NAME_ATTR, username);
+		return li;
+	},
+	setVideoSource: function (domEl, stream) {
+		domEl.src = URL.createObjectURL(stream);
+		domEl.play();
+	},
+	checkAndPlay: function (element) {
+		if (!window.sound || !notifier.isTabMain()) {
+			return;
+		}
+		try {
+			element.pause();
+			element.currentTime = 0;
+			element.volume = volumeProportion[window.sound];
+			element.play();
+		} catch (e) {
+			logger.error("Skipping playing message, because {}", e.message || e)();
+		}
+	},
+	readFileAsB64: function (file, callback, showGrowl) {
+		if (!file) {
+			logger.warn("Context contains no files")();
+		} else if (file.type.indexOf("image") < 0) {
+			webRtcApi.createWebrtcObject(FileSender, file);
+		} else {
+			var fileName = file.name ? file.name : '';
+			if (showGrowl) {
+				growlInfo("<span>Sending file <b>{}</b> ({}) to server</span>".format(fileName, bytesToSize(file.size)));
+			}
+			var reader = new FileReader();
+			reader.onload = callback;
+			reader.readAsDataURL(file);
+		}
+	},
+	extractError: function (arguments) {
+		var argument = arguments[0] || arguments;
+		return arguments.length > 1 ? Array.prototype.join.call(arguments, ' ') :
+				argument.name || argument.message ? "{}: {}".format(argument.name, argument.message) :
+						JSON.stringify(arguments);
+	},
+	createMicrophoneLevelVoice: function (stream, onaudioprocess) {
+		try {
+			var audioProc = {};
+			audioProc.audioContext = new AudioContext();
+			audioProc.analyser = audioProc.audioContext.createAnalyser();
+			var microphone = audioProc.audioContext.createMediaStreamSource(stream);
+			audioProc.javascriptNode = audioProc.audioContext.createScriptProcessor(2048, 1, 1);
+			audioProc.analyser.smoothingTimeConstant = 0.3;
+			audioProc.analyser.fftSize = 1024;
+			microphone.connect(audioProc.analyser);
+			audioProc.analyser.connect(audioProc.javascriptNode);
+			audioProc.javascriptNode.connect(audioProc.audioContext.destination);
+			audioProc.prevVolumeValues = 0;
+			audioProc.volumeValuesCount = 0;
+			audioProc.javascriptNode.onaudioprocess = onaudioprocess(audioProc);
+			return audioProc;
+		} catch (err) {
+			logger.error("Unable to use microphone level because {}", Utils.extractError(err))();
+		}
+	},
+	showHelp: function () {
+		if (!suggestions) {
+			return
+		}
+		var infoMessages = [
+			"<span>Every time you join chat those help messages will be shown to you. " +
+			"You can disable them in you profile settings (<i class='icon-wrench'></i> icon). Simply click on popup to hide them</span>",
+			"<span>Browser will notify you on incoming message every time when chat tab is not active. " +
+			"You can disable this option in your profile(<i class='icon-wrench'></i> icon).</span>",
+			"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon." +
+			" To delete created room hover mouse on its name and click on <i class='icon-cancel-circled-outline'></i> icon.</span>",
+			"<span>You can make an audio/video call. Currently pychat allows calling only one person." +
+			" To call someone you need to create ( <i class='icon-plus-squared'></i>) and join direct message," +
+			" open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> </span>",
+			"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
+			"<span>You can write multiline message by pressing <b>shift+Enter</b></span>",
+			"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon." +
+			" To close appeared smile container click outside of it or press <b>Esc</b></span>",
+			"You can comment somebody's message. This will be shown to all users in current channel. Just click on message time" +
+			"and it's content appears in message text",
+			"<span>You have a feature to suggest or you lack some functionality? Click on <i class='icon-pencil'></i>icon on top menu and write your " +
+			"suggestion there</span>",
+			"<span>Chat uses your browser cache to store messages. To clear current cache click on " +
+			"<i class='icon-clear'></i> icon on the top menu</span>",
+			"<span>You can view offline users in current channel by clicking on <b>CHANNEL ONLINE</b> text</span>",
+			"<span>You can invite a new user to current room by clicking on <i class='icon-user-plus'></i> icon</span>",
+			"You can load history of current channel. For this you need to focus place with messages by simply" +
+			" clicking on it and press arrow up/page up or just scroll up with mousewheel",
+			"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>",
+			"<span>To paste image from clipboard: focus box with messages (by clicking on it) and press <B>Ctrl + V</b></span>",
+			"<span>You can edit/delete message that you have sent during one minute. Focus input text, delete its content " +
+			"and press <b>Up Arrow</b>. The edited message should become highlighted with outline. If you apply blank text the" +
+			" message will be removed.To exit the mode press <b>Esc</b></span>"
+		];
+		var index = localStorage.getItem('HelpIndex');
+		if (index == null) {
+			index = 0;
+		} else {
+			index = parseInt(index);
+		}
+		if (index < infoMessages.length) {
+			growlInfo(infoMessages[index]);
+			localStorage.setItem('HelpIndex', index + 1);
+		}
+	}
 };

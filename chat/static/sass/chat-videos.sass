@@ -1,0 +1,70 @@
+@mixin selectIfHasAmountOfChild($child) // renders style depending on amount of children
+	$realChild: $child +1
+	.micVideoWrapper:first-child:nth-last-child(#{$realChild}), .micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ .micVideoWrapper
+		@content
+
+@mixin selectVideoIfhasAmountOfChild($child) // renders style depending on amount of children
+	$realChild: $child +1
+	.micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ video
+		@content
+
+@mixin selectNthIfHasAmountOfChildren($amountOfChild, $nth)
+	.micVideoWrapper:first-child:nth-last-child(#{$amountOfChild +1}) ~ .micVideoWrapper:nth-child(#{$nth})
+		@content
+
+//1
+@include selectVideoIfhasAmountOfChild(1)
+	bottom: 0
+	right: 0
+//2
+@include selectIfHasAmountOfChild(2)
+	max-width: calc(50% - 5px)
+
+@include selectVideoIfhasAmountOfChild(2)
+	bottom: 0
+	left: 50%
+	transform: translateX(-50%)
+
+//3
+@include selectIfHasAmountOfChild(3)
+	max-width: calc(50% - 5px)
+	display: table-cell
+
+@include selectVideoIfhasAmountOfChild(3)
+	bottom: 0
+	right: 0
+
+@include selectNthIfHasAmountOfChildren(3,3)
+	margin-right: calc(50% - 2px)
+
+//4
+@include selectIfHasAmountOfChild(4)
+	max-width: calc(50% - 5px)
+	display: inline-block
+
+@include selectVideoIfhasAmountOfChild(4)
+	top: 50%
+	left: 50%
+	transform: translate(-50%, -50%)
+
+//5
+@include selectIfHasAmountOfChild(5)
+	max-width: calc(50% - 5px)
+	display: inline-block
+
+@include selectNthIfHasAmountOfChildren(5,5)
+	margin-right: calc(50% - 2px)
+
+@include selectVideoIfhasAmountOfChild(5)
+	right: 0
+	bottom: 0
+
+//6
+@include selectIfHasAmountOfChild(6)
+	max-width: calc(50% - 5px)
+	display: inline-block
+
+@include selectVideoIfhasAmountOfChild(6)
+	left: 50%
+	transform: translateX(-50%)
+	bottom: 0

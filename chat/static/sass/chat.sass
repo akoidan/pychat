@@ -632,10 +632,6 @@ p
 		background: #272C2D
 		border: 1px solid grey
 
-.remoteVideo
-	max-height: calc(60vh - 120px)
-	max-width: 100%
-
 #changeProfileVideo
 	position: absolute
 	max-width: 35%
@@ -654,8 +650,6 @@ p
 	max-width: 35%
 	max-height: 35%
 	background: #555
-	bottom: 0
-	right: 0
 	margin-bottom: 4px
 
 .modal-fixed
@@ -706,7 +700,7 @@ p
 	&.videoContainer
 		background-color: black
 
-	.remoteVideo
+	.micVideoWrapper > video
 		max-height: 99vh
 		height: 99vh
 
@@ -716,7 +710,12 @@ p
 		display: block
 
 .micVideoWrapper
+	display: inline-block
 	position: relative
+	margin: 1px
+	video
+		max-height: calc(60vh - 120px)
+		max-width: 100%
 	> div
 		position: absolute
 		bottom: 5px
@@ -729,6 +728,8 @@ p
 		box-shadow: 0 0 6px 6px $color
 	&:hover div
 		display: block
+
+@import "chat-videos"
 
 .icon-webrtc-cont
 	display: none
