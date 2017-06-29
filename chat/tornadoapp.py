@@ -58,7 +58,8 @@ class Actions(object):
 	SEND_MESSAGE = 'sendMessage'
 	PRINT_MESSAGE = 'printMessage'
 	WEBRTC = 'sendRtcData'
-	CLOSE_WEBRTC = 'destroyConnection'
+	CLOSE_FILE_CONNECTION = 'destroyFileConnection'
+	CLOSE_CALL_CONNECTION = 'destroyCallConnection'
 	ACCEPT_CALL = 'acceptCall'
 	ACCEPT_FILE = 'acceptFile'
 	ROOMS = 'setRooms'
@@ -322,7 +323,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
 			Actions.WEBRTC: self.proxy_webrtc,
-			Actions.CLOSE_WEBRTC: self.close_and_proxy_connection,
+			Actions.CLOSE_FILE_CONNECTION: self.close_file_connection,
+			Actions.CLOSE_CALL_CONNECTION: self.close_call_connection,
 			Actions.ACCEPT_CALL: self.accept_call,
 			Actions.ACCEPT_FILE: self.accept_file,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
@@ -515,18 +517,37 @@ class MessagesHandler(MessagesCreator):
 		prepared_message = self.create_send_message(message_db)
 		self.publish(prepared_message, channel)
 
-	def close_and_proxy_connection(self, in_message):
+	def close_file_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
 		self_channel_status = self.sync_redis.shget(connection_id, self.id)
 		if not self_channel_status:
 			raise Exception("Access Denied")
-		if self_channel_status != 'closed':
+		if self_channel_status != WebRtcRedisStates.CLOSED:
 			sender_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
 			if sender_id == self.id:
 				self.close_sender(connection_id)
 			else:
 				self.close_receiver(connection_id, in_message, sender_id)
 			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.CLOSED)
+
+	def close_call_connection(self, in_message):
+		connection_id = in_message[VarNames.CONNECTION_ID]
+		conn_users = self.sync_redis.shgetall(connection_id)
+		if conn_users[self.id] in [WebRtcRedisStates.READY, WebRtcRedisStates.RESPONDED]:
+			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.CLOSED)
+			del conn_users[self.id]
+			message = {
+				VarNames.EVENT: Actions.CLOSE_CALL_CONNECTION,
+				VarNames.CONNECTION_ID: connection_id,
+				VarNames.USER_ID: self.user_id,
+				VarNames.WEBRTC_OPPONENT_ID: self.id,
+				VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
+			}
+			for user in conn_users:
+				if conn_users[user] != WebRtcRedisStates.CLOSED:
+					self.publish(message, user)
+		else:
+			raise ValidationError("Invalid channel status.")
 
 	def close_receiver(self, connection_id, in_message, sender_id): # TODO for call we should close all
 		sender_status = self.sync_redis.shget(connection_id, sender_id)
@@ -544,7 +565,7 @@ class MessagesHandler(MessagesCreator):
 			if values[ws_id] == WebRtcRedisStates.CLOSED:
 				continue
 			self.publish({
-				VarNames.EVENT: Actions.CLOSE_WEBRTC,
+				VarNames.EVENT: Actions.CLOSE_FILE_CONNECTION,
 				VarNames.CONNECTION_ID: connection_id,
 				VarNames.WEBRTC_OPPONENT_ID: self.id,
 				VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER,
@@ -623,9 +644,9 @@ class MessagesHandler(MessagesCreator):
 		if conn_users[self.id] == WebRtcRedisStates.OFFERED:
 			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.RESPONDED)
 			del conn_users[self.id]
+			message = self.reply_webrtc(Actions.REPLY_CALL_CONNECTION, connection_id)
 			for user in conn_users:
 				if conn_users[user] != WebRtcRedisStates.CLOSED:
-					message = self.reply_webrtc(Actions.REPLY_CALL_CONNECTION, connection_id)
 					self.publish(message, user)
 		else:
 			raise ValidationError("Invalid channel status.")
