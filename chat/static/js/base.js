@@ -451,6 +451,10 @@ function Draggable(container, headerText) {
 		e.stopPropagation();
 		e.preventDefault();
 	};
+	self.onMouseMove = function(e) {
+		self.top = e.pageY;
+		self.left = e.pageX;
+	};
 	self.init = function () {
 		CssUtils.addClass(self.dom.container, "modal-body");
 		CssUtils.addClass(self.dom.container, "modal-draggable");
@@ -485,16 +489,23 @@ function Draggable(container, headerText) {
 		self.dom.container.setAttribute('tabindex', "-1");
 	};
 	self.ondragend = function (e) {
-		// e.stopPropagation();
-		// e.preventDefault();
+		var x,y;
+		if (isFirefox) {
+			document.removeEventListener('dragover', self.onMouseMove);
+			x = self.left;
+			y = self.top;
+		} else {
+			x = e.pageX;
+			y = e.pageY;
+		}
 		CssUtils.removeClass(self.dom.container, self.MOVING_CLASS);
-		var left = e.pageX + self.leftCorrection;
+		var left = x + self.leftCorrection;
 		if (left < 0) {
 			left = 0;
 		} else if (left > self.maxLeft) {
 			left = self.maxLeft;
 		}
-		var top = e.pageY + self.topCorrection;
+		var top = y + self.topCorrection;
 		if (top < 0) {
 			top = 0;
 		} else if (top > self.maxTop) {
@@ -504,6 +515,10 @@ function Draggable(container, headerText) {
 		self.dom.container.style.top =  top + "px";
 	};
 	self.ondragstart = function (e) {
+		if (isFirefox) {
+			e.dataTransfer.setData('text/plain', 'won');
+			document.addEventListener('dragover', self.onMouseMove);
+		}
 		var clickedEl = self.mouseDownElement;
 		self.mouseDownElement = null;
 		if (isDescendant(self.dom.header, clickedEl)) {
