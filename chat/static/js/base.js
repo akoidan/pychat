@@ -293,6 +293,15 @@ function encodeAnchorsHTML(html) {
     return encodeHTML(html).replace(linksRegex, replaceLinkPattern);
 }
 
+function isDescendant(parent, child) {
+	while (child != null) {
+		if (child == parent) {
+			return true;
+		}
+		child = child.parentNode;
+	}
+	return false;
+}
 
 var CssUtils = {
 	visibilityClass: 'hidden',
@@ -430,7 +439,6 @@ function growlInfo(message) {
 }
 
 
-// TODO replace with HTML5 if possible
 function Draggable(container, headerText) {
 	var self = this;
 	self.UNACTIVE_CLASS = 'blurred';
@@ -439,12 +447,24 @@ function Draggable(container, headerText) {
 		container:  container
 	};
 	self.headerText = headerText;
+	self.preventDefault = function (e) {
+		e.stopPropagation();
+		e.preventDefault();
+	};
 	self.init = function () {
 		CssUtils.addClass(self.dom.container, "modal-body");
 		CssUtils.addClass(self.dom.container, "modal-draggable");
 		self.dom.header = document.createElement('DIV');
 		self.dom.header.className = 'windowHeader noSelection';
-		self.dom.header.addEventListener ("mousedown", self.eleMouseDown, false);
+		self.dom.header.addEventListener ("mousedown", function(ev) {
+			self.mouseDownElement = ev.target;
+		}, false);
+		self.dom.container.setAttribute('draggable', 'true');
+		self.dom.container.ondragstart = self.ondragstart;
+		self.dom.container.ondragend = self.ondragend;
+		// self.dom.container.ondrop = self.preventDefault; // TODO doens't work
+		// self.dom.container.ondragleave  = self.preventDefault; // this thing causes ondrop event on messages
+		// self.dom.container.ondragenter  = self.preventDefault;
 		self.dom.headerText = document.createElement('span');
 		self.dom.header.appendChild(self.dom.headerText);
 		self.dom.headerText.style = 'display: inline-block';
@@ -464,9 +484,43 @@ function Draggable(container, headerText) {
 		self.dom.container.addEventListener('blur', self.onfocusout);
 		self.dom.container.setAttribute('tabindex', "-1");
 	};
+	self.ondragend = function (e) {
+		// e.stopPropagation();
+		// e.preventDefault();
+		CssUtils.removeClass(self.dom.container, self.MOVING_CLASS);
+		var left = e.pageX + self.leftCorrection;
+		if (left < 0) {
+			left = 0;
+		} else if (left > self.maxLeft) {
+			left = self.maxLeft;
+		}
+		var top = e.pageY + self.topCorrection;
+		if (top < 0) {
+			top = 0;
+		} else if (top > self.maxTop) {
+			top = self.maxTop;
+		}
+		self.dom.container.style.left = left + "px";
+		self.dom.container.style.top =  top + "px";
+	};
+	self.ondragstart = function (e) {
+		var clickedEl = self.mouseDownElement;
+		self.mouseDownElement = null;
+		if (isDescendant(self.dom.header, clickedEl)) {
+			if (clickedEl.tagName !== 'I') {
+				CssUtils.addClass(self.dom.container, self.MOVING_CLASS);
+				self.leftCorrection = self.dom.container.offsetLeft - e.pageX;
+				self.topCorrection = self.dom.container.offsetTop - e.pageY;
+				self.maxTop = document.body.clientHeight - self.dom.container.clientHeight - 7;
+				self.maxLeft = document.body.clientWidth - self.dom.container.clientWidth - 3;
+				return;
+			}
+		}
+		e.preventDefault();
+	};
 	self.fixInputs = function () {
-		if (!container.id) {
-			container.id = 'draggable'+getRandomId();
+		if (!self.dom.container.id) {
+			self.dom.container.id = 'draggable'+getRandomId();
 		}
 		var inputs = document.querySelectorAll('#{0} input, #{0} button'.formatPos(container.id));
 		// typeOf(inputs) = HTMLCollection, not an array. that doesn't have forEach
@@ -487,39 +541,6 @@ function Draggable(container, headerText) {
 	};
 	self.show = function () {
 		CssUtils.showElement(self.dom.container);
-	};
-	self.eleMouseDown = function (ev) {
-		if (ev.target.tagName == 'I') {
-			return; // if close icon was clicked
-		}
-		CssUtils.addClass(self.dom.container, self.MOVING_CLASS);
-		self.leftCorrection =  self.dom.container.offsetLeft - ev.pageX;
-		self.topCorrection = self.dom.container.offsetTop - ev.pageY;
-		self.maxTop = document.body.clientHeight - self.dom.container.clientHeight - 7;
-		self.maxLeft =  document.body.clientWidth - self.dom.container.clientWidth - 3;
-		document.addEventListener ("mousemove", self.eleMouseMove, false);
-		document.addEventListener ("mouseup", self.eleMouseUp, false);
-	};
-	self.eleMouseMove = function (ev) {
-		var left = ev.pageX + self.leftCorrection;
-		if (left < 0) {
-			left = 0;
-		} else if (left > self.maxLeft) {
-			left = self.maxLeft;
-		}
-		self.dom.container.style.left = left + "px";
-		var top = ev.pageY + self.topCorrection;
-		if (top < 0) {
-			top = 0;
-		} else if (top > self.maxTop) {
-			top = self.maxTop;
-		}
-		self.dom.container.style.top = top + "px";
-	};
-	self.eleMouseUp = function () {
-		CssUtils.removeClass(self.dom.container, self.MOVING_CLASS);
-		document.removeEventListener ("mousemove", self.eleMouseMove, false);
-		document.removeEventListener ("mouseup", self.eleMouseUp, false);
 	};
 	self.super = {
 		show: self.show,
