@@ -309,10 +309,12 @@ var CssUtils = {
 		return element.className != null && element.className.indexOf(className) >= 0;
 	},
 	addClass: function (element, className) {
-		if (!CssUtils.hasClass(element, className)) {
+		var hasClass = CssUtils.hasClass(element, className);
+		if (!hasClass) {
 			var oldClassName = element.className;
 			element.className = "{} {}".format(oldClassName.trim(), className);
 		}
+		return hasClass;
 	},
 	deleteElement: function(target) {
 		target.parentNode.removeChild(target)
@@ -336,15 +338,17 @@ var CssUtils = {
 		return CssUtils.hasClass(element, CssUtils.visibilityClass);
 	},
 	removeClass: function (element, className) {
-		if (CssUtils.hasClass(element, className)) {
+		var hasClass = CssUtils.hasClass(element, className);
+		if (hasClass) {
 			element.className = element.className.replace(className, '');
 		}
+		return hasClass;
 	},
 	showElement: function (element) {
-		CssUtils.removeClass(element, CssUtils.visibilityClass)
+		return CssUtils.removeClass(element, CssUtils.visibilityClass)
 	},
 	hideElement: function (element) {
-		CssUtils.addClass(element, CssUtils.visibilityClass);
+		return CssUtils.addClass(element, CssUtils.visibilityClass);
 	},
 	toggleVisibility: function (element) {
 		return CssUtils.toggleClass(element,CssUtils.visibilityClass);

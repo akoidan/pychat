@@ -90,6 +90,7 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 TODO
 ====
+* Painter doesn't work on mobile devices (add ontouch)
 * add timeout to call. (finish after timeout) Display busy if calling to SAME chanel otherwise it will show multiple videos
 * Replace opacity in css to darken and lighten color function of sass
 * file transfer - add ability to click on user on receivehandler popup (draggable)

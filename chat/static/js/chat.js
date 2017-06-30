@@ -1246,7 +1246,7 @@ function ChannelsHandler() {
 	};
 	self.postCallUserAction = function () {
 		webRtcApi.toggleCallContainer();
-		webRtcApi.callPeople();
+		webRtcApi.callPeople(); //TODO
 	};
 	self.postCallTransferFileAction = function () {
 		webRtcApi.toggleCallContainer();
@@ -1282,7 +1282,7 @@ function ChannelsHandler() {
 			webRtcApi.showCallDialog();
 			webRtcApi.receiverId = parseInt(self.getActiveUserId());
 			webRtcApi.receiverName = self.getActiveUsername();
-			webRtcApi.callPeople();
+			webRtcApi.callPeople(); // TODO
 		} else {
 			growlError("You can't call yourself");
 		}
@@ -1491,9 +1491,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		self.removeNewMessages();
 		CssUtils.hideElement(self.dom.newMessages);
 		CssUtils.showElement(self.dom.deleteIcon);
-		// var isHidden = webRtcApi.isActive() && webRtcApi.channel != self.roomId; // TODO multirtc
-		var isHidden = true;
-		CssUtils.setVisibility(webRtcApi.dom.callContainer, self.callIsAttached && !isHidden);
+		if (self.callHandler) {
+			self.callHandler.restoreState()
+		}
 	};
 	/*==================== DOM EVENTS LISTENERS ============================*/
 // keyboard and mouse handlers for loadUpHistory
@@ -1530,22 +1530,24 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.dom.chatBoxDiv.addEventListener('keydown', self.keyDownLoadUp);
 	self.hide = function () {
 		CssUtils.hideElement(self.dom.chatBoxDiv);
+		if (self.callHandler) {
+			self.callHandler.hide();
+		}
 		CssUtils.hideElement(self.dom.userList);
 		CssUtils.removeClass(self.dom.roomNameLi, self.activeRoomClass);
-	};
-	self.setChannelAttach = function (isAttached) {
-		self.callIsAttached = isAttached;
-		if (isAttached) {
-			self.getCallHandler().show();
-		} else {
-			self.getCallHandler().hide();
-		}
 	};
 	self.getCallHandler = function () {
 		if (!self.callHandler) {
 			self.callHandler = new CallHandler(self.roomId)
 		}
 		return self.callHandler;
+	};
+	self.toggleCallHandler = function () {
+		if (self.callHandler) {
+			self.callHandler.toggle();
+		} else {
+			self.getCallHandler();
+		}
 	};
 	self.isPrivate = function () {
 		return self.dom.roomNameLi.hasAttribute(USER_ID_ATTR);
@@ -2169,6 +2171,7 @@ function CallHandler(roomId) {
 	var self = this;
 	BaseTransferHandler.call(self);
 	self.acceptedPeers = [];
+	self.visible = true;
 	self.roomId = roomId;
 	self.audioProcessors = {};
 	self.callPopupTable = {};
@@ -2421,7 +2424,13 @@ function CallHandler(roomId) {
 		CssUtils.showElement(self.dom.callContainerContent);
 	};
 	self.hide = function () {
-		CssUtils.showElement(self.dom.callContainerContent);
+		CssUtils.hideElement(self.dom.callContainerContent);
+	};
+	self.toggle = function() {
+		self.visible = !CssUtils.toggleVisibility(self.dom.callContainerContent);
+	};
+	self.restoreState = function() {
+		CssUtils.setVisibility(self.dom.callContainerContent, self.visible);
 	};
 	self.showOffer = function (message, channelName) {
 		self.getCallPopup().show(message.user, channelName);
@@ -2446,7 +2455,7 @@ function CallHandler(roomId) {
 	};
 	self.showAndAttachCallDialogOnResponse = function () {
 		channelsHandler.setActiveChannel(self.roomId);
-		channelsHandler.getActiveChannel().setChannelAttach(true);
+		channelsHandler.getActiveChannel().getCallHandler.show();
 		CssUtils.showElement(webRtcApi.dom.callContainer);
 	};
 	self.getTrack = function (isVideo) {
@@ -3167,7 +3176,7 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached) {
 		};
 	};
 	self.closeEvents = function (reason) {
-		self.log('Destroying CallPeerConnection because', reason);
+		self.log('Destroying CallPeerConnection because', reason)();
 		self.closePeerConnection();
 		if (self.audioProcessors && audioProcessors.javascriptNode) {
 			audioProcessors.javascriptNode.onaudioprocess = null;
@@ -3204,8 +3213,7 @@ function WebRtcApi() {
 		self.connections[data.connId]['on' + data.type](data);
 	};
 	self.toggleCallContainer = function () {
-		var visible = CssUtils.toggleVisibility(self.dom.callContainer);
-		channelsHandler.getActiveChannel().setChannelAttach(!visible);
+		channelsHandler.getActiveChannel().toggleCallHandler();
 	};
 	self.onsetConnectionId = function (message) {
 		var el = self.quedConnections[message.id];
@@ -3245,7 +3253,9 @@ function WebRtcApi() {
 		} else if (self.connections[data.connId]) {
 			self.connections[data.connId].handle(data);
 		} else {
-			logger.error('Connection "{}" is unknown. Available connections: "{}". Skipping message:', data.connId, Object.keys(self.connections))();
+			logger.error('Unable to handle "{}" because connection "{}" is unknown.' +
+					' Available connections: "{}". Skipping message:',
+					data.action, data.connId, Object.keys(self.connections))();
 		}
 	};
 	self.addCallHandler = function (callHandler) {
