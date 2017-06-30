@@ -10,7 +10,7 @@
 	font-weight: bold
 
 
-@mixin hovered-user-room()
+%hovered-user-room
 	&:hover:not(.active-room)
 		cursor: pointer
 		background-color:  rgba(135, 135, 135, 0.3)
@@ -206,6 +206,15 @@ p
 	right: 1px
 	font-size: 13px
 
+.icon-minimize
+	@extend .icon-cancel
+	right: 15px
+	top: -8px
+	font-size: 20px
+	&:before
+		content: '_'
+		font-weight: bolder
+
 .message-text-holder
 	overflow: hidden
 	padding-left: 5px
@@ -239,7 +248,7 @@ p
 		li
 			padding: 0 0 0 5px
 			border-radius: 2px
-			@include hovered-user-room
+			@extend %hovered-user-room
 
 #directUserTable,
 #rooms
@@ -249,7 +258,7 @@ p
 		border-radius: 3px
 		position: relative
 		height: 30px
-		@include hovered-user-room
+		@extend %hovered-user-room
 		&:hover
 			padding-right: 25px
 			.icon-cancel-circled-outline
@@ -407,6 +416,9 @@ p
 	overflow: auto
 	background-color: black
 	background-color: rgba(0, 0, 0, 0.5)
+	display: flex
+	justify-content: center
+	align-items: center
 
 .modal-body
 	border-radius: 3px
@@ -447,7 +459,10 @@ p
 		display: inline-block
 	.icon-cancel
 		float: right
-		color: rgb(177, 53, 51)
+		color: #b13533
+	.icon-minimize
+		float: right
+		color: #e2b500
 
 
 #chartdiv
@@ -479,7 +494,7 @@ p
 	label
 		cursor: pointer
 
-#callContainerContent
+.callContainerContent
 	padding: 5px
 	display: inline-block
 	min-width: 150px
@@ -490,14 +505,18 @@ p
 	width: 100%
 	padding-top: 10px
 
-.volumeLevelsHolder
-	display: inline-block
-	vertical-align: middle
-	padding-left: 10px
-	margin-top: -20px
-	> *
-		display: block
-		margin: auto
+	.hangUpHolder
+		display: inline-block
+		position: relative
+		width: 46px
+		height: 28px
+		margin-left: 10px
+		margin-top: -7px
+		.icon-hang-up
+			position: absolute
+			font-size: 35px
+			top: 0
+			left: 0
 
 =microphone-after
 	background-color: rgb(28, 30, 29)
@@ -506,13 +525,14 @@ p
 =microphone-progress
 	border-radius: 3px 0 0 3px
 
-#microphoneLevel
+.microphoneLevel
+	display: block
 	$color: #4b9637
 	$height: 6px
 	$transition-time: all 0.1s
 	height: $height
 	@include appearance(none)
-	width: 150px
+	width: 100%
 	background-size: auto
 	border: solid 1px
 	box-shadow: 0 1px 1px rgba(250, 255, 253, 0.2),  inset 0 1px 1px rgba(0, 0, 0, 0.41)
@@ -532,8 +552,6 @@ p
 	@-moz-document url-prefix()
 		height: $height - 2px
 
-#transmitProgress
-	margin-top: 5px
 #callUserList
 	margin: 0
 	min-width: 150px
@@ -604,7 +622,8 @@ p
 	border-radius: 3px
 	padding: 3px
 
-#videoContainer
+.videoContainer
+	min-height: 100px
 	position: relative
 	width: 100%
 	text-align: center
@@ -612,10 +631,6 @@ p
 	video
 		background: #272C2D
 		border: 1px solid grey
-
-#remoteVideo
-	max-height: calc(60vh - 120px)
-	max-width: 100%
 
 #changeProfileVideo
 	position: absolute
@@ -629,19 +644,15 @@ p
 	background-color: #0c0d0f
 	min-height: 150px
 
-#localVideo
+.localVideo
+	z-index: 1
 	position: absolute
 	max-width: 35%
 	max-height: 35%
 	background: #555
-	bottom: 0
-	right: 0
 	margin-bottom: 4px
 
 .modal-fixed
-	left: 50%
-	top: 45%
-	transform: translate(-50%, -50%)
 	padding: 10px
 	border-radius: 10px
 
@@ -650,76 +661,157 @@ p
 		margin: 10px
 
 .answerButtons
+	display: flex
 	padding-top: 10px
+	justify-content: space-around
 	text-align: center
 
-	/*collapse to center
+	.video-answer-btn
+		margin-left: 7px
+		margin-right: 7px
+		@extend .green-btn
 
-	> button
-		padding: 5px 10px 0 5px !important
-		margin-top: 5px
+	.answer-btn
+		@extend .green-btn
 
-		/* small screen collapsed distance between
-		border-radius: 20px
+	.decline-btn
+		@extend .red-btn
 
-	div
-		display: inline-block
-		vertical-align: top
-
-	i
-		font-size: 30px
-
-#hangUpIcon
-	float: right
-	font-size: 40px
-	margin-bottom: -25px
-	margin-top: -6px
+	button
+		position: relative
+		i
+			top: 4px
+			left: 5px
+			position: absolute
+			font-size: 21px
+		&:active i
+			top: 5px
+		div
+			display: inline-block
+			padding-left: 25px
+			vertical-align: top
+	@media screen and (max-width: 500px)
+		flex-direction: column
+		button
+			width: 100%
+			&.video-answer-btn
+				margin: 8px 0
 
 .fullscreen
-	&#videoContainer
+	&.videoContainer
 		background-color: black
 
-	#remoteVideo
+	.micVideoWrapper > video
 		max-height: 99vh
 		height: 99vh
 
-	&#videoContainer video
+	&.videoContainer video
 		border-color: #272727
+	.icon-webrtc-cont
+		display: block
 
-#videoStatusIcon
-	margin-left: -5px
-	margin-right: 15px
 
-#icon-webrtc-cont
+.micVideoWrapper
+	display: inline-block
+	position: relative
+	margin: 1px
+	$color: rgba(24, 24, 25, 0.82)
+	%asbolute
+		z-index: 3
+		position: absolute
+		background-color: $color
+		box-shadow: 0 0 6px 6px $color
+		border-radius: 6px
+		display: none
+	video
+		max-height: calc(60vh - 120px)
+		max-width: 100%
+	> div
+		@extend %asbolute
+		bottom: 5px
+		left: calc(50% - 55px)
+	> span
+		@extend %asbolute
+		top: calc(5px + 10%)
+		font-size: 20px
+		left: 50%
+		transform: translateX(-50%)
+	&:hover
+		div, span
+			display: block
+
+@import "chat-videos"
+
+.icon-webrtc-cont
 	display: none
 	position: absolute
 	bottom: 2vh
 	left: 2vw
-
-.fullscreen #icon-webrtc-cont
-	display: block
-
-#icon-webrtc-cont > i
-	display: block
-	font-size: 36px
-	opacity: 1
-
-	&:before
-		border-radius: 50%
-		width: 36px
-		height: 36px
-		padding: 8px
-		background: rgba(102, 102, 102, 0.6)
-		text-align: center
-		box-shadow: 3px 3px 12px #444
+	i:hover:before, .icon-webrtc-nomic:before, .icon-webrtc-novideo:before
+		background-color: rgba(88, 143, 255, 0.6)
+		opacity: 1
 		color: white
-		margin: 7px 30px 15px 7px
+		box-shadow: 6px 6px 36px #666
+
+	i.icon-webrtc-hangup:hover:before
+		background: rgba(217, 24, 24, 0.6)
+	> i
+		display: block
+		font-size: 36px
+		opacity: 1
+
+		&:before
+			border-radius: 50%
+			width: 36px
+			height: 36px
+			padding: 8px
+			background: rgba(102, 102, 102, 0.6)
+			text-align: center
+			box-shadow: 3px 3px 12px #444
+			color: white
+			margin: 7px 30px 15px 7px
+
+.inactive .icon-webrtc-cont > i
+	transform: translateX(calc(-2vw - 70px))
+	@include transition(all 0.1s ease-in-out)
 
 .icon-webrtc-fullscreen
 	position: absolute
 	left: -30px
 	font-size: 40px
 	top: -10px
+
+.transferFile
+	min-width: 200px
+	.yesNo
+		padding-top: 15px
+		display: flex
+		justify-content: space-around
+		input[type=button]
+			width: 100%
+			&[value=Accept]
+				@extend .green-btn
+				margin-right: 10px
+			&[value=Decline]
+				@extend .red-btn
+	.progress-wrap
+		width: calc(100% - 20px)
+		margin: auto
+	.success
+		color: #5cc75c
+		font-weight: bold
+	.error
+		color: #f15e5e
+		font-weight: bold
+
+.table
+	th
+		color: #79aeb6
+		font-weight: bold
+	td
+		text-overflow: ellipsis
+		max-width: 250px
+		overflow: hidden
 
 #painter
 	width: 400px
@@ -731,24 +823,11 @@ p
 #paintRadius::-webkit-slider-runnable-track
 	background-size: 10% 100%, 100% 100%
 
-#enterFullScreenHolder
+.enterFullScreenHolder
 	position: relative
 	display: inline
+	margin-left: 20px
 	padding-left: 5px
-
-#icon-webrtc-cont
-	i:hover:before, .icon-webrtc-nomic:before, .icon-webrtc-novideo:before
-		background-color: rgba(88, 143, 255, 0.6)
-		opacity: 1
-		color: white
-		box-shadow: 6px 6px 36px #666
-
-	i.icon-webrtc-hangup:hover:before
-		background: rgba(217, 24, 24, 0.6)
-
-.inactive #icon-webrtc-cont > i
-	transform: translateX(calc(-2vw - 70px))
-	@include transition(all 0.1s ease-in-out)
 
 @media screen and (max-height: 550px)
 	#callContainer

@@ -91,7 +91,7 @@ IS_HTTPS = 'CRT_PATH' in locals()
 API_PORT = '8888'
 WEBSOCKET_PROTOCOL = 'wss' if IS_HTTPS else 'ws'
 SITE_PROTOCOL = 'https' if IS_HTTPS else 'http'
-API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/'))
+API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/?id='))
 
 # SESSION_COOKIE_AGE = 10
 # SESSION_SAVE_EVERY_REQUEST = True
@@ -256,11 +256,13 @@ LOGGING = {
 	},
 	'formatters': {
 		'django': {
-			'format': '%(user_id)s:%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
+			'format': '%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},
 }
+
+WS_ID_CHAR_LENGTH = 4
 
 
 logging.config.dictConfig(LOGGING)
@@ -289,6 +291,7 @@ JS_CONSOLE_LOGS = True
 IP_API_URL = 'http://ip-api.com/json/%s'
 
 ALL_REDIS_ROOM = 'all'
+WEBRTC_CONNECTION = 'webrtc_conn'
 ALL_ROOM_ID = 1
 
 SELECT_SELF_ROOM = """SELECT
@@ -309,7 +312,7 @@ UPDATE chat_room_users out_cru
 	INNER JOIN
 		(SELECT
 			max(chat_message.id) message_id,
-			chat_room_users.id	 rooms_users_id
+			chat_room_users.id rooms_users_id
 		 FROM chat_room_users
 			JOIN chat_message ON chat_message.room_id = chat_room_users.room_id
 		WHERE chat_room_users.user_id = %s and chat_room_users.room_id != {}

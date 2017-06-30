@@ -200,16 +200,16 @@ def extract_photo(image_base64, filename=None):
 	base64_type_data = re.search(r'data:(\w+/(\w+));base64,(.*)$', image_base64)
 	logger.debug('Parsing base64 image')
 	image_data = base64_type_data.group(3)
-	file = BytesIO(base64.b64decode(image_data))
+	f = BytesIO(base64.b64decode(image_data))
 	content_type = base64_type_data.group(1)
 	name = filename or ".{}".format(base64_type_data.group(2))
 	logger.debug('Base64 filename extension %s, content_type %s', name, content_type)
 	image = InMemoryUploadedFile(
-		file,
+		f,
 		field_name='photo',
 		name=name,
 		content_type=content_type,
-		size=sys.getsizeof(file),
+		size=sys.getsizeof(f),
 		charset=None)
 	return image
 

@@ -1,0 +1,8 @@
+Webrtc frontend classes diagram you can find [here](https://www.draw.io/?lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=draw.io-uml_diagram.xml#Uhttps%3A%2F%2Fraw.githubusercontent.com%2FDeathangel908%2Fdjangochat-config%2Fmaster%2Fdraw.io-uml_diagram.xml).
+
+By default each user has turned off browser (console) logs. You can turn them on in [/#/profile](https://localhost:8000/#/profile) page (`logs` checkbox). All websocket/rest packets will be logged in console then. You can also inspect ws messages [here](https://github.com/Deathangel908/djangochat-config/blob/master/ws_messages.jpeg?raw=true) for chromium. `wsHandler` takes care of handling those messages. It has `handleMessage(object)` and `handle(string)` methods. You can play with both in debug to see what's going on.
+
+#Smileys
+This chat uses default smiles from commfort application. All scripts to extract smiles located in [djangochat-config](https://github.com/Deathangel908/djangochat-config) project
+https://github.com/Deathangel908/djangochat-config/tree/master/smileys
+You can easily add new smileys by adding base64

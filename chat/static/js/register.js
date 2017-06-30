@@ -273,8 +273,8 @@ function sendGoogleTokenToServer(token) {
 function onGoogleSignIn() {
 	var googleUser = auth2.currentUser.get();
 	var profile = googleUser.getBasicProfile();
-	console.log(getDebugMessage("Signed as {} with id {} and email {}  ",
-			profile.getName(), profile.getId(), profile.getEmail()));
+	logger.info("Signed as {} with id {} and email {}  ",
+			profile.getName(), profile.getId(), profile.getEmail())();
 	googleToken = googleUser.getAuthResponse().id_token;
 	sendGoogleTokenToServer(googleToken);
 }
@@ -291,14 +291,14 @@ function googleLogin(event) {
 		doGet(G_OAUTH_URL, function () {
 			gapi.load('client:auth2', function () {
 			  //gapi.client.setApiKey(apiKey);
-				console.log(getDebugMessage("Initing google sdk"));
+				logger.info("Initing google sdk")();
 				gapi.auth2.init().then(function () {
 					auth2 = gapi.auth2.getAuthInstance();
 					auth2.isSignedIn.listen(function (isSignedIn) {
 						if (isSignedIn) {
 							onGoogleSignIn();
 						} else {
-							console.warn(getDebugMessage("Skipping sending token because not signed in into google"));
+							logger.warn("Skipping sending token because not signed in into google")();
 						}
 					});
 					if (auth2.isSignedIn.get()) {
@@ -329,7 +329,7 @@ function facebookLogin(event) {
 }
 
 window.fbAsyncInit = function () {
-	console.log(getDebugMessage("Initing facebook sdk..."));
+	logger.info("Initing facebook sdk...")();
 	FB.init({
 		appId: FACEBOOK_APP_ID,
 		xfbml: true,
@@ -356,7 +356,7 @@ function fbStatusChangeIfReAuth(response) {
 }
 
 function fbStatusChange(response) {
-	console.log(response);
+	loggerInfo(response);
 	if (fbStatusChangeIfReAuth(response)) {
 		FB.login(fbStatusChangeIfReAuth, {auth_type: 'reauthenticate'});
 	}
