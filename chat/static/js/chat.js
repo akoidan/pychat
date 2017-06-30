@@ -2079,8 +2079,12 @@ function BaseTransferHandler(removeReferenceFn) {
 	self.handle = function (data) {
 		if (data.handler === 'webrtcTransfer') {
 			self['on' + data.action](data);
-		} else {
+		} else if (self.peerConnections[data.opponentWsId]) {
 			self.peerConnections[data.opponentWsId]['on' + data.action](data);
+		} else { // this is only supposed to be for destroyPeerConnection
+			// when self.pc.iceConnectionState === 'disconnected' fired before destroyCallConnection action came
+			self.logErr("Can't execute {} on {}, because such PC doesn't exist. Existing PC:{}",
+					data.action, data.opponentWsId, Object.keys(self.peerConnections))();
 		}
 	};
 	self.setConnectionId = function (id) {
@@ -2502,7 +2506,8 @@ function CallHandler(roomId) {
 		self.superRemoveChildPeerReference(id);
 		var index = self.acceptedPeers.indexOf(id);
 		if (index > - 1) { // remove
-			self.acceptedPeers = self.acceptedPeers.splice(index, 1);
+			self.acceptedPeers.splice(index, 1);
+			self.log("Removed {} from acceptedPeers, current acceptedPeers are {}", id, self.acceptedPeers.toString())();
 		}
 		if (!self.accepted) {
 			if (self.callPopupTable[id]) {
@@ -2549,7 +2554,7 @@ function CallHandler(roomId) {
 				self.peerConnections[e].connectToRemote(self.localStream);
 			} else {
 				self.logErr("Unable to get pc with id {}, available peer connections are {}, accepted peers are {}",
-						e, Object.keys(self.peerConnections), Object.keys(self.acceptedPeers))();
+						e, Object.keys(self.peerConnections), self.acceptedPeers.toString())();
 			}
 		});
 		wsHandler.sendToServer({
