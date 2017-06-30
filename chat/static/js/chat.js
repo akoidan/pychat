@@ -2172,7 +2172,7 @@ function CallHandler(roomId) {
 	var self = this;
 	BaseTransferHandler.call(self);
 	self.acceptedPeers = [];
-	self.callTimeoutTime = 5000;
+	self.callTimeoutTime = 60000;
 	self.visible = true;
 	self.roomId = roomId;
 	self.audioProcessors = {};
@@ -2503,6 +2503,10 @@ function CallHandler(roomId) {
 	self.superRemoveChildPeerReference = self.removeChildPeerReference;
 	self.removeChildPeerReference = function (id, reason) {
 		self.superRemoveChildPeerReference(id);
+		var index = self.acceptedPeers.indexOf(id);
+		if (index > - 1) { // remove
+			self.acceptedPeers = self.acceptedPeers.splice(index, 1);
+		}
 		if (!self.accepted) {
 			if (self.callPopupTable[id]) {
 				self.callPopupTable[id].textContent = 'Declined';
@@ -3262,7 +3266,7 @@ function WebRtcApi() {
 				action: 'cancelCallConnection',
 				connId: message.connId
 			});
-			growlInfo("User {} tries to call you", message.user);
+			growlInfo("User {} tried to call.".format(message.user));
 		}
 	};
 	self.handle = function (data) {
