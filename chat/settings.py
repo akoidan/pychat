@@ -73,8 +73,11 @@ FACEBOOK_JS_URL = '//connect.facebook.net/en_US/sdk.js'
 #FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
 # GOOGLE_OAUTH_2_HOST = 'pychat.org'
 
+REDIS_PORT = 6379
+TORNADO_REDIS_PORT = REDIS_PORT
+SESSION_REDIS_PORT = REDIS_PORT
 SESSION_ENGINE = 'redis_sessions.session'
-BROKER_URL = 'redis://localhost:6379/0'
+BROKER_URL = str(SESSION_REDIS_PORT).join(('redis://localhost:','/0'))
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -86,7 +89,7 @@ KEY_PATH = '/etc/nginx/ssl/server.key'
 IS_HTTPS = 'CRT_PATH' in locals()
 WEBSOCKET_PROTOCOL = 'wss' if IS_HTTPS else 'ws'
 SITE_PROTOCOL = 'https' if IS_HTTPS else 'http'
-API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/'))
+API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/?id='))
 
 # SESSION_COOKIE_AGE = 10
 # SESSION_SAVE_EVERY_REQUEST = True
@@ -263,11 +266,13 @@ LOGGING = {
 	},
 	'formatters': {
 		'django': {
-			'format': '%(user_id)s:%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
+			'format': '%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
 			'datefmt': '%H:%M:%S',
 		},
 	},
 }
+
+WS_ID_CHAR_LENGTH = 4
 
 
 logging.config.dictConfig(LOGGING)
@@ -299,6 +304,7 @@ ADMINS = [('Andrew', 'nightmare.quake@mail.ru'), ]
 IP_API_URL = 'http://ip-api.com/json/%s'
 
 ALL_REDIS_ROOM = 'all'
+WEBRTC_CONNECTION = 'webrtc_conn'
 ALL_ROOM_ID = 1
 
 SELECT_SELF_ROOM = """SELECT
@@ -319,7 +325,7 @@ UPDATE chat_room_users out_cru
 	INNER JOIN
 		(SELECT
 			max(chat_message.id) message_id,
-			chat_room_users.id	 rooms_users_id
+			chat_room_users.id rooms_users_id
 		 FROM chat_room_users
 			JOIN chat_message ON chat_message.room_id = chat_room_users.room_id
 		WHERE chat_room_users.user_id = %s and chat_room_users.room_id != {}

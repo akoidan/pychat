@@ -41,6 +41,7 @@ chat/static/js/amcharts-dark.js
 chat/static/js/amcharts-all.js
 chat/static/js/md5.js
 chat/static/sass/partials/_asphalt.sass
+chat/static/sass/partials/_ajax-status.sass
 chat/production.py
 backup.sh
 data.sql

@@ -1,22 +1,36 @@
 ![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7--1.9-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/djangochat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/djangochat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/djangochat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/djangochat)
 
-What is it?
-==============
-This is free web (browser) chat. It allows users send instant text messages or images, make video/audio calls, send files and other useful stuff.
+This is web (browser) chat, that supports:
+ - Sending instant text messages via websockets.
+ - Sending images to chat.
+ - Smiles.
+ - [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) calls and video conference using webrtc.
+ - Peer to peer file sending
+ - Drawing images using canvas.
+ - Facebook/google oauth.
+
+Live demo: [pychat.org](http://pychat.org/)
+
+Table of contents
+=================
+  * [Breaf description](#how-it-works)
+  * [Installation](#installation)
+    * [Prepare the system](#prepare-the-system)
+    * [Run chat](#run-chat)
+  * [Contributing](#contributing)
+  * [TODO list](#todo)
 
 How it works?
-==============
-Chat is written in **Python** with [django](https://www.djangoproject.com/). For handling realtime messages [WebSockets](https://en.wikipedia.org/wiki/WebSocket) are used: browser support on client part and asynchronous framework [Tornado](http://www.tornadoweb.org/) on server part. Messages are being broadcast by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using [tornado-redis](https://github.com/leporo/tornado-redis) backend. Redis is also used as django session backend and for storing current users online.  For video call [webrtc](https://webrtc.org/) technology was used with stun server to make a connection, which means you will always get the lowest ping and the best possible connection channel. Client part doesn't use any javascript frameworks (like jquery or datatables) in order to get best performance. Chat written as a singlePage application, so even if user navigates across different pages websocket connection doesn't break. Chat also supports OAuth2 login standard via FaceBook/Google. Css is compiled from [sass](http://sass-lang.com/guide). Server side can be run on any platform **Windows**, **Linux**, **Mac** with **Python 2.7** and **Python 3.x**. Client (users) can use the chat from any browser with websocket support: IE11, Edge, Chrome, Firefox, Android, Opera, Safari...
+=============
+Chat is written in **Python** with [django](https://www.djangoproject.com/). For handling realtime messages [WebSockets](https://en.wikipedia.org/wiki/WebSocket) are used: browser support on client part and asynchronous framework [Tornado](http://www.tornadoweb.org/) on server part. Messages are being broadcast by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using [tornado-redis](https://github.com/leporo/tornado-redis) backend. Redis is also used as django session backend and for storing current users online.  For video call [webrtc](https://webrtc.org/) technology was used with stun server to make a connection, which means you will always get the lowest ping and the best possible connection channel. Client part doesn't use any javascript frameworks (like jquery or datatables) in order to get best performance. Chat written as a singlePage application, so even if user navigates across different pages websocket connection doesn't break. Chat also supports OAuth2 login standard via FaceBook/Google. Css is compiled from [sass](http://sass-lang.com/guide). Server side can be run on any platform **Windows**, **Linux**, **Mac** with **Python 2.7** and **Python 3.x**.Client (users) can use the chat from any browser with websocket support: IE11, Edge, Chrome, Firefox, Android, Opera, Safari...
 
-[Live demo](http://pychat.org/)
-================
-
-Setup instructions for Archlinux:
-================================
+Installation:
+=============
 
 Though ArchLinux is not recommended as a server OS I prefer using it over other stable ones.
   
 Prepare the system.
+------------------
  0. Install packages `pacman -S  git nginx python python-pip redis mariadb mysql-python python-mysql-connector postfix ruby gcc jansson`. You surely can install `uwsgi` and `uwsgi-plugin-python` via pacman but I found pip's package more stable so `pip install uwsgi`. Also you need to install sass, you can do it via aur `yaourt -S ruby-sass` or gem: `gem install sass` (don't forget to add `sass` to `PATH` variable if you install it via gem: `export PATH="$PATH:$(ls ~/.gem/ruby/*/bin/ -d)"`)
  0. Clone project to local filesystem (I would recommend to clone it into `/srv/http` directory): `git clone https://github.com/Deathangel908/djangochat`. Further instructions assume that working directory is project root, so `cd djangochat`. And change the branch: `git checkout -b prod_archlinux origin/prod_archlinux`
  0. If you cloned project into different directory than `/srv/http` you need to replace all absolute paths for your one in config files `pattern="/srv/http"; grep -rl "$pattern" ./rootfs |xargs sed -i "s#$pattern#$PWD#g"` 
@@ -33,7 +47,8 @@ Prepare the system.
  0. Add django admin static files: `python manage.py collectstatic`
  0. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
 
-Start the chat:
+Run chat:
+---------
  1. Start session holder: `systemctl start redis`
  1. Run server: `systemctl start  nginx`
  1. Start email server `systemctl start postfix`
@@ -43,10 +58,25 @@ Start the chat:
  1. Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx listens no by ip address but by domain.name
  1. If something doesn't work you want to check `djangochat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
 
-# TODO
+Contributing:
+=============
+Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
+
+TODO
+====
 * add tornado sinle log file instead of 1 per port, add port param to it
 * Add colored logs http://stackoverflow.com/questions/7505623/colors-in-javascript-console
 * replace `new Date().getTime()` with `Date.now()`
+* remove setHeaderTest, highlight current page icos. Always display username in right top
+* Painter doesn't work on mobile devices (add ontouch)
+* add timeout to call. (finish after timeout) Display busy if calling to SAME chanel otherwise it will show multiple videos
+* Replace opacity in css to darken and lighten color function of sass
+* file transfer - add ability to click on user on receivehandler popup (draggable)
+* Ability to restore minimized draggable
+* Add showing time left and current send speed to file transfer dialog
+* add message queue if socketed is currently disconnected ???
+* Add FileSystem api to be able to store large files https://www.html5rocks.com/en/tutorials/file/filesystem/
+* Add link to gihub in console
 * `'` Symbol in links breaks anchor tag. For example https://raw.githubusercontent.com/NeverSinkDev/NeverSink-Filter/master/NeverSink's%20filter%20-%201-REGULAR.filter
 * webrtc connection lost while transfering file causes js error
 * Add title for room. 
@@ -71,7 +101,6 @@ Start the chat:
 * move loading messages on startup to single function? 
 * add antiflood settings to nginx
 * tornado redis connection reset prevents user from deleting its entry in online_users
-* run tornado via nginx http://tornado.readthedocs.org/en/latest/guide/running.html
 * fixme tornado logs messages to chat.log when messages don't belong to tornadoapp.p
 * add media query for register and usersettings to adjust for phone's width
 * add change password and realtime javascript to change_profile

@@ -11,14 +11,11 @@
 	<meta property="og:description" content="Chat with your friends, make video calls or transfer files with Pychat!"/>
 	<script>
 		const RESPONSE_SUCCESS = "{{ successResponse }}";
-		window.LOGS = {{ logs |yesno:"true,false" }};
+		window.START_WITH_LOGS = {{ logs |yesno:"true,false" }};
 	</script>
 	<script src="{% md5url "js/base.js" %}"></script>
 	{% block head %} {% endblock head %}
 	<style>
-		#ajaxStatus.show {
-			background-image: url('{% md5url 'images/ajaxStatus.gif' %}');
-		}
 		@font-face {
 			font-family: 'Oswald';
 			font-style: normal;

@@ -34,12 +34,10 @@
 
 	// call container
 	.modal-body
-		$start-gradient: rgba(42, 46, 42, 0.89)
-		@include linear-gradient($start-gradient, #181b18)
+		@include linear-gradient(#1e3348, #0f1922)
 		box-shadow: 0 5px 5px #16161f
-		background: linear-gradient(#243240, #0d1b29)
-		input[type=button]
-			background: linear-gradient(#353c4c, #101318)
+		input[type=button], button
+			@include linear-gradient(#353c4c, #101318)
 			border-radius: 4px
 			border: 1px solid #091016
 			box-shadow: 0 1px 0 #525969 inset, 0 1px 0 #212e3b
@@ -51,7 +49,6 @@
 			padding: $padding-vert $padding-hori
 			opacity: 1
 			font-family: sans-serif
-			background-color: rgba(0, 0, 0, 0)
 			&:hover
 				background: #242a36
 			&:active
@@ -62,6 +59,13 @@
 			&[type=text], &[type=search]
 				&::-webkit-input-placeholder
 					color: rgba(208, 215, 231, 0.51)
+
+	.modal-fixed
+		color: darkgrey
+		opacity: 1 !important
+		box-shadow: 2px 2px 3px 4px rgba(0, 0, 0, 0.3)
+		border-top: 1px solid #385877
+		border-left: 1px solid #1d3347
 
 	.windowHeader
 		border-radius: 4px 4px 0 0
@@ -85,7 +89,8 @@
 			left: 0
 			position: absolute
 			width: 100%
-		.icon-cancel
+		$left: 11px
+		.icon-action
 			background: radial-gradient(circle farthest-side at right bottom, #c7c8ca, #30333c)
 			border: 1px solid #22252b
 			border-radius: 50%
@@ -96,7 +101,6 @@
 			list-style-type: none
 			position: absolute
 			width: 11px
-			left: 11px
 			opacity: 1
 			-webkit-mask-image: none
 			box-sizing: border-box
@@ -111,27 +115,46 @@
 				top: 1px
 				margin: 0
 				width: 5px
+				&:hover
+					background: linear-gradient(#ffffff 1%, rgba(0, 0, 0, 0))
+		@mixin background($grad-start, $grad-end)
+			background: radial-gradient(circle farthest-side at right bottom, $grad-start, $grad-end)
+		.icon-cancel
+			@extend .icon-action
+			$grad-end: #911306
+			$grad-start: #cea29e
+			left: $left
+			@include background($grad-start, $grad-end)
 			&:hover
-				background: radial-gradient(circle farthest-side at right bottom, #cea29e, #911306)
+				@include background(lighten($grad-start, 10%), lighten($grad-end, 10%))
+		.icon-minimize
+			$grad-start: #c1bc62
+			$grad-end: #837700
+			@extend .icon-action
+			left: $left*2 + 5 // margin
+			@include background($grad-start, $grad-end)
+			&:hover
+				@include background(lighten($grad-start, 5%), lighten($grad-end, 5%))
+
 	.callContainerIcons
 		color: #259BBD
+		.icon-hang-up
+			color: #BC2F2F
 	#callUserList
 		color: #A5A5A5
 		background-color: #242A2A
-	#hangUpIcon
-		color: #BC2F2F
-	.active-call-user
-		@include linear-gradient(#1A747A, #104B4F)
-		text-shadow: $default-shadow
 	.red-btn
 		@include linear-gradient(#A30000, #530000)
-		background-color: #530000
+		&:hover
+			@include linear-gradient(#6c0808, #6c0808)
+		&:active
+			@include linear-gradient(#530000, #9a0000)
 	.green-btn
 		@include linear-gradient(#148212, #093C08)
-		background-color: #093C08
-	.answerButtons div
-		padding-top: 8px
-
+		&:hover
+			@include linear-gradient(#114b0f, #114b0f)
+		&:active
+			@include linear-gradient(#093C08, #146013)
 	.newMessagesCount
 		background-color: #891313
 		// end call container

@@ -47,23 +47,24 @@
 		color: #fcaf3e
 
 	// call container
-	.active-call-user
-		background-color: #386D63
 	.modal-body
 		background: #282923
-		.icon-cancel
+		.icon-action
 			float: right
+		.icon-cancel
+			@extend .icon-action
 			color: rgb(177, 53, 51)
+		.icon-minimize
+			@extend .icon-action
+			color: rgb(177, 168, 0)
 	.windowHeader
 		background-color: #42433B
 	.callContainerIcons
 		color: darkgreen
+		.icon-hang-up
+			color: #910000
 	#callUserList
 		background-color: #343A3B
-	#hangUpIcon
-		color: #910000
-	.answerButtons div
-		padding-top: 5px
 
 	.newMessagesCount
 		background-color: #913d3c
