@@ -2545,7 +2545,12 @@ function CallHandler(roomId) {
 	self.sendAcceptAndInitPeerConnections = function () {
 		self.accepted = true;
 		self.acceptedPeers.forEach(function(e) {
-			self.peerConnections[e].connectToRemote(self.localStream);
+			if (self.peerConnections[e]) {
+				self.peerConnections[e].connectToRemote(self.localStream);
+			} else {
+				self.logErr("Unable to get pc with id {}, available peer connections are {}, accepted peers are {}",
+						e, Object.keys(self.peerConnections), Object.keys(self.acceptedPeers))();
+			}
 		});
 		wsHandler.sendToServer({
 			action: 'acceptCall',
@@ -3142,17 +3147,19 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached) {
 		remote: document.createElement('video'),
 		callVolume: document.createElement('input')
 	};
-	self.dom.userSpan.textContent = userName;
-	self.dom.videoContainer.appendChild(self.dom.remote);
-	self.dom.callVolume.addEventListener('input', self.changeVolume);
-	var colVolumeWrapper = document.createElement('div');
-	self.dom.videoContainer.appendChild(colVolumeWrapper);
-	colVolumeWrapper.appendChild(self.dom.callVolume);
-	self.dom.videoContainer.appendChild(self.dom.userSpan);
-	self.dom.callVolume.setAttribute("type", "range");
-	self.dom.callVolume.setAttribute("value", "100");
-	self.dom.callVolume.setAttribute("title", "Volume level");
-	styleInputRange(self.dom.callVolume);
+	self.init = function () {
+		self.dom.userSpan.textContent = userName;
+		self.dom.videoContainer.appendChild(self.dom.remote);
+		self.dom.callVolume.addEventListener('input', self.changeVolume);
+		var colVolumeWrapper = document.createElement('div');
+		self.dom.videoContainer.appendChild(colVolumeWrapper);
+		colVolumeWrapper.appendChild(self.dom.callVolume);
+		self.dom.videoContainer.appendChild(self.dom.userSpan);
+		self.dom.callVolume.setAttribute("type", "range");
+		self.dom.callVolume.setAttribute("value", "100");
+		self.dom.callVolume.setAttribute("title", "Volume level");
+		styleInputRange(self.dom.callVolume);
+	};
 	self.onsetError = function (message) {
 		growlError(message.content)
 	};
@@ -3212,6 +3219,7 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached) {
 	self.ondestroyCallConnection = function (message) {
 		self.closeEvents("Opponent hang up");
 	};
+	self.init();
 }
 
 function WebRtcApi() {
@@ -3489,14 +3497,18 @@ var Utils = {
 		}
 	},
 	extractError: function (arguments) {
-		if (typeof arguments === 'string') {
-			return arguments;
-		} else if (arguments.length > 1) {
-			return Array.prototype.join.call(arguments, ' ');
-		} else if (arguments.length === 1) {
-			arguments = arguments[0];
+		try {
+			if (typeof arguments === 'string') {
+				return arguments;
+			} else if (arguments.length > 1) {
+				return Array.prototype.join.call(arguments, ' ');
+			} else if (arguments.length === 1) {
+				arguments = arguments[0];
+			}
+			return arguments && (arguments.name || arguments.message) ? "{}: {}".format(arguments.name, arguments.message) : JSON.stringify(arguments);
+		} catch (e) {
+			return "Error during parsing error, :("
 		}
-		return arguments.name || arguments.message ? "{}: {}".format(arguments.name, arguments.message) : JSON.stringify(arguments);
 	},
 	createMicrophoneLevelVoice: function (stream, onaudioprocess) {
 		try {
