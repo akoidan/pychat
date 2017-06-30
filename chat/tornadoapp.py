@@ -167,11 +167,12 @@ class MessagesCreator(object):
 			VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER,
 		}
 
-	def set_ws_id(self, random):
+	def set_ws_id(self, random, self_id):
 		return {
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 			VarNames.EVENT: Actions.SET_WS_ID,
-			VarNames.CONTENT: random
+			VarNames.CONTENT: random,
+			VarNames.WEBRTC_OPPONENT_ID: self_id
 		}
 
 	def room_online(self, online, event, channel):
@@ -200,8 +201,7 @@ class MessagesCreator(object):
 			VarNames.EVENT: Actions.SET_WEBRTC_ID,
 			VarNames.HANDLER_NAME: HandlerNames.WEBRTC,
 			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_QUED_ID: qued_id,
-			VarNames.WEBRTC_OPPONENT_ID: self.id
+			VarNames.WEBRTC_QUED_ID: qued_id
 		}
 
 	def set_webrtc_error(self, error, connection_id, qued_id=None):
@@ -1010,7 +1010,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 		conn_arg = self.get_argument('id', None)
 		self.id, random = create_id(self.user_id, conn_arg)
 		if random != conn_arg:
-			self.ws_write(self.set_ws_id(random))
+			self.ws_write(self.set_ws_id(random, self.id))
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)

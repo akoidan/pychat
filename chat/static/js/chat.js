@@ -2083,10 +2083,8 @@ function BaseTransferHandler(removeReferenceFn) {
 			self.peerConnections[data.opponentWsId]['on' + data.action](data);
 		}
 	};
-	self.setConnectionId = function (id, myId) {
+	self.setConnectionId = function (id) {
 		self.connectionId = id;
-		self.selfWsid = myId; // used to  determine who's sender and who's receiver
-		// well it's same as loggedUserId + wsHandler.wsConnectionId, but for sake we set it explicitly
 		self.log("CallHandler initialized")();
 	};
 	self.closeAllPeerConnections = function (text) {
@@ -2489,7 +2487,7 @@ function CallHandler(roomId) {
 		var videoContainer = document.createElement('div');
 		videoContainer.className = 'micVideoWrapper';
 		self.dom.videoContainerForVideos.insertBefore(videoContainer, self.dom.videoContainerForVideos.firstChild);
-		var PeerConnectionClass = message.opponentWsId > self.selfWsid ? CallSenderPeerConnection : CallReceiverPeerConnection;
+		var PeerConnectionClass = message.opponentWsId > wsHandler.wsConnectionFullId ? CallSenderPeerConnection : CallReceiverPeerConnection;
 		self.peerConnections[message.opponentWsId] = new PeerConnectionClass(
 				message.connId,
 				message.opponentWsId,
@@ -3242,7 +3240,7 @@ function WebRtcApi() {
 		var el = self.quedConnections[message.id];
 		delete self.quedConnections[message.id];
 		self.connections[message.connId] = el;
-		el.setConnectionId(message.connId, message.opponentWsId);
+		el.setConnectionId(message.connId);
 	};
 	self.onofferFile = function(message) {
 		var handler = new FileReceiver(self.removeChildReference);
@@ -3325,7 +3323,8 @@ function WsHandler() {
 	};
 	self.handle = function (message) {
 		self.wsConnectionId = message.content;
-		logger.info("CONNECTION ID HAS BEEN SET TO {}", self.wsConnectionId)();
+		self.wsConnectionFullId = message.opponentWsId;
+		logger.info("CONNECTION ID HAS BEEN SET TO {}, (full id is {})", self.wsConnectionId, self.wsConnectionFullId)();
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
@@ -3490,15 +3489,21 @@ var Utils = {
 		}
 	},
 	extractError: function (arguments) {
-		var argument = arguments[0] || arguments;
-		return arguments.length > 1 ? Array.prototype.join.call(arguments, ' ') :
-				argument.name || argument.message ? "{}: {}".format(argument.name, argument.message) :
-						JSON.stringify(arguments);
+		if (typeof arguments === 'string') {
+			return arguments;
+		} else if (arguments.length > 1) {
+			return Array.prototype.join.call(arguments, ' ');
+		} else if (arguments.length === 1) {
+			arguments = arguments[0];
+		}
+		return arguments.name || arguments.message ? "{}: {}".format(arguments.name, arguments.message) : JSON.stringify(arguments);
 	},
 	createMicrophoneLevelVoice: function (stream, onaudioprocess) {
 		try {
-			if (stream.getTrack(false)) {
-				throw "Stream has no tracks";
+			var audioTracks = stream && stream.getAudioTracks();
+			audioTracks = audioTracks.length > 0 ? audioTracks[0] : false;
+			if (!audioTracks) {
+				throw "Stream has no audio tracks";
 			}
 			var audioProc = {};
 			audioProc.audioContext = new AudioContext();
