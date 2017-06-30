@@ -1277,16 +1277,6 @@ function ChannelsHandler() {
 			actionTrigger: 'addOnlineUser'
 		}
 	};
-	self.call = function () {
-		if (self.getActiveUsername() != loggedUser) {
-			webRtcApi.showCallDialog();
-			webRtcApi.receiverId = parseInt(self.getActiveUserId());
-			webRtcApi.receiverName = self.getActiveUsername();
-			webRtcApi.callPeople(); // TODO
-		} else {
-			growlError("You can't call yourself");
-		}
-	};
 	self.dom.activeUserContext = null;
 	self.showContextMenu = function (e) {
 		var li = e.target;
@@ -1538,9 +1528,21 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.getCallHandler = function () {
 		if (!self.callHandler) {
-			self.callHandler = new CallHandler(self.roomId)
+			self.callHandler = new CallHandler(self.roomId);
 		}
 		return self.callHandler;
+	};
+	self.createCallHandler = function() {
+		if (self.callHandler && self.callHandler.callInProggress) {
+			return false;
+		}else if (self.callHandler) {
+			self.callHandler.closeEvents();
+			return self.callHandler;
+		} else {
+			self.callHandler = new CallHandler(self.roomId);
+			self.callHandler.toggle(); // I mean hide + set this.visible
+			return self.callHandler;
+		}
 	};
 	self.toggleCallHandler = function () {
 		if (self.callHandler) {
@@ -2010,7 +2012,6 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	};
 	self.onsendRtcData = function (message) {
 		var data = message.content;
-		//self.clearTimeout(); TODO multirtc
 		if (self.pc.iceConnectionState && self.pc.iceConnectionState !== 'closed') {
 			if (data.sdp) {
 				self.pc.setRemoteDescription(new RTCSessionDescription(data), self.handleAnswer, self.failWebRtc('setRemoteDescription'));
@@ -2171,6 +2172,7 @@ function CallHandler(roomId) {
 	var self = this;
 	BaseTransferHandler.call(self);
 	self.acceptedPeers = [];
+	self.callTimeoutTime = 5000;
 	self.visible = true;
 	self.roomId = roomId;
 	self.audioProcessors = {};
@@ -2227,6 +2229,7 @@ function CallHandler(roomId) {
 		} else {
 			self.hidePhoneIcon();
 		}
+		self.callInProggress = isCall;
 		CssUtils.setVisibility(self.dom.hangUpHolder, isCall);
 		CssUtils.setVisibility(self.dom.videoContainer, isCall);
 		CssUtils.setVisibility(self.dom.callIcon, !isCall);
@@ -2387,7 +2390,7 @@ function CallHandler(roomId) {
 		self.attachLocalStream(stream);
 		var id = webRtcApi.addCallHandler(self);
 		self.sendOffer(id);
-		//self.timeoutFunnction = setTimeout(self.closeDialog, self.callTimeoutTime); TODO multirtc
+		self.setTimeout();
 	};
 	self.onFailedCaptureSource =  function() {
 		var what = '';
@@ -2402,15 +2405,6 @@ function CallHandler(roomId) {
 		growlError(message);
 		self.logErr(message);
 	};
-	self.showCallDialog = function (isCallActive) {
-		isCallActive = isCallActive || self.isActive();
-		self.setIconState(isCallActive);
-		if (!isCallActive) {
-			self.setHeaderText("Make a call");
-		} else {
-			// self.clearTimeout(); TODO multirtc
-		}
-	};
 	self.setHeaderText = function (text) { // TODO multirtc
 		channelsHandler.setTitle(text);
 		singlePage.updateTitle();
@@ -2421,6 +2415,7 @@ function CallHandler(roomId) {
 		self.captureInput(self.captureInputStream);
 	};
 	self.show = function() {
+		self.visible = true;
 		CssUtils.showElement(self.dom.callContainerContent);
 	};
 	self.hide = function () {
@@ -2451,11 +2446,11 @@ function CallHandler(roomId) {
 	self.createAfterResponseCall = function () {
 		self.captureInput(self.createCallAfterCapture, true);
 		self.showAndAttachCallDialogOnResponse();
-		self.showCallDialog(true);
+		self.setIconState(true)
 	};
 	self.showAndAttachCallDialogOnResponse = function () {
 		channelsHandler.setActiveChannel(self.roomId);
-		channelsHandler.getActiveChannel().getCallHandler.show();
+		channelsHandler.getActiveChannel().getCallHandler().show(true);
 		CssUtils.showElement(webRtcApi.dom.callContainer);
 	};
 	self.getTrack = function (isVideo) {
@@ -2508,6 +2503,11 @@ function CallHandler(roomId) {
 	self.superRemoveChildPeerReference = self.removeChildPeerReference;
 	self.removeChildPeerReference = function (id, reason) {
 		self.superRemoveChildPeerReference(id);
+		if (!self.accepted) {
+			if (self.callPopupTable[id]) {
+				self.callPopupTable[id].textContent = 'Declined';
+			}
+		}
 		if (Object.keys(self.peerConnections).length === 0) {
 			self.log("All peer connections are gone, destroying CallHandler")();
 			self.closeEvents(reason);
@@ -2520,9 +2520,14 @@ function CallHandler(roomId) {
 	self.onreplyCall = function (message) {
 		self.createCallPeerConnection(message);
 		if (self.callPopup) { // if we're not call initiator
-			self.callPopupTable[message.userId] = self.callPopup.inserRow("Called:", message.user);
+			self.callPopupTable[message.opponentWsId] = self.callPopup.inserRow("Called:", message.user);
 		}
 	};
+	self.oncancelCallConnection = function(message) {
+		if (self.callPopup) { // if we're not call initiator
+			self.callPopupTable[message.opponentWsId] = self.callPopup.inserRow("Busy:", message.user);
+		}
+	},
 	self.sendOffer = function (newId) {
 		var messageRequest = {
 			action: 'offerCall',
@@ -2532,6 +2537,7 @@ function CallHandler(roomId) {
 		wsHandler.sendToServer(messageRequest);
 	};
 	self.accept = function () {
+		self.clearTimeout();
 		self.callPopup.hide();
 		self.createAfterResponseCall();
 	};
@@ -2545,7 +2551,21 @@ function CallHandler(roomId) {
 			connId: self.connectionId
 		});
 	};
+	self.setTimeout = function () {
+		self.timeoutFunnction = setTimeout(function() {
+			self.log("Closing CallHandler by timeout")();
+			self.hangUp();
+		}, self.callTimeoutTime);
+	};
+	self.clearTimeout = function () {
+		if (self.timeoutFunnction) {
+			clearTimeout(self.timeoutFunnction);
+			self.timeoutFunnction = null;
+		}
+	};
 	self.initAndDisplayOffer = function (message, channelName) {
+		self.callInProggress = true;
+		self.setTimeout();
 		self.connectionId = message.connId;
 		self.log("CallHandler initialized")();
 		wsHandler.sendToServer({
@@ -2558,13 +2578,15 @@ function CallHandler(roomId) {
 	};
 	self.onacceptCall = function (message) {
 		if (self.accepted) {
+			self.clearTimeout(); // if we're call initiator
 			self.peerConnections[message.opponentWsId].connectToRemote(self.localStream);
 		} else {
-			self.callPopupTable[message.userId].textContent = 'Talking:';
+			self.callPopupTable[message.opponentWsId].textContent = 'Talking:';
 			self.acceptedPeers.push(message.opponentWsId);
 		}
 	};
 	self.hangUp = function () {
+		self.clearTimeout();
 		var wereConn = self.closeAllPeerConnections("Call is finished.");
 		if (!wereConn) { // last peerConnection will call self.closeEvents
 			// if there were no any - we call it manually
@@ -2577,9 +2599,12 @@ function CallHandler(roomId) {
 			growlInfo(text)
 		}
 		if (self.callPopup) {
+			self.callPopup.closeEvents();
 			self.callPopup.hide();
-
 		}
+		// if somebody sent us destroyConnection event, b4 timeout fired
+		self.clearTimeout();
+		self.accepted = false;
 		self.setHeaderText(loggedUser);
 		self.setIconState(false);
 		self.callPopupTable = {};
@@ -2594,9 +2619,6 @@ function CallHandler(roomId) {
 				tracks[i].stop()
 			}
 		}
-		;
-		/*also executes removing event on exiting from fullscreen TODO*/
-		//self.clearTimeout(); TODO multirtc
 	};
 	self.onExitFullScreen = function () {
 		if (!(document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement)) {
@@ -3198,7 +3220,6 @@ function WebRtcApi() {
 		webRtcFileIcon: $('webRtcFileIcon'),
 		fileInput: $('webRtcFileInput')
 	};
-	self.callTimeoutTime = 60000;
 	self.connections = {};
 	self.quedConnections = {};
 	self.quedId = 0;
@@ -3221,12 +3242,6 @@ function WebRtcApi() {
 		self.connections[message.connId] = el;
 		el.setConnectionId(message.connId);
 	};
-	self.clearTimeout = function () {
-		if (self.timeoutFunnction) {
-			clearTimeout(self.timeoutFunnction);
-			self.timeoutFunnction = null;
-		}
-	};
 	self.onofferFile = function(message) {
 		var handler = new FileReceiver(self.removeChildReference);
 		self.connections[message.connId] = handler;
@@ -3237,15 +3252,18 @@ function WebRtcApi() {
 		if (!chatHandler) {
 			throw "Somebody tried to call you to nonexisted channel";
 		}
-		var handler = chatHandler.getCallHandler();
-		handler.setIsReceiver(true);
-		// if (self.timeoutFunnction) {
-		// 	wsHandler.sendToServer('busy'); // TODO multirtc
-		// }
-		// TODO multirtc settimout
-		// self.timeoutFunnction = setTimeout(self.connections[message.connId].declineCall, self.callTimeoutTime);
-		self.connections[message.connId] = handler;
-		handler.initAndDisplayOffer(message, chatHandler.roomName);
+		var handler = chatHandler.createCallHandler();
+		if (handler) {
+			handler.setIsReceiver(true);
+			self.connections[message.connId] = handler;
+			handler.initAndDisplayOffer(message, chatHandler.roomName);
+		} else {
+			wsHandler.sendToServer({
+				action: 'cancelCallConnection',
+				connId: message.connId
+			});
+			growlInfo("User {} tries to call you", message.user);
+		}
 	};
 	self.handle = function (data) {
 		if (data.handler === 'webrtc') {
