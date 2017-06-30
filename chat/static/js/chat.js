@@ -2012,6 +2012,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	};
 	self.onsendRtcData = function (message) {
 		var data = message.content;
+		self.log("onsendRtcData")();
 		if (self.pc.iceConnectionState && self.pc.iceConnectionState !== 'closed') {
 			if (data.sdp) {
 				self.pc.setRemoteDescription(new RTCSessionDescription(data), self.handleAnswer, self.failWebRtc('setRemoteDescription'));
@@ -2082,8 +2083,10 @@ function BaseTransferHandler(removeReferenceFn) {
 			self.peerConnections[data.opponentWsId]['on' + data.action](data);
 		}
 	};
-	self.setConnectionId = function (id) {
+	self.setConnectionId = function (id, myId) {
 		self.connectionId = id;
+		self.selfWsid = myId; // used to  determine who's sender and who's receiver
+		// well it's same as loggedUserId + wsHandler.wsConnectionId, but for sake we set it explicitly
 		self.log("CallHandler initialized")();
 	};
 	self.closeAllPeerConnections = function (text) {
@@ -2445,13 +2448,9 @@ function CallHandler(roomId) {
 	};
 	self.createAfterResponseCall = function () {
 		self.captureInput(self.createCallAfterCapture, true);
-		self.showAndAttachCallDialogOnResponse();
-		self.setIconState(true)
-	};
-	self.showAndAttachCallDialogOnResponse = function () {
+		self.setIconState(true);
 		channelsHandler.setActiveChannel(self.roomId);
-		channelsHandler.getActiveChannel().getCallHandler().show(true);
-		CssUtils.showElement(webRtcApi.dom.callContainer);
+		self.show(true);
 	};
 	self.getTrack = function (isVideo) {
 		var track = null;
@@ -2490,7 +2489,7 @@ function CallHandler(roomId) {
 		var videoContainer = document.createElement('div');
 		videoContainer.className = 'micVideoWrapper';
 		self.dom.videoContainerForVideos.insertBefore(videoContainer, self.dom.videoContainerForVideos.firstChild);
-		var PeerConnectionClass = message.userId > loggedUserId ? CallSenderPeerConnection : CallReceiverPeerConnection;
+		var PeerConnectionClass = message.opponentWsId > self.selfWsid ? CallSenderPeerConnection : CallReceiverPeerConnection;
 		self.peerConnections[message.opponentWsId] = new PeerConnectionClass(
 				message.connId,
 				message.opponentWsId,
@@ -3220,7 +3219,6 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached) {
 function WebRtcApi() {
 	var self = this;
 	self.dom = {
-		callContainer: $('callContainer'),
 		webRtcFileIcon: $('webRtcFileIcon'),
 		fileInput: $('webRtcFileInput')
 	};
@@ -3244,7 +3242,7 @@ function WebRtcApi() {
 		var el = self.quedConnections[message.id];
 		delete self.quedConnections[message.id];
 		self.connections[message.connId] = el;
-		el.setConnectionId(message.connId);
+		el.setConnectionId(message.connId, message.opponentWsId);
 	};
 	self.onofferFile = function(message) {
 		var handler = new FileReceiver(self.removeChildReference);
@@ -3499,6 +3497,9 @@ var Utils = {
 	},
 	createMicrophoneLevelVoice: function (stream, onaudioprocess) {
 		try {
+			if (stream.getTrack(false)) {
+				throw "Stream has no tracks";
+			}
 			var audioProc = {};
 			audioProc.audioContext = new AudioContext();
 			audioProc.analyser = audioProc.audioContext.createAnalyser();

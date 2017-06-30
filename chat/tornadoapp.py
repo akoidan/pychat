@@ -200,7 +200,8 @@ class MessagesCreator(object):
 			VarNames.EVENT: Actions.SET_WEBRTC_ID,
 			VarNames.HANDLER_NAME: HandlerNames.WEBRTC,
 			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_QUED_ID: qued_id
+			VarNames.WEBRTC_QUED_ID: qued_id,
+			VarNames.WEBRTC_OPPONENT_ID: self.id
 		}
 
 	def set_webrtc_error(self, error, connection_id, qued_id=None):
