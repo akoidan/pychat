@@ -90,6 +90,10 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 TODO
 ====
+* add window minimize
+* add pasting image to textarea instead of chatbox
+* add drawing lines with alpha by saving image
+* check transfer files over net - doesnt work, while localhost works
 * remove setHeaderTest, highlight current page icos. Always display username in right top
 * Painter doesn't work on mobile devices (add ontouch)
 * add timeout to call. (finish after timeout) Display busy if calling to SAME chanel otherwise it will show multiple videos
