@@ -796,10 +796,12 @@ function ChannelsHandler() {
 	self.imageDrop = function (evt) {
 		self.preventDefault(evt);
 		var file = evt.dataTransfer.files[0];
-		if (file.type.indexOf("image") >= 0) {
-			Utils.pasteImgToTextArea(file);
-		} else {
-			webRtcApi.offerFile(file, self.activeChannel);
+		if (file) {
+			if (file.type.indexOf("image") >= 0) {
+				Utils.pasteImgToTextArea(file);
+			} else {
+				webRtcApi.offerFile(file, self.activeChannel);
+			}
 		}
 	};
 	self.imagePaste = function (e) {
