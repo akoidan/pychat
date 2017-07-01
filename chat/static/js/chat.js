@@ -1,23 +1,26 @@
-const CONNECTION_RETRY_TIME = 5000;
-const SYSTEM_HEADER_CLASS = 'message-header-system';
-const TIME_SPAN_CLASS = 'timeMess';
-const CONTENT_STYLE_CLASS = 'message-text-style';
-const DEFAULT_CHANNEL_NAME = 1;
+var CONNECTION_RETRY_TIME = 5000;
+var SYSTEM_HEADER_CLASS = 'message-header-system';
+var TIME_SPAN_CLASS = 'timeMess';
+var CONTENT_STYLE_CLASS = 'message-text-style';
+var DEFAULT_CHANNEL_NAME = 1;
 // used in ChannelsHandler and ChatHandler
-const USER_ID_ATTR = 'userid';
-const SELF_HEADER_CLASS = 'message-header-self';
-const USER_NAME_ATTR = 'username';
-const REMOVED_MESSAGE_CLASSNAME = 'removed-message';
-const MESSAGE_ID_ATTRIBUTE = 'messageId';
+var USER_ID_ATTR = 'userid';
+var SELF_HEADER_CLASS = 'message-header-self';
+var USER_NAME_ATTR = 'username';
+var REMOVED_MESSAGE_CLASSNAME = 'removed-message';
+var MESSAGE_ID_ATTRIBUTE = 'messageId';
+var MAX_ACCEPT_FILE_SIZE_WO_FS_API = Math.pow(2, 28); // 256 MB
 // end used
-const SYSTEM_USERNAME = 'System';
-const CANCEL_ICON_CLASS_NAME = 'icon-cancel-circled-outline';
-const GENDER_ICONS = {
+var SYSTEM_USERNAME = 'System';
+var CANCEL_ICON_CLASS_NAME = 'icon-cancel-circled-outline';
+var PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
+var GENDER_ICONS = {
 	'Male': 'icon-man',
 	'Female': 'icon-girl',
 	'Secret': 'icon-user-secret'
 };
 var smileUnicodeRegex = /[\u3400-\u3500]/g;
+var imageUnicodeRegex = /[\u3501-\u3600]/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
@@ -34,7 +37,6 @@ var wsHandler;
 var storage;
 var singlePage;
 var painter;
-const MAX_ACCEPT_FILE_SIZE_WO_FS_API = Math.pow(2, 28); // 256 MB
 
 onDocLoad(function () {
 	userMessage = $("usermsg");
@@ -83,8 +85,13 @@ function Painter() {
 		var rect = painter.dom.canvas.getBoundingClientRect();
 		self.leftOffset = rect.left;
 		self.topOffset = rect.top;
+		//self.tmpData = self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height); TODO
 		self.ctx.beginPath();
 		var xy = self.getXY(e);
+		// self.ctx.fillStyle = self.dom.color.value; TODO
+		// self.ctx.arc(xy.x, xy.y, self.ctx.lineWidth / 2, 0, 2 * Math.PI);
+		// self.ctx.fill();
+		// self.points = [];
 		self.ctx.lineTo(xy.x, xy.y);
 		self.ctx.stroke();
 		self.dom.canvas.addEventListener('mousemove', self.onPaint, false);
@@ -164,6 +171,7 @@ function Painter() {
 		}
 	};
 	self.onPaintPen = function (x, y) {
+		//self.points.push({x:x, y:y}); TODO
 		self.ctx.lineTo(x, y);
 		self.ctx.stroke();
 	};
@@ -175,12 +183,7 @@ function Painter() {
 		self.ctx.clearRect(0, 0, parseInt(self.dom.canvas.width), parseInt(self.dom.canvas.height));
 	};
 	self.sendImage = function () {
-		wsHandler.sendToServer({
-			image: self.dom.canvas.toDataURL(),
-			content: null,
-			action: 'sendMessage',
-			channel: channelsHandler.activeChannel
-		});
+		Utils.pasteb64ImgToTextArea(self.dom.canvas.toDataURL());
 		self.hide();
 	};
 	self.contKeyPress = function (event) {
@@ -671,6 +674,7 @@ function ChannelsHandler() {
 		addRoomButton: $('addRoomButton'),
 		directUserTable: $('directUserTable'),
 		imgInput: $('imgInput'),
+		imgInputIcon: $('imgInputIcon'),
 		usersStateText: $('usersStateText'),
 		inviteUser: $('inviteUser'),
 		navCallIcon: $('navCallIcon'),
@@ -782,42 +786,40 @@ function ChannelsHandler() {
 	};
 	self.sendMessage = function (messageRequest) {
 		// anonymous is set by name, registered user is set by id.
+		var buHtml = userMessage.innerHTML;
 		var sendSuccessful = wsHandler.sendToServer(messageRequest);
-		if (sendSuccessful) {
-			userMessage.innerHTML = "";
-		}
+		userMessage.innerHTML = sendSuccessful ? "" : buHtml;
 	};
 	self.handleFileSelect = function (evt) {
 		var files = evt.target.files;
-		self.readDataAndSend(files[0]);
+		Utils.pasteImgToTextArea(files[0]);
 		self.dom.imgInput.value = "";
-	};
-	self.readDataAndSend = function (file) {
-		Utils.readFileAsB64(file, function (event) {
-			self.sendMessage({
-				image: event.target.result,
-				filename: file.name,
-				content: null,
-				action: 'sendMessage',
-				channel: self.activeChannel
-			});
-		}, true);
 	};
 	self.preventDefault = function (e) {
 		e.preventDefault();
 	};
 	self.imageDrop = function (evt) {
 		self.preventDefault(evt);
-		self.readDataAndSend(evt.dataTransfer.files[0]);
+		var file = evt.dataTransfer.files[0];
+		if (file) {
+			Utils.pasteImgToTextArea(file);
+		}
 	};
 	self.imagePaste = function (e) {
 		if (e.clipboardData) {
 			var items = e.clipboardData.items;
-			if (items) {
+			if (items && items.length > 0) {
+				var prevent = false;
 				for (var i = 0; i < items.length; i++) {
-					self.readDataAndSend(items[i].getAsFile());
+					var asFile = items[i].getAsFile();
+					if (asFile) {
+						prevent = true;
+						Utils.pasteImgToTextArea(asFile);
+					}
 				}
-				self.preventDefault(e);
+				if (prevent) {
+					self.preventDefault(e);
+				}
 			}
 		}
 	};
@@ -911,7 +913,27 @@ function ChannelsHandler() {
 		sel.removeAllRanges();
 		sel.addRange(range);
 	};
+	self.nextChar = function (c) {
+		return String.fromCharCode(c.charCodeAt(0) + 1)
+	};
+	self.getPastedImage = function () {
+		var res = {}; // return array from nodeList
+		var images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
+		var currSymbol = '\u3500';
+		for (var i = 0; i < images.length; i++) {
+			currSymbol = self.nextChar(currSymbol);
+			var textNode = document.createTextNode(currSymbol);
+			var img = images[i];
+			img.parentNode.replaceChild(textNode, img);
+			res[currSymbol] = {
+				b64: img.src,
+				fileName: img.getAttribute('fileName')
+			};
+		}
+		return res;
+	};
 	self.handleSendMessage = function () {
+		var images = self.getPastedImage();
 		smileyUtil.purgeImagesFromSmileys();
 		var messageContent = userMessage.textContent;
 		messageContent = blankRegex.test(messageContent) ? null : messageContent;
@@ -920,18 +942,19 @@ function ChannelsHandler() {
 			message = {
 				id: self.editLastMessageNode.id,
 				action: 'editMessage',
+				images: images,
 				content: messageContent
 			};
 			self.removeEditingMode();
-		} else {
-			if (!messageContent) {
-				return;
-			}
+		} else if (messageContent) {
 			message = {
+				images: images,
 				action: 'sendMessage',
 				content: messageContent,
 				channel: self.activeChannel
 			};
+		} else {
+			return;
 		}
 		self.sendMessage(message);
 	};
@@ -1088,7 +1111,7 @@ function ChannelsHandler() {
 		li.appendChild(i);
 		li.setAttribute(self.ROOM_ID_ATTR, roomId);
 		var chatBoxDiv = document.createElement('div');
-		chatBoxDiv.onpaste = self.imagePaste;
+		userMessage.onpaste = self.imagePaste;
 		chatBoxDiv.ondrop = self.imageDrop;
 		chatBoxDiv.ondragover = self.preventDefault;
 		self.channels[roomId] = new ChatHandler(li, chatBoxDiv, users, roomId, roomName);
@@ -1216,6 +1239,7 @@ function ChannelsHandler() {
 		self.dom.rooms.onclick = self.roomClick;
 		self.dom.directUserTable.onclick = self.roomClick;
 		self.dom.imgInput.onchange = self.handleFileSelect;
+		self.dom.imgInputIcon.onclick = function() {self.dom.imgInput.click()};
 		self.dom.addRoomInput.onkeypress = self.finishAddRoomOnEnter;
 		self.dom.addRoomButton.onclick = self.finishAddRoom;
 		self.addUserHandler = new Draggable(self.dom.addUserHolder, "");
@@ -1338,36 +1362,17 @@ function SmileyUtil() {
 	self.addSmile = function (event) {
 		event.preventDefault(); // prevents from losing focus
 		event.stopPropagation(); // don't allow onDocClick
-		//event = event || window.event; TODO is that really needed
 		var smileImg = event.target;
 		if (smileImg.tagName !== 'IMG') {
 			return;
 		}
-		self.pasteHtmlAtCaret(smileImg.cloneNode());
+		Utils.pasteHtmlAtCaret(smileImg.cloneNode());
 		logger.info('Added smile "{}"', smileImg.alt)();
 	};
-	self.pasteHtmlAtCaret = function (img) {
-		var sel = window.getSelection();
-		var range = sel.getRangeAt(0);
-		range.deleteContents();
-		// Range.createContextualFragment() would be useful here but is
-		// non-standard and not supported in all browsers (IE9, for one)
-		var frag = document.createDocumentFragment();
-		frag.appendChild(img);
-		range.insertNode(frag);
-		// Preserve the selection
-		range = range.cloneRange();
-		range.setStartAfter(img);
-		range.collapse(true);
-		sel.removeAllRanges();
-		sel.addRange(range);
-	};
 	self.encodeSmileys = function (html) {
-		html = encodeAnchorsHTML(html);
-		html = html.replace(smileUnicodeRegex, function (s) {
+		return html.replace(smileUnicodeRegex, function (s) {
 			return self.smileyDict[s];
 		});
-		return html;
 	};
 	self.toggleSmileys = function (event) {
 		event.stopPropagation(); // prevent top event
@@ -1464,12 +1469,12 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.allMessages = [];
 	self.allMessagesDates = [];
 	self.activeRoomClass = 'active-room';
-	self.dom.newMessages.className = 'newMessagesCount hidden';
+	self.dom.newMessages.className = 'newMessagesCount ' + CssUtils.visibilityClass;
 	li.appendChild(self.dom.newMessages);
 	self.OTHER_HEADER_CLASS = 'message-header-others';
-	self.dom.userList.className = 'hidden';
+	self.dom.userList.className = CssUtils.visibilityClass;
 	channelsHandler.dom.chatUsersTable.appendChild(self.dom.userList);
-	self.dom.chatBoxDiv.className = 'chatbox hidden';
+	self.dom.chatBoxDiv.className = 'chatbox ' + CssUtils.visibilityClass;
 	self.dom.chatBoxHolder.appendChild(self.dom.chatBoxDiv);
 	// tabindex allows focus, focus allows keydown binding event
 	self.dom.chatBoxDiv.setAttribute('tabindex', '1');
@@ -1761,7 +1766,13 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 	};
 	self.encodeMessage = function (data) {
-		return data.image ? "<img src=\'{}\'/>".format(data.image) : smileyUtil.encodeSmileys(data.content);
+		var html = encodeAnchorsHTML(data.content);
+		if (data.images) {
+			html = html.replace(imageUnicodeRegex, function (s) {
+				return "<img src=\'{}\'/>".format(data.images[s]);
+			});
+		}
+		return smileyUtil.encodeSmileys(html);
 	};
 	self.editMessage = function (data) {
 		var html = self.encodeMessage(data);
@@ -1799,7 +1810,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var preparedHtml = self.encodeMessage(data);
 		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, data.id);
 		if (p) { // not duplicate message
-			notifier.notify(displayedUsername, data.content || 'image', data.image);
+			notifier.notify(displayedUsername, data.content || 'images', data.image); //TODo
 			if (self.isHidden() && !window.newMessagesDisabled) {
 				self.newMessages++;
 				self.dom.newMessages.textContent = self.newMessages;
@@ -2314,7 +2325,7 @@ function CallHandler(roomId) {
 		self.dom.local.className = 'localVideo';
 		self.dom.videoContainer.appendChild(iwc);
 		self.dom.videoContainer.appendChild(self.dom.videoContainerForVideos);
-		self.dom.videoContainer.className = 'videoContainer';
+		self.dom.videoContainer.className = 'videoContainer ' + CssUtils.visibilityClass;
 		self.dom.callContainerContent.className = 'callContainerContent';
 		self.dom.callContainerContent.appendChild(self.dom.videoContainer);
 		self.dom.callContainer.appendChild(self.dom.callContainerContent);
@@ -2340,7 +2351,7 @@ function CallHandler(roomId) {
 		self.dom.fs.enterFullScreen.title = 'Fullscreen';
 		enterFullScreenHolder.appendChild(self.dom.fs.enterFullScreen);
 
-		self.dom.hangUpHolder.className = 'hangUpHolder '+CssUtils.visibilityClass;
+		self.dom.hangUpHolder.className = 'hangUpHolder ' + CssUtils.visibilityClass;
 		self.dom.hangUpHolder.appendChild(self.dom.hangUpIcon);
 		self.dom.hangUpIcon.className = 'icon-hang-up ';
 		self.dom.hangUpIcon.title = 'Hang Up';
@@ -2686,10 +2697,6 @@ function FileTransferHandler(removeReferenceFn) {
 		self.dom.fileInfo.className = 'table';
 		document.querySelector('body').appendChild(self.dom.container);
 		CssUtils.addClass(self.dom.body, 'transferFile');
-		self.dom.iconMinimize = document.createElement('i');
-		self.dom.header.appendChild(self.dom.iconMinimize);
-		self.dom.iconMinimize.onclick = self.hide;
-		self.dom.iconMinimize.className = 'icon-minimize';
 		self.dom.iconCancel.onclick = self.noAction;
 		self.insertData('Name:', self.fileName);
 		self.insertData('Size:', bytesToSize(self.fileSize));
@@ -2704,37 +2711,9 @@ function FileTransferHandler(removeReferenceFn) {
 		valueField.textContent = value;
 		return valueField;
 	};
-	self.hideButtons = function () {
-		if (self.dom.yesNoHolder) {
-			CssUtils.hideElement(self.dom.yesNoHolder)
-		}
-	};
-	self.yesAction = function () {
-		self.hideButtons();
-		self.acceptFileReply();
-	};
-	self.remove = function () {
-		CssUtils.deleteElement(self.dom.container);
-	};
 	self.noAction = function () {
 		self.closeWindowClick();
-		self.remove();
-	};
-	self.addYesNo = function () {
-		self.dom.yesNoHolder = document.createElement('DIV');
-		self.dom.yes = document.createElement('INPUT');
-		self.dom.no = document.createElement('INPUT');
-		self.dom.body.appendChild(self.dom.yesNoHolder);
-		self.dom.yesNoHolder.appendChild(self.dom.yes);
-		self.dom.yesNoHolder.appendChild(self.dom.no);
-		self.dom.yesNoHolder.className = 'yesNo';
-		self.dom.yes.onclick = self.yesAction;
-		self.dom.no.onclick = self.noAction;
-		self.dom.yes.setAttribute('type', 'button');
-		self.dom.no.setAttribute('type', 'button');
-		self.dom.yes.setAttribute('value', 'Accept');
-		self.dom.no.setAttribute('value', 'Decline');
-		self.fixInputs();
+		self.destroy();
 	};
 	self.decline = function () {
 		wsHandler.sendToServer({
@@ -2743,9 +2722,6 @@ function FileTransferHandler(removeReferenceFn) {
 			connId: self.connectionId
 		});
 	};
-	self.remove = function () {
-		document.querySelector('body').removeChild(self.dom.container);
-	}
 }
 
 
@@ -2762,6 +2738,31 @@ function FileReceiver(removeReferenceFn) {
 		self.setHeaderText("{} sends file".format(self.opponentName));
 		self.dom.connectionStatus = self.insertData('Status:', 'Received an offer');
 		self.addYesNo();
+	};
+	self.yesAction = function () {
+		self.hideButtons();
+		self.acceptFileReply();
+	};
+	self.hideButtons = function () {
+		if (self.dom.yesNoHolder) {
+			CssUtils.hideElement(self.dom.yesNoHolder)
+		}
+	};
+	self.addYesNo = function () {
+		self.dom.yesNoHolder = document.createElement('DIV');
+		self.dom.yes = document.createElement('INPUT');
+		self.dom.no = document.createElement('INPUT');
+		self.dom.body.appendChild(self.dom.yesNoHolder);
+		self.dom.yesNoHolder.appendChild(self.dom.yes);
+		self.dom.yesNoHolder.appendChild(self.dom.no);
+		self.dom.yesNoHolder.className = 'yesNo';
+		self.dom.yes.onclick = self.yesAction;
+		self.dom.no.onclick = self.noAction;
+		self.dom.yes.setAttribute('type', 'button');
+		self.dom.no.setAttribute('type', 'button');
+		self.dom.yes.setAttribute('value', 'Accept');
+		self.dom.no.setAttribute('value', 'Decline');
+		self.fixInputs();
 	};
 	self.sendErrorFSApi = function() {
 		var bsize = bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API);
@@ -2803,7 +2804,7 @@ function FileReceiver(removeReferenceFn) {
 	};
 	self.ondestroyFileConnection = function (message) {
 		if (self.peerConnections[message.opponentWsId]) {
-			self.peerConnections[message.opponentWsId].ondestroyConnection(message);
+			self.peerConnections[message.opponentWsId].ondestroyFileConnection(message);
 		} else {
 			self.hideButtons();
 			self.dom.connectionStatus.textContent = "Opponent declined sending";
@@ -2921,9 +2922,9 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 	self.gotReceiveChannel = function (event) {
 		self.superGotReceiveChannel(event);
 	};
-	self.superOnDestroyConnection = self.ondestroyFileConnection;
+	self.superOnDestroyFileConnection = self.ondestroyFileConnection;
 	self.ondestroyFileConnection = function (data) {
-		self.superOnDestroyConnection();
+		self.superOnDestroyFileConnection(data);
 		self.downloadBar.setStatus("Error: Opponent closed connection");
 		self.downloadBar.setError();
 	};
@@ -3548,6 +3549,44 @@ var Utils = { createUserLi: function(userId, gender, username) {
 			values += array[i];
 		}
 		return values / length;
+	},
+	pasteHtmlAtCaret: function (img) {
+		usermsg.focus();
+		var sel = window.getSelection();
+		var range = sel.getRangeAt(0);
+		range.deleteContents();
+		// Range.createContextualFragment() would be useful here but is
+		// non-standard and not supported in all browsers (IE9, for one)
+		var frag = document.createDocumentFragment();
+		frag.appendChild(img);
+		range.insertNode(frag);
+		// Preserve the selection
+		range = range.cloneRange();
+		range.setStartAfter(img);
+		range.collapse(true);
+		sel.removeAllRanges();
+		sel.addRange(range);
+	},
+	pasteb64ImgToTextArea: function(b64, name){
+		var img = document.createElement('img');
+		img.src = b64;
+		if (name) {
+			img.setAttribute('fileName', name);
+		}
+		img.className = PASTED_IMG_CLASS;
+		Utils.pasteHtmlAtCaret(img);
+	},
+	pasteImgToTextArea: function (file) {
+		if (file.type.indexOf("image") >= 0) {
+			var reader = new FileReader();
+			reader.onload = function (e) {
+				Utils.pasteb64ImgToTextArea(e.target.result, file.name);
+			};
+			reader.readAsDataURL(file);
+		} else {
+			growlError("Pasted file is not an image");
+		}
+
 	},
 	showHelp: function () {
 		if (!suggestions) {

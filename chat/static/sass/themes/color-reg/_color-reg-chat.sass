@@ -32,10 +32,12 @@
 	.icon-webrtc-fullscreen
 		color: #6EEFFF
 
-	// call container
-	.modal-body
+	.window
 		@include linear-gradient(#1e3348, #0f1922)
 		box-shadow: 0 5px 5px #16161f
+
+	.modal-body
+		@extend .window
 		input[type=button], button
 			@include linear-gradient(#353c4c, #101318)
 			border-radius: 4px

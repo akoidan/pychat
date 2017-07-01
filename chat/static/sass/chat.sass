@@ -53,9 +53,6 @@ fieldset
 .message-img-holder
 	display: block
 
-p
-	margin-top: 0.8em
-	margin-bottom: 0.8em
 
 #wrapper
 	@include flex(1)
@@ -86,7 +83,24 @@ p
 		max-height: 300px
 		display: block
 		margin: 5px 0 0 15px
+	p
+		margin-top: 0.8em
+		margin-bottom: 0.8em
+	.message-header-others, .message-header-self
+		display: inline-block
+		vertical-align: top
+	.message-text-style
+		display: inline-block
+		padding-left: 5px
 
+.minimizedList
+	min-width: 200px
+	min-height: 20px
+	padding: 5px
+
+.B4j2ContentEditableImg
+	max-height: 100px
+	max-width: 100px
 #wrapper
 	position: relative
 
@@ -233,6 +247,15 @@ p
 /*TODO login dropdown goes under scroll, FF doesn't support
 /*}
 
+.list
+	max-height: calc(80vh - 100px)
+	overflow-y: scroll
+	margin: 5px 0 0
+
+	li
+		padding: 0 0 0 5px
+		border-radius: 2px
+		@extend %hovered-user-room
 
 #addUserHolder
 	position: absolute
@@ -240,15 +263,6 @@ p
 	left: 20vw
 	top: 20vh
 
-	#addUserList
-		max-height: calc(80vh - 100px)
-		overflow-y: scroll
-		margin: 5px 0 0
-
-		li
-			padding: 0 0 0 5px
-			border-radius: 2px
-			@extend %hovered-user-room
 
 #directUserTable,
 #rooms
@@ -420,12 +434,15 @@ p
 	justify-content: center
 	align-items: center
 
-.modal-body
+.window
 	border-radius: 3px
 	position: absolute
 	box-shadow: 2px 2px 1px #1F1F27
 	z-index: 3
 	outline: none
+
+.modal-body
+	@extend .window
 	&:not(:focus):not(.blurred)
 		opacity: 0.8
 	&.moving
@@ -433,10 +450,6 @@ p
 		cursor: move !important
 		.windowHeader
 			cursor: move !important
-
-.modal-draggable
-	left: calc(50% - 100px)
-	top: 10%
 
 #userProfile
 	top: 2px

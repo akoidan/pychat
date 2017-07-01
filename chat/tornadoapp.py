@@ -28,10 +28,9 @@ try:  # py2
 	from urlparse import urlparse
 except ImportError:  # py3
 	from urllib.parse import urlparse
-
 from chat.settings import MAX_MESSAGE_SIZE, ALL_ROOM_ID, GENDERS, UPDATE_LAST_READ_MESSAGE, SELECT_SELF_ROOM, \
 	TORNADO_REDIS_PORT, WEBRTC_CONNECTION
-from chat.models import User, Message, Room, get_milliseconds, UserJoinedInfo, RoomUsers
+from chat.models import User, Message, Room, get_milliseconds, UserJoinedInfo, RoomUsers, Image
 
 PY3 = sys.version > '3'
 str_type = str if PY3 else basestring
@@ -89,12 +88,13 @@ class VarNames(object):
 	USER_ID = 'userId'
 	TIME = 'time'
 	CONTENT = 'content'
-	IMG = 'image'
+	IMG = 'images'
+	IMG_B64 = 'b64'
+	IMG_FILE_NAME = 'fileName'
 	EVENT = 'action'
 	MESSAGE_ID = 'id'
 	GENDER = 'sex'
 	ROOM_NAME = 'name'
-	FILE_NAME = 'filename'
 	ROOM_ID = 'roomId'
 	ROOM_USERS = 'users'
 	CHANNEL = 'channel'
@@ -212,39 +212,51 @@ class MessagesCreator(object):
 		return message
 
 	@classmethod
-	def create_message(cls, message):
+	def create_message(cls, message, images):
 		res = {
 			VarNames.USER_ID: message.sender_id,
 			VarNames.CONTENT: message.content,
 			VarNames.TIME: message.time,
 			VarNames.MESSAGE_ID: message.id,
+			VarNames.IMG: images
 		}
-		if message.img.name:
-			res[VarNames.IMG] = message.img.url
 		return res
 
 	@classmethod
-	def create_send_message(cls, message, event=Actions.PRINT_MESSAGE):
+	def create_send_message(cls, message, event, imgs):
 		"""
 		:param message:
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
 		"sex": "Alien", "user": "tRD6emzs", "time": "20:48:57"}
 		"""
-		res = cls.create_message(message)
+		res = cls.create_message(message, imgs)
 		res[VarNames.EVENT] = event
 		res[VarNames.CHANNEL] = message.room_id
 		res[VarNames.HANDLER_NAME] = HandlerNames.CHAT
 		return res
 
 	@classmethod
-	def get_messages(cls, messages, channel):
+	def append_images(cls, messages, images):
+		res_mess = []
+		for message in messages:
+			res_images = cls.prepare_img(images, message.id)
+			res_mess.append(cls.create_message(message, res_images))
+		return res_mess
+
+	@classmethod
+	def prepare_img(cls, images, message_id):
+		if images:
+			return {x.symbol: x.img.url for x in images if x.message_id == message_id}
+
+	@classmethod
+	def get_messages(cls, messages, channel, images):
 		"""
 		:type messages: list[Messages]
 		:type channel: str
 		:type messages: QuerySet[Messages]
 		"""
 		return {
-			VarNames.CONTENT: [cls.create_message(message) for message in messages],
+			VarNames.CONTENT: cls.append_images(messages, images),
 			VarNames.EVENT: Actions.GET_MESSAGES,
 			VarNames.CHANNEL: channel,
 			VarNames.HANDLER_NAME: HandlerNames.CHAT
@@ -514,10 +526,15 @@ class MessagesHandler(MessagesCreator):
 			content=message[VarNames.CONTENT]
 		)
 		message_db.room_id = channel
-		if VarNames.IMG in message:
-			message_db.img = extract_photo(message[VarNames.IMG], message.get(VarNames.FILE_NAME))
-		self.do_db(message_db.save)  # exit on hacked id with exception
-		prepared_message = self.create_send_message(message_db)
+		self.do_db(message_db.save)
+		imgs = message.get(VarNames.IMG)
+		res_imgs = []
+		if imgs:
+			for k in imgs:
+				img = extract_photo(imgs[k][VarNames.IMG_B64], message.get(VarNames.IMG_FILE_NAME))
+				res_imgs.append(Image(message_id=message_db.id, img=img, symbol=k))
+			Image.objects.bulk_create(res_imgs)
+		prepared_message = self.create_send_message(message_db, Actions.PRINT_MESSAGE, self.prepare_img(res_imgs, message_db.id))
 		self.publish(prepared_message, channel)
 
 	def close_file_connection(self, in_message):
@@ -807,7 +824,7 @@ class MessagesHandler(MessagesCreator):
 		else:
 			action = Actions.EDIT_MESSAGE
 			selector.update(content=message.content)
-		self.publish(self.create_send_message(message, action), message.room_id)
+		self.publish(self.create_send_message(message, action, None), message.room_id) # TODO we're deleting old images
 
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -838,18 +855,27 @@ class MessagesHandler(MessagesCreator):
 			messages = Message.objects.filter(Q(room_id=room_id), Q(deleted=False)).order_by('-pk')[:count]
 		else:
 			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id), Q(deleted=False)).order_by('-pk')[:count]
-		response = self.do_db(self.get_messages, messages, room_id)
+		images = self.do_db(self.get_message_images, messages)
+		response = self.get_messages(messages, room_id, images)
 		self.ws_write(response)
+
+	def get_message_images(self, messages):
+		ids =[message.id for message in messages]
+		images = Image.objects.filter(message_id__in=ids)
+		self.logger.info('!! Messages have %d images', len(images))
+		return images
 
 	def get_offline_messages(self):
 		res = {}
-		offline_messages = Message.objects.filter(
+		off_mess = Message.objects.filter(
 			id__gt=F('room__roomusers__last_read_message_id'),
 			deleted=False,
 			room__roomusers__user_id=self.user_id
 		)
-		for message in offline_messages:
-			res.setdefault(message.room_id, []).append(self.create_message(message))
+		images = self.do_db(self.get_message_images, off_mess)
+		for message in off_mess:
+			prep_m = self.create_message(message, self.prepare_img(images, message.id))
+			res.setdefault(message.room_id, []).append(prep_m)
 		return res
 
 	def get_users_in_current_user_rooms(self):

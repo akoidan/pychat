@@ -19,6 +19,7 @@ function sliceZero(number, count) {
 }
 
 var growlHolder;
+var minimizedWindows;
 
 window.onerror = function (msg, url, linenumber) {
 	var message = 'Error occurred in {}:{}\n{}'.format(url, linenumber, msg);
@@ -187,7 +188,7 @@ function getDay(dateObj) {
 	return year + "/" + month + "/" + day;
 }
 
-const escapeMap = {
+var escapeMap = {
 	"&": "&amp;",
 	"<": "&lt;",
 	">": "&gt;",
@@ -448,12 +449,88 @@ function growlInfo(message) {
 }
 
 
+function MinimizedWindow() {
+	var self = this;
+	self.draggables = [];
+	self.dom = {
+		ul: document.createElement('UL'),
+		minimizedWindowsIcon: $('minimizedWindows')
+	};
+	self.init = function() {
+		self.dom.ul.className = 'minimizedList window list ' + CssUtils.visibilityClass;
+		document.body.appendChild(self.dom.ul);
+		self.dom.minimizedWindowsIcon.onclick = self.toggle;
+		self.dom.ul.onclick = self.onulclick;
+	};
+	self.onulclick = function(e) {
+		if (e.target.tagName === 'LI') {
+			document.removeEventListener("click", self.hideWindow);
+			var el = self.findAndRemove(e.target, true);
+			el.show();
+			self.hideIfNeeded();
+			CssUtils.hideElement(self.dom.ul);
+		}
+	};
+	self.toggle = function (e) {
+		var wasVisible = CssUtils.toggleVisibility(self.dom.ul);
+		if (!wasVisible) {
+			document.addEventListener("click", self.hideWindow);
+			var a = self.dom.minimizedWindowsIcon;
+			e.stopPropagation();
+			self.dom.ul.style.top = a.offsetHeight + a.offsetTop + 'px';
+			self.dom.ul.style.left = a.offsetLeft - 100 + 'px';
+		} else {
+			document.removeEventListener("click", self.hideWindow);
+		}
+	};
+	self.hideWindow = function() {
+		document.removeEventListener("click", self.hideWindow);
+		CssUtils.hideElement(self.dom.ul);
+	};
+	self.add = function(draggable) {
+		var li = document.createElement('li');
+		self.dom.ul.appendChild(li);
+		li.textContent = draggable.getHeaderText();
+		self.draggables.push({obj: draggable, li: li});
+		draggable.hide();
+		CssUtils.showElement(self.dom.minimizedWindowsIcon);
+	};
+	self.findAndRemove = function(li, isLi) {
+		for (var i = 0; i < self.draggables.length; i++) {
+			var e = self.draggables[i];
+			if ((isLi && e.li === li) || (!isLi && e.obj === li)) {
+				self.draggables.splice(i, 1);
+				self.dom.ul.removeChild(e.li);
+				return e.obj;
+			}
+		}
+	};
+	self.hideIfNeeded = function() {
+		if (self.draggables.length === 0) {
+			CssUtils.hideElement(self.dom.minimizedWindowsIcon);
+		}
+	};
+	self.remove = function(draggable) {
+		var e = self.findAndRemove(draggable);
+		if (e) {
+			e.hide();
+			self.hideIfNeeded();
+		} else {
+			logger.error("Draggable {} not found", draggable)();
+		}
+	};
+	self.init();
+}
+
+
 function Draggable(container, headerText) {
 	var self = this;
 	self.UNACTIVE_CLASS = 'blurred';
 	self.MOVING_CLASS = 'moving';
 	self.dom = {
-		container:  container
+		container:  container,
+		iconMinimize: document.createElement('I'),
+		header: document.createElement('DIV'),
 	};
 	self.headerText = headerText;
 	self.preventDefault = function (e) {
@@ -466,8 +543,11 @@ function Draggable(container, headerText) {
 	};
 	self.init = function () {
 		CssUtils.addClass(self.dom.container, "modal-body");
-		CssUtils.addClass(self.dom.container, "modal-draggable");
-		self.dom.header = document.createElement('DIV');
+		self.dom.container.style.left = 'calc(50% - 100px)';
+		self.dom.container.style.top = '10%';
+		self.dom.header.appendChild(self.dom.iconMinimize);
+		self.dom.iconMinimize.onclick = self.minimize;
+		self.dom.iconMinimize.className = 'icon-minimize';
 		self.dom.header.className = 'windowHeader noSelection';
 		self.dom.header.addEventListener ("mousedown", function(ev) {
 			self.mouseDownElement = ev.target;
@@ -563,8 +643,17 @@ function Draggable(container, headerText) {
 	self.setHeaderText = function (text) {
 		self.dom.headerText.innerHTML = text;
 	};
+	self.getHeaderText = function() {
+		return self.dom.headerText.textContent;
+	};
 	self.show = function () {
 		CssUtils.showElement(self.dom.container);
+	};
+	self.destroy= function() {
+		CssUtils.deleteElement(self.dom.container);
+	};
+	self.minimize = function() {
+		minimizedWindows.add(self);
 	};
 	self.super = {
 		show: self.show,
@@ -576,6 +665,7 @@ function Draggable(container, headerText) {
 
 onDocLoad(function () {
 	muteBtn = $("muteBtn");
+	minimizedWindows = new MinimizedWindow();
 	var sound = localStorage.getItem('sound');
 	if (sound == null) {
 		window.sound = 0;

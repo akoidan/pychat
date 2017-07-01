@@ -145,8 +145,14 @@ class Message(models.Model):
 	# DateField.auto_now
 	time = models.BigIntegerField(default=get_milliseconds)
 	content = models.TextField(null=True)
-	img = FileField(upload_to=get_random_path, null=True)
+	#img = FileField(upload_to=get_random_path, null=True)
 	deleted = BooleanField(default=False)
+
+
+class Image(models.Model):
+	symbol = models.CharField(null=False, max_length=1)
+	message = models.ForeignKey(Message, related_name='message', null=False)
+	img = FileField(upload_to=get_random_path, null=True)
 
 
 class RoomUsers(models.Model):

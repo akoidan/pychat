@@ -67,6 +67,8 @@ TODO
 * add tornado sinle log file instead of 1 per port, add port param to it
 * Add colored logs http://stackoverflow.com/questions/7505623/colors-in-javascript-console
 * replace `new Date().getTime()` with `Date.now()`
+* add drawing lines with alpha by saving image
+* check transfer files over net - doesnt work, while localhost works
 * remove setHeaderTest, highlight current page icos. Always display username in right top
 * Painter doesn't work on mobile devices (add ontouch)
 * add timeout to call. (finish after timeout) Display busy if calling to SAME chanel otherwise it will show multiple videos
@@ -75,7 +77,6 @@ TODO
 * Ability to restore minimized draggable
 * Add showing time left and current send speed to file transfer dialog
 * add message queue if socketed is currently disconnected ???
-* Add FileSystem api to be able to store large files https://www.html5rocks.com/en/tutorials/file/filesystem/
 * Add link to gihub in console
 * `'` Symbol in links breaks anchor tag. For example https://raw.githubusercontent.com/NeverSinkDev/NeverSink-Filter/master/NeverSink's%20filter%20-%201-REGULAR.filter
 * webrtc connection lost while transfering file causes js error
