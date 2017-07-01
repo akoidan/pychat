@@ -527,15 +527,31 @@ class MessagesHandler(MessagesCreator):
 		)
 		message_db.room_id = channel
 		self.do_db(message_db.save)
-		imgs = message.get(VarNames.IMG)
-		res_imgs = []
-		if imgs:
-			for k in imgs:
-				img = extract_photo(imgs[k][VarNames.IMG_B64], message.get(VarNames.IMG_FILE_NAME))
-				res_imgs.append(Image(message_id=message_db.id, img=img, symbol=k))
-			Image.objects.bulk_create(res_imgs)
+		res_imgs = self.parse_imgs(message.get(VarNames.IMG), message_db.id)
 		prepared_message = self.create_send_message(message_db, Actions.PRINT_MESSAGE, self.prepare_img(res_imgs, message_db.id))
 		self.publish(prepared_message, channel)
+
+	def parse_imgs(self, imgs, mess_id):
+		res_imgs = []
+		if imgs:
+			fetch = False
+			for k in imgs:
+				b64 =imgs[k].get(VarNames.IMG_B64)
+				if b64:
+					img = extract_photo(imgs[k][VarNames.IMG_B64], imgs[k][VarNames.IMG_FILE_NAME])
+					res_imgs.append(Image(message_id=mess_id, img=img, symbol=k))
+				else:
+					fetch = True
+			fetched_messages = None
+			if fetch:
+				fetched_messages = Image.objects.filter(message_id=mess_id)
+				len(fetched_messages)  # fetch
+			if res_imgs:
+				Image.objects.bulk_create(res_imgs)
+			if fetched_messages:
+				for m in fetched_messages:
+					res_imgs.append(m)
+		return res_imgs
 
 	def close_file_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
@@ -812,19 +828,22 @@ class MessagesHandler(MessagesCreator):
 		message = Message.objects.get(id=message_id)
 		if message.sender_id != self.user_id:
 			raise ValidationError("You can only edit your messages")
-		if message.time + 60000 < get_milliseconds():
-			raise ValidationError("You can only edit messages that were send not more than 1 min ago")
+		if message.time + 600000 < get_milliseconds():
+			raise ValidationError("You can only edit messages that were send not more than 10 min ago")
 		if message.deleted:
 			raise ValidationError("Already deleted")
 		message.content = data[VarNames.CONTENT]
 		selector = Message.objects.filter(id=message_id)
 		if message.content is None:
+			imgs = None
 			selector.update(deleted=True)
 			action = Actions.DELETE_MESSAGE
 		else:
+			imgs = self.parse_imgs(data.get(VarNames.IMG), message.id)
+			prep_imgs = self.prepare_img(imgs, message_id)
 			action = Actions.EDIT_MESSAGE
 			selector.update(content=message.content)
-		self.publish(self.create_send_message(message, action, None), message.room_id) # TODO we're deleting old images
+		self.publish(self.create_send_message(message, action, prep_imgs), message.room_id)
 
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
