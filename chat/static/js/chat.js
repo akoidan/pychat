@@ -83,8 +83,13 @@ function Painter() {
 		var rect = painter.dom.canvas.getBoundingClientRect();
 		self.leftOffset = rect.left;
 		self.topOffset = rect.top;
+		//self.tmpData = self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height); TODO
 		self.ctx.beginPath();
 		var xy = self.getXY(e);
+		// self.ctx.fillStyle = self.dom.color.value; TODO
+		// self.ctx.arc(xy.x, xy.y, self.ctx.lineWidth / 2, 0, 2 * Math.PI);
+		// self.ctx.fill();
+		// self.points = [];
 		self.ctx.lineTo(xy.x, xy.y);
 		self.ctx.stroke();
 		self.dom.canvas.addEventListener('mousemove', self.onPaint, false);
@@ -164,6 +169,7 @@ function Painter() {
 		}
 	};
 	self.onPaintPen = function (x, y) {
+		//self.points.push({x:x, y:y}); TODO
 		self.ctx.lineTo(x, y);
 		self.ctx.stroke();
 	};
@@ -813,7 +819,7 @@ function ChannelsHandler() {
 	self.imagePaste = function (e) {
 		if (e.clipboardData) {
 			var items = e.clipboardData.items;
-			if (items) {
+			if (items && items.length > 0) {
 				for (var i = 0; i < items.length; i++) {
 					self.readDataAndSend(items[i].getAsFile());
 				}
@@ -1464,12 +1470,12 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.allMessages = [];
 	self.allMessagesDates = [];
 	self.activeRoomClass = 'active-room';
-	self.dom.newMessages.className = 'newMessagesCount hidden';
+	self.dom.newMessages.className = 'newMessagesCount ' + CssUtils.visibilityClass;
 	li.appendChild(self.dom.newMessages);
 	self.OTHER_HEADER_CLASS = 'message-header-others';
-	self.dom.userList.className = 'hidden';
+	self.dom.userList.className = CssUtils.visibilityClass;
 	channelsHandler.dom.chatUsersTable.appendChild(self.dom.userList);
-	self.dom.chatBoxDiv.className = 'chatbox hidden';
+	self.dom.chatBoxDiv.className = 'chatbox ' + CssUtils.visibilityClass;
 	self.dom.chatBoxHolder.appendChild(self.dom.chatBoxDiv);
 	// tabindex allows focus, focus allows keydown binding event
 	self.dom.chatBoxDiv.setAttribute('tabindex', '1');
@@ -2314,7 +2320,7 @@ function CallHandler(roomId) {
 		self.dom.local.className = 'localVideo';
 		self.dom.videoContainer.appendChild(iwc);
 		self.dom.videoContainer.appendChild(self.dom.videoContainerForVideos);
-		self.dom.videoContainer.className = 'videoContainer';
+		self.dom.videoContainer.className = 'videoContainer ' + CssUtils.visibilityClass;
 		self.dom.callContainerContent.className = 'callContainerContent';
 		self.dom.callContainerContent.appendChild(self.dom.videoContainer);
 		self.dom.callContainer.appendChild(self.dom.callContainerContent);
@@ -2340,7 +2346,7 @@ function CallHandler(roomId) {
 		self.dom.fs.enterFullScreen.title = 'Fullscreen';
 		enterFullScreenHolder.appendChild(self.dom.fs.enterFullScreen);
 
-		self.dom.hangUpHolder.className = 'hangUpHolder '+CssUtils.visibilityClass;
+		self.dom.hangUpHolder.className = 'hangUpHolder ' + CssUtils.visibilityClass;
 		self.dom.hangUpHolder.appendChild(self.dom.hangUpIcon);
 		self.dom.hangUpIcon.className = 'icon-hang-up ';
 		self.dom.hangUpIcon.title = 'Hang Up';
@@ -2686,10 +2692,6 @@ function FileTransferHandler(removeReferenceFn) {
 		self.dom.fileInfo.className = 'table';
 		document.querySelector('body').appendChild(self.dom.container);
 		CssUtils.addClass(self.dom.body, 'transferFile');
-		self.dom.iconMinimize = document.createElement('i');
-		self.dom.header.appendChild(self.dom.iconMinimize);
-		self.dom.iconMinimize.onclick = self.hide;
-		self.dom.iconMinimize.className = 'icon-minimize';
 		self.dom.iconCancel.onclick = self.noAction;
 		self.insertData('Name:', self.fileName);
 		self.insertData('Size:', bytesToSize(self.fileSize));
@@ -2704,37 +2706,9 @@ function FileTransferHandler(removeReferenceFn) {
 		valueField.textContent = value;
 		return valueField;
 	};
-	self.hideButtons = function () {
-		if (self.dom.yesNoHolder) {
-			CssUtils.hideElement(self.dom.yesNoHolder)
-		}
-	};
-	self.yesAction = function () {
-		self.hideButtons();
-		self.acceptFileReply();
-	};
-	self.remove = function () {
-		CssUtils.deleteElement(self.dom.container);
-	};
 	self.noAction = function () {
 		self.closeWindowClick();
-		self.remove();
-	};
-	self.addYesNo = function () {
-		self.dom.yesNoHolder = document.createElement('DIV');
-		self.dom.yes = document.createElement('INPUT');
-		self.dom.no = document.createElement('INPUT');
-		self.dom.body.appendChild(self.dom.yesNoHolder);
-		self.dom.yesNoHolder.appendChild(self.dom.yes);
-		self.dom.yesNoHolder.appendChild(self.dom.no);
-		self.dom.yesNoHolder.className = 'yesNo';
-		self.dom.yes.onclick = self.yesAction;
-		self.dom.no.onclick = self.noAction;
-		self.dom.yes.setAttribute('type', 'button');
-		self.dom.no.setAttribute('type', 'button');
-		self.dom.yes.setAttribute('value', 'Accept');
-		self.dom.no.setAttribute('value', 'Decline');
-		self.fixInputs();
+		self.destroy();
 	};
 	self.decline = function () {
 		wsHandler.sendToServer({
@@ -2743,9 +2717,6 @@ function FileTransferHandler(removeReferenceFn) {
 			connId: self.connectionId
 		});
 	};
-	self.remove = function () {
-		document.querySelector('body').removeChild(self.dom.container);
-	}
 }
 
 
@@ -2762,6 +2733,31 @@ function FileReceiver(removeReferenceFn) {
 		self.setHeaderText("{} sends file".format(self.opponentName));
 		self.dom.connectionStatus = self.insertData('Status:', 'Received an offer');
 		self.addYesNo();
+	};
+	self.yesAction = function () {
+		self.hideButtons();
+		self.acceptFileReply();
+	};
+	self.hideButtons = function () {
+		if (self.dom.yesNoHolder) {
+			CssUtils.hideElement(self.dom.yesNoHolder)
+		}
+	};
+	self.addYesNo = function () {
+		self.dom.yesNoHolder = document.createElement('DIV');
+		self.dom.yes = document.createElement('INPUT');
+		self.dom.no = document.createElement('INPUT');
+		self.dom.body.appendChild(self.dom.yesNoHolder);
+		self.dom.yesNoHolder.appendChild(self.dom.yes);
+		self.dom.yesNoHolder.appendChild(self.dom.no);
+		self.dom.yesNoHolder.className = 'yesNo';
+		self.dom.yes.onclick = self.yesAction;
+		self.dom.no.onclick = self.noAction;
+		self.dom.yes.setAttribute('type', 'button');
+		self.dom.no.setAttribute('type', 'button');
+		self.dom.yes.setAttribute('value', 'Accept');
+		self.dom.no.setAttribute('value', 'Decline');
+		self.fixInputs();
 	};
 	self.sendErrorFSApi = function() {
 		var bsize = bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API);
@@ -2803,7 +2799,7 @@ function FileReceiver(removeReferenceFn) {
 	};
 	self.ondestroyFileConnection = function (message) {
 		if (self.peerConnections[message.opponentWsId]) {
-			self.peerConnections[message.opponentWsId].ondestroyConnection(message);
+			self.peerConnections[message.opponentWsId].ondestroyFileConnection(message);
 		} else {
 			self.hideButtons();
 			self.dom.connectionStatus.textContent = "Opponent declined sending";
@@ -2921,9 +2917,9 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 	self.gotReceiveChannel = function (event) {
 		self.superGotReceiveChannel(event);
 	};
-	self.superOnDestroyConnection = self.ondestroyFileConnection;
+	self.superOnDestroyFileConnection = self.ondestroyFileConnection;
 	self.ondestroyFileConnection = function (data) {
-		self.superOnDestroyConnection();
+		self.superOnDestroyFileConnection(data);
 		self.downloadBar.setStatus("Error: Opponent closed connection");
 		self.downloadBar.setError();
 	};

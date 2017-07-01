@@ -28,6 +28,7 @@
 		<a class="icon-phone" id="navCallIcon" href="/#/call" title="Make a video/mic call" onclick="event.preventDefault(); webRtcApi.toggleCallContainer()"><span class="mText">Call</span></a>
 		<a href="/#/statistics" class="icon-chart-pie hide-wide" onclick="event.preventDefault(); singlePage.showPage('/statistics')" title="Show user countries statistics"><span class="mText">statistics</span></a>
 		<i class="icon-doc-inv" id="webRtcFileIcon"><span class="mText">Send File</span></i>
+		<i class="icon-popup hidden" id="minimizedWindows"><span class="mText">Minimized Winows</span></i>
 		<span id="onlineStatus" title="Online status" class="flex-push-right offline">●</span>
 		<span id='headerText' class="username very-small-screen"></span>
 		<a  href="/#/profile" title="Settings" onclick="event.preventDefault(); singlePage.showPage('/profile')" class="icon-wrench"> <span class="mText">Profile</span></a>
@@ -84,7 +85,7 @@
 	<div id="addUserHolder" class="hidden">
 		<div>
 			<input type="search" placeholder="Search" title="Filter by username" onkeyup="channelsHandler.filterAddUser(event)" id="addUserInput"/>
-			<ul id="addUserList" onclick="channelsHandler.addUserHolderClick(event)">
+			<ul id="addUserList" class="list" onclick="channelsHandler.addUserHolderClick(event)">
 			</ul>
 		</div>
 	</div>
