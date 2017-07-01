@@ -11,7 +11,6 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import logging.config
 import os
-import re
 import sys
 from os.path import join
 
@@ -151,7 +150,6 @@ CACHES = {
 	}
 }
 
-IMAGE_REGEX = re.compile(r'[\u3501-\u3600]')
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
 

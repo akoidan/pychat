@@ -888,7 +888,7 @@ function ChannelsHandler() {
 			return;
 		}
 		var editLastMessageNode = self.getActiveChannel().lastMessage;
-		// only if message was sent 1 min ago + 2seconds for message to being processed
+		// only if message was sent 10 min ago + 2seconds for message to being processed
 		if (editLastMessageNode && self.isMessageEditable(editLastMessageNode.time)) {
 			self.editLastMessageNode = editLastMessageNode;
 			self.editLastMessageNode.dom = $(editLastMessageNode.time);
@@ -900,7 +900,7 @@ function ChannelsHandler() {
 		}
 	};
 	self.isMessageEditable = function (time) {
-		return time + 58000 > Date.now();
+		return time + 595000 > Date.now();
 	};
 	self.placeCaretAtEnd = function () {
 		var range = document.createRange();
@@ -913,29 +913,37 @@ function ChannelsHandler() {
 	self.nextChar = function (c) {
 		return String.fromCharCode(c.charCodeAt(0) + 1)
 	};
-	self.getPastedImage = function () {
+	self.getPastedImage = function (currSymbol) {
 		var res = {}; // return array from nodeList
 		var images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
-		var currSymbol = '\u3500';
 		for (var i = 0; i < images.length; i++) {
-			currSymbol = self.nextChar(currSymbol);
-			var textNode = document.createTextNode(currSymbol);
 			var img = images[i];
+			var elSymb = img.getAttribute('symbol');
+			currSymbol = elSymb || self.nextChar(currSymbol);
+			var textNode = document.createTextNode(currSymbol);
 			img.parentNode.replaceChild(textNode, img);
 			res[currSymbol] = {
-				b64: img.src,
+				b64: elSymb ? null : img.src,// don't send image again, it's already in server
 				fileName: img.getAttribute('fileName')
 			};
 		}
 		return res;
 	};
 	self.handleSendMessage = function () {
-		var images = self.getPastedImage();
+		var isEdit = self.editLastMessageNode && !self.editLastMessageNode.notReady;
+		var currSymbol = '\u3501';
+		if (isEdit) {
+			var symb = self.editLastMessageNode.dom.getAttribute('symbol');
+			if (symb.charCodeAt(0) > currSymbol.charCodeAt(0)) { // just to be sure
+				currSymbol = symb;
+			}
+		}
+		var images = self.getPastedImage(currSymbol);
 		smileyUtil.purgeImagesFromSmileys();
 		var messageContent = userMessage.textContent;
 		messageContent = blankRegex.test(messageContent) ? null : messageContent;
 		var message;
-		if (self.editLastMessageNode && !self.editLastMessageNode.notReady) {
+		if (isEdit) {
 			message = {
 				id: self.editLastMessageNode.id,
 				action: 'editMessage',
@@ -1266,8 +1274,7 @@ function ChannelsHandler() {
 		self.showOrInviteDirectChannel(self.postCallUserAction);
 	};
 	self.postCallUserAction = function () {
-		webRtcApi.toggleCallContainer();
-		webRtcApi.callPeople(); //TODO
+		self.getActiveChannel().getCallHandler().offerCall();
 	};
 	self.postCallTransferFileAction = function () {
 		webRtcApi.toggleCallContainer();
@@ -1280,22 +1287,24 @@ function ChannelsHandler() {
 	self.showOrInviteDirectChannel = function (postAction) {
 		var userId = self.getActiveUserId();
 		var exclude = self.getDirectMessagesUserIds();
-		if (exclude[userId]) {
+		if (userId == loggedUserId) {
+			growlError("You can't call yourself");
+		} else if (exclude[userId]) {
 			var selector = "#directUserTable li[userid='{}']".format(userId);
 			var strRoomId = document.querySelector(selector).getAttribute(self.ROOM_ID_ATTR);
 			self.setActiveChannel(parseInt(strRoomId));
+			postAction();
 		} else {
-			self.actionAfterRoomCreate = userId;
+			self.postUserAction = {
+				action: postAction,
+				time: Date.now(),
+				userId: userId,
+				actionTrigger: 'addOnlineUser'
+			};
 			wsHandler.sendToServer({
 				action: 'addDirectChannel',
 				userId: userId
 			});
-		}
-		self.postUserAction = {
-			action: postAction,
-			time: Date.now(),
-			userId: userId,
-			actionTrigger: 'addOnlineUser'
 		}
 	};
 	self.dom.activeUserContext = null;
@@ -1709,7 +1718,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		return result;
 	};
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
-	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId) {
+	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, symbol) {
 		var pos = null;
 		if (self.allMessages.length > 0 && !(timeMillis > self.allMessages[self.allMessages.length - 1])) {
 			try {
@@ -1724,6 +1733,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 		var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId);
 		// every message has UTC millis ID so we can detect if message is already displayed or position to display
+		if (symbol) {
+			p.setAttribute('symbol', symbol)
+		}
 		pos = self.insertCurrentDay(timeMillis, pos);
 		if (pos != null) {
 			self.dom.chatBoxDiv.insertBefore(p, pos);
@@ -1764,18 +1776,24 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.encodeMessage = function (data) {
 		var html = encodeAnchorsHTML(data.content);
+		var symb = '\u3501';
 		if (data.images) {
 			html = html.replace(imageUnicodeRegex, function (s) {
-				return "<img src=\'{}\'/>".format(data.images[s]);
+				if (s.charCodeAt(0) > symb.charCodeAt(0)) {
+					symb = s;
+				}
+				return "<img src=\'{}\' symbol=\'{}\' class=\'{}\'/>".format(data.images[s], s, PASTED_IMG_CLASS);
 			});
 		}
-		return smileyUtil.encodeSmileys(html);
+		return {html: smileyUtil.encodeSmileys(html), symbol: symb};
 	};
 	self.editMessage = function (data) {
-		var html = self.encodeMessage(data);
+		var datDict = self.encodeMessage(data);
 		var p = $(data.time);
 		if (p != null) {
-			document.querySelector("[id='{}'] .{}".format(data.time, CONTENT_STYLE_CLASS)).innerHTML = html;
+			var element = p.querySelector("." + CONTENT_STYLE_CLASS);
+			p.setAttribute('symbol', datDict.symbol);
+			element.innerHTML = datDict.html;
 			CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
 		}
 	};
@@ -1804,8 +1822,15 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var displayedUsername = user.user;
 		//private message
 		var headerStyle = data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
-		var preparedHtml = self.encodeMessage(data);
-		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, data.id);
+		var datDict = self.encodeMessage(data);
+		var p = self.displayPreparedMessage(
+				headerStyle,
+				data.time,
+				datDict.html,
+				displayedUsername,
+				data.id,
+				datDict.symbol
+		);
 		if (p) { // not duplicate message
 			var keys = data.images && Object.keys(data.images);
 			var img = keys && data.images[keys[0]];
@@ -3619,7 +3644,7 @@ var Utils = {
 			" clicking on it and press arrow up/page up or just scroll up with mousewheel",
 			"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>",
 			"<span>You can send images to to chat by pasting them in bottom textarea by pressing <B>Ctrl + V</b></span>",
-			"<span>You can edit/delete message that you have sent during one minute. Focus input text, delete its content " +
+			"<span>You can edit/delete message that you have sent during 10 minutes. Focus input text, delete its content " +
 			"and press <b>Up Arrow</b>. The edited message should become highlighted with outline. If you apply blank text the" +
 			" message will be removed.To exit the mode press <b>Esc</b></span>"
 		];
