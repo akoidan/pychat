@@ -188,7 +188,7 @@ function getDay(dateObj) {
 	return year + "/" + month + "/" + day;
 }
 
-const escapeMap = {
+var escapeMap = {
 	"&": "&amp;",
 	"<": "&lt;",
 	">": "&gt;",

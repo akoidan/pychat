@@ -90,8 +90,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 TODO
 ====
-* add window minimize
-* add pasting image to textarea instead of chatbox
 * add drawing lines with alpha by saving image
 * check transfer files over net - doesnt work, while localhost works
 * remove setHeaderTest, highlight current page icos. Always display username in right top
@@ -102,7 +100,6 @@ TODO
 * Ability to restore minimized draggable
 * Add showing time left and current send speed to file transfer dialog
 * add message queue if socketed is currently disconnected ???
-* Add FileSystem api to be able to store large files https://www.html5rocks.com/en/tutorials/file/filesystem/
 * Add link to gihub in console
 * webrtc connection lost while transfering file causes js error
 * Add title for room. 
