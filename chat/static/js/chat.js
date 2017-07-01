@@ -174,7 +174,6 @@ function Draggable(container, headerText) {
 		// self.dom.container.ondragenter  = self.preventDefault;
 		self.dom.headerText = document.createElement('span');
 		self.dom.header.appendChild(self.dom.headerText);
-		self.dom.headerText.style = 'display: inline-block';
 		self.setHeaderText(self.headerText);
 		self.dom.iconCancel = document.createElement('i');
 		self.dom.header.appendChild(self.dom.iconCancel);

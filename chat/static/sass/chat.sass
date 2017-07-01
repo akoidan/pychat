@@ -246,6 +246,11 @@ fieldset
 	li
 		padding: 0 0 0 5px
 		border-radius: 2px
+		text-overflow: ellipsis
+		overflow: hidden
+		max-width: 250px
+		float: left
+		white-space: nowrap
 		@extend %hovered-user-room
 
 #addUserHolder
@@ -465,6 +470,12 @@ fieldset
 	cursor: pointer
 	span
 		display: inline-block
+		text-overflow: ellipsis
+		overflow: hidden
+		max-width: 275px
+		float: left
+		margin-left: 50px
+		white-space: nowrap
 	.icon-cancel
 		float: right
 		color: #b13533
