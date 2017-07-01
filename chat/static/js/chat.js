@@ -37,10 +37,12 @@ var wsHandler;
 var storage;
 var singlePage;
 var painter;
+var minimizedWindows;
 
 onDocLoad(function () {
 	userMessage = $("usermsg");
 	headerText = $('headerText');
+	minimizedWindows = new MinimizedWindows();
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	channelsHandler = new ChannelsHandler();
 	singlePage = new PageHandler();
@@ -59,6 +61,220 @@ onDocLoad(function () {
 	Utils.showHelp();
 });
 
+
+
+function MinimizedWindows() {
+	var self = this;
+	self.draggables = [];
+	self.dom = {
+		ul: document.createElement('UL'),
+		minimizedWindowsIcon: $('minimizedWindows')
+	};
+	self.init = function() {
+		self.dom.ul.className = 'minimizedList window list ' + CssUtils.visibilityClass;
+		document.body.appendChild(self.dom.ul);
+		self.dom.minimizedWindowsIcon.onclick = self.toggle;
+		self.dom.ul.onclick = self.onulclick;
+	};
+	self.onulclick = function(e) {
+		if (e.target.tagName === 'LI') {
+			document.removeEventListener("click", self.hideWindow);
+			var el = self.findAndRemove(e.target, true);
+			el.show();
+			self.hideIfNeeded();
+			CssUtils.hideElement(self.dom.ul);
+		}
+	};
+	self.toggle = function (e) {
+		var wasVisible = CssUtils.toggleVisibility(self.dom.ul);
+		if (!wasVisible) {
+			document.addEventListener("click", self.hideWindow);
+			var a = self.dom.minimizedWindowsIcon;
+			e.stopPropagation();
+			self.dom.ul.style.top = a.offsetHeight + a.offsetTop + 'px';
+			self.dom.ul.style.left = a.offsetLeft - 100 + 'px';
+		} else {
+			document.removeEventListener("click", self.hideWindow);
+		}
+	};
+	self.hideWindow = function() {
+		document.removeEventListener("click", self.hideWindow);
+		CssUtils.hideElement(self.dom.ul);
+	};
+	self.add = function(draggable) {
+		var li = document.createElement('li');
+		self.dom.ul.appendChild(li);
+		li.textContent = draggable.getHeaderText();
+		self.draggables.push({obj: draggable, li: li});
+		draggable.hide();
+		CssUtils.showElement(self.dom.minimizedWindowsIcon);
+	};
+	self.findAndRemove = function(li, isLi) {
+		for (var i = 0; i < self.draggables.length; i++) {
+			var e = self.draggables[i];
+			if ((isLi && e.li === li) || (!isLi && e.obj === li)) {
+				self.draggables.splice(i, 1);
+				self.dom.ul.removeChild(e.li);
+				return e.obj;
+			}
+		}
+	};
+	self.hideIfNeeded = function() {
+		if (self.draggables.length === 0) {
+			CssUtils.hideElement(self.dom.minimizedWindowsIcon);
+		}
+	};
+	self.remove = function(draggable) {
+		var e = self.findAndRemove(draggable);
+		if (e) {
+			e.hide();
+			self.hideIfNeeded();
+		} else {
+			logger.error("Draggable {} not found", draggable)();
+		}
+	};
+	self.init();
+}
+
+
+function Draggable(container, headerText) {
+	var self = this;
+	self.UNACTIVE_CLASS = 'blurred';
+	self.MOVING_CLASS = 'moving';
+	self.dom = {
+		container:  container,
+		iconMinimize: document.createElement('I'),
+		header: document.createElement('DIV'),
+	};
+	self.headerText = headerText;
+	self.preventDefault = function (e) {
+		e.stopPropagation();
+		e.preventDefault();
+	};
+	self.onMouseMove = function(e) {
+		self.top = e.pageY;
+		self.left = e.pageX;
+	};
+	self.init = function () {
+		CssUtils.addClass(self.dom.container, "modal-body");
+		self.dom.container.style.left = 'calc(50% - 100px)';
+		self.dom.container.style.top = '10%';
+		self.dom.header.appendChild(self.dom.iconMinimize);
+		self.dom.iconMinimize.onclick = self.minimize;
+		self.dom.iconMinimize.className = 'icon-minimize';
+		self.dom.header.className = 'windowHeader noSelection';
+		self.dom.header.addEventListener ("mousedown", function(ev) {
+			self.mouseDownElement = ev.target;
+		}, false);
+		self.dom.container.setAttribute('draggable', 'true');
+		self.dom.container.ondragstart = self.ondragstart;
+		self.dom.container.ondragend = self.ondragend;
+		// self.dom.container.ondrop = self.preventDefault; // TODO doens't work
+		// self.dom.container.ondragleave  = self.preventDefault; // this thing causes ondrop event on messages
+		// self.dom.container.ondragenter  = self.preventDefault;
+		self.dom.headerText = document.createElement('span');
+		self.dom.header.appendChild(self.dom.headerText);
+		self.dom.headerText.style = 'display: inline-block';
+		self.setHeaderText(self.headerText);
+		self.dom.iconCancel = document.createElement('i');
+		self.dom.header.appendChild(self.dom.iconCancel);
+		self.dom.iconCancel.onclick = self.hide;
+		self.dom.iconCancel.className = 'icon-cancel';
+		self.dom.body = self.dom.container.children[0];
+		if (!self.dom.body) {
+			self.dom.body = document.createElement('DIV');
+			self.dom.container.appendChild(self.dom.body);
+		}
+		CssUtils.addClass(self.dom.body, 'window-body');
+		self.dom.container.insertBefore(self.dom.header, self.dom.body);
+		self.dom.container.addEventListener('focus', self.onfocus);
+		self.dom.container.addEventListener('blur', self.onfocusout);
+		self.dom.container.setAttribute('tabindex', "-1");
+	};
+	self.ondragend = function (e) {
+		var x,y;
+		if (isFirefox) {
+			document.removeEventListener('dragover', self.onMouseMove);
+			x = self.left;
+			y = self.top;
+		} else {
+			x = e.pageX;
+			y = e.pageY;
+		}
+		CssUtils.removeClass(self.dom.container, self.MOVING_CLASS);
+		var left = x + self.leftCorrection;
+		if (left < 0) {
+			left = 0;
+		} else if (left > self.maxLeft) {
+			left = self.maxLeft;
+		}
+		var top = y + self.topCorrection;
+		if (top < 0) {
+			top = 0;
+		} else if (top > self.maxTop) {
+			top = self.maxTop;
+		}
+		self.dom.container.style.left = left + "px";
+		self.dom.container.style.top =  top + "px";
+	};
+	self.ondragstart = function (e) {
+		if (isFirefox) {
+			e.dataTransfer.setData('text/plain', 'won');
+			document.addEventListener('dragover', self.onMouseMove);
+		}
+		var clickedEl = self.mouseDownElement;
+		self.mouseDownElement = null;
+		if (isDescendant(self.dom.header, clickedEl)) {
+			if (clickedEl.tagName !== 'I') {
+				CssUtils.addClass(self.dom.container, self.MOVING_CLASS);
+				self.leftCorrection = self.dom.container.offsetLeft - e.pageX;
+				self.topCorrection = self.dom.container.offsetTop - e.pageY;
+				self.maxTop = document.body.clientHeight - self.dom.container.clientHeight - 7;
+				self.maxLeft = document.body.clientWidth - self.dom.container.clientWidth - 3;
+				return;
+			}
+		}
+		e.preventDefault();
+	};
+	self.fixInputs = function () {
+		if (!self.dom.container.id) {
+			self.dom.container.id = 'draggable'+getRandomId();
+		}
+		var inputs = document.querySelectorAll('#{0} input, #{0} button'.formatPos(container.id));
+		// typeOf(inputs) = HTMLCollection, not an array. that doesn't have forEach
+		for (var i = 0; i < inputs.length; i++) {
+			inputs[i].addEventListener('focus', function () {
+				CssUtils.addClass(self.dom.container, self.UNACTIVE_CLASS);
+			});
+			inputs[i].addEventListener('blur', function () {
+				CssUtils.removeClass(self.dom.container, self.UNACTIVE_CLASS);
+			});
+		}
+	};
+	self.hide = function () {
+		CssUtils.hideElement(self.dom.container);
+	};
+	self.setHeaderText = function (text) {
+		self.dom.headerText.innerHTML = text;
+	};
+	self.getHeaderText = function() {
+		return self.dom.headerText.textContent;
+	};
+	self.show = function () {
+		CssUtils.showElement(self.dom.container);
+	};
+	self.destroy= function() {
+		CssUtils.deleteElement(self.dom.container);
+	};
+	self.minimize = function() {
+		minimizedWindows.add(self);
+	};
+	self.super = {
+		show: self.show,
+		hide: self.hide
+	};
+	self.init();
+}
 
 function Painter() {
 	var self = this;
@@ -2196,14 +2412,14 @@ function CallPopup(answerFn, videoAnswerFn, declineFn) {
 		self.dom.callSound.pause();
 		self.super.hide();
 	};
-	self.show = function (user, channelName) {
+	self.initAndShow = function (user, channelName) {
 		var text = "{} calls".format(channelName);
 		self.setHeaderText(text);
 		self.inserRow("Initiator: ", user);
-		self.super.show();
+		self.show();
 		Utils.checkAndPlay(self.dom.callSound);
 	};
-	self.closeEvents = function() {
+	self.closeEvents = function () {
 		CssUtils.deleteChildren(self.dom.users);
 	};
 	self.init();
@@ -2470,7 +2686,7 @@ function CallHandler(roomId) {
 		CssUtils.setVisibility(self.dom.callContainerContent, self.visible);
 	};
 	self.showOffer = function (message, channelName) {
-		self.getCallPopup().show(message.user, channelName);
+		self.getCallPopup().initAndShow(message.user, channelName);
 		notifier.notify(message.user, "Calls you");
 	};
 	self.showNoMicError = function () {
@@ -2761,7 +2977,7 @@ function FileReceiver(removeReferenceFn) {
 		notifier.notify(message.user, "Sends file {}".format(self.fileName));
 		self.init();
 		self.insertData("From:", self.opponentName);
-		self.setHeaderText("{} sends file".format(self.opponentName));
+		self.setHeaderText("{} sends {}".format(self.opponentName, self.fileName));
 		self.dom.connectionStatus = self.insertData('Status:', 'Received an offer');
 		self.addYesNo();
 	};
@@ -2861,6 +3077,7 @@ function FileSender(removeReferenceFn, file) {
 		//self.dom.fileInput.disabled = true;
 		self.fileName = self.file.name;
 		self.fileSize = self.file.size;
+		self.setHeaderText("Sending {}".format(self.fileName));
 		var messageRequest = {
 			action: 'offerFile',
 			channel: currentActiveChannel,
@@ -3323,7 +3540,7 @@ function WebRtcApi() {
 	};
 	self.offerFile = function(file, channel) {
 		var newId = self.createQuedId();
-		self.quedConnections[newId] = new FileSender(self.removeChildReference,file);
+		self.quedConnections[newId] = new FileSender(self.removeChildReference, file);
 		self.quedConnections[newId].sendOffer(newId, channel);
 		return self.quedConnections[newId];
 	};
