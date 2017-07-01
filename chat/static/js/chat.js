@@ -1810,7 +1810,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var preparedHtml = self.encodeMessage(data);
 		var p = self.displayPreparedMessage(headerStyle, data.time, preparedHtml, displayedUsername, data.id);
 		if (p) { // not duplicate message
-			notifier.notify(displayedUsername, data.content || 'images', data.image); //TODo
+			var keys = data.images && Object.keys(data.images);
+			var img = keys && data.images[keys[0]];
+			notifier.notify(displayedUsername, data.content || 'images', img);
 			if (self.isHidden() && !window.newMessagesDisabled) {
 				self.newMessages++;
 				self.dom.newMessages.textContent = self.newMessages;
