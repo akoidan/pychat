@@ -764,13 +764,8 @@ function ChannelsHandler() {
 			chatHandler.show();
 			if (chatHandler.isPrivate()) {
 				CssUtils.hideElement(self.dom.inviteUser);
-				//CssUtils.showElement(self.dom.navCallIcon);
-				//CssUtils.showElement(self.dom.webRtcFileIcon);
 			} else {
-				//  TODO multirtc
 				CssUtils.showElement(self.dom.inviteUser);
-				//CssUtils.hideElement(self.dom.navCallIcon);
-				//CssUtils.hideElement(self.dom.webRtcFileIcon);
 			}
 		}
 		userMessage.focus()
@@ -801,8 +796,10 @@ function ChannelsHandler() {
 	self.imageDrop = function (evt) {
 		self.preventDefault(evt);
 		var file = evt.dataTransfer.files[0];
-		if (file) {
+		if (file.type.indexOf("image") >= 0) {
 			Utils.pasteImgToTextArea(file);
+		} else {
+			webRtcApi.offerFile(file, self.activeChannel);
 		}
 	};
 	self.imagePaste = function (e) {
@@ -3297,10 +3294,10 @@ function WebRtcApi() {
 		self.quedConnections[newId] = callHandler;
 		return newId;
 	};
-	self.offerFile = function () {
+	self.offerFile = function(file, channel) {
 		var newId = self.createQuedId();
-		self.quedConnections[newId] = new FileSender(self.removeChildReference, self.dom.fileInput.files[0]);
-		self.quedConnections[newId].sendOffer(newId, channelsHandler.activeChannel);
+		self.quedConnections[newId] = new FileSender(self.removeChildReference,file);
+		self.quedConnections[newId].sendOffer(newId, channel);
 		return self.quedConnections[newId];
 	};
 	self.removeChildReference = function (id) {
@@ -3309,7 +3306,9 @@ function WebRtcApi() {
 	};
 	self.attachEvents = function () {
 		self.dom.webRtcFileIcon.onclick = self.clickFile;
-		self.dom.fileInput.onchange = self.offerFile;
+		self.dom.fileInput.onchange = function() {
+			self.offerFile(self.dom.fileInput.files[0], channelsHandler.activeChannel);
+		};
 	};
 	self.attachEvents();
 }
@@ -3602,9 +3601,8 @@ var Utils = {
 			"You can disable this option in your profile(<i class='icon-wrench'></i> icon).</span>",
 			"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon." +
 			" To delete created room hover mouse on its name and click on <i class='icon-cancel-circled-outline'></i> icon.</span>",
-			"<span>You can make an audio/video call. Currently pychat allows calling only one person." +
-			" To call someone you need to create ( <i class='icon-plus-squared'></i>) and join direct message," +
-			" open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> </span>",
+			"<span>You can make an audio/video call." +
+			" Calls are only allowed for rooms you're in. If you want to call single person you need to create direct room to him. To make a call in room open call dialog by pressing <i class='icon-phone '></i> and click on phone <i class='icon-phone-circled'></i> All people in current channel are gonna be called</span>",
 			"<span>You can change chat appearance in your profile. To open profile click on <i class='icon-wrench'></i> icon in top right corner</span>",
 			"<span>You can write multiline message by pressing <b>shift+Enter</b></span>",
 			"<span>You can add smileys by clicking on bottom right <i class='icon-smile'></i> icon." +
@@ -3620,7 +3618,7 @@ var Utils = {
 			"You can load history of current channel. For this you need to focus place with messages by simply" +
 			" clicking on it and press arrow up/page up or just scroll up with mousewheel",
 			"<span>You can collapse user list by pressing on <i class='icon-angle-circled-up'></i> icon</span>",
-			"<span>To paste image from clipboard: focus box with messages (by clicking on it) and press <B>Ctrl + V</b></span>",
+			"<span>You can send images to to chat by pasting them in bottom textarea by pressing <B>Ctrl + V</b></span>",
 			"<span>You can edit/delete message that you have sent during one minute. Focus input text, delete its content " +
 			"and press <b>Up Arrow</b>. The edited message should become highlighted with outline. If you apply blank text the" +
 			" message will be removed.To exit the mode press <b>Esc</b></span>"
