@@ -533,25 +533,28 @@ class MessagesHandler(MessagesCreator):
 
 	def parse_imgs(self, imgs, mess_id):
 		res_imgs = []
-		if imgs:
-			fetch = False
-			for k in imgs:
-				b64 =imgs[k].get(VarNames.IMG_B64)
-				if b64:
-					img = extract_photo(imgs[k][VarNames.IMG_B64], imgs[k][VarNames.IMG_FILE_NAME])
-					res_imgs.append(Image(message_id=mess_id, img=img, symbol=k))
-				else:
-					fetch = True
-			fetched_messages = None
-			if fetch:
-				fetched_messages = Image.objects.filter(message_id=mess_id)
-				len(fetched_messages)  # fetch
-			if res_imgs:
-				Image.objects.bulk_create(res_imgs)
-			if fetched_messages:
-				for m in fetched_messages:
-					res_imgs.append(m)
+		if not imgs:
+			return res_imgs
+		fetch = False
+		for k in imgs:
+			b64 = imgs[k].get(VarNames.IMG_B64)
+			if b64:
+				img = extract_photo(imgs[k][VarNames.IMG_B64], imgs[k][VarNames.IMG_FILE_NAME])
+				res_imgs.append(Image(message_id=mess_id, img=img, symbol=k))
+			else:
+				fetch = True
+		self.merge_came_imgs_with_db(fetch, mess_id, res_imgs)
 		return res_imgs
+
+	def merge_came_imgs_with_db(self, fetch, mess_id, res_imgs):
+		fetched_messages = None
+		if fetch:
+			fetched_messages = Image.objects.filter(message_id=mess_id)
+		if res_imgs:
+			Image.objects.bulk_create(res_imgs)
+		if fetched_messages:
+			for m in fetched_messages:
+				res_imgs.append(m)
 
 	def close_file_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
@@ -626,25 +629,12 @@ class MessagesHandler(MessagesCreator):
 		else:
 			raise ValidationError("Invalid channel status")
 
-	# todo if we shgetall and only then do async hset
-	# todo we can catch an issue when 2 concurrent users accepted the call
-	# todo but we didn't  send them ACCEPT_CALL as they both were in status 'offered'
-	# def accept_call(self, in_message):
-	# 	connection_id = in_message[VarNames.CONNECTION_ID]
-	# 	channel_status = self.sync_redis.shgetall(connection_id)
-	# 	if channel_status and channel_status[self.id] == WebRtcRedisStates.RESPONDED:
-	# 		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
-	# 		for key in channel_status:  # del channel_status[self.id] not needed as self in responded
-	# 			if channel_status[key] == WebRtcRedisStates.READY:
-	# 				self.publish({
-	# 					VarNames.EVENT: Actions.ACCEPT_CALL,
-	# 					VarNames.CONNECTION_ID: connection_id,
-	# 					VarNames.WEBRTC_OPPONENT_ID: self.id,
-	# 					VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER,
-	# 				}, key)
-	# 	else:
-	# 		raise ValidationError("Invalid channel status")
-
+	# todo
+	# we can use channel_status = self.sync_redis.shgetall(connection_id)
+	# and then self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
+	# if we shgetall and only then do async hset
+	# we can catch an issue when 2 concurrent users accepted the call
+	# but we didn't  send them ACCEPT_CALL as they both were in status 'offered'
 	def accept_call(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
 		self_status = self.sync_redis.shget(connection_id, self.id)
