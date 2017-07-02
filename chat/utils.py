@@ -11,19 +11,20 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
+from django.db import connection, OperationalError, InterfaceError
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from chat import local
 from chat import settings
-from chat.models import User, UserProfile, Verification, RoomUsers, IpAddress
+from chat.models import Room
+from chat.models import User
+from chat.models import UserProfile, Verification, RoomUsers, IpAddress
+from chat.py2_3 import urlopen
 from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID
-
-try:  # py2
-	from urllib import urlopen
-except ImportError:  # py3
-	from urllib.request import urlopen
+from chat.tornado.constants import RedisPrefix
+from chat.tornado.constants import VarNames
 
 USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
 API_URL = getattr(settings, "IP_API_URL", None)
@@ -40,6 +41,53 @@ def is_blank(check_str):
 		return False
 	else:
 		return True
+
+
+def get_users_in_current_user_rooms(user_id):
+	user_rooms = Room.objects.filter(users__id=user_id, disabled=False).values('id', 'name')
+	res = {room['id']: {
+			VarNames.ROOM_NAME: room['name'],
+			VarNames.ROOM_USERS: {}
+		} for room in user_rooms}
+	room_ids = (room_id for room_id in res)
+	rooms_users = User.objects.filter(rooms__in=room_ids).values('id', 'username', 'sex', 'rooms__id')
+	for user in rooms_users:
+		RedisPrefix.set_js_user_structure(
+			res[user['rooms__id']][VarNames.ROOM_USERS],
+			user['id'],
+			user['username'],
+			user['sex']
+		)
+	return res
+
+
+def update_room(room_id, disabled):
+	if not disabled:
+		raise ValidationError('This room already exist')
+	else:
+		Room.objects.filter(id=room_id).update(disabled=False)
+
+
+def do_db(callback, *args, **kwargs):
+	try:
+		return callback(*args, **kwargs)
+	except (OperationalError, InterfaceError) as e:
+		if 'MySQL server has gone away' in str(e):
+			logger.warning('%s, reconnecting' % e)
+			connection.close()
+			return callback(*args, **kwargs)
+		else:
+			raise e
+
+
+def execute_query(query, *args, **kwargs):
+	cursor = connection.cursor()
+	cursor.execute(query, *args, **kwargs)
+	desc = cursor.description
+	return [
+		dict(zip([col[0] for col in desc], row))
+		for row in cursor.fetchall()
+	]
 
 
 def hide_fields(post, fields, huge=False, fill_with='****'):
