@@ -18,7 +18,7 @@ from chat.settings import UPDATE_LAST_READ_MESSAGE
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions
 from chat.tornado.image_utils import get_message_images, prepare_img
-from chat.tornado.message_handler import MessagesHandler
+from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
 from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms
 
 sessionStore = SessionStore()
@@ -26,7 +26,7 @@ sessionStore = SessionStore()
 parent_logger = logging.getLogger(__name__)
 
 
-class TornadoHandler(WebSocketHandler, MessagesHandler):
+class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 
 	def __init__(self, *args, **kwargs):
 		super(TornadoHandler, self).__init__(*args, **kwargs)

@@ -46,29 +46,17 @@ class MessagesHandler(WebRtcMessageCreator):
 		self.pre_process_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
-			Actions.WEBRTC: self.proxy_webrtc,
-			Actions.CLOSE_FILE_CONNECTION: self.close_file_connection,
-			Actions.CLOSE_CALL_CONNECTION: self.close_call_connection,
-			Actions.CANCEL_CALL_CONNECTION: self.cancel_call_connection,
-			Actions.ACCEPT_CALL: self.accept_call,
-			Actions.ACCEPT_FILE: self.accept_file,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
 			Actions.DELETE_ROOM: self.delete_channel,
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
-			Actions.INVITE_USER: self.invite_user,
-			Actions.OFFER_FILE_CONNECTION: self.offer_webrtc_connection,
-			Actions.OFFER_CALL_CONNECTION: self.offer_webrtc_connection,
-			Actions.REPLY_FILE_CONNECTION: self.reply_file_connection,
-			Actions.REPLY_CALL_CONNECTION: self.reply_call_connection,
+			Actions.INVITE_USER: self.invite_user
 		}
 		self.post_process_message = {
 			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_channel,
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
-			Actions.INVITE_USER: self.send_client_new_channel,
-			Actions.OFFER_FILE_CONNECTION: self.set_opponent_call_channel,
-			Actions.OFFER_CALL_CONNECTION: self.set_opponent_call_channel
+			Actions.INVITE_USER: self.send_client_new_channel
 		}
 
 	def patch_tornadoredis(self):  # TODO remove this
@@ -225,165 +213,6 @@ class MessagesHandler(WebRtcMessageCreator):
 		)
 		self.publish(prepared_message, channel)
 
-	def close_file_connection(self, in_message):
-		connection_id = in_message[VarNames.CONNECTION_ID]
-		self_channel_status = self.sync_redis.shget(connection_id, self.id)
-		if not self_channel_status:
-			raise Exception("Access Denied")
-		if self_channel_status != WebRtcRedisStates.CLOSED:
-			sender_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
-			if sender_id == self.id:
-				self.close_file_sender(connection_id)
-			else:
-				self.close_file_receiver(connection_id, in_message, sender_id)
-			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.CLOSED)
-
-	def close_call_connection(self, in_message):
-		self.send_call_answer(
-			in_message,
-			WebRtcRedisStates.CLOSED,
-			Actions.CLOSE_CALL_CONNECTION,
-			[WebRtcRedisStates.READY, WebRtcRedisStates.RESPONDED],
-			HandlerNames.PEER_CONNECTION
-		)
-
-	def cancel_call_connection(self, in_message):
-		self.send_call_answer(
-			in_message,
-			WebRtcRedisStates.CLOSED,
-			Actions.CANCEL_CALL_CONNECTION,
-			[WebRtcRedisStates.OFFERED],
-			HandlerNames.WEBRTC_TRANSFER
-		)
-
-	def close_file_receiver(self, connection_id, in_message, sender_id):
-		sender_status = self.sync_redis.shget(connection_id, sender_id)
-		if not sender_status:
-			raise Exception("Access denied")
-		if sender_status != WebRtcRedisStates.CLOSED:
-			in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
-			in_message[VarNames.HANDLER_NAME] = HandlerNames.PEER_CONNECTION
-			self.publish(in_message, sender_id)
-
-	def close_file_sender(self, connection_id):
-		values = self.sync_redis.shgetall(connection_id)
-		del values[self.id]
-		message = self.get_close_file_sender_message(connection_id)
-		for ws_id in values:
-			if values[ws_id] == WebRtcRedisStates.CLOSED:
-				continue
-			self.publish(message, ws_id)
-
-	def accept_file(self, in_message):
-		connection_id = in_message[VarNames.CONNECTION_ID]
-		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
-		sender_ws_status = self.sync_redis.shget(connection_id, sender_ws_id)
-		self_ws_status = self.sync_redis.shget(connection_id, self.id)
-		if sender_ws_status == WebRtcRedisStates.READY and self_ws_status == WebRtcRedisStates.RESPONDED:
-			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
-			self.publish(self.get_accept_file_message(connection_id), sender_ws_id)
-		else:
-			raise ValidationError("Invalid channel status")
-
-	# todo
-	# we can use channel_status = self.sync_redis.shgetall(connection_id)
-	# and then self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
-	# if we shgetall and only then do async hset
-	# we can catch an issue when 2 concurrent users accepted the call
-	# but we didn't  send them ACCEPT_CALL as they both were in status 'offered'
-	def accept_call(self, in_message):
-		connection_id = in_message[VarNames.CONNECTION_ID]
-		self_status = self.sync_redis.shget(connection_id, self.id)
-		if self_status == WebRtcRedisStates.RESPONDED:
-			conn_users = self.sync_redis.shgetall(connection_id)
-			self.publish_call_answer(
-				conn_users,
-				connection_id,
-				HandlerNames.WEBRTC_TRANSFER,
-				Actions.ACCEPT_CALL,
-				WebRtcRedisStates.READY
-			)
-		else:
-			raise ValidationError("Invalid channel status")
-
-	def offer_webrtc_connection(self, in_message):
-		room_id = in_message[VarNames.CHANNEL]
-		content = in_message.get(VarNames.CONTENT)
-		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
-		connection_id = id_generator(RedisPrefix.CONNECTION_ID_LENGTH)
-		# use list because sets dont have 1st element which is offerer
-		self.async_redis_publisher.hset(WEBRTC_CONNECTION, connection_id, self.id)
-		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
-		opponents_message = self.offer_webrtc(content, connection_id, room_id, in_message[VarNames.EVENT])
-		self_message = self.set_connection_id(qued_id, connection_id)
-		self.ws_write(self_message)
-		self.logger.info('!! Offering a webrtc, connection_id %s', connection_id)
-		self.publish(opponents_message, room_id, True)
-
-	def reply_call_connection(self, in_message):
-		self.send_call_answer(
-			in_message,
-			WebRtcRedisStates.RESPONDED,
-			Actions.REPLY_CALL_CONNECTION,
-			[WebRtcRedisStates.OFFERED],
-			HandlerNames.WEBRTC_TRANSFER
-		)
-
-	def send_call_answer(self, in_message, status_set, reply_action, allowed_state, message_handler):
-		connection_id = in_message[VarNames.CONNECTION_ID]
-		conn_users = self.sync_redis.shgetall(connection_id)
-		if conn_users[self.id] in allowed_state:
-			self.publish_call_answer(conn_users, connection_id, message_handler, reply_action, status_set)
-		else:
-			raise ValidationError("Invalid channel status.")
-
-	def publish_call_answer(self, conn_users, connection_id, message_handler, reply_action, status_set):
-		self.async_redis_publisher.hset(connection_id, self.id, status_set)
-		del conn_users[self.id]
-		message = self.reply_webrtc(reply_action, connection_id, message_handler)
-		for user in conn_users:
-			if conn_users[user] != WebRtcRedisStates.CLOSED:
-				self.publish(message, user)
-
-	def reply_file_connection(self, in_message):
-		connection_id = in_message[VarNames.CONNECTION_ID]
-		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
-		sender_ws_status = self.sync_redis.shget(connection_id, sender_ws_id)
-		self_ws_status = self.sync_redis.shget(connection_id, self.id)
-		if sender_ws_status == WebRtcRedisStates.READY and self_ws_status == WebRtcRedisStates.OFFERED:
-			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.RESPONDED)
-			self.publish(self.reply_webrtc(
-				Actions.REPLY_FILE_CONNECTION,
-				connection_id,
-				HandlerNames.WEBRTC_TRANSFER
-			), sender_ws_id)
-		else:
-			raise ValidationError("Invalid channel status.")
-
-	def proxy_webrtc(self, in_message):
-		"""
-		:type in_message: dict
-		"""
-		connection_id = in_message[VarNames.CONNECTION_ID]
-		channel = in_message.get(VarNames.WEBRTC_OPPONENT_ID)
-		self_channel_status = self.sync_redis.shget(connection_id, self.id)
-		opponent_channel_status = self.sync_redis.shget(connection_id, channel)
-		if not (self_channel_status == WebRtcRedisStates.READY and opponent_channel_status == WebRtcRedisStates.READY):
-			raise ValidationError('Error in connection status, your status is {} while opponent is {}'.format(
-				self_channel_status, opponent_channel_status
-			))  # todo receiver should only accept proxy_webrtc from sender, sender can accept all
-		# I mean somebody if there're 3 ppl in 1 channel and first is initing transfer to 2nd and 3rd,
-		# 2nd guy can fraud 3rd guy webrtc traffic, which is allowed during the call, but not while transering file
-		in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
-		in_message[VarNames.HANDLER_NAME] = HandlerNames.PEER_CONNECTION
-		self.logger.debug(
-			"Forwarding message to channel %s, self %s, other status %s",
-			channel,
-			self_channel_status,
-			opponent_channel_status
-		)
-		self.publish(in_message, channel)
-
 	def create_new_room(self, message):
 		room_name = message[VarNames.ROOM_NAME]
 		if not room_name or len(room_name) > 16:
@@ -473,12 +302,6 @@ class MessagesHandler(WebRtcMessageCreator):
 		self.add_channel(room_id)
 		self.add_online_user(room_id)
 
-	def set_opponent_call_channel(self, message):
-		connection_id = message[VarNames.CONNECTION_ID]
-		if message[VarNames.WEBRTC_OPPONENT_ID] == self.id:
-			return True
-		self.sync_redis.hset(connection_id, self.id, WebRtcRedisStates.OFFERED)
-
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		self.async_redis.unsubscribe((room_id,))
@@ -500,3 +323,190 @@ class MessagesHandler(WebRtcMessageCreator):
 		images = do_db(get_message_images, messages)
 		response = self.get_messages(messages, room_id, images)
 		self.ws_write(response)
+
+
+class WebRtcMessageHandler(MessagesHandler):
+
+	def __init__(self, *args, **kwargs):
+		super(WebRtcMessageHandler, self).__init__(*args, **kwargs)
+		self.pre_process_message.update({
+			Actions.WEBRTC: self.proxy_webrtc,
+			Actions.CLOSE_FILE_CONNECTION: self.close_file_connection,
+			Actions.CLOSE_CALL_CONNECTION: self.close_call_connection,
+			Actions.CANCEL_CALL_CONNECTION: self.cancel_call_connection,
+			Actions.ACCEPT_CALL: self.accept_call,
+			Actions.ACCEPT_FILE: self.accept_file,
+			Actions.OFFER_FILE_CONNECTION: self.offer_webrtc_connection,
+			Actions.OFFER_CALL_CONNECTION: self.offer_webrtc_connection,
+			Actions.REPLY_FILE_CONNECTION: self.reply_file_connection,
+			Actions.REPLY_CALL_CONNECTION: self.reply_call_connection,
+		})
+		self.post_process_message.update({
+			Actions.OFFER_FILE_CONNECTION: self.set_opponent_call_channel,
+			Actions.OFFER_CALL_CONNECTION: self.set_opponent_call_channel
+		})
+
+	def set_opponent_call_channel(self, message):
+		connection_id = message[VarNames.CONNECTION_ID]
+		if message[VarNames.WEBRTC_OPPONENT_ID] == self.id:
+			return True
+		self.sync_redis.hset(connection_id, self.id, WebRtcRedisStates.OFFERED)
+
+	def offer_webrtc_connection(self, in_message):
+		room_id = in_message[VarNames.CHANNEL]
+		content = in_message.get(VarNames.CONTENT)
+		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
+		connection_id = id_generator(RedisPrefix.CONNECTION_ID_LENGTH)
+		# use list because sets dont have 1st element which is offerer
+		self.async_redis_publisher.hset(WEBRTC_CONNECTION, connection_id, self.id)
+		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
+		opponents_message = self.offer_webrtc(content, connection_id, room_id, in_message[VarNames.EVENT])
+		self_message = self.set_connection_id(qued_id, connection_id)
+		self.ws_write(self_message)
+		self.logger.info('!! Offering a webrtc, connection_id %s', connection_id)
+		self.publish(opponents_message, room_id, True)
+
+	def reply_file_connection(self, in_message):
+		connection_id = in_message[VarNames.CONNECTION_ID]
+		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
+		sender_ws_status = self.sync_redis.shget(connection_id, sender_ws_id)
+		self_ws_status = self.sync_redis.shget(connection_id, self.id)
+		if sender_ws_status == WebRtcRedisStates.READY and self_ws_status == WebRtcRedisStates.OFFERED:
+			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.RESPONDED)
+			self.publish(self.reply_webrtc(
+				Actions.REPLY_FILE_CONNECTION,
+				connection_id,
+				HandlerNames.WEBRTC_TRANSFER
+			), sender_ws_id)
+		else:
+			raise ValidationError("Invalid channel status.")
+
+	def reply_call_connection(self, in_message):
+		self.send_call_answer(
+			in_message,
+			WebRtcRedisStates.RESPONDED,
+			Actions.REPLY_CALL_CONNECTION,
+			[WebRtcRedisStates.OFFERED],
+			HandlerNames.WEBRTC_TRANSFER
+		)
+
+	def proxy_webrtc(self, in_message):
+		"""
+		:type in_message: dict
+		"""
+		connection_id = in_message[VarNames.CONNECTION_ID]
+		channel = in_message.get(VarNames.WEBRTC_OPPONENT_ID)
+		self_channel_status = self.sync_redis.shget(connection_id, self.id)
+		opponent_channel_status = self.sync_redis.shget(connection_id, channel)
+		if not (self_channel_status == WebRtcRedisStates.READY and opponent_channel_status == WebRtcRedisStates.READY):
+			raise ValidationError('Error in connection status, your status is {} while opponent is {}'.format(
+				self_channel_status, opponent_channel_status
+			))  # todo receiver should only accept proxy_webrtc from sender, sender can accept all
+		# I mean somebody if there're 3 ppl in 1 channel and first is initing transfer to 2nd and 3rd,
+		# 2nd guy can fraud 3rd guy webrtc traffic, which is allowed during the call, but not while transering file
+		in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
+		in_message[VarNames.HANDLER_NAME] = HandlerNames.PEER_CONNECTION
+		self.logger.debug(
+			"Forwarding message to channel %s, self %s, other status %s",
+			channel,
+			self_channel_status,
+			opponent_channel_status
+		)
+		self.publish(in_message, channel)
+
+	def close_file_connection(self, in_message):
+		connection_id = in_message[VarNames.CONNECTION_ID]
+		self_channel_status = self.sync_redis.shget(connection_id, self.id)
+		if not self_channel_status:
+			raise Exception("Access Denied")
+		if self_channel_status != WebRtcRedisStates.CLOSED:
+			sender_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
+			if sender_id == self.id:
+				self.close_file_sender(connection_id)
+			else:
+				self.close_file_receiver(connection_id, in_message, sender_id)
+			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.CLOSED)
+
+	def close_call_connection(self, in_message):
+		self.send_call_answer(
+			in_message,
+			WebRtcRedisStates.CLOSED,
+			Actions.CLOSE_CALL_CONNECTION,
+			[WebRtcRedisStates.READY, WebRtcRedisStates.RESPONDED],
+			HandlerNames.PEER_CONNECTION
+		)
+
+	def cancel_call_connection(self, in_message):
+		self.send_call_answer(
+			in_message,
+			WebRtcRedisStates.CLOSED,
+			Actions.CANCEL_CALL_CONNECTION,
+			[WebRtcRedisStates.OFFERED],
+			HandlerNames.WEBRTC_TRANSFER
+		)
+
+	def close_file_receiver(self, connection_id, in_message, sender_id):
+		sender_status = self.sync_redis.shget(connection_id, sender_id)
+		if not sender_status:
+			raise Exception("Access denied")
+		if sender_status != WebRtcRedisStates.CLOSED:
+			in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
+			in_message[VarNames.HANDLER_NAME] = HandlerNames.PEER_CONNECTION
+			self.publish(in_message, sender_id)
+
+	def close_file_sender(self, connection_id):
+		values = self.sync_redis.shgetall(connection_id)
+		del values[self.id]
+		message = self.get_close_file_sender_message(connection_id)
+		for ws_id in values:
+			if values[ws_id] == WebRtcRedisStates.CLOSED:
+				continue
+			self.publish(message, ws_id)
+
+	def accept_file(self, in_message):
+		connection_id = in_message[VarNames.CONNECTION_ID]
+		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
+		sender_ws_status = self.sync_redis.shget(connection_id, sender_ws_id)
+		self_ws_status = self.sync_redis.shget(connection_id, self.id)
+		if sender_ws_status == WebRtcRedisStates.READY and self_ws_status == WebRtcRedisStates.RESPONDED:
+			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
+			self.publish(self.get_accept_file_message(connection_id), sender_ws_id)
+		else:
+			raise ValidationError("Invalid channel status")
+
+	# todo
+	# we can use channel_status = self.sync_redis.shgetall(connection_id)
+	# and then self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
+	# if we shgetall and only then do async hset
+	# we can catch an issue when 2 concurrent users accepted the call
+	# but we didn't  send them ACCEPT_CALL as they both were in status 'offered'
+	def accept_call(self, in_message):
+		connection_id = in_message[VarNames.CONNECTION_ID]
+		self_status = self.sync_redis.shget(connection_id, self.id)
+		if self_status == WebRtcRedisStates.RESPONDED:
+			conn_users = self.sync_redis.shgetall(connection_id)
+			self.publish_call_answer(
+				conn_users,
+				connection_id,
+				HandlerNames.WEBRTC_TRANSFER,
+				Actions.ACCEPT_CALL,
+				WebRtcRedisStates.READY
+			)
+		else:
+			raise ValidationError("Invalid channel status")
+
+	def send_call_answer(self, in_message, status_set, reply_action, allowed_state, message_handler):
+		connection_id = in_message[VarNames.CONNECTION_ID]
+		conn_users = self.sync_redis.shgetall(connection_id)
+		if conn_users[self.id] in allowed_state:
+			self.publish_call_answer(conn_users, connection_id, message_handler, reply_action, status_set)
+		else:
+			raise ValidationError("Invalid channel status.")
+
+	def publish_call_answer(self, conn_users, connection_id, message_handler, reply_action, status_set):
+		self.async_redis_publisher.hset(connection_id, self.id, status_set)
+		del conn_users[self.id]
+		message = self.reply_webrtc(reply_action, connection_id, message_handler)
+		for user in conn_users:
+			if conn_users[user] != WebRtcRedisStates.CLOSED:
+				self.publish(message, user)
