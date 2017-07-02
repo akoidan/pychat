@@ -104,7 +104,7 @@
 				<input type="color" id="paintPicker" value="#ff0000"/>
 				<i id="paintEraser" class="icon-eraser" title="Eraser"></i>
 				<input type="range" id="paintRadius" title="Line width" step="1" max="32" min="1" value="3"/>
-				<input type="range" id="paintOpacity" title="Opacity" step="0.025" max="1" min="0.46416" value="1"/>
+				<input type="range" id="paintOpacity" title="Opacity" step="0.025" max="1" min="0.01" value="1"/>
 				<i title="Clear" id="paintClear" class="icon-trash-circled"></i>
 				<i title="Send" id="paintSend" class="icon-send"></i>
 			</div>
@@ -113,7 +113,7 @@
 	<div id="userMessageWrapper" class="hidden" style="position: relative">
 		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
 		<i class="icon-picture" id="imgInputIcon" title="Attach Image File"></i>
-		<i class="icon-brush" title="Draw an Image" onclick="painter.show()"></i>
+		<i class="icon-brush" title="Draw an Image" id="painterIcon"></i>
 		<i class="icon-smile" title="Add a smile :)" onmousedown="smileyUtil.toggleSmileys(event)"></i>
 		<div contenteditable="true" id="usermsg" onkeydown="channelsHandler.checkAndSendMessage(event)"></div>
 	{% comment %}TODO which chat variable to use?{% endcomment %}
