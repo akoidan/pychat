@@ -1109,6 +1109,9 @@ function ChannelsHandler() {
 		if (editLastMessageNode && self.isMessageEditable(editLastMessageNode.time)) {
 			self.editLastMessageNode = editLastMessageNode;
 			self.editLastMessageNode.dom = $(editLastMessageNode.time);
+			if (!self.editLastMessageNode.dom) { //if history has been cleared
+				return
+			}
 			CssUtils.addClass(self.editLastMessageNode.dom, self.HIGHLIGHT_MESSAGE_CLASS);
 			var selector = '[id="{}"] .{}'.format(editLastMessageNode.time, CONTENT_STYLE_CLASS);
 			userMessage.innerHTML = document.querySelector(selector).innerHTML;
@@ -1135,24 +1138,31 @@ function ChannelsHandler() {
 		var images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
 		for (var i = 0; i < images.length; i++) {
 			var img = images[i];
-			var elSymb = img.getAttribute('symbol');
-			currSymbol = elSymb || self.nextChar(currSymbol);
-			var textNode = document.createTextNode(currSymbol);
+			var elSymbol = img.getAttribute('symbol');
+			if (!elSymbol) {
+				currSymbol = self.nextChar(currSymbol);
+				elSymbol = currSymbol;
+			}
+			var textNode = document.createTextNode(elSymbol);
 			img.parentNode.replaceChild(textNode, img);
-			res[currSymbol] = {
-				b64: elSymb ? null : img.src,// don't send image again, it's already in server
-				fileName: img.getAttribute('fileName')
-			};
+			if (!img.getAttribute('symbol')) { // don't send image again, it's already in server
+				res[elSymbol] = {
+					b64: img.src,
+					fileName: img.getAttribute('fileName')
+				};
+			}
 		}
 		return res;
 	};
 	self.handleSendMessage = function () {
 		var isEdit = self.editLastMessageNode && !self.editLastMessageNode.notReady;
-		var currSymbol = '\u3501';
-		if (isEdit) {
-			var symb = self.editLastMessageNode.dom.getAttribute('symbol');
-			if (symb.charCodeAt(0) > currSymbol.charCodeAt(0)) { // just to be sure
-				currSymbol = symb;
+		var currSymbol = '\u3500'; // it's gonna increase in getPastedImage
+		if (isEdit && self.editLastMessageNode.dom) {
+			// dom can be null if we cleared the history
+			// in this case symbol will be parsed in be
+			var newSymbol = self.editLastMessageNode.dom.getAttribute('symbol');
+			if (newSymbol) {
+				currSymbol = newSymbol;
 			}
 		}
 		var images = self.getPastedImage(currSymbol);
@@ -1993,24 +2003,35 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.encodeMessage = function (data) {
 		var html = encodeAnchorsHTML(data.content);
-		var symb = '\u3501';
-		if (data.images) {
+		if (data.images && Object.keys(data.images).length) {
 			html = html.replace(imageUnicodeRegex, function (s) {
-				if (s.charCodeAt(0) > symb.charCodeAt(0)) {
-					symb = s;
-				}
 				return "<img src=\'{}\' symbol=\'{}\' class=\'{}\'/>".format(data.images[s], s, PASTED_IMG_CLASS);
 			});
 		}
-		return {html: smileyUtil.encodeSmileys(html), symbol: symb};
+		return smileyUtil.encodeSmileys(html);
+	};
+	self.getMaxSymbol = function(images) { //deprecated
+		var symbols = images && Object.keys(images);
+		if (symbols && symbols.length) {
+			var symbol = '\u3501';
+			for (var i = 0; i < symbols.length; i++) {
+				if (symbols[i].charCodeAt(0) > symbol.charCodeAt(0)) {
+					symbol = symbols[i]
+				}
+			}
+			return symbol;
+		}
+
 	};
 	self.editMessage = function (data) {
-		var datDict = self.encodeMessage(data);
 		var p = $(data.time);
 		if (p != null) {
+			var html = self.encodeMessage(data);
 			var element = p.querySelector("." + CONTENT_STYLE_CLASS);
-			p.setAttribute('symbol', datDict.symbol);
-			element.innerHTML = datDict.html;
+			if (data.symbol){
+				p.setAttribute('symbol', data.symbol);
+			}
+			element.innerHTML = html;
 			CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
 		}
 	};
@@ -2039,14 +2060,14 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var displayedUsername = user.user;
 		//private message
 		var headerStyle = data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
-		var datDict = self.encodeMessage(data);
+		var html = self.encodeMessage(data);
 		var p = self.displayPreparedMessage(
 				headerStyle,
 				data.time,
-				datDict.html,
+				html,
 				displayedUsername,
 				data.id,
-				datDict.symbol
+				data.symbol
 		);
 		if (p) { // not duplicate message
 			var keys = data.images && Object.keys(data.images);

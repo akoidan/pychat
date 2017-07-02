@@ -21,7 +21,7 @@ from tornado.websocket import WebSocketHandler
 
 from chat.cookies_middleware import create_id
 from chat.log_filters import id_generator
-from chat.utils import extract_photo
+from chat.utils import extract_photo, get_max_key
 from chat.utils import get_or_create_ip
 
 try:  # py2
@@ -105,6 +105,7 @@ class VarNames(object):
 	IS_ROOM_PRIVATE = 'private'
 	CONNECTION_ID = 'connId'
 	HANDLER_NAME = 'handler'
+	SYMBOL = 'symbol'
 
 
 class HandlerNames:
@@ -232,6 +233,7 @@ class MessagesCreator(object):
 		res = cls.create_message(message, imgs)
 		res[VarNames.EVENT] = event
 		res[VarNames.CHANNEL] = message.room_id
+		res[VarNames.SYMBOL] = message.symbol
 		res[VarNames.HANDLER_NAME] = HandlerNames.CHAT
 		return res
 
@@ -520,41 +522,22 @@ class MessagesHandler(MessagesCreator):
 		"""
 		:type message: dict
 		"""
+		raw_imgs = message.get(VarNames.IMG)
 		channel = message[VarNames.CHANNEL]
 		message_db = Message(
 			sender_id=self.user_id,
-			content=message[VarNames.CONTENT]
+			content=message[VarNames.CONTENT],
+			symbol=get_max_key(raw_imgs)
 		)
 		message_db.room_id = channel
 		self.do_db(message_db.save)
-		res_imgs = self.parse_imgs(message.get(VarNames.IMG), message_db.id)
-		prepared_message = self.create_send_message(message_db, Actions.PRINT_MESSAGE, self.prepare_img(res_imgs, message_db.id))
+		db_images = self.save_images(raw_imgs, message_db.id)
+		prepared_message = self.create_send_message(
+			message_db,
+			Actions.PRINT_MESSAGE,
+			self.prepare_img(db_images, message_db.id)
+		)
 		self.publish(prepared_message, channel)
-
-	def parse_imgs(self, imgs, mess_id):
-		res_imgs = []
-		if not imgs:
-			return res_imgs
-		fetch = False
-		for k in imgs:
-			b64 = imgs[k].get(VarNames.IMG_B64)
-			if b64:
-				img = extract_photo(imgs[k][VarNames.IMG_B64], imgs[k][VarNames.IMG_FILE_NAME])
-				res_imgs.append(Image(message_id=mess_id, img=img, symbol=k))
-			else:
-				fetch = True
-		self.merge_came_imgs_with_db(fetch, mess_id, res_imgs)
-		return res_imgs
-
-	def merge_came_imgs_with_db(self, fetch, mess_id, res_imgs):
-		fetched_messages = None
-		if fetch:
-			fetched_messages = Image.objects.filter(message_id=mess_id)
-		if res_imgs:
-			Image.objects.bulk_create(res_imgs)
-		if fetched_messages:
-			for m in fetched_messages:
-				res_imgs.append(m)
 
 	def close_file_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
@@ -807,6 +790,7 @@ class MessagesHandler(MessagesCreator):
 		self.publish(message, room_id, True)
 
 	def edit_message(self, data):
+		# ord(next (iter (message['images'])))
 		message_id = data[VarNames.MESSAGE_ID]
 		message = Message.objects.get(id=message_id)
 		if message.sender_id != self.user_id:
@@ -818,15 +802,56 @@ class MessagesHandler(MessagesCreator):
 		message.content = data[VarNames.CONTENT]
 		selector = Message.objects.filter(id=message_id)
 		if message.content is None:
-			imgs = None
+			prep_imgs = None
 			selector.update(deleted=True)
 			action = Actions.DELETE_MESSAGE
 		else:
-			imgs = self.parse_imgs(data.get(VarNames.IMG), message.id)
-			prep_imgs = self.prepare_img(imgs, message_id)
+			images = data.get(VarNames.IMG)
+			if images:
+				if message.symbol:
+					self.replace_symbols_if_needed(images, message)
+				new_symbol = get_max_key(images)
+				if message.symbol is None or new_symbol > message.symbol:
+					message.symbol = new_symbol
+			db_images = self.save_images(images, message.id)
+			if message.symbol:  # fetch all, including that we just store
+				db_images = Image.objects.filter(message_id=message.id)
+			prep_imgs = self.prepare_img(db_images, message_id)
 			action = Actions.EDIT_MESSAGE
-			selector.update(content=message.content)
+			selector.update(content=message.content, symbol=message.symbol)
 		self.publish(self.create_send_message(message, action, prep_imgs), message.room_id)
+
+	def save_images(self, images, message_id):
+		db_images = []
+		if images:
+			db_images = [Image(
+				message_id=message_id,
+				img=extract_photo(
+					images[k][VarNames.IMG_B64],
+					images[k][VarNames.IMG_FILE_NAME]
+				),
+				symbol=k) for k in images]
+			Image.objects.bulk_create(db_images)
+		return db_images
+
+	def replace_symbols_if_needed(self, images, message):
+		# if message was edited user wasn't notified about that and he edits message again
+		# his symbol can go out of sync
+		order = ord(message.symbol)
+		new_dict = []
+		for img in images:
+			if img <= message.symbol:
+				order += 1
+				new_symb = chr(order)
+				new_dict.append({
+					'new': new_symb,
+					'old': img,
+					'value': images[img]
+				})
+				message.content = message.content.replace(img, new_symb)
+		for d in new_dict:  # dictionary changed size during iteration
+			del images[d['old']]
+			images[d['new']] = d['value']
 
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -862,8 +887,11 @@ class MessagesHandler(MessagesCreator):
 		self.ws_write(response)
 
 	def get_message_images(self, messages):
-		ids =[message.id for message in messages]
-		images = Image.objects.filter(message_id__in=ids)
+		ids = [message.id for message in messages if message.symbol]
+		if ids:
+			images = Image.objects.filter(message_id__in=ids)
+		else:
+			images = []
 		self.logger.info('!! Messages have %d images', len(images))
 		return images
 

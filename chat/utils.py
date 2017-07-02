@@ -214,6 +214,10 @@ def extract_photo(image_base64, filename=None):
 	return image
 
 
+def get_max_key(dictionary):
+	return max(dictionary.keys()) if dictionary else None
+
+
 def create_user_model(user):
 	user.save()
 	RoomUsers(user_id=user.id, room_id=ALL_ROOM_ID).save()

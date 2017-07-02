@@ -145,14 +145,22 @@ class Message(models.Model):
 	# DateField.auto_now
 	time = models.BigIntegerField(default=get_milliseconds)
 	content = models.TextField(null=True)
-	#img = FileField(upload_to=get_random_path, null=True)
+	# if symbol = null - no images refers this row
+	# symbol is the same as "select max(symbol) from images where message_id = message.id
+	# we store symbol in this table in case if user edits message
+	# - images that refers same message always have unique symbols
+	symbol = models.CharField(null=True, max_length=1)
 	deleted = BooleanField(default=False)
 
 
 class Image(models.Model):
+	# character in Message.content that will be replaced with this image
 	symbol = models.CharField(null=False, max_length=1)
 	message = models.ForeignKey(Message, related_name='message', null=False)
 	img = FileField(upload_to=get_random_path, null=True)
+
+	class Meta:
+		unique_together = ('symbol', 'message')
 
 
 class RoomUsers(models.Model):
