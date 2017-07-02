@@ -29,5 +29,6 @@ Icons
 =====
 To add a new icon you need to drag [djangochat-config/config.json](https://github.com/Deathangel908/djangochat-config/blob/master/config.json) into [fontello](http://fontello.com), click on new icon and on download webfont button. The archive with all icons will be downloaded. Then you need to extract archive into djangochat-config directory ( `config.json` would go to `/`, `css` `font` and `demo.html` to `/static`) You can use [djangochat-config/generate-fonts.sh](https://github.com/Deathangel908/djangochat-config/blob/master/generate-fonts.sh) for it. If you all did correctly `git status` should show that files were modified but not added. Commit and push this changes and follow [djangochat-config](#djangochat-config) section instructions to apply changed from submodule to main repository. If you all did right [demo.html](https://0.0.0.0:8000/static/demo.html) should show new icons
 
-#Database migrations
+Database migrations
+===================
 I use standard [django migrations](https://docs.djangoproject.com/en/1.11/topics/migrations/) tools. So if you updated you branch from my repository and database has changed you need to `./manage.py makemigration` and  `./manage.py migrate`. If automatic migration didn't work I also store migrations in [djangochat-config/migration](https://github.com/Deathangel908/djangochat-config/tree/master/migrations).  So you might take a look if required migration is there before exeuting commands. Don't forget to change `Migration.dependencies[]` and rename the file if you get migration from my repo. 
