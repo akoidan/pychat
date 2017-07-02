@@ -82,8 +82,8 @@ class RedisPrefix:
 	CONNECTION_ID_LENGTH = 8  # should be secure
 
 	@staticmethod
-	def set_js_user_structure(user_dict, user_id, name, sex):
-		user_dict[user_id] = {
+	def set_js_user_structure(name, sex):
+		return {
 			VarNames.USER: name,
 			VarNames.GENDER: GENDERS[sex]
 		}

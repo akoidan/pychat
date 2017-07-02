@@ -66,7 +66,7 @@ class TornadoHandler(WebSocketHandler, MessagesHandler):
 	def publish_logout(self, channel, log_data):
 		# seems like async solves problem with connection lost and wrong data status
 		# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
-		online, is_online = self.get_online_from_redis(channel, True)
+		is_online, online = self.get_online_and_status_from_redis(channel)
 		log_data[channel] = {'online': online, 'is_online': is_online}
 		if not is_online:
 			message = self.room_online(online, Actions.LOGOUT, channel)

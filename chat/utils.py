@@ -11,6 +11,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
+from django.db import IntegrityError
 from django.db import connection, OperationalError, InterfaceError
 from django.template import RequestContext
 from django.template.loader import render_to_string
@@ -18,7 +19,7 @@ from django.utils.safestring import mark_safe
 
 from chat import local
 from chat import settings
-from chat.models import Room
+from chat.models import Room, get_milliseconds
 from chat.models import User
 from chat.models import UserProfile, Verification, RoomUsers, IpAddress
 from chat.py2_3 import urlopen
@@ -52,13 +53,22 @@ def get_users_in_current_user_rooms(user_id):
 	room_ids = (room_id for room_id in res)
 	rooms_users = User.objects.filter(rooms__in=room_ids).values('id', 'username', 'sex', 'rooms__id')
 	for user in rooms_users:
-		RedisPrefix.set_js_user_structure(
-			res[user['rooms__id']][VarNames.ROOM_USERS],
-			user['id'],
-			user['username'],
-			user['sex']
-		)
+		dict = res[user['rooms__id']][VarNames.ROOM_USERS]
+		dict[user['id']] = RedisPrefix.set_js_user_structure(user['username'], user['sex'])
 	return res
+
+
+def get_or_create_room(channels, room_id, user_id):
+	if room_id not in channels:
+		raise ValidationError("Access denied, only allowed for channels {}".format(channels))
+	room = do_db(Room.objects.get, id=room_id)
+	if room.is_private:
+		raise ValidationError("You can't add users to direct room, create a new room instead")
+	try:
+		Room.users.through.objects.create(room_id=room_id, user_id=user_id)
+	except IntegrityError:
+		raise ValidationError("User is already in channel")
+	return room
 
 
 def update_room(room_id, disabled):
@@ -66,6 +76,29 @@ def update_room(room_id, disabled):
 		raise ValidationError('This room already exist')
 	else:
 		Room.objects.filter(id=room_id).update(disabled=False)
+
+
+def create_room_users(me, other):
+	room = Room()
+	room.save()
+	room_id = room.id
+	if me == other:
+		RoomUsers(user_id=me, room_id=room_id).save()
+	else:
+		RoomUsers.objects.bulk_create([
+			RoomUsers(user_id=other, room_id=room_id),
+			RoomUsers(user_id=me, room_id=room_id),
+		])
+	return room_id
+
+
+def validate_edit_message(self_id, message):
+	if message.sender_id != self_id:
+		raise ValidationError("You can only edit your messages")
+	if message.time + 600000 < get_milliseconds():
+		raise ValidationError("You can only edit messages that were send not more than 10 min ago")
+	if message.deleted:
+		raise ValidationError("Already deleted")
 
 
 def do_db(callback, *args, **kwargs):

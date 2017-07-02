@@ -2,20 +2,19 @@ import json
 import logging
 
 from django.core.exceptions import ValidationError
-from django.db import IntegrityError
 from django.db.models import Q
 from tornado.gen import engine, Task
 from tornadoredis import Client
 
 from chat.log_filters import id_generator
-from chat.models import Message, Room, get_milliseconds, RoomUsers
+from chat.models import Message, Room, RoomUsers
 from chat.py2_3 import str_type
-from chat.settings import ALL_ROOM_ID, SELECT_SELF_ROOM, \
-	TORNADO_REDIS_PORT, WEBRTC_CONNECTION
+from chat.settings import ALL_ROOM_ID, SELECT_SELF_ROOM, TORNADO_REDIS_PORT, WEBRTC_CONNECTION
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
 from chat.tornado.image_utils import process_images, prepare_img, save_images, get_message_images
 from chat.tornado.message_creator import WebRtcMessageCreator
-from chat.utils import get_max_key, execute_query, do_db, update_room
+from chat.utils import get_max_key, execute_query, do_db, update_room, create_room_users, validate_edit_message, \
+	get_or_create_room
 
 parent_logger = logging.getLogger(__name__)
 base_logger = logging.LoggerAdapter(parent_logger, {
@@ -124,26 +123,30 @@ class MessagesHandler(WebRtcMessageCreator):
 		do_db(len, query_set)
 		return query_set
 
-	def get_online_from_redis(self, channel, check_self_online=False):
+	def get_online_from_redis(self, channel):
+		return self.get_online_and_status_from_redis(channel)[1]
+
+	def get_online_and_status_from_redis(self, channel):
 		"""
-		:rtype : dict
-		returns (dict, bool) if check_type is present
+		:rtype : (bool, list)
 		"""
-		online = self.sync_redis.smembers(channel)
+		online = self.sync_redis.ssmembers(channel)
 		self.logger.debug('!! channel %s redis online: %s', channel, online)
+		return self.parse_redis_online(online) if online else (False, [])
+
+	def parse_redis_online(self, online):
+		"""
+		:rtype : (bool, list)
+		"""
 		result = set()
 		user_is_online = False
-		# redis stores8 REDIS_USER_FORMAT, so parse them
-		if online:
-			for raw in online:  # py2 iteritems
-				decoded = raw.decode('utf-8')
-				# : char specified in cookies_middleware.py.create_id
-				user_id = int(decoded.split(':')[0])
-				if user_id == self.user_id and decoded != self.id:
-					user_is_online = True
-				result.add(user_id)
-		result = list(result)
-		return (result, user_is_online) if check_self_online else result
+		for decoded in online:  # py2 iteritems
+			# : char specified in cookies_middleware.py.create_id
+			user_id = int(decoded.split(':')[0])
+			if user_id == self.user_id and decoded != self.id:
+				user_is_online = True
+			result.add(user_id)
+		return user_is_online, list(result)
 
 	def add_online_user(self, room_id, offline_messages=None):
 		"""
@@ -153,26 +156,18 @@ class MessagesHandler(WebRtcMessageCreator):
 		"""
 		self.async_redis_publisher.sadd(room_id, self.id)
 		# since we add user to online first, latest trigger will always show correct online
-		online, is_online = self.get_online_from_redis(room_id, True)
-		if not is_online:  # if a new tab has been opened
+		is_online, online = self.get_online_and_status_from_redis(room_id)
+		if is_online:  # Send user names to self
+			online_user_names_mes = self.room_online(online, Actions.REFRESH_USER, room_id)
+			self.logger.info('!! Second tab, retrieving online for self')
+			self.ws_write(online_user_names_mes)
+		else:  # if a new tab has been opened
 			online.append(self.user_id)
-			online_user_names_mes = self.room_online(
-				online,
-				Actions.LOGIN,
-				room_id
-			)
+			online_user_names_mes = self.room_online(online, Actions.LOGIN, room_id)
 			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes, room_id)
 			if offline_messages:
 				self.ws_write(self.load_offline_message(offline_messages, room_id))
-		else:  # Send user names to self
-			online_user_names_mes = self.room_online(
-				online,
-				Actions.REFRESH_USER,
-				room_id
-			)
-			self.logger.info('!! Second tab, retrieving online for self')
-			self.ws_write(online_user_names_mes)
 
 	def publish(self, message, channel, parsable=False):
 		jsoned_mess = json.dumps(message)
@@ -402,18 +397,11 @@ class MessagesHandler(WebRtcMessageCreator):
 	def invite_user(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		user_id = message[VarNames.USER_ID]
-		if room_id not in self.channels:
-			raise ValidationError("Access denied, only allowed for channels {}".format(self.channels))
-		room = do_db(Room.objects.get, id=room_id)
-		if room.is_private:
-			raise ValidationError("You can't add users to direct room, create a new room instead")
-		try:
-			Room.users.through.objects.create(room_id=room_id, user_id=user_id)
-		except IntegrityError:
-			raise ValidationError("User is already in channel")
-		users_in_room = {}
-		for user in room.users.all():
-			RedisPrefix.set_js_user_structure(users_in_room, user.id, user.username, user.sex)
+		room = get_or_create_room(self.channels, room_id, user_id)
+		users_in_room = {
+			user.id: RedisPrefix.set_js_user_structure(user.username, user.sex)
+			for user in room.users.all()
+		}
 		self.publish(self.add_user_to_room(room_id, user_id, users_in_room[user_id]), room_id)
 		subscribe_message = self.invite_room_channel_message(room_id, user_id, room.name, users_in_room)
 		self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
@@ -430,16 +418,7 @@ class MessagesHandler(WebRtcMessageCreator):
 			room_id = room['room__id']
 			update_room(room_id, room['room__disabled'])
 		except RoomUsers.DoesNotExist:
-			room = Room()
-			room.save()
-			room_id = room.id
-			if self.user_id == user_id:
-				RoomUsers(user_id=self.user_id, room_id=room_id).save()
-			else:
-				RoomUsers.objects.bulk_create([
-					RoomUsers(user_id=user_id, room_id=room_id),
-					RoomUsers(user_id=self.user_id, room_id=room_id),
-				])
+			room_id = create_room_users(self.user_id, user_id)
 		return room_id
 
 	def create_user_channel(self, message):
@@ -476,12 +455,7 @@ class MessagesHandler(WebRtcMessageCreator):
 		# ord(next (iter (message['images'])))
 		message_id = data[VarNames.MESSAGE_ID]
 		message = Message.objects.get(id=message_id)
-		if message.sender_id != self.user_id:
-			raise ValidationError("You can only edit your messages")
-		if message.time + 600000 < get_milliseconds():
-			raise ValidationError("You can only edit messages that were send not more than 10 min ago")
-		if message.deleted:
-			raise ValidationError("Already deleted")
+		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
 		selector = Message.objects.filter(id=message_id)
 		if message.content is None:

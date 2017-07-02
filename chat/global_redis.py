@@ -43,10 +43,21 @@ def new_hgetall(instance, *args, **kwargs):
 	return {k.decode('utf-8'): res[k].decode('utf-8') for k in res}
 
 
+def patch_smembers(arg_red):
+	fabric = type(arg_red.smembers)
+	arg_red.ssmembers = fabric(new_smembers, arg_red)
+
+
+def new_smembers(instance, *args, **kwargs):
+	res = instance.smembers(*args, **kwargs) # neither key or value are null
+	return [k.decode('utf-8') for k in res]
+
+
 # # global connection to read synchronously
 sync_redis = redis.StrictRedis(port=TORNADO_REDIS_PORT)
 patch_hget(sync_redis)
 patch_hgetall(sync_redis)
+patch_smembers(sync_redis)
 # patch(sync_redis)
 # Redis connection cannot be shared between publishers and subscribers.
 async_redis_publisher = tornadoredis.Client(port=TORNADO_REDIS_PORT)
