@@ -802,24 +802,26 @@ class MessagesHandler(MessagesCreator):
 		message.content = data[VarNames.CONTENT]
 		selector = Message.objects.filter(id=message_id)
 		if message.content is None:
+			action = Actions.DELETE_MESSAGE
 			prep_imgs = None
 			selector.update(deleted=True)
-			action = Actions.DELETE_MESSAGE
 		else:
-			images = data.get(VarNames.IMG)
-			if images:
-				if message.symbol:
-					self.replace_symbols_if_needed(images, message)
-				new_symbol = get_max_key(images)
-				if message.symbol is None or new_symbol > message.symbol:
-					message.symbol = new_symbol
-			db_images = self.save_images(images, message.id)
-			if message.symbol:  # fetch all, including that we just store
-				db_images = Image.objects.filter(message_id=message.id)
-			prep_imgs = self.prepare_img(db_images, message_id)
 			action = Actions.EDIT_MESSAGE
+			prep_imgs = self.process_images(data.get(VarNames.IMG), message)
 			selector.update(content=message.content, symbol=message.symbol)
 		self.publish(self.create_send_message(message, action, prep_imgs), message.room_id)
+
+	def process_images(self, images, message):
+		if images:
+			if message.symbol:
+				self.replace_symbols_if_needed(images, message)
+			new_symbol = get_max_key(images)
+			if message.symbol is None or new_symbol > message.symbol:
+				message.symbol = new_symbol
+		db_images = self.save_images(images, message.id)
+		if message.symbol:  # fetch all, including that we just store
+			db_images = Image.objects.filter(message_id=message.id)
+		return  self.prepare_img(db_images, message.id)
 
 	def save_images(self, images, message_id):
 		db_images = []
