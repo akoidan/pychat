@@ -5,6 +5,7 @@ Table of contents
   * [Frontend logging](#frontend-logging)
   * [Smileys](#smileys)
   * [Icons](#icons)
+  * [Database migrations](#database-migrations)
 
 draw-io
 =======
