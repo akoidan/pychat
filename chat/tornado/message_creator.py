@@ -184,15 +184,6 @@ class WebRtcMessageCreator(MessagesCreator):
 			VarNames.WEBRTC_QUED_ID: qued_id
 		}
 
-	def get_close_call_connection_message(self, connection_id):
-		return {
-			VarNames.EVENT: Actions.CLOSE_CALL_CONNECTION,
-			VarNames.CONNECTION_ID: connection_id,
-			VarNames.USER_ID: self.user_id,
-			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
-		}
-
 	def get_close_file_sender_message(self, connection_id):
 		return {
 			VarNames.EVENT: Actions.CLOSE_FILE_CONNECTION,
@@ -209,24 +200,13 @@ class WebRtcMessageCreator(MessagesCreator):
 			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
 		}
 
-	def get_accept_call_message(self, connection_id):
-		return {
-			VarNames.EVENT: Actions.ACCEPT_CALL,
-			VarNames.USER_ID: self.user_id,
-			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER,
-		}
 
-	def reply_webrtc(self, event, connection_id):
-		"""
-		:return: {"action": event, "content": content, "time": "20:48:57"}
-		"""
+	def reply_webrtc(self, event, connection_id, handler):
 		return {
 			VarNames.EVENT: event,
 			VarNames.CONNECTION_ID: connection_id,
 			VarNames.USER_ID: self.user_id,
 			VarNames.USER: self.sender_name,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER,
+			VarNames.HANDLER_NAME: handler,
 		}
