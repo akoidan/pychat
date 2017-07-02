@@ -12,7 +12,7 @@ from chat.py2_3 import str_type
 from chat.settings import ALL_ROOM_ID, SELECT_SELF_ROOM, TORNADO_REDIS_PORT, WEBRTC_CONNECTION
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
 from chat.tornado.image_utils import process_images, prepare_img, save_images, get_message_images
-from chat.tornado.message_creator import WebRtcMessageCreator
+from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, execute_query, do_db, update_room, create_room_users, validate_edit_message, \
 	get_or_create_room
 
@@ -28,13 +28,17 @@ base_logger = logging.LoggerAdapter(parent_logger, {
 # wait_for_available=True)
 
 
-class MessagesHandler(WebRtcMessageCreator):
+class MessagesHandler(MessagesCreator):
 
 	def __init__(self, *args, **kwargs):
 		self.closed_channels = None
 		self.parsable_prefix = 'p'
-		super(MessagesHandler, self).__init__(*args, **kwargs)
+		super(MessagesHandler, self).__init__()
 		self.webrtc_ids = {}
+		self.id = None  # child init
+		self.sex = None
+		self.sender_name = None
+		self.user_id = 0  # anonymous by default
 		self.ip = None
 		from chat import global_redis
 		self.async_redis_publisher = global_redis.async_redis_publisher
@@ -325,7 +329,7 @@ class MessagesHandler(WebRtcMessageCreator):
 		self.ws_write(response)
 
 
-class WebRtcMessageHandler(MessagesHandler):
+class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 
 	def __init__(self, *args, **kwargs):
 		super(WebRtcMessageHandler, self).__init__(*args, **kwargs)

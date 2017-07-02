@@ -5,11 +5,6 @@ from chat.tornado.image_utils import prepare_img
 
 class MessagesCreator(object):
 
-	def __init__(self, *args, **kwargs):
-		self.sex = None
-		self.sender_name = None
-		self.user_id = 0  # anonymous by default
-
 	def default(self, content, event, handler):
 		"""
 		:return: {"action": event, "content": content, "time": "20:48:57"}
@@ -152,28 +147,32 @@ class MessagesCreator(object):
 		return res
 
 
-class WebRtcMessageCreator(MessagesCreator):
-	def __init__(self, *args, **kwargs):
-		super(WebRtcMessageCreator, self).__init__(*args, **kwargs)
-		self.id = None  # child init
+class WebRtcMessageCreator(object):
 
 	def offer_webrtc(self, content, connection_id, room_id, action):
 		"""
 		:return: {"action": "call", "content": content, "time": "20:48:57"}
 		"""
-		message = self.default(content, action, HandlerNames.WEBRTC)
-		message[VarNames.USER] = self.sender_name
-		message[VarNames.CONNECTION_ID] = connection_id
-		message[VarNames.WEBRTC_OPPONENT_ID] = self.id
-		message[VarNames.CHANNEL] = room_id
-		return message
+		return {
+			VarNames.EVENT: action,
+			VarNames.CONTENT: content,
+			VarNames.USER_ID: self.user_id,
+			VarNames.HANDLER_NAME: HandlerNames.WEBRTC,
+			VarNames.USER: self.sender_name,
+			VarNames.CONNECTION_ID: connection_id,
+			VarNames.WEBRTC_OPPONENT_ID: self.id,
+			VarNames.CHANNEL: room_id
+		}
 
 	def set_webrtc_error(self, error, connection_id, qued_id=None):
-		message = self.default(error, Actions.SET_WEBRTC_ERROR, HandlerNames.PEER_CONNECTION)
-		message[VarNames.CONNECTION_ID] = connection_id
-		if qued_id:
-			message[VarNames.WEBRTC_QUED_ID] = qued_id
-		return message
+		return {
+			VarNames.EVENT: Actions.SET_WEBRTC_ERROR,
+			VarNames.CONTENT: error,
+			VarNames.USER_ID: self.user_id,
+			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
+			VarNames.CONNECTION_ID: connection_id,
+			VarNames.WEBRTC_QUED_ID: qued_id
+		}
 
 	@staticmethod
 	def set_connection_id(qued_id, connection_id):
@@ -199,7 +198,6 @@ class WebRtcMessageCreator(MessagesCreator):
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
 			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
 		}
-
 
 	def reply_webrtc(self, event, connection_id, handler):
 		return {
