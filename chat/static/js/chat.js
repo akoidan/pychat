@@ -314,10 +314,8 @@ function Painter() {
 		} else if (width > 126) {
 			width = 126;
 		}
-		var imB64 = btoa('<svg xmlns="http://www.w3.org/2000/svg" height="128" width="128"><circle cx="64" cy="64" r="{0}" fill="{1}"{2}/></svg>'.formatPos(
-				width, fill, stroke
-		)); // TODO doesn't work
-		self.dom.canvas.style.cursor = 'url(data:image/svg+xml;base64,{}) {} {}, auto'.format(imB64, 64, 64);
+		var svg = '<svg xmlns="http://www.w3.org/2000/svg" height="128" width="128"><circle cx="64" cy="64" r="{0}" fill="{1}"{2}/></svg>'.formatPos(width, fill, stroke);
+		self.dom.canvas.style.cursor = 'url(data:image/svg+xml;base64,{}) {} {}, auto'.format(btoa(svg), 64, 64);
 	};
 	self.changeRadius = function (event) {
 		self.ctx.lineWidth = parseInt(Math.pow(parseInt(event.target.value), 1.4));
@@ -382,7 +380,7 @@ function Painter() {
 				self.dom.eraser.onclick = self.tools.eraser.onActivate;
 			},
 			setCursor: function () {
-				self.setCursor(self.ctx.strokeStyle, '');
+				self.setCursor('#aaaaaa', ' stroke="black" stroke-width="2"');
 			},
 			onActivate: function () {
 				self.mode = 'eraser';
@@ -410,7 +408,7 @@ function Painter() {
 				self.dom.pen.onclick = self.tools.pen.onActivate;
 			},
 			setCursor: function() {
-				self.setCursor('#aaaaaa', 'stroke="black" stroke-width="2"');
+				self.setCursor(self.ctx.strokeStyle, '');
 			},
 			onActivate: function () {
 				self.mode = 'pen';
