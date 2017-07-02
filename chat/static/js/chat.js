@@ -165,8 +165,8 @@ function Draggable(container, headerText) {
 		self.dom.header.className = 'windowHeader noSelection';
 		self.dom.header.addEventListener ("mousedown", function(ev) {
 			self.mouseDownElement = ev.target;
+			self.dom.container.setAttribute('draggable', true);
 		}, false);
-		self.dom.container.setAttribute('draggable', 'true');
 		self.dom.container.ondragstart = self.ondragstart;
 		self.dom.container.ondragend = self.ondragend;
 		// self.dom.container.ondrop = self.preventDefault; // TODO doens't work
@@ -215,6 +215,7 @@ function Draggable(container, headerText) {
 		}
 		self.dom.container.style.left = left + "px";
 		self.dom.container.style.top =  top + "px";
+		self.dom.container.removeAttribute('draggable');
 	};
 	self.ondragstart = function (e) {
 		if (isFirefox) {
