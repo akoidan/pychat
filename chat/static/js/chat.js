@@ -404,12 +404,16 @@ function Painter() {
 			}
 		}
 		var trimHeight = bound.bottom - bound.top,
-				trimWidth = bound.right - bound.left,
-				trimmed = self.ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
-		copy.canvas.width = trimWidth;
-		copy.canvas.height = trimHeight;
-		copy.putImageData(trimmed, 0, 0);
-		return copy.canvas;
+				trimWidth = bound.right - bound.left;
+		if (trimWidth && trimHeight) {
+			var trimmed = self.ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+			copy.canvas.width = trimWidth;
+			copy.canvas.height = trimHeight;
+			copy.putImageData(trimmed, 0, 0);
+			return copy.canvas;
+		} else {
+			return false;
+		}
 	};
 	self.getScaledOrdinate = function (ordinateName/*width*/, value) {
 		var clientOrdinateName = 'client' + ordinateName.charAt(0).toUpperCase() + ordinateName.substr(1);
@@ -496,8 +500,13 @@ function Painter() {
 		self.ctx.clearRect(0, 0, parseInt(self.dom.canvas.width), parseInt(self.dom.canvas.height));
 	};
 	self.sendImage = function () {
-		Utils.pasteb64ImgToTextArea(self.trimImage().toDataURL());
-		self.hide();
+		var trimImage = self.trimImage();
+		if (trimImage) {
+			Utils.pasteb64ImgToTextArea(trimImage.toDataURL());
+			self.hide();
+		} else {
+			growlError("You can't paste empty images");
+		}
 	};
 	self.contKeyPress = function (event) {
 		if (event.keyCode === 13) {
