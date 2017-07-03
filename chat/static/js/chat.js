@@ -307,6 +307,11 @@ function Painter() {
 	self.setColorStrikeColor = function () {
 		self.dom.pen.style.color = self.ctx.strokeStyle;
 	};
+	self.log = function () {
+		var args = Array.prototype.slice.call(arguments);
+		args.unshift("Painter");
+		return logger.webrtc.apply(logger, args);
+	};
 	self.setCursor = function (fill, stroke) {
 		var width = self.ctx.lineWidth;
 		if (width < 3) {
@@ -333,7 +338,7 @@ function Painter() {
 		);
 	};
 	self.onmousedown = function (e) {
-		logger.info("mouse down,  points {}", JSON.stringify(self.points))();
+		self.log("Mouse down")();
 		self.mouseDown++;
 		var rect = painter.dom.canvas.getBoundingClientRect();
 		self.leftOffset = rect.left;
@@ -347,11 +352,12 @@ function Painter() {
 	};
 	self.onmouseup = function (e) {
 		if (self.mouseDown > 0) {
+			self.log("Mouse Up")();
 			self.mouseDown--;
 			self.cStep++;
 			if (self.cStep < self.cPushArray.length) {
 				self.cPushArray.length = self.cStep;
-			};
+			}
 			self.cPushArray.push(self.dom.canvas.toDataURL());
 			self.dom.canvas.removeEventListener('mousemove', self.onmousemove, false);
 			var xy = self.getXY(e);
@@ -360,6 +366,50 @@ function Painter() {
 				self.getScaledOrdinate('height', xy.y)
 		);
 		}
+	};
+	self.trimImage = function () {
+		var copy = document.createElement('canvas').getContext('2d'),
+				pixels = self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height),
+				l = pixels.data.length,
+				i,
+				bound = {
+					top: null,
+					left: null,
+					right: null,
+					bottom: null
+				},
+				x, y;
+		for (i = 0; i < l; i += 4) {
+			if (pixels.data[i + 3] !== 0) {
+				x = (i / 4) % self.dom.canvas.width;
+				y = ~~((i / 4) / self.dom.canvas.width);
+				if (bound.top === null) {
+					bound.top = y;
+				}
+				if (bound.left === null) {
+					bound.left = x;
+				} else if (x < bound.left) {
+					bound.left = x;
+				}
+				if (bound.right === null) {
+					bound.right = x;
+				} else if (bound.right < x) {
+					bound.right = x;
+				}
+				if (bound.bottom === null) {
+					bound.bottom = y;
+				} else if (bound.bottom < y) {
+					bound.bottom = y;
+				}
+			}
+		}
+		var trimHeight = bound.bottom - bound.top,
+				trimWidth = bound.right - bound.left,
+				trimmed = self.ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+		copy.canvas.width = trimWidth;
+		copy.canvas.height = trimHeight;
+		copy.putImageData(trimmed, 0, 0);
+		return copy.canvas;
 	};
 	self.getScaledOrdinate = function (ordinateName/*width*/, value) {
 		var clientOrdinateName = 'client' + ordinateName.charAt(0).toUpperCase() + ordinateName.substr(1);
@@ -425,7 +475,7 @@ function Painter() {
 				self.tmpData = self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height);
 			},
 			onMouseMove: function(x,y) {
-				logger.info("mouse move,  points {}", JSON.stringify(self.points))();
+				self.log("mouse move,  points {}", JSON.stringify(self.points))();
 				self.ctx.putImageData(self.tmpData, 0, 0);
 				self.points.push({x: x, y: y});
 				self.ctx.beginPath();
@@ -446,7 +496,7 @@ function Painter() {
 		self.ctx.clearRect(0, 0, parseInt(self.dom.canvas.width), parseInt(self.dom.canvas.height));
 	};
 	self.sendImage = function () {
-		Utils.pasteb64ImgToTextArea(self.dom.canvas.toDataURL());
+		Utils.pasteb64ImgToTextArea(self.trimImage().toDataURL());
 		self.hide();
 	};
 	self.contKeyPress = function (event) {
