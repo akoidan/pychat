@@ -3758,9 +3758,12 @@ function Storage() {
 	};
 	// Use both json and object repr for less JSON actions
 	self.saveMessageToStorage = function (objectItem, jsonItem) {
-		if (notifier.isTabMain() && self.actionsToSave.indexOf(objectItem.action) >= 0) {
+		if (notifier.isTabMain() && self.actionsToSave.indexOf(objectItem.action) >= 0 && cacheMessages) {
 			self.fastAddToStorage(jsonItem);
 		}
+	};
+	self.clearStorage = function() {
+		localStorage.removeItem(self.STORAGE_NAME);
 	};
 	self.fastAddToStorage = function (text) {
 		var storageData = localStorage.getItem(self.STORAGE_NAME);

@@ -102,6 +102,7 @@ class UserProfile(User):
 	photo = FileField(upload_to=get_random_path, null=True)
 	suggestions = BooleanField(null=False, default=True)
 	notifications = BooleanField(null=False, default=True)
+	cache_messages = BooleanField(null=False, default=True)
 	logs = BooleanField(null=False, default=JS_CONSOLE_LOGS)
 	# TODO, save theme in profile? theme_name = CharField(max_length=16, null=True)
 
