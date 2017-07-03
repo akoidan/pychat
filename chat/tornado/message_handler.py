@@ -107,8 +107,7 @@ class MessagesHandler(MessagesCreator):
 	@engine
 	def add_channel(self, channel):
 		self.channels.append(channel)
-		yield Task(
-			self.async_redis.subscribe, (channel,))
+		yield Task(self.async_redis.subscribe, (channel,))
 
 	@staticmethod
 	def evaluate(query_set):

@@ -2859,7 +2859,7 @@ function CallHandler(roomId) {
 		if (self.callPopup) { // if we're not call initiator
 			self.callPopupTable[message.opponentWsId] = self.callPopup.inserRow("Busy:", message.user);
 		}
-	},
+	};
 	self.sendOffer = function (newId) {
 		var messageRequest = {
 			action: 'offerCall',
