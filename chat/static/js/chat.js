@@ -581,27 +581,27 @@ function Painter() {
 	self.preventDefault = function (e) {
 		e.preventDefault();
 	};
-	self.onZoom = function (event) {
-		//var mousex = event.clientX - self.dom.canvas.offsetLeft;
-		//var mousey = event.clientY - self.dom.canvas.offsetTop;
-		var mousex = self.getScaledOrdinate('width', event.pageX - self.leftOffset);
-		var mousey = self.getScaledOrdinate('height', event.pageX - self.leftOffset);
-		var wheel = event.wheelDelta / 120;//n or -n
-		var zoom = 1 + wheel / 2;
-		self.ctx.translate(
-				self.originx,
-				self.originy
-		);
-		self.ctx.scale(zoom, zoom);
-		self.ctx.translate(
-				-( mousex / self.scale + self.originx - mousex / ( self.scale * zoom ) ),
-				-( mousey / self.scale + self.originy - mousey / ( self.scale * zoom ) )
-		);
-
-		self.originx = ( mousex / self.scale + self.originx - mousex / ( self.scale * zoom ) );
-		self.originy = ( mousey / self.scale + self.originy - mousey / ( self.scale * zoom ) );
-		self.scale *= zoom;
-	};
+	// self.onZoom = function (event) {
+	// 	//var mousex = event.clientX - self.dom.canvas.offsetLeft;
+	// 	//var mousey = event.clientY - self.dom.canvas.offsetTop;
+	// 	var mousex = self.getScaledOrdinate('width', event.pageX - self.leftOffset);
+	// 	var mousey = self.getScaledOrdinate('height', event.pageX - self.leftOffset);
+	// 	var wheel = event.wheelDelta / 120;//n or -n
+	// 	var zoom = 1 + wheel / 2;
+	// 	self.ctx.translate(
+	// 			self.originx,
+	// 			self.originy
+	// 	);
+	// 	self.ctx.scale(zoom, zoom);
+	// 	self.ctx.translate(
+	// 			-( mousex / self.scale + self.originx - mousex / ( self.scale * zoom ) ),
+	// 			-( mousey / self.scale + self.originy - mousey / ( self.scale * zoom ) )
+	// 	);
+	//
+	// 	self.originx = ( mousex / self.scale + self.originx - mousex / ( self.scale * zoom ) );
+	// 	self.originy = ( mousey / self.scale + self.originy - mousey / ( self.scale * zoom ) );
+	// 	self.scale *= zoom;
+	// };
 	self.initChild = function () {
 		self.dom.canvas.addEventListener('mousedown', self.onmousedown, false);
 		self.dom.container.onpaste = self.canvasImagePaste;
