@@ -92,7 +92,8 @@ class UserProfile(User):
 	name = CharField(max_length=30, null=True)
 
 	surname = CharField(max_length=30, null=True)
-	email = models.EmailField(null=True, unique=True, blank=True)
+	# tho email max length is 254 characted mysql supports unique keys only 767 bytes long (utf8 4 bytes = 767/4 = 191)
+	email = models.EmailField(null=True, unique=True, blank=True, max_length=190)
 	city = CharField(max_length=50, null=True)
 
 	birthday = DateField(null=True)
