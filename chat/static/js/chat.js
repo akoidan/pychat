@@ -159,7 +159,7 @@ function Draggable(container, headerText) {
 	};
 	self.init = function () {
 		CssUtils.addClass(self.dom.container, "modal-body");
-		self.dom.container.style.left = 'calc(50% - 100px)';
+		self.dom.container.style.left = '10%';
 		self.dom.container.style.top = '10%';
 		self.dom.header.appendChild(self.dom.iconMinimize);
 		self.dom.iconMinimize.onclick = self.minimize;
@@ -298,8 +298,7 @@ function Painter() {
 	self.scale = 1;
 	self.originx = 0;
 	self.originy = 0;
-	self.cPushArray = [];
-	self.cStep = -1;
+	self.current = null;
 	self.changeColor = function (event) {
 		self.ctx.strokeStyle = event.target.value;
 		self.setColorStrikeColor();
@@ -345,9 +344,11 @@ function Painter() {
 		self.leftOffset = rect.left;
 		self.topOffset = rect.top;
 		var xy = self.getXY(e);
+		var imgData = self.buffer.startAction();
 		self.tools[self.mode].onMouseDown(
 				self.getScaledOrdinate('width', xy.x),
-				self.getScaledOrdinate('height', xy.y)
+				self.getScaledOrdinate('height', xy.y),
+				imgData
 		);
 		self.dom.canvas.addEventListener('mousemove', self.onmousemove, false);
 	};
@@ -355,13 +356,9 @@ function Painter() {
 		if (self.mouseDown > 0) {
 			self.log("Mouse Up")();
 			self.mouseDown--;
-			self.cStep++;
-			if (self.cStep < self.cPushArray.length) {
-				self.cPushArray.length = self.cStep;
-			}
-			self.cPushArray.push(self.dom.canvas.toDataURL());
 			self.dom.canvas.removeEventListener('mousemove', self.onmousemove, false);
 			var xy = self.getXY(e);
+			self.buffer.finishAction()
 			self.tools[self.mode].onMouseUp(
 				self.getScaledOrdinate('width', xy.x),
 				self.getScaledOrdinate('height', xy.y)
@@ -429,73 +426,81 @@ function Painter() {
 			y: self.getScaledOrdinate('height', e.pageY - self.topOffset)
 		}
 	};
+	self.getData = function() {
+		return self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height)
+	};
 	self.tools = {
-		eraser:{
-			onCreate: function() {
-				self.dom.eraser.onclick = self.tools.eraser.onActivate;
-			},
-			setCursor: function () {
+		eraser: new (function () {
+			var tool = this;
+			tool.onCreate = function () {
+				self.dom.eraser.onclick = tool.onActivate;
+			};
+			tool.setCursor = function () {
 				self.setCursor('#aaaaaa', ' stroke="black" stroke-width="2"');
-			},
-			onActivate: function () {
+			};
+			tool.onActivate = function () {
 				self.mode = 'eraser';
 				CssUtils.addClass(self.dom.pen, self.PICKED_TOOL_CLASS);
 				CssUtils.removeClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
 				CssUtils.hideElement(self.dom.opacity);
 				CssUtils.hideElement(self.dom.colorIcon);
 				self.ctx.globalCompositeOperation = "destination-out";
-				self.tools.eraser.setCursor();
-			},
-			onMouseDown: function(x,y) {
+				tool.setCursor();
+			};
+			tool.onMouseDown = function (x, y) {
 				self.ctx.moveTo(x, y);
 				self.ctx.beginPath();
-			},
-			onMouseMove: function(x, y) {
+				tool.onMouseMove(x, y)
+			};
+			tool.onMouseMove = function (x, y) {
 				self.ctx.lineTo(x, y);
 				self.ctx.stroke();
-			},
-			onMouseUp: function(x,y) {
+			};
+			tool.onMouseUp = function (x, y) {
 				self.ctx.closePath();
-			}
-		},
-		pen: {
-			onCreate: function() {
-				self.dom.pen.onclick = self.tools.pen.onActivate;
-			},
-			setCursor: function() {
+			};
+			return tool;
+		})(),
+		pen: new (function(){
+			var tool = this;
+			tool.onCreate = function () {
+				self.dom.pen.onclick = tool.onActivate;
+			};
+			tool.setCursor = function () {
 				self.setCursor(self.ctx.strokeStyle, '');
-			},
-			onActivate: function () {
+			};
+			tool.onActivate = function () {
 				self.mode = 'pen';
 				CssUtils.removeClass(self.dom.pen, self.PICKED_TOOL_CLASS);
 				CssUtils.addClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
 				CssUtils.showElement(self.dom.opacity);
 				CssUtils.showElement(self.dom.colorIcon);
 				self.ctx.globalCompositeOperation = "source-over";
-				self.tools.pen.setCursor();
-			},
-			onMouseDown: function(x, y) {
+				tool.setCursor();
+			};
+			tool.onMouseDown = function (x, y, data) {
 				self.ctx.moveTo(x, y);
-				self.points = [];
-				self.tmpData = self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height);
-			},
-			onMouseMove: function(x,y) {
-				self.log("mouse move,  points {}", JSON.stringify(self.points))();
-				self.ctx.putImageData(self.tmpData, 0, 0);
-				self.points.push({x: x, y: y});
+				tool.points = [];
+				tool.tmpData = data;
+				tool.onMouseMove(x, y)
+			};
+			tool.onMouseMove = function (x, y) {
+				self.log("mouse move,  points {}", JSON.stringify(tool.points))();
+				self.ctx.putImageData(tool.tmpData, 0, 0);
+				tool.points.push({x: x, y: y});
 				self.ctx.beginPath();
-				self.ctx.moveTo(self.points[0].x, self.points[0].y);
-				for (var i = 0; i < self.points.length; i++) {
-					self.ctx.lineTo(self.points[i].x, self.points[i].y);
+				self.ctx.moveTo(tool.points[0].x, tool.points[0].y);
+				for (var i = 0; i < tool.points.length; i++) {
+					self.ctx.lineTo(tool.points[i].x, tool.points[i].y);
 				}
 				self.ctx.stroke();
-			},
-			onMouseUp: function(x,y) {
+			};
+			tool.onMouseUp = function (x, y) {
 				self.ctx.closePath();
-				self.points = [];
-				self.tmpData = null;
-			}
-		}
+				tool.points = [];
+				tool.tmpData = null;
+			};
+		})
 	};
 	self.clearCanvas = function () {
 		self.ctx.clearRect(0, 0, parseInt(self.dom.canvas.width), parseInt(self.dom.canvas.height));
@@ -514,36 +519,47 @@ function Painter() {
 			self.sendImage();
 			// event.code if keyboard is different (e.g Russian)
 		} else if (event.keyCode === 26 && event.ctrlKey || event.code === 'KeyZ') {
-			self.undo();
+			self.buffer.undo();
 		} else if (event.keyCode === 25 && event.ctrlKey || event.code === 'KeyY') {
-			self.redo();
+			self.buffer.redo();
 		}
 	};
-	self.undo = function () {
-		if (self.cStep > 0) {
-			self.cStep--;
-			var canvasPic = new Image();
-			canvasPic.src = self.cPushArray[self.cStep];
-			canvasPic.onload = function () {
-				self.clearCanvas();
-				self.ctx.save();
-				self.ctx.globalAlpha = 1;
-				self.ctx.drawImage(canvasPic, 0, 0);
-				self.ctx.restore();
+	self.buffer = new (function () {
+		var tool = this;
+		var undoImages = [];
+		var redoImages = [];
+		var current = null;
+		tool.undo = function () {
+			var restore = undoImages.pop();
+			if (restore) {
+				redoImages.push(current);
+				current = restore;
+				self.ctx.putImageData(restore, 0, 0);
 			}
-		}
-	};
-	self.redo = function () {
-		if (self.cStep < self.cPushArray.length - 1) {
-			self.cStep++;
-			var canvasPic = new Image();
-			canvasPic.src = self.cPushArray[self.cStep];
-			canvasPic.onload = function () {
-				self.clearCanvas();
-				self.ctx.drawImage(canvasPic, 0, 0);
+		};
+		tool.redo = function () {
+			var restore = redoImages.pop();
+			if (restore) {
+				undoImages.push(current);
+				current = restore;
+				self.ctx.putImageData(restore, 0, 0);
 			}
-		}
-	};
+		};
+		tool.finishAction = function() {
+			if (current) {
+				undoImages.push(current);
+			}
+			redoImages = [];
+			current = self.getData();
+		};
+		tool.startAction = function() {
+			if (!current) {
+				current = self.getData();
+			}
+			return current;
+		};
+	})();
+
 	self.canvasImagePaste = function (e) {
 		if (e.clipboardData) {
 			var items = e.clipboardData.items;
