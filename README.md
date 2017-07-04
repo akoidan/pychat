@@ -90,6 +90,7 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 TODO
 ====
+*https://codepen.io/techslides/pen/zowLd 
 * Add retry file send option. continue from spot we finished Or maybe autoreconnect automatically
 * remove setHeaderTest, highlight current page icos. Always display username in right top
 * Painter doesn't work on mobile devices (add ontouch)

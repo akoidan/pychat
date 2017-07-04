@@ -286,6 +286,7 @@ function Painter() {
 	self.dom.canvas = $('painter');
 	self.dom.painterIcon = $('painterIcon');
 	self.dom.color = $('paintPicker');
+	self.dom.paintMove = $('paintMove');
 	self.dom.sendButton = $('paintSend');
 	self.dom.clearButton = $('paintClear');
 	self.dom.range = $('paintRadius');
@@ -432,25 +433,24 @@ function Painter() {
 	self.tools = {
 		eraser: new (function () {
 			var tool = this;
-			tool.onCreate = function () {
-				self.dom.eraser.onclick = tool.onActivate;
-			};
 			tool.setCursor = function () {
 				self.setCursor('#aaaaaa', ' stroke="black" stroke-width="2"');
 			};
 			tool.onActivate = function () {
 				self.mode = 'eraser';
-				CssUtils.addClass(self.dom.pen, self.PICKED_TOOL_CLASS);
 				CssUtils.removeClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
-				CssUtils.hideElement(self.dom.opacity);
-				CssUtils.hideElement(self.dom.colorIcon);
 				self.ctx.globalCompositeOperation = "destination-out";
+				CssUtils.showElement(self.dom.range);
 				tool.setCursor();
 			};
 			tool.onMouseDown = function (x, y) {
 				self.ctx.moveTo(x, y);
 				self.ctx.beginPath();
 				tool.onMouseMove(x, y)
+			};
+			tool.onDeactivate = function () {
+				CssUtils.addClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
+				CssUtils.hideElement(self.dom.range);
 			};
 			tool.onMouseMove = function (x, y) {
 				self.ctx.lineTo(x, y);
@@ -463,18 +463,14 @@ function Painter() {
 		})(),
 		pen: new (function(){
 			var tool = this;
-			tool.onCreate = function () {
-				self.dom.pen.onclick = tool.onActivate;
-			};
 			tool.setCursor = function () {
 				self.setCursor(self.ctx.strokeStyle, '');
 			};
 			tool.onActivate = function () {
-				self.mode = 'pen';
 				CssUtils.removeClass(self.dom.pen, self.PICKED_TOOL_CLASS);
-				CssUtils.addClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
 				CssUtils.showElement(self.dom.opacity);
 				CssUtils.showElement(self.dom.colorIcon);
+				CssUtils.showElement(self.dom.range);
 				self.ctx.globalCompositeOperation = "source-over";
 				tool.setCursor();
 			};
@@ -483,6 +479,12 @@ function Painter() {
 				tool.points = [];
 				tool.tmpData = data;
 				tool.onMouseMove(x, y)
+			};
+			tool.onDeactivate = function () {
+				CssUtils.addClass(self.dom.pen, self.PICKED_TOOL_CLASS);
+				CssUtils.hideElement(self.dom.opacity);
+				CssUtils.hideElement(self.dom.colorIcon);
+				CssUtils.hideElement(self.dom.range);
 			};
 			tool.onMouseMove = function (x, y) {
 				self.log("mouse move,  points {}", JSON.stringify(tool.points))();
@@ -500,10 +502,35 @@ function Painter() {
 				tool.points = [];
 				tool.tmpData = null;
 			};
+		}),
+		move: new (function(){
+			var tool = this;
+			tool.setCursor = function () {
+				self.dom.canvas.style.cursor = 'move';
+			};
+			tool.onActivate = function () {
+				self.mode = 'move';
+				CssUtils.removeClass(self.dom.paintMove, self.PICKED_TOOL_CLASS);
+				tool.setCursor();
+			};
+			tool.onDeactivate = function () {
+				CssUtils.addClass(self.dom.paintMove, self.PICKED_TOOL_CLASS);
+			};
+			tool.onMouseDown = function (x, y, data) {
+				console.log('mousedown');
+			};
+			tool.onMouseMove = function (x, y) {
+				console.log('onMouseMove');
+			};
+			tool.onMouseUp = function (x, y) {
+				console.log('onMouseUp')
+			};
 		})
 	};
 	self.clearCanvas = function () {
+		self.buffer.startAction();
 		self.ctx.clearRect(0, 0, parseInt(self.dom.canvas.width), parseInt(self.dom.canvas.height));
+		self.buffer.finishAction();
 	};
 	self.sendImage = function () {
 		var trimImage = self.trimImage();
@@ -536,6 +563,11 @@ function Painter() {
 				current = restore;
 				self.ctx.putImageData(restore, 0, 0);
 			}
+		};
+		tool.clear = function () {
+			undoImages = [];
+			redoImages = [];
+			current = null;
 		};
 		tool.redo = function () {
 			var restore = redoImages.pop();
@@ -631,15 +663,21 @@ function Painter() {
 		self.dom.container.addEventListener('keypress', self.contKeyPress, false);
 		//self.dom.container.addEventListener(mouseWheelEventName, self.onZoom);
 		self.dom.color.style.color = self.ctx.strokeStyle;
-		for (var key in self.tools) {
-			if (!self.tools.hasOwnProperty(key)) continue;
-			self.tools[key].onCreate();
-		}
+		self.dom.eraser.onclick =  self.setMode.bind(self, 'eraser');
+		self.dom.pen.onclick = self.setMode.bind(self, 'pen');
+		self.dom.paintMove.onclick = self.setMode.bind(self, 'move');
 		self.dom.colorIcon.onclick = function () {
 			self.dom.color.click();
 		};
 		self.dom.sendButton.onclick = self.sendImage;
 		self.dom.clearButton.onclick = self.clearCanvas;
+	};
+	self.setMode = function(mode) {
+		if (self.mode) {
+			self.tools[self.mode].onDeactivate();
+		}
+		self.mode = mode;
+		self.tools[self.mode].onActivate();
 	};
 	self.show = function() {
 		self.super.show();
@@ -647,6 +685,7 @@ function Painter() {
 	};
 	self.initAndShow = function () {
 		self.show();
+		self.buffer.clear();
 		self.dom.canvas.setAttribute('width', self.dom.canvas.offsetWidth);
 		self.dom.canvas.setAttribute('height', self.dom.canvas.offsetHeight);
 		self.ctx.lineWidth = 3;
@@ -654,7 +693,7 @@ function Painter() {
 		self.ctx.lineCap = 'round';
 		self.ctx.strokeStyle = self.dom.color.value;
 		self.setColorStrikeColor();
-		self.tools.pen.onActivate();
+		self.setMode('pen');
 	};
 	self.superHide = self.hide;
 	self.hide = function () {

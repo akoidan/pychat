@@ -199,6 +199,20 @@ fieldset
 		&.offline
 			display: none
 
+.toolsAndCanvas
+	display: flex
+	.painterTools
+		display: flex
+		margin-left: -5px
+		flex-direction: column
+		*
+			display: flex
+			padding: 5px 5px 5px 0
+
+.bottomTools
+	margin-left: 20px
+
+
 #onlineStatus
 	padding: 0 10px
 
@@ -350,6 +364,9 @@ fieldset
 	:visibility hidden
 
 #paintEraser
+	color: #ff8383
+
+#paintMove
 	color: #ff8383
 
 .n-active-icon
