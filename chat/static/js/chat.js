@@ -2104,9 +2104,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var messages = data.content || [];
 		var oldSound = window.sound;
 		window.sound = 0;
-		messages.forEach(function (message) {
-			self.printMessage(message, true);
-		});
+		messages.forEach(self.printNewMessage);
 		window.sound = oldSound;
 	};
 	self.setHeaderId = function (headerId) {
@@ -2158,7 +2156,13 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			}
 		}
 	};
-	self.printMessage = function (data, isNew) {
+	self.printNewMessage = function(data) {
+		self._printMessage(data, true);
+	};
+	self.printMessage = function(data) {
+		self._printMessage(data, false);
+	};
+	self._printMessage = function(data, isNew) {
 		self.setHeaderId(data.id);
 		var user = self.allUsers[data.userId];
 		if (loggedUserId === data.userId) {
@@ -2222,9 +2226,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		// loadMessages could be called from localStorage
 		var savedNewMessagesDisabledStatus = window.newMessagesDisabled;
 		window.newMessagesDisabled = true;
-		message.forEach(function (message) {  // dont pass function straight , foreach passes index as 2nd arg
-			self.printMessage(message);
-		});
+		message.forEach(self.printMessage);
 		window.newMessagesDisabled = savedNewMessagesDisabledStatus;
 		self.lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
 		window.sound = windowsSoundState;
