@@ -327,10 +327,10 @@ var CssUtils = {
 		return CssUtils.hasClass(element, CssUtils.visibilityClass);
 	},
 	showElement: function (element) {
-		return CssUtils.removeClass(element, CssUtils.visibilityClass)
+		CssUtils.removeClass(element, CssUtils.visibilityClass)
 	},
 	hideElement: function (element) {
-		return CssUtils.addClass(element, CssUtils.visibilityClass);
+		CssUtils.addClass(element, CssUtils.visibilityClass);
 	},
 	toggleVisibility: function (element) {
 		return CssUtils.toggleClass(element, CssUtils.visibilityClass);
@@ -352,12 +352,10 @@ var CssUtils = {
 		}
 	} else {
 		CssUtils.addClass = function (element, className) {
-			var hasClass = CssUtils.hasClass(element, className);
-			if (!hasClass) {
+			if (!CssUtils.hasClass(element, className)) {
 				var oldClassName = element.className;
-				element.className = "{} {}".format(oldClassName.trim(), className);
+				element.className += (' '+ className);
 			}
-			return hasClass;
 		}
 	}
 	if (cl && cl.remove) {
@@ -366,16 +364,14 @@ var CssUtils = {
 		}
 	} else {
 		CssUtils.removeClass = function (element, className) {
-			var hasClass = CssUtils.hasClass(element, className);
-			if (hasClass) {
-				element.className = element.className.replace(className, '');
+			if (element.className) {
+				element.className.replace(new RegExp('(?:^|\\s)'+ className + '(?:\\s|$)'), ' ');
 			}
-			return hasClass;
 		}
 	}
 	if (cl && cl.toggle) {
 		CssUtils.toggleClass = function (element, className) {
-			element.classList.toggle(className)
+			return element.classList.toggle(className)
 		}
 	} else {
 		CssUtils.toggleClass = function (element, className) {
