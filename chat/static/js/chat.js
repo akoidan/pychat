@@ -2164,7 +2164,22 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self._printMessage = function(data, isNew) {
 		self.setHeaderId(data.id);
-		var user = self.allUsers[data.userId];
+		self.printMessagePlay(data);
+		var displayedUsername = self.allUsers[data.userId].user;
+		var html = self.encodeMessage(data);
+		var p = self.displayPreparedMessage(
+				data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS,
+				data.time,
+				html,
+				displayedUsername,
+				data.id,
+				data.symbol
+		);
+		if (p) { // not duplicate message
+			self.highLightMessageIfNeeded(p, displayedUsername, isNew, data.content, data.images);
+		}
+	};
+	self.printMessagePlay = function(data) {
 		if (loggedUserId === data.userId) {
 			Utils.checkAndPlay(self.dom.chatOutgoing);
 			self.lastMessage = {
@@ -2174,39 +2189,26 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		} else {
 			Utils.checkAndPlay(self.dom.chatIncoming);
 		}
-		var displayedUsername = user.user;
-		//private message
-		var headerStyle = data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
-		var html = self.encodeMessage(data);
-		var p = self.displayPreparedMessage(
-				headerStyle,
-				data.time,
-				html,
-				displayedUsername,
-				data.id,
-				data.symbol
-		);
-		if (p) { // not duplicate message
-			var keys = data.images && Object.keys(data.images);
-			var img = keys && data.images[keys[0]];
-			notifier.notify(displayedUsername, data.content || 'images', img);
-			if (self.isHidden() && !window.newMessagesDisabled) {
-				self.newMessages++;
-				self.dom.newMessages.textContent = self.newMessages;
-				if (self.newMessages == 1) {
-					CssUtils.showElement(self.dom.newMessages);
-					CssUtils.hideElement(self.dom.deleteIcon);
-				}
+	};
+	self.highLightMessageIfNeeded = function (p, displayedUsername, isNew, content, images) {
+		var keys = images && Object.keys(images);
+		var img = keys && images[keys[0]];
+		notifier.notify(displayedUsername, content || 'images', img);
+		if (self.isHidden() && !window.newMessagesDisabled) {
+			self.newMessages++;
+			self.dom.newMessages.textContent = self.newMessages;
+			if (self.newMessages == 1) {
+				CssUtils.showElement(self.dom.newMessages);
+				CssUtils.hideElement(self.dom.deleteIcon);
 			}
-			//
-			// if flag newMessagesDisabled wasn't set to true  && (...))
-			if (!window.newMessagesDisabled && (self.isHidden() || isNew || !notifier.isCurrentTabActive)) {
-				CssUtils.addClass(p, self.UNREAD_MESSAGE_CLASS);
-				p.onmouseover = function (event) {
-					var pTag = event.target;
-					pTag.onmouseover = null;
-					CssUtils.removeClass(pTag, self.UNREAD_MESSAGE_CLASS);
-				}
+		}
+		// if flag newMessagesDisabled wasn't set to true  && (...))
+		if (!window.newMessagesDisabled && (self.isHidden() || isNew || !notifier.isCurrentTabActive)) {
+			CssUtils.addClass(p, self.UNREAD_MESSAGE_CLASS);
+			p.onmouseover = function (event) {
+				var pTag = event.target;
+				pTag.onmouseover = null;
+				CssUtils.removeClass(pTag, self.UNREAD_MESSAGE_CLASS);
 			}
 		}
 	};
