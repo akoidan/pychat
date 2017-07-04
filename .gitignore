@@ -21,6 +21,7 @@ example
 sessionsids.txt
 chat/static/css
 chat/static/sass/.sass-cache
+chat/static/js/painterro.min.js
 chat/static/sass/partials/*.scss
 chat/static/valentine
 redis-3.2.0-rc3

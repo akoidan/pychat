@@ -9,6 +9,7 @@ var SELF_HEADER_CLASS = 'message-header-self';
 var USER_NAME_ATTR = 'username';
 var REMOVED_MESSAGE_CLASSNAME = 'removed-message';
 var MESSAGE_ID_ATTRIBUTE = 'messageId';
+var YOUTUBE_REGEX = /^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/;
 var MAX_ACCEPT_FILE_SIZE_WO_FS_API = Math.pow(2, 28); // 256 MB
 // end used
 var SYSTEM_USERNAME = 'System';
@@ -3449,32 +3450,55 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 			self.closeEvents("Can't send empty file");
 		} else {
 			self.downloadBar.setStatus("Sending file...");
-			self.sliceFile(0);
+			self.reader = new window.FileReader();
+			self.offset = 0;
+			self.reader.onload = self.onFileReaderLoad;
+			self.sendCurrentSlice();
+			self.lastPrinted = 0;
 		}
 	};
-	self.sliceFile = function (offset) {
-		var reader = new window.FileReader();
-		reader.onload = (function () {
-			return function (e) {
-				if (self.sendChannel.readyState === 'open') {
-					try {
-						self.sendChannel.send(e.target.result);
-					} catch (error) {
-						self.logErr(error)();
-						growlError("Connection loss while sending file {} to user {}".format(self.fileName, self.receiverName));
-					}
-					if (self.fileSize > offset + e.target.result.byteLength) {
-						window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
-					}
-					self.setTranseferdAmount(offset + e.target.result.byteLength);
-				} else {
-					self.downloadBar.setStatus("Error: Connection has been lost");
-					self.downloadBar.setError();
+	self.sendCurrentSlice = function() {
+		var currentSlice = self.file.slice(self.offset, self.offset + self.CHUNK_SIZE);
+		self.reader.readAsArrayBuffer(currentSlice);
+	};
+	self.logTransferProgress = function() {
+		var now = Date.now();
+		if (now - self.lastPrinted > 1000) {
+			self.lastPrinted = now;
+			return self.log.apply(self, arguments);
+		} else {
+			return function(){};
+		}
+	};
+	self.onFileReaderLoad = function (e) {
+		try {
+			if (self.sendChannel.readyState === 'open') {
+				if (self.sendChannel.bufferedAmount > 10000000) { // prevent chrome buffer overfill
+					// if it happens chrome will just close the datachannel
+					self.logTransferProgress("Buffer overflow by {}bytes, waiting to flush...",
+							bytesToSize(self.sendChannel.bufferedAmount))();
+					return window.setTimeout(self.onFileReaderLoad, 100, {target: {result: e.target.result}});
 				}
-			};
-		})(self.file);
-		var slice = self.file.slice(offset, offset + self.CHUNK_SIZE);
-		reader.readAsArrayBuffer(slice);
+				self.sendChannel.send(e.target.result);
+				var readSize = e.target.result.byteLength;
+				if (self.fileSize >= self.offset + readSize) {
+					window.setTimeout(self.sendCurrentSlice, 0);
+				} else {
+					self.log("Exiting, offset is {} now, fs: {}", self.offset, self.fileSize)();
+				}
+				self.setTranseferdAmount(self.offset + readSize);
+				self.offset += self.CHUNK_SIZE;
+				self.logTransferProgress("Transferred {}/{}", bytesToSize(self.offset), bytesToSize(self.fileSize))();
+			} else {
+				throw 'sendChannel status is {} which is not equals to "open"'.format(self.sendChannel.readyState);
+			}
+		} catch (error) {
+			self.downloadBar.setStatus("Error: Connection has been lost");
+			self.downloadBar.setError();
+			self.closeEvents("SendChannel is in status {} which is not opened".format(self.sendChannel.readyState));
+			self.logErr(error)();
+			growlError("Connection loss while sending file {} to user {}".format(self.fileName, self.receiverName));
+		}
 	};
 	self.channelOpen = function () {
 		self.downloadBar.setStatus("Sending a file");
