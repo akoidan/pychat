@@ -84,7 +84,7 @@ compile_sass() {
     for i in "${sass_files[@]}"
     do
         name_no_ext=$(basename $i .sass)
-        sass "$i" "$CSS_DIR/$name_no_ext.css"
+        sassc "$i" "$CSS_DIR/$name_no_ext.css"
     done
     cd "$PROJECT_ROOT"
 }
