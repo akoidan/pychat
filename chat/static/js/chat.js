@@ -655,8 +655,21 @@ function Painter() {
 		} else {
 			return;
 		}
+		var xProp = e.offsetX / self.dom.canvasWrapper.scrollWidth;
+		var yProp = e.offsetY / self.dom.canvasWrapper.scrollHeight;
 		self.dom.canvas.style.width = self.dom.canvas.width * self.zoom + 'px';
 		self.dom.canvas.style.height = self.dom.canvas.height * self.zoom + 'px';
+		var newScrollWidth = xProp * self.dom.canvasWrapper.scrollWidth - (self.dom.canvasWrapper.clientWidth / 2);
+		var newScrollHeight = yProp * self.dom.canvasWrapper.scrollHeight - (self.dom.canvasWrapper.clientHeight / 2);
+		self.log("Zoomed to {}; newScrollOffset: {{}, {}} from proportion {{}, {}}",
+				self.zoom.toFixed(2),
+				Math.round(newScrollWidth),
+				Math.round(newScrollHeight),
+				xProp.toFixed(2),
+				yProp.toFixed(2)
+		)();
+		self.dom.canvasWrapper.scrollTop = newScrollHeight;
+		self.dom.canvasWrapper.scrollLeft = newScrollWidth;
 	};
 	self.initChild = function () {
 		self.dom.canvas.addEventListener('mousedown', self.onmousedown, false);
