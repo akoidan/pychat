@@ -334,11 +334,10 @@ function Painter() {
 		self.tools[self.mode].setCursor();
 	};
 	self.onmousemove = function (e) {
-		self.log("pageX {}, offsetX {}, layerX{}", e.pageX, e.offsetX, e.layerX)();
 		self.tools[self.mode].onMouseMove(self.getXY(e));
 	};
 	self.onmousedown = function (e) {
-// 		self.log("Mouse down")();
+		self.log("Mouse down")();
 		self.mouseDown++;
 		var rect = painter.dom.canvas.getBoundingClientRect();
 		self.leftOffset = rect.left;
@@ -349,7 +348,7 @@ function Painter() {
 	};
 	self.onmouseup = function (e) {
 		if (self.mouseDown > 0) {
-// 			self.log("Mouse Up")();
+ 			self.log("Mouse Up")();
 			self.mouseDown--;
 			self.dom.canvas.removeEventListener('mousemove', self.onmousemove, false);
 			self.buffer.finishAction();
