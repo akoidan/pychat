@@ -22,7 +22,6 @@ Table of contents
     * [Production](#production)
   * [Initializing](#initializing)
   * [Running](#running)
-  * [Jetbrains filewatcher](#jetbrains-filewatcher)
   * [Contributing](#contributing)
   * [TODO list](#todo)
 
@@ -78,11 +77,6 @@ Running:
  4. Open in browser [http**s**://127.0.0.1:8000](https://127.0.0.1:8000).
  5. If you get an ssl error on establishing websocket connection in browser, that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
 
-Jetbrains filewatcher:
-=====================
- 1. arguments: `--no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded`
- 2. working directory: `$ProjectFileDir$/chat/static/sass`
- 3. output files to refresh: `$ProjectFileDir$/chat/static/css/`
  
 Contributing:
 =============
@@ -90,7 +84,7 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 TODO
 ====
-*https://codepen.io/techslides/pen/zowLd 
+* Just a note https://codepen.io/techslides/pen/zowLd , i guess transform: scale is better https://stackoverflow.com/questions/11332608/understanding-html-5-canvas-scale-and-translate-order https://stackoverflow.com/questions/16687023/bug-with-transform-scale-and-overflow-hidden-in-chrome
 * Add retry file send option. continue from spot we finished Or maybe autoreconnect automatically
 * remove setHeaderTest, highlight current page icos. Always display username in right top
 * Painter doesn't work on mobile devices (add ontouch)
