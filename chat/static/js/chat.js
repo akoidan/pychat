@@ -283,11 +283,14 @@ function Draggable(container, headerText) {
 function Painter() {
 	var self = this;
 	Draggable.call(self, $('canvasHolder'), "Painter");
+	self.ZOOM_SCALE = 1.1;
 	self.PICKED_TOOL_CLASS = 'n-active-icon';
 	self.dom.canvas = $('painter');
 	self.dom.painterIcon = $('painterIcon');
 	self.dom.color = $('paintPicker');
 	self.dom.paintMove = $('paintMove');
+	self.dom.paintZoomIn = $('paintZoomIn');
+	self.dom.paintZoomOut = $('paintZoomOut');
 	self.dom.sendButton = $('paintSend');
 	self.dom.clearButton = $('paintClear');
 	self.dom.range = $('paintRadius');
@@ -511,10 +514,9 @@ function Painter() {
 				tool.lastCoord = {x: e.pageX, y: e.pageY};
 			};
 			tool.onMouseMove = function (e) {
-
 				var x = tool.lastCoord.x - e.pageX;
 				var y = tool.lastCoord.y - e.pageY;
-				self.log("{{}, {}}", x,y)();
+				self.log("Moving to: {{}, {}}", x,y)();
 				self.dom.canvasWrapper.scrollTop += y;
 				self.dom.canvasWrapper.scrollLeft += x;
 				tool.lastCoord = {x: e.pageX, y: e.pageY};
@@ -628,24 +630,29 @@ function Painter() {
 	self.preventDefault = function (e) {
 		e.preventDefault();
 	};
-	self.onmousewheel = function(e) {
-		e.preventDefault();
-		var zoomScale = 1.1;
-		var isTopDirection = e.detail < 0 || e.wheelDelta > 0;
-		if (isTopDirection) {
-			self.zoom *= zoomScale;
+	self.zoomIn = function() {
+		self.applyZoom(true);
+	};
+	self.zoomOut = function() {
+		self.applyZoom(false);
+	};
+	self.applyZoom = function (isIncrease) {
+		if (isIncrease) {
+			self.zoom *= self.ZOOM_SCALE;
 		} else if (self.zoom !== 1) {
-			self.zoom /= zoomScale;
+			self.zoom /= self.ZOOM_SCALE;
 			if (self.zoom < 1) {
 				self.zoom = 1;
 			}
-		} else {
-			return;
 		}
-		var xProp = e.offsetX / self.dom.canvasWrapper.scrollWidth;
-		var yProp = e.offsetY / self.dom.canvasWrapper.scrollHeight;
 		self.dom.canvas.style.width = self.dom.canvas.width * self.zoom + 'px';
 		self.dom.canvas.style.height = self.dom.canvas.height * self.zoom + 'px';
+	};
+	self.onmousewheel = function(e) {
+		e.preventDefault();
+		var xProp = e.offsetX / self.dom.canvasWrapper.scrollWidth;
+		var yProp = e.offsetY / self.dom.canvasWrapper.scrollHeight;
+		self.applyZoom(e.detail < 0 || e.wheelDelta > 0); // isTop
 		var newScrollWidth = xProp * self.dom.canvasWrapper.scrollWidth - (self.dom.canvasWrapper.clientWidth / 2);
 		var newScrollHeight = yProp * self.dom.canvasWrapper.scrollHeight - (self.dom.canvasWrapper.clientHeight / 2);
 		self.log("Zoomed to {}; newScrollOffset: {{}, {}} from proportion {{}, {}}",
@@ -673,6 +680,8 @@ function Painter() {
 		self.dom.eraser.onclick =  self.setMode.bind(self, 'eraser');
 		self.dom.pen.onclick = self.setMode.bind(self, 'pen');
 		self.dom.paintMove.onclick = self.setMode.bind(self, 'move');
+		self.dom.paintZoomIn.onclick = self.zoomIn;
+		self.dom.paintZoomOut.onclick = self.zoomOut;
 		self.dom.colorIcon.onclick = function () {
 			self.dom.color.click();
 		};
