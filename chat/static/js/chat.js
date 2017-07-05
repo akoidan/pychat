@@ -334,11 +334,10 @@ function Painter() {
 		self.tools[self.mode].setCursor();
 	};
 	self.onmousemove = function (e) {
-		self.log("pageX {}, offsetX {}, layerX{}", e.pageX, e.offsetX, e.layerX)();
 		self.tools[self.mode].onMouseMove(self.getXY(e));
 	};
 	self.onmousedown = function (e) {
-// 		self.log("Mouse down")();
+		self.log("Mouse down")();
 		self.mouseDown++;
 		var rect = painter.dom.canvas.getBoundingClientRect();
 		self.leftOffset = rect.left;
@@ -349,7 +348,7 @@ function Painter() {
 	};
 	self.onmouseup = function (e) {
 		if (self.mouseDown > 0) {
-// 			self.log("Mouse Up")();
+ 			self.log("Mouse Up")();
 			self.mouseDown--;
 			self.dom.canvas.removeEventListener('mousemove', self.onmousemove, false);
 			self.buffer.finishAction();
@@ -655,8 +654,21 @@ function Painter() {
 		} else {
 			return;
 		}
+		var xProp = e.offsetX / self.dom.canvasWrapper.scrollWidth;
+		var yProp = e.offsetY / self.dom.canvasWrapper.scrollHeight;
 		self.dom.canvas.style.width = self.dom.canvas.width * self.zoom + 'px';
 		self.dom.canvas.style.height = self.dom.canvas.height * self.zoom + 'px';
+		var newScrollWidth = xProp * self.dom.canvasWrapper.scrollWidth - (self.dom.canvasWrapper.clientWidth / 2);
+		var newScrollHeight = yProp * self.dom.canvasWrapper.scrollHeight - (self.dom.canvasWrapper.clientHeight / 2);
+		self.log("Zoomed to {}; newScrollOffset: {{}, {}} from proportion {{}, {}}",
+				self.zoom.toFixed(2),
+				Math.round(newScrollWidth),
+				Math.round(newScrollHeight),
+				xProp.toFixed(2),
+				yProp.toFixed(2)
+		)();
+		self.dom.canvasWrapper.scrollTop = newScrollHeight;
+		self.dom.canvasWrapper.scrollLeft = newScrollWidth;
 	};
 	self.initChild = function () {
 		self.dom.canvas.addEventListener('mousedown', self.onmousedown, false);
