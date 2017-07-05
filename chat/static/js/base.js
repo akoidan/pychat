@@ -489,7 +489,7 @@ onDocLoad(function () {
 		logger.warn("Ops, there's no scrollbar for firefox")();
 	}
 	growlHolder = $('growlHolder');
-	document.querySelectorAll('input[type=range]').forEach(styleInputRange);
+	[].forEach.call(document.querySelectorAll('input[type=range]'), styleInputRange);
 
 });
 function fixInputRangeStyle() { // TODO this can be moved to element's style

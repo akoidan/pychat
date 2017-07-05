@@ -356,7 +356,7 @@ function fbStatusChangeIfReAuth(response) {
 }
 
 function fbStatusChange(response) {
-	loggerInfo(response);
+	logger.info(response)();
 	if (fbStatusChangeIfReAuth(response)) {
 		FB.login(fbStatusChangeIfReAuth, {auth_type: 'reauthenticate'});
 	}
