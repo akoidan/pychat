@@ -1,11 +1,6 @@
 import logging
 import re
 
-try:
-	from urllib2 import urlopen as wget  # py2
-except ImportError:
-	from urllib.request import urlopen as wget  # py3
-
 import requests
 from django.contrib.auth import login as djangologin
 from django.core.exceptions import ValidationError
@@ -18,6 +13,7 @@ from oauth2client.crypt import AppIdentityError
 from chat import settings
 from chat.log_filters import id_generator
 from chat.models import UserProfile
+from chat.py2_3 import urlopen
 from chat.settings import VALIDATION_IS_OK, AUTHENTICATION_BACKENDS
 from chat.utils import create_user_model, check_user
 
@@ -44,7 +40,7 @@ class SocialAuth(View):
 	def download_http_photo(self, url, user_profile):
 		if url is not None:
 			try:
-				response = wget(url)
+				response = urlopen(url)
 				# first param for extension
 				user_profile.photo.save(url, ContentFile(response.read()))
 			except Exception as e:

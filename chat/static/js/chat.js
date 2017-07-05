@@ -9,6 +9,7 @@ var SELF_HEADER_CLASS = 'message-header-self';
 var USER_NAME_ATTR = 'username';
 var REMOVED_MESSAGE_CLASSNAME = 'removed-message';
 var MESSAGE_ID_ATTRIBUTE = 'messageId';
+var YOUTUBE_REGEX = /^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$/;
 var MAX_ACCEPT_FILE_SIZE_WO_FS_API = Math.pow(2, 28); // 256 MB
 // end used
 var SYSTEM_USERNAME = 'System';
@@ -145,6 +146,7 @@ function Draggable(container, headerText) {
 		container:  container,
 		iconMinimize: document.createElement('I'),
 		header: document.createElement('DIV'),
+		iconCancel: document.createElement('i'),
 	};
 	self.headerText = headerText;
 	self.preventDefault = function (e) {
@@ -157,16 +159,18 @@ function Draggable(container, headerText) {
 	};
 	self.init = function () {
 		CssUtils.addClass(self.dom.container, "modal-body");
-		self.dom.container.style.left = 'calc(50% - 100px)';
+		self.dom.container.style.left = '10%';
 		self.dom.container.style.top = '10%';
 		self.dom.header.appendChild(self.dom.iconMinimize);
 		self.dom.iconMinimize.onclick = self.minimize;
 		self.dom.iconMinimize.className = 'icon-minimize';
+		self.dom.iconMinimize.setAttribute('title', 'Minimize window');
 		self.dom.header.className = 'windowHeader noSelection';
+		self.zoom = 1;
 		self.dom.header.addEventListener ("mousedown", function(ev) {
 			self.mouseDownElement = ev.target;
+			self.dom.container.setAttribute('draggable', true);
 		}, false);
-		self.dom.container.setAttribute('draggable', 'true');
 		self.dom.container.ondragstart = self.ondragstart;
 		self.dom.container.ondragend = self.ondragend;
 		// self.dom.container.ondrop = self.preventDefault; // TODO doens't work
@@ -174,12 +178,11 @@ function Draggable(container, headerText) {
 		// self.dom.container.ondragenter  = self.preventDefault;
 		self.dom.headerText = document.createElement('span');
 		self.dom.header.appendChild(self.dom.headerText);
-		self.dom.headerText.style = 'display: inline-block';
 		self.setHeaderText(self.headerText);
-		self.dom.iconCancel = document.createElement('i');
 		self.dom.header.appendChild(self.dom.iconCancel);
 		self.dom.iconCancel.onclick = self.hide;
 		self.dom.iconCancel.className = 'icon-cancel';
+		self.dom.iconCancel.setAttribute('title', 'Close window');
 		self.dom.body = self.dom.container.children[0];
 		if (!self.dom.body) {
 			self.dom.body = document.createElement('DIV');
@@ -216,6 +219,7 @@ function Draggable(container, headerText) {
 		}
 		self.dom.container.style.left = left + "px";
 		self.dom.container.style.top =  top + "px";
+		self.dom.container.removeAttribute('draggable');
 	};
 	self.ondragstart = function (e) {
 		if (isFirefox) {
@@ -281,92 +285,123 @@ function Painter() {
 	Draggable.call(self, $('canvasHolder'), "Painter");
 	self.PICKED_TOOL_CLASS = 'n-active-icon';
 	self.dom.canvas = $('painter');
+	self.dom.painterIcon = $('painterIcon');
 	self.dom.color = $('paintPicker');
+	self.dom.paintMove = $('paintMove');
 	self.dom.sendButton = $('paintSend');
 	self.dom.clearButton = $('paintClear');
 	self.dom.range = $('paintRadius');
 	self.dom.opacity = $('paintOpacity');
+	self.dom.canvasWrapper = $('canvasWrapper');
 	self.dom.pen = $('paintPen');
 	self.dom.eraser = $('paintEraser');
 	self.dom.colorIcon = $('paintPickerIcon');
 	self.ctx = self.dom.canvas.getContext('2d');
-	self.mouse = {x: 0, y: 0};
-	//self.serializer = new XMLSerializer();
 	self.mouseDown = 0;
 	self.scale = 1;
 	self.originx = 0;
 	self.originy = 0;
-	self.startDraw = function (e) { // TODO start draw line without moving, if user just clicks on place
-		self.mouseDown++;
-		var rect = painter.dom.canvas.getBoundingClientRect();
-		self.leftOffset = rect.left;
-		self.topOffset = rect.top;
-		//self.tmpData = self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height); TODO
-		self.ctx.beginPath();
-		var xy = self.getXY(e);
-		// self.ctx.fillStyle = self.dom.color.value; TODO
-		// self.ctx.arc(xy.x, xy.y, self.ctx.lineWidth / 2, 0, 2 * Math.PI);
-		// self.ctx.fill();
-		// self.points = [];
-		self.ctx.lineTo(xy.x, xy.y);
-		self.ctx.stroke();
-		self.dom.canvas.addEventListener('mousemove', self.onPaint, false);
-	};
-	self.cPushArray = [];
-	self.cStep = -1;
+	self.current = null;
 	self.changeColor = function (event) {
 		self.ctx.strokeStyle = event.target.value;
 		self.setColorStrikeColor();
-		self.setPenUrl();
+		self.tools[self.mode].setCursor();
 	};
 	self.setColorStrikeColor = function () {
 		self.dom.pen.style.color = self.ctx.strokeStyle;
 	};
-	self.setPen = function () {
-		CssUtils.removeClass(self.dom.pen, self.PICKED_TOOL_CLASS);
-		CssUtils.addClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
-		self.mode = 'onPaintPen';
-		self.ctx.globalCompositeOperation = "source-over";
-		self.setPenUrl();
+	self.log = function () {
+		var args = Array.prototype.slice.call(arguments);
+		args.unshift("Painter");
+		return logger.webrtc.apply(logger, args);
 	};
-	self.setPenUrl = function () {
-		var isPaint = self.mode == 'onPaintPen';
+	self.setCursor = function (fill, stroke) {
 		var width = self.ctx.lineWidth;
 		if (width < 3) {
 			width = 3;
 		} else if (width > 126) {
 			width = 126;
 		}
-		var fill = isPaint ? self.ctx.strokeStyle : '#aaaaaa';
-		var stroke = isPaint ? '' : ' stroke="black" stroke-width="2" ';
-		var imB64 = btoa('<svg xmlns="http://www.w3.org/2000/svg" height="128" width="128"><circle cx="64" cy="64" r="{0}" fill="{1}"{2}/></svg>'.formatPos(
-				width, fill, stroke
-		));
-		self.dom.canvas.style.cursor = 'url(data:image/svg+xml;base64,{}) {} {}, auto'.format(imB64, 64, 64);
-	};
-	self.setEraser = function () {
-		CssUtils.addClass(self.dom.pen, self.PICKED_TOOL_CLASS);
-		CssUtils.removeClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
-		self.ctx.globalCompositeOperation = "destination-out";
-		self.mode = 'onPaintEraser';
-		self.setPenUrl();
+		var svg = '<svg xmlns="http://www.w3.org/2000/svg" height="128" width="128"><circle cx="64" cy="64" r="{0}" fill="{1}"{2}/></svg>'.formatPos(width, fill, stroke);
+		self.dom.canvas.style.cursor = 'url(data:image/svg+xml;base64,{}) {} {}, auto'.format(btoa(svg), 64, 64);
 	};
 	self.changeRadius = function (event) {
-		self.ctx.lineWidth = parseInt(event.target.value);
-		self.setPenUrl();
+		self.ctx.lineWidth = parseInt(Math.pow(parseInt(event.target.value), 1.4));
+		self.tools[self.mode].setCursor();
 	};
 	self.changeOpacity = function (event) {
-		self.ctx.globalAlpha = Math.pow(parseFloat(event.target.value), 6);
+		self.ctx.globalAlpha = event.target.value;
+		self.tools[self.mode].setCursor();
 	};
-	self.finishDraw = function () {
+	self.onmousemove = function (e) {
+		self.log("pageX {}, offsetX {}, layerX{}", e.pageX, e.offsetX, e.layerX)();
+		self.tools[self.mode].onMouseMove(self.getXY(e));
+	};
+	self.onmousedown = function (e) {
+// 		self.log("Mouse down")();
+		self.mouseDown++;
+		var rect = painter.dom.canvas.getBoundingClientRect();
+		self.leftOffset = rect.left;
+		self.topOffset = rect.top;
+		var imgData = self.buffer.startAction();
+		self.tools[self.mode].onMouseDown(self.getXY(e), imgData);
+		self.dom.canvas.addEventListener('mousemove', self.onmousemove, false);
+	};
+	self.onmouseup = function (e) {
 		if (self.mouseDown > 0) {
+// 			self.log("Mouse Up")();
 			self.mouseDown--;
-			self.cStep++;
-			if (self.cStep < self.cPushArray.length) {
-				self.cPushArray.length = self.cStep;
+			self.dom.canvas.removeEventListener('mousemove', self.onmousemove, false);
+			self.buffer.finishAction();
+			self.tools[self.mode].onMouseUp(self.getXY(e));
+		}
+	};
+	self.trimImage = function () {
+		var copy = document.createElement('canvas').getContext('2d'),
+				pixels = self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height),
+				l = pixels.data.length,
+				i,
+				bound = {
+					top: null,
+					left: null,
+					right: null,
+					bottom: null
+				},
+				x, y;
+		for (i = 0; i < l; i += 4) {
+			if (pixels.data[i + 3] !== 0) {
+				x = (i / 4) % self.dom.canvas.width;
+				y = ~~((i / 4) / self.dom.canvas.width);
+				if (bound.top === null) {
+					bound.top = y;
+				}
+				if (bound.left === null) {
+					bound.left = x;
+				} else if (x < bound.left) {
+					bound.left = x;
+				}
+				if (bound.right === null) {
+					bound.right = x;
+				} else if (bound.right < x) {
+					bound.right = x;
+				}
+				if (bound.bottom === null) {
+					bound.bottom = y;
+				} else if (bound.bottom < y) {
+					bound.bottom = y;
+				}
 			}
-			self.cPushArray.push(self.dom.canvas.toDataURL());
-			self.dom.canvas.removeEventListener('mousemove', self.onPaint, false);
+		}
+		var trimHeight = bound.bottom - bound.top,
+				trimWidth = bound.right - bound.left;
+		if (trimWidth && trimHeight) {
+			var trimmed = self.ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+			copy.canvas.width = trimWidth;
+			copy.canvas.height = trimHeight;
+			copy.putImageData(trimmed, 0, 0);
+			return copy.canvas;
+		} else {
+			return false;
 		}
 	};
 	self.getScaledOrdinate = function (ordinateName/*width*/, value) {
@@ -376,67 +411,177 @@ function Painter() {
 		var ordinate = self.dom.canvas[ordinateName];
 		return ordinate == clientOrdinate ? value : Math.round(ordinate * value / clientOrdinate); // apply page zoom
 	};
-	self.onPaint = function (e) {
-		var xy = self.getXY(e);
-		self[self.mode](self.getScaledOrdinate('width', xy.x), self.getScaledOrdinate('height', xy.y));
-	};
 	self.getXY = function (e) {
 		return {
-			x: self.getScaledOrdinate('width', e.pageX - self.leftOffset),
-			y: self.getScaledOrdinate('height', e.pageY - self.topOffset)
+			x: self.getScaledOrdinate('width', e.offsetX),
+			y: self.getScaledOrdinate('height', e.offsetY)
 		}
 	};
-	self.onPaintPen = function (x, y) {
-		//self.points.push({x:x, y:y}); TODO
-		self.ctx.lineTo(x, y);
-		self.ctx.stroke();
+	self.getData = function() {
+		return self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height)
 	};
-	self.onPaintEraser = function (x, y) {
-		self.ctx.lineTo(x, y);
-		self.ctx.stroke();
+	self.tools = {
+		eraser: new (function () {
+			var tool = this;
+			tool.setCursor = function () {
+				self.setCursor('#aaaaaa', ' stroke="black" stroke-width="2"');
+			};
+			tool.onActivate = function () {
+				self.mode = 'eraser';
+				CssUtils.removeClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
+				self.ctx.globalCompositeOperation = "destination-out";
+				CssUtils.showElement(self.dom.range);
+				tool.setCursor();
+			};
+			tool.onMouseDown = function (coord) {
+				self.ctx.moveTo(coord.x, coord.y);
+				self.ctx.beginPath();
+				tool.onMouseMove(coord)
+			};
+			tool.onDeactivate = function () {
+				CssUtils.addClass(self.dom.eraser, self.PICKED_TOOL_CLASS);
+				CssUtils.hideElement(self.dom.range);
+			};
+			tool.onMouseMove = function (coord) {
+				self.ctx.lineTo(coord.x, coord.y);
+				self.ctx.stroke();
+			};
+			tool.onMouseUp = function (x, y) {
+				self.ctx.closePath();
+			};
+			return tool;
+		})(),
+		pen: new (function(){
+			var tool = this;
+			tool.setCursor = function () {
+				self.setCursor(self.ctx.strokeStyle, '');
+			};
+			tool.onActivate = function () {
+				CssUtils.removeClass(self.dom.pen, self.PICKED_TOOL_CLASS);
+				CssUtils.showElement(self.dom.opacity);
+				CssUtils.showElement(self.dom.colorIcon);
+				CssUtils.showElement(self.dom.range);
+				self.ctx.globalCompositeOperation = "source-over";
+				tool.setCursor();
+			};
+			tool.onMouseDown = function (coord, data) {
+				self.ctx.moveTo(coord.x, coord.y);
+				tool.points = [];
+				tool.tmpData = data;
+				tool.onMouseMove(coord)
+			};
+			tool.onDeactivate = function () {
+				CssUtils.addClass(self.dom.pen, self.PICKED_TOOL_CLASS);
+				CssUtils.hideElement(self.dom.opacity);
+				CssUtils.hideElement(self.dom.colorIcon);
+				CssUtils.hideElement(self.dom.range);
+			};
+			tool.onMouseMove = function (coord) {
+				// self.log("mouse move,  points {}", JSON.stringify(tool.points))();
+				self.ctx.putImageData(tool.tmpData, 0, 0);
+				tool.points.push(coord);
+				self.ctx.beginPath();
+				self.ctx.moveTo(tool.points[0].x, tool.points[0].y);
+				for (var i = 0; i < tool.points.length; i++) {
+					self.ctx.lineTo(tool.points[i].x, tool.points[i].y);
+				}
+				self.ctx.stroke();
+			};
+			tool.onMouseUp = function (coord) {
+				self.ctx.closePath();
+				tool.points = [];
+				tool.tmpData = null;
+			};
+		}),
+		move: new (function(){
+			var tool = this;
+			tool.setCursor = function () {
+				self.dom.canvas.style.cursor = 'move';
+			};
+			tool.onActivate = function () {
+				self.mode = 'move';
+				CssUtils.removeClass(self.dom.paintMove, self.PICKED_TOOL_CLASS);
+				tool.setCursor();
+			};
+			tool.onDeactivate = function () {
+				CssUtils.addClass(self.dom.paintMove, self.PICKED_TOOL_CLASS);
+			};
+			tool.onMouseDown = function (coord, data) {
+				console.log('mousedown');
+			};
+			tool.onMouseMove = function (coord) {
+				console.log('onMouseMove');
+			};
+			tool.onMouseUp = function (coord) {
+				console.log('onMouseUp')
+			};
+		})
 	};
 	self.clearCanvas = function () {
+		self.buffer.startAction();
 		self.ctx.clearRect(0, 0, parseInt(self.dom.canvas.width), parseInt(self.dom.canvas.height));
+		self.buffer.finishAction();
 	};
 	self.sendImage = function () {
-		Utils.pasteb64ImgToTextArea(self.dom.canvas.toDataURL());
-		self.hide();
+		var trimImage = self.trimImage();
+		if (trimImage) {
+			Utils.pasteb64ImgToTextArea(trimImage.toDataURL());
+			self.hide();
+		} else {
+			growlError("You can't paste empty images");
+		}
 	};
 	self.contKeyPress = function (event) {
 		if (event.keyCode === 13) {
 			self.sendImage();
 			// event.code if keyboard is different (e.g Russian)
 		} else if (event.keyCode === 26 && event.ctrlKey || event.code === 'KeyZ') {
-			self.undo();
+			self.buffer.undo();
 		} else if (event.keyCode === 25 && event.ctrlKey || event.code === 'KeyY') {
-			self.redo();
+			self.buffer.redo();
 		}
 	};
-	self.undo = function () {
-		if (self.cStep > 0) {
-			self.cStep--;
-			var canvasPic = new Image();
-			canvasPic.src = self.cPushArray[self.cStep];
-			canvasPic.onload = function () {
-				self.clearCanvas();
-				self.ctx.save();
-				self.ctx.globalAlpha = 1;
-				self.ctx.drawImage(canvasPic, 0, 0);
-				self.ctx.restore();
+	self.buffer = new (function () {
+		var tool = this;
+		var undoImages = [];
+		var redoImages = [];
+		var current = null;
+		tool.undo = function () {
+			var restore = undoImages.pop();
+			if (restore) {
+				redoImages.push(current);
+				current = restore;
+				self.ctx.putImageData(restore, 0, 0);
 			}
-		}
-	};
-	self.redo = function () {
-		if (self.cStep < self.cPushArray.length - 1) {
-			self.cStep++;
-			var canvasPic = new Image();
-			canvasPic.src = self.cPushArray[self.cStep];
-			canvasPic.onload = function () {
-				self.clearCanvas();
-				self.ctx.drawImage(canvasPic, 0, 0);
+		};
+		tool.clear = function () {
+			undoImages = [];
+			redoImages = [];
+			current = null;
+		};
+		tool.redo = function () {
+			var restore = redoImages.pop();
+			if (restore) {
+				undoImages.push(current);
+				current = restore;
+				self.ctx.putImageData(restore, 0, 0);
 			}
-		}
-	};
+		};
+		tool.finishAction = function() {
+			if (current) {
+				undoImages.push(current);
+			}
+			redoImages = [];
+			current = self.getData();
+		};
+		tool.startAction = function() {
+			if (!current) {
+				current = self.getData();
+			}
+			return current;
+		};
+	})();
+
 	self.canvasImagePaste = function (e) {
 		if (e.clipboardData) {
 			var items = e.clipboardData.items;
@@ -475,63 +620,92 @@ function Painter() {
 	self.preventDefault = function (e) {
 		e.preventDefault();
 	};
-	self.onZoom = function (event) {
-		//var mousex = event.clientX - self.dom.canvas.offsetLeft;
-		//var mousey = event.clientY - self.dom.canvas.offsetTop;
-		var mousex = self.getScaledOrdinate('width', event.pageX - self.leftOffset);
-		var mousey = self.getScaledOrdinate('height', event.pageX - self.leftOffset);
-		var wheel = event.wheelDelta / 120;//n or -n
-		var zoom = 1 + wheel / 2;
-		self.ctx.translate(
-				self.originx,
-				self.originy
-		);
-		self.ctx.scale(zoom, zoom);
-		self.ctx.translate(
-				-( mousex / self.scale + self.originx - mousex / ( self.scale * zoom ) ),
-				-( mousey / self.scale + self.originy - mousey / ( self.scale * zoom ) )
-		);
-
-		self.originx = ( mousex / self.scale + self.originx - mousex / ( self.scale * zoom ) );
-		self.originy = ( mousey / self.scale + self.originy - mousey / ( self.scale * zoom ) );
-		self.scale *= zoom;
+	// self.onZoom = function (event) {
+	// 	//var mousex = event.clientX - self.dom.canvas.offsetLeft;
+	// 	//var mousey = event.clientY - self.dom.canvas.offsetTop;
+	// 	var mousex = self.getScaledOrdinate('width', event.pageX - self.leftOffset);
+	// 	var mousey = self.getScaledOrdinate('height', event.pageX - self.leftOffset);
+	// 	var wheel = event.wheelDelta / 120;//n or -n
+	// 	var zoom = 1 + wheel / 2;
+	// 	self.ctx.translate(
+	// 			self.originx,
+	// 			self.originy
+	// 	);
+	// 	self.ctx.scale(zoom, zoom);
+	// 	self.ctx.translate(
+	// 			-( mousex / self.scale + self.originx - mousex / ( self.scale * zoom ) ),
+	// 			-( mousey / self.scale + self.originy - mousey / ( self.scale * zoom ) )
+	// 	);
+	//
+	// 	self.originx = ( mousex / self.scale + self.originx - mousex / ( self.scale * zoom ) );
+	// 	self.originy = ( mousey / self.scale + self.originy - mousey / ( self.scale * zoom ) );
+	// 	self.scale *= zoom;
+	// };
+	self.onmousewheel = function(e) {
+		e.preventDefault();
+		var zoomScale = 1.1;
+		var isTopDirection = e.detail < 0 || e.wheelDelta > 0;
+		if (isTopDirection) {
+			self.zoom *= zoomScale;
+		} else if (self.zoom !== 1) {
+			self.zoom /= zoomScale;
+			if (self.zoom < 1) {
+				self.zoom = 1;
+			}
+		} else {
+			return;
+		}
+		self.dom.canvas.style.width = self.dom.canvas.width * self.zoom + 'px';
+		self.dom.canvas.style.height = self.dom.canvas.height * self.zoom + 'px';
 	};
 	self.initChild = function () {
-		self.dom.canvas.addEventListener('mousedown', self.startDraw, false);
+		self.dom.canvas.addEventListener('mousedown', self.onmousedown, false);
 		self.dom.container.onpaste = self.canvasImagePaste;
+		self.dom.painterIcon.onclick = self.initAndShow;
+		self.dom.canvasWrapper.addEventListener(mouseWheelEventName, self.onmousewheel, {passive: false});
 		self.dom.container.ondrop = self.canvasImageDrop;
 		self.dom.container.ondragover = self.preventDefault;
 		self.dom.color.addEventListener('input', self.changeColor, false);
 		self.dom.range.addEventListener('change', self.changeRadius, false);
 		self.dom.opacity.addEventListener('change', self.changeOpacity, false);
 		self.dom.container.addEventListener('keypress', self.contKeyPress, false);
-		//self.dom.container.addEventListener(mouseWheelEventName, self.onZoom);
 		self.dom.color.style.color = self.ctx.strokeStyle;
+		self.dom.eraser.onclick =  self.setMode.bind(self, 'eraser');
+		self.dom.pen.onclick = self.setMode.bind(self, 'pen');
+		self.dom.paintMove.onclick = self.setMode.bind(self, 'move');
 		self.dom.colorIcon.onclick = function () {
 			self.dom.color.click();
 		};
-		self.dom.pen.onclick = self.setPen;
-		self.dom.eraser.onclick = self.setEraser;
 		self.dom.sendButton.onclick = self.sendImage;
 		self.dom.clearButton.onclick = self.clearCanvas;
 	};
-	self.superShow = self.show;
-	self.show = function () {
-		self.superShow();
-		document.body.addEventListener('mouseup', self.finishDraw, false);
-		self.dom.canvas.setAttribute('width', self.dom.canvas.offsetWidth);
-		self.dom.canvas.setAttribute('height', self.dom.canvas.offsetHeight);
+	self.setMode = function(mode) {
+		if (self.mode) {
+			self.tools[self.mode].onDeactivate();
+		}
+		self.mode = mode;
+		self.tools[self.mode].onActivate();
+	};
+	self.show = function() {
+		self.super.show();
+		document.body.addEventListener('mouseup', self.onmouseup, false);
+	};
+	self.initAndShow = function () {
+		self.show();
+		self.buffer.clear();
+		self.dom.canvas.setAttribute('width', self.dom.canvasWrapper.offsetWidth - 2);
+		self.dom.canvas.setAttribute('height', self.dom.canvasWrapper.offsetHeight - 6);
 		self.ctx.lineWidth = 3;
 		self.ctx.lineJoin = 'round';
 		self.ctx.lineCap = 'round';
 		self.ctx.strokeStyle = self.dom.color.value;
 		self.setColorStrikeColor();
-		self.setPen();
+		self.setMode('pen');
 	};
 	self.superHide = self.hide;
 	self.hide = function () {
 		self.superHide();
-		document.body.removeEventListener('mouseup', self.finishDraw, false);
+		document.body.removeEventListener('mouseup', self.onmouseup, false);
 	};
 	self.initChild();
 }
@@ -1110,6 +1284,9 @@ function ChannelsHandler() {
 		if (editLastMessageNode && self.isMessageEditable(editLastMessageNode.time)) {
 			self.editLastMessageNode = editLastMessageNode;
 			self.editLastMessageNode.dom = $(editLastMessageNode.time);
+			if (!self.editLastMessageNode.dom) { //if history has been cleared
+				return
+			}
 			CssUtils.addClass(self.editLastMessageNode.dom, self.HIGHLIGHT_MESSAGE_CLASS);
 			var selector = '[id="{}"] .{}'.format(editLastMessageNode.time, CONTENT_STYLE_CLASS);
 			userMessage.innerHTML = document.querySelector(selector).innerHTML;
@@ -1136,24 +1313,31 @@ function ChannelsHandler() {
 		var images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
 		for (var i = 0; i < images.length; i++) {
 			var img = images[i];
-			var elSymb = img.getAttribute('symbol');
-			currSymbol = elSymb || self.nextChar(currSymbol);
-			var textNode = document.createTextNode(currSymbol);
+			var elSymbol = img.getAttribute('symbol');
+			if (!elSymbol) {
+				currSymbol = self.nextChar(currSymbol);
+				elSymbol = currSymbol;
+			}
+			var textNode = document.createTextNode(elSymbol);
 			img.parentNode.replaceChild(textNode, img);
-			res[currSymbol] = {
-				b64: elSymb ? null : img.src,// don't send image again, it's already in server
-				fileName: img.getAttribute('fileName')
-			};
+			if (!img.getAttribute('symbol')) { // don't send image again, it's already in server
+				res[elSymbol] = {
+					b64: img.src,
+					fileName: img.getAttribute('fileName')
+				};
+			}
 		}
 		return res;
 	};
 	self.handleSendMessage = function () {
 		var isEdit = self.editLastMessageNode && !self.editLastMessageNode.notReady;
-		var currSymbol = '\u3501';
-		if (isEdit) {
-			var symb = self.editLastMessageNode.dom.getAttribute('symbol');
-			if (symb.charCodeAt(0) > currSymbol.charCodeAt(0)) { // just to be sure
-				currSymbol = symb;
+		var currSymbol = '\u3500'; // it's gonna increase in getPastedImage
+		if (isEdit && self.editLastMessageNode.dom) {
+			// dom can be null if we cleared the history
+			// in this case symbol will be parsed in be
+			var newSymbol = self.editLastMessageNode.dom.getAttribute('symbol');
+			if (newSymbol) {
+				currSymbol = newSymbol;
 			}
 		}
 		var images = self.getPastedImage(currSymbol);
@@ -1982,9 +2166,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		var messages = data.content || [];
 		var oldSound = window.sound;
 		window.sound = 0;
-		messages.forEach(function (message) {
-			self.printMessage(message, true);
-		});
+		messages.forEach(self.printNewMessage);
 		window.sound = oldSound;
 	};
 	self.setHeaderId = function (headerId) {
@@ -1994,24 +2176,35 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.encodeMessage = function (data) {
 		var html = encodeAnchorsHTML(data.content);
-		var symb = '\u3501';
-		if (data.images) {
+		if (data.images && Object.keys(data.images).length) {
 			html = html.replace(imageUnicodeRegex, function (s) {
-				if (s.charCodeAt(0) > symb.charCodeAt(0)) {
-					symb = s;
-				}
 				return "<img src=\'{}\' symbol=\'{}\' class=\'{}\'/>".format(data.images[s], s, PASTED_IMG_CLASS);
 			});
 		}
-		return {html: smileyUtil.encodeSmileys(html), symbol: symb};
+		return smileyUtil.encodeSmileys(html);
+	};
+	self.getMaxSymbol = function(images) { //deprecated
+		var symbols = images && Object.keys(images);
+		if (symbols && symbols.length) {
+			var symbol = '\u3501';
+			for (var i = 0; i < symbols.length; i++) {
+				if (symbols[i].charCodeAt(0) > symbol.charCodeAt(0)) {
+					symbol = symbols[i]
+				}
+			}
+			return symbol;
+		}
+
 	};
 	self.editMessage = function (data) {
-		var datDict = self.encodeMessage(data);
 		var p = $(data.time);
 		if (p != null) {
+			var html = self.encodeMessage(data);
 			var element = p.querySelector("." + CONTENT_STYLE_CLASS);
-			p.setAttribute('symbol', datDict.symbol);
-			element.innerHTML = datDict.html;
+			if (data.symbol){
+				p.setAttribute('symbol', data.symbol);
+			}
+			element.innerHTML = html;
 			CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
 		}
 	};
@@ -2025,9 +2218,30 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			}
 		}
 	};
-	self.printMessage = function (data, isNew) {
+	self.printNewMessage = function(data) {
+		self._printMessage(data, true);
+	};
+	self.printMessage = function(data) {
+		self._printMessage(data, false);
+	};
+	self._printMessage = function(data, isNew) {
 		self.setHeaderId(data.id);
-		var user = self.allUsers[data.userId];
+		self.printMessagePlay(data);
+		var displayedUsername = self.allUsers[data.userId].user;
+		var html = self.encodeMessage(data);
+		var p = self.displayPreparedMessage(
+				data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS,
+				data.time,
+				html,
+				displayedUsername,
+				data.id,
+				data.symbol
+		);
+		if (p) { // not duplicate message
+			self.highLightMessageIfNeeded(p, displayedUsername, isNew, data.content, data.images);
+		}
+	};
+	self.printMessagePlay = function(data) {
 		if (loggedUserId === data.userId) {
 			Utils.checkAndPlay(self.dom.chatOutgoing);
 			self.lastMessage = {
@@ -2037,39 +2251,26 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		} else {
 			Utils.checkAndPlay(self.dom.chatIncoming);
 		}
-		var displayedUsername = user.user;
-		//private message
-		var headerStyle = data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS;
-		var datDict = self.encodeMessage(data);
-		var p = self.displayPreparedMessage(
-				headerStyle,
-				data.time,
-				datDict.html,
-				displayedUsername,
-				data.id,
-				datDict.symbol
-		);
-		if (p) { // not duplicate message
-			var keys = data.images && Object.keys(data.images);
-			var img = keys && data.images[keys[0]];
-			notifier.notify(displayedUsername, data.content || 'images', img);
-			if (self.isHidden() && !window.newMessagesDisabled) {
-				self.newMessages++;
-				self.dom.newMessages.textContent = self.newMessages;
-				if (self.newMessages == 1) {
-					CssUtils.showElement(self.dom.newMessages);
-					CssUtils.hideElement(self.dom.deleteIcon);
-				}
+	};
+	self.highLightMessageIfNeeded = function (p, displayedUsername, isNew, content, images) {
+		var keys = images && Object.keys(images);
+		var img = keys && images[keys[0]];
+		notifier.notify(displayedUsername, content || 'images', img);
+		if (self.isHidden() && !window.newMessagesDisabled) {
+			self.newMessages++;
+			self.dom.newMessages.textContent = self.newMessages;
+			if (self.newMessages == 1) {
+				CssUtils.showElement(self.dom.newMessages);
+				CssUtils.hideElement(self.dom.deleteIcon);
 			}
-			//
-			// if flag newMessagesDisabled wasn't set to true  && (...))
-			if (!window.newMessagesDisabled && (self.isHidden() || isNew || !notifier.isCurrentTabActive)) {
-				CssUtils.addClass(p, self.UNREAD_MESSAGE_CLASS);
-				p.onmouseover = function (event) {
-					var pTag = event.target;
-					pTag.onmouseover = null;
-					CssUtils.removeClass(pTag, self.UNREAD_MESSAGE_CLASS);
-				}
+		}
+		// if flag newMessagesDisabled wasn't set to true  && (...))
+		if (!window.newMessagesDisabled && (self.isHidden() || isNew || !notifier.isCurrentTabActive)) {
+			CssUtils.addClass(p, self.UNREAD_MESSAGE_CLASS);
+			p.onmouseover = function (event) {
+				var pTag = event.target;
+				pTag.onmouseover = null;
+				CssUtils.removeClass(pTag, self.UNREAD_MESSAGE_CLASS);
 			}
 		}
 	};
@@ -2089,9 +2290,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		// loadMessages could be called from localStorage
 		var savedNewMessagesDisabledStatus = window.newMessagesDisabled;
 		window.newMessagesDisabled = true;
-		message.forEach(function (message) {  // dont pass function straight , foreach passes index as 2nd arg
-			self.printMessage(message);
-		});
+		message.forEach(self.printMessage);
 		window.newMessagesDisabled = savedNewMessagesDisabledStatus;
 		self.lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
 		window.sound = windowsSoundState;
@@ -2786,7 +2985,7 @@ function CallHandler(roomId) {
 		if (self.callPopup) { // if we're not call initiator
 			self.callPopupTable[message.opponentWsId] = self.callPopup.inserRow("Busy:", message.user);
 		}
-	},
+	};
 	self.sendOffer = function (newId) {
 		var messageRequest = {
 			action: 'offerCall',
@@ -3317,32 +3516,55 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 			self.closeEvents("Can't send empty file");
 		} else {
 			self.downloadBar.setStatus("Sending file...");
-			self.sliceFile(0);
+			self.reader = new window.FileReader();
+			self.offset = 0;
+			self.reader.onload = self.onFileReaderLoad;
+			self.sendCurrentSlice();
+			self.lastPrinted = 0;
 		}
 	};
-	self.sliceFile = function (offset) {
-		var reader = new window.FileReader();
-		reader.onload = (function () {
-			return function (e) {
-				if (self.sendChannel.readyState === 'open') {
-					try {
-						self.sendChannel.send(e.target.result);
-					} catch (error) {
-						self.logErr(error)();
-						growlError("Connection loss while sending file {} to user {}".format(self.fileName, self.receiverName));
-					}
-					if (self.fileSize > offset + e.target.result.byteLength) {
-						window.setTimeout(self.sliceFile, 0, offset + self.CHUNK_SIZE);
-					}
-					self.setTranseferdAmount(offset + e.target.result.byteLength);
-				} else {
-					self.downloadBar.setStatus("Error: Connection has been lost");
-					self.downloadBar.setError();
+	self.sendCurrentSlice = function() {
+		var currentSlice = self.file.slice(self.offset, self.offset + self.CHUNK_SIZE);
+		self.reader.readAsArrayBuffer(currentSlice);
+	};
+	self.logTransferProgress = function() {
+		var now = Date.now();
+		if (now - self.lastPrinted > 1000) {
+			self.lastPrinted = now;
+			return self.log.apply(self, arguments);
+		} else {
+			return function(){};
+		}
+	};
+	self.onFileReaderLoad = function (e) {
+		try {
+			if (self.sendChannel.readyState === 'open') {
+				if (self.sendChannel.bufferedAmount > 10000000) { // prevent chrome buffer overfill
+					// if it happens chrome will just close the datachannel
+					self.logTransferProgress("Buffer overflow by {}bytes, waiting to flush...",
+							bytesToSize(self.sendChannel.bufferedAmount))();
+					return window.setTimeout(self.onFileReaderLoad, 100, {target: {result: e.target.result}});
 				}
-			};
-		})(self.file);
-		var slice = self.file.slice(offset, offset + self.CHUNK_SIZE);
-		reader.readAsArrayBuffer(slice);
+				self.sendChannel.send(e.target.result);
+				var readSize = e.target.result.byteLength;
+				if (self.fileSize >= self.offset + readSize) {
+					window.setTimeout(self.sendCurrentSlice, 0);
+				} else {
+					self.log("Exiting, offset is {} now, fs: {}", self.offset, self.fileSize)();
+				}
+				self.setTranseferdAmount(self.offset + readSize);
+				self.offset += self.CHUNK_SIZE;
+				self.logTransferProgress("Transferred {}/{}", bytesToSize(self.offset), bytesToSize(self.fileSize))();
+			} else {
+				throw 'sendChannel status is {} which is not equals to "open"'.format(self.sendChannel.readyState);
+			}
+		} catch (error) {
+			self.downloadBar.setStatus("Error: Connection has been lost");
+			self.downloadBar.setError();
+			self.closeEvents("SendChannel is in status {} which is not opened".format(self.sendChannel.readyState));
+			self.logErr(error)();
+			growlError("Connection loss while sending file {} to user {}".format(self.fileName, self.receiverName));
+		}
 	};
 	self.channelOpen = function () {
 		self.downloadBar.setStatus("Sending a file");
@@ -3685,9 +3907,12 @@ function Storage() {
 	};
 	// Use both json and object repr for less JSON actions
 	self.saveMessageToStorage = function (objectItem, jsonItem) {
-		if (notifier.isTabMain() && self.actionsToSave.indexOf(objectItem.action) >= 0) {
+		if (notifier.isTabMain() && self.actionsToSave.indexOf(objectItem.action) >= 0 && cacheMessages) {
 			self.fastAddToStorage(jsonItem);
 		}
+	};
+	self.clearStorage = function() {
+		localStorage.removeItem(self.STORAGE_NAME);
 	};
 	self.fastAddToStorage = function (text) {
 		var storageData = localStorage.getItem(self.STORAGE_NAME);

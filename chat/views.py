@@ -80,8 +80,10 @@ def home(request):
 	@return:  the x intercept of the line M{y=m*x+b}.
 	"""
 	context = csrf(request)
-	context['suggestions'] = UserProfile.objects.get(id=request.user.id).suggestions
-	context['notifications'] = UserProfile.objects.get(id=request.user.id).notifications
+	up = UserProfile.objects.defer('suggestions', 'notifications', 'cache_messages').get(id=request.user.id)
+	context['suggestions'] = up.suggestions
+	context['notifications'] = up.notifications
+	context['cache_messages'] = up.cache_messages
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
 

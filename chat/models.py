@@ -92,7 +92,8 @@ class UserProfile(User):
 	name = CharField(max_length=30, null=True)
 
 	surname = CharField(max_length=30, null=True)
-	email = models.EmailField(null=True, unique=True, blank=True)
+	# tho email max length is 254 characted mysql supports unique keys only 767 bytes long (utf8 4 bytes = 767/4 = 191)
+	email = models.EmailField(null=True, unique=True, blank=True, max_length=190)
 	city = CharField(max_length=50, null=True)
 
 	birthday = DateField(null=True)
@@ -101,6 +102,7 @@ class UserProfile(User):
 	photo = FileField(upload_to=get_random_path, null=True)
 	suggestions = BooleanField(null=False, default=True)
 	notifications = BooleanField(null=False, default=True)
+	cache_messages = BooleanField(null=False, default=True)
 	logs = BooleanField(null=False, default=JS_CONSOLE_LOGS)
 	# TODO, save theme in profile? theme_name = CharField(max_length=16, null=True)
 
@@ -145,14 +147,22 @@ class Message(models.Model):
 	# DateField.auto_now
 	time = models.BigIntegerField(default=get_milliseconds)
 	content = models.TextField(null=True)
-	#img = FileField(upload_to=get_random_path, null=True)
+	# if symbol = null - no images refers this row
+	# symbol is the same as "select max(symbol) from images where message_id = message.id
+	# we store symbol in this table in case if user edits message
+	# - images that refers same message always have unique symbols
+	symbol = models.CharField(null=True, max_length=1)
 	deleted = BooleanField(default=False)
 
 
 class Image(models.Model):
+	# character in Message.content that will be replaced with this image
 	symbol = models.CharField(null=False, max_length=1)
 	message = models.ForeignKey(Message, related_name='message', null=False)
 	img = FileField(upload_to=get_random_path, null=True)
+
+	class Meta:
+		unique_together = ('symbol', 'message')
 
 
 class RoomUsers(models.Model):

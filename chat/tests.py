@@ -1,3 +1,5 @@
+import json
+import ssl
 from random import randint
 from random import random
 from threading import Thread
@@ -8,7 +10,7 @@ from django.test import TestCase
 from websocket import create_connection
 
 
-#
+
 # class ModelTest(TestCase):
 #
 # 	def test_gender(self):
@@ -48,6 +50,10 @@ from websocket import create_connection
 # 		elem = driver.find_element_by_id("userNameLabel")
 # 		self.assertRegexpMatches(elem.text, "^[a-zA-Z-_0-9]{1,16}$")
 # 		driver.close()
+from chat.global_redis import sync_redis
+from chat.settings import WEBSOCKET_PROTOCOL, ALL_ROOM_ID
+from chat.tornado.constants import VarNames, Actions
+from chat.tornado.message_creator import MessagesCreator
 
 
 class WebSocketLoadTest(TestCase):
@@ -61,21 +67,36 @@ class WebSocketLoadTest(TestCase):
 		# thread = Thread(target=call_command, args=('start_tornado',))
 		# thread.start()
 
-	def threaded_function(self, session):
-		cookies = '{}={}'.format((settings.SESSION_COOKIE_NAME, session))
-		ws = create_connection("ws://%s" % self.SITE_TO_SPAM, cookie=cookies)
+	def threaded_function(self, session, num):
+		cookies = '{}={}'.format(settings.SESSION_COOKIE_NAME, session)
+
+		ws = create_connection("{}://{}".format(WEBSOCKET_PROTOCOL, self.SITE_TO_SPAM), cookie=cookies, sslopt={"cert_reqs": ssl.CERT_NONE})
+		print("Connected #{}  with sessions {}".format(num, session))
 		for i in range(randint(30, 50)):
+			if i % 10 == 0:
+				print("{}#{} sent {}".format(session, num, i))
 			sleep(random())
-			ws.send('{"content":"%d","action":"send"}' % i)
+			ws.send(json.dumps({
+				VarNames.CONTENT: "{}".format(i),
+				VarNames.EVENT: Actions.SEND_MESSAGE,
+				VarNames.CHANNEL: ALL_ROOM_ID
+			}))
+
+	# def read_session(self):
+	# 	with open('sessionsids.txt') as f:
+	# 		lines =f.read().splitlines()
+	# 		return lines
+
 
 	def read_session(self):
-		with open('sessionsids.txt') as f:
-			lines =f.read().splitlines()
-			return lines
-
+		return [k for k in sync_redis.keys() if len(k) == 32]
 
 	def test_simple(self):
+		max_users = 10
 		for session in self.read_session():
-			for i in range(randint(10, 15)):
-				thread = Thread(target=self.threaded_function, args=(session, ))
+			max_users -= 1
+			if max_users < 0:
+				break
+			for i in range(randint(3, 7)):
+				thread = Thread(target=self.threaded_function, args=(session, i))
 				thread.start()

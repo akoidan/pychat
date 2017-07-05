@@ -305,17 +305,6 @@ function isDescendant(parent, child) {
 
 var CssUtils = {
 	visibilityClass: 'hidden',
-	hasClass: function(element, className){
-		return element.className != null && element.className.indexOf(className) >= 0;
-	},
-	addClass: function (element, className) {
-		var hasClass = CssUtils.hasClass(element, className);
-		if (!hasClass) {
-			var oldClassName = element.className;
-			element.className = "{} {}".format(oldClassName.trim(), className);
-		}
-		return hasClass;
-	},
 	deleteElement: function(target) {
 		target.parentNode.removeChild(target)
 	},
@@ -337,21 +326,14 @@ var CssUtils = {
 	isHidden: function(element) {
 		return CssUtils.hasClass(element, CssUtils.visibilityClass);
 	},
-	removeClass: function (element, className) {
-		var hasClass = CssUtils.hasClass(element, className);
-		if (hasClass) {
-			element.className = element.className.replace(className, '');
-		}
-		return hasClass;
-	},
 	showElement: function (element) {
-		return CssUtils.removeClass(element, CssUtils.visibilityClass)
+		CssUtils.removeClass(element, CssUtils.visibilityClass)
 	},
 	hideElement: function (element) {
-		return CssUtils.addClass(element, CssUtils.visibilityClass);
+		CssUtils.addClass(element, CssUtils.visibilityClass);
 	},
 	toggleVisibility: function (element) {
-		return CssUtils.toggleClass(element,CssUtils.visibilityClass);
+		return CssUtils.toggleClass(element, CssUtils.visibilityClass);
 	},
 	setVisibility: function(element, isVisible){
 		if (isVisible) {
@@ -360,17 +342,58 @@ var CssUtils = {
 			CssUtils.addClass(element, CssUtils.visibilityClass);
 		}
 	},
-	toggleClass: function (element, className) {
-		if (CssUtils.hasClass(element, className)) {
-			CssUtils.removeClass(element, className);
-			return false;
-		} else {
-			CssUtils.addClass(element, className);
-			return true;
-		}
-	}
 };
 
+(function () {
+	var cl = document.documentElement.classList;
+	if (cl && cl.add) {
+		CssUtils.addClass = function (element, className) {
+			element.classList.add(className)
+		}
+	} else {
+		CssUtils.addClass = function (element, className) {
+			if (!CssUtils.hasClass(element, className)) {
+				var oldClassName = element.className;
+				element.className += (' '+ className);
+			}
+		}
+	}
+	if (cl && cl.remove) {
+		CssUtils.removeClass = function (element, className) {
+			element.classList.remove(className)
+		}
+	} else {
+		CssUtils.removeClass = function (element, className) {
+			if (element.className) {
+				element.className.replace(new RegExp('(?:^|\\s)'+ className + '(?:\\s|$)'), ' ');
+			}
+		}
+	}
+	if (cl && cl.toggle) {
+		CssUtils.toggleClass = function (element, className) {
+			return element.classList.toggle(className)
+		}
+	} else {
+		CssUtils.toggleClass = function (element, className) {
+			if (CssUtils.hasClass(element, className)) {
+				CssUtils.removeClass(element, className);
+				return false;
+			} else {
+				CssUtils.addClass(element, className);
+				return true;
+			}
+		}
+	}
+	if (cl && cl.contains) {
+		CssUtils.hasClass = function (element, className) {
+			return element.classList.contains(className);
+		}
+	} else {
+		CssUtils.hasClass = function (element, className) {
+			return element.className && element.className.split(' ').indexOf(className) >= 0;
+		}
+	}
+})();
 
 var Growl = function (message) {
 	var self = this;

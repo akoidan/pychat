@@ -1,5 +1,5 @@
 import json
-from urllib.request import urlopen
+from chat.py2_3 import urlopen
 
 from chat import settings
 from chat.models import IpAddress

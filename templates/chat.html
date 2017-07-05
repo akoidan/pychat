@@ -1,18 +1,19 @@
 {% extends "base.html" %}
 {% block head %} {% load md5url %}
 	<script>
-		const API_URL = "{{ apiUrl }}";
-		const PICKADAY_CSS_URL = "{% md5url 'css/pikaday.css' %}";
-		const MOMENT_JS_URL = "{% md5url 'js/moment.js' %}";
-		const PICKADAY_JS_URL = "{% md5url 'js/pikaday.js' %}";
-		const AMCHART_URL = "{% md5url 'js/amcharts-all.js' %}";
-		const CHANGE_PROFILE_JS_URL = "{% md5url 'js/profile.js' %}";
-		const STATISTICS_JS_URL = "{% md5url "js/statistic.js" %}";
-		const loggedUser = "{{ username }}";
-		const loggedUserId = {{ userid }};
-		const NOTIFICATION_ICON_URL = "{% md5url 'images/favicon.ico' %}";
+		var API_URL = "{{ apiUrl }}";
+		var PICKADAY_CSS_URL = "{% md5url 'css/pikaday.css' %}";
+		var MOMENT_JS_URL = "{% md5url 'js/moment.js' %}";
+		var PICKADAY_JS_URL = "{% md5url 'js/pikaday.js' %}";
+		var AMCHART_URL = "{% md5url 'js/amcharts-all.js' %}";
+		var CHANGE_PROFILE_JS_URL = "{% md5url 'js/profile.js' %}";
+		var STATISTICS_JS_URL = "{% md5url "js/statistic.js" %}";
+		var loggedUser = "{{ username }}";
+		var loggedUserId = {{ userid }};
+		var NOTIFICATION_ICON_URL = "{% md5url 'images/favicon.ico' %}";
 		var suggestions = {{ suggestions |yesno:"true,false" }};
 		var notifications = {{ notifications |yesno:"true,false" }};
+		var cacheMessages = {{ cache_messages |yesno:"true,false" }};
 	</script>
 	<script src="{% md5url "js/smileys_data.js" %}" async></script>
 	<script src="{% md5url "js/chat.js" %}"></script>
@@ -97,15 +98,22 @@
 	</div>
 	<div id="canvasHolder" class="hidden">
 		<div>
-			<canvas id="painter"></canvas>
-			<div style="display: block">
-				<i id="paintPen" title="Pen" class="icon-brush-1"></i>
+			<div class="toolsAndCanvas">
+				<div class="painterTools">
+					<i id="paintPen" title="Pen" class="icon-brush-1 n-active-icon"></i>
+					<i id="paintEraser" class="icon-eraser n-active-icon" title="Eraser"></i>
+					<i title="Move" id="paintMove" class="icon-move  n-active-icon"></i>
+					<i title="Clear" id="paintClear" class="icon-trash-circled"></i>
+				</div>
+				<div class="canvasWrapper" id="canvasWrapper">
+					<canvas id="painter"></canvas>
+				</div>
+			</div>
+			<div class="bottomTools">
 				<i class="icon-color-adjust" title="Pick color" id="paintPickerIcon"></i>
 				<input type="color" id="paintPicker" value="#ff0000"/>
-				<i id="paintEraser" class="icon-eraser" title="Eraser"></i>
 				<input type="range" id="paintRadius" title="Line width" step="1" max="32" min="1" value="3"/>
-				<input type="range" id="paintOpacity" title="Opacity" step="0.025" max="1" min="0.46416" value="1"/>
-				<i title="Clear" id="paintClear" class="icon-trash-circled"></i>
+				<input type="range" id="paintOpacity" title="Opacity" step="0.025" max="1" min="0.01" value="1"/>
 				<i title="Send" id="paintSend" class="icon-send"></i>
 			</div>
 		</div>
@@ -113,7 +121,7 @@
 	<div id="userMessageWrapper" class="hidden" style="position: relative">
 		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
 		<i class="icon-picture" id="imgInputIcon" title="Attach Image File"></i>
-		<i class="icon-brush" title="Draw an Image" onclick="painter.show()"></i>
+		<i class="icon-brush" title="Draw an Image" id="painterIcon"></i>
 		<i class="icon-smile" title="Add a smile :)" onmousedown="smileyUtil.toggleSmileys(event)"></i>
 		<div contenteditable="true" id="usermsg" onkeydown="channelsHandler.checkAndSendMessage(event)"></div>
 	{% comment %}TODO which chat variable to use?{% endcomment %}

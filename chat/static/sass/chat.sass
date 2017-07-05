@@ -50,9 +50,6 @@ fieldset
 		top: 1px
 		height: 16px
 
-.message-img-holder
-	display: block
-
 
 #wrapper
 	@include flex(1)
@@ -78,7 +75,7 @@ fieldset
 	a:hover
 		text-decoration: underline
 
-	img:not([code])
+	img.B4j2ContentEditableImg
 		max-width: calc(100% - 25px)
 		max-height: 300px
 		display: block
@@ -202,6 +199,44 @@ fieldset
 		&.offline
 			display: none
 
+.toolsAndCanvas
+	display: flex
+	.painterTools
+		display: flex
+		margin-left: -5px
+		flex-direction: column
+		*
+			display: flex
+			padding: 5px 5px 5px 0
+
+	.canvasWrapper
+		overflow: auto
+		width: 700px
+		height: 500px
+		max-height: calc(90vh - 100px)
+		max-width: calc(90vh - 100px)
+		border: 1px solid transparent
+		//border: 1px solid #697075
+		&::-webkit-scrollbar
+			height: 10px
+			width: 10px
+		&::-webkit-scrollbar-thumb
+			height: 10px
+			background-color: #5d738e
+			width: 10px
+		&::-webkit-scrollbar-corner
+			background-color: #1c1c1c
+		canvas
+			background: #333
+
+
+#paintRadius::-webkit-slider-runnable-track
+	background-size: 10% 100%, 100% 100%
+
+.bottomTools
+	margin-left: 20px
+
+
 #onlineStatus
 	padding: 0 10px
 
@@ -246,6 +281,10 @@ fieldset
 	li
 		padding: 0 0 0 5px
 		border-radius: 2px
+		text-overflow: ellipsis
+		overflow: hidden
+		max-width: 250px
+		white-space: nowrap
 		@extend %hovered-user-room
 
 #addUserHolder
@@ -348,11 +387,17 @@ fieldset
 	padding: 0
 	:visibility hidden
 
-#paintEraser
+%activePaintIcon
 	color: #ff8383
 
 .n-active-icon
 	color: $main-color !important
+
+#paintEraser
+	@extend %activePaintIcon
+
+#paintMove
+	@extend %activePaintIcon
 
 #paintSend
 	float: right
@@ -465,6 +510,12 @@ fieldset
 	cursor: pointer
 	span
 		display: inline-block
+		text-overflow: ellipsis
+		overflow: hidden
+		max-width: 275px
+		float: left
+		margin-left: 50px
+		white-space: nowrap
 	.icon-cancel
 		float: right
 		color: #b13533
@@ -748,7 +799,7 @@ fieldset
 		div, span
 			display: block
 
-@import "chat-videos"
+@import "partials/chat-videos"
 
 .icon-webrtc-cont
 	display: none
@@ -820,16 +871,6 @@ fieldset
 		text-overflow: ellipsis
 		max-width: 250px
 		overflow: hidden
-
-#painter
-	width: 400px
-	height: 300px
-	height: calc(90vh - 100px)
-	width: calc(90vh - 100px)
-	background: #333
-
-#paintRadius::-webkit-slider-runnable-track
-	background-size: 10% 100%, 100% 100%
 
 .enterFullScreenHolder
 	position: relative

@@ -11,19 +11,21 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 from django.core.mail import send_mail
 from django.core.validators import validate_email
+from django.db import IntegrityError
+from django.db import connection, OperationalError, InterfaceError
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from chat import local
 from chat import settings
-from chat.models import User, UserProfile, Verification, RoomUsers, IpAddress
+from chat.models import Room, get_milliseconds
+from chat.models import User
+from chat.models import UserProfile, Verification, RoomUsers, IpAddress
+from chat.py2_3 import urlopen
 from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID
-
-try:  # py2
-	from urllib import urlopen
-except ImportError:  # py3
-	from urllib.request import urlopen
+from chat.tornado.constants import RedisPrefix
+from chat.tornado.constants import VarNames
 
 USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
 API_URL = getattr(settings, "IP_API_URL", None)
@@ -40,6 +42,85 @@ def is_blank(check_str):
 		return False
 	else:
 		return True
+
+
+def get_users_in_current_user_rooms(user_id):
+	user_rooms = Room.objects.filter(users__id=user_id, disabled=False).values('id', 'name')
+	res = {room['id']: {
+			VarNames.ROOM_NAME: room['name'],
+			VarNames.ROOM_USERS: {}
+		} for room in user_rooms}
+	room_ids = (room_id for room_id in res)
+	rooms_users = User.objects.filter(rooms__in=room_ids).values('id', 'username', 'sex', 'rooms__id')
+	for user in rooms_users:
+		dict = res[user['rooms__id']][VarNames.ROOM_USERS]
+		dict[user['id']] = RedisPrefix.set_js_user_structure(user['username'], user['sex'])
+	return res
+
+
+def get_or_create_room(channels, room_id, user_id):
+	if room_id not in channels:
+		raise ValidationError("Access denied, only allowed for channels {}".format(channels))
+	room = do_db(Room.objects.get, id=room_id)
+	if room.is_private:
+		raise ValidationError("You can't add users to direct room, create a new room instead")
+	try:
+		Room.users.through.objects.create(room_id=room_id, user_id=user_id)
+	except IntegrityError:
+		raise ValidationError("User is already in channel")
+	return room
+
+
+def update_room(room_id, disabled):
+	if not disabled:
+		raise ValidationError('This room already exist')
+	else:
+		Room.objects.filter(id=room_id).update(disabled=False)
+
+
+def create_room_users(me, other):
+	room = Room()
+	room.save()
+	room_id = room.id
+	if me == other:
+		RoomUsers(user_id=me, room_id=room_id).save()
+	else:
+		RoomUsers.objects.bulk_create([
+			RoomUsers(user_id=other, room_id=room_id),
+			RoomUsers(user_id=me, room_id=room_id),
+		])
+	return room_id
+
+
+def validate_edit_message(self_id, message):
+	if message.sender_id != self_id:
+		raise ValidationError("You can only edit your messages")
+	if message.time + 600000 < get_milliseconds():
+		raise ValidationError("You can only edit messages that were send not more than 10 min ago")
+	if message.deleted:
+		raise ValidationError("Already deleted")
+
+
+def do_db(callback, *args, **kwargs):
+	try:
+		return callback(*args, **kwargs)
+	except (OperationalError, InterfaceError) as e:
+		if 'MySQL server has gone away' in str(e):
+			logger.warning('%s, reconnecting' % e)
+			connection.close()
+			return callback(*args, **kwargs)
+		else:
+			raise e
+
+
+def execute_query(query, *args, **kwargs):
+	cursor = connection.cursor()
+	cursor.execute(query, *args, **kwargs)
+	desc = cursor.description
+	return [
+		dict(zip([col[0] for col in desc], row))
+		for row in cursor.fetchall()
+	]
 
 
 def hide_fields(post, fields, huge=False, fill_with='****'):
@@ -212,6 +293,10 @@ def extract_photo(image_base64, filename=None):
 		size=sys.getsizeof(f),
 		charset=None)
 	return image
+
+
+def get_max_key(dictionary):
+	return max(dictionary.keys()) if dictionary else None
 
 
 def create_user_model(user):

@@ -69,12 +69,13 @@ TODO
 * replace `new Date().getTime()` with `Date.now()`
 * add drawing lines with alpha by saving image
 * check transfer files over net - doesnt work, while localhost works
+* Just a note https://codepen.io/techslides/pen/zowLd , i guess transform: scale is better https://stackoverflow.com/questions/11332608/understanding-html-5-canvas-scale-and-translate-order https://stackoverflow.com/questions/16687023/bug-with-transform-scale-and-overflow-hidden-in-chrome
+* Add retry file send option. continue from spot we finished Or maybe autoreconnect automatically
 * remove setHeaderTest, highlight current page icos. Always display username in right top
 * Painter doesn't work on mobile devices (add ontouch)
 * add timeout to call. (finish after timeout) Display busy if calling to SAME chanel otherwise it will show multiple videos
 * Replace opacity in css to darken and lighten color function of sass
 * file transfer - add ability to click on user on receivehandler popup (draggable)
-* Ability to restore minimized draggable
 * Add showing time left and current send speed to file transfer dialog
 * add message queue if socketed is currently disconnected ???
 * Add link to gihub in console
@@ -92,7 +93,6 @@ TODO
 * add email confirmation for username or password change
 * remember if user has camera/mic and autoset values after second call
 * android play() can only be initiated by a user gesture.
-* insecure images on usermessage editable div prevent sending messages
 * add 404page
 * https://code.djangoproject.com/ticket/25489
 * http://stackoverflow.com/a/18843553/3872976
