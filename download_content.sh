@@ -65,8 +65,8 @@ minify_js() {
 
 }
 compile_sass() {
-    if ! type "sass" &> /dev/null; then
-     >&2 echo "You need to install sass to be able to use stylesheets"
+    if ! type "sassc" &> /dev/null; then
+     >&2 echo "You need to install sassc to be able to use stylesheets"
      exit 1
     fi
     sass_files=($(ls "$SASS_DIR"/*.sass))
@@ -75,7 +75,7 @@ compile_sass() {
     for i in "${sass_files[@]}"
     do
         name_no_ext=$(basename $i .sass)
-        sass --no-cache --update "$i":"$CSS_DIR/$name_no_ext.css" --style compressed
+        sass "$i" "$CSS_DIR/$name_no_ext.css"
     done
     cd "$PROJECT_ROOT"
 }

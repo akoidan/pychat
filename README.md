@@ -37,7 +37,7 @@ Installation:
  1. Install [python](https://www.python.org/downloads/) with pip. Any version **Python2.7** or **Python 3.x** both are supported
  2. Add **pip** and **python** to `PATH` variable.
  3. Install [redis](https://github.com/MSOpenTech/redis/releases). Get the newest version or at least 2.8.
- 4. Install [ruby](http://rubyinstaller.org/) and run `gem install sass` from command line as admin. Add **sass** command path to `PATH` variable
+ 4. Install [sassc](http://sass-lang.com/libsass). Add **sassc** command path to `PATH` variable.
  5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector. 
  6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can downloads download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
  7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`). 
@@ -46,13 +46,12 @@ Installation:
 ----------------------------------
  1. Install required packages: `apt-get install python pip mysql-server ruby`
  2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
- 3. Install **sass**: `gem install sass`
+ 3. Install **sassc**. You can find instructions [here](http://crocodillon.com/blog/how-to-install-sassc-and-libsass-on-ubuntu). Or maybe you can find packet in ubuntu repository. Alternatively you can use any other sass. 
 
 [Archlinux](https://www.archlinux.org/):
 ------------------------------------------
- 1. Install required packages: `pacman -S python pip redis mariadb ruby`
+ 1. Install required packages: `pacman -S python pip redis mariadb ruby sassc`
  2. Follow the [database guide](https://wiki.archlinux.org/index.php/MySQL) to configure it if you need. 
- 5. Install **sass**: `gem install sass`.
 
 [CentOs](https://www.centos.org/)
 ---------------------------------------
