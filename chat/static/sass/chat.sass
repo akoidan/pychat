@@ -212,6 +212,7 @@ fieldset
 	.canvasWrapper
 		overflow: auto
 		width: 700px
+		position: relative
 		height: 500px
 		max-height: calc(90vh - 100px)
 		max-width: calc(90vh - 100px)
@@ -228,7 +229,14 @@ fieldset
 			background-color: #1c1c1c
 		canvas
 			background: #333
-
+		.text
+			position: absolute
+			border: 1px dashed
+			width: auto
+			min-width: 5px
+			overflow: hidden
+			word-wrap: normal
+			padding: 0 1px
 
 #paintRadius::-webkit-slider-runnable-track
 	background-size: 10% 100%, 100% 100%
