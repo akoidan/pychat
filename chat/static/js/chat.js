@@ -304,8 +304,6 @@ function Painter() {
 	self.current = null;
 	self.changeColor = function (event) {
 		self.ctx.strokeStyle = event.target.value;
-		self.dom.pen.style.color = self.ctx.strokeStyle;
-		self.tools[self.mode].setCursor();
 	};
 	self.log = function () {
 		var args = Array.prototype.slice.call(arguments);
@@ -459,6 +457,10 @@ function Painter() {
 		pen: new (function(){
 			var tool = this;
 			tool.icon =  $('paintPen');
+			tool.changeColor = function(e) {
+				tool.icon.style.color = self.ctx.strokeStyle;
+				self.setCursor(e.target.value, '')
+			};
 			tool.setCursor = function () {
 				self.setCursor(self.ctx.strokeStyle, '');
 			};
@@ -466,6 +468,7 @@ function Painter() {
 				CssUtils.showElement(self.dom.opacity);
 				CssUtils.showElement(self.dom.colorIcon);
 				CssUtils.showElement(self.dom.range);
+				self.dom.color.addEventListener('input', tool.changeColor, false);
 				tool.icon.style.color = self.ctx.strokeStyle;
 				self.ctx.globalCompositeOperation = "source-over";
 			};
@@ -477,6 +480,7 @@ function Painter() {
 				tool.onMouseMove(e)
 			};
 			tool.onDeactivate = function () {
+				self.dom.color.removeEventListener('input', tool.changeColor, false);
 				CssUtils.hideElement(self.dom.opacity);
 				CssUtils.hideElement(self.dom.colorIcon);
 				CssUtils.hideElement(self.dom.range);
@@ -523,13 +527,24 @@ function Painter() {
 		}),
 		text: new (function() {
 			var tool = this;
+			tool.span = $('paintTextSpan');
 			tool.icon = $('paintText');
 			tool.bufferHandler = true;
 			tool.setCursor = function () {
 				self.dom.canvas.style.cursor = 'crosshair';
 			};
+			tool.onActivate = function () {
+				self.dom.container.removeEventListener('keypress', self.contKeyPress);
+			};
+			tool.onDeactivate = function () {
+				self.dom.container.addEventListener('keypress', self.contKeyPress);
+			};
 			tool.onMouseDown = function (e) {
+				CssUtils.showElement(tool.span);
+				tool.span.style.top = e.offsetY + 'px';
+				tool.span.style.left = e.offsetX + 'px';
 				tool.lastCoord = {x: e.pageX, y: e.pageY};
+				tool.span.focus();
 			};
 		})
 	};
