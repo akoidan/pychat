@@ -104,12 +104,16 @@
 					<i id="paintEraser" class="icon-eraser n-active-icon" title="Eraser"></i>
 					<i title="Move" id="paintMove" class="icon-move  n-active-icon"></i>
 					<i id="paintText" class="icon-text n-active-icon" title="Insert text"></i>
-					<i title="Zoom IN (you also can zoom with mouse wheel)" id="paintZoomIn" class="icon-zoom-in  n-active-icon"></i>
-					<i title="Zoom OUT (you also can zoom with mouse wheel)" id="paintZoomOut" class="icon-zoom-out  n-active-icon"></i>
+					<i title="Zoom IN (ctrl+ mouse wheel)" id="paintZoomIn" class="icon-zoom-in"></i>
+					<i title="Zoom OUT (ctrl + mouse wheel)" id="paintZoomOut" class="icon-zoom-out"></i>
+					<i title="Undo (ctrl+Z)" id="paintUndo" class="icon-undo"></i>
+					<i title="Redo (ctrl+Y)" id="paintRedo" class="icon-redo"></i>
 					<i title="Clear" id="paintClear" class="icon-trash-circled"></i>
 				</div>
-				<div class="canvasWrapper" id="canvasWrapper">
-					<canvas id="painter"></canvas>
+				<div class="forText">
+					<div class="canvasWrapper" id="canvasWrapper">
+						<canvas id="painter"></canvas>
+					</div>
 					<span class="text hidden" tabindex="-1" id="paintTextSpan" contenteditable="true"></span>
 				</div>
 			</div>
@@ -118,6 +122,7 @@
 				<input type="color" id="paintPicker" value="#ff0000"/>
 				<input type="range" id="paintRadius" title="Line width" step="1" max="32" min="1" value="3"/>
 				<input type="range" id="paintOpacity" title="Opacity" step="0.025" max="1" min="0.01" value="1"/>
+				<select id="paintFont" class="hidden"></select>
 				<i title="Send" id="paintSend" class="icon-send"></i>
 			</div>
 		</div>

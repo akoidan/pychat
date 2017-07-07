@@ -199,6 +199,21 @@ fieldset
 		&.offline
 			display: none
 
+.bottomTools
+	margin-left: 20px
+	height: 30px
+	padding: 5px
+
+	#paintFont
+		display: inline-block
+		text-decoration: none
+		text-overflow: ellipsis
+		overflow: hidden
+		white-space: nowrap
+		width: 202px
+		height: 32px
+		border: 1px solid grey
+
 .toolsAndCanvas
 	display: flex
 	.painterTools
@@ -208,41 +223,38 @@ fieldset
 		*
 			display: flex
 			padding: 5px 5px 5px 0
-
-	.canvasWrapper
-		overflow: auto
-		width: 700px
+	.forText
 		position: relative
-		height: 500px
-		max-height: calc(90vh - 100px)
-		max-width: calc(90vh - 100px)
-		border: 1px solid transparent
-		//border: 1px solid #697075
-		&::-webkit-scrollbar
-			height: 10px
-			width: 10px
-		&::-webkit-scrollbar-thumb
-			height: 10px
-			background-color: #5d738e
-			width: 10px
-		&::-webkit-scrollbar-corner
-			background-color: #1c1c1c
-		canvas
-			background: #333
+		overflow: hidden
 		.text
 			position: absolute
 			border: 1px dashed
 			width: auto
 			min-width: 5px
-			overflow: hidden
 			word-wrap: normal
 			padding: 0 1px
+		.canvasWrapper
+			overflow: auto
+			width: 700px
+			height: 500px
+			max-height: calc(90vh - 100px)
+			max-width: calc(90vh - 100px)
+			border: 1px solid transparent
+			//border: 1px solid #697075
+			&::-webkit-scrollbar
+				height: 10px
+				width: 10px
+			&::-webkit-scrollbar-thumb
+				height: 10px
+				background-color: #5d738e
+				width: 10px
+			&::-webkit-scrollbar-corner
+				background-color: #1c1c1c
+			canvas
+				background: #333
 
 #paintRadius::-webkit-slider-runnable-track
 	background-size: 10% 100%, 100% 100%
-
-.bottomTools
-	margin-left: 20px
 
 
 #onlineStatus
