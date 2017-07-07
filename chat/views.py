@@ -337,27 +337,3 @@ class RegisterView(View):
 			logger.debug('Rejecting request because "%s"', message)
 		return HttpResponse(message, content_type='text/plain')
 
-
-@require_http_methods('GET')
-def valentine(request):
-	"""
-	Login or logout navbar is creates by means of create_nav_page
-	@return:  the x intercept of the line M{y=m*x+b}.
-	"""
-	return render_to_response('valentine.html', csrf(request), context_instance=RequestContext(request))
-
-@require_http_methods('GET')
-def birthday25(request):
-	"""
-	Login or logout navbar is creates by means of create_nav_page
-	@return:  the x intercept of the line M{y=m*x+b}.
-	"""
-	return render_to_response('birthday.html', csrf(request), context_instance=RequestContext(request))
-
-@require_http_methods('GET')
-def start_valentine(request):
-	"""
-	Login or logout navbar is creates by means of create_nav_page
-	@return:  the x intercept of the line M{y=m*x+b}.
-	"""
-	return render_to_response('startValentine.html', csrf(request), context_instance=RequestContext(request))
