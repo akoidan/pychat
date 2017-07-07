@@ -18,7 +18,6 @@ JS_DIR="$STATIC_DIR/js"
 CSS_DIR="$STATIC_DIR/css"
 FONT_DIR="$STATIC_DIR/font"
 SOUNDS_DIR="$STATIC_DIR/sounds"
-VAL_DIR="$STATIC_DIR/valentine"
 IMAGES_DIR="$STATIC_DIR/images"
 SASS_DIR="$STATIC_DIR/sass"
 # Implementing installed files
@@ -46,14 +45,6 @@ declare -a files=(\
     "$CSS_DIR/main.css" \
     "$CSS_DIR/chat.css"\
     "$CSS_DIR/register.css"\
-    "$VAL_DIR/Love_and_Passion.ttf"\
-    "$VAL_DIR/teddy.gif"\
-    "$VAL_DIR/v2.ttf"\
-    "$VAL_DIR/videoplayback.mp3"\
-    "$VAL_DIR/bloone.ttf"\
-    "$VAL_DIR/cupcake.ttf"\
-    "$VAL_DIR/happyBirthdaySong.mp3"\
-    "$VAL_DIR/tedya.jpg"\
     "$JS_DIR/amcharts-all.js"
 )
 
