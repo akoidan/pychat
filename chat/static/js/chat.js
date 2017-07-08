@@ -745,12 +745,12 @@ function Painter() {
 				self.buffer.startAction();
 				self.ctx.fillStyle = self.ctx.strokeStyle;
 				self.ctx.font = "{}px {}".format(5 + self.ctx.lineWidth, self.ctx.fontFamily);
-				self.ctx.fillText(tool.span.textContent, tool.lastCoord.x + 2, self.ctx.lineWidth + tool.lastCoord.y + 1);
+				self.ctx.fillText(tool.span.textContent, tool.lastCoord.x, self.ctx.lineWidth + tool.lastCoord.y);
 				self.buffer.finishAction();
 				self.setMode('pen');
 			};
 			tool.onZoomChange = function () {
-				tool.span.style.fontSize = (self.zoom * (self.ctx.lineWidth + 5)) + 'px'
+				tool.span.style.fontSize = (self.zoom * (self.ctx.lineWidth + 5)) + 'px';
 				tool.span.style.top = (tool.originOffest.y * self.zoom  / tool.originOffest.z) + 'px';
 				tool.span.style.left = (tool.originOffest.x * self.zoom  / tool.originOffest.z) + 'px';
 			};
@@ -773,8 +773,8 @@ function Painter() {
 					y: e.offsetY,
 					z: self.zoom,
 				};
-				tool.span.style.top = e.offsetY + 'px';
-				tool.span.style.left = e.offsetX + 'px';
+				tool.span.style.top = tool.originOffest.y +'px';
+				tool.span.style.left = tool.originOffest.x +'px';
 				tool.lastCoord = self.helper.getXY(e);
 				setTimeout(function (e) {
 					tool.span.focus()
