@@ -275,9 +275,27 @@ fieldset
 		*
 			display: flex
 			padding: 5px 5px 5px 0
-	.forText
+	.canvasWrapper
 		position: relative
-		overflow: hidden
+		overflow: auto
+		width: 700px
+		background-color: #333
+		height: 500px
+		max-height: calc(90vh - 100px)
+		max-width: calc(90vh - 100px)
+		border: 1px solid transparent
+		//border: 1px solid #697075
+		&::-webkit-scrollbar
+			height: 10px
+			width: 10px
+		&::-webkit-scrollbar-thumb
+			height: 10px
+			background-color: #5d738e
+			width: 10px
+		&::-webkit-scrollbar-corner
+			background-color: #1c1c1c
+		canvas
+			background: #333
 		.text
 			position: absolute
 			border: 1px dashed
@@ -285,26 +303,6 @@ fieldset
 			min-width: 5px
 			word-wrap: normal
 			padding: 0 1px
-		.canvasWrapper
-			overflow: auto
-			width: 700px
-			background-color: #333
-			height: 500px
-			max-height: calc(90vh - 100px)
-			max-width: calc(90vh - 100px)
-			border: 1px solid transparent
-			//border: 1px solid #697075
-			&::-webkit-scrollbar
-				height: 10px
-				width: 10px
-			&::-webkit-scrollbar-thumb
-				height: 10px
-				background-color: #5d738e
-				width: 10px
-			&::-webkit-scrollbar-corner
-				background-color: #1c1c1c
-			canvas
-				background: #333
 
 
 #onlineStatus

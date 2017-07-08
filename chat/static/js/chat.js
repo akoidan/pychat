@@ -385,12 +385,12 @@ function Painter() {
 		initCanvas: function () {
 			[
 				{dom: self.dom.canvas, listener: 'mousedown', handler: 'onmousedown'},
-				{dom: self.dom.container, listener: 'keypress', handler: 'contKeyPress'},
-				{dom: self.dom.container, listener: 'paste', handler: 'canvasImagePaste'},
+				{dom: self.dom.container, listener: 'keypress', handler: 'contKeyPress', params: false},
+				{dom: self.dom.container, listener: 'paste', handler: 'canvasImagePaste', params: false},
 				{dom: self.dom.canvasWrapper, listener: mouseWheelEventName, handler: 'onmousewheel'
 					, params: {passive: false}},
 				{dom: self.dom.container, listener: 'drop', handler: 'canvasImageDrop', params: {passive: false}}
-			].forEach(function(e){
+			].forEach(function (e) {
 				e.dom.addEventListener(e.listener, self.events[e.handler], e.params);
 			});
 			self.dom.painterIcon.onclick = self.actions.initAndShow;
@@ -514,6 +514,9 @@ function Painter() {
 					self.zoom = 1;
 				}
 			}
+			if (self.tools[self.mode].onZoomChange) {
+				self.tools[self.mode].onZoomChange(self.zoom);
+			}
 			self.dom.canvas.style.width = self.dom.canvas.width * self.zoom + 'px';
 			self.dom.canvas.style.height = self.dom.canvas.height * self.zoom + 'px';
 		},
@@ -587,6 +590,7 @@ function Painter() {
 			self.dom.canvasWrapper.scrollLeft = newScrollWidth;
 		},
 		contKeyPress: function (event) {
+			self.log("keyPress: {} ({})", event.keyCode, event.code);
 			if (event.keyCode === 13) {
 				self.actions.sendImage();
 				// event.code if keyboard is different (e.g Russian)
@@ -627,7 +631,7 @@ function Painter() {
 				self.ctx.globalAlpha = 1;
 				self.ctx.globalCompositeOperation = "destination-out";
 			};
-			tool.onDeactivate = function() {
+			tool.onDeactivate = function () {
 				self.ctx.globalAlpha = tool.tmpAlpha;
 			};
 			tool.onMouseDown = function (e) {
@@ -718,38 +722,45 @@ function Painter() {
 			tool.icon = $('paintText');
 			tool.apply = $('paintApplyText');
 			//prevent self.events.contKeyPress
-			tool.span.addEventListener('keypress', function (e) { e.stopPropagation() });
+			tool.span.addEventListener('keypress', function (e) {
+				e.stopPropagation()
+			});
 			tool.bufferHandler = true;
-			tool.onChangeFont = function(e) {
+			tool.onChangeFont = function (e) {
 				tool.span.style.fontFamily = e.target.value;
 			};
-			tool.onActivate = function() { // TODO this looks bad
+			tool.onActivate = function () { // TODO this looks bad
 				tool.onChangeFont({target: {value: self.ctx.fontFamily}});
 				tool.onChangeRadius({target: {value: self.ctx.lineWidth}});
-				tool.onChangeOpacity({target: {value: self.ctx.globalAlpha*100}});
+				tool.onChangeOpacity({target: {value: self.ctx.globalAlpha * 100}});
 				tool.onChangeColor({target: {value: self.ctx.strokeStyle}});
 				tool.span.innerHTML = '';
 				CssUtils.showElement(tool.apply);
 			};
-			tool.onDeactivate = function() {
+			tool.onDeactivate = function () {
 				CssUtils.hideElement(tool.apply);
 				CssUtils.hideElement(tool.span);
 			};
-			tool.apply.onclick = function() {
+			tool.apply.onclick = function () {
 				self.buffer.startAction();
 				self.ctx.fillStyle = self.ctx.strokeStyle;
-				self.ctx.font = "{}px {}".format(self.ctx.lineWidth, self.ctx.fontFamily);
-				self.ctx.fillText(tool.span.textContent, tool.lastCoord.x, tool.lastCoord.y);
+				self.ctx.font = "{}px {}".format(5 + self.ctx.lineWidth, self.ctx.fontFamily);
+				self.ctx.fillText(tool.span.textContent, tool.lastCoord.x + 2, self.ctx.lineWidth + tool.lastCoord.y + 1);
 				self.buffer.finishAction();
 				self.setMode('pen');
+			};
+			tool.onZoomChange = function () {
+				tool.span.style.fontSize = (self.zoom * (self.ctx.lineWidth + 5)) + 'px'
+				tool.span.style.top = (tool.originOffest.y * self.zoom  / tool.originOffest.z) + 'px';
+				tool.span.style.left = (tool.originOffest.x * self.zoom  / tool.originOffest.z) + 'px';
 			};
 			tool.setCursor = function () {
 				self.dom.canvas.style.cursor = 'crosshair';
 			};
-			tool.onChangeRadius = function(e) {
-				tool.span.style.fontSize = 5 + parseInt(e.target.value)  + 'px';
+			tool.onChangeRadius = function (e) {
+				tool.span.style.fontSize = (self.zoom * (5 + parseInt(e.target.value))) + 'px';
 			};
-			tool.onChangeOpacity = function(e) {
+			tool.onChangeOpacity = function (e) {
 				tool.span.style.opacity = e.target.value / 100
 			};
 			tool.onChangeColor = function (e) {
@@ -757,6 +768,11 @@ function Painter() {
 			};
 			tool.onMouseDown = function (e) {
 				CssUtils.showElement(tool.span);
+				tool.originOffest = {
+					x: e.offsetX,
+					y: e.offsetY,
+					z: self.zoom,
+				};
 				tool.span.style.top = e.offsetY + 'px';
 				tool.span.style.left = e.offsetX + 'px';
 				tool.lastCoord = self.helper.getXY(e);
@@ -809,7 +825,7 @@ function Painter() {
 				self.ctx.putImageData(restore, 0, 0);
 			}
 		};
-		tool.getCanvasImage = function() {
+		tool.getCanvasImage = function () {
 			return self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height)
 		};
 		tool.clear = function () {
@@ -869,7 +885,7 @@ function Painter() {
 		self.superHide();
 		document.body.removeEventListener('mouseup', self.events.onmouseup, false);
 	};
-	Object.keys(self.init).forEach(function(k) {
+	Object.keys(self.init).forEach(function (k) {
 		self.init[k]()
 	});
 }
