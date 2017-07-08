@@ -290,30 +290,30 @@ function Painter() {
 	self.instruments = {
 		color: {
 			holder: $('paintColor'),
-			handler: 'changeColor',
+			handler: 'onChangeColor',
 			ctxSetter: function (v) {
 				self.ctx.strokeStyle = v;
 			},
-			range: document.querySelector('#paintColor input[range]')
 		},
 		opacity: {
 			holder: $('paintOpacity'),
-			handler: 'changeOpacity',
+			handler: 'onChangeOpacity',
+			range: true,
 			ctxSetter: function (v) {
 				self.ctx.globalAlpha = v / 100;
-			},
-			range: document.querySelector('#paintOpacity input[range]')
+			}
 		},
 		width: {
+			range: true,
 			holder: $('paintRadius'),
-			handler: 'changeRadius',
+			handler: 'onChangeRadius',
 			ctxSetter: function (v) {
 				self.ctx.lineWidth = v;
-			}
+			},
 		},
 		font: {
 			holder: $('paintFont'),
-			handler: 'changeFont',
+			handler: 'onChangeFont',
 			ctxSetter: function (v) {
 				self.ctx.fontFamily = v;
 			}
@@ -321,16 +321,36 @@ function Painter() {
 	};
 	self.ctx = self.dom.canvas.getContext('2d');
 	self.init = {
-		initInstruments: function () {
+		initInstruments: function () { // TODO this looks bad
 			Object.keys(self.instruments).forEach(function (k) {
 				var instr = self.instruments[k];
 				instr.value = instr.holder.querySelector('.value')
 				instr.ctxSetter(instr.value.value);
-				instr.value.addEventListener('change', function (e) {
+				instr.value.addEventListener('input', function (e) {
+					if (instr.range && instr.value.value.length > 2 && this.value != 100) { // != isntead !== in case it's a string
+						instr.value.value = this.value.slice(0, 2)
+					}
 					instr.ctxSetter(e.target.value);
 					var handler = self.tools[self.mode][instr.handler];
 					handler && handler(e);
-				})
+					if (instr.range) {
+						instr.range.value = instr.value.value;
+						fixInputRangeStyle(instr.range);
+					}
+				});
+				if (instr.range) {
+					instr.value.addEventListener('keypress', function (e) {
+						var charCode = e.which || e.keyCode;
+						return charCode > 47 && charCode < 58;
+					});
+					instr.range = instr.holder.querySelector('input[type=range]');
+					instr.range.addEventListener('input', function (e) {
+						instr.value.value = instr.range.value;
+						instr.ctxSetter(e.target.value);
+						var handler = self.tools[self.mode][instr.handler];
+						handler && handler(e);
+					});
+				}
 			});
 		},
 		setContext: function () {
@@ -351,10 +371,10 @@ function Painter() {
 		},
 		initButtons: function () {
 			var buttons = {
-				paintZoomIn: self.zoomIn,
-				paintZoomOut: self.zoomOut,
-				paintSend: self.sendImage,
-				paintClear: self.clearCanvas,
+				paintZoomIn: self.actions.zoomIn,
+				paintZoomOut: self.actions.zoomOut,
+				paintSend: self.actions.sendImage,
+				paintClear: self.actions.clearCanvas,
 				paintUndo: self.buffer.undo,
 				paintRedo: self.buffer.redo
 			};
@@ -437,7 +457,7 @@ function Painter() {
 			var charCode = evt.which || evt.keyCode;
 			return charCode > 47 && charCode < 58;
 		},
-		trimImage: function () {
+		trimImage: function () { // TODO this looks bad
 			var copy = document.createElement('canvas').getContext('2d'),
 					pixels = self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height),
 					l = pixels.data.length,
@@ -599,7 +619,7 @@ function Painter() {
 			tool.setCursor = function () {
 				self.helper.setCursor('#aaaaaa', ' stroke="black" stroke-width="2"', self.ctx.lineWidth);
 			};
-			tool.changeRadius = function (e) {
+			tool.onChangeRadius = function (e) {
 				tool.setCursor();
 			};
 			tool.onActivate = function () {
@@ -628,13 +648,13 @@ function Painter() {
 		pen: new (function () {
 			var tool = this;
 			tool.icon = $('paintPen');
-			tool.changeColor = function (e) {
+			tool.onChangeColor = function (e) {
 				tool.setCursor();
 			};
-			tool.changeRadius = function (e) {
+			tool.onChangeRadius = function (e) {
 				tool.setCursor();
 			};
-			tool.changeOpacity = function (e) {
+			tool.onChangeOpacity = function (e) {
 				tool.setCursor();
 			};
 			tool.setCursor = function () {
@@ -696,29 +716,50 @@ function Painter() {
 			var tool = this;
 			tool.span = $('paintTextSpan');
 			tool.icon = $('paintText');
+			tool.apply = $('paintApplyText');
 			//prevent self.events.contKeyPress
 			tool.span.addEventListener('keypress', function (e) { e.stopPropagation() });
 			tool.bufferHandler = true;
-			tool.changeFont = function(e) {
+			tool.onChangeFont = function(e) {
 				tool.span.style.fontFamily = e.target.value;
+			};
+			tool.onActivate = function() { // TODO this looks bad
+				tool.onChangeFont({target: {value: self.ctx.fontFamily}});
+				tool.onChangeRadius({target: {value: self.ctx.lineWidth}});
+				tool.onChangeOpacity({target: {value: self.ctx.globalAlpha*100}});
+				tool.onChangeColor({target: {value: self.ctx.strokeStyle}});
+				tool.span.innerHTML = '';
+				CssUtils.showElement(tool.apply);
+			};
+			tool.onDeactivate = function() {
+				CssUtils.hideElement(tool.apply);
+				CssUtils.hideElement(tool.span);
+			};
+			tool.apply.onclick = function() {
+				self.buffer.startAction();
+				self.ctx.fillStyle = self.ctx.strokeStyle;
+				self.ctx.font = "{}px {}".format(self.ctx.lineWidth, self.ctx.fontFamily);
+				self.ctx.fillText(tool.span.textContent, tool.lastCoord.x, tool.lastCoord.y);
+				self.buffer.finishAction();
+				self.setMode('pen');
 			};
 			tool.setCursor = function () {
 				self.dom.canvas.style.cursor = 'crosshair';
 			};
-			tool.changeRadius = function(e) {
-				tool.span.style.fontSize = 10 + parseInt(e.target.value)  + 'px';
+			tool.onChangeRadius = function(e) {
+				tool.span.style.fontSize = 5 + parseInt(e.target.value)  + 'px';
 			};
-			tool.changeOpacity = function(e) {
+			tool.onChangeOpacity = function(e) {
 				tool.span.style.opacity = e.target.value / 100
 			};
-			tool.changeColor = function (e) {
+			tool.onChangeColor = function (e) {
 				tool.span.style.color = e.target.value;
 			};
 			tool.onMouseDown = function (e) {
 				CssUtils.showElement(tool.span);
 				tool.span.style.top = e.offsetY + 'px';
 				tool.span.style.left = e.offsetX + 'px';
-				tool.lastCoord = {x: e.pageX, y: e.pageY};
+				tool.lastCoord = self.helper.getXY(e);
 				setTimeout(function (e) {
 					tool.span.focus()
 				});
@@ -799,13 +840,12 @@ function Painter() {
 		};
 	})();
 	self.setMode = function (mode) {
-		var oldMode = self.mode;
-		if (oldMode) {
-			var old = self.tools[oldMode];
-			old.onDeactivate && old.onDeactivate();
-			CssUtils.removeClass(old.icon, self.PICKED_TOOL_CLASS);
-		}
+		var oldMode = self.tools[self.mode];
 		self.mode = mode;
+		if (oldMode) {
+			oldMode.onDeactivate && oldMode.onDeactivate();
+			CssUtils.removeClass(oldMode.icon, self.PICKED_TOOL_CLASS);
+		}
 		var newMode = self.tools[self.mode];
 		newMode.onActivate && newMode.onActivate();
 		newMode.setCursor && newMode.setCursor();

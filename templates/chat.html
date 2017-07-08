@@ -118,28 +118,29 @@
 				</div>
 			</div>
 			<div class="bottomTools">
-				<div id="paintColor" title="Color">
+				<div id="paintColor" title="Color" class="hidden">
 					<span>C:</span>
 					<input type="color" value="#ff0000" class="value"/>
 				</div>
-				<div id="paintOpacity" title="Alpha (transparency or opacity)">
+				<div id="paintOpacity" title="Alpha (color transparency)" class="hidden">
 					<span>A:</span>
 					<input type="text" step="1" class="value" value="100"/>
 					<div>
 						<input type="range" step="1" max="100" min="1" value="100"/>
 					</div>
 				</div>
-				<div id="paintRadius" title="Width">
+				<div id="paintRadius" title="Width" class="hidden">
 					<span>W:</span>
 					<input type="text" step="1" class="value" value="20"/>
 					<div>
-						<input type="range" step="1" max="100" min="1" value="100"/>
+						<input type="range" step="1" max="100" min="1" value="20"/>
 					</div>
 				</div>
-				<div id="paintFont" title="Width">
+				<div id="paintFont" title="Font" class="hidden">
 					<span>F:</span>
 					<select class="value"></select>
 				</div>
+				<input type="button" id="paintApplyText" value="Apply" class="hidden"/>
 				<i title="Send" id="paintSend" class="hidden icon-send"></i>
 			</div>
 		</div>
