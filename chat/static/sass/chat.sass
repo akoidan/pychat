@@ -199,6 +199,73 @@ fieldset
 		&.offline
 			display: none
 
+.iconColorPicker
+	display: inline-block
+	width: 20px
+	height: 20px
+	border: 1px solid #8d8d8d
+
+.bottomTools
+	%hideEl
+		display: inline-block
+		vertical-align: top
+		input[type=text]
+			width: 30px
+			padding: 5px
+			vertical-align: top
+		> span
+			vertical-align: top
+			display: inline-block
+			padding-top: 3px
+		> input
+			margin-right: 0
+		div
+			display: inline-block
+			overflow: hidden
+			width: 0
+			@include transition(width 0.5s)
+		&:hover div
+			width: 120px
+
+	margin-left: 24px
+	height: 30px
+
+	#paintFont
+		@extend %hideEl
+		select
+			display: inline-block
+			text-decoration: none
+			text-overflow: ellipsis
+			overflow: hidden
+			white-space: nowrap
+			width: 120px
+			font-size: 14px
+			height: 25px
+			border: 1px solid grey
+
+	#paintOpacity
+		@extend %hideEl
+
+	#paintRadius
+		@extend %hideEl
+
+	#paintApplyText
+		display: inline-block
+
+	#paintColor
+		@extend %hideEl
+		input[type=color]
+			-webkit-appearance: none
+			padding: 0
+			border: 1px solid grey
+			border-radius: 1px
+			height: 25px
+			width: 25px
+			&::-webkit-color-swatch-wrapper
+				padding: 0
+			&::-webkit-color-swatch
+				border: none
+
 .toolsAndCanvas
 	display: flex
 	.painterTools
@@ -208,11 +275,11 @@ fieldset
 		*
 			display: flex
 			padding: 5px 5px 5px 0
-
 	.canvasWrapper
+		position: relative
 		overflow: auto
 		width: 700px
-		position: relative
+		background-color: #333
 		height: 500px
 		max-height: calc(90vh - 100px)
 		max-width: calc(90vh - 100px)
@@ -234,15 +301,8 @@ fieldset
 			border: 1px dashed
 			width: auto
 			min-width: 5px
-			overflow: hidden
 			word-wrap: normal
 			padding: 0 1px
-
-#paintRadius::-webkit-slider-runnable-track
-	background-size: 10% 100%, 100% 100%
-
-.bottomTools
-	margin-left: 20px
 
 
 #onlineStatus
@@ -395,20 +455,8 @@ fieldset
 	padding: 0
 	:visibility hidden
 
-%activePaintIcon
-	color: #ff8383
-
-.n-active-icon
-	color: $main-color !important
-
-#paintEraser
-	@extend %activePaintIcon
-
-#paintMove
-	@extend %activePaintIcon
-
-#paintText
-	@extend %activePaintIcon
+.active-icon
+	color: #ff2020
 
 #paintSend
 	float: right

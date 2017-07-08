@@ -492,12 +492,13 @@ onDocLoad(function () {
 	[].forEach.call(document.querySelectorAll('input[type=range]'), styleInputRange);
 
 });
-function fixInputRangeStyle() { // TODO this can be moved to element's style
-	var id = this.getAttribute('id');
+function fixInputRangeStyle(e) {
+	// since webkit-slider-runnable-track is a selector, it's impossible to inject it to style directly
+	var id = e.getAttribute('id');
 	var el = inputRangeStyles[id];
 	el.style.textContent =
 			'#{}::-webkit-slider-runnable-track {background-size: {}% 100%, 100% 100%; }'
-					.format(id, Math.round((this.value - el.minValue) / (el.diff) * 100));
+					.format(id, Math.round((e.value - el.minValue) / (el.diff) * 100));
 }
 
 var getRandomId = (function getRandomId() {
@@ -514,7 +515,7 @@ function styleInputRange(ir) {
 		id = getRandomId();
 		ir.setAttribute('id', id);
 	}
-	ir.addEventListener('input', fixInputRangeStyle);
+	ir.addEventListener('input', function() {fixInputRangeStyle(this)});
 	var minValue = ir.getAttribute('min') || 0;
 	var maxValue = ir.getAttribute('max') || 100;
 	inputRangeStyles[id] = {
@@ -522,6 +523,7 @@ function styleInputRange(ir) {
 		diff: maxValue - minValue,
 		minValue: minValue
 	};
+	fixInputRangeStyle(ir);
 	document.head.appendChild(inputRangeStyles[id].style);
 }
 

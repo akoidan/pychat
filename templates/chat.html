@@ -100,12 +100,14 @@
 		<div>
 			<div class="toolsAndCanvas">
 				<div class="painterTools">
-					<i id="paintPen" title="Brush" class="icon-brush-1 n-active-icon"></i>
-					<i id="paintEraser" class="icon-eraser n-active-icon" title="Eraser"></i>
-					<i title="Move" id="paintMove" class="icon-move  n-active-icon"></i>
-					<i id="paintText" class="icon-text n-active-icon" title="Insert text"></i>
-					<i title="Zoom IN (you also can zoom with mouse wheel)" id="paintZoomIn" class="icon-zoom-in  n-active-icon"></i>
-					<i title="Zoom OUT (you also can zoom with mouse wheel)" id="paintZoomOut" class="icon-zoom-out  n-active-icon"></i>
+					<i id="paintPen" title="Brush" class="icon-brush-1"></i>
+					<i id="paintEraser" class="icon-eraser" title="Eraser"></i>
+					<i title="Move" id="paintMove" class="icon-move "></i>
+					<i id="paintText" class="icon-text" title="Insert text"></i>
+					<i title="Zoom IN (ctrl+ mouse wheel)" id="paintZoomIn" class="icon-zoom-in"></i>
+					<i title="Zoom OUT (ctrl + mouse wheel)" id="paintZoomOut" class="icon-zoom-out"></i>
+					<i title="Undo (ctrl+Z)" id="paintUndo" class="icon-undo"></i>
+					<i title="Redo (ctrl+Y)" id="paintRedo" class="icon-redo"></i>
 					<i title="Clear" id="paintClear" class="icon-trash-circled"></i>
 				</div>
 				<div class="canvasWrapper" id="canvasWrapper">
@@ -114,11 +116,30 @@
 				</div>
 			</div>
 			<div class="bottomTools">
-				<i class="icon-color-adjust" title="Pick color" id="paintPickerIcon"></i>
-				<input type="color" id="paintPicker" value="#ff0000"/>
-				<input type="range" id="paintRadius" title="Line width" step="1" max="32" min="1" value="3"/>
-				<input type="range" id="paintOpacity" title="Opacity" step="0.025" max="1" min="0.01" value="1"/>
-				<i title="Send" id="paintSend" class="icon-send"></i>
+				<div id="paintColor" title="Color" class="hidden">
+					<span>C:</span>
+					<input type="color" value="#ff0000" class="value"/>
+				</div>
+				<div id="paintOpacity" title="Alpha (color transparency)" class="hidden">
+					<span>A:</span>
+					<input type="text" step="1" class="value" value="100"/>
+					<div>
+						<input type="range" step="1" max="100" min="1" value="100"/>
+					</div>
+				</div>
+				<div id="paintRadius" title="Width" class="hidden">
+					<span>W:</span>
+					<input type="text" step="1" class="value" value="20"/>
+					<div>
+						<input type="range" step="1" max="100" min="1" value="20"/>
+					</div>
+				</div>
+				<div id="paintFont" title="Font" class="hidden">
+					<span>F:</span>
+					<select class="value"></select>
+				</div>
+				<input type="button" id="paintApplyText" value="Apply" class="hidden"/>
+				<i title="Send" id="paintSend" class="hidden icon-send"></i>
 			</div>
 		</div>
 	</div>
