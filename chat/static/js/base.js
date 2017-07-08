@@ -492,7 +492,8 @@ onDocLoad(function () {
 	[].forEach.call(document.querySelectorAll('input[type=range]'), styleInputRange);
 
 });
-function fixInputRangeStyle() { // TODO this can be moved to element's style
+function fixInputRangeStyle() {
+	// since webkit-slider-runnable-track is a selector, it's impossible to inject it to style directly
 	var id = this.getAttribute('id');
 	var el = inputRangeStyles[id];
 	el.style.textContent =

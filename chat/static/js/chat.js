@@ -283,167 +283,341 @@ function Painter() {
 	var self = this;
 	Draggable.call(self, $('canvasHolder'), "Painter");
 	self.ZOOM_SCALE = 1.1;
-	self.PICKED_TOOL_CLASS = 'n-active-icon';
+	self.PICKED_TOOL_CLASS = 'active-icon';
 	self.dom.canvas = $('painter');
 	self.dom.painterIcon = $('painterIcon');
-	self.dom.color = $('paintPicker');
-	self.dom.paintZoomIn = $('paintZoomIn');
-	self.dom.paintZoomOut = $('paintZoomOut');
-	self.dom.sendButton = $('paintSend');
-	self.dom.clearButton = $('paintClear');
-	self.dom.range = $('paintRadius');
-	self.dom.opacity = $('paintOpacity');
 	self.dom.canvasWrapper = $('canvasWrapper');
-	self.dom.colorIcon = $('paintPickerIcon');
-	self.dom.paintFont = $('paintFont');
-	self.dom.paintUndo = $('paintUndo');
-	self.dom.paintRedo = $('paintRedo');
+	self.instruments = {
+		color: {
+			holder: $('paintColor'),
+			handler: 'changeColor',
+			ctxSetter: function (v) {
+				self.ctx.strokeStyle = v;
+			},
+			range: document.querySelector('#paintColor input[range]')
+		},
+		opacity: {
+			holder: $('paintOpacity'),
+			handler: 'changeOpacity',
+			ctxSetter: function (v) {
+				self.ctx.globalAlpha = v / 100;
+			},
+			range: document.querySelector('#paintOpacity input[range]')
+		},
+		width: {
+			holder: $('paintRadius'),
+			handler: 'changeRadius',
+			ctxSetter: function (v) {
+				self.ctx.lineWidth = v;
+			}
+		},
+		font: {
+			holder: $('paintFont'),
+			handler: 'changeFont',
+			ctxSetter: function (v) {
+				self.ctx.fontFamily = v;
+			}
+		}
+	};
 	self.ctx = self.dom.canvas.getContext('2d');
-	self.mouseDown = 0;
-	self.scale = 1;
-	self.originx = 0;
-	self.originy = 0;
-	self.current = null;
-	self.instruments = [
-		{dom: self.dom.range, handler: 'changeRadius', trigger: 'change'},
-		{dom: self.dom.opacity, handler: 'changeOpacity', trigger: 'change'},
-		{dom: self.dom.color, handler: 'changeColor', trigger: 'input'},
-		{dom: self.dom.paintFont, handler: 'changeFont', trigger: 'change'}
-	];
+	self.init = {
+		initInstruments: function () {
+			Object.keys(self.instruments).forEach(function (k) {
+				var instr = self.instruments[k];
+				instr.value = instr.holder.querySelector('.value')
+				instr.ctxSetter(instr.value.value);
+				instr.value.addEventListener('change', function (e) {
+					instr.ctxSetter(e.target.value);
+					var handler = self.tools[self.mode][instr.handler];
+					handler && handler(e);
+				})
+			});
+		},
+		setContext: function () {
+			Object.keys(self.instruments).forEach(function (k) {
+				var instr = self.instruments[k];
+				instr.ctxSetter(instr.value.value);
+			});
+		},
+		initTools: function () {
+			for (var tool in self.tools) {
+				if (!self.tools.hasOwnProperty(tool)) continue;
+				var t = self.tools[tool];
+				t.icon.onclick = self.setMode.bind(self, tool);
+				if (t.constructor) {
+					t.constructor();
+				}
+			}
+		},
+		initButtons: function () {
+			var buttons = {
+				paintZoomIn: self.zoomIn,
+				paintZoomOut: self.zoomOut,
+				paintSend: self.sendImage,
+				paintClear: self.clearCanvas,
+				paintUndo: self.buffer.undo,
+				paintRedo: self.buffer.redo
+			};
+			Object.keys(buttons).forEach(function (k) {
+				$(k).onclick = buttons[k];
+			});
+		},
+		initCanvas: function () {
+			[
+				{dom: self.dom.canvas, listener: 'mousedown', handler: 'onmousedown'},
+				{dom: self.dom.container, listener: 'keypress', handler: 'contKeyPress'},
+				{dom: self.dom.container, listener: 'paste', handler: 'canvasImagePaste'},
+				{dom: self.dom.canvasWrapper, listener: mouseWheelEventName, handler: 'onmousewheel'
+					, params: {passive: false}},
+				{dom: self.dom.container, listener: 'drop', handler: 'canvasImageDrop', params: {passive: false}}
+			].forEach(function(e){
+				e.dom.addEventListener(e.listener, self.events[e.handler], e.params);
+			});
+			self.dom.painterIcon.onclick = self.actions.initAndShow;
+		},
+		createFonts: function () {
+			var select = self.instruments.font.value;
+			var fonts = [
+				'Arial, Helvetica, sans-serif',
+				'"Arial Black", Gadget, sans-serif',
+				'"Comic Sans MS", cursive, sans-serif',
+				'Impact, Charcoal, sans-serif',
+				'"Lucida Sans Unicode", "Lucida Grande", sans-serif',
+				'Tahoma, Geneva, sans-serif',
+				'"Trebuchet MS", Helvetica, sans-serif',
+				'Verdana, Geneva, sans-serif',
+				'"Courier New", Courier, monospace',
+				'"Lucida Console", Monaco, monospace'
+			];
+			fonts.forEach(function (t) {
+				var o = document.createElement('option');
+				select.appendChild(o);
+				o.textContent = t;
+				o.style.fontFamily = t;
+				o.value = t;
+			});
+		},
+	};
 	self.log = function () {
 		var args = Array.prototype.slice.call(arguments);
 		args.unshift("Painter");
 		return logger.webrtc.apply(logger, args);
 	};
-	self.setCursor = function (fill, stroke) {
-		var width = self.ctx.lineWidth;
-		if (width < 3) {
-			width = 3;
-		} else if (width > 126) {
-			width = 126;
-		}
-		var svg = '<svg xmlns="http://www.w3.org/2000/svg" height="128" width="128"><circle cx="64" cy="64" r="{0}" fill="{1}"{2}/></svg>'.formatPos(width, fill, stroke);
-		self.dom.canvas.style.cursor = 'url(data:image/svg+xml;base64,{}) {} {}, auto'.format(btoa(svg), 64, 64);
+	self.helper = {
+		readAndPasteCanvas: function (file) {
+			Utils.readFileAsB64(file, function (event) {
+				var img = new Image();
+				img.src = event.target.result;
+				var cnvW = self.dom.canvas.width;
+				var cnvH = self.dom.canvas.height;
+				var imgW = img.width;
+				var imgH = img.height;
+				if (imgW > cnvW || imgH > cnvH) {
+					var scaleH = imgH / cnvH;
+					var scaleW = imgW / cnvW;
+					var scale = scaleH > scaleW ? scaleH : scaleW;
+					self.ctx.drawImage(img,
+							0, 0, imgW, imgH,
+							0, 0, Math.round(imgW / scale), Math.round(imgH / scale));
+				} else {
+					self.ctx.drawImage(img, 0, 0, imgW, img.height);
+				}
+			});
+		},
+		setCursor: function (fill, stroke, width) {
+			if (width < 3) {
+				width = 3;
+			} else if (width > 126) {
+				width = 126;
+			}
+			var svg = '<svg xmlns="http://www.w3.org/2000/svg" height="128" width="128"><circle cx="64" cy="64" r="{0}" fill="{1}"{2}/></svg>'.formatPos(width, fill, stroke);
+			self.dom.canvas.style.cursor = 'url(data:image/svg+xml;base64,{}) {} {}, auto'.format(btoa(svg), 64, 64);
+		},
+		isNumberKey: function (evt) {
+			var charCode = evt.which || evt.keyCode;
+			return charCode > 47 && charCode < 58;
+		},
+		trimImage: function () {
+			var copy = document.createElement('canvas').getContext('2d'),
+					pixels = self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height),
+					l = pixels.data.length,
+					i,
+					bound = {
+						top: null,
+						left: null,
+						right: null,
+						bottom: null
+					},
+					x, y;
+			for (i = 0; i < l; i += 4) {
+				if (pixels.data[i + 3] !== 0) {
+					x = (i / 4) % self.dom.canvas.width;
+					y = ~~((i / 4) / self.dom.canvas.width);
+					if (bound.top === null) {
+						bound.top = y;
+					}
+					if (bound.left === null) {
+						bound.left = x;
+					} else if (x < bound.left) {
+						bound.left = x;
+					}
+					if (bound.right === null) {
+						bound.right = x;
+					} else if (bound.right < x) {
+						bound.right = x;
+					}
+					if (bound.bottom === null) {
+						bound.bottom = y;
+					} else if (bound.bottom < y) {
+						bound.bottom = y;
+					}
+				}
+			}
+			var trimHeight = bound.bottom - bound.top,
+					trimWidth = bound.right - bound.left;
+			if (trimWidth && trimHeight) {
+				var trimmed = self.ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
+				copy.canvas.width = trimWidth;
+				copy.canvas.height = trimHeight;
+				copy.putImageData(trimmed, 0, 0);
+				return copy.canvas;
+			} else {
+				return false;
+			}
+		},
+		applyZoom: function (isIncrease) {
+			if (isIncrease) {
+				self.zoom *= self.ZOOM_SCALE;
+			} else if (self.zoom !== 1) {
+				self.zoom /= self.ZOOM_SCALE;
+				if (self.zoom < 1) {
+					self.zoom = 1;
+				}
+			}
+			self.dom.canvas.style.width = self.dom.canvas.width * self.zoom + 'px';
+			self.dom.canvas.style.height = self.dom.canvas.height * self.zoom + 'px';
+		},
+		getScaledOrdinate: function (ordinateName/*width*/, value) {
+			var clientOrdinateName = 'client' + ordinateName.charAt(0).toUpperCase() + ordinateName.substr(1);
+			/*clientWidth*/
+			var clientOrdinate = self.dom.canvas[clientOrdinateName];
+			var ordinate = self.dom.canvas[ordinateName];
+			return ordinate == clientOrdinate ? value : Math.round(ordinate * value / clientOrdinate); // apply page zoom
+		},
+		getXY: function (e) {
+			return {
+				x: self.helper.getScaledOrdinate('width', e.offsetX),
+				y: self.helper.getScaledOrdinate('height', e.offsetY)
+			}
+		},
 	};
-	self.onmousedown = function (e) {
-		self.log("{} mouse down", self.mode)();
-		self.mouseDown++;
-		var rect = painter.dom.canvas.getBoundingClientRect();
-		self.leftOffset = rect.left;
-		self.topOffset = rect.top;
-		var imgData;
-		var tool = self.tools[self.mode];
-		if (!tool.bufferHandler) {
-			imgData = self.buffer.startAction();
-		}
-		tool.onMouseDown(e, imgData);
-		if (tool.onMouseMove) {
-			self.dom.canvas.addEventListener('mousemove', tool.onMouseMove);
-		}
-	};
-	self.onmouseup = function (e) {
-		if (self.mouseDown > 0) {
-			self.mouseDown--;
+	self.events = {
+		mouseDown: 0,
+		onmousedown: function (e) {
+			self.log("{} mouse down", self.mode)();
+			self.events.mouseDown++;
+			var rect = painter.dom.canvas.getBoundingClientRect();
+			self.leftOffset = rect.left;
+			self.topOffset = rect.top;
+			var imgData;
 			var tool = self.tools[self.mode];
 			if (!tool.bufferHandler) {
-				self.buffer.finishAction();
+				imgData = self.buffer.startAction();
 			}
-			var mu = tool.onMouseUp;
-			if (mu) {
-				self.log("{} mouse up", self.mode)();
-				mu(e)
-			}
+			tool.onMouseDown(e, imgData);
 			if (tool.onMouseMove) {
-				self.dom.canvas.removeEventListener('mousemove', tool.onMouseMove);
+				self.dom.canvas.addEventListener('mousemove', tool.onMouseMove);
 			}
-		}
-	};
-	self.trimImage = function () {
-		var copy = document.createElement('canvas').getContext('2d'),
-				pixels = self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height),
-				l = pixels.data.length,
-				i,
-				bound = {
-					top: null,
-					left: null,
-					right: null,
-					bottom: null
-				},
-				x, y;
-		for (i = 0; i < l; i += 4) {
-			if (pixels.data[i + 3] !== 0) {
-				x = (i / 4) % self.dom.canvas.width;
-				y = ~~((i / 4) / self.dom.canvas.width);
-				if (bound.top === null) {
-					bound.top = y;
+		},
+		onmouseup: function (e) {
+			if (self.events.mouseDown > 0) {
+				self.events.mouseDown--;
+				var tool = self.tools[self.mode];
+				if (!tool.bufferHandler) {
+					self.buffer.finishAction();
 				}
-				if (bound.left === null) {
-					bound.left = x;
-				} else if (x < bound.left) {
-					bound.left = x;
+				var mu = tool.onMouseUp;
+				if (mu) {
+					self.log("{} mouse up", self.mode)();
+					mu(e)
 				}
-				if (bound.right === null) {
-					bound.right = x;
-				} else if (bound.right < x) {
-					bound.right = x;
-				}
-				if (bound.bottom === null) {
-					bound.bottom = y;
-				} else if (bound.bottom < y) {
-					bound.bottom = y;
+				if (tool.onMouseMove) {
+					self.dom.canvas.removeEventListener('mousemove', tool.onMouseMove);
 				}
 			}
+		},
+		onmousewheel: function (e) {
+			if (!e.ctrlKey) {
+				return;
+			}
+			e.preventDefault();
+			var xProp = e.offsetX / self.dom.canvasWrapper.scrollWidth;
+			var yProp = e.offsetY / self.dom.canvasWrapper.scrollHeight;
+			self.helper.applyZoom(e.detail < 0 || e.wheelDelta > 0); // isTop
+			var newScrollWidth = xProp * self.dom.canvasWrapper.scrollWidth - (self.dom.canvasWrapper.clientWidth / 2);
+			var newScrollHeight = yProp * self.dom.canvasWrapper.scrollHeight - (self.dom.canvasWrapper.clientHeight / 2);
+			self.log("Zoomed to {}; newScrollOffset: {{}, {}} from proportion {{}, {}}",
+					self.zoom.toFixed(2),
+					Math.round(newScrollWidth),
+					Math.round(newScrollHeight),
+					xProp.toFixed(2),
+					yProp.toFixed(2)
+			)();
+			self.dom.canvasWrapper.scrollTop = newScrollHeight;
+			self.dom.canvasWrapper.scrollLeft = newScrollWidth;
+		},
+		contKeyPress: function (event) {
+			if (event.keyCode === 13) {
+				self.actions.sendImage();
+				// event.code if keyboard is different (e.g Russian)
+			} else if (event.keyCode === 26 && event.ctrlKey || event.code === 'KeyZ') {
+				self.buffer.undo();
+			} else if (event.keyCode === 25 && event.ctrlKey || event.code === 'KeyY') {
+				self.buffer.redo();
+			}
+		},
+		canvasImageDrop: function (e) {
+			self.preventDefault(e);
+			self.readAndPasteCanvas(e.dataTransfer.files[0]);
+		},
+		canvasImagePaste: function (e) {
+			if (e.clipboardData) {
+				var items = e.clipboardData.items;
+				if (items) {
+					for (var i = 0; i < items.length; i++) {
+						self.readAndPasteCanvas(items[i].getAsFile());
+					}
+					self.preventDefault(e);
+				}
+			}
 		}
-		var trimHeight = bound.bottom - bound.top,
-				trimWidth = bound.right - bound.left;
-		if (trimWidth && trimHeight) {
-			var trimmed = self.ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
-			copy.canvas.width = trimWidth;
-			copy.canvas.height = trimHeight;
-			copy.putImageData(trimmed, 0, 0);
-			return copy.canvas;
-		} else {
-			return false;
-		}
-	};
-	self.getScaledOrdinate = function (ordinateName/*width*/, value) {
-		var clientOrdinateName = 'client' + ordinateName.charAt(0).toUpperCase() + ordinateName.substr(1);
-		/*clientWidth*/
-		var clientOrdinate = self.dom.canvas[clientOrdinateName];
-		var ordinate = self.dom.canvas[ordinateName];
-		return ordinate == clientOrdinate ? value : Math.round(ordinate * value / clientOrdinate); // apply page zoom
-	};
-	self.getXY = function (e) {
-		return {
-			x: self.getScaledOrdinate('width', e.offsetX),
-			y: self.getScaledOrdinate('height', e.offsetY)
-		}
-	};
-	self.getData = function () {
-		return self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height)
 	};
 	self.tools = {
 		eraser: new (function () {
 			var tool = this;
 			tool.icon = $('paintEraser');
 			tool.setCursor = function () {
-				self.setCursor('#aaaaaa', ' stroke="black" stroke-width="2"');
+				self.helper.setCursor('#aaaaaa', ' stroke="black" stroke-width="2"', self.ctx.lineWidth);
 			};
 			tool.changeRadius = function (e) {
-				self.ctx.lineWidth = 10 + parseInt(Math.pow(parseInt(e.target.value), 1.4));
 				tool.setCursor();
 			};
 			tool.onActivate = function () {
+				tool.tmpAlpha = self.ctx.globalAlpha;
+				self.ctx.globalAlpha = 1;
 				self.ctx.globalCompositeOperation = "destination-out";
 			};
+			tool.onDeactivate = function() {
+				self.ctx.globalAlpha = tool.tmpAlpha;
+			};
 			tool.onMouseDown = function (e) {
-				var coord = self.getXY(e);
+				var coord = self.helper.getXY(e);
 				self.ctx.moveTo(coord.x, coord.y);
 				self.ctx.beginPath();
 				tool.onMouseMove(e)
 			};
 			tool.onMouseMove = function (e) {
-				var coord = self.getXY(e);
+				var coord = self.helper.getXY(e);
 				self.ctx.lineTo(coord.x, coord.y);
 				self.ctx.stroke();
 			};
@@ -455,27 +629,24 @@ function Painter() {
 			var tool = this;
 			tool.icon = $('paintPen');
 			tool.changeColor = function (e) {
-				tool.icon.style.color = self.ctx.strokeStyle;
-				self.setCursor(e.target.value, '')
-				self.ctx.strokeStyle = e.target.value;
+				tool.setCursor();
 			};
 			tool.changeRadius = function (e) {
-				self.ctx.lineWidth = parseInt(Math.pow(parseInt(e.target.value), 1.4));
 				tool.setCursor();
 			};
 			tool.changeOpacity = function (e) {
-				self.ctx.globalAlpha = event.target.value;
 				tool.setCursor();
 			};
 			tool.setCursor = function () {
-				self.setCursor(self.ctx.strokeStyle, '');
+				self.helper.setCursor(self.ctx.strokeStyle, '', self.ctx.lineWidth);
 			};
 			tool.onActivate = function () {
-				tool.icon.style.color = self.ctx.strokeStyle;
+				self.ctx.lineJoin = 'round';
+				self.ctx.lineCap = 'round';
 				self.ctx.globalCompositeOperation = "source-over";
 			};
 			tool.onMouseDown = function (e, data) {
-				var coord = self.getXY(e);
+				var coord = self.helper.getXY(e);
 				self.ctx.moveTo(coord.x, coord.y);
 				tool.points = [];
 				tool.tmpData = data;
@@ -483,7 +654,7 @@ function Painter() {
 			};
 			tool.onMouseMove = function (e) {
 				// self.log("mouse move,  points {}", JSON.stringify(tool.points))();
-				var coord = self.getXY(e);
+				var coord = self.helper.getXY(e);
 				self.ctx.putImageData(tool.tmpData, 0, 0);
 				tool.points.push(coord);
 				self.ctx.beginPath();
@@ -525,6 +696,8 @@ function Painter() {
 			var tool = this;
 			tool.span = $('paintTextSpan');
 			tool.icon = $('paintText');
+			//prevent self.events.contKeyPress
+			tool.span.addEventListener('keypress', function (e) { e.stopPropagation() });
 			tool.bufferHandler = true;
 			tool.changeFont = function(e) {
 				tool.span.style.fontFamily = e.target.value;
@@ -536,16 +709,10 @@ function Painter() {
 				tool.span.style.fontSize = 10 + parseInt(e.target.value)  + 'px';
 			};
 			tool.changeOpacity = function(e) {
-
+				tool.span.style.opacity = e.target.value / 100
 			};
 			tool.changeColor = function (e) {
 				tool.span.style.color = e.target.value;
-			};
-			tool.onActivate = function () {
-				self.dom.container.removeEventListener('keypress', self.contKeyPress);
-			};
-			tool.onDeactivate = function () {
-				self.dom.container.addEventListener('keypress', self.contKeyPress);
 			};
 			tool.onMouseDown = function (e) {
 				CssUtils.showElement(tool.span);
@@ -558,29 +725,35 @@ function Painter() {
 			};
 		})
 	};
-	self.clearCanvas = function () {
-		self.buffer.startAction();
-		self.ctx.clearRect(0, 0, parseInt(self.dom.canvas.width), parseInt(self.dom.canvas.height));
-		self.buffer.finishAction();
-	};
-	self.sendImage = function () {
-		var trimImage = self.trimImage();
-		if (trimImage) {
-			Utils.pasteb64ImgToTextArea(trimImage.toDataURL());
-			self.hide();
-		} else {
-			growlError("You can't paste empty images");
-		}
-	};
-	self.contKeyPress = function (event) {
-		if (event.keyCode === 13) {
-			self.sendImage();
-			// event.code if keyboard is different (e.g Russian)
-		} else if (event.keyCode === 26 && event.ctrlKey || event.code === 'KeyZ') {
-			self.buffer.undo();
-		} else if (event.keyCode === 25 && event.ctrlKey || event.code === 'KeyY') {
-			self.buffer.redo();
-		}
+	self.actions = {
+		clearCanvas: function () {
+			self.buffer.startAction();
+			self.ctx.clearRect(0, 0, parseInt(self.dom.canvas.width), parseInt(self.dom.canvas.height));
+			self.buffer.finishAction();
+		},
+		sendImage: function () {
+			var trimImage = self.helper.trimImage();
+			if (trimImage) {
+				Utils.pasteb64ImgToTextArea(trimImage.toDataURL());
+				self.hide();
+			} else {
+				growlError("You can't paste empty images");
+			}
+		},
+		zoomIn: function () {
+			self.helper.applyZoom(true);
+		},
+		zoomOut: function () {
+			self.helper.applyZoom(false);
+		},
+		initAndShow: function () {
+			self.show();
+			self.buffer.clear();
+			self.dom.canvas.setAttribute('width', self.dom.canvasWrapper.offsetWidth - 2);
+			self.dom.canvas.setAttribute('height', self.dom.canvasWrapper.offsetHeight - 6);
+			self.init.setContext();
+			self.setMode('pen');
+		},
 	};
 	self.buffer = new (function () {
 		var tool = this;
@@ -594,6 +767,9 @@ function Painter() {
 				current = restore;
 				self.ctx.putImageData(restore, 0, 0);
 			}
+		};
+		tool.getCanvasImage = function() {
+			return self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height)
 		};
 		tool.clear = function () {
 			undoImages = [];
@@ -613,189 +789,49 @@ function Painter() {
 				undoImages.push(current);
 			}
 			redoImages = [];
-			current = self.getData();
+			current = tool.getCanvasImage();
 		};
 		tool.startAction = function () {
 			if (!current) {
-				current = self.getData();
+				current = tool.getCanvasImage();
 			}
 			return current;
 		};
 	})();
-
-	self.canvasImagePaste = function (e) {
-		if (e.clipboardData) {
-			var items = e.clipboardData.items;
-			if (items) {
-				for (var i = 0; i < items.length; i++) {
-					self.readAndPasteCanvas(items[i].getAsFile());
-				}
-				self.preventDefault(e);
-			}
-		}
-	};
-	self.canvasImageDrop = function (e) {
-		self.preventDefault(e);
-		self.readAndPasteCanvas(e.dataTransfer.files[0]);
-	};
-	self.readAndPasteCanvas = function (file) {
-		Utils.readFileAsB64(file, function (event) {
-			var img = new Image();
-			img.src = event.target.result;
-			var cnvW = self.dom.canvas.width;
-			var cnvH = self.dom.canvas.height;
-			var imgW = img.width;
-			var imgH = img.height;
-			if (imgW > cnvW || imgH > cnvH) {
-				var scaleH = imgH / cnvH;
-				var scaleW = imgW / cnvW;
-				var scale = scaleH > scaleW ? scaleH : scaleW;
-				self.ctx.drawImage(img,
-						0, 0, imgW, imgH,
-						0, 0, Math.round(imgW / scale), Math.round(imgH / scale));
-			} else {
-				self.ctx.drawImage(img, 0, 0, imgW, img.height);
-			}
-		});
-	};
-	self.preventDefault = function (e) {
-		e.preventDefault();
-	};
-	self.zoomIn = function() {
-		self.applyZoom(true);
-	};
-	self.zoomOut = function() {
-		self.applyZoom(false);
-	};
-	self.applyZoom = function (isIncrease) {
-		if (isIncrease) {
-			self.zoom *= self.ZOOM_SCALE;
-		} else if (self.zoom !== 1) {
-			self.zoom /= self.ZOOM_SCALE;
-			if (self.zoom < 1) {
-				self.zoom = 1;
-			}
-		}
-		self.dom.canvas.style.width = self.dom.canvas.width * self.zoom + 'px';
-		self.dom.canvas.style.height = self.dom.canvas.height * self.zoom + 'px';
-	};
-	self.onmousewheel = function (e) {
-		if (!e.ctrlKey) {
-			return;
-		}
-		e.preventDefault();
-		var xProp = e.offsetX / self.dom.canvasWrapper.scrollWidth;
-		var yProp = e.offsetY / self.dom.canvasWrapper.scrollHeight;
-		self.applyZoom(e.detail < 0 || e.wheelDelta > 0); // isTop
-		var newScrollWidth = xProp * self.dom.canvasWrapper.scrollWidth - (self.dom.canvasWrapper.clientWidth / 2);
-		var newScrollHeight = yProp * self.dom.canvasWrapper.scrollHeight - (self.dom.canvasWrapper.clientHeight / 2);
-		self.log("Zoomed to {}; newScrollOffset: {{}, {}} from proportion {{}, {}}",
-				self.zoom.toFixed(2),
-				Math.round(newScrollWidth),
-				Math.round(newScrollHeight),
-				xProp.toFixed(2),
-				yProp.toFixed(2)
-		)();
-		self.dom.canvasWrapper.scrollTop = newScrollHeight;
-		self.dom.canvasWrapper.scrollLeft = newScrollWidth;
-	};
-	self.initChild = function () {
-		var fonts = [
-				'Arial, Helvetica, sans-serif',
-				'"Arial Black", Gadget, sans-serif',
-				'"Comic Sans MS", cursive, sans-serif',
-				'Impact, Charcoal, sans-serif',
-				'"Lucida Sans Unicode", "Lucida Grande", sans-serif',
-				'Tahoma, Geneva, sans-serif',
-				'"Trebuchet MS", Helvetica, sans-serif',
-				'Verdana, Geneva, sans-serif',
-				'"Courier New", Courier, monospace',
-				'"Lucida Console", Monaco, monospace',
-			];
-		fonts.forEach(function (t) {
-			var o = document.createElement('option');
-			self.dom.paintFont.appendChild(o);
-			o.textContent = t;
-			o.style.fontFamily = t;
-			o.value = t;
-		});
-		self.dom.paintUndo.onclick = self.buffer.undo;
-		self.dom.paintRedo.onclick = self.buffer.redo;
-		self.dom.canvas.addEventListener('mousedown', self.onmousedown, false);
-		self.dom.container.onpaste = self.canvasImagePaste;
-		self.dom.painterIcon.onclick = self.initAndShow;
-		self.dom.canvasWrapper.addEventListener(mouseWheelEventName, self.onmousewheel, {passive: false});
-		self.dom.container.ondrop = self.canvasImageDrop;
-		self.dom.container.ondragover = self.preventDefault;
-		self.instruments.forEach(function (instr) {
-			instr.dom.addEventListener(instr.trigger, function (e) {
-				var handler = self.tools[self.mode][instr.handler];
-				if (handler) {
-					handler(e);
-				}
-			})
-		});
-		self.dom.container.addEventListener('keypress', self.contKeyPress, false);
-		self.dom.color.style.color = self.ctx.strokeStyle;
-		for (var tool in self.tools) {
-			if (!self.tools.hasOwnProperty(tool)) continue;
-			var t = self.tools[tool];
-			t.icon.onclick = self.setMode.bind(self, tool);
-			if (t.constructor) {
-				t.constructor();
-			}
-		}
-		self.dom.paintZoomIn.onclick = self.zoomIn;
-		self.dom.paintZoomOut.onclick = self.zoomOut;
-		self.dom.colorIcon.onclick = function () {
-			self.dom.color.click();
-		};
-		self.dom.sendButton.onclick = self.sendImage;
-		self.dom.clearButton.onclick = self.clearCanvas;
-	};
 	self.setMode = function (mode) {
 		var oldMode = self.mode;
 		if (oldMode) {
 			var old = self.tools[oldMode];
 			old.onDeactivate && old.onDeactivate();
-			CssUtils.addClass(old.icon, self.PICKED_TOOL_CLASS);
+			CssUtils.removeClass(old.icon, self.PICKED_TOOL_CLASS);
 		}
 		self.mode = mode;
 		var newMode = self.tools[self.mode];
 		newMode.onActivate && newMode.onActivate();
-		CssUtils.removeClass(newMode.icon, self.PICKED_TOOL_CLASS);
-		self.instruments.forEach(function (instr) {
+		newMode.setCursor && newMode.setCursor();
+		CssUtils.addClass(newMode.icon, self.PICKED_TOOL_CLASS);
+		Object.keys(self.instruments).forEach(function (k) {
+			var instr = self.instruments[k];
 			if (oldMode && oldMode[instr.handler]) {
-				CssUtils.hideElement(instr.dom);
-			}1
+				CssUtils.hideElement(instr.holder);
+			}
 			if (newMode[instr.handler]) {
-				CssUtils.showElement(instr.dom);
+				CssUtils.showElement(instr.holder);
 			}
 		});
-		newMode.onActivate && newMode.onActivate();
-		newMode.setCursor && newMode.setCursor();
 	};
 	self.show = function () {
 		self.super.show();
-		document.body.addEventListener('mouseup', self.onmouseup, false);
-	};
-	self.initAndShow = function () {
-		self.show();
-		self.buffer.clear();
-		self.dom.canvas.setAttribute('width', self.dom.canvasWrapper.offsetWidth - 2);
-		self.dom.canvas.setAttribute('height', self.dom.canvasWrapper.offsetHeight - 6);
-		self.ctx.lineWidth = 3;
-		self.ctx.lineJoin = 'round';
-		self.ctx.lineCap = 'round';
-		self.ctx.strokeStyle = self.dom.color.value;
-		self.setMode('pen');
+		document.body.addEventListener('mouseup', self.events.onmouseup, false);
 	};
 	self.superHide = self.hide;
 	self.hide = function () {
 		self.superHide();
-		document.body.removeEventListener('mouseup', self.onmouseup, false);
+		document.body.removeEventListener('mouseup', self.events.onmouseup, false);
 	};
-	self.initChild();
+	Object.keys(self.init).forEach(function(k) {
+		self.init[k]()
+	});
 }
 
 
