@@ -429,13 +429,92 @@ fieldset
 	img
 		cursor: pointer
 
-.icon-picture
+#imgInputIcon
 	display: inline
 	float: right
 	position: absolute
 	left: 6px
 	top: 2px
 	height: 16px
+
+
+
+#paint-crp-rect
+	position: absolute
+	min-width: 20px
+	min-height: 20px
+	border: 1px dashed #cacaca
+	$square-size: -4px
+
+	#paintPastedImg
+		width: 100%
+		height: 100%
+		cursor: move
+		margin-bottom: $square-size
+
+	%painterCrop
+		position: absolute
+		background-color: #e2e2e2
+		border: 1px solid #cacaca
+		width: 6px
+		height: 6px
+		z-index: 2
+
+	[pos=tl]
+		@extend %painterCrop
+		top: 0
+		left: 0
+		margin: $square-size 0 0 $square-size
+		cursor: se-resize
+
+	[pos=bl]
+		@extend %painterCrop
+		left: 0
+		bottom: 0
+		margin: 0 0 $square-size $square-size
+		cursor: ne-resize
+
+	[pos=br]
+		@extend %painterCrop
+		right: 0
+		bottom: 0
+		margin: 0 $square-size $square-size 0
+		cursor: se-resize
+
+	[pos=tr]
+		@extend %painterCrop
+		right: 0
+		top: 0
+		margin: $square-size $square-size 0 0
+		cursor: ne-resize
+
+	[pos=l]
+		@extend %painterCrop
+		top: 50%
+		left: 0
+		margin: $square-size 0 0 $square-size
+		cursor: e-resize
+
+	[pos=t]
+		@extend %painterCrop
+		top: 0
+		left: 50%
+		margin: $square-size 0 0 $square-size
+		cursor: s-resize
+
+	[pos=r]
+		@extend %painterCrop
+		top: 50%
+		right: 0
+		margin: $square-size $square-size 0 0
+		cursor: e-resize
+
+	[pos=b]
+		@extend %painterCrop
+		left: 50%
+		bottom: 0
+		margin: 0 0 $square-size $square-size
+		cursor: s-resize
 
 .icon-brush
 	display: inline
@@ -454,6 +533,12 @@ fieldset
 	border: 0
 	padding: 0
 	:visibility hidden
+
+#paintPasteImg
+	display: none
+
+	&.active-icon
+		display: block
 
 .active-icon
 	color: #ff2020
