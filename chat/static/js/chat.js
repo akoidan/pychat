@@ -492,7 +492,7 @@ function Painter() {
 				return false;
 			}
 		},
-		applyZoom: function (isIncrease) {
+		setZoom: function (isIncrease) {
 			if (isIncrease) {
 				self.zoom *= self.ZOOM_SCALE;
 			} else {
@@ -501,6 +501,9 @@ function Painter() {
 			if (self.tools[self.mode].onZoomChange) {
 				self.tools[self.mode].onZoomChange(self.zoom);
 			}
+			self.helper.applyZoom();
+		},
+		applyZoom: function() {
 			self.dom.canvas.style.width = self.dom.canvas.width * self.zoom + 'px';
 			self.dom.canvas.style.height = self.dom.canvas.height * self.zoom + 'px';
 		},
@@ -570,7 +573,7 @@ function Painter() {
 			e.preventDefault();
 			var xProp = e.offsetX / self.dom.canvasWrapper.scrollWidth;
 			var yProp = e.offsetY / self.dom.canvasWrapper.scrollHeight;
-			self.helper.applyZoom(e.detail < 0 || e.wheelDelta > 0); // isTop
+			self.helper.setZoom(e.detail < 0 || e.wheelDelta > 0); // isTop
 			var newScrollWidth = xProp * self.dom.canvasWrapper.scrollWidth - (self.dom.canvasWrapper.clientWidth / 2);
 			var newScrollHeight = yProp * self.dom.canvasWrapper.scrollHeight - (self.dom.canvasWrapper.clientHeight / 2);
 			self.log("Zoomed to {}; newScrollOffset: {{}, {}} from proportion {{}, {}}",
@@ -904,6 +907,7 @@ function Painter() {
 				var data = self.buffer.startAction();
 				self.helper.setDimensions(tool.width.value, tool.height.value);
 				self.ctx.putImageData(data, 0, 0);
+				self.helper.applyZoom();
 				self.buffer.finishAction();
 				self.setMode('pen')
 			};
@@ -1073,10 +1077,10 @@ function Painter() {
 			}
 		},
 		zoomIn: function () {
-			self.helper.applyZoom(true);
+			self.helper.setZoom(true);
 		},
 		zoomOut: function () {
-			self.helper.applyZoom(false);
+			self.helper.setZoom(false);
 		},
 		initAndShow: function () {
 			self.show();
