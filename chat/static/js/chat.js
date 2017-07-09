@@ -377,7 +377,7 @@ function Painter() {
 			Object.keys(self.actions).forEach(function (btn) {
 				$(btn).onclick = function () {
 					self.actions[btn]();
-					self.applyZoom();
+					self.helper.applyZoom();
 				}
 			});
 		},
@@ -577,6 +577,7 @@ function Painter() {
 			)();
 			self.dom.canvasWrapper.scrollTop = newScrollHeight;
 			self.dom.canvasWrapper.scrollLeft = newScrollWidth;
+			self.helper.applyZoom()
 		},
 		contKeyPress: function (event) {
 			self.log("keyPress: {} ({})", event.keyCode, event.code);
