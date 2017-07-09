@@ -575,7 +575,11 @@ function Painter() {
 		contKeyPress: function (event) {
 			self.log("keyPress: {} ({})", event.keyCode, event.code);
 			if (event.keyCode === 13) {
-				self.actions.sendImage();
+				if (self.tools[self.mode].onApply) {
+					self.tools[self.mode].onApply();
+				} else {
+					self.actions.sendImage();
+				}
 				// event.code if keyboard is different (e.g Russian)
 			} else if (event.keyCode === 26 && event.ctrlKey || event.code === 'KeyZ') {
 				self.buffer.undo();
