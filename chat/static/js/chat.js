@@ -286,6 +286,7 @@ function Painter() {
 	self.PICKED_TOOL_CLASS = 'active-icon';
 	self.dom.canvas = $('painter');
 	self.dom.painterIcon = $('painterIcon');
+	self.dom.paintDimensions = $('paintDimensions');
 	self.dom.canvasWrapper = $('canvasWrapper');
 	self.instruments = {
 		color: {
@@ -516,17 +517,27 @@ function Painter() {
 				y: self.helper.getScaledOrdinate('height', e.offsetY)
 			}
 		},
+		setDimensions: function(w, h) {
+			w = parseInt(w);
+			h = parseInt(h);
+			self.dom.canvas.width = w;
+			self.dom.canvas.height = h;
+			self.dom.paintDimensions.textContent = '{}x{}'.format(w, h);
+		}
 	};
 	self.events = {
 		mouseDown: 0,
 		onmousedown: function (e) {
+			var tool = self.tools[self.mode];
+			if (!tool.onMouseDown) {
+				return;
+			}
 			self.log("{} mouse down", self.mode)();
 			self.events.mouseDown++;
 			var rect = painter.dom.canvas.getBoundingClientRect();
 			self.leftOffset = rect.left;
 			self.topOffset = rect.top;
 			var imgData;
-			var tool = self.tools[self.mode];
 			if (!tool.bufferHandler) {
 				imgData = self.buffer.startAction();
 			}
@@ -811,15 +822,13 @@ function Painter() {
 				var data = self.buffer.startAction();
 				var params = self.resizer.params;
 				var applyBuff = false;
-				if (params.left + params.width > self.dom.canvas.width) {
-					self.dom.canvas.width = params.left + params.width;
-					applyBuff = true;
-				}
-				if (params.top + params.height > self.dom.canvas.height) {
-					self.dom.canvas.height = params.top + params.height;
-					applyBuff = true;
-				}
-				if (applyBuff) {
+				var nw = params.left + params.width;
+				var nh = params.top + params.height;
+				if (nw > self.dom.canvas.width || nh > self.dom.canvas.height) {
+					self.helper.setDimensions(
+							Math.max(nw, self.dom.canvas.width),
+							Math.max(nh, self.dom.canvas.height)
+					);
 					self.ctx.putImageData(data, 0, 0);
 				}
 				self.ctx.drawImage(tool.imgObj,
@@ -837,8 +846,6 @@ function Painter() {
 				self.resizer.hide();
 				CssUtils.hideElement(tool.img);
 			};
-			tool.onMouseDown = function (e) {
-			}
 		}),
 		crop: new (function () {
 			var tool = this;
@@ -851,8 +858,7 @@ function Painter() {
 				var params = self.resizer.params;
 				self.buffer.startAction();
 				var img = self.ctx.getImageData(params.left, params.top, params.width, params.height);
-				self.dom.canvas.width = params.width;
-				self.dom.canvas.height = params.height;
+				self.helper.setDimensions(params.width, params.height);
 				self.ctx.putImageData(img, 0, 0);
 				self.buffer.finishAction(img);
 				self.setMode('pen');
@@ -875,6 +881,43 @@ function Painter() {
 
 			};
 		})(),
+		resize: new (function () {
+			var tool = this;
+			tool.icon = $('paintResize');
+			tool.container = $('paintResizeTools');
+			tool.width = tool.container.querySelector('[placeholder=width]');
+			tool.height = tool.container.querySelector('[placeholder=height]');
+			tool.lessThan4 = function(e) {
+				if (this.value.length > 4) {
+					this.value = this.value.slice(0, 4);
+				}
+			};
+			tool.onlyNumber = function(e) {
+				var charCode = e.which || e.keyCode;
+				return  charCode > 47 && charCode < 58;
+			};
+			tool.width.onkeypress = tool.onlyNumber;
+			tool.width.oninput = tool.lessThan4;
+			tool.height.oninput = tool.lessThan4;
+			tool.height.onkeypress = tool.onlyNumber;
+			tool.onApply = function() {
+				self.buffer.startAction();
+				self.helper.setDimensions(tool.width.value, tool.height.value);
+				self.buffer.finishAction();
+				self.setMode('pen')
+			};
+			tool.setCursor = function() {
+				self.dom.canvas.style.cursor = '';
+			};
+			tool.onActivate = function() {
+				CssUtils.showElement(tool.container);
+				tool.width.value = self.dom.canvas.width;
+				tool.height.value = self.dom.canvas.height;
+			};
+			tool.onDeactivate = function() {
+				CssUtils.hideElement(tool.container);
+			};
+		}),
 		pen: new (function () {
 			var tool = this;
 			tool.icon = $('paintPen');
@@ -970,7 +1013,7 @@ function Painter() {
 				self.buffer.startAction();
 				self.ctx.fillStyle = self.ctx.strokeStyle;
 				self.ctx.font = "{}px {}".format(5 + self.ctx.lineWidth, self.ctx.fontFamily);
-				var width = 5 + self.ctx.lineWidth;
+				var width = 5 + self.ctx.lineWidth; //todo lineheight causes so many issues
 				var lineheight = parseInt(width * 1.25);
 				var linediff = parseInt(width * 0.01);
 				var lines = tool.span.textContent.split('\n');
@@ -1037,8 +1080,10 @@ function Painter() {
 		initAndShow: function () {
 			self.show();
 			self.buffer.clear();
-			self.dom.canvas.setAttribute('width', self.dom.canvasWrapper.offsetWidth - 2);
-			self.dom.canvas.setAttribute('height', self.dom.canvasWrapper.offsetHeight - 6);
+			self.helper.setDimensions(
+					self.dom.canvasWrapper.offsetWidth - 2,
+					self.dom.canvasWrapper.offsetHeight - 6
+			);
 			self.init.setContext();
 			self.setMode('pen');
 		},
@@ -1070,8 +1115,7 @@ function Painter() {
 							self.dom.canvas.width, self.dom.canvas.height,
 							current.width, current.height
 					)();
-					self.dom.canvas.width = current.width;
-					self.dom.canvas.height = current.height;
+					self.helper.setDimensions(current.width, current.height)
 				}
 				self.ctx.putImageData(restore.data, 0, 0);
 			}

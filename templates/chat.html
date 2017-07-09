@@ -105,6 +105,7 @@
 					<i title="Move" id="paintMove" class="icon-move "></i>
 					<i id="paintText" class="icon-text" title="Insert text"></i>
 					<i id="paintCrop" class="icon-crop" title="Crop Image"></i>
+					<i title="Resize" id="paintResize" class="icon-resize"></i>
 					<i title="Pasting image" id="paintPasteImg" class="icon-picture"></i>
 					<i title="Zoom IN (ctrl+ mouse wheel)" id="paintZoomIn" class="icon-zoom-in"></i>
 					<i title="Zoom OUT (ctrl + mouse wheel)" id="paintZoomOut" class="icon-zoom-out"></i>
@@ -151,10 +152,16 @@
 					<span>F:</span>
 					<select class="value"></select>
 				</div>
+				<div id="paintResizeTools" class="hidden ">
+					<input type="text" placeholder="width"/>
+					<span>X</span>
+					<input type="text" placeholder="height"/>
+				</div>
 				<div id="paintApplyText" class="hidden ">
 					<input type="button" value="Apply" class="value"/>
 				</div>
 				<input type="button" value="Send" class="value" id="paintSend"/>
+				<span id="paintDimensions"></span>
 			</div>
 		</div>
 	</div>
