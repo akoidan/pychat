@@ -285,7 +285,6 @@ function Painter() {
 	self.ZOOM_SCALE = 1.1;
 	self.PICKED_TOOL_CLASS = 'active-icon';
 	self.dom.canvas = $('painter');
-	self.dom.painterIcon = $('painterIcon');
 	self.dom.paintDimensions = $('paintDimensions');
 	self.dom.canvasWrapper = $('canvasWrapper');
 	self.instruments = {
@@ -375,17 +374,11 @@ function Painter() {
 			}
 		},
 		initButtons: function () {
-			var buttons = {
-				paintZoomIn: self.actions.zoomIn,
-				paintRotate: self.actions.rotate,
-				paintZoomOut: self.actions.zoomOut,
-				paintSend: self.actions.sendImage,
-				paintClear: self.actions.clearCanvas,
-				paintUndo: self.buffer.undo,
-				paintRedo: self.buffer.redo
-			};
-			Object.keys(buttons).forEach(function (k) {
-				$(k).onclick = buttons[k];
+			Object.keys(self.actions).forEach(function (btn) {
+				$(btn).onclick = function () {
+					self.actions[btn]();
+					self.applyZoom();
+				}
 			});
 		},
 		initCanvas: function () {
@@ -401,7 +394,6 @@ function Painter() {
 			].forEach(function (e) {
 				e.dom.addEventListener(e.listener, self.events[e.handler], e.params);
 			});
-			self.dom.painterIcon.onclick = self.actions.initAndShow;
 		},
 		createFonts: function () {
 			var select = self.instruments.font.value;
@@ -502,7 +494,6 @@ function Painter() {
 			if (self.tools[self.mode].onZoomChange) {
 				self.tools[self.mode].onZoomChange(self.zoom);
 			}
-			self.helper.applyZoom();
 		},
 		applyZoom: function() {
 			self.dom.canvas.style.width = self.dom.canvas.width * self.zoom + 'px';
@@ -593,7 +584,7 @@ function Painter() {
 				if (self.tools[self.mode].onApply) {
 					self.tools[self.mode].onApply();
 				} else {
-					self.actions.sendImage();
+					self.actions.paintSend();
 				}
 				// event.code if keyboard is different (e.g Russian)
 			} else if (event.keyCode === 26 && event.ctrlKey || event.code === 'KeyZ') {
@@ -865,7 +856,6 @@ function Painter() {
 				self.helper.setDimensions(params.width, params.height);
 				self.ctx.putImageData(img, 0, 0);
 				self.buffer.finishAction(img);
-				self.helper.applyZoom();
 				self.setMode('pen');
 			};
 			tool.onZoomChange = self.resizer.onZoomChange;
@@ -909,7 +899,6 @@ function Painter() {
 				var data = self.buffer.startAction();
 				self.helper.setDimensions(tool.width.value, tool.height.value);
 				self.ctx.putImageData(data, 0, 0);
-				self.helper.applyZoom();
 				self.buffer.finishAction();
 				self.setMode('pen')
 			};
@@ -1091,12 +1080,18 @@ function Painter() {
 		})
 	};
 	self.actions = {
-		clearCanvas: function () {
+		paintClear: function () {
 			self.buffer.startAction();
 			self.ctx.clearRect(0, 0, parseInt(self.dom.canvas.width), parseInt(self.dom.canvas.height));
 			self.buffer.finishAction();
 		},
-		sendImage: function () {
+		paintUndo: function() {
+			self.buffer.undo();
+		},
+		paintRedo: function() {
+			self.buffer.redo();
+		},
+		paintSend: function () {
 			var trimImage = self.helper.trimImage();
 			if (trimImage) {
 				Utils.pasteb64ImgToTextArea(trimImage.toDataURL());
@@ -1105,10 +1100,10 @@ function Painter() {
 				growlError("You can't paste empty images");
 			}
 		},
-		zoomIn: function () {
+		paintZoomIn: function () {
 			self.helper.setZoom(true);
 		},
-		rotate: function () {
+		paintRotate: function () {
 			self.buffer.startAction();
 			var state = self.buffer.getState();
 			var tmpData = self.dom.canvas.toDataURL();
@@ -1122,16 +1117,15 @@ function Painter() {
 			img.onload = function(e) {
 				self.ctx.drawImage(img, -w / 2, -h / 2);
 				self.ctx.restore();
-				self.helper.applyZoom();
 				self.buffer.restoreState(state);
 				self.buffer.finishAction();
 			};
 			img.src = tmpData;
 		},
-		zoomOut: function () {
+		paintZoomOut: function () {
 			self.helper.setZoom(false);
 		},
-		initAndShow: function () {
+		paintOpen: function () {
 			self.show();
 			self.buffer.clear();
 			self.helper.setDimensions(
@@ -1185,11 +1179,9 @@ function Painter() {
 		};
 		tool.redo = function () {
 			tool.dodo(redoImages, undoImages);
-			self.helper.applyZoom();
 		};
 		tool.undo = function () {
 			tool.dodo(undoImages, redoImages);
-			self.helper.applyZoom();
 		};
 		tool.finishAction = function (img) {
 			if (current) {
@@ -1198,6 +1190,7 @@ function Painter() {
 			redoImages = [];
 			tool.setIconsState();
 			current = tool.getCanvasImage(img);
+			self.helper.applyZoom();
 		};
 		tool.getState = function() {
 			var d = {};
