@@ -672,20 +672,20 @@ function Painter() {
 			};
 			tool.params = {
 				setWidth: function (w) {
-					tool.imgHolder.style.width = tool.params.width * self.zoom + w + 'px';
-					tool.params.width = tool.params.width + w / self.zoom;
+					tool.imgHolder.style.width = tool.params.lastCoord.ow * self.zoom + w + 'px';
+					tool.params.width = tool.params.lastCoord.ow + w / self.zoom;
 				},
 				setHeight: function (h) {
-					tool.imgHolder.style.height = tool.params.height * self.zoom + h + 'px';
-					tool.params.height = tool.params.height + h / self.zoom;
+					tool.imgHolder.style.height = tool.params.lastCoord.oh * self.zoom + h + 'px';
+					tool.params.height = tool.params.lastCoord.oh + h / self.zoom;
 				},
 				setTop: function (t) {
-					tool.imgHolder.style.top = tool.params.top * self.zoom + t + 'px';
-					tool.params.top = tool.params.top + t / self.zoom;
+					tool.imgHolder.style.top = tool.params.lastCoord.oy * self.zoom + t + 'px';
+					tool.params.top = tool.params.lastCoord.oy + t / self.zoom;
 				},
 				setLeft: function (l) {
-					tool.imgHolder.style.left = tool.params.left * self.zoom + l + 'px';
-					tool.params.left = tool.params.left + l / self.zoom;
+					tool.imgHolder.style.left = tool.params.lastCoord.ox * self.zoom + l + 'px';
+					tool.params.left = tool.params.lastCoord.ox + l / self.zoom;
 				}
 			};
 			tool.onZoomChange = function () {
@@ -699,9 +699,18 @@ function Painter() {
 			};
 			tool.imgHolder.onmousedown = function (e) {
 				tool.mode = e.target.getAttribute('pos');
-				tool.proportion = tool.imgObj.width / tool.imgObj.height;
 				self.dom.canvasWrapper.addEventListener('mousemove', tool.handleMouseMove);
-				tool.lastCoord = {x: e.pageX, y: e.pageY};
+				tool.params.lastCoord = {
+					x: e.pageX,
+					y: e.pageY,
+					ox: tool.params.left, // origin x
+					oy: tool.params.top, // origin y
+					ow: tool.params.width, // origin width
+					oh: tool.params.height, // origin height
+					op: tool.params.width / tool.params.height // origin proportion
+				};
+				// ( lastCoord.op * x)^2 + x^2 = z;
+				tool.params.lastCoord.nl = Math.pow(tool.params.lastCoord.op, 2) + 1;
 				tool._setCursor(tool.cursors[tool.mode]);
 			};
 			tool.setCursor = function () {
@@ -718,54 +727,59 @@ function Painter() {
 				t: 's-resize',
 				l: 'e-resize',
 				r: 'e-resize',
-				bl: 'ne-resize',
 				tl: 'se-resize',
 				br: 'se-resize',
+				bl: 'ne-resize',
 				tr: 'ne-resize'
 			};
 			tool.handlers = {
 				m: function (x, y) {
-					tool.params.setTop(-y);
-					tool.params.setLeft(-x);
+					tool.params.setTop(+y);
+					tool.params.setLeft(+x);
 				},
 				b: function (x, y) {
-					tool.params.setHeight(-y);
+					tool.params.setHeight(+y);
 				},
 				t: function (x, y) {
-					tool.params.setTop(-y);
-					tool.params.setHeight(+y);
+					tool.params.setTop(+y);
+					tool.params.setHeight(-y);
 				},
 				l: function (x, y) {
-					tool.params.setLeft(-x);
-					tool.params.setWidth(+x);
+					tool.params.setLeft(+x);
+					tool.params.setWidth(-x);
 				},
 				r: function (x, y) {
-					tool.params.setWidth(-x);
-				},
-				bl: function (x, y, s) {
-					tool.params.setLeft(-x);
 					tool.params.setWidth(+x);
-					tool.params.setHeight(-y);
-				},
-				tl: function (x, y, s) {
-					tool.params.setLeft(-x);
-					tool.params.setWidth(+x);
-					tool.params.setHeight(+y);
-					tool.params.setTop(-y);
-				},
-				br: function (x, y, s) {
-					tool.params.setWidth(-x);
-					tool.params.setHeight(-y);
-				},
-				tr: function (x, y, s) {
-					tool.params.setWidth(-x);
-					tool.params.setHeight(+y);
-					tool.params.setTop(-y);
 				}
 			};
-			tool.handleMouseMove = function(e) {
-				tool.handlers[tool.mode](tool.lastCoord.x - e.pageX, tool.lastCoord.y - e.pageY, e.shiftKey);
-				tool.lastCoord = {x: e.pageX, y: e.pageY};
+			function calcProportCoord(x, y) {
+				var d = {
+					tl: {dx: 1, dy: 1},
+					tr: {dx: 1, dy: -1},
+					bl: {dx: -1, dy: 1},
+					br: {dx: 1, dy: 1}
+				}[tool.mode];
+				var dx = x > 0 ? 1 : -1;
+				var dy = y > 0 ? 1 : -1;
+				var nl = x * x * dx * d.dx + y * y * dy * d.dy;
+				var dnl = nl > 0 ? 1 : -1;
+				var v = dnl * Math.sqrt(Math.abs(nl) / tool.params.lastCoord.nl);
+				y = v * d.dy;
+				x = v * tool.params.lastCoord.op * d.dx;
+				return {x: x, y: y};
+			}
+			tool.handleMouseMove = function (e) {
+				var x = e.pageX - tool.params.lastCoord.x;
+				var y = e.pageY - tool.params.lastCoord.y ;
+				if (e.shiftKey && tool.mode.length === 2) {
+					var __ret = calcProportCoord(x, y);
+					x = __ret.x;
+					y = __ret.y;
+				}
+				tool.handlers[tool.mode.charAt(0)](x, y);
+				if (tool.mode.length === 2) {
+					tool.handlers[tool.mode.charAt(1)](x, y);
+				}
 			};
 			tool.onApply = function (event) {
 				self.buffer.startAction();

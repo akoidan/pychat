@@ -121,7 +121,7 @@ fieldset
 
 	> span
 		opacity: 0.9
-		@include user-select(none)
+		@extend %user-select-none
 		border-radius: 2px
 
 	#usersStateText:hover
@@ -443,6 +443,7 @@ fieldset
 	position: absolute
 	min-width: 20px
 	min-height: 20px
+	@extend %user-select-none
 	border: 1px dashed #cacaca
 	$square-size: -4px
 
@@ -450,6 +451,7 @@ fieldset
 		width: 100%
 		height: 100%
 		cursor: move
+		@extend %user-select-none
 		margin-bottom: $square-size
 
 	%painterCrop
