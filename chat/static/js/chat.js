@@ -377,6 +377,7 @@ function Painter() {
 		initButtons: function () {
 			var buttons = {
 				paintZoomIn: self.actions.zoomIn,
+				paintRotate: self.actions.rotate,
 				paintZoomOut: self.actions.zoomOut,
 				paintSend: self.actions.sendImage,
 				paintClear: self.actions.clearCanvas,
@@ -923,6 +924,33 @@ function Painter() {
 				CssUtils.hideElement(tool.container);
 			};
 		}),
+		line: new (function () {
+			var tool = this;
+			tool.icon = $('paintLine');
+			tool.setCursor = function () {
+				self.dom.canvas.style.cursor = 'crosshair';
+			};
+			tool.onChangeColor = function (e) { };
+			tool.onChangeRadius = function (e) { };
+			tool.onChangeOpacity = function (e) { };
+			tool.onMouseDown = function (e, data) {
+				tool.tmpData = data;
+				tool.coord = self.helper.getXY(e);
+				tool.onMouseMove(e)
+			};
+			tool.onMouseMove = function (e) {
+				self.ctx.putImageData(tool.tmpData, 0, 0);
+				self.ctx.beginPath();
+				self.ctx.moveTo(tool.coord.x, tool.coord.y);
+				var coord = self.helper.getXY(e);
+				self.ctx.lineTo(coord.x, coord.y);
+				self.ctx.stroke();
+			};
+			tool.onMouseUp = function (e) {
+				self.ctx.closePath();
+				tool.tmpData = null;
+			};
+		})(),
 		pen: new (function () {
 			var tool = this;
 			tool.icon = $('paintPen');
@@ -1078,6 +1106,24 @@ function Painter() {
 		},
 		zoomIn: function () {
 			self.helper.setZoom(true);
+		},
+		rotate: function () {
+			self.buffer.startAction();
+			var tmpData = self.dom.canvas.toDataURL();
+			var w = self.dom.canvas.width;
+			var h = self.dom.canvas.height;
+			self.helper.setDimensions(h, w);
+			self.ctx.save();
+			self.ctx.translate(h / 2, w / 2);
+			self.ctx.rotate(Math.PI / 2);
+			var img = new Image();
+			img.onload = function(e) {
+				self.ctx.drawImage(img, -w / 2, -h / 2);
+				self.ctx.restore();
+				self.helper.applyZoom();
+				self.buffer.finishAction();
+			};
+			img.src = tmpData;
 		},
 		zoomOut: function () {
 			self.helper.setZoom(false);
