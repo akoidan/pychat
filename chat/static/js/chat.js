@@ -752,7 +752,7 @@ function Painter() {
 					tool.params.setWidth(+x);
 				}
 			};
-			function calcProportCoord(x, y) {
+			tool.calcProportion = function(x, y) {
 				var d = {
 					tl: {dx: 1, dy: 1},
 					tr: {dx: 1, dy: -1},
@@ -767,12 +767,12 @@ function Painter() {
 				y = v * d.dy;
 				x = v * tool.params.lastCoord.op * d.dx;
 				return {x: x, y: y};
-			}
+			};
 			tool.handleMouseMove = function (e) {
 				var x = e.pageX - tool.params.lastCoord.x;
 				var y = e.pageY - tool.params.lastCoord.y ;
 				if (e.shiftKey && tool.mode.length === 2) {
-					var __ret = calcProportCoord(x, y);
+					var __ret = tool.calcProportion(x, y);
 					x = __ret.x;
 					y = __ret.y;
 				}
@@ -782,7 +782,19 @@ function Painter() {
 				}
 			};
 			tool.onApply = function (event) {
-				self.buffer.startAction();
+				var data = self.buffer.startAction();
+				var applyBuff = false;
+				if (tool.params.left + tool.params.width > self.dom.canvas.width) {
+					self.dom.canvas.width = tool.params.left + tool.params.width;
+					applyBuff = true;
+				}
+				if (tool.params.top + tool.params.height > self.dom.canvas.height) {
+					self.dom.canvas.height = tool.params.top + tool.params.height;
+					applyBuff = true;
+				}
+				if (applyBuff) {
+					self.ctx.putImageData(data, 0, 0);
+				}
 				self.ctx.drawImage(tool.imgObj,
 						0, 0, tool.imgObj.width, tool.imgObj.height,
 						tool.params.left, tool.params.top, tool.params.width, tool.params.height);
@@ -964,29 +976,39 @@ function Painter() {
 		var undoImages = [];
 		var redoImages = [];
 		var current = null;
-		tool.undo = function () {
-			var restore = undoImages.pop();
-			if (restore) {
-				redoImages.push(current);
-				current = restore;
-				self.ctx.putImageData(restore, 0, 0);
-			}
-		};
 		tool.getCanvasImage = function () {
-			return self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height)
+			return {
+				width: self.dom.canvas.width,
+				height: self.dom.canvas.height,
+				data: self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height)
+			}
 		};
 		tool.clear = function () {
 			undoImages = [];
 			redoImages = [];
 			current = null;
 		};
-		tool.redo = function () {
-			var restore = redoImages.pop();
+		tool.dodo = function(from, to) {
+			var restore = from.pop();
 			if (restore) {
-				undoImages.push(current);
+				to.push(current);
 				current = restore;
-				self.ctx.putImageData(restore, 0, 0);
+				if (self.dom.canvas.width != current.width || self.dom.canvas.height != current.height) {
+					self.log("Resizing canvas from {}x{} to {}x{}",
+							self.dom.canvas.width, self.dom.canvas.height,
+							current.width, current.height
+					)();
+					self.dom.canvas.width = current.width;
+					self.dom.canvas.height = current.height;
+				}
+				self.ctx.putImageData(restore.data, 0, 0);
 			}
+		};
+		tool.redo = function () {
+			tool.dodo(redoImages, undoImages);
+		};
+		tool.undo = function () {
+			tool.dodo(undoImages, redoImages);
 		};
 		tool.finishAction = function () {
 			if (current) {
@@ -999,7 +1021,7 @@ function Painter() {
 			if (!current) {
 				current = tool.getCanvasImage();
 			}
-			return current;
+			return current.data;
 		};
 	})();
 	self.setMode = function (mode) {
