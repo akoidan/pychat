@@ -377,7 +377,7 @@ function Painter() {
 			Object.keys(self.actions).forEach(function (btn) {
 				$(btn).onclick = function () {
 					self.actions[btn]();
-					self.applyZoom();
+					self.helper.applyZoom();
 				}
 			});
 		},
@@ -513,10 +513,12 @@ function Painter() {
 			}
 		},
 		setDimensions: function(w, h) {
+			var state = self.buffer.getState();
 			w = parseInt(w);
 			h = parseInt(h);
 			self.dom.canvas.width = w;
 			self.dom.canvas.height = h;
+			self.buffer.restoreState(state);
 			self.dom.paintDimensions.textContent = '{}x{}'.format(w, h);
 		}
 	};
@@ -577,6 +579,7 @@ function Painter() {
 			)();
 			self.dom.canvasWrapper.scrollTop = newScrollHeight;
 			self.dom.canvasWrapper.scrollLeft = newScrollWidth;
+			self.helper.applyZoom()
 		},
 		contKeyPress: function (event) {
 			self.log("keyPress: {} ({})", event.keyCode, event.code);
@@ -1105,7 +1108,6 @@ function Painter() {
 		},
 		paintRotate: function () {
 			self.buffer.startAction();
-			var state = self.buffer.getState();
 			var tmpData = self.dom.canvas.toDataURL();
 			var w = self.dom.canvas.width;
 			var h = self.dom.canvas.height;
@@ -1117,7 +1119,6 @@ function Painter() {
 			img.onload = function(e) {
 				self.ctx.drawImage(img, -w / 2, -h / 2);
 				self.ctx.restore();
-				self.buffer.restoreState(state);
 				self.buffer.finishAction();
 			};
 			img.src = tmpData;
