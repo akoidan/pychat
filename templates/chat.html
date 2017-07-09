@@ -104,6 +104,7 @@
 					<i id="paintEraser" class="icon-eraser" title="Eraser"></i>
 					<i title="Move" id="paintMove" class="icon-move "></i>
 					<i id="paintText" class="icon-text" title="Insert text"></i>
+					<i id="paintCrop" class="icon-crop" title="Crop Image"></i>
 					<i title="Pasting image" id="paintPasteImg" class="icon-picture"></i>
 					<i title="Zoom IN (ctrl+ mouse wheel)" id="paintZoomIn" class="icon-zoom-in"></i>
 					<i title="Zoom OUT (ctrl + mouse wheel)" id="paintZoomOut" class="icon-zoom-out"></i>
@@ -163,7 +164,6 @@
 		<i class="icon-brush" title="Draw an Image" id="painterIcon"></i>
 		<i class="icon-smile" title="Add a smile :)" onmousedown="smileyUtil.toggleSmileys(event)"></i>
 		<div contenteditable="true" id="usermsg" onkeydown="channelsHandler.checkAndSendMessage(event)"></div>
-	{% comment %}TODO which chat variable to use?{% endcomment %}
 	</div>
 	<form method="post" id="issueForm" class="hidden max-height-scrollable">
 		<table class="fullwidth padding10">

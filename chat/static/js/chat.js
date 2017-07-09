@@ -494,11 +494,8 @@ function Painter() {
 		applyZoom: function (isIncrease) {
 			if (isIncrease) {
 				self.zoom *= self.ZOOM_SCALE;
-			} else if (self.zoom !== 1) {
+			} else {
 				self.zoom /= self.ZOOM_SCALE;
-				if (self.zoom < 1) {
-					self.zoom = 1;
-				}
 			}
 			if (self.tools[self.mode].onZoomChange) {
 				self.tools[self.mode].onZoomChange(self.zoom);
@@ -605,6 +602,147 @@ function Painter() {
 			}
 		}
 	};
+	self.resizer = new (function() {
+		var tool = this;
+		tool.cursorStyle = document.createElement('style');
+		document.head.appendChild(tool.cursorStyle);
+		tool.imgHolder = $('paint-crp-rect');
+		tool.params = {
+			setWidth: function (w) {
+				tool.imgHolder.style.width = tool.params.lastCoord.ow * self.zoom + w + 'px';
+				tool.params.width = tool.params.lastCoord.ow + w / self.zoom;
+			},
+			setHeight: function (h) {
+				tool.imgHolder.style.height = tool.params.lastCoord.oh * self.zoom + h + 'px';
+				tool.params.height = tool.params.lastCoord.oh + h / self.zoom;
+			},
+			setTop: function (t) {
+				tool.imgHolder.style.top = tool.params.lastCoord.oy * self.zoom + t + 'px';
+				tool.params.top = tool.params.lastCoord.oy + t / self.zoom;
+			},
+			setLeft: function (l) {
+				tool.imgHolder.style.left = tool.params.lastCoord.ox * self.zoom + l + 'px';
+				tool.params.left = tool.params.lastCoord.ox + l / self.zoom;
+			}
+		};
+		tool.setMode = function (m) {
+			tool.mode = m;
+		};
+		tool.setData = function (t, l, w, h) {
+			tool.params.top = t / self.zoom;
+			tool.params.left = l / self.zoom;
+			tool.params.width = w;
+			tool.params.height = h;
+			tool.imgHolder.style.left = l + 'px';
+			tool.imgHolder.style.top = t + 'px';
+			tool.imgHolder.style.width = w * self.zoom + 'px';
+			tool.imgHolder.style.height = h * self.zoom + 'px';
+		};
+		tool._setCursor = function (cursor) {
+			tool.cursorStyle.textContent = cursor ? "#paintPastedImg, #paint-crp-rect, #painter {cursor: {} !important}".format(cursor) : ""
+		};
+		tool.onZoomChange = function () {
+			tool.imgHolder.style.width = tool.params.width * self.zoom + 'px';
+			tool.imgHolder.style.height = tool.params.height * self.zoom + 'px';
+			tool.imgHolder.style.top = tool.params.top * self.zoom + 'px';
+			tool.imgHolder.style.left = tool.params.left * self.zoom + 'px';
+		};
+		tool.show = function() {
+			CssUtils.showElement(tool.imgHolder);
+			document.addEventListener('mouseup', tool.docMouseUp);
+		};
+		tool.hide = function() {
+			CssUtils.hideElement(tool.imgHolder);
+			document.removeEventListener('mouseup', tool.docMouseUp);
+		};
+		tool.imgHolder.onmousedown = function(e) {
+			self.log("Resizer mousedown")();
+			tool.mode = e.target.getAttribute('pos');
+			self.dom.canvasWrapper.addEventListener('mousemove', tool.handleMouseMove);
+			tool.setParamsFromEvent(e);
+			tool._setCursor(tool.cursors[tool.mode]);
+		};
+		tool.setParamsFromEvent = function(e) {
+			tool.params.lastCoord = {
+				x: e.pageX,
+				y: e.pageY,
+				ox: tool.params.left, // origin x
+				oy: tool.params.top, // origin y
+				ow: tool.params.width, // origin width
+				oh: tool.params.height, // origin height
+				op: tool.params.width / tool.params.height // origin proportion
+			};
+			// ( lastCoord.op * x)^2 + x^2 = z;
+			tool.params.lastCoord.nl = Math.pow(tool.params.lastCoord.op, 2) + 1;
+		};
+		tool.docMouseUp = function (e) {
+			self.log("Resizer mouseup")();
+			tool.mode = null;
+			tool._setCursor(null);
+			self.dom.canvasWrapper.removeEventListener('mousemove', tool.handleMouseMove);
+		};
+		tool.cursors = {
+			m: 'move',
+			b: 's-resize',
+			t: 's-resize',
+			l: 'e-resize',
+			r: 'e-resize',
+			tl: 'se-resize',
+			br: 'se-resize',
+			bl: 'ne-resize',
+			tr: 'ne-resize'
+		};
+		tool.handlers = {
+			m: function (x, y) {
+				tool.params.setTop(+y);
+				tool.params.setLeft(+x);
+			},
+			b: function (x, y) {
+				tool.params.setHeight(+y);
+			},
+			t: function (x, y) {
+				tool.params.setTop(+y);
+				tool.params.setHeight(-y);
+			},
+			l: function (x, y) {
+				tool.params.setLeft(+x);
+				tool.params.setWidth(-x);
+			},
+			r: function (x, y) {
+				tool.params.setWidth(+x);
+			}
+		};
+		tool.calcProportion = function (x, y) {
+			var d = {
+				tl: {dx: 1, dy: 1},
+				tr: {dx: 1, dy: -1},
+				bl: {dx: -1, dy: 1},
+				br: {dx: 1, dy: 1}
+			}[tool.mode];
+			var dx = x > 0 ? 1 : -1;
+			var dy = y > 0 ? 1 : -1;
+			var nl = x * x * dx * d.dx + y * y * dy * d.dy;
+			var dnl = nl > 0 ? 1 : -1;
+			var v = dnl * Math.sqrt(Math.abs(nl) / tool.params.lastCoord.nl);
+			y = v * d.dy;
+			x = v * tool.params.lastCoord.op * d.dx;
+			return {x: x, y: y};
+		};
+		tool.handleMouseMove = function (e) {
+			self.log("resizer mousmove")();
+			var x = e.pageX - tool.params.lastCoord.x;
+			var y = e.pageY - tool.params.lastCoord.y;
+			if (e.shiftKey && tool.mode.length === 2) {
+				var __ret = tool.calcProportion(x, y);
+				x = __ret.x;
+				y = __ret.y;
+			}
+			tool.handlers[tool.mode.charAt(0)](x, y);
+			if (tool.mode.length === 2) {
+				tool.handlers[tool.mode.charAt(1)](x, y);
+			}
+		};
+	})();
 	self.tools = {
 		eraser: new (function () {
 			var tool = this;
@@ -642,154 +780,39 @@ function Painter() {
 			var tool = this;
 			tool.icon = $('paintPasteImg');
 			tool.img = $('paintPastedImg');
-			tool.imgHolder = $('paint-crp-rect');
 			tool.bufferHandler = true;
 			tool.imgObj = null;
-			tool.cursorStyle = document.createElement('style');
-			document.head.appendChild(tool.cursorStyle);
 			tool.readAndPasteCanvas = function (file) {
 				var reader = new FileReader();
 				reader.readAsDataURL(file);
-				reader.onload = tool.onImgLoad;
-			};
-			tool.onImgLoad = function (event) {
-				tool.imgObj = new Image();
-				var top = 10 + self.dom.canvasWrapper.scrollTop;
-				var left = 10 + self.dom.canvasWrapper.scrollLeft;
-				tool.params.top = top / self.zoom;
-				tool.params.left = left / self.zoom;
-				tool.imgHolder.style.left = left + 'px';
-				tool.imgHolder.style.top = top + 'px';
-				var b64 = event.target.result;
-				tool.imgObj.onload = function () {
-					tool.img.src = b64;
-					tool.params.width = tool.imgObj.width;
-					tool.params.height = tool.imgObj.height;
-					tool.imgHolder.style.width = (tool.imgObj.width * self.zoom) + 'px';
-					tool.imgHolder.style.height = (tool.imgObj.height * self.zoom) + 'px';
+				reader.onload = function (event) {
+					tool.imgObj = new Image();
+					var b64 = event.target.result;
+					tool.imgObj.onload = function () {
+						tool.img.src = b64;
+						self.resizer.setData(
+								10 + self.dom.canvasWrapper.scrollTop,
+								10 + self.dom.canvasWrapper.scrollLeft,
+								tool.imgObj.width,
+								tool.imgObj.height
+						);
+					};
+					tool.imgObj.src = b64;
 				};
-				tool.imgObj.src = b64;
-			};
-			tool.params = {
-				setWidth: function (w) {
-					tool.imgHolder.style.width = tool.params.lastCoord.ow * self.zoom + w + 'px';
-					tool.params.width = tool.params.lastCoord.ow + w / self.zoom;
-				},
-				setHeight: function (h) {
-					tool.imgHolder.style.height = tool.params.lastCoord.oh * self.zoom + h + 'px';
-					tool.params.height = tool.params.lastCoord.oh + h / self.zoom;
-				},
-				setTop: function (t) {
-					tool.imgHolder.style.top = tool.params.lastCoord.oy * self.zoom + t + 'px';
-					tool.params.top = tool.params.lastCoord.oy + t / self.zoom;
-				},
-				setLeft: function (l) {
-					tool.imgHolder.style.left = tool.params.lastCoord.ox * self.zoom + l + 'px';
-					tool.params.left = tool.params.lastCoord.ox + l / self.zoom;
-				}
-			};
-			tool.onZoomChange = function () {
-				tool.imgHolder.style.width = tool.params.width * self.zoom + 'px';
-				tool.imgHolder.style.height = tool.params.height * self.zoom + 'px';
-				tool.imgHolder.style.top = tool.params.top * self.zoom + 'px';
-				tool.imgHolder.style.left = tool.params.left * self.zoom + 'px';
-			};
-			tool._setCursor = function (cursor) {
-				tool.cursorStyle.textContent = cursor ? "#paintPastedImg, #paint-crp-rect, #painter {cursor: {} !important}".format(cursor) : ""
-			};
-			tool.imgHolder.onmousedown = function (e) {
-				tool.mode = e.target.getAttribute('pos');
-				self.dom.canvasWrapper.addEventListener('mousemove', tool.handleMouseMove);
-				tool.params.lastCoord = {
-					x: e.pageX,
-					y: e.pageY,
-					ox: tool.params.left, // origin x
-					oy: tool.params.top, // origin y
-					ow: tool.params.width, // origin width
-					oh: tool.params.height, // origin height
-					op: tool.params.width / tool.params.height // origin proportion
-				};
-				// ( lastCoord.op * x)^2 + x^2 = z;
-				tool.params.lastCoord.nl = Math.pow(tool.params.lastCoord.op, 2) + 1;
-				tool._setCursor(tool.cursors[tool.mode]);
 			};
 			tool.setCursor = function () {
 				self.dom.canvas.style.cursor = null;
 			};
-			document.addEventListener('mouseup', function (e) {
-				tool.mode = null;
-				tool._setCursor(null);
-				self.dom.canvasWrapper.removeEventListener('mousemove', tool.handleMouseMove);
-			});
-			tool.cursors = {
-				m: 'move',
-				b: 's-resize',
-				t: 's-resize',
-				l: 'e-resize',
-				r: 'e-resize',
-				tl: 'se-resize',
-				br: 'se-resize',
-				bl: 'ne-resize',
-				tr: 'ne-resize'
-			};
-			tool.handlers = {
-				m: function (x, y) {
-					tool.params.setTop(+y);
-					tool.params.setLeft(+x);
-				},
-				b: function (x, y) {
-					tool.params.setHeight(+y);
-				},
-				t: function (x, y) {
-					tool.params.setTop(+y);
-					tool.params.setHeight(-y);
-				},
-				l: function (x, y) {
-					tool.params.setLeft(+x);
-					tool.params.setWidth(-x);
-				},
-				r: function (x, y) {
-					tool.params.setWidth(+x);
-				}
-			};
-			tool.calcProportion = function(x, y) {
-				var d = {
-					tl: {dx: 1, dy: 1},
-					tr: {dx: 1, dy: -1},
-					bl: {dx: -1, dy: 1},
-					br: {dx: 1, dy: 1}
-				}[tool.mode];
-				var dx = x > 0 ? 1 : -1;
-				var dy = y > 0 ? 1 : -1;
-				var nl = x * x * dx * d.dx + y * y * dy * d.dy;
-				var dnl = nl > 0 ? 1 : -1;
-				var v = dnl * Math.sqrt(Math.abs(nl) / tool.params.lastCoord.nl);
-				y = v * d.dy;
-				x = v * tool.params.lastCoord.op * d.dx;
-				return {x: x, y: y};
-			};
-			tool.handleMouseMove = function (e) {
-				var x = e.pageX - tool.params.lastCoord.x;
-				var y = e.pageY - tool.params.lastCoord.y ;
-				if (e.shiftKey && tool.mode.length === 2) {
-					var __ret = tool.calcProportion(x, y);
-					x = __ret.x;
-					y = __ret.y;
-				}
-				tool.handlers[tool.mode.charAt(0)](x, y);
-				if (tool.mode.length === 2) {
-					tool.handlers[tool.mode.charAt(1)](x, y);
-				}
-			};
 			tool.onApply = function (event) {
 				var data = self.buffer.startAction();
+				var params = self.resizer.params;
 				var applyBuff = false;
-				if (tool.params.left + tool.params.width > self.dom.canvas.width) {
-					self.dom.canvas.width = tool.params.left + tool.params.width;
+				if (params.left + params.width > self.dom.canvas.width) {
+					self.dom.canvas.width = params.left + params.width;
 					applyBuff = true;
 				}
-				if (tool.params.top + tool.params.height > self.dom.canvas.height) {
-					self.dom.canvas.height = tool.params.top + tool.params.height;
+				if (params.top + params.height > self.dom.canvas.height) {
+					self.dom.canvas.height = params.top + params.height;
 					applyBuff = true;
 				}
 				if (applyBuff) {
@@ -797,20 +820,57 @@ function Painter() {
 				}
 				self.ctx.drawImage(tool.imgObj,
 						0, 0, tool.imgObj.width, tool.imgObj.height,
-						tool.params.left, tool.params.top, tool.params.width, tool.params.height);
+						params.left, params.top, params.width, params.height);
 				self.buffer.finishAction();
 				self.setMode('pen');
 			};
+			tool.onZoomChange = self.resizer.onZoomChange;
 			tool.onActivate = function(e) {
-				CssUtils.showElement(tool.imgHolder);
+				self.resizer.show();
+				CssUtils.showElement(tool.img);
 			};
 			tool.onDeactivate = function() {
-				CssUtils.hideElement(tool.imgHolder);
+				self.resizer.hide();
+				CssUtils.hideElement(tool.img);
 			};
-			tool.onMouseDown = function(e) {
-
+			tool.onMouseDown = function (e) {
 			}
 		}),
+		crop: new (function () {
+			var tool = this;
+			tool.icon = $('paintCrop');
+			tool.bufferHandler = true;
+			tool.setCursor = function () {
+				self.dom.canvas.style.cursor = 'crosshair';
+			};
+			tool.onApply = function () {
+				var params = self.resizer.params;
+				self.buffer.startAction();
+				var img = self.ctx.getImageData(params.left, params.top, params.width, params.height);
+				self.dom.canvas.width = params.width;
+				self.dom.canvas.height = params.height;
+				self.ctx.putImageData(img, 0, 0);
+				self.buffer.finishAction(img);
+				self.setMode('pen');
+			};
+			tool.onZoomChange = self.resizer.onZoomChange;
+			tool.onDeactivate = function() {
+				self.resizer.hide();
+			};
+			tool.onMouseDown = function (e) {
+				self.resizer.show();
+				self.resizer.setData(e.offsetY, e.offsetX, 0, 0);
+				self.resizer.setParamsFromEvent(e);
+				self.resizer.setMode('br');
+			};
+			tool.onMouseMove = function(e) {
+				self.log("Crop mousmove")();
+				self.resizer.handleMouseMove(e);
+			};
+			tool.onMouseUp = function (e) {
+
+			};
+		})(),
 		pen: new (function () {
 			var tool = this;
 			tool.icon = $('paintPen');
@@ -976,11 +1036,11 @@ function Painter() {
 		var undoImages = [];
 		var redoImages = [];
 		var current = null;
-		tool.getCanvasImage = function () {
+		tool.getCanvasImage = function (img) {
 			return {
 				width: self.dom.canvas.width,
 				height: self.dom.canvas.height,
-				data: self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height)
+				data: img || self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height)
 			}
 		};
 		tool.clear = function () {
@@ -1010,12 +1070,12 @@ function Painter() {
 		tool.undo = function () {
 			tool.dodo(undoImages, redoImages);
 		};
-		tool.finishAction = function () {
+		tool.finishAction = function (img) {
 			if (current) {
 				undoImages.push(current);
 			}
 			redoImages = [];
-			current = tool.getCanvasImage();
+			current = tool.getCanvasImage(img);
 		};
 		tool.startAction = function () {
 			if (!current) {
@@ -1029,6 +1089,9 @@ function Painter() {
 		self.mode = mode;
 		if (oldMode) {
 			oldMode.onDeactivate && oldMode.onDeactivate();
+			if (oldMode.onMouseMove) {
+				self.dom.canvas.removeEventListener('mousemove', oldMode.onMouseMove);
+			}
 			CssUtils.removeClass(oldMode.icon, self.PICKED_TOOL_CLASS);
 		}
 		var newMode = self.tools[self.mode];
