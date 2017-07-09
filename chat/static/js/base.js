@@ -335,13 +335,16 @@ var CssUtils = {
 	toggleVisibility: function (element) {
 		return CssUtils.toggleClass(element, CssUtils.visibilityClass);
 	},
-	setVisibility: function(element, isVisible){
+	setClassToState: function(element, isVisible, clazz){
 		if (isVisible) {
-			CssUtils.removeClass(element, CssUtils.visibilityClass);
+			CssUtils.removeClass(element, clazz);
 		} else {
-			CssUtils.addClass(element, CssUtils.visibilityClass);
+			CssUtils.addClass(element, clazz);
 		}
 	},
+	setVisibility: function(element, isVisible){
+		CssUtils.setClassToState(element, isVisible, CssUtils.visibilityClass);
+	}
 };
 
 (function () {

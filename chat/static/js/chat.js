@@ -377,6 +377,7 @@ function Painter() {
 		initButtons: function () {
 			var buttons = {
 				paintZoomIn: self.actions.zoomIn,
+				paintRotate: self.actions.rotate,
 				paintZoomOut: self.actions.zoomOut,
 				paintSend: self.actions.sendImage,
 				paintClear: self.actions.clearCanvas,
@@ -864,6 +865,7 @@ function Painter() {
 				self.helper.setDimensions(params.width, params.height);
 				self.ctx.putImageData(img, 0, 0);
 				self.buffer.finishAction(img);
+				self.helper.applyZoom();
 				self.setMode('pen');
 			};
 			tool.onZoomChange = self.resizer.onZoomChange;
@@ -923,6 +925,33 @@ function Painter() {
 				CssUtils.hideElement(tool.container);
 			};
 		}),
+		line: new (function () {
+			var tool = this;
+			tool.icon = $('paintLine');
+			tool.setCursor = function () {
+				self.dom.canvas.style.cursor = 'crosshair';
+			};
+			tool.onChangeColor = function (e) { };
+			tool.onChangeRadius = function (e) { };
+			tool.onChangeOpacity = function (e) { };
+			tool.onMouseDown = function (e, data) {
+				tool.tmpData = data;
+				tool.coord = self.helper.getXY(e);
+				tool.onMouseMove(e)
+			};
+			tool.onMouseMove = function (e) {
+				self.ctx.putImageData(tool.tmpData, 0, 0);
+				self.ctx.beginPath();
+				self.ctx.moveTo(tool.coord.x, tool.coord.y);
+				var coord = self.helper.getXY(e);
+				self.ctx.lineTo(coord.x, coord.y);
+				self.ctx.stroke();
+			};
+			tool.onMouseUp = function (e) {
+				self.ctx.closePath();
+				tool.tmpData = null;
+			};
+		})(),
 		pen: new (function () {
 			var tool = this;
 			tool.icon = $('paintPen');
@@ -1079,6 +1108,26 @@ function Painter() {
 		zoomIn: function () {
 			self.helper.setZoom(true);
 		},
+		rotate: function () {
+			self.buffer.startAction();
+			var state = self.buffer.getState();
+			var tmpData = self.dom.canvas.toDataURL();
+			var w = self.dom.canvas.width;
+			var h = self.dom.canvas.height;
+			self.helper.setDimensions(h, w);
+			self.ctx.save();
+			self.ctx.translate(h / 2, w / 2);
+			self.ctx.rotate(Math.PI / 2);
+			var img = new Image();
+			img.onload = function(e) {
+				self.ctx.drawImage(img, -w / 2, -h / 2);
+				self.ctx.restore();
+				self.helper.applyZoom();
+				self.buffer.restoreState(state);
+				self.buffer.finishAction();
+			};
+			img.src = tmpData;
+		},
 		zoomOut: function () {
 			self.helper.setZoom(false);
 		},
@@ -1097,6 +1146,9 @@ function Painter() {
 		var tool = this;
 		var undoImages = [];
 		var redoImages = [];
+		var paintUndo = $('paintUndo');
+		var paintRedo = $('paintRedo');
+		var buStateData = ['lineWidth', 'strokeStyle', 'globalAlpha', 'lineJoin', 'lineCap', 'globalCompositeOperation'];
 		var current = null;
 		tool.getCanvasImage = function (img) {
 			return {
@@ -1115,7 +1167,8 @@ function Painter() {
 			if (restore) {
 				to.push(current);
 				current = restore;
-				if (self.dom.canvas.width != current.width || self.dom.canvas.height != current.height) {
+				if (self.dom.canvas.width != current.width
+						|| self.dom.canvas.height != current.height) {
 					self.log("Resizing canvas from {}x{} to {}x{}",
 							self.dom.canvas.width, self.dom.canvas.height,
 							current.width, current.height
@@ -1123,20 +1176,40 @@ function Painter() {
 					self.helper.setDimensions(current.width, current.height)
 				}
 				self.ctx.putImageData(restore.data, 0, 0);
+				tool.setIconsState();
 			}
+		};
+		tool.setIconsState = function() {
+			CssUtils.setClassToState(paintUndo, undoImages.length, 'disabled');
+			CssUtils.setClassToState(paintRedo, redoImages.length, 'disabled');
 		};
 		tool.redo = function () {
 			tool.dodo(redoImages, undoImages);
+			self.helper.applyZoom();
 		};
 		tool.undo = function () {
 			tool.dodo(undoImages, redoImages);
+			self.helper.applyZoom();
 		};
 		tool.finishAction = function (img) {
 			if (current) {
 				undoImages.push(current);
 			}
 			redoImages = [];
+			tool.setIconsState();
 			current = tool.getCanvasImage(img);
+		};
+		tool.getState = function() {
+			var d = {};
+			buStateData.forEach(function (e) {
+				d[e] = self.ctx[e];
+			});
+			return d;
+		};
+		tool.restoreState = function (state) {
+			buStateData.forEach(function (e) {
+				self.ctx[e] = state[e];
+			});
 		};
 		tool.startAction = function () {
 			if (!current) {
