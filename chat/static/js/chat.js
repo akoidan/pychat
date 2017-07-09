@@ -948,7 +948,9 @@ function Painter() {
 			tool.icon = $('paintText');
 			//prevent self.events.contKeyPress
 			tool.span.addEventListener('keypress', function (e) {
-				e.stopPropagation()
+				if (e.keyCode !== 13 || e.shiftKey) {
+					e.stopPropagation(); //proxy onapply
+				}
 			});
 			tool.bufferHandler = true;
 			tool.onChangeFont = function (e) {
@@ -968,7 +970,13 @@ function Painter() {
 				self.buffer.startAction();
 				self.ctx.fillStyle = self.ctx.strokeStyle;
 				self.ctx.font = "{}px {}".format(5 + self.ctx.lineWidth, self.ctx.fontFamily);
-				self.ctx.fillText(tool.span.textContent, tool.lastCoord.x, self.ctx.lineWidth + tool.lastCoord.y);
+				var width = 5 + self.ctx.lineWidth;
+				var lineheight = parseInt(width * 1.25);
+				var linediff = parseInt(width * 0.01);
+				var lines = tool.span.textContent.split('\n');
+				for (var i = 0; i < lines.length; i++) {
+					self.ctx.fillText(lines[i], tool.lastCoord.x, width + i * lineheight + tool.lastCoord.y - linediff);
+				}
 				self.buffer.finishAction();
 				self.setMode('pen');
 			};
