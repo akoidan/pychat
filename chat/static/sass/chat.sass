@@ -279,7 +279,7 @@ fieldset
 		position: relative
 		overflow: auto
 		width: 700px
-		background-color: #1b1b1b
+		background-color: #313131
 		height: 500px
 		max-height: calc(90vh - 100px)
 		max-width: calc(90vh - 100px)
@@ -295,7 +295,18 @@ fieldset
 		&::-webkit-scrollbar-corner
 			background-color: #1c1c1c
 		canvas
-			background: #333
+			$c1: #cacacc
+			$c2: transparent
+			background-color: #868686
+			background-image: -moz-linear-gradient(45deg, $c1 25%, $c2 25%), -moz-linear-gradient(-45deg, $c1 25%, $c2 25%), -moz-linear-gradient(45deg, $c2 75%, $c1 75%), -moz-linear-gradient(-45deg, $c2 75%, $c1 75%)
+			background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, $c1), color-stop(.25, $c2)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, $c1), color-stop(.25, $c2)), -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, $c2), color-stop(.75, $c1)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, $c2), color-stop(.75, $c1))
+			$width: 50px
+			$h_width: $width/2
+			-moz-background-size: $width $width
+			background-size: $width $width
+			-webkit-background-size: $width $width /* override value for shitty webkit */
+
+			background-position: 0 0, $h_width 0, $h_width -#{$h_width}, 0px $h_width
 		.text
 			position: absolute
 			border: 1px dashed
