@@ -295,6 +295,11 @@ function Painter() {
 				self.ctx.strokeStyle = v;
 			},
 		},
+		apply: {
+			holder: $('paintApplyText'),
+			trigger: 'click',
+			handler: 'onApply'
+		},
 		opacity: {
 			holder: $('paintOpacity'),
 			handler: 'onChangeOpacity',
@@ -325,12 +330,11 @@ function Painter() {
 			Object.keys(self.instruments).forEach(function (k) {
 				var instr = self.instruments[k];
 				instr.value = instr.holder.querySelector('.value')
-				instr.ctxSetter(instr.value.value);
-				instr.value.addEventListener('input', function (e) {
+				instr.value.addEventListener(instr.trigger || 'input', function (e) {
 					if (instr.range && instr.value.value.length > 2 && this.value != 100) { // != isntead !== in case it's a string
 						instr.value.value = this.value.slice(0, 2)
 					}
-					instr.ctxSetter(e.target.value);
+					instr.ctxSetter && instr.ctxSetter(e.target.value);
 					var handler = self.tools[self.mode][instr.handler];
 					handler && handler(e);
 					if (instr.range) {
@@ -356,7 +360,7 @@ function Painter() {
 		setContext: function () {
 			Object.keys(self.instruments).forEach(function (k) {
 				var instr = self.instruments[k];
-				instr.ctxSetter(instr.value.value);
+				instr.ctxSetter && instr.ctxSetter(instr.value.value);
 			});
 		},
 		initTools: function () {
@@ -387,8 +391,10 @@ function Painter() {
 				{dom: self.dom.canvas, listener: 'mousedown', handler: 'onmousedown'},
 				{dom: self.dom.container, listener: 'keypress', handler: 'contKeyPress', params: false},
 				{dom: self.dom.container, listener: 'paste', handler: 'canvasImagePaste', params: false},
-				{dom: self.dom.canvasWrapper, listener: mouseWheelEventName, handler: 'onmousewheel'
-					, params: {passive: false}},
+				{
+					dom: self.dom.canvasWrapper, listener: mouseWheelEventName, handler: 'onmousewheel'
+					, params: {passive: false}
+				},
 				{dom: self.dom.container, listener: 'drop', handler: 'canvasImageDrop', params: {passive: false}}
 			].forEach(function (e) {
 				e.dom.addEventListener(e.listener, self.events[e.handler], e.params);
@@ -424,26 +430,6 @@ function Painter() {
 		return logger.webrtc.apply(logger, args);
 	};
 	self.helper = {
-		readAndPasteCanvas: function (file) {
-			Utils.readFileAsB64(file, function (event) {
-				var img = new Image();
-				img.src = event.target.result;
-				var cnvW = self.dom.canvas.width;
-				var cnvH = self.dom.canvas.height;
-				var imgW = img.width;
-				var imgH = img.height;
-				if (imgW > cnvW || imgH > cnvH) {
-					var scaleH = imgH / cnvH;
-					var scaleW = imgW / cnvW;
-					var scale = scaleH > scaleW ? scaleH : scaleW;
-					self.ctx.drawImage(img,
-							0, 0, imgW, imgH,
-							0, 0, Math.round(imgW / scale), Math.round(imgH / scale));
-				} else {
-					self.ctx.drawImage(img, 0, 0, imgW, img.height);
-				}
-			});
-		},
 		setCursor: function (fill, stroke, width) {
 			if (width < 3) {
 				width = 3;
@@ -601,17 +587,20 @@ function Painter() {
 			}
 		},
 		canvasImageDrop: function (e) {
-			self.preventDefault(e);
-			self.readAndPasteCanvas(e.dataTransfer.files[0]);
+			e.preventDefault();
+			self.setMode('img');
+			self.tools.img.readAndPasteCanvas(e.dataTransfer.files[0]);
 		},
 		canvasImagePaste: function (e) {
-			if (e.clipboardData) {
-				var items = e.clipboardData.items;
-				if (items) {
-					for (var i = 0; i < items.length; i++) {
-						self.readAndPasteCanvas(items[i].getAsFile());
+			if (e.clipboardData && e.clipboardData.items) {
+				for (var i = 0; i < e.clipboardData.items.length; i++) {
+					var asFile = e.clipboardData.items[i].getAsFile();
+					if (asFile && asFile.type.indexOf('image') >= 0) {
+						self.setMode('img');
+						self.tools.img.readAndPasteCanvas(asFile);
+						self.preventDefault(e);
+						return;
 					}
-					self.preventDefault(e);
 				}
 			}
 		}
@@ -649,6 +638,153 @@ function Painter() {
 				self.ctx.closePath();
 			};
 		})(),
+		img: new (function () {
+			var tool = this;
+			tool.icon = $('paintPasteImg');
+			tool.img = $('paintPastedImg');
+			tool.imgHolder = $('paint-crp-rect');
+			tool.bufferHandler = true;
+			tool.imgObj = null;
+			tool.cursorStyle = document.createElement('style');
+			document.head.appendChild(tool.cursorStyle);
+			tool.readAndPasteCanvas = function (file) {
+				var reader = new FileReader();
+				reader.readAsDataURL(file);
+				reader.onload = tool.onImgLoad;
+			};
+			tool.onImgLoad = function (event) {
+				tool.imgObj = new Image();
+				var top = 10 + self.dom.canvasWrapper.scrollTop;
+				var left = 10 + self.dom.canvasWrapper.scrollLeft;
+				tool.params.top = top / self.zoom;
+				tool.params.left = left / self.zoom;
+				tool.imgHolder.style.left = left + 'px';
+				tool.imgHolder.style.top = top + 'px';
+				var b64 = event.target.result;
+				tool.imgObj.onload = function () {
+					tool.img.src = b64;
+					tool.params.width = tool.imgObj.width;
+					tool.params.height = tool.imgObj.height;
+					tool.imgHolder.style.width = (tool.imgObj.width * self.zoom) + 'px';
+					tool.imgHolder.style.height = (tool.imgObj.height * self.zoom) + 'px';
+				};
+				tool.imgObj.src = b64;
+			};
+			tool.params = {
+				setWidth: function (w) {
+					tool.imgHolder.style.width = tool.params.width * self.zoom + w + 'px';
+					tool.params.width = tool.params.width + w / self.zoom;
+				},
+				setHeight: function (h) {
+					tool.imgHolder.style.height = tool.params.height * self.zoom + h + 'px';
+					tool.params.height = tool.params.height + h / self.zoom;
+				},
+				setTop: function (t) {
+					tool.imgHolder.style.top = tool.params.top * self.zoom + t + 'px';
+					tool.params.top = tool.params.top + t / self.zoom;
+				},
+				setLeft: function (l) {
+					tool.imgHolder.style.left = tool.params.left * self.zoom + l + 'px';
+					tool.params.left = tool.params.left + l / self.zoom;
+				}
+			};
+			tool.onZoomChange = function () {
+				tool.imgHolder.style.width = tool.params.width * self.zoom + 'px';
+				tool.imgHolder.style.height = tool.params.height * self.zoom + 'px';
+				tool.imgHolder.style.top = tool.params.top * self.zoom + 'px';
+				tool.imgHolder.style.left = tool.params.left * self.zoom + 'px';
+			};
+			tool._setCursor = function (cursor) {
+				tool.cursorStyle.textContent = cursor ? "#paintPastedImg, #paint-crp-rect, #painter {cursor: {} !important}".format(cursor) : ""
+			};
+			tool.imgHolder.onmousedown = function (e) {
+				tool.mode = e.target.getAttribute('pos');
+				tool.proportion = tool.imgObj.width / tool.imgObj.height;
+				self.dom.canvasWrapper.addEventListener('mousemove', tool.handleMouseMove);
+				tool.lastCoord = {x: e.pageX, y: e.pageY};
+				tool._setCursor(tool.cursors[tool.mode]);
+			};
+			tool.setCursor = function () {
+				self.dom.canvas.style.cursor = null;
+			};
+			document.addEventListener('mouseup', function (e) {
+				tool.mode = null;
+				tool._setCursor(null);
+				self.dom.canvasWrapper.removeEventListener('mousemove', tool.handleMouseMove);
+			});
+			tool.cursors = {
+				m: 'move',
+				b: 's-resize',
+				t: 's-resize',
+				l: 'e-resize',
+				r: 'e-resize',
+				bl: 'ne-resize',
+				tl: 'se-resize',
+				br: 'se-resize',
+				tr: 'ne-resize'
+			};
+			tool.handlers = {
+				m: function (x, y) {
+					tool.params.setTop(-y);
+					tool.params.setLeft(-x);
+				},
+				b: function (x, y) {
+					tool.params.setHeight(-y);
+				},
+				t: function (x, y) {
+					tool.params.setTop(-y);
+					tool.params.setHeight(+y);
+				},
+				l: function (x, y) {
+					tool.params.setLeft(-x);
+					tool.params.setWidth(+x);
+				},
+				r: function (x, y) {
+					tool.params.setWidth(-x);
+				},
+				bl: function (x, y, s) {
+					tool.params.setLeft(-x);
+					tool.params.setWidth(+x);
+					tool.params.setHeight(-y);
+				},
+				tl: function (x, y, s) {
+					tool.params.setLeft(-x);
+					tool.params.setWidth(+x);
+					tool.params.setHeight(+y);
+					tool.params.setTop(-y);
+				},
+				br: function (x, y, s) {
+					tool.params.setWidth(-x);
+					tool.params.setHeight(-y);
+				},
+				tr: function (x, y, s) {
+					tool.params.setWidth(-x);
+					tool.params.setHeight(+y);
+					tool.params.setTop(-y);
+				}
+			};
+			tool.handleMouseMove = function(e) {
+				tool.handlers[tool.mode](tool.lastCoord.x - e.pageX, tool.lastCoord.y - e.pageY, e.shiftKey);
+				tool.lastCoord = {x: e.pageX, y: e.pageY};
+			};
+			tool.onApply = function (event) {
+				self.buffer.startAction();
+				self.ctx.drawImage(tool.imgObj,
+						0, 0, tool.imgObj.width, tool.imgObj.height,
+						tool.params.left, tool.params.top, tool.params.width, tool.params.height);
+				self.buffer.finishAction();
+				self.setMode('pen');
+			};
+			tool.onActivate = function(e) {
+				CssUtils.showElement(tool.imgHolder);
+			};
+			tool.onDeactivate = function() {
+				CssUtils.hideElement(tool.imgHolder);
+			};
+			tool.onMouseDown = function(e) {
+
+			}
+		}),
 		pen: new (function () {
 			var tool = this;
 			tool.icon = $('paintPen');
@@ -720,7 +856,6 @@ function Painter() {
 			var tool = this;
 			tool.span = $('paintTextSpan');
 			tool.icon = $('paintText');
-			tool.apply = $('paintApplyText');
 			//prevent self.events.contKeyPress
 			tool.span.addEventListener('keypress', function (e) {
 				e.stopPropagation()
@@ -735,13 +870,11 @@ function Painter() {
 				tool.onChangeOpacity({target: {value: self.ctx.globalAlpha * 100}});
 				tool.onChangeColor({target: {value: self.ctx.strokeStyle}});
 				tool.span.innerHTML = '';
-				CssUtils.showElement(tool.apply);
 			};
 			tool.onDeactivate = function () {
-				CssUtils.hideElement(tool.apply);
 				CssUtils.hideElement(tool.span);
 			};
-			tool.apply.onclick = function () {
+			tool.onApply = function () {
 				self.buffer.startAction();
 				self.ctx.fillStyle = self.ctx.strokeStyle;
 				self.ctx.font = "{}px {}".format(5 + self.ctx.lineWidth, self.ctx.fontFamily);
@@ -865,7 +998,7 @@ function Painter() {
 		var newMode = self.tools[self.mode];
 		newMode.onActivate && newMode.onActivate();
 		newMode.setCursor && newMode.setCursor();
-		CssUtils.addClass(newMode.icon, self.PICKED_TOOL_CLASS);
+		newMode.icon && CssUtils.addClass(newMode.icon, self.PICKED_TOOL_CLASS);
 		Object.keys(self.instruments).forEach(function (k) {
 			var instr = self.instruments[k];
 			if (oldMode && oldMode[instr.handler]) {
@@ -4135,21 +4268,6 @@ var Utils = { createUserLi: function(userId, gender, username) {
 			element.play();
 		} catch (e) {
 			logger.error("Skipping playing message, because {}", e.message || e)();
-		}
-	},
-	readFileAsB64: function (file, callback, showGrowl) {
-		if (!file) {
-			logger.warn("Context contains no files")();
-		} else if (file.type.indexOf("image") < 0) {
-			webRtcApi.createWebrtcObject(FileSender, file);
-		} else {
-			var fileName = file.name ? file.name : '';
-			if (showGrowl) {
-				growlInfo("<span>Sending file <b>{}</b> ({}) to server</span>".format(fileName, bytesToSize(file.size)));
-			}
-			var reader = new FileReader();
-			reader.onload = callback;
-			reader.readAsDataURL(file);
 		}
 	},
 	extractError: function (arguments) {

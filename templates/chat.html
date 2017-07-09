@@ -104,6 +104,7 @@
 					<i id="paintEraser" class="icon-eraser" title="Eraser"></i>
 					<i title="Move" id="paintMove" class="icon-move "></i>
 					<i id="paintText" class="icon-text" title="Insert text"></i>
+					<i title="Pasting image" id="paintPasteImg" class="icon-picture"></i>
 					<i title="Zoom IN (ctrl+ mouse wheel)" id="paintZoomIn" class="icon-zoom-in"></i>
 					<i title="Zoom OUT (ctrl + mouse wheel)" id="paintZoomOut" class="icon-zoom-out"></i>
 					<i title="Undo (ctrl+Z)" id="paintUndo" class="icon-undo"></i>
@@ -113,6 +114,17 @@
 				<div class="canvasWrapper" id="canvasWrapper">
 					<canvas id="painter"></canvas>
 					<span class="text hidden" tabindex="-1" id="paintTextSpan" contenteditable="true"></span>
+					<div id="paint-crp-rect" pos="m" class="hidden">
+						<div pos="l"></div>
+						<div pos="r"></div>
+						<div pos="t"></div>
+						<div pos="b"></div>
+						<div pos="tl"></div>
+						<div pos="tr"></div>
+						<div pos="bl"></div>
+						<div pos="br"></div>
+						<img id="paintPastedImg"pos="m"></img>
+					</div>
 				</div>
 			</div>
 			<div class="bottomTools">
@@ -138,7 +150,9 @@
 					<span>F:</span>
 					<select class="value"></select>
 				</div>
-				<input type="button" id="paintApplyText" value="Apply" class="hidden"/>
+				<div id="paintApplyText" class="hidden ">
+					<input type="button" value="Apply" class="value"/>
+				</div>
 				<i title="Send" id="paintSend" class="hidden icon-send"></i>
 			</div>
 		</div>
