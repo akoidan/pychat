@@ -865,6 +865,7 @@ function Painter() {
 				self.helper.setDimensions(params.width, params.height);
 				self.ctx.putImageData(img, 0, 0);
 				self.buffer.finishAction(img);
+				self.helper.applyZoom();
 				self.setMode('pen');
 			};
 			tool.onZoomChange = self.resizer.onZoomChange;
@@ -1184,9 +1185,11 @@ function Painter() {
 		};
 		tool.redo = function () {
 			tool.dodo(redoImages, undoImages);
+			self.helper.applyZoom();
 		};
 		tool.undo = function () {
 			tool.dodo(undoImages, redoImages);
+			self.helper.applyZoom();
 		};
 		tool.finishAction = function (img) {
 			if (current) {
