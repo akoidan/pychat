@@ -391,8 +391,10 @@ function Painter() {
 				{dom: self.dom.canvas, listener: 'mousedown', handler: 'onmousedown'},
 				{dom: self.dom.container, listener: 'keypress', handler: 'contKeyPress', params: false},
 				{dom: self.dom.container, listener: 'paste', handler: 'canvasImagePaste', params: false},
-				{dom: self.dom.canvasWrapper, listener: mouseWheelEventName, handler: 'onmousewheel'
-					, params: {passive: false}},
+				{
+					dom: self.dom.canvasWrapper, listener: mouseWheelEventName, handler: 'onmousewheel'
+					, params: {passive: false}
+				},
 				{dom: self.dom.container, listener: 'drop', handler: 'canvasImageDrop', params: {passive: false}}
 			].forEach(function (e) {
 				e.dom.addEventListener(e.listener, self.events[e.handler], e.params);
@@ -636,7 +638,7 @@ function Painter() {
 				self.ctx.closePath();
 			};
 		})(),
-		img: new (function() {
+		img: new (function () {
 			var tool = this;
 			tool.icon = $('paintPasteImg');
 			tool.img = $('paintPastedImg');
@@ -651,60 +653,61 @@ function Painter() {
 				reader.onload = tool.onImgLoad;
 			};
 			tool.onImgLoad = function (event) {
-				tool.params.setTop(10);
-				tool.params.setLeft(10);
 				tool.imgObj = new Image();
+				var top = 10 + self.dom.canvasWrapper.scrollTop;
+				var left = 10 + self.dom.canvasWrapper.scrollLeft;
+				tool.params.top = top / self.zoom;
+				tool.params.left = left / self.zoom;
+				tool.imgHolder.style.left = left + 'px';
+				tool.imgHolder.style.top = top + 'px';
 				var b64 = event.target.result;
-				tool.imgObj.onload = function() {
+				tool.imgObj.onload = function () {
 					tool.img.src = b64;
-					tool.params.setWidth(tool.imgObj.width);
-					tool.params.setHeight(tool.imgObj.height);
+					tool.params.width = tool.imgObj.width;
+					tool.params.height = tool.imgObj.height;
+					tool.imgHolder.style.width = (tool.imgObj.width * self.zoom) + 'px';
+					tool.imgHolder.style.height = (tool.imgObj.height * self.zoom) + 'px';
 				};
 				tool.imgObj.src = b64;
 			};
 			tool.params = {
 				setWidth: function (w) {
-					tool.params.width = w;
-					tool.imgHolder.style.width = w + 'px';
+					tool.imgHolder.style.width = tool.params.width * self.zoom + w + 'px';
+					tool.params.width = tool.params.width + w / self.zoom;
 				},
 				setHeight: function (h) {
-					tool.params.height = h;
-					tool.imgHolder.style.height = h + 'px';
+					tool.imgHolder.style.height = tool.params.height * self.zoom + h + 'px';
+					tool.params.height = tool.params.height + h / self.zoom;
 				},
 				setTop: function (t) {
-					tool.params.top = t;
-					tool.imgHolder.style.top = t + 'px';
+					tool.imgHolder.style.top = tool.params.top * self.zoom + t + 'px';
+					tool.params.top = tool.params.top + t / self.zoom;
 				},
 				setLeft: function (l) {
-					tool.params.left = l;
-					tool.imgHolder.style.left = l + 'px';
+					tool.imgHolder.style.left = tool.params.left * self.zoom + l + 'px';
+					tool.params.left = tool.params.left + l / self.zoom;
 				}
 			};
 			tool.onZoomChange = function () {
-				tool.params.setWidth(tool.params.width);
-				tool.params.setHeight(tool.params.height);
-				// tool.span.style.fontSize = (self.zoom * (self.ctx.lineWidth + 5)) + 'px';
-				// tool.span.style.top = (tool.originOffest.y * self.zoom  / tool.originOffest.z) + 'px';
-				// tool.span.style.left = (tool.originOffest.x * self.zoom  / tool.originOffest.z) + 'px';
+				tool.imgHolder.style.width = tool.params.width * self.zoom + 'px';
+				tool.imgHolder.style.height = tool.params.height * self.zoom + 'px';
+				tool.imgHolder.style.top = tool.params.top * self.zoom + 'px';
+				tool.imgHolder.style.left = tool.params.left * self.zoom + 'px';
 			};
 			tool._setCursor = function (cursor) {
-				tool.cursorStyle.textContent = cursor ? "#paintPastedImg, #painter {cursor: {}}".format(cursor) : ""
+				tool.cursorStyle.textContent = cursor ? "#paintPastedImg, #paint-crp-rect, #painter {cursor: {} !important}".format(cursor) : ""
 			};
-			tool.imgHolder.onmousedown = function(e) {
+			tool.imgHolder.onmousedown = function (e) {
 				tool.mode = e.target.getAttribute('pos');
+				tool.proportion = tool.imgObj.width / tool.imgObj.height;
 				self.dom.canvasWrapper.addEventListener('mousemove', tool.handleMouseMove);
 				tool.lastCoord = {x: e.pageX, y: e.pageY};
-				tool.originOffest = {
-					x: e.offsetX,
-					y: e.offsetY,
-					z: self.zoom,
-				};
 				tool._setCursor(tool.cursors[tool.mode]);
 			};
-			tool.setCursor = function() {
+			tool.setCursor = function () {
 				self.dom.canvas.style.cursor = null;
 			};
-			document.addEventListener('mouseup', function(e) {
+			document.addEventListener('mouseup', function (e) {
 				tool.mode = null;
 				tool._setCursor(null);
 				self.dom.canvasWrapper.removeEventListener('mousemove', tool.handleMouseMove);
@@ -715,78 +718,68 @@ function Painter() {
 				t: 's-resize',
 				l: 'e-resize',
 				r: 'e-resize',
-				bl: 'se-resize',
+				bl: 'ne-resize',
 				tl: 'se-resize',
-				br: 'ne-resize',
+				br: 'se-resize',
 				tr: 'ne-resize'
 			};
 			tool.handlers = {
 				m: function (x, y) {
-					tool.params.setTop(tool.params.top - y);
-					tool.params.setLeft(tool.params.left - x);
+					tool.params.setTop(-y);
+					tool.params.setLeft(-x);
 				},
-				b: function (x,y) {
-					tool.params.setHeight(tool.params.height - y);
+				b: function (x, y) {
+					tool.params.setHeight(-y);
 				},
 				t: function (x, y) {
-					tool.params.setTop(tool.params.top - y);
-					tool.params.setHeight(tool.params.height + y);
+					tool.params.setTop(-y);
+					tool.params.setHeight(+y);
 				},
 				l: function (x, y) {
-					tool.params.setLeft(tool.params.left - x);
-					tool.params.setWidth(tool.params.width + x);
+					tool.params.setLeft(-x);
+					tool.params.setWidth(+x);
 				},
 				r: function (x, y) {
-					tool.params.setWidth(tool.params.width - x);
+					tool.params.setWidth(-x);
 				},
-				bl: function (x, y) {
-					tool.params.setLeft(tool.params.left - x);
-					tool.params.setWidth(tool.params.width + x);
-					tool.params.setHeight(tool.params.height - y);
+				bl: function (x, y, s) {
+					tool.params.setLeft(-x);
+					tool.params.setWidth(+x);
+					tool.params.setHeight(-y);
 				},
-				tl: function (x, y) {
-					tool.params.setLeft(tool.params.left - x);
-					tool.params.setWidth(tool.params.width + x);
-					tool.params.setHeight(tool.params.height + y);
-					tool.params.setTop(tool.params.top - y);
+				tl: function (x, y, s) {
+					tool.params.setLeft(-x);
+					tool.params.setWidth(+x);
+					tool.params.setHeight(+y);
+					tool.params.setTop(-y);
 				},
-				br: function (x, y) {
-					tool.params.setWidth(tool.params.width - x);
-					tool.params.setHeight(tool.params.height - y);
+				br: function (x, y, s) {
+					tool.params.setWidth(-x);
+					tool.params.setHeight(-y);
 				},
-				tr: function (x, y) {
-					tool.params.setWidth(tool.params.width - x);
-					tool.params.setHeight(tool.params.height + y);
-					tool.params.setTop(tool.params.top - y);
+				tr: function (x, y, s) {
+					tool.params.setWidth(-x);
+					tool.params.setHeight(+y);
+					tool.params.setTop(-y);
 				}
 			};
 			tool.handleMouseMove = function(e) {
-				tool.handlers[tool.mode](tool.lastCoord.x - e.pageX, tool.lastCoord.y - e.pageY);
+				tool.handlers[tool.mode](tool.lastCoord.x - e.pageX, tool.lastCoord.y - e.pageY, e.shiftKey);
 				tool.lastCoord = {x: e.pageX, y: e.pageY};
 			};
-			tool.onApply = function(event) {
-				console.log('asd');
-				return;
-				var cnvW = self.dom.canvas.width;
-				var cnvH = self.dom.canvas.height;
-				var imgW = img.width;
-				var imgH = img.height;
-				if (imgW > cnvW || imgH > cnvH) {
-					var scaleH = imgH / cnvH;
-					var scaleW = imgW / cnvW;
-					var scale = scaleH > scaleW ? scaleH : scaleW;
-					self.ctx.drawImage(img,
-							0, 0, imgW, imgH,
-							0, 0, Math.round(imgW / scale), Math.round(imgH / scale));
-				} else {
-					self.ctx.drawImage(img, 0, 0, imgW, img.height);
-				}
+			tool.onApply = function (event) {
+				self.buffer.startAction();
+				self.ctx.drawImage(tool.imgObj,
+						0, 0, tool.imgObj.width, tool.imgObj.height,
+						tool.params.left, tool.params.top, tool.params.width, tool.params.height);
+				self.buffer.finishAction();
+				self.setMode('pen');
 			};
 			tool.onActivate = function(e) {
-				CssUtils.showElement(tool.img);
+				CssUtils.showElement(tool.imgHolder);
 			};
 			tool.onDeactivate = function() {
-				CssUtils.hideElement(tool.img);
+				CssUtils.hideElement(tool.imgHolder);
 			};
 			tool.onMouseDown = function(e) {
 
