@@ -6,7 +6,7 @@ This is web (browser) chat, that supports:
  - Smiles.
  - [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) calls and video conference using webrtc.
  - Peer to peer file sending
- - Drawing images using canvas.
+ - Painter (canvas-based, brush/line/erase/crop/cpilboard paste/resize/rotate/zoom/add text/history...)
  - Facebook/google oauth.
 
 Live demo: [pychat.org](http://pychat.org/)
