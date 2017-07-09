@@ -901,8 +901,9 @@ function Painter() {
 			tool.height.oninput = tool.lessThan4;
 			tool.height.onkeypress = tool.onlyNumber;
 			tool.onApply = function() {
-				self.buffer.startAction();
+				var data = self.buffer.startAction();
 				self.helper.setDimensions(tool.width.value, tool.height.value);
+				self.ctx.putImageData(data, 0, 0);
 				self.buffer.finishAction();
 				self.setMode('pen')
 			};
