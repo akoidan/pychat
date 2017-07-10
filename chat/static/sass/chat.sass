@@ -243,7 +243,7 @@ fieldset
 			height: 25px
 			border: 1px solid grey
 
-	#paintOpacity
+	#paintOpacity, #paintFillOpacity
 		@extend %hideEl
 
 	#paintRadius
@@ -252,7 +252,7 @@ fieldset
 	#paintApplyText
 		display: inline-block
 
-	#paintColor
+	#paintColor, #paintColorFill
 		@extend %hideEl
 		input[type=color]
 			-webkit-appearance: none
@@ -278,6 +278,7 @@ fieldset
 	.canvasWrapper
 		position: relative
 		overflow: auto
+		@extend %user-select-none
 		width: 700px
 		background-color: #313131
 		height: 500px

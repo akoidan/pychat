@@ -105,6 +105,9 @@
 					<i id="paintText" class="icon-text" title="Insert text"></i>
 					<i id="paintCrop" class="icon-crop" title="Crop Image"></i>
 					<i id="paintLine" class="icon-line" title="Line"></i>
+					<i id="paintRect" class="icon-rect" title="Rectangle"></i>
+					<i id="paintEllipse" class="icon-ellipse" title="Ellipse"></i>
+					<i id="paintFill" class="icon-fill" title="Flood Fill"></i>
 					<i title="Resize (change WIDTH x HEIGHT in px)" id="paintResize" class="icon-resize"></i>
 					<i title="Move" id="paintMove" class="icon-move "></i>
 					<i title="Pasting image" id="paintPasteImg" class="icon-picture"></i>
@@ -143,11 +146,22 @@
 						<input type="range" step="1" max="100" min="1" value="100"/>
 					</div>
 				</div>
+				<div id="paintColorFill" title="Fill color" class="hidden">
+					<span>CF:</span>
+					<input type="color" value="#0000ff" class="value"/>
+				</div>
+				<div id="paintFillOpacity" title="Fill alpha" class="hidden">
+					<span>AF:</span>
+					<input type="text" step="1" class="value" value="100"/>
+					<div>
+						<input type="range" step="1" max="100" min="1" value="100"/>
+					</div>
+				</div>
 				<div id="paintRadius" title="Width" class="hidden">
 					<span>W:</span>
-					<input type="text" step="1" class="value" value="20"/>
+					<input type="text" step="1" class="value" value="10"/>
 					<div>
-						<input type="range" step="1" max="100" min="1" value="20"/>
+						<input type="range" step="1" max="100" min="1" value="10"/>
 					</div>
 				</div>
 				<div id="paintFont" title="Font" class="hidden">
