@@ -424,6 +424,13 @@ function Painter() {
 				self.keyProcessors.push(a.keyActivator);
 				i.onclick = a.keyActivator.clickAction;
 			});
+			var check = {};
+			self.keyProcessors.forEach(function(proc) {
+				if (check[proc.code]) {
+					throw "key " + proc.code + "is used";
+				}
+				check[proc.code] = true;
+			});
 			self.log("Registered keys: {}", JSON.stringify(self.keyProcessors))();
 		},
 		initCanvas: function () {
@@ -664,7 +671,8 @@ function Painter() {
 				}
 			}
 			self.keyProcessors.forEach(function(proc) {
-				if (event.code == proc.code) {
+				if (event.code == proc.code
+						&& (!proc.ctrlKey || (proc.ctrlKey && event.ctrlKey))) {
 					proc.clickAction();
 				}
 			});
@@ -831,6 +839,481 @@ function Painter() {
 		};
 	})();
 	self.tools = {
+		select: new (function () {
+			var tool = this;
+			tool.keyActivator = {
+				code: 'KeyS',
+				icon: 'icon-selection',
+				title: 'Select (S)'
+			};
+			tool.bufferHandler = true;
+			tool.domImg = $('paintPastedImg');
+			tool.dummyCanvas = document.createElement('canvas');
+			tool.dummyContext = tool.dummyCanvas.getContext('2d');
+			tool.getCursor = function () {
+				return 'crosshair';
+			};
+			tool.onActivate = function() {
+				tool.inProgress = false;
+				tool.mouseUpClicked = false;
+			};
+			// document.addEventListener('copy', tool.onCopy);
+			tool.onZoomChange = self.resizer.onZoomChange;
+			tool.onDeactivate = function() {
+				self.resizer.hide();
+				if (tool.inProgress) {
+					self.ctx.putImageData(tool.savedState, 0, 0);
+				}
+				CssUtils.hideElement(tool.domImg);
+			};
+			tool.onApply = function(e) {
+				var params = self.resizer.params;
+				self.log(
+						'Applying image {}, {}x{}, to  {x: {}, y: {}, w: {}, h:{}',
+						tool.img.width,
+						tool.img.height,
+						params.left,
+						params.top,
+						params.width,
+						params.height
+				)();
+				self.helper.drawImage(tool.img,
+					0, 0, tool.img.width, tool.img.height,
+					params.left, params.top, params.width, params.height);
+				self.buffer.finishAction();
+				tool.inProgress = false ; // don't restore in onDeactivate
+				self.setMode('pen');
+			};
+			tool.onMouseDown = function (e) {
+				if (tool.inProgress) {
+					return;
+				}
+				tool.mouseUpClicked = false;
+				self.log('select mouseDown')();
+				tool.inProgress = true;
+				self.resizer.show();
+				self.resizer.setData(e.offsetY, e.offsetX, 0, 0);
+				self.resizer.setParamsFromEvent(e);
+				self.resizer.setMode('br');
+			};
+			tool.onMouseMove = function(e) {
+				if (!tool.mouseUpClicked) {
+					self.resizer.handleMouseMove(e);
+				}
+			};
+			tool.onMouseUp = function (e) {
+				if (tool.mouseUpClicked) {
+					return;
+				}
+				self.log('select mouseUp')();
+				tool.mouseUpClicked = true;
+				var params = self.resizer.params;
+				var imageData = self.ctx.getImageData(params.left, params.top, params.width, params.height);
+				tool.dummyCanvas.width = params.width;
+				tool.dummyCanvas.height = params.height;
+				tool.dummyContext.putImageData(imageData, 0, 0);
+				CssUtils.showElement(tool.domImg);
+				tool.img = new Image();
+				tool.img.onload = function() {
+					self.log(
+							'Image Created {}x{}, from  {x: {}, y: {}, w: {}, h:{}',
+							tool.img.width,
+							tool.img.height,
+							params.left,
+							params.top,
+							params.width,
+							params.height
+					)();
+				};
+				tool.domImg.src = tool.dummyCanvas.toDataURL();
+				tool.img.src = tool.domImg.src;
+				tool.savedState = self.buffer.startAction();
+				self.ctx.clearRect(params.left, params.top, params.width, params.height);
+			};
+		})(),
+		pen: new (function () {
+			var tool = this;
+			tool.keyActivator = {
+				code: 'KeyB',
+				icon: 'icon-brush-1',
+				title: 'Brush (B)'
+			};
+			tool.onChangeColor = function (e) {
+				self.helper.setCursor(tool.getCursor());
+			};
+			tool.onChangeRadius = function (e) {
+				self.helper.setCursor(tool.getCursor());
+			};
+			tool.onChangeOpacity = function (e) {
+				self.helper.setCursor(tool.getCursor());
+			};
+			tool.getCursor = function () {
+				return self.helper.buildCursor(self.ctx.strokeStyle, '', self.ctx.lineWidth);
+			};
+			tool.onActivate = function () {
+				self.ctx.lineJoin = 'round';
+				self.ctx.lineCap = 'round';
+				self.ctx.globalCompositeOperation = "source-over";
+			};
+			tool.onMouseDown = function (e) {
+				var coord = self.helper.getXY(e);
+				self.ctx.moveTo(coord.x, coord.y);
+				tool.points = [];
+				self.tmp.saveState();
+				tool.onMouseMove(e)
+			};
+			tool.onMouseMove = function (e) {
+				// self.log("mouse move,  points {}", JSON.stringify(tool.points))();
+				var coord = self.helper.getXY(e);
+				self.tmp.restoreState();
+				tool.points.push(coord);
+				self.ctx.beginPath();
+				self.ctx.moveTo(tool.points[0].x, tool.points[0].y);
+				for (var i = 0; i < tool.points.length; i++) {
+					self.ctx.lineTo(tool.points[i].x, tool.points[i].y);
+				}
+				self.ctx.stroke();
+			};
+			tool.onMouseUp = function (e) {
+				self.ctx.closePath();
+				tool.points = [];
+			};
+	}),
+		line: new (function () {
+			var tool = this;
+			tool.keyActivator = {
+				code: 'KeyL',
+				icon: 'icon-line',
+				title: 'Line (L)'
+			};
+			tool.getCursor = function () {
+				return 'crosshair';
+			};
+			tool.onChangeColor = function (e) { };
+			tool.onChangeRadius = function (e) { };
+			tool.onChangeOpacity = function (e) { };
+			tool.onMouseDown = function (e) {
+				self.tmp.saveState();
+				tool.startCoord = self.helper.getXY(e);
+				tool.onMouseMove(e)
+			};
+			tool.calcProportCoord = function(currCord) {
+				var deg = Math.atan((tool.startCoord.x - currCord.x) / (currCord.y - tool.startCoord.y)) * 8 / Math.PI;
+				if (Math.abs(deg) < 1) { // < 45/2
+					currCord.x = tool.startCoord.x;
+				} else if (Math.abs(deg) > 3) { // > 45 + 45/2
+					currCord.y = tool.startCoord.y;
+				} else {
+					var base = (Math.abs(currCord.x - tool.startCoord.x) + Math.abs(currCord.y - tool.startCoord.y, 2)) / 2;
+					currCord.x = tool.startCoord.x + base * (tool.startCoord.x < currCord.x ? 1 : -1);
+					currCord.y = tool.startCoord.y + base * (tool.startCoord.y < currCord.y ? 1 : -1);
+				}
+			};
+			tool.onMouseMove = function (e) {
+				self.tmp.restoreState();
+				self.ctx.beginPath();
+				var currCord = self.helper.getXY(e);
+				if (e.shiftKey) {
+					tool.calcProportCoord(currCord);
+				}
+				self.ctx.moveTo(tool.startCoord.x, tool.startCoord.y);
+				self.ctx.lineTo(currCord.x, currCord.y);
+				self.ctx.stroke();
+			};
+			tool.onMouseUp = function (e) {
+				self.ctx.closePath();
+				tool.tmpData = null;
+			};
+		})(),
+		fill: new (function (ctx) {
+			var tool = this;
+			tool.keyActivator = {
+				code: 'KeyF',
+				icon: 'icon-fill',
+				title: 'Flood Fill (F)'
+			};
+			tool.bufferHandler = true;
+			tool.getCursor = function() {
+				return null;
+			};
+			tool.onChangeColorFill = function(e) {};
+			tool.onChangeFillOpacity = function(e) {};
+			tool.floodFill = (function() {
+				function floodfill(data, x, y, fillcolor, tolerance, width, height) {
+					var length = data.length;
+					var Q = [];
+					var i = (x + y * width) * 4;
+					var e = i, w = i, me, mw, w2 = width * 4;
+					var targetcolor = [data[i], data[i + 1], data[i + 2], data[i + 3]];
+					if (!pixelCompare(i, targetcolor, fillcolor, data, length, tolerance)) {
+						return false;
+					}
+					Q.push(i);
+					while (Q.length) {
+						i = Q.pop();
+						if (pixelCompareAndSet(i, targetcolor, fillcolor, data, length, tolerance)) {
+							e = i;
+							w = i;
+							mw = parseInt(i / w2) * w2; //left bound
+							me = mw + w2;             //right bound
+							while (mw < w && mw < (w -= 4) && pixelCompareAndSet(w, targetcolor, fillcolor, data, length, tolerance)); //go left until edge hit
+							while (me > e && me > (e += 4) && pixelCompareAndSet(e, targetcolor, fillcolor, data, length, tolerance)); //go right until edge hit
+							for (var j = w; j < e; j += 4) {
+								if (j - w2 >= 0 && pixelCompare(j - w2, targetcolor, fillcolor, data, length, tolerance)) Q.push(j - w2); //queue y-1
+								if (j + w2 < length && pixelCompare(j + w2, targetcolor, fillcolor, data, length, tolerance)) Q.push(j + w2); //queue y+1
+							}
+						}
+					}
+					return data;
+				}
+
+				function pixelCompare(i, targetcolor, fillcolor, data, length, tolerance) {
+					if (i < 0 || i >= length) return false; //out of bounds
+					if (data[i + 3] === 0 && fillcolor.a > 0) return true;  //surface is invisible and fill is visible
+
+					if (
+							Math.abs(targetcolor[3] - fillcolor.a) <= tolerance &&
+							Math.abs(targetcolor[0] - fillcolor.r) <= tolerance &&
+							Math.abs(targetcolor[1] - fillcolor.g) <= tolerance &&
+							Math.abs(targetcolor[2] - fillcolor.b) <= tolerance
+					) return false; //target is same as fill
+
+					if (
+							(targetcolor[3] === data[i + 3]) &&
+							(targetcolor[0] === data[i]  ) &&
+							(targetcolor[1] === data[i + 1]) &&
+							(targetcolor[2] === data[i + 2])
+					) return true; //target matches surface
+
+					if (
+							Math.abs(targetcolor[3] - data[i + 3]) <= (255 - tolerance) &&
+							Math.abs(targetcolor[0] - data[i]) <= tolerance &&
+							Math.abs(targetcolor[1] - data[i + 1]) <= tolerance &&
+							Math.abs(targetcolor[2] - data[i + 2]) <= tolerance
+					) return true; //target to surface within tolerance
+
+					return false; //no match
+				}
+
+				function pixelCompareAndSet(i, targetcolor, fillcolor, data, length, tolerance) {
+					if (pixelCompare(i, targetcolor, fillcolor, data, length, tolerance)) {
+						//fill the color
+						data[i] = fillcolor.r;
+						data[i + 1] = fillcolor.g;
+						data[i + 2] = fillcolor.b;
+						data[i + 3] = fillcolor.a;
+						return true;
+					}
+					return false;
+				}
+				return floodfill;
+			})();
+			tool.getRGBA = function () {
+				var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(self.ctx.fillStyle);
+				if (!result) {
+					throw "Invalid color";
+				}
+				return {
+					r: parseInt(result[1], 16),
+					g: parseInt(result[2], 16),
+					b: parseInt(result[3], 16),
+					a: (self.instruments.opacityFill.inputValue || 0) * 255
+				}
+			};
+			tool.onMouseDown = function (e) {
+				if (!((self.dom.canvas.width * self.dom.canvas.height) < 1000001)) {
+					growlError("Can't fill image because amount of  data is too huge. Your browser would just explode ;(");
+				} else {
+					var xy = self.helper.getXY(e);
+					var image = self.buffer.startAction();
+					var processData = image.data.slice(0);
+					tool.floodFill(processData, xy.x, xy.y, tool.getRGBA(), 0, image.width, image.height);
+					var resultingImg = new ImageData(processData, image.width, image.height);
+					self.ctx.putImageData(resultingImg, 0, 0);
+					self.buffer.finishAction(resultingImg);
+				}
+			}
+		})(),
+		rect: new (function () {
+			var tool = this;
+			tool.keyActivator = {
+				code: 'KeyQ',
+				icon: 'icon-rect',
+				title: 'Rectangle (Q)'
+			};
+			tool.getCursor = function () {
+				return 'crosshair';
+			};
+			tool.onChangeRadius = function (e) { };
+			tool.onChangeColor = function (e) { };
+			tool.onChangeOpacity = function (e) { };
+			tool.onChangeColorFill = function (e) { };
+			tool.onChangeFillOpacity = function (e) { };
+			tool.onMouseDown = function (e) {
+				self.tmp.saveState();
+				tool.startCoord = self.helper.getXY(e);
+				tool.onMouseMove(e)
+			};
+			tool.calcProportCoord = function(currCord) {
+				if (currCord.w < currCord.h) {
+					currCord.h = currCord.w;
+				} else {
+					currCord.w = currCord.h;
+				}
+			};
+			tool.onMouseMove = function (e) {
+				var endCoord = self.helper.getXY(e);
+				var dim = {
+					w: endCoord.x - tool.startCoord.x,
+					h: endCoord.y - tool.startCoord.y,
+				};
+				if (e.shiftKey) {
+					tool.calcProportCoord(dim);
+				}
+				self.ctx.beginPath();
+				self.tmp.restoreState();
+				self.ctx.rect(tool.startCoord.x, tool.startCoord.y, dim.w, dim.h);
+				self.ctx.globalAlpha = self.instruments.opacityFill.inputValue;
+				self.ctx.fill();
+				self.ctx.globalAlpha = self.instruments.opacity.inputValue;
+				self.ctx.stroke();
+			};
+		})(),
+		ellipse: new (function () {
+			var tool = this;
+			tool.keyActivator = {
+				code: 'KeyE',
+				icon: 'icon-ellipse',
+				title: 'Eclipse (E)'
+			};
+			tool.getCursor = function () {
+				return 'crosshair';
+			};
+			tool.onChangeColor = function (e) { };
+			tool.onChangeColorFill = function (e) { };
+			tool.onChangeRadius = function (e) { };
+			tool.onChangeOpacity = function (e) { };
+			tool.onChangeFillOpacity = function (e) { };
+			tool.onMouseDown = function (e, data) {
+				self.tmp.saveState();
+				tool.startCoord = self.helper.getXY(e);
+				tool.onMouseMove(e)
+			};
+			tool.calcProportCoord = function(currCord) {
+				if (currCord.w < currCord.h) {
+					currCord.h = currCord.w;
+				} else {
+					currCord.w = currCord.h;
+				}
+			};
+			tool.draw = function (x, y, w, h) {
+				var kappa = .5522848,
+						ox = (w / 2) * kappa, // control point offset horizontal
+						oy = (h / 2) * kappa, // control point offset vertical
+						xe = x + w,           // x-end
+						ye = y + h,           // y-end
+						xm = x + w / 2,       // x-middle
+						ym = y + h / 2;       // y-middle
+				self.ctx.moveTo(x, ym);
+				self.ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+				self.ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+				self.ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+				self.ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+			};
+			tool.onMouseMove = function (e) {
+				var endCoord = self.helper.getXY(e);
+				var dim = {
+					w: endCoord.x - tool.startCoord.x,
+					h: endCoord.y - tool.startCoord.y
+				};
+				self.tmp.restoreState();
+				self.ctx.beginPath();
+				if (e.shiftKey) {
+					tool.calcProportCoord(dim);
+				}
+				tool.draw(tool.startCoord.x, tool.startCoord.y, dim.w, dim.h);
+				self.ctx.closePath();
+				self.ctx.globalAlpha = self.instruments.opacityFill.inputValue;
+				self.ctx.fill();
+				self.ctx.globalAlpha = self.instruments.opacity.inputValue;
+				self.ctx.stroke();
+			};
+		})(),
+		text: new (function () {
+			var tool = this;
+			tool.keyActivator = {
+				code: 'KeyT',
+				icon: 'icon-text',
+				title: 'Text (T)'
+			};
+			tool.span = $('paintTextSpan');
+			//prevent self.events.contKeyPress
+			tool.span.addEventListener('keypress', function (e) {
+				if (e.keyCode !== 13 || e.shiftKey) {
+					e.stopPropagation(); //proxy onapply
+				}
+			});
+			tool.bufferHandler = true;
+			tool.onChangeFont = function (e) {
+				tool.span.style.fontFamily = e.target.value;
+			};
+			tool.onActivate = function () { // TODO this looks bad
+				tool.onChangeFont({target: {value: self.ctx.fontFamily}});
+				tool.onChangeRadius({target: {value: self.ctx.lineWidth}});
+				tool.onChangeFillOpacity({target: {value: self.instruments.opacityFill.inputValue * 100}});
+				tool.onChangeColorFill({target: {value: self.ctx.fillStyle}});
+				tool.span.innerHTML = '';
+			};
+			tool.onDeactivate = function () {
+				CssUtils.hideElement(tool.span);
+			};
+			tool.onApply = function () {
+				self.buffer.startAction();
+				self.ctx.font = "{}px {}".format(5 + self.ctx.lineWidth, self.ctx.fontFamily);
+				self.ctx.globalAlpha = self.instruments.opacityFill.inputValue;
+				var width = 5 + self.ctx.lineWidth; //todo lineheight causes so many issues
+				var lineheight = parseInt(width * 1.25);
+				var linediff = parseInt(width * 0.01);
+				var lines = tool.span.textContent.split('\n');
+				for (var i = 0; i < lines.length; i++) {
+					self.ctx.fillText(lines[i], tool.lastCoord.x, width + i * lineheight + tool.lastCoord.y - linediff);
+				}
+				self.ctx.globalAlpha = self.instruments.opacity.inputValue;
+				self.buffer.finishAction();
+				self.setMode('pen');
+			};
+			tool.onZoomChange = function () {
+				tool.span.style.fontSize = (self.zoom * (self.ctx.lineWidth + 5)) + 'px';
+				tool.span.style.top = (tool.originOffest.y * self.zoom  / tool.originOffest.z) + 'px';
+				tool.span.style.left = (tool.originOffest.x * self.zoom  / tool.originOffest.z) + 'px';
+			};
+			tool.getCursor = function () {
+				return 'crosshair';
+			};
+			tool.onChangeRadius = function (e) {
+				tool.span.style.fontSize = (self.zoom * (5 + parseInt(e.target.value))) + 'px';
+			};
+			tool.onChangeFillOpacity = function (e) {
+				tool.span.style.opacity = e.target.value / 100
+			};
+			tool.onChangeColorFill = function (e) {
+				tool.span.style.color = e.target.value;
+			};
+			tool.onMouseDown = function (e) {
+				CssUtils.showElement(tool.span);
+				tool.originOffest = {
+					x: e.offsetX,
+					y: e.offsetY,
+					z: self.zoom
+				};
+				tool.span.style.top = tool.originOffest.y +'px';
+				tool.span.style.left = tool.originOffest.x +'px';
+				tool.lastCoord = self.helper.getXY(e);
+				setTimeout(function (e) {
+					tool.span.focus()
+				});
+			};
+		}),
 		eraser: new (function () {
 			var tool = this;
 			tool.keyActivator = {
@@ -963,98 +1446,6 @@ function Painter() {
 
 			};
 		})(),
-		select: new (function () {
-			var tool = this;
-			tool.keyActivator = {
-				code: 'KeyS',
-				icon: 'icon-selection',
-				title: 'Select (S)'
-			};
-			tool.bufferHandler = true;
-			tool.domImg = $('paintPastedImg');
-			tool.dummyCanvas = document.createElement('canvas');
-			tool.dummyContext = tool.dummyCanvas.getContext('2d');
-			tool.getCursor = function () {
-				return 'crosshair';
-			};
-			tool.onActivate = function() {
-				tool.inProgress = false;
-				tool.mouseUpClicked = false;
-			};
-			// document.addEventListener('copy', tool.onCopy);
-			tool.onZoomChange = self.resizer.onZoomChange;
-			tool.onDeactivate = function() {
-				self.resizer.hide();
-				if (tool.inProgress) {
-					self.ctx.putImageData(tool.savedState, 0, 0);
-				}
-				CssUtils.hideElement(tool.domImg);
-			};
-			tool.onApply = function(e) {
-				var params = self.resizer.params;
-				self.log(
-						'Applying image {}, {}x{}, to  {x: {}, y: {}, w: {}, h:{}',
-						tool.img.width,
-						tool.img.height,
-						params.left,
-						params.top,
-						params.width,
-						params.height
-				)();
-				self.helper.drawImage(tool.img,
-					0, 0, tool.img.width, tool.img.height,
-					params.left, params.top, params.width, params.height);
-				self.buffer.finishAction();
-				tool.inProgress = false ; // don't restore in onDeactivate
-				self.setMode('pen');
-			};
-			tool.onMouseDown = function (e) {
-				if (tool.inProgress) {
-					return;
-				}
-				tool.mouseUpClicked = false;
-				self.log('select mouseDown')();
-				tool.inProgress = true;
-				self.resizer.show();
-				self.resizer.setData(e.offsetY, e.offsetX, 0, 0);
-				self.resizer.setParamsFromEvent(e);
-				self.resizer.setMode('br');
-			};
-			tool.onMouseMove = function(e) {
-				if (!tool.mouseUpClicked) {
-					self.resizer.handleMouseMove(e);
-				}
-			};
-			tool.onMouseUp = function (e) {
-				if (tool.mouseUpClicked) {
-					return;
-				}
-				self.log('select mouseUp')();
-				tool.mouseUpClicked = true;
-				var params = self.resizer.params;
-				var imageData = self.ctx.getImageData(params.left, params.top, params.width, params.height);
-				tool.dummyCanvas.width = params.width;
-				tool.dummyCanvas.height = params.height;
-				tool.dummyContext.putImageData(imageData, 0, 0);
-				CssUtils.showElement(tool.domImg);
-				tool.img = new Image();
-				tool.img.onload = function() {
-					self.log(
-							'Image Created {}x{}, from  {x: {}, y: {}, w: {}, h:{}',
-							tool.img.width,
-							tool.img.height,
-							params.left,
-							params.top,
-							params.width,
-							params.height
-					)();
-				};
-				tool.domImg.src = tool.dummyCanvas.toDataURL();
-				tool.img.src = tool.domImg.src;
-				tool.savedState = self.buffer.startAction();
-				self.ctx.clearRect(params.left, params.top, params.width, params.height);
-			};
-		})(),
 		resize: new (function () {
 			var tool = this;
 			tool.keyActivator = {
@@ -1097,211 +1488,12 @@ function Painter() {
 				CssUtils.hideElement(tool.container);
 			};
 		}),
-		line: new (function () {
-			var tool = this;
-			tool.keyActivator = {
-				code: 'KeyL',
-				icon: 'icon-line',
-				title: 'Line (L)'
-			};
-			tool.getCursor = function () {
-				return 'crosshair';
-			};
-			tool.onChangeColor = function (e) { };
-			tool.onChangeRadius = function (e) { };
-			tool.onChangeOpacity = function (e) { };
-			tool.onMouseDown = function (e) {
-				self.tmp.saveState();
-				tool.startCoord = self.helper.getXY(e);
-				tool.onMouseMove(e)
-			};
-			tool.calcProportCoord = function(currCord) {
-				var deg = Math.atan((tool.startCoord.x - currCord.x) / (currCord.y - tool.startCoord.y)) * 8 / Math.PI;
-				if (Math.abs(deg) < 1) { // < 45/2
-					currCord.x = tool.startCoord.x;
-				} else if (Math.abs(deg) > 3) { // > 45 + 45/2
-					currCord.y = tool.startCoord.y;
-				} else {
-					var base = (Math.abs(currCord.x - tool.startCoord.x) + Math.abs(currCord.y - tool.startCoord.y, 2)) / 2;
-					currCord.x = tool.startCoord.x + base * (tool.startCoord.x < currCord.x ? 1 : -1);
-					currCord.y = tool.startCoord.y + base * (tool.startCoord.y < currCord.y ? 1 : -1);
-				}
-			};
-			tool.onMouseMove = function (e) {
-				self.tmp.restoreState();
-				self.ctx.beginPath();
-				var currCord = self.helper.getXY(e);
-				if (e.shiftKey) {
-					tool.calcProportCoord(currCord);
-				}
-				self.ctx.moveTo(tool.startCoord.x, tool.startCoord.y);
-				self.ctx.lineTo(currCord.x, currCord.y);
-				self.ctx.stroke();
-			};
-			tool.onMouseUp = function (e) {
-				self.ctx.closePath();
-				tool.tmpData = null;
-			};
-		})(),
-		rect: new (function () {
-			var tool = this;
-			tool.keyActivator = {
-				code: 'KeyQ',
-				icon: 'icon-rect',
-				title: 'Rectangle (Q)'
-			};
-			tool.getCursor = function () {
-				return 'crosshair';
-			};
-			tool.onChangeRadius = function (e) { };
-			tool.onChangeColor = function (e) { };
-			tool.onChangeOpacity = function (e) { };
-			tool.onChangeColorFill = function (e) { };
-			tool.onChangeFillOpacity = function (e) { };
-			tool.onMouseDown = function (e) {
-				self.tmp.saveState();
-				tool.startCoord = self.helper.getXY(e);
-				tool.onMouseMove(e)
-			};
-			tool.calcProportCoord = function(currCord) {
-				if (currCord.w < currCord.h) {
-					currCord.h = currCord.w;
-				} else {
-					currCord.w = currCord.h;
-				}
-			};
-			tool.onMouseMove = function (e) {
-				var endCoord = self.helper.getXY(e);
-				var dim = {
-					w: endCoord.x - tool.startCoord.x,
-					h: endCoord.y - tool.startCoord.y,
-				};
-				if (e.shiftKey) {
-					tool.calcProportCoord(dim);
-				}
-				self.ctx.beginPath();
-				self.tmp.restoreState();
-				self.ctx.rect(tool.startCoord.x, tool.startCoord.y, dim.w, dim.h);
-				self.ctx.globalAlpha = self.instruments.opacityFill.inputValue;
-				self.ctx.fill();
-				self.ctx.globalAlpha = self.instruments.opacity.inputValue;
-				self.ctx.stroke();
-			};
-		})(),
-		ellipse: new (function () {
-			var tool = this;
-			tool.keyActivator = {
-				code: 'KeyE',
-				icon: 'icon-ellipse',
-				title: 'Eclipse (E)'
-			};
-			tool.getCursor = function () {
-				return 'crosshair';
-			};
-			tool.onChangeColor = function (e) { };
-			tool.onChangeColorFill = function (e) { };
-			tool.onChangeRadius = function (e) { };
-			tool.onChangeOpacity = function (e) { };
-			tool.onChangeFillOpacity = function (e) { };
-			tool.onMouseDown = function (e, data) {
-				self.tmp.saveState();
-				tool.startCoord = self.helper.getXY(e);
-				tool.onMouseMove(e)
-			};
-			tool.calcProportCoord = function(currCord) {
-				if (currCord.w < currCord.h) {
-					currCord.h = currCord.w;
-				} else {
-					currCord.w = currCord.h;
-				}
-			};
-			tool.draw = function (x, y, w, h) {
-				var kappa = .5522848,
-						ox = (w / 2) * kappa, // control point offset horizontal
-						oy = (h / 2) * kappa, // control point offset vertical
-						xe = x + w,           // x-end
-						ye = y + h,           // y-end
-						xm = x + w / 2,       // x-middle
-						ym = y + h / 2;       // y-middle
-				self.ctx.moveTo(x, ym);
-				self.ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
-				self.ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
-				self.ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-				self.ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
-			};
-			tool.onMouseMove = function (e) {
-				var endCoord = self.helper.getXY(e);
-				var dim = {
-					w: endCoord.x - tool.startCoord.x,
-					h: endCoord.y - tool.startCoord.y
-				};
-				self.tmp.restoreState();
-				self.ctx.beginPath();
-				if (e.shiftKey) {
-					tool.calcProportCoord(dim);
-				}
-				tool.draw(tool.startCoord.x, tool.startCoord.y, dim.w, dim.h);
-				self.ctx.closePath();
-				self.ctx.globalAlpha = self.instruments.opacityFill.inputValue;
-				self.ctx.fill();
-				self.ctx.globalAlpha = self.instruments.opacity.inputValue;
-				self.ctx.stroke();
-			};
-		})(),
-		pen: new (function () {
-			var tool = this;
-			tool.keyActivator = {
-				code: 'KeyB',
-				icon: 'icon-brush-1',
-				title: 'Brush (B)'
-			};
-			tool.onChangeColor = function (e) {
-				self.helper.setCursor(tool.getCursor());
-			};
-			tool.onChangeRadius = function (e) {
-				self.helper.setCursor(tool.getCursor());
-			};
-			tool.onChangeOpacity = function (e) {
-				self.helper.setCursor(tool.getCursor());
-			};
-			tool.getCursor = function () {
-				return self.helper.buildCursor(self.ctx.strokeStyle, '', self.ctx.lineWidth);
-			};
-			tool.onActivate = function () {
-				self.ctx.lineJoin = 'round';
-				self.ctx.lineCap = 'round';
-				self.ctx.globalCompositeOperation = "source-over";
-			};
-			tool.onMouseDown = function (e) {
-				var coord = self.helper.getXY(e);
-				self.ctx.moveTo(coord.x, coord.y);
-				tool.points = [];
-				self.tmp.saveState();
-				tool.onMouseMove(e)
-			};
-			tool.onMouseMove = function (e) {
-				// self.log("mouse move,  points {}", JSON.stringify(tool.points))();
-				var coord = self.helper.getXY(e);
-				self.tmp.restoreState();
-				tool.points.push(coord);
-				self.ctx.beginPath();
-				self.ctx.moveTo(tool.points[0].x, tool.points[0].y);
-				for (var i = 0; i < tool.points.length; i++) {
-					self.ctx.lineTo(tool.points[i].x, tool.points[i].y);
-				}
-				self.ctx.stroke();
-			};
-			tool.onMouseUp = function (e) {
-				self.ctx.closePath();
-				tool.points = [];
-			};
-		}),
 		move: new (function () {
 			var tool = this;
 			tool.keyActivator = {
 				code: 'KeyM',
 				icon: 'icon-move',
-				title: 'Move (E)'
+				title: 'Move (Mm)'
 			};
 			tool.getCursor = function () {
 				return 'move';
@@ -1321,203 +1513,32 @@ function Painter() {
 			tool.onMouseUp = function (coord) {
 				tool.lastCoord = null;
 			};
-		}),
-		text: new (function () {
-			var tool = this;
-			tool.keyActivator = {
-				code: 'KeyT',
-				icon: 'icon-text',
-				title: 'Text (T)'
-			};
-			tool.span = $('paintTextSpan');
-			//prevent self.events.contKeyPress
-			tool.span.addEventListener('keypress', function (e) {
-				if (e.keyCode !== 13 || e.shiftKey) {
-					e.stopPropagation(); //proxy onapply
-				}
-			});
-			tool.bufferHandler = true;
-			tool.onChangeFont = function (e) {
-				tool.span.style.fontFamily = e.target.value;
-			};
-			tool.onActivate = function () { // TODO this looks bad
-				tool.onChangeFont({target: {value: self.ctx.fontFamily}});
-				tool.onChangeRadius({target: {value: self.ctx.lineWidth}});
-				tool.onChangeFillOpacity({target: {value: self.instruments.opacityFill.inputValue * 100}});
-				tool.onChangeColorFill({target: {value: self.ctx.fillStyle}});
-				tool.span.innerHTML = '';
-			};
-			tool.onDeactivate = function () {
-				CssUtils.hideElement(tool.span);
-			};
-			tool.onApply = function () {
-				self.buffer.startAction();
-				self.ctx.font = "{}px {}".format(5 + self.ctx.lineWidth, self.ctx.fontFamily);
-				self.ctx.globalAlpha = self.instruments.opacityFill.inputValue;
-				var width = 5 + self.ctx.lineWidth; //todo lineheight causes so many issues
-				var lineheight = parseInt(width * 1.25);
-				var linediff = parseInt(width * 0.01);
-				var lines = tool.span.textContent.split('\n');
-				for (var i = 0; i < lines.length; i++) {
-					self.ctx.fillText(lines[i], tool.lastCoord.x, width + i * lineheight + tool.lastCoord.y - linediff);
-				}
-				self.ctx.globalAlpha = self.instruments.opacity.inputValue;
-				self.buffer.finishAction();
-				self.setMode('pen');
-			};
-			tool.onZoomChange = function () {
-				tool.span.style.fontSize = (self.zoom * (self.ctx.lineWidth + 5)) + 'px';
-				tool.span.style.top = (tool.originOffest.y * self.zoom  / tool.originOffest.z) + 'px';
-				tool.span.style.left = (tool.originOffest.x * self.zoom  / tool.originOffest.z) + 'px';
-			};
-			tool.getCursor = function () {
-				return 'crosshair';
-			};
-			tool.onChangeRadius = function (e) {
-				tool.span.style.fontSize = (self.zoom * (5 + parseInt(e.target.value))) + 'px';
-			};
-			tool.onChangeFillOpacity = function (e) {
-				tool.span.style.opacity = e.target.value / 100
-			};
-			tool.onChangeColorFill = function (e) {
-				tool.span.style.color = e.target.value;
-			};
-			tool.onMouseDown = function (e) {
-				CssUtils.showElement(tool.span);
-				tool.originOffest = {
-					x: e.offsetX,
-					y: e.offsetY,
-					z: self.zoom
-				};
-				tool.span.style.top = tool.originOffest.y +'px';
-				tool.span.style.left = tool.originOffest.x +'px';
-				tool.lastCoord = self.helper.getXY(e);
-				setTimeout(function (e) {
-					tool.span.focus()
-				});
-			};
-		}),
-		fill: new (function (ctx) {
-			var tool = this;
-			tool.keyActivator = {
-				code: 'KeyF',
-				icon: 'icon-fill',
-				title: 'Flood Fill (F)'
-			};
-			tool.bufferHandler = true;
-			tool.getCursor = function() {
-				return null;
-			};
-			tool.onChangeColorFill = function(e) {};
-			tool.onChangeFillOpacity = function(e) {};
-			tool.floodFill = (function() {
-				function floodfill(data, x, y, fillcolor, tolerance, width, height) {
-					var length = data.length;
-					var Q = [];
-					var i = (x + y * width) * 4;
-					var e = i, w = i, me, mw, w2 = width * 4;
-					var targetcolor = [data[i], data[i + 1], data[i + 2], data[i + 3]];
-					if (!pixelCompare(i, targetcolor, fillcolor, data, length, tolerance)) {
-						return false;
-					}
-					Q.push(i);
-					while (Q.length) {
-						i = Q.pop();
-						if (pixelCompareAndSet(i, targetcolor, fillcolor, data, length, tolerance)) {
-							e = i;
-							w = i;
-							mw = parseInt(i / w2) * w2; //left bound
-							me = mw + w2;             //right bound
-							while (mw < w && mw < (w -= 4) && pixelCompareAndSet(w, targetcolor, fillcolor, data, length, tolerance)); //go left until edge hit
-							while (me > e && me > (e += 4) && pixelCompareAndSet(e, targetcolor, fillcolor, data, length, tolerance)); //go right until edge hit
-							for (var j = w; j < e; j += 4) {
-								if (j - w2 >= 0 && pixelCompare(j - w2, targetcolor, fillcolor, data, length, tolerance)) Q.push(j - w2); //queue y-1
-								if (j + w2 < length && pixelCompare(j + w2, targetcolor, fillcolor, data, length, tolerance)) Q.push(j + w2); //queue y+1
-							}
-						}
-					}
-					return data;
-				}
-
-				function pixelCompare(i, targetcolor, fillcolor, data, length, tolerance) {
-					if (i < 0 || i >= length) return false; //out of bounds
-					if (data[i + 3] === 0 && fillcolor.a > 0) return true;  //surface is invisible and fill is visible
-
-					if (
-							Math.abs(targetcolor[3] - fillcolor.a) <= tolerance &&
-							Math.abs(targetcolor[0] - fillcolor.r) <= tolerance &&
-							Math.abs(targetcolor[1] - fillcolor.g) <= tolerance &&
-							Math.abs(targetcolor[2] - fillcolor.b) <= tolerance
-					) return false; //target is same as fill
-
-					if (
-							(targetcolor[3] === data[i + 3]) &&
-							(targetcolor[0] === data[i]  ) &&
-							(targetcolor[1] === data[i + 1]) &&
-							(targetcolor[2] === data[i + 2])
-					) return true; //target matches surface
-
-					if (
-							Math.abs(targetcolor[3] - data[i + 3]) <= (255 - tolerance) &&
-							Math.abs(targetcolor[0] - data[i]) <= tolerance &&
-							Math.abs(targetcolor[1] - data[i + 1]) <= tolerance &&
-							Math.abs(targetcolor[2] - data[i + 2]) <= tolerance
-					) return true; //target to surface within tolerance
-
-					return false; //no match
-				}
-
-				function pixelCompareAndSet(i, targetcolor, fillcolor, data, length, tolerance) {
-					if (pixelCompare(i, targetcolor, fillcolor, data, length, tolerance)) {
-						//fill the color
-						data[i] = fillcolor.r;
-						data[i + 1] = fillcolor.g;
-						data[i + 2] = fillcolor.b;
-						data[i + 3] = fillcolor.a;
-						return true;
-					}
-					return false;
-				}
-				return floodfill;
-			})();
-			tool.getRGBA = function () {
-				var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(self.ctx.fillStyle);
-				if (!result) {
-					throw "Invalid color";
-				}
-				return {
-					r: parseInt(result[1], 16),
-					g: parseInt(result[2], 16),
-					b: parseInt(result[3], 16),
-					a: (self.instruments.opacityFill.inputValue || 0) * 255
-				}
-			};
-			tool.onMouseDown = function (e) {
-				if (!((self.dom.canvas.width * self.dom.canvas.height) < 1000001)) {
-					growlError("Can't fill image because amount of  data is too huge. Your browser would just explode ;(");
-				} else {
-					var xy = self.helper.getXY(e);
-					var image = self.buffer.startAction();
-					var processData = image.data.slice(0);
-					tool.floodFill(processData, xy.x, xy.y, tool.getRGBA(), 0, image.width, image.height);
-					var resultingImg = new ImageData(processData, image.width, image.height);
-					self.ctx.putImageData(resultingImg, 0, 0);
-					self.buffer.finishAction(resultingImg);
-				}
-			}
-		})()
+		})
 	};
 	self.actions = [
 		{
 			keyActivator: {
-				code: 'KeyG',
-				icon: 'icon-trash-circled',
-				title: 'Clear All (G) = Garbage'
+				code: 'KeyR',
+				ctrlKey: true,
+				icon: 'icon-rotate',
+				title: 'Rotate (R)'
 			},
 			handler: function () {
 				self.buffer.startAction();
-				self.ctx.clearRect(0, 0, self.dom.canvas.width, self.dom.canvas.height);
-				self.buffer.finishAction();
+				var tmpData = self.dom.canvas.toDataURL();
+				var w = self.dom.canvas.width;
+				var h = self.dom.canvas.height;
+				self.helper.setDimensions(h, w);
+				self.ctx.save();
+				self.ctx.translate(h / 2, w / 2);
+				self.ctx.rotate(Math.PI / 2);
+				var img = new Image();
+				img.onload = function (e) {
+					self.helper.drawImage(img, -w / 2, -h / 2);
+					self.ctx.restore();
+					self.buffer.finishAction();
+				};
+				img.src = tmpData;
 			}
 		}, {
 			keyActivator: {
@@ -1559,27 +1580,14 @@ function Painter() {
 			}
 		}, {
 			keyActivator: {
-				code: 'KeyR',
-				ctrlKey: true,
-				icon: 'icon-rotate',
-				title: 'Rotate (R)'
+				code: 'KeyG',
+				icon: 'icon-trash-circled',
+				title: 'Clear All (G) = Garbage'
 			},
 			handler: function () {
 				self.buffer.startAction();
-				var tmpData = self.dom.canvas.toDataURL();
-				var w = self.dom.canvas.width;
-				var h = self.dom.canvas.height;
-				self.helper.setDimensions(h, w);
-				self.ctx.save();
-				self.ctx.translate(h / 2, w / 2);
-				self.ctx.rotate(Math.PI / 2);
-				var img = new Image();
-				img.onload = function (e) {
-					self.helper.drawImage(img, -w / 2, -h / 2);
-					self.ctx.restore();
-					self.buffer.finishAction();
-				};
-				img.src = tmpData;
+				self.ctx.clearRect(0, 0, self.dom.canvas.width, self.dom.canvas.height);
+				self.buffer.finishAction();
 			}
 		}
 	];
