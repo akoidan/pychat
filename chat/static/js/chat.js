@@ -1517,7 +1517,6 @@ function Painter() {
 		{
 			keyActivator: {
 				code: 'KeyR',
-				ctrlKey: true,
 				icon: 'icon-rotate',
 				title: 'Rotate (R)'
 			},
