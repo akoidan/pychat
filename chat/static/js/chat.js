@@ -927,15 +927,15 @@ function Painter() {
 			// 	};
 			// 	tool.img.src = tool.dummyCanvas.toDataURL();
 			// };
-			self.onActivate = function() {
-				self.inProgress = false;
-				self.mouseUpClicked = false;
+			tool.onActivate = function() {
+				tool.inProgress = false;
+				tool.mouseUpClicked = false;
 			};
 			// document.addEventListener('copy', tool.onCopy);
 			tool.onZoomChange = self.resizer.onZoomChange;
 			tool.onDeactivate = function() {
 				self.resizer.hide();
-				if (self.inProgress) {
+				if (tool.inProgress) {
 					self.ctx.putImageData(tool.savedState, 0, 0);
 				}
 				CssUtils.hideElement(tool.domImg);
@@ -955,31 +955,32 @@ function Painter() {
 					0, 0, tool.img.width, tool.img.height,
 					params.left, params.top, params.width, params.height);
 				self.buffer.finishAction();
-				self.inProgress = false ; // don't restore in onDeactivate
+				tool.inProgress = false ; // don't restore in onDeactivate
 				self.setMode('pen');
 			};
 			tool.onMouseDown = function (e) {
-				if (self.inProgress) {
+				if (tool.inProgress) {
 					return;
 				}
+				tool.mouseUpClicked = false;
 				self.log('select mouseDown')();
-				self.inProgress = true;
+				tool.inProgress = true;
 				self.resizer.show();
 				self.resizer.setData(e.offsetY, e.offsetX, 0, 0);
 				self.resizer.setParamsFromEvent(e);
 				self.resizer.setMode('br');
 			};
 			tool.onMouseMove = function(e) {
-				if (!self.mouseUpClicked) {
+				if (!tool.mouseUpClicked) {
 					self.resizer.handleMouseMove(e);
 				}
 			};
 			tool.onMouseUp = function (e) {
-				if (self.mouseUpClicked) {
+				if (tool.mouseUpClicked) {
 					return;
 				}
 				self.log('select mouseUp')();
-				self.mouseUpClicked = true;
+				tool.mouseUpClicked = true;
 				var params = self.resizer.params;
 				tool.imageData = self.ctx.getImageData(params.left, params.top, params.width, params.height);
 				tool.dummyCanvas.width = params.width;
