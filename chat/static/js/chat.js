@@ -1222,11 +1222,12 @@ function Painter() {
 		fill: new (function (ctx) {
 			var tool = this;
 			tool.icon = $('paintFill');
+			tool.bufferHandler = true;
 			tool.getCursor = function() {
 				return null;
 			};
 			tool.onChangeColorFill = function(e) {};
-			tool.onChangeOpacity = function(e) {};
+			tool.onChangeFillOpacity = function(e) {};
 			tool.floodFill = (function() {
 				function floodfill(data, x, y, fillcolor, tolerance, width, height) {
 					var length = data.length;
@@ -1295,65 +1296,32 @@ function Painter() {
 					}
 					return false;
 				}
-
-				function fillUint8ClampedArray(data, x, y, color, tolerance, width, height) {
-					if (!data instanceof Uint8ClampedArray) throw new Error("data must be an instance of Uint8ClampedArray");
-					if (isNaN(width) || width < 1)  throw new Error("argument 'width' must be a positive integer");
-					if (isNaN(height) || height < 1) throw new Error("argument 'height' must be a positive integer");
-					if (isNaN(x) || x < 0) throw new Error("argument 'x' must be a positive integer");
-					if (isNaN(y) || y < 0) throw new Error("argument 'y' must be a positive integer");
-					if (width * height * 4 !== data.length) throw new Error("width and height do not fit Uint8ClampedArray dimensions");
-					var xi = Math.floor(x);
-					var yi = Math.floor(y);
-					if (xi !== x) console.warn("x truncated from", x, "to", xi);
-					if (yi !== y) console.warn("y truncated from", y, "to", yi);
-					//Maximum tolerance of 254, Default to 0
-					tolerance = (!isNaN(tolerance)) ? Math.min(Math.abs(Math.round(tolerance)), 254) : 0;
-					return floodfill(data, xi, yi, color, tolerance, width, height);
-				}
-
-				function getComputedColor(c) {
-					var temp = document.createElement("div");
-					var color = {r: 0, g: 0, b: 0, a: 0};
-					temp.style.color = c;
-					temp.style.display = "none";
-					document.body.appendChild(temp);
-					//Use native window.getComputedStyle to parse any CSS color pattern
-					var style = window.getComputedStyle(temp, null).color;
-					document.body.removeChild(temp);
-					var recol = /([\.\d]+)/g;
-					var vals = style.match(recol);
-					if (vals && vals.length > 2) {
-						//Coerce the string value into an rgba object
-						color.r = parseInt(vals[0]) || 0;
-						color.g = parseInt(vals[1]) || 0;
-						color.b = parseInt(vals[2]) || 0;
-						color.a = Math.round((parseFloat(vals[3]) || 1.0) * 255);
-					}
-					return color;
-				};
-
-				return function (x, y, tolerance, left, top, right, bottom) {
-					//Gets the rgba color from the context fillStyle
-					var color = getComputedColor(self.ctx.fillStyle);
-					//Defaults and type checks for image boundaries
-					left = (isNaN(left)) ? 0 : left;
-					top = (isNaN(top)) ? 0 : top;
-					right = (!isNaN(right) && right) ? Math.min(Math.abs(right), self.ctx.canvas.width) : self.ctx.canvas.width;
-					bottom = (!isNaN(bottom) && bottom) ? Math.min(Math.abs(bottom), self.ctx.canvas.height) : self.ctx.canvas.height;
-					var image = self.ctx.getImageData(left, top, right, bottom);
-					var data = image.data;
-					var width = image.width;
-					var height = image.height;
-					if (width > 0 && height > 0) {
-						fillUint8ClampedArray(data, x, y, color, tolerance, width, height);
-						self.ctx.putImageData(image, left, top);
-					}
-				};
+				return floodfill;
 			})();
-			tool.onMouseDown = function(e) {
-				var xy = self.helper.getXY(e);
-				tool.floodFill(xy.x, xy.y);
+			tool.getRGBA = function () {
+				var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(self.ctx.fillStyle);
+				if (!result) {
+					throw "Invalid color";
+				}
+				return {
+					r: parseInt(result[1], 16),
+					g: parseInt(result[2], 16),
+					b: parseInt(result[3], 16),
+					a: (self.instruments.opacityFill.inputValue || 0) * 255
+				}
+			};
+			tool.onMouseDown = function (e) {
+				if (!((self.dom.canvas.width * self.dom.canvas.height) < 1000001)) {
+					growlError("Can't fill image because amount of  data is too huge. Your browser would just explode ;(");
+				} else {
+					var xy = self.helper.getXY(e);
+					var image = self.buffer.startAction();
+					var processData = image.data.slice(0);
+					tool.floodFill(processData, xy.x, xy.y, tool.getRGBA(), 0, image.width, image.height);
+					var resultingImg = new ImageData(processData, image.width, image.height);
+					self.ctx.putImageData(resultingImg, 0, 0);
+					self.buffer.finishAction(resultingImg);
+				}
 			}
 		})()
 	};
