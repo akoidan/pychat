@@ -1230,10 +1230,6 @@ function Painter() {
 			tool.onChangeFillOpacity = function(e) {};
 			tool.floodFill = (function() {
 				function floodfill(data, x, y, fillcolor, tolerance, width, height) {
-					if (!((width * height) < 1000001)) {
-						growlError("Can't fill image because data is too huge");
-						return;
-					}
 					var length = data.length;
 					var Q = [];
 					var i = (x + y * width) * 4;
@@ -1314,12 +1310,18 @@ function Painter() {
 					a: (self.instruments.opacityFill.inputValue || 0) * 255
 				}
 			};
-			tool.onMouseDown = function (e, data) {
-				var xy = self.helper.getXY(e);
-				var image = self.buffer.startAction();
-				tool.floodFill(image.data, xy.x, xy.y, tool.getRGBA(), 0, image.width, image.height);
-				self.ctx.putImageData(image, 0, 0);
-				self.buffer.finishAction(image);
+			tool.onMouseDown = function (e) {
+				if (!((self.dom.canvas.width * self.dom.canvas.height) < 1000001)) {
+					growlError("Can't fill image because amount of  data is too huge. Your browser would just explode ;(");
+				} else {
+					var xy = self.helper.getXY(e);
+					var image = self.buffer.startAction();
+					var processData = image.data.slice(0);
+					tool.floodFill(processData, xy.x, xy.y, tool.getRGBA(), 0, image.width, image.height);
+					var resultingImg = new ImageData(processData, image.width, image.height);
+					self.ctx.putImageData(resultingImg, 0, 0);
+					self.buffer.finishAction(resultingImg);
+				}
 			}
 		})()
 	};
