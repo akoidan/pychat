@@ -424,14 +424,17 @@ function Painter() {
 		return logger.webrtc.apply(logger, args);
 	};
 	self.helper = {
-		setCursor: function (fill, stroke, width) {
+		setCursor: function(text) {
+			self.dom.canvas.style.cursor = text;
+		},
+		buildCursor: function (fill, stroke, width) {
 			if (width < 3) {
 				width = 3;
 			} else if (width > 126) {
 				width = 126;
 			}
 			var svg = '<svg xmlns="http://www.w3.org/2000/svg" height="128" width="128"><circle cx="64" cy="64" r="{0}" fill="{1}"{2}/></svg>'.formatPos(width, fill, stroke);
-			self.dom.canvas.style.cursor = 'url(data:image/svg+xml;base64,{}) {} {}, auto'.format(btoa(svg), 64, 64);
+			return 'url(data:image/svg+xml;base64,{}) {} {}, auto'.format(btoa(svg), 64, 64);
 		},
 		isNumberKey: function (evt) {
 			var charCode = evt.which || evt.keyCode;
@@ -760,11 +763,11 @@ function Painter() {
 		eraser: new (function () {
 			var tool = this;
 			tool.icon = $('paintEraser');
-			tool.setCursor = function () {
-				self.helper.setCursor('#aaaaaa', ' stroke="black" stroke-width="2"', self.ctx.lineWidth);
+			tool.getCursor = function () {
+				return self.helper.buildCursor('#aaaaaa', ' stroke="black" stroke-width="2"', self.ctx.lineWidth);
 			};
 			tool.onChangeRadius = function (e) {
-				tool.setCursor();
+				self.helper.setCursor(tool.getCursor());
 			};
 			tool.onActivate = function () {
 				tool.tmpAlpha = self.ctx.globalAlpha;
@@ -813,8 +816,8 @@ function Painter() {
 					tool.imgObj.src = b64;
 				};
 			};
-			tool.setCursor = function () {
-				self.dom.canvas.style.cursor = null;
+			tool.getCursor = function () {
+				return null;
 			};
 			tool.onApply = function (event) {
 				var data = self.buffer.startAction();
@@ -849,8 +852,8 @@ function Painter() {
 			var tool = this;
 			tool.icon = $('paintCrop');
 			tool.bufferHandler = true;
-			tool.setCursor = function () {
-				self.dom.canvas.style.cursor = 'crosshair';
+			tool.getCursor = function () {
+				return 'crosshair';
 			};
 			tool.onApply = function () {
 				var params = self.resizer.params;
@@ -905,8 +908,8 @@ function Painter() {
 				self.buffer.finishAction();
 				self.setMode('pen')
 			};
-			tool.setCursor = function() {
-				self.dom.canvas.style.cursor = '';
+			tool.getCursor = function() {
+				return null;
 			};
 			tool.onActivate = function() {
 				CssUtils.showElement(tool.container);
@@ -920,8 +923,8 @@ function Painter() {
 		line: new (function () {
 			var tool = this;
 			tool.icon = $('paintLine');
-			tool.setCursor = function () {
-				self.dom.canvas.style.cursor = 'crosshair';
+			tool.getCursor = function () {
+				return 'crosshair';
 			};
 			tool.onChangeColor = function (e) { };
 			tool.onChangeRadius = function (e) { };
@@ -959,20 +962,114 @@ function Painter() {
 				tool.tmpData = null;
 			};
 		})(),
+		rect: new (function () {
+			var tool = this;
+			tool.icon = $('paintRect');
+			tool.getCursor = function () {
+				return 'crosshair';
+			};
+			tool.onChangeColor = function (e) { };
+			tool.onChangeRadius = function (e) { };
+			tool.onChangeOpacity = function (e) { };
+			tool.onMouseDown = function (e, data) {
+				tool.tmpData = data;
+				tool.startCoord = self.helper.getXY(e);
+				tool.onMouseMove(e)
+			};
+			tool.calcProportCoord = function(currCord) {
+				if (currCord.w < currCord.h) {
+					currCord.h = currCord.w;
+				} else {
+					currCord.w = currCord.h;
+				}
+			};
+			tool.onMouseMove = function (e) {
+				var endCoord = self.helper.getXY(e);
+				var dim = {
+					w: endCoord.x - tool.startCoord.x,
+					h: endCoord.y - tool.startCoord.y,
+				};
+				if (e.shiftKey) {
+					tool.calcProportCoord(dim);
+				}
+				self.ctx.beginPath();
+				self.ctx.putImageData(tool.tmpData, 0, 0);
+				self.ctx.rect(tool.startCoord.x, tool.startCoord.y, dim.w, dim.h);
+				self.ctx.stroke();
+			};
+			tool.onMouseUp = function (e) {
+				tool.tmpData = null;
+			};
+		})(),
+		ellipse: new (function () {
+			var tool = this;
+			tool.icon = $('paintEllipse');
+			tool.getCursor = function () {
+				return 'crosshair';
+			};
+			tool.onChangeColor = function (e) { };
+			tool.onChangeRadius = function (e) { };
+			tool.onChangeOpacity = function (e) { };
+			tool.onMouseDown = function (e, data) {
+				tool.tmpData = data;
+				tool.startCoord = self.helper.getXY(e);
+				tool.onMouseMove(e)
+			};
+			tool.calcProportCoord = function(currCord) {
+				if (currCord.w < currCord.h) {
+					currCord.h = currCord.w;
+				} else {
+					currCord.w = currCord.h;
+				}
+			};
+			tool.draw = function (x, y, w, h) {
+				var kappa = .5522848,
+						ox = (w / 2) * kappa, // control point offset horizontal
+						oy = (h / 2) * kappa, // control point offset vertical
+						xe = x + w,           // x-end
+						ye = y + h,           // y-end
+						xm = x + w / 2,       // x-middle
+						ym = y + h / 2;       // y-middle
+				self.ctx.moveTo(x, ym);
+				self.ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+				self.ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+				self.ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+				self.ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+			};
+			tool.onMouseMove = function (e) {
+				var endCoord = self.helper.getXY(e);
+				var dim = {
+					w: endCoord.x - tool.startCoord.x,
+					h: endCoord.y - tool.startCoord.y
+				};
+				self.ctx.putImageData(tool.tmpData, 0, 0);
+				self.ctx.beginPath();
+				if (e.shiftKey) {
+					tool.calcProportCoord(dim);
+				}
+				tool.draw(tool.startCoord.x, tool.startCoord.y, dim.w, dim.h);
+				self.ctx.closePath();
+				self.ctx.fill();
+				self.ctx.stroke();
+			};
+			tool.onMouseUp = function (e) {
+				tool.tmpData = null;
+			};
+		})(),
 		pen: new (function () {
 			var tool = this;
 			tool.icon = $('paintPen');
 			tool.onChangeColor = function (e) {
-				tool.setCursor();
+				self.helper.setCursor(tool.getCursor());
 			};
 			tool.onChangeRadius = function (e) {
-				tool.setCursor();
+				self.helper.setCursor(tool.getCursor());
 			};
 			tool.onChangeOpacity = function (e) {
-				tool.setCursor();
+				self.helper.setCursor(tool.getCursor());
 			};
-			tool.setCursor = function () {
-				self.helper.setCursor(self.ctx.strokeStyle, '', self.ctx.lineWidth);
+			tool.getCursor = function () {
+				return self.helper.buildCursor(self.ctx.strokeStyle, '', self.ctx.lineWidth);
 			};
 			tool.onActivate = function () {
 				self.ctx.lineJoin = 'round';
@@ -1007,8 +1104,8 @@ function Painter() {
 		move: new (function () {
 			var tool = this;
 			tool.icon = $('paintMove');
-			tool.setCursor = function () {
-				self.dom.canvas.style.cursor = 'move';
+			tool.getCursor = function () {
+				return 'move';
 			};
 			tool.onMouseDown = function (e) {
 				tool.lastCoord = {x: e.pageX, y: e.pageY};
@@ -1069,8 +1166,8 @@ function Painter() {
 				tool.span.style.top = (tool.originOffest.y * self.zoom  / tool.originOffest.z) + 'px';
 				tool.span.style.left = (tool.originOffest.x * self.zoom  / tool.originOffest.z) + 'px';
 			};
-			tool.setCursor = function () {
-				self.dom.canvas.style.cursor = 'crosshair';
+			tool.getCursor = function () {
+				return 'crosshair';
 			};
 			tool.onChangeRadius = function (e) {
 				tool.span.style.fontSize = (self.zoom * (5 + parseInt(e.target.value))) + 'px';
@@ -1239,7 +1336,7 @@ function Painter() {
 		}
 		var newMode = self.tools[self.mode];
 		newMode.onActivate && newMode.onActivate();
-		newMode.setCursor && newMode.setCursor();
+		newMode.getCursor && self.helper.setCursor(newMode.getCursor());
 		newMode.icon && CssUtils.addClass(newMode.icon, self.PICKED_TOOL_CLASS);
 		Object.keys(self.instruments).forEach(function (k) {
 			var instr = self.instruments[k];
