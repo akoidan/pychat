@@ -400,38 +400,36 @@ function Painter() {
 			var toolsHolder = $('painterTools');
 			self.keyProcessors = [];
 			$('paintOpen').onclick = self.helper.openCanvas;
-			function createIcon(keyActivator) {
+			function createIcon(keyActivator,f) {
 				var i = document.createElement('i');
 				toolsHolder.appendChild(i);
 				i.setAttribute('title', keyActivator.title);
 				i.className = keyActivator.icon;
+				keyActivator.clickAction = f;
+				i.onclick = f;
+				self.keyProcessors.push(keyActivator);
 				return i;
 			}
 			for (var tool in self.tools) {
 				if (!self.tools.hasOwnProperty(tool)) continue;
-				var i = createIcon(self.tools[tool].keyActivator);
-				self.tools[tool].keyActivator.clickAction = self.setMode.bind(self, tool);
-				i.onclick = self.tools[tool].keyActivator.clickAction;
-				self.keyProcessors.push(self.tools[tool].keyActivator);
-				self.tools[tool].icon = i;
+				self.tools[tool].icon = createIcon(self.tools[tool].keyActivator, self.setMode.bind(self, tool));
 			}
 			self.actions.forEach(function(a) {
-				var i = createIcon(a.keyActivator);
-				a.keyActivator.clickAction =  function() {
+				var i = createIcon(a.keyActivator, function() {
 					a.handler();
 					self.helper.applyZoom();
-				};
-				self.keyProcessors.push(a.keyActivator);
-				i.onclick = a.keyActivator.clickAction;
+				});
 			});
-			var check = {};
-			self.keyProcessors.forEach(function(proc) {
-				if (check[proc.code]) {
+		},
+		checkEventCodes: function() {
+			var check = [];
+			self.keyProcessors.forEach(function (proc) {
+				if (check.indexOf(proc.code) >= 0) {
 					throw "key " + proc.code + "is used";
 				}
-				check[proc.code] = true;
+				check.push(proc.code);
 			});
-			self.log("Registered keys: {}", JSON.stringify(self.keyProcessors))();
+			self.log("Registered keys: {}", JSON.stringify(check))();
 		},
 		initCanvas: function () {
 			[
