@@ -320,7 +320,7 @@ function Painter() {
 			handler: 'onChangeOpacity',
 			range: true,
 			ctxSetter: function (v) {
-				self.ctx.globalAlpha = v;
+				self.ctx.globalAlpha = v / 100;
 				self.instruments.opacity.inputValue = v / 100;
 			}
 		},
