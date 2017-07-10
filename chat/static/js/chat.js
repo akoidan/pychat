@@ -293,7 +293,22 @@ function Painter() {
 			handler: 'onChangeColor',
 			ctxSetter: function (v) {
 				self.ctx.strokeStyle = v;
-			},
+			}
+		},
+		colorFill: {
+			holder: $('paintColorFill'),
+			handler: 'onChangeColorFill',
+			ctxSetter: function (v) {
+				self.ctx.fillStyle = v;
+			}
+		},
+		opacityFill: {
+			holder: $('paintFillOpacity'),
+			handler: 'onChangeFillOpacity',
+			range: true,
+			ctxSetter: function (v) {
+				self.instruments.opacityFill.inputValue = v / 100;
+			}
 		},
 		apply: {
 			holder: $('paintApplyText'),
@@ -305,7 +320,8 @@ function Painter() {
 			handler: 'onChangeOpacity',
 			range: true,
 			ctxSetter: function (v) {
-				self.ctx.globalAlpha = v / 100;
+				self.ctx.globalAlpha = v;
+				self.instruments.opacity.inputValue = v / 100;
 			}
 		},
 		width: {
@@ -968,9 +984,11 @@ function Painter() {
 			tool.getCursor = function () {
 				return 'crosshair';
 			};
-			tool.onChangeColor = function (e) { };
 			tool.onChangeRadius = function (e) { };
+			tool.onChangeColor = function (e) { };
 			tool.onChangeOpacity = function (e) { };
+			tool.onChangeColorFill = function (e) { };
+			tool.onChangeFillOpacity = function (e) { };
 			tool.onMouseDown = function (e, data) {
 				tool.tmpData = data;
 				tool.startCoord = self.helper.getXY(e);
@@ -995,6 +1013,9 @@ function Painter() {
 				self.ctx.beginPath();
 				self.ctx.putImageData(tool.tmpData, 0, 0);
 				self.ctx.rect(tool.startCoord.x, tool.startCoord.y, dim.w, dim.h);
+				self.ctx.globalAlpha = self.instruments.opacityFill.inputValue;
+				self.ctx.fill();
+				self.ctx.globalAlpha = self.instruments.opacity.inputValue;
 				self.ctx.stroke();
 			};
 			tool.onMouseUp = function (e) {
@@ -1008,8 +1029,10 @@ function Painter() {
 				return 'crosshair';
 			};
 			tool.onChangeColor = function (e) { };
+			tool.onChangeColorFill = function (e) { };
 			tool.onChangeRadius = function (e) { };
 			tool.onChangeOpacity = function (e) { };
+			tool.onChangeFillOpacity = function (e) { };
 			tool.onMouseDown = function (e, data) {
 				tool.tmpData = data;
 				tool.startCoord = self.helper.getXY(e);
@@ -1049,7 +1072,9 @@ function Painter() {
 				}
 				tool.draw(tool.startCoord.x, tool.startCoord.y, dim.w, dim.h);
 				self.ctx.closePath();
+				self.ctx.globalAlpha = self.instruments.opacityFill.inputValue;
 				self.ctx.fill();
+				self.ctx.globalAlpha = self.instruments.opacity.inputValue;
 				self.ctx.stroke();
 			};
 			tool.onMouseUp = function (e) {
@@ -1140,8 +1165,8 @@ function Painter() {
 			tool.onActivate = function () { // TODO this looks bad
 				tool.onChangeFont({target: {value: self.ctx.fontFamily}});
 				tool.onChangeRadius({target: {value: self.ctx.lineWidth}});
-				tool.onChangeOpacity({target: {value: self.ctx.globalAlpha * 100}});
-				tool.onChangeColor({target: {value: self.ctx.strokeStyle}});
+				tool.onChangeFillOpacity({target: {value: self.instruments.opacityFill.inputValue * 100}});
+				tool.onChangeColorFill({target: {value: self.ctx.fillStyle}});
 				tool.span.innerHTML = '';
 			};
 			tool.onDeactivate = function () {
@@ -1149,8 +1174,8 @@ function Painter() {
 			};
 			tool.onApply = function () {
 				self.buffer.startAction();
-				self.ctx.fillStyle = self.ctx.strokeStyle;
 				self.ctx.font = "{}px {}".format(5 + self.ctx.lineWidth, self.ctx.fontFamily);
+				self.ctx.globalAlpha = self.instruments.opacityFill.inputValue;
 				var width = 5 + self.ctx.lineWidth; //todo lineheight causes so many issues
 				var lineheight = parseInt(width * 1.25);
 				var linediff = parseInt(width * 0.01);
@@ -1158,6 +1183,7 @@ function Painter() {
 				for (var i = 0; i < lines.length; i++) {
 					self.ctx.fillText(lines[i], tool.lastCoord.x, width + i * lineheight + tool.lastCoord.y - linediff);
 				}
+				self.ctx.globalAlpha = self.instruments.opacity.inputValue;
 				self.buffer.finishAction();
 				self.setMode('pen');
 			};
@@ -1172,10 +1198,10 @@ function Painter() {
 			tool.onChangeRadius = function (e) {
 				tool.span.style.fontSize = (self.zoom * (5 + parseInt(e.target.value))) + 'px';
 			};
-			tool.onChangeOpacity = function (e) {
+			tool.onChangeFillOpacity = function (e) {
 				tool.span.style.opacity = e.target.value / 100
 			};
-			tool.onChangeColor = function (e) {
+			tool.onChangeColorFill = function (e) {
 				tool.span.style.color = e.target.value;
 			};
 			tool.onMouseDown = function (e) {
@@ -1183,7 +1209,7 @@ function Painter() {
 				tool.originOffest = {
 					x: e.offsetX,
 					y: e.offsetY,
-					z: self.zoom,
+					z: self.zoom
 				};
 				tool.span.style.top = tool.originOffest.y +'px';
 				tool.span.style.left = tool.originOffest.x +'px';
