@@ -928,15 +928,30 @@ function Painter() {
 			tool.onChangeOpacity = function (e) { };
 			tool.onMouseDown = function (e, data) {
 				tool.tmpData = data;
-				tool.coord = self.helper.getXY(e);
+				tool.startCoord = self.helper.getXY(e);
 				tool.onMouseMove(e)
+			};
+			tool.calcProportCoord = function(currCord) {
+				var deg = Math.atan((tool.startCoord.x - currCord.x) / (currCord.y - tool.startCoord.y)) * 8 / Math.PI;
+				if (Math.abs(deg) < 1) { // < 45/2
+					currCord.x = tool.startCoord.x;
+				} else if (Math.abs(deg) > 3) { // > 45 + 45/2
+					currCord.y = tool.startCoord.y;
+				} else {
+					var base = (Math.abs(currCord.x - tool.startCoord.x) + Math.abs(currCord.y - tool.startCoord.y, 2)) / 2;
+					currCord.x = tool.startCoord.x + base * (tool.startCoord.x < currCord.x ? 1 : -1);
+					currCord.y = tool.startCoord.y + base * (tool.startCoord.y < currCord.y ? 1 : -1);
+				}
 			};
 			tool.onMouseMove = function (e) {
 				self.ctx.putImageData(tool.tmpData, 0, 0);
 				self.ctx.beginPath();
-				self.ctx.moveTo(tool.coord.x, tool.coord.y);
-				var coord = self.helper.getXY(e);
-				self.ctx.lineTo(coord.x, coord.y);
+				var currCord = self.helper.getXY(e);
+				if (e.shiftKey) {
+					tool.calcProportCoord(currCord);
+				}
+				self.ctx.moveTo(tool.startCoord.x, tool.startCoord.y);
+				self.ctx.lineTo(currCord.x, currCord.y);
 				self.ctx.stroke();
 			};
 			tool.onMouseUp = function (e) {
