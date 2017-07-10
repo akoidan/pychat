@@ -384,9 +384,6 @@ function Painter() {
 				if (!self.tools.hasOwnProperty(tool)) continue;
 				var t = self.tools[tool];
 				t.icon.onclick = self.setMode.bind(self, tool);
-				if (t.constructor) {
-					t.constructor();
-				}
 			}
 		},
 		initButtons: function () {
@@ -548,7 +545,7 @@ function Painter() {
 			if (!tool.onMouseDown) {
 				return;
 			}
-			self.log("{} mouse down", self.mode)();
+			// self.log("{} mouse down", self.mode)();
 			self.events.mouseDown++;
 			var rect = painter.dom.canvas.getBoundingClientRect();
 			self.leftOffset = rect.left;
@@ -571,7 +568,7 @@ function Painter() {
 				}
 				var mu = tool.onMouseUp;
 				if (mu) {
-					self.log("{} mouse up", self.mode)();
+					// self.log("{} mouse up", self.mode)();
 					mu(e)
 				}
 				if (tool.onMouseMove) {
@@ -625,6 +622,7 @@ function Painter() {
 				for (var i = 0; i < e.clipboardData.items.length; i++) {
 					var asFile = e.clipboardData.items[i].getAsFile();
 					if (asFile && asFile.type.indexOf('image') >= 0) {
+						self.log("Pasting images")();
 						self.setMode('img');
 						self.tools.img.readAndPasteCanvas(asFile);
 						self.preventDefault(e);
@@ -761,7 +759,7 @@ function Painter() {
 			return {x: x, y: y};
 		};
 		tool.handleMouseMove = function (e) {
-			self.log("resizer mousmove")();
+// 			self.log("resizer mousmove")();
 			var x = e.pageX - tool.params.lastCoord.x;
 			var y = e.pageY - tool.params.lastCoord.y;
 			if (e.shiftKey && tool.mode.length === 2) {
@@ -838,7 +836,6 @@ function Painter() {
 			tool.onApply = function (event) {
 				var data = self.buffer.startAction();
 				var params = self.resizer.params;
-				var applyBuff = false;
 				var nw = params.left + params.width;
 				var nh = params.top + params.height;
 				if (nw > self.dom.canvas.width || nh > self.dom.canvas.height) {
@@ -896,6 +893,115 @@ function Painter() {
 			};
 			tool.onMouseUp = function (e) {
 
+			};
+		})(),
+		select: new (function () {
+			var tool = this;
+			tool.icon = $('paintSelect');
+			tool.bufferHandler = true;
+			tool.domImg = $('paintPastedImg');
+			tool.dummyCanvas = document.createElement('canvas');
+			tool.dummyContext = tool.dummyCanvas.getContext('2d');
+			tool.getCursor = function () {
+				return 'crosshair';
+			};
+			// tool.onCopy = function (e) {
+			// 	if (self.mode == 'select' && isDescendant(document.activeElement, self.dom.container)) {
+			// 		self.log("setting image from area to clipboard")();
+			// 		//e.clipboardData.setDragImage(tool.img, 10, 10);
+			// 		e.clipboardData.setData("image/png", tool.file);
+			// 		//e.clipboardData.items.add(tool.file, 'image/png');
+			// 		e.preventDefault();
+			// 	}
+			// };
+			// tool.createImg = function(e) {
+			// 	var params = self.resizer.params;
+			// 	var data = self.ctx.getImageData(params.left, params.top, params.width, params.height);
+			// 	tool.dummyCanvas.width = params.width;
+			// 	tool.dummyCanvas.height = params.height;
+			// 	tool.dummyContext.putImageData(data, 0, 0);
+			// 	tool.file = new File(data.data, "file.png", {type: "image/png"});
+			// 	tool.img = new Image();
+			// 	tool.img.onload = function() {
+			// 		self.log("Image Created")();
+			// 	};
+			// 	tool.img.src = tool.dummyCanvas.toDataURL();
+			// };
+			self.onActivate = function() {
+				self.inProgress = false;
+				self.mouseUpClicked = false;
+			};
+			// document.addEventListener('copy', tool.onCopy);
+			tool.onZoomChange = self.resizer.onZoomChange;
+			tool.onDeactivate = function() {
+				self.resizer.hide();
+				if (self.inProgress) {
+					self.ctx.putImageData(tool.savedState, 0, 0);
+				}
+				CssUtils.hideElement(tool.domImg);
+			};
+			tool.onApply = function(e) {
+				var params = self.resizer.params;
+				self.log(
+						'Applying image {}, {}x{}, to  {x: {}, y: {}, w: {}, h:{}',
+						tool.img.width,
+						tool.img.height,
+						params.left,
+						params.top,
+						params.width,
+						params.height
+				)();
+				self.ctx.drawImage(tool.img,
+					0, 0, tool.img.width, tool.img.height,
+					params.left, params.top, params.width, params.height);
+				self.buffer.finishAction();
+				self.inProgress = false ; // don't restore in onDeactivate
+				self.setMode('pen');
+			};
+			tool.onMouseDown = function (e) {
+				if (self.inProgress) {
+					return;
+				}
+				self.log('select mouseDown')();
+				self.inProgress = true;
+				self.resizer.show();
+				self.resizer.setData(e.offsetY, e.offsetX, 0, 0);
+				self.resizer.setParamsFromEvent(e);
+				self.resizer.setMode('br');
+			};
+			tool.onMouseMove = function(e) {
+				if (!self.mouseUpClicked) {
+					self.resizer.handleMouseMove(e);
+				}
+			};
+			tool.onMouseUp = function (e) {
+				if (self.mouseUpClicked) {
+					return;
+				}
+				self.log('select mouseUp')();
+				self.mouseUpClicked = true;
+				var params = self.resizer.params;
+				tool.imageData = self.ctx.getImageData(params.left, params.top, params.width, params.height);
+				tool.dummyCanvas.width = params.width;
+				tool.dummyCanvas.height = params.height;
+				tool.dummyContext.putImageData(tool.imageData, 0, 0);
+				CssUtils.showElement(tool.domImg);
+				tool.domImg.src = tool.dummyCanvas.toDataURL();
+				tool.img = new Image();
+				tool.img.onload = function() {
+					self.log(
+							'Image Created {}x{}, from  {x: {}, y: {}, w: {}, h:{}',
+							tool.img.width,
+							tool.img.height,
+							params.left,
+							params.top,
+							params.width,
+							params.height
+					)();
+				};
+				tool.img.src = tool.dummyCanvas.toDataURL();
+				tool.savedState = self.buffer.startAction();
+				self.ctx.clearRect(params.left, params.top, params.width, params.height);
 			};
 		})(),
 		resize: new (function () {
@@ -1383,6 +1489,7 @@ function Painter() {
 	self.buffer = new (function () {
 		var tool = this;
 		var undoImages = [];
+		window.undoImages = undoImages;
 		var redoImages = [];
 		var paintUndo = $('paintUndo');
 		var paintRedo = $('paintRedo');
@@ -1397,6 +1504,7 @@ function Painter() {
 		};
 		tool.clear = function () {
 			undoImages = [];
+			window.undoImages = undoImages;
 			redoImages = [];
 			current = null;
 		};
@@ -1447,6 +1555,9 @@ function Painter() {
 			buStateData.forEach(function (e) {
 				self.ctx[e] = state[e];
 			});
+		};
+		tool.setCurrent = function(newCurrent) {
+			current = newCurrent;
 		};
 		tool.startAction = function () {
 			if (!current) {
@@ -1985,6 +2096,7 @@ function ChannelsHandler() {
 				for (var i = 0; i < items.length; i++) {
 					var asFile = items[i].getAsFile();
 					if (asFile) {
+						logger.info("Pasting image")();
 						prevent = true;
 						Utils.pasteImgToTextArea(asFile);
 					}
