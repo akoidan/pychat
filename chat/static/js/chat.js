@@ -880,15 +880,15 @@ function Painter() {
 				var params = self.resizer.params;
 				self.log(
 						'Applying image {}, {}x{}, to  {x: {}, y: {}, w: {}, h:{}',
-						tool.imgInfo.width.width,
-						tool.imgInfo.width.height,
+						tool.imgInfo.width,
+						tool.imgInfo.width,
 						params.left,
 						params.top,
 						params.width,
 						params.height
 				)();
 				self.helper.drawImage(tool.domImg,
-					0, 0, tool.imgInfo.width.width, tool.imgInfo.width.height,
+					0, 0, tool.imgInfo.width, tool.imgInfo.width,
 					params.left, params.top, params.width, params.height);
 				self.buffer.finishAction();
 				tool.inProgress = false ; // don't restore in onDeactivate
