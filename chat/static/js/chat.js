@@ -416,8 +416,8 @@ function Painter() {
 				self.tools[tool].icon = createIcon(self.tools[tool].keyActivator, self.setMode.bind(self, tool));
 			}
 			self.actions.forEach(function(a) {
-				var i = createIcon(a.keyActivator, function() {
-					a.handler();
+				var i = createIcon(a.keyActivator, function(e) {
+					a.handler(e);
 					self.helper.applyZoom();
 				});
 			});
@@ -672,7 +672,7 @@ function Painter() {
 			self.keyProcessors.forEach(function(proc) {
 				if (event.code == proc.code
 						&& (!proc.ctrlKey || (proc.ctrlKey && event.ctrlKey))) {
-					proc.clickAction();
+					proc.clickAction(event);
 				}
 			});
 		},
@@ -718,6 +718,14 @@ function Painter() {
 			setLeft: function (l) {
 				tool.imgHolder.style.left = tool.params.lastCoord.ox * self.zoom + l - 1 + 'px';
 				tool.params.left = tool.params.lastCoord.ox + l / self.zoom;
+			},
+			rotate: function() {
+				var w = tool.imgHolder.style.width;
+				tool.imgHolder.style.width = tool.imgHolder.style.height;
+				tool.imgHolder.style.height = w;
+				w = tool.params.width;
+				tool.params.width = tool.params.height;
+				tool.params.height = w;
 			}
 		};
 		tool.setMode = function (m) {
@@ -865,19 +873,22 @@ function Painter() {
 				}
 				CssUtils.hideElement(tool.domImg);
 			};
+			tool.isSelectionActive = function() {
+				return self.mode == 'select' && tool.inProgress && tool.mouseUpClicked;
+			};
 			tool.onApply = function(e) {
 				var params = self.resizer.params;
 				self.log(
 						'Applying image {}, {}x{}, to  {x: {}, y: {}, w: {}, h:{}',
-						tool.img.width,
-						tool.img.height,
+						tool.imgInfo.width.width,
+						tool.imgInfo.width.height,
 						params.left,
 						params.top,
 						params.width,
 						params.height
 				)();
-				self.helper.drawImage(tool.img,
-					0, 0, tool.img.width, tool.img.height,
+				self.helper.drawImage(tool.domImg,
+					0, 0, tool.imgInfo.width.width, tool.imgInfo.width.height,
 					params.left, params.top, params.width, params.height);
 				self.buffer.finishAction();
 				tool.inProgress = false ; // don't restore in onDeactivate
@@ -914,24 +925,25 @@ function Painter() {
 					var imageData = self.ctx.getImageData(params.left, params.top, params.width, params.height);
 					tool.dummyCanvas.width = params.width;
 					tool.dummyCanvas.height = params.height;
+					tool.imgInfo = {width: params.width, height: params.height};
 					tool.dummyContext.putImageData(imageData, 0, 0);
 					CssUtils.showElement(tool.domImg);
-					tool.img = new Image();
-					tool.img.onload = function () {
-						self.log(
-								'Image Created {}x{}, from  {x: {}, y: {}, w: {}, h:{}',
-								tool.img.width,
-								tool.img.height,
-								params.left,
-								params.top,
-								params.width,
-								params.height
-						)();
-					};
 					tool.domImg.src = tool.dummyCanvas.toDataURL();
-					tool.img.src = tool.domImg.src;
 					tool.savedState = self.buffer.startAction();
 					self.ctx.clearRect(params.left, params.top, params.width, params.height);
+				}
+			};
+			tool.rotateInfo = function() {
+				var c = tool.imgInfo.width;
+				tool.imgInfo.width = tool.imgInfo.height;
+				tool.imgInfo.height = c;
+				self.resizer.params.rotate();
+			};
+			tool.getAreaData = function() {
+				return {
+					width: tool.imgInfo.width,
+					height: tool.imgInfo.height,
+					img: tool.domImg
 				}
 			};
 		})(),
@@ -1532,21 +1544,40 @@ function Painter() {
 				title: 'Rotate (R)'
 			},
 			handler: function () {
-				self.buffer.startAction();
-				var tmpData = self.dom.canvas.toDataURL();
-				var w = self.dom.canvas.width;
-				var h = self.dom.canvas.height;
-				self.helper.setDimensions(h, w);
-				self.ctx.save();
-				self.ctx.translate(h / 2, w / 2);
-				self.ctx.rotate(Math.PI / 2);
-				var img = new Image();
-				img.onload = function (e) {
-					self.helper.drawImage(img, -w / 2, -h / 2);
-					self.ctx.restore();
-					self.buffer.finishAction();
-				};
-				img.src = tmpData;
+				if (self.tools['select'].isSelectionActive()) {
+					var m = self.tools.select;
+					var d = m.getAreaData();
+					self.log("{}x{}", d.width, d.height)();
+					userMessage.innerHTML = `<img src="${d.img.src}"/>`;
+					console.log('sd');
+					var canvas = document.createElement('canvas');
+					canvas.width = d.height; //specify width of your canvas
+					canvas.height = d.width; //specify height of your canvas
+					var ctx = canvas.getContext("2d");
+					ctx.save();
+					ctx.translate(d.height / 2, d.width / 2);
+					ctx.rotate(Math.PI / 2);
+					ctx.drawImage(d.img, -d.width / 2, -d.height / 2); //draw it
+					ctx.restore();
+					d.img.src = canvas.toDataURL();
+					m.rotateInfo();
+				} else {
+					self.buffer.startAction();
+					var tmpData = self.dom.canvas.toDataURL();
+					var w = self.dom.canvas.width;
+					var h = self.dom.canvas.height;
+					self.helper.setDimensions(h, w);
+					self.ctx.save();
+					self.ctx.translate(h / 2, w / 2);
+					self.ctx.rotate(Math.PI / 2);
+					var img = new Image();
+					img.onload = function (e) {
+						self.helper.drawImage(img, -w / 2, -h / 2);
+						self.ctx.restore();
+						self.buffer.finishAction();
+					};
+					img.src = tmpData;
+				}
 			}
 		}, {
 			keyActivator: {
