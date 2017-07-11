@@ -703,19 +703,20 @@ function Painter() {
 		tool.imgHolder = $('paint-crp-rect');
 		tool.params = {
 			setWidth: function (w) {
-				tool.imgHolder.style.width = tool.params.lastCoord.ow * self.zoom + w + 'px';
+				// 1px border, so left is 1px closer, and width is 2px more (counting right border)
+				tool.imgHolder.style.width = tool.params.lastCoord.ow * self.zoom + w + 2 + 'px';
 				tool.params.width = tool.params.lastCoord.ow + w / self.zoom;
 			},
 			setHeight: function (h) {
-				tool.imgHolder.style.height = tool.params.lastCoord.oh * self.zoom + h + 'px';
+				tool.imgHolder.style.height = tool.params.lastCoord.oh * self.zoom + h + 2 + 'px';
 				tool.params.height = tool.params.lastCoord.oh + h / self.zoom;
 			},
 			setTop: function (t) {
-				tool.imgHolder.style.top = tool.params.lastCoord.oy * self.zoom + t + 'px';
+				tool.imgHolder.style.top = tool.params.lastCoord.oy * self.zoom + t - 1 + 'px';
 				tool.params.top = tool.params.lastCoord.oy + t / self.zoom;
 			},
 			setLeft: function (l) {
-				tool.imgHolder.style.left = tool.params.lastCoord.ox * self.zoom + l + 'px';
+				tool.imgHolder.style.left = tool.params.lastCoord.ox * self.zoom + l - 1 + 'px';
 				tool.params.left = tool.params.lastCoord.ox + l / self.zoom;
 			}
 		};
@@ -727,25 +728,26 @@ function Painter() {
 			tool.params.left = l / self.zoom;
 			tool.params.width = w;
 			tool.params.height = h;
-			tool.imgHolder.style.left = l + 'px';
-			tool.imgHolder.style.top = t + 'px';
-			tool.imgHolder.style.width = w * self.zoom + 'px';
-			tool.imgHolder.style.height = h * self.zoom + 'px';
+			tool.imgHolder.style.left = l - 1 + 'px';
+			tool.imgHolder.style.top = t - 1 + 'px';
+			tool.imgHolder.style.width = w * self.zoom + 2 + 'px';
+			tool.imgHolder.style.height = h * self.zoom + +2 + 'px';
 		};
 		tool._setCursor = function (cursor) {
 			tool.cursorStyle.textContent = cursor ? "#paintPastedImg, #paint-crp-rect, #painter {cursor: {} !important}".format(cursor) : ""
 		};
 		tool.onZoomChange = function () {
-			tool.imgHolder.style.width = tool.params.width * self.zoom + 'px';
-			tool.imgHolder.style.height = tool.params.height * self.zoom + 'px';
-			tool.imgHolder.style.top = tool.params.top * self.zoom + 'px';
-			tool.imgHolder.style.left = tool.params.left * self.zoom + 'px';
+			tool.imgHolder.style.width = tool.params.width * self.zoom + 2 + 'px';
+			tool.imgHolder.style.height = tool.params.height * self.zoom + 2 + 'px';
+			tool.imgHolder.style.top = tool.params.top * self.zoom - 1 + 'px';
+			tool.imgHolder.style.left = tool.params.left * self.zoom - 1 + 'px';
 		};
-		tool.show = function() {
+		tool.show = function () {
 			CssUtils.showElement(tool.imgHolder);
 			document.addEventListener('mouseup', tool.docMouseUp);
 		};
 		tool.hide = function() {
+			tool._setCursor(null);
 			CssUtils.hideElement(tool.imgHolder);
 			document.removeEventListener('mouseup', tool.docMouseUp);
 		};
@@ -771,8 +773,6 @@ function Painter() {
 		};
 		tool.docMouseUp = function (e) {
 			self.log("Resizer mouseup")();
-			tool.mode = null;
-			tool._setCursor(null);
 			self.dom.canvasWrapper.removeEventListener('mousemove', tool.handleMouseMove);
 		};
 		tool.cursors = {
@@ -1584,7 +1584,7 @@ function Painter() {
 				title: 'Zoom Out (Ctrl-)/(Mouse Wheel)'
 			},
 			handler: function () {
-				self.helper.setZoom(true);
+				self.helper.setZoom(false);
 			}
 		}, {
 			keyActivator: {
