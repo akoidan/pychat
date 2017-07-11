@@ -400,6 +400,7 @@ function Painter() {
 			var toolsHolder = $('painterTools');
 			self.keyProcessors = [];
 			$('paintOpen').onclick = self.helper.openCanvas;
+			$('paintSend').onclick = self.helper.pasteToTextArea;
 			function createIcon(keyActivator,f) {
 				var i = document.createElement('i');
 				toolsHolder.appendChild(i);
@@ -478,8 +479,8 @@ function Painter() {
 			self.show();
 			self.buffer.clear();
 			self.helper.setDimensions(
-					self.dom.canvasWrapper.offsetWidth - 2,
-					self.dom.canvasWrapper.offsetHeight - 6
+					self.dom.canvasWrapper.offsetWidth - 15,
+					self.dom.canvasWrapper.offsetHeight - 15
 			);
 			self.init.setContext();
 			self.setMode('pen');
@@ -880,14 +881,15 @@ function Painter() {
 					params.left, params.top, params.width, params.height);
 				self.buffer.finishAction();
 				tool.inProgress = false ; // don't restore in onDeactivate
-				self.setMode('pen');
+				tool.onDeactivate();
 			};
 			tool.onMouseDown = function (e) {
+				self.log('select mouseDown')();
 				if (tool.inProgress) {
-					return;
+					CssUtils.hideElement(tool.domImg);
+					self.ctx.putImageData(tool.savedState, 0, 0);
 				}
 				tool.mouseUpClicked = false;
-				self.log('select mouseDown')();
 				tool.inProgress = true;
 				self.resizer.show();
 				self.resizer.setData(e.offsetY, e.offsetX, 0, 0);
@@ -903,30 +905,34 @@ function Painter() {
 				if (tool.mouseUpClicked) {
 					return;
 				}
-				self.log('select mouseUp')();
-				tool.mouseUpClicked = true;
 				var params = self.resizer.params;
-				var imageData = self.ctx.getImageData(params.left, params.top, params.width, params.height);
-				tool.dummyCanvas.width = params.width;
-				tool.dummyCanvas.height = params.height;
-				tool.dummyContext.putImageData(imageData, 0, 0);
-				CssUtils.showElement(tool.domImg);
-				tool.img = new Image();
-				tool.img.onload = function() {
-					self.log(
-							'Image Created {}x{}, from  {x: {}, y: {}, w: {}, h:{}',
-							tool.img.width,
-							tool.img.height,
-							params.left,
-							params.top,
-							params.width,
-							params.height
-					)();
-				};
-				tool.domImg.src = tool.dummyCanvas.toDataURL();
-				tool.img.src = tool.domImg.src;
-				tool.savedState = self.buffer.startAction();
-				self.ctx.clearRect(params.left, params.top, params.width, params.height);
+				if (!params.width || !params.height) {
+					self.resizer.hide();
+				} else {
+					self.log('select mouseUp')();
+					tool.mouseUpClicked = true;
+					var imageData = self.ctx.getImageData(params.left, params.top, params.width, params.height);
+					tool.dummyCanvas.width = params.width;
+					tool.dummyCanvas.height = params.height;
+					tool.dummyContext.putImageData(imageData, 0, 0);
+					CssUtils.showElement(tool.domImg);
+					tool.img = new Image();
+					tool.img.onload = function () {
+						self.log(
+								'Image Created {}x{}, from  {x: {}, y: {}, w: {}, h:{}',
+								tool.img.width,
+								tool.img.height,
+								params.left,
+								params.top,
+								params.width,
+								params.height
+						)();
+					};
+					tool.domImg.src = tool.dummyCanvas.toDataURL();
+					tool.img.src = tool.domImg.src;
+					tool.savedState = self.buffer.startAction();
+					self.ctx.clearRect(params.left, params.top, params.width, params.height);
+				}
 			};
 		})(),
 		pen: new (function () {
@@ -1419,12 +1425,17 @@ function Painter() {
 			};
 			tool.onApply = function () {
 				var params = self.resizer.params;
-				self.buffer.startAction();
-				var img = self.ctx.getImageData(params.left, params.top, params.width, params.height);
-				self.helper.setDimensions(params.width, params.height);
-				self.ctx.putImageData(img, 0, 0);
-				self.buffer.finishAction(img);
-				self.setMode('pen');
+				if (!params.width || !params.height) {
+					growlError("Can't crop to {}x{}".format(params.width, params.height));
+
+				} else {
+					self.buffer.startAction();
+					var img = self.ctx.getImageData(params.left, params.top, params.width, params.height);
+					self.helper.setDimensions(params.width, params.height);
+					self.ctx.putImageData(img, 0, 0);
+					self.buffer.finishAction(img);
+					self.setMode('pen');
+				}
 			};
 			tool.onZoomChange = self.resizer.onZoomChange;
 			tool.onDeactivate = function() {
