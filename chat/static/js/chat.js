@@ -759,13 +759,14 @@ function Painter() {
 			CssUtils.hideElement(tool.imgHolder);
 			document.removeEventListener('mouseup', tool.docMouseUp);
 		};
-		tool.imgHolder.onmousedown = function(e) {
+		tool.trackMouseMove = function(e, mode) {
 			self.log("Resizer mousedown")();
-			tool.mode = e.target.getAttribute('pos');
+			tool.mode = mode || e.target.getAttribute('pos');
 			self.dom.canvasWrapper.addEventListener('mousemove', tool.handleMouseMove);
 			tool.setParamsFromEvent(e);
 			tool._setCursor(tool.cursors[tool.mode]);
 		};
+		tool.imgHolder.onmousedown = tool.trackMouseMove;
 		tool.setParamsFromEvent = function(e) {
 			tool.params.lastCoord = {
 				x: e.pageX,
@@ -904,13 +905,7 @@ function Painter() {
 				tool.inProgress = true;
 				self.resizer.show();
 				self.resizer.setData(e.offsetY, e.offsetX, 0, 0);
-				self.resizer.setParamsFromEvent(e);
-				self.resizer.setMode('br');
-			};
-			tool.onMouseMove = function(e) {
-				if (!tool.mouseUpClicked) {
-					self.resizer.handleMouseMove(e);
-				}
+				self.resizer.trackMouseMove(e, 'br');
 			};
 			tool.onMouseUp = function (e) {
 				if (tool.mouseUpClicked) {
@@ -1439,7 +1434,6 @@ function Painter() {
 				var params = self.resizer.params;
 				if (!params.width || !params.height) {
 					growlError("Can't crop to {}x{}".format(params.width, params.height));
-
 				} else {
 					self.buffer.startAction();
 					var img = self.ctx.getImageData(params.left, params.top, params.width, params.height);
@@ -1456,12 +1450,7 @@ function Painter() {
 			tool.onMouseDown = function (e) {
 				self.resizer.show();
 				self.resizer.setData(e.offsetY, e.offsetX, 0, 0);
-				self.resizer.setParamsFromEvent(e);
-				self.resizer.setMode('br');
-			};
-			tool.onMouseMove = function(e) {
-				self.log("Crop mousmove")();
-				self.resizer.handleMouseMove(e);
+				self.resizer.trackMouseMove(e, 'br');
 			};
 			tool.onMouseUp = function (e) {
 
