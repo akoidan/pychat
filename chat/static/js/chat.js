@@ -881,14 +881,14 @@ function Painter() {
 				self.log(
 						'Applying image {}, {}x{}, to  {x: {}, y: {}, w: {}, h:{}',
 						tool.imgInfo.width,
-						tool.imgInfo.width,
+						tool.imgInfo.height,
 						params.left,
 						params.top,
 						params.width,
 						params.height
 				)();
 				self.helper.drawImage(tool.domImg,
-					0, 0, tool.imgInfo.width, tool.imgInfo.width,
+					0, 0, tool.imgInfo.width, tool.imgInfo.height,
 					params.left, params.top, params.width, params.height);
 				self.buffer.finishAction();
 				tool.inProgress = false ; // don't restore in onDeactivate
@@ -1548,8 +1548,6 @@ function Painter() {
 					var m = self.tools.select;
 					var d = m.getAreaData();
 					self.log("{}x{}", d.width, d.height)();
-					userMessage.innerHTML = `<img src="${d.img.src}"/>`;
-					console.log('sd');
 					var canvas = document.createElement('canvas');
 					canvas.width = d.height; //specify width of your canvas
 					canvas.height = d.width; //specify height of your canvas
