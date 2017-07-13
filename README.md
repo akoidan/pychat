@@ -71,7 +71,6 @@ TODO
 * check transfer files over net - doesnt work, while localhost works
 * If canvas mode == 'select' rotation should apply to selection.
 * Add applying zoom to method that trigger via keyboard in canvas 
-* mousemove doesn't trigger on resizer while in cropper or
 * add queued messaged to wsHandler, if ws is offline messages goes to array. userMessage input clears after we press enter and we don't restore its state we just put message to queue. When webrtc is disconnected we send reconnect event to this ws.queue
 * Just a note https://codepen.io/techslides/pen/zowLd , i guess transform: scale is better https://stackoverflow.com/questions/11332608/understanding-html-5-canvas-scale-and-translate-order https://stackoverflow.com/questions/16687023/bug-with-transform-scale-and-overflow-hidden-in-chrome
 * Add retry file send option. continue from spot we finished Or maybe autoreconnect automatically
