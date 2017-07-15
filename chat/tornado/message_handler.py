@@ -9,12 +9,12 @@ from tornadoredis import Client
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers
 from chat.py2_3 import str_type
-from chat.settings import ALL_ROOM_ID, SELECT_SELF_ROOM, TORNADO_REDIS_PORT, WEBRTC_CONNECTION
+from chat.settings import ALL_ROOM_ID, TORNADO_REDIS_PORT, WEBRTC_CONNECTION
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
 from chat.tornado.image_utils import process_images, prepare_img, save_images, get_message_images
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
-from chat.utils import get_max_key, execute_query, do_db, update_room, create_room_users, validate_edit_message, \
-	get_or_create_room
+from chat.utils import get_max_key, do_db, validate_edit_message, get_or_create_room, \
+	create_room
 
 parent_logger = logging.getLogger(__name__)
 base_logger = logging.LoggerAdapter(parent_logger, {
@@ -108,11 +108,6 @@ class MessagesHandler(MessagesCreator):
 	def add_channel(self, channel):
 		self.channels.append(channel)
 		yield Task(self.async_redis.subscribe, (channel,))
-
-	@staticmethod
-	def evaluate(query_set):
-		do_db(len, query_set)
-		return query_set
 
 	def get_online_from_redis(self, channel):
 		return self.get_online_and_status_from_redis(channel)[1]
@@ -238,27 +233,10 @@ class MessagesHandler(MessagesCreator):
 		subscribe_message = self.invite_room_channel_message(room_id, user_id, room.name, users_in_room)
 		self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
 
-	def create_room(self, user_rooms, user_id):
-		if self.user_id == user_id:
-			room_ids = list([room['room_id'] for room in self.evaluate(user_rooms)])
-			query_res = execute_query(SELECT_SELF_ROOM, [room_ids, ])
-		else:
-			rooms_query = RoomUsers.objects.filter(user_id=user_id, room__in=user_rooms)
-			query_res = rooms_query.values('room__id', 'room__disabled')
-		try:
-			room = do_db(query_res.get)
-			room_id = room['room__id']
-			update_room(room_id, room['room__disabled'])
-		except RoomUsers.DoesNotExist:
-			room_id = create_room_users(self.user_id, user_id)
-		return room_id
 
 	def create_user_channel(self, message):
 		user_id = message[VarNames.USER_ID]
-		# get all self private rooms ids
-		user_rooms = Room.users.through.objects.filter(user_id=self.user_id, room__name__isnull=True).values('room_id')
-		# get private room that contains another user from rooms above
-		room_id = self.create_room(user_rooms, user_id)
+		room_id = create_room(self.user_id, user_id)
 		subscribe_message = self.subscribe_direct_channel_message(room_id, user_id)
 		self.publish(subscribe_message, self.channel, True)
 		other_channel = RedisPrefix.generate_user(user_id)
