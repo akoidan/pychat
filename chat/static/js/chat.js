@@ -4576,7 +4576,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 				}
 				self.sendChannel.send(e.target.result);
 				var readSize = e.target.result.byteLength;
-				if (self.fileSize >= self.offset + readSize) {
+				if (self.fileSize > self.offset + readSize) {
 					window.setTimeout(self.sendCurrentSlice, 0);
 				} else {
 					self.log("Exiting, offset is {} now, fs: {}", self.offset, self.fileSize)();
