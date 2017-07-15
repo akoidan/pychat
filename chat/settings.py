@@ -257,7 +257,7 @@ LOGGING = {
                         'level': 'ERROR',
                         'propagate': True,
                 },
-		'chat.tornadoapp': {
+		'chat.tornado': {
 			'handlers': ['file-tornado'],
 			'level': 'DEBUG',
 			'propagate': False,

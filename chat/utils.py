@@ -23,7 +23,7 @@ from chat.models import Room, get_milliseconds
 from chat.models import User
 from chat.models import UserProfile, Verification, RoomUsers, IpAddress
 from chat.py2_3 import urlopen
-from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID
+from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID, SELECT_SELF_ROOM
 from chat.tornado.constants import RedisPrefix
 from chat.tornado.constants import VarNames
 
@@ -78,19 +78,68 @@ def update_room(room_id, disabled):
 		Room.objects.filter(id=room_id).update(disabled=False)
 
 
-def create_room_users(me, other):
+def create_room(self_user_id, user_id):
+	# get all self private rooms ids
+	user_rooms = Room.users.through.objects.filter(user_id=self_user_id, room__name__isnull=True).values('room_id')
+	# get private room that contains another user from rooms above
+	if user_rooms and self_user_id == user_id:
+		room_id = create_self_room(self_user_id,user_rooms)
+	elif user_rooms:
+		room_id = create_other_room(self_user_id, user_id, user_rooms)
+	else:
+		room_id = create_other_room_wo_check(self_user_id, user_id)
+	return room_id
+
+
+def create_other_room_wo_check(self_user_id, user_id):
 	room = Room()
 	room.save()
 	room_id = room.id
-	if me == other:
-		RoomUsers(user_id=me, room_id=room_id).save()
+	if self_user_id == user_id:
+		RoomUsers(user_id=user_id, room_id=room_id).save()
 	else:
 		RoomUsers.objects.bulk_create([
-			RoomUsers(user_id=other, room_id=room_id),
-			RoomUsers(user_id=me, room_id=room_id),
+			RoomUsers(user_id=self_user_id, room_id=room_id),
+			RoomUsers(user_id=user_id, room_id=room_id),
 		])
 	return room_id
 
+
+def create_other_room(self_user_id, user_id, user_rooms):
+	rooms_query = RoomUsers.objects.filter(user_id=user_id, room__in=user_rooms)
+	query = rooms_query.values('room__id', 'room__disabled')
+	try:
+		room = do_db(query.get)
+		room_id = room['room__id']
+		update_room(room_id, room['room__disabled'])
+	except RoomUsers.DoesNotExist:
+		room = Room()
+		room.save()
+		room_id = room.id
+		RoomUsers.objects.bulk_create([
+			RoomUsers(user_id=self_user_id, room_id=room_id),
+			RoomUsers(user_id=user_id, room_id=room_id),
+		])
+	return room_id
+
+
+def evaluate(query_set):
+	do_db(len, query_set)
+	return query_set
+
+
+def create_self_room(self_user_id, user_rooms):
+	room_ids = list([room['room_id'] for room in evaluate(user_rooms)])
+	query = execute_query(SELECT_SELF_ROOM, [room_ids, ])
+	if query:
+		room_id = query[0]['room__id']
+		update_room(room_id, query[0]['room__disabled'])
+	else:
+		room = Room()
+		room.save()
+		room_id = room.id
+		RoomUsers(user_id=self_user_id, room_id=room_id).save()
+	return room_id
 
 def validate_edit_message(self_id, message):
 	if message.sender_id != self_id:
