@@ -1742,7 +1742,7 @@ function NotifierHandler() {
 	self.currentTabId = Date.now().toString();
 	/*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
 	self.LAST_TAB_ID_VARNAME = 'lastTabId';
-	self.clearNotificationTime = 5000;
+	self.clearNotificationTime = 500;
 	self.serviceWorkerTry = true;
 	self.tryNotification = function (params, cb) {
 		if (!self.serviceWorkerTry && !self.registration) {
@@ -1752,12 +1752,15 @@ function NotifierHandler() {
 				cb(new Notification(params.title, {icon: params.icon, body: params.body}));
 			} catch (e) {
 				if (e.name == 'TypeError' && navigator.serviceWorker && self.serviceWorkerTry) {
+					logger.info("Notification api is only available via workers, trying to load one")();
 					self.serviceWorkerTry = false;
-					navigator.serviceWorker.register('/dummyWorker').then(function (registration) {
+					navigator.serviceWorker.register('/dummyWorker').catch(function (e) {
+						logger.error("Unable to load serviceWorker to show notification because {}", Utils.extractError(e))();
+					});
+					navigator.serviceWorker.ready.then(function (registration) {
+						logger.info("Loading workes succeeded")();
 						self.registration = registration;
-						self.registration.showNotification(params.title, {icon: params.icon, body: params.body});
-					}).catch(function (e) {
-						logger.error("Unable to load serviceWorker to show notification because {}", JSON.stringify(e))();
+						registration.showNotification(params.title, {icon: params.icon, body: params.body});
 					});
 				} else {
 					logger.warn("Skipping notification cause service worker hasn't been loaded yet")();
