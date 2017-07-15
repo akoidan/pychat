@@ -1738,14 +1738,46 @@ function Painter() {
 
 function NotifierHandler() {
 	var self = this;
-	self.maxNotifyTime = 300;
+	self.maxNotifyTime = 500;
 	self.currentTabId = Date.now().toString();
 	/*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
 	self.LAST_TAB_ID_VARNAME = 'lastTabId';
 	self.clearNotificationTime = 5000;
-	self.askPermissions = function () {
-		if (notifications && Notification.permission !== "granted") {
-			Notification.requestPermission();
+	self.serviceWorkerTry = true;
+	self.tryNotification = function (params, cb) {
+		if (!self.serviceWorkerTry && !self.registration) {
+			logger.warn("Skipping notification because service worked failed to load")();
+		} else {
+			try {
+				cb(new Notification(params.title, {icon: params.icon, body: params.body}));
+			} catch (e) {
+				if (e.name == 'TypeError' && navigator.serviceWorker && self.serviceWorkerTry) {
+					self.serviceWorkerTry = false;
+					try {
+						navigator.serviceWorker.register(window.STATISTICS_JS_URL);
+						navigator.serviceWorker.ready.then(function (registration) {
+							self.registration = registration;
+							self.registration.showNotification(params.title, {icon: params.icon, body: params.body});
+						});
+					} catch (e) {
+						logger.error("Unable to load serviceWorker to show notification because {}", e)();
+					}
+				} else {
+					logger.warn("Skipping notification cause service worker hasn't been loaded yet")();
+				}
+			}
+		}
+
+	};
+	self.askAndCreate = function (params, cb, init) {
+		if (Notification.permission !== "granted") {
+			Notification.requestPermission(function(result) {
+				if (result === 'granted') {
+					self.tryNotification(params, cb);
+				}
+			});
+		} else {
+			!init && self.tryNotification(params, cb)
 		}
 	};
 	self.popedNotifQueue = [];
@@ -1757,8 +1789,10 @@ function NotifierHandler() {
 		self.onFocus();
 		if (!window.Notification) {
 			logger.warn("Notification is not supported")();
-		} else {
-			self.askPermissions();
+		} else if (notifications) {
+			self.askAndCreate({title: 'Pychat notifications enabled. You can disable them in profile'}, function () {
+				logger.info("notification succeeded")();
+			}, true);
 		}
 	};
 	self.notificationClick = function () {
@@ -1766,6 +1800,15 @@ function NotifierHandler() {
 		this.close()
 	};
 	self.lastNotifyTime = Date.now();
+	self.createNot = function (notification, currentTime) {
+		self.popedNotifQueue.push(notification);
+		self.lastNotifyTime = currentTime;
+		notification.onclick = self.notificationClick;
+		notification.onclose = function () {
+			self.popedNotifQueue.pop(this);
+		};
+		setTimeout(self.clearNotification, self.clearNotificationTime);
+	};
 	self.notify = function (title, message, icon) {
 		if (self.isCurrentTabActive) {
 			return;
@@ -1777,21 +1820,19 @@ function NotifierHandler() {
 		}
 		var currentTime = Date.now();
 		// last opened tab not this one, leave the oppotunity to show notification from last tab
-		if (!window.Notification || !self.isTabMain() || !notifications || currentTime - self.maxNotifyTime < self.lastNotifyTime) {
+		if (!window.Notification
+				|| !self.isTabMain()
+				|| !notifications
+				|| currentTime - self.maxNotifyTime < self.lastNotifyTime) {
 			return
 		}
-		self.askPermissions();
-		var notification = new Notification(title, {
+		self.askAndCreate({
+			title: title,
 			icon: icon || NOTIFICATION_ICON_URL,
 			body: message
+		}, function (notification) {
+			self.createNot(notification, currentTime);
 		});
-		self.popedNotifQueue.push(notification);
-		self.lastNotifyTime = currentTime;
-		notification.onclick = self.notificationClick;
-		notification.onclose = function () {
-			self.popedNotifQueue.pop(this);
-		};
-		setTimeout(self.clearNotification, self.clearNotificationTime);
 	};
 	self.isTabMain = function () {
 		var activeTab = localStorage.getItem(self.LAST_TAB_ID_VARNAME);
@@ -1819,12 +1860,14 @@ function NotifierHandler() {
 	};
 	self.onFocus = function () {
 		localStorage.setItem(self.LAST_TAB_ID_VARNAME, self.currentTabId);
+		logger.info("Marking current tab as active")();
 		self.isCurrentTabActive = true;
 		self.newMessagesCount = 0;
 		document.title = 'PyChat';
 	};
 	self.onFocusOut = function () {
-		self.isCurrentTabActive = false
+		self.isCurrentTabActive = false;
+		logger.info("Deactivating current tab")();
 	};
 	self.init();
 }
@@ -4576,7 +4619,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 				}
 				self.sendChannel.send(e.target.result);
 				var readSize = e.target.result.byteLength;
-				if (self.fileSize >= self.offset + readSize) {
+				if (self.fileSize > self.offset + readSize) {
 					window.setTimeout(self.sendCurrentSlice, 0);
 				} else {
 					self.log("Exiting, offset is {} now, fs: {}", self.offset, self.fileSize)();
