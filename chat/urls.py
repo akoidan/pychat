@@ -16,6 +16,7 @@ urlpatterns = patterns(
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'^$', 'chat.views.home'),  # url(r'^login$', 'story.views.login'),
 	url(r'^logout$', 'chat.views.logout'),
+	url(r'^dummyWorker', 'chat.views.dummy_worker'),
 	url(r'^auth$', 'chat.views.auth'),
 	url(r'^register$', RegisterView.as_view(), name='register'),
 	url(r'^confirm_email$', 'chat.views.confirm_email'),

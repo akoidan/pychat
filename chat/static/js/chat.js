@@ -1753,21 +1753,17 @@ function NotifierHandler() {
 			} catch (e) {
 				if (e.name == 'TypeError' && navigator.serviceWorker && self.serviceWorkerTry) {
 					self.serviceWorkerTry = false;
-					try {
-						navigator.serviceWorker.register(window.STATISTICS_JS_URL);
-						navigator.serviceWorker.ready.then(function (registration) {
-							self.registration = registration;
-							self.registration.showNotification(params.title, {icon: params.icon, body: params.body});
-						});
-					} catch (e) {
-						logger.error("Unable to load serviceWorker to show notification because {}", e)();
-					}
+					navigator.serviceWorker.register('/dummyWorker').then(function (registration) {
+						self.registration = registration;
+						self.registration.showNotification(params.title, {icon: params.icon, body: params.body});
+					}).catch(function (e) {
+						logger.error("Unable to load serviceWorker to show notification because {}", JSON.stringify(e))();
+					});
 				} else {
 					logger.warn("Skipping notification cause service worker hasn't been loaded yet")();
 				}
 			}
 		}
-
 	};
 	self.askAndCreate = function (params, cb, init) {
 		if (Notification.permission !== "granted") {
