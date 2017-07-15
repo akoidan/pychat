@@ -1752,11 +1752,13 @@ function NotifierHandler() {
 				cb(new Notification(params.title, {icon: params.icon, body: params.body}));
 			} catch (e) {
 				if (e.name == 'TypeError' && navigator.serviceWorker && self.serviceWorkerTry) {
+					logger.info("Notification api is only available via workers, trying to load one")();
 					self.serviceWorkerTry = false;
 					navigator.serviceWorker.register('/dummyWorker').catch(function (e) {
-						logger.error("Unable to load serviceWorker to show notification because {}", JSON.stringify(e))();
+						logger.error("Unable to load serviceWorker to show notification because {}", Utils.extractError(e))();
 					});
 					navigator.serviceWorker.ready.then(function (registration) {
+						logger.info("Loading workes succeeded")();
 						self.registration = registration;
 						registration.showNotification(params.title, {icon: params.icon, body: params.body});
 					});
