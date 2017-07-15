@@ -54,12 +54,14 @@
 			padding: $padding-vert $padding-hori
 			opacity: 1
 			font-family: sans-serif
-			&:hover
+			&:hover:not([disabled])
 				background: #242a36
-			&:active
+			&:active:not([disabled])
 				padding: $padding-vert + 1 $padding-hori $padding-vert - 1 $padding-hori !important
 				background: linear-gradient(#101318, #353c4c)
 				box-shadow: 0 1px 0 #212e3b inset, 0 1px 0 #525969
+			&[disabled]
+				color: #787878
 		input
 			&[type=text], &[type=search]
 				&::-webkit-input-placeholder
