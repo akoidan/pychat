@@ -96,6 +96,14 @@ def logout(request):
 	return HttpResponseRedirect('/')
 
 
+@login_required_no_redirect(True)
+def dummy_worker(request):
+	"""
+	POST. Logs out into system.
+	"""
+	return HttpResponse("var a = 3;", content_type='application/x-javascript')
+
+
 @require_http_methods(['POST'])
 def auth(request):
 	"""
