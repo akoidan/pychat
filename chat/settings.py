@@ -248,7 +248,7 @@ LOGGING = {
 			'level': 'DEBUG',
 			'propagate': False,
 		},
-		'chat.tornadoapp': {
+		'chat.tornado': {
 			'handlers': ['tornado-console'],
 			'level': 'DEBUG',
 			'propagate': False,
