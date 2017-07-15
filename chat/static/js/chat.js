@@ -156,6 +156,10 @@ function Draggable(container, headerText) {
 		self.top = e.pageY;
 		self.left = e.pageX;
 	};
+	self.headerDragStart = function(e) {
+		self.mouseDownElement = e.target;
+		self.dom.container.setAttribute('draggable', true);
+	};
 	self.init = function () {
 		CssUtils.addClass(self.dom.container, "modal-body");
 		self.dom.container.style.left = '10%';
@@ -166,10 +170,8 @@ function Draggable(container, headerText) {
 		self.dom.iconMinimize.setAttribute('title', 'Minimize window');
 		self.dom.header.className = 'windowHeader noSelection';
 		self.zoom = 1;
-		self.dom.header.addEventListener("mousedown", function (ev) {
-			self.mouseDownElement = ev.target;
-			self.dom.container.setAttribute('draggable', true);
-		}, false);
+		self.dom.header.addEventListener('mousedown', self.headerDragStart, false);
+		self.dom.header.addEventListener('touchstart', self.headerDragStart, false);
 		self.dom.container.ondragstart = self.ondragstart;
 		self.dom.container.ondragend = self.ondragend;
 		// self.dom.container.ondrop = self.preventDefault; // TODO doens't work
@@ -434,7 +436,7 @@ function Painter() {
 		},
 		initCanvas: function () {
 			[
-				{dom: self.dom.canvas, listener: 'mousedown', handler: 'onmousedown'},
+				{dom: self.dom.canvas, listener: ['mousedown', 'touchstart'], handler: 'onmousedown'},
 				{dom: self.dom.container, listener: 'keypress', handler: 'contKeyPress', params: false},
 				{dom: self.dom.container, listener: 'paste', handler: 'canvasImagePaste', params: false},
 				{
@@ -443,7 +445,11 @@ function Painter() {
 				},
 				{dom: self.dom.container, listener: 'drop', handler: 'canvasImageDrop', params: {passive: false}}
 			].forEach(function (e) {
-				e.dom.addEventListener(e.listener, self.events[e.handler], e.params);
+				var listeners = Array.isArray(e.listener) ? e.listener: [e.listener];
+				listeners.forEach(function(listener) {
+					e.dom.addEventListener(listener, self.events[e.handler], e.params);
+				});
+
 			});
 		},
 		createFonts: function () {
@@ -601,6 +607,16 @@ function Painter() {
 			self.dom.paintDimensions.textContent = '{}x{}'.format(w, h);
 		}
 	};
+	self.Appliable = function() {
+		var tool = this;
+		tool.applyBtn = document.querySelector('#paintApplyText input[type=button]');
+		tool.enableApply = function() {
+			tool.applyBtn.removeAttribute('disabled');
+		};
+		tool.disableApply = function() {
+			tool.applyBtn.setAttribute('disabled', 'disabled');
+		};
+	};
 	self.events = {
 		mouseDown: 0,
 		onmousedown: function (e) {
@@ -620,6 +636,7 @@ function Painter() {
 			tool.onMouseDown(e, imgData);
 			if (tool.onMouseMove) {
 				self.dom.canvas.addEventListener('mousemove', tool.onMouseMove);
+				self.dom.canvas.addEventListener('touchmove', tool.onMouseMove);
 			}
 		},
 		onmouseup: function (e) {
@@ -636,6 +653,7 @@ function Painter() {
 				}
 				if (tool.onMouseMove) {
 					self.dom.canvas.removeEventListener('mousemove', tool.onMouseMove);
+					self.dom.canvas.removeEventListener('touchmove', tool.onMouseMove);
 				}
 			}
 		},
@@ -753,20 +771,24 @@ function Painter() {
 		tool.show = function () {
 			CssUtils.showElement(tool.imgHolder);
 			document.addEventListener('mouseup', tool.docMouseUp);
+			document.addEventListener('touchend', tool.docMouseUp);
 		};
 		tool.hide = function() {
 			tool._setCursor(null);
 			CssUtils.hideElement(tool.imgHolder);
 			document.removeEventListener('mouseup', tool.docMouseUp);
+			document.removeEventListener('touchend', tool.docMouseUp);
 		};
 		tool.trackMouseMove = function(e, mode) {
 			self.log("Resizer mousedown")();
 			tool.mode = mode || e.target.getAttribute('pos');
 			self.dom.canvasWrapper.addEventListener('mousemove', tool.handleMouseMove);
+			self.dom.canvasWrapper.addEventListener('touchmove', tool.handleMouseMove);
 			tool.setParamsFromEvent(e);
 			tool._setCursor(tool.cursors[tool.mode]);
 		};
 		tool.imgHolder.onmousedown = tool.trackMouseMove;
+		tool.imgHolder.ontouchstart = tool.trackMouseMove;
 		tool.setParamsFromEvent = function(e) {
 			tool.params.lastCoord = {
 				x: e.pageX,
@@ -783,6 +805,7 @@ function Painter() {
 		tool.docMouseUp = function (e) {
 			self.log("Resizer mouseup")();
 			self.dom.canvasWrapper.removeEventListener('mousemove', tool.handleMouseMove);
+			self.dom.canvasWrapper.removeEventListener('touchmove', tool.handleMouseMove);
 		};
 		tool.cursors = {
 			m: 'move',
@@ -849,6 +872,7 @@ function Painter() {
 	self.tools = {
 		select: new (function () {
 			var tool = this;
+			self.Appliable.call(this);
 			tool.keyActivator = {
 				code: 'KeyS',
 				icon: 'icon-selection',
@@ -863,11 +887,13 @@ function Painter() {
 			};
 			tool.onActivate = function() {
 				tool.inProgress = false;
+				tool.disableApply();
 				tool.mouseUpClicked = false;
 			};
 			// document.addEventListener('copy', tool.onCopy);
 			tool.onZoomChange = self.resizer.onZoomChange;
 			tool.onDeactivate = function() {
+				tool.enableApply();
 				self.resizer.hide();
 				if (tool.inProgress) {
 					self.ctx.putImageData(tool.savedState, 0, 0);
@@ -897,6 +923,7 @@ function Painter() {
 			};
 			tool.onMouseDown = function (e) {
 				self.log('select mouseDown')();
+				tool.disableApply();
 				if (tool.inProgress) {
 					CssUtils.hideElement(tool.domImg);
 					self.ctx.putImageData(tool.savedState, 0, 0);
@@ -914,7 +941,9 @@ function Painter() {
 				var params = self.resizer.params;
 				if (!params.width || !params.height) {
 					self.resizer.hide();
+					tool.disableApply();
 				} else {
+					tool.enableApply();
 					self.log('select mouseUp')();
 					tool.mouseUpClicked = true;
 					var imageData = self.ctx.getImageData(params.left, params.top, params.width, params.height);
@@ -1252,6 +1281,7 @@ function Painter() {
 		})(),
 		text: new (function () {
 			var tool = this;
+			self.Appliable.call(this);
 			tool.keyActivator = {
 				code: 'KeyT',
 				icon: 'icon-text',
@@ -1269,6 +1299,7 @@ function Painter() {
 				tool.span.style.fontFamily = e.target.value;
 			};
 			tool.onActivate = function () { // TODO this looks bad
+				tool.disableApply();
 				tool.onChangeFont({target: {value: self.ctx.fontFamily}});
 				tool.onChangeRadius({target: {value: self.ctx.lineWidth}});
 				tool.onChangeFillOpacity({target: {value: self.instruments.opacityFill.inputValue * 100}});
@@ -1276,6 +1307,7 @@ function Painter() {
 				tool.span.innerHTML = '';
 			};
 			tool.onDeactivate = function () {
+				tool.enableApply();
 				CssUtils.hideElement(tool.span);
 			};
 			tool.onApply = function () {
@@ -1317,6 +1349,7 @@ function Painter() {
 					y: e.offsetY,
 					z: self.zoom
 				};
+				tool.enableApply();
 				tool.span.style.top = tool.originOffest.y +'px';
 				tool.span.style.left = tool.originOffest.x +'px';
 				tool.lastCoord = self.helper.getXY(e);
@@ -1421,6 +1454,7 @@ function Painter() {
 		}),
 		crop: new (function () {
 			var tool = this;
+			self.Appliable.call(this);
 			tool.keyActivator = {
 				code: 'KeyC',
 				icon: 'icon-crop',
@@ -1443,16 +1477,27 @@ function Painter() {
 					self.setMode('pen');
 				}
 			};
+			tool.onActivate = function() {
+				tool.disableApply();
+			};
 			tool.onZoomChange = self.resizer.onZoomChange;
 			tool.onDeactivate = function() {
 				self.resizer.hide();
+				tool.enableApply();
 			};
 			tool.onMouseDown = function (e) {
 				self.resizer.show();
+				tool.disableApply();
 				self.resizer.setData(e.offsetY, e.offsetX, 0, 0);
 				self.resizer.trackMouseMove(e, 'br');
 			};
 			tool.onMouseUp = function (e) {
+				var params = self.resizer.params;
+				if (!params.width || !params.height) {
+					self.resizer.hide();
+				} else {
+					tool.enableApply();
+				}
 
 			};
 		})(),
@@ -1704,6 +1749,7 @@ function Painter() {
 			oldMode.onDeactivate && oldMode.onDeactivate();
 			if (oldMode.onMouseMove) {
 				self.dom.canvas.removeEventListener('mousemove', oldMode.onMouseMove);
+				self.dom.canvas.removeEventListener('touchmove', oldMode.onMouseMove);
 			}
 			CssUtils.removeClass(oldMode.icon, self.PICKED_TOOL_CLASS);
 		}
@@ -1724,11 +1770,13 @@ function Painter() {
 	self.show = function () {
 		self.super.show();
 		document.body.addEventListener('mouseup', self.events.onmouseup, false);
+		document.body.addEventListener('touchend', self.events.onmouseup, false);
 	};
 	self.superHide = self.hide;
 	self.hide = function () {
 		self.superHide();
 		document.body.removeEventListener('mouseup', self.events.onmouseup, false);
+		document.body.removeEventListener('touchend', self.events.onmouseup, false);
 	};
 	Object.keys(self.init).forEach(function (k) {
 		self.init[k]()
@@ -2821,12 +2869,12 @@ function SmileyUtil() {
 		}
 		self.inited = true;
 		self.loadSmileys(smileys_bas64_data);
-		userMessage.addEventListener("mousedown", function (event) {
+		userMessage.addEventListener("click", function (event) {
 			event.stopPropagation(); // Don't fire onDocClick
 		});
 	};
 	self.hideSmileys = function () {
-		document.removeEventListener("mousedown", self.onDocClick);
+		document.removeEventListener("click", self.onDocClick);
 		CssUtils.hideElement(self.dom.smileParentHolder);
 	};
 	self.onDocClick = function (event) {
@@ -2857,9 +2905,9 @@ function SmileyUtil() {
 		event.preventDefault();
 		var becomeHidden = CssUtils.toggleVisibility(self.dom.smileParentHolder);
 		if (becomeHidden) {
-			document.removeEventListener("mousedown", self.onDocClick);
+			document.removeEventListener("click", self.onDocClick);
 		} else {
-			document.addEventListener("mousedown", self.onDocClick);
+			document.addEventListener("click", self.onDocClick);
 			if (document.activeElement != userMessage) {
 				userMessage.focus();
 			}

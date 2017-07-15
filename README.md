@@ -64,52 +64,7 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 
 TODO
 ====
-* add tornado sinle log file instead of 1 per port, add port param to it
-* Add colored logs http://stackoverflow.com/questions/7505623/colors-in-javascript-console
-* replace `new Date().getTime()` with `Date.now()`
-* add drawing lines with alpha by saving image
-* check transfer files over net - doesnt work, while localhost works
-* If canvas mode == 'select' rotation should apply to selection.
-* Add applying zoom to method that trigger via keyboard in canvas 
-* Android bugs:
-```
-13:18:11.397: WS_IN {"action": "offerFile", "content": {"name": "settings.jar", "size": 9274}, "userId": 1, "handler": "webrtc", "user": "admin", "connId": "uIkTmFu0", "opponentWsId": "0001:XrAg", "channel": 1}
-chat.js?v=5e3558a9:4289 13:18:11.400: uIkTmFu0 initAndDisplayOffer file
-chat.js?v=5e3558a9:4856 13:18:11.401: WS out {"action":"replyFile","connId":"uIkTmFu0"}
-chat.js?v=5e3558a9:1784 Uncaught TypeError: Failed to construct 'Notification': Illegal constructor. Use ServiceWorkerRegistration.showNotification() instead.
-    at NotifierHandler.self.notify (chat.js?v=5e3558a9:1784)
-    at FileReceiver.self.showOffer (chat.js?v=5e3558a9:4204)
-    at FileReceiver.self.initAndDisplayOffer (chat.js?v=5e3558a9:4295)
-    at WebRtcApi.self.onofferFile (chat.js?v=5e3558a9:4754)
-    at WebRtcApi.self.handle (chat.js?v=5e3558a9:4776)
-    at WsHandler.self.handleMessage (chat.js?v=5e3558a9:4846)
-    at WebSocket.WsHandler.self.onWsMessage (chat.js?v=5e3558a9:4841)
-chat.js?v=5e3558a9:4856 13:19:34.694: WS out {"content":"decline","action":"destroyFileConnection","connId":"SJFG8gkV"}
-chat.js?v=5e3558a9:3527 13:19:34.695: SJFG8gkV:0001:XrAg No peer connection to close
-chat.js?v=5e3558a9:4376 13:19:34.695: SJFG8gkV:0001:XrAg No channels to close
-chat.js?v=5e3558a9:4797 13:19:34.695: Removing transferHandler with id SJFG8gkV
-chat.js?v=5e3558a9:4839 13:19:48.371: WS_IN {"action": "destroyFileConnection", "connId": "uIkTmFu0", "opponentWsId": "0001:XrAg", "handler": "webrtcTransfer"}
-chat.js?v=5e3558a9:4279 Uncaught TypeError: Cannot set property 'textContent' of undefined
-    at FileReceiver.self.ondestroyFileConnection (chat.js?v=5e3558a9:4279)
-    at FileReceiver.BaseTransferHandler.self.handle (chat.js?v=5e3558a9:3561)
-    at WebRtcApi.self.handle (chat.js?v=5e3558a9:4778)
-    at WsHandler.self.handleMessage (chat.js?v=5e3558a9:4846)
-    at WebSocket.WsHandler.self.onWsMessage (chat.js?v=5e3558a9:4841)
-chat.js?v=5e3558a9:4839 13:19:49.725: WS_IN {"action": "destroyFileConnection", "connId": "X9TQiSf8", "opponentWsId": "0001:XrAg", "handler": "webrtcTransfer"}
-chat.js?v=5e3558a9:4279 Uncaught TypeError: Cannot set property 'textContent' of undefined
-    at FileReceiver.self.ondestroyFileConnection (chat.js?v=5e3558a9:4279)
-    at FileReceiver.BaseTransferHandler.self.handle (chat.js?v=5e3558a9:3561)
-    at WebRtcApi.self.handle (chat.js?v=5e3558a9:4778)
-    at WsHandler.self.handleMessage (chat.js?v=5e3558a9:4846)
-    at WebSocket.WsHandler.self.onWsMessage (chat.js?v=5e3558a9:4841)
-chat.js?v=5e3558a9:4839 13:19:50.542: WS_IN {"action": "destroyFileConnection", "connId": "89H6OJit", "opponentWsId": "0001:XrAg", "handler": "webrtcTransfer"}
-chat.js?v=5e3558a9:4279 Uncaught TypeError: Cannot set property 'textContent' of undefined
-    at FileReceiver.self.ondestroyFileConnection (chat.js?v=5e3558a9:4279)
-    at FileReceiver.BaseTransferHandler.self.handle (chat.js?v=5e3558a9:3561)
-    at WebRtcApi.self.handle (chat.js?v=5e3558a9:4778)
-    at WsHandler.self.handleMessage (chat.js?v=5e3558a9:4846)
-    at WebSocket.WsHandler.self.onWsMessage (chat.js?v=5e3558a9:4841)
-```
+* Replaced email oauth with fb\google id and add them to profile
 * Add applying zoom to method that trigger via keyboard in canvas
 * add queued messaged to wsHandler, if ws is offline messages goes to array. userMessage input clears after we press enter and we don't restore its state we just put message to queue. When webrtc is disconnected we send reconnect event to this ws.queue
 * Just a note https://codepen.io/techslides/pen/zowLd , i guess transform: scale is better https://stackoverflow.com/questions/11332608/understanding-html-5-canvas-scale-and-translate-order https://stackoverflow.com/questions/16687023/bug-with-transform-scale-and-overflow-hidden-in-chrome
