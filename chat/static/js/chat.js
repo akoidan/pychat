@@ -895,7 +895,7 @@ function Painter() {
 			tool.onDeactivate = function() {
 				tool.enableApply();
 				self.resizer.hide();
-				if (tool.inProgress) {
+				if (tool.inProgress && tool.savedState) {
 					self.ctx.putImageData(tool.savedState, 0, 0);
 				}
 				CssUtils.hideElement(tool.domImg);
