@@ -64,6 +64,7 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 
 TODO
 ====
+* paste event doesn't fire at all most of the times on painter canvasHolder, mb try to move it to <canvas>
 * Replaced email oauth with fb\google id and add them to profile
 * Add applying zoom to method that trigger via keyboard in canvas
 * add queued messaged to wsHandler, if ws is offline messages goes to array. userMessage input clears after we press enter and we don't restore its state we just put message to queue. When webrtc is disconnected we send reconnect event to this ws.queue
