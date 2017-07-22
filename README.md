@@ -81,7 +81,6 @@ TODO
 * `'` Symbol in links breaks anchor tag. For example https://raw.githubusercontent.com/NeverSinkDev/NeverSink-Filter/master/NeverSink's%20filter%20-%201-REGULAR.filter
 * webrtc connection lost while transfering file causes js error
 * Add title for room. 
-* add scale to painter and Ctrl+Z
 * Show online status right of Direct user's messages besides channels' online 
 * TODO if someone offers a new call till establishing connection for a call self.call_receiver_channel would be set to wrong
 * !!!IMPORTANT Debug call dialog by switching channels while calling and no.
