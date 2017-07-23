@@ -288,6 +288,7 @@ function Painter() {
 	self.PICKED_TOOL_CLASS = 'active-icon';
 	self.dom.canvas = $('painter');
 	self.dom.paintDimensions = $('paintDimensions');
+	self.dom.paintXY = $('paintXY');
 	self.dom.canvasWrapper = $('canvasWrapper');
 	self.tmp = new function() {
 		var tool = this;
@@ -437,6 +438,7 @@ function Painter() {
 		initCanvas: function () {
 			[
 				{dom: self.dom.canvas, listener: ['mousedown', 'touchstart'], handler: 'onmousedown'},
+				{dom: self.dom.canvas, listener: ['mousemove', 'touchmove'], handler: 'onmousemove'},
 				{dom: self.dom.container, listener: 'keypress', handler: 'contKeyPress', params: false},
 				{dom: self.dom.container, listener: 'paste', handler: 'canvasImagePaste', params: false},
 				{
@@ -634,9 +636,13 @@ function Painter() {
 				imgData = self.buffer.startAction();
 			}
 			tool.onMouseDown(e, imgData);
-			if (tool.onMouseMove) {
-				self.dom.canvas.addEventListener('mousemove', tool.onMouseMove);
-				self.dom.canvas.addEventListener('touchmove', tool.onMouseMove);
+		},
+		onmousemove: function(e) {
+			var tool = self.tools[self.mode];
+			var xy = self.helper.getXY(e);
+			self.dom.paintXY.textContent = "[{},{}]".format(xy.x, xy.y)
+			if (self.events.mouseDown > 0 && tool.onMouseMove) {
+				tool.onMouseMove(e);
 			}
 		},
 		onmouseup: function (e) {
@@ -650,10 +656,6 @@ function Painter() {
 				if (mu) {
 					// self.log("{} mouse up", self.mode)();
 					mu(e)
-				}
-				if (tool.onMouseMove) {
-					self.dom.canvas.removeEventListener('mousemove', tool.onMouseMove);
-					self.dom.canvas.removeEventListener('touchmove', tool.onMouseMove);
 				}
 			}
 		},
@@ -1747,10 +1749,6 @@ function Painter() {
 		self.mode = mode;
 		if (oldMode) {
 			oldMode.onDeactivate && oldMode.onDeactivate();
-			if (oldMode.onMouseMove) {
-				self.dom.canvas.removeEventListener('mousemove', oldMode.onMouseMove);
-				self.dom.canvas.removeEventListener('touchmove', oldMode.onMouseMove);
-			}
 			CssUtils.removeClass(oldMode.icon, self.PICKED_TOOL_CLASS);
 		}
 		var newMode = self.tools[self.mode];

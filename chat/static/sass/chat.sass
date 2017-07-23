@@ -206,6 +206,13 @@ fieldset
 	border: 1px solid #8d8d8d
 
 .bottomTools
+	.paintXYdimens
+		float: right
+		font-size: 12px
+		padding: 5px 10px
+		display: inline-block
+		> *
+			display: block
 	%hideEl
 		display: inline-block
 		vertical-align: top
@@ -278,7 +285,8 @@ fieldset
 	.canvasWrapper
 		position: relative
 		overflow: auto
-		@extend %user-select-none
+		// select none prevent paste event  https://stackoverflow.com/questions/31207253/onpaste-paste-event-not-firing-for-table-on-first-few-attempts
+		//@extend %user-select-none
 		width: 700px
 		background-color: #313131
 		height: 500px
@@ -565,11 +573,6 @@ fieldset
 
 #paintTextSpan
 	white-space: pre-wrap
-
-#paintDimensions
-	float: right
-	display: inline-block
-	padding: 10px
 
 #paintResizeTools
 	display: inline-block
