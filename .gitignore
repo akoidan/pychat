@@ -2,6 +2,8 @@
 .project
 .pydevproject
 .idea
+.vscode
+test/
 dump.rdb
 photos
 django.db
