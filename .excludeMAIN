@@ -4,6 +4,8 @@
 .project
 .pydevproject
 .idea
+.vscode
+test/
 dump.rdb
 photos
 django.db
@@ -51,4 +53,11 @@ chat/static/alsa.txt
 chat/static/androidApi.txt
 chat/static/dmesg.txt
 chat/static/err.txt
+chat/static/a.zip
+chat/static/b.zip
+chat/static/gr-2.61.zip
+chat/static/package.2.6.2.zip
+chat/static/recover.sh
+chat/static/recovery-pacman.sh
+
 

@@ -642,7 +642,7 @@ function Painter() {
 			var xy = self.helper.getXY(e);
 			self.dom.paintXY.textContent = "[{},{}]".format(xy.x, xy.y)
 			if (self.events.mouseDown > 0 && tool.onMouseMove) {
-				tool.onMouseMove(e);
+				tool.onMouseMove(e, xy);
 			}
 		},
 		onmouseup: function (e) {
@@ -1002,11 +1002,10 @@ function Painter() {
 				self.ctx.moveTo(coord.x, coord.y);
 				tool.points = [];
 				self.tmp.saveState();
-				tool.onMouseMove(e)
+				tool.onMouseMove(e, coord)
 			};
-			tool.onMouseMove = function (e) {
+			tool.onMouseMove = function (e, coord) {
 				// self.log("mouse move,  points {}", JSON.stringify(tool.points))();
-				var coord = self.helper.getXY(e);
 				self.tmp.restoreState();
 				tool.points.push(coord);
 				self.ctx.beginPath();
@@ -1037,7 +1036,7 @@ function Painter() {
 			tool.onMouseDown = function (e) {
 				self.tmp.saveState();
 				tool.startCoord = self.helper.getXY(e);
-				tool.onMouseMove(e)
+				tool.onMouseMove(e, tool.startCoord);
 			};
 			tool.calcProportCoord = function(currCord) {
 				var deg = Math.atan((tool.startCoord.x - currCord.x) / (currCord.y - tool.startCoord.y)) * 8 / Math.PI;
@@ -1051,10 +1050,9 @@ function Painter() {
 					currCord.y = tool.startCoord.y + base * (tool.startCoord.y < currCord.y ? 1 : -1);
 				}
 			};
-			tool.onMouseMove = function (e) {
+			tool.onMouseMove = function (e, currCord) {
 				self.tmp.restoreState();
 				self.ctx.beginPath();
-				var currCord = self.helper.getXY(e);
 				if (e.shiftKey) {
 					tool.calcProportCoord(currCord);
 				}
@@ -1194,7 +1192,7 @@ function Painter() {
 			tool.onMouseDown = function (e) {
 				self.tmp.saveState();
 				tool.startCoord = self.helper.getXY(e);
-				tool.onMouseMove(e)
+				tool.onMouseMove(e, tool.startCoord)
 			};
 			tool.calcProportCoord = function(currCord) {
 				if (currCord.w < currCord.h) {
@@ -1203,8 +1201,7 @@ function Painter() {
 					currCord.w = currCord.h;
 				}
 			};
-			tool.onMouseMove = function (e) {
-				var endCoord = self.helper.getXY(e);
+			tool.onMouseMove = function (e, endCoord) {
 				var dim = {
 					w: endCoord.x - tool.startCoord.x,
 					h: endCoord.y - tool.startCoord.y,
@@ -1239,7 +1236,7 @@ function Painter() {
 			tool.onMouseDown = function (e, data) {
 				self.tmp.saveState();
 				tool.startCoord = self.helper.getXY(e);
-				tool.onMouseMove(e)
+				tool.onMouseMove(e, tool.startCoord)
 			};
 			tool.calcProportCoord = function(currCord) {
 				if (currCord.w < currCord.h) {
@@ -1262,8 +1259,7 @@ function Painter() {
 				self.ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
 				self.ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
 			};
-			tool.onMouseMove = function (e) {
-				var endCoord = self.helper.getXY(e);
+			tool.onMouseMove = function (e, endCoord) {
 				var dim = {
 					w: endCoord.x - tool.startCoord.x,
 					h: endCoord.y - tool.startCoord.y
@@ -1385,10 +1381,9 @@ function Painter() {
 				var coord = self.helper.getXY(e);
 				self.ctx.moveTo(coord.x, coord.y);
 				self.ctx.beginPath();
-				tool.onMouseMove(e)
+				tool.onMouseMove(e, coord)
 			};
-			tool.onMouseMove = function (e) {
-				var coord = self.helper.getXY(e);
+			tool.onMouseMove = function (e, coord) {
 				self.ctx.lineTo(coord.x, coord.y);
 				self.ctx.stroke();
 			};
@@ -4348,13 +4343,13 @@ function FileReceiver(removeReferenceFn) {
 		}
 	};
 	self.sendAccessFileSuccess = function (fileSystemSucess) {
-		if (fileSystemSucess) {
+		if (fileSystemSucess || self.fileSize < MAX_ACCEPT_FILE_SIZE_WO_FS_API) {
 			self.peerConnections[self.offerOpponentWsId].waitForAnswer();
 			wsHandler.sendToServer({
 				action: 'acceptFile',
 				connId: self.connectionId
 			});
-		} else if (self.fileSize > MAX_ACCEPT_FILE_SIZE_WO_FS_API) {
+		} else {
 			self.sendErrorFSApi();
 			self.peerConnections[self.offerOpponentWsId].destroy(); //TODO
 		}
