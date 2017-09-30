@@ -4343,13 +4343,13 @@ function FileReceiver(removeReferenceFn) {
 		}
 	};
 	self.sendAccessFileSuccess = function (fileSystemSucess) {
-		if (fileSystemSucess) {
+		if (fileSystemSucess || self.fileSize < MAX_ACCEPT_FILE_SIZE_WO_FS_API) {
 			self.peerConnections[self.offerOpponentWsId].waitForAnswer();
 			wsHandler.sendToServer({
 				action: 'acceptFile',
 				connId: self.connectionId
 			});
-		} else if (self.fileSize > MAX_ACCEPT_FILE_SIZE_WO_FS_API) {
+		} else {
 			self.sendErrorFSApi();
 			self.peerConnections[self.offerOpponentWsId].destroy(); //TODO
 		}
