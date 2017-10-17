@@ -2850,7 +2850,9 @@ function ChannelsHandler() {
 function SmileyUtil() {
 	var self = this;
 	self.dom = {
-		smileParentHolder: $('smileParentHolder')
+		smileParentHolder: $('smileParentHolder'),
+		tabNames: $('tabNames'),
+		iconSmile: $('iconSmile')
 	};
 	self.smileRegex = /<img[^>]*code="([^"]+)"[^>]*>/g;
 	self.tabNames = [];
@@ -2860,6 +2862,9 @@ function SmileyUtil() {
 		if (self.inited) {
 			return;
 		}
+		self.dom.iconSmile.addEventListener('click', self.toggleSmileys, true);
+		self.dom.tabNames.addEventListener('click', self.showTabByName, true);
+		self.dom.smileParentHolder.addEventListener('click', self.addSmile, true);
 		self.inited = true;
 		self.loadSmileys(smileys_bas64_data);
 		userMessage.addEventListener("click", function (event) {
@@ -2879,6 +2884,9 @@ function SmileyUtil() {
 		userMessage.innerHTML = userMessage.innerHTML.replace(self.smileRegex, "$1");
 	};
 	self.addSmile = function (event) {
+		if (event.target.tagName == 'LI') {
+			return
+		}
 		event.preventDefault(); // prevents from losing focus
 		event.stopPropagation(); // don't allow onDocClick
 		var smileImg = event.target;
