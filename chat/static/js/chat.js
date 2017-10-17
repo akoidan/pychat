@@ -2860,6 +2860,7 @@ function SmileyUtil() {
 		if (self.inited) {
 			return;
 		}
+		$('iconSmile').addEventListener('click', self.toggleSmileys, true);
 		self.inited = true;
 		self.loadSmileys(smileys_bas64_data);
 		userMessage.addEventListener("click", function (event) {
