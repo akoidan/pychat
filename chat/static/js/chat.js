@@ -1409,8 +1409,8 @@ function Painter() {
 					tool.imgObj.onload = function () {
 						tool.img.src = b64;
 						self.resizer.setData(
-								10 + self.dom.canvasWrapper.scrollTop,
-								10 + self.dom.canvasWrapper.scrollLeft,
+								self.dom.canvasWrapper.scrollTop,
+								self.dom.canvasWrapper.scrollLeft,
 								tool.imgObj.width,
 								tool.imgObj.height
 						);
