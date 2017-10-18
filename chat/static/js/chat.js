@@ -640,7 +640,7 @@ function Painter() {
 		onmousemove: function(e) {
 			var tool = self.tools[self.mode];
 			var xy = self.helper.getXY(e);
-			self.dom.paintXY.textContent = "[{},{}]".format(xy.x, xy.y)
+			self.dom.paintXY.textContent = "[{},{}]x{}".format(xy.x, xy.y, self.zoom.toFixed(2))
 			if (self.events.mouseDown > 0 && tool.onMouseMove) {
 				tool.onMouseMove(e, xy);
 			}
@@ -770,6 +770,7 @@ function Painter() {
 			tool.imgHolder.style.height = tool.params.height * self.zoom + 2 + 'px';
 			tool.imgHolder.style.top = tool.params.top * self.zoom - 1 + 'px';
 			tool.imgHolder.style.left = tool.params.left * self.zoom - 1 + 'px';
+			self.dom.paintXY.textContent = self.dom.paintXY.textContent.split('x')[0] + 'x' + self.zoom.toFixed(2);
 		};
 		tool.show = function () {
 			CssUtils.showElement(tool.imgHolder);
