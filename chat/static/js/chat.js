@@ -727,13 +727,13 @@ function Painter() {
 				tool.imgHolder.style.width = ampl * (tool.params.lastCoord.ow * self.zoom /*+ 2*/)+ w + 'px';
 				tool.params.width = ampl * tool.params.lastCoord.ow + w / self.zoom;
 			},
-			setHeight: function (h) {
-				tool.imgHolder.style.height = tool.params.lastCoord.oh * self.zoom + h /*+ 2*/ + 'px';
-				tool.params.height = tool.params.lastCoord.oh + h / self.zoom;
+			setHeight: function (h, ampl) {
+				tool.imgHolder.style.height = ampl * tool.params.lastCoord.oh * self.zoom + h /*+ 2*/ + 'px';
+				tool.params.height = ampl * tool.params.lastCoord.oh + h / self.zoom;
 			},
-			setTop: function (t) {
-				tool.imgHolder.style.top = tool.params.lastCoord.oy * self.zoom + t /*- 1*/ + 'px';
-				tool.params.top = tool.params.lastCoord.oy + t / self.zoom;
+			setTop: function (t, padding) {
+				tool.imgHolder.style.top = (tool.params.lastCoord.oy + padding) * self.zoom + t /*- 1*/ + 'px';
+				tool.params.top = tool.params.lastCoord.oy + t / self.zoom + padding;
 			},
 			setLeft: function (l, padding) {
 				tool.imgHolder.style.left = (tool.params.lastCoord.ox  + padding)* self.zoom + l /*- 1*/ + 'px';
@@ -822,15 +822,24 @@ function Painter() {
 		};
 		tool.handlers = {
 			m: function (x, y) {
-				tool.params.setTop(+y);
+				tool.params.setTop(+y, 0);
 				tool.params.setLeft(+x, 0);
 			},
 			b: function (x, y) {
-				tool.params.setHeight(+y);
+				if (y < -tool.params.lastCoord.oh) {
+					tool.params.setHeight(-y, -1);
+					tool.params.setTop(y, tool.params.lastCoord.oh);
+				} else {
+					tool.params.setHeight(+y, 1);
+				}
 			},
 			t: function (x, y) {
-				tool.params.setTop(+y);
-				tool.params.setHeight(-y);
+				if (y > tool.params.lastCoord.oh) {
+					tool.params.setHeight(y, -1)
+				} else {
+					tool.params.setTop(+y, 0);
+					tool.params.setHeight(-y, 1);
+				}
 			},
 			l: function (x, y) {
 				if (x > tool.params.lastCoord.ow) {
