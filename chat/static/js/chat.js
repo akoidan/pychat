@@ -722,6 +722,10 @@ function Painter() {
 		document.head.appendChild(tool.cursorStyle);
 		tool.imgHolder = $('paint-crp-rect');
 		tool.params = {
+			restoreOrd: function(name, alias, padd) {
+				tool.params[name] = tool.params.lastCoord[alias] + (padd ? tool.params.lastCoord[padd] : 0)  ;
+				tool.imgHolder.style[name] = tool.params[name]* self.zoom + 'px';
+			},
 			setWidth: function (w, ampl) {
 				// 1px border, so left is 1px closer, and width is 2px more (counting right border)
 				tool.imgHolder.style.width = ampl * (tool.params.lastCoord.ow * self.zoom /*+ 2*/)+ w + 'px';
@@ -831,11 +835,13 @@ function Painter() {
 					tool.params.setTop(y, tool.params.lastCoord.oh);
 				} else {
 					tool.params.setHeight(+y, 1);
+					tool.params.restoreOrd('top', 'oy');
 				}
 			},
 			t: function (x, y) {
 				if (y > tool.params.lastCoord.oh) {
-					tool.params.setHeight(y, -1)
+					tool.params.setHeight(y, -1);
+					tool.params.restoreOrd('top', 'oy', 'oh');
 				} else {
 					tool.params.setTop(+y, 0);
 					tool.params.setHeight(-y, 1);
@@ -843,7 +849,8 @@ function Painter() {
 			},
 			l: function (x, y) {
 				if (x > tool.params.lastCoord.ow) {
-					tool.params.setWidth(x, -1)
+					tool.params.setWidth(x, -1);
+					tool.params.restoreOrd('left', 'ox', 'ow');
 				} else {
 					tool.params.setLeft(+x, 0);
 					tool.params.setWidth(-x, 1);
@@ -854,6 +861,7 @@ function Painter() {
 					tool.params.setWidth(-x, -1);
 					tool.params.setLeft(x, tool.params.lastCoord.ow);
 				} else {
+					tool.params.restoreOrd('left', 'ox');
 					tool.params.setWidth(+x, 1);
 				}
 			}
