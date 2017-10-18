@@ -726,6 +726,7 @@ function Painter() {
 				// 1px border, so left is 1px closer, and width is 2px more (counting right border)
 				tool.imgHolder.style.width = tool.params.lastCoord.ow * self.zoom + w + 2 + 'px';
 				tool.params.width = tool.params.lastCoord.ow + w / self.zoom;
+				self.log("new width {}", tool.params.width)();
 			},
 			setHeight: function (h) {
 				tool.imgHolder.style.height = tool.params.lastCoord.oh * self.zoom + h + 2 + 'px';
@@ -833,11 +834,24 @@ function Painter() {
 				tool.params.setHeight(-y);
 			},
 			l: function (x, y) {
-				tool.params.setLeft(+x);
-				tool.params.setWidth(-x);
+				if (x > tool.params.lastCoord.ow) {
+					tool.params.setWidth(x - 2 * tool.params.lastCoord.ow);
+				} else {
+					tool.params.setLeft(+x);
+					tool.params.setWidth(-x);
+				}
 			},
 			r: function (x, y) {
-				tool.params.setWidth(+x);
+				self.log("x {}, diff {}", x, -x + 2 * tool.params.lastCoord.ow)();
+				// if (x < -tool.params.lastCoord.ow) {
+				// 	var l = -x-2*tool.params.lastCoord.ow;
+				// 	tool.params.setWidth(l);
+				// 	tool.params.setLeft(-l);
+				// } else {
+					tool.imgHolder.style.left = tool.params.lastCoord.ox + 'px';
+					tool.params.left = tool.params.lastCoord.ox;
+					tool.params.setWidth(+x);
+				// }
 			}
 		};
 		tool.calcProportion = function (x, y) {
