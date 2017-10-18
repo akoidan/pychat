@@ -722,26 +722,23 @@ function Painter() {
 		document.head.appendChild(tool.cursorStyle);
 		tool.imgHolder = $('paint-crp-rect');
 		tool.params = {
-			restoreOrd: function(name, alias, padd) {
+			alias: {
+				width: 'ow',
+				height: 'oh',
+				top: 'oy',
+				left: 'ox'
+			},
+			restoreOrd: function(name, padd) {
+				var alias = tool.params.alias[name];
 				tool.params[name] = tool.params.lastCoord[alias] + (padd ? tool.params.lastCoord[padd] : 0)  ;
 				tool.imgHolder.style[name] = tool.params[name]* self.zoom + 'px';
 			},
-			setWidth: function (w, ampl) {
-				// 1px border, so left is 1px closer, and width is 2px more (counting right border)
-				tool.imgHolder.style.width = ampl * (tool.params.lastCoord.ow * self.zoom /*+ 2*/)+ w + 'px';
-				tool.params.width = ampl * tool.params.lastCoord.ow + w / self.zoom;
-			},
-			setHeight: function (h, ampl) {
-				tool.imgHolder.style.height = ampl * tool.params.lastCoord.oh * self.zoom + h /*+ 2*/ + 'px';
-				tool.params.height = ampl * tool.params.lastCoord.oh + h / self.zoom;
-			},
-			setTop: function (t, padding) {
-				tool.imgHolder.style.top = (tool.params.lastCoord.oy + padding) * self.zoom + t /*- 1*/ + 'px';
-				tool.params.top = tool.params.lastCoord.oy + t / self.zoom + padding;
-			},
-			setLeft: function (l, padding) {
-				tool.imgHolder.style.left = (tool.params.lastCoord.ox  + padding)* self.zoom + l /*- 1*/ + 'px';
-				tool.params.left = tool.params.lastCoord.ox + l / self.zoom + padding;
+			setOrd: function(name, v, ampl, padding) {
+				ampl = ampl || 1;
+				padding = padding || 0;
+				var alias = tool.params.alias[name];
+				tool.imgHolder.style[name] = ampl * ((tool.params.lastCoord[alias] + padding) * self.zoom)+ v + 'px';
+				tool.params[name] = ampl * tool.params.lastCoord[alias] + v / self.zoom + padding;
 			},
 			rotate: function() {
 				var w = tool.imgHolder.style.width;
@@ -826,43 +823,43 @@ function Painter() {
 		};
 		tool.handlers = {
 			m: function (x, y) {
-				tool.params.setTop(+y, 0);
-				tool.params.setLeft(+x, 0);
+				tool.params.setOrd('top', y);
+				tool.params.setOrd('left', x);
 			},
 			b: function (x, y) {
 				if (y < -tool.params.lastCoord.oh) {
-					tool.params.setHeight(-y, -1);
-					tool.params.setTop(y, tool.params.lastCoord.oh);
+					tool.params.setOrd('height', -y, -1);
+					tool.params.setOrd('top', y, null, tool.params.lastCoord.oh);
 				} else {
-					tool.params.setHeight(+y, 1);
-					tool.params.restoreOrd('top', 'oy');
+					tool.params.setOrd('height', y);
+					tool.params.restoreOrd('top');
 				}
 			},
 			t: function (x, y) {
 				if (y > tool.params.lastCoord.oh) {
-					tool.params.setHeight(y, -1);
-					tool.params.restoreOrd('top', 'oy', 'oh');
+					tool.params.setOrd('height', y, -1);
+					tool.params.restoreOrd('top', 'oh');
 				} else {
-					tool.params.setTop(+y, 0);
-					tool.params.setHeight(-y, 1);
+					tool.params.setOrd('top', y);
+					tool.params.setOrd('height', -y);
 				}
 			},
 			l: function (x, y) {
 				if (x > tool.params.lastCoord.ow) {
-					tool.params.setWidth(x, -1);
-					tool.params.restoreOrd('left', 'ox', 'ow');
+					tool.params.setOrd('width', x, -1);
+					tool.params.restoreOrd('left', 'ow');
 				} else {
-					tool.params.setLeft(+x, 0);
-					tool.params.setWidth(-x, 1);
+					tool.params.setOrd('left', x);
+					tool.params.setOrd('width', -x);
 				}
 			},
 			r: function (x, y) {
 				if (x < -tool.params.lastCoord.ow) {
-					tool.params.setWidth(-x, -1);
-					tool.params.setLeft(x, tool.params.lastCoord.ow);
+					tool.params.setOrd('width', -x, -1);
+					tool.params.setOrd('left', x, null, tool.params.lastCoord.ow);
 				} else {
-					tool.params.restoreOrd('left', 'ox');
-					tool.params.setWidth(+x, 1);
+					tool.params.restoreOrd('left');
+					tool.params.setOrd('width', x);
 				}
 			}
 		};
