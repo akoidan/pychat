@@ -578,6 +578,7 @@ function Painter() {
 			} else {
 				self.zoom /= self.ZOOM_SCALE;
 			}
+			self.dom.paintXY.textContent = self.dom.paintXY.textContent.split('x')[0] + 'x' + self.zoom.toFixed(2);
 			if (self.tools[self.mode].onZoomChange) {
 				self.tools[self.mode].onZoomChange(self.zoom);
 			}
@@ -770,7 +771,6 @@ function Painter() {
 			tool.imgHolder.style.height = tool.params.height * self.zoom + 2 + 'px';
 			tool.imgHolder.style.top = tool.params.top * self.zoom - 1 + 'px';
 			tool.imgHolder.style.left = tool.params.left * self.zoom - 1 + 'px';
-			self.dom.paintXY.textContent = self.dom.paintXY.textContent.split('x')[0] + 'x' + self.zoom.toFixed(2);
 		};
 		tool.show = function () {
 			CssUtils.showElement(tool.imgHolder);
