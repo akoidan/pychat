@@ -288,9 +288,7 @@ fieldset
 		overflow: auto
 		// select none prevent paste event  https://stackoverflow.com/questions/31207253/onpaste-paste-event-not-firing-for-table-on-first-few-attempts
 		//@extend %user-select-none
-		width: 700px
 		background-color: #313131
-		height: 500px
 		max-height: calc(90vh - 100px)
 		max-width: calc(90vh - 100px)
 		border: 1px solid transparent
@@ -331,6 +329,14 @@ fieldset
 
 #onlineStatus
 	padding: 0 10px
+
+#canvasResize
+	cursor: se-resize
+	position: absolute
+	bottom: -5px
+	right: -5px
+	width: 10px
+	height: 10px
 
 .icon-cancel
 	position: absolute

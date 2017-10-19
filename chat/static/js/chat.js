@@ -290,6 +290,7 @@ function Painter() {
 	self.dom.paintDimensions = $('paintDimensions');
 	self.dom.paintXY = $('paintXY');
 	self.dom.trimImage = $('trimImage');
+	self.dom.canvasResize = $('canvasResize');
 	self.dom.canvasWrapper = $('canvasWrapper');
 	self.tmp = new function() {
 		var tool = this;
@@ -442,11 +443,9 @@ function Painter() {
 				{dom: self.dom.canvas, listener: ['mousemove', 'touchmove'], handler: 'onmousemove'},
 				{dom: self.dom.container, listener: 'keypress', handler: 'contKeyPress', params: false},
 				{dom: self.dom.container, listener: 'paste', handler: 'canvasImagePaste', params: false},
-				{
-					dom: self.dom.canvasWrapper, listener: mouseWheelEventName, handler: 'onmousewheel'
-					, params: {passive: false}
-				},
-				{dom: self.dom.container, listener: 'drop', handler: 'canvasImageDrop', params: {passive: false}}
+				{dom: self.dom.canvasWrapper, listener: mouseWheelEventName, handler: 'onmousewheel', params: {passive: false}},
+				{dom: self.dom.container, listener: 'drop', handler: 'canvasImageDrop', params: {passive: false}},
+				{dom: self.dom.canvasResize, listener: 'mousedown', handler: 'painterResize'}
 			].forEach(function (e) {
 				var listeners = Array.isArray(e.listener) ? e.listener: [e.listener];
 				listeners.forEach(function(listener) {
@@ -701,6 +700,21 @@ function Painter() {
 						&& (!proc.ctrlKey || (proc.ctrlKey && event.ctrlKey))) {
 					proc.clickAction(event);
 				}
+			});
+		},
+		painterResize: function(e) {
+			var st = painter.dom.canvasWrapper.style;
+			var w = parseInt(st.width.split('px')[0]);
+			var h = parseInt(st.height.split('px')[0]);
+			var x = e.pageX;
+			var y = e.pageY;
+			var listener = function(e) {
+				self.dom.canvasWrapper.style.width = w - x + e.pageX + 'px';
+				self.dom.canvasWrapper.style.height = h - y + e.pageY + 'px';
+			};
+			document.addEventListener('mousemove', listener);
+			document.addEventListener('mouseup', function() {
+				document.removeEventListener('mousemove', listener);
 			});
 		},
 		canvasImageDrop: function (e) {
