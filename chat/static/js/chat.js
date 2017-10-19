@@ -289,6 +289,7 @@ function Painter() {
 	self.dom.canvas = $('painter');
 	self.dom.paintDimensions = $('paintDimensions');
 	self.dom.paintXY = $('paintXY');
+	self.dom.trimImage = $('trimImage');
 	self.dom.canvasWrapper = $('canvasWrapper');
 	self.tmp = new function() {
 		var tool = this;
@@ -494,12 +495,17 @@ function Painter() {
 			self.setMode('pen');
 		},
 		pasteToTextArea: function () {
-			var trimImage = self.helper.trimImage();
-			if (trimImage) {
-				Utils.pasteb64ImgToTextArea(trimImage.toDataURL());
-				self.hide();
+			if (self.dom.trimImage.checked) {
+				var trimImage = self.helper.trimImage();
+				if (trimImage) {
+					Utils.pasteb64ImgToTextArea(trimImage.toDataURL());
+					self.hide();
+				} else {
+					growlError("You can't paste empty images");
+				}
 			} else {
-				growlError("You can't paste empty images");
+				Utils.pasteb64ImgToTextArea(self.dom.canvas.toDataURL());
+				self.hide();
 			}
 		},
 		drawImage: function() {
