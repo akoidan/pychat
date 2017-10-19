@@ -483,6 +483,9 @@ function Painter() {
 		return logger.webrtc.apply(logger, args);
 	};
 	self.helper = {
+		setUIText: function(text) {
+			self.dom.paintXY.textContent = text + ' ' + Math.round(self.zoom * 100) + '%';
+		},
 		openCanvas: function (e) { // TODO
 			self.show();
 			self.buffer.clear();
@@ -583,7 +586,7 @@ function Painter() {
 			} else {
 				self.zoom /= self.ZOOM_SCALE;
 			}
-			self.dom.paintXY.textContent = self.dom.paintXY.textContent.split('x')[0] + 'x' + self.zoom.toFixed(2);
+			self.helper.setUIText(self.dom.paintXY.textContent.split(' ')[0]);
 			if (self.tools[self.mode].onZoomChange) {
 				self.tools[self.mode].onZoomChange(self.zoom);
 			}
@@ -646,7 +649,7 @@ function Painter() {
 		onmousemove: function(e) {
 			var tool = self.tools[self.mode];
 			var xy = self.helper.getXY(e);
-			self.dom.paintXY.textContent = "[{},{}]x{}".format(xy.x, xy.y, self.zoom.toFixed(2))
+			self.helper.setUIText("[{},{}]".format(xy.x, xy.y));
 			if (self.events.mouseDown > 0 && tool.onMouseMove) {
 				tool.onMouseMove(e, xy);
 			}
@@ -1588,7 +1591,7 @@ function Painter() {
 			tool.keyActivator = {
 				code: 'KeyM',
 				icon: 'icon-move',
-				title: 'Move (Mm)'
+				title: 'Move (M)'
 			};
 			tool.getCursor = function () {
 				return 'move';
