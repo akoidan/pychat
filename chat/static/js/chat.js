@@ -828,7 +828,7 @@ function Painter() {
 				tool.params.setOrd('left', x);
 			},
 			b: function (x, y) {
-				if (y < -tool.params.lastCoord.oh) {
+				if (y / self.zoom < -tool.params.lastCoord.oh) {
 					tool.params.setOrd('height', -y, -1);
 					tool.params.setOrd('top', y, null, tool.params.lastCoord.oh);
 				} else {
@@ -837,7 +837,7 @@ function Painter() {
 				}
 			},
 			t: function (x, y) {
-				if (y > tool.params.lastCoord.oh) {
+				if (y / self.zoom > tool.params.lastCoord.oh) {
 					tool.params.setOrd('height', y, -1);
 					tool.params.restoreOrd('top', 'oh');
 				} else {
@@ -846,7 +846,7 @@ function Painter() {
 				}
 			},
 			l: function (x, y) {
-				if (x > tool.params.lastCoord.ow) {
+				if (x / self.zoom  > tool.params.lastCoord.ow) {
 					tool.params.setOrd('width', x, -1);
 					tool.params.restoreOrd('left', 'ow');
 				} else {
@@ -855,7 +855,7 @@ function Painter() {
 				}
 			},
 			r: function (x, y) {
-				if (x < -tool.params.lastCoord.ow) {
+				if (x / self.zoom  < -tool.params.lastCoord.ow) {
 					tool.params.setOrd('width', -x, -1);
 					tool.params.setOrd('left', x, null, tool.params.lastCoord.ow);
 				} else {
