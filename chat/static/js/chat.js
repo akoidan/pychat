@@ -578,6 +578,7 @@ function Painter() {
 			} else {
 				self.zoom /= self.ZOOM_SCALE;
 			}
+			self.dom.paintXY.textContent = self.dom.paintXY.textContent.split('x')[0] + 'x' + self.zoom.toFixed(2);
 			if (self.tools[self.mode].onZoomChange) {
 				self.tools[self.mode].onZoomChange(self.zoom);
 			}
@@ -770,7 +771,6 @@ function Painter() {
 			tool.imgHolder.style.height = tool.params.height * self.zoom + 2 + 'px';
 			tool.imgHolder.style.top = tool.params.top * self.zoom - 1 + 'px';
 			tool.imgHolder.style.left = tool.params.left * self.zoom - 1 + 'px';
-			self.dom.paintXY.textContent = self.dom.paintXY.textContent.split('x')[0] + 'x' + self.zoom.toFixed(2);
 		};
 		tool.show = function () {
 			CssUtils.showElement(tool.imgHolder);
@@ -828,7 +828,7 @@ function Painter() {
 				tool.params.setOrd('left', x);
 			},
 			b: function (x, y) {
-				if (y < -tool.params.lastCoord.oh) {
+				if (y / self.zoom < -tool.params.lastCoord.oh) {
 					tool.params.setOrd('height', -y, -1);
 					tool.params.setOrd('top', y, null, tool.params.lastCoord.oh);
 				} else {
@@ -837,7 +837,7 @@ function Painter() {
 				}
 			},
 			t: function (x, y) {
-				if (y > tool.params.lastCoord.oh) {
+				if (y / self.zoom > tool.params.lastCoord.oh) {
 					tool.params.setOrd('height', y, -1);
 					tool.params.restoreOrd('top', 'oh');
 				} else {
@@ -846,7 +846,7 @@ function Painter() {
 				}
 			},
 			l: function (x, y) {
-				if (x > tool.params.lastCoord.ow) {
+				if (x / self.zoom  > tool.params.lastCoord.ow) {
 					tool.params.setOrd('width', x, -1);
 					tool.params.restoreOrd('left', 'ow');
 				} else {
@@ -855,7 +855,7 @@ function Painter() {
 				}
 			},
 			r: function (x, y) {
-				if (x < -tool.params.lastCoord.ow) {
+				if (x / self.zoom  < -tool.params.lastCoord.ow) {
 					tool.params.setOrd('width', -x, -1);
 					tool.params.setOrd('left', x, null, tool.params.lastCoord.ow);
 				} else {
