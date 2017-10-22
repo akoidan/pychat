@@ -364,6 +364,7 @@ function Painter() {
 	};
 	self.ctx = self.dom.canvas.getContext('2d');
 	self.init = {
+		fixInput: self.fixInputs,
 		initInstruments: function () { // TODO this looks bad
 			Object.keys(self.instruments).forEach(function (k) {
 				var instr = self.instruments[k];
@@ -442,7 +443,7 @@ function Painter() {
 				{dom: self.dom.canvas, listener: ['mousedown', 'touchstart'], handler: 'onmousedown'},
 				{dom: self.dom.canvas, listener: ['mousemove', 'touchmove'], handler: 'onmousemove'},
 				{dom: self.dom.container, listener: 'keypress', handler: 'contKeyPress', params: false},
-				{dom: self.dom.container, listener: 'paste', handler: 'canvasImagePaste', params: false},
+				{dom: document.body, listener: 'paste', handler: 'canvasImagePaste', params: false},
 				{dom: self.dom.canvasWrapper, listener: mouseWheelEventName, handler: 'onmousewheel', params: {passive: false}},
 				{dom: self.dom.container, listener: 'drop', handler: 'canvasImageDrop', params: {passive: false}},
 				{dom: self.dom.canvasResize, listener: 'mousedown', handler: 'painterResize'}
@@ -726,7 +727,7 @@ function Painter() {
 			self.tools.img.readAndPasteCanvas(e.dataTransfer.files[0]);
 		},
 		canvasImagePaste: function (e) {
-			if (e.clipboardData && e.clipboardData.items) {
+			if (document.activeElement == self.dom.container && e.clipboardData && e.clipboardData.items) {
 				for (var i = 0; i < e.clipboardData.items.length; i++) {
 					var asFile = e.clipboardData.items[i].getAsFile();
 					if (asFile && asFile.type.indexOf('image') >= 0) {
