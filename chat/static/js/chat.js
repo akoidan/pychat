@@ -39,10 +39,12 @@ var storage;
 var singlePage;
 var painter;
 var minimizedWindows;
+var chatFileAudio;
 
 onDocLoad(function () {
 	userMessage = $("usermsg");
 	headerText = $('headerText');
+	chatFileAudio = $('chatFile');
 	minimizedWindows = new MinimizedWindows();
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	channelsHandler = new ChannelsHandler();
@@ -727,7 +729,9 @@ function Painter() {
 			self.tools.img.readAndPasteCanvas(e.dataTransfer.files[0]);
 		},
 		canvasImagePaste: function (e) {
+			console.log('asd');
 			if (document.activeElement == self.dom.container && e.clipboardData && e.clipboardData.items) {
+
 				for (var i = 0; i < e.clipboardData.items.length; i++) {
 					var asFile = e.clipboardData.items[i].getAsFile();
 					if (asFile && asFile.type.indexOf('image') >= 0) {
@@ -4340,6 +4344,7 @@ function FileReceiver(removeReferenceFn) {
 		self.fileName = message.content.name;
 		self.opponentName = message.user;
 		notifier.notify(message.user, "Sends file {}".format(self.fileName));
+		Utils.checkAndPlay(chatFileAudio);
 		self.init();
 		self.insertData("From:", self.opponentName);
 		self.setHeaderText("{} sends {}".format(self.opponentName, self.fileName));

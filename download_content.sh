@@ -24,6 +24,8 @@ SASS_DIR="$STATIC_DIR/sass"
 declare -a files=(\
     "$IMAGES_DIR/favicon.ico" \
     "$SOUNDS_DIR/ChatOutgoing.wav" \
+    "$SOUNDS_DIR/File.mp3" \
+    "$SOUNDS_DIR/Call.mp3" \
     "$SOUNDS_DIR/ChatIncoming.wav" \
     "$SOUNDS_DIR/ChatLogin.wav" \
     "$SOUNDS_DIR/ChatLogout.wav" \
