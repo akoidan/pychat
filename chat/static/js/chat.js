@@ -1699,14 +1699,20 @@ function Painter() {
 			}
 		}, {
 			keyActivator: {
-				code: 'KeyG',
+				code: 'Delete',
 				icon: 'icon-trash-circled',
-				title: 'Clear All (G) = Garbage'
+				title: 'Delete (Del)'
 			},
 			handler: function () {
-				self.buffer.startAction();
-				self.ctx.clearRect(0, 0, self.dom.canvas.width, self.dom.canvas.height);
-				self.buffer.finishAction();
+				if (self.tools['select'].isSelectionActive()) {
+					self.tools['select'].inProgress = false; // don't restore image
+					self.buffer.finishAction();
+					self.tools['select'].onDeactivate();
+				} else {
+					self.buffer.startAction();
+					self.ctx.clearRect(0, 0, self.dom.canvas.width, self.dom.canvas.height);
+					self.buffer.finishAction();
+				}
 			}
 		}
 	];
