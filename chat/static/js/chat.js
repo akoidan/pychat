@@ -247,7 +247,7 @@ function Draggable(container, headerText) {
 		if (!self.dom.container.id) {
 			self.dom.container.id = 'draggable' + getRandomId();
 		}
-		var inputs = document.querySelectorAll('#{0} input, #{0} button'.formatPos(container.id));
+		var inputs = document.querySelectorAll('#{0} input, #{0} button, .fixInput'.formatPos(container.id));
 		// typeOf(inputs) = HTMLCollection, not an array. that doesn't have forEach
 		for (var i = 0; i < inputs.length; i++) {
 			inputs[i].addEventListener('focus', function () {
@@ -1113,7 +1113,7 @@ function Painter() {
 			};
 			tool.bufferHandler = true;
 			tool.getCursor = function() {
-				return null;
+				return window.flood_fill_icon_b64;
 			};
 			tool.onChangeColorFill = function(e) {};
 			tool.onChangeFillOpacity = function(e) {};
@@ -1368,7 +1368,7 @@ function Painter() {
 				tool.span.style.left = (tool.originOffest.x * self.zoom  / tool.originOffest.z) + 'px';
 			};
 			tool.getCursor = function () {
-				return 'crosshair';
+				return 'text';
 			};
 			tool.onChangeRadius = function (e) {
 				tool.span.style.fontSize = (self.zoom * (5 + parseInt(e.target.value))) + 'px';
