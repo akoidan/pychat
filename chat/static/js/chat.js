@@ -812,7 +812,7 @@ function Painter() {
 			document.removeEventListener('touchend', tool.docMouseUp);
 		};
 		tool.trackMouseMove = function(e, mode) {
-			self.log("Resizer mousedown")();
+			//self.log("Resizer mousedown")();
 			tool.mode = mode || e.target.getAttribute('pos');
 			self.dom.canvasWrapper.addEventListener('mousemove', tool.handleMouseMove);
 			self.dom.canvasWrapper.addEventListener('touchmove', tool.handleMouseMove);
@@ -835,7 +835,7 @@ function Painter() {
 			tool.params.lastCoord.nl = Math.pow(tool.params.lastCoord.op, 2) + 1;
 		};
 		tool.docMouseUp = function (e) {
-			self.log("Resizer mouseup")();
+			//self.log("Resizer mouseup")();
 			self.dom.canvasWrapper.removeEventListener('mousemove', tool.handleMouseMove);
 			self.dom.canvasWrapper.removeEventListener('touchmove', tool.handleMouseMove);
 		};
@@ -940,49 +940,38 @@ function Painter() {
 			};
 			tool.onActivate = function() {
 				tool.inProgress = false;
-				tool.disableApply();
 				tool.mouseUpClicked = false;
 			};
 			// document.addEventListener('copy', tool.onCopy);
 			tool.onZoomChange = self.resizer.onZoomChange;
-			tool.onDeactivate = function() {
-				tool.enableApply();
-				self.resizer.hide();
-				if (tool.inProgress && tool.savedState) {
-					self.ctx.putImageData(tool.savedState, 0, 0);
+			tool.onDeactivate = function () {
+				if (tool.inProgress) {
+					var params = self.resizer.params;
+					self.log(
+							'Applying image {}, {}x{}, to  {x: {}, y: {}, w: {}, h:{}',
+							tool.imgInfo.width,
+							tool.imgInfo.height,
+							params.left,
+							params.top,
+							params.width,
+							params.height
+					)();
+					self.helper.drawImage(tool.domImg,
+							0, 0, tool.imgInfo.width, tool.imgInfo.height,
+							params.left, params.top, params.width, params.height);
+					self.buffer.finishAction();
+					tool.inProgress = false; // don't restore in onDeactivate
 				}
+				self.resizer.hide();
 				CssUtils.hideElement(tool.domImg);
 			};
 			tool.isSelectionActive = function() {
-				return self.mode == 'select' && tool.inProgress && tool.mouseUpClicked;
-			};
-			tool.onApply = function(e) {
-				var params = self.resizer.params;
-				self.log(
-						'Applying image {}, {}x{}, to  {x: {}, y: {}, w: {}, h:{}',
-						tool.imgInfo.width,
-						tool.imgInfo.height,
-						params.left,
-						params.top,
-						params.width,
-						params.height
-				)();
-				self.helper.drawImage(tool.domImg,
-					0, 0, tool.imgInfo.width, tool.imgInfo.height,
-					params.left, params.top, params.width, params.height);
-				self.buffer.finishAction();
-				tool.inProgress = false ; // don't restore in onDeactivate
-				tool.onDeactivate();
+				return self.mode === 'select' && tool.inProgress && tool.mouseUpClicked;
 			};
 			tool.onMouseDown = function (e) {
-				self.log('select mouseDown')();
-				tool.disableApply();
-				if (tool.inProgress) {
-					CssUtils.hideElement(tool.domImg);
-					self.ctx.putImageData(tool.savedState, 0, 0);
-				}
+				//self.log('select mouseDown')();
+				tool.onDeactivate();
 				tool.mouseUpClicked = false;
-				tool.inProgress = true;
 				self.resizer.show();
 				self.resizer.setData(e.offsetY, e.offsetX, 0, 0);
 				self.resizer.trackMouseMove(e, 'br');
@@ -994,10 +983,9 @@ function Painter() {
 				var params = self.resizer.params;
 				if (!params.width || !params.height) {
 					self.resizer.hide();
-					tool.disableApply();
 				} else {
-					tool.enableApply();
-					self.log('select mouseUp')();
+					//self.log('select mouseUp')();
+					tool.inProgress = true;
 					tool.mouseUpClicked = true;
 					var imageData = self.ctx.getImageData(params.left, params.top, params.width, params.height);
 					tool.dummyCanvas.width = params.width;
@@ -1006,7 +994,7 @@ function Painter() {
 					tool.dummyContext.putImageData(imageData, 0, 0);
 					CssUtils.showElement(tool.domImg);
 					tool.domImg.src = tool.dummyCanvas.toDataURL();
-					tool.savedState = self.buffer.startAction();
+					self.buffer.startAction();
 					self.ctx.clearRect(params.left, params.top, params.width, params.height);
 				}
 			};
@@ -1699,21 +1687,26 @@ function Painter() {
 			}
 		}, {
 			keyActivator: {
-				code: 'KeyG',
+				code: 'Delete',
 				icon: 'icon-trash-circled',
-				title: 'Clear All (G) = Garbage'
+				title: 'Delete (Del)'
 			},
 			handler: function () {
-				self.buffer.startAction();
-				self.ctx.clearRect(0, 0, self.dom.canvas.width, self.dom.canvas.height);
-				self.buffer.finishAction();
+				if (self.tools['select'].isSelectionActive()) {
+					self.tools['select'].inProgress = false; // don't restore image
+					self.buffer.finishAction();
+					self.tools['select'].onDeactivate();
+				} else {
+					self.buffer.startAction();
+					self.ctx.clearRect(0, 0, self.dom.canvas.width, self.dom.canvas.height);
+					self.buffer.finishAction();
+				}
 			}
 		}
 	];
 	self.buffer = new (function () {
 		var tool = this;
 		var undoImages = [];
-		window.undoImages = undoImages;
 		var redoImages = [];
 		var paintUndo = $('paintUndo');
 		var paintRedo = $('paintRedo');
@@ -1728,9 +1721,14 @@ function Painter() {
 		};
 		tool.clear = function () {
 			undoImages = [];
-			window.undoImages = undoImages;
 			redoImages = [];
 			current = null;
+		};
+		tool.getUndo = function() {
+			return undoImages;
+		};
+		tool.getRedo = function() {
+			return redoImages;
 		};
 		tool.dodo = function(from, to) {
 			var restore = from.pop();
@@ -1760,6 +1758,7 @@ function Painter() {
 			tool.dodo(undoImages, redoImages);
 		};
 		tool.finishAction = function (img) {
+			self.log('finish action')();
 			if (current) {
 				undoImages.push(current);
 			}
@@ -1784,6 +1783,7 @@ function Painter() {
 			current = newCurrent;
 		};
 		tool.startAction = function () {
+			self.log('start action')();
 			if (!current) {
 				current = tool.getCanvasImage();
 			}
