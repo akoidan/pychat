@@ -5122,7 +5122,8 @@ var Utils = {
 			element.pause();
 			element.currentTime = 0;
 			element.volume = volumeProportion[window.sound];
-			element.play();
+			var prom = element.play();
+			prom && prom.catch(function(e) {});
 		} catch (e) {
 			logger.error("Skipping playing message, because {}", e.message || e)();
 		}
