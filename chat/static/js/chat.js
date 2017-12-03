@@ -4170,6 +4170,10 @@ function CallHandler(roomId) {
 		self.createAfterResponseCall();
 	};
 	self.sendAcceptAndInitPeerConnections = function () {
+		wsHandler.sendToServer({
+			action: 'acceptCall',
+			connId: self.connectionId
+		})
 		self.accepted = true;
 		self.acceptedPeers.forEach(function (e) {
 			if (self.peerConnections[e]) {
@@ -4178,10 +4182,6 @@ function CallHandler(roomId) {
 				self.logErr("Unable to get pc with id {}, available peer connections are {}, accepted peers are {}",
 						e, Object.keys(self.peerConnections), self.acceptedPeers.toString())();
 			}
-		});
-		wsHandler.sendToServer({
-			action: 'acceptCall',
-			connId: self.connectionId
 		});
 	};
 	self.setTimeout = function () {
@@ -5158,15 +5158,17 @@ var Utils = {
 				throw "Stream has no audio tracks";
 			}
 			var audioProc = {};
-			audioProc.audioContext = new AudioContext();
-			audioProc.analyser = audioProc.audioContext.createAnalyser();
-			var microphone = audioProc.audioContext.createMediaStreamSource(stream);
-			audioProc.javascriptNode = audioProc.audioContext.createScriptProcessor(2048, 1, 1);
+			if (!window.audioContext) {
+				window.audioContext = new AudioContext()
+			}
+			audioProc.analyser = window.audioContext.createAnalyser();
+			var microphone = window.audioContext.createMediaStreamSource(stream);
+			audioProc.javascriptNode = window.audioContext.createScriptProcessor(2048, 1, 1);
 			audioProc.analyser.smoothingTimeConstant = 0.3;
 			audioProc.analyser.fftSize = 1024;
 			microphone.connect(audioProc.analyser);
 			audioProc.analyser.connect(audioProc.javascriptNode);
-			audioProc.javascriptNode.connect(audioProc.audioContext.destination);
+			audioProc.javascriptNode.connect(window.audioContext.destination);
 			audioProc.prevVolumeValues = 0;
 			audioProc.volumeValuesCount = 0;
 			audioProc.javascriptNode.onaudioprocess = onaudioprocess(audioProc);
