@@ -4244,12 +4244,11 @@ function CallHandler(roomId) {
 		webRtcApi.removeChildReference(self.connectionId);
 		self.dom.microphoneLevel.value = 0;
 		self.exitFullScreen();
-		self.dom.local.pause();
 		if (self.audioProcessor && self.audioProcessor.javascriptNode && self.audioProcessor.javascriptNode.onaudioprocess) {
 			self.log('Removing local audio processor')();
 			self.audioProcessor.javascriptNode.onaudioprocess = null;
 		}
-		self.dom.local.src = null;
+		Utils.detachVideoSource(self.dom.local);
 		if (self.localStream) {
 			var tracks = self.localStream.getTracks();
 			for (var i = 0; i < tracks.length; i++) {
@@ -4853,12 +4852,11 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached) {
 	self.closeEvents = function (reason) {
 		self.log('Destroying CallPeerConnection because', reason)();
 		self.closePeerConnection();
-			if (self.audioProcessor && self.audioProcessor.javascriptNode && self.audioProcessor.javascriptNode.onaudioprocess) {
+		if (self.audioProcessor && self.audioProcessor.javascriptNode && self.audioProcessor.javascriptNode.onaudioprocess) {
 			self.log('Removing remote audio processor')();
 			self.audioProcessor.javascriptNode.onaudioprocess = null;
 		}
-		self.dom.remote.pause();
-		self.dom.remote.src = null;
+		Utils.detachVideoSource(self.dom.remote);
 		CssUtils.deleteElement(self.dom.videoContainer);
 		self.removeChildPeerReference(self.opponentWsId, reason);
 	};
@@ -5104,6 +5102,11 @@ function Storage() {
 }
 
 var Utils = {
+	detachVideoSource: function (video) {
+		video.pause();
+		video.src = "";
+		video.load()
+	},
 	createUserLi: function (userId, gender, username) {
 		var icon;
 		icon = document.createElement('i');

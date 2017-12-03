@@ -83,7 +83,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 TODO
 ====
-* `Failed to load resource: the server responded with a status of 404 (Not Found)` when webrtc connection destroys
 * Wrong message order, that prevents of successful webrtc connection: https://github.com/leporo/tornado-redis/issues/106 https://stackoverflow.com/questions/47496922/tornado-redis-garantee-order-of-published-messages
 * No sound in call https://bugs.chromium.org/p/chromium/issues/detail?id=604523
 * paste event doesn't fire at all most of the times on painter canvasHolder, mb try to move it to <canvas>
