@@ -33,7 +33,43 @@ To add a new icon you need to drag [djangochat-config/config.json](https://githu
 Database migrations
 ===================
 I use standard [django migrations](https://docs.djangoproject.com/en/1.11/topics/migrations/) tools. So if you updated you branch from my repository and database has changed you need to `./manage.py makemigration` and  `./manage.py migrate`. If automatic migration didn't work I also store migrations in [djangochat-config/migration](https://github.com/Deathangel908/djangochat-config/tree/master/migrations).  So you might take a look if required migration is there before exeuting commands. Don't forget to change `Migration.dependencies[]` and rename the file if you get migration from my repo.
- 
+
+WEB Rtc connection establishment
+===============================
+The successful connection produces logs below in console
+
+Sender:
+```
+rsok33GN CallHandler initialized
+rsok33GN:0005:EJAd Created CallSenderPeerConnection
+rsok33GN:0005:EJAd Creating RTCPeerConnection
+rsok33GN:0005:EJAd Creating offer...
+rsok33GN:0005:EJAd Created offer, setting local description
+rsok33GN:0005:EJAd Sending offer to remote
+rsok33GN:0005:EJAd onsendRtcData
+rsok33GN:0005:EJAd answer received
+rsok33GN:0005:EJAd onaddstream
+rsok33GN:0005:EJAd onsendRtcData
+```
+
+Receiver:
+```
+rsok33GN CallHandler initialized
+rsok33GN:0004:oIc5 Created CallReceiverPeerConnection
+rsok33GN:0004:oIc5 Creating RTCPeerConnection
+rsok33GN:0004:oIc5 onsendRtcData
+rsok33GN:0004:oIc5 Creating answer
+rsok33GN:0004:oIc5 onaddstream
+rsok33GN:0004:oIc5 Sending answer
+rsok33GN:0004:oIc5 onsendRtcData
+rsok33GN:0004:oIc5 onsendRtcData
+```
+
+The string `rsok33GN:0005:EJAd` describes:
+ - `rsok33GN` is ID of CallHandler
+ - `0005` is Id of user
+ - `EJAd` id of connection (`TornadoHandler.id`)
+
 Jetbrains filewatcher:
 =====================
  1. arguments: `--no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded`
