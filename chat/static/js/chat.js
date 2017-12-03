@@ -3802,7 +3802,7 @@ function CallHandler(roomId) {
 	self.callTimeoutTime = 60000;
 	self.visible = true;
 	self.roomId = roomId;
-	self.audioProcessors = {};
+	self.audioProcessor = null;
 	self.callPopupTable = {};
 	self.setIsReceiver = function (isReceiver) {
 		self.accepted = !isReceiver;
@@ -4245,6 +4245,10 @@ function CallHandler(roomId) {
 		self.dom.microphoneLevel.value = 0;
 		self.exitFullScreen();
 		self.dom.local.pause();
+		if (self.audioProcessor && self.audioProcessor.javascriptNode && self.audioProcessor.javascriptNode.onaudioprocess) {
+			self.log('Removing local audio processor')();
+			self.audioProcessor.javascriptNode.onaudioprocess = null;
+		}
 		self.dom.local.src = null;
 		if (self.localStream) {
 			var tracks = self.localStream.getTracks();
@@ -4849,8 +4853,9 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached) {
 	self.closeEvents = function (reason) {
 		self.log('Destroying CallPeerConnection because', reason)();
 		self.closePeerConnection();
-		if (self.audioProcessors && audioProcessors.javascriptNode) {
-			audioProcessors.javascriptNode.onaudioprocess = null;
+			if (self.audioProcessor && self.audioProcessor.javascriptNode && self.audioProcessor.javascriptNode.onaudioprocess) {
+			self.log('Removing remote audio processor')();
+			self.audioProcessor.javascriptNode.onaudioprocess = null;
 		}
 		self.dom.remote.pause();
 		self.dom.remote.src = null;
@@ -4979,7 +4984,7 @@ function WsHandler() {
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
-		logger.ws("WS_IN", jsonData)();
+		// logger.ws("WS_IN", jsonData)();
 		var data = JSON.parse(jsonData);
 		self.handleMessage(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
@@ -4996,7 +5001,7 @@ function WsHandler() {
 			growlError("Can't send message, because connection is lost :(");
 			return false;
 		} else {
-			logger.ws("WS out", logEntry)();
+			// logger.ws("WS out", logEntry)();
 			self.ws.send(jsonRequest);
 			return true;
 		}
