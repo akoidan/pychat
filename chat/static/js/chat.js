@@ -3820,6 +3820,7 @@ function CallHandler(roomId) {
 		hangUpHolder: document.createElement('div'),
 		microphoneLevel: document.createElement('progress'),
 		callIcon: document.createElement('i'),
+		microphones: document.createElement('select'),
 		fs: {
 			/*FullScreen*/
 			video: document.createElement("i"),
@@ -3970,20 +3971,69 @@ function CallHandler(roomId) {
 		self.dom.microphoneLevel.setAttribute("value", "0");
 		self.dom.microphoneLevel.setAttribute("title", "Your microphone level");
 		self.dom.microphoneLevel.className = 'microphoneLevel';
+		self.dom.microphones.onchange = self.microphoneChanged;
 		callContainerIcons.appendChild(self.dom.callIcon);
 		callContainerIcons.appendChild(self.dom.audioStatusIcon);
 		callContainerIcons.appendChild(self.dom.videoStatusIcon);
 		callContainerIcons.appendChild(enterFullScreenHolder);
 		callContainerIcons.appendChild(self.dom.hangUpHolder);
+		callContainerIcons.appendChild(self.dom.microphones);
 		callContainerIcons.appendChild(self.dom.microphoneLevel);
 	};
 	self.init = function () {
 		self.renderDom();
 		self.attachDomEvents();
 	};
+	self.microphoneChanged = function(e) {
+		navigator.getUserMedia({audio:  {deviceId: e.target.value}, video: self.constraints.video}, function(stream) {
+			var audioTracks = self.localStream.getAudioTracks();
+			if (audioTracks && audioTracks.length > 0) {
+				self.localStream.removeTrack(audioTracks[0]);
+				self.log("Removing old audioTrack")();
+			}
+			var newTracks = stream.getAudioTracks();
+			if (newTracks && newTracks.length > 0) {
+				self.localStream.addTrack(newTracks[0]);
+				self.log("Attaching new audioTrack")();
+			}
+		},self.onFailedCaptureSource);
+	};
 	self.captureInput = function (callback, callIfNoSource) {
 		if (self.constraints.audio || self.constraints.video) {
-			navigator.getUserMedia(self.constraints, callback, self.onFailedCaptureSource);
+			var audio = self.constraints.audio
+			if (self.dom.microphones.value) {
+				audio = {deviceId: self.dom.microphones.value};
+			}
+			var c = {audio: audio, video: self.constraints.video};
+			navigator.mediaDevices.getUserMedia(c).then(function(stream) {
+				callback(stream);
+				if (navigator.mediaDevices.enumerateDevices) {
+					return navigator.mediaDevices.enumerateDevices();	
+				} else {
+					return false;
+				}
+				
+			}).then(function(devices) {
+				var n = 0;
+				CssUtils.deleteChildren(self.dom.microphones);
+				devices.forEach(function (device) {
+					switch (device.kind) {
+						case "audioinput":
+							var option = document.createElement('option');
+							option.value =  device.deviceId;
+							option.innerText = device.label || 'Microphone ' + (++n);
+							self.dom.microphones.appendChild(option);
+							break;
+						case "audiooutput":
+							break;
+						case "videoinput":
+							break;
+						default:
+							self.log("Unexpected device {}", device.kind)();
+							break
+					}
+				});
+			}).catch(self.onFailedCaptureSource);
 		} else if (callIfNoSource) {
 			callback();
 		}
@@ -4982,7 +5032,7 @@ function WsHandler() {
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
-		// logger.ws("WS_IN", jsonData)();
+		logger.ws("WS_IN", jsonData)();
 		var data = JSON.parse(jsonData);
 		self.handleMessage(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
@@ -4999,7 +5049,7 @@ function WsHandler() {
 			growlError("Can't send message, because connection is lost :(");
 			return false;
 		} else {
-			// logger.ws("WS out", logEntry)();
+			logger.ws("WS_OUT", logEntry)();
 			self.ws.send(jsonRequest);
 			return true;
 		}
