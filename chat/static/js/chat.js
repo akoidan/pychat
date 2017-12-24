@@ -730,7 +730,6 @@ function Painter() {
 			self.tools.img.readAndPasteCanvas(e.dataTransfer.files[0]);
 		},
 		canvasImagePaste: function (e) {
-			console.log('asd');
 			if (document.activeElement == self.dom.container && e.clipboardData && e.clipboardData.items) {
 
 				for (var i = 0; i < e.clipboardData.items.length; i++) {
@@ -4136,9 +4135,9 @@ function CallHandler(roomId) {
 				if (!(tracks && tracks.length > 0)) {
 					throw "No video tracks from captured screen";
 				}
+				tracks[0].isShare = true;
 				if (endStream) {
 						endStream.addTrack(tracks[0]);
-						endStream.getVideoTracks()[0].isScreenShare = true;
 				} else {
 					endStream = stream;
 				}
@@ -4261,7 +4260,7 @@ function CallHandler(roomId) {
 				throw 'invalid track name';
 			}
 			if (tracks.length > 0) {
-				var isShare = tracks[0].label && tracks[0].label.match(/screen/i);
+				var isShare = tracks[0].isShare;
 				if (isShare && kind == 'share') {
 					track = tracks[0]
 				} else if (!isShare && kind == 'video') {
@@ -4387,6 +4386,7 @@ function CallHandler(roomId) {
 		}, self.callTimeoutTime);
 	};
 	self.clearTimeout = function () {
+		self.log("Removed timeout to autohang")();
 		if (self.timeoutFunnction) {
 			clearTimeout(self.timeoutFunnction);
 			self.timeoutFunnction = null;
