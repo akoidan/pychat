@@ -38,6 +38,21 @@ WEB Rtc connection establishment
 ===============================
 The successful connection produces logs below in console
 
+SCREEN_SHARE
+============
+ScreenShare is only available for chrome atm. It uses `chrome.desktopCapture` feature that is available only via extension. The extension folder is located under [screen_cast_extension](screen_cast_extension)`.
+If you want to locally test it:
+
+ - Open `chrome://extensions/` url in chrome and verify that `developer mode` checkbox is checked.
+ - In the same tab click on `load unpacked extension...` button and select [screen_cast_extension](screen_cast_extension) directory.
+ - Note that in order to `background.js` be able to receive messages from webpage you need to add your host to `externally_connectable` section in  [manifest.json](screen_cast_extension/manifest.json)
+
+Tp publish extension:
+ - If you want to update existing extension don't forget to increment `version` in [manifest.json](package/manifest.json).
+ - Zip [screen_cast_extension](screen_cast_extension) directory into e.g. `extension.zip`
+ - Upload archive `extension.zip` to [chrome webstore](https://chrome.google.com/webstore/developer/dashboard) (Note, you need to have a developer account, that's 5$ worth atm).
+
+
 Sender:
 ```
 rsok33GN CallHandler initialized

@@ -1,0 +1,27 @@
+{
+  "name": "Pychat Screensharing Extension",
+  "description": "This extension allows to shareScreen during a call for pychat.org.",
+  "version": "1.0.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAk2Ad9n6KHqF5MZ9lR9scs2b5LqeBXoBwWCwoTUYekVqKnytVHr1p0j6oR0bme6AFkSVDAMMK0NtP2+J7/ZKHJoX+GDxUc9+av8auIbu2asEPtHv05TAMWpkmD0CRReYQnZJfpRYm65gIrNyrqbi8SgEAxdp3vxfQ2ctXPiM9Zpya10ofee7250YCrfUTo6Pn2sygt8yMtcz/mu/t2tNFcK0LVt7H98eFAnm94nYUvzGT7thTDpK6zyrHYRHnNaoRg2a6miNywuM2T64SqgD5EtmP7bKzBAWQdgYGOj7vv+5Hj244Gb35mghU0UjhQQzPWNyXaTF1JVG/+txqD3ZMCQIDAQAB",
+  "author": "deathangel908@gmail.com https://github.com/Deathangel908",
+  "manifest_version": 2,
+  "icons": {
+    "16": "icon-16.png",
+    "128": "icon-128.png"
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "externally_connectable": {
+    "matches": [
+      "https://localhost:8000/*",
+      "https://pychat.org/*"
+    ]
+  },
+  "permissions": [
+    "desktopCapture",
+    "tabs"
+  ]
+}

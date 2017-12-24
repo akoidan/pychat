@@ -32,9 +32,6 @@
 	.icon-github
 		color: #bbbbbb
 
-	.icon-webrtc-fullscreen
-		color: #6EEFFF
-
 	.window
 		@include linear-gradient(#1e3348, #0f1922)
 		box-shadow: 0 5px 5px #16161f
@@ -146,9 +143,12 @@
 				@include background(lighten($grad-start, 5%), lighten($grad-end, 5%))
 
 	.callContainerIcons
-		color: #259BBD
 		.icon-hang-up
 			color: #BC2F2F
+		.icon-mic, .icon-videocam, .icon-desktop:not(.callActiveIcon)
+			color: #518858
+		.icon-cog, .icon-webrtc-fullscreen
+			color: #259BBD
 	#callUserList
 		color: #A5A5A5
 		background-color: #242A2A
