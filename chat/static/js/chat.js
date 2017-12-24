@@ -3821,6 +3821,7 @@ function CallHandler(roomId) {
 		callContainerContent: document.createElement("DIV"),
 		videoContainer: document.createElement("DIV"),
 		videoContainerForVideos: document.createElement("DIV"),
+		settingsContainer: document.createElement("TABLE"),
 		local: document.createElement('video'),
 		audioStatusIcon: document.createElement('i'),
 		videoStatusIcon: document.createElement('i'),
@@ -3830,6 +3831,9 @@ function CallHandler(roomId) {
 		callIcon: document.createElement('i'),
 		shareScreen: document.createElement('i'),
 		microphones: document.createElement('select'),
+		cameras: document.createElement('select'),
+		speakers: document.createElement('select'),
+		settings: document.createElement('i'),
 		fs: {
 			/*FullScreen*/
 			video: document.createElement("i"),
@@ -3910,6 +3914,10 @@ function CallHandler(roomId) {
 		self.dom.audioStatusIcon.onclick = self.toggleMic;
 		self.dom.shareScreen.onclick = self.toggleShare;
 		self.dom.fs.share.onclick = self.toggleShare;
+		self.dom.microphones.onchange = self.microphoneChanged;
+		self.dom.speakers.onchange = self.speakerChanged;
+		self.dom.cameras.onchange = self.cameraChanged;
+		self.dom.settings.onclick = self.toggleSettingsContainer;
 		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
 		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
 			document.addEventListener(fullScreenChangeEvents[i], self.onExitFullScreen, false);
@@ -3966,8 +3974,22 @@ function CallHandler(roomId) {
 		self.dom.videoContainer.appendChild(iwc);
 		self.dom.videoContainer.appendChild(self.dom.videoContainerForVideos);
 		self.dom.videoContainer.className = 'videoContainer ' + CssUtils.visibilityClass;
+		function ap(el, icon) {
+			var row = self.dom.settingsContainer.insertRow(0);
+			var cell1 = row.insertCell(0);
+			var cell2 = row.insertCell(1);
+			var i = document.createElement('i');
+			i.className = icon;
+			cell1.appendChild(i);
+			cell2.appendChild(el);
+		}
+		ap(self.dom.microphones, 'icon-mic');
+		ap(self.dom.cameras, 'icon-videocam');
+		ap(self.dom.speakers, 'icon-volume-2');
+		self.dom.settingsContainer.className = 'settingsContainer ' + CssUtils.visibilityClass;
 		self.dom.callContainerContent.className = 'callContainerContent';
 		self.dom.callContainerContent.appendChild(self.dom.videoContainer);
+		self.dom.callContainerContent.appendChild(self.dom.settingsContainer);
 		self.dom.callContainer.appendChild(self.dom.callContainerContent);
 		self.dom.fs.minimize.className = 'icon-webrtc-minimizedscreen';
 		self.dom.fs.minimize.title = 'Exit fullscreen';
@@ -4000,14 +4022,13 @@ function CallHandler(roomId) {
 		self.dom.microphoneLevel.setAttribute("value", "0");
 		self.dom.microphoneLevel.setAttribute("title", "Your microphone level");
 		self.dom.microphoneLevel.className = 'microphoneLevel';
-		self.dom.microphones.onchange = self.microphoneChanged;
 		self.dom.shareScreen.className = 'icon-desktop';
-		self.dom.microphones.className = 'microphonesList';
+		self.dom.settings.className = 'icon-cog';
 		callContainerIcons.appendChild(self.dom.callIcon);
 		callContainerIcons.appendChild(self.dom.audioStatusIcon);
-		callContainerIcons.appendChild(self.dom.microphones);
 		callContainerIcons.appendChild(self.dom.videoStatusIcon);
 		callContainerIcons.appendChild(self.dom.shareScreen);
+		callContainerIcons.appendChild(self.dom.settings);
 		callContainerIcons.appendChild(enterFullScreenHolder);
 		callContainerIcons.appendChild(self.dom.hangUpHolder);
 		callContainerIcons.appendChild(self.dom.microphoneLevel);
@@ -4023,9 +4044,26 @@ function CallHandler(roomId) {
 		self.renderDom();
 		self.attachDomEvents();
 	};
+	self.speakerChanged = function() {
+		for (var pcName in self.peerConnections) {
+			if (!self.peerConnections.hasOwnProperty(pcName)) continue;
+			var v = self.peerConnections[pcName].dom.remote;
+			if (v.setSinkId) {
+				v.setSinkId(self.dom.speakers.value);
+			} else {
+				growlError('Changing output speaker is unsupported')
+				return;
+			}
+		}
+	};
+	self.cameraChanged = function(e) {
+		if (self.isActive()) {
+			self.updateConnection();
+		}
+	};
 	self.microphoneChanged = function(e) {
 		if (self.isActive()) {
-		self.updateConnection();
+			self.updateConnection();
 		}
 	};
 	self.updateConnection = function () {
@@ -4047,27 +4085,39 @@ function CallHandler(roomId) {
 		}, true);
 	};
 	self.inflateDevices = function (devices) {
-		var n = 0;
+		var n, k , c = 0;
 		CssUtils.deleteChildren(self.dom.microphones);
+		CssUtils.deleteChildren(self.dom.speakers);
+		CssUtils.deleteChildren(self.dom.cameras);
 		if (devices) {
 			devices.forEach(function (device) {
+				if (["audioinput", "audiooutput", "videoinput"].indexOf(device.kind)>= 0) {
+					var option = document.createElement('option');
+					option.value = device.deviceId;
+				} else {
+					self.logErr("Unexpected device {}", device.kind)();
+				}
 				switch (device.kind) {
 					case "audioinput":
-						var option = document.createElement('option');
-						option.value = device.deviceId;
 						option.innerText = device.label || 'Microphone ' + (++n);
 						self.dom.microphones.appendChild(option);
 						break;
 					case "audiooutput":
+						option.innerText = device.label || 'Speaker ' + (++k);
+						self.dom.speakers.appendChild(option);
 						break;
 					case "videoinput":
+						option.innerText = device.label || 'Camera ' + (++c);
+						self.dom.cameras.appendChild(option);
 						break;
-					default:
-						self.log("Unexpected device {}", device.kind)();
-						break
 				}
 			})
 		}
+		[self.dom.microphones, self.dom.speakers, self.dom.cameras].forEach(function (d) {
+			if (d.children.length == 0) {
+
+			}
+		})
 	};
 	self.getDesktopShareFromExtension = function() {
 		return new Promise(function (res, rej) {
@@ -4295,6 +4345,9 @@ function CallHandler(roomId) {
 		}
 		self.autoSetLocalVideoVisibility();
 	};
+	self.toggleSettingsContainer = function () {
+		CssUtils.toggleVisibility(self.dom.settingsContainer);
+	};
 	self.toggleVideo = function () {
 		self.toggleInput('video');
 	};
@@ -4304,6 +4357,9 @@ function CallHandler(roomId) {
 	self.toggleShare = function() {
 		self.toggleInput('share');
 	};
+	self.getSpeakerId = function() {
+		return self.dom.speakers.value;
+	}
 	self.createCallPeerConnection = function (message) {
 		var videoContainer = document.createElement('div');
 		videoContainer.className = 'micVideoWrapper';
@@ -4315,7 +4371,8 @@ function CallHandler(roomId) {
 				self.removeChildPeerReference,
 				videoContainer,
 				self.onStreamAttached,
-				message.user
+				message.user,
+				self.getSpeakerId
 		);
 	};
 	self.superRemoveChildPeerReference = self.removeChildPeerReference;
@@ -4964,10 +5021,11 @@ function CallSenderPeerConnection(connectionId,
 											 removeFromParentFn,
 											 remoteVideo,
 											 onStreamAttached,
-											 userName) {
+											 userName,
+											 getSpeakerId) {
 	var self = this;
 	SenderPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
-	CallPeerConnection.call(self, remoteVideo, userName, onStreamAttached);
+	CallPeerConnection.call(self, remoteVideo, userName, onStreamAttached, getSpeakerId);
 	self.log("Created CallSenderPeerConnection")();
 	self.connectToRemote = function (stream) {
 		self.createPeerConnection(stream);
@@ -4981,17 +5039,18 @@ function CallReceiverPeerConnection(connectionId,
 												removeFromParentFn,
 												videoContainer,
 												onStreamAttached,
-												userName) {
+												userName,
+												getSpeakerId) {
 	var self = this;
 	ReceiverPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
-	CallPeerConnection.call(self, videoContainer, userName, onStreamAttached);
+	CallPeerConnection.call(self, videoContainer, userName, onStreamAttached, getSpeakerId);
 	self.log("Created CallReceiverPeerConnection")();
 	self.connectToRemote = function (stream) {
 		self.createPeerConnection(stream);
 	}
 }
 
-function CallPeerConnection(videoContainer, userName, onStreamAttached) {
+function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeakerId) {
 	var self = this;
 	self.dom = {
 		userSpan: document.createElement('span'),
@@ -5038,6 +5097,10 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached) {
 		self.pc.onaddstream = function (event) {
 			self.log("onaddstream")();
 			Utils.setVideoSource(self.dom.remote, event.stream);
+			var speakerId = getSpeakerId();
+			if (speakerId && self.dom.remote.setSinkId) {
+				self.dom.remote.setSinkId(speakerId);
+			}
 			self.audioProcessor = Utils.createMicrophoneLevelVoice(event.stream, self.processAudio);
 			onStreamAttached(self.opponentWsId);
 		};
