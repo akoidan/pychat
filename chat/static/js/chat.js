@@ -3829,12 +3829,13 @@ function CallHandler(roomId) {
 		hangUpHolder: document.createElement('div'),
 		microphoneLevel: document.createElement('progress'),
 		callIcon: document.createElement('i'),
-		shareScreen: document.createElement('input'),
+		shareScreen: document.createElement('i'),
 		microphones: document.createElement('select'),
 		fs: {
 			/*FullScreen*/
 			video: document.createElement("i"),
 			audio: document.createElement("i"),
+			share: document.createElement("i"),
 			hangup: document.createElement("i"),
 			minimize: document.createElement("i"),
 			enterFullScreen: document.createElement("i")
@@ -3843,7 +3844,7 @@ function CallHandler(roomId) {
 	self.constraints = {
 		audio: true,
 		video: true,
-		desktopCapture: false
+		share: false,
 	};
 	self.hidePhoneIcon = function () {
 		if (self.dom.phoneIcon) {
@@ -3873,6 +3874,14 @@ function CallHandler(roomId) {
 		CssUtils.setVisibility(self.dom.videoContainer, isCall);
 		CssUtils.setVisibility(self.dom.callIcon, !isCall);
 	};
+	self.setDesktopCapture = function (value) {
+		self.constraints.share = value;
+		CssUtils.setClassToState(self.dom.shareScreen, value, 'callActiveIcon');
+		self.dom.fs.share.className = value ? "icon-webrtc-mic" : "icon-webrtc-nomic";
+		var title = value ? "Capture your desktop screen and start sharing it" : "Turn off screen sharing";
+		self.dom.shareScreen.title = title;
+		self.dom.fs.share.title = title;
+	};
 	self.setAudio = function (value) {
 		CssUtils.setVisibility(self.dom.microphones, value);
 		self.constraints.audio = value;
@@ -3901,6 +3910,8 @@ function CallHandler(roomId) {
 		self.dom.fs.hangup.onclick = self.hangUp;
 		self.dom.fs.audio.onclick = self.toggleMic;
 		self.dom.audioStatusIcon.onclick = self.toggleMic;
+		self.dom.shareScreen.onclick = self.toggleShare;
+		self.dom.fs.share.onclick = self.toggleShare;
 		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
 		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
 			document.addEventListener(fullScreenChangeEvents[i], self.onExitFullScreen, false);
@@ -3930,12 +3941,14 @@ function CallHandler(roomId) {
 	self.answerWebRtcCall = function () {
 		self.setAudio(true);
 		self.setVideo(false);
+		self.setDesktopCapture(false);
 		self.accept();
 		self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
 	};
 	self.videoAnswerWebRtcCall = function () {
 		self.accept();
 		self.setAudio(true);
+		self.setDesktopCapture(false);
 		self.setVideo(true);
 		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
 	};
@@ -3964,6 +3977,7 @@ function CallHandler(roomId) {
 		iwc.appendChild(self.dom.fs.audio);
 		iwc.appendChild(self.dom.fs.minimize);
 		iwc.appendChild(self.dom.fs.hangup);
+		iwc.appendChild(self.dom.fs.share);
 		var callContainerIcons = document.createElement('div');
 		callContainerIcons.className = 'callContainerIcons noSelection';
 		self.dom.callContainerContent.appendChild(callContainerIcons);
@@ -3987,10 +4001,8 @@ function CallHandler(roomId) {
 		self.dom.microphoneLevel.setAttribute("title", "Your microphone level");
 		self.dom.microphoneLevel.className = 'microphoneLevel';
 		self.dom.microphones.onchange = self.microphoneChanged;
-		self.dom.shareScreen.setAttribute('type', 'button');
-		self.dom.shareScreen.setAttribute('value', 'share');
+		self.dom.shareScreen.className = 'icon-desktop';
 		self.dom.microphones.className = 'microphonesList';
-		self.dom.shareScreen.onclick = self.shareClick;
 		callContainerIcons.appendChild(self.dom.callIcon);
 		callContainerIcons.appendChild(self.dom.audioStatusIcon);
 		callContainerIcons.appendChild(self.dom.microphones);
@@ -3999,58 +4011,22 @@ function CallHandler(roomId) {
 		callContainerIcons.appendChild(enterFullScreenHolder);
 		callContainerIcons.appendChild(self.dom.hangUpHolder);
 		callContainerIcons.appendChild(self.dom.microphoneLevel);
+		self.setAudio(true);
+		self.setVideo(false);
+		self.setDesktopCapture(false);
 	};
 	self.init = function () {
 		self.renderDom();
 		self.attachDomEvents();
 	};
-	self.shareScreenReceivedStream = function (stream) {
-		if (self.constraints.video) {
-			self.setVideo(false);
-		}
-		self.constraints.desktopCapture = {
-			audio: false,
-			video: {
-				mandatory: {
-					chromeMediaSource: 'desktop',
-					chromeMediaSourceId: stream,
-					maxWidth: window.screen.width,
-					maxHeight: window.screen.height
-				}
-			}
-		}
-		if (self.isActive()) {
-			self.updateConnection();
-		}
-	};
-	self.shareClick = function() {
-		var message ;
-		if (!isChrome) {
-			growlInfo("ScreenCast feature is only available from chrome atm");
-		} else  {
-			Utils.pingExtension(function(success) {
-				if (success) {
-					Utils.getDesktopCapture(function (response) {
-						if (response && response.data === 'success') {
-							self.shareScreenReceivedStream(response.streamId)
-						} else {
-							growlError("Failed to capture desktop stream");
-						}
-					})
-				} else {
-					message = '<span>You need to install a chrome extension.<b> <a href="'+CHROME_EXTENSION_URL+'" target="_blank">Click to install</a></b></span>';
-					growlInfo(message);
-				}
-			})
-		}
-	}
 	self.microphoneChanged = function(e) {
+		if (self.isActive()) {
 		self.updateConnection();
+		}
 	};
 	self.updateConnection = function () {
 		self.captureInput(function (stream) {
 			if (stream) {
-				self.attachLocalStream(stream);
 				for (var pcName in self.peerConnections) {
 					if (!self.peerConnections.hasOwnProperty(pcName)) continue;
 					var abstrPc = self.peerConnections[pcName];
@@ -4065,6 +4041,65 @@ function CallHandler(roomId) {
 				growlError("Unable to capture new stream");
 			}
 		}, true);
+	};
+	self.inflateDevices = function (devices) {
+		var n = 0;
+		CssUtils.deleteChildren(self.dom.microphones);
+		if (devices) {
+			devices.forEach(function (device) {
+				switch (device.kind) {
+					case "audioinput":
+						var option = document.createElement('option');
+						option.value = device.deviceId;
+						option.innerText = device.label || 'Microphone ' + (++n);
+						self.dom.microphones.appendChild(option);
+						break;
+					case "audiooutput":
+						break;
+					case "videoinput":
+						break;
+					default:
+						self.log("Unexpected device {}", device.kind)();
+						break
+				}
+			})
+		}
+	};
+	self.getDesktopShareFromExtension = function() {
+		return new Promise(function (res, rej) {
+			var message;
+			if (!isChrome) {
+				rej("ScreenCast feature is only available from chrome atm")
+			} else {
+				Utils.pingExtension(function (success) {
+					self.log("Ping to extension succeeded")();
+					if (success) {
+						Utils.getDesktopCapture(function (response) {
+							if (response && response.data === 'success') {
+								self.log("Getting desktop share succeeded")();
+								self.constraints.share = {
+									audio: false,
+									video: {
+										mandatory: {
+											chromeMediaSource: 'desktop',
+											chromeMediaSourceId: response.streamId,
+											maxWidth: window.screen.width,
+											maxHeight: window.screen.height
+										}
+									}
+								}
+								res();
+							} else {
+								rej("Failed to capture desktop stream");
+							}
+						})
+					} else {
+						rej('<span>You need to install a chrome extension.<b> <a href="' + CHROME_EXTENSION_URL + '" target="_blank">Click to install</a></b></span>');
+					}
+				})
+			}
+			return true;
+		});
 	};
 	self.captureInput = function (callback, callIfNoSource) {
 		self.stopLocalStream();
@@ -4086,36 +4121,19 @@ function CallHandler(roomId) {
 				} else {
 					return false;
 				}
-			}).then(function (devices) {
-				var n = 0;
-				CssUtils.deleteChildren(self.dom.microphones);
-				if (devices) {
-					devices.forEach(function (device) {
-						switch (device.kind) {
-							case "audioinput":
-								var option = document.createElement('option');
-								option.value = device.deviceId;
-								option.innerText = device.label || 'Microphone ' + (++n);
-								self.dom.microphones.appendChild(option);
-								break;
-							case "audiooutput":
-								break;
-							case "videoinput":
-								break;
-							default:
-								self.log("Unexpected device {}", device.kind)();
-								break
-						}
-					})
-				}
-			});
+			}).then(self.inflateDevices);
 		}
-		if (self.constraints.desktopCapture) {
-			prom = prom.then(function () {
-				return navigator.mediaDevices.getUserMedia(self.constraints.desktopCapture)
+		if (self.constraints.share) {
+			prom = prom.then(self.getDesktopShareFromExtension()).then(function () {
+				self.log("Resolving userMedia from dekstopShare")();
+				return navigator.mediaDevices.getUserMedia(self.constraints.share)
 			}).then(function (stream) {
+				var tracks = stream.getVideoTracks();
+				if (!(tracks && tracks.length > 0)) {
+					throw "No video tracks from captured screen";
+				}
 				if (endStream) {
-					endStream.addTrack(stream.getVideoTracks()[0]);
+						endStream.addTrack(tracks[0]);
 				} else {
 					endStream = stream;
 				}
@@ -4123,19 +4141,30 @@ function CallHandler(roomId) {
 		}
 		prom.then(function () {
 			if (endStream) {
+				self.attachLocalStream(endStream);
 				callback(endStream)
 			} else if (callIfNoSource) {
 				callback();
 			}
-		}).catch(self.onFailedCaptureSource);
+		}).catch(function (e) {
+			if (endStream) {
+				var tracks = endStream.getTracks();
+				for (var i = 0; i < tracks.length; i++) {
+					tracks[i].stop()
+				}
+			}
+			self.onFailedCaptureSource.apply(self, arguments);
+		});
 	};
 	self.attachLocalStream = function (stream) {
+		self.log("Local stream has been attached");
 		self.localStream = stream;
 		if (stream) {
 			Utils.setVideoSource(self.dom.local, stream);
 		}
-		self.setVideo(self.getTrack(true) != null);
-		self.setAudio(self.getTrack(false) != null);
+		self.setVideo(self.getTrack('video') != null);
+		self.setAudio(self.getTrack('audio') != null);
+		self.setDesktopCapture(self.getTrack('share') != null);
 		self.audioProcessor = Utils.createMicrophoneLevelVoice(stream, self.processAudio);
 	};
 	self.processAudio = function (audioProc) {
@@ -4152,10 +4181,9 @@ function CallHandler(roomId) {
 			self.dom.microphoneLevel.value = value;
 		}
 	};
-	self.captureInputStream = function (stream) {
+	self.captureInputStream = function () {
 		self.setIconState(true);
 		self.setHeaderText("Establishing connection with {}".format(self.receiverName));
-		self.attachLocalStream(stream);
 		var id = webRtcApi.addCallHandler(self);
 		self.sendOffer(id);
 		self.setTimeout();
@@ -4168,7 +4196,7 @@ function CallHandler(roomId) {
 		if (self.constraints.audio) {
 			what.push('video');
 		}
-		if (self.constraints.desktopCapture) {
+		if (self.constraints.share) {
 			what.push('screenshare');
 		}
 		var message = "Failed to capture {} source, because {}".format(what.join(', '), Utils.extractError(arguments));
@@ -4209,34 +4237,38 @@ function CallHandler(roomId) {
 		growlError('<div>Unable to capture input from microphone. Check your microphone connection or {}'
 				.format(url));
 	};
-	self.createCallAfterCapture = function (stream) {
-		self.attachLocalStream(stream);
-		self.sendAcceptAndInitPeerConnections();
-	};
 	self.createAfterResponseCall = function () {
-		self.captureInput(self.createCallAfterCapture, true);
+		self.captureInput(self.sendAcceptAndInitPeerConnections, true);
 		self.setIconState(true);
 		channelsHandler.setActiveChannel(self.roomId);
 		self.show(true);
 	};
-	self.getTrack = function (isVideo) {
+	self.getTrack = function (kind) {
 		var track = null;
+		var tracks = [];
 		if (self.localStream) {
-			var tracks = isVideo ? self.localStream.getVideoTracks() : self.localStream.getAudioTracks();
+			if (kind == 'video') {
+				tracks = self.localStream.getVideoTracks();
+			} else if (kind == 'audio') {
+				tracks = self.localStream.getAudioTracks();
+			} else if (kind == 'share') {
+				// TODO
+			}
 			if (tracks.length > 0) {
 				track = tracks[0]
 			}
 		}
 		return track;
 	};
-	self.toggleInput = function (isVideo) {
-		var kind = isVideo ? 'video' : 'audio';
-		var track = self.getTrack(isVideo);
+	self.toggleInput = function (kind) {
+		var track = self.getTrack(kind);
 		var newValue = !self.constraints[kind];
-		if (isVideo) {
+		if (kind == 'video') {
 			self.setVideo(newValue);
-		} else {
+		} else if (kind == 'audio') {
 			self.setAudio(newValue);
+		} else if (kind == 'share') {
+			self.setDesktopCapture(newValue);
 		}
 		if (track) {
 			track.enabled = self.constraints[kind];
@@ -4245,10 +4277,13 @@ function CallHandler(roomId) {
 		}
 	};
 	self.toggleVideo = function () {
-		self.toggleInput(true);
+		self.toggleInput('video');
 	};
 	self.toggleMic = function () {
-		self.toggleInput(false);
+		self.toggleInput('audio');
+	};
+	self.toggleShare = function() {
+		self.toggleInput('share');
 	};
 	self.createCallPeerConnection = function (message) {
 		var videoContainer = document.createElement('div');
@@ -4376,6 +4411,11 @@ function CallHandler(roomId) {
 				tracks[i].stop()
 			}
 		}
+		chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
+			type: 'PYCHAT_SCREEN_SHARE_CANCEL'
+		}, function (response) {
+			self.log("PYCHAT_SCREEN_SHARE_CANCEL response {}", response)();
+		});
 	};
 	self.closeEvents = function (text) {
 		if (text) {
