@@ -5411,37 +5411,37 @@ var Utils = {
 
 (function () {
 	if (typeof chrome != 'undefined') {
-		var port = chrome.runtime.connect("ppibnonicgkeojloifobdloaiajedhgg");
-	port.onMessage.addListener(function (event) {
-		if (event.origin !== window.location.origin) {
-			return;
-		}
-		// content-script will send a 'PYCHAT_SCREEN_SHARE_PING' msg if extension is installed
-		if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_PING')) {
-			screenCastExtensionInstalled = true;
-		}
-		// user chose a stream
-		if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_DIALOG_SUCCESS')) {
-			var msg = {
-				connId: event.data.connId,
-				stream: event.data.streamId,
-				handler: 'webrtcTransfer',
-				action: 'shareScreenReceivedStream'
-			};
-			if (event.data.connId) {
-				webRtcApi.handle(msg);
-			} else if (event.data.roomId) {
-				channelsHandler.channels[event.data.roomId].getCallHandler().handle(msg);
-			} else {
-				alert('invalid ');
+		var editorExtensionId = "ppibnonicgkeojloifobdloaiajedhgg";
+		chrome.runtime.sendMessage(editorExtensionId, {
+			type: 'PYCHAT_SCREEN_SHARE_PING',
+			text: 'start'
+		}, function (response) {
+			console.log(response);
+			if (!response.success)
+				if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_PING')) {
+					screenCastExtensionInstalled = true;
+				}
+			// user chose a stream
+			if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_DIALOG_SUCCESS')) {
+				var msg = {
+					connId: event.data.connId,
+					stream: event.data.streamId,
+					handler: 'webrtcTransfer',
+					action: 'shareScreenReceivedStream'
+				};
+				if (event.data.connId) {
+					webRtcApi.handle(msg);
+				} else if (event.data.roomId) {
+					channelsHandler.channels[event.data.roomId].getCallHandler().handle(msg);
+				} else {
+					alert('invalid ');
+				}
 			}
-		}
-		// user clicked on 'cancel' in choose media dialog
-		if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_DIALOG_CANCEL')) {
-			growlError("Can't share screen because you cancelled");
-		}
-	});
-	port.postMessage({type: 'PYCHAT_SCREEN_SHARE_PING', text: 'start'});
+			// user clicked on 'cancel' in choose media dialog
+			if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_DIALOG_CANCEL')) {
+				growlError("Can't share screen because you cancelled");
+			}
+		});
 	}
 })();
 

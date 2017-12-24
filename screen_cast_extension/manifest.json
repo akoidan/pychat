@@ -11,10 +11,13 @@
   "background": {
     "scripts": ["background.js"]
   },
+  "externally_connectable": {
+    "matches": [
+      "https://localhost:8000/*", "https://pychat.org/*"
+    ]
+  },
   "permissions": [
     "desktopCapture",
-    "https://pychat.org/*",
-    "https://localhost:8000/*",
     "tabs"
   ]
 }
