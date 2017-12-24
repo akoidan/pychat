@@ -4148,7 +4148,7 @@ function CallHandler(roomId) {
 							}
 						})
 					} else {
-						rej('<span>You need to install a chrome extension.<b> <a href="' + CHROME_EXTENSION_URL + '" target="_blank">Click to install</a></b></span>');
+						rej({rawError: 'To share your screen you need chrome extension.<b> <a href="' + CHROME_EXTENSION_URL + '" target="_blank">Click to install</a></b>'});
 					}
 				})
 			}
@@ -4207,6 +4207,7 @@ function CallHandler(roomId) {
 					tracks[i].stop()
 				}
 			}
+			self.setCallIconsState();
 			self.onFailedCaptureSource.apply(self, arguments);
 		});
 	};
@@ -4216,12 +4217,15 @@ function CallHandler(roomId) {
 		if (stream) {
 			Utils.setVideoSource(self.dom.local, stream);
 		}
-		self.setVideo(self.getTrack('video') != null);
-		self.setAudio(self.getTrack('audio') != null);
-		self.setDesktopCapture(self.getTrack('share') != null);
-		self.autoSetLocalVideoVisibility();
+		self.setCallIconsState();
 		self.audioProcessor = Utils.createMicrophoneLevelVoice(stream, self.processAudio);
 	};
+	self.setCallIconsState = function () {
+			self.setVideo(self.getTrack('video') != null);
+			self.setAudio(self.getTrack('audio') != null);
+			self.setDesktopCapture(self.getTrack('share') != null);
+			self.autoSetLocalVideoVisibility();
+		}
 	self.processAudio = function (audioProc) {
 		return function () {
 			if (!self.constraints.audio) {
@@ -4254,7 +4258,7 @@ function CallHandler(roomId) {
 		if (self.constraints.share) {
 			what.push('screenshare');
 		}
-		var message = "Failed to capture {} source, because {}".format(what.join(', '), Utils.extractError(arguments));
+		var message = "<span>Failed to capture {} source, because {}</span>".format(what.join(', '), Utils.extractError(arguments));
 		growlError(message);
 		self.logErr(message)();
 	};
@@ -5379,13 +5383,12 @@ var Utils = {
 		var timedCB = setTimeout(function () {
 			!triggered && cb(false);
 			triggered = true;
-		}, 2000);
+		}, 500);
 
 		chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
-			type: 'PYCHAT_SCREEN_SHARE_PING',
-			text: 'start'
+			type: 'PYCHAT_SCREEN_SHARE_PING'
 		}, function (response) {
-			!triggered && cb(response.data === 'success');
+			!triggered && cb(response && response.data === 'success');
 			clearTimeout(timedCB);
 		});
 	},
@@ -5432,7 +5435,13 @@ var Utils = {
 			} else if (arguments.length === 1) {
 				arguments = arguments[0];
 			}
-			return arguments && (arguments.name || arguments.message) ? "{}: {}".format(arguments.name, arguments.message) : JSON.stringify(arguments);
+			if (arguments && (arguments.name || arguments.message) ) {
+				return "{}: {}".format(arguments.name, arguments.message);
+			} else if (arguments.rawError) {
+				return arguments.rawError;
+			} else {
+				return JSON.stringify(arguments);
+			}
 		} catch (e) {
 			return "Error during parsing error, :("
 		}
