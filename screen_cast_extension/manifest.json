@@ -11,13 +11,6 @@
   "background": {
     "scripts": ["background.js"]
   },
-  "content_scripts": [
-    {
-      "matches": ["https://localhost:8000/*", "https://pychat.org/*"],
-      "js": ["content-script.js"],
-      "run_at": "document_end"
-    }
-  ],
   "permissions": [
     "desktopCapture",
     "https://pychat.org/*",

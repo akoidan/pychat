@@ -20,7 +20,7 @@ var GENDER_ICONS = {
 	'Female': 'icon-girl',
 	'Secret': 'icon-user-secret'
 };
-`var screenCastExtensionInstalled = false;
+var screenCastExtensionInstalled = false;
 var smileUnicodeRegex = /[\u3400-\u3500]/g;
 var imageUnicodeRegex = /[\u3501-\u3600]/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
@@ -5409,34 +5409,40 @@ var Utils = {
 };
 
 
-// listen for messages from the content-script
-window.addEventListener('message', function () {
-	// discard foreign events
-	if (event.origin !== window.location.origin) {
-		return;
-	}
-
-	// content-script will send a 'PYCHAT_SCREEN_SHARE_PING' msg if extension is installed
-	if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_PING')) {
-		screenCastExtensionInstalled = true;
-	}
-
-	// user chose a stream
-	if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_DIALOG_SUCCESS')) {
-		var msg = {connId: event.data.connId, stream: event.data.streamId, handler: 'webrtcTransfer', action: 'shareScreenReceivedStream'};
-		if (event.data.connId) {
-			webRtcApi.handle(msg);	
-		} else if (event.data.roomId) {
-			channelsHandler.channels[event.data.roomId].getCallHandler().handle(msg);
-		} else {
-			alert('invalid ');
+(function () {
+	if (typeof chrome != 'undefined') {
+		var port = chrome.runtime.connect("ppibnonicgkeojloifobdloaiajedhgg");
+	port.onMessage.addListener(function (event) {
+		if (event.origin !== window.location.origin) {
+			return;
 		}
+		// content-script will send a 'PYCHAT_SCREEN_SHARE_PING' msg if extension is installed
+		if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_PING')) {
+			screenCastExtensionInstalled = true;
+		}
+		// user chose a stream
+		if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_DIALOG_SUCCESS')) {
+			var msg = {
+				connId: event.data.connId,
+				stream: event.data.streamId,
+				handler: 'webrtcTransfer',
+				action: 'shareScreenReceivedStream'
+			};
+			if (event.data.connId) {
+				webRtcApi.handle(msg);
+			} else if (event.data.roomId) {
+				channelsHandler.channels[event.data.roomId].getCallHandler().handle(msg);
+			} else {
+				alert('invalid ');
+			}
+		}
+		// user clicked on 'cancel' in choose media dialog
+		if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_DIALOG_CANCEL')) {
+			growlError("Can't share screen because you cancelled");
+		}
+	});
+	port.postMessage({type: 'PYCHAT_SCREEN_SHARE_PING', text: 'start'});
 	}
-
-	// user clicked on 'cancel' in choose media dialog
-	if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_DIALOG_CANCEL')) {
-		growlError("Can't share screen because you cancelled");
-	}
-});
+})();
 
 

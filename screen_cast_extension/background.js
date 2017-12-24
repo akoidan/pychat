@@ -1,7 +1,9 @@
 var desktopMediaRequestId = '';
 
 chrome.runtime.onConnect.addListener(function(port) {
+  console.log("Connected from new port ", port);
   port.onMessage.addListener(function(msg) {
+    console.log("Got new message ", msg);
     if (msg.type === 'PYCHAT_SCREEN_SHARE_REQUEST') {
       requestScreenSharing(port, msg);
     }
@@ -39,26 +41,3 @@ function cancelScreenSharing(msg) {
      chrome.desktopCapture.cancelChooseDesktopMedia(desktopMediaRequestId);
   }
 }
-
-function flatten(arr) {
-  return [].concat.apply([], arr);
-}
-
-// This avoids a reload after an installation
-chrome.windows.getAll({ populate: true }, function(windows) {
-  const details = { file: 'content-script.js', allFrames: true };
-
-  flatten(windows.map(function(w) {
-    return w.tabs})).forEach(function(tab)  {
-    // Skip chrome:// pages
-    if (tab.url.match(/(chrome):\/\//gi)) {
-      return;
-    }
-
-    // https://developer.chrome.com/extensions/tabs#method-executeScript
-    // Would be nice to skip non authorized pages too, to avoid errors.
-    chrome.tabs.executeScript(tab.id, details, function() {
-      console.log('After injection in tab: ', tab);
-    });
-  });
-});
