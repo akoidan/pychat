@@ -3996,7 +3996,7 @@ function CallHandler(roomId) {
 		self.dom.hangUpHolder.appendChild(self.dom.hangUpIcon);
 		self.dom.hangUpIcon.className = 'icon-hang-up ';
 		self.dom.hangUpIcon.title = 'Hang Up';
-		self.dom.microphoneLevel.setAttribute("max", "100");
+		self.dom.microphoneLevel.setAttribute("max", "15");
 		self.dom.microphoneLevel.setAttribute("value", "0");
 		self.dom.microphoneLevel.setAttribute("title", "Your microphone level");
 		self.dom.microphoneLevel.className = 'microphoneLevel';
@@ -4183,7 +4183,7 @@ function CallHandler(roomId) {
 			if (audioProc.volumeValuesCount == 100 && audioProc.prevVolumeValues == 0) {
 				self.showNoMicError();
 			}
-			self.dom.microphoneLevel.value = value;
+			self.dom.microphoneLevel.value = Math.sqrt(value);
 		}
 	};
 	self.captureInputStream = function () {
@@ -5046,13 +5046,9 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached) {
 	self.processAudio = function (audioProc) {
 		return function () {
 			var level = Utils.getAverageAudioLevel(audioProc); //256 max
-			var clasNu;
-			if (level >= 162) {
+			var clasNu = Math.floor(Math.sqrt(level) / 1.3)+1;
+			if (clasNu > 10) {
 				clasNu = 10;
-			} else if (level == 0) {
-				clasNu = 0
-			} else {
-				clasNu = Math.floor(level / 18) + 1;
 			}
 			self.dom.callVolume.className = 'vol-level-{}'.format(clasNu);
 		};
