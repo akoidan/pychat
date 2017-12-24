@@ -89,6 +89,8 @@ KEY_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.key"))
 
 IS_HTTPS = 'CRT_PATH' in locals()
 API_PORT = '8888'
+EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn'
+EXTENSION_INSTALL_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + EXTENSION_ID
 WEBSOCKET_PROTOCOL = 'wss' if IS_HTTPS else 'ws'
 SITE_PROTOCOL = 'https' if IS_HTTPS else 'http'
 API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/?id='))

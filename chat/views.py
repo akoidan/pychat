@@ -26,7 +26,7 @@ from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification
-from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging
+from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging, EXTENSION_ID, EXTENSION_INSTALL_URL
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
 	create_user_model, check_captcha, send_reset_password_email
 
@@ -84,6 +84,8 @@ def home(request):
 	context['suggestions'] = up.suggestions
 	context['notifications'] = up.notifications
 	context['cache_messages'] = up.cache_messages
+	context['extensionId'] = EXTENSION_ID
+	context['extensionUrl'] = EXTENSION_INSTALL_URL
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
 

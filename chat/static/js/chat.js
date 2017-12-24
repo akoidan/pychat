@@ -20,7 +20,7 @@ var GENDER_ICONS = {
 	'Female': 'icon-girl',
 	'Secret': 'icon-user-secret'
 };
-var screenCastExtensionInstalled = false;
+
 var smileUnicodeRegex = /[\u3400-\u3500]/g;
 var imageUnicodeRegex = /[\u3501-\u3600]/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
@@ -4004,7 +4004,7 @@ function CallHandler(roomId) {
 		self.renderDom();
 		self.attachDomEvents();
 	};
-	self.onshareScreenReceivedStream = function (event) {
+	self.shareScreenReceivedStream = function (stream) {
 		if (self.constraints.video) {
 			self.setVideo(false);
 		}
@@ -4013,7 +4013,7 @@ function CallHandler(roomId) {
 			video: {
 				mandatory: {
 					chromeMediaSource: 'desktop',
-					chromeMediaSourceId: event.stream,
+					chromeMediaSourceId: stream,
 					maxWidth: window.screen.width,
 					maxHeight: window.screen.height
 				}
@@ -4026,12 +4026,22 @@ function CallHandler(roomId) {
 	self.shareClick = function() {
 		var message ;
 		if (!isChrome) {
-			message = "ScreenCast only available from chrome atm";
-		} else if (!screenCastExtensionInstalled) {
-			message = '<span>You need to install a chrome extension.<b> <a href="https://pychat.org/" target="_blank">Click to install</a></b></span>';
-			growlInfo(message);
-		} else {
-			window.postMessage({type: 'PYCHAT_SCREEN_SHARE_REQUEST', text: 'start', connId: self.connectionId, roomId: self.roomId}, '*');
+			growlInfo("ScreenCast feature is only available from chrome atm");
+		} else  {
+			Utils.pingExtension(function(success) {
+				if (success) {
+					Utils.getDesktopCapture(function (response) {
+						if (response && response.data === 'success') {
+							self.shareScreenReceivedStream(response.streamId)
+						} else {
+							growlError("Failed to capture desktop stream");
+						}
+					})
+				} else {
+					message = '<span>You need to install a chrome extension.<b> <a href="'+CHROME_EXTENSION_URL+'" target="_blank">Click to install</a></b></span>';
+					growlInfo(message);
+				}
+			})
 		}
 	}
 	self.microphoneChanged = function(e) {
@@ -4040,8 +4050,6 @@ function CallHandler(roomId) {
 	self.updateConnection = function () {
 		self.captureInput(function (stream) {
 			if (stream) {
-				self.stopLocalStream();
-				self.destroyAudioProcessor();
 				self.attachLocalStream(stream);
 				for (var pcName in self.peerConnections) {
 					if (!self.peerConnections.hasOwnProperty(pcName)) continue;
@@ -4059,6 +4067,8 @@ function CallHandler(roomId) {
 		}, true);
 	};
 	self.captureInput = function (callback, callIfNoSource) {
+		self.stopLocalStream();
+		self.destroyAudioProcessor();
 		var prom = Promise.resolve(false);
 		var endStream;
 		if (self.constraints.audio || self.constraints.video) {
@@ -4099,26 +4109,25 @@ function CallHandler(roomId) {
 					})
 				}
 			});
-			if (self.constraints.desktopCapture) {
-					prom = prom.then(function() {
-						return navigator.mediaDevices.getUserMedia(self.constraints.desktopCapture)
-					}).then(function(stream) {
-						if (endStream) {
-							endStream.addTrack(stream.getVideoTracks()[0]);
-						} else {
-							endStream = stream;
-						}
-					})
-			}
-			prom.then(function() {
-				if (endStream) {
-					callback(endStream)
-				} else if (callIfNoSource) {
-					callback();
-				}
-			}).catch(self.onFailedCaptureSource);
 		}
-
+		if (self.constraints.desktopCapture) {
+			prom = prom.then(function () {
+				return navigator.mediaDevices.getUserMedia(self.constraints.desktopCapture)
+			}).then(function (stream) {
+				if (endStream) {
+					endStream.addTrack(stream.getVideoTracks()[0]);
+				} else {
+					endStream = stream;
+				}
+			})
+		}
+		prom.then(function () {
+			if (endStream) {
+				callback(endStream)
+			} else if (callIfNoSource) {
+				callback();
+			}
+		}).catch(self.onFailedCaptureSource);
 	};
 	self.attachLocalStream = function (stream) {
 		self.localStream = stream;
@@ -4152,15 +4161,17 @@ function CallHandler(roomId) {
 		self.setTimeout();
 	};
 	self.onFailedCaptureSource = function () {
-		var what = '';
-		if (self.constraints.audio && self.constraints.audio) {
-			what = 'audio and video'
-		} else if (self.constraints.audio) {
-			what = 'audio'
-		} else {
-			what = 'video'
+		var what = [];
+		if (self.constraints.audio) {
+			what.push('audio');
 		}
-		var message = "Failed to capture {} source, because {}".format(what, Utils.extractError(arguments));
+		if (self.constraints.audio) {
+			what.push('video');
+		}
+		if (self.constraints.desktopCapture) {
+			what.push('screenshare');
+		}
+		var message = "Failed to capture {} source, because {}".format(what.join(', '), Utils.extractError(arguments));
 		growlError(message);
 		self.logErr(message);
 	};
@@ -5244,6 +5255,26 @@ var Utils = {
 		video.src = "";
 		video.load()
 	},
+	pingExtension: function(cb) {
+		var triggered = false;
+		var timedCB = setTimeout(function () {
+			!triggered && cb(false);
+			triggered = true;
+		}, 2000);
+
+		chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
+			type: 'PYCHAT_SCREEN_SHARE_PING',
+			text: 'start'
+		}, function (response) {
+			!triggered && cb(response.data === 'success');
+			clearTimeout(timedCB);
+		});
+	},
+	getDesktopCapture: function(cb) {
+		chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
+			type: 'PYCHAT_SCREEN_SHARE_REQUEST'
+		}, cb);
+	},
 	createUserLi: function (userId, gender, username) {
 		var icon;
 		icon = document.createElement('i');
@@ -5407,42 +5438,3 @@ var Utils = {
 		}
 	}
 };
-
-
-(function () {
-	if (typeof chrome != 'undefined') {
-		var editorExtensionId = "ppibnonicgkeojloifobdloaiajedhgg";
-		chrome.runtime.sendMessage(editorExtensionId, {
-			type: 'PYCHAT_SCREEN_SHARE_PING',
-			text: 'start'
-		}, function (response) {
-			console.log(response);
-			if (!response.success)
-				if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_PING')) {
-					screenCastExtensionInstalled = true;
-				}
-			// user chose a stream
-			if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_DIALOG_SUCCESS')) {
-				var msg = {
-					connId: event.data.connId,
-					stream: event.data.streamId,
-					handler: 'webrtcTransfer',
-					action: 'shareScreenReceivedStream'
-				};
-				if (event.data.connId) {
-					webRtcApi.handle(msg);
-				} else if (event.data.roomId) {
-					channelsHandler.channels[event.data.roomId].getCallHandler().handle(msg);
-				} else {
-					alert('invalid ');
-				}
-			}
-			// user clicked on 'cancel' in choose media dialog
-			if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_DIALOG_CANCEL')) {
-				growlError("Can't share screen because you cancelled");
-			}
-		});
-	}
-})();
-
-
