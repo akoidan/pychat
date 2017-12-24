@@ -3572,33 +3572,14 @@ function DownloadBar(holder, fileSize, statusDiv) {
 function SenderPeerConnection(connectionId, opponentWsId, removeChildPeerReferenceFn) {
 	var self = this;
 	AbstractPeerConnection.call(self, connectionId, opponentWsId, removeChildPeerReferenceFn);
-	self.handleAnswer = function () {
-		self.log('answer received')();
-	};
-	self.createOffer = function () {
-		self.log('Creating offer...')();
-		self.pc.createOffer(function (offer) {
-			self.log('Created offer, setting local description')();
-			self.pc.setLocalDescription(offer, function () {
-				self.log('Sending offer to remote')();
-				self.sendWebRtcEvent(offer);
-			}, self.failWebRtc('setLocalDescription'));
-		}, self.failWebRtc('createOffer'), self.sdpConstraints);
-	};
+
+
 }
 
 function ReceiverPeerConnection(connectionId, opponentWsId, removeChildPeerReferenceFn) {
 	var self = this;
 	AbstractPeerConnection.call(self, connectionId, opponentWsId, removeChildPeerReferenceFn);
-	self.handleAnswer = function () {
-		self.log('Creating answer')();
-		self.pc.createAnswer(function (answer) {
-			self.log('Sending answer')();
-			self.pc.setLocalDescription(answer, function () {
-				self.sendWebRtcEvent(answer);
-			}, self.failWebRtc('setLocalDescription'));
-		}, self.failWebRtc('createAnswer'), self.sdpConstraints);
-	};
+
 	self.onChannelMessage = function (msg) {
 // 		self.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();
 	}
@@ -3684,6 +3665,33 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 			growlError(message);
 			self.logErr(message)();
 		}
+	};
+	self.createOffer = function () { // each peer should be able to createOffer in case of microphone change
+		self.log('Creating offer...')();
+		self.offerCreator = true;
+		self.pc.createOffer(function (offer) {
+			self.log('Created offer, setting local description')();
+			self.pc.setLocalDescription(offer, function () {
+				self.log('Sending offer to remote')();
+				self.sendWebRtcEvent(offer);
+			}, self.failWebRtc('setLocalDescription'));
+		}, self.failWebRtc('createOffer'), self.sdpConstraints);
+	};
+	self.respondeOffer = function() {
+		self.offerCreator = false;
+		self.pc.createAnswer(function (answer) {
+			self.log('Sending answer')();
+			self.pc.setLocalDescription(answer, function () {
+				self.sendWebRtcEvent(answer);
+			}, self.failWebRtc('setLocalDescription'));
+		}, self.failWebRtc('createAnswer'), self.sdpConstraints);
+	}
+	self.handleAnswer = function () {
+		self.log('Creating answer')();
+		if (!self.offerCreator ) {
+			self.respondeOffer();
+		}
+		self.offerCreator = false;
 	};
 }
 
@@ -3820,6 +3828,7 @@ function CallHandler(roomId) {
 		hangUpHolder: document.createElement('div'),
 		microphoneLevel: document.createElement('progress'),
 		callIcon: document.createElement('i'),
+		microphones: document.createElement('select'),
 		fs: {
 			/*FullScreen*/
 			video: document.createElement("i"),
@@ -3862,7 +3871,15 @@ function CallHandler(roomId) {
 		CssUtils.setVisibility(self.dom.callIcon, !isCall);
 	};
 	self.setAudio = function (value) {
-		self.constraints.audio = value;
+		CssUtils.setVisibility(self.dom.microphones, value);
+		if (self.dom.microphones.value && value) {
+			self.constraints.audio = {deviceId: self.dom.microphones.value};
+		} else {
+			self.constraints.audio = value;
+		}
+		if (!value) {
+			self.dom.microphoneLevel.value = 0;
+		}
 		self.dom.audioStatusIcon.className = value ? "icon-mic" : "icon-mute callActiveIcon";
 		self.dom.fs.audio.className = value ? "icon-webrtc-mic" : "icon-webrtc-nomic";
 		var title = value ? "Turn off your microphone" : "Turn on your microphone";
@@ -3966,12 +3983,15 @@ function CallHandler(roomId) {
 		self.dom.hangUpHolder.appendChild(self.dom.hangUpIcon);
 		self.dom.hangUpIcon.className = 'icon-hang-up ';
 		self.dom.hangUpIcon.title = 'Hang Up';
-		self.dom.microphoneLevel.setAttribute("max", "160");
+		self.dom.microphoneLevel.setAttribute("max", "100");
 		self.dom.microphoneLevel.setAttribute("value", "0");
 		self.dom.microphoneLevel.setAttribute("title", "Your microphone level");
 		self.dom.microphoneLevel.className = 'microphoneLevel';
+		self.dom.microphones.onchange = self.microphoneChanged;
+		self.dom.microphones.className = 'microphonesList';
 		callContainerIcons.appendChild(self.dom.callIcon);
 		callContainerIcons.appendChild(self.dom.audioStatusIcon);
+		callContainerIcons.appendChild(self.dom.microphones);
 		callContainerIcons.appendChild(self.dom.videoStatusIcon);
 		callContainerIcons.appendChild(enterFullScreenHolder);
 		callContainerIcons.appendChild(self.dom.hangUpHolder);
@@ -3981,9 +4001,66 @@ function CallHandler(roomId) {
 		self.renderDom();
 		self.attachDomEvents();
 	};
+	self.updateConnection = function() {
+		navigator.getUserMedia(self.constraints, function(stream) {
+			self.stopLocalStream();
+			self.destroyAudioProcessor();
+			self.attachLocalStream(stream);
+
+			for (var pcName in self.peerConnections) {
+				if (!self.peerConnections.hasOwnProperty(pcName)) continue;
+				var abstrPc = self.peerConnections[pcName];
+				var pc = abstrPc.pc;
+				if (pc) {
+					pc.removeStream(self.localStream);
+					pc.addStream(stream);
+					abstrPc.createOffer();
+				}
+			}
+		},self.onFailedCaptureSource);
+	};
+	self.microphoneChanged = function(e) {
+		if (self.constraints.audio) {
+			self.constraints.audio = {deviceId: e.target.value};
+		}
+		self.updateConnection();
+	};
 	self.captureInput = function (callback, callIfNoSource) {
 		if (self.constraints.audio || self.constraints.video) {
-			navigator.getUserMedia(self.constraints, callback, self.onFailedCaptureSource);
+			var audio = self.constraints.audio
+			if (self.dom.microphones.value) {
+				audio = {deviceId: self.dom.microphones.value};
+			}
+			var c = {audio: audio, video: self.constraints.video};
+			navigator.mediaDevices.getUserMedia(c).then(function(stream) {
+				callback(stream);
+				if (navigator.mediaDevices.enumerateDevices) {
+					return navigator.mediaDevices.enumerateDevices();	
+				} else {
+					return false;
+				}
+				
+			}).then(function(devices) {
+				var n = 0;
+				CssUtils.deleteChildren(self.dom.microphones);
+				devices.forEach(function (device) {
+					switch (device.kind) {
+						case "audioinput":
+							var option = document.createElement('option');
+							option.value =  device.deviceId;
+							option.innerText = device.label || 'Microphone ' + (++n);
+							self.dom.microphones.appendChild(option);
+							break;
+						case "audiooutput":
+							break;
+						case "videoinput":
+							break;
+						default:
+							self.log("Unexpected device {}", device.kind)();
+							break
+					}
+				});
+			}).catch(self.onFailedCaptureSource);
 		} else if (callIfNoSource) {
 			callback();
 		}
@@ -4089,18 +4166,16 @@ function CallHandler(roomId) {
 	self.toggleInput = function (isVideo) {
 		var kind = isVideo ? 'video' : 'audio';
 		var track = self.getTrack(isVideo);
-		if (!self.isActive() || track) {
-			var newValue = !self.constraints[kind];
-			if (isVideo) {
-				self.setVideo(newValue);
-			} else {
-				self.setAudio(newValue);
-			}
+		var newValue = !self.constraints[kind];
+		if (isVideo) {
+			self.setVideo(newValue);
+		} else {
+			self.setAudio(newValue);
 		}
 		if (track) {
 			track.enabled = self.constraints[kind];
 		} else if (self.isActive()) {
-			growlError("You need to call/reply with {} to turn it on".format(kind));
+			self.updateConnection();
 		}
 	};
 	self.toggleVideo = function () {
@@ -4227,6 +4302,15 @@ function CallHandler(roomId) {
 		}
 		self.decline();
 	};
+
+	self.stopLocalStream = function() {
+		if (self.localStream) {
+			var tracks = self.localStream.getTracks();
+			for (var i = 0; i < tracks.length; i++) {
+				tracks[i].stop()
+			}
+		}
+	};
 	self.closeEvents = function (text) {
 		if (text) {
 			growlInfo(text)
@@ -4244,16 +4328,14 @@ function CallHandler(roomId) {
 		webRtcApi.removeChildReference(self.connectionId);
 		self.dom.microphoneLevel.value = 0;
 		self.exitFullScreen();
+		Utils.detachVideoSource(self.dom.local);
+		self.destroyAudioProcessor();
+		self.stopLocalStream();
+	};
+	self.destroyAudioProcessor = function() {
 		if (self.audioProcessor && self.audioProcessor.javascriptNode && self.audioProcessor.javascriptNode.onaudioprocess) {
 			self.log('Removing local audio processor')();
 			self.audioProcessor.javascriptNode.onaudioprocess = null;
-		}
-		Utils.detachVideoSource(self.dom.local);
-		if (self.localStream) {
-			var tracks = self.localStream.getTracks();
-			for (var i = 0; i < tracks.length; i++) {
-				tracks[i].stop()
-			}
 		}
 	};
 	self.onExitFullScreen = function () {
@@ -4982,7 +5064,7 @@ function WsHandler() {
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
-		// logger.ws("WS_IN", jsonData)();
+		logger.ws("WS_IN", jsonData)();
 		var data = JSON.parse(jsonData);
 		self.handleMessage(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
@@ -4999,7 +5081,7 @@ function WsHandler() {
 			growlError("Can't send message, because connection is lost :(");
 			return false;
 		} else {
-			// logger.ws("WS out", logEntry)();
+			logger.ws("WS_OUT", logEntry)();
 			self.ws.send(jsonRequest);
 			return true;
 		}
