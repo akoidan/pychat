@@ -1,0 +1,27 @@
+{
+  "name": "Pychat Screensharing Extension",
+  "description": "This extension allows to shareScreen during a call for pychat.org.",
+  "version": "1.0.0",
+  "author": "deathangel908@gmail.com https://github.com/Deathangel908",
+  "manifest_version": 2,
+  "icons": {
+    "16": "icon-16.png",
+    "128": "icon-128.png"
+  },
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://localhost:8000/*", "https://pychat.org/*"],
+      "js": ["content-script.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": [
+    "desktopCapture",
+    "https://pychat.org/*",
+    "https://localhost:8000/*",
+    "tabs"
+  ]
+}

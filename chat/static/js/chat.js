@@ -20,6 +20,7 @@ var GENDER_ICONS = {
 	'Female': 'icon-girl',
 	'Secret': 'icon-user-secret'
 };
+`var screenCastExtensionInstalled = false;
 var smileUnicodeRegex = /[\u3400-\u3500]/g;
 var imageUnicodeRegex = /[\u3501-\u3600]/g;
 var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
@@ -3828,6 +3829,7 @@ function CallHandler(roomId) {
 		hangUpHolder: document.createElement('div'),
 		microphoneLevel: document.createElement('progress'),
 		callIcon: document.createElement('i'),
+		shareScreen: document.createElement('input'),
 		microphones: document.createElement('select'),
 		fs: {
 			/*FullScreen*/
@@ -3840,7 +3842,8 @@ function CallHandler(roomId) {
 	};
 	self.constraints = {
 		audio: true,
-		video: true
+		video: true,
+		desktopCapture: false
 	};
 	self.hidePhoneIcon = function () {
 		if (self.dom.phoneIcon) {
@@ -3872,11 +3875,7 @@ function CallHandler(roomId) {
 	};
 	self.setAudio = function (value) {
 		CssUtils.setVisibility(self.dom.microphones, value);
-		if (self.dom.microphones.value && value) {
-			self.constraints.audio = {deviceId: self.dom.microphones.value};
-		} else {
-			self.constraints.audio = value;
-		}
+		self.constraints.audio = value;
 		if (!value) {
 			self.dom.microphoneLevel.value = 0;
 		}
@@ -3988,11 +3987,15 @@ function CallHandler(roomId) {
 		self.dom.microphoneLevel.setAttribute("title", "Your microphone level");
 		self.dom.microphoneLevel.className = 'microphoneLevel';
 		self.dom.microphones.onchange = self.microphoneChanged;
+		self.dom.shareScreen.setAttribute('type', 'button');
+		self.dom.shareScreen.setAttribute('value', 'share');
 		self.dom.microphones.className = 'microphonesList';
+		self.dom.shareScreen.onclick = self.shareClick;
 		callContainerIcons.appendChild(self.dom.callIcon);
 		callContainerIcons.appendChild(self.dom.audioStatusIcon);
 		callContainerIcons.appendChild(self.dom.microphones);
 		callContainerIcons.appendChild(self.dom.videoStatusIcon);
+		callContainerIcons.appendChild(self.dom.shareScreen);
 		callContainerIcons.appendChild(enterFullScreenHolder);
 		callContainerIcons.appendChild(self.dom.hangUpHolder);
 		callContainerIcons.appendChild(self.dom.microphoneLevel);
@@ -4001,69 +4004,121 @@ function CallHandler(roomId) {
 		self.renderDom();
 		self.attachDomEvents();
 	};
-	self.updateConnection = function() {
-		navigator.getUserMedia(self.constraints, function(stream) {
-			self.stopLocalStream();
-			self.destroyAudioProcessor();
-			self.attachLocalStream(stream);
-
-			for (var pcName in self.peerConnections) {
-				if (!self.peerConnections.hasOwnProperty(pcName)) continue;
-				var abstrPc = self.peerConnections[pcName];
-				var pc = abstrPc.pc;
-				if (pc) {
-					pc.removeStream(self.localStream);
-					pc.addStream(stream);
-					abstrPc.createOffer();
+	self.onshareScreenReceivedStream = function (event) {
+		if (self.constraints.video) {
+			self.setVideo(false);
+		}
+		self.constraints.desktopCapture = {
+			audio: false,
+			video: {
+				mandatory: {
+					chromeMediaSource: 'desktop',
+					chromeMediaSourceId: event.stream,
+					maxWidth: window.screen.width,
+					maxHeight: window.screen.height
 				}
 			}
-		},self.onFailedCaptureSource);
-	};
-	self.microphoneChanged = function(e) {
-		if (self.constraints.audio) {
-			self.constraints.audio = {deviceId: e.target.value};
 		}
+		if (self.isActive()) {
+			self.updateConnection();
+		}
+	};
+	self.shareClick = function() {
+		var message ;
+		if (!isChrome) {
+			message = "ScreenCast only available from chrome atm";
+		} else if (!screenCastExtensionInstalled) {
+			message = '<span>You need to install a chrome extension.<b> <a href="https://pychat.org/" target="_blank">Click to install</a></b></span>';
+			growlInfo(message);
+		} else {
+			window.postMessage({type: 'PYCHAT_SCREEN_SHARE_REQUEST', text: 'start', connId: self.connectionId, roomId: self.roomId}, '*');
+		}
+	}
+	self.microphoneChanged = function(e) {
 		self.updateConnection();
 	};
+	self.updateConnection = function () {
+		self.captureInput(function (stream) {
+			if (stream) {
+				self.stopLocalStream();
+				self.destroyAudioProcessor();
+				self.attachLocalStream(stream);
+				for (var pcName in self.peerConnections) {
+					if (!self.peerConnections.hasOwnProperty(pcName)) continue;
+					var abstrPc = self.peerConnections[pcName];
+					var pc = abstrPc.pc;
+					if (pc) {
+						pc.removeStream(self.localStream);
+						pc.addStream(stream);
+						abstrPc.createOffer();
+					}
+				}
+			} else {
+				growlError("Unable to capture new stream");
+			}
+		}, true);
+	};
 	self.captureInput = function (callback, callIfNoSource) {
+		var prom = Promise.resolve(false);
+		var endStream;
 		if (self.constraints.audio || self.constraints.video) {
 			var audio = self.constraints.audio
 			if (self.dom.microphones.value) {
 				audio = {deviceId: self.dom.microphones.value};
 			}
 			var c = {audio: audio, video: self.constraints.video};
-			navigator.mediaDevices.getUserMedia(c).then(function(stream) {
-				callback(stream);
+			prom = prom.then(function() {
+				return navigator.mediaDevices.getUserMedia(c);
+			}).then(function(stream) {
+				endStream = stream;
 				if (navigator.mediaDevices.enumerateDevices) {
-					return navigator.mediaDevices.enumerateDevices();	
+					return navigator.mediaDevices.enumerateDevices();
 				} else {
 					return false;
 				}
-				
-			}).then(function(devices) {
+			}).then(function (devices) {
 				var n = 0;
 				CssUtils.deleteChildren(self.dom.microphones);
-				devices.forEach(function (device) {
-					switch (device.kind) {
-						case "audioinput":
-							var option = document.createElement('option');
-							option.value =  device.deviceId;
-							option.innerText = device.label || 'Microphone ' + (++n);
-							self.dom.microphones.appendChild(option);
-							break;
-						case "audiooutput":
-							break;
-						case "videoinput":
-							break;
-						default:
-							self.log("Unexpected device {}", device.kind)();
-							break
-					}
-				});
+				if (devices) {
+					devices.forEach(function (device) {
+						switch (device.kind) {
+							case "audioinput":
+								var option = document.createElement('option');
+								option.value = device.deviceId;
+								option.innerText = device.label || 'Microphone ' + (++n);
+								self.dom.microphones.appendChild(option);
+								break;
+							case "audiooutput":
+								break;
+							case "videoinput":
+								break;
+							default:
+								self.log("Unexpected device {}", device.kind)();
+								break
+						}
+					})
+				}
+			});
+			if (self.constraints.desktopCapture) {
+					prom = prom.then(function() {
+						return navigator.mediaDevices.getUserMedia(self.constraints.desktopCapture)
+					}).then(function(stream) {
+						if (endStream) {
+							endStream.addTrack(stream.getVideoTracks()[0]);
+						} else {
+							endStream = stream;
+						}
+					})
+			}
+			prom.then(function() {
+				if (endStream) {
+					callback(endStream)
+				} else if (callIfNoSource) {
+					callback();
+				}
 			}).catch(self.onFailedCaptureSource);
-		} else if (callIfNoSource) {
-			callback();
 		}
+
 	};
 	self.attachLocalStream = function (stream) {
 		self.localStream = stream;
@@ -5352,3 +5407,36 @@ var Utils = {
 		}
 	}
 };
+
+
+// listen for messages from the content-script
+window.addEventListener('message', function () {
+	// discard foreign events
+	if (event.origin !== window.location.origin) {
+		return;
+	}
+
+	// content-script will send a 'PYCHAT_SCREEN_SHARE_PING' msg if extension is installed
+	if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_PING')) {
+		screenCastExtensionInstalled = true;
+	}
+
+	// user chose a stream
+	if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_DIALOG_SUCCESS')) {
+		var msg = {connId: event.data.connId, stream: event.data.streamId, handler: 'webrtcTransfer', action: 'shareScreenReceivedStream'};
+		if (event.data.connId) {
+			webRtcApi.handle(msg);	
+		} else if (event.data.roomId) {
+			channelsHandler.channels[event.data.roomId].getCallHandler().handle(msg);
+		} else {
+			alert('invalid ');
+		}
+	}
+
+	// user clicked on 'cancel' in choose media dialog
+	if (event.data.type && (event.data.type === 'PYCHAT_SCREEN_SHARE_DIALOG_CANCEL')) {
+		growlError("Can't share screen because you cancelled");
+	}
+});
+
+
