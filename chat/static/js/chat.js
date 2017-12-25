@@ -5482,7 +5482,7 @@ var Utils = {
 			audioProc.volumeValuesCount = 0;
 			audioProc.javascriptNode.onaudioprocess = onaudioprocess(audioProc);
 			audioProcesssors.push(audioProc);
-			logger.log("Created new audioProcessor")();
+			logger.info("Created new audioProcessor")();
 			return audioProc;
 		} catch (err) {
 			logger.error("Unable to use microphone level because {}", Utils.extractError(err))();
