@@ -275,10 +275,31 @@ fieldset
 				border: none
 
 .settingsContainer
-	select
-		width: 200px
-	[class^='icon-']
-		color: #24768e !important
+	width: 200px
+	margin: auto
+	.callInfo
+		padding-left: 20px
+		display: block
+	.playTestSound
+		color: grey
+		display: block
+		font-size: 12px
+		text-align: left
+		padding-left: 10px
+		&:hover
+			color: #d7d7d7
+			cursor: pointer
+	td
+		position: relative
+		padding: 3px
+		select
+			width: 200px
+			padding-left: 30px
+		[class^='icon-']
+			position: absolute
+			top: 7px
+			left: 5px
+			color: #24768e !important
 
 .toolsAndCanvas
 	display: flex
@@ -993,6 +1014,7 @@ fieldset
 
 .icon-webrtc-cont
 	display: none
+	z-index: 1 // override webrtc fullscreen z-index
 	position: absolute
 	bottom: 2vh
 	left: 2vw

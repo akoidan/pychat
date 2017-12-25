@@ -41,11 +41,13 @@ var singlePage;
 var painter;
 var minimizedWindows;
 var chatFileAudio;
+var chatTestVolume;
 
 onDocLoad(function () {
 	userMessage = $("usermsg");
 	headerText = $('headerText');
 	chatFileAudio = $('chatFile');
+	chatTestVolume = $('chatTestVolume');
 	minimizedWindows = new MinimizedWindows();
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	channelsHandler = new ChannelsHandler();
@@ -3790,8 +3792,7 @@ function CallPopup(answerFn, videoAnswerFn, declineFn) {
 		self.super.hide();
 	};
 	self.initAndShow = function (user, channelName) {
-		var text = "{} calls".format(channelName);
-		self.setHeaderText(text);
+		self.setHeaderText("Incoming call");
 		self.inserRow("Initiator: ", user);
 		self.show();
 		Utils.checkAndPlay(self.dom.callSound);
@@ -3822,6 +3823,7 @@ function CallHandler(roomId) {
 		videoContainer: document.createElement("DIV"),
 		videoContainerForVideos: document.createElement("DIV"),
 		settingsContainer: document.createElement("TABLE"),
+		headerText: document.createElement("span"),
 		local: document.createElement('video'),
 		audioStatusIcon: document.createElement('i'),
 		videoStatusIcon: document.createElement('i'),
@@ -3833,6 +3835,7 @@ function CallHandler(roomId) {
 		microphones: document.createElement('select'),
 		cameras: document.createElement('select'),
 		speakers: document.createElement('select'),
+		playTestSound: document.createElement('span'),
 		settings: document.createElement('i'),
 		fs: {
 			/*FullScreen*/
@@ -3914,6 +3917,7 @@ function CallHandler(roomId) {
 		self.dom.microphones.onchange = self.microphoneChanged;
 		self.dom.speakers.onchange = self.speakerChanged;
 		self.dom.cameras.onchange = self.cameraChanged;
+		self.dom.playTestSound.onclick = self.testSound;
 		self.dom.settings.onclick = self.toggleSettingsContainer;
 		var fullScreenChangeEvents = ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'];
 		for (var i = 0; i < fullScreenChangeEvents.length; i++) {
@@ -3947,7 +3951,7 @@ function CallHandler(roomId) {
 		self.setDesktopCapture(false);
 		self.autoSetLocalVideoVisibility();
 		self.accept();
-		self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
+		self.setHeaderText("Answered with audio");
 	};
 	self.videoAnswerWebRtcCall = function () {
 		self.accept();
@@ -3955,7 +3959,7 @@ function CallHandler(roomId) {
 		self.setDesktopCapture(false);
 		self.setVideo(true);
 		self.autoSetLocalVideoVisibility();
-		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
+		self.setHeaderText("Answered with video");
 	};
 	self.getCallPopup = function () {
 		if (!self.callPopup) {
@@ -3974,15 +3978,21 @@ function CallHandler(roomId) {
 		function ap(el, icon) {
 			var row = self.dom.settingsContainer.insertRow(0);
 			var cell1 = row.insertCell(0);
-			var cell2 = row.insertCell(1);
 			var i = document.createElement('i');
 			i.className = icon;
 			cell1.appendChild(i);
-			cell2.appendChild(el);
+			cell1.appendChild(el);
+			return cell1;
 		}
 		ap(self.dom.microphones, 'icon-mic');
 		ap(self.dom.cameras, 'icon-videocam');
-		ap(self.dom.speakers, 'icon-volume-2');
+		var speakersCell = ap(self.dom.speakers, 'icon-volume-2');
+		speakersCell.appendChild(self.dom.playTestSound);
+		self.dom.playTestSound.className = 'playTestSound';
+		ap(self.dom.headerText, 'icon-quote-left');
+		self.dom.headerText.textContent = 'Call info';
+		self.dom.headerText.className = 'callInfo';
+		self.dom.playTestSound.textContent = "Play test sound";
 		self.dom.settingsContainer.className = 'settingsContainer ' + CssUtils.visibilityClass;
 		self.dom.callContainerContent.className = 'callContainerContent';
 		self.dom.callContainerContent.appendChild(self.dom.videoContainer);
@@ -4040,6 +4050,15 @@ function CallHandler(roomId) {
 	self.init = function () {
 		self.renderDom();
 		self.attachDomEvents();
+	};
+	self.testSound = function () {
+		chatTestVolume.setSinkId(self.dom.speakers.value);
+		chatTestVolume.pause();
+		chatTestVolume.currentTime = 0;
+		chatTestVolume.volume = 1;
+		var prom = chatTestVolume.play();
+		prom && prom.catch(function (e) {
+		});
 	};
 	self.speakerChanged = function() {
 		for (var pcName in self.peerConnections) {
@@ -4134,6 +4153,8 @@ function CallHandler(roomId) {
 			var message;
 			if (!isChrome) {
 				rej("ScreenCast feature is only available from chrome atm")
+			} else if (isMobile) {
+				rej("ScreenCast is not available for mobile phones yet")
 			} else {
 				Utils.pingExtension(function (success) {
 					self.log("Ping to extension succeeded")();
@@ -4260,9 +4281,8 @@ function CallHandler(roomId) {
 		growlError(message);
 		self.logErr(message)();
 	};
-	self.setHeaderText = function (text) { // TODO multirtc
-		channelsHandler.setTitle(text);
-		singlePage.updateTitle();
+	self.setHeaderText = function (text) {
+		self.dom.headerText.innerHTML = text;
 	};
 	self.offerCall = function () {
 		self.accepted = true;
@@ -4271,7 +4291,7 @@ function CallHandler(roomId) {
 			if (success) {
 				self.attachLocalStream(stream);
 				self.setIconState(true);
-				self.setHeaderText("Establishing connection with {}".format(self.receiverName));
+				self.setHeaderText("Establishing connection with room #{}".format(self.roomId));
 				var id = webRtcApi.addCallHandler(self);
 				self.sendOffer(id);
 				self.setTimeout();
@@ -4422,7 +4442,7 @@ function CallHandler(roomId) {
 		}
 	};
 	self.onStreamAttached = function (opponentWsId) { // TODO this is called multiple times for each peer connection
-		self.setHeaderText("Talking with <b>{}</b>".format(self.receiverName));
+		self.setHeaderText("Talking");
 		self.setIconState(true);
 	};
 	self.onreplyCall = function (message) {
@@ -4502,11 +4522,7 @@ function CallHandler(roomId) {
 				tracks[i].stop()
 			}
 		}
-		chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
-			type: 'PYCHAT_SCREEN_SHARE_CANCEL'
-		}, function (response) {
-			self.log("PYCHAT_SCREEN_SHARE_CANCEL response {}", response)();
-		});
+		Utils.stopDesktopCapture();
 	};
 	self.closeEvents = function (text) {
 		if (text) {
@@ -4519,13 +4535,13 @@ function CallHandler(roomId) {
 		// if somebody sent us destroyConnection event, b4 timeout fired
 		self.clearTimeout();
 		self.accepted = false;
-		self.setHeaderText(loggedUser);
 		self.setIconState(false);
 		self.callPopupTable = {};
 		webRtcApi.removeChildReference(self.connectionId);
 		self.dom.microphoneLevel.value = 0;
 		self.exitFullScreen();
 		Utils.detachVideoSource(self.dom.local);
+		self.setHeaderText("Call finished");
 		self.stopLocalStream();
 	};
 	self.destroyAudioProcessor = function() {
@@ -4556,7 +4572,9 @@ function CallHandler(roomId) {
 		self.dom.videoContainer.requestFullscreen();
 		CssUtils.addClass(self.dom.videoContainer, 'fullscreen');
 		document.addEventListener('mousemove', self.fsMouseMove, false);
-		self.hideContainerTimeoutRes = setInterval(self.hideContainerTimeout, 1000);
+		if (!isMobile) {
+			self.hideContainerTimeoutRes = setInterval(self.hideContainerTimeout, 1000);
+		}
 		/*to clear only function from resultOf setInterval should be passed, otherwise doesn't work*/
 	};
 	self.fsMouseMove = function () {
@@ -5391,19 +5409,32 @@ var Utils = {
 		video.src = "";
 		video.load()
 	},
-	pingExtension: function(cb) {
-		var triggered = false;
-		var timedCB = setTimeout(function () {
-			!triggered && cb(false);
-			triggered = true;
-		}, 500);
+	pingExtension: function (cb) {
+		if (chrome.runtime && chrome.runtime.sendMessage) {
+			var triggered = false;
+			var timedCB = setTimeout(function () {
+				!triggered && cb(false);
+				triggered = true;
+			}, 500);
 
-		chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
-			type: 'PYCHAT_SCREEN_SHARE_PING'
-		}, function (response) {
-			!triggered && cb(response && response.data === 'success');
-			clearTimeout(timedCB);
-		});
+			chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
+				type: 'PYCHAT_SCREEN_SHARE_PING'
+			}, function (response) {
+				!triggered && cb(response && response.data === 'success');
+				clearTimeout(timedCB);
+			});
+		} else {
+			cb(false)
+		}
+	},
+	stopDesktopCapture: function () {
+		if (typeof chrome != 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+			chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
+				type: 'PYCHAT_SCREEN_SHARE_CANCEL'
+			}, function (response) {
+
+			});
+		}
 	},
 	getDesktopCapture: function(cb) {
 		chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
