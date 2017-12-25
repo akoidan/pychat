@@ -4495,6 +4495,7 @@ function CallHandler(roomId) {
 	};
 
 	self.stopLocalStream = function() {
+		self.destroyAudioProcessor();
 		if (self.localStream) {
 			var tracks = self.localStream.getTracks();
 			for (var i = 0; i < tracks.length; i++) {
@@ -4525,12 +4526,11 @@ function CallHandler(roomId) {
 		self.dom.microphoneLevel.value = 0;
 		self.exitFullScreen();
 		Utils.detachVideoSource(self.dom.local);
-		self.destroyAudioProcessor();
 		self.stopLocalStream();
 	};
 	self.destroyAudioProcessor = function() {
 		if (self.audioProcessor && self.audioProcessor.javascriptNode && self.audioProcessor.javascriptNode.onaudioprocess) {
-			self.log('Removing local audio processor')();
+			self.log("Removing local audioproc")();
 			self.audioProcessor.javascriptNode.onaudioprocess = null;
 		}
 	};
@@ -5114,6 +5114,7 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 			if (speakerId && self.dom.remote.setSinkId) {
 				self.dom.remote.setSinkId(speakerId);
 			}
+			self.removeAudioProcessor();
 			self.audioProcessor = Utils.createMicrophoneLevelVoice(event.stream, self.processAudio);
 			onStreamAttached(self.opponentWsId);
 		};
@@ -5129,13 +5130,16 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 			self.dom.callVolume.className = 'vol-level-{}'.format(clasNu);
 		};
 	};
+	self.removeAudioProcessor = function () {
+		if (self.audioProcessor && self.audioProcessor.javascriptNode && self.audioProcessor.javascriptNode.onaudioprocess) {
+			self.audioProcessor.javascriptNode.onaudioprocess = null;
+			self.log("Removed remote audioProcessor")();
+		}
+	};
 	self.closeEvents = function (reason) {
 		self.log('Destroying CallPeerConnection because', reason)();
 		self.closePeerConnection();
-		if (self.audioProcessor && self.audioProcessor.javascriptNode && self.audioProcessor.javascriptNode.onaudioprocess) {
-			self.log('Removing remote audio processor')();
-			self.audioProcessor.javascriptNode.onaudioprocess = null;
-		}
+		self.removeAudioProcessor();
 		Utils.detachVideoSource(self.dom.remote);
 		CssUtils.deleteElement(self.dom.videoContainer);
 		self.removeChildPeerReference(self.opponentWsId, reason);
@@ -5478,6 +5482,7 @@ var Utils = {
 			audioProc.volumeValuesCount = 0;
 			audioProc.javascriptNode.onaudioprocess = onaudioprocess(audioProc);
 			audioProcesssors.push(audioProc);
+			logger.log("Created new audioProcessor")();
 			return audioProc;
 		} catch (err) {
 			logger.error("Unable to use microphone level because {}", Utils.extractError(err))();
