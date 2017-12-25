@@ -3822,6 +3822,7 @@ function CallHandler(roomId) {
 		videoContainer: document.createElement("DIV"),
 		videoContainerForVideos: document.createElement("DIV"),
 		settingsContainer: document.createElement("TABLE"),
+		headerText: document.createElement("span"),
 		local: document.createElement('video'),
 		audioStatusIcon: document.createElement('i'),
 		videoStatusIcon: document.createElement('i'),
@@ -3947,7 +3948,7 @@ function CallHandler(roomId) {
 		self.setDesktopCapture(false);
 		self.autoSetLocalVideoVisibility();
 		self.accept();
-		self.setHeaderText("Answered for {} call with audio".format(self.receiverName));
+		self.setHeaderText("Answered for {} call with audio".format(self.roomId));
 	};
 	self.videoAnswerWebRtcCall = function () {
 		self.accept();
@@ -3955,7 +3956,7 @@ function CallHandler(roomId) {
 		self.setDesktopCapture(false);
 		self.setVideo(true);
 		self.autoSetLocalVideoVisibility();
-		self.setHeaderText("Answered for {} call with video".format(self.receiverName));
+		self.setHeaderText("Answered for {} call with video".format(self.roomId));
 	};
 	self.getCallPopup = function () {
 		if (!self.callPopup) {
@@ -3983,6 +3984,7 @@ function CallHandler(roomId) {
 		ap(self.dom.microphones, 'icon-mic');
 		ap(self.dom.cameras, 'icon-videocam');
 		ap(self.dom.speakers, 'icon-volume-2');
+		ap(self.dom.headerText, 'icon-quote-left');
 		self.dom.settingsContainer.className = 'settingsContainer ' + CssUtils.visibilityClass;
 		self.dom.callContainerContent.className = 'callContainerContent';
 		self.dom.callContainerContent.appendChild(self.dom.videoContainer);
@@ -4260,9 +4262,8 @@ function CallHandler(roomId) {
 		growlError(message);
 		self.logErr(message)();
 	};
-	self.setHeaderText = function (text) { // TODO multirtc
-		channelsHandler.setTitle(text);
-		singlePage.updateTitle();
+	self.setHeaderText = function (text) {
+		self.dom.headerText.innerHTML = text;
 	};
 	self.offerCall = function () {
 		self.accepted = true;
@@ -4422,7 +4423,7 @@ function CallHandler(roomId) {
 		}
 	};
 	self.onStreamAttached = function (opponentWsId) { // TODO this is called multiple times for each peer connection
-		self.setHeaderText("Talking with <b>{}</b>".format(self.receiverName));
+		self.setHeaderText("Talking with <b>{}</b>".format(self.roomId));
 		self.setIconState(true);
 	};
 	self.onreplyCall = function (message) {
@@ -4519,7 +4520,6 @@ function CallHandler(roomId) {
 		// if somebody sent us destroyConnection event, b4 timeout fired
 		self.clearTimeout();
 		self.accepted = false;
-		self.setHeaderText(loggedUser);
 		self.setIconState(false);
 		self.callPopupTable = {};
 		webRtcApi.removeChildReference(self.connectionId);
