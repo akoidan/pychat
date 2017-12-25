@@ -20,6 +20,7 @@ var GENDER_ICONS = {
 	'Female': 'icon-girl',
 	'Secret': 'icon-user-secret'
 };
+var navCallIcon;
 var audioProcesssors = [];
 var smileUnicodeRegex = /[\u3400-\u3500]/g;
 var imageUnicodeRegex = /[\u3501-\u3600]/g;
@@ -45,6 +46,7 @@ var chatTestVolume;
 
 onDocLoad(function () {
 	userMessage = $("usermsg");
+	navCallIcon = $('navCallIcon');
 	headerText = $('headerText');
 	chatFileAudio = $('chatFile');
 	chatTestVolume = $('chatTestVolume');
@@ -503,6 +505,9 @@ function Painter() {
 			self.setMode('pen');
 		},
 		pasteToTextArea: function () {
+			if (singlePage.currentPage.pageName != 'channels') {
+				return;
+			}
 			if (self.dom.trimImage.checked) {
 				var trimImage = self.helper.trimImage();
 				if (trimImage) {
@@ -2037,6 +2042,7 @@ function Page() {
 function IssuePage() {
 	var self = this;
 	Page.call(self);
+	self.pageName = 'issue';
 	self.url = '/report_issue';
 	self.title = 'Report issue';
 	self.dom = {
@@ -2082,6 +2088,7 @@ function IssuePage() {
 function ViewProfilePage() {
 	var self = this;
 	Page.call(self);
+	self.pageName = 'viewprofile';
 	self.getUrl = function () {
 		return '/profile/{}'.format(self.userId);
 	};
@@ -2101,6 +2108,7 @@ function ChangeProfilePage() {
 	var self = this;
 	Page.call(self);
 	self.url = '/profile';
+	self.pageName = 'changeProfile';
 	self.title = "<b>{}</b> (your) profile".format(loggedUser);
 	self.onLoad = function (html) {
 		self.rendered = true;
@@ -2115,6 +2123,7 @@ function ChangeProfilePage() {
 function AmchartsPage() {
 	var self = this;
 	Page.call(self);
+	self.pageName = 'amcharts';
 	self.title = 'Statistics';
 	self.url = '/statistics';
 	self.render = function () {
@@ -2203,6 +2212,7 @@ function PageHandler() {
 
 function ChannelsHandler() {
 	var self = this;
+	self.pageName = 'channels';
 	Page.call(self);
 	self.url = '/chat/';
 	self.render = self.show;
@@ -2228,7 +2238,7 @@ function ChannelsHandler() {
 		imgInputIcon: $('imgInputIcon'),
 		usersStateText: $('usersStateText'),
 		inviteUser: $('inviteUser'),
-		navCallIcon: $('navCallIcon'),
+		navCallIcon: navCallIcon,
 		webRtcFileIcon: $('webRtcFileIcon'),
 		m2Message: $('m2Message')
 	};
@@ -2897,6 +2907,16 @@ function ChannelsHandler() {
 		CssUtils.removeClass(self.dom.activeUserContext, 'active-user');
 	};
 	self.init();
+	self.superShow = self.show;
+	self.superHide = self.hide;
+	self.show = function() {
+		self.superShow();
+		CssUtils.showElement(navCallIcon);
+	};
+	self.hide = function() {
+		self.superHide();
+		CssUtils.hideElement(navCallIcon);
+	}
 }
 
 
@@ -3886,7 +3906,6 @@ function CallHandler(roomId) {
 		self.dom.fs.share.title = title;
 	};
 	self.setAudio = function (value) {
-		CssUtils.setVisibility(self.dom.microphones, value);
 		self.constraints.audio = value;
 		if (!value) {
 			self.dom.microphoneLevel.value = 0;

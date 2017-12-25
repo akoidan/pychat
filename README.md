@@ -84,8 +84,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 TODO
 ====
-* Painter bug if we change to report issue and click send, it goes to wrong area
-* icon-webrtc-nomic is absent
 * implement Google/Facebook OAuth using redirect instead of popup screen
 * Wrong message order, that prevents of successful webrtc connection: https://github.com/leporo/tornado-redis/issues/106 https://stackoverflow.com/questions/47496922/tornado-redis-garantee-order-of-published-messages
 * No sound in call https://bugs.chromium.org/p/chromium/issues/detail?id=604523
