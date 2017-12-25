@@ -34,11 +34,7 @@ Database migrations
 ===================
 I use standard [django migrations](https://docs.djangoproject.com/en/1.11/topics/migrations/) tools. So if you updated you branch from my repository and database has changed you need to `./manage.py makemigration` and  `./manage.py migrate`. If automatic migration didn't work I also store migrations in [djangochat-config/migration](https://github.com/Deathangel908/djangochat-config/tree/master/migrations).  So you might take a look if required migration is there before exeuting commands. Don't forget to change `Migration.dependencies[]` and rename the file if you get migration from my repo.
 
-WEB Rtc connection establishment
-===============================
-The successful connection produces logs below in console
-
-SCREEN_SHARE
+Screen Share
 ============
 ScreenShare is only available for chrome atm. It uses `chrome.desktopCapture` feature that is available only via extension. The extension folder is located under [screen_cast_extension](screen_cast_extension)`.
 If you want to locally test it:
@@ -52,6 +48,9 @@ Tp publish extension:
  - Zip [screen_cast_extension](screen_cast_extension) directory into e.g. `extension.zip`
  - Upload archive `extension.zip` to [chrome webstore](https://chrome.google.com/webstore/developer/dashboard) (Note, you need to have a developer account, that's 5$ worth atm).
 
+WEB Rtc connection establishment
+===============================
+The successful connection produces logs below in console
 
 Sender:
 ```
