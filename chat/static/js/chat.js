@@ -4136,6 +4136,8 @@ function CallHandler(roomId) {
 			var message;
 			if (!isChrome) {
 				rej("ScreenCast feature is only available from chrome atm")
+			} else if (isMobile) {
+				rej("ScreenCast is not available for mobile phones yet")
 			} else {
 				Utils.pingExtension(function (success) {
 					self.log("Ping to extension succeeded")();
@@ -4503,11 +4505,7 @@ function CallHandler(roomId) {
 				tracks[i].stop()
 			}
 		}
-		chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
-			type: 'PYCHAT_SCREEN_SHARE_CANCEL'
-		}, function (response) {
-			self.log("PYCHAT_SCREEN_SHARE_CANCEL response {}", response)();
-		});
+		Utils.stopDesktopCapture();
 	};
 	self.closeEvents = function (text) {
 		if (text) {
@@ -4556,7 +4554,9 @@ function CallHandler(roomId) {
 		self.dom.videoContainer.requestFullscreen();
 		CssUtils.addClass(self.dom.videoContainer, 'fullscreen');
 		document.addEventListener('mousemove', self.fsMouseMove, false);
-		self.hideContainerTimeoutRes = setInterval(self.hideContainerTimeout, 1000);
+		if (!isMobile) {
+			self.hideContainerTimeoutRes = setInterval(self.hideContainerTimeout, 1000);
+		}
 		/*to clear only function from resultOf setInterval should be passed, otherwise doesn't work*/
 	};
 	self.fsMouseMove = function () {
@@ -5391,19 +5391,32 @@ var Utils = {
 		video.src = "";
 		video.load()
 	},
-	pingExtension: function(cb) {
-		var triggered = false;
-		var timedCB = setTimeout(function () {
-			!triggered && cb(false);
-			triggered = true;
-		}, 500);
+	pingExtension: function (cb) {
+		if (chrome.runtime && chrome.runtime.sendMessage) {
+			var triggered = false;
+			var timedCB = setTimeout(function () {
+				!triggered && cb(false);
+				triggered = true;
+			}, 500);
 
-		chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
-			type: 'PYCHAT_SCREEN_SHARE_PING'
-		}, function (response) {
-			!triggered && cb(response && response.data === 'success');
-			clearTimeout(timedCB);
-		});
+			chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
+				type: 'PYCHAT_SCREEN_SHARE_PING'
+			}, function (response) {
+				!triggered && cb(response && response.data === 'success');
+				clearTimeout(timedCB);
+			});
+		} else {
+			cb(false)
+		}
+	},
+	stopDesktopCapture: function () {
+		if (typeof chrome != 'undefined' && chrome.runtime && chrome.runtime.sendMessage) {
+			chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
+				type: 'PYCHAT_SCREEN_SHARE_CANCEL'
+			}, function (response) {
+
+			});
+		}
 	},
 	getDesktopCapture: function(cb) {
 		chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
