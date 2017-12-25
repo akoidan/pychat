@@ -4075,6 +4075,7 @@ function CallHandler(roomId) {
 		if (self.isActive()) {
 			self.captureInput(function (stream, success) {
 				if (success) {
+					self.stopLocalStream();
 					self.attachLocalStream(stream);
 					for (var pcName in self.peerConnections) {
 						if (!self.peerConnections.hasOwnProperty(pcName)) continue;
