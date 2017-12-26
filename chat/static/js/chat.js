@@ -2304,7 +2304,7 @@ function ChannelsHandler() {
 		var liEl = tagName == 'I' || tagName == 'SPAN' ? target.parentNode : target;
 		var roomId = parseInt(liEl.getAttribute(self.ROOM_ID_ATTR));
 		if (CssUtils.hasClass(target, CANCEL_ICON_CLASS_NAME)) {
-			wsHandler.sendToServer({
+			wsHandler.sendPreventDuplicates({
 				action: 'deleteRoom',
 				roomId: roomId
 			});
@@ -5311,6 +5311,7 @@ function WebRtcApi() {
 function WsHandler() {
 	var self = this;
 	self.wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 9 - connected;
+	self.duplicates = {};
 	self.dom = {
 		onlineStatus: $('onlineStatus'),
 		onlineClass: 'online',
@@ -5348,6 +5349,9 @@ function WsHandler() {
 	};
 	self.sendToServer = function (messageRequest) {
 		var jsonRequest = JSON.stringify(messageRequest);
+		return self.sendRawTextToServer(jsonRequest);
+	};
+	self.sendRawTextToServer = function(jsonRequest) {
 		var logEntry = jsonRequest.substring(0, 500);
 		if (self.ws.readyState !== WebSocket.OPEN) {
 			logger.warn("Web socket is closed. Can't send {}", logEntry)();
@@ -5359,7 +5363,18 @@ function WsHandler() {
 			return true;
 		}
 	};
-
+	self.sendPreventDuplicates = function (data) {
+		var jsonRequest = JSON.stringify(data);
+		if (!self.duplicates[jsonRequest]) {
+			self.duplicates[jsonRequest] = Date.now();
+			self.sendRawTextToServer(jsonRequest)
+			setTimeout(function () {
+				delete self.duplicates[jsonRequest];
+			}, 5000);
+		} else {
+			logger.warn("WS blocked duplicate from sending: {}", jsonRequest)();
+		}
+	}
 	self.setStatus = function (isOnline) {
 		var statusClass = isOnline ? self.dom.onlineClass : self.dom.offlineClass;
 		CssUtils.setOnOf(self.dom.onlineStatus, statusClass, [self.dom.onlineClass, self.dom.offlineClass]);
