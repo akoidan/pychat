@@ -2759,11 +2759,14 @@ function ChannelsHandler() {
 			self[message.action](message);
 		} else if (message.handler === 'chat') {
 			var channelHandler = self.channels[message.channel];
-			if (!channelHandler) {
+			if (channelHandler) {
+				channelHandler[message.action](message);
+				self.executePostUserAction(message);
+			} else if (message.action == 'removeOnlineUser') {
+				logger.info("Skipping removing online user cause channel {} could have been destroyed", message.channel)();
+			} else {
 				throw 'Unknown channel {} for message "{}"'.format(message.channel, JSON.stringify(message));
 			}
-			channelHandler[message.action](message);
-			self.executePostUserAction(message);
 		}
 	};
 	self.executePostUserAction = function (message) {
