@@ -3851,7 +3851,8 @@ function CallHandler(roomId) {
 	var self = this;
 	BaseTransferHandler.call(self);
 	self.acceptedPeers = [];
-	self.callTimeoutTime = 60000;
+	self.CALL_TIMEOUT_NO_ANSWER = 60000;
+	self.CALL_TIMEOUT_NO_USERS = 4000;
 	self.visible = true;
 	self.roomId = roomId;
 	self.audioProcessor = null;
@@ -4337,6 +4338,7 @@ function CallHandler(roomId) {
 				var id = webRtcApi.addCallHandler(self);
 				self.sendOffer(id);
 				self.setTimeout();
+				self.setNoAnswerTimeout();
 			} else if (stream) {
 				self.destroyStreamData(stream);
 			}
@@ -4488,6 +4490,7 @@ function CallHandler(roomId) {
 		self.setIconState(true);
 	};
 	self.onreplyCall = function (message) {
+		self.clearNoAnswerTimeout()
 		self.createCallPeerConnection(message);
 		if (self.callPopup) { // if we're not call initiator
 			self.callPopupTable[message.opponentWsId] = self.callPopup.inserRow("Called:", message.user);
@@ -4514,16 +4517,30 @@ function CallHandler(roomId) {
 	self.setTimeout = function () {
 		self.timeoutFunnction = setTimeout(function () {
 			self.log("Closing CallHandler by timeout")();
-			self.hangUp();
-		}, self.callTimeoutTime);
+			self.hangUp(null, "Finishing the call because no one picked the phone");
+		}, self.CALL_TIMEOUT_NO_ANSWER);
+	};
+	self.setNoAnswerTimeout = function () {
+		self.timeoutFunctionNoUsers = setTimeout(function () {
+			self.log("Closing CallHandler because no users found")();
+			self.hangUp(null, "Finishing the call because no one is online in this channel");
+		}, self.CALL_TIMEOUT_NO_USERS);
 	};
 	self.clearTimeout = function () {
-		self.log("Removed timeout to autohang")();
 		if (self.timeoutFunnction) {
+			self.log("Removed 60s timeout")();
 			clearTimeout(self.timeoutFunnction);
 			self.timeoutFunnction = null;
 		}
+		self.clearNoAnswerTimeout();
 	};
+	self.clearNoAnswerTimeout = function() {
+		if (self.timeoutFunctionNoUsers) {
+			self.log("Removed 5s timeout")();
+			clearTimeout(self.timeoutFunctionNoUsers);
+			self.timeoutFunctionNoUsers = null;
+		}
+	}
 	self.initAndDisplayOffer = function (message, channelName) {
 		self.callInProggress = true;
 		self.setTimeout();
@@ -4553,12 +4570,12 @@ function CallHandler(roomId) {
 			self.acceptedPeers.push(message.opponentWsId);
 		}
 	};
-	self.hangUp = function () {
+	self.hangUp = function (e, reason) {
 		self.clearTimeout();
 		var wereConn = self.closeAllPeerConnections("Call is finished.");
 		if (!wereConn) { // last peerConnection will call self.closeEvents
 			// if there were no any - we call it manually
-			self.closeEvents("Call is finished.")
+			self.closeEvents(reason || "Call is finished.")
 		}
 		self.decline();
 	};
