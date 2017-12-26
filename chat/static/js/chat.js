@@ -3610,6 +3610,7 @@ function ReceiverPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 
 function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerReferenceFn) {
 	var self = this;
+	self.sendRtcDataQueue = [];
 	self.opponentWsId = opponentWsId;
 	self.connectionId = connectionId;
 	self.pc = null;
@@ -3636,18 +3637,24 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 		self.log("Call message {}", JSON.stringify(message))();
 	};
 	self.onsendRtcData = function (message) {
-		var data = message.content;
-		self.log("onsendRtcData")();
-		if (self.pc.iceConnectionState && self.pc.iceConnectionState !== 'closed') {
-			if (data.sdp) {
-				self.pc.setRemoteDescription(new RTCSessionDescription(data), self.handleAnswer, self.failWebRtc('setRemoteDescription'));
-			} else if (data.candidate) {
-				self.pc.addIceCandidate(new RTCIceCandidate(data));
-			} else if (data.message) {
-				growlInfo(data.message);
-			}
+		if (!self.connectedToRemote) {
+			self.log("Connection is not accepted yet, pushing data to queue")();
+			self.sendRtcDataQueue.push(message); // TODO https://stackoverflow.com/questions/47496922/tornado-redis-garantee-order-of-published-messages
+			return;
 		} else {
-			self.logErr("Skipping ws message for closed connection")();
+			var data = message.content;
+			self.log("onsendRtcData")();
+			if (self.pc.iceConnectionState && self.pc.iceConnectionState !== 'closed') {
+				if (data.sdp) {
+					self.pc.setRemoteDescription(new RTCSessionDescription(data), self.handleAnswer, self.failWebRtc('setRemoteDescription'));
+				} else if (data.candidate) {
+					self.pc.addIceCandidate(new RTCIceCandidate(data));
+				} else if (data.message) {
+					growlInfo(data.message);
+				}
+			} else {
+				self.logErr("Skipping ws message for closed connection")();
+			}
 		}
 	};
 	self.createPeerConnection = function () {
@@ -4517,7 +4524,14 @@ function CallHandler(roomId) {
 	self.onacceptCall = function (message) {
 		if (self.accepted) {
 			self.clearTimeout(); // if we're call initiator
-			self.peerConnections[message.opponentWsId].connectToRemote(self.localStream);
+			var pc = self.peerConnections[message.opponentWsId];
+			pc.connectToRemote(self.localStream);
+			if (pc.sendRtcDataQueue.length > 0) {
+				self.log("Connection accepted, consuming sendRtcDataQueue")();
+				var queue = pc.sendRtcDataQueue;
+				pc.sendRtcDataQueue = [];
+				queue.forEach(pc.onsendRtcData);
+			}
 		} else {
 			self.callPopupTable[message.opponentWsId].textContent = 'Talking:';
 			self.acceptedPeers.push(message.opponentWsId);
@@ -5074,10 +5088,12 @@ function CallSenderPeerConnection(connectionId,
 											 userName,
 											 getSpeakerId) {
 	var self = this;
+ self.connectedToRemote = false;
 	SenderPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
 	CallPeerConnection.call(self, remoteVideo, userName, onStreamAttached, getSpeakerId);
 	self.log("Created CallSenderPeerConnection")();
 	self.connectToRemote = function (stream) {
+   self.connectedToRemote = true;
 		self.createPeerConnection(stream);
 		self.createOffer();
 	}
@@ -5092,10 +5108,12 @@ function CallReceiverPeerConnection(connectionId,
 												userName,
 												getSpeakerId) {
 	var self = this;
+ self.connectedToRemote = false;
 	ReceiverPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
 	CallPeerConnection.call(self, videoContainer, userName, onStreamAttached, getSpeakerId);
 	self.log("Created CallReceiverPeerConnection")();
 	self.connectToRemote = function (stream) {
+   self.connectedToRemote = true;
 		self.createPeerConnection(stream);
 	}
 }
