@@ -2832,7 +2832,7 @@ function ChannelsHandler() {
 			}
 		}
 		self.dom.usersStateText.onclick = self.toggleChannelOfflineOnline;
-		self.dom.usersStateText.click();
+		self.dom.usersStateText.textContent = 'Channel Users';
 	};
 	self.minifyList = function (event) {
 		var minifier = self.dom.minifier[event.target.getAttribute('name')];
