@@ -11,6 +11,7 @@
 		var CHANGE_PROFILE_JS_URL = "{% md5url 'js/profile.js' %}";
 		var STATISTICS_JS_URL = "{% md5url  'js/statistic.js' %}";
 		var loggedUser = "{{ username }}";
+		var DEFAULT_CHANNEL_NAME = "{{ defaultRoomId }}";
 		var loggedUserId = {{ userid }};
 		var NOTIFICATION_ICON_URL = "{% md5url 'images/favicon.ico' %}";
 		var suggestions = {{ suggestions |yesno:"true,false" }};
