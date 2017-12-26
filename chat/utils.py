@@ -80,7 +80,7 @@ def update_room(room_id, disabled):
 
 def create_room(self_user_id, user_id):
 	# get all self private rooms ids
-	user_rooms = Room.users.through.objects.filter(user_id=self_user_id, room__name__isnull=True).values('room_id')
+	user_rooms = evaluate(Room.users.through.objects.filter(user_id=self_user_id, room__name__isnull=True).values('room_id'))
 	# get private room that contains another user from rooms above
 	if user_rooms and self_user_id == user_id:
 		room_id = create_self_room(self_user_id,user_rooms)

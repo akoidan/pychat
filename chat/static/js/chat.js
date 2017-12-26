@@ -2,7 +2,6 @@ var CONNECTION_RETRY_TIME = 5000;
 var SYSTEM_HEADER_CLASS = 'message-header-system';
 var TIME_SPAN_CLASS = 'timeMess';
 var CONTENT_STYLE_CLASS = 'message-text-style';
-var DEFAULT_CHANNEL_NAME = 1;
 // used in ChannelsHandler and ChatHandler
 var USER_ID_ATTR = 'userid';
 var SELF_HEADER_CLASS = 'message-header-self';
@@ -15,12 +14,14 @@ var MAX_ACCEPT_FILE_SIZE_WO_FS_API = Math.pow(2, 28); // 256 MB
 var SYSTEM_USERNAME = 'System';
 var CANCEL_ICON_CLASS_NAME = 'icon-cancel-circled-outline';
 var PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
+var OFFLINE_CLASS = 'offline';
 var GENDER_ICONS = {
 	'Male': 'icon-man',
 	'Female': 'icon-girl',
 	'Secret': 'icon-user-secret'
 };
 var navCallIcon;
+var directUserTable;
 var audioProcesssors = [];
 var smileUnicodeRegex = /[\u3400-\u3500]/g;
 var imageUnicodeRegex = /[\u3501-\u3600]/g;
@@ -50,6 +51,7 @@ onDocLoad(function () {
 	headerText = $('headerText');
 	chatFileAudio = $('chatFile');
 	chatTestVolume = $('chatTestVolume');
+	directUserTable = $('directUserTable');
 	minimizedWindows = new MinimizedWindows();
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	channelsHandler = new ChannelsHandler();
@@ -2233,7 +2235,7 @@ function ChannelsHandler() {
 		addUserList: $('addUserList'),
 		addUserInput: $('addUserInput'),
 		addRoomButton: $('addRoomButton'),
-		directUserTable: $('directUserTable'),
+		directUserTable: directUserTable,
 		imgInput: $('imgInput'),
 		imgInputIcon: $('imgInputIcon'),
 		usersStateText: $('usersStateText'),
@@ -2592,7 +2594,7 @@ function ChannelsHandler() {
 		self.createNewRoomChatHandler(message.roomId, message.name, message.content);
 	};
 	self.fillAddUser = function (excludeUsersId) {
-		self.dom.addUserList.innerHTML = '';
+		CssUtils.deleteChildren(self.dom.addUserList);
 		self.addUserUsersList = {};
 		var allUsers = self.getAllUsersInfo();
 		for (var userId in allUsers) {
@@ -2608,10 +2610,9 @@ function ChannelsHandler() {
 		if (self.dom.addUserList.childNodes.length === 0) return true;
 	};
 	self.getDirectMessagesUserIds = function () {
-		var els = document.querySelectorAll('#directUserTable li');
 		var res = {};
-		for (var i = 0; i < els.length; i++) {
-			var userId = els[i].getAttribute(USER_ID_ATTR);
+		for (var i = 0; i < directUserTable.children.length; i++) {
+			var userId = directUserTable.children[i].getAttribute(USER_ID_ATTR);
 			res[userId] = true;
 		}
 		return res;
@@ -2630,6 +2631,9 @@ function ChannelsHandler() {
 	};
 	self.getAllUsersInfo = function () {
 		return self.channels[DEFAULT_CHANNEL_NAME].allUsers;
+	};
+	self.getOnlineUsersIds = function () {
+		return self.channels[DEFAULT_CHANNEL_NAME].onlineUsers;
 	};
 	self.filterAddUser = function (event) {
 		var filterValue = self.dom.addUserInput.value;
@@ -2701,6 +2705,8 @@ function ChannelsHandler() {
 		var anotherUserId = self.getAnotherUserId(allUsersIds);
 		var roomName = users[anotherUserId].user;
 		var li = Utils.createUserLi(anotherUserId, users[anotherUserId].sex, roomName);
+		var oIds = self.getOnlineUsersIds() || [];
+		CssUtils.setClassToState(li, oIds.indexOf(parseInt(anotherUserId)) >= 0, OFFLINE_CLASS);
 		self.dom.directUserTable.appendChild(li);
 		self.createChannelChatHandler(roomId, li, users, roomName);
 		return anotherUserId;
@@ -2710,9 +2716,6 @@ function ChannelsHandler() {
 		self.dom.rooms.appendChild(li);
 		li.innerHTML = roomName;
 		self.createChannelChatHandler(roomId, li, users, roomName);
-	};
-	self.getCurrentRoomIDs = function () {
-
 	};
 	self.destroyChannel = function (channelKey) {
 		logger.info("Destroying channel {} while offline", channelKey)();
@@ -3205,7 +3208,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.addUserLi = function (userId, sex, username) {
 		var li = Utils.createUserLi(userId, sex, username);
-		li.className = 'offline';
+		li.className = OFFLINE_CLASS;
 		self.allUsers[userId].li = li;
 		self.dom.userList.appendChild(li);
 	};
@@ -3513,12 +3516,22 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			if (!self.allUsers.hasOwnProperty(userId)) continue;
 			var user = self.allUsers[userId];
 			if (self.onlineUsers.indexOf(parseInt(userId)) >= 0) {
-				CssUtils.removeClass(user.li, 'offline');
+				CssUtils.removeClass(user.li, OFFLINE_CLASS);
 			} else {
-				CssUtils.addClass(user.li, 'offline');
+				CssUtils.addClass(user.li, OFFLINE_CLASS);
 			}
 		}
+		self.setDirectChannelOnline();
 	};
+	self.setDirectChannelOnline = function() {
+		if (roomId == DEFAULT_CHANNEL_NAME) {
+			for (var i = 0; i < directUserTable.children.length; i++) {
+				var e = directUserTable.children[i];
+				var userid = parseInt(e.getAttribute('userid'));
+				CssUtils.setClassToState(e, self.onlineUsers.indexOf(userid) >= 0, OFFLINE_CLASS);
+			}
+		}
+	}
 	self.loadUpHistory = function (count) {
 		if (self.dom.chatBoxDiv.scrollTop === 0) {
 			var currentMillis = Date.now();
@@ -5298,7 +5311,7 @@ function WsHandler() {
 	self.dom = {
 		onlineStatus: $('onlineStatus'),
 		onlineClass: 'online',
-		offlineClass: 'offline'
+		offlineClass: OFFLINE_CLASS
 	};
 	self.wsConnectionId = '';
 	self.handlers = {
