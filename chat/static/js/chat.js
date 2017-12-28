@@ -4242,11 +4242,15 @@ function CallHandler(roomId) {
 		var endStream;
 		if (self.constraints.audio || self.constraints.video) {
 			var audio = self.constraints.audio
-			if (self.dom.microphones.value) {
+			if (self.dom.microphones.value && audio) {
 				audio = {deviceId: self.dom.microphones.value};
 			}
+			var video = self.constraints.video;
+			if (self.dom.cameras.value && video) {
+				video = {deviceId: self.dom.cameras.value};
+			}
 			prom = prom.then(function() {
-				return navigator.mediaDevices.getUserMedia({audio: audio, video: self.constraints.video});
+				return navigator.mediaDevices.getUserMedia({audio: audio, video: video});
 			}).then(function(stream) {
 				endStream = stream;
 				if (navigator.mediaDevices.enumerateDevices) {
