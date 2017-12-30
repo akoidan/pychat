@@ -26,6 +26,15 @@
 @mixin linear-gradient($begin, $end)
 	@include linear-gradient-values($begin 0%, $end 100%)
 
+@mixin linear-gradient-hover($color, $begin, $end)
+	color: $color
+	background-color: darken($begin, 5%)
+	@include linear-gradient-values($begin 0%, $end 100%)
+	&:hover
+		color: lighten($color, 15%)
+		background-color: lighten($begin, 5%)
+		@include linear-gradient-values(lighten($begin, 5%) 0%, $end 100%)
+
 @mixin linear-double-gradient($f1, $f2, $s1, $s2)
 	background-image: -webkit-linear-gradient($s1, $s2), -webkit-linear-gradient($f1, $f2)
 	background-image: -moz-linear-gradient($s1, $s2), -moz-linear-gradient($f1, $f2)
@@ -54,6 +63,13 @@
 	-webkit-flex: $value
 	-ms-flex: $value
 	flex: $value
+
+@mixin hover-click($color)
+	color: desaturate(darken($color, 8%), 15%)
+	-webkit-mask-image: -webkit-linear-gradient(top, rgba(0,0,0,1),rgba(0,0,0,0.5))
+	&:hover
+		text-shadow: 0 0 0.2em #575757
+		color: saturate(lighten($color, 8%), 15%)
 
 @mixin flex-direction($value...)
 	-webkit-flex-direction: $value
