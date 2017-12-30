@@ -18,6 +18,7 @@
 		var notifications = {{ notifications |yesno:"true,false" }};
 		var cacheMessages = {{ cache_messages |yesno:"true,false" }};
 	</script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Snowstorm/20131208/snowstorm-min.js"></script>
 	<script src="{% md5url "js/smileys_data.js" %}" async></script>
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
