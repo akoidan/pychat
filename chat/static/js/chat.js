@@ -4342,13 +4342,12 @@ function CallHandler(roomId) {
 		self.dom.headerText.innerHTML = text;
 	};
 	self.offerCall = function () {
-		self.accepted = true;
 		self.setHeaderText("Confirm browser to use your input devices for call");
 		self.captureInput(function (stream, success) {
 			if (success) {
 				self.attachLocalStream(stream);
 				self.setIconState(true);
-				self.setCallStatus('init');
+				self.setCallStatus('sent_offer');
 				self.setHeaderText("Establishing connection with room #{}".format(self.roomId));
 				var id = webRtcApi.addCallHandler(self);
 				self.sendOffer(id);
@@ -4383,28 +4382,6 @@ function CallHandler(roomId) {
 				' . Right click on volume icon in system tray -> record devices -> input -> microphone';
 		growlError('<div>Unable to capture input from microphone. Check your microphone connection or {}'
 				.format(url));
-	};
-	self.createAfterResponseCall = function () {
-		self.captureInput(function (stream) {
-			self.attachLocalStream(stream);
-			wsHandler.sendToServer({
-				action: 'acceptCall',
-				connId: self.connectionId
-			})
-			self.accepted = true;
-			self.acceptedPeers.forEach(function (e) {
-				if (self.peerConnections[e]) {
-					self.peerConnections[e].connectToRemote(self.localStream);
-				} else {
-					self.logErr("Unable to get pc with id {}, available peer connections are {}, accepted peers are {}",
-							e, Object.keys(self.peerConnections), self.acceptedPeers.toString())();
-				}
-			});
-		}, true);
-		self.setIconState(true);
-		self.setCallStatus('init');
-		channelsHandler.setActiveChannel(self.roomId);
-		self.show(true);
 	};
 	self.getTrack = function (kind) {
 		var track = null;
@@ -4491,7 +4468,7 @@ function CallHandler(roomId) {
 			self.acceptedPeers.splice(index, 1);
 			self.log("Removed {} from acceptedPeers, current acceptedPeers are {}", id, self.acceptedPeers.toString())();
 		}
-		if (!self.accepted) {
+		if (self.getCallStatus() == 'accepted') {
 			if (self.callPopupTable[id]) {
 				self.callPopupTable[id].textContent = 'Declined';
 			}
@@ -4529,8 +4506,26 @@ function CallHandler(roomId) {
 	self.accept = function () {
 		self.clearTimeout();
 		self.callPopup.hide();
-		self.createAfterResponseCall();
-		self.timeoutFunctionNoUsers = setTimeout(function() {
+		self.setCallStatus('accepted');
+		self.captureInput(function (stream) {
+			self.attachLocalStream(stream);
+			wsHandler.sendToServer({
+				action: 'acceptCall',
+				connId: self.connectionId
+			})
+			self.acceptedPeers.forEach(function (e) {
+				if (self.peerConnections[e]) {
+					self.peerConnections[e].connectToRemote(self.localStream);
+				} else {
+					self.logErr("Unable to get pc with id {}, available peer connections are {}, accepted peers are {}",
+							e, Object.keys(self.peerConnections), self.acceptedPeers.toString())();
+				}
+			});
+		}, true);
+		self.setIconState(true);
+		channelsHandler.setActiveChannel(self.roomId);
+		self.show(true);
+		self.timeoutFunctionNoUsers = setTimeout(function () {
 			if (self.getCallStatus() != 'running') {
 				self.hangUp(null, "No call opponents found");
 			}
@@ -4566,7 +4561,7 @@ function CallHandler(roomId) {
 		}
 	}
 	self.initAndDisplayOffer = function (message, channelName) {
-		self.setCallStatus('init');
+		self.setCallStatus('received_offer');
 		self.setTimeout();
 		self.connectionId = message.connId;
 		self.log("CallHandler initialized")();
@@ -4579,7 +4574,7 @@ function CallHandler(roomId) {
 		self.showOffer(message, channelName);
 	};
 	self.onacceptCall = function (message) {
-		if (self.accepted) {
+		if (self.getCallStatus() != 'received_offer') {
 			self.clearTimeout(); // if we're call initiator
 			var pc = self.peerConnections[message.opponentWsId];
 			pc.connectToRemote(self.localStream);
@@ -4624,7 +4619,6 @@ function CallHandler(roomId) {
 		}
 		// if somebody sent us destroyConnection event, b4 timeout fired
 		self.clearTimeout();
-		self.accepted = false;
 		self.setIconState(false);
 		self.setCallStatus('closed');
 		self.callPopupTable = {};
@@ -5315,7 +5309,6 @@ function WebRtcApi() {
 		}
 		var handler = chatHandler.createCallHandler();
 		if (handler) {
-			handler.accepted = true;
 			self.connections[message.connId] = handler;
 			handler.initAndDisplayOffer(message, chatHandler.roomName);
 		} else {
