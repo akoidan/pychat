@@ -3944,7 +3944,7 @@ function CallHandler(roomId) {
 	self.setDesktopCapture = function (value) {
 		self.constraints.share = value;
 		CssUtils.setClassToState(self.dom.shareScreen, value, 'callActiveIcon');
-		self.dom.fs.share.className = value ? "icon-webrtc-mic" : "icon-webrtc-nomic";
+		self.dom.fs.share.className = value ? "icon-desktop" : "icon-no-desktop";
 		var title = value ? "Capture your desktop screen and start sharing it" : "Turn off screen sharing";
 		self.dom.shareScreen.title = title;
 		self.dom.fs.share.title = title;

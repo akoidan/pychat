@@ -1007,12 +1007,18 @@ fieldset
 	position: absolute
 	bottom: 2vh
 	left: 2vw
-	i:hover:before, .icon-webrtc-nomic:before, .icon-webrtc-novideo:before
-		background-color: rgba(88, 143, 255, 0.6)
-		opacity: 1
-		color: white
-		box-shadow: 6px 6px 36px #666
+	i:hover, .icon-webrtc-mic, .icon-webrtc-video, .icon-desktop
+		&:before
+			background-color: rgba(88, 143, 255, 0.6)
+			opacity: 1
+			color: white
+			box-shadow: 6px 6px 36px #666
 
+	i.icon-desktop, i.icon-no-desktop
+		font-size: 25px
+		&:before
+			padding-top: 13px !important
+			padding-bottom: 3px !important
 	i.icon-webrtc-hangup:hover:before
 		background: rgba(217, 24, 24, 0.6)
 	> i
