@@ -7,6 +7,7 @@
 		var CHROME_EXTENSION_URL = "{{ extensionUrl }}";
 		var MOMENT_JS_URL = "{% md5url 'js/moment.js' %}";
 		var PICKADAY_JS_URL = "{% md5url 'js/pikaday.js' %}";
+		var SMILEY_URL = "{% md5url 'smileys' %}";
 		var AMCHART_URL = "{% md5url 'js/amcharts-all.js' %}";
 		var CHANGE_PROFILE_JS_URL = "{% md5url 'js/profile.js' %}";
 		var STATISTICS_JS_URL = "{% md5url  'js/statistic.js' %}";
@@ -18,7 +19,6 @@
 		var notifications = {{ notifications |yesno:"true,false" }};
 		var cacheMessages = {{ cache_messages |yesno:"true,false" }};
 	</script>
-	<script src="{% md5url "js/smileys_data.js" %}" async></script>
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}

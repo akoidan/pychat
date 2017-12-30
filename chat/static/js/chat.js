@@ -2940,14 +2940,13 @@ function SmileyUtil() {
 	self.smileyDict = {};
 	self.inited = false;
 	self.init = function (smileys_bas64_data) {
-		if (self.inited) {
-			return;
-		}
 		self.dom.iconSmile.addEventListener('click', self.toggleSmileys, true);
 		self.dom.tabNames.addEventListener('click', self.showTabByName, true);
 		self.dom.smileParentHolder.addEventListener('click', self.addSmile, true);
 		self.inited = true;
-		self.loadSmileys(smileys_bas64_data);
+		doGet(SMILEY_URL+'/info.json', function(smileys_bas64_data) {
+			self.loadSmileys(smileys_bas64_data);
+		})
 		userMessage.addEventListener("click", function (event) {
 			event.stopPropagation(); // Don't fire onDocClick
 		});
@@ -3034,21 +3033,21 @@ function SmileyUtil() {
 			self.dom.smileParentHolder.appendChild(tabRef);
 
 			var tabSmileys = smileyData[tab];
-			for (var smile in tabSmileys) {
-				if (!tabSmileys.hasOwnProperty(smile)) continue;
+			tabSmileys.forEach(function(smile) {
 				var fileRef = document.createElement('IMG');
-				var fullSmileyUrl = "data:image/gif;base64," + tabSmileys[smile].base64;
+				var fullSmileyUrl = SMILEY_URL + '/'+tab+'/'+smile.src;
 				fileRef.setAttribute("src", fullSmileyUrl);
-				fileRef.setAttribute("code", smile);
-				fileRef.setAttribute("alt", tabSmileys[smile].text_alt);
+				fileRef.setAttribute("code", smile.code);
+				fileRef.setAttribute("alt", smile.text_alt);
 				tabRef.appendChild(fileRef);
 				// http://stackoverflow.com/a/1750860/3872976
 				/** encode dict key, so {@link encodeSmileys} could parse smileys after encoding */
-				self.smileyDict[encodeHTML(smile)] = fileRef.outerHTML;
-			}
+				self.smileyDict[encodeHTML(smile.code)] = fileRef.outerHTML;
+			});
 		}
 		self.showTabByName(Object.keys(smileyData)[0]);
 	};
+	self.init();
 }
 
 

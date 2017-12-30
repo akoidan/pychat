@@ -648,7 +648,11 @@ function doGet(fileUrl, callback) {
 					if (xobj.status === 200) {
 						logger.http('GET in','{} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100))();
 						if (callback) {
-							callback(xobj.responseText);
+							if (fileType === 'json') {
+								callback(JSON.parse(xobj.responseText))
+							} else {
+								callback(xobj.responseText);
+							}
 						}
 					} else {
 						logger._http("Unable to load {}, response code is '{}', response: {}", fileUrl, xobj.status, xobj.response )();
