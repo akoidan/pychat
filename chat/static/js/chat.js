@@ -3147,7 +3147,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		if (self.callHandler && self.callHandler.callInProggress) {
 			return false;
 		} else if (self.callHandler) {
-			self.callHandler.closeEvents();
 			return self.callHandler;
 		} else {
 			self.callHandler = new CallHandler(self.roomId);
@@ -4530,11 +4529,11 @@ function CallHandler(roomId) {
 		self.clearTimeout();
 		self.callPopup.hide();
 		self.createAfterResponseCall();
-		setTimeout(function() {
+		self.timeoutFunctionNoUsers = setTimeout(function() {
 			if (!self.isAnyConnectionsActive()) {
 				self.hangUp(null, "No call opponents found");
 			}
-		}, 3000);
+		}, self.CALL_TIMEOUT_NO_USERS);
 	};
 	self.setTimeout = function () {
 		self.timeoutFunnction = setTimeout(function () {
@@ -4558,7 +4557,7 @@ function CallHandler(roomId) {
 	};
 	self.clearNoAnswerTimeout = function() {
 		if (self.timeoutFunctionNoUsers) {
-			self.log("Removed 5s timeout")();
+			self.log("Removed 3s timeout")();
 			clearTimeout(self.timeoutFunctionNoUsers);
 			self.timeoutFunctionNoUsers = null;
 		}
@@ -5212,7 +5211,11 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 	};
 	self.oniceconnectionstatechange = function () {
 		if (self.pc.iceConnectionState === 'disconnected') {
-			self.closeEvents('Connection has been lost');
+			self.log("Peer connection has been lost, setting timeout to destroy current handler")();
+			self.timeoutedPeerConnectionDisconnected = setTimeout(function() {
+				// give a chance destroyEvent to close connection first
+				self.closeEvents('Connection has been lost');
+			}, 1000)
 		}
 	};
 	self.createPeerConnectionParent = self.createPeerConnection;
@@ -5248,6 +5251,11 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 		}
 	};
 	self.closeEvents = function (reason) {
+		if (self.timeoutedPeerConnectionDisconnected) {
+			clearTimeout(self.timeoutedPeerConnectionDisconnected);
+			self.timeoutedPeerConnectionDisconnected = null;
+			self.log("Removing peer connection lost closeEvents timeout")();
+		}
 		self.log('Destroying CallPeerConnection because', reason)();
 		self.closePeerConnection();
 		self.removeAudioProcessor();
