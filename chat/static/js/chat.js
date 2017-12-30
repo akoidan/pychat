@@ -3144,7 +3144,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		return self.callHandler;
 	};
 	self.createCallHandler = function () {
-		if (self.callHandler && self.callHandler.callInProggress) {
+		if (self.callHandler && ['new', 'closed'].indexOf(self.callHandler.getCallStatus()) < 0) {
 			return false;
 		} else if (self.callHandler) {
 			return self.callHandler;
@@ -3629,6 +3629,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	self.opponentWsId = opponentWsId;
 	self.connectionId = connectionId;
 	self.pc = null;
+	self.connectionStatus = 'new';
 	self.removeChildPeerReference = removeChildPeerReferenceFn;
 	var webRtcUrl = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 	self.pc_config = {iceServers: [{url: webRtcUrl}]};
@@ -3638,6 +3639,13 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 			{RtpDataChannels: false /*true*/}
 		]
 	};
+	self.setConnectionStatus = function(newStatus) {
+		self.connectionStatus = newStatus;
+		self.log("Setting connection status to {}", newStatus)();
+	},
+	self.getConnectionStatus = function() {
+		return self.connectionStatus;
+	}
 	self.log = function () {
 		var args = Array.prototype.slice.call(arguments);
 		args.unshift(self.connectionId + ":" + self.opponentWsId);
@@ -3687,6 +3695,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 		};
 	};
 	self.closePeerConnection = function (text) {
+		self.setConnectionStatus('closed');
 		if (self.pc && self.pc.signalingState !== 'closed') {
 			self.log("Closing peer connection")();
 			self.pc.close();
@@ -3750,19 +3759,6 @@ function BaseTransferHandler(removeReferenceFn) {
 		delete self.peerConnections[id];
 	};
 	self.peerConnections = {};
-	self.isAnyConnectionsActive = function() {
-		var hasConnections = false;
-		for (var pc in self.peerConnections) {
-			if (!self.peerConnections.hasOwnProperty(pc)) continue;
-			var peerConnection = self.peerConnections[pc];
-			if (peerConnection && peerConnection.pc
-					&& ["connected", "completed"].indexOf(peerConnection.pc.iceConnectionState) >= 0) {
-				hasConnections = true;
-				break
-			}
-		}
-		return hasConnections;
-	}
 	self.handle = function (data) {
 		if (data.handler === 'webrtcTransfer') {
 			self['on' + data.action](data);
@@ -3864,14 +3860,12 @@ function CallHandler(roomId) {
 	BaseTransferHandler.call(self);
 	self.acceptedPeers = [];
 	self.CALL_TIMEOUT_NO_ANSWER = 60000;
-	self.CALL_TIMEOUT_NO_USERS = 4000;
+	self.CALL_TIMEOUT_NO_USERS = 3000;
+	self.callStatus = 'new';
 	self.visible = true;
 	self.roomId = roomId;
 	self.audioProcessor = null;
 	self.callPopupTable = {};
-	self.setIsReceiver = function (isReceiver) {
-		self.accepted = !isReceiver;
-	};
 	self.dom = {
 		callAnswerText: $('callAnswerText'),
 		callContainer: $('callContainer'),
@@ -3922,13 +3916,27 @@ function CallHandler(roomId) {
 			roomNameLi.insertBefore(self.dom.phoneIcon, roomNameLi.firstChild);
 		}
 	};
+	self.getCallStatus = function() {
+		var hasPcActive = false;
+		for (var pcName in self.peerConnections) {
+			if (!self.peerConnections.hasOwnProperty(pcName)) continue;
+			var abstrPc = self.peerConnections[pcName].getConnectionStatus();
+			if (abstrPc == 'running') {
+				hasPcActive = true;
+			}
+		}
+		return hasPcActive ? 'running': self.callStatus;
+	}
+	self.setCallStatus = function(newStatus) {
+		self.log("Setting call status to {}", newStatus)();
+		self.callStatus = newStatus;
+	}
 	self.setIconState = function (isCall) {
 		if (isCall) {
 			self.showPhoneIcon()
 		} else {
 			self.hidePhoneIcon();
 		}
-		self.callInProggress = isCall;
 		CssUtils.setVisibility(self.dom.hangUpHolder, isCall);
 		CssUtils.setVisibility(self.dom.videoContainer, isCall);
 		CssUtils.setVisibility(self.dom.callIcon, !isCall);
@@ -4133,20 +4141,8 @@ function CallHandler(roomId) {
 	self.microphoneChanged = function(e) {
 			self.updateConnection();
 	};
-	self.isActive = function () {
-		var hasPcActive = false;
-		for (var pcName in self.peerConnections) {
-			if (!self.peerConnections.hasOwnProperty(pcName)) continue;
-			var abstrPc = self.peerConnections[pcName];
-			var pc = abstrPc.pc;
-			if (abstrPc.pc) {
-				hasPcActive = true;
-			}
-		}
-		return (self.localStream && self.localStream.active ) || hasPcActive;
-	};
 	self.updateConnection = function () {
-		if (self.isActive()) {
+		if (self.localStream && self.localStream.active || self.getCallStatus() == 'running') {
 			self.captureInput(function (stream, success) {
 				if (success) {
 					self.stopLocalStream();
@@ -4306,8 +4302,10 @@ function CallHandler(roomId) {
 		self.audioProcessor = Utils.createMicrophoneLevelVoice(stream, self.processAudio);
 	};
 	self.setCallIconsState = function () {
-			self.setVideo(self.getTrack('video') != null);
-			self.setAudio(self.getTrack('audio') != null);
+		var videoTrack = self.getTrack('video');
+		self.setVideo(videoTrack && videoTrack.enabled);
+		var audioTrack = self.getTrack('audio');
+		self.setAudio(audioTrack && audioTrack.enabled);
 			self.setDesktopCapture(self.getTrack('share') != null);
 			self.autoSetLocalVideoVisibility();
 		}
@@ -4350,6 +4348,7 @@ function CallHandler(roomId) {
 			if (success) {
 				self.attachLocalStream(stream);
 				self.setIconState(true);
+				self.setCallStatus('init');
 				self.setHeaderText("Establishing connection with room #{}".format(self.roomId));
 				var id = webRtcApi.addCallHandler(self);
 				self.sendOffer(id);
@@ -4403,6 +4402,7 @@ function CallHandler(roomId) {
 			});
 		}, true);
 		self.setIconState(true);
+		self.setCallStatus('init');
 		channelsHandler.setActiveChannel(self.roomId);
 		self.show(true);
 	};
@@ -4504,6 +4504,7 @@ function CallHandler(roomId) {
 	self.onStreamAttached = function (opponentWsId) { // TODO this is called multiple times for each peer connection
 		self.setHeaderText("Talking");
 		self.setIconState(true);
+		self.setCallStatus('in_proggress');
 	};
 	self.onreplyCall = function (message) {
 		self.clearNoAnswerTimeout()
@@ -4530,18 +4531,20 @@ function CallHandler(roomId) {
 		self.callPopup.hide();
 		self.createAfterResponseCall();
 		self.timeoutFunctionNoUsers = setTimeout(function() {
-			if (!self.isAnyConnectionsActive()) {
+			if (self.getCallStatus() != 'running') {
 				self.hangUp(null, "No call opponents found");
 			}
 		}, self.CALL_TIMEOUT_NO_USERS);
 	};
 	self.setTimeout = function () {
+		self.log("Created no answers timeout")();
 		self.timeoutFunnction = setTimeout(function () {
 			self.log("Closing CallHandler by timeout")();
 			self.hangUp(null, "Finishing the call because no one picked the phone");
 		}, self.CALL_TIMEOUT_NO_ANSWER);
 	};
 	self.setNoAnswerTimeout = function () {
+		self.log("Created no users timeout")();
 		self.timeoutFunctionNoUsers = setTimeout(function () {
 			self.log("Closing CallHandler because no users found")();
 			self.hangUp(null, "Finishing the call because no one is online in this channel");
@@ -4549,7 +4552,7 @@ function CallHandler(roomId) {
 	};
 	self.clearTimeout = function () {
 		if (self.timeoutFunnction) {
-			self.log("Removed 60s timeout")();
+			self.log("Removed no answers timeout")();
 			clearTimeout(self.timeoutFunnction);
 			self.timeoutFunnction = null;
 		}
@@ -4557,13 +4560,13 @@ function CallHandler(roomId) {
 	};
 	self.clearNoAnswerTimeout = function() {
 		if (self.timeoutFunctionNoUsers) {
-			self.log("Removed 3s timeout")();
+			self.log("Removed no users timeout")();
 			clearTimeout(self.timeoutFunctionNoUsers);
 			self.timeoutFunctionNoUsers = null;
 		}
 	}
 	self.initAndDisplayOffer = function (message, channelName) {
-		self.callInProggress = true;
+		self.setCallStatus('init');
 		self.setTimeout();
 		self.connectionId = message.connId;
 		self.log("CallHandler initialized")();
@@ -4623,6 +4626,7 @@ function CallHandler(roomId) {
 		self.clearTimeout();
 		self.accepted = false;
 		self.setIconState(false);
+		self.setCallStatus('closed');
 		self.callPopupTable = {};
 		webRtcApi.removeChildReference(self.connectionId);
 		self.dom.microphoneLevel.value = 0;
@@ -5211,11 +5215,13 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 	};
 	self.oniceconnectionstatechange = function () {
 		if (self.pc.iceConnectionState === 'disconnected') {
-			self.log("Peer connection has been lost, setting timeout to destroy current handler")();
+			self.log("Created connection lost timeout")();
 			self.timeoutedPeerConnectionDisconnected = setTimeout(function() {
 				// give a chance destroyEvent to close connection first
 				self.closeEvents('Connection has been lost');
 			}, 1000)
+		} else if (['completed', 'connected'].indexOf(self.pc.iceConnectionState) >= 0) {
+			self.setConnectionStatus('running');
 		}
 	};
 	self.createPeerConnectionParent = self.createPeerConnection;
@@ -5254,7 +5260,7 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 		if (self.timeoutedPeerConnectionDisconnected) {
 			clearTimeout(self.timeoutedPeerConnectionDisconnected);
 			self.timeoutedPeerConnectionDisconnected = null;
-			self.log("Removing peer connection lost closeEvents timeout")();
+			self.log("Removing connections lost timeout")();
 		}
 		self.log('Destroying CallPeerConnection because', reason)();
 		self.closePeerConnection();
@@ -5309,7 +5315,7 @@ function WebRtcApi() {
 		}
 		var handler = chatHandler.createCallHandler();
 		if (handler) {
-			handler.setIsReceiver(true);
+			handler.accepted = true;
 			self.connections[message.connId] = handler;
 			handler.initAndDisplayOffer(message, chatHandler.roomName);
 		} else {
