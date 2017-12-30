@@ -3751,6 +3751,19 @@ function BaseTransferHandler(removeReferenceFn) {
 		delete self.peerConnections[id];
 	};
 	self.peerConnections = {};
+	self.isAnyConnectionsActive = function() {
+		var hasConnections = false;
+		for (var pc in self.peerConnections) {
+			if (!self.peerConnections.hasOwnProperty(pc)) continue;
+			var peerConnection = self.peerConnections[pc];
+			if (peerConnection && peerConnection.pc
+					&& ["connected", "completed"].indexOf(peerConnection.pc.iceConnectionState) >= 0) {
+				hasConnections = true;
+				break
+			}
+		}
+		return hasConnections;
+	}
 	self.handle = function (data) {
 		if (data.handler === 'webrtcTransfer') {
 			self['on' + data.action](data);
@@ -4517,6 +4530,11 @@ function CallHandler(roomId) {
 		self.clearTimeout();
 		self.callPopup.hide();
 		self.createAfterResponseCall();
+		setTimeout(function() {
+			if (!self.isAnyConnectionsActive()) {
+				self.hangUp(null, "No call opponents found");
+			}
+		}, 3000);
 	};
 	self.setTimeout = function () {
 		self.timeoutFunnction = setTimeout(function () {
@@ -4576,12 +4594,12 @@ function CallHandler(roomId) {
 	};
 	self.hangUp = function (e, reason) {
 		self.clearTimeout();
-		var wereConn = self.closeAllPeerConnections("Call is finished.");
+		reason = reason || "Call is finished.";
+		var wereConn = self.closeAllPeerConnections(reason);
 		if (!wereConn) { // last peerConnection will call self.closeEvents
 			// if there were no any - we call it manually
-			self.closeEvents(reason || "Call is finished.")
+			self.closeEvents(reason)
 		}
-		self.decline();
 	};
 
 	self.stopLocalStream = function() {
@@ -4613,6 +4631,7 @@ function CallHandler(roomId) {
 		Utils.detachVideoSource(self.dom.local);
 		self.setHeaderText("Call finished");
 		self.stopLocalStream();
+		self.decline();
 	};
 	self.destroyAudioProcessor = function() {
 		if (self.audioProcessor && self.audioProcessor.javascriptNode && self.audioProcessor.javascriptNode.onaudioprocess) {
@@ -5581,6 +5600,10 @@ var Utils = {
 	},
 	createMicrophoneLevelVoice: function (stream, onaudioprocess) {
 		try {
+			if (isMobile) {
+				logger.info("Current phone is mobile, audio processor won't be created")();
+				return;
+			}
 			var audioTracks = stream && stream.getAudioTracks();
 			audioTracks = audioTracks.length > 0 ? audioTracks[0] : false;
 			if (!audioTracks) {
