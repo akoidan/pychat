@@ -1353,6 +1353,7 @@ function Painter() {
 				tool.span.innerHTML = '';
 			};
 			tool.onDeactivate = function () {
+				tool.onApply();
 				tool.enableApply();
 				CssUtils.hideElement(tool.span);
 			};
@@ -1493,6 +1494,7 @@ function Painter() {
 				CssUtils.showElement(tool.img);
 			};
 			tool.onDeactivate = function() {
+				tool.onApply();
 				self.resizer.hide();
 				CssUtils.hideElement(tool.img);
 			};
@@ -1541,7 +1543,7 @@ function Painter() {
 				if (!params.width || !params.height) {
 					self.resizer.hide();
 				} else {
-					tool.enableApply();
+					tool.onApply();
 				}
 
 			};
