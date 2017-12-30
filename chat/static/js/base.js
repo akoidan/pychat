@@ -253,7 +253,7 @@ function getUrlParam(name, url) {
 	if (!url) url = window.location.href;
 	name = name.replace(/[\[\]]/g, "\\$&");
 	// TODO encode "#" ? like new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)", "i"),
-	var regex = new RegExp("[?&]" + name + "(=([^&]*)|&|$)", "i"),
+	var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|$)", "i"),
 			results = regex.exec(url);
 	if (!results) return null;
 	if (!results[2]) return '';

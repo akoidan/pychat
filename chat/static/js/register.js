@@ -3,7 +3,6 @@ var registerForm;
 var recoverForm;
 var showLoginEl;
 var showRegisterEl;
-var auth2;
 var googleToken;
 var FBApiLoaded = false;
 var googleApiLoaded = false;
@@ -222,12 +221,30 @@ function initRegisterPage() {
 	showLoginEl.onclick = showLogin;
 	$('recoverPassword').onclick = showForgotPassword;
 	var initType = getUrlParam('type');
-	if (initType == 'login') {
+	googleInit(); //init auth so by the time users click on button api will be inited
+	// and when users tries to open a new popup window.event will still exist and popup won't get blocked
+	if (typeof FACEBOOK_JS_URL !== 'undefined') {
+		doGet(FACEBOOK_JS_URL, function () {
+			logger.info("Initing facebook sdk...")();
+			FB.init({
+				appId: FACEBOOK_APP_ID,
+				xfbml: true,
+				version: 'v2.7'
+			});
+			FBApiLoaded = true;
+		});
+	}
+	if (initType === 'login') {
 		showLogin();
-	} else if (initType == 'register') {
+	} else if (initType === 'register') {
 		showRegister();
-	} else if (initType == 'forgot') {
+	} else if (initType === 'forgot') {
 		showForgotPassword();
+	}
+	var lastOnError = window.onerror;
+	window.onerror = function() {
+		ajaxHide();
+		lastOnError.apply(this, arguments);
 	}
 }
 
@@ -270,73 +287,71 @@ function sendGoogleTokenToServer(token) {
 }
 
 
-function onGoogleSignIn() {
-	var googleUser = auth2.currentUser.get();
-	var profile = googleUser.getBasicProfile();
-	logger.info("Signed as {} with id {} and email {}  ",
-			profile.getName(), profile.getId(), profile.getEmail())();
-	googleToken = googleUser.getAuthResponse().id_token;
-	sendGoogleTokenToServer(googleToken);
+function googleLogin() {
+	if (!googleApiLoaded) {
+		growlError("Google authorizer is still initializing, wait a second...");
+		return;
+	}
+	ajaxShow();
+	var auth2 = gapi.auth2.getAuthInstance();
+
+	function onGoogleSignIn() {
+		var googleUser = auth2.currentUser.get();
+		var profile = googleUser.getBasicProfile();
+		logger.info("Signed as {} with id {} and email {}  ",
+				profile.getName(), profile.getId(), profile.getEmail())();
+		googleToken = googleUser.getAuthResponse().id_token;
+		sendGoogleTokenToServer(googleToken);
+	}
+
+	auth2.isSignedIn.listen(function (isSignedIn) {
+		if (isSignedIn) {
+			onGoogleSignIn();
+		} else {
+			logger.warn("Skipping sending token because not signed in into google")();
+		}
+	});
+	if (auth2.isSignedIn.get()) {
+		onGoogleSignIn();
+	} else {
+		auth2.signIn().catch(onsdkError("Unable to signin with google: "))
+	}
 }
 
-
-function googleLogin(event) {
-	event.preventDefault(); // somehow button triggers sumbit
+function onsdkError(message) {
+	return function (e) {
+		ajaxHide();
+		var error =  e.details || e.error || e;
+		logger.error(message + error)();
+		growlError(message + error);
+	}
+}
+function googleInit() {
 	// Load the API client and auth library
-	ajaxShow();
-	if (googleToken) {
-		sendGoogleTokenToServer(googleToken)
-	} else if (!googleApiLoaded) {
-		growlInfo("Trying to log in via Google");
+	if (window.G_OAUTH_URL) {
+		logger.info("Initializing google sdk")();
 		doGet(G_OAUTH_URL, function () {
 			gapi.load('client:auth2', function () {
-			  //gapi.client.setApiKey(apiKey);
-				logger.info("Initing google sdk")();
+				logger.info("gapi 2 is ready")();
 				gapi.auth2.init().then(function () {
-					auth2 = gapi.auth2.getAuthInstance();
-					auth2.isSignedIn.listen(function (isSignedIn) {
-						if (isSignedIn) {
-							onGoogleSignIn();
-						} else {
-							logger.warn("Skipping sending token because not signed in into google")();
-						}
-					});
-					if (auth2.isSignedIn.get()) {
-						onGoogleSignIn();
-					} else {
-						ajaxHide();
-						auth2.signIn();
-					}
-				});
-			});
+					logger.info("gauth 2 is ready")();
+					googleApiLoaded = true;
+				}).catch(onsdkError("Unable to init gauth2 sdk: "))
+			})
 		});
-	} else {
-		auth2.signIn();
 	}
-	googleApiLoaded = true;
 }
 
 function facebookLogin(event) {
 	if (event) event.preventDefault();
-	ajaxShow();
-	growlInfo("Trying to log in via Facebook");
-	if (!FBApiLoaded) {
-		doGet(FACEBOOK_JS_URL);
-		FBApiLoaded = true;
-	} else {
+	if (FBApiLoaded) {
+		ajaxShow();
 		FB.getLoginStatus(fbStatusChange);
+	} else {
+		growlError("Facebook authorizer is still initializing, wait a second...");
 	}
 }
 
-window.fbAsyncInit = function () {
-	logger.info("Initing facebook sdk...")();
-	FB.init({
-		appId: FACEBOOK_APP_ID,
-		xfbml: true,
-		version: 'v2.7'
-	});
-	FB.getLoginStatus(fbStatusChange);
-};
 
 function fbStatusChangeIfReAuth(response) {
 	if (response.status === 'connected') {
@@ -346,8 +361,8 @@ function fbStatusChangeIfReAuth(response) {
 			token: response.authResponse.accessToken
 		}, redirectToNextPage);
 	} else {
-		ajaxHide();
 		if (response.status === 'not_authorized') {
+			ajaxHide();
 			growlInfo("Allow facebook application to use your data");
 		} else {
 			return true;
@@ -359,5 +374,7 @@ function fbStatusChange(response) {
 	logger.info("fbStatusChange {}", JSON.stringify(response))();
 	if (fbStatusChangeIfReAuth(response)) {
 		FB.login(fbStatusChangeIfReAuth, {auth_type: 'reauthenticate'});
+	} else {
+			ajaxHide();
 	}
 }
