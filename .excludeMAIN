@@ -16,6 +16,7 @@ chat/static/font/*
 !/chat/static/font/OpenSans.ttf
 !/chat/static/font/Oswald.ttf
 chat/static/sass/partials/_fontello.scss
+chat/static/sass/fontello/
 trash
 .fontello
 chat/static/demo.html
