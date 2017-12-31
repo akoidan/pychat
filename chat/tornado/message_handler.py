@@ -357,7 +357,8 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 			self.publish(self.reply_webrtc(
 				Actions.REPLY_FILE_CONNECTION,
 				connection_id,
-				HandlerNames.WEBRTC_TRANSFER
+				HandlerNames.WEBRTC_TRANSFER,
+				in_message[VarNames.CONTENT]
 			), sender_ws_id)
 		else:
 			raise ValidationError("Invalid channel status.")
@@ -471,23 +472,25 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 				connection_id,
 				HandlerNames.WEBRTC_TRANSFER,
 				Actions.ACCEPT_CALL,
-				WebRtcRedisStates.READY
+				WebRtcRedisStates.READY,
+				{}
 			)
 		else:
 			raise ValidationError("Invalid channel status")
 
 	def send_call_answer(self, in_message, status_set, reply_action, allowed_state, message_handler):
 		connection_id = in_message[VarNames.CONNECTION_ID]
+		content = in_message[VarNames.CONTENT]
 		conn_users = self.sync_redis.shgetall(connection_id)
 		if conn_users[self.id] in allowed_state:
-			self.publish_call_answer(conn_users, connection_id, message_handler, reply_action, status_set)
+			self.publish_call_answer(conn_users, connection_id, message_handler, reply_action, status_set, content)
 		else:
 			raise ValidationError("Invalid channel status.")
 
-	def publish_call_answer(self, conn_users, connection_id, message_handler, reply_action, status_set):
+	def publish_call_answer(self, conn_users, connection_id, message_handler, reply_action, status_set, content):
 		self.async_redis_publisher.hset(connection_id, self.id, status_set)
 		del conn_users[self.id]
-		message = self.reply_webrtc(reply_action, connection_id, message_handler)
+		message = self.reply_webrtc(reply_action, connection_id, message_handler, content)
 		for user in conn_users:
 			if conn_users[user] != WebRtcRedisStates.CLOSED:
 				self.publish(message, user)

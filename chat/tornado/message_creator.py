@@ -199,12 +199,13 @@ class WebRtcMessageCreator(object):
 			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
 		}
 
-	def reply_webrtc(self, event, connection_id, handler):
+	def reply_webrtc(self, event, connection_id, handler, content):
 		return {
 			VarNames.EVENT: event,
 			VarNames.CONNECTION_ID: connection_id,
 			VarNames.USER_ID: self.user_id,
 			VarNames.USER: self.sender_name,
+			VarNames.CONTENT: content,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
 			VarNames.HANDLER_NAME: handler,
 		}
