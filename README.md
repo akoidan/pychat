@@ -66,7 +66,7 @@ Initializing:
 =============
  1. Install python packages with `pip install -r requirements.txt`. 
  2. Create database. Open mysql command tool: `mysql -u YOUR_USERNAME -p` and create database `create database django CHARACTER SET utf8 COLLATE utf8_general_ci`. Specify database connection options (username, password) in `chat/settings.py`. Next fill database with tables: `python manage.py init_db`. If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
- 3. Static content fot chat stores in a [separate repository](https://github.com/Deathangel908/djangochat-config). To download all needed files and compile css execute: `sh download_content.sh`
+ 3. Populate project files: `sh download_content.sh all`
  
 Running:
 ========

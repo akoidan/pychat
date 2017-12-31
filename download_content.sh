@@ -28,7 +28,6 @@ declare -a files=(\
     "$FONT_DIR/fontello.woff" \
     "$FONT_DIR/fontello.woff2" \
     "$FONT_DIR/fontello.woff2" \
-    "$FONT_DIR/OpenSans.ttf" \
     "$SASS_DIR/partials/_fontello.scss" \
     "$SMILEYS_DIR" \
     "$SMILEYS_DIR/info.json" \
@@ -55,7 +54,7 @@ check_files() {
 
     if [[ $failed_count > 0 ]]; then
       for path_failed2 in "${failed_count[@]}" ; do
-        >&2 echo "$path_failed2 wasn't installed"
+        >&2 echo "$path_failed2 were NOT installed"
       done
       >&2 echo "Please report for missing files at https://github.com/Deathangel908/djangochat/issues/new"
       rm -rfv "$TMP_DIR"
@@ -85,12 +84,13 @@ compile_sass() {
      >&2 echo "You need to install sassc to be able to use stylesheets"
      exit 1
     fi
+    mkdir -p "$CSS_DIR"
     sass_files=($(ls "$SASS_DIR"/*.sass))
-    echo "Compiling sass files: $sass_files"
     cd "$SASS_DIR"
     for i in "${sass_files[@]}"
     do
         name_no_ext=$(basename $i .sass)
+        echo "Compiling $i  to $CSS_DIR/$name_no_ext.css "
         sassc "$i" "$CSS_DIR/$name_no_ext.css"
     done
     cd "$PROJECT_ROOT"
@@ -119,9 +119,9 @@ zip_extension() {
 chp(){
  size=${#1}
  indent=$((20 - $size))
- printf "\e[1;37;40m$1"
+ printf "\e[1;37;40m$1\e[0;36;40m"
  for (( c=1; c<= $indent; c++))  ; do
- printf "\e[0;36;40m."
+ printf "."
  done
  printf "\e[0;33;40m$2\n\e[0;37;40m"
 }
@@ -145,13 +145,13 @@ download_fontello() {
     curl -X GET "http://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
     unzip "$TMP_DIR/fonts.zip" -d "$TMP_DIR/fontello"
     dir=$(ls "$TMP_DIR/fontello")
-    cp -r "$TMP_DIR/fontello"/$dir/font "$FONT_DIR"
-    cp  "$TMP_DIR/fontello"/$dir/css/fontello.css "$SASS_DIR/_fontello.scss"
+    cp  "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
+    cp  "$TMP_DIR/fontello"/$dir/css/fontello.css "$SASS_DIR/partials/_fontello.scss"
     cp "$TMP_DIR/fontello"/$dir/demo.html "$STATIC_DIR/demo.html"
     cp "$TMP_DIR/fontello"/$dir/config.json "$PROJECT_ROOT"
 
     if type "sed" &> /dev/null; then
-        sed -i '1i\@charset "UTF-8";' "$SASS_DIR/fontello/_fontello.scss"
+        sed -i '1i\@charset "UTF-8";' "$SASS_DIR/partials/_fontello.scss"
     else
         >&2 echo "WARNING: sass would be compiled w/o encoding"
     fi
@@ -160,7 +160,8 @@ download_fontello() {
 download_files() {
     # datepicker
     # use curl since it's part of windows git bash
-    curl -X GET http://dbushell.github.io/Pikaday/css/pikaday.css -o "$CSS_DIR/pikaday.css"
+    mkdir -p "$CSS_DIR"
+    curl -X GET https://dbushell.com/Pikaday/css/pikaday.css -o "$CSS_DIR/pikaday.css"
     curl -X GET https://raw.githubusercontent.com/dbushell/Pikaday/master/pikaday.js -o "$JS_DIR/pikaday.js"
     curl -X GET http://momentjs.com/downloads/moment.js -o "$JS_DIR/moment.js"
     curl -X GET https://www.amcharts.com/lib/3/amcharts.js -o "$JS_DIR/amcharts.js"
@@ -204,8 +205,8 @@ else
  chp check_files "Verifies if all files are installed"
  chp sass "Compiles css"
  chp download_files "Downloads static files like amcharts.js "
- chp zip_extension "Creates zip acrhive for ChromeWebStore from \e[96m screen_cast_extension \e[0;33;40mfile"
- printf " \e[93mFonts\n\e[0;37;40mTo edit fonts execute\e[1;37;40m fonts_session\e[0;37;40m After you finish editing fonts in browser execute \e[1;37;40mdownload_fonts\e[0;37;40m\n"
+ chp zip_extension "Creates zip acrhive for ChromeWebStore from \e[96mscreen_cast_extension \e[0;33;40mdirectory"
+ printf " \e[93mFonts:\n\e[0;37;40mTo edit fonts execute\e[1;37;40m fonts_session\e[0;37;40m After you finish editing fonts in browser execute \e[1;37;40mdownload_fonts\e[0;37;40m\n"
  chp fonts_session "Creates fontello session from config.json and saves it to \e[96m .fontello \e[0;33;40mfile"
  chp get_fonts_session "Shows current used url for editing fonts"
  chp download_fontello "Downloads and extracts fonts from fontello to project"
