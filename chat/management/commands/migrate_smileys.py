@@ -31,13 +31,12 @@ class Command(BaseCommand):
 		for k in data_new:
 			for smile in data_new[k]:
 				entry = find_old_entry(smile['alt'])
-				output[str(entry.encode('utf8'))] = smile['code']
+				output[json.dumps(entry)] = smile['code']
 		messages = Message.objects.all()
 		for mess in messages:
 			output_content = ""
 			for char in mess.content:
-				sdfsd = str(char.encode('utf8'))
-				get = output.get(sdfsd)
+				get = output.get(json.dumps(char))
 				if get is not None:
 					output_content += get
 				else:
@@ -45,4 +44,4 @@ class Command(BaseCommand):
 			if mess.content != output_content:
 				mess.content = output_content
 				mess.save(update_fields=["content"])
-				print("Updating " + mess.id)
+				print("Updating " + str(mess.id))
