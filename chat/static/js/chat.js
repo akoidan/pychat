@@ -683,20 +683,12 @@ function Painter() {
 				return;
 			}
 			e.preventDefault();
-			var xProp = e.offsetX / self.dom.canvasWrapper.scrollWidth;
-			var yProp = e.offsetY / self.dom.canvasWrapper.scrollHeight;
+			var xy = self.helper.getXY(e)
 			self.helper.setZoom(e.detail < 0 || e.wheelDelta > 0); // isTop
-			var newScrollWidth = xProp * self.dom.canvasWrapper.scrollWidth - (self.dom.canvasWrapper.clientWidth / 2);
-			var newScrollHeight = yProp * self.dom.canvasWrapper.scrollHeight - (self.dom.canvasWrapper.clientHeight / 2);
-			self.log("Zoomed to {}; newScrollOffset: {{}, {}} from proportion {{}, {}}",
-					self.zoom.toFixed(2),
-					Math.round(newScrollWidth),
-					Math.round(newScrollHeight),
-					xProp.toFixed(2),
-					yProp.toFixed(2)
-			)();
-			self.dom.canvasWrapper.scrollTop = newScrollHeight;
-			self.dom.canvasWrapper.scrollLeft = newScrollWidth;
+			var scrollLeft = (xy.x * self.zoom) - (e.clientX - self.leftOffset);
+			self.dom.canvasWrapper.scrollLeft = scrollLeft
+			var scrollTop = (xy.y * self.zoom) - (e.clientY - self.topOffset);
+			self.dom.canvasWrapper.scrollTop = scrollTop;
 			self.helper.applyZoom()
 		},
 		contKeyPress: function (event) {
