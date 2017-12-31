@@ -60,9 +60,6 @@ onDocLoad(function () {
 	smileyUtil = new SmileyUtil();
 	wsHandler = new WsHandler();
 	//bottom call loadMessagesFromLocalStorage(); s
-	if (typeof finishInitSmile != 'undefined') {
-		finishInitSmile();
-	}
 	storage = new Storage();
 	notifier = new NotifierHandler();
 	painter = new Painter();
@@ -3035,10 +3032,10 @@ function SmileyUtil() {
 			var tabSmileys = smileyData[tab];
 			tabSmileys.forEach(function(smile) {
 				var fileRef = document.createElement('IMG');
-				var fullSmileyUrl = SMILEY_URL + '/'+tab+'/'+smile.src;
+				var fullSmileyUrl = SMILEY_URL + '/' + tab + '/' + smile.src;
 				fileRef.setAttribute("src", fullSmileyUrl);
 				fileRef.setAttribute("code", smile.code);
-				fileRef.setAttribute("alt", smile.text_alt);
+				fileRef.setAttribute("alt", smile.alt);
 				tabRef.appendChild(fileRef);
 				// http://stackoverflow.com/a/1750860/3872976
 				/** encode dict key, so {@link encodeSmileys} could parse smileys after encoding */
