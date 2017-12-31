@@ -3422,7 +3422,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self._printMessage = function (data, isNew) {
 		self.setHeaderId(data.id);
 		self.printMessagePlay(data);
-		var displayedUsername = self.allUsers[data.userId].user;
+		// we can't use self.allUsers[data.userId].user; since user could left and his message remains
+		var displayedUsername = channelsHandler.getAllUsersInfo()[data.userId].user;
 		var html = self.encodeMessage(data);
 		var p = self.displayPreparedMessage(
 				data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS,
