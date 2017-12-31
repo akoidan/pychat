@@ -10,7 +10,6 @@
 
 	nav
 		background-image: linear-gradient(#232323 0%, #151515 100%)
-		opacity: 0.9
 
 	label
 		font: 13px Open Sans
@@ -83,28 +82,21 @@
 		font: 12px Oswald
 
 	@mixin reg-button-style()
-		background-color: rgb(39, 42, 35)
-		color: $grayish-green
-		opacity: 0.8
 		outline: none
 		font: 12px Oswald
 		@include box-shadow(1px 1px 1px rgba(0,0,0,0.2))
 		text-shadow: $default-shadow
 		border-top: 1px solid rgba(255, 255, 255, 0.6)
 		border-left: 1px solid rgba(171, 171, 171, 0.83)
-		/* text-transform: uppercase */
-		@include linear-gradient(#4B4E45, #33352F)
-		&:hover
-			opacity: 1
+		@include linear-gradient-hover($grayish-green, #4f5249, #2e302a)
 
 		&:active
 			text-shadow: none
-			opacity: 1
-			color: #878787
+			color: #e4e4e4
 			background-image: none
 			@include box-shadow(1px 1px 1px rgba(255,255,255,0.2))
 			@include drop-padding($button-padding-top, $button-padding-left)
-			@include top-left-border(1px inset rgba(1, 1, 1, 0.5)) // TODO why rgba(0,0,0 ) is shown as white
+			@include top-left-border(1px inset rgba(1, 1, 1, 0.5))
 
 	input[type=button], input[type=submit], button
 		@include reg-button-style
@@ -114,14 +106,16 @@
 		input[type=file]
 			@include reg-button-style
 	button
-		border-top: 1px solid rgba(255, 255, 255, 0.4)
-		border-left: 1px solid rgba(171, 171, 171, 0.4)
+		border-top: 1px solid rgba(227, 227, 227, 0.4)
+		border-left: 1px solid rgba(114, 114, 114, 0.4)
 
 
 
 	input[type=submit]
-		background-color: #273726
+		background-color: #375a34
 		@include linear-gradient(#457741, #2A4029)
+		&:hover:not(:active)
+			@include linear-gradient(#448b3f, #014905)
 		text-shadow: $default-shadow
 		@include box-shadow(1px 1px 2px 0 black)
 		-webkit-box-reflect: below 0 -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255, 255, 255, 0.2)))
@@ -130,43 +124,43 @@
 		background-color: rgba(33,33,31, 0.9)
 		border: 1px #696951 solid
 
-	@mixin hover-icon
-		text-shadow: 0 0 0.2em #575757
-		opacity: 1
+	.icon-github
+		@include hover-click(#bbbbbb)
 
-	[class^='icon-']
-		opacity: 0.8
-		-webkit-mask-image: -webkit-linear-gradient(top, rgba(0,0,0,1),rgba(0,0,0,0.5))
-		&:hover
-			@include hover-icon
-
-	button
-		&:hover, &:focus
-			> [class^='icon-']
-				@include hover-icon
-
+	.icon-smile, .icon-picture, .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
+		@include hover-click(#e3e3e3)
+	.painterTools [class^='icon-']
+		@include hover-click(#e3e3e3)
+	.icon-webrtc-fullscreen, .icon-cog
+		@include hover-click(#59b2c1)
 	[class^='icon-volume']
-		color: #DCA737
+		@include hover-click(#DCA737)
 	.icon-home
-		color: #20A0FF
+		@include hover-click(#20A0FF)
 	.icon-brush
-		color: #ee0000
+		@include hover-click(#ee0000)
 	.icon-pencil
-		color: #8D28DE
+		@include hover-click(#8D28DE)
 	.icon-chart-pie
-		color: #B7D710
+		@include hover-click(#B7D710)
 	.icon-sign-out
-		color: #F5504C
+		@include hover-click(#F5504C)
 	.icon-wrench
-		color: #67C8B0
+		@include hover-click(#67C8B0)
 	.icon-clear
-		color: #D42C5A
+		@include hover-click(#D42C5A)
 	.icon-phone
-		color: #37BB21 /*override .		color-lor :link*/
+		@include hover-click(#37BB21) /*override .		color-lor :link*/
 	.icon-doc-inv
-		color: #15dfff
+		@include hover-click(#15dfff)
 	.icon-popup
-		color: #ff9900
+		@include hover-click(#ff9900)
+	.icon-cog, .icon-webrtc-fullscreen
+		@include hover-click(#21bace)
+	.callActiveIcon
+		@include hover-click(#bf1710)
+	.painterTools .active-icon
+		@include hover-click(#ff5e53)
 
 	@include scrollbar($mostly-black, #313A3C, #7dc071, #c08b00,#3c763d)
 

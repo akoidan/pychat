@@ -1353,6 +1353,7 @@ function Painter() {
 				tool.span.innerHTML = '';
 			};
 			tool.onDeactivate = function () {
+				tool.onApply();
 				tool.enableApply();
 				CssUtils.hideElement(tool.span);
 			};
@@ -1493,6 +1494,7 @@ function Painter() {
 				CssUtils.showElement(tool.img);
 			};
 			tool.onDeactivate = function() {
+				tool.onApply();
 				self.resizer.hide();
 				CssUtils.hideElement(tool.img);
 			};
@@ -1541,7 +1543,7 @@ function Painter() {
 				if (!params.width || !params.height) {
 					self.resizer.hide();
 				} else {
-					tool.enableApply();
+					tool.onApply();
 				}
 
 			};
@@ -2938,14 +2940,13 @@ function SmileyUtil() {
 	self.smileyDict = {};
 	self.inited = false;
 	self.init = function (smileys_bas64_data) {
-		if (self.inited) {
-			return;
-		}
 		self.dom.iconSmile.addEventListener('click', self.toggleSmileys, true);
 		self.dom.tabNames.addEventListener('click', self.showTabByName, true);
 		self.dom.smileParentHolder.addEventListener('click', self.addSmile, true);
 		self.inited = true;
-		self.loadSmileys(smileys_bas64_data);
+		doGet(SMILEY_URL+'/info.json', function(smileys_bas64_data) {
+			self.loadSmileys(smileys_bas64_data);
+		})
 		userMessage.addEventListener("click", function (event) {
 			event.stopPropagation(); // Don't fire onDocClick
 		});
@@ -3032,21 +3033,21 @@ function SmileyUtil() {
 			self.dom.smileParentHolder.appendChild(tabRef);
 
 			var tabSmileys = smileyData[tab];
-			for (var smile in tabSmileys) {
-				if (!tabSmileys.hasOwnProperty(smile)) continue;
+			tabSmileys.forEach(function(smile) {
 				var fileRef = document.createElement('IMG');
-				var fullSmileyUrl = "data:image/gif;base64," + tabSmileys[smile].base64;
+				var fullSmileyUrl = SMILEY_URL + '/'+tab+'/'+smile.src;
 				fileRef.setAttribute("src", fullSmileyUrl);
-				fileRef.setAttribute("code", smile);
-				fileRef.setAttribute("alt", tabSmileys[smile].text_alt);
+				fileRef.setAttribute("code", smile.code);
+				fileRef.setAttribute("alt", smile.text_alt);
 				tabRef.appendChild(fileRef);
 				// http://stackoverflow.com/a/1750860/3872976
 				/** encode dict key, so {@link encodeSmileys} could parse smileys after encoding */
-				self.smileyDict[encodeHTML(smile)] = fileRef.outerHTML;
-			}
+				self.smileyDict[encodeHTML(smile.code)] = fileRef.outerHTML;
+			});
 		}
 		self.showTabByName(Object.keys(smileyData)[0]);
 	};
+	self.init();
 }
 
 
@@ -3144,10 +3145,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		return self.callHandler;
 	};
 	self.createCallHandler = function () {
-		if (self.callHandler && self.callHandler.callInProggress) {
+		if (self.callHandler && ['new', 'closed'].indexOf(self.callHandler.getCallStatus()) < 0) {
 			return false;
 		} else if (self.callHandler) {
-			self.callHandler.closeEvents();
 			return self.callHandler;
 		} else {
 			self.callHandler = new CallHandler(self.roomId);
@@ -3630,6 +3630,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	self.opponentWsId = opponentWsId;
 	self.connectionId = connectionId;
 	self.pc = null;
+	self.connectionStatus = 'new';
 	self.removeChildPeerReference = removeChildPeerReferenceFn;
 	var webRtcUrl = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 	self.pc_config = {iceServers: [{url: webRtcUrl}]};
@@ -3639,6 +3640,13 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 			{RtpDataChannels: false /*true*/}
 		]
 	};
+	self.setConnectionStatus = function(newStatus) {
+		self.connectionStatus = newStatus;
+		self.log("Setting connection status to {}", newStatus)();
+	},
+	self.getConnectionStatus = function() {
+		return self.connectionStatus;
+	}
 	self.log = function () {
 		var args = Array.prototype.slice.call(arguments);
 		args.unshift(self.connectionId + ":" + self.opponentWsId);
@@ -3688,6 +3696,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 		};
 	};
 	self.closePeerConnection = function (text) {
+		self.setConnectionStatus('closed');
 		if (self.pc && self.pc.signalingState !== 'closed') {
 			self.log("Closing peer connection")();
 			self.pc.close();
@@ -3751,19 +3760,6 @@ function BaseTransferHandler(removeReferenceFn) {
 		delete self.peerConnections[id];
 	};
 	self.peerConnections = {};
-	self.isAnyConnectionsActive = function() {
-		var hasConnections = false;
-		for (var pc in self.peerConnections) {
-			if (!self.peerConnections.hasOwnProperty(pc)) continue;
-			var peerConnection = self.peerConnections[pc];
-			if (peerConnection && peerConnection.pc
-					&& ["connected", "completed"].indexOf(peerConnection.pc.iceConnectionState) >= 0) {
-				hasConnections = true;
-				break
-			}
-		}
-		return hasConnections;
-	}
 	self.handle = function (data) {
 		if (data.handler === 'webrtcTransfer') {
 			self['on' + data.action](data);
@@ -3865,14 +3861,12 @@ function CallHandler(roomId) {
 	BaseTransferHandler.call(self);
 	self.acceptedPeers = [];
 	self.CALL_TIMEOUT_NO_ANSWER = 60000;
-	self.CALL_TIMEOUT_NO_USERS = 4000;
+	self.CALL_TIMEOUT_NO_USERS = 3000;
+	self.callStatus = 'new';
 	self.visible = true;
 	self.roomId = roomId;
 	self.audioProcessor = null;
 	self.callPopupTable = {};
-	self.setIsReceiver = function (isReceiver) {
-		self.accepted = !isReceiver;
-	};
 	self.dom = {
 		callAnswerText: $('callAnswerText'),
 		callContainer: $('callContainer'),
@@ -3923,13 +3917,27 @@ function CallHandler(roomId) {
 			roomNameLi.insertBefore(self.dom.phoneIcon, roomNameLi.firstChild);
 		}
 	};
+	self.getCallStatus = function() {
+		var hasPcActive = false;
+		for (var pcName in self.peerConnections) {
+			if (!self.peerConnections.hasOwnProperty(pcName)) continue;
+			var abstrPc = self.peerConnections[pcName].getConnectionStatus();
+			if (abstrPc == 'running') {
+				hasPcActive = true;
+			}
+		}
+		return hasPcActive ? 'running': self.callStatus;
+	}
+	self.setCallStatus = function(newStatus) {
+		self.log("Setting call status to {}", newStatus)();
+		self.callStatus = newStatus;
+	}
 	self.setIconState = function (isCall) {
 		if (isCall) {
 			self.showPhoneIcon()
 		} else {
 			self.hidePhoneIcon();
 		}
-		self.callInProggress = isCall;
 		CssUtils.setVisibility(self.dom.hangUpHolder, isCall);
 		CssUtils.setVisibility(self.dom.videoContainer, isCall);
 		CssUtils.setVisibility(self.dom.callIcon, !isCall);
@@ -3937,7 +3945,7 @@ function CallHandler(roomId) {
 	self.setDesktopCapture = function (value) {
 		self.constraints.share = value;
 		CssUtils.setClassToState(self.dom.shareScreen, value, 'callActiveIcon');
-		self.dom.fs.share.className = value ? "icon-webrtc-mic" : "icon-webrtc-nomic";
+		self.dom.fs.share.className = value ? "icon-desktop" : "icon-no-desktop";
 		var title = value ? "Capture your desktop screen and start sharing it" : "Turn off screen sharing";
 		self.dom.shareScreen.title = title;
 		self.dom.fs.share.title = title;
@@ -4134,20 +4142,8 @@ function CallHandler(roomId) {
 	self.microphoneChanged = function(e) {
 			self.updateConnection();
 	};
-	self.isActive = function () {
-		var hasPcActive = false;
-		for (var pcName in self.peerConnections) {
-			if (!self.peerConnections.hasOwnProperty(pcName)) continue;
-			var abstrPc = self.peerConnections[pcName];
-			var pc = abstrPc.pc;
-			if (abstrPc.pc) {
-				hasPcActive = true;
-			}
-		}
-		return (self.localStream && self.localStream.active ) || hasPcActive;
-	};
 	self.updateConnection = function () {
-		if (self.isActive()) {
+		if (self.localStream && self.localStream.active || self.getCallStatus() == 'running') {
 			self.captureInput(function (stream, success) {
 				if (success) {
 					self.stopLocalStream();
@@ -4307,8 +4303,10 @@ function CallHandler(roomId) {
 		self.audioProcessor = Utils.createMicrophoneLevelVoice(stream, self.processAudio);
 	};
 	self.setCallIconsState = function () {
-			self.setVideo(self.getTrack('video') != null);
-			self.setAudio(self.getTrack('audio') != null);
+		var videoTrack = self.getTrack('video');
+		self.setVideo(videoTrack && videoTrack.enabled);
+		var audioTrack = self.getTrack('audio');
+		self.setAudio(audioTrack && audioTrack.enabled);
 			self.setDesktopCapture(self.getTrack('share') != null);
 			self.autoSetLocalVideoVisibility();
 		}
@@ -4345,12 +4343,12 @@ function CallHandler(roomId) {
 		self.dom.headerText.innerHTML = text;
 	};
 	self.offerCall = function () {
-		self.accepted = true;
 		self.setHeaderText("Confirm browser to use your input devices for call");
 		self.captureInput(function (stream, success) {
 			if (success) {
 				self.attachLocalStream(stream);
 				self.setIconState(true);
+				self.setCallStatus('sent_offer');
 				self.setHeaderText("Establishing connection with room #{}".format(self.roomId));
 				var id = webRtcApi.addCallHandler(self);
 				self.sendOffer(id);
@@ -4385,27 +4383,6 @@ function CallHandler(roomId) {
 				' . Right click on volume icon in system tray -> record devices -> input -> microphone';
 		growlError('<div>Unable to capture input from microphone. Check your microphone connection or {}'
 				.format(url));
-	};
-	self.createAfterResponseCall = function () {
-		self.captureInput(function (stream) {
-			self.attachLocalStream(stream);
-			wsHandler.sendToServer({
-				action: 'acceptCall',
-				connId: self.connectionId
-			})
-			self.accepted = true;
-			self.acceptedPeers.forEach(function (e) {
-				if (self.peerConnections[e]) {
-					self.peerConnections[e].connectToRemote(self.localStream);
-				} else {
-					self.logErr("Unable to get pc with id {}, available peer connections are {}, accepted peers are {}",
-							e, Object.keys(self.peerConnections), self.acceptedPeers.toString())();
-				}
-			});
-		}, true);
-		self.setIconState(true);
-		channelsHandler.setActiveChannel(self.roomId);
-		self.show(true);
 	};
 	self.getTrack = function (kind) {
 		var track = null;
@@ -4492,7 +4469,7 @@ function CallHandler(roomId) {
 			self.acceptedPeers.splice(index, 1);
 			self.log("Removed {} from acceptedPeers, current acceptedPeers are {}", id, self.acceptedPeers.toString())();
 		}
-		if (!self.accepted) {
+		if (self.getCallStatus() == 'accepted') {
 			if (self.callPopupTable[id]) {
 				self.callPopupTable[id].textContent = 'Declined';
 			}
@@ -4505,6 +4482,7 @@ function CallHandler(roomId) {
 	self.onStreamAttached = function (opponentWsId) { // TODO this is called multiple times for each peer connection
 		self.setHeaderText("Talking");
 		self.setIconState(true);
+		self.setCallStatus('in_proggress');
 	};
 	self.onreplyCall = function (message) {
 		self.clearNoAnswerTimeout()
@@ -4529,20 +4507,40 @@ function CallHandler(roomId) {
 	self.accept = function () {
 		self.clearTimeout();
 		self.callPopup.hide();
-		self.createAfterResponseCall();
-		setTimeout(function() {
-			if (!self.isAnyConnectionsActive()) {
+		self.setCallStatus('accepted');
+		self.captureInput(function (stream) {
+			self.attachLocalStream(stream);
+			wsHandler.sendToServer({
+				action: 'acceptCall',
+				connId: self.connectionId
+			})
+			self.acceptedPeers.forEach(function (e) {
+				if (self.peerConnections[e]) {
+					self.peerConnections[e].connectToRemote(self.localStream);
+				} else {
+					self.logErr("Unable to get pc with id {}, available peer connections are {}, accepted peers are {}",
+							e, Object.keys(self.peerConnections), self.acceptedPeers.toString())();
+				}
+			});
+		}, true);
+		self.setIconState(true);
+		channelsHandler.setActiveChannel(self.roomId);
+		self.show(true);
+		self.timeoutFunctionNoUsers = setTimeout(function () {
+			if (self.getCallStatus() != 'running') {
 				self.hangUp(null, "No call opponents found");
 			}
-		}, 3000);
+		}, self.CALL_TIMEOUT_NO_USERS);
 	};
 	self.setTimeout = function () {
+		self.log("Created no answers timeout")();
 		self.timeoutFunnction = setTimeout(function () {
 			self.log("Closing CallHandler by timeout")();
 			self.hangUp(null, "Finishing the call because no one picked the phone");
 		}, self.CALL_TIMEOUT_NO_ANSWER);
 	};
 	self.setNoAnswerTimeout = function () {
+		self.log("Created no users timeout")();
 		self.timeoutFunctionNoUsers = setTimeout(function () {
 			self.log("Closing CallHandler because no users found")();
 			self.hangUp(null, "Finishing the call because no one is online in this channel");
@@ -4550,7 +4548,7 @@ function CallHandler(roomId) {
 	};
 	self.clearTimeout = function () {
 		if (self.timeoutFunnction) {
-			self.log("Removed 60s timeout")();
+			self.log("Removed no answers timeout")();
 			clearTimeout(self.timeoutFunnction);
 			self.timeoutFunnction = null;
 		}
@@ -4558,13 +4556,13 @@ function CallHandler(roomId) {
 	};
 	self.clearNoAnswerTimeout = function() {
 		if (self.timeoutFunctionNoUsers) {
-			self.log("Removed 5s timeout")();
+			self.log("Removed no users timeout")();
 			clearTimeout(self.timeoutFunctionNoUsers);
 			self.timeoutFunctionNoUsers = null;
 		}
 	}
 	self.initAndDisplayOffer = function (message, channelName) {
-		self.callInProggress = true;
+		self.setCallStatus('received_offer');
 		self.setTimeout();
 		self.connectionId = message.connId;
 		self.log("CallHandler initialized")();
@@ -4577,7 +4575,7 @@ function CallHandler(roomId) {
 		self.showOffer(message, channelName);
 	};
 	self.onacceptCall = function (message) {
-		if (self.accepted) {
+		if (self.getCallStatus() != 'received_offer') {
 			self.clearTimeout(); // if we're call initiator
 			var pc = self.peerConnections[message.opponentWsId];
 			pc.connectToRemote(self.localStream);
@@ -4622,8 +4620,8 @@ function CallHandler(roomId) {
 		}
 		// if somebody sent us destroyConnection event, b4 timeout fired
 		self.clearTimeout();
-		self.accepted = false;
 		self.setIconState(false);
+		self.setCallStatus('closed');
 		self.callPopupTable = {};
 		webRtcApi.removeChildReference(self.connectionId);
 		self.dom.microphoneLevel.value = 0;
@@ -5212,7 +5210,13 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 	};
 	self.oniceconnectionstatechange = function () {
 		if (self.pc.iceConnectionState === 'disconnected') {
-			self.closeEvents('Connection has been lost');
+			self.log("Created connection lost timeout")();
+			self.timeoutedPeerConnectionDisconnected = setTimeout(function() {
+				// give a chance destroyEvent to close connection first
+				self.closeEvents('Connection has been lost');
+			}, 1000)
+		} else if (['completed', 'connected'].indexOf(self.pc.iceConnectionState) >= 0) {
+			self.setConnectionStatus('running');
 		}
 	};
 	self.createPeerConnectionParent = self.createPeerConnection;
@@ -5248,6 +5252,11 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 		}
 	};
 	self.closeEvents = function (reason) {
+		if (self.timeoutedPeerConnectionDisconnected) {
+			clearTimeout(self.timeoutedPeerConnectionDisconnected);
+			self.timeoutedPeerConnectionDisconnected = null;
+			self.log("Removing connections lost timeout")();
+		}
 		self.log('Destroying CallPeerConnection because', reason)();
 		self.closePeerConnection();
 		self.removeAudioProcessor();
@@ -5301,7 +5310,6 @@ function WebRtcApi() {
 		}
 		var handler = chatHandler.createCallHandler();
 		if (handler) {
-			handler.setIsReceiver(true);
 			self.connections[message.connId] = handler;
 			handler.initAndDisplayOffer(message, chatHandler.roomName);
 		} else {

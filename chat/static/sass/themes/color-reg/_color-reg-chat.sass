@@ -26,12 +26,6 @@
 	.activeTab
 		color: #C6B955
 
-	.icon-phone-circled
-		color: #3AC73A
-
-	.icon-github
-		color: #bbbbbb
-
 	.window
 		@include linear-gradient(#1e3348, #0f1922)
 		box-shadow: 0 5px 5px #16161f
@@ -145,10 +139,8 @@
 	.callContainerIcons
 		.icon-hang-up
 			color: #BC2F2F
-		.icon-mic, .icon-videocam, .icon-desktop:not(.callActiveIcon)
-			color: #518858
-		.icon-cog, .icon-webrtc-fullscreen
-			color: #259BBD
+		.icon-mic, .icon-videocam, .icon-desktop:not(.callActiveIcon), .icon-phone-circled
+			@include hover-click(#33b334)
 	#callUserList
 		color: #A5A5A5
 		background-color: #242A2A
@@ -169,10 +161,10 @@
 		// end call container
 
 	.icon-man, .icon-girl, .icon-user-secret
-		color: #2e9154 !important
+		color: #1f772c !important
 	.offline
 		.icon-man, .icon-girl, .icon-user-secret
-			color: #dc3c3c !important
+			color: #b32c1c !important
 
 	#chat-room-users-wrapper > span
 		background-color: #171717
@@ -180,7 +172,6 @@
 	#directUserTable,
 	#rooms
 		.icon-cancel-circled-outline
-			opacity: 0.8
 			&:hover
 				opacity: 1
 				color: #ff5e5c
