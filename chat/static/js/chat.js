@@ -639,14 +639,14 @@ function Painter() {
 		};
 	};
 	self.events = {
-		mouseDown: 0,
+		mouseDown: false,
 		onmousedown: function (e) {
 			var tool = self.tools[self.mode];
 			if (!tool.onMouseDown) {
 				return;
 			}
 			// self.log("{} mouse down", self.mode)();
-			self.events.mouseDown++;
+			self.events.mouseDown = true
 			var rect = painter.dom.canvas.getBoundingClientRect();
 			self.leftOffset = rect.left;
 			self.topOffset = rect.top;
@@ -660,13 +660,13 @@ function Painter() {
 			var tool = self.tools[self.mode];
 			var xy = self.helper.getXY(e);
 			self.helper.setUIText("[{},{}]".format(xy.x, xy.y));
-			if (self.events.mouseDown > 0 && tool.onMouseMove) {
+			if (self.events.mouseDown && tool.onMouseMove) {
 				tool.onMouseMove(e, xy);
 			}
 		},
 		onmouseup: function (e) {
-			if (self.events.mouseDown > 0) {
-				self.events.mouseDown--;
+			if (self.events.mouseDown) {
+				self.events.mouseDown = false;
 				var tool = self.tools[self.mode];
 				if (!tool.bufferHandler) {
 					self.buffer.finishAction();
