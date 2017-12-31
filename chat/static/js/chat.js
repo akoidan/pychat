@@ -4039,8 +4039,10 @@ function CallHandler(roomId) {
 		self.dom.videoContainer.appendChild(iwc);
 		self.dom.videoContainer.appendChild(self.dom.videoContainerForVideos);
 		self.dom.videoContainer.className = 'videoContainer ' + CssUtils.visibilityClass;
-		function ap(el, icon) {
+		function ap(icon, holder) {
 			var row = self.dom.settingsContainer.insertRow(0);
+			var el = self.dom[holder];
+			self.dom[holder + 'Holder' ] = row;
 			var cell1 = row.insertCell(0);
 			var i = document.createElement('i');
 			i.className = icon;
@@ -4048,12 +4050,12 @@ function CallHandler(roomId) {
 			cell1.appendChild(el);
 			return cell1;
 		}
-		ap(self.dom.microphones, 'icon-mic');
-		ap(self.dom.cameras, 'icon-videocam');
-		var speakersCell = ap(self.dom.speakers, 'icon-volume-2');
+		ap('icon-mic', 'microphones');
+		ap('icon-videocam', 'cameras');
+		var speakersCell = ap('icon-volume-2', 'speakers');
 		speakersCell.appendChild(self.dom.playTestSound);
 		self.dom.playTestSound.className = 'playTestSound';
-		ap(self.dom.headerText, 'icon-quote-left');
+		ap('icon-quote-left', 'headerText');
 		self.dom.headerText.textContent = 'Call info';
 		self.dom.headerText.className = 'callInfo';
 		self.dom.playTestSound.textContent = "Play test sound";
@@ -4198,10 +4200,10 @@ function CallHandler(roomId) {
 				}
 			})
 		}
-		[self.dom.microphones, self.dom.speakers, self.dom.cameras].forEach(function (d) {
-			if (d.children.length == 0) {
-
-			}
+		['microphones', 'cameras', 'speakers'].forEach(function (d) {
+			var el = self.dom[d];
+			var holder = self.dom[d+'Holder'];
+			CssUtils.setVisibility(holder, el.children.length > 0);
 		})
 	};
 	self.getDesktopShareFromExtension = function() {
@@ -5281,7 +5283,12 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 		self.createPeerConnectionParent();
 		self.pc.onaddstream = function (event) {
 			self.log("onaddstream")();
-			Utils.setVideoSource(self.dom.remote, event.stream).catch(Utils.clickToPlay(self.dom.remote))
+			var p = Utils.setVideoSource(self.dom.remote, event.stream)
+			if (p) { //firefox video.play doesn't return promise
+				// chrome returns promise, if it's on mobile devices video sound would be muted
+				// coz it initialized from network instead of user gesture
+				p.catch(Utils.clickToPlay(self.dom.remote))
+			}
 			var speakerId = getSpeakerId();
 			if (speakerId && self.dom.remote.setSinkId) {
 				self.dom.remote.setSinkId(speakerId);
