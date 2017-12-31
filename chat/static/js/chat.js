@@ -4946,7 +4946,7 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 	self.superOnDestroyFileConnection = self.ondestroyFileConnection;
 	self.ondestroyFileConnection = function (data) {
 		self.superOnDestroyFileConnection(data);
-		self.downloadBar.setStatus(data || "Error: Opponent closed connection");
+		self.downloadBar.setStatus(typeof data == 'string' ? data : "Error: Opponent closed connection");
 		self.downloadBar.setError();
 	};
 	self.assembleFileIfDone = function () {
@@ -5030,7 +5030,9 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 	self.onChannelMessage = function (event) {
 		self.superOnChannelMessage(event);
 		self.receiveBuffer.push(event.data);
-		self.receivedSize += event.data.byteLength;
+		// chrome accepts bufferArray (.byteLength). firefox accepts blob (.size)
+		var receivedSize = event.data.byteLength ? event.data.byteLength : event.data.size;
+		self.receivedSize += receivedSize;
 		self.syncBufferWithFs();
 		self.setTranseferdAmount(self.receivedSize);
 		self.assembleFileIfDone();
