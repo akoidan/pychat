@@ -41,27 +41,43 @@ declare -a files=(\
 cd "$PROJECT_ROOT"
 
 check_files() {
+    if [ "$1" = "remove_script" ]; then
+        delete_tmp_dir
+    fi
+    printOut "checking files"
     # Checking if all files are loaded
     failed_count=0
     for path in "${files[@]}" ; do
       if [ ! -f "$path" ] && [ ! -d "$path" ]; then #if doen't exist
         ((failed_count++))
-         >&2 echo "Can't find file: $path"
+         printError "Can't find file: $path"
         failed_items[$failed_count]="$path"
       fi
     done
 
-
     if [[ $failed_count > 0 ]]; then
       for path_failed2 in "${failed_count[@]}" ; do
-        >&2 echo "$path_failed2 were NOT installed"
+        printError "$path_failed2 is missing"
       done
-      >&2 echo "Please report for missing files at https://github.com/Deathangel908/djangochat/issues/new"
-      rm -rfv "$TMP_DIR"
+      if [ "$1" = "remove_script" ]; then
+        printError "Please report for missing files at https://github.com/Deathangel908/djangochat/issues/new"
+      fi
       exit 1
     else
-      echo "Installation succeeded"
+        if [ "$1" = "remove_script" ]; then
+            printf "\e[92mAll files are installed. Population succeeded\e[0;37;40m\n"
+        else
+            printOut "All files are present"
+        fi
     fi
+}
+
+printOut() {
+    printf "\e[93m$1\e[0;37;40m\n"
+}
+
+printError() {
+    >&2  printf "\e[91m$1\e[0;37;40m\n"
 }
 
 minify_js() {
@@ -80,9 +96,14 @@ minify_js() {
 
 }
 compile_sass() {
+    printOut "Compiling sass files"
     if ! type "sassc" &> /dev/null; then
-     >&2 echo "You need to install sassc to be able to use stylesheets"
-     exit 1
+     if ! type "sass" &> /dev/null; then
+       printError "Can't find sass nor sassc command in $PATH, please install it to be able to use stylesheets"
+       exit 1
+     else
+       printError "sassc wasn't found trying to use sass instead"
+     fi
     fi
     mkdir -p "$CSS_DIR"
     sass_files=($(ls "$SASS_DIR"/*.sass))
@@ -91,12 +112,17 @@ compile_sass() {
     do
         name_no_ext=$(basename $i .sass)
         echo "Compiling $i  to $CSS_DIR/$name_no_ext.css "
-        sassc "$i" "$CSS_DIR/$name_no_ext.css"
+        if ! type "sassc" &> /dev/null; then
+            sass "$i" "$CSS_DIR/$name_no_ext.css"
+        else
+            sassc "$i" "$CSS_DIR/$name_no_ext.css"
+        fi
     done
     cd "$PROJECT_ROOT"
 }
 
 remove_old_files() {
+    printOut "Removing old files"
     # Deleting all content creating empty dirs
     for path in "${files[@]}" ; do
       if [ -f "$path" ]; then
@@ -109,10 +135,11 @@ remove_old_files() {
 }
 
 zip_extension() {
+    printOut "Zipping extension"
     EX_FILE="$PROJECT_ROOT/extension.zip"
     rm -f "$EX_FILE"
     zip -j -r "EX_FILE" ./screen_cast_extension/*
-    echo "Extension is created in $EX_FILE"
+    printOut "Extension is created in $EX_FILE"
 }
 
 
@@ -128,20 +155,24 @@ chp(){
 
 
 post_fontello_conf() {
+    printOut "Creating fontello config"
     curl --silent --show-error --fail --form "config=@./config.json" --output .fontello http://fontello.com
-    show_fontello_session
+    fontello_session=$(cat .fontello)
+    url="http://fontello.com/`cat .fontello`"
+    echo "Genereted fontello url: $url"
 }
 
 show_fontello_session() {
     fontello_session=$(cat .fontello)
     url="http://fontello.com/`cat .fontello`"
-    echo "Fonts url is: $url , open it mannualy if your browser doesn't launch automatically"
+    printOut "Fonts url is: $url , open it mannualy if your browser doesn't launch automatically"
     python -mwebbrowser $url
 }
 
 download_fontello() {
-    mkdir "$TMP_DIR"
     fontello_session=$(cat .fontello)
+    printOut "Downloading fontello using fontello session '$fontello_session'"
+    mkdir "$TMP_DIR"
     curl -X GET "http://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
     unzip "$TMP_DIR/fonts.zip" -d "$TMP_DIR/fontello"
     dir=$(ls "$TMP_DIR/fontello")
@@ -153,7 +184,7 @@ download_fontello() {
     if type "sed" &> /dev/null; then
         sed -i '1i\@charset "UTF-8";' "$SASS_DIR/partials/_fontello.scss"
     else
-        >&2 echo "WARNING: sass would be compiled w/o encoding"
+        printError "WARNING: sass would be compiled w/o encoding"
     fi
 }
 
@@ -161,9 +192,12 @@ download_files() {
     # datepicker
     # use curl since it's part of windows git bash
     mkdir -p "$CSS_DIR"
+    printOut "Downloading pikaday.js"
     curl -X GET https://dbushell.com/Pikaday/css/pikaday.css -o "$CSS_DIR/pikaday.css"
     curl -X GET https://raw.githubusercontent.com/dbushell/Pikaday/master/pikaday.js -o "$JS_DIR/pikaday.js"
+    printOut "Downloading moment.js"
     curl -X GET http://momentjs.com/downloads/moment.js -o "$JS_DIR/moment.js"
+    printOut "Downloading amcharts.js"
     curl -X GET https://www.amcharts.com/lib/3/amcharts.js -o "$JS_DIR/amcharts.js"
     curl -X GET https://www.amcharts.com/lib/3/pie.js -o "$JS_DIR/amcharts-pie.js"
     curl -X GET https://www.amcharts.com/lib/3/themes/dark.js -o "$JS_DIR/amcharts-dark.js"
@@ -171,7 +205,15 @@ download_files() {
 }
 
 generate_smileys() {
+    printOut "Generating smileys"
     python manage.py extract_cfpack
+}
+
+delete_tmp_dir() {
+    if [  -d "$TMP_DIR" ]; then #if doen't exist
+         printOut "Removing temporary files in $TMP_DIR"
+         rm -rfv "$TMP_DIR"
+    fi
 }
 
 if [ "$1" = "sass" ]; then
@@ -197,10 +239,9 @@ elif [ "$1" == "all" ]; then
     post_fontello_conf
     download_fontello
     compile_sass
-    check_files
+    check_files "remove_script"
 else
- printf " \e[93m"
- echo "Wellcome to pychat download manager, available commands are:"
+ printf " \e[93mWellcome to pychat download manager, available commands are:\n"
  chp all "Downloads all content required for project"
  chp check_files "Verifies if all files are installed"
  chp sass "Compiles css"
@@ -219,4 +260,4 @@ fi
 # Sounds
 #curl -L -o $TMP_DIR/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip $TMP_DIR/sounds.zip -d $SOUNDS_DIR
 
-rm -rfv "$TMP_DIR"
+delete_tmp_dir

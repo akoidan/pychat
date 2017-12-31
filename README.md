@@ -106,7 +106,6 @@ TODO
 * TODO if someone offers a new call till establishing connection for a call self.call_receiver_channel would be set to wrong
 * !!!IMPORTANT Debug call dialog by switching channels while calling and no.
 * shape-inside for contentteditable 
-* Colored print in download_content.sh
 * Add multi-language support. 
 * Move clear cache icon from nav to settings
 * add email confirmation for username or password change
