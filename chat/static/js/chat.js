@@ -4113,13 +4113,17 @@ function CallHandler(roomId) {
 		self.attachDomEvents();
 	};
 	self.testSound = function () {
-		chatTestVolume.setSinkId(self.dom.speakers.value);
-		chatTestVolume.pause();
-		chatTestVolume.currentTime = 0;
-		chatTestVolume.volume = 1;
-		var prom = chatTestVolume.play();
-		prom && prom.catch(function (e) {
-		});
+		if (chatTestVolume.setSinkId) {
+			chatTestVolume.setSinkId(self.dom.speakers.value);
+			chatTestVolume.pause();
+			chatTestVolume.currentTime = 0;
+			chatTestVolume.volume = 1;
+			var prom = chatTestVolume.play();
+			prom && prom.catch(function (e) {
+			});
+		} else {
+			growlError("Your browser doesn't support changing output channel")
+		}
 	};
 	self.speakerChanged = function() {
 		for (var pcName in self.peerConnections) {
@@ -5221,7 +5225,7 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 		self.createPeerConnectionParent();
 		self.pc.onaddstream = function (event) {
 			self.log("onaddstream")();
-			Utils.setVideoSource(self.dom.remote, event.stream);
+			Utils.setVideoSource(self.dom.remote, event.stream).catch(Utils.clickToPlay(self.dom.remote))
 			var speakerId = getSpeakerId();
 			if (speakerId && self.dom.remote.setSinkId) {
 				self.dom.remote.setSinkId(speakerId);
@@ -5344,6 +5348,7 @@ function WebRtcApi() {
 		delete self.connections[id];
 	};
 	self.attachEvents = function () {
+		navCallIcon.onclick = self.toggleCallContainer;
 		self.dom.webRtcFileIcon.onclick = self.clickFile;
 		self.dom.fileInput.onchange = function () {
 			self.offerFile(self.dom.fileInput.files[0], channelsHandler.activeChannel);
@@ -5522,6 +5527,15 @@ var Utils = {
 		video.src = "";
 		video.load()
 	},
+	clickToPlay: function (video) {
+		return function () {
+			new Growl("Your browser has blocked remote video sound, please click on this message to enable it", function () {
+				video.play().then(function () {
+					growlInfo("Sound has been enabled");
+				})
+			}).showInfinity('col-info');
+		}
+	},
 	pingExtension: function (cb) {
 		if (chrome.runtime && chrome.runtime.sendMessage) {
 			var triggered = false;
@@ -5567,7 +5581,7 @@ var Utils = {
 	},
 	setVideoSource: function (domEl, stream) {
 		domEl.src = URL.createObjectURL(stream);
-		domEl.play();
+		return domEl.play();
 	},
 	checkAndPlay: function (element) {
 		if (!window.sound || !notifier.isTabMain()) {
