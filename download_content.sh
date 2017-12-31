@@ -51,7 +51,9 @@ check_files() {
       if [ ! -f "$path" ] && [ ! -d "$path" ]; then #if doen't exist
         ((failed_count++))
          printError "Can't find file: $path"
-        failed_items[$failed_count]="$path"
+         failed_items[$failed_count]="$path"
+      else
+        echo "File $path exists"
       fi
     done
 
@@ -67,7 +69,7 @@ check_files() {
         if [ "$1" = "remove_script" ]; then
             printf "\e[92mAll files are installed. Population succeeded\e[0;37;40m\n"
         else
-            printOut "All files are present"
+            echo "All files are present"
         fi
     fi
 }
