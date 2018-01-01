@@ -16,6 +16,9 @@
 	-ms-transition: $text
 	transition: $text
 
+@mixin drop-padding($top, $left)
+	padding: $top + 1px $left - 1px $top - 1px $left + 1px
+
 @mixin linear-gradient-values($value...)
 	background-image: -webkit-linear-gradient($value)
 	background-image: -moz-linear-gradient($value)
@@ -31,18 +34,31 @@
 	border-radius: 4px
 	outline: none
 	color: $textColor
+	border: 1px solid transparent
 	&:not(:hover):not(:active)
+		border-top: 1px solid lighten($backgroundColor, 20%)
+		border-left: 1px solid lighten($backgroundColor, 5%)
+		border-bottom: 1px solid darken($backgroundColor, 25%)
+		border-right: 1px solid darken($backgroundColor, 25%)
 		@include linear-gradient-values($backgroundColor 0%, $bgEnd 100%)
 	&:hover:not(:active)
+		cursor: pointer
 		color: lighten($textColor, 8%)
-		background-color: desaturate(darken($backgroundColor, 5%), 5%)
+		//background-color: desaturate(darken($backgroundColor, 5%), 5%)
+		background-color: darken($backgroundColor, 8%)
 	&:active
+		border: 1px solid transparent
+		cursor: pointer
+		border-top: 1px solid darken($backgroundColor, 25%)
+		border-left: 1px solid darken($backgroundColor, 25%)
+		border-right: 1px solid transparent
+		border-bottom: 1px solid $backgroundColor
 		@include box-shadow(1px 1px 1px rgba(255, 255, 255, 0.2))
 		color: lighten($textColor, 15%)
-		@include linear-gradient-values($bgEnd 0%, darken($backgroundColor, 1.7%) 100%)
+		@include linear-gradient-values(darken($backgroundColor, 8.7%) 0%, darken($backgroundColor, 1.7%) 100%)
 	padding: $padding-vert $padding-hori
 	&:active:not([disabled])
-		padding: $padding-vert + 1 $padding-hori $padding-vert - 1 $padding-hori
+		@include drop-padding($padding-vert, $padding-hori)
 	&[disabled]
 		@include linear-gradient-values($backgroundColor 0%, $bgEnd 100%)
 		color: darken($textColor, 20%) !important
@@ -145,8 +161,6 @@
 		to
 			background-position: #{ -$width*($steps) + 'px'} #{'-' + $y+'px'}
 
-@mixin drop-padding($top, $left)
-	padding: $top + 1px $left - 1px $top - 1px $left + 1px
 
 @function pow($number, $exponent)
 	$value: 1

@@ -24,30 +24,9 @@ li
 	vertical-align: middle
 	margin-top: 15%
 
-@mixin button-style()
-	border: 1px solid transparent
-	border-radius: 3px
-	font-size: 18px
-	padding: $button-padding-top $button-padding-left
-
-	&:hover
-		cursor: pointer
-
 .window-body
 	padding: 10px
 
-
-input[type=button],
-input[type=submit],
-button
-	@include button-style
-input[type=file]::-webkit-file-upload-button
-	@include button-style
-@-moz-document url-prefix()
-	input[type=file]
-		@include button-style
-button
-	border-bottom: none
 
 [class^='icon-']:hover
 	cursor: pointer
@@ -339,7 +318,6 @@ video
 
 		&[type=submit]
 			width: 100%
-			padding: $userProfileData-sp
 			margin-bottom: 10px
 		&[type=file]
 			width: 100%
