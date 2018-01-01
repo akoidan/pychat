@@ -2,7 +2,6 @@
 @import "../../partials/variables"
 
 .color-reg
-	@import "../checkbox"
 	.message-header-others
 		color: #729fcf
 	.message-header-self
@@ -20,6 +19,7 @@
 	//		background-color: #181818
 
 	.context-menu
+		@include box-shadow(3px 3px 3px rgba(6, 3, 8, 0.77))
 		@include linear-gradient(#214341 , #193237)
 		li:hover
 			background-color: #0F201F

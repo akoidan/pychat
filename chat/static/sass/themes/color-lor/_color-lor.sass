@@ -8,6 +8,9 @@ $default-lor-background: #272c2d
 	background-color: $default-lor-background
 	color: $grayish-green
 
+	@import "../checkbox"
+	@import "../inputRange"
+
 	::-webkit-calendar-picker-indicator
 		background: rgb(186, 189, 182)
 
@@ -87,7 +90,8 @@ $default-lor-background: #272c2d
 				font-size: 14px
 				@include lor-button-style
 
-
+	fieldset legend
+		color: #9DD3DD
 	.growl, #smileParentHolder
 		background-color: rgba(34, 31, 31, 0.86)
 		border: 1px #775E39 solid
@@ -132,6 +136,10 @@ $default-lor-background: #272c2d
 	.active-icon
 		color: #ff2020
 
+	.context-menu, #m2Message, #user-context-menu
+		color: #ACACAC
+		&:hover
+			color: #c7c7c7
 
 	@include scrollbar($color-lor-scroll, $grayish-blue, #7dc071, #c08b00,#3c763d )
 

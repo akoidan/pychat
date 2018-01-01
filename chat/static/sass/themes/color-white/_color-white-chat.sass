@@ -1,0 +1,145 @@
+$mainWhiteTxtClr: #353535
+.color-white
+	background: #fff
+	color: $mainWhiteTxtClr
+	#chat-room-users-wrapper > span
+		background-color: #333333
+		color: white
+	nav
+		background-color: #333
+		border-color: #080808
+		color: white
+
+	@mixin button($bg, $br, $bgh, $brh, $bga, $bra)
+		color: #fff
+		background-color: $bg
+		border: 1px solid $br
+		outline: none
+		display: inline-block
+		padding: 6px 12px
+		margin-bottom: 0
+		font-size: 14px
+		font-weight: 400
+		line-height: 1.42857143
+		cursor: pointer
+		user-select: none
+		background-image: none
+		border-radius: 4px
+		&:hover
+			background-color: $bgh
+			border: 1px solid $brh
+			box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19)
+		&:active
+			background-color: $bga
+			border: 1px solid $bra
+
+
+	input[type=button]
+		@include button(#286090, #204d74, #286090, #204d74, #204d74, #122b40)
+	input[type=submit]
+		@include button(#5cb85c, #4cae4c, #4CAF50, #4CAF50, #449d44, #398439)
+	input::-webkit-file-upload-button
+		@include button(#286090, #204d74, #286090, #204d74, #204d74, #122b40)
+	input[type=text], input[type=date], input[type=email], div[contenteditable], textarea, select
+		height: 34px
+		padding: 3px 12px
+		font-size: 14px
+		line-height: 1.42857143
+		color: #555
+		background-color: #fff
+		background-image: none
+		border: 1px solid #ccc
+		border-radius: 4px
+		box-shadow: inset 0 1px 1px rgba(0,0,0,.075)
+		@include transition(border-color ease-in-out .15s,box-shadow ease-in-out .15s)
+		&:focus
+			border-color: #66afe9
+			outline: none
+			@include box-shadow(inset 0 1px 1px rgba(0,0,0,.075), 0 0 8px rgba(102,175,233,.6))
+
+	.modal-body
+		background-color: #c3c6ca
+	.icon-smile, .icon-picture, .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
+		color: #cccccc
+	.painterTools [class^='icon-']
+		color: #474747
+	.icon-webrtc-fullscreen, .icon-cog
+		color: #59b2c1
+	[class^='icon-volume']
+		color: #875d30
+	.icon-home
+		color: #20A0FF
+	.icon-brush
+		color: #c51900
+	.icon-pencil
+		color: #ae49ff
+	.icon-chart-pie
+		color: #8a9c2c
+	.icon-sign-out
+		color: #F5504C
+	.icon-wrench
+		color: #67C8B0
+	.icon-repeat
+		color: #009910
+	.icon-clear
+		color: #D42C5A
+	.icon-phone
+		color: #257517 /*override .		color-lor :link*/
+	.icon-doc-inv
+		color: #0095ad
+	.icon-popup
+		color: #ff9900
+	.icon-cog, .icon-webrtc-fullscreen
+		color: #21bace
+	.callActiveIcon
+		color: #bf1710
+	.painterTools .active-icon
+		color: #ff3111
+	#directUserTable, #chat-user-table ul
+		li.offline
+			.icon-user-secret, .icon-man, .icon-girl
+				color: #ad0300
+		li:not(.offline)
+			.icon-user-secret, .icon-man, .icon-girl
+				color: #005800
+	.message-header-others
+		color: red
+		.timeMess
+			color: $mainWhiteTxtClr
+	.message-header-self
+		color: blue
+		.timeMess
+			color: $mainWhiteTxtClr
+	.message-header-system
+		.timeMess
+			color: #555
+		color: #555
+	.chatbox
+		font-family: Helvetica,Arial,sans-serif
+		font-size: 14px
+	fieldset legend
+		color: #555
+
+	.growl
+		opacity: 1
+		color: white
+		border-radius: 0px
+		padding: 15px
+		background-color: rgba(79, 140, 255, 0.9) !important
+		&.col-error
+			background-color: rgba(201, 52, 1, 0.9) !important
+		&.col-success
+			background-color: rgba(4, 168, 79, 0.9) !important
+
+	.context-menu, #m2Message, #user-context-menu
+		background-color: #dedee1
+
+	@media screen and (max-width: 35em)
+		#chat-room-users-wrapper
+			border-bottom: 2px solid grey
+
+	#onlineStatus
+		&.online
+			color: green
+		&.offline
+			color: red

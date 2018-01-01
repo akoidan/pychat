@@ -3,6 +3,7 @@
 @import "themes/download-bar"
 @import "themes/color-lor/color-lor-chat"
 @import "themes/color-reg/color-reg-chat"
+@import "themes/color-white/color-white-chat"
 @import "partials/mixins"
 @import "partials/variables"
 [class^="message-header"]
@@ -35,7 +36,6 @@ fieldset
 	legend
 		padding: 0 10px
 		font-weight: bold
-		color: #9DD3DD
 
 #userMessageWrapper
 	margin: 8px
@@ -135,14 +135,11 @@ fieldset
 .context-menu
 	z-index: 3
 	font-size: 16px
-	color: #ACACAC
 	border: $user-context-border
-	@include box-shadow(3px 3px 3px rgba(6, 3, 8, 0.77))
 	li
 		padding: 2px 5px
 		&:hover
 			cursor: pointer
-			color: #c7c7c7
 			border-radius: 3px
 
 #m2Message
@@ -324,15 +321,7 @@ ul#directUserTable
 		max-width: calc(90vw - 50px)
 		border: 1px solid transparent
 		//border: 1px solid #697075
-		&::-webkit-scrollbar
-			height: 10px
-			width: 10px
-		&::-webkit-scrollbar-thumb
-			height: 10px
-			background-color: #5d738e
-			width: 10px
-		&::-webkit-scrollbar-corner
-			background-color: #1c1c1c
+
 		canvas
 			$c1: #cacacc
 			$c2: transparent
@@ -754,7 +743,6 @@ ul#directUserTable
 	display: inline-block
 	max-width: 100%
 	text-align: center
-	@include right-bottom-border(6px solid $mostly-black)
 
 	label
 		cursor: pointer
