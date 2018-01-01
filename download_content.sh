@@ -158,7 +158,7 @@ chp(){
  for (( c=1; c<= $indent; c++))  ; do
  printf "."
  done
- printf "\e[0;33;40m$2\n\e[0;37;40m"
+ printf " \e[0;33;40m$2\n\e[0;37;40m"
 }
 
 
@@ -269,7 +269,7 @@ else
  chp sass "Compiles css"
  chp download_files "Downloads static files like amcharts.js "
  chp zip_extension "Creates zip acrhive for ChromeWebStore from \e[96mscreen_cast_extension \e[0;33;40mdirectory"
- printf " \e[93mFonts:\n\e[0;37;40mTo edit fonts execute\e[1;37;40m fonts_session\e[0;37;40m After you finish editing fonts in browser execute \e[1;37;40mdownload_fonts\e[0;37;40m\n"
+ printf " \e[93mIcons:\n\e[0;37;40mTo edit icons execute\e[1;37;40m generate_icon_session\e[0;37;40m After you finish editing fonts in browser execute \e[1;37;40mdownload_icon\e[0;37;40m\n"
  chp generate_icon_session "Creates fontello session from config.json and saves it to \e[96m .fontello \e[0;33;40mfile"
  chp print_icon_session "Shows current used url for editing fonts"
  chp download_icon "Downloads and extracts fonts from fontello to project"

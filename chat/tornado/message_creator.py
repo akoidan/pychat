@@ -191,12 +191,13 @@ class WebRtcMessageCreator(object):
 			VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER,
 		}
 
-	def get_accept_file_message(self, connection_id):
+	def get_accept_file_message(self, connection_id, content):
 		return {
 			VarNames.EVENT: Actions.ACCEPT_FILE,
 			VarNames.CONNECTION_ID: connection_id,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
 			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
+			VarNames.CONTENT: content,
 		}
 
 	def reply_webrtc(self, event, connection_id, handler, content):
@@ -208,4 +209,12 @@ class WebRtcMessageCreator(object):
 			VarNames.CONTENT: content,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
 			VarNames.HANDLER_NAME: handler,
+		}
+
+	def retry_file(self, connection_id):
+		return {
+			VarNames.EVENT: Actions.RETRY_FILE_CONNECTION,
+			VarNames.CONNECTION_ID: connection_id,
+			VarNames.WEBRTC_OPPONENT_ID: self.id,
+			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
 		}
