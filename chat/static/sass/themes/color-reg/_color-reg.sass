@@ -66,14 +66,6 @@
 	input, select
 		outline: none
 
-	input
-		&[type=button],
-		&[type=submit]
-			&.blue-button
-				background-color: #005C64
-				font-size: 14px
-				text-transform: uppercase
-				@include linear-gradient(#28D2DE, #1A878F)
 
 	button > i
 		opacity: 1
@@ -82,43 +74,20 @@
 		font: 12px Oswald
 
 	@mixin reg-button-style()
-		outline: none
-		font: 12px Oswald
-		@include box-shadow(1px 1px 1px rgba(0,0,0,0.2))
-		text-shadow: $default-shadow
-		border-top: 1px solid rgba(255, 255, 255, 0.6)
-		border-left: 1px solid rgba(171, 171, 171, 0.83)
-		@include linear-gradient-hover($grayish-green, #4f5249, #2e302a)
+		@include linear-gradient-hover($grayish-green, #4f5249)
 
-		&:active
-			text-shadow: none
-			color: #e4e4e4
-			background-image: none
-			@include box-shadow(1px 1px 1px rgba(255,255,255,0.2))
-			@include drop-padding($button-padding-top, $button-padding-left)
-			@include top-left-border(1px inset rgba(1, 1, 1, 0.5))
 
-	input[type=button], input[type=submit], button
-		@include reg-button-style
 	input[type=file]::-webkit-file-upload-button
 		@include reg-button-style
 	@-moz-document url-prefix()
 		input[type=file]
 			@include reg-button-style
+	.lor-btn
+		@include reg-button-style
 	button
 		border-top: 1px solid rgba(227, 227, 227, 0.4)
 		border-left: 1px solid rgba(114, 114, 114, 0.4)
 
-
-
-	input[type=submit]
-		background-color: #375a34
-		@include linear-gradient(#457741, #2A4029)
-		&:hover:not(:active)
-			@include linear-gradient(#448b3f, #014905)
-		text-shadow: $default-shadow
-		@include box-shadow(1px 1px 2px 0 black)
-		-webkit-box-reflect: below 0 -webkit-gradient(linear, left top, left bottom, from(transparent), color-stop(50%, transparent), to(rgba(255, 255, 255, 0.2)))
 
 	.growl, #smileParentHolder
 		background-color: rgba(33,33,31, 0.9)

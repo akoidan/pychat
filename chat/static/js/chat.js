@@ -3566,6 +3566,7 @@ function DownloadBar(holder, fileSize, statusDiv) {
 		text: document.createElement('A'),
 		statusDiv: statusDiv
 	};
+	logger.info("Added download bar")();
 	self.max = fileSize;
 	self.dom.wrapper.className = 'progress-wrap';
 	self.dom.wrapper.appendChild(self.dom.text);
@@ -3721,6 +3722,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 		self.log('Creating offer...')();
 		self.offerCreator = true;
 		self.pc.createOffer(function (offer) {
+			offer.sdp = Utils.setMediaBitrate(offer.sdp, 1638400);
 			self.log('Created offer, setting local description')();
 			self.pc.setLocalDescription(offer, function () {
 				self.log('Sending offer to remote')();
@@ -3731,6 +3733,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	self.respondeOffer = function() {
 		self.offerCreator = false;
 		self.pc.createAnswer(function (answer) {
+			answer.sdp = Utils.setMediaBitrate(answer.sdp, 1638400);
 			self.log('Sending answer')();
 			self.pc.setLocalDescription(answer, function () {
 				self.sendWebRtcEvent(answer);
@@ -4036,8 +4039,10 @@ function CallHandler(roomId) {
 		self.dom.videoContainer.appendChild(iwc);
 		self.dom.videoContainer.appendChild(self.dom.videoContainerForVideos);
 		self.dom.videoContainer.className = 'videoContainer ' + CssUtils.visibilityClass;
-		function ap(el, icon) {
+		function ap(icon, holder) {
 			var row = self.dom.settingsContainer.insertRow(0);
+			var el = self.dom[holder];
+			self.dom[holder + 'Holder' ] = row;
 			var cell1 = row.insertCell(0);
 			var i = document.createElement('i');
 			i.className = icon;
@@ -4045,12 +4050,12 @@ function CallHandler(roomId) {
 			cell1.appendChild(el);
 			return cell1;
 		}
-		ap(self.dom.microphones, 'icon-mic');
-		ap(self.dom.cameras, 'icon-videocam');
-		var speakersCell = ap(self.dom.speakers, 'icon-volume-2');
+		ap('icon-mic', 'microphones');
+		ap('icon-videocam', 'cameras');
+		var speakersCell = ap('icon-volume-2', 'speakers');
 		speakersCell.appendChild(self.dom.playTestSound);
 		self.dom.playTestSound.className = 'playTestSound';
-		ap(self.dom.headerText, 'icon-quote-left');
+		ap('icon-quote-left', 'headerText');
 		self.dom.headerText.textContent = 'Call info';
 		self.dom.headerText.className = 'callInfo';
 		self.dom.playTestSound.textContent = "Play test sound";
@@ -4084,7 +4089,7 @@ function CallHandler(roomId) {
 
 		self.dom.hangUpHolder.className = 'hangUpHolder ' + CssUtils.visibilityClass;
 		self.dom.hangUpHolder.appendChild(self.dom.hangUpIcon);
-		self.dom.hangUpIcon.className = 'icon-hang-up ';
+		self.dom.hangUpIcon.className = 'icon-hang-up callActiveIcon';
 		self.dom.hangUpIcon.title = 'Hang Up';
 		self.dom.microphoneLevel.setAttribute("max", "15");
 		self.dom.microphoneLevel.setAttribute("value", "0");
@@ -4113,13 +4118,17 @@ function CallHandler(roomId) {
 		self.attachDomEvents();
 	};
 	self.testSound = function () {
-		chatTestVolume.setSinkId(self.dom.speakers.value);
-		chatTestVolume.pause();
-		chatTestVolume.currentTime = 0;
-		chatTestVolume.volume = 1;
-		var prom = chatTestVolume.play();
-		prom && prom.catch(function (e) {
-		});
+		if (chatTestVolume.setSinkId) {
+			chatTestVolume.setSinkId(self.dom.speakers.value);
+			chatTestVolume.pause();
+			chatTestVolume.currentTime = 0;
+			chatTestVolume.volume = 1;
+			var prom = chatTestVolume.play();
+			prom && prom.catch(function (e) {
+			});
+		} else {
+			growlError("Your browser doesn't support changing output channel")
+		}
 	};
 	self.speakerChanged = function() {
 		for (var pcName in self.peerConnections) {
@@ -4191,10 +4200,10 @@ function CallHandler(roomId) {
 				}
 			})
 		}
-		[self.dom.microphones, self.dom.speakers, self.dom.cameras].forEach(function (d) {
-			if (d.children.length == 0) {
-
-			}
+		['microphones', 'cameras', 'speakers'].forEach(function (d) {
+			var el = self.dom[d];
+			var holder = self.dom[d+'Holder'];
+			CssUtils.setVisibility(holder, el.children.length > 0);
 		})
 	};
 	self.getDesktopShareFromExtension = function() {
@@ -4497,6 +4506,7 @@ function CallHandler(roomId) {
 		var messageRequest = {
 			action: 'offerCall',
 			channel: self.roomId,
+			content: {browser: browserVersion},
 			id: newId
 		};
 		wsHandler.sendToServer(messageRequest);
@@ -4565,7 +4575,8 @@ function CallHandler(roomId) {
 		self.log("CallHandler initialized")();
 		wsHandler.sendToServer({
 			action: 'replyCall',
-			connId: message.connId
+			connId: message.connId,
+			content: {browser: browserVersion}
 		});
 		self.acceptedPeers.push(message.opponentWsId);
 		self.createCallPeerConnection(message);
@@ -4771,7 +4782,7 @@ function FileReceiver(removeReferenceFn) {
 	self.acceptFileReply = function () {
 		if (self.fileSize > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem) {
 			self.sendErrorFSApi();
-			growlError("Your browser doesn't support receiving files over {}".format(bsize))
+			growlError("Your browser doesn't support receiving files over {}".format(bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API)))
 		} else {
 			self.peerConnections[self.offerOpponentWsId] = new FileReceiverPeerConnection(
 					self.connectionId,
@@ -4781,8 +4792,8 @@ function FileReceiver(removeReferenceFn) {
 					self.removeChildPeerReference
 			);
 			var db = self.addDownloadBar();
+			self.peerConnections[self.offerOpponentWsId].setDownloadBar(db); // should be before initFileSystemApi
 			self.peerConnections[self.offerOpponentWsId].initFileSystemApi(self.sendAccessFileSuccess);
-			self.peerConnections[self.offerOpponentWsId].setDownloadBar(db);
 		}
 	};
 	self.sendAccessFileSuccess = function (fileSystemSucess) {
@@ -4794,7 +4805,7 @@ function FileReceiver(removeReferenceFn) {
 			});
 		} else {
 			self.sendErrorFSApi();
-			self.peerConnections[self.offerOpponentWsId].destroy(); //TODO
+			self.peerConnections[self.offerOpponentWsId].ondestroyFileConnection("Browser doesn't support acepting file sizes over {}".format(bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API)));
 		}
 	};
 	self.ondestroyFileConnection = function (message) {
@@ -4816,7 +4827,8 @@ function FileReceiver(removeReferenceFn) {
 		self.offerOpponentWsId = message.opponentWsId;
 		wsHandler.sendToServer({
 			action: 'replyFile',
-			connId: message.connId
+			connId: message.connId,
+			content: {browser: browserVersion}
 		});
 		self.showOffer(message);
 	};
@@ -4836,6 +4848,7 @@ function FileSender(removeReferenceFn, file) {
 			channel: currentActiveChannel,
 			id: quedId,
 			content: {
+				browser: browserVersion,
 				name: self.fileName,
 				size: self.fileSize
 			}
@@ -4891,6 +4904,19 @@ function FilePeerConnection() {
 		}
 	};
 	self.setTranseferdAmount = function (value) {
+		var now = Date.now();
+		var timeDiff = now - self.lastMonitored;
+		if (timeDiff > 1000) {
+			var speed = (value - self.lastMonitoredValue) / timeDiff * 1000
+			self.lastMonitoredValue = value;
+			self.lastMonitored = now;
+			self.downloadBar.setStatus('{}/{} ({}/s)'.format(
+					bytesToSize(value),
+					bytesToSize(self.fileSize),
+					bytesToSize(speed)
+			));
+		}
+
 		self.downloadBar.setValue(value);
 	};
 	self.closeEvents = function () {
@@ -4906,6 +4932,7 @@ function FilePeerConnection() {
 
 function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSize, removeChildPeerReferenceFn) {
 	var self = this;
+	self.connectedToRemote = true;
 	self.fileSize = fileSize;
 	self.fileName = fileName;
 	self.blobsQueue = [];
@@ -4921,7 +4948,7 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 	self.superOnDestroyFileConnection = self.ondestroyFileConnection;
 	self.ondestroyFileConnection = function (data) {
 		self.superOnDestroyFileConnection(data);
-		self.downloadBar.setStatus("Error: Opponent closed connection");
+		self.downloadBar.setStatus(typeof data == 'string' ? data : "Error: Opponent closed connection");
 		self.downloadBar.setError();
 	};
 	self.assembleFileIfDone = function () {
@@ -4959,30 +4986,55 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 						self.fileWriter.onwriteend = self.onWriteEnd;
 						self.log("FileWriter is created")();
 						cb(true);
-					}, self.fileSystemErr(1, cb));
+					}, self.fileSystemErr(1, cb, fs));
 
-				}, self.fileSystemErr(2, cb))
+				}, self.fileSystemErr(2, cb, fs))
 			}, self.fileSystemErr(3, cb));
 		} else {
 			cb(false);
 		}
 	};
-	self.fileSystemErr = function (errN, cb) {
+	self.onExceededQuota = function(fs) {
+		var growl = new Growl("Can't accept file, because no space left on storage quota, click on this message to clear it. If you're accepting other files (even in other tabs) that will break their downloads", function () {
+			fs.root.createReader().readEntries(function (entries) {
+				entries.forEach(function (e) {
+					function onRemove() {
+						self.log("Removed {}", e.fullPath)();
+					}
+					if (e.isFile) {
+						e.remove(onRemove);
+					} else {
+						e.removeRecursively(onRemove);
+					}
+				})
+				growlInfo("Storage has been cleared");
+			})
+		});
+		growl.showInfinity('col-error');
+	}
+	self.fileSystemErr = function (errN, cb, fs) {
 		return function (e) {
-			growlError("FileSystemApi Error: " + e.message || e.code || e);
-			self.logErr("FileSystemApi Error {}, {}", errN, e.message || e.code || e)();
+			self.logErr("FileSystemApi Error {}: {}, code {}", errN, e.message || e, e.code)();
+			if (fs && e.code == 22) {
+				self.onExceededQuota(fs);
+			} else {
+				growlError("FileSystemApi Error: " + e.message || e.code || e);
+			}
 			cb(false);
 		};
-
 	};
 	self.channelOpen = function () {
+		self.lastMonitored = 0;
+		self.lastMonitoredValue = 0;
 		self.downloadBar.setStatus("Receiving file...");
 	};
 	self.superOnChannelMessage = self.onChannelMessage;
 	self.onChannelMessage = function (event) {
 		self.superOnChannelMessage(event);
 		self.receiveBuffer.push(event.data);
-		self.receivedSize += event.data.byteLength;
+		// chrome accepts bufferArray (.byteLength). firefox accepts blob (.size)
+		var receivedSize = event.data.byteLength ? event.data.byteLength : event.data.size;
+		self.receivedSize += receivedSize;
 		self.syncBufferWithFs();
 		self.setTranseferdAmount(self.receivedSize);
 		self.assembleFileIfDone();
@@ -5025,6 +5077,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 	var self = this;
 	FilePeerConnection.call(self);
 	self.file = file;
+	self.connectedToRemote = true;
 	self.fileName = file.name;
 	self.fileSize = file.size;
 	SenderPeerConnection.call(self, connectionId, opponentWsId, removeChildPeerReferenceFn);
@@ -5044,8 +5097,15 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 			self.downloadBar.setSuccess();
 
 		} else {
-			self.downloadBar.setStatus(data.content === 'decline' ?
-					"Declined by opponent" : "Connection error");
+			var errorMessage;
+			if (data.content == 'decline') {
+				errorMessage = "Declined by opponent";
+			} else if (data.content) {
+				errorMessage = data.content
+			} else {
+				errorMessage = "Connection error";
+			}
+			self.downloadBar.setStatus(errorMessage);
 			self.downloadBar.setError();
 		}
 	};
@@ -5075,6 +5135,8 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 			self.reader.onload = self.onFileReaderLoad;
 			self.sendCurrentSlice();
 			self.lastPrinted = 0;
+			self.lastMonitored = 0;
+			self.lastMonitoredValue = 0;
 		}
 	};
 	self.sendCurrentSlice = function () {
@@ -5099,17 +5161,17 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 					self.logTransferProgress("Buffer overflow by {}bytes, waiting to flush...",
 							bytesToSize(self.sendChannel.bufferedAmount))();
 					return window.setTimeout(self.onFileReaderLoad, 100, {target: {result: e.target.result}});
-				}
-				self.sendChannel.send(e.target.result);
-				var readSize = e.target.result.byteLength;
-				if (self.fileSize > self.offset + readSize) {
-					window.setTimeout(self.sendCurrentSlice, 0);
 				} else {
-					self.log("Exiting, offset is {} now, fs: {}", self.offset, self.fileSize)();
+					self.sendChannel.send(e.target.result);
+					var readSize = e.target.result.byteLength;
+					if (self.fileSize > self.offset + readSize) {
+						window.setTimeout(self.sendCurrentSlice, 0);
+					} else {
+						self.log("Exiting, offset is {} now, fs: {}", self.offset, self.fileSize)();
+					}
+					self.setTranseferdAmount(self.offset + readSize);
+					self.offset += self.CHUNK_SIZE;
 				}
-				self.setTranseferdAmount(self.offset + readSize);
-				self.offset += self.CHUNK_SIZE;
-				self.logTransferProgress("Transferred {}/{}", bytesToSize(self.offset), bytesToSize(self.fileSize))();
 			} else {
 				throw 'sendChannel status is {} which is not equals to "open"'.format(self.sendChannel.readyState);
 			}
@@ -5221,7 +5283,12 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 		self.createPeerConnectionParent();
 		self.pc.onaddstream = function (event) {
 			self.log("onaddstream")();
-			Utils.setVideoSource(self.dom.remote, event.stream);
+			var p = Utils.setVideoSource(self.dom.remote, event.stream)
+			if (p) { //firefox video.play doesn't return promise
+				// chrome returns promise, if it's on mobile devices video sound would be muted
+				// coz it initialized from network instead of user gesture
+				p.catch(Utils.clickToPlay(self.dom.remote))
+			}
 			var speakerId = getSpeakerId();
 			if (speakerId && self.dom.remote.setSinkId) {
 				self.dom.remote.setSinkId(speakerId);
@@ -5344,6 +5411,7 @@ function WebRtcApi() {
 		delete self.connections[id];
 	};
 	self.attachEvents = function () {
+		navCallIcon.onclick = self.toggleCallContainer;
 		self.dom.webRtcFileIcon.onclick = self.clickFile;
 		self.dom.fileInput.onchange = function () {
 			self.offerFile(self.dom.fileInput.files[0], channelsHandler.activeChannel);
@@ -5517,10 +5585,50 @@ function Storage() {
 }
 
 var Utils = {
+	setMediaBitrate: function (sdp, bitrate) {
+		return sdp;
+		var lines = sdp.split("\n");
+		var line = -1;
+		for (var i = 0; i < lines.length; i++) {
+			if (lines[i].indexOf("m=") === 0) {
+				line = i+1;
+				break;
+			}
+		}
+		if (line === -1) {
+			logger.info("Could not find the m line for {}", sdp);
+			return sdp;
+		}
+		// Skip i and c lines
+		while (lines[line].indexOf("i=") === 0 || lines[line].indexOf("c=") === 0) {
+			line++;
+		}
+		if (lines[line].indexOf("b") === 0) {
+			logger.info("Replaced b line at line", line)();
+			lines[line] = "b=AS:" + bitrate;
+			return lines.join("\n");
+		} else {
+			// Add a new b line
+			logger.info("Adding new b line before line", line)();
+			var newLines = lines.slice(0, line)
+			newLines.push("b=AS:" + bitrate)
+			newLines = newLines.concat(lines.slice(line, lines.length))
+			return newLines.join("\n")
+		}
+	},
 	detachVideoSource: function (video) {
 		video.pause();
 		video.src = "";
 		video.load()
+	},
+	clickToPlay: function (video) {
+		return function () {
+			new Growl("Your browser has blocked remote video sound, please click on this message to enable it", function () {
+				video.play().then(function () {
+					growlInfo("Sound has been enabled");
+				})
+			}).showInfinity('col-info');
+		}
 	},
 	pingExtension: function (cb) {
 		if (chrome.runtime && chrome.runtime.sendMessage) {
@@ -5567,7 +5675,7 @@ var Utils = {
 	},
 	setVideoSource: function (domEl, stream) {
 		domEl.src = URL.createObjectURL(stream);
-		domEl.play();
+		return domEl.play();
 	},
 	checkAndPlay: function (element) {
 		if (!window.sound || !notifier.isTabMain()) {

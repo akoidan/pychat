@@ -84,7 +84,11 @@ The string `rsok33GN:0005:EJAd` describes:
  - `EJAd` id of connection (`TornadoHandler.id`)
 
 Jetbrains filewatcher:
-=====================
- 1. arguments: `--no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded`
+======================
+I use the latest [sassc](https://github.com/sass/sassc) implementation for libsass, since it's the fastest ones, along with chrome workspace feature you can edit sass directly in browser or with jetbrains filewatcher. Latest sassc also allows inline sourcemap (base64 map directly in css file) that correctly shows source files in chrome. `--sourcemap=inline` does that. If your sassc doesn't have inline sourcemap support, please remove flag from argument command below. Also you you use any implementation you want, it's just a suggestion.
+
+Go to Jetbrains `Settings` (alt+shift+s) -> `Tools` -> `FileWatchers` -> `Click add` -> `Sass`:
+
+ 1. arguments: `--no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded`. Or for newest sass `$FilePath$ $ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --sourcemap=inline`
  2. working directory: `$ProjectFileDir$/chat/static/sass`
  3. output files to refresh: `$ProjectFileDir$/chat/static/css/`

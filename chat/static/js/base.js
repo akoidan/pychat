@@ -287,7 +287,7 @@ function encodeHTML(html) {
 
 function bytesToSize(bytes) {
 	var sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-	if (bytes == 0) return '0 Byte';
+	if (bytes < 1) return '0 Byte';
 	var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
 	return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 }
@@ -403,7 +403,7 @@ var CssUtils = {
 	}
 })();
 
-var Growl = function (message) {
+var Growl = function (message, onclicklistener) {
 	var self = this;
 	self.growlHolder = growlHolder;
 	self.message = message;
@@ -429,23 +429,26 @@ var Growl = function (message) {
 			// logger.info("Growl #{} is already removed", self.id)();
 		}
 	};
-	self.showInfinity = function(growlClass) {
+	self.showInfinity = function (growlClass) {
 		self.growl = document.createElement('div');
 		// logger.info("Rendering growl #{}", self.id)();
 		if (self.message) {
 			self.message = self.message.trim();
-			self.growl.innerHTML = self.message.indexOf("<") === 0? self.message : encodeAnchorsHTML(self.message);
+			self.growl.innerHTML = self.message.indexOf("<") === 0 ? self.message : encodeAnchorsHTML(self.message);
 		}
 		self.growl.className = 'growl ' + growlClass;
 		self.growlHolder.appendChild(self.growl);
 		self.growl.clientHeight; // request to paint now!
 		self.growl.style.opacity++;
+		self.growl.onclick = function () {
+			onclicklistener && onclicklistener();
+			self.hide();
+		}
 	};
 	self.show = function (baseTime, growlClass) {
 		self.showInfinity(growlClass);
 		if (baseTime) {
 			var timeout = baseTime + self.message.length * 50;
-			self.growl.onclick = self.hide;
 			setTimeout(self.hide, timeout);
 		}
 	};
