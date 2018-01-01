@@ -173,6 +173,14 @@ fieldset
 .max-height-scrollable
 	overflow-y: auto
 
+#chat-user-table > ul,
+ul#directUserTable
+	display: flex
+	flex-direction: column
+	li:not(.offline)
+		order: 1
+	li.offline
+		order: 2
 #chat-user-table
 	margin: 5px 0
 	li

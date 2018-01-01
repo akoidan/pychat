@@ -101,8 +101,7 @@ TODO
 * add message queue if socketed is currently disconnected ???
 * Add link to gihub in console
 * webrtc connection lost while transfering file causes js error
-* Add title for room. 
-* Show online status right of Direct user's messages besides channels' online 
+* Add title for room.
 * TODO if someone offers a new call till establishing connection for a call self.call_receiver_channel would be set to wrong
 * !!!IMPORTANT Debug call dialog by switching channels while calling and no.
 * shape-inside for contentteditable 
