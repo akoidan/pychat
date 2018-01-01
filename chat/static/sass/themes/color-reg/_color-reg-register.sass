@@ -5,11 +5,22 @@
 	.forg-pass
 		color: #249BA3
 
-	input[type=submit].disabled
-		@include linear-gradient(#434343, #434343)
-		background-color: #303030
-		&:active
-			background-image: none
+	%top-btn-register
+		border-top: 1px solid rgba(255, 255, 255, 0.6)
+		border-left: 1px solid rgba(171, 171, 171, 0.83)
+		text-transform: uppercase
+		font: 14px Oswald
+		border-radius: 0px !important
+	.cyan-btn
+		@include linear-gradient-hover(#BABDB6, #28D2DE, 15px, 12px)
+		@extend %top-btn-register
+	.signLogBtn:not(.disabled)
+		@extend %top-btn-register
+		@extend .cyan-btn
+	.signLogBtn.disabled
+		@include linear-gradient-hover($grayish-green, #434343, 15px, 12px, #434343)
+		@extend %top-btn-register
+
 
 	.submit-button
 		width: 100%

@@ -4,7 +4,7 @@
 		<div class="padding10" style="position: relative;">
 			<img {% if form.instance.photo %}  src="{{ form.instance.photo.url }}" {% endif %} alt="ava" id='photoImg'  class="fullwidth">
 			<video autoplay id="changeProfileVideo"></video>
-		<input type="button" class="button" value="Make a photo from webcam" style="margin-top: 10px" onclick="startCapturingVideo(this)"/>
+		<input type="button" class="button lor-btn" value="Make a photo from webcam" style="margin-top: 10px" onclick="startCapturingVideo(this)"/>
 		</div>
 	</div>
 	<form  method="post" id="changeProfileForm" enctype="multipart/form-data" onsubmit="saveProfile(event)">

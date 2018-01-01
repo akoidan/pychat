@@ -4089,7 +4089,7 @@ function CallHandler(roomId) {
 
 		self.dom.hangUpHolder.className = 'hangUpHolder ' + CssUtils.visibilityClass;
 		self.dom.hangUpHolder.appendChild(self.dom.hangUpIcon);
-		self.dom.hangUpIcon.className = 'icon-hang-up ';
+		self.dom.hangUpIcon.className = 'icon-hang-up callActiveIcon';
 		self.dom.hangUpIcon.title = 'Hang Up';
 		self.dom.microphoneLevel.setAttribute("max", "15");
 		self.dom.microphoneLevel.setAttribute("value", "0");

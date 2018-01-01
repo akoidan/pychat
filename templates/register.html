@@ -17,8 +17,8 @@
 {% endblock %}
 {% block content %}
 <div class="reg-log-container">
-	<input type="submit" class="blue-button" id="showRegister" value="Sign Up"/>
-	<input type="submit" class="disabled blue-button" id="showLogin" value="Log In" style="float: right"/>
+	<input type="submit" class="signLogBtn" id="showRegister" value="Sign Up"/>
+	<input type="submit" class="disabled signLogBtn" id="showLogin" value="Log In" style="float: right"/>
 	<form id="recoverForm" class="hidden" method="post" onsubmit="restorePassword(event);">
 		<h1>Restore password</h1>
 		<div>
@@ -29,7 +29,7 @@
 			<div class="g-recaptcha" data-theme="dark" data-sitekey="{{ captcha_key }}"></div>
 		{% endif %}
 		<div>
-			<input type="submit" class="blue-button submit-button" value="Recover password"/>
+			<input type="submit" class="cyan-btn submit-button" value="Recover password"/>
 		</div>
 	</form>
 	<form id="regLoginForm" method="post" class="hidden" onsubmit="login(event);">
@@ -47,16 +47,16 @@
 		</div>
 		<div>
 			{% if oauth_token %}
-				<button class="g-icon" title="Sign in using google account" onclick="googleLogin(event)">Via
+				<button class="g-icon lor-btn" title="Sign in using google account" onclick="googleLogin(event)">Via
 					Google
 				</button>
 			{% endif %}
 			{% if fb_app_id %}
-				<button title="Sign in using facebook account" class="f-icon" onclick="facebookLogin(event)">
+				<button title="Sign in using facebook account" class="f-icon lor-btn" onclick="facebookLogin(event)">
 					<i class="icon-facebook-squared"></i>Via Facebook
 				</button>
 			{% endif %}
-			<input type="submit" class="blue-button submit-button" value="LOG IN"/>
+			<input type="submit" class="cyan-btn submit-button" value="LOG IN"/>
 		</div>
 	</form>
 	<form id="register-form" method="post" onsubmit="register(event)">
@@ -93,14 +93,14 @@
 			<div class="slider closed"></div>
 		</div>
 		{% if oauth_token %}
-			<button class="g-icon" title="Sign up using google account" onclick="googleLogin(event)">With Google</button>
+			<button class="g-icon lor-btn" title="Sign up using google account" onclick="googleLogin(event)">With Google</button>
 		{% endif %}
 		{% if fb_app_id %}
-			<button title="Sign up using facebook account" class="f-icon" onclick="facebookLogin(event)">
+			<button title="Sign up using facebook account" class="f-icon lor-btn" onclick="facebookLogin(event)">
 				<i class="icon-facebook-squared"></i>With Facebook
 			</button>
 		{% endif %}
-		<input type="submit" class="blue-button submit-button" value="REGISTER"/>
+		<input type="submit" class="cyan-btn submit-button" value="REGISTER"/>
 		{% csrf_token %} {% comment %}IS csrf needed?{% endcomment %}
 	</form>
 </div>
