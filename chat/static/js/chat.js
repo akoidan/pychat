@@ -21,6 +21,7 @@ var GENDER_ICONS = {
 	'Female': 'icon-girl',
 	'Secret': 'icon-user-secret'
 };
+var webRtcFileIcon;
 var navCallIcon;
 var directUserTable;
 var audioProcesssors = [];
@@ -53,6 +54,7 @@ onDocLoad(function () {
 	chatFileAudio = $('chatFile');
 	chatTestVolume = $('chatTestVolume');
 	directUserTable = $('directUserTable');
+	webRtcFileIcon = $('webRtcFileIcon');
 	minimizedWindows = new MinimizedWindows();
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	channelsHandler = new ChannelsHandler();
@@ -2239,7 +2241,7 @@ function ChannelsHandler() {
 		usersStateText: $('usersStateText'),
 		inviteUser: $('inviteUser'),
 		navCallIcon: navCallIcon,
-		webRtcFileIcon: $('webRtcFileIcon'),
+		webRtcFileIcon: webRtcFileIcon,
 		m2Message: $('m2Message')
 	};
 	self.getActiveChannel = function () {
@@ -2918,10 +2920,13 @@ function ChannelsHandler() {
 	self.show = function() {
 		self.superShow();
 		CssUtils.showElement(navCallIcon);
+		CssUtils.showElement(webRtcFileIcon);
 	};
+	self.render = self.show;
 	self.hide = function() {
 		self.superHide();
 		CssUtils.hideElement(navCallIcon);
+		CssUtils.hideElement(webRtcFileIcon);
 	}
 }
 
@@ -5363,7 +5368,7 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 function WebRtcApi() {
 	var self = this;
 	self.dom = {
-		webRtcFileIcon: $('webRtcFileIcon'),
+		webRtcFileIcon: webRtcFileIcon,
 		fileInput: $('webRtcFileInput')
 	};
 	self.connections = {};

@@ -77,6 +77,11 @@ $default-lor-background: #272c2d
 	#issueForm input[type=submit]
 		@include color-lor-submit
 
+	.yesNo, .answerButtons
+		input[type=button], button
+			padding: 6px 12px
+			@include lor-button-style
+
 	#changeProfileForm
 		input[type=submit], .green-btn
 			@include lor-button-style
