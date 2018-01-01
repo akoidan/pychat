@@ -1841,7 +1841,7 @@ function NotifierHandler() {
 	self.currentTabId = Date.now().toString();
 	/*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
 	self.LAST_TAB_ID_VARNAME = 'lastTabId';
-	self.clearNotificationTime = 500;
+	self.clearNotificationTime = 5000;
 	self.serviceWorkerTry = true;
 	self.tryNotification = function (params, cb) {
 		if (!self.serviceWorkerTry && !self.registration) {
@@ -4159,7 +4159,7 @@ function CallHandler(roomId) {
 						var abstrPc = self.peerConnections[pcName];
 						var pc = abstrPc.pc;
 						if (pc) {
-							pc.removeStream(self.localStream);
+							self.localStream && pc.removeStream(self.localStream);
 							pc.addStream(stream);
 							abstrPc.createOffer();
 						}
@@ -4304,9 +4304,9 @@ function CallHandler(roomId) {
 			self.log("Local stream has been attached")();
 			self.localStream = stream;
 			Utils.setVideoSource(self.dom.local, stream);
+			self.audioProcessor = Utils.createMicrophoneLevelVoice(stream, self.processAudio);
 		}
 		self.setCallIconsState();
-		self.audioProcessor = Utils.createMicrophoneLevelVoice(stream, self.processAudio);
 	};
 	self.setCallIconsState = function () {
 		var videoTrack = self.getTrack('video');
@@ -4430,7 +4430,7 @@ function CallHandler(roomId) {
 			}
 			self.setDesktopCapture(newValue);
 		}
-		if (track) {
+		if (track && track.readyState === 'live') {
 			track.enabled = self.constraints[kind];
 		} else {
 			self.updateConnection();
@@ -5297,7 +5297,7 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 			self.audioProcessor = Utils.createMicrophoneLevelVoice(event.stream, self.processAudio);
 			onStreamAttached(self.opponentWsId);
 		};
-		self.pc.addStream(stream);
+		stream && self.pc.addStream(stream);
 	};
 	self.processAudio = function (audioProc) {
 		return function () {
