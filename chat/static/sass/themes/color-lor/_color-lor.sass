@@ -52,22 +52,41 @@ $default-lor-background: #272c2d
 
 	@mixin lor-button-style()
 		color: $grayish-green
-		background-color: rgb(62, 65, 58)
+		outline: none
+		border-radius: 3px
+		border: 1px solid transparent
+		&:not(:hover)
+			background-color: rgb(62, 65, 58)
 		&:hover
 			color: #000000
 			background: linear-gradient($grayish-green, #abbdab) repeat scroll 0 0 transparent
 			@include box-shadow($default-box-shadow)
-	input[type=button],
-	input[type=submit],
-	button
+	@mixin color-lor-submit
 		@include lor-button-style
-	button:focus
-		outline: none
-	input[type=file]::-webkit-file-upload-button
+		padding: 10px 12px
+		font-size: 18px
+	@mixin color-lor-btn
 		@include lor-button-style
-	@-moz-document url-prefix()
-		input[type=file]
+		padding: 6px 12px
+	.lor-btn, .blue-btn
+		@include color-lor-btn
+
+	#issueForm input[type=submit]
+		@include color-lor-submit
+
+	#changeProfileForm
+		input[type=submit], .green-btn
 			@include lor-button-style
+			padding: 10px 12px
+			font-size: 18px
+		input[type=file]::-webkit-file-upload-button
+			@include lor-button-style
+			padding: 5px 10px
+		@-moz-document url-prefix()
+			input[type=file]
+				font-size: 14px
+				@include lor-button-style
+
 
 	.growl, #smileParentHolder
 		background-color: rgba(34, 31, 31, 0.86)
@@ -113,11 +132,6 @@ $default-lor-background: #272c2d
 	.active-icon
 		color: #ff2020
 
-	// TODO uncomment
-	//#hideableDropDown
-	//	background-color: rgb(38, 36, 37)
-	//	border-color: rgb(30, 30, 30)
-	//	@include box-shadow("3px 3px 7px #0E1011")
 
 	@include scrollbar($color-lor-scroll, $grayish-blue, #7dc071, #c08b00,#3c763d )
 
