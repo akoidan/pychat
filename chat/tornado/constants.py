@@ -30,6 +30,7 @@ class Actions(object):
 	OFFER_FILE_CONNECTION = 'offerFile'
 	OFFER_CALL_CONNECTION = 'offerCall'
 	REPLY_FILE_CONNECTION = 'replyFile'
+	RETRY_FILE_CONNECTION = 'retryFile'
 	REPLY_CALL_CONNECTION = 'replyCall'
 
 

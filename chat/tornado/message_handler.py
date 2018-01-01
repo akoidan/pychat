@@ -320,6 +320,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 			Actions.OFFER_FILE_CONNECTION: self.offer_webrtc_connection,
 			Actions.OFFER_CALL_CONNECTION: self.offer_webrtc_connection,
 			Actions.REPLY_FILE_CONNECTION: self.reply_file_connection,
+			Actions.RETRY_FILE_CONNECTION: self.retry_file_connection,
 			Actions.REPLY_CALL_CONNECTION: self.reply_call_connection,
 		})
 		self.post_process_message.update({
@@ -346,6 +347,16 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		self.ws_write(self_message)
 		self.logger.info('!! Offering a webrtc, connection_id %s', connection_id)
 		self.publish(opponents_message, room_id, True)
+
+	def retry_file_connection(self, in_message):
+		connection_id = in_message[VarNames.CONNECTION_ID]
+		opponent_ws_id = in_message[VarNames.WEBRTC_OPPONENT_ID]
+		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
+		receiver_ws_status = self.sync_redis.shget(connection_id, opponent_ws_id)
+		if receiver_ws_status == WebRtcRedisStates.READY and self.id == sender_ws_id:
+			self.publish(self.retry_file(connection_id), opponent_ws_id)
+		else:
+			raise ValidationError("Invalid channel status.")
 
 	def reply_file_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
@@ -447,12 +458,14 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 
 	def accept_file(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
+		content = in_message[VarNames.CONTENT]
 		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
 		sender_ws_status = self.sync_redis.shget(connection_id, sender_ws_id)
 		self_ws_status = self.sync_redis.shget(connection_id, self.id)
-		if sender_ws_status == WebRtcRedisStates.READY and self_ws_status == WebRtcRedisStates.RESPONDED:
+		if sender_ws_status == WebRtcRedisStates.READY \
+				and self_ws_status in [WebRtcRedisStates.RESPONDED, WebRtcRedisStates.READY]:
 			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
-			self.publish(self.get_accept_file_message(connection_id), sender_ws_id)
+			self.publish(self.get_accept_file_message(connection_id, content), sender_ws_id)
 		else:
 			raise ValidationError("Invalid channel status")
 
