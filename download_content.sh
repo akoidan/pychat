@@ -67,11 +67,15 @@ check_files() {
       exit 1
     else
         if [ "$1" = "remove_script" ]; then
-            printf "\e[92mAll files are installed. Population succeeded\e[0;37;40m\n"
+            printSuccess "All files are installed. Population succeeded"
         else
             echo "All files are present"
         fi
     fi
+}
+
+printSuccess() {
+    printf "\e[92m$1\e[0;37;40m\n"
 }
 
 printOut() {
@@ -92,6 +96,7 @@ minify_js() {
         mkdir "$TMP_DIR"
         curl -X GET https://dl.google.com/closure-compiler/compiler-latest.zip -o "$TMP_DIR/closure.zip"
         unzip "$TMP_DIR/closure.zip" "*.jar" -d "$PROJECT_ROOT"
+        delete_tmp_dir
     fi
     jar_file=`ls "$PROJECT_ROOT"/closure-compiler*.jar`
     java -jar "$jar_file"  --compilation_level ADVANCED_OPTIMIZATIONS  --js "$JS_DIR/base.js" --js "$JS_DIR/smileys_data.js" --js "$JS_DIR/chat.js" --js_output_file "$JS_DIR/chat-minified.js"
@@ -147,8 +152,9 @@ zip_extension() {
 
 chp(){
  size=${#1}
- indent=$((20 - $size))
+ indent=$((25 - $size))
  printf "\e[1;37;40m$1\e[0;36;40m"
+ printf " "
  for (( c=1; c<= $indent; c++))  ; do
  printf "."
  done
@@ -158,7 +164,7 @@ chp(){
 
 post_fontello_conf() {
     printOut "Creating fontello config"
-    curl --silent --show-error --fail --form "config=@./config.json" --output .fontello http://fontello.com
+    safeRunCommand curl --silent --show-error --fail --form "config=@./config.json" --output .fontello http://fontello.com
     fontello_session=$(cat .fontello)
     url="http://fontello.com/`cat .fontello`"
     echo "Genereted fontello url: $url"
@@ -167,21 +173,31 @@ post_fontello_conf() {
 show_fontello_session() {
     fontello_session=$(cat .fontello)
     url="http://fontello.com/`cat .fontello`"
-    printOut "Fonts url is: $url , open it mannualy if your browser doesn't launch automatically"
+    printOut "Fonts url is: $url \nIt has been opened in new browser tab"
     python -mwebbrowser $url
+}
+
+
+safeRunCommand() {
+  eval "$@"
+  ret_code=$?
+  if [ $ret_code != 0 ]; then
+    printf "\e[91mError $ret_code when executing command: \e[93m$@ \e[0;37;40m\n"
+    exit $ret_code
+  fi
 }
 
 download_fontello() {
     fontello_session=$(cat .fontello)
     printOut "Downloading fontello using fontello session '$fontello_session'"
     mkdir "$TMP_DIR"
-    curl -X GET "http://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
-    unzip "$TMP_DIR/fonts.zip" -d "$TMP_DIR/fontello"
+    safeRunCommand curl -X GET "http://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
+    safeRunCommand unzip "$TMP_DIR/fonts.zip" -d "$TMP_DIR/fontello"
     dir=$(ls "$TMP_DIR/fontello")
-    cp  "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
-    cp  "$TMP_DIR/fontello"/$dir/css/fontello.css "$SASS_DIR/partials/_fontello.scss"
-    cp "$TMP_DIR/fontello"/$dir/demo.html "$STATIC_DIR/demo.html"
-    cp "$TMP_DIR/fontello"/$dir/config.json "$PROJECT_ROOT"
+    cp -v "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
+    cp -v "$TMP_DIR/fontello"/$dir/css/fontello.css "$SASS_DIR/partials/_fontello.scss"
+    cp -v "$TMP_DIR/fontello"/$dir/demo.html "$STATIC_DIR/demo.html"
+    cp -v "$TMP_DIR/fontello"/$dir/config.json "$PROJECT_ROOT"
 
     if type "sed" &> /dev/null; then
         sed -i '1i\@charset "UTF-8";' "$SASS_DIR/partials/_fontello.scss"
@@ -195,20 +211,20 @@ download_files() {
     # use curl since it's part of windows git bash
     mkdir -p "$CSS_DIR"
     printOut "Downloading pikaday.js"
-    curl -X GET https://dbushell.com/Pikaday/css/pikaday.css -o "$CSS_DIR/pikaday.css"
-    curl -X GET https://raw.githubusercontent.com/dbushell/Pikaday/master/pikaday.js -o "$JS_DIR/pikaday.js"
+    safeRunCommand curl -X GET https://dbushell.com/Pikaday/css/pikaday.css -o "$CSS_DIR/pikaday.css"
+    safeRunCommand curl -X GET https://raw.githubusercontent.com/dbushell/Pikaday/master/pikaday.js -o "$JS_DIR/pikaday.js"
     printOut "Downloading moment.js"
-    curl -X GET http://momentjs.com/downloads/moment.js -o "$JS_DIR/moment.js"
+    safeRunCommand curl -X GET http://momentjs.com/downloads/moment.js -o "$JS_DIR/moment.js"
     printOut "Downloading amcharts.js"
-    curl -X GET https://www.amcharts.com/lib/3/amcharts.js -o "$JS_DIR/amcharts.js"
-    curl -X GET https://www.amcharts.com/lib/3/pie.js -o "$JS_DIR/amcharts-pie.js"
-    curl -X GET https://www.amcharts.com/lib/3/themes/dark.js -o "$JS_DIR/amcharts-dark.js"
+    safeRunCommand curl -X GET https://www.amcharts.com/lib/3/amcharts.js -o "$JS_DIR/amcharts.js"
+    safeRunCommand curl -X GET https://www.amcharts.com/lib/3/pie.js -o "$JS_DIR/amcharts-pie.js"
+    safeRunCommand curl -X GET https://www.amcharts.com/lib/3/themes/dark.js -o "$JS_DIR/amcharts-dark.js"
     cat "$JS_DIR/amcharts.js" "$JS_DIR/amcharts-pie.js" "$JS_DIR/amcharts-dark.js" > "$JS_DIR/amcharts-all.js"
 }
 
 generate_smileys() {
     printOut "Generating smileys"
-    python manage.py extract_cfpack
+    safeRunCommand python manage.py extract_cfpack
 }
 
 delete_tmp_dir() {
@@ -220,7 +236,7 @@ delete_tmp_dir() {
 
 if [ "$1" = "sass" ]; then
     compile_sass
-elif [ "$1" = "get_fonts_session" ]; then
+elif [ "$1" = "generate_icon_session" ]; then
     post_fontello_conf
 elif [ "$1" = "check_files" ]; then
     check_files
@@ -230,10 +246,14 @@ elif [ "$1" = "download_files" ]; then
     download_files
 elif [ "$1" = "smileys" ]; then
     generate_smileys
-elif [ "$1" = "show_fonts_session" ]; then
+elif [ "$1" = "print_icon_session" ]; then
     show_fontello_session
-elif [ "$1" = "download_fonts" ]; then
+elif [ "$1" = "download_icon" ]; then
     download_fontello
+    compile_sass
+    delete_tmp_dir
+    printSuccess "Fonts have been installed"
+    printOut "You can view them at https://localhost:8000/static/demo.html"
 elif [ "$1" == "all" ]; then
     remove_old_files
     download_files
@@ -250,9 +270,9 @@ else
  chp download_files "Downloads static files like amcharts.js "
  chp zip_extension "Creates zip acrhive for ChromeWebStore from \e[96mscreen_cast_extension \e[0;33;40mdirectory"
  printf " \e[93mFonts:\n\e[0;37;40mTo edit fonts execute\e[1;37;40m fonts_session\e[0;37;40m After you finish editing fonts in browser execute \e[1;37;40mdownload_fonts\e[0;37;40m\n"
- chp fonts_session "Creates fontello session from config.json and saves it to \e[96m .fontello \e[0;33;40mfile"
- chp get_fonts_session "Shows current used url for editing fonts"
- chp download_fontello "Downloads and extracts fonts from fontello to project"
+ chp generate_icon_session "Creates fontello session from config.json and saves it to \e[96m .fontello \e[0;33;40mfile"
+ chp print_icon_session "Shows current used url for editing fonts"
+ chp download_icon "Downloads and extracts fonts from fontello to project"
 fi
 
 
@@ -261,5 +281,3 @@ fi
 # http://www.mineks.com/assets/admin/css/fonts/glyphicons.social.pro/
 # Sounds
 #curl -L -o $TMP_DIR/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip $TMP_DIR/sounds.zip -d $SOUNDS_DIR
-
-delete_tmp_dir
