@@ -2828,7 +2828,9 @@ function ChannelsHandler() {
 		self.dom.addRoomInput.onkeypress = self.finishAddRoomOnEnter;
 		self.dom.addRoomButton.onclick = self.finishAddRoom;
 		self.addUserHandler = new Draggable(self.dom.addUserHolder, "");
+		self.addUserHandler.fixInputs();
 		self.addRoomHandler = new Draggable(self.dom.addRoomHolder, "Create New Room");
+		self.addUserHandler.fixInputs();
 		var minifier = self.dom.minifier;
 		for (var el in minifier) {
 			if (minifier.hasOwnProperty(el)) {
