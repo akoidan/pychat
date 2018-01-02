@@ -101,6 +101,12 @@ class MessagesCreator(object):
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS
 		}
 
+	def responde_pong(self):
+		return {
+			VarNames.EVENT: Actions.PING,
+			VarNames.HANDLER_NAME: HandlerNames.WS
+		}
+
 	def subscribe_room_channel_message(self, room_id, room_name):
 		return {
 			VarNames.EVENT: Actions.CREATE_ROOM_CHANNEL,

@@ -54,7 +54,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.DELETE_ROOM: self.delete_channel,
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
-			Actions.INVITE_USER: self.invite_user
+			Actions.INVITE_USER: self.invite_user,
+			Actions.PING: self.respond_ping
 		}
 		self.post_process_message = {
 			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_channel,
@@ -233,6 +234,8 @@ class MessagesHandler(MessagesCreator):
 		subscribe_message = self.invite_room_channel_message(room_id, user_id, room.name, users_in_room)
 		self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
 
+	def respond_ping(self, message):
+		self.ws_write(self.responde_pong())
 
 	def create_user_channel(self, message):
 		user_id = message[VarNames.USER_ID]
