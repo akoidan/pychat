@@ -32,6 +32,7 @@ class Actions(object):
 	REPLY_FILE_CONNECTION = 'replyFile'
 	RETRY_FILE_CONNECTION = 'retryFile'
 	REPLY_CALL_CONNECTION = 'replyCall'
+	PING = 'ping'
 
 
 class VarNames(object):

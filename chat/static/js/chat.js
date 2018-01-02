@@ -5475,13 +5475,32 @@ function WsHandler() {
 			}
 		}
 	};
+	self.pingTimeout = null;
 	self.handle = function (message) {
+		self['on'+message.action](message);
+	};
+	self.onsetWsId = function(message) {
 		self.wsConnectionId = message.content;
 		self.wsConnectionFullId = message.opponentWsId;
-		logger.info("CONNECTION ID HAS BEEN SET TO {}, (full id is {})", self.wsConnectionId, self.wsConnectionFullId)();
+		logger.ws("WS", "CONNECTION ID HAS BEEN SET TO {}, (full id is {})", self.wsConnectionId, self.wsConnectionFullId)();
+	};
+	self.onping = function(message) {
+		logger.ws("WS", "Connection updated")();
+	};
+	self.onTimeout = function() {
+		self.pingTimeout = null;
+		self.sendToServer({action: 'ping'});
+		self.updateTimeout();
+	};
+	self.updateTimeout = function() {
+		if (self.pingTimeout) {
+			clearTimeout(self.pingTimeout);
+		}
+		self.pingTimeout = setTimeout(self.onTimeout, 300000); // every 5 min update connection
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
+		self.updateTimeout();
 		logger.ws("WS_IN", jsonData)();
 		var data = JSON.parse(jsonData);
 		self.handleMessage(data);
@@ -5502,6 +5521,7 @@ function WsHandler() {
 			growlError("Can't send message, because connection is lost :(");
 			return false;
 		} else {
+			self.updateTimeout();
 			logger.ws("WS_OUT", logEntry)();
 			self.ws.send(jsonRequest);
 			return true;
