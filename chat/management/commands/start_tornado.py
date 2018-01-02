@@ -8,6 +8,7 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.web import Application
 
+from chat.settings import IS_HTTPS
 from chat.tornado.tornado_handler import TornadoHandler
 
 
@@ -19,10 +20,13 @@ class Command(BaseCommand):
 			(r'.*', TornadoHandler),
 		], debug=settings.DEBUG)
 		try:
-			ssl_options={
-				"certfile": settings.CRT_PATH,
-				"keyfile": settings.KEY_PATH
-			}
+			if IS_HTTPS:
+				ssl_options={
+					"certfile": settings.CRT_PATH,
+					"keyfile": settings.KEY_PATH
+				}
+			else:
+				ssl_options = None
 		except AttributeError:
 			ssl_options = None
 		self.http_server = HTTPServer(application, ssl_options=ssl_options)
