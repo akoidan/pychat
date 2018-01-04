@@ -61,6 +61,7 @@ class MessagesCreator(object):
 		res[VarNames.CHANNEL] = message.room_id
 		res[VarNames.SYMBOL] = message.symbol
 		res[VarNames.HANDLER_NAME] = HandlerNames.CHAT
+		res[VarNames.GYPHY] = message.gyphy
 		return res
 
 	@classmethod

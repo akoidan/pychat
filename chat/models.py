@@ -5,7 +5,7 @@ from time import mktime
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.db import models
-from django.db.models import CharField, DateField, FileField, BooleanField
+from django.db.models import CharField, DateField, FileField, BooleanField, URLField
 
 from chat.log_filters import id_generator
 from chat.settings import GENDERS, DEFAULT_PROFILE_ID, JS_CONSOLE_LOGS
@@ -155,6 +155,7 @@ class Message(models.Model):
 	# - images that refers same message always have unique symbols
 	symbol = models.CharField(null=True, max_length=1)
 	deleted = BooleanField(default=False)
+	gyphy = URLField(null=True)
 
 
 class Image(models.Model):

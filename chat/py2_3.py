@@ -11,4 +11,9 @@ try:  # py2
 except ImportError:  # py3
 	from urllib.parse import urlparse
 
+try:
+	from urllib import quote
+except ImportError:  # py3
+	from urllib.parse import quote
+
 str_type = str if sys.version > '3' else basestring
