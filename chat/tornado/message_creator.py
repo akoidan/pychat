@@ -43,7 +43,8 @@ class MessagesCreator(object):
 			VarNames.CONTENT: message.content,
 			VarNames.TIME: message.time,
 			VarNames.MESSAGE_ID: message.id,
-			VarNames.IMG: images
+			VarNames.IMG: images,
+			VarNames.GYPHY: message.gyphy
 		}
 		return res
 
@@ -61,7 +62,6 @@ class MessagesCreator(object):
 		res[VarNames.CHANNEL] = message.room_id
 		res[VarNames.SYMBOL] = message.symbol
 		res[VarNames.HANDLER_NAME] = HandlerNames.CHAT
-		res[VarNames.GYPHY] = message.gyphy
 		return res
 
 	@classmethod

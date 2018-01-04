@@ -3,7 +3,7 @@
 This is web (browser) chat, that supports:
  - Sending instant text messages via websockets.
  - Sending images to chat.
- - Smiles.
+ - Social integration: Smiles, urls, embedded youtube, [gyphy](https://giphy.com/)
  - [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) calls and video conference using webrtc.
  - Screen sharing during call and conference (installing extension is required).
  - Peer to peer file sending
