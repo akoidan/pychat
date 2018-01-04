@@ -84,6 +84,7 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 TODO
 ====
+* Add embedded youtube and code fragment support
 * https://developers.google.com/web/updates/2015/12/background-sync
 * Added bad code stub for: Wrong message order, that prevents of successful webrtc connection: https://github.com/leporo/tornado-redis/issues/106 https://stackoverflow.com/questions/47496922/tornado-redis-garantee-order-of-published-messages
 * No sound in call https://bugs.chromium.org/p/chromium/issues/detail?id=604523
