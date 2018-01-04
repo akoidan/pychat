@@ -103,6 +103,8 @@ class UserProfile(User):
 	suggestions = BooleanField(null=False, default=True)
 	notifications = BooleanField(null=False, default=True)
 	cache_messages = BooleanField(null=False, default=True)
+	embedded_youtube = BooleanField(null=False, default=True)
+	highlight_code = BooleanField(null=False, default=False)
 	logs = BooleanField(null=False, default=JS_CONSOLE_LOGS)
 	# TODO, save theme in profile? theme_name = CharField(max_length=16, null=True)
 

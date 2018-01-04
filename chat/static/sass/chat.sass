@@ -6,6 +6,7 @@
 @import "themes/color-white/color-white-chat"
 @import "partials/mixins"
 @import "partials/variables"
+@import "partials/highlight"
 [class^="message-header"]
 	font-weight: bold
 
@@ -73,6 +74,17 @@ fieldset
 		outline: none
 	a:hover
 		text-decoration: underline
+
+	pre
+		margin: 5px
+	iframe
+		border: none
+		width: 500px
+		height: 350px
+		max-width: calc(100% - 25px)
+		max-height: 400px
+		display: block
+		margin: 5px 0 0 15px
 
 	img.B4j2ContentEditableImg
 		max-width: calc(100% - 25px)

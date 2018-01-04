@@ -13,5 +13,8 @@ class Command(BaseCommand):
 		from chat.global_redis import sync_redis
 		rooms = Room.objects.values('id')
 		rooms_id = [room['id'] for room in rooms]
-		sync_redis.delete(*rooms_id)
-		print('Flushed room keys: {}'.format(rooms_id))
+		if len(rooms_id) > 0:
+			sync_redis.delete(*rooms_id)
+			print('Flushed room keys: {}'.format(rooms_id))
+		else:
+			raise Exception('No rooms found, expected at least one global room. Did you forget to run "python manage.py init_db" command?')

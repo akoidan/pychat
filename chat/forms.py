@@ -45,6 +45,8 @@ class UserProfileForm(forms.ModelForm):
 	suggestions = BooleanField(widget=BooleanWidget)
 	cache_messages = BooleanField(widget=BooleanWidget)
 	logs = BooleanField(widget=BooleanWidget)
+	embedded_youtube =BooleanField(widget=BooleanWidget)
+	highlight_code = BooleanField(widget=BooleanWidget, help_text="```console.log('Highlight code like this')```")
 
 	GENDER_CHOICES = (
 		(1, 'Male'),
@@ -57,7 +59,8 @@ class UserProfileForm(forms.ModelForm):
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
 		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts',
-				'sex', 'photo', 'notifications', 'suggestions', 'logs', 'cache_messages')
+				'sex', 'photo', 'notifications', 'suggestions', 'logs', 'cache_messages',
+					 'embedded_youtube', 'highlight_code')
 
 	def __init__(self, *args, **kwargs):
 		"""

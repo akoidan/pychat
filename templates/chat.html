@@ -10,6 +10,7 @@
 		var SMILEY_URL = "{% md5url 'smileys' %}";
 		var AMCHART_URL = "{% md5url 'js/amcharts-all.js' %}";
 		var CHANGE_PROFILE_JS_URL = "{% md5url 'js/profile.js' %}";
+		var HIGHLIGHT_JS_URL = "{% md5url 'js/highlight.min.js' %}";
 		var STATISTICS_JS_URL = "{% md5url  'js/statistic.js' %}";
 		var loggedUser = "{{ username }}";
 		var DEFAULT_CHANNEL_NAME = "{{ defaultRoomId }}";
@@ -18,8 +19,13 @@
 		var suggestions = {{ suggestions |yesno:"true,false" }};
 		var notifications = {{ notifications |yesno:"true,false" }};
 		var cacheMessages = {{ cache_messages |yesno:"true,false" }};
+		window.highlightCode = {{ highlight_code |yesno:"true,false" }};
+		window.embeddedYoutube = {{ embedded_youtube |yesno:"true,false" }};
 	</script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Snowstorm/20131208/snowstorm-min.js"></script>
+	  {% if highlight_code %}
+			<script src="{% md5url "js/highlight.min.js" %}"></script>
+    {% endif %}
 	<script src="{% md5url "js/chat.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}
