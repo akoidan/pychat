@@ -44,7 +44,7 @@ class MessagesCreator(object):
 			VarNames.TIME: message.time,
 			VarNames.MESSAGE_ID: message.id,
 			VarNames.IMG: images,
-			VarNames.GYPHY: message.gyphy
+			VarNames.GIPHY: message.giphy
 		}
 		return res
 

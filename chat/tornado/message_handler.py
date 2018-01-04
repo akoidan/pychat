@@ -13,7 +13,7 @@ from chat import settings
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers
 from chat.py2_3 import str_type, quote
-from chat.settings import ALL_ROOM_ID, TORNADO_REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GYPHY_REGEX
+from chat.settings import ALL_ROOM_ID, TORNADO_REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
 from chat.tornado.image_utils import process_images, prepare_img, save_images, get_message_images
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
@@ -197,39 +197,39 @@ class MessagesHandler(MessagesCreator):
 		raise NotImplementedError('WebSocketHandler implements')
 
 	@asynchronous
-	def search_gyphy(self, message ,query, cb):
-		self.logger.debug("!! Asking gyphy for: %s", query)
-		def on_gyphy_reply(response):
+	def search_giphy(self, message, query, cb):
+		self.logger.debug("!! Asking giphy for: %s", query)
+		def on_giphy_reply(response):
 			try:
-				self.logger.debug("!! Got gyphy response: " + str(response.body))
+				self.logger.debug("!! Got giphy response: " + str(response.body))
 				res =  json.loads(response.body)
-				gyphy = res['data'][0]['embed_url']
+				giphy = res['data'][0]['embed_url']
 			except:
-				gyphy = None
-			cb(message, gyphy)
+				giphy = None
+			cb(message, giphy)
 		http_client = AsyncHTTPClient()
 		url = GIPHY_URL.format(GIPHY_API_KEY, quote(query, safe=''))
-		http_client.fetch(url, callback=on_gyphy_reply)
+		http_client.fetch(url, callback=on_giphy_reply)
 
-	def isGyphy(self, content):
+	def isGiphy(self, content):
 		if GIPHY_API_KEY is not None:
-			gyphy_match = re.search(GYPHY_REGEX, content)
-			return gyphy_match.group(1) if gyphy_match is not None else None
+			giphy_match = re.search(GIPHY_REGEX, content)
+			return giphy_match.group(1) if giphy_match is not None else None
 
 	def process_send_message(self, message):
 		"""
 		:type message: dict
 		"""
 		content = message.get(VarNames.CONTENT)
-		gyphy_match = self.isGyphy(content)
-		def send_message(message, gyphy=None):
+		giphy_match = self.isGiphy(content)
+		def send_message(message, giphy=None):
 			raw_imgs = message.get(VarNames.IMG)
 			channel = message[VarNames.CHANNEL]
 			message_db = Message(
 				sender_id=self.user_id,
 				content=message[VarNames.CONTENT],
 				symbol=get_max_key(raw_imgs),
-				gyphy=gyphy
+				giphy=giphy
 			)
 			message_db.room_id = channel
 			do_db(message_db.save)
@@ -240,8 +240,8 @@ class MessagesHandler(MessagesCreator):
 				prepare_img(db_images, message_db.id)
 			)
 			self.publish(prepared_message, channel)
-		if gyphy_match is not None:
-			self.search_gyphy(message, gyphy_match, send_message)
+		if giphy_match is not None:
+			self.search_giphy(message, giphy_match, send_message)
 		else:
 			send_message(message)
 
@@ -304,23 +304,23 @@ class MessagesHandler(MessagesCreator):
 		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
 		selector = Message.objects.filter(id=message_id)
-		gyphy_match = self.isGyphy(data[VarNames.CONTENT])
+		giphy_match = self.isGiphy(data[VarNames.CONTENT])
 		if message.content is None:
 			action = Actions.DELETE_MESSAGE
 			prep_imgs = None
 			selector.update(deleted=True)
-		elif gyphy_match is not None:
-			def edit_glyphy(message, glyphy):
-				do_db(selector.update, content=message.content, symbol=message.symbol, gyphy=glyphy)
-				message.gyphy = glyphy
+		elif giphy_match is not None:
+			def edit_glyphy(message, giphy):
+				do_db(selector.update, content=message.content, symbol=message.symbol, giphy=giphy)
+				message.giphy = giphy
 				self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None), message.room_id)
-			self.search_gyphy(message, gyphy_match, edit_glyphy)
+			self.search_giphy(message, giphy_match, edit_glyphy)
 			return
 		else:
 			action = Actions.EDIT_MESSAGE
-			message.gyphy = None
+			message.giphy = None
 			prep_imgs = process_images(data.get(VarNames.IMG), message)
-			selector.update(content=message.content, symbol=message.symbol, gyphy=None)
+			selector.update(content=message.content, symbol=message.symbol, giphy=None)
 		self.publish(self.create_send_message(message, action, prep_imgs), message.room_id)
 
 	def send_client_new_channel(self, message):

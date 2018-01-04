@@ -3375,8 +3375,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 	};
 	self.encodeMessage = function (data) {
-		if (data.gyphy) {
-			return "<iframe src='{}' class='gyphy'/>".format(data.gyphy)
+		if (data.giphy) {
+			return "<iframe src='{}' class='giphy'/>".format(data.giphy)
 		} else {
 			var html = encodeAnchorsHTML(data.content);
 			if (data.images && Object.keys(data.images).length) {
@@ -5863,7 +5863,7 @@ var Utils = {
 		var infoMessages = [
 			"<span>Every time you join chat those help messages will be shown to you. " +
 			"You can disable them in you profile settings (<i class='icon-wrench'></i> icon). Simply click on popup to hide them</span>",
-			"You can add gyphy by typing /gyphy example",
+			"You can add giphy by typing /giphy example",
 			"<span>Browser will notify you on incoming message every time when chat tab is not active. " +
 			"You can disable this option in your profile(<i class='icon-wrench'></i> icon).</span>",
 			"<span>You can create a new room by clicking on <i class='icon-plus-squared'></i> icon." +
