@@ -198,8 +198,10 @@ class MessagesHandler(MessagesCreator):
 
 	@asynchronous
 	def search_gyphy(self, message ,query, cb):
+		self.logger.debug("!! Asking gyphy for: %s", query)
 		def on_gyphy_reply(response):
 			try:
+				self.logger.debug("!! Got gyphy response: " + str(response.body))
 				res =  json.loads(response.body)
 				gyphy = res['data'][0]['embed_url']
 			except:
@@ -209,13 +211,17 @@ class MessagesHandler(MessagesCreator):
 		url = GIPHY_URL.format(GIPHY_API_KEY, quote(query, safe=''))
 		http_client.fetch(url, callback=on_gyphy_reply)
 
+	def isGyphy(self, content):
+		if GIPHY_API_KEY is not None:
+			gyphy_match = re.search(GYPHY_REGEX, content)
+			return gyphy_match.group(1) if gyphy_match is not None else None
+
 	def process_send_message(self, message):
 		"""
 		:type message: dict
 		"""
 		content = message.get(VarNames.CONTENT)
-		gyphy_match = re.search(GYPHY_REGEX, content)
-
+		gyphy_match = self.isGyphy(content)
 		def send_message(message, gyphy=None):
 			raw_imgs = message.get(VarNames.IMG)
 			channel = message[VarNames.CHANNEL]
@@ -235,7 +241,7 @@ class MessagesHandler(MessagesCreator):
 			)
 			self.publish(prepared_message, channel)
 		if gyphy_match is not None:
-			self.search_gyphy(message, gyphy_match.group(1), send_message)
+			self.search_gyphy(message, gyphy_match, send_message)
 		else:
 			send_message(message)
 
@@ -298,20 +304,21 @@ class MessagesHandler(MessagesCreator):
 		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
 		selector = Message.objects.filter(id=message_id)
-		gyphy_match = re.search(GYPHY_REGEX, data[VarNames.CONTENT])
+		gyphy_match = self.isGyphy(data[VarNames.CONTENT])
 		if message.content is None:
 			action = Actions.DELETE_MESSAGE
 			prep_imgs = None
 			selector.update(deleted=True)
 		elif gyphy_match is not None:
 			def edit_glyphy(message, glyphy):
-				selector.update(content=message.content, symbol=message.symbol, gyphy=glyphy)
+				do_db(selector.update, content=message.content, symbol=message.symbol, gyphy=glyphy)
 				message.gyphy = glyphy
 				self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None), message.room_id)
-			self.search_gyphy(message, gyphy_match.group(1), edit_glyphy)
+			self.search_gyphy(message, gyphy_match, edit_glyphy)
 			return
 		else:
 			action = Actions.EDIT_MESSAGE
+			message.gyphy = None
 			prep_imgs = process_images(data.get(VarNames.IMG), message)
 			selector.update(content=message.content, symbol=message.symbol, gyphy=None)
 		self.publish(self.create_send_message(message, action, prep_imgs), message.room_id)
@@ -438,7 +445,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
 		in_message[VarNames.HANDLER_NAME] = HandlerNames.PEER_CONNECTION
 		self.logger.debug(
-			"Forwarding message to channel %s, self %s, other status %s",
+			"!! Forwarding message to channel %s, self %s, other status %s",
 			channel,
 			self_channel_status,
 			opponent_channel_status
