@@ -155,7 +155,7 @@ class Message(models.Model):
 	# - images that refers same message always have unique symbols
 	symbol = models.CharField(null=True, max_length=1)
 	deleted = BooleanField(default=False)
-	gyphy = URLField(null=True)
+	giphy = URLField(null=True)
 
 
 class Image(models.Model):

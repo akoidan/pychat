@@ -3,7 +3,7 @@
 This is web (browser) chat, that supports:
  - Sending instant text messages via websockets.
  - Sending images to chat.
- - Social integration: Smiles, urls, embedded youtube, [gyphy](https://giphy.com/)
+ - Social integration: Smiles, urls, embedded youtube, [giphy](https://giphy.com/)
  - [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) calls and video conference using webrtc.
  - Screen sharing during call and conference (installing extension is required).
  - Peer to peer file sending
@@ -42,7 +42,7 @@ Installation:
  5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector. 
  6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can downloads download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
  7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`).
- 8. If you want to use [Gyphy](https://giphy.com/), you need to sign up in [developers.giphy.com](https://developers.giphy.com/) , create a new app there, and add `GIPHY_API_KEY` to [settings.py](chat/settings.py)
+ 8. If you want to use [Giphy](https://giphy.com/), you need to sign up in [developers.giphy.com](https://developers.giphy.com/) , create a new app there, and add `GIPHY_API_KEY` to [settings.py](chat/settings.py)
 
 [Ubuntu](http://www.ubuntu.com/):
 ----------------------------------

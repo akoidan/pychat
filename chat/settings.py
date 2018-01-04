@@ -97,7 +97,7 @@ API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/?id='))
 
 # GIPHY_API_KEY = 'thZMTtDfFdugqPDIAY461GzYTctuYIeIj' // TODO paste your GIPHY api key from https://developers.giphy.com/
 GIPHY_URL= 'http://api.giphy.com/v1/gifs/search?limit=1&api_key={}&q={}'
-GYPHY_REGEX = r"^\s*\/gyphy (.+)"
+GIPHY_REGEX = r"^\s*\/giphy (.+)"
 # SESSION_COOKIE_AGE = 10
 # SESSION_SAVE_EVERY_REQUEST = True
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
