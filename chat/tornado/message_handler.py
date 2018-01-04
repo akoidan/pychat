@@ -267,7 +267,7 @@ class MessagesHandler(MessagesCreator):
 	def edit_message(self, data):
 		# ord(next (iter (message['images'])))
 		message_id = data[VarNames.MESSAGE_ID]
-		message = Message.objects.get(id=message_id)
+		message = do_db(Message.objects.get, id=message_id)
 		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
 		selector = Message.objects.filter(id=message_id)

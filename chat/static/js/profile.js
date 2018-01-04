@@ -10,6 +10,8 @@ var themeSelector;
 var changeProfileForm;
 var notificationInput;
 var cacheMessagesInput;
+var embeddedYoutubeInput;
+var highlightCodeInput;
 var logsInput;
 var photoSrc = null;
 
@@ -23,6 +25,8 @@ function initChangeProfile() {
 	changeProfileForm = $('changeProfileForm');
 	notificationInput = $('id_notifications');
 	cacheMessagesInput = $('id_cache_messages');
+	embeddedYoutubeInput = $('id_embedded_youtube');
+	highlightCodeInput = $('id_highlight_code');
 	logsInput = $('id_logs');
 	var item = localStorage.getItem('theme');
 	video.addEventListener('click', takeSnapshot, false);
@@ -167,8 +171,15 @@ function setJsState() {
 	document.body.className = themeSelector.value;
 	notifications = notificationInput.checked; // global var
 	cacheMessages = cacheMessagesInput.checked; // global var
+	window.embeddedYoutube = embeddedYoutubeInput.checked; // global var
+	window.highlightCode = highlightCodeInput.checked; // global var
 	if (!cacheMessages) {
 		storage.clearStorage();
+	}
+	if (window.highlightCode) {
+		doGet(HIGHLIGHT_JS_URL, function() {
+			Utils.highlightCode(document.body);
+		});
 	}
 	if (logsInput.checked) {
 		logger.enableLogs();

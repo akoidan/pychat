@@ -22,6 +22,7 @@ declare -a files=(\
     "$CSS_DIR/pikaday.css" \
     "$JS_DIR/pikaday.js" \
     "$JS_DIR/moment.js" \
+    "$JS_DIR/highlight.min.js" \
     "$FONT_DIR/fontello.eot" \
     "$FONT_DIR/fontello.svg" \
     "$FONT_DIR/fontello.ttf" \
@@ -29,6 +30,7 @@ declare -a files=(\
     "$FONT_DIR/fontello.woff2" \
     "$FONT_DIR/fontello.woff2" \
     "$SASS_DIR/partials/_fontello.scss" \
+    "$SASS_DIR/partials/_highlight.scss" \
     "$SMILEYS_DIR" \
     "$SMILEYS_DIR/info.json" \
     "$SMILEYS_DIR/base/000a.gif" \
@@ -219,6 +221,9 @@ download_files() {
     safeRunCommand curl -X GET https://www.amcharts.com/lib/3/amcharts.js -o "$JS_DIR/amcharts.js"
     safeRunCommand curl -X GET https://www.amcharts.com/lib/3/pie.js -o "$JS_DIR/amcharts-pie.js"
     safeRunCommand curl -X GET https://www.amcharts.com/lib/3/themes/dark.js -o "$JS_DIR/amcharts-dark.js"
+    printOut "Downloading highlight.js"
+    safeRunCommand curl -X GET https://raw.githubusercontent.com/isagalaev/highlight.js/master/src/styles/railscasts.css -o "$SASS_DIR/partials/_highlight.scss"
+    safeRunCommand curl -X GET https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js -o "$JS_DIR/highlight.min.js"
     cat "$JS_DIR/amcharts.js" "$JS_DIR/amcharts-pie.js" "$JS_DIR/amcharts-dark.js" > "$JS_DIR/amcharts-all.js"
 }
 

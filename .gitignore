@@ -13,6 +13,7 @@ chat/static/font/*
 !/chat/static/font/OpenSans.ttf
 !/chat/static/font/Oswald.ttf
 chat/static/sass/partials/_fontello.scss
+chat/static/sass/partials/_highlight.scss
 trash
 .fontello
 chat/static/demo.html
@@ -27,6 +28,7 @@ sessionsids.txt
 chat/static/css
 chat/static/sass/.sass-cache
 chat/static/js/painterro.min.js
+chat/static/js/highlight.min.js
 redis-3.2.0-rc3
 chat/static/js/amcharts.js
 chat/static/js/amcharts-pie.js
