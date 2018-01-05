@@ -3376,7 +3376,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.encodeMessage = function (data) {
 		if (data.giphy) {
-			return "<iframe src='{}' class='giphy'/>".format(data.giphy)
+			return '<div class="giphy"><img src="{0}" /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>'.formatPos(data.giphy);
 		} else {
 			var html = encodeAnchorsHTML(data.content);
 			if (data.images && Object.keys(data.images).length) {

@@ -7,6 +7,7 @@
 @import "partials/mixins"
 @import "partials/variables"
 @import "partials/highlight"
+@import "partials/powered_by_giphy"
 [class^="message-header"]
 	font-weight: bold
 
@@ -89,11 +90,29 @@ fieldset
 		display: block
 		margin: 5px 0 0 15px
 
-	img.B4j2ContentEditableImg
+	@mixin chat_img
 		max-width: calc(100% - 25px)
 		max-height: 300px
+		max-height: calc(50vh - 100px)
+		min-height: 50px
 		display: block
 		margin: 5px 0 0 15px
+
+	.giphy
+		position: relative
+		img
+			@include chat_img
+		&:not(:hover) .giphy_hover
+			display: none
+		.giphy_hover
+			bottom: 5px
+			position: absolute
+			left: 20px
+			width: 100px
+			height: 36px
+
+	img.B4j2ContentEditableImg
+		@include chat_img
 	p
 		margin-top: 0.8em
 		margin-bottom: 0.8em
