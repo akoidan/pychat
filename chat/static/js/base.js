@@ -51,7 +51,7 @@ var ajaxLoader;
 var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g;/*http://anycharacter except end of text, <br> or space*/
 var youTubePattern = /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)?[^"]*" target="_blank">[^<]+<\/a>/;
 var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
-var replaceYoutubePattern = '<iframe allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen" msallowfullscreen="msallowfullscreen" oallowfullscreen="oallowfullscreen" webkitallowfullscreen="webkitallowfullscreen" src="https://www.youtube.com/embed/$1"></iframe>';
+var replaceYoutubePattern = '<div class="youtube-player" data-id="$1"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>';
 var codePattern = /```(.+?)(?=```)```/;
 var replaceCodePattern = '<pre>$1</pre>';
 var muteBtn;
