@@ -49,7 +49,7 @@ var ajaxLoader;
 
 ///var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|&#39;|$))/g;/*http://anycharacter except end of text, <br> or space*/ TODO is ' ( &#39; ) allowed symbol? if not this breaks https://raw.githubusercontent.com/NeverSinkDev/NeverSink-Filter/master/NeverSink's%20filter%20-%201-REGULAR.filter
 var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g;/*http://anycharacter except end of text, <br> or space*/
-var youTubePattern = /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)?[^"]+" target="_blank">[^<]+<\/a>/;
+var youTubePattern = /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)?[^"]*" target="_blank">[^<]+<\/a>/;
 var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
 var replaceYoutubePattern = '<iframe allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen" msallowfullscreen="msallowfullscreen" oallowfullscreen="oallowfullscreen" webkitallowfullscreen="webkitallowfullscreen" src="https://www.youtube.com/embed/$1"></iframe>';
 var codePattern = /```(.+?)(?=```)```/;
