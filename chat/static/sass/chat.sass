@@ -8,6 +8,7 @@
 @import "partials/variables"
 @import "partials/highlight"
 @import "partials/powered_by_giphy"
+@import "partials/youtube_player"
 [class^="message-header"]
 	font-weight: bold
 
@@ -89,6 +90,49 @@ fieldset
 		max-height: 400px
 		display: block
 		margin: 5px 0 0 15px
+
+	.youtube-player
+		@extend %user-select-none
+		display: block
+		margin: 5px 0 0 15px
+		> div
+			position: relative
+			display: inline-block
+			zoom: 1
+			&:not(:hover)
+				-webkit-filter: brightness(90%)
+			&:after
+				content: ''
+				position: absolute
+				top: 0
+				bottom: 0
+				left: 0
+				right: 0
+				display: block
+
+			img
+				max-width: calc(100% - 25px)
+				max-height: 300px
+				max-height: calc(50vh - 100px)
+				min-height: 50px
+				display: block
+			.icon-youtube-play
+				position: absolute
+				z-index: 13
+				top: 50%
+				left: 50%
+				margin-top: -35px
+				margin-left: -45px
+				font-size: 50px
+				color: black
+				height: 80px
+				width: 80px
+				@media screen and (max-height: 40em)
+					margin-top: -10px !important
+					margin-left: -15px !important
+					height: 30px !important
+					width: 30px !important
+
 
 	@mixin chat_img
 		max-width: calc(100% - 25px)

@@ -2321,7 +2321,7 @@ function ChannelsHandler() {
 	self.showActiveChannel = function () {
 		var chatHandler = self.getActiveChannel();
 		if (chatHandler == null) {
-			singlePage.showDefaultPage();
+			//singlePage.showDefaultPage();
 		} else {
 			chatHandler.show();
 			if (chatHandler.isPrivate()) {
@@ -3445,6 +3445,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		);
 		if (p) {
 			Utils.highlightCode(p);
+			Utils.setYoutubeEvent(p);
 			self.highLightMessageIfNeeded(p, displayedUsername, isNew, data.content, data.images);
 		}
 	};
@@ -5641,6 +5642,20 @@ function Storage() {
 }
 
 var Utils = {
+	setYoutubeEvent: function (e) {
+		if (window.embeddedYoutube) {
+			var r = e.querySelector('.youtube-player')
+			if (r) {
+				r.querySelector('.icon-youtube-play').onclick = function () {
+					var iframe = document.createElement("iframe");
+					iframe.setAttribute("src", "https://www.youtube.com/embed/" + r.getAttribute('data-id')+'?autoplay=1');
+					iframe.setAttribute("frameborder", "0");
+					iframe.setAttribute("allowfullscreen", "1");
+					e.parentNode.replaceChild(iframe, e);
+				}
+			}
+		}
+	},
 	highlightCode: function (element) {
 		if (window.highlightCode && window.hljs) {
 			var s = element.querySelectorAll('pre');
