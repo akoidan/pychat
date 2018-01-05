@@ -203,7 +203,7 @@ class MessagesHandler(MessagesCreator):
 			try:
 				self.logger.debug("!! Got giphy response: " + str(response.body))
 				res =  json.loads(response.body)
-				giphy = res['data'][0]['embed_url']
+				giphy = res['data']['image_url']
 			except:
 				giphy = None
 			cb(message, giphy)
