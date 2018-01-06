@@ -172,6 +172,7 @@ class RoomUsers(models.Model):
 	room = models.ForeignKey(Room, null=False)
 	user = models.ForeignKey(User, null=False)
 	last_read_message = models.ForeignKey(Message, null=True)
+	last_extension_message = models.ForeignKey(Message, null=True, related_name='last_extension_message')
 
 	class Meta:  # pylint: disable=C1001
 		unique_together = ("user", "room")

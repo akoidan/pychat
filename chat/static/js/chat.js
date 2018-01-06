@@ -45,8 +45,10 @@ var painter;
 var minimizedWindows;
 var chatFileAudio;
 var chatTestVolume;
+var serviceWorker;
 
 onDocLoad(function () {
+	serviceWorker = new ServiceWorkerApi();
 	userMessage = $("usermsg");
 	navCallIcon = $('navCallIcon');
 	headerText = $('headerText');
@@ -55,8 +57,12 @@ onDocLoad(function () {
 	directUserTable = $('directUserTable');
 	webRtcFileIcon = $('webRtcFileIcon');
 	var navbar = $('navbar');
-	$('navMenu').onclick = function() {
-		CssUtils.toggleClass(navbar, 'expanded');
+	navbar.onclick = function(e) {
+		if (e.target == navbar) {
+			return
+		} else {
+			CssUtils.toggleClass(navbar, 'expanded');
+		}
 	}
 	minimizedWindows = new MinimizedWindows();
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
@@ -69,10 +75,49 @@ onDocLoad(function () {
 	storage = new Storage();
 	notifier = new NotifierHandler();
 	painter = new Painter();
-	logger.info("Trying to resolve WebSocket Server")();
 	wsHandler.listenWS();
 	Utils.showHelp();
 });
+
+function ServiceWorkerApi() {
+	var self = this;
+	self.log = loggerFactory.getLogger('SW', console.log, "color: #ffb500; font-weight: bold");
+	if (navigator.serviceWorker) {
+		self.log("Registering service worker {}", SERVICE_WORKER_URL)();
+		navigator.serviceWorker.register('/sw.js').then(function (reg) {
+			self.log("Registered service worker {}", reg)();
+			return navigator.serviceWorker.ready;
+		}).then(function (reg) {
+			self.serviceWorker = reg.active;
+			self.log("Service worker is ready {}", self.serviceWorker)();
+			self.updateData();
+		})
+		self.updateData = function () {
+			var message = {
+				action: 'setData',
+				csrf: readCookie("csrftoken"),
+				remoteAddress: window.location.origin,
+				logsEnabled: loggerFactory.logsEnabled
+			};
+			self.log("Posting to {} data: {}", self.serviceWorker, message)();
+			self.serviceWorker.postMessage(message)
+		};
+		self.deleteAllWorkers = function () {
+			if (navigator.serviceWorker) {
+				return navigator.serviceWorker.getRegistrations().then(function (registrations) {
+					self.log("Found {} service workers", registrations.length)();
+					return Promise.all([registrations.map(function (r) {
+						return r.unregister();
+					})])
+				})
+			}
+		}
+	} else {
+		self.deleteAllWorkers = function(){};
+		self.updateData = function(){};
+	}
+}
+
 
 
 function MinimizedWindows() {
@@ -490,11 +535,7 @@ function Painter() {
 			});
 		},
 	};
-	self.log = function () {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift("Painter");
-		return logger.webrtc.apply(logger, args);
-	};
+	self.log = loggerFactory.getLogger("Painter", console.log, 'color: #f200da');
 	self.helper = {
 		setUIText: function(text) {
 			self.dom.paintXY.textContent = text + ' ' + Math.round(self.zoom * 100) + '%';
@@ -1843,6 +1884,11 @@ function Painter() {
 function NotifierHandler() {
 	var self = this;
 	self.maxNotifyTime = 500;
+	var logger = {
+		info: loggerFactory.getLogger("NOTIFY", console.log, 'color: #06e3e8; font-weight: bold'),
+		warn: loggerFactory.getLogger("NOTIFY", console.warn, 'color: #06e3e8; font-weight: bold'),
+		error: loggerFactory.getLogger("NOTIFY", console.error, 'color: #06e3e8; font-weight: bold')
+	};
 	self.currentTabId = Date.now().toString();
 	/*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
 	self.LAST_TAB_ID_VARNAME = 'lastTabId';
@@ -1961,9 +2007,10 @@ function NotifierHandler() {
 			self.popedNotifQueue.shift();
 		}
 	};
-	self.onFocus = function () {
+	self.onFocus = function (e) {
 		localStorage.setItem(self.LAST_TAB_ID_VARNAME, self.currentTabId);
 		logger.info("Marking current tab as active")();
+		wsHandler.onTimeout();
 		self.isCurrentTabActive = true;
 		self.newMessagesCount = 0;
 		document.title = 'PyChat';
@@ -2074,11 +2121,6 @@ function IssuePage() {
 	self.onsubmit = function (event) {
 		event.preventDefault();
 		var params = {};
-		if ($('history').checked) {
-			if (logger.historyStorage != null) {
-				params['log'] = logger.historyStorage
-			}
-		}
 		doPost('/report_issue', params, function (response) {
 			if (response === RESPONSE_SUCCESS) {
 				growlSuccess("Your issue has been successfully submitted");
@@ -2217,6 +2259,11 @@ function PageHandler() {
 
 function ChannelsHandler() {
 	var self = this;
+	var logger = {
+		warn: loggerFactory.getLogger("CHAT", console.warn, 'color: #FF0F00; font-weight: bold'),
+		info: loggerFactory.getLogger("CHAT", console.log, 'color: #FF0F00; font-weight: bold'),
+		error: loggerFactory.getLogger("CHAT", console.error, 'color: #FF0F00; font-weight: bold')
+	}
 	self.pageName = 'channels';
 	Page.call(self);
 	self.url = '/chat/';
@@ -3063,6 +3110,11 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.EDITED_MESSAGE_CLASS = 'editedMessage';
 	self.roomId = parseInt(roomId);
 	self.roomName = roomName;
+	var logger = {
+		warn: loggerFactory.getLogger("CH:"+roomId, console.warn, 'color: #FF0F00; font-weight: bold'),
+		info: loggerFactory.getLogger("CH:"+roomId, console.log, 'color: #FF0F00; font-weight: bold'),
+		error: loggerFactory.getLogger("CH:"+roomId, console.error, 'color: #FF0F00; font-weight: bold')
+	}
 	self.lastMessage = {};
 	self.dom = {
 		chatBoxDiv: chatboxDiv,
@@ -3678,16 +3730,8 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	self.getConnectionStatus = function() {
 		return self.connectionStatus;
 	}
-	self.log = function () {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift(self.connectionId + ":" + self.opponentWsId);
-		return logger.webrtc.apply(logger, args);
-	};
-	self.logErr = function (text) {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift(self.connectionId + ":" + self.opponentWsId);
-		return logger.webrtcErr.apply(logger, args);
-	};
+	self.log = loggerFactory.getLogger(self.connectionId + ":" + self.opponentWsId, console.log,  "color: #960055; font-weight: bold");
+	self.logErr = loggerFactory.getLogger(self.connectionId + ":" + self.opponentWsId, console.error,  "color: #960055; font-weight: bold");
 	self.print = function (message) {
 		self.log("Call message {}", JSON.stringify(message))();
 	};
@@ -3807,6 +3851,8 @@ function BaseTransferHandler(removeReferenceFn) {
 	self.setConnectionId = function (id) {
 		self.connectionId = id;
 		self.log("CallHandler initialized")();
+		self.log = loggerFactory.getLogger(self.connectionId, console.log, 'color: #960055; font-weight: bold');
+		self.logErr = loggerFactory.getLogger(self.connectionId, console.error, 'color: #960055; font-weight: bold');
 	};
 	self.closeAllPeerConnections = function (text) {
 		var hasConnections = false;
@@ -3816,16 +3862,6 @@ function BaseTransferHandler(removeReferenceFn) {
 			hasConnections = true;
 		}
 		return hasConnections;
-	};
-	self.log = function () {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift(self.connectionId);
-		return logger.webrtc.apply(logger, args);
-	};
-	self.logErr = function (text) {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift(self.connectionId);
-		return logger.webrtcErr.apply(logger, args);
 	};
 }
 
@@ -5399,6 +5435,11 @@ function WebRtcApi() {
 	};
 	self.connections = {};
 	self.quedConnections = {};
+	var logger = {
+		warn: loggerFactory.getLogger("WEBRTC", console.warn, 'color: #960055; font-weight: bold'),
+		info: loggerFactory.getLogger("WEBRTC", console.log, 'color: #960055; font-weight: bold'),
+		error: loggerFactory.getLogger("WEBRTC", console.error, 'color: #960055; font-weight: bold')
+	}
 	self.quedId = 0;
 	self.clickFile = function () {
 		self.dom.fileInput.value = null;
@@ -5482,6 +5523,11 @@ function WsHandler() {
 	var self = this;
 	self.wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 9 - connected;
 	self.duplicates = {};
+	self.log = loggerFactory.getLogger('WS', console.log, "color: green; font-weight: bold");
+	self.logWarn = loggerFactory.getLogger('WS', console.warn, "color: green; font-weight: bold");
+	self.logError = loggerFactory.getLogger('WS', console.error, "color: green; font-weight: bold");
+	self.logIn = loggerFactory.getLogger('WS_IN', console.log, "color: green; font-weight: bold");
+	self.logOut = loggerFactory.getLogger('WS_OUT', console.log, "color: green; font-weight: bold");
 	self.dom = {
 		onlineStatus: $('onlineStatus'),
 		onlineClass: 'online',
@@ -5508,26 +5554,25 @@ function WsHandler() {
 	self.onsetWsId = function(message) {
 		self.wsConnectionId = message.content;
 		self.wsConnectionFullId = message.opponentWsId;
-		logger.ws("WS", "CONNECTION ID HAS BEEN SET TO {}, (full id is {})", self.wsConnectionId, self.wsConnectionFullId)();
+		self.log("CONNECTION ID HAS BEEN SET TO {}, (full id is {})", self.wsConnectionId, self.wsConnectionFullId)();
 	};
 	self.onping = function(message) {
-		logger.ws("WS", "Connection updated")();
+		self.log("Connection updated")();
 	};
 	self.onTimeout = function() {
 		self.pingTimeout = null;
-		self.sendToServer({action: 'ping'});
-		self.updateTimeout();
+		self.sendToServer({action: 'ping'}, true);
 	};
 	self.updateTimeout = function() {
 		if (self.pingTimeout) {
 			clearTimeout(self.pingTimeout);
 		}
-		self.pingTimeout = setTimeout(self.onTimeout, 300000); // every 5 min update connection
+		self.pingTimeout = setTimeout(self.onTimeout, 60000); // every 1 min update connection
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
 		self.updateTimeout();
-		logger.ws("WS_IN", jsonData)();
+		self.logIn('{}', jsonData)();
 		var data = JSON.parse(jsonData);
 		self.handleMessage(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
@@ -5536,24 +5581,26 @@ function WsHandler() {
 	self.handleMessage = function (data) {
 		self.handlers[data.handler].handle(data);
 	};
-	self.sendToServer = function (messageRequest) {
+	self.sendToServer = function (messageRequest, skipGrowl) {
 		var jsonRequest = JSON.stringify(messageRequest);
-		return self.sendRawTextToServer(jsonRequest);
+		return self.sendRawTextToServer(jsonRequest, skipGrowl);
 	};
-	self.sendRawTextToServer = function(jsonRequest) {
+	self.sendRawTextToServer = function(jsonRequest, skipGrowl) {
 		var logEntry = jsonRequest.substring(0, 500);
-		if (self.ws.readyState !== WebSocket.OPEN) {
-			logger.warn("Web socket is closed. Can't send {}", logEntry)();
-			growlError("Can't send message, because connection is lost :(");
+		if (!self.ws || self.ws.readyState !== WebSocket.OPEN) {
+			if (!skipGrowl){
+				growlError("Can't send message, because connection is lost :(");
+			}
+			self.logError("Web socket is closed. Can't send {}", logEntry)();
 			return false;
 		} else {
 			self.updateTimeout();
-			logger.ws("WS_OUT", logEntry)();
+			self.logOut(logEntry)();
 			self.ws.send(jsonRequest);
 			return true;
 		}
 	};
-	self.sendPreventDuplicates = function (data) {
+	self.sendPreventDuplicates = function (data, skipGrowl) {
 		var jsonRequest = JSON.stringify(data);
 		if (!self.duplicates[jsonRequest]) {
 			self.duplicates[jsonRequest] = Date.now();
@@ -5562,7 +5609,7 @@ function WsHandler() {
 				delete self.duplicates[jsonRequest];
 			}, 5000);
 		} else {
-			logger.warn("WS blocked duplicate from sending: {}", jsonRequest)();
+			self.logWarn("blocked duplicate from sending: {}", jsonRequest)();
 		}
 	}
 	self.setStatus = function (isOnline) {
@@ -5576,13 +5623,13 @@ function WsHandler() {
 		if (e.code === 403) {
 			var message = "Server has forbidden request because '{}'".format(reason);
 			growlError(message);
-			logger.error(message)();
+			self.logError('{}', message)();
 		} else if (self.wsState === 0) {
 			growlError("Can't establish connection with server");
-			logger.error("Chat server is down because {}", reason)();
+			self.logError("Chat server is down because {}", reason)();
 		} else if (self.wsState === 9) {
 			growlError("Connection to chat server has been lost, because {}".format(reason));
-			logger.error(
+			self.logError(
 					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
 					e.reason, CONNECTION_RETRY_TIME)();
 		}
@@ -5606,9 +5653,10 @@ function WsHandler() {
 				growlSuccess(message);
 			}
 			self.wsState = 9;
-			logger.info(message)();
+			self.log(message)();
 		};
 	};
+
 }
 
 function Storage() {

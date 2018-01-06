@@ -24,6 +24,8 @@ urlpatterns = patterns(
 	url(r'^facebook-auth', FacebookAuth.as_view()),
 	# story/register.js uses link below
 	url(r'^validate_user$', 'chat.views.validate_user'),
+	url(r'^get_extension_messages$', 'chat.views.get_messages_for_extension'),
+	url(r'^sw\.js$', 'chat.views.get_service_worker'),
 	url(r'^restore_password$', RestorePassword.as_view(), name='restore_pass'),
 	url(r'^send_restore_password$', 'chat.views.send_restore_password'),
 	url(r'^validate_email$', 'chat.views.validate_email'),

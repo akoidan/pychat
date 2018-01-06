@@ -7,6 +7,7 @@
 		var CHROME_EXTENSION_URL = "{{ extensionUrl }}";
 		var MOMENT_JS_URL = "{% md5url 'js/moment.js' %}";
 		var PICKADAY_JS_URL = "{% md5url 'js/pikaday.js' %}";
+		var SERVICE_WORKER_URL = "{% md5url 'js#root#/sw.js' %}";
 		var SMILEY_URL = "{% md5url 'smileys' %}";
 		var AMCHART_URL = "{% md5url 'js/amcharts-all.js' %}";
 		var CHANGE_PROFILE_JS_URL = "{% md5url 'js/profile.js' %}";
@@ -18,6 +19,7 @@
 		var NOTIFICATION_ICON_URL = "{% md5url 'images/favicon.ico' %}";
 		var suggestions = {{ suggestions |yesno:"true,false" }};
 		var notifications = {{ notifications |yesno:"true,false" }};
+		var cacheMessages = {{ cache_messages |yesno:"true,false" }};
 		var cacheMessages = {{ cache_messages |yesno:"true,false" }};
 		window.highlightCode = {{ highlight_code |yesno:"true,false" }};
 		window.embeddedYoutube = {{ embedded_youtube |yesno:"true,false" }};
@@ -200,11 +202,6 @@
 				<th><label for="version">Affected browser</label></th>
 				<td><input type="text" name="browser" id="version"/></td>
 			</tr>
-			<tr>
-				<th>
-					<label for="history">Send Logs</label>
-				</th>
-				<td><input type="checkbox" name="history" id="history" checked/> <label for="history"></label></td>
 			<tr>
 				<td colspan="2"><input type="submit" class="green-btn" value="Sumbit"></td>
 			</tr>

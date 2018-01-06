@@ -181,11 +181,8 @@ function setJsState() {
 			Utils.highlightCode(document.body);
 		});
 	}
-	if (logsInput.checked) {
-		logger.enableLogs();
-	} else {
-		logger.disableLogs();
-	}
+	window.loggerFactory.logsEnabled = logsInput.checked;
+	serviceWorker.updateData();
 }
 
 function saveProfile(event) {
