@@ -47,13 +47,6 @@ window.sound = 0;
 window.loggingEnabled = true;
 var ajaxLoader;
 
-///var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|&#39;|$))/g;/*http://anycharacter except end of text, <br> or space*/ TODO is ' ( &#39; ) allowed symbol? if not this breaks https://raw.githubusercontent.com/NeverSinkDev/NeverSink-Filter/master/NeverSink's%20filter%20-%201-REGULAR.filter
-var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g;/*http://anycharacter except end of text, <br> or space*/
-var youTubePattern = /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)?[^"]*" target="_blank">[^<]+<\/a>/;
-var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
-var replaceYoutubePattern = '<div class="youtube-player" data-id="$1"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>';
-var codePattern = /```(.+?)(?=```)```/;
-var replaceCodePattern = '<pre>$1</pre>';
 var muteBtn;
 var inputRangeStyles = {};
 
@@ -296,18 +289,6 @@ function bytesToSize(bytes) {
 	return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
 }
 
-
-function encodeAnchorsHTML(html) {
-	//&#x2F;&#x2F; = // (already encoded by encodeHTML above)
-	var a = encodeHTML(html)
-			.replace(linksRegex, replaceLinkPattern);
-	if (window.embeddedYoutube) {
-		a = a.replace(youTubePattern, replaceYoutubePattern);
-	}
-	a = a.replace(codePattern, replaceCodePattern);
-	return a;
-}
-
 function isDescendant(parent, child) {
 	while (child != null) {
 		if (child == parent) {
@@ -444,7 +425,7 @@ var Growl = function (message, onclicklistener) {
 		// logger.info("Rendering growl #{}", self.id)();
 		if (self.message) {
 			self.message = self.message.trim();
-			self.growl.innerHTML = self.message.indexOf("<") === 0 ? self.message : encodeAnchorsHTML(self.message);
+			self.growl.innerHTML = self.message.indexOf("<") === 0 ? self.message : encodeHTML(self.message);
 		}
 		self.growl.className = 'growl ' + growlClass;
 		self.growlHolder.appendChild(self.growl);
@@ -618,10 +599,15 @@ function doPost(url, params, callback, form) {
 	}
 	r.open("POST", url, true);
 	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
-	if (data.entries) { //es6
+	var entries = data.entries();
+	if (entries && entries.next) {
 		params = '';
-		for (var pair of data.entries()) {
-			params += pair[0] +'='+ pair[1] +'; ';
+		var d;
+		while (d = entries.next()) {
+			if (d.done) {
+				break;
+			}
+			params += d.value[0] + '=' + d.value[1] + '; ';
 		}
 	}
 	logger.http("POST out", "{} ::: {}", url, params)();

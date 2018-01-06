@@ -54,6 +54,10 @@ onDocLoad(function () {
 	chatTestVolume = $('chatTestVolume');
 	directUserTable = $('directUserTable');
 	webRtcFileIcon = $('webRtcFileIcon');
+	var navbar = $('navbar');
+	$('navMenu').onclick = function() {
+		CssUtils.toggleClass(navbar, 'expanded');
+	}
 	minimizedWindows = new MinimizedWindows();
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	channelsHandler = new ChannelsHandler();
@@ -3374,11 +3378,27 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			self.headerId = headerId;
 		}
 	};
+	self.patterns = {
+		linksRegex: /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g, /*http://anycharacter except end of text, <br> or space*/
+		youTubePattern: /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)?[^"]*" target="_blank">[^<]+<\/a>/,
+		replaceLinkPattern: '<a href="$1" target="_blank">$1</a>',
+		replaceYoutubePattern: '<div class="youtube-player" data-id="$1"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
+		codePattern: /```(.+?)(?=```)```/,
+		replaceCodePattern: '<pre>$1</pre>'
+	}
+	self.encodeHtmlAll = function (html) {
+		var a = encodeHTML(html).replace(self.patterns.linksRegex, self.patterns.replaceLinkPattern);
+		if (window.embeddedYoutube) {
+			a = a.replace(self.patterns.youTubePattern, self.patterns.replaceYoutubePattern);
+		}
+		a = a.replace(self.patterns.codePattern, self.patterns.replaceCodePattern);
+		return a;
+	}
 	self.encodeMessage = function (data) {
 		if (data.giphy) {
 			return '<div class="giphy"><img src="{0}" /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>'.formatPos(data.giphy);
 		} else {
-			var html = encodeAnchorsHTML(data.content);
+			var html = self.encodeHtmlAll(data.content);
 			if (data.images && Object.keys(data.images).length) {
 				html = html.replace(imageUnicodeRegex, function (s) {
 					return "<img src=\'{}\' symbol=\'{}\' class=\'{}\'/>".format(data.images[s], s, PASTED_IMG_CLASS);

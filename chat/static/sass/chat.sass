@@ -82,40 +82,35 @@ fieldset
 		max-width: calc(100% - 15px)
 		overflow-x: auto
 
-	iframe
-		border: none
-		width: 500px
-		height: 350px
+	@mixin margin-img
+		margin: 5px 0 0 15px
+	@mixin margin-img-def
 		max-width: calc(100% - 25px)
 		max-height: 400px
 		display: block
-		margin: 5px 0 0 15px
+
+	@mixin margin-img-in
+		@include margin-img-def
+		width: 500px
+		height: 350px
+	iframe
+		border: none
+		@include margin-img-in
+		@include margin-img
 
 	.youtube-player
 		@extend %user-select-none
 		display: block
-		margin: 5px 0 0 15px
+		@include margin-img
 		> div
 			position: relative
 			display: inline-block
 			zoom: 1
 			&:not(:hover)
 				-webkit-filter: brightness(90%)
-			&:after
-				content: ''
-				position: absolute
-				top: 0
-				bottom: 0
-				left: 0
-				right: 0
-				display: block
 
 			img
-				max-width: calc(100% - 25px)
-				max-height: 300px
-				max-height: calc(50vh - 100px)
-				min-height: 50px
-				display: block
+				@include margin-img-def
 			.icon-youtube-play
 				position: absolute
 				z-index: 13
@@ -128,24 +123,16 @@ fieldset
 				height: 80px
 				width: 80px
 				@media screen and (max-height: 40em)
-					margin-top: -10px !important
-					margin-left: -15px !important
-					height: 30px !important
-					width: 30px !important
-
-
-	@mixin chat_img
-		max-width: calc(100% - 25px)
-		max-height: 300px
-		max-height: calc(50vh - 100px)
-		min-height: 50px
-		display: block
-		margin: 5px 0 0 15px
+					margin-top: -10px
+					margin-left: -15px
+					height: 30px
+					width: 30px
 
 	.giphy
 		position: relative
 		img
-			@include chat_img
+			@include margin-img-def
+			@include margin-img
 		&:not(:hover) .giphy_hover
 			display: none
 		.giphy_hover
@@ -156,7 +143,8 @@ fieldset
 			height: 36px
 
 	img.B4j2ContentEditableImg
-		@include chat_img
+		@include margin-img-in
+		@include margin-img
 	p
 		margin-top: 0.8em
 		margin-bottom: 0.8em
@@ -520,7 +508,7 @@ ul#directUserTable
 		right: 0
 		background: transparent
 
-@media screen and (max-width: 35em)
+@media screen and (max-width: $collapse-width)
 	#wrapper
 		@include flex-direction(column-reverse)
 	#chat-room-users-wrapper
@@ -1173,9 +1161,5 @@ ul#directUserTable
 @media screen and (max-height: 300px), screen and (max-width: 600px)
 	#smileParentHolder
 		width: calc(100% - 30px)
-
-@media screen and (max-width: 500px)
-	.hide-wide
-		display: none
 
 /*# sourceMappingURL=chat.css.map
