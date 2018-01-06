@@ -27,7 +27,7 @@ All scripts to extract smiles located in [DefaultSmilies.cfpack](DefaultSmilies.
 
 Icons
 =====
-Chat uses [fontello](fontello.com) and its api for icons.  To edit fonts execute `sh download_content.sh fonts_session`. After this open generated url browser, edit everything as you like (you're redirected with a session so every change will be saved in fontello for 24 hours. After you finish download changes with `sh download_content.sh download_fontello`. If you did everything right new icons should appear in [demo.html](https://127.0.0.1:8000/static/demo.html)
+Chat uses [fontello](fontello.com) and its api for icons.  To edit fonts execute `sh download_content.sh fonts_session`. After this open generated url browser, edit everything as you like (you're redirected with a session so every change will be saved in fontello for 24 hours, edit icons and click on "Save session". Afterwords execute `sh download_content.sh download_fontello`. If you did everything right new icons should appear in [demo.html](https://127.0.0.1:8000/static/demo.html)
 
 Database migrations
 ===================

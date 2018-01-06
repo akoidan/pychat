@@ -54,6 +54,10 @@ onDocLoad(function () {
 	chatTestVolume = $('chatTestVolume');
 	directUserTable = $('directUserTable');
 	webRtcFileIcon = $('webRtcFileIcon');
+	var navbar = $('navbar');
+	$('navMenu').onclick = function() {
+		CssUtils.toggleClass(navbar, 'collapsed');
+	}
 	minimizedWindows = new MinimizedWindows();
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
 	channelsHandler = new ChannelsHandler();
