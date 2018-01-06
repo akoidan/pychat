@@ -260,11 +260,11 @@ nav
 	position: relative
 	flex-direction: row
 	overflow: hidden
-	max-height: 500px
+	max-height: 30px
 	transition: max-height 0.4s ease-out
 	#navMenu
 		display: none
-	@media screen and (max-width: 500px)
+	@media screen and (max-width: $collapse-width)
 		flex-direction: column
 		.mText
 			display: inline-block !important
@@ -283,8 +283,8 @@ nav
 			.icon-menu
 				position: absolute
 				right: 0
-		&.collapsed
-			max-height: 30px
+		&.expanded
+			max-height: 430px
 
 
 /*::-webkit-inner-spin-button { display: none; }
@@ -378,7 +378,7 @@ input[type=range][orient=vertical]
 	input[type=file]
 		max-width: 360px
 
-@media screen and (max-width: 35em)
+@media screen and (max-width: $collapse-width)
 	.very-small-screen, .timeMess
 		display: none !important
 	#hide

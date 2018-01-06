@@ -56,7 +56,7 @@ onDocLoad(function () {
 	webRtcFileIcon = $('webRtcFileIcon');
 	var navbar = $('navbar');
 	$('navMenu').onclick = function() {
-		CssUtils.toggleClass(navbar, 'collapsed');
+		CssUtils.toggleClass(navbar, 'expanded');
 	}
 	minimizedWindows = new MinimizedWindows();
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
