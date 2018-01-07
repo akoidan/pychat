@@ -176,6 +176,9 @@ function setJsState() {
 	if (!cacheMessages) {
 		storage.clearStorage();
 	}
+	if (notifications) {
+		notifier.tryAgainRegisterServiceWorker();
+	}
 	if (window.highlightCode) {
 		doGet(HIGHLIGHT_JS_URL, function() {
 			Utils.highlightCode(document.body);

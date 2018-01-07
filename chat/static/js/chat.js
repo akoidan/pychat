@@ -1851,34 +1851,34 @@ function NotifierHandler() {
 	/*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
 	self.LAST_TAB_ID_VARNAME = 'lastTabId';
 	self.clearNotificationTime = 5000;
-	self.serviceWorkerTry = true;
-	self.serviceWorker = false;
-	self.tryNotification = function (params, cb, skipIfGranted) {
-		if (self.serviceWorker) {
-			!skipIfGranted && cb(self.showNot(params));
-		} else if (!self.serviceWorkerTry && !self.serviceWorker) {
-			logger.warn("Skipping notification because service worked failed to load")();
-		} else if (navigator.serviceWorker) {
-			self.registerWorker(params, cb, skipIfGranted);
-		} else {
-			!skipIfGranted && cb(self.showNot(params, onInit));
+	self.serviceWorkedTried = false;
+	// Permissions are granted here!
+	self.showNot = function(params) {
+		try {
+			var not = new Notification(params.title, {icon: params.icon, body: params.body})
+			self.popedNotifQueue.push(not);
+			self.lastNotifyTime = Date.now();
+			not.onclick = self.notificationClick;
+			not.onclose = function () {
+				self.popedNotifQueue.pop(this);
+			};
+			setTimeout(self.clearNotification, self.clearNotificationTime);
+			logger.info("New notification has been spawned {}", params)();
+		} catch (e) {
+			logger.error("Failed to show notification {}", e)();
 		}
 	};
-	self.showNot = function(params) {
-		logger.info("Spawing Notification {}", params)();
-		return new Notification(params.title, {icon: params.icon, body: params.body})
-	};
-	self.askAndCreate = function (params, cb, skipIfGranted) {
+	self.checkPermissions = function (cb) {
 		if (Notification.permission !== "granted") {
 			Notification.requestPermission(function (result) {
 				if (result === 'granted') {
-					self.tryNotification(params, cb);
+					cb(true);
 				} else {
 					logger.warn("User blocked notification permission. Notifications won't be available")();
 				}
 			});
 		} else {
-			self.tryNotification(params, cb, skipIfGranted);
+			cb(false);
 		}
 	};
 
@@ -1903,12 +1903,9 @@ function NotifierHandler() {
 		}
 	}
 
-	self.registerWorker = function (params, cb, skipIfGranted) {
-		self.serviceWorkerTry = false;
+	self.registerWorker = function (cb) {
 		navigator.serviceWorker.register('/sw.js',  {scope: '/'}).then(function (r) {
-			self.serviceWorker = true;
 			logger.info("Registered service worker {}", r)();
-			!skipIfGranted && cb(self.showNot(params));
 			return navigator.serviceWorker.ready;
 		}).then(function (serviceWorkerRegistration) {
 			logger.info("Service worker is ready {}", serviceWorkerRegistration)();
@@ -1931,9 +1928,10 @@ function NotifierHandler() {
 			}
 		}).then(function () {
 			logger.info("Saved subscription to server")();
+			cb(false);
 		}).catch(function (e) {
-			growlError("Offline notifications won't be available because " + Utils.extractError(e))
 			logger.error("Unable to load serviceWorker to show notification because {}", e)();
+			cb(e);
 		});
 	}
 	self.popedNotifQueue = [];
@@ -1946,27 +1944,30 @@ function NotifierHandler() {
 		if (!window.Notification) {
 			logger.warn("Notifications are not supported")();
 		} else if (notifications) {
-			self.askAndCreate({
-				title: 'Pychat notifications enabled. You can disable them in profile'
-			}, function () {
-				logger.info("notification succeeded")();
-			}, true);
+			self.tryAgainRegisterServiceWorker();
 		}
 	};
+	self.tryAgainRegisterServiceWorker = function () {
+		self.checkPermissions(function (result) {
+			if (!self.serviceWorkedTried) {
+				self.serviceWorkedTried = true;
+				self.registerWorker(function (error) {
+					error && growlError("Offline notifications won't work, because " + Utils.extractError(error));
+					if (result) {
+						self.showNot({
+							title: 'Pychat notifications enabled',
+							body:  "You can disable notifications in profile",
+						});
+					}
+				});
+			}
+		}, true);
+	}
 	self.notificationClick = function () {
 		window.focus();
 		this.close()
 	};
 	self.lastNotifyTime = Date.now();
-	self.createNot = function (notification, currentTime) {
-		self.popedNotifQueue.push(notification);
-		self.lastNotifyTime = currentTime;
-		notification.onclick = self.notificationClick;
-		notification.onclose = function () {
-			self.popedNotifQueue.pop(this);
-		};
-		setTimeout(self.clearNotification, self.clearNotificationTime);
-	};
 	self.notify = function (title, message, icon) {
 		if (self.isCurrentTabActive) {
 			return;
@@ -1984,12 +1985,12 @@ function NotifierHandler() {
 				|| currentTime - self.maxNotifyTime < self.lastNotifyTime) {
 			return
 		}
-		self.askAndCreate({
-			title: title,
-			icon: icon || NOTIFICATION_ICON_URL,
-			body: message
-		}, function (notification) {
-			self.createNot(notification, currentTime);
+		self.checkPermissions(function (withGranted) {
+			self.showNot({
+				title: title,
+				icon: icon || NOTIFICATION_ICON_URL,
+				body: message
+			});
 		});
 	};
 	self.isTabMain = function () {
