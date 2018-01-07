@@ -508,6 +508,12 @@ function Painter() {
 			self.init.setContext();
 			self.setMode('pen');
 		},
+		getPageXY: function(e) {
+			return {
+				pageX: e.pageX || e.touches[0].pageX,
+				pageY: e.pageY || e.touches[0].pageY,
+			}
+		},
 		pasteToTextArea: function () {
 			if (singlePage.currentPage.pageName != 'channels') {
 				return;
@@ -610,18 +616,33 @@ function Painter() {
 			self.dom.canvas.style.width = self.dom.canvas.width * self.zoom + 'px';
 			self.dom.canvas.style.height = self.dom.canvas.height * self.zoom + 'px';
 		},
-		getScaledOrdinate: function (ordinateName/*width*/, value) {
-			var clientOrdinateName = 'client' + ordinateName.charAt(0).toUpperCase() + ordinateName.substr(1);
-			/*clientWidth*/
+		getScaledOrdinate: function (ordinateName, clientOrdinateName, value) {
 			var clientOrdinate = self.dom.canvas[clientOrdinateName];
 			var ordinate = self.dom.canvas[ordinateName];
 			return ordinate == clientOrdinate ? value : Math.round(ordinate * value / clientOrdinate); // apply page zoom
 		},
-		getXY: function (e) {
-			return {
-				x: self.helper.getScaledOrdinate('width', e.offsetX),
-				y: self.helper.getScaledOrdinate('height', e.offsetY)
+		getOffset: function (el) {
+			var _x = 0;
+			var _y = 0;
+			while (el && !isNaN(el.offsetLeft) && !isNaN(el.offsetTop)) {
+				_x += el.offsetLeft - el.scrollLeft;
+				_y += el.offsetTop - el.scrollTop;
+				el = el.offsetParent;
 			}
+			return {offsetTop: _y, offsetLeft: _x};
+		},
+		getXY: function (e) {
+			if (!e.offsetX && e.touches) {
+				var offset = self.helper.getOffset(self.dom.canvas);
+				var pxy = self.helper.getPageXY(e);
+				e.offsetX = pxy.pageX- offset.offsetLeft;
+				e.offsetY = pxy.pageY- offset.offsetTop;
+			}
+			var newVar = {
+				x: self.helper.getScaledOrdinate('width', 'clientWidth', e.offsetX),
+				y: self.helper.getScaledOrdinate('height', 'clientHeight', e.offsetY)
+			};
+			return newVar
 		},
 		setDimensions: function(w, h) {
 			var state = self.buffer.getState();
@@ -716,16 +737,21 @@ function Painter() {
 			var st = painter.dom.canvasWrapper.style;
 			var w = parseInt(st.width.split('px')[0]);
 			var h = parseInt(st.height.split('px')[0]);
-			var x = e.pageX;
-			var y = e.pageY;
+			var pxy =self.helper.getPageXY(e);
 			var listener = function(e) {
-				self.dom.canvasWrapper.style.width = w - x + e.pageX + 'px';
-				self.dom.canvasWrapper.style.height = h - y + e.pageY + 'px';
+				var cxy = self.helper.getPageXY(e);
+				self.dom.canvasWrapper.style.width = w - pxy.pageX + cxy.pageX + 'px';
+				self.dom.canvasWrapper.style.height = h - pxy.pageY + cxy.pageY + 'px';
 			};
+			logger.info("Added mousmove. touchmove")();
 			document.addEventListener('mousemove', listener);
-			document.addEventListener('mouseup', function() {
+			document.addEventListener('touchmove', listener);
+			var remove = function() {
 				document.removeEventListener('mousemove', listener);
-			});
+				document.removeEventListener('touchmove', listener);
+			};
+			document.addEventListener('mouseup', remove);
+			document.addEventListener('touchend', remove);
 		},
 		canvasImageDrop: function (e) {
 			e.preventDefault();
@@ -815,7 +841,7 @@ function Painter() {
 			document.removeEventListener('touchend', tool.docMouseUp);
 		};
 		tool.trackMouseMove = function(e, mode) {
-			//self.log("Resizer mousedown")();
+			self.log("Resizer mousedown")();
 			tool.mode = mode || e.target.getAttribute('pos');
 			self.dom.canvasWrapper.addEventListener('mousemove', tool.handleMouseMove);
 			self.dom.canvasWrapper.addEventListener('touchmove', tool.handleMouseMove);
@@ -825,9 +851,10 @@ function Painter() {
 		tool.imgHolder.onmousedown = tool.trackMouseMove;
 		tool.imgHolder.ontouchstart = tool.trackMouseMove;
 		tool.setParamsFromEvent = function(e) {
+			var pxy =self.helper.getPageXY(e);
 			tool.params.lastCoord = {
-				x: e.pageX,
-				y: e.pageY,
+				x: pxy.pageX,
+				y: pxy.pageY,
 				ox: tool.params.left, // origin x
 				oy: tool.params.top, // origin y
 				ow: tool.params.width, // origin width
@@ -912,13 +939,16 @@ function Painter() {
 			return {x: x, y: y};
 		};
 		tool.handleMouseMove = function (e) {
-			var x = e.pageX - tool.params.lastCoord.x;
-			var y = e.pageY - tool.params.lastCoord.y;
+			//self.log('handleMouseMove {}', e)();
+			var pxy =self.helper.getPageXY(e);
+			var x = pxy.pageX - tool.params.lastCoord.x;
+			var y = pxy.pageY - tool.params.lastCoord.y;
 			if (e.shiftKey && tool.mode.length === 2) {
 				var __ret = tool.calcProportion(x, y);
 				x = __ret.x;
 				y = __ret.y;
 			}
+// 			self.log('handleMouseMove ({}, {})', x, y)();
 			tool.handlers[tool.mode.charAt(0)](x, y);
 			if (tool.mode.length === 2) {
 				tool.handlers[tool.mode.charAt(1)](x, y);
@@ -1601,15 +1631,17 @@ function Painter() {
 				return 'move';
 			};
 			tool.onMouseDown = function (e) {
-				tool.lastCoord = {x: e.pageX, y: e.pageY};
+				var pxy = self.helper.getPageXY(e);
+				tool.lastCoord = {x: pxy.pageX, y: pxy.pageY};
 			};
 			tool.onMouseMove = function (e) {
-				var x = tool.lastCoord.x - e.pageX;
-				var y = tool.lastCoord.y - e.pageY;
+				var pxy = self.helper.getPageXY(e);
+				var x = tool.lastCoord.x - pxy.pageX;
+				var y = tool.lastCoord.y - pxy.pageY;
 				self.log("Moving to: {{}, {}}", x, y)();
 				self.dom.canvasWrapper.scrollTop += y;
 				self.dom.canvasWrapper.scrollLeft += x;
-				tool.lastCoord = {x: e.pageX, y: e.pageY};
+				tool.lastCoord = {x: pxy.pageX, y: pxy.pageY};
 				// self.log('X,Y: {{}, {}}', self.dom.canvasWrapper.scrollLeft, self.dom.canvasWrapper.scrollTop )();
 			};
 			tool.onMouseUp = function (coord) {
@@ -5577,7 +5609,6 @@ function WsHandler() {
 			}
 		}
 	};
-	self.pingTimeout = null;
 	self.handle = function (message) {
 		self['on'+message.action](message);
 	};
@@ -5595,6 +5626,9 @@ function WsHandler() {
 	self.updateTimeout = function() {
 		if (self.pingTimeout) {
 			clearTimeout(self.pingTimeout);
+			self.log("Cleared old timeout, scheduling new one")();
+		} else {
+			self.log("Scheduling ping timeout (prev timeout is null)")();
 		}
 		self.pingTimeout = setTimeout(self.onTimeout, 60000); // every 1 min update connection
 	};
