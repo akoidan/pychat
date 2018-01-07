@@ -3839,6 +3839,8 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 
 function BaseTransferHandler(removeReferenceFn) {
 	var self = this;
+	self.log = loggerFactory.getLogger("WRTC", console.log, 'color: #960055; font-weight: bold');
+	self.logErr = loggerFactory.getLogger("WRTC", console.error, 'color: #960055; font-weight: bold');
 	self.removeReference = function () {
 		removeReferenceFn(self.connectionId);
 	};
@@ -4335,11 +4337,11 @@ function CallHandler(roomId) {
 		var prom = Promise.resolve(false);
 		var endStream;
 		if (self.constraints.audio || self.constraints.video) {
-			var audio = self.constraints.audio
+			var audio = !!self.constraints.audio
 			if (self.dom.microphones.value && audio) {
 				audio = {deviceId: self.dom.microphones.value};
 			}
-			var video = self.constraints.video;
+			var video = !!self.constraints.video; // convert null to bolean, if we pass null to getUserMedia it tries to capture
 			if (self.dom.cameras.value && video) {
 				video = {deviceId: self.dom.cameras.value};
 			}
@@ -5405,9 +5407,27 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 	self.processAudio = function (audioProc) {
 		return function () {
 			var level = Utils.getAverageAudioLevel(audioProc); //256 max
-			var clasNu = Math.floor(Math.sqrt(level) / 1.3)+1;
-			if (clasNu > 10) {
-				clasNu = 10;
+			var clasNu;
+			if (level < 0.5) {
+				clasNu = 0
+			} else if (level < 5) {
+				clasNu = 1;
+			} else if (level < 12) {
+				clasNu = 2;
+			} else if (level < 25) {
+				clasNu = 3;
+			} else if (level < 50) {
+				clasNu = 4;
+			} else if (level < 90) {
+				clasNu = 5
+			} else if (level < 110) {
+				clasNu = 6
+			} else if (level < 140) {
+				clasNu = 7
+			} else if (level < 180) {
+				clasNu = 8
+			} else {
+				clasNu = 9
 			}
 			self.dom.callVolume.className = 'vol-level-{}'.format(clasNu);
 		};
