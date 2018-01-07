@@ -176,16 +176,15 @@ function setJsState() {
 	if (!cacheMessages) {
 		storage.clearStorage();
 	}
+	if (notifications) {
+		notifier.tryAgainRegisterServiceWorker();
+	}
 	if (window.highlightCode) {
 		doGet(HIGHLIGHT_JS_URL, function() {
 			Utils.highlightCode(document.body);
 		});
 	}
-	if (logsInput.checked) {
-		logger.enableLogs();
-	} else {
-		logger.disableLogs();
-	}
+	window.loggerFactory.logsEnabled = logsInput.checked;
 }
 
 function saveProfile(event) {
@@ -220,7 +219,7 @@ function saveProfile(event) {
 		} else {
 			growlError(response);
 		}
-	}, changeProfileForm, true);
+	}, changeProfileForm);
 }
 
 

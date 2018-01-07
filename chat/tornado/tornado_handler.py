@@ -1,14 +1,15 @@
 import json
 import logging
-from datetime import timedelta
 from numbers import Number
 from threading import Thread
 
+from datetime import timedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import F, Q
 from redis_sessions.session import SessionStore
 from tornado import ioloop
+from tornado.httpclient import AsyncHTTPClient
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from chat.cookies_middleware import create_id
@@ -17,9 +18,9 @@ from chat.py2_3 import str_type, urlparse
 from chat.settings import UPDATE_LAST_READ_MESSAGE
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions
-from chat.tornado.image_utils import get_message_images, prepare_img
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
-from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms
+from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms, get_message_images, \
+	prepare_img
 
 sessionStore = SessionStore()
 
@@ -31,6 +32,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 	def __init__(self, *args, **kwargs):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
 		self.__connected__ = False
+		self.__http_client__ = AsyncHTTPClient()
 		self.anti_spam = AntiSpam()
 
 	@property
@@ -40,6 +42,13 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 	@connected.setter
 	def connected(self, value):
 		self.__connected__ = value
+
+	@property
+	def http_client(self):
+		"""
+		@type: AsyncHTTPClient
+		"""
+		return self.__http_client__
 
 	def data_received(self, chunk):
 		pass

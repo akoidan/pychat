@@ -55,8 +55,12 @@ onDocLoad(function () {
 	directUserTable = $('directUserTable');
 	webRtcFileIcon = $('webRtcFileIcon');
 	var navbar = $('navbar');
-	$('navMenu').onclick = function() {
-		CssUtils.toggleClass(navbar, 'expanded');
+	navbar.onclick = function(e) {
+		if (e.target == navbar) {
+			return
+		} else {
+			CssUtils.toggleClass(navbar, 'expanded');
+		}
 	}
 	minimizedWindows = new MinimizedWindows();
 	// some browser don't fire keypress event for num keys so keydown instead of keypress
@@ -69,7 +73,6 @@ onDocLoad(function () {
 	storage = new Storage();
 	notifier = new NotifierHandler();
 	painter = new Painter();
-	logger.info("Trying to resolve WebSocket Server")();
 	wsHandler.listenWS();
 	Utils.showHelp();
 });
@@ -490,11 +493,7 @@ function Painter() {
 			});
 		},
 	};
-	self.log = function () {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift("Painter");
-		return logger.webrtc.apply(logger, args);
-	};
+	self.log = loggerFactory.getLogger("Painter", console.log, 'color: #f200da');
 	self.helper = {
 		setUIText: function(text) {
 			self.dom.paintXY.textContent = text + ' ' + Math.round(self.zoom * 100) + '%';
@@ -1843,46 +1842,98 @@ function Painter() {
 function NotifierHandler() {
 	var self = this;
 	self.maxNotifyTime = 500;
+	var logger = {
+		info: loggerFactory.getLogger("NOTIFY", console.log, 'color: #ffb500; font-weight: bold'),
+		warn: loggerFactory.getLogger("NOTIFY", console.warn, 'color: #ffb500; font-weight: bold'),
+		error: loggerFactory.getLogger("NOTIFY", console.error, 'color: #ffb500; font-weight: bold')
+	};
 	self.currentTabId = Date.now().toString();
 	/*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
 	self.LAST_TAB_ID_VARNAME = 'lastTabId';
 	self.clearNotificationTime = 5000;
-	self.serviceWorkerTry = true;
-	self.tryNotification = function (params, cb) {
-		if (!self.serviceWorkerTry && !self.registration) {
-			logger.warn("Skipping notification because service worked failed to load")();
-		} else {
-			try {
-				cb(new Notification(params.title, {icon: params.icon, body: params.body}));
-			} catch (e) {
-				if (e.name == 'TypeError' && navigator.serviceWorker && self.serviceWorkerTry) {
-					logger.info("Notification api is only available via workers, trying to load one")();
-					self.serviceWorkerTry = false;
-					navigator.serviceWorker.register('/dummyWorker').catch(function (e) {
-						logger.error("Unable to load serviceWorker to show notification because {}", Utils.extractError(e))();
-					});
-					navigator.serviceWorker.ready.then(function (registration) {
-						logger.info("Loading workes succeeded")();
-						self.registration = registration;
-						registration.showNotification(params.title, {icon: params.icon, body: params.body});
-					});
-				} else {
-					logger.warn("Skipping notification cause service worker hasn't been loaded yet")();
-				}
-			}
+	self.serviceWorkedTried = false;
+	// Permissions are granted here!
+	self.showNot = function(params) {
+		try {
+			var not = new Notification(params.title, {icon: params.icon, body: params.body})
+			self.popedNotifQueue.push(not);
+			self.lastNotifyTime = Date.now();
+			not.onclick = self.notificationClick;
+			not.onclose = function () {
+				self.popedNotifQueue.pop(this);
+			};
+			setTimeout(self.clearNotification, self.clearNotificationTime);
+			logger.info("New notification has been spawned {}", params)();
+		} catch (e) {
+			logger.error("Failed to show notification {}", e)();
 		}
 	};
-	self.askAndCreate = function (params, cb, init) {
+	self.checkPermissions = function (cb) {
 		if (Notification.permission !== "granted") {
-			Notification.requestPermission(function(result) {
+			Notification.requestPermission(function (result) {
 				if (result === 'granted') {
-					self.tryNotification(params, cb);
+					cb(true);
+				} else {
+					logger.warn("User blocked notification permission. Notifications won't be available")();
 				}
 			});
 		} else {
-			!init && self.tryNotification(params, cb)
+			cb(false);
 		}
 	};
+
+	self.getSubscriptionId = function (pushSubscription) {
+		var mergedEndpoint = pushSubscription.endpoint;
+		if (pushSubscription.endpoint.indexOf('https://android.googleapis.com/gcm/send') === 0) {
+			// Make sure we only mess with GCM
+			// Chrome 42 + 43 will not have the subscriptionId attached
+			// to the endpoint.
+			if (pushSubscription.subscriptionId &&
+					pushSubscription.endpoint.indexOf(pushSubscription.subscriptionId) === -1) {
+				// Handle version 42 where you have separate subId and Endpoint
+				mergedEndpoint = pushSubscription.endpoint + '/' +
+						pushSubscription.subscriptionId;
+			}
+		}
+		var GCM_ENDPOINT = 'https://android.googleapis.com/gcm/send';
+		if (mergedEndpoint.indexOf(GCM_ENDPOINT) !== 0) {
+			return null;
+		} else {
+			return mergedEndpoint.split('/').pop();
+		}
+	}
+
+	self.registerWorker = function (cb) {
+		navigator.serviceWorker.register('/sw.js',  {scope: '/'}).then(function (r) {
+			logger.info("Registered service worker {}", r)();
+			return navigator.serviceWorker.ready;
+		}).then(function (serviceWorkerRegistration) {
+			logger.info("Service worker is ready {}", serviceWorkerRegistration)();
+			return serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true})
+		}).then(function (subscription) {
+			logger.info("Got subscription {}", subscription)();
+			var subscriptionId = self.getSubscriptionId(subscription);
+			if (!subscriptionId) {
+				throw 'Current browser doesnt support offline notifications';
+			} else {
+				return new Promise(function (resolve, reject) {
+					doPost('/register_fcb', {registration_id: subscriptionId}, function (response) {
+						if (response == RESPONSE_SUCCESS) {
+							resolve()
+						} else {
+							reject();
+						}
+					})
+				});
+			}
+		}).then(function () {
+			logger.info("Saved subscription to server")();
+			cb(false);
+		}).catch(function (e) {
+			logger.error("Unable to load serviceWorker to show notification because {}", e)();
+			cb(e);
+		});
+	}
 	self.popedNotifQueue = [];
 	self.init = function () {
 		window.addEventListener("blur", self.onFocusOut);
@@ -1891,27 +1942,32 @@ function NotifierHandler() {
 		window.addEventListener("unload", self.onUnload);
 		self.onFocus();
 		if (!window.Notification) {
-			logger.warn("Notification is not supported")();
+			logger.warn("Notifications are not supported")();
 		} else if (notifications) {
-			self.askAndCreate({title: 'Pychat notifications enabled. You can disable them in profile'}, function () {
-				logger.info("notification succeeded")();
-			}, true);
+			self.tryAgainRegisterServiceWorker();
 		}
 	};
+	self.tryAgainRegisterServiceWorker = function () {
+		self.checkPermissions(function (result) {
+			if (!self.serviceWorkedTried) {
+				self.serviceWorkedTried = true;
+				self.registerWorker(function (error) {
+					error && growlError("Offline notifications won't work, because " + Utils.extractError(error));
+					if (result) {
+						self.showNot({
+							title: 'Pychat notifications enabled',
+							body:  "You can disable notifications in profile",
+						});
+					}
+				});
+			}
+		}, true);
+	}
 	self.notificationClick = function () {
 		window.focus();
 		this.close()
 	};
 	self.lastNotifyTime = Date.now();
-	self.createNot = function (notification, currentTime) {
-		self.popedNotifQueue.push(notification);
-		self.lastNotifyTime = currentTime;
-		notification.onclick = self.notificationClick;
-		notification.onclose = function () {
-			self.popedNotifQueue.pop(this);
-		};
-		setTimeout(self.clearNotification, self.clearNotificationTime);
-	};
 	self.notify = function (title, message, icon) {
 		if (self.isCurrentTabActive) {
 			return;
@@ -1929,12 +1985,12 @@ function NotifierHandler() {
 				|| currentTime - self.maxNotifyTime < self.lastNotifyTime) {
 			return
 		}
-		self.askAndCreate({
-			title: title,
-			icon: icon || NOTIFICATION_ICON_URL,
-			body: message
-		}, function (notification) {
-			self.createNot(notification, currentTime);
+		self.checkPermissions(function (withGranted) {
+			self.showNot({
+				title: title,
+				icon: icon || NOTIFICATION_ICON_URL,
+				body: message
+			});
 		});
 	};
 	self.isTabMain = function () {
@@ -1961,9 +2017,10 @@ function NotifierHandler() {
 			self.popedNotifQueue.shift();
 		}
 	};
-	self.onFocus = function () {
+	self.onFocus = function (e) {
 		localStorage.setItem(self.LAST_TAB_ID_VARNAME, self.currentTabId);
 		logger.info("Marking current tab as active")();
+		wsHandler.onTimeout();
 		self.isCurrentTabActive = true;
 		self.newMessagesCount = 0;
 		document.title = 'PyChat';
@@ -2074,11 +2131,6 @@ function IssuePage() {
 	self.onsubmit = function (event) {
 		event.preventDefault();
 		var params = {};
-		if ($('history').checked) {
-			if (logger.historyStorage != null) {
-				params['log'] = logger.historyStorage
-			}
-		}
 		doPost('/report_issue', params, function (response) {
 			if (response === RESPONSE_SUCCESS) {
 				growlSuccess("Your issue has been successfully submitted");
@@ -2217,6 +2269,11 @@ function PageHandler() {
 
 function ChannelsHandler() {
 	var self = this;
+	var logger = {
+		warn: loggerFactory.getLogger("CHAT", console.warn, 'color: #FF0F00; font-weight: bold'),
+		info: loggerFactory.getLogger("CHAT", console.log, 'color: #FF0F00; font-weight: bold'),
+		error: loggerFactory.getLogger("CHAT", console.error, 'color: #FF0F00; font-weight: bold')
+	}
 	self.pageName = 'channels';
 	Page.call(self);
 	self.url = '/chat/';
@@ -3063,6 +3120,11 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.EDITED_MESSAGE_CLASS = 'editedMessage';
 	self.roomId = parseInt(roomId);
 	self.roomName = roomName;
+	var logger = {
+		warn: loggerFactory.getLogger("CH:"+roomId, console.warn, 'color: #FF0F00; font-weight: bold'),
+		info: loggerFactory.getLogger("CH:"+roomId, console.log, 'color: #FF0F00; font-weight: bold'),
+		error: loggerFactory.getLogger("CH:"+roomId, console.error, 'color: #FF0F00; font-weight: bold')
+	}
 	self.lastMessage = {};
 	self.dom = {
 		chatBoxDiv: chatboxDiv,
@@ -3678,16 +3740,8 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	self.getConnectionStatus = function() {
 		return self.connectionStatus;
 	}
-	self.log = function () {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift(self.connectionId + ":" + self.opponentWsId);
-		return logger.webrtc.apply(logger, args);
-	};
-	self.logErr = function (text) {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift(self.connectionId + ":" + self.opponentWsId);
-		return logger.webrtcErr.apply(logger, args);
-	};
+	self.log = loggerFactory.getLogger(self.connectionId + ":" + self.opponentWsId, console.log,  "color: #960055; font-weight: bold");
+	self.logErr = loggerFactory.getLogger(self.connectionId + ":" + self.opponentWsId, console.error,  "color: #960055; font-weight: bold");
 	self.print = function (message) {
 		self.log("Call message {}", JSON.stringify(message))();
 	};
@@ -3807,6 +3861,8 @@ function BaseTransferHandler(removeReferenceFn) {
 	self.setConnectionId = function (id) {
 		self.connectionId = id;
 		self.log("CallHandler initialized")();
+		self.log = loggerFactory.getLogger(self.connectionId, console.log, 'color: #960055; font-weight: bold');
+		self.logErr = loggerFactory.getLogger(self.connectionId, console.error, 'color: #960055; font-weight: bold');
 	};
 	self.closeAllPeerConnections = function (text) {
 		var hasConnections = false;
@@ -3816,16 +3872,6 @@ function BaseTransferHandler(removeReferenceFn) {
 			hasConnections = true;
 		}
 		return hasConnections;
-	};
-	self.log = function () {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift(self.connectionId);
-		return logger.webrtc.apply(logger, args);
-	};
-	self.logErr = function (text) {
-		var args = Array.prototype.slice.call(arguments);
-		args.unshift(self.connectionId);
-		return logger.webrtcErr.apply(logger, args);
 	};
 }
 
@@ -5399,6 +5445,11 @@ function WebRtcApi() {
 	};
 	self.connections = {};
 	self.quedConnections = {};
+	var logger = {
+		warn: loggerFactory.getLogger("WEBRTC", console.warn, 'color: #960055; font-weight: bold'),
+		info: loggerFactory.getLogger("WEBRTC", console.log, 'color: #960055; font-weight: bold'),
+		error: loggerFactory.getLogger("WEBRTC", console.error, 'color: #960055; font-weight: bold')
+	}
 	self.quedId = 0;
 	self.clickFile = function () {
 		self.dom.fileInput.value = null;
@@ -5482,6 +5533,11 @@ function WsHandler() {
 	var self = this;
 	self.wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 9 - connected;
 	self.duplicates = {};
+	self.log = loggerFactory.getLogger('WS', console.log, "color: green;");
+	self.logWarn = loggerFactory.getLogger('WS', console.warn, "color: green;");
+	self.logError = loggerFactory.getLogger('WS', console.error, "color: green;");
+	self.logIn = loggerFactory.getLogger('WS_IN', console.log, "color: green; font-weight: bold");
+	self.logOut = loggerFactory.getLogger('WS_OUT', console.log, "color: green; font-weight: bold");
 	self.dom = {
 		onlineStatus: $('onlineStatus'),
 		onlineClass: 'online',
@@ -5508,27 +5564,32 @@ function WsHandler() {
 	self.onsetWsId = function(message) {
 		self.wsConnectionId = message.content;
 		self.wsConnectionFullId = message.opponentWsId;
-		logger.ws("WS", "CONNECTION ID HAS BEEN SET TO {}, (full id is {})", self.wsConnectionId, self.wsConnectionFullId)();
+		self.log("CONNECTION ID HAS BEEN SET TO {}, (full id is {})", self.wsConnectionId, self.wsConnectionFullId)();
 	};
 	self.onping = function(message) {
-		logger.ws("WS", "Connection updated")();
+		self.log("Connection updated")();
 	};
 	self.onTimeout = function() {
-		self.pingTimeout = null;
-		self.sendToServer({action: 'ping'});
-		self.updateTimeout();
+		self.sendToServer({action: 'ping'}, true);
 	};
 	self.updateTimeout = function() {
 		if (self.pingTimeout) {
 			clearTimeout(self.pingTimeout);
 		}
-		self.pingTimeout = setTimeout(self.onTimeout, 300000); // every 5 min update connection
+		self.pingTimeout = setTimeout(self.onTimeout, 60000); // every 1 min update connection
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
 		self.updateTimeout();
-		logger.ws("WS_IN", jsonData)();
-		var data = JSON.parse(jsonData);
+		var data;
+		try {
+			data = JSON.parse(jsonData);
+			self.logIn("{}", jsonData)();
+		} catch (e) {
+			self.logError('Unable to parse incomming message {}', jsonData)();
+			growlError("Unable to parse incoming message {}", e);
+			return;
+		}
 		self.handleMessage(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
 		storage.saveMessageToStorage(data, jsonData);
@@ -5536,33 +5597,35 @@ function WsHandler() {
 	self.handleMessage = function (data) {
 		self.handlers[data.handler].handle(data);
 	};
-	self.sendToServer = function (messageRequest) {
+	self.sendToServer = function (messageRequest, skipGrowl) {
 		var jsonRequest = JSON.stringify(messageRequest);
-		return self.sendRawTextToServer(jsonRequest);
+		return self.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
 	};
-	self.sendRawTextToServer = function(jsonRequest) {
+	self.sendRawTextToServer = function(jsonRequest, skipGrowl, objData) {
 		var logEntry = jsonRequest.substring(0, 500);
-		if (self.ws.readyState !== WebSocket.OPEN) {
-			logger.warn("Web socket is closed. Can't send {}", logEntry)();
-			growlError("Can't send message, because connection is lost :(");
+		if (!self.ws || self.ws.readyState !== WebSocket.OPEN) {
+			if (!skipGrowl){
+				growlError("Can't send message, because connection is lost :(");
+			}
+			self.logError("Web socket is closed. Can't send {}", logEntry)();
 			return false;
 		} else {
 			self.updateTimeout();
-			logger.ws("WS_OUT", logEntry)();
+			self.logOut("{}", jsonRequest)();
 			self.ws.send(jsonRequest);
 			return true;
 		}
 	};
-	self.sendPreventDuplicates = function (data) {
+	self.sendPreventDuplicates = function (data, skipGrowl) {
 		var jsonRequest = JSON.stringify(data);
 		if (!self.duplicates[jsonRequest]) {
 			self.duplicates[jsonRequest] = Date.now();
-			self.sendRawTextToServer(jsonRequest)
+			self.sendRawTextToServer(jsonRequest, skipGrowl, data)
 			setTimeout(function () {
 				delete self.duplicates[jsonRequest];
 			}, 5000);
 		} else {
-			logger.warn("WS blocked duplicate from sending: {}", jsonRequest)();
+			self.logWarn("blocked duplicate from sending: {}", jsonRequest)();
 		}
 	}
 	self.setStatus = function (isOnline) {
@@ -5576,13 +5639,13 @@ function WsHandler() {
 		if (e.code === 403) {
 			var message = "Server has forbidden request because '{}'".format(reason);
 			growlError(message);
-			logger.error(message)();
+			self.logError('{}', message)();
 		} else if (self.wsState === 0) {
 			growlError("Can't establish connection with server");
-			logger.error("Chat server is down because {}", reason)();
+			self.logError("Chat server is down because {}", reason)();
 		} else if (self.wsState === 9) {
 			growlError("Connection to chat server has been lost, because {}".format(reason));
-			logger.error(
+			self.logError(
 					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
 					e.reason, CONNECTION_RETRY_TIME)();
 		}
@@ -5606,9 +5669,10 @@ function WsHandler() {
 				growlSuccess(message);
 			}
 			self.wsState = 9;
-			logger.info(message)();
+			self.log(message)();
 		};
 	};
+
 }
 
 function Storage() {

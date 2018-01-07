@@ -1,6 +1,5 @@
 from chat.models import get_milliseconds
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
-from chat.tornado.image_utils import prepare_img
 
 
 class MessagesCreator(object):
@@ -65,7 +64,7 @@ class MessagesCreator(object):
 		return res
 
 	@classmethod
-	def append_images(cls, messages, images):
+	def append_images(cls, messages, images, prepare_img):
 		"""
 		:type messages: list[chat.models.Message] 
 		:type images: list[chat.models.Image] 
@@ -77,14 +76,14 @@ class MessagesCreator(object):
 		return res_mess
 
 	@classmethod
-	def get_messages(cls, messages, channel, images):
+	def get_messages(cls, messages, channel, images, prepare_img):
 		"""
 		:type images: list[chat.models.Image]
 		:type messages: list[chat.models.Message]
 		:type channel: str
 		"""
 		return {
-			VarNames.CONTENT: cls.append_images(messages, images),
+			VarNames.CONTENT: cls.append_images(messages, images, prepare_img),
 			VarNames.EVENT: Actions.GET_MESSAGES,
 			VarNames.CHANNEL: channel,
 			VarNames.HANDLER_NAME: HandlerNames.CHAT

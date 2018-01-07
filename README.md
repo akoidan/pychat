@@ -29,16 +29,16 @@ Installation:
 =============
 
 Though ArchLinux is not recommended as a server OS I prefer using it over other stable ones.
-  
+
 Prepare the system.
 ------------------
- 0. Install packages `pacman -S  git nginx python python-pip redis mariadb mysql-python python-mysql-connector postfix ruby gcc jansson sassc`. You surely can install `uwsgi` and `uwsgi-plugin-python` via pacman but I found pip's package more stable so `pip install uwsgi`. 
+ 0. Install packages `pacman -S  git nginx python python-pip redis mariadb mysql-python python-mysql-connector postfix ruby gcc jansson sassc`. You surely can install `uwsgi` and `uwsgi-plugin-python` via pacman but I found pip's package more stable so `pip install uwsgi`.
  0. Clone project to local filesystem (I would recommend to clone it into `/srv/http` directory): `git clone https://github.com/Deathangel908/djangochat`. Further instructions assume that working directory is project root, so `cd djangochat`. And change the branch: `git checkout -b prod_archlinux origin/prod_archlinux`
- 0. If you cloned project into different directory than `/srv/http` you need to replace all absolute paths for your one in config files `pattern="/srv/http"; grep -rl "$pattern" ./rootfs |xargs sed -i "s#$pattern#$PWD#g"` 
+ 0. If you cloned project into different directory than `/srv/http` you need to replace all absolute paths for your one in config files `pattern="/srv/http"; grep -rl "$pattern" ./rootfs |xargs sed -i "s#$pattern#$PWD#g"`
  0. Replace all occurrences of domain name `exist_domain="pychat\.org"; your_domain="YOUR\.DOMAIN\.COM"; grep -rl "$exist_domain" ./ |xargs sed -i "s#$exist_domain#$your_domain#g"`. (note regex escape for dot char) Change `STATIC_URL` to `/static/` and `MEDIA_URL` to `/photo/` in `chat/settings.py`. Also check `rootfs/etc/nginx/nginx.conf` you may want to merge `location /photo` and `location /static` into main `server` conf. (you need all of this because I used subdomain for static urls)
- 0. Copy config files to rootfs `cp rootfs / -r `. Change owner of project to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`. 
+ 0. Copy config files to rootfs `cp rootfs / -r `. Change owner of project to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`.
  0.  Generate postfix postman: `postmap /etc/postfix/virtual; postman /etc/aliases`
- 0. Add file `chat/production.py`, place there `SECRET_KEY` and optional: `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`, `GOOGLE_OAUTH_2_CLIENT_ID`, `FACEBOOK_ACCESS_TOKEN`, `FACEBOOK_APP_ID`.  
+ 0. Add file `chat/production.py`, place there `SECRET_KEY` and optional: `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`, `GOOGLE_OAUTH_2_CLIENT_ID`, `FACEBOOK_ACCESS_TOKEN`, `FACEBOOK_APP_ID`.
  0. If you just installed mariadb you need to initialize it: `mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`. Start mysql `systemctl start mysqld` and create database `echo "create database django CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`
  0. Optional: add services to autostart  `packages=( mysqld  redis uwsgi tornado nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`
  0. Get all dependencies `pip install -r requirements.txt`
@@ -48,6 +48,21 @@ Prepare the system.
  0. Add django admin static files: `python manage.py collectstatic`
  0. If you want to use [Giphy](https://giphy.com/), you need to sign up in [developers.giphy.com](https://developers.giphy.com/) , create a new app there, and add `GIPHY_API_KEY` to [settings.py](chat/settings.py)
  0. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
+ 0. Pychat also supports [webpush](https://developers.google.com/web/fundamentals/push-notifications/) notifications, like in facebook. They will fire even user doesn't have opened tab. That can be turned on/off by used in his/her profile with checkbox `Notifications`. The implementation is similar like [here](https://github.com/GoogleChrome/samples/tree/gh-pages/push-messaging-and-notifications). So to add notification support you need
+    1. Create a project on the [Firebase Developer Console](https://console.firebase.google.com/):
+    2. Go to Settings (the cog near the top left corner), click the [Cloud Messaging Tab](https://console.firebase.google.com/u/1/project/pychat-org/settings/cloudmessaging/)
+    3. Put `<Your Cloud Messaging API Key ...>` to [settings.py](chat/settings.py) as `FIREBASE_API_KEY`
+    4. Create `chat/static/manifest.json` with content like [here](https://github.com/GoogleChrome/samples/blob/gh-pages/push-messaging-and-notifications/manifest.sample.json):
+  ```
+{
+  "name": "Pychat Push Notifications",
+  "short_name": "PyPush",
+  "start_url": "/",
+  "display": "standalone",
+  "gcm_sender_id": "<Your Sender ID from https://console.firebase.google.com>"
+}
+```
+
 
 Run chat:
 ---------
@@ -66,6 +81,9 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 
 TODO
 ====
+* collapsed nav should display current login name instead of static Pychat
+* growlInfo should contain X to close message, and next btn if it's a tip. so anchors would be clickable as well
+* https://static.pychat.org/photo/xE9bSyvC_image.png
 * https://developers.google.com/web/updates/2015/12/background-sync
 * Added bad code stub for: Wrong message order, that prevents of successful webrtc connection: https://github.com/leporo/tornado-redis/issues/106 https://stackoverflow.com/questions/47496922/tornado-redis-garantee-order-of-published-messages
 * No sound in call https://bugs.chromium.org/p/chromium/issues/detail?id=604523
