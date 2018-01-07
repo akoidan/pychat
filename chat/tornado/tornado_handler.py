@@ -9,6 +9,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import F, Q
 from redis_sessions.session import SessionStore
 from tornado import ioloop
+from tornado.httpclient import AsyncHTTPClient
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from chat.cookies_middleware import create_id
@@ -31,6 +32,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 	def __init__(self, *args, **kwargs):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
 		self.__connected__ = False
+		self.__http_client__ = AsyncHTTPClient()
 		self.anti_spam = AntiSpam()
 
 	@property
@@ -40,6 +42,13 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 	@connected.setter
 	def connected(self, value):
 		self.__connected__ = value
+
+	@property
+	def http_client(self):
+		"""
+		@type: AsyncHTTPClient
+		"""
+		return self.__http_client__
 
 	def data_received(self, chunk):
 		pass

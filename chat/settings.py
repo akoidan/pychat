@@ -120,6 +120,8 @@ AUTH_USER_MODEL = 'chat.User'
 AUTHENTICATION_BACKENDS = ['chat.utils.EmailOrUsernameModelBackend']
 
 LOGIN_URL = '/'
+FIREBASE_URL = 'https://android.googleapis.com/gcm/send'
+FIREBASE_API_KEY = 'AAAAkHQDLlo:APA91bEP9aCjIXjUiUGTdjuFnYG3ifutHuMiLiiM5rtPXMCuu9UwKOiweauT0Go0xaEDR5IQX4Bln_aWrjCJtIBcYAvVZz5ikHU1kDTGoqkoQOeedHRbUHQ1ZBlBPvYKl712XeNaikun'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
@@ -323,21 +325,7 @@ UPDATE chat_room_users out_cru
 			JOIN chat_message ON chat_message.room_id = chat_room_users.room_id
 		WHERE chat_room_users.user_id = %s and chat_room_users.room_id != {}
 		GROUP BY chat_message.room_id) last_message ON out_cru.id = last_message.rooms_users_id
-SET out_cru.last_read_message_id = last_message.message_id, out_cru.last_extension_message_id = last_message.message_id 
-""".format(ALL_ROOM_ID)
-
-
-UPDATE_LAST_EXTENSION_MESSAGE = """
-UPDATE chat_room_users out_cru
-	INNER JOIN
-		(SELECT
-			max(chat_message.id) message_id,
-			chat_room_users.id rooms_users_id
-		 FROM chat_room_users
-			JOIN chat_message ON chat_message.room_id = chat_room_users.room_id
-		WHERE chat_room_users.user_id = %s and chat_room_users.room_id != {}
-		GROUP BY chat_message.room_id) last_message ON out_cru.id = last_message.rooms_users_id
-SET  out_cru.last_extension_message_id = last_message.message_id 
+SET out_cru.last_read_message_id = last_message.message_id 
 """.format(ALL_ROOM_ID)
 
 # ---------------JAVASCRIPT CONSTANTS --------------------

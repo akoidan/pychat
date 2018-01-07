@@ -63,6 +63,14 @@ class User(AbstractBaseUser):
 			self.sex = 0
 
 
+class Subscription(models.Model):
+	user = models.ForeignKey(User, null=False)
+	registration_id = models.CharField(null=False, max_length=255)
+	created = models.DateTimeField(default=datetime.datetime.now)
+
+	class Meta:
+		unique_together = ('registration_id', 'user')
+
 class Verification(models.Model):
 
 	class TypeChoices(Enum):
@@ -172,7 +180,6 @@ class RoomUsers(models.Model):
 	room = models.ForeignKey(Room, null=False)
 	user = models.ForeignKey(User, null=False)
 	last_read_message = models.ForeignKey(Message, null=True)
-	last_extension_message = models.ForeignKey(Message, null=True, related_name='last_extension_message')
 
 	class Meta:  # pylint: disable=C1001
 		unique_together = ("user", "room")

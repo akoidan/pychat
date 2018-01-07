@@ -45,10 +45,8 @@ var painter;
 var minimizedWindows;
 var chatFileAudio;
 var chatTestVolume;
-var serviceWorker;
 
 onDocLoad(function () {
-	serviceWorker = new ServiceWorkerApi();
 	userMessage = $("usermsg");
 	navCallIcon = $('navCallIcon');
 	headerText = $('headerText');
@@ -78,46 +76,6 @@ onDocLoad(function () {
 	wsHandler.listenWS();
 	Utils.showHelp();
 });
-
-function ServiceWorkerApi() {
-	var self = this;
-	self.log = loggerFactory.getLogger('SW', console.log, "color: #ffb500; font-weight: bold");
-	if (navigator.serviceWorker) {
-		self.log("Registering service worker {}", SERVICE_WORKER_URL)();
-		navigator.serviceWorker.register('/sw.js').then(function (reg) {
-			self.log("Registered service worker {}", reg)();
-			return navigator.serviceWorker.ready;
-		}).then(function (reg) {
-			self.serviceWorker = reg.active;
-			self.log("Service worker is ready {}", self.serviceWorker)();
-			self.updateData();
-		})
-		self.updateData = function () {
-			var message = {
-				action: 'setData',
-				csrf: readCookie("csrftoken"),
-				remoteAddress: window.location.origin,
-				logsEnabled: loggerFactory.logsEnabled
-			};
-			self.log("Posting to {} data: {}", self.serviceWorker, message)();
-			self.serviceWorker.postMessage(message)
-		};
-		self.deleteAllWorkers = function () {
-			if (navigator.serviceWorker) {
-				return navigator.serviceWorker.getRegistrations().then(function (registrations) {
-					self.log("Found {} service workers", registrations.length)();
-					return Promise.all([registrations.map(function (r) {
-						return r.unregister();
-					})])
-				})
-			}
-		}
-	} else {
-		self.deleteAllWorkers = function(){};
-		self.updateData = function(){};
-	}
-}
-
 
 
 function MinimizedWindows() {
@@ -1885,50 +1843,98 @@ function NotifierHandler() {
 	var self = this;
 	self.maxNotifyTime = 500;
 	var logger = {
-		info: loggerFactory.getLogger("NOTIFY", console.log, 'color: #06e3e8; font-weight: bold'),
-		warn: loggerFactory.getLogger("NOTIFY", console.warn, 'color: #06e3e8; font-weight: bold'),
-		error: loggerFactory.getLogger("NOTIFY", console.error, 'color: #06e3e8; font-weight: bold')
+		info: loggerFactory.getLogger("NOTIFY", console.log, 'color: #ffb500; font-weight: bold'),
+		warn: loggerFactory.getLogger("NOTIFY", console.warn, 'color: #ffb500; font-weight: bold'),
+		error: loggerFactory.getLogger("NOTIFY", console.error, 'color: #ffb500; font-weight: bold')
 	};
 	self.currentTabId = Date.now().toString();
 	/*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
 	self.LAST_TAB_ID_VARNAME = 'lastTabId';
 	self.clearNotificationTime = 5000;
 	self.serviceWorkerTry = true;
-	self.tryNotification = function (params, cb) {
-		if (!self.serviceWorkerTry && !self.registration) {
+	self.serviceWorker = false;
+	self.tryNotification = function (params, cb, skipIfGranted) {
+		if (self.serviceWorker) {
+			!skipIfGranted && cb(self.showNot(params));
+		} else if (!self.serviceWorkerTry && !self.serviceWorker) {
 			logger.warn("Skipping notification because service worked failed to load")();
+		} else if (navigator.serviceWorker) {
+			self.registerWorker(params, cb, skipIfGranted);
 		} else {
-			try {
-				cb(new Notification(params.title, {icon: params.icon, body: params.body}));
-			} catch (e) {
-				if (e.name == 'TypeError' && navigator.serviceWorker && self.serviceWorkerTry) {
-					logger.info("Notification api is only available via workers, trying to load one")();
-					self.serviceWorkerTry = false;
-					navigator.serviceWorker.register('/dummyWorker').catch(function (e) {
-						logger.error("Unable to load serviceWorker to show notification because {}", Utils.extractError(e))();
-					});
-					navigator.serviceWorker.ready.then(function (registration) {
-						logger.info("Loading workes succeeded")();
-						self.registration = registration;
-						registration.showNotification(params.title, {icon: params.icon, body: params.body});
-					});
-				} else {
-					logger.warn("Skipping notification cause service worker hasn't been loaded yet")();
-				}
-			}
+			!skipIfGranted && cb(self.showNot(params, onInit));
 		}
 	};
-	self.askAndCreate = function (params, cb, init) {
+	self.showNot = function(params) {
+		logger.info("Spawing Notification {}", params)();
+		return new Notification(params.title, {icon: params.icon, body: params.body})
+	};
+	self.askAndCreate = function (params, cb, skipIfGranted) {
 		if (Notification.permission !== "granted") {
-			Notification.requestPermission(function(result) {
+			Notification.requestPermission(function (result) {
 				if (result === 'granted') {
 					self.tryNotification(params, cb);
+				} else {
+					logger.warn("User blocked notification permission. Notifications won't be available")();
 				}
 			});
 		} else {
-			!init && self.tryNotification(params, cb)
+			self.tryNotification(params, cb, skipIfGranted);
 		}
 	};
+
+	self.endpointWorkaround = function (pushSubscription) {
+		// Make sure we only mess with GCM
+		if (pushSubscription.endpoint.indexOf('https://android.googleapis.com/gcm/send') !== 0) {
+			return pushSubscription.endpoint;
+		}
+		var mergedEndpoint = pushSubscription.endpoint;
+		// Chrome 42 + 43 will not have the subscriptionId attached
+		// to the endpoint.
+		if (pushSubscription.subscriptionId &&
+				pushSubscription.endpoint.indexOf(pushSubscription.subscriptionId) === -1) {
+			// Handle version 42 where you have separate subId and Endpoint
+			mergedEndpoint = pushSubscription.endpoint + '/' +
+					pushSubscription.subscriptionId;
+		}
+		return mergedEndpoint;
+	}
+
+	self.registerWorker = function (params, cb, skipIfGranted) {
+		self.serviceWorkerTry = false;
+		navigator.serviceWorker.register('/sw.js').then(function (r) {
+			self.serviceWorker = true;
+			logger.info("Registered service worker {}", r)();
+			!skipIfGranted && cb(self.showNot(params));
+			return navigator.serviceWorker.ready;
+		}).then(function (serviceWorkerRegistration) {
+			logger.info("Service worker is ready {}", serviceWorkerRegistration)();
+			return serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true})
+		}).then(function (subscription) {
+			logger.info("Got subscription {}", subscription)();
+			var mergedEndpoint = self.endpointWorkaround(subscription);
+			var GCM_ENDPOINT = 'https://android.googleapis.com/gcm/send';
+			if (mergedEndpoint.indexOf(GCM_ENDPOINT) !== 0) {
+				logger.error('Current browser doesnt support offline notifications')();
+				return;
+			}
+			var endpointSections = mergedEndpoint.split('/');
+			var subscriptionId = endpointSections[endpointSections.length - 1];
+			return new Promise(function (resolve, reject) {
+				doPost('/register_fcb', {registration_id: subscriptionId}, function (response) {
+					if (response == RESPONSE_SUCCESS) {
+						resolve()
+					} else {
+						reject();
+					}
+				})
+			});
+		}).then(function () {
+			logger.info("Saved subscription to server")();
+		}).catch(function (e) {
+			growlError("Offline notifications won't be available because " + Utils.extractError(e))
+			logger.error("Unable to load serviceWorker to show notification because {}", e)();
+		});
+	}
 	self.popedNotifQueue = [];
 	self.init = function () {
 		window.addEventListener("blur", self.onFocusOut);
@@ -1937,9 +1943,11 @@ function NotifierHandler() {
 		window.addEventListener("unload", self.onUnload);
 		self.onFocus();
 		if (!window.Notification) {
-			logger.warn("Notification is not supported")();
+			logger.warn("Notifications are not supported")();
 		} else if (notifications) {
-			self.askAndCreate({title: 'Pychat notifications enabled. You can disable them in profile'}, function () {
+			self.askAndCreate({
+				title: 'Pychat notifications enabled. You can disable them in profile'
+			}, function () {
 				logger.info("notification succeeded")();
 			}, true);
 		}
@@ -1959,6 +1967,9 @@ function NotifierHandler() {
 		setTimeout(self.clearNotification, self.clearNotificationTime);
 	};
 	self.notify = function (title, message, icon) {
+		// TODO
+		logger.error("Returing from notify")();
+		return;
 		if (self.isCurrentTabActive) {
 			return;
 		}

@@ -1,7 +1,8 @@
+console.log("%cSW_S startup", 'color: #ffb500; font-weight: bold');
 var loggerFactory = (function (logsEnabled) {
 	var self = this;
 	self.logsEnabled = logsEnabled;
-	self.dummy = function() {
+	self.dummy = function () {
 	};
 	self.getLogger = function (initiator, dest, style) {
 		return function () {
@@ -30,55 +31,53 @@ var logger = {
 };
 
 
-logger.log("SW Startup!")();
-var csrf;
-var remoteAddress;
 // Install Service Worker
 self.addEventListener('install', function (event) {
-	logger.log('1 installed!')();
+	logger.log(' installed!')();
 });
 
 // Service Worker Active
 self.addEventListener('activate', function (event) {
-	logger.log('1 activated!')();
+	logger.log(' activated!')();
 });
 
-self.addEventListener('message', function (event) {
-	logger.log('Got message' + event)();
-	if (event.data && event.data.action === 'setData') {
-		csrf = event.data.csrf;
-		loggerFactory.logsEnabled = event.data.logsEnabled;
-		remoteAddress = event.data.remoteAddress;
-	}
-});
+self.addEventListener('push', function (event) {
+	logger.log('Received a push message {}', event)();
 
-function showNot(title, body) {
-	self.registration.showNotification(title, {body: body});
-}
-setInterval(function () {
-	if (csrf && origin) {
-		logger.log('fetching '+ remoteAddress+ '/get_extension_messages')();
-		fetch(remoteAddress+ '/get_extension_messages', {
-			credentials: 'include'
-		}).then(function (response) {
-			logger.log("Fetching finished", response)();
-			response.json().then(function(e) {
-				logger.log("Parsed response", e)();
-				if (e.length > 3) {
-					new Notification('Pychat', { body: "You have " + e.length + " unread messages"});
-				} else if (e.length > 0) {
-					e.forEach(function(m) {
-						showNot('Pychat', { body: m.content});
-					})
-				} else {
-					logger.log("No new messages found")();
-				}
+	var title = 'Yay a message.';
+	var body = 'We have received a push message.';
+	var icon = '/images/icon-192x192.png';
+	var tag = 'simple-push-demo-notification-tag';
+
+	event.waitUntil(
+			self.registration.showNotification(title, {
+				body: body,
+				icon: icon,
+				tag: tag
 			})
-		}).catch(function (response) {
-			console.error(response)();
-		})
-	} else {
-		logger.warn("Skipping fetch, csrf='{}' , origin='{}'", csrf, origin);
-	}
-}, 5000);
+	);
+});
+
+self.addEventListener('notificationclick', function (event) {
+	logger.log('On notification click: {}', event.notification.tag);
+	// Android doesn’t close the notification when you click on it
+	// See: http://crbug.com/463146
+	event.notification.close();
+
+	// This looks to see if the current is already open and
+	// focuses if it is
+	event.waitUntil(clients.matchAll({
+		type: 'window'
+	}).then(function (clientList) {
+		for (var i = 0; i < clientList.length; i++) {
+			var client = clientList[i];
+			if (client.url === '/' && 'focus' in client) {
+				return client.focus();
+			}
+		}
+		if (clients.openWindow) {
+			return clients.openWindow('/');
+		}
+	}));
+});
 

@@ -26,9 +26,9 @@ from django.views.generic import View
 from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
-from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message
+from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription
 from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging, EXTENSION_ID, EXTENSION_INSTALL_URL, \
-	ALL_ROOM_ID, UPDATE_LAST_EXTENSION_MESSAGE, STATIC_ROOT
+	ALL_ROOM_ID,  STATIC_ROOT
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
 	create_user_model, check_captcha, send_reset_password_email, execute_query
 
@@ -58,6 +58,11 @@ def validate_email(request):
 		response = e.message
 	return HttpResponse(response, content_type='text/plain')
 
+@require_http_methods('POST')
+def register_subscription(request):
+	registration_id = request.POST['registration_id']
+	Subscription.objects.get_or_create(registration_id=registration_id, user=request.user)
+	return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
 
 @require_http_methods('POST')
 def validate_user(request):
@@ -78,23 +83,6 @@ def get_service_worker(request):  # this stub is only for development, this is r
 	worker = open(os.path.join(STATIC_ROOT, 'js', 'sw.js'), 'rb')
 	response = HttpResponse(content=worker)
 	response['Content-Type'] = 'application/javascript'
-	return response
-
-@require_http_methods('GET')
-@login_required_no_redirect(False)
-def get_messages_for_extension(request):
-	"""
-	Login or logout navbar is creates by means of create_nav_page
-	@return:  the x intercept of the line M{y=m*x+b}.
-	"""
-	off_mess = Message.objects.filter(
-		id__gt=F('room__roomusers__last_extension_message_id'),
-		deleted=False,
-		room__roomusers__user_id=request.user.id).values('content', 'sender__username', 'time')
-	execute_query(UPDATE_LAST_EXTENSION_MESSAGE, [request.user.id,])
-
-	response = HttpResponse(json.dumps(list(off_mess)), content_type='application/json')
-	response['Access-Control-Allow-Origin'] = 'https://localhost:8000/'
 	return response
 
 @require_http_methods('GET')
@@ -124,15 +112,6 @@ def logout(request):
 	"""
 	djangologout(request)
 	return HttpResponseRedirect('/')
-
-
-@login_required_no_redirect(True)
-def dummy_worker(request):
-	"""
-	POST. Logs out into system.
-	"""
-	return HttpResponse("var a = 3;", content_type='application/x-javascript')
-
 
 @require_http_methods(['POST'])
 def auth(request):

@@ -478,7 +478,7 @@ function ajaxHide() {
  * @param url : string url to post
  * @param form : form in canse form is used
  * */
-function doPost(url, params, callback, form) {
+function doPost(url, params, callback, form, isJsonEncoded) {
 	var r = new XMLHttpRequest();
 	r.onreadystatechange = function () {
 		if (r.readyState === 4) {
@@ -494,32 +494,40 @@ function doPost(url, params, callback, form) {
 			}
 		}
 	};
-	/*Firefox doesn't accept null*/
-	var data = form == null ? new FormData() : new FormData(form);
 
-	if (params) {
-		for (var key in params) {
-			if (params.hasOwnProperty(key)) {
-				data.append(key, params[key]);
-			}
-		}
-	}
 	if (url === "") {
 		url = window.location.href ; // f*cking IE
 	}
 	r.open("POST", url, true);
-	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
-	var entries = data.entries();
-	if (entries && entries.next) {
-		params = '';
-		var d;
-		while (d = entries.next()) {
-			if (d.done) {
-				break;
+	var data;
+	if (isJsonEncoded) {
+		data = JSON.stringify(params);
+		r.setRequestHeader("Content-Type", 'application/json');
+	} else {
+		/*Firefox doesn't accept null*/
+		data = form == null ? new FormData() : new FormData(form);
+
+		if (params) {
+			for (var key in params) {
+				if (params.hasOwnProperty(key)) {
+					data.append(key, params[key]);
+				}
 			}
-			params += d.value[0] + '=' + d.value[1] + '; ';
+		}
+		var entries = data.entries();
+		if (entries && entries.next) {
+			params = '';
+			var d;
+			while (d = entries.next()) {
+				if (d.done) {
+					break;
+				}
+				params += d.value[0] + '=' + d.value[1] + '; ';
+			}
 		}
 	}
+	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+
 	logger.http("POST out {} ::: {}", url, params)();
 	r.send(data);
 }

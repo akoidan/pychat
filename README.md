@@ -85,6 +85,7 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 TODO
 ====
+* collapsed nav should display current login name instead of static Pychat
 * growlInfo should contain X to close message, and next btn if it's a tip. so anchors would be clickable as well
 * https://static.pychat.org/photo/xE9bSyvC_image.png
 * https://developers.google.com/web/updates/2015/12/background-sync

@@ -89,13 +89,11 @@ fieldset
 		max-height: 400px
 		display: block
 
-	@mixin margin-img-in
+	iframe
+		border: none
 		@include margin-img-def
 		width: 500px
 		height: 350px
-	iframe
-		border: none
-		@include margin-img-in
 		@include margin-img
 
 	.youtube-player
@@ -143,7 +141,7 @@ fieldset
 			height: 36px
 
 	img.B4j2ContentEditableImg
-		@include margin-img-in
+		@include margin-img-def
 		@include margin-img
 	p
 		margin-top: 0.8em

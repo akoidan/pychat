@@ -20,7 +20,6 @@
 		var suggestions = {{ suggestions |yesno:"true,false" }};
 		var notifications = {{ notifications |yesno:"true,false" }};
 		var cacheMessages = {{ cache_messages |yesno:"true,false" }};
-		var cacheMessages = {{ cache_messages |yesno:"true,false" }};
 		window.highlightCode = {{ highlight_code |yesno:"true,false" }};
 		window.embeddedYoutube = {{ embedded_youtube |yesno:"true,false" }};
 	</script>
@@ -28,6 +27,7 @@
 			<script src="{% md5url "js/highlight.min.js" %}"></script>
     {% endif %}
 	<script src="{% md5url "js/chat.js" %}"></script>
+	<link rel="manifest" href="{% md5url  'manifest.json' %}">
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}
 {% block content %}

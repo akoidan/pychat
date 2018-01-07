@@ -16,7 +16,6 @@ urlpatterns = patterns(
 	url(r'^admin/', include(admin.site.urls)),
 	url(r'^$', 'chat.views.home'),  # url(r'^login$', 'story.views.login'),
 	url(r'^logout$', 'chat.views.logout'),
-	url(r'^dummyWorker', 'chat.views.dummy_worker'),
 	url(r'^auth$', 'chat.views.auth'),
 	url(r'^register$', RegisterView.as_view(), name='register'),
 	url(r'^confirm_email$', 'chat.views.confirm_email'),
@@ -24,7 +23,7 @@ urlpatterns = patterns(
 	url(r'^facebook-auth', FacebookAuth.as_view()),
 	# story/register.js uses link below
 	url(r'^validate_user$', 'chat.views.validate_user'),
-	url(r'^get_extension_messages$', 'chat.views.get_messages_for_extension'),
+	url(r'^register_fcb', 'chat.views.register_subscription'),
 	url(r'^sw\.js$', 'chat.views.get_service_worker'),
 	url(r'^restore_password$', RestorePassword.as_view(), name='restore_pass'),
 	url(r'^send_restore_password$', 'chat.views.send_restore_password'),
