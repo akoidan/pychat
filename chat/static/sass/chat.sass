@@ -211,6 +211,38 @@ fieldset
 	border-radius: 3px
 	position: fixed
 
+nav
+	display: flex
+	position: relative
+	flex-direction: row
+	overflow: hidden
+	max-height: 30px
+	transition: max-height 0.4s ease-out
+	> *
+		order: 2
+	#navMenu
+		margin-left: auto
+		.icon-menu
+			display: none
+	@media screen and (min-width: $collapse-width) and (max-width: $collapse-no-mtext)
+		.mText
+			display: none !important
+	@media screen and (max-width: $collapse-width)
+		flex-direction: column
+		> *
+			margin-right: auto !important
+		#navMenu
+			position: relative
+			width: 100%
+			margin-bottom: 10px
+			order: 1
+			.icon-menu
+				display: inline-block
+				position: absolute
+				top: 0
+				right: 5px
+		&.expanded
+			max-height: 450px
 
 #user-context-menu
 	@extend .context-menu
@@ -412,9 +444,6 @@ ul#directUserTable
 	&.disabled
 		color: #616161
 
-#onlineStatus
-	padding: 0 10px
-
 #canvasResize
 	cursor: se-resize
 	position: absolute
@@ -444,9 +473,12 @@ ul#directUserTable
 	padding-bottom: 1px
 	padding-right: 12px
 
-.timeMess:hover
-	cursor: pointer
-	color: #979797
+.timeMess
+	@media screen and (max-width: $collapse-width)
+		display: none !important
+	&:hover
+		cursor: pointer
+		color: #979797
 
 /*-webkit-background-clip: text;
 /*-webkit-text-fill-color: transparent;
@@ -1010,7 +1042,7 @@ ul#directUserTable
 			display: inline-block
 			padding-left: 25px
 			vertical-align: top
-	@media screen and (max-width: 500px)
+	@media screen and (max-width: $collapse-width)
 		flex-direction: column
 		button
 			width: 100%
@@ -1152,5 +1184,3 @@ ul#directUserTable
 @media screen and (max-height: 300px), screen and (max-width: 600px)
 	#smileParentHolder
 		width: calc(100% - 30px)
-
-/*# sourceMappingURL=chat.css.map

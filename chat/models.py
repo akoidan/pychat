@@ -65,11 +65,9 @@ class User(AbstractBaseUser):
 
 class Subscription(models.Model):
 	user = models.ForeignKey(User, null=False)
-	registration_id = models.CharField(null=False, max_length=255)
+	registration_id = models.CharField(null=False, max_length=255, unique=True)
 	created = models.DateTimeField(default=datetime.datetime.now)
 
-	class Meta:
-		unique_together = ('registration_id', 'user')
 
 class Verification(models.Model):
 

@@ -255,36 +255,6 @@ nav [class^='icon-']
 
 .noSelection
 	@extend %user-select-none
-nav
-	display: flex
-	position: relative
-	flex-direction: row
-	overflow: hidden
-	max-height: 30px
-	transition: max-height 0.4s ease-out
-	#navMenu
-		display: none
-	@media screen and (max-width: $collapse-width)
-		flex-direction: column
-		.mText
-			display: inline-block !important
-		> *
-			margin-right: auto !important
-		#onlineStatus
-			position: absolute
-			top: 10px
-			right: 40px
-		#navMenu
-			width: calc(100% - 5px)
-			position: relative
-			display: block
-			margin-bottom: 10px
-			padding-left: 5px
-			.icon-menu
-				position: absolute
-				right: 0
-		&.expanded
-			max-height: 430px
 
 
 /*::-webkit-inner-spin-button { display: none; }
@@ -377,12 +347,6 @@ input[type=range][orient=vertical]
 
 	input[type=file]
 		max-width: 360px
-
-@media screen and (max-width: $collapse-width)
-	.very-small-screen, .timeMess
-		display: none !important
-	#hide
-		margin-left: auto
 
 $restPassMargin: 20px
 

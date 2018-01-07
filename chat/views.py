@@ -8,6 +8,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 
+from chat.templatetags.md5url import md5url
+
 try:
 	from django.template.context_processors import csrf
 except ImportError:
@@ -30,7 +32,7 @@ from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verificatio
 from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging, EXTENSION_ID, EXTENSION_INSTALL_URL, \
 	ALL_ROOM_ID,  STATIC_ROOT
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
-	create_user_model, check_captcha, send_reset_password_email, execute_query
+	create_user_model, check_captcha, send_reset_password_email
 
 logger = logging.getLogger(__name__)
 RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
@@ -39,6 +41,7 @@ GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
 GOOGLE_OAUTH_2_JS_URL = getattr(settings, "GOOGLE_OAUTH_2_JS_URL", None)
 FACEBOOK_APP_ID = getattr(settings, "FACEBOOK_APP_ID", None)
 FACEBOOK_JS_URL = getattr(settings, "FACEBOOK_JS_URL", None)
+FIREBASE_API_KEY = getattr(settings, "FIREBASE_API_KEY", None)
 
 # TODO doesn't work
 def handler404(request):
@@ -58,10 +61,36 @@ def validate_email(request):
 		response = e.message
 	return HttpResponse(response, content_type='text/plain')
 
+
+@require_http_methods('GET')
+def get_firebase_playback(request):
+	registration_id = request.META['HTTP_AUTH']
+	user_id = Subscription.objects.values_list('user_id', flat=True).get(registration_id=registration_id)
+	off_mess = Message.objects.filter(
+		id__gt=F('room__roomusers__last_read_message_id'),
+		deleted=False,
+		room__roomusers__user_id=user_id
+	)
+	d = off_mess.select_related("sender__username").order_by("-time")[:1]
+	message = list(d)[0]
+	data = {
+		'title': message.sender.username,
+		'options': {
+			'body': message.content,
+			'icon': md5url('images/favicon.ico'),
+			'data': {
+				'url': '/#/chat/' + str(message.room_id)
+			}
+		},
+	}
+	response = HttpResponse(json.dumps(data), content_type='application/json')
+	return response
+
+
 @require_http_methods('POST')
 def register_subscription(request):
 	registration_id = request.POST['registration_id']
-	Subscription.objects.get_or_create(registration_id=registration_id, user=request.user)
+	Subscription.objects.update_or_create(registration_id=registration_id, user=request.user)
 	return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
 
 @require_http_methods('POST')
@@ -102,6 +131,7 @@ def home(request):
 	context['extensionId'] = EXTENSION_ID
 	context['extensionUrl'] = EXTENSION_INSTALL_URL
 	context['defaultRoomId'] = ALL_ROOM_ID
+	context['manifest'] = FIREBASE_API_KEY is not None
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
 

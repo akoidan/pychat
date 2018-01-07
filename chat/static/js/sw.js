@@ -1,4 +1,5 @@
-console.log("%cSW_S startup", 'color: #ffb500; font-weight: bold');
+var SW_VERSION = '1.0';
+console.log("%cSW_S startup, version is " + SW_VERSION, 'color: #ffb500; font-weight: bold');
 var loggerFactory = (function (logsEnabled) {
 	var self = this;
 	self.logsEnabled = logsEnabled;
@@ -30,6 +31,7 @@ var logger = {
 	error: loggerFactory.getLogger("SW_S", console.error, 'color: #ffb500; font-weight: bold')
 };
 
+var subScr = null;
 
 // Install Service Worker
 self.addEventListener('install', function (event) {
@@ -41,21 +43,58 @@ self.addEventListener('activate', function (event) {
 	logger.log(' activated!')();
 });
 
+
+function getSubscriptionId(pushSubscription) {
+	var mergedEndpoint = pushSubscription.endpoint;
+	if (pushSubscription.endpoint.indexOf('https://android.googleapis.com/gcm/send') === 0) {
+		if (pushSubscription.subscriptionId &&
+				pushSubscription.endpoint.indexOf(pushSubscription.subscriptionId) === -1) {
+			mergedEndpoint = pushSubscription.endpoint + '/' +
+					pushSubscription.subscriptionId;
+		}
+	}
+	var GCM_ENDPOINT = 'https://android.googleapis.com/gcm/send';
+	if (mergedEndpoint.indexOf(GCM_ENDPOINT) !== 0) {
+		return null;
+	} else {
+		return mergedEndpoint.split('/').pop();
+	}
+}
+
+function getAuth(cb) {
+	if (subScr) {
+		cb(subScr);
+	} else {
+		self.registration.pushManager.getSubscription().then(function (r) {
+			subScr = getSubscriptionId(r);
+			cb(subScr)
+		});
+	}
+}
+
 self.addEventListener('push', function (event) {
 	logger.log('Received a push message {}', event)();
 
-	var title = 'Yay a message.';
-	var body = 'We have received a push message.';
-	var icon = '/images/icon-192x192.png';
-	var tag = 'simple-push-demo-notification-tag';
-
-	event.waitUntil(
-			self.registration.showNotification(title, {
-				body: body,
-				icon: icon,
-				tag: tag
+	getAuth(function (auth) {
+		if (auth) {
+			fetch('/get_firebase_playback', {
+				credentials: 'omit',
+				headers: {auth: auth}
+			}).then(function (response) {
+				logger.log("Fetching finished", response)();
+				response.json().then(function (m) {
+					logger.log("Parsed response", m)();
+					var  a = self.registration.showNotification(m.title, m.options);
+					logger.log("{}", a);
+				})
+			}).catch(function (response) {
+				logger.error(response)();
 			})
-	);
+		} else {
+			logger.error("Auth header is null")();
+		}
+
+	})
 });
 
 self.addEventListener('notificationclick', function (event) {
@@ -76,7 +115,7 @@ self.addEventListener('notificationclick', function (event) {
 			}
 		}
 		if (clients.openWindow) {
-			return clients.openWindow('/');
+			return clients.openWindow(event.notification.data.url);
 		}
 	}));
 });

@@ -1882,26 +1882,30 @@ function NotifierHandler() {
 		}
 	};
 
-	self.endpointWorkaround = function (pushSubscription) {
-		// Make sure we only mess with GCM
-		if (pushSubscription.endpoint.indexOf('https://android.googleapis.com/gcm/send') !== 0) {
-			return pushSubscription.endpoint;
-		}
+	self.getSubscriptionId = function (pushSubscription) {
 		var mergedEndpoint = pushSubscription.endpoint;
-		// Chrome 42 + 43 will not have the subscriptionId attached
-		// to the endpoint.
-		if (pushSubscription.subscriptionId &&
-				pushSubscription.endpoint.indexOf(pushSubscription.subscriptionId) === -1) {
-			// Handle version 42 where you have separate subId and Endpoint
-			mergedEndpoint = pushSubscription.endpoint + '/' +
-					pushSubscription.subscriptionId;
+		if (pushSubscription.endpoint.indexOf('https://android.googleapis.com/gcm/send') === 0) {
+			// Make sure we only mess with GCM
+			// Chrome 42 + 43 will not have the subscriptionId attached
+			// to the endpoint.
+			if (pushSubscription.subscriptionId &&
+					pushSubscription.endpoint.indexOf(pushSubscription.subscriptionId) === -1) {
+				// Handle version 42 where you have separate subId and Endpoint
+				mergedEndpoint = pushSubscription.endpoint + '/' +
+						pushSubscription.subscriptionId;
+			}
 		}
-		return mergedEndpoint;
+		var GCM_ENDPOINT = 'https://android.googleapis.com/gcm/send';
+		if (mergedEndpoint.indexOf(GCM_ENDPOINT) !== 0) {
+			return null;
+		} else {
+			return mergedEndpoint.split('/').pop();
+		}
 	}
 
 	self.registerWorker = function (params, cb, skipIfGranted) {
 		self.serviceWorkerTry = false;
-		navigator.serviceWorker.register('/sw.js').then(function (r) {
+		navigator.serviceWorker.register('/sw.js',  {scope: '/'}).then(function (r) {
 			self.serviceWorker = true;
 			logger.info("Registered service worker {}", r)();
 			!skipIfGranted && cb(self.showNot(params));
@@ -1911,23 +1915,20 @@ function NotifierHandler() {
 			return serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true})
 		}).then(function (subscription) {
 			logger.info("Got subscription {}", subscription)();
-			var mergedEndpoint = self.endpointWorkaround(subscription);
-			var GCM_ENDPOINT = 'https://android.googleapis.com/gcm/send';
-			if (mergedEndpoint.indexOf(GCM_ENDPOINT) !== 0) {
-				logger.error('Current browser doesnt support offline notifications')();
-				return;
+			var subscriptionId = self.getSubscriptionId(subscription);
+			if (!subscriptionId) {
+				throw 'Current browser doesnt support offline notifications';
+			} else {
+				return new Promise(function (resolve, reject) {
+					doPost('/register_fcb', {registration_id: subscriptionId}, function (response) {
+						if (response == RESPONSE_SUCCESS) {
+							resolve()
+						} else {
+							reject();
+						}
+					})
+				});
 			}
-			var endpointSections = mergedEndpoint.split('/');
-			var subscriptionId = endpointSections[endpointSections.length - 1];
-			return new Promise(function (resolve, reject) {
-				doPost('/register_fcb', {registration_id: subscriptionId}, function (response) {
-					if (response == RESPONSE_SUCCESS) {
-						resolve()
-					} else {
-						reject();
-					}
-				})
-			});
 		}).then(function () {
 			logger.info("Saved subscription to server")();
 		}).catch(function (e) {
@@ -1967,9 +1968,6 @@ function NotifierHandler() {
 		setTimeout(self.clearNotification, self.clearNotificationTime);
 	};
 	self.notify = function (title, message, icon) {
-		// TODO
-		logger.error("Returing from notify")();
-		return;
 		if (self.isCurrentTabActive) {
 			return;
 		}
@@ -5534,9 +5532,9 @@ function WsHandler() {
 	var self = this;
 	self.wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 9 - connected;
 	self.duplicates = {};
-	self.log = loggerFactory.getLogger('WS', console.log, "color: green; font-weight: bold");
-	self.logWarn = loggerFactory.getLogger('WS', console.warn, "color: green; font-weight: bold");
-	self.logError = loggerFactory.getLogger('WS', console.error, "color: green; font-weight: bold");
+	self.log = loggerFactory.getLogger('WS', console.log, "color: green;");
+	self.logWarn = loggerFactory.getLogger('WS', console.warn, "color: green;");
+	self.logError = loggerFactory.getLogger('WS', console.error, "color: green;");
 	self.logIn = loggerFactory.getLogger('WS_IN', console.log, "color: green; font-weight: bold");
 	self.logOut = loggerFactory.getLogger('WS_OUT', console.log, "color: green; font-weight: bold");
 	self.dom = {
@@ -5571,7 +5569,6 @@ function WsHandler() {
 		self.log("Connection updated")();
 	};
 	self.onTimeout = function() {
-		self.pingTimeout = null;
 		self.sendToServer({action: 'ping'}, true);
 	};
 	self.updateTimeout = function() {
@@ -5583,8 +5580,15 @@ function WsHandler() {
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
 		self.updateTimeout();
-		self.logIn('{}', jsonData)();
-		var data = JSON.parse(jsonData);
+		var data;
+		try {
+			data = JSON.parse(jsonData);
+			self.logIn("{}", jsonData)();
+		} catch (e) {
+			self.logError('Unable to parse incomming message {}', jsonData)();
+			growlError("Unable to parse incoming message {}", e);
+			return;
+		}
 		self.handleMessage(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
 		storage.saveMessageToStorage(data, jsonData);
@@ -5594,9 +5598,9 @@ function WsHandler() {
 	};
 	self.sendToServer = function (messageRequest, skipGrowl) {
 		var jsonRequest = JSON.stringify(messageRequest);
-		return self.sendRawTextToServer(jsonRequest, skipGrowl);
+		return self.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
 	};
-	self.sendRawTextToServer = function(jsonRequest, skipGrowl) {
+	self.sendRawTextToServer = function(jsonRequest, skipGrowl, objData) {
 		var logEntry = jsonRequest.substring(0, 500);
 		if (!self.ws || self.ws.readyState !== WebSocket.OPEN) {
 			if (!skipGrowl){
@@ -5606,7 +5610,7 @@ function WsHandler() {
 			return false;
 		} else {
 			self.updateTimeout();
-			self.logOut(logEntry)();
+			self.logOut("{}", jsonRequest)();
 			self.ws.send(jsonRequest);
 			return true;
 		}
@@ -5615,7 +5619,7 @@ function WsHandler() {
 		var jsonRequest = JSON.stringify(data);
 		if (!self.duplicates[jsonRequest]) {
 			self.duplicates[jsonRequest] = Date.now();
-			self.sendRawTextToServer(jsonRequest)
+			self.sendRawTextToServer(jsonRequest, skipGrowl, data)
 			setTimeout(function () {
 				delete self.duplicates[jsonRequest];
 			}, 5000);

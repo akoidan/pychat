@@ -27,12 +27,13 @@
 			<script src="{% md5url "js/highlight.min.js" %}"></script>
     {% endif %}
 	<script src="{% md5url "js/chat.js" %}"></script>
-	<link rel="manifest" href="{% md5url  'manifest.json' %}">
+	{% if manifest %}
+		<link rel="manifest" href="{% md5url 'manifest.json' %}">
+	{% endif %}
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/chat.css' %}">
 {% endblock head %}
 {% block content %}
 	<nav class="noSelection" id="navbar">
-		<div id="navMenu"><span class="mtext">Pychat</span><i class="icon-menu" title="Open Menu" ></i></div>
 		<a class="icon-home" href="/" title="Go home" onclick="event.preventDefault(); singlePage.showDefaultPage();"><span class="mText">Home</span></a>
 		<i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds" onclick="mute();"><span class="mText">Volume</span></i>
 		<i class="icon-brush" title="Draw an Image" id="paintOpen">
@@ -46,8 +47,11 @@
 		<i class="icon-doc-inv hidden" id="webRtcFileIcon"><span class="mText">Send File</span></i>
 		<i class="icon-popup hidden" id="minimizedWindows"><span class="mText">Minimized Winows</span></i>
 		<a href="https://github.com/Deathangel908/djangochat" class="icon-github"><span class="mText">Github</span></a>
-		<span id="onlineStatus" title="Online status" class="flex-push-right offline">●</span>
-		<span id='headerText' class="username very-small-screen"></span>
+		<div id="navMenu">
+			<span id="onlineStatus" title="Online status" class="offline">●</span>
+			<span id='headerText' class="username"></span>
+			<i class="icon-menu" title="Open Menu" ></i>
+		</div>
 		<a  href="/#/profile" title="Settings" onclick="event.preventDefault(); singlePage.showPage('/profile')" class="icon-wrench"> <span class="mText">Profile</span></a>
 		<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}" onclick="channelsHandler.clearChannelHistory()">
 			<i title="Sign out" class="icon-sign-out"><span class="mText">sign out</span></i> </a>

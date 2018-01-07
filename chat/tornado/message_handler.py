@@ -11,15 +11,13 @@ from tornado.web import asynchronous
 from tornadoredis import Client
 from chat import settings
 from chat.log_filters import id_generator
-from chat.models import Message, Room, RoomUsers, Subscription, User
+from chat.models import Message, Room, RoomUsers, Subscription, User, UserProfile
 from chat.py2_3 import str_type, quote
-from chat.settings import ALL_ROOM_ID, TORNADO_REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, \
-	FIREBASE_API_KEY
+from chat.settings import ALL_ROOM_ID, TORNADO_REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
-from chat.tornado.image_utils import process_images, prepare_img, save_images, get_message_images
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, get_or_create_room, \
-	create_room, evaluate
+	create_room, evaluate, process_images, prepare_img, save_images, get_message_images
 
 parent_logger = logging.getLogger(__name__)
 base_logger = logging.LoggerAdapter(parent_logger, {
@@ -33,6 +31,7 @@ base_logger = logging.LoggerAdapter(parent_logger, {
 # wait_for_available=True)
 
 GIPHY_API_KEY = getattr(settings, "GIPHY_API_KEY", None)
+FIREBASE_API_KEY = getattr(settings, "FIREBASE_API_KEY", None)
 
 class MessagesHandler(MessagesCreator):
 
@@ -215,30 +214,32 @@ class MessagesHandler(MessagesCreator):
 		url = GIPHY_URL.format(GIPHY_API_KEY, quote(query, safe=''))
 		self.http_client.fetch(url, callback=on_giphy_reply)
 
-	@asynchronous
-	def post_fire_message(self, content, channel, id):
+	def notify_offline(self, channel):
+		if FIREBASE_API_KEY is None:
+			return
 		online = self.get_online_from_redis(channel)
-		if len(online) < 2 and channel != ALL_ROOM_ID:
-			print('-'*10)
-			offline_users = User.objects.filter(rooms__id=channel).exclude(id__in=online).only('id')
-			print('=' * 10)
-			notifications = evaluate(Subscription.objects.filter(user__in=offline_users).values_list('registration_id', flat=True))
-			notifications = list(set(notifications))
-			print('+' * 10)
-			if len(notifications) > 0:
-				def on_reply(response):
-					try:
-						self.logger.debug("!! FireBase response: " + str(response.body))
-						response = json.loads(response.body)
-						print(response)
-					except Exception as e:
-						self.logger.error("Unable to parse response" + str(e))
-						pass
-				headers = {"Content-Type": "application/json", "Authorization": "key=%s" % FIREBASE_API_KEY}
-				body = json.dumps({"registration_ids": notifications})
-				self.logger.debug("!! post_fire_message %s", body)
-				r = HTTPRequest(FIREBASE_URL, method="POST", headers=headers, body=body)
-				self.http_client.fetch(r, callback=on_reply)
+		if channel == ALL_ROOM_ID:
+			return
+		offline_users = UserProfile.objects.filter(rooms__id=channel, notifications=True).exclude(id__in=online).only('id')
+		reg_ids = evaluate(Subscription.objects.filter(user__in=offline_users).values_list('registration_id', flat=True))
+		if len(reg_ids) == 0:
+			return
+		self.post_firebase(list(reg_ids))
+
+	@asynchronous
+	def post_firebase(self, reg_ids):
+		def on_reply(response):
+			try:
+				self.logger.debug("!! FireBase response: " + str(response.body))
+			except Exception as e:
+				self.logger.error("Unable to parse response" + str(e))
+				pass
+
+		headers = {"Content-Type": "application/json", "Authorization": "key=%s" % FIREBASE_API_KEY}
+		body = json.dumps({"registration_ids": reg_ids})
+		self.logger.debug("!! post_fire_message %s", body)
+		r = HTTPRequest(FIREBASE_URL, method="POST", headers=headers, body=body)
+		self.http_client.fetch(r, callback=on_reply)
 
 	def isGiphy(self, content):
 		if GIPHY_API_KEY is not None:
@@ -269,7 +270,7 @@ class MessagesHandler(MessagesCreator):
 				prepare_img(db_images, message_db.id)
 			)
 			self.publish(prepared_message, channel)
-			self.post_fire_message(content, channel, message_db.id)
+			self.notify_offline(channel)
 		if giphy_match is not None:
 			self.search_giphy(message, giphy_match, send_message)
 		else:
@@ -377,7 +378,7 @@ class MessagesHandler(MessagesCreator):
 		else:
 			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id), Q(deleted=False)).order_by('-pk')[:count]
 		images = do_db(get_message_images, messages)
-		response = self.get_messages(messages, room_id, images)
+		response = self.get_messages(messages, room_id, images, prepare_img)
 		self.ws_write(response)
 
 

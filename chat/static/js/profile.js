@@ -182,7 +182,6 @@ function setJsState() {
 		});
 	}
 	window.loggerFactory.logsEnabled = logsInput.checked;
-	serviceWorker.updateData();
 }
 
 function saveProfile(event) {
@@ -217,7 +216,7 @@ function saveProfile(event) {
 		} else {
 			growlError(response);
 		}
-	}, changeProfileForm, true);
+	}, changeProfileForm);
 }
 
 

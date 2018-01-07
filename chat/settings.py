@@ -87,7 +87,7 @@ CELERY_RESULT_SERIALIZER = 'json'
 CRT_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.crt"))
 KEY_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.key"))
 
-IS_HTTPS = False
+IS_HTTPS = 'CRT_PATH' in locals()
 API_PORT = '8888'
 EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn'
 EXTENSION_INSTALL_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + EXTENSION_ID
@@ -121,7 +121,6 @@ AUTHENTICATION_BACKENDS = ['chat.utils.EmailOrUsernameModelBackend']
 
 LOGIN_URL = '/'
 FIREBASE_URL = 'https://android.googleapis.com/gcm/send'
-FIREBASE_API_KEY = 'AAAAkHQDLlo:APA91bEP9aCjIXjUiUGTdjuFnYG3ifutHuMiLiiM5rtPXMCuu9UwKOiweauT0Go0xaEDR5IQX4Bln_aWrjCJtIBcYAvVZz5ikHU1kDTGoqkoQOeedHRbUHQ1ZBlBPvYKl712XeNaikun'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases

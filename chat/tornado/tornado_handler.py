@@ -1,9 +1,9 @@
 import json
 import logging
-from datetime import timedelta
 from numbers import Number
 from threading import Thread
 
+from datetime import timedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import F, Q
@@ -18,9 +18,9 @@ from chat.py2_3 import str_type, urlparse
 from chat.settings import UPDATE_LAST_READ_MESSAGE
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions
-from chat.tornado.image_utils import get_message_images, prepare_img
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
-from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms
+from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms, get_message_images, \
+	prepare_img
 
 sessionStore = SessionStore()
 
