@@ -256,6 +256,7 @@ nav [class^='icon-']
 .noSelection
 	@extend %user-select-none
 
+
 /*::-webkit-inner-spin-button { display: none; }
 
 \::-webkit-inner-spin-button
@@ -332,7 +333,7 @@ input[type=range][orient=vertical]
 	padding: 0 5px
 
 /*user-profile
-@media screen and (max-width: 50em)
+@media screen and (max-width: $collapse-width)
 	.two-columns
 		display: block
 		overflow-y: auto
@@ -346,16 +347,6 @@ input[type=range][orient=vertical]
 
 	input[type=file]
 		max-width: 360px
-
-@media screen and (max-width: 35em)
-	.very-small-screen, .timeMess
-		display: none !important
-	#hide
-		margin-left: auto
-
-@media screen and (max-width: 100em)
-	.mText
-		display: none
 
 $restPassMargin: 20px
 

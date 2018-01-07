@@ -4,7 +4,7 @@ from os import path
 
 from django import template
 
-from chat.settings import STATIC_URL, STATIC_ROOT, logging
+from chat.settings import STATIC_URL, STATIC_ROOT, logging, DEBUG
 
 register = template.Library()
 logger = logging.getLogger(__name__)
@@ -17,17 +17,30 @@ class UrlCache(object):
 	@classmethod
 	def get_md5(cls, file_name):
 		try:
-			return cls._md5_sum[file_name]
+			if DEBUG:
+				raise KeyError("Debug mode is on, forcing calculating")
+			else:
+				return cls._md5_sum[file_name]
 		except KeyError:
+			entry_name = file_name
 			with cls._lock:
 				try:
-					md5 = cls.calc_md5(path.join(STATIC_ROOT, file_name))[:8]
-					value = '%s%s?v=%s' % (STATIC_URL, file_name, md5)
+					key = '#root#'
+					if key in file_name:
+						file_name = file_name.split(key,1)[1]
+						file_path = path.join(STATIC_ROOT, entry_name.replace(key, ''))
+						prefix = ''
+					else:
+						file_path = path.join(STATIC_ROOT, file_name)
+						prefix = STATIC_URL
+
+					md5 = cls.calc_md5(path.join(STATIC_ROOT, file_path))[:8]
+					value = '%s%s?v=%s' % (prefix, file_name, md5)
 					logger.info("Static file %s calculated md5 %s", file_name, md5)
 				except:
 					value = STATIC_URL + file_name
 					logger.error("File %s not found, put url %s", file_name, value)
-				cls._md5_sum[file_name] = value
+				cls._md5_sum[entry_name] = value
 				return value
 
 	@classmethod

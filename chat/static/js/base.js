@@ -46,141 +46,33 @@ var fileTypeRegex = /\.(\w+)(\?.*)?$/;
 window.sound = 0;
 window.loggingEnabled = true;
 var ajaxLoader;
-
-///var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|&#39;|$))/g;/*http://anycharacter except end of text, <br> or space*/ TODO is ' ( &#39; ) allowed symbol? if not this breaks https://raw.githubusercontent.com/NeverSinkDev/NeverSink-Filter/master/NeverSink's%20filter%20-%201-REGULAR.filter
-var linksRegex = /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g;/*http://anycharacter except end of text, <br> or space*/
-var youTubePattern = /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)?[^"]+" target="_blank">[^<]+<\/a>/;
-var replaceLinkPattern = '<a href="$1" target="_blank">$1</a>';
-var replaceYoutubePattern = '<iframe allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen" msallowfullscreen="msallowfullscreen" oallowfullscreen="oallowfullscreen" webkitallowfullscreen="webkitallowfullscreen" src="https://www.youtube.com/embed/$1"></iframe>';
-var codePattern = /```(.+?)(?=```)```/;
-var replaceCodePattern = '<pre>$1</pre>';
+var logger;
 var muteBtn;
 var inputRangeStyles = {};
 
-
-window.logger = (function (logsEnabled) {
+window.loggerFactory = (function (logsEnabled) {
 	var self = this;
-	self.historyStorage = null;
-	self.styles = {
-		time: "color: blue",
-		msg: "color: black",
-		ws: "color: green; font-weight: bold",
-		http: "color: green; font-weight: bold",
-		webrtc: "color: #960055; font-weight: bold"
-	};
-	self.dummyFun = function () {
-		return function () { }
-	};
-	self.disableLogs = function () {
-		self.info = dummyFun;
-		self.error = dummyFun;
-		self.ws = dummyFun;
-		self.http = dummyFun;
-		self.httpErr = dummyFun;
-		self.warn = dummyFun;
-		self.webrtc = dummyFun;
-		self.webrtcErr = dummyFun;
-	};
-	self.enableLogs = function () {
-		self.info = self._info;
-		self.error = self._error;
-		self.warn = self._warn;
-		self.ws = self._http;
-		self.http = self._http;
-		self.httpErr = self._httpErr;
-		self.webrtc = self._webrtc;
-		self.webrtcErr = _webrtcErr;
-	};
-	self._info = function () {
-		return self.doLog(arguments, console.log);
-	};
-	self._error = function () {
-		return self.doLog(arguments, console.error);
-	};
-	self._warn = function () {
-		return self.doLog(arguments, console.warn);
-	};
-	self._webrtc = function() {
-		return self._debug(arguments, self.styles.webrtc, console.log);
-	};
-	self._webrtcErr = function() {
-		return self._debug(arguments, self.styles.webrtc, console.error);
-	};
-	self._http = function() {
-		return self._debug(arguments, self.styles.http, console.log);
-	};
-	self._ws = function() {
-		return self._debug(arguments, self.styles.ws, console.log);
-	};
-	self._httpErr = function() {
-		return self._debug(arguments, self.styles.http, console.error);
-	};
-	self._debug = function (inArg, style, dest) {
-		var args = Array.prototype.slice.call(inArg);
-		var initiator = args.shift();
-		var now = new Date();
-		// second argument is format, others are params
-		var text = args.length > 1 ? String.prototype.format.apply(args.shift(), args) : args[0];
-		var result = "%c{}:{}:{}.{}: %c{} %c{}".format(
-				sliceZero(now.getHours()),
-				sliceZero(now.getMinutes()),
-				sliceZero(now.getSeconds()),
-				sliceZero(now.getMilliseconds(), -3),
-				initiator,
-				text
-		);
-		saveLogToStorage(result);
-		return Function.prototype.bind.apply(dest,
-				[window.console, result, self.styles.time, style, self.styles.msg]);
-	};
-	self.saveLogToStorage = function (result) {
-		if (!window.loggingEnabled) {
-			return;
-		}
-		if (self.historyStorage == null) {
-			self.historyStorage = result;
-		} else if (self.historyStorage.length > MAX_STORAGE_LENGTH) {
-			var notConcatInfo = self.historyStorage + ';;;' + result;
-			self.historyStorage = notConcatInfo.substr(notConcatInfo.length - MAX_STORAGE_LENGTH, notConcatInfo.length);
-		} else {
-			self.historyStorage = self.historyStorage + ';;;' + result;
-		}
-	};
+	self.logsEnabled = logsEnabled;
+	self.dummy = function() {
 
-	self.doLog = function (arguments, fn) {
-		return Function.prototype.bind.apply(fn, self.log.apply(self.log, arguments));
 	};
-	/**
-	 *
-	 * Formats message for debug,
-	 * Usage log("{} is {}", 'war', 'bad');
-	 * @returns:  Array "15:09:31:009: war is bad"
-	 *  */
-	self.log = function () {
-		var now = new Date();
-		// first argument is format, others are params
-		var text;
-		if (arguments.length > 1) {
+	self.getLogger = function (initiator, dest, style) {
+		return function () {
+			if (!self.logsEnabled) {
+				return self.dummy;
+			}
 			var args = Array.prototype.slice.call(arguments);
-			text = String.prototype.format.apply(args.shift(), args);
-		} else {
-			text = arguments[0];
-		}
-		var result = "%c{}:{}:{}.{}%c: {}".format(
-				sliceZero(now.getHours()),
-				sliceZero(now.getMinutes()),
-				sliceZero(now.getSeconds()),
-				sliceZero(now.getMilliseconds(), -3),
-				text
-		);
-		saveLogToStorage(result);
-		return [window.console, result, self.styles.time, self.styles.msg];
+			var parts = args.shift().split('{}');
+			var params = [window.console, '%c' + initiator, style];
+			for (var i = 0; i < parts.length; i++) {
+				params.push(parts[i]);
+				if (args[i]) {
+					params.push(args[i])
+				}
+			}
+			return Function.prototype.bind.apply(dest, params);
+		};
 	};
-	if (logsEnabled)  {
-		self.enableLogs();
-	} else {
-		self.disableLogs();
-	}
 	return self;
 })(window.START_WITH_LOGS);
 
@@ -278,6 +170,17 @@ function setUrlParam(name, value) {
 }
 
 function onDocLoad(onload) {
+	/*		msg: "color: black",
+		ws: "color: green; font-weight: bold",
+		webrtc: "color: #960055; font-weight: bold",
+		sw: "color: #ffb500; font-weight: bold"*/
+	logger = {
+		warn: loggerFactory.getLogger("GLOBAL", console.warn, 'color: #687000; font-weight: bold'),
+		info: loggerFactory.getLogger("GLOBAL", console.log, 'color: #687000; font-weight: bold'),
+		error: loggerFactory.getLogger("GLOBAL", console.error, 'color: #687000; font-weight: bold'),
+		http: loggerFactory.getLogger("HTTP", console.log, 'color: green; font-weight: bold'),
+		httpErr: loggerFactory.getLogger("HTTP", console.error, 'color: green; font-weight: bold')
+	};
 	return document.addEventListener("DOMContentLoaded", onload);
 }
 
@@ -294,18 +197,6 @@ function bytesToSize(bytes) {
 	if (bytes < 1) return '0 Byte';
 	var i = parseInt(Math.floor(Math.log(bytes) / Math.log(1024)));
 	return Math.round(bytes / Math.pow(1024, i), 2) + ' ' + sizes[i];
-}
-
-
-function encodeAnchorsHTML(html) {
-	//&#x2F;&#x2F; = // (already encoded by encodeHTML above)
-	var a = encodeHTML(html)
-			.replace(linksRegex, replaceLinkPattern);
-	if (window.embeddedYoutube) {
-		a = a.replace(youTubePattern, replaceYoutubePattern);
-	}
-	a = a.replace(codePattern, replaceCodePattern);
-	return a;
 }
 
 function isDescendant(parent, child) {
@@ -444,7 +335,7 @@ var Growl = function (message, onclicklistener) {
 		// logger.info("Rendering growl #{}", self.id)();
 		if (self.message) {
 			self.message = self.message.trim();
-			self.growl.innerHTML = self.message.indexOf("<") === 0 ? self.message : encodeAnchorsHTML(self.message);
+			self.growl.innerHTML = self.message.indexOf("<") === 0 ? self.message : encodeHTML(self.message);
 		}
 		self.growl.className = 'growl ' + growlClass;
 		self.growlHolder.appendChild(self.growl);
@@ -587,12 +478,12 @@ function ajaxHide() {
  * @param url : string url to post
  * @param form : form in canse form is used
  * */
-function doPost(url, params, callback, form) {
+function doPost(url, params, callback, form, isJsonEncoded) {
 	var r = new XMLHttpRequest();
 	r.onreadystatechange = function () {
 		if (r.readyState === 4) {
 			if (r.status === 200) {
-				logger.http("POST in", "{} ::: {};", url, r.response)();
+				logger.http("POST in {} ::: {};", url, r.response)();
 			} else {
 				logger.httpErr("POST out: {} ::: {}, status:", url, r.response, r.status)();
 			}
@@ -603,28 +494,41 @@ function doPost(url, params, callback, form) {
 			}
 		}
 	};
-	/*Firefox doesn't accept null*/
-	var data = form == null ? new FormData() : new FormData(form);
 
-	if (params) {
-		for (var key in params) {
-			if (params.hasOwnProperty(key)) {
-				data.append(key, params[key]);
-			}
-		}
-	}
 	if (url === "") {
 		url = window.location.href ; // f*cking IE
 	}
 	r.open("POST", url, true);
-	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
-	if (data.entries) { //es6
-		params = '';
-		for (var pair of data.entries()) {
-			params += pair[0] +'='+ pair[1] +'; ';
+	var data;
+	if (isJsonEncoded) {
+		data = JSON.stringify(params);
+		r.setRequestHeader("Content-Type", 'application/json');
+	} else {
+		/*Firefox doesn't accept null*/
+		data = form == null ? new FormData() : new FormData(form);
+
+		if (params) {
+			for (var key in params) {
+				if (params.hasOwnProperty(key)) {
+					data.append(key, params[key]);
+				}
+			}
+		}
+		var entries = data.entries();
+		if (entries && entries.next) {
+			params = '';
+			var d;
+			while (d = entries.next()) {
+				if (d.done) {
+					break;
+				}
+				params += d.value[0] + '=' + d.value[1] + '; ';
+			}
 		}
 	}
-	logger.http("POST out", "{} ::: {}", url, params)();
+	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+
+	logger.http("POST out {} ::: {}", url, params)();
 	r.send(data);
 }
 
@@ -632,7 +536,7 @@ function doPost(url, params, callback, form) {
 /**
  * Loads file from server on runtime */
 function doGet(fileUrl, callback) {
-	logger.http("GET out", fileUrl)();
+	logger.http("GET out {}", fileUrl)();
 	var regexRes = fileTypeRegex.exec(fileUrl);
 	var fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
 	var fileRef = null;
@@ -659,7 +563,7 @@ function doGet(fileUrl, callback) {
 			xobj.onreadystatechange = function () {
 				if (xobj.readyState === 4) {
 					if (xobj.status === 200) {
-						logger.http('GET in','{} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100))();
+						logger.http('GET in {} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100))();
 						if (callback) {
 							if (fileType === 'json') {
 								callback(JSON.parse(xobj.responseText))
@@ -668,7 +572,7 @@ function doGet(fileUrl, callback) {
 							}
 						}
 					} else {
-						logger._http("Unable to load {}, response code is '{}', response: {}", fileUrl, xobj.status, xobj.response )();
+						logger.httpErr("Unable to load {}, XMLHttpRequest: {}", fileUrl, xobj)();
 						growlError("<span>Unable to load {}, response code is <b>{}</b>, response: {} <span>".format(fileUrl, xobj.status, xobj.response));
 					}
 				}

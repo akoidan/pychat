@@ -94,7 +94,7 @@ SITE_PROTOCOL = 'https' if IS_HTTPS else 'http'
 API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/?id='))
 
 # GIPHY_API_KEY = 'thZMTtDfFdugqPDIAY461GzYTctuYIeIj' // TODO paste your GIPHY api key from https://developers.giphy.com/
-GIPHY_URL= 'http://api.giphy.com/v1/gifs/search?limit=1&api_key={}&q={}'
+GIPHY_URL= 'http://api.giphy.com/v1/gifs/random?api_key={}&q={}'
 GIPHY_REGEX = r"^\s*\/giphy (.+)"
 # SESSION_COOKIE_AGE = 10
 # SESSION_SAVE_EVERY_REQUEST = True
@@ -117,6 +117,7 @@ AUTH_USER_MODEL = 'chat.User'
 AUTHENTICATION_BACKENDS = ['chat.utils.EmailOrUsernameModelBackend']
 
 LOGIN_URL = '/'
+FIREBASE_URL = 'https://android.googleapis.com/gcm/send'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
@@ -336,7 +337,7 @@ UPDATE chat_room_users out_cru
 			JOIN chat_message ON chat_message.room_id = chat_room_users.room_id
 		WHERE chat_room_users.user_id = %s and chat_room_users.room_id != {}
 		GROUP BY chat_message.room_id) last_message ON out_cru.id = last_message.rooms_users_id
-SET out_cru.last_read_message_id = last_message.message_id
+SET out_cru.last_read_message_id = last_message.message_id 
 """.format(ALL_ROOM_ID)
 
 # ---------------JAVASCRIPT CONSTANTS --------------------

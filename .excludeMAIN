@@ -61,4 +61,4 @@ chat/static/package.2.6.2.zip
 chat/static/recover.sh
 chat/static/recovery-pacman.sh
 pycharm-debug-py3k.egg
-
+chat/static/manifest.json

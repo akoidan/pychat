@@ -7,6 +7,8 @@
 @import "partials/mixins"
 @import "partials/variables"
 @import "partials/highlight"
+@import "partials/powered_by_giphy"
+@import "partials/youtube_player"
 [class^="message-header"]
 	font-weight: bold
 
@@ -80,20 +82,67 @@ fieldset
 		max-width: calc(100% - 15px)
 		overflow-x: auto
 
-	iframe
-		border: none
-		width: 500px
-		height: 350px
+	@mixin margin-img
+		margin: 5px 0 0 15px
+	@mixin margin-img-def
 		max-width: calc(100% - 25px)
 		max-height: 400px
 		display: block
-		margin: 5px 0 0 15px
+
+	iframe
+		border: none
+		@include margin-img-def
+		width: 500px
+		height: 350px
+		@include margin-img
+
+	.youtube-player
+		@extend %user-select-none
+		display: block
+		@include margin-img
+		> div
+			position: relative
+			display: inline-block
+			zoom: 1
+			&:not(:hover)
+				-webkit-filter: brightness(90%)
+
+			img
+				@include margin-img-def
+			.icon-youtube-play
+				position: absolute
+				z-index: 13
+				top: 50%
+				left: 50%
+				margin-top: -50px
+				margin-left: -55px
+				font-size: 50px
+				color: black
+				height: 100px
+				width: 100px
+				@media screen and (max-width: $collapse-width)
+					margin-top: -35px
+					margin-left: -45px
+					height: 70px
+					width: 70px
+
+	.giphy
+		position: relative
+		img
+			@include margin-img-def
+			@include margin-img
+		&:not(:hover) .giphy_hover
+			display: none
+		.giphy_hover
+			bottom: 5px
+			position: absolute
+			left: 20px
+			width: 100px
+			height: 36px
 
 	img.B4j2ContentEditableImg
-		max-width: calc(100% - 25px)
-		max-height: 300px
-		display: block
-		margin: 5px 0 0 15px
+		@include margin-img-def
+		@include margin-img
 	p
 		margin-top: 0.8em
 		margin-bottom: 0.8em
@@ -162,6 +211,38 @@ fieldset
 	border-radius: 3px
 	position: fixed
 
+nav
+	display: flex
+	position: relative
+	flex-direction: row
+	overflow: hidden
+	max-height: 30px
+	transition: max-height 0.4s ease-out
+	> *
+		order: 2
+	#navMenu
+		margin-left: auto
+		.icon-menu
+			display: none
+	@media screen and (min-width: $collapse-width) and (max-width: $collapse-no-mtext)
+		.mText
+			display: none !important
+	@media screen and (max-width: $collapse-width)
+		flex-direction: column
+		> *
+			margin-right: auto !important
+		#navMenu
+			position: relative
+			width: 100%
+			margin-bottom: 10px
+			order: 1
+			.icon-menu
+				display: inline-block
+				position: absolute
+				top: 0
+				right: 5px
+		&.expanded
+			max-height: 450px
 
 #user-context-menu
 	@extend .context-menu
@@ -363,9 +444,6 @@ ul#directUserTable
 	&.disabled
 		color: #616161
 
-#onlineStatus
-	padding: 0 10px
-
 #canvasResize
 	cursor: se-resize
 	position: absolute
@@ -395,9 +473,12 @@ ul#directUserTable
 	padding-bottom: 1px
 	padding-right: 12px
 
-.timeMess:hover
-	cursor: pointer
-	color: #979797
+.timeMess
+	@media screen and (max-width: $collapse-width)
+		display: none !important
+	&:hover
+		cursor: pointer
+		color: #979797
 
 /*-webkit-background-clip: text;
 /*-webkit-text-fill-color: transparent;
@@ -457,7 +538,7 @@ ul#directUserTable
 		right: 0
 		background: transparent
 
-@media screen and (max-width: 35em)
+@media screen and (max-width: $collapse-width)
 	#wrapper
 		@include flex-direction(column-reverse)
 	#chat-room-users-wrapper
@@ -961,7 +1042,7 @@ ul#directUserTable
 			display: inline-block
 			padding-left: 25px
 			vertical-align: top
-	@media screen and (max-width: 500px)
+	@media screen and (max-width: $collapse-width)
 		flex-direction: column
 		button
 			width: 100%
@@ -1098,21 +1179,8 @@ ul#directUserTable
 	margin-left: 20px
 	padding-left: 5px
 
-@media screen and (max-height: 550px)
-	#callContainer
-		top: 0 !important
-
-@media screen and (max-width: 700px)
-	#callContainer
-		left: 0 !important
 
 /*--------------- END CALL DIALOG -----------------------
 @media screen and (max-height: 300px), screen and (max-width: 600px)
 	#smileParentHolder
 		width: calc(100% - 30px)
-
-@media screen and (max-width: 500px)
-	.hide-wide
-		display: none
-
-/*# sourceMappingURL=chat.css.map
