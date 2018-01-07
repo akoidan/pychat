@@ -1,40 +1,44 @@
 ![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7--1.9-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/djangochat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/djangochat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/djangochat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/djangochat)
 
-This is web (browser) chat, that supports:
- - Sending instant text messages via websockets.
- - Sending images to chat.
- - Social integration: Smiles, urls, embedded youtube, [giphy](https://giphy.com/)
+This is web (browser) chat, that is able to:
+ - Send instant text messages via websockets.
+ - Send images to chat.
+ - Use: smiles, anchors, embedded youtube, [giphy](https://giphy.com/), code [highlight](https://highlightjs.org/)
  - [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) calls and video conference using webrtc.
- - Screen sharing during call and conference (installing extension is required).
- - Peer to peer file sending
- - Painter (canvas-based, brush/line/erase/crop/cpilboard paste/resize/rotate/zoom/add text/history...)
- - Facebook/google oauth.
+ - Share screen during call/conference
+ - Send files peer to peer file using webrtc with FileSystem Api
+ - Edit images with integrated painter (brush/line/reactangle/oval/flood fill/erase/crop/cpilboard paste/resize/rotate/zoom/add text/ctrl+a)
+ - Login in with facebook/google oauth.
+ - Send offline messages with Firebase push notifications
+ - Adjust interface according to screen size (bs like)+ themes
 
 Live demo: [pychat.org](http://pychat.org/)
 
-Table of contents
-=================
-  * [Breaf description](#how-it-works)
-  * [Installation](#installation)
-    * [Windows](#windows)
-    * [Ubuntu](#ubuntu)
-    * [Archlinux](#archlinux)
-    * [CentOs](#centos)
-    * [Production](#production)
-  * [Initializing](#initializing)
-  * [Running](#running)
+# Table of contents
+  * [Breaf description](#breaf-description)
+  * [How to run on my own server](#how-to-run-on-my-own-server)
+    * [Install required packages](#install-required-packages)
+      * [Windows](#windows)
+      * [Ubuntu](#ubuntu)
+      * [Archlinux](#archlinux)
+      * [CentOs](#centos)
+      * [Production](#production)
+    * [Initializing](#initializing)
+    * [Running](#running)
   * [Contributing](#contributing)
-  * [TODO list](#todo)
+  * [TODO list](#todo-list)
 
-How it works?
-=============
+# Breaf description
+
 Chat is written in **Python** with [django](https://www.djangoproject.com/). For handling realtime messages [WebSockets](https://en.wikipedia.org/wiki/WebSocket) are used: browser support on client part and asynchronous framework [Tornado](http://www.tornadoweb.org/) on server part. Messages are being broadcast by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using [tornado-redis](https://github.com/leporo/tornado-redis) backend. Redis is also used as django session backend and for storing current users online.  For video call [webrtc](https://webrtc.org/) technology was used with stun server to make a connection, which means you will always get the lowest ping and the best possible connection channel. Client part doesn't use any javascript frameworks (like jquery or datatables) in order to get best performance. Chat written as a singlePage application, so even if user navigates across different pages websocket connection doesn't break. Chat also supports OAuth2 login standard via FaceBook/Google. Css is compiled from [sass](http://sass-lang.com/guide). Server side can be run on any platform **Windows**, **Linux**, **Mac** with **Python 2.7** and **Python 3.x**.Client (users) can use the chat from any browser with websocket support: IE11, Edge, Chrome, Firefox, Android, Opera, Safari...
 
-Installation:
-=============
+# How to run on my own server:
 
-*[Windows](https://www.microsoft.com/en-us/download/windows.aspx)*:
--------------------------------------------------------------------
+## Install required packages
+
+This section depends on the OS you use. I tested full install on Windows/Ubuntu/CentOs/Archlinux/Archlinux(rpi2 armv7). [pychat.org](https://pychat.org) currently runs on Archlinux rpi2.
+
+### [Windows](https://www.microsoft.com/en-us/download/windows.aspx):
  1. Install [python](https://www.python.org/downloads/) with pip. Any version **Python2.7** or **Python 3.x** both are supported
  2. Add **pip** and **python** to `PATH` variable.
  3. Install [redis](https://github.com/MSOpenTech/redis/releases). Get the newest version or at least 2.8.
@@ -42,8 +46,28 @@ Installation:
  5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector. 
  6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can downloads download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
  7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`).
- 8. If you want to use [Giphy](https://giphy.com/), you need to sign up in [developers.giphy.com](https://developers.giphy.com/) , create a new app there, and add `GIPHY_API_KEY` to [settings.py](chat/settings.py)
- 9. Pychat also supports [webpush](https://developers.google.com/web/fundamentals/push-notifications/) notifications, like in facebook. They will fire even user doesn't have opened tab. That can be turned on/off by used in his/her profile with checkbox `Notifications`. The implementation is similar like [here](https://github.com/GoogleChrome/samples/tree/gh-pages/push-messaging-and-notifications). So to add notification support you need
+
+### [Ubuntu](http://www.ubuntu.com/):
+ 1. Install required packages: `apt-get install python pip mysql-server ruby`
+ 2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
+ 3. Install **sassc**. You can find instructions [here](http://crocodillon.com/blog/how-to-install-sassc-and-libsass-on-ubuntu). Or maybe you can find packet in ubuntu repository. Alternatively you can use any other sass. 
+
+### [Archlinux](https://www.archlinux.org/):
+ 1. Install required packages: `pacman -S python pip redis mariadb ruby sassc`
+ 2. Follow the [database guide](https://wiki.archlinux.org/index.php/MySQL) to configure it if you need. 
+
+### [CentOs](https://www.centos.org/)
+There's stale branch [production](https://github.com/Deathangel908/djangochat/tree/production) that was used for centos. Basic instruction you can find there.
+
+### Production
+You can also find full production setup for *[Archlinux](https://www.archlinux.org/)* in [prod_archlinux](https://github.com/Deathangel908/djangochat/tree/prod_archlinux) branch
+  
+## Initializing:
+ 1. Install python packages with `pip install -r requirements.txt`. 
+ 2. Create database. Open mysql command tool: `mysql -u YOUR_USERNAME -p` and create database `create database django CHARACTER SET utf8 COLLATE utf8_general_ci`. Specify database connection options (username, password) in `chat/settings.py`. Next fill database with tables: `python manage.py init_db`. If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
+ 3. Populate project files: `sh download_content.sh all`
+ 4. If you want to use [Giphy](https://giphy.com/), you need to sign up in [developers.giphy.com](https://developers.giphy.com/) , create a new app there, and add `GIPHY_API_KEY` to [settings.py](chat/settings.py)
+ 5. Pychat also supports [webpush](https://developers.google.com/web/fundamentals/push-notifications/) notifications, like in facebook. They will fire even user doesn't have opened tab. That can be turned on/off by used in his/her profile with checkbox `Notifications`. The implementation is similar like [here](https://github.com/GoogleChrome/samples/tree/gh-pages/push-messaging-and-notifications). So to add notification support you need
     1. Create a project on the [Firebase Developer Console](https://console.firebase.google.com/):
     2. Go to Settings (the cog near the top left corner), click the [Cloud Messaging Tab](https://console.firebase.google.com/u/1/project/pychat-org/settings/cloudmessaging/)
     3. Put `<Your Cloud Messaging API Key ...>` to [settings.py](chat/settings.py) as `FIREBASE_API_KEY`
@@ -57,48 +81,20 @@ Installation:
   "gcm_sender_id": "<Your Sender ID from https://console.firebase.google.com>"
 }
 ```
-
-[Ubuntu](http://www.ubuntu.com/):
-----------------------------------
- 1. Install required packages: `apt-get install python pip mysql-server ruby`
- 2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
- 3. Install **sassc**. You can find instructions [here](http://crocodillon.com/blog/how-to-install-sassc-and-libsass-on-ubuntu). Or maybe you can find packet in ubuntu repository. Alternatively you can use any other sass. 
-
-[Archlinux](https://www.archlinux.org/):
-------------------------------------------
- 1. Install required packages: `pacman -S python pip redis mariadb ruby sassc`
- 2. Follow the [database guide](https://wiki.archlinux.org/index.php/MySQL) to configure it if you need. 
-
-[CentOs](https://www.centos.org/)
----------------------------------------
-There's stale branch [production](https://github.com/Deathangel908/djangochat/tree/production) that was used for centos. Basic instruction you can find there.
-
-Production
-----------
-You can also find full production setup for *[Archlinux](https://www.archlinux.org/)* in [prod_archlinux](https://github.com/Deathangel908/djangochat/tree/prod_archlinux) branch
-  
-Initializing:
-=============
- 1. Install python packages with `pip install -r requirements.txt`. 
- 2. Create database. Open mysql command tool: `mysql -u YOUR_USERNAME -p` and create database `create database django CHARACTER SET utf8 COLLATE utf8_general_ci`. Specify database connection options (username, password) in `chat/settings.py`. Next fill database with tables: `python manage.py init_db`. If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
- 3. Populate project files: `sh download_content.sh all`
  
-Running:
-========
+## Running:
  0. Start `mysql` server if it's not started. 
  1. Start session holder: `redis-server`
  2. Start webSocket listener: `python manage.py start_tornado`
  3. Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
  4. Open in browser [http**s**://127.0.0.1:8000](https://127.0.0.1:8000).
- 5. If you get an ssl error on establishing websocket connection in browser, that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
+ 5. If you get an ssl error on establishing websocket connection in browser (at least in Firefox, chrome should be fine), that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
 
  
-Contributing:
-=============
+# Contributing:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
-TODO
-====
+# TODO list
 * collapsed nav should display current login name instead of static Pychat
 * growlInfo should contain X to close message, and next btn if it's a tip. so anchors would be clickable as well
 * https://static.pychat.org/photo/xE9bSyvC_image.png
