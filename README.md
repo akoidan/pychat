@@ -43,7 +43,7 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  3. Install [redis](https://github.com/MSOpenTech/redis/releases). Get the newest version or at least 2.8.
  4. Install [sassc](http://sass-lang.com/libsass). Add **sassc** command path to `PATH` variable.
  5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector. 
- 6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can downloads download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
+ 6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
  7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`).
 
 ### [Ubuntu](http://www.ubuntu.com/):
@@ -94,6 +94,10 @@ You can also find full production setup for *[Archlinux](https://www.archlinux.o
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Add payback to firebase
+* Add docker
+* Fix all broken painter event in mobile
+* youtube iframe should contain full link with time and other parmas
 * collapsed nav should display current login name instead of static Pychat
 * growlInfo should contain X to close message, and next btn if it's a tip. so anchors would be clickable as well
 * https://static.pychat.org/photo/xE9bSyvC_image.png

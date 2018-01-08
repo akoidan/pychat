@@ -377,8 +377,12 @@ function Painter() {
 			}
 		}
 	};
-	self.ctx = self.dom.canvas.getContext('2d');
 	self.init = {
+		createCanvas: function() {
+			self.ctx = self.dom.canvas.getContext('2d');
+			self.ctx.imageSmoothingEnabled= false;
+			self.ctx.mozImageSmoothingEnabled = false;
+		},
 		fixInput: self.fixInputs,
 		initInstruments: function () { // TODO this looks bad
 			Object.keys(self.instruments).forEach(function (k) {
@@ -743,7 +747,7 @@ function Painter() {
 				self.dom.canvasWrapper.style.width = w - pxy.pageX + cxy.pageX + 'px';
 				self.dom.canvasWrapper.style.height = h - pxy.pageY + cxy.pageY + 'px';
 			};
-			logger.info("Added mousmove. touchmove")();
+			self.log("Added mousmove. touchmove")();
 			document.addEventListener('mousemove', listener);
 			document.addEventListener('touchmove', listener);
 			var remove = function() {
@@ -1936,6 +1940,12 @@ function NotifierHandler() {
 	}
 
 	self.registerWorker = function (cb) {
+		if (!window.Promise || !navigator.serviceWorker) {
+			return cb("Service worker is not supported")
+		} else if (!window.manifest) {
+			//you need to provice FIREBASE_API_KEY in settings.py and chat/static/manifest.json
+			return cb("manifest.json is missing from meta")
+		}
 		navigator.serviceWorker.register('/sw.js',  {scope: '/'}).then(function (r) {
 			logger.info("Registered service worker {}", r)();
 			return navigator.serviceWorker.ready;
