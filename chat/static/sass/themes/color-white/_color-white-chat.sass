@@ -1,9 +1,12 @@
 $mainWhiteTxtClr: #353535
 .color-white
-	background: #fff
+	.hljs
+		border: 1px dashed #777777
+	@import "../highlight-light"
 	color: $mainWhiteTxtClr
+	background-color: #fff7ee
 	#chat-room-users-wrapper > span
-		background-color: #333333
+		background-color: #656565
 		color: white
 	nav
 		background-color: #333
@@ -33,7 +36,6 @@ $mainWhiteTxtClr: #353535
 			background-color: $bga
 			border: 1px solid $bra
 
-
 	input[type=button]
 		@include button(#286090, #204d74, #286090, #204d74, #204d74, #122b40)
 	input[type=submit]
@@ -59,8 +61,10 @@ $mainWhiteTxtClr: #353535
 
 	.modal-body
 		background-color: #c3c6ca
-	.icon-smile, .icon-picture, .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
+	.icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
 		color: #cccccc
+	.icon-smile, .icon-picture
+		color: #6a6a6a
 	.painterTools [class^='icon-']
 		color: #474747
 	.icon-webrtc-fullscreen, .icon-cog
@@ -98,10 +102,10 @@ $mainWhiteTxtClr: #353535
 	#directUserTable, #chat-user-table ul
 		li.offline
 			.icon-user-secret, .icon-man, .icon-girl
-				color: #ad0300
+				color: #b23f3d
 		li:not(.offline)
 			.icon-user-secret, .icon-man, .icon-girl
-				color: #005800
+				color: #328732
 	.message-header-others
 		color: red
 		.timeMess
@@ -115,6 +119,10 @@ $mainWhiteTxtClr: #353535
 			color: #555
 		color: #555
 	.chatbox
+		box-shadow: inset 0 0 20px #BBB
+		border-radius: 5px
+		background-color: white
+		margin: 10px 0 0 10px
 		font-family: Helvetica,Arial,sans-serif
 		font-size: 14px
 	fieldset legend

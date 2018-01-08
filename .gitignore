@@ -13,7 +13,8 @@ chat/static/font/*
 !/chat/static/font/OpenSans.ttf
 !/chat/static/font/Oswald.ttf
 chat/static/sass/partials/_fontello.scss
-chat/static/sass/partials/_highlight.scss
+chat/static/sass/themes/_highlight-dark.scss
+chat/static/sass/themes/_highlight-light.scss
 trash
 .fontello
 chat/static/demo.html
