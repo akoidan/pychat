@@ -18,6 +18,8 @@ chat/static/font/*
 chat/static/sass/partials/_fontello.scss
 chat/static/sass/fontello/
 chat/static/sass/partials/_highlight.scss
+chat/static/sass/themes/_highlight-dark.scss
+chat/static/sass/themes/_highlight-light.scss
 trash
 .fontello
 chat/static/demo.html

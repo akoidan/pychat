@@ -6,7 +6,6 @@
 @import "themes/color-white/color-white-chat"
 @import "partials/mixins"
 @import "partials/variables"
-@import "partials/highlight"
 @import "partials/powered_by_giphy"
 @import "partials/youtube_player"
 [class^="message-header"]
@@ -41,16 +40,21 @@ fieldset
 		font-weight: bold
 
 #userMessageWrapper
-	margin: 8px
+	padding: 8px
 	width: calc(100% - 16px)
 
-	.icon-smile
+	@mixin chat-icon
 		display: inline
 		float: right
 		position: absolute
-		right: 1px
-		top: 1px
 		height: 16px
+		top: 13px
+	.icon-smile
+		@include chat-icon
+		right: 10px
+	#imgInputIcon
+		@include chat-icon
+		left: 15px
 
 
 #wrapper
@@ -78,7 +82,7 @@ fieldset
 		text-decoration: underline
 
 	pre
-		margin: 5px
+		margin: 10px
 		max-width: calc(100% - 15px)
 		overflow-x: auto
 
@@ -183,7 +187,6 @@ fieldset
 		margin-right: 5px
 
 	> span
-		opacity: 0.9
 		@extend %user-select-none
 		border-radius: 2px
 
@@ -575,15 +578,6 @@ ul#directUserTable
 
 	img
 		cursor: pointer
-
-#imgInputIcon
-	display: inline
-	float: right
-	position: absolute
-	left: 6px
-	top: 2px
-	height: 16px
-
 
 
 #paint-crp-rect

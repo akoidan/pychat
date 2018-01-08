@@ -5,9 +5,12 @@ $default-box-shadow: 0 0 10px #55585b
 $default-lor-background: #272c2d
 
 .color-lor
+	@import "../highlight-dark"
+
 	background-color: $default-lor-background
 	.hljs
-		background-color: initial !important
+		border: 1px dashed #777777
+		background-color: #2e3436 !important
 	color: $grayish-green
 
 	@import "../checkbox"

@@ -76,6 +76,12 @@ Though ArchLinux is not recommended as a server OS I prefer using it over other 
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 
 # TODO list
+* Fix onscroll load messages in mobile 
+* Add quote message
+* Add payback to firebase
+* Add docker
+* Fix all broken painter event in mobile
+* youtube iframe should contain full link with time and other parmas
 * collapsed nav should display current login name instead of static Pychat
 * growlInfo should contain X to close message, and next btn if it's a tip. so anchors would be clickable as well
 * https://static.pychat.org/photo/xE9bSyvC_image.png
