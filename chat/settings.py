@@ -304,7 +304,7 @@ EMAIL_HOST_PASSWORD = ''
 #DEFAULT_FROM_EMAIL = 'root <root@pychat.org>'
 SERVER_EMAIL = 'root@pychat.org'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-ADMINS = [('Andrew', 'nightmare.quake@mail.ru'), ]
+ADMINS = [('Andrew', 'deathangel908@gmail.com'), ]
 
 # If this options is set, on every oncoming request chat will gather info about user location
 
