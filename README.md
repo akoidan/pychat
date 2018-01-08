@@ -94,6 +94,7 @@ You can also find full production setup for *[Archlinux](https://www.archlinux.o
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Add user to room search should be case insensitive
 * Fix onscroll load messages in mobile 
 * Add quote message
 * Add payback to firebase
