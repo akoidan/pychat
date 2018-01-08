@@ -90,7 +90,7 @@ def get_firebase_playback(request):
 @require_http_methods('POST')
 def register_subscription(request):
 	registration_id = request.POST['registration_id']
-	Subscription.objects.update_or_create(registration_id=registration_id, user=request.user)
+	Subscription.objects.update_or_create(registration_id=registration_id, defaults={ 'user': request.user})
 	return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
 
 @require_http_methods('POST')
