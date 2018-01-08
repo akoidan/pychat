@@ -76,6 +76,7 @@ Though ArchLinux is not recommended as a server OS I prefer using it over other 
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 
 # TODO list
+* Add user to room search should be case insensitive
 * Fix onscroll load messages in mobile 
 * Add quote message
 * Add payback to firebase
