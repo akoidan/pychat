@@ -147,8 +147,13 @@ class MessagesCreator(object):
 			VarNames.TIME: get_milliseconds()
 		}
 
-	def load_offline_message(self, offline_messages, channel_key):
-		res = self.default(offline_messages, Actions.OFFLINE_MESSAGES, HandlerNames.CHAT)
+	def load_offline_message(self, offline_messages, history_messages, channel_key):
+		res = self.default({
+			VarNames.LOAD_MESSAGES_OFFLINE: offline_messages,
+			VarNames.LOAD_MESSAGES_HISTORY: history_messages
+		},
+			Actions.OFFLINE_MESSAGES,
+			HandlerNames.CHAT)
 		res[VarNames.CHANNEL] = channel_key
 		return res
 
