@@ -96,8 +96,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 # TODO list
 * WS close event doesn't fire after suspending PC to ram https://github.com/websockets/ws/issues/686
 * Add user to room search should be case insensitive
-* Fix onscroll load messages in mobile 
-* Add quote message
 * Add payback to firebase
 * Add docker
 * Fix all broken painter event in mobile
