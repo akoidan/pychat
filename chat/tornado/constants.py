@@ -60,6 +60,8 @@ class VarNames(object):
 	HANDLER_NAME = 'handler'
 	GIPHY = 'giphy'
 	SYMBOL = 'symbol'
+	LOAD_MESSAGES_HISTORY = 'history'
+	LOAD_MESSAGES_OFFLINE = 'offline'
 
 
 class HandlerNames:

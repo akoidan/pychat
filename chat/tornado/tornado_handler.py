@@ -1,9 +1,10 @@
 import json
 import logging
+from datetime import timedelta
+from itertools import chain
 from numbers import Number
 from threading import Thread
 
-from datetime import timedelta
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import F, Q
@@ -153,9 +154,11 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			for room_id in user_rooms:
 				self.channels.append(room_id)
 			self.listen(self.channels)
-			off_messages = self.get_offline_messages()
+			off_messages, history = self.get_offline_messages(user_rooms)
 			for room_id in user_rooms:
-				self.add_online_user(room_id, off_messages.get(room_id))
+				self.add_online_user(room_id)
+				if off_messages.get(room_id) or history.get(room_id):
+					self.ws_write(self.load_offline_message(off_messages.get(room_id), history.get(room_id), room_id))
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
 			self.connected = True
 			Thread(target=self.save_ip).start()
@@ -163,18 +166,33 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key %s has been rejected" % session_key)
 
-	def get_offline_messages(self):
-		res = {}
-		off_mess = Message.objects.filter(
+	def get_offline_messages(self, user_rooms):
+		q_objects = Q()
+		for room_id in user_rooms:
+			c = self.get_cookie(str(room_id))
+			if c is not None:
+				q_objects.add(Q(id__gte=c, room_id=room_id), Q.OR)
+		off_messages = Message.objects.filter(
 			id__gt=F('room__roomusers__last_read_message_id'),
 			deleted=False,
 			room__roomusers__user_id=self.user_id
 		)
-		images = do_db(get_message_images, off_mess)
-		for message in off_mess:
+		off = {}
+		history = {}
+		if len(q_objects.children) > 0:
+			history_messages = Message.objects.filter(q_objects)
+			all = list(chain(off_messages, history_messages))
+		else:
+			history_messages = []
+			all = off_messages
+		images = get_message_images(all)
+		for message in off_messages:
 			prep_m = self.create_message(message, prepare_img(images, message.id))
-			res.setdefault(message.room_id, []).append(prep_m)
-		return res
+			off.setdefault(message.room_id, []).append(prep_m)
+		for message in history_messages:
+			prep_m = self.create_message(message, prepare_img(images, message.id))
+			history.setdefault(message.room_id, []).append(prep_m)
+		return off, history
 
 	def check_origin(self, origin):
 		"""

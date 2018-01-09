@@ -2388,8 +2388,11 @@ function ChannelsHandler() {
 		}
 	};
 	self.clearChannelHistory = function () {
-		localStorage.clear();
-		self.getActiveChannel().clearHistory();
+		storage.clearStorage();
+		for (var i in self.channels) {
+			if (!self.channels.hasOwnProperty(i)) continue;
+			self.channels[i].clearHistory();
+		}
 		logger.info('History has been cleared')();
 		growlSuccess('History has been cleared');
 	};
@@ -2843,10 +2846,6 @@ function ChannelsHandler() {
 			}
 		}
 		self.showActiveChannel();
-		if (!self.roomsInited) {
-			storage.loadMessagesFromLocalStorage();
-		}
-		self.roomsInited = true;
 	};
 	self.handle = function (message) {
 		if (message.handler === 'channels') {
@@ -3249,7 +3248,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 	};
 	self.clearHistory = function () {
-		self.headerId = null;
 		self.dom.chatBoxDiv.innerHTML = '';
 		self.allMessages = [];
 		self.allMessagesDates = [];
@@ -3489,16 +3487,17 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 	};
 	self.loadOfflineMessages = function (data) {
-		var messages = data.content || [];
+		var hisMess = data.content.history || [];
+		var offlMess = data.content.offline || [];
 		var oldSound = window.sound;
 		window.sound = 0;
-		messages.forEach(self.printNewMessage);
+		offlMess.forEach(function(d) {
+			self._printMessage(d, true, false);
+		});
+		hisMess.forEach(function(d) {
+			self._printMessage(d, false, true);
+		});
 		window.sound = oldSound;
-	};
-	self.setHeaderId = function (headerId) {
-		if (!self.headerId || headerId < self.headerId) {
-			self.headerId = headerId;
-		}
 	};
 	self.patterns = {
 		linksRegex: /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g, /*http://anycharacter except end of text, <br> or space*/
@@ -3507,7 +3506,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		replaceYoutubePattern: '<div class="youtube-player" data-id="$1"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
 		codePattern: /```(.+?)(?=```)```/,
 		replaceCodePattern: '<pre>$1</pre>',
-		quotePattern: /(^.*)&gt;&gt;&gt;<br>/,
+		quotePattern: /(^\(\d\d:\d\d:\d\d\)\s\w+:.*)&gt;&gt;&gt;<br>/,
 		replaceQuotePattern: '<div class="quote">$1</div>'
 	}
 	self.encodeHtmlAll = function (html) {
@@ -3568,14 +3567,11 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			}
 		}
 	};
-	self.printNewMessage = function (data) {
-		self._printMessage(data, true);
-	};
 	self.printMessage = function (data) {
 		self._printMessage(data, false);
 	};
-	self._printMessage = function (data, isNew) {
-		self.setHeaderId(data.id);
+	self._printMessage = function (data, isNew, forceSkipHL) {
+		storage.setRoomHeaderId(self.roomId, data.id);
 		self.printMessagePlay(data);
 		// we can't use self.allUsers[data.userId].user; since user could left and his message remains
 		var displayedUsername = channelsHandler.getAllUsersInfo()[data.userId].user;
@@ -3591,7 +3587,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		if (p) {
 			Utils.highlightCode(p);
 			Utils.setYoutubeEvent(p);
-			self.highLightMessageIfNeeded(p, displayedUsername, isNew, data.content, data.images);
+			if (!forceSkipHL) {
+					self.highLightMessageIfNeeded(p, displayedUsername, isNew, data.content, data.images);
+			}
 		}
 	};
 	self.printMessagePlay = function (data) {
@@ -3700,7 +3698,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			}
 			self.lastLoadUpHistoryRequest = currentMillis;
 			var getMessageRequest = {
-				headerId: self.headerId,
+				headerId: storage.getRoomHeaderId(self.roomId),
 				count: count,
 				action: 'loadMessages',
 				channel: self.roomId
@@ -5677,7 +5675,6 @@ function WsHandler() {
 		}
 		self.handleMessage(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
-		storage.saveMessageToStorage(data, jsonData);
 	};
 	self.handleMessage = function (data) {
 		self.handlers[data.handler].handle(data);
@@ -5763,51 +5760,26 @@ function WsHandler() {
 function Storage() {
 	var self = this;
 	self.STORAGE_NAME = 'main';
-	self.actionsToSave = ['printMessage', 'loadMessages', 'editMessage', 'deleteMessage', 'loadOfflineMessages'];
-	self.loadMessagesFromLocalStorage = function () {
-		var jsonData = localStorage.getItem(self.STORAGE_NAME);
-		if (jsonData != null) {
-			var parsedData = JSON.parse(jsonData);
-			logger.info('Loading {} messages from localstorage', parsedData.length)();
-			// don't make sound on loadHistory
-			var savedSoundStatus = window.sound;
-			window.sound = 0;
-			window.loggingEnabled = false;
-			window.newMessagesDisabled = true;
-			for (var i = 0; i < parsedData.length; i++) {
-				try {
-					wsHandler.handleMessage(parsedData[i]);
-				} catch (err) {
-					logger.warn("Message '{}' isn't loaded because {}",
-							JSON.stringify(parsedData[i]), err)();
-				}
-			}
-			window.loggingEnabled = true;
-			window.newMessagesDisabled = false;
-			window.sound = savedSoundStatus;
-		}
-	};
-	// Use both json and object repr for less JSON actions
-	self.saveMessageToStorage = function (objectItem, jsonItem) {
-		if (notifier.isTabMain() && self.actionsToSave.indexOf(objectItem.action) >= 0 && cacheMessages) {
-			self.fastAddToStorage(jsonItem);
-		}
-	};
+	self.cache = {}
 	self.clearStorage = function () {
-		localStorage.removeItem(self.STORAGE_NAME);
-	};
-	self.fastAddToStorage = function (text) {
-		var storageData = localStorage.getItem(self.STORAGE_NAME);
-		var newStorageData;
-		if (storageData) {
-			// insert new text before "]" symbol and add it manually
-			var copyUntil = storageData.length - 1;
-			newStorageData = storageData.substr(0, copyUntil) + ',' + text + ']';
-		} else {
-			newStorageData = '[' + text + ']';
+		var cookies = readCookie();
+		for (var c in cookies) {
+			if (!cookies.hasOwnProperty(c)) continue;
+			if (!isNaN(c)) {
+				Utils.deleteCookie(c);
+			}
 		}
-		localStorage.setItem(self.STORAGE_NAME, newStorageData);
+		self.cache = readCookie();
 	};
+	self.getRoomHeaderId = function(roomId) {
+		return self.cache[roomId];
+	}
+	self.setRoomHeaderId = function (roomId, value) {
+		if (!self.cache[roomId] || value < self.cache[roomId]) {
+			self.cache[roomId] = value;
+			document.cookie = roomId + '=' + value;
+		}
+	}
 }
 
 var Utils = {
@@ -6047,6 +6019,12 @@ var Utils = {
 			growlError("Pasted file is not an image");
 		}
 
+	},
+	deleteCookie: function (name, path, domain) {
+		document.cookie = name + "=" +
+				((path) ? ";path=" + path : "") +
+				((domain) ? ";domain=" + domain : "") +
+				";expires=Thu, 01 Jan 1970 00:00:01 GMT";
 	},
 	showHelp: function () {
 		if (!suggestions) {

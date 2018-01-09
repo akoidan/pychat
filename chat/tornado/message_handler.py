@@ -144,7 +144,7 @@ class MessagesHandler(MessagesCreator):
 			result.add(user_id)
 		return user_is_online, list(result)
 
-	def add_online_user(self, room_id, offline_messages=None):
+	def add_online_user(self, room_id):
 		"""
 		adds to redis
 		online_users = { connection_hash1 = stored_redis_user1, connection_hash_2 = stored_redis_user2 }
@@ -162,8 +162,6 @@ class MessagesHandler(MessagesCreator):
 			online_user_names_mes = self.room_online(online, Actions.LOGIN, room_id)
 			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes, room_id)
-			if offline_messages:
-				self.ws_write(self.load_offline_message(offline_messages, room_id))
 
 	def publish(self, message, channel, parsable=False):
 		jsoned_mess = json.dumps(message)

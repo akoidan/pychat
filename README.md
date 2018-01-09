@@ -76,6 +76,7 @@ Though ArchLinux is not recommended as a server OS I prefer using it over other 
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 
 # TODO list
+* after disconnect I guess we should fetch all messages from header or not... and if we fetch them -> replace current messages. in case someone edited message
 * WS close event doesn't fire after suspending PC to ram https://github.com/websockets/ws/issues/686
 * Add user to room search should be case insensitive
 * Add payback to firebase

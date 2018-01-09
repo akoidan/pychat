@@ -446,22 +446,22 @@ function mute() {
 }
 
 
-function readCookie(name, c, C, i) {
+function readCookie() {
+	var c, C, i;
 	c = document.cookie.split('; ');
 	var cookies = {};
 	for (i = c.length - 1; i >= 0; i--) {
 		C = c[i].split('=');
+		if (C[1]) {
+			var length = C[1].length - 1;
+			// if cookie is wrapped with quotes (for ex api)
+			if (C[1][0] === '"' && C[1][length] === '"') {
+				C[1] = C[1].substring(1, length);
+			}
+		}
 		cookies[C[0]] = C[1];
 	}
-	var cookie = cookies[name];
-	if (cookie != null) {
-		var length = cookie.length - 1;
-		// if cookie is wrapped with quotes (for ex api)
-		if (cookie[0] === '"' && cookie[length] === '"') {
-			cookie = cookie.substring(1, length);
-		}
-	}
-	return cookie;
+	return cookies;
 }
 
 function ajaxShow() {
@@ -526,7 +526,7 @@ function doPost(url, params, callback, form, isJsonEncoded) {
 			}
 		}
 	}
-	r.setRequestHeader("X-CSRFToken", readCookie("csrftoken"));
+	r.setRequestHeader("X-CSRFToken", readCookie()["csrftoken"]);
 
 	logger.http("POST out {} ::: {}", url, params)();
 	r.send(data);
