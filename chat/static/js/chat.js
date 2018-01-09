@@ -2538,7 +2538,7 @@ function ChannelsHandler() {
 		self.editLastMessageNode.notReady = false;
 		var selector = '[id="{}"] .{}'.format(self.editLastMessageNode.time, CONTENT_STYLE_CLASS);
 		userMessage.innerHTML = document.querySelector(selector).innerHTML;
-		self.placeCaretAtEnd();
+		Utils.placeCaretAtEnd();
 		event.stopPropagation();
 		document.removeEventListener('click', self.hideM2EditMessage);
 		CssUtils.hideElement(self.dom.m2Message);
@@ -2566,20 +2566,12 @@ function ChannelsHandler() {
 			CssUtils.addClass(self.editLastMessageNode.dom, self.HIGHLIGHT_MESSAGE_CLASS);
 			var selector = '[id="{}"] .{}'.format(editLastMessageNode.time, CONTENT_STYLE_CLASS);
 			userMessage.innerHTML = document.querySelector(selector).innerHTML;
-			self.placeCaretAtEnd();
+			Utils.placeCaretAtEnd();
 			event.preventDefault();
 		}
 	};
 	self.isMessageEditable = function (time) {
 		return time + 595000 > Date.now();
-	};
-	self.placeCaretAtEnd = function () {
-		var range = document.createRange();
-		range.selectNodeContents(userMessage);
-		range.collapse(false);
-		var sel = window.getSelection();
-		sel.removeAllRanges();
-		sel.addRange(range);
 	};
 	self.nextChar = function (c) {
 		return String.fromCharCode(c.charCodeAt(0) + 1)
@@ -3195,6 +3187,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.dom.chatBoxHolder.appendChild(self.dom.chatBoxDiv);
 	// tabindex allows focus, focus allows keydown binding event
 	self.dom.chatBoxDiv.setAttribute('tabindex', '1');
+
 	self.show = function () {
 		self.rendered = true;
 		CssUtils.showElement(self.dom.chatBoxDiv);
@@ -3221,6 +3214,30 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		self.newMessages = 0;
 		CssUtils.hideElement(self.dom.newMessages);
 	};
+
+	self.xDown = null;
+	self.yDown = null;
+	self.handleTouchStart = function (evt) {
+		self.xDown = evt.touches[0].clientX;
+		self.yDown = evt.touches[0].clientY;
+	};
+	self.handleTouchMove = function(evt) {
+		if (!self.xDown || !self.yDown) {
+			return;
+		}
+		var xUp = evt.touches[0].clientX;
+		var yUp = evt.touches[0].clientY;
+		var xDiff = self.xDown - xUp;
+		var yDiff = self.yDown - yUp;
+		if (Math.abs(xDiff) < Math.abs(yDiff) && yDiff < 0) {/*most significant*/
+			self.loadUpHistory();
+		}
+		/* reset values */
+		self.xDown = null;
+		self.yDown = null;
+	};
+	self.dom.chatBoxDiv.addEventListener('touchstart', self.handleTouchStart, false);
+	self.dom.chatBoxDiv.addEventListener('touchmove', self.handleTouchMove, false);
 	self.dom.chatBoxDiv.addEventListener(mouseWheelEventName, self.mouseWheelLoadUp, {passive: true});
 	self.keyDownLoadUp = function (e) {
 		if (e.which === 33) {    // page up
@@ -3359,11 +3376,12 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		delete self.allUsers[message.userId];
 	};
 	self.timeMessageClick = function (event) {
+		userMessage.focus();
 		var value = userMessage.innerHTML;
 		var match = value.match(timePattern);
 		var oldText = match ? value.substr(match[0].length) : value;
-		userMessage.innerHTML = '{}>>> {}'.format(event.target.parentElement.parentElement.textContent, oldText);
-		userMessage.focus();
+		userMessage.innerHTML = event.target.parentElement.parentElement.innerHTML + '&gt;&gt;&gt;' + String.fromCharCode(13) + ' '+ oldText;
+		Utils.placeCaretAtEnd();
 	};
 	/** Creates a DOM node with attached events and all message content*/
 	self.createMessageNode = function (timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId) {
@@ -3488,7 +3506,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		replaceLinkPattern: '<a href="$1" target="_blank">$1</a>',
 		replaceYoutubePattern: '<div class="youtube-player" data-id="$1"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
 		codePattern: /```(.+?)(?=```)```/,
-		replaceCodePattern: '<pre>$1</pre>'
+		replaceCodePattern: '<pre>$1</pre>',
+		quotePattern: /(^.*)&gt;&gt;&gt;<br>/,
+		replaceQuotePattern: '<div class="quote">$1</div>'
 	}
 	self.encodeHtmlAll = function (html) {
 		var a = encodeHTML(html).replace(self.patterns.linksRegex, self.patterns.replaceLinkPattern);
@@ -3496,6 +3516,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			a = a.replace(self.patterns.youTubePattern, self.patterns.replaceYoutubePattern);
 		}
 		a = a.replace(self.patterns.codePattern, self.patterns.replaceCodePattern);
+		a = a.replace(self.patterns.quotePattern, self.patterns.replaceQuotePattern);
 		return a;
 	}
 	self.encodeMessage = function (data) {
@@ -5790,6 +5811,14 @@ function Storage() {
 }
 
 var Utils = {
+	placeCaretAtEnd: function () {
+		var range = document.createRange();
+		range.selectNodeContents(userMessage);
+		range.collapse(false);
+		var sel = window.getSelection();
+		sel.removeAllRanges();
+		sel.addRange(range);
+	},
 	setYoutubeEvent: function (e) {
 		if (window.embeddedYoutube) {
 			var r = e.querySelector('.youtube-player')
