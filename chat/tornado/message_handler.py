@@ -148,7 +148,7 @@ class MessagesHandler(MessagesCreator):
 		"""
 		adds to redis
 		online_users = { connection_hash1 = stored_redis_user1, connection_hash_2 = stored_redis_user2 }
-		:return:
+		:return: if user is online
 		"""
 		self.async_redis_publisher.sadd(room_id, self.id)
 		# since we add user to online first, latest trigger will always show correct online
@@ -162,6 +162,7 @@ class MessagesHandler(MessagesCreator):
 			online_user_names_mes = self.room_online(online, Actions.LOGIN, room_id)
 			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes, room_id)
+		return is_online
 
 	def publish(self, message, channel, parsable=False):
 		jsoned_mess = json.dumps(message)
