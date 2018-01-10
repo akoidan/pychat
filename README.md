@@ -78,13 +78,10 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 # TODO list
 * after disconnect I guess we should fetch all messages from header or not... and if we fetch them -> replace current messages. in case someone edited message
 * WS close event doesn't fire after suspending PC to ram https://github.com/websockets/ws/issues/686
-* Add user to room search should be case insensitive
 * Add payback to firebase
 * Add docker
 * Fix all broken painter event in mobile
 * youtube iframe should contain full link with time and other parmas
-* collapsed nav should display current login name instead of static Pychat
-* growlInfo should contain X to close message, and next btn if it's a tip. so anchors would be clickable as well
 * https://static.pychat.org/photo/xE9bSyvC_image.png
 * https://developers.google.com/web/updates/2015/12/background-sync
 * Added bad code stub for: Wrong message order, that prevents of successful webrtc connection: https://github.com/leporo/tornado-redis/issues/106 https://stackoverflow.com/questions/47496922/tornado-redis-garantee-order-of-published-messages
@@ -94,11 +91,9 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * Add applying zoom to method that trigger via keyboard in canvas
 * add queued messaged to wsHandler, if ws is offline messages goes to array. userMessage input clears after we press enter and we don't restore its state we just put message to queue. When webrtc is disconnected we send reconnect event to this ws.queue
 * Just a note https://codepen.io/techslides/pen/zowLd , i guess transform: scale is better https://stackoverflow.com/questions/11332608/understanding-html-5-canvas-scale-and-translate-order https://stackoverflow.com/questions/16687023/bug-with-transform-scale-and-overflow-hidden-in-chrome
-* Add retry file send option. continue from spot we finished Or maybe autoreconnect automatically
 * remove setHeaderTest, highlight current page icos. Always display username in right top
 * Painter doesn't work on mobile devices (add ontouch)
 * add timeout to call. (finish after timeout) Display busy if calling to SAME chanel otherwise it will show multiple videos
-* Replace opacity in css to darken and lighten color function of sass
 * file transfer - add ability to click on user on receivehandler popup (draggable)
 * Add showing time left and current send speed to file transfer dialog
 * add message queue if socketed is currently disconnected ???

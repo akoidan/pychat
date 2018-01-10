@@ -2346,6 +2346,10 @@ function ChannelsHandler() {
 		webRtcFileIcon: webRtcFileIcon,
 		m2Message: $('m2Message')
 	};
+	self.initCha = function() {
+		self.dom.addUserInput.onkeyup = self.filterAddUser;
+		self.dom.addUserList.onclick = self.addUserHolderClick;
+	}
 	self.getActiveChannel = function () {
 		return self.channels[self.activeChannel];
 	};
@@ -2740,9 +2744,10 @@ function ChannelsHandler() {
 				return;
 			}
 		}
+		var v = new RegExp(filterValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'),'i');
 		for (var userName in self.addUserUsersList) {
 			if (!self.addUserUsersList.hasOwnProperty(userName)) continue;
-			if (userName.indexOf(filterValue) > -1) {
+			if (v.exec(userName)) {
 				CssUtils.showElement(self.addUserUsersList[userName]);
 			} else {
 				CssUtils.hideElement(self.addUserUsersList[userName]);
@@ -3021,6 +3026,7 @@ function ChannelsHandler() {
 		CssUtils.hideElement(navCallIcon);
 		CssUtils.hideElement(webRtcFileIcon);
 	}
+	self.initCha();
 }
 
 
@@ -5762,6 +5768,7 @@ function Storage() {
 	self.STORAGE_NAME = 'main';
 	self.cache = {}
 	self.clearStorage = function () {
+		localStorage.clear()
 		var cookies = readCookie();
 		for (var c in cookies) {
 			if (!cookies.hasOwnProperty(c)) continue;
@@ -6068,7 +6075,13 @@ var Utils = {
 			index = parseInt(index);
 		}
 		if (index < infoMessages.length) {
-			growlInfo(infoMessages[index]);
+			var growl = new Growl(infoMessages[index], function (e) {
+				if (e.target != growl.growlClose) {
+					growl.remove();
+					Utils.showHelp();
+				}
+			})
+			growl.info();
 			localStorage.setItem('HelpIndex', index + 1);
 		}
 	}

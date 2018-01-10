@@ -156,9 +156,11 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.listen(self.channels)
 			off_messages, history = self.get_offline_messages(user_rooms)
 			for room_id in user_rooms:
-				self.add_online_user(room_id)
-				if off_messages.get(room_id) or history.get(room_id):
-					self.ws_write(self.load_offline_message(off_messages.get(room_id), history.get(room_id), room_id))
+				is_online = self.add_online_user(room_id)
+				# there're no offline messages if we're online
+				offl_mess = [] if is_online else off_messages.get(room_id)
+				if offl_mess or history.get(room_id):
+					self.ws_write(self.load_offline_message(offl_mess, history.get(room_id), room_id))
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
 			self.connected = True
 			Thread(target=self.save_ip).start()
