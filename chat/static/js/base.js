@@ -332,24 +332,28 @@ var Growl = function (message, onclicklistener) {
 	};
 	self.showInfinity = function (growlClass) {
 		self.growl = document.createElement('div');
+		self.growlInner = document.createElement('div');
+		self.growlClose = document.createElement('div');
 		// logger.info("Rendering growl #{}", self.id)();
 		if (self.message) {
 			self.message = self.message.trim();
-			self.growl.innerHTML = self.message.indexOf("<") === 0 ? self.message : encodeHTML(self.message);
+			self.growlInner.innerHTML = self.message.indexOf("<") === 0 ? self.message : encodeHTML(self.message);
 		}
+		self.growl.appendChild(self.growlClose);
+		self.growl.appendChild(self.growlInner);
+		self.growlClose.className = 'icon-cancel';
 		self.growl.className = 'growl ' + growlClass;
 		self.growlHolder.appendChild(self.growl);
 		self.growl.clientHeight; // request to paint now!
 		self.growl.style.opacity++;
-		self.growl.onclick = function () {
-			onclicklistener && onclicklistener();
-			self.hide();
-		}
+		self.growl.onclick = onclicklistener;
+		self.growlClose.onclick = self.hide;
+
 	};
 	self.show = function (baseTime, growlClass) {
 		self.showInfinity(growlClass);
 		if (baseTime) {
-			var timeout = baseTime + self.message.length * 50;
+			var timeout = baseTime + self.message.length * 100;
 			setTimeout(self.hide, timeout);
 		}
 	};

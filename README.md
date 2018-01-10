@@ -100,8 +100,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * Add docker
 * Fix all broken painter event in mobile
 * youtube iframe should contain full link with time and other parmas
-* collapsed nav should display current login name instead of static Pychat
-* growlInfo should contain X to close message, and next btn if it's a tip. so anchors would be clickable as well
 * https://static.pychat.org/photo/xE9bSyvC_image.png
 * https://developers.google.com/web/updates/2015/12/background-sync
 * Added bad code stub for: Wrong message order, that prevents of successful webrtc connection: https://github.com/leporo/tornado-redis/issues/106 https://stackoverflow.com/questions/47496922/tornado-redis-garantee-order-of-published-messages

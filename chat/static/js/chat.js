@@ -5768,6 +5768,7 @@ function Storage() {
 	self.STORAGE_NAME = 'main';
 	self.cache = {}
 	self.clearStorage = function () {
+		localStorage.clear()
 		var cookies = readCookie();
 		for (var c in cookies) {
 			if (!cookies.hasOwnProperty(c)) continue;
@@ -6074,7 +6075,13 @@ var Utils = {
 			index = parseInt(index);
 		}
 		if (index < infoMessages.length) {
-			growlInfo(infoMessages[index]);
+			var growl = new Growl(infoMessages[index], function (e) {
+				if (e.target != growl.growlClose) {
+					growl.remove();
+					Utils.showHelp();
+				}
+			})
+			growl.info();
 			localStorage.setItem('HelpIndex', index + 1);
 		}
 	}
