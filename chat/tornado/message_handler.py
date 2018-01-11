@@ -241,7 +241,7 @@ class MessagesHandler(MessagesCreator):
 		self.http_client.fetch(r, callback=on_reply)
 
 	def isGiphy(self, content):
-		if GIPHY_API_KEY is not None:
+		if GIPHY_API_KEY is not None and content is not None:
 			giphy_match = re.search(GIPHY_REGEX, content)
 			return giphy_match.group(1) if giphy_match is not None else None
 
