@@ -3360,21 +3360,21 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	/** Inserts element in the middle if it's not there
 	 * @param time element
-	 * @returns Node element that follows the inserted one
+	 * @returns dict: {exists: boolean, el: Node} where el is element that follows the inserted one
 	 * @throws exception if element already there*/
 	self.getPosition = function (time) {
 		var arrayEl;
 		for (var i = 0; i < self.allMessages.length; i++) {
 			arrayEl = self.allMessages[i];
 			if (time === arrayEl) {
-				throw "Already in list";
+				return {exists: $(arrayEl)};
 			}
 			if (time < arrayEl) {
 				self.allMessages.splice(i, 0, time);
-				return $(arrayEl);
+				return {el: $(arrayEl)};
 			}
 		}
-		return null;
+		return {el: null};
 	};
 	self.removeUser = function (message) {
 		//if (self.onlineUsers.indexOf(message.userId) >= 0) {
@@ -3460,21 +3460,22 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
 	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, symbol) {
 		var pos = null;
-		if (self.allMessages.length > 0 && !(timeMillis > self.allMessages[self.allMessages.length - 1])) {
-			try {
-				pos = self.getPosition(timeMillis);
-			} catch (err) {
-				logger.warn("Skipping duplicate message, time: {}, content: <<<{}>>> ",
-						timeMillis, htmlEncodedContent)();
-				return;
-			}
-		} else {
-			self.allMessages.push(timeMillis);
-		}
-		var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId);
+			var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId);
 		// every message has UTC millis ID so we can detect if message is already displayed or position to display
 		if (symbol) {
 			p.setAttribute('symbol', symbol)
+		}
+		if (self.allMessages.length > 0 && !(timeMillis > self.allMessages[self.allMessages.length - 1])) {
+				var posRes = self.getPosition(timeMillis);
+				if (posRes.exists) {
+					logger.info("Updaing message with timeId {}", timeMillis)();
+					self.dom.chatBoxDiv.replaceChild(p, posRes.exists);
+					return
+				} else {
+					pos = posRes.el;
+				}
+		} else {
+			self.allMessages.push(timeMillis);
 		}
 		pos = self.insertCurrentDay(timeMillis, pos);
 		if (pos != null) {
