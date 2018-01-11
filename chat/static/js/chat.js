@@ -1891,15 +1891,22 @@ function NotifierHandler() {
 	// Permissions are granted here!
 	self.showNot = function(params) {
 		try {
-			var not = new Notification(params.title, {icon: params.icon, body: params.body})
-			self.popedNotifQueue.push(not);
-			self.lastNotifyTime = Date.now();
-			not.onclick = self.notificationClick;
-			not.onclose = function () {
-				self.popedNotifQueue.pop(this);
-			};
-			setTimeout(self.clearNotification, self.clearNotificationTime);
-			logger.info("New notification has been spawned {}", params)();
+			if (self.serviceWorkerRegistration && isMobile && isChrome) {
+				self.serviceWorkerRegistration.showNotification(params.title, params).then(function(r) {
+					logger.info("res {}", r)();
+					//TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
+				})
+			} else {
+				var not = new Notification(params.title, params)
+				self.popedNotifQueue.push(not);
+				self.lastNotifyTime = Date.now();
+				not.onclick = self.notificationClick;
+				not.onclose = function () {
+					self.popedNotifQueue.pop(this);
+				};
+				setTimeout(self.clearNotification, self.clearNotificationTime);
+				logger.info("New notification has been spawned {}", params)();
+			}
 		} catch (e) {
 			logger.error("Failed to show notification {}", e)();
 		}
@@ -1951,6 +1958,7 @@ function NotifierHandler() {
 			return navigator.serviceWorker.ready;
 		}).then(function (serviceWorkerRegistration) {
 			logger.info("Service worker is ready {}", serviceWorkerRegistration)();
+			self.serviceWorkerRegistration = serviceWorkerRegistration;
 			return serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true})
 		}).then(function (subscription) {
 			logger.info("Got subscription {}", subscription)();
@@ -5821,7 +5829,6 @@ var Utils = {
 		}
 	},
 	setMediaBitrate: function (sdp, bitrate) {
-		return sdp;
 		var lines = sdp.split("\n");
 		var line = -1;
 		for (var i = 0; i < lines.length; i++) {
