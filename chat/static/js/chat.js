@@ -678,8 +678,6 @@ function Painter() {
 			// self.log("{} mouse down", self.mode)();
 			self.events.mouseDown = true
 			var rect = painter.dom.canvas.getBoundingClientRect();
-			self.leftOffset = rect.left;
-			self.topOffset = rect.top;
 			var imgData;
 			if (!tool.bufferHandler) {
 				imgData = self.buffer.startAction();
@@ -715,11 +713,12 @@ function Painter() {
 			e.preventDefault();
 			var xy = self.helper.getXY(e)
 			self.helper.setZoom(e.detail < 0 || e.wheelDelta > 0); // isTop
-			var scrollLeft = (xy.x * self.zoom) - (e.clientX - self.leftOffset);
-			self.dom.canvasWrapper.scrollLeft = scrollLeft
-			var scrollTop = (xy.y * self.zoom) - (e.clientY - self.topOffset);
-			self.dom.canvasWrapper.scrollTop = scrollTop;
 			self.helper.applyZoom()
+			var clientRect = self.dom.canvasWrapper.getBoundingClientRect();
+			var scrollLeft = (xy.x * self.zoom) - (e.clientX - clientRect.left);
+			var scrollTop = (xy.y * self.zoom) - (e.clientY - clientRect.top);
+			self.dom.canvasWrapper.scrollLeft = scrollLeft
+			self.dom.canvasWrapper.scrollTop = scrollTop;
 		},
 		contKeyPress: function (event) {
 			self.log("keyPress: {} ({})", event.keyCode, event.code)();

@@ -109,13 +109,10 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * add queued messaged to wsHandler, if ws is offline messages goes to array. userMessage input clears after we press enter and we don't restore its state we just put message to queue. When webrtc is disconnected we send reconnect event to this ws.queue
 * Just a note https://codepen.io/techslides/pen/zowLd , i guess transform: scale is better https://stackoverflow.com/questions/11332608/understanding-html-5-canvas-scale-and-translate-order https://stackoverflow.com/questions/16687023/bug-with-transform-scale-and-overflow-hidden-in-chrome
 * remove setHeaderTest, highlight current page icos. Always display username in right top
-* Painter doesn't work on mobile devices (add ontouch)
 * add timeout to call. (finish after timeout) Display busy if calling to SAME chanel otherwise it will show multiple videos
 * file transfer - add ability to click on user on receivehandler popup (draggable)
-* Add showing time left and current send speed to file transfer dialog
 * add message queue if socketed is currently disconnected ???
 * Add link to gihub in console
-* webrtc connection lost while transfering file causes js error
 * Add title for room.
 * TODO if someone offers a new call till establishing connection for a call self.call_receiver_channel would be set to wrong
 * !!!IMPORTANT Debug call dialog by switching channels while calling and no.
