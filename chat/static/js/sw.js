@@ -114,7 +114,7 @@ self.addEventListener('notificationclick', function (event) {
 				return client.focus();
 			}
 		}
-		if (clients.openWindow) {
+		if (clients.openWindow && event.notification.data) {
 			return clients.openWindow(event.notification.data.url);
 		}
 	}));

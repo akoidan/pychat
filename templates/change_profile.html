@@ -13,6 +13,12 @@
 			<table class="biginputtext" id="userProfileData">
 				{{ form.as_table }}
 				<tr>
+					<th><label>Clear history</label></th>
+					<td style="padding: 10px 0">
+						<input type="button"  class="button lor-btn" value="clear now" onclick="channelsHandler.clearChannelHistory()"/>
+					</td>
+				</tr>
+				<tr>
 					<th><label for="themeSelector">Theme:</label></th>
 					<td>
 						<select id="themeSelector">
@@ -23,7 +29,7 @@
 					</td>
 				</tr>
 				<tr>
-					<td colspan="2" style="text-align: center"><input type="submit"  value="Save"/></td>
+					<td colspan="2" style="text-align: center"><input type="submit" class="green-btn " value="Save"/></td>
 				</tr>
 			</table>
 		</div>

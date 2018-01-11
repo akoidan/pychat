@@ -67,7 +67,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				raise Exception("event {} is unknown".format(message[VarNames.EVENT]))
 			channel = message.get(VarNames.CHANNEL)
 			if channel and channel not in self.channels:
-				raise Exception('Access denied for channel {}. Allowed channels: {}'.format(channel, self.channels))
+				raise ValidationError('Access denied for channel {}. Allowed channels: {}'.format(channel, self.channels))
 			self.pre_process_message[message[VarNames.EVENT]](message)
 		except ValidationError as e:
 			error_message = self.default(str(e.message), Actions.GROWL_MESSAGE, HandlerNames.GROWL)

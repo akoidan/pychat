@@ -678,8 +678,6 @@ function Painter() {
 			// self.log("{} mouse down", self.mode)();
 			self.events.mouseDown = true
 			var rect = painter.dom.canvas.getBoundingClientRect();
-			self.leftOffset = rect.left;
-			self.topOffset = rect.top;
 			var imgData;
 			if (!tool.bufferHandler) {
 				imgData = self.buffer.startAction();
@@ -715,11 +713,12 @@ function Painter() {
 			e.preventDefault();
 			var xy = self.helper.getXY(e)
 			self.helper.setZoom(e.detail < 0 || e.wheelDelta > 0); // isTop
-			var scrollLeft = (xy.x * self.zoom) - (e.clientX - self.leftOffset);
-			self.dom.canvasWrapper.scrollLeft = scrollLeft
-			var scrollTop = (xy.y * self.zoom) - (e.clientY - self.topOffset);
-			self.dom.canvasWrapper.scrollTop = scrollTop;
 			self.helper.applyZoom()
+			var clientRect = self.dom.canvasWrapper.getBoundingClientRect();
+			var scrollLeft = (xy.x * self.zoom) - (e.clientX - clientRect.left);
+			var scrollTop = (xy.y * self.zoom) - (e.clientY - clientRect.top);
+			self.dom.canvasWrapper.scrollLeft = scrollLeft
+			self.dom.canvasWrapper.scrollTop = scrollTop;
 		},
 		contKeyPress: function (event) {
 			self.log("keyPress: {} ({})", event.keyCode, event.code)();
@@ -1891,15 +1890,22 @@ function NotifierHandler() {
 	// Permissions are granted here!
 	self.showNot = function(params) {
 		try {
-			var not = new Notification(params.title, {icon: params.icon, body: params.body})
-			self.popedNotifQueue.push(not);
-			self.lastNotifyTime = Date.now();
-			not.onclick = self.notificationClick;
-			not.onclose = function () {
-				self.popedNotifQueue.pop(this);
-			};
-			setTimeout(self.clearNotification, self.clearNotificationTime);
-			logger.info("New notification has been spawned {}", params)();
+			if (self.serviceWorkerRegistration && isMobile && isChrome) {
+				self.serviceWorkerRegistration.showNotification(params.title, params).then(function(r) {
+					logger.info("res {}", r)();
+					//TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
+				})
+			} else {
+				var not = new Notification(params.title, params)
+				self.popedNotifQueue.push(not);
+				self.lastNotifyTime = Date.now();
+				not.onclick = self.notificationClick;
+				not.onclose = function () {
+					self.popedNotifQueue.pop(this);
+				};
+				setTimeout(self.clearNotification, self.clearNotificationTime);
+				logger.info("New notification has been spawned {}", params)();
+			}
 		} catch (e) {
 			logger.error("Failed to show notification {}", e)();
 		}
@@ -1951,6 +1957,7 @@ function NotifierHandler() {
 			return navigator.serviceWorker.ready;
 		}).then(function (serviceWorkerRegistration) {
 			logger.info("Service worker is ready {}", serviceWorkerRegistration)();
+			self.serviceWorkerRegistration = serviceWorkerRegistration;
 			return serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true})
 		}).then(function (subscription) {
 			logger.info("Got subscription {}", subscription)();
@@ -3352,21 +3359,21 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	/** Inserts element in the middle if it's not there
 	 * @param time element
-	 * @returns Node element that follows the inserted one
+	 * @returns dict: {exists: boolean, el: Node} where el is element that follows the inserted one
 	 * @throws exception if element already there*/
 	self.getPosition = function (time) {
 		var arrayEl;
 		for (var i = 0; i < self.allMessages.length; i++) {
 			arrayEl = self.allMessages[i];
 			if (time === arrayEl) {
-				throw "Already in list";
+				return {exists: $(arrayEl)};
 			}
 			if (time < arrayEl) {
 				self.allMessages.splice(i, 0, time);
-				return $(arrayEl);
+				return {el: $(arrayEl)};
 			}
 		}
-		return null;
+		return {el: null};
 	};
 	self.removeUser = function (message) {
 		//if (self.onlineUsers.indexOf(message.userId) >= 0) {
@@ -3452,21 +3459,22 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
 	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, symbol) {
 		var pos = null;
-		if (self.allMessages.length > 0 && !(timeMillis > self.allMessages[self.allMessages.length - 1])) {
-			try {
-				pos = self.getPosition(timeMillis);
-			} catch (err) {
-				logger.warn("Skipping duplicate message, time: {}, content: <<<{}>>> ",
-						timeMillis, htmlEncodedContent)();
-				return;
-			}
-		} else {
-			self.allMessages.push(timeMillis);
-		}
-		var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId);
+			var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId);
 		// every message has UTC millis ID so we can detect if message is already displayed or position to display
 		if (symbol) {
 			p.setAttribute('symbol', symbol)
+		}
+		if (self.allMessages.length > 0 && !(timeMillis > self.allMessages[self.allMessages.length - 1])) {
+				var posRes = self.getPosition(timeMillis);
+				if (posRes.exists) {
+					logger.info("Updaing message with timeId {}", timeMillis)();
+					self.dom.chatBoxDiv.replaceChild(p, posRes.exists);
+					return
+				} else {
+					pos = posRes.el;
+				}
+		} else {
+			self.allMessages.push(timeMillis);
 		}
 		pos = self.insertCurrentDay(timeMillis, pos);
 		if (pos != null) {
@@ -3512,8 +3520,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		replaceYoutubePattern: '<div class="youtube-player" data-id="$1"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
 		codePattern: /```(.+?)(?=```)```/,
 		replaceCodePattern: '<pre>$1</pre>',
-		quotePattern: /(^\(\d\d:\d\d:\d\d\)\s\w+:.*)&gt;&gt;&gt;<br>/,
-		replaceQuotePattern: '<div class="quote">$1</div>'
+		quotePattern: /(^\(\d\d:\d\d:\d\d\)\s\w+:)(.*)&gt;&gt;&gt;<br>/,
+		replaceQuotePattern: '<div class="quote"><span>$1</span>$2</div>'
 	}
 	self.encodeHtmlAll = function (html) {
 		var a = encodeHTML(html).replace(self.patterns.linksRegex, self.patterns.replaceLinkPattern);
@@ -5030,7 +5038,8 @@ function FileSender(removeReferenceFn, file) {
 
 function FilePeerConnection() {
 	var self = this;
-	self.CHUNK_SIZE = 16384;
+	self.SEND_CHUNK_SIZE = 16384;
+	self.READ_CHUNK_SIZE = self.SEND_CHUNK_SIZE * 64; // 1MB per file chunk
 	self.MAX_BUFFER_SIZE = 256;
 	self.receivedSize = 0;
 	self.sdpConstraints = {};
@@ -5265,6 +5274,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 	self.ondestroyFileConnection = function (data) {
 		self.superOnDestroyFileConnection();
 		if (data.content === 'success') {
+			self.downloadBar.setValue(self.fileSize); // we set value last time
 			self.downloadBar.setStatus("File transferred");
 			self.downloadBar.setSuccess();
 
@@ -5298,7 +5308,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 		}
 	};
 	self.sendCurrentSlice = function () {
-		var currentSlice = self.file.slice(self.offset, self.offset + self.CHUNK_SIZE);
+		var currentSlice = self.file.slice(self.offset, self.offset + self.READ_CHUNK_SIZE);
 		self.reader.readAsArrayBuffer(currentSlice);
 	};
 	self.logTransferProgress = function () {
@@ -5312,23 +5322,42 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 		}
 	};
 	self.onFileReaderLoad = function (e) {
+		if (e.target.result.byteLength > 0 ) {
+			self.sendData(e.target.result, 0, function() {
+				self.offset += e.target.result.byteLength;
+				self.sendCurrentSlice();
+			});
+		} else {
+			function trackTransfer() {
+				if (self.sendChannel.readyState === 'open' && self.sendChannel.bufferedAmount > 0) {
+					self.downloadBar.setValue(self.offset - self.sendChannel.bufferedAmount);
+					setTimeout(trackTransfer, 500);
+				} else if (self.sendChannel.bufferedAmount == 0) {
+						self.downloadBar.setValue(self.offset);
+				}
+			}
+			trackTransfer();
+			self.log("Exiting, offset is {} now, fs: {}", self.offset, self.fileSize)();
+		}
+	}
+	self.sendData = function(data, offset, cb) {
 		try {
 			if (self.sendChannel.readyState === 'open') {
 				if (self.sendChannel.bufferedAmount > 10000000) { // prevent chrome buffer overfill
 					// if it happens chrome will just close the datachannel
 					self.logTransferProgress("Buffer overflow by {}bytes, waiting to flush...",
 							bytesToSize(self.sendChannel.bufferedAmount))();
-					return window.setTimeout(self.onFileReaderLoad, 100, {target: {result: e.target.result}});
+					return window.setTimeout(self.sendData, 100, data, offset, cb);
 				} else {
-					self.sendChannel.send(e.target.result);
-					var readSize = e.target.result.byteLength;
-					if (self.fileSize > self.offset + readSize) {
-						window.setTimeout(self.sendCurrentSlice, 0);
+					var buffer = data.slice(offset, offset + self.SEND_CHUNK_SIZE);
+					self.sendChannel.send(buffer);
+					var chunkOffset = offset + buffer.byteLength;
+					self.setTranseferdAmount(self.offset + chunkOffset - self.sendChannel.bufferedAmount);
+					if (data.byteLength > chunkOffset) {
+						self.sendData(data, chunkOffset, cb);
 					} else {
-						self.log("Exiting, offset is {} now, fs: {}", self.offset, self.fileSize)();
+						cb();
 					}
-					self.setTranseferdAmount(self.offset + readSize);
-					self.offset += self.CHUNK_SIZE;
 				}
 			} else {
 				throw 'sendChannel status is {} which is not equals to "open"'.format(self.sendChannel.readyState);
@@ -5821,7 +5850,6 @@ var Utils = {
 		}
 	},
 	setMediaBitrate: function (sdp, bitrate) {
-		return sdp;
 		var lines = sdp.split("\n");
 		var line = -1;
 		for (var i = 0; i < lines.length; i++) {

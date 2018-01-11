@@ -76,7 +76,6 @@ Though ArchLinux is not recommended as a server OS I prefer using it over other 
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 
 # TODO list
-* after disconnect I guess we should fetch all messages from header or not... and if we fetch them -> replace current messages. in case someone edited message
 * WS close event doesn't fire after suspending PC to ram https://github.com/websockets/ws/issues/686
 * Add payback to firebase
 * Add docker
@@ -92,10 +91,8 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * add queued messaged to wsHandler, if ws is offline messages goes to array. userMessage input clears after we press enter and we don't restore its state we just put message to queue. When webrtc is disconnected we send reconnect event to this ws.queue
 * Just a note https://codepen.io/techslides/pen/zowLd , i guess transform: scale is better https://stackoverflow.com/questions/11332608/understanding-html-5-canvas-scale-and-translate-order https://stackoverflow.com/questions/16687023/bug-with-transform-scale-and-overflow-hidden-in-chrome
 * remove setHeaderTest, highlight current page icos. Always display username in right top
-* Painter doesn't work on mobile devices (add ontouch)
 * add timeout to call. (finish after timeout) Display busy if calling to SAME chanel otherwise it will show multiple videos
 * file transfer - add ability to click on user on receivehandler popup (draggable)
-* Add showing time left and current send speed to file transfer dialog
 * add message queue if socketed is currently disconnected ???
 * Add link to gihub in console
 * `'` Symbol in links breaks anchor tag. For example https://raw.githubusercontent.com/NeverSinkDev/NeverSink-Filter/master/NeverSink's%20filter%20-%201-REGULAR.filter
@@ -105,7 +102,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * !!!IMPORTANT Debug call dialog by switching channels while calling and no.
 * shape-inside for contentteditable 
 * Add multi-language support. 
-* Move clear cache icon from nav to settings
 * add email confirmation for username or password change
 * remember if user has camera/mic and autoset values after second call
 * android play() can only be initiated by a user gesture.
