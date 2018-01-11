@@ -5038,7 +5038,8 @@ function FileSender(removeReferenceFn, file) {
 
 function FilePeerConnection() {
 	var self = this;
-	self.CHUNK_SIZE = 16384;
+	self.SEND_CHUNK_SIZE = 16384;
+	self.READ_CHUNK_SIZE = self.SEND_CHUNK_SIZE * 64;
 	self.MAX_BUFFER_SIZE = 256;
 	self.receivedSize = 0;
 	self.sdpConstraints = {};
@@ -5273,6 +5274,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 	self.ondestroyFileConnection = function (data) {
 		self.superOnDestroyFileConnection();
 		if (data.content === 'success') {
+			self.downloadBar.setValue(self.fileSize); // we set value last time
 			self.downloadBar.setStatus("File transferred");
 			self.downloadBar.setSuccess();
 
@@ -5306,7 +5308,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 		}
 	};
 	self.sendCurrentSlice = function () {
-		var currentSlice = self.file.slice(self.offset, self.offset + self.CHUNK_SIZE);
+		var currentSlice = self.file.slice(self.offset, self.offset + self.READ_CHUNK_SIZE);
 		self.reader.readAsArrayBuffer(currentSlice);
 	};
 	self.logTransferProgress = function () {
@@ -5320,23 +5322,42 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 		}
 	};
 	self.onFileReaderLoad = function (e) {
+		if (e.target.result.byteLength > 0 ) {
+			self.sendData(e.target.result, 0, function() {
+				self.offset += e.target.result.byteLength;
+				self.sendCurrentSlice();
+			});
+		} else {
+			function trackTransfer() {
+				if (self.sendChannel.readyState === 'open' && self.sendChannel.bufferedAmount > 0) {
+					self.downloadBar.setValue(self.offset - self.sendChannel.bufferedAmount);
+					setTimeout(trackTransfer, 500);
+				} else if (self.sendChannel.bufferedAmount == 0) {
+						self.downloadBar.setValue(self.offset);
+				}
+			}
+			trackTransfer();
+			self.log("Exiting, offset is {} now, fs: {}", self.offset, self.fileSize)();
+		}
+	}
+	self.sendData = function(data, offset, cb) {
 		try {
 			if (self.sendChannel.readyState === 'open') {
 				if (self.sendChannel.bufferedAmount > 10000000) { // prevent chrome buffer overfill
 					// if it happens chrome will just close the datachannel
 					self.logTransferProgress("Buffer overflow by {}bytes, waiting to flush...",
 							bytesToSize(self.sendChannel.bufferedAmount))();
-					return window.setTimeout(self.onFileReaderLoad, 100, {target: {result: e.target.result}});
+					return window.setTimeout(self.sendData, 100, data, offset, cb);
 				} else {
-					self.sendChannel.send(e.target.result);
-					var readSize = e.target.result.byteLength;
-					if (self.fileSize > self.offset + readSize) {
-						window.setTimeout(self.sendCurrentSlice, 0);
+					var buffer = data.slice(offset, offset + self.SEND_CHUNK_SIZE);
+					self.sendChannel.send(buffer);
+					var chunkOffset = offset + buffer.byteLength;
+					self.setTranseferdAmount(self.offset + chunkOffset - self.sendChannel.bufferedAmount);
+					if (data.byteLength > chunkOffset) {
+						self.sendData(data, chunkOffset, cb);
 					} else {
-						self.log("Exiting, offset is {} now, fs: {}", self.offset, self.fileSize)();
+						cb();
 					}
-					self.setTranseferdAmount(self.offset + readSize);
-					self.offset += self.CHUNK_SIZE;
 				}
 			} else {
 				throw 'sendChannel status is {} which is not equals to "open"'.format(self.sendChannel.readyState);
