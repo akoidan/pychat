@@ -5039,7 +5039,7 @@ function FileSender(removeReferenceFn, file) {
 function FilePeerConnection() {
 	var self = this;
 	self.SEND_CHUNK_SIZE = 16384;
-	self.READ_CHUNK_SIZE = self.SEND_CHUNK_SIZE * 64;
+	self.READ_CHUNK_SIZE = self.SEND_CHUNK_SIZE * 64; // 1MB per file chunk
 	self.MAX_BUFFER_SIZE = 256;
 	self.receivedSize = 0;
 	self.sdpConstraints = {};

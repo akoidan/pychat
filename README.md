@@ -118,7 +118,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * !!!IMPORTANT Debug call dialog by switching channels while calling and no.
 * shape-inside for contentteditable 
 * Add multi-language support. 
-* Move clear cache icon from nav to settings
 * add email confirmation for username or password change
 * remember if user has camera/mic and autoset values after second call
 * android play() can only be initiated by a user gesture.

@@ -386,7 +386,13 @@ function growlInfo(message) {
 	new Growl(message).info();
 }
 
-
+function setTheme() {
+	var theme = localStorage.getItem('theme');
+	if (theme != null) {
+		document.body.className = theme;
+	}
+	isMobile && CssUtils.addClass(document.body, 'mobile')
+}
 onDocLoad(function () {
 	muteBtn = $("muteBtn");
 	var sound = localStorage.getItem('sound');
@@ -396,10 +402,7 @@ onDocLoad(function () {
 		window.sound = sound - 1;
 	}
 	mute();
-	var theme = localStorage.getItem('theme');
-	if (theme != null) {
-		document.body.className = theme;
-	}
+	setTheme();
 	ajaxLoader = $("ajaxStatus");
 	if (typeof InstallTrigger !== 'undefined') { // browser = firefox
 		logger.warn("Ops, there's no scrollbar for firefox")();

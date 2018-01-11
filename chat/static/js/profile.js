@@ -168,7 +168,7 @@ function preventDefault(e) {
 function setJsState() {
 	var options = [];
 	localStorage.setItem('theme', themeSelector.value);
-	document.body.className = themeSelector.value;
+	setTheme();
 	notifications = notificationInput.checked; // global var
 	cacheMessages = cacheMessagesInput.checked; // global var
 	window.embeddedYoutube = embeddedYoutubeInput.checked; // global var
