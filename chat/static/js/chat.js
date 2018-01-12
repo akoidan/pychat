@@ -3520,7 +3520,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		replaceYoutubePattern: '<div class="youtube-player" data-id="$1"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
 		codePattern: /```(.+?)(?=```)```/,
 		replaceCodePattern: '<pre>$1</pre>',
-		quotePattern: /(^\(\d\d:\d\d:\d\d\)\s\w+:)(.*)&gt;&gt;&gt;<br>/,
+		quotePattern: /(^\(\d\d:\d\d:\d\d\)\s[a-zA-Z-_0-9]{1,16}:)(.*)&gt;&gt;&gt;<br>/,
 		replaceQuotePattern: '<div class="quote"><span>$1</span>$2</div>'
 	}
 	self.encodeHtmlAll = function (html) {
