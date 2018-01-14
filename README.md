@@ -94,7 +94,6 @@ You can also find full production setup for *[Archlinux](https://www.archlinux.o
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
-* Nick with '-' can't be quoted
 * WS close event doesn't fire after suspending PC to ram https://github.com/websockets/ws/issues/686
 * Add payback to firebase
 * Add docker
