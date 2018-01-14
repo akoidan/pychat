@@ -1,0 +1,22 @@
+version: '3.3'
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfileserver
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfiledatabase
+      ports:
+      - 3306:3306
+  redis:
+    image: redis:latest
+    ports:
+     - 6379:6379
+  ws:
+    build:
+      context: .
+      dockerfile: Dockerfilewebsocket
+      ports:
+      - 8888:8888
