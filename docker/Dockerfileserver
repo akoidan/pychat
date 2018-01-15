@@ -1,4 +1,4 @@
 FROM python:3.6
-COPY . /usr/src
+COPY ./chat ./manage.py ./requirements.txt ./templates  ./download_content.sh /usr/src/
 WORKDIR  /usr/src/
 RUN pip install -r requirements.txt

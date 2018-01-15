@@ -135,6 +135,7 @@ if 'DATABASES' not in locals():
 			'USER': 'root', # TODO put your username here
 			'PASSWORD': '', # TODO put your password here
 			'default-character-set': 'utf8',
+			'PORT': 3306,
 			'OPTIONS': {
 				'autocommit': True,
 
