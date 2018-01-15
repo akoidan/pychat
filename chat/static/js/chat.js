@@ -177,8 +177,8 @@ function Draggable(container, headerText) {
 	};
 	self.init = function () {
 		CssUtils.addClass(self.dom.container, "modal-body");
-		self.dom.container.style.left = '10%';
-		self.dom.container.style.top = '10%';
+		self.dom.container.style.left = '100px';
+		self.dom.container.style.top = '10px';
 		self.dom.header.appendChild(self.dom.iconMinimize);
 		self.dom.iconMinimize.onclick = self.minimize;
 		self.dom.iconMinimize.className = 'icon-minimize';
@@ -382,6 +382,13 @@ function Painter() {
 			self.ctx = self.dom.canvas.getContext('2d');
 			self.ctx.imageSmoothingEnabled= false;
 			self.ctx.mozImageSmoothingEnabled = false;
+			var height = Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight,
+					document.documentElement.scrollHeight, document.documentElement.offsetHeight);
+			var width = Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight,
+					document.documentElement.scrollHeight, document.documentElement.offsetHeight);
+			self.helper.setDimensions(500, 500);
+			self.dom.canvasWrapper.style.height = height * 0.9 - 100 + 'px'
+			self.dom.canvasWrapper.style.width = width * 0.9 - 80 + 'px'
 		},
 		fixInput: self.fixInputs,
 		initInstruments: function () { // TODO this looks bad
@@ -502,13 +509,9 @@ function Painter() {
 		setUIText: function(text) {
 			self.dom.paintXY.textContent = text + ' ' + Math.round(self.zoom * 100) + '%';
 		},
-		openCanvas: function (e) { // TODO
+		openCanvas: function (e) {
 			self.show();
 			self.buffer.clear();
-			self.helper.setDimensions(
-					self.dom.canvasWrapper.offsetWidth - 15,
-					self.dom.canvasWrapper.offsetHeight - 15
-			);
 			self.init.setContext();
 			self.setMode('pen');
 		},
@@ -635,13 +638,15 @@ function Painter() {
 			}
 			return {offsetTop: _y, offsetLeft: _x};
 		},
-		getXY: function (e) {
+		setOffset: function(e) {
 			if (!e.offsetX && e.touches) {
 				var offset = self.helper.getOffset(self.dom.canvas);
 				var pxy = self.helper.getPageXY(e);
-				e.offsetX = pxy.pageX- offset.offsetLeft;
-				e.offsetY = pxy.pageY- offset.offsetTop;
+				e.offsetX = Math.round(pxy.pageX- offset.offsetLeft);
+				e.offsetY = Math.round(pxy.pageY- offset.offsetTop);
 			}
+		},
+		getXY: function (e) {
 			var newVar = {
 				x: self.helper.getScaledOrdinate('width', 'clientWidth', e.offsetX),
 				y: self.helper.getScaledOrdinate('height', 'clientHeight', e.offsetY)
@@ -675,6 +680,7 @@ function Painter() {
 			if (!tool.onMouseDown) {
 				return;
 			}
+			self.helper.setOffset(e);
 			// self.log("{} mouse down", self.mode)();
 			self.events.mouseDown = true
 			var rect = painter.dom.canvas.getBoundingClientRect();
@@ -686,6 +692,7 @@ function Painter() {
 		},
 		onmousemove: function(e) {
 			var tool = self.tools[self.mode];
+			self.helper.setOffset(e);
 			var xy = self.helper.getXY(e);
 			self.helper.setUIText("[{},{}]".format(xy.x, xy.y));
 			if (self.events.mouseDown && tool.onMouseMove) {
@@ -711,6 +718,7 @@ function Painter() {
 				return;
 			}
 			e.preventDefault();
+			self.helper.setOffset(e);
 			var xy = self.helper.getXY(e)
 			self.helper.setZoom(e.detail < 0 || e.wheelDelta > 0); // isTop
 			self.helper.applyZoom()
@@ -951,7 +959,7 @@ function Painter() {
 				x = __ret.x;
 				y = __ret.y;
 			}
-// 			self.log('handleMouseMove ({}, {})', x, y)();
+ 			self.log('handleMouseMove ({}, {})', x, y)();
 			tool.handlers[tool.mode.charAt(0)](x, y);
 			if (tool.mode.length === 2) {
 				tool.handlers[tool.mode.charAt(1)](x, y);
@@ -3520,7 +3528,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		replaceYoutubePattern: '<div class="youtube-player" data-id="$1"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
 		codePattern: /```(.+?)(?=```)```/,
 		replaceCodePattern: '<pre>$1</pre>',
-		quotePattern: /(^\(\d\d:\d\d:\d\d\)\s\w+:)(.*)&gt;&gt;&gt;<br>/,
+		quotePattern: /(^\(\d\d:\d\d:\d\d\)\s[a-zA-Z-_0-9]{1,16}:)(.*)&gt;&gt;&gt;<br>/,
 		replaceQuotePattern: '<div class="quote"><span>$1</span>$2</div>'
 	}
 	self.encodeHtmlAll = function (html) {

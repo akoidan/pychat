@@ -414,20 +414,26 @@ ul#directUserTable
 		display: flex
 		margin-left: -5px
 		flex-direction: column
+		height: fit-content
 		*
 			display: flex
 			padding: 5px 5px 5px 0
+		@media screen and (max-height: 600px)
+			width: 60px
+			flex-direction: row
+			flex-wrap: wrap
 	.canvasWrapper
 		position: relative
 		overflow: auto
 		// select none prevent paste event  https://stackoverflow.com/questions/31207253/onpaste-paste-event-not-firing-for-table-on-first-few-attempts
 		//@extend %user-select-none
 		background-color: #313131
-		max-height: calc(90vh - 50px)
-		max-width: calc(90vw - 50px)
+		max-height: calc(95vh - 100px)
+		max-width: calc(90vw - 80px)
 		border: 1px solid transparent
 		//border: 1px solid #697075
-
+		#painter
+			touch-action: none
 		canvas
 			$c1: #cacacc
 			$c2: transparent
@@ -449,6 +455,14 @@ ul#directUserTable
 			min-width: 5px
 			word-wrap: normal
 			padding: 0 1px
+
+.mobile
+	#painterTools
+		> *
+			transform: scale(1.4, 1.4)
+			margin: 5px
+		@media screen and (max-height: 600px)
+			width: 80px
 
 #paintUndo, #paintRedo
 	&.disabled
