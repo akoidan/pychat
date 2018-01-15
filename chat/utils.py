@@ -32,7 +32,7 @@ from chat.tornado.message_creator import MessagesCreator
 
 USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
 API_URL = getattr(settings, "IP_API_URL", None)
-RECAPTCHA_SECRET_KEY = getattr(settings, "RECAPTCHA_SECRET_KEY", None)
+RECAPTCHA_PRIVATE_KEY = getattr(settings, "RECAPTCHA_PRIVATE_KEY", None)
 GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
 GOOGLE_OAUTH_2_HOST = getattr(settings, "GOOGLE_OAUTH_2_HOST", None)
 FACEBOOK_ACCESS_TOKEN = getattr(settings, "FACEBOOK_ACCESS_TOKEN", None)
@@ -253,16 +253,16 @@ def check_captcha(request):
 	"""
 	:type request: WSGIRequest
 	:raises ValidationError: if captcha is not valid or not set
-	If RECAPTCHA_SECRET_KEY is enabled in settings validates request with it
+	If RECAPTCHA_PRIVATE_KEY is enabled in settings validates request with it
 	"""
-	if not RECAPTCHA_SECRET_KEY:
+	if not RECAPTCHA_PRIVATE_KEY:
 		logger.debug('Skipping captcha validation')
 		return
 	try:
 		captcha_rs = request.POST.get('g-recaptcha-response')
 		url = "https://www.google.com/recaptcha/api/siteverify"
 		params = {
-			'secret': RECAPTCHA_SECRET_KEY,
+			'secret': RECAPTCHA_PRIVATE_KEY,
 			'response': captcha_rs,
 			'remoteip': local.client_ip
 		}

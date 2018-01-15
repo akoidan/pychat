@@ -12,6 +12,7 @@ requests
 enum34
 django-sslserver # for browser access to input devices
 #django-redis-cache
+django-captcha-admin
 # PyMySQL
 # mysql-connector-python
 mysqlclient # for windows you can install client with mysql installer or via whl file specified in readme

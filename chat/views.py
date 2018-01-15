@@ -35,7 +35,7 @@ from chat.utils import hide_fields, check_user, check_password, check_email, ext
 	create_user_model, check_captcha, send_reset_password_email
 
 logger = logging.getLogger(__name__)
-RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
+RECAPTCHA_PUBLIC_KEY = getattr(settings, "RECAPTCHA_PUBLIC_KEY", None)
 RECAPTHCA_SITE_URL = getattr(settings, "RECAPTHCA_SITE_URL", None)
 GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
 GOOGLE_OAUTH_2_JS_URL = getattr(settings, "GOOGLE_OAUTH_2_JS_URL", None)
@@ -352,10 +352,10 @@ class RegisterView(View):
 	def get(self, request):
 		logger.debug(
 			'Rendering register page with captcha site key %s and oauth key %s',
-			RECAPTCHA_SITE_KEY, GOOGLE_OAUTH_2_CLIENT_ID
+			RECAPTCHA_PUBLIC_KEY, GOOGLE_OAUTH_2_CLIENT_ID
 		)
 		c = csrf(request)
-		c['captcha_key'] = RECAPTCHA_SITE_KEY
+		c['captcha_key'] = RECAPTCHA_PUBLIC_KEY
 		c['captcha_url'] = RECAPTHCA_SITE_URL
 		c['oauth_url'] = GOOGLE_OAUTH_2_JS_URL
 		c['oauth_token'] = GOOGLE_OAUTH_2_CLIENT_ID

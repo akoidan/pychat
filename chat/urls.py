@@ -1,16 +1,16 @@
 import logging
 
+from captcha_admin import admin
 from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
-from django.contrib import admin
 
 from chat import settings
 from chat.socials import GoogleAuth, FacebookAuth
 from chat.views import RegisterView, ProfileView, RestorePassword
 
 logger = logging.getLogger(__name__)
-
 admin.autodiscover()
+
 urlpatterns = patterns(
 	'',
 	url(r'^admin/', include(admin.site.urls)),

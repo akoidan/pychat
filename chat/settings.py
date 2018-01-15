@@ -60,14 +60,16 @@ INSTALLED_APPS = (
 	'simplejson',
 	'redis',
 	'tornado',
-	"sslserver"
+	"sslserver",
+	"captcha_admin",
+	"admin"
 )
 
 # TODO replace this into your keys if you want this features to be available
 # Google recaptcha keys
 RECAPTHCA_SITE_URL = 'https://www.google.com/recaptcha/api.js'
-# RECAPTCHA_SECRET_KEY = 'REPLACE_THIS_WITH_KEY_FOR_RETRIEVING_RESULT'
-# RECAPTCHA_SITE_KEY = 'REPLACE_THIS_WITH_DATA-SITEKEY_DIV_ATTRIBUTE'
+# RECAPTCHA_PRIVATE_KEY = 'REPLACE_THIS_WITH_KEY_FOR_RETRIEVING_RESULT'
+# RECAPTCHA_PUBLIC_KEY = 'REPLACE_THIS_WITH_DATA-SITEKEY_DIV_ATTRIBUTE'
 # GOOGLE_OAUTH_2_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com'
 GOOGLE_OAUTH_2_JS_URL = 'https://apis.google.com/js/platform.js'
 FACEBOOK_JS_URL = '//connect.facebook.net/en_US/sdk.js'
