@@ -1,3 +1,0 @@
-FROM mysql
-WORKDIR /usr/src/app
-RUN python manage.py init_db

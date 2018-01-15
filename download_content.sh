@@ -7,16 +7,16 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 
 RANDOM_DIR=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
-TMP_DIR="/tmp/$RANDOM_DIR"
-STATIC_PARENT="$PROJECT_ROOT/chat"
-STATIC_DIR="$STATIC_PARENT/static"
-JS_DIR="$STATIC_DIR/js"
-CSS_DIR="$STATIC_DIR/css"
-FONT_DIR="$STATIC_DIR/font"
-SOUNDS_DIR="$STATIC_DIR/sounds"
-SMILEYS_DIR="$STATIC_DIR/smileys"
-IMAGES_DIR="$STATIC_DIR/images"
-SASS_DIR="$STATIC_DIR/sass"
+TMP_DIR="${TMP_DIR:-/tmp/$RANDOM_DIR}"
+STATIC_PARENT="${STATIC_PARENT:-$PROJECT_ROOT/chat}"
+STATIC_DIR="${STATIC_DIR:-$STATIC_PARENT/static}"
+JS_DIR="${JS_DIR:-$STATIC_DIR/js}"
+CSS_DIR="${CSS_DIR:-$STATIC_DIR/css}"
+FONT_DIR="${FONT_DIR:-$STATIC_DIR/font}"
+SOUNDS_DIR="${SOUNDS_DIR:-$STATIC_DIR/sounds}"
+SMILEYS_DIR="${SMILEYS_DIR:-$STATIC_DIR/smileys}"
+IMAGES_DIR="${IMAGES_DIR:-$STATIC_DIR/images}"
+SASS_DIR="${SASS_DIR:-$STATIC_DIR/sass}"
 # Implementing installed files
 declare -a files=(\
     "$CSS_DIR/pikaday.css" \

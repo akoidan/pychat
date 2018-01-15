@@ -14,7 +14,7 @@ Webrtc frontend classes diagram you can find [here](https://www.draw.io/?lightbo
 
 download_content.sh
 ===================
-Execute `sh download_content.sh` it will will you help.
+Execute `sh download_content.sh` it will show you help.
 
 
 Frontend logging
@@ -23,15 +23,15 @@ By default each user has turned off browser (console) logs. You can turn them on
 
 Smileys
 =======
-All scripts to extract smiles located in [DefaultSmilies.cfpack](DefaultSmilies.cfpack) , this is file from [commfort](http://www.commfort.com/en/) chat. `python manage.py extract_cfpack.py` extracts files from this pack and generates [info.json](chat/static/smileys/info.json), if you want to add smileys just add them to  `info.json` with new data, new data will be automatically populated to smileys div.
+By default pychat uses standard  [commfort](http://www.commfort.com/en/) chat  [smileys](DefaultSmilies.cfpack) . `python manage.py extract_cfpack.py` extracts files from this pack and generates [info.json](chat/static/smileys/info.json), if you want to add/delete smileys - just edit `info.json`
 
 Icons
 =====
-Chat uses [fontello](fontello.com) and its api for icons.  To edit fonts execute `sh download_content.sh fonts_session`. After this open generated url browser, edit everything as you like (you're redirected with a session so every change will be saved in fontello for 24 hours, edit icons and click on "Save session". Afterwords execute `sh download_content.sh download_fontello`. If you did everything right new icons should appear in [demo.html](https://127.0.0.1:8000/static/demo.html)
+Chat uses [fontello](fontello.com) and its api for icons. You can easily edit fonts via your browser, just execute `sh download_content.sh fonts_session`. Make your changes and hit "Save session". Then execute `sh download_content.sh download_fontello`. If you did everything right new icons should appear in [demo.html](https://127.0.0.1:8000/static/demo.html)
 
 Database migrations
 ===================
-I use standard [django migrations](https://docs.djangoproject.com/en/1.11/topics/migrations/) tools. So if you updated you branch from my repository and database has changed you need to `./manage.py makemigration` and  `./manage.py migrate`. If automatic migration didn't work I also store migrations in [migration](migrations).  So you might take a look if required migration is there before exeuting commands. Don't forget to change `Migration.dependencies[]` and rename the file if you get migration from my repo.
+Pychat uses standard [django migrations](https://docs.djangoproject.com/en/1.11/topics/migrations/) tools. So if you updated your branch from my repository and database has changed you need to `./manage.py makemigration` and  `./manage.py migrate`. If automatic migration didn't work I also store migrations in [migration](migrations).  So you might take a look if required migration is there before executing commands. If you found required migration in my repo don't forget to change `Migration.dependencies[]` and rename the file.
 
 Screen Share
 ============

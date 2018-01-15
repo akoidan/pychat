@@ -1,9 +1,10 @@
 FROM alpine:3.5
 #
 WORKDIR /usr/src/sass
+ENV SASS_LIBSASS_PATH /usr/src/sass/libsass
 RUN apk update &&\
 apk upgrade &&\
-apk add --no-cache curl git make gcc autoconf automake libtool g++ libstdc++ &&\
+apk add --no-cache curl git make gcc autoconf automake libtool g++ libstdc++ bash &&\
 git clone https://github.com/sass/libsass.git &&\
 git clone https://github.com/sass/sassc.git libsass/sassc &&\
 cd /usr/src/sass/libsass &&\
@@ -14,6 +15,6 @@ cd /usr/src/sass/libsass && \
 . sassc/script/bootstrap && \
 make -C sassc -j5 &&\
 make -C sassc install &&\
-apk del curl git make gcc autoconf automake libtool g++ &&\
+apk del git make gcc autoconf automake libtool g++ &&\
 cd /usr/src/sass &&\
 rm -rf /usr/src/sass/libsass

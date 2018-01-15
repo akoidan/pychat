@@ -94,6 +94,7 @@ You can also find full production setup for *[Archlinux](https://www.archlinux.o
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* giphy search should return random image
 * FIrebase message should update notification instead of showing one, even push notificaiton should update and not dissapear
 * WS close event doesn't fire after suspending PC to ram https://github.com/websockets/ws/issues/686
 * Add payback to firebase

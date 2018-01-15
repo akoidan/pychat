@@ -1,22 +1,43 @@
 version: '3.3'
 services:
-  server:
+  css:
     build:
-      context: .
-      dockerfile: Dockerfileserver
+      context: ..
+      dockerfile: ./docker/Dockerfilecss
+    volumes:
+      - css-volume:/usr/src/css
   db:
-    build:
-      context: .
-      dockerfile: Dockerfiledatabase
-      ports:
+    image: mysql/mysql-server
+    ports:
       - 3306:3306
   redis:
     image: redis:latest
     ports:
-     - 6379:6379
+      - 6379:6379
+  server:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfileserver
+    volumes:
+      - css-volume:/usr/src/css
+    command: bash -c "python manage.py init_db && python manage.py runsslserver 0.0.0.0:8000"
+    volumes:
+      - css-volume:/usr/src/chat/static/css
+    links:
+      - db
+    depends_on:
+      - db
+      - redis
+      - css
   ws:
     build:
-      context: .
+      context: ..
       dockerfile: Dockerfilewebsocket
-      ports:
-      - 8888:8888
+    ports:
+    - 8888:8888
+    depends_on:
+    - db
+    - redis
+    - server
+volumes:
+  css-volume:
