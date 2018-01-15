@@ -72,19 +72,21 @@ def get_firebase_playback(request):
 		room__roomusers__user_id=user_id
 	)
 	d = off_mess.select_related("sender__username").order_by("-time")[:1]
-	message = list(d)[0]
-	data = {
-		'title': message.sender.username,
-		'options': {
-			'body': message.content,
-			'icon': md5url('images/favicon.ico'),
-			'data': {
-				'url': '/#/chat/' + str(message.room_id)
-			}
-		},
-	}
-	response = HttpResponse(json.dumps(data), content_type='application/json')
-	return response
+	if len(d) > 0:
+		message = list(d)[0]
+		data = {
+			'title': message.sender.username,
+			'options': {
+				'body': message.content,
+				'icon': md5url('images/favicon.ico'),
+				'data': {
+					'url': '/#/chat/' + str(message.room_id)
+				}
+			},
+		}
+		return HttpResponse(json.dumps(data), content_type='application/json')
+	else:
+		return HttpResponse("No new messages found", content_type='text/plain')
 
 
 @require_http_methods('POST')
