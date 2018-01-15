@@ -8,21 +8,21 @@ services:
       - css-volume:/usr/src/css
   db:
     image: mysql/mysql-server
-    ports:
-      - 3306:3306
+    expose:
+      - "3306"
   redis:
     image: redis:latest
-    ports:
-      - 6379:6379
+    expose:
+      - "6379"
   server:
     build:
       context: ../
       dockerfile: ./docker/Dockerfileserver
     volumes:
-      - css-volume:/usr/src/css
-    command: bash -c "python manage.py init_db && python manage.py runsslserver 0.0.0.0:8000"
-    volumes:
       - css-volume:/usr/src/chat/static/css
+    command: bash -c "python manage.py init_db && python manage.py runsslserver 0.0.0.0:8000"
+    ports:
+      - 8000:8000
     links:
       - db
     depends_on:
@@ -31,8 +31,8 @@ services:
       - css
   ws:
     build:
-      context: ..
-      dockerfile: Dockerfilewebsocket
+      context: ../
+      dockerfile: ./docker/Dockerfileserver
     ports:
     - 8888:8888
     depends_on:
