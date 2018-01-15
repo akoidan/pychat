@@ -76,6 +76,7 @@ Though ArchLinux is not recommended as a server OS I prefer using it over other 
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 
 # TODO list
+* FIrebase message should update notification instead of showing one, even push notificaiton should update and not dissapear
 * WS close event doesn't fire after suspending PC to ram https://github.com/websockets/ws/issues/686
 * Add payback to firebase
 * Add docker
