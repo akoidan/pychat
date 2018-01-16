@@ -16,4 +16,10 @@ try:
 except ImportError:  # py3
 	from urllib.parse import quote
 
+def get_unicode(ch):
+	if sys.version > '3':
+		return chr(ch)
+	else:
+		return unichr(ch)
+
 str_type = str if sys.version > '3' else basestring

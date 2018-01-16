@@ -19,25 +19,25 @@ IMAGES_DIR="${IMAGES_DIR:-$STATIC_DIR/images}"
 SASS_DIR="${SASS_DIR:-$STATIC_DIR/sass}"
 # Implementing installed files
 declare -a files=(\
-    "$CSS_DIR/pikaday.css" \
-    "$JS_DIR/pikaday.js" \
-    "$JS_DIR/moment.js" \
-    "$JS_DIR/highlight.min.js" \
-    "$FONT_DIR/fontello.eot" \
-    "$FONT_DIR/fontello.svg" \
-    "$FONT_DIR/fontello.ttf" \
-    "$FONT_DIR/fontello.woff" \
-    "$FONT_DIR/fontello.woff2" \
-    "$FONT_DIR/fontello.woff2" \
-    "$SASS_DIR/partials/_fontello.scss" \
-    "$SASS_DIR/themes/_highlight-dark.scss"\
+    "$CSS_DIR/pikaday.css"
+    "$JS_DIR/pikaday.js"
+    "$JS_DIR/moment.js"
+    "$JS_DIR/highlight.min.js"
+    "$FONT_DIR/fontello.eot"
+    "$FONT_DIR/fontello.svg"
+    "$FONT_DIR/fontello.ttf"
+    "$FONT_DIR/fontello.woff"
+    "$FONT_DIR/fontello.woff2"
+    "$FONT_DIR/fontello.woff2"
+    "$SASS_DIR/partials/_fontello.scss"
+    "$SASS_DIR/themes/_highlight-dark.scss"
     "$SASS_DIR/themes/_highlight-light.scss"
-    "$SMILEYS_DIR" \
-    "$SMILEYS_DIR/info.json" \
-    "$SMILEYS_DIR/base/000a.gif" \
-    "$CSS_DIR/main.css" \
-    "$CSS_DIR/chat.css"\
-    "$CSS_DIR/register.css"\
+    "$SMILEYS_DIR"
+    "$SMILEYS_DIR/info.json"
+    "$SMILEYS_DIR/base/000a.gif"
+    "$CSS_DIR/main.css"
+    "$CSS_DIR/chat.css"
+    "$CSS_DIR/register.css"
     "$JS_DIR/amcharts-all.js"
 )
 
@@ -194,7 +194,7 @@ safeRunCommand() {
 download_fontello() {
     fontello_session=$(cat .fontello)
     printOut "Downloading fontello using fontello session '$fontello_session'"
-    mkdir "$TMP_DIR"
+    mkdir -p "$TMP_DIR/fontello"
     safeRunCommand curl -X GET "http://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
     safeRunCommand unzip "$TMP_DIR/fonts.zip" -d "$TMP_DIR/fontello"
     dir=$(ls "$TMP_DIR/fontello")

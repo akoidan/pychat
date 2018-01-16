@@ -1,6 +1,0 @@
-FROM deathangel908/sassc
-ENV SASS_DIR /usr/src/sass
-ENV CSS_DIR /usr/src/css
-COPY ./download_content.sh /usr/src/
-COPY ./chat/static/sass /usr/src/sass
-RUN bash /usr/src/download_content.sh sass

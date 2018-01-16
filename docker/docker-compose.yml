@@ -1,11 +1,5 @@
 version: '3.3'
 services:
-  css:
-    build:
-      context: ..
-      dockerfile: ./docker/Dockerfilecss
-    volumes:
-      - css-volume:/usr/src/css
   db:
     image: mysql/mysql-server
     expose:
@@ -19,7 +13,7 @@ services:
       context: ../
       dockerfile: ./docker/Dockerfileserver
     volumes:
-      - css-volume:/usr/src/chat/static/css
+      - ./log:/usr/src/log
     command: bash -c "python manage.py init_db && python manage.py runsslserver 0.0.0.0:8000"
     ports:
       - 8000:8000
@@ -28,16 +22,13 @@ services:
     depends_on:
       - db
       - redis
-      - css
-  ws:
-    build:
-      context: ../
-      dockerfile: ./docker/Dockerfileserver
-    ports:
-    - 8888:8888
-    depends_on:
-    - db
-    - redis
-    - server
-volumes:
-  css-volume:
+#  ws:
+#    build:
+#      context: ../
+#      dockerfile: ./docker/Dockerfileserver
+#    ports:
+#    - 8888:8888
+#    depends_on:
+#    - db
+#    - redis
+#    - server

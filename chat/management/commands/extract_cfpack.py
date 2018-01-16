@@ -1,14 +1,14 @@
 import json
+import os
 import re
+import struct
+from time import strftime
 
+from django.core.management.base import BaseCommand
+
+from chat.py2_3 import get_unicode
 from chat.settings import BASE_DIR, SMILEYS_ROOT
 
-
-# based on cfpack stealer cfpack_st101.zip http://alexforum.ws/showthread.php?t=3911&page=3
-import struct
-import os
-from time import strftime
-from django.core.management.base import BaseCommand
 ext = {
 	b'\x47\x49': 'gif',
 	b'\xff\xd8': 'jpg',
@@ -28,7 +28,7 @@ smiley_pattern = re.compile(r'^:.*:$')
 
 
 class Command(BaseCommand):
-
+	requires_system_checks = False
 	def __init__(self):
 		super(Command, self).__init__()
 	help = 'CFPack Stealer 1.01'
@@ -53,15 +53,15 @@ class Command(BaseCommand):
 			size = struct.unpack('<H', f.read(2))  # header size (useless)
 			addition_info['width'], addition_info['height'], count = struct.unpack('<HHB', f.read(5))
 			for c in range(count):
-				size = ord(f.read(1)) * 2  # 2 байта на символ utf16
-				cats.append((f.read(size)).decode('utf-16le'))  # запоминаем категории
+				size = ord(f.read(1)) * 2  # 2 bytes per utf8
+				cats.append((f.read(size)).decode('utf-16le'))  # save category
 				addition_info[cats[c]] = []
 				tab_dir_path = os.sep.join((SMILEYS_ROOT, file_names_pattern[cats[c]]))
 				if not os.path.exists(tab_dir_path):
 					os.mkdir(tab_dir_path)
-			addition_info['count'] = struct.unpack('<H', f.read(2))[0]  # число смайлов в паке
+			addition_info['count'] = struct.unpack('<H', f.read(2))[0]  # amount of bytes in a single pack
 			for item in range(addition_info['count']):
-				f.seek(1, 1)  # размер заголовка пропускаем
+				f.seek(1, 1)  # skip header size
 				cat_cur = ord(f.read(1))
 				if cat_cur >= count:
 					raise SyntaxError('File is not valid')
@@ -79,7 +79,7 @@ class Command(BaseCommand):
 				if not smiley_pattern.match(alias):
 					alias = ":%s:" % alias
 				smileys[tab].append({
-					'code': chr(start_char),
+					'code': get_unicode(start_char),
 					'alt': alias,
 					'src': file_name,
 				})
@@ -90,13 +90,13 @@ class Command(BaseCommand):
 	def create_json_info(self, info):
 
 		info_file_name = os.sep.join((SMILEYS_ROOT, 'info.json'))
-		with open(info_file_name, 'w', encoding='utf-8') as f:
+		with open(info_file_name, 'w') as f:
 			f.write(json.dumps(info))
 
 	def handle(self, *args, **options):
 		self.pack_path = options['port']
 		if not os.path.exists(self.pack_path):
-			raise FileNotFoundError("cfpack file <<%s>> doesn't exist" % self.pack_path)
+			raise Exception("cfpack file <<%s>> doesn't exist" % self.pack_path)
 		info = self.extract_file()
 		self.create_json_info(info)
 		print(strftime('[%H:%M:%S] Done.'))

@@ -1,4 +1,10 @@
-FROM python:3.6
-COPY ./chat ./manage.py ./requirements.txt ./templates  ./download_content.sh /usr/src/
-WORKDIR  /usr/src/
-RUN pip install -r requirements.txt
+FROM alpine:3.5
+WORKDIR /usr/src
+COPY ./chat  /usr/src/chat
+COPY ./templates  /usr/src/templates
+COPY ./manage.py ./requirements.txt ./config.json ./DefaultSmilies.cfpack ./download_content.sh /usr/src/
+RUN mkdir /usr/src/log &&\
+apk update &&\
+apk add python2 py2-pip sassc py-mysqldb bash curl &&\
+pip2 install -r requirements.txt &&\
+bash download_content.sh all

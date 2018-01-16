@@ -14,7 +14,7 @@ Webrtc frontend classes diagram you can find [here](https://www.draw.io/?lightbo
 
 download_content.sh
 ===================
-Execute `sh download_content.sh` it will show you help.
+Execute `bash download_content.sh` it will show you help.
 
 
 Frontend logging
@@ -27,7 +27,7 @@ By default pychat uses standard  [commfort](http://www.commfort.com/en/) chat  [
 
 Icons
 =====
-Chat uses [fontello](fontello.com) and its api for icons. You can easily edit fonts via your browser, just execute `sh download_content.sh fonts_session`. Make your changes and hit "Save session". Then execute `sh download_content.sh download_fontello`. If you did everything right new icons should appear in [demo.html](https://127.0.0.1:8000/static/demo.html)
+Chat uses [fontello](fontello.com) and its api for icons. You can easily edit fonts via your browser, just execute `bash download_content.sh fonts_session`. Make your changes and hit "Save session". Then execute `sh download_content.sh download_fontello`. If you did everything right new icons should appear in [demo.html](https://127.0.0.1:8000/static/demo.html)
 
 Database migrations
 ===================
@@ -44,7 +44,7 @@ If you want to locally test it:
 
 Tp publish extension:
  - If you want to update existing extension don't forget to increment `version` in [manifest.json](package/manifest.json).
- - Zip [screen_cast_extension](screen_cast_extension) directory into e.g. `sh download_content.sh zip_extension`
+ - Zip [screen_cast_extension](screen_cast_extension) directory into e.g. `bash download_content.sh zip_extension`
  - Upload archive `extension.zip` to [chrome webstore](https://chrome.google.com/webstore/developer/dashboard) (Note, you need to have a developer account, that's 5$ worth atm).
 
 WEB Rtc connection establishment
