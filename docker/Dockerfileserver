@@ -1,4 +1,4 @@
-FROM alpine:3.5
+FROM alpine:3.6
 WORKDIR /usr/src
 COPY ./chat  /usr/src/chat
 COPY ./templates  /usr/src/templates

@@ -75,14 +75,20 @@ FACEBOOK_JS_URL = '//connect.facebook.net/en_US/sdk.js'
 #FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
 # GOOGLE_OAUTH_2_HOST = 'pychat.org'
 
-REDIS_PORT = 6379
-TORNADO_REDIS_PORT = REDIS_PORT
-SESSION_REDIS_PORT = REDIS_PORT
+REDIS_PORT = int(os.environ.get('REDIS_PORT', '6379'))
+REDIS_HOST = os.environ.get('REDIS_HOST', 'db')
+SESSION_REDIS = {
+	'host': REDIS_HOST,
+	'post': REDIS_PORT,
+	'db': 3
+}
 SESSION_ENGINE = 'redis_sessions.session'
-BROKER_URL = str(SESSION_REDIS_PORT).join(('redis://localhost:','/0'))
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
+
+
+# BROKER_URL = str(SESSION_REDIS_PORT).join(('redis://localhost:','/0'))
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_SERIALIZER = 'json'
 
 CRT_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.crt"))
 KEY_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.key"))
@@ -127,22 +133,17 @@ FIREBASE_URL = 'https://android.googleapis.com/gcm/send'
 # pip install PyMySQL
 # import pymysql
 # pymysql.install_as_MySQLdb()
-if 'DATABASES' not in locals():
-	DATABASES = {
-		'default': {
-			'NAME': 'django',
-			'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
-			'USER': 'root', # TODO put your username here
-			'PASSWORD': '', # TODO put your password here
-			'default-character-set': 'utf8',
-			'PORT': 3306,
-			'OPTIONS': {
-				'autocommit': True,
 
-			},
-		}
+DATABASES = {
+	'default': {
+		'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
+		'NAME': os.environ.get('MYSQL_DATABASE', 'pychat'),
+		'USER': os.environ.get('MYSQL_USER', 'root'),
+		'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
+		'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
+		'PORT': os.environ.get('MYSQL_PORT', '3306')  # mysql uses socket if host is localhost
 	}
-
+}
 #
 # DATABASES = {
 # 	'default': {

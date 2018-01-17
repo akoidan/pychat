@@ -13,7 +13,7 @@ from chat import settings
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, User, UserProfile
 from chat.py2_3 import str_type, quote
-from chat.settings import ALL_ROOM_ID, TORNADO_REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL
+from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, get_or_create_room, \
@@ -50,7 +50,7 @@ class MessagesHandler(MessagesCreator):
 		self.sync_redis = global_redis.sync_redis
 		self.channels = []
 		self._logger = None
-		self.async_redis = Client(port=TORNADO_REDIS_PORT)
+		self.async_redis = Client(host=REDIS_HOST, port=REDIS_PORT)
 		self.patch_tornadoredis()
 		self.pre_process_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,

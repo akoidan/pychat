@@ -1,4 +1,4 @@
-FROM alpine:3.5
+FROM alpine:3.6
 #
 WORKDIR /usr/src/sass
 ENV SASS_LIBSASS_PATH /usr/src/sass/libsass
