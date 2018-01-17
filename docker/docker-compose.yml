@@ -51,6 +51,8 @@ services:
       server:
         condition: service_healthy
     command: python manage.py start_tornado
+    links:
+      - server
     ports:
      - 8888:8888
     environment:
