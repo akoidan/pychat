@@ -16,14 +16,17 @@ Live demo: [pychat.org](http://pychat.org/)
 # Table of contents
   * [Breaf description](#breaf-description)
   * [How to run on my own server](#how-to-run-on-my-own-server)
-    * [Install required packages](#install-required-packages)
-      * [Windows](#windows)
-      * [Ubuntu](#ubuntu)
-      * [Archlinux](#archlinux)
-      * [CentOs](#centos)
-      * [Production](#production)
-    * [Initializing](#initializing)
-    * [Running](#running)
+    * [Via Docker](#vid-docker)
+    * [Manual Setup](#manual-setup)
+       * [Install OS packages](#install-os-packages)
+         * [Windows](#windows)
+         * [Ubuntu](#ubuntu)
+         * [Archlinux](#archlinux)
+         * [CentOs](#centos)
+         * [Production](#production)
+       * [Bootstrap files](#bootstrap-files)
+       * [Start services](#start-services)
+    * [Check it out](#check-it-out)
   * [Contributing](#contributing)
   * [TODO list](#todo-list)
 
@@ -33,11 +36,19 @@ Chat is written in **Python** with [django](https://www.djangoproject.com/). For
 
 # How to run on my own server:
 
-## Install required packages
+## Via docker
+
+This is the fastest way to try out pychat. Just run `docker-compose -f docker/docker-compose.yml up` and open `https://localhost:8000/#/chat/1`
+
+## Manual setup
+
+If docker method lacks something or you just simply need the development configuration you can always set everything up yourself.
+
+### Install OS packages
 
 This section depends on the OS you use. I tested full install on Windows/Ubuntu/CentOs/Archlinux/Archlinux(rpi2 armv7). [pychat.org](https://pychat.org) currently runs on Archlinux rpi2.
 
-### [Windows](https://www.microsoft.com/en-us/download/windows.aspx):
+#### [Windows](https://www.microsoft.com/en-us/download/windows.aspx):
  1. Install [python](https://www.python.org/downloads/) with pip. Any version **Python2.7** or **Python 3.x** both are supported
  2. Add **pip** and **python** to `PATH` variable.
  3. Install [redis](https://github.com/MSOpenTech/redis/releases). Get the newest version or at least 2.8.
@@ -46,22 +57,22 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
  7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`).
 
-### [Ubuntu](http://www.ubuntu.com/):
+#### [Ubuntu](http://www.ubuntu.com/):
  1. Install required packages: `apt-get install python pip mysql-server ruby`
  2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
  3. Install **sassc**. You can find instructions [here](http://crocodillon.com/blog/how-to-install-sassc-and-libsass-on-ubuntu). Or maybe you can find packet in ubuntu repository. Alternatively you can use any other sass. 
 
-### [Archlinux](https://www.archlinux.org/):
+#### [Archlinux](https://www.archlinux.org/):
  1. Install required packages: `pacman -S python pip redis mariadb ruby sassc`
  2. Follow the [database guide](https://wiki.archlinux.org/index.php/MySQL) to configure it if you need. 
 
 ### [CentOs](https://www.centos.org/)
 There's stale branch [production](https://github.com/Deathangel908/djangochat/tree/production) that was used for centos. Basic instruction you can find there.
 
-### Production
+#### Production
 You can also find full production setup for *[Archlinux](https://www.archlinux.org/)* in [prod_archlinux](https://github.com/Deathangel908/djangochat/tree/prod_archlinux) branch
   
-## Initializing:
+### Bootstrap files:
  1. Install python packages with `pip install -r requirements.txt`. 
  2. Create database. Open mysql command tool: `mysql -u YOUR_USERNAME -p` and create database `create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci`. Specify database connection options (username, password) in `chat/settings.py`. Next fill database with tables: `python manage.py init_db`. If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
  3. Populate project files: `sh download_content.sh all`
@@ -81,13 +92,15 @@ You can also find full production setup for *[Archlinux](https://www.archlinux.o
 }
 ```
  
-## Running:
+### Start services:
  0. Start `mysql` server if it's not started. 
  1. Start session holder: `redis-server`
  2. Start webSocket listener: `python manage.py start_tornado`
  3. Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
- 4. Open in browser [http**s**://127.0.0.1:8000](https://127.0.0.1:8000).
- 5. If you get an ssl error on establishing websocket connection in browser (at least in Firefox, chrome should be fine), that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
+
+## Check if everything works:
+ - Open in browser [http**s**://127.0.0.1:8000](https://127.0.0.1:8000).
+ - If you get an ssl error on establishing websocket connection in browser (at least in Firefox, chrome should be fine), that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
 
  
 # Contributing:
