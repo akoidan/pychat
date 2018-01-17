@@ -26,7 +26,7 @@ Live demo: [pychat.org](http://pychat.org/)
          * [Production](#production)
        * [Bootstrap files](#bootstrap-files)
        * [Start services](#start-services)
-    * [Check it out](#check-it-out)
+    * [Check if everything works](#check-if-everything-works)
   * [Contributing](#contributing)
   * [TODO list](#todo-list)
 
@@ -66,7 +66,7 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  1. Install required packages: `pacman -S python pip redis mariadb ruby sassc`
  2. Follow the [database guide](https://wiki.archlinux.org/index.php/MySQL) to configure it if you need. 
 
-### [CentOs](https://www.centos.org/)
+#### [CentOs](https://www.centos.org/)
 There's stale branch [production](https://github.com/Deathangel908/djangochat/tree/production) that was used for centos. Basic instruction you can find there.
 
 #### Production
@@ -93,10 +93,10 @@ You can also find full production setup for *[Archlinux](https://www.archlinux.o
 ```
  
 ### Start services:
- 0. Start `mysql` server if it's not started. 
- 1. Start session holder: `redis-server`
- 2. Start webSocket listener: `python manage.py start_tornado`
- 3. Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
+ - Start `mysql` server if it's not started.
+ - Start session holder: `redis-server`
+ - Start webSocket listener: `python manage.py start_tornado`
+ - Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
 
 ## Check if everything works:
  - Open in browser [http**s**://127.0.0.1:8000](https://127.0.0.1:8000).
