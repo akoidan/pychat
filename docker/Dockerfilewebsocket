@@ -1,0 +1,9 @@
+FROM alpine:3.6
+WORKDIR /usr/src
+COPY ./chat  /usr/src/chat
+COPY ./templates  /usr/src/templates
+COPY ./manage.py ./requirements.txt /usr/src/
+RUN mkdir /usr/src/log &&\
+apk update &&\
+apk add python2 py2-pip py-mysqldb &&\
+pip2 install -r requirements.txt
