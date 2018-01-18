@@ -17,7 +17,7 @@
 
 ### this this emails settings will be used to send emails. E.g. when user restores password via email.
 ###  Comment them out if you don't want to setup
-# import os
+
 # EMAIL_USE_TLS = True
 # EMAIL_HOST = 'localhost' # For gmail settings example 'smtp.gmail.com'
 # EMAIL_PORT = 25 # google smpt port '587'
@@ -26,23 +26,6 @@
 # SERVER_EMAIL = 'root@pychat.org'
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # ADMINS = [('YourName', 'emailAddresThatYouWillReceiveReportsOn@gmail.com'), ]
-
-
-# REDIS_PORT = int(os.environ.get('REDIS_PORT', '6379'))
-# REDIS_HOST = os.environ.get('REDIS_HOST', 'db')
-# DATABASES = {
-# 	'default': {
-# 		'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
-# 		'NAME': os.environ.get('MYSQL_DATABASE', 'pychat'),
-# 		'USER': os.environ.get('MYSQL_USER', 'root'),
-# 		'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
-# 		'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
-# 		'PORT': os.environ.get('MYSQL_PORT', '3306'),  # mysql uses socket if host is localhost
-# 		'OPTIONS': {
-# 			'autocommit': True,
-# 		},
-# 	}
-# }
 
 
 

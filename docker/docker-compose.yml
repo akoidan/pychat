@@ -31,14 +31,6 @@ services:
       - redis
     volumes:
       - ./log:/usr/src/log
-    environment:
-      MYSQL_DATABASE: 'pychat'
-      MYSQL_USER: 'pychat'
-      MYSQL_PASSWORD: 'pypass'
-      MYSQL_HOST: 'db'
-      MYSQL_PORT: '3306'
-      REDIS_PORT: '6379'
-      REDIS_HOST: 'redis'
 
   redis:
     image: redis:alpine
@@ -55,11 +47,3 @@ services:
       - server
     ports:
      - 8888:8888
-    environment:
-      MYSQL_DATABASE: 'pychat'
-      MYSQL_USER: 'pychat'
-      MYSQL_PASSWORD: 'pypass'
-      MYSQL_HOST: 'db'
-      MYSQL_PORT: '3306'
-      REDIS_PORT: '6379'
-      REDIS_HOST: 'redis'
