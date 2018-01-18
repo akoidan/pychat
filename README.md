@@ -16,8 +16,8 @@ Live demo: [pychat.org](http://pychat.org/)
 # Table of contents
   * [Breaf description](#breaf-description)
   * [How to run on my own server](#how-to-run-on-my-own-server)
-    * [Via Docker](#vid-docker)
-    * [Development Setup](#development-setup)
+    * [Via Docker](#via-docker)
+    * [Development setup](#development-setup)
        * [Install OS packages](#install-os-packages)
          * [Windows](#windows)
          * [Ubuntu](#ubuntu)
@@ -25,26 +25,27 @@ Live demo: [pychat.org](http://pychat.org/)
          * [CentOs](#centos)
        * [Bootstrap files](#bootstrap-files)
        * [Start services and run](#start-services-and-run)
-    * [Production for Archlinux](#production-for-archlinux)
+    * [Production setup](#production-setup)
+       * [Archlinux prod](#archlinux-prod)
+       * [CentOs prod](#centos-prod)
   * [Contributing](#contributing)
   * [TODO list](#todo-list)
 
 # Breaf description
-
 Chat is written in **Python** with [django](https://www.djangoproject.com/). For handling realtime messages [WebSockets](https://en.wikipedia.org/wiki/WebSocket) are used: browser support on client part and asynchronous framework [Tornado](http://www.tornadoweb.org/) on server part. Messages are being broadcast by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using [tornado-redis](https://github.com/leporo/tornado-redis) backend. Redis is also used as django session backend and for storing current users online.  For video call [WebRTC](https://webrtc.org/) technology was used with stun server to make a connection, which means you will always get the lowest ping and the best possible connection channel. Client part doesn't use any javascript frameworks (like jquery or datatables) in order to get best performance. Chat written as a singlePage application, so even if user navigates across different pages websocket connection doesn't break. Chat also supports OAuth2 login standard via FaceBook/Google. Css is compiled from [sass](http://sass-lang.com/guide). Server side can be run on any platform **Windows**, **Linux**, **Mac** with **Python 2.7** and **Python 3.x**.Client (users) can use the chat from any browser with websocket support: IE11, Edge, Chrome, Firefox, Android, Opera, Safari...
 
 # How to run on my own server:
 
 ## Via docker
-
 This is the fastest way to try out pychat. Just run `docker-compose -f docker/docker-compose.yml up` and open `https://localhost:8000/#/chat/1`
 
 ## Development setup
-
-If docker method lacks something or you just simply need the development configuration you can always set everything up yourself.
+The flow is the following
+ - Install OS packages depending on your OS type
+ - Bootstart files
+ - Start services and check if it works
 
 ### Install OS packages
-
 This section depends on the OS you use. I tested full install on Windows/Ubuntu/CentOs/Archlinux/Archlinux(rpi2 armv7). [pychat.org](https://pychat.org) currently runs on Archlinux rpi2.
 
 #### [Windows](https://www.microsoft.com/en-us/download/windows.aspx):
@@ -65,9 +66,6 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  1. Simple and easy as always: `pacman -S python pip redis mariadb  sassc mysql-python python-mysql-connector`
  2. If you just installed mariadb you need to initialize it: `mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`.
 
-#### [CentOs](https://www.centos.org/)
-There's stale branch [production](https://github.com/Deathangel908/djangochat/tree/production) that was used for centos. Basic instruction you can find there.
-
 ### Bootstrap files:
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
  2. Rename [chat/production_example.py](chat/production.py) to `chat/production.py`. And And replace it with your data.
@@ -83,23 +81,41 @@ There's stale branch [production](https://github.com/Deathangel908/djangochat/tr
  - Open in browser [http**s**://127.0.0.1:8000](https://127.0.0.1:8000).
  - If you get an ssl error on establishing websocket connection in browser (at least in Firefox, chrome should be fine), that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
 
-## Production for Archlinux
+## Production setup
+Further instructions assume that you're executing them from project directory. First of of you need to install packages for Archlinux/CentOS and then follow the [Common](#common) flow
+
+### Archlinux prod
+Services commands for Archlinux:
+ - Start services:  `packages=( mysqld  redis uwsgi tornado nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`
+ - Enabling autostart: `packages=( redis  nginx postfix mysqld uwsgi tornado) ; for package in "${packages[@]}" ; do systemctl start $package; done;`
+
+Installing packages for Archlinux:
  - Install packages `pacman -S nginx postfix gcc jansson`.
  - Install `pip install uwsgi`. You also can install `uwsgi` and `uwsgi-plugin-python` via pacman but I found pip's package more stable.
  - Follow the instructions in [Archlinux](#archlinux).
+
+### CentOS prod
+Installing packages for Archlinux
+ - Add `alias yum="python2 $(which yum)"` to /etc/bashrc if you use python3
+ - Install packages `yum install nginx, python34u, uWSGI, python34u-pip, redis, mysql-server, mysql-devel, postfix, mailx, ruby, rubygems`
+ - Install sass `gem install sass`
+
+Services commands for Archlinux:
+ - Start services: `packages=( redis-server  nginx postfix mysqld uwsgi tornado) ; for package in "${packages[@]}" ; do service $package start; done;`
+ - Enabling autostart: `chkconfig mysqld on; chkconfig uwsgi on; chkconfig tornado on; chkconfig redis on; chkconfig postfix on`
+
+### Common
  - Follow the instructions in [Boostrap files](#bootstrap-files).
- - Further instructions assume that you're executing them from project directory. For production I would recommend `/srv/http/djangochat`.  If you cloned project into different directory than `/srv/http` you need to replace all absolute paths for your one in config files `pattern="/srv/http"; grep -rl "$pattern" ./rootfs |xargs sed -i "s#$pattern#$PWD#g"`
+ - For production I would recommend to clone repository to `/srv/http/djangochat`.  If you cloned project into different directory than `/srv/http` you need to replace all absolute paths for your one in config files `pattern="/srv/http"; grep -rl "$pattern" ./rootfs |xargs sed -i "s#$pattern#$PWD#g"`
  - Replace all occurrences of domain name `exist_domain="pychat\.org"; your_domain="YOUR\.DOMAIN\.COM"; grep -rl "$exist_domain" ./ |xargs sed -i "s#$exist_domain#$your_domain#g"`. (note regex escape for dot char). Also check `rootfs/etc/nginx/nginx.conf` you may want to merge `location /photo` and `location /static` into main `server` conf. (you need all of this because I used subdomain for static urls)
  - Copy config files to rootfs `cp rootfs / -r `. Change owner of project to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`.
  - Generate postfix postman: `postmap /etc/postfix/virtual; postman /etc/aliases`
- - Optional: add services to autostart  `packages=( mysqld  redis uwsgi tornado nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`
  - Place your certificate in `/etc/nginx/ssl`, you can get free one with startssl. For it start postfix service, send validation email to domain `webmaster@pychat.org` and apply verification code from `/root/Maildir/new/<<time>>` (you may also need to  disable ssl in /etc/postfix/main.cf since it's enabled by default). You can generate server.key and get certificate from  https://www.startssl.com/Certificates/ApplySSLCert . Put them into  `/etc/nginx/ssl/server.key` and `/etc/nginx/ssl/1_${YOUR.DOMAIN.COM}_bundle.crt` (`YOUR.DOMAIN.COM` = `pychat.org` by default, but replaced above) (those settings are listed in `nginx.conf` and `settings.py`). (you can also create your own certificate or copy them from `/usr/lib/python*/site-packages/sslserver/certs/`). Don't forget to change owner of files to http user `chown -R http:http /etc/nginx/ssl/`
  - Add django admin static files: `python manage.py collectstatic`
- - Start services `packages=( redis  nginx postfix mysqld uwsgi tornado) ; for package in "${packages[@]}" ; do systemctl start $package; done;`
- - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx listens no by ip address but by domain.name
+ - Execute start services and if you need enablign autostart commands described for [Archlinux](#archliunux-prod) or [CentOS](#centos-prod)
+ - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
  - If something doesn't work you want to check `djangochat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
 
- 
 # Contributing:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
