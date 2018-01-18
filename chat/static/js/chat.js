@@ -5695,18 +5695,8 @@ function WsHandler() {
 	self.onTimeout = function() {
 		self.sendToServer({action: 'ping'}, true);
 	};
-	self.updateTimeout = function() {
-		if (self.pingTimeout) {
-			clearTimeout(self.pingTimeout);
-			self.log("Cleared old timeout, scheduling new one")();
-		} else {
-			self.log("Scheduling ping timeout (prev timeout is null)")();
-		}
-		self.pingTimeout = setTimeout(self.onTimeout, 60000); // every 1 min update connection
-	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
-		self.updateTimeout();
 		var data;
 		try {
 			data = JSON.parse(jsonData);
@@ -5735,7 +5725,6 @@ function WsHandler() {
 			self.logError("Web socket is closed. Can't send {}", logEntry)();
 			return false;
 		} else {
-			self.updateTimeout();
 			self.logOut("{}", jsonRequest)();
 			self.ws.send(jsonRequest);
 			return true;
@@ -5792,6 +5781,8 @@ function WsHandler() {
 			var message = "Connection to server has been established";
 			if (self.wsState === 1) { // if not inited don't growl message on page load
 				growlSuccess(message);
+			} else {
+				setInterval(self.onTimeout, 60000); // Chrome timeout stops working afer some period of time
 			}
 			self.wsState = 9;
 			self.log(message)();
