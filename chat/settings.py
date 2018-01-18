@@ -36,12 +36,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '8ou!cqb1yd)6c4h0i-cxjo&@@+04%4np6od8qn+z@5b=6)!v(o'
+# remove this
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
 
 DEBUG = True
-
+DEBUG = False
+TEMPLATE_DEBUG = False
 ALLOWED_HOSTS = ["*",]
 
 username_processor = 'chat.context_processors.add_user_name'
@@ -95,6 +97,9 @@ KEY_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.key"))
 
 IS_HTTPS = 'CRT_PATH' in locals()
 API_PORT = '8888'
+CRT_PATH = '/etc/nginx/ssl/1_pychat.org_bundle.crt'
+KEY_PATH = '/etc/nginx/ssl/server.key'
+IS_HTTPS = 'CRT_PATH' in locals()
 EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn'
 EXTENSION_INSTALL_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + EXTENSION_ID
 WEBSOCKET_PROTOCOL = 'wss' if IS_HTTPS else 'ws'
@@ -115,7 +120,6 @@ MIDDLEWARE_CLASSES = (
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'chat.cookies_middleware.UserCookieMiddleWare',
-	'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'chat.urls'
@@ -142,6 +146,11 @@ DATABASES = {
 		'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
 		'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
 		'PORT': os.environ.get('MYSQL_PORT', '3306')  # mysql uses socket if host is localhost
+		'default-character-set': 'utf8',
+		'OPTIONS': {
+			'autocommit': True,
+
+		},
 	}
 }
 #
@@ -178,7 +187,7 @@ handler404 = 'chat.views.handler404'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 STATIC_URL = '/static/'
-
+STATIC_URL = 'https://static.pychat.org/'
 PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
@@ -187,7 +196,12 @@ SMILEYS_ROOT = os.path.join(STATIC_ROOT, 'smileys')
 AUTH_PROFILE_MODULE = 'chat.UserProfile'
 
 if 'start_tornado' in sys.argv:
-	log_file_name = 'tornado.log'
+	try:
+		index_port = sys.argv.index('--port')
+		port = sys.argv[index_port + 1]
+	except (ValueError, IndexError):
+		port = API_PORT
+	log_file_name = 'tornado-{}.log'.format(port)
 else:
 	log_file_name = 'chat.log'
 
@@ -203,11 +217,11 @@ TEMPLATES = [{
 	'BACKEND': 'django.template.backends.django.DjangoTemplates',
 	'DIRS': [join(BASE_DIR, 'templates')],
 	'OPTIONS': {
-		# 'loaders': [
-		# 	('django.template.loaders.cached.Loader', [
-		# 		'django.template.loaders.filesystem.Loader',
-		# 		'django.template.loaders.app_directories.Loader',
-		# 	])],
+		 'loaders': [ # TORO remove in debug
+		 	('django.template.loaders.cached.Loader', [
+		 		'django.template.loaders.filesystem.Loader',
+		 		'django.template.loaders.app_directories.Loader',
+		 	])],
 		'context_processors': global_settings.TEMPLATE_CONTEXT_PROCESSORS + [username_processor]
 	}
 }]
@@ -291,9 +305,19 @@ SESSION_COOKIE_NAME = "sessionid"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 
 MEDIA_URL = "/photo/"
-
+MEDIA_URL = "https://static.pychat.org/photo/"
 USER_COOKIE_NAME = 'user'
 JS_CONSOLE_LOGS = True
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 25
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = ''
+#DEFAULT_FROM_EMAIL = 'root <root@pychat.org>'
+SERVER_EMAIL = 'root@pychat.org'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+ADMINS = [('Andrew', 'deathangel908@gmail.com'), ]
 
 # If this options is set, on every oncoming request chat will gather info about user location
 

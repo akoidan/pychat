@@ -24,6 +24,7 @@
 		window.highlightCode = {{ highlight_code |yesno:"true,false" }};
 		window.embeddedYoutube = {{ embedded_youtube |yesno:"true,false" }};
 	</script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Snowstorm/20131208/snowstorm-min.js"></script>
 	  {% if highlight_code %}
 			<script src="{% md5url "js/highlight.min.js" %}"></script>
     {% endif %}
@@ -40,6 +41,7 @@
 		<i class="icon-brush" title="Draw an Image" id="paintOpen">
 			<span class="mText">Painter</span>
 		</i>
+		<i class="icon-snow-heavy-inv" title="Disable or enable snowing" style="color: white" onclick="snowStorm.toggleSnow()"><span class="mText">snow</span></i>
 		<a href="/#/report_issue" class="icon-pencil" title="report an issue"
 			onclick="event.preventDefault(); singlePage.showPage('/report_issue')"><span class="mText">Issue</span></a>
 		<i class="icon-phone hidden" id="navCallIcon" title="Make a video/mic call"><span class="mText">Call</span></i>

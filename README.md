@@ -53,14 +53,14 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  2. Add **pip** and **python** to `PATH` variable.
  3. Install [redis](https://github.com/MSOpenTech/redis/releases). Get the newest version or at least 2.8.
  4. Install [sassc](http://sass-lang.com/libsass). Add **sassc** command path to `PATH` variable.
- 5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector. 
+ 5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector.
  6. You also need to install python's **mysqlclient**. If you want to compile one yourself you need to **vs2015** tools. You can download [visual-studio](https://www.visualstudio.com/en-us/downloads/download-visual-studio-vs.aspx) and install [Common Tools for Visual C++ 2015](http://i.stack.imgur.com/J1aet.png). You need to run setup as administrator. The only connector can be found [here](http://dev.mysql.com/downloads/connector/python/). The wheel (already compiled) connectors can be also found here [Mysqlclient](http://www.lfd.uci.edu/~gohlke/pythonlibs/#mysqlclient). Use `pip` to install them.
  7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`).
 
 #### [Ubuntu](http://www.ubuntu.com/):
  1. Install required packages: `apt-get install python pip mysql-server ruby`
  2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
- 3. Install **sassc**. You can find instructions [here](http://crocodillon.com/blog/how-to-install-sassc-and-libsass-on-ubuntu). Or maybe you can find packet in ubuntu repository. Alternatively you can use any other sass. 
+ 3. Install **sassc**. You can find instructions [here](http://crocodillon.com/blog/how-to-install-sassc-and-libsass-on-ubuntu). Or maybe you can find packet in ubuntu repository. Alternatively you can use any other sass.
 
 #### [Archlinux](https://www.archlinux.org/):
  1. Install required packages: `pacman -S python pip redis mariadb ruby sassc`
@@ -69,11 +69,8 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 #### [CentOs](https://www.centos.org/)
 There's stale branch [production](https://github.com/Deathangel908/djangochat/tree/production) that was used for centos. Basic instruction you can find there.
 
-#### Production
-You can also find full production setup for *[Archlinux](https://www.archlinux.org/)* in [prod_archlinux](https://github.com/Deathangel908/djangochat/tree/prod_archlinux) branch
-  
 ### Bootstrap files:
- 1. Install python packages with `pip install -r requirements.txt`. 
+ 1. Install python packages with `pip install -r requirements.txt`.
  2. Create database. Open mysql command tool: `mysql -u YOUR_USERNAME -p` and create database `create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci`. Specify database connection options (username, password) in `chat/settings.py`. Next fill database with tables: `python manage.py init_db`. If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
  3. Populate project files: `sh download_content.sh all`
  4. If you want to use [Giphy](https://giphy.com/), you need to sign up in [developers.giphy.com](https://developers.giphy.com/) , create a new app there, and add `GIPHY_API_KEY` to [settings.py](chat/settings.py)
@@ -102,6 +99,49 @@ You can also find full production setup for *[Archlinux](https://www.archlinux.o
  - Open in browser [http**s**://127.0.0.1:8000](https://127.0.0.1:8000).
  - If you get an ssl error on establishing websocket connection in browser (at least in Firefox, chrome should be fine), that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
 
+# Production
+
+## Prepare the system.
+ 0. Install packages `pacman -S  git nginx python python-pip redis mariadb mysql-python python-mysql-connector postfix ruby gcc jansson sassc`. You surely can install `uwsgi` and `uwsgi-plugin-python` via pacman but I found pip's package more stable so `pip install uwsgi`.
+ 0. Clone project to local filesystem (I would recommend to clone it into `/srv/http` directory): `git clone https://github.com/Deathangel908/djangochat`. Further instructions assume that working directory is project root, so `cd djangochat`. And change the branch: `git checkout -b prod_archlinux origin/prod_archlinux`
+ 0. If you cloned project into different directory than `/srv/http` you need to replace all absolute paths for your one in config files `pattern="/srv/http"; grep -rl "$pattern" ./rootfs |xargs sed -i "s#$pattern#$PWD#g"`
+ 0. Replace all occurrences of domain name `exist_domain="pychat\.org"; your_domain="YOUR\.DOMAIN\.COM"; grep -rl "$exist_domain" ./ |xargs sed -i "s#$exist_domain#$your_domain#g"`. (note regex escape for dot char) Change `STATIC_URL` to `/static/` and `MEDIA_URL` to `/photo/` in `chat/settings.py`. Also check `rootfs/etc/nginx/nginx.conf` you may want to merge `location /photo` and `location /static` into main `server` conf. (you need all of this because I used subdomain for static urls)
+ 0. Copy config files to rootfs `cp rootfs / -r `. Change owner of project to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`.
+ 0.  Generate postfix postman: `postmap /etc/postfix/virtual; postman /etc/aliases`
+ 0. Add file `chat/production.py`, place there `SECRET_KEY` and optional: `RECAPTCHA_SITE_KEY`, `RECAPTCHA_SECRET_KEY`, `GOOGLE_OAUTH_2_CLIENT_ID`, `FACEBOOK_ACCESS_TOKEN`, `FACEBOOK_APP_ID`.
+ 0. If you just installed mariadb you need to initialize it: `mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`. Start mysql `systemctl start mysqld` and create database `echo "create database django CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`
+ 0. Optional: add services to autostart  `packages=( mysqld  redis uwsgi tornado nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`
+ 0. Get all dependencies `pip install -r requirements.txt`
+ 0. Fill database with tables `python manage.py init_db`.  If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
+ 0. To download all needed files and compile css execute: `sh download_content.sh all`
+ 0. Place your certificate in `/etc/nginx/ssl`, you can get free one with startssl. For it start postfix service, send validation email to domain `webmaster@pychat.org` and apply verification code from `/root/Maildir/new/<<time>>` (you may also need to  disable ssl in /etc/postfix/main.cf since it's enabled by default). You can generate server.key and get certificate from  https://www.startssl.com/Certificates/ApplySSLCert . Put them into  `/etc/nginx/ssl/server.key` and `/etc/nginx/ssl/1_${YOUR.DOMAIN.COM}_bundle.crt` (`YOUR.DOMAIN.COM` = `pychat.org` by default, but replaced above) (those settings are listed in `nginx.conf` and `settings.py`). (you can also create your own certificate or copy them from `/usr/lib/python*/site-packages/sslserver/certs/`). Don't forget to change owner of files to http user `chown -R http:http /etc/nginx/ssl/`
+ 0. Add django admin static files: `python manage.py collectstatic`
+ 0. If you want to use [Giphy](https://giphy.com/), you need to sign up in [developers.giphy.com](https://developers.giphy.com/) , create a new app there, and add `GIPHY_API_KEY` to [settings.py](chat/settings.py)
+ 0. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
+ 0. Pychat also supports [webpush](https://developers.google.com/web/fundamentals/push-notifications/) notifications, like in facebook. They will fire even user doesn't have opened tab. That can be turned on/off by used in his/her profile with checkbox `Notifications`. The implementation is similar like [here](https://github.com/GoogleChrome/samples/tree/gh-pages/push-messaging-and-notifications). So to add notification support you need
+    1. Create a project on the [Firebase Developer Console](https://console.firebase.google.com/):
+    2. Go to Settings (the cog near the top left corner), click the [Cloud Messaging Tab](https://console.firebase.google.com/u/1/project/pychat-org/settings/cloudmessaging/)
+    3. Put `<Your Cloud Messaging API Key ...>` to [settings.py](chat/settings.py) as `FIREBASE_API_KEY`
+    4. Create `chat/static/manifest.json` with content like [here](https://github.com/GoogleChrome/samples/blob/gh-pages/push-messaging-and-notifications/manifest.sample.json):
+  ```
+{
+  "name": "Pychat Push Notifications",
+  "short_name": "PyPush",
+  "start_url": "/",
+  "display": "standalone",
+  "gcm_sender_id": "<Your Sender ID from https://console.firebase.google.com>"
+}
+
+## Run chat:
+ 1. Start session holder: `systemctl start redis`
+ 1. Run server: `systemctl start  nginx`
+ 1. Start email server `systemctl start postfix`
+ 1. Start database: `systemctl start mysqld`
+ 1. Start the Chat: `systemctl start uwsgi`
+ 1. Start the WebSocket listener: `systemctl start tornado`
+ 1. Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx listens no by ip address but by domain.name
+ 1. If something doesn't work you want to check `djangochat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
+
  
 # Contributing:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
@@ -128,6 +168,8 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * file transfer - add ability to click on user on receivehandler popup (draggable)
 * add message queue if socketed is currently disconnected ???
 * Add link to gihub in console
+* `'` Symbol in links breaks anchor tag. For example https://raw.githubusercontent.com/NeverSinkDev/NeverSink-Filter/master/NeverSink's%20filter%20-%201-REGULAR.filter
+* webrtc connection lost while transfering file causes js error
 * Add title for room.
 * TODO if someone offers a new call till establishing connection for a call self.call_receiver_channel would be set to wrong
 * !!!IMPORTANT Debug call dialog by switching channels while calling and no.

@@ -385,3 +385,4 @@ class RegisterView(View):
 			message = e.message
 			logger.debug('Rejecting request because "%s"', message)
 		return HttpResponse(message, content_type='text/plain')
+
