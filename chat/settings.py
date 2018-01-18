@@ -15,16 +15,8 @@ import sys
 from os.path import join
 
 from django.conf import global_settings
-import sslserver
 
 import chat as project_module
-
-try:
-	from chat.production import *
-	print('imported production.py settings')
-except ImportError as e:
-	print('Failed to import production.py because {}'.format(e))
-	pass
 
 LOGGING_CONFIG = None
 
@@ -36,14 +28,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '8ou!cqb1yd)6c4h0i-cxjo&@@+04%4np6od8qn+z@5b=6)!v(o'
-# remove this
-
 # SECURITY WARNING: don't run with debug turned on in production!
 
-
 DEBUG = True
-DEBUG = False
-TEMPLATE_DEBUG = False
+
 ALLOWED_HOSTS = ["*",]
 
 username_processor = 'chat.context_processors.add_user_name'
@@ -62,28 +50,16 @@ INSTALLED_APPS = (
 	'simplejson',
 	'redis',
 	'tornado',
-	"sslserver"
 )
 
-# TODO replace this into your keys if you want this features to be available
-# Google recaptcha keys
+
 RECAPTHCA_SITE_URL = 'https://www.google.com/recaptcha/api.js'
-# RECAPTCHA_SECRET_KEY = 'REPLACE_THIS_WITH_KEY_FOR_RETRIEVING_RESULT'
-# RECAPTCHA_SITE_KEY = 'REPLACE_THIS_WITH_DATA-SITEKEY_DIV_ATTRIBUTE'
-# GOOGLE_OAUTH_2_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com'
 GOOGLE_OAUTH_2_JS_URL = 'https://apis.google.com/js/platform.js'
 FACEBOOK_JS_URL = '//connect.facebook.net/en_US/sdk.js'
-#FACEBOOK_ACCESS_TOKEN = '!6_NUMBER_APP_ID|ALPHABET_TOKEN' # https://developers.facebook.com/tools/access_token/
-#FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
-# GOOGLE_OAUTH_2_HOST = 'pychat.org'
 
-REDIS_PORT = int(os.environ.get('REDIS_PORT', '6379'))
-REDIS_HOST = os.environ.get('REDIS_HOST', 'db')
-SESSION_REDIS = {
-	'host': REDIS_HOST,
-	'post': REDIS_PORT,
-	'db': 3
-}
+
+REDIS_PORT = 6379
+REDIS_HOST ='localhost'
 SESSION_ENGINE = 'redis_sessions.session'
 
 
@@ -92,16 +68,13 @@ SESSION_ENGINE = 'redis_sessions.session'
 # CELERY_TASK_SERIALIZER = 'json'
 # CELERY_RESULT_SERIALIZER = 'json'
 
-CRT_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.crt"))
-KEY_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.key"))
 
-IS_HTTPS = 'CRT_PATH' in locals()
+
 API_PORT = '8888'
-CRT_PATH = '/etc/nginx/ssl/1_pychat.org_bundle.crt'
-KEY_PATH = '/etc/nginx/ssl/server.key'
-IS_HTTPS = 'CRT_PATH' in locals()
 EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn'
 EXTENSION_INSTALL_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + EXTENSION_ID
+
+IS_HTTPS = True
 WEBSOCKET_PROTOCOL = 'wss' if IS_HTTPS else 'ws'
 SITE_PROTOCOL = 'https' if IS_HTTPS else 'http'
 API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/?id='))
@@ -141,15 +114,13 @@ FIREBASE_URL = 'https://android.googleapis.com/gcm/send'
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
-		'NAME': os.environ.get('MYSQL_DATABASE', 'pychat'),
-		'USER': os.environ.get('MYSQL_USER', 'root'),
-		'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
-		'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
-		'PORT': os.environ.get('MYSQL_PORT', '3306')  # mysql uses socket if host is localhost
+		'NAME': 'pychat',
+		'USER': 'root',
+		'PASSWORD': '',
+		'HOST': 'localhost',
 		'default-character-set': 'utf8',
 		'OPTIONS': {
 			'autocommit': True,
-
 		},
 	}
 }
@@ -187,7 +158,7 @@ handler404 = 'chat.views.handler404'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 STATIC_URL = '/static/'
-STATIC_URL = 'https://static.pychat.org/'
+
 PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
@@ -205,23 +176,10 @@ if 'start_tornado' in sys.argv:
 else:
 	log_file_name = 'chat.log'
 
-if DEBUG:
-	class InvalidString(str):
-		def __mod__(self, other):
-			from django.template.base import TemplateSyntaxError
-			raise TemplateSyntaxError(
-				"Undefined variable or unknown value for: %s" % other)
-	TEMPLATE_STRING_IF_INVALID = InvalidString("%s")
-
 TEMPLATES = [{
 	'BACKEND': 'django.template.backends.django.DjangoTemplates',
 	'DIRS': [join(BASE_DIR, 'templates')],
 	'OPTIONS': {
-		 'loaders': [ # TORO remove in debug
-		 	('django.template.loaders.cached.Loader', [
-		 		'django.template.loaders.filesystem.Loader',
-		 		'django.template.loaders.app_directories.Loader',
-		 	])],
 		'context_processors': global_settings.TEMPLATE_CONTEXT_PROCESSORS + [username_processor]
 	}
 }]
@@ -263,19 +221,10 @@ LOGGING = {
 			'class': 'logging.StreamHandler',
 			'formatter': 'django',
 		},
-	},
-	'loggers': {
-		# root logger
-		'': {
-			'handlers': ['django-console'],
-			'level': 'DEBUG',
-			'propagate': False,
-		},
-		'chat.tornado': {
-			'handlers': ['tornado-console'],
-			'level': 'DEBUG',
-			'propagate': False,
-		},
+		'mail_admins': {
+			'level': 'ERROR',
+			'class': 'django.utils.log.AdminEmailHandler',
+		}
 	},
 	'formatters': {
 		'django': {
@@ -291,12 +240,6 @@ WS_ID_CHAR_LENGTH = 4
 logging.config.dictConfig(LOGGING)
 
 DEFAULT_PROFILE_ID = 1
-# for gmail or google apps
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'chat.django@gmail.com'
-EMAIL_HOST_PASSWORD = 'Ilovepython'
 
 ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/djangochat/issues/new'
 
@@ -305,19 +248,9 @@ SESSION_COOKIE_NAME = "sessionid"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 
 MEDIA_URL = "/photo/"
-MEDIA_URL = "https://static.pychat.org/photo/"
+
 USER_COOKIE_NAME = 'user'
 JS_CONSOLE_LOGS = True
-
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 25
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-#DEFAULT_FROM_EMAIL = 'root <root@pychat.org>'
-SERVER_EMAIL = 'root@pychat.org'
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-ADMINS = [('Andrew', 'deathangel908@gmail.com'), ]
 
 # If this options is set, on every oncoming request chat will gather info about user location
 
@@ -363,3 +296,76 @@ GENDERS = {0: 'Secret', 1: 'Male', 2: 'Female', }
 DATE_INPUT_FORMATS = ('%Y-%m-%d',)  # html5 input date default format, see also Pikaday in js
 DATE_INPUT_FORMATS_JS = 'YYYY-MM-DD'  # html5 input date default format, see also Pikaday in js, TODO webrtc.js
 USE_L10N = False  # use DATE_INPUT_FORMATS as main format for date rendering
+
+
+try:
+	from chat.production import *
+	print('imported production.py settings')
+except ImportError as e:
+	print('Failed to import production.py because {}'.format(e))
+	pass
+
+SESSION_REDIS = {
+	'host': REDIS_HOST,
+	'post': REDIS_PORT,
+	'db': 3
+}
+
+if DEBUG:
+	class InvalidString(str):
+		def __mod__(self, other):
+			from django.template.base import TemplateSyntaxError
+			raise TemplateSyntaxError(
+				"Undefined variable or unknown value for: %s" % other)
+	TEMPLATE_STRING_IF_INVALID = InvalidString("%s")
+	import sslserver
+	CRT_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.crt"))
+	KEY_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.key"))
+	TORNADO_SSL_OPTIONS = {
+		"certfile": CRT_PATH,
+		"keyfile": KEY_PATH
+	}
+	INSTALLED_APPS = INSTALLED_APPS + ('sslserver',)
+	LOGGING['loggers'] = {
+		# root logger
+		'': {
+			'handlers': ['django-console'],
+			'level': 'DEBUG',
+			'propagate': False,
+		},
+		'chat.tornado': {
+			'handlers': ['tornado-console'],
+			'level': 'DEBUG',
+			'propagate': False,
+		},
+	}
+else:
+	TORNADO_SSL_OPTIONS = None
+	TEMPLATES[0]['OPTIONS']['loaders'] = [
+		('django.template.loaders.cached.Loader', [
+			'django.template.loaders.filesystem.Loader',
+			'django.template.loaders.app_directories.Loader',
+		])]
+	LOGGING['loggers'] = {
+		'django.request': {
+			'handlers': ['mail_admins', 'file'],
+			'level': 'ERROR',
+			'propagate': False,
+		},
+		'': {
+			'handlers': ['file', ],
+			'level': 'DEBUG',
+			'propagate': False,
+		},
+		'tornado.application': {
+			'handlers': ['file-tornado', 'mail_admins'],
+			'level': 'ERROR',
+			'propagate': True,
+		},
+		'chat.tornado': {
+			'handlers': ['file-tornado'],
+			'level': 'DEBUG',
+			'propagate': False,
+		},
+
+	}
