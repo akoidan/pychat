@@ -11,6 +11,8 @@ services:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 5s
       retries: 10
+    volumes:
+      - ./volumes/:/var/lib/mysql
   server:
     build:
       context: ../
@@ -30,11 +32,14 @@ services:
       - db
       - redis
     volumes:
-      - ./log:/usr/src/log
+      - ./volumes/log:/usr/src/log
+      - ./volumes/migrations:/usr/src/chat/migrations
 
   redis:
     image: redis:alpine
-
+    volumes:
+      - ./volumes/redis:/data
+  nginx
   ws:
     build:
       context: ../
@@ -43,6 +48,8 @@ services:
       server:
         condition: service_healthy
     command: python manage.py start_tornado
+    volumes:
+      - ./docker/log:/usr/src/log
     links:
       - server
     ports:

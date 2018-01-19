@@ -41,19 +41,21 @@ You can always use [pychat.org](https://pychat.org), but if you want run chat yo
  - Run chat as in production
 
 ## Via docker
-This is the fastest way to try out pychat. Just run `docker-compose -f docker/docker-compose.yml up` and open `https://localhost:8000/#/chat/1`
+ - execute `./download_content.sh generate_certificate`
+ - Rename [chat/production_example.py](chat/production_example.py) to `chat/production.py`. Open it and replace with your data. Docker section, debug section and secret key is required. If you leave everything else as it is chat will run but lack those thing you left commented.
+ - Run `docker-compose -f docker/docker-compose.yml up` and open `https://localhost:8000/#/chat/1`
 
 ## Development setup
 The flow is the following
  - Install OS packages depending on your OS type
- - Bootstart files
+ - Bootstrap files
  - Start services and check if it works
 
 ### Install OS packages
 This section depends on the OS you use. I tested full install on Windows/Ubuntu/CentOs/Archlinux/Archlinux(rpi2 armv7). [pychat.org](https://pychat.org) currently runs on Archlinux rpi2.
 
 #### [Windows](https://www.microsoft.com/en-us/download/windows.aspx):
- 1. Install [python](https://www.python.org/downloads/) with pip. Any version **Python2.7** or **Python 3.x** both are supported. Caution: Chrome refuses to work with django-ssl-server on python 2, you will need to generate custom certificate.
+ 1. Install [python](https://www.python.org/downloads/) with pip. Any version **Python2.7** or **Python 3.x** both are supported.
  2. Add **pip** and **python** to `PATH` variable.
  3. Install [redis](https://github.com/MSOpenTech/redis/releases). Get the newest version or at least 2.8.
  4. Install [sassc](http://sass-lang.com/libsass). Add **sassc** command path to `PATH` variable.
@@ -111,10 +113,22 @@ Services commands for Archlinux:
 ### Common
  - Follow the instructions in [Boostrap files](#bootstrap-files).
  - For production I would recommend to clone repository to `/srv/http/djangochat`.  If you cloned project into different directory than `/srv/http` you need to replace all absolute paths for your one in config files `pattern="/srv/http"; grep -rl "$pattern" ./rootfs |xargs sed -i "s#$pattern#$PWD#g"`
- - Replace all occurrences of domain name `exist_domain="pychat\.org"; your_domain="YOUR\.DOMAIN\.COM"; grep -rl "$exist_domain" ./ |xargs sed -i "s#$exist_domain#$your_domain#g"`. (note regex escape for dot char). Also check `rootfs/etc/nginx/nginx.conf` you may want to merge `location /photo` and `location /static` into main `server` conf. (you need all of this because I used subdomain for static urls)
+ - Replace all occurrences of domain name `exist_domain="pychat\.org"; your_domain="YOUR\.DOMAIN\.COM"; grep -rl "$exist_domain" ./ |xargs sed -i "s#$exist_domain#$your_domain#g"`. (note regex escape for dot char). So for example you have domain. https://google.come. THe command will look:  `exist_domain="pychat\.org"; your_domain="google\.com"; grep -rl "$exist_domain" ./ |xargs sed -i "s#$exist_domain#$your_domain#g"` Also check `rootfs/etc/nginx/nginx.conf` you may want to merge `location /photo` and `location /static` into main `server` conf. You need all of this because I used subdomain for static urls/
+ - HTTPS is required for webrtc calls so you need to enable ssl:
+   - Obtain ceritifcate.
+       - Register online. There're a lot of free and paid services. Like comodo or startssl(only 1 year free). Here's instructions for startssl.
+         - Follow the instructions in https://www.startssl.com.
+         - Start postfix service (it's required to verify that you have access to domain)
+         - Send validation email to domain `webmaster@pychat.org`
+         - Apply verification code from `/root/Maildir/new/<<time>>` (you may also need to  disable ssl in /etc/postfix/main.cf since it's enabled by default).
+         - You can generate server.key and get certificate from  https://www.startssl.com/Certificates/ApplySSLCert .
+       - Generate custom certificate.
+         - execute `./download_content.sh generate_certificate`
+         - Or generate by yourself
+   - Now you got certificate and you want to put files according to [nginx.conf](rootfs/etc/nginx/nginx.conf). Copy server key into `./rootfs/etc/nginx/ssl/server.key` and certificate into `./rootfs/etc/nginx/ssl/certificate.crt`.
+   - Don't forget to change owner of files to http user `chown -R http:http /etc/nginx/ssl/`
  - Copy config files to rootfs `cp rootfs / -r `. Change owner of project to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`.
  - Generate postfix postman: `postmap /etc/postfix/virtual; postman /etc/aliases`
- - Place your certificate in `/etc/nginx/ssl`, you can get free one with startssl. For it start postfix service, send validation email to domain `webmaster@pychat.org` and apply verification code from `/root/Maildir/new/<<time>>` (you may also need to  disable ssl in /etc/postfix/main.cf since it's enabled by default). You can generate server.key and get certificate from  https://www.startssl.com/Certificates/ApplySSLCert . Put them into  `/etc/nginx/ssl/server.key` and `/etc/nginx/ssl/1_${YOUR.DOMAIN.COM}_bundle.crt` (`YOUR.DOMAIN.COM` = `pychat.org` by default, but replaced above) (those settings are listed in `nginx.conf` and `settings.py`). (you can also create your own certificate or copy them from `/usr/lib/python*/site-packages/sslserver/certs/`). Don't forget to change owner of files to http user `chown -R http:http /etc/nginx/ssl/`
  - Add django admin static files: `python manage.py collectstatic`
  - Execute start services and if you need enablign autostart commands described for [Archlinux](#archliunux-prod) or [CentOS](#centos-prod)
  - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
@@ -124,6 +138,8 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Self signed certificate doesn't work in chrome from docker
+* setTimeot stops working after 30min in chrome background, it has been changed to setInterval, check if it works
 * giphy search should return random image
 * FIrebase message should update notification instead of showing one, even push notificaiton should update and not dissapear
 * WS close event doesn't fire after suspending PC to ram https://github.com/websockets/ws/issues/686

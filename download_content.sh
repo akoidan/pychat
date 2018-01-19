@@ -43,6 +43,23 @@ declare -a files=(\
 
 cd "$PROJECT_ROOT"
 
+generate_certificate() {
+    key_path="$PROJECT_ROOT/rootfs/etc/nginx/ssl/server.key"
+    cert_path="$PROJECT_ROOT/rootfs/etc/nginx/ssl/certificate.crt"
+    safeRunCommand openssl req -x509 -newkey rsa:4096 -keyout $PWD/server.key -out $PWD/1_pychat.org_bundle.crt -days 3650
+    printOut "Generated server.key in $key_path\nGenerated certificate in $cert_path"
+}
+
+rename_domain() {
+    if [ $# -eq 0  ]; then
+        printError "Please provide domain name"
+        exit 1;
+    fi
+    exist_domain="pychat\.org"
+    your_domain="$1"
+    grep -rl "$exist_domain" "$PROJECT_ROOT/rootfs" |xargs sed -i "s#$exist_domain#$your_domain#g"
+}
+
 check_files() {
     if [ "$1" = "remove_script" ]; then
         delete_tmp_dir
@@ -186,7 +203,9 @@ safeRunCommand() {
   eval "$@"
   ret_code=$?
   if [ $ret_code != 0 ]; then
-    printf "\e[91mError $ret_code when executing command: \e[93m$@ \e[0;37;40m\n"
+    printf "\e[91mExecution of command below has failed \e[93m\n"
+    >&2 echo "$@"
+    printf "\e[91mResult code is $ret_code \e[0;37;40m\n"
     exit $ret_code
   fi
 }
@@ -249,6 +268,10 @@ elif [ "$1" = "generate_icon_session" ]; then
     python -mwebbrowser "http://fontello.com/`cat .fontello`"
 elif [ "$1" = "check_files" ]; then
     check_files
+elif [ "$1" = "rename_domain" ]; then
+    rename_domain $2
+elif [ "$1" = "generate_certificate" ]; then
+    generate_certificate
 elif [ "$1" = "extension" ]; then
     zip_extension
 elif [ "$1" = "download_files" ]; then
@@ -274,6 +297,8 @@ elif [ "$1" == "all" ]; then
     check_files "remove_script"
 else
  printf " \e[93mWellcome to pychat download manager, available commands are:\n"
+ chp generate_certificate "Create self-singed ssl certificate"
+ chp rename_domain "Rename all occurencies of pychat.org in rootfs for your domain name. Please escape dots, e.g. to replace pychat.org to google.com use download_content.sh rename_domain 'google\.com'"
  chp all "Downloads all content required for project"
  chp check_files "Verifies if all files are installed"
  chp sass "Compiles css"
