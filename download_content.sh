@@ -310,8 +310,8 @@ elif [ "$1" == "all" ]; then
 else
  printf " \e[93mWellcome to pychat download manager, available commands are:\n"
  chp generate_certificate "Create self-singed ssl certificate"
- chp rename_domain "Rename all occurencies of pychat.org in \e[96m$PROJECT_ROOT\e[0;33;40m for your domain name. To replace pychat.org to e.g. google.com use \e[92mrename_domain 'google.com'"
- chp rename_root_directory "Rename all occurencies of /srv/http to \e[96m$PROJECT_ROOT\e[0;33;40m in \e[96m$PROJECT_ROOT/rootfs\e[0;33;40m"
+ chp rename_domain "Rename all occurrences of \e[96mpychat.org\e[0;33;40m in \e[96m$PROJECT_ROOT\e[0;33;40m for your domain name. Usage: \e[92mrename_domain your.domain.com"
+ chp rename_root_directory "Rename all occurrences of \e[96m/srv/http\e[0;33;40m to \e[96m$PROJECT_ROOT\e[0;33;40m in \e[96m$PROJECT_ROOT/rootfs\e[0;33;40m"
  chp all "Downloads all content required for project"
  chp check_files "Verifies if all files are installed"
  chp sass "Compiles css"
