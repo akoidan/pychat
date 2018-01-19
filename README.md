@@ -112,8 +112,9 @@ Services commands for Archlinux:
 
 ### Common
  - Follow the instructions in [Boostrap files](#bootstrap-files).
- - For production I would recommend to clone repository to `/srv/http/djangochat`.  If you cloned project into different directory than `/srv/http` you need to replace all absolute paths for your one in config files `pattern="/srv/http"; grep -rl "$pattern" ./rootfs |xargs sed -i "s#$pattern#$PWD#g"`
- - Replace all occurrences of domain name `exist_domain="pychat\.org"; your_domain="YOUR\.DOMAIN\.COM"; grep -rl "$exist_domain" ./ |xargs sed -i "s#$exist_domain#$your_domain#g"`. (note regex escape for dot char). So for example you have domain. https://google.come. THe command will look:  `exist_domain="pychat\.org"; your_domain="google\.com"; grep -rl "$exist_domain" ./ |xargs sed -i "s#$exist_domain#$your_domain#g"` Also check `rootfs/etc/nginx/nginx.conf` you may want to merge `location /photo` and `location /static` into main `server` conf. You need all of this because I used subdomain for static urls/
+ - For production I would recommend to clone repository to `/srv/http/djangochat`.  If you cloned project into different directory than `/srv/http/djangochat` replace all absolute paths in config files. You can use `download_content.sh rename_root_directory` to do that.
+ - Replace all occurrences of `pychat.org` in [rootfs](rootfs) for your domain. You can use `./download_content.sh rename_domain your.new.domain.com`
+ - Also check `rootfs/etc/nginx/nginx.conf` you may want to merge `location /photo` and `location /static` into main `server` conf. You need all of this because I used subdomain for static urls/
  - HTTPS is required for webrtc calls so you need to enable ssl:
    - Obtain ceritifcate.
        - Register online. There're a lot of free and paid services. Like comodo or startssl(only 1 year free). Here's instructions for startssl.
