@@ -68,9 +68,17 @@ SESSION_ENGINE = 'redis_sessions.session'
 # CELERY_TASK_SERIALIZER = 'json'
 # CELERY_RESULT_SERIALIZER = 'json'
 
-
-
 API_PORT = '8888'
+if 'start_tornado' in sys.argv:
+	try:
+		index_port = sys.argv.index('--port')
+		API_PORT = sys.argv[index_port + 1]
+	except (ValueError, IndexError):
+		pass
+	log_file_name = 'tornado-{}.log'.format(API_PORT)
+else:
+	log_file_name = 'chat.log'
+
 EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn'
 EXTENSION_INSTALL_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + EXTENSION_ID
 
@@ -166,15 +174,6 @@ SMILEYS_ROOT = os.path.join(STATIC_ROOT, 'smileys')
 
 AUTH_PROFILE_MODULE = 'chat.UserProfile'
 
-if 'start_tornado' in sys.argv:
-	try:
-		index_port = sys.argv.index('--port')
-		port = sys.argv[index_port + 1]
-	except (ValueError, IndexError):
-		port = API_PORT
-	log_file_name = 'tornado-{}.log'.format(port)
-else:
-	log_file_name = 'chat.log'
 
 TEMPLATES = [{
 	'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -236,8 +235,6 @@ LOGGING = {
 
 WS_ID_CHAR_LENGTH = 4
 
-
-logging.config.dictConfig(LOGGING)
 
 DEFAULT_PROFILE_ID = 1
 
@@ -369,3 +366,5 @@ else:
 		},
 
 	}
+
+logging.config.dictConfig(LOGGING)

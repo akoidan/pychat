@@ -12,3 +12,5 @@ DATABASES = {
 		},
 	}
 }
+
+API_ADDRESS_PATTERN = 'wss://%s:8000/ws?id='

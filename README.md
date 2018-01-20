@@ -43,6 +43,7 @@ You can always use [pychat.org](https://pychat.org), but if you want run chat yo
 ## Via docker
  - execute `./download_content.sh generate_certificate`
  - Rename [chat/production_example.py](chat/production_example.py) to `chat/production.py`. Open it and replace with your data. Everything in this file is optional
+ - By default chat listens port 8000. If you want to change it, replace API_ADDRESS_PATTERN in [docker/production_db.py](docker/production_db.py) and `nginx  ports: 8000:` in [docker/docker-compose.yml](docker/docker-compose.yml).
  - Run `docker-compose -f docker/docker-compose.yml up` and open `https://localhost:8000/#/chat/1`
 
 ## Development setup
@@ -139,6 +140,8 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* docker proceses should send logs to stdout
+* start_tornado doesn't work port sis not listened
 * When user logs out he shouldn't receive notifications anymore
 * When we send notification and we receive unregistered we should delete it from database.
 * Notifications have same body

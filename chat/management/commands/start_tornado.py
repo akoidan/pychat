@@ -8,7 +8,7 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.web import Application
 
-from chat.settings import IS_HTTPS, TORNADO_SSL_OPTIONS
+from chat.settings import TORNADO_SSL_OPTIONS
 from chat.tornado.tornado_handler import TornadoHandler
 
 
