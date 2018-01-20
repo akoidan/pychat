@@ -46,12 +46,9 @@ cd "$PROJECT_ROOT"
 generate_certificate() {
     key_path="$PROJECT_ROOT/rootfs/etc/nginx/ssl/server.key"
     cert_path="$PROJECT_ROOT/rootfs/etc/nginx/ssl/certificate.crt"
-    safeRunCommand openssl req -x509 -newkey rsa:4096 -keyout $PWD/server.key -out $PWD/1_pychat.org_bundle.crt -days 3650
+    safeRunCommand openssl req -nodes  -new -x509 -keyout "$key_path" -out "$cert_path" -days 3650
     printOut "Generated server.key in $key_path\nGenerated certificate in $cert_path"
 }
-
-
-
 
 rename_root_directory() {
     pattern="/srv/http"

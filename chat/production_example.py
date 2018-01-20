@@ -1,28 +1,9 @@
 ### RENAME THIS FILE to production py
 ### 3 hashtag in this file tells you want to do, while single hastag is required to uncomment
 
-
-### START DOCKER SECTION
-### UNCOMMENT THIS IF YOU USE DOCKER
-#REDIS_HOST = 'redis'
-#DATABASES = {
-#	'default': {
-#		'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
-#		'NAME': 'pychat',
-#		'USER': 'pychat',
-#		'PASSWORD': 'pypass',
-#		'HOST': 'db',
-#		'PORT': '3306',  # mysql uses socket if host is localhost
-#		'OPTIONS': {
-#			'autocommit': True,
-#		},
-#	}
-#}
-### END DOCKER SECTION
-
 ### Turn off debug in production
-# DEBUG = False
-# TEMPLATE_DEBUG = False
+DEBUG = False
+TEMPLATE_DEBUG = False
 
 ### Replace with your django secret key, you can use https://www.miniwebtool.com/django-secret-key-generator/ to generate one
 # SECRET_KEY = '**************************************************'

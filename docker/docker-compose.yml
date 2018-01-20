@@ -12,17 +12,17 @@ services:
       timeout: 5s
       retries: 10
     volumes:
-      - ./volumes/:/var/lib/mysql
+      - ./volumes/mysql:/var/lib/mysql
   server:
     build:
       context: ../
       dockerfile: ./docker/Dockerfileserver
     command:
-       bash -c "python manage.py init_db && python manage.py runsslserver 0.0.0.0:8000"
-    healthcheck:
-      test: ["CMD", "curl", "-fk", "https://localhost:8000/"]
-      timeout: 5s
-      retries: 10
+       bash -c "python manage.py init_db && uwsgi --ini /usr/src/chat-uwsgi.ini"
+#    healthcheck:
+#      test: ["CMD", "curl", "-fk", "https://localhost:8000/"]
+#      timeout: 5s
+#      retries: 10
     ports:
      - 8000:8000
     depends_on:
@@ -34,23 +34,36 @@ services:
     volumes:
       - ./volumes/log:/usr/src/log
       - ./volumes/migrations:/usr/src/chat/migrations
+      - ./volumes/photos:/usr/src/photos
+      - socket:/tmp/socket
+      - static:/usr/src/chat/static
 
   redis:
     image: redis:alpine
     volumes:
       - ./volumes/redis:/data
-  nginx
+  nginx:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfilenginx
+    volumes:
+      - socket:/tmp/socket
+      - ./volumes/photos/:/srv/http/photos
+      - static:/srv/http/static
   ws:
     build:
       context: ../
       dockerfile: ./docker/Dockerfilewebsocket
-    depends_on:
-      server:
-        condition: service_healthy
+#    depends_on:
+#      server:
+#        condition: service_healthy
     command: python manage.py start_tornado
     volumes:
-      - ./docker/log:/usr/src/log
+      - ./volumes/log:/usr/src/log
     links:
       - server
     ports:
      - 8888:8888
+volumes:
+   socket:
+   static:

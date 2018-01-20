@@ -42,7 +42,7 @@ You can always use [pychat.org](https://pychat.org), but if you want run chat yo
 
 ## Via docker
  - execute `./download_content.sh generate_certificate`
- - Rename [chat/production_example.py](chat/production_example.py) to `chat/production.py`. Open it and replace with your data. Docker section, debug section and secret key is required. If you leave everything else as it is chat will run but lack those thing you left commented.
+ - Rename [chat/production_example.py](chat/production_example.py) to `chat/production.py`. Open it and replace with your data. Everything in this file is optional
  - Run `docker-compose -f docker/docker-compose.yml up` and open `https://localhost:8000/#/chat/1`
 
 ## Development setup
@@ -139,6 +139,9 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* When user logs out he shouldn't receive notifications anymore
+* When we send notification and we receive unregistered we should delete it from database.
+* Notifications have same body
 * Self signed certificate doesn't work in chrome from docker
 * setTimeot stops working after 30min in chrome background, it has been changed to setInterval, check if it works
 * giphy search should return random image

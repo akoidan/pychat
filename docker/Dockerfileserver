@@ -1,14 +1,15 @@
 FROM alpine:3.6
 WORKDIR /usr/src
-COPY ./chat  /usr/src/chat
-COPY ./templates  /usr/src/templates
-COPY ./docker/docker_settings.py  /usr/src/chat/production.py
-COPY ./manage.py ./requirements.txt ./config.json ./DefaultSmilies.cfpack ./download_content.sh /usr/src/
-RUN mkdir /usr/src/log &&\
+RUN mkdir ./log &&\
 apk update &&\
-apk add python3 python3-dev mariadb-dev build-base sassc bash curl &&\
-pip3 install -r requirements.txt &&\
+apk add python3 python3-dev mariadb-dev build-base sassc bash curl uwsgi &&\
+pip3 install mysqlclient && \
 apk del python3-dev mariadb-dev build-base &&\
 apk add mariadb-client-libs &&\
-ln -s `which python3` "$(dirname `which python3`)/python" &&\
-bash download_content.sh all
+ln -s `which python3` "$(dirname `which python3`)/python"
+COPY ./requirements.txt .
+RUN pip3 install -r requirements.txt
+COPY ./docker/production_db.py ./manage.py ./config.json ./DefaultSmilies.cfpack ./docker/chat-uwsgi.ini ./download_content.sh ./
+COPY ./chat ./chat/production.py ./chat/
+COPY ./templates  ./templates
+RUN cat ./production_db.py >> ./chat/production.py && bash download_content.sh all
