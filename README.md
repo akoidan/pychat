@@ -42,8 +42,8 @@ You can always use [pychat.org](https://pychat.org), but if you want run chat yo
 
 ## Via docker
  - execute `./download_content.sh generate_certificate`
- - Rename [chat/production_example.py](chat/production_example.py) to `chat/production.py`. Open it and replace with your data. Everything in this file is optional
- - By default chat listens port 8000. If you want to change it, replace API_ADDRESS_PATTERN in [docker/production_db.py](docker/production_db.py) and `nginx  ports: 8000:` in [docker/docker-compose.yml](docker/docker-compose.yml).
+ - Rename [chat/production_example.py](chat/settings_config.py) to `chat/settings.py`. Open it and replace with your data according to comments. Everything in this file but `SECRET_KEY` is optional.
+ - By default chat listens port `8000`. If you want to change it, for e.g to `8001` set `API_ADDRESS_PATTERN=wss://%s:8001/ws?id=` in `chat/settings.py` and `nginx  ports: 8001:443` in [docker/docker-compose.yml](docker/docker-compose.yml).
  - Run `docker-compose -f docker/docker-compose.yml up` and open `https://localhost:8000/#/chat/1`
 
 ## Development setup
@@ -78,7 +78,8 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  2. Rename [chat/production_example.py](chat/production.py) to `chat/production.py`. And And replace it with your data.
  3. Install python packages with `pip install -r requirements.txt`.
  4. Create database: `echo "create database django CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`.If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
- 5. Populate project files: `sh download_content.sh all`
+ 5. Fill database with tables: `./manage.py init_db && ./manage.py sync_db`
+ 6. Populate project files: `sh download_content.sh all`
 
 ### Start services and run:
  - Start `mysql` server if it's not started.

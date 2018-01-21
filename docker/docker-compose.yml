@@ -20,7 +20,7 @@ services:
       context: ../
       dockerfile: ./docker/Dockerfileserver
     command:
-       bash -c "python manage.py init_db && uwsgi --ini /usr/src/chat-uwsgi.ini"
+       bash -c "rm -f /tmp/socket/uwsgi.sock && python manage.py init_db && python manage.py sync_db && uwsgi --ini /usr/src/chat-uwsgi.ini"
     healthcheck:
       test:  bash -c "[ -S /tmp/socket/uwsgi.sock ]"
       start_period: 50s
