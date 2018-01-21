@@ -1,6 +1,7 @@
 FROM alpine:3.6
 WORKDIR /usr/src
-RUN mkdir ./log &&\
+ENV PYCHAT_CONFIG docker
+RUN mkdir -p ./log &&\
 apk update &&\
 apk add python3 python3-dev mariadb-dev build-base &&\
 pip3 install mysqlclient &&\
@@ -8,8 +9,7 @@ apk del python3-dev mariadb-dev build-base &&\
 apk add mariadb-client-libs &&\
 ln -s `which python3` "$(dirname `which python3`)/python"
 COPY ./requirements.txt ./
+COPY ./manage.py ./
 RUN pip3 install -r requirements.txt
-COPY ./chat ./chat/production.py  ./chat/
+COPY ./chat ./chat/
 COPY ./templates  ./templates
-COPY ./manage.py ./requirements.txt ./docker/production_db.py ./
-RUN cat ./production_db.py >> ./chat/production.py

@@ -8,7 +8,8 @@ from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop
 from tornado.web import Application
 
-from chat.settings import TORNADO_SSL_OPTIONS
+from django.conf import settings
+TORNADO_SSL_OPTIONS = getattr(settings, "TORNADO_SSL_OPTIONS", None)
 from chat.tornado.tornado_handler import TornadoHandler
 
 

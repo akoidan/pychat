@@ -1,370 +1,68 @@
-"""
-Django settings for myproject project.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/1.6/topics/settings/
-
-For the full list of settings and their values, see
-https://docs.djangoproject.com/en/1.6/ref/settings/
-"""
-
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import logging.config
+### Rename this file to chat/settings.py
+### 3 hashtag in this file tells you want to do, while single hastag is required to uncomment
+import importlib
 import os
-import sys
-from os.path import join
 
-from django.conf import global_settings
-
-import chat as project_module
-
-LOGGING_CONFIG = None
-
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-
-
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
+config = 'chat.settings_{}'.format(os.environ['PYCHAT_CONFIG'])
+globals().update(importlib.import_module(config).__dict__)
 SECRET_KEY = '8ou!cqb1yd)6c4h0i-cxjo&@@+04%4np6od8qn+z@5b=6)!v(o'
-# SECURITY WARNING: don't run with debug turned on in production!
+### Replace with your django secret key, you can use https://www.miniwebtool.com/django-secret-key-generator/ to generate one
+# SECRET_KEY = '**************************************************'
 
-DEBUG = True
-
-ALLOWED_HOSTS = ["*",]
-
-username_processor = 'chat.context_processors.add_user_name'
-
-# Application definition
-
-INSTALLED_APPS = (
-	'django.contrib.admin',
-	'django.contrib.auth',
-	'django.contrib.contenttypes',
-	'django.contrib.sessions',
-	'django.contrib.messages',
-	'django.contrib.staticfiles',
-	'django.db.migrations',
-	'chat',
-	'simplejson',
-	'redis',
-	'tornado',
-)
+### If you use ClodFlare, you may want to serve static files via it.
+### I wouldn't recommend to put everything under CloudFlare, your sockect connection will strugle!
+### Instead you can create a separate domain and forward static traffic through it
+# STATIC_URL = 'https://static.pychat.org/'
+# MEDIA_URL = "https://static.pychat.org/photo/"
 
 
-RECAPTHCA_SITE_URL = 'https://www.google.com/recaptcha/api.js'
-GOOGLE_OAUTH_2_JS_URL = 'https://apis.google.com/js/platform.js'
-FACEBOOK_JS_URL = '//connect.facebook.net/en_US/sdk.js'
+### this this emails settings will be used to send emails. E.g. when user restores password via email.
+###  Comment them out if you don't want to setup
+
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'localhost' # For gmail settings example 'smtp.gmail.com'
+# EMAIL_PORT = 25 # google smpt port '587'
+# EMAIL_HOST_USER = '' # you gmail username e.g. 'chat.django@gmail.com'
+# EMAIL_HOST_PASSWORD = '' # Your gmail password  e.g. 'Ilovepython'
+# SERVER_EMAIL = 'root@pychat.org'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# ADMINS = [('YourName', 'emailAddresThatYouWillReceiveReportsOn@gmail.com'), ]
 
 
-REDIS_PORT = 6379
-REDIS_HOST ='localhost'
-SESSION_ENGINE = 'redis_sessions.session'
+
+### Pychat also supports https://developers.google.com/web/fundamentals/push-notifications/ firebase notifications, like in facebook.
+### They will fire even user doesn't have opened tab. That can be turned on/off by used in his/her profile with checkbox `Notifications`.
+### The implementation is similar like https://github.com/GoogleChrome/samples/tree/gh-pages/push-messaging-and-notifications.
+###    1. Create a project on the Firebase Developer Console: https://console.firebase.google.com/
+###    2. Go to Settings (the cog near the top left corner), click the Cloud Messaging Tab: https://console.firebase.google.com/u/1/project/pychat-org/settings/cloudmessaging/
+###    3. Put `<Your Cloud Messaging API Key ...>` to `FIREBASE_API_KEY` below.
+###    4. Create `chat/static/manifest.json` with content like https://github.com/GoogleChrome/samples/blob/gh-pages/push-messaging-and-notifications/manifest.sample.json:
+###
+### {
+###  "name": "Pychat Push Notifications",
+###  "short_name": "PyPush",
+###  "start_url": "/",
+###  "display": "standalone",
+###  "gcm_sender_id": "<Your Sender ID from https://console.firebase.google.com>"
+### }
+
+# FIREBASE_API_KEY = '***********:********************************************************************************************************************************************'
 
 
-# BROKER_URL = str(SESSION_REDIS_PORT).join(('redis://localhost:','/0'))
-# CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
-
-API_PORT = '8888'
-if 'start_tornado' in sys.argv:
-	try:
-		index_port = sys.argv.index('--port')
-		API_PORT = sys.argv[index_port + 1]
-	except (ValueError, IndexError):
-		pass
-	log_file_name = 'tornado-{}.log'.format(API_PORT)
-else:
-	log_file_name = 'chat.log'
-
-EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn'
-EXTENSION_INSTALL_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + EXTENSION_ID
-
-IS_HTTPS = True
-WEBSOCKET_PROTOCOL = 'wss' if IS_HTTPS else 'ws'
-SITE_PROTOCOL = 'https' if IS_HTTPS else 'http'
-API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/?id='))
-
-# GIPHY_API_KEY = 'thZMTtDfFdugqPDIAY461GzYTctuYIeIj' // TODO paste your GIPHY api key from https://developers.giphy.com/
-GIPHY_URL= 'http://api.giphy.com/v1/gifs/search?api_key={}&limit=1&q={}'
-GIPHY_REGEX = r"^\s*\/giphy (.+)"
-# SESSION_COOKIE_AGE = 10
-# SESSION_SAVE_EVERY_REQUEST = True
-# SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-MIDDLEWARE_CLASSES = (
-	'django.middleware.csrf.CsrfViewMiddleware',
-	'django.contrib.sessions.middleware.SessionMiddleware',
-	'django.middleware.common.CommonMiddleware',
-	'django.contrib.auth.middleware.AuthenticationMiddleware',
-	'django.contrib.messages.middleware.MessageMiddleware',
-	'chat.cookies_middleware.UserCookieMiddleWare',
-)
-
-ROOT_URLCONF = 'chat.urls'
-
-WSGI_APPLICATION = 'chat.wsgi.application'
-
-AUTH_USER_MODEL = 'chat.User'
-AUTHENTICATION_BACKENDS = ['chat.utils.EmailOrUsernameModelBackend']
-
-LOGIN_URL = '/'
-FIREBASE_URL = 'https://android.googleapis.com/gcm/send'
-
-# Database
-# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-# pip install PyMySQL
-# import pymysql
-# pymysql.install_as_MySQLdb()
-
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
-		'NAME': 'pychat',
-		'USER': 'root',
-		'PASSWORD': '',
-		'HOST': 'localhost',
-		'default-character-set': 'utf8',
-		'OPTIONS': {
-			'autocommit': True,
-		},
-	}
-}
-#
-# DATABASES = {
-# 	'default': {
-# 		'ENGINE': 'django.db.backends.sqlite3',
-# 		'NAME': 'django.db',
-# 	}
-# }
-
-CACHES = {
-	'default': {
-		'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
-	}
-}
-
-# Internationalization
-# https://docs.djangoproject.com/en/1.6/topics/i18n/
-
-LANGUAGE_CODE = 'en-us'
-
-TIME_ZONE = 'Europe/Kiev'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
-DEFAULT_CHARSET = 'utf-8'
-
-handler404 = 'chat.views.handler404'
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.6/howto/static-files/
-STATIC_URL = '/static/'
-
-PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
-
-STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
-SMILEYS_ROOT = os.path.join(STATIC_ROOT, 'smileys')
-
-AUTH_PROFILE_MODULE = 'chat.UserProfile'
+#### If you want to use giphy images that appears if user types "/giphy example".
+### To get those -sign up in https://developers.giphy.com/, create a new app and replaced with its key.
+# GIPHY_API_KEY = '********************************'
 
 
-TEMPLATES = [{
-	'BACKEND': 'django.template.backends.django.DjangoTemplates',
-	'DIRS': [join(BASE_DIR, 'templates')],
-	'OPTIONS': {
-		'context_processors': global_settings.TEMPLATE_CONTEXT_PROCESSORS + [username_processor]
-	}
-}]
-
-LOGGING = {
-	'version': 1,
-	'disable_existing_loggers': True,
-	'filters': {
-		'id': {
-			'()': 'chat.log_filters.ContextFilter',
-		}
-	},
-	'handlers': {
-		'file-tornado': {
-			'level': 'DEBUG',
-			'class': 'logging.handlers.TimedRotatingFileHandler',
-			'filename': join(BASE_DIR, 'log/', log_file_name),
-			'formatter': 'django',
-			'when': 'midnight',
-			'interval': 1
-		},
-		'file': {
-			'level': 'DEBUG',
-			'class': 'logging.handlers.TimedRotatingFileHandler',
-			'filename': join(BASE_DIR, 'log/', log_file_name),
-			'formatter': 'django',
-			'filters': ['id', ],
-			'when': 'midnight',
-			'interval': 1
-		},
-		'django-console': {
-			'level': 'DEBUG',
-			'class': 'logging.StreamHandler',
-			'formatter': 'django',
-			'filters': ['id', ]
-		},
-		'tornado-console': {
-			'level': 'DEBUG',
-			'class': 'logging.StreamHandler',
-			'formatter': 'django',
-		},
-		'mail_admins': {
-			'level': 'ERROR',
-			'class': 'django.utils.log.AdminEmailHandler',
-		}
-	},
-	'formatters': {
-		'django': {
-			'format': '%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
-			'datefmt': '%H:%M:%S',
-		},
-	},
-}
-
-WS_ID_CHAR_LENGTH = 4
+### If you want recaptcha: Open https://www.google.com/recaptcha/admin#list and register new domain
+# RECAPTCHA_SITE_KEY = '****************************************' # REPLACE_THIS_WITH_DATA-SITEKEY_DIV_ATTRIBUTE
+# RECAPTCHA_SECRET_KEY = '****************************************' # REPLACE_THIS_WITH_KEY_FOR_RETRIEVING_RESULT
 
 
-DEFAULT_PROFILE_ID = 1
+### For google auth follow the instructions here https://developers.google.com/identity/sign-in/web/devconsole-project
+# GOOGLE_OAUTH_2_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com'
+# GOOGLE_OAUTH_2_HOST = 'your.domain.com'
 
-ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/djangochat/issues/new'
-
-SESSION_COOKIE_NAME = "sessionid"
-
-MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
-
-MEDIA_URL = "/photo/"
-
-USER_COOKIE_NAME = 'user'
-JS_CONSOLE_LOGS = True
-
-# If this options is set, on every oncoming request chat will gather info about user location
-
-IP_API_URL = 'http://ip-api.com/json/%s'
-
-ALL_REDIS_ROOM = 'all'
-WEBRTC_CONNECTION = 'webrtc_conn'
-ALL_ROOM_ID = 1
-
-SELECT_SELF_ROOM = """SELECT
-	a.id as room__id,
-	a.disabled as room__disabled
-FROM chat_room a
-WHERE a.id IN %s AND
-			EXISTS
-			(
-					SELECT 1
-					FROM chat_room_users b
-					WHERE a.id = b.room_id
-					HAVING COUNT(b.user_id) = 1
-			)"""
-
-UPDATE_LAST_READ_MESSAGE = """
-UPDATE chat_room_users out_cru
-	INNER JOIN
-		(SELECT
-			max(chat_message.id) message_id,
-			chat_room_users.id rooms_users_id
-		 FROM chat_room_users
-			JOIN chat_message ON chat_message.room_id = chat_room_users.room_id
-		WHERE chat_room_users.user_id = %s and chat_room_users.room_id != {}
-		GROUP BY chat_message.room_id) last_message ON out_cru.id = last_message.rooms_users_id
-SET out_cru.last_read_message_id = last_message.message_id 
-""".format(ALL_ROOM_ID)
-
-# ---------------JAVASCRIPT CONSTANTS --------------------
-
-VALIDATION_IS_OK = 'ok'
-MAX_USERNAME_LENGTH = 16
-MAX_MESSAGE_SIZE = 100000
-GENDERS = {0: 'Secret', 1: 'Male', 2: 'Female', }
-#
-DATE_INPUT_FORMATS = ('%Y-%m-%d',)  # html5 input date default format, see also Pikaday in js
-DATE_INPUT_FORMATS_JS = 'YYYY-MM-DD'  # html5 input date default format, see also Pikaday in js, TODO webrtc.js
-USE_L10N = False  # use DATE_INPUT_FORMATS as main format for date rendering
-
-
-try:
-	from chat.production import *
-	print('imported production.py settings')
-except ImportError as e:
-	print('Failed to import production.py because {}'.format(e))
-	pass
-
-SESSION_REDIS = {
-	'host': REDIS_HOST,
-	'post': REDIS_PORT,
-	'db': 3
-}
-
-if DEBUG:
-	class InvalidString(str):
-		def __mod__(self, other):
-			from django.template.base import TemplateSyntaxError
-			raise TemplateSyntaxError(
-				"Undefined variable or unknown value for: %s" % other)
-	TEMPLATE_STRING_IF_INVALID = InvalidString("%s")
-	import sslserver
-	CRT_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.crt"))
-	KEY_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.key"))
-	TORNADO_SSL_OPTIONS = {
-		"certfile": CRT_PATH,
-		"keyfile": KEY_PATH
-	}
-	INSTALLED_APPS = INSTALLED_APPS + ('sslserver',)
-	LOGGING['loggers'] = {
-		# root logger
-		'': {
-			'handlers': ['django-console'],
-			'level': 'DEBUG',
-			'propagate': False,
-		},
-		'chat.tornado': {
-			'handlers': ['tornado-console'],
-			'level': 'DEBUG',
-			'propagate': False,
-		},
-	}
-else:
-	TORNADO_SSL_OPTIONS = None
-	TEMPLATES[0]['OPTIONS']['loaders'] = [
-		('django.template.loaders.cached.Loader', [
-			'django.template.loaders.filesystem.Loader',
-			'django.template.loaders.app_directories.Loader',
-		])]
-	LOGGING['loggers'] = {
-		'django.request': {
-			'handlers': ['mail_admins', 'file'],
-			'level': 'ERROR',
-			'propagate': False,
-		},
-		'': {
-			'handlers': ['file', ],
-			'level': 'DEBUG',
-			'propagate': False,
-		},
-		'tornado.application': {
-			'handlers': ['file-tornado', 'mail_admins'],
-			'level': 'ERROR',
-			'propagate': True,
-		},
-		'chat.tornado': {
-			'handlers': ['file-tornado'],
-			'level': 'DEBUG',
-			'propagate': False,
-		},
-
-	}
-
-logging.config.dictConfig(LOGGING)
+### For facebook auth:
+# FACEBOOK_ACCESS_TOKEN = '***************|***************************' # https://developers.facebook.com/tools/access_token/
+# FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/

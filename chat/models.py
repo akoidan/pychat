@@ -65,7 +65,7 @@ class User(AbstractBaseUser):
 
 class Subscription(models.Model):
 	user = models.ForeignKey(User, null=False)
-	registration_id = models.CharField(null=False, max_length=255, unique=True)
+	registration_id = models.CharField(null=False, max_length=191, unique=True)
 	created = models.DateTimeField(default=datetime.datetime.now)
 
 

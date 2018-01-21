@@ -1,0 +1,5 @@
+docker/volumes
+chat/migrations
+chat/static/css
+log
+photos

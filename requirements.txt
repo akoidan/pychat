@@ -1,6 +1,6 @@
 setuptools==38.4.0
 oauth2client==4.1.2
-django==1.9.13
+django==1.9.12
 simplejson==3.13.2
 redis==2.10.6
 tornado==4.5.3

@@ -1,9 +1,10 @@
-### RENAME THIS FILE to production py
+### Rename this file to chat/settings.py
 ### 3 hashtag in this file tells you want to do, while single hastag is required to uncomment
+import importlib
+import os
 
-### Turn off debug in production
-DEBUG = False
-TEMPLATE_DEBUG = False
+config = 'chat.settings_{}'.format(os.environ['PYCHAT_CONFIG'])
+globals().update(importlib.import_module(config).__dict__)
 
 ### Replace with your django secret key, you can use https://www.miniwebtool.com/django-secret-key-generator/ to generate one
 # SECRET_KEY = '**************************************************'

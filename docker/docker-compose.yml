@@ -1,4 +1,4 @@
-version: '2.1'
+version: '2.3'
 services:
   db:
     image: mysql/mysql-server
@@ -12,6 +12,7 @@ services:
       timeout: 3s
       interval: 5s
       retries: 10
+      start_period: 50s
     volumes:
       - ./volumes/mysql:/var/lib/mysql
   server:
@@ -22,13 +23,12 @@ services:
        bash -c "python manage.py init_db && uwsgi --ini /usr/src/chat-uwsgi.ini"
     healthcheck:
       test:  bash -c "[ -S /tmp/socket/uwsgi.sock ]"
-      retries: 10
-      interval: 5s
+      start_period: 50s
+      retries: 5
+      interval: 3s
     depends_on:
       db:
         condition: service_healthy
-    links:
-      - db
     volumes:
       - ./volumes/log:/usr/src/log
       - ./volumes/migrations:/usr/src/chat/migrations
@@ -61,8 +61,6 @@ services:
       python manage.py start_tornado
     volumes:
       - ./volumes/log:/usr/src/log
-    links:
-      - server
 volumes:
    socket:
    static:
