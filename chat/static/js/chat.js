@@ -3475,7 +3475,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		if (self.allMessages.length > 0 && !(timeMillis > self.allMessages[self.allMessages.length - 1])) {
 				var posRes = self.getPosition(timeMillis);
 				if (posRes.exists) {
-					logger.info("Updaing message with timeId {}", timeMillis)();
+					//logger.info("Updaing message with timeId {}", timeMillis)();
 					self.dom.chatBoxDiv.replaceChild(p, posRes.exists);
 					return
 				} else {
@@ -3689,7 +3689,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.setOnlineUsers = function (message) {
 		self.onlineUsers = message.content;
-		logger.info("Load user names: {}", Object.keys(self.onlineUsers))();
+		//logger.info("Load user names: {}", Object.keys(self.onlineUsers))();
 		for (var userId in self.allUsers) {
 			if (!self.allUsers.hasOwnProperty(userId)) continue;
 			var user = self.allUsers[userId];
@@ -5660,6 +5660,12 @@ function WsHandler() {
 	self.log = loggerFactory.getLogger('WS', console.log, "color: green;");
 	self.logWarn = loggerFactory.getLogger('WS', console.warn, "color: green;");
 	self.logError = loggerFactory.getLogger('WS', console.error, "color: green;");
+	self.logData = function(tag, obj, raw,) {
+		if (raw.length > 1000) {
+			raw = ""
+		}
+		return loggerFactory.getLogger(tag, console.log, "color: green; font-weight: bold")("{} {}", raw, obj);
+	}
 	self.logIn = loggerFactory.getLogger('WS_IN', console.log, "color: green; font-weight: bold");
 	self.logOut = loggerFactory.getLogger('WS_OUT', console.log, "color: green; font-weight: bold");
 	self.dom = {
@@ -5700,7 +5706,7 @@ function WsHandler() {
 		var data;
 		try {
 			data = JSON.parse(jsonData);
-			self.logIn("{}", jsonData)();
+			self.logData("WS_IN", data, jsonData)();
 		} catch (e) {
 			self.logError('Unable to parse incomming message {}', jsonData)();
 			growlError("Unable to parse incoming message {}", e);
@@ -5725,7 +5731,7 @@ function WsHandler() {
 			self.logError("Web socket is closed. Can't send {}", logEntry)();
 			return false;
 		} else {
-			self.logOut("{}", jsonRequest)();
+			self.logData("WS_OUT", objData, jsonRequest)();
 			self.ws.send(jsonRequest);
 			return true;
 		}
