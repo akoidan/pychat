@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import datetime
 import json
+import logging
 
 import os
 from django.conf import settings
@@ -29,8 +30,7 @@ from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription
-from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging, EXTENSION_ID, EXTENSION_INSTALL_URL, \
-	ALL_ROOM_ID,  STATIC_ROOT
+from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
 	create_user_model, check_captcha, send_reset_password_email
 
@@ -56,7 +56,7 @@ def validate_email(request):
 	email = request.POST.get('email')
 	try:
 		utils.check_email(email)
-		response = VALIDATION_IS_OK
+		response = settings.VALIDATION_IS_OK
 	except ValidationError as e:
 		response = e.message
 	return HttpResponse(response, content_type='text/plain')
@@ -89,11 +89,15 @@ def get_firebase_playback(request):
 		return HttpResponse("No new messages found", content_type='text/plain')
 
 
+def test(request):
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+
+
 @require_http_methods('POST')
 def register_subscription(request):
 	registration_id = request.POST['registration_id']
 	Subscription.objects.update_or_create(registration_id=registration_id, defaults={ 'user': request.user})
-	return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 @require_http_methods('POST')
 def validate_user(request):
@@ -104,14 +108,14 @@ def validate_user(request):
 		username = request.POST.get('username')
 		utils.check_user(username)
 		# hardcoded ok check in register.js
-		message = VALIDATION_IS_OK
+		message = settings.VALIDATION_IS_OK
 	except ValidationError as e:
 		message = e.message
 	return HttpResponse(message, content_type='text/plain')
 
 
 def get_service_worker(request):  # this stub is only for development, this is replaced in nginx for prod
-	worker = open(os.path.join(STATIC_ROOT, 'js', 'sw.js'), 'rb')
+	worker = open(os.path.join(settings.STATIC_ROOT, 'js', 'sw.js'), 'rb')
 	response = HttpResponse(content=worker)
 	response['Content-Type'] = 'application/javascript'
 	return response
@@ -130,9 +134,9 @@ def home(request):
 	context['cache_messages'] = up.cache_messages
 	context['highlight_code'] = up.highlight_code
 	context['embedded_youtube'] = up.embedded_youtube
-	context['extensionId'] = EXTENSION_ID
-	context['extensionUrl'] = EXTENSION_INSTALL_URL
-	context['defaultRoomId'] = ALL_ROOM_ID
+	context['extensionId'] = settings.EXTENSION_ID
+	context['extensionUrl'] = settings.EXTENSION_INSTALL_URL
+	context['defaultRoomId'] = settings.ALL_ROOM_ID
 	context['manifest'] = FIREBASE_API_KEY is not None
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
@@ -155,7 +159,7 @@ def auth(request):
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		djangologin(request, user)
-		message = VALIDATION_IS_OK
+		message = settings.VALIDATION_IS_OK
 	else:
 		message = 'Login or password is wrong'
 	logger.debug('Auth request %s ; Response: %s', hide_fields(request.POST, ('password',)), message)
@@ -176,7 +180,7 @@ def send_restore_password(request):
 		verification = Verification(type_enum=Verification.TypeChoices.password, user_id=user_profile.id)
 		verification.save()
 		send_reset_password_email(request, user_profile, verification)
-		message = VALIDATION_IS_OK
+		message = settings.VALIDATION_IS_OK
 		logger.debug('Verification email has been send for token %s to user %s(id=%d)',
 				verification.token, user_profile.username, user_profile.id)
 	except UserProfile.DoesNotExist:
@@ -229,7 +233,7 @@ class RestorePassword(View):
 			verification.verified = True
 			verification.save(update_fields=('verified',))
 			logger.info('Password has been change for token %s user %s(id=%d)', token, user.username, user.id)
-			response = VALIDATION_IS_OK
+			response = settings.VALIDATION_IS_OK
 		except ValidationError as e:
 			logger.debug('Rejecting verification token %s because %s', token, e)
 			response = "".join(("You can't reset password with this token because ", str(e)))
@@ -241,7 +245,7 @@ class RestorePassword(View):
 		try:
 			user = self.get_user_by_code(token)[0]
 			response = {
-				'message': VALIDATION_IS_OK,
+				'message': settings.VALIDATION_IS_OK,
 				'restore_user': user.username,
 				'token': token
 			}
@@ -272,7 +276,7 @@ def confirm_email(request):
 			raise ValidationError('Verification token expired because you generated another one')
 		v.verified = True
 		v.save(update_fields=['verified'])
-		message = VALIDATION_IS_OK
+		message = settings.VALIDATION_IS_OK
 		logger.info('Email verification token %s has been accepted for user %s(id=%d)', token, user.username, user.id)
 	except Exception as e:
 		logger.debug('Rejecting verification token %s because %s', token, e)
@@ -314,7 +318,7 @@ def report_issue(request):
 		log=request.POST.get('log')
 	)
 	issue_details.save()
-	return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 
 class ProfileView(View):
@@ -325,7 +329,7 @@ class ProfileView(View):
 		form = UserProfileForm(instance=user_profile)
 		c = csrf(request)
 		c['form'] = form
-		c['date_format'] = DATE_INPUT_FORMATS_JS
+		c['date_format'] = settings.DATE_INPUT_FORMATS_JS
 		return render_to_response('change_profile.html', c, context_instance=RequestContext(request))
 
 	@login_required_no_redirect()
@@ -341,7 +345,7 @@ class ProfileView(View):
 		form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 		if form.is_valid():
 			profile = form.save()
-			response = profile. photo.url if 'photo' in  request.FILES else VALIDATION_IS_OK
+			response = profile. photo.url if 'photo' in  request.FILES else settings.VALIDATION_IS_OK
 		else:
 			response = form.errors
 		return HttpResponse(response, content_type='text/plain')
@@ -377,7 +381,7 @@ class RegisterView(View):
 			create_user_model(user_profile)
 			# You must call authenticate before you can call login
 			auth_user = authenticate(username=username, password=password)
-			message = VALIDATION_IS_OK  # redirect
+			message = settings.VALIDATION_IS_OK  # redirect
 			if email:
 				send_sign_up_email(user_profile, request.get_host(), request)
 			djangologin(request, auth_user)

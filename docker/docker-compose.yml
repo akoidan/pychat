@@ -30,7 +30,6 @@ services:
       db:
         condition: service_healthy
     volumes:
-      - ./volumes/log:/usr/src/log
       - ./volumes/migrations:/usr/src/chat/migrations
       - ./volumes/photos:/usr/src/photos
       - socket:/tmp/socket
@@ -51,7 +50,7 @@ services:
     ports:
      - 8000:443
     depends_on:
-      server:
+      ws:
         condition: service_healthy
   ws:
     build:
@@ -62,8 +61,12 @@ services:
         condition: service_healthy
     command:
       python manage.py start_tornado
-    volumes:
-      - ./volumes/log:/usr/src/log
+    healthcheck:
+      test: sh -c "[ '`curl -s http://localhost:8888/test`' = 'ok' ]"
+      timeout: 3s
+      interval: 5s
+      retries: 10
+      start_period: 50s
 volumes:
    socket:
    static:

@@ -1,9 +1,8 @@
 FROM alpine:3.6
 WORKDIR /usr/src
 ENV PYCHAT_CONFIG docker
-RUN mkdir -p ./log &&\
-apk update &&\
-apk add python3 python3-dev mariadb-dev build-base &&\
+RUN apk update &&\
+apk add python3 python3-dev mariadb-dev build-base curl &&\
 pip3 install mysqlclient &&\
 apk del python3-dev mariadb-dev build-base &&\
 apk add mariadb-client-libs &&\

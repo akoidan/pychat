@@ -9,6 +9,9 @@ from tornado.ioloop import IOLoop
 from tornado.web import Application
 
 from django.conf import settings
+
+from chat.tornado.http_handler import HttpHandler
+
 TORNADO_SSL_OPTIONS = getattr(settings, "TORNADO_SSL_OPTIONS", None)
 from chat.tornado.tornado_handler import TornadoHandler
 
@@ -18,6 +21,7 @@ class Command(BaseCommand):
 	def __init__(self):
 		super(Command, self).__init__()
 		application = Application([
+			(r'/test', HttpHandler),
 			(r'.*', TornadoHandler),
 		], debug=settings.DEBUG)
 		self.http_server = HTTPServer(application, ssl_options=TORNADO_SSL_OPTIONS)

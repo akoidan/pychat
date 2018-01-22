@@ -16,7 +16,6 @@ from tornado.websocket import WebSocketHandler, WebSocketClosedError
 from chat.cookies_middleware import create_id
 from chat.models import User, Message, UserJoinedInfo
 from chat.py2_3 import str_type, urlparse
-from chat.settings import UPDATE_LAST_READ_MESSAGE
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
@@ -98,7 +97,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			if self.connected:
 				gone_offline = self.publish_logout(channel, log_data) or gone_offline
 		if gone_offline:
-			res = do_db(execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
+			res = do_db(execute_query, settings.UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
 		self.disconnect(json.dumps(log_data))
 
