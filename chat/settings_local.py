@@ -26,6 +26,7 @@ TORNADO_SSL_OPTIONS = {
 	"keyfile": KEY_PATH
 }
 INSTALLED_APPS = INSTALLED_APPS + ('sslserver',)
+LOGGING['handlers'] = console_handlers
 LOGGING['loggers'] = {
 	# root logger
 	'': {

@@ -169,46 +169,50 @@ TEMPLATES = [{
 	}
 }]
 
+file_handlers = {
+	'file-tornado': {
+		'level': 'DEBUG',
+		'class': 'logging.handlers.TimedRotatingFileHandler',
+		'filename': join(BASE_DIR, 'log/', log_file_name),
+		'formatter': 'django',
+		'when': 'midnight',
+		'interval': 1
+	},
+	'file': {
+		'level': 'DEBUG',
+		'class': 'logging.handlers.TimedRotatingFileHandler',
+		'filename': join(BASE_DIR, 'log/', log_file_name),
+		'formatter': 'django',
+		'filters': ['id', ],
+		'when': 'midnight',
+		'interval': 1
+	},
+}
+
+console_handlers = {
+	'django-console': {
+		'level': 'DEBUG',
+		'class': 'logging.StreamHandler',
+		'formatter': 'django',
+		'filters': ['id', ]
+	},
+	'tornado-console': {
+		'level': 'DEBUG',
+		'class': 'logging.StreamHandler',
+		'formatter': 'django',
+	},
+	'mail_admins': {
+		'level': 'ERROR',
+		'class': 'django.utils.log.AdminEmailHandler',
+	}
+}
+
 LOGGING = {
 	'version': 1,
 	'disable_existing_loggers': True,
 	'filters': {
 		'id': {
 			'()': 'chat.log_filters.ContextFilter',
-		}
-	},
-	'handlers': {
-		'file-tornado': {
-			'level': 'DEBUG',
-			'class': 'logging.handlers.TimedRotatingFileHandler',
-			'filename': join(BASE_DIR, 'log/', log_file_name),
-			'formatter': 'django',
-			'when': 'midnight',
-			'interval': 1
-		},
-		'file': {
-			'level': 'DEBUG',
-			'class': 'logging.handlers.TimedRotatingFileHandler',
-			'filename': join(BASE_DIR, 'log/', log_file_name),
-			'formatter': 'django',
-			'filters': ['id', ],
-			'when': 'midnight',
-			'interval': 1
-		},
-		'django-console': {
-			'level': 'DEBUG',
-			'class': 'logging.StreamHandler',
-			'formatter': 'django',
-			'filters': ['id', ]
-		},
-		'tornado-console': {
-			'level': 'DEBUG',
-			'class': 'logging.StreamHandler',
-			'formatter': 'django',
-		},
-		'mail_admins': {
-			'level': 'ERROR',
-			'class': 'django.utils.log.AdminEmailHandler',
 		}
 	},
 	'formatters': {

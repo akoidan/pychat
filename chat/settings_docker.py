@@ -28,6 +28,7 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 		'django.template.loaders.filesystem.Loader',
 		'django.template.loaders.app_directories.Loader',
 	])]
+LOGGING['handlers'] = console_handlers
 LOGGING['loggers'] = {
 	'django.request': {
 		'handlers': ['mail_admins', 'django-console'],
