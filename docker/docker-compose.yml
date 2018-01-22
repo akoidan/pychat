@@ -50,6 +50,9 @@ services:
       - static:/srv/http/static:ro
     ports:
      - 8000:443
+    depends_on:
+      server:
+        condition: service_healthy
   ws:
     build:
       context: ../
