@@ -43,8 +43,8 @@ You can always use [pychat.org](https://pychat.org), but if you want run chat yo
 ## Via docker
  - Generate ssl certificates:
    - If you have bash installed: `./download_content.sh generate_certificate`
-   - You can also generate them manually and put into `/rootfs/etc/nginx/ssl/server.key` and `rootfs/etc/nginx/ssl/certificate.crt`
- - Rename [chat/production_example.py](chat/settings_example.py) to `chat/settings.py`. Open it and replace with your data according to comments. Everything in this file but `SECRET_KEY` is optional.
+   - You can also generate them manually and put into `./rootfs/etc/nginx/ssl/server.key` and `./rootfs/etc/nginx/ssl/certificate.crt`
+ - Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. Open it and replace with your data according to comments. Everything in this file but `SECRET_KEY` is optional.
  - By default chat listens port `8000`. If you want to change it, for e.g to `443` set  `nginx  ports: 443:8000` in [docker/docker-compose.yml](docker/docker-compose.yml).
  - Run `docker-compose -f docker/docker-compose.yml up` and open `https://localhost:8000/`
 
