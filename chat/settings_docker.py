@@ -1,3 +1,5 @@
+import sslserver
+
 from chat.settings_base import *
 import logging.config
 
@@ -8,7 +10,7 @@ REDIS_HOST = 'redis'
 SESSION_REDIS = {
 	'host': REDIS_HOST,
 	'post': REDIS_PORT,
-	'db': 3
+	'db': 0
 }
 DATABASES = {
 	'default': {
@@ -55,6 +57,8 @@ LOGGING['loggers'] = {
 
 logging.config.dictConfig(LOGGING)
 
-
-
-API_ADDRESS_PATTERN = 'wss://%s:8000/ws?id='
+TORNADO_SSL_OPTIONS = {
+	"certfile": '/usr/src/certificate.crt',
+	"keyfile": '/usr/src/server.key'
+}
+API_ADDRESS_PATTERN = 'wss://%s:8888/?id='

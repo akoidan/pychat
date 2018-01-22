@@ -11,7 +11,7 @@ services:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       timeout: 3s
       interval: 5s
-      retries: 10
+      retries: 3
       start_period: 50s
     volumes:
       - ./volumes/mysql:/var/lib/mysql
@@ -24,8 +24,8 @@ services:
     healthcheck:
       test:  bash -c "[ -S /tmp/socket/uwsgi.sock ]"
       start_period: 50s
-      retries: 5
-      interval: 3s
+      retries: 3
+      interval: 5s
     depends_on:
       db:
         condition: service_healthy
@@ -62,11 +62,13 @@ services:
     command:
       python manage.py start_tornado
     healthcheck:
-      test: sh -c "[ '`curl -s http://localhost:8888/test`' = 'ok' ]"
+      test: sh -c "[ '`curl -sk https://localhost:8888/test`' = 'ok' ]"
       timeout: 3s
       interval: 5s
-      retries: 10
-      start_period: 50s
+      retries: 3
+      start_period: 10s
+    ports:
+      - 8888:8888
 volumes:
    socket:
    static:

@@ -36,15 +36,15 @@ Chat is written in **Python** with [django](https://www.djangoproject.com/). For
 
 # How to run on my own server:
 You can always use [pychat.org](https://pychat.org), but if you want run chat yourself you have 3 options:
- - Run chat via docker
- - Run chat as in development
- - Run chat as in production
+ - Set up chat for production/test via docker
+ - Run chat for development
+ - Set up for production w/o docker
 
 ## Via docker
  - execute `./download_content.sh generate_certificate`
  - Rename [chat/production_example.py](chat/settings_config.py) to `chat/settings.py`. Open it and replace with your data according to comments. Everything in this file but `SECRET_KEY` is optional.
- - By default chat listens port `8000`. If you want to change it, for e.g to `8001` set `API_ADDRESS_PATTERN=wss://%s:8001/ws?id=` in `chat/settings.py` and `nginx  ports: 8001:443` in [docker/docker-compose.yml](docker/docker-compose.yml).
- - Run `docker-compose -f docker/docker-compose.yml up` and open `https://localhost:8000/#/chat/1`
+ - By default chat listens port `8000`. If you want to change it, for e.g to `443` set  `nginx  ports: 443:8000` in [docker/docker-compose.yml](docker/docker-compose.yml).
+ - Run `docker-compose -f docker/docker-compose.yml up` and open `https://localhost:8000/`
 
 ## Development setup
 The flow is the following

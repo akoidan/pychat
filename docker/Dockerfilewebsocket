@@ -7,6 +7,7 @@ pip3 install mysqlclient &&\
 apk del python3-dev mariadb-dev build-base &&\
 apk add mariadb-client-libs &&\
 ln -s `which python3` "$(dirname `which python3`)/python"
+COPY ./rootfs/etc/nginx/ssl/certificate.crt ./rootfs/etc/nginx/ssl/server.key /usr/src/
 COPY ./requirements.txt ./
 COPY ./manage.py ./
 RUN pip3 install -r requirements.txt
