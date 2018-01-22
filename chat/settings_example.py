@@ -1,5 +1,8 @@
 ### Rename this file to chat/settings.py
 ### 3 hashtag in this file tells you want to do, while single hastag is required to uncomment
+
+### DON't EDIT THIS SECTION
+###<<<<<
 import importlib
 import os
 
@@ -9,7 +12,8 @@ if get not in configs:
 	raise Exception("Expected environment variable PYCHAT_CONFIG to be one of {}".format(configs))
 config = 'chat.settings_{}'.format(get)
 globals().update(importlib.import_module(config).__dict__)
-SECRET_KEY = '8ou!cqb1yd)6c4h0i-cxjo&@@+04%4np6od8qn+z@5b=6)!v(o'
+###>>>>
+
 ### Replace with your django secret key, you can use https://www.miniwebtool.com/django-secret-key-generator/ to generate one
 # SECRET_KEY = '**************************************************'
 

@@ -41,8 +41,10 @@ You can always use [pychat.org](https://pychat.org), but if you want run chat yo
  - Set up for production w/o docker
 
 ## Via docker
- - execute `./download_content.sh generate_certificate`
- - Rename [chat/production_example.py](chat/settings_config.py) to `chat/settings.py`. Open it and replace with your data according to comments. Everything in this file but `SECRET_KEY` is optional.
+ - Generate ssl certificates:
+   - If you have bash installed: `./download_content.sh generate_certificate`
+   - You can also generate them manually and put into `/rootfs/etc/nginx/ssl/server.key` and `rootfs/etc/nginx/ssl/certificate.crt`
+ - Rename [chat/production_example.py](chat/settings_example.py) to `chat/settings.py`. Open it and replace with your data according to comments. Everything in this file but `SECRET_KEY` is optional.
  - By default chat listens port `8000`. If you want to change it, for e.g to `443` set  `nginx  ports: 443:8000` in [docker/docker-compose.yml](docker/docker-compose.yml).
  - Run `docker-compose -f docker/docker-compose.yml up` and open `https://localhost:8000/`
 
@@ -82,6 +84,7 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  6. Populate project files: `sh download_content.sh all`
 
 ### Start services and run:
+ - Set environment variable `PYCHAT_CONFIG=local`
  - Start `mysql` server if it's not started.
  - Start session holder: `redis-server`
  - Start webSocket listener: `python manage.py start_tornado`
@@ -113,6 +116,7 @@ Services commands for Archlinux:
  - Enabling autostart: `chkconfig mysqld on; chkconfig uwsgi on; chkconfig tornado on; chkconfig redis on; chkconfig postfix on`
 
 ### Common
+ - Set environment variable `PYCHAT_CONFIG=prod`
  - Follow the instructions in [Boostrap files](#bootstrap-files).
  - For production I would recommend to clone repository to `/srv/http/djangochat`.  If you cloned project into different directory than `/srv/http/djangochat` replace all absolute paths in config files. You can use `download_content.sh rename_root_directory` to do that.
  - Replace all occurrences of `pychat.org` in [rootfs](rootfs) for your domain. You can use `./download_content.sh rename_domain your.new.domain.com`

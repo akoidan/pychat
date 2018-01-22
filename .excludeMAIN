@@ -51,7 +51,6 @@ chat/static/js/amcharts-pie.js
 chat/static/js/amcharts-dark.js
 chat/static/js/amcharts-all.js
 chat/static/js/md5.js
-chat/settings.py
 backup.sh
 data.sql
 cron-bu
