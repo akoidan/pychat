@@ -1,5 +1,4 @@
-from chat.settings import ALL_ROOM_ID, GENDERS
-
+from django.conf import settings
 
 class Actions(object):
 	LOGIN = 'addOnlineUser'
@@ -83,14 +82,14 @@ class WebRtcRedisStates:
 
 class RedisPrefix:
 	USER_ID_CHANNEL_PREFIX = 'u'
-	DEFAULT_CHANNEL = ALL_ROOM_ID
+	DEFAULT_CHANNEL = settings.ALL_ROOM_ID
 	CONNECTION_ID_LENGTH = 8  # should be secure
 
 	@staticmethod
 	def set_js_user_structure(name, sex):
 		return {
 			VarNames.USER: name,
-			VarNames.GENDER: GENDERS[sex]
+			VarNames.GENDER: settings.GENDERS[sex]
 		}
 
 	@classmethod

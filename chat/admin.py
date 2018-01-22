@@ -8,7 +8,7 @@ from django.utils.html import format_html
 
 from chat import models
 from chat.models import UserJoinedInfo
-from chat.settings import STATIC_URL
+from django.conf import settings
 
 exclude_auto = ('UserJoinedInfo',)
 model_classes = (class_name[1] for class_name in inspect.getmembers(sys.modules[models.__name__], inspect.isclass)
@@ -54,6 +54,6 @@ class UserLocation(admin.ModelAdmin):
 	def country(self, instance):
 		iso2 = instance.ip.country_code if instance.ip.country_code else "None"
 		return format_html("<span style='white-space:nowrap'><img src='{}/flags/{}.png' /> {}</span>",
-			STATIC_URL,
+			settings.STATIC_URL,
 			iso2.lower(),
 			instance.ip.country)

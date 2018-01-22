@@ -2,15 +2,15 @@ import random
 
 from chat import local
 from chat.log_filters import id_generator
-from chat.settings import WS_ID_CHAR_LENGTH
+from django.conf import settings
 from chat.utils import get_client_ip
 
 
 def create_id(user_id, random=None):
 	if user_id is None:
 		user_id = 0
-	if not random or len(random) != WS_ID_CHAR_LENGTH:
-		random = id_generator(WS_ID_CHAR_LENGTH)
+	if not random or len(random) != settings.WS_ID_CHAR_LENGTH:
+		random = id_generator(settings.WS_ID_CHAR_LENGTH)
 	return "{:04d}:{}".format(user_id, random), random
 
 

@@ -7,7 +7,7 @@ from time import strftime
 from django.core.management.base import BaseCommand
 
 from chat.py2_3 import get_unicode
-from chat.settings import BASE_DIR, SMILEYS_ROOT
+from django.conf import settings
 
 ext = {
 	b'\x47\x49': 'gif',
@@ -37,7 +37,7 @@ class Command(BaseCommand):
 		parser.add_argument(
 			'--source',
 			dest='port',
-			default= os.path.join(BASE_DIR, 'DefaultSmilies.cfpack'),
+			default= os.path.join(settings.BASE_DIR, 'DefaultSmilies.cfpack'),
 			type=str,
 		)
 
@@ -47,16 +47,16 @@ class Command(BaseCommand):
 			smileys = {}
 			start_char  = START_CHAR
 
-			if not os.path.exists(SMILEYS_ROOT):
-				print("Created smileys dir" + SMILEYS_ROOT)
-				os.mkdir(SMILEYS_ROOT)
+			if not os.path.exists(settings.SMILEYS_ROOT):
+				print("Created smileys dir" + settings.SMILEYS_ROOT)
+				os.mkdir(settings.SMILEYS_ROOT)
 			size = struct.unpack('<H', f.read(2))  # header size (useless)
 			addition_info['width'], addition_info['height'], count = struct.unpack('<HHB', f.read(5))
 			for c in range(count):
 				size = ord(f.read(1)) * 2  # 2 bytes per utf8
 				cats.append((f.read(size)).decode('utf-16le'))  # save category
 				addition_info[cats[c]] = []
-				tab_dir_path = os.sep.join((SMILEYS_ROOT, file_names_pattern[cats[c]]))
+				tab_dir_path = os.sep.join((settings.SMILEYS_ROOT, file_names_pattern[cats[c]]))
 				if not os.path.exists(tab_dir_path):
 					os.mkdir(tab_dir_path)
 			addition_info['count'] = struct.unpack('<H', f.read(2))[0]  # amount of bytes in a single pack
@@ -73,7 +73,7 @@ class Command(BaseCommand):
 				file_ext = ext.get(data[:2], '')
 				file_name = '{0:04x}.{1}'.format(item, file_ext)
 				tab = file_names_pattern[cats[cat_cur]]
-				gif_file_path = os.sep.join((SMILEYS_ROOT, tab, file_name))
+				gif_file_path = os.sep.join((settings.SMILEYS_ROOT, tab, file_name))
 				smileys.setdefault(tab, [])
 				start_char += 1
 				if not smiley_pattern.match(alias):
@@ -89,7 +89,7 @@ class Command(BaseCommand):
 
 	def create_json_info(self, info):
 
-		info_file_name = os.sep.join((SMILEYS_ROOT, 'info.json'))
+		info_file_name = os.sep.join((settings.SMILEYS_ROOT, 'info.json'))
 		with open(info_file_name, 'w') as f:
 			f.write(json.dumps(info))
 
