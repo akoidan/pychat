@@ -4,6 +4,7 @@
     Type=oneshot
     ExecStart=/srv/http/djangochat/manage.py flush_online
     RemainAfterExit=yes
+    Environment=PYCHAT_CONFIG=prod
     User=http
 
 [Install]

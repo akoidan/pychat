@@ -79,7 +79,7 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
  2. Rename [chat/production_example.py](chat/production.py) to `chat/production.py`. And And replace it with your data.
  3. Install python packages with `pip install -r requirements.txt`.
- 4. Create database: `echo "create database django CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`.If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
+ 4. Create database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`.If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
  5. Fill database with tables: `./manage.py init_db && ./manage.py sync_db`
  6. Populate project files: `sh download_content.sh all`
 
