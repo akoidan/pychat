@@ -247,7 +247,7 @@ def check_captcha(request):
 	:raises ValidationError: if captcha is not valid or not set
 	If RECAPTCHA_SECRET_KEY is enabled in settings validates request with it
 	"""
-	if settings.get('RECAPTCHA_SECRET_KEY') is None:
+	if not hasattr(settings, 'RECAPTCHA_SECRET_KEY'):
 		logger.debug('Skipping captcha validation')
 		return
 	try:
@@ -270,7 +270,7 @@ def check_captcha(request):
 
 
 def send_sign_up_email(user, site_address, request):
-	if user.email is not None and settings.get('EMAIL_HOST') is not None:
+	if user.email is not None:
 		verification = Verification(user=user, type_enum=Verification.TypeChoices.register)
 		verification.save()
 		user.email_verification = verification
@@ -292,8 +292,12 @@ def send_sign_up_email(user, site_address, request):
 		}
 		html_message = render_to_string('sign_up_email.html', context, context_instance=RequestContext(request))
 		logger.info('Sending verification email to userId %s (email %s)', user.id, user.email)
-		send_mail("Confirm chat registration", text, site_address, [user.email, ], html_message=html_message)
-		logger.info('Email %s has been sent', user.email)
+		try:
+			send_mail("Confirm chat registration", text, site_address, [user.email, ], html_message=html_message, fail_silently=True)
+		except Exception as e:
+			logging.error("Failed to send registration email because {}".format(e))
+		else:
+			logger.info('Email %s has been sent', user.email)
 
 
 def send_reset_password_email(request, user_profile, verification):
@@ -357,7 +361,7 @@ def get_or_create_ip(ip, logger):
 		ip_address = IpAddress.objects.get(ip=ip)
 	except IpAddress.DoesNotExist:
 		try:
-			if settings.get('IP_API_URL') is None:
+			if not hasattr(settings, 'IP_API_URL'):
 				raise Exception('api url is absent')
 			logger.debug("Creating ip record %s", ip)
 			f = urlopen(settings.IP_API_URL % ip)

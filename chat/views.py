@@ -41,7 +41,6 @@ GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
 GOOGLE_OAUTH_2_JS_URL = getattr(settings, "GOOGLE_OAUTH_2_JS_URL", None)
 FACEBOOK_APP_ID = getattr(settings, "FACEBOOK_APP_ID", None)
 FACEBOOK_JS_URL = getattr(settings, "FACEBOOK_JS_URL", None)
-FIREBASE_API_KEY = getattr(settings, "FIREBASE_API_KEY", None)
 
 # TODO doesn't work
 def handler404(request):
@@ -137,7 +136,7 @@ def home(request):
 	context['extensionId'] = settings.EXTENSION_ID
 	context['extensionUrl'] = settings.EXTENSION_INSTALL_URL
 	context['defaultRoomId'] = settings.ALL_ROOM_ID
-	context['manifest'] = FIREBASE_API_KEY is not None
+	context['manifest'] = hasattr(settings, 'FIREBASE_API_KEY')
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
 
