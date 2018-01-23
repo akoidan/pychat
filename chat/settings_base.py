@@ -189,6 +189,13 @@ file_handlers = {
 	},
 }
 
+mail_admins = {
+	'mail_admins': {
+		'level': 'ERROR',
+		'class': 'django.utils.log.AdminEmailHandler',
+	}
+}
+
 console_handlers = {
 	'django-console': {
 		'level': 'DEBUG',
@@ -201,10 +208,6 @@ console_handlers = {
 		'class': 'logging.StreamHandler',
 		'formatter': 'django',
 	},
-	'mail_admins': {
-		'level': 'ERROR',
-		'class': 'django.utils.log.AdminEmailHandler',
-	}
 }
 
 LOGGING = {

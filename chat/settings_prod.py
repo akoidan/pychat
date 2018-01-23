@@ -10,6 +10,7 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 		'django.template.loaders.app_directories.Loader',
 	])]
 LOGGING['handlers'] = file_handlers
+file_handlers.update(mail_admins)
 LOGGING['loggers'] = {
 	'django.request': {
 		'handlers': ['mail_admins', 'file'],
