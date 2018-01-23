@@ -83,10 +83,10 @@
 	\:-ms-input-placeholder // TODO doesn't work
 		@content
 
-@mixin display-flex()
-	display: -ms-flexbox
-	display: -webkit-flex
-	display: flex
+@mixin display-flex($important: null)
+	display: -ms-flexbox $important
+	display: -webkit-flex $important
+	display: flex $important
 
 @mixin flex($value...)
 	-webkit-flex: $value

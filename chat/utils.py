@@ -6,6 +6,7 @@ import sys
 from io import BytesIO
 
 import requests
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
@@ -13,29 +14,20 @@ from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.db import IntegrityError
 from django.db import connection, OperationalError, InterfaceError
-from django.db.models import F
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from chat import local
-from chat import settings
 from chat.models import Image
-from chat.models import Room, get_milliseconds, Message
+from chat.models import Room, get_milliseconds
 from chat.models import User
 from chat.models import UserProfile, Verification, RoomUsers, IpAddress
 from chat.py2_3 import urlopen
-from chat.settings import ISSUES_REPORT_LINK, SITE_PROTOCOL, ALL_ROOM_ID, SELECT_SELF_ROOM
 from chat.tornado.constants import RedisPrefix
 from chat.tornado.constants import VarNames
-from chat.tornado.message_creator import MessagesCreator
 
 USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
-API_URL = getattr(settings, "IP_API_URL", None)
-RECAPTCHA_SECRET_KEY = getattr(settings, "RECAPTCHA_SECRET_KEY", None)
-GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
-GOOGLE_OAUTH_2_HOST = getattr(settings, "GOOGLE_OAUTH_2_HOST", None)
-FACEBOOK_ACCESS_TOKEN = getattr(settings, "FACEBOOK_ACCESS_TOKEN", None)
 
 logger = logging.getLogger(__name__)
 
@@ -133,7 +125,7 @@ def evaluate(query_set):
 
 def create_self_room(self_user_id, user_rooms):
 	room_ids = list([room['room_id'] for room in evaluate(user_rooms)])
-	query = execute_query(SELECT_SELF_ROOM, [room_ids, ])
+	query = execute_query(settings.SELECT_SELF_ROOM, [room_ids, ])
 	if query:
 		room_id = query[0]['room__id']
 		update_room(room_id, query[0]['room__disabled'])
@@ -255,14 +247,14 @@ def check_captcha(request):
 	:raises ValidationError: if captcha is not valid or not set
 	If RECAPTCHA_SECRET_KEY is enabled in settings validates request with it
 	"""
-	if not RECAPTCHA_SECRET_KEY:
+	if settings.get('RECAPTCHA_SECRET_KEY') is None:
 		logger.debug('Skipping captcha validation')
 		return
 	try:
 		captcha_rs = request.POST.get('g-recaptcha-response')
 		url = "https://www.google.com/recaptcha/api/siteverify"
 		params = {
-			'secret': RECAPTCHA_SECRET_KEY,
+			'secret': settings.RECAPTCHA_SECRET_KEY,
 			'response': captcha_rs,
 			'remoteip': local.client_ip
 		}
@@ -278,20 +270,20 @@ def check_captcha(request):
 
 
 def send_sign_up_email(user, site_address, request):
-	if user.email is not None:
+	if user.email is not None and settings.get('EMAIL_HOST') is not None:
 		verification = Verification(user=user, type_enum=Verification.TypeChoices.register)
 		verification.save()
 		user.email_verification = verification
 		user.save(update_fields=['email_verification'])
-		link = "{}://{}/confirm_email?token={}".format(SITE_PROTOCOL, site_address, verification.token)
+		link = "{}://{}/confirm_email?token={}".format(settings.SITE_PROTOCOL, site_address, verification.token)
 		text = ('Hi {}, you have registered pychat'
 				  '\nTo complete your registration please click on the url bellow: {}'
 				  '\n\nIf you find any bugs or propositions you can post them {}').format(
-			user.username, link, ISSUES_REPORT_LINK)
+			user.username, link, settings.ISSUES_REPORT_LINK)
 		start_message = mark_safe((
 			"You have registered in <b>Pychat</b>. If you find any bugs or propositions you can post them"
 			" <a href='{}'>here</a>. To complete your registration please click on the link below.").format(
-				ISSUES_REPORT_LINK))
+				settings.ISSUES_REPORT_LINK))
 		context = {
 			'username': user.username,
 			'magicLink': link,
@@ -305,7 +297,7 @@ def send_sign_up_email(user, site_address, request):
 
 
 def send_reset_password_email(request, user_profile, verification):
-	link = "{}://{}/restore_password?token={}".format(SITE_PROTOCOL, request.get_host(), verification.token)
+	link = "{}://{}/restore_password?token={}".format(settings.SITE_PROTOCOL, request.get_host(), verification.token)
 	message = "{},\n" \
 				 "You requested to change a password on site {}.\n" \
 				 "To proceed click on the link {}\n" \
@@ -349,8 +341,8 @@ def extract_photo(image_base64, filename=None):
 
 def create_user_model(user):
 	user.save()
-	RoomUsers(user_id=user.id, room_id=ALL_ROOM_ID).save()
-	logger.info('Signed up new user %s, subscribed for channels with id %d', user, ALL_ROOM_ID)
+	RoomUsers(user_id=user.id, room_id=settings.ALL_ROOM_ID).save()
+	logger.info('Signed up new user %s, subscribed for channels with id %d', user, settings.ALL_ROOM_ID)
 	return user
 
 
@@ -365,10 +357,10 @@ def get_or_create_ip(ip, logger):
 		ip_address = IpAddress.objects.get(ip=ip)
 	except IpAddress.DoesNotExist:
 		try:
-			if not API_URL:
+			if settings.get('IP_API_URL') is None:
 				raise Exception('api url is absent')
 			logger.debug("Creating ip record %s", ip)
-			f = urlopen(API_URL % ip)
+			f = urlopen(settings.IP_API_URL % ip)
 			raw_response = f.read().decode("utf-8")
 			response = json.loads(raw_response)
 			if response['status'] != "success":

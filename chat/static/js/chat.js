@@ -1958,7 +1958,7 @@ function NotifierHandler() {
 			return cb("Service worker is not supported")
 		} else if (!window.manifest) {
 			//you need to provice FIREBASE_API_KEY in settings.py and chat/static/manifest.json
-			return cb("manifest.json is missing from meta")
+			return cb()
 		}
 		navigator.serviceWorker.register('/sw.js',  {scope: '/'}).then(function (r) {
 			logger.info("Registered service worker {}", r)();
