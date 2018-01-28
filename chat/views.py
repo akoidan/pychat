@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
+from django.core.mail import send_mail, mail_admins
 
 from chat.templatetags.md5url import md5url
 
@@ -310,13 +311,18 @@ def statistics(request):
 @transaction.atomic
 def report_issue(request):
 	logger.info('Saving issue: %s', hide_fields(request.POST, ('log',), huge=True))
-	issue = Issue.objects.get_or_create(content=request.POST['issue'])[0]
+	issue_text = request.POST['issue']
+	issue = Issue.objects.get_or_create(content=issue_text)[0]
 	issue_details = IssueDetails(
 		sender_id=request.user.id,
 		browser=request.POST.get('browser'),
 		issue=issue,
 		log=request.POST.get('log')
 	)
+	try:
+		mail_admins("{} reported issue".format(request.user.username), issue_text, fail_silently=True)
+	except Exception as e:
+		logging.error("Failed to send issue email because {}".format(e))
 	issue_details.save()
 	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 

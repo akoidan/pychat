@@ -50,6 +50,7 @@ RECAPTHCA_SITE_URL = 'https://www.google.com/recaptcha/api.js'
 GOOGLE_OAUTH_2_JS_URL = 'https://apis.google.com/js/platform.js'
 FACEBOOK_JS_URL = '//connect.facebook.net/en_US/sdk.js'
 
+EMAIL_SUBJECT_PREFIX = '[Pychat] '
 
 REDIS_PORT = 6379
 REDIS_HOST ='localhost'
