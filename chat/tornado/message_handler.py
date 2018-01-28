@@ -4,6 +4,7 @@ import re
 import urllib
 
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.db.models import Q
 from tornado.gen import engine, Task
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
@@ -11,7 +12,7 @@ from tornado.web import asynchronous
 from tornadoredis import Client
 from chat import settings
 from chat.log_filters import id_generator
-from chat.models import Message, Room, RoomUsers, Subscription, User, UserProfile
+from chat.models import Message, Room, RoomUsers, Subscription, User, UserProfile, SubscriptionMessages
 from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
@@ -77,6 +78,7 @@ class MessagesHandler(MessagesCreator):
 			try:
 				return new_self.old_read(callback=callback)
 			except Exception as e:
+				return
 				current_online = self.get_online_from_redis(RedisPrefix.DEFAULT_CHANNEL)
 				self.logger.error(e)
 				self.logger.error(
@@ -213,16 +215,19 @@ class MessagesHandler(MessagesCreator):
 		url = GIPHY_URL.format(GIPHY_API_KEY, quote(query, safe=''))
 		self.http_client.fetch(url, callback=on_giphy_reply)
 
-	def notify_offline(self, channel):
+	def notify_offline(self, channel, message_id):
 		if FIREBASE_API_KEY is None:
 			return
 		online = self.get_online_from_redis(channel)
 		if channel == ALL_ROOM_ID:
 			return
 		offline_users = UserProfile.objects.filter(rooms__id=channel, notifications=True).exclude(id__in=online).only('id')
-		reg_ids = evaluate(Subscription.objects.filter(user__in=offline_users).values_list('registration_id', flat=True))
-		if len(reg_ids) == 0:
+		subscriptions = Subscription.objects.filter(user__in=offline_users)
+		if len(subscriptions) == 0:
 			return
+		new_sub_mess =[SubscriptionMessages(message_id=message_id, subscription_id=r.id) for r in subscriptions]
+		reg_ids =[r.registration_id for r in subscriptions]
+		SubscriptionMessages.objects.bulk_create(new_sub_mess)
 		self.post_firebase(list(reg_ids))
 
 	@asynchronous
@@ -251,6 +256,8 @@ class MessagesHandler(MessagesCreator):
 		"""
 		content = message.get(VarNames.CONTENT)
 		giphy_match = self.isGiphy(content)
+
+		# @transaction.atomic mysql has gone away
 		def send_message(message, giphy=None):
 			raw_imgs = message.get(VarNames.IMG)
 			channel = message[VarNames.CHANNEL]
@@ -269,7 +276,7 @@ class MessagesHandler(MessagesCreator):
 				prepare_img(db_images, message_db.id)
 			)
 			self.publish(prepared_message, channel)
-			self.notify_offline(channel)
+			self.notify_offline(channel, message_db.id)
 		if giphy_match is not None:
 			self.search_giphy(message, giphy_match, send_message)
 		else:

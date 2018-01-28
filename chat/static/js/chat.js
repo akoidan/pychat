@@ -1955,10 +1955,9 @@ function NotifierHandler() {
 
 	self.registerWorker = function (cb) {
 		if (!window.Promise || !navigator.serviceWorker) {
-			return cb("Service worker is not supported")
+			return cb(false, "Service worker is not supported", true)
 		} else if (!window.manifest) {
-			//you need to provice FIREBASE_API_KEY in settings.py and chat/static/manifest.json
-			return cb()
+			return cb(false, "FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing", false)
 		}
 		navigator.serviceWorker.register('/sw.js',  {scope: '/'}).then(function (r) {
 			logger.info("Registered service worker {}", r)();
@@ -1985,10 +1984,9 @@ function NotifierHandler() {
 			}
 		}).then(function () {
 			logger.info("Saved subscription to server")();
-			cb(false);
+			cb(true);
 		}).catch(function (e) {
-			logger.error("Unable to load serviceWorker to show notification because {}", e)();
-			cb(e);
+			cb(false, e, true);
 		});
 	}
 	self.popedNotifQueue = [];
@@ -2008,8 +2006,13 @@ function NotifierHandler() {
 		self.checkPermissions(function (result) {
 			if (!self.serviceWorkedTried) {
 				self.serviceWorkedTried = true;
-				self.registerWorker(function (error) {
-					error && growlError("Offline notifications won't work, because " + Utils.extractError(error));
+				self.registerWorker(function (succ, error, growl) {
+					if (growl){
+						growlError("Offline notifications won't work, because " + Utils.extractError(error));
+					}
+					if (!succ) {
+						 logger.error("Unable to load serviceWorker to show notification because {}", error)();
+					}
 					if (result) {
 						self.showNot({
 							title: 'Pychat notifications enabled',

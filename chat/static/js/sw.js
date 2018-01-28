@@ -81,14 +81,18 @@ self.addEventListener('push', function (event) {
 				credentials: 'omit',
 				headers: {auth: auth}
 			}).then(function (response) {
-				logger.log("Fetching finished", response)();
-				response.json().then(function (m) {
-					logger.log("Parsed response", m)();
-					var  a = self.registration.showNotification(m.title, m.options);
-					logger.log("{}", a);
-				})
+				logger.log("Fetching finished {}", response)();
+				return response.json();
+			}).then(function (m) {
+				logger.log("Parsed response {}", m)();
+				var  a = self.registration.showNotification(m.title, m.options);
+				logger.log("Spawned notification {}", a)();
 			}).catch(function (response) {
-				logger.error(response)();
+				if (response.message  === 'Failed to fetch') {
+					logger.error('Got "Failed to fetch" exception while getting message, this could be caused by invalid/self signed certificate, if this during development try to run chrome with  --allow-insecure-localhost --user-data-dir=/tmp/lol')();
+				} else {
+						logger.error('Exception during fetching message: {}', response)();
+				}
 			})
 		} else {
 			logger.error("Auth header is null")();
@@ -98,7 +102,7 @@ self.addEventListener('push', function (event) {
 });
 
 self.addEventListener('notificationclick', function (event) {
-	logger.log('On notification click: {}', event.notification.tag);
+	logger.log('On notification click: {}', event.notification.tag)();
 	// Android doesn’t close the notification when you click on it
 	// See: http://crbug.com/463146
 	event.notification.close();

@@ -17,12 +17,6 @@ globals().update(importlib.import_module(config).__dict__)
 ### Replace with your django secret key, you can use https://www.miniwebtool.com/django-secret-key-generator/ to generate one
 # SECRET_KEY = '**************************************************'
 
-### If you use ClodFlare, you may want to serve static files via it.
-### I wouldn't recommend to put everything under CloudFlare, your sockect connection will strugle!
-### Instead you can create a separate domain and forward static traffic through it
-# STATIC_URL = 'https://static.pychat.org/'
-# MEDIA_URL = "https://static.pychat.org/photo/"
-
 
 ### this this emails settings will be used to send emails. E.g. when user restores password via email.
 ###  Comment them out if you don't want to setup

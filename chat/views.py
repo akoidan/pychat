@@ -29,7 +29,8 @@ from django.views.generic import View
 from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
-from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription
+from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
+	SubscriptionMessages
 from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
 	create_user_model, check_captcha, send_reset_password_email
@@ -62,30 +63,24 @@ def validate_email(request):
 
 
 @require_http_methods('GET')
+@transaction.atomic
 def get_firebase_playback(request):
 	registration_id = request.META['HTTP_AUTH']
-	user_id = Subscription.objects.values_list('user_id', flat=True).get(registration_id=registration_id)
-	off_mess = Message.objects.filter(
-		id__gt=F('room__roomusers__last_read_message_id'),
-		deleted=False,
-		room__roomusers__user_id=user_id
-	)
-	d = off_mess.select_related("sender__username").order_by("-time")[:1]
-	if len(d) > 0:
-		message = list(d)[0]
-		data = {
-			'title': message.sender.username,
-			'options': {
-				'body': message.content,
-				'icon': md5url('images/favicon.ico'),
-				'data': {
-					'url': '/#/chat/' + str(message.room_id)
-				}
-			},
-		}
-		return HttpResponse(json.dumps(data), content_type='application/json')
-	else:
-		return HttpResponse("No new messages found", content_type='text/plain')
+	query_sub_message = SubscriptionMessages.objects.filter(subscription__registration_id=registration_id, received=False).order_by('-message__time')[:1]
+	sub_message = query_sub_message[0]
+	SubscriptionMessages.objects.filter(id=sub_message.id).update(received=True)
+	message= Message.objects.select_related("sender__username").get(id=sub_message.message_id)
+	data = {
+		'title': message.sender.username,
+		'options': {
+			'body': message.content,
+			'icon': md5url('images/favicon.ico'),
+			'data': {
+				'url': '/#/chat/' + str(message.room_id)
+			}
+		},
+	}
+	return HttpResponse(json.dumps(data), content_type='application/json')
 
 
 def test(request):

@@ -155,7 +155,6 @@ class Message(models.Model):
 	# DateField.auto_now
 	time = models.BigIntegerField(default=get_milliseconds)
 	content = models.TextField(null=True)
-	subscription = models.ManyToManyField(Subscription, related_name='message')
 	# if symbol = null - no images refers this row
 	# symbol is the same as "select max(symbol) from images where message_id = message.id
 	# we store symbol in this table in case if user edits message
@@ -183,6 +182,16 @@ class RoomUsers(models.Model):
 	class Meta:  # pylint: disable=C1001
 		unique_together = ("user", "room")
 		db_table = ''.join((User._meta.app_label, '_room_users'))
+
+
+class SubscriptionMessages(models.Model):
+	message = models.ForeignKey(Message, null=False)
+	subscription = models.ForeignKey(Subscription, null=False)
+	received = BooleanField(null=False, default=False)
+
+	class Meta:  # pylint: disable=C1001
+		unique_together = ("message", "subscription")
+		db_table = ''.join((User._meta.app_label, '_subscription_message'))
 
 
 class Issue(models.Model):
