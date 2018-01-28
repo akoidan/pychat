@@ -3611,6 +3611,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			Utils.setYoutubeEvent(p);
 			if (!forceSkipHL) {
 					self.highLightMessageIfNeeded(p, displayedUsername, isNew, data.content, data.images);
+					if (data.userId != loggedUserId) {
+						notifier.notify(displayedUsername, data.content || 'images', data.images);
+					}
 			}
 		}
 	};
@@ -3628,7 +3631,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.highLightMessageIfNeeded = function (p, displayedUsername, isNew, content, images) {
 		var keys = images && Object.keys(images);
 		var img = keys && images[keys[0]];
-		notifier.notify(displayedUsername, content || 'images', img);
 		if (self.isHidden() && !window.newMessagesDisabled) {
 			self.newMessages++;
 			self.dom.newMessages.textContent = self.newMessages;
