@@ -155,6 +155,7 @@ class Message(models.Model):
 	# DateField.auto_now
 	time = models.BigIntegerField(default=get_milliseconds)
 	content = models.TextField(null=True)
+	subscription = models.ManyToManyField(Subscription, related_name='message')
 	# if symbol = null - no images refers this row
 	# symbol is the same as "select max(symbol) from images where message_id = message.id
 	# we store symbol in this table in case if user edits message
