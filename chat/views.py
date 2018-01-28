@@ -143,8 +143,11 @@ def logout(request):
 	"""
 	POST. Logs out into system.
 	"""
+	registration_id = request.POST.get('registration_id')
+	if registration_id is not None:
+		Subscription.objects.filter(registration_id=registration_id).delete()
 	djangologout(request)
-	return HttpResponseRedirect('/')
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 @require_http_methods(['POST'])
 def auth(request):

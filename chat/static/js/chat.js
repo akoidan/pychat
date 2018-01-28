@@ -75,6 +75,16 @@ onDocLoad(function () {
 	painter = new Painter();
 	wsHandler.listenWS();
 	Utils.showHelp();
+	$('singout').onclick = function() {
+		channelsHandler.clearChannelHistory();
+		doPost('/logout', {registration_id: notifier.subscriptionId}, function(response) {
+			if (response === RESPONSE_SUCCESS) {
+				window.location = '/register'
+			} else {
+				growlError("<div>Unable to logout, because: " + r + "</div>")
+			}
+		});
+	}
 });
 
 
@@ -1968,12 +1978,12 @@ function NotifierHandler() {
 			return serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true})
 		}).then(function (subscription) {
 			logger.info("Got subscription {}", subscription)();
-			var subscriptionId = self.getSubscriptionId(subscription);
-			if (!subscriptionId) {
+			self.subscriptionId = self.getSubscriptionId(subscription);
+			if (!self.subscriptionId) {
 				throw 'Current browser doesnt support offline notifications';
 			} else {
 				return new Promise(function (resolve, reject) {
-					doPost('/register_fcb', {registration_id: subscriptionId}, function (response) {
+					doPost('/register_fcb', {registration_id: self.subscriptionId}, function (response) {
 						if (response == RESPONSE_SUCCESS) {
 							resolve()
 						} else {

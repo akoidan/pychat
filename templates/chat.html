@@ -53,8 +53,7 @@
 			<i class="icon-menu" title="Open Menu" ></i>
 		</div>
 		<a  href="/#/profile" title="Settings" onclick="event.preventDefault(); singlePage.showPage('/profile')" class="icon-wrench"> <span class="mText">Profile</span></a>
-		<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}" onclick="channelsHandler.clearChannelHistory()">
-			<i title="Sign out" class="icon-sign-out"><span class="mText">sign out</span></i> </a>
+		<i title="Sign out" id="singout" class="icon-sign-out"><span class="mText">sign out</span></i>
 	</nav>
 	<div>
 		<audio id="chatIncoming" src="{% md5url 'sounds/ChatIncoming.wav' %}" preload="none"></audio>
