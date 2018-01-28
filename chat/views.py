@@ -69,13 +69,16 @@ def get_firebase_playback(request):
 	query_sub_message = SubscriptionMessages.objects.filter(subscription__registration_id=registration_id, received=False).order_by('-message__time')[:1]
 	sub_message = query_sub_message[0]
 	SubscriptionMessages.objects.filter(id=sub_message.id).update(received=True)
-	message= Message.objects.select_related("sender__username").get(id=sub_message.message_id)
+	message = Message.objects.select_related("sender__username", "room__name").get(id=sub_message.message_id)
 	data = {
 		'title': message.sender.username,
 		'options': {
 			'body': message.content,
 			'icon': md5url('images/favicon.ico'),
 			'data': {
+				'id': sub_message.message_id,
+				'sender': message.sender.username,
+				'room': message.room.name,
 				'url': '/#/chat/' + str(message.room_id)
 			}
 		},

@@ -1,4 +1,4 @@
-var SW_VERSION = '1.0';
+var SW_VERSION = '1.1';
 console.log("%cSW_S startup, version is " + SW_VERSION, 'color: #ffb500; font-weight: bold');
 var loggerFactory = (function (logsEnabled) {
 	var self = this;
@@ -85,8 +85,32 @@ self.addEventListener('push', function (event) {
 				return response.json();
 			}).then(function (m) {
 				logger.log("Parsed response {}", m)();
-				var  a = self.registration.showNotification(m.title, m.options);
-				logger.log("Spawned notification {}", a)();
+				self.registration.getNotifications().then(function (notifications) {
+					var count = 1;
+					if (m.options && m.options.data) {
+						var room = m.options.data.room;
+						var sender = m.options.data.sender;
+						for (var i = 0; i < notifications.length; i++) {
+							if (room && notifications[i].data.room === room
+									|| (sender && notifications[i].data.sender === sender)) {
+								notifications[i].close();
+								count+= notifications[i].data.replaced || 1;
+							}
+						}
+						if (count > 1) {
+							m.options.data.replaced = count;
+							if (room) {
+								m.title = room;
+								m.options.body = "You have " + count + " new messages";
+							} else if (sender) {
+								m.options.body = "You have " + count + " new messages"
+							}
+						}
+					}
+					var a = self.registration.showNotification(m.title, m.options);
+					logger.log("Spawned notification {}", m)();
+				});
+
 			}).catch(function (response) {
 				if (response.message  === 'Failed to fetch') {
 					logger.error('Got "Failed to fetch" exception while getting message, this could be caused by invalid/self signed certificate, if this during development try to run chrome with  --allow-insecure-localhost --user-data-dir=/tmp/lol')();

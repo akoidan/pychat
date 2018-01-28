@@ -146,7 +146,6 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
-* If notification popup is displayed already, or like 5 of them, new notifications should replace old ones, or at least replace theirs text to '5 new notifications'
 * When user logs out he shouldn't receive notifications anymore
 * When we send notification and we receive unregistered we should delete it from database.
 * setTimeot stops working after 30min in chrome background, it has been changed to setInterval, check if it works
