@@ -5705,6 +5705,10 @@ function WsHandler() {
 	};
 	self.onTimeout = function() {
 		self.sendToServer({action: 'ping'}, true);
+		self.intervalFunctionCalled++
+		if (self.intervalFunctionCalled > 20) {
+			self.startPing();
+		}
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
@@ -5787,13 +5791,23 @@ function WsHandler() {
 		self.ws = new WebSocket(API_URL + self.wsConnectionId);
 		self.ws.onmessage = self.onWsMessage;
 		self.ws.onclose = self.onWsClose;
+		self.startPing = function () {
+			if (self.intervalFunction) {
+				clearInterval(self.intervalFunction);
+				self.log("Clearead old ping interval and scheduled new one")();
+			} else {
+				self.log("Started ping interval")();
+			}
+			self.intervalFunctionCalled = 0;
+			self.intervalFunction = setInterval(self.onTimeout, 60000); // Chrome timeout stops working afer some period of time
+		}
 		self.ws.onopen = function () {
 			self.setStatus(true);
 			var message = "Connection to server has been established";
 			if (self.wsState === 1) { // if not inited don't growl message on page load
 				growlSuccess(message);
 			} else {
-				setInterval(self.onTimeout, 60000); // Chrome timeout stops working afer some period of time
+				self.startPing();
 			}
 			self.wsState = 9;
 			self.log(message)();
