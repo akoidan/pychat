@@ -3514,7 +3514,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		} else {
 			self.dom.chatBoxDiv.appendChild(p);
 			if (htmlEncodedContent.startsWith('<img')) {
-					document.querySelector('[id="{}"] img'.format(id)).onload = function () {
+					document.querySelector('[id="{}"] img'.format(p.id)).onload = function () {
 						self.dom.chatBoxDiv.scrollTop = self.dom.chatBoxDiv.scrollHeight;
 					}
 			} else {
