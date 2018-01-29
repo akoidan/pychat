@@ -66,7 +66,7 @@ window.loggerFactory = (function (logsEnabled) {
 			var params = [window.console, '%c' + initiator, style];
 			for (var i = 0; i < parts.length; i++) {
 				params.push(parts[i]);
-				if (args[i]) {
+				if (typeof args[i] !== 'undefined' ) { // args can be '0'
 					params.push(args[i])
 				}
 			}

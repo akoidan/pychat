@@ -1894,7 +1894,6 @@ function Painter() {
 
 function NotifierHandler() {
 	var self = this;
-	self.maxNotifyTime = 500;
 	var logger = {
 		info: loggerFactory.getLogger("NOTIFY", console.log, 'color: #ffb500; font-weight: bold'),
 		warn: loggerFactory.getLogger("NOTIFY", console.warn, 'color: #ffb500; font-weight: bold'),
@@ -1903,9 +1902,29 @@ function NotifierHandler() {
 	self.currentTabId = Date.now().toString();
 	/*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
 	self.LAST_TAB_ID_VARNAME = 'lastTabId';
-	self.clearNotificationTime = 5000;
 	self.serviceWorkedTried = false;
-	// Permissions are granted here!
+
+	self.replaceIfMultiple = function(params) {
+		var count = 1;
+		if (params.data && params.data.replaced) {
+			for (var i = 0; i < self.popedNotifQueue.length; i++) {
+				if (self.popedNotifQueue[i].title == params.title) {
+					count += self.popedNotifQueue[i].data.replaced;
+					self.popedNotifQueue[i].close();
+				}
+			}
+			if (count > 1) {
+				if (!params.data) {
+					params.data = {replaced: count};
+				} else {
+					params.data.replaced = count
+				}
+				params.body = "You have " + count + " new messages";
+			}
+		}
+	}
+
+// Permissions are granted here!
 	self.showNot = function(params) {
 		try {
 			if (self.serviceWorkerRegistration && isMobile && isChrome) {
@@ -1914,15 +1933,14 @@ function NotifierHandler() {
 					//TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
 				})
 			} else {
+				self.replaceIfMultiple(params);
 				var not = new Notification(params.title, params)
 				self.popedNotifQueue.push(not);
-				self.lastNotifyTime = Date.now();
 				not.onclick = self.notificationClick;
 				not.onclose = function () {
-					self.popedNotifQueue.pop(this);
+					self.popedNotifQueue.splice(self.popedNotifQueue.indexOf(this), 1);
 				};
-				setTimeout(self.clearNotification, self.clearNotificationTime);
-				logger.info("New notification has been spawned {}", params)();
+				logger.info("Notification {} has been spawned, current queue {}", params, self.popedNotifQueue)();
 			}
 		} catch (e) {
 			logger.error("Failed to show notification {}", e)();
@@ -2037,7 +2055,6 @@ function NotifierHandler() {
 		window.focus();
 		this.close()
 	};
-	self.lastNotifyTime = Date.now();
 	self.notify = function (title, message, icon) {
 		if (self.isCurrentTabActive) {
 			return;
@@ -2051,15 +2068,15 @@ function NotifierHandler() {
 		// last opened tab not this one, leave the oppotunity to show notification from last tab
 		if (!window.Notification
 				|| !self.isTabMain()
-				|| !notifications
-				|| currentTime - self.maxNotifyTime < self.lastNotifyTime) {
+				|| !notifications) {
 			return
 		}
 		self.checkPermissions(function (withGranted) {
 			self.showNot({
 				title: title,
 				icon: icon || NOTIFICATION_ICON_URL,
-				body: message
+				body: message,
+				data: {replaced: 1}
 			});
 		});
 	};
@@ -2079,13 +2096,6 @@ function NotifierHandler() {
 			localStorage.setItem(self.LAST_TAB_ID_VARNAME, "0");
 		}
 		self.unloaded = true;
-	};
-	self.clearNotification = function () {
-		if (self.popedNotifQueue.length > 0) {
-			var notif = self.popedNotifQueue[0];
-			notif.close();
-			self.popedNotifQueue.shift();
-		}
 	};
 	self.onFocus = function (e) {
 		localStorage.setItem(self.LAST_TAB_ID_VARNAME, self.currentTabId);
@@ -3232,6 +3242,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		if (self.callHandler) {
 			self.callHandler.restoreState()
 		}
+		self.dom.chatBoxDiv.scrollTop = self.dom.chatBoxDiv.scrollHeight;
 	};
 	/*==================== DOM EVENTS LISTENERS ============================*/
 // keyboard and mouse handlers for loadUpHistory
@@ -3501,25 +3512,16 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		if (pos != null) {
 			self.dom.chatBoxDiv.insertBefore(p, pos);
 		} else {
-			var oldscrollHeight = self.dom.chatBoxDiv.scrollHeight;
 			self.dom.chatBoxDiv.appendChild(p);
 			if (htmlEncodedContent.startsWith('<img')) {
-				(function (id, oldScrollHeight) {
-					document.querySelector('[id="{}"] img'.format(id)).addEventListener('load', function () {
-						self.scrollBottom(oldScrollHeight);
-					});
-				})(p.id, oldscrollHeight);
+					document.querySelector('[id="{}"] img'.format(id)).onload = function () {
+						self.dom.chatBoxDiv.scrollTop = self.dom.chatBoxDiv.scrollHeight;
+					}
 			} else {
-				self.scrollBottom(oldscrollHeight);
+				self.dom.chatBoxDiv.scrollTop = self.dom.chatBoxDiv.scrollHeight;
 			}
 		}
 		return p;
-	};
-	self.scrollBottom = function (oldscrollHeight) {
-		var newscrollHeight = self.dom.chatBoxDiv.scrollHeight;
-		if (newscrollHeight > oldscrollHeight) {
-			self.dom.chatBoxDiv.scrollTop = newscrollHeight;
-		}
 	};
 	self.loadOfflineMessages = function (data) {
 		var hisMess = data.content.history || [];
@@ -5675,7 +5677,7 @@ function WsHandler() {
 	self.log = loggerFactory.getLogger('WS', console.log, "color: green;");
 	self.logWarn = loggerFactory.getLogger('WS', console.warn, "color: green;");
 	self.logError = loggerFactory.getLogger('WS', console.error, "color: green;");
-	self.logData = function(tag, obj, raw,) {
+	self.logData = function(tag, obj, raw) {
 		if (raw.length > 1000) {
 			raw = ""
 		}

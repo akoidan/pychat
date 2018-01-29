@@ -1,4 +1,4 @@
-var SW_VERSION = '1.1';
+var SW_VERSION = '1.2';
 console.log("%cSW_S startup, version is " + SW_VERSION, 'color: #ffb500; font-weight: bold');
 var loggerFactory = (function (logsEnabled) {
 	var self = this;
@@ -15,7 +15,7 @@ var loggerFactory = (function (logsEnabled) {
 			var params = [console, '%c' + initiator, style];
 			for (var i = 0; i < parts.length; i++) {
 				params.push(parts[i]);
-				if (args[i]) {
+				if (typeof args[i] !== 'undefined') {
 					params.push(args[i])
 				}
 			}
