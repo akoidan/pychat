@@ -10,17 +10,18 @@ from django.core.exceptions import ValidationError
 from django.db.models import F, Q
 from redis_sessions.session import SessionStore
 from tornado import ioloop
-from tornado.httpclient import AsyncHTTPClient
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.web import asynchronous
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from chat.cookies_middleware import create_id
-from chat.models import User, Message, UserJoinedInfo
+from chat.models import User, Message, UserJoinedInfo, IpAddress
 from chat.py2_3 import str_type, urlparse
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
 from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms, get_message_images, \
-	prepare_img
+	prepare_img, save_ip
 
 sessionStore = SessionStore()
 
@@ -162,7 +163,9 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 					self.ws_write(self.load_offline_message(offl_mess, history.get(room_id), room_id))
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
 			self.connected = True
-			Thread(target=self.save_ip).start()
+			if not do_db(UserJoinedInfo.objects.filter(
+					Q(ip__ip=self.ip) & Q(user_id=self.user_id)).exists):
+				self.fetch_and_save_ip()
 		else:
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key %s has been rejected" % session_key)
@@ -206,15 +209,28 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		browser_domain = browser_set.split(':')[0]
 		return browser_domain == origin_domain
 
-	def save_ip(self):
-		if (do_db(UserJoinedInfo.objects.filter(
-					Q(ip__ip=self.ip) & Q(user_id=self.user_id)).exists)):
-			return
-		ip_address = get_or_create_ip(self.ip, self.logger)
-		UserJoinedInfo.objects.create(
-			ip=ip_address,
-			user_id=self.user_id
-		)
+	@asynchronous
+	def fetch_and_save_ip(self):
+
+		def create(ip_address):
+			UserJoinedInfo.objects.create(
+				ip=ip_address,
+				user_id=self.user_id
+			)
+		def on_reply(r):
+			try:
+				ip_address = save_ip(self.ip, r.body)
+			except Exception as e:
+				self.logger.error("Error while creating ip with country info, because %s", e)
+				ip_address = IpAddress.objects.create(ip=self.ip)
+			create(ip_address)
+
+		if not hasattr(settings, 'IP_API_URL'):
+			ip_address = IpAddress.objects.create(ip=self.ip)
+			create(ip_address)
+		else:
+			r = HTTPRequest(settings.IP_API_URL % self.ip, method="GET")
+			self.http_client.fetch(r, callback=on_reply)
 
 	def ws_write(self, message):
 		"""

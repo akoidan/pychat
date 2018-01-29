@@ -152,7 +152,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * giphy search should return random image
 * WS close event doesn't fire after suspending PC to ram https://github.com/websockets/ws/issues/686
 * Add payback to firebase
-* Add docker
 * Fix all broken painter event in mobile
 * youtube iframe should contain full link with time and other parmas
 * https://static.pychat.org/photo/xE9bSyvC_image.png
@@ -186,12 +185,9 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * move loading messages on startup to single function? 
 * add antiflood settings to nginx
 * tornado redis connection reset prevents user from deleting its entry in online_users
-* fixme tornado logs messages to chat.log when messages don't belong to tornadoapp.p
 * add media query for register and usersettings to adjust for phone's width
 * add change password and realtime javascript to change_profile
 * file upload http://stackoverflow.com/a/14605593/3872976
-* add periodic refresh user task -> runs every N hours. publish message to online channel, gets all usernames in N seconds, then edits connection in redis http://michal.karzynski.pl/blog/2014/05/18/setting-up-an-asynchronous-task-queue-for-django-using-celery-redis/ 
-* youtube frame
 * add pictures preview if user post an url that's content-type =image
 * SELECT_SELF_ROOM  https://github.com/Deathangel908/djangochat/blob/master/chat/settings.py#L292-L303 doesnt work with mariadb engine 10.1
 * also admin email wasn't triggered while SELECT_SELF_ROOM has failed

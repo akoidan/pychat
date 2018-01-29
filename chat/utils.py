@@ -350,9 +350,23 @@ def create_user_model(user):
 	return user
 
 
+def save_ip(ip, raw_response):
+	response = json.loads(raw_response)
+	if response['status'] != "success":
+		raise Exception("Creating iprecord failed, server responded: %s" % raw_response)
+	ip_address = IpAddress.objects.create(
+		ip=ip,
+		isp=response['isp'],
+		country=response['country'],
+		region=response['regionName'],
+		city=response['city'],
+		country_code=response['countryCode']
+	)
+	return ip_address
+
+
 def get_or_create_ip(ip, logger):
 	"""
-
 	@param ip: ip to fetch info from
 	@param logger initialized logger:
 	@type IpAddress
@@ -365,18 +379,7 @@ def get_or_create_ip(ip, logger):
 				raise Exception('api url is absent')
 			logger.debug("Creating ip record %s", ip)
 			f = urlopen(settings.IP_API_URL % ip)
-			raw_response = f.read().decode("utf-8")
-			response = json.loads(raw_response)
-			if response['status'] != "success":
-				raise Exception("Creating iprecord failed, server responded: %s" % raw_response)
-			ip_address = IpAddress.objects.create(
-				ip=ip,
-				isp=response['isp'],
-				country=response['country'],
-				region=response['regionName'],
-				city=response['city'],
-				country_code=response['countryCode']
-			)
+			ip_address = save_ip(ip, f.read().decode("utf-8"))
 		except Exception as e:
 			logger.error("Error while creating ip with country info, because %s", e)
 			ip_address = IpAddress.objects.create(ip=ip)
