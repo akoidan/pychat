@@ -187,8 +187,8 @@ function Draggable(container, headerText) {
 	};
 	self.init = function () {
 		CssUtils.addClass(self.dom.container, "modal-body");
-		self.dom.container.style.left = '100px';
-		self.dom.container.style.top = '10px';
+		self.dom.container.style.left = '0px';
+		self.dom.container.style.top = '50px';
 		self.dom.header.appendChild(self.dom.iconMinimize);
 		self.dom.iconMinimize.onclick = self.minimize;
 		self.dom.iconMinimize.className = 'icon-minimize';
