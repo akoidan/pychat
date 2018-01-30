@@ -146,6 +146,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Close notifications if user opens channel/ focuses tab 
 * update service worker if its version changed with registration.update()
 * When we send notification and we receive unregistered we should delete it from database.
 * setTimeot stops working after 30min in chrome background, it has been changed to setInterval, check if it works
