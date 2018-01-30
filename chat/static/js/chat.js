@@ -1904,43 +1904,41 @@ function NotifierHandler() {
 	self.LAST_TAB_ID_VARNAME = 'lastTabId';
 	self.serviceWorkedTried = false;
 
-	self.replaceIfMultiple = function(params) {
+	self.replaceIfMultiple = function(data) {
 		var count = 1;
-		if (params.data && params.data.replaced) {
+		var newMessData = data.options.data;
+		if (newMessData && newMessData.replaced) {
 			for (var i = 0; i < self.popedNotifQueue.length; i++) {
-				if (self.popedNotifQueue[i].title == params.title) {
+				if (self.popedNotifQueue[i].data.title == newMessData.title) {
 					count += self.popedNotifQueue[i].data.replaced;
 					self.popedNotifQueue[i].close();
 				}
 			}
 			if (count > 1) {
-				if (!params.data) {
-					params.data = {replaced: count};
-				} else {
-					params.data.replaced = count
-				}
-				params.body = "You have " + count + " new messages";
+				newMessData.replaced = count;
+				data.title = count +  " messages from " + newMessData.title;
 			}
 		}
 	}
 
 // Permissions are granted here!
-	self.showNot = function(params) {
+	self.showNot = function(title, options) {
 		try {
 			if (self.serviceWorkerRegistration && isMobile && isChrome) {
-				self.serviceWorkerRegistration.showNotification(params.title, params).then(function(r) {
+				self.serviceWorkerRegistration.showNotification(title, options).then(function(r) {
 					logger.info("res {}", r)();
 					//TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
 				})
 			} else {
-				self.replaceIfMultiple(params);
-				var not = new Notification(params.title, params)
+				var data = {title: title, options: options}
+				self.replaceIfMultiple(data);
+				var not = new Notification(data.title, data.options)
 				self.popedNotifQueue.push(not);
 				not.onclick = self.notificationClick;
 				not.onclose = function () {
 					self.popedNotifQueue.splice(self.popedNotifQueue.indexOf(this), 1);
 				};
-				logger.info("Notification {} has been spawned, current queue {}", params, self.popedNotifQueue)();
+				logger.info("Notification {} {} has been spawned, current queue {}", title, options, self.popedNotifQueue)();
 			}
 		} catch (e) {
 			logger.error("Failed to show notification {}", e)();
@@ -2042,8 +2040,7 @@ function NotifierHandler() {
 						 logger.error("Unable to load serviceWorker to show notification because {}", error)();
 					}
 					if (result) {
-						self.showNot({
-							title: 'Pychat notifications enabled',
+						self.showNot('Pychat notifications enabled', {
 							body:  "You can disable notifications in profile",
 						});
 					}
@@ -2055,7 +2052,7 @@ function NotifierHandler() {
 		window.focus();
 		this.close()
 	};
-	self.notify = function (title, message, icon) {
+	self.notify = function (title, options) {
 		if (self.isCurrentTabActive) {
 			return;
 		}
@@ -2064,7 +2061,6 @@ function NotifierHandler() {
 		if (navigator.vibrate) {
 			navigator.vibrate(200);
 		}
-		var currentTime = Date.now();
 		// last opened tab not this one, leave the oppotunity to show notification from last tab
 		if (!window.Notification
 				|| !self.isTabMain()
@@ -2072,12 +2068,7 @@ function NotifierHandler() {
 			return
 		}
 		self.checkPermissions(function (withGranted) {
-			self.showNot({
-				title: title,
-				icon: icon || NOTIFICATION_ICON_URL,
-				body: message,
-				data: {replaced: 1}
-			});
+			self.showNot(title, options);
 		});
 	};
 	self.isTabMain = function () {
@@ -2104,6 +2095,9 @@ function NotifierHandler() {
 		self.isCurrentTabActive = true;
 		self.newMessagesCount = 0;
 		document.title = 'PyChat';
+		self.popedNotifQueue.forEach(function(n) {
+			n.close()
+		})
 	};
 	self.onFocusOut = function () {
 		self.isCurrentTabActive = false;
@@ -3627,7 +3621,11 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			if (!forceSkipHL) {
 					self.highLightMessageIfNeeded(p, displayedUsername, isNew, data.content, data.images);
 					if (data.userId != loggedUserId) {
-						notifier.notify(displayedUsername, data.content || 'images', data.images);
+						notifier.notify(displayedUsername, {
+							body: data.content,
+							data: {replaced: 1, title: displayedUsername},
+							icon: data.images || NOTIFICATION_ICON_URL
+						});
 					}
 			}
 		}
@@ -4561,7 +4559,7 @@ function CallHandler(roomId) {
 	};
 	self.showOffer = function (message, channelName) {
 		self.getCallPopup().initAndShow(message.user, channelName);
-		notifier.notify(message.user, "Calls you");
+		notifier.notify(message.user, {body: "Calls you", icon: NOTIFICATION_ICON_URL});
 	};
 	self.showNoMicError = function () {
 		var url = isChrome ? 'setting in chrome://settings/content' : 'your browser settings';
@@ -4918,7 +4916,7 @@ function FileReceiver(removeReferenceFn) {
 		self.fileSize = parseInt(message.content.size);
 		self.fileName = message.content.name;
 		self.opponentName = message.user;
-		notifier.notify(message.user, "Sends file {}".format(self.fileName));
+		notifier.notify(message.user, {body: "Sends file {}".format(self.fileName), icon: NOTIFICATION_ICON_URL});
 		Utils.checkAndPlay(chatFileAudio);
 		self.init();
 		self.insertData("From:", self.opponentName);
