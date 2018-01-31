@@ -1,4 +1,4 @@
-var SW_VERSION = '1.2';
+var SW_VERSION = '1.3';
 console.log("%cSW_S startup, version is " + SW_VERSION, 'color: #ffb500; font-weight: bold');
 var loggerFactory = (function (logsEnabled) {
 	var self = this;
@@ -100,10 +100,10 @@ self.addEventListener('push', function (event) {
 						if (count > 1) {
 							m.options.data.replaced = count;
 							if (room) {
-								m.title = room;
-								m.options.body = "You have " + count + " new messages";
+								m.title = count + ' messages in ' + room;
+								m.options.body = sender + ':' + m.options.body;
 							} else if (sender) {
-								m.options.body = "You have " + count + " new messages"
+								m.title = count + ' messages from ' + sender;
 							}
 						}
 					}
