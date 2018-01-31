@@ -1916,7 +1916,7 @@ function NotifierHandler() {
 			}
 			if (count > 1) {
 				newMessData.replaced = count;
-				data.title = count +  " messages from " + newMessData.title;
+				data.title = newMessData.title + "(+" + count + ")";
 			}
 		}
 	}
