@@ -222,7 +222,7 @@ class MessagesHandler(MessagesCreator):
 		if channel == ALL_ROOM_ID:
 			return
 		offline_users = UserProfile.objects.filter(rooms__id=channel, notifications=True).exclude(id__in=online).only('id')
-		subscriptions = Subscription.objects.filter(user__in=offline_users)
+		subscriptions = Subscription.objects.filter(user__in=offline_users, inactive=False)
 		if len(subscriptions) == 0:
 			return
 		new_sub_mess =[SubscriptionMessages(message_id=message_id, subscription_id=r.id) for r in subscriptions]
@@ -235,6 +235,14 @@ class MessagesHandler(MessagesCreator):
 		def on_reply(response):
 			try:
 				self.logger.debug("!! FireBase response: " + str(response.body))
+				response_obj = json.loads(response.body)
+				delete = []
+				for index, elem in enumerate(response_obj['results']):
+					if elem.get('error') in ['NotRegistered', 'InvalidRegistration']:
+						delete.append(reg_ids[index])
+				if len(delete) > 0:
+					self.logger.info("Deactivating subscriptions: %s", delete)
+					Subscription.objects.filter(registration_id__in=delete).update(inactive=True)
 			except Exception as e:
 				self.logger.error("Unable to parse response" + str(e))
 				pass

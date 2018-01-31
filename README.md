@@ -147,7 +147,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
 * update service worker if its version changed with registration.update()
-* When we send notification and we receive unregistered we should delete it from database.
 * setTimeot stops working after 30min in chrome background, it has been changed to setInterval, check if it works
 * giphy search should return random image
 * WS close event doesn't fire after suspending PC to ram https://github.com/websockets/ws/issues/686

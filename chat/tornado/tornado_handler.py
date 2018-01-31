@@ -21,7 +21,7 @@ from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
 from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms, get_message_images, \
-	prepare_img, save_ip
+	prepare_img, get_or_create_ip_wrapper, create_ip_structure
 
 sessionStore = SessionStore()
 
@@ -163,9 +163,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 					self.ws_write(self.load_offline_message(offl_mess, history.get(room_id), room_id))
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
 			self.connected = True
-			if not do_db(UserJoinedInfo.objects.filter(
-					Q(ip__ip=self.ip) & Q(user_id=self.user_id)).exists):
-				self.fetch_and_save_ip()
+			self.save_ip()
 		else:
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key %s has been rejected" % session_key)
@@ -209,28 +207,24 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		browser_domain = browser_set.split(':')[0]
 		return browser_domain == origin_domain
 
-	@asynchronous
-	def fetch_and_save_ip(self):
+	def save_ip(self):
+		if not do_db(UserJoinedInfo.objects.filter(
+				Q(ip__ip=self.ip) & Q(user_id=self.user_id)).exists):
+			res = get_or_create_ip_wrapper(self.ip, self.logger, self.fetch_and_save_ip_http)
+			if res is not None:
+				UserJoinedInfo.objects.create(ip=res, user_id=self.user_id)
 
-		def create(ip_address):
-			UserJoinedInfo.objects.create(
-				ip=ip_address,
-				user_id=self.user_id
-			)
-		def on_reply(r):
+	@asynchronous
+	def fetch_and_save_ip_http(self):
+		def fetch_response(response):
 			try:
-				ip_address = save_ip(self.ip, r.body)
+				ip_record = create_ip_structure(self.ip, response.body)
 			except Exception as e:
 				self.logger.error("Error while creating ip with country info, because %s", e)
-				ip_address = IpAddress.objects.create(ip=self.ip)
-			create(ip_address)
-
-		if not hasattr(settings, 'IP_API_URL'):
-			ip_address = IpAddress.objects.create(ip=self.ip)
-			create(ip_address)
-		else:
-			r = HTTPRequest(settings.IP_API_URL % self.ip, method="GET")
-			self.http_client.fetch(r, callback=on_reply)
+				ip_record = IpAddress.objects.create(ip=self.ip)
+			UserJoinedInfo.objects.create(ip=ip_record, user_id=self.user_id)
+		r = HTTPRequest(settings.IP_API_URL % self.ip, method="GET")
+		self.http_client.fetch(r, callback=fetch_response)
 
 	def ws_write(self, message):
 		"""

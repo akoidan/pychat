@@ -350,11 +350,11 @@ def create_user_model(user):
 	return user
 
 
-def save_ip(ip, raw_response):
+def create_ip_structure(ip, raw_response):
 	response = json.loads(raw_response)
 	if response['status'] != "success":
 		raise Exception("Creating iprecord failed, server responded: %s" % raw_response)
-	ip_address = IpAddress.objects.create(
+	return IpAddress.objects.create(
 		ip=ip,
 		isp=response['isp'],
 		country=response['country'],
@@ -362,28 +362,32 @@ def save_ip(ip, raw_response):
 		city=response['city'],
 		country_code=response['countryCode']
 	)
-	return ip_address
 
 
 def get_or_create_ip(ip, logger):
+	def create_ip():
+		f = urlopen(settings.IP_API_URL % ip)
+		decode = f.read().decode("utf-8")
+		return create_ip_structure(ip, decode)
+	return get_or_create_ip_wrapper(ip, logger, create_ip)
+
+
+def get_or_create_ip_wrapper(ip, logger, fetcher_ip_function):
 	"""
 	@param ip: ip to fetch info from
 	@param logger initialized logger:
 	@type IpAddress
 	"""
 	try:
-		ip_address = IpAddress.objects.get(ip=ip)
+		return IpAddress.objects.get(ip=ip)
 	except IpAddress.DoesNotExist:
 		try:
 			if not hasattr(settings, 'IP_API_URL'):
-				raise Exception('api url is absent')
-			logger.debug("Creating ip record %s", ip)
-			f = urlopen(settings.IP_API_URL % ip)
-			ip_address = save_ip(ip, f.read().decode("utf-8"))
+				raise Exception("IP_API_URL aint set")
+			return fetcher_ip_function()
 		except Exception as e:
 			logger.error("Error while creating ip with country info, because %s", e)
-			ip_address = IpAddress.objects.create(ip=ip)
-	return ip_address
+			return IpAddress.objects.create(ip=ip)
 
 
 class EmailOrUsernameModelBackend(object):
