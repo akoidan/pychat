@@ -94,7 +94,7 @@ def test(request):
 @require_http_methods('POST')
 def register_subscription(request):
 	registration_id = request.POST['registration_id']
-	Subscription.objects.update_or_create(registration_id=registration_id, defaults={ 'user': request.user})
+	Subscription.objects.update_or_create(registration_id=registration_id, defaults={'user': request.user, 'inactive': False})
 	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 @require_http_methods('POST')
