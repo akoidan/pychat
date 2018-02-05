@@ -146,6 +146,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* https://stackoverflow.com/a/36553583/3872976
 * Add avatar to notifications and users 
 * update service worker if its version changed with registration.update()
 * setTimeot stops working after 30min in chrome background, it has been changed to setInterval, check if it works
