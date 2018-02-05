@@ -28,14 +28,8 @@ TORNADO_SSL_OPTIONS = {
 INSTALLED_APPS = INSTALLED_APPS + ('sslserver',)
 LOGGING['handlers'] = console_handlers
 LOGGING['loggers'] = {
-	# root logger
 	'': {
-		'handlers': ['django-console'],
-		'level': 'DEBUG',
-		'propagate': False,
-	},
-	'chat.tornado': {
-		'handlers': ['tornado-console'],
+		'handlers': ['default', ],
 		'level': 'DEBUG',
 		'propagate': False,
 	},

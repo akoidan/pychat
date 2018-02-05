@@ -14,7 +14,10 @@ def id_generator(size=16, chars=string.ascii_letters + string.digits):
 class ContextFilter(Filter):
 
 	def filter(self, record):
-		record.user_id = getattr(local, 'user_id', None)
-		record.id = getattr(local, 'random', None)
-		record.ip = getattr(local, 'client_ip', None)
+		if not hasattr(record, 'user_id'):
+			record.user_id = getattr(local, 'user_id', None)
+		if not hasattr(record, 'id'):
+			record.id = getattr(local, 'random', None)
+		if not hasattr(record, 'ip'):
+			record.ip = getattr(local, 'client_ip', None)
 		return True

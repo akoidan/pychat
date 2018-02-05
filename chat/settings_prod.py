@@ -12,27 +12,11 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 LOGGING['handlers'] = file_handlers
 file_handlers.update(mail_admins)
 LOGGING['loggers'] = {
-	'django.request': {
-		'handlers': ['mail_admins', 'file'],
-		'level': 'ERROR',
-		'propagate': False,
-	},
 	'': {
-		'handlers': ['file', ],
+		'handlers': ['default', 'mail_admins'],
 		'level': 'DEBUG',
 		'propagate': False,
 	},
-	'tornado.application': {
-		'handlers': ['file-tornado', 'mail_admins'],
-		'level': 'ERROR',
-		'propagate': True,
-	},
-	'chat.tornado': {
-		'handlers': ['file-tornado'],
-		'level': 'DEBUG',
-		'propagate': False,
-	},
-
 }
 
 logging.config.dictConfig(LOGGING)

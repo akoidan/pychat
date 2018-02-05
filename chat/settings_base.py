@@ -67,6 +67,51 @@ SESSION_ENGINE = 'redis_sessions.session'
 # CELERY_TASK_SERIALIZER = 'json'
 # CELERY_RESULT_SERIALIZER = 'json'
 
+
+mail_admins = {
+	'mail_admins': {
+		'level': 'ERROR',
+		'class': 'django.utils.log.AdminEmailHandler',
+	}
+}
+
+
+LOGGING = {
+	'version': 1,
+	'disable_existing_loggers': True,
+	'filters': {
+		'id': {
+			'()': 'chat.log_filters.ContextFilter',
+		}
+	},
+	'formatters': {
+		'django': {
+			'format': '%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
+			'datefmt': '%H:%M:%S',
+		},
+	},
+}
+
+file_handlers = {
+	'default': {
+		'level': 'DEBUG',
+		'class': 'logging.handlers.TimedRotatingFileHandler',
+		'formatter': 'django',
+		'when': 'midnight',
+		'filters': ['id', ],
+		'interval': 1
+	},
+}
+
+console_handlers = {
+	'default': {
+		'level': 'DEBUG',
+		'class': 'logging.StreamHandler',
+		'filters': ['id', ],
+		'formatter': 'django',
+	},
+}
+
 API_PORT = '8888'
 if 'start_tornado' in sys.argv:
 	try:
@@ -74,9 +119,11 @@ if 'start_tornado' in sys.argv:
 		API_PORT = sys.argv[index_port + 1]
 	except (ValueError, IndexError):
 		pass
-	log_file_name = 'tornado-{}.log'.format(API_PORT)
+	file_handlers['default']['filename'] = join(BASE_DIR, 'log/tornado-{}.log'.format(API_PORT)),
+
 else:
-	log_file_name = 'chat.log'
+	file_handlers['default']['filename'] = join(BASE_DIR, 'log/chat.log'),
+
 
 EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn'
 EXTENSION_INSTALL_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + EXTENSION_ID
@@ -170,62 +217,6 @@ TEMPLATES = [{
 	}
 }]
 
-file_handlers = {
-	'file-tornado': {
-		'level': 'DEBUG',
-		'class': 'logging.handlers.TimedRotatingFileHandler',
-		'filename': join(BASE_DIR, 'log/', log_file_name),
-		'formatter': 'django',
-		'when': 'midnight',
-		'interval': 1
-	},
-	'file': {
-		'level': 'DEBUG',
-		'class': 'logging.handlers.TimedRotatingFileHandler',
-		'filename': join(BASE_DIR, 'log/', log_file_name),
-		'formatter': 'django',
-		'filters': ['id', ],
-		'when': 'midnight',
-		'interval': 1
-	},
-}
-
-mail_admins = {
-	'mail_admins': {
-		'level': 'ERROR',
-		'class': 'django.utils.log.AdminEmailHandler',
-	}
-}
-
-console_handlers = {
-	'django-console': {
-		'level': 'DEBUG',
-		'class': 'logging.StreamHandler',
-		'formatter': 'django',
-		'filters': ['id', ]
-	},
-	'tornado-console': {
-		'level': 'DEBUG',
-		'class': 'logging.StreamHandler',
-		'formatter': 'django',
-	},
-}
-
-LOGGING = {
-	'version': 1,
-	'disable_existing_loggers': True,
-	'filters': {
-		'id': {
-			'()': 'chat.log_filters.ContextFilter',
-		}
-	},
-	'formatters': {
-		'django': {
-			'format': '%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
-			'datefmt': '%H:%M:%S',
-		},
-	},
-}
 
 WS_ID_CHAR_LENGTH = 4
 
