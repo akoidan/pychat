@@ -119,10 +119,9 @@ if 'start_tornado' in sys.argv:
 		API_PORT = sys.argv[index_port + 1]
 	except (ValueError, IndexError):
 		pass
-	file_handlers['default']['filename'] = join(BASE_DIR, 'log/tornado-{}.log'.format(API_PORT)),
-
+	file_handlers['default']['filename'] = join(BASE_DIR, 'log/tornado-{}.log'.format(API_PORT))
 else:
-	file_handlers['default']['filename'] = join(BASE_DIR, 'log/chat.log'),
+	file_handlers['default']['filename'] = join(BASE_DIR, 'log/chat.log')
 
 
 EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn'
