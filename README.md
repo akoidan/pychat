@@ -146,6 +146,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Fix line ending so it works in all browsers
 * Add ability to disable push notification/sound for specifici channel, like mute volume icon on the edge of channel name
 * https://stackoverflow.com/a/36553583/3872976
 * Add avatar to notifications and users 
