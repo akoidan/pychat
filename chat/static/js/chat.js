@@ -2365,7 +2365,6 @@ function ChannelsHandler() {
 		userContextMenu: $('user-context-menu'),
 		addUserHolder: $('addUserHolder'),
 		addRoomHolder: $('addRoomHolder'),
-		roomSettings: $('roomSettings'),
 		addRoomInput: $('addRoomInput'),
 		addUserList: $('addUserList'),
 		addUserInput: $('addUserInput'),
@@ -2447,6 +2446,9 @@ function ChannelsHandler() {
 		var roomId = parseInt(liEl.getAttribute(self.ROOM_ID_ATTR));
 		if (CssUtils.hasClass(target, SETTINGS_ICON_CLASS_NAME)) {
 			self.channelSettings.show();
+			var ac = self.getActiveChannel()
+			self.channelSettings.setHeaderText("<b>{}</b>'s room settings".format(ac.roomName));
+			self.channelSettings.setFor(ac.roomId);
 			// wsHandler.sendPreventDuplicates({
 			// 	action: 'deleteRoom',
 			// 	roomId: roomId
@@ -2964,7 +2966,8 @@ function ChannelsHandler() {
 		self.addUserHandler = new Draggable(self.dom.addUserHolder, "");
 		self.addUserHandler.fixInputs();
 		self.addRoomHandler = new Draggable(self.dom.addRoomHolder, "Create New Room");
-		self.channelSettings = new Draggable(self.dom.roomSettings, "Add room");
+		self.channelSettings = new RoomSettings();
+		self.channelSettings.fixInputs();
 		self.addUserHandler.fixInputs();
 		var minifier = self.dom.minifier;
 		for (var el in minifier) {
@@ -3978,7 +3981,13 @@ function BaseTransferHandler(removeReferenceFn) {
 	};
 }
 
-
+function RoomSettings() {
+	var self = this;
+	Draggable.call(self, $('roomSettings'), "");
+	self.setFor = function(roomId) {
+		self.roomId = roomId;
+	}
+}
 function CallPopup(answerFn, videoAnswerFn, declineFn) {
 	var self = this;
 	Draggable.call(self, document.createElement('DIV'), "Call");
