@@ -12,7 +12,7 @@ var MAX_ACCEPT_FILE_SIZE_WO_FS_API = Math.pow(2, 28); // 256 MB
 // end used
 var FLOOD_FILL_CURSOR = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> <svg    xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"    xmlns:dc="http://purl.org/dc/elements/1.1/"    xmlns:cc="http://creativecommons.org/ns#"    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"    xmlns:svg="http://www.w3.org/2000/svg"    xmlns="http://www.w3.org/2000/svg"    xmlns:xlink="http://www.w3.org/1999/xlink"    height="128"    width="128"    id="svg12"    xml:space="preserve"    enable-background="new 0 0 1000 1000"    viewBox="0 0 128 128"    y="0px"    x="0px"    version="1.1"><defs      id="defs16"><linearGradient        osb:paint="solid"        id="linearGradient4668"><stop          id="stop4666"          offset="0"          style="stop-color:#a70000;stop-opacity:1;" /></linearGradient><linearGradient        gradientUnits="userSpaceOnUse"        y2="129.24489"        x2="8692.8536"        y1="129.24489"        x1="124.50469"        id="linearGradient4670"        xlink:href="#linearGradient4668" /></defs><metadata      id="metadata2"> Svg Vector Icons : http://www.onlinewebfonts.com/icon <rdf:RDF><cc:Work      rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type        rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><g      transform="matrix(-0.06545548,0,0,0.06545548,96.091518,32.9054)"      id="g10"><g        id="g8"        transform="matrix(0.1,0,0,-0.1,0,511)"><path          style="fill-opacity:1;fill:url(#linearGradient4670)"          id="path4"          d="M 2923.3,4723.5 C 2495.2541,4641.7289 2116.2015,4282.4666 2019.575,3861.7722 2010.936,2974.8482 2002.3121,2087.9242 1993.7,1201 1372.6067,561.9446 713.75686,-43.111911 124.50469,-711.1 177.79443,-1124.6012 696.18046,-1384.5817 946.92256,-1721.6746 1873.0645,-2644.7129 2784.7436,-3583.1992 3733.8,-4482.7 c 414.8568,-14.5444 672.1458,554.0816 1010.5846,786.2741 C 5933.4015,-2520.7561 7113.1744,-1335.7883 8297.1,-155 8684.9234,-201.73044 8869.3553,83.429201 8467.4077,323.01301 7303.9011,1506.5241 6142.0458,2693.2924 4939.988,3837.6106 4686.657,4091.5786 4729.7111,3391.5044 4719.1559,3565.1616 4714.1012,2956.3168 4711.3726,2347.458 4708.5,1738.6 5031.0341,1335.4454 4991.2388,661.12765 4526.4426,380.70059 4035.9919,26.383144 3257.4044,327.55874 3152.1031,931.46414 c -39.8563,589.13426 159.3241,863.35076 203.329,893.32976 2.2707,246.6969 2.431,493.4008 2.1679,740.1061 -300.1928,-300.1072 -600.3595,-600.2405 -900.5,-900.4 12.8139,725.2498 -32.7477,1454.2178 35.8271,2176.4281 162.6751,558.7872 1062.6877,586.7614 1253.7345,27.8061 112.979,-515.8061 41.7341,-1055.8192 61.1384,-1582.3166 -12.3655,-253.837 24.6538,-527.0728 -18.3526,-768.8737 -333.2237,-217.6526 -244.4878,-787.61406 173.4897,-834.19331 511.1059,-79.84462 657.2051,617.00781 295.0629,870.31461 -13.3602,773.8703 35.6765,1552.1607 -42.4,2322.3348 -122.666,568.0766 -724.5835,955.0335 -1292.3,847.5 z" /><path          style="fill:{};fill-opacity:1"          id="path6"          d="m 8652.1,-872.8 c -387.3878,-526.6483 -739.4695,-1099.2442 -952.5422,-1720.4453 -255.0408,-767.135 561.8384,-1583.3109 1332.0652,-1367.7587 707.6368,133.0412 1091.285,1010.324 735.7851,1630.769 -236.9486,492.8542 -488.9007,986.3895 -824.0081,1420.335 -74.892,70.77849 -202.3378,99.68687 -291.3,37.1 z" /></g></g></svg>';
 var SYSTEM_USERNAME = 'System';
-var CANCEL_ICON_CLASS_NAME = 'icon-cancel-circled-outline';
+var SETTINGS_ICON_CLASS_NAME = 'icon-cog';
 var PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
 var OFFLINE_CLASS = 'offline';
 var GENDER_ICONS = {
@@ -2365,6 +2365,7 @@ function ChannelsHandler() {
 		userContextMenu: $('user-context-menu'),
 		addUserHolder: $('addUserHolder'),
 		addRoomHolder: $('addRoomHolder'),
+		roomSettings: $('roomSettings'),
 		addRoomInput: $('addRoomInput'),
 		addUserList: $('addUserList'),
 		addUserInput: $('addUserInput'),
@@ -2444,11 +2445,12 @@ function ChannelsHandler() {
 		// liEl = closest parent with LI
 		var liEl = tagName == 'I' || tagName == 'SPAN' ? target.parentNode : target;
 		var roomId = parseInt(liEl.getAttribute(self.ROOM_ID_ATTR));
-		if (CssUtils.hasClass(target, CANCEL_ICON_CLASS_NAME)) {
-			wsHandler.sendPreventDuplicates({
-				action: 'deleteRoom',
-				roomId: roomId
-			});
+		if (CssUtils.hasClass(target, SETTINGS_ICON_CLASS_NAME)) {
+			self.channelSettings.show();
+			// wsHandler.sendPreventDuplicates({
+			// 	action: 'deleteRoom',
+			// 	roomId: roomId
+			// });
 		} else {
 			self.setActiveChannel(roomId);
 		}
@@ -2824,7 +2826,7 @@ function ChannelsHandler() {
 	};
 	self.createChannelChatHandler = function (roomId, li, users, roomName) {
 		var i = document.createElement('span');
-		i.className = CANCEL_ICON_CLASS_NAME;
+		i.className = SETTINGS_ICON_CLASS_NAME;
 		li.appendChild(i);
 		li.setAttribute(self.ROOM_ID_ATTR, roomId);
 		var chatBoxDiv = document.createElement('div');
@@ -2962,6 +2964,7 @@ function ChannelsHandler() {
 		self.addUserHandler = new Draggable(self.dom.addUserHolder, "");
 		self.addUserHandler.fixInputs();
 		self.addRoomHandler = new Draggable(self.dom.addRoomHolder, "Create New Room");
+		self.channelSettings = new Draggable(self.dom.roomSettings, "Add room");
 		self.addUserHandler.fixInputs();
 		var minifier = self.dom.minifier;
 		for (var el in minifier) {

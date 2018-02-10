@@ -16,11 +16,11 @@ md5_cache = {}
 def md5url(file_name):
 	value = md5_cache.get(file_name)
 	if value is None or DEBUG:
-		value = get_file_url(file_name)
+		value = calculate_url(file_name)
 	return value
 
 
-def get_file_url(file_name):
+def calculate_url(file_name):
 	entry_name = file_name
 	try:
 		key = '#root#'

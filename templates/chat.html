@@ -111,6 +111,38 @@
 			</ul>
 		</div>
 	</div>
+	<div id="roomSettings" class="hidden">
+		<table>
+			<tr>
+				<td>
+					<label for="roomSettNotifications">Notifications</label>
+				</td>
+				<td>
+					<input type="checkbox" value="LEAVE ROOM" id="roomSettNotifications"/>
+				<label for="roomSettNotifications"></label>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<label for="roomSettSound">Sound</label>
+				</td>
+				<td>
+					<input type="range" id="roomSettSound"/>
+				</td>
+			</tr>
+						<tr>
+				<td colspan="2">
+					<input type="button" class="red-btn" value="exit" id="roomSettExit"/>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<input type="button" class="green-btn" value="apply" id="roomSettApply"/>
+				</td>
+			</tr>
+		</table>
+		</div>
+	</div>
 	<div id="addRoomHolder" class="hidden">
 		<div>
 			<input type="text" placeholder="Room Name" title="Enter New Room Name Here" id="addRoomInput" maxlength="16"/>
