@@ -43,7 +43,6 @@ var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var MAX_STORAGE_LENGTH = 3000;
 var blankRegex = /^\s*$/;
 var fileTypeRegex = /\.(\w+)(\?.*)?$/;
-window.sound = 0;
 window.loggingEnabled = true;
 var ajaxLoader;
 var logger;
@@ -395,13 +394,6 @@ function setTheme() {
 }
 onDocLoad(function () {
 	muteBtn = $("muteBtn");
-	var sound = localStorage.getItem('sound');
-	if (sound == null) {
-		window.sound = 0;
-	} else {
-		window.sound = sound - 1;
-	}
-	mute();
 	setTheme();
 	ajaxLoader = $("ajaxStatus");
 	if (typeof InstallTrigger !== 'undefined') { // browser = firefox
@@ -445,13 +437,6 @@ function styleInputRange(ir) {
 	fixInputRangeStyle(ir);
 	document.head.appendChild(inputRangeStyles[id].style);
 }
-
-function mute() {
-	window.sound = (window.sound + 1) % 4;
-	localStorage.sound = window.sound;
-	if (muteBtn) muteBtn.className = volumeIcons[window.sound];
-}
-
 
 function readCookie() {
 	var c, C, i;

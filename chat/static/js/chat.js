@@ -3525,15 +3525,15 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	self.loadOfflineMessages = function (data) {
 		var hisMess = data.content.history || [];
 		var offlMess = data.content.offline || [];
-		var oldSound = window.sound;
-		window.sound = 0;
+		var bu = Utils.checkAndPlay;
+		Utils.checkAndPlay = function() {}
 		offlMess.forEach(function(d) {
 			self._printMessage(d, true, false);
 		});
 		hisMess.forEach(function(d) {
 			self._printMessage(d, false, true);
 		});
-		window.sound = oldSound;
+		Utils.checkAndPlay = bu;
 	};
 	self.patterns = {
 		linksRegex: /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g, /*http://anycharacter except end of text, <br> or space*/
@@ -3637,13 +3637,13 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 	};
 	self.printMessagePlay = function (data) {
 		if (loggedUserId === data.userId) {
-			Utils.checkAndPlay(self.dom.chatOutgoing);
+			Utils.checkAndPlay(self.dom.chatOutgoing, self.volume);
 			self.lastMessage = {
 				id: data.id,
 				time: data.time
 			}
 		} else {
-			Utils.checkAndPlay(self.dom.chatIncoming);
+			Utils.checkAndPlay(self.dom.chatIncoming, self.volume);
 		}
 	};
 	self.highLightMessageIfNeeded = function (p, displayedUsername, isNew, content, images) {
@@ -3668,8 +3668,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 	};
 	self.loadMessages = function (data) {
-		var windowsSoundState = window.sound;
-		window.sound = 0;
+		var bu = Utils.checkAndPlay;
+		Utils.checkAndPlay = function() {}
 		logger.info('appending messages to top')();
 		// This check should fire only once,
 		// because requests aren't being sent when there are no event for them, thus no responses
@@ -3686,7 +3686,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		message.forEach(self.printMessage);
 		window.newMessagesDisabled = savedNewMessagesDisabledStatus;
 		self.lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
-		window.sound = windowsSoundState;
+		Utils.checkAndPlay = bu;
 	};
 	self.addOnlineUser = function (message) {
 		self.addUserToDom(message);
@@ -3703,7 +3703,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		} else {
 			dm = 'User <b>{}</b> has {}'.format(username, action);
 		}
-		Utils.checkAndPlay(sound);
+		Utils.checkAndPlay(sound, self.volume);
 		self.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
 		self.setOnlineUsers(message);
 	};
@@ -6025,14 +6025,17 @@ var Utils = {
 		domEl.src = URL.createObjectURL(stream);
 		return domEl.play();
 	},
-	checkAndPlay: function (element) {
-		if (!window.sound || !notifier.isTabMain()) {
+	checkAndPlay: function (element, volume) {
+		if (typeof volume == 'undefined') {
+			volume = 2;
+		}
+		if (!volume || !notifier.isTabMain()) {
 			return;
 		}
 		try {
 			element.pause();
 			element.currentTime = 0;
-			element.volume = volumeProportion[window.sound];
+			element.volume = volumeProportion[volume];
 			var prom = element.play();
 			prom && prom.catch(function(e) {});
 		} catch (e) {
