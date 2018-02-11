@@ -2446,8 +2446,8 @@ function ChannelsHandler() {
 		if (CssUtils.hasClass(target, SETTINGS_ICON_CLASS_NAME)) {
 			self.channelSettings.show();
 			var ac = self.getActiveChannel()
-			self.channelSettings.setHeaderText("<b>{}</b>'s room settings".format(ac.roomName));
-			self.channelSettings.setFor(ac.roomId);
+			self.channelSettings.setHeaderText("<b>{}</b>'s room settings".format(liEl.textContent));
+			self.channelSettings.setFor(roomId);
 		} else {
 			self.setActiveChannel(roomId);
 		}
@@ -2735,7 +2735,7 @@ function ChannelsHandler() {
 			var li = document.createElement('LI');
 			var username = allUsers[userId].user;
 			self.addUserUsersList[username] = li;
-			li.innerText = username;
+			li.textContent = username;
 			li.setAttribute(USER_ID_ATTR, userId);
 			self.dom.addUserList.appendChild(li);
 		}
@@ -4392,15 +4392,15 @@ function CallHandler(roomId) {
 				}
 				switch (device.kind) {
 					case "audioinput":
-						option.innerText = device.label || 'Microphone ' + (++n);
+						option.textContent = device.label || 'Microphone ' + (++n);
 						self.dom.microphones.appendChild(option);
 						break;
 					case "audiooutput":
-						option.innerText = device.label || 'Speaker ' + (++k);
+						option.textContent = device.label || 'Speaker ' + (++k);
 						self.dom.speakers.appendChild(option);
 						break;
 					case "videoinput":
-						option.innerText = device.label || 'Camera ' + (++c);
+						option.textContent = device.label || 'Camera ' + (++c);
 						self.dom.cameras.appendChild(option);
 						break;
 				}
