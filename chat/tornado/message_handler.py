@@ -221,7 +221,7 @@ class MessagesHandler(MessagesCreator):
 		online = self.get_online_from_redis(channel)
 		if channel == ALL_ROOM_ID:
 			return
-		offline_users = UserProfile.objects.filter(rooms__id=channel, notifications=True).exclude(id__in=online).only('id')
+		offline_users = RoomUsers.objects.filter(room_id=channel, notifications=True).exclude(user_id__in=online).values_list('user_id')
 		subscriptions = Subscription.objects.filter(user__in=offline_users, inactive=False)
 		if len(subscriptions) == 0:
 			return

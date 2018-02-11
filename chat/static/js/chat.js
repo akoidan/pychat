@@ -3625,7 +3625,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 			Utils.setYoutubeEvent(p);
 			if (!forceSkipHL) {
 					self.highLightMessageIfNeeded(p, displayedUsername, isNew, data.content, data.images);
-					if (data.userId != loggedUserId) {
+					if (data.userId != loggedUserId && self.notifications) {
 						notifier.notify(displayedUsername, {
 							body: data.content,
 							data: {replaced: 1, title: displayedUsername},
