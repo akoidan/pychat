@@ -2434,7 +2434,11 @@ function ChannelsHandler() {
 	self.setParams = function (params) {
 		self.activeChannel = self.parseActiveChannelFromParams(params);
 	};
-	self.roomClick = function (event) {
+	self.rightRoomClick = function(event) {
+		event.preventDefault();
+		self.roomClick(event, true);
+	}
+	self.roomClick = function (event, isRight) {
 		var target = event.target;
 		var tagName = target.tagName;
 		if (tagName == 'UL') {
@@ -2443,7 +2447,7 @@ function ChannelsHandler() {
 		// liEl = closest parent with LI
 		var liEl = tagName == 'I' || tagName == 'SPAN' ? target.parentNode : target;
 		var roomId = parseInt(liEl.getAttribute(self.ROOM_ID_ATTR));
-		if (CssUtils.hasClass(target, SETTINGS_ICON_CLASS_NAME)) {
+		if (CssUtils.hasClass(target, SETTINGS_ICON_CLASS_NAME) || isRight) {
 			self.channelSettings.show(roomId);
 		} else {
 			self.setActiveChannel(roomId);
@@ -2952,6 +2956,10 @@ function ChannelsHandler() {
 		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);
 		self.dom.rooms.onclick = self.roomClick;
 		self.dom.directUserTable.onclick = self.roomClick;
+		if (isMobile) {
+			self.dom.rooms.oncontextmenu = self.rightRoomClick;
+			self.dom.directUserTable.oncontextmenu = self.rightRoomClick;
+		}
 		self.dom.imgInput.onchange = self.handleFileSelect;
 		self.dom.imgInputIcon.onclick = function () {
 			self.dom.imgInput.click()
