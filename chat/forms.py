@@ -41,7 +41,6 @@ class UserProfileForm(forms.ModelForm):
 	# the widget gets rid of <a href=
 	photo = FileField(widget=forms.FileInput)
 	birthday = DateField(widget=DateWidget)  # input_formats=settings.DATE_INPUT_FORMATS
-	notifications = BooleanField(widget=BooleanWidget)
 	suggestions = BooleanField(widget=BooleanWidget)
 	cache_messages = BooleanField(widget=BooleanWidget)
 	logs = BooleanField(widget=BooleanWidget)
@@ -59,7 +58,7 @@ class UserProfileForm(forms.ModelForm):
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
 		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts',
-				'sex', 'photo', 'notifications', 'suggestions', 'logs', 'cache_messages',
+				'sex', 'photo', 'suggestions', 'logs', 'cache_messages',
 					 'embedded_youtube', 'highlight_code')
 
 	def __init__(self, *args, **kwargs):

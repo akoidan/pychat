@@ -2934,6 +2934,7 @@ function ChannelsHandler() {
 		var anotherUserId = self.createNewUserChatHandler(message.roomId, channelUsers);
 		self.setActiveChannel(message.roomId);
 		growlInfo('<span>Room for user <b>{}</b> has been created</span>'.format(anotherUserName[anotherUserId].user));
+		self.channels[message.roomId].setRoomSettings(message.volume, message.notifications)
 	};
 	self.addRoom = function (message) {
 		var users = message.users;
@@ -2942,6 +2943,7 @@ function ChannelsHandler() {
 		channelUsers[users[0]] = self.getAllUsersInfo()[users[0]];
 		self.createNewRoomChatHandler(message.roomId, roomName, channelUsers);
 		growlInfo('<span>Room <b>{}</b> has been created</span>'.format(roomName));
+		self.channels[message.roomId].setRoomSettings(message.volume, message.notifications)
 	};
 	self.viewProfile = function () {
 		singlePage.showPage('/profile/', [self.getActiveUserId()]);

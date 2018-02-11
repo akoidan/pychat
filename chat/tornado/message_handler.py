@@ -318,7 +318,7 @@ class MessagesHandler(MessagesCreator):
 	def create_user_channel(self, message):
 		user_id = message[VarNames.USER_ID]
 		room_id = create_room(self.user_id, user_id)
-		subscribe_message = self.subscribe_direct_channel_message(room_id, user_id)
+		subscribe_message = self.subscribe_direct_channel_message(room_id, user_id, self.user_id != user_id)
 		self.publish(subscribe_message, self.channel, True)
 		other_channel = RedisPrefix.generate_user(user_id)
 		if self.channel != other_channel:

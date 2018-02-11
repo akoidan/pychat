@@ -108,7 +108,6 @@ class UserProfile(User):
 	# fileField + <img instead of ImageField (removes preview link)
 	photo = FileField(upload_to=get_random_path, null=True)
 	suggestions = BooleanField(null=False, default=True)
-	notifications = BooleanField(null=False, default=True)
 	cache_messages = BooleanField(null=False, default=True)
 	embedded_youtube = BooleanField(null=False, default=True)
 	highlight_code = BooleanField(null=False, default=False)

@@ -93,9 +93,11 @@ class MessagesCreator(object):
 	def channel(self):
 		return RedisPrefix.generate_user(self.user_id)
 
-	def subscribe_direct_channel_message(self, room_id, other_user_id):
+	def subscribe_direct_channel_message(self, room_id, other_user_id, notifications):
 		return {
 			VarNames.EVENT: Actions.CREATE_DIRECT_CHANNEL,
+			VarNames.VOLUME: 2,
+			VarNames.NOTIFICATIONS: notifications,
 			VarNames.ROOM_ID: room_id,
 			VarNames.ROOM_USERS: [self.user_id, other_user_id],
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS
@@ -113,6 +115,8 @@ class MessagesCreator(object):
 			VarNames.ROOM_ID: room_id,
 			VarNames.ROOM_USERS: [self.user_id],
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.VOLUME: 2,
+			VarNames.NOTIFICATIONS: True,
 			VarNames.ROOM_NAME: room_name
 		}
 

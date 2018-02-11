@@ -135,7 +135,7 @@ def create_self_room(self_user_id, user_rooms):
 		room = Room()
 		room.save()
 		room_id = room.id
-		RoomUsers(user_id=self_user_id, room_id=room_id).save()
+		RoomUsers(user_id=self_user_id, room_id=room_id, notifications=False).save()
 	return room_id
 
 def validate_edit_message(self_id, message):
@@ -347,7 +347,7 @@ def extract_photo(image_base64, filename=None):
 
 def create_user_model(user):
 	user.save()
-	RoomUsers(user_id=user.id, room_id=settings.ALL_ROOM_ID).save()
+	RoomUsers(user_id=user.id, room_id=settings.ALL_ROOM_ID, notifications=False).save()
 	logger.info('Signed up new user %s, subscribed for channels with id %d', user, settings.ALL_ROOM_ID)
 	return user
 
