@@ -2649,7 +2649,7 @@ function ChannelsHandler() {
 		}
 		var images = self.getPastedImage(currSymbol);
 		smileyUtil.purgeImagesFromSmileys();
-		var messageContent = userMessage.textContent;
+		var messageContent = typeof userMessage.innerText != 'undefined' ? userMessage.innerText : userMessage.textContent;
 		messageContent = blankRegex.test(messageContent) ? null : messageContent;
 		var message;
 		if (isEdit) {
