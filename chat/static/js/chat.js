@@ -2024,7 +2024,7 @@ function NotifierHandler() {
 		self.onFocus();
 		if (!window.Notification) {
 			logger.warn("Notifications are not supported")();
-		} else if (notifications) {
+		} else {
 			self.tryAgainRegisterServiceWorker();
 		}
 	};
@@ -2041,7 +2041,7 @@ function NotifierHandler() {
 					}
 					if (result) {
 						self.showNot('Pychat notifications enabled', {
-							body:  "You can disable notifications in profile",
+							body:  "You can disable them in room's settings",
 						});
 					}
 				});
@@ -2063,8 +2063,7 @@ function NotifierHandler() {
 		}
 		// last opened tab not this one, leave the oppotunity to show notification from last tab
 		if (!window.Notification
-				|| !self.isTabMain()
-				|| !notifications) {
+				|| !self.isTabMain()) {
 			return
 		}
 		self.checkPermissions(function (withGranted) {
@@ -2449,10 +2448,6 @@ function ChannelsHandler() {
 			var ac = self.getActiveChannel()
 			self.channelSettings.setHeaderText("<b>{}</b>'s room settings".format(ac.roomName));
 			self.channelSettings.setFor(ac.roomId);
-			// wsHandler.sendPreventDuplicates({
-			// 	action: 'deleteRoom',
-			// 	roomId: roomId
-			// });
 		} else {
 			self.setActiveChannel(roomId);
 		}
@@ -3984,10 +3979,30 @@ function BaseTransferHandler(removeReferenceFn) {
 function RoomSettings() {
 	var self = this;
 	Draggable.call(self, $('roomSettings'), "");
+	self.dom.roomSettExit = $('roomSettExit')
+	self.dom.roomSettApply = $('roomSettApply')
+	self.dom.roomSettNotifications = $('roomSettNotifications')
+	self.dom.roomSettSound = $('roomSettSound')
 	self.setFor = function(roomId) {
 		self.roomId = roomId;
 	}
+	self.apply = function() {
+
+	}
+	self.leave = function() {
+		var sent = wsHandler.sendToServer({
+			action: 'deleteRoom',
+			roomId: self.roomId
+		});
+		if (sent) {
+			self.hide()
+		}
+	}
+	self.dom.roomSettApply.onclick = self.apply;
+	self.dom.roomSettExit.onclick = self.leave;
 }
+
+
 function CallPopup(answerFn, videoAnswerFn, declineFn) {
 	var self = this;
 	Draggable.call(self, document.createElement('DIV'), "Call");

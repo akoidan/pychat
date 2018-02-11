@@ -18,7 +18,6 @@
 		var loggedUserId = {{ userid }};
 		var NOTIFICATION_ICON_URL = "{% md5url 'images/favicon.ico' %}";
 		var suggestions = {{ suggestions |yesno:"true,false" }};
-		var notifications = {{ notifications |yesno:"true,false" }};
 		var cacheMessages = {{ cache_messages |yesno:"true,false" }};
 		var manifest = {{ manifest |yesno:"true,false" }};
 		window.highlightCode = {{ highlight_code |yesno:"true,false" }};
@@ -127,7 +126,7 @@
 					<label for="roomSettSound">Sound</label>
 				</th>
 				<td>
-					<input type="range" id="roomSettSound"/>
+					<input type="range" id="roomSettSound" min="0" max="3"/>
 				</td>
 			</tr>
 						<tr>

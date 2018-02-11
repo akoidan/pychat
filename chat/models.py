@@ -179,6 +179,8 @@ class RoomUsers(models.Model):
 	room = models.ForeignKey(Room, null=False)
 	user = models.ForeignKey(User, null=False)
 	last_read_message = models.ForeignKey(Message, null=True)
+	volume = models.IntegerField(default=2, null=False)
+	notifications = BooleanField(null=False, default=True)
 
 	class Meta:  # pylint: disable=C1001
 		unique_together = ("user", "room")

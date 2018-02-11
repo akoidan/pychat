@@ -47,6 +47,8 @@ class VarNames(object):
 	MESSAGE_ID = 'id'
 	GENDER = 'sex'
 	ROOM_NAME = 'name'
+	NOTIFICATIONS = 'notifications'
+	VOLUME = 'volume'
 	ROOM_ID = 'roomId'
 	ROOM_USERS = 'users'
 	CHANNEL = 'channel'

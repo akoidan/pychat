@@ -126,9 +126,8 @@ def home(request):
 	@return:  the x intercept of the line M{y=m*x+b}.
 	"""
 	context = csrf(request)
-	up = UserProfile.objects.defer('suggestions', 'notifications', 'cache_messages', 'highlight_code', 'embedded_youtube').get(id=request.user.id)
+	up = UserProfile.objects.defer('suggestions', 'cache_messages', 'highlight_code', 'embedded_youtube').get(id=request.user.id)
 	context['suggestions'] = up.suggestions
-	context['notifications'] = up.notifications
 	context['cache_messages'] = up.cache_messages
 	context['highlight_code'] = up.highlight_code
 	context['embedded_youtube'] = up.embedded_youtube

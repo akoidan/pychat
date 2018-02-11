@@ -40,9 +40,11 @@ def is_blank(check_str):
 
 
 def get_users_in_current_user_rooms(user_id):
-	user_rooms = Room.objects.filter(users__id=user_id, disabled=False).values('id', 'name')
+	user_rooms = Room.objects.filter(users__id=user_id, disabled=False).values('id', 'name', 'roomusers__notifications', 'roomusers__volume')
 	res = {room['id']: {
 			VarNames.ROOM_NAME: room['name'],
+			VarNames.NOTIFICATIONS: room['roomusers__notifications'],
+			VarNames.VOLUME: room['roomusers__volume'],
 			VarNames.ROOM_USERS: {}
 		} for room in user_rooms}
 	room_ids = (room_id for room_id in res)
