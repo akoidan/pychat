@@ -34,4 +34,5 @@ urlpatterns = patterns(
 	url(r'^report_issue$', 'chat.views.report_issue'),
 	url(r'^statistics$', 'chat.views.statistics'),
 	url(r'^test$', 'chat.views.test'),
+	url(r'^save_room_settings$', 'chat.views.save_room_settings'),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

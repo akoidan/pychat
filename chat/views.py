@@ -31,7 +31,7 @@ from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
-	SubscriptionMessages
+	SubscriptionMessages, RoomUsers
 from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
 	create_user_model, check_captcha, send_reset_password_email
@@ -61,6 +61,19 @@ def validate_email(request):
 	except ValidationError as e:
 		response = e.message
 	return HttpResponse(response, content_type='text/plain')
+
+
+@require_http_methods(['POST'])
+@login_required_no_redirect(False)
+def save_room_settings(request):
+	"""
+	POST only, validates email during registration
+	"""
+	room_id = request.POST['roomId']
+	volume = request.POST['volume']
+	notifications = request.POST['notifications']
+	updated = RoomUsers.objects.filter(room_id=room_id, user_id=request.user.id).update(volume=volume, notifications=notifications == 'true')
+	return HttpResponse(settings.VALIDATION_IS_OK if updated == 1 else "Nothing updated", content_type='text/plain')
 
 
 @require_http_methods('GET')

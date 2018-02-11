@@ -2444,10 +2444,7 @@ function ChannelsHandler() {
 		var liEl = tagName == 'I' || tagName == 'SPAN' ? target.parentNode : target;
 		var roomId = parseInt(liEl.getAttribute(self.ROOM_ID_ATTR));
 		if (CssUtils.hasClass(target, SETTINGS_ICON_CLASS_NAME)) {
-			self.channelSettings.show();
-			var ac = self.getActiveChannel()
-			self.channelSettings.setHeaderText("<b>{}</b>'s room settings".format(liEl.textContent));
-			self.channelSettings.setFor(roomId);
+			self.channelSettings.show(roomId);
 		} else {
 			self.setActiveChannel(roomId);
 		}
@@ -2880,6 +2877,7 @@ function ChannelsHandler() {
 					self.createNewUserChatHandler(roomId, newUserList);
 				}
 			}
+			self.channels[roomId].setRoomSettings(newRoom.volume, newRoom.notifications)
 		}
 		self.showActiveChannel();
 	};
@@ -3239,6 +3237,10 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 		self.dom.chatBoxDiv.scrollTop = self.dom.chatBoxDiv.scrollHeight;
 	};
+	self.setRoomSettings = function(volume, notifications) {
+		self.volume = volume;
+		self.notifications = notifications;
+	}
 	/*==================== DOM EVENTS LISTENERS ============================*/
 // keyboard and mouse handlers for loadUpHistory
 // Those events are removed when loadUpHistory() reaches top
@@ -3983,11 +3985,31 @@ function RoomSettings() {
 	self.dom.roomSettApply = $('roomSettApply')
 	self.dom.roomSettNotifications = $('roomSettNotifications')
 	self.dom.roomSettSound = $('roomSettSound')
-	self.setFor = function(roomId) {
-		self.roomId = roomId;
-	}
 	self.apply = function() {
-
+		var data = {
+			roomId: self.roomId,
+			volume: self.dom.roomSettSound.value,
+			notifications: self.dom.roomSettNotifications.checked
+		};
+		doPost('/save_room_settings', data, function(response) {
+			if (response == RESPONSE_SUCCESS) {
+				growlSuccess("Settings have been saved");
+				self.hide();
+				channelsHandler.channels[self.roomId].setRoomSettings(data.volume, data.notifications)
+			} else {
+				growlError("Failed to save settings: " + response);
+			}
+		});
+	}
+	self.superShow = self.show;
+	self.show = function(roomId) {
+		self.superShow()
+		self.roomId = roomId;
+		var sd = channelsHandler.channels[roomId];
+		self.dom.roomSettSound.value = sd.volume;
+		self.dom.roomSettNotifications.checked = sd.notifications;
+		fixInputRangeStyle(self.dom.roomSettSound)
+		self.setHeaderText("<b>{}</b>'s room settings".format(sd.roomName));
 	}
 	self.leave = function() {
 		var sent = wsHandler.sendToServer({
