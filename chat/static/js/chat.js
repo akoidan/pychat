@@ -4035,13 +4035,13 @@ function RoomSettings() {
 }
 
 
-function CallPopup(answerFn, videoAnswerFn, declineFn) {
+function CallPopup(answerFn, videoAnswerFn, declineFn, user, channelName, volume) {
 	var self = this;
 	Draggable.call(self, document.createElement('DIV'), "Call");
 	self.dom.callSound = $('chatCall');
-	self.dom.callSound.addEventListener("ended", function () {
-		Utils.checkAndPlay(self.dom.callSound);
-	});
+	self.dom.callSound.onended = function () {
+		Utils.checkAndPlay(self.dom.callSound, volume);
+	};
 	self.init = function () {
 		var answerButtons = document.createElement('div');
 		self.dom.users = document.createElement('table');
@@ -4054,6 +4054,11 @@ function CallPopup(answerFn, videoAnswerFn, declineFn) {
 		self.dom.body.appendChild(answerButtons);
 		document.querySelector('body').appendChild(self.dom.container);
 		self.fixInputs();
+		self.setHeaderText("Incoming call");
+		self.inserRow("From: ", user);
+		self.inserRow("Room: ", channelName);
+		self.show();
+		Utils.checkAndPlay(self.dom.callSound, volume);
 	};
 	self.inserRow = function (name, value) {
 		var raw = self.dom.users.insertRow();
@@ -4080,12 +4085,6 @@ function CallPopup(answerFn, videoAnswerFn, declineFn) {
 	self.hide = function () {
 		self.dom.callSound.pause();
 		self.super.hide();
-	};
-	self.initAndShow = function (user, channelName) {
-		self.setHeaderText("Incoming call");
-		self.inserRow("Initiator: ", user);
-		self.show();
-		Utils.checkAndPlay(self.dom.callSound);
 	};
 	self.closeEvents = function () {
 		CssUtils.deleteChildren(self.dom.users);
@@ -4262,12 +4261,6 @@ function CallHandler(roomId) {
 		self.setVideo(true);
 		self.autoSetLocalVideoVisibility();
 		self.setHeaderText("Answered with video");
-	};
-	self.getCallPopup = function () {
-		if (!self.callPopup) {
-			self.callPopup = new CallPopup(self.answerWebRtcCall, self.videoAnswerWebRtcCall, self.hangUp);
-		}
-		return self.callPopup;
 	};
 	self.renderDom = function () {
 		var iwc = document.createElement('DIV');
@@ -4617,8 +4610,12 @@ function CallHandler(roomId) {
 		CssUtils.setVisibility(self.dom.callContainerContent, self.visible);
 	};
 	self.showOffer = function (message, channelName) {
-		self.getCallPopup().initAndShow(message.user, channelName);
-		notifier.notify(message.user, {body: "Calls you", icon: NOTIFICATION_ICON_URL});
+		var chatHandler = channelsHandler.channels[message.channel];
+
+		self.callPopup = new CallPopup(self.answerWebRtcCall, self.videoAnswerWebRtcCall, self.hangUp, message.user, channelName, chatHandler.volume);
+		if (chatHandler.notifications) {
+			notifier.notify(message.user, {body: "Calls you", icon: NOTIFICATION_ICON_URL});
+		}
 	};
 	self.showNoMicError = function () {
 		var url = isChrome ? 'setting in chrome://settings/content' : 'your browser settings';
@@ -4732,7 +4729,7 @@ function CallHandler(roomId) {
 		self.clearNoAnswerTimeout()
 		self.createCallPeerConnection(message);
 		if (self.callPopup) { // if we're not call initiator
-			self.callPopupTable[message.opponentWsId] = self.callPopup.inserRow("Called:", message.user);
+			self.callPopupTable[message.opponentWsId] = self.callPopup.inserRow("To:", message.user);
 		}
 	};
 	self.oncancelCallConnection = function (message) {
@@ -4975,8 +4972,11 @@ function FileReceiver(removeReferenceFn) {
 		self.fileSize = parseInt(message.content.size);
 		self.fileName = message.content.name;
 		self.opponentName = message.user;
-		notifier.notify(message.user, {body: "Sends file {}".format(self.fileName), icon: NOTIFICATION_ICON_URL});
-		Utils.checkAndPlay(chatFileAudio);
+		var chatHanlder = channelsHandler.channels[message.channel];
+		if (chatHanlder.notifications) {
+			notifier.notify(message.user, {body: "Sends file {}".format(self.fileName), icon: NOTIFICATION_ICON_URL});
+		}
+		Utils.checkAndPlay(chatFileAudio, chatHanlder.volume);
 		self.init();
 		self.insertData("From:", self.opponentName);
 		self.setHeaderText("{} sends {}".format(self.opponentName, self.fileName));
@@ -5912,6 +5912,18 @@ function Storage() {
 }
 
 var Utils = {
+	volumeProportion: {
+		0: 0,
+		1: 0.15,
+		2: 0.4,
+		3: 1
+	},
+	volumeIcons: {
+		0: 'icon-volume-off',
+		1: 'icon-volume-1',
+		2: 'icon-volume-2',
+		3: 'icon-volume-3'
+	},
 	placeCaretAtEnd: function () {
 		var range = document.createRange();
 		range.selectNodeContents(userMessage);
@@ -6034,20 +6046,17 @@ var Utils = {
 		return domEl.play();
 	},
 	checkAndPlay: function (element, volume) {
-		if (typeof volume == 'undefined') {
-			volume = 2;
-		}
-		if (!volume || !notifier.isTabMain()) {
-			return;
-		}
-		try {
-			element.pause();
-			element.currentTime = 0;
-			element.volume = volumeProportion[volume];
-			var prom = element.play();
-			prom && prom.catch(function(e) {});
-		} catch (e) {
-			logger.error("Skipping playing message, because {}", e.message || e)();
+		if (volume && notifier.isTabMain()) {
+			try {
+				element.pause();
+				element.currentTime = 0;
+				element.volume = Utils.volumeProportion[volume];
+				var prom = element.play();
+				prom && prom.catch(function (e) {
+				});
+			} catch (e) {
+				logger.error("Skipping playing message, because {}", e.message || e)();
+			}
 		}
 	},
 	extractError: function (arguments) {
