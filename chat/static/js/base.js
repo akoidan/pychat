@@ -91,18 +91,6 @@ var escapeMap = {
 	"\n": '<br>',
 	"/": '&#x2F;'
 };
-var volumeProportion = {
-	0: 0,
-	1: 0.15,
-	2: 0.4,
-	3: 1
-};
-var volumeIcons = {
-	0: 'icon-volume-off',
-	1: 'icon-volume-1',
-	2: 'icon-volume-2',
-	3: 'icon-volume-3'
-};
 var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 
 var $ = function (id) {
