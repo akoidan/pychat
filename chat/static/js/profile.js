@@ -8,7 +8,6 @@ var photoInput;
 var userProfileData;
 var themeSelector;
 var changeProfileForm;
-var notificationInput;
 var cacheMessagesInput;
 var embeddedYoutubeInput;
 var highlightCodeInput;
@@ -23,7 +22,6 @@ function initChangeProfile() {
 	userProfileData = $('userProfileData');
 	themeSelector = $('themeSelector');
 	changeProfileForm = $('changeProfileForm');
-	notificationInput = $('id_notifications');
 	cacheMessagesInput = $('id_cache_messages');
 	embeddedYoutubeInput = $('id_embedded_youtube');
 	highlightCodeInput = $('id_highlight_code');
@@ -169,16 +167,13 @@ function setJsState() {
 	var options = [];
 	localStorage.setItem('theme', themeSelector.value);
 	setTheme();
-	notifications = notificationInput.checked; // global var
 	cacheMessages = cacheMessagesInput.checked; // global var
 	window.embeddedYoutube = embeddedYoutubeInput.checked; // global var
 	window.highlightCode = highlightCodeInput.checked; // global var
 	if (!cacheMessages) {
 		storage.clearStorage();
 	}
-	if (notifications) {
-		notifier.tryAgainRegisterServiceWorker();
-	}
+
 	if (window.highlightCode) {
 		doGet(HIGHLIGHT_JS_URL, function() {
 			Utils.highlightCode(document.body);
