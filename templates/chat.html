@@ -113,11 +113,20 @@
 		<table>
 			<tr>
 				<th>
-					<label for="roomSettNotifications">Notifications</label>
+					Offline Notifications
 				</th>
 				<td>
-					<input type="checkbox" id="roomSettNotifications"/>
-				<label for="roomSettNotifications"></label>
+					<input type="checkbox" id="roomSettOfflineNotifications"/>
+					<label for="roomSettOfflineNotifications"></label>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Online Notifications
+				</th>
+				<td>
+					<input type="checkbox" id="roomSettOnlineNotifications"/>
+					<label for="roomSettOnlineNotifications"></label>
 				</td>
 			</tr>
 			<tr>
@@ -128,7 +137,61 @@
 					<input type="range" id="roomSettSound" min="0" max="3"/>
 				</td>
 			</tr>
-						<tr>
+			<tr>
+				<th>
+					Incoming message
+				</th>
+				<td>
+					<input type="checkbox" id="roomSettIncomingMessage"/>
+					<label for="roomSettIncomingMessage"></label>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Outgoing message
+				</th>
+				<td>
+					<input type="checkbox" id="roomSettOutgoingMessage"/>
+					<label for="roomSettOutgoingMessage"></label>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Appears online
+				</th>
+				<td>
+					<input type="checkbox" id="roomSettAppearsOnline"/>
+					<label for="roomSettAppearsOnline"></label>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Goes offline
+				</th>
+				<td>
+					<input type="checkbox" id="roomSettGoesOffline"/>
+				<label for="roomSettGoesOffline"></label>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Call
+				</th>
+				<td>
+					<input type="checkbox" id="roomSettCall"/>
+					<label for="roomSettCall"></label>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					File
+				</th>
+				<td>
+					<input type="checkbox" id="roomSettFile"/>
+				<label for="roomSettFile"></label>
+				</td>
+			</tr>
+			<tr>
 				<td colspan="2">
 					<input type="button" class="red-btn" value="LEAVE THIS ROOM" id="roomSettExit"/>
 				</td>

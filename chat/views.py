@@ -70,9 +70,16 @@ def save_room_settings(request):
 	POST only, validates email during registration
 	"""
 	room_id = request.POST['roomId']
-	volume = request.POST['volume']
-	notifications = request.POST['notifications']
-	updated = RoomUsers.objects.filter(room_id=room_id, user_id=request.user.id).update(volume=volume, notifications=notifications == 'true')
+	updated = RoomUsers.objects.filter(room_id=room_id, user_id=request.user.id).update(
+		volume=request.POST['volume'],
+		notifications=request.POST['notifications'] == 'true',
+		appears_online_sound=request.POST['appears_online_sound'] == 'true',
+		goes_offline_sound=request.POST['goes_offline_sound'] == 'true',
+		call_sound=request.POST['call_sound'] == 'true',
+		file_sound=request.POST['file_sound'] == 'true',
+		incoming_message=request.POST['incoming_message'] == 'true',
+		outgoing_message=request.POST['outgoing_message'] == 'true',
+	)
 	return HttpResponse(settings.VALIDATION_IS_OK if updated == 1 else "Nothing updated", content_type='text/plain')
 
 

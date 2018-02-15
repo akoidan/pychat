@@ -180,6 +180,13 @@ class RoomUsers(models.Model):
 	last_read_message = models.ForeignKey(Message, null=True)
 	volume = models.IntegerField(default=2, null=False)
 	notifications = BooleanField(null=False, default=True)
+	online_notifications = BooleanField(null=False, default=True)
+	appears_online_sound = BooleanField(null=False, default=True)
+	goes_offline_sound = BooleanField(null=False, default=True)
+	call_sound = BooleanField(null=False, default=True)
+	file_sound = BooleanField(null=False, default=True)
+	incoming_message = BooleanField(null=False, default=True)
+	outgoing_message = BooleanField(null=False, default=True)
 
 	class Meta:  # pylint: disable=C1001
 		unique_together = ("user", "room")

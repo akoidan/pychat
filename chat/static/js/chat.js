@@ -3993,13 +3993,13 @@ function RoomSettings() {
 	Draggable.call(self, $('roomSettings'), "");
 	self.dom.roomSettExit = $('roomSettExit')
 	self.dom.roomSettApply = $('roomSettApply')
-	self.dom.roomSettNotifications = $('roomSettNotifications')
+	self.dom.roomSettOfflineNotifications = $('roomSettOfflineNotifications')
 	self.dom.roomSettSound = $('roomSettSound')
 	self.apply = function() {
 		var data = {
 			roomId: self.roomId,
 			volume: self.dom.roomSettSound.value,
-			notifications: self.dom.roomSettNotifications.checked
+			notifications: self.dom.roomSettOfflineNotifications.checked
 		};
 		doPost('/save_room_settings', data, function(response) {
 			if (response == RESPONSE_SUCCESS) {
@@ -4017,7 +4017,7 @@ function RoomSettings() {
 		self.roomId = roomId;
 		var sd = channelsHandler.channels[roomId];
 		self.dom.roomSettSound.value = sd.volume;
-		self.dom.roomSettNotifications.checked = sd.notifications;
+		self.dom.roomSettOfflineNotifications.checked = sd.notifications;
 		fixInputRangeStyle(self.dom.roomSettSound)
 		self.setHeaderText("<b>{}</b>'s room settings".format(sd.roomName));
 	}
