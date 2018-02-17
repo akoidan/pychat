@@ -69,6 +69,7 @@ def save_room_settings(request):
 	"""
 	POST only, validates email during registration
 	"""
+	logger.debug('save_room_settings request,  %s', request.POST)
 	room_id = request.POST['roomId']
 	volume = request.POST['volume']
 	notifications = request.POST['notifications']
@@ -80,6 +81,7 @@ def save_room_settings(request):
 @transaction.atomic
 def get_firebase_playback(request):
 	registration_id = request.META['HTTP_AUTH']
+	logger.debug('Firebase playback, id %s', registration_id)
 	query_sub_message = SubscriptionMessages.objects.filter(subscription__registration_id=registration_id, received=False).order_by('-message__time')[:1]
 	sub_message = query_sub_message[0]
 	SubscriptionMessages.objects.filter(id=sub_message.id).update(received=True)
@@ -106,8 +108,16 @@ def test(request):
 
 @require_http_methods('POST')
 def register_subscription(request):
+	logger.debug('Subscription request,  %s', request)
 	registration_id = request.POST['registration_id']
-	Subscription.objects.update_or_create(registration_id=registration_id, defaults={'user': request.user, 'inactive': False})
+	Subscription.objects.update_or_create(
+		registration_id=registration_id,
+		defaults={
+			'user': request.user,
+			'inactive': False,
+			'updated': datetime.datetime.now()
+		}
+	)
 	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 @require_http_methods('POST')
