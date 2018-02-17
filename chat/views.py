@@ -95,7 +95,7 @@ def get_firebase_playback(request):
 				'id': sub_message.message_id,
 				'sender': message.sender.username,
 				'room': message.room.name,
-				'url': '/#/chat/' + str(message.room_id)
+				'roomId': message.room_id,
 			}
 		},
 	}

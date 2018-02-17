@@ -1,4 +1,4 @@
-var SW_VERSION = '1.4';
+var SW_VERSION = '1.5';
 console.log("%cSW_S startup, version is " + SW_VERSION, 'color: #ffb500; font-weight: bold');
 var loggerFactory = (function (logsEnabled) {
 	var self = this;
@@ -107,7 +107,7 @@ self.addEventListener('push', function (event) {
 							}
 						}
 					}
-					var a = self.registration.showNotification(m.title, m.options);
+					self.registration.showNotification(m.title, m.options);
 					logger.log("Spawned notification {}", m)();
 				});
 
@@ -136,14 +136,15 @@ self.addEventListener('notificationclick', function (event) {
 	event.waitUntil(clients.matchAll({
 		type: 'window'
 	}).then(function (clientList) {
-		for (var i = 0; i < clientList.length; i++) {
-			var client = clientList[i];
-			if (client.url === '/' && 'focus' in client) {
-				return client.focus();
-			}
-		}
-		if (clients.openWindow && event.notification.data) {
-			return clients.openWindow(event.notification.data.url);
+		var roomId = event.notification.data && event.notification.data.roomId;
+		if (clientList && clientList[0] && roomId) {
+			clientList[0].navigate('/#/chat/' + roomId)
+		} else if (clientList && clientList[0]) {
+			clientList[0].focus()
+		} else if (roomId) {
+			clients.openWindow('/#/chat/' + roomId);
+		} else {
+			clients.openWindow('/');
 		}
 	}));
 });
