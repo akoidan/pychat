@@ -1925,6 +1925,8 @@ function NotifierHandler() {
 	self.showNot = function(title, options) {
 		try {
 			if (self.serviceWorkerRegistration && isMobile && isChrome) {
+				// TODO  options should contain page id here but it's not
+				// so we open unfefined url
 				self.serviceWorkerRegistration.showNotification(title, options).then(function(r) {
 					logger.info("res {}", r)();
 					//TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
