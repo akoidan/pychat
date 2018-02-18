@@ -3650,6 +3650,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 								title: displayedUsername,
 								roomId: data.channel,
 							},
+							requireInteraction: true,
 							icon: data.images || NOTIFICATION_ICON_URL
 						});
 					}
@@ -4993,7 +4994,11 @@ function FileReceiver(removeReferenceFn) {
 		self.opponentName = message.user;
 		var chatHanlder = channelsHandler.channels[message.channel];
 		if (chatHanlder.notifications) {
-			notifier.notify(message.user, {body: "Sends file {}".format(self.fileName), icon: NOTIFICATION_ICON_URL});
+			notifier.notify(message.user, {
+				body: "Sends file {}".format(self.fileName),
+				icon: NOTIFICATION_ICON_URL,
+				requireInteraction: true
+			});
 		}
 		if (window.incomingFileCallSound) {
 				Utils.checkAndPlay(chatFileAudio, chatHanlder.volume);

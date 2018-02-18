@@ -96,8 +96,9 @@ def get_firebase_playback(request):
 				'id': sub_message.message_id,
 				'sender': message.sender.username,
 				'room': message.room.name,
-				'roomId': message.room_id,
-			}
+				'roomId': message.room_id
+			},
+			'requireInteraction': True
 		},
 	}
 	return HttpResponse(json.dumps(data), content_type='application/json')
