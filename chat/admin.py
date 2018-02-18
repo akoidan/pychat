@@ -49,9 +49,12 @@ exclude_fields = {
 
 for model in model_classes:
 	fields = []
+	list_display = []
 	vname = model._meta.verbose_name
-	class_struct = {'fields': fields, 'list_display': fields}
+	class_struct = {'fields': fields, 'list_display': list_display}
 	for field in model._meta.fields:
+		if field.name != 'id':
+			fields.append(field.name)
 		if exclude_fields.get(vname) is not None and field.name in extra_fields.get(vname):
 			break
 		if isinstance(field, ForeignKey):
@@ -68,12 +71,12 @@ for model in model_classes:
 				link.allow_tags = True
 				link.__name__ = str(field.name)
 				return link
-			fields.append(gen_link(field))
+			list_display.append(gen_link(field))
 		else:
-			fields.append(field.name)
+			list_display.append(field.name)
 
 	if extra_fields.get(vname) is not None:
-		fields.extend(extra_fields.get(vname))
+		list_display.extend(extra_fields.get(vname))
 	admin.site.register(model, type(
 		'SubClass',
 		(admin.ModelAdmin,),
