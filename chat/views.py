@@ -34,7 +34,7 @@ from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verificatio
 	SubscriptionMessages, RoomUsers
 from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
-	create_user_model, check_captcha, send_reset_password_email
+	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip
 
 logger = logging.getLogger(__name__)
 RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
@@ -110,12 +110,18 @@ def test(request):
 def register_subscription(request):
 	logger.debug('Subscription request,  %s', request)
 	registration_id = request.POST['registration_id']
+	agent = request.POST['agent']
+	is_mobile = request.POST['is_mobile']
+	ip = get_or_create_ip(get_client_ip(request), logger)
 	Subscription.objects.update_or_create(
 		registration_id=registration_id,
 		defaults={
 			'user': request.user,
 			'inactive': False,
-			'updated': datetime.datetime.now()
+			'updated': datetime.datetime.now(),
+			'agent': agent,
+			'is_mobile': is_mobile == 'true',
+			'ip': ip
 		}
 	)
 	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')

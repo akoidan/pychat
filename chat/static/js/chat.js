@@ -2001,7 +2001,11 @@ function NotifierHandler() {
 				throw 'Current browser doesnt support offline notifications';
 			} else {
 				return new Promise(function (resolve, reject) {
-					doPost('/register_fcb', {registration_id: self.subscriptionId}, function (response) {
+					doPost('/register_fcb', {
+						registration_id: self.subscriptionId,
+						agent: browserVersion,
+						is_mobile: isMobile
+					}, function (response) {
 						if (response == RESPONSE_SUCCESS) {
 							resolve()
 						} else {
