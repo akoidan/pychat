@@ -180,8 +180,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * https://code.djangoproject.com/ticket/25489
 * http://stackoverflow.com/a/18843553/3872976
 * add antispam system
-* add http://www.amcharts.com/download/ to chart spam or user s  tatistic info
-* startup loading messages in a separate thread (JS )
 * move loading messages on startup to single function? 
 * add antiflood settings to nginx
 * tornado redis connection reset prevents user from deleting its entry in online_users

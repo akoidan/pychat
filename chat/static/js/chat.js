@@ -2831,7 +2831,7 @@ function ChannelsHandler() {
 		}
 		return anotherUserId;
 	};
-	self.createChannelChatHandler = function (roomId, li, users, roomName) {
+	self.createChannelChatHandler = function (roomId, li, users, roomName, private) {
 		var i = document.createElement('span');
 		i.className = SETTINGS_ICON_CLASS_NAME;
 		li.appendChild(i);
@@ -2840,7 +2840,7 @@ function ChannelsHandler() {
 		userMessage.onpaste = self.imagePaste;
 		chatBoxDiv.ondrop = self.imageDrop;
 		chatBoxDiv.ondragover = self.preventDefault;
-		self.channels[roomId] = new ChatHandler(li, chatBoxDiv, users, roomId, roomName);
+		self.channels[roomId] = new ChatHandler(li, chatBoxDiv, users, roomId, roomName, private);
 		self.channels[roomId].dom.chatBoxDiv.oncontextmenu = self.showM2ContextDelete;
 	};
 	self.createNewUserChatHandler = function (roomId, users) {
@@ -2851,14 +2851,14 @@ function ChannelsHandler() {
 		var oIds = self.getOnlineUsersIds() || [];
 		CssUtils.setClassToState(li, oIds.indexOf(parseInt(anotherUserId)) >= 0, OFFLINE_CLASS);
 		self.dom.directUserTable.appendChild(li);
-		self.createChannelChatHandler(roomId, li, users, roomName);
+		self.createChannelChatHandler(roomId, li, users, roomName, true);
 		return anotherUserId;
 	};
 	self.createNewRoomChatHandler = function (roomId, roomName, users) {
 		var li = document.createElement('li');
 		self.dom.rooms.appendChild(li);
 		li.innerHTML = roomName;
-		self.createChannelChatHandler(roomId, li, users, roomName);
+		self.createChannelChatHandler(roomId, li, users, roomName, false);
 	};
 	self.destroyChannel = function (channelKey) {
 		logger.info("Destroying channel {} while offline", channelKey)();
@@ -3203,7 +3203,7 @@ function SmileyUtil() {
 }
 
 
-function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
+function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	var self = this;
 	self.UNREAD_MESSAGE_CLASS = 'unreadMessage';
 	self.EDITED_MESSAGE_CLASS = 'editedMessage';
@@ -4013,15 +4013,33 @@ function RoomSettings() {
 	self.dom.roomSettApply = $('roomSettApply')
 	self.dom.roomSettNotifications = $('roomSettNotifications')
 	self.dom.roomSettSound = $('roomSettSound')
+	self.dom.roomSettName = $('roomSettName')
+	self.dom.roomSettNameHolder = $('roomSettNameHolder')
 	self.apply = function() {
 		var data = {
 			roomId: self.roomId,
 			volume: self.dom.roomSettSound.value,
 			notifications: self.dom.roomSettNotifications.checked
 		};
+		if (self.originName != roomSettName.value) {
+			var value = roomSettName.value.trim()
+			if (value.length < 1) {
+				growlError("Room name cannot be empty");
+				return
+			}
+			self.roomChanged = true;
+			data.roomName = value;
+		} else {
+			self.roomChanged = false;
+		}
 		doPost('/save_room_settings', data, function(response) {
 			if (response == RESPONSE_SUCCESS) {
-				growlSuccess("Settings have been saved");
+				if (self.roomChanged) {
+					channelsHandler.channels[self.roomId].roomName = data.roomName;
+					growlSuccess("Settings have been saved, room name will be updated on next page refresh");
+				} else {
+					growlSuccess("Settings have been saved");
+				}
 				self.hide();
 				channelsHandler.channels[self.roomId].setRoomSettings(data.volume, data.notifications)
 			} else {
@@ -4036,6 +4054,9 @@ function RoomSettings() {
 		var sd = channelsHandler.channels[roomId];
 		self.dom.roomSettSound.value = sd.volume;
 		self.dom.roomSettNotifications.checked = sd.notifications;
+		CssUtils.setVisibility(roomSettNameHolder, !sd.isPrivate() && roomId != DEFAULT_CHANNEL_NAME);
+		roomSettName.value = sd.roomName;
+		self.originName = sd.roomName;
 		fixInputRangeStyle(self.dom.roomSettSound)
 		self.setHeaderText("<b>{}</b>'s room settings".format(sd.roomName));
 	}

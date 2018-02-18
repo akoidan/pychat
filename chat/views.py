@@ -16,7 +16,7 @@ try:
 	from django.template.context_processors import csrf
 except ImportError:
 	from django.core.context_processors import csrf
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
 from django.db import transaction
 from django.db.models import Count, Q, F
 from django.http import Http404
@@ -31,7 +31,7 @@ from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
-	SubscriptionMessages, RoomUsers
+	SubscriptionMessages, RoomUsers, Room
 from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
 	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip
@@ -65,17 +65,25 @@ def validate_email(request):
 
 @require_http_methods(['POST'])
 @login_required_no_redirect(False)
+@transaction.atomic
 def save_room_settings(request):
 	"""
 	POST only, validates email during registration
 	"""
 	logger.debug('save_room_settings request,  %s', request.POST)
 	room_id = request.POST['roomId']
+	room_name = request.POST.get('roomName')
 	updated = RoomUsers.objects.filter(room_id=room_id, user_id=request.user.id).update(
 		volume=request.POST['volume'],
 		notifications=request.POST['notifications'] == 'true',
 	)
-	return HttpResponse(settings.VALIDATION_IS_OK if updated == 1 else "Nothing updated", content_type='text/plain')
+	if updated != 1:
+		raise PermissionDenied
+	if room_name is not None:
+		room_name = room_name.strip()
+		if room_name and int(room_id) != settings.ALL_ROOM_ID:
+			Room.objects.filter(id=room_id).update(name = room_name)
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 
 @require_http_methods('GET')
