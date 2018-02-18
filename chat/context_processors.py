@@ -13,5 +13,6 @@ def add_user_name(request):
 		'successResponse': settings.VALIDATION_IS_OK,
 		'username': request.user.username if request.user.is_authenticated() else '',
 		'userid': request.user.id if request.user.is_authenticated() else 0,
+		'theme': 'color-reg',
 		'logs': request.user.userprofile.logs if request.user.is_authenticated() else settings.JS_CONSOLE_LOGS
 	}

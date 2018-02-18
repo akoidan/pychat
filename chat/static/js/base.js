@@ -373,16 +373,14 @@ function growlInfo(message) {
 	new Growl(message).info();
 }
 
-function setTheme() {
-	var theme = localStorage.getItem('theme');
-	if (theme != null) {
+function setTheme(theme) {
+	if (theme) {
 		document.body.className = theme;
 	}
 	isMobile && CssUtils.addClass(document.body, 'mobile')
 }
 onDocLoad(function () {
 	muteBtn = $("muteBtn");
-	setTheme();
 	ajaxLoader = $("ajaxStatus");
 	if (typeof InstallTrigger !== 'undefined') { // browser = firefox
 		logger.warn("Ops, there's no scrollbar for firefox")();

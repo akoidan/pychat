@@ -42,11 +42,18 @@ class UserProfileForm(forms.ModelForm):
 	photo = FileField(widget=forms.FileInput)
 	birthday = DateField(widget=DateWidget)  # input_formats=settings.DATE_INPUT_FORMATS
 	suggestions = BooleanField(widget=BooleanWidget)
-	cache_messages = BooleanField(widget=BooleanWidget)
 	logs = BooleanField(widget=BooleanWidget)
 	embedded_youtube =BooleanField(widget=BooleanWidget)
 	highlight_code = BooleanField(widget=BooleanWidget, help_text="```console.log('Highlight code like this')```")
-
+	incoming_file_call_sound = BooleanField(widget=BooleanWidget)
+	message_sound = BooleanField(widget=BooleanWidget)
+	online_change_sound = BooleanField(widget=BooleanWidget)
+	THEME_CHOICES = (
+		('color-reg', 'Modern'),
+		('color-lor', 'Simple'),
+		('color-white', 'Light(Beta)'),
+	)
+	theme = ChoiceField(required=True, choices=THEME_CHOICES)
 	GENDER_CHOICES = (
 		(1, 'Male'),
 		(2, 'Female'),
@@ -57,9 +64,7 @@ class UserProfileForm(forms.ModelForm):
 
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
-		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts',
-				'sex', 'photo', 'suggestions', 'logs', 'cache_messages',
-					 'embedded_youtube', 'highlight_code')
+		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts', 'sex', 'photo', 'suggestions', 'logs', 'embedded_youtube', 'highlight_code', 'message_sound', 'incoming_file_call_sound', 'online_change_sound', 'theme')
 
 	def __init__(self, *args, **kwargs):
 		"""

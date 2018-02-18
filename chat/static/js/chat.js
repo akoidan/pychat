@@ -3657,14 +3657,16 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		}
 	};
 	self.printMessagePlay = function (data) {
-		if (loggedUserId === data.userId) {
-			Utils.checkAndPlay(self.dom.chatOutgoing, self.volume);
-			self.lastMessage = {
-				id: data.id,
-				time: data.time
+		if (window.messageSound) {
+			if (loggedUserId === data.userId) {
+				Utils.checkAndPlay(self.dom.chatOutgoing, self.volume);
+				self.lastMessage = {
+					id: data.id,
+					time: data.time
+				}
+			} else {
+				Utils.checkAndPlay(self.dom.chatIncoming, self.volume);
 			}
-		} else {
-			Utils.checkAndPlay(self.dom.chatIncoming, self.volume);
 		}
 	};
 	self.highLightMessageIfNeeded = function (p, displayedUsername, isNew, content, images) {
@@ -3724,7 +3726,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 		} else {
 			dm = 'User <b>{}</b> has {}'.format(username, action);
 		}
-		Utils.checkAndPlay(sound, self.volume);
+		if (window.onlineChangeSound) {
+				Utils.checkAndPlay(sound, self.volume);
+		}
 		self.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
 		self.setOnlineUsers(message);
 	};
@@ -4006,13 +4010,13 @@ function RoomSettings() {
 	Draggable.call(self, $('roomSettings'), "");
 	self.dom.roomSettExit = $('roomSettExit')
 	self.dom.roomSettApply = $('roomSettApply')
-	self.dom.roomSettOfflineNotifications = $('roomSettOfflineNotifications')
+	self.dom.roomSettNotifications = $('roomSettNotifications')
 	self.dom.roomSettSound = $('roomSettSound')
 	self.apply = function() {
 		var data = {
 			roomId: self.roomId,
 			volume: self.dom.roomSettSound.value,
-			notifications: self.dom.roomSettOfflineNotifications.checked
+			notifications: self.dom.roomSettNotifications.checked
 		};
 		doPost('/save_room_settings', data, function(response) {
 			if (response == RESPONSE_SUCCESS) {
@@ -4030,7 +4034,7 @@ function RoomSettings() {
 		self.roomId = roomId;
 		var sd = channelsHandler.channels[roomId];
 		self.dom.roomSettSound.value = sd.volume;
-		self.dom.roomSettOfflineNotifications.checked = sd.notifications;
+		self.dom.roomSettNotifications.checked = sd.notifications;
 		fixInputRangeStyle(self.dom.roomSettSound)
 		self.setHeaderText("<b>{}</b>'s room settings".format(sd.roomName));
 	}
@@ -4052,8 +4056,6 @@ function CallPopup(answerFn, videoAnswerFn, declineFn, user, channelName, volume
 	var self = this;
 	Draggable.call(self, document.createElement('DIV'), "Call");
 	self.dom.callSound = $('chatCall');
-	self.dom.callSound.onended = function () {
-		Utils.checkAndPlay(self.dom.callSound, volume);
 	};
 	self.init = function () {
 		var answerButtons = document.createElement('div');
@@ -4071,7 +4073,11 @@ function CallPopup(answerFn, videoAnswerFn, declineFn, user, channelName, volume
 		self.inserRow("From: ", user);
 		self.inserRow("Room: ", channelName);
 		self.show();
-		Utils.checkAndPlay(self.dom.callSound, volume);
+		if (window.incomingFileCallSound) {
+			Utils.checkAndPlay(self.dom.callSound, volume);
+			self.dom.callSound.onended = function () {
+				Utils.checkAndPlay(self.dom.callSound, volume);
+			}
 	};
 	self.inserRow = function (name, value) {
 		var raw = self.dom.users.insertRow();
@@ -4989,7 +4995,9 @@ function FileReceiver(removeReferenceFn) {
 		if (chatHanlder.notifications) {
 			notifier.notify(message.user, {body: "Sends file {}".format(self.fileName), icon: NOTIFICATION_ICON_URL});
 		}
-		Utils.checkAndPlay(chatFileAudio, chatHanlder.volume);
+		if (window.incomingFileCallSound) {
+				Utils.checkAndPlay(chatFileAudio, chatHanlder.volume);
+		}
 		self.init();
 		self.insertData("From:", self.opponentName);
 		self.setHeaderText("{} sends {}".format(self.opponentName, self.fileName));

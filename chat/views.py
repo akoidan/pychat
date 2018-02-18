@@ -74,12 +74,6 @@ def save_room_settings(request):
 	updated = RoomUsers.objects.filter(room_id=room_id, user_id=request.user.id).update(
 		volume=request.POST['volume'],
 		notifications=request.POST['notifications'] == 'true',
-		appears_online_sound=request.POST['appears_online_sound'] == 'true',
-		goes_offline_sound=request.POST['goes_offline_sound'] == 'true',
-		call_sound=request.POST['call_sound'] == 'true',
-		file_sound=request.POST['file_sound'] == 'true',
-		incoming_message=request.POST['incoming_message'] == 'true',
-		outgoing_message=request.POST['outgoing_message'] == 'true',
 	)
 	return HttpResponse(settings.VALIDATION_IS_OK if updated == 1 else "Nothing updated", content_type='text/plain')
 
@@ -162,10 +156,13 @@ def home(request):
 	@return:  the x intercept of the line M{y=m*x+b}.
 	"""
 	context = csrf(request)
-	up = UserProfile.objects.defer('suggestions', 'cache_messages', 'highlight_code', 'embedded_youtube').get(id=request.user.id)
+	up = UserProfile.objects.defer('suggestions', 'highlight_code', 'embedded_youtube', 'online_change_sound', 'incoming_file_call_sound', 'message_sound', 'theme').get(id=request.user.id)
 	context['suggestions'] = up.suggestions
-	context['cache_messages'] = up.cache_messages
 	context['highlight_code'] = up.highlight_code
+	context['message_sound'] = up.message_sound
+	context['incoming_file_call_sound'] = up.incoming_file_call_sound
+	context['online_change_sound'] = up.online_change_sound
+	context['theme'] = up.theme
 	context['embedded_youtube'] = up.embedded_youtube
 	context['extensionId'] = settings.EXTENSION_ID
 	context['extensionUrl'] = settings.EXTENSION_INSTALL_URL

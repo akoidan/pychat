@@ -18,9 +18,11 @@
 		var loggedUserId = {{ userid }};
 		var NOTIFICATION_ICON_URL = "{% md5url 'images/favicon.ico' %}";
 		var suggestions = {{ suggestions |yesno:"true,false" }};
-		var cacheMessages = {{ cache_messages |yesno:"true,false" }};
 		var manifest = {{ manifest |yesno:"true,false" }};
 		window.highlightCode = {{ highlight_code |yesno:"true,false" }};
+		window.onlineChangeSound = {{ online_change_sound |yesno:"true,false" }};
+		window.incomingFileCallSound = {{ incoming_file_call_sound |yesno:"true,false" }};
+		window.messageSound = {{ message_sound |yesno:"true,false" }};
 		window.embeddedYoutube = {{ embedded_youtube |yesno:"true,false" }};
 	</script>
 	  {% if highlight_code %}
@@ -113,82 +115,19 @@
 		<table>
 			<tr>
 				<th>
-					Offline Notifications
+					Notifications
 				</th>
 				<td>
-					<input type="checkbox" id="roomSettOfflineNotifications"/>
-					<label for="roomSettOfflineNotifications"></label>
+					<input type="checkbox" id="roomSettNotifications"/>
+					<label for="roomSettNotifications"></label>
 				</td>
 			</tr>
 			<tr>
 				<th>
-					Online Notifications
-				</th>
-				<td>
-					<input type="checkbox" id="roomSettOnlineNotifications"/>
-					<label for="roomSettOnlineNotifications"></label>
-				</td>
-			</tr>
-			<tr>
-				<th>
-					<label for="roomSettSound">Sound</label>
+					Sound
 				</th>
 				<td>
 					<input type="range" id="roomSettSound" min="0" max="3"/>
-				</td>
-			</tr>
-			<tr>
-				<th>
-					Incoming message
-				</th>
-				<td>
-					<input type="checkbox" id="roomSettIncomingMessage"/>
-					<label for="roomSettIncomingMessage"></label>
-				</td>
-			</tr>
-			<tr>
-				<th>
-					Outgoing message
-				</th>
-				<td>
-					<input type="checkbox" id="roomSettOutgoingMessage"/>
-					<label for="roomSettOutgoingMessage"></label>
-				</td>
-			</tr>
-			<tr>
-				<th>
-					Appears online
-				</th>
-				<td>
-					<input type="checkbox" id="roomSettAppearsOnline"/>
-					<label for="roomSettAppearsOnline"></label>
-				</td>
-			</tr>
-			<tr>
-				<th>
-					Goes offline
-				</th>
-				<td>
-					<input type="checkbox" id="roomSettGoesOffline"/>
-				<label for="roomSettGoesOffline"></label>
-				</td>
-			</tr>
-			<tr>
-				<th>
-					Call
-				</th>
-				<td>
-					<input type="checkbox" id="roomSettCall"/>
-					<label for="roomSettCall"></label>
-				</td>
-			</tr>
-			<tr>
-				<th>
-					File
-				</th>
-				<td>
-					<input type="checkbox" id="roomSettFile"/>
-				<label for="roomSettFile"></label>
 				</td>
 			</tr>
 			<tr>

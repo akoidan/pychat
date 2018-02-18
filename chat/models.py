@@ -112,11 +112,13 @@ class UserProfile(User):
 	# fileField + <img instead of ImageField (removes preview link)
 	photo = FileField(upload_to=get_random_path, null=True)
 	suggestions = BooleanField(null=False, default=True)
-	cache_messages = BooleanField(null=False, default=True)
 	embedded_youtube = BooleanField(null=False, default=True)
 	highlight_code = BooleanField(null=False, default=False)
 	logs = BooleanField(null=False, default=JS_CONSOLE_LOGS)
-	# TODO, save theme in profile? theme_name = CharField(max_length=16, null=True)
+	theme = CharField(max_length=16, null=False, default='color-reg')
+	online_change_sound = BooleanField(null=False, default=True)
+	incoming_file_call_sound = BooleanField(null=False, default=True)
+	message_sound = BooleanField(null=False, default=True)
 
 	email_verification = models.ForeignKey(Verification, null=True)
 
@@ -184,13 +186,6 @@ class RoomUsers(models.Model):
 	last_read_message = models.ForeignKey(Message, null=True)
 	volume = models.IntegerField(default=2, null=False)
 	notifications = BooleanField(null=False, default=True)
-	online_notifications = BooleanField(null=False, default=True)
-	appears_online_sound = BooleanField(null=False, default=True)
-	goes_offline_sound = BooleanField(null=False, default=True)
-	call_sound = BooleanField(null=False, default=True)
-	file_sound = BooleanField(null=False, default=True)
-	incoming_message = BooleanField(null=False, default=True)
-	outgoing_message = BooleanField(null=False, default=True)
 
 	class Meta:  # pylint: disable=C1001
 		unique_together = ("user", "room")

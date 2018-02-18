@@ -8,7 +8,6 @@ var photoInput;
 var userProfileData;
 var themeSelector;
 var changeProfileForm;
-var cacheMessagesInput;
 var embeddedYoutubeInput;
 var highlightCodeInput;
 var logsInput;
@@ -20,18 +19,15 @@ function initChangeProfile() {
 	canvas = $('canvasBuffer');
 	photoInput = $('id_photo');
 	userProfileData = $('userProfileData');
-	themeSelector = $('themeSelector');
+	themeSelector = $('id_theme');
 	changeProfileForm = $('changeProfileForm');
-	cacheMessagesInput = $('id_cache_messages');
 	embeddedYoutubeInput = $('id_embedded_youtube');
 	highlightCodeInput = $('id_highlight_code');
+	onlineChangeSoundInput = $('id_online_change_sound');
+	incomingFileCallSoundInput = $('id_incoming_file_call_sound');
+	messageSoundInput = $('id_message_sound');
 	logsInput = $('id_logs');
-	var item = localStorage.getItem('theme');
 	video.addEventListener('click', takeSnapshot, false);
-	if (item != null) {
-		themeSelector.value = item;
-		/*TODO $* to var*/
-	}
 	photoImg.addEventListener('drop', dropPhoto, false);
 	var events = ["dragenter", "dragstart", "dragend", "dragleave", "dragover", "drag", "drop"];
 	for (var i = 0, iLen = events.length; i < iLen; i++) {
@@ -162,19 +158,14 @@ function preventDefault(e) {
 	 e.preventDefault();
 }
 
-
 function setJsState() {
-	var options = [];
-	localStorage.setItem('theme', themeSelector.value);
-	setTheme();
-	cacheMessages = cacheMessagesInput.checked; // global var
+	setTheme(themeSelector.value);
+	window.onlineChangeSound = onlineChangeSoundInput.checked;
+	window.incomingFileCallSound = incomingFileCallSoundInput.checked;
+	window.messageSound = messageSoundInput.checked;
 	window.embeddedYoutube = embeddedYoutubeInput.checked; // global var
 	window.highlightCode = highlightCodeInput.checked; // global var
-	if (!cacheMessages) {
-		storage.clearStorage();
-	}
-
-	if (window.highlightCode) {
+		if (window.highlightCode) {
 		doGet(HIGHLIGHT_JS_URL, function() {
 			Utils.highlightCode(document.body);
 		});
