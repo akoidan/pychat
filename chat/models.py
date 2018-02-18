@@ -68,6 +68,10 @@ class Subscription(models.Model):
 	inactive = BooleanField(default=False, null=False)
 	registration_id = models.CharField(null=False, max_length=191, unique=True)
 	created = models.DateTimeField(default=datetime.datetime.now)
+	updated = models.DateTimeField(default=datetime.datetime.now)
+	agent = models.CharField(max_length=64, null=True)
+	is_mobile = BooleanField(default=False, null=False)
+	ip = models.ForeignKey('IpAddress', null=True)
 
 
 class Verification(models.Model):

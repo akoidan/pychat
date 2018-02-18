@@ -34,7 +34,7 @@ from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verificatio
 	SubscriptionMessages, RoomUsers
 from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
-	create_user_model, check_captcha, send_reset_password_email
+	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip
 
 logger = logging.getLogger(__name__)
 RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
@@ -69,6 +69,7 @@ def save_room_settings(request):
 	"""
 	POST only, validates email during registration
 	"""
+	logger.debug('save_room_settings request,  %s', request.POST)
 	room_id = request.POST['roomId']
 	updated = RoomUsers.objects.filter(room_id=room_id, user_id=request.user.id).update(
 		volume=request.POST['volume'],
@@ -87,6 +88,7 @@ def save_room_settings(request):
 @transaction.atomic
 def get_firebase_playback(request):
 	registration_id = request.META['HTTP_AUTH']
+	logger.debug('Firebase playback, id %s', registration_id)
 	query_sub_message = SubscriptionMessages.objects.filter(subscription__registration_id=registration_id, received=False).order_by('-message__time')[:1]
 	sub_message = query_sub_message[0]
 	SubscriptionMessages.objects.filter(id=sub_message.id).update(received=True)
@@ -100,7 +102,7 @@ def get_firebase_playback(request):
 				'id': sub_message.message_id,
 				'sender': message.sender.username,
 				'room': message.room.name,
-				'url': '/#/chat/' + str(message.room_id)
+				'roomId': message.room_id,
 			}
 		},
 	}
@@ -113,8 +115,22 @@ def test(request):
 
 @require_http_methods('POST')
 def register_subscription(request):
+	logger.debug('Subscription request,  %s', request)
 	registration_id = request.POST['registration_id']
-	Subscription.objects.update_or_create(registration_id=registration_id, defaults={'user': request.user, 'inactive': False})
+	agent = request.POST['agent']
+	is_mobile = request.POST['is_mobile']
+	ip = get_or_create_ip(get_client_ip(request), logger)
+	Subscription.objects.update_or_create(
+		registration_id=registration_id,
+		defaults={
+			'user': request.user,
+			'inactive': False,
+			'updated': datetime.datetime.now(),
+			'agent': agent,
+			'is_mobile': is_mobile == 'true',
+			'ip': ip
+		}
+	)
 	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 @require_http_methods('POST')

@@ -1925,6 +1925,8 @@ function NotifierHandler() {
 	self.showNot = function(title, options) {
 		try {
 			if (self.serviceWorkerRegistration && isMobile && isChrome) {
+				// TODO  options should contain page id here but it's not
+				// so we open unfefined url
 				self.serviceWorkerRegistration.showNotification(title, options).then(function(r) {
 					logger.info("res {}", r)();
 					//TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
@@ -1999,7 +2001,11 @@ function NotifierHandler() {
 				throw 'Current browser doesnt support offline notifications';
 			} else {
 				return new Promise(function (resolve, reject) {
-					doPost('/register_fcb', {registration_id: self.subscriptionId}, function (response) {
+					doPost('/register_fcb', {
+						registration_id: self.subscriptionId,
+						agent: browserVersion,
+						is_mobile: isMobile
+					}, function (response) {
 						if (response == RESPONSE_SUCCESS) {
 							resolve()
 						} else {
@@ -2050,6 +2056,9 @@ function NotifierHandler() {
 	}
 	self.notificationClick = function () {
 		window.focus();
+		if (this.data && this.data.roomId) {
+			channelsHandler.setActiveChannel(this.data.roomId);
+		}
 		this.close()
 	};
 	self.notify = function (title, options) {
@@ -3636,7 +3645,11 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName) {
 					if (data.userId != loggedUserId && self.notifications) {
 						notifier.notify(displayedUsername, {
 							body: data.content,
-							data: {replaced: 1, title: displayedUsername},
+							data: {
+								replaced: 1,
+								title: displayedUsername,
+								roomId: data.channel,
+							},
 							icon: data.images || NOTIFICATION_ICON_URL
 						});
 					}
@@ -4183,7 +4196,7 @@ function CallHandler(roomId) {
 		self.constraints.share = value;
 		CssUtils.setClassToState(self.dom.shareScreen, value, 'callActiveIcon');
 		self.dom.fs.share.className = value ? "icon-desktop" : "icon-no-desktop";
-		var title = value ? "Capture your desktop screen and start sharing it" : "Turn off screen sharing";
+		var title = value ? "Turn off screen sharing" :"Capture your desktop screen and start sharing it" ;
 		self.dom.shareScreen.title = title;
 		self.dom.fs.share.title = title;
 	};
