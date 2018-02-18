@@ -18,7 +18,10 @@ class InvalidString(str):
 			"Undefined variable or unknown value for: %s" % other)
 
 TEMPLATE_STRING_IF_INVALID = InvalidString("%s")
-
+TEMPLATES[0]['OPTIONS']['loaders'] = [
+	'django.template.loaders.filesystem.Loader',
+	'django.template.loaders.app_directories.Loader',
+]
 CRT_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.crt"))
 KEY_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.key"))
 TORNADO_SSL_OPTIONS = {
