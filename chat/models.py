@@ -1,4 +1,5 @@
 import datetime
+import json
 import time
 from enum import Enum
 from time import mktime
@@ -69,9 +70,15 @@ class Subscription(models.Model):
 	registration_id = models.CharField(null=False, max_length=191, unique=True)
 	created = models.DateTimeField(default=datetime.datetime.now)
 	updated = models.DateTimeField(default=datetime.datetime.now)
-	agent = models.CharField(max_length=64, null=True)
-	is_mobile = BooleanField(default=False, null=False)
-	ip = models.ForeignKey('IpAddress', null=True)
+	agent = models.CharField(max_length=64, null=True, blank=True)
+	is_mobile = BooleanField(default=False, null=False, blank=True)
+	ip = models.ForeignKey('IpAddress', null=True, blank=True)
+
+	def __unicode__(self):
+		return self.__str__()
+
+	def __str__(self):
+		return str(self.id)
 
 
 class Verification(models.Model):
@@ -87,6 +94,12 @@ class Verification(models.Model):
 	time = models.DateTimeField(default=datetime.datetime.now)
 	verified = BooleanField(default=False)
 
+	def __unicode__(self):
+		return self.__str__()
+
+	def __str__(self):
+		return str(self.id)
+
 	@property
 	def type_enum(self):
 		return self.TypeChoices(self.type)
@@ -100,17 +113,17 @@ class Verification(models.Model):
 
 
 class UserProfile(User):
-	name = CharField(max_length=30, null=True)
+	name = CharField(max_length=30, null=True, blank=True)
 
-	surname = CharField(max_length=30, null=True)
+	surname = CharField(max_length=30, null=True, blank=True)
 	# tho email max length is 254 characted mysql supports unique keys only 767 bytes long (utf8 4 bytes = 767/4 = 191)
 	email = models.EmailField(null=True, unique=True, blank=True, max_length=190)
-	city = CharField(max_length=50, null=True)
+	city = CharField(max_length=50, null=True, blank=True)
 
-	birthday = DateField(null=True)
-	contacts = CharField(max_length=100, null=True)
+	birthday = DateField(null=True, blank=True)
+	contacts = CharField(max_length=100, null=True, blank=True)
 	# fileField + <img instead of ImageField (removes preview link)
-	photo = FileField(upload_to=get_random_path, null=True)
+	photo = FileField(upload_to=get_random_path, null=True, blank=True)
 	suggestions = BooleanField(null=False, default=True)
 	embedded_youtube = BooleanField(null=False, default=True)
 	highlight_code = BooleanField(null=False, default=False)
@@ -134,13 +147,19 @@ class UserProfile(User):
 
 
 class Room(models.Model):
-	name = CharField(max_length=16, null=True)
+	name = CharField(max_length=16, null=True, blank=True)
 	users = models.ManyToManyField(User, related_name='rooms', through='RoomUsers')
 	disabled = BooleanField(default=False, null=False)
 
 	@property
 	def is_private(self):
 		return self.name is None
+
+	def __unicode__(self):
+		return self.__str__()
+
+	def __str__(self):
+		return "{}/{}".format(self.id, self.name)
 
 
 def get_milliseconds(dt=None):
@@ -160,14 +179,28 @@ class Message(models.Model):
 	room = models.ForeignKey(Room, null=True)
 	# DateField.auto_now
 	time = models.BigIntegerField(default=get_milliseconds)
-	content = models.TextField(null=True)
+	content = models.TextField(null=True, blank=True)
 	# if symbol = null - no images refers this row
 	# symbol is the same as "select max(symbol) from images where message_id = message.id
 	# we store symbol in this table in case if user edits message
 	# - images that refers same message always have unique symbols
-	symbol = models.CharField(null=True, max_length=1)
+	symbol = models.CharField(null=True, max_length=1, blank=True)
 	deleted = BooleanField(default=False)
-	giphy = URLField(null=True)
+	giphy = URLField(null=True, blank=True)
+
+	def __unicode__(self):
+		return self.__str__()
+
+	def __str__(self):
+
+		if self.content is None:
+			v = ''
+		elif len(self.content) > 50:
+			v = self.content[:50]
+		else:
+			v = self.content
+		v = json.dumps(v)
+		return "{}/{}".format(self.id, v)
 
 
 class Image(models.Model):
@@ -210,11 +243,11 @@ class Issue(models.Model):
 
 
 class IssueDetails(models.Model):
-	sender = models.ForeignKey(User, null=False	)
-	browser = models.CharField(null=False, max_length=32)
+	sender = models.ForeignKey(User, null=False)
+	browser = models.CharField(null=False, max_length=32, blank=True)
 	time = models.DateField(default=datetime.datetime.now, blank=True)
 	issue = models.ForeignKey(Issue, related_name='issue')
-	log = models.TextField(null=True)
+	log = models.TextField(null=True, blank=True)
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((User._meta.app_label, '_issue_detail'))
@@ -222,11 +255,11 @@ class IssueDetails(models.Model):
 
 class IpAddress(models.Model):
 	ip = models.CharField(null=False, max_length=32, unique=True)
-	isp = models.CharField(null=True, max_length=32)
-	country_code = models.CharField(null=True, max_length=16)
-	country = models.CharField(null=True, max_length=32)
-	region = models.CharField(null=True, max_length=32)
-	city = models.CharField(null=True, max_length=32)
+	isp = models.CharField(null=True, max_length=32, blank=True)
+	country_code = models.CharField(null=True, max_length=16, blank=True)
+	country = models.CharField(null=True, max_length=32, blank=True)
+	region = models.CharField(null=True, max_length=32, blank=True)
+	city = models.CharField(null=True, max_length=32, blank=True)
 
 	def __str__(self):
 		return self.ip

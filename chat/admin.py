@@ -9,7 +9,7 @@ from django.utils.html import format_html
 
 from chat import models
 
-exclude_auto = ()
+exclude_auto = ('User')
 model_classes = (class_name[1] for class_name in inspect.getmembers(sys.modules[models.__name__], inspect.isclass)
 					if class_name[1].__module__ == models.__name__ and class_name[0] not in exclude_auto)
 
@@ -47,13 +47,29 @@ exclude_fields = {
 	'ip address': ('country',)
 }
 
+list_filter = {
+	'message': ('room', 'deleted', 'sender'),
+	'room': ('disabled',),
+	'ip address': ('country', 'region', 'city'),
+	'room users': ('notifications', 'user', 'room'),
+	'subscription': ('user', 'inactive', 'is_mobile', 'created', 'updated'),
+	'subscription messages': ('subscription', 'received', 'message'),
+	'user joined info': ('user', 'time'),
+	'issue details': ('sender', 'time'),
+	'user': ('sex',),
+	'user profile': ('last_login', 'sex'),
+	'verification': ('verified', 'time'),
+}
+
 for model in model_classes:
 	fields = []
 	list_display = []
 	vname = model._meta.verbose_name
 	class_struct = {'fields': fields, 'list_display': list_display}
+	if list_filter.get(vname) is not None:
+		class_struct['list_filter'] = list_filter.get(vname)
 	for field in model._meta.fields:
-		if field.name != 'id':
+		if field.name != 'id' and field.name != 'user_ptr':
 			fields.append(field.name)
 		if exclude_fields.get(vname) is not None and field.name in extra_fields.get(vname):
 			break
@@ -66,7 +82,8 @@ for model in model_classes:
 						return "Null"
 					else:
 						another_name = another._meta.verbose_name
-						link = '/admin/chat/{}/{}/change'.format(another_name, another.id)
+						another_link = another_name if another_name != 'user' else 'userprofile'
+						link = '/admin/chat/{}/{}/change'.format(another_link, another.id)
 						return u'<a href="%s">%s</a>' % (link, main_fields[another_name](another))
 				link.allow_tags = True
 				link.__name__ = str(field.name)
