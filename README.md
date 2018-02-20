@@ -10,6 +10,7 @@ This is free web (browser) chat, that features:
  - Login in with facebook/google oauth.
  - Send offline messages with Firebase push notifications
  - Responsive interface (bs like)+ themes
+ - Admin interface with django-admin
 
 Live demo: [pychat.org](http://pychat.org/)
 
