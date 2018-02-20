@@ -1,6 +1,7 @@
 import inspect
 import json
 import sys
+from datetime import datetime
 
 from django.conf import settings
 from django.contrib import admin
@@ -23,28 +24,26 @@ def gen_fun(field):
 	return col_name
 
 
-main_fields = {
-	'user': gen_fun('username'),
-	'room': gen_fun('name'),
-	'issue': gen_fun('content'),
-	'ip address': gen_fun('ip'),
-	'message': gen_fun('content'),
-	'subscription': gen_fun('id'),
-}
-
-
 def country(instance):
 	iso2 = instance.country_code if instance.country_code else "None"
 	return format_html("<span style='white-space:nowrap'><img src='{}/flags/{}.png' /> {}</span>",
 							 settings.STATIC_URL,
 							 iso2.lower(),
 							 instance.country)
+
+def time(instance):
+	d = datetime.fromtimestamp(instance.time / 1000 ).strftime('%Y-%m-%d %H:%M:%S')
+	return format_html("<span style='white-space:nowrap'>{}</span>", d)
+
+
 extra_fields = {
-	'ip address': (country,)
+	'ip address': (country,),
+	'message': (time,),
 }
 
 exclude_fields = {
-	'ip address': ('country',)
+	'ip address': ('country',),
+	'message': ('time',),
 }
 
 list_filter = {
@@ -69,10 +68,10 @@ for model in model_classes:
 	if list_filter.get(vname) is not None:
 		class_struct['list_filter'] = list_filter.get(vname)
 	for field in model._meta.fields:
+		if field.name in exclude_fields.get(vname, []):
+			continue
 		if field.name != 'id' and field.name != 'user_ptr':
 			fields.append(field.name)
-		if exclude_fields.get(vname) is not None and field.name in extra_fields.get(vname):
-			break
 		if isinstance(field, ForeignKey):
 			def gen_link(field):
 				def link(obj):
@@ -84,14 +83,13 @@ for model in model_classes:
 						another_name = another._meta.verbose_name
 						another_link = another_name if another_name != 'user' else 'userprofile'
 						link = '/admin/chat/{}/{}/change'.format(another_link, another.id)
-						return u'<a href="%s">%s</a>' % (link, main_fields[another_name](another))
+						return u'<a href="%s">%s</a>' % (link, str(another))
 				link.allow_tags = True
 				link.__name__ = str(field.name)
 				return link
 			list_display.append(gen_link(field))
 		else:
 			list_display.append(field.name)
-
 	if extra_fields.get(vname) is not None:
 		list_display.extend(extra_fields.get(vname))
 	admin.site.register(model, type(
