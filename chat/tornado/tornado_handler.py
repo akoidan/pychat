@@ -140,7 +140,8 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				'ip': self.ip
 			}
 			self._logger = logging.LoggerAdapter(parent_logger, log_params)
-			self.logger.debug("!! Incoming connection, session %s, thread hash %s, cookies %s", session_key, self.id, self.request.cookies)
+			cookies = ["{}={}".format(k, self.request.cookies[k].value) for k in self.request.cookies]
+			self.logger.debug("!! Incoming connection, session %s, thread hash %s, cookies: %s", session_key, self.id, ";".join(cookies))
 			self.async_redis.connect()
 			user_db = do_db(User.objects.get, id=self.user_id)
 			self.sender_name = user_db.username
