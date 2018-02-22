@@ -12,7 +12,8 @@ from chat import models
 
 exclude_auto = ('User')
 model_classes = (class_name[1] for class_name in inspect.getmembers(sys.modules[models.__name__], inspect.isclass)
-					if class_name[1].__module__ == models.__name__ and class_name[0] not in exclude_auto)
+					  if class_name[1].__module__ == models.__name__ and class_name[0] not in exclude_auto)
+
 
 def gen_fun(field):
 	def col_name(o):
@@ -21,6 +22,7 @@ def gen_fun(field):
 		if len(v) > 50:
 			v = v[:50]
 		return v
+
 	return col_name
 
 
@@ -31,47 +33,70 @@ def country(instance):
 							 iso2.lower(),
 							 instance.country)
 
+
 def time(instance):
-	d = datetime.fromtimestamp(instance.time / 1000 ).strftime('%Y-%m-%d %H:%M:%S')
+	d = datetime.fromtimestamp(instance.time / 1000).strftime('%Y-%m-%d %H:%M:%S')
 	return format_html("<span style='white-space:nowrap'>{}</span>", d)
 
 
-extra_fields = {
-	'ip address': (country,),
-	'message': (time,),
+conf = {
+	'ip address': {
+		'extra_fields': (country,),
+		'exclude_fields': ('country',),
+		'list_filter': ('country', 'region', 'city'),
+		'search_fields': ('ip',)
+	},
+	'message': {
+		'extra_fields': (time,),
+		'exclude_fields': ('time',),
+		'list_filter': ('room', 'deleted', 'sender'),
+		'search_fields': ('content', )
+	},
+	'room': {
+		'list_filter': ('disabled',),
+		'search_fields': ('name', )
+	},
+	'room users': {
+		'list_filter': ('notifications', 'user', 'room'),
+	},
+	'subscription': {
+		'list_filter': ('user', 'inactive', 'is_mobile', 'created', 'updated'),
+		'search_fields': ('registration_id', )
+	},
+	'subscription messages': {
+		'list_filter': ('subscription', 'received', 'message'),
+	},
+	'user joined info': {
+		'list_filter': ('user', 'time'),
+	},
+	'issue details': {
+		'list_filter': ('sender', 'time'),
+	},
+	'issue': {
+		'search_fields': ('content', )
+	},
+	'user profile': {
+		'list_filter': ('last_login', 'sex'),
+		'search_fields': ('username', )
+	},
+	'verification': {
+		'list_filter': ('verified', 'time'),
+	},
 }
 
-exclude_fields = {
-	'ip address': ('country',),
-	'message': ('time',),
-}
 
-list_filter = {
-	'message': ('room', 'deleted', 'sender'),
-	'room': ('disabled',),
-	'ip address': ('country', 'region', 'city'),
-	'room users': ('notifications', 'user', 'room'),
-	'subscription': ('user', 'inactive', 'is_mobile', 'created', 'updated'),
-	'subscription messages': ('subscription', 'received', 'message'),
-	'user joined info': ('user', 'time'),
-	'issue details': ('sender', 'time'),
-	'user': ('sex',),
-	'user profile': ('last_login', 'sex'),
-	'verification': ('verified', 'time'),
-}
 
 for model in model_classes:
-	fields = []
-	list_display = []
 	vname = model._meta.verbose_name
-	class_struct = {'fields': fields, 'list_display': list_display}
-	if list_filter.get(vname) is not None:
-		class_struct['list_filter'] = list_filter.get(vname)
+	class_struct = {'fields': [], 'list_display': []}
+	c = conf.get(vname, {})
+	if c.get('list_filter') is not None:
+		class_struct['list_filter'] = c['list_filter']
 	for field in model._meta.fields:
-		if field.name in exclude_fields.get(vname, []):
+		if field.name in c.get('exclude_fields', []):
 			continue
 		if field.name != 'id' and field.name != 'user_ptr':
-			fields.append(field.name)
+			class_struct['fields'].append(field.name)
 		if isinstance(field, ForeignKey):
 			def gen_link(field):
 				def link(obj):
@@ -87,17 +112,19 @@ for model in model_classes:
 				link.allow_tags = True
 				link.__name__ = str(field.name)
 				return link
-			list_display.append(gen_link(field))
+
+			class_struct['list_display'].append(gen_link(field))
 		else:
-			list_display.append(field.name)
-	if extra_fields.get(vname) is not None:
-		list_display.extend(extra_fields.get(vname))
+			class_struct['list_display'].append(field.name)
+	if c.get('extra_fields') is not None:
+		class_struct['list_display'].extend(c['extra_fields'])
+	if c.get('search_fields') is not None:
+		class_struct['search_fields'] = c['search_fields']
 	admin.site.register(model, type(
 		'SubClass',
 		(admin.ModelAdmin,),
 		class_struct
 	))
-
 
 # class CountryFilter(SimpleListFilter):
 # 	title = 'country'
