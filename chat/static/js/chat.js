@@ -3707,7 +3707,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		// loadMessages could be called from localStorage
 		var savedNewMessagesDisabledStatus = window.newMessagesDisabled;
 		window.newMessagesDisabled = true;
-		message.forEach(self.printMessage);
+		message.forEach(function(message) {
+			self._printMessage(message, false, true)
+		});
 		window.newMessagesDisabled = savedNewMessagesDisabledStatus;
 		self.lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
 		Utils.checkAndPlay = bu;
