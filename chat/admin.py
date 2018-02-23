@@ -107,6 +107,7 @@ for model in model_classes:
 					else:
 						another_name = another._meta.verbose_name
 						another_link = another_name if another_name != 'user' else 'userprofile'
+						another_link = another_link.replace(' ', '')
 						link = '/admin/chat/{}/{}/change'.format(another_link, another.id)
 						return u'<a href="%s">%s</a>' % (link, str(another))
 				link.allow_tags = True
