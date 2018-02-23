@@ -2355,7 +2355,7 @@ function ChannelsHandler() {
 		warn: loggerFactory.getLogger("CHAT", console.warn, 'color: #FF0F00; font-weight: bold'),
 		info: loggerFactory.getLogger("CHAT", console.log, 'color: #FF0F00; font-weight: bold'),
 		error: loggerFactory.getLogger("CHAT", console.error, 'color: #FF0F00; font-weight: bold')
-	}
+	};
 	self.pageName = 'channels';
 	Page.call(self);
 	self.url = '/chat/';
@@ -2364,56 +2364,57 @@ function ChannelsHandler() {
 	self.activeChannel = DEFAULT_CHANNEL_NAME;
 	self.HIGHLIGHT_MESSAGE_CLASS = 'highLightMessage';
 	self.channels = {};
-	self.childDom = {
-		wrapper: $('wrapper'),
-		userMessageWrapper: $('userMessageWrapper'),
-		chatUsersTable: $("chat-user-table"),
-		rooms: $("rooms"),
-		activeUserContext: null,
-		userContextMenu: $('user-context-menu'),
-		addUserHolder: $('addUserHolder'),
-		addRoomHolder: $('addRoomHolder'),
-		addRoomInput: $('addRoomInput'),
-		addUserList: $('addUserList'),
-		addUserInput: $('addUserInput'),
-		addRoomButton: $('addRoomButton'),
-		directUserTable: directUserTable,
-		imgInput: $('imgInput'),
-		imgInputIcon: $('imgInputIcon'),
-		usersStateText: $('usersStateText'),
-		inviteUser: $('inviteUser'),
-		navCallIcon: navCallIcon,
-		webRtcFileIcon: webRtcFileIcon,
-		m2Message: $('m2Message')
-	};
+	self.dom = (function () {
+		var childDom = {
+			wrapper: $('wrapper'),
+			userMessageWrapper: $('userMessageWrapper'),
+			chatUsersTable: $("chat-user-table"),
+			rooms: $("rooms"),
+			activeUserContext: null,
+			userContextMenu: $('user-context-menu'),
+			addUserHolder: $('addUserHolder'),
+			addRoomHolder: $('addRoomHolder'),
+			addRoomInput: $('addRoomInput'),
+			addUserList: $('addUserList'),
+			addUserInput: $('addUserInput'),
+			addRoomButton: $('addRoomButton'),
+			directUserTable: directUserTable,
+			imgInput: $('imgInput'),
+			imgInputIcon: $('imgInputIcon'),
+			usersStateText: $('usersStateText'),
+			inviteUser: $('inviteUser'),
+			navCallIcon: navCallIcon,
+			webRtcFileIcon: webRtcFileIcon,
+			m2Message: $('m2Message'),
+		};
+		childDom.minifier = {
+			channel: {
+				icon: $('channelsMinifier'),
+				body: childDom.rooms
+			},
+			direct: {
+				icon: $('directMinifier'),
+				body: childDom.directUserTable
+			},
+			user: {
+				icon: $('usersMinifier'),
+				body: childDom.chatUsersTable
+			}
+		};
+		for (var attrname in self.dom) {
+			if (self.dom.hasOwnProperty(attrname)) {
+				childDom[attrname] = self.dom[attrname];
+			}
+		}
+		return childDom;
+	})();
 	self.initCha = function() {
 		self.dom.addUserInput.onkeyup = self.filterAddUser;
 		self.dom.addUserList.onclick = self.addUserHolderClick;
-	}
+	};
 	self.getActiveChannel = function () {
 		return self.channels[self.activeChannel];
 	};
-	self.childDom.minifier = {
-		channel: {
-			icon: $('channelsMinifier'),
-			body: self.childDom.rooms
-		},
-		direct: {
-			icon: $('directMinifier'),
-			body: self.childDom.directUserTable
-		},
-		user: {
-			icon: $('usersMinifier'),
-			body: self.childDom.chatUsersTable
-		}
-	};
-	for (var attrname in self.dom) {
-		if (self.dom.hasOwnProperty(attrname)) {
-			self.childDom[attrname] = self.dom[attrname];
-		}
-	}
-	self.dom = self.childDom;
-	delete self.childDom;
 	self.dom.el = [
 		self.dom.wrapper,
 		self.dom.userMessageWrapper
@@ -2962,7 +2963,7 @@ function ChannelsHandler() {
 		singlePage.showPage('/profile/', [self.getActiveUserId()]);
 	};
 	self.init = function () {
-		self.dom.chatUsersTable.addEventListener('contextmenu', self.showContextMenu, false);
+		self.dom.wrapper.addEventListener('contextmenu', self.showContextMenu, false);
 		self.dom.rooms.onclick = self.roomClick;
 		self.dom.directUserTable.onclick = self.roomClick;
 		if (isMobile) {
@@ -3042,16 +3043,21 @@ function ChannelsHandler() {
 	self.dom.activeUserContext = null;
 	self.showContextMenu = function (e) {
 		var li = e.target;
-		if (li.tagName == 'I') {
-			li = li.parentElement;
-		} else if (li.tagName != 'LI') {
-			return;
+		if (li.tagName === 'I') {
+			li = li.parent;
+		}
+		var userId = li.getAttribute('userid');
+		if (!userId) {
+			return
 		}
 		if (self.dom.activeUserContext != null) {
 			CssUtils.removeClass(self.dom.activeUserContext, 'active-user');
 		}
 		self.dom.activeUserContext = li;
-		self.dom.userContextMenu.style.top = li.offsetTop + li.clientHeight + "px";
+		var bcr = li.getBoundingClientRect();
+		self.dom.userContextMenu.style.top = bcr.top + (li.clientHeight || 20) + "px";
+		self.dom.userContextMenu.style.left = bcr.left -2 + "px";
+		self.dom.userContextMenu.style.width = Math.max(bcr.width, 205) + "px";
 		CssUtils.addClass(self.dom.activeUserContext, 'active-user');
 		CssUtils.showElement(self.dom.userContextMenu);
 		document.addEventListener("click", self.removeContextMenu);
@@ -3443,7 +3449,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		Utils.placeCaretAtEnd();
 	};
 	/** Creates a DOM node with attached events and all message content*/
-	self.createMessageNode = function (timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId) {
+	self.createMessageNode = function (timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId, userId) {
 		var date = new Date(timeMillis);
 		var time = [sliceZero(date.getHours()), sliceZero(date.getMinutes()), sliceZero(date.getSeconds())].join(':');
 
@@ -3462,6 +3468,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 
 		var userNameA = document.createElement('span');
 		userNameA.textContent = displayedUsername;
+		if (userId)  {
+				userNameA.setAttribute('userid', userId);
+		}
 		headSpan.insertAdjacentHTML('beforeend', ' ');
 		headSpan.appendChild(userNameA);
 		headSpan.insertAdjacentHTML('beforeend', ': ');
@@ -3505,9 +3514,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		return result;
 	};
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
-	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, symbol) {
+	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, symbol, userId) {
 		var pos = null;
-			var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId);
+			var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId, userId);
 		// every message has UTC millis ID so we can detect if message is already displayed or position to display
 		if (symbol) {
 			p.setAttribute('symbol', symbol)
@@ -3635,7 +3644,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 				html,
 				displayedUsername,
 				data.id,
-				data.symbol
+				data.symbol,
+				data.userId
 		);
 		if (p) {
 			Utils.highlightCode(p);

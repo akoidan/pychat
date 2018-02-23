@@ -275,6 +275,12 @@ nav
 .max-height-scrollable
 	overflow-y: auto
 
+.active-user
+	border: $user-context-border !important
+	border-radius: 5px 5px 0 0
+	transition: 0.3s
+	transition-property: background-color, border
+
 #chat-user-table > ul,
 ul#directUserTable
 	display: flex
@@ -292,11 +298,6 @@ ul#directUserTable
 		border-radius: 3px
 		[class^='icon-']
 			opacity: 1
-		&.active-user
-			border: $user-context-border
-			border-radius: 5px 5px 0 0
-			transition: 0.3s
-			transition-property: background-color, border
 		@include fix-user-icon-top-position
 		i:hover
 			cursor: inherit
