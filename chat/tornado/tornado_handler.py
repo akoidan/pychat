@@ -174,7 +174,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		for room_id in user_rooms:
 			c = self.get_cookie(str(room_id))
 			if c is not None:
-				q_objects.add(Q(id__gte=c, room_id=room_id), Q.OR)
+				q_objects.add(Q(id__gte=c, room_id=room_id, deleted=False), Q.OR)
 		off_messages = Message.objects.filter(
 			id__gt=F('room__roomusers__last_read_message_id'),
 			deleted=False,
