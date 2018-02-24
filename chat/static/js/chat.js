@@ -4820,6 +4820,7 @@ function CallHandler(roomId) {
 			self.acceptedPeers.forEach(function (e) {
 				if (self.peerConnections[e]) {
 					self.peerConnections[e].connectToRemote(self.localStream);
+					CssUtils.addClass(self.peerConnections[e].dom.remote, 'connected');
 				} else {
 					self.logErr("Unable to get pc with id {}, available peer connections are {}, accepted peers are {}",
 							e, Object.keys(self.peerConnections), self.acceptedPeers.toString())();
@@ -4882,6 +4883,7 @@ function CallHandler(roomId) {
 		if (self.getCallStatus() != 'received_offer') {
 			self.clearTimeout(); // if we're call initiator
 			var pc = self.peerConnections[message.opponentWsId];
+			CssUtils.addClass(pc.dom.remote, 'connected');
 			pc.connectToRemote(self.localStream);
 			if (pc.sendRtcDataQueue.length > 0) {
 				self.log("Connection accepted, consuming sendRtcDataQueue")();
@@ -6031,7 +6033,7 @@ var Utils = {
 			}
 		}
 		if (line === -1) {
-			logger.info("Could not find the m line for {}", sdp);
+			logger.info("Could not find the m line for {}", sdp)();
 			return sdp;
 		}
 		// Skip i and c lines
