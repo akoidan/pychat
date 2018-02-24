@@ -4090,7 +4090,6 @@ function CallPopup(answerFn, videoAnswerFn, declineFn, user, channelName, volume
 	var self = this;
 	Draggable.call(self, document.createElement('DIV'), "Call");
 	self.dom.callSound = $('chatCall');
-	};
 	self.init = function () {
 		var answerButtons = document.createElement('div');
 		self.dom.users = document.createElement('table');
@@ -4112,6 +4111,7 @@ function CallPopup(answerFn, videoAnswerFn, declineFn, user, channelName, volume
 			self.dom.callSound.onended = function () {
 				Utils.checkAndPlay(self.dom.callSound, volume);
 			}
+		}
 	};
 	self.inserRow = function (name, value) {
 		var raw = self.dom.users.insertRow();

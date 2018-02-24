@@ -583,7 +583,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 
 	def send_call_answer(self, in_message, status_set, reply_action, allowed_state, message_handler):
 		connection_id = in_message[VarNames.CONNECTION_ID]
-		content = in_message[VarNames.CONTENT]
+		content = in_message.get(VarNames.CONTENT)  # cancel call can skip browser
 		conn_users = self.sync_redis.shgetall(connection_id)
 		if conn_users[self.id] in allowed_state:
 			self.publish_call_answer(conn_users, connection_id, message_handler, reply_action, status_set, content)
