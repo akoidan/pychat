@@ -3044,7 +3044,7 @@ function ChannelsHandler() {
 	self.showContextMenu = function (e) {
 		var li = e.target;
 		if (li.tagName === 'I') {
-			li = li.parent;
+			li = li.parentElement;
 		}
 		var userId = li.getAttribute('userid');
 		if (!userId) {
