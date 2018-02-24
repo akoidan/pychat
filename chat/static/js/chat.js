@@ -4457,6 +4457,11 @@ function CallHandler(roomId) {
 	};
 	self.inflateDevices = function (devices) {
 		var n, k , c = 0;
+		var values = {};
+		var types = ['microphones', 'cameras', 'speakers'];
+		types.forEach(function(t) {
+			values[t] = self.dom[t].value
+		});
 		CssUtils.deleteChildren(self.dom.microphones);
 		CssUtils.deleteChildren(self.dom.speakers);
 		CssUtils.deleteChildren(self.dom.cameras);
@@ -4487,6 +4492,9 @@ function CallHandler(roomId) {
 		['microphones', 'cameras', 'speakers'].forEach(function (d) {
 			var el = self.dom[d];
 			var holder = self.dom[d+'Holder'];
+			if (values[d]) {
+					el.value = values[d];
+			}
 			CssUtils.setVisibility(holder, el.children.length > 0);
 		})
 	};
