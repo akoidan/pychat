@@ -4308,11 +4308,11 @@ function CallHandler(roomId) {
 		self.setHeaderText("Answered with audio");
 	};
 	self.videoAnswerWebRtcCall = function () {
-		self.accept();
 		self.setAudio(true);
-		self.setDesktopCapture(false);
 		self.setVideo(true);
+		self.setDesktopCapture(false);
 		self.autoSetLocalVideoVisibility();
+		self.accept();
 		self.setHeaderText("Answered with video");
 	};
 	self.renderDom = function () {
