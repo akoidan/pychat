@@ -492,15 +492,17 @@ function doPost(url, params, callback, form, isJsonEncoded) {
 				}
 			}
 		}
-		var entries = data.entries();
-		if (entries && entries.next) {
-			params = '';
-			var d;
-			while (d = entries.next()) {
-				if (d.done) {
-					break;
+		if (data.entries) {
+			var entries = data.entries();
+			if (entries && entries.next) {
+				params = '';
+				var d;
+				while (d = entries.next()) {
+					if (d.done) {
+						break;
+					}
+					params += d.value[0] + '=' + d.value[1] + '; ';
 				}
-				params += d.value[0] + '=' + d.value[1] + '; ';
 			}
 		}
 	}
