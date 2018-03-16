@@ -147,6 +147,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* signup verification emails is sent to admin instead of current user.
 * Add avatar to notifications and users 
 * update service worker if its version changed with registration.update()
 * setTimeot stops working after 30min in chrome background, it has been changed to setInterval, check if it works
