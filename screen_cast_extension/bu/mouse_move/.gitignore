@@ -3,4 +3,4 @@
 !CMakeLists.txt
 !MouseMove/src/main.cpp
 !MouseMove/CMakeLists.txt
-!cmake/FindSDL2.cmake
+!FindSDL2.cmake
