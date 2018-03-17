@@ -5,3 +5,4 @@
 !MouseMove/src/main.cpp
 !MouseMove/CMakeLists.txt
 !cmake/FindSDL2.cmake
+!README.md
