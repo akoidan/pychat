@@ -1,6 +1,0 @@
-*
-!.gitignore
-!CMakeLists.txt
-!MouseMove/src/main.cpp
-!MouseMove/CMakeLists.txt
-!FindSDL2.cmake
