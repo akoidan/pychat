@@ -36,5 +36,5 @@ smtpd_tls_cert_file = /etc/nginx/ssl/certificate.crt
 smtpd_tls_loglevel = 1
 meta_directory = /etc/postfix
 shlib_directory = /usr/lib/postfix
-virtual_alias_maps = hash:/etc/postfix/virtual
+virtual_alias_maps = hash:/etc/postfix/virtual,  regexp:/etc/postfix/virtual-regexp
 relayhost = [smtprelay.kyivstar.ua]:25
