@@ -62,4 +62,3 @@ patch_smembers(sync_redis)
 # Redis connection cannot be shared between publishers and subscribers.
 async_redis_publisher = tornadoredis.Client(host=REDIS_HOST, port=REDIS_PORT)
 patch_read(async_redis_publisher)
-async_redis_publisher.connect()

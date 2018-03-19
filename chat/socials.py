@@ -12,7 +12,7 @@ from oauth2client.crypt import AppIdentityError
 
 from chat import settings
 from chat.log_filters import id_generator
-from chat.models import UserProfile
+from chat.models import UserProfile, get_random_path
 from chat.py2_3 import urlopen
 from chat.settings import VALIDATION_IS_OK, AUTHENTICATION_BACKENDS
 from chat.utils import create_user_model, check_user
@@ -41,8 +41,9 @@ class SocialAuth(View):
 		if url is not None:
 			try:
 				response = urlopen(url)
-				# first param for extension
-				user_profile.photo.save(url, ContentFile(response.read()))
+				filename = get_random_path(None, url.split('/')[-1])
+				content = ContentFile(response.read())
+				user_profile.photo.save(filename, content, False)
 			except Exception as e:
 				logger.error("Unable to download photo from url %s for user %s because %s",
 						url, user_profile.username, e)

@@ -9,8 +9,6 @@ from django.conf import settings
 from django.test import TestCase
 from websocket import create_connection
 
-
-
 # class ModelTest(TestCase):
 #
 # 	def test_gender(self):
@@ -51,10 +49,22 @@ from websocket import create_connection
 # 		self.assertRegexpMatches(elem.text, "^[a-zA-Z-_0-9]{1,16}$")
 # 		driver.close()
 from chat.global_redis import sync_redis
-from chat.settings import WEBSOCKET_PROTOCOL, ALL_ROOM_ID
+from chat.models import UserProfile
+from chat.socials import GoogleAuth
 from chat.tornado.constants import VarNames, Actions
-from chat.tornado.message_creator import MessagesCreator
 
+
+class RegisterTest(TestCase):
+
+    def test_animals_can_speak(self):
+		user_profile = UserProfile(
+			 name='test',
+			 surname='test',
+			 email='asd@mail.ru',
+			 username='test'
+		 )
+		gauth = GoogleAuth()
+		gauth.download_http_photo('https://lh4.googleusercontent.com/-CuLSUOTQ4Kw/AAAAAAAAAAI/AAAAAAAAANQ/VlgHrqehE90/s96-c/photo.jpg', user_profile)
 
 class WebSocketLoadTest(TestCase):
 
@@ -70,7 +80,7 @@ class WebSocketLoadTest(TestCase):
 	def threaded_function(self, session, num):
 		cookies = '{}={}'.format(settings.SESSION_COOKIE_NAME, session)
 
-		ws = create_connection("{}://{}".format(WEBSOCKET_PROTOCOL, self.SITE_TO_SPAM), cookie=cookies, sslopt={"cert_reqs": ssl.CERT_NONE})
+		ws = create_connection("{}://{}".format(settings.WEBSOCKET_PROTOCOL, self.SITE_TO_SPAM), cookie=cookies, sslopt={"cert_reqs": ssl.CERT_NONE})
 		print("Connected #{}  with sessions {}".format(num, session))
 		for i in range(randint(30, 50)):
 			if i % 10 == 0:
@@ -79,7 +89,7 @@ class WebSocketLoadTest(TestCase):
 			ws.send(json.dumps({
 				VarNames.CONTENT: "{}".format(i),
 				VarNames.EVENT: Actions.SEND_MESSAGE,
-				VarNames.CHANNEL: ALL_ROOM_ID
+				VarNames.CHANNEL: settings.ALL_ROOM_ID
 			}))
 
 	# def read_session(self):
