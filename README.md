@@ -147,6 +147,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Upload image in raw format instead of b64 to ws
 * signup verification emails is sent to admin instead of current user.
 * Add avatar to notifications and users 
 * update service worker if its version changed with registration.update()
