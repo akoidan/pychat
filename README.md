@@ -147,6 +147,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Add upload image progress bar + appear messages in chat instantly with automatic resend when connection is up
 * Upload image in raw format instead of b64 to ws
 * signup verification emails is sent to admin instead of current user.
 * Add avatar to notifications and users 

@@ -206,7 +206,7 @@ class Message(models.Model):
 class Image(models.Model):
 	# character in Message.content that will be replaced with this image
 	symbol = models.CharField(null=False, max_length=1)
-	message = models.ForeignKey(Message, related_name='message', null=False)
+	message = models.ForeignKey(Message, related_name='message', null=True)
 	img = FileField(upload_to=get_random_path, null=True)
 
 	class Meta:
