@@ -5901,6 +5901,8 @@ function WsHandler() {
 				if (self.ws.bufferedAmount) {
 					db.setValue(jsonRequest.length - self.ws.bufferedAmount);
 				} else {
+					db.setValue(jsonRequest.length);
+					db.dom.text.textContent = "Message is transferred";
 					self.progressInterval.text.innerText = "Server is processing message...";
 					clearInterval(self.progressInterval.interval);
 					self.progressInterval.interval = null;
