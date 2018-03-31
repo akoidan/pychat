@@ -5795,6 +5795,7 @@ function WebRtcApi() {
 
 function WsHandler() {
 	var self = this;
+	self.messageId = 0;
 	self.wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 9 - connected;
 	self.duplicates = {};
 	self.log = loggerFactory.getLogger('WS', console.log, "color: green;");
@@ -5856,6 +5857,7 @@ function WsHandler() {
 			growlError("Unable to parse incoming message {}", e);
 			return;
 		}
+		self.consumeInterval(data);
 		self.handleMessage(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
 	};
@@ -5863,13 +5865,24 @@ function WsHandler() {
 		self.handlers[data.handler].handle(data);
 	};
 	self.sendToServer = function (messageRequest, skipGrowl) {
+		self.messageId++;
+		messageRequest.messageId = self.messageId;
 		var jsonRequest = JSON.stringify(messageRequest);
 		return self.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
+	};
+	self.consumeInterval = function (message) {
+		if (self.progressInterval) {
+			if (message.messageId == self.progressInterval.messageId) {
+				self.hideGrowlProggress();
+			}
+		}
 	};
 	self.hideGrowlProggress = function() {
 		if (self.progressInterval) {
 			self.progressInterval.growl.hide();
-			clearInterval(self.progressInterval.interval);
+			if (self.progressInterval.interval) {
+					clearInterval(self.progressInterval.interval);
+			}
 			self.progressInterval = null;
 		}
 	};
@@ -5877,16 +5890,24 @@ function WsHandler() {
 		if (jsonRequest.length > 500000 && !self.progressInterval) {
 			self.progressInterval = {};
 			var div = document.createElement("DIV");
+			self.progressInterval.text = document.createElement("span");
+			var holder = document.createElement("holder");
+			holder.appendChild(self.progressInterval.text);
+			holder.appendChild(div);
+			self.progressInterval.text.innerText = "Uploading message...";
 			var db = new DownloadBar(div, jsonRequest.length);
-			self.progressInterval.growl = new Growl(null, null, div);
+			self.progressInterval.growl = new Growl(null, null, holder);
 			var handler = function () {
 				if (self.ws.bufferedAmount) {
 					db.setValue(jsonRequest.length - self.ws.bufferedAmount);
 				} else {
-					self.hideGrowlProggress();
+					self.progressInterval.text.innerText = "Server is processing message...";
+					clearInterval(self.progressInterval.interval);
+					self.progressInterval.interval = null;
 				}
 			};
 			self.progressInterval.growl.showInfinity('');
+			self.progressInterval.messageId = self.messageId;
 			self.progressInterval.interval = setInterval(handler, 200);
 		}
 	};
@@ -5906,6 +5927,8 @@ function WsHandler() {
 		}
 	};
 	self.sendPreventDuplicates = function (data, skipGrowl) {
+		self.messageId++;
+		data.messageId = self.messageId;
 		var jsonRequest = JSON.stringify(data);
 		if (!self.duplicates[jsonRequest]) {
 			self.duplicates[jsonRequest] = Date.now();

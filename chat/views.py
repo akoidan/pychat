@@ -191,11 +191,6 @@ def logout(request):
 	djangologout(request)
 	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
-@login_required_no_redirect(True)
-@require_http_methods(['POST'])
-def upload_photo(request):
-	request.POST.get('file')
-	request.FILES['myfile']
 
 @require_http_methods(['POST'])
 def auth(request):

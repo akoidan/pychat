@@ -269,6 +269,7 @@ class MessagesHandler(MessagesCreator):
 		def send_message(message, giphy=None):
 			raw_imgs = message.get(VarNames.IMG)
 			channel = message[VarNames.CHANNEL]
+			js_id = message[VarNames.JS_MESSAGE_ID]
 			message_db = Message(
 				sender_id=self.user_id,
 				content=message[VarNames.CONTENT],
@@ -281,7 +282,8 @@ class MessagesHandler(MessagesCreator):
 			prepared_message = self.create_send_message(
 				message_db,
 				Actions.PRINT_MESSAGE,
-				prepare_img(db_images, message_db.id)
+				prepare_img(db_images, message_db.id),
+				js_id
 			)
 			self.publish(prepared_message, channel)
 			self.notify_offline(channel, message_db.id)
@@ -345,6 +347,7 @@ class MessagesHandler(MessagesCreator):
 
 	def edit_message(self, data):
 		message_id = data[VarNames.MESSAGE_ID]
+		js_id = data[VarNames.JS_MESSAGE_ID]
 		message = do_db(Message.objects.get, id=message_id)
 		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
@@ -358,7 +361,7 @@ class MessagesHandler(MessagesCreator):
 			def edit_glyphy(message, giphy):
 				do_db(selector.update, content=message.content, symbol=message.symbol, giphy=giphy)
 				message.giphy = giphy
-				self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None), message.room_id)
+				self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None, js_id), message.room_id)
 			self.search_giphy(message, giphy_match, edit_glyphy)
 			return
 		else:
@@ -366,7 +369,7 @@ class MessagesHandler(MessagesCreator):
 			message.giphy = None
 			prep_imgs = process_images(data.get(VarNames.IMG), message)
 			selector.update(content=message.content, symbol=message.symbol, giphy=None)
-		self.publish(self.create_send_message(message, action, prep_imgs), message.room_id)
+		self.publish(self.create_send_message(message, action, prep_imgs, js_id), message.room_id)
 
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]

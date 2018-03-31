@@ -48,7 +48,7 @@ class MessagesCreator(object):
 		return res
 
 	@classmethod
-	def create_send_message(cls, message, event, imgs):
+	def create_send_message(cls, message, event, imgs, js_id):
 		"""
 		:type message: chat.models.Message
 		:type imgs: dict
@@ -58,6 +58,7 @@ class MessagesCreator(object):
 		"""
 		res = cls.create_message(message, imgs)
 		res[VarNames.EVENT] = event
+		res[VarNames.JS_MESSAGE_ID] = js_id
 		res[VarNames.CHANNEL] = message.room_id
 		res[VarNames.SYMBOL] = message.symbol
 		res[VarNames.HANDLER_NAME] = HandlerNames.CHAT

@@ -44,6 +44,7 @@ class VarNames(object):
 	IMG_B64 = 'b64'
 	IMG_FILE_NAME = 'fileName'
 	EVENT = 'action'
+	JS_MESSAGE_ID = 'messageId'
 	MESSAGE_ID = 'id'
 	GENDER = 'sex'
 	ROOM_NAME = 'name'
