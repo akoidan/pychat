@@ -2212,15 +2212,14 @@ function IssuePage() {
 	};
 	self.onsubmit = function (event) {
 		event.preventDefault();
-		var params = {};
-		doPost('/report_issue', params, function (response) {
+		doPost('/report_issue', {}, function (response) {
 			if (response === RESPONSE_SUCCESS) {
 				growlSuccess("Your issue has been successfully submitted");
 				singlePage.showDefaultPage();
 			} else {
 				growlError(response);
 			}
-		}, self.dom.issueForm);
+		}, new FormData(self.dom.issueForm));
 	};
 }
 
@@ -2493,12 +2492,6 @@ function ChannelsHandler() {
 			self.getActiveChannel().hide()
 		}
 	};
-	self.sendMessage = function (messageRequest) {
-		// anonymous is set by name, registered user is set by id.
-		var buHtml = userMessage.innerHTML;
-		var sendSuccessful = wsHandler.sendToServer(messageRequest);
-		userMessage.innerHTML = sendSuccessful ? "" : buHtml;
-	};
 	self.handleFileSelect = function (evt) {
 		var files = evt.target.files;
 		Utils.pasteImgToTextArea(files[0]);
@@ -2647,6 +2640,7 @@ function ChannelsHandler() {
 		return res;
 	};
 	self.handleSendMessage = function () {
+		var buHtml = userMessage.innerHTML;
 		var isEdit = self.editLastMessageNode && !self.editLastMessageNode.notReady;
 		var currSymbol = '\u3500'; // it's gonna increase in getPastedImage
 		if (isEdit && self.editLastMessageNode.dom) {
@@ -2680,7 +2674,8 @@ function ChannelsHandler() {
 		} else {
 			return;
 		}
-		self.sendMessage(message);
+		var sendSuccessful = wsHandler.sendToServer(message);
+		userMessage.innerHTML = sendSuccessful ? "" : buHtml;
 	};
 	self.checkAndSendMessage = function (event) {
 		if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
@@ -3815,7 +3810,9 @@ function DownloadBar(holder, fileSize, statusDiv) {
 		self.dom.text.textContent = percent;
 	};
 	self.setStatus = function (text) {
-		self.dom.statusDiv.textContent = text;
+		if (self.dom.statusDiv) {
+			self.dom.statusDiv.textContent = text;
+		}
 	};
 	self.getAnchor = function () {
 		return self.dom.text;
@@ -5869,6 +5866,30 @@ function WsHandler() {
 		var jsonRequest = JSON.stringify(messageRequest);
 		return self.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
 	};
+	self.hideGrowlProggress = function() {
+		if (self.progressInterval) {
+			self.progressInterval.growl.hide();
+			clearInterval(self.progressInterval.interval);
+			self.progressInterval = null;
+		}
+	};
+	self.displayProggress = function (jsonRequest) {
+		if (jsonRequest.length > 500000 && !self.progressInterval) {
+			self.progressInterval = {};
+			var div = document.createElement("DIV");
+			var db = new DownloadBar(div, jsonRequest.length);
+			self.progressInterval.growl = new Growl(null, null, div);
+			var handler = function () {
+				if (self.ws.bufferedAmount) {
+					db.setValue(jsonRequest.length - self.ws.bufferedAmount);
+				} else {
+					self.hideGrowlProggress();
+				}
+			};
+			self.progressInterval.growl.showInfinity('');
+			self.progressInterval.interval = setInterval(handler, 200);
+		}
+	};
 	self.sendRawTextToServer = function(jsonRequest, skipGrowl, objData) {
 		var logEntry = jsonRequest.substring(0, 500);
 		if (!self.ws || self.ws.readyState !== WebSocket.OPEN) {
@@ -5880,6 +5901,7 @@ function WsHandler() {
 		} else {
 			self.logData("WS_OUT", objData, jsonRequest)();
 			self.ws.send(jsonRequest);
+			self.displayProggress(jsonRequest);
 			return true;
 		}
 	};
@@ -5902,6 +5924,7 @@ function WsHandler() {
 	};
 	self.onWsClose = function (e) {
 		self.setStatus(false);
+		self.hideGrowlProggress();
 		var reason = e.reason || e;
 		if (e.code === 403) {
 			var message = "Server has forbidden request because '{}'".format(reason);
@@ -5945,7 +5968,7 @@ function WsHandler() {
 			if (self.wsState === 1) { // if not inited don't growl message on page load
 				growlSuccess(message);
 			} else {
-				self.startPing();
+				//self.startPing();
 			}
 			self.wsState = 9;
 			self.log(message)();
@@ -5992,6 +6015,16 @@ var Utils = {
 		1: 'icon-volume-1',
 		2: 'icon-volume-2',
 		3: 'icon-volume-3'
+	},
+	dataURItoBlob: function (dataURI) {
+		// convert base64/URLEncoded data component to raw binary data held in a string
+		var byteString = dataURI.split(',')[0].indexOf('base64') >= 0 ? atob(dataURI.split(',')[1]) :unescape(dataURI.split(',')[1]);
+		var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+		var ia = new Uint8Array(byteString.length);
+		for (var i = 0; i < byteString.length; i++) {
+			ia[i] = byteString.charCodeAt(i);
+		}
+		return new Blob([ia], {type: mimeString});
 	},
 	placeCaretAtEnd: function () {
 		var range = document.createRange();

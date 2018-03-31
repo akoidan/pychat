@@ -15,7 +15,7 @@ This is free web (browser) chat, that features:
 Live demo: [pychat.org](http://pychat.org/)
 
 # Table of contents
-  * [Breaf description](#breaf-description)
+  * [Breaf description](#brief-description)
   * [How to run on my own server](#how-to-run-on-my-own-server)
     * [Via Docker](#via-docker)
     * [Development setup](#development-setup)
@@ -147,8 +147,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
-* Add upload image progress bar + appear messages in chat instantly with automatic resend when connection is up
-* Upload image in raw format instead of b64 to ws
+* Messages should appear in chat instantly with automatic resend when connection is up
 * signup verification emails is sent to admin instead of current user.
 * Add avatar to notifications and users 
 * update service worker if its version changed with registration.update()

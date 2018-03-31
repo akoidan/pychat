@@ -291,7 +291,7 @@ var CssUtils = {
 	}
 })();
 
-var Growl = function (message, onclicklistener) {
+var Growl = function (message, onclicklistener, messageDiv) {
 	var self = this;
 	self.growlHolder = growlHolder;
 	self.message = message;
@@ -322,7 +322,9 @@ var Growl = function (message, onclicklistener) {
 		self.growlInner = document.createElement('div');
 		self.growlClose = document.createElement('div');
 		// logger.info("Rendering growl #{}", self.id)();
-		if (self.message) {
+		if (messageDiv) {
+			self.growlInner.appendChild(messageDiv)
+		} else if (self.message) {
 			self.message = self.message.trim();
 			self.growlInner.innerHTML = self.message.indexOf("<") === 0 ? self.message : encodeHTML(self.message);
 		}
