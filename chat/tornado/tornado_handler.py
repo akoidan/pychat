@@ -242,7 +242,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.logger.debug(">> %.1000s", message)
 			self.write_message(message)
 		except WebSocketClosedError as e:
-			self.logger.error("%s. Can't send << %s >> message", e, str(message))
+			self.logger.warning("%s. Can't send message << %s >> ", e, str(message))
 
 	def get_client_ip(self):
 		return self.request.headers.get("X-Real-IP") or self.request.remote_ip
