@@ -31,10 +31,11 @@ from chat import utils
 from chat.decorators import login_required_no_redirect
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
-	SubscriptionMessages, RoomUsers, Room
+	SubscriptionMessages, RoomUsers, Room, UserJoinedInfo
 from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
-	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip
+	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip, \
+	get_or_create_ip_wrapper
 
 logger = logging.getLogger(__name__)
 RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
@@ -165,6 +166,10 @@ def home(request):
 	@return:  the x intercept of the line M{y=m*x+b}.
 	"""
 	context = csrf(request)
+	ip = get_client_ip(request)
+	if not UserJoinedInfo.objects.filter(Q(ip__ip=ip) & Q(user=request.user)).exists():
+		ip_obj = get_or_create_ip(ip, logger)
+		UserJoinedInfo.objects.create(ip=ip_obj, user=request.user)
 	up = UserProfile.objects.defer('suggestions', 'highlight_code', 'embedded_youtube', 'online_change_sound', 'incoming_file_call_sound', 'message_sound', 'theme').get(id=request.user.id)
 	context['suggestions'] = up.suggestions
 	context['highlight_code'] = up.highlight_code

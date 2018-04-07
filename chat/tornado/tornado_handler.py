@@ -164,7 +164,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 					self.ws_write(self.load_offline_message(offl_mess, history.get(room_id), room_id))
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
 			self.connected = True
-			self.save_ip()
+			# self.save_ip()
 		else:
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key %s has been rejected" % session_key)
@@ -209,6 +209,9 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		return browser_domain == origin_domain
 
 	def save_ip(self):
+		"""
+		This code is not used anymore
+		"""
 		if not do_db(UserJoinedInfo.objects.filter(
 				Q(ip__ip=self.ip) & Q(user_id=self.user_id)).exists):
 			res = get_or_create_ip_wrapper(self.ip, self.logger, self.fetch_and_save_ip_http)
@@ -217,6 +220,9 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 
 	@asynchronous
 	def fetch_and_save_ip_http(self):
+		"""
+			This code is not used anymore
+		"""
 		def fetch_response(response):
 			try:
 				ip_record = create_ip_structure(self.ip, response.body)
