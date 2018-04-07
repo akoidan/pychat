@@ -388,6 +388,15 @@ function Painter() {
 		}
 	};
 	self.init = {
+		createFullScreen: function() {
+			self.dom.header.ondblclick = function() {
+				var xy = Utils.getWindowParams();
+				self.dom.canvasWrapper.style.width = xy.x -60 + 'px';
+				self.dom.canvasWrapper.style.height =  xy.y - 95 + 'px';
+				self.dom.container.style.left = '1px';
+				self.dom.container.style.top = '1px';
+			}
+		},
 		createCanvas: function() {
 			self.ctx = self.dom.canvas.getContext('2d');
 			self.ctx.imageSmoothingEnabled= false;
@@ -6286,6 +6295,15 @@ var Utils = {
 			growlError("Pasted file is not an image");
 		}
 
+	},
+	getWindowParams: function () {
+		var w = window,
+				d = document,
+				e = d.documentElement,
+				g = d.getElementsByTagName('body')[0],
+				x = w.innerWidth || e.clientWidth || g.clientWidth,
+				y = w.innerHeight || e.clientHeight || g.clientHeight;
+		return {x: x, y: y};
 	},
 	deleteCookie: function (name, path, domain) {
 		document.cookie = name + "=" +

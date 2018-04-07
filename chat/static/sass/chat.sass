@@ -411,6 +411,7 @@ ul#directUserTable
 
 .toolsAndCanvas
 	display: flex
+	$two-columns-painter: 600px
 	#painterTools
 		display: flex
 		margin-left: -5px
@@ -419,7 +420,7 @@ ul#directUserTable
 		*
 			display: flex
 			padding: 5px 5px 5px 0
-		@media screen and (max-height: 600px)
+		@media screen and (max-height: $two-columns-painter)
 			width: 60px
 			flex-direction: row
 			flex-wrap: wrap
@@ -429,8 +430,10 @@ ul#directUserTable
 		// select none prevent paste event  https://stackoverflow.com/questions/31207253/onpaste-paste-event-not-firing-for-table-on-first-few-attempts
 		//@extend %user-select-none
 		background-color: #313131
-		max-height: calc(95vh - 100px)
-		max-width: calc(90vw - 80px)
+		max-height: calc(100vh - 95px)
+		max-width: calc(100vw - 60px)
+		@media screen and (max-height: $two-columns-painter)
+			max-width: calc(100vw - 90px)
 		border: 1px solid transparent
 		//border: 1px solid #697075
 		#painter
