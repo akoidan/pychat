@@ -2419,6 +2419,8 @@ function ChannelsHandler() {
 	self.initCha = function() {
 		self.dom.addUserInput.onkeyup = self.filterAddUser;
 		self.dom.addUserList.onclick = self.addUserHolderClick;
+		document.body.ondrop = self.imageDrop;
+		document.body.ondragover = self.preventDefault;
 	};
 	self.getActiveChannel = function () {
 		return self.channels[self.activeChannel];
@@ -2503,20 +2505,24 @@ function ChannelsHandler() {
 	};
 	self.handleFileSelect = function (evt) {
 		var files = evt.target.files;
-		Utils.pasteImgToTextArea(files[0]);
+		for (var i = 0; i < evt.target.files.length; i++) {
+			Utils.pasteImgToTextArea(files[i]);
+		}
 		self.dom.imgInput.value = "";
 	};
 	self.preventDefault = function (e) {
 		e.preventDefault();
 	};
-	self.imageDrop = function (evt) {
+		self.imageDrop = function (evt) {
 		self.preventDefault(evt);
-		var file = evt.dataTransfer.files[0];
-		if (file) {
-			if (file.type.indexOf("image") >= 0) {
-				Utils.pasteImgToTextArea(file);
-			} else {
-				webRtcApi.offerFile(file, self.activeChannel);
+		if (singlePage.currentPage.pageName === 'channels' && evt.dataTransfer.files) {
+			for (var i = 0; i < evt.dataTransfer.files.length; i++) {
+				var file = evt.dataTransfer.files[i];
+				if (file.type.indexOf("image") >= 0) {
+					Utils.pasteImgToTextArea(file);
+				} else {
+					webRtcApi.offerFile(file, self.activeChannel);
+				}
 			}
 		}
 	};
@@ -2843,8 +2849,6 @@ function ChannelsHandler() {
 		li.setAttribute(self.ROOM_ID_ATTR, roomId);
 		var chatBoxDiv = document.createElement('div');
 		userMessage.onpaste = self.imagePaste;
-		chatBoxDiv.ondrop = self.imageDrop;
-		chatBoxDiv.ondragover = self.preventDefault;
 		self.channels[roomId] = new ChatHandler(li, chatBoxDiv, users, roomId, roomName, private);
 		self.channels[roomId].dom.chatBoxDiv.oncontextmenu = self.showM2ContextDelete;
 	};
