@@ -6263,7 +6263,7 @@ var Utils = {
 		return values / length;
 	},
 	pasteHtmlAtCaret: function (img) {
-		usermsg.focus();
+		userMessage.focus();
 		var sel = window.getSelection();
 		var range = sel.getRangeAt(0);
 		range.deleteContents();
@@ -6289,14 +6289,15 @@ var Utils = {
 		Utils.pasteHtmlAtCaret(img);
 	},
 	pasteImgToTextArea: function (file) {
-		if (file.type.indexOf("image") >= 0) {
+		var type = file.type;
+		if (type.indexOf("image") >= 0) {
 			var reader = new FileReader();
 			reader.onload = function (e) {
 				Utils.pasteb64ImgToTextArea(e.target.result, file.name);
 			};
 			reader.readAsDataURL(file);
 		} else {
-			growlError("Pasted file is not an image");
+			growlError("Pasted file type {}, which is not an image".format(type));
 		}
 
 	},
