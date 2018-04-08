@@ -5819,14 +5819,13 @@ function WsHandler() {
 			raw = ""
 		}
 		return loggerFactory.getLogger(tag, console.log, "color: green; font-weight: bold")("{} {}", raw, obj);
-	}
-	self.logIn = loggerFactory.getLogger('WS_IN', console.log, "color: green; font-weight: bold");
-	self.logOut = loggerFactory.getLogger('WS_OUT', console.log, "color: green; font-weight: bold");
+	};
 	self.dom = {
 		onlineStatus: $('onlineStatus'),
 		onlineClass: 'online',
 		offlineClass: OFFLINE_CLASS
 	};
+	self.progressInterval = {};
 	self.wsConnectionId = '';
 	self.handlers = {
 		channels: channelsHandler,
@@ -5870,7 +5869,7 @@ function WsHandler() {
 			growlError("Unable to parse incoming message {}", e);
 			return;
 		}
-		self.consumeInterval(data);
+		self.hideGrowlProgress(data.messageId);
 		self.handleMessage(data);
 		//cache some messages to localStorage save only after handle, in case of errors +  it changes the message,
 	};
@@ -5883,47 +5882,49 @@ function WsHandler() {
 		var jsonRequest = JSON.stringify(messageRequest);
 		return self.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
 	};
-	self.consumeInterval = function (message) {
-		if (self.progressInterval) {
-			if (message.messageId == self.progressInterval.messageId) {
-				self.hideGrowlProggress();
+	self.hideGrowlProgress = function (key) {
+		var progInter = self.progressInterval[key];
+		if (progInter) {
+			self.log("Removing progressInterval {}", key)();
+			progInter.growl.hide();
+			if (progInter.interval) {
+				clearInterval(progInter.interval);
 			}
+			delete self.progressInterval[key];
 		}
 	};
-	self.hideGrowlProggress = function() {
-		if (self.progressInterval) {
-			self.progressInterval.growl.hide();
-			if (self.progressInterval.interval) {
-					clearInterval(self.progressInterval.interval);
-			}
-			self.progressInterval = null;
+	self.displayProgress = function (length, messageId) {
+		for (var k in self.progressInterval) {
+			self.progressInterval[k].anotherAmount += length;
 		}
-	};
-	self.displayProggress = function (jsonRequest) {
-		if (jsonRequest.length > 500000 && !self.progressInterval) {
-			self.progressInterval = {};
+		if (length > 300000) {
+			var progressInterval = {};
+			progressInterval.length = length;
+			progressInterval.anotherAmount = 0;
 			var div = document.createElement("DIV");
-			self.progressInterval.text = document.createElement("span");
+			progressInterval.text = document.createElement("span");
 			var holder = document.createElement("holder");
-			holder.appendChild(self.progressInterval.text);
+			holder.appendChild(progressInterval.text);
 			holder.appendChild(div);
-			self.progressInterval.text.innerText = "Uploading message...";
-			var db = new DownloadBar(div, jsonRequest.length);
-			self.progressInterval.growl = new Growl(null, null, holder);
+			progressInterval.text.innerText = "Uploading message #{}...".format(messageId);
+			var db = new DownloadBar(div, progressInterval.length);
+			progressInterval.growl = new Growl(null, null, holder);
 			var handler = function () {
-				if (self.ws.bufferedAmount) {
-					db.setValue(jsonRequest.length - self.ws.bufferedAmount);
+				var ba = self.ws.bufferedAmount;
+				var transferred = progressInterval.length - ba + progressInterval.anotherAmount;
+				if (transferred < progressInterval.length) {
+					db.setValue(transferred);
 				} else {
-					db.setValue(jsonRequest.length);
-					db.dom.text.textContent = "Message is transferred";
-					self.progressInterval.text.innerText = "Server is processing message...";
-					clearInterval(self.progressInterval.interval);
-					self.progressInterval.interval = null;
+					db.setValue(progressInterval.length);
+					db.dom.text.textContent = "Message #{} is transferred".format(messageId);
+					progressInterval.text.innerText = "Server is processing message #{}...".format(messageId);
+					clearInterval(progressInterval.interval);
+					progressInterval.interval = null;
 				}
 			};
-			self.progressInterval.growl.showInfinity('');
-			self.progressInterval.messageId = self.messageId;
-			self.progressInterval.interval = setInterval(handler, 200);
+			progressInterval.growl.showInfinity('');
+			self.progressInterval[messageId] = progressInterval;
+			progressInterval.interval = setInterval(handler, 200);
 		}
 	};
 	self.sendRawTextToServer = function(jsonRequest, skipGrowl, objData) {
@@ -5937,7 +5938,7 @@ function WsHandler() {
 		} else {
 			self.logData("WS_OUT", objData, jsonRequest)();
 			self.ws.send(jsonRequest);
-			self.displayProggress(jsonRequest);
+			self.displayProgress(jsonRequest.length, objData.messageId);
 			return true;
 		}
 	};
@@ -5962,7 +5963,9 @@ function WsHandler() {
 	};
 	self.onWsClose = function (e) {
 		self.setStatus(false);
-		self.hideGrowlProggress();
+		for (var k in self.progressInterval) {
+			self.hideGrowlProgress(k);
+		}
 		var reason = e.reason || e;
 		if (e.code === 403) {
 			var message = "Server has forbidden request because '{}'".format(reason);
