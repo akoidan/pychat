@@ -77,7 +77,7 @@ conf = {
 	},
 	'user profile': {
 		'list_filter': ('last_login', 'sex'),
-		'search_fields': ('username', )
+		'search_fields': ('username', 'email' )
 	},
 	'verification': {
 		'list_filter': ('verified', 'time'),
