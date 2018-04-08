@@ -19,6 +19,13 @@ def get_random_path(instance, filename):
 	"""
 	return "{}_{}".format(id_generator(8), filename)
 
+def myoverridenmeta(name, bases, adict):
+	newClass = type(name, bases, adict)
+	for field in newClass._meta.fields:
+		if field.attname == 'password':
+			field.blank = True
+	return newClass
+
 
 class User(AbstractBaseUser):
 	def get_short_name(self):
@@ -62,6 +69,8 @@ class User(AbstractBaseUser):
 			self.sex = 2
 		else:
 			self.sex = 0
+
+	__metaclass__ = myoverridenmeta
 
 
 class Subscription(models.Model):
@@ -114,7 +123,6 @@ class Verification(models.Model):
 
 class UserProfile(User):
 	name = CharField(max_length=30, null=True, blank=True)
-
 	surname = CharField(max_length=30, null=True, blank=True)
 	# tho email max length is 254 characted mysql supports unique keys only 767 bytes long (utf8 4 bytes = 767/4 = 191)
 	email = models.EmailField(null=True, unique=True, blank=True, max_length=190)
@@ -133,7 +141,7 @@ class UserProfile(User):
 	incoming_file_call_sound = BooleanField(null=False, default=True)
 	message_sound = BooleanField(null=False, default=True)
 
-	email_verification = models.ForeignKey(Verification, null=True)
+	email_verification = models.ForeignKey(Verification, null=True, blank=True)
 
 	def save(self, *args, **kwargs):
 		"""
