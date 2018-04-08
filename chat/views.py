@@ -8,6 +8,7 @@ from django.conf import settings
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
+from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail, mail_admins
 
 from chat.templatetags.md5url import md5url
@@ -28,14 +29,14 @@ from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 from django.views.generic import View
 from chat import utils
-from chat.decorators import login_required_no_redirect
+from chat.decorators import login_required_no_redirect, validation
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
 	SubscriptionMessages, RoomUsers, Room, UserJoinedInfo
 from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
 	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip, \
-	get_or_create_ip_wrapper
+	get_or_create_ip_wrapper, send_email_changed, send_password_changed
 
 logger = logging.getLogger(__name__)
 RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
@@ -51,17 +52,13 @@ def handler404(request):
 
 
 @require_http_methods(['POST'])
+@validation
 def validate_email(request):
 	"""
 	POST only, validates email during registration
 	"""
-	email = request.POST.get('email')
-	try:
-		utils.check_email(email)
-		response = settings.VALIDATION_IS_OK
-	except ValidationError as e:
-		response = e.message
-	return HttpResponse(response, content_type='text/plain')
+	utils.check_email(request.POST.get('email'))
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 
 @require_http_methods(['POST'])
@@ -138,18 +135,14 @@ def register_subscription(request):
 	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 @require_http_methods('POST')
+@validation
 def validate_user(request):
 	"""
 	Validates user during registration
 	"""
-	try:
-		username = request.POST.get('username')
-		utils.check_user(username)
-		# hardcoded ok check in register.js
-		message = settings.VALIDATION_IS_OK
-	except ValidationError as e:
-		message = e.message
-	return HttpResponse(message, content_type='text/plain')
+	utils.check_user(request.POST.get('username'))
+	# hardcoded ok check in register.js
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 
 def get_service_worker(request):  # this stub is only for development, this is replaced in nginx for prod
@@ -266,26 +259,22 @@ class RestorePassword(View):
 			raise ValidationError('Unknown verification token')
 
 	@transaction.atomic
+	@validation
 	def post(self, request):
 		"""
 		Sends email verification token
 		"""
 		token = request.POST.get('token', False)
-		try:
-			logger.debug('Proceed Recover password with token %s', token)
-			user, verification = self.get_user_by_code(token)
-			password = request.POST.get('password')
-			check_password(password)
-			user.set_password(password)
-			user.save(update_fields=('password',))
-			verification.verified = True
-			verification.save(update_fields=('verified',))
-			logger.info('Password has been change for token %s user %s(id=%d)', token, user.username, user.id)
-			response = settings.VALIDATION_IS_OK
-		except ValidationError as e:
-			logger.debug('Rejecting verification token %s because %s', token, e)
-			response = "".join(("You can't reset password with this token because ", str(e)))
-		return HttpResponse(response, content_type='text/plain')
+		logger.debug('Proceed Recover password with token %s', token)
+		user, verification = self.get_user_by_code(token)
+		password = request.POST.get('password')
+		check_password(password)
+		user.set_password(password)
+		user.save(update_fields=('password',))
+		verification.verified = True
+		verification.save(update_fields=('verified',))
+		logger.info('Password has been change for token %s user %s(id=%d)', token, user.username, user.id)
+		return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 	def get(self, request):
 		token = request.GET.get('token', False)
@@ -385,19 +374,35 @@ class ProfileView(View):
 		c['date_format'] = settings.DATE_INPUT_FORMATS_JS
 		return render_to_response('change_profile.html', c, context_instance=RequestContext(request))
 
+	@validation
 	@login_required_no_redirect()
 	def post(self, request):
 		logger.info('Saving profile: %s', hide_fields(request.POST, ("base64_image", ), huge=True))
 		user_profile = UserProfile.objects.get(pk=request.user.id)
 		image_base64 = request.POST.get('base64_image')
-
+		if request.POST['email']:
+			utils.validate_email(request.POST['email'])
+		utils.validate_user(request.POST['username'])
 		if image_base64 is not None:
 			image = extract_photo(image_base64)
 			request.FILES['photo'] = image
-
+		passwd = request.POST['password']
+		if passwd:
+			if request.user.password:
+				is_valid = authenticate(username=request.user.username, password=request.POST['old_password'])
+				if not is_valid:
+					return HttpResponse("Invalid old password", content_type='text/plain')
+			utils.check_password(passwd)
+			request.POST['password'] = make_password(passwd)
 		form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 		if form.is_valid():
+			if not passwd:
+				form.instance.password = form.initial['password']
 			profile = form.save()
+			if passwd:
+				send_password_changed(request, form.initial['email'])
+			if request.POST['email'] != form.initial['email']:
+				send_email_changed(request, form.initial['email'], request.POST['email'])
 			response = profile. photo.url if 'photo' in  request.FILES else settings.VALIDATION_IS_OK
 		else:
 			response = form.errors
@@ -421,24 +426,20 @@ class RegisterView(View):
 		return render_to_response("register.html", c, context_instance=RequestContext(request))
 
 	@transaction.atomic
+	@validation
 	def post(self, request):
-		try:
-			rp = request.POST
-			logger.info('Got register request %s', hide_fields(rp, ('password', 'repeatpassword')))
-			(username, password, email) = (rp.get('username'), rp.get('password'), rp.get('email'))
-			check_user(username)
-			check_password(password)
-			check_email(email)
-			user_profile = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
-			user_profile.set_password(password)
-			create_user_model(user_profile)
-			# You must call authenticate before you can call login
-			auth_user = authenticate(username=username, password=password)
-			message = settings.VALIDATION_IS_OK  # redirect
-			if email:
-				send_sign_up_email(user_profile, request.get_host(), request)
-			djangologin(request, auth_user)
-		except ValidationError as e:
-			message = e.message
-			logger.debug('Rejecting request because "%s"', message)
-		return HttpResponse(message, content_type='text/plain')
+		rp = request.POST
+		logger.info('Got register request %s', hide_fields(rp, ('password', 'repeatpassword')))
+		(username, password, email) = (rp.get('username'), rp.get('password'), rp.get('email'))
+		check_user(username)
+		check_password(password)
+		check_email(email)
+		user_profile = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
+		user_profile.set_password(password)
+		create_user_model(user_profile)
+		# You must call authenticate before you can call login
+		auth_user = authenticate(username=username, password=password)
+		if email:
+			send_sign_up_email(user_profile, request.get_host(), request)
+		djangologin(request, auth_user)
+		return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')

@@ -6,6 +6,7 @@ import sys
 from io import BytesIO
 
 import requests
+from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -226,16 +227,20 @@ def check_user(username):
 	:raises ValidationError exception if username is not valid
 	"""
 	# Skip javascript validation, only summary message
-	if is_blank(username):
-		raise ValidationError("Username can't be empty")
-	if not re.match(USERNAME_REGEX, username):
-		raise ValidationError("Username {} doesn't match regex {}".format(username, USERNAME_REGEX))
+	validate_user(username)
 	try:
 		# theoretically can throw returning 'more than 1' error
 		User.objects.get(username=username)
 		raise ValidationError("Username {} is already used. Please select another one".format(username))
 	except User.DoesNotExist:
 		pass
+
+
+def validate_user(username):
+	if is_blank(username):
+		raise ValidationError("Username can't be empty")
+	if not re.match(USERNAME_REGEX, username):
+		raise ValidationError("Username {} doesn't match regex {}".format(username, USERNAME_REGEX))
 
 
 def get_client_ip(request):
@@ -324,6 +329,35 @@ def send_reset_password_email(request, user_profile, verification):
 	}
 	html_message = render_to_string('reset_pass_email.html', context, context_instance=RequestContext(request))
 	send_mail("Pychat: restore password", message, request.get_host(), (user_profile.email,), fail_silently=False,
+				 html_message=html_message)
+
+
+def send_password_changed(request, email):
+	message = "Password has been changed for user {}".format(request.user.username)
+	ip_info = get_or_create_ip(get_client_ip(request), logger)
+	context = {
+		'username': request.user.username,
+		'ipInfo': ip_info.info,
+		'ip': ip_info.ip,
+		'timeCreated': datetime.now(),
+	}
+	html_message = render_to_string('change_password.html', context, context_instance=RequestContext(request))
+	send_mail("Pychat: password change", message, request.get_host(), (email,), fail_silently=False,
+				 html_message=html_message)
+
+
+def send_email_changed(request, old_email, new_email):
+	message = "Dmail been changed for user {}".format(request.user.username)
+	ip_info = get_or_create_ip(get_client_ip(request), logger)
+	context = {
+		'username': request.user.username,
+		'ipInfo': ip_info.info,
+		'ip': ip_info.ip,
+		'timeCreated': datetime.now(),
+		'email': new_email,
+	}
+	html_message = render_to_string('change_email.html', context, context_instance=RequestContext(request))
+	send_mail("Pychat: email change", message, request.get_host(), (old_email,), fail_silently=False,
 				 html_message=html_message)
 
 

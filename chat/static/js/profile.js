@@ -11,6 +11,9 @@ var changeProfileForm;
 var embeddedYoutubeInput;
 var highlightCodeInput;
 var logsInput;
+var password;
+var repeatPassword;
+var oldPassword;
 var photoSrc = null;
 
 function initChangeProfile() {
@@ -26,6 +29,9 @@ function initChangeProfile() {
 	onlineChangeSoundInput = $('id_online_change_sound');
 	incomingFileCallSoundInput = $('id_incoming_file_call_sound');
 	messageSoundInput = $('id_message_sound');
+	password = $('id_password');
+	repeatPassword = $('id_repeat_password');
+	oldPassword = $('id_old_password');
 	logsInput = $('id_logs');
 	video.addEventListener('click', takeSnapshot, false);
 	photoImg.addEventListener('drop', dropPhoto, false);
@@ -177,6 +183,10 @@ function saveProfile(event) {
 	event.preventDefault();
 	var image = null;
 	var params = null;
+	if (password.value.length > 0 && password.value !== repeatPassword.value) {
+		growlError("Passwords don't match");
+		return;
+	}
 	if (photoSrc == 'canvas' || photoSrc == 'drop') {
 		if (photoSrc == 'canvas') {
 			image = canvas.toDataURL("image/png");
@@ -200,6 +210,9 @@ function saveProfile(event) {
 			ajaxHide();
 		}
 		if (response === RESPONSE_SUCCESS) {
+			oldPassword.value = "";
+			password.value = "";
+			repeatPassword.value = "";
 			growlSuccess("Your profile has been successfully updated. Press home icon to return on main page");
 			setJsState();
 		} else {

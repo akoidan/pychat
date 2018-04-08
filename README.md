@@ -147,6 +147,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Add confirmation email when email changes
 * Messages should appear in chat instantly with automatic resend when connection is up
 * signup verification emails is sent to admin instead of current user.
 * Add avatar to notifications and users 
@@ -175,8 +176,7 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * TODO if someone offers a new call till establishing connection for a call self.call_receiver_channel would be set to wrong
 * !!!IMPORTANT Debug call dialog by switching channels while calling and no.
 * shape-inside for contentteditable 
-* Add multi-language support. 
-* add email confirmation for username or password change
+* Add multi-language support.
 * remember if user has camera/mic and autoset values after second call
 * android play() can only be initiated by a user gesture.
 * add 404page
@@ -187,7 +187,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * add antiflood settings to nginx
 * tornado redis connection reset prevents user from deleting its entry in online_users
 * add media query for register and usersettings to adjust for phone's width
-* add change password and realtime javascript to change_profile
 * file upload http://stackoverflow.com/a/14605593/3872976
 * add pictures preview if user post an url that's content-type =image
 * SELECT_SELF_ROOM  https://github.com/Deathangel908/djangochat/blob/master/chat/settings.py#L292-L303 doesnt work with mariadb engine 10.1
