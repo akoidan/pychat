@@ -2359,6 +2359,7 @@ function PageHandler() {
 
 function ChannelsHandler() {
 	var self = this;
+	self.MAX_MESSAGE_SIZE = 40000000;
 	var logger = {
 		warn: loggerFactory.getLogger("CHAT", console.warn, 'color: #FF0F00; font-weight: bold'),
 		info: loggerFactory.getLogger("CHAT", console.log, 'color: #FF0F00; font-weight: bold'),
@@ -2656,6 +2657,11 @@ function ChannelsHandler() {
 	};
 	self.handleSendMessage = function () {
 		var buHtml = userMessage.innerHTML;
+		var bul = buHtml.length;
+		if (bul > self.MAX_MESSAGE_SIZE) {
+			growlError("Can't send {} in a single message, that exceed {} limit. Please split it into multiple.".format(bytesToSize(bul), bytesToSize(self.MAX_MESSAGE_SIZE)));
+			return;
+		}
 		var isEdit = self.editLastMessageNode && !self.editLastMessageNode.notReady;
 		var currSymbol = '\u3500'; // it's gonna increase in getPastedImage
 		if (isEdit && self.editLastMessageNode.dom) {
