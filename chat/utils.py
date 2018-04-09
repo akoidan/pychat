@@ -3,10 +3,10 @@ import json
 import logging
 import re
 import sys
+import datetime
 from io import BytesIO
 
 import requests
-from datetime import datetime
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -18,6 +18,7 @@ from django.db import connection, OperationalError, InterfaceError
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.utils.timezone import utc
 
 from chat import local
 from chat.models import Image
@@ -327,8 +328,75 @@ def send_reset_password_email(request, user_profile, verification):
 		'timeCreated': verification.time,
 		'greetings': start_message
 	}
-	html_message = render_to_string('reset_pass_email.html', context, context_instance=RequestContext(request))
+	html_message = render_to_string('token_email.html', context, context_instance=RequestContext(request))
 	send_mail("Pychat: restore password", message, request.get_host(), (user_profile.email,), fail_silently=False,
+				 html_message=html_message)
+
+
+def get_user_by_code(token, type):
+	"""
+	:param token: token code to verify
+	:type token: str
+	:raises ValidationError: if token is not usable
+	:return: UserProfile, Verification: if token is usable
+	"""
+	try:
+		v = Verification.objects.get(token=token)
+		if v.type_enum != type:
+			raise ValidationError("it's not for this operation ")
+		if v.verified:
+			raise ValidationError("it's already used")
+		# TODO move to sql query or leave here?
+		if v.time < datetime.datetime.utcnow().replace(tzinfo=utc) - datetime.timedelta(days=1):
+			raise ValidationError("it's expired")
+		return UserProfile.objects.get(id=v.user_id), v
+	except Verification.DoesNotExist:
+		raise ValidationError('Unknown verification token')
+
+
+def send_new_email_ver(request, user, email):
+	new_ver = Verification(user=user, type_enum=Verification.TypeChoices.confirm_email)
+	new_ver.save()
+	link = "{}://{}/confirm_email?token={}".format(settings.SITE_PROTOCOL, request.get_host(), new_ver.token)
+	text = ('Hi {}, you have changed email to curren on pychat \nTo verify it, please click on the url: {}') \
+		.format(user.username, link)
+	start_message = mark_safe("You have changed email to current one in  <b>Pychat</b>. \n"
+									  "To stay safe please verify it by clicking on the url below.")
+	context = {
+		'username': user.username,
+		'magicLink': link,
+		'btnText': "CONFIRM THIS EMAIL",
+		'greetings': start_message
+	}
+	html_message = render_to_string('sign_up_email.html', context, context_instance=RequestContext(request))
+	logger.info('Sending verification email to userId %s (email %s)', user.id, email)
+	send_mail("Confirm this email", text, request.get_host(), [email, ], html_message=html_message,
+				 fail_silently=False)
+	return new_ver
+
+
+def send_email_change(request, user, verification):
+	link = "{}://{}/change_email?token={}".format(settings.SITE_PROTOCOL, request.get_host(), verification.token)
+	message = "{},\n" \
+				 "You requested to change an email on site {}.\n" \
+				 "To proceed click on the link {}\n" \
+				 "If you didn't request the email change someone has hijacked your account. Please change your password" \
+		.format(user.username, request.get_host(), link)
+	ip_info = get_or_create_ip(get_client_ip(request), logger)
+	start_message = mark_safe(
+		"You have requested an email change on <b>Pychat</b>. Please click on the link below to proceed. If it wasn't you,"
+		" we recommend to change your password because someone has hijacked your account.")
+	context = {
+		'username': user.username,
+		'magicLink': link,
+		'ipInfo': ip_info.info,
+		'ip': ip_info.ip,
+		'btnText': "CHANGE EMAIL",
+		'timeCreated': verification.time,
+		'greetings': start_message
+	}
+	html_message = render_to_string('token_email.html', context, context_instance=RequestContext(request))
+	send_mail("Pychat: change email", message, request.get_host(), (user.email,), fail_silently=False,
 				 html_message=html_message)
 
 
@@ -339,7 +407,7 @@ def send_password_changed(request, email):
 		'username': request.user.username,
 		'ipInfo': ip_info.info,
 		'ip': ip_info.ip,
-		'timeCreated': datetime.now(),
+		'timeCreated': datetime.datetime.now(),
 	}
 	html_message = render_to_string('change_password.html', context, context_instance=RequestContext(request))
 	send_mail("Pychat: password change", message, request.get_host(), (email,), fail_silently=False,
@@ -353,7 +421,7 @@ def send_email_changed(request, old_email, new_email):
 		'username': request.user.username,
 		'ipInfo': ip_info.info,
 		'ip': ip_info.ip,
-		'timeCreated': datetime.now(),
+		'timeCreated': datetime.datetime.now(),
 		'email': new_email,
 	}
 	html_message = render_to_string('change_email.html', context, context_instance=RequestContext(request))

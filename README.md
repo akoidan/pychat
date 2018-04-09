@@ -147,7 +147,6 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
-* Add confirmation email when email changes
 * Messages should appear in chat instantly with automatic resend when connection is up
 * signup verification emails is sent to admin instead of current user.
 * Add avatar to notifications and users 

@@ -2,14 +2,13 @@
 import datetime
 import json
 import logging
-
 import os
-from django.conf import settings
+
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 from django.contrib.auth.hashers import make_password
-from django.core.mail import send_mail, mail_admins
+from django.core.mail import mail_admins
 
 from chat.templatetags.md5url import md5url
 
@@ -19,11 +18,9 @@ except ImportError:
 	from django.core.context_processors import csrf
 from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
 from django.db import transaction
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q
 from django.http import Http404
-from django.utils.timezone import utc
 from django.http import HttpResponse
-from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
@@ -36,7 +33,7 @@ from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verificatio
 from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
 	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip, \
-	get_or_create_ip_wrapper, send_email_changed, send_password_changed
+	send_password_changed, send_email_change, send_new_email_ver
 
 logger = logging.getLogger(__name__)
 RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
@@ -233,30 +230,34 @@ def send_restore_password(request):
 	return HttpResponse(message, content_type='text/plain')
 
 
-def get_html_restore_pass():
-	""""""
+@require_http_methods(['GET'])
+def proceed_email_changed(request):
+	try:
+		with transaction.atomic():
+			token = request.POST.get('token', False)
+			logger.debug('Proceed change email with token %s', token)
+			user, verification = utils.get_user_by_code(token, Verification.TypeChoices.email)
+			new_ver = send_new_email_ver(request, user, verification.email)
+			user.email = verification.email
+			user.email_verification = new_ver.id
+			user.save(update_fields=('email', 'email_verification'))
+			verification.verified = True
+			verification.save(update_fields=('verified',))
+			logger.info('Email has been change for token %s user %s(id=%d)', token, user.username, user.id)
+			return render_to_response(
+				'email_changed.html',
+				{'text': 'Your email has been changed to {}.'.format(verification.email)},
+				context_instance=RequestContext(request)
+			)
+	except Exception as e:
+		return render_to_response(
+			'email_changed.html',
+			{'text': 'Unable to change your email because {}'.format(e.message)}
+			, context_instance=RequestContext(request)
+		)
+
 
 class RestorePassword(View):
-
-	def get_user_by_code(self, token):
-		"""
-		:param token: token code to verify
-		:type token: str
-		:raises ValidationError: if token is not usable
-		:return: UserProfile, Verification: if token is usable
-		"""
-		try:
-			v = Verification.objects.get(token=token)
-			if v.type_enum != Verification.TypeChoices.password:
-				raise ValidationError("it's not for this operation ")
-			if v.verified:
-				raise ValidationError("it's already used")
-			# TODO move to sql query or leave here?
-			if v.time < datetime.datetime.utcnow().replace(tzinfo=utc) - datetime.timedelta(days=1):
-				raise ValidationError("it's expired")
-			return UserProfile.objects.get(id=v.user_id), v
-		except Verification.DoesNotExist:
-			raise ValidationError('Unknown verification token')
 
 	@transaction.atomic
 	@validation
@@ -266,7 +267,7 @@ class RestorePassword(View):
 		"""
 		token = request.POST.get('token', False)
 		logger.debug('Proceed Recover password with token %s', token)
-		user, verification = self.get_user_by_code(token)
+		user, verification = utils.get_user_by_code(token, Verification.TypeChoices.password)
 		password = request.POST.get('password')
 		check_password(password)
 		user.set_password(password)
@@ -280,7 +281,7 @@ class RestorePassword(View):
 		token = request.GET.get('token', False)
 		logger.debug('Rendering restore password page with token  %s', token)
 		try:
-			user = self.get_user_by_code(token)[0]
+			user = utils.get_user_by_code(token, Verification.TypeChoices.password)[0]
 			response = {
 				'message': settings.VALIDATION_IS_OK,
 				'restore_user': user.username,
@@ -304,7 +305,7 @@ def confirm_email(request):
 			v = Verification.objects.get(token=token)
 		except Verification.DoesNotExist:
 			raise ValidationError('Unknown verification token')
-		if v.type_enum != Verification.TypeChoices.register:
+		if v.type_enum not in (Verification.TypeChoices.register, Verification.TypeChoices.confirm_email):
 			raise ValidationError('This is not confirm email token')
 		if v.verified:
 			raise ValidationError('This verification token already accepted')
@@ -375,13 +376,15 @@ class ProfileView(View):
 		return render_to_response('change_profile.html', c, context_instance=RequestContext(request))
 
 	@validation
+	@transaction.atomic
 	@login_required_no_redirect()
 	def post(self, request):
 		logger.info('Saving profile: %s', hide_fields(request.POST, ("base64_image", ), huge=True))
 		user_profile = UserProfile.objects.get(pk=request.user.id)
 		image_base64 = request.POST.get('base64_image')
-		if request.POST['email']:
-			utils.validate_email(request.POST['email'])
+		new_email = request.POST['email']
+		if new_email:
+			utils.validate_email(new_email)
 		utils.validate_user(request.POST['username'])
 		if image_base64 is not None:
 			image = extract_photo(image_base64)
@@ -396,13 +399,24 @@ class ProfileView(View):
 			request.POST['password'] = make_password(passwd)
 		form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 		if form.is_valid():
+			email_changed = new_email != form.initial['email']
 			if not passwd:
 				form.instance.password = form.initial['password']
+			if email_changed:
+				if form.initial['email'] and form.instance.email_verification and  form.instance.email_verification.verified:
+					verification = Verification(
+						type_enum=Verification.TypeChoices.email,
+						user_id=user_profile.id,
+						email=new_email
+					)
+					verification.save()
+					send_email_change(request, form.initial, verification)
+					raise ValidationError("In order to change an email please confirm it from you current address. We send you an verification email to {}.".format(form.initial['email']))
+				new_ver = send_new_email_ver(request, request.user, new_email)
+				form.instance.email_verification = new_ver
 			profile = form.save()
 			if passwd:
 				send_password_changed(request, form.initial['email'])
-			if request.POST['email'] != form.initial['email']:
-				send_email_changed(request, form.initial['email'], request.POST['email'])
 			response = profile. photo.url if 'photo' in  request.FILES else settings.VALIDATION_IS_OK
 		else:
 			response = form.errors

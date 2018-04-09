@@ -95,6 +95,8 @@ class Verification(models.Model):
 	class TypeChoices(Enum):
 		register = 'r'
 		password = 'p'
+		email = 'e'
+		confirm_email = 'c'
 
 	# a - account activation, r - recover
 	type = models.CharField(null=False, max_length=1)
@@ -102,6 +104,7 @@ class Verification(models.Model):
 	user = models.ForeignKey(User, null=False)
 	time = models.DateTimeField(default=datetime.datetime.now)
 	verified = BooleanField(default=False)
+	email = models.EmailField(null=True, unique=False, blank=True, max_length=190)
 
 	def __unicode__(self):
 		return self.__str__()
