@@ -1,15 +1,6 @@
 {% extends "base.html" %}
 {% block head %}
 	{% load md5url %}<link rel="stylesheet" type="text/css" href="{% md5url 'css/main.css' %}">
-	<script type="text/javascript">
-		var a = "{{message}}";
-		if (a == RESPONSE_SUCCESS ) {
-			alert('verification code is accepted');
-			setTimeout(function() {
-				location.href = '/';
-			}, 5000);
-		}
-	</script>
 {% endblock head %}
 {% block content %}
 	{% if message == successResponse %}
@@ -20,5 +11,6 @@
 		<div class="message">
 			{{ message }}
 		</div>
+		<div> <a href="/">Go to main page</a> </div>
 	{% endif %}
 {% endblock %}

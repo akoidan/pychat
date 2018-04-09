@@ -234,12 +234,12 @@ def send_restore_password(request):
 def proceed_email_changed(request):
 	try:
 		with transaction.atomic():
-			token = request.POST.get('token', False)
+			token = request.GET['token']
 			logger.debug('Proceed change email with token %s', token)
 			user, verification = utils.get_user_by_code(token, Verification.TypeChoices.email)
 			new_ver = send_new_email_ver(request, user, verification.email)
 			user.email = verification.email
-			user.email_verification = new_ver.id
+			user.email_verification = new_ver
 			user.save(update_fields=('email', 'email_verification'))
 			verification.verified = True
 			verification.save(update_fields=('verified',))
@@ -375,14 +375,17 @@ class ProfileView(View):
 		c['date_format'] = settings.DATE_INPUT_FORMATS_JS
 		return render_to_response('change_profile.html', c, context_instance=RequestContext(request))
 
-	@validation
+
 	@transaction.atomic
 	@login_required_no_redirect()
+	@validation # should follow after transaciton.atomic, thus ValidationError doesn't rollback
 	def post(self, request):
 		logger.info('Saving profile: %s', hide_fields(request.POST, ("base64_image", ), huge=True))
 		user_profile = UserProfile.objects.get(pk=request.user.id)
 		image_base64 = request.POST.get('base64_image')
 		new_email = request.POST['email']
+		if not new_email:
+			new_email = None
 		if new_email:
 			utils.validate_email(new_email)
 		utils.validate_user(request.POST['username'])
@@ -399,10 +402,9 @@ class ProfileView(View):
 			request.POST['password'] = make_password(passwd)
 		form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 		if form.is_valid():
-			email_changed = new_email != form.initial['email']
 			if not passwd:
 				form.instance.password = form.initial['password']
-			if email_changed:
+			if new_email != form.initial['email']:
 				if form.initial['email'] and form.instance.email_verification and  form.instance.email_verification.verified:
 					verification = Verification(
 						type_enum=Verification.TypeChoices.email,
@@ -410,12 +412,13 @@ class ProfileView(View):
 						email=new_email
 					)
 					verification.save()
-					send_email_change(request, form.initial, verification)
+					send_email_change(request, request.user.username, form.initial['email'], verification, new_email)
 					raise ValidationError("In order to change an email please confirm it from you current address. We send you an verification email to {}.".format(form.initial['email']))
-				new_ver = send_new_email_ver(request, request.user, new_email)
-				form.instance.email_verification = new_ver
+				if new_email:
+					new_ver = send_new_email_ver(request, request.user, new_email)
+					form.instance.email_verification = new_ver
 			profile = form.save()
-			if passwd:
+			if passwd and form.initial['email']:
 				send_password_changed(request, form.initial['email'])
 			response = profile. photo.url if 'photo' in  request.FILES else settings.VALIDATION_IS_OK
 		else:

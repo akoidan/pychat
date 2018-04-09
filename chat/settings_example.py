@@ -20,17 +20,25 @@ globals().update(importlib.import_module(config).__dict__)
 
 ### this this emails settings will be used to send emails. E.g. when user restores password via email.
 ###  Comment them out if you don't want to setup
-
-# EMAIL_USE_TLS = True
-# EMAIL_HOST = 'localhost' # For gmail settings example 'smtp.gmail.com'
-# EMAIL_PORT = 25 # google smpt port '587'
-# EMAIL_HOST_USER = '' # you gmail username e.g. 'chat.django@gmail.com'
-# EMAIL_HOST_PASSWORD = '' # Your gmail password  e.g. 'Ilovepython'
-# SERVER_EMAIL = 'root@pychat.org'
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # ADMINS = [('YourName', 'emailAddresThatYouWillReceiveReportsOn@gmail.com'), ]
 
+# EMAIL_USE_TLS = True
+# EMAIL_HOST = 'localhost'
+# EMAIL_PORT = 25
+# EMAIL_HOST_USER = ''
+# EMAIL_HOST_PASSWORD = ''
+# SERVER_EMAIL = 'root@pychat.org'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
+
+### Gmail smpt (from account) settings example:
+#EMAIL_USE_TLS = True
+#EMAIL_HOST = 'smtp.gmail.com' # For gmail settings example
+#EMAIL_PORT = '587' # google smpt port
+#EMAIL_HOST_USER = 'chat.django@gmail.com'
+#EMAIL_HOST_PASSWORD = 'Ilovepython'
+#SERVER_EMAIL = 'chat.django@gmail.com'
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
 ### Pychat also supports https://developers.google.com/web/fundamentals/push-notifications/ firebase notifications, like in facebook.
 ### They will fire even user doesn't have opened tab. That can be turned on/off by used in his/her profile with checkbox `Notifications`.

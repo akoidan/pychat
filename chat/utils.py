@@ -355,7 +355,7 @@ def get_user_by_code(token, type):
 
 
 def send_new_email_ver(request, user, email):
-	new_ver = Verification(user=user, type_enum=Verification.TypeChoices.confirm_email)
+	new_ver = Verification(user=user, type_enum=Verification.TypeChoices.confirm_email, email=email)
 	new_ver.save()
 	link = "{}://{}/confirm_email?token={}".format(settings.SITE_PROTOCOL, request.get_host(), new_ver.token)
 	text = ('Hi {}, you have changed email to curren on pychat \nTo verify it, please click on the url: {}') \
@@ -370,24 +370,27 @@ def send_new_email_ver(request, user, email):
 	}
 	html_message = render_to_string('sign_up_email.html', context, context_instance=RequestContext(request))
 	logger.info('Sending verification email to userId %s (email %s)', user.id, email)
-	send_mail("Confirm this email", text, request.get_host(), [email, ], html_message=html_message,
+	try:
+		send_mail("Confirm this email", text, request.get_host(), [email, ], html_message=html_message,
 				 fail_silently=False)
-	return new_ver
+		return new_ver
+	except Exception as e:
+		logger.exception("Failed to send email")
+		raise ValidationError(e.message)
 
 
-def send_email_change(request, user, verification):
+def send_email_change(request, username, old_email, verification, new_email):
 	link = "{}://{}/change_email?token={}".format(settings.SITE_PROTOCOL, request.get_host(), verification.token)
 	message = "{},\n" \
-				 "You requested to change an email on site {}.\n" \
+				 "You requested to change an email from {} to {} on site {}.\n" \
 				 "To proceed click on the link {}\n" \
 				 "If you didn't request the email change someone has hijacked your account. Please change your password" \
-		.format(user.username, request.get_host(), link)
+		.format(old_email, new_email, username, request.get_host(), link)
 	ip_info = get_or_create_ip(get_client_ip(request), logger)
 	start_message = mark_safe(
-		"You have requested an email change on <b>Pychat</b>. Please click on the link below to proceed. If it wasn't you,"
-		" we recommend to change your password because someone has hijacked your account.")
+		"You have requested an email change on <b>Pychat</b>. After you click on the url bellow we replace email in your profile from current one ({}) to {}. If it wasn't you please change your password as soon as possible".format(old_email, new_email))
 	context = {
-		'username': user.username,
+		'username': username,
 		'magicLink': link,
 		'ipInfo': ip_info.info,
 		'ip': ip_info.ip,
@@ -396,7 +399,7 @@ def send_email_change(request, user, verification):
 		'greetings': start_message
 	}
 	html_message = render_to_string('token_email.html', context, context_instance=RequestContext(request))
-	send_mail("Pychat: change email", message, request.get_host(), (user.email,), fail_silently=False,
+	send_mail("Pychat: change email", message, request.get_host(), (old_email,), fail_silently=False,
 				 html_message=html_message)
 
 

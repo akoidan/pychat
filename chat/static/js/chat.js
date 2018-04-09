@@ -81,7 +81,7 @@ onDocLoad(function () {
 			if (response === RESPONSE_SUCCESS) {
 				window.location = '/register'
 			} else {
-				growlError("<div>Unable to logout, because: " + r + "</div>")
+				growlError("<div>Unable to logout, because: " + response + "</div>")
 			}
 		});
 	}
