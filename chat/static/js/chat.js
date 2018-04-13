@@ -3584,16 +3584,17 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		replaceCodePattern: '<pre>$1</pre>',
 		quotePattern: /(^\(\d\d:\d\d:\d\d\)\s[a-zA-Z-_0-9]{1,16}:)(.*)&gt;&gt;&gt;<br>/,
 		replaceQuotePattern: '<div class="quote"><span>$1</span>$2</div>'
-	}
+	};
 	self.encodeHtmlAll = function (html) {
-		var a = encodeHTML(html).replace(self.patterns.linksRegex, self.patterns.replaceLinkPattern);
+		var a = encodeHTML(html);
+		a = a.replace(self.patterns.quotePattern, self.patterns.replaceQuotePattern);
+		a = a.replace(self.patterns.linksRegex, self.patterns.replaceLinkPattern);
 		if (window.embeddedYoutube) {
 			a = a.replace(self.patterns.youTubePattern, self.patterns.replaceYoutubePattern);
 		}
 		a = a.replace(self.patterns.codePattern, self.patterns.replaceCodePattern);
-		a = a.replace(self.patterns.quotePattern, self.patterns.replaceQuotePattern);
 		return a;
-	}
+	};
 	self.encodeMessage = function (data) {
 		if (data.giphy) {
 			return '<div class="giphy"><img src="{0}" /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>'.formatPos(data.giphy);
