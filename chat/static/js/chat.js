@@ -3577,9 +3577,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	};
 	self.patterns = {
 		linksRegex: /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g, /*http://anycharacter except end of text, <br> or space*/
-		youTubePattern: /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)?[^"]*" target="_blank">[^<]+<\/a>/,
 		replaceLinkPattern: '<a href="$1" target="_blank">$1</a>',
-		replaceYoutubePattern: '<div class="youtube-player" data-id="$1"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
+		youTubePattern: /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)(?:[^"]*?\&amp\;t=([\w\-\_]*))?[^"]*" target="_blank">[^<]+<\/a>/,
+		replaceYoutubePattern: '<div class="youtube-player" data-id="$1" data-time="$2"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
 		codePattern: /```(.+?)(?=```)```/,
 		replaceCodePattern: '<pre>$1</pre>',
 		quotePattern: /(^\(\d\d:\d\d:\d\d\)\s[a-zA-Z-_0-9]{1,16}:)(.*)&gt;&gt;&gt;<br>/,
@@ -6064,6 +6064,7 @@ var Utils = {
 		2: 'icon-volume-2',
 		3: 'icon-volume-3'
 	},
+	yotubeTimeRegex: /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/,
 	dataURItoBlob: function (dataURI) {
 		// convert base64/URLEncoded data component to raw binary data held in a string
 		var byteString = dataURI.split(',')[0].indexOf('base64') >= 0 ? atob(dataURI.split(',')[1]) :unescape(dataURI.split(',')[1]);
@@ -6082,13 +6083,41 @@ var Utils = {
 		sel.removeAllRanges();
 		sel.addRange(range);
 	},
+	getTime: function (time) {
+		var start = 0;
+		if (time) {
+			var res = Utils.yotubeTimeRegex.exec(time);
+			if (res) {
+				if (res[1]) {
+					start += res[1] * 3600;
+				}
+				if (res[2]) {
+					start += res[2] * 60;
+				}
+				if (res[3]) {
+					start += parseInt(res[3]);
+				}
+				if (res[4]) {
+					start += parseInt(res[4]);
+				}
+			}
+		}
+		return start;
+	},
 	setYoutubeEvent: function (e) {
 		if (window.embeddedYoutube) {
 			var r = e.querySelector('.youtube-player')
 			if (r) {
 				r.querySelector('.icon-youtube-play').onclick = function () {
 					var iframe = document.createElement("iframe");
-					iframe.setAttribute("src", "https://www.youtube.com/embed/" + r.getAttribute('data-id')+'?autoplay=1');
+					var id = r.getAttribute('data-id');
+					var time = Utils.getTime(r.getAttribute('data-time'));
+					if (time) {
+						time = '&start='+time;
+					} else {
+						time = ""
+					}
+					iframe.setAttribute("src", "https://www.youtube.com/embed/{}?autoplay=1{}".format(id, time));
 					iframe.setAttribute("frameborder", "0");
 					iframe.setAttribute("allowfullscreen", "1");
 					e.parentNode.replaceChild(iframe, e);

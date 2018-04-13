@@ -159,7 +159,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * WS close event doesn't fire after suspending PC to ram https://github.com/websockets/ws/issues/686
 * Add payback to firebase
 * Fix all broken painter event in mobile
-* youtube iframe should contain full link with time and other parmas
 * https://static.pychat.org/photo/xE9bSyvC_image.png
 * https://developers.google.com/web/updates/2015/12/background-sync
 * Added bad code stub for: Wrong message order, that prevents of successful webrtc connection: https://github.com/leporo/tornado-redis/issues/106 https://stackoverflow.com/questions/47496922/tornado-redis-garantee-order-of-published-messages
