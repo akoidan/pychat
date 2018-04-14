@@ -6117,8 +6117,10 @@ var Utils = {
 					} else {
 						time = ""
 					}
-					iframe.setAttribute("src", "https://www.youtube.com/embed/{}?autoplay=1{}".format(id, time));
+					var src =  "https://www.youtube.com/embed/{}?autoplay=1{}".format(id, time);
+					iframe.setAttribute("src", src);
 					iframe.setAttribute("frameborder", "0");
+					logger.info("Replacing youtube url {}", src)();
 					iframe.setAttribute("allowfullscreen", "1");
 					e.parentNode.replaceChild(iframe, e);
 				}
