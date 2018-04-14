@@ -1,7 +1,7 @@
 import hashlib
 import threading
-from os import path
-
+from os import path, name, stat
+from stat import S_ISDIR,ST_MODE
 from django import template
 
 from chat.settings import STATIC_URL, STATIC_ROOT, logging, DEBUG
@@ -22,6 +22,7 @@ def md5url(file_name):
 
 def calculate_url(file_name):
 	entry_name = file_name
+	file_path = None
 	try:
 		key = '#root#'
 		if key in file_name:
@@ -36,7 +37,8 @@ def calculate_url(file_name):
 		value = '%s%s?v=%s' % (prefix, file_name, md5)
 		logger.info("Caching url '%s' for file '%s'", value, file_name)
 	except Exception as e:
-		if hasattr(e, 'errno') and e.errno == 21:  # is a directory
+		mode = stat(file_path)[ST_MODE]
+		if file_path and S_ISDIR(mode):
 			value = STATIC_URL + file_name
 			logger.warning("Caching url '%s' for directory %s", value, file_name)
 		else:
