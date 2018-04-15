@@ -218,7 +218,7 @@ function saveProfile(event) {
 		} else {
 			growlError(response);
 		}
-	}, changeProfileForm);
+	}, new FormData(changeProfileForm));
 }
 
 

@@ -62,7 +62,7 @@ var RegisterValidator = function () {
 					} else {
 						self.setError(self.username, data);
 					}
-				}, null);
+				});
 			}
 		}
 	};
@@ -136,7 +136,7 @@ var RegisterValidator = function () {
 					} else {
 						self.setError(self.email, data);
 					}
-				}, null);
+				});
 			}
 		}
 	};
@@ -206,7 +206,7 @@ function redirectToNextPage(response) {
 function login(event) {
 	event.preventDefault();
 	ajaxShow();
-	doPost('/auth', null, redirectToNextPage, loginForm);
+	doPost('/auth', null, redirectToNextPage, new FormData(loginForm));
 }
 
 function initRegisterPage() {
@@ -251,7 +251,7 @@ function initRegisterPage() {
 function register(event) {
 	event.preventDefault();
 	ajaxShow();
-	doPost('/register', null, redirectToNextPage, registerForm);
+	doPost('/register', null, redirectToNextPage, new FormData(registerForm));
 }
 
 
@@ -275,7 +275,7 @@ function restorePassword(event) {
 		}
 	};
 	ajaxShow();
-	doPost('/send_restore_password', null, callback, form);
+	doPost('/send_restore_password', null, callback, new FormData(form));
 }
 
 

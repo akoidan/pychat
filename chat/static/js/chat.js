@@ -21,7 +21,7 @@ var GENDER_ICONS = {
 	'Secret': 'icon-user-secret'
 };
 var webRtcFileIcon;
-var navCallIcon;
+var navCallIconSearch;
 var directUserTable;
 var audioProcesssors = [];
 var smileUnicodeRegex = /[\u3400-\u3500]/g;
@@ -48,7 +48,7 @@ var chatTestVolume;
 
 onDocLoad(function () {
 	userMessage = $("usermsg");
-	navCallIcon = $('navCallIcon');
+	navCallIconSearch = $('navCallIconSearch');
 	headerText = $('headerText');
 	chatFileAudio = $('chatFile');
 	chatTestVolume = $('chatTestVolume');
@@ -2392,7 +2392,7 @@ function ChannelsHandler() {
 			imgInputIcon: $('imgInputIcon'),
 			usersStateText: $('usersStateText'),
 			inviteUser: $('inviteUser'),
-			navCallIcon: navCallIcon,
+			navCallIcon: $('navCallIcon'),
 			webRtcFileIcon: webRtcFileIcon,
 			m2Message: $('m2Message'),
 		};
@@ -2418,6 +2418,9 @@ function ChannelsHandler() {
 		return childDom;
 	})();
 	self.initCha = function() {
+		self.dom.navCallIcon.onclick = function() {
+			self.getActiveChannel().toggleCallHandler();
+		};
 		self.dom.addUserInput.onkeyup = self.filterAddUser;
 		self.dom.addUserList.onclick = self.addUserHolderClick;
 		document.body.ondrop = self.imageDrop;
@@ -3023,11 +3026,8 @@ function ChannelsHandler() {
 	self.postCallUserAction = function () {
 		self.getActiveChannel().getCallHandler().offerCall();
 	};
-	self.postCallTransferFileAction = function () {
-		webRtcApi.toggleCallContainer();
-	};
 	self.m2TransferFile = function () {
-		self.showOrInviteDirectChannel(self.postCallTransferFileAction);
+		self.showOrInviteDirectChannel(self.getActiveChannel().toggleCallHandler);
 		webRtcApi.dom.fileInput.value = null;
 		webRtcApi.dom.fileInput.click();
 	};
@@ -3087,15 +3087,15 @@ function ChannelsHandler() {
 	self.superHide = self.hide;
 	self.show = function() {
 		self.superShow();
-		CssUtils.showElement(navCallIcon);
+		CssUtils.showElement(self.dom.navCallIcon);
 		CssUtils.showElement(webRtcFileIcon);
 	};
 	self.render = self.show;
 	self.hide = function() {
 		self.superHide();
-		CssUtils.hideElement(navCallIcon);
+		CssUtils.hideElement(self.dom.navCallIcon);
 		CssUtils.hideElement(webRtcFileIcon);
-	}
+	};
 	self.initCha();
 }
 
@@ -5745,9 +5745,6 @@ function WebRtcApi() {
 	self.proxyHandler = function (data) {
 		self.connections[data.connId]['on' + data.type](data);
 	};
-	self.toggleCallContainer = function () {
-		channelsHandler.getActiveChannel().toggleCallHandler();
-	};
 	self.onsetConnectionId = function (message) {
 		var el = self.quedConnections[message.id];
 		delete self.quedConnections[message.id];
@@ -5803,7 +5800,6 @@ function WebRtcApi() {
 		delete self.connections[id];
 	};
 	self.attachEvents = function () {
-		navCallIcon.onclick = self.toggleCallContainer;
 		self.dom.webRtcFileIcon.onclick = self.clickFile;
 		self.dom.fileInput.onchange = function () {
 			self.offerFile(self.dom.fileInput.files[0], channelsHandler.activeChannel);
@@ -6117,7 +6113,7 @@ var Utils = {
 					} else {
 						time = ""
 					}
-					var src =  "https://www.youtube.com/embed/{}?autoplay=1{}".format(id, time);
+					var src = "https://www.youtube.com/embed/{}?autoplay=1{}".format(id, time);
 					iframe.setAttribute("src", src);
 					iframe.setAttribute("frameborder", "0");
 					logger.info("Replacing youtube url {}", src)();

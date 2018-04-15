@@ -456,9 +456,9 @@ function ajaxHide() {
  * @param params : object dict of params or DOM form
  * @param callback : function calls on response
  * @param url : string url to post
- * @param form : form in canse form is used
+ * @param formData : form in canse form is used
  * */
-function doPost(url, params, callback, form, isJsonEncoded) {
+function doPost(url, params, callback, formData, isJsonEncoded) {
 	var r = new XMLHttpRequest();
 	r.onreadystatechange = function () {
 		if (r.readyState === 4) {
@@ -485,7 +485,7 @@ function doPost(url, params, callback, form, isJsonEncoded) {
 		r.setRequestHeader("Content-Type", 'application/json');
 	} else {
 		/*Firefox doesn't accept null*/
-		data = form == null ? new FormData() : new FormData(form);
+		data = formData ? formData : new FormData();
 
 		if (params) {
 			for (var key in params) {
