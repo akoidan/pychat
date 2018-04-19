@@ -3575,31 +3575,42 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		});
 		Utils.checkAndPlay = bu;
 	};
-	self.patterns = {
-		linksRegex: /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g, /*http://anycharacter except end of text, <br> or space*/
-		replaceLinkPattern: '<a href="$1" target="_blank">$1</a>',
-		youTubePattern: /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)(?:[^"]*?\&amp\;t=([\w\-\_]*))?[^"]*" target="_blank">[^<]+<\/a>/,
-		replaceYoutubePattern: '<div class="youtube-player" data-id="$1" data-time="$2"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
-		codePattern: /```(.+?)(?=```)```/,
-		replaceCodePattern: '<pre>$1</pre>',
-		quotePattern: /(^\(\d\d:\d\d:\d\d\)\s[a-zA-Z-_0-9]{1,16}:)(.*)&gt;&gt;&gt;<br>/,
-		replaceQuotePattern: '<div class="quote"><span>$1</span>$2</div>'
-	};
-	self.encodeHtmlAll = function (html) {
-		var a = encodeHTML(html);
-		a = a.replace(self.patterns.quotePattern, self.patterns.replaceQuotePattern);
-		a = a.replace(self.patterns.linksRegex, self.patterns.replaceLinkPattern);
-		if (window.embeddedYoutube) {
-			a = a.replace(self.patterns.youTubePattern, self.patterns.replaceYoutubePattern);
+	self.patterns = [
+		{
+			search: /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g, /*http://anycharacter except end of text, <br> or space*/
+			replace: '<a href="$1" target="_blank">$1</a>',
+			name: "links"
+		}, {
+			search: /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)(?:[^"]*?\&amp\;t=([\w\-\_]*))?[^"]*" target="_blank">[^<]+<\/a>/,
+			replace: '<div class="youtube-player" data-id="$1" data-time="$2"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
+			name: 'youtube'
+		},
+		{
+			search: /```(.+?)(?=```)```/,
+			replace: '<pre>$1</pre>',
+			name: 'code'},
+		{
+			search: /(^\(\d\d:\d\d:\d\d\)\s[a-zA-Z-_0-9]{1,16}:)(.*)&gt;&gt;&gt;<br>/,
+			replace: '<div class="quote"><span>$1</span>$2</div>',
+			name: 'quote'
 		}
-		a = a.replace(self.patterns.codePattern, self.patterns.replaceCodePattern);
-		return a;
-	};
+	];
 	self.encodeMessage = function (data) {
 		if (data.giphy) {
 			return '<div class="giphy"><img src="{0}" /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>'.formatPos(data.giphy);
 		} else {
-			var html = self.encodeHtmlAll(data.content);
+			var html = encodeHTML(data.content);
+			var replaceElements = [];
+			self.patterns.forEach(function (pattern) {
+				var res = html.replace(pattern.search, pattern.replace);
+				if (res !== html) {
+					replaceElements.push(pattern.name);
+					html = res;
+				}
+			});
+			if (replaceElements.length) {
+				logger.info("Replaced {} in message #{}", replaceElements.join(", "), data.id)();
+			}
 			if (data.images && Object.keys(data.images).length) {
 				html = html.replace(imageUnicodeRegex, function (s) {
 					return "<img src=\'{}\' symbol=\'{}\' class=\'{}\'/>".format(data.images[s], s, PASTED_IMG_CLASS);
