@@ -6115,9 +6115,11 @@ var Utils = {
 		if (window.embeddedYoutube) {
 			var r = e.querySelector('.youtube-player')
 			if (r) {
-				r.querySelector('.icon-youtube-play').onclick = function () {
+				var querySelector = r.querySelector('.icon-youtube-play');
+				var id = r.getAttribute('data-id');
+				logger.info("Embedding youtube view {}", id)();
+				querySelector.onclick = function () {
 					var iframe = document.createElement("iframe");
-					var id = r.getAttribute('data-id');
 					var time = Utils.getTime(r.getAttribute('data-time'));
 					if (time) {
 						time = '&start='+time;
