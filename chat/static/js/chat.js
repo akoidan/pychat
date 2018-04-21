@@ -21,7 +21,6 @@ var GENDER_ICONS = {
 	'Secret': 'icon-user-secret'
 };
 var webRtcFileIcon;
-var navCallIconSearch;
 var directUserTable;
 var audioProcesssors = [];
 var smileUnicodeRegex = /[\u3400-\u3500]/g;
@@ -45,11 +44,11 @@ var painter;
 var minimizedWindows;
 var chatFileAudio;
 var chatTestVolume;
-
+var searchIcon;
 onDocLoad(function () {
 	userMessage = $("usermsg");
-	navCallIconSearch = $('navCallIconSearch');
 	headerText = $('headerText');
+	searchIcon = $('navSearchIcon');
 	chatFileAudio = $('chatFile');
 	chatTestVolume = $('chatTestVolume');
 	directUserTable = $('directUserTable');
@@ -85,6 +84,7 @@ onDocLoad(function () {
 			}
 		});
 	}
+	new Search();
 });
 
 
@@ -3089,12 +3089,14 @@ function ChannelsHandler() {
 		self.superShow();
 		CssUtils.showElement(self.dom.navCallIcon);
 		CssUtils.showElement(webRtcFileIcon);
+		CssUtils.showElement(searchIcon);
 	};
 	self.render = self.show;
 	self.hide = function() {
 		self.superHide();
 		CssUtils.hideElement(self.dom.navCallIcon);
 		CssUtils.hideElement(webRtcFileIcon);
+		CssUtils.hideElement(searchIcon);
 	};
 	self.initCha();
 }
@@ -3221,6 +3223,81 @@ function SmileyUtil() {
 	};
 	self.init();
 }
+
+
+function Search() {
+	var self = this;
+	self.dom = {
+		query: $('search_data'),
+		result: $('search_result'),
+		container: $('search')
+	};
+	self.ps = [];
+	self.lastChatBoxDiv = null;
+	self.init = function() {
+		searchIcon.onclick = function() {
+			var visible = CssUtils.toggleVisibility(self.dom.container);
+			if (visible) {
+				CssUtils.removeClass(self.lastChatBoxDiv, 'display-search-only');
+				self.clearSearch();
+			}
+		};
+		self.dom.query.oninput = self.oninput;
+	};
+	self.inProgress = false;
+	self.clearSearch = function() {
+		self.ps.forEach(function (node) {
+			CssUtils.removeClass(node, 'filter-search');
+		});
+		self.ps = [];
+	};
+	self.oninput = function(event) {
+		self.lastSearch = self.dom.query.value;
+		if (!self.inProgress) { // 13 = enter
+			 self.inProgress = true;
+			 var currentSearch = self.lastSearch;
+			 self.dom.container.className = 'loading';
+			 var channel = channelsHandler.getActiveChannel();
+			self.lastChatBoxDiv = channel.dom.chatBoxDiv;
+			doPost('/search_messages', {
+				data: self.dom.query.value,
+				room: channel.roomId
+			}, function(response) {
+				self.clearSearch();
+				var b = self.lastSearch == currentSearch;
+				self.inProgress = false;
+				CssUtils.addClass(channel.dom.chatBoxDiv, 'display-search-only');
+				self.dom.container.className = '';
+				var r = JSON.parse(response);
+				if (r.length) {
+					CssUtils.hideElement(self.dom.result);
+					r.forEach(function (data) {
+						var displayedUsername = channelsHandler.getAllUsersInfo()[data.userId].user;
+						var html = channel.encodeMessage(data);
+						var p = channel.displayPreparedMessage(
+								data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS,
+								data.time,
+								html,
+								displayedUsername,
+								data.id,
+								data.symbol,
+								data.userId
+						);
+						CssUtils.addClass(p.node, 'filter-search');
+						self.ps.push(p.node)
+					})
+				} else {
+					CssUtils.showElement(self.dom.result);
+				}
+				if (!b) {
+					self.oninput();
+				}
+			})
+		}
+	};
+	self.init();
+}
+
 
 
 function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
@@ -3540,7 +3617,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 				if (posRes.exists) {
 					//logger.info("Updaing message with timeId {}", timeMillis)();
 					self.dom.chatBoxDiv.replaceChild(p, posRes.exists);
-					return
+					return {node: p};
 				} else {
 					pos = posRes.el;
 				}
@@ -3560,7 +3637,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 				self.dom.chatBoxDiv.scrollTop = self.dom.chatBoxDiv.scrollHeight;
 			}
 		}
-		return p;
+		return {node: p, created: true};
 	};
 	self.loadOfflineMessages = function (data) {
 		var hisMess = data.content.history || [];
@@ -3673,9 +3750,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 				data.symbol,
 				data.userId
 		);
-		if (p) {
-			Utils.highlightCode(p);
-			Utils.setYoutubeEvent(p);
+		if (p.created) {
+			Utils.highlightCode(p.node);
+			Utils.setYoutubeEvent(p.node);
 			if (!forceSkipHL) {
 					self.highLightMessageIfNeeded(p, displayedUsername, isNew, data.content, data.images);
 					if (data.userId != loggedUserId && self.notifications) {

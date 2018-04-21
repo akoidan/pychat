@@ -24,6 +24,27 @@
 	i:before
 		transform: translate(0, 3px)
 
+#search
+	padding: 5px
+	> *
+		display: inline-block
+	input
+		width: calc(100% - 10px)
+	&.loading
+		.search-loading
+			margin-left: 5px
+			margin-bottom: -5px
+			margin-top: -3px
+			@include spinner(3px, white)
+		input
+			width: calc(100% - 40px)
+
+	#search_result
+		display: flex
+		justify-content: center
+		padding-top: 10px
+
+
 fieldset
 	border-top: 1px solid #aaa
 	border-bottom: none
@@ -87,6 +108,9 @@ fieldset
 		outline: none
 	a:hover
 		text-decoration: underline
+	&.display-search-only
+		>:not(.filter-search)
+			display: none
 
 	pre
 		margin: 10px

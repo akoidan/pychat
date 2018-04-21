@@ -11,6 +11,7 @@ from django.contrib.auth.hashers import make_password
 from django.core.mail import mail_admins
 
 from chat.templatetags.md5url import md5url
+from chat.tornado.message_creator import MessagesCreator
 
 try:
 	from django.template.context_processors import csrf
@@ -33,7 +34,7 @@ from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verificatio
 from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
 	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip, \
-	send_password_changed, send_email_change, send_new_email_ver
+	send_password_changed, send_email_change, send_new_email_ver, get_message_images, prepare_img
 
 logger = logging.getLogger(__name__)
 RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
@@ -109,6 +110,26 @@ def get_firebase_playback(request):
 
 def test(request):
 	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+
+
+@require_http_methods('POST')
+@login_required_no_redirect(False)
+@validation
+def search_messages(request):
+	import time
+	time.sleep(2)
+	data = request.POST['data']
+	room_id = request.POST['room']
+	if not RoomUsers.objects.filter(room_id=room_id, user_id=request.user.id).exists():
+		raise ValidationError("You can't access this room")
+	messages = Message.objects.filter(content__icontains=data, room_id=room_id)[:10]
+	images = get_message_images(messages)
+	result = []
+	for message in messages:
+		prep_m = MessagesCreator.create_message(message, prepare_img(images, message.id))
+		result.append(prep_m)
+	response = json.dumps(result)
+	return HttpResponse(response, content_type='application/json')
 
 
 @require_http_methods('POST')
