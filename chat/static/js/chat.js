@@ -3275,7 +3275,7 @@ function Search() {
 						var displayedUsername = channelsHandler.getAllUsersInfo()[data.userId].user;
 						var html = channel.encodeMessage(data);
 						var p = channel.displayPreparedMessage(
-								data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS,
+								data.userId == loggedUserId ? SELF_HEADER_CLASS : channel.OTHER_HEADER_CLASS,
 								data.time,
 								html,
 								displayedUsername,
