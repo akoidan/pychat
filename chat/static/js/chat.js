@@ -2419,6 +2419,13 @@ function ChannelsHandler() {
 		self.dom.navCallIcon.onclick = function() {
 			self.getActiveChannel().toggleCallHandler();
 		};
+		window.addEventListener("keydown", function (e) {
+			if (e.shiftKey && e.ctrlKey && e.keyCode === 70) {
+				if (!CssUtils.isHidden(self.dom.wrapper)) {
+					self.getActiveChannel().search.toggle();
+				}
+			}
+		});
 		self.dom.searchIcon.onclick = function() {
 			self.getActiveChannel().search.toggle();
 		};
@@ -3264,10 +3271,14 @@ function Search(channel) {
 		if (self.isHidden) {
 			CssUtils.removeClass(self.channel.dom.chatBoxDiv, 'display-search-only');
 			self.clearSearch();
+			userMessage.focus();
+		} else {
+			self.dom.query.focus();
 		}
 	};
 	self.inProgress = false;
 	self.clearSearch = function() {
+		CssUtils.hideElement(self.dom.result);
 		self.lastSearchNodes.forEach(function (node) {
 			CssUtils.removeClass(node, 'filter-search');
 		});
