@@ -44,11 +44,9 @@ var painter;
 var minimizedWindows;
 var chatFileAudio;
 var chatTestVolume;
-var searchIcon;
 onDocLoad(function () {
 	userMessage = $("usermsg");
 	headerText = $('headerText');
-	searchIcon = $('navSearchIcon');
 	chatFileAudio = $('chatFile');
 	chatTestVolume = $('chatTestVolume');
 	directUserTable = $('directUserTable');
@@ -84,7 +82,6 @@ onDocLoad(function () {
 			}
 		});
 	}
-	new Search();
 });
 
 
@@ -2376,6 +2373,7 @@ function ChannelsHandler() {
 	self.dom = (function () {
 		var childDom = {
 			wrapper: $('wrapper'),
+			searchIcon : $('navSearchIcon'),
 			userMessageWrapper: $('userMessageWrapper'),
 			chatUsersTable: $("chat-user-table"),
 			rooms: $("rooms"),
@@ -2420,6 +2418,9 @@ function ChannelsHandler() {
 	self.initCha = function() {
 		self.dom.navCallIcon.onclick = function() {
 			self.getActiveChannel().toggleCallHandler();
+		};
+		self.dom.searchIcon.onclick = function() {
+			self.getActiveChannel().search.toggle();
 		};
 		self.dom.addUserInput.onkeyup = self.filterAddUser;
 		self.dom.addUserList.onclick = self.addUserHolderClick;
@@ -3089,14 +3090,14 @@ function ChannelsHandler() {
 		self.superShow();
 		CssUtils.showElement(self.dom.navCallIcon);
 		CssUtils.showElement(webRtcFileIcon);
-		CssUtils.showElement(searchIcon);
+		CssUtils.showElement(self.dom.searchIcon);
 	};
 	self.render = self.show;
 	self.hide = function() {
 		self.superHide();
 		CssUtils.hideElement(self.dom.navCallIcon);
 		CssUtils.hideElement(webRtcFileIcon);
-		CssUtils.hideElement(searchIcon);
+		CssUtils.hideElement(self.dom.searchIcon);
 	};
 	self.initCha();
 }
@@ -3225,40 +3226,64 @@ function SmileyUtil() {
 }
 
 
-function Search() {
+function Search(channel) {
 	var self = this;
 	self.dom = {
-		query: $('search_data'),
-		result: $('search_result'),
-		container: $('search')
+		query: document.createElement('input'),
+		result: document.createElement('div'),
+		loading: document.createElement('div'),
+		container: document.createElement('div'),
 	};
-	self.ps = [];
-	self.lastChatBoxDiv = null;
+	self.lastSearchNodes = [];
+	self.channel = channel;
+	self.isHidden = true;
 	self.init = function() {
-		searchIcon.onclick = function() {
-			var visible = CssUtils.toggleVisibility(self.dom.container);
-			if (visible) {
-				CssUtils.removeClass(self.lastChatBoxDiv, 'display-search-only');
-				self.clearSearch();
-			}
-		};
+		self.dom.query.type = 'search';
+		self.dom.loading.className = 'search-loading';
+		self.dom.result.textContent = 'No results found';
+		self.dom.container.appendChild(self.dom.query);
+		self.dom.container.appendChild(self.dom.loading);
+		self.dom.container.appendChild(self.dom.result);
+		self.dom.container.className = 'search hidden';
+		self.dom.result.className = 'search_result hidden';
 		self.dom.query.oninput = self.oninput;
+		self.channel.dom.chatBoxHolder.appendChild(self.dom.container);
+	};
+	self.hide = function() {
+		if (!self.isHidden) {
+			CssUtils.hideElement(self.dom.container);
+		}
+	};
+	self.show = function() {
+		if (!self.isHidden) {
+			CssUtils.showElement(self.dom.container);
+		}
+	};
+	self.toggle = function () {
+		self.isHidden = CssUtils.toggleVisibility(self.dom.container);
+		if (self.isHidden) {
+			CssUtils.removeClass(self.channel.dom.chatBoxDiv, 'display-search-only');
+			self.clearSearch();
+		}
 	};
 	self.inProgress = false;
 	self.clearSearch = function() {
-		self.ps.forEach(function (node) {
+		self.lastSearchNodes.forEach(function (node) {
 			CssUtils.removeClass(node, 'filter-search');
 		});
-		self.ps = [];
+		self.lastSearchNodes= [];
 	};
 	self.oninput = function(event) {
 		self.lastSearch = self.dom.query.value;
 		if (!self.inProgress) { // 13 = enter
-			 self.inProgress = true;
-			 var currentSearch = self.lastSearch;
-			 self.dom.container.className = 'loading';
-			 var channel = channelsHandler.getActiveChannel();
-			self.lastChatBoxDiv = channel.dom.chatBoxDiv;
+			if (!self.lastSearch) {
+				self.clearSearch();
+				CssUtils.removeClass(self.channel.dom.chatBoxDiv, 'display-search-only');
+				return;
+			}
+			self.inProgress = true;
+			var currentSearch = self.lastSearch;
+			CssUtils.addClass(self.dom.container, 'loading');
 			doPost('/search_messages', {
 				data: self.dom.query.value,
 				room: channel.roomId
@@ -3267,24 +3292,14 @@ function Search() {
 				var b = self.lastSearch == currentSearch;
 				self.inProgress = false;
 				CssUtils.addClass(channel.dom.chatBoxDiv, 'display-search-only');
-				self.dom.container.className = '';
+				CssUtils.removeClass(self.dom.container, 'loading');
 				var r = JSON.parse(response);
 				if (r.length) {
 					CssUtils.hideElement(self.dom.result);
 					r.forEach(function (data) {
-						var displayedUsername = channelsHandler.getAllUsersInfo()[data.userId].user;
-						var html = channel.encodeMessage(data);
-						var p = channel.displayPreparedMessage(
-								data.userId == loggedUserId ? SELF_HEADER_CLASS : channel.OTHER_HEADER_CLASS,
-								data.time,
-								html,
-								displayedUsername,
-								data.id,
-								data.symbol,
-								data.userId
-						);
+						var p = self.channel.createMessageNodeAll(data);
+						self.lastSearchNodes.push(p.node);
 						CssUtils.addClass(p.node, 'filter-search');
-						self.ps.push(p.node)
 					})
 				} else {
 					CssUtils.showElement(self.dom.result);
@@ -3328,6 +3343,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	self.newMessages = 0;
 	self.lastLoadUpHistoryRequest = 0;
 	self.allMessages = [];
+	self.search = new Search(self);
 	self.allMessagesDates = [];
 	self.activeRoomClass = 'active-room';
 	self.dom.newMessages.className = 'newMessagesCount ' + CssUtils.visibilityClass;
@@ -3342,6 +3358,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 
 	self.show = function () {
 		self.rendered = true;
+		self.search.show();
 		CssUtils.showElement(self.dom.chatBoxDiv);
 		CssUtils.showElement(self.dom.userList);
 		CssUtils.addClass(self.dom.roomNameLi, self.activeRoomClass);
@@ -3418,6 +3435,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		if (self.callHandler) {
 			self.callHandler.hide();
 		}
+		self.search.hide();
 		CssUtils.hideElement(self.dom.userList);
 		CssUtils.removeClass(self.dom.roomNameLi, self.activeRoomClass);
 	};
@@ -3735,10 +3753,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	self.printMessage = function (data) {
 		self._printMessage(data, false);
 	};
-	self._printMessage = function (data, isNew, forceSkipHL) {
-		storage.setRoomHeaderId(self.roomId, data.id);
-		self.printMessagePlay(data);
-		// we can't use self.allUsers[data.userId].user; since user could left and his message remains
+
+	self.createMessageNodeAll = function (data) {
 		var displayedUsername = channelsHandler.getAllUsersInfo()[data.userId].user;
 		var html = self.encodeMessage(data);
 		var p = self.displayPreparedMessage(
@@ -3750,17 +3766,25 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 				data.symbol,
 				data.userId
 		);
+		p.username = displayedUsername;
+		return p;
+	};
+	self._printMessage = function (data, isNew, forceSkipHL) {
+		storage.setRoomHeaderId(self.roomId, data.id);
+		self.printMessagePlay(data);
+		// we can't use self.allUsers[data.userId].user; since user could left and his message remains
+		var p = self.createMessageNodeAll(data);
 		if (p.created) {
 			Utils.highlightCode(p.node);
 			Utils.setYoutubeEvent(p.node);
 			if (!forceSkipHL) {
-					self.highLightMessageIfNeeded(p, displayedUsername, isNew, data.content, data.images);
+					self.highLightMessageIfNeeded(p, p.username, isNew, data.content, data.images);
 					if (data.userId != loggedUserId && self.notifications) {
-						notifier.notify(displayedUsername, {
+						notifier.notify(p.username, {
 							body: data.content,
 							data: {
 								replaced: 1,
-								title: displayedUsername,
+								title: p.username,
 								roomId: data.channel,
 							},
 							requireInteraction: true,
