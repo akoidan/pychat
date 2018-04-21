@@ -116,8 +116,6 @@ def test(request):
 @login_required_no_redirect(False)
 @validation
 def search_messages(request):
-	import time
-	time.sleep(2)
 	data = request.POST['data']
 	room_id = request.POST['room']
 	if not RoomUsers.objects.filter(room_id=room_id, user_id=request.user.id).exists():
