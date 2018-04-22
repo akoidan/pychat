@@ -182,6 +182,13 @@ def get_milliseconds(dt=None):
 		return mktime(dt.time.timetuple()) * 1000 + int(dt.time.microsecond / 1000)
 
 
+class MessageHistory(models.Model):
+	time = models.BigIntegerField(default=get_milliseconds)
+	message = models.ForeignKey('Message', null=False)
+	content = models.TextField(null=True, blank=True)
+	giphy = URLField(null=True, blank=True)
+
+
 class Message(models.Model):
 	"""
 	Contains all public messages
@@ -198,6 +205,7 @@ class Message(models.Model):
 	symbol = models.CharField(null=True, max_length=1, blank=True)
 	deleted = BooleanField(default=False)
 	giphy = URLField(null=True, blank=True)
+	edited_times = models.IntegerField(default=0, null=False)
 
 	def __unicode__(self):
 		return self.__str__()

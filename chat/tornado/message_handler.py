@@ -12,7 +12,7 @@ from tornado.web import asynchronous
 from tornadoredis import Client
 from chat import settings
 from chat.log_filters import id_generator
-from chat.models import Message, Room, RoomUsers, Subscription, User, UserProfile, SubscriptionMessages
+from chat.models import Message, Room, RoomUsers, Subscription, User, UserProfile, SubscriptionMessages, MessageHistory
 from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
@@ -351,15 +351,17 @@ class MessagesHandler(MessagesCreator):
 		message = do_db(Message.objects.get, id=message_id)
 		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
+		MessageHistory(message=message, content=message.content, giphy=message.giphy).save()
+		message.edited_times += 1
 		selector = Message.objects.filter(id=message_id)
 		giphy_match = self.isGiphy(data[VarNames.CONTENT])
 		if message.content is None:
 			action = Actions.DELETE_MESSAGE
 			prep_imgs = None
-			selector.update(deleted=True)
+			selector.update(deleted=True, edited_times=message.edited_times)
 		elif giphy_match is not None:
 			def edit_glyphy(message, giphy):
-				do_db(selector.update, content=message.content, symbol=message.symbol, giphy=giphy)
+				do_db(selector.update, content=message.content, symbol=message.symbol, giphy=giphy, edited_times=message.edited_times)
 				message.giphy = giphy
 				self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None, js_id), message.room_id)
 			self.search_giphy(message, giphy_match, edit_glyphy)
@@ -368,7 +370,7 @@ class MessagesHandler(MessagesCreator):
 			action = Actions.EDIT_MESSAGE
 			message.giphy = None
 			prep_imgs = process_images(data.get(VarNames.IMG), message)
-			selector.update(content=message.content, symbol=message.symbol, giphy=None)
+			selector.update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
 		self.publish(self.create_send_message(message, action, prep_imgs, js_id), message.room_id)
 
 	def send_client_new_channel(self, message):
