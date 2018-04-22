@@ -3789,7 +3789,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 			Utils.highlightCode(p.node);
 			Utils.setYoutubeEvent(p.node);
 			if (!forceSkipHL) {
-					self.highLightMessageIfNeeded(p, p.username, isNew, data.content, data.images);
+					self.highLightMessageIfNeeded(p.node, p.username, isNew, data.content, data.images);
 					if (data.userId != loggedUserId && self.notifications) {
 						notifier.notify(p.username, {
 							body: data.content,
