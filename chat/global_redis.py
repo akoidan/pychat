@@ -13,7 +13,7 @@ def new_read(instance, *args, **kwargs):
 		return instance.old_read(*args, **kwargs)
 	except Exception as e:
 		redis_online = sync_redis.hgetall(ALL_REDIS_ROOM)
-		logger.error("Error occurred during reading tornadoredis connection. Redis online  %s", redis_online)
+		logger.warning("Error occurred during reading tornadoredis connection. Redis online  %s", redis_online)
 		raise e
 
 
