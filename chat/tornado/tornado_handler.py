@@ -33,6 +33,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 	def __init__(self, *args, **kwargs):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
 		self.__connected__ = False
+		self.restored_connection = False
 		self.__http_client__ = AsyncHTTPClient()
 		self.anti_spam = AntiSpam()
 
@@ -126,7 +127,10 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		conn_arg = self.get_argument('id', None)
 		self.id, random = create_id(self.user_id, conn_arg)
 		if random != conn_arg:
+			self.restored_connection = False
 			self.ws_write(self.set_ws_id(random, self.id))
+		else:
+			self.restored_connection = True
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
@@ -174,7 +178,10 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		for room_id in user_rooms:
 			c = self.get_cookie(str(room_id))
 			if c is not None:
-				q_objects.add(Q(id__gte=c, room_id=room_id, deleted=False, edited_times__gt=0), Q.OR)
+				if self.restored_connection:
+					q_objects.add(Q(id__gte=c, room_id=room_id, deleted=False, edited_times__gt=0), Q.OR)
+				else:
+					q_objects.add(Q(id__gte=c, room_id=room_id, deleted=False), Q.OR)
 		off_messages = Message.objects.filter(
 			id__gt=F('room__roomusers__last_read_message_id'),
 			deleted=False,

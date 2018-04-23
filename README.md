@@ -147,6 +147,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Editing a message breaks youtube video
 * Highlight new messages disappear if user went offline
 * Firefox doesn't google support fcm push
 * Transfer file should be inside of chatbox instead of being a separate window
