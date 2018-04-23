@@ -3639,43 +3639,46 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		}
 		return result;
 	};
+
+
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
-	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, symbol, userId, content) {
-		var pos = null;
-			var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId, userId);
-		// every message has UTC millis ID so we can detect if message is already displayed or position to display
-		if (symbol) {
-			p.setAttribute('symbol', symbol)
-		}
-		if (content) {
-			p.setAttribute('content', content);
-		}
+	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, userId, edited) {
+		var pos;
+		var existed = false;
 		if (self.allMessages.length > 0 && !(timeMillis > self.allMessages[self.allMessages.length - 1])) {
-				var posRes = self.getPosition(timeMillis);
-				if (posRes.exists) {
-					//logger.info("Updaing message with timeId {}", timeMillis)();
-					self.dom.chatBoxDiv.replaceChild(p, posRes.exists);
-					return {node: p};
-				} else {
-					pos = posRes.el;
+			var posRes = self.getPosition(timeMillis);
+			if (posRes.exists) {
+				if (posRes.exists.getAttribute('edited') == edited) {
+					logger.info("Skipping rendering for message #{} as it exists", messageId)();
+					return {node: posRes.exists, skip: true}
 				}
+				existed = posRes.exists;
+			} else {
+				pos = posRes.el;
+			}
 		} else {
 			self.allMessages.push(timeMillis);
 		}
-		pos = self.insertCurrentDay(timeMillis, pos);
-		if (pos != null) {
-			self.dom.chatBoxDiv.insertBefore(p, pos);
+		var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId, userId);
+		if (existed) {
+			self.dom.chatBoxDiv.replaceChild(p, existed);
 		} else {
-			self.dom.chatBoxDiv.appendChild(p);
-			if (htmlEncodedContent.startsWith('<img')) {
+			// every message has UTC millis ID so we can detect if message is already displayed or position to display
+			pos = self.insertCurrentDay(timeMillis, pos);
+			if (pos != null) {
+				self.dom.chatBoxDiv.insertBefore(p, pos);
+			} else {
+				self.dom.chatBoxDiv.appendChild(p);
+				if (htmlEncodedContent.startsWith('<img')) {
 					document.querySelector('[id="{}"] img'.format(p.id)).onload = function () {
 						self.dom.chatBoxDiv.scrollTop = self.dom.chatBoxDiv.scrollHeight;
 					}
-			} else {
-				self.dom.chatBoxDiv.scrollTop = self.dom.chatBoxDiv.scrollHeight;
+				} else {
+					self.dom.chatBoxDiv.scrollTop = self.dom.chatBoxDiv.scrollHeight;
+				}
 			}
 		}
-		return {node: p, created: true};
+		return {node: p, skip: false};
 	};
 	self.loadOfflineMessages = function (data) {
 		var hisMess = data.content.history || [];
@@ -3747,19 +3750,24 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		}
 
 	};
+	self.setAttributesData = function (p, data) {
+		if (data.symbol) {
+			p.setAttribute('symbol', data.symbol);
+		}
+		p.setAttribute('content', data.content);
+		p.setAttribute('edited', data.edited);
+		if (data.edited != '0') {
+					CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
+		}
+	};
 	self.editMessage = function (data) {
 		var p = $(data.time);
 		if (p != null) {
 			var html = self.encodeMessage(data);
 			var element = p.querySelector("." + CONTENT_STYLE_CLASS);
-			if (data.symbol) {
-				p.setAttribute('symbol', data.symbol);
-			}
-			p.setAttribute('content', data.content);
+			self.setAttributesData(p, data);
 			element.innerHTML = html;
-			Utils.highlightCode(element);
-			Utils.setYoutubeEvent(p.node);
-			CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
+			self.setupMessageEvents(p);
 		}
 	};
 	self.deleteMessage = function (data) {
@@ -3775,7 +3783,10 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	self.printMessage = function (data) {
 		self._printMessage(data, false);
 	};
-
+	self.setupMessageEvents = function(data) {
+		Utils.setYoutubeEvent(data);
+		Utils.highlightCode(data)
+	};
 	self.createMessageNodeAll = function (data) {
 		var displayedUsername = channelsHandler.getAllUsersInfo()[data.userId].user;
 		var html = self.encodeMessage(data);
@@ -3785,10 +3796,13 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 				html,
 				displayedUsername,
 				data.id,
-				data.symbol,
 				data.userId,
-				data.content
+				data.edited
 		);
+		if (!p.skip) {
+			self.setAttributesData(p.node, data);
+			self.setupMessageEvents(p.node);
+		}
 		p.username = displayedUsername;
 		return p;
 	};
@@ -3797,9 +3811,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		self.printMessagePlay(data);
 		// we can't use self.allUsers[data.userId].user; since user could left and his message remains
 		var p = self.createMessageNodeAll(data);
-		Utils.setYoutubeEvent(p.node);
-		Utils.highlightCode(p.node);
-		if (p.created && !forceSkipHL) {
+		if (!p.skip && !forceSkipHL) {
 			self.highLightMessageIfNeeded(p.node, p.username, isNew, data.content, data.images);
 			if (data.userId != loggedUserId && self.notifications) {
 				notifier.notify(p.username, {

@@ -64,6 +64,7 @@ class VarNames(object):
 	SYMBOL = 'symbol'
 	LOAD_MESSAGES_HISTORY = 'history'
 	LOAD_MESSAGES_OFFLINE = 'offline'
+	EDITED_TIMES = 'edited'
 
 
 class HandlerNames:
