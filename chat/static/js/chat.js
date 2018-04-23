@@ -25,7 +25,7 @@ var directUserTable;
 var audioProcesssors = [];
 var smileUnicodeRegex = /[\u3400-\u3500]/g;
 var imageUnicodeRegex = /[\u3501-\u3600]/g;
-var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
+var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*>>>\s/;
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
 // input type that contains text for sending message
@@ -2605,12 +2605,14 @@ function ChannelsHandler() {
 	};
 	self.m2EditMessage = function () {
 		self.editLastMessageNode.notReady = false;
-		var selector = '[id="{}"] .{}'.format(self.editLastMessageNode.time, CONTENT_STYLE_CLASS);
-		userMessage.innerHTML = document.querySelector(selector).innerHTML;
-		Utils.placeCaretAtEnd();
+		self.continueEdit($(self.editLastMessageNode.time));
 		event.stopPropagation();
-		document.removeEventListener('click', self.hideM2EditMessage);
 		CssUtils.hideElement(self.dom.m2Message);
+		document.removeEventListener('click', self.hideM2EditMessage);
+	};
+	self.continueEdit = function(p) {
+		userMessage.textContent = p.getAttribute('content');
+		Utils.placeCaretAtEnd();
 	};
 	self.m2DeleteMessage = function () {
 		wsHandler.sendToServer({
@@ -2633,9 +2635,7 @@ function ChannelsHandler() {
 				return
 			}
 			CssUtils.addClass(self.editLastMessageNode.dom, self.HIGHLIGHT_MESSAGE_CLASS);
-			var selector = '[id="{}"] .{}'.format(editLastMessageNode.time, CONTENT_STYLE_CLASS);
-			userMessage.innerHTML = document.querySelector(selector).innerHTML;
-			Utils.placeCaretAtEnd();
+			self.continueEdit(self.editLastMessageNode.dom);
 			event.preventDefault();
 		}
 	};
@@ -3562,10 +3562,12 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	};
 	self.timeMessageClick = function (event) {
 		userMessage.focus();
-		var value = userMessage.innerHTML;
-		var match = value.match(timePattern);
-		var oldText = match ? value.substr(match[0].length) : value;
-		userMessage.innerHTML = event.target.parentElement.parentElement.innerHTML + '&gt;&gt;&gt;' + String.fromCharCode(13) + ' '+ oldText;
+		var p = event.target.parentElement.parentElement;
+		var oldValue = userMessage.textContent;
+		var match = oldValue.match(timePattern);
+		var timeText = p.querySelector('[class^="message-header').textContent;
+		var oldText = match ? oldValue.substr(match[0].length) : oldValue;
+		userMessage.textContent = timeText + p.getAttribute('content') + ' >>>'+String.fromCharCode(13);
 		Utils.placeCaretAtEnd();
 	};
 	/** Creates a DOM node with attached events and all message content*/
@@ -3634,12 +3636,15 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		return result;
 	};
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
-	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, symbol, userId) {
+	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, symbol, userId, content) {
 		var pos = null;
 			var p = self.createMessageNode(timeMillis, headerStyle, displayedUsername, htmlEncodedContent, messageId, userId);
 		// every message has UTC millis ID so we can detect if message is already displayed or position to display
 		if (symbol) {
 			p.setAttribute('symbol', symbol)
+		}
+		if (content) {
+			p.setAttribute('content', content);
 		}
 		if (self.allMessages.length > 0 && !(timeMillis > self.allMessages[self.allMessages.length - 1])) {
 				var posRes = self.getPosition(timeMillis);
@@ -3746,6 +3751,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 			if (data.symbol) {
 				p.setAttribute('symbol', data.symbol);
 			}
+			p.setAttribute('content', data.content);
 			element.innerHTML = html;
 			Utils.highlightCode(element);
 			CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
@@ -3775,7 +3781,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 				displayedUsername,
 				data.id,
 				data.symbol,
-				data.userId
+				data.userId,
+				data.content
 		);
 		p.username = displayedUsername;
 		return p;
@@ -3785,23 +3792,21 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		self.printMessagePlay(data);
 		// we can't use self.allUsers[data.userId].user; since user could left and his message remains
 		var p = self.createMessageNodeAll(data);
-		if (p.created) {
-			Utils.highlightCode(p.node);
-			Utils.setYoutubeEvent(p.node);
-			if (!forceSkipHL) {
-					self.highLightMessageIfNeeded(p.node, p.username, isNew, data.content, data.images);
-					if (data.userId != loggedUserId && self.notifications) {
-						notifier.notify(p.username, {
-							body: data.content,
-							data: {
-								replaced: 1,
-								title: p.username,
-								roomId: data.channel,
-							},
-							requireInteraction: true,
-							icon: data.images || NOTIFICATION_ICON_URL
-						});
-					}
+		Utils.setYoutubeEvent(p.node);
+		Utils.highlightCode(p.node);
+		if (p.created && !forceSkipHL) {
+			self.highLightMessageIfNeeded(p.node, p.username, isNew, data.content, data.images);
+			if (data.userId != loggedUserId && self.notifications) {
+				notifier.notify(p.username, {
+					body: data.content,
+					data: {
+						replaced: 1,
+						title: p.username,
+						roomId: data.channel
+					},
+					requireInteraction: true,
+					icon: data.images || NOTIFICATION_ICON_URL
+				});
 			}
 		}
 	};
