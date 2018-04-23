@@ -3758,6 +3758,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 			p.setAttribute('content', data.content);
 			element.innerHTML = html;
 			Utils.highlightCode(element);
+			Utils.setYoutubeEvent(p.node);
 			CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
 		}
 	};
@@ -6239,7 +6240,7 @@ var Utils = {
 				var querySelector = r.querySelector('.icon-youtube-play');
 				var id = r.getAttribute('data-id');
 				logger.info("Embedding youtube view {}", id)();
-				querySelector.onclick = function () {
+				querySelector.onclick = function (event) {
 					var iframe = document.createElement("iframe");
 					var time = Utils.getTime(r.getAttribute('data-time'));
 					if (time) {
@@ -6252,7 +6253,7 @@ var Utils = {
 					iframe.setAttribute("frameborder", "0");
 					logger.info("Replacing youtube url {}", src)();
 					iframe.setAttribute("allowfullscreen", "1");
-					e.parentNode.replaceChild(iframe, e);
+					r.parentNode.replaceChild(iframe, r);
 				}
 			}
 		}
