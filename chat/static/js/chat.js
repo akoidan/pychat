@@ -3247,7 +3247,6 @@ function Search(channel) {
 	self.init = function() {
 		self.dom.query.type = 'search';
 		self.dom.loading.className = 'search-loading';
-		self.dom.result.textContent = 'No results found';
 		self.dom.container.appendChild(self.dom.query);
 		self.dom.container.appendChild(self.dom.loading);
 		self.dom.container.appendChild(self.dom.result);
@@ -3286,10 +3285,14 @@ function Search(channel) {
 	};
 	self.oninput = function(event) {
 		self.lastSearch = self.dom.query.value;
-		if (!self.inProgress) { // 13 = enter
-			if (!self.lastSearch) {
+		if (!self.inProgress) {
+			if (self.lastSearch.length < 2) {
 				self.clearSearch();
 				CssUtils.removeClass(self.channel.dom.chatBoxDiv, 'display-search-only');
+				if (self.lastSearch.length === 1) {
+					CssUtils.showElement(self.dom.result);
+					self.dom.result.textContent = "Query is to broad";
+				}
 				return;
 			}
 			self.inProgress = true;
@@ -3313,6 +3316,7 @@ function Search(channel) {
 						CssUtils.addClass(p.node, 'filter-search');
 					})
 				} else {
+					self.dom.result.textContent = "No results found";
 					CssUtils.showElement(self.dom.result);
 				}
 				if (!b) {
