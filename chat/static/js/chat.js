@@ -3301,7 +3301,11 @@ function Search(channel) {
 			doPost('/search_messages', {
 				data: self.dom.query.value,
 				room: channel.roomId
-			}, function(response) {
+			}, function(response, error) {
+				if (error) {
+					growlError("Unable to search because" + error);
+					return;
+				}
 				self.clearSearch();
 				var b = self.lastSearch == currentSearch;
 				self.inProgress = false;
@@ -3758,7 +3762,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		p.setAttribute('edited', data.edited);
 		if (data.edited != '0') {
 					CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
-		}
+		}t
 	};
 	self.editMessage = function (data) {
 		var p = $(data.time);

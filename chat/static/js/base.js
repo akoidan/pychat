@@ -468,7 +468,15 @@ function doPost(url, params, callback, formData, isJsonEncoded) {
 				logger.httpErr("POST out: {} ::: {}, status:", url, r.response, r.status)();
 			}
 			if (typeof(callback) === "function") {
-				callback(r.response);
+				var error;
+				if (r.status === 0) {
+					error = "No internet connection";
+				} else if (r.status === 200) {
+					error = null;
+				} else {
+					error = "Server error";
+				}
+				callback(r.response, error);
 			} else {
 				logger.warn("Skipping {} callback for POST {}", callback, url)();
 			}
