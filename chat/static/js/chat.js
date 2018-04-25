@@ -3644,7 +3644,10 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		return result;
 	};
 
-
+	self.isScrollInTHeMiddle = function () {
+		var element = self.dom.chatBoxDiv;
+		return element.scrollHeight - element.scrollTop > element.clientHeight;
+	};
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
 	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, userId, edited) {
 		var pos;
@@ -3672,13 +3675,16 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 			if (pos != null) {
 				self.dom.chatBoxDiv.insertBefore(p, pos);
 			} else {
+				var inTheMiddle = self.isScrollInTHeMiddle();
 				self.dom.chatBoxDiv.appendChild(p);
-				if (htmlEncodedContent.startsWith('<img')) {
-					document.querySelector('[id="{}"] img'.format(p.id)).onload = function () {
+				if (!inTheMiddle) {
+					if (htmlEncodedContent.startsWith('<img')) {
+						document.querySelector('[id="{}"] img'.format(p.id)).onload = function () {
+							self.dom.chatBoxDiv.scrollTop = self.dom.chatBoxDiv.scrollHeight;
+						}
+					} else {
 						self.dom.chatBoxDiv.scrollTop = self.dom.chatBoxDiv.scrollHeight;
 					}
-				} else {
-					self.dom.chatBoxDiv.scrollTop = self.dom.chatBoxDiv.scrollHeight;
 				}
 			}
 		}
