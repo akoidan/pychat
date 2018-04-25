@@ -147,6 +147,8 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+https://static.pychat.org/photo/uEXCJWJH_image.png
+* If last_read_message is null, user went offline in 1st tab, and he was online in 2nd tab, he won't receive offline_messages in loadhistory response. I guess last_read_message should be always not null
 * Firefox doesn't google support fcm push
 * Transfer file should be inside of chatbox instead of being a separate window
 * Messages should appear in chat instantly with automatic resend when connection is up

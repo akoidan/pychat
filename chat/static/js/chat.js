@@ -3708,7 +3708,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 			name: 'youtube'
 		},
 		{
-			search: /```(.+?)(?=```)```/,
+			search: /```(.+?)(?=```)```/g,
 			replace: '<pre>$1</pre>',
 			name: 'code'},
 		{
@@ -3762,7 +3762,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		p.setAttribute('edited', data.edited);
 		if (data.edited != '0') {
 					CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
-		}t
+		}
 	};
 	self.editMessage = function (data) {
 		var p = $(data.time);
