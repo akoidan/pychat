@@ -2823,6 +2823,10 @@ function ChannelsHandler() {
 			}
 		}
 	};
+	self.m2QuoteMessage = function (event) {
+		var p = self.dom.activeUserContext.parentElement.parentElement;
+		self.getActiveChannel().quoteMessage(p);
+	};
 	self.createDirectChannel = function () {
 		var userId = self.getActiveUserId();
 		var exclude = self.getDirectMessagesUserIds();
@@ -3569,8 +3573,10 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		delete self.allUsers[message.userId];
 	};
 	self.timeMessageClick = function (event) {
+		self.quoteMessage(event.target.parentElement.parentElement);
+	};
+	self.quoteMessage = function(p) {
 		userMessage.focus();
-		var p = event.target.parentElement.parentElement;
 		var oldValue = userMessage.textContent;
 		var match = oldValue.match(timePattern);
 		var timeText = p.querySelector('[class^="message-header').textContent;
@@ -3646,7 +3652,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 
 	self.isScrollInTHeMiddle = function () {
 		var element = self.dom.chatBoxDiv;
-		return element.scrollHeight - element.scrollTop > element.clientHeight;
+		return element.scrollHeight - element.scrollTop > element.clientHeight + 10;
 	};
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
 	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, userId, edited) {
