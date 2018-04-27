@@ -2623,7 +2623,7 @@ function ChannelsHandler() {
 		// eventPropagande will execute onclick on document.body that will hide contextMenu
 	};
 	self.handleEditMessage = function (event) {
-		if (!blankRegex.test(userMessage.textContent)) {
+		if (blankRegex.test(userMessage.textContent)) {
 			return;
 		}
 		var editLastMessageNode = self.getActiveChannel().lastMessage;
