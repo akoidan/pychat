@@ -25,6 +25,7 @@ Live demo: [pychat.org](http://pychat.org/)
          * [Archlinux](#archlinux)
          * [CentOs](#centos)
        * [Bootstrap files](#bootstrap-files)
+       * [Configure Pycharm if you use it](#configure-pycharm-if-you-use-it)
        * [Start services and run](#start-services-and-run)
     * [Production setup](#production-setup)
        * [Archlinux prod](#archlinux-prod)
@@ -53,6 +54,7 @@ You can always use [pychat.org](https://pychat.org), but if you want run chat yo
 The flow is the following
  - Install OS packages depending on your OS type
  - Bootstrap files
+ - Configure Pycharm if you use it
  - Start services and check if it works
 
 ### Install OS packages
@@ -74,17 +76,39 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  4. `echo 'export PYCHAT_CONFIG=local' >> /etc/profile`
 
 #### [Archlinux](https://www.archlinux.org/):
- 1. Simple and easy as always: `pacman -S python pip redis mariadb  sassc mysql-python python-mysql-connector`
+ 1. With py3:  `pacman -S unzip python python-pip redis mariadb  sassc`. `yaourt -S aur/python-mysqlclient`. For py2 use `extra/mysql-python`
  2. If you just installed mariadb you need to initialize it: `mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`.
  3. `echo 'export PYCHAT_CONFIG=local' >> /etc/profile`
 
 ### Bootstrap files:
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
- 2. Rename [chat/production_example.py](chat/production.py) to `chat/production.py`. And And replace it with your data.
- 3. Install python packages with `pip install -r requirements.txt`.
- 4. Create database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`.If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
- 5. Fill database with tables: `./manage.py init_db && ./manage.py sync_db`
- 6. Populate project files: `sh download_content.sh all`
+ 2. Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. Modify file according to the comments in it.
+ 3. Install VirtualEnv if you don't have it. `pip install virtualenv`. 
+ 4. Create virtualEnv `virtualenv --system-site-packages .venv` and activate it `.venv/bin/activate`
+ 5. Install python packages with `pip install -r requirements.txt`.
+ 6. Create database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`.If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
+ 7. Fill database with tables: `./manage.py init_db && ./manage.py sync_db`
+ 8. Populate project files: `sh download_content.sh all`
+
+### Configure Pycharm if you use it:
+ 1. Enable django support. Go to Settings -> Django -> Enable django support. 
+   - Django project root: root directory of your project. Where .git asides.
+   - Put `Settings:` to `chat/settings.py`
+   - 'Environment variables: `PYCHAT_CONFIG=local`
+ 2. `Settings` -> `Project djangochat` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `djangochatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
+ 3. `Settings` -> `Project: djangochat` -> `Project structure`
+  - You might want to exclude: `.idea`, `chat/static/css`
+  - mark `templates` directory as `Template Folder`
+ 4. Add start scripts:
+ - Add server script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `runsslserver` . Leave port 8000 as it it. Click on Environment Variable and set `PYCHAT_CONFIG=local`
+ - Add tornado script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `start_tornado`. Remove port value. Click on Environment Variable and set `PYCHAT_CONFIG=local`
+ 5. Pycharm sassc fewatcher.  I use the latest [sassc](https://github.com/sass/sassc) implementation for libsass, since it's the fastest ones, along with chrome workspace feature you can edit sass directly in browser or with jetbrains filewatcher. Latest sassc also allows inline sourcemap (base64 map directly in css file) that correctly shows source files in chrome. `--sourcemap=inline` does that. If your sassc doesn't have inline sourcemap support, please remove flag from argument command below. Also you you use any implementation you want, it's just a suggestion.
+
+ - Go to Jetbrains `Settings` -> `Tools` -> `FileWatchers` -> `Click add` -> `Sass`:
+ - arguments: `--no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded`. Or for newest sass `$FilePath$ $ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --sourcemap=inline`
+ - working directory: `$ProjectFileDir$/chat/static/sass`
+ - output files to refresh: `$ProjectFileDir$/chat/static/css/`
+
 
 ### Start services and run:
  - Start `mysql` server if it's not started.
@@ -142,6 +166,7 @@ Services commands for Archlinux:
  - Execute start services and if you need enablign autostart commands described for [Archlinux](#archliunux-prod) or [CentOS](#centos-prod)
  - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
  - If something doesn't work you want to check `djangochat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
+
 
 # Contributing:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
