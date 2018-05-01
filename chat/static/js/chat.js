@@ -3332,6 +3332,13 @@ function Search(channel) {
 	};
 	self.toggle = function () {
 		self.isHidden = CssUtils.toggleVisibility(self.dom.container);
+		if (self.currentRequest) {
+			logger.info("Canceling request {}", self.currentRequest)();
+			var cr = self.currentRequest;
+			self.currentRequest = null;
+			cr.abort();
+			CssUtils.removeClass(self.dom.container, 'loading');
+		}
 		if (self.isHidden) {
 			CssUtils.removeClass(self.channel.dom.chatBoxDiv, 'display-search-only');
 			self.clearSearch();
@@ -3340,7 +3347,6 @@ function Search(channel) {
 			self.dom.query.focus();
 		}
 	};
-	self.inProgress = false;
 	self.clearSearch = function() {
 		CssUtils.hideElement(self.dom.result);
 		self.lastSearchNodes.forEach(function (node) {
@@ -3350,7 +3356,7 @@ function Search(channel) {
 	};
 	self.oninput = function(event) {
 		self.lastSearch = self.dom.query.value;
-		if (!self.inProgress) {
+		if (!self.currentRequest) {
 			if (self.lastSearch.length < 2) {
 				self.clearSearch();
 				CssUtils.removeClass(self.channel.dom.chatBoxDiv, 'display-search-only');
@@ -3360,20 +3366,21 @@ function Search(channel) {
 				}
 				return;
 			}
-			self.inProgress = true;
 			var currentSearch = self.lastSearch;
 			CssUtils.addClass(self.dom.container, 'loading');
-			doPost('/search_messages', {
+			self.currentRequest = doPost('/search_messages', {
 				data: self.dom.query.value,
 				room: channel.roomId
 			}, function(response, error) {
-				if (error) {
+				if (error && self.currentRequest) {
 					growlError("Unable to search because" + error);
+				}
+				self.currentRequest = null;
+				if (error) {
 					return;
 				}
 				self.clearSearch();
 				var b = self.lastSearch == currentSearch;
-				self.inProgress = false;
 				CssUtils.addClass(channel.dom.chatBoxDiv, 'display-search-only');
 				CssUtils.removeClass(self.dom.container, 'loading');
 				var r = JSON.parse(response);

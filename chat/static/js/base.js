@@ -523,6 +523,7 @@ function doPost(url, params, callback, formData, isJsonEncoded, process) {
 		process(r);
 	}
 	r.send(data);
+	return r;
 }
 
 
