@@ -19,7 +19,7 @@ from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL,
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, get_or_create_room, \
-	create_room, process_files, get_message_images_videos
+	create_room, get_message_images_videos, update_symbols
 
 parent_logger = logging.getLogger(__name__)
 base_logger = logging.LoggerAdapter(parent_logger, {
@@ -285,6 +285,7 @@ class MessagesHandler(MessagesCreator):
 				blk_save = [Image(symbol=f.symbol, message=message_db, img=f.file, type=f.type) for f in files]
 				images = Image.objects.bulk_create(blk_save)
 				res_files = MessagesCreator.prepare_img_video(images, message_db.id)
+				files.delete()
 			prepared_message = self.create_send_message(
 				message_db,
 				Actions.PRINT_MESSAGE,
@@ -350,34 +351,46 @@ class MessagesHandler(MessagesCreator):
 		message = self.unsubscribe_direct_message(room_id)
 		self.publish(message, room_id, True)
 
-
 	def edit_message(self, data):
-		message_id = data[VarNames.MESSAGE_ID]
 		js_id = data[VarNames.JS_MESSAGE_ID]
-		message = do_db(Message.objects.get, id=message_id)
+		message = do_db(Message.objects.get, id=data[VarNames.MESSAGE_ID])
 		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
 		MessageHistory(message=message, content=message.content, giphy=message.giphy).save()
 		message.edited_times += 1
-		selector = Message.objects.filter(id=message_id)
 		giphy_match = self.isGiphy(data[VarNames.CONTENT])
 		if message.content is None:
-			action = Actions.DELETE_MESSAGE
-			prep_files = None
-			selector.update(deleted=True, edited_times=message.edited_times)
+			Message.objects.filter(id=data[VarNames.MESSAGE_ID]).update(deleted=True, edited_times=message.edited_times)
+			self.publish(self.create_send_message(message, Actions.DELETE_MESSAGE, None, js_id), message.room_id)
 		elif giphy_match is not None:
-			def edit_glyphy(message, giphy):
-				do_db(selector.update, content=message.content, symbol=message.symbol, giphy=giphy, edited_times=message.edited_times)
-				message.giphy = giphy
-				self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None, js_id), message.room_id)
-			self.search_giphy(message, giphy_match, edit_glyphy)
-			return
+			self.edit_message_giphy(giphy_match, message, js_id)
 		else:
-			action = Actions.EDIT_MESSAGE
-			message.giphy = None
-			files = UploadedFile.objects.filter(id__in=data.get(VarNames.FILES), user_id=self.user_id)
-			prep_files = process_files(files, message)
-			selector.update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
+			self.edit_message_edit(data, message, js_id)
+
+	def edit_message_giphy(self, giphy_match, message, js_id):
+		def edit_glyphy(message, giphy):
+			do_db(Message.objects.filter(id=message.id).update, content=message.content, symbol=message.symbol, giphy=giphy,
+					edited_times=message.edited_times)
+			message.giphy = giphy
+			self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None, js_id), message.room_id)
+
+		self.search_giphy(message, giphy_match, edit_glyphy)
+
+	def edit_message_edit(self, data, message, js_id):
+		action = Actions.EDIT_MESSAGE
+		message.giphy = None
+		files = UploadedFile.objects.filter(id__in=data.get(VarNames.FILES), user_id=self.user_id)
+		if files:
+			update_symbols(files, message)
+			blk_save = [Image(symbol=f.symbol, message=message, img=f.file, type=f.type) for f in files]
+			Image.objects.bulk_create(blk_save)
+			files.delete()
+		if message.symbol:  # fetch all, including that we just store
+			db_images = Image.objects.filter(message_id=message.id)
+			prep_files = MessagesCreator.prepare_img_video(db_images, message.id)
+		else:
+			prep_files = None
+			Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
 		self.publish(self.create_send_message(message, action, prep_files, js_id), message.room_id)
 
 	def send_client_new_channel(self, message):

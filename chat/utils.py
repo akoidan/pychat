@@ -528,26 +528,18 @@ def get_max_key(files):
 	return max
 
 
-def process_files(files, message):
-	if files:
-		if message.symbol:
-			order = ord(message.symbol)
-			for up in files:
-				if ord(up.symbol) <= order:
-					order += 1
-					new_symb = chr(order)
-					message.content = message.content.replace(up.symbol, new_symb)
-					up.symbol = new_symb
-		new_symbol = get_max_key(files)
-		if message.symbol is None or new_symbol > message.symbol:
-			message.symbol = new_symbol
-		blk_save = [Image(symbol=f.symbol, message=message, img=f.file, type=f.type) for f in files]
-		Image.objects.bulk_create(blk_save)
-	if message.symbol:  # fetch all, including that we just store
-		db_images = Image.objects.filter(message_id=message.id)
-	else:
-		db_images = None
-	return MessagesCreator.prepare_img_video(db_images, message.id)
+def update_symbols(files, message):
+	if message.symbol:
+		order = ord(message.symbol)
+		for up in files:
+			if ord(up.symbol) <= order:
+				order += 1
+				new_symb = chr(order)
+				message.content = message.content.replace(up.symbol, new_symb)
+				up.symbol = new_symb
+	new_symbol = get_max_key(files)
+	if message.symbol is None or new_symbol > message.symbol:
+		message.symbol = new_symbol
 
 
 def get_message_images_videos(messages):
