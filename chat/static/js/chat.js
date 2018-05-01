@@ -2728,7 +2728,7 @@ function ChannelsHandler() {
 		if (files.length) {
 			var fd = new FormData();
 			files.forEach(function(sd) {
-				fd.append(sd.type + sd.symbol, sd.file);
+				fd.append(sd.type + sd.symbol, sd.file, sd.file.name);
 			});
 			var gr;
 			doPost('/upload_file', null, function (res) {
@@ -6625,11 +6625,12 @@ var Utils = {
 					var img = document.createElement('img');
 					img.className = PASTED_IMG_CLASS;
 					img.src = url;
+					blob.name = '.jpg';
 					img.setAttribute('associatedVideo', src);
 					Utils.videoFiles[src] = file;
 					Utils.previewFiles[url] = blob;
 					Utils.pasteHtmlAtCaret(img);
-				});
+				},  'image/jpeg', 0.95);
 			}, false);
 			video.src = src;
 		} else {
