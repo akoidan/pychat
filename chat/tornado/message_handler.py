@@ -12,13 +12,14 @@ from tornado.web import asynchronous
 from tornadoredis import Client
 from chat import settings
 from chat.log_filters import id_generator
-from chat.models import Message, Room, RoomUsers, Subscription, User, UserProfile, SubscriptionMessages, MessageHistory
+from chat.models import Message, Room, RoomUsers, Subscription, User, UserProfile, SubscriptionMessages, MessageHistory, \
+	UploadedFile, Image
 from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, get_or_create_room, \
-	create_room, evaluate, process_images, prepare_img, save_images, get_message_images
+	create_room, process_files, get_message_images_videos
 
 parent_logger = logging.getLogger(__name__)
 base_logger = logging.LoggerAdapter(parent_logger, {
@@ -267,22 +268,27 @@ class MessagesHandler(MessagesCreator):
 
 		# @transaction.atomic mysql has gone away
 		def send_message(message, giphy=None):
-			raw_imgs = message.get(VarNames.IMG)
+			files = UploadedFile.objects.filter(id__in=message.get(VarNames.FILES), user_id=self.user_id)
+			symbol = get_max_key(files)
 			channel = message[VarNames.CHANNEL]
 			js_id = message[VarNames.JS_MESSAGE_ID]
 			message_db = Message(
 				sender_id=self.user_id,
 				content=message[VarNames.CONTENT],
-				symbol=get_max_key(raw_imgs),
-				giphy=giphy
+				symbol=symbol,
+				giphy=giphy,
+				room_id=channel
 			)
-			message_db.room_id = channel
+			res_files = []
 			do_db(message_db.save)
-			db_images = save_images(raw_imgs, message_db.id)
+			if files:
+				blk_save = [Image(symbol=f.symbol, message=message_db, img=f.file, type=f.type) for f in files]
+				images = Image.objects.bulk_create(blk_save)
+				res_files = MessagesCreator.prepare_img_video(images, message_db.id)
 			prepared_message = self.create_send_message(
 				message_db,
 				Actions.PRINT_MESSAGE,
-				prepare_img(db_images, message_db.id),
+				res_files,
 				js_id
 			)
 			self.publish(prepared_message, channel)
@@ -357,7 +363,7 @@ class MessagesHandler(MessagesCreator):
 		giphy_match = self.isGiphy(data[VarNames.CONTENT])
 		if message.content is None:
 			action = Actions.DELETE_MESSAGE
-			prep_imgs = None
+			prep_files = None
 			selector.update(deleted=True, edited_times=message.edited_times)
 		elif giphy_match is not None:
 			def edit_glyphy(message, giphy):
@@ -369,9 +375,10 @@ class MessagesHandler(MessagesCreator):
 		else:
 			action = Actions.EDIT_MESSAGE
 			message.giphy = None
-			prep_imgs = process_images(data.get(VarNames.IMG), message)
+			files = UploadedFile.objects.filter(id__in=data.get(VarNames.FILES), user_id=self.user_id)
+			prep_files = process_files(files, message)
 			selector.update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
-		self.publish(self.create_send_message(message, action, prep_imgs, js_id), message.room_id)
+		self.publish(self.create_send_message(message, action, prep_files, js_id), message.room_id)
 
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -396,8 +403,8 @@ class MessagesHandler(MessagesCreator):
 			messages = Message.objects.filter(Q(room_id=room_id), Q(deleted=False)).order_by('-pk')[:count]
 		else:
 			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id), Q(deleted=False)).order_by('-pk')[:count]
-		images = do_db(get_message_images, messages)
-		response = self.get_messages(messages, room_id, images, prepare_img)
+		imv = do_db(get_message_images_videos, messages)
+		response = self.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video)
 		self.ws_write(response)
 
 

@@ -1,11 +1,10 @@
+import sys
+
 import base64
+import datetime
 import json
 import logging
 import re
-import sys
-import datetime
-from io import BytesIO
-
 import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -19,15 +18,17 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.timezone import utc
+from io import BytesIO
 
 from chat import local
 from chat.models import Image
-from chat.models import Room, get_milliseconds
+from chat.models import Room
 from chat.models import User
 from chat.models import UserProfile, Verification, RoomUsers, IpAddress
 from chat.py2_3 import urlopen
 from chat.tornado.constants import RedisPrefix
 from chat.tornado.constants import VarNames
+from chat.tornado.message_creator import MessagesCreator
 
 USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
 
@@ -143,8 +144,6 @@ def create_self_room(self_user_id, user_rooms):
 def validate_edit_message(self_id, message):
 	if message.sender_id != self_id:
 		raise ValidationError("You can only edit your messages")
-	if message.time + 600000 < get_milliseconds():
-		raise ValidationError("You can only edit messages that were send not more than 10 min ago")
 	if message.deleted:
 		raise ValidationError("Already deleted")
 
@@ -520,67 +519,38 @@ class EmailOrUsernameModelBackend(object):
 			return None
 
 
-def get_max_key(dictionary):
-	return max(dictionary.keys()) if dictionary else None
+def get_max_key(files):
+	max = None
+	if files:
+		for f in files:
+			if max is None or f.symbol > max:
+				max = f.symbol
+	return max
 
 
-def process_images(images, message):
-	if images:
+def process_files(files, message):
+	if files:
 		if message.symbol:
-			replace_symbols_if_needed(images, message)
-		new_symbol = get_max_key(images)
+			order = ord(message.symbol)
+			for up in files:
+				if ord(up.symbol) <= order:
+					order += 1
+					new_symb = chr(order)
+					message.content = message.content.replace(up.symbol, new_symb)
+					up.symbol = new_symb
+		new_symbol = get_max_key(files)
 		if message.symbol is None or new_symbol > message.symbol:
 			message.symbol = new_symbol
-	db_images = save_images(images, message.id)
+		blk_save = [Image(symbol=f.symbol, message=message, img=f.file, type=f.type) for f in files]
+		Image.objects.bulk_create(blk_save)
 	if message.symbol:  # fetch all, including that we just store
 		db_images = Image.objects.filter(message_id=message.id)
-	return prepare_img(db_images, message.id)
+	else:
+		db_images = None
+	return MessagesCreator.prepare_img_video(db_images, message.id)
 
 
-def save_images(images, message_id):
-	db_images = []
-	if images:
-		db_images = [Image(
-			message_id=message_id,
-			img=extract_photo(
-				images[k][VarNames.IMG_B64],
-				images[k][VarNames.IMG_FILE_NAME]
-			),
-			symbol=k) for k in images]
-		Image.objects.bulk_create(db_images)
-	return db_images
-
-
-def replace_symbols_if_needed(images, message):
-	# if message was edited user wasn't notified about that and he edits message again
-	# his symbol can go out of sync
-	order = ord(message.symbol)
-	new_dict = []
-	for img in images:
-		if img <= message.symbol:
-			order += 1
-			new_symb = chr(order)
-			new_dict.append({
-				'new': new_symb,
-				'old': img,
-				'value': images[img]
-			})
-			message.content = message.content.replace(img, new_symb)
-	for d in new_dict:  # dictionary changed size during iteration
-		del images[d['old']]
-		images[d['new']] = d['value']
-
-
-def prepare_img(images, message_id):
-	"""
-	:type message_id: int
-	:type images: list[chat.models.Image]
-	"""
-	if images:
-		return {x.symbol: x.img.url for x in images if x.message_id == message_id}
-
-
-def get_message_images(messages):
+def get_message_images_videos(messages):
 	ids = [message.id for message in messages if message.symbol]
 	if ids:
 		images = Image.objects.filter(message_id__in=ids)

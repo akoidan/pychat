@@ -30,11 +30,11 @@ from chat import utils
 from chat.decorators import login_required_no_redirect, validation
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
-	SubscriptionMessages, RoomUsers, Room, UserJoinedInfo
+	SubscriptionMessages, RoomUsers, Room, UserJoinedInfo, UploadedFile
 from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
 	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip, \
-	send_password_changed, send_email_change, send_new_email_ver, get_message_images, prepare_img
+	send_password_changed, send_email_change, send_new_email_ver, get_message_images_videos
 
 logger = logging.getLogger(__name__)
 RECAPTCHA_SITE_KEY = getattr(settings, "RECAPTCHA_SITE_KEY", None)
@@ -57,6 +57,22 @@ def validate_email(request):
 	"""
 	utils.check_email(request.POST.get('email'))
 	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+
+
+@require_http_methods(['POST'])
+@login_required_no_redirect(False)
+@transaction.atomic
+def upload_file(request):
+	"""
+	POST only, validates email during registration
+	"""
+	logger.debug('Uploading file %s', request.POST)
+	res = []
+	for file in request.FILES:
+		uf = UploadedFile(symbol=file[1], user=request.user, file=request.FILES[file], type_enum=UploadedFile.UploadedFileChoices(file[0]))
+		uf.save()
+		res.append(uf.id)
+	return HttpResponse(json.dumps(res), content_type='application/json')
 
 
 @require_http_methods(['POST'])
@@ -121,10 +137,11 @@ def search_messages(request):
 	if not RoomUsers.objects.filter(room_id=room_id, user_id=request.user.id).exists():
 		raise ValidationError("You can't access this room")
 	messages = Message.objects.filter(content__icontains=data, room_id=room_id)[:10]
-	images = get_message_images(messages)
+	imv = get_message_images_videos(messages)
 	result = []
 	for message in messages:
-		prep_m = MessagesCreator.create_message(message, prepare_img(images, message.id))
+		files = MessagesCreator.prepare_img_video(imv, message.id)
+		prep_m = MessagesCreator.create_message(message, files)
 		result.append(prep_m)
 	response = json.dumps(result)
 	return HttpResponse(response, content_type='application/json')

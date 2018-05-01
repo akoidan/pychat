@@ -222,11 +222,43 @@ class Message(models.Model):
 		return "{}/{}".format(self.id, v)
 
 
+class UploadedFile(models.Model):
+	class UploadedFileChoices(Enum):
+		video = 'v'
+		image = 'i'
+	symbol = models.CharField(null=False, max_length=1)
+	file = FileField(upload_to=get_random_path, null=True)
+	user = models.ForeignKey(User, null=False)
+	type = models.CharField(null=False, max_length=1)
+
+	@property
+	def type_enum(self):
+		return UploadedFileChoices(self.type)
+
+	@type_enum.setter
+	def type_enum(self, p_type):
+		self.type = p_type.value
+
+
 class Image(models.Model):
+
+	class MediaTypeChoices(Enum):
+		video = 'v'
+		image = 'i'
+
 	# character in Message.content that will be replaced with this image
 	symbol = models.CharField(null=False, max_length=1)
-	message = models.ForeignKey(Message, related_name='message', null=True)
+	message = models.ForeignKey(Message, related_name='message', null=False)
 	img = FileField(upload_to=get_random_path, null=True)
+	type = models.CharField(null=False, max_length=1, default=MediaTypeChoices.image.value)
+
+	@property
+	def type_enum(self):
+		return MediaTypeChoices(self.type)
+
+	@type_enum.setter
+	def type_enum(self, p_type):
+		self.type = p_type.value
 
 	class Meta:
 		unique_together = ('symbol', 'message')

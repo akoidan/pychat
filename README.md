@@ -172,6 +172,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* edit message should display smileys/images/videos instead of encoded characters
 * seacrh message -> while search is in progress -> close search -> no messages in chatbox while searh is closed.
 * https://static.pychat.org/photo/uEXCJWJH_image.png
 * Add go down button if scroll is not in the botom for chatbox

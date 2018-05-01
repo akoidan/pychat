@@ -19,9 +19,9 @@ from chat.models import User, Message, UserJoinedInfo, IpAddress
 from chat.py2_3 import str_type, urlparse
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions
+from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
-from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms, get_message_images, \
-	prepare_img, get_or_create_ip_wrapper, create_ip_structure
+from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms, get_message_images_videos, get_or_create_ip_wrapper, create_ip_structure
 
 sessionStore = SessionStore()
 
@@ -178,10 +178,11 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		for room_id in user_rooms:
 			c = self.get_cookie(str(room_id))
 			if c is not None:
-				if self.restored_connection:
-					q_objects.add(Q(id__gte=c, room_id=room_id, deleted=False, edited_times__gt=0), Q.OR)
-				else:
-					q_objects.add(Q(id__gte=c, room_id=room_id, deleted=False), Q.OR)
+				q_objects.add(Q(id__gte=c, room_id=room_id, deleted=False), Q.OR)
+				# if self.restored_connection:
+				# 	q_objects.add(Q(id__gte=c, room_id=room_id, deleted=False, edited_times__gt=0), Q.OR)
+				# else:
+				# 	q_objects.add(Q(id__gte=c, room_id=room_id, deleted=False), Q.OR)
 		off_messages = Message.objects.filter(
 			id__gt=F('room__roomusers__last_read_message_id'),
 			deleted=False,
@@ -195,14 +196,16 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		else:
 			history_messages = []
 			all = off_messages
-		images = get_message_images(all)
-		for message in off_messages:
-			prep_m = self.create_message(message, prepare_img(images, message.id))
-			off.setdefault(message.room_id, []).append(prep_m)
-		for message in history_messages:
-			prep_m = self.create_message(message, prepare_img(images, message.id))
-			history.setdefault(message.room_id, []).append(prep_m)
+		imv = get_message_images_videos(all)
+		self.set_video_images_messages(imv, off_messages, off)
+		self.set_video_images_messages(imv, history_messages, history)
 		return off, history
+
+	def set_video_images_messages(self, imv, inm, outm):
+		for message in inm:
+			files = MessagesCreator.prepare_img_video(imv, message.id)
+			prep_m = self.create_message(message, files)
+			outm.setdefault(message.room_id, []).append(prep_m)
 
 	def check_origin(self, origin):
 		"""

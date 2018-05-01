@@ -14,6 +14,7 @@ var FLOOD_FILL_CURSOR = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> 
 var SYSTEM_USERNAME = 'System';
 var SETTINGS_ICON_CLASS_NAME = 'icon-cog';
 var PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
+var PASTED_VIDEO_CLASS = 'B4j2ContentEditableVideo';
 var OFFLINE_CLASS = 'offline';
 var GENDER_ICONS = {
 	'Male': 'icon-man',
@@ -44,6 +45,7 @@ var painter;
 var minimizedWindows;
 var chatFileAudio;
 var chatTestVolume;
+var tmpCanvasContext = document.createElement('canvas').getContext('2d');
 onDocLoad(function () {
 	userMessage = $("usermsg");
 	headerText = $('headerText');
@@ -544,13 +546,13 @@ function Painter() {
 			if (self.dom.trimImage.checked) {
 				var trimImage = self.helper.trimImage();
 				if (trimImage) {
-					Utils.pasteb64ImgToTextArea(trimImage.toDataURL());
+					trimImage.toBlob(Utils.pasteBlobImgToTextArea);
 					self.hide();
 				} else {
 					growlError("You can't paste empty images");
 				}
 			} else {
-				Utils.pasteb64ImgToTextArea(self.dom.canvas.toDataURL());
+				self.dom.canvas.toBlob(Utils.pasteBlobImgToTextArea);
 				self.hide();
 			}
 		},
@@ -577,8 +579,7 @@ function Painter() {
 			return charCode > 47 && charCode < 58;
 		},
 		trimImage: function () { // TODO this looks bad
-			var copy = document.createElement('canvas').getContext('2d'),
-					pixels = self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height),
+					var pixels = self.ctx.getImageData(0, 0, self.dom.canvas.width, self.dom.canvas.height),
 					l = pixels.data.length,
 					i,
 					bound = {
@@ -616,10 +617,10 @@ function Painter() {
 					trimWidth = bound.right - bound.left;
 			if (trimWidth && trimHeight) {
 				var trimmed = self.ctx.getImageData(bound.left, bound.top, trimWidth, trimHeight);
-				copy.canvas.width = trimWidth;
-				copy.canvas.height = trimHeight;
-				copy.putImageData(trimmed, 0, 0);
-				return copy.canvas;
+				tmpCanvasContext.canvas.width = trimWidth;
+				tmpCanvasContext.canvas.height = trimHeight;
+				tmpCanvasContext.putImageData(trimmed, 0, 0);
+				return tmpCanvasContext.canvas;
 			} else {
 				return false;
 			}
@@ -993,8 +994,6 @@ function Painter() {
 			};
 			tool.bufferHandler = true;
 			tool.domImg = $('paintPastedImg');
-			tool.dummyCanvas = document.createElement('canvas');
-			tool.dummyContext = tool.dummyCanvas.getContext('2d');
 			tool.getCursor = function () {
 				return 'crosshair';
 			};
@@ -1048,12 +1047,12 @@ function Painter() {
 					tool.inProgress = true;
 					tool.mouseUpClicked = true;
 					var imageData = self.ctx.getImageData(params.left, params.top, params.width, params.height);
-					tool.dummyCanvas.width = params.width;
-					tool.dummyCanvas.height = params.height;
+					tmpCanvasContext.canvas.width = params.width;
+					tmpCanvasContext.canvas.height = params.height;
 					tool.imgInfo = {width: params.width, height: params.height};
-					tool.dummyContext.putImageData(imageData, 0, 0);
+					tmpCanvasContext.putImageData(imageData, 0, 0);
 					CssUtils.showElement(tool.domImg);
-					tool.domImg.src = tool.dummyCanvas.toDataURL();
+					tool.domImg.src = tmpCanvasContext.canvas.toDataURL();
 					self.buffer.startAction();
 					self.ctx.clearRect(params.left, params.top, params.width, params.height);
 				}
@@ -1161,7 +1160,6 @@ function Painter() {
 			};
 			tool.onMouseUp = function (e) {
 				self.ctx.closePath();
-				tool.tmpData = null;
 			};
 		})(),
 		fill: new (function (ctx) {
@@ -1688,16 +1686,15 @@ function Painter() {
 					var m = self.tools.select;
 					var d = m.getAreaData();
 					self.log("{}x{}", d.width, d.height)();
-					var canvas = document.createElement('canvas');
-					canvas.width = d.height; //specify width of your canvas
-					canvas.height = d.width; //specify height of your canvas
-					var ctx = canvas.getContext("2d");
+					tmpCanvasContext.canvas.width = d.height; //specify width of your canvas
+					tmpCanvasContext.canvas.height = d.width; //specify height of your canvas
+					var ctx = tmpCanvasContext;
 					ctx.save();
 					ctx.translate(d.height / 2, d.width / 2);
 					ctx.rotate(Math.PI / 2);
 					ctx.drawImage(d.img, -d.width / 2, -d.height / 2); //draw it
 					ctx.restore();
-					d.img.src = canvas.toDataURL();
+					d.img.src = tmpCanvasContext.canvas.toDataURL();
 					m.rotateInfo();
 				} else {
 					self.buffer.startAction();
@@ -2623,9 +2620,9 @@ function ChannelsHandler() {
 		// eventPropagande will execute onclick on document.body that will hide contextMenu
 	};
 	self.handleEditMessage = function (event) {
-		if (blankRegex.test(userMessage.textContent)) {
-			return;
-		}
+		// if (blankRegex.test(userMessage.textContent)) {
+		// 	return;
+		// }
 		var editLastMessageNode = self.getActiveChannel().lastMessage;
 		// only if message was sent 10 min ago + 2seconds for message to being processed
 		if (editLastMessageNode && self.isMessageEditable(editLastMessageNode.time)) {
@@ -2640,13 +2637,13 @@ function ChannelsHandler() {
 		}
 	};
 	self.isMessageEditable = function (time) {
-		return time + 595000 > Date.now();
+		return true;/* time + 595000 > Date.now()*/;
 	};
 	self.nextChar = function (c) {
 		return String.fromCharCode(c.charCodeAt(0) + 1)
 	};
 	self.getPastedImage = function (currSymbol) {
-		var res = {}; // return array from nodeList
+		var res = {images: {}, videos: {}}; // return array from nodeList
 		var images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
 		for (var i = 0; i < images.length; i++) {
 			var img = images[i];
@@ -2658,22 +2655,45 @@ function ChannelsHandler() {
 			var textNode = document.createTextNode(elSymbol);
 			img.parentNode.replaceChild(textNode, img);
 			if (!img.getAttribute('symbol')) { // don't send image again, it's already in server
-				res[elSymbol] = {
-					b64: img.src,
-					fileName: img.getAttribute('fileName')
-				};
+				var assVideo = img.getAttribute('associatedVideo');
+				if (assVideo) {
+					res.videos[elSymbol] = {
+						file: Utils.videoFiles[assVideo]
+					};
+				} else {
+					res.images[elSymbol] = {
+						file: Utils.imagesFiles[img.src]
+					};
+				}
 			}
 		}
 		return res;
 	};
+	self.sendMessage = function(lastEditedNodeId, files, messageContent) {
+		if (lastEditedNodeId) {
+			wsHandler.sendToServer({
+				id: lastEditedNodeId,
+				action: 'editMessage',
+				files: files,
+				content: messageContent
+			});
+		} else if (messageContent) {
+			wsHandler.sendToServer({
+				files: files,
+				action: 'sendMessage',
+				content: messageContent,
+				channel: self.activeChannel
+			})
+		}
+	};
 	self.handleSendMessage = function () {
-		var buHtml = userMessage.innerHTML;
-		var bul = buHtml.length;
-		if (bul > self.MAX_MESSAGE_SIZE) {
-			growlError("Can't send {} in a single message, that exceed {} limit. Please split it into multiple.".format(bytesToSize(bul), bytesToSize(self.MAX_MESSAGE_SIZE)));
-			return;
+		if (!wsHandler.isWsOpen()) {
+			growlError("Can't send message, because server is not available atm");
 		}
 		var isEdit = self.editLastMessageNode && !self.editLastMessageNode.notReady;
+		if (isEdit) {
+			isEdit = self.editLastMessageNode.id;
+		}
 		var currSymbol = '\u3500'; // it's gonna increase in getPastedImage
 		if (isEdit && self.editLastMessageNode.dom) {
 			// dom can be null if we cleared the history
@@ -2683,31 +2703,63 @@ function ChannelsHandler() {
 				currSymbol = newSymbol;
 			}
 		}
-		var images = self.getPastedImage(currSymbol);
+		var files = self.getPastedImage(currSymbol);
 		smileyUtil.purgeImagesFromSmileys();
 		var messageContent = typeof userMessage.innerText != 'undefined' ? userMessage.innerText : userMessage.textContent;
 		messageContent = blankRegex.test(messageContent) ? null : messageContent;
-		var message;
-		if (isEdit) {
-			message = {
-				id: self.editLastMessageNode.id,
-				action: 'editMessage',
-				images: images,
-				content: messageContent
-			};
-			self.removeEditingMode();
-		} else if (messageContent) {
-			message = {
-				images: images,
-				action: 'sendMessage',
-				content: messageContent,
-				channel: self.activeChannel
-			};
+		self.removeEditingMode();
+		CssUtils.deleteChildren(userMessage);
+		if (Object.keys(files.videos).length || Object.keys(files.images).length) {
+			var fd = new FormData();
+			for (var k in files.videos) {
+				if (files.videos[k].file) {
+					fd.append("v"+k, files.videos[k].file);
+				}
+			}
+			for (var k in files.images) {
+				if (files.images[k].file) {
+					fd.append("i"+k, files.images[k].file);
+				}
+			}
+			var gr;
+			doPost('/upload_file', null, function (res) {
+				if (gr) {
+					gr.hide();
+				}
+				var d;
+				try {
+					d = JSON.parse(res);
+				} catch (e) {
+					growlError("Unable to upload videos, failed to parse response from server");
+					return;
+				}
+				self.sendMessage(isEdit, d, messageContent)
+			}, fd, null, function(r) {
+				var db;
+				var text;
+				r.upload.addEventListener('progress', function (evt) {
+					if (evt.lengthComputable) {
+						if (!db) {
+							var div = document.createElement("DIV");
+							var holder = document.createElement("DIV");
+							text = document.createElement("SPAN");
+							holder.appendChild(text);
+							holder.appendChild(div);
+							text.innerText = "Uploading files...";
+							db = new DownloadBar(div, evt.total);
+							gr = new Growl(null, null, holder);
+							gr.show();
+						}
+						db.setValue(evt.loaded);
+						if (evt.loaded === evt.total) {
+							text.innerText = "Server is processing files...";
+						}
+					}
+				}, false);
+			});
 		} else {
-			return;
+			self.sendMessage(isEdit, [], messageContent);
 		}
-		var sendSuccessful = wsHandler.sendToServer(message);
-		userMessage.innerHTML = sendSuccessful ? "" : buHtml;
 	};
 	self.checkAndSendMessage = function (event) {
 		if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
@@ -2724,7 +2776,7 @@ function ChannelsHandler() {
 		if (self.editLastMessageNode) {
 			CssUtils.removeClass(self.editLastMessageNode.dom, self.HIGHLIGHT_MESSAGE_CLASS);
 			self.editLastMessageNode = null;
-			userMessage.innerHTML = "";
+			CssUtils.deleteChildren(userMessage);
 		}
 	};
 	self.addUserHolderClick = function (event) {
@@ -3652,7 +3704,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 
 	self.isScrollInTHeMiddle = function () {
 		var element = self.dom.chatBoxDiv;
-		return element.scrollHeight - element.scrollTop > element.clientHeight + 10;
+		logger.info("{} [scrollHeight] - {} [scrollTop] >  [element.clientHeight] + 30 {},  {} > {}",element.scrollHeight, element.scrollTop, element.clientHeight, element.scrollHeight - element.scrollTop, element.clientHeight + 30 )();
+		return element.scrollHeight - element.scrollTop > element.clientHeight + 30;
 	};
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
 	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, userId, edited) {
@@ -3745,9 +3798,19 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 			if (replaceElements.length) {
 				logger.info("Replaced {} in message #{}", replaceElements.join(", "), data.id)();
 			}
-			if (data.images && Object.keys(data.images).length) {
+			if (data.files && Object.keys(data.files).length) {
 				html = html.replace(imageUnicodeRegex, function (s) {
-					return "<img src=\'{}\' symbol=\'{}\' class=\'{}\'/>".format(data.images[s], s, PASTED_IMG_CLASS);
+					if (data.files[s]) {
+						if (data.files[s].type == 'i') {
+							return "<img src=\'{}\' symbol=\'{}\' class=\'{}\'/>".format(data.files[s].url, s, PASTED_IMG_CLASS);
+						} else if (data.files[s].type == 'v') {
+							return "<video src=\'{}\' symbol=\'{}\' class=\'{}\' controls preload=\"none\"/>".format(data.files[s].url, s, PASTED_IMG_CLASS);
+						} else {
+							logger.error('Invalid type {}', data.files[s].type)();
+						}
+					} else {
+						return s;
+					}
 				});
 			}
 			return smileyUtil.encodeSmileys(html);
@@ -6091,9 +6154,12 @@ function WsHandler() {
 			progressInterval.interval = setInterval(handler, 200);
 		}
 	};
+	self.isWsOpen = function() {
+		return self.ws && self.ws.readyState === WebSocket.OPEN;
+	};
 	self.sendRawTextToServer = function(jsonRequest, skipGrowl, objData) {
 		var logEntry = jsonRequest.substring(0, 500);
-		if (!self.ws || self.ws.readyState !== WebSocket.OPEN) {
+		if (!self.isWsOpen()) {
 			if (!skipGrowl){
 				growlError("Can't send message, because connection is lost :(");
 			}
@@ -6209,6 +6275,12 @@ function Storage() {
 }
 
 var Utils = {
+	videoFiles: {
+
+	},
+	imagesFiles: {
+
+	},
 	volumeProportion: {
 		0: 0,
 		1: 0.15,
@@ -6479,25 +6551,44 @@ var Utils = {
 		sel.removeAllRanges();
 		sel.addRange(range);
 	},
-	pasteb64ImgToTextArea: function (b64, name) {
+	pasteBlobImgToTextArea: function(blob) {
 		var img = document.createElement('img');
-		img.src = b64;
-		if (name) {
-			img.setAttribute('fileName', name);
-		}
 		img.className = PASTED_IMG_CLASS;
+		var src = URL.createObjectURL(blob);
+		img.src = src;
+		Utils.imagesFiles[src] = blob;
 		Utils.pasteHtmlAtCaret(img);
+		return img;
 	},
-	pasteImgToTextArea: function (file) {
-		var type = file.type;
-		if (type.indexOf("image") >= 0) {
-			var reader = new FileReader();
-			reader.onload = function (e) {
-				Utils.pasteb64ImgToTextArea(e.target.result, file.name);
-			};
-			reader.readAsDataURL(file);
+	pasteBlobVideoToTextArea: function (file) {
+		var video = document.createElement('video');
+		if (video.canPlayType(file.type)) {
+			video.autoplay = false;
+			var src = URL.createObjectURL(file);
+			video.loop = false;
+			video.addEventListener("loadeddata", function () {
+				tmpCanvasContext.canvas.width = video.videoWidth;
+				tmpCanvasContext.canvas.height = video.videoHeight;
+				tmpCanvasContext.drawImage(video, 0, 0);
+				var url = tmpCanvasContext.canvas.toDataURL();
+				var img = document.createElement('img');
+				img.className = PASTED_IMG_CLASS;
+				img.src = url;
+				img.setAttribute('associatedVideo', src);
+				Utils.videoFiles[src] = file;
+				Utils.pasteHtmlAtCaret(img);
+			}, false);
+			video.src = src;
 		} else {
-			growlError("Pasted file type {}, which is not an image".format(type));
+			growlError("Browser doesn't support playing " + file.type);
+		}
+	}, pasteImgToTextArea: function (file) {
+		if (file.type.indexOf("image") >= 0) {
+			Utils.pasteBlobImgToTextArea(file);
+		} else if (file.type.indexOf("video") >= 0) {
+			Utils.pasteBlobVideoToTextArea(file);
+		} else {
+			growlError("Pasted file type {}, which is not an image".format(file.type));
 		}
 
 	},

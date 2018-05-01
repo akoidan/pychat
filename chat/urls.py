@@ -37,4 +37,5 @@ urlpatterns = patterns(
 	url(r'^test$', 'chat.views.test'),
 	url(r'^search_messages$', 'chat.views.search_messages'),
 	url(r'^save_room_settings$', 'chat.views.save_room_settings'),
+	url(r'^upload_file$', 'chat.views.upload_file'),
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

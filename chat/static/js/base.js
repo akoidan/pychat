@@ -458,7 +458,7 @@ function ajaxHide() {
  * @param url : string url to post
  * @param formData : form in canse form is used
  * */
-function doPost(url, params, callback, formData, isJsonEncoded) {
+function doPost(url, params, callback, formData, isJsonEncoded, process) {
 	var r = new XMLHttpRequest();
 	r.onreadystatechange = function () {
 		if (r.readyState === 4) {
@@ -519,6 +519,9 @@ function doPost(url, params, callback, formData, isJsonEncoded) {
 	r.setRequestHeader("X-CSRFToken", readCookie()["csrftoken"]);
 
 	logger.http("POST out {} ::: {}", url, params)();
+	if (process) {
+		process(r);
+	}
 	r.send(data);
 }
 
