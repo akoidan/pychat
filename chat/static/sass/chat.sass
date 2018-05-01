@@ -124,14 +124,14 @@ fieldset
 		max-height: 400px
 		display: block
 
-	iframe
+	.video-player-ready
 		border: none
 		@include margin-img-def
 		width: 500px
 		height: 350px
 		@include margin-img
 
-	.youtube-player
+	%img-play
 		@extend %user-select-none
 		display: block
 		@include margin-img
@@ -160,6 +160,10 @@ fieldset
 					margin-left: -45px
 					height: 70px
 					width: 70px
+	.youtube-player
+		@extend %img-play
+	.video-player
+		@extend %img-play
 
 	.giphy
 		position: relative

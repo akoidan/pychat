@@ -18,6 +18,9 @@ globals().update(importlib.import_module(config).__dict__)
 # SECRET_KEY = '**************************************************'
 
 
+### Replace with your timezone. You can find list of timezones here https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+# TIME_ZONE = 'Europe/Kiev'
+
 ### this this emails settings will be used to send emails. E.g. when user restores password via email.
 ###  Comment them out if you don't want to setup
 # ADMINS = [('YourName', 'emailAddresThatYouWillReceiveReportsOn@gmail.com'), ]

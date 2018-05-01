@@ -97,7 +97,11 @@ class MessagesCreator(object):
 		:type files: list[chat.models.Image]
 		"""
 		if files:
-			return {x.symbol: {VarNames.FILE_URL: x.img.url, VarNames.FILE_TYPE: x.type} for x in files if x.message_id == message_id}
+			return {x.symbol: {
+				VarNames.FILE_URL: x.img.url,
+				VarNames.FILE_TYPE: x.type,
+				VarNames.PREVIEW: x.preview.url if x.preview else None
+			} for x in files if x.message_id == message_id}
 
 	@property
 	def channel(self):

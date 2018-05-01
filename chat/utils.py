@@ -21,11 +21,11 @@ from django.utils.timezone import utc
 from io import BytesIO
 
 from chat import local
-from chat.models import Image
+from chat.models import Image, UploadedFile
 from chat.models import Room
 from chat.models import User
 from chat.models import UserProfile, Verification, RoomUsers, IpAddress
-from chat.py2_3 import urlopen
+from chat.py2_3 import urlopen, dict_values_to_list
 from chat.tornado.constants import RedisPrefix
 from chat.tornado.constants import VarNames
 from chat.tornado.message_creator import MessagesCreator
@@ -548,4 +548,19 @@ def get_message_images_videos(messages):
 		images = Image.objects.filter(message_id__in=ids)
 	else:
 		images = []
+	return images
+
+
+def up_files_to_img(files, message_id):
+	blk_video = {}
+	for f in files:
+		stored_file = blk_video.setdefault(f.symbol, Image(symbol=f.symbol))
+		if f.type_enum == UploadedFile.UploadedFileChoices.preview:
+			stored_file.preview = f.file
+		else:
+			stored_file.message_id = message_id
+			stored_file.img = f.file
+			stored_file.type = f.type
+	images = Image.objects.bulk_create(dict_values_to_list(blk_video))
+	files.delete()
 	return images

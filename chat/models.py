@@ -226,6 +226,7 @@ class UploadedFile(models.Model):
 	class UploadedFileChoices(Enum):
 		video = 'v'
 		image = 'i'
+		preview = 'p'
 	symbol = models.CharField(null=False, max_length=1)
 	file = FileField(upload_to=get_random_path, null=True)
 	user = models.ForeignKey(User, null=False)
@@ -233,7 +234,7 @@ class UploadedFile(models.Model):
 
 	@property
 	def type_enum(self):
-		return UploadedFileChoices(self.type)
+		return self.UploadedFileChoices(self.type)
 
 	@type_enum.setter
 	def type_enum(self, p_type):
@@ -250,11 +251,12 @@ class Image(models.Model):
 	symbol = models.CharField(null=False, max_length=1)
 	message = models.ForeignKey(Message, related_name='message', null=False)
 	img = FileField(upload_to=get_random_path, null=True)
+	preview = FileField(upload_to=get_random_path, null=True)
 	type = models.CharField(null=False, max_length=1, default=MediaTypeChoices.image.value)
 
 	@property
 	def type_enum(self):
-		return MediaTypeChoices(self.type)
+		return self.MediaTypeChoices(self.type)
 
 	@type_enum.setter
 	def type_enum(self, p_type):

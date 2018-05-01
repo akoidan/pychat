@@ -19,7 +19,7 @@ from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL,
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, get_or_create_room, \
-	create_room, get_message_images_videos, update_symbols
+	create_room, get_message_images_videos, update_symbols, up_files_to_img
 
 parent_logger = logging.getLogger(__name__)
 base_logger = logging.LoggerAdapter(parent_logger, {
@@ -282,10 +282,8 @@ class MessagesHandler(MessagesCreator):
 			res_files = []
 			do_db(message_db.save)
 			if files:
-				blk_save = [Image(symbol=f.symbol, message=message_db, img=f.file, type=f.type) for f in files]
-				images = Image.objects.bulk_create(blk_save)
+				images = up_files_to_img(files, message_db.id)
 				res_files = MessagesCreator.prepare_img_video(images, message_db.id)
-				files.delete()
 			prepared_message = self.create_send_message(
 				message_db,
 				Actions.PRINT_MESSAGE,
@@ -382,9 +380,7 @@ class MessagesHandler(MessagesCreator):
 		files = UploadedFile.objects.filter(id__in=data.get(VarNames.FILES), user_id=self.user_id)
 		if files:
 			update_symbols(files, message)
-			blk_save = [Image(symbol=f.symbol, message=message, img=f.file, type=f.type) for f in files]
-			Image.objects.bulk_create(blk_save)
-			files.delete()
+			up_files_to_img(files, message.id)
 		if message.symbol:  # fetch all, including that we just store
 			db_images = Image.objects.filter(message_id=message.id)
 			prep_files = MessagesCreator.prepare_img_video(db_images, message.id)
@@ -392,6 +388,7 @@ class MessagesHandler(MessagesCreator):
 			prep_files = None
 			Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
 		self.publish(self.create_send_message(message, action, prep_files, js_id), message.room_id)
+
 
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]

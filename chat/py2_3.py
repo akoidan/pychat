@@ -23,3 +23,10 @@ def get_unicode(ch):
 		return unichr(ch)
 
 str_type = str if sys.version > '3' else basestring
+
+
+def dict_values_to_list(dict):
+	if sys.version > '3':
+		return list(dict.values())
+	else:
+		return dict.values()

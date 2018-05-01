@@ -14,7 +14,6 @@ var FLOOD_FILL_CURSOR = '<?xml version="1.0" encoding="UTF-8" standalone="no"?> 
 var SYSTEM_USERNAME = 'System';
 var SETTINGS_ICON_CLASS_NAME = 'icon-cog';
 var PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
-var PASTED_VIDEO_CLASS = 'B4j2ContentEditableVideo';
 var OFFLINE_CLASS = 'offline';
 var GENDER_ICONS = {
 	'Male': 'icon-man',
@@ -26,7 +25,7 @@ var directUserTable;
 var audioProcesssors = [];
 var smileUnicodeRegex = /[\u3400-\u3500]/g;
 var imageUnicodeRegex = /[\u3501-\u3600]/g;
-var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*>>>\s/;
+var timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 var mouseWheelEventName = (/Firefox/i.test(navigator.userAgent)) ? "DOMMouseScroll" : "mousewheel";
 // browser tab notification
 // input type that contains text for sending message
@@ -2608,7 +2607,7 @@ function ChannelsHandler() {
 		document.removeEventListener('click', self.hideM2EditMessage);
 	};
 	self.continueEdit = function(p) {
-		userMessage.textContent = p.getAttribute('content');
+		userMessage.innerHTML = Utils.encodeP(p);
 		Utils.placeCaretAtEnd();
 	};
 	self.m2DeleteMessage = function () {
@@ -2643,7 +2642,7 @@ function ChannelsHandler() {
 		return String.fromCharCode(c.charCodeAt(0) + 1)
 	};
 	self.getPastedImage = function (currSymbol) {
-		var res = {images: {}, videos: {}}; // return array from nodeList
+		var res = []; // return array from nodeList
 		var images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
 		for (var i = 0; i < images.length; i++) {
 			var img = images[i];
@@ -2657,16 +2656,33 @@ function ChannelsHandler() {
 			if (!img.getAttribute('symbol')) { // don't send image again, it's already in server
 				var assVideo = img.getAttribute('associatedVideo');
 				if (assVideo) {
-					res.videos[elSymbol] = {
-						file: Utils.videoFiles[assVideo]
-					};
+					res.push({
+						file: Utils.videoFiles[assVideo],
+						type: 'v',
+						symbol:  elSymbol
+					});
+					res.push({
+						file: Utils.previewFiles[img.src],
+						type: 'p',
+						symbol:  elSymbol
+					});
 				} else {
-					res.images[elSymbol] = {
-						file: Utils.imagesFiles[img.src]
-					};
+					res.push({
+						file: Utils.imagesFiles[img.src],
+						type: 'i',
+						symbol:  elSymbol
+					});
 				}
 			}
 		}
+		var urls = [Utils.imagesFiles, Utils.videoFiles, Utils.previewFiles];
+		urls.forEach(function(url) {
+			for (var k in url) {
+				logger.info("Revoking url {}", k)();
+				URL.revokeObjectURL(k);
+				delete urls[k];
+			}
+		});
 		return res;
 	};
 	self.sendMessage = function(lastEditedNodeId, files, messageContent) {
@@ -2709,18 +2725,11 @@ function ChannelsHandler() {
 		messageContent = blankRegex.test(messageContent) ? null : messageContent;
 		self.removeEditingMode();
 		CssUtils.deleteChildren(userMessage);
-		if (Object.keys(files.videos).length || Object.keys(files.images).length) {
+		if (files.length) {
 			var fd = new FormData();
-			for (var k in files.videos) {
-				if (files.videos[k].file) {
-					fd.append("v"+k, files.videos[k].file);
-				}
-			}
-			for (var k in files.images) {
-				if (files.images[k].file) {
-					fd.append("i"+k, files.images[k].file);
-				}
-			}
+			files.forEach(function(sd) {
+				fd.append(sd.type + sd.symbol, sd.file);
+			});
 			var gr;
 			doPost('/upload_file', null, function (res) {
 				if (gr) {
@@ -3629,11 +3638,11 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	};
 	self.quoteMessage = function(p) {
 		userMessage.focus();
-		var oldValue = userMessage.textContent;
+		var oldValue = userMessage.innerHTML;
 		var match = oldValue.match(timePattern);
 		var timeText = p.querySelector('[class^="message-header').textContent;
-		var oldText = match ? oldValue.substr(match[0].length) : oldValue;
-		userMessage.textContent = timeText + p.getAttribute('content') + ' >>>'+String.fromCharCode(13);
+		oldValue = match ? oldValue.substr(match[0].length + 1) : oldValue;
+		userMessage.innerHTML = encodeHTML(timeText) + Utils.encodeP(p) + encodeHTML(' >>>') + String.fromCharCode(13) +' '+ oldValue;
 		Utils.placeCaretAtEnd();
 	};
 	/** Creates a DOM node with attached events and all message content*/
@@ -3762,60 +3771,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		});
 		Utils.checkAndPlay = bu;
 	};
-	self.patterns = [
-		{
-			search: /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g, /*http://anycharacter except end of text, <br> or space*/
-			replace: '<a href="$1" target="_blank">$1</a>',
-			name: "links"
-		}, {
-			search: /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)(?:[^"]*?\&amp\;t=([\w\-\_]*))?[^"]*" target="_blank">[^<]+<\/a>/,
-			replace: '<div class="youtube-player" data-id="$1" data-time="$2"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
-			name: 'youtube'
-		},
-		{
-			search: /```(.+?)(?=```)```/g,
-			replace: '<pre>$1</pre>',
-			name: 'code'},
-		{
-			search: /(^\(\d\d:\d\d:\d\d\)\s[a-zA-Z-_0-9]{1,16}:)(.*)&gt;&gt;&gt;<br>/,
-			replace: '<div class="quote"><span>$1</span>$2</div>',
-			name: 'quote'
-		}
-	];
-	self.encodeMessage = function (data) {
-		if (data.giphy) {
-			return '<div class="giphy"><img src="{0}" /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>'.formatPos(data.giphy);
-		} else {
-			var html = encodeHTML(data.content);
-			var replaceElements = [];
-			self.patterns.forEach(function (pattern) {
-				var res = html.replace(pattern.search, pattern.replace);
-				if (res !== html) {
-					replaceElements.push(pattern.name);
-					html = res;
-				}
-			});
-			if (replaceElements.length) {
-				logger.info("Replaced {} in message #{}", replaceElements.join(", "), data.id)();
-			}
-			if (data.files && Object.keys(data.files).length) {
-				html = html.replace(imageUnicodeRegex, function (s) {
-					if (data.files[s]) {
-						if (data.files[s].type == 'i') {
-							return "<img src=\'{}\' symbol=\'{}\' class=\'{}\'/>".format(data.files[s].url, s, PASTED_IMG_CLASS);
-						} else if (data.files[s].type == 'v') {
-							return "<video src=\'{}\' symbol=\'{}\' class=\'{}\' controls preload=\"none\"/>".format(data.files[s].url, s, PASTED_IMG_CLASS);
-						} else {
-							logger.error('Invalid type {}', data.files[s].type)();
-						}
-					} else {
-						return s;
-					}
-				});
-			}
-			return smileyUtil.encodeSmileys(html);
-		}
-	};
 	self.getMaxSymbol = function (images) { //deprecated
 		var symbols = images && Object.keys(images);
 		if (symbols && symbols.length) {
@@ -3834,6 +3789,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 			p.setAttribute('symbol', data.symbol);
 		}
 		p.setAttribute('content', data.content);
+		p.setAttribute('files', JSON.stringify(data.files));
 		p.setAttribute('edited', data.edited);
 		if (data.edited != '0') {
 					CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
@@ -3842,7 +3798,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	self.editMessage = function (data) {
 		var p = $(data.time);
 		if (p != null) {
-			var html = self.encodeMessage(data);
+			var html = Utils.encodeMessage(data);
 			var element = p.querySelector("." + CONTENT_STYLE_CLASS);
 			self.setAttributesData(p, data);
 			element.innerHTML = html;
@@ -3864,11 +3820,12 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	};
 	self.setupMessageEvents = function(data) {
 		Utils.setYoutubeEvent(data);
+		Utils.setVideoEvent(data);
 		Utils.highlightCode(data)
 	};
 	self.createMessageNodeAll = function (data) {
 		var displayedUsername = channelsHandler.getAllUsersInfo()[data.userId].user;
-		var html = self.encodeMessage(data);
+		var html = Utils.encodeMessage(data);
 		var p = self.displayPreparedMessage(
 				data.userId == loggedUserId ? SELF_HEADER_CLASS : self.OTHER_HEADER_CLASS,
 				data.time,
@@ -6278,9 +6235,32 @@ var Utils = {
 	videoFiles: {
 
 	},
+	previewFiles: {
+
+	},
 	imagesFiles: {
 
 	},
+	patterns: [
+		{
+			search: /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g, /*http://anycharacter except end of text, <br> or space*/
+			replace: '<a href="$1" target="_blank">$1</a>',
+			name: "links"
+		}, {
+			search: /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)(?:[^"]*?\&amp\;t=([\w\-\_]*))?[^"]*" target="_blank">[^<]+<\/a>/g,
+			replace: '<div class="youtube-player" data-id="$1" data-time="$2"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
+			name: 'youtube'
+		},
+		{
+			search: /```(.+?)(?=```)```/g,
+			replace: '<pre>$1</pre>',
+			name: 'code'},
+		{
+			search: /(^\(\d\d:\d\d:\d\d\)\s[a-zA-Z-_0-9]{1,16}:)(.*)&gt;&gt;&gt;<br>/,
+			replace: '<div class="quote"><span>$1</span>$2</div>',
+			name: 'quote'
+		}
+	],
 	volumeProportion: {
 		0: 0,
 		1: 0.15,
@@ -6294,16 +6274,64 @@ var Utils = {
 		3: 'icon-volume-3'
 	},
 	yotubeTimeRegex: /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/,
-	dataURItoBlob: function (dataURI) {
-		// convert base64/URLEncoded data component to raw binary data held in a string
-		var byteString = dataURI.split(',')[0].indexOf('base64') >= 0 ? atob(dataURI.split(',')[1]) :unescape(dataURI.split(',')[1]);
-		var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-		var ia = new Uint8Array(byteString.length);
-		for (var i = 0; i < byteString.length; i++) {
-			ia[i] = byteString.charCodeAt(i);
+	encodeP: function(p) {
+		var content = p.getAttribute('content');
+		var files = p.getAttribute('files');
+		if (files) {
+			files = JSON.parse(files);
 		}
-		return new Blob([ia], {type: mimeString});
+		var html = encodeHTML(content);
+		html = Utils.encodeFiles(html, files);
+		return smileyUtil.encodeSmileys(html);
 	},
+	encodeFiles: function (html, files) {
+		if (files && Object.keys(files).length) {
+			html = html.replace(imageUnicodeRegex, function (s) {
+				var v = files[s];
+				if (v) {
+					if (v.type == 'i') {
+						return "<img src=\'{}\' symbol=\'{}\' class=\'{}\'/>".format(v.url, s, PASTED_IMG_CLASS);
+					} else if (v.type == 'v') {
+						return "<div class='video-player' associatedVideo='{}'><div><img src='{}' symbol='{}' class='{}'/><div class=\"icon-youtube-play\"></div></div></div>".format(v.url, v.preview, s, PASTED_IMG_CLASS);
+					} else {
+						logger.error('Invalid type {}', v.type)();
+					}
+				}
+				return s;
+			});
+		}
+		return html;
+	},
+	encodeMessage: function (data) {
+		if (data.giphy) {
+			return '<div class="giphy"><img src="{0}" /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>'.formatPos(data.giphy);
+		} else {
+			var html = encodeHTML(data.content);
+			var replaceElements = [];
+			Utils.patterns.forEach(function (pattern) {
+				var res = html.replace(pattern.search, pattern.replace);
+				if (res !== html) {
+					replaceElements.push(pattern.name);
+					html = res;
+				}
+			});
+			if (replaceElements.length) {
+				logger.info("Replaced {} in message #{}", replaceElements.join(", "), data.id)();
+			}
+			html = Utils.encodeFiles(html, data.files);
+			return smileyUtil.encodeSmileys(html);
+		}
+	},
+	// dataURItoBlob: function (dataURI) {
+	// 	// convert base64/URLEncoded data component to raw binary data held in a string
+	// 	var byteString = dataURI.split(',')[0].indexOf('base64') >= 0 ? atob(dataURI.split(',')[1]) :unescape(dataURI.split(',')[1]);
+	// 	var mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+	// 	var ia = new Uint8Array(byteString.length);
+	// 	for (var i = 0; i < byteString.length; i++) {
+	// 		ia[i] = byteString.charCodeAt(i);
+	// 	}
+	// 	return new Blob([ia], {type: mimeString});
+	// },
 	placeCaretAtEnd: function () {
 		var range = document.createRange();
 		range.selectNodeContents(userMessage);
@@ -6333,28 +6361,50 @@ var Utils = {
 		}
 		return start;
 	},
+	setVideoEvent: function (e) {
+		var r = e.querySelectorAll('.video-player');
+		for (var i = 0; i < r.length; i++) {
+			(function (e) {
+				var querySelector = e.querySelector('.icon-youtube-play');
+				var url = e.getAttribute('associatedVideo');
+				logger.info("Embedding video url {}", url)();
+				querySelector.onclick = function (event) {
+					var video = document.createElement("video");
+					video.setAttribute('controls', '');
+					video.className = 'video-player-ready';
+					logger.info("Replacing video url {}", url)();
+					video.src = url;
+					e.parentNode.replaceChild(video, e);
+					video.play();
+				}
+			})(r[i]);
+		}
+	},
 	setYoutubeEvent: function (e) {
 		if (window.embeddedYoutube) {
-			var r = e.querySelector('.youtube-player')
-			if (r) {
-				var querySelector = r.querySelector('.icon-youtube-play');
-				var id = r.getAttribute('data-id');
+			var r = e.querySelectorAll('.youtube-player')
+			for (var i = 0; i < r.length; i++) {
+				var querySelector = r[i].querySelector('.icon-youtube-play');
+				var id = r[i].getAttribute('data-id');
 				logger.info("Embedding youtube view {}", id)();
-				querySelector.onclick = function (event) {
-					var iframe = document.createElement("iframe");
-					var time = Utils.getTime(r.getAttribute('data-time'));
-					if (time) {
-						time = '&start='+time;
-					} else {
-						time = ""
+				querySelector.onclick = (function (e) {
+					return function (event) {
+						var iframe = document.createElement("iframe");
+						var time = Utils.getTime(e.getAttribute('data-time'));
+						if (time) {
+							time = '&start=' + time;
+						} else {
+							time = ""
+						}
+						var src = "https://www.youtube.com/embed/{}?autoplay=1{}".format(id, time);
+						iframe.setAttribute("src", src);
+						iframe.setAttribute("frameborder", "0");
+						iframe.className = 'video-player-ready';
+						logger.info("Replacing youtube url {}", src)();
+						iframe.setAttribute("allowfullscreen", "1");
+						e.parentNode.replaceChild(iframe, e);
 					}
-					var src = "https://www.youtube.com/embed/{}?autoplay=1{}".format(id, time);
-					iframe.setAttribute("src", src);
-					iframe.setAttribute("frameborder", "0");
-					logger.info("Replacing youtube url {}", src)();
-					iframe.setAttribute("allowfullscreen", "1");
-					r.parentNode.replaceChild(iframe, r);
-				}
+				})(r[i]);
 			}
 		}
 	},
@@ -6570,13 +6620,16 @@ var Utils = {
 				tmpCanvasContext.canvas.width = video.videoWidth;
 				tmpCanvasContext.canvas.height = video.videoHeight;
 				tmpCanvasContext.drawImage(video, 0, 0);
-				var url = tmpCanvasContext.canvas.toDataURL();
-				var img = document.createElement('img');
-				img.className = PASTED_IMG_CLASS;
-				img.src = url;
-				img.setAttribute('associatedVideo', src);
-				Utils.videoFiles[src] = file;
-				Utils.pasteHtmlAtCaret(img);
+				tmpCanvasContext.canvas.toBlob(function(blob) {
+					var url = URL.createObjectURL(blob);
+					var img = document.createElement('img');
+					img.className = PASTED_IMG_CLASS;
+					img.src = url;
+					img.setAttribute('associatedVideo', src);
+					Utils.videoFiles[src] = file;
+					Utils.previewFiles[url] = blob;
+					Utils.pasteHtmlAtCaret(img);
+				});
 			}, false);
 			video.src = src;
 		} else {
