@@ -386,7 +386,7 @@ class MessagesHandler(MessagesCreator):
 			prep_files = MessagesCreator.prepare_img_video(db_images, message.id)
 		else:
 			prep_files = None
-			Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
+		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
 		self.publish(self.create_send_message(message, action, prep_files, js_id), message.room_id)
 
 
