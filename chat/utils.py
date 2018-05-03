@@ -521,6 +521,7 @@ class EmailOrUsernameModelBackend(object):
 
 def get_max_key(files):
 	max = None
+	evaluate(files)
 	if files:
 		for f in files:
 			if max is None or f.symbol > max:

@@ -1,15 +1,14 @@
-import signal
 import time
 
+import signal
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from tornado.httpserver import HTTPServer
-from tornado.ioloop import IOLoop
+from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import Application
 
-from django.conf import settings
-
+from chat.global_redis import ping_online
 from chat.tornado.http_handler import HttpHandler
 
 TORNADO_SSL_OPTIONS = getattr(settings, "TORNADO_SSL_OPTIONS", None)
@@ -36,10 +35,15 @@ class Command(BaseCommand):
 		)
 		parser.add_argument(
 			'--keep_online',
-			action='store_true',
 			dest='keep_online',
 			default=False,
 			help='Execute flush command as well',
+		)
+		parser.add_argument(
+			'--no_ping',
+			dest='no_ping',
+			default=False,
+			help='If omitted server will ping clients every PING_INTERVAL milliseconds.',
 		)
 
 	def sig_handler(self):
@@ -60,6 +64,9 @@ class Command(BaseCommand):
 		# Init signals handler
 		if not options['keep_online']:
 			call_command('flush_online')
+		if not options['no_ping']:
+			PeriodicCallback(ping_online, settings.PING_INTERVAL).start()
+
 		signal.signal(signal.SIGTERM, self.sig_handler)
 		# This will also catch KeyboardInterrupt exception
 		signal.signal(signal.SIGINT, self.sig_handler)

@@ -32,6 +32,8 @@ class Actions(object):
 	RETRY_FILE_CONNECTION = 'retryFile'
 	REPLY_CALL_CONNECTION = 'replyCall'
 	PING = 'ping'
+	PONG = 'pong'
+	CHECK_PING = 'check_ping'
 
 
 class VarNames(object):
@@ -87,6 +89,7 @@ class WebRtcRedisStates:
 
 class RedisPrefix:
 	USER_ID_CHANNEL_PREFIX = 'u'
+	PARSABLE_PREFIX = 'p'
 	DEFAULT_CHANNEL = settings.ALL_ROOM_ID
 	CONNECTION_ID_LENGTH = 8  # should be secure
 
