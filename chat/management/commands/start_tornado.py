@@ -39,12 +39,6 @@ class Command(BaseCommand):
 			default=False,
 			help='Execute flush command as well',
 		)
-		parser.add_argument(
-			'--no_ping',
-			dest='no_ping',
-			default=False,
-			help='If omitted server will ping clients every PING_INTERVAL milliseconds.',
-		)
 
 	def sig_handler(self):
 		"""Catch signal and init callback"""
@@ -64,7 +58,7 @@ class Command(BaseCommand):
 		# Init signals handler
 		if not options['keep_online']:
 			call_command('flush_online')
-		if not options['no_ping']:
+		if options['port'] == settings.MAIN_TORNADO_PROCESS_PORT:
 			PeriodicCallback(ping_online, settings.PING_INTERVAL).start()
 
 		signal.signal(signal.SIGTERM, self.sig_handler)
