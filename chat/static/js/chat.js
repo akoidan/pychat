@@ -2623,9 +2623,9 @@ function ChannelsHandler() {
 		// eventPropagande will execute onclick on document.body that will hide contextMenu
 	};
 	self.handleEditMessage = function (event) {
-		// if (blankRegex.test(userMessage.textContent)) {
-		// 	return;
-		// }
+		if (!blankRegex.test(userMessage.textContent)) {
+			return;
+		}
 		var editLastMessageNode = self.getActiveChannel().lastMessage;
 		// only if message was sent 10 min ago + 2seconds for message to being processed
 		if (editLastMessageNode && self.isMessageEditable(editLastMessageNode.time)) {
