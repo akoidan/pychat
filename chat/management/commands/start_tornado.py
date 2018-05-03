@@ -35,6 +35,7 @@ class Command(BaseCommand):
 		)
 		parser.add_argument(
 			'--keep_online',
+			action='store_true',
 			dest='keep_online',
 			default=False,
 			help='Execute flush command as well',
