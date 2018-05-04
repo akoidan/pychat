@@ -6202,7 +6202,7 @@ function WsHandler() {
 		}
 		self.noServerPingTimeout = setTimeout(function () {
 			self.logError("Force closing socket coz server didn't ping us")();
-			self.ws.close(408, "Sever didn't ping us");
+			self.ws.close(1000, "Sever didn't ping us");
 		}, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
 	};
 	self.onping = function(message) {
@@ -6214,7 +6214,7 @@ function WsHandler() {
 			self.onpong();
 			self.pingTimeoutFunction = setTimeout(function() {
 				self.logError("Force closing socket coz pong time out")();
-				self.ws.close(408, "Ping timeout");
+				self.ws.close(1000, "Ping timeout");
 			}, PING_CLOSE_JS_DELAY);
 		}
 
@@ -6313,9 +6313,9 @@ var Utils = {
 				var v = files[s];
 				if (v) {
 					if (v.type == 'i') {
-						return "<img src=\'{}\' symbol=\'{}\' class=\'{}\'/>".format(v.url, s, PASTED_IMG_CLASS);
+						return "<img src=\'{}\' imageId='{}' symbol=\'{}\' class=\'{}\'/>".format(v.url, v.id, s, PASTED_IMG_CLASS);
 					} else if (v.type == 'v') {
-						return "<div class='video-player' associatedVideo='{}'><div><img src='{}' symbol='{}' class='{}'/><div class=\"icon-youtube-play\"></div></div></div>".format(v.url, v.preview, s, PASTED_IMG_CLASS);
+						return "<div class='video-player' associatedVideo='{}'><div><img src='{}' symbol='{}' imageId='{}' class='{}'/><div class=\"icon-youtube-play\"></div></div></div>".format(v.url, v.preview, s, v.id, PASTED_IMG_CLASS);
 					} else {
 						logger.error('Invalid type {}', v.type)();
 					}
