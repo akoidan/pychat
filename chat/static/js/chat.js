@@ -6282,7 +6282,7 @@ var Utils = {
 	},
 	yotubeTimeRegex: /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/,
 	encodeP: function(p) {
-		var content = p.getAttribute('content');
+		var content = p.getAttribute('content') || p.textContent;
 		var files = p.getAttribute('files');
 		if (files) {
 			files = JSON.parse(files);
