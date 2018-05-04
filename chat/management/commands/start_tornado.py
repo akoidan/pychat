@@ -7,12 +7,15 @@ from django.core.management.base import BaseCommand
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop, PeriodicCallback
 from tornado.web import Application
-
 from chat.global_redis import ping_online
 from chat.tornado.http_handler import HttpHandler
+import logging
 
 TORNADO_SSL_OPTIONS = getattr(settings, "TORNADO_SSL_OPTIONS", None)
 from chat.tornado.tornado_handler import TornadoHandler
+
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -59,10 +62,12 @@ class Command(BaseCommand):
 		# Init signals handler
 		if not options['keep_online']:
 			call_command('flush_online')
-		if options['port'] == settings.MAIN_TORNADO_PROCESS_PORT:
+		if not hasattr(settings, 'MAIN_TORNADO_PROCESS_PORT') \
+				or settings.MAIN_TORNADO_PROCESS_PORT == options['port']:
+			logger.info("Starting pinger")
 			PeriodicCallback(ping_online, settings.PING_INTERVAL).start()
-
+		else:
+			logger.info("Skipping pinger for this instance")
 		signal.signal(signal.SIGTERM, self.sig_handler)
 		# This will also catch KeyboardInterrupt exception
-		signal.signal(signal.SIGINT, self.sig_handler)
 		IOLoop.instance().start()
