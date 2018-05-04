@@ -6,11 +6,14 @@ import urllib
 from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import Q
+from tornado import ioloop
 from tornado.gen import engine, Task
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.ioloop import IOLoop
 from tornado.web import asynchronous
 from tornadoredis import Client
-from chat import settings
+from django.conf import settings
+from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, User, UserProfile, SubscriptionMessages, MessageHistory, \
 	UploadedFile, Image
@@ -39,11 +42,11 @@ class MessagesHandler(MessagesCreator):
 
 	def __init__(self, *args, **kwargs):
 		self.closed_channels = None
-		self.parsable_prefix = 'p'
 		super(MessagesHandler, self).__init__()
 		self.webrtc_ids = {}
 		self.id = None  # child init
 		self.sex = None
+		self.last_client_ping = 0
 		self.sender_name = None
 		self.user_id = 0  # anonymous by default
 		self.ip = None
@@ -54,7 +57,9 @@ class MessagesHandler(MessagesCreator):
 		self._logger = None
 		self.async_redis = Client(host=REDIS_HOST, port=REDIS_PORT)
 		self.patch_tornadoredis()
-		self.pre_process_message = {
+		# input websocket messages handlers
+		# The handler is determined by @VarNames.EVENT
+		self.process_ws_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
@@ -62,13 +67,17 @@ class MessagesHandler(MessagesCreator):
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
 			Actions.INVITE_USER: self.invite_user,
-			Actions.PING: self.respond_ping
+			Actions.PING: self.respond_ping,
+			Actions.PONG: self.process_pong_message,
 		}
-		self.post_process_message = {
+		# Handlers for redis messages, if handler returns true - message won't be sent to client
+		# The handler is determined by @VarNames.EVENT
+		self.process_pubsub_message = {
 			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_channel,
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
-			Actions.INVITE_USER: self.send_client_new_channel
+			Actions.INVITE_USER: self.send_client_new_channel,
+			Actions.PING: self.process_ping_message,
 		}
 
 	def patch_tornadoredis(self):  # TODO remove this
@@ -111,7 +120,7 @@ class MessagesHandler(MessagesCreator):
 	def listen(self, channels):
 		yield Task(
 			self.async_redis.subscribe, channels)
-		self.async_redis.listen(self.pub_sub_message)
+		self.async_redis.listen(self.on_pub_sub_message)
 
 	@property
 	def logger(self):
@@ -168,32 +177,22 @@ class MessagesHandler(MessagesCreator):
 		return is_online
 
 	def publish(self, message, channel, parsable=False):
-		jsoned_mess = json.dumps(message)
+		jsoned_mess = encode_message(message, parsable)
 		self.logger.debug('<%s> %s', channel, jsoned_mess)
-		if parsable:
-			jsoned_mess = self.encode(jsoned_mess)
 		self.async_redis_publisher.publish(channel, jsoned_mess)
 
-	def encode(self, message):
+	def on_pub_sub_message(self, message):
 		"""
-		Marks message with prefix to specify that
-		it should be decoded and proccesed before sending to client
-		@param message: message to mark
-		@return: marked message
+		All pubsub messages are automatically sent to client.
+		:param message:
+		:return:
 		"""
-		return self.parsable_prefix + message
-
-	def remove_parsable_prefix(self, message):
-		if message.startswith(self.parsable_prefix):
-			return message[1:]
-
-	def pub_sub_message(self, message):
 		data = message.body
-		if isinstance(data, str_type):  # subscribe event
-			prefixless_str = self.remove_parsable_prefix(data)
+		if isinstance(data, str_type):  # not subscribe event
+			prefixless_str = remove_parsable_prefix(data)
 			if prefixless_str:
 				dict_message = json.loads(prefixless_str)
-				res = self.post_process_message[dict_message[VarNames.EVENT]](dict_message)
+				res = self.process_pubsub_message[dict_message[VarNames.EVENT]](dict_message)
 				if not res:
 					self.ws_write(prefixless_str)
 			else:
@@ -320,7 +319,16 @@ class MessagesHandler(MessagesCreator):
 		self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
 
 	def respond_ping(self, message):
-		self.ws_write(self.responde_pong())
+		self.ws_write(self.responde_pong(message[VarNames.JS_MESSAGE_ID]))
+
+	def process_pong_message(self, message):
+		self.last_client_ping = message[VarNames.TIME]
+
+	def process_ping_message(self, message):
+		def call_check():
+			if message[VarNames.TIME] != self.last_client_ping:
+				self.close(408, "Ping timeout")
+		IOLoop.instance().call_later(settings.PING_CLOSE_SERVER_DELAY, call_check)
 
 	def create_user_channel(self, message):
 		user_id = message[VarNames.USER_ID]
@@ -389,7 +397,6 @@ class MessagesHandler(MessagesCreator):
 		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
 		self.publish(self.create_send_message(message, action, prep_files, js_id), message.room_id)
 
-
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		self.add_channel(room_id)
@@ -422,7 +429,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 
 	def __init__(self, *args, **kwargs):
 		super(WebRtcMessageHandler, self).__init__(*args, **kwargs)
-		self.pre_process_message.update({
+		self.process_ws_message.update({
 			Actions.WEBRTC: self.proxy_webrtc,
 			Actions.CLOSE_FILE_CONNECTION: self.close_file_connection,
 			Actions.CLOSE_CALL_CONNECTION: self.close_call_connection,
@@ -435,7 +442,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 			Actions.RETRY_FILE_CONNECTION: self.retry_file_connection,
 			Actions.REPLY_CALL_CONNECTION: self.reply_call_connection,
 		})
-		self.post_process_message.update({
+		self.process_pubsub_message.update({
 			Actions.OFFER_FILE_CONNECTION: self.set_opponent_call_channel,
 			Actions.OFFER_CALL_CONNECTION: self.set_opponent_call_channel
 		})

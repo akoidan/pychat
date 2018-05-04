@@ -19,6 +19,8 @@
 		var NOTIFICATION_ICON_URL = "{% md5url 'images/favicon.ico' %}";
 		var suggestions = {{ suggestions |yesno:"true,false" }};
 		var manifest = {{ manifest |yesno:"true,false" }};
+		var PING_CLOSE_JS_DELAY = {{ pingCloseDelay }};
+		var CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = {{ pingServerCloseDelay }};
 		window.highlightCode = {{ highlight_code |yesno:"true,false" }};
 		window.onlineChangeSound = {{ online_change_sound |yesno:"true,false" }};
 		window.incomingFileCallSound = {{ incoming_file_call_sound |yesno:"true,false" }};

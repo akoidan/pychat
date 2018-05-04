@@ -207,6 +207,8 @@ def home(request):
 	context['extensionId'] = settings.EXTENSION_ID
 	context['extensionUrl'] = settings.EXTENSION_INSTALL_URL
 	context['defaultRoomId'] = settings.ALL_ROOM_ID
+	context['pingCloseDelay'] = settings.PING_CLOSE_JS_DELAY
+	context['pingServerCloseDelay'] = settings.CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT
 	context['manifest'] = hasattr(settings, 'FIREBASE_API_KEY')
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 

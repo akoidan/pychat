@@ -91,6 +91,14 @@ class MessagesCreator(object):
 		}
 
 	@staticmethod
+	def ping_client(time):
+		return {
+			VarNames.EVENT: Actions.PING,
+			VarNames.TIME: time,
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+		}
+
+	@staticmethod
 	def prepare_img_video(files, message_id):
 		"""
 		:type message_id: int
@@ -117,10 +125,11 @@ class MessagesCreator(object):
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS
 		}
 
-	def responde_pong(self):
+	def responde_pong(self, js_id):
 		return {
-			VarNames.EVENT: Actions.PING,
-			VarNames.HANDLER_NAME: HandlerNames.WS
+			VarNames.EVENT: Actions.PONG,
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.JS_MESSAGE_ID: js_id
 		}
 
 	def subscribe_room_channel_message(self, room_id, room_name):

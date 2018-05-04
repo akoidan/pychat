@@ -2100,8 +2100,12 @@ function NotifierHandler() {
 	};
 	self.onFocus = function (e) {
 		localStorage.setItem(self.LAST_TAB_ID_VARNAME, self.currentTabId);
-		logger.info("Marking current tab as active")();
-		wsHandler.onTimeout();
+		if (e) {
+			logger.info("Marking current tab as active, pinging server")();
+			wsHandler.pingServer(); // if no event = call from init();
+		} else {
+			logger.info("Marking current tab as active")();
+		}
 		self.isCurrentTabActive = true;
 		self.newMessagesCount = 0;
 		document.title = 'PyChat';
@@ -3720,8 +3724,8 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 
 	self.isScrollInTHeMiddle = function () {
 		var element = self.dom.chatBoxDiv;
-		logger.info("{} [scrollHeight] - {} [scrollTop] >  [element.clientHeight] + 30 {},  {} > {}",element.scrollHeight, element.scrollTop, element.clientHeight, element.scrollHeight - element.scrollTop, element.clientHeight + 30 )();
-		return element.scrollHeight - element.scrollTop > element.clientHeight + 30;
+		// logger.info("{} [scrollHeight] - {} [scrollTop] >  [element.clientHeight] + 30 {},  {} > {}",element.scrollHeight, element.scrollTop, element.clientHeight, element.scrollHeight - element.scrollTop, element.clientHeight + 30 )();
+		return element.scrollHeight - element.scrollTop > element.clientHeight + 100;
 	};
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
 	self.displayPreparedMessage = function (headerStyle, timeMillis, htmlEncodedContent, displayedUsername, messageId, userId, edited) {
@@ -6039,16 +6043,6 @@ function WsHandler() {
 		self.wsConnectionFullId = message.opponentWsId;
 		self.log("CONNECTION ID HAS BEEN SET TO {}, (full id is {})", self.wsConnectionId, self.wsConnectionFullId)();
 	};
-	self.onping = function(message) {
-		self.log("Connection updated")();
-	};
-	self.onTimeout = function() {
-		self.sendToServer({action: 'ping'}, true);
-		self.intervalFunctionCalled++
-		if (self.intervalFunctionCalled > 20) {
-			self.startPing();
-		}
-	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
 		var data;
@@ -6187,16 +6181,6 @@ function WsHandler() {
 		self.ws = new WebSocket(API_URL + self.wsConnectionId);
 		self.ws.onmessage = self.onWsMessage;
 		self.ws.onclose = self.onWsClose;
-		self.startPing = function () {
-			if (self.intervalFunction) {
-				clearInterval(self.intervalFunction);
-				self.log("Clearead old ping interval and scheduled new one")();
-			} else {
-				self.log("Started ping interval")();
-			}
-			self.intervalFunctionCalled = 0;
-			self.intervalFunction = setInterval(self.onTimeout, 60000); // Chrome timeout stops working afer some period of time
-		}
 		self.ws.onopen = function () {
 			self.setStatus(true);
 			var message = "Connection to server has been established";
@@ -6205,11 +6189,43 @@ function WsHandler() {
 			} else {
 				//self.startPing();
 			}
+			self.startNoPingTimeout();
 			self.wsState = 9;
 			self.log(message)();
 		};
 	};
+	self.startNoPingTimeout = function() {
+		if (self.noServerPingTimeout) {
+			clearTimeout(self.noServerPingTimeout);
+			self.log("Clearing noServerPingTimeout")();
+			self.noServerPingTimeout = null;
+		}
+		self.noServerPingTimeout = setTimeout(function () {
+			self.logError("Force closing socket coz server didn't ping us")();
+			self.ws.close(408, "Sever didn't ping us");
+		}, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
+	};
+	self.onping = function(message) {
+		self.startNoPingTimeout();
+		self.sendToServer({action: 'pong', time: message.time});
+	};
+	self.pingServer = function () {
+		if (self.sendToServer({action: 'ping'})) {
+			self.onpong();
+			self.pingTimeoutFunction = setTimeout(function() {
+				self.logError("Force closing socket coz pong time out")();
+				self.ws.close(408, "Ping timeout");
+			}, PING_CLOSE_JS_DELAY);
+		}
 
+	};
+	self.onpong = function(message) {
+		if (self.pingTimeoutFunction) {
+			self.log("Clearing pingTimeoutFunction")();
+			clearTimeout(self.pingTimeoutFunction);
+			self.pingTimeoutFunction = null;
+		}
+	};
 }
 
 function Storage() {

@@ -113,6 +113,11 @@ console_handlers = {
 }
 
 API_PORT = '8888'
+
+# Tornado instance on this port will perform ping publish action
+# The matching port way is preffered since systemd subdemons links match
+MAIN_TORNADO_PROCESS_PORT = API_PORT
+
 if 'start_tornado' in sys.argv:
 	try:
 		index_port = sys.argv.index('--port')
@@ -240,6 +245,11 @@ IP_API_URL = 'http://ip-api.com/json/%s'
 ALL_REDIS_ROOM = 'all'
 WEBRTC_CONNECTION = 'webrtc_conn'
 ALL_ROOM_ID = 1
+PING_CLOSE_JS_DELAY = 10_000  # milliseconds
+PING_CLOSE_SERVER_DELAY = PING_CLOSE_JS_DELAY / 1000  # seconds
+PING_INTERVAL = 300_000  # milliseconds
+CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = PING_INTERVAL * 1.01 + PING_CLOSE_JS_DELAY  # milliseconds
+MAIN_TORNADO_PROCESS_PORT = 8003
 
 SELECT_SELF_ROOM = """SELECT
 	a.id as room__id,

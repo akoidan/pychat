@@ -1,9 +1,16 @@
+import json
+from datetime import datetime
+
 import logging
 
 import redis
 import tornadoredis
 
+from chat.models import get_milliseconds
 from chat.settings import ALL_REDIS_ROOM, REDIS_PORT, REDIS_HOST
+from chat.settings_base import ALL_ROOM_ID
+from chat.tornado.constants import RedisPrefix
+from chat.tornado.message_creator import MessagesCreator
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +58,30 @@ def patch_smembers(arg_red):
 def new_smembers(instance, *args, **kwargs):
 	res = instance.smembers(*args, **kwargs) # neither key or value are null
 	return [k.decode('utf-8') for k in res]
+
+
+def encode_message(message, parsable):
+	"""
+	@param parsable: Marks message with prefix to specify that
+	it should be decoded and proccesed before sending to client
+	@param message: message to mark
+	@return: marked message
+	"""
+	jsoned_mess = json.dumps(message)
+	if parsable:
+		jsoned_mess = RedisPrefix.PARSABLE_PREFIX + jsoned_mess
+	return jsoned_mess
+
+
+def remove_parsable_prefix(message):
+	if message.startswith(RedisPrefix.PARSABLE_PREFIX):
+		return message[1:]
+
+
+def ping_online():
+	message = encode_message(MessagesCreator.ping_client(get_milliseconds()), True)
+	logger.info("Pinging clients: %s", message)
+	async_redis_publisher.publish(ALL_ROOM_ID, message)
 
 
 # # global connection to read synchronously

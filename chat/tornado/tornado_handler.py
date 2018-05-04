@@ -64,12 +64,12 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			# self.anti_spam.check_spam(json_message)
 			self.logger.debug('<< %.1000s', json_message)
 			message = json.loads(json_message)
-			if message[VarNames.EVENT] not in self.pre_process_message:
+			if message[VarNames.EVENT] not in self.process_ws_message:
 				raise Exception("event {} is unknown".format(message[VarNames.EVENT]))
 			channel = message.get(VarNames.CHANNEL)
 			if channel and channel not in self.channels:
 				raise ValidationError('Access denied for channel {}. Allowed channels: {}'.format(channel, self.channels))
-			self.pre_process_message[message[VarNames.EVENT]](message)
+			self.process_ws_message[message[VarNames.EVENT]](message)
 		except ValidationError as e:
 			error_message = self.default(str(e.message), Actions.GROWL_MESSAGE, HandlerNames.GROWL)
 			self.ws_write(error_message)
