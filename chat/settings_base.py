@@ -269,10 +269,10 @@ UPDATE chat_room_users out_cru
 			chat_room_users.id rooms_users_id
 		 FROM chat_room_users
 			JOIN chat_message ON chat_message.room_id = chat_room_users.room_id
-		WHERE chat_room_users.user_id = %s and chat_room_users.room_id != {}
+		WHERE chat_room_users.user_id = %s
 		GROUP BY chat_message.room_id) last_message ON out_cru.id = last_message.rooms_users_id
 SET out_cru.last_read_message_id = last_message.message_id 
-""".format(ALL_ROOM_ID)
+"""
 
 # ---------------JAVASCRIPT CONSTANTS --------------------
 

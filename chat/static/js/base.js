@@ -163,6 +163,7 @@ function onDocLoad(onload) {
 		sw: "color: #ffb500; font-weight: bold"*/
 	logger = {
 		warn: loggerFactory.getLogger("GLOBAL", console.warn, 'color: #687000; font-weight: bold'),
+		debug: loggerFactory.getLogger("GLOBAL", console.debug, 'color: #687000; font-weight: bold'),
 		info: loggerFactory.getLogger("GLOBAL", console.log, 'color: #687000; font-weight: bold'),
 		error: loggerFactory.getLogger("GLOBAL", console.error, 'color: #687000; font-weight: bold'),
 		http: loggerFactory.getLogger("HTTP", console.log, 'color: green; font-weight: bold'),

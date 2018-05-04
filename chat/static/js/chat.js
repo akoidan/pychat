@@ -66,9 +66,9 @@ onDocLoad(function () {
 	singlePage = new PageHandler();
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
+	storage = new Storage();
 	wsHandler = new WsHandler();
 	//bottom call loadMessagesFromLocalStorage(); s
-	storage = new Storage();
 	notifier = new NotifierHandler();
 	painter = new Painter();
 	wsHandler.listenWS();
@@ -1898,6 +1898,7 @@ function NotifierHandler() {
 	var self = this;
 	var logger = {
 		info: loggerFactory.getLogger("NOTIFY", console.log, 'color: #ffb500; font-weight: bold'),
+		debug: loggerFactory.getLogger("NOTIFY", console.debug, 'color: #ffb500; font-weight: bold'),
 		warn: loggerFactory.getLogger("NOTIFY", console.warn, 'color: #ffb500; font-weight: bold'),
 		error: loggerFactory.getLogger("NOTIFY", console.error, 'color: #ffb500; font-weight: bold')
 	};
@@ -2101,10 +2102,10 @@ function NotifierHandler() {
 	self.onFocus = function (e) {
 		localStorage.setItem(self.LAST_TAB_ID_VARNAME, self.currentTabId);
 		if (e) {
-			logger.info("Marking current tab as active, pinging server")();
+			logger.debug("Marking current tab as active, pinging server")();
 			wsHandler.pingServer(); // if no event = call from init();
 		} else {
-			logger.info("Marking current tab as active")();
+			logger.debug("Marking current tab as active")();
 		}
 		self.isCurrentTabActive = true;
 		self.newMessagesCount = 0;
@@ -2115,7 +2116,7 @@ function NotifierHandler() {
 	};
 	self.onFocusOut = function () {
 		self.isCurrentTabActive = false;
-		logger.info("Deactivating current tab")();
+		logger.debug("Deactivating current tab")();
 	};
 	self.init();
 }
@@ -2359,6 +2360,7 @@ function ChannelsHandler() {
 	self.MAX_MESSAGE_SIZE = 40000000;
 	var logger = {
 		warn: loggerFactory.getLogger("CHAT", console.warn, 'color: #FF0F00; font-weight: bold'),
+		debug: loggerFactory.getLogger("CHAT", console.debug, 'color: #FF0F00; font-weight: bold'),
 		info: loggerFactory.getLogger("CHAT", console.log, 'color: #FF0F00; font-weight: bold'),
 		error: loggerFactory.getLogger("CHAT", console.error, 'color: #FF0F00; font-weight: bold')
 	};
@@ -2978,7 +2980,7 @@ function ChannelsHandler() {
 				oldRoom.updateAllDomUsers(newUserList);
 			} else {
 				var roomName = newRoom.name;
-				logger.info("Creating new room '{}' with id {} while offline", roomName, roomId)();
+				logger.debug("Creating new room '{}' with id {} while offline", roomName, roomId)();
 				if (roomName) {
 					self.createNewRoomChatHandler(roomId, roomName, newUserList);
 				} else {
@@ -6007,6 +6009,7 @@ function WsHandler() {
 	self.wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 9 - connected;
 	self.duplicates = {};
 	self.log = loggerFactory.getLogger('WS', console.log, "color: green;");
+	self.debugLog = loggerFactory.getLogger('WS', console.debug, "color: green;");
 	self.logWarn = loggerFactory.getLogger('WS', console.warn, "color: green;");
 	self.logError = loggerFactory.getLogger('WS', console.error, "color: green;");
 	self.logData = function(tag, obj, raw) {
@@ -6178,7 +6181,11 @@ function WsHandler() {
 					"Android, Chrome, Opera, Safari, IE11, Edge, Firefox", window.browserVersion));
 			return;
 		}
-		self.ws = new WebSocket(API_URL + self.wsConnectionId);
+		var s = API_URL + self.wsConnectionId;
+		if (Object.keys(storage.cache).length > 0) {
+			s += "&messages=" + encodeURI(JSON.stringify(storage.cache));
+		}
+		self.ws = new WebSocket(s);
 		self.ws.onmessage = self.onWsMessage;
 		self.ws.onclose = self.onWsClose;
 		self.ws.onopen = function () {
@@ -6221,7 +6228,7 @@ function WsHandler() {
 	};
 	self.onpong = function(message) {
 		if (self.pingTimeoutFunction) {
-			self.log("Clearing pingTimeoutFunction")();
+			self.debugLog("Clearing pingTimeoutFunction")();
 			clearTimeout(self.pingTimeoutFunction);
 			self.pingTimeoutFunction = null;
 		}
@@ -6230,26 +6237,50 @@ function WsHandler() {
 
 function Storage() {
 	var self = this;
-	self.STORAGE_NAME = 'main';
-	self.cache = {}
-	self.clearStorage = function () {
-		localStorage.clear()
-		var cookies = readCookie();
-		for (var c in cookies) {
-			if (!cookies.hasOwnProperty(c)) continue;
-			if (!isNaN(c)) {
-				Utils.deleteCookie(c);
+	self.STORAGE_NAME = 'wsHeaderIds';
+	self.cache = {};
+	var ms = localStorage.getItem(self.STORAGE_NAME);
+	if (ms) {
+		var loaded = JSON.parse(ms);
+		for (var k in loaded) {
+			self.cache[k] = {
+				h: loaded[k],
+				f: loaded[k]
 			}
 		}
-		self.cache = readCookie();
+	} else {
+		localStorage.setItem(self.STORAGE_NAME, "{}");
+	}
+	self.clearStorage = function () {
+		localStorage.clear();
+		self.bottomValues = {};
 	};
 	self.getRoomHeaderId = function(roomId) {
-		return self.cache[roomId];
-	}
+		return self.cache[roomId] ? self.cache[roomId].h : null;
+	};
+	self.getWsQuery = function() {
+
+	};
 	self.setRoomHeaderId = function (roomId, value) {
-		if (!self.cache[roomId] || value < self.cache[roomId]) {
-			self.cache[roomId] = value;
-			document.cookie = roomId + '=' + value;
+		if (!self.cache[roomId]) {
+			self.cache[roomId] = {
+				h: value,
+				f: value
+			}
+		} else if (value < self.cache[roomId].h) {
+			self.cache[roomId].h = value;
+		} else if (value > self.cache[roomId].f) {
+			self.cache[roomId].f = value;
+		} else {
+			return
+		}
+		var lm = JSON.parse(localStorage.getItem(self.STORAGE_NAME));
+		if (!lm[roomId] || value < lm[roomId]) {
+			lm[roomId] = value;
+			logger.debug("Updating headerId {} -> {} for room {}. LS: {}", lm[roomId], value, roomId, lm)();
+			localStorage.setItem(self.STORAGE_NAME, JSON.stringify(lm));
+		} else {
+			logger.debug("Loaded header ids for room {} from local storage {} . Update is not needed since stored header {} is lower than current ", roomId, lm, lm[roomId], value)();
 		}
 	}
 }
@@ -6339,7 +6370,7 @@ var Utils = {
 				}
 			});
 			if (replaceElements.length) {
-				logger.info("Replaced {} in message #{}", replaceElements.join(", "), data.id)();
+				logger.debug("Replaced {} in message #{}", replaceElements.join(", "), data.id)();
 			}
 			html = Utils.encodeFiles(html, data.files);
 			return smileyUtil.encodeSmileys(html);
@@ -6390,12 +6421,12 @@ var Utils = {
 			(function (e) {
 				var querySelector = e.querySelector('.icon-youtube-play');
 				var url = e.getAttribute('associatedVideo');
-				logger.info("Embedding video url {}", url)();
+				logger.debug("Embedding video url {}", url)();
 				querySelector.onclick = function (event) {
 					var video = document.createElement("video");
 					video.setAttribute('controls', '');
 					video.className = 'video-player-ready';
-					logger.info("Replacing video url {}", url)();
+					logger.debug("Replacing video url {}", url)();
 					video.src = url;
 					e.parentNode.replaceChild(video, e);
 					video.play();
@@ -6409,7 +6440,7 @@ var Utils = {
 			for (var i = 0; i < r.length; i++) {
 				var querySelector = r[i].querySelector('.icon-youtube-play');
 				var id = r[i].getAttribute('data-id');
-				logger.info("Embedding youtube view {}", id)();
+				logger.debug("Embedding youtube view {}", id)();
 				querySelector.onclick = (function (e) {
 					return function (event) {
 						var iframe = document.createElement("iframe");

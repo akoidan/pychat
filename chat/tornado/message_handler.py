@@ -174,7 +174,6 @@ class MessagesHandler(MessagesCreator):
 			online_user_names_mes = self.room_online(online, Actions.LOGIN, room_id)
 			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes, room_id)
-		return is_online
 
 	def publish(self, message, channel, parsable=False):
 		jsoned_mess = encode_message(message, parsable)

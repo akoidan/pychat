@@ -161,11 +161,9 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.listen(self.channels)
 			off_messages, history = self.get_offline_messages(user_rooms)
 			for room_id in user_rooms:
-				is_online = self.add_online_user(room_id)
-				# there're no offline messages if we're online
-				offl_mess = [] if is_online else off_messages.get(room_id)
-				if offl_mess or history.get(room_id):
-					self.ws_write(self.load_offline_message(offl_mess, history.get(room_id), room_id))
+				self.add_online_user(room_id)
+				if off_messages.get(room_id) or history.get(room_id):
+					self.ws_write(self.load_offline_message(off_messages.get(room_id), history.get(room_id), room_id))
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
 			self.connected = True
 			# self.save_ip()
@@ -175,14 +173,20 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 
 	def get_offline_messages(self, user_rooms):
 		q_objects = Q()
+		messages = self.get_argument('messages', None)
+		if messages:
+			pmessages = json.loads(messages)
+		else:
+			pmessages = {}
 		for room_id in user_rooms:
-			c = self.get_cookie(str(room_id))
-			if c is not None:
-				q_objects.add(Q(id__gte=c, room_id=room_id, deleted=False), Q.OR)
-				# if self.restored_connection:
-				# 	q_objects.add(Q(id__gte=c, room_id=room_id, deleted=False, edited_times__gt=0), Q.OR)
-				# else:
-				# 	q_objects.add(Q(id__gte=c, room_id=room_id, deleted=False), Q.OR)
+			room_hf = pmessages.get(str(room_id))
+			if room_hf:
+				h = room_hf['h']
+				f = room_hf['f']
+				if not self.restored_connection:
+					q_objects.add(Q(id__gte=h, room_id=room_id, deleted=False), Q.OR)
+				else:
+					q_objects.add(Q(room_id=room_id, deleted=False) & (( Q(id__gte=h) & Q(id__lte=f) & Q(edited_times__gt=0)) | Q(id__gt=f)), Q.OR)
 		off_messages = Message.objects.filter(
 			id__gt=F('room__roomusers__last_read_message_id'),
 			deleted=False,
@@ -196,6 +200,9 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		else:
 			history_messages = []
 			all = off_messages
+		if self.restored_connection:
+			off_messages = all
+			history_messages = []
 		imv = get_message_images_videos(all)
 		self.set_video_images_messages(imv, off_messages, off)
 		self.set_video_images_messages(imv, history_messages, history)
