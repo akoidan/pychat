@@ -48,6 +48,7 @@ class VarNames(object):
 	EVENT = 'action'
 	JS_MESSAGE_ID = 'messageId'
 	MESSAGE_ID = 'id'
+	IMAGE_ID = 'id'
 	GENDER = 'sex'
 	ROOM_NAME = 'name'
 	NOTIFICATIONS = 'notifications'

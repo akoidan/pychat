@@ -14,6 +14,7 @@ from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.db import IntegrityError
 from django.db import connection, OperationalError, InterfaceError
+from django.db.models import Q
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -44,12 +45,7 @@ def is_blank(check_str):
 
 def get_users_in_current_user_rooms(user_id):
 	user_rooms = Room.objects.filter(users__id=user_id, disabled=False).values('id', 'name', 'roomusers__notifications', 'roomusers__volume')
-	res = {room['id']: {
-			VarNames.ROOM_NAME: room['name'],
-			VarNames.NOTIFICATIONS: room['roomusers__notifications'],
-			VarNames.VOLUME: room['roomusers__volume'],
-			VarNames.ROOM_USERS: {}
-		} for room in user_rooms}
+	res = MessagesCreator.create_user_rooms(user_rooms)
 	room_ids = (room_id for room_id in res)
 	rooms_users = User.objects.filter(rooms__in=room_ids).values('id', 'username', 'sex', 'rooms__id')
 	for user in rooms_users:
@@ -76,6 +72,29 @@ def update_room(room_id, disabled):
 		raise ValidationError('This room already exist')
 	else:
 		Room.objects.filter(id=room_id).update(disabled=False)
+
+
+def get_history_message_query(messages, user_rooms, restored_connection):
+	cb = restored_connection_q if restored_connection else new_connection_q
+	q_objects = Q()
+	if messages:
+		pmessages = json.loads(messages)
+	else:
+		pmessages = {}
+	for room_id in user_rooms:
+		room_hf = pmessages.get(str(room_id))
+		if room_hf:
+			cb(q_objects, room_id, room_hf['h'], room_hf['f'])
+	return q_objects
+
+
+def new_connection_q(q_objects, room_id, h, f):
+	q_objects.add(Q(id__gte=h, room_id=room_id, deleted=False), Q.OR)
+
+
+def restored_connection_q(q_objects, room_id, h, f):
+	q_objects.add(Q(room_id=room_id, deleted=False) & (
+			(Q(id__gte=h) & Q(id__lte=f) & Q(edited_times__gt=0)) | Q(id__gt=f)), Q.OR)
 
 
 def create_room(self_user_id, user_id):

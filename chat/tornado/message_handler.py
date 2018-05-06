@@ -156,15 +156,12 @@ class MessagesHandler(MessagesCreator):
 			result.add(user_id)
 		return user_is_online, list(result)
 
-	def add_online_user(self, room_id):
+	def add_online_user(self, room_id, is_online, online):
 		"""
 		adds to redis
 		online_users = { connection_hash1 = stored_redis_user1, connection_hash_2 = stored_redis_user2 }
 		:return: if user is online
 		"""
-		self.async_redis_publisher.sadd(room_id, self.id)
-		# since we add user to online first, latest trigger will always show correct online
-		is_online, online = self.get_online_and_status_from_redis(room_id)
 		if is_online:  # Send user names to self
 			online_user_names_mes = self.room_online(online, Actions.REFRESH_USER, room_id)
 			self.logger.info('!! Second tab, retrieving online for self')
@@ -174,6 +171,12 @@ class MessagesHandler(MessagesCreator):
 			online_user_names_mes = self.room_online(online, Actions.LOGIN, room_id)
 			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes, room_id)
+		return is_online
+
+	def get_is_online(self, room_id):
+		self.async_redis_publisher.sadd(room_id, self.id)
+		# since we add user to online first, latest trigger will always show correct online
+		return self.get_online_and_status_from_redis(room_id)
 
 	def publish(self, message, channel, parsable=False):
 		jsoned_mess = encode_message(message, parsable)
@@ -399,7 +402,8 @@ class MessagesHandler(MessagesCreator):
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		self.add_channel(room_id)
-		self.add_online_user(room_id)
+		is_online, online = self.get_is_online(room_id=room_id)
+		self.add_online_user(room_id, is_online, online)
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]

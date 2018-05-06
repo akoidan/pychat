@@ -3420,6 +3420,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	self.roomName = roomName;
 	var logger = {
 		warn: loggerFactory.getLogger("CH:"+roomId, console.warn, 'color: #FF0F00; font-weight: bold'),
+		debug: loggerFactory.getLogger("CH:"+roomId, console.debug, 'color: #FF0F00; font-weight: bold'),
 		info: loggerFactory.getLogger("CH:"+roomId, console.log, 'color: #FF0F00; font-weight: bold'),
 		error: loggerFactory.getLogger("CH:"+roomId, console.error, 'color: #FF0F00; font-weight: bold')
 	}
@@ -3737,7 +3738,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 			var posRes = self.getPosition(timeMillis);
 			if (posRes.exists) {
 				if (posRes.exists.getAttribute('edited') == edited) {
-					logger.info("Skipping rendering for message #{} as it exists", messageId)();
+					logger.debug("Skipping rendering for message #{} as it exists", messageId)();
 					return {node: posRes.exists, skip: true}
 				}
 				existed = posRes.exists;
@@ -6217,7 +6218,7 @@ function WsHandler() {
 		self.sendToServer({action: 'pong', time: message.time});
 	};
 	self.pingServer = function () {
-		if (self.sendToServer({action: 'ping'})) {
+		if (self.sendToServer({action: 'ping'}, true)) {
 			self.onpong();
 			self.pingTimeoutFunction = setTimeout(function() {
 				self.logError("Force closing socket coz pong time out")();

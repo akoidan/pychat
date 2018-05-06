@@ -108,7 +108,8 @@ class MessagesCreator(object):
 			return {x.symbol: {
 				VarNames.FILE_URL: x.img.url,
 				VarNames.FILE_TYPE: x.type,
-				VarNames.PREVIEW: x.preview.url if x.preview else None
+				VarNames.PREVIEW: x.preview.url if x.preview else None,
+				VarNames.IMAGE_ID: x.id
 			} for x in files if x.message_id == message_id}
 
 	@property
@@ -182,6 +183,16 @@ class MessagesCreator(object):
 			Actions.OFFLINE_MESSAGES,
 			HandlerNames.CHAT)
 		res[VarNames.CHANNEL] = channel_key
+		return res
+
+	@staticmethod
+	def create_user_rooms(user_rooms):
+		res = {room['id']: {
+			VarNames.ROOM_NAME: room['name'],
+			VarNames.NOTIFICATIONS: room['roomusers__notifications'],
+			VarNames.VOLUME: room['roomusers__volume'],
+			VarNames.ROOM_USERS: {}
+		} for room in user_rooms}
 		return res
 
 

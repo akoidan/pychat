@@ -21,7 +21,8 @@ from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions
 from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
-from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms, get_message_images_videos, get_or_create_ip_wrapper, create_ip_structure
+from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms, \
+	get_message_images_videos, get_or_create_ip_wrapper, create_ip_structure, get_history_message_query
 
 sessionStore = SessionStore()
 
@@ -91,14 +92,13 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		else:
 			self.logger.info("Close event, not subscribed, channels: %s", self.channels)
 		log_data = {}
-		gone_offline = False
 		for channel in self.channels:
 			if not isinstance(channel, Number):
 				continue
 			self.sync_redis.srem(channel, self.id)
 			if self.connected:
-				gone_offline = self.publish_logout(channel, log_data) or gone_offline
-		if gone_offline:
+				self.publish_logout(channel, log_data)
+		if self.connected:
 			res = do_db(execute_query, settings.UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
 		self.disconnect(json.dumps(log_data))
@@ -156,12 +156,17 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.channels = []  # py2 doesn't support clear()
 			self.channels.append(self.channel)
 			self.channels.append(self.id)
+			rooms_online = {}
+			was_online = False
 			for room_id in user_rooms:
 				self.channels.append(room_id)
+				rooms_online[room_id] = self.get_is_online(room_id)
+				was_online = was_online or rooms_online[room_id][0]
 			self.listen(self.channels)
-			off_messages, history = self.get_offline_messages(user_rooms)
+			off_messages, history = self.get_offline_messages(user_rooms, was_online)
 			for room_id in user_rooms:
-				self.add_online_user(room_id)
+				self.get_is_online(room_id)
+				is_online = self.add_online_user(room_id, rooms_online[room_id][0], rooms_online[room_id][1])
 				if off_messages.get(room_id) or history.get(room_id):
 					self.ws_write(self.load_offline_message(off_messages.get(room_id), history.get(room_id), room_id))
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
@@ -171,32 +176,22 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key %s has been rejected" % session_key)
 
-	def get_offline_messages(self, user_rooms):
-		q_objects = Q()
-		messages = self.get_argument('messages', None)
-		if messages:
-			pmessages = json.loads(messages)
+	def get_offline_messages(self, user_rooms, was_online):
+		q_objects = get_history_message_query(self.get_argument('messages', None), user_rooms, self.restored_connection)
+		if was_online:
+			off_messages = []
 		else:
-			pmessages = {}
-		for room_id in user_rooms:
-			room_hf = pmessages.get(str(room_id))
-			if room_hf:
-				h = room_hf['h']
-				f = room_hf['f']
-				if not self.restored_connection:
-					q_objects.add(Q(id__gte=h, room_id=room_id, deleted=False), Q.OR)
-				else:
-					q_objects.add(Q(room_id=room_id, deleted=False) & (( Q(id__gte=h) & Q(id__lte=f) & Q(edited_times__gt=0)) | Q(id__gt=f)), Q.OR)
-		off_messages = Message.objects.filter(
-			id__gt=F('room__roomusers__last_read_message_id'),
-			deleted=False,
-			room__roomusers__user_id=self.user_id
-		)
+			off_messages = Message.objects.filter(
+				id__gt=F('room__roomusers__last_read_message_id'),
+				deleted=False,
+				room__roomusers__user_id=self.user_id
+			)
 		off = {}
 		history = {}
 		if len(q_objects.children) > 0:
 			history_messages = Message.objects.filter(q_objects)
 			all = list(chain(off_messages, history_messages))
+			self.logger.info("Offline messages IDs: %s, history messages: %s", [m.id for m in off_messages], [m.id for m in history_messages])
 		else:
 			history_messages = []
 			all = off_messages
