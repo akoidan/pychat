@@ -172,9 +172,10 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Add "last seen" feature
+* Add video/voice record to chat like in telegram
 * https://static.pychat.org/photo/uEXCJWJH_image.png
 * Add go down button if scroll is not in the botom for chatbox
-* If last_read_message is null, user went offline in 1st tab, and he was online in 2nd tab, he won't receive offline_messages in loadhistory response. I guess last_read_message should be always not null
 * Firefox doesn't google support fcm push
 * Transfer file should be inside of chatbox instead of being a separate window
 * Messages should appear in chat instantly with automatic resend when connection is up
@@ -183,7 +184,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * update service worker if its version changed with registration.update()
 * setTimeot stops working after 30min in chrome background, it has been changed to setInterval, check if it works
 * giphy search should return random image
-* WS close event doesn't fire after suspending PC to ram https://github.com/websockets/ws/issues/686
 * Add payback to firebase
 * Fix all broken painter event in mobile
 * https://static.pychat.org/photo/xE9bSyvC_image.png
