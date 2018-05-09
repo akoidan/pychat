@@ -781,22 +781,27 @@ function Painter() {
 			document.addEventListener('touchend', remove);
 		},
 		canvasImageDrop: function (e) {
-			e.preventDefault();
-			self.setMode('img');
-			self.tools.img.readAndPasteCanvas(e.dataTransfer.files[0]);
+			self.dropImg(e.dataTransfer.files, e, function(e) {
+				return e
+			});
 		},
 		canvasImagePaste: function (e) {
-			if (document.activeElement == self.dom.container && e.clipboardData && e.clipboardData.items) {
-
-				for (var i = 0; i < e.clipboardData.items.length; i++) {
-					var asFile = e.clipboardData.items[i].getAsFile();
-					if (asFile && asFile.type.indexOf('image') >= 0) {
-						self.log("Pasting images")();
-						self.setMode('img');
-						self.tools.img.readAndPasteCanvas(asFile);
-						self.preventDefault(e);
-						return;
-					}
+			if (document.activeElement === self.dom.container && e.clipboardData) {
+				self.dropImg(e.clipboardData.items, e, function (b) {
+					return b.getAsFile();
+				})
+			}
+		}
+	};
+	self.dropImg = function (files, e, getter) {
+		if (files) {
+			for (var i = 0; i < files.length; i++) {
+				if (files[i].type.indexOf('image') >= 0) {
+					self.log("Pasting images")();
+					self.setMode('img');
+					self.tools.img.readAndPasteCanvas(getter(files[i]));
+					self.preventDefault(e);
+					return;
 				}
 			}
 		}

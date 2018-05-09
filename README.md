@@ -172,7 +172,12 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
-* Add "last seen" feature
+* Add "last seen" feature and status afk/online/dnd
+* blink icon in title on new message
+* Painter remove selection on del keypress
+* Add message to favorite
+* Ability to quote any code
+* Paint errors
 * Add video/voice record to chat like in telegram
 * https://static.pychat.org/photo/uEXCJWJH_image.png
 * Add go down button if scroll is not in the botom for chatbox
