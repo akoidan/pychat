@@ -6661,6 +6661,9 @@ var Utils = {
 		img.className = PASTED_IMG_CLASS;
 		var src = URL.createObjectURL(blob);
 		img.src = src;
+		if (!blob.name && blob.type.indexOf('/') >1) {
+			blob.name = "." + blob.type.split('/')[1];
+		}
 		Utils.imagesFiles[src] = blob;
 		Utils.pasteHtmlAtCaret(img);
 		return img;
