@@ -3115,16 +3115,15 @@ function ChannelsHandler() {
 		self.getActiveChannel().getCallHandler().offerCall();
 	};
 	self.m2TransferFile = function () {
-		self.showOrInviteDirectChannel(self.getActiveChannel().toggleCallHandler);
-		webRtcApi.dom.fileInput.value = null;
-		webRtcApi.dom.fileInput.click();
+		self.showOrInviteDirectChannel(function() {
+			webRtcApi.dom.fileInput.value = null;
+			webRtcApi.dom.fileInput.click();
+		});
 	};
 	self.showOrInviteDirectChannel = function (postAction) {
 		var userId = self.getActiveUserId();
 		var exclude = self.getDirectMessagesUserIds();
-		if (userId == loggedUserId) {
-			growlError("You can't call yourself");
-		} else if (exclude[userId]) {
+		 if (exclude[userId]) {
 			var selector = "#directUserTable li[userid='{}']".format(userId);
 			var strRoomId = document.querySelector(selector).getAttribute(self.ROOM_ID_ATTR);
 			self.setActiveChannel(parseInt(strRoomId));
