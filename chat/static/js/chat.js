@@ -522,6 +522,7 @@ function Painter() {
 		},
 	};
 	self.log = loggerFactory.getLogger("Painter", console.log, 'color: #f200da');
+	self.debug = loggerFactory.getLogger("Painter", console.debug, 'color: #f200da');
 	self.helper = {
 		setUIText: function(text) {
 			self.dom.paintXY.textContent = text + ' ' + Math.round(self.zoom * 100) + '%';
@@ -863,12 +864,15 @@ function Painter() {
 		};
 		tool.show = function () {
 			CssUtils.showElement(tool.imgHolder);
+			self.debug("Adding mouseUp doc listener")();
 			document.addEventListener('mouseup', tool.docMouseUp);
 			document.addEventListener('touchend', tool.docMouseUp);
 		};
 		tool.hide = function() {
 			tool._setCursor(null);
 			CssUtils.hideElement(tool.imgHolder);
+			self.debug("Removing mouseUp doc listener")();
+			tool.docMouseUp();
 			document.removeEventListener('mouseup', tool.docMouseUp);
 			document.removeEventListener('touchend', tool.docMouseUp);
 		};
@@ -980,7 +984,7 @@ function Painter() {
 				x = __ret.x;
 				y = __ret.y;
 			}
- 			self.log('handleMouseMove ({}, {})', x, y)();
+ 			self.debug('handleMouseMove ({}, {})', x, y)();
 			tool.handlers[tool.mode.charAt(0)](x, y);
 			if (tool.mode.length === 2) {
 				tool.handlers[tool.mode.charAt(1)](x, y);
