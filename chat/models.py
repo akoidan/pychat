@@ -227,6 +227,7 @@ class UploadedFile(models.Model):
 		video = 'v'
 		image = 'i'
 		preview = 'p'
+		issue = 's'
 	symbol = models.CharField(null=False, max_length=1)
 	file = FileField(upload_to=get_random_path, null=True)
 	user = models.ForeignKey(User, null=False)
@@ -296,8 +297,8 @@ class Issue(models.Model):
 
 
 class IssueDetails(models.Model):
-	sender = models.ForeignKey(User, null=False)
-	browser = models.CharField(null=False, max_length=32, blank=True)
+	sender = models.ForeignKey(User, null=True)
+	browser = models.CharField(null=True, max_length=32, blank=True)
 	time = models.DateField(default=datetime.datetime.now, blank=True)
 	issue = models.ForeignKey(Issue, related_name='issue')
 	log = models.TextField(null=True, blank=True)

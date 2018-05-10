@@ -382,7 +382,6 @@ def statistics(request):
 	return HttpResponse(json.dumps(list(pie_data)), content_type='application/json')
 
 
-@login_required_no_redirect()
 @transaction.atomic
 def report_issue(request):
 	logger.info('Saving issue: %s', hide_fields(request.POST, ('log',), huge=True))

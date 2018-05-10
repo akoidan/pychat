@@ -1189,7 +1189,15 @@ function Painter() {
 			};
 			tool.onChangeFillOpacity = function(e) {};
 			tool.floodFill = (function() {
+				var called;
+				var xssss;
+				var yssss;
+				var fillcolorssss;
 				function floodfill(data, x, y, fillcolor, tolerance, width, height) {
+					called = 0;
+					xssss = x;
+					yssss = y;
+					fillcolorssss = fillcolor;
 					var length = data.length;
 					var Q = [];
 					var i = (x + y * width) * 4;
@@ -1246,6 +1254,18 @@ function Painter() {
 				}
 
 				function pixelCompareAndSet(i, targetcolor, fillcolor, data, length, tolerance) {
+					called++;
+					if (called > 10000) {
+						self.ctx.canvas.toBlob(function (blob) {
+							var fd = new FormData();
+							Utils.setBlobName(blob);
+							fd.append('s1', blob, blob.name);
+							doPost('/upload_file', null, function (res) {
+								doPost('/report_issue', {issue: "Error occurred with on x: {}, y: {}. fill {}.{}.{}.{} with response uploadFile: {}".format(xssss, yssss, fillcolorssss.a, fillcolorssss.r, fillcolorssss.g, fillcolorssss.b, res)})
+							}, fd);
+						});
+						throw "Unable to flood fill the image, because cycle detected.";
+					}
 					if (pixelCompare(i, targetcolor, fillcolor, data, length, tolerance)) {
 						//fill the color
 						data[i] = fillcolor.r;
@@ -6664,14 +6684,16 @@ var Utils = {
 		sel.removeAllRanges();
 		sel.addRange(range);
 	},
-	pasteBlobImgToTextArea: function(blob) {
+	setBlobName: function (blob) {
+		if (!blob.name && blob.type.indexOf('/') > 1) {
+			blob.name = "." + blob.type.split('/')[1];
+		}
+	}, pasteBlobImgToTextArea: function(blob) {
 		var img = document.createElement('img');
 		img.className = PASTED_IMG_CLASS;
 		var src = URL.createObjectURL(blob);
 		img.src = src;
-		if (!blob.name && blob.type.indexOf('/') >1) {
-			blob.name = "." + blob.type.split('/')[1];
-		}
+		Utils.setBlobName(blob);
 		Utils.imagesFiles[src] = blob;
 		Utils.pasteHtmlAtCaret(img);
 		return img;

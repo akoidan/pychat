@@ -23,6 +23,7 @@ var growlHolder;
 window.onerror = function (msg, url, linenumber) {
 	var message = 'Error occurred in {}:{}\n{}'.format(url, linenumber, msg);
 	if (growlHolder) {
+		doPost('/report_issue', {issue: message});
 		growlError(message);
 	} else {
 		alert(message);
