@@ -1255,7 +1255,7 @@ function Painter() {
 
 				function pixelCompareAndSet(i, targetcolor, fillcolor, data, length, tolerance) {
 					called++;
-					if (called > 10000) {
+					if (called > 10000000) {
 						self.ctx.canvas.toBlob(function (blob) {
 							var fd = new FormData();
 							Utils.setBlobName(blob);
