@@ -485,7 +485,7 @@ function Painter() {
 			[
 				{dom: self.dom.canvas, listener: ['mousedown', 'touchstart'], handler: 'onmousedown'},
 				{dom: self.dom.canvas, listener: ['mousemove', 'touchmove'], handler: 'onmousemove'},
-				{dom: self.dom.container, listener: 'keypress', handler: 'contKeyPress', params: false},
+				{dom: self.dom.container, listener: 'keydown', handler: 'contKeyPress', params: false},
 				{dom: document.body, listener: 'paste', handler: 'canvasImagePaste', params: false},
 				{dom: self.dom.canvasWrapper, listener: mouseWheelEventName, handler: 'onmousewheel', params: {passive: false}},
 				{dom: self.dom.container, listener: 'drop', handler: 'canvasImageDrop', params: {passive: false}},
