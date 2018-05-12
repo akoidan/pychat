@@ -134,9 +134,10 @@ def test(request):
 def search_messages(request):
 	data = request.POST['data']
 	room_id = request.POST['room']
+	offset = int(request.POST['offset'])
 	if not RoomUsers.objects.filter(room_id=room_id, user_id=request.user.id).exists():
 		raise ValidationError("You can't access this room")
-	messages = Message.objects.filter(content__icontains=data, room_id=room_id)[:10]
+	messages = Message.objects.filter(content__icontains=data, room_id=room_id).order_by('-id')[offset:offset+settings.MESSAGES_PER_SEARCH]
 	imv = get_message_images_videos(messages)
 	result = []
 	for message in messages:
@@ -209,6 +210,7 @@ def home(request):
 	context['defaultRoomId'] = settings.ALL_ROOM_ID
 	context['pingCloseDelay'] = settings.PING_CLOSE_JS_DELAY
 	context['pingServerCloseDelay'] = settings.CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT
+	context['MESSAGES_PER_SEARCH'] = settings.MESSAGES_PER_SEARCH
 	context['manifest'] = hasattr(settings, 'FIREBASE_API_KEY')
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 

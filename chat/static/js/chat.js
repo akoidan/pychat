@@ -3340,6 +3340,8 @@ function Search(channel) {
 		loading: document.createElement('div'),
 		container: document.createElement('div'),
 	};
+	self.lastSearchOffset = 0;
+	self.hasMore = true;
 	self.lastSearchNodes = [];
 	self.channel = channel;
 	self.isHidden = true;
@@ -3353,6 +3355,11 @@ function Search(channel) {
 		self.dom.result.className = 'search_result hidden';
 		self.dom.query.oninput = self.oninput;
 		self.channel.dom.chatBoxHolder.appendChild(self.dom.container);
+	};
+	self.repeat = function() {
+		if (self.hasMore && !self.currentRequest) {
+			self.executeSearch();
+		}
 	};
 	self.hide = function() {
 		if (!self.isHidden) {
@@ -3388,6 +3395,44 @@ function Search(channel) {
 		});
 		self.lastSearchNodes= [];
 	};
+	self.executeSearch = function(onExecute) {
+		var currentSearch = self.lastSearch;
+		CssUtils.addClass(self.dom.container, 'loading');
+		self.currentRequest = doPost('/search_messages', {
+			data: self.dom.query.value,
+			room: channel.roomId,
+			offset: self.lastSearchOffset
+		}, function (response, error) {
+			if (error && self.currentRequest) {
+				growlError("Unable to search because" + error);
+			}
+			self.currentRequest = null;
+			if (error) {
+				return;
+			}
+			onExecute && onExecute();
+			var b = self.lastSearch == currentSearch;
+			CssUtils.addClass(channel.dom.chatBoxDiv, 'display-search-only');
+			CssUtils.removeClass(self.dom.container, 'loading');
+			var r = JSON.parse(response);
+			self.lastSearchOffset += r.length;
+			self.hasMore = r.length === MESSAGES_PER_SEARCH;
+			if (r.length) {
+				CssUtils.hideElement(self.dom.result);
+				r.forEach(function (data) {
+					var p = self.channel.createMessageNodeAll(data);
+					self.lastSearchNodes.push(p.node);
+					CssUtils.addClass(p.node, 'filter-search');
+				})
+			} else {
+				self.dom.result.textContent = "No results found";
+				CssUtils.showElement(self.dom.result);
+			}
+			if (!b) {
+				self.oninput();
+			}
+		})
+	};
 	self.oninput = function(event) {
 		self.lastSearch = self.dom.query.value;
 		if (!self.currentRequest) {
@@ -3400,39 +3445,8 @@ function Search(channel) {
 				}
 				return;
 			}
-			var currentSearch = self.lastSearch;
-			CssUtils.addClass(self.dom.container, 'loading');
-			self.currentRequest = doPost('/search_messages', {
-				data: self.dom.query.value,
-				room: channel.roomId
-			}, function(response, error) {
-				if (error && self.currentRequest) {
-					growlError("Unable to search because" + error);
-				}
-				self.currentRequest = null;
-				if (error) {
-					return;
-				}
-				self.clearSearch();
-				var b = self.lastSearch == currentSearch;
-				CssUtils.addClass(channel.dom.chatBoxDiv, 'display-search-only');
-				CssUtils.removeClass(self.dom.container, 'loading');
-				var r = JSON.parse(response);
-				if (r.length) {
-					CssUtils.hideElement(self.dom.result);
-					r.forEach(function (data) {
-						var p = self.channel.createMessageNodeAll(data);
-						self.lastSearchNodes.push(p.node);
-						CssUtils.addClass(p.node, 'filter-search');
-					})
-				} else {
-					self.dom.result.textContent = "No results found";
-					CssUtils.showElement(self.dom.result);
-				}
-				if (!b) {
-					self.oninput();
-				}
-			})
+			self.lastSearchOffset = 0;
+			self.executeSearch(self.clearSearch);
 		}
 	};
 	self.init();
@@ -4008,20 +4022,24 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	}
 	self.loadUpHistory = function (count) {
 		if (self.dom.chatBoxDiv.scrollTop === 0) {
-			var currentMillis = Date.now();
-			// 0 if locked, or last request was sent earlier than 3 seconds ago
-			if (self.lastLoadUpHistoryRequest + 3000 > currentMillis) {
-				logger.info("Skipping loading message, because it's locked")();
-				return
+			if (self.search.isHidden) {
+				var currentMillis = Date.now();
+				// 0 if locked, or last request was sent earlier than 3 seconds ago
+				if (self.lastLoadUpHistoryRequest + 3000 > currentMillis) {
+					logger.info("Skipping loading message, because it's locked")();
+					return
+				}
+				self.lastLoadUpHistoryRequest = currentMillis;
+				var getMessageRequest = {
+					headerId: storage.getRoomHeaderId(self.roomId),
+					count: count,
+					action: 'loadMessages',
+					channel: self.roomId
+				};
+				wsHandler.sendToServer(getMessageRequest);
+			} else {
+				self.search.repeat(count);
 			}
-			self.lastLoadUpHistoryRequest = currentMillis;
-			var getMessageRequest = {
-				headerId: storage.getRoomHeaderId(self.roomId),
-				count: count,
-				action: 'loadMessages',
-				channel: self.roomId
-			};
-			wsHandler.sendToServer(getMessageRequest);
 		}
 	};
 	self.destroy = function () {
