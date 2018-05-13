@@ -48,7 +48,7 @@ services:
       - ./volumes/photos/:/srv/http/photos:ro
       - static:/srv/http/static:ro
     ports:
-     - 8000:443
+     - 443:443
     depends_on:
       ws:
         condition: service_healthy
