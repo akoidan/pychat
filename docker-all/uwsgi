@@ -1,0 +1,6 @@
+#!/sbin/openrc-run
+
+command="/usr/bin/uwsgi"
+command_args="--ini /srv/http/chat-uwsgi.ini"
+command_background="yes"
+pidfile="/tmp/uwsgi.pid"

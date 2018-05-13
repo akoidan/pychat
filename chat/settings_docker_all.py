@@ -2,28 +2,24 @@ import logging.config
 
 from chat.settings_base import *
 
-TEMPLATE_DEBUG = True
-DEBUG = True
+TEMPLATE_DEBUG = False
+DEBUG = False
 
-REDIS_HOST = 'redis'
-SESSION_REDIS = {
-	'host': REDIS_HOST,
-	'post': REDIS_PORT,
-	'db': 0
-}
+
 DATABASES = {
 	'default': {
-		'ENGINE': 'django.db.backends.mysql',
+		'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
 		'NAME': 'pychat',
 		'USER': 'pychat',
 		'PASSWORD': 'pypass',
-		'HOST': 'db',
-		'PORT': '3306',  # mysql uses socket if host is localhost
+		'HOST': 'localhost',
+		'default-character-set': 'utf8',
 		'OPTIONS': {
 			'autocommit': True,
 		},
 	}
 }
+
 TEMPLATES[0]['OPTIONS']['loaders'] = [
 	('django.template.loaders.cached.Loader', [
 		'django.template.loaders.filesystem.Loader',
@@ -41,8 +37,4 @@ LOGGING['loggers'] = {
 
 logging.config.dictConfig(LOGGING)
 
-TORNADO_SSL_OPTIONS = {
-	"certfile": '/etc/nginx/ssl/certificate.crt',
-	"keyfile": '/etc/nginx/ssl/server.key'
-}
 API_ADDRESS_PATTERN = 'wss://%s:8888/?id='
