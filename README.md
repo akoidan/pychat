@@ -45,7 +45,7 @@ You can always use [pychat.org](https://pychat.org), but if you want run chat yo
  - Set up for production w/o docker
 
 ## Run test docker image
- - docker run -p 443:443 -p 8888:8888 deathangel908/pychat
+ - Download and run image: `docker run -p 443:443 -p 8888:8888 deathangel908/pychat`
  - Open https://localhost
 Please don't use this build for production, as it uses debug ssl certificate and lacks a few features. The docker files are [here](docker-all).
 
@@ -55,7 +55,7 @@ Please don't use this build for production, as it uses debug ssl certificate and
    - You can also generate them manually and put into `./rootfs/etc/nginx/ssl/server.key` and `./rootfs/etc/nginx/ssl/certificate.crt`
  - Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. Open it and replace with your data according to comments. Everything in this file but `SECRET_KEY` is optional.
  - Build the image, you can use either single container or multiple:
-   - Single container: `docker build . -f docker-all/Dockerfile`
+   - Single container: `docker build -t pychat . -f docker-all/Dockerfile`. `docker run -p 443:443 -p 8888:8888 pychat`
    - Multiple container: `docker-compose -f docker/docker-compose.yml up`.
  - Open https://localhost
 
