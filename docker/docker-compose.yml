@@ -1,7 +1,7 @@
 version: '2.3'
 services:
   db:
-    image: mysql/mysql-server
+    image: mysql/mysql-server:5.7.22
     environment:
       MYSQL_ROOT_PASSWORD: 'Ilovepython'
       MYSQL_DATABASE: 'pychat'
@@ -12,7 +12,7 @@ services:
       timeout: 3s
       interval: 5s
       retries: 3
-      start_period: 50s
+      start_period: 100s
     volumes:
       - ./volumes/mysql:/var/lib/mysql
   server:
