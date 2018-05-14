@@ -17,7 +17,8 @@ Live demo: [pychat.org](http://pychat.org/)
 # Table of contents
   * [Breaf description](#brief-description)
   * [How to run on my own server](#how-to-run-on-my-own-server)
-    * [Via Docker](#via-docker)
+    * [Run test docker image](#run-test-docker-image)
+    * [Build docker](#build-docker)
     * [Development setup](#development-setup)
        * [Install OS packages](#install-os-packages)
          * [Windows](#windows)
@@ -38,17 +39,25 @@ Chat is written in **Python** with [django](https://www.djangoproject.com/). For
 
 # How to run on my own server:
 You can always use [pychat.org](https://pychat.org), but if you want run chat yourself you have 3 options:
- - Set up chat for production/test via docker
+ - Test pychat with prebuilt docker image
+ - Build docker image for production/test
  - Run chat for development
  - Set up for production w/o docker
 
-## Via docker
+## Run test docker image
+ - Download and run image: `docker run -p 443:443 -p 8888:8888 deathangel908/pychat`
+ - Open https://localhost
+Please don't use this build for production, as it uses debug ssl certificate and lacks a few features. The docker files are [here](docker-all).
+
+## Build docker
  - Generate ssl certificates:
    - If you have bash installed: `./download_content.sh generate_certificate`
    - You can also generate them manually and put into `./rootfs/etc/nginx/ssl/server.key` and `./rootfs/etc/nginx/ssl/certificate.crt`
  - Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. Open it and replace with your data according to comments. Everything in this file but `SECRET_KEY` is optional.
- - By default chat listens port `8000`. If you want to change it, for e.g to `443` set  `nginx  ports: 443:8000` in [docker/docker-compose.yml](docker/docker-compose.yml).
- - Run `docker-compose -f docker/docker-compose.yml up` and open `https://localhost:8000/`
+ - Build the image, you can use either single container or multiple:
+   - Single container: `docker build -t pychat . -f docker-all/Dockerfile`. `docker run -p 443:443 -p 8888:8888 pychat`
+   - Multiple container: `docker-compose -f docker/docker-compose.yml up`.
+ - Open https://localhost
 
 ## Development setup
 The flow is the following

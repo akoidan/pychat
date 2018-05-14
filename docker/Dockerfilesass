@@ -2,7 +2,8 @@ FROM alpine:3.6
 #
 WORKDIR /usr/src/sass
 ENV SASS_LIBSASS_PATH /usr/src/sass/libsass
-RUN apk update &&\
+RUN set -x &&\
+apk update &&\
 apk add --no-cache curl git make gcc autoconf automake libtool g++ libstdc++ &&\
 git clone https://github.com/sass/libsass.git &&\
 git clone https://github.com/sass/sassc.git libsass/sassc &&\

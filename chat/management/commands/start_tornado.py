@@ -20,13 +20,6 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
 
-	def __init__(self):
-		super(Command, self).__init__()
-		application = Application([
-			(r'/test', HttpHandler),
-			(r'.*', TornadoHandler),
-		], debug=settings.DEBUG)
-		self.http_server = HTTPServer(application, ssl_options=TORNADO_SSL_OPTIONS)
 	help = 'Starts the Tornado application for message handling.'
 
 	def add_arguments(self, parser):
@@ -35,6 +28,12 @@ class Command(BaseCommand):
 			dest='port',
 			default=settings.API_PORT,
 			type=int,
+		)
+		parser.add_argument(
+			'--host',
+			dest='host',
+			default=None,
+			type=str,
 		)
 		parser.add_argument(
 			'--keep_online',
@@ -55,6 +54,11 @@ class Command(BaseCommand):
 		io_loop.add_timeout(time.time() + 2, io_loop.stop)
 
 	def handle(self, *args, **options):
+		application = Application([
+			(r'/test', HttpHandler),
+			(r'.*', TornadoHandler),
+		], debug=settings.DEBUG, default_host=options['host'])
+		self.http_server = HTTPServer(application, ssl_options=TORNADO_SSL_OPTIONS)
 		self.http_server.bind(options['port'])
 		print('Listening port {}'.format(options['port']))
 		#  uncomment me for multiple process

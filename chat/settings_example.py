@@ -7,7 +7,7 @@ import importlib
 import os
 
 get = os.environ.get('PYCHAT_CONFIG')
-configs = ['docker', 'local', 'prod']
+configs = ['docker', 'local', 'prod', 'docker_all']
 if get not in configs:
 	raise Exception("Expected environment variable PYCHAT_CONFIG to be one of {}".format(configs))
 config = 'chat.settings_{}'.format(get)
