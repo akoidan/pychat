@@ -176,7 +176,6 @@ Services commands for Archlinux:
  - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
  - If something doesn't work you want to check `pychat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
 
-
 # Contributing:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
