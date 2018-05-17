@@ -1,4 +1,4 @@
-![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7--1.9-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/djangochat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/djangochat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/djangochat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/djangochat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/djangochat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/djangochat)
+![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7--1.9-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/pychat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/pychat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/pychat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/pychat)
 
 This is free web (browser) chat, that features:
  - Send instant text messages via websockets.
@@ -55,7 +55,7 @@ Please don't use this build for production, as it uses debug ssl certificate and
    - You can also generate them manually and put into `./rootfs/etc/nginx/ssl/server.key` and `./rootfs/etc/nginx/ssl/certificate.crt`
  - Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. Open it and replace with your data according to comments. Everything in this file but `SECRET_KEY` is optional.
  - Build the image, you can use either single container or multiple:
-   - Single container: `docker build -t pychat . -f docker-all/Dockerfile`. `docker run -p 443:443 -p 8888:8888 pychat`
+   - Single container: `docker build -t pychat . -f docker-all/Dockerfile`. `docker volume create pychat_data` `docker run -p 443:443 -p 8888:8888 -v pychat_data:/data pychat`
    - Multiple container: `docker-compose -f docker/docker-compose.yml up`.
  - Open https://localhost
 
@@ -104,8 +104,8 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
    - Django project root: root directory of your project. Where .git asides.
    - Put `Settings:` to `chat/settings.py`
    - 'Environment variables: `PYCHAT_CONFIG=local`
- 2. `Settings` -> `Project djangochat` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `djangochatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
- 3. `Settings` -> `Project: djangochat` -> `Project structure`
+ 2. `Settings` -> `Project pychat` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `pychatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
+ 3. `Settings` -> `Project: pychat` -> `Project structure`
   - You might want to exclude: `.idea`, `chat/static/css`
   - mark `templates` directory as `Template Folder`
  4. Add start scripts:
@@ -153,7 +153,7 @@ Services commands for Archlinux:
 ### Common
  - Set environment variable `PYCHAT_CONFIG=prod`
  - Follow the instructions in [Boostrap files](#bootstrap-files).
- - For production I would recommend to clone repository to `/srv/http/djangochat`.  If you cloned project into different directory than `/srv/http/djangochat` replace all absolute paths in config files. You can use `download_content.sh rename_root_directory` to do that.
+ - For production I would recommend to clone repository to `/srv/http/pychat`.  If you cloned project into different directory than `/srv/http/pychat` replace all absolute paths in config files. You can use `download_content.sh rename_root_directory` to do that.
  - Replace all occurrences of `pychat.org` in [rootfs](rootfs) for your domain. You can use `./download_content.sh rename_domain your.new.domain.com`
  - Also check `rootfs/etc/nginx/nginx.conf` you may want to merge `location /photo` and `location /static` into main `server` conf. You need all of this because I used subdomain for static urls/
  - HTTPS is required for webrtc calls so you need to enable ssl:
@@ -174,7 +174,7 @@ Services commands for Archlinux:
  - Add django admin static files: `python manage.py collectstatic`
  - Execute start services and if you need enablign autostart commands described for [Archlinux](#archliunux-prod) or [CentOS](#centos-prod)
  - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
- - If something doesn't work you want to check `djangochat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
+ - If something doesn't work you want to check `pychat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
 
 
 # Contributing:
@@ -230,5 +230,5 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * add media query for register and usersettings to adjust for phone's width
 * file upload http://stackoverflow.com/a/14605593/3872976
 * add pictures preview if user post an url that's content-type =image
-* SELECT_SELF_ROOM  https://github.com/Deathangel908/djangochat/blob/master/chat/settings.py#L292-L303 doesnt work with mariadb engine 10.1
+* SELECT_SELF_ROOM  https://github.com/Deathangel908/pychat/blob/master/chat/settings.py#L292-L303 doesnt work with mariadb engine 10.1
 * also admin email wasn't triggered while SELECT_SELF_ROOM has failed

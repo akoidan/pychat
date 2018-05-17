@@ -223,7 +223,7 @@ WS_ID_CHAR_LENGTH = 4
 
 DEFAULT_PROFILE_ID = 1
 
-ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/djangochat/issues/new'
+ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/pychat/issues/new'
 
 SESSION_COOKIE_NAME = "sessionid"
 

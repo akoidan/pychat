@@ -6,7 +6,7 @@ from django.conf import settings
 
 class DefaultSettingsConfig(AppConfig):
 	name = 'chat'
-	verbose_name = 'djangochat'
+	verbose_name = 'pychat'
 
 	colors = {}
 

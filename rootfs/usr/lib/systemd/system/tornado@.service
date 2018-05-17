@@ -5,7 +5,7 @@ Before=tornado.service
 BindsTo=tornado.service
 
 [Service]
-ExecStart=/srv/http/djangochat/manage.py start_tornado --port %I --keep_online
+ExecStart=/srv/http/pychat/manage.py start_tornado --port %I --keep_online
 SyslogIdentifier=tornado-%i
 SuccessExitStatus=30
 Environment=PYCHAT_CONFIG=prod

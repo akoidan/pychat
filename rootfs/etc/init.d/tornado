@@ -32,7 +32,7 @@ start() {
     export LC_ALL='en_US.utf8'
     export LANG='en_US.utf8'
     curdir=`pwd`
-    cd /root/djangochat/
+    cd /srv/http/pychat/
     nohup python3 ./manage.py start_tornado  > ./log/tornadoST.log 2>&1 &
     pid=$!
     cd "$curdir"

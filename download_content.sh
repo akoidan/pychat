@@ -89,7 +89,7 @@ check_files() {
         printError "$path_failed2 is missing"
       done
       if [ "$1" = "remove_script" ]; then
-        printError "Please report for missing files at https://github.com/Deathangel908/djangochat/issues/new"
+        printError "Please report for missing files at https://github.com/Deathangel908/pychat/issues/new"
       fi
       exit 1
     else
