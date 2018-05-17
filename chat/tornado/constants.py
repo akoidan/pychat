@@ -23,7 +23,6 @@ class Actions(object):
 	CREATE_ROOM_CHANNEL = 'addRoom'
 	INVITE_USER = 'inviteUser'
 	ADD_USER = 'addUserToDom'
-	OFFLINE_MESSAGES = 'loadOfflineMessages'
 	SET_WEBRTC_ID = 'setConnectionId'
 	SET_WEBRTC_ERROR = 'setError'
 	OFFER_FILE_CONNECTION = 'offerFile'

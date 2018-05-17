@@ -2999,6 +2999,8 @@ function ChannelsHandler() {
 				self.destroyChannel(channelKey);
 			}
 		}
+		var bu = Utils.checkAndPlay;
+		Utils.checkAndPlay = function () {};
 		for (var roomId in rooms) {
 			// if a new room has been added while disconnected
 			if (!rooms.hasOwnProperty(roomId)) continue;
@@ -3016,9 +3018,18 @@ function ChannelsHandler() {
 					self.createNewUserChatHandler(roomId, newUserList);
 				}
 			}
-			self.channels[roomId].setRoomSettings(newRoom.volume, newRoom.notifications)
+			self.channels[roomId].setRoomSettings(newRoom.volume, newRoom.notifications);
+			var hisMess = newRoom.history || [];
+			var offlMess = newRoom.offline || [];
+			offlMess.forEach(function (d) {
+				self.channels[roomId]._printMessage(d, true, false);
+			});
+			hisMess.forEach(function (d) {
+				self.channels[roomId]._printMessage(d, false, true);
+			});
 		}
 		self.showActiveChannel();
+		Utils.checkAndPlay = bu;
 	};
 	self.handle = function (message) {
 		if (message.handler === 'channels') {
@@ -3813,19 +3824,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 			}
 		}
 		return {node: p, skip: false};
-	};
-	self.loadOfflineMessages = function (data) {
-		var hisMess = data.content.history || [];
-		var offlMess = data.content.offline || [];
-		var bu = Utils.checkAndPlay;
-		Utils.checkAndPlay = function() {}
-		offlMess.forEach(function(d) {
-			self._printMessage(d, true, false);
-		});
-		hisMess.forEach(function(d) {
-			self._printMessage(d, false, true);
-		});
-		Utils.checkAndPlay = bu;
 	};
 	self.getMaxSymbol = function (images) { //deprecated
 		var symbols = images && Object.keys(images);

@@ -17,6 +17,14 @@ class MessagesCreator(object):
 		}
 
 	@staticmethod
+	def base_default(event, content, handler):
+		return {
+			VarNames.EVENT: event,
+			VarNames.CONTENT: content,
+			VarNames.HANDLER_NAME: handler
+		}
+
+	@staticmethod
 	def set_ws_id(random, self_id):
 		return {
 			VarNames.HANDLER_NAME: HandlerNames.WS,
@@ -24,6 +32,10 @@ class MessagesCreator(object):
 			VarNames.CONTENT: random,
 			VarNames.WEBRTC_OPPONENT_ID: self_id
 		}
+
+	@classmethod
+	def set_room(cls, rooms):
+		return cls.base_default(Actions.ROOMS, rooms, HandlerNames.CHANNELS)
 
 	def room_online(self, online, event, channel):
 		"""
@@ -174,16 +186,6 @@ class MessagesCreator(object):
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
 			VarNames.TIME: get_milliseconds()
 		}
-
-	def load_offline_message(self, offline_messages, history_messages, channel_key):
-		res = self.default({
-			VarNames.LOAD_MESSAGES_OFFLINE: offline_messages,
-			VarNames.LOAD_MESSAGES_HISTORY: history_messages
-		},
-			Actions.OFFLINE_MESSAGES,
-			HandlerNames.CHAT)
-		res[VarNames.CHANNEL] = channel_key
-		return res
 
 	@staticmethod
 	def create_user_rooms(user_rooms):
