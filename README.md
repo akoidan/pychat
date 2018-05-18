@@ -180,6 +180,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Messages is not removed if user was offline, while another removed it.
 * Store userOnline in a single list, refactor All channel for online storing
 * Add "last seen" feature and status afk/online/dnd
 * blink icon in title on new message
