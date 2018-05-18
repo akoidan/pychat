@@ -171,7 +171,6 @@ class MessagesHandler(MessagesCreator):
 			online_user_names_mes = self.room_online(online, Actions.LOGIN, room_id)
 			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes, room_id)
-		return is_online
 
 	def get_is_online(self, room_id):
 		self.async_redis_publisher.sadd(room_id, self.id)

@@ -185,6 +185,9 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * Add message to favorite
 * Ability to quote any code
 * Paint errors
+* Add ability to show growls messages to channel from ADMIN
+* gitb don't backup files larger than 10MB
+* Add "last seen" feature
 * Add video/voice record to chat like in telegram
 * https://static.pychat.org/photo/uEXCJWJH_image.png
 * Add go down button if scroll is not in the botom for chatbox

@@ -164,11 +164,12 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.listen(self.channels)
 			off_messages, history = self.get_offline_messages(user_rooms, was_online)
 			for room_id in user_rooms:
-				self.get_is_online(room_id)
-				is_online = self.add_online_user(room_id, rooms_online[room_id][0], rooms_online[room_id][1])
 				user_rooms[room_id][VarNames.LOAD_MESSAGES_HISTORY] = history.get(room_id)
 				user_rooms[room_id][VarNames.LOAD_MESSAGES_OFFLINE] = off_messages.get(room_id)
 			self.ws_write(self.set_room(user_rooms))
+			for room_id in user_rooms:
+				self.async_redis_publisher.sadd(room_id, self.id)
+				self.add_online_user(room_id, rooms_online[room_id][0], rooms_online[room_id][1])
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
 			self.connected = True
 			# self.save_ip()
