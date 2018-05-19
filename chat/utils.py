@@ -74,8 +74,8 @@ def update_room(room_id, disabled):
 		Room.objects.filter(id=room_id).update(disabled=False)
 
 
-def get_history_message_query(messages, user_rooms, restored_connection):
-	cb = restored_connection_q if restored_connection else new_connection_q
+def get_history_message_query(messages, user_rooms, with_history):
+	cb = with_history_q if with_history else no_history_q
 	q_objects = Q()
 	if messages:
 		pmessages = json.loads(messages)
@@ -88,11 +88,11 @@ def get_history_message_query(messages, user_rooms, restored_connection):
 	return q_objects
 
 
-def new_connection_q(q_objects, room_id, h, f):
+def with_history_q(q_objects, room_id, h, f):
 	q_objects.add(Q(id__gte=h, room_id=room_id, deleted=False), Q.OR)
 
 
-def restored_connection_q(q_objects, room_id, h, f):
+def no_history_q(q_objects, room_id, h, f):
 	q_objects.add(Q(room_id=room_id, deleted=False) & (
 			(Q(id__gte=h) & Q(id__lte=f) & Q(edited_times__gt=0)) | Q(id__gt=f)), Q.OR)
 

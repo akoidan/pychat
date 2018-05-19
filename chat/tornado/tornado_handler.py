@@ -162,7 +162,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				rooms_online[room_id] = self.get_is_online(room_id)
 				was_online = was_online or rooms_online[room_id][0]
 			self.listen(self.channels)
-			off_messages, history = self.get_offline_messages(user_rooms, was_online)
+			off_messages, history = self.get_offline_messages(user_rooms, was_online, self.get_argument('history', False))
 			for room_id in user_rooms:
 				user_rooms[room_id][VarNames.LOAD_MESSAGES_HISTORY] = history.get(room_id)
 				user_rooms[room_id][VarNames.LOAD_MESSAGES_OFFLINE] = off_messages.get(room_id)
@@ -177,8 +177,8 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key %s has been rejected" % session_key)
 
-	def get_offline_messages(self, user_rooms, was_online):
-		q_objects = get_history_message_query(self.get_argument('messages', None), user_rooms, self.restored_connection)
+	def get_offline_messages(self, user_rooms, was_online, with_history):
+		q_objects = get_history_message_query(self.get_argument('messages', None), user_rooms, with_history)
 		if was_online:
 			off_messages = []
 		else:

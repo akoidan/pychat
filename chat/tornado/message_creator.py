@@ -54,9 +54,11 @@ class MessagesCreator(object):
 			VarNames.CONTENT: message.content,
 			VarNames.TIME: message.time,
 			VarNames.MESSAGE_ID: message.id,
-			VarNames.FILES: files,
+			VarNames.FILES: files if files else {},
 			VarNames.GIPHY: message.giphy,
-			VarNames.EDITED_TIMES: message.edited_times
+			VarNames.EDITED_TIMES: message.edited_times,
+			VarNames.CHANNEL: message.room_id,
+			VarNames.SYMBOL: message.symbol
 		}
 		return res
 
@@ -72,8 +74,6 @@ class MessagesCreator(object):
 		res = cls.create_message(message, files)
 		res[VarNames.EVENT] = event
 		res[VarNames.JS_MESSAGE_ID] = js_id
-		res[VarNames.CHANNEL] = message.room_id
-		res[VarNames.SYMBOL] = message.symbol
 		res[VarNames.HANDLER_NAME] = HandlerNames.CHAT
 		return res
 

@@ -182,6 +182,7 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 # TODO list
 * Messages is not removed if user was offline, while another removed it.
 * Store userOnline in a single list, refactor All channel for online storing
+* replace loggerFactory.getLogger with single factory for 4 methods debug/warn/log/error
 * Add "last seen" feature and status afk/online/dnd
 * blink icon in title on new message
 * Add message to favorite

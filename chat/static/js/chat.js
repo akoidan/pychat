@@ -66,12 +66,23 @@ onDocLoad(function () {
 	singlePage = new PageHandler();
 	webRtcApi = new WebRtcApi();
 	smileyUtil = new SmileyUtil();
-	storage = new Storage();
 	wsHandler = new WsHandler();
 	//bottom call loadMessagesFromLocalStorage(); s
 	notifier = new NotifierHandler();
 	painter = new Painter();
-	wsHandler.listenWS();
+	var db = new DataBase();
+	db.init(function (success) {
+		if (success) {
+			storage = db;
+			db.getMessages(channelsHandler.loadMessage);
+			wsHandler.listenWS();
+		} else {
+			storage = new LocalStorage();
+			wsHandler.loadHistoryFromWs = true;
+			wsHandler.listenWS();
+		}
+	});
+
 	Utils.showHelp();
 	$('singout').onclick = function() {
 		channelsHandler.clearChannelHistory();
@@ -2446,6 +2457,23 @@ function ChannelsHandler() {
 		}
 		return childDom;
 	})();
+	self.loadMessage = function(messages, setRooms) {
+		if (setRooms) {
+			self.setRoomsFinished = true;
+		}
+		if (messages) {
+			self.dbMessages = messages;
+		}
+		if (self.setRoomsFinished && self.dbMessages) {
+			for (var i = 0; i < self.dbMessages.length; i++) {
+				var room = self.dbMessages[i];
+				if (room.channel) {
+					self.channels[room.channel]._printMessage(room, false, true);
+				}
+			}
+			self.dbMessages = null;
+		}
+	};
 	self.initCha = function() {
 		self.dom.navCallIcon.onclick = function() {
 			self.getActiveChannel().toggleCallHandler();
@@ -3027,7 +3055,10 @@ function ChannelsHandler() {
 			hisMess.forEach(function (d) {
 				self.channels[roomId]._printMessage(d, false, true);
 			});
+			storage.saveMessages(offlMess);
+			storage.saveMessages(hisMess);
 		}
+		self.loadMessage(null, true);
 		self.showActiveChannel();
 		Utils.checkAndPlay = bu;
 	};
@@ -3464,6 +3495,118 @@ function Search(channel) {
 }
 
 
+function DataBase() {
+	var self = this;
+	var logger = {
+		warn: loggerFactory.getLogger("DB", console.warn, 'color: blue; font-weight: bold'),
+		debug: loggerFactory.getLogger("DB:", console.debug, 'color: blue; font-weight: bold'),
+		info: loggerFactory.getLogger("DB", console.log, 'color: blue; font-weight: bold'),
+		error: loggerFactory.getLogger("DB", console.error, 'color: blue; font-weight: bold')
+	};
+	function transaction(transactionType, cb) {
+		return function (a1, a2, a3) {
+			if (self.db) {
+				var rcb;
+				self.db[transactionType](function (t) {
+					rcb = cb(t, a1, a2, a3);
+				}, function (e) {
+					rcb && rcb(null);
+					logger.error("Error during saving message {}", e)();
+				})
+			}
+		}
+	}
+	function read(cb) {
+		return transaction('transaction', cb);
+	}
+	function write(cb) {
+		return transaction('transaction', cb);
+	}
+	self.getRoomHeaderId = read(function(t, id, cb) {
+		t.executeSql('select min(id) as min from message where channel = ?', [id], function(t, d) {
+			cb(d.rows.length ? d.rows[0].min: null);
+		})
+	});
+	self.getIds = read(function(t, cb) {
+		t.executeSql('select max(id) as max, channel, min(id) as min from message group by channel', [], function (t, d) {
+			var res = {};
+			for (var i = 0; i < d.rows.length; i++) {
+				var e = d.rows[i];
+				res[e.channel] = {h: e.min, f: e.max}
+			}
+			cb(res);
+		})
+	});
+	self.init = function (cb) {
+		if (!window.openDatabase) {
+			logger.warn("Current Browser doesn't support websql ")();
+			cb(null);
+		} else {
+			logger.info("Initializing database")();
+			self.db = openDatabase('pydb', '', 'Messages database', 10 * 1024 * 1024);
+			if (self.db.version == '') {
+				self.db.changeVersion(self.db.version, '1.0', function (t) {
+					t.executeSql('CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy boolean NOT NULL CHECK (giphy IN (0,1)), edited integer, channel integer, userId integer)', [], function(t,d) {
+						t.executeSql('CREATE TABLE image (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text);', [], function (t, s) {
+							logger.info("Database has been initialized with version {}", self.db.version)();
+							cb(true);
+						});
+					});
+				}, function (error) {
+					logger.error("Error during creating database {}", error)();
+					cb(false)
+				});
+			} else if (self.db.version == '1.0') {
+				logger.info("Created new db connection")();
+				cb(true);
+			}
+		}
+	};
+	self.clearStorage = write(function (t) {
+		t.executeSql('delete from message');
+		t.executeSql('delete from image');
+		logger.info("Db has been cleared")();
+	});
+	self.getMessages = read(function(t, cb) {
+		t.executeSql('SELECT * FROM message', [], function (t, m) {
+			t.executeSql('SELECT * from image', [], function (t, i) {
+				var mid = {};
+				var messages = [];
+				for (var j = 0; j < m.rows.length; j++) {
+					var e = m.rows[j];
+					mid[e.id] = e;
+					e.files = {};
+					messages.push(e)
+				}
+				for (var j = 0; j < i.rows.length; j++) {
+					var e = i.rows[j];
+					mid[e.message_id].files[e.symbol] = e;
+				}
+				cb(messages);
+			})
+		});
+		return cb;
+	});
+	self.insertMessage = function (t, message) {
+		t.executeSql('insert or replace into message (id, time, content, symbol, deleted, giphy, edited, channel, userId) values (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+				[message.id, message.time, message.content, message.symbol, 0, 0, message.edited, message.channel, message.userId], function (t, d) {
+					for (var k in message.files) {
+						var f = message.files[k];
+						t.executeSql('insert or replace into image (id, symbol, url, message_id, type, preview) values (?, ?, ?, ?, ?, ?)', [f.id, k, f.url, message.id, f.type, f.preview]);
+					}
+				});
+	};
+	self.saveMessage = write(self.insertMessage);
+	self.saveMessages = write(function(t, data) {
+		data.forEach(function(m) {
+			self.insertMessage(t, m);
+		});
+	});
+	self.setRoomHeaderId = function() {
+
+	}
+}
+
 
 function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	var self = this;
@@ -3870,6 +4013,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		}
 	};
 	self.printMessage = function (data) {
+		storage.saveMessage(data);
 		self._printMessage(data, false);
 	};
 	self.setupMessageEvents = function(data) {
@@ -3897,7 +4041,6 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		return p;
 	};
 	self._printMessage = function (data, isNew, forceSkipHL) {
-		storage.setRoomHeaderId(self.roomId, data.id);
 		self.printMessagePlay(data);
 		// we can't use self.allUsers[data.userId].user; since user could left and his message remains
 		var p = self.createMessageNodeAll(data);
@@ -3970,6 +4113,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		message.forEach(function(message) {
 			self._printMessage(message, false, true)
 		});
+		storage.saveMessages(message);
 		window.newMessagesDisabled = savedNewMessagesDisabledStatus;
 		self.lastLoadUpHistoryRequest = 0; // allow fetching again, after new header is set
 		Utils.checkAndPlay = bu;
@@ -4028,13 +4172,15 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 					return
 				}
 				self.lastLoadUpHistoryRequest = currentMillis;
-				var getMessageRequest = {
-					headerId: storage.getRoomHeaderId(self.roomId),
-					count: count,
-					action: 'loadMessages',
-					channel: self.roomId
-				};
-				wsHandler.sendToServer(getMessageRequest);
+				storage.getRoomHeaderId(self.roomId, function (hid) {
+					var getMessageRequest = {
+						headerId: hid,
+						count: count,
+						action: 'loadMessages',
+						channel: self.roomId
+					};
+					wsHandler.sendToServer(getMessageRequest);
+				});
 			} else {
 				self.search.repeat(count);
 			}
@@ -6051,7 +6197,7 @@ function WebRtcApi() {
 function WsHandler() {
 	var self = this;
 	self.messageId = 0;
-	self.wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 9 - connected;
+	self.wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 2 - connections is lost,  9 - connected;
 	self.duplicates = {};
 	self.log = loggerFactory.getLogger('WS', console.log, "color: green;");
 	self.debugLog = loggerFactory.getLogger('WS', console.debug, "color: green;");
@@ -6210,41 +6356,47 @@ function WsHandler() {
 		} else if (self.wsState === 0) {
 			growlError("Can't establish connection with server");
 			self.logError("Chat server is down because {}", reason)();
+			self.wsState = 1;
 		} else if (self.wsState === 9) {
 			growlError("Connection to chat server has been lost, because {}".format(reason));
 			self.logError(
 					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
 					e.reason, CONNECTION_RETRY_TIME)();
 		}
-		self.wsState = 1;
+		if (self.wsState !== 1) {
+				self.wsState = 2;
+		}
 		// Try to reconnect in 10 seconds
 		setTimeout(self.listenWS, CONNECTION_RETRY_TIME);
 	};
 	self.listenWS = function () {
 		if (!window.WebSocket) {
-			growlError(getText("Your browser ({}) doesn't support webSockets. Supported browsers: " +
-					"Android, Chrome, Opera, Safari, IE11, Edge, Firefox", window.browserVersion));
+			growlError("Your browser ({}) doesn't support webSockets. Supported browsers: " +
+					"Android, Chrome, Opera, Safari, IE11, Edge, Firefox".format(window.browserVersion));
 			return;
 		}
-		var s = API_URL + self.wsConnectionId;
-		if (Object.keys(storage.cache).length > 0) {
-			s += "&messages=" + encodeURI(JSON.stringify(storage.cache));
-		}
-		self.ws = new WebSocket(s);
-		self.ws.onmessage = self.onWsMessage;
-		self.ws.onclose = self.onWsClose;
-		self.ws.onopen = function () {
-			self.setStatus(true);
-			var message = "Connection to server has been established";
-			if (self.wsState === 1) { // if not inited don't growl message on page load
-				growlSuccess(message);
-			} else {
-				//self.startPing();
+		storage.getIds(function (ids) {
+			var s = API_URL + self.wsConnectionId;
+			if (Object.keys(ids).length > 0) {
+				s += "&messages=" + encodeURI(JSON.stringify(ids));
 			}
-			self.startNoPingTimeout();
-			self.wsState = 9;
-			self.log(message)();
-		};
+			if (self.loadHistoryFromWs && self.wsState !== 2) {
+				s += "&history=true";
+			}
+			self.ws = new WebSocket(s);
+			self.ws.onmessage = self.onWsMessage;
+			self.ws.onclose = self.onWsClose;
+			self.ws.onopen = function () {
+				self.setStatus(true);
+				var message = "Connection to server has been established";
+				if (self.wsState === 2) { // if not inited don't growl message on page load
+					growlSuccess(message);
+				}
+				self.startNoPingTimeout();
+				self.wsState = 9;
+				self.log(message)();
+			};
+		});
 	};
 	self.startNoPingTimeout = function() {
 		if (self.noServerPingTimeout) {
@@ -6280,7 +6432,7 @@ function WsHandler() {
 	};
 }
 
-function Storage() {
+function LocalStorage() {
 	var self = this;
 	self.STORAGE_NAME = 'wsHeaderIds';
 	self.cache = {};
@@ -6300,11 +6452,8 @@ function Storage() {
 		localStorage.clear();
 		self.bottomValues = {};
 	};
-	self.getRoomHeaderId = function(roomId) {
-		return self.cache[roomId] ? self.cache[roomId].h : null;
-	};
-	self.getWsQuery = function() {
-
+	self.getRoomHeaderId = function(roomId, cb) {
+		cb(self.cache[roomId] ? self.cache[roomId].h : null);
 	};
 	self.setRoomHeaderId = function (roomId, value) {
 		if (!self.cache[roomId]) {
