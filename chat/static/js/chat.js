@@ -3532,7 +3532,7 @@ function DataBase() {
 			var res = {};
 			for (var i = 0; i < d.rows.length; i++) {
 				var e = d.rows[i];
-				res[e.channel] = {h: e.min, f: e.max}
+				res[e.channel] = {h: e.min, f: self.cache[e.channel] || e.max};
 			}
 			cb(res);
 		})
@@ -3588,6 +3588,7 @@ function DataBase() {
 		return cb;
 	});
 	self.insertMessage = function (t, message) {
+		self.setRoomHeaderId(message.channel, message.id);
 		t.executeSql('insert or replace into message (id, time, content, symbol, deleted, giphy, edited, channel, userId) values (?, ?, ?, ?, ?, ?, ?, ?, ?)',
 				[message.id, message.time, message.content, message.symbol, 0, 0, message.edited, message.channel, message.userId], function (t, d) {
 					for (var k in message.files) {
@@ -3597,13 +3598,19 @@ function DataBase() {
 				});
 	};
 	self.saveMessage = write(self.insertMessage);
+	self.deleteMessage = write(function(t, id) {
+		t.executeSql('delete from message where id = ?', [id])
+	});
 	self.saveMessages = write(function(t, data) {
 		data.forEach(function(m) {
 			self.insertMessage(t, m);
 		});
 	});
-	self.setRoomHeaderId = function() {
-
+	self.cache = {};
+	self.setRoomHeaderId = function(roomId, headerId) {
+		if (!self.cache[roomId] || self.cache[roomId] < roomId) {
+			self.cache[roomId] = headerId;
+		}
 	}
 }
 
@@ -4004,6 +4011,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	};
 	self.deleteMessage = function (data) {
 		var target = document.querySelector("[id='{}'] .{}".format(data.time, CONTENT_STYLE_CLASS));
+		storage.deleteMessage(data.id);
 		if (target) {
 			target.innerHTML = 'This message has been removed.';
 			CssUtils.addClass($(data.time), REMOVED_MESSAGE_CLASSNAME);
@@ -6448,14 +6456,34 @@ function LocalStorage() {
 	} else {
 		localStorage.setItem(self.STORAGE_NAME, "{}");
 	}
+	self.getIds = function(cb) {
+		cb(self.cache);
+	};
+	self.saveMessage = function(message) {
+		self.setRoomHeaderId(message.channel, message.id);
+	};
+	self.saveMessages = function(messages) {
+		messages.forEach(function(message) {
+			self.applyCache(message.channel, message.id)
+		});
+		var lm = JSON.parse(localStorage.getItem(self.STORAGE_NAME));
+		for (var k in self.cache) {
+			if (!lm[k] || self.cache[k].h < lm[k]) {
+				lm[k] = self.cache[k].h;
+			}
+		}
+		localStorage.setItem(self.STORAGE_NAME, JSON.stringify(lm));
+	};
+	self.deleteMessage = function() {};
 	self.clearStorage = function () {
-		localStorage.clear();
-		self.bottomValues = {};
+		localStorage.setItem(self.STORAGE_NAME, "{}");
+		self.cache = {};
 	};
 	self.getRoomHeaderId = function(roomId, cb) {
 		cb(self.cache[roomId] ? self.cache[roomId].h : null);
 	};
-	self.setRoomHeaderId = function (roomId, value) {
+
+	self.applyCache = function (roomId, value) {
 		if (!self.cache[roomId]) {
 			self.cache[roomId] = {
 				h: value,
@@ -6466,8 +6494,15 @@ function LocalStorage() {
 		} else if (value > self.cache[roomId].f) {
 			self.cache[roomId].f = value;
 		} else {
-			return
+			return true;
 		}
+	};
+	self.setRoomHeaderId = function (roomId, value) {
+		if (!self.applyCache(roomId, value)) {
+			self.saveJson(roomId, value)
+		}
+	};
+	self.saveJson = function(roomId, value) {
 		var lm = JSON.parse(localStorage.getItem(self.STORAGE_NAME));
 		if (!lm[roomId] || value < lm[roomId]) {
 			lm[roomId] = value;
