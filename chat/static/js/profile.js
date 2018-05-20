@@ -53,7 +53,7 @@ function initChangeProfile() {
 					maxDate: new Date(),
 					yearRange: [1930, 2010]
 				});
-				logger.info("pikaday date picker has been loaded")();
+				logger.log("pikaday date picker has been loaded")();
 			});
 		})
 	}
@@ -104,7 +104,7 @@ function startSharingVideo() {
 	}
 
 	function errorCallback(error) {
-		logger.info("navigator.getUserMedia error: {}", error)();
+		logger.log("navigator.getUserMedia error: {}", error)();
 	}
 
 	navigator.getUserMedia(constraints, successCallback, errorCallback);

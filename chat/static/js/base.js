@@ -47,16 +47,29 @@ var fileTypeRegex = /\.(\w+)(\?.*)?$/;
 window.loggingEnabled = true;
 var ajaxLoader;
 var logger;
+var httpLogger;
 var muteBtn;
 var inputRangeStyles = {};
 
 window.loggerFactory = (function (logsEnabled) {
 	var self = this;
 	self.logsEnabled = logsEnabled;
-	self.dummy = function() {
-
+	self.dummy = {
+		warn: function() {},
+		log: function() {},
+		error: function() {},
+		debug: function() {}
 	};
-	self.getLogger = function (initiator, dest, style) {
+	self.emptyFunction = function() {};
+	self.getLogger = function (initiator, style) {
+		return {
+			warn: self.getSingleLogger(initiator, style, console.warn),
+			log: self.getSingleLogger(initiator, style, console.log),
+			error: self.getSingleLogger(initiator, style, console.error),
+			debug: self.getSingleLogger(initiator, style, console.debug)
+		}
+	};
+	self.getSingleLogger = function (initiator, style, fn) {
 		return function () {
 			if (!self.logsEnabled) {
 				return self.dummy;
@@ -66,15 +79,15 @@ window.loggerFactory = (function (logsEnabled) {
 			var params = [window.console, '%c' + initiator, style];
 			for (var i = 0; i < parts.length; i++) {
 				params.push(parts[i]);
-				if (typeof args[i] !== 'undefined' ) { // args can be '0'
+				if (typeof args[i] !== 'undefined') { // args can be '0'
 					params.push(args[i])
 				}
 			}
-			return Function.prototype.bind.apply(dest, params);
+			return Function.prototype.bind.apply(fn, params);
 		};
 	};
 	return self;
-})(window.START_WITH_LOGS);
+})(START_WITH_LOGS);
 
 function getDay(dateObj) {
 	var month = dateObj.getUTCMonth() + 1; //months from 1-12
@@ -162,14 +175,8 @@ function onDocLoad(onload) {
 		ws: "color: green; font-weight: bold",
 		webrtc: "color: #960055; font-weight: bold",
 		sw: "color: #ffb500; font-weight: bold"*/
-	logger = {
-		warn: loggerFactory.getLogger("GLOBAL", console.warn, 'color: #687000; font-weight: bold'),
-		debug: loggerFactory.getLogger("GLOBAL", console.debug, 'color: #687000; font-weight: bold'),
-		info: loggerFactory.getLogger("GLOBAL", console.log, 'color: #687000; font-weight: bold'),
-		error: loggerFactory.getLogger("GLOBAL", console.error, 'color: #687000; font-weight: bold'),
-		http: loggerFactory.getLogger("HTTP", console.log, 'color: green; font-weight: bold'),
-		httpErr: loggerFactory.getLogger("HTTP", console.error, 'color: green; font-weight: bold')
-	};
+	logger = loggerFactory.getLogger("GLOBAL", 'color: #687000; font-weight: bold');
+	httpLogger = loggerFactory.getLogger("HTTP", 'color: green; font-weight: bold');
 	return document.addEventListener("DOMContentLoaded", onload);
 }
 
@@ -314,16 +321,16 @@ var Growl = function (message, onclicklistener, messageDiv) {
 	self.remove = function () {
 		if (self.growl.parentNode === self.growlHolder) {
 			self.growlHolder.removeChild(self.growl);
-			// logger.info("Removing growl #{}", self.id)();
+			// logger.log("Removing growl #{}", self.id)();
 		} else {
-			// logger.info("Growl #{} is already removed", self.id)();
+			// logger.log("Growl #{} is already removed", self.id)();
 		}
 	};
 	self.showInfinity = function (growlClass) {
 		self.growl = document.createElement('div');
 		self.growlInner = document.createElement('div');
 		self.growlClose = document.createElement('div');
-		// logger.info("Rendering growl #{}", self.id)();
+		// logger.log("Rendering growl #{}", self.id)();
 		if (messageDiv) {
 			self.growlInner.appendChild(messageDiv)
 		} else if (self.message) {
@@ -465,9 +472,9 @@ function doPost(url, params, callback, formData, isJsonEncoded, process) {
 	r.onreadystatechange = function () {
 		if (r.readyState === 4) {
 			if (r.status === 200) {
-				logger.http("POST in {} ::: {};", url, r.response)();
+				httpLogger.log("POST in {} ::: {};", url, r.response)();
 			} else {
-				logger.httpErr("POST out: {} ::: {}, status:", url, r.response, r.status)();
+				httpLogger.error("POST out: {} ::: {}, status:", url, r.response, r.status)();
 			}
 			if (typeof(callback) === "function") {
 				var error;
@@ -520,7 +527,7 @@ function doPost(url, params, callback, formData, isJsonEncoded, process) {
 	}
 	r.setRequestHeader("X-CSRFToken", readCookie()["csrftoken"]);
 
-	logger.http("POST out {} ::: {}", url, params)();
+	httpLogger.log("POST out {} ::: {}", url, params)();
 	if (process) {
 		process(r);
 	}
@@ -532,7 +539,7 @@ function doPost(url, params, callback, formData, isJsonEncoded, process) {
 /**
  * Loads file from server on runtime */
 function doGet(fileUrl, callback) {
-	logger.http("GET out {}", fileUrl)();
+	httpLogger.log("GET out {}", fileUrl)();
 	var regexRes = fileTypeRegex.exec(fileUrl);
 	var fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
 	var fileRef = null;
@@ -559,7 +566,7 @@ function doGet(fileUrl, callback) {
 			xobj.onreadystatechange = function () {
 				if (xobj.readyState === 4) {
 					if (xobj.status === 200) {
-						logger.http('GET in {} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100))();
+						httpLogger.log('GET in {} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100))();
 						if (callback) {
 							if (fileType === 'json') {
 								callback(JSON.parse(xobj.responseText))
@@ -568,7 +575,7 @@ function doGet(fileUrl, callback) {
 							}
 						}
 					} else {
-						logger.httpErr("Unable to load {}, XMLHttpRequest: {}", fileUrl, xobj)();
+						httpLogger.error("Unable to load {}, XMLHttpRequest: {}", fileUrl, xobj)();
 						growlError("<span>Unable to load {}, response code is <b>{}</b>, response: {} <span>".format(fileUrl, xobj.status, xobj.response));
 					}
 				}

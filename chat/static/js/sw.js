@@ -3,9 +3,13 @@ console.log("%cSW_S startup, version is " + SW_VERSION, 'color: #ffb500; font-we
 var loggerFactory = (function (logsEnabled) {
 	var self = this;
 	self.logsEnabled = logsEnabled;
-	self.dummy = function () {
+	self.dummy = {
+		warn: function() {},
+		log: function() {},
+		error: function() {},
+		debug: function() {}
 	};
-	self.getLogger = function (initiator, dest, style) {
+	self.getLogger = function (initiator, style) {
 		return function () {
 			if (!self.logsEnabled) {
 				return self.dummy;
@@ -19,18 +23,18 @@ var loggerFactory = (function (logsEnabled) {
 					params.push(args[i])
 				}
 			}
-			return Function.prototype.bind.apply(dest, params);
+			return {
+				warn: Function.prototype.bind.apply(console.warn, params),
+				log: Function.prototype.bind.apply(console.log, params),
+				error: Function.prototype.bind.apply(console.error, params),
+				debug: Function.prototype.bind.apply(console.debug, params)
+			}
 		};
 	};
 	return self;
 })(true);
 
-var logger = {
-	warn: loggerFactory.getLogger("SW_S", console.warn, 'color: #ffb500; font-weight: bold'),
-	log: loggerFactory.getLogger("SW_S", console.log, 'color: #ffb500; font-weight: bold'),
-	error: loggerFactory.getLogger("SW_S", console.error, 'color: #ffb500; font-weight: bold')
-};
-
+var logger = loggerFactory.getLogger("SW_S", 'color: #ffb500; font-weight: bold');
 var subScr = null;
 
 // Install Service Worker

@@ -335,7 +335,7 @@ function Painter() {
 			tool.tmpCanvas.height = self.dom.canvas.height;
 			tool.tmpData.clearRect(0, 0, self.dom.canvas.width, self.dom.canvas.height);
 			tool.tmpData.drawImage(self.dom.canvas, 0, 0);
-			self.log("Context saved")();
+			logger.log("Context saved")();
 		};
 		tool.restoreState = function() {
 			self.ctx.clearRect(0, 0, self.dom.canvas.width, self.dom.canvas.height);
@@ -490,7 +490,7 @@ function Painter() {
 				}
 				check.push(proc.code);
 			});
-			self.log("Registered keys: {}", JSON.stringify(check))();
+			logger.log("Registered keys: {}", JSON.stringify(check))();
 		},
 		initCanvas: function () {
 			[
@@ -532,8 +532,7 @@ function Painter() {
 			});
 		},
 	};
-	self.log = loggerFactory.getLogger("Painter", console.log, 'color: #f200da');
-	self.debug = loggerFactory.getLogger("Painter", console.debug, 'color: #f200da');
+	var logger = loggerFactory.getLogger("Painter", 'color: #f200da');
 	self.helper = {
 		setUIText: function(text) {
 			self.dom.paintXY.textContent = text + ' ' + Math.round(self.zoom * 100) + '%';
@@ -709,7 +708,7 @@ function Painter() {
 				return;
 			}
 			self.helper.setOffset(e);
-			// self.log("{} mouse down", self.mode)();
+			// logger.log("{} mouse down", self.mode)();
 			self.events.mouseDown = true
 			var rect = painter.dom.canvas.getBoundingClientRect();
 			var imgData;
@@ -736,7 +735,7 @@ function Painter() {
 				}
 				var mu = tool.onMouseUp;
 				if (mu) {
-					// self.log("{} mouse up", self.mode)();
+					// logger.log("{} mouse up", self.mode)();
 					mu(e)
 				}
 			}
@@ -757,7 +756,7 @@ function Painter() {
 			self.dom.canvasWrapper.scrollTop = scrollTop;
 		},
 		contKeyPress: function (event) {
-			self.log("keyPress: {} ({})", event.keyCode, event.code)();
+			logger.log("keyPress: {} ({})", event.keyCode, event.code)();
 			if (event.keyCode === 13) {
 				if (self.tools[self.mode].onApply) {
 					self.tools[self.mode].onApply();
@@ -782,7 +781,7 @@ function Painter() {
 				self.dom.canvasWrapper.style.width = w - pxy.pageX + cxy.pageX + 'px';
 				self.dom.canvasWrapper.style.height = h - pxy.pageY + cxy.pageY + 'px';
 			};
-			self.log("Added mousmove. touchmove")();
+			logger.log("Added mousmove. touchmove")();
 			document.addEventListener('mousemove', listener);
 			document.addEventListener('touchmove', listener);
 			var remove = function() {
@@ -809,7 +808,7 @@ function Painter() {
 		if (files) {
 			for (var i = 0; i < files.length; i++) {
 				if (files[i].type.indexOf('image') >= 0) {
-					self.log("Pasting images")();
+					logger.log("Pasting images")();
 					self.setMode('img');
 					self.tools.img.readAndPasteCanvas(getter(files[i]));
 					self.preventDefault(e);
@@ -875,20 +874,20 @@ function Painter() {
 		};
 		tool.show = function () {
 			CssUtils.showElement(tool.imgHolder);
-			self.debug("Adding mouseUp doc listener")();
+			logger.debug("Adding mouseUp doc listener")();
 			document.addEventListener('mouseup', tool.docMouseUp);
 			document.addEventListener('touchend', tool.docMouseUp);
 		};
 		tool.hide = function() {
 			tool._setCursor(null);
 			CssUtils.hideElement(tool.imgHolder);
-			self.debug("Removing mouseUp doc listener")();
+			logger.debug("Removing mouseUp doc listener")();
 			tool.docMouseUp();
 			document.removeEventListener('mouseup', tool.docMouseUp);
 			document.removeEventListener('touchend', tool.docMouseUp);
 		};
 		tool.trackMouseMove = function(e, mode) {
-			self.log("Resizer mousedown")();
+			logger.log("Resizer mousedown")();
 			tool.mode = mode || e.target.getAttribute('pos');
 			self.dom.canvasWrapper.addEventListener('mousemove', tool.handleMouseMove);
 			self.dom.canvasWrapper.addEventListener('touchmove', tool.handleMouseMove);
@@ -912,7 +911,7 @@ function Painter() {
 			tool.params.lastCoord.nl = Math.pow(tool.params.lastCoord.op, 2) + 1;
 		};
 		tool.docMouseUp = function (e) {
-			//self.log("Resizer mouseup")();
+			//logger.log("Resizer mouseup")();
 			self.dom.canvasWrapper.removeEventListener('mousemove', tool.handleMouseMove);
 			self.dom.canvasWrapper.removeEventListener('touchmove', tool.handleMouseMove);
 		};
@@ -986,7 +985,7 @@ function Painter() {
 			return {x: x, y: y};
 		};
 		tool.handleMouseMove = function (e) {
-			//self.log('handleMouseMove {}', e)();
+			//logger.log('handleMouseMove {}', e)();
 			var pxy =self.helper.getPageXY(e);
 			var x = pxy.pageX - tool.params.lastCoord.x;
 			var y = pxy.pageY - tool.params.lastCoord.y;
@@ -995,7 +994,7 @@ function Painter() {
 				x = __ret.x;
 				y = __ret.y;
 			}
- 			self.debug('handleMouseMove ({}, {})', x, y)();
+ 			logger.debug('handleMouseMove ({}, {})', x, y)();
 			tool.handlers[tool.mode.charAt(0)](x, y);
 			if (tool.mode.length === 2) {
 				tool.handlers[tool.mode.charAt(1)](x, y);
@@ -1025,7 +1024,7 @@ function Painter() {
 			tool.onDeactivate = function () {
 				if (tool.inProgress) {
 					var params = self.resizer.params;
-					self.log(
+					logger.log(
 							'Applying image {}, {}x{}, to  {x: {}, y: {}, w: {}, h:{}',
 							tool.imgInfo.width,
 							tool.imgInfo.height,
@@ -1047,7 +1046,7 @@ function Painter() {
 				return self.mode === 'select' && tool.inProgress && tool.mouseUpClicked;
 			};
 			tool.onMouseDown = function (e) {
-				//self.log('select mouseDown')();
+				//logger.log('select mouseDown')();
 				tool.onDeactivate();
 				tool.mouseUpClicked = false;
 				self.resizer.show();
@@ -1062,7 +1061,7 @@ function Painter() {
 				if (!params.width || !params.height) {
 					self.resizer.hide();
 				} else {
-					//self.log('select mouseUp')();
+					//logger.log('select mouseUp')();
 					tool.inProgress = true;
 					tool.mouseUpClicked = true;
 					var imageData = self.ctx.getImageData(params.left, params.top, params.width, params.height);
@@ -1122,7 +1121,7 @@ function Painter() {
 				tool.onMouseMove(e, coord)
 			};
 			tool.onMouseMove = function (e, coord) {
-				// self.log("mouse move,  points {}", JSON.stringify(tool.points))();
+				// logger.log("mouse move,  points {}", JSON.stringify(tool.points))();
 				self.tmp.restoreState();
 				tool.points.push(coord);
 				self.ctx.beginPath();
@@ -1702,11 +1701,11 @@ function Painter() {
 				var pxy = self.helper.getPageXY(e);
 				var x = tool.lastCoord.x - pxy.pageX;
 				var y = tool.lastCoord.y - pxy.pageY;
-				self.log("Moving to: {{}, {}}", x, y)();
+				logger.log("Moving to: {{}, {}}", x, y)();
 				self.dom.canvasWrapper.scrollTop += y;
 				self.dom.canvasWrapper.scrollLeft += x;
 				tool.lastCoord = {x: pxy.pageX, y: pxy.pageY};
-				// self.log('X,Y: {{}, {}}', self.dom.canvasWrapper.scrollLeft, self.dom.canvasWrapper.scrollTop )();
+				// logger.log('X,Y: {{}, {}}', self.dom.canvasWrapper.scrollLeft, self.dom.canvasWrapper.scrollTop )();
 			};
 			tool.onMouseUp = function (coord) {
 				tool.lastCoord = null;
@@ -1724,7 +1723,7 @@ function Painter() {
 				if (self.tools['select'].isSelectionActive()) {
 					var m = self.tools.select;
 					var d = m.getAreaData();
-					self.log("{}x{}", d.width, d.height)();
+					logger.log("{}x{}", d.width, d.height)();
 					tmpCanvasContext.canvas.width = d.height; //specify width of your canvas
 					tmpCanvasContext.canvas.height = d.width; //specify height of your canvas
 					var ctx = tmpCanvasContext;
@@ -1843,7 +1842,7 @@ function Painter() {
 				current = restore;
 				if (self.dom.canvas.width != current.width
 						|| self.dom.canvas.height != current.height) {
-					self.log("Resizing canvas from {}x{} to {}x{}",
+					logger.log("Resizing canvas from {}x{} to {}x{}",
 							self.dom.canvas.width, self.dom.canvas.height,
 							current.width, current.height
 					)();
@@ -1864,7 +1863,7 @@ function Painter() {
 			tool.dodo(undoImages, redoImages);
 		};
 		tool.finishAction = function (img) {
-			self.log('finish action')();
+			logger.log('finish action')();
 			if (current) {
 				undoImages.push(current);
 			}
@@ -1889,7 +1888,7 @@ function Painter() {
 			current = newCurrent;
 		};
 		tool.startAction = function () {
-			self.log('start action')();
+			logger.log('start action')();
 			if (!current) {
 				current = tool.getCanvasImage();
 			}
@@ -1936,12 +1935,7 @@ function Painter() {
 
 function NotifierHandler() {
 	var self = this;
-	var logger = {
-		info: loggerFactory.getLogger("NOTIFY", console.log, 'color: #ffb500; font-weight: bold'),
-		debug: loggerFactory.getLogger("NOTIFY", console.debug, 'color: #ffb500; font-weight: bold'),
-		warn: loggerFactory.getLogger("NOTIFY", console.warn, 'color: #ffb500; font-weight: bold'),
-		error: loggerFactory.getLogger("NOTIFY", console.error, 'color: #ffb500; font-weight: bold')
-	};
+	var logger = loggerFactory.getLogger("NOTIFY", 'color: #ffb500; font-weight: bold');
 	self.currentTabId = Date.now().toString();
 	/*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
 	self.LAST_TAB_ID_VARNAME = 'lastTabId';
@@ -1971,7 +1965,7 @@ function NotifierHandler() {
 				// TODO  options should contain page id here but it's not
 				// so we open unfefined url
 				self.serviceWorkerRegistration.showNotification(title, options).then(function(r) {
-					logger.info("res {}", r)();
+					logger.log("res {}", r)();
 					//TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
 				})
 			} else {
@@ -1983,7 +1977,7 @@ function NotifierHandler() {
 				not.onclose = function () {
 					self.popedNotifQueue.splice(self.popedNotifQueue.indexOf(this), 1);
 				};
-				logger.info("Notification {} {} has been spawned, current queue {}", title, options, self.popedNotifQueue)();
+				logger.log("Notification {} {} has been spawned, current queue {}", title, options, self.popedNotifQueue)();
 			}
 		} catch (e) {
 			logger.error("Failed to show notification {}", e)();
@@ -2031,14 +2025,14 @@ function NotifierHandler() {
 			return cb(false, "FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing", false)
 		}
 		navigator.serviceWorker.register('/sw.js',  {scope: '/'}).then(function (r) {
-			logger.info("Registered service worker {}", r)();
+			logger.log("Registered service worker {}", r)();
 			return navigator.serviceWorker.ready;
 		}).then(function (serviceWorkerRegistration) {
-			logger.info("Service worker is ready {}", serviceWorkerRegistration)();
+			logger.log("Service worker is ready {}", serviceWorkerRegistration)();
 			self.serviceWorkerRegistration = serviceWorkerRegistration;
 			return serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true})
 		}).then(function (subscription) {
-			logger.info("Got subscription {}", subscription)();
+			logger.log("Got subscription {}", subscription)();
 			self.subscriptionId = self.getSubscriptionId(subscription);
 			if (!self.subscriptionId) {
 				throw 'Current browser doesnt support offline notifications';
@@ -2058,7 +2052,7 @@ function NotifierHandler() {
 				});
 			}
 		}).then(function () {
-			logger.info("Saved subscription to server")();
+			logger.log("Saved subscription to server")();
 			cb(true);
 		}).catch(function (e) {
 			cb(false, e, true);
@@ -2378,7 +2372,7 @@ function PageHandler() {
 		window.history.pushState(historyUrl, historyUrl, historyUrl);
 	};
 	self.showPage = function (page, params, dontHistory) {
-		logger.info('Rendering page "{}"', page)();
+		logger.log('Rendering page "{}"', page)();
 		if (self.currentPage) self.currentPage.hide();
 		self.currentPage = self.pages[page];
 		if (self.currentPage.rendered) {
@@ -2398,12 +2392,7 @@ function PageHandler() {
 function ChannelsHandler() {
 	var self = this;
 	self.MAX_MESSAGE_SIZE = 40000000;
-	var logger = {
-		warn: loggerFactory.getLogger("CHAT", console.warn, 'color: #FF0F00; font-weight: bold'),
-		debug: loggerFactory.getLogger("CHAT", console.debug, 'color: #FF0F00; font-weight: bold'),
-		info: loggerFactory.getLogger("CHAT", console.log, 'color: #FF0F00; font-weight: bold'),
-		error: loggerFactory.getLogger("CHAT", console.error, 'color: #FF0F00; font-weight: bold')
-	};
+	var logger = loggerFactory.getLogger("CHAT", 'color: #FF0F00; font-weight: bold');
 	self.pageName = 'channels';
 	Page.call(self);
 	self.url = '/chat/';
@@ -2519,7 +2508,7 @@ function ChannelsHandler() {
 			if (!self.channels.hasOwnProperty(i)) continue;
 			self.channels[i].clearHistory();
 		}
-		logger.info('History has been cleared')();
+		logger.log('History has been cleared')();
 		growlSuccess('History has been cleared');
 	};
 	self.setParams = function (params) {
@@ -2605,7 +2594,7 @@ function ChannelsHandler() {
 				for (var i = 0; i < items.length; i++) {
 					var asFile = items[i].getAsFile();
 					if (asFile) {
-						logger.info("Pasting image")();
+						logger.log("Pasting image")();
 						prevent = true;
 						Utils.pasteImgToTextArea(asFile);
 					}
@@ -2741,7 +2730,7 @@ function ChannelsHandler() {
 		var urls = [Utils.imagesFiles, Utils.videoFiles, Utils.previewFiles];
 		urls.forEach(function(url) {
 			for (var k in url) {
-				logger.info("Revoking url {}", k)();
+				logger.log("Revoking url {}", k)();
 				URL.revokeObjectURL(k);
 				delete urls[k];
 			}
@@ -3015,7 +3004,7 @@ function ChannelsHandler() {
 		self.createChannelChatHandler(roomId, li, users, roomName, false);
 	};
 	self.destroyChannel = function (channelKey) {
-		logger.info("Destroying channel {} while offline", channelKey)();
+		logger.log("Destroying channel {} while offline", channelKey)();
 		self.channels[channelKey].destroy();
 		delete self.channels[channelKey];
 	};
@@ -3071,7 +3060,7 @@ function ChannelsHandler() {
 				channelHandler[message.action](message);
 				self.executePostUserAction(message);
 			} else if (message.action == 'removeOnlineUser') {
-				logger.info("Skipping removing online user cause channel {} could have been destroyed", message.channel)();
+				logger.log("Skipping removing online user cause channel {} could have been destroyed", message.channel)();
 			} else {
 				throw 'Unknown channel {} for message "{}"'.format(message.channel, JSON.stringify(message));
 			}
@@ -3082,7 +3071,7 @@ function ChannelsHandler() {
 			if (self.postUserAction.time + 30000 > Date.now()) {
 				if (self.postUserAction.actionTrigger == message.action
 						&& self.postUserAction.userId == message.userId) {
-					logger.info("Proceeding postUserAction {}", self.postUserAction)();
+					logger.log("Proceeding postUserAction {}", self.postUserAction)();
 					self.postUserAction.action();
 					self.postUserAction = null;
 				}
@@ -3297,7 +3286,7 @@ function SmileyUtil() {
 			return;
 		}
 		Utils.pasteHtmlAtCaret(smileImg.cloneNode());
-		logger.info('Added smile "{}"', smileImg.alt)();
+		logger.log('Added smile "{}"', smileImg.alt)();
 	};
 	self.encodeSmileys = function (html) {
 		return html.replace(smileUnicodeRegex, function (s) {
@@ -3416,7 +3405,7 @@ function Search(channel) {
 	self.toggle = function () {
 		self.isHidden = CssUtils.toggleVisibility(self.dom.container);
 		if (self.currentRequest) {
-			logger.info("Canceling request {}", self.currentRequest)();
+			logger.log("Canceling request {}", self.currentRequest)();
 			var cr = self.currentRequest;
 			self.currentRequest = null;
 			cr.abort();
@@ -3497,12 +3486,7 @@ function Search(channel) {
 
 function DataBase() {
 	var self = this;
-	var logger = {
-		warn: loggerFactory.getLogger("DB", console.warn, 'color: blue; font-weight: bold'),
-		debug: loggerFactory.getLogger("DB:", console.debug, 'color: blue; font-weight: bold'),
-		info: loggerFactory.getLogger("DB", console.log, 'color: blue; font-weight: bold'),
-		error: loggerFactory.getLogger("DB", console.error, 'color: blue; font-weight: bold')
-	};
+	var logger = loggerFactory.getLogger("DB", 'color: blue; font-weight: bold');
 	function transaction(transactionType, cb) {
 		return function (a1, a2, a3) {
 			if (self.db) {
@@ -3542,13 +3526,13 @@ function DataBase() {
 			logger.warn("Current Browser doesn't support websql ")();
 			cb(null);
 		} else {
-			logger.info("Initializing database")();
+			logger.log("Initializing database")();
 			self.db = openDatabase('pydb', '', 'Messages database', 10 * 1024 * 1024);
 			if (self.db.version == '') {
 				self.db.changeVersion(self.db.version, '1.0', function (t) {
 					t.executeSql('CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy boolean NOT NULL CHECK (giphy IN (0,1)), edited integer, channel integer, userId integer)', [], function(t,d) {
 						t.executeSql('CREATE TABLE image (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text);', [], function (t, s) {
-							logger.info("Database has been initialized with version {}", self.db.version)();
+							logger.log("Database has been initialized with version {}", self.db.version)();
 							cb(true);
 						});
 					});
@@ -3557,7 +3541,7 @@ function DataBase() {
 					cb(false)
 				});
 			} else if (self.db.version == '1.0') {
-				logger.info("Created new db connection")();
+				logger.log("Created new db connection")();
 				cb(true);
 			}
 		}
@@ -3565,7 +3549,7 @@ function DataBase() {
 	self.clearStorage = write(function (t) {
 		t.executeSql('delete from message');
 		t.executeSql('delete from image');
-		logger.info("Db has been cleared")();
+		logger.log("Db has been cleared")();
 	});
 	self.getMessages = read(function(t, cb) {
 		t.executeSql('SELECT * FROM message', [], function (t, m) {
@@ -3621,12 +3605,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	self.EDITED_MESSAGE_CLASS = 'editedMessage';
 	self.roomId = parseInt(roomId);
 	self.roomName = roomName;
-	var logger = {
-		warn: loggerFactory.getLogger("CH:"+roomId, console.warn, 'color: #FF0F00; font-weight: bold'),
-		debug: loggerFactory.getLogger("CH:"+roomId, console.debug, 'color: #FF0F00; font-weight: bold'),
-		info: loggerFactory.getLogger("CH:"+roomId, console.log, 'color: #FF0F00; font-weight: bold'),
-		error: loggerFactory.getLogger("CH:"+roomId, console.error, 'color: #FF0F00; font-weight: bold')
-	}
+	var logger = loggerFactory.getLogger("CH:"+roomId, 'color: #FF0F00; font-weight: bold');
 	self.lastMessage = {};
 	self.dom = {
 		chatBoxDiv: chatboxDiv,
@@ -3788,7 +3767,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 			if (!newUsers[oldUserId]) {
 				var oldLi = document.querySelector('ul[roomId="{}"] > li[userId="{}"]'.format(self.roomId, oldUserId));
 				CssUtils.deleteElement(oldLi);
-				logger.info("User with id {} has been deleted while offline", oldUserId)();
+				logger.log("User with id {} has been deleted while offline", oldUserId)();
 				delete self.allUsers[oldUserId];
 			}
 		}
@@ -3797,7 +3776,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 			var newUser = newUsers[newUserId];
 			if (!self.allUsers[newUserId]) {
 				self.allUsers[newUserId] = newUser;
-				logger.info("User with id {} has been signed up while offline", newUserId)();
+				logger.log("User with id {} has been signed up while offline", newUserId)();
 				self.addUserLi(newUserId, newUser.sex, newUser.user);
 			}
 		}
@@ -3930,7 +3909,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 
 	self.isScrollInTHeMiddle = function () {
 		var element = self.dom.chatBoxDiv;
-		// logger.info("{} [scrollHeight] - {} [scrollTop] >  [element.clientHeight] + 30 {},  {} > {}",element.scrollHeight, element.scrollTop, element.clientHeight, element.scrollHeight - element.scrollTop, element.clientHeight + 30 )();
+		// logger.log("{} [scrollHeight] - {} [scrollTop] >  [element.clientHeight] + 30 {},  {} > {}",element.scrollHeight, element.scrollTop, element.clientHeight, element.scrollHeight - element.scrollTop, element.clientHeight + 30 )();
 		return element.scrollHeight - element.scrollTop > element.clientHeight + 100;
 	};
 	/** Inserts a message to positions, saves is to variable and scrolls if required*/
@@ -4105,12 +4084,12 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	self.loadMessages = function (data) {
 		var bu = Utils.checkAndPlay;
 		Utils.checkAndPlay = function() {}
-		logger.info('appending messages to top')();
+		logger.log('appending messages to top')();
 		// This check should fire only once,
 		// because requests aren't being sent when there are no event for them, thus no responses
 		var message = data.content;
 		if (message.length === 0) {
-			logger.info('Requesting messages has reached the top, removing loadUpHistoryEvent handlers')();
+			logger.log('Requesting messages has reached the top, removing loadUpHistoryEvent handlers')();
 			self.dom.chatBoxDiv.removeEventListener(mouseWheelEventName, self.mouseWheelLoadUp);
 			self.dom.chatBoxDiv.removeEventListener("keydown", self.keyDownLoadUp);
 			return;
@@ -4149,7 +4128,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 	};
 	self.setOnlineUsers = function (message) {
 		self.onlineUsers = message.content;
-		//logger.info("Load user names: {}", Object.keys(self.onlineUsers))();
+		//logger.log("Load user names: {}", Object.keys(self.onlineUsers))();
 		for (var userId in self.allUsers) {
 			if (!self.allUsers.hasOwnProperty(userId)) continue;
 			var user = self.allUsers[userId];
@@ -4176,7 +4155,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 				var currentMillis = Date.now();
 				// 0 if locked, or last request was sent earlier than 3 seconds ago
 				if (self.lastLoadUpHistoryRequest + 3000 > currentMillis) {
-					logger.info("Skipping loading message, because it's locked")();
+					logger.log("Skipping loading message, because it's locked")();
 					return
 				}
 				self.lastLoadUpHistoryRequest = currentMillis;
@@ -4210,7 +4189,7 @@ function DownloadBar(holder, fileSize, statusDiv) {
 		text: document.createElement('A'),
 		statusDiv: statusDiv
 	};
-	logger.info("Added download bar")();
+	logger.log("Added download bar")();
 	self.max = fileSize;
 	self.dom.wrapper.className = 'progress-wrap';
 	self.dom.wrapper.appendChild(self.dom.text);
@@ -4263,7 +4242,7 @@ function ReceiverPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	AbstractPeerConnection.call(self, connectionId, opponentWsId, removeChildPeerReferenceFn);
 
 	self.onChannelMessage = function (msg) {
-// 		self.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();
+// 		logger.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();
 	}
 }
 
@@ -4286,24 +4265,23 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	};
 	self.setConnectionStatus = function(newStatus) {
 		self.connectionStatus = newStatus;
-		self.log("Setting connection status to {}", newStatus)();
+		logger.log("Setting connection status to {}", newStatus)();
 	},
 	self.getConnectionStatus = function() {
 		return self.connectionStatus;
 	}
-	self.log = loggerFactory.getLogger(self.connectionId + ":" + self.opponentWsId, console.log,  "color: #960055; font-weight: bold");
-	self.logErr = loggerFactory.getLogger(self.connectionId + ":" + self.opponentWsId, console.error,  "color: #960055; font-weight: bold");
+	var logger = loggerFactory.getLogger(self.connectionId + ":" + self.opponentWsId,  "color: #960055; font-weight: bold");
 	self.print = function (message) {
-		self.log("Call message {}", JSON.stringify(message))();
+		logger.log("Call message {}", JSON.stringify(message))();
 	};
 	self.onsendRtcData = function (message) {
 		if (!self.connectedToRemote) {
-			self.log("Connection is not accepted yet, pushing data to queue")();
+			logger.log("Connection is not accepted yet, pushing data to queue")();
 			self.sendRtcDataQueue.push(message); // TODO https://stackoverflow.com/questions/47496922/tornado-redis-garantee-order-of-published-messages
 			return;
 		} else {
 			var data = message.content;
-			self.log("onsendRtcData")();
+			logger.log("onsendRtcData")();
 			if (self.pc.iceConnectionState && self.pc.iceConnectionState !== 'closed') {
 				if (data.sdp) {
 					self.pc.setRemoteDescription(new RTCSessionDescription(data), self.handleAnswer, self.failWebRtc('setRemoteDescription'));
@@ -4313,19 +4291,19 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 					growlInfo(data.message);
 				}
 			} else {
-				self.logErr("Skipping ws message for closed connection")();
+				logger.error("Skipping ws message for closed connection")();
 			}
 		}
 	};
 	self.createPeerConnection = function () {
-		self.log("Creating RTCPeerConnection")();
+		logger.log("Creating RTCPeerConnection")();
 		if (!RTCPeerConnection) {
 			throw "Your browser doesn't support RTCPeerConnection";
 		}
 		self.pc = new RTCPeerConnection(self.pc_config, self.pc_constraints);
 		self.pc.oniceconnectionstatechange = self.oniceconnectionstatechange;
 		self.pc.onicecandidate = function (event) {
-			self.log('onicecandidate')();
+			logger.log('onicecandidate')();
 			if (event.candidate) {
 				self.sendWebRtcEvent(event.candidate);
 			}
@@ -4334,10 +4312,10 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	self.closePeerConnection = function (text) {
 		self.setConnectionStatus('closed');
 		if (self.pc && self.pc.signalingState !== 'closed') {
-			self.log("Closing peer connection")();
+			logger.log("Closing peer connection")();
 			self.pc.close();
 		} else {
-			self.log("No peer connection to close")();
+			logger.log("No peer connection to close")();
 		}
 	};
 
@@ -4353,17 +4331,17 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 		return function () {
 			var message = "An error occurred while {}: {}".format(parent, Utils.extractError(arguments));
 			growlError(message);
-			self.logErr(message)();
+			logger.error(message)();
 		}
 	};
 	self.createOffer = function () { // each peer should be able to createOffer in case of microphone change
-		self.log('Creating offer...')();
+		logger.log('Creating offer...')();
 		self.offerCreator = true;
 		self.pc.createOffer(function (offer) {
 			offer.sdp = Utils.setMediaBitrate(offer.sdp, 1638400);
-			self.log('Created offer, setting local description')();
+			logger.log('Created offer, setting local description')();
 			self.pc.setLocalDescription(offer, function () {
-				self.log('Sending offer to remote')();
+				logger.log('Sending offer to remote')();
 				self.sendWebRtcEvent(offer);
 			}, self.failWebRtc('setLocalDescription'));
 		}, self.failWebRtc('createOffer'), self.sdpConstraints);
@@ -4372,14 +4350,14 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 		self.offerCreator = false;
 		self.pc.createAnswer(function (answer) {
 			answer.sdp = Utils.setMediaBitrate(answer.sdp, 1638400);
-			self.log('Sending answer')();
+			logger.log('Sending answer')();
 			self.pc.setLocalDescription(answer, function () {
 				self.sendWebRtcEvent(answer);
 			}, self.failWebRtc('setLocalDescription'));
 		}, self.failWebRtc('createAnswer'), self.sdpConstraints);
 	}
 	self.handleAnswer = function () {
-		self.log('Creating answer')();
+		logger.log('Creating answer')();
 		if (!self.offerCreator ) {
 			self.respondeOffer();
 		}
@@ -4390,13 +4368,12 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 
 function BaseTransferHandler(removeReferenceFn) {
 	var self = this;
-	self.log = loggerFactory.getLogger("WRTC", console.log, 'color: #960055; font-weight: bold');
-	self.logErr = loggerFactory.getLogger("WRTC", console.error, 'color: #960055; font-weight: bold');
+	var logger = loggerFactory.getLogger("WRTC", 'color: #960055; font-weight: bold');
 	self.removeReference = function () {
 		removeReferenceFn(self.connectionId);
 	};
 	self.removeChildPeerReference = function (id) {
-		self.log("Removing peer connection {}", id)();
+		logger.log("Removing peer connection {}", id)();
 		delete self.peerConnections[id];
 	};
 	self.peerConnections = {};
@@ -4407,15 +4384,14 @@ function BaseTransferHandler(removeReferenceFn) {
 			self.peerConnections[data.opponentWsId]['on' + data.action](data);
 		} else { // this is only supposed to be for destroyPeerConnection
 			// when self.pc.iceConnectionState === 'disconnected' fired before destroyCallConnection action came
-			self.logErr("Can't execute {} on {}, because such PC doesn't exist. Existing PC:{}",
+			logger.error("Can't execute {} on {}, because such PC doesn't exist. Existing PC:{}",
 					data.action, data.opponentWsId, Object.keys(self.peerConnections))();
 		}
 	};
 	self.setConnectionId = function (id) {
 		self.connectionId = id;
-		self.log("CallHandler initialized")();
-		self.log = loggerFactory.getLogger(self.connectionId, console.log, 'color: #960055; font-weight: bold');
-		self.logErr = loggerFactory.getLogger(self.connectionId, console.error, 'color: #960055; font-weight: bold');
+		logger.log("CallHandler initialized")();
+		logger = loggerFactory.getLogger(self.connectionId, 'color: #960055; font-weight: bold');
 	};
 	self.closeAllPeerConnections = function (text) {
 		var hasConnections = false;
@@ -4629,7 +4605,7 @@ function CallHandler(roomId) {
 		return hasPcActive ? 'running': self.callStatus;
 	}
 	self.setCallStatus = function(newStatus) {
-		self.log("Setting call status to {}", newStatus)();
+		logger.log("Setting call status to {}", newStatus)();
 		self.callStatus = newStatus;
 	}
 	self.setIconState = function (isCall) {
@@ -4881,7 +4857,7 @@ function CallHandler(roomId) {
 					var option = document.createElement('option');
 					option.value = device.deviceId;
 				} else {
-					self.logErr("Unexpected device {}", device.kind)();
+					logger.error("Unexpected device {}", device.kind)();
 				}
 				switch (device.kind) {
 					case "audioinput":
@@ -4917,11 +4893,11 @@ function CallHandler(roomId) {
 				rej("ScreenCast is not available for mobile phones yet")
 			} else {
 				Utils.pingExtension(function (success) {
-					self.log("Ping to extension succeeded")();
+					logger.log("Ping to extension succeeded")();
 					if (success) {
 						Utils.getDesktopCapture(function (response) {
 							if (response && response.data === 'success') {
-								self.log("Getting desktop share succeeded")();
+								logger.log("Getting desktop share succeeded")();
 								self.constraints.share = {
 									audio: false,
 									video: {
@@ -4979,7 +4955,7 @@ function CallHandler(roomId) {
 		}
 		if (self.constraints.share) {
 			prom = prom.then(self.getDesktopShareFromExtension).then(function () {
-				self.log("Resolving userMedia from dekstopShare")();
+				logger.log("Resolving userMedia from dekstopShare")();
 				return navigator.mediaDevices.getUserMedia(self.constraints.share)
 			}).then(function (stream) {
 				var tracks = stream.getVideoTracks();
@@ -5003,7 +4979,7 @@ function CallHandler(roomId) {
 	};
 	self.attachLocalStream = function (stream) {
 		if (stream) {
-			self.log("Local stream has been attached")();
+			logger.log("Local stream has been attached")();
 			self.localStream = stream;
 			Utils.setVideoSource(self.dom.local, stream);
 			self.audioProcessor = Utils.createMicrophoneLevelVoice(stream, self.processAudio);
@@ -5045,7 +5021,7 @@ function CallHandler(roomId) {
 		}
 		var message = "<span>Failed to capture {} source, because {}</span>".format(what.join(', '), Utils.extractError(arguments));
 		growlError(message);
-		self.logErr(message)();
+		logger.error(message)();
 	};
 	self.setHeaderText = function (text) {
 		self.dom.headerText.innerHTML = text;
@@ -5179,7 +5155,7 @@ function CallHandler(roomId) {
 		var index = self.acceptedPeers.indexOf(id);
 		if (index > -1) { // remove
 			self.acceptedPeers.splice(index, 1);
-			self.log("Removed {} from acceptedPeers, current acceptedPeers are {}", id, self.acceptedPeers.toString())();
+			logger.log("Removed {} from acceptedPeers, current acceptedPeers are {}", id, self.acceptedPeers.toString())();
 		}
 		if (self.getCallStatus() == 'accepted') {
 			if (self.callPopupTable[id]) {
@@ -5187,7 +5163,7 @@ function CallHandler(roomId) {
 			}
 		}
 		if (Object.keys(self.peerConnections).length === 0) {
-			self.log("All peer connections are gone, destroying CallHandler")();
+			logger.log("All peer connections are gone, destroying CallHandler")();
 			self.closeEvents(reason);
 		}
 	};
@@ -5232,7 +5208,7 @@ function CallHandler(roomId) {
 					self.peerConnections[e].connectToRemote(self.localStream);
 					CssUtils.addClass(self.peerConnections[e].dom.remote, 'connected');
 				} else {
-					self.logErr("Unable to get pc with id {}, available peer connections are {}, accepted peers are {}",
+					logger.error("Unable to get pc with id {}, available peer connections are {}, accepted peers are {}",
 							e, Object.keys(self.peerConnections), self.acceptedPeers.toString())();
 				}
 			});
@@ -5247,22 +5223,22 @@ function CallHandler(roomId) {
 		}, self.CALL_TIMEOUT_NO_USERS);
 	};
 	self.setTimeout = function () {
-		self.log("Created no answers timeout")();
+		logger.log("Created no answers timeout")();
 		self.timeoutFunnction = setTimeout(function () {
-			self.log("Closing CallHandler by timeout")();
+			logger.log("Closing CallHandler by timeout")();
 			self.hangUp(null, "Finishing the call because no one picked the phone");
 		}, self.CALL_TIMEOUT_NO_ANSWER);
 	};
 	self.setNoAnswerTimeout = function () {
-		self.log("Created no users timeout")();
+		logger.log("Created no users timeout")();
 		self.timeoutFunctionNoUsers = setTimeout(function () {
-			self.log("Closing CallHandler because no users found")();
+			logger.log("Closing CallHandler because no users found")();
 			self.hangUp(null, "Finishing the call because no one is online in this channel");
 		}, self.CALL_TIMEOUT_NO_USERS);
 	};
 	self.clearTimeout = function () {
 		if (self.timeoutFunnction) {
-			self.log("Removed no answers timeout")();
+			logger.log("Removed no answers timeout")();
 			clearTimeout(self.timeoutFunnction);
 			self.timeoutFunnction = null;
 		}
@@ -5270,7 +5246,7 @@ function CallHandler(roomId) {
 	};
 	self.clearNoAnswerTimeout = function() {
 		if (self.timeoutFunctionNoUsers) {
-			self.log("Removed no users timeout")();
+			logger.log("Removed no users timeout")();
 			clearTimeout(self.timeoutFunctionNoUsers);
 			self.timeoutFunctionNoUsers = null;
 		}
@@ -5279,7 +5255,7 @@ function CallHandler(roomId) {
 		self.setCallStatus('received_offer');
 		self.setTimeout();
 		self.connectionId = message.connId;
-		self.log("CallHandler initialized")();
+		logger.log("CallHandler initialized")();
 		wsHandler.sendToServer({
 			action: 'replyCall',
 			connId: message.connId,
@@ -5296,7 +5272,7 @@ function CallHandler(roomId) {
 			CssUtils.addClass(pc.dom.remote, 'connected');
 			pc.connectToRemote(self.localStream);
 			if (pc.sendRtcDataQueue.length > 0) {
-				self.log("Connection accepted, consuming sendRtcDataQueue")();
+				logger.log("Connection accepted, consuming sendRtcDataQueue")();
 				var queue = pc.sendRtcDataQueue;
 				pc.sendRtcDataQueue = [];
 				queue.forEach(pc.onsendRtcData);
@@ -5349,7 +5325,7 @@ function CallHandler(roomId) {
 	};
 	self.destroyAudioProcessor = function() {
 		if (self.audioProcessor && self.audioProcessor.javascriptNode && self.audioProcessor.javascriptNode.onaudioprocess) {
-			self.log("Removing local audioproc")();
+			logger.log("Removing local audioproc")();
 			self.audioProcessor.javascriptNode.onaudioprocess = null;
 		}
 	};
@@ -5539,7 +5515,7 @@ function FileReceiver(removeReferenceFn) {
 
 	self.initAndDisplayOffer = function (message) {
 		self.connectionId = message.connId;
-		self.log("initAndDisplayOffer file")();
+		logger.log("initAndDisplayOffer file")();
 		self.offerOpponentWsId = message.opponentWsId;
 		wsHandler.sendToServer({
 			action: 'replyFile',
@@ -5622,7 +5598,7 @@ function FilePeerConnection() {
 			self.downloadBar.setStatus(message.content);
 			self.downloadBar.setError();
 		} else {
-			self.log("Setting status to '{}' failed", message.content)();
+			logger.log("Setting status to '{}' failed", message.content)();
 		}
 	};
 	self.setTranseferdAmount = function (value) {
@@ -5644,10 +5620,10 @@ function FilePeerConnection() {
 	self.closeEvents = function () {
 		self.closePeerConnection();
 		if (self.sendChannel && self.sendChannel.readyState !== 'closed') {
-			self.log("Closing chanel")();
+			logger.log("Closing chanel")();
 			self.sendChannel.close();
 		} else {
-			self.log("No channels to close")();
+			logger.log("No channels to close")();
 		}
 	}
 }
@@ -5662,7 +5638,7 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 	self.receiveBuffer = [];
 	FilePeerConnection.call(self);
 	ReceiverPeerConnection.call(self, connectionId, opponentWsId, removeChildPeerReferenceFn);
-	self.log("Created FileReceiverPeerConnection")();
+	logger.log("Created FileReceiverPeerConnection")();
 	self.superGotReceiveChannel = self.gotReceiveChannel;
 	self.gotReceiveChannel = function (event) {
 		self.superGotReceiveChannel(event);
@@ -5684,7 +5660,7 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 	self.assembleFileIfDone = function () {
 		if (self.isDone()) {
 			var received = self.recevedUsingFile ? self.fileEntry.toURL() : URL.createObjectURL(new window.Blob(self.receiveBuffer));
-			self.log("File is received")();
+			logger.log("File is received")();
 			wsHandler.sendToServer({
 				content: 'success',
 				action: 'destroyFileConnection',
@@ -5705,7 +5681,7 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 		return self.receivedSize === self.fileSize;
 	};
 	self.initFileSystemApi = function (cb) {
-		self.log("Creating temp location {}", bytesToSize(self.fileSize))();
+		logger.log("Creating temp location {}", bytesToSize(self.fileSize))();
 		if (requestFileSystem) {
 			requestFileSystem(window.TEMPORARY, self.fileSize, function (fs) {
 				fs.root.getFile(self.connectionId, {create: true}, function (fileEntry) {
@@ -5714,7 +5690,7 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 						self.fileWriter = fileWriter;
 						self.fileWriter.WRITING = 1;
 						self.fileWriter.onwriteend = self.onWriteEnd;
-						self.log("FileWriter is created")();
+						logger.log("FileWriter is created")();
 						cb(true);
 					}, self.fileSystemErr(1, cb, fs));
 
@@ -5729,7 +5705,7 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 			fs.root.createReader().readEntries(function (entries) {
 				entries.forEach(function (e) {
 					function onRemove() {
-						self.log("Removed {}", e.fullPath)();
+						logger.log("Removed {}", e.fullPath)();
 					}
 					if (e.isFile) {
 						e.remove(onRemove);
@@ -5744,7 +5720,7 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 	}
 	self.fileSystemErr = function (errN, cb, fs) {
 		return function (e) {
-			self.logErr("FileSystemApi Error {}: {}, code {}", errN, e.message || e, e.code)();
+			logger.error("FileSystemApi Error {}: {}, code {}", errN, e.message || e, e.code)();
 			if (fs && e.code == 22) {
 				self.onExceededQuota(fs);
 			} else {
@@ -5790,12 +5766,12 @@ function FileReceiverPeerConnection(connectionId, opponentWsId, fileName, fileSi
 	};
 	self.waitForAnswer = function () {
 		self.createPeerConnection();
-		self.log("Waiting for rtc datachannels.")();
+		logger.log("Waiting for rtc datachannels.")();
 		self.pc.ondatachannel = self.gotReceiveChannel;
 		self.downloadBar.setStatus("Establishing connection");
 	};
 	self.gotReceiveChannel = function (event) {
-		self.log('Received new channel')();
+		logger.log('Received new channel')();
 		self.sendChannel = event.channel;
 		self.sendChannel.onmessage = self.onChannelMessage;
 		self.sendChannel.onopen = self.channelOpen;
@@ -5813,9 +5789,9 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 	self.offset = 0;
 	SenderPeerConnection.call(self, connectionId, opponentWsId, removeChildPeerReferenceFn);
 	self.sendChannel = null;
-	self.log("Created FileSenderPeerConnection")();
+	logger.log("Created FileSenderPeerConnection")();
 	self.onfileAccepted = function (message) {
-		self.log("Transfer file {} result : {}", self.fileName, message.content)();
+		logger.log("Transfer file {} result : {}", self.fileName, message.content)();
 		self.downloadBar.setStatus("Transferred");
 		self.downloadBar.setSuccess();
 		self.closeEvents();
@@ -5853,7 +5829,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 		}
 	};
 	self.onreceiveChannelOpen = function () {
-		self.log('Channel is open, slicing file: {} {} {} {}', self.fileName, bytesToSize(self.fileSize), self.file.type, getDay(self.file.lastModifiedDate))();
+		logger.log('Channel is open, slicing file: {} {} {} {}', self.fileName, bytesToSize(self.fileSize), self.file.type, getDay(self.file.lastModifiedDate))();
 		if (self.fileSize === 0) {
 			self.downloadBar.setStatus("Can't send empty file");
 			self.downloadBar.setError();
@@ -5898,7 +5874,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 				}
 			}
 			trackTransfer();
-			self.log("Exiting, offset is {} now, fs: {}", self.offset, self.fileSize)();
+			logger.log("Exiting, offset is {} now, fs: {}", self.offset, self.fileSize)();
 		}
 	}
 	self.sendData = function(data, offset, cb) {
@@ -5928,7 +5904,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 			self.downloadBar.setStatus("Error: Connection has been lost");
 			self.downloadBar.setError();
 			self.closeEvents("SendChannel is in status {} which is not opened".format(self.sendChannel.readyState));
-			self.logErr(error)();
+			logger.error(error)();
 			growlError("Connection loss while sending file {} to user {}".format(self.fileName, self.receiverName));
 		}
 	};
@@ -5944,11 +5920,11 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 			// Reliable data channels not supported by Chrome
 			self.sendChannel = self.pc.createDataChannel("sendDataChannel", {reliable: false});
 			self.sendChannel.onopen = self.onreceiveChannelOpen;
-			self.log("Created send data channel.")();
+			logger.log("Created send data channel.")();
 		} catch (e) {
 			var error = "Failed to create data channel because {} ".format(e.message || e);
 			growlError(error);
-			self.logErr(error)();
+			logger.error(error)();
 		}
 		self.createOffer();
 	};
@@ -5966,7 +5942,7 @@ function CallSenderPeerConnection(connectionId,
  self.connectedToRemote = false;
 	SenderPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
 	CallPeerConnection.call(self, remoteVideo, userName, onStreamAttached, getSpeakerId);
-	self.log("Created CallSenderPeerConnection")();
+	logger.log("Created CallSenderPeerConnection")();
 	self.connectToRemote = function (stream) {
    self.connectedToRemote = true;
 		self.createPeerConnection(stream);
@@ -5986,7 +5962,7 @@ function CallReceiverPeerConnection(connectionId,
  self.connectedToRemote = false;
 	ReceiverPeerConnection.call(self, connectionId, wsOpponentId, removeFromParentFn);
 	CallPeerConnection.call(self, videoContainer, userName, onStreamAttached, getSpeakerId);
-	self.log("Created CallReceiverPeerConnection")();
+	logger.log("Created CallReceiverPeerConnection")();
 	self.connectToRemote = function (stream) {
    self.connectedToRemote = true;
 		self.createPeerConnection(stream);
@@ -6027,11 +6003,11 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 		}
 	};
 	self.channelOpen = function () {
-		self.log('Opened a new chanel')();
+		logger.log('Opened a new chanel')();
 	};
 	self.oniceconnectionstatechange = function () {
 		if (self.pc.iceConnectionState === 'disconnected') {
-			self.log("Created connection lost timeout")();
+			logger.log("Created connection lost timeout")();
 			self.timeoutedPeerConnectionDisconnected = setTimeout(function() {
 				// give a chance destroyEvent to close connection first
 				self.closeEvents('Connection has been lost');
@@ -6044,7 +6020,7 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 	self.createPeerConnection = function (stream) {
 		self.createPeerConnectionParent();
 		self.pc.onaddstream = function (event) {
-			self.log("onaddstream")();
+			logger.log("onaddstream")();
 			var p = Utils.setVideoSource(self.dom.remote, event.stream)
 			if (p) { //firefox video.play doesn't return promise
 				// chrome returns promise, if it's on mobile devices video sound would be muted
@@ -6092,16 +6068,16 @@ function CallPeerConnection(videoContainer, userName, onStreamAttached, getSpeak
 	self.removeAudioProcessor = function () {
 		if (self.audioProcessor && self.audioProcessor.javascriptNode && self.audioProcessor.javascriptNode.onaudioprocess) {
 			self.audioProcessor.javascriptNode.onaudioprocess = null;
-			self.log("Removed remote audioProcessor")();
+			logger.log("Removed remote audioProcessor")();
 		}
 	};
 	self.closeEvents = function (reason) {
 		if (self.timeoutedPeerConnectionDisconnected) {
 			clearTimeout(self.timeoutedPeerConnectionDisconnected);
 			self.timeoutedPeerConnectionDisconnected = null;
-			self.log("Removing connections lost timeout")();
+			logger.log("Removing connections lost timeout")();
 		}
-		self.log('Destroying CallPeerConnection because', reason)();
+		logger.log('Destroying CallPeerConnection because', reason)();
 		self.closePeerConnection();
 		self.removeAudioProcessor();
 		Utils.detachVideoSource(self.dom.remote);
@@ -6122,11 +6098,7 @@ function WebRtcApi() {
 	};
 	self.connections = {};
 	self.quedConnections = {};
-	var logger = {
-		warn: loggerFactory.getLogger("WEBRTC", console.warn, 'color: #960055; font-weight: bold'),
-		info: loggerFactory.getLogger("WEBRTC", console.log, 'color: #960055; font-weight: bold'),
-		error: loggerFactory.getLogger("WEBRTC", console.error, 'color: #960055; font-weight: bold')
-	}
+	var logger = loggerFactory.getLogger("WEBRTC", 'color: #960055; font-weight: bold');
 	self.quedId = 0;
 	self.clickFile = function () {
 		self.dom.fileInput.value = null;
@@ -6189,7 +6161,7 @@ function WebRtcApi() {
 		return self.quedConnections[newId];
 	};
 	self.removeChildReference = function (id) {
-		logger.info("Removing transferHandler with id {}", id)();
+		logger.log("Removing transferHandler with id {}", id)();
 		delete self.connections[id];
 	};
 	self.attachEvents = function () {
@@ -6207,15 +6179,12 @@ function WsHandler() {
 	self.messageId = 0;
 	self.wsState = 0; // 0 - not inited, 1 - tried to connect but failed; 2 - connections is lost,  9 - connected;
 	self.duplicates = {};
-	self.log = loggerFactory.getLogger('WS', console.log, "color: green;");
-	self.debugLog = loggerFactory.getLogger('WS', console.debug, "color: green;");
-	self.logWarn = loggerFactory.getLogger('WS', console.warn, "color: green;");
-	self.logError = loggerFactory.getLogger('WS', console.error, "color: green;");
+	var logger = loggerFactory.getLogger('WS', "color: green;");
 	self.logData = function(tag, obj, raw) {
 		if (raw.length > 1000) {
 			raw = ""
 		}
-		return loggerFactory.getLogger(tag, console.log, "color: green; font-weight: bold")("{} {}", raw, obj);
+		return loggerFactory.getSingleLogger(tag, "color: green; font-weight: bold", console.log)("{} {}", raw, obj);
 	};
 	self.dom = {
 		onlineStatus: $('onlineStatus'),
@@ -6243,7 +6212,7 @@ function WsHandler() {
 	self.onsetWsId = function(message) {
 		self.wsConnectionId = message.content;
 		self.wsConnectionFullId = message.opponentWsId;
-		self.log("CONNECTION ID HAS BEEN SET TO {}, (full id is {})", self.wsConnectionId, self.wsConnectionFullId)();
+		logger.log("CONNECTION ID HAS BEEN SET TO {}, (full id is {})", self.wsConnectionId, self.wsConnectionFullId)();
 	};
 	self.onWsMessage = function (message) {
 		var jsonData = message.data;
@@ -6252,7 +6221,7 @@ function WsHandler() {
 			data = JSON.parse(jsonData);
 			self.logData("WS_IN", data, jsonData)();
 		} catch (e) {
-			self.logError('Unable to parse incomming message {}', jsonData)();
+			logger.error('Unable to parse incomming message {}', jsonData)();
 			growlError("Unable to parse incoming message {}", e);
 			return;
 		}
@@ -6272,7 +6241,7 @@ function WsHandler() {
 	self.hideGrowlProgress = function (key) {
 		var progInter = self.progressInterval[key];
 		if (progInter) {
-			self.log("Removing progressInterval {}", key)();
+			logger.log("Removing progressInterval {}", key)();
 			progInter.growl.hide();
 			if (progInter.interval) {
 				clearInterval(progInter.interval);
@@ -6323,7 +6292,7 @@ function WsHandler() {
 			if (!skipGrowl){
 				growlError("Can't send message, because connection is lost :(");
 			}
-			self.logError("Web socket is closed. Can't send {}", logEntry)();
+			logger.error("Web socket is closed. Can't send {}", logEntry)();
 			return false;
 		} else {
 			self.logData("WS_OUT", objData, jsonRequest)();
@@ -6343,7 +6312,7 @@ function WsHandler() {
 				delete self.duplicates[jsonRequest];
 			}, 5000);
 		} else {
-			self.logWarn("blocked duplicate from sending: {}", jsonRequest)();
+			logger.warn("blocked duplicate from sending: {}", jsonRequest)();
 		}
 	}
 	self.setStatus = function (isOnline) {
@@ -6360,14 +6329,14 @@ function WsHandler() {
 		if (e.code === 403) {
 			var message = "Server has forbidden request because '{}'".format(reason);
 			growlError(message);
-			self.logError('{}', message)();
+			logger.error('{}', message)();
 		} else if (self.wsState === 0) {
 			growlError("Can't establish connection with server");
-			self.logError("Chat server is down because {}", reason)();
+			logger.error("Chat server is down because {}", reason)();
 			self.wsState = 1;
 		} else if (self.wsState === 9) {
 			growlError("Connection to chat server has been lost, because {}".format(reason));
-			self.logError(
+			logger.error(
 					'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
 					e.reason, CONNECTION_RETRY_TIME)();
 		}
@@ -6402,18 +6371,18 @@ function WsHandler() {
 				}
 				self.startNoPingTimeout();
 				self.wsState = 9;
-				self.log(message)();
+				logger.log(message)();
 			};
 		});
 	};
 	self.startNoPingTimeout = function() {
 		if (self.noServerPingTimeout) {
 			clearTimeout(self.noServerPingTimeout);
-			self.log("Clearing noServerPingTimeout")();
+			logger.log("Clearing noServerPingTimeout")();
 			self.noServerPingTimeout = null;
 		}
 		self.noServerPingTimeout = setTimeout(function () {
-			self.logError("Force closing socket coz server didn't ping us")();
+			logger.error("Force closing socket coz server didn't ping us")();
 			self.ws.close(1000, "Sever didn't ping us");
 		}, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
 	};
@@ -6425,7 +6394,7 @@ function WsHandler() {
 		if (self.sendToServer({action: 'ping'}, true)) {
 			self.onpong();
 			self.pingTimeoutFunction = setTimeout(function() {
-				self.logError("Force closing socket coz pong time out")();
+				logger.error("Force closing socket coz pong time out")();
 				self.ws.close(1000, "Ping timeout");
 			}, PING_CLOSE_JS_DELAY);
 		}
@@ -6433,7 +6402,7 @@ function WsHandler() {
 	};
 	self.onpong = function(message) {
 		if (self.pingTimeoutFunction) {
-			self.debugLog("Clearing pingTimeoutFunction")();
+			logger.debug("Clearing pingTimeoutFunction")();
 			clearTimeout(self.pingTimeoutFunction);
 			self.pingTimeoutFunction = null;
 		}
@@ -6683,7 +6652,7 @@ var Utils = {
 						iframe.setAttribute("src", src);
 						iframe.setAttribute("frameborder", "0");
 						iframe.className = 'video-player-ready';
-						logger.info("Replacing youtube url {}", src)();
+						logger.log("Replacing youtube url {}", src)();
 						iframe.setAttribute("allowfullscreen", "1");
 						e.parentNode.replaceChild(iframe, e);
 					}
@@ -6709,7 +6678,7 @@ var Utils = {
 			}
 		}
 		if (line === -1) {
-			logger.info("Could not find the m line for {}", sdp)();
+			logger.log("Could not find the m line for {}", sdp)();
 			return sdp;
 		}
 		// Skip i and c lines
@@ -6717,12 +6686,12 @@ var Utils = {
 			line++;
 		}
 		if (lines[line].indexOf("b") === 0) {
-			logger.info("Replaced b line at line", line)();
+			logger.log("Replaced b line at line", line)();
 			lines[line] = "b=AS:" + bitrate;
 			return lines.join("\n");
 		} else {
 			// Add a new b line
-			logger.info("Adding new b line before line", line)();
+			logger.log("Adding new b line before line", line)();
 			var newLines = lines.slice(0, line)
 			newLines.push("b=AS:" + bitrate)
 			newLines = newLines.concat(lines.slice(line, lines.length))
@@ -6827,7 +6796,7 @@ var Utils = {
 	createMicrophoneLevelVoice: function (stream, onaudioprocess) {
 		try {
 			if (isMobile) {
-				logger.info("Current phone is mobile, audio processor won't be created")();
+				logger.log("Current phone is mobile, audio processor won't be created")();
 				return;
 			}
 			var audioTracks = stream && stream.getAudioTracks();
@@ -6851,7 +6820,7 @@ var Utils = {
 			audioProc.volumeValuesCount = 0;
 			audioProc.javascriptNode.onaudioprocess = onaudioprocess(audioProc);
 			audioProcesssors.push(audioProc);
-			logger.info("Created new audioProcessor")();
+			logger.log("Created new audioProcessor")();
 			return audioProc;
 		} catch (err) {
 			logger.error("Unable to use microphone level because {}", Utils.extractError(err))();
