@@ -54,12 +54,7 @@ var inputRangeStyles = {};
 window.loggerFactory = (function (logsEnabled) {
 	var self = this;
 	self.logsEnabled = logsEnabled;
-	self.dummy = {
-		warn: function() {},
-		log: function() {},
-		error: function() {},
-		debug: function() {}
-	};
+	self.dummy = function() {};
 	self.emptyFunction = function() {};
 	self.getLogger = function (initiator, style) {
 		return {

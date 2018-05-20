@@ -1,15 +1,21 @@
 var SW_VERSION = '1.5';
 console.log("%cSW_S startup, version is " + SW_VERSION, 'color: #ffb500; font-weight: bold');
+
+
 var loggerFactory = (function (logsEnabled) {
 	var self = this;
 	self.logsEnabled = logsEnabled;
-	self.dummy = {
-		warn: function() {},
-		log: function() {},
-		error: function() {},
-		debug: function() {}
-	};
+	self.dummy = function() {};
+	self.emptyFunction = function() {};
 	self.getLogger = function (initiator, style) {
+		return {
+			warn: self.getSingleLogger(initiator, style, console.warn),
+			log: self.getSingleLogger(initiator, style, console.log),
+			error: self.getSingleLogger(initiator, style, console.error),
+			debug: self.getSingleLogger(initiator, style, console.debug)
+		}
+	};
+	self.getSingleLogger = function (initiator, style, fn) {
 		return function () {
 			if (!self.logsEnabled) {
 				return self.dummy;
@@ -19,16 +25,11 @@ var loggerFactory = (function (logsEnabled) {
 			var params = [console, '%c' + initiator, style];
 			for (var i = 0; i < parts.length; i++) {
 				params.push(parts[i]);
-				if (typeof args[i] !== 'undefined') {
+				if (typeof args[i] !== 'undefined') { // args can be '0'
 					params.push(args[i])
 				}
 			}
-			return {
-				warn: Function.prototype.bind.apply(console.warn, params),
-				log: Function.prototype.bind.apply(console.log, params),
-				error: Function.prototype.bind.apply(console.error, params),
-				debug: Function.prototype.bind.apply(console.debug, params)
-			}
+			return Function.prototype.bind.apply(fn, params);
 		};
 	};
 	return self;
