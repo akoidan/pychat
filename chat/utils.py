@@ -89,11 +89,11 @@ def get_history_message_query(messages, user_rooms, with_history):
 
 
 def with_history_q(q_objects, room_id, h, f):
-	q_objects.add(Q(id__gte=h, room_id=room_id, deleted=False), Q.OR)
+	q_objects.add(Q(id__gte=h, room_id=room_id), Q.OR)
 
 
 def no_history_q(q_objects, room_id, h, f):
-	q_objects.add(Q(room_id=room_id, deleted=False) & (
+	q_objects.add(Q(room_id=room_id) & (
 			(Q(id__gte=h) & Q(id__lte=f) & Q(edited_times__gt=0)) | Q(id__gt=f)), Q.OR)
 
 

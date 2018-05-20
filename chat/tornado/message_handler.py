@@ -367,7 +367,11 @@ class MessagesHandler(MessagesCreator):
 		message.edited_times += 1
 		giphy_match = self.isGiphy(data[VarNames.CONTENT])
 		if message.content is None:
-			Message.objects.filter(id=data[VarNames.MESSAGE_ID]).update(deleted=True, edited_times=message.edited_times)
+			Message.objects.filter(id=data[VarNames.MESSAGE_ID]).update(
+				deleted=True,
+				edited_times=message.edited_times,
+				content=None
+			)
 			self.publish(self.create_send_message(message, Actions.DELETE_MESSAGE, None, js_id), message.room_id)
 		elif giphy_match is not None:
 			self.edit_message_giphy(giphy_match, message, js_id)
@@ -419,9 +423,9 @@ class MessagesHandler(MessagesCreator):
 		room_id = data[VarNames.CHANNEL]
 		self.logger.info('!! Fetching %d messages starting from %s', count, header_id)
 		if header_id is None:
-			messages = Message.objects.filter(Q(room_id=room_id), Q(deleted=False)).order_by('-pk')[:count]
+			messages = Message.objects.filter(room_id=room_id).order_by('-pk')[:count]
 		else:
-			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id), Q(deleted=False)).order_by('-pk')[:count]
+			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id)).order_by('-pk')[:count]
 		imv = do_db(get_message_images_videos, messages)
 		response = self.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video)
 		self.ws_write(response)

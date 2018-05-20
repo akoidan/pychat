@@ -184,7 +184,6 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		else:
 			off_messages = Message.objects.filter(
 				id__gt=F('room__roomusers__last_read_message_id'),
-				deleted=False,
 				room__roomusers__user_id=self.user_id
 			)
 		off = {}

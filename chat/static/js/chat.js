@@ -3527,10 +3527,10 @@ function DataBase() {
 			cb(null);
 		} else {
 			logger.log("Initializing database")();
-			self.db = openDatabase('pydb', '', 'Messages database', 10 * 1024 * 1024);
+			self.db = openDatabase('pydb_1.0', '', 'Messages database', 10 * 1024 * 1024);
 			if (self.db.version == '') {
 				self.db.changeVersion(self.db.version, '1.0', function (t) {
-					t.executeSql('CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy boolean NOT NULL CHECK (giphy IN (0,1)), edited integer, channel integer, userId integer)', [], function(t,d) {
+					t.executeSql('CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, channel integer, userId integer)', [], function(t,d) {
 						t.executeSql('CREATE TABLE image (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text);', [], function (t, s) {
 							logger.log("Database has been initialized with version {}", self.db.version)();
 							cb(true);
@@ -3574,7 +3574,7 @@ function DataBase() {
 	self.insertMessage = function (t, message) {
 		self.setRoomHeaderId(message.channel, message.id);
 		t.executeSql('insert or replace into message (id, time, content, symbol, deleted, giphy, edited, channel, userId) values (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-				[message.id, message.time, message.content, message.symbol, 0, 0, message.edited, message.channel, message.userId], function (t, d) {
+				[message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.channel, message.userId], function (t, d) {
 					for (var k in message.files) {
 						var f = message.files[k];
 						t.executeSql('insert or replace into image (id, symbol, url, message_id, type, preview) values (?, ?, ?, ?, ?, ?)', [f.id, k, f.url, message.id, f.type, f.preview]);
@@ -3583,7 +3583,7 @@ function DataBase() {
 	};
 	self.saveMessage = write(self.insertMessage);
 	self.deleteMessage = write(function(t, id) {
-		t.executeSql('delete from message where id = ?', [id])
+		t.executeSql('update message set deleted = 1 where id = ? ', [id])
 	});
 	self.saveMessages = write(function(t, data) {
 		data.forEach(function(m) {
@@ -3972,7 +3972,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 			p.setAttribute('symbol', data.symbol);
 		}
 		p.setAttribute('content', data.content);
-		p.setAttribute('files', JSON.stringify(data.files));
+		if (data.files) {
+			p.setAttribute('files', JSON.stringify(data.files));
+		}
 		p.setAttribute('edited', data.edited);
 		if (data.edited != '0') {
 					CssUtils.addClass(p, self.EDITED_MESSAGE_CLASS);
@@ -4028,22 +4030,26 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private) {
 		return p;
 	};
 	self._printMessage = function (data, isNew, forceSkipHL) {
-		self.printMessagePlay(data);
-		// we can't use self.allUsers[data.userId].user; since user could left and his message remains
-		var p = self.createMessageNodeAll(data);
-		if (!p.skip && !forceSkipHL) {
-			self.highLightMessageIfNeeded(p.node, p.username, isNew, data.content, data.images);
-			if (data.userId != loggedUserId && self.notifications) {
-				notifier.notify(p.username, {
-					body: data.content,
-					data: {
-						replaced: 1,
-						title: p.username,
-						roomId: data.channel
-					},
-					requireInteraction: true,
-					icon: data.images || NOTIFICATION_ICON_URL
-				});
+		if (data.deleted) {
+			self.deleteMessage(data)
+		} else {
+			self.printMessagePlay(data);
+			// we can't use self.allUsers[data.userId].user; since user could left and his message remains
+			var p = self.createMessageNodeAll(data);
+			if (!p.skip && !forceSkipHL) {
+				self.highLightMessageIfNeeded(p.node, p.username, isNew, data.content, data.images);
+				if (data.userId != loggedUserId && self.notifications) {
+					notifier.notify(p.username, {
+						body: data.content,
+						data: {
+							replaced: 1,
+							title: p.username,
+							roomId: data.channel
+						},
+						requireInteraction: true,
+						icon: data.images || NOTIFICATION_ICON_URL
+					});
+				}
 			}
 		}
 	};

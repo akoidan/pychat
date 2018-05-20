@@ -54,12 +54,17 @@ class MessagesCreator(object):
 			VarNames.CONTENT: message.content,
 			VarNames.TIME: message.time,
 			VarNames.MESSAGE_ID: message.id,
-			VarNames.FILES: files if files else {},
-			VarNames.GIPHY: message.giphy,
 			VarNames.EDITED_TIMES: message.edited_times,
 			VarNames.CHANNEL: message.room_id,
-			VarNames.SYMBOL: message.symbol
 		}
+		if message.deleted:
+			res[VarNames.DELETED] = True
+		if files:
+			res[VarNames.FILES] = files
+		if message.symbol:
+			res[VarNames.SYMBOL] = message.symbol
+		if message.giphy:
+			res[VarNames.GIPHY] = message.giphy
 		return res
 
 	@classmethod
