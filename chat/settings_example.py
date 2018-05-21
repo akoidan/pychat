@@ -68,8 +68,8 @@ globals().update(importlib.import_module(config).__dict__)
 
 
 ### If you want recaptcha: Open https://www.google.com/recaptcha/admin#list and register new domain
-# RECAPTCHA_SITE_KEY = '****************************************' # REPLACE_THIS_WITH_DATA-SITEKEY_DIV_ATTRIBUTE
-# RECAPTCHA_SECRET_KEY = '****************************************' # REPLACE_THIS_WITH_KEY_FOR_RETRIEVING_RESULT
+# RECAPTCHA_PUBLIC_KEY = '****************************************' # REPLACE_THIS_WITH_DATA-SITEKEY_DIV_ATTRIBUTE
+# RECAPTCHA_PRIVATE_KEY = '****************************************' # REPLACE_THIS_WITH_KEY_FOR_RETRIEVING_RESULT
 
 
 ### For google auth follow the instructions here https://developers.google.com/identity/sign-in/web/devconsole-project
