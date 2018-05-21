@@ -32,6 +32,8 @@ username_processor = 'chat.context_processors.add_user_name'
 # Application definition
 
 INSTALLED_APPS = (
+	'snowpenguin.django.recaptcha2',
+	'multi_captcha_admin',
 	'django.contrib.admin',
 	'django.contrib.auth',
 	'django.contrib.contenttypes',
@@ -43,10 +45,11 @@ INSTALLED_APPS = (
 	'simplejson',
 	'redis',
 	'tornado',
-	'captcha_admin',
-	'captcha',
 )
 
+MULTI_CAPTCHA_ADMIN = {
+    'engine': 'recaptcha2',
+}
 
 RECAPTHCA_SITE_URL = 'https://www.google.com/recaptcha/api.js'
 # RECAPTCHA_PRIVATE_KEY = 'REPLACE_THIS_WITH_KEY_FOR_RETRIEVING_RESULT'

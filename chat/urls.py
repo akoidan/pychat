@@ -1,6 +1,6 @@
 import logging
 
-from captcha_admin import admin
+from django.contrib import admin
 from django.conf.urls import patterns, include, url
 from django.conf.urls.static import static
 
