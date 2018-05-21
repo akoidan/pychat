@@ -43,9 +43,8 @@ INSTALLED_APPS = (
 	'simplejson',
 	'redis',
 	'tornado',
-	"sslserver",
-	"captcha_admin",
-	"admin"
+	'captcha_admin',
+	'captcha',
 )
 
 

@@ -9,7 +9,7 @@ import os
 get = os.environ.get('PYCHAT_CONFIG')
 configs = ['docker', 'local', 'prod', 'docker_all']
 if get not in configs:
-	raise Exception("Expected environment variable PYCHAT_CONFIG to be one of {}".format(configs))
+	raise Exception("Expected environment variable PYCHAT_CONFIG to be one of {}. Please execute `export PYCHAT_CONFIG=local` if you don't know what to do.".format(configs))
 config = 'chat.settings_{}'.format(get)
 globals().update(importlib.import_module(config).__dict__)
 ###>>>>
