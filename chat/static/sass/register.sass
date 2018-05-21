@@ -152,3 +152,35 @@ input:not([type=submit]), select
 input.username-or-pass //strong selector
 	padding-left: 10px
 	width: calc(100% - 35px)
+
+
+#restorePassword
+	width: 40%
+	margin-top: 10%
+	flex-direction: column
+	@include display-flex(!important)
+	max-width: 400px
+	min-width: 200px
+	$height: 70px
+	$padding: 20px
+	> input
+		padding: $padding
+		margin: $restPassMargin
+		display: block
+		width: 100%
+		height: 50px
+		font-size: 20px
+	[type=password]
+		$dif: $padding * 2
+		width: calc(100% - #{$dif})
+		height: $height - ($padding + 1) * 2
+	[type=submit]
+		height: $height
+
+
+.restoreHeader
+	font-size: 25px
+	text-align: center
+	width: 100%
+	margin-left: $restPassMargin
+	margin-right: $restPassMargin

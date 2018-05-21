@@ -9,7 +9,7 @@ def get_order(f):
 	d = datetime.datetime.strptime(res.group(1), '%H:%M:%S:%f') if res else None
 	return line, d
 
-f1 = open(argv[1] if len(argv) >= 2 else './tornado-8881.log')
+f1 = open(argv[1] if len(argv) >= 2 else './tornado-8883.log')
 f2 = open(argv[2] if len(argv) >= 3 else './tornado-8882.log')
 f3 = open(argv[3] if len(argv) >= 3 else './tornado.log', 'w')
 

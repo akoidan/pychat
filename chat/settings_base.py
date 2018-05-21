@@ -9,22 +9,13 @@ https://docs.djangoproject.com/en/1.6/ref/settings/
 """
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-import logging.config
 import os
 import sys
 from os.path import join
 
 from django.conf import global_settings
-import sslserver
 
 import chat as project_module
-
-try:
-	from chat.production import *
-	print('imported production.py settings')
-except ImportError as e:
-	print('Failed to import production.py because {}'.format(e))
-	pass
 
 LOGGING_CONFIG = None
 
@@ -33,14 +24,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '8ou!cqb1yd)6c4h0i-cxjo&@@+04%4np6od8qn+z@5b=6)!v(o'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-
-
-DEBUG = True
 
 ALLOWED_HOSTS = ["*",]
 
@@ -65,34 +48,93 @@ INSTALLED_APPS = (
 	"admin"
 )
 
-# TODO replace this into your keys if you want this features to be available
-# Google recaptcha keys
+
 RECAPTHCA_SITE_URL = 'https://www.google.com/recaptcha/api.js'
 # RECAPTCHA_PRIVATE_KEY = 'REPLACE_THIS_WITH_KEY_FOR_RETRIEVING_RESULT'
 # RECAPTCHA_PUBLIC_KEY = 'REPLACE_THIS_WITH_DATA-SITEKEY_DIV_ATTRIBUTE'
 # GOOGLE_OAUTH_2_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com'
 GOOGLE_OAUTH_2_JS_URL = 'https://apis.google.com/js/platform.js'
 FACEBOOK_JS_URL = '//connect.facebook.net/en_US/sdk.js'
-#FACEBOOK_ACCESS_TOKEN = '!6_NUMBER_APP_ID|ALPHABET_TOKEN' # https://developers.facebook.com/tools/access_token/
-#FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
-# GOOGLE_OAUTH_2_HOST = 'pychat.org'
+
+EMAIL_SUBJECT_PREFIX = '[Pychat] '
 
 REDIS_PORT = 6379
-TORNADO_REDIS_PORT = REDIS_PORT
-SESSION_REDIS_PORT = REDIS_PORT
+REDIS_HOST ='localhost'
+SESSION_REDIS = {
+	'host': REDIS_HOST,
+	'post': REDIS_PORT,
+	'db': 3
+}
 SESSION_ENGINE = 'redis_sessions.session'
-BROKER_URL = str(SESSION_REDIS_PORT).join(('redis://localhost:','/0'))
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
 
-CRT_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.crt"))
-KEY_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.key"))
 
-IS_HTTPS = 'CRT_PATH' in locals()
+# BROKER_URL = str(SESSION_REDIS_PORT).join(('redis://localhost:','/0'))
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_SERIALIZER = 'json'
+
+
+mail_admins = {
+	'mail_admins': {
+		'level': 'ERROR',
+		'class': 'django.utils.log.AdminEmailHandler',
+	}
+}
+
+
+LOGGING = {
+	'version': 1,
+	'disable_existing_loggers': True,
+	'filters': {
+		'id': {
+			'()': 'chat.log_filters.ContextFilter',
+		}
+	},
+	'formatters': {
+		'django': {
+			'format': '%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
+			'datefmt': '%H:%M:%S',
+		},
+	},
+}
+
+file_handlers = {
+	'default': {
+		'level': 'DEBUG',
+		'class': 'logging.handlers.TimedRotatingFileHandler',
+		'formatter': 'django',
+		'when': 'midnight',
+		'filters': ['id', ],
+		'interval': 1
+	},
+}
+
+console_handlers = {
+	'default': {
+		'level': 'DEBUG',
+		'class': 'logging.StreamHandler',
+		'filters': ['id', ],
+		'formatter': 'django',
+	},
+}
+
 API_PORT = '8888'
+
+if 'start_tornado' in sys.argv:
+	try:
+		index_port = sys.argv.index('--port')
+		API_PORT = sys.argv[index_port + 1]
+	except (ValueError, IndexError):
+		pass
+	file_handlers['default']['filename'] = join(BASE_DIR, 'log/tornado-{}.log'.format(API_PORT))
+else:
+	file_handlers['default']['filename'] = join(BASE_DIR, 'log/chat.log')
+
+
 EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn'
 EXTENSION_INSTALL_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + EXTENSION_ID
+
+IS_HTTPS = True
 WEBSOCKET_PROTOCOL = 'wss' if IS_HTTPS else 'ws'
 SITE_PROTOCOL = 'https' if IS_HTTPS else 'http'
 API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/?id='))
@@ -111,7 +153,6 @@ MIDDLEWARE_CLASSES = (
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
 	'chat.cookies_middleware.UserCookieMiddleWare',
-	'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
 ROOT_URLCONF = 'chat.urls'
@@ -129,37 +170,26 @@ FIREBASE_URL = 'https://android.googleapis.com/gcm/send'
 # pip install PyMySQL
 # import pymysql
 # pymysql.install_as_MySQLdb()
-if 'DATABASES' not in locals():
-	DATABASES = {
-		'default': {
-			'NAME': 'django',
-			'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
-			'USER': 'root', # TODO put your username here
-			'PASSWORD': '', # TODO put your password here
-			'default-character-set': 'utf8',
-			'OPTIONS': {
-				'autocommit': True,
 
-			},
-		}
+DATABASES = {
+	'default': {
+		'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
+		'NAME': 'pychat',
+		'USER': 'root',
+		'PASSWORD': '',
+		'HOST': 'localhost',
+		'default-character-set': 'utf8',
+		'OPTIONS': {
+			'autocommit': True,
+		},
 	}
-
-#
-# DATABASES = {
-# 	'default': {
-# 		'ENGINE': 'django.db.backends.sqlite3',
-# 		'NAME': 'django.db',
-# 	}
-# }
+}
 
 CACHES = {
 	'default': {
 		'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
 	}
 }
-
-# Internationalization
-# https://docs.djangoproject.com/en/1.6/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
 
@@ -175,116 +205,31 @@ DEFAULT_CHARSET = 'utf-8'
 
 handler404 = 'chat.views.handler404'
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/1.6/howto/static-files/
 STATIC_URL = '/static/'
 
 PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
 SMILEYS_ROOT = os.path.join(STATIC_ROOT, 'smileys')
-
+MESSAGES_PER_SEARCH = 10
 AUTH_PROFILE_MODULE = 'chat.UserProfile'
 
-if 'start_tornado' in sys.argv:
-	log_file_name = 'tornado.log'
-else:
-	log_file_name = 'chat.log'
-
-if DEBUG:
-	class InvalidString(str):
-		def __mod__(self, other):
-			from django.template.base import TemplateSyntaxError
-			raise TemplateSyntaxError(
-				"Undefined variable or unknown value for: %s" % other)
-	TEMPLATE_STRING_IF_INVALID = InvalidString("%s")
 
 TEMPLATES = [{
 	'BACKEND': 'django.template.backends.django.DjangoTemplates',
 	'DIRS': [join(BASE_DIR, 'templates')],
 	'OPTIONS': {
-		# 'loaders': [
-		# 	('django.template.loaders.cached.Loader', [
-		# 		'django.template.loaders.filesystem.Loader',
-		# 		'django.template.loaders.app_directories.Loader',
-		# 	])],
 		'context_processors': global_settings.TEMPLATE_CONTEXT_PROCESSORS + [username_processor]
 	}
 }]
 
-LOGGING = {
-	'version': 1,
-	'disable_existing_loggers': True,
-	'filters': {
-		'id': {
-			'()': 'chat.log_filters.ContextFilter',
-		}
-	},
-	'handlers': {
-		'file-tornado': {
-			'level': 'DEBUG',
-			'class': 'logging.handlers.TimedRotatingFileHandler',
-			'filename': join(BASE_DIR, 'log/', log_file_name),
-			'formatter': 'django',
-			'when': 'midnight',
-			'interval': 1
-		},
-		'file': {
-			'level': 'DEBUG',
-			'class': 'logging.handlers.TimedRotatingFileHandler',
-			'filename': join(BASE_DIR, 'log/', log_file_name),
-			'formatter': 'django',
-			'filters': ['id', ],
-			'when': 'midnight',
-			'interval': 1
-		},
-		'django-console': {
-			'level': 'DEBUG',
-			'class': 'logging.StreamHandler',
-			'formatter': 'django',
-			'filters': ['id', ]
-		},
-		'tornado-console': {
-			'level': 'DEBUG',
-			'class': 'logging.StreamHandler',
-			'formatter': 'django',
-		},
-	},
-	'loggers': {
-		# root logger
-		'': {
-			'handlers': ['django-console'],
-			'level': 'DEBUG',
-			'propagate': False,
-		},
-		'chat.tornado': {
-			'handlers': ['tornado-console'],
-			'level': 'DEBUG',
-			'propagate': False,
-		},
-	},
-	'formatters': {
-		'django': {
-			'format': '%(id)s [%(asctime)s:%(msecs)03d;%(ip)s;%(module)s:%(lineno)s]: %(message)s',
-			'datefmt': '%H:%M:%S',
-		},
-	},
-}
 
 WS_ID_CHAR_LENGTH = 4
 
 
-logging.config.dictConfig(LOGGING)
-
 DEFAULT_PROFILE_ID = 1
-# for gmail or google apps
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'chat.django@gmail.com'
-EMAIL_HOST_PASSWORD = 'Ilovepython'
 
-ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/djangochat/issues/new'
+ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/pychat/issues/new'
 
 SESSION_COOKIE_NAME = "sessionid"
 
@@ -302,6 +247,12 @@ IP_API_URL = 'http://ip-api.com/json/%s'
 ALL_REDIS_ROOM = 'all'
 WEBRTC_CONNECTION = 'webrtc_conn'
 ALL_ROOM_ID = 1
+
+PING_CLOSE_JS_DELAY = 10000  # milliseconds
+PING_INTERVAL = 300000  # milliseconds
+
+PING_CLOSE_SERVER_DELAY = PING_CLOSE_JS_DELAY / 1000  # seconds
+CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = PING_INTERVAL * 1.01 + PING_CLOSE_JS_DELAY  # milliseconds
 
 SELECT_SELF_ROOM = """SELECT
 	a.id as room__id,
@@ -324,10 +275,10 @@ UPDATE chat_room_users out_cru
 			chat_room_users.id rooms_users_id
 		 FROM chat_room_users
 			JOIN chat_message ON chat_message.room_id = chat_room_users.room_id
-		WHERE chat_room_users.user_id = %s and chat_room_users.room_id != {}
+		WHERE chat_room_users.user_id = %s
 		GROUP BY chat_message.room_id) last_message ON out_cru.id = last_message.rooms_users_id
 SET out_cru.last_read_message_id = last_message.message_id 
-""".format(ALL_ROOM_ID)
+"""
 
 # ---------------JAVASCRIPT CONSTANTS --------------------
 
@@ -339,3 +290,5 @@ GENDERS = {0: 'Secret', 1: 'Male', 2: 'Female', }
 DATE_INPUT_FORMATS = ('%Y-%m-%d',)  # html5 input date default format, see also Pikaday in js
 DATE_INPUT_FORMATS_JS = 'YYYY-MM-DD'  # html5 input date default format, see also Pikaday in js, TODO webrtc.js
 USE_L10N = False  # use DATE_INPUT_FORMATS as main format for date rendering
+
+

@@ -23,6 +23,7 @@ var growlHolder;
 window.onerror = function (msg, url, linenumber) {
 	var message = 'Error occurred in {}:{}\n{}'.format(url, linenumber, msg);
 	if (growlHolder) {
+		doPost('/report_issue', {issue: message});
 		growlError(message);
 	} else {
 		alert(message);
@@ -43,20 +44,27 @@ var USER_REGEX = /^[a-zA-Z-_0-9]{1,16}$/;
 var MAX_STORAGE_LENGTH = 3000;
 var blankRegex = /^\s*$/;
 var fileTypeRegex = /\.(\w+)(\?.*)?$/;
-window.sound = 0;
 window.loggingEnabled = true;
 var ajaxLoader;
 var logger;
+var httpLogger;
 var muteBtn;
 var inputRangeStyles = {};
 
 window.loggerFactory = (function (logsEnabled) {
 	var self = this;
 	self.logsEnabled = logsEnabled;
-	self.dummy = function() {
-
+	self.dummy = function() {};
+	self.emptyFunction = function() {};
+	self.getLogger = function (initiator, style) {
+		return {
+			warn: self.getSingleLogger(initiator, style, console.warn),
+			log: self.getSingleLogger(initiator, style, console.log),
+			error: self.getSingleLogger(initiator, style, console.error),
+			debug: self.getSingleLogger(initiator, style, console.debug)
+		}
 	};
-	self.getLogger = function (initiator, dest, style) {
+	self.getSingleLogger = function (initiator, style, fn) {
 		return function () {
 			if (!self.logsEnabled) {
 				return self.dummy;
@@ -66,15 +74,15 @@ window.loggerFactory = (function (logsEnabled) {
 			var params = [window.console, '%c' + initiator, style];
 			for (var i = 0; i < parts.length; i++) {
 				params.push(parts[i]);
-				if (args[i]) {
+				if (typeof args[i] !== 'undefined') { // args can be '0'
 					params.push(args[i])
 				}
 			}
-			return Function.prototype.bind.apply(dest, params);
+			return Function.prototype.bind.apply(fn, params);
 		};
 	};
 	return self;
-})(window.START_WITH_LOGS);
+})(START_WITH_LOGS);
 
 function getDay(dateObj) {
 	var month = dateObj.getUTCMonth() + 1; //months from 1-12
@@ -91,18 +99,6 @@ var escapeMap = {
 	"'": '&#39;',
 	"\n": '<br>',
 	"/": '&#x2F;'
-};
-var volumeProportion = {
-	0: 0,
-	1: 0.15,
-	2: 0.4,
-	3: 1
-};
-var volumeIcons = {
-	0: 'icon-volume-off',
-	1: 'icon-volume-1',
-	2: 'icon-volume-2',
-	3: 'icon-volume-3'
 };
 var replaceHtmlRegex = new RegExp("["+Object.keys(escapeMap).join("")+"]",  "g");
 
@@ -174,13 +170,8 @@ function onDocLoad(onload) {
 		ws: "color: green; font-weight: bold",
 		webrtc: "color: #960055; font-weight: bold",
 		sw: "color: #ffb500; font-weight: bold"*/
-	logger = {
-		warn: loggerFactory.getLogger("GLOBAL", console.warn, 'color: #687000; font-weight: bold'),
-		info: loggerFactory.getLogger("GLOBAL", console.log, 'color: #687000; font-weight: bold'),
-		error: loggerFactory.getLogger("GLOBAL", console.error, 'color: #687000; font-weight: bold'),
-		http: loggerFactory.getLogger("HTTP", console.log, 'color: green; font-weight: bold'),
-		httpErr: loggerFactory.getLogger("HTTP", console.error, 'color: green; font-weight: bold')
-	};
+	logger = loggerFactory.getLogger("GLOBAL", 'color: #687000; font-weight: bold');
+	httpLogger = loggerFactory.getLogger("HTTP", 'color: green; font-weight: bold');
 	return document.addEventListener("DOMContentLoaded", onload);
 }
 
@@ -304,7 +295,7 @@ var CssUtils = {
 	}
 })();
 
-var Growl = function (message, onclicklistener) {
+var Growl = function (message, onclicklistener, messageDiv) {
 	var self = this;
 	self.growlHolder = growlHolder;
 	self.message = message;
@@ -325,17 +316,19 @@ var Growl = function (message, onclicklistener) {
 	self.remove = function () {
 		if (self.growl.parentNode === self.growlHolder) {
 			self.growlHolder.removeChild(self.growl);
-			// logger.info("Removing growl #{}", self.id)();
+			// logger.log("Removing growl #{}", self.id)();
 		} else {
-			// logger.info("Growl #{} is already removed", self.id)();
+			// logger.log("Growl #{} is already removed", self.id)();
 		}
 	};
 	self.showInfinity = function (growlClass) {
 		self.growl = document.createElement('div');
 		self.growlInner = document.createElement('div');
 		self.growlClose = document.createElement('div');
-		// logger.info("Rendering growl #{}", self.id)();
-		if (self.message) {
+		// logger.log("Rendering growl #{}", self.id)();
+		if (messageDiv) {
+			self.growlInner.appendChild(messageDiv)
+		} else if (self.message) {
 			self.message = self.message.trim();
 			self.growlInner.innerHTML = self.message.indexOf("<") === 0 ? self.message : encodeHTML(self.message);
 		}
@@ -386,23 +379,14 @@ function growlInfo(message) {
 	new Growl(message).info();
 }
 
-function setTheme() {
-	var theme = localStorage.getItem('theme');
-	if (theme != null) {
+function setTheme(theme) {
+	if (theme) {
 		document.body.className = theme;
 	}
 	isMobile && CssUtils.addClass(document.body, 'mobile')
 }
 onDocLoad(function () {
 	muteBtn = $("muteBtn");
-	var sound = localStorage.getItem('sound');
-	if (sound == null) {
-		window.sound = 0;
-	} else {
-		window.sound = sound - 1;
-	}
-	mute();
-	setTheme();
 	ajaxLoader = $("ajaxStatus");
 	if (typeof InstallTrigger !== 'undefined') { // browser = firefox
 		logger.warn("Ops, there's no scrollbar for firefox")();
@@ -446,13 +430,6 @@ function styleInputRange(ir) {
 	document.head.appendChild(inputRangeStyles[id].style);
 }
 
-function mute() {
-	window.sound = (window.sound + 1) % 4;
-	localStorage.sound = window.sound;
-	if (muteBtn) muteBtn.className = volumeIcons[window.sound];
-}
-
-
 function readCookie() {
 	var c, C, i;
 	c = document.cookie.split('; ');
@@ -483,19 +460,27 @@ function ajaxHide() {
  * @param params : object dict of params or DOM form
  * @param callback : function calls on response
  * @param url : string url to post
- * @param form : form in canse form is used
+ * @param formData : form in canse form is used
  * */
-function doPost(url, params, callback, form, isJsonEncoded) {
+function doPost(url, params, callback, formData, isJsonEncoded, process) {
 	var r = new XMLHttpRequest();
 	r.onreadystatechange = function () {
 		if (r.readyState === 4) {
 			if (r.status === 200) {
-				logger.http("POST in {} ::: {};", url, r.response)();
+				httpLogger.log("POST in {} ::: {};", url, r.response)();
 			} else {
-				logger.httpErr("POST out: {} ::: {}, status:", url, r.response, r.status)();
+				httpLogger.error("POST out: {} ::: {}, status:", url, r.response, r.status)();
 			}
 			if (typeof(callback) === "function") {
-				callback(r.response);
+				var error;
+				if (r.status === 0) {
+					error = "No internet connection";
+				} else if (r.status === 200) {
+					error = null;
+				} else {
+					error = "Server error";
+				}
+				callback(r.response, error);
 			} else {
 				logger.warn("Skipping {} callback for POST {}", callback, url)();
 			}
@@ -512,7 +497,7 @@ function doPost(url, params, callback, form, isJsonEncoded) {
 		r.setRequestHeader("Content-Type", 'application/json');
 	} else {
 		/*Firefox doesn't accept null*/
-		data = form == null ? new FormData() : new FormData(form);
+		data = formData ? formData : new FormData();
 
 		if (params) {
 			for (var key in params) {
@@ -521,29 +506,35 @@ function doPost(url, params, callback, form, isJsonEncoded) {
 				}
 			}
 		}
-		var entries = data.entries();
-		if (entries && entries.next) {
-			params = '';
-			var d;
-			while (d = entries.next()) {
-				if (d.done) {
-					break;
+		if (data.entries) {
+			var entries = data.entries();
+			if (entries && entries.next) {
+				params = '';
+				var d;
+				while (d = entries.next()) {
+					if (d.done) {
+						break;
+					}
+					params += d.value[0] + '=' + d.value[1] + '; ';
 				}
-				params += d.value[0] + '=' + d.value[1] + '; ';
 			}
 		}
 	}
 	r.setRequestHeader("X-CSRFToken", readCookie()["csrftoken"]);
 
-	logger.http("POST out {} ::: {}", url, params)();
+	httpLogger.log("POST out {} ::: {}", url, params)();
+	if (process) {
+		process(r);
+	}
 	r.send(data);
+	return r;
 }
 
 
 /**
  * Loads file from server on runtime */
 function doGet(fileUrl, callback) {
-	logger.http("GET out {}", fileUrl)();
+	httpLogger.log("GET out {}", fileUrl)();
 	var regexRes = fileTypeRegex.exec(fileUrl);
 	var fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
 	var fileRef = null;
@@ -570,7 +561,7 @@ function doGet(fileUrl, callback) {
 			xobj.onreadystatechange = function () {
 				if (xobj.readyState === 4) {
 					if (xobj.status === 200) {
-						logger.http('GET in {} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100))();
+						httpLogger.log('GET in {} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100))();
 						if (callback) {
 							if (fileType === 'json') {
 								callback(JSON.parse(xobj.responseText))
@@ -579,7 +570,7 @@ function doGet(fileUrl, callback) {
 							}
 						}
 					} else {
-						logger.httpErr("Unable to load {}, XMLHttpRequest: {}", fileUrl, xobj)();
+						httpLogger.error("Unable to load {}, XMLHttpRequest: {}", fileUrl, xobj)();
 						growlError("<span>Unable to load {}, response code is <b>{}</b>, response: {} <span>".format(fileUrl, xobj.status, xobj.response));
 					}
 				}

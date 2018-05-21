@@ -1,11 +1,21 @@
-var SW_VERSION = '1.0';
+var SW_VERSION = '1.5';
 console.log("%cSW_S startup, version is " + SW_VERSION, 'color: #ffb500; font-weight: bold');
+
+
 var loggerFactory = (function (logsEnabled) {
 	var self = this;
 	self.logsEnabled = logsEnabled;
-	self.dummy = function () {
+	self.dummy = function() {};
+	self.emptyFunction = function() {};
+	self.getLogger = function (initiator, style) {
+		return {
+			warn: self.getSingleLogger(initiator, style, console.warn),
+			log: self.getSingleLogger(initiator, style, console.log),
+			error: self.getSingleLogger(initiator, style, console.error),
+			debug: self.getSingleLogger(initiator, style, console.debug)
+		}
 	};
-	self.getLogger = function (initiator, dest, style) {
+	self.getSingleLogger = function (initiator, style, fn) {
 		return function () {
 			if (!self.logsEnabled) {
 				return self.dummy;
@@ -15,22 +25,17 @@ var loggerFactory = (function (logsEnabled) {
 			var params = [console, '%c' + initiator, style];
 			for (var i = 0; i < parts.length; i++) {
 				params.push(parts[i]);
-				if (args[i]) {
+				if (typeof args[i] !== 'undefined') { // args can be '0'
 					params.push(args[i])
 				}
 			}
-			return Function.prototype.bind.apply(dest, params);
+			return Function.prototype.bind.apply(fn, params);
 		};
 	};
 	return self;
 })(true);
 
-var logger = {
-	warn: loggerFactory.getLogger("SW_S", console.warn, 'color: #ffb500; font-weight: bold'),
-	log: loggerFactory.getLogger("SW_S", console.log, 'color: #ffb500; font-weight: bold'),
-	error: loggerFactory.getLogger("SW_S", console.error, 'color: #ffb500; font-weight: bold')
-};
-
+var logger = loggerFactory.getLogger("SW_S", 'color: #ffb500; font-weight: bold');
 var subScr = null;
 
 // Install Service Worker
@@ -81,14 +86,42 @@ self.addEventListener('push', function (event) {
 				credentials: 'omit',
 				headers: {auth: auth}
 			}).then(function (response) {
-				logger.log("Fetching finished", response)();
-				response.json().then(function (m) {
-					logger.log("Parsed response", m)();
-					var  a = self.registration.showNotification(m.title, m.options);
-					logger.log("{}", a);
-				})
+				logger.log("Fetching finished {}", response)();
+				return response.json();
+			}).then(function (m) {
+				logger.log("Parsed response {}", m)();
+				self.registration.getNotifications().then(function (notifications) {
+					var count = 1;
+					if (m.options && m.options.data) {
+						var room = m.options.data.room;
+						var sender = m.options.data.sender;
+						for (var i = 0; i < notifications.length; i++) {
+							if (room && notifications[i].data.room === room
+									|| (sender && notifications[i].data.sender === sender)) {
+								notifications[i].close();
+								count+= notifications[i].data.replaced || 1;
+							}
+						}
+						if (count > 1) {
+							m.options.data.replaced = count;
+							if (room) {
+								m.title = "Room: " + room + "(+" + count + ")";
+								m.options.body = sender + ':' + m.options.body;
+							} else if (sender) {
+								m.title = sender + "(+" + count + ")";
+							}
+						}
+					}
+					self.registration.showNotification(m.title, m.options);
+					logger.log("Spawned notification {}", m)();
+				});
+
 			}).catch(function (response) {
-				logger.error(response)();
+				if (response.message  === 'Failed to fetch') {
+					logger.error('Got "Failed to fetch" exception while getting message, this could be caused by invalid/self signed certificate, if this during development try to run chrome with  --allow-insecure-localhost --user-data-dir=/tmp/lol')();
+				} else {
+						logger.error('Exception during fetching message: {}', response)();
+				}
 			})
 		} else {
 			logger.error("Auth header is null")();
@@ -98,7 +131,7 @@ self.addEventListener('push', function (event) {
 });
 
 self.addEventListener('notificationclick', function (event) {
-	logger.log('On notification click: {}', event.notification.tag);
+	logger.log('On notification click: {}', event.notification.tag)();
 	// Android doesn’t close the notification when you click on it
 	// See: http://crbug.com/463146
 	event.notification.close();
@@ -108,14 +141,15 @@ self.addEventListener('notificationclick', function (event) {
 	event.waitUntil(clients.matchAll({
 		type: 'window'
 	}).then(function (clientList) {
-		for (var i = 0; i < clientList.length; i++) {
-			var client = clientList[i];
-			if (client.url === '/' && 'focus' in client) {
-				return client.focus();
-			}
-		}
-		if (clients.openWindow && event.notification.data) {
-			return clients.openWindow(event.notification.data.url);
+		var roomId = event.notification.data && event.notification.data.roomId;
+		if (clientList && clientList[0] && roomId) {
+			clientList[0].navigate('/#/chat/' + roomId)
+		} else if (clientList && clientList[0]) {
+			clientList[0].focus()
+		} else if (roomId) {
+			clients.openWindow('/#/chat/' + roomId);
+		} else {
+			clients.openWindow('/');
 		}
 	}));
 });

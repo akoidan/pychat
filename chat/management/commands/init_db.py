@@ -14,6 +14,5 @@ class Command(BaseCommand):
 		#python manage.py syncdb --all
 		#python manage.py migrate --fake
 		call_command('makemigrations', 'chat')
-		call_command('migrate')
-		Room.objects.get_or_create(id=ALL_ROOM_ID, name=ALL_REDIS_ROOM)
+		call_command('migrate', 'auth')
 		# call_command('syncdb')

@@ -24,6 +24,27 @@
 	i:before
 		transform: translate(0, 3px)
 
+.search
+	padding: 5px
+	> *
+		display: inline-block
+	input
+		width: calc(100% - 10px)
+	&.loading
+		.search-loading
+			margin-left: 5px
+			margin-bottom: -5px
+			margin-top: -3px
+			@include spinner(3px, white)
+		input
+			width: calc(100% - 40px)
+
+	.search_result
+		display: flex
+		justify-content: center
+		padding-top: 10px
+
+
 fieldset
 	border-top: 1px solid #aaa
 	border-bottom: none
@@ -87,6 +108,9 @@ fieldset
 		outline: none
 	a:hover
 		text-decoration: underline
+	&.display-search-only
+		>:not(.filter-search)
+			display: none
 
 	pre
 		margin: 10px
@@ -100,14 +124,14 @@ fieldset
 		max-height: 400px
 		display: block
 
-	iframe
+	.video-player-ready
 		border: none
 		@include margin-img-def
 		width: 500px
 		height: 350px
 		@include margin-img
 
-	.youtube-player
+	%img-play
 		@extend %user-select-none
 		display: block
 		@include margin-img
@@ -136,6 +160,10 @@ fieldset
 					margin-left: -45px
 					height: 70px
 					width: 70px
+	.youtube-player
+		@extend %img-play
+	.video-player
+		@extend %img-play
 
 	.giphy
 		position: relative
@@ -151,7 +179,7 @@ fieldset
 			width: 100px
 			height: 36px
 
-	img.B4j2ContentEditableImg
+	.B4j2ContentEditableImg
 		@include margin-img-def
 		@include margin-img
 	p
@@ -275,6 +303,12 @@ nav
 .max-height-scrollable
 	overflow-y: auto
 
+.active-user
+	border: $user-context-border !important
+	border-radius: 5px 5px 0 0
+	transition: 0.3s
+	transition-property: background-color, border
+
 #chat-user-table > ul,
 ul#directUserTable
 	display: flex
@@ -292,11 +326,6 @@ ul#directUserTable
 		border-radius: 3px
 		[class^='icon-']
 			opacity: 1
-		&.active-user
-			border: $user-context-border
-			border-radius: 5px 5px 0 0
-			transition: 0.3s
-			transition-property: background-color, border
 		@include fix-user-icon-top-position
 		i:hover
 			cursor: inherit
@@ -320,7 +349,7 @@ ul#directUserTable
 		padding: 5px 10px
 		display: inline-block
 		> *
-			display: block
+			display: block !important
 	%hideEl
 		display: inline-block
 		vertical-align: top
@@ -410,6 +439,7 @@ ul#directUserTable
 
 .toolsAndCanvas
 	display: flex
+	$two-columns-painter: 600px
 	#painterTools
 		display: flex
 		margin-left: -5px
@@ -418,7 +448,7 @@ ul#directUserTable
 		*
 			display: flex
 			padding: 5px 5px 5px 0
-		@media screen and (max-height: 600px)
+		@media screen and (max-height: $two-columns-painter)
 			width: 60px
 			flex-direction: row
 			flex-wrap: wrap
@@ -428,8 +458,10 @@ ul#directUserTable
 		// select none prevent paste event  https://stackoverflow.com/questions/31207253/onpaste-paste-event-not-firing-for-table-on-first-few-attempts
 		//@extend %user-select-none
 		background-color: #313131
-		max-height: calc(95vh - 100px)
-		max-width: calc(90vw - 80px)
+		max-height: calc(100vh - 95px)
+		max-width: calc(100vw - 60px)
+		@media screen and (max-height: $two-columns-painter)
+			max-width: calc(100vw - 90px)
 		border: 1px solid transparent
 		//border: 1px solid #697075
 		#painter
@@ -544,7 +576,7 @@ ul#directUserTable
 		@extend %hovered-user-room
 		&:hover
 			padding-right: 25px
-			.icon-cancel-circled-outline
+			.icon-cog
 				display: inline
 
 #rooms li
@@ -555,12 +587,24 @@ ul#directUserTable
 	margin-left: $padding
 	margin-right: $padding
 
-	.icon-cancel-circled-outline
+	.icon-cog
 		display: none
 		position: absolute
 		top: 2px
 		right: 0
 		background: transparent
+
+#roomSettings
+	table
+		input[type=button]
+			width: 100%
+		td
+			padding: 5px 0
+		th
+			padding-right: 5px
+	[for=roomSettNotifications]
+		margin: auto
+
 
 @media screen and (max-width: $collapse-width)
 	#wrapper
@@ -754,7 +798,6 @@ ul#directUserTable
 
 	*
 		background-color: transparent !important
-		display: inline !important
 		color: inherit !important
 		font-size: inherit !important
 		font-family: inherit !important
@@ -1092,6 +1135,9 @@ ul#directUserTable
 	video
 		max-height: calc(60vh - 120px)
 		max-width: 100%
+		background-color: #630000
+		&.connected
+			background-color: #165620
 	> div
 		@extend %asbolute
 		bottom: 5px

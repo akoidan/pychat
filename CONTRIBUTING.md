@@ -1,20 +1,18 @@
 Table of contents
 =================
   * [Draw-io uml diagramm](#draw-io)
-  * [Djangochat-config submodule](#djangochat-config)
   * [Frontend logging](#frontend-logging)
   * [Smileys](#smileys)
   * [Icons](#icons)
   * [Database migrations](#database-migrations)
-  * [Jetbrains filewatcher](#jetbrains-filewatcher)
 
 draw-io
 =======
-Webrtc frontend classes diagram you can find [here](https://www.draw.io/?lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=draw.io-uml_diagram.xml#Uhttps%3A%2F%2Fraw.githubusercontent.com%2FDeathangel908%2Fdjangochat%2Fmaster%2Fdraw.io-uml_diagram.xml).
+Webrtc frontend classes diagram you can find [here](https://www.draw.io/?lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=draw.io-uml_diagram.xml#Uhttps%3A%2F%2Fraw.githubusercontent.com%2FDeathangel908%2Fpychat%2Fmaster%2Fdraw.io-uml_diagram.xml).
 
 download_content.sh
 ===================
-Execute `sh download_content.sh` it will show you help.
+Execute `bash download_content.sh` it will show you help.
 
 
 Frontend logging
@@ -27,7 +25,12 @@ By default pychat uses standard  [commfort](http://www.commfort.com/en/) chat  [
 
 Icons
 =====
-Chat uses [fontello](fontello.com) and its api for icons. You can easily edit fonts via your browser, just execute `sh download_content.sh fonts_session`. Make your changes and hit "Save session". Then execute `sh download_content.sh download_fontello`. If you did everything right new icons should appear in [demo.html](https://127.0.0.1:8000/static/demo.html)
+Chat uses [fontello](fontello.com) and its api for icons. You can easily edit fonts via your browser, just execute `bash download_content.sh fonts_session`. Make your changes and hit "Save session". Then execute `sh download_content.sh download_fontello`. If you did everything right new icons should appear in [demo.html](https://127.0.0.1:8000/static/demo.html)
+
+Sustaining online protocol
+=============
+Server pings clients every PING_INTERVAL miliseconds. If client doesn't respond with pong in PING_CLOSE_JS_DELAY, server closes the connection. If ther're multiple tornado processes if can specify port for main process with MAIN_TORNADO_PROCESS_PORT. In turn the client expects to be pinged by the server, if client doesn't receive ping event it will close the connection as well. As well page has window listens for focus and sends ping event when it receives it, this is handy for situation when pc suspends from ram.
+
 
 Database migrations
 ===================
@@ -44,7 +47,7 @@ If you want to locally test it:
 
 Tp publish extension:
  - If you want to update existing extension don't forget to increment `version` in [manifest.json](package/manifest.json).
- - Zip [screen_cast_extension](screen_cast_extension) directory into e.g. `sh download_content.sh zip_extension`
+ - Zip [screen_cast_extension](screen_cast_extension) directory into e.g. `bash download_content.sh zip_extension`
  - Upload archive `extension.zip` to [chrome webstore](https://chrome.google.com/webstore/developer/dashboard) (Note, you need to have a developer account, that's 5$ worth atm).
 
 WEB Rtc connection establishment
@@ -82,13 +85,3 @@ The string `rsok33GN:0005:EJAd` describes:
  - `rsok33GN` is ID of CallHandler
  - `0005` is Id of user
  - `EJAd` id of connection (`TornadoHandler.id`)
-
-Jetbrains filewatcher:
-======================
-I use the latest [sassc](https://github.com/sass/sassc) implementation for libsass, since it's the fastest ones, along with chrome workspace feature you can edit sass directly in browser or with jetbrains filewatcher. Latest sassc also allows inline sourcemap (base64 map directly in css file) that correctly shows source files in chrome. `--sourcemap=inline` does that. If your sassc doesn't have inline sourcemap support, please remove flag from argument command below. Also you you use any implementation you want, it's just a suggestion.
-
-Go to Jetbrains `Settings` (alt+shift+s) -> `Tools` -> `FileWatchers` -> `Click add` -> `Sass`:
-
- 1. arguments: `--no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded`. Or for newest sass `$FilePath$ $ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --sourcemap=inline`
- 2. working directory: `$ProjectFileDir$/chat/static/sass`
- 3. output files to refresh: `$ProjectFileDir$/chat/static/css/`

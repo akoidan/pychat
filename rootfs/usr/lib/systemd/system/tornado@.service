@@ -1,0 +1,20 @@
+[Unit]
+Description=Websocket server on port %I
+Requires=tornado.service
+Before=tornado.service
+BindsTo=tornado.service
+
+[Service]
+ExecStart=/srv/http/pychat/manage.py start_tornado --port %I --keep_online
+SyslogIdentifier=tornado-%i
+SuccessExitStatus=30
+Environment=PYCHAT_CONFIG=prod
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+Restart=always
+Type=simple
+NotifyAccess=all
+User=http
+
+[Install]
+WantedBy=tornado.service

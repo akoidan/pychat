@@ -1,38 +1,40 @@
 # -*- encoding: utf-8 -*-
 import datetime
 import json
-
+import logging
 import os
-from django.conf import settings
+
 from django.contrib.auth import authenticate
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
+from django.contrib.auth.hashers import make_password
+from django.core.mail import mail_admins
 
 from chat.templatetags.md5url import md5url
+from chat.tornado.message_creator import MessagesCreator
 
 try:
 	from django.template.context_processors import csrf
 except ImportError:
 	from django.core.context_processors import csrf
-from django.core.exceptions import ObjectDoesNotExist, ValidationError
+from django.core.exceptions import ObjectDoesNotExist, ValidationError, PermissionDenied
 from django.db import transaction
-from django.db.models import Count, Q, F
+from django.db.models import Count, Q
 from django.http import Http404
-from django.utils.timezone import utc
 from django.http import HttpResponse
-from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 from django.views.generic import View
 from chat import utils
-from chat.decorators import login_required_no_redirect
+from chat.decorators import login_required_no_redirect, validation
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
-from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription
-from chat.settings import VALIDATION_IS_OK, DATE_INPUT_FORMATS_JS, logging, EXTENSION_ID, EXTENSION_INSTALL_URL, \
-	ALL_ROOM_ID,  STATIC_ROOT
+from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
+	SubscriptionMessages, RoomUsers, Room, UserJoinedInfo, UploadedFile
+from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
-	create_user_model, check_captcha, send_reset_password_email
+	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip, \
+	send_password_changed, send_email_change, send_new_email_ver, get_message_images_videos
 
 logger = logging.getLogger(__name__)
 RECAPTCHA_PUBLIC_KEY = getattr(settings, "RECAPTCHA_PUBLIC_KEY", None)
@@ -41,7 +43,6 @@ GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
 GOOGLE_OAUTH_2_JS_URL = getattr(settings, "GOOGLE_OAUTH_2_JS_URL", None)
 FACEBOOK_APP_ID = getattr(settings, "FACEBOOK_APP_ID", None)
 FACEBOOK_JS_URL = getattr(settings, "FACEBOOK_JS_URL", None)
-FIREBASE_API_KEY = getattr(settings, "FIREBASE_API_KEY", None)
 
 # TODO doesn't work
 def handler404(request):
@@ -49,69 +50,137 @@ def handler404(request):
 
 
 @require_http_methods(['POST'])
+@validation
 def validate_email(request):
 	"""
 	POST only, validates email during registration
 	"""
-	email = request.POST.get('email')
-	try:
-		utils.check_email(email)
-		response = VALIDATION_IS_OK
-	except ValidationError as e:
-		response = e.message
-	return HttpResponse(response, content_type='text/plain')
+	utils.check_email(request.POST.get('email'))
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+
+
+@require_http_methods(['POST'])
+@login_required_no_redirect(False)
+@transaction.atomic
+def upload_file(request):
+	"""
+	POST only, validates email during registration
+	"""
+	logger.debug('Uploading file %s', request.POST)
+	res = []
+	for file in request.FILES:
+		uf = UploadedFile(symbol=file[1], user=request.user, file=request.FILES[file], type_enum=UploadedFile.UploadedFileChoices(file[0]))
+		uf.save()
+		res.append(uf.id)
+	return HttpResponse(json.dumps(res), content_type='application/json')
+
+
+@require_http_methods(['POST'])
+@login_required_no_redirect(False)
+@transaction.atomic
+def save_room_settings(request):
+	"""
+	POST only, validates email during registration
+	"""
+	logger.debug('save_room_settings request,  %s', request.POST)
+	room_id = request.POST['roomId']
+	room_name = request.POST.get('roomName')
+	updated = RoomUsers.objects.filter(room_id=room_id, user_id=request.user.id).update(
+		volume=request.POST['volume'],
+		notifications=request.POST['notifications'] == 'true',
+	)
+	if updated != 1:
+		raise PermissionDenied
+	if room_name is not None:
+		room_name = room_name.strip()
+		if room_name and int(room_id) != settings.ALL_ROOM_ID:
+			Room.objects.filter(id=room_id).update(name = room_name)
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 
 @require_http_methods('GET')
+@transaction.atomic
 def get_firebase_playback(request):
 	registration_id = request.META['HTTP_AUTH']
-	user_id = Subscription.objects.values_list('user_id', flat=True).get(registration_id=registration_id)
-	off_mess = Message.objects.filter(
-		id__gt=F('room__roomusers__last_read_message_id'),
-		deleted=False,
-		room__roomusers__user_id=user_id
-	)
-	d = off_mess.select_related("sender__username").order_by("-time")[:1]
-	if len(d) > 0:
-		message = list(d)[0]
-		data = {
-			'title': message.sender.username,
-			'options': {
-				'body': message.content,
-				'icon': md5url('images/favicon.ico'),
-				'data': {
-					'url': '/#/chat/' + str(message.room_id)
-				}
+	logger.debug('Firebase playback, id %s', registration_id)
+	query_sub_message = SubscriptionMessages.objects.filter(subscription__registration_id=registration_id, received=False).order_by('-message__time')[:1]
+	sub_message = query_sub_message[0]
+	SubscriptionMessages.objects.filter(id=sub_message.id).update(received=True)
+	message = Message.objects.select_related("sender__username", "room__name").get(id=sub_message.message_id)
+	data = {
+		'title': message.sender.username,
+		'options': {
+			'body': message.content,
+			'icon': md5url('images/favicon.ico'),
+			'data': {
+				'id': sub_message.message_id,
+				'sender': message.sender.username,
+				'room': message.room.name,
+				'roomId': message.room_id
 			},
-		}
-		return HttpResponse(json.dumps(data), content_type='application/json')
-	else:
-		return HttpResponse("No new messages found", content_type='text/plain')
+			'requireInteraction': True
+		},
+	}
+	return HttpResponse(json.dumps(data), content_type='application/json')
+
+
+def test(request):
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+
+
+@require_http_methods('POST')
+@login_required_no_redirect(False)
+@validation
+def search_messages(request):
+	data = request.POST['data']
+	room_id = request.POST['room']
+	offset = int(request.POST['offset'])
+	if not RoomUsers.objects.filter(room_id=room_id, user_id=request.user.id).exists():
+		raise ValidationError("You can't access this room")
+	messages = Message.objects.filter(content__icontains=data, room_id=room_id).order_by('-id')[offset:offset+settings.MESSAGES_PER_SEARCH]
+	imv = get_message_images_videos(messages)
+	result = []
+	for message in messages:
+		files = MessagesCreator.prepare_img_video(imv, message.id)
+		prep_m = MessagesCreator.create_message(message, files)
+		result.append(prep_m)
+	response = json.dumps(result)
+	return HttpResponse(response, content_type='application/json')
 
 
 @require_http_methods('POST')
 def register_subscription(request):
+	logger.debug('Subscription request,  %s', request)
 	registration_id = request.POST['registration_id']
-	Subscription.objects.update_or_create(registration_id=registration_id, defaults={ 'user': request.user})
-	return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
+	agent = request.POST['agent']
+	is_mobile = request.POST['is_mobile']
+	ip = get_or_create_ip(get_client_ip(request), logger)
+	Subscription.objects.update_or_create(
+		registration_id=registration_id,
+		defaults={
+			'user': request.user,
+			'inactive': False,
+			'updated': datetime.datetime.now(),
+			'agent': agent,
+			'is_mobile': is_mobile == 'true',
+			'ip': ip
+		}
+	)
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 @require_http_methods('POST')
+@validation
 def validate_user(request):
 	"""
 	Validates user during registration
 	"""
-	try:
-		username = request.POST.get('username')
-		utils.check_user(username)
-		# hardcoded ok check in register.js
-		message = VALIDATION_IS_OK
-	except ValidationError as e:
-		message = e.message
-	return HttpResponse(message, content_type='text/plain')
+	utils.check_user(request.POST.get('username'))
+	# hardcoded ok check in register.js
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 
 def get_service_worker(request):  # this stub is only for development, this is replaced in nginx for prod
-	worker = open(os.path.join(STATIC_ROOT, 'js', 'sw.js'), 'rb')
+	worker = open(os.path.join(settings.STATIC_ROOT, 'js', 'sw.js'), 'rb')
 	response = HttpResponse(content=worker)
 	response['Content-Type'] = 'application/javascript'
 	return response
@@ -124,16 +193,25 @@ def home(request):
 	@return:  the x intercept of the line M{y=m*x+b}.
 	"""
 	context = csrf(request)
-	up = UserProfile.objects.defer('suggestions', 'notifications', 'cache_messages', 'highlight_code', 'embedded_youtube').get(id=request.user.id)
+	ip = get_client_ip(request)
+	if not UserJoinedInfo.objects.filter(Q(ip__ip=ip) & Q(user=request.user)).exists():
+		ip_obj = get_or_create_ip(ip, logger)
+		UserJoinedInfo.objects.create(ip=ip_obj, user=request.user)
+	up = UserProfile.objects.defer('suggestions', 'highlight_code', 'embedded_youtube', 'online_change_sound', 'incoming_file_call_sound', 'message_sound', 'theme').get(id=request.user.id)
 	context['suggestions'] = up.suggestions
-	context['notifications'] = up.notifications
-	context['cache_messages'] = up.cache_messages
 	context['highlight_code'] = up.highlight_code
+	context['message_sound'] = up.message_sound
+	context['incoming_file_call_sound'] = up.incoming_file_call_sound
+	context['online_change_sound'] = up.online_change_sound
+	context['theme'] = up.theme
 	context['embedded_youtube'] = up.embedded_youtube
-	context['extensionId'] = EXTENSION_ID
-	context['extensionUrl'] = EXTENSION_INSTALL_URL
-	context['defaultRoomId'] = ALL_ROOM_ID
-	context['manifest'] = FIREBASE_API_KEY is not None
+	context['extensionId'] = settings.EXTENSION_ID
+	context['extensionUrl'] = settings.EXTENSION_INSTALL_URL
+	context['defaultRoomId'] = settings.ALL_ROOM_ID
+	context['pingCloseDelay'] = settings.PING_CLOSE_JS_DELAY
+	context['pingServerCloseDelay'] = settings.CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT
+	context['MESSAGES_PER_SEARCH'] = settings.MESSAGES_PER_SEARCH
+	context['manifest'] = hasattr(settings, 'FIREBASE_API_KEY')
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
 
@@ -142,8 +220,12 @@ def logout(request):
 	"""
 	POST. Logs out into system.
 	"""
+	registration_id = request.POST.get('registration_id')
+	if registration_id is not None:
+		Subscription.objects.filter(registration_id=registration_id).delete()
 	djangologout(request)
-	return HttpResponseRedirect('/')
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+
 
 @require_http_methods(['POST'])
 def auth(request):
@@ -155,7 +237,7 @@ def auth(request):
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		djangologin(request, user)
-		message = VALIDATION_IS_OK
+		message = settings.VALIDATION_IS_OK
 	else:
 		message = 'Login or password is wrong'
 	logger.debug('Auth request %s ; Response: %s', hide_fields(request.POST, ('password',)), message)
@@ -176,7 +258,7 @@ def send_restore_password(request):
 		verification = Verification(type_enum=Verification.TypeChoices.password, user_id=user_profile.id)
 		verification.save()
 		send_reset_password_email(request, user_profile, verification)
-		message = VALIDATION_IS_OK
+		message = settings.VALIDATION_IS_OK
 		logger.debug('Verification email has been send for token %s to user %s(id=%d)',
 				verification.token, user_profile.username, user_profile.id)
 	except UserProfile.DoesNotExist:
@@ -188,60 +270,60 @@ def send_restore_password(request):
 	return HttpResponse(message, content_type='text/plain')
 
 
-def get_html_restore_pass():
-	""""""
+@require_http_methods(['GET'])
+def proceed_email_changed(request):
+	try:
+		with transaction.atomic():
+			token = request.GET['token']
+			logger.debug('Proceed change email with token %s', token)
+			user, verification = utils.get_user_by_code(token, Verification.TypeChoices.email)
+			new_ver = send_new_email_ver(request, user, verification.email)
+			user.email = verification.email
+			user.email_verification = new_ver
+			user.save(update_fields=('email', 'email_verification'))
+			verification.verified = True
+			verification.save(update_fields=('verified',))
+			logger.info('Email has been change for token %s user %s(id=%d)', token, user.username, user.id)
+			return render_to_response(
+				'email_changed.html',
+				{'text': 'Your email has been changed to {}.'.format(verification.email)},
+				context_instance=RequestContext(request)
+			)
+	except Exception as e:
+		return render_to_response(
+			'email_changed.html',
+			{'text': 'Unable to change your email because {}'.format(e.message)}
+			, context_instance=RequestContext(request)
+		)
+
 
 class RestorePassword(View):
 
-	def get_user_by_code(self, token):
-		"""
-		:param token: token code to verify
-		:type token: str
-		:raises ValidationError: if token is not usable
-		:return: UserProfile, Verification: if token is usable
-		"""
-		try:
-			v = Verification.objects.get(token=token)
-			if v.type_enum != Verification.TypeChoices.password:
-				raise ValidationError("it's not for this operation ")
-			if v.verified:
-				raise ValidationError("it's already used")
-			# TODO move to sql query or leave here?
-			if v.time < datetime.datetime.utcnow().replace(tzinfo=utc) - datetime.timedelta(days=1):
-				raise ValidationError("it's expired")
-			return UserProfile.objects.get(id=v.user_id), v
-		except Verification.DoesNotExist:
-			raise ValidationError('Unknown verification token')
-
 	@transaction.atomic
+	@validation
 	def post(self, request):
 		"""
 		Sends email verification token
 		"""
 		token = request.POST.get('token', False)
-		try:
-			logger.debug('Proceed Recover password with token %s', token)
-			user, verification = self.get_user_by_code(token)
-			password = request.POST.get('password')
-			check_password(password)
-			user.set_password(password)
-			user.save(update_fields=('password',))
-			verification.verified = True
-			verification.save(update_fields=('verified',))
-			logger.info('Password has been change for token %s user %s(id=%d)', token, user.username, user.id)
-			response = VALIDATION_IS_OK
-		except ValidationError as e:
-			logger.debug('Rejecting verification token %s because %s', token, e)
-			response = "".join(("You can't reset password with this token because ", str(e)))
-		return HttpResponse(response, content_type='text/plain')
+		logger.debug('Proceed Recover password with token %s', token)
+		user, verification = utils.get_user_by_code(token, Verification.TypeChoices.password)
+		password = request.POST.get('password')
+		check_password(password)
+		user.set_password(password)
+		user.save(update_fields=('password',))
+		verification.verified = True
+		verification.save(update_fields=('verified',))
+		logger.info('Password has been change for token %s user %s(id=%d)', token, user.username, user.id)
+		return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 	def get(self, request):
 		token = request.GET.get('token', False)
 		logger.debug('Rendering restore password page with token  %s', token)
 		try:
-			user = self.get_user_by_code(token)[0]
+			user = utils.get_user_by_code(token, Verification.TypeChoices.password)[0]
 			response = {
-				'message': VALIDATION_IS_OK,
+				'message': settings.VALIDATION_IS_OK,
 				'restore_user': user.username,
 				'token': token
 			}
@@ -263,7 +345,7 @@ def confirm_email(request):
 			v = Verification.objects.get(token=token)
 		except Verification.DoesNotExist:
 			raise ValidationError('Unknown verification token')
-		if v.type_enum != Verification.TypeChoices.register:
+		if v.type_enum not in (Verification.TypeChoices.register, Verification.TypeChoices.confirm_email):
 			raise ValidationError('This is not confirm email token')
 		if v.verified:
 			raise ValidationError('This verification token already accepted')
@@ -272,7 +354,7 @@ def confirm_email(request):
 			raise ValidationError('Verification token expired because you generated another one')
 		v.verified = True
 		v.save(update_fields=['verified'])
-		message = VALIDATION_IS_OK
+		message = settings.VALIDATION_IS_OK
 		logger.info('Email verification token %s has been accepted for user %s(id=%d)', token, user.username, user.id)
 	except Exception as e:
 		logger.debug('Rejecting verification token %s because %s', token, e)
@@ -302,19 +384,23 @@ def statistics(request):
 	return HttpResponse(json.dumps(list(pie_data)), content_type='application/json')
 
 
-@login_required_no_redirect()
 @transaction.atomic
 def report_issue(request):
 	logger.info('Saving issue: %s', hide_fields(request.POST, ('log',), huge=True))
-	issue = Issue.objects.get_or_create(content=request.POST['issue'])[0]
+	issue_text = request.POST['issue']
+	issue = Issue.objects.get_or_create(content=issue_text)[0]
 	issue_details = IssueDetails(
 		sender_id=request.user.id,
 		browser=request.POST.get('browser'),
 		issue=issue,
 		log=request.POST.get('log')
 	)
+	try:
+		mail_admins("{} reported issue".format(request.user.username), issue_text, fail_silently=True)
+	except Exception as e:
+		logging.error("Failed to send issue email because {}".format(e))
 	issue_details.save()
-	return HttpResponse(VALIDATION_IS_OK, content_type='text/plain')
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 
 class ProfileView(View):
@@ -325,23 +411,55 @@ class ProfileView(View):
 		form = UserProfileForm(instance=user_profile)
 		c = csrf(request)
 		c['form'] = form
-		c['date_format'] = DATE_INPUT_FORMATS_JS
+		c['date_format'] = settings.DATE_INPUT_FORMATS_JS
 		return render_to_response('change_profile.html', c, context_instance=RequestContext(request))
 
+
+	@transaction.atomic
 	@login_required_no_redirect()
+	@validation # should follow after transaciton.atomic, thus ValidationError doesn't rollback
 	def post(self, request):
 		logger.info('Saving profile: %s', hide_fields(request.POST, ("base64_image", ), huge=True))
 		user_profile = UserProfile.objects.get(pk=request.user.id)
 		image_base64 = request.POST.get('base64_image')
-
+		new_email = request.POST['email']
+		if not new_email:
+			new_email = None
+		if new_email:
+			utils.validate_email(new_email)
+		utils.validate_user(request.POST['username'])
 		if image_base64 is not None:
 			image = extract_photo(image_base64)
 			request.FILES['photo'] = image
-
+		passwd = request.POST['password']
+		if passwd:
+			if request.user.password:
+				is_valid = authenticate(username=request.user.username, password=request.POST['old_password'])
+				if not is_valid:
+					return HttpResponse("Invalid old password", content_type='text/plain')
+			utils.check_password(passwd)
+			request.POST['password'] = make_password(passwd)
 		form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 		if form.is_valid():
+			if not passwd:
+				form.instance.password = form.initial['password']
+			if new_email != form.initial['email']:
+				if form.initial['email'] and form.instance.email_verification and  form.instance.email_verification.verified:
+					verification = Verification(
+						type_enum=Verification.TypeChoices.email,
+						user_id=user_profile.id,
+						email=new_email
+					)
+					verification.save()
+					send_email_change(request, request.user.username, form.initial['email'], verification, new_email)
+					raise ValidationError("In order to change an email please confirm it from you current address. We send you an verification email to {}.".format(form.initial['email']))
+				if new_email:
+					new_ver = send_new_email_ver(request, request.user, new_email)
+					form.instance.email_verification = new_ver
 			profile = form.save()
-			response = profile. photo.url if 'photo' in  request.FILES else VALIDATION_IS_OK
+			if passwd and form.initial['email']:
+				send_password_changed(request, form.initial['email'])
+			response = profile. photo.url if 'photo' in  request.FILES else settings.VALIDATION_IS_OK
 		else:
 			response = form.errors
 		return HttpResponse(response, content_type='text/plain')
@@ -364,24 +482,20 @@ class RegisterView(View):
 		return render_to_response("register.html", c, context_instance=RequestContext(request))
 
 	@transaction.atomic
+	@validation
 	def post(self, request):
-		try:
-			rp = request.POST
-			logger.info('Got register request %s', hide_fields(rp, ('password', 'repeatpassword')))
-			(username, password, email) = (rp.get('username'), rp.get('password'), rp.get('email'))
-			check_user(username)
-			check_password(password)
-			check_email(email)
-			user_profile = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
-			user_profile.set_password(password)
-			create_user_model(user_profile)
-			# You must call authenticate before you can call login
-			auth_user = authenticate(username=username, password=password)
-			message = VALIDATION_IS_OK  # redirect
-			if email:
-				send_sign_up_email(user_profile, request.get_host(), request)
-			djangologin(request, auth_user)
-		except ValidationError as e:
-			message = e.message
-			logger.debug('Rejecting request because "%s"', message)
-		return HttpResponse(message, content_type='text/plain')
+		rp = request.POST
+		logger.info('Got register request %s', hide_fields(rp, ('password', 'repeatpassword')))
+		(username, password, email) = (rp.get('username'), rp.get('password'), rp.get('email'))
+		check_user(username)
+		check_password(password)
+		check_email(email)
+		user_profile = UserProfile(username=username, email=email, sex_str=rp.get('sex'))
+		user_profile.set_password(password)
+		create_user_model(user_profile)
+		# You must call authenticate before you can call login
+		auth_user = authenticate(username=username, password=password)
+		if email:
+			send_sign_up_email(user_profile, request.get_host(), request)
+		djangologin(request, auth_user)
+		return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')

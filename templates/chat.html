@@ -18,10 +18,14 @@
 		var loggedUserId = {{ userid }};
 		var NOTIFICATION_ICON_URL = "{% md5url 'images/favicon.ico' %}";
 		var suggestions = {{ suggestions |yesno:"true,false" }};
-		var notifications = {{ notifications |yesno:"true,false" }};
-		var cacheMessages = {{ cache_messages |yesno:"true,false" }};
 		var manifest = {{ manifest |yesno:"true,false" }};
+		var PING_CLOSE_JS_DELAY = {{ pingCloseDelay }};
+		var CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = {{ pingServerCloseDelay }};
+		var MESSAGES_PER_SEARCH = {{ MESSAGES_PER_SEARCH }};
 		window.highlightCode = {{ highlight_code |yesno:"true,false" }};
+		window.onlineChangeSound = {{ online_change_sound |yesno:"true,false" }};
+		window.incomingFileCallSound = {{ incoming_file_call_sound |yesno:"true,false" }};
+		window.messageSound = {{ message_sound |yesno:"true,false" }};
 		window.embeddedYoutube = {{ embedded_youtube |yesno:"true,false" }};
 	</script>
 	  {% if highlight_code %}
@@ -36,25 +40,24 @@
 {% block content %}
 	<nav class="noSelection" id="navbar">
 		<a class="icon-home" href="/" title="Go home" onclick="event.preventDefault(); singlePage.showDefaultPage();"><span class="mText">Home</span></a>
-		<i id="muteBtn" class="icon-volume-off" title="Turn on or off sounds" onclick="mute();"><span class="mText">Volume</span></i>
 		<i class="icon-brush" title="Draw an Image" id="paintOpen">
 			<span class="mText">Painter</span>
 		</i>
 		<a href="/#/report_issue" class="icon-pencil" title="report an issue"
 			onclick="event.preventDefault(); singlePage.showPage('/report_issue')"><span class="mText">Issue</span></a>
 		<i class="icon-phone hidden" id="navCallIcon" title="Make a video/mic call"><span class="mText">Call</span></i>
+		<i class="icon-search hidden" id="navSearchIcon" title="Search messages in current room (Shift+Ctrl+F)"><span class="mText">Search</span></i>
 		<a href="/#/statistics" class="icon-chart-pie" onclick="event.preventDefault(); singlePage.showPage('/statistics')" title="Show user countries statistics"><span class="mText">statistics</span></a>
 		<i class="icon-doc-inv hidden" id="webRtcFileIcon"><span class="mText">Send File</span></i>
 		<i class="icon-popup hidden" id="minimizedWindows"><span class="mText">Minimized Winows</span></i>
-		<a href="https://github.com/Deathangel908/djangochat" class="icon-github"><span class="mText">Github</span></a>
+		<a href="https://github.com/Deathangel908/pychat" target="_blank" class="icon-github"><span class="mText">Github</span></a>
 		<div id="navMenu">
 			<span id="onlineStatus" title="Online status" class="offline">●</span>
 			<span id='headerText' class="username"></span>
 			<i class="icon-menu" title="Open Menu" ></i>
 		</div>
 		<a  href="/#/profile" title="Settings" onclick="event.preventDefault(); singlePage.showPage('/profile')" class="icon-wrench"> <span class="mText">Profile</span></a>
-		<a id="exit" rel="nofollow" href="{% url 'chat.views.logout' %}" onclick="channelsHandler.clearChannelHistory()">
-			<i title="Sign out" class="icon-sign-out"><span class="mText">sign out</span></i> </a>
+		<i title="Sign out" id="singout" class="icon-sign-out"><span class="mText">sign out</span></i>
 	</nav>
 	<div>
 		<audio id="chatIncoming" src="{% md5url 'sounds/ChatIncoming.wav' %}" preload="none"></audio>
@@ -71,16 +74,9 @@
 				<li onclick="channelsHandler.m2EditMessage()">Edit message</li>
 				<li onclick="channelsHandler.m2DeleteMessage()">Delete message</li>
 			</ul>
-		<div id="callContainer">
-		</div>
+			<div id="callContainer"></div>
 		</div>
 		<div id="chat-room-users-wrapper">
-			<ul id="user-context-menu" class="hidden">
-				<li onclick="channelsHandler.m2Call()">Call</li>
-				<li onclick="channelsHandler.m2TransferFile()">Transfer file</li>
-				<li onclick="channelsHandler.viewProfile()">View profile</li>
-				<li onclick="channelsHandler.createDirectChannel()">Write message </li>
-			</ul>
 			<span>
 				<span id="directMinifier" name="direct" class="icon-angle-circled-up"></span>
 				<span id="directStateText">direct  messages</span>
@@ -105,11 +101,58 @@
 			<ul id="tabNames"></ul>
 		</div>
 	</div>
+	<ul id="user-context-menu" class="hidden">
+		<li onclick="channelsHandler.m2Call()">Call</li>
+		<li onclick="channelsHandler.m2TransferFile()">Transfer file</li>
+		<li onclick="channelsHandler.viewProfile()">View profile</li>
+		<li onclick="channelsHandler.createDirectChannel()">Write message </li>
+		<li onclick="channelsHandler.m2QuoteMessage(event)">Quote </li>
+	</ul>
 	<div id="addUserHolder" class="hidden">
 		<div>
 			<input type="search" placeholder="Search" title="Filter by username" id="addUserInput"/>
 			<ul id="addUserList" class="list" >
 			</ul>
+		</div>
+	</div>
+	<div id="roomSettings" class="hidden">
+		<table>
+			<tr id="roomSettNameHolder">
+				<th>
+					Name
+				</th>
+				<td>
+					<input type="text" id="roomSettName" maxlength="16" />
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Notifications
+				</th>
+				<td>
+					<input type="checkbox" id="roomSettNotifications"/>
+					<label for="roomSettNotifications"></label>
+				</td>
+			</tr>
+			<tr>
+				<th>
+					Sound
+				</th>
+				<td>
+					<input type="range" id="roomSettSound" min="0" max="3"/>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<input type="button" class="red-btn" value="LEAVE THIS ROOM" id="roomSettExit"/>
+				</td>
+			</tr>
+			<tr>
+				<td colspan="2">
+					<input type="button" class="green-btn" value="APPLY SETTINGS" id="roomSettApply"/>
+				</td>
+			</tr>
+		</table>
 		</div>
 	</div>
 	<div id="addRoomHolder" class="hidden">
@@ -191,8 +234,8 @@
 		<div id="canvasResize"></div>
 	</div>
 	<div id="userMessageWrapper" class="hidden" style="position: relative">
-		<input type="file" accept="image/*" id="imgInput" class="hidden"/>
-		<i class="icon-picture" id="imgInputIcon" title="Attach Image File"></i>
+		<input type="file" accept="image/*,video/*" id="imgInput" multiple="multiple" class="hidden"/>
+		<i class="icon-picture" id="imgInputIcon" title="Share Video/Image"></i>
 		<i class="icon-smile" title="Add a smile :)" id="iconSmile"></i>
 		<div contenteditable="true" id="usermsg" onkeydown="channelsHandler.checkAndSendMessage(event)"></div>
 	</div>

@@ -62,7 +62,7 @@ var RegisterValidator = function () {
 					} else {
 						self.setError(self.username, data);
 					}
-				}, null);
+				});
 			}
 		}
 	};
@@ -136,7 +136,7 @@ var RegisterValidator = function () {
 					} else {
 						self.setError(self.email, data);
 					}
-				}, null);
+				});
 			}
 		}
 	};
@@ -206,7 +206,7 @@ function redirectToNextPage(response) {
 function login(event) {
 	event.preventDefault();
 	ajaxShow();
-	doPost('/auth', null, redirectToNextPage, loginForm);
+	doPost('/auth', null, redirectToNextPage, new FormData(loginForm));
 }
 
 function initRegisterPage() {
@@ -225,7 +225,7 @@ function initRegisterPage() {
 	// and when users tries to open a new popup window.event will still exist and popup won't get blocked
 	if (typeof FACEBOOK_JS_URL !== 'undefined') {
 		doGet(FACEBOOK_JS_URL, function () {
-			logger.info("Initing facebook sdk...")();
+			logger.log("Initing facebook sdk...")();
 			FB.init({
 				appId: FACEBOOK_APP_ID,
 				xfbml: true,
@@ -251,7 +251,7 @@ function initRegisterPage() {
 function register(event) {
 	event.preventDefault();
 	ajaxShow();
-	doPost('/register', null, redirectToNextPage, registerForm);
+	doPost('/register', null, redirectToNextPage, new FormData(registerForm));
 }
 
 
@@ -275,7 +275,7 @@ function restorePassword(event) {
 		}
 	};
 	ajaxShow();
-	doPost('/send_restore_password', null, callback, form);
+	doPost('/send_restore_password', null, callback, new FormData(form));
 }
 
 
@@ -298,7 +298,7 @@ function googleLogin() {
 	function onGoogleSignIn() {
 		var googleUser = auth2.currentUser.get();
 		var profile = googleUser.getBasicProfile();
-		logger.info("Signed as {} with id {} and email {}  ",
+		logger.log("Signed as {} with id {} and email {}  ",
 				profile.getName(), profile.getId(), profile.getEmail())();
 		googleToken = googleUser.getAuthResponse().id_token;
 		sendGoogleTokenToServer(googleToken);
@@ -329,12 +329,12 @@ function onsdkError(message) {
 function googleInit() {
 	// Load the API client and auth library
 	if (window.G_OAUTH_URL) {
-		logger.info("Initializing google sdk")();
+		logger.log("Initializing google sdk")();
 		doGet(G_OAUTH_URL, function () {
 			gapi.load('client:auth2', function () {
-				logger.info("gapi 2 is ready")();
+				logger.log("gapi 2 is ready")();
 				gapi.auth2.init().then(function () {
-					logger.info("gauth 2 is ready")();
+					logger.log("gauth 2 is ready")();
 					googleApiLoaded = true;
 				}).catch(onsdkError("Unable to init gauth2 sdk: "))
 			})
@@ -371,7 +371,7 @@ function fbStatusChangeIfReAuth(response) {
 }
 
 function fbStatusChange(response) {
-	logger.info("fbStatusChange {}", JSON.stringify(response))();
+	logger.log("fbStatusChange {}", JSON.stringify(response))();
 	if (fbStatusChangeIfReAuth(response)) {
 		FB.login(fbStatusChangeIfReAuth, {auth_type: 'reauthenticate'});
 	} else {

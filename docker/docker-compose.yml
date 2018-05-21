@@ -1,43 +1,74 @@
-version: '3.3'
+version: '2.3'
 services:
-  css:
-    build:
-      context: ..
-      dockerfile: ./docker/Dockerfilecss
-    volumes:
-      - css-volume:/usr/src/css
   db:
-    image: mysql/mysql-server
-    ports:
-      - 3306:3306
-  redis:
-    image: redis:latest
-    ports:
-      - 6379:6379
+    image: mysql/mysql-server:5.7.22
+    environment:
+      MYSQL_ROOT_PASSWORD: 'Ilovepython'
+      MYSQL_DATABASE: 'pychat'
+      MYSQL_USER: 'pychat'
+      MYSQL_PASSWORD: 'pypass'
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 3s
+      interval: 5s
+      retries: 3
+      start_period: 100s
+    volumes:
+      - ./volumes/mysql:/var/lib/mysql
   server:
     build:
       context: ../
       dockerfile: ./docker/Dockerfileserver
-    volumes:
-      - css-volume:/usr/src/css
-    command: bash -c "python manage.py init_db && python manage.py runsslserver 0.0.0.0:8000"
-    volumes:
-      - css-volume:/usr/src/chat/static/css
-    links:
-      - db
+    command:
+       bash -c "rm -f /tmp/socket/uwsgi.sock && python manage.py init_db && python manage.py sync_db && uwsgi --ini /usr/src/chat-uwsgi.ini"
+    healthcheck:
+      test:  bash -c "[ -S /tmp/socket/uwsgi.sock ]"
+      start_period: 50s
+      retries: 3
+      interval: 5s
     depends_on:
-      - db
-      - redis
-      - css
+      db:
+        condition: service_healthy
+    volumes:
+      - ./volumes/migrations:/usr/src/chat/migrations
+      - ./volumes/photos:/usr/src/photos
+      - socket:/tmp/socket
+      - static:/usr/src/chat/static
+
+  redis:
+    image: redis:alpine
+    volumes:
+      - ./volumes/redis:/data
+  nginx:
+    build:
+      context: ../
+      dockerfile: ./docker/Dockerfilenginx
+    volumes:
+      - socket:/tmp/socket:ro
+      - ./volumes/photos/:/srv/http/photos:ro
+      - static:/srv/http/static:ro
+    ports:
+     - 443:443
+    depends_on:
+      ws:
+        condition: service_healthy
   ws:
     build:
-      context: ..
-      dockerfile: Dockerfilewebsocket
-    ports:
-    - 8888:8888
+      context: ../
+      dockerfile: ./docker/Dockerfilewebsocket
     depends_on:
-    - db
-    - redis
-    - server
+      server:
+        condition: service_healthy
+    command:
+      python manage.py start_tornado
+    healthcheck:
+      test: sh -c "[ '`curl -sk https://localhost:8888/test`' = 'ok' ]"
+      timeout: 3s
+      interval: 5s
+      retries: 3
+      start_period: 10s
+    ports:
+      - 8888:8888
 volumes:
-  css-volume:
+   socket:
+   static:

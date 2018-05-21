@@ -10,18 +10,19 @@ from django.core.exceptions import ValidationError
 from django.db.models import F, Q
 from redis_sessions.session import SessionStore
 from tornado import ioloop
-from tornado.httpclient import AsyncHTTPClient
+from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.web import asynchronous
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from chat.cookies_middleware import create_id
-from chat.models import User, Message, UserJoinedInfo
+from chat.models import User, Message, UserJoinedInfo, IpAddress
 from chat.py2_3 import str_type, urlparse
-from chat.settings import UPDATE_LAST_READ_MESSAGE
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions
+from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
-from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms, get_message_images, \
-	prepare_img
+from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms, \
+	get_message_images_videos, get_or_create_ip_wrapper, create_ip_structure, get_history_message_query
 
 sessionStore = SessionStore()
 
@@ -33,6 +34,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 	def __init__(self, *args, **kwargs):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
 		self.__connected__ = False
+		self.restored_connection = False
 		self.__http_client__ = AsyncHTTPClient()
 		self.anti_spam = AntiSpam()
 
@@ -63,12 +65,12 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			# self.anti_spam.check_spam(json_message)
 			self.logger.debug('<< %.1000s', json_message)
 			message = json.loads(json_message)
-			if message[VarNames.EVENT] not in self.pre_process_message:
+			if message[VarNames.EVENT] not in self.process_ws_message:
 				raise Exception("event {} is unknown".format(message[VarNames.EVENT]))
 			channel = message.get(VarNames.CHANNEL)
 			if channel and channel not in self.channels:
 				raise ValidationError('Access denied for channel {}. Allowed channels: {}'.format(channel, self.channels))
-			self.pre_process_message[message[VarNames.EVENT]](message)
+			self.process_ws_message[message[VarNames.EVENT]](message)
 		except ValidationError as e:
 			error_message = self.default(str(e.message), Actions.GROWL_MESSAGE, HandlerNames.GROWL)
 			self.ws_write(error_message)
@@ -90,15 +92,14 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		else:
 			self.logger.info("Close event, not subscribed, channels: %s", self.channels)
 		log_data = {}
-		gone_offline = False
 		for channel in self.channels:
 			if not isinstance(channel, Number):
 				continue
 			self.sync_redis.srem(channel, self.id)
 			if self.connected:
-				gone_offline = self.publish_logout(channel, log_data) or gone_offline
-		if gone_offline:
-			res = do_db(execute_query, UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
+				self.publish_logout(channel, log_data)
+		if self.connected:
+			res = do_db(execute_query, settings.UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
 		self.disconnect(json.dumps(log_data))
 
@@ -126,7 +127,10 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		conn_arg = self.get_argument('id', None)
 		self.id, random = create_id(self.user_id, conn_arg)
 		if random != conn_arg:
+			self.restored_connection = False
 			self.ws_write(self.set_ws_id(random, self.id))
+		else:
+			self.restored_connection = True
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
@@ -140,61 +144,70 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				'ip': self.ip
 			}
 			self._logger = logging.LoggerAdapter(parent_logger, log_params)
-			self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, self.id)
+			cookies = ["{}={}".format(k, self.request.cookies[k].value) for k in self.request.cookies]
+			self.logger.debug("!! Incoming connection, session %s, thread hash %s, cookies: %s", session_key, self.id, ";".join(cookies))
 			self.async_redis.connect()
 			user_db = do_db(User.objects.get, id=self.user_id)
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
 			user_rooms = get_users_in_current_user_rooms(self.user_id)
-			self.ws_write(self.default(user_rooms, Actions.ROOMS, HandlerNames.CHANNELS))
 			# get all missed messages
 			self.channels = []  # py2 doesn't support clear()
 			self.channels.append(self.channel)
 			self.channels.append(self.id)
+			rooms_online = {}
+			was_online = False
 			for room_id in user_rooms:
 				self.channels.append(room_id)
+				rooms_online[room_id] = self.get_is_online(room_id)
+				was_online = was_online or rooms_online[room_id][0]
 			self.listen(self.channels)
-			off_messages, history = self.get_offline_messages(user_rooms)
+			off_messages, history = self.get_offline_messages(user_rooms, was_online, self.get_argument('history', False))
 			for room_id in user_rooms:
-				is_online = self.add_online_user(room_id)
-				# there're no offline messages if we're online
-				offl_mess = [] if is_online else off_messages.get(room_id)
-				if offl_mess or history.get(room_id):
-					self.ws_write(self.load_offline_message(offl_mess, history.get(room_id), room_id))
+				user_rooms[room_id][VarNames.LOAD_MESSAGES_HISTORY] = history.get(room_id)
+				user_rooms[room_id][VarNames.LOAD_MESSAGES_OFFLINE] = off_messages.get(room_id)
+			self.ws_write(self.set_room(user_rooms))
+			for room_id in user_rooms:
+				self.async_redis_publisher.sadd(room_id, self.id)
+				self.add_online_user(room_id, rooms_online[room_id][0], rooms_online[room_id][1])
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
 			self.connected = True
-			Thread(target=self.save_ip).start()
+			# self.save_ip()
 		else:
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key %s has been rejected" % session_key)
 
-	def get_offline_messages(self, user_rooms):
-		q_objects = Q()
-		for room_id in user_rooms:
-			c = self.get_cookie(str(room_id))
-			if c is not None:
-				q_objects.add(Q(id__gte=c, room_id=room_id), Q.OR)
-		off_messages = Message.objects.filter(
-			id__gt=F('room__roomusers__last_read_message_id'),
-			deleted=False,
-			room__roomusers__user_id=self.user_id
-		)
+	def get_offline_messages(self, user_rooms, was_online, with_history):
+		q_objects = get_history_message_query(self.get_argument('messages', None), user_rooms, with_history)
+		if was_online:
+			off_messages = []
+		else:
+			off_messages = Message.objects.filter(
+				id__gt=F('room__roomusers__last_read_message_id'),
+				room__roomusers__user_id=self.user_id
+			)
 		off = {}
 		history = {}
 		if len(q_objects.children) > 0:
 			history_messages = Message.objects.filter(q_objects)
 			all = list(chain(off_messages, history_messages))
+			self.logger.info("Offline messages IDs: %s, history messages: %s", [m.id for m in off_messages], [m.id for m in history_messages])
 		else:
 			history_messages = []
 			all = off_messages
-		images = get_message_images(all)
-		for message in off_messages:
-			prep_m = self.create_message(message, prepare_img(images, message.id))
-			off.setdefault(message.room_id, []).append(prep_m)
-		for message in history_messages:
-			prep_m = self.create_message(message, prepare_img(images, message.id))
-			history.setdefault(message.room_id, []).append(prep_m)
+		if self.restored_connection:
+			off_messages = all
+			history_messages = []
+		imv = get_message_images_videos(all)
+		self.set_video_images_messages(imv, off_messages, off)
+		self.set_video_images_messages(imv, history_messages, history)
 		return off, history
+
+	def set_video_images_messages(self, imv, inm, outm):
+		for message in inm:
+			files = MessagesCreator.prepare_img_video(imv, message.id)
+			prep_m = self.create_message(message, files)
+			outm.setdefault(message.room_id, []).append(prep_m)
 
 	def check_origin(self, origin):
 		"""
@@ -208,14 +221,29 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		return browser_domain == origin_domain
 
 	def save_ip(self):
-		if (do_db(UserJoinedInfo.objects.filter(
-					Q(ip__ip=self.ip) & Q(user_id=self.user_id)).exists)):
-			return
-		ip_address = get_or_create_ip(self.ip, self.logger)
-		UserJoinedInfo.objects.create(
-			ip=ip_address,
-			user_id=self.user_id
-		)
+		"""
+		This code is not used anymore
+		"""
+		if not do_db(UserJoinedInfo.objects.filter(
+				Q(ip__ip=self.ip) & Q(user_id=self.user_id)).exists):
+			res = get_or_create_ip_wrapper(self.ip, self.logger, self.fetch_and_save_ip_http)
+			if res is not None:
+				UserJoinedInfo.objects.create(ip=res, user_id=self.user_id)
+
+	@asynchronous
+	def fetch_and_save_ip_http(self):
+		"""
+			This code is not used anymore
+		"""
+		def fetch_response(response):
+			try:
+				ip_record = create_ip_structure(self.ip, response.body)
+			except Exception as e:
+				self.logger.error("Error while creating ip with country info, because %s", e)
+				ip_record = IpAddress.objects.create(ip=self.ip)
+			UserJoinedInfo.objects.create(ip=ip_record, user_id=self.user_id)
+		r = HTTPRequest(settings.IP_API_URL % self.ip, method="GET")
+		self.http_client.fetch(r, callback=fetch_response)
 
 	def ws_write(self, message):
 		"""
@@ -232,7 +260,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.logger.debug(">> %.1000s", message)
 			self.write_message(message)
 		except WebSocketClosedError as e:
-			self.logger.error("%s. Can't send << %s >> message", e, str(message))
+			self.logger.warning("%s. Can't send message << %s >> ", e, str(message))
 
 	def get_client_ip(self):
 		return self.request.headers.get("X-Real-IP") or self.request.remote_ip

@@ -4,20 +4,25 @@ import re
 import urllib
 
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.db.models import Q
+from tornado import ioloop
 from tornado.gen import engine, Task
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.ioloop import IOLoop
 from tornado.web import asynchronous
 from tornadoredis import Client
-from chat import settings
+from django.conf import settings
+from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
-from chat.models import Message, Room, RoomUsers, Subscription, User, UserProfile
+from chat.models import Message, Room, RoomUsers, Subscription, User, UserProfile, SubscriptionMessages, MessageHistory, \
+	UploadedFile, Image
 from chat.py2_3 import str_type, quote
-from chat.settings import ALL_ROOM_ID, TORNADO_REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL
+from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, get_or_create_room, \
-	create_room, evaluate, process_images, prepare_img, save_images, get_message_images
+	create_room, get_message_images_videos, update_symbols, up_files_to_img
 
 parent_logger = logging.getLogger(__name__)
 base_logger = logging.LoggerAdapter(parent_logger, {
@@ -37,11 +42,11 @@ class MessagesHandler(MessagesCreator):
 
 	def __init__(self, *args, **kwargs):
 		self.closed_channels = None
-		self.parsable_prefix = 'p'
 		super(MessagesHandler, self).__init__()
 		self.webrtc_ids = {}
 		self.id = None  # child init
 		self.sex = None
+		self.last_client_ping = 0
 		self.sender_name = None
 		self.user_id = 0  # anonymous by default
 		self.ip = None
@@ -50,9 +55,11 @@ class MessagesHandler(MessagesCreator):
 		self.sync_redis = global_redis.sync_redis
 		self.channels = []
 		self._logger = None
-		self.async_redis = Client(port=TORNADO_REDIS_PORT)
+		self.async_redis = Client(host=REDIS_HOST, port=REDIS_PORT)
 		self.patch_tornadoredis()
-		self.pre_process_message = {
+		# input websocket messages handlers
+		# The handler is determined by @VarNames.EVENT
+		self.process_ws_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
 			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
@@ -60,13 +67,17 @@ class MessagesHandler(MessagesCreator):
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
 			Actions.INVITE_USER: self.invite_user,
-			Actions.PING: self.respond_ping
+			Actions.PING: self.respond_ping,
+			Actions.PONG: self.process_pong_message,
 		}
-		self.post_process_message = {
+		# Handlers for redis messages, if handler returns true - message won't be sent to client
+		# The handler is determined by @VarNames.EVENT
+		self.process_pubsub_message = {
 			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_channel,
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
-			Actions.INVITE_USER: self.send_client_new_channel
+			Actions.INVITE_USER: self.send_client_new_channel,
+			Actions.PING: self.process_ping_message,
 		}
 
 	def patch_tornadoredis(self):  # TODO remove this
@@ -77,6 +88,7 @@ class MessagesHandler(MessagesCreator):
 			try:
 				return new_self.old_read(callback=callback)
 			except Exception as e:
+				return
 				current_online = self.get_online_from_redis(RedisPrefix.DEFAULT_CHANNEL)
 				self.logger.error(e)
 				self.logger.error(
@@ -108,7 +120,7 @@ class MessagesHandler(MessagesCreator):
 	def listen(self, channels):
 		yield Task(
 			self.async_redis.subscribe, channels)
-		self.async_redis.listen(self.pub_sub_message)
+		self.async_redis.listen(self.on_pub_sub_message)
 
 	@property
 	def logger(self):
@@ -144,15 +156,12 @@ class MessagesHandler(MessagesCreator):
 			result.add(user_id)
 		return user_is_online, list(result)
 
-	def add_online_user(self, room_id):
+	def add_online_user(self, room_id, is_online, online):
 		"""
 		adds to redis
 		online_users = { connection_hash1 = stored_redis_user1, connection_hash_2 = stored_redis_user2 }
 		:return: if user is online
 		"""
-		self.async_redis_publisher.sadd(room_id, self.id)
-		# since we add user to online first, latest trigger will always show correct online
-		is_online, online = self.get_online_and_status_from_redis(room_id)
 		if is_online:  # Send user names to self
 			online_user_names_mes = self.room_online(online, Actions.REFRESH_USER, room_id)
 			self.logger.info('!! Second tab, retrieving online for self')
@@ -162,35 +171,29 @@ class MessagesHandler(MessagesCreator):
 			online_user_names_mes = self.room_online(online, Actions.LOGIN, room_id)
 			self.logger.info('!! First tab, sending refresh online for all')
 			self.publish(online_user_names_mes, room_id)
-		return is_online
+
+	def get_is_online(self, room_id):
+		self.async_redis_publisher.sadd(room_id, self.id)
+		# since we add user to online first, latest trigger will always show correct online
+		return self.get_online_and_status_from_redis(room_id)
 
 	def publish(self, message, channel, parsable=False):
-		jsoned_mess = json.dumps(message)
+		jsoned_mess = encode_message(message, parsable)
 		self.logger.debug('<%s> %s', channel, jsoned_mess)
-		if parsable:
-			jsoned_mess = self.encode(jsoned_mess)
 		self.async_redis_publisher.publish(channel, jsoned_mess)
 
-	def encode(self, message):
+	def on_pub_sub_message(self, message):
 		"""
-		Marks message with prefix to specify that
-		it should be decoded and proccesed before sending to client
-		@param message: message to mark
-		@return: marked message
+		All pubsub messages are automatically sent to client.
+		:param message:
+		:return:
 		"""
-		return self.parsable_prefix + message
-
-	def remove_parsable_prefix(self, message):
-		if message.startswith(self.parsable_prefix):
-			return message[1:]
-
-	def pub_sub_message(self, message):
 		data = message.body
-		if isinstance(data, str_type):  # subscribe event
-			prefixless_str = self.remove_parsable_prefix(data)
+		if isinstance(data, str_type):  # not subscribe event
+			prefixless_str = remove_parsable_prefix(data)
 			if prefixless_str:
 				dict_message = json.loads(prefixless_str)
-				res = self.post_process_message[dict_message[VarNames.EVENT]](dict_message)
+				res = self.process_pubsub_message[dict_message[VarNames.EVENT]](dict_message)
 				if not res:
 					self.ws_write(prefixless_str)
 			else:
@@ -213,16 +216,19 @@ class MessagesHandler(MessagesCreator):
 		url = GIPHY_URL.format(GIPHY_API_KEY, quote(query, safe=''))
 		self.http_client.fetch(url, callback=on_giphy_reply)
 
-	def notify_offline(self, channel):
+	def notify_offline(self, channel, message_id):
 		if FIREBASE_API_KEY is None:
 			return
 		online = self.get_online_from_redis(channel)
 		if channel == ALL_ROOM_ID:
 			return
-		offline_users = UserProfile.objects.filter(rooms__id=channel, notifications=True).exclude(id__in=online).only('id')
-		reg_ids = evaluate(Subscription.objects.filter(user__in=offline_users).values_list('registration_id', flat=True))
-		if len(reg_ids) == 0:
+		offline_users = RoomUsers.objects.filter(room_id=channel, notifications=True).exclude(user_id__in=online).values_list('user_id')
+		subscriptions = Subscription.objects.filter(user__in=offline_users, inactive=False)
+		if len(subscriptions) == 0:
 			return
+		new_sub_mess =[SubscriptionMessages(message_id=message_id, subscription_id=r.id) for r in subscriptions]
+		reg_ids =[r.registration_id for r in subscriptions]
+		SubscriptionMessages.objects.bulk_create(new_sub_mess)
 		self.post_firebase(list(reg_ids))
 
 	@asynchronous
@@ -230,6 +236,14 @@ class MessagesHandler(MessagesCreator):
 		def on_reply(response):
 			try:
 				self.logger.debug("!! FireBase response: " + str(response.body))
+				response_obj = json.loads(response.body)
+				delete = []
+				for index, elem in enumerate(response_obj['results']):
+					if elem.get('error') in ['NotRegistered', 'InvalidRegistration']:
+						delete.append(reg_ids[index])
+				if len(delete) > 0:
+					self.logger.info("Deactivating subscriptions: %s", delete)
+					Subscription.objects.filter(registration_id__in=delete).update(inactive=True)
 			except Exception as e:
 				self.logger.error("Unable to parse response" + str(e))
 				pass
@@ -251,25 +265,33 @@ class MessagesHandler(MessagesCreator):
 		"""
 		content = message.get(VarNames.CONTENT)
 		giphy_match = self.isGiphy(content)
+
+		# @transaction.atomic mysql has gone away
 		def send_message(message, giphy=None):
-			raw_imgs = message.get(VarNames.IMG)
+			files = UploadedFile.objects.filter(id__in=message.get(VarNames.FILES), user_id=self.user_id)
+			symbol = get_max_key(files)
 			channel = message[VarNames.CHANNEL]
+			js_id = message[VarNames.JS_MESSAGE_ID]
 			message_db = Message(
 				sender_id=self.user_id,
 				content=message[VarNames.CONTENT],
-				symbol=get_max_key(raw_imgs),
-				giphy=giphy
+				symbol=symbol,
+				giphy=giphy,
+				room_id=channel
 			)
-			message_db.room_id = channel
+			res_files = []
 			do_db(message_db.save)
-			db_images = save_images(raw_imgs, message_db.id)
+			if files:
+				images = up_files_to_img(files, message_db.id)
+				res_files = MessagesCreator.prepare_img_video(images, message_db.id)
 			prepared_message = self.create_send_message(
 				message_db,
 				Actions.PRINT_MESSAGE,
-				prepare_img(db_images, message_db.id)
+				res_files,
+				js_id
 			)
 			self.publish(prepared_message, channel)
-			self.notify_offline(channel)
+			self.notify_offline(channel, message_db.id)
 		if giphy_match is not None:
 			self.search_giphy(message, giphy_match, send_message)
 		else:
@@ -298,12 +320,21 @@ class MessagesHandler(MessagesCreator):
 		self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
 
 	def respond_ping(self, message):
-		self.ws_write(self.responde_pong())
+		self.ws_write(self.responde_pong(message[VarNames.JS_MESSAGE_ID]))
+
+	def process_pong_message(self, message):
+		self.last_client_ping = message[VarNames.TIME]
+
+	def process_ping_message(self, message):
+		def call_check():
+			if message[VarNames.TIME] != self.last_client_ping:
+				self.close(408, "Ping timeout")
+		IOLoop.instance().call_later(settings.PING_CLOSE_SERVER_DELAY, call_check)
 
 	def create_user_channel(self, message):
 		user_id = message[VarNames.USER_ID]
 		room_id = create_room(self.user_id, user_id)
-		subscribe_message = self.subscribe_direct_channel_message(room_id, user_id)
+		subscribe_message = self.subscribe_direct_channel_message(room_id, user_id, self.user_id != user_id)
 		self.publish(subscribe_message, self.channel, True)
 		other_channel = RedisPrefix.generate_user(user_id)
 		if self.channel != other_channel:
@@ -327,36 +358,55 @@ class MessagesHandler(MessagesCreator):
 		message = self.unsubscribe_direct_message(room_id)
 		self.publish(message, room_id, True)
 
-
 	def edit_message(self, data):
-		message_id = data[VarNames.MESSAGE_ID]
-		message = do_db(Message.objects.get, id=message_id)
+		js_id = data[VarNames.JS_MESSAGE_ID]
+		message = do_db(Message.objects.get, id=data[VarNames.MESSAGE_ID])
 		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
-		selector = Message.objects.filter(id=message_id)
+		MessageHistory(message=message, content=message.content, giphy=message.giphy).save()
+		message.edited_times += 1
 		giphy_match = self.isGiphy(data[VarNames.CONTENT])
 		if message.content is None:
-			action = Actions.DELETE_MESSAGE
-			prep_imgs = None
-			selector.update(deleted=True)
+			Message.objects.filter(id=data[VarNames.MESSAGE_ID]).update(
+				deleted=True,
+				edited_times=message.edited_times,
+				content=None
+			)
+			self.publish(self.create_send_message(message, Actions.DELETE_MESSAGE, None, js_id), message.room_id)
 		elif giphy_match is not None:
-			def edit_glyphy(message, giphy):
-				do_db(selector.update, content=message.content, symbol=message.symbol, giphy=giphy)
-				message.giphy = giphy
-				self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None), message.room_id)
-			self.search_giphy(message, giphy_match, edit_glyphy)
-			return
+			self.edit_message_giphy(giphy_match, message, js_id)
 		else:
-			action = Actions.EDIT_MESSAGE
-			message.giphy = None
-			prep_imgs = process_images(data.get(VarNames.IMG), message)
-			selector.update(content=message.content, symbol=message.symbol, giphy=None)
-		self.publish(self.create_send_message(message, action, prep_imgs), message.room_id)
+			self.edit_message_edit(data, message, js_id)
+
+	def edit_message_giphy(self, giphy_match, message, js_id):
+		def edit_glyphy(message, giphy):
+			do_db(Message.objects.filter(id=message.id).update, content=message.content, symbol=message.symbol, giphy=giphy,
+					edited_times=message.edited_times)
+			message.giphy = giphy
+			self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None, js_id), message.room_id)
+
+		self.search_giphy(message, giphy_match, edit_glyphy)
+
+	def edit_message_edit(self, data, message, js_id):
+		action = Actions.EDIT_MESSAGE
+		message.giphy = None
+		files = UploadedFile.objects.filter(id__in=data.get(VarNames.FILES), user_id=self.user_id)
+		if files:
+			update_symbols(files, message)
+			up_files_to_img(files, message.id)
+		if message.symbol:  # fetch all, including that we just store
+			db_images = Image.objects.filter(message_id=message.id)
+			prep_files = MessagesCreator.prepare_img_video(db_images, message.id)
+		else:
+			prep_files = None
+		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
+		self.publish(self.create_send_message(message, action, prep_files, js_id), message.room_id)
 
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		self.add_channel(room_id)
-		self.add_online_user(room_id)
+		is_online, online = self.get_is_online(room_id=room_id)
+		self.add_online_user(room_id, is_online, online)
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -373,11 +423,11 @@ class MessagesHandler(MessagesCreator):
 		room_id = data[VarNames.CHANNEL]
 		self.logger.info('!! Fetching %d messages starting from %s', count, header_id)
 		if header_id is None:
-			messages = Message.objects.filter(Q(room_id=room_id), Q(deleted=False)).order_by('-pk')[:count]
+			messages = Message.objects.filter(room_id=room_id).order_by('-pk')[:count]
 		else:
-			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id), Q(deleted=False)).order_by('-pk')[:count]
-		images = do_db(get_message_images, messages)
-		response = self.get_messages(messages, room_id, images, prepare_img)
+			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id)).order_by('-pk')[:count]
+		imv = do_db(get_message_images_videos, messages)
+		response = self.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video)
 		self.ws_write(response)
 
 
@@ -385,7 +435,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 
 	def __init__(self, *args, **kwargs):
 		super(WebRtcMessageHandler, self).__init__(*args, **kwargs)
-		self.pre_process_message.update({
+		self.process_ws_message.update({
 			Actions.WEBRTC: self.proxy_webrtc,
 			Actions.CLOSE_FILE_CONNECTION: self.close_file_connection,
 			Actions.CLOSE_CALL_CONNECTION: self.close_call_connection,
@@ -398,7 +448,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 			Actions.RETRY_FILE_CONNECTION: self.retry_file_connection,
 			Actions.REPLY_CALL_CONNECTION: self.reply_call_connection,
 		})
-		self.post_process_message.update({
+		self.process_pubsub_message.update({
 			Actions.OFFER_FILE_CONNECTION: self.set_opponent_call_channel,
 			Actions.OFFER_CALL_CONNECTION: self.set_opponent_call_channel
 		})
@@ -568,7 +618,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 
 	def send_call_answer(self, in_message, status_set, reply_action, allowed_state, message_handler):
 		connection_id = in_message[VarNames.CONNECTION_ID]
-		content = in_message[VarNames.CONTENT]
+		content = in_message.get(VarNames.CONTENT)  # cancel call can skip browser
 		conn_users = self.sync_redis.shgetall(connection_id)
 		if conn_users[self.id] in allowed_state:
 			self.publish_call_answer(conn_users, connection_id, message_handler, reply_action, status_set, content)

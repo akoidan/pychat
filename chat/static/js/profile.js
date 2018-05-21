@@ -8,11 +8,12 @@ var photoInput;
 var userProfileData;
 var themeSelector;
 var changeProfileForm;
-var notificationInput;
-var cacheMessagesInput;
 var embeddedYoutubeInput;
 var highlightCodeInput;
 var logsInput;
+var password;
+var repeatPassword;
+var oldPassword;
 var photoSrc = null;
 
 function initChangeProfile() {
@@ -21,19 +22,18 @@ function initChangeProfile() {
 	canvas = $('canvasBuffer');
 	photoInput = $('id_photo');
 	userProfileData = $('userProfileData');
-	themeSelector = $('themeSelector');
+	themeSelector = $('id_theme');
 	changeProfileForm = $('changeProfileForm');
-	notificationInput = $('id_notifications');
-	cacheMessagesInput = $('id_cache_messages');
 	embeddedYoutubeInput = $('id_embedded_youtube');
 	highlightCodeInput = $('id_highlight_code');
+	onlineChangeSoundInput = $('id_online_change_sound');
+	incomingFileCallSoundInput = $('id_incoming_file_call_sound');
+	messageSoundInput = $('id_message_sound');
+	password = $('id_password');
+	repeatPassword = $('id_repeat_password');
+	oldPassword = $('id_old_password');
 	logsInput = $('id_logs');
-	var item = localStorage.getItem('theme');
 	video.addEventListener('click', takeSnapshot, false);
-	if (item != null) {
-		themeSelector.value = item;
-		/*TODO $* to var*/
-	}
 	photoImg.addEventListener('drop', dropPhoto, false);
 	var events = ["dragenter", "dragstart", "dragend", "dragleave", "dragover", "drag", "drop"];
 	for (var i = 0, iLen = events.length; i < iLen; i++) {
@@ -53,7 +53,7 @@ function initChangeProfile() {
 					maxDate: new Date(),
 					yearRange: [1930, 2010]
 				});
-				logger.info("pikaday date picker has been loaded")();
+				logger.log("pikaday date picker has been loaded")();
 			});
 		})
 	}
@@ -104,7 +104,7 @@ function startSharingVideo() {
 	}
 
 	function errorCallback(error) {
-		logger.info("navigator.getUserMedia error: {}", error)();
+		logger.log("navigator.getUserMedia error: {}", error)();
 	}
 
 	navigator.getUserMedia(constraints, successCallback, errorCallback);
@@ -164,22 +164,14 @@ function preventDefault(e) {
 	 e.preventDefault();
 }
 
-
 function setJsState() {
-	var options = [];
-	localStorage.setItem('theme', themeSelector.value);
-	setTheme();
-	notifications = notificationInput.checked; // global var
-	cacheMessages = cacheMessagesInput.checked; // global var
+	setTheme(themeSelector.value);
+	window.onlineChangeSound = onlineChangeSoundInput.checked;
+	window.incomingFileCallSound = incomingFileCallSoundInput.checked;
+	window.messageSound = messageSoundInput.checked;
 	window.embeddedYoutube = embeddedYoutubeInput.checked; // global var
 	window.highlightCode = highlightCodeInput.checked; // global var
-	if (!cacheMessages) {
-		storage.clearStorage();
-	}
-	if (notifications) {
-		notifier.tryAgainRegisterServiceWorker();
-	}
-	if (window.highlightCode) {
+		if (window.highlightCode) {
 		doGet(HIGHLIGHT_JS_URL, function() {
 			Utils.highlightCode(document.body);
 		});
@@ -191,6 +183,10 @@ function saveProfile(event) {
 	event.preventDefault();
 	var image = null;
 	var params = null;
+	if (password.value.length > 0 && password.value !== repeatPassword.value) {
+		growlError("Passwords don't match");
+		return;
+	}
 	if (photoSrc == 'canvas' || photoSrc == 'drop') {
 		if (photoSrc == 'canvas') {
 			image = canvas.toDataURL("image/png");
@@ -214,12 +210,15 @@ function saveProfile(event) {
 			ajaxHide();
 		}
 		if (response === RESPONSE_SUCCESS) {
+			oldPassword.value = "";
+			password.value = "";
+			repeatPassword.value = "";
 			growlSuccess("Your profile has been successfully updated. Press home icon to return on main page");
 			setJsState();
 		} else {
 			growlError(response);
 		}
-	}, changeProfileForm);
+	}, new FormData(changeProfileForm));
 }
 
 

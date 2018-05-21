@@ -1,5 +1,5 @@
-from django.core.exceptions import PermissionDenied
-from django.http import HttpRequest
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect
 
 
@@ -25,3 +25,13 @@ def login_required_no_redirect(do_redirect=None):
 		wrap.__name__ = f.__name__
 		return wrap
 	return method_wrapper
+
+
+def validation(func):
+	def wrapper(*a, **ka):
+		try:
+			return func(*a, **ka)
+		except ValidationError as e:
+			message = e.message
+			return HttpResponse(message, content_type='text/plain')
+	return wrapper

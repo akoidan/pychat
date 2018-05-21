@@ -17,6 +17,14 @@ class MessagesCreator(object):
 		}
 
 	@staticmethod
+	def base_default(event, content, handler):
+		return {
+			VarNames.EVENT: event,
+			VarNames.CONTENT: content,
+			VarNames.HANDLER_NAME: handler
+		}
+
+	@staticmethod
 	def set_ws_id(random, self_id):
 		return {
 			VarNames.HANDLER_NAME: HandlerNames.WS,
@@ -24,6 +32,10 @@ class MessagesCreator(object):
 			VarNames.CONTENT: random,
 			VarNames.WEBRTC_OPPONENT_ID: self_id
 		}
+
+	@classmethod
+	def set_room(cls, rooms):
+		return cls.base_default(Actions.ROOMS, rooms, HandlerNames.CHANNELS)
 
 	def room_online(self, online, event, channel):
 		"""
@@ -36,19 +48,27 @@ class MessagesCreator(object):
 		return room_less
 
 	@classmethod
-	def create_message(cls, message, images):
+	def create_message(cls, message, files):
 		res = {
 			VarNames.USER_ID: message.sender_id,
 			VarNames.CONTENT: message.content,
 			VarNames.TIME: message.time,
 			VarNames.MESSAGE_ID: message.id,
-			VarNames.IMG: images,
-			VarNames.GIPHY: message.giphy
+			VarNames.EDITED_TIMES: message.edited_times,
+			VarNames.CHANNEL: message.room_id,
 		}
+		if message.deleted:
+			res[VarNames.DELETED] = True
+		if files:
+			res[VarNames.FILES] = files
+		if message.symbol:
+			res[VarNames.SYMBOL] = message.symbol
+		if message.giphy:
+			res[VarNames.GIPHY] = message.giphy
 		return res
 
 	@classmethod
-	def create_send_message(cls, message, event, imgs):
+	def create_send_message(cls, message, event, files, js_id):
 		"""
 		:type message: chat.models.Message
 		:type imgs: dict
@@ -56,55 +76,78 @@ class MessagesCreator(object):
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
 		"sex": "Alien", "user": "tRD6emzs", "time": "20:48:57"}
 		"""
-		res = cls.create_message(message, imgs)
+		res = cls.create_message(message, files)
 		res[VarNames.EVENT] = event
-		res[VarNames.CHANNEL] = message.room_id
-		res[VarNames.SYMBOL] = message.symbol
+		res[VarNames.JS_MESSAGE_ID] = js_id
 		res[VarNames.HANDLER_NAME] = HandlerNames.CHAT
 		return res
 
 	@classmethod
-	def append_images(cls, messages, images, prepare_img):
+	def append_images(cls, messages, files, prepare_img):
 		"""
 		:type messages: list[chat.models.Message] 
-		:type images: list[chat.models.Image] 
+		:type files: list[chat.models.Image]
 		"""
 		res_mess = []
 		for message in messages:
-			res_images = prepare_img(images, message.id)
-			res_mess.append(cls.create_message(message, res_images))
+			res_mess.append(cls.create_message(message, prepare_img(files, message.id)))
 		return res_mess
 
 	@classmethod
-	def get_messages(cls, messages, channel, images, prepare_img):
+	def get_messages(cls, messages, channel, files, prepare_img):
 		"""
 		:type images: list[chat.models.Image]
 		:type messages: list[chat.models.Message]
 		:type channel: str
 		"""
 		return {
-			VarNames.CONTENT: cls.append_images(messages, images, prepare_img),
+			VarNames.CONTENT: cls.append_images(messages, files, prepare_img),
 			VarNames.EVENT: Actions.GET_MESSAGES,
 			VarNames.CHANNEL: channel,
 			VarNames.HANDLER_NAME: HandlerNames.CHAT
 		}
 
+	@staticmethod
+	def ping_client(time):
+		return {
+			VarNames.EVENT: Actions.PING,
+			VarNames.TIME: time,
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+		}
+
+	@staticmethod
+	def prepare_img_video(files, message_id):
+		"""
+		:type message_id: int
+		:type files: list[chat.models.Image]
+		"""
+		if files:
+			return {x.symbol: {
+				VarNames.FILE_URL: x.img.url,
+				VarNames.FILE_TYPE: x.type,
+				VarNames.PREVIEW: x.preview.url if x.preview else None,
+				VarNames.IMAGE_ID: x.id
+			} for x in files if x.message_id == message_id}
+
 	@property
 	def channel(self):
 		return RedisPrefix.generate_user(self.user_id)
 
-	def subscribe_direct_channel_message(self, room_id, other_user_id):
+	def subscribe_direct_channel_message(self, room_id, other_user_id, notifications):
 		return {
 			VarNames.EVENT: Actions.CREATE_DIRECT_CHANNEL,
+			VarNames.VOLUME: 2,
+			VarNames.NOTIFICATIONS: notifications,
 			VarNames.ROOM_ID: room_id,
 			VarNames.ROOM_USERS: [self.user_id, other_user_id],
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS
 		}
 
-	def responde_pong(self):
+	def responde_pong(self, js_id):
 		return {
-			VarNames.EVENT: Actions.PING,
-			VarNames.HANDLER_NAME: HandlerNames.WS
+			VarNames.EVENT: Actions.PONG,
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.JS_MESSAGE_ID: js_id
 		}
 
 	def subscribe_room_channel_message(self, room_id, room_name):
@@ -113,6 +156,8 @@ class MessagesCreator(object):
 			VarNames.ROOM_ID: room_id,
 			VarNames.ROOM_USERS: [self.user_id],
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.VOLUME: 2,
+			VarNames.NOTIFICATIONS: True,
 			VarNames.ROOM_NAME: room_name
 		}
 
@@ -147,14 +192,14 @@ class MessagesCreator(object):
 			VarNames.TIME: get_milliseconds()
 		}
 
-	def load_offline_message(self, offline_messages, history_messages, channel_key):
-		res = self.default({
-			VarNames.LOAD_MESSAGES_OFFLINE: offline_messages,
-			VarNames.LOAD_MESSAGES_HISTORY: history_messages
-		},
-			Actions.OFFLINE_MESSAGES,
-			HandlerNames.CHAT)
-		res[VarNames.CHANNEL] = channel_key
+	@staticmethod
+	def create_user_rooms(user_rooms):
+		res = {room['id']: {
+			VarNames.ROOM_NAME: room['name'],
+			VarNames.NOTIFICATIONS: room['roomusers__notifications'],
+			VarNames.VOLUME: room['roomusers__volume'],
+			VarNames.ROOM_USERS: {}
+		} for room in user_rooms}
 		return res
 
 

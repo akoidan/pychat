@@ -1,5 +1,4 @@
-from chat.settings import ALL_ROOM_ID, GENDERS
-
+from django.conf import settings
 
 class Actions(object):
 	LOGIN = 'addOnlineUser'
@@ -24,7 +23,6 @@ class Actions(object):
 	CREATE_ROOM_CHANNEL = 'addRoom'
 	INVITE_USER = 'inviteUser'
 	ADD_USER = 'addUserToDom'
-	OFFLINE_MESSAGES = 'loadOfflineMessages'
 	SET_WEBRTC_ID = 'setConnectionId'
 	SET_WEBRTC_ERROR = 'setError'
 	OFFER_FILE_CONNECTION = 'offerFile'
@@ -33,6 +31,8 @@ class Actions(object):
 	RETRY_FILE_CONNECTION = 'retryFile'
 	REPLY_CALL_CONNECTION = 'replyCall'
 	PING = 'ping'
+	PONG = 'pong'
+	CHECK_PING = 'check_ping'
 
 
 class VarNames(object):
@@ -41,13 +41,17 @@ class VarNames(object):
 	USER_ID = 'userId'
 	TIME = 'time'
 	CONTENT = 'content'
-	IMG = 'images'
-	IMG_B64 = 'b64'
-	IMG_FILE_NAME = 'fileName'
+	FILES = 'files'
+	FILE_URL = 'url'
+	FILE_TYPE = 'type'
 	EVENT = 'action'
+	JS_MESSAGE_ID = 'messageId'
 	MESSAGE_ID = 'id'
+	IMAGE_ID = 'id'
 	GENDER = 'sex'
 	ROOM_NAME = 'name'
+	NOTIFICATIONS = 'notifications'
+	VOLUME = 'volume'
 	ROOM_ID = 'roomId'
 	ROOM_USERS = 'users'
 	CHANNEL = 'channel'
@@ -62,6 +66,9 @@ class VarNames(object):
 	SYMBOL = 'symbol'
 	LOAD_MESSAGES_HISTORY = 'history'
 	LOAD_MESSAGES_OFFLINE = 'offline'
+	EDITED_TIMES = 'edited'
+	PREVIEW = 'preview'
+	DELETED = 'deleted'
 
 
 class HandlerNames:
@@ -83,14 +90,15 @@ class WebRtcRedisStates:
 
 class RedisPrefix:
 	USER_ID_CHANNEL_PREFIX = 'u'
-	DEFAULT_CHANNEL = ALL_ROOM_ID
+	PARSABLE_PREFIX = 'p'
+	DEFAULT_CHANNEL = settings.ALL_ROOM_ID
 	CONNECTION_ID_LENGTH = 8  # should be secure
 
 	@staticmethod
 	def set_js_user_structure(name, sex):
 		return {
 			VarNames.USER: name,
-			VarNames.GENDER: GENDERS[sex]
+			VarNames.GENDER: settings.GENDERS[sex]
 		}
 
 	@classmethod
