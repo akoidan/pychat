@@ -37,4 +37,4 @@ LOGGING['loggers'] = {
 
 logging.config.dictConfig(LOGGING)
 
-API_ADDRESS_PATTERN = 'wss://%s:8888/?id='
+API_ADDRESS_PATTERN = 'wss://%s/ws?id='

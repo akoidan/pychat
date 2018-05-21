@@ -62,13 +62,11 @@ services:
     command:
       python manage.py start_tornado
     healthcheck:
-      test: sh -c "[ '`curl -sk https://localhost:8888/test`' = 'ok' ]"
+      test: sh -c "[ '`curl -s http://localhost:8888/test`' = 'ok' ]"
       timeout: 3s
       interval: 5s
       retries: 3
       start_period: 10s
-    ports:
-      - 8888:8888
 volumes:
    socket:
    static:

@@ -1,7 +1,7 @@
 #!/sbin/openrc-run
 
 command="python3"
-command_args="/srv/http/manage.py init_db_start_tornado --port 8887"
+command_args="/srv/http/manage.py init_db_start_tornado"
 command_background="yes"
 pidfile="/tmp/tornado.pid"
 

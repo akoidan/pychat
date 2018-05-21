@@ -82,7 +82,7 @@ rc-update add redis default &&\
 pip3 install -r requirements.txt &&\
 bash download_content.sh all
 
-EXPOSE 8888 80 443
+EXPOSE 443
 CMD ["/sbin/init"]
 
 

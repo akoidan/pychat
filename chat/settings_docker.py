@@ -41,8 +41,4 @@ LOGGING['loggers'] = {
 
 logging.config.dictConfig(LOGGING)
 
-TORNADO_SSL_OPTIONS = {
-	"certfile": '/etc/nginx/ssl/certificate.crt',
-	"keyfile": '/etc/nginx/ssl/server.key'
-}
-API_ADDRESS_PATTERN = 'wss://%s:8888/?id='
+API_ADDRESS_PATTERN = 'wss://%s/ws?id='
