@@ -2573,7 +2573,7 @@ function ChannelsHandler() {
 	self.preventDefault = function (e) {
 		e.preventDefault();
 	};
-		self.imageDrop = function (evt) {
+	self.imageDrop = function (evt) {
 		self.preventDefault(evt);
 		if (singlePage.currentPage.pageName === 'channels' && evt.dataTransfer.files) {
 			for (var i = 0; i < evt.dataTransfer.files.length; i++) {

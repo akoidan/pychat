@@ -32,8 +32,6 @@ username_processor = 'chat.context_processors.add_user_name'
 # Application definition
 
 INSTALLED_APPS = (
-	'snowpenguin.django.recaptcha2',
-	'multi_captcha_admin',
 	'django.contrib.admin',
 	'django.contrib.auth',
 	'django.contrib.contenttypes',

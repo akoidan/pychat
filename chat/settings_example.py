@@ -79,3 +79,15 @@ globals().update(importlib.import_module(config).__dict__)
 ### For facebook auth:
 # FACEBOOK_ACCESS_TOKEN = '***************|***************************' # https://developers.facebook.com/tools/access_token/
 # FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
+
+
+### DON't EDIT THIS SECTION
+###<<<<<
+try:
+	RECAPTCHA_PUBLIC_KEY
+	RECAPTCHA_PRIVATE_KEY
+except NameError:
+  print "well, it WASN'T defined after all!"
+else:
+	INSTALLED_APPS = ('snowpenguin.django.recaptcha2', 'multi_captcha_admin') + INSTALLED_APPS
+###>>>>
