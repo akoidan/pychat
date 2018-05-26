@@ -2,8 +2,8 @@ import logging.config
 
 from chat.settings_base import *
 
-TEMPLATE_DEBUG = True
-DEBUG = True
+TEMPLATE_DEBUG = False
+DEBUG = False
 
 REDIS_HOST = 'redis'
 SESSION_REDIS = {

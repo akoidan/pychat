@@ -14,7 +14,8 @@ config = 'chat.settings_{}'.format(get)
 globals().update(importlib.import_module(config).__dict__)
 ###>>>>
 
-### Replace with your django secret key, you can use https://www.miniwebtool.com/django-secret-key-generator/ to generate one
+### Replace with your django secret key, use the command bellow to audogenerate it
+### bash download_content.sh generate_secret_key
 # SECRET_KEY = '**************************************************'
 
 
@@ -87,7 +88,7 @@ try:
 	RECAPTCHA_PUBLIC_KEY
 	RECAPTCHA_PRIVATE_KEY
 except NameError:
-  print "well, it WASN'T defined after all!"
+	pass
 else:
 	INSTALLED_APPS = ('snowpenguin.django.recaptcha2', 'multi_captcha_admin') + INSTALLED_APPS
 ###>>>>

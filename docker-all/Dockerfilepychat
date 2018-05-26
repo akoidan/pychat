@@ -1,0 +1,6 @@
+FROM deathangel908/pychat
+COPY ./rootfs/etc/nginx/ssl/certificate.crt ./rootfs/etc/nginx/ssl/server.key /etc/nginx/ssl/
+COPY ./chat/settings.py /srv/http/chat/
+
+
+

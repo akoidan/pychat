@@ -1,10 +1,7 @@
-Table of contents
-=================
-  * [Draw-io uml diagramm](#draw-io)
-  * [Frontend logging](#frontend-logging)
-  * [Smileys](#smileys)
-  * [Icons](#icons)
-  * [Database migrations](#database-migrations)
+docker
+======
+docker build -f ./docker-all/Dockerfile -t deathangel908/pychat .
+docker build -f ./docker-all/Dockerfilepychat -t deathangel908/pychat:test .
 
 draw-io
 =======

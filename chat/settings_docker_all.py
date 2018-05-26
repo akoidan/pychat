@@ -25,8 +25,8 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 		'django.template.loaders.filesystem.Loader',
 		'django.template.loaders.app_directories.Loader',
 	])]
-LOGGING['handlers'] = console_handlers
-console_handlers.update(mail_admins)
+LOGGING['handlers'] = file_handlers
+file_handlers.update(mail_admins)
 LOGGING['loggers'] = {
 	'': {
 		'handlers': ['default', 'mail_admins'],

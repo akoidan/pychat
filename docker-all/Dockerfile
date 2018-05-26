@@ -68,7 +68,6 @@ COPY ./manage.py ./config.json ./DefaultSmilies.cfpack ./docker-all/chat-uwsgi.i
 COPY ./chat ./chat/
 COPY ./docker-all/uwsgi ./docker-all/tornado /etc/init.d/
 COPY ./templates  ./templates
-COPY ./rootfs/etc/nginx/ssl/certificate.crt ./rootfs/etc/nginx/ssl/server.key /etc/nginx/ssl/
 COPY ./docker-all/nginx.conf /etc/nginx
 
 RUN mkdir log &&\
@@ -80,7 +79,10 @@ rc-update add uwsgi default &&\
 rc-update add tornado default &&\
 rc-update add redis default &&\
 pip3 install -r requirements.txt &&\
-bash download_content.sh all
+cp ./chat/settings_example.py ./chat/settings.py &&\
+bash download_content.sh generate_secret_key &&\
+bash download_content.sh all &&\
+rm ./chat/settings.py
 
 EXPOSE 443
 CMD ["/sbin/init"]

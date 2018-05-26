@@ -44,8 +44,8 @@ declare -a files=(\
 cd "$PROJECT_ROOT"
 
 generate_certificate() {
-    key_path="$PROJECT_ROOT/rootfs/etc/nginx/ssl/server.key"
-    cert_path="$PROJECT_ROOT/rootfs/etc/nginx/ssl/certificate.crt"
+    key_path="$1/server.key"
+    cert_path="$1/certificate.crt"
     safeRunCommand openssl req -nodes  -new -x509 -keyout "$key_path" -out "$cert_path" -days 3650
     printOut "Generated server.key in $key_path\nGenerated certificate in $cert_path"
 }
@@ -57,10 +57,6 @@ rename_root_directory() {
 }
 
 rename_domain() {
-    if [ $# -eq 0  ]; then
-        printError "Please provide domain name"
-        exit 1;
-    fi
     exist_domain="pychat\.org"
     your_domain="$1"
     printOut "Replacing all occurences of $exist_domain to $your_domain in $PROJECT_ROOT/rootfs"
@@ -268,6 +264,17 @@ delete_tmp_dir() {
     fi
 }
 
+generate_secret_key() {
+    if [ ! -f "$PROJECT_ROOT/chat/settings.py" ]; then
+        printError "File $PROJECT_ROOT/chat/settings.py doesn't exist. Create it before running the command"
+        exit 1;
+    fi
+    echo "" >> $PROJECT_ROOT/chat/settings.py
+    echo -n "SECRET_KEY = '" >> $PROJECT_ROOT/chat/settings.py
+    tr -dc 'A-Za-z0-9!@#$%^&*(-_=+)' </dev/urandom | head -c 50 >> $PROJECT_ROOT/chat/settings.py
+    echo "'" >> $PROJECT_ROOT/chat/settings.py
+}
+
 if [ "$1" = "sass" ]; then
     compile_sass
 elif [ "$1" = "generate_icon_session" ]; then
@@ -276,11 +283,19 @@ elif [ "$1" = "generate_icon_session" ]; then
 elif [ "$1" = "check_files" ]; then
     check_files
 elif [ "$1" = "rename_domain" ]; then
+    if [ $# -eq 0  ]; then
+        printError "Please provide domain name"
+        exit 1;
+    fi
     rename_domain $2
 elif [ "$1" = "rename_root_directory" ]; then
     rename_root_directory
 elif [ "$1" = "generate_certificate" ]; then
-    generate_certificate
+    if [ $# -eq 1 ]; then
+         generate_certificate "$PROJECT_ROOT/rootfs/etc/nginx/ssl/"
+    else
+        generate_certificate "$2"
+    fi
 elif [ "$1" = "extension" ]; then
     zip_extension
 elif [ "$1" = "download_files" ]; then
@@ -304,6 +319,8 @@ elif [ "$1" == "all" ]; then
     download_fontello
     compile_sass
     check_files "remove_script"
+elif [ "$1" == "generate_secret_key" ]; then
+    generate_secret_key
 else
  printf " \e[93mWellcome to pychat download manager, available commands are:\n"
  chp generate_certificate "Create self-singed ssl certificate"
@@ -318,6 +335,7 @@ else
  chp generate_icon_session "Creates fontello session from config.json and saves it to \e[96m .fontello \e[0;33;40mfile"
  chp print_icon_session "Shows current used url for editing fonts"
  chp download_icon "Downloads and extracts fonts from fontello to project"
+ chp generate_secret_key "Creates django secret key into \e[96m$PROJECT_ROOT/chat/settings.py\e[0;33;40m"
 fi
 
 
