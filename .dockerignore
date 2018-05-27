@@ -1,4 +1,5 @@
 docker/volumes
+docker-all/volumes
 chat/migrations
 chat/static/css
 log
