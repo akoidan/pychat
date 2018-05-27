@@ -3,4 +3,5 @@
 command="/usr/bin/uwsgi"
 command_args="--ini /srv/http/chat-uwsgi.ini"
 command_background="yes"
+command_user="http"
 pidfile="/tmp/uwsgi.pid"

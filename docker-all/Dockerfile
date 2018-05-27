@@ -9,8 +9,8 @@ ENV SASS_LIBSASS_PATH=/usr/src/sass/libsass \
     MAX_ALLOWED_PACKET=200
 
 WORKDIR /srv/http
-
 RUN set -x  &&\
+adduser -D -g '' http &&\
 apk update &&\
 apk add redis python3 python3-dev openrc mariadb-dev mariadb-client mariadb build-base curl nginx sassc linux-headers pcre-dev sassc bash &&\
 pip3 install mysqlclient &&\
@@ -82,6 +82,7 @@ pip3 install -r requirements.txt &&\
 cp ./chat/settings_example.py ./chat/settings.py &&\
 bash download_content.sh generate_secret_key &&\
 bash download_content.sh all &&\
+chown -R http:http /srv/http/ &&\
 rm ./chat/settings.py
 
 EXPOSE 443

@@ -3,6 +3,7 @@
 command="python3"
 command_args="/srv/http/manage.py init_db_start_tornado"
 command_background="yes"
+command_user="http"
 pidfile="/tmp/tornado.pid"
 
 depend() {
