@@ -1,0 +1,12 @@
+version: '3'
+services:
+  pychat:
+    image: deathangel908/pychat
+    volumes:
+      - ../chat/settings.py:/srv/http/chat/settings.py
+      - ../rootfs/etc/nginx/ssl/server.key:/etc/nginx/ssl/server.key
+      - ../rootfs/etc/nginx/ssl/certificate.crt:/etc/nginx/ssl/certificate.crt
+      - ./volumes/photos:/srv/http/photos
+      - ./volumes/mysql:/var/lib/mysql
+    ports:
+     - 443:443
