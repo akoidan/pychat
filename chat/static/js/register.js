@@ -53,7 +53,7 @@ var RegisterValidator = function () {
 			var username = input.value;
 			if (username === "") {
 				self.setError(self.username, self.username.text);
-			} else if (!USER_REGEX.test(username)) {
+			} else if (!window.USER_REGEX.test(username)) {
 				self.setError(self.username, self.username.badUsernameText);
 			} else {
 				doPost('/validate_user', {username: username}, function (data) {

@@ -231,7 +231,7 @@ function Draggable(container, headerText) {
 	};
 	self.ondragend = function (e) {
 		var x, y;
-		if (isFirefox) {
+		if (window.isFirefox) {
 			document.removeEventListener('dragover', self.onMouseMove);
 			x = self.left;
 			y = self.top;
@@ -257,7 +257,7 @@ function Draggable(container, headerText) {
 		self.dom.container.removeAttribute('draggable');
 	};
 	self.ondragstart = function (e) {
-		if (isFirefox) {
+		if (window.isFirefox) {
 			e.dataTransfer.setData('text/plain', 'won');
 			document.addEventListener('dragover', self.onMouseMove);
 		}
@@ -1961,7 +1961,7 @@ function NotifierHandler() {
 // Permissions are granted here!
 	self.showNot = function(title, options) {
 		try {
-			if (self.serviceWorkerRegistration && isMobile && isChrome) {
+			if (self.serviceWorkerRegistration && window.isMobile && window.isChrome) {
 				// TODO  options should contain page id here but it's not
 				// so we open unfefined url
 				self.serviceWorkerRegistration.showNotification(title, options).then(function(r) {
@@ -2041,7 +2041,7 @@ function NotifierHandler() {
 					doPost('/register_fcb', {
 						registration_id: self.subscriptionId,
 						agent: browserVersion,
-						is_mobile: isMobile
+						is_mobile: window.isMobile
 					}, function (response) {
 						if (response == RESPONSE_SUCCESS) {
 							resolve()
@@ -2671,7 +2671,7 @@ function ChannelsHandler() {
 		// eventPropagande will execute onclick on document.body that will hide contextMenu
 	};
 	self.handleEditMessage = function (event) {
-		if (!blankRegex.test(userMessage.textContent)) {
+		if (!window.blankRegex.test(userMessage.textContent)) {
 			return;
 		}
 		var editLastMessageNode = self.getActiveChannel().lastMessage;
@@ -3122,7 +3122,7 @@ function ChannelsHandler() {
 		self.dom.wrapper.addEventListener('contextmenu', self.showContextMenu, false);
 		self.dom.rooms.onclick = self.roomClick;
 		self.dom.directUserTable.onclick = self.roomClick;
-		if (isMobile) {
+		if (window.isMobile) {
 			self.dom.rooms.oncontextmenu = self.rightRoomClick;
 			self.dom.directUserTable.oncontextmenu = self.rightRoomClick;
 		}
@@ -4261,7 +4261,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 	self.pc = null;
 	self.connectionStatus = 'new';
 	self.removeChildPeerReference = removeChildPeerReferenceFn;
-	var webRtcUrl = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
+	var webRtcUrl = window.isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 	self.pc_config = {iceServers: [{url: webRtcUrl}]};
 	self.pc_constraints = {
 		optional: [/*Firefox*/
@@ -4893,9 +4893,9 @@ function CallHandler(roomId) {
 	self.getDesktopShareFromExtension = function() {
 		return new Promise(function (res, rej) {
 			var message;
-			if (!isChrome) {
+			if (!window.isChrome) {
 				rej("ScreenCast feature is only available from chrome atm")
-			} else if (isMobile) {
+			} else if (window.isMobile) {
 				rej("ScreenCast is not available for mobile phones yet")
 			} else {
 				Utils.pingExtension(function (success) {
@@ -5071,7 +5071,7 @@ function CallHandler(roomId) {
 		}
 	};
 	self.showNoMicError = function () {
-		var url = isChrome ? 'setting in chrome://settings/content' : 'your browser settings';
+		var url = window.isChrome ? 'setting in chrome://settings/content' : 'your browser settings';
 		url += navigator.platform.indexOf('Linux') >= 0 ?
 				'. Open pavucontrol for more info' :
 				' . Right click on volume icon in system tray -> record devices -> input -> microphone';
@@ -5357,7 +5357,7 @@ function CallHandler(roomId) {
 		self.dom.videoContainer.requestFullscreen();
 		CssUtils.addClass(self.dom.videoContainer, 'fullscreen');
 		document.addEventListener('mousemove', self.fsMouseMove, false);
-		if (!isMobile) {
+		if (!window.isMobile) {
 			self.hideContainerTimeoutRes = setInterval(self.hideContainerTimeout, 1000);
 		}
 		/*to clear only function from resultOf setInterval should be passed, otherwise doesn't work*/
@@ -6801,7 +6801,7 @@ var Utils = {
 	},
 	createMicrophoneLevelVoice: function (stream, onaudioprocess) {
 		try {
-			if (isMobile) {
+			if (window.isMobile) {
 				logger.log("Current phone is mobile, audio processor won't be created")();
 				return;
 			}
