@@ -264,6 +264,49 @@ delete_tmp_dir() {
     fi
 }
 
+
+create_db() {
+    files=$(shopt -s nullglob dotglob; echo ${DB_DATA_PATH}/*)
+    if (( ${#files} ))
+    then
+        printOut "Database directory already exist"
+        exit 0;
+    else
+        printOut "Database doesn't exist, creating one..."
+        safeRunCommand mysql_install_db --user=mysql --datadir=${DB_DATA_PATH}
+        printOut "Waiting mysql";
+        mysqld_safe & bash -c 'echo -ne "Waiting mysql"; \
+        mysqlFinish=0; \
+        for i in 10 9 8 7 6 5 4 3 2 1; do \
+                mysqladmin ping --silent; \
+                a=$? ; \
+                if (( $a == 0 )); then \
+                        mysqlFinish=1; \
+                        break;\
+                fi;\
+                sleep 1; \
+                echo -ne "."; \
+        done; \
+        if (( $mysqlFinish == 0 )); then \
+            echo -ne "Mysql startup failed"; \
+            exit 2; \
+        fi'
+
+        printOut "Creating pychat database"
+        mysqladmin -u root password "${DB_ROOT_PASS}"
+        echo "GRANT ALL ON *.* TO ${DB_USER}@'127.0.0.1' IDENTIFIED BY '${DB_PASS}' WITH GRANT OPTION;\
+        GRANT ALL ON *.* TO ${DB_USER}@'localhost' IDENTIFIED BY '${DB_PASS}' WITH GRANT OPTION;\
+        GRANT ALL ON *.* TO ${DB_USER}@'::1' IDENTIFIED BY '${DB_PASS}' WITH GRANT OPTION;\
+        create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; \
+        DELETE FROM mysql.user WHERE User='';\
+        DROP DATABASE test;\
+        FLUSH PRIVILEGES;"| mysql -u root --password="${DB_ROOT_PASS}"
+        printOut "Database has been created"
+        mysqladmin  -u root --password="${DB_ROOT_PASS}" shutdown
+    fi
+}
+
+
 generate_secret_key() {
     if [ ! -f "$PROJECT_ROOT/chat/settings.py" ]; then
         printError "File $PROJECT_ROOT/chat/settings.py doesn't exist. Create it before running the command"
@@ -282,6 +325,8 @@ elif [ "$1" = "generate_icon_session" ]; then
     python -mwebbrowser "http://fontello.com/`cat .fontello`"
 elif [ "$1" = "check_files" ]; then
     check_files
+elif [ "$1" = "create_db" ]; then
+    create_db
 elif [ "$1" = "rename_domain" ]; then
     if [ $# -eq 0  ]; then
         printError "Please provide domain name"
@@ -336,6 +381,7 @@ else
  chp print_icon_session "Shows current used url for editing fonts"
  chp download_icon "Downloads and extracts fonts from fontello to project"
  chp generate_secret_key "Creates django secret key into \e[96m$PROJECT_ROOT/chat/settings.py\e[0;33;40m"
+ chp create_db "Creates database pychat to mysql, the following environment variable should be defined \e[94mDB_ROOT_PASS DB_USER DB_PASS DB_DATA_PATH"
 fi
 
 

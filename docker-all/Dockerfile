@@ -33,36 +33,11 @@ rm -f /etc/init.d/hwdrivers \
     /etc/init.d/modules-load \
     /etc/init.d/modloop &&\
 sed -i 's/cgroup_add_service /# cgroup_add_service /g' /lib/rc/sh/openrc-run.sh &&\
-sed -i 's/VSERVER/DOCKER/Ig' /lib/rc/sh/init.sh
-
-RUN mysql_install_db --user=mysql --datadir=${DB_DATA_PATH} &&\
-( mysqld_safe & bash -c 'echo -ne "Waiting mysql"; \
-    mysqlFinish=0; \
-    for i in 10 9 8 7 6 5 4 3 2 1; do \
-            mysqladmin ping --silent; \
-            a=$? ; \
-            if (( $a == 0 )); then \
-                    mysqlFinish=1; \
-                    break;\
-            fi;\
-            sleep 1; \
-            echo -ne "."; \
-    done; \
-    if (( $mysqlFinish == 0 )); then \
-        echo -ne "Mysql startup failed"; \
-        exit 2; \
-    fi') &&\
-mysqladmin -u root password "${DB_ROOT_PASS}" &&\
-echo "GRANT ALL ON *.* TO ${DB_USER}@'127.0.0.1' IDENTIFIED BY '${DB_PASS}' WITH GRANT OPTION;\
-GRANT ALL ON *.* TO ${DB_USER}@'localhost' IDENTIFIED BY '${DB_PASS}' WITH GRANT OPTION;\
-GRANT ALL ON *.* TO ${DB_USER}@'::1' IDENTIFIED BY '${DB_PASS}' WITH GRANT OPTION;\
-create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; \
-DELETE FROM mysql.user WHERE User='';\
-DROP DATABASE test;\
-FLUSH PRIVILEGES;"| mysql -u root --password="${DB_ROOT_PASS}" &&\
-mysqladmin  -u root --password="${DB_ROOT_PASS}" shutdown && \\
+sed -i 's/VSERVER/DOCKER/Ig' /lib/rc/sh/init.sh &&\
 sed -i "s|max_allowed_packet\s*=\s*1M|max_allowed_packet = ${MAX_ALLOWED_PACKET}|g" /etc/mysql/my.cnf &&\
-sed -i "s|max_allowed_packet\s*=\s*16M|max_allowed_packet = ${MAX_ALLOWED_PACKET}|g" /etc/mysql/my.cnf
+sed -i "s|max_allowed_packet\s*=\s*16M|max_allowed_packet = ${MAX_ALLOWED_PACKET}|g" /etc/mysql/my.cnf &&\
+sed -i 's|eerror "Datadir \x27\$required_dirs\x27 is empty or invalid\."|bash /srv/http/download_content.sh create_db|g' /etc/init.d/mariadb &&\
+sed -i '/eerror "Run \x27\/etc\/init.d\/mariadb setup\x27 to create new database."/d' /etc/init.d/mariadb
 
 COPY ./manage.py ./config.json ./DefaultSmilies.cfpack ./docker-all/chat-uwsgi.ini ./download_content.sh requirements.txt ./
 COPY ./chat ./chat/
