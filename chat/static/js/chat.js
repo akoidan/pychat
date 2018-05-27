@@ -88,7 +88,8 @@ onDocLoad(function () {
 		channelsHandler.clearChannelHistory();
 		doPost('/logout', {registration_id: notifier.subscriptionId}, function(response) {
 			if (response === RESPONSE_SUCCESS) {
-				window.location = '/register'
+				window.location = '/register';
+				storage.clearStorage();
 			} else {
 				growlError("<div>Unable to logout, because: " + response + "</div>")
 			}
@@ -3527,7 +3528,7 @@ function DataBase() {
 			cb(null);
 		} else {
 			logger.log("Initializing database")();
-			self.db = openDatabase('pydb_1.0', '', 'Messages database', 10 * 1024 * 1024);
+			self.db = openDatabase('pydb_1.0_'+loggedUserId, '', 'Messages database', 10 * 1024 * 1024);
 			if (self.db.version == '') {
 				self.db.changeVersion(self.db.version, '1.0', function (t) {
 					t.executeSql('CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, channel integer, userId integer)', [], function(t,d) {
