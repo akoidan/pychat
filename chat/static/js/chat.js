@@ -2792,7 +2792,11 @@ function ChannelsHandler() {
 				try {
 					d = JSON.parse(res);
 				} catch (e) {
-					growlError("Unable to upload videos, failed to parse response from server");
+					if (res.indexOf("<") === 0) {
+						growlError(res);
+					} else {
+						growlError("Unable to upload videos, failed to parse response from server");
+					}
 					return;
 				}
 				self.sendMessage(isEdit, d, messageContent)
