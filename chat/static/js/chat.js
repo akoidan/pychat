@@ -88,8 +88,8 @@ onDocLoad(function () {
 		channelsHandler.clearChannelHistory();
 		doPost('/logout', {registration_id: notifier.subscriptionId}, function(response) {
 			if (response === RESPONSE_SUCCESS) {
-				window.location = '/register';
 				storage.clearStorage();
+				window.location = '/register';
 			} else {
 				growlError("<div>Unable to logout, because: " + response + "</div>")
 			}
@@ -6338,9 +6338,14 @@ function WsHandler() {
 		}
 		var reason = e.reason || e;
 		if (e.code === 403) {
-			var message = "Server has forbidden request because '{}'".format(reason);
+			var message = "Server has forbidden request because '{}'. Logging out...".format(reason);
 			growlError(message);
 			logger.error('{}', message)();
+			setTimeout(function() {
+				storage.clearStorage();
+				window.location = '/register';
+			}, 1000);
+			return;
 		} else if (self.wsState === 0) {
 			growlError("Can't establish connection with server");
 			logger.error("Chat server is down because {}", reason)();
