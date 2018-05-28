@@ -314,7 +314,7 @@ generate_secret_key() {
     fi
     echo "" >> $PROJECT_ROOT/chat/settings.py
     echo -n "SECRET_KEY = '" >> $PROJECT_ROOT/chat/settings.py
-    tr -dc 'A-Za-z0-9!@#$%^&*(-_=+)' </dev/urandom | head -c 50 >> $PROJECT_ROOT/chat/settings.py
+    tr -dc 'A-Za-z0-9!@#$%^&*(\-\_\=\+)' </dev/urandom | head -c 50 >> $PROJECT_ROOT/chat/settings.py
     echo "'" >> $PROJECT_ROOT/chat/settings.py
 }
 
