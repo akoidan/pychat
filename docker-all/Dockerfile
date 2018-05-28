@@ -39,7 +39,10 @@ sed -i "s|max_allowed_packet\s*=\s*16M|max_allowed_packet = ${MAX_ALLOWED_PACKET
 sed -i 's|eerror "Datadir \x27\$required_dirs\x27 is empty or invalid\."|bash /srv/http/download_content.sh create_db|g' /etc/init.d/mariadb &&\
 sed -i '/eerror "Run \x27\/etc\/init.d\/mariadb setup\x27 to create new database."/d' /etc/init.d/mariadb
 
-COPY ./manage.py ./config.json ./DefaultSmilies.cfpack ./docker-all/chat-uwsgi.ini ./download_content.sh requirements.txt ./
+COPY ./requirements.txt ./
+RUN pip3 install -r requirements.txt
+
+COPY ./manage.py ./config.json ./DefaultSmilies.cfpack ./docker-all/chat-uwsgi.ini ./download_content.sh ./
 COPY ./chat ./chat/
 COPY ./docker-all/uwsgi ./docker-all/tornado /etc/init.d/
 COPY ./templates  ./templates
@@ -53,7 +56,6 @@ rc-update add nginx default &&\
 rc-update add uwsgi default &&\
 rc-update add tornado default &&\
 rc-update add redis default &&\
-pip3 install -r requirements.txt &&\
 cp ./chat/settings_example.py ./chat/settings.py &&\
 bash download_content.sh generate_secret_key &&\
 bash download_content.sh all &&\

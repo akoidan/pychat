@@ -58,8 +58,7 @@ Please don't use this build for production, as it uses debug ssl certificate, la
    - You can also generate them manually and put into `./rootfs/etc/nginx/ssl/server.key` and `./rootfs/etc/nginx/ssl/certificate.crt`
  - Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. Execute `bash download_content.sh generate_secret_key`. If you need additional features like oauth/push notifications you can set those up by editing `chat/settings.py`.
  - Build/run docker images, choose **ONE** of methods below:
-   - Run my built image: `docker-compose -f ./docker-all/docker-compose.yml up`. If you don't have docker-compose you can run the image binding volumes manually: `docker run -v $PWD/chat/settings.py:/srv/http/chat/settings.py -v $PWD/rootfs/etc/nginx/ssl/server.key:/etc/nginx/ssl/server.key -v $PWD/rootfs/etc/nginx/ssl/certificate.crt:/etc/nginx/ssl/certificate.crt -v $PWD/docker-all/volumes/mysql:/var/lib/mysql -v $PWD/docker-all/volumes/photos:/srv/http/photos -v $PWD/docker-all/volumes/redis:/var/lib/redis -p 443:443 deathangel908/pychat`
-   - Build and run single container: `docker build -t pychat . -f docker-all/Dockerfilepychat`.  `docker run -p 443:443 pychat -v $PWD/docker-all/volumes/mysql:/var/lib/mysql v $PWD/docker-all/volumes/photos:/srv/http/photos`. This will build the same image, with the  difference that you won't need to import config files from host OS as in step above.
+   - Run my built image: `docker-compose -f ./docker-all/docker-compose.yml up`.
    - Build and run multiple containers: `docker-compose -f docker/docker-compose.yml up`. This build contains 1 process per container. I'm using docker-compose 2.3 for health-check feature, make sure you have latest installation of docker to support it.
  - Open https://localhost
 

@@ -1,11 +1,16 @@
 #!/sbin/openrc-run
 
 command="python3"
-command_args="/srv/http/manage.py init_db_start_tornado"
+command_args="/srv/http/manage.py start_tornado --host localhost"
 command_background="yes"
 command_user="http"
 pidfile="/tmp/tornado.pid"
 
 depend() {
     want mariadb redis
+}
+
+start_pre() {
+   python3 /srv/http/manage.py init_db
+   python3 /srv/http/manage.py sync_db
 }
