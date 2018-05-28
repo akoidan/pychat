@@ -8,5 +8,6 @@ services:
       - ../rootfs/etc/nginx/ssl/certificate.crt:/etc/nginx/ssl/certificate.crt
       - ./volumes/photos:/srv/http/photos
       - ./volumes/mysql:/var/lib/mysql
+      - ./volumes/redis:/var/lib/redis
     ports:
      - 443:443
