@@ -37,7 +37,8 @@ sed -i 's/VSERVER/DOCKER/Ig' /lib/rc/sh/init.sh &&\
 sed -i "s|max_allowed_packet\s*=\s*1M|max_allowed_packet = ${MAX_ALLOWED_PACKET}|g" /etc/mysql/my.cnf &&\
 sed -i "s|max_allowed_packet\s*=\s*16M|max_allowed_packet = ${MAX_ALLOWED_PACKET}|g" /etc/mysql/my.cnf &&\
 sed -i 's|eerror "Datadir \x27\$required_dirs\x27 is empty or invalid\."|bash /srv/http/download_content.sh create_db|g' /etc/init.d/mariadb &&\
-sed -i '/eerror "Run \x27\/etc\/init.d\/mariadb setup\x27 to create new database."/d' /etc/init.d/mariadb
+sed -i '/eerror "Run \x27\/etc\/init.d\/mariadb setup\x27 to create new database."/d' /etc/init.d/mariadb &&\
+mkdir ./log
 
 COPY ./requirements.txt ./
 RUN pip3 install -r requirements.txt
@@ -47,9 +48,9 @@ COPY ./chat ./chat/
 COPY ./docker-all/uwsgi ./docker-all/tornado /etc/init.d/
 COPY ./templates  ./templates
 COPY ./docker-all/nginx.conf /etc/nginx
+COPY ./log/concat_logs.py ./log/
 
-RUN mkdir log &&\
-chmod a+x /etc/init.d/tornado &&\
+RUN chmod a+x /etc/init.d/tornado &&\
 chmod a+x /etc/init.d/uwsgi &&\
 rc-update add mariadb default &&\
 rc-update add nginx default &&\

@@ -3,4 +3,5 @@ docker-all/volumes
 chat/migrations
 chat/static/css
 log
+!log/concat_logs.py
 photos

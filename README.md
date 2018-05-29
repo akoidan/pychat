@@ -60,7 +60,7 @@ Please don't use this build for production, as it uses debug ssl certificate, la
  - Build/run docker images, choose **ONE** of methods below:
    - Run my built image: `docker-compose -f ./docker-all/docker-compose.yml up`.
    - Build and run multiple containers: `docker-compose -f docker/docker-compose.yml up`. This build contains 1 process per container. I'm using docker-compose 2.3 for health-check feature, make sure you have latest installation of docker to support it.
- - Open https://localhost
+ - Open https://localhost . If something is broken you can check /srv/http/log/ in docker `docker exec -it containerId bash`
 
 ## Development setup
 The flow is the following
