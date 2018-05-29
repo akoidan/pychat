@@ -11,6 +11,6 @@ depend() {
 }
 
 start_pre() {
-   python3 /srv/http/manage.py init_db
-   python3 /srv/http/manage.py sync_db
+   su -c 'python3 /srv/http/manage.py init_db'
+   su -c 'python3 /srv/http/manage.py sync_db'
 }
