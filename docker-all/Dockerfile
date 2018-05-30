@@ -1,7 +1,6 @@
 FROM alpine:3.7
 
-ENV SASS_LIBSASS_PATH=/usr/src/sass/libsass \
-    PYCHAT_CONFIG=docker_all \
+ENV PYCHAT_CONFIG=docker_all \
     DB_DATA_PATH=/var/lib/mysql \
     DB_ROOT_PASS=pypass_root \
     DB_USER=pychat \
