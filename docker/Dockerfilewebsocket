@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM alpine:3.7
 WORKDIR /usr/src
 ENV PYCHAT_CONFIG docker
 RUN set -x &&\

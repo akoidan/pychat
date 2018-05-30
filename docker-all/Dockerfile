@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM alpine:3.7
 
 ENV SASS_LIBSASS_PATH=/usr/src/sass/libsass \
     PYCHAT_CONFIG=docker_all \
