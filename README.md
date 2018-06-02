@@ -1,4 +1,4 @@
-<p align="center"><img src="logo.svg"></p>
+<p align="center"><img src="./logo/logo.svg"></p>
 
 ![python](https://img.shields.io/badge/python-2.7%2C%203.x-blue.svg) ![python](https://img.shields.io/badge/django-1.7--1.9-blue.svg) [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/pychat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/pychat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/pychat/master) [![Codacy Badge](https://www.codacy.com/project/badge/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/public/nightmarequake/pychat)
 
