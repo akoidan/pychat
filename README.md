@@ -183,6 +183,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Add sound/video messages like in telegram
 * Add webrtc peer to peer secure chats (like telegrams)
 * docker-all should output logs to stdout
 * openrc is not getting killed in docker https://github.com/dockage/alpine-openrc/issues/2
