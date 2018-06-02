@@ -5859,16 +5859,6 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 		var currentSlice = self.file.slice(self.offset, self.offset + self.READ_CHUNK_SIZE);
 		self.reader.readAsArrayBuffer(currentSlice);
 	};
-	self.logTransferProgress = function () {
-		var now = Date.now();
-		if (now - self.lastPrinted > 1000) {
-			self.lastPrinted = now;
-			return self.log.apply(self, arguments);
-		} else {
-			return function () {
-			};
-		}
-	};
 	self.onFileReaderLoad = function (e) {
 		if (e.target.result.byteLength > 0 ) {
 			self.sendData(e.target.result, 0, function() {
@@ -5893,8 +5883,12 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 			if (self.sendChannel.readyState === 'open') {
 				if (self.sendChannel.bufferedAmount > 10000000) { // prevent chrome buffer overfill
 					// if it happens chrome will just close the datachannel
-					self.logTransferProgress("Buffer overflow by {}bytes, waiting to flush...",
+					var now = Date.now();
+					if (now - self.lastPrinted > 1000) {
+						self.lastPrinted = now;
+						logger.log("Buffer overflow by {}bytes, waiting to flush...",
 							bytesToSize(self.sendChannel.bufferedAmount))();
+					}
 					return window.setTimeout(self.sendData, 100, data, offset, cb);
 				} else {
 					var buffer = data.slice(offset, offset + self.SEND_CHUNK_SIZE);

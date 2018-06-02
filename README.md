@@ -7,7 +7,7 @@ This is free web (browser) chat, that features:
  - Send: images, smiles, anchors, embedded youtube, [giphy](https://giphy.com/), code [highlight](https://highlightjs.org/)
  - Make calls and video conference using [Peer to peer](https://en.wikipedia.org/wiki/Peer-to-peer) WebRTC.
  - Share screen during call or conference
- - Send files directly to another PC (p2p) using WebRTC + FileSystem Api (Average speed is 25MByte/s, limited by RTCDataChannel speed, but already is twice more than 100Mbit wan)
+ - Send files directly to another PC (p2p) using WebRTC + FileSystem Api (up to 50MByte/s, limited by RTCDataChannel speed)
  - Edit images with integrated painter (brush/line/reactangle/oval/flood fill/erase/crop/cpilboard paste/resize/rotate/zoom/add text/ctrl+a)
  - Login in with facebook/google oauth.
  - Send offline messages with Firebase push notifications
