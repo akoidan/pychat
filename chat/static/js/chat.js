@@ -4342,7 +4342,7 @@ function AbstractPeerConnection(connectionId, opponentWsId, removeChildPeerRefer
 		return function () {
 			var message = "An error occurred while {}: {}".format(parent, Utils.extractError(arguments));
 			growlError(message);
-			logger.error(message)();
+			logger.error("failWebRtc {}", message)();
 		}
 	};
 	self.createOffer = function () { // each peer should be able to createOffer in case of microphone change
@@ -5032,7 +5032,7 @@ function CallHandler(roomId) {
 		}
 		var message = "<span>Failed to capture {} source, because {}</span>".format(what.join(', '), Utils.extractError(arguments));
 		growlError(message);
-		logger.error(message)();
+		logger.error("onFailedCaptureSource {}", message)();
 	};
 	self.setHeaderText = function (text) {
 		self.dom.headerText.innerHTML = text;
@@ -5915,7 +5915,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 			self.downloadBar.setStatus("Error: Connection has been lost");
 			self.downloadBar.setError();
 			self.closeEvents("SendChannel is in status {} which is not opened".format(self.sendChannel.readyState));
-			logger.error(error)();
+			logger.error("sendData {}", error)();
 			growlError("Connection loss while sending file {} to user {}".format(self.fileName, self.receiverName));
 		}
 	};
@@ -5935,7 +5935,7 @@ function FileSenderPeerConnection(connectionId, opponentWsId, file, removeChildP
 		} catch (e) {
 			var error = "Failed to create data channel because {} ".format(e.message || e);
 			growlError(error);
-			logger.error(error)();
+			logger.error("onacceptFile {}", error)();
 		}
 		self.createOffer();
 	};
@@ -6340,7 +6340,7 @@ function WsHandler() {
 		if (e.code === 403) {
 			var message = "Server has forbidden request because '{}'. Logging out...".format(reason);
 			growlError(message);
-			logger.error('{}', message)();
+			logger.error('onWsClose {}', message)();
 			setTimeout(function() {
 				storage.clearStorage();
 				window.location = '/register';

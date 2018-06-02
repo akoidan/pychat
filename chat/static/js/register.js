@@ -322,7 +322,7 @@ function onsdkError(message) {
 	return function (e) {
 		ajaxHide();
 		var error =  e.details || e.error || e;
-		logger.error(message + error)();
+		logger.error("sdk error message {}, {}", message, error)();
 		growlError(message + error);
 	}
 }
