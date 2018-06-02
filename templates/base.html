@@ -13,7 +13,7 @@
 		const RESPONSE_SUCCESS = "{{ successResponse }}";
 		window.START_WITH_LOGS = {{ logs |yesno:"true,false" }};
 	</script>
-	<script src="{% md5url "js/base.js" %}"></script>
+	<script crossorigin="anonymous" src="{% md5url "js/base.js" %}"></script>
 	{% block head %} {% endblock head %}
 	<style>
 		@font-face {

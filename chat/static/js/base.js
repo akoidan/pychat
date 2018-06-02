@@ -20,10 +20,12 @@ function sliceZero(number, count) {
 
 var growlHolder;
 
-window.onerror = function (msg, url, linenumber) {
+window.onerror = function (msg, url, linenumber, column, errorObj) {
 	var message = 'Error occurred in {}:{}\n{}'.format(url, linenumber, msg);
 	if (growlHolder) {
-		doPost('/report_issue', {issue: message});
+		doPost('/report_issue', {
+			issue: '{}:{}:{}\n{}\n\nOBJ:  {}'.format(url, linenumber, column ||'?', msg, errorObj || '?')
+		});
 		growlError(message);
 	} else {
 		alert(message);

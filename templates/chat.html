@@ -29,9 +29,9 @@
 		window.embeddedYoutube = {{ embedded_youtube |yesno:"true,false" }};
 	</script>
 	  {% if highlight_code %}
-			<script src="{% md5url "js/highlight.min.js" %}"></script>
+			<script crossorigin="anonymous" src="{% md5url "js/highlight.min.js" %}"></script>
     {% endif %}
-	<script src="{% md5url "js/chat.js" %}"></script>
+	<script crossorigin="anonymous" src="{% md5url "js/chat.js" %}"></script>
 	{% if manifest %}
 		<link rel="manifest" href="{% md5url 'manifest.json' %}">
 	{% endif %}

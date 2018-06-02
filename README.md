@@ -183,6 +183,8 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* m2 user -> write direct message, if channel wasn't created, I get error Uncaught Unknown channel 227 for message "{"action":"setOnlineUsers","content":[97],"userId":97,"time":1527945723611,"handler":"chat","channel":227,"user":"AAdmin","sex":"Male"}"
+* Messages aren't appearing in 2nd tab if tab was offline while pubsub is sent
 * Add sound/video messages like in telegram
 * Add webrtc peer to peer secure chats (like telegrams)
 * docker-all should output logs to stdout

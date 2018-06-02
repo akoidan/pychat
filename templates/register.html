@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load md5url %}
 {% block head %}
-	<script src="{% md5url "js/register.js" %}"></script>
+	<script crossorigin="anonymous" src="{% md5url "js/register.js" %}"></script>
 	<link rel="stylesheet" type="text/css" href="{% md5url 'css/register.css' %}">
 	{% if oauth_token %}
 		<meta name="google-signin-scope" content="profile email">
