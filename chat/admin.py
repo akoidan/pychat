@@ -12,7 +12,7 @@ from chat import models
 
 exclude_auto = ('User')
 model_classes = (class_name[1] for class_name in inspect.getmembers(sys.modules[models.__name__], inspect.isclass)
-					  if class_name[1].__module__ == models.__name__ and class_name[0] not in exclude_auto)
+		if class_name[1].__module__ == models.__name__ and class_name[0] not in exclude_auto)
 
 
 def gen_fun(field):

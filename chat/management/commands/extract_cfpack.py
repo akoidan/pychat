@@ -61,31 +61,34 @@ class Command(BaseCommand):
 					os.mkdir(tab_dir_path)
 			addition_info['count'] = struct.unpack('<H', f.read(2))[0]  # amount of bytes in a single pack
 			for item in range(addition_info['count']):
-				f.seek(1, 1)  # skip header size
-				cat_cur = ord(f.read(1))
-				if cat_cur >= count:
-					raise SyntaxError('File is not valid')
-				size = ord(f.read(1)) * 2
-				alias = (f.read(size)).decode('utf-16le')
-				f.seek(1, 1)  # 0
-				size = struct.unpack('<I', f.read(4))[0]
-				data = f.read(size)
-				file_ext = ext.get(data[:2], '')
-				file_name = '{0:04x}.{1}'.format(item, file_ext)
-				tab = file_names_pattern[cats[cat_cur]]
-				gif_file_path = os.sep.join((settings.SMILEYS_ROOT, tab, file_name))
-				smileys.setdefault(tab, [])
-				start_char += 1
-				if not smiley_pattern.match(alias):
-					alias = ":%s:" % alias
-				smileys[tab].append({
-					'code': get_unicode(start_char),
-					'alt': alias,
-					'src': file_name,
-				})
-				with open(gif_file_path, 'wb') as gif:
-					gif.write(data)
+				self.write_smile(cats, count, f, item, smileys, start_char)
 		return smileys
+
+	def write_smile(self, cats, count, f, item, smileys, start_char):
+		f.seek(1, 1)  # skip header size
+		cat_cur = ord(f.read(1))
+		if cat_cur >= count:
+			raise SyntaxError('File is not valid')
+		size = ord(f.read(1)) * 2
+		alias = (f.read(size)).decode('utf-16le')
+		f.seek(1, 1)  # 0
+		size = struct.unpack('<I', f.read(4))[0]
+		data = f.read(size)
+		file_ext = ext.get(data[:2], '')
+		file_name = '{0:04x}.{1}'.format(item, file_ext)
+		tab = file_names_pattern[cats[cat_cur]]
+		gif_file_path = os.sep.join((settings.SMILEYS_ROOT, tab, file_name))
+		smileys.setdefault(tab, [])
+		start_char += 1
+		if not smiley_pattern.match(alias):
+			alias = ":%s:" % alias
+		smileys[tab].append({
+			'code': get_unicode(start_char),
+			'alt': alias,
+			'src': file_name,
+		})
+		with open(gif_file_path, 'wb') as gif:
+			gif.write(data)
 
 	def create_json_info(self, info):
 
