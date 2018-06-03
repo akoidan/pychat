@@ -8,7 +8,12 @@
 	<meta property="og:title" content="Open Source Chat"/>
 	<meta property="og:image" content="{% md5url 'images/favicon.ico' %}"/>
 	<meta property="og:site_name" content="Pychat"/>
-	{% if theme == "color-reg" %}<meta name="theme-color" content="#232323" />{% endif %}
+	{% if theme == "color-reg" %}
+		<meta name="theme-color" content="#232323" />
+		<meta name="msapplication-navbutton-color" content="#232323">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	{% endif %}
 	<meta property="og:description" content="Chat with your friends, make video calls or transfer files with Pychat!"/>
 	<script>
 		window.RESPONSE_SUCCESS = "{{ successResponse }}";
