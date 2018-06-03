@@ -3023,6 +3023,7 @@ function ChannelsHandler() {
 		}
 		var bu = Utils.checkAndPlay;
 		Utils.checkAndPlay = function () {};
+		var allMessages = [];
 		for (var roomId in rooms) {
 			// if a new room has been added while disconnected
 			if (!rooms.hasOwnProperty(roomId)) continue;
@@ -3049,9 +3050,10 @@ function ChannelsHandler() {
 			hisMess.forEach(function (d) {
 				self.channels[roomId]._printMessage(d, false, true);
 			});
-			storage.saveMessages(offlMess);
-			storage.saveMessages(hisMess);
+		 Array.prototype.push.apply(allMessages, offlMess);
+		 Array.prototype.push.apply(allMessages, hisMess);
 		}
+		storage.saveMessages(allMessages);
 		self.loadMessage(null, true);
 		self.showActiveChannel();
 		Utils.checkAndPlay = bu;
@@ -3597,7 +3599,7 @@ function DataBase() {
 	});
 	self.cache = {};
 	self.setRoomHeaderId = function(roomId, headerId) {
-		if (!self.cache[roomId] || self.cache[roomId] < roomId) {
+		if (!self.cache[roomId] || self.cache[roomId] < headerId) {
 			self.cache[roomId] = headerId;
 		}
 	}
