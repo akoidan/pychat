@@ -56,6 +56,12 @@ rename_root_directory() {
     grep -rl "$pattern" "$PROJECT_ROOT/rootfs" |xargs sed -i "s#$PROJECT_ROOT#$PWD#g"
 }
 
+update_docker() {
+    safeRunCommand docker build -f ./docker-all/Dockerfile -t deathangel908/pychat .
+    safeRunCommand docker build -f ./docker-all/Dockerfilepychat -t deathangel908/pychat:test .
+    safeRunCommand docker push deathangel908/pychat
+}
+
 rename_domain() {
     exist_domain="pychat\.org"
     your_domain="$1"
@@ -345,6 +351,8 @@ elif [ "$1" = "extension" ]; then
     zip_extension
 elif [ "$1" = "download_files" ]; then
     download_files
+elif [ "$1" = "update_docker" ]; then
+    update_docker
 elif [ "$1" = "smileys" ]; then
     generate_smileys
 elif [ "$1" = "print_icon_session" ]; then
@@ -382,6 +390,7 @@ else
  chp download_icon "Downloads and extracts fonts from fontello to project"
  chp generate_secret_key "Creates django secret key into \e[96m$PROJECT_ROOT/chat/settings.py\e[0;33;40m"
  chp create_db "Creates database pychat to mysql, the following environment variable should be defined \e[94mDB_ROOT_PASS DB_USER DB_PASS DB_DATA_PATH"
+ chp update_docker "Builds docker images for deathangel908/pychat"
 fi
 
 
