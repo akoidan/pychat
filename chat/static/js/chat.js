@@ -2457,11 +2457,13 @@ function ChannelsHandler() {
 		if (self.setRoomsFinished && self.dbMessages) {
 			var skipped = [];
 			for (var i = 0; i < self.dbMessages.length; i++) {
-				var mesage = self.dbMessages[i];
-				if (self.channels[mesage.roomId]) {
-					self.channels[mesage.roomId]._printMessage(mesage, false, true);
+				var message = self.dbMessages[i];
+				var oui = self.getAllUsersInfo();
+				// if room or user was deleted
+				if (self.channels[message.roomId] && oui[message.userId]) {
+					self.channels[message.roomId]._printMessage(message, false, true);
 				} else {
-					skipped.push(mesage);
+					skipped.push(message);
 				}
 			}
 			if (skipped.length) {
@@ -2888,7 +2890,6 @@ function ChannelsHandler() {
 		if (message.inviteeUserId == loggedUserId) {
 			self.createNewRoomChatHandler(message.roomId, message.name, message.users);
 			room = self.channels[message.roomId];
-			room.refreshOnlineStatus();
 		} else {
 			room = self.channels[message.roomId];
 			var inviteeUser = self.getAllUsersInfo()[message.inviteeUserId];
@@ -3030,7 +3031,7 @@ function ChannelsHandler() {
 		self.channels[roomId].dom.userList.innerHTML = '';
 		users.forEach(function(userId) {
 			var user = self.getAllUsersInfo()[userId];
-			chatHandler.addUserLi(userId, user.sex, user.user);
+			chatHandler.addUserLi(userId, user.sex, user.user, self.isUserIdOnline(userId));
 		});
 		chatBoxDiv.oncontextmenu = self.showM2ContextDelete;
 	};
@@ -3157,14 +3158,12 @@ function ChannelsHandler() {
 				message.time,
 				'Room for user <b userId="{}">{}</b> has been created'.format(anotherUserId, anotherUserName[anotherUserId].user)
 		);
-		room.refreshOnlineStatus();
 	};
 	self.addRoom = function (message) {
 		self.createNewRoomChatHandler(message.roomId, message.name, message.users);
 		var room = self.channels[message.roomId];
 		room.displayPreparedMessage(SYSTEM_HEADER_CLASS, Date.now(), '<span>Room <b>{}</b> has been created</span>'.format(message.name), SYSTEM_USERNAME);
 		room.setRoomSettings(message.volume, message.notifications);
-		room.refreshOnlineStatus();
 	};
 	self.viewProfile = function () {
 		singlePage.showPage('/profile/', [self.getActiveUserId()]);
@@ -3301,7 +3300,7 @@ function ChannelsHandler() {
 			Utils.checkAndPlay(sound, 1);
 		}
 		self.onlineUsersIds = message.content;
-		self.setOnlineUsers(message.content);
+		self.setOnlineUsers();
 	};
 	self.setOnlineUsers = function () {
 		for (var roomId in self.channels) {
@@ -3875,7 +3874,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private, getAll
 			if (self.roomUsersIds.indexOf(newUserId) < 0) {
 				var newUser = getAllUsersInfo()[newUserId];
 				logger.log("User with id {} has been signed up while offline", newUserId)();
-				self.addUserLi(newUserId, newUser.sex, newUser.user);
+				self.addUserLi(newUserId, newUser.sex, newUser.user, isUserIdOnline(newUserId));
 			}
 		});
 	};

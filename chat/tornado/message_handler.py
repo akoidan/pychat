@@ -336,10 +336,11 @@ class MessagesHandler(MessagesCreator):
 			raise ValidationError('Room is already deleted')
 		if room.name is None:  # if private then disable
 			room.disabled = True
+			room.save()
 		else:  # if public -> leave the room, delete the link
 			RoomUsers.objects.filter(room_id=room.id, user_id=self.user_id).delete()
 		ru = list(RoomUsers.objects.filter(room_id=room.id).values_list('user_id', flat=True))
-		message = self.unsubscribe_direct_message(room_id, ru)
+		message = self.unsubscribe_direct_message(room_id, ru, room.name)
 		self.publish(message, room_id, True)
 
 	def edit_message(self, data):
@@ -392,8 +393,9 @@ class MessagesHandler(MessagesCreator):
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
-		self.async_redis.unsubscribe((room_id,))
-		self.channels.remove(room_id)
+		if message[VarNames.USER_ID] == self.user_id or message[VarNames.ROOM_NAME] is None:
+			self.async_redis.unsubscribe((room_id,))
+			self.channels.remove(room_id)
 
 	def process_get_messages(self, data):
 		"""
