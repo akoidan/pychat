@@ -89,7 +89,7 @@ class MessagesHandler(MessagesCreator):
 				return new_self.old_read(callback=callback)
 			except Exception as e:
 				return
-				current_online = self.get_online_from_redis(RedisPrefix.DEFAULT_CHANNEL)
+				current_online = self.get_online_from_redis()
 				self.logger.error(e)
 				self.logger.error(
 					"Exception info: "
@@ -131,15 +131,15 @@ class MessagesHandler(MessagesCreator):
 		self.channels.append(channel)
 		yield Task(self.async_redis.subscribe, (channel,))
 
-	def get_online_from_redis(self, channel):
-		return self.get_online_and_status_from_redis(channel)[1]
+	def get_online_from_redis(self):
+		return self.get_online_and_status_from_redis()[1]
 
-	def get_online_and_status_from_redis(self, channel):
+	def get_online_and_status_from_redis(self):
 		"""
 		:rtype : (bool, list)
 		"""
-		online = self.sync_redis.ssmembers(channel)
-		self.logger.debug('!! channel %s redis online: %s', channel, online)
+		online = self.sync_redis.ssmembers(RedisPrefix.ONLINE_VAR)
+		self.logger.debug('!! redis online: %s', online)
 		return self.parse_redis_online(online) if online else (False, [])
 
 	def parse_redis_online(self, online):
@@ -155,27 +155,6 @@ class MessagesHandler(MessagesCreator):
 				user_is_online = True
 			result.add(user_id)
 		return user_is_online, list(result)
-
-	def add_online_user(self, room_id, is_online, online):
-		"""
-		adds to redis
-		online_users = { connection_hash1 = stored_redis_user1, connection_hash_2 = stored_redis_user2 }
-		:return: if user is online
-		"""
-		if is_online:  # Send user names to self
-			online_user_names_mes = self.room_online(online, Actions.REFRESH_USER, room_id)
-			self.logger.info('!! Second tab, retrieving online for self')
-			self.ws_write(online_user_names_mes)
-		else:  # if a new tab has been opened
-			online.append(self.user_id)
-			online_user_names_mes = self.room_online(online, Actions.LOGIN, room_id)
-			self.logger.info('!! First tab, sending refresh online for all')
-			self.publish(online_user_names_mes, room_id)
-
-	def get_is_online(self, room_id):
-		self.async_redis_publisher.sadd(room_id, self.id)
-		# since we add user to online first, latest trigger will always show correct online
-		return self.get_online_and_status_from_redis(room_id)
 
 	def publish(self, message, channel, parsable=False):
 		jsoned_mess = encode_message(message, parsable)
@@ -219,7 +198,7 @@ class MessagesHandler(MessagesCreator):
 	def notify_offline(self, channel, message_id):
 		if FIREBASE_API_KEY is None:
 			return
-		online = self.get_online_from_redis(channel)
+		online = self.get_online_from_redis()
 		if channel == ALL_ROOM_ID:
 			return
 		offline_users = RoomUsers.objects.filter(room_id=channel, notifications=True).exclude(user_id__in=online).values_list('user_id')
@@ -270,7 +249,7 @@ class MessagesHandler(MessagesCreator):
 		def send_message(message, giphy=None):
 			files = UploadedFile.objects.filter(id__in=message.get(VarNames.FILES), user_id=self.user_id)
 			symbol = get_max_key(files)
-			channel = message[VarNames.CHANNEL]
+			channel = message[VarNames.ROOM_ID]
 			js_id = message[VarNames.JS_MESSAGE_ID]
 			message_db = Message(
 				sender_id=self.user_id,
@@ -311,13 +290,17 @@ class MessagesHandler(MessagesCreator):
 		room_id = message[VarNames.ROOM_ID]
 		user_id = message[VarNames.USER_ID]
 		room = get_or_create_room(self.channels, room_id, user_id)
-		users_in_room = {
-			user.id: RedisPrefix.set_js_user_structure(user.username, user.sex)
-			for user in room.users.all()
-		}
-		self.publish(self.add_user_to_room(room_id, user_id, users_in_room[user_id]), room_id)
-		subscribe_message = self.invite_room_channel_message(room_id, user_id, room.name, users_in_room)
-		self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
+		users_in_room = list(RoomUsers.objects.filter(room_id=room_id).values_list('user_id', flat=True))
+		notify_others = self.add_user_to_room(
+			room_id,
+			room.name,
+			self.user_id,
+			user_id,
+			users_in_room
+		)
+		self.publish(notify_others, room_id)
+		if user_id != self.user_id:
+			self.publish(notify_others, RedisPrefix.generate_user(user_id), True)
 
 	def respond_ping(self, message):
 		self.ws_write(self.responde_pong(message[VarNames.JS_MESSAGE_ID]))
@@ -334,11 +317,15 @@ class MessagesHandler(MessagesCreator):
 	def create_user_channel(self, message):
 		user_id = message[VarNames.USER_ID]
 		room_id = create_room(self.user_id, user_id)
-		subscribe_message = self.subscribe_direct_channel_message(room_id, user_id, self.user_id != user_id)
+		multiple_users = user_id != self.user_id
+		subscribe_message = self.subscribe_direct_channel_message(
+			room_id,
+			[user_id, self.user_id] if multiple_users else [self.user_id],
+			self.user_id != user_id
+		)
 		self.publish(subscribe_message, self.channel, True)
-		other_channel = RedisPrefix.generate_user(user_id)
-		if self.channel != other_channel:
-			self.publish(subscribe_message, other_channel, True)
+		if multiple_users:
+			self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
 
 	def delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -351,9 +338,6 @@ class MessagesHandler(MessagesCreator):
 			room.disabled = True
 		else:  # if public -> leave the room, delete the link
 			RoomUsers.objects.filter(room_id=room.id, user_id=self.user_id).delete()
-			online = self.get_online_from_redis(room_id)
-			online.remove(self.user_id)
-			self.publish(self.room_online(online, Actions.LOGOUT, room_id), room_id)
 		room.save()
 		message = self.unsubscribe_direct_message(room_id)
 		self.publish(message, room_id, True)
@@ -405,13 +389,10 @@ class MessagesHandler(MessagesCreator):
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		self.add_channel(room_id)
-		is_online, online = self.get_is_online(room_id=room_id)
-		self.add_online_user(room_id, is_online, online)
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		self.async_redis.unsubscribe((room_id,))
-		self.async_redis_publisher.hdel(room_id, self.id)
 		self.channels.remove(room_id)
 
 	def process_get_messages(self, data):
@@ -420,7 +401,7 @@ class MessagesHandler(MessagesCreator):
 		"""
 		header_id = data.get(VarNames.GET_MESSAGES_HEADER_ID, None)
 		count = int(data.get(VarNames.GET_MESSAGES_COUNT, 10))
-		room_id = data[VarNames.CHANNEL]
+		room_id = data[VarNames.ROOM_ID]
 		self.logger.info('!! Fetching %d messages starting from %s', count, header_id)
 		if header_id is None:
 			messages = Message.objects.filter(room_id=room_id).order_by('-pk')[:count]
@@ -460,7 +441,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		self.sync_redis.hset(connection_id, self.id, WebRtcRedisStates.OFFERED)
 
 	def offer_webrtc_connection(self, in_message):
-		room_id = in_message[VarNames.CHANNEL]
+		room_id = in_message[VarNames.ROOM_ID]
 		content = in_message.get(VarNames.CONTENT)
 		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
 		connection_id = id_generator(RedisPrefix.CONNECTION_ID_LENGTH)

@@ -212,6 +212,8 @@ def home(request):
 	context['pingServerCloseDelay'] = settings.CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT
 	context['MESSAGES_PER_SEARCH'] = settings.MESSAGES_PER_SEARCH
 	context['manifest'] = hasattr(settings, 'FIREBASE_API_KEY')
+	context['apiUrl'] = settings.API_ADDRESS_PATTERN % request.get_host().split(':')[0]
+	context['sendLogs'] = up.send_logs
 	return render_to_response('chat.html', context, context_instance=RequestContext(request))
 
 

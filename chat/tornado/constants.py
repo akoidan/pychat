@@ -13,7 +13,6 @@ class Actions(object):
 	ACCEPT_CALL = 'acceptCall'
 	ACCEPT_FILE = 'acceptFile'
 	ROOMS = 'setRooms'
-	REFRESH_USER = 'setOnlineUsers'
 	GROWL_MESSAGE = 'growl'
 	GET_MESSAGES = 'loadMessages'
 	CREATE_DIRECT_CHANNEL = 'addDirectChannel'
@@ -39,6 +38,8 @@ class VarNames(object):
 	WEBRTC_QUED_ID = 'id'
 	USER = 'user'
 	USER_ID = 'userId'
+	INVITER_USER_ID = 'inviterUserId'
+	INVITEE_USER_ID = 'inviteeUserId'
 	TIME = 'time'
 	CONTENT = 'content'
 	FILES = 'files'
@@ -54,11 +55,9 @@ class VarNames(object):
 	VOLUME = 'volume'
 	ROOM_ID = 'roomId'
 	ROOM_USERS = 'users'
-	CHANNEL = 'channel'
 	WEBRTC_OPPONENT_ID = 'opponentWsId'
 	GET_MESSAGES_COUNT = 'count'
 	GET_MESSAGES_HEADER_ID = 'headerId'
-	CHANNEL_NAME = 'channel'
 	IS_ROOM_PRIVATE = 'private'
 	CONNECTION_ID = 'connId'
 	HANDLER_NAME = 'handler'
@@ -66,6 +65,7 @@ class VarNames(object):
 	SYMBOL = 'symbol'
 	LOAD_MESSAGES_HISTORY = 'history'
 	LOAD_MESSAGES_OFFLINE = 'offline'
+	ONLINE = 'online'
 	EDITED_TIMES = 'edited'
 	PREVIEW = 'preview'
 	DELETED = 'deleted'
@@ -91,7 +91,7 @@ class WebRtcRedisStates:
 class RedisPrefix:
 	USER_ID_CHANNEL_PREFIX = 'u'
 	PARSABLE_PREFIX = 'p'
-	DEFAULT_CHANNEL = settings.ALL_ROOM_ID
+	ONLINE_VAR = 'online'
 	CONNECTION_ID_LENGTH = 8  # should be secure
 
 	@staticmethod

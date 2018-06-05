@@ -89,7 +89,7 @@ class WebSocketLoadTest(TestCase):
 			ws.send(json.dumps({
 				VarNames.CONTENT: "{}".format(i),
 				VarNames.EVENT: Actions.SEND_MESSAGE,
-				VarNames.CHANNEL: settings.ALL_ROOM_ID
+				VarNames.ROOM_ID: settings.ALL_ROOM_ID
 			}))
 
 	# def read_session(self):

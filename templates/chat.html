@@ -23,6 +23,7 @@
 		var CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = {{ pingServerCloseDelay }};
 		var MESSAGES_PER_SEARCH = {{ MESSAGES_PER_SEARCH }};
 		window.highlightCode = {{ highlight_code |yesno:"true,false" }};
+		window.sendLogs = {{ sendLogs |yesno:"true,false" }};
 		window.onlineChangeSound = {{ online_change_sound |yesno:"true,false" }};
 		window.incomingFileCallSound = {{ incoming_file_call_sound |yesno:"true,false" }};
 		window.messageSound = {{ message_sound |yesno:"true,false" }};

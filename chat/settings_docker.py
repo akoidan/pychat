@@ -6,11 +6,7 @@ TEMPLATE_DEBUG = False
 DEBUG = False
 
 REDIS_HOST = 'redis'
-SESSION_REDIS = {
-	'host': REDIS_HOST,
-	'post': REDIS_PORT,
-	'db': 0
-}
+
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.mysql',
@@ -40,5 +36,3 @@ LOGGING['loggers'] = {
 }
 
 logging.config.dictConfig(LOGGING)
-
-API_ADDRESS_PATTERN = 'wss://%s/ws?id='

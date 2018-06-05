@@ -2,12 +2,6 @@ from chat.settings_base import *
 import sslserver
 import logging.config
 
-SESSION_REDIS = {
-	'host': REDIS_HOST,
-	'post': REDIS_PORT,
-	'db': 3
-}
-
 DEBUG = True
 TEMPLATE_DEBUG = True
 SECRET_KEY = '8ou!cqb1yd)6c4h0i-cxjo&@@+04%4np6od8qn+z@5b=6)!v(o'
@@ -16,6 +10,8 @@ class InvalidString(str):
 		from django.template.base import TemplateSyntaxError
 		raise TemplateSyntaxError(
 			"Undefined variable or unknown value for: %s" % other)
+
+API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/?id='))
 
 TEMPLATE_STRING_IF_INVALID = InvalidString("%s")
 TEMPLATES[0]['OPTIONS']['loaders'] = [
@@ -38,6 +34,8 @@ LOGGING['loggers'] = {
 	},
 }
 
+# Don't close socket if we're in debug
+PING_CLOSE_JS_DELAY = 100000
 
 logging.config.dictConfig(LOGGING)
 

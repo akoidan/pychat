@@ -80,3 +80,11 @@ globals().update(importlib.import_module(config).__dict__)
 ### For facebook auth:
 # FACEBOOK_ACCESS_TOKEN = '***************|***************************' # https://developers.facebook.com/tools/access_token/
 # FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
+
+###<<<<<
+SESSION_REDIS = {
+	'host': REDIS_HOST,
+	'port': REDIS_PORT,
+	'db': REDIS_SESSION_DB
+}
+###>>>>

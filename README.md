@@ -183,6 +183,13 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* room_users.last_message_id shoud be set when room is  created, if last_message_id is null, we should propagade all messages to history/offline_messages
+* RoomUsers should have disabled instead of Room, so when user leaves direct messages, another one doesn't exit it. But in case of new message, user just doesn't receive any... Mb we can make them hidden in UI
+* Merge base.js into chat.js so 1 request less
+* https://static.pychat.org/photo/649syM8h_image.png
+* https://static.pychat.org/photo/stpipHj0_image.png
+* Limit edit messages only with 1 day. so history_messages fetches messages only edited on current day thus not flooding the channel on reconnect
+* https://github.com/tornadoweb/tornado/issues/2243
 * m2 user -> write direct message, if channel wasn't created, I get error Uncaught Unknown channel 227 for message "{"action":"setOnlineUsers","content":[97],"userId":97,"time":1527945723611,"handler":"chat","channel":227,"user":"AAdmin","sex":"Male"}"
 * Add sound/video messages like in telegram
 * Add webrtc peer to peer secure chats (like telegrams)

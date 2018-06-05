@@ -60,11 +60,8 @@ EMAIL_SUBJECT_PREFIX = '[Pychat] '
 
 REDIS_PORT = 6379
 REDIS_HOST ='localhost'
-SESSION_REDIS = {
-	'host': REDIS_HOST,
-	'post': REDIS_PORT,
-	'db': 3
-}
+REDIS_SESSION_DB = 3
+
 SESSION_ENGINE = 'redis_sessions.session'
 
 
@@ -137,7 +134,7 @@ EXTENSION_INSTALL_URL = 'https://chrome.google.com/webstore/detail/pychat-screen
 IS_HTTPS = True
 WEBSOCKET_PROTOCOL = 'wss' if IS_HTTPS else 'ws'
 SITE_PROTOCOL = 'https' if IS_HTTPS else 'http'
-API_ADDRESS_PATTERN = ''.join((WEBSOCKET_PROTOCOL, '://%s:', API_PORT, '/?id='))
+API_ADDRESS_PATTERN = 'wss://%s/ws?id='
 
 # GIPHY_API_KEY = 'thZMTtDfFdugqPDIAY461GzYTctuYIeIj' // TODO paste your GIPHY api key from https://developers.giphy.com/
 GIPHY_URL= 'http://api.giphy.com/v1/gifs/search?api_key={}&limit=1&q={}'

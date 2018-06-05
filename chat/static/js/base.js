@@ -23,9 +23,11 @@ var growlHolder;
 window.onerror = function (msg, url, linenumber, column, errorObj) {
 	var message = 'Error occurred in {}:{}\n{}'.format(url, linenumber, msg);
 	if (growlHolder) {
-		doPost('/report_issue', {
-			issue: '{}:{}:{}\n{}\n\nOBJ:  {}'.format(url, linenumber, column ||'?', msg, errorObj || '?')
-		});
+		if (window.sendLogs) {
+			doPost('/report_issue', {
+				issue: '{}:{}:{}\n{}\n\nOBJ:  {}'.format(url, linenumber, column || '?', msg, errorObj || '?')
+			});
+		}
 		growlError(message);
 	} else {
 		alert(message);

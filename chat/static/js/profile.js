@@ -10,6 +10,7 @@ var themeSelector;
 var changeProfileForm;
 var embeddedYoutubeInput;
 var highlightCodeInput;
+var sendLogsInput;
 var logsInput;
 var password;
 var repeatPassword;
@@ -26,6 +27,7 @@ function initChangeProfile() {
 	changeProfileForm = $('changeProfileForm');
 	embeddedYoutubeInput = $('id_embedded_youtube');
 	highlightCodeInput = $('id_highlight_code');
+	sendLogsInput = $('id_send_logs');
 	onlineChangeSoundInput = $('id_online_change_sound');
 	incomingFileCallSoundInput = $('id_incoming_file_call_sound');
 	messageSoundInput = $('id_message_sound');
@@ -171,6 +173,7 @@ function setJsState() {
 	window.messageSound = messageSoundInput.checked;
 	window.embeddedYoutube = embeddedYoutubeInput.checked; // global var
 	window.highlightCode = highlightCodeInput.checked; // global var
+	window.sendLogs = sendLogsInput.checked; // global var
 		if (window.highlightCode) {
 		doGet(HIGHLIGHT_JS_URL, function() {
 			Utils.highlightCode(document.body);

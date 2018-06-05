@@ -15,13 +15,13 @@ from tornado.web import asynchronous
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from chat.cookies_middleware import create_id
-from chat.models import User, Message, UserJoinedInfo, IpAddress
+from chat.models import User, Message, UserJoinedInfo, IpAddress, Room, RoomUsers
 from chat.py2_3 import str_type, urlparse
 from chat.tornado.anti_spam import AntiSpam
-from chat.tornado.constants import VarNames, HandlerNames, Actions
+from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
-from chat.utils import execute_query, do_db, get_or_create_ip, get_users_in_current_user_rooms, \
+from chat.utils import execute_query, do_db, \
 	get_message_images_videos, get_or_create_ip_wrapper, create_ip_structure, get_history_message_query
 
 sessionStore = SessionStore()
@@ -67,7 +67,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			message = json.loads(json_message)
 			if message[VarNames.EVENT] not in self.process_ws_message:
 				raise Exception("event {} is unknown".format(message[VarNames.EVENT]))
-			channel = message.get(VarNames.CHANNEL)
+			channel = message.get(VarNames.ROOM_ID)
 			if channel and channel not in self.channels:
 				raise ValidationError('Access denied for channel {}. Allowed channels: {}'.format(channel, self.channels))
 			self.process_ws_message[message[VarNames.EVENT]](message)
@@ -75,35 +75,23 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			error_message = self.default(str(e.message), Actions.GROWL_MESSAGE, HandlerNames.GROWL)
 			self.ws_write(error_message)
 
-	def publish_logout(self, channel, log_data):
-		# seems like async solves problem with connection lost and wrong data status
-		# http://programmers.stackexchange.com/questions/294663/how-to-store-online-status
-		is_online, online = self.get_online_and_status_from_redis(channel)
-		log_data[channel] = {'online': online, 'is_online': is_online}
-		if not is_online:
-			message = self.room_online(online, Actions.LOGOUT, channel)
-			self.publish(message, channel)
-			return True
-
 	def on_close(self):
 		if self.async_redis.subscribed:
 			self.logger.info("Close event, unsubscribing from %s", self.channels)
 			self.async_redis.unsubscribe(self.channels)
 		else:
 			self.logger.info("Close event, not subscribed, channels: %s", self.channels)
-		log_data = {}
-		for channel in self.channels:
-			if not isinstance(channel, Number):
-				continue
-			self.sync_redis.srem(channel, self.id)
-			if self.connected:
-				self.publish_logout(channel, log_data)
+		self.async_redis_publisher.srem(RedisPrefix.ONLINE_VAR, self.id)
+		is_online, online = self.get_online_and_status_from_redis()
 		if self.connected:
+			if not is_online:
+				message = self.room_online(online, Actions.LOGOUT)
+				self.publish(message, settings.ALL_ROOM_ID)
 			res = do_db(execute_query, settings.UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
-		self.disconnect(json.dumps(log_data))
+		self.disconnect()
 
-	def disconnect(self, log_data, tries=0):
+	def disconnect(self, tries=0):
 		"""
 		Closes a connection if it's not in proggress, otherwice timeouts closing
 		https://github.com/evilkost/brukva/issues/25#issuecomment-9468227
@@ -113,9 +101,9 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		self.channels = []
 		if self.async_redis.connection.in_progress and tries < 1000:  # failsafe eternal loop
 			self.logger.debug('Closing a connection timeouts')
-			ioloop.IOLoop.instance().add_timeout(timedelta(0.00001), self.disconnect, log_data, tries+1)
+			ioloop.IOLoop.instance().add_timeout(timedelta(0.00001), self.disconnect, tries+1)
 		else:
-			self.logger.info("Close connection result: %s", log_data)
+			self.logger.info("Close connection result: %s")
 			self.async_redis.disconnect()
 
 	def generate_self_id(self):
@@ -139,40 +127,49 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			session = SessionStore(session_key)
 			self.user_id = int(session["_auth_user_id"])
 			self.generate_self_id()
-			log_params = {
+			self._logger = logging.LoggerAdapter(parent_logger, {
 				'id': self.id,
 				'ip': self.ip
-			}
-			self._logger = logging.LoggerAdapter(parent_logger, log_params)
+			})
 			cookies = ["{}={}".format(k, self.request.cookies[k].value) for k in self.request.cookies]
 			self.logger.debug("!! Incoming connection, session %s, thread hash %s, cookies: %s", session_key, self.id, ";".join(cookies))
 			self.async_redis.connect()
+			self.async_redis_publisher.sadd(RedisPrefix.ONLINE_VAR, self.id)
+			# since we add user to online first, latest trigger will always show correct online
+			was_online, online = self.get_online_and_status_from_redis()
 			user_db = do_db(User.objects.get, id=self.user_id)
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
-			user_rooms = get_users_in_current_user_rooms(self.user_id)
+			user_rooms1 = Room.objects.filter(users__id=self.user_id, disabled=False)\
+				.values('id', 'name', 'roomusers__notifications', 'roomusers__volume')
+			user_rooms = MessagesCreator.create_user_rooms(user_rooms1)
+			room_ids = [room_id for room_id in user_rooms]
+			rooms_users = RoomUsers.objects.filter(room_id__in=room_ids).values('user_id', 'room_id')
+			for ru in rooms_users:
+				user_rooms[ru['room_id']][VarNames.ROOM_USERS].append(ru['user_id'])
 			# get all missed messages
-			self.channels = []  # py2 doesn't support clear()
+			self.channels = room_ids  # py2 doesn't support clear()
 			self.channels.append(self.channel)
 			self.channels.append(self.id)
-			rooms_online = {}
-			was_online = False
-			for room_id in user_rooms:
-				self.channels.append(room_id)
-				rooms_online[room_id] = self.get_is_online(room_id)
-				was_online = was_online or rooms_online[room_id][0]
 			self.listen(self.channels)
 			off_messages, history = self.get_offline_messages(user_rooms, was_online, self.get_argument('history', False))
 			for room_id in user_rooms:
-				user_rooms[room_id][VarNames.LOAD_MESSAGES_HISTORY] = history.get(room_id)
-				user_rooms[room_id][VarNames.LOAD_MESSAGES_OFFLINE] = off_messages.get(room_id)
-			self.ws_write(self.set_room(user_rooms))
-			for room_id in user_rooms:
-				self.async_redis_publisher.sadd(room_id, self.id)
-				self.add_online_user(room_id, rooms_online[room_id][0], rooms_online[room_id][1])
+				get = history.get(room_id)
+				messages_get = off_messages.get(room_id)
+				user_rooms[room_id][VarNames.LOAD_MESSAGES_HISTORY] = get
+				user_rooms[room_id][VarNames.LOAD_MESSAGES_OFFLINE] = messages_get
+			user_dict = {}
+			for user in User.objects.values('id', 'username', 'sex'):
+				user_dict[user['id']] = RedisPrefix.set_js_user_structure(user['username'], user['sex'])
+			if self.user_id not in online:
+				online.append(self.user_id)
+			self.ws_write(self.set_room(user_rooms, user_dict, online))
+			if not was_online:  # if a new tab has been opened
+				online_user_names_mes = self.room_online(online, Actions.LOGIN)
+				self.logger.info('!! First tab, sending refresh online for all')
+				self.publish(online_user_names_mes, settings.ALL_ROOM_ID)
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
 			self.connected = True
-			# self.save_ip()
 		else:
 			self.logger.warning('!! Session key %s has been rejected', str(session_key))
 			self.close(403, "Session key %s has been rejected" % session_key)

@@ -61,6 +61,7 @@ class UserProfileForm(forms.ModelForm):
 	suggestions = BooleanField(widget=BooleanWidget)
 	logs = BooleanField(widget=BooleanWidget)
 	embedded_youtube =BooleanField(widget=BooleanWidget)
+	send_logs = BooleanField(widget=BooleanWidget)
 	highlight_code = BooleanField(widget=BooleanWidget, help_text="```console.log('Highlight code like this')```")
 	incoming_file_call_sound = BooleanField(widget=BooleanWidget)
 	message_sound = BooleanField(widget=BooleanWidget)
@@ -82,7 +83,7 @@ class UserProfileForm(forms.ModelForm):
 
 	class Meta:  # pylint: disable=C1001
 		model = UserProfile
-		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts', 'sex', 'photo', 'suggestions', 'logs', 'embedded_youtube', 'highlight_code', 'message_sound', 'incoming_file_call_sound', 'online_change_sound', 'theme', 'password')
+		fields = ('username', 'name', 'city', 'surname', 'email', 'birthday', 'contacts', 'sex', 'photo', 'suggestions', 'embedded_youtube', 'highlight_code', 'message_sound', 'incoming_file_call_sound', 'online_change_sound', 'logs', 'send_logs', 'theme', 'password')
 
 	def __init__(self, *args, **kwargs):
 		"""

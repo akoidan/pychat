@@ -43,17 +43,6 @@ def is_blank(check_str):
 		return True
 
 
-def get_users_in_current_user_rooms(user_id):
-	user_rooms = Room.objects.filter(users__id=user_id, disabled=False).values('id', 'name', 'roomusers__notifications', 'roomusers__volume')
-	res = MessagesCreator.create_user_rooms(user_rooms)
-	room_ids = (room_id for room_id in res)
-	rooms_users = User.objects.filter(rooms__in=room_ids).values('id', 'username', 'sex', 'rooms__id')
-	for user in rooms_users:
-		dict = res[user['rooms__id']][VarNames.ROOM_USERS]
-		dict[user['id']] = RedisPrefix.set_js_user_structure(user['username'], user['sex'])
-	return res
-
-
 def get_or_create_room(channels, room_id, user_id):
 	if room_id not in channels:
 		raise ValidationError("Access denied, only allowed for channels {}".format(channels))

@@ -1,6 +1,3 @@
-from chat.models import Room
-from chat.settings import ALL_ROOM_ID, ALL_REDIS_ROOM
-
 __author__ = 'andrew'
 from django.core.management import call_command, BaseCommand
 

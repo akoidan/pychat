@@ -34,15 +34,17 @@ class MessagesCreator(object):
 		}
 
 	@classmethod
-	def set_room(cls, rooms):
-		return cls.base_default(Actions.ROOMS, rooms, HandlerNames.CHANNELS)
+	def set_room(cls, rooms, users, online):
+		res = cls.base_default(Actions.ROOMS, rooms, HandlerNames.CHANNELS)
+		res[VarNames.ROOM_USERS] = users
+		res[VarNames.ONLINE] = online
+		return res
 
-	def room_online(self, online, event, channel):
+	def room_online(self, online, event):
 		"""
 		:return: {"action": event, "content": content, "time": "20:48:57"}
 		"""
-		room_less = self.default(online, event, HandlerNames.CHAT)
-		room_less[VarNames.CHANNEL_NAME] = channel
+		room_less = self.default(online, event, HandlerNames.CHANNELS)
 		room_less[VarNames.USER] = self.sender_name
 		room_less[VarNames.GENDER] = self.sex
 		return room_less
@@ -55,7 +57,7 @@ class MessagesCreator(object):
 			VarNames.TIME: message.time,
 			VarNames.MESSAGE_ID: message.id,
 			VarNames.EDITED_TIMES: message.edited_times,
-			VarNames.CHANNEL: message.room_id,
+			VarNames.ROOM_ID: message.room_id,
 		}
 		if message.deleted:
 			res[VarNames.DELETED] = True
@@ -103,7 +105,7 @@ class MessagesCreator(object):
 		return {
 			VarNames.CONTENT: cls.append_images(messages, files, prepare_img),
 			VarNames.EVENT: Actions.GET_MESSAGES,
-			VarNames.CHANNEL: channel,
+			VarNames.ROOM_ID: channel,
 			VarNames.HANDLER_NAME: HandlerNames.CHAT
 		}
 
@@ -133,13 +135,14 @@ class MessagesCreator(object):
 	def channel(self):
 		return RedisPrefix.generate_user(self.user_id)
 
-	def subscribe_direct_channel_message(self, room_id, other_user_id, notifications):
+	def subscribe_direct_channel_message(self, room_id, users_id, notifications):
 		return {
 			VarNames.EVENT: Actions.CREATE_DIRECT_CHANNEL,
 			VarNames.VOLUME: 2,
 			VarNames.NOTIFICATIONS: notifications,
 			VarNames.ROOM_ID: room_id,
-			VarNames.ROOM_USERS: [self.user_id, other_user_id],
+			VarNames.TIME: get_milliseconds(),
+			VarNames.ROOM_USERS: users_id,
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS
 		}
 
@@ -162,25 +165,16 @@ class MessagesCreator(object):
 		}
 
 	@staticmethod
-	def invite_room_channel_message(room_id, user_id, room_name, users):
+	def add_user_to_room(channel, channel_name, inviter, invitee, all_users):
 		return {
 			VarNames.EVENT: Actions.INVITE_USER,
-			VarNames.ROOM_ID: room_id,
-			VarNames.USER_ID: user_id,
+			VarNames.ROOM_ID: channel,
+			VarNames.ROOM_NAME: channel_name,
+			VarNames.INVITEE_USER_ID: invitee,
+			VarNames.INVITER_USER_ID: inviter,
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
-			VarNames.ROOM_NAME: room_name,
-			VarNames.CONTENT: users
-		}
-
-	@staticmethod
-	def add_user_to_room(channel, user_id, content):
-		return {
-			VarNames.EVENT: Actions.ADD_USER,
-			VarNames.CHANNEL: channel,
-			VarNames.USER_ID: user_id,
-			VarNames.HANDLER_NAME: HandlerNames.CHAT,
-			VarNames.GENDER: content[VarNames.GENDER],  # SEX: 'Alien', USER: 'Andrew'
-			VarNames.USER: content[VarNames.USER]  # SEX: 'Alien', USER: 'Andrew'
+			VarNames.ROOM_USERS: all_users,
+			VarNames.TIME: get_milliseconds(),
 		}
 
 	def unsubscribe_direct_message(self, room_id):
@@ -198,7 +192,7 @@ class MessagesCreator(object):
 			VarNames.ROOM_NAME: room['name'],
 			VarNames.NOTIFICATIONS: room['roomusers__notifications'],
 			VarNames.VOLUME: room['roomusers__volume'],
-			VarNames.ROOM_USERS: {}
+			VarNames.ROOM_USERS: []
 		} for room in user_rooms}
 		return res
 
@@ -217,7 +211,7 @@ class WebRtcMessageCreator(object):
 			VarNames.USER: self.sender_name,
 			VarNames.CONNECTION_ID: connection_id,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.CHANNEL: room_id
+			VarNames.ROOM_ID: room_id
 		}
 
 	def set_webrtc_error(self, error, connection_id, qued_id=None):

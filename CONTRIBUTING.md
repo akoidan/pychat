@@ -1,8 +1,3 @@
-docker
-======
-docker build -f ./docker-all/Dockerfile -t deathangel908/pychat .
-docker build -f ./docker-all/Dockerfilepychat -t deathangel908/pychat:test .
-
 draw-io
 =======
 Webrtc frontend classes diagram you can find [here](https://www.draw.io/?lightbox=1&highlight=0000ff&edit=_blank&layers=1&nav=1&title=draw.io-uml_diagram.xml#Uhttps%3A%2F%2Fraw.githubusercontent.com%2FDeathangel908%2Fpychat%2Fmaster%2Fdraw.io-uml_diagram.xml).
