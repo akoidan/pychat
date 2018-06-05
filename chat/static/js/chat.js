@@ -2891,6 +2891,7 @@ function ChannelsHandler() {
 			room.refreshOnlineStatus();
 		} else {
 			room = self.channels[message.roomId];
+			room.
 			var inviteeUser = self.allUsersDict[message.inviteeUserId];
 			room.addUserLi(
 					message.inviteeUserId,
@@ -2956,8 +2957,8 @@ function ChannelsHandler() {
 	self.getAllUsersInfo = function () {
 		return self.allUsersDict;
 	};
-	self.getOnlineUsersIds = function () {
-		return self.onlineUsersIds || [];
+	self.isUserIdOnline = function (userId) {
+		return self.onlineUsersIds.indexOf(parseInt(userId)) >= 0;
 	};
 	self.filterAddUser = function (event) {
 		var filterValue = self.dom.addUserInput.value;
@@ -3024,7 +3025,7 @@ function ChannelsHandler() {
 		li.appendChild(i);
 		li.setAttribute(self.ROOM_ID_ATTR, roomId);
 		var chatBoxDiv = document.createElement('div');
-		var chatHandler =  new ChatHandler(li, chatBoxDiv, users, roomId, roomName, privateR, self.getAllUsersInfo, self.getOnlineUsersIds);
+		var chatHandler =  new ChatHandler(li, chatBoxDiv, users, roomId, roomName, privateR, self.getAllUsersInfo, self.isUserIdOnline);
 		self.channels[roomId] = chatHandler;
 		self.channels[roomId].dom.userList.innerHTML = '';
 		users.forEach(function(userId) {
@@ -3038,8 +3039,7 @@ function ChannelsHandler() {
 		var user = self.getAllUsersInfo()[anotherUserId];
 		var roomName = user.user;
 		var li = Utils.createUserLi(anotherUserId, user.sex, roomName);
-		var oIds = self.getOnlineUsersIds();
-		CssUtils.setClassToState(li, oIds.indexOf(parseInt(anotherUserId)) >= 0, OFFLINE_CLASS);
+		CssUtils.setClassToState(li, self.isUserIdOnline(anotherUserId), OFFLINE_CLASS);
 		self.dom.directUserTable.appendChild(li);
 		self.createChannelChatHandler(roomId, li, allUsersIds, roomName, true);
 		return anotherUserId;
@@ -3692,7 +3692,7 @@ function DataBase() {
 }
 
 
-function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private, getAllUsersInfo, getOnlineUsersIds) {
+function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private, getAllUsersInfo, isUserIdOnline) {
 	var self = this;
 	self.UNREAD_MESSAGE_CLASS = 'unreadMessage';
 	self.EDITED_MESSAGE_CLASS = 'editedMessage';
@@ -3847,7 +3847,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private, getAll
 		return allUsersInfoElement && allUsersInfoElement.user;
 	};
 	self.setLiState = function (userLi, userId) {
-		CssUtils.setClassToState(userLi, getOnlineUsersIds().indexOf(parseInt(userId)) >= 0, OFFLINE_CLASS);
+		CssUtils.setClassToState(userLi, isUserIdOnline(userId), OFFLINE_CLASS);
 	};
 	self.refreshOnlineStatus = function () {
 		self.roomUsersIds.forEach(function (userId) {
