@@ -22,7 +22,7 @@ from django.utils.timezone import utc
 from io import BytesIO
 
 from chat import local
-from chat.models import Image, UploadedFile
+from chat.models import Image, UploadedFile, get_milliseconds
 from chat.models import Room
 from chat.models import User
 from chat.models import UserProfile, Verification, RoomUsers, IpAddress
@@ -35,6 +35,7 @@ USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}
 
 logger = logging.getLogger(__name__)
 
+ONE_DAY = 60 * 60 * 24 * 1000
 
 def is_blank(check_str):
 	if check_str and check_str.strip():
@@ -83,7 +84,7 @@ def with_history_q(q_objects, room_id, h, f):
 
 def no_history_q(q_objects, room_id, h, f):
 	q_objects.add(Q(room_id=room_id) & (
-			(Q(id__gte=h) & Q(id__lte=f) & Q(edited_times__gt=0)) | Q(id__gt=f)), Q.OR)
+			(Q(id__gte=h) & Q(id__lte=f) & Q(edited_times__gt=0) & Q(time__gt=get_milliseconds() - ONE_DAY)) | Q(id__gt=f)), Q.OR)
 
 
 def create_room(self_user_id, user_id):
@@ -152,6 +153,8 @@ def create_self_room(self_user_id, user_rooms):
 def validate_edit_message(self_id, message):
 	if message.sender_id != self_id:
 		raise ValidationError("You can only edit your messages")
+	if message.time + ONE_DAY < get_milliseconds():
+		raise ValidationError("You can only edit messages that were send not more than 1 day")
 	if message.deleted:
 		raise ValidationError("Already deleted")
 

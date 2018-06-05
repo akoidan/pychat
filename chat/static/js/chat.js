@@ -2696,8 +2696,9 @@ function ChannelsHandler() {
 			event.preventDefault();
 		}
 	};
+	self.ONE_DAY = 24 * 60 * 60 * 1000;
 	self.isMessageEditable = function (time) {
-		return true;/* time + 595000 > Date.now()*/;
+		return time + self.ONE_DAY > Date.now();
 	};
 	self.nextChar = function (c) {
 		return String.fromCharCode(c.charCodeAt(0) + 1)

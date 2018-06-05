@@ -188,12 +188,10 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * Merge base.js into chat.js so 1 request less
 * https://static.pychat.org/photo/649syM8h_image.png
 * https://static.pychat.org/photo/stpipHj0_image.png
-* Limit edit messages only with 1 day. so history_messages fetches messages only edited on current day thus not flooding the channel on reconnect
 * https://github.com/tornadoweb/tornado/issues/2243
-* m2 user -> write direct message, if channel wasn't created, I get error Uncaught Unknown channel 227 for message "{"action":"setOnlineUsers","content":[97],"userId":97,"time":1527945723611,"handler":"chat","channel":227,"user":"AAdmin","sex":"Male"}"
 * Add sound/video messages like in telegram
 * Add webrtc peer to peer secure chats (like telegrams)
-* docker-all should output logs to stdout
+* output logs to kibana
 * openrc is not getting killed in docker https://github.com/dockage/alpine-openrc/issues/2
 * Store userOnline in a single list, refactor All channel for online storing
 * Add "last seen" feature and status afk/online/dnd
