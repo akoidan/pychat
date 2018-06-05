@@ -2891,23 +2891,23 @@ function ChannelsHandler() {
 			room.refreshOnlineStatus();
 		} else {
 			room = self.channels[message.roomId];
-			room.
-			var inviteeUser = self.allUsersDict[message.inviteeUserId];
+			var inviteeUser = self.getAllUsersInfo()[message.inviteeUserId];
 			room.addUserLi(
 					message.inviteeUserId,
 					inviteeUser.sex,
 					inviteeUser.user,
-					self.onlineUsersIds.indexOf(message.inviteeUserId) >= 0
+					self.isUserIdOnline(message.inviteeUserId)
 			);
+			room.roomUsersIds = message.users;
 		}
 		function getName(userid) {
 			if (userid == loggedUserId) {
 				return '<b>You</b>'
 			} else {
-				return '<b userid="{}">{}</b>'.format(userid, self.allUsersDict[userid].user);
+				return '<b userid="{}">{}</b>'.format(userid, self.getAllUsersInfo()[userid].user);
 			}
 		}
-		var html = "{} {} added {} to this room".format(
+		var html = "{} {} added {} to conversation".format(
 				getName(message.inviterUserId),
 				message.inviterUserId == loggedUserId ? 'have' : 'has',
 				getName(message.inviteeUserId)
@@ -3029,7 +3029,7 @@ function ChannelsHandler() {
 		self.channels[roomId] = chatHandler;
 		self.channels[roomId].dom.userList.innerHTML = '';
 		users.forEach(function(userId) {
-			var user = self.allUsersDict[userId];
+			var user = self.getAllUsersInfo()[userId];
 			chatHandler.addUserLi(userId, user.sex, user.user);
 		});
 		chatBoxDiv.oncontextmenu = self.showM2ContextDelete;
@@ -3270,7 +3270,11 @@ function ChannelsHandler() {
 		var allUserIds = self.getAllUsersInfo();
 		if (!allUserIds[message.userId]) {
 			var defa = self.channels[DEFAULT_CHANNEL_NAME];
-			defa.addUserLi(message.userId, message.sex, message.user);
+			allUserIds[message.userId] = {
+				sex: message.sex,
+				user: message.user,
+			};
+			defa.addUserLi(message.userId, message.sex, message.user, true);
 			defa.roomUsersIds.push(message.userId);
 		}
 		self.printChangeOnlineStatus('appeared online.', message, self.dom.chatLogin);
@@ -3288,7 +3292,10 @@ function ChannelsHandler() {
 			dm = 'User <b userId="{}">{}</b> has {}'.format(message.userId, username, action);
 		}
 		for (var roomId in self.channels) {
-			self.channels[roomId].displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
+			var channel = self.channels[roomId];
+			if (channel.roomUsersIds.indexOf(message.userId) > 0) {
+				channel.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
+			}
 		}
 		if (window.onlineChangeSound) {
 			Utils.checkAndPlay(sound, 1);
@@ -3305,7 +3312,7 @@ function ChannelsHandler() {
 		for (var i = 0; i < dut.children.length; i++) {
 			var e = dut.children[i];
 			var userId = parseInt(e.getAttribute('userid'));
-			CssUtils.setClassToState(e, self.onlineUsersIds.indexOf(parseInt(userId)) >= 0, OFFLINE_CLASS);
+			CssUtils.setClassToState(e, self.isUserIdOnline(userId), OFFLINE_CLASS);
 		}
 	};
 	self.removeContextMenu = function () {
@@ -3909,6 +3916,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private, getAll
 		var dm = 'User <b userId="{}">{}</b> has left the conversation'.format(message.userId, user.user);
 		self.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
 		delete self.usersLi[message.userId];
+		self.roomUsersIds = message.users;
 	};
 	self.timeMessageClick = function (event) {
 		self.quoteMessage(event.target.parentElement.parentElement);

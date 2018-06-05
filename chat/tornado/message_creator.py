@@ -177,12 +177,13 @@ class MessagesCreator(object):
 			VarNames.TIME: get_milliseconds(),
 		}
 
-	def unsubscribe_direct_message(self, room_id):
+	def unsubscribe_direct_message(self, room_id, room_user_ids):
 		return {
 			VarNames.EVENT: Actions.DELETE_ROOM,
 			VarNames.ROOM_ID: room_id,
 			VarNames.USER_ID: self.user_id,
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.ROOM_USERS: room_user_ids,
 			VarNames.TIME: get_milliseconds()
 		}
 

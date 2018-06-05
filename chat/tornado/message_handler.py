@@ -338,8 +338,8 @@ class MessagesHandler(MessagesCreator):
 			room.disabled = True
 		else:  # if public -> leave the room, delete the link
 			RoomUsers.objects.filter(room_id=room.id, user_id=self.user_id).delete()
-		room.save()
-		message = self.unsubscribe_direct_message(room_id)
+		ru = list(RoomUsers.objects.filter(room_id=room.id).values_list('user_id', flat=True))
+		message = self.unsubscribe_direct_message(room_id, ru)
 		self.publish(message, room_id, True)
 
 	def edit_message(self, data):
