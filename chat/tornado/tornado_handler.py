@@ -154,10 +154,12 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.listen(self.channels)
 			off_messages, history = self.get_offline_messages(user_rooms, was_online, self.get_argument('history', False))
 			for room_id in user_rooms:
-				get = history.get(room_id)
-				messages_get = off_messages.get(room_id)
-				user_rooms[room_id][VarNames.LOAD_MESSAGES_HISTORY] = get
-				user_rooms[room_id][VarNames.LOAD_MESSAGES_OFFLINE] = messages_get
+				h = history.get(room_id)
+				o = off_messages.get(room_id)
+				if h:
+					user_rooms[room_id][VarNames.LOAD_MESSAGES_HISTORY] = h
+				if o:
+					user_rooms[room_id][VarNames.LOAD_MESSAGES_OFFLINE] = o
 			user_dict = {}
 			for user in User.objects.values('id', 'username', 'sex'):
 				user_dict[user['id']] = RedisPrefix.set_js_user_structure(user['username'], user['sex'])
