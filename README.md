@@ -183,7 +183,6 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
-* room_users.last_message_id shoud be set when room is  created, if last_message_id is null, we should propagade all messages to history/offline_messages
 * RoomUsers should have disabled instead of Room, so when user leaves direct messages, another one doesn't exit it. But in case of new message, user just doesn't receive any... Mb we can make them hidden in UI
 * Merge base.js into chat.js so 1 request less
 * https://github.com/tornadoweb/tornado/issues/2243
