@@ -1,28 +1,25 @@
 import json
 import logging
 import re
-import urllib
-
+from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import transaction
 from django.db.models import Q
-from tornado import ioloop
 from tornado.gen import engine, Task
-from tornado.httpclient import AsyncHTTPClient, HTTPRequest
+from tornado.httpclient import HTTPRequest
 from tornado.ioloop import IOLoop
 from tornado.web import asynchronous
 from tornadoredis import Client
-from django.conf import settings
+
 from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
-from chat.models import Message, Room, RoomUsers, Subscription, User, UserProfile, SubscriptionMessages, MessageHistory, \
+from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
 	UploadedFile, Image
 from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, get_or_create_room, \
-	create_room, get_message_images_videos, update_symbols, up_files_to_img
+	create_room, get_message_images_videos, update_symbols, up_files_to_img, create_simple_room_users
 
 parent_logger = logging.getLogger(__name__)
 base_logger = logging.LoggerAdapter(parent_logger, {
@@ -282,7 +279,7 @@ class MessagesHandler(MessagesCreator):
 			raise ValidationError('Incorrect room name "{}"'.format(room_name))
 		room = Room(name=room_name)
 		do_db(room.save)
-		RoomUsers(room_id=room.id, user_id=self.user_id).save()
+		create_simple_room_users(self.user_id, room.id)
 		subscribe_message = self.subscribe_room_channel_message(room.id, room_name)
 		self.publish(subscribe_message, self.channel, True)
 

@@ -14,7 +14,7 @@ from django.core.mail import send_mail
 from django.core.validators import validate_email
 from django.db import IntegrityError
 from django.db import connection, OperationalError, InterfaceError
-from django.db.models import Q
+from django.db.models import Q, Max
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -22,14 +22,11 @@ from django.utils.timezone import utc
 from io import BytesIO
 
 from chat import local
-from chat.models import Image, UploadedFile, get_milliseconds
+from chat.models import Image, UploadedFile, get_milliseconds, Message
 from chat.models import Room
 from chat.models import User
 from chat.models import UserProfile, Verification, RoomUsers, IpAddress
 from chat.py2_3 import urlopen, dict_values_to_list
-from chat.tornado.constants import RedisPrefix
-from chat.tornado.constants import VarNames
-from chat.tornado.message_creator import MessagesCreator
 
 USERNAME_REGEX = str(settings.MAX_USERNAME_LENGTH).join(['^[a-zA-Z-_0-9]{1,', '}$'])
 
@@ -100,6 +97,14 @@ def create_room(self_user_id, user_id):
 	return room_id
 
 
+def create_simple_room_users(user_id, room_id):
+	RoomUsers(room_id=room_id, user_id=user_id, last_read_message_id=get_max_id()).save()
+
+
+def get_max_id():
+	return Message.objects.all().aggregate(Max('id'))['id__max']
+
+
 def create_other_room_wo_check(self_user_id, user_id):
 	room = Room()
 	room.save()
@@ -107,9 +112,10 @@ def create_other_room_wo_check(self_user_id, user_id):
 	if self_user_id == user_id:
 		RoomUsers(user_id=user_id, room_id=room_id).save()
 	else:
+		max_id = get_max_id()
 		RoomUsers.objects.bulk_create([
-			RoomUsers(user_id=self_user_id, room_id=room_id),
-			RoomUsers(user_id=user_id, room_id=room_id),
+			RoomUsers(user_id=self_user_id, room_id=room_id, last_read_message_id=max_id),
+			RoomUsers(user_id=user_id, room_id=room_id,last_read_message_id=max_id),
 		])
 	return room_id
 
@@ -125,9 +131,10 @@ def create_other_room(self_user_id, user_id, user_rooms):
 		room = Room()
 		room.save()
 		room_id = room.id
+		max_id = get_max_id()
 		RoomUsers.objects.bulk_create([
-			RoomUsers(user_id=self_user_id, room_id=room_id),
-			RoomUsers(user_id=user_id, room_id=room_id),
+			RoomUsers(user_id=self_user_id, room_id=room_id, last_read_message_id=max_id),
+			RoomUsers(user_id=user_id, room_id=room_id, last_read_message_id=max_id),
 		])
 	return room_id
 
