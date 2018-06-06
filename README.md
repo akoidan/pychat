@@ -186,7 +186,6 @@ Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
 * room_users.last_message_id shoud be set when room is  created, if last_message_id is null, we should propagade all messages to history/offline_messages
 * RoomUsers should have disabled instead of Room, so when user leaves direct messages, another one doesn't exit it. But in case of new message, user just doesn't receive any... Mb we can make them hidden in UI
 * Merge base.js into chat.js so 1 request less
-* https://static.pychat.org/photo/stpipHj0_image.png
 * https://github.com/tornadoweb/tornado/issues/2243
 * Add sound/video messages like in telegram
 * Add webrtc peer to peer secure chats (like telegrams)
