@@ -3892,14 +3892,17 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private, getAll
 	 * @throws exception if element already there*/
 	self.getPosition = function (time) {
 		var arrayEl;
+		function getExists() {
+			return self.dom.chatBoxDiv.querySelector("[id='{}'".format(arrayEl));
+		}
 		for (var i = 0; i < self.allMessages.length; i++) {
 			arrayEl = self.allMessages[i];
 			if (time === arrayEl) {
-				return {exists: $(arrayEl)};
+				return {exists: getExists()};
 			}
 			if (time < arrayEl) {
 				self.allMessages.splice(i, 0, time);
-				return {el: $(arrayEl)};
+				return {el: getExists()};
 			}
 		}
 		return {el: null};
