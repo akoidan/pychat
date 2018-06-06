@@ -4226,6 +4226,9 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private, getAll
 	};
 	self.destroy = function () {
 		var elements = [self.dom.chatBoxDiv, self.dom.roomNameLi, self.dom.userList];
+		if (self.callHandler) {
+			elements.push(self.callHandler.dom.callContainerContent);
+		}
 		for (var i = 0; i < elements.length; i++) {
 			CssUtils.deleteElement(elements[i]);
 		}
