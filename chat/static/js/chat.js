@@ -1,10 +1,10 @@
 var CONNECTION_RETRY_TIME = 5000;
-var SYSTEM_HEADER_CLASS = 'message-header-system';
+var SYSTEM_HEADER_CLASS = 'message-system';
 var TIME_SPAN_CLASS = 'timeMess';
 var CONTENT_STYLE_CLASS = 'message-text-style';
 // used in ChannelsHandler and ChatHandler
 var USER_ID_ATTR = 'userid';
-var SELF_HEADER_CLASS = 'message-header-self';
+var SELF_HEADER_CLASS = 'message-self';
 var USER_NAME_ATTR = 'username';
 var REMOVED_MESSAGE_CLASSNAME = 'removed-message';
 var MESSAGE_ID_ATTRIBUTE = 'messageId';
@@ -2638,14 +2638,9 @@ function ChannelsHandler() {
 				if (strMessageId) {
 					var messageId = parseInt(strMessageId);
 					var time = parseInt(el.id);
-					var selector = "[{}='{}']:not(.{}) .{}".format(
-							MESSAGE_ID_ATTRIBUTE,
-							strMessageId,
-							REMOVED_MESSAGE_CLASSNAME,
-							SELF_HEADER_CLASS
-					);
-					var p = document.querySelector(selector);
-					if (p && self.isMessageEditable(time)) {
+					if (!CssUtils.hasClass(el, 'removed-message')
+							&& CssUtils.hasClass(el, 'message-self')
+							&& self.isMessageEditable(time)) {
 						self.showM2EditMenu(event, el, messageId, time);
 					}
 				}
@@ -3293,7 +3288,7 @@ function ChannelsHandler() {
 		}
 		for (var roomId in self.channels) {
 			var channel = self.channels[roomId];
-			if (channel.roomUsersIds.indexOf(message.userId) > 0) {
+			if (channel.roomUsersIds.indexOf(message.userId) >= 0) {
 				channel.displayPreparedMessage(SYSTEM_HEADER_CLASS, message.time, dm, SYSTEM_USERNAME);
 			}
 		}
@@ -3728,7 +3723,7 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private, getAll
 	self.activeRoomClass = 'active-room';
 	self.dom.newMessages.className = 'newMessagesCount ' + CssUtils.visibilityClass;
 	li.appendChild(self.dom.newMessages);
-	self.OTHER_HEADER_CLASS = 'message-header-others';
+	self.OTHER_HEADER_CLASS = 'message-others';
 	self.dom.userList.className = CssUtils.visibilityClass;
 	channelsHandler.dom.chatUsersTable.appendChild(self.dom.userList);
 	self.dom.chatBoxDiv.className = 'chatbox ' + CssUtils.visibilityClass;
@@ -3937,11 +3932,12 @@ function ChatHandler(li, chatboxDiv, allUsers, roomId, roomName, private, getAll
 
 		var p = document.createElement('p');
 		p.setAttribute("id", timeMillis);
+		CssUtils.addClass(p, headerStyle);
 		if (messageId) {
 			p.setAttribute(MESSAGE_ID_ATTRIBUTE, messageId);
 		}
 		var headSpan = document.createElement('span');
-		headSpan.className = headerStyle; // note it's not appending classes, it sets all classes to specified
+		headSpan.className = 'message-header';
 		var timeSpan = document.createElement('span');
 		timeSpan.className = TIME_SPAN_CLASS;
 		timeSpan.textContent = '({})'.format(time);
