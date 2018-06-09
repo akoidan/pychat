@@ -1,0 +1,43 @@
+{
+  "name": "pychat",
+  "version": "1.0.0",
+  "description": "opensource chat",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:dev": "webpack-dev-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Deathangel908/pychat.git"
+  },
+  "author": "Andrew Koidan <deathangel908@gmail.com",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Deathangel908/pychat/issues"
+  },
+  "homepage": "https://github.com/Deathangel908/pychat#readme",
+  "devDependencies": {
+    "@types/websql": "0.0.27",
+    "css-loader": "^0.28.11",
+    "style-loader": "^0.21.0",
+    "ts-loader": "^4.3.1",
+    "typescript": "^2.9.1",
+    "vue-class-component": "^6.2.0",
+    "vue-loader": "^15.2.4",
+    "vue-property-decorator": "^6.1.0",
+    "vue-template-compiler": "^2.5.16",
+    "webpack": "^4.11.1",
+    "webpack-cli": "^3.0.3",
+    "webpack-dev-server": "^3.1.4",
+    "tslint": "^5.10.0"
+  },
+  "dependencies": {
+    "vue": "^2.5.16",
+    "vue-router": "^3.0.1",
+    "vuex": "^3.0.1"
+  }
+}
