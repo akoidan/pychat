@@ -7,8 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "prod": "webpack --mode production",
-    "dev": "webpack-dev-server --mode development"
+    "prod": "webpack --progress --mode production ",
+    "dev": "webpack-dev-server --mode development --hot"
   },
   "repository": {
     "type": "git",
@@ -37,16 +37,21 @@
       "vuex-class: allows to write  `@State foo` instead of @Component({ computed: mapState(['stateName']) and abilitity to have type",
       "webpack: assembles multiple files into a single one, resolving required dependencies",
       "webpack-dev-server: serves files from node server",
-      "webpack-cli: required by webpack to run builds"
+      "webpack-cli: required by webpack to run builds",
+      "file-loader: allows to copy files specifies as urls in css to output directory",
+      "url-loader: allows to copy files speicified as urls into base64 data"
+
     ],
     "@types/websql": "0.0.27",
     "css-loader": "^0.28.11",
+    "file-loader": "^1.1.11",
     "mini-css-extract-plugin": "^0.4.0",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.3",
     "ts-loader": "^4.3.1",
     "tslint": "^5.10.0",
     "typescript": "^2.9.1",
+    "url-loader": "^1.0.1",
     "vue-class-component": "^6.2.0",
     "vue-loader": "^15.2.4",
     "vue-property-decorator": "^6.1.0",
@@ -57,6 +62,9 @@
     "webpack-dev-server": "^3.1.4"
   },
   "dependencies": {
+    "highlightjs": "^9.10.0",
+    "npm-font-open-sans": "^1.1.0",
+    "typeface-oswald": "^0.0.54",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
     "vuex": "^3.0.1"

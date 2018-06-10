@@ -46,6 +46,20 @@ module.exports = (env, argv) => {
             "sass-loader?indentedSyntax"
           ]
         },
+        {
+          test: /\.(woff2?|eot|ttf|otf|svg)(\?.*)?$/,
+          loader: 'file-loader',
+          options: {
+            name: '[name].[ext]?[sha512:hash:base64:6]',
+          }
+        },
+        {
+          test: /\.(png|jpg|gif)$/,
+          loader: 'url-loader',
+          options: {
+            limit: 65536
+          }
+        },
       ],
     },
   };

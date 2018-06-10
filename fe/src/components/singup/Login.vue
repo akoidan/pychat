@@ -1,9 +1,9 @@
 <template>
-  <form id='regLoginForm' method='post' class='hidden' v-on:submit.prevent='login' ref="form">
+  <form v-on:submit.prevent='login' ref="form">
     <h1>Welcome back!</h1>
     <div>
       <i class='icon-user'></i>
-      <input type='text' maxlength='254' required placeholder='Username/Email' name='username' value=''/>
+      <input type='text' maxlength='254' required placeholder='Username/Email' name='username'/>
     </div>
     <div>
       <i class='icon-key'></i>
@@ -14,7 +14,7 @@
     </div>
     <div>
       <button v-if='oauth_token' class='g-icon lor-btn' title='Sign in using google account'
-              onclick='googleLogin(event)'>Via Google
+              onclick='googleLogin'>Via Google
       </button>
       <button v-if='fb_app_id' title='Sign in using facebook account' class='f-icon lor-btn'
               @click='facebookLogin'>
@@ -40,7 +40,9 @@
     @Prop() captcha_key: String;
     @Prop() oauth_token: String;
     @Prop() fb_app_id: String;
-    @Action addGrowl
+
+    @Action addGrowl;
+
     running: boolean = false;
 
     facebookLogin() {

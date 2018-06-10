@@ -8,8 +8,7 @@
 </template>
 
 <script lang='ts'>
-  import {Vue, Component} from "vue-property-decorator";
-  import {mapState} from "vuex";
+  import {Component, Vue} from "vue-property-decorator";
   import Growl from "./Growl";
   import {State} from "vuex-class";
 
