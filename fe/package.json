@@ -25,6 +25,7 @@
       "@types/websql: window.openDatabase",
       "css-loader: ability to load css from files",
       "mini-css-extract-plugin: extract files from .vue and .sass to a separate file",
+      "html-webpack-plugin: generate index.html with file hashes",
       "node-sass: compiles sass into css",
       "sass-loader: loads sass from files to node-sass",
       "ts-loader: loads typescript from files to typescript",
@@ -40,11 +41,11 @@
       "webpack-cli: required by webpack to run builds",
       "file-loader: allows to copy files specifies as urls in css to output directory",
       "url-loader: allows to copy files speicified as urls into base64 data"
-
     ],
     "@types/websql": "0.0.27",
     "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",
+    "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.4.0",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.3",
