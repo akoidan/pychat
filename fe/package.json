@@ -7,8 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start:dev": "webpack-dev-server"
+    "prod": "webpack --mode production",
+    "dev": "webpack-dev-server --mode development"
   },
   "repository": {
     "type": "git",
@@ -21,19 +21,40 @@
   },
   "homepage": "https://github.com/Deathangel908/pychat#readme",
   "devDependencies": {
+    "//": [
+      "@types/websql: window.openDatabase",
+      "css-loader: ability to load css from files",
+      "mini-css-extract-plugin: extract files from .vue and .sass to a separate file",
+      "node-sass: compiles sass into css",
+      "sass-loader: loads sass from files to node-sass",
+      "ts-loader: loads typescript from files to typescript",
+      "typescript: compiles ts into es5",
+      "tslint: adds tslint to webstorm",
+      "vue-class-component: allows to write component as classes",
+      "vue-loader: allows to assemble vue via webpack",
+      "vue-template-compiler: allows to write singlefile component",
+      "vue-property-decorator: allows to specifies ts types on props and etc",
+      "vuex-class: allows to write  `@State foo` instead of @Component({ computed: mapState(['stateName']) and abilitity to have type",
+      "webpack: assembles multiple files into a single one, resolving required dependencies",
+      "webpack-dev-server: serves files from node server",
+      "webpack-cli: required by webpack to run builds"
+    ],
     "@types/websql": "0.0.27",
     "css-loader": "^0.28.11",
-    "style-loader": "^0.21.0",
+    "mini-css-extract-plugin": "^0.4.0",
+    "node-sass": "^4.9.0",
+    "sass-loader": "^7.0.3",
     "ts-loader": "^4.3.1",
+    "tslint": "^5.10.0",
     "typescript": "^2.9.1",
     "vue-class-component": "^6.2.0",
     "vue-loader": "^15.2.4",
     "vue-property-decorator": "^6.1.0",
     "vue-template-compiler": "^2.5.16",
+    "vuex-class": "^0.3.1",
     "webpack": "^4.11.1",
     "webpack-cli": "^3.0.3",
-    "webpack-dev-server": "^3.1.4",
-    "tslint": "^5.10.0"
+    "webpack-dev-server": "^3.1.4"
   },
   "dependencies": {
     "vue": "^2.5.16",

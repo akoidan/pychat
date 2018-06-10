@@ -1,6 +1,6 @@
 interface RootState {
   isOnline: boolean;
-  growls: string[];
+  growls: GrowlModel[];
 }
 
 interface MessageDb {
@@ -13,6 +13,11 @@ interface MessageDb {
   edited: number;
   roomId: number;
   userId: number;
+}
+
+interface GrowlModel {
+  id: number;
+  title: string;
 }
 
 interface FileModel {
@@ -53,3 +58,8 @@ interface ObjectCb {
 interface NumberCb {
   (t: number): void;
 }
+
+interface StringCb {
+  (t: string): void;
+}
+

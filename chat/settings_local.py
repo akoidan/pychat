@@ -34,6 +34,11 @@ LOGGING['loggers'] = {
 	},
 }
 
+MIDDLEWARE_CLASSES = ('corsheaders.middleware.CorsMiddleware', ) + MIDDLEWARE_CLASSES
+CORS_ORIGIN_WHITELIST = (
+	'localhost:8080'
+)
+
 # Don't close socket if we're in debug
 PING_CLOSE_JS_DELAY = 100000
 

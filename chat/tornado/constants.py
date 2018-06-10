@@ -12,7 +12,6 @@ class Actions(object):
 	CANCEL_CALL_CONNECTION = 'cancelCallConnection'
 	ACCEPT_CALL = 'acceptCall'
 	ACCEPT_FILE = 'acceptFile'
-	ROOMS = 'setRooms'
 	GROWL_MESSAGE = 'growl'
 	GET_MESSAGES = 'loadMessages'
 	CREATE_DIRECT_CHANNEL = 'addDirectChannel'

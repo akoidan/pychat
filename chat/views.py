@@ -4,7 +4,7 @@ import json
 import logging
 import os
 
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, SESSION_KEY, BACKEND_SESSION_KEY, HASH_SESSION_KEY
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 from django.contrib.auth.hashers import make_password
@@ -239,11 +239,12 @@ def auth(request):
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		djangologin(request, user)
+		request.session.save()
 		message = settings.VALIDATION_IS_OK
 	else:
 		message = 'Login or password is wrong'
 	logger.debug('Auth request %s ; Response: %s', hide_fields(request.POST, ('password',)), message)
-	return HttpResponse(message, content_type='text/plain')
+	return HttpResponse(json.dumps({"session":request.session.session_key}), content_type='application/json')
 
 
 def send_restore_password(request):

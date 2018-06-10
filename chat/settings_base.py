@@ -144,12 +144,9 @@ GIPHY_REGEX = r"^\s*\/giphy (.+)"
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 MIDDLEWARE_CLASSES = (
-	'django.middleware.csrf.CsrfViewMiddleware',
-	'django.contrib.sessions.middleware.SessionMiddleware',
 	'django.middleware.common.CommonMiddleware',
-	'django.contrib.auth.middleware.AuthenticationMiddleware',
-	'django.contrib.messages.middleware.MessageMiddleware',
-	'chat.cookies_middleware.UserCookieMiddleWare',
+	'chat.auth_middleware.AuthorizationMiddleware',
+	'chat.cookies_middleware.RandomMiddleware',
 )
 
 ROOT_URLCONF = 'chat.urls'

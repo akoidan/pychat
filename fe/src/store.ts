@@ -12,21 +12,22 @@ const store: StoreOptions<RootState> = {
     setIsOnline (state, isOnline: boolean) {
       state.isOnline = isOnline;
     },
-    addGrowl (state, text: string) {
-      state.growls.push(text);
+    addGrowl (state, growlModel: GrowlModel) {
+      state.growls.push(growlModel);
     },
-    removeGrowl (state, text: string) {
-      let index = state.growls.indexOf(text, 0);
+    removeGrowl (state, growlModel: GrowlModel) {
+      let index = state.growls.indexOf(growlModel, 0);
       if (index > -1) {
         state.growls.splice(index, 1);
       }
     },
   },
   actions: {
-    addGrowl(context, text) {
-      context.commit('addGrowl', text);
+    addGrowl(context, title) {
+      let growl: GrowlModel = {id: Date.now(), title};
+      context.commit('addGrowl', growl);
       setTimeout(f => {
-        context.commit('removeGrowl', text);
+        context.commit('removeGrowl', growl);
       }, 4000);
     },
     setOnline(context) {

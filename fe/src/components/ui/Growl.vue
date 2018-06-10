@@ -1,6 +1,7 @@
 <template>
+
   <div>
-    <div>{{this.title}}</div>
+    <div>{{title}}</div>
   </div>
 </template>
 
@@ -12,3 +13,4 @@
     @Prop() title: string;
   }
 </script>
+

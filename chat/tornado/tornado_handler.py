@@ -15,7 +15,7 @@ from tornado.web import asynchronous
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from chat.cookies_middleware import create_id
-from chat.models import User, Message, UserJoinedInfo, IpAddress, Room, RoomUsers
+from chat.models import User, Message, UserJoinedInfo, IpAddress, Room, RoomUsers, UserProfile
 from chat.py2_3 import str_type, urlparse
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
@@ -114,11 +114,9 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		"""
 		conn_arg = self.get_argument('id', None)
 		self.id, random = create_id(self.user_id, conn_arg)
-		if random != conn_arg:
-			self.restored_connection = False
-			self.ws_write(self.set_ws_id(random, self.id))
-		else:
-			self.restored_connection = True
+		self.restored_connection =  random == conn_arg
+		self.restored_connection = False
+		self.save_ip()
 
 	def open(self):
 		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
@@ -126,6 +124,17 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.ip = self.get_client_ip()
 			session = SessionStore(session_key)
 			self.user_id = int(session["_auth_user_id"])
+			user_db = do_db(UserProfile.objects.defer(
+				'suggestions',
+				'highlight_code',
+				'embedded_youtube',
+				'online_change_sound',
+				'incoming_file_call_sound',
+				'message_sound',
+				'theme',
+				'username',
+				'sex'
+			).get, id=self.user_id)
 			self.generate_self_id()
 			self._logger = logging.LoggerAdapter(parent_logger, {
 				'id': self.id,
@@ -137,7 +146,6 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.async_redis_publisher.sadd(RedisPrefix.ONLINE_VAR, self.id)
 			# since we add user to online first, latest trigger will always show correct online
 			was_online, online = self.get_online_and_status_from_redis()
-			user_db = do_db(User.objects.get, id=self.user_id)
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
 			user_rooms1 = Room.objects.filter(users__id=self.user_id, disabled=False)\
@@ -165,7 +173,8 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				user_dict[user['id']] = RedisPrefix.set_js_user_structure(user['username'], user['sex'])
 			if self.user_id not in online:
 				online.append(self.user_id)
-			self.ws_write(self.set_room(user_rooms, user_dict, online))
+
+			self.ws_write(self.set_room(user_rooms, user_dict, online, user_db))
 			if not was_online:  # if a new tab has been opened
 				online_user_names_mes = self.room_online(online, Actions.LOGIN)
 				self.logger.info('!! First tab, sending refresh online for all')

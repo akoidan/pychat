@@ -20,16 +20,17 @@
               @click='facebookLogin'>
         <i class='icon-facebook-squared'></i>Via Facebook
       </button>
-      <input type='submit' class='cyan-btn submit-button' value='LOG IN'/>
+      <submit class='cyan-btn submit-button' value='LOG IN' :running="running"/>
     </div>
   </form>
 </template>
 
 <script lang='ts'>
-  import {Vue, Component, Prop} from "vue-property-decorator";
-  import {xhr} from "../../utils/singletons";
+  import {Component, Prop, Vue} from "vue-property-decorator";
+  import Submit from "../ui/Submit.vue"
+  import {Action} from "vuex-class";
 
-  @Component
+  @Component({components: {Submit}})
   export default class Register extends Vue {
 
     $refs: {
@@ -39,15 +40,19 @@
     @Prop() captcha_key: String;
     @Prop() oauth_token: String;
     @Prop() fb_app_id: String;
+    @Action addGrowl
+    running: boolean = false;
 
     facebookLogin() {
       alert('todo');
     }
 
     login() {
-      xhr.doPost("/auth", null, (data) => {
-        alert(data);
-      }, new FormData(this.$refs.form));
+      this.running = true;
+      setTimeout(t => {
+        this.running = false;
+        this.addGrowl("sucks");
+      }, 3000);
     }
 
   }

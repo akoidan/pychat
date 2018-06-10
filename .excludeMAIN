@@ -24,6 +24,8 @@ chat/static/sass/themes/_highlight-light.scss
 trash
 .fontello
 docker/volumes
+docker-all/volumes
+fe/node_modules
 rootfs/etc/nginx/ssl/*
 chat/static/demo.html
 rootfs/etc/nginx/ssl/server.key

@@ -1,90 +1,78 @@
-const path = require('path');;
+const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const chalk = require('chalk');
 
-let is_prod = process.env.NODE_ENV === 'production';
-assetsPath = function (_path) {
-  let assetsSubDirectory = is_prod ? '' : 'static';
-  return path.posix.join(assetsSubDirectory, _path)
-};
+module.exports = (env, argv) => {
 
-
-module.exports = {
-  entry: './src/main.ts',
-  output: {
-    filename: 'main.js',
-    publicPath: '/dist/',
-    path: path.resolve(__dirname, 'dist')
-  },
-  plugins: [
-    new VueLoaderPlugin()
-  ],
-  resolve: {
-    extensions: ['.ts', '.js', '.vue', '.json'],
-    alias: {
-      'vue$': 'vue/dist/vue.esm.js'
-    }
-  },
-  mode: 'development',
-  devtool: '#source-map',
-  devServer: {
-    historyApiFallback: true,
-    noInfo: true
-  },
-  // optimization: {
-  //   splitChunks: {
-  //     cacheGroups: {
-  //       commons: {
-  //         test: /[\\/]node_modules[\\/]/,
-  //         name: "vendors",
-  //         chunks: "all"
-  //       }
-  //     }
-  //   },
-  // },
-  module: {
-    rules: [
-      // {
-      //   test: /\.ts$/,
-      //   exclude: /node_modules/,
-      //   enforce: 'pre',
-      //   loader: 'tslint-loader'
-      // },
-      {
-        test: /\.ts$/,
-        loader: 'ts-loader',
-        exclude: /node_modules/,
-        options: {
-          appendTsSuffixTo: [/\.vue$/]
-        }
-      },
-      {
-        exclude: /node_modules/,
-        test: /\.vue$/,
-        loader: 'vue-loader',
-        options: {
-          loaders: {
-            // ts:  'ts-loader!tslint-loader'
-            ts:  'ts-loader'
-          }
-        }
-      },
-      // {
-      //   exclude: /node_modules/,
-      //   test: /\.sass$/,
-      //   use: [
-      //     "css-loader", // translates CSS into CommonJS
-      //     "sass-loader" // compiles Sass to CSS
-      //   ]
-      // },
-      // {
-      //   exclude: /node_modules/,
-      //   test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
-      //   loader: 'url-loader',
-      //   options: {
-      //     limit: 10000000,
-      //     name: assetsPath('fonts/[name].[ext]')
-      //   }
-      // }
+  const conf =  {
+    entry: ['./src/main.ts', './src/assets/sass/main.sass'],
+    plugins: [
+      new VueLoaderPlugin(),
+      new MiniCssExtractPlugin(), // extract css to a separate file, instead of having it loaded from js
+      // thus we can increase load time, since css is not required for domready state
+      function(){
+        let msg = function(stats) {
+          console.log(chalk.magenta(('\n[' + new Date().toLocaleString() + ']') + ' Begin a new compilation.\n'));
+        };
+        this.plugin('done', msg);
+        this.plugin('failed', msg);
+        this.plugin('invalid', msg);
+      }
     ],
+    resolve: {
+      extensions: ['.ts', '.js', '.vue', '.json'],
+    },
+    module: {
+      rules: [
+        {
+          test: /\.ts$/,
+          loader: 'ts-loader',
+          exclude: /node_modules/,
+          options: {
+            appendTsSuffixTo: [/\.vue$/]
+          }
+        },
+        {
+          exclude: /node_modules/,
+          test: /\.vue$/,
+          loader: 'vue-loader',
+        },
+        {
+          test: /\.sass$/,
+          use: [
+            MiniCssExtractPlugin.loader,
+            "css-loader",
+            "sass-loader?indentedSyntax"
+          ]
+        },
+      ],
+    },
+  };
+
+  if (argv.mode === 'development') {
+    // create vendor.js file for development so webpack doesn't need to reassemble it every time
+    // you can remove `argv.mode === 'development'` if you want it for prod. Or remove this if at all
+    conf.optimization = {
+      splitChunks: {
+        chunks: 'all',
+        minSize: 0,
+        maxAsyncRequests: Infinity,
+        maxInitialRequests: Infinity,
+        name: true,
+        cacheGroups: {
+          vendor: {
+            name: 'vendor',
+            chunks: 'initial',
+            reuseExistingChunk: true,
+            priority: -5,
+            enforce: true,
+            test: /[\\/]node_modules[\\/]/
+          },
+        }
+      }
+    };
+    conf.devtool = '#source-map';
   }
+  return conf;
 };

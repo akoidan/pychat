@@ -33,12 +33,26 @@ class MessagesCreator(object):
 			VarNames.WEBRTC_OPPONENT_ID: self_id
 		}
 
-	@classmethod
-	def set_room(cls, rooms, users, online):
-		res = cls.base_default(Actions.ROOMS, rooms, HandlerNames.CHANNELS)
-		res[VarNames.ROOM_USERS] = users
-		res[VarNames.ONLINE] = online
-		return res
+	def set_room(self, rooms, users, online, up):
+		return {
+			VarNames.ROOM_USERS: users,
+			VarNames.ONLINE: online,
+			VarNames.CONTENT: rooms,
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.SET_WS_ID,
+			VarNames.WEBRTC_OPPONENT_ID: self.id,
+			VarNames.USER: self.sender_name,
+			VarNames.USER_ID: self.user_id,
+			'suggestions': up.suggestions,
+			'START_WITH_LOGS': up.send_logs,
+			'sendLogs': up.send_logs,
+			'embeddedYoutube': up.embedded_youtube,
+			'incomingFileCallSound': up.incoming_file_call_sound,
+			'messageSound': up.message_sound,
+			'theme': up.theme,
+			'highlightCode': up.highlight_code,
+			'onlineChangeSound': up.online_change_sound,
+		}
 
 	def room_online(self, online, event):
 		"""
