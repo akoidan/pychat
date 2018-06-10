@@ -7,6 +7,8 @@ const store: StoreOptions<RootState> = {
   state: {
     isOnline: true,
     growls: [],
+    theme: 'color-reg',
+    regHeader: null
   },
   mutations: {
     setIsOnline (state, isOnline: boolean) {
@@ -20,6 +22,9 @@ const store: StoreOptions<RootState> = {
       if (index > -1) {
         state.growls.splice(index, 1);
       }
+    },
+    setRegHeader (state, regHeader: string) {
+      state.regHeader = regHeader;
     },
   },
   actions: {

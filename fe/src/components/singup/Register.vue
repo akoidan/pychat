@@ -1,18 +1,17 @@
 <template>
   <form id='register-form' method='post' v-on:submit.prevent='register'>
-    <h1>Create new account</h1>
-    <div class='required'>
+    <div class='reg-required'>
       <i class='icon-user'></i>
       <input type='text' maxlength='16' required placeholder='Username' name='username' value='' id='rusername'/>
       <div class='slider closed'></div>
     </div>
-    <div class='required'>
+    <div class='reg-required'>
       <i class='icon-lock'></i>
       <input type='password' required name='password' value=''
              id='rpassword' placeholder='Password'/>
       <div class='slider closed'></div>
     </div>
-    <div class='required'>
+    <div class='reg-required'>
       <i class='icon-lock'></i>
       <input type='password' required name='repeatpassword' value='' placeholder='Confirm password'
              id='repeatpassword'/>
@@ -46,6 +45,7 @@
 <script lang='ts'>
   import {Vue, Component, Prop} from 'vue-property-decorator';
   import {xhr} from '../../utils/singletons';
+  import {Mutation} from "vuex-class";
 
   @Component
   export default class Register extends Vue {
@@ -62,6 +62,12 @@
       alert('TODO');
     }
 
+    @Mutation setRegHeader;
+
+    created() {
+      this.setRegHeader('Create new account');
+    }
+
     register() {
       xhr.doPost('/register', null, (res) => {
         alert(res);
@@ -70,3 +76,17 @@
 
   }
 </script>
+<style lang="sass" scoped>
+  .reg-required
+    position: relative
+
+    &:after
+      content: " *"
+      position: absolute
+      right: 7px
+      top: 17px
+      font-size: 17px
+      display: inline-block
+      font-weight: bold
+      color: #6E6E6E
+</style>

@@ -1,6 +1,8 @@
 interface RootState {
   isOnline: boolean;
   growls: GrowlModel[];
+  theme: string;
+  regHeader: string;
 }
 
 interface MessageDb {

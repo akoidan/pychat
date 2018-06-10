@@ -1,6 +1,5 @@
 <template>
   <form id='recoverForm' v-on:submit.prevent='restorePassword' ref="form">
-    <h1>Restore password</h1>
     <div>
       <input type='text' required placeholder='Username or email' class='username-or-pass' name='username_or_password'
              value=''/>
@@ -16,6 +15,7 @@
 <script lang='ts'>
   import {Vue, Component, Prop} from "vue-property-decorator";
   import {xhr} from "../../utils/singletons";
+  import {Mutation} from "vuex-class";
 
   @Component
   export default class ResetPassword extends Vue {
@@ -23,10 +23,14 @@
     $refs: {
       form: HTMLFormElement
     }
-
+    @Mutation setRegHeader;
 
     @Prop() captcha_key: String;
 
+
+    created() {
+      this.setRegHeader('Restore password');
+    }
 
     register() {
       xhr.doPost("/register", null, (res) => {

@@ -7,7 +7,7 @@ const chalk = require('chalk');
 module.exports = (env, argv) => {
 
   const conf =  {
-    entry: ['./src/main.ts', './src/assets/sass/main.sass'],
+    entry: ['./src/main.ts', './src/assets/sass/common.sass'],
     plugins: [
       new VueLoaderPlugin(),
       new MiniCssExtractPlugin(), // extract css to a separate file, instead of having it loaded from js
@@ -51,7 +51,7 @@ module.exports = (env, argv) => {
           test: /\.(png|jpg|gif)$/,
           loader: 'url-loader',
           options: {
-            limit: 65536
+            limit: 32000
           }
         },
       ],

@@ -15,6 +15,10 @@ export default new VueRouter({
       name: 'auth',
       children: [
         {
+          path: '',
+          beforeEnter: (to, from, next) => next('/auth/login')
+        },
+        {
           path: 'login',
           component: Login,
           name: 'login',

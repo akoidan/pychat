@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div :class="theme">
     <div class="growlHolder">
       <growl v-for="growl in growls" :title="growl.title" :key="growl.id"></growl>
     </div>
@@ -16,7 +16,8 @@
     components: {Growl}
   })
   export default class App extends Vue {
-    @State growls: string[]
+    @State growls: string[];
+    @State theme;
 
   }
 </script>

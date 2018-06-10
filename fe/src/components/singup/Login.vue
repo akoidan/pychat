@@ -1,6 +1,5 @@
 <template>
   <form v-on:submit.prevent='login' ref="form">
-    <h1>Welcome back!</h1>
     <div>
       <i class='icon-user'></i>
       <input type='text' maxlength='254' required placeholder='Username/Email' name='username'/>
@@ -29,6 +28,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import Submit from "../ui/Submit.vue"
   import {Action} from "vuex-class";
+  import {Mutation} from "vuex-class";
 
   @Component({components: {Submit}})
   export default class Register extends Vue {
@@ -42,11 +42,15 @@
     @Prop() fb_app_id: String;
 
     @Action addGrowl;
+    @Mutation setRegHeader;
 
     running: boolean = false;
 
     facebookLogin() {
       alert('todo');
+    }
+    created() {
+      this.setRegHeader('Welcome back!');
     }
 
     login() {
