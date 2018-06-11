@@ -2,15 +2,13 @@
   <form v-on:submit.prevent='login' ref="form">
     <div>
       <i class='icon-user'></i>
-      <input type='text' maxlength='254' required placeholder='Username/Email' name='username'/>
+      <input type='text' maxlength='254' class="input" required placeholder='Username/Email' name='username'/>
     </div>
     <div>
       <i class='icon-key'></i>
-      <input type='password' name='password' placeholder='Password' id='password' required/>
+      <input type='password' name='password' class="input" placeholder='Password' required/>
     </div>
-    <div class='forg-pass'>
-      <router-link :to="{name: 'reset-password'}">Forgot Password?</router-link>
-    </div>
+      <router-link class='forg-pass' :to="{name: 'reset-password'}">Forgot Password?</router-link>
     <div>
       <button v-if='oauth_token' class='g-icon lor-btn' title='Sign in using google account'
               onclick='googleLogin'>Via Google
@@ -19,7 +17,7 @@
               @click='facebookLogin'>
         <i class='icon-facebook-squared'></i>Via Facebook
       </button>
-      <submit class='cyan-btn submit-button' value='LOG IN' :running="running"/>
+      <submit class='submit-button' value='LOG IN' :running="running"/>
     </div>
   </form>
 </template>
@@ -49,6 +47,7 @@
     facebookLogin() {
       alert('todo');
     }
+
     created() {
       this.setRegHeader('Welcome back!');
     }
@@ -63,3 +62,21 @@
 
   }
 </script>
+<style lang="sass" scoped>
+  .forg-pass
+    color: #249BA3
+
+  .forg-pass
+    text-align: right
+    font: 12px Open Sans
+    padding-right: 10px
+    width: inherit
+    padding-top: 3px
+    padding-bottom: 5px
+    text-shadow: #000 0 1px 5px
+    &:hover
+      text-decoration: underline
+      cursor: pointer
+
+  @import "register"
+</style>

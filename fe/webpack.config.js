@@ -1,22 +1,45 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const chalk = require('chalk');
 
 module.exports = (env, argv) => {
 
+  let plugins;
+  let sasscPlugins;
+  if (argv.mode === 'production') {
+    const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+    plugins = [
+      new VueLoaderPlugin(),
+      new MiniCssExtractPlugin(),
+      new HtmlWebpackPlugin({hash: true, favicon: 'src/assets/img/favicon.ico',  template: 'src/index.html'}),
+    ];
+    sasscPlugins = [
+      MiniCssExtractPlugin.loader,
+      "css-loader",
+      "sass-loader?indentedSyntax"
+    ];
+  } else if (argv.mode === 'development') {
+    plugins =[
+      new VueLoaderPlugin(),
+      new HtmlWebpackPlugin({hash: true, favicon: 'src/assets/img/favicon.ico',  template: 'src/index.html'}),
+    ];
+    sasscPlugins = [
+      "style-loader",
+      "css-loader",
+      "sass-loader?indentedSyntax"
+    ];
+  } else {
+    throw `Pass --mode production/development, current ${argv.mode} is invalid`
+  }
+
   const conf =  {
     entry: ['./src/main.ts', './src/assets/sass/common.sass'],
-    plugins: [
-      new VueLoaderPlugin(),
-      new MiniCssExtractPlugin(), // extract css to a separate file, instead of having it loaded from js
-      // thus we can increase load time, since css is not required for domready state
-      new HtmlWebpackPlugin({hash: true, favicon: 'src/assets/img/favicon.ico',  template: 'src/index.html'}),
-    ],
+    plugins,
     resolve: {
       extensions: ['.ts', '.js', '.vue', '.json'],
     },
+    devtool: '#source-map',
     module: {
       rules: [
         {
@@ -34,11 +57,7 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.sass$/,
-          use: [
-            MiniCssExtractPlugin.loader,
-            "css-loader",
-            "sass-loader?indentedSyntax"
-          ]
+          use: sasscPlugins
         },
         {
           test: /\.(woff2?|eot|ttf|otf|svg)(\?.*)?$/,
@@ -58,7 +77,6 @@ module.exports = (env, argv) => {
     },
   };
 
-  // if (argv.mode === 'development') {
     // create vendor.js file for development so webpack doesn't need to reassemble it every time
     // you can remove `argv.mode === 'development'` if you want it for prod. Or remove this if at all
     // conf.optimization = {
@@ -80,7 +98,7 @@ module.exports = (env, argv) => {
     //     }
     //   }
     // };
-    // conf.devtool = '#source-map';
+    // conf.
   // }
   return conf;
 };

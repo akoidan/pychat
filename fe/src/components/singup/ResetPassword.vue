@@ -1,13 +1,13 @@
 <template>
-  <form id='recoverForm' v-on:submit.prevent='restorePassword' ref="form">
+  <form v-on:submit.prevent='restorePassword' ref="form">
     <div>
-      <input type='text' required placeholder='Username or email' class='username-or-pass' name='username_or_password'
+      <input type='text' class="input" required placeholder='Username or email'  name='username_or_password'
              value=''/>
       <div class='slider'>Enter your username or email</div>
     </div>
     <div v-if='captcha_key' class='g-recaptcha' data-theme='dark' :data-sitekey='captcha_key'></div>
     <div>
-      <input type='submit' class='cyan-btn submit-button' value='Recover password'/>
+      <submit class='submit-button' value='Recover password' :running="running"/>
     </div>
   </form>
 </template>
@@ -16,8 +16,9 @@
   import {Vue, Component, Prop} from "vue-property-decorator";
   import {xhr} from "../../utils/singletons";
   import {Mutation} from "vuex-class";
+  import Submit from "../ui/Submit.vue"
 
-  @Component
+  @Component({components: {Submit}})
   export default class ResetPassword extends Vue {
 
     $refs: {
@@ -48,3 +49,33 @@
 
   }
 </script>
+<style lang="sass" scoped>
+
+  @import "../../assets/sass/partials/mixins"
+  @import "../../assets/sass/partials/variables"
+  @import "register"
+
+  form
+    width: 40%
+    margin-top: 10%
+    flex-direction: column
+    @include display-flex(!important)
+    max-width: 400px
+    min-width: 200px
+    $height: 70px
+    $padding: 20px
+    > input
+      padding: $padding
+      margin:  20px
+      display: block
+      width: 100%
+      height: 50px
+      font-size: 20px
+    [type=password]
+      $dif: $padding * 2
+      width: calc(100% - #{$dif})
+      height: $height - ($padding + 1) * 2
+    [type=submit]
+      height: $height
+
+</style>

@@ -1,3 +1,29 @@
+@import "partials/mixins"
+
 .color-reg
+  *
+    outline: none
   background: radial-gradient(rgba(30, 30, 30, 0.32), rgba(26, 26, 26, 0.85)), url('../img/aspalt.jpg')
   background-color: #222222
+
+  .input
+    @include box-shadow(inset 4px 6px 10px -4px rgba(0, 0, 0, 0.3), 0 1px 1px -1px rgba(255, 255, 255, 0.3))
+    background: rgba(0, 0, 0, 0.2)
+    border: 1px solid rgba(0, 0, 0, 1)
+    color: $reg-theme-main-color
+    text-shadow: $default-shadow
+    font-family: Arial, serif
+
+    &:focus
+      box-shadow: inset 4px 6px 10px -4px rgba(0, 0, 0, 0.7), 0 1px 1px -1px rgba(255, 255, 255, 0.3)
+      background: rgba(0, 0, 0, 0.35)
+      @include transition(0.7s ease)
+      transition-property: box-shadow, 	background
+
+    &:-webkit-autofill
+      @include box-shadow(0 0 0 1000px #30302A inset !important)
+      -webkit-text-fill-color: #9BA577
+      text-shadow: none
+
+  .input option
+    background-color: $mostly-black

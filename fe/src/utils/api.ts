@@ -1,5 +1,6 @@
 import Xhr from './Xhr';
 import {Store} from 'vuex';
+import {RESPONSE_SUCCESS} from './consts';
 
 export default class Api {
   private xhr: Xhr;
@@ -26,5 +27,25 @@ export default class Api {
         cb('Unable to parse response from server');
       }
     }, form);
+  }
+
+  public validateUsername(username: string, cb: StringCb) {
+    this.xhr.doPost('/validate_user', {username},  (data) => {
+      if (data === RESPONSE_SUCCESS) {
+        cb(null);
+      } else {
+        cb(data);
+      }
+    });
+  }
+
+  public validateEmail(email: string, cb: StringCb) {
+    this.xhr.doPost('/validate_email', {email},  (data) => {
+      if (data === RESPONSE_SUCCESS) {
+        cb(null);
+      } else {
+        cb(data);
+      }
+    });
   }
 }

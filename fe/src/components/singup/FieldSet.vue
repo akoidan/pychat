@@ -1,0 +1,72 @@
+<template>
+  <div class='reg-required'>
+    <i v-bind:class="[icon, validation]"></i>
+      <slot/>
+    <div class="slider" v-bind:class='{closed}'>
+      {{ description }}
+    </div>
+  </div>
+</template>
+<script lang="ts">
+
+  import Vue from "vue";
+  import {Prop, Component} from "vue-property-decorator";
+  import {IconColor} from './types';
+
+
+  @Component
+  export default class FieldSet extends Vue {
+    @Prop() icon: string;
+    @Prop() validation: IconColor;
+    @Prop() description: string;
+    @Prop() closed: boolean = true;
+
+  }
+</script>
+<style lang="sass" scoped>
+
+  .slider
+    font: 13px Open Sans
+    color: #6E6E6E
+    text-shadow: #000 0 1px 5px
+    margin-top: -7px
+    margin-bottom: 7px
+    padding-left: 10px
+    font-size: 10px
+    overflow-y: hidden
+    text-align: left
+    height: 30px
+
+    /* approximate max height
+    transition: 1s	height 0s
+
+    &.closed
+      height: 2px // Chrome53 pushes block all FORM left if height is set to 0
+
+  .reg-required
+    position: relative
+
+    &:after
+      content: " *"
+      position: absolute
+      right: 7px
+      top: 17px
+      font-size: 17px
+      display: inline-block
+      font-weight: bold
+      color: #6E6E6E
+  i
+    position: absolute
+    top: 15px
+    color: #6E6E6E
+    left: 5px
+    &.error
+      color: #922727
+
+    &.success
+      color: #387933
+
+    &.warn
+      color: #6D6B2C
+
+</style>
