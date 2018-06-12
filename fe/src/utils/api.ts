@@ -12,7 +12,11 @@ export default class Api {
   }
 
   public login(form: FormData, cb: StringCb) {
-    this.xhr.doPost('/auth', null, res => {
+    this.xhr.doPost('/auth', null, (res, error) => {
+      if (error) {
+        cb(error);
+        return;
+      }
       try {
         let pr = JSON.parse(res);
         if (pr.session) {
@@ -30,8 +34,10 @@ export default class Api {
   }
 
   public validateUsername(username: string, cb: StringCb) {
-    this.xhr.doPost('/validate_user', {username},  (data) => {
-      if (data === RESPONSE_SUCCESS) {
+    this.xhr.doPost('/validate_user', {username},  (data, error) => {
+      if (error) {
+        cb(error);
+      } else if (data === RESPONSE_SUCCESS) {
         cb(null);
       } else {
         cb(data);
@@ -40,8 +46,10 @@ export default class Api {
   }
 
   public validateEmail(email: string, cb: StringCb) {
-    this.xhr.doPost('/validate_email', {email},  (data) => {
-      if (data === RESPONSE_SUCCESS) {
+    this.xhr.doPost('/validate_email', {email},  (data, error) => {
+      if (error) {
+        cb(error);
+      } else if (data === RESPONSE_SUCCESS) {
         cb(null);
       } else {
         cb(data);
