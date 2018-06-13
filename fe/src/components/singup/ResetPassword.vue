@@ -53,7 +53,6 @@
 
   @import "partials/mixins"
   @import "partials/variables"
-  @import "register"
 
   form
     width: 40%

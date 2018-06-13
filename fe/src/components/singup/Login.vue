@@ -79,5 +79,7 @@
       text-decoration: underline
       cursor: pointer
 
-  @import "register"
+  @import "./mixins"
+  i
+    @extend %i
 </style>

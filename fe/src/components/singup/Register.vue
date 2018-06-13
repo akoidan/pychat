@@ -207,15 +207,3 @@
 
   }
 </script>
-<style lang="sass" scoped>
-  @import "partials/mixins"
-
-  select.input
-    border-radius: 5px
-    margin-bottom: 10px
-    font-size: 13px
-    width: 100%
-
-
-  @import "register"
-</style>

@@ -25,8 +25,6 @@
 </script>
 <style scoped lang="sass">
 
-  @import "register"
-
   $restPassMargin: 20px
 
   .restoreHeader

@@ -55,18 +55,9 @@
       display: inline-block
       font-weight: bold
       color: #6E6E6E
+
+  @import "./mixins"
   i
-    position: absolute
-    top: 15px
-    color: #6E6E6E
-    left: 5px
-    &.error
-      color: #922727
-
-    &.success
-      color: #387933
-
-    &.warn
-      color: #6D6B2C
+    @extend %i
 
 </style>

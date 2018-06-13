@@ -236,15 +236,14 @@ def auth(request):
 	"""
 	username = request.POST.get('username')
 	password = request.POST.get('password')
+	logger.debug('Auth request %s', hide_fields(request.POST, ('password',)))
 	user = authenticate(username=username, password=password)
 	if user is not None:
 		djangologin(request, user)
 		request.session.save()
-		message = settings.VALIDATION_IS_OK
+		return HttpResponse(json.dumps({"session": request.session.session_key}), content_type='application/json')
 	else:
-		message = 'Login or password is wrong'
-	logger.debug('Auth request %s ; Response: %s', hide_fields(request.POST, ('password',)), message)
-	return HttpResponse(json.dumps({"session":request.session.session_key}), content_type='application/json')
+		return HttpResponse(json.dumps({"error": 'Login or password is wrong'}), content_type='application/json')
 
 
 def send_restore_password(request):
