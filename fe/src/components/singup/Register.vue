@@ -1,5 +1,5 @@
 <template>
-  <form id='register-form' method='post' @submit.prevent='register'>
+  <form id='register-form' method='post' @submit.prevent='register' ref="form">
     <register-field-set icon="icon-user" :validation="userCheckValue" :closed="userFoc" :description="userDescription" >
       <input type='text' maxlength='16' required placeholder='Username' ref="username" v-model.trim="username" name='username' class="input" @focus="userFoc = false" @blur="userFoc = true"/>
     </register-field-set>
@@ -34,7 +34,7 @@
 <script lang='ts'>
   import {Vue, Component, Prop, Watch} from "vue-property-decorator";
   import {api, xhr} from "../../utils/singletons";
-  import {Mutation} from "vuex-class";
+  import {Mutation, Action} from "vuex-class";
   import AppSubmit from "../ui/AppSubmit.vue"
   import RegisterFieldSet from './RegisterFieldSet.vue'
   import _ from 'lodash';
@@ -47,6 +47,7 @@
     @Prop() oauth_token: string;
     @Prop() fb_app_id: string;
     @Mutation setRegHeader;
+    @Action growlError;
 
     running: boolean = false;
 
@@ -200,9 +201,13 @@
 
 
     register() {
-      xhr.doPost('/register', null, (res) => {
-        alert(res);
-      });
+      this.running = true;
+      api.register(this.$refs.form, error => {
+        this.running = false;
+        if (error) {
+          this.growlError(error);
+        }
+      })
     }
 
   }

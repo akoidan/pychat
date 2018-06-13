@@ -243,7 +243,7 @@ def auth(request):
 		request.session.save()
 		return HttpResponse(json.dumps({"session": request.session.session_key}), content_type='application/json')
 	else:
-		return HttpResponse(json.dumps({"error": 'Login or password is wrong'}), content_type='application/json')
+		return HttpResponse('Login or password is wrong', content_type='text/plain')
 
 
 def send_restore_password(request):
@@ -509,4 +509,5 @@ class RegisterView(View):
 		if email:
 			send_sign_up_email(user_profile, request.get_host(), request)
 		djangologin(request, auth_user)
-		return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+		request.session.save()
+		return HttpResponse(json.dumps({"session": request.session.session_key}), content_type='application/json')

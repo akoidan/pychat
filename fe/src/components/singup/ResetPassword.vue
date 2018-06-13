@@ -53,9 +53,12 @@
 
   @import "partials/mixins"
   @import "partials/variables"
+  @import "./mixins"
+
+  .slider
+    @extend %slider
 
   form
-    width: 40%
     margin-top: 10%
     flex-direction: column
     @include display-flex(!important)

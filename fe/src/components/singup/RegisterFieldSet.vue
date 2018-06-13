@@ -25,20 +25,14 @@
 </script>
 <style lang="sass" scoped>
 
+  @import "mixins"
   .slider
-    font: 13px Open Sans
-    color: #6E6E6E
-    text-shadow: #000 0 1px 5px
-    margin-top: -7px
-    margin-bottom: 7px
-    padding-left: 10px
-    font-size: 10px
+    @extend %slider
     overflow-y: hidden
-    text-align: left
     height: 30px
 
     /* approximate max height
-    transition: 1s	height 0s
+    transition: 1s height 0s
 
     &.closed
       height: 2px // Chrome53 pushes block all FORM left if height is set to 0

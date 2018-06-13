@@ -57,7 +57,11 @@
       this.running = true;
       api.login(this.$refs.form, err => {
         this.running = false;
-        this.growlError(err);
+        if (err) {
+          this.growlError(err);
+        } else {
+          alert('login')
+        }
       });
     }
 

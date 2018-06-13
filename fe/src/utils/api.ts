@@ -29,7 +29,37 @@ export default class Api {
           cb('Unknown error');
         }
       } catch (e) {
-        cb('Unable to parse response from server');
+        if (res) {
+          cb(res);
+        }  else {
+          cb('Unable to parse response from server');
+        }
+      }
+    }, new FormData(form));
+  }
+
+  public register(form: HTMLFormElement, cb: StringCb) {
+    this.xhr.doPost('/register', null, (res, error) => {
+      if (error) {
+        cb(error);
+        return;
+      }
+      try {
+        let pr = JSON.parse(res);
+        if (pr.session) {
+          localStorage.setItem('session_id', pr.session);
+          cb(null);
+        } else if (pr.error) {
+          cb(pr.error);
+        } else {
+          cb('Unknown error');
+        }
+      } catch (e) {
+        if (res) {
+          cb(res);
+        }  else {
+          cb('Unable to parse response from server');
+        }
       }
     }, new FormData(form));
   }
