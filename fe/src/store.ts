@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import Vuex, { StoreOptions } from 'vuex';
 Vue.use(Vuex);
-
+import {GrowlModel, GrowlType, RootState} from './types';
 
 const store: StoreOptions<RootState> = {
   state: {
@@ -28,8 +28,22 @@ const store: StoreOptions<RootState> = {
     },
   },
   actions: {
-    addGrowl(context, title) {
-      let growl: GrowlModel = {id: Date.now(), title};
+    growlError(context, title) {
+      let growl: GrowlModel = {id: Date.now(), title, type: GrowlType.ERROR};
+      context.commit('addGrowl', growl);
+      setTimeout(f => {
+        context.commit('removeGrowl', growl);
+      }, 4000);
+    },
+    growlInfo(context, title) {
+      let growl: GrowlModel = {id: Date.now(), title, type: GrowlType.INFO};
+      context.commit('addGrowl', growl);
+      setTimeout(f => {
+        context.commit('removeGrowl', growl);
+      }, 4000);
+    },
+    growlSuccess(context, title) {
+      let growl: GrowlModel = {id: Date.now(), title, type: GrowlType.SUCCESS};
       context.commit('addGrowl', growl);
       setTimeout(f => {
         context.commit('removeGrowl', growl);

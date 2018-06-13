@@ -1,6 +1,7 @@
 import Xhr from './Xhr';
 import {Store} from 'vuex';
 import {RESPONSE_SUCCESS} from './consts';
+import {RootState} from '../types';
 
 export default class Api {
   private xhr: Xhr;
@@ -11,7 +12,7 @@ export default class Api {
     this.store = store;
   }
 
-  public login(form: FormData, cb: StringCb) {
+  public login(form: HTMLFormElement, cb: StringCb) {
     this.xhr.doPost('/auth', null, (res, error) => {
       if (error) {
         cb(error);
@@ -30,7 +31,7 @@ export default class Api {
       } catch (e) {
         cb('Unable to parse response from server');
       }
-    }, form);
+    }, new FormData(form));
   }
 
   public validateUsername(username: string, cb: StringCb) {

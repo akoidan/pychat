@@ -1,5 +1,5 @@
 <template>
-  <form v-on:submit.prevent='restorePassword' ref="form">
+  <form @submit.prevent='restorePassword' ref="form">
     <div>
       <input type='text' class="input" required placeholder='Username or email'  name='username_or_password'
              value=''/>
@@ -7,7 +7,7 @@
     </div>
     <div v-if='captcha_key' class='g-recaptcha' data-theme='dark' :data-sitekey='captcha_key'></div>
     <div>
-      <submit class='submit-button' value='Recover password' :running="running"/>
+      <app-submit class='submit-button' value='Recover password' :running="running"/>
     </div>
   </form>
 </template>
@@ -16,9 +16,9 @@
   import {Vue, Component, Prop} from "vue-property-decorator";
   import {xhr} from "../../utils/singletons";
   import {Mutation} from "vuex-class";
-  import Submit from "../ui/Submit.vue"
+  import AppSubmit from "../ui/AppSubmit.vue"
 
-  @Component({components: {Submit}})
+  @Component({components: {AppSubmit}})
   export default class ResetPassword extends Vue {
 
     $refs: {
@@ -51,8 +51,8 @@
 </script>
 <style lang="sass" scoped>
 
-  @import "../../assets/sass/partials/mixins"
-  @import "../../assets/sass/partials/variables"
+  @import "partials/mixins"
+  @import "partials/variables"
   @import "register"
 
   form

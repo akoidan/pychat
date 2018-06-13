@@ -2,6 +2,7 @@ import {Logger} from './Logger';
 import {API_URL, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT, CONNECTION_RETRY_TIME, PING_CLOSE_JS_DELAY} from './consts';
 import {Store} from 'vuex';
 import {VueRouter} from 'vue-router/types/router';
+import {IStorage, RootState} from '../types';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED

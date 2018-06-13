@@ -42,6 +42,7 @@
       "file-loader: allows to copy files specifies as urls in css to output directory",
       "url-loader: allows to copy files speicified as urls into base64 data"
     ],
+    "@types/lodash": "^4.14.109",
     "@types/websql": "0.0.27",
     "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",

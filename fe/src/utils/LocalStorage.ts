@@ -1,4 +1,5 @@
 import {Logger} from './Logger';
+import {IStorage, MessageModel} from '../types';
 
 export default class LocalStorage implements IStorage {
 

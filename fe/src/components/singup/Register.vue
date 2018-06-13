@@ -1,24 +1,24 @@
 <template>
-  <form id='register-form' method='post' v-on:submit.prevent='register'>
-    <field-set icon="icon-user" :validation="userCheckValue" :closed="userFoc" :description="userDescription" >
+  <form id='register-form' method='post' @submit.prevent='register'>
+    <register-field-set icon="icon-user" :validation="userCheckValue" :closed="userFoc" :description="userDescription" >
       <input type='text' maxlength='16' required placeholder='Username' ref="username" v-model.trim="username" name='username' class="input" @focus="userFoc = false" @blur="userFoc = true"/>
-    </field-set>
-    <field-set icon="icon-lock" :validation="passwordCheckValue" :closed="passwordFoc" :description="passwordDescription" >
+    </register-field-set>
+    <register-field-set icon="icon-lock" :validation="passwordCheckValue" :closed="passwordFoc" :description="passwordDescription" >
       <input ref="password" type='password' required name='password' class="input" placeholder='Password'  @focus="passwordFoc = false"  v-model="password" @blur="passwordFoc = true"/>
-    </field-set>
-    <field-set icon="icon-lock" :validation="repPassCheckValue" :closed="repPassFoc" :description="repPassDescription" >
+    </register-field-set>
+    <register-field-set icon="icon-lock" :validation="repPassCheckValue" :closed="repPassFoc" :description="repPassDescription" >
       <input ref="repPass" type='password' required name='repPass' class="input" placeholder='Repeat password'  @focus="repPassFoc = false"  v-model="repPass" @blur="repPassFoc = true"/>
-    </field-set>
-    <field-set icon="icon-mail" :validation="emailCheckValue" :closed="emailFoc" :description="emailDescription" >
+    </register-field-set>
+    <register-field-set icon="icon-mail" :validation="emailCheckValue" :closed="emailFoc" :description="emailDescription" >
       <input type='email' ref="email" placeholder='Email' name='email' class="input" @focus="emailFoc = false"  v-model.trim="email" @blur="emailFoc = true"/>
-    </field-set>
-      <field-set icon="icon-user-pair" :validation="sexCheckValue" :closed="sexFoc" :description="sexDescription" >
-        <select ref="sex" name='sex' class="input" @focus="sexFoc = false"  v-model.trim="sex" @blur="sexFoc = true">
-          <option value='Secret' disabled selected hidden>Gender</option>
-          <option value='Male'>Male</option>
-          <option value='Female'>Female</option>
-        </select>
-      </field-set>
+    </register-field-set>
+    <register-field-set icon="icon-user-pair" :validation="sexCheckValue" :closed="sexFoc" :description="sexDescription">
+      <select ref="sex" name='sex' class="input" @focus="sexFoc = false" v-model.trim="sex" @blur="sexFoc = true">
+        <option value='Secret' disabled selected hidden>Gender</option>
+        <option value='Male'>Male</option>
+        <option value='Female'>Female</option>
+      </select>
+    </register-field-set>
 
     <button v-if='oauth_token' class='g-icon lor-btn' title='Sign up using google account'
             @click='googleLogin'>With Google
@@ -27,7 +27,7 @@
             @click='facebookLogin'>
       <i class='icon-facebook-squared'></i>With Facebook
     </button>
-    <submit class='submit-button' value='REGISTER' :running="running"/>
+    <app-submit class='submit-button' value='REGISTER' :running="running"/>
   </form>
 </template>
 
@@ -35,12 +35,12 @@
   import {Vue, Component, Prop, Watch} from "vue-property-decorator";
   import {api, xhr} from "../../utils/singletons";
   import {Mutation} from "vuex-class";
-  import Submit from "../ui/Submit.vue"
-  import FieldSet from './FieldSet.vue'
+  import AppSubmit from "../ui/AppSubmit.vue"
+  import RegisterFieldSet from './RegisterFieldSet.vue'
   import _ from 'lodash';
   import {IconColor} from './types';
 
-  @Component({components: {Submit, FieldSet}})
+  @Component({components: {AppSubmit, RegisterFieldSet}})
   export default class Register extends Vue {
 
     @Prop() captcha_key: string;
@@ -49,6 +49,14 @@
     @Mutation setRegHeader;
 
     running: boolean = false;
+
+    $refs: {
+      form: HTMLFormElement,
+      username: HTMLInputElement,
+      password: HTMLInputElement,
+      repPass: HTMLInputElement,
+      email: HTMLInputElement,
+    };
 
     created() {
       this.setRegHeader('Create new account');
@@ -67,7 +75,7 @@
     checkUserName(username: string) {
       api.validateUsername(username, errors => {
         this.userCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
-        this.$refs.username['setCustomValidity'](errors ? errors : "");
+        this.$refs.username.setCustomValidity(errors ? errors : "");
         this.userDescription = errors ? errors : `Username ${username} is available`;
       });
     }
@@ -77,13 +85,13 @@
       if (username === "") {
         this.userCheckValue = IconColor.ERROR;
         this.userDescription = "Username can't be empty";
-        this.$refs.username['setCustomValidity'](this.userDescription);
+        this.$refs.username.setCustomValidity(this.userDescription);
       } else if (!/^[a-zA-Z-_0-9]{1,16}$/.test(username)) {
         this.userDescription = "Username can only contain latin letters, numbers, dashes or underscore";
-        this.$refs.username['setCustomValidity'](this.userDescription);
+        this.$refs.username.setCustomValidity(this.userDescription);
         this.userCheckValue = IconColor.ERROR;
       } else {
-        this.$refs.username['setCustomValidity']("checking...");
+        this.$refs.username.setCustomValidity("checking...");
         this.userCheckValue = IconColor.NOT_SET;
         this.debouncedValidateUserName(username)
       }
@@ -98,19 +106,19 @@
     onPasswordChange(pswd: string) {
       if (pswd.length === 0) {
         this.passwordDescription = 'Come up with strong password';
-        this.$refs.password['setCustomValidity'](this.passwordDescription);
+        this.$refs.password.setCustomValidity(this.passwordDescription);
         this.passwordCheckValue = IconColor.ERROR;
       } else if (!/^\S.+\S$/.test(pswd)) {
         this.passwordCheckValue = IconColor.ERROR;
         this.passwordDescription = "Password is too short";
-        this.$refs.password['setCustomValidity'](this.passwordDescription);
+        this.$refs.password.setCustomValidity(this.passwordDescription);
       } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{5,}$/.test(pswd) && pswd.length < 11) {
         this.passwordDescription = "Password is weak! Good one contains at least 5 characters, one big letter small letter and a digit";
-        this.$refs.password['setCustomValidity']("");
+        this.$refs.password.setCustomValidity("");
         this.passwordCheckValue = IconColor.WARN;
       } else {
         this.passwordDescription = "Password is good!";
-        this.$refs.password['setCustomValidity']("");
+        this.$refs.password.setCustomValidity("");
         this.passwordCheckValue = IconColor.SUCCESS;
       }
     }
@@ -128,10 +136,10 @@
       if (this.repPass != this.password) {
         this.repPassCheckValue = IconColor.ERROR;
         this.repPassDescription = "Passwords don't match"
-        this.$refs.repPass['setCustomValidity'](this.repPassDescription);
+        this.$refs.repPass.setCustomValidity(this.repPassDescription);
       } else {
         this.repPassCheckValue = IconColor.SUCCESS;
-        this.$refs.repPass['setCustomValidity']("");
+        this.$refs.repPass.setCustomValidity("");
         this.repPassDescription = "Passwords match";
       }
     }
@@ -146,7 +154,7 @@
       console.log('asd');
       api.validateEmail(username, errors => {
         this.emailCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
-        this.$refs.email['setCustomValidity'](errors ? errors : "");
+        this.$refs.email.setCustomValidity(errors ? errors : "");
         this.emailDescription = errors ? errors : `Email ${username} is not registered`;
       });
     }
@@ -155,11 +163,11 @@
     onEmailChange(email: string) {
       if (email === "") {
         this.emailCheckValue = IconColor.WARN;
-        this.$refs.email['setCustomValidity']("");
+        this.$refs.email.setCustomValidity("");
         this.userDescription = "Well, it's still fine to leave it blank...";
       } else {
         this.emailCheckValue = IconColor.NOT_SET;
-        this.$refs.email['setCustomValidity']("checking...");
+        this.$refs.email.setCustomValidity("checking...");
         this.debouncedValidateEmail(email)
       }
     }
@@ -200,7 +208,7 @@
   }
 </script>
 <style lang="sass" scoped>
-  @import "../../assets/sass/partials/mixins"
+  @import "partials/mixins"
 
   select.input
     border-radius: 5px

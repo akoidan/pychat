@@ -1,5 +1,5 @@
 <template>
-  <form v-on:submit.prevent='login' ref="form">
+  <form @submit.prevent='login' ref="form">
     <div>
       <i class='icon-user'></i>
       <input type='text' maxlength='254' class="input" required placeholder='Username/Email' name='username'/>
@@ -17,18 +17,19 @@
               @click='facebookLogin'>
         <i class='icon-facebook-squared'></i>Via Facebook
       </button>
-      <submit class='submit-button' value='LOG IN' :running="running"/>
+      <app-submit class='submit-button' value='LOG IN' :running="running"/>
     </div>
   </form>
 </template>
 
 <script lang='ts'>
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import Submit from "../ui/Submit.vue"
+  import AppSubmit from "../ui/AppSubmit.vue"
   import {Action} from "vuex-class";
   import {Mutation} from "vuex-class";
+  import {api} from '../../utils/singletons';
 
-  @Component({components: {Submit}})
+  @Component({components: {AppSubmit}})
   export default class Register extends Vue {
 
     $refs: {
@@ -39,7 +40,7 @@
     @Prop() oauth_token: String;
     @Prop() fb_app_id: String;
 
-    @Action addGrowl;
+    @Action growlError;
     @Mutation setRegHeader;
 
     running: boolean = false;
@@ -54,10 +55,10 @@
 
     login() {
       this.running = true;
-      setTimeout(t => {
+      api.login(this.$refs.form, err => {
         this.running = false;
-        this.addGrowl("sucks");
-      }, 3000);
+        this.growlError(err);
+      });
     }
 
   }

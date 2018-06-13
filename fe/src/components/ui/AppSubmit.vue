@@ -1,7 +1,7 @@
 <template>
   <button :disabled="running" :class="btnClass">
-    {{value}}
     <div class="spinner" v-if="running"></div>
+    {{value}}
   </button>
 </template>
 
@@ -9,7 +9,7 @@
   import {Vue, Component, Prop} from "vue-property-decorator";
 
   @Component
-  export default class Submit extends Vue {
+  export default class AppSubmit extends Vue {
     @Prop() value: string;
     @Prop() running: boolean;
     get btnClass() {
@@ -19,7 +19,7 @@
     }
   }
 </script>
-<style lang="sass">
+<style lang="sass" scoped>
 
   @mixin spinner($size)
     width: $size * 7
@@ -31,10 +31,9 @@
   @-webkit-keyframes sp-rotate
     to
       -webkit-transform: rotate(360deg)
-  .sp-loading
-    cursor: not-allowed
   .spinner
     display: inline-block
+    margin: -4px 10px -4px 10px
     @include spinner(3px)
 
 </style>

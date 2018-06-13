@@ -2,7 +2,7 @@
   <div class='reg-required'>
     <i v-bind:class="[icon, validation]"></i>
       <slot/>
-    <div class="slider" v-bind:class='{closed}'>
+    <div class="slider" :class='{closed}'>
       {{ description }}
     </div>
   </div>

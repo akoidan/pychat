@@ -8,6 +8,7 @@ import LocalStorage from './LocalStorage';
 import store from '../store';
 import router from '../router';
 import Api from './api';
+import {IStorage} from '../types';
 const loggerFactory = new LoggerFactory(true);
 
 let storageLogger = loggerFactory.getLogger('DB', 'color: blue; font-weight: bold');

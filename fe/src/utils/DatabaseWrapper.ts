@@ -1,4 +1,5 @@
 import {Logger} from './Logger';
+import {IStorage, MessageModel} from '../types';
 
 interface TransactionCb { (t: SQLTransaction, ...rest): void; }
 

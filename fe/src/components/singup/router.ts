@@ -28,10 +28,10 @@ export default {
       component: Register,
       name: 'register',
     },
-    // {
-    //   path: 'proceed-reset-password',
-    //   component: ApplyResetPassword,
-    //   name: 'proceed-reset',
-    // }
+    {
+      path: 'proceed-reset-password',
+      component: ApplyResetPassword,
+      name: 'proceed-reset',
+    }
   ]
 };

@@ -1,20 +1,20 @@
 <template>
-  <form method="post" v-on:submit.prevent="submitResetPassword">
+  <form method="post" @submit.prevent="submitResetPassword">
     <div class="restoreHeader">Restore password for
       <b>{{ restoreUser }}</b>
     </div>
     <input type="password" name="password" class="input" required placeholder="password"/>
     <input type="password" name="repeatpassword" class="input" required placeholder="repeat password"/>
-    <submit class='submit-button' value='Submit Password' :running="running"/>
+    <app-submit class='submit-button' value='Submit Password' :running="running"/>
   </form>
 </template>
 <script lang="ts">
 
   import {Prop, Component} from "vue-property-decorator";
   import Vue from 'vue';
-  import Submit from '../ui/Submit';
+  import AppSubmit from '../ui/AppSubmit.vue';
 
-  @Component({children: {Submit}})
+  @Component({components: {AppSubmit}})
   export default class ApplyResetPassword extends Vue {
     @Prop() restoreUser: string;
 

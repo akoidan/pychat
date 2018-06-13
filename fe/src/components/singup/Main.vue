@@ -19,7 +19,7 @@
 </script>
 <style lang="sass" scoped>
 
-  @import '../../assets/sass/partials/mixins.sass'
+  @import 'partials/mixins.sass'
   h1
     text-align: center
     padding: 30px 0 30px 0

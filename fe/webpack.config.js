@@ -6,29 +6,31 @@ const chalk = require('chalk');
 module.exports = (env, argv) => {
 
   let plugins;
-  let sasscPlugins;
+  let sasscPlugins = [
+    "css-loader",
+    {
+      loader: "sass-loader",
+      options: {
+        indentedSyntax: true,
+        includePaths: [path.resolve(__dirname, 'src/assets/sass')]
+      }
+    }
+  ];
+  plugins = [
+    new VueLoaderPlugin(),
+    new HtmlWebpackPlugin({hash: true, favicon: 'src/assets/img/favicon.ico',  template: 'src/index.html'}),
+  ];
   if (argv.mode === 'production') {
     const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-    plugins = [
-      new VueLoaderPlugin(),
-      new MiniCssExtractPlugin(),
-      new HtmlWebpackPlugin({hash: true, favicon: 'src/assets/img/favicon.ico',  template: 'src/index.html'}),
-    ];
-    sasscPlugins = [
-      MiniCssExtractPlugin.loader,
-      "css-loader",
-      "sass-loader?indentedSyntax"
-    ];
+    plugins.push(new MiniCssExtractPlugin());
+    sasscPlugins.unshift(MiniCssExtractPlugin.loader);
   } else if (argv.mode === 'development') {
-    plugins =[
-      new VueLoaderPlugin(),
-      new HtmlWebpackPlugin({hash: true, favicon: 'src/assets/img/favicon.ico',  template: 'src/index.html'}),
-    ];
-    sasscPlugins = [
-      "style-loader",
-      "css-loader",
-      "sass-loader?indentedSyntax"
-    ];
+    sasscPlugins.unshift({
+      loader: 'style-loader',
+      options: {
+        sourceMap: true //todo doesnt work
+      }
+    });
   } else {
     throw `Pass --mode production/development, current ${argv.mode} is invalid`
   }
