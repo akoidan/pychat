@@ -1,3 +1,5 @@
+@import "./variables"
+
 @mixin border-radius($radius...)
 	-webkit-border-radius: $radius
 	-moz-border-radius: $radius
@@ -42,6 +44,8 @@
 	outline: none
 	color: $textColor
 	border: 1px solid transparent
+	&:disabled
+		cursor: not-allowed
 	&:not(:hover):not(:active)
 		border-top: 1px solid lighten($backgroundColor, 20%)
 		border-left: 1px solid lighten($backgroundColor, 5%)
@@ -49,14 +53,14 @@
 		border-right: 1px solid darken($backgroundColor, 25%)
 		@include linear-gradient-values($backgroundColor 0%, $bgEnd 100%)
 	&:hover:not(:active)
-		cursor: pointer
 		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19)
 		color: lighten($textColor, 8%)
 		//background-color: desaturate(darken($backgroundColor, 5%), 5%)
 		background-color: darken($backgroundColor, 8%)
+		&:not(:disabled)
+			cursor: pointer
 	&:active
 		border: 1px solid transparent
-		cursor: pointer
 		border-top: 1px solid darken($backgroundColor, 25%)
 		border-left: 1px solid darken($backgroundColor, 25%)
 		border-right: 1px solid transparent
@@ -64,6 +68,8 @@
 		@include box-shadow(1px 1px 1px rgba(255, 255, 255, 0.2))
 		color: lighten($textColor, 15%)
 		@include linear-gradient-values(darken($backgroundColor, 8.7%) 0%, darken($backgroundColor, 1.7%) 100%)
+		&:not(:disabled)
+			cursor: pointer
 	padding: $padding-vert $padding-hori
 	&:active:not([disabled])
 		@include drop-padding($padding-vert, $padding-hori)
