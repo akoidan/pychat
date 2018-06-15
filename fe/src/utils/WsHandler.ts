@@ -15,7 +15,7 @@ interface SetWsIdMessage extends DefaultMessage {
   users: { [id: number]: UserModel };
   online: number[];
   opponentWsId: string;
-  currentUserInfo: CurrentUserInfo;
+  userInfo: CurrentUserInfo;
 }
 
 interface AllHandlers {
@@ -88,7 +88,7 @@ export class WsHandler implements MessageHandler {
 
   handlesetWsId(message: SetWsIdMessage) {
     this.wsConnectionId = message.opponentWsId;
-    this.store.commit('setUserInfo', message.currentUserInfo);
+    this.store.commit('setUserInfo', message.userInfo);
     this.handlers.channels.setRooms(message.rooms);
     this.handlers.channels.setOnline(message.online);
     this.handlers.channels.setUsers(message.users);
@@ -255,14 +255,14 @@ export class WsHandler implements MessageHandler {
     }, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
   }
 
-  onping(message) {
+  handleping(message) {
     this.startNoPingTimeout();
     this.sendToServer({action: 'pong', time: message.time});
   }
 
   pingServer() {
     if (this.sendToServer({action: 'ping'}, true)) {
-      this.onpong();
+      this.handlepong();
       this.pingTimeoutFunction = setTimeout(() => {
         this.logger.error('Force closing socket coz pong time out')();
         this.ws.close(1000, 'Ping timeout');
@@ -270,7 +270,7 @@ export class WsHandler implements MessageHandler {
     }
   }
 
-  onpong() {
+  handlepong() {
     if (this.pingTimeoutFunction) {
       this.logger.debug('Clearing pingTimeoutFunction')();
       clearTimeout(this.pingTimeoutFunction);

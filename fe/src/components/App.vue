@@ -3,27 +3,7 @@
     <div class="growlHolder">
       <growl v-for="growl in growls" :growl="growl" :key="growl.id"></growl>
     </div>
-    <nav class="noSelection" v-if="userInfo">
-      <router-link to="/" class="icon-home" title="Go home"><span class="mText">Home</span></router-link>
-      <i class="icon-brush" title="Draw an Image">
-        <span class="mText">Painter</span>
-      </i>
-      <router-link to="/report-issue" class="icon-pencil" title="Report an issue"><span class="mText">Issue</span></router-link>
-      <i class="icon-phone" title="Make a video/mic call"><span class="mText">Call</span></i>
-      <i class="icon-search" title="Search messages in current room (Shift+Ctrl+F)"><span class="mText">Search</span></i>
-
-      <router-link to="/statistics" class="icon-chart-pie" title="Show user countries statistics"><span class="mText">Statistics</span></router-link>
-      <i class="icon-doc-inv"><span class="mText">Send File</span></i>
-      <i class="icon-popup hidden"><span class="mText">Minimized Winows</span></i>
-      <a href="https://github.com/Deathangel908/pychat" target="_blank" class="icon-github"><span class="mText">Github</span></a>
-      <div id="navMenu">
-        <span id="onlineStatus" title="Websocket connection established. You are online" class=" online">●</span>
-        <span id="headerText" class="username"><b>AAdmin</b></span>
-        <i class="icon-menu" title="Open Menu"></i>
-      </div>
-      <router-link to="/profile" class="icon-wrench" title="Settings"><span class="mText">Profile</span></router-link>
-      <i title="Sign out" class="icon-sign-out"><span class="mText">Sign out</span></i>
-    </nav>
+    <app-nav class="noSelection" v-if="userInfo" :user-info="userInfo"/>
     <router-view class="view"></router-view>
   </div>
 </template>
@@ -32,9 +12,10 @@
   import {Component, Vue} from "vue-property-decorator";
   import Growl from "./ui/AppGrowl";
   import {State} from "vuex-class";
+  import AppNav from "./AppNav.vue";
 
   @Component({
-    components: {Growl}
+    components: {Growl, AppNav}
   })
   export default class App extends Vue {
     @State growls: string[];
