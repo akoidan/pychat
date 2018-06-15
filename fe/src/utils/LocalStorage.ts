@@ -1,5 +1,6 @@
 import {Logger} from './Logger';
 import {IStorage, MessageModel} from '../types';
+import loggerFactory from './loggerFactory';
 
 export default class LocalStorage implements IStorage {
 
@@ -8,8 +9,8 @@ export default class LocalStorage implements IStorage {
   private cache = {};
 
 
-  constructor(logger: Logger) {
-    this.logger = logger;
+  constructor() {
+    this.logger = loggerFactory.getLogger('LS', 'color: blue; font-weight: bold');
     let ms = localStorage.getItem(this.STORAGE_NAME);
     if (ms) {
       let loaded = JSON.parse(ms);

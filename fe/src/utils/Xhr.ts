@@ -1,4 +1,5 @@
 import {Logger} from './Logger';
+import loggerFactory from './loggerFactory';
 
 
 /**
@@ -13,8 +14,8 @@ export default class Xhr {
   private httpLogger: Logger;
   private apiUrl: string;
 
-  constructor(logger: Logger, apiUrl: string) {
-    this.httpLogger = logger;
+  constructor(apiUrl: string) {
+    this.httpLogger = loggerFactory.getLogger('HTTP', 'color: green; font-weight: bold');
     this.apiUrl = apiUrl;
   }
 

@@ -2,13 +2,14 @@ import {Logger} from './Logger';
 import {API_URL, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT, CONNECTION_RETRY_TIME, PING_CLOSE_JS_DELAY} from './consts';
 import {Store} from 'vuex';
 import {VueRouter} from 'vue-router/types/router';
-import {IStorage, RootState} from '../types';
+import {DefaultMessage, IStorage, MessageHandler, RootState} from '../types';
+import ChannelsHandler from './ChannelsHandler';
+import loggerFactory from './loggerFactory';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
 }
-
-export class WsHandler {
+export class WsHandler implements MessageHandler {
 
   private logger: Logger;
   private pingTimeoutFunction;
@@ -18,9 +19,10 @@ export class WsHandler {
   private storage: IStorage;
   private store: Store<RootState>;
   private router: VueRouter;
+  private listenWsTimeout: number;
 
-  constructor(logger: Logger, channelsHandler, webRtcApi, storage: IStorage, store: Store<RootState>, router: VueRouter) {
-    this.logger = logger;
+  constructor(channelsHandler: ChannelsHandler, webRtcApi, storage: IStorage, store: Store<RootState>, router: VueRouter) {
+    this.logger = loggerFactory.getLogger('WS', 'color: green;');
     this.storage = storage;
     this.store = store;
     this.router = router;
@@ -33,7 +35,7 @@ export class WsHandler {
       peerConnection: webRtcApi,
       growl: {
         handle: function (message) {
-          alert(message.content);
+          // alert(message.content);
           // growlError(message.content);
         }
       }
@@ -49,7 +51,7 @@ export class WsHandler {
     if (raw.length > 1000) {
       raw = '';
     }
-    return this.logger.log('{} {}', raw, obj);
+    return loggerFactory.getSingleLogger(tag, 'color: green; font-weight: bold', console.log)('{} {}', raw, obj);
   }
 
   // this.dom = {
@@ -60,28 +62,27 @@ export class WsHandler {
   private progressInterval = {};
   private wsConnectionId = '';
 
-  private handlers: any;
+  private handlers: {[id: string]: MessageHandler};
 
-  private handle(message) {
-    this['on' + message.action](message);
+  public handle(message: DefaultMessage) {
+    this['handle' + message.action](message);
   }
 
-  onsetWsId(message) {
+  handlesetWsId(message) {
     this.wsConnectionId = message.content;
     this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
   }
 
   onWsMessage(message) {
     let jsonData = message.data;
-    let data;
+    let data: DefaultMessage;
     try {
       data = JSON.parse(jsonData);
-      this.logData('WS_IN', data, jsonData);
+      this.logData('WS_IN', data, jsonData)();
     } catch (e) {
       this.logger.error('Unable to parse incomming message {}', jsonData)();
       return;
     }
-    this.hideGrowlProgress(data.messageId);
     this.handleMessage(data);
   }
 
@@ -148,6 +149,13 @@ export class WsHandler {
     this.store.commit('setIsOnline', isOnline);
   }
 
+  close() {
+    if (this.ws) {
+      this.ws.onclose = null;
+      this.ws.close();
+    }
+  }
+
 
   onWsClose(e) {
     this.setStatus(false);
@@ -175,7 +183,7 @@ export class WsHandler {
       this.wsState = 2;
     }
     // Try to reconnect in 10 seconds
-    setTimeout(this.listenWS, CONNECTION_RETRY_TIME);
+    this.listenWsTimeout = setTimeout(this.listenWS.bind(this), CONNECTION_RETRY_TIME);
   }
 
 
@@ -189,14 +197,16 @@ export class WsHandler {
     this.storage.getIds((ids) => {
       let s = API_URL + this.wsConnectionId;
       if (Object.keys(ids).length > 0) {
-        s += '&messages=' + encodeURI(JSON.stringify(ids));
+        s += `&messages=${encodeURI(JSON.stringify(ids))}`;
       }
       if (this.loadHistoryFromWs && this.wsState !== WsState.CONNECTION_IS_LOST) {
         s += '&history=true';
       }
+      s += `&sessionId=${this.store.state.sessionId}`;
+
       this.ws = new WebSocket(s);
-      this.ws.onmessage = this.onWsMessage;
-      this.ws.onclose = this.onWsClose;
+      this.ws.onmessage = this.onWsMessage.bind(this);
+      this.ws.onclose = this.onWsClose.bind(this);
       this.ws.onopen = () => {
         this.setStatus(true);
         let message = 'Connection to server has been established';

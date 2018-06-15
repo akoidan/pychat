@@ -29,6 +29,10 @@ sessionStore = SessionStore()
 parent_logger = logging.getLogger(__name__)
 
 
+class Error401(Exception):
+	pass
+
+
 class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 
 	def __init__(self, *args, **kwargs):
@@ -119,11 +123,16 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		self.save_ip()
 
 	def open(self):
-		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
-		if sessionStore.exists(session_key):
-			self.ip = self.get_client_ip()
+		session_key = self.get_argument('sessionId', None)
+		try:
+			if session_key is None:
+				raise Error401()
 			session = SessionStore(session_key)
-			self.user_id = int(session["_auth_user_id"])
+			try:
+				self.user_id = int(session["_auth_user_id"])
+			except:
+				raise Error401()
+			self.ip = self.get_client_ip()
 			user_db = do_db(UserProfile.objects.defer(
 				'suggestions',
 				'highlight_code',
@@ -148,7 +157,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			was_online, online = self.get_online_and_status_from_redis()
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
-			user_rooms1 = Room.objects.filter(users__id=self.user_id, disabled=False)\
+			user_rooms1 = Room.objects.filter(users__id=self.user_id, disabled=False) \
 				.values('id', 'name', 'roomusers__notifications', 'roomusers__volume')
 			user_rooms = MessagesCreator.create_user_rooms(user_rooms1)
 			room_ids = [room_id for room_id in user_rooms]
@@ -181,8 +190,8 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				self.publish(online_user_names_mes, settings.ALL_ROOM_ID)
 			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
 			self.connected = True
-		else:
-			self.logger.warning('!! Session key %s has been rejected', str(session_key))
+		except Error401:
+			self.logger.warning('!! Session key %s has been rejected' % session_key)
 			self.close(403, "Session key %s has been rejected" % session_key)
 
 	def get_offline_messages(self, user_rooms, was_online, with_history):

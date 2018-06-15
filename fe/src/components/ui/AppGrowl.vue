@@ -1,19 +1,25 @@
 <template>
   <transition name="growl">
-    <div :class="['growl', type]">
-      <div>{{title}}</div>
+    <div :class="['growl', growl.type]">
+      <!--Single line-->
+      <div class="icon-cancel" @click="close"></div><div>{{growl.title}}</div>
     </div>
   </transition>
 </template>
 
 <script lang='ts'>
   import {Vue, Component, Prop} from "vue-property-decorator";
-  import {GrowlType} from "../../types";
+  import {GrowlModel, GrowlType} from "../../types";
+  import {Mutation} from "vuex-class";
 
   @Component
   export default class AppGrowl extends Vue {
-    @Prop() title: string;
-    @Prop() type: GrowlType;
+    @Prop() growl: GrowlModel;
+
+    @Mutation removeGrowl;
+    close() {
+      this.removeGrowl(this.growl);
+    }
   }
 </script>
 <style lang="sass" scoped>
@@ -22,7 +28,7 @@
   @import "themes/mixin_all"
 
   .growl-leave-active
-    @include transition(1s opacity)
+    @include transition(0.5s opacity)
 
   .growl-leave-to
     opacity: 0
@@ -39,6 +45,7 @@
     margin-bottom: 5px
     position: relative
     .icon-cancel
+      cursor: pointer
       position: absolute
       top: 2px
       right: -2px
@@ -63,6 +70,8 @@
       color: #5BC25C
     &.col-info
       color: #78CAD8
+    .icon-cancel
+      @include hover-click(#eb0000)
 
   .color-lor .growl
     @extend %window-lor
@@ -72,5 +81,7 @@
       color: #39C03B
     &.col-info
       color: #67bdc0
+    .icon-cancel
+      color: #a94442
 
 </style>

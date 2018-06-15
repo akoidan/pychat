@@ -38,6 +38,18 @@ export default class Api {
     }, new FormData(form));
   }
 
+  public sendRestorePassword(form: HTMLFormElement, cb: StringCb) {
+    this.xhr.doPost('/send_restore_password', null, (data, error) => {
+      if (error) {
+        cb(error);
+      } else if (data === RESPONSE_SUCCESS) {
+        cb(null);
+      } else {
+        cb(data);
+      }
+    }, new FormData(form));
+  }
+
   public register(form: HTMLFormElement, cb: StringCb) {
     this.xhr.doPost('/register', null, (res, error) => {
       if (error) {

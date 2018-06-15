@@ -8,7 +8,9 @@ const store: StoreOptions<RootState> = {
     isOnline: true,
     growls: [],
     theme: 'color-reg',
-    regHeader: null
+    regHeader: null,
+    userInfo: null,
+    sessionId: localStorage.getItem('session_id'), // TODO mock?
   },
   mutations: {
     setIsOnline (state, isOnline: boolean) {
@@ -26,6 +28,10 @@ const store: StoreOptions<RootState> = {
     setRegHeader (state, regHeader: string) {
       state.regHeader = regHeader;
     },
+    setSessionId(state, sessionId: string) {
+      state.sessionId = sessionId;
+      localStorage.setItem('session_id', sessionId);
+    }
   },
   actions: {
     growlError(context, title) {

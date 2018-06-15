@@ -25,8 +25,7 @@
 <script lang='ts'>
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from "../ui/AppSubmit.vue"
-  import {Action} from "vuex-class";
-  import {Mutation} from "vuex-class";
+  import {Action, Mutation} from "vuex-class";
   import {api} from '../../utils/singletons';
 
   @Component({components: {AppSubmit}})

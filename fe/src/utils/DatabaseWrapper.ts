@@ -1,5 +1,6 @@
 import {Logger} from './Logger';
 import {IStorage, MessageModel} from '../types';
+import loggerFactory from './loggerFactory';
 
 interface TransactionCb { (t: SQLTransaction, ...rest): void; }
 
@@ -11,8 +12,8 @@ export default class DatabaseWrapper implements IStorage {
   private db: Database;
   private cache: object = {};
 
-  constructor(logger: Logger, dbName: String ) {
-    this.logger = logger;
+  constructor(dbName: String ) {
+    this.logger = loggerFactory.getLogger('DB', 'color: blue; font-weight: bold');
     this.dbName = dbName;
   }
 
@@ -39,17 +40,11 @@ export default class DatabaseWrapper implements IStorage {
   }
   
   private transaction(transactionType: string, cb: TransactionCb) {
-    return  (a1, a2, a3) => {
-      if (this.db) {
-        let rcb;
-        this.db[transactionType]( t => {
-          rcb = cb(t, a1, a2, a3);
-        }, (e) => {
-          rcb && rcb(null);
-          this.logger.error('Error during saving message {}', e)();
-        });
-      }
-    };
+    this.db[transactionType]( t => {
+      cb(t);
+    }, (e) => {
+      this.logger.error('Error during saving message {}', e)();
+    });
   }
 
   private read(cb: TransactionCb) {

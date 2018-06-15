@@ -1,10 +1,13 @@
 import Vue from 'vue';
 
 import App from './components/App.vue';
-import {storage, ws} from './utils/singletons';
+import {globalLogger, storage, ws} from './utils/singletons';
 import store from './store';
 import router from './router';
 
+window.onerror = function() {
+
+}
 
 document.addEventListener('DOMContentLoaded', function () {
   storage.connect(finished => {
@@ -13,8 +16,8 @@ document.addEventListener('DOMContentLoaded', function () {
       store,
       render: h => h(App)
     }).$mount('#app');
-    let sessionId = localStorage.getItem('session_id');
-    if (sessionId) {
+    globalLogger.log('Got sessionId {}, proceeding', store.state.sessionId)();
+    if (store.state.sessionId) {
       ws.listenWS();
     } else {
       router.replace('/auth');

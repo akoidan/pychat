@@ -9,12 +9,13 @@ import store from '../store';
 import router from '../router';
 import Api from './api';
 import {IStorage} from '../types';
-const loggerFactory = new LoggerFactory(true);
+import loggerFactory from './loggerFactory';
 
-let storageLogger = loggerFactory.getLogger('DB', 'color: blue; font-weight: bold');
-export const storage: IStorage = window.openDatabase ? new DatabaseWrapper(storageLogger, 'userName') : new LocalStorage(storageLogger);
+
+export const channelsHandler = new ChannelsHandler();
+export const storage: IStorage = window.openDatabase ? new DatabaseWrapper( 'userName') : new LocalStorage();
 export  const globalLogger: Logger = loggerFactory.getLogger('GLOBAL', 'color: #687000; font-weight: bold');
-export const xhr: Xhr = new Xhr(loggerFactory.getLogger('HTTP', 'color: green; font-weight: bold'), API_URL_DEFAULT);
-export const ws = new WsHandler(loggerFactory.getLogger('WS', 'color: green;'), null, null, storage, store, router);
-export const channelsHandler = new ChannelsHandler(loggerFactory.getLogger('CHAT', 'color: #FF0F00; font-weight: bold'));
+export const xhr: Xhr = new Xhr(API_URL_DEFAULT);
+export const ws = new WsHandler(channelsHandler, null, storage, store, router);
+
 export const api: Api = new Api(xhr, store);
