@@ -37,21 +37,22 @@ class MessagesCreator(object):
 		return {
 			VarNames.ROOM_USERS: users,
 			VarNames.ONLINE: online,
-			VarNames.CONTENT: rooms,
+			VarNames.ROOMS: rooms,
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 			VarNames.EVENT: Actions.SET_WS_ID,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.USER: self.sender_name,
-			VarNames.USER_ID: self.user_id,
-			'suggestions': up.suggestions,
-			'START_WITH_LOGS': up.send_logs,
-			'sendLogs': up.send_logs,
-			'embeddedYoutube': up.embedded_youtube,
-			'incomingFileCallSound': up.incoming_file_call_sound,
-			'messageSound': up.message_sound,
-			'theme': up.theme,
-			'highlightCode': up.highlight_code,
-			'onlineChangeSound': up.online_change_sound,
+			VarNames.CURRENT_USER_INFO: {
+				VarNames.USER: self.sender_name,
+				VarNames.USER_ID: self.user_id,
+				'suggestions': up.suggestions,
+				'sendLogs': up.send_logs,
+				'embeddedYoutube': up.embedded_youtube,
+				'incomingFileCallSound': up.incoming_file_call_sound,
+				'messageSound': up.message_sound,
+				'theme': up.theme,
+				'highlightCode': up.highlight_code,
+				'onlineChangeSound': up.online_change_sound,
+			}
 		}
 
 	def room_online(self, online, event):

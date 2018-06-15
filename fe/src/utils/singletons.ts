@@ -12,7 +12,7 @@ import {IStorage} from '../types';
 import loggerFactory from './loggerFactory';
 
 
-export const channelsHandler = new ChannelsHandler();
+export const channelsHandler = new ChannelsHandler(store);
 export const storage: IStorage = window.openDatabase ? new DatabaseWrapper( 'userName') : new LocalStorage();
 export  const globalLogger: Logger = loggerFactory.getLogger('GLOBAL', 'color: #687000; font-weight: bold');
 export const xhr: Xhr = new Xhr(API_URL_DEFAULT);

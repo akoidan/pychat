@@ -57,7 +57,6 @@ export interface MessageHandler {
 }
 
 export interface RoomModel {
-  id: number;
   name: string;
   users: number[];
   notifications: boolean;
@@ -75,13 +74,19 @@ export enum VolumeLevelModel {
 export interface UserModel {
   user: string;
   sex: SexModel;
-  id: number;
 }
 
 export interface CurrentUserInfo {
-  name: string;
-  sex: string;
-  id: number;
+  embeddedYoutube: boolean;
+  highlightCode: boolean;
+  incomingFileCallSound: boolean;
+  messageSound: boolean;
+  onlineChangeSound: boolean;
+  sendLogs: boolean;
+  suggestions: boolean;
+  theme: string;
+  user: string;
+  userId: number;
 }
 
 export interface DefaultMessage {
@@ -95,7 +100,7 @@ export interface ChatHandlerMessage extends DefaultMessage{
 
 export interface SetRootMessage extends DefaultMessage {
   online: number[];
-  users: UserModel;
+  users: { [id: number]: UserModel };
   content: RoomModel[];
 }
 
@@ -104,6 +109,9 @@ export interface RootState {
   growls: GrowlModel[];
   theme: string;
   userInfo: CurrentUserInfo;
+  allUsers: { [id: number]: UserModel };
   regHeader: string;
+  online: number[];
+  rooms: {[id: string]: RoomModel};
   sessionId: string;
 }

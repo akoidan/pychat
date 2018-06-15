@@ -1,36 +1,54 @@
 import Vue from 'vue';
 import Vuex, { StoreOptions } from 'vuex';
 Vue.use(Vuex);
-import {GrowlModel, GrowlType, RootState} from './types';
+import {CurrentUserInfo, GrowlModel, GrowlType, RoomModel, RootState, UserModel} from './types';
 
 const store: StoreOptions<RootState> = {
   state: {
     isOnline: true,
     growls: [],
+    allUsers: {},
     theme: 'color-reg',
     regHeader: null,
+    rooms: {},
     userInfo: null,
+    online: [],
     sessionId: localStorage.getItem('session_id'), // TODO mock?
   },
   mutations: {
-    setIsOnline (state, isOnline: boolean) {
+    setIsOnline(state, isOnline: boolean) {
       state.isOnline = isOnline;
     },
-    addGrowl (state, growlModel: GrowlModel) {
+    addGrowl(state, growlModel: GrowlModel) {
       state.growls.push(growlModel);
     },
-    removeGrowl (state, growlModel: GrowlModel) {
+    removeGrowl(state, growlModel: GrowlModel) {
       let index = state.growls.indexOf(growlModel, 0);
       if (index > -1) {
         state.growls.splice(index, 1);
       }
     },
-    setRegHeader (state, regHeader: string) {
+    setRegHeader(state, regHeader: string) {
       state.regHeader = regHeader;
     },
     setSessionId(state, sessionId: string) {
       state.sessionId = sessionId;
       localStorage.setItem('session_id', sessionId);
+    },
+    addUser(state, {userId, user, sex}) {
+      state.allUsers[userId] = {sex, user};
+    },
+    setOnline(state, ids: number[]) {
+      state.online = ids;
+    },
+    setUsers(state, users: { [id: number]: UserModel }) {
+      state.allUsers = users;
+    },
+    setUserInfo(state, userInfo: CurrentUserInfo) {
+      state.userInfo = userInfo;
+    },
+    setRooms(state, rooms: {[id: string]: RoomModel}) {
+      state.rooms = rooms;
     }
   },
   actions: {

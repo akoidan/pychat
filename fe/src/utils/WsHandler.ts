@@ -2,12 +2,30 @@ import {Logger} from './Logger';
 import {API_URL, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT, CONNECTION_RETRY_TIME, PING_CLOSE_JS_DELAY} from './consts';
 import {Store} from 'vuex';
 import {VueRouter} from 'vue-router/types/router';
-import {DefaultMessage, IStorage, MessageHandler, RootState} from '../types';
+import {CurrentUserInfo, DefaultMessage, IStorage, MessageHandler, RoomModel, RootState, UserModel} from '../types';
 import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
+}
+
+interface SetWsIdMessage extends DefaultMessage {
+  rooms: { [id: number]: RoomModel };
+  users: { [id: number]: UserModel };
+  online: number[];
+  opponentWsId: string;
+  currentUserInfo: CurrentUserInfo;
+}
+
+interface AllHandlers {
+  channels: ChannelsHandler;
+  chat: MessageHandler;
+  ws: WsHandler;
+  webrtc: MessageHandler;
+  webrtcTransfer: MessageHandler;
+  peerConnection: MessageHandler;
+  growl: MessageHandler;
 }
 export class WsHandler implements MessageHandler {
 
@@ -62,14 +80,18 @@ export class WsHandler implements MessageHandler {
   private progressInterval = {};
   private wsConnectionId = '';
 
-  private handlers: {[id: string]: MessageHandler};
+  private handlers: AllHandlers;
 
   public handle(message: DefaultMessage) {
     this['handle' + message.action](message);
   }
 
-  handlesetWsId(message) {
-    this.wsConnectionId = message.content;
+  handlesetWsId(message: SetWsIdMessage) {
+    this.wsConnectionId = message.opponentWsId;
+    this.store.commit('setUserInfo', message.currentUserInfo);
+    this.handlers.channels.setRooms(message.rooms);
+    this.handlers.channels.setOnline(message.online);
+    this.handlers.channels.setUsers(message.users);
     this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
   }
 
