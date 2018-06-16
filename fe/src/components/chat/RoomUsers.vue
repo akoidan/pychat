@@ -6,7 +6,7 @@
         <i class="icon-plus-squared" title="Create New Direct Channel"
            @click="showAddUser"></i></span>
     <ul class="directUserTable" v-show="!directMinified">
-      <li class="offline" v-for="user in privateRooms">
+      <li :class="getOnlineClass(user.id)" v-for="user in privateRooms">
         <i :class="getUserSexClass(user)"></i>{{user.user}}
         <span class="icon-cog"></span>
         <span class="newMessagesCount"></span>
@@ -29,16 +29,24 @@
            @click="showInviteUser"></i>
       </span>
     <ul class="chat-user-table" v-show="!onlineMinified">
-      <li v-for="user in allUsers">
-      <i :class="getUserSexClass(user)"></i>{{ user.user }}
-      </li>
+      <template v-for="(user, id) in allUsers">
+        <li :class="getOnlineClass(parseInt(id))" v-show="userIsInActiveRoom(parseInt(id))">
+          <i :class="getUserSexClass(user)"></i>{{ user.user }}
+        </li>
+      </template>
     </ul>
   </div>
 </template>
 <script lang="ts">
   import {State, Action, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {RoomModel, SexModel, UserModel} from "../../types";
+  import {CurrentUserInfo, RoomModel, SexModel, UserModel} from "../../types";
+  import {globalLogger} from '../../utils/singletons';
+
+
+  interface UserModelId extends UserModel {
+    id: number
+  }
 
   @Component
   export default class RoomUsers extends Vue {
@@ -46,25 +54,39 @@
     @State rooms: {[id: string]: RoomModel};
     @State allUsers: {[id: string]: UserModel};
     @State activeRoomId: number;
+    @State userInfo: CurrentUserInfo;
+    @State online: number[];
 
     directMinified: boolean = false;
     roomsMinified: boolean = false;
     onlineMinified: boolean = false;
     onlineShowOnlyOnline: boolean = false;
 
-    getUserSexClass(user: UserModel) {
+    getUserSexClass(user: UserModelId) {
       return user.sex === SexModel.MALE? 'icon-man' : user.sex === SexModel.FEMALE  ? 'icon-girl' : 'icon-user-secret'
     }
 
-    get privateRooms(): { [id: string]: UserModel } {
-      return Object.keys(this.rooms)
+    userIsInActiveRoom(userId) {
+      return this.rooms[this.activeRoomId].users.indexOf(userId) >= 0;
+    }
+
+    getOnlineClass(id: number) : string {
+      return this.online.indexOf(id) < 0 ? 'offline' : 'online';
+    }
+
+    get privateRooms(): { [id: string]: UserModelId } {
+      let res =  Object.keys(this.rooms)
           .filter(key => !this.rooms[key].name)
           .reduce((obj, key) => {
+            let users = this.rooms[key].users;
+            let id = this.userInfo.userId === users[0]? users[1] : users[0];
             return {
               ...obj,
-              [key]: this.allUsers[key]
+              [key]: {...this.allUsers[id], id}
             };
-          }, {});
+          }, {}) as { [id: string]: UserModelId };
+      globalLogger.log("private rooms {}", res)();
+      return res;
     }
 
     get publicRooms(): { [id: string]: RoomModel } {
@@ -118,9 +140,9 @@
   .chat-user-table > ul, ul.directUserTable
     display: flex
     flex-direction: column
-    li:not(.offline)
+    .online
       order: 1
-    li.offline
+    .offline
       order: 2
 
   .chat-user-table
@@ -190,8 +212,20 @@
       > span
         background-color: #221f1f
         color: #8f8f8f
+    .online
+      .icon-man, .icon-girl, .icon-user-secret
+        color: #2e9154
+    .offline
+      .icon-man, .icon-girl, .icon-user-secret
+        color: #c53432
 
   .color-reg
+    .offline
+      .icon-man, .icon-girl, .icon-user-secret
+        color: #b32c1c
+    .online
+      .icon-man, .icon-girl, .icon-user-secret
+        color: #1f772c
     .chat-user-table li
       &.offline:before
         color: #801615
@@ -208,10 +242,10 @@
 
   .color-white
     .directUserTable, .chat-user-table ul
-      li.offline
+      .offline
         .icon-user-secret, .icon-man, .icon-girl
           color: #fa9d9b
-      li:not(.offline)
+      .online
         .icon-user-secret, .icon-man, .icon-girl
           color: #90e690
     .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up

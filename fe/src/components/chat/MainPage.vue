@@ -19,7 +19,6 @@
 
     created() {
       ws.startListening();
-      globalLogger.log("Rendering mainPage")();
     }
 
     destroy() {

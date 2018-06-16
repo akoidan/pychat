@@ -220,12 +220,14 @@ export class WsHandler implements MessageHandler {
   }
 
   public startListening() {
+    this.logger.log('Starting webSocket')();
     if (!this.listenWsTimeout && !this.ws) {
       this.listenWS();
     }
   }
 
   public stopListening() {
+    this.logger.log('Finishing websocket')();
     if (this.listenWsTimeout) {
       this.listenWsTimeout = null;
     }

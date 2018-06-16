@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <div id="userMessageWrapper" class="hidden" style="position: relative">
+    <div id="userMessageWrapper" class="hidden" style="position: relative" v-show="false">
       <input type="file" accept="image/*,video/*" id="imgInput" multiple="multiple" class="hidden"/>
       <i class="icon-picture" id="imgInputIcon" title="Share Video/Image"></i>
       <i class="icon-smile" title="Add a smile :)" id="iconSmile"></i>
