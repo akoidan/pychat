@@ -3,8 +3,7 @@
     <div class="growlHolder">
       <growl v-for="growl in growls" :growl="growl" :key="growl.id"></growl>
     </div>
-    <app-nav class="noSelection" v-if="userInfo" :user-info="userInfo"/>
-    <router-view class="view"></router-view>
+    <router-view/>
   </div>
 </template>
 
@@ -12,15 +11,18 @@
   import {Component, Vue} from "vue-property-decorator";
   import Growl from "./ui/AppGrowl";
   import {State} from "vuex-class";
-  import AppNav from "./AppNav.vue";
+  import {globalLogger} from '../utils/singletons';
 
   @Component({
-    components: {Growl, AppNav}
+    components: {Growl}
   })
   export default class App extends Vue {
     @State growls: string[];
     @State theme;
-    @State userInfo;
+
+    created() {
+      globalLogger.log("rendering app")();
+    }
 
   }
 </script>

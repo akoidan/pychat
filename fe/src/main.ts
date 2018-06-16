@@ -16,11 +16,5 @@ document.addEventListener('DOMContentLoaded', function () {
       store,
       render: h => h(App)
     }).$mount('#app');
-    globalLogger.log('Got sessionId {}, proceeding', store.state.sessionId)();
-    if (store.state.sessionId) {
-      ws.listenWS();
-    } else {
-      router.replace('/auth');
-    }
   });
 });

@@ -13,7 +13,7 @@ const store: StoreOptions<RootState> = {
     rooms: {},
     userInfo: null,
     online: [],
-    sessionId: localStorage.getItem('session_id'), // TODO mock?
+    activeRoomId: 1,
   },
   mutations: {
     setIsOnline(state, isOnline: boolean) {
@@ -30,10 +30,6 @@ const store: StoreOptions<RootState> = {
     },
     setRegHeader(state, regHeader: string) {
       state.regHeader = regHeader;
-    },
-    setSessionId(state, sessionId: string) {
-      state.sessionId = sessionId;
-      localStorage.setItem('session_id', sessionId);
     },
     addUser(state, {userId, user, sex}) {
       state.allUsers[userId] = {sex, user};

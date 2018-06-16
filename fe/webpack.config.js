@@ -40,6 +40,9 @@ module.exports = (env, argv) => {
     plugins,
     resolve: {
       extensions: ['.ts', '.js', '.vue', '.json'],
+      alias: {
+        vue: 'vue/dist/vue.js'
+      }
     },
     devtool: '#source-map',
     module: {

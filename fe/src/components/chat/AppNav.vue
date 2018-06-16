@@ -27,8 +27,8 @@
 
   @Component
   export default class App extends Vue {
-    @Prop() userInfo;
     @State isOnline;
+    @State userInfo;
     expanded: boolean = false;
 
     get title() {
@@ -43,8 +43,8 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/variables"
-  @import "partials/mixins"
+  @import "../../assets/sass/partials/variables"
+  @import "../../assets/sass/partials/mixins"
 
   nav
     font-size: 26px

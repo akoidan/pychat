@@ -2,7 +2,16 @@ import {Logger} from './Logger';
 import {API_URL, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT, CONNECTION_RETRY_TIME, PING_CLOSE_JS_DELAY} from './consts';
 import {Store} from 'vuex';
 import {VueRouter} from 'vue-router/types/router';
-import {CurrentUserInfo, DefaultMessage, IStorage, MessageHandler, RoomModel, RootState, UserModel} from '../types';
+import {
+  CurrentUserInfo,
+  DefaultMessage,
+  IStorage,
+  MessageHandler,
+  RoomModel,
+  RootState,
+  SessionHolder,
+  UserModel
+} from '../types';
 import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
 
@@ -37,11 +46,13 @@ export class WsHandler implements MessageHandler {
   private storage: IStorage;
   private store: Store<RootState>;
   private router: VueRouter;
+  private sessionHolder: SessionHolder;
   private listenWsTimeout: number;
 
-  constructor(channelsHandler: ChannelsHandler, webRtcApi, storage: IStorage, store: Store<RootState>, router: VueRouter) {
+  constructor(sessionHolder: SessionHolder, channelsHandler: ChannelsHandler, webRtcApi, storage: IStorage, store: Store<RootState>, router: VueRouter) {
     this.logger = loggerFactory.getLogger('WS', 'color: green;');
     this.storage = storage;
+    this.sessionHolder = sessionHolder;
     this.store = store;
     this.router = router;
     this.handlers = {
@@ -208,6 +219,24 @@ export class WsHandler implements MessageHandler {
     this.listenWsTimeout = setTimeout(this.listenWS.bind(this), CONNECTION_RETRY_TIME);
   }
 
+  public startListening() {
+    if (!this.listenWsTimeout && !this.ws) {
+      this.listenWS();
+    }
+  }
+
+  public stopListening() {
+    if (this.listenWsTimeout) {
+      this.listenWsTimeout = null;
+    }
+    if (this.ws) {
+      this.ws.onclose = null;
+      this.ws.close();
+    }
+  }
+
+
+
 
   public listenWS() {
     if (typeof WebSocket === 'undefined') {
@@ -224,7 +253,7 @@ export class WsHandler implements MessageHandler {
       if (this.loadHistoryFromWs && this.wsState !== WsState.CONNECTION_IS_LOST) {
         s += '&history=true';
       }
-      s += `&sessionId=${this.store.state.sessionId}`;
+      s += `&sessionId=${this.sessionHolder.session}`;
 
       this.ws = new WebSocket(s);
       this.ws.onmessage = this.onWsMessage.bind(this);

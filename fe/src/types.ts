@@ -64,7 +64,7 @@ export interface RoomModel {
 }
 
 export enum SexModel {
-  MALE = 'col-success', FEMALE = 'col-info', ALIEN = 'col-error'
+  MALE = 'Male', FEMALE = 'Female', ALIEN = 'Secret'
 }
 
 export enum VolumeLevelModel {
@@ -108,10 +108,14 @@ export interface RootState {
   isOnline: boolean;
   growls: GrowlModel[];
   theme: string;
+  activeRoomId: number;
   userInfo: CurrentUserInfo;
   allUsers: { [id: number]: UserModel };
   regHeader: string;
   online: number[];
   rooms: {[id: string]: RoomModel};
-  sessionId: string;
+}
+
+export interface SessionHolder {
+  session: string;
 }
