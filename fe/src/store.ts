@@ -28,6 +28,9 @@ const store: StoreOptions<RootState> = {
         state.growls.splice(index, 1);
       }
     },
+    setActiveRoomId(state, id: number) {
+      state.activeRoomId = id;
+    },
     setRegHeader(state, regHeader: string) {
       state.regHeader = regHeader;
     },

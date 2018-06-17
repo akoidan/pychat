@@ -6,8 +6,10 @@
         <i class="icon-plus-squared" title="Create New Direct Channel"
            @click="showAddUser"></i></span>
     <ul class="directUserTable" v-show="!directMinified">
-      <li :class="getOnlineClass(user.id)" v-for="user in privateRooms">
-        <i :class="getUserSexClass(user)"></i>{{user.user}}
+      <li :class="getOnlineActiveClass(user.id, id)" v-for="(user, id) in privateRooms">
+        <router-link :to="`/chat/${id}`">
+          <i :class="getUserSexClass(user)"></i>{{user.user}}
+        </router-link>
         <span class="icon-cog"></span>
         <span class="newMessagesCount"></span>
       </li>
@@ -17,7 +19,10 @@
         <span class="channelsStateText">rooms</span>
         <i class="icon-plus-squared" title="Create New Room" @click="showAddRoom"></i></span>
     <ul class="rooms" v-show="!roomsMinified">
-      <li v-for="room in publicRooms">{{ room.name }}
+      <li v-for="(room, id) in publicRooms" :class="getActiveClass(id)">
+        <router-link :to="`/chat/${id}`">
+          {{ room.name }}
+        </router-link>
         <span class="icon-cog"></span>
         <span class="newMessagesCount"></span>
       </li>
@@ -30,7 +35,7 @@
       </span>
     <ul class="chat-user-table" v-show="!onlineMinified">
       <template v-for="(user, id) in allUsers">
-        <li :class="getOnlineClass(parseInt(id))" v-show="userIsInActiveRoom(parseInt(id))">
+        <li :class="getOnlineClass(id)" v-show="userIsInActiveRoom(id)">
           <i :class="getUserSexClass(user)"></i>{{ user.user }}
         </li>
       </template>
@@ -62,16 +67,29 @@
     onlineMinified: boolean = false;
     onlineShowOnlyOnline: boolean = false;
 
+
     getUserSexClass(user: UserModelId) {
       return user.sex === SexModel.MALE? 'icon-man' : user.sex === SexModel.FEMALE  ? 'icon-girl' : 'icon-user-secret'
     }
 
-    userIsInActiveRoom(userId) {
-      return this.rooms[this.activeRoomId].users.indexOf(userId) >= 0;
+    userIsInActiveRoom(userId: string) {
+      return this.rooms[this.activeRoomId].users.indexOf(parseInt(userId)) >= 0;
     }
 
-    getOnlineClass(id: number) : string {
-      return this.online.indexOf(id) < 0 ? 'offline' : 'online';
+    getOnlineClass(id: string) : string {
+      return this.online.indexOf(parseInt(id)) < 0 ? 'offline' : 'online';
+    }
+
+    getActiveClass(roomId: string) {
+      return parseInt(roomId) === this.activeRoomId ? 'active-room' : null;
+    }
+
+    getOnlineActiveClass(id: number, roomId: string) : string[] {
+      const a = [this.online.indexOf(id) < 0 ? "offline" : "online"];
+      if (parseInt(roomId) === this.activeRoomId) {
+        a.push('active-room');
+      }
+      return a;
     }
 
     get privateRooms(): { [id: string]: UserModelId } {
@@ -125,13 +143,16 @@
   @import "partials/variables"
   @import "partials/mixins"
 
-  %hovered-user-room
+  li
     &:hover:not(.active-room)
       cursor: pointer
       background-color:  rgba(135, 135, 135, 0.3)
       opacity: 1
       i
         opacity: inherit
+  a
+    display: flex
+    flex-grow: 1
 
   @mixin fix-user-icon-top-position()
     i:before
@@ -200,6 +221,12 @@
 
 
   .color-lor
+    a
+      color: $color-lor-main
+    .icon-cog
+      color: #59b2c1
+    .active-room
+      background-color: #375a70
     .chat-user-table li
       &.offline:before
         color: #a93331
@@ -220,6 +247,12 @@
         color: #c53432
 
   .color-reg
+    a
+      color: $color-lor-main
+    .icon-cog
+      @include hover-click(#59b2c1)
+    .active-room
+      background-color: rgba(33, 158, 147, 0.45)
     .offline
       .icon-man, .icon-girl, .icon-user-secret
         color: #b32c1c
@@ -241,6 +274,12 @@
         background-color: #171717
 
   .color-white
+    a
+      color: $color-white-main
+    .icon-cog
+      color: #59b2c1
+    .active-room
+      background-color: #656888
     .directUserTable, .chat-user-table ul
       .offline
         .icon-user-secret, .icon-man, .icon-girl
@@ -277,7 +316,6 @@
       border-radius: 3px
       position: relative
       height: 30px
-      @extend %hovered-user-room
       &:hover
         padding-right: 25px
         .icon-cog
