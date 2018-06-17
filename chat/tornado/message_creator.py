@@ -96,7 +96,7 @@ class MessagesCreator(object):
 		res = cls.create_message(message, files)
 		res[VarNames.EVENT] = event
 		res[VarNames.JS_MESSAGE_ID] = js_id
-		res[VarNames.HANDLER_NAME] = HandlerNames.CHAT
+		res[VarNames.HANDLER_NAME] = HandlerNames.CHANNELS
 		return res
 
 	@classmethod

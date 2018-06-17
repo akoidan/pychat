@@ -100,6 +100,7 @@ export interface RootState {
   isOnline: boolean;
   growls: GrowlModel[];
   theme: string;
+  editedMessageid: number;
   activeRoomId: number;
   userInfo: CurrentUserInfo;
   allUsers: { [id: number]: UserModel };

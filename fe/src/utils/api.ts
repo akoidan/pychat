@@ -5,11 +5,9 @@ import {RootState} from '../types';
 
 export default class Api {
   private xhr: Xhr;
-  private store: Store<RootState>;
 
-  constructor(xhr: Xhr, store: Store<RootState>) {
+  constructor(xhr: Xhr) {
     this.xhr = xhr;
-    this.store = store;
   }
 
   public login(form: HTMLFormElement, cb: StringCb) {
@@ -88,6 +86,26 @@ export default class Api {
     });
   }
 
+
+  public uploadFile(fd: FormData, cb: Function, progress: Function) {
+    this.xhr.doPost('/upload_file', null,  (data, error) => {
+      if (error) {
+        cb(null, error);
+      } else {
+        let parse;
+        try {
+          parse = JSON.parse(data);
+        } catch (e) {
+          cb(null, 'Unable to parse response');
+          return;
+        }
+        cb(parse);
+      }
+    }, fd, null, r => {
+      r.upload.addEventListener('progress', progress);
+    });
+  }
+
   public validateEmail(email: string, cb: StringCb) {
     this.xhr.doPost('/validate_email', {email},  (data, error) => {
       if (error) {
@@ -97,6 +115,6 @@ export default class Api {
       } else {
         cb(data);
       }
-    });
+    }, );
   }
 }

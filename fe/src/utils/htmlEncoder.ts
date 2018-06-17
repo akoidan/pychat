@@ -1,6 +1,7 @@
 import {globalLogger} from './singletons';
 import smileys from '../assets/smileys/info.json';
 import {SmileyStructure} from '../types';
+import {PASTED_IMG_CLASS} from './consts';
 
 const smileysTabNames = Object.keys(smileys);
 let codes = {};
@@ -18,7 +19,6 @@ const escapeMap = {
 };
 
 
-const PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
 const smileUnicodeRegex = /[\u3400-\u3500]/g;
 const imageUnicodeRegex = /[\u3501-\u3600]/g;
 const patterns = [

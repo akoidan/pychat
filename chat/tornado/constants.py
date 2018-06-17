@@ -74,7 +74,6 @@ class VarNames(object):
 
 class HandlerNames:
 	CHANNELS = 'channels'
-	CHAT = 'chat'
 	GROWL = 'growl'
 	WEBRTC = 'webrtc'
 	PEER_CONNECTION = 'peerConnection'

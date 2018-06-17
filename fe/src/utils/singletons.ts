@@ -12,10 +12,11 @@ import {IStorage} from '../types';
 import loggerFactory from './loggerFactory';
 import sessionHolder from './sessionHolder';
 
-export const channelsHandler = new ChannelsHandler(store);
+export const xhr: Xhr = new Xhr(API_URL_DEFAULT);
+export const api: Api = new Api(xhr);
+export const channelsHandler = new ChannelsHandler(store, api);
 export const storage: IStorage = window.openDatabase ? new DatabaseWrapper( 'userName') : new LocalStorage();
 export  const globalLogger: Logger = loggerFactory.getLogger('GLOBAL', 'color: #687000; font-weight: bold');
-export const xhr: Xhr = new Xhr(API_URL_DEFAULT);
 export const ws = new WsHandler(sessionHolder, channelsHandler, null, storage, store, router);
+channelsHandler.setWsHandler(ws);
 
-export const api: Api = new Api(xhr, store);

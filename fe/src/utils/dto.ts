@@ -37,3 +37,18 @@ export interface LoadMessages extends DefaultMessage {
   content: MessageModel[];
   roomId: number;
 }
+
+
+export interface PrintMessage extends DefaultMessage {
+  edited: number;
+  messageId: number;
+  userId: number;
+  content: string;
+  time: number;
+  roomId: number;
+  id: number;
+  deleted: boolean;
+  files: Map<number, FileModel>;
+  symbol: string;
+  giphy: string;
+}

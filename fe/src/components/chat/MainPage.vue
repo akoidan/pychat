@@ -21,13 +21,13 @@
 
 <script lang='ts'>
   import {Component, Vue} from "vue-property-decorator";
-  import {State} from "vuex-class";
+  import {State, Getter} from "vuex-class";
   import RoomUsers from "./RoomUsers.vue"
   import ChatBox from "./ChatBox.vue"
   import SmileyHolder from "./SmileyHolder.vue"
   import {RoomModel} from '../../types';
   import {pasteHtmlAtCaret} from '../../utils/htmlApi';
-  import {globalLogger} from '../../utils/singletons';
+  import {channelsHandler, globalLogger} from "../../utils/singletons";
   import {getSmileyHtml} from '../../utils/htmlEncoder';
 
   @Component({components: {RoomUsers, ChatBox, SmileyHolder}})
@@ -36,6 +36,7 @@
     @State theme;
     @State activeRoomId;
     @State rooms: {[id: string]: RoomModel};
+    @Getter maxId;
 
     $refs: {
       userMessage: HTMLTextAreaElement;
@@ -48,8 +49,18 @@
       pasteHtmlAtCaret(getSmileyHtml(code), this.$refs.userMessage);
     }
 
-    checkAndSendMessage() {
-
+    checkAndSendMessage(event: KeyboardEvent) {
+      if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
+        event.preventDefault();
+        channelsHandler.sendMessage(this.activeRoomId, this.$refs.userMessage);
+      } else if (event.keyCode === 27) { // 27 = escape
+        this.showSmileys = false;
+        alert('todo');
+        // self.removeEditingMode();
+      } else if (event.keyCode === 38) { // up arrow
+        alert('todo');
+        // self.handleEditMessage(event);
+      }
     }
   }
 </script>

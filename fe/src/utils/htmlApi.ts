@@ -18,3 +18,15 @@ export function pasteHtmlAtCaret(html: string, div: HTMLTextAreaElement) {
   sel.removeAllRanges();
   sel.addRange(range);
 }
+
+export const Utils = {
+  videoFiles: {
+
+  },
+  previewFiles: {
+
+  },
+  imagesFiles: {
+
+  }
+};

@@ -194,6 +194,24 @@ export class WsHandler implements MessageHandler {
     }
   }
 
+  public sendEditMessage(content: string, id: number, files: any[]) {
+    this.sendToServer({
+      id,
+      action: 'editMessage',
+      files,
+      content
+    });
+  }
+
+  public sendSendMessage(content: string, roomId: number, files: any[]) {
+    this.sendToServer({
+      files,
+      action: 'sendMessage',
+      content,
+      roomId
+    });
+  }
+
 
   public sendLoadMessages(roomId: number, headerId: number, count: number, cb: Function) {
     this.sendToServer({

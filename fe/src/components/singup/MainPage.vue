@@ -20,9 +20,6 @@
 
 <style lang="sass" scoped>
 
-  .r2d2 /deep/ .r2d3
-    background: red
-
   @import 'partials/mixins.sass'
   @import "partials/variables"
   %top-btn-register
