@@ -38,7 +38,7 @@
   import AppSubmit from "../ui/AppSubmit.vue"
   import RegisterFieldSet from './RegisterFieldSet.vue'
   import _ from 'lodash';
-  import {IconColor} from './types';
+  import {IconColor} from '../../types';
 
   @Component({components: {AppSubmit, RegisterFieldSet}})
   export default class Register extends Vue {

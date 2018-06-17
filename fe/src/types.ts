@@ -52,6 +52,9 @@ export enum GrowlType {
   SUCCESS = 'col-success', INFO = 'col-info', ERROR = 'col-error'
 }
 
+export enum IconColor {
+  SUCCESS = 'success', ERROR = 'error', WARN = 'warn', NOT_SET = ''
+}
 
 export interface RoomModel {
   name: string;
