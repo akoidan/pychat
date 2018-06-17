@@ -61,6 +61,7 @@ export interface RoomModel {
   users: number[];
   notifications: boolean;
   volume: VolumeLevelModel;
+  messages: MessageModel[];
 }
 
 export enum SexModel {

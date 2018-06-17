@@ -6,7 +6,7 @@
         <i class="icon-plus-squared" title="Create New Direct Channel"
            @click="showAddUser"></i></span>
     <ul class="directUserTable" v-show="!directMinified">
-      <li :class="getOnlineActiveClass(user.id, id)" v-for="(user, id) in privateRooms">
+      <li :class="getOnlineActiveClass(user.id, id)" :key="id" v-for="(user, id) in privateRooms">
         <router-link :to="`/chat/${id}`">
           <i :class="getUserSexClass(user)"></i>{{user.user}}
         </router-link>
@@ -19,7 +19,7 @@
         <span class="channelsStateText">rooms</span>
         <i class="icon-plus-squared" title="Create New Room" @click="showAddRoom"></i></span>
     <ul class="rooms" v-show="!roomsMinified">
-      <li v-for="(room, id) in publicRooms" :class="getActiveClass(id)">
+      <li v-for="(room, id) in publicRooms" :key="id" :class="getActiveClass(id)">
         <router-link :to="`/chat/${id}`">
           {{ room.name }}
         </router-link>
@@ -35,7 +35,7 @@
       </span>
     <ul class="chat-user-table" v-show="!onlineMinified">
       <template v-for="(user, id) in allUsers">
-        <li :class="getOnlineClass(id)" v-show="userIsInActiveRoom(id)">
+        <li :class="getOnlineClass(id)" v-show="userIsInActiveRoom(id)" :key="id">
           <i :class="getUserSexClass(user)"></i>{{ user.user }}
         </li>
       </template>
@@ -221,8 +221,6 @@
 
 
   .color-lor
-    a
-      color: $color-lor-main
     .icon-cog
       color: #59b2c1
     .active-room
@@ -233,7 +231,6 @@
       &:before
         color: #2e9154
     .chat-room-users-wrapper
-      color: $color-lor-main
       @media screen and (max-width: $collapse-width)
         border-bottom-color: $color-lor-scroll
       > span
@@ -265,7 +262,6 @@
       &:before
         color: #28671d
     .chat-room-users-wrapper
-      color: $color-reg-main
       .icon-smile, .icon-picture, .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
         @include hover-click(#e3e3e3)
       @media screen and (max-width: $collapse-width)

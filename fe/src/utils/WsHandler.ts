@@ -264,7 +264,7 @@ export class WsHandler implements MessageHandler {
         this.setStatus(true);
         let message = 'Connection to server has been established';
         if (this.wsState === 2) { // if not inited don't growl message on page load
-          alert(message);
+          // alert(message); TODO
         }
         this.startNoPingTimeout();
         this.wsState = 9;

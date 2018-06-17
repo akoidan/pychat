@@ -53,7 +53,7 @@
 
   @import "partials/mixins"
   @import "partials/variables"
-  @import "./mixins"
+  @import "partials/abstract_classes"
 
   .slider
     @extend %slider

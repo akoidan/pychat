@@ -1,6 +1,12 @@
-@import "../partials/mixins"
+@import "partials/mixins"
 
 .color-reg
+
+  @include scrollbar($mostly-black, #3a4a4e, #7dc071, #c08b00,#3c763d)
+
+  color: $color-reg-main
+  a
+    color: $color-reg-main
   *
     outline: none
   background: radial-gradient(rgba(30, 30, 30, 0.32), rgba(26, 26, 26, 0.85)), url('../img/aspalt.jpg')

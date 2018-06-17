@@ -82,7 +82,7 @@
       text-decoration: underline
       cursor: pointer
 
-  @import "./mixins"
+  @import "partials/abstract_classes"
   i
     @extend %i
 </style>

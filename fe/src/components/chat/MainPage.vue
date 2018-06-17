@@ -1,7 +1,7 @@
 <template>
-  <div>
+  <div class="body flex">
     <app-nav v-if="userInfo"/>
-    <router-view/>
+    <router-view class="body"/>
   </div>
 </template>
 <script lang="ts">
@@ -28,4 +28,8 @@
 </script>
 
 <style lang="sass" scoped>
+  @import "partials/mixins"
+  .flex
+    @include display-flex()
+    flex-direction: column
 </style>

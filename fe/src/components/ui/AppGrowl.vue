@@ -24,8 +24,8 @@
 </script>
 <style lang="sass" scoped>
 
-  @import "partials/mixins.sass"
-  @import "themes/mixin_all"
+  @import "partials/mixins"
+  @import "partials/abstract_classes"
 
   .growl-leave-active
     @include transition(0.5s opacity)

@@ -25,7 +25,7 @@
 </script>
 <style lang="sass" scoped>
 
-  @import "mixins"
+  @import "partials/abstract_classes"
   .slider
     @extend %slider
     overflow-y: hidden
@@ -50,7 +50,6 @@
       font-weight: bold
       color: #6E6E6E
 
-  @import "./mixins"
   i
     @extend %i
 

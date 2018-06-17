@@ -1,5 +1,5 @@
 <template>
-  <div :class="theme" class="holder">
+  <div :class="theme" class="body">
     <div class="growlHolder">
       <growl v-for="growl in growls" :growl="growl" :key="growl.id"></growl>
     </div>
@@ -42,6 +42,4 @@
     overflow: hidden
     .progress-wrap
       width: 100%
-  .holder
-    height: 100vh
 </style>

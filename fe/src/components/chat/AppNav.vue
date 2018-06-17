@@ -88,10 +88,7 @@
     cursor: pointer
 
   .color-lor nav
-    color: $color-lor-main
     background-color: $color-lor-nav-color
-  .color-reg nav
-    color: $color-reg-main
     background-image: linear-gradient(#232323 0%, #151515 100%)
   .color-white nav
     background-color: #333

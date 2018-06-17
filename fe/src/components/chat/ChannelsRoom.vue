@@ -7,7 +7,7 @@
   import {State} from "vuex-class";
 
   @Component()
-  export default class App extends Vue {
+  export default class ChannelsRoom extends Vue {
     @State growls: string[];
     @State theme;
 
