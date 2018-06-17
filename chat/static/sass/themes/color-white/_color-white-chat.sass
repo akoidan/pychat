@@ -5,9 +5,7 @@ $mainWhiteTxtClr: #353535
 	@import "../highlight-light"
 	color: white
 	background-color: #87a59d
-	#chat-room-users-wrapper > span
-		background-color: #414141
-		color: white
+
 	nav
 		background-color: #333
 		border-color: #080808
@@ -67,8 +65,6 @@ $mainWhiteTxtClr: #353535
 
 	.modal-body
 		background-color: #c3c6ca
-	.icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
-		color: #cccccc
 	.icon-smile, .icon-picture
 		color: #6a6a6a
 	.painterTools [class^='icon-']
@@ -105,13 +101,6 @@ $mainWhiteTxtClr: #353535
 		color: #bf1710
 	.painterTools .active-icon
 		color: #ff3111
-	#directUserTable, #chat-user-table ul
-		li.offline
-			.icon-user-secret, .icon-man, .icon-girl
-				color: #fa9d9b
-		li:not(.offline)
-			.icon-user-secret, .icon-man, .icon-girl
-				color: #90e690
 	.timeMess
 		color: #85d379
 		font-weight: normal
@@ -152,15 +141,4 @@ $mainWhiteTxtClr: #353535
 		background-color: #f2fbff
 		border: 1px solid #50547b
 
-	@media screen and (max-width: $collapse-width)
-		#chat-room-users-wrapper
-			border-bottom: 2px solid grey
 
-	.active-room
-		background-color: #656888
-
-	#onlineStatus
-		&.online
-			color: green
-		&.offline
-			color: red

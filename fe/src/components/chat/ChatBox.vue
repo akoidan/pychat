@@ -1,15 +1,15 @@
 <template>
   <div class="holder">
     <div class="search" v-show="showSearch">
-      <input type="search">
+      <input type="search"/>
       <div class="search-loading"></div>
       <div class="search_result hidden"></div>
     </div>
-    <div class="chatbox" tabindex="1">
+    <div class="chatbox" tabindex="1" @scroll.passive="onScroll">
       <p :class="getClass(message)" :key="message.id" v-for="message in room.messages">
       <span class="message-header">
         <span class="timeMess">({{getTime(message.time)}})</span>
-        <span userid="97">{{allUsers[message.userId]}}</span>: </span>
+        <span>{{allUsers[message.userId].user}}</span>: </span>
         <span class="message-text-style">{{message.content}}</span></p>
     </div>
   </div>
@@ -18,6 +18,7 @@
   import {State, Action, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfo, MessageModel, RoomModel, UserModel} from "../../types";
+  import {ws} from '../../utils/singletons';
 
   @Component
   export default class ChatBox extends Vue {
@@ -26,11 +27,24 @@
     @State userInfo: CurrentUserInfo;
     @Prop() room: RoomModel;
     showSearch: boolean = false;
+    loading: boolean = false;
 
 
     getTime(timeMillis: number) {
       var date = new Date(timeMillis);
       var time = [this.sliceZero(date.getHours()), this.sliceZero(date.getMinutes()), this.sliceZero(date.getSeconds())].join(':');
+    }
+
+    onScroll() {
+      this.loading = true;
+    }
+
+    get maxId() {
+      return this.room.messages.length > 0 ? this.room.messages[0] : null;
+    }
+
+    get minId() {
+      return this.room.messages.length > 0 ? this.room.messages[this.room.messages.length - 1] : null;
     }
 
     getClass(message: MessageModel) {
@@ -49,6 +63,28 @@
   @import "partials/mixins"
   .holder
     height: 100%
+
+
+  .search
+    padding: 5px
+    > *
+      display: inline-block
+    input
+      width: calc(100% - 10px)
+    &.loading
+      .search-loading
+        margin-left: 5px
+        margin-bottom: -5px
+        margin-top: -3px
+        @include spinner(3px, white)
+      input
+        width: calc(100% - 40px)
+
+    .search_result
+      display: flex
+      justify-content: center
+      padding-top: 10px
+
 
   .chatbox
     overflow-y: scroll

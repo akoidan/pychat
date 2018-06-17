@@ -33,6 +33,8 @@ export default class ChannelsHandler implements MessageHandler {
     this.store.commit('setOnline', online);
   }
 
+
+
   public handle(message: DefaultMessage) {
     if (message.handler === 'channels') {
       this[`handle${message.action}`](message);

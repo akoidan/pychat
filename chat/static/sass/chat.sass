@@ -12,37 +12,6 @@
 	font-weight: bold
 
 
-%hovered-user-room
-	&:hover:not(.active-room)
-		cursor: pointer
-		background-color:  rgba(135, 135, 135, 0.3)
-		opacity: 1
-		i
-			opacity: inherit
-
-@mixin fix-user-icon-top-position()
-	i:before
-		transform: translate(0, 3px)
-
-.search
-	padding: 5px
-	> *
-		display: inline-block
-	input
-		width: calc(100% - 10px)
-	&.loading
-		.search-loading
-			margin-left: 5px
-			margin-bottom: -5px
-			margin-top: -3px
-			@include spinner(3px, white)
-		input
-			width: calc(100% - 40px)
-
-	.search_result
-		display: flex
-		justify-content: center
-		padding-top: 10px
 
 
 fieldset
@@ -60,33 +29,7 @@ fieldset
 		padding: 0 10px
 		font-weight: bold
 
-#userMessageWrapper
-	padding: 8px
-	width: calc(100% - 16px)
 
-	@mixin chat-icon
-		display: inline
-		float: right
-		position: absolute
-		height: 16px
-		top: 13px
-	.icon-smile
-		@include chat-icon
-		right: 10px
-	#imgInputIcon
-		@include chat-icon
-		left: 15px
-
-
-#wrapper
-	@include flex(1)
-	@include display-flex
-	min-height: 0
-
-#chatBoxHolder
-	@include display-flex
-	@include flex-direction(column)
-	width: 100%
 
 .chatbox
 	overflow-y: scroll
@@ -191,43 +134,6 @@ fieldset
 	min-height: 20px
 	padding: 5px
 
-#wrapper
-	position: relative
-
-#chat-room-users-wrapper
-	float: right
-	font-size: 24px
-	overflow-y: auto
-	overflow-x: hidden
-	position: relative
-	width: 300px
-	ul
-		margin-top: 5px
-		margin-bottom: 5px
-	> *
-		display: block
-
-	#channelsStateText, #directStateText, #usersStateText
-		font-size: 13px
-		font-weight: bold
-		text-transform: uppercase
-		vertical-align: middle
-
-	.icon-angle-circled-down, .icon-angle-circled-up
-		font-size: 15px
-
-	.icon-plus-squared, .icon-user-plus
-		float: right
-		margin-top: 7px
-		margin-right: 5px
-
-	> span
-		@extend %user-select-none
-		border-radius: 2px
-
-	#usersStateText:hover
-		cursor: pointer
-		color: #f1f1f1
 
 .removed-message
 	.message-text-style
@@ -248,39 +154,6 @@ fieldset
 	@extend .context-menu
 	border-radius: 3px
 	position: fixed
-
-nav
-	display: flex
-	position: relative
-	flex-direction: row
-	overflow: hidden
-	max-height: 30px
-	transition: max-height 0.4s ease-out
-	> *
-		order: 2
-	#navMenu
-		margin-left: auto
-		.icon-menu
-			display: none
-	@media screen and (min-width: $collapse-width) and (max-width: $collapse-no-mtext)
-		.mText
-			display: none !important
-	@media screen and (max-width: $collapse-width)
-		flex-direction: column
-		> *
-			margin-right: auto !important
-		#navMenu
-			position: relative
-			width: 100%
-			margin-bottom: 10px
-			order: 1
-			.icon-menu
-				display: inline-block
-				position: absolute
-				top: 0
-				right: 5px
-		&.expanded
-			max-height: $collapse-height
 
 #user-context-menu
 	@extend .context-menu
@@ -309,30 +182,6 @@ nav
 	transition: 0.3s
 	transition-property: background-color, border
 
-#chat-user-table > ul,
-ul#directUserTable
-	display: flex
-	flex-direction: column
-	li:not(.offline)
-		order: 1
-	li.offline
-		order: 2
-#chat-user-table
-	margin: 5px 0
-	li
-		border: 1px solid transparent
-		width: 100%
-		@include ellipsis
-		border-radius: 3px
-		[class^='icon-']
-			opacity: 1
-		@include fix-user-icon-top-position
-		i:hover
-			cursor: inherit
-
-	&.hideOffline li
-		&.offline
-			display: none
 
 .iconColorPicker
 	display: inline-block
@@ -579,20 +428,7 @@ ul#directUserTable
 			.icon-cog
 				display: inline
 
-#rooms li
-	padding-left: 7px
 
-#rooms, #directUserTable, #chat-user-table > ul
-	$padding: 2px
-	margin-left: $padding
-	margin-right: $padding
-
-	.icon-cog
-		display: none
-		position: absolute
-		top: 2px
-		right: 0
-		background: transparent
 
 #roomSettings
 	table
@@ -606,18 +442,7 @@ ul#directUserTable
 		margin: auto
 
 
-@media screen and (max-width: $collapse-width)
-	#wrapper
-		@include flex-direction(column-reverse)
-	#chat-room-users-wrapper
-		width: 100%
-		border-bottom: 8px solid
-	#chatBoxHolder, #chat-room-users-wrapper
-		@include flex(1)
-	#chatBoxHolder
-		flex-grow: 3
-	#chat-room-users-wrapper
-		flex-grow: 2
+
 
 .icon-user-plus
 	font-size: 15px
@@ -967,9 +792,6 @@ ul#directUserTable
 	max-height: calc(100vh - 90px)
 	overflow-y: auto
 	width: 100%
-
-.icon-plus-squared
-	font-size: 15px
 
 #callUserList > li
 	border-radius: 2px

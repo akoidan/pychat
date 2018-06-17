@@ -150,15 +150,6 @@
 		// end call container
 
 
-	.icon-man, .icon-girl, .icon-user-secret
-		color: #1f772c !important
-	.offline
-		.icon-man, .icon-girl, .icon-user-secret
-			color: #b32c1c !important
-
-	#chat-room-users-wrapper > span
-		background-color: #171717
-
 	#directUserTable,
 	#rooms
 		.icon-cancel-circled-outline
@@ -166,22 +157,3 @@
 				opacity: 1
 				color: #ff5e5c
 
-	.active-room
-		background-color: rgba(33, 158, 147, 0.45)
-
-	#chat-user-table li
-		&.offline:before
-			color: #801615
-		&:before
-			color: #28671d
-
-	#onlineStatus
-		padding: 0 10px
-		&.offline
-			color: #ee2d2d
-		&.online
-			color: #53a045
-
-	@media screen and (max-width: $collapse-width)
-		#chat-room-users-wrapper
-			border-bottom-color: $mostly-black

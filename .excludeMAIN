@@ -12,6 +12,9 @@ django.db
 chat/migrations
 .venv
 chat.log
+fe/src/assets/font
+fe/src/assets/sass/partials/fontello.scss
+fe/src/assets/sass/fonts
 chat/production.py
 chat/static/font/*
 !/chat/static/font/OpenSans.ttf
