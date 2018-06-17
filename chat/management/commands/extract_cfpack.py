@@ -61,6 +61,7 @@ class Command(BaseCommand):
 					os.mkdir(tab_dir_path)
 			addition_info['count'] = struct.unpack('<H', f.read(2))[0]  # amount of bytes in a single pack
 			for item in range(addition_info['count']):
+				start_char += 1
 				self.write_smile(cats, count, f, item, smileys, start_char)
 		return smileys
 
@@ -78,15 +79,13 @@ class Command(BaseCommand):
 		file_name = '{0:04x}.{1}'.format(item, file_ext)
 		tab = file_names_pattern[cats[cat_cur]]
 		gif_file_path = os.sep.join((settings.SMILEYS_ROOT, tab, file_name))
-		smileys.setdefault(tab, [])
-		start_char += 1
+		smileys.setdefault(tab, {})
 		if not smiley_pattern.match(alias):
 			alias = ":%s:" % alias
-		smileys[tab].append({
-			'code': get_unicode(start_char),
+		smileys[tab][get_unicode(start_char)] = {
 			'alt': alias,
 			'src': file_name,
-		})
+		}
 		with open(gif_file_path, 'wb') as gif:
 			gif.write(data)
 

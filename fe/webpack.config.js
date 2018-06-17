@@ -36,7 +36,7 @@ module.exports = (env, argv) => {
   }
 
   const conf =  {
-    entry: ['./src/main.ts', './src/assets/sass/common.sass'],
+    entry: ['./src/main.ts', './src/assets/sass/common.sass', './src/smileys.js'],
     plugins,
     resolve: {
       extensions: ['.ts', '.js', '.vue', '.json'],
@@ -65,14 +65,14 @@ module.exports = (env, argv) => {
           use: sasscPlugins
         },
         {
-          test: /\.(woff2?|eot|ttf|otf|svg)(\?.*)?$/,
+          test: /\.(woff2?|eot|ttf|otf|svg|gif)(\?.*)?$/,
           loader: 'file-loader',
           options: {
             name: '[name].[ext]?[sha512:hash:base64:6]',
           }
         },
         {
-          test: /\.(png|jpg|gif)$/,
+          test: /\.(png|jpg)$/,
           loader: 'url-loader',
           options: {
             limit: 32000

@@ -110,8 +110,9 @@ class MessagesCreator(object):
 			res_mess.append(cls.create_message(message, prepare_img(files, message.id)))
 		return res_mess
 
+
 	@classmethod
-	def get_messages(cls, messages, channel, files, prepare_img):
+	def get_messages(cls, messages, channel, files, prepare_img, message_id):
 		"""
 		:type images: list[chat.models.Image]
 		:type messages: list[chat.models.Message]
@@ -121,7 +122,8 @@ class MessagesCreator(object):
 			VarNames.CONTENT: cls.append_images(messages, files, prepare_img),
 			VarNames.EVENT: Actions.GET_MESSAGES,
 			VarNames.ROOM_ID: channel,
-			VarNames.HANDLER_NAME: HandlerNames.CHAT
+			VarNames.JS_MESSAGE_ID: message_id,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS
 		}
 
 	@staticmethod

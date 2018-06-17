@@ -1,5 +1,5 @@
 import ChannelsPage from './ChannelsPage.vue';
-import MainPage from './MainPage.vue';
+import MainPage from '../MainPage.vue';
 import sessionHolder from '../../utils/sessionHolder';
 import loggerFactory from '../../utils/loggerFactory';
 import store from '../../store';

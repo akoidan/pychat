@@ -4,9 +4,7 @@ import {Store} from 'vuex';
 import {VueRouter} from 'vue-router/types/router';
 import {
   CurrentUserInfo,
-  DefaultMessage,
   IStorage,
-  MessageHandler,
   RoomModel,
   RootState,
   SessionHolder,
@@ -14,13 +12,14 @@ import {
 } from '../types';
 import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
+import {DefaultMessage, MessageHandler, RoomDTO} from './dto';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
 }
 
 interface SetWsIdMessage extends DefaultMessage {
-  rooms: { [id: number]: RoomModel };
+  rooms: { [id: number]: RoomDTO };
   users: { [id: number]: UserModel };
   online: number[];
   opponentWsId: string;
@@ -48,6 +47,7 @@ export class WsHandler implements MessageHandler {
   private router: VueRouter;
   private sessionHolder: SessionHolder;
   private listenWsTimeout: number;
+  private callBacks: { [id: number]: Function } = {};
 
   constructor(sessionHolder: SessionHolder, channelsHandler: ChannelsHandler, webRtcApi, storage: IStorage, store: Store<RootState>, router: VueRouter) {
     this.logger = loggerFactory.getLogger('WS', 'color: green;');
@@ -121,6 +121,11 @@ export class WsHandler implements MessageHandler {
 
   handleMessage(data) {
     this.handlers[data.handler].handle(data);
+    if (this.callBacks[data.messageId]) {
+      this.logger.debug('resolving cb')();
+      this.callBacks[data.messageId]();
+      delete this.callBacks[data.messageId];
+    }
   }
 
 
@@ -187,6 +192,17 @@ export class WsHandler implements MessageHandler {
       this.ws.onclose = null;
       this.ws.close();
     }
+  }
+
+
+  public sendLoadMessages(roomId: number, headerId: number, count: number, cb: Function) {
+    this.sendToServer({
+      headerId,
+      count,
+      action: 'loadMessages',
+      roomId
+    });
+    this.callBacks[this.messageId] = cb;
   }
 
 

@@ -407,7 +407,7 @@ class MessagesHandler(MessagesCreator):
 		else:
 			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id)).order_by('-pk')[:count]
 		imv = do_db(get_message_images_videos, messages)
-		response = self.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video)
+		response = self.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video, data[VarNames.JS_MESSAGE_ID])
 		self.ws_write(response)
 
 

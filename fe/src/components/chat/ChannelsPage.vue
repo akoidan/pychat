@@ -7,16 +7,14 @@
         </template>
       </div>
       <room-users/>
-      <div id="smileParentHolder" class="padding10" v-show="false">
-        <ul id="tabNames"></ul>
-      </div>
+      <smiley-holder v-show="showSmileys" v-on:add-smiley="addSmiley"/>
     </div>
 
     <div class="userMessageWrapper" >
       <input type="file" accept="image/*,video/*" id="imgInput" multiple="multiple" v-show="false"/>
       <i class="icon-picture" id="imgInputIcon" title="Share Video/Image"></i>
-      <i class="icon-smile" title="Add a smile :)" id="iconSmile"></i>
-      <div contenteditable="true" class="usermsg input" @keydown="checkAndSendMessage"></div>
+      <i class="icon-smile" title="Add a smile :)" @click="showSmileys = !showSmileys"></i>
+      <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage"></div>
     </div>
   </div>
 </template>
@@ -26,14 +24,30 @@
   import {State} from "vuex-class";
   import RoomUsers from "./RoomUsers.vue"
   import ChatBox from "./ChatBox.vue"
+  import SmileyHolder from "./SmileyHolder.vue"
   import {RoomModel} from '../../types';
+  import {pasteHtmlAtCaret} from '../../utils/htmlApi';
+  import {globalLogger} from '../../utils/singletons';
+  import {getSmileyHtml} from '../../utils/htmlEncoder';
 
-  @Component({components: {RoomUsers, ChatBox}})
+  @Component({components: {RoomUsers, ChatBox, SmileyHolder}})
   export default class ChannelsPage extends Vue {
     @State growls: string[];
     @State theme;
     @State activeRoomId;
     @State rooms: {[id: string]: RoomModel};
+
+    $refs: {
+      userMessage: HTMLTextAreaElement;
+    };
+
+    showSmileys: boolean = false;
+
+    addSmiley(code: string) {
+      globalLogger.log("Adding smiley {}", code)();
+      pasteHtmlAtCaret(getSmileyHtml(code), this.$refs.userMessage);
+    }
+
     checkAndSendMessage() {
 
     }

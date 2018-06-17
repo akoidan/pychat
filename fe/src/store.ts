@@ -1,7 +1,16 @@
 import Vue from 'vue';
 import Vuex, { StoreOptions } from 'vuex';
 Vue.use(Vuex);
-import {CurrentUserInfo, GrowlModel, GrowlType, RoomModel, RootState, UserModel} from './types';
+import {
+  CurrentUserInfo,
+  GrowlModel,
+  GrowlType,
+  MessageDb,
+  MessageModel,
+  RoomModel,
+  RootState,
+  UserModel
+} from './types';
 
 const store: StoreOptions<RootState> = {
   state: {
@@ -15,7 +24,18 @@ const store: StoreOptions<RootState> = {
     online: [],
     activeRoomId: 1,
   },
+  getters: {
+    maxId(state) {
+      return id => state.rooms[id].messages.length > 0 ? state.rooms[id].messages[0].id : null;
+    },
+    minId(state) {
+      return id => state.rooms[id].messages.length > 0 ? state.rooms[id].messages[this.room.messages.length - 1].id : null;
+    },
+  },
   mutations: {
+    setMessages(state, {messages, roomId}) {
+      state.rooms[roomId].messages = messages;
+    },
     setIsOnline(state, isOnline: boolean) {
       state.isOnline = isOnline;
     },
@@ -48,6 +68,9 @@ const store: StoreOptions<RootState> = {
     },
     setRooms(state, rooms: {[id: string]: RoomModel}) {
       state.rooms = rooms;
+    },
+    setAllLoaded(state, roomId: number) {
+      state.rooms[roomId].allLoaded = true;
     }
   },
   actions: {

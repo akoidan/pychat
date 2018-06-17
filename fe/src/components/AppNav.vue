@@ -43,8 +43,8 @@
 
 <style lang="sass" scoped>
 
-  @import "../../assets/sass/partials/variables"
-  @import "../../assets/sass/partials/mixins"
+  @import "../assets/sass/partials/variables"
+  @import "../assets/sass/partials/mixins"
 
   nav
     font-size: 26px

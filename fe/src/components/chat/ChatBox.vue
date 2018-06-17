@@ -5,7 +5,7 @@
       <div class="search-loading"></div>
       <div class="search_result hidden"></div>
     </div>
-    <div class="chatbox" tabindex="1" @scroll.passive="onScroll">
+    <div class="chatbox" tabindex="1" @mousewheel="onScroll" ref="chatbox">
       <p :class="getClass(message)" :key="message.id" v-for="message in room.messages">
       <span class="message-header">
         <span class="timeMess">({{getTime(message.time)}})</span>
@@ -15,10 +15,10 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {Getter, State} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfo, MessageModel, RoomModel, UserModel} from "../../types";
-  import {ws} from '../../utils/singletons';
+  import {globalLogger, ws} from "../../utils/singletons";
 
   @Component
   export default class ChatBox extends Vue {
@@ -26,25 +26,29 @@
     @State allUsers: { [id: number]: UserModel };
     @State userInfo: CurrentUserInfo;
     @Prop() room: RoomModel;
+    @Getter maxId;
     showSearch: boolean = false;
     loading: boolean = false;
-
+    $refs: {
+      chatbox: HTMLElement
+    };
 
     getTime(timeMillis: number) {
-      var date = new Date(timeMillis);
-      var time = [this.sliceZero(date.getHours()), this.sliceZero(date.getMinutes()), this.sliceZero(date.getSeconds())].join(':');
+      let date = new Date(timeMillis);
+      return [this.sliceZero(date.getHours()), this.sliceZero(date.getMinutes()), this.sliceZero(date.getSeconds())].join(':');
     }
 
-    onScroll() {
-      this.loading = true;
-    }
-
-    get maxId() {
-      return this.room.messages.length > 0 ? this.room.messages[0] : null;
-    }
-
-    get minId() {
-      return this.room.messages.length > 0 ? this.room.messages[this.room.messages.length - 1] : null;
+    onScroll(e) {
+      globalLogger.log("Handling scroll {}, scrollTop {}", e, this.$refs.chatbox.scrollTop)();
+      if (!this.room.allLoaded
+          && !this.loading
+          && (e.detail < 0 || e.wheelDelta > 0)
+          && this.$refs.chatbox.scrollTop === 0) {
+        this.loading = true;
+        ws.sendLoadMessages(this.roomId, this.maxId(this.roomId), 10, () => {
+          this.loading = false;
+        });
+      }
     }
 
     getClass(message: MessageModel) {
@@ -61,6 +65,28 @@
 <style lang="sass" scoped>
 
   @import "partials/mixins"
+
+  .message-header
+    font-weight: bold
+
+  .color-lor
+    .message-others .message-header
+      color: #729fcf
+    .message-self .message-header
+      color: #e29722
+    .message-system .message-header
+      color: #9DD3DD
+  .color-reg
+    .message-others .message-header
+      color: #729fcf
+    .message-self .message-header
+      color: #e29722
+    .message-system .message-header
+      color: #84B7C0
+  .color-white
+    .message-others
+      background-color: white
+
   .holder
     height: 100%
 

@@ -52,9 +52,6 @@ export enum GrowlType {
   SUCCESS = 'col-success', INFO = 'col-info', ERROR = 'col-error'
 }
 
-export interface MessageHandler {
-  handle(message: DefaultMessage);
-}
 
 export interface RoomModel {
   name: string;
@@ -62,6 +59,12 @@ export interface RoomModel {
   notifications: boolean;
   volume: VolumeLevelModel;
   messages: MessageModel[];
+  allLoaded: boolean;
+}
+
+export interface SmileyStructure {
+  alt: string;
+  src: string;
 }
 
 export enum SexModel {
@@ -88,21 +91,6 @@ export interface CurrentUserInfo {
   theme: string;
   user: string;
   userId: number;
-}
-
-export interface DefaultMessage {
-  action: string;
-  handler: string;
-}
-
-export interface ChatHandlerMessage extends DefaultMessage{
-  roomId: number;
-}
-
-export interface SetRootMessage extends DefaultMessage {
-  online: number[];
-  users: { [id: number]: UserModel };
-  content: RoomModel[];
 }
 
 export interface RootState {

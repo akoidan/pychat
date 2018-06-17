@@ -1,19 +1,12 @@
 import {Logger} from './Logger';
-import {ChatHandlerMessage, DefaultMessage, MessageHandler, RoomModel, RootState, SexModel, UserModel} from '../types';
+import {RoomModel, RootState, UserModel} from '../types';
+import {AddOnlineUser, DefaultMessage, LoadMessages, MessageHandler, RoomDTO} from './dto';
 import loggerFactory from './loggerFactory';
-import ChatHandler from './ChatHandler';
 import {Store} from 'vuex';
 
-interface AddOnlineUser extends DefaultMessage {
-  content: number[];
-  sex: SexModel;
-  user: string;
-  userId: number;
-}
+
 export default class ChannelsHandler implements MessageHandler {
   private logger: Logger;
-  private dbMessages: Array<any>;
-  private chatHandlers: { [id: number]: ChatHandler };
   private store: Store<RootState>;
 
   constructor(store: Store<RootState>) {
@@ -25,8 +18,55 @@ export default class ChannelsHandler implements MessageHandler {
     this.store.commit('setUsers', users);
   }
 
-  public setRooms(rooms: {[id: string]: RoomModel}) {
-    this.store.commit('setRooms', rooms);
+  private handleloadMessages(lm: LoadMessages) {
+    if (lm.content.length > 0) {
+      let messages = this.store.state.rooms[lm.roomId].messages;
+      let oldMessages = {};
+      messages.forEach(m => {
+        oldMessages[m.id] = true;
+      });
+      lm.content.filter(i => oldMessages[i.id]);
+      messages = messages.concat(lm.content);
+      messages.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
+      this.store.commit('setMessages', {messages, roomId: lm.roomId});
+    } else {
+      this.store.commit('setAllLoaded', lm.roomId);
+    }
+  }
+
+  handleaddOnlineUser(message: AddOnlineUser) {
+    if (!this.store.state.allUsers[message.userId]) {
+      this.store.commit('addUser', {userId: message.userId, user: message.user, sex: message.sex});
+    }
+    this.store.commit('setOnline', message.content);
+  }
+
+  public setRooms(rooms: {[id: string]: RoomDTO}) {
+    let dict: { [id: number]: RoomModel } = {};
+    for (let id in rooms) {
+      let oldRoom = this.store.state.rooms[id];
+      let newRoom = rooms[id];
+      if (oldRoom) {
+        dict[id] = {
+          messages: oldRoom.messages,
+          name: newRoom.name,
+          notifications: newRoom.notifications,
+          users: newRoom.users,
+          volume: newRoom.volume,
+          allLoaded: oldRoom.allLoaded
+        };
+      } else {
+        dict[id] = {
+          messages: [],
+          name: newRoom.name,
+          notifications: newRoom.notifications,
+          users: newRoom.users,
+          volume: newRoom.volume,
+          allLoaded: false
+        };
+      }
+    }
+    this.store.commit('setRooms', dict);
   }
 
   public setOnline(online: number[]) {
@@ -39,20 +79,8 @@ export default class ChannelsHandler implements MessageHandler {
     if (message.handler === 'channels') {
       this[`handle${message.action}`](message);
     } else if (message.handler === 'chat') {
-      let chm: ChatHandlerMessage = message as ChatHandlerMessage;
-      let channelHandler: ChatHandler = this.chatHandlers[chm.roomId];
-      if (channelHandler) {
-        channelHandler.handle(chm);
-      } else {
-        throw `Unknown channel ${chm.roomId} for message "${JSON.stringify(message)}"`;
-      }
+      alert('oops');
     }
-  }
-  handleaddOnlineUser(message: AddOnlineUser) {
-    if (!this.store.state.allUsers[message.userId]) {
-      this.store.commit('addUser', {userId: message.userId, user: message.user, sex: message.sex});
-    }
-    this.store.commit('setOnline', message.content);
   }
 
 }

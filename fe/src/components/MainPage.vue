@@ -8,7 +8,7 @@
   import {State, Action, Mutation} from "vuex-class";
   import AppNav from "./AppNav.vue";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {globalLogger, ws} from '../../utils/singletons';
+  import {globalLogger, ws} from '../utils/singletons';
 
   @Component({
     components: {AppNav}
@@ -28,7 +28,7 @@
 </script>
 
 <style lang="sass" scoped>
-  @import "partials/mixins"
+  @import "../assets/sass/partials/mixins"
   .flex
     @include display-flex()
     flex-direction: column
