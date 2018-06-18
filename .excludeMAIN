@@ -38,6 +38,7 @@ chat/static/favicon.ico
 chat/static/js/pikaday.js
 chat/static/js/moment.js
 chat/static/smileys
+fe/src/assets/smileys
 chat/static/js/angular*
 example
 sessionsids.txt

@@ -16,12 +16,11 @@
   </div>
 </template>
 <script lang="ts">
-  import {Getter, State} from "vuex-class";
+  import {Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {CurrentUserInfo, MessageModel, RoomModel, UserModel} from "../../types";
+  import {RoomModel} from "../../types";
   import {globalLogger, ws} from "../../utils/singletons";
-  import {encodeMessage} from '../../utils/htmlEncoder';
-  import ChatMessage from './ChatMessage.vue';
+  import ChatMessage from "./ChatMessage.vue";
 
   @Component({components: {ChatMessage}})
   export default class ChatBox extends Vue {

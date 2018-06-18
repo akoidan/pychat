@@ -27,8 +27,8 @@
   import {Component, Vue} from "vue-property-decorator";
   import smileys from "../../assets/smileys/info.json";
   import {globalLogger} from '../../utils/singletons';
-  import {getSmileyPath} from "../../utils/htmlEncoder";
   import {SmileyStructure} from '../../types';
+  import {getSmileyPath} from '../../utils/htmlApi';
 
   @Component
   export default class SmileyHolder extends Vue {

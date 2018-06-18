@@ -11,8 +11,8 @@
     </div>
 
     <div class="userMessageWrapper" >
-      <input type="file" accept="image/*,video/*" id="imgInput" multiple="multiple" v-show="false"/>
-      <i class="icon-picture" title="Share Video/Image"></i>
+      <input type="file" @change="handleFileSelect" accept="image/*,video/*" ref="imgInput" multiple="multiple" v-show="false"/>
+      <i class="icon-picture" title="Share Video/Image" @click="addImage"></i>
       <i class="icon-smile" title="Add a smile :)" @click="showSmileys = !showSmileys"></i>
       <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage"></div>
     </div>
@@ -21,14 +21,13 @@
 
 <script lang='ts'>
   import {Component, Vue} from "vue-property-decorator";
-  import {State, Getter} from "vuex-class";
+  import {State, Getter, Action} from "vuex-class";
   import RoomUsers from "./RoomUsers.vue"
   import ChatBox from "./ChatBox.vue"
   import SmileyHolder from "./SmileyHolder.vue"
   import {RoomModel} from '../../types';
-  import {pasteHtmlAtCaret} from '../../utils/htmlApi';
+  import {getSmileyHtml, pasteHtmlAtCaret, pasteImgToTextArea} from "../../utils/htmlApi";
   import {channelsHandler, globalLogger} from "../../utils/singletons";
-  import {getSmileyHtml} from '../../utils/htmlEncoder';
 
   @Component({components: {RoomUsers, ChatBox, SmileyHolder}})
   export default class ChannelsPage extends Vue {
@@ -37,12 +36,30 @@
     @State activeRoomId;
     @State rooms: {[id: string]: RoomModel};
     @Getter maxId;
+    @Action growlError;
 
     $refs: {
       userMessage: HTMLTextAreaElement;
+      imgInput: HTMLInputElement;
     };
 
     showSmileys: boolean = false;
+
+    addImage() {
+      this.$refs.imgInput.click();
+    }
+
+
+    handleFileSelect (evt) {
+      let files: File[] = evt.target.files;
+      for (let i = 0; i < evt.target.files.length; i++) {
+        pasteImgToTextArea(files[i], this.$refs.userMessage, err => {
+          this.growlError(err);
+        });
+      }
+      this.$refs.imgInput.value = "";
+    };
+
 
     addSmiley(code: string) {
       globalLogger.log("Adding smiley {}", code)();

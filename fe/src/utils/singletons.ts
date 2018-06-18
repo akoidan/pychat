@@ -12,7 +12,7 @@ import {IStorage} from '../types';
 import loggerFactory from './loggerFactory';
 import sessionHolder from './sessionHolder';
 
-export const xhr: Xhr = new Xhr(API_URL_DEFAULT);
+export const xhr: Xhr = new Xhr(API_URL_DEFAULT, sessionHolder);
 export const api: Api = new Api(xhr);
 export const channelsHandler = new ChannelsHandler(store, api);
 export const storage: IStorage = window.openDatabase ? new DatabaseWrapper( 'userName') : new LocalStorage();

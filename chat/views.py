@@ -44,6 +44,7 @@ GOOGLE_OAUTH_2_JS_URL = getattr(settings, "GOOGLE_OAUTH_2_JS_URL", None)
 FACEBOOK_APP_ID = getattr(settings, "FACEBOOK_APP_ID", None)
 FACEBOOK_JS_URL = getattr(settings, "FACEBOOK_JS_URL", None)
 
+
 # TODO doesn't work
 def handler404(request):
 	return HttpResponse("Page not found", content_type='text/plain')
@@ -60,7 +61,7 @@ def validate_email(request):
 
 
 @require_http_methods(['POST'])
-@login_required_no_redirect(False)
+@login_required_no_redirect()
 @transaction.atomic
 def upload_file(request):
 	"""

@@ -11,8 +11,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfo, MessageModel, RoomModel, UserModel} from "../../types";
   import {globalLogger, ws} from "../../utils/singletons";
-  import {encodeMessage} from '../../utils/htmlEncoder';
-  import {highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
+  import {encodeMessage, highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
 
 
   @Component

@@ -1,5 +1,6 @@
 import {Logger} from './Logger';
 import loggerFactory from './loggerFactory';
+import {SessionHolder} from '../types';
 
 
 /**
@@ -13,8 +14,10 @@ export default class Xhr {
 
   private httpLogger: Logger;
   private apiUrl: string;
+  private sessionHolder: SessionHolder;
 
-  constructor(apiUrl: string) {
+  constructor(apiUrl: string, sessionHolder: SessionHolder) {
+    this.sessionHolder = sessionHolder;
     this.httpLogger = loggerFactory.getLogger('HTTP', 'color: green; font-weight: bold');
     this.apiUrl = apiUrl;
   }
@@ -157,7 +160,7 @@ export default class Xhr {
         }
       }
     }
-    r.setRequestHeader('X-CSRFToken', Xhr.readCookie()['csrftoken']);
+    r.setRequestHeader('session-id', this.sessionHolder.session);
 
     this.httpLogger.log('POST out {} ::: {} ::: {} ::: {}', url, params, logOut)();
     if (process) {

@@ -1,12 +1,123 @@
 import {globalLogger} from './singletons';
 import hljs from 'highlightjs';
+import smileys from '../assets/smileys/info.json';
+import {MessageModel, SmileyStructure} from '../types';
+import {API_URL_DEFAULT, PASTED_IMG_CLASS} from './consts';
 
+const tmpCanvasContext = document.createElement('canvas').getContext('2d');
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
-export function pasteHtmlAtCaret(html: string, div: HTMLTextAreaElement) {
+const smileysTabNames = Object.keys(smileys);
+let codes = {};
+smileysTabNames.forEach(tb => {
+  codes = {...smileys[tb], ...codes};
+});
+const escapeMap = {
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  '\'': '&#39;',
+  '\n': '<br>',
+  '/': '&#x2F;'
+};
+
+
+const smileUnicodeRegex = /[\u3400-\u3500]/g;
+const imageUnicodeRegex = /[\u3501-\u3600]/g;
+const patterns = [
+  {
+    search: /(https?:&#x2F;&#x2F;.+?(?=\s+|<br>|&quot;|$))/g, /*http://anycharacter except end of text, <br> or space*/
+    replace: '<a href="$1" target="_blank">$1</a>',
+    name: 'links'
+  }, {
+    search: /<a href="http(?:s?):&#x2F;&#x2F;(?:www\.)?youtu(?:be\.com&#x2F;watch\?v=|\.be\/)([\w\-\_]*)(?:[^"]*?\&amp\;t=([\w\-\_]*))?[^"]*" target="_blank">[^<]+<\/a>/g,
+    replace: '<div class="youtube-player" data-id="$1" data-time="$2"><div><img src="https://i.ytimg.com/vi/$1/hqdefault.jpg"><div class="icon-youtube-play"></div></div></div>',
+    name: 'youtube'
+  },
+  {
+    search: /```(.+?)(?=```)```/g,
+    replace: '<pre>$1</pre>',
+    name: 'code'
+  },
+  {
+    search: /(^\(\d\d:\d\d:\d\d\)\s[a-zA-Z-_0-9]{1,16}:)(.*)&gt;&gt;&gt;<br>/,
+    replace: '<div class="quote"><span>$1</span>$2</div>',
+    name: 'quote'
+  }
+];
+
+
+
+const replaceHtmlRegex = new RegExp('[' + Object.keys(escapeMap).join('') + ']', 'g');
+
+function encodeHTML(html: string) {
+  return html.replace(replaceHtmlRegex, s => escapeMap[s]);
+}
+
+export function getSmileyPath(s: SmileyStructure) {
+  return `/${s.src}`;
+}
+
+export function getSmileyHtml (code: string) {
+  let smiley = codes[code];
+  return `<img src="${getSmileyPath(smiley)}" code="${code}" alt="${smiley.alt}">`;
+}
+
+
+function resolveUrl(src: string): string{
+  return `${API_URL_DEFAULT}${src}`;
+}
+
+export function encodeSmileys(html: string): string {
+  return html.replace(smileUnicodeRegex, c => getSmileyHtml(c));
+}
+
+export function encodeMessage(data: MessageModel) {
+  globalLogger.debug('Encoding message {}', data)();
+  if (data.giphy) {
+    return `<div class="giphy"><img src='${resolveUrl(data.giphy)}' /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>`;
+  } else {
+    let html = encodeHTML(data.content);
+    let replaceElements = [];
+    patterns.forEach( (pattern) => {
+      let res = html.replace(pattern.search, pattern.replace);
+      if (res !== html) {
+        replaceElements.push(pattern.name);
+        html = res;
+      }
+    });
+    if (replaceElements.length) {
+      globalLogger.debug('Replaced {} in message #{}', replaceElements.join(', '), data.id)();
+    }
+    html = encodeFiles(html, data.files);
+    return encodeSmileys(html);
+  }
+}
+
+function encodeFiles(html, files) {
+  if (files && Object.keys(files).length) {
+    html = html.replace(imageUnicodeRegex,  (s) => {
+      let v = files[s];
+      if (v) {
+        if (v.type === 'i') {
+          return `<img src='${resolveUrl(v.url)}' imageId='${v.id}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
+        } else if (v.type === 'v') {
+          return `<div class='video-player' associatedVideo='${v.url}'><div><img src='${resolveUrl(v.preview)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
+        } else {
+          globalLogger.error('Invalid type {}', v.type)();
+        }
+      }
+      return s;
+    });
+  }
+  return html;
+}
+
+
+
+
+export function pasteNodeAtCaret(img: Node, div: HTMLTextAreaElement) {
   div.focus();
-  let divOuter = document.createElement('div');
-  divOuter.innerHTML = html;
-  let img = divOuter.firstChild;
   let sel = window.getSelection();
   let range = sel.getRangeAt(0);
   range.deleteContents();
@@ -24,7 +135,15 @@ export function pasteHtmlAtCaret(html: string, div: HTMLTextAreaElement) {
 }
 
 
-export  function setVideoEvent(e: HTMLElement) {
+export function pasteHtmlAtCaret(html: string, div: HTMLTextAreaElement) {
+  let divOuter = document.createElement('div');
+  divOuter.innerHTML = html;
+  let img = divOuter.firstChild;
+  pasteNodeAtCaret(img, div);
+}
+
+
+export function setVideoEvent(e: HTMLElement) {
   let r = e.querySelectorAll('.video-player');
   for (let i = 0; i < r.length; i++) {
     (function (e) {
@@ -36,7 +155,7 @@ export  function setVideoEvent(e: HTMLElement) {
         video.setAttribute('controls', '');
         video.className = 'video-player-ready';
         globalLogger.debug('Replacing video url {}', url)();
-        video.src = url;
+        video.src = resolveUrl(url);
         e.parentNode.replaceChild(video, e);
         video.play();
       };
@@ -67,34 +186,91 @@ function getTime(time: string): number {
   return start;
 }
 
-export function setYoutubeEvent(e) {
-    let r = e.querySelectorAll('.youtube-player');
-    for (let i = 0; i < r.length; i++) {
-      let querySelector = r[i].querySelector('.icon-youtube-play');
-      let id = r[i].getAttribute('data-id');
-      globalLogger.debug('Embedding youtube view {}', id)();
-      querySelector.onclick = (function (e) {
-        return function (event) {
-          let iframe = document.createElement('iframe');
-          let time: string = getTime(e.getAttribute('data-time')).toString();
-          if (time) {
-            time = '&start=' + time;
-          } else {
-            time = '';
-          }
-          let src = `https://www.youtube.com/embed/${id}?autoplay=1${time}`;
-          iframe.setAttribute('src', src);
-          iframe.setAttribute('frameborder', '0');
-          iframe.className = 'video-player-ready';
-          globalLogger.log('Replacing youtube url {}', src)();
-          iframe.setAttribute('allowfullscreen', '1');
-          e.parentNode.replaceChild(iframe, e);
-        };
-      })(r[i]);
-    }
+export function setYoutubeEvent(e: HTMLElement) {
+  let r = e.querySelectorAll('.youtube-player');
+  for (let i = 0; i < r.length; i++) {
+    let querySelector: HTMLElement = r[i].querySelector('.icon-youtube-play');
+    let id = r[i].getAttribute('data-id');
+    globalLogger.debug('Embedding youtube view {}', id)();
+    querySelector.onclick = (function (e) {
+      return function (event) {
+        let iframe = document.createElement('iframe');
+        let time: string = getTime(e.getAttribute('data-time')).toString();
+        if (time) {
+          time = '&start=' + time;
+        } else {
+          time = '';
+        }
+        let src = `https://www.youtube.com/embed/${id}?autoplay=1${time}`;
+        iframe.setAttribute('src', src);
+        iframe.setAttribute('frameborder', '0');
+        iframe.className = 'video-player-ready';
+        globalLogger.log('Replacing youtube url {}', src)();
+        iframe.setAttribute('allowfullscreen', '1');
+        e.parentNode.replaceChild(iframe, e);
+      };
+    })(r[i]);
+  }
 }
 
-export  function highlightCode(element) {
+
+function setBlobName(blob: Blob) {
+  if (!blob['name'] && blob.type.indexOf('/') > 1) {
+    blob['name'] = '.' + blob.type.split('/')[1];
+  }
+}
+
+function pasteBlobImgToTextArea(blob: Blob, textArea: HTMLTextAreaElement) {
+  let img = document.createElement('img');
+  img.className = PASTED_IMG_CLASS;
+  let src = URL.createObjectURL(blob);
+  img.src = src;
+  setBlobName(blob);
+  Utils.imagesFiles[src] = blob;
+  pasteNodeAtCaret(img, textArea);
+  return img;
+}
+
+function pasteBlobVideoToTextArea(file: File, textArea: HTMLTextAreaElement, errCb: Function) {
+  let video = document.createElement('video');
+  if (video.canPlayType(file.type)) {
+    video.autoplay = false;
+    let src = URL.createObjectURL(file);
+    video.loop = false;
+    video.addEventListener('loadeddata', function () {
+      tmpCanvasContext.canvas.width = video.videoWidth;
+      tmpCanvasContext.canvas.height = video.videoHeight;
+      tmpCanvasContext.drawImage(video, 0, 0);
+      tmpCanvasContext.canvas.toBlob(function (blob) {
+        let url = URL.createObjectURL(blob);
+        let img = document.createElement('img');
+        img.className = PASTED_IMG_CLASS;
+        img.src = url;
+        blob['name'] = '.jpg';
+        img.setAttribute('associatedVideo', src);
+        Utils.videoFiles[src] = file;
+        Utils.previewFiles[url] = blob;
+        pasteNodeAtCaret(img, textArea);
+      }, 'image/jpeg', 0.95);
+    }, false);
+    video.src = src;
+  } else {
+    errCb(`Browser doesn't support playing ${file.type}`);
+  }
+}
+
+
+export function pasteImgToTextArea(file: File, textArea: HTMLTextAreaElement, errCb: Function) {
+  if (file.type.indexOf('image') >= 0) {
+    pasteBlobImgToTextArea(file, textArea);
+  } else if (file.type.indexOf('video') >= 0) {
+    pasteBlobVideoToTextArea(file, textArea, errCb);
+  } else {
+    errCb(`Pasted file type ${file.type}, which is not an image`);
+  }
+}
+
+export function highlightCode(element) {
   let s = element.querySelectorAll('pre');
   for (let i = 0; i < s.length; i++) {
     hljs.highlightBlock(s[i]);
