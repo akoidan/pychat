@@ -36,6 +36,13 @@ export default class Api {
     }, new FormData(form));
   }
 
+
+  sendLogs(issue) {
+    this.xhr.doPost('/send_logs', {issue}, cb => {
+
+    });
+  }
+
   public sendRestorePassword(form: HTMLFormElement, cb: StringCb) {
     this.xhr.doPost('/send_restore_password', null, (data, error) => {
       if (error) {

@@ -1,6 +1,14 @@
 import {Logger} from './Logger';
 import {MessageModel, RoomModel, RootState, UserModel} from '../types';
-import {AddOnlineUser, DefaultMessage, LoadMessages, MessageHandler, PrintMessage, RoomDTO} from './dto';
+import {
+  AddOnlineUser,
+  DefaultMessage,
+  LoadMessages,
+  MessageHandler,
+  PrintMessage,
+  RemoveOnlineUser,
+  RoomDTO
+} from './dto';
 import loggerFactory from './loggerFactory';
 import {Store} from 'vuex';
 import {WsHandler} from './WsHandler';
@@ -52,6 +60,11 @@ export default class ChannelsHandler implements MessageHandler {
     }
     this.store.commit('setOnline', message.content);
   }
+
+  handleremoveOnlineUser(message: RemoveOnlineUser) {
+    this.store.commit('setOnline', message.content);
+  }
+
 
   nextChar(c) {
     return String.fromCharCode(c.charCodeAt(0) + 1);

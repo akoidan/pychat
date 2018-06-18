@@ -46,6 +46,10 @@
   @import "../assets/sass/partials/variables"
   @import "../assets/sass/partials/mixins"
 
+  .username
+    font-size: 22px
+    padding-right: 10px
+
   nav
     font-size: 26px
     margin: 0
@@ -87,18 +91,56 @@
   [class^='icon-']
     cursor: pointer
 
-  .color-lor nav
-    background-color: $color-lor-nav-color
-    background-image: linear-gradient(#232323 0%, #151515 100%)
-  .color-white nav
-    background-color: #333
-    border-color: #080808
-    color: $color-white-main
+  .color-lor
+    nav
+      background-color: $color-lor-nav-color
+      background-image: linear-gradient(#232323 0%, #151515 100%)
+    .onlineStatus
+      padding: 0 10px
+      &.offline
+        color: #b02e2e
+      &.online
+        color: #53a045
+      [class^='icon-']:hover
+        text-shadow: 0 0 0.2em #FFF, 0 0 0.2em #3D3D3D
+
+      .icon-home
+        color: rgb(51, 122, 183)
+      .icon-brush
+        color: #960000
+      .icon-pencil
+        color: rgb(85, 26, 139)
+      .icon-santa-hat
+        color: rgb(207, 80, 80)
+      .icon-chart-pie
+        color: rgb(121, 144, 15)
+      .icon-sign-out
+        color: rgb(169, 68, 66)
+      .icon-wrench
+        color: rgb(70, 133, 117)
+      .icon-phone
+        color: #136C00
+      .icon-doc-inv
+        color: #40b2b2
+      .icon-popup
+        color: #c58446
+  .color-white
+    nav
+      background-color: #333
+      border-color: #080808
+      color: $color-white-main
+    .onlineStatus
+      &.online
+        color: green
+      &.offline
+        color: red
 
   .onlineStatus
     padding: 0 10px
 
   .color-reg
+    nav
+      background-image: linear-gradient(#232323 0%, #151515 100%)
     .onlineStatus
       &.offline
         color: #ee2d2d
@@ -127,39 +169,4 @@
       @include hover-click(#ff9900)
 
 
-  .color-white .onlineStatus
-    &.online
-      color: green
-    &.offline
-      color: red
-  .color-lor
-    .onlineStatus
-      padding: 0 10px
-      &.offline
-        color: #b02e2e
-      &.online
-        color: #53a045
-    [class^='icon-']:hover
-      text-shadow: 0 0 0.2em #FFF, 0 0 0.2em #3D3D3D
-
-    .icon-home
-      color: rgb(51, 122, 183)
-    .icon-brush
-      color: #960000
-    .icon-pencil
-      color: rgb(85, 26, 139)
-    .icon-santa-hat
-      color: rgb(207, 80, 80)
-    .icon-chart-pie
-      color: rgb(121, 144, 15)
-    .icon-sign-out
-      color: rgb(169, 68, 66)
-    .icon-wrench
-      color: rgb(70, 133, 117)
-    .icon-phone
-      color: #136C00
-    .icon-doc-inv
-      color: #40b2b2
-    .icon-popup
-      color: #c58446
 </style>

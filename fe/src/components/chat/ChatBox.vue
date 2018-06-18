@@ -35,6 +35,22 @@
       chatbox: HTMLElement
     };
 
+    scrollBottom: boolean = false;
+
+    beforeUpdate() {
+      let el = this.$refs.chatbox;
+      this.scrollBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 100;
+    }
+
+    updated() {
+      this.$nextTick(function () {
+        if (this.scrollBottom) {
+          this.$refs.chatbox.scrollTop = this.$refs.chatbox.scrollHeight;
+          // globalLogger.debug("Scrolling to bottom")();
+        }
+      })
+    }
+
     get messages() {
       globalLogger.debug("Reevaluating messages")();
       let newArray = [];

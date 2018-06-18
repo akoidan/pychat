@@ -16,12 +16,17 @@ export interface RoomDTO {
   volume: VolumeLevelModel;
 }
 
-export interface AddOnlineUser extends DefaultMessage {
-  content: number[];
-  sex: SexModel;
-  user: string;
+
+interface ChangeUserOnline extends DefaultMessage {
   userId: number;
+  sex: SexModel;
+  content: number[];
+  user: string;
+  time: number;
 }
+
+export interface AddOnlineUser extends ChangeUserOnline {}
+export interface RemoveOnlineUser extends ChangeUserOnline {}
 
 export interface ChatHandlerMessage extends DefaultMessage {
   roomId: number;

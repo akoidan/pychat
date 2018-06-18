@@ -234,7 +234,7 @@ export class WsHandler implements MessageHandler {
       let message = `Server has forbidden request because '${reason}'. Logging out...`;
       alert(message);
       this.logger.error('onWsClose {}', message)();
-      this.router.replace('/auth');
+      this.router.replace('/auth/login');
       return;
     } else if (this.wsState === WsState.NOT_INITED) {
       alert('Can\'t establish connection with server');
