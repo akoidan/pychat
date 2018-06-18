@@ -10,120 +10,6 @@
 @import "partials/youtube_player"
 
 
-fieldset
-	border-top: 1px solid #e8e8e8
-	border-bottom: none
-	border-left: none
-	border-right: none
-	display: block
-	text-align: center
-	padding: 0
-	margin-left: 3px
-	margin-right: 10px
-
-	legend
-		padding: 0 10px
-		font-weight: bold
-
-
-
-.chatbox
-	overflow-y: scroll
-	height: 100%
-	min-height: 50px
-	padding-left: 8px
-	word-wrap: break-word
-	font-size: 18px
-	@include flex(1) // Fix Safari's 0 height
-
-	.quote
-		border-left: 5px solid #4d4d4d
-		padding-left: 5px
-		margin: 5px
-		span
-			font-weight: bold
-
-	&:focus
-		outline: none
-	a:hover
-		text-decoration: underline
-	&.display-search-only
-		>:not(.filter-search)
-			display: none
-
-	pre
-		margin: 10px
-		max-width: calc(100% - 15px)
-		overflow-x: auto
-
-	@mixin margin-img
-		margin: 5px 0 0 15px
-	@mixin margin-img-def
-		max-width: calc(100% - 25px)
-		max-height: 400px
-		display: block
-
-	.video-player-ready
-		border: none
-		@include margin-img-def
-		width: 500px
-		height: 350px
-		@include margin-img
-
-	%img-play
-		@extend %user-select-none
-		display: block
-		@include margin-img
-		> div
-			position: relative
-			display: inline-block
-			zoom: 1
-			&:not(:hover)
-				-webkit-filter: brightness(90%)
-
-			img
-				@include margin-img-def
-			.icon-youtube-play
-				position: absolute
-				z-index: 13
-				top: 50%
-				left: 50%
-				margin-top: -50px
-				margin-left: -55px
-				font-size: 50px
-				color: black
-				height: 100px
-				width: 100px
-				@media screen and (max-width: $collapse-width)
-					margin-top: -35px
-					margin-left: -45px
-					height: 70px
-					width: 70px
-	.youtube-player
-		@extend %img-play
-	.video-player
-		@extend %img-play
-
-	.giphy
-		position: relative
-		img
-			@include margin-img-def
-			@include margin-img
-		&:not(:hover) .giphy_hover
-			display: none
-		.giphy_hover
-			bottom: 5px
-			position: absolute
-			left: 20px
-			width: 100px
-			height: 36px
-
-	.B4j2ContentEditableImg
-		@include margin-img-def
-		@include margin-img
-	p
-		margin-top: 0.8em
-		margin-bottom: 0.8em
 
 .minimizedList
 	min-width: 200px
@@ -563,12 +449,7 @@ fieldset
 	padding-right: 10px
 	> input
 		width: 50px
-.chatbox img[code], #usermsg img[code]
-	margin-top: -17px
-	margin-bottom: -10px
-	/*remove background if someones copies smile
-	background-color: rgba(255, 255, 255, 0)
-	vertical-align: middle
+
 
 .dbRetrHolder
 	display: flex
@@ -578,34 +459,6 @@ fieldset
 		margin-top: 5px
 		margin-right: 8px
 
-
-#usermsg
-	margin-left: 4px
-	padding-left: 25px
-	padding-right: 20px // before smiley
-	max-height: 200px
-
-	/*fallback
-	max-height: 30vh
-	min-height: 1.15em
-
-	/*Firefox
-	overflow-y: auto
-	white-space: pre-wrap
-
-	.B4j2ContentEditableImg
-		max-height: 200px
-		max-width: 400px
-
-	*
-		background-color: transparent !important
-		color: inherit !important
-		font-size: inherit !important
-		font-family: inherit !important
-		cursor: inherit !important
-		font-weight: inherit !important
-		margin: 0 !important
-		padding: 0 !important
 
 
 	/*chrome keep \n, no horizontal scroll

@@ -12,7 +12,7 @@
 
     <div class="userMessageWrapper" >
       <input type="file" accept="image/*,video/*" id="imgInput" multiple="multiple" v-show="false"/>
-      <i class="icon-picture" id="imgInputIcon" title="Share Video/Image"></i>
+      <i class="icon-picture" title="Share Video/Image"></i>
       <i class="icon-smile" title="Add a smile :)" @click="showSmileys = !showSmileys"></i>
       <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage"></div>
     </div>
@@ -68,14 +68,11 @@
 
   @import "partials/mixins"
   @import "partials/variables"
+  @import "partials/abstract_classes"
 
 
-  .chatbox img[code], .usermsg img[code]
-    margin-top: -17px
-    margin-bottom: -10px
-    /*remove background if someones copies smile
-    background-color: rgba(255, 255, 255, 0)
-    vertical-align: middle
+  .usermsg /deep/ img[code]
+    @extend %img-code
 
 
   .userMessageWrapper
@@ -92,7 +89,7 @@
     .icon-smile
       @include chat-icon
       right: 10px
-    #imgInputIcon
+    .icon-picture
       @include chat-icon
       left: 15px
 
@@ -111,11 +108,11 @@
     overflow-y: auto
     white-space: pre-wrap
 
-    .B4j2ContentEditableImg
+    /deep/ .B4j2ContentEditableImg
       max-height: 200px
       max-width: 400px
 
-    *
+    /deep/ *
       background-color: transparent !important
       color: inherit !important
       font-size: inherit !important

@@ -6,11 +6,12 @@
       <div class="search_result hidden"></div>
     </div>
     <div class="chatbox" tabindex="1" @mousewheel="onScroll" ref="chatbox">
-      <p :class="getClass(message)" :key="message.id" v-for="message in room.messages">
-      <span class="message-header">
-        <span class="timeMess">({{getTime(message.time)}})</span>
-        <span>{{allUsers[message.userId].user}}</span>: </span>
-        <span class="message-text-style" v-html="encodeMessage(message)"></span></p>
+      <template v-for="message in messages">
+        <fieldset v-if="message.fieldDay">
+          <legend align="center">{{message.fieldDay}}</legend>
+        </fieldset>
+        <chat-message v-else :key="message.id"  :message="message"/>
+      </template>
     </div>
   </div>
 </template>
@@ -20,23 +21,34 @@
   import {CurrentUserInfo, MessageModel, RoomModel, UserModel} from "../../types";
   import {globalLogger, ws} from "../../utils/singletons";
   import {encodeMessage} from '../../utils/htmlEncoder';
+  import ChatMessage from './ChatMessage.vue';
 
-  @Component
+  @Component({components: {ChatMessage}})
   export default class ChatBox extends Vue {
     @Prop() roomId: number;
-    @State allUsers: { [id: number]: UserModel };
-    @State userInfo: CurrentUserInfo;
     @Prop() room: RoomModel;
     @Getter maxId;
+    @Getter messagesFields;
+
     showSearch: boolean = false;
     loading: boolean = false;
     $refs: {
       chatbox: HTMLElement
     };
 
-    getTime(timeMillis: number) {
-      let date = new Date(timeMillis);
-      return [this.sliceZero(date.getHours()), this.sliceZero(date.getMinutes()), this.sliceZero(date.getSeconds())].join(':');
+    get messages() {
+      globalLogger.debug("Reevaluating messages")();
+      let newArray = [];
+      let dates = {};
+      this.room.messages.forEach(m => {
+        let d = new Date(m.time).toDateString();
+        if (!dates[d]) {
+          dates[d] = true;
+          newArray.push({fieldDay: d});
+        }
+        newArray.push(m);
+      });
+      return newArray;
     }
 
     onScroll(e) {
@@ -52,18 +64,6 @@
       }
     }
 
-    encodeMessage(message: MessageModel) {
-      return encodeMessage(message);
-    }
-
-    getClass(message: MessageModel) {
-      return message.userId === this.userInfo.userId ? "message-self" : "message-others";
-    }
-
-    sliceZero(number: number, count: number = -2) {
-      return String("00" + number).slice(count);
-    }
-
   }
 </script>
 
@@ -72,27 +72,6 @@
   $img-path: "../../assets/img"
   @import "partials/mixins"
   @import "partials/abstract_classes"
-
-  .message-header
-    font-weight: bold
-
-  .color-lor
-    .message-others .message-header
-      color: #729fcf
-    .message-self .message-header
-      color: #e29722
-    .message-system .message-header
-      color: #9DD3DD
-  .color-reg
-    .message-others .message-header
-      color: #729fcf
-    .message-self .message-header
-      color: #e29722
-    .message-system .message-header
-      color: #84B7C0
-  .color-white
-    .message-others
-      background-color: white
 
   .holder
     height: 100%
@@ -128,94 +107,34 @@
     font-size: 18px
     @include flex(1) // Fix Safari's 0 height
 
-    /deep/ .quote
-      border-left: 5px solid #4d4d4d
-      padding-left: 5px
-      margin: 5px
-      span
-        font-weight: bold
-
     &:focus
       outline: none
-    a:hover
-      text-decoration: underline
+
     &.display-search-only
       >:not(.filter-search)
         display: none
 
-    /deep/ pre
-      margin: 10px
-      max-width: calc(100% - 15px)
-      overflow-x: auto
 
-    @mixin margin-img
-      margin: 5px 0 0 15px
-    @mixin margin-img-def
-      max-width: calc(100% - 25px)
-      max-height: 400px
-      display: block
+  fieldset
+    border-top: 1px solid #e8e8e8
+    border-bottom: none
+    border-left: none
+    border-right: none
+    display: block
+    text-align: center
+    padding: 0
+    margin-left: 3px
+    margin-right: 10px
 
-    /deep/ .video-player-ready
-      border: none
-      @include margin-img-def
-      width: 500px
-      height: 350px
-      @include margin-img
+    legend
+      padding: 0 10px
+      font-weight: bold
 
-    %img-play-chat
-      @extend %user-select-none
-      display: block
-      @include margin-img
-      > div
-        position: relative
-        display: inline-block
-        zoom: 1
-        &:not(:hover)
-          -webkit-filter: brightness(90%)
+  .color-lor fieldset legend
+    color: #9DD3DD
 
-        img
-          @include margin-img-def
-        .icon-youtube-play
-          position: absolute
-          z-index: 13
-          top: 50%
-          left: 50%
-          margin-top: -50px
-          margin-left: -55px
-          font-size: 50px
-          color: black
-          height: 100px
-          width: 100px
-          @media screen and (max-width: $collapse-width)
-            margin-top: -35px
-            margin-left: -45px
-            height: 70px
-            width: 70px
-    /deep/ .youtube-player
-      @extend %img-play-chat
-      @extend %img-play
-    /deep/ .video-player
-      @extend %img-play-chat
-      @extend %img-play
+  .color-reg fieldset legend
+    color: #9DD3DD
 
-    /deep/  .giphy
-      position: relative
-      img
-        @include margin-img-def
-        @include margin-img
-      &:not(:hover) .giphy_hover
-        display: none
-      .giphy_hover
-        bottom: 5px
-        position: absolute
-        left: 20px
-        width: 100px
-        height: 36px
 
-    .B4j2ContentEditableImg
-      @include margin-img-def
-      @include margin-img
-    p
-      margin-top: 0.8em
-      margin-bottom: 0.8em
 </style>

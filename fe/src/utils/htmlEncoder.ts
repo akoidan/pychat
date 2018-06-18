@@ -44,6 +44,7 @@ const patterns = [
 ];
 
 
+
 const replaceHtmlRegex = new RegExp('[' + Object.keys(escapeMap).join('') + ']', 'g');
 
 function encodeHTML(html: string) {
@@ -64,6 +65,7 @@ export function encodeSmileys(html) {
 }
 
 export function encodeMessage(data: MessageModel) {
+  globalLogger.debug('Encoding message {}', data)();
   if (data.giphy) {
     return `<div class="giphy"><img src='${data.giphy}' /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>`;
   } else {
