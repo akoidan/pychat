@@ -50,7 +50,7 @@ const patterns = [
 
 const replaceHtmlRegex = new RegExp('[' + Object.keys(escapeMap).join('') + ']', 'g');
 
-function encodeHTML(html: string) {
+export function encodeHTML(html: string) {
   return html.replace(replaceHtmlRegex, s => escapeMap[s]);
 }
 

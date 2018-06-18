@@ -141,7 +141,8 @@ export default class ChannelsHandler implements MessageHandler {
     if (!this.ws.isWsOpen()) {
       this.store.dispatch('growlError', `Can't send message, no internet connection`);
     }
-    let isEdit = this.store.state.editedMessageid;
+    let em = this.store.state.editedMessage;
+    let isEdit = em && em.isEditingNow ? em.messageId : null;
     let currSymbol = '\u3500'; // it's gonna increase in getPastedImage
     let editedMessage = this.store.state.rooms[roomId].messages.find(a => a.id === isEdit);
     if (isEdit && editedMessage) {
@@ -246,5 +247,6 @@ export default class ChannelsHandler implements MessageHandler {
       alert('oops');
     }
   }
+
 
 }

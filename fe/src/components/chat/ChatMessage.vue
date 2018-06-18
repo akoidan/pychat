@@ -1,18 +1,27 @@
 <template>
   <p :class="getClass(message)">
+     <span v-show="editedMessage && editedMessage.messageId === message.id">
+       <div class="icons">
+          <i class="icon-pencil" @click="m2EditMessage"></i>
+          <i class="icon-trash-circled" @click="m2DeleteMessage"></i>
+          <i class="icon-cancel" @click="m2Close"></i>
+       </div>
+    </span>
       <span class="message-header">
         <span class="timeMess">({{getTime(message.time)}})</span>
         <span>{{allUsers[message.userId].user}}</span>: </span>
-    <span class="message-text-style" v-html="encoded" ref="content"></span>
+    <span class="message-text-style" v-html="encoded" ref="content" @contextmenu="contextmenu"></span>
   </p>
 </template>
 <script lang="ts">
-  import {Getter, State} from "vuex-class";
+  import {Getter, State, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfo, MessageModel, RoomModel, UserModel} from "../../types";
-  import {globalLogger, ws} from "../../utils/singletons";
-  import {encodeMessage, highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
+  import {channelsHandler, globalLogger, ws} from "../../utils/singletons";
+  import {encodeHTML, encodeMessage, highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
 
+
+  const ONE_DAY = 24 * 60 * 60 * 1000;
 
   @Component
   export default class ChatMessage extends Vue {
@@ -20,6 +29,9 @@
     @State userInfo: CurrentUserInfo;
     @Prop() message: MessageModel;
     @State allUsers: { [id: number]: UserModel };
+    @State editedMessage;
+    @Mutation setEditedMessage;
+
 
     $refs: {
       content: HTMLElement
@@ -27,11 +39,34 @@
 
     getTime(timeMillis: number) {
       let date = new Date(timeMillis);
-      return [this.sliceZero(date.getHours()), this.sliceZero(date.getMinutes()), this.sliceZero(date.getSeconds())].join(':');
+      return [this.sliceZero(date.getHours()), this.sliceZero(date.getMinutes()), this.sliceZero(date.getSeconds())].join(":");
     }
 
     get encoded() {
-      return encodeMessage(this.message);
+      return this.message.content ? encodeMessage(this.message) : encodeHTML("This message has been removed");
+    }
+
+    m2Close() {
+      this.setEditedMessage(null);
+    }
+
+    m2DeleteMessage() {
+      ws.sendDeleteMessage(this.message.id);
+      this.setEditedMessage(null);
+    }
+
+    m2EditMessage() {
+      this.setEditedMessage({messageId: this.message.id, isEditingNow: true});
+    }
+
+    contextmenu(event) {
+      if (!this.message.deleted && this.isSelf && this.message.time + ONE_DAY > Date.now()) {
+        this.setEditedMessage(null);
+        event.preventDefault();
+        event.stopPropagation();
+        this.setEditedMessage({messageId: this.message.id, isEditingNow: false});
+      }
+      globalLogger.debug("Context menu for {}", event.target)();
     }
 
     updated() {
@@ -60,7 +95,18 @@
     }
 
     getClass(message: MessageModel) {
-      return message.userId === this.userInfo.userId ? "message-self" : "message-others";
+      let strings = [this.isSelf ? "message-self" : "message-others"];
+      if (message.deleted) {
+        strings.push('removed-message');
+      }
+      if (this.isSelf) {
+        strings.push('highLightMessage');
+      }
+      return strings;
+    }
+
+    get isSelf() {
+      return this.message.userId === this.userInfo.userId;
     }
 
     sliceZero(number: number, count: number = -2) {
@@ -71,20 +117,37 @@
 
 <style lang="sass" scoped>
 
+  .icons
+    position: absolute
+    right: 0
+    top: 6px
+    font-size: 25px
+    > *
+      padding: 0 5px
+
+
   $img-path: "../../assets/img"
   @import "partials/mixins"
   @import "partials/abstract_classes"
 
-
-
   @mixin margin-img
     margin: 5px 0 0 15px
+
   @mixin margin-img-def
     max-width: calc(100% - 25px)
     max-height: 400px
     display: block
 
+  .highLightMessage
+    border: 1px solid grey
+    border-radius: 3px
+    margin-right: 6px
+    padding: 10px 150px 10px 10px
 
+
+  .removed-message .message-text-style
+    color: #5d5d5d
+    text-decoration: line-through
 
   %img-play-chat
     @extend %user-select-none
@@ -115,7 +178,6 @@
           margin-left: -45px
           height: 70px
           width: 70px
-
 
   .message-text-style
 
@@ -155,8 +217,7 @@
       height: 350px
       @include margin-img
 
-
-    /deep/  .giphy
+    /deep/ .giphy
       position: relative
       img
         @include margin-img-def
@@ -180,7 +241,12 @@
   .message-header
     font-weight: bold
 
+  .message-self, .message-others
+    position: relative
+
   .color-lor
+    .icons
+      color: grey
     @import "~highlightjs/styles/railscasts.css"
     .message-others .message-header
       color: #729fcf
@@ -188,7 +254,11 @@
       color: #e29722
     .message-system .message-header
       color: #9DD3DD
+
   .color-reg
+    .icons > *
+      cursor: pointer
+      @include hover-click(#bdbdce)
     @import "~highlightjs/styles/railscasts.css"
     .message-others .message-header
       color: #729fcf
@@ -196,7 +266,13 @@
       color: #e29722
     .message-system .message-header
       color: #84B7C0
+
   .color-white
+    .icons
+      color: black
+    .highLightMessage
+      border: 1px solid #3f3f3f
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5), 0 3px 10px 0 rgba(0,0,0,0.5)
     @import "~highlightjs/styles/railscasts.css"
     .message-others
       background-color: white

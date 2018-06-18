@@ -96,11 +96,16 @@ export interface CurrentUserInfo {
   userId: number;
 }
 
+export interface EditingMessage {
+  messageId: number;
+  isEditingNow: boolean;
+}
+
 export interface RootState {
   isOnline: boolean;
   growls: GrowlModel[];
   theme: string;
-  editedMessageid: number;
+  editedMessage: EditingMessage;
   activeRoomId: number;
   userInfo: CurrentUserInfo;
   allUsers: { [id: number]: UserModel };

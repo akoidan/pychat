@@ -10,7 +10,7 @@ window.addEventListener('focus', ws.pingServer.bind(ws));
 
 window.onerror = function (msg, url, linenumber, column, errorObj) {
   let message = `Error occurred in ${url}:${linenumber}\n${msg}`;
-  if (!!this.store.state.userInfo || this.store.state.userInfo.sendLogs) {
+  if (!!store.state.userInfo || store.state.userInfo.sendLogs) {
     api.sendLogs(`${url}:${linenumber}:${column || '?'}\n${msg}\n\nOBJ:  ${errorObj || '?'}`);
   }
   store.dispatch('growlError', message);

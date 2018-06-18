@@ -203,6 +203,14 @@ export class WsHandler implements MessageHandler {
     });
   }
 
+  public sendDeleteMessage(id: number) {
+    this.sendToServer({
+      id,
+      action: 'editMessage',
+      content: null
+    });
+  }
+
   public sendSendMessage(content: string, roomId: number, files: any[]) {
     this.sendToServer({
       files,
@@ -211,7 +219,6 @@ export class WsHandler implements MessageHandler {
       roomId
     });
   }
-
 
   public sendLoadMessages(roomId: number, headerId: number, count: number, cb: Function) {
     this.sendToServer({

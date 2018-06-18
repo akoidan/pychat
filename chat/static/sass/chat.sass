@@ -17,25 +17,7 @@
 	padding: 5px
 
 
-.removed-message
-	.message-text-style
-		color: #5d5d5d
-		text-decoration: line-through
 
-.context-menu
-	z-index: 3
-	font-size: 16px
-	border: $user-context-border
-	li
-		padding: 2px 5px
-		&:hover
-			cursor: pointer
-			border-radius: 3px
-
-#m2Message
-	@extend .context-menu
-	border-radius: 3px
-	position: fixed
 
 #user-context-menu
 	@extend .context-menu
@@ -670,11 +652,6 @@
 		position: absolute
 		font-size: 10px
 		color: grey
-
-.highLightMessage
-	border: 1px solid grey
-	border-radius: 3px
-	padding: 3px
 
 .videoContainer
 	min-height: 100px

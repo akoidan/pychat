@@ -4,7 +4,7 @@ import {ActionContext} from 'vuex/types';
 
 Vue.use(Vuex);
 import {
-  CurrentUserInfo,
+  CurrentUserInfo, EditingMessage,
   GrowlModel,
   GrowlType,
   MessageDb,
@@ -33,7 +33,7 @@ const store: StoreOptions<RootState> = {
     userInfo: null,
     online: [],
     activeRoomId: 1,
-    editedMessageid: null
+    editedMessage: null,
   },
   getters: {
     maxId(state) {
@@ -44,6 +44,9 @@ const store: StoreOptions<RootState> = {
     },
   },
   mutations: {
+    setEditedMessage(state: RootState, editedMessage: EditingMessage) {
+      state.editedMessage = editedMessage;
+    },
     setMessages(state: RootState, {messages, roomId}) {
       state.rooms[roomId].messages = messages;
     },

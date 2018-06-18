@@ -48,3 +48,38 @@ $img-path: "../../img" !default
   padding-left: 10px
   font-size: 10px
   text-align: left
+
+
+%context-menu
+  z-index: 3
+  font-size: 16px
+  border: $user-context-border
+  li
+    padding: 2px 5px
+    &:hover
+      cursor: pointer
+      border-radius: 3px
+
+.color-lor %context-menu
+  @include box-shadow(3px 3px 3px rgba(6, 3, 8, 0.77))
+  background-color: #2C2B2A
+  color: #ACACAC
+  &:hover
+    color: #c7c7c7
+
+  li:hover
+    background-color: $color-lor-nav-color
+
+.color-reg %context-menu
+  @include box-shadow(3px 3px 3px rgba(6, 3, 8, 0.77))
+  @include linear-gradient(#214341 , #193237)
+  color: #ACACAC
+  &:hover
+    color: #c7c7c7
+  li:hover
+    background-color: #0F201F
+
+.color-white
+  color: #50547b
+  background-color: #f2fbff
+  border: 1px solid #50547b
