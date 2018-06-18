@@ -2,6 +2,7 @@
 @import "themes/mixin-lor"
 @import "themes/mixin-white"
 
+$img-path: "../../img" !default
 
 %i
   position: absolute
@@ -17,6 +18,12 @@
   &.warn
     color: #6D6B2C
 
+%img-play > div
+  &:not(:hover) .icon-youtube-play
+    background: url('#{$img-path}/icon-play-black.svg') no-repeat center
+  &:hover .icon-youtube-play
+    background: url('#{$img-path}/icon-play-red.svg') no-repeat center
+  background: black
 
 %img
   margin-top: -17px

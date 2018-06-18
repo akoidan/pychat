@@ -1,6 +1,6 @@
 import {globalLogger} from './singletons';
 import smileys from '../assets/smileys/info.json';
-import {SmileyStructure} from '../types';
+import {MessageModel, SmileyStructure} from '../types';
 import {PASTED_IMG_CLASS} from './consts';
 
 const smileysTabNames = Object.keys(smileys);
@@ -63,7 +63,7 @@ export function encodeSmileys(html) {
   return html.replace(smileUnicodeRegex, c => getSmileyHtml(c));
 }
 
-export function encodeMessage(data) {
+export function encodeMessage(data: MessageModel) {
   if (data.giphy) {
     return `<div class="giphy"><img src='${data.giphy}' /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>`;
   } else {

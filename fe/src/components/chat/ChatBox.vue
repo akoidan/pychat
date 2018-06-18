@@ -10,7 +10,7 @@
       <span class="message-header">
         <span class="timeMess">({{getTime(message.time)}})</span>
         <span>{{allUsers[message.userId].user}}</span>: </span>
-        <span class="message-text-style">{{message.content}}</span></p>
+        <span class="message-text-style" v-html="encodeMessage(message)"></span></p>
     </div>
   </div>
 </template>
@@ -19,6 +19,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfo, MessageModel, RoomModel, UserModel} from "../../types";
   import {globalLogger, ws} from "../../utils/singletons";
+  import {encodeMessage} from '../../utils/htmlEncoder';
 
   @Component
   export default class ChatBox extends Vue {
@@ -39,7 +40,7 @@
     }
 
     onScroll(e) {
-      globalLogger.log("Handling scroll {}, scrollTop {}", e, this.$refs.chatbox.scrollTop)();
+      // globalLogger.debug("Handling scroll {}, scrollTop {}", e, this.$refs.chatbox.scrollTop)();
       if (!this.room.allLoaded
           && !this.loading
           && (e.detail < 0 || e.wheelDelta > 0)
@@ -49,6 +50,10 @@
           this.loading = false;
         });
       }
+    }
+
+    encodeMessage(message: MessageModel) {
+      return encodeMessage(message);
     }
 
     getClass(message: MessageModel) {
@@ -64,7 +69,9 @@
 
 <style lang="sass" scoped>
 
+  $img-path: "../../assets/img"
   @import "partials/mixins"
+  @import "partials/abstract_classes"
 
   .message-header
     font-weight: bold
@@ -121,7 +128,7 @@
     font-size: 18px
     @include flex(1) // Fix Safari's 0 height
 
-    .quote
+    /deep/ .quote
       border-left: 5px solid #4d4d4d
       padding-left: 5px
       margin: 5px
@@ -136,7 +143,7 @@
       >:not(.filter-search)
         display: none
 
-    pre
+    /deep/ pre
       margin: 10px
       max-width: calc(100% - 15px)
       overflow-x: auto
@@ -148,14 +155,14 @@
       max-height: 400px
       display: block
 
-    .video-player-ready
+    /deep/ .video-player-ready
       border: none
       @include margin-img-def
       width: 500px
       height: 350px
       @include margin-img
 
-    %img-play
+    %img-play-chat
       @extend %user-select-none
       display: block
       @include margin-img
@@ -184,12 +191,14 @@
             margin-left: -45px
             height: 70px
             width: 70px
-    .youtube-player
+    /deep/ .youtube-player
+      @extend %img-play-chat
       @extend %img-play
-    .video-player
+    /deep/ .video-player
+      @extend %img-play-chat
       @extend %img-play
 
-    .giphy
+    /deep/  .giphy
       position: relative
       img
         @include margin-img-def
