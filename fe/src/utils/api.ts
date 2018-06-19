@@ -62,27 +62,26 @@ export default class Api {
     }, new FormData(form));
   }
 
-  public register(form: HTMLFormElement, cb: SingleParamCB<string>) {
+  public register(form: HTMLFormElement, cb: ErrorCB<string>) {
     this.xhr.doPost('/register', null, (res, error) => {
       if (error) {
-        cb(error);
+        cb(null, error);
         return;
       }
       try {
         let pr = JSON.parse(res);
         if (pr.session) {
-          localStorage.setItem('session_id', pr.session);
-          cb(null);
+          cb(pr.session, null);
         } else if (pr.error) {
-          cb(pr.error);
+          cb(null, pr.error);
         } else {
-          cb('Unknown error');
+          cb(null, 'Unknown error');
         }
       } catch (e) {
         if (res) {
-          cb(res);
+          cb(null, res);
         }  else {
-          cb('Unable to parse response from server');
+          cb(null, 'Unable to parse response from server');
         }
       }
     }, new FormData(form));

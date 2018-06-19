@@ -230,6 +230,7 @@ export class WsHandler implements MessageHandler {
 
 
   onWsClose(e) {
+    this.ws = null;
     this.setStatus(false);
     for (let k in this.progressInterval) {
       this.hideGrowlProgress(k);
@@ -273,6 +274,7 @@ export class WsHandler implements MessageHandler {
       this.ws.onclose = null;
       info.push('closed ws');
       this.ws.close();
+      this.ws = null;
     }
     this.logger.log('Finished ws: {}', info.join(', '))();
   }

@@ -33,12 +33,14 @@
 
 <script lang='ts'>
   import {Vue, Component, Prop, Watch} from "vue-property-decorator";
-  import {api, xhr} from "../../utils/singletons";
+  import {api, globalLogger, xhr} from "../../utils/singletons";
   import {Mutation, Action} from "vuex-class";
   import AppSubmit from "../ui/AppSubmit.vue"
   import RegisterFieldSet from './RegisterFieldSet.vue'
   import _ from 'lodash';
   import {IconColor} from '../../types';
+  import sessionHolder from '../../utils/sessionHolder';
+  import {login} from '../../utils/utils';
 
   @Component({components: {AppSubmit, RegisterFieldSet}})
   export default class SignUp extends Vue {
@@ -202,11 +204,9 @@
 
     register() {
       this.running = true;
-      api.register(this.$refs.form, error => {
+      api.register(this.$refs.form, (session, error )=> {
         this.running = false;
-        if (error) {
-          this.growlError(error);
-        }
+        login(session, error);
       })
     }
 

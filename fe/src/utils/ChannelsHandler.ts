@@ -216,6 +216,7 @@ export default class ChannelsHandler implements MessageHandler {
 
 
   public setRooms(rooms: {[id: string]: RoomDTO}) {
+    this.logger.debug('Setting rooms')();
     let dict: { [id: number]: RoomModel } = {};
     for (let id in rooms) {
       let oldRoom = this.store.state.rooms[id];

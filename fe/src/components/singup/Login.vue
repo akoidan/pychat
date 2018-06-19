@@ -28,6 +28,7 @@
   import {Action, Mutation} from "vuex-class";
   import {api, globalLogger} from "../../utils/singletons";
   import sessionHolder from '../../utils/sessionHolder';
+  import {login} from '../../utils/utils';
 
   @Component({components: {AppSubmit}})
   export default class Register extends Vue {
@@ -57,13 +58,7 @@
       this.running = true;
       api.login(this.$refs.form, (session, err) => {
         this.running = false;
-        if (err) {
-          this.growlError(err);
-        } else {
-          sessionHolder.session = session;
-          globalLogger.log("Proceeding to /")();
-          this.$router.push('/chat/1');
-        }
+        login(session, err);
       });
     }
 

@@ -6,7 +6,11 @@ import store from './store';
 import router from './router';
 
 
-window.addEventListener('focus', ws.pingServer.bind(ws));
+window.addEventListener('focus',  () => {
+  if (store.state.userInfo) {
+    ws.pingServer();
+  }
+});
 
 window.onerror = function (msg, url, linenumber, column, errorObj) {
   let message = `Error occurred in ${url}:${linenumber}\n${msg}`;
