@@ -166,10 +166,14 @@
     min-height: 0
     overflow-y: auto
     position: relative
+    @media screen and (max-width: $collapse-width)
+      flex-direction: column-reverse
 
 
   .chatBoxHolder
+    overflow-y: auto
     @include display-flex
+    flex: 1
     @include flex-direction(column)
     width: 100%
 

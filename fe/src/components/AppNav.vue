@@ -1,5 +1,5 @@
 <template>
-  <nav class="noSelection" :class="{expanded}" @click="toggle">
+  <nav :class="{expanded}" @click="toggle">
     <router-link to="/" class="icon-home" title="Go home"><span class="mText">Home</span></router-link>
     <i class="icon-brush" title="Draw an Image">
       <span class="mText">Painter</span>
@@ -71,6 +71,7 @@
   nav
     font-size: 26px
     margin: 0
+    flex-shrink: 0
     padding: 10px 4px 9px 10px
     @include display-flex
     align-items: center
