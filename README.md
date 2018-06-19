@@ -183,6 +183,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* Ability to select language to hightlight js
 * If self assigned certificate was used, mb add user an option to click on iframe or smth?
 * Giphy: The gif-picture won't change after editing and leaving it's name. But there are tons of other gifs under every tag. 
 * If user A was online in Brower BA and he didn't have any history, when he joins online from browser B and send the message, it won't appear on browser BA when he opens ba.
