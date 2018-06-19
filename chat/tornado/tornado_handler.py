@@ -76,7 +76,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				raise ValidationError('Access denied for channel {}. Allowed channels: {}'.format(channel, self.channels))
 			self.process_ws_message[message[VarNames.EVENT]](message)
 		except ValidationError as e:
-			error_message = self.default(str(e.message), Actions.GROWL_MESSAGE, HandlerNames.GROWL)
+			error_message = self.default(str(e.message), Actions.GROWL_MESSAGE, HandlerNames.WS)
 			self.ws_write(error_message)
 
 	def on_close(self):

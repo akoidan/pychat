@@ -74,7 +74,6 @@ class VarNames(object):
 
 class HandlerNames:
 	CHANNELS = 'channels'
-	GROWL = 'growl'
 	WEBRTC = 'webrtc'
 	PEER_CONNECTION = 'peerConnection'
 	WEBRTC_TRANSFER = 'webrtcTransfer'

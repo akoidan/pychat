@@ -1,12 +1,7 @@
-interface ObjectCb {
-  (t: object): void;
+interface SingleParamCB<T> {
+  (t: T): void;
 }
 
-interface NumberCb {
-  (t: number): void;
+interface ErrorCB <T> {
+  (a: T, t: string): void;
 }
-
-interface StringCb {
-  (t: string): void;
-}
-

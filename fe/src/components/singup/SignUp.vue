@@ -41,7 +41,7 @@
   import {IconColor} from '../../types';
 
   @Component({components: {AppSubmit, RegisterFieldSet}})
-  export default class Register extends Vue {
+  export default class SignUp extends Vue {
 
     @Prop() captcha_key: string;
     @Prop() oauth_token: string;

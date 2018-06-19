@@ -18,7 +18,11 @@
   })
   export default class App extends Vue {
     @State growls: string[];
-    @State theme;
+    @State userInfo;
+
+    get theme (){
+      return this.userInfo && this.userInfo.theme || 'color-reg';
+    }
 
     created() {
       globalLogger.log("rendering app")();

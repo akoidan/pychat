@@ -1,5 +1,5 @@
 <template>
-  <div class="holder">
+  <div class="holder" v-if="inited">
     <div class="wrapper">
       <div class="chatBoxHolder">
         <template  v-for="(room, id) in rooms">
@@ -16,6 +16,10 @@
       <i class="icon-smile" title="Add a smile :)" @click="showSmileys = !showSmileys"></i>
       <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage"></div>
     </div>
+  </div>
+  <div v-else class="spinner">
+    <div class="text">Connecting...</div>
+    <div class="sp"></div>
   </div>
 </template>
 
@@ -42,6 +46,10 @@
       userMessage: HTMLTextAreaElement;
       imgInput: HTMLInputElement;
     };
+
+    get inited() {
+      return Object.keys(this.rooms).length > 0;
+    }
 
     showSmileys: boolean = false;
 
@@ -91,6 +99,15 @@
   .usermsg /deep/ img[code]
     @extend %img-code
 
+  .spinner
+    display: flex
+    align-items: center
+    justify-content: center
+    .sp
+      @include spinner(10px, white)
+    .text
+      padding-right: 20px
+      font-size: 40px
 
   .userMessageWrapper
     padding: 8px

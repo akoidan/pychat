@@ -27,7 +27,6 @@ const store: StoreOptions<RootState> = {
     isOnline: true,
     growls: [],
     allUsers: {},
-    theme: 'color-reg',
     regHeader: null,
     rooms: {},
     userInfo: null,
@@ -60,6 +59,10 @@ const store: StoreOptions<RootState> = {
         }
       }
       room.messages.splice(i, 0, rm.message);
+    },
+    deleteMessage(state: RootState, rm: IaddMessage) {
+      let room = state.rooms[rm.roomId];
+      room.messages.splice(room.messages.indexOf(rm.message), 1);
     },
     setIsOnline(state: RootState, isOnline: boolean) {
       state.isOnline = isOnline;
@@ -120,13 +123,12 @@ const store: StoreOptions<RootState> = {
         context.commit('removeGrowl', growl);
       }, 4000);
     },
-    setOnline(context: State) {
-      context.commit('setIsOnline', true);
-    },
-    setOffline(context: State) {
-      context.commit('setIsOnline', false);
+    logout(context: State) {
+      context.commit('setUserInfo', null);
+      context.commit('setEditedMessage', null);
+      context.commit('setRooms', {});
     }
-  }
+  },
 };
 
 

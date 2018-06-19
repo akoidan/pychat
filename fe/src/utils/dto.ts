@@ -44,7 +44,8 @@ export interface LoadMessages extends DefaultMessage {
 }
 
 
-export interface PrintMessage extends DefaultMessage {
+
+interface ModifyMessage {
   edited: number;
   messageId: number;
   userId: number;
@@ -53,6 +54,12 @@ export interface PrintMessage extends DefaultMessage {
   roomId: number;
   id: number;
   deleted: boolean;
+}
+
+export interface DeleteMessage extends ModifyMessage {
+}
+
+export interface PrintMessage extends ModifyMessage {
   files: Map<number, FileModel>;
   symbol: string;
   giphy: string;

@@ -39,12 +39,12 @@ export  interface MessageModel {
 
 
 export  interface IStorage {
-  getIds(cb: ObjectCb);
+  getIds(cb: SingleParamCB<object>);
   saveMessages(messages: MessageModel[]);
   deleteMessage(id: number);
   clearStorage();
   connect(cb: Function);
-  getRoomHeaderId(roomId: number, cb: NumberCb);
+  getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
   setRoomHeaderId(roomId: number, value: number);
 }
 
@@ -104,7 +104,6 @@ export interface EditingMessage {
 export interface RootState {
   isOnline: boolean;
   growls: GrowlModel[];
-  theme: string;
   editedMessage: EditingMessage;
   activeRoomId: number;
   userInfo: CurrentUserInfo;

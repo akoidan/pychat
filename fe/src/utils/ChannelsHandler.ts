@@ -2,7 +2,7 @@ import {Logger} from './Logger';
 import {MessageModel, RoomModel, RootState, UserModel} from '../types';
 import {
   AddOnlineUser,
-  DefaultMessage,
+  DefaultMessage, DeleteMessage,
   LoadMessages,
   MessageHandler,
   PrintMessage,
@@ -136,10 +136,19 @@ export default class ChannelsHandler implements MessageHandler {
     }
   }
 
+  handleDeleteMessage(message: DeleteMessage) {
+    let r: RoomModel = this.store.state.rooms[message.roomId];
+    let storeMessage = r.messages.find(m => m.id === message.id);
+    if (storeMessage) {
+      this.store.commit('deleteMessage', storeMessage);
+    }
+  }
+
 
   public sendMessage(roomId, userMessage: HTMLTextAreaElement) {
     if (!this.ws.isWsOpen()) {
-      this.store.dispatch('growlError', `Can't send message, no internet connection`);
+      this.store.dispatch('growlError', `Can't send message, can't connect to the server`);
+      return;
     }
     let em = this.store.state.editedMessage;
     let isEdit = em && em.isEditingNow ? em.messageId : null;
@@ -241,10 +250,10 @@ export default class ChannelsHandler implements MessageHandler {
 
 
   public handle(message: DefaultMessage) {
-    if (message.handler === 'channels') {
+    if (this[`handle${message.action}`]) {
       this[`handle${message.action}`](message);
     } else if (message.handler === 'chat') {
-      alert('oops');
+      throw `Can't find handler for ${message.action} for message ${JSON.stringify(message)}`;
     }
   }
 

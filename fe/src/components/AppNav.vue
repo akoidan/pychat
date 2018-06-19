@@ -12,23 +12,29 @@
     <i class="icon-doc-inv"><span class="mText">Send File</span></i>
     <i class="icon-popup"><span class="mText">Minimized Windows</span></i>
     <a href="https://github.com/Deathangel908/pychat" target="_blank" class="icon-github"><span class="mText">Github</span></a>
-    <div class="navMenu">
-      <span class="onlineStatus" :title="title" :class="{online: isOnline, offline: !isOnline}">●</span>
-      <span class="username"><b>{{userInfo.user}}</b></span>
-      <i class="icon-menu" title="Open Menu"></i>
-    </div>
-    <router-link to="/profile" class="icon-wrench" title="Settings"><span class="mText">Profile</span></router-link>
-    <i title="Sign out" class="icon-sign-out"><span class="mText">Sign out</span></i>
+    <template v-if="userInfo">
+      <div class="navMenu">
+        <span class="onlineStatus" :title="title" :class="{online: isOnline, offline: !isOnline}">●</span>
+        <span class="username"><b>{{userInfo.user}}</b></span>
+        <i class="icon-menu" title="Open Menu"></i>
+      </div>
+      <router-link to="/profile" class="icon-wrench" title="Settings"><span class="mText">Profile</span></router-link>
+      <i title="Sign out" class="icon-sign-out" @click="signOut"><span class="mText">Sign out</span></i>
+    </template>
   </nav>
 </template>
 <script lang="ts">
   import {State, Action, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
+  import {api, ws} from "../utils/singletons";
+  import sessionHolder from "../utils/sessionHolder";
 
   @Component
   export default class App extends Vue {
     @State isOnline;
     @State userInfo;
+    @Action growlError;
+    @Action logout;
     expanded: boolean = false;
 
     get title() {
@@ -37,6 +43,18 @@
 
     toggle() {
       this.expanded = !this.expanded;
+    }
+
+    signOut() {
+      api.logout(e => {
+        if (e) {
+          this.growlError(e);
+        }
+        this.$router.push('/auth/login');
+        ws.stopListening();
+        this.logout();
+        sessionHolder.session = '';
+      });
     }
   }
 </script>

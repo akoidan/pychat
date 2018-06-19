@@ -19,6 +19,9 @@
 	transition: $text
 
 @mixin spinner($size, $color)
+	@-webkit-keyframes pychat-rotate
+		to
+			-webkit-transform: rotate(360deg)
 	width: $size * 7
 	height: $size * 7
 	-webkit-animation: pychat-rotate 1s infinite linear

@@ -8,7 +8,7 @@
   },
   "scripts": {
     "prod": "webpack --progress --mode production ",
-    "dev": "webpack-dev-server --mode development --hot"
+    "dev": "webpack-dev-server --mode development --hot --https "
   },
   "repository": {
     "type": "git",

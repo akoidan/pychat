@@ -105,7 +105,7 @@ export default class Xhr {
     }
   }
 
-  doPost(url: string, params: object, callback: Function, formData?: FormData, isJsonEncoded?: boolean, process?: Function) {
+  doPost(url: string, params: object, callback: ErrorCB<string>, formData?: FormData, isJsonEncoded?: boolean, process?: Function) {
     let r = new XMLHttpRequest();
     r.onreadystatechange = () => {
       if (r.readyState === 4) {
@@ -117,7 +117,7 @@ export default class Xhr {
         if (typeof(callback) === 'function') {
           let error;
           if (r.status === 0) {
-            error = 'No internet connection';
+            error = `Can't connect to the server`;
           } else if (r.status === 200) {
             error = null;
           } else {

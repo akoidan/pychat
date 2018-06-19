@@ -16,7 +16,7 @@
 <script lang="ts">
   import {Getter, State, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {CurrentUserInfo, MessageModel, RoomModel, UserModel} from "../../types";
+  import {CurrentUserInfo, EditingMessage, MessageModel, RoomModel, UserModel} from "../../types";
   import {channelsHandler, globalLogger, ws} from "../../utils/singletons";
   import {encodeHTML, encodeMessage, highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
 
@@ -29,7 +29,7 @@
     @State userInfo: CurrentUserInfo;
     @Prop() message: MessageModel;
     @State allUsers: { [id: number]: UserModel };
-    @State editedMessage;
+    @State editedMessage : EditingMessage;
     @Mutation setEditedMessage;
 
 
@@ -99,7 +99,7 @@
       if (message.deleted) {
         strings.push('removed-message');
       }
-      if (this.isSelf) {
+      if (this.isEditing) {
         strings.push('highLightMessage');
       }
       return strings;
@@ -109,12 +109,15 @@
       return this.message.userId === this.userInfo.userId;
     }
 
+    get isEditing() {
+      return this.editedMessage && this.editedMessage.messageId === this.message.id;
+    }
+
     sliceZero(number: number, count: number = -2) {
       return String("00" + number).slice(count);
     }
   }
 </script>
-
 <style lang="sass" scoped>
 
   .icons
@@ -234,9 +237,9 @@
     .B4j2ContentEditableImg
       @include margin-img-def
       @include margin-img
-    p
-      margin-top: 0.8em
-      margin-bottom: 0.8em
+  p
+    margin-top: 0.8em
+    margin-bottom: 0.8em
 
   .message-header
     font-weight: bold
@@ -244,10 +247,14 @@
   .message-self, .message-others
     position: relative
 
+  .color-lor p /deep/, .color-reg p /deep/
+    @import "~highlightjs/styles/railscasts"
+  .color-white p /deep/
+    @import "~highlightjs/styles/default"
+
   .color-lor
     .icons
       color: grey
-    @import "~highlightjs/styles/railscasts.css"
     .message-others .message-header
       color: #729fcf
     .message-self .message-header
@@ -259,7 +266,6 @@
     .icons > *
       cursor: pointer
       @include hover-click(#bdbdce)
-    @import "~highlightjs/styles/railscasts.css"
     .message-others .message-header
       color: #729fcf
     .message-self .message-header
@@ -273,7 +279,6 @@
     .highLightMessage
       border: 1px solid #3f3f3f
       box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5), 0 3px 10px 0 rgba(0,0,0,0.5)
-    @import "~highlightjs/styles/railscasts.css"
     .message-others
       background-color: white
 </style>

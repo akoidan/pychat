@@ -219,6 +219,7 @@ def home(request):
 
 
 @login_required_no_redirect(True)
+@require_http_methods(['POST'])
 def logout(request):
 	"""
 	POST. Logs out into system.

@@ -1,7 +1,9 @@
 <template>
-  <div class="reg-log-container">
-    <router-link :to="{name: 'register'}" class="signLogBtn f">Sign Up</router-link>
-    <router-link :to="{name: 'login'}" class="signLogBtn s">Log In</router-link>
+  <div class="reg-log-container body">
+    <div class="topBtns">
+      <router-link to="/auth/sign-up">Sign Up</router-link>
+      <router-link to="/auth/login">Log In</router-link>
+    </div>
     <h1>{{regHeader}}</h1>
     <router-view></router-view>
   </div>
@@ -104,19 +106,18 @@
     flex-basis: 300px
     margin: auto
 
-  .signLogBtn
-    @extend %top-btn-register
-    &:not(.router-link-active)
-      @include linear-gradient-hover($grayish-green, #434343, 15px, 12px, #434343)
+  .topBtns
+    display: flex
+    flex-direction: row
+    > *
       @extend %top-btn-register
-      border-radius: 0
-    width: calc(50% - 26px)
-    text-align: center
-    display: inline-block
-  .f
-    margin-right: -2px
-  .s
-    margin-left: -2px
+      &:not(.router-link-active)
+        @include linear-gradient-hover($grayish-green, #434343, 15px, 12px, #434343)
+        @extend %top-btn-register
+        border-radius: 0
+      flex: 1
+      text-align: center
+
   .router-link-active
     @extend %cyan-btn
 

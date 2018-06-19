@@ -8,7 +8,7 @@
       <i class='icon-key'></i>
       <input type='password' name='password' class="input" placeholder='Password' required/>
     </div>
-      <router-link class='forg-pass' :to="{name: 'reset-password'}">Forgot Password?</router-link>
+      <router-link class='forg-pass' to="/auth/reset-password">Forgot Password?</router-link>
     <div>
       <button v-if='oauth_token' class='g-icon lor-btn' title='Sign in using google account'
               onclick='googleLogin'>Via Google
@@ -26,14 +26,15 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from "../ui/AppSubmit.vue"
   import {Action, Mutation} from "vuex-class";
-  import {api} from '../../utils/singletons';
+  import {api, globalLogger} from "../../utils/singletons";
+  import sessionHolder from '../../utils/sessionHolder';
 
   @Component({components: {AppSubmit}})
   export default class Register extends Vue {
 
     $refs: {
       form: HTMLFormElement
-    }
+    };
 
     @Prop() captcha_key: String;
     @Prop() oauth_token: String;
@@ -54,12 +55,14 @@
 
     login() {
       this.running = true;
-      api.login(this.$refs.form, err => {
+      api.login(this.$refs.form, (session, err) => {
         this.running = false;
         if (err) {
           this.growlError(err);
         } else {
-          alert('login')
+          sessionHolder.session = session;
+          globalLogger.log("Proceeding to /")();
+          this.$router.push('/chat/1');
         }
       });
     }

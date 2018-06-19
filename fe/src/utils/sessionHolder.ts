@@ -7,6 +7,7 @@ class SessionHolderImpl {
   get session(): string {
    return localStorage.getItem('session_id');
   }
+
 }
 
 export default new SessionHolderImpl() as SessionHolder;

@@ -39,7 +39,9 @@
 
     beforeUpdate() {
       let el = this.$refs.chatbox;
-      this.scrollBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 100;
+      if (el) { // checked, el could be missing
+        this.scrollBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 100;
+      }
     }
 
     updated() {

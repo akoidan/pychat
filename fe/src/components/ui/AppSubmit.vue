@@ -26,6 +26,6 @@
   .spinner
     display: inline-block
     margin: -4px 10px -4px 10px
-    @include spinner(3px, solid black)
+    @include spinner(3px, black)
 
 </style>

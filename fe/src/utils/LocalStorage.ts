@@ -25,7 +25,7 @@ export default class LocalStorage implements IStorage {
     }
   }
 
-  public getIds(cb: ObjectCb) {
+  public getIds(cb: SingleParamCB<object>) {
     cb(this.cache);
   }
 
@@ -55,7 +55,7 @@ export default class LocalStorage implements IStorage {
     this.cache = {};
   }
 
-  public getRoomHeaderId(roomId: number, cb: NumberCb) {
+  public getRoomHeaderId(roomId: number, cb: SingleParamCB<number>) {
     cb(this.cache[roomId] ? this.cache[roomId].h : null);
   }
 

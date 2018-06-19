@@ -1,6 +1,6 @@
 <template>
   <div class="body flex">
-    <app-nav v-if="userInfo"/>
+    <app-nav/>
     <router-view class="body"/>
   </div>
 </template>
@@ -14,8 +14,6 @@
     components: {AppNav}
   })
   export default class MainPage extends Vue {
-
-    @State userInfo;
 
     created() {
       ws.startListening();

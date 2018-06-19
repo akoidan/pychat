@@ -8,16 +8,19 @@ import ChannelsPage from './components/chat/MainPage.vue';
 import SignupPage from './components/singup/MainPage.vue';
 import ResetPassword from './components/singup/ResetPassword.vue';
 import Login from './components/singup/Login.vue';
-import Register from './components/singup/Register.vue';
+import SignUp from './components/singup/SignUp.vue';
 import ApplyResetPassword from './components/singup/ApplyResetPassword.vue';
+import {globalLogger} from './utils/singletons';
 
 Vue.use(VueRouter);
-const logger = loggerFactory.getLogger('ROUTE', 'color: black;');
 const router = new VueRouter({
   routes: [
     {
       path: '',
       component: MainPage,
+      meta: {
+        loginRequired: true
+      },
       children: [
         {
           path: '',
@@ -25,13 +28,19 @@ const router = new VueRouter({
         },
         {
           component: ChannelsPage,
-          path: '/chat/:id',
-          name: 'chat'
+          beforeEnter: (to, from, next) => {
+            store.commit('setActiveRoomId', parseInt(to.params.id));
+            next();
+          },
+          path: '/chat/:id'
         }
       ]
     }, {
       path: '/auth',
       component: SignupPage,
+      meta: {
+        loginRequired: false
+      },
       name: 'auth',
       children: [
         {
@@ -40,42 +49,28 @@ const router = new VueRouter({
         },
         {
           path: 'login',
-          component: Login,
-          name: 'login',
+          component: Login
         },
         {
           path: 'reset-password',
-          component: ResetPassword,
-          name: 'reset-password',
+          component: ResetPassword
         },
         {
           path: 'sign-up',
-          component: Register,
-          name: 'register',
+          component: SignUp,
         },
         {
           path: 'proceed-reset-password',
-          component: ApplyResetPassword,
-          name: 'proceed-reset',
+          component: ApplyResetPassword
         }
       ]
-    }, {
-      path: '*',
-      beforeEnter: (to, from, next) => {
-        let session = sessionHolder.session;
-        logger.log('Entered invalid page, proceeding session {}', session)();
-        if (session) {
-          next('/chat/1');
-        } else {
-          next('/auth/login');
-        }
-      }
     }]
 });
 router.beforeEach((to, from, next) => {
-  if (to.name === 'chat') { // https://github.com/vuejs/vue-router/issues/1012
-    store.commit('setActiveRoomId', parseInt(to.params.id));
+  if (to.matched[0] && to.matched[0].meta && to.matched[0].meta.loginRequired && !sessionHolder.session) {
+    next('/auth/login');
+  } else {
+    next();
   }
-  next();
 });
 export default router;

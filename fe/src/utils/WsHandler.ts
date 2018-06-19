@@ -13,6 +13,7 @@ import {
 import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
 import {DefaultMessage, MessageHandler, RoomDTO} from './dto';
+import {logout} from './utils';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
@@ -33,7 +34,6 @@ interface AllHandlers {
   webrtc: MessageHandler;
   webrtcTransfer: MessageHandler;
   peerConnection: MessageHandler;
-  growl: MessageHandler;
 }
 export class WsHandler implements MessageHandler {
 
@@ -61,13 +61,7 @@ export class WsHandler implements MessageHandler {
       ws: this,
       webrtc: webRtcApi,
       webrtcTransfer: webRtcApi,
-      peerConnection: webRtcApi,
-      growl: {
-        handle: function (message) {
-          // alert(message.content);
-          // growlError(message.content);
-        }
-      }
+      peerConnection: webRtcApi
     };
   }
 
@@ -104,6 +98,10 @@ export class WsHandler implements MessageHandler {
     this.handlers.channels.setOnline(message.online);
     this.handlers.channels.setUsers(message.users);
     this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
+  }
+
+  handleGrowl() {
+    this.store.dispatch('growlError', 'asdf');
   }
 
   onWsMessage(message) {
@@ -239,10 +237,8 @@ export class WsHandler implements MessageHandler {
     let reason = e.reason || e;
     if (e.code === 403) {
       let message = `Server has forbidden request because '${reason}'. Logging out...`;
-      alert(message);
       this.logger.error('onWsClose {}', message)();
-      this.router.replace('/auth/login');
-      return;
+      logout(message);
     } else if (this.wsState === WsState.NOT_INITED) {
       alert('Can\'t establish connection with server');
       this.logger.error('Chat server is down because {}', reason)();
@@ -268,14 +264,17 @@ export class WsHandler implements MessageHandler {
   }
 
   public stopListening() {
-    this.logger.log('Finishing websocket')();
+    let info = [];
     if (this.listenWsTimeout) {
       this.listenWsTimeout = null;
+      info.push('purged timeout');
     }
     if (this.ws) {
       this.ws.onclose = null;
+      info.push('closed ws');
       this.ws.close();
     }
+    this.logger.log('Finished ws: {}', info.join(', '))();
   }
 
 
