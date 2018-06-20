@@ -1,5 +1,5 @@
 <template>
-  <div :class="theme" class="body">
+  <div class="body">
     <div class="growlHolder">
       <growl v-for="growl in growls" :growl="growl" :key="growl.id"></growl>
     </div>
@@ -20,10 +20,6 @@
     @State growls: string[];
     @State userInfo;
 
-    get theme (){
-      return this.userInfo && this.userInfo.theme || 'color-reg';
-    }
-
     created() {
       globalLogger.log("rendering app")();
     }
@@ -31,6 +27,8 @@
   }
 </script>
 <style lang="sass" scoped>
+  .body
+    height: 100%
   .growlHolder
     top: 10px
     min-width: 250px

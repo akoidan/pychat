@@ -1,5 +1,5 @@
 <template>
-  <div class="body flex">
+  <div class="flex">
     <app-nav v-show="showNav"/>
     <keep-alive>
       <router-view class="body"/>
@@ -33,10 +33,14 @@
   @import "partials/mixins"
   @import "partials/abstract_classes"
   .flex
+    height: 100%
     @include display-flex()
     flex-direction: column
 
   nav
     @extend %nav
+
+  .body
+    height: 100%
 
 </style>

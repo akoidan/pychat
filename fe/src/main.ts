@@ -11,6 +11,9 @@ window.addEventListener('focus',  () => {
     ws.pingServer();
   }
 });
+store.watch(s => s.userInfo && s.userInfo.theme || 'color-reg', (v, o) => {
+  document.body.parentElement.className = v;
+});
 
 window.onerror = function (msg, url, linenumber, column, errorObj) {
   let message = `Error occurred in ${url}:${linenumber}\n${msg}`;

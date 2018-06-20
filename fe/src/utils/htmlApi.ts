@@ -59,6 +59,10 @@ export function encodeHTML(html: string) {
 export function getSmileyPath(s: SmileyStructure) {
   return `/${s.src}`;
 }
+let uniqueId = 1;
+export function getUniqueId() {
+  return uniqueId++;
+}
 
 export function getSmileyHtml (symbol: string) {
   let smiley = codes[symbol];

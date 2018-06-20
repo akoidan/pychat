@@ -1,5 +1,5 @@
 <template>
-  <div class="reg-log-container body">
+  <div class="reg-log-container">
     <div class="topBtns">
       <router-link to="/auth/sign-up">Sign Up</router-link>
       <router-link to="/auth/login">Log In</router-link>

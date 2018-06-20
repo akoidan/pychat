@@ -212,3 +212,24 @@
 	scrollbar-3dlight-color: $ie-3dlight
 	scrollbar-highlight-color: $ie-highlight
 	scrollbar-arrow-color: $ie-arrow
+
+
+@mixin lor-button-style
+	color: $grayish-green
+	outline: none
+	border-radius: 3px
+	border: 1px solid transparent
+	&:not(:hover)
+		background-color: rgb(62, 65, 58)
+	&:hover
+		color: #000000
+		background: linear-gradient($grayish-green, #abbdab) repeat scroll 0 0 transparent
+		@include box-shadow($default-box-shadow)
+
+@mixin color-lor-submit
+	@include lor-button-style
+	padding: 10px 12px
+	font-size: 18px
+@mixin color-lor-btn
+	@include lor-button-style
+	padding: 6px 12px
