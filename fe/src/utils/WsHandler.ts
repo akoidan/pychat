@@ -1,41 +1,30 @@
-import {Logger} from './Logger';
+
 import {API_URL, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT, CONNECTION_RETRY_TIME, PING_CLOSE_JS_DELAY} from './consts';
 import {Store} from 'vuex';
 import {VueRouter} from 'vue-router/types/router';
-import {
-  CurrentUserInfo,
-  IStorage,
-  RoomModel,
-  RootState,
-  SessionHolder,
-  UserModel
-} from '../types';
+
 import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
-import {DefaultMessage, MessageHandler, RoomDTO} from './dto';
+import {DefaultMessage, RoomDTO, SetWsIdMessage} from './dto';
+import MesageHandler, {default as MessageHandler} from './MesageHandler';
 import {logout} from './utils';
+import {CurrentUserInfo, RootState, UserModel} from '../model';
+import {IStorage, Logger, SessionHolder} from '../types';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
 }
 
-interface SetWsIdMessage extends DefaultMessage {
-  rooms: { [id: number]: RoomDTO };
-  users: { [id: number]: UserModel };
-  online: number[];
-  opponentWsId: string;
-  userInfo: CurrentUserInfo;
-}
-
 interface AllHandlers {
   channels: ChannelsHandler;
-  chat: MessageHandler;
   ws: WsHandler;
   webrtc: MessageHandler;
   webrtcTransfer: MessageHandler;
   peerConnection: MessageHandler;
 }
-export class WsHandler implements MessageHandler {
+
+
+export class WsHandler extends MessageHandler {
 
   private logger: Logger;
   private pingTimeoutFunction;
@@ -48,8 +37,43 @@ export class WsHandler implements MessageHandler {
   private sessionHolder: SessionHolder;
   private listenWsTimeout: number;
   private callBacks: { [id: number]: Function } = {};
+  private handlers: AllHandlers;
+  private methodHandlers = {
+    growl() {
+      this.store.dispatch('growlError', 'asdf');
+    },
+    setWsId(message: SetWsIdMessage) {
+      this.wsConnectionId = message.opponentWsId;
+      this.store.commit('setUserInfo', message.userInfo);
+      this.handlers.channels.setRooms(message.rooms);
+      this.handlers.channels.setOnline(message.online);
+      this.handlers.channels.setUsers(message.users);
+      this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
+    },
+    ping(message) {
+      this.startNoPingTimeout();
+      this.sendToServer({action: 'pong', time: message.time});
+    },
+    pong() {
+      this.answerPong();
+    }
+  };
+
+  private answerPong() {
+    if (this.pingTimeoutFunction) {
+      this.logger.debug('Clearing pingTimeoutFunction')();
+      clearTimeout(this.pingTimeoutFunction);
+      this.pingTimeoutFunction = null;
+    }
+  }
+
+
+  protected getMethodHandlers() {
+    return this.methodHandlers;
+  }
 
   constructor(sessionHolder: SessionHolder, channelsHandler: ChannelsHandler, webRtcApi, storage: IStorage, store: Store<RootState>, router: VueRouter) {
+    super();
     this.logger = loggerFactory.getLogger('WS', 'color: green;');
     this.storage = storage;
     this.sessionHolder = sessionHolder;
@@ -57,7 +81,6 @@ export class WsHandler implements MessageHandler {
     this.router = router;
     this.handlers = {
       channels: channelsHandler,
-      chat: channelsHandler,
       ws: this,
       webrtc: webRtcApi,
       webrtcTransfer: webRtcApi,
@@ -85,24 +108,6 @@ export class WsHandler implements MessageHandler {
   private progressInterval = {};
   private wsConnectionId = '';
 
-  private handlers: AllHandlers;
-
-  public handle(message: DefaultMessage) {
-    this['handle' + message.action](message);
-  }
-
-  handlesetWsId(message: SetWsIdMessage) {
-    this.wsConnectionId = message.opponentWsId;
-    this.store.commit('setUserInfo', message.userInfo);
-    this.handlers.channels.setRooms(message.rooms);
-    this.handlers.channels.setOnline(message.online);
-    this.handlers.channels.setUsers(message.users);
-    this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
-  }
-
-  handleGrowl() {
-    this.store.dispatch('growlError', 'asdf');
-  }
 
   onWsMessage(message) {
     let jsonData = message.data;
@@ -154,9 +159,8 @@ export class WsHandler implements MessageHandler {
     let logEntry = jsonRequest.substring(0, 500);
     if (!this.isWsOpen()) {
       if (!skipGrowl) {
-        alert('Can\'t send message, because connection is lost :(');
+        this.store.dispatch('growlError', 'Can\'t send message, because connection is lost :(');
       }
-      this.logger.error('Web socket is closed. Can\'t send {}', logEntry)();
       return false;
     } else {
       this.logData('WS_OUT', objData, jsonRequest)();
@@ -328,14 +332,9 @@ export class WsHandler implements MessageHandler {
     }, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
   }
 
-  handleping(message) {
-    this.startNoPingTimeout();
-    this.sendToServer({action: 'pong', time: message.time});
-  }
-
   pingServer() {
     if (this.sendToServer({action: 'ping'}, true)) {
-      this.handlepong();
+      this.answerPong();
       this.pingTimeoutFunction = setTimeout(() => {
         this.logger.error('Force closing socket coz pong time out')();
         this.ws.close(1000, 'Ping timeout');
@@ -343,11 +342,4 @@ export class WsHandler implements MessageHandler {
     }
   }
 
-  handlepong() {
-    if (this.pingTimeoutFunction) {
-      this.logger.debug('Clearing pingTimeoutFunction')();
-      clearTimeout(this.pingTimeoutFunction);
-      this.pingTimeoutFunction = null;
-    }
-  }
 }

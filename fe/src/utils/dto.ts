@@ -1,13 +1,12 @@
-import {FileModel, MessageModel, RoomModel, SexModel, UserModel, VolumeLevelModel} from '../types';
+import {CurrentUserInfo, FileModel, MessageModel, RoomModel, SexModel, UserModel, VolumeLevelModel} from '../model';
+import MesageHandler from './MesageHandler';
+
 
 export interface DefaultMessage {
   action: string;
   handler: string;
 }
 
-export interface MessageHandler {
-  handle(message: DefaultMessage);
-}
 
 export interface RoomDTO {
   name: string;
@@ -16,6 +15,13 @@ export interface RoomDTO {
   volume: VolumeLevelModel;
 }
 
+export interface SetWsIdMessage extends MesageHandler {
+  rooms: { [id: number]: RoomDTO };
+  users: { [id: number]: UserModel };
+  online: number[];
+  opponentWsId: string;
+  userInfo: CurrentUserInfo;
+}
 
 interface ChangeUserOnline extends DefaultMessage {
   userId: number;
@@ -44,23 +50,19 @@ export interface LoadMessages extends DefaultMessage {
 }
 
 
-
-interface ModifyMessage {
+export interface DeleteMessage extends DefaultMessage{
+  roomId: number;
+  id: number;
   edited: number;
+}
+
+export interface EditMessage extends DeleteMessage {
   messageId: number;
   userId: number;
   content: string;
   time: number;
-  roomId: number;
-  id: number;
-  deleted: boolean;
-}
-
-export interface DeleteMessage extends ModifyMessage {
-}
-
-export interface PrintMessage extends ModifyMessage {
   files: Map<number, FileModel>;
   symbol: string;
   giphy: string;
+  deleted: boolean;
 }

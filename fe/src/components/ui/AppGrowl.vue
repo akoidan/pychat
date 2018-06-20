@@ -9,7 +9,7 @@
 
 <script lang='ts'>
   import {Vue, Component, Prop} from "vue-property-decorator";
-  import {GrowlModel, GrowlType} from "../../types";
+  import {GrowlModel, GrowlType} from "../../model";
   import {Mutation} from "vuex-class";
 
   @Component

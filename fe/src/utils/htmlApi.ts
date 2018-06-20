@@ -1,8 +1,10 @@
 import {globalLogger} from './singletons';
 import hljs from 'highlightjs';
 import smileys from '../assets/smileys/info.json';
-import {MessageModel, SmileyStructure} from '../types';
+
 import {API_URL_DEFAULT, PASTED_IMG_CLASS} from './consts';
+import {MessageDataEncode, SmileyStructure, UploadFile} from '../types';
+import {MessageModel} from '../model';
 
 const tmpCanvasContext = document.createElement('canvas').getContext('2d');
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -58,19 +60,26 @@ export function getSmileyPath(s: SmileyStructure) {
   return `/${s.src}`;
 }
 
-export function getSmileyHtml (code: string) {
-  let smiley = codes[code];
-  return `<img src="${getSmileyPath(smiley)}" code="${code}" alt="${smiley.alt}">`;
+export function getSmileyHtml (symbol: string) {
+  let smiley = codes[symbol];
+  return `<img src="${getSmileyPath(smiley)}" symbol="${symbol}" alt="${smiley.alt}">`;
 }
 
 
-function resolveUrl(src: string): string{
+function resolveUrl(src: string): string {
   return `${API_URL_DEFAULT}${src}`;
 }
 
 export function encodeSmileys(html: string): string {
   return html.replace(smileUnicodeRegex, c => getSmileyHtml(c));
 }
+
+export function encodeP(data: MessageModel) {
+  let html = encodeHTML(data.content);
+  html = encodeFiles(html, data.files);
+  return encodeSmileys(html);
+}
+
 
 export function encodeMessage(data: MessageModel) {
   globalLogger.debug('Encoding message {}', data)();
@@ -277,6 +286,60 @@ export function highlightCode(element) {
   }
 }
 
+
+function nextChar(c: string): string {
+  return String.fromCharCode(c.charCodeAt(0) + 1);
+}
+
+
+export function getMessageData (currSymbol: string, userMessage: HTMLTextAreaElement): MessageDataEncode {
+  let files: UploadFile[] = []; // return array from nodeList
+  let images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
+  for (let i = 0; i < images.length; i++) {
+    let img = images[i];
+    let elSymbol = img.getAttribute('symbol');
+    if (!elSymbol) {
+      currSymbol = nextChar(currSymbol);
+      elSymbol = currSymbol;
+    }
+    let textNode = document.createTextNode(elSymbol);
+    img.parentNode.replaceChild(textNode, img);
+    if (!img.getAttribute('symbol')) { // don't send image again, it's already in server
+      let assVideo = img.getAttribute('associatedVideo');
+      if (assVideo) {
+        files.push({
+          file: Utils.videoFiles[assVideo],
+          type: 'v',
+          symbol:  elSymbol
+        });
+        files.push({
+          file: Utils.previewFiles[img.getAttribute('src')],
+          type: 'p',
+          symbol:  elSymbol
+        });
+      } else {
+        files.push({
+          file: Utils.imagesFiles[img.getAttribute('src')],
+          type: 'i',
+          symbol:  elSymbol
+        });
+      }
+    }
+  }
+  let urls = [Utils.imagesFiles, Utils.videoFiles, Utils.previewFiles];
+  urls.forEach((url) => {
+    for (let k in url) {
+      globalLogger.log('Revoking url {}', k)();
+      URL.revokeObjectURL(k);
+      delete urls[k];
+    }
+  });
+  userMessage.innerHTML = userMessage.innerHTML.replace(/<img[^>]*symbol="([^"]+)"[^>]*>/g, '$1');
+  let messageContent: string = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
+  messageContent = /^\s*$/.test(messageContent) ? null : messageContent;
+  userMessage.innerHTML = '';
+  return {files, messageContent};
+}
 
 export const Utils = {
   videoFiles: {},

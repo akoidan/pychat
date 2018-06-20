@@ -43,14 +43,14 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {State, Action,Getter, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {CurrentUserInfo, RoomModel, SexModel, UserModel} from "../../types";
+  import {CurrentUserInfo, RoomModel, SexModel, UserModel} from "../../model";
   import {globalLogger} from '../../utils/singletons';
 
 
   interface UserModelId extends UserModel {
-    id: number
+    id: number;
   }
 
   @Component
@@ -59,6 +59,7 @@
     @State rooms: {[id: string]: RoomModel};
     @State allUsers: {[id: string]: UserModel};
     @State activeRoomId: number;
+    @Getter activeRoom: RoomModel;
     @State userInfo: CurrentUserInfo;
     @State online: number[];
 
@@ -73,7 +74,7 @@
     }
 
     userIsInActiveRoom(userId: string) {
-      return this.rooms[this.activeRoomId].users.indexOf(parseInt(userId)) >= 0;
+      return this.activeRoom.users.indexOf(parseInt(userId)) >= 0;
     }
 
     getOnlineClass(id: string) : string {

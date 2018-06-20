@@ -1,14 +1,7 @@
-export interface Logger {
-  warn(format: String, ...args): Function;
+import {Logger} from '../types';
 
-  log(format: String, ...args): Function;
 
-  error(format: String, ...args): Function;
-
-  debug(format: String, ...args): Function;
-}
-
-export class LoggerFactory {
+export default class LoggerFactory {
 
   logsEnabled: boolean;
 

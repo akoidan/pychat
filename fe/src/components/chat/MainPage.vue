@@ -24,28 +24,43 @@
 </template>
 
 <script lang='ts'>
-  import {Component, Vue} from "vue-property-decorator";
-  import {State, Getter, Action} from "vuex-class";
+  import {Component, Vue, Watch, Mixins} from "vue-property-decorator";
+  import {Action, Getter, State, Mutation} from "vuex-class";
   import RoomUsers from "./RoomUsers.vue"
   import ChatBox from "./ChatBox.vue"
   import SmileyHolder from "./SmileyHolder.vue"
-  import {RoomModel} from '../../types';
-  import {getSmileyHtml, pasteHtmlAtCaret, pasteImgToTextArea} from "../../utils/htmlApi";
-  import {channelsHandler, globalLogger} from "../../utils/singletons";
+  import {CurrentUserInfo, EditingMessage, MessageModel, RoomModel} from "../../model";
+  import {encodeP, getMessageData, getSmileyHtml, pasteHtmlAtCaret, pasteImgToTextArea} from "../../utils/htmlApi";
+  import {api, globalLogger, ws} from "../../utils/singletons";
+  import EditMessageMixin from './EditMessageMixin';
 
   @Component({components: {RoomUsers, ChatBox, SmileyHolder}})
-  export default class ChannelsPage extends Vue {
+  export default class ChannelsPage extends Mixins(EditMessageMixin) {
     @State growls: string[];
     @State theme;
     @State activeRoomId;
+    @State editedMessage: EditingMessage;
+    @State userInfo: CurrentUserInfo;
     @State rooms: {[id: string]: RoomModel};
-    @Getter maxId;
+    @Getter maxId: SingleParamCB<number>;
+    @Getter activeRoom: RoomModel;
+    @Getter editingMessageModel: MessageModel;
     @Action growlError;
+    // used in mixin from event.keyCode === 38
+    @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
 
     $refs: {
       userMessage: HTMLTextAreaElement;
       imgInput: HTMLInputElement;
     };
+
+    @Watch('editedMessage')
+    onActiveRoomIdChange(val: EditingMessage) {
+      if (val && val.isEditingNow) {
+        this.$refs.userMessage.innerHTML = encodeP(this.editingMessageModel);
+        this.$refs.userMessage.focus();
+      }
+    }
 
     get inited() {
       return Object.keys(this.rooms).length > 0;
@@ -77,14 +92,79 @@
     checkAndSendMessage(event: KeyboardEvent) {
       if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
         event.preventDefault();
-        channelsHandler.sendMessage(this.activeRoomId, this.$refs.userMessage);
+        if (!ws.isWsOpen()) {
+          this.growlError(`Can't send message, can't connect to the server`);
+        } else {
+          globalLogger.log('Sending message')();
+          let messageId = this.editedMessage && this.editedMessage.isEditingNow ? this.editedMessage.messageId : null;
+          let currSymbol;
+          if (messageId) {
+            currSymbol = this.editingMessageModel.symbol;
+          }
+          this.setEditedMessage(null);
+          if (!currSymbol) {
+            currSymbol = '\u3500'
+          }
+          let arId = this.activeRoomId;
+          let um = this.$refs.userMessage;
+          let md = getMessageData(currSymbol, um);
+          if (md.files.length) {
+            let gr;
+            let db;
+            let text;
+            api.uploadFiles(md.files, (res, err) => {
+              if (err) { // TOdo async should move to vuex
+                this.growlError(err);
+              } else  {
+                this.send(messageId, md.messageContent, arId, res)
+              }
+            }, evt => {
+              if (evt.lengthComputable) {
+
+                // TODO evt.loaded
+                // if (!db) {
+                //   let div = document.createElement("DIV");
+                //   let holder = document.createElement("DIV");
+                //   text = document.createElement("SPAN");
+                //   holder.appendChild(text);
+                //   holder.appendChild(div);
+                //   text.innerText = "Uploading files...";
+                //   db = new DownloadBar(div, evt.total);
+                //   gr = new Growl(null, null, holder);
+                //   gr.show();
+                // }
+                // db.setValue(evt.loaded);
+                // if (evt.loaded === evt.total) {
+                //   text.innerText = "Server is processing files...";
+                // }
+              }
+            });
+          } else {
+            this.send(messageId, md.messageContent, arId, []);
+          }
+        }
+
       } else if (event.keyCode === 27) { // 27 = escape
         this.showSmileys = false;
-        alert('todo');
-        // self.removeEditingMode();
-      } else if (event.keyCode === 38) { // up arrow
-        alert('todo');
-        // self.handleEditMessage(event);
+        if (this.editedMessage) {
+          this.$refs.userMessage.innerHTML = "";
+          this.setEditedMessage(null);
+
+        }
+      } else if (event.keyCode === 38 && this.$refs.userMessage.innerHTML == "") { // up arrow
+        let ms = this.activeRoom.messages;
+        if (ms.length > 0) {
+          let m = ms[ms.length-1];
+          this.sem(event, m, true);
+        }
+      }
+    }
+
+    private send(messageId: number, messageContent: string, arId: number, files: any[]) {
+      if (messageId) {
+        ws.sendEditMessage(messageContent, messageId, files);
+      } else if (messageContent) {
+        ws.sendSendMessage(messageContent, arId, files);
       }
     }
   }

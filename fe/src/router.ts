@@ -41,7 +41,6 @@ const router = new VueRouter({
       meta: {
         loginRequired: false
       },
-      name: 'auth',
       children: [
         {
           path: '',

@@ -1,5 +1,6 @@
 import Xhr from './Xhr';
 import {RESPONSE_SUCCESS} from './consts';
+import {UploadFile} from '../types';
 
 export default class Api {
   private xhr: Xhr;
@@ -100,7 +101,11 @@ export default class Api {
   }
 
 
-  public uploadFile(fd: FormData, cb: Function, progress: Function) {
+  public uploadFiles(files: UploadFile[], cb: Function, progress: Function) {
+    let fd = new FormData();
+    files.forEach(function(sd) {
+      fd.append(sd.type + sd.symbol, sd.file, sd.file.name);
+    });
     this.xhr.doPost('/upload_file', null,  (data, error) => {
       if (error) {
         cb(null, error);

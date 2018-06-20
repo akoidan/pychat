@@ -1,3 +1,4 @@
-import {LoggerFactory} from './Logger';
+import LoggerFactory from './Logger';
+
 
 export default new LoggerFactory(true);

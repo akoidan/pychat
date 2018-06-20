@@ -7,7 +7,7 @@ import router from './router';
 
 
 window.addEventListener('focus',  () => {
-  if (store.state.userInfo) {
+  if (store.state.userInfo && ws.isWsOpen()) {
     ws.pingServer();
   }
 });

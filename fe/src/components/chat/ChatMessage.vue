@@ -1,36 +1,35 @@
 <template>
-  <p :class="getClass(message)">
-     <span v-show="editedMessage && editedMessage.messageId === message.id">
+  <p :class="getClass(message)" @contextmenu="contextmenu">
+     <span v-if="editedMessage && editedMessage.messageId === message.id">
        <div class="icons">
-          <i class="icon-pencil" @click="m2EditMessage"></i>
-          <i class="icon-trash-circled" @click="m2DeleteMessage"></i>
+          <i class="icon-pencil" v-if="!editedMessage.isEditingNow" @click="m2EditMessage"></i>
+          <i class="icon-trash-circled" v-if="!editedMessage.isEditingNow" @click="m2DeleteMessage"></i>
           <i class="icon-cancel" @click="m2Close"></i>
        </div>
     </span>
       <span class="message-header">
         <span class="timeMess">({{getTime(message.time)}})</span>
         <span>{{allUsers[message.userId].user}}</span>: </span>
-    <span class="message-text-style" v-html="encoded" ref="content" @contextmenu="contextmenu"></span>
+    <span class="message-text-style" v-html="encoded" ref="content"></span>
   </p>
 </template>
 <script lang="ts">
-  import {Getter, State, Mutation} from "vuex-class";
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {CurrentUserInfo, EditingMessage, MessageModel, RoomModel, UserModel} from "../../types";
-  import {channelsHandler, globalLogger, ws} from "../../utils/singletons";
+  import {Mutation, State} from "vuex-class";
+  import {Component, Prop, Vue, Mixins} from "vue-property-decorator";
+  import {CurrentUserInfo, EditingMessage, MessageModel, UserModel} from "../../model";
+  import {globalLogger, ws} from "../../utils/singletons";
   import {encodeHTML, encodeMessage, highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
+  import EditedMessageMixin, {default as EditMessageMixin} from "./EditMessageMixin"
 
 
-  const ONE_DAY = 24 * 60 * 60 * 1000;
-
-  @Component
-  export default class ChatMessage extends Vue {
+  @Component({mixins: [EditedMessageMixin] })
+  export default class ChatMessage extends Mixins(EditMessageMixin) {
 
     @State userInfo: CurrentUserInfo;
     @Prop() message: MessageModel;
     @State allUsers: { [id: number]: UserModel };
     @State editedMessage : EditingMessage;
-    @Mutation setEditedMessage;
+    @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
 
 
     $refs: {
@@ -56,17 +55,11 @@
     }
 
     m2EditMessage() {
-      this.setEditedMessage({messageId: this.message.id, isEditingNow: true});
+      this.setEditedMessage({messageId: this.message.id, isEditingNow: true, roomId: this.message.roomId});
     }
 
     contextmenu(event) {
-      if (!this.message.deleted && this.isSelf && this.message.time + ONE_DAY > Date.now()) {
-        this.setEditedMessage(null);
-        event.preventDefault();
-        event.stopPropagation();
-        this.setEditedMessage({messageId: this.message.id, isEditingNow: false});
-      }
-      globalLogger.debug("Context menu for {}", event.target)();
+      this.sem(event, this.message, false);
     }
 
     updated() {
@@ -234,7 +227,7 @@
         width: 100px
         height: 36px
 
-    .B4j2ContentEditableImg
+    /deep/ .B4j2ContentEditableImg
       @include margin-img-def
       @include margin-img
   p
