@@ -10,7 +10,9 @@
         <router-link :to="`/chat/${id}`">
           <i :class="getUserSexClass(user)"></i>{{user.user}}
         </router-link>
-        <span class="icon-cog"></span>
+        <router-link :to="`/room-settings/${id}`">
+          <span class="icon-cog"></span>
+        </router-link>
         <span class="newMessagesCount"></span>
       </li>
     </ul>
@@ -23,7 +25,9 @@
         <router-link :to="`/chat/${id}`">
           {{ room.name }}
         </router-link>
-        <span class="icon-cog"></span>
+        <router-link :to="`/room-settings/${id}`">
+          <span class="icon-cog"></span>
+        </router-link>
         <span class="newMessagesCount"></span>
       </li>
     </ul>
@@ -144,6 +148,9 @@
 
   @import "partials/variables"
   @import "partials/mixins"
+
+  .icon-cog
+    cursor: pointer
 
   li
     &:hover:not(.active-room)

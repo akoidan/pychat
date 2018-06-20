@@ -239,6 +239,10 @@ export class WsHandler extends MessageHandler {
     for (let k in this.progressInterval) {
       this.hideGrowlProgress(k);
     }
+    if (this.noServerPingTimeout) {
+      clearTimeout(this.noServerPingTimeout);
+      this.noServerPingTimeout = null;
+    }
     let reason = e.reason || e;
     if (e.code === 403) {
       let message = `Server has forbidden request because '${reason}'. Logging out...`;
