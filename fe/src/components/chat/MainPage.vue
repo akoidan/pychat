@@ -1,5 +1,7 @@
 <template>
   <div class="holder" v-if="inited">
+    <nav-edit-message v-if="editedMessage" :edited-message="editedMessage" />
+    <nav-user-show v-if="activeUser" :active-user="activeUser"/>
     <div class="wrapper">
       <div class="chatBoxHolder">
         <template  v-for="(room, id) in rooms">
@@ -36,12 +38,15 @@
   import {encodeP, getMessageData, getSmileyHtml, pasteHtmlAtCaret, pasteImgToTextArea} from "../../utils/htmlApi";
   import {api, globalLogger, ws} from "../../utils/singletons";
   import EditMessageMixin from './EditMessageMixin';
+  import NavEditMessage from './NavEditMessage.vue';
+  import NavUserShow from './NavUserShow.vue';
 
-  @Component({components: {RoomUsers, ChatBox, SmileyHolder}})
+  @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Mixins(EditMessageMixin) {
     @State growls: string[];
     @State theme;
     @State activeRoomId;
+    @Getter activeUser;
     @State editedMessage: EditingMessage;
     @State userInfo: CurrentUserInfo;
     @State rooms: {[id: string]: RoomModel};

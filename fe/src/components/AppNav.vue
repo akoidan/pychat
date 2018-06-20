@@ -1,54 +1,46 @@
 <template>
-  <nav :class="{expanded}" @click="toggle">
-    <div v-show="!editedMessage" class="navInner">
-      <router-link to="/" class="icon-home" title="Go home"><span class="mText">Home</span></router-link>
-      <i class="icon-brush" title="Draw an Image">
-        <span class="mText">Painter</span>
-      </i>
-      <router-link to="/report-issue" class="icon-pencil" title="Report an issue"><span class="mText">Issue</span>
-      </router-link>
-      <i class="icon-phone" title="Make a video/mic call"><span class="mText">Call</span></i>
-      <i class="icon-search" title="Search messages in current room (Shift+Ctrl+F)"><span
-          class="mText">Search</span></i>
+  <nav @click="toggle" :class="{expanded}">
+    <router-link to="/" class="icon-home" title="Go home"><span class="mText">Home</span></router-link>
+    <i class="icon-brush" title="Draw an Image">
+      <span class="mText">Painter</span>
+    </i>
+    <router-link to="/report-issue" class="icon-pencil" title="Report an issue"><span class="mText">Issue</span>
+    </router-link>
+    <i class="icon-phone" title="Make a video/mic call"><span class="mText">Call</span></i>
+    <i class="icon-search" title="Search messages in current room (Shift+Ctrl+F)"><span
+        class="mText">Search</span></i>
 
-      <router-link to="/statistics" class="icon-chart-pie" title="Show user countries statistics"><span class="mText">Statistics</span>
-      </router-link>
-      <i class="icon-doc-inv"><span class="mText">Send File</span></i>
-      <i class="icon-popup"><span class="mText">Minimized Windows</span></i>
-      <a href="https://github.com/Deathangel908/pychat" target="_blank" class="icon-github"><span
-          class="mText">Github</span></a>
-      <template v-if="userInfo">
-        <div class="navMenu">
-          <span class="onlineStatus" :title="title" :class="{online: isOnline, offline: !isOnline}">●</span>
-          <span class="username"><b>{{userInfo.user}}</b></span>
-          <i class="icon-menu" title="Open Menu"></i>
-        </div>
-        <router-link to="/profile" class="icon-wrench" title="Settings"><span class="mText">Profile</span></router-link>
-        <i title="Sign out" class="icon-sign-out" @click="signOut"><span class="mText">Sign out</span></i>
-      </template>
-    </div>
-   <div class="icons" v-if="editedMessage">
-      <i class="icon-pencil" v-if="!editedMessage.isEditingNow" @click="m2EditMessage"><span class="mText">Edit</span></i>
-      <i class="icon-trash-circled" v-if="!editedMessage.isEditingNow" @click="m2DeleteMessage"><span class="mText">Delete</span></i>
-      <i class="icon-cancel" @click="m2Close"><span class="mText">Close</span></i>
-   </div>
+    <router-link to="/statistics" class="icon-chart-pie" title="Show user countries statistics"><span class="mText">Statistics</span>
+    </router-link>
+    <i class="icon-doc-inv"><span class="mText">Send File</span></i>
+    <i class="icon-popup"><span class="mText">Minimized Windows</span></i>
+    <a href="https://github.com/Deathangel908/pychat" target="_blank" class="icon-github"><span
+        class="mText">Github</span></a>
+    <template v-if="userInfo">
+      <div class="navMenu">
+        <span class="onlineStatus" :title="title" :class="{online: isOnline, offline: !isOnline}">●</span>
+        <span class="username"><b>{{userInfo.user}}</b></span>
+        <i class="icon-menu" title="Open Menu"></i>
+      </div>
+      <router-link to="/profile" class="icon-wrench" title="Settings"><span class="mText">Profile</span></router-link>
+      <i title="Sign out" class="icon-sign-out" @click="signOut"><span class="mText">Sign out</span></i>
+    </template>
   </nav>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {State, Action, Mutation, Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {api, ws} from "../utils/singletons";
+  import {api, globalLogger, ws} from "../utils/singletons";
   import sessionHolder from "../utils/sessionHolder";
-  import {EditingMessage} from '../model';
+  import {EditingMessage, UserModel} from "../model";
 
   @Component
-  export default class App extends Vue {
+  export default class AppNav extends Vue {
     @State isOnline;
     @State userInfo;
     @Action growlError;
     @Action logout;
-    @State editedMessage : EditingMessage;
-    @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
+
     expanded: boolean = false;
 
     get title() {
@@ -56,21 +48,8 @@
     }
 
     toggle() {
+      globalLogger.log('Toggle nav')();
       this.expanded = !this.expanded;
-    }
-
-
-    m2Close() {
-      this.setEditedMessage(null);
-    }
-
-    m2DeleteMessage() {
-      ws.sendDeleteMessage(this.editedMessage.messageId);
-      this.setEditedMessage(null);
-    }
-
-    m2EditMessage() {
-      this.setEditedMessage({...this.editedMessage, isEditingNow: true});
     }
 
     signOut() {
@@ -89,39 +68,21 @@
 
 <style lang="sass" scoped>
 
-  @import "../assets/sass/partials/variables"
-  @import "../assets/sass/partials/mixins"
+  @import "partials/variables"
+  @import "partials/mixins"
+  @import "partials/abstract_classes"
 
   .username
     font-size: 22px
     padding-right: 10px
 
-  .icon-trash-circled
-    margin-right: auto
 
-  .icons
-    display: flex
-    > *
-      padding: 0 10px
-  nav
-    padding: 10px 4px 9px 10px
-    max-height: 52px
-    font-size: 26px
-    overflow: hidden
-    transition: max-height 0.4s ease-out
-    flex-shrink: 0
   .expanded
     max-height: $collapse-height
 
-  nav > .navInner
-
-    margin: 0
-    flex-shrink: 0
-    @include display-flex
-    align-items: center
-    display: flex
-    position: relative
-    flex-direction: row
+  nav
+    max-height: 32px
+    @extend %nav
     > *
       order: 2
     .navMenu
@@ -140,19 +101,16 @@
         width: 100%
         margin-bottom: 10px
         order: 1
-        .icon-menu
-          display: inline-block
-          position: absolute
-          top: 0
-          right: 5px
+      .icon-menu
+        display: inline-block
+        position: absolute
+        top: 0
+        right: 5px
 
   [class^='icon-']
     cursor: pointer
 
   .color-lor
-    nav
-      background-color: $color-lor-nav-color
-      background-image: linear-gradient(#232323 0%, #151515 100%)
     .onlineStatus
       padding: 0 10px
       &.offline
@@ -172,8 +130,8 @@
         color: rgb(207, 80, 80)
       .icon-chart-pie
         color: rgb(121, 144, 15)
-      .icon-sign-out, .icon-cancel
-        color: rgb(169, 68, 66)
+      .icon-sign-out
+        color: $red-cancel-lor
       .icon-trash-circled
         color: #2d88c4
       .icon-wrench
@@ -185,10 +143,6 @@
       .icon-popup
         color: #c58446
   .color-white
-    nav
-      background-color: #333
-      border-color: #080808
-      color: $color-white-main
     .onlineStatus
       &.online
         color: green
@@ -199,8 +153,6 @@
     padding: 0 10px
 
   .color-reg
-    nav
-      background-image: linear-gradient(#232323 0%, #151515 100%)
     .onlineStatus
       &.offline
         color: #ee2d2d
@@ -218,8 +170,8 @@
       @include hover-click(#35a3e8)
     .icon-chart-pie
       @include hover-click(#B7D710)
-    .icon-sign-out, .icon-cancel
-      @include hover-click(#F5504C)
+    .icon-sign-out
+      @include hover-click($red-cancel-reg)
     .icon-wrench
       @include hover-click(#67C8B0)
 

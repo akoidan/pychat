@@ -28,9 +28,10 @@ const store: StoreOptions<RootState> = {
     allUsers: {},
     regHeader: null,
     rooms: {},
+    activeUserId: null,
     userInfo: null,
     online: [],
-    activeRoomId: 1,
+    activeRoomId: null,
     editedMessage: null,
   },
   getters: {
@@ -42,6 +43,12 @@ const store: StoreOptions<RootState> = {
     },
     minId(state): SingleParamCB<number> {
       return id => state.rooms[id].messages.length > 0 ? state.rooms[id].messages[this.room.messages.length - 1].id : null;
+    },
+    activeUser(state): UserModel {
+      return state.allUsers[state.activeUserId];
+    },
+    showNav(state) {
+      return !state.editedMessage && !state.activeUserId;
     },
     editingMessageModel(state): MessageModel {
       if (state.editedMessage) {
@@ -55,6 +62,11 @@ const store: StoreOptions<RootState> = {
   mutations: {
     setEditedMessage(state: RootState, editedMessage: EditingMessage) {
       state.editedMessage = editedMessage;
+      state.activeUserId = null;
+    },
+    setActiveUserId(state: RootState, activeUserId: number) {
+      state.activeUserId = activeUserId;
+      state.editedMessage = null;
     },
     setMessages(state: RootState, {messages, roomId}) {
       state.rooms[roomId].messages = messages;

@@ -2,12 +2,12 @@
   <p :class="getClass(message)" @contextmenu="contextmenu">
       <span class="message-header">
         <span class="timeMess">({{getTime(message.time)}})</span>
-        <span>{{allUsers[message.userId].user}}</span>: </span>
+        <span @contextmenu.prevent="setActiveUser">{{allUsers[message.userId].user}}</span>: </span>
     <span class="message-text-style" v-html="encoded" ref="content"></span>
   </p>
 </template>
 <script lang="ts">
-  import {Mutation, State} from "vuex-class";
+  import {Mutation, State, Getter} from "vuex-class";
   import {Component, Prop, Vue, Mixins} from "vue-property-decorator";
   import {CurrentUserInfo, EditingMessage, MessageModel, UserModel} from "../../model";
   import {globalLogger, ws} from "../../utils/singletons";
@@ -23,11 +23,17 @@
     @State allUsers: { [id: number]: UserModel };
     @State editedMessage : EditingMessage;
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
-
+    @Mutation setActiveUserId: SingleParamCB<number>;
 
     $refs: {
       content: HTMLElement
     };
+
+    setActiveUser(evt: Event) {
+      globalLogger.log("setActiveUserId {}", this.message.userId)();
+      evt.stopPropagation();
+      this.setActiveUserId(this.message.userId);
+    }
 
     getTime(timeMillis: number) {
       let date = new Date(timeMillis);
@@ -228,7 +234,6 @@
       color: #9DD3DD
 
   .color-reg
-      @include hover-click(#bdbdce)
     .message-others .message-header
       color: #729fcf
     .message-self .message-header

@@ -76,6 +76,7 @@ export interface RootState {
   growls: GrowlModel[];
   editedMessage: EditingMessage;
   activeRoomId: number;
+  activeUserId: number;
   userInfo: CurrentUserInfo;
   allUsers: { [id: number]: UserModel };
   regHeader: string;

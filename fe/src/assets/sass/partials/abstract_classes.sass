@@ -32,6 +32,39 @@ $img-path: "../../img" !default
     background: url('#{$img-path}/icon-play-red.svg') no-repeat center
   background: black
 
+
+.color-lor %nav
+  background-color: $color-lor-nav-color
+  background-image: linear-gradient(#232323 0%, #151515 100%)
+
+.color-white %nav
+  background-color: #333
+  border-color: #080808
+  color: $color-white-main
+
+.color-reg %nav
+  background-image: linear-gradient(#232323 0%, #151515 100%)
+
+%nav
+  padding: 10px 4px 9px 10px
+  font-size: 26px
+  overflow: hidden
+  transition: max-height 0.4s ease-out
+  flex-shrink: 0
+  margin: 0
+  @include display-flex
+  align-items: center
+  display: flex
+  position: relative
+  flex-direction: row
+  @media screen and (min-width: $collapse-width) and (max-width: $collapse-no-mtext)
+    .mText
+      display: none !important
+  @media screen and (max-width: $collapse-width)
+    flex-direction: column
+    > *
+      margin-right: auto !important
+
 %img
   margin-top: -17px
   margin-bottom: -10px

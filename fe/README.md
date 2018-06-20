@@ -6,4 +6,4 @@ generate fonts from npm??
 - yarn install
 - yarn run build
 - yarn run build:umd
-- cp `./lib` to fo node_nodules `fe/node_modules/vue-property-decorator/lib`
+- `cp -r ./lib fe/node_modules/vue-property-decorator`
