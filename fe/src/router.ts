@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import sessionHolder from './utils/sessionHolder';
-import loggerFactory from './utils/loggerFactory';
 import store from './store';
 import MainPage from './components/MainPage.vue';
 import ChannelsPage from './components/chat/MainPage.vue';
@@ -9,6 +8,7 @@ import SignupPage from './components/singup/MainPage.vue';
 import ResetPassword from './components/singup/ResetPassword.vue';
 import Login from './components/singup/Login.vue';
 import SignUp from './components/singup/SignUp.vue';
+import ProfilePage from './components/pages/ProfilePage.vue';
 import ApplyResetPassword from './components/singup/ApplyResetPassword.vue';
 import {globalLogger} from './utils/singletons';
 
@@ -28,11 +28,18 @@ const router = new VueRouter({
         },
         {
           component: ChannelsPage,
-          beforeEnter: (to, from, next) => {
-            store.commit('setActiveRoomId', parseInt(to.params.id));
-            next();
+          meta: {
+            beforeEnter: (to, from, next) => {
+              globalLogger.log('setActiveRoomId {}', to.params.id)();
+              store.commit('setActiveRoomId', parseInt(to.params.id));
+              next();
+            },
           },
           path: '/chat/:id'
+        },
+        {
+          component: ProfilePage,
+          path: '/profile'
         }
       ]
     }, {
@@ -63,12 +70,19 @@ const router = new VueRouter({
           component: ApplyResetPassword
         }
       ]
-    }]
+    }, {
+      path: '*',
+      beforeEnter: (to, from, next) => next('/chat/1')
+    }
+    ]
 });
 router.beforeEach((to, from, next) => {
   if (to.matched[0] && to.matched[0].meta && to.matched[0].meta.loginRequired && !sessionHolder.session) {
     next('/auth/login');
   } else {
+    if (to.meta && to.meta.beforeEnter) {
+      to.meta.beforeEnter(to, from, next);
+    }
     next();
   }
 });

@@ -20,7 +20,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {globalLogger, ws} from "../../utils/singletons";
   import ChatMessage from "./ChatMessage.vue";
-  import {RoomModel} from '../../model';
+  import {RoomModel} from "../../model";
 
   @Component({components: {ChatMessage}})
   export default class ChatBox extends Vue {

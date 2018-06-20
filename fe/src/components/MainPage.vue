@@ -1,7 +1,9 @@
 <template>
   <div class="body flex">
     <app-nav/>
-    <router-view class="body"/>
+    <keep-alive>
+      <router-view class="body"/>
+    </keep-alive>
   </div>
 </template>
 <script lang="ts">

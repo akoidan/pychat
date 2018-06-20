@@ -5,6 +5,9 @@
         <template  v-for="(room, id) in rooms">
           <chat-box :room-id="parseInt(id)" :room="room" :key="id" v-show="activeRoomId === parseInt(id)"/>
         </template>
+        <div v-if="!activeRoom" class="noRoom" >
+          <router-link to="/chat/1">This room doesn't exist, or you don't have access to it. Click to go to main room</router-link>
+        </div>
       </div>
       <room-users/>
       <smiley-holder v-show="showSmileys" v-on:add-smiley="addSmiley"/>
@@ -175,7 +178,18 @@
   @import "partials/variables"
   @import "partials/abstract_classes"
 
-
+  .noRoom
+    justify-content: center
+    align-items: center
+    display: flex
+    font-size: 30px
+    margin-top: 30px
+    > *
+      text-align: center
+      color: #8fadff
+      cursor: pointer
+      &:hover
+        text-decoration: underline
   .usermsg /deep/ img[code]
     @extend %img-code
 

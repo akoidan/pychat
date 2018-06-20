@@ -1,12 +1,5 @@
 <template>
   <p :class="getClass(message)" @contextmenu="contextmenu">
-     <span v-if="editedMessage && editedMessage.messageId === message.id">
-       <div class="icons">
-          <i class="icon-pencil" v-if="!editedMessage.isEditingNow" @click="m2EditMessage"></i>
-          <i class="icon-trash-circled" v-if="!editedMessage.isEditingNow" @click="m2DeleteMessage"></i>
-          <i class="icon-cancel" @click="m2Close"></i>
-       </div>
-    </span>
       <span class="message-header">
         <span class="timeMess">({{getTime(message.time)}})</span>
         <span>{{allUsers[message.userId].user}}</span>: </span>
@@ -45,18 +38,6 @@
       return this.message.content ? encodeMessage(this.message) : encodeHTML("This message has been removed");
     }
 
-    m2Close() {
-      this.setEditedMessage(null);
-    }
-
-    m2DeleteMessage() {
-      ws.sendDeleteMessage(this.message.id);
-      this.setEditedMessage(null);
-    }
-
-    m2EditMessage() {
-      this.setEditedMessage({messageId: this.message.id, isEditingNow: true, roomId: this.message.roomId});
-    }
 
     contextmenu(event) {
       this.sem(event, this.message, false);
@@ -113,14 +94,6 @@
 </script>
 <style lang="sass" scoped>
 
-  .icons
-    position: absolute
-    right: 0
-    top: 6px
-    font-size: 25px
-    > *
-      padding: 0 5px
-
 
   $img-path: "../../assets/img"
   @import "partials/mixins"
@@ -138,7 +111,7 @@
     border: 1px solid grey
     border-radius: 3px
     margin-right: 6px
-    padding: 10px 150px 10px 10px
+    padding: 5px
 
 
   .removed-message .message-text-style
@@ -246,8 +219,7 @@
     @import "~highlightjs/styles/default"
 
   .color-lor
-    .icons
-      color: grey
+
     .message-others .message-header
       color: #729fcf
     .message-self .message-header
@@ -256,8 +228,6 @@
       color: #9DD3DD
 
   .color-reg
-    .icons > *
-      cursor: pointer
       @include hover-click(#bdbdce)
     .message-others .message-header
       color: #729fcf
@@ -267,8 +237,6 @@
       color: #84B7C0
 
   .color-white
-    .icons
-      color: black
     .highLightMessage
       border: 1px solid #3f3f3f
       box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5), 0 3px 10px 0 rgba(0,0,0,0.5)

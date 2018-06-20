@@ -74,7 +74,8 @@
     }
 
     userIsInActiveRoom(userId: string) {
-      return this.activeRoom.users.indexOf(parseInt(userId)) >= 0;
+      let ar = this.activeRoom;
+      return ar && ar.users.indexOf(parseInt(userId)) >= 0;
     }
 
     getOnlineClass(id: string) : string {
