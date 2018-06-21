@@ -22,7 +22,7 @@
       this.cls = `wbktRange${getUniqueId()}`;
     }
 
-    $destroy() {
+    destroy() {
       document.head.removeChild(this.style);
     }
 

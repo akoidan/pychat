@@ -1,4 +1,4 @@
-import {CurrentUserInfo, FileModel, MessageModel, RoomModel, SexModel, UserModel, VolumeLevelModel} from '../model';
+import {CurrentUserInfo, FileModel, MessageModel, RoomModel, SexModel, UserModel} from '../model';
 import MesageHandler from './MesageHandler';
 
 
@@ -12,7 +12,7 @@ export interface RoomDTO {
   name: string;
   users: number[];
   notifications: boolean;
-  volume: VolumeLevelModel;
+  volume: number;
 }
 
 export interface SetWsIdMessage extends MesageHandler {
@@ -29,6 +29,10 @@ interface ChangeUserOnline extends DefaultMessage {
   content: number[];
   user: string;
   time: number;
+}
+
+export interface DeleteRoom extends DefaultMessage {
+  roomId: number;
 }
 
 export interface AddOnlineUser extends ChangeUserOnline {}
@@ -49,6 +53,9 @@ export interface LoadMessages extends DefaultMessage {
   roomId: number;
 }
 
+export interface GrowlMessage extends DefaultMessage {
+  content: string;
+}
 
 export interface DeleteMessage extends DefaultMessage{
   roomId: number;

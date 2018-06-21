@@ -1,4 +1,4 @@
-import {AddOnlineUser, DeleteMessage, EditMessage, LoadMessages, RemoveOnlineUser, RoomDTO} from './dto';
+import {AddOnlineUser, DeleteMessage, DeleteRoom, EditMessage, LoadMessages, RemoveOnlineUser, RoomDTO} from './dto';
 import loggerFactory from './loggerFactory';
 import {Store} from 'vuex';
 import Api from './api';
@@ -46,6 +46,9 @@ export default class ChannelsHandler extends MessageHandler {
       let messsage = this.getMessage(message);
       this.store.commit('addMessage', messsage);
     },
+    deleteRoom(message: DeleteRoom) {
+      this.store.commit('deleteRoom', message.roomId);
+    }
   };
 
   constructor(store: Store<RootState>, api: Api) {

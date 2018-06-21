@@ -52,15 +52,12 @@ export default class Api {
   }
 
   public sendRestorePassword(form: HTMLFormElement, cb: SingleParamCB<string>) {
-    this.xhr.doPost('/send_restore_password', null, (data, error) => {
-      if (error) {
-        cb(error);
-      } else if (data === RESPONSE_SUCCESS) {
-        cb(null);
-      } else {
-        cb(data);
-      }
-    }, new FormData(form));
+    this.xhr.doPost(
+        '/send_restore_password',
+        null,
+        this.getResponseSuccessCB(cb),
+        new FormData(form)
+    );
   }
 
   public register(form: HTMLFormElement, cb: ErrorCB<string>) {
@@ -89,15 +86,29 @@ export default class Api {
   }
 
   public validateUsername(username: string, cb: SingleParamCB<string>) {
-    this.xhr.doPost('/validate_user', {username},  (data, error) => {
+    this.xhr.doPost('/validate_user', {username},  this.getResponseSuccessCB(cb));
+  }
+
+  private getResponseSuccessCB(cb: SingleParamCB<String>) {
+    return (data, error) => {
       if (error) {
         cb(error);
       } else if (data === RESPONSE_SUCCESS) {
         cb(null);
-      } else {
+      } else if (data) {
         cb(data);
+      } else {
+        cb('Unknown error');
       }
-    });
+    };
+  }
+
+  public sendRoomSettings(roomName, volume, notifications, roomId, cb: SingleParamCB<String>) {
+    this.xhr.doPost(
+        '/save_room_settings',
+        {roomName, volume, notifications, roomId},
+        this.getResponseSuccessCB(cb)
+    );
   }
 
 
@@ -125,14 +136,6 @@ export default class Api {
   }
 
   public validateEmail(email: string, cb: SingleParamCB<string>) {
-    this.xhr.doPost('/validate_email', {email},  (data, error) => {
-      if (error) {
-        cb(error);
-      } else if (data === RESPONSE_SUCCESS) {
-        cb(null);
-      } else {
-        cb(data);
-      }
-    }, );
+    this.xhr.doPost('/validate_email', {email},  this.getResponseSuccessCB(cb));
   }
 }

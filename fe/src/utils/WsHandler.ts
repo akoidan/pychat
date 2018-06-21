@@ -5,7 +5,7 @@ import {VueRouter} from 'vue-router/types/router';
 
 import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
-import {DefaultMessage, RoomDTO, SetWsIdMessage} from './dto';
+import {DefaultMessage, GrowlMessage, RoomDTO, SetWsIdMessage} from './dto';
 import MesageHandler, {default as MessageHandler} from './MesageHandler';
 import {logout} from './utils';
 import {CurrentUserInfo, RootState, UserModel} from '../model';
@@ -39,15 +39,16 @@ export class WsHandler extends MessageHandler {
   private callBacks: { [id: number]: Function } = {};
   private handlers: AllHandlers;
   private methodHandlers = {
-    growl() {
-      this.store.dispatch('growlError', 'asdf');
+    growl(gm: GrowlMessage) {
+      this.store.dispatch('growlError', gm.content);
     },
     setWsId(message: SetWsIdMessage) {
       this.wsConnectionId = message.opponentWsId;
-      this.store.commit('setUserInfo', message.userInfo);
       this.handlers.channels.setRooms(message.rooms);
       this.handlers.channels.setOnline(message.online);
       this.handlers.channels.setUsers(message.users);
+      // userInfo should be last , so MainPage.inited depends on it
+      this.store.commit('setUserInfo', message.userInfo);
       this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
     },
     ping(message) {
@@ -232,12 +233,29 @@ export class WsHandler extends MessageHandler {
     this.callBacks[this.messageId] = cb;
   }
 
+  public sendLeaveRoom(roomId, cb: Function) {
+    this.sendToServer({
+      roomId,
+      action: 'deleteRoom',
+    });
+    this.callBacks[this.messageId] = cb;
+  }
 
   onWsClose(e) {
     this.ws = null;
     this.setStatus(false);
     for (let k in this.progressInterval) {
       this.hideGrowlProgress(k);
+    }
+    for (let cb in this.callBacks) {
+      try {
+        this.logger.log('Resolving cb {}', cb)();
+        this.callBacks[cb]();
+        this.logger.log('Cb {} has been resolved', cb)();
+        delete this.callBacks[cb];
+      } catch (e) {
+        this.logger.log('Error during resolving cb', cb)();
+      }
     }
     if (this.noServerPingTimeout) {
       clearTimeout(this.noServerPingTimeout);
@@ -286,8 +304,6 @@ export class WsHandler extends MessageHandler {
     }
     this.logger.log('Finished ws: {}', info.join(', '))();
   }
-
-
 
 
   public listenWS() {

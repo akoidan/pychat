@@ -57,16 +57,14 @@ export enum SexModel {
   MALE = 'Male', FEMALE = 'Female', ALIEN = 'Secret'
 }
 
-export enum VolumeLevelModel {
-  OFF = 0, LOW = 1, MID = 2, HIGH = 3
+export interface RoomSettings {
+  name: string;
+  notifications: boolean;
+  volume: number;
 }
 
-
-export interface RoomModel {
-  name: string;
+export interface RoomModel extends RoomSettings {
   users: number[];
-  notifications: boolean;
-  volume: VolumeLevelModel;
   messages: MessageModel[];
   allLoaded: boolean;
 }

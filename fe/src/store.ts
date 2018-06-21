@@ -15,7 +15,8 @@ import {
   RootState,
   UserModel
 } from './model';
-import {MessageLocation} from './types';
+import {MessageLocation, SetRoomSettings} from './types';
+import {globalLogger} from './utils/singletons';
 
 interface State extends ActionContext<RootState, RootState> {}
 
@@ -70,6 +71,21 @@ const store: StoreOptions<RootState> = {
     },
     setMessages(state: RootState, {messages, roomId}) {
       state.rooms[roomId].messages = messages;
+    },
+    setRoomSettings(state: RootState, srm: SetRoomSettings) {
+      let room = state.rooms[srm.roomId];
+      room.notifications = srm.settings.notifications;
+      room.volume = srm.settings.volume;
+      room.name = srm.settings.name;
+    },
+    deleteRoom(state, roomId: number) {
+      let room = state.rooms[roomId];
+      if (state.rooms[roomId]) {
+        let a = 'delete';
+        Vue[a](state.rooms, roomId);
+      } else {
+        globalLogger.error('Unable to find room {} to delete', roomId)();
+      }
     },
     addMessage(state: RootState, rm: MessageModel) {
       let r: RoomModel = state.rooms[rm.roomId];

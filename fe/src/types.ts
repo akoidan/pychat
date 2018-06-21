@@ -1,4 +1,4 @@
-import {MessageModel, UserModel} from './model';
+import {MessageModel, RoomSettings, UserModel} from './model';
 
 export interface MessageDb {
   id: number;
@@ -49,6 +49,11 @@ export interface MessageLocation {
   roomId: number;
   id: number;
   edited: number;
+}
+
+export interface SetRoomSettings {
+  settings: RoomSettings;
+  roomId: number;
 }
 
 export enum IconColor {
