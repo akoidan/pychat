@@ -45,6 +45,17 @@ export  interface IStorage {
   setRoomHeaderId(roomId: number, value: number);
 }
 
+export interface SetRoomsUsers {
+  roomId: number;
+  users: number[];
+}
+
+
+export interface UserModelId extends UserModel {
+  id: number;
+}
+
+
 export interface MessageLocation {
   roomId: number;
   id: number;

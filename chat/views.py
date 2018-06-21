@@ -79,6 +79,7 @@ def upload_file(request):
 @require_http_methods(['POST'])
 @login_required_no_redirect(False)
 @transaction.atomic
+@validation
 def save_room_settings(request):
 	"""
 	POST only, validates email during registration
@@ -91,7 +92,7 @@ def save_room_settings(request):
 		notifications=request.POST['notifications'] == 'true',
 	)
 	if updated != 1:
-		raise PermissionDenied
+		raise ValidationError("You don't have access to this room")
 	if room_name is not None:
 		room_name = room_name.strip()
 		if room_name and int(room_id) != settings.ALL_ROOM_ID:

@@ -35,6 +35,12 @@ export interface DeleteRoom extends DefaultMessage {
   roomId: number;
 }
 
+export interface LeaveUser extends DefaultMessage {
+  roomId: number;
+  userId: number;
+  users: number[];
+}
+
 export interface AddOnlineUser extends ChangeUserOnline {}
 export interface RemoveOnlineUser extends ChangeUserOnline {}
 

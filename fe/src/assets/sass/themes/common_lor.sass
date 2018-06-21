@@ -1,0 +1,12 @@
+@import "partials/variables"
+@import "partials/mixins"
+
+.color-lor
+  color: $color-lor-main
+  a
+    color: $color-lor-main
+
+  @include scrollbar($color-lor-scroll, $grayish-blue, #7dc071, #c08b00,#3c763d )
+
+  .lor-btn, .blue-btn, .green-btn, .red-btn
+    @include color-lor-btn

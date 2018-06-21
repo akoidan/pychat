@@ -1,7 +1,7 @@
 <template>
   <div class="flex">
     <app-nav v-show="showNav"/>
-    <keep-alive v-if="inited">
+    <keep-alive v-if="inited" :include="['ChannelsPage']">
       <router-view class="body"/>
     </keep-alive>
     <div v-else class="spinner">

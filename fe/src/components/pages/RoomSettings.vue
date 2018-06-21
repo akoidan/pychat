@@ -78,10 +78,6 @@
       return parseInt(this.sound);
     }
 
-    updated() {
-      this.setVars();
-    }
-
     created() {
       this.setVars();
     }

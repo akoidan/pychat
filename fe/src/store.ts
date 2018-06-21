@@ -15,8 +15,7 @@ import {
   RootState,
   UserModel
 } from './model';
-import {MessageLocation, SetRoomSettings} from './types';
-import {globalLogger} from './utils/singletons';
+import {MessageLocation, UserModelId, SetRoomSettings} from './types';
 
 interface State extends ActionContext<RootState, RootState> {}
 
@@ -36,6 +35,32 @@ const store: StoreOptions<RootState> = {
     editedMessage: null,
   },
   getters: {
+    privateRooms(state): { [id: string]: UserModelId } {
+      let res =  Object.keys(state.rooms)
+          .filter(key => !state.rooms[key].name)
+          .reduce((obj, key) => {
+            let users = state.rooms[key].users;
+            let id = state.userInfo.userId === users[0] ? users[1] : users[0];
+            return {
+              ...obj,
+              [key]: {...state.allUsers[id], id}
+            };
+          }, {}) as { [id: string]: UserModelId };
+      logger.log('private rooms {}', res)();
+      return res;
+    },
+    publicRooms(state): { [id: string]: RoomModel } {
+      let res =  Object.keys(state.rooms)
+          .filter(key => state.rooms[key].name)
+          .reduce((obj, key) => {
+            return {
+              ...obj,
+              [key]: state.rooms[key]
+            };
+          }, {});
+      logger.log('public rooms {}', res)();
+      return res;
+    },
     maxId(state): SingleParamCB<number> {
       return id => state.rooms[id].messages.length > 0 ? state.rooms[id].messages[0].id : null;
     },
@@ -78,13 +103,20 @@ const store: StoreOptions<RootState> = {
       room.volume = srm.settings.volume;
       room.name = srm.settings.name;
     },
-    deleteRoom(state, roomId: number) {
+    deleteRoom(state: RootState, roomId: number) {
       let room = state.rooms[roomId];
       if (state.rooms[roomId]) {
-        let a = 'delete';
+        let a = 'delete'; // TODO
         Vue[a](state.rooms, roomId);
       } else {
-        globalLogger.error('Unable to find room {} to delete', roomId)();
+        logger.error('Unable to find room {} to delete', roomId)();
+      }
+    },
+    setRoomsUsers(state: RootState, {roomId, users}) {
+      if (state.rooms[roomId]) {
+        state.rooms[roomId].users = users;
+      } else {
+        logger.error('Unable to find room {} to kick user', roomId)();
       }
     },
     addMessage(state: RootState, rm: MessageModel) {

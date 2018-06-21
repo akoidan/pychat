@@ -3,8 +3,8 @@
       <span>
         <span name="direct" :class="directClass" @click="directMinified = !directMinified"></span>
         <span class="directStateText">direct  messages</span>
-        <i class="icon-plus-squared" title="Create New Direct Channel"
-           @click="showAddUser"></i></span>
+        <router-link to="/create-private-room" class="icon-plus-squared" title="Create direct room"/>
+      </span>
     <ul class="directUserTable" v-show="!directMinified">
       <li :class="getOnlineActiveClass(user.id, id)" :key="id" v-for="(user, id) in privateRooms">
         <router-link :to="`/chat/${id}`">
@@ -19,7 +19,8 @@
     <span>
         <span name="channel" :class="roomsClass" @click="roomsMinified = !roomsMinified"></span>
         <span class="channelsStateText">rooms</span>
-        <i class="icon-plus-squared" title="Create New Room" @click="showAddRoom"></i></span>
+        <router-link to="/create-public-room" class="icon-plus-squared" title="Create public room"/>
+    </span>
     <ul class="rooms" v-show="!roomsMinified">
       <li v-for="(room, id) in publicRooms" :key="id" :class="getActiveClass(id)">
         <router-link :to="`/chat/${id}`">
@@ -51,11 +52,8 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfo, RoomModel, SexModel, UserModel} from "../../model";
   import {globalLogger} from '../../utils/singletons';
+  import {UserModelId} from '../../types';
 
-
-  interface UserModelId extends UserModel {
-    id: number;
-  }
 
   @Component
   export default class RoomUsers extends Vue {
@@ -66,6 +64,8 @@
     @Getter activeRoom: RoomModel;
     @State userInfo: CurrentUserInfo;
     @State online: number[];
+    @Getter publicRooms: { [id: string]: UserModelId };
+    @Getter privateRooms: { [id: string]: RoomModel };
 
     directMinified: boolean = false;
     roomsMinified: boolean = false;
@@ -98,32 +98,6 @@
       return a;
     }
 
-    get privateRooms(): { [id: string]: UserModelId } {
-      let res =  Object.keys(this.rooms)
-          .filter(key => !this.rooms[key].name)
-          .reduce((obj, key) => {
-            let users = this.rooms[key].users;
-            let id = this.userInfo.userId === users[0]? users[1] : users[0];
-            return {
-              ...obj,
-              [key]: {...this.allUsers[id], id}
-            };
-          }, {}) as { [id: string]: UserModelId };
-      globalLogger.log("private rooms {}", res)();
-      return res;
-    }
-
-    get publicRooms(): { [id: string]: RoomModel } {
-      return Object.keys(this.rooms)
-          .filter(key => this.rooms[key].name)
-          .reduce((obj, key) => {
-            return {
-              ...obj,
-              [key]: this.rooms[key]
-            };
-          }, {});
-    }
-
     get onlineText() {
       return this.onlineShowOnlyOnline ? 'Room Users' : 'Room Online'
     }
@@ -140,7 +114,7 @@
 
     showInviteUser() {}
     showAddRoom(){}
-    showAddUser() {}
+
   }
 </script>
 
@@ -148,17 +122,13 @@
 
   @import "partials/variables"
   @import "partials/mixins"
+  @import "partials/abstract_classes"
 
   .icon-cog
     cursor: pointer
 
-  li
-    &:hover:not(.active-room)
-      cursor: pointer
-      background-color:  rgba(135, 135, 135, 0.3)
-      opacity: 1
-      i
-        opacity: inherit
+  li:not(.active-room)
+    @extend %hovered-user-room
   a
     display: flex
     flex-grow: 1

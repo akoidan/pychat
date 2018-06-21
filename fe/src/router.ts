@@ -9,6 +9,7 @@ import ResetPassword from './components/singup/ResetPassword.vue';
 import Login from './components/singup/Login.vue';
 import SignUp from './components/singup/SignUp.vue';
 import ProfilePage from './components/pages/ProfilePage.vue';
+import CreatePrivateRoom from './components/pages/CreatePrivateRoom.vue';
 import RoomSettings from './components/pages/RoomSettings.vue';
 import ApplyResetPassword from './components/singup/ApplyResetPassword.vue';
 import {globalLogger} from './utils/singletons';
@@ -45,6 +46,10 @@ const router = new VueRouter({
         {
           component: RoomSettings,
           path: '/room-settings/:id'
+        },
+        {
+          component: CreatePrivateRoom,
+          path: '/create-private-room',
         }
       ]
     }, {

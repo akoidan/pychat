@@ -61,6 +61,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		pass
 
 	def on_message(self, json_message):
+		message = None
 		try:
 			if not self.connected:
 				raise ValidationError('Skipping message %s, as websocket is not initialized yet' % json_message)
@@ -77,6 +78,8 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.process_ws_message[message[VarNames.EVENT]](message)
 		except ValidationError as e:
 			error_message = self.default(str(e.message), Actions.GROWL_MESSAGE, HandlerNames.WS)
+			if message:
+				error_message[VarNames.JS_MESSAGE_ID] = message.get(VarNames.JS_MESSAGE_ID, None)
 			self.ws_write(error_message)
 
 	def on_close(self):

@@ -326,6 +326,7 @@ class MessagesHandler(MessagesCreator):
 
 	def delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
+		js_id = message[VarNames.JS_MESSAGE_ID]
 		if room_id not in self.channels or room_id == ALL_ROOM_ID:
 			raise ValidationError('You are not allowed to exit this room')
 		room = do_db(Room.objects.get, id=room_id)
@@ -337,7 +338,7 @@ class MessagesHandler(MessagesCreator):
 		else:  # if public -> leave the room, delete the link
 			RoomUsers.objects.filter(room_id=room.id, user_id=self.user_id).delete()
 		ru = list(RoomUsers.objects.filter(room_id=room.id).values_list('user_id', flat=True))
-		message = self.unsubscribe_direct_message(room_id, ru, room.name)
+		message = self.unsubscribe_direct_message(room_id, js_id, self.id, ru)
 		self.publish(message, room_id, True)
 
 	def edit_message(self, data):
@@ -393,6 +394,25 @@ class MessagesHandler(MessagesCreator):
 		if message[VarNames.USER_ID] == self.user_id or message[VarNames.ROOM_NAME] is None:
 			self.async_redis.unsubscribe((room_id,))
 			self.channels.remove(room_id)
+			channels = {
+				VarNames.EVENT: Actions.DELETE_MY_ROOM,
+				VarNames.ROOM_ID: room_id,
+				VarNames.HANDLER_NAME: HandlerNames.CHANNELS
+			}
+			if self.id == message[VarNames.CB_BY_SENDER]:
+				channels[VarNames.JS_MESSAGE_ID] = message[VarNames.JS_MESSAGE_ID]
+			self.ws_write(channels)
+		else:
+			self.ws_write({
+				{
+					VarNames.EVENT: Actions.USER_LEAVES_ROOM,
+					VarNames.ROOM_ID: room_id,
+					VarNames.USER_ID: message[VarNames.USER_ID],
+					VarNames.ROOM_USERS: message[VarNames.ROOM_USERS],
+					VarNames.HANDLER_NAME: HandlerNames.CHANNELS
+				}
+			})
+		return True
 
 	def process_get_messages(self, data):
 		"""

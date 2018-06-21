@@ -223,6 +223,17 @@ export class WsHandler extends MessageHandler {
     });
   }
 
+  public sendAddRoom(roomName, volume, notifications, users, cb: Function) {
+    this.sendToServer({
+      users,
+      roomName,
+      action: 'addRoom',
+      volume,
+      notifications
+    });
+    this.callBacks[this.messageId] = cb;
+  }
+
   public sendLoadMessages(roomId: number, headerId: number, count: number, cb: Function) {
     this.sendToServer({
       headerId,
