@@ -33,11 +33,12 @@
   import {api, globalLogger, ws} from "../utils/singletons";
   import sessionHolder from "../utils/sessionHolder";
   import {EditingMessage, UserModel} from "../model";
+  import {logout} from '../utils/utils';
 
   @Component
   export default class AppNav extends Vue {
-    @State isOnline;
-    @State userInfo;
+    @State isOnline: boolean;
+    @State userInfo: UserModel;
     @Action growlError;
     @Action logout;
 
@@ -53,15 +54,7 @@
     }
 
     signOut() {
-      api.logout(e => {
-        if (e) {
-          this.growlError(e);
-        }
-        this.$router.push('/auth/login');
-        ws.stopListening();
-        this.logout();
-        sessionHolder.session = '';
-      });
+      api.logout(logout);
     }
   }
 </script>

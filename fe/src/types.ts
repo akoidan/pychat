@@ -1,4 +1,4 @@
-import {MessageModel, RoomSettings, UserModel} from './model';
+import {MessageModel} from './model';
 
 export interface MessageDb {
   id: number;
@@ -50,22 +50,12 @@ export interface SetRoomsUsers {
   users: number[];
 }
 
-
-export interface UserModelId extends UserModel {
-  id: number;
-}
-
-
 export interface MessageLocation {
   roomId: number;
   id: number;
   edited: number;
 }
 
-export interface SetRoomSettings {
-  settings: RoomSettings;
-  roomId: number;
-}
 
 export enum IconColor {
   SUCCESS = 'success', ERROR = 'error', WARN = 'warn', NOT_SET = ''

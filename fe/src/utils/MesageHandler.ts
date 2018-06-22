@@ -1,4 +1,4 @@
-import {DefaultMessage} from './dto';
+import {DefaultMessage} from './messages';
 
 export default abstract class MessageHandler {
 

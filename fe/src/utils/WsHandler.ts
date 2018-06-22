@@ -1,15 +1,15 @@
-
 import {API_URL, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT, CONNECTION_RETRY_TIME, PING_CLOSE_JS_DELAY} from './consts';
 import {Store} from 'vuex';
 import {VueRouter} from 'vue-router/types/router';
 
 import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
-import {DefaultMessage, GrowlMessage, RoomDTO, SetWsIdMessage} from './dto';
-import MesageHandler, {default as MessageHandler} from './MesageHandler';
+import {CurrentUserInfoDto} from './dto';
+import {default as MessageHandler} from './MesageHandler';
 import {logout} from './utils';
-import {CurrentUserInfo, RootState, UserModel} from '../model';
+import {CurrentUserInfoModel, RootState} from '../model';
 import {IStorage, Logger, SessionHolder} from '../types';
+import {DefaultMessage, GrowlMessage, SetWsIdMessage} from './messages';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
@@ -47,8 +47,7 @@ export class WsHandler extends MessageHandler {
       this.handlers.channels.setRooms(message.rooms);
       this.handlers.channels.setOnline(message.online);
       this.handlers.channels.setUsers(message.users);
-      // userInfo should be last , so MainPage.inited depends on it
-      this.store.commit('setUserInfo', message.userInfo);
+      this.setUserInfo(message.userInfo);
       this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
     },
     ping(message) {
@@ -59,6 +58,11 @@ export class WsHandler extends MessageHandler {
       this.answerPong();
     }
   };
+
+  private setUserInfo(userInfo: CurrentUserInfoDto) {
+    let um: CurrentUserInfoModel = {...userInfo};
+    this.store.commit('setUserInfo', um);
+  }
 
   private answerPong() {
     if (this.pingTimeoutFunction) {
@@ -278,11 +282,11 @@ export class WsHandler extends MessageHandler {
       this.logger.error('onWsClose {}', message)();
       logout(message);
     } else if (this.wsState === WsState.NOT_INITED) {
-      alert('Can\'t establish connection with server');
+      this.store.dispatch('growlError', 'Can\'t establish connection with server');
       this.logger.error('Chat server is down because {}', reason)();
       this.wsState = WsState.TRIED_TO_CONNECT;
     } else if (this.wsState === WsState.CONNECTED) {
-      alert(`Connection to chat server has been lost, because ${reason}`);
+      this.store.dispatch('growlError', `Connection to chat server has been lost, because ${reason}`);
       this.logger.error(
           'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
           e.reason, CONNECTION_RETRY_TIME)();

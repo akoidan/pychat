@@ -1,81 +1,52 @@
-import {CurrentUserInfo, FileModel, MessageModel, RoomModel, SexModel, UserModel} from '../model';
-import MesageHandler from './MesageHandler';
-
-
-export interface DefaultMessage {
-  action: string;
-  handler: string;
+export enum SexModelDto {
+  Male = 'Male',
+  Female = 'Female',
+  Secret = 'Secret'
 }
 
-
-export interface RoomDTO {
+export interface RoomDto {
   name: string;
   users: number[];
   notifications: boolean;
   volume: number;
+  roomId: number;
 }
 
-export interface SetWsIdMessage extends MesageHandler {
-  rooms: { [id: number]: RoomDTO };
-  users: { [id: number]: UserModel };
-  online: number[];
-  opponentWsId: string;
-  userInfo: CurrentUserInfo;
-}
-
-interface ChangeUserOnline extends DefaultMessage {
-  userId: number;
-  sex: SexModel;
-  content: number[];
+export interface UserDto {
   user: string;
-  time: number;
-}
-
-export interface DeleteRoom extends DefaultMessage {
-  roomId: number;
-}
-
-export interface LeaveUser extends DefaultMessage {
-  roomId: number;
   userId: number;
-  users: number[];
+  sex: SexModelDto;
 }
 
-export interface AddOnlineUser extends ChangeUserOnline {}
-export interface RemoveOnlineUser extends ChangeUserOnline {}
-
-export interface ChatHandlerMessage extends DefaultMessage {
-  roomId: number;
+export interface CurrentUserInfoDto {
+  embeddedYoutube: boolean;
+  highlightCode: boolean;
+  incomingFileCallSound: boolean;
+  messageSound: boolean;
+  onlineChangeSound: boolean;
+  sendLogs: boolean;
+  suggestions: boolean;
+  theme: string;
+  user: string;
+  userId: number;
 }
 
-export interface SetRootMessage extends DefaultMessage {
-  online: number[];
-  users: { [id: number]: UserModel };
-  content: RoomModel[];
-}
-
-export interface LoadMessages extends DefaultMessage {
-  content: MessageModel[];
-  roomId: number;
-}
-
-export interface GrowlMessage extends DefaultMessage {
-  content: string;
-}
-
-export interface DeleteMessage extends DefaultMessage{
-  roomId: number;
+export interface FileModelDto {
   id: number;
-  edited: number;
+  url: string;
+  type: string;
+  preview: string;
 }
 
-export interface EditMessage extends DeleteMessage {
-  messageId: number;
-  userId: number;
-  content: string;
+export interface MessageModelDto {
+  id: number;
   time: number;
-  files: Map<number, FileModel>;
+  files: Map<number, FileModelDto>;
+  content: string;
   symbol: string;
-  giphy: string;
   deleted: boolean;
+  giphy: string;
+  edited: number;
+  roomId: number;
+  userId: number;
 }

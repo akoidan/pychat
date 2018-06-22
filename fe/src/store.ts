@@ -6,28 +6,30 @@ Vue.use(Vuex);
 
 import loggerFactory from './utils/loggerFactory';
 import {
-  CurrentUserInfo,
+  CurrentUserInfoModel,
   EditingMessage,
   GrowlModel,
   GrowlType,
   MessageModel,
-  RoomModel,
+  RoomModel, RoomSettingsModel,
   RootState,
   UserModel
 } from './model';
-import {MessageLocation, UserModelId, SetRoomSettings} from './types';
+import {MessageLocation} from './types';
+import {getMessageById} from './utils/utils';
 
 interface State extends ActionContext<RootState, RootState> {}
 
-const logger = loggerFactory.getLogger('CHAT', 'color: #0FFF00; font-weight: bold');
+const logger = loggerFactory.getLogger('STORE', 'color: #0FFF00; font-weight: bold');
+
 
 const store: StoreOptions<RootState> = {
   state: {
     isOnline: true,
     growls: [],
-    allUsers: {},
+    allUsersDict: {},
     regHeader: null,
-    rooms: {},
+    roomsDict: {},
     activeUserId: null,
     userInfo: null,
     online: [],
@@ -35,51 +37,59 @@ const store: StoreOptions<RootState> = {
     editedMessage: null,
   },
   getters: {
-    privateRooms(state): { [id: string]: UserModelId } {
-      let res =  Object.keys(state.rooms)
-          .filter(key => !state.rooms[key].name)
-          .reduce((obj, key) => {
-            let users = state.rooms[key].users;
-            let id = state.userInfo.userId === users[0] ? users[1] : users[0];
-            return {
-              ...obj,
-              [key]: {...state.allUsers[id], id}
-            };
-          }, {}) as { [id: string]: UserModelId };
-      logger.log('private rooms {}', res)();
+    privateRooms(state: RootState, getters): { [id: string]: UserModel } {
+      let ud: { [id: number]: UserModel } = state.allUsersDict;
+      let res: { [id: string]: UserModel } = {};
+      if (state.userInfo) {
+        let myId: number = state.userInfo.userId;
+        getters.roomsArray
+            .filter((r: RoomModel) => !r.name)
+            .forEach((r: RoomModel) => {
+              let id = myId === r.users[0] ? r.users[1] : r.users[0];
+              res[r.id] = ud[id];
+            });
+      }
+      logger.log('privateRooms {}', res)();
       return res;
     },
-    publicRooms(state): { [id: string]: RoomModel } {
-      let res =  Object.keys(state.rooms)
-          .filter(key => state.rooms[key].name)
-          .reduce((obj, key) => {
-            return {
-              ...obj,
-              [key]: state.rooms[key]
-            };
-          }, {});
-      logger.log('public rooms {}', res)();
+    roomsArray(state: RootState): RoomModel[] {
+      return Object.values(state.roomsDict);
+    },
+    publicRooms(state: RootState, getters): RoomModel[] {
+      let roomModels: RoomModel[] = getters.roomsArray.filter(r => r.name);
+      logger.log('publicRooms {} ', roomModels)();
+      return roomModels;
+    },
+    usersArray(state: RootState): UserModel[] {
+      let res: UserModel[] = Object.values(state.allUsersDict);
+      logger.log('usersArray {}', res)();
       return res;
     },
-    maxId(state): SingleParamCB<number> {
-      return id => state.rooms[id].messages.length > 0 ? state.rooms[id].messages[0].id : null;
+    maxId(state: RootState): SingleParamCB<number> {
+      return (id: number) => {
+        let messages = state.roomsDict[id].messages;
+        return messages.length > 0 ? messages[0].id : null;
+      };
     },
-    activeRoom(state): RoomModel {
-      return state.rooms[state.activeRoomId];
+    activeRoom(state: RootState): RoomModel {
+      return state.roomsDict[state.activeRoomId];
     },
-    minId(state): SingleParamCB<number> {
-      return id => state.rooms[id].messages.length > 0 ? state.rooms[id].messages[this.room.messages.length - 1].id : null;
+    minId(state: RootState): SingleParamCB<number> {
+      return (id: number) => {
+        let messages = state.roomsDict[id].messages;
+        return messages.length > 0 ? messages[messages.length - 1].id : null;
+      };
     },
-    activeUser(state): UserModel {
-      return state.allUsers[state.activeUserId];
+    activeUser(state: RootState): UserModel {
+      return state.allUsersDict[state.activeUserId];
     },
-    showNav(state) {
+    showNav(state: RootState) {
       return !state.editedMessage && !state.activeUserId;
     },
-    editingMessageModel(state): MessageModel {
+    editingMessageModel(state: RootState): MessageModel {
+      logger.log('Eval editingMessageModel')();
       if (state.editedMessage) {
-        logger.log('Eval editingMessageModel')();
-        return state.rooms[state.editedMessage.roomId].messages.find(m => m.id === state.editedMessage.messageId);
+        return getMessageById(state, state.editedMessage.roomId, state.editedMessage.messageId);
       } else {
         return null;
       }
@@ -94,68 +104,37 @@ const store: StoreOptions<RootState> = {
       state.activeUserId = activeUserId;
       state.editedMessage = null;
     },
-    setMessages(state: RootState, {messages, roomId}) {
-      state.rooms[roomId].messages = messages;
+    addMessages(state: RootState, {messages, roomId}) {
+      let om: MessageModel[] = state.roomsDict[roomId].messages;
+      om.push(...messages);
+      om.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
     },
-    setRoomSettings(state: RootState, srm: SetRoomSettings) {
-      let room = state.rooms[srm.roomId];
-      room.notifications = srm.settings.notifications;
-      room.volume = srm.settings.volume;
-      room.name = srm.settings.name;
+    setAllLoaded(state, roomId: number) {
+      state.roomsDict[roomId].allLoaded = true;
+    },
+    setRoomSettings(state: RootState, srm: RoomSettingsModel) {
+      let room = state.roomsDict[srm.id];
+      room.notifications = srm.notifications;
+      room.volume = srm.volume;
+      room.name = srm.name;
     },
     deleteRoom(state: RootState, roomId: number) {
-      let room = state.rooms[roomId];
-      if (state.rooms[roomId]) {
-        let a = 'delete'; // TODO
-        Vue[a](state.rooms, roomId);
-      } else {
-        logger.error('Unable to find room {} to delete', roomId)();
-      }
+      let a = 'delete'; // TODO
+      Vue[a](state.roomsDict, roomId);
     },
     setRoomsUsers(state: RootState, {roomId, users}) {
-      if (state.rooms[roomId]) {
-        state.rooms[roomId].users = users;
-      } else {
-        logger.error('Unable to find room {} to kick user', roomId)();
-      }
+      state.roomsDict[roomId].users = users;
     },
-    addMessage(state: RootState, rm: MessageModel) {
-      let r: RoomModel = state.rooms[rm.roomId];
-      if (r.messages.find(m => m.id === rm.id)) {
-        logger.log('Skipping printing message {}, because it\'s already in list', rm)();
-      } else {
-        logger.log('Adding message to storage {}', rm)();
-        let room = state.rooms[rm.roomId];
-        let i = 0;
-        for (; i < room.messages.length; i++) {
-          if (room.messages[i].time > rm.time) {
-            break;
-          }
-        }
-        room.messages.splice(i, 0, rm);
-      }
+    addMessage(state: RootState, {message, i}) {
+      state.roomsDict[message.roomId].messages.splice(i, 0, message);
     },
-    deleteMessage(state: RootState, rm: MessageLocation) {
-      let room = state.rooms[rm.roomId];
-      let m: MessageModel = room.messages.find(m => m.id === rm.id);
-      if (m) {
-        logger.log('Removing message {} ', rm.id)();
-        m.deleted = true;
-        m.content = null;
-        m.files = null;
-      } else {
-        logger.log('Unable to find message {} to remove it', rm.id)();
-      }
+    deleteMessage(state: RootState, rm: MessageModel) {
+      let m: MessageModel =  getMessageById(state, rm.roomId, rm.id);
+      Object.assign(m, rm);
     },
     editMessage(state: RootState, rm: MessageModel) {
-      let room = state.rooms[rm.roomId];
-      let i: number = room.messages.findIndex(m => m.id === rm.id);
-      if (i >= 0) {
-        logger.log('Editing message {} , index is {}', rm.id, i)();
-        room.messages.splice(i, 1, rm);
-      } else {
-        logger.log('Unable to find message {} to edit it', rm.id)();
-      }
+      let message = getMessageById(state, rm.roomId, rm.id);
+      Object.assign(message, rm);
     },
     setIsOnline(state: RootState, isOnline: boolean) {
       state.isOnline = isOnline;
@@ -175,23 +154,23 @@ const store: StoreOptions<RootState> = {
     setRegHeader(state: RootState, regHeader: string) {
       state.regHeader = regHeader;
     },
-    addUser(state: RootState, {userId, user, sex}) {
-      state.allUsers[userId] = {sex, user};
+    addUser(state: RootState, u: UserModel) {
+      state.allUsersDict[u.id] = u;
     },
     setOnline(state: RootState, ids: number[]) {
       state.online = ids;
     },
     setUsers(state: RootState, users: { [id: number]: UserModel }) {
-      state.allUsers = users;
+      state.allUsersDict = users;
     },
-    setUserInfo(state: RootState, userInfo: CurrentUserInfo) {
+    setUserInfo(state: RootState, userInfo: CurrentUserInfoModel) {
       state.userInfo = userInfo;
     },
-    setRooms(state: RootState, rooms: {[id: string]: RoomModel}) {
-      state.rooms = rooms;
+    setRooms(state: RootState, rooms: { [id: number]: RoomModel }) {
+      state.roomsDict = rooms;
     },
-    setAllLoaded(state: RootState, roomId: number) {
-      state.rooms[roomId].allLoaded = true;
+    addRoom(state: RootState, room: RoomModel) {
+      state.roomsDict[room.id] = room;
     }
   },
   actions: {

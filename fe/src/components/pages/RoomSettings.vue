@@ -49,8 +49,7 @@
   import AppInputRange from '../ui/AppInputRange';
   import AppSubmit from '../ui/AppSubmit';
   import {api, globalLogger, ws} from "../../utils/singletons";
-  import {RoomModel} from "../../model";
-  import {SetRoomSettings} from "../../types";
+  import {RoomModel, RoomSettingsModel} from "../../model";
   @Component({components: {AppInputRange, AppSubmit}})
   export default class RoomSettings extends Vue {
 
@@ -59,7 +58,7 @@
     notifications: boolean = false;
     running: boolean = false;
     isPublic: boolean = false;
-    @State rooms;
+    @State roomsDict: {[id: string]: RoomModel};
 
     @Action growlError;
     @Action growlSuccess;
@@ -93,7 +92,7 @@
     }
 
     get room(): RoomModel {
-      return this.rooms[this.roomId];
+      return this.roomsDict[this.roomId];
     }
 
     get roomId() : number {
@@ -110,9 +109,11 @@
         if (err) {
           this.growlError(err);
         } else {
-          let payload: SetRoomSettings = {
-            roomId: this.roomId,
-            settings: {name: this.roomName, notifications: this.notifications, volume: this.soundInt}
+          let payload: RoomSettingsModel = {
+            id: this.roomId,
+            name: this.roomName,
+            notifications: this.notifications,
+            volume: this.soundInt
           };
           this.setRoomSettings(payload);
           this.growlSuccess('Settings has been saved');

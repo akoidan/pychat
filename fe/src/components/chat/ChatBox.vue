@@ -24,10 +24,8 @@
 
   @Component({components: {ChatMessage}})
   export default class ChatBox extends Vue {
-    @Prop() roomId: number;
     @Prop() room: RoomModel;
     @Getter maxId;
-    @Getter messagesFields;
 
     showSearch: boolean = false;
     loading: boolean = false;
@@ -56,7 +54,7 @@
     }
 
     get messages() {
-      globalLogger.debug("Reevaluating messages")();
+      globalLogger.debug("Reevaluating messages in room #{}", this.room.id)();
       let newArray = [];
       let dates = {};
       this.room.messages.forEach(m => {
@@ -77,7 +75,7 @@
           && (e.detail < 0 || e.wheelDelta > 0)
           && this.$refs.chatbox.scrollTop === 0) {
         this.loading = true;
-        ws.sendLoadMessages(this.roomId, this.maxId(this.roomId), 10, () => {
+        ws.sendLoadMessages(this.room.id, this.maxId(this.room.id), 10, () => {
           this.loading = false;
         });
       }

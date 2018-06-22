@@ -14,7 +14,6 @@ class Actions(object):
 	ACCEPT_FILE = 'acceptFile'
 	GROWL_MESSAGE = 'growl'
 	GET_MESSAGES = 'loadMessages'
-	CREATE_DIRECT_CHANNEL = 'addDirectChannel'
 	DELETE_ROOM = 'deleteRoom'
 	DELETE_MY_ROOM = DELETE_ROOM
 	USER_LEAVES_ROOM = 'leaveUser'
@@ -96,9 +95,10 @@ class RedisPrefix:
 	CONNECTION_ID_LENGTH = 8  # should be secure
 
 	@staticmethod
-	def set_js_user_structure(name, sex):
+	def set_js_user_structure(id, name, sex):
 		return {
 			VarNames.USER: name,
+			VarNames.USER_ID: id,
 			VarNames.GENDER: settings.GENDERS[sex]
 		}
 

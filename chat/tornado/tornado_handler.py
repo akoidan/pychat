@@ -160,33 +160,40 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			was_online, online = self.get_online_and_status_from_redis()
 			self.sender_name = user_db.username
 			self.sex = user_db.sex_str
-			user_rooms1 = Room.objects.filter(users__id=self.user_id, disabled=False) \
+			user_rooms_query = Room.objects.filter(users__id=self.user_id, disabled=False) \
 				.values('id', 'name', 'roomusers__notifications', 'roomusers__volume')
-			user_rooms = MessagesCreator.create_user_rooms(user_rooms1)
-			room_ids = [room_id for room_id in user_rooms]
+			room_users = [{
+				VarNames.ROOM_ID: room['id'],
+				VarNames.ROOM_NAME: room['name'],
+				VarNames.NOTIFICATIONS: room['roomusers__notifications'],
+				VarNames.VOLUME: room['roomusers__volume'],
+				VarNames.ROOM_USERS: []
+			} for room in user_rooms_query]
+			user_rooms_dict = {room[VarNames.ROOM_ID]: room for room in room_users}
+			room_ids = [room_id[VarNames.ROOM_ID] for room_id in room_users]
 			rooms_users = RoomUsers.objects.filter(room_id__in=room_ids).values('user_id', 'room_id')
 			for ru in rooms_users:
-				user_rooms[ru['room_id']][VarNames.ROOM_USERS].append(ru['user_id'])
+				user_rooms_dict[ru['room_id']][VarNames.ROOM_USERS].append(ru['user_id'])
 			# get all missed messages
 			self.channels = room_ids  # py2 doesn't support clear()
 			self.channels.append(self.channel)
 			self.channels.append(self.id)
 			self.listen(self.channels)
-			off_messages, history = self.get_offline_messages(user_rooms, was_online, self.get_argument('history', False))
-			for room_id in user_rooms:
+			off_messages, history = self.get_offline_messages(room_users, was_online, self.get_argument('history', False))
+			for room in room_users:
+				room_id = room[VarNames.ROOM_ID]
 				h = history.get(room_id)
 				o = off_messages.get(room_id)
 				if h:
-					user_rooms[room_id][VarNames.LOAD_MESSAGES_HISTORY] = h
+					room[VarNames.LOAD_MESSAGES_HISTORY] = h
 				if o:
-					user_rooms[room_id][VarNames.LOAD_MESSAGES_OFFLINE] = o
-			user_dict = {}
-			for user in User.objects.values('id', 'username', 'sex'):
-				user_dict[user['id']] = RedisPrefix.set_js_user_structure(user['username'], user['sex'])
+					room[VarNames.LOAD_MESSAGES_OFFLINE] = o
+			user_dict = [RedisPrefix.set_js_user_structure(user['id'], user['username'], user['sex'])
+					for user in User.objects.values('id', 'username', 'sex')]
 			if self.user_id not in online:
 				online.append(self.user_id)
 
-			self.ws_write(self.set_room(user_rooms, user_dict, online, user_db))
+			self.ws_write(self.set_room(room_users, user_dict, online, user_db))
 			if not was_online:  # if a new tab has been opened
 				online_user_names_mes = self.room_online(online, Actions.LOGIN)
 				self.logger.info('!! First tab, sending refresh online for all')

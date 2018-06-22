@@ -4,8 +4,8 @@
     <nav-user-show v-if="activeUser" :active-user="activeUser"/>
     <div class="wrapper">
       <div class="chatBoxHolder">
-        <template  v-for="(room, id) in rooms">
-          <chat-box :room-id="parseInt(id)" :room="room" :key="id" v-show="activeRoomId === parseInt(id)"/>
+        <template v-for="room in roomsArray">
+          <chat-box :room="room" :key="room.id" v-show="activeRoomId === room.id"/>
         </template>
         <div v-if="!activeRoom" class="noRoom" >
           <router-link to="/chat/1">This room doesn't exist, or you don't have access to it. Click to go to main room</router-link>
@@ -30,7 +30,7 @@
   import RoomUsers from "./RoomUsers.vue"
   import ChatBox from "./ChatBox.vue"
   import SmileyHolder from "./SmileyHolder.vue"
-  import {CurrentUserInfo, EditingMessage, MessageModel, RoomModel} from "../../model";
+  import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from "../../model";
   import {encodeP, getMessageData, getSmileyHtml, pasteHtmlAtCaret, pasteImgToTextArea} from "../../utils/htmlApi";
   import {api, globalLogger, ws} from "../../utils/singletons";
   import EditMessageMixin from './EditMessageMixin';
@@ -39,13 +39,10 @@
 
   @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Mixins(EditMessageMixin) {
-    @State growls: string[];
-    @State theme;
-    @State activeRoomId;
     @Getter activeUser;
     @State editedMessage: EditingMessage;
-    @State userInfo: CurrentUserInfo;
-    @State rooms: {[id: string]: RoomModel};
+    @State activeRoomId: number;
+    @Getter roomsArray: RoomModel[];
     @Getter maxId: SingleParamCB<number>;
     @Getter activeRoom: RoomModel;
     @Getter editingMessageModel: MessageModel;

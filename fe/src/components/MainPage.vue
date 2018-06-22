@@ -34,7 +34,7 @@
     }
 
     destroy() {
-      ws.stopListening();
+
     }
   }
 </script>

@@ -57,28 +57,27 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppInputRange from '../ui/AppInputRange';
   import AppSubmit from '../ui/AppSubmit';
-  import {UserModel} from '../../model';
-  import {UserModelId} from '../../types';
+  import {CurrentUserInfoModel, UserModel} from "../../model";
   import {api, globalLogger, ws} from "../../utils/singletons";
 
   @Component({components: {AppInputRange, AppSubmit}})
   export default class CreatePrivateRoom extends Vue {
-    @State allUsers;
-    @State rooms;
+    @Getter usersArray;
+    @State userInfo: CurrentUserInfoModel;
     @Action growlError;
-    @Getter privateRooms: { [id: string]: UserModelId };
-    currentUsers: UserModelId[] = [];
+    @Getter privateRooms: { [id: string]: UserModel };
+    currentUsers: UserModel[] = [];
     notifications: boolean = false;
     sound: number = 0;
     search: string = '';
     roomName: string = '';
     running: boolean = false;
 
-    removeUser(currentUser: UserModelId) {
+    removeUser(currentUser: UserModel) {
       this.currentUsers.splice(this.currentUsers.indexOf(currentUser), 1);
     }
 
-    addUser(user: UserModelId) {
+    addUser(user: UserModel) {
       this.search = '';
       this.currentUsers.push(user);
     }
@@ -88,34 +87,29 @@
         this.growlError('You should specify room name or at least add one user');
       } else {
         this.running = true;
-        ws.sendAddRoom(this.roomName, this.sound, this.notifications, this.currentUsers.map(u => u.id), e => {
+        ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), e => {
           this.running = false;
         });
       }
     }
 
-    get users(): UserModelId[] {
+    get users(): UserModel[] {
       let uids: number[] = this.currentUsers.map(a => a.id);
+      uids.push(this.userInfo.userId);
       for (let user in this.privateRooms) {
         uids.push(this.privateRooms[user].id)
       }
-      let users: UserModelId[] = [];
-      for (let uid in this.allUsers) {
-        let u: UserModel = this.allUsers[uid];
-        if (uids.indexOf(parseInt(uid)) < 0) {
-          let c: UserModelId = {
-            user: u.user,
-            id: parseInt(uid),
-            sex: u.sex
-          };
-          users.push(c);
+      let users: UserModel[] = [];
+      this.usersArray.forEach(u => {
+        if (uids.indexOf(u.id) < 0) {
+          users.push(u);
         }
-      }
+      });
       globalLogger.debug("Reeval users in CreatePrivateRoom")();
       return users;
     }
 
-    get filteredUsers(): UserModelId[] {
+    get filteredUsers(): UserModel[] {
       globalLogger.debug("Reeval filter CreatePrivateRoom")();
       let s = this.search.toLowerCase();
       return this.users.filter(u => u.user.toLowerCase().indexOf(s) >= 0);

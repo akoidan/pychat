@@ -84,61 +84,6 @@ def no_history_q(q_objects, room_id, h, f):
 			(Q(id__gte=h) & Q(id__lte=f) & Q(edited_times__gt=0) & Q(time__gt=get_milliseconds() - ONE_DAY)) | Q(id__gt=f)), Q.OR)
 
 
-def create_room(self_user_id, user_id):
-	# get all self private rooms ids
-	user_rooms = evaluate(Room.users.through.objects.filter(user_id=self_user_id, room__name__isnull=True).values('room_id'))
-	# get private room that contains another user from rooms above
-	if user_rooms and self_user_id == user_id:
-		room_id = create_self_room(self_user_id,user_rooms)
-	elif user_rooms:
-		room_id = create_other_room(self_user_id, user_id, user_rooms)
-	else:
-		room_id = create_other_room_wo_check(self_user_id, user_id)
-	return room_id
-
-
-def create_simple_room_users(user_id, room_id):
-	RoomUsers(room_id=room_id, user_id=user_id, last_read_message_id=get_max_id()).save()
-
-
-def get_max_id():
-	return Message.objects.all().aggregate(Max('id'))['id__max']
-
-
-def create_other_room_wo_check(self_user_id, user_id):
-	room = Room()
-	room.save()
-	room_id = room.id
-	if self_user_id == user_id:
-		RoomUsers(user_id=user_id, room_id=room_id).save()
-	else:
-		max_id = get_max_id()
-		RoomUsers.objects.bulk_create([
-			RoomUsers(user_id=self_user_id, room_id=room_id, last_read_message_id=max_id),
-			RoomUsers(user_id=user_id, room_id=room_id,last_read_message_id=max_id),
-		])
-	return room_id
-
-
-def create_other_room(self_user_id, user_id, user_rooms):
-	rooms_query = RoomUsers.objects.filter(user_id=user_id, room__in=user_rooms)
-	query = rooms_query.values('room__id', 'room__disabled')
-	try:
-		room = do_db(query.get)
-		room_id = room['room__id']
-		update_room(room_id, room['room__disabled'])
-	except RoomUsers.DoesNotExist:
-		room = Room()
-		room.save()
-		room_id = room.id
-		max_id = get_max_id()
-		RoomUsers.objects.bulk_create([
-			RoomUsers(user_id=self_user_id, room_id=room_id, last_read_message_id=max_id),
-			RoomUsers(user_id=user_id, room_id=room_id, last_read_message_id=max_id),
-		])
-	return room_id
-
-
 def evaluate(query_set):
 	do_db(len, query_set)
 	return query_set

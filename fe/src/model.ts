@@ -14,7 +14,7 @@ export interface EditingMessage {
   isEditingNow: boolean;
 }
 
-export interface CurrentUserInfo {
+export interface CurrentUserInfoModel {
   embeddedYoutube: boolean;
   highlightCode: boolean;
   incomingFileCallSound: boolean;
@@ -29,6 +29,7 @@ export interface CurrentUserInfo {
 
 export interface UserModel {
   user: string;
+  id: number;
   sex: SexModel;
 }
 
@@ -54,16 +55,17 @@ export  interface MessageModel {
 
 
 export enum SexModel {
-  MALE = 'Male', FEMALE = 'Female', ALIEN = 'Secret'
+  Male = 'Male', Female = 'Female', Secret = 'Secret'
 }
 
-export interface RoomSettings {
+export interface RoomSettingsModel {
   name: string;
   notifications: boolean;
   volume: number;
+  id: number;
 }
 
-export interface RoomModel extends RoomSettings {
+export interface RoomModel extends RoomSettingsModel {
   users: number[];
   messages: MessageModel[];
   allLoaded: boolean;
@@ -75,10 +77,10 @@ export interface RootState {
   editedMessage: EditingMessage;
   activeRoomId: number;
   activeUserId: number;
-  userInfo: CurrentUserInfo;
-  allUsers: { [id: number]: UserModel };
+  userInfo: CurrentUserInfoModel;
+  allUsersDict: { [id: number]: UserModel };
   regHeader: string;
   online: number[];
-  rooms: {[id: string]: RoomModel};
+  roomsDict: { [id: number]: RoomModel };
 }
 

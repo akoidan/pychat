@@ -49,6 +49,9 @@ module.exports = (env, argv) => {
         vue: 'vue/dist/vue.js'
       }
     },
+    output: {
+      publicPath: '/' //https://github.com/webpack/webpack-dev-server/issues/851#issuecomment-399227814
+    },
     devtool: '#source-map',
     module: {
       rules: [

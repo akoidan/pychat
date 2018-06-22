@@ -6,7 +6,7 @@
         <router-link to="/create-private-room" class="icon-plus-squared" title="Create direct room"/>
       </span>
     <ul class="directUserTable" v-show="!directMinified">
-      <li :class="getOnlineActiveClass(user.id, id)" :key="id" v-for="(user, id) in privateRooms">
+      <li :class="getOnlineActiveClass(user.id, parseInt(id))" :key="id" v-for="(user, id) in privateRooms">
         <router-link :to="`/chat/${id}`">
           <i :class="getUserSexClass(user)"></i>{{user.user}}
         </router-link>
@@ -22,11 +22,11 @@
         <router-link to="/create-public-room" class="icon-plus-squared" title="Create public room"/>
     </span>
     <ul class="rooms" v-show="!roomsMinified">
-      <li v-for="(room, id) in publicRooms" :key="id" :class="getActiveClass(id)">
-        <router-link :to="`/chat/${id}`">
+      <li v-for="room in publicRooms" :key="room.id" :class="getActiveClass(room.id)">
+        <router-link :to="`/chat/${room.id}`">
           {{ room.name }}
         </router-link>
-        <router-link :to="`/room-settings/${id}`">
+        <router-link :to="`/room-settings/${room.id}`">
           <span class="icon-cog"></span>
         </router-link>
         <span class="newMessagesCount"></span>
@@ -39,8 +39,8 @@
            @click="showInviteUser"></i>
       </span>
     <ul class="chat-user-table" v-show="!onlineMinified">
-      <template v-for="(user, id) in allUsers">
-        <li :class="getOnlineClass(id)" v-show="userIsInActiveRoom(id)" :key="id">
+      <template v-for="user in usersArray">
+        <li :class="getOnlineClass(user.id)" v-show="userIsInActiveRoom(user.id)" :key="user.id">
           <i :class="getUserSexClass(user)"></i>{{ user.user }}
         </li>
       </template>
@@ -50,49 +50,54 @@
 <script lang="ts">
   import {State, Action,Getter, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {CurrentUserInfo, RoomModel, SexModel, UserModel} from "../../model";
+  import {CurrentUserInfoModel, RoomModel, SexModel, UserModel} from "../../model";
   import {globalLogger} from '../../utils/singletons';
-  import {UserModelId} from '../../types';
+
 
 
   @Component
   export default class RoomUsers extends Vue {
 
-    @State rooms: {[id: string]: RoomModel};
-    @State allUsers: {[id: string]: UserModel};
+    @Getter usersArray: { [id: string]: UserModel};
     @State activeRoomId: number;
     @Getter activeRoom: RoomModel;
-    @State userInfo: CurrentUserInfo;
     @State online: number[];
-    @Getter publicRooms: { [id: string]: UserModelId };
-    @Getter privateRooms: { [id: string]: RoomModel };
+    @Getter publicRooms: RoomModel[];
+    @Getter privateRooms: { [id: string]: UserModel};
 
     directMinified: boolean = false;
     roomsMinified: boolean = false;
     onlineMinified: boolean = false;
     onlineShowOnlyOnline: boolean = false;
 
-
-    getUserSexClass(user: UserModelId) {
-      return user.sex === SexModel.MALE? 'icon-man' : user.sex === SexModel.FEMALE  ? 'icon-girl' : 'icon-user-secret'
+    getUserSexClass(user: UserModel) {
+      if (user.sex === SexModel.Male) {
+        return 'icon-man';
+      } else if (user.sex === SexModel.Female) {
+        return 'icon-girl';
+      } else if (user.sex === SexModel.Secret) {
+        return 'icon-user-secret';
+      } else {
+        throw `Invalid sex ${user.sex}`;
+      }
     }
 
-    userIsInActiveRoom(userId: string) {
+    userIsInActiveRoom(userId: number) {
       let ar = this.activeRoom;
-      return ar && ar.users.indexOf(parseInt(userId)) >= 0;
+      return ar && ar.users.indexOf(userId) >= 0;
     }
 
-    getOnlineClass(id: string) : string {
-      return this.online.indexOf(parseInt(id)) < 0 ? 'offline' : 'online';
+    getOnlineClass(id: number) : string {
+      return this.online.indexOf(id) < 0 ? 'offline' : 'online';
     }
 
-    getActiveClass(roomId: string) {
-      return parseInt(roomId) === this.activeRoomId ? 'active-room' : null;
+    getActiveClass(roomId: number) {
+      return roomId === this.activeRoomId ? 'active-room' : null;
     }
 
-    getOnlineActiveClass(id: number, roomId: string) : string[] {
+    getOnlineActiveClass(id: number, roomId: number) : string[] {
       const a = [this.online.indexOf(id) < 0 ? "offline" : "online"];
-      if (parseInt(roomId) === this.activeRoomId) {
+      if (roomId === this.activeRoomId) {
         a.push('active-room');
       }
       return a;

@@ -152,17 +152,6 @@ class MessagesCreator(object):
 	def channel(self):
 		return RedisPrefix.generate_user(self.user_id)
 
-	def subscribe_direct_channel_message(self, room_id, users_id, notifications):
-		return {
-			VarNames.EVENT: Actions.CREATE_DIRECT_CHANNEL,
-			VarNames.VOLUME: 2,
-			VarNames.NOTIFICATIONS: notifications,
-			VarNames.ROOM_ID: room_id,
-			VarNames.TIME: get_milliseconds(),
-			VarNames.ROOM_USERS: users_id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS
-		}
-
 	def responde_pong(self, js_id):
 		return {
 			VarNames.EVENT: Actions.PONG,
@@ -170,16 +159,6 @@ class MessagesCreator(object):
 			VarNames.JS_MESSAGE_ID: js_id
 		}
 
-	def subscribe_room_channel_message(self, room_id, room_name):
-		return {
-			VarNames.EVENT: Actions.CREATE_ROOM_CHANNEL,
-			VarNames.ROOM_ID: room_id,
-			VarNames.ROOM_USERS: [self.user_id],
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
-			VarNames.VOLUME: 2,
-			VarNames.NOTIFICATIONS: True,
-			VarNames.ROOM_NAME: room_name
-		}
 
 	@staticmethod
 	def add_user_to_room(channel, channel_name, inviter, invitee, all_users):

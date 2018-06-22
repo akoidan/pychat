@@ -15,7 +15,7 @@
 
   @Component
   export default class Main extends Vue {
-    @State regHeader;
+    @State regHeader: string;
 
   }
 </script>

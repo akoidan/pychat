@@ -2,14 +2,14 @@
   <p :class="getClass(message)" @contextmenu="contextmenu">
       <span class="message-header">
         <span class="timeMess">({{getTime(message.time)}})</span>
-        <span @contextmenu.prevent="setActiveUser">{{allUsers[message.userId].user}}</span>: </span>
+        <span @contextmenu.prevent="setActiveUser">{{allUsersDict[message.userId].user}}</span>: </span>
     <span class="message-text-style" v-html="encoded" ref="content"></span>
   </p>
 </template>
 <script lang="ts">
   import {Mutation, State, Getter} from "vuex-class";
   import {Component, Prop, Vue, Mixins} from "vue-property-decorator";
-  import {CurrentUserInfo, EditingMessage, MessageModel, UserModel} from "../../model";
+  import {CurrentUserInfoModel, EditingMessage, MessageModel, UserModel} from "../../model";
   import {globalLogger, ws} from "../../utils/singletons";
   import {encodeHTML, encodeMessage, highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
   import EditedMessageMixin, {default as EditMessageMixin} from "./EditMessageMixin"
@@ -18,9 +18,9 @@
   @Component({mixins: [EditedMessageMixin] })
   export default class ChatMessage extends Mixins(EditMessageMixin) {
 
-    @State userInfo: CurrentUserInfo;
+    @State userInfo: CurrentUserInfoModel;
     @Prop() message: MessageModel;
-    @State allUsers: { [id: number]: UserModel };
+    @State allUsersDict: { [id: number]: UserModel };
     @State editedMessage : EditingMessage;
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
     @Mutation setActiveUserId: SingleParamCB<number>;

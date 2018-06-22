@@ -3,7 +3,7 @@ import logging
 import re
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.db.models import Q, Max
 from tornado.gen import engine, Task
 from tornado.httpclient import HTTPRequest
 from tornado.ioloop import IOLoop
@@ -13,13 +13,13 @@ from tornadoredis import Client
 from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
-	UploadedFile, Image
+	UploadedFile, Image, get_milliseconds
 from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, get_or_create_room, \
-	create_room, get_message_images_videos, update_symbols, up_files_to_img, create_simple_room_users
+	get_message_images_videos, update_symbols, up_files_to_img, evaluate
 
 parent_logger = logging.getLogger(__name__)
 base_logger = logging.LoggerAdapter(parent_logger, {
@@ -59,7 +59,6 @@ class MessagesHandler(MessagesCreator):
 		self.process_ws_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
-			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
 			Actions.DELETE_ROOM: self.delete_channel,
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
@@ -70,7 +69,6 @@ class MessagesHandler(MessagesCreator):
 		# Handlers for redis messages, if handler returns true - message won't be sent to client
 		# The handler is determined by @VarNames.EVENT
 		self.process_pubsub_message = {
-			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_channel,
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
 			Actions.INVITE_USER: self.send_client_new_channel,
@@ -274,14 +272,57 @@ class MessagesHandler(MessagesCreator):
 			send_message(message)
 
 	def create_new_room(self, message):
-		room_name = message[VarNames.ROOM_NAME]
-		if not room_name or len(room_name) > 16:
+		room_name = message.get(VarNames.ROOM_NAME)
+		users = message.get(VarNames.ROOM_USERS)
+		users.append(self.user_id)
+		users = list(set(users))
+		max_id =Message.objects.all().aggregate(Max('id'))['id__max']
+		if room_name and len(room_name) > 16:
 			raise ValidationError('Incorrect room name "{}"'.format(room_name))
-		room = Room(name=room_name)
-		do_db(room.save)
-		create_simple_room_users(self.user_id, room.id)
-		subscribe_message = self.subscribe_room_channel_message(room.id, room_name)
-		self.publish(subscribe_message, self.channel, True)
+		create_user_rooms = True
+		if not room_name and  len(users) == 2:
+			user_rooms = evaluate(Room.users.through.objects.filter(user_id=self.user_id, room__name__isnull=True).values('room_id'))
+			user_id = users[0] if users[1] == self.user_id else users[1]
+			try:
+				room = RoomUsers.objects.filter(user_id=user_id, room__in=user_rooms).values('room__id', 'room__disabled').get()
+				room_id = room['room__id']
+				if room['room__disabled']:
+					Room.objects.filter(id=room_id).update(disabled=False)
+				else:
+					raise ValidationError('This room already exist')
+				create_user_rooms = False
+			except RoomUsers.DoesNotExist:
+				pass
+		elif not room_name:
+			raise ValidationError('At least one user should be selected, or room should be public')
+		if create_user_rooms:
+			room = Room(name=room_name)
+			do_db(room.save)
+			room_id = room.id
+			ru = [RoomUsers(
+				user_id=user_id,
+				room_id=room_id,
+				last_read_message_id=max_id,
+				volume=message[VarNames.VOLUME],
+				notifications=message[VarNames.NOTIFICATIONS]
+			) for user_id in users]
+			RoomUsers.objects.bulk_create(ru)
+
+		m = {
+			VarNames.EVENT: Actions.CREATE_ROOM_CHANNEL,
+			VarNames.ROOM_ID: room_id,
+			VarNames.ROOM_USERS: users,
+			VarNames.CB_BY_SENDER: self.id,
+			VarNames.USER_ID: self.user_id,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.VOLUME: message[VarNames.VOLUME],
+			VarNames.NOTIFICATIONS: message[VarNames.NOTIFICATIONS],
+			VarNames.ROOM_NAME: room_name,
+			VarNames.TIME: get_milliseconds(),
+		}
+		self.publish(m, self.channel, True)
+		m[VarNames.JS_MESSAGE_ID] = message[VarNames.JS_MESSAGE_ID]
+		self.ws_write(m)
 
 	def invite_user(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -310,19 +351,6 @@ class MessagesHandler(MessagesCreator):
 			if message[VarNames.TIME] != self.last_client_ping:
 				self.close(408, "Ping timeout")
 		IOLoop.instance().call_later(settings.PING_CLOSE_SERVER_DELAY, call_check)
-
-	def create_user_channel(self, message):
-		user_id = message[VarNames.USER_ID]
-		room_id = create_room(self.user_id, user_id)
-		multiple_users = user_id != self.user_id
-		subscribe_message = self.subscribe_direct_channel_message(
-			room_id,
-			[user_id, self.user_id] if multiple_users else [self.user_id],
-			self.user_id != user_id
-		)
-		self.publish(subscribe_message, self.channel, True)
-		if multiple_users:
-			self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
 
 	def delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -388,6 +416,8 @@ class MessagesHandler(MessagesCreator):
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		self.add_channel(room_id)
+		if message[VarNames.CB_BY_SENDER] == self.id:
+			return True
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]

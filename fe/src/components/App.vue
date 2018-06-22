@@ -18,7 +18,6 @@
   })
   export default class App extends Vue {
     @State growls: string[];
-    @State userInfo;
 
     created() {
       globalLogger.log("rendering app")();
