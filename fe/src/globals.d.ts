@@ -5,3 +5,4 @@ interface SingleParamCB<T> {
 interface ErrorCB <T> {
   (a: T, t: string): void;
 }
+

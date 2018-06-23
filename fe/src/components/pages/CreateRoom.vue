@@ -170,7 +170,7 @@
 
   ul
     max-height: calc(100vh - 400px)
-    min-height: 30px
+    min-height: 50px
     overflow-y: scroll
     padding-left: 0
 
