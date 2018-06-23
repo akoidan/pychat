@@ -1,6 +1,6 @@
-import {WsHandler} from './utils/WsHandler';
+import {WsHandler} from '../utils/WsHandler';
 import {Logger} from './types';
-import Api from './utils/api';
+import Api from '../utils/api';
 import VueRouter, {Route} from 'vue-router';
 
 

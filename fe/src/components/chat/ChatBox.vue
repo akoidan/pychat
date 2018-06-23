@@ -19,7 +19,7 @@
   import {Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import ChatMessage from "./ChatMessage.vue";
-  import {RoomModel} from "../../model";
+  import {RoomModel} from "../../types/model";
 
   @Component({components: {ChatMessage}})
   export default class ChatBox extends Vue {

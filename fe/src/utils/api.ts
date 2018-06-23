@@ -1,6 +1,6 @@
 import Xhr from './Xhr';
 import {RESPONSE_SUCCESS} from './consts';
-import {UploadFile} from '../types';
+import {UploadFile} from '../types/types';
 
 export default class Api {
   private xhr: Xhr;

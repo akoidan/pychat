@@ -30,7 +30,7 @@
 <script lang="ts">
   import {Action, State} from "vuex-class";
   import {Component, Vue} from "vue-property-decorator";
-  import {UserModel} from "../model";
+  import {UserModel} from "../types/model";
   import {logout} from "../utils/utils";
 
   @Component

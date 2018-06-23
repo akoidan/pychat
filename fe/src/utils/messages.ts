@@ -1,4 +1,4 @@
-import {CurrentUserInfoDto, FileModelDto, MessageModelDto, RoomDto, UserDto} from './dto';
+import {CurrentUserInfoDto, FileModelDto, MessageModelDto, RoomDto, UserDto} from '../types/dto';
 
 export interface DefaultMessage {
   action: string;

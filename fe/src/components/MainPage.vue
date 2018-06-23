@@ -14,7 +14,7 @@
   import {Getter, State} from "vuex-class";
   import AppNav from "./AppNav.vue";
   import {Component, Vue} from "vue-property-decorator";
-  import {UserModel} from "../model";
+  import {UserModel} from "../types/model";
 
   @Component({
     components: {AppNav}

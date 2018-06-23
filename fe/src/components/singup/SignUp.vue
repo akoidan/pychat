@@ -37,7 +37,7 @@
   import AppSubmit from "../ui/AppSubmit.vue"
   import RegisterFieldSet from './RegisterFieldSet.vue'
   import _ from 'lodash';
-  import {IconColor} from '../../types';
+  import {IconColor} from '../../types/types';
   import sessionHolder from '../../utils/sessionHolder';
   import {login} from '../../utils/utils';
 

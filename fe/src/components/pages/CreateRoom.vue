@@ -58,7 +58,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppInputRange from '../ui/AppInputRange';
   import AppSubmit from '../ui/AppSubmit';
-  import {CurrentUserInfoModel, UserModel} from "../../model";
+  import {CurrentUserInfoModel, UserModel} from "../../types/model";
   import {AddRoomMessage} from "../../utils/messages";
 
   @Component({components: {AppInputRange, AppSubmit}})

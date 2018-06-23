@@ -12,7 +12,7 @@
 <script lang="ts">
   import {State, Action, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {UserModel} from "../../model";
+  import {UserModel} from "../../types/model";
 
   @Component
   export default class NavUserShow extends Vue {

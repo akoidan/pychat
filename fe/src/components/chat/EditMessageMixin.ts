@@ -3,7 +3,7 @@ import {Component, Watch, Mixins} from 'vue-property-decorator';
 const ONE_DAY = 24 * 60 * 60 * 1000;
 import Vue from 'vue';
 import {globalLogger} from '../../utils/singletons';
-import {CurrentUserInfoModel, EditingMessage, MessageModel} from '../../model';
+import {CurrentUserInfoModel, EditingMessage, MessageModel} from '../../types/model';
 
 @Component
 

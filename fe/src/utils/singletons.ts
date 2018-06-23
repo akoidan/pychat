@@ -7,7 +7,7 @@ import LocalStorage from './LocalStorage';
 import store from '../store';
 import router from '../router';
 import Api from './api';
-import {IStorage, Logger} from '../types';
+import {IStorage, Logger} from '../types/types';
 import loggerFactory from './loggerFactory';
 import sessionHolder from './sessionHolder';
 

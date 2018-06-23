@@ -2,8 +2,8 @@ import loggerFactory from './loggerFactory';
 import {Store} from 'vuex';
 import Api from './api';
 import MessageHandler from './MesageHandler';
-import {AddMessagePayload, Logger, MessageLocation, SetRoomsUsers} from '../types';
-import {MessageModel, RoomDictModel, RoomModel, RootState, SexModel, UserDictModel, UserModel} from '../model';
+import {AddMessagePayload, Logger, MessageLocation, SetRoomsUsers} from '../types/types';
+import {MessageModel, RoomDictModel, RoomModel, RootState, SexModel, UserDictModel, UserModel} from '../types/model';
 import {
   AddOnlineUserMessage,
   AddRoomMessage,
@@ -14,7 +14,7 @@ import {
   LoadMessages,
   RemoveOnlineUserMessage
 } from './messages';
-import {MessageModelDto, RoomDto, SexModelDto, UserDto} from './dto';
+import {MessageModelDto, RoomDto, SexModelDto, UserDto} from '../types/dto';
 import {getMessageById} from './utils';
 
 

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 import './assets/sass/common.sass';
-import './smileys.js';
+import './assets/smileys.js';
 import App from './components/App.vue';
 import {api, globalLogger, storage, ws} from './utils/singletons';
 import store from './store';

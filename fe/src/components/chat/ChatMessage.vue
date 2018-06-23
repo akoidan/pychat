@@ -9,7 +9,7 @@
 <script lang="ts">
   import {Mutation, State, Getter} from "vuex-class";
   import {Component, Prop, Vue, Mixins} from "vue-property-decorator";
-  import {CurrentUserInfoModel, EditingMessage, MessageModel, UserDictModel, UserModel} from "../../model";
+  import {CurrentUserInfoModel, EditingMessage, MessageModel, UserDictModel, UserModel} from "../../types/model";
   import {encodeHTML, encodeMessage, highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
   import EditMessageMixin from './EditMessageMixin';
 

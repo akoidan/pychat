@@ -48,7 +48,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppInputRange from '../ui/AppInputRange';
   import AppSubmit from '../ui/AppSubmit';
-  import {RoomDictModel, RoomModel, RoomSettingsModel} from "../../model";
+  import {RoomDictModel, RoomModel, RoomSettingsModel} from "../../types/model";
   @Component({components: {AppInputRange, AppSubmit}})
   export default class RoomSettings extends Vue {
 

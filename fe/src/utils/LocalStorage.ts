@@ -1,7 +1,7 @@
 
 import loggerFactory from './loggerFactory';
-import {IStorage, Logger} from '../types';
-import {MessageModel} from '../model';
+import {IStorage, Logger} from '../types/types';
+import {MessageModel} from '../types/model';
 
 export default class LocalStorage implements IStorage {
 

@@ -3,8 +3,8 @@ import hljs from 'highlightjs';
 import smileys from '../assets/smileys/info.json';
 
 import {API_URL_DEFAULT, PASTED_IMG_CLASS} from './consts';
-import {MessageDataEncode, SmileyStructure, UploadFile} from '../types';
-import {MessageModel} from '../model';
+import {MessageDataEncode, SmileyStructure, UploadFile} from '../types/types';
+import {MessageModel} from '../types/model';
 
 const tmpCanvasContext = document.createElement('canvas').getContext('2d');
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;

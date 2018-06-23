@@ -14,8 +14,8 @@ import {
   RoomModel, RoomSettingsModel,
   RootState, UserDictModel,
   UserModel
-} from './model';
-import {AddMessagePayload, MessageLocation} from './types';
+} from './types/model';
+import {AddMessagePayload, MessageLocation} from './types/types';
 import {getMessageById} from './utils/utils';
 
 interface State extends ActionContext<RootState, RootState> {}

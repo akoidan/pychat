@@ -50,7 +50,7 @@
 <script lang="ts">
   import {Getter, State} from "vuex-class";
   import {Component, Vue} from "vue-property-decorator";
-  import {RoomModel, SexModel, UserDictModel, UserModel} from "../../model";
+  import {RoomModel, SexModel, UserDictModel, UserModel} from "../../types/model";
 
 
   @Component

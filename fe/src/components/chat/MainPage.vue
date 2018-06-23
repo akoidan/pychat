@@ -30,7 +30,7 @@
   import RoomUsers from "./RoomUsers.vue"
   import ChatBox from "./ChatBox.vue"
   import SmileyHolder from "./SmileyHolder.vue"
-  import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from "../../model";
+  import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from "../../types/model";
   import {encodeP, getMessageData, getSmileyHtml, pasteHtmlAtCaret, pasteImgToTextArea} from "../../utils/htmlApi";
   import EditMessageMixin from './EditMessageMixin';
   import NavEditMessage from './NavEditMessage.vue';

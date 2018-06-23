@@ -1,5 +1,5 @@
 import loggerFactory from './loggerFactory';
-import {Logger, SessionHolder} from '../types';
+import {Logger, SessionHolder} from '../types/types';
 
 
 /**

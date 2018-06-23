@@ -26,7 +26,7 @@
 <script lang="ts">
   import {Component, Vue} from "vue-property-decorator";
   import smileys from "../../assets/smileys/info.json";
-  import {SmileyStructure} from '../../types';
+  import {SmileyStructure} from '../../types/types';
   import {getSmileyPath} from '../../utils/htmlApi';
 
   @Component

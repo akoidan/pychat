@@ -1,6 +1,6 @@
-import {IStorage, Logger} from '../types';
+import {IStorage, Logger} from '../types/types';
 import loggerFactory from './loggerFactory';
-import {MessageModel} from '../model';
+import {MessageModel} from '../types/model';
 interface TransactionCb { (t: SQLTransaction, ...rest): void; }
 
 export default class DatabaseWrapper implements IStorage {

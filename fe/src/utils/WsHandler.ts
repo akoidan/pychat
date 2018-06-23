@@ -4,11 +4,11 @@ import {VueRouter} from 'vue-router/types/router';
 
 import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
-import {CurrentUserInfoDto} from './dto';
+import {CurrentUserInfoDto} from '../types/dto';
 import {default as MessageHandler} from './MesageHandler';
 import {logout} from './utils';
-import {CurrentUserInfoModel, RootState} from '../model';
-import {IStorage, Logger, SessionHolder} from '../types';
+import {CurrentUserInfoModel, RootState} from '../types/model';
+import {IStorage, Logger, SessionHolder} from '../types/types';
 import {DefaultMessage, GrowlMessage, SetWsIdMessage} from './messages';
 
 enum WsState {
