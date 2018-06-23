@@ -209,7 +209,7 @@
   .usermsg
     margin-left: 4px
     padding-left: 25px
-    color: white
+    color: #c1c1c1
     padding-right: 20px // before smiley
     max-height: 200px
 

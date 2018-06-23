@@ -11,7 +11,7 @@
 
   import {Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {EditingMessage} from "../../model";;
+  import {EditingMessage} from "../../model";
 
 
   @Component

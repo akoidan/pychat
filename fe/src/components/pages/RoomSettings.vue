@@ -41,7 +41,7 @@
       </tbody>
     </table>
   </form>
-  <div v-else>Room {{roomId}} doesn't exist </div>
+  <div v-else>Room #{{roomId}} doesn't exist </div>
 </template>
 <script lang="ts">
   import {State, Action, Mutation} from "vuex-class";
