@@ -10,7 +10,7 @@ export default class DatabaseWrapper implements IStorage {
   private cache: object = {};
 
   constructor(dbName: String ) {
-    this.logger = loggerFactory.getLogger('DB', 'color: blue; font-weight: bold');
+    this.logger = loggerFactory.getLoggerColor('db', '#753e01');
     this.dbName = dbName;
   }
 

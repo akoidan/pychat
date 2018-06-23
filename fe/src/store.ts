@@ -20,7 +20,7 @@ import {getMessageById} from './utils/utils';
 
 interface State extends ActionContext<RootState, RootState> {}
 
-const logger = loggerFactory.getLogger('STORE', 'color: #0FFF00; font-weight: bold');
+const logger = loggerFactory.getLoggerColor('store', '#6a6400');
 
 
 const store: StoreOptions<RootState> = {

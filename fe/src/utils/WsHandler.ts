@@ -79,7 +79,7 @@ export class WsHandler extends MessageHandler {
 
   constructor(sessionHolder: SessionHolder, channelsHandler: ChannelsHandler, webRtcApi, storage: IStorage, store: Store<RootState>, router: VueRouter) {
     super();
-    this.logger = loggerFactory.getLogger('WS', 'color: green;');
+    this.logger = loggerFactory.getLoggerColor('ws', '#006c00');
     this.storage = storage;
     this.sessionHolder = sessionHolder;
     this.store = store;
@@ -102,7 +102,7 @@ export class WsHandler extends MessageHandler {
     if (raw.length > 1000) {
       raw = '';
     }
-    return loggerFactory.getSingleLogger(tag, 'color: green; font-weight: bold', console.log)('{} {}', raw, obj);
+    return loggerFactory.getSingleLoggerColor(tag, '#006c00', console.log)('{} {}', raw, obj);
   }
 
   // this.dom = {
@@ -119,7 +119,7 @@ export class WsHandler extends MessageHandler {
     let data: DefaultMessage;
     try {
       data = JSON.parse(jsonData);
-      this.logData('WS_IN', data, jsonData)();
+      this.logData('ws-in', data, jsonData)();
     } catch (e) {
       this.logger.error('Unable to parse incomming message {}', jsonData)();
       return;
@@ -168,7 +168,7 @@ export class WsHandler extends MessageHandler {
       }
       return false;
     } else {
-      this.logData('WS_OUT', objData, jsonRequest)();
+      this.logData('ws-out', objData, jsonRequest)();
       this.ws.send(jsonRequest);
       return true;
     }

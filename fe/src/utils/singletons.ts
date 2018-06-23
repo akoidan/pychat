@@ -15,6 +15,6 @@ export const xhr: Xhr = new Xhr(API_URL_DEFAULT, sessionHolder);
 export const api: Api = new Api(xhr);
 export const channelsHandler = new ChannelsHandler(store, api);
 export const storage: IStorage = window.openDatabase ? new DatabaseWrapper( 'userName') : new LocalStorage();
-export  const globalLogger: Logger = loggerFactory.getLogger('GLOBAL', 'color: #687000; font-weight: bold');
+export  const globalLogger: Logger = loggerFactory.getLoggerColor('global', '#000000');
 export const ws = new WsHandler(sessionHolder, channelsHandler, null, storage, store, router);
 

@@ -11,7 +11,7 @@ export default class LocalStorage implements IStorage {
 
 
   constructor() {
-    this.logger = loggerFactory.getLogger('LS', 'color: blue; font-weight: bold');
+    this.logger = loggerFactory.getLoggerColor('ls', '#006263');
     let ms = localStorage.getItem(this.STORAGE_NAME);
     if (ms) {
       let loaded = JSON.parse(ms);

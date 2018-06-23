@@ -17,7 +17,7 @@ export default class Xhr {
 
   constructor(apiUrl: string, sessionHolder: SessionHolder) {
     this.sessionHolder = sessionHolder;
-    this.httpLogger = loggerFactory.getLogger('HTTP', 'color: green; font-weight: bold');
+    this.httpLogger = loggerFactory.getLoggerColor('http', '#680061');
     this.apiUrl = apiUrl;
   }
 

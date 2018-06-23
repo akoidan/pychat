@@ -122,7 +122,7 @@ export default class ChannelsHandler extends MessageHandler {
     super();
     this.store = store;
     this.api = api;
-    this.logger = loggerFactory.getLogger('CHAT', 'color: #FF0F00; font-weight: bold');
+    this.logger = loggerFactory.getLoggerColor('chat', '#940500');
   }
 
   protected getMethodHandlers() {

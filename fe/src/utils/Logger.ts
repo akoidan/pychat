@@ -13,7 +13,12 @@ export default class LoggerFactory {
 
   }
 
-  getSingleLogger(initiator: string, style: string, fn: Function) {
+
+  public getSingleLoggerColor(initiator: string, color: string, fn: Function) {
+    return this.getSingleLogger(initiator, this.getColorStyle(color), fn);
+  }
+
+  private getSingleLogger(initiator: string, style: string, fn: Function) {
     return (...args1) => {
       if (!this.logsEnabled) {
         return this.dummy;
@@ -31,7 +36,15 @@ export default class LoggerFactory {
     };
   }
 
-  getLogger(initiator: string, style: string): Logger {
+  getLoggerColor(initiator: string, color: string): Logger {
+    return this.getLogger(initiator, this.getColorStyle(color));
+  }
+
+  private getColorStyle(color: string) {
+    return `color: white; background-color: ${color}; padding: 2px 6px; border-radius: 2px; font-size: 10px`;
+  }
+
+  private getLogger(initiator: string, style: string): Logger {
     return {
       warn: this.getSingleLogger(initiator, style, console.warn),
       log: this.getSingleLogger(initiator, style, console.log),

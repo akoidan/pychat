@@ -6,6 +6,7 @@ import App from './components/App.vue';
 import {api, globalLogger, storage, ws} from './utils/singletons';
 import store from './store';
 import router from './router';
+import loggerFactory from './utils/loggerFactory';
 
 
 window.addEventListener('focus', () => {
@@ -25,6 +26,17 @@ window.onerror = function (msg, url, linenumber, column, errorObj) {
   store.dispatch('growlError', message);
   return false;
 };
+
+Vue.mixin({
+  data: function() {
+    let lg = loggerFactory.getLoggerColor(this.$options['_componentTag'] || 'vue-comp', '#35495e');
+    return {
+      get logger() {
+        return lg;
+      }
+    };
+  }
+});
 
 Vue.prototype.api = api;
 Vue.prototype.ws = ws;
