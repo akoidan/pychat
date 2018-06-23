@@ -26,9 +26,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from "../ui/AppSubmit.vue"
   import {Action, Mutation} from "vuex-class";
-  import {api, globalLogger} from "../../utils/singletons";
-  import sessionHolder from '../../utils/sessionHolder';
-  import {login} from '../../utils/utils';
+  import {login} from "../../utils/utils";
 
   @Component({components: {AppSubmit}})
   export default class Register extends Vue {
@@ -56,7 +54,7 @@
 
     login() {
       this.running = true;
-      api.login(this.$refs.form, (session, err) => {
+      this.api.login(this.$refs.form, (session, err) => {
         this.running = false;
         login(session, err);
       });

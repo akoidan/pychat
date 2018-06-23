@@ -1,7 +1,9 @@
 import Vue from 'vue';
 
+import './assets/sass/common.sass';
+import './smileys.js';
 import App from './components/App.vue';
-import {api, storage, ws} from './utils/singletons';
+import {api, globalLogger, storage, ws} from './utils/singletons';
 import store from './store';
 import router from './router';
 
@@ -26,6 +28,9 @@ import router from './router';
     return false;
   };
 
+  Vue.prototype.api = api;
+  Vue.prototype.ws = ws;
+  Vue.prototype.logger = globalLogger;
   document.addEventListener('DOMContentLoaded', function () {
     storage.connect(finished => {
       new Vue({

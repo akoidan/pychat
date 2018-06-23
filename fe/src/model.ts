@@ -65,6 +65,16 @@ export interface RoomSettingsModel {
   id: number;
 }
 
+export interface UserDictModel {
+  [id: string]: UserModel;
+}
+
+
+export interface RoomDictModel {
+  [id: string]: RoomModel;
+}
+
+
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
   messages: MessageModel[];
@@ -78,9 +88,9 @@ export interface RootState {
   activeRoomId: number;
   activeUserId: number;
   userInfo: CurrentUserInfoModel;
-  allUsersDict: { [id: number]: UserModel };
+  allUsersDict: UserDictModel;
   regHeader: string;
   online: number[];
-  roomsDict: { [id: number]: RoomModel };
+  roomsDict: RoomDictModel;
 }
 

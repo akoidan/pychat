@@ -32,7 +32,6 @@
   import SmileyHolder from "./SmileyHolder.vue"
   import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from "../../model";
   import {encodeP, getMessageData, getSmileyHtml, pasteHtmlAtCaret, pasteImgToTextArea} from "../../utils/htmlApi";
-  import {api, globalLogger, ws} from "../../utils/singletons";
   import EditMessageMixin from './EditMessageMixin';
   import NavEditMessage from './NavEditMessage.vue';
   import NavUserShow from './NavUserShow.vue';
@@ -58,7 +57,7 @@
 
     @Watch('editedMessage')
     onActiveRoomIdChange(val: EditingMessage) {
-      globalLogger.log("editedMessage changed")();
+      this.logger.log("editedMessage changed")();
       if (val && val.isEditingNow) {
         this.$refs.userMessage.innerHTML = encodeP(this.editingMessageModel);
         this.$refs.userMessage.focus();
@@ -84,17 +83,17 @@
 
 
     addSmiley(code: string) {
-      globalLogger.log("Adding smiley {}", code)();
+      this.logger.log("Adding smiley {}", code)();
       pasteHtmlAtCaret(getSmileyHtml(code), this.$refs.userMessage);
     }
 
     checkAndSendMessage(event: KeyboardEvent) {
       if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
         event.preventDefault();
-        if (!ws.isWsOpen()) {
+        if (!this.ws.isWsOpen()) {
           this.growlError(`Can't send message, can't connect to the server`);
         } else {
-          globalLogger.log('Sending message')();
+          this.logger.log('Sending message')();
           let messageId = this.editedMessage && this.editedMessage.isEditingNow ? this.editedMessage.messageId : null;
           let currSymbol;
           if (messageId) {
@@ -111,7 +110,7 @@
             let gr;
             let db;
             let text;
-            api.uploadFiles(md.files, (res, err) => {
+            this.api.uploadFiles(md.files, (res, err) => {
               if (err) { // TOdo async should move to vuex
                 this.growlError(err);
               } else  {
@@ -161,9 +160,9 @@
 
     private send(messageId: number, messageContent: string, arId: number, files: any[]) {
       if (messageId) {
-        ws.sendEditMessage(messageContent, messageId, files);
+        this.ws.sendEditMessage(messageContent, messageId, files);
       } else if (messageContent) {
-        ws.sendSendMessage(messageContent, arId, files);
+        this.ws.sendSendMessage(messageContent, arId, files);
       }
     }
   }

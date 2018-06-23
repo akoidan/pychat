@@ -26,7 +26,6 @@
 <script lang="ts">
   import {Component, Vue} from "vue-property-decorator";
   import smileys from "../../assets/smileys/info.json";
-  import {globalLogger} from '../../utils/singletons';
   import {SmileyStructure} from '../../types';
   import {getSmileyPath} from '../../utils/htmlApi';
 
@@ -36,7 +35,7 @@
     activeTab: string = Object.keys(smileys)[0];
 
     created() {
-      globalLogger.log("Smiley inited {}", this.smileys)();
+      this.logger.log("Smiley inited {}", this.smileys)();
     }
 
     buildUrl(smiley: SmileyStructure, tabName: string) {

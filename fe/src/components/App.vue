@@ -11,7 +11,6 @@
   import {Component, Vue} from "vue-property-decorator";
   import Growl from "./ui/AppGrowl";
   import {State} from "vuex-class";
-  import {globalLogger} from '../utils/singletons';
 
   @Component({
     components: {Growl}
@@ -20,7 +19,7 @@
     @State growls: string[];
 
     created() {
-      globalLogger.log("rendering app")();
+      this.logger.log("rendering app")();
     }
 
   }

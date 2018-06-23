@@ -8,7 +8,7 @@
   },
   "scripts": {
     "prod": "webpack --progress --mode production ",
-    "dev": "webpack-dev-server --mode development --hot --https "
+    "dev": "webpack-dev-server --mode development --hot"
   },
   "repository": {
     "type": "git",
@@ -59,6 +59,7 @@
     "vue-property-decorator": "^6.1.0",
     "vue-template-compiler": "^2.5.16",
     "vuex-class": "^0.3.1",
+    "vuex-typescript": "^3.0.2",
     "webpack": "^4.11.1",
     "webpack-cli": "^3.0.3",
     "webpack-dev-server": "^3.1.4"

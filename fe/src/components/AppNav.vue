@@ -28,12 +28,10 @@
   </nav>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation, Getter} from "vuex-class";
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {api, globalLogger, ws} from "../utils/singletons";
-  import sessionHolder from "../utils/sessionHolder";
-  import {EditingMessage, UserModel} from "../model";
-  import {logout} from '../utils/utils';
+  import {Action, State} from "vuex-class";
+  import {Component, Vue} from "vue-property-decorator";
+  import {UserModel} from "../model";
+  import {logout} from "../utils/utils";
 
   @Component
   export default class AppNav extends Vue {
@@ -49,12 +47,12 @@
     }
 
     toggle() {
-      globalLogger.log('Toggle nav')();
+      this.logger.log('Toggle nav')();
       this.expanded = !this.expanded;
     }
 
     signOut() {
-      api.logout(logout);
+      this.api.logout(logout);
     }
   }
 </script>

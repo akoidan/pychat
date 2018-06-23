@@ -33,7 +33,6 @@
 
 <script lang='ts'>
   import {Vue, Component, Prop, Watch} from "vue-property-decorator";
-  import {api, globalLogger, xhr} from "../../utils/singletons";
   import {Mutation, Action} from "vuex-class";
   import AppSubmit from "../ui/AppSubmit.vue"
   import RegisterFieldSet from './RegisterFieldSet.vue'
@@ -76,7 +75,7 @@
 
 
     checkUserName(username: string) {
-      api.validateUsername(username, errors => {
+      this.api.validateUsername(username, errors => {
         this.userCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
         this.$refs.username.setCustomValidity(errors ? errors : "");
         this.userDescription = errors ? errors : `Username ${username} is available`;
@@ -155,7 +154,7 @@
 
     checkEmail(username: string) {
       console.log('asd');
-      api.validateEmail(username, errors => {
+      this.api.validateEmail(username, errors => {
         this.emailCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
         this.$refs.email.setCustomValidity(errors ? errors : "");
         this.emailDescription = errors ? errors : `Email ${username} is not registered`;
@@ -204,7 +203,7 @@
 
     register() {
       this.running = true;
-      api.register(this.$refs.form, (session, error )=> {
+      this.api.register(this.$refs.form, (session, error )=> {
         this.running = false;
         login(session, error);
       })

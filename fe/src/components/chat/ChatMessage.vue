@@ -9,8 +9,7 @@
 <script lang="ts">
   import {Mutation, State, Getter} from "vuex-class";
   import {Component, Prop, Vue, Mixins} from "vue-property-decorator";
-  import {CurrentUserInfoModel, EditingMessage, MessageModel, UserModel} from "../../model";
-  import {globalLogger, ws} from "../../utils/singletons";
+  import {CurrentUserInfoModel, EditingMessage, MessageModel, UserDictModel, UserModel} from "../../model";
   import {encodeHTML, encodeMessage, highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
   import EditMessageMixin from './EditMessageMixin';
 
@@ -20,7 +19,7 @@
 
     @State userInfo: CurrentUserInfoModel;
     @Prop() message: MessageModel;
-    @State allUsersDict: { [id: number]: UserModel };
+    @State allUsersDict: UserDictModel;
     @State editedMessage : EditingMessage;
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
     @Mutation setActiveUserId: SingleParamCB<number>;
@@ -30,7 +29,7 @@
     };
 
     setActiveUser(evt: Event) {
-      globalLogger.log("setActiveUserId {}", this.message.userId)();
+      this.logger.log("setActiveUserId {}", this.message.userId)();
       evt.stopPropagation();
       this.setActiveUserId(this.message.userId);
     }

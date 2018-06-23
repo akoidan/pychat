@@ -12,7 +12,7 @@ import {
   GrowlType,
   MessageModel,
   RoomModel, RoomSettingsModel,
-  RootState,
+  RootState, UserDictModel,
   UserModel
 } from './model';
 import {AddMessagePayload, MessageLocation} from './types';
@@ -38,7 +38,7 @@ const store: StoreOptions<RootState> = {
   },
   getters: {
     privateRooms(state: RootState, getters): { [id: string]: UserModel } {
-      let ud: { [id: number]: UserModel } = state.allUsersDict;
+      let ud: UserDictModel = state.allUsersDict;
       let res: { [id: string]: UserModel } = {};
       if (state.userInfo) {
         let myId: number = state.userInfo.userId;
@@ -163,7 +163,7 @@ const store: StoreOptions<RootState> = {
     setOnline(state: RootState, ids: number[]) {
       state.online = ids;
     },
-    setUsers(state: RootState, users: { [id: number]: UserModel }) {
+    setUsers(state: RootState, users: UserDictModel) {
       state.allUsersDict = users;
     },
     setUserInfo(state: RootState, userInfo: CurrentUserInfoModel) {

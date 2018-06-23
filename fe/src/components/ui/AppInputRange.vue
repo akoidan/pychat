@@ -4,7 +4,6 @@
 <script lang="ts">
   import {Component, Vue, Prop} from "vue-property-decorator";
   import {getUniqueId} from "../../utils/htmlApi";
-  import {globalLogger} from "../../utils/singletons";
 
   @Component
   export default class AppInputRange extends Vue {

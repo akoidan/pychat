@@ -11,8 +11,7 @@
 
   import {Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {EditingMessage} from "../../model";
-  import {ws} from "../../utils/singletons";
+  import {EditingMessage} from "../../model";;
 
 
   @Component
@@ -21,7 +20,7 @@
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
 
     m2DeleteMessage() {
-      ws.sendDeleteMessage(this.editedMessage.messageId);
+      this.ws.sendDeleteMessage(this.editedMessage.messageId);
       this.setEditedMessage(null);
     }
 

@@ -41,7 +41,7 @@ module.exports = (env, argv) => {
   }
 
   const conf =  {
-    entry: ['./src/main.ts', './src/assets/sass/common.sass', './src/smileys.js'],
+    entry: ['./src/main.ts'],
     plugins,
     resolve: {
       extensions: ['.ts', '.js', '.vue', '.json'],

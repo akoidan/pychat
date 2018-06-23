@@ -14,7 +14,6 @@
 
 <script lang='ts'>
   import {Vue, Component, Prop} from "vue-property-decorator";
-  import {api, xhr} from "../../utils/singletons";
   import AppSubmit from "../ui/AppSubmit.vue"
   import {Action, Mutation} from "vuex-class";
 
@@ -38,7 +37,7 @@
 
     restorePassword(event) {
       this.running = true;
-      api.sendRestorePassword(this.$refs.form, error => {
+      this.api.sendRestorePassword(this.$refs.form, error => {
         this.running = false;
         if (error) {
           this.growlError(error);

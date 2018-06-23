@@ -48,17 +48,15 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action,Getter, Mutation} from "vuex-class";
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {CurrentUserInfoModel, RoomModel, SexModel, UserModel} from "../../model";
-  import {globalLogger} from '../../utils/singletons';
-
+  import {Getter, State} from "vuex-class";
+  import {Component, Vue} from "vue-property-decorator";
+  import {RoomModel, SexModel, UserDictModel, UserModel} from "../../model";
 
 
   @Component
   export default class RoomUsers extends Vue {
 
-    @Getter usersArray: { [id: string]: UserModel};
+    @Getter usersArray: UserDictModel;
     @State activeRoomId: number;
     @Getter activeRoom: RoomModel;
     @State online: number[];

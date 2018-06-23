@@ -48,8 +48,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppInputRange from '../ui/AppInputRange';
   import AppSubmit from '../ui/AppSubmit';
-  import {api, globalLogger, ws} from "../../utils/singletons";
-  import {RoomModel, RoomSettingsModel} from "../../model";
+  import {RoomDictModel, RoomModel, RoomSettingsModel} from "../../model";
   @Component({components: {AppInputRange, AppSubmit}})
   export default class RoomSettings extends Vue {
 
@@ -58,16 +57,16 @@
     notifications: boolean = false;
     running: boolean = false;
     isPublic: boolean = false;
-    @State roomsDict: {[id: string]: RoomModel};
+    @State roomsDict: RoomDictModel;
 
     @Action growlError;
     @Action growlSuccess;
     @Mutation setRoomSettings;
 
     leave() {
-      globalLogger.log("Leaving room {}", this.roomId)();
+      this.logger.log("Leaving room {}", this.roomId)();
       this.running = true;
-      ws.sendLeaveRoom(this.roomId, () => {
+      this.ws.sendLeaveRoom(this.roomId, () => {
         this.running = false;
         this.$router.replace('/chat/1');
       });
@@ -79,7 +78,7 @@
     }
 
     private setVars() {
-      globalLogger.log("Updated for room settings {} ", this.room)();
+      this.logger.log("Updated for room settings {} ", this.room)();
       if (this.room) {
         this.roomName = this.room.name;
         this.isPublic = !!this.roomName;
@@ -94,15 +93,15 @@
 
     get roomId() : number {
       let id = this.$route.params.id;
-      globalLogger.log("Rending room settings for {}", id)();
+      this.logger.log("Rending room settings for {}", id)();
       return parseInt(id);
     }
 
 
     apply() {
-      globalLogger.log("Applying room {} settings", this.roomId)();
+      this.logger.log("Applying room {} settings", this.roomId)();
       this.running = true;
-      api.sendRoomSettings(this.roomName, this.sound, this.notifications, this.roomId, (err) => {
+      this.api.sendRoomSettings(this.roomName, this.sound, this.notifications, this.roomId, (err) => {
         if (err) {
           this.growlError(err);
         } else {

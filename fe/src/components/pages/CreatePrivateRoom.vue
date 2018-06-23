@@ -58,7 +58,6 @@
   import AppInputRange from '../ui/AppInputRange';
   import AppSubmit from '../ui/AppSubmit';
   import {CurrentUserInfoModel, UserModel} from "../../model";
-  import {api, globalLogger, ws} from "../../utils/singletons";
   import {AddRoomMessage} from "../../utils/messages";
 
   @Component({components: {AppInputRange, AppSubmit}})
@@ -88,7 +87,7 @@
         this.growlError('You should specify room name or at least add one user');
       } else {
         this.running = true;
-        ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), (e: AddRoomMessage)=> {
+        this.ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), (e: AddRoomMessage)=> {
           if (e && e.roomId) {
             this.$router.replace(`/chat/${e.roomId}`);
           }
@@ -109,12 +108,12 @@
           users.push(u);
         }
       });
-      globalLogger.debug("Reeval users in CreatePrivateRoom")();
+      this.logger.debug("Reeval users in CreatePrivateRoom")();
       return users;
     }
 
     get filteredUsers(): UserModel[] {
-      globalLogger.debug("Reeval filter CreatePrivateRoom")();
+      this.logger.debug("Reeval filter CreatePrivateRoom")();
       let s = this.search.toLowerCase();
       return this.users.filter(u => u.user.toLowerCase().indexOf(s) >= 0);
     }

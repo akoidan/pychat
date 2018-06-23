@@ -3,7 +3,7 @@ import {Store} from 'vuex';
 import Api from './api';
 import MessageHandler from './MesageHandler';
 import {AddMessagePayload, Logger, MessageLocation, SetRoomsUsers} from '../types';
-import {MessageModel, RoomModel, RootState, SexModel, UserModel} from '../model';
+import {MessageModel, RoomDictModel, RoomModel, RootState, SexModel, UserDictModel, UserModel} from '../model';
 import {
   AddOnlineUserMessage,
   AddRoomMessage,
@@ -131,7 +131,7 @@ export default class ChannelsHandler extends MessageHandler {
 
   public setUsers(users: UserDto[]) {
     this.logger.log('set users', users)();
-    let um: { [id: number]: UserModel } = {};
+    let um: UserDictModel = {};
     users.forEach(u => {
       um[u.userId] = this.convertUser(u);
     });
@@ -168,8 +168,8 @@ export default class ChannelsHandler extends MessageHandler {
 
   public setRooms(rooms: RoomDto[]) {
     this.logger.debug('Setting rooms')();
-    let storeRooms: { [id: number]: RoomModel } = {};
-    let roomsDict: { [id: number]: RoomModel } = this.store.state.roomsDict;
+    let storeRooms: RoomDictModel = {};
+    let roomsDict: RoomDictModel = this.store.state.roomsDict;
     rooms.forEach((newRoom: RoomDto) => {
       let oldRoom = roomsDict[newRoom.roomId];
       let rm: RoomModel = {

@@ -2,7 +2,7 @@ import store from '../store';
 import router from '../router';
 import sessionHolder from './sessionHolder';
 import {globalLogger, ws} from './singletons';
-import {MessageModel, RoomModel, RootState} from '../model';
+import {MessageModel, RootState} from '../model';
 
 export function logout(errMessage: string) {
   store.dispatch('logout');
