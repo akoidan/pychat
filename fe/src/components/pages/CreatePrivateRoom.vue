@@ -59,6 +59,7 @@
   import AppSubmit from '../ui/AppSubmit';
   import {CurrentUserInfoModel, UserModel} from "../../model";
   import {api, globalLogger, ws} from "../../utils/singletons";
+  import {AddRoomMessage} from "../../utils/messages";
 
   @Component({components: {AppInputRange, AppSubmit}})
   export default class CreatePrivateRoom extends Vue {
@@ -87,7 +88,10 @@
         this.growlError('You should specify room name or at least add one user');
       } else {
         this.running = true;
-        ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), e => {
+        ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), (e: AddRoomMessage)=> {
+          if (e && e.roomId) {
+            this.$router.replace(`/chat/${e.roomId}`);
+          }
           this.running = false;
         });
       }

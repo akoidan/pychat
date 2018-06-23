@@ -131,7 +131,7 @@ export class WsHandler extends MessageHandler {
     this.handlers[data.handler].handle(data);
     if (this.callBacks[data.messageId]) {
       this.logger.debug('resolving cb')();
-      this.callBacks[data.messageId]();
+      this.callBacks[data.messageId](data);
       delete this.callBacks[data.messageId];
     }
   }
@@ -227,10 +227,10 @@ export class WsHandler extends MessageHandler {
     });
   }
 
-  public sendAddRoom(roomName, volume, notifications, users, cb: Function) {
+  public sendAddRoom(name, volume, notifications, users, cb: Function) {
     this.sendToServer({
       users,
-      roomName,
+      name,
       action: 'addRoom',
       volume,
       notifications

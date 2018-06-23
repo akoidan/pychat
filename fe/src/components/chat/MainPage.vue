@@ -41,6 +41,7 @@
   export default class ChannelsPage extends Mixins(EditMessageMixin) {
     @Getter activeUser;
     @State editedMessage: EditingMessage;
+    @State userInfo: CurrentUserInfoModel;
     @State activeRoomId: number;
     @Getter roomsArray: RoomModel[];
     @Getter maxId: SingleParamCB<number>;
@@ -57,6 +58,7 @@
 
     @Watch('editedMessage')
     onActiveRoomIdChange(val: EditingMessage) {
+      globalLogger.log("editedMessage changed")();
       if (val && val.isEditingNow) {
         this.$refs.userMessage.innerHTML = encodeP(this.editingMessageModel);
         this.$refs.userMessage.focus();

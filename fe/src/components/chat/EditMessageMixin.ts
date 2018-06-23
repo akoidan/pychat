@@ -5,6 +5,8 @@ import Vue from 'vue';
 import {globalLogger} from '../../utils/singletons';
 import {CurrentUserInfoModel, EditingMessage, MessageModel} from '../../model';
 
+@Component
+
 export default class EditMessageMixin extends Vue {
 
   sem(event, message: MessageModel, isEditingNow: boolean) {

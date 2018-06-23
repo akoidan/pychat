@@ -10,7 +10,7 @@
   export default class AppInputRange extends Vue {
     style: any;
     cls: string;
-    @Prop() value: string;
+    @Prop() value: number;
 
     $refs: {
       el: HTMLInputElement
@@ -31,7 +31,7 @@
 
     oninput(event) {
       this.fixStyle();
-      this.$emit('input', event.target.value);
+      this.$emit('input', parseInt(event.target.value));
     }
 
     fixStyle() {

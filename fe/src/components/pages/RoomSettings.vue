@@ -54,7 +54,7 @@
   export default class RoomSettings extends Vue {
 
     roomName: string = "";
-    sound: string = '0';
+    sound: number = 0;
     notifications: boolean = false;
     running: boolean = false;
     isPublic: boolean = false;
@@ -73,9 +73,6 @@
       });
     }
 
-    get soundInt() {
-      return parseInt(this.sound);
-    }
 
     created() {
       this.setVars();
@@ -86,7 +83,7 @@
       if (this.room) {
         this.roomName = this.room.name;
         this.isPublic = !!this.roomName;
-        this.sound = String(this.room.volume);
+        this.sound = this.room.volume;
         this.notifications = this.room.notifications;
       }
     }
@@ -113,7 +110,7 @@
             id: this.roomId,
             name: this.roomName,
             notifications: this.notifications,
-            volume: this.soundInt
+            volume: this.sound
           };
           this.setRoomSettings(payload);
           this.growlSuccess('Settings has been saved');

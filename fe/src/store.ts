@@ -53,7 +53,9 @@ const store: StoreOptions<RootState> = {
       return res;
     },
     roomsArray(state: RootState): RoomModel[] {
-      return Object.values(state.roomsDict);
+      let anies = Object.values(state.roomsDict);
+      logger.log('roomsArray {}', anies)();
+      return anies;
     },
     publicRooms(state: RootState, getters): RoomModel[] {
       let roomModels: RoomModel[] = getters.roomsArray.filter(r => r.name);
@@ -155,7 +157,8 @@ const store: StoreOptions<RootState> = {
       state.regHeader = regHeader;
     },
     addUser(state: RootState, u: UserModel) {
-      state.allUsersDict[u.id] = u;
+      let newVar = 'set';
+      Vue[newVar](state.allUsersDict, u.id, u);
     },
     setOnline(state: RootState, ids: number[]) {
       state.online = ids;
@@ -170,7 +173,8 @@ const store: StoreOptions<RootState> = {
       state.roomsDict = rooms;
     },
     addRoom(state: RootState, room: RoomModel) {
-      state.roomsDict[room.id] = room;
+      let newVar = 'set';
+      Vue[newVar](state.roomsDict, room.id, room);
     }
   },
   actions: {
