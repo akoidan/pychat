@@ -1,8 +1,8 @@
 <template>
-  <input type="range" @input="fixStyle" :class="cls" ref="el" />
+  <input type="range" @input="oninput" v-bind:value="value" :class="cls" ref="el" />
 </template>
 <script lang="ts">
-  import {Component, Vue} from "vue-property-decorator";
+  import {Component, Vue, Prop} from "vue-property-decorator";
   import {getUniqueId} from "../../utils/htmlApi";
   import {globalLogger} from "../../utils/singletons";
 
@@ -10,7 +10,7 @@
   export default class AppInputRange extends Vue {
     style: any;
     cls: string;
-    value: number;
+    @Prop() value: string;
 
     $refs: {
       el: HTMLInputElement
@@ -20,10 +20,18 @@
       this.style = document.createElement('style');
       document.head.appendChild(this.style);
       this.cls = `wbktRange${getUniqueId()}`;
+      this.$nextTick(function() {
+        this.fixStyle();
+      });
     }
 
     destroy() {
       document.head.removeChild(this.style);
+    }
+
+    oninput(event) {
+      this.fixStyle();
+      this.$emit('input', event.target.value);
     }
 
     fixStyle() {

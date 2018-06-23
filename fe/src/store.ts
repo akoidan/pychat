@@ -15,7 +15,7 @@ import {
   RootState,
   UserModel
 } from './model';
-import {MessageLocation} from './types';
+import {AddMessagePayload, MessageLocation} from './types';
 import {getMessageById} from './utils/utils';
 
 interface State extends ActionContext<RootState, RootState> {}
@@ -125,8 +125,8 @@ const store: StoreOptions<RootState> = {
     setRoomsUsers(state: RootState, {roomId, users}) {
       state.roomsDict[roomId].users = users;
     },
-    addMessage(state: RootState, {message, i}) {
-      state.roomsDict[message.roomId].messages.splice(i, 0, message);
+    addMessage(state: RootState, m: AddMessagePayload) {
+      state.roomsDict[m.message.roomId].messages.splice(m.index, 0, m.message);
     },
     deleteMessage(state: RootState, rm: MessageModel) {
       let m: MessageModel =  getMessageById(state, rm.roomId, rm.id);

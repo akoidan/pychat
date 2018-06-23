@@ -2,7 +2,7 @@ import loggerFactory from './loggerFactory';
 import {Store} from 'vuex';
 import Api from './api';
 import MessageHandler from './MesageHandler';
-import {Logger, MessageLocation, SetRoomsUsers} from '../types';
+import {AddMessagePayload, Logger, MessageLocation, SetRoomsUsers} from '../types';
 import {MessageModel, RoomModel, RootState, SexModel, UserModel} from '../model';
 import {
   AddOnlineUserMessage,
@@ -38,17 +38,19 @@ export default class ChannelsHandler extends MessageHandler {
       }
     },
     deleteMessage(message: DeleteMessage) {
-      let existingMessage = getMessageById(this.store, message.roomId, message.id);
+      let existingMessage = getMessageById(this.store.state, message.roomId, message.id);
       if (existingMessage) {
         this.logger.log('Deleting message {}', message)();
-        this.store.commit('deleteMessage', this.getMessage(message));
+        let newBody: MessageModel = this.getMessage(message);
+        newBody.deleted = true;
+        this.store.commit('deleteMessage', newBody);
       } else {
         this.logger.log('Unable to find message {} to delete it', message)();
       }
       this.store.commit('deleteMessage', message);
     },
     editMessage(message: EditMessage) {
-      let existingMessage = getMessageById(this.store, message.roomId, message.id);
+      let existingMessage = getMessageById(this.store.state, message.roomId, message.id);
       if (existingMessage) {
         this.logger.log('Editing message {}', message)();
         this.store.commit('editMessage', this.getMessage(message));
@@ -66,23 +68,21 @@ export default class ChannelsHandler extends MessageHandler {
     removeOnlineUser(message: RemoveOnlineUserMessage) {
       this.store.commit('setOnline', message.content);
     },
-    printMessage(message: EditMessage) {
-      let messsage = this.getMessage(message);
-
-      let r: RoomModel = this.store.state.roomsDict[message.roomId];
-      if (r && r.messages.find(m => m.id === message.id)) {
-        this.logger.log('Skipping printing message {}, because it\'s already in list', message.id)();
+    printMessage(inMessage: EditMessage) {
+      let r: RoomModel = this.store.state.roomsDict[inMessage.roomId];
+      if (r && r.messages.find(m => m.id === inMessage.id)) {
+        this.logger.log('Skipping printing message {}, because it\'s already in list', inMessage.id)();
       } else {
+        let message: MessageModel = this.getMessage(inMessage);
         this.logger.log('Adding message to storage {}', message)();
-        let model: MessageModel = this.getMessage(message);
         let room = this.store.state.roomsDict[message.roomId];
-        let i = 0;
-        for (; i < room.messages.length; i++) {
-          if (room.messages[i].time > message.time) {
+        let index = 0;
+        for (; index < room.messages.length; index++) {
+          if (room.messages[index].time > message.time) {
             break;
           }
         }
-        this.store.commit('addMessage', {messsage, i});
+        this.store.commit('addMessage', {message, index} as AddMessagePayload);
       }
 
     },

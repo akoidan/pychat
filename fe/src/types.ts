@@ -56,6 +56,10 @@ export interface MessageLocation {
   edited: number;
 }
 
+export interface AddMessagePayload {
+  index: number;
+  message: MessageModel;
+}
 
 export enum IconColor {
   SUCCESS = 'success', ERROR = 'error', WARN = 'warn', NOT_SET = ''

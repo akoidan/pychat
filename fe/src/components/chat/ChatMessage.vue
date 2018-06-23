@@ -12,10 +12,10 @@
   import {CurrentUserInfoModel, EditingMessage, MessageModel, UserModel} from "../../model";
   import {globalLogger, ws} from "../../utils/singletons";
   import {encodeHTML, encodeMessage, highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
-  import EditedMessageMixin, {default as EditMessageMixin} from "./EditMessageMixin"
+  import EditMessageMixin from './EditMessageMixin';
 
 
-  @Component({mixins: [EditedMessageMixin] })
+  @Component
   export default class ChatMessage extends Mixins(EditMessageMixin) {
 
     @State userInfo: CurrentUserInfoModel;

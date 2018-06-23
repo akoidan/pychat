@@ -9,7 +9,7 @@ module.exports = (env, argv) => {
   let sasscPlugins;
   plugins = [
     new VueLoaderPlugin(),
-    new HtmlWebpackPlugin({hash: true, favicon: 'src/assets/img/favicon.ico',  template: 'src/index.html'}),
+    new HtmlWebpackPlugin({hash: true, favicon: 'src/assets/img/favicon.ico',  template: 'src/index.ejs', inject: false}),
   ];
   if (argv.mode === 'production') {
     const MiniCssExtractPlugin = require("mini-css-extract-plugin");

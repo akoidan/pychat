@@ -12,6 +12,8 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta property="og:description" content="Chat with your friends, make video calls or transfer files with Pychat!"/>
+  <% for (key in htmlWebpackPlugin.files.js) { %><script crossorigin="anonymous" type="text/javascript" src="<%= htmlWebpackPlugin.files.js[key] %>"></script><% } %>
+  <% for (key in htmlWebpackPlugin.files.css) { %><link rel="stylesheet" type="text/css" href="<%= htmlWebpackPlugin.files.css[key] %>"><% } %>
 </head>
 <body>
 <div id="app"></div>
