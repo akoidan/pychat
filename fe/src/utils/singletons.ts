@@ -7,9 +7,10 @@ import LocalStorage from './LocalStorage';
 import store from '../store';
 import router from '../router';
 import Api from './api';
-import {IStorage, Logger} from '../types/types';
+import {IStorage} from '../types/types';
 import loggerFactory from './loggerFactory';
 import sessionHolder from './sessionHolder';
+import {Logger} from 'lines-logger';
 
 export const xhr: Xhr = new Xhr(API_URL_DEFAULT, sessionHolder);
 export const api: Api = new Api(xhr);

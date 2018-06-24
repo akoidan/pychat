@@ -66,6 +66,7 @@
   },
   "dependencies": {
     "highlightjs": "^9.10.0",
+    "lines-logger": "^1.0.2",
     "lodash": "^4.17.10",
     "npm-font-open-sans": "^1.1.0",
     "typeface-oswald": "^0.0.54",

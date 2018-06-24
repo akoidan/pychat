@@ -25,19 +25,19 @@
 </template>
 
 <script lang='ts'>
-  import {Component, Vue, Watch, Mixins} from "vue-property-decorator";
+  import {Component, Vue, Watch} from "vue-property-decorator";
   import {Action, Getter, State, Mutation} from "vuex-class";
   import RoomUsers from "./RoomUsers.vue"
   import ChatBox from "./ChatBox.vue"
   import SmileyHolder from "./SmileyHolder.vue"
   import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from "../../types/model";
   import {encodeP, getMessageData, getSmileyHtml, pasteHtmlAtCaret, pasteImgToTextArea} from "../../utils/htmlApi";
-  import EditMessageMixin from './EditMessageMixin';
   import NavEditMessage from './NavEditMessage.vue';
   import NavUserShow from './NavUserShow.vue';
+  import {sem} from '../../utils/utils';
 
   @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
-  export default class ChannelsPage extends Mixins(EditMessageMixin) {
+  export default class ChannelsPage extends Vue {
     @Getter activeUser;
     @State editedMessage: EditingMessage;
     @State userInfo: CurrentUserInfoModel;
@@ -153,7 +153,7 @@
         let ms = this.activeRoom.messages;
         if (ms.length > 0) {
           let m = ms[ms.length-1];
-          this.sem(event, m, true);
+          sem(event, m, true, this.userInfo, this.setEditedMessage);
         }
       }
     }

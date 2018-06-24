@@ -12,16 +12,6 @@ export interface MessageDb {
   userId: number;
 }
 
-export interface Logger {
-  warn(format: String, ...args): Function;
-
-  log(format: String, ...args): Function;
-
-  error(format: String, ...args): Function;
-
-  debug(format: String, ...args): Function;
-}
-
 
 export interface UploadFile {
    type: string;

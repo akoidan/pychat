@@ -2,7 +2,7 @@ import store from '../store';
 import router from '../router';
 import sessionHolder from './sessionHolder';
 import {globalLogger, ws} from './singletons';
-import {MessageModel, RootState} from '../types/model';
+import {CurrentUserInfoModel, EditingMessage, MessageModel, RootState} from '../types/model';
 
 export function logout(errMessage: string) {
   store.dispatch('logout');
@@ -23,6 +23,20 @@ export function login(session, errMessage) {
     router.replace('/chat/1');
   }
 }
+
+
+
+const ONE_DAY = 24 * 60 * 60 * 1000;
+
+
+export function sem(event, message: MessageModel, isEditingNow: boolean, userInfo: CurrentUserInfoModel, setEditedMessage: SingleParamCB<EditingMessage>) {
+  if (message.userId === userInfo.userId && !message.deleted && message.time + ONE_DAY > Date.now()) {
+    event.preventDefault();
+    event.stopPropagation();
+    setEditedMessage({messageId: message.id, isEditingNow, roomId: message.roomId} as EditingMessage);
+  }
+}
+
 
 export function getMessageById(state: RootState, roomId: number, messageId: number): MessageModel {
   return state.roomsDict[roomId].messages.find(r => r.id === messageId);

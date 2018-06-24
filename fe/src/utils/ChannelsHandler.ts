@@ -2,8 +2,9 @@ import loggerFactory from './loggerFactory';
 import {Store} from 'vuex';
 import Api from './api';
 import MessageHandler from './MesageHandler';
-import {AddMessagePayload, Logger, MessageLocation, SetRoomsUsers} from '../types/types';
+import {AddMessagePayload, MessageLocation, SetRoomsUsers} from '../types/types';
 import {MessageModel, RoomDictModel, RoomModel, RootState, SexModel, UserDictModel, UserModel} from '../types/model';
+import {Logger} from 'lines-logger';
 import {
   AddOnlineUserMessage,
   AddRoomMessage,
@@ -130,7 +131,7 @@ export default class ChannelsHandler extends MessageHandler {
   }
 
   public setUsers(users: UserDto[]) {
-    this.logger.log('set users', users)();
+    this.logger.log('set users {}', users)();
     let um: UserDictModel = {};
     users.forEach(u => {
       um[u.userId] = this.convertUser(u);

@@ -1,5 +1,6 @@
-import {IStorage, Logger} from '../types/types';
+import {IStorage} from '../types/types';
 import loggerFactory from './loggerFactory';
+import {Logger} from 'lines-logger';
 import {MessageModel} from '../types/model';
 interface TransactionCb { (t: SQLTransaction, ...rest): void; }
 

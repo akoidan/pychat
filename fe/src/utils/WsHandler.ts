@@ -8,8 +8,9 @@ import {CurrentUserInfoDto} from '../types/dto';
 import {default as MessageHandler} from './MesageHandler';
 import {logout} from './utils';
 import {CurrentUserInfoModel, RootState} from '../types/model';
-import {IStorage, Logger, SessionHolder} from '../types/types';
+import {IStorage, SessionHolder} from '../types/types';
 import {DefaultMessage, GrowlMessage, SetWsIdMessage} from './messages';
+import {Logger} from 'lines-logger';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED

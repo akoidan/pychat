@@ -8,14 +8,14 @@
 </template>
 <script lang="ts">
   import {Mutation, State, Getter} from "vuex-class";
-  import {Component, Prop, Vue, Mixins} from "vue-property-decorator";
+  import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfoModel, EditingMessage, MessageModel, UserDictModel, UserModel} from "../../types/model";
   import {encodeHTML, encodeMessage, highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
-  import EditMessageMixin from './EditMessageMixin';
+  import {sem} from '../../utils/utils';
 
 
   @Component
-  export default class ChatMessage extends Mixins(EditMessageMixin) {
+  export default class ChatMessage extends Vue {
 
     @State userInfo: CurrentUserInfoModel;
     @Prop() message: MessageModel;
@@ -45,7 +45,7 @@
 
 
     contextmenu(event) {
-      this.sem(event, this.message, false);
+      sem(event, this.message, false, this.userInfo, this.setEditedMessage);
     }
 
     updated() {
