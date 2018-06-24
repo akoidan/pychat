@@ -80,7 +80,7 @@ export class WsHandler extends MessageHandler {
 
   constructor(sessionHolder: SessionHolder, channelsHandler: ChannelsHandler, webRtcApi, storage: IStorage, store: Store<RootState>, router: VueRouter) {
     super();
-    this.logger = loggerFactory.getLoggerColor('ws', '#006c00');
+    this.logger = loggerFactory.getLoggerColor('ws', '#2e631e');
     this.storage = storage;
     this.sessionHolder = sessionHolder;
     this.store = store;

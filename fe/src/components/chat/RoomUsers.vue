@@ -35,8 +35,7 @@
     <span>
         <span name="user" :class="onlineClass" @click="onlineMinified = !onlineMinified"></span>
         <span class="usersStateText" @click="onlineShowOnlyOnline = !onlineShowOnlyOnline">{{onlineText}}</span>
-        <i class="icon-user-plus" title="Add user to current active channel"
-           @click="showInviteUser"></i>
+        <router-link :to="`/invite-user/${activeRoomId}`" class="icon-user-plus" title="Add user to current active channel"/>
       </span>
     <ul class="chat-user-table" v-show="!onlineMinified">
       <template v-for="user in usersArray">
@@ -114,9 +113,6 @@
     get onlineClass() {
       return this.onlineMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down'
     }
-
-    showInviteUser() {}
-    showAddRoom(){}
 
   }
 </script>
