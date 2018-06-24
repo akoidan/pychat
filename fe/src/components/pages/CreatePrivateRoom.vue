@@ -4,7 +4,7 @@
 <script lang="ts">
 
   import {Component, Vue} from "vue-property-decorator";
-  import CreateRoom from "./CreateRoom.vue"
+  import CreateRoom from "./parts/CreateRoom.vue"
 
   @Component({components: {CreateRoom}})
   export default class CreatePrivateRoom extends Vue {

@@ -27,26 +27,20 @@
           <app-input-range min="0" max="3" v-model="sound"/>
         </td>
       </tr>
-      <tr>
-        <td colspan="2">
-          <div>
-            <add-user-to-room v-model="currentUsers" :text="inviteUsers" :exclude-users-ids="excludeUsersIds" :showInviteUsers="showInviteUsers"/>
-            <app-submit type="button" @click.native="add" value="Create Room" class="green-btn" :running="running"/>
-          </div>
-        </td>
-      </tr>
       </tbody>
     </table>
+    <add-user-to-room v-model="currentUsers" :text="inviteUsers" :exclude-users-ids="excludeUsersIds" :showInviteUsers="showInviteUsers"/>
+    <app-submit type="button" @click.native="add" value="Create Room" class="green-btn" :running="running"/>
   </div>
 </template>
 <script lang="ts">
   import {Action, Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import AppInputRange from "../ui/AppInputRange";
-  import AppSubmit from "../ui/AppSubmit";
+  import AppInputRange from "../../ui/AppInputRange";
+  import AppSubmit from "../../ui/AppSubmit";
   import AddUserToRoom from "./AddUserToRoom.vue";
-  import {UserModel} from "../../types/model";
-  import {AddRoomMessage} from "../../utils/messages";
+  import {UserModel} from "../../../types/model";
+  import {AddRoomMessage} from "../../../utils/messages";
 
   @Component({components: {AppInputRange, AppSubmit, AddUserToRoom}})
   export default class CreateRoom extends Vue {
@@ -61,7 +55,7 @@
     @Prop() isPublic: boolean;
 
     get inviteUsers(): string {
-      return this.isPublic ? "Invite users" : "Select user";
+      return this.isPublic ? "Invite users to new room" : "Select user for private room";
     }
 
     get showInviteUsers() {
@@ -105,9 +99,7 @@
     max-width: calc(100vw - 140px)
 
   .holder
-    display: flex
-    justify-content: center
-    padding-top: 20px
+    @extend %room-settings-holder
 
   th, td
     padding: 5px

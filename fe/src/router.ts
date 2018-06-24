@@ -8,7 +8,8 @@ import SignupPage from './components/singup/MainPage.vue';
 import ResetPassword from './components/singup/ResetPassword.vue';
 import Login from './components/singup/Login.vue';
 import SignUp from './components/singup/SignUp.vue';
-import ProfilePage from './components/pages/ProfilePage.vue';
+import UserProfile from './components/pages/UserProfile.vue';
+import InviteUser from './components/pages/InviteUser.vue';
 import CreatePrivateRoom from './components/pages/CreatePrivateRoom.vue';
 import CreatePublicRoom from './components/pages/CreatePublicRoom.vue';
 import RoomSettings from './components/pages/RoomSettings.vue';
@@ -41,7 +42,7 @@ const router = new VueRouter({
           path: '/chat/:id'
         },
         {
-          component: ProfilePage,
+          component: UserProfile,
           path: '/profile'
         },
         {
@@ -55,6 +56,10 @@ const router = new VueRouter({
         {
           component: CreatePublicRoom,
           path: '/create-public-room',
+        },
+        {
+          component: InviteUser,
+          path: '/invite-user/:id',
         }
       ]
     }, {

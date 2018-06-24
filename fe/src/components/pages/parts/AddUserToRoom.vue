@@ -1,6 +1,6 @@
 <template>
   <div class="controls">
-    <div>
+    <div class="spanHo">
       <span class="spann" v-for="currentUser in value">{{ currentUser.user }}
         <i @click="removeUser(currentUser)" class="icon-cancel"></i>
       </span>
@@ -17,7 +17,7 @@
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {Getter, State} from 'vuex-class';
-  import {CurrentUserInfoModel, UserModel} from "../../types/model";
+  import {CurrentUserInfoModel, UserModel} from "../../../types/model";
 
   @Component
   export default class AddUserToRoom extends Vue {
@@ -88,7 +88,6 @@
 
 
   ul
-    max-height: calc(100vh - 400px)
     min-height: 50px
     margin-top: 5px
     overflow-y: scroll
@@ -99,7 +98,6 @@
     border-radius: 2px
     text-overflow: ellipsis
     overflow: hidden
-    max-width: 250px
     white-space: nowrap
     @extend %hovered-user-room
 </style>
