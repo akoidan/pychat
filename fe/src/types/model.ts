@@ -79,6 +79,8 @@ export interface RoomModel extends RoomSettingsModel {
   users: number[];
   messages: MessageModel[];
   allLoaded: boolean;
+  searchActive: boolean;
+  searchedIds: number[];
 }
 
 export interface RootState {

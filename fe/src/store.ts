@@ -15,7 +15,7 @@ import {
   RootState, UserDictModel,
   UserModel
 } from './types/model';
-import {AddMessagePayload, SetRoomsUsers} from './types/types';
+import {AddMessagePayload, MessagesLocation, SearchedMessagesIds, SetRoomsUsers, SetSearchTo} from './types/types';
 import {getMessageById} from './utils/utils';
 
 interface State extends ActionContext<RootState, RootState> {}
@@ -102,14 +102,20 @@ const store: StoreOptions<RootState> = {
       state.editedMessage = editedMessage;
       state.activeUserId = null;
     },
+    setSearchTo(state: RootState, payload: SetSearchTo) {
+      state.roomsDict[payload.roomId].searchActive = payload.searchActive;
+    },
     setActiveUserId(state: RootState, activeUserId: number) {
       state.activeUserId = activeUserId;
       state.editedMessage = null;
     },
-    addMessages(state: RootState, {messages, roomId}) {
-      let om: MessageModel[] = state.roomsDict[roomId].messages;
-      om.push(...messages);
+    addMessages(state: RootState, ml: MessagesLocation) {
+      let om: MessageModel[] = state.roomsDict[ml.roomId].messages;
+      om.push(...ml.messages);
       om.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
+    },
+    setSearchedIds(state: RootState, smi: SearchedMessagesIds) {
+      state.roomsDict[smi.roomId].searchedIds = smi.messagesIds;
     },
     setAllLoaded(state, roomId: number) {
       state.roomsDict[roomId].allLoaded = true;

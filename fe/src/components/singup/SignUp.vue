@@ -36,7 +36,7 @@
   import {Mutation, Action} from "vuex-class";
   import AppSubmit from "../ui/AppSubmit.vue"
   import RegisterFieldSet from './RegisterFieldSet.vue'
-  import _ from 'lodash';
+  import {debounce} from 'lodash';
   import {IconColor} from '../../types/types';
   import sessionHolder from '../../utils/sessionHolder';
   import {login} from '../../utils/utils';
@@ -62,8 +62,8 @@
 
     created() {
       this.setRegHeader('Create new account');
-      this.debouncedValidateUserName = _.debounce(this.checkUserName, 500);
-      this.debouncedValidateEmail = _.debounce(this.checkEmail, 500);
+      this.debouncedValidateUserName = debounce(this.checkUserName, 500);
+      this.debouncedValidateEmail = debounce(this.checkEmail, 500);
     }
 
 

@@ -1,5 +1,5 @@
 import loggerFactory from './loggerFactory';
-import { SessionHolder} from '../types/types';
+import {PostData, SessionHolder} from '../types/types';
 import {Logger} from 'lines-logger';
 
 
@@ -105,16 +105,16 @@ export default class Xhr {
     }
   }
 
-  doPost(url: string, params: object, callback: ErrorCB<string>, formData?: FormData, isJsonEncoded?: boolean, process?: Function) {
+  doPost<T>(d: PostData<T>) {
     let r = new XMLHttpRequest();
     r.onreadystatechange = () => {
       if (r.readyState === 4) {
         if (r.status === 200) {
-          this.httpLogger.log('POST in {} ::: {};', url, r.response)();
+          this.httpLogger.log('POST in {} ::: {};', d.url, r.response)();
         } else {
-          this.httpLogger.error('POST out: {} ::: {}, status:', url, r.response, r.status)();
+          this.httpLogger.error('POST out: {} ::: {}, status: {}', d.url, r.response, r.status)();
         }
-        if (typeof(callback) === 'function') {
+        if (typeof(d.cb) === 'function') {
           let error;
           if (r.status === 0) {
             error = `Can't connect to the server`;
@@ -123,28 +123,39 @@ export default class Xhr {
           } else {
             error = 'Server error';
           }
-          callback(r.response, error);
+          if (d.isJsonDecoded) {
+            let parsed;
+            try {
+              parsed = JSON.parse(r.response);
+            } catch (e) {
+              d.cb(null, `Unable to parse response ${e}`);
+              return;
+            }
+            d.cb(parsed, error);
+          } else {
+            d.cb(r.response, error);
+          }
         } else {
-          this.httpLogger.warn('Skipping {} callback for POST {}', callback, url)();
+          this.httpLogger.warn('Skipping {} callback for POST {}', d.cb, d.url)();
         }
       }
     };
 
-    url = this.getUrl(url);
+    let url = this.getUrl(d.url);
 
     r.open('POST', url, true);
     let data;
     let logOut: String = '';
-    if (isJsonEncoded) {
-      data = JSON.stringify(params);
+    if (d.isJsonEncoded) {
+      data = JSON.stringify(d.params);
       r.setRequestHeader('Content-Type', 'application/json');
     } else {
       /*Firefox doesn't accept null*/
-      data = formData ? formData : new FormData();
+      data = d.formData ? d.formData : new FormData();
 
-      if (params) {
-        for (let key in params) {
-          data.append(key, params[key]);
+      if (d.params) {
+        for (let key in d.params) {
+          data.append(key, d.params[key]);
         }
       }
       if (data.entries) {
@@ -162,9 +173,9 @@ export default class Xhr {
     }
     r.setRequestHeader('session-id', this.sessionHolder.session);
 
-    this.httpLogger.log('POST out {} ::: {} ::: {}', url, params, logOut)();
-    if (process) {
-      process(r);
+    this.httpLogger.log('POST out {} ::: {} ::: {}', url, d.params, logOut)();
+    if (d.process) {
+      d.process(r);
     }
     r.send(data);
     return r;

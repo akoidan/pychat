@@ -1,5 +1,5 @@
 <template>
-  <p :class="getClass(message)" @contextmenu="contextmenu">
+  <p :class="mainCls" @contextmenu="contextmenu">
       <span class="message-header">
         <span class="timeMess">({{getTime(message.time)}})</span>
         <span @contextmenu.prevent="setActiveUser">{{allUsersDict[message.userId].user}}</span>: </span>
@@ -19,6 +19,7 @@
 
     @State userInfo: CurrentUserInfoModel;
     @Prop() message: MessageModel;
+    @Prop() searched: number[];
     @State allUsersDict: UserDictModel;
     @State editedMessage : EditingMessage;
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
@@ -73,15 +74,14 @@
       return encodeMessage(message);
     }
 
-    getClass(message: MessageModel) {
-      let strings = [this.isSelf ? "message-self" : "message-others"];
-      if (message.deleted) {
-        strings.push('removed-message');
+    get mainCls() {
+      return {
+        "message-self": this.isSelf,
+        "message-others": !this.isSelf,
+        "removed-message": this.message.deleted,
+        "highLightMessage": this.isEditing,
+        "filter-search": this.searched.indexOf(this.message.id),
       }
-      if (this.isEditing) {
-        strings.push('highLightMessage');
-      }
-      return strings;
     }
 
     get isSelf() {

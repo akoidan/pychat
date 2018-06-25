@@ -2,7 +2,7 @@ import loggerFactory from './loggerFactory';
 import {Store} from 'vuex';
 import Api from './api';
 import MessageHandler from './MesageHandler';
-import {AddMessagePayload, MessageLocation, SetRoomsUsers} from '../types/types';
+import {AddMessagePayload, MessageLocation, MessagesLocation, SetRoomsUsers} from '../types/types';
 import {MessageModel, RoomDictModel, RoomModel, RootState, SexModel, UserDictModel, UserModel} from '../types/model';
 import {Logger} from 'lines-logger';
 import {
@@ -27,14 +27,7 @@ export default class ChannelsHandler extends MessageHandler {
   private handlers = {
     loadMessages(lm: LoadMessages) {
       if (lm.content.length > 0) {
-        let oldMessages: MessageModel[] = this.store.state.roomsDict[lm.roomId].messages;
-        let oldMessagesDist = {};
-        oldMessages.forEach(m => {
-          oldMessagesDist[m.id] = true;
-        });
-        let newMesages: MessageModelDto[] = lm.content.filter(i => !oldMessagesDist[i.id]);
-        let messages: MessageModel[] = newMesages.map(this.getMessage.bind(this));
-        this.store.commit('addMessages', {messages, roomId: lm.roomId});
+        this.addMessages(lm.roomId, lm.content);
       } else {
         this.store.commit('setAllLoaded', lm.roomId);
       }
@@ -114,6 +107,8 @@ export default class ChannelsHandler extends MessageHandler {
         name: message.name,
         messages: [],
         allLoaded: true,
+        searchedIds: [],
+        searchActive: false,
         users: message.users
       };
       this.store.commit('addRoom', r);
@@ -128,12 +123,25 @@ export default class ChannelsHandler extends MessageHandler {
         notifications: message.notifications,
         name: message.name,
         messages: [],
+        searchedIds: [],
+        searchActive: false,
         allLoaded: true,
         users: message.users
       };
       this.store.commit('addRoom', r);
     },
   };
+
+  public addMessages(roomId: number, inMessages: MessageModelDto[]) {
+    let oldMessages: MessageModel[] = this.store.state.roomsDict[roomId].messages;
+    let oldMessagesDist = {};
+    oldMessages.forEach(m => {
+      oldMessagesDist[m.id] = true;
+    });
+    let newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessagesDist[i.id]);
+    let messages: MessageModel[] = newMesages.map(this.getMessage.bind(this));
+    this.store.commit('addMessages', {messages, roomId: roomId} as MessagesLocation);
+  }
 
   constructor(store: Store<RootState>, api: Api) {
     super();
@@ -193,6 +201,8 @@ export default class ChannelsHandler extends MessageHandler {
         id: newRoom.roomId,
         messages: oldRoom ? oldRoom.messages : [],
         name: newRoom.name,
+        searchedIds: oldRoom ? oldRoom.searchedIds: [],
+        searchActive: oldRoom ? oldRoom.searchActive : false,
         notifications: newRoom.notifications,
         users: [...newRoom.users],
         volume: newRoom.volume,

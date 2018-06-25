@@ -38,6 +38,10 @@ export interface FileModelDto {
   preview: string;
 }
 
+export interface FileModelXhr {
+
+}
+
 export interface MessageModelDto {
   id: number;
   time: number;

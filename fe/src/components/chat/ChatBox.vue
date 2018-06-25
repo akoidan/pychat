@@ -1,32 +1,28 @@
 <template>
   <div class="holder">
-    <div class="search" v-show="showSearch">
-      <input type="search"/>
-      <div class="search-loading"></div>
-      <div class="search_result hidden"></div>
-    </div>
+    <search-messages :room="room"/>
     <div class="chatbox" tabindex="1" @mousewheel="onScroll" ref="chatbox">
       <template v-for="message in messages">
         <fieldset v-if="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
         </fieldset>
-        <chat-message v-else :key="message.id"  :message="message"/>
+        <chat-message v-else :key="message.id"  :message="message" :searched="room.searchedIds"/>
       </template>
     </div>
   </div>
 </template>
 <script lang="ts">
   import {Getter} from "vuex-class";
-  import {Component, Prop, Vue} from "vue-property-decorator";
+  import {Component, Prop, Vue ,Watch } from "vue-property-decorator";
   import ChatMessage from "./ChatMessage.vue";
+  import SearchMessages from "./SearchMessages.vue";
   import {RoomModel} from "../../types/model";
 
-  @Component({components: {ChatMessage}})
+  @Component({components: {ChatMessage, SearchMessages}})
   export default class ChatBox extends Vue {
     @Prop() room: RoomModel;
     @Getter maxId;
 
-    showSearch: boolean = false;
     loading: boolean = false;
     $refs: {
       chatbox: HTMLElement
@@ -91,27 +87,6 @@
 
   .holder
     height: 100%
-
-
-  .search
-    padding: 5px
-    > *
-      display: inline-block
-    input
-      width: calc(100% - 10px)
-    &.loading
-      .search-loading
-        margin-left: 5px
-        margin-bottom: -5px
-        margin-top: -3px
-        @include spinner(3px, white)
-      input
-        width: calc(100% - 40px)
-
-    .search_result
-      display: flex
-      justify-content: center
-      padding-top: 10px
 
 
   .chatbox

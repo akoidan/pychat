@@ -35,6 +35,16 @@ export  interface IStorage {
   setRoomHeaderId(roomId: number, value: number);
 }
 
+export interface PostData<T> {
+  url: string;
+  params?: object;
+  cb: ErrorCB<T>;
+  formData?: FormData;
+  isJsonEncoded?: boolean;
+  isJsonDecoded?: boolean;
+  process?: Function;
+}
+
 export interface SetRoomsUsers {
   roomId: number;
   users: number[];
@@ -44,6 +54,21 @@ export interface MessageLocation {
   roomId: number;
   id: number;
   edited: number;
+}
+
+export interface MessagesLocation {
+  roomId: number;
+  messages: MessageModel[];
+}
+
+export interface SearchedMessagesIds {
+  roomId: number;
+  messagesIds: number[];
+}
+
+export interface SetSearchTo {
+  roomId: number;
+  searchActive: boolean;
 }
 
 export interface AddMessagePayload {

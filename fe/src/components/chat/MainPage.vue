@@ -35,6 +35,7 @@
   import NavEditMessage from './NavEditMessage.vue';
   import NavUserShow from './NavUserShow.vue';
   import {sem} from '../../utils/utils';
+  import {FileModelDto, FileModelXhr} from "../../types/dto";
 
   @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Vue {
@@ -110,7 +111,7 @@
             let gr;
             let db;
             let text;
-            this.$api.uploadFiles(md.files, (res, err) => {
+            this.$api.uploadFiles(md.files, (res: FileModelXhr[], err: string) => {
               if (err) { // TOdo async should move to vuex
                 this.growlError(err);
               } else  {
@@ -158,7 +159,7 @@
       }
     }
 
-    private send(messageId: number, messageContent: string, arId: number, files: any[]) {
+    private send(messageId: number, messageContent: string, arId: number, files: FileModelXhr[]) {
       if (messageId) {
         this.$ws.sendEditMessage(messageContent, messageId, files);
       } else if (messageContent) {

@@ -7,7 +7,7 @@
     <router-link to="/report-issue" class="icon-pencil" title="Report an issue"><span class="mText">Issue</span>
     </router-link>
     <i class="icon-phone" title="Make a video/mic call"><span class="mText">Call</span></i>
-    <i class="icon-search" title="Search messages in current room (Shift+Ctrl+F)"><span
+    <i class="icon-search" v-if="activeRoom" @click='invertSearch' title="Search messages in current room (Shift+Ctrl+F)"><span
         class="mText">Search</span></i>
 
     <router-link to="/statistics" class="icon-chart-pie" title="Show user countries statistics"><span class="mText">Statistics</span>
@@ -28,22 +28,28 @@
   </nav>
 </template>
 <script lang="ts">
-  import {Action, State} from "vuex-class";
+  import {Action, State, Getter, Mutation} from "vuex-class";
   import {Component, Vue} from "vue-property-decorator";
-  import {UserModel} from "../types/model";
+  import {RoomModel, UserModel} from "../types/model";
   import {logout} from "../utils/utils";
 
   @Component
   export default class AppNav extends Vue {
     @State isOnline: boolean;
     @State userInfo: UserModel;
+    @Getter activeRoom: RoomModel;
     @Action growlError;
     @Action logout;
+    @Mutation setSearchTo;
 
     expanded: boolean = false;
 
     get title() {
       return this.isOnline ? "Websocket connection established. You are online": "Trying to connect to the server. You're offline";
+    }
+
+    invertSearch() {
+      this.setSearchTo({roomId: this.activeRoom.id, searchActive: !this.activeRoom.searchActive})
     }
 
     toggle() {
