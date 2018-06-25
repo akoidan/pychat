@@ -74,9 +74,9 @@
       if (!this.loading
           && (e.detail < 0 || e.wheelDelta > 0)
           && this.$refs.chatbox.scrollTop === 0) {
-        this.loading = true;
         let s = this.room.search;
         if (s.searchActive && !s.locked) {
+          this.loading = true;
           this.$api.search(s.searchText, this.room.id, s.searchedIds.length, (a: MessageModelDto[], e: string) => {
             this.loading = false;
             if (e) {
@@ -106,6 +106,7 @@
             }
           });
         } else if (!s.searchActive && !this.room.allLoaded) {
+          this.loading = true;
           this.$ws.sendLoadMessages(this.room.id, this.maxId(this.room.id), 10, () => {
             this.loading = false;
           });

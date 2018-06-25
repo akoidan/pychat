@@ -1,8 +1,8 @@
 <template>
-  <div class="search" v-show="room.search.searchActive" :class="{loading}">
+  <div class="search" v-show="room.search.searchActive" :class="{'loading': !!currentRequest}">
     <input type="search" class="input" v-model.trim="search"/>
-    <div class="search-loading" v-show="loading"></div>
-    <div class="search_result" v-if="searchResult">{{searchResult}}</div>
+    <div class="search-loading"></div>
+    <div class="search_result" v-if="searchResultText">{{searchResultText}}</div>
   </div>
 </template>
 <script lang="ts">
@@ -13,7 +13,10 @@
   import {MessageModelDto} from "../../types/dto";
   import {channelsHandler} from "../../utils/singletons";
   import {SetSearchTo} from "../../types/types";
+  import {MESSAGES_PER_SEARCH} from '../../utils/consts';
 
+
+  const START_TYPING = 'Start typing and messages will appear';
 
   @Component
   export default class SearchMessages extends Vue {
@@ -23,14 +26,27 @@
 
     debouncedSearch: Function;
     search: string = '';
-    loading: boolean = false;
     offset: number = 0;
+    currentRequest: XMLHttpRequest = null;
     searchResult: string = '';
     searchedIds = [];
+
+    get searchResultText() {
+      if (this.searchResult) {
+        return this.searchResult;
+      } else if (!this.room.search.locked) {
+        return 'More messages are available, scroll top to load them';
+      } else {
+        return '';
+      }
+    }
 
 
     created() {
       this.search = this.room.search.searchText;
+      if (!this.search) {
+        this.searchResult = START_TYPING;
+      }
       this.debouncedSearch = debounce(this.doSearch, 500);
     }
 
@@ -39,7 +55,7 @@
         searchActive: this.room.search.searchActive,
         searchedIds,
         searchText,
-        locked: false
+        locked: searchedIds.length < MESSAGES_PER_SEARCH
       };
       this.setSearchTo({
         roomId: this.room.id,
@@ -49,9 +65,9 @@
 
     doSearch(search: string) {
       if (search) {
-        this.loading = true;
-        this.$api.search(search, this.room.id, this.offset, (a: MessageModelDto[], e: string) => {
-          this.loading = false;
+        this.currentRequest = this.$api.search(search, this.room.id, this.offset, (a: MessageModelDto[], e: string) => {
+          this.logger.debug("http response {} {}", a, e)();
+          this.currentRequest = null;
           if (e) {
             this.searchResult = e;
             this.mutateSearchedIds([], search);
@@ -67,12 +83,16 @@
         });
       } else {
         this.mutateSearchedIds([], search);
-        this.searchResult = 'Start typing and messages will appear';
+        this.searchResult = START_TYPING;
       }
     }
 
     @Watch("search")
     onSearchChange(search: string) {
+      if (this.currentRequest) {
+        this.currentRequest.abort();
+        this.currentRequest = null;
+      }
       this.debouncedSearch(search)
     }
   }
@@ -95,8 +115,8 @@
       input
         width: calc(100% - 40px)
 
-    .search_result
-      display: flex
-      justify-content: center
-      padding-top: 10px
+  .search_result
+    display: flex
+    justify-content: center
+    padding-top: 10px
 </style>

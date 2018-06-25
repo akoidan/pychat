@@ -38,8 +38,8 @@ export default class Api {
     });
   }
 
-  public search(data: string, room: number, offset: number, cb: ErrorCB<MessageModelDto[]>) {
-    this.xhr.doPost<MessageModelDto[]>({
+  public search(data: string, room: number, offset: number, cb: ErrorCB<MessageModelDto[]>): XMLHttpRequest {
+   return this.xhr.doPost<MessageModelDto[]>({
       url: '/search_messages',
       params: {data, room, offset},
       isJsonDecoded: true,

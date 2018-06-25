@@ -105,8 +105,8 @@ export default class Xhr {
     }
   }
 
-  doPost<T>(d: PostData<T>) {
-    let r = new XMLHttpRequest();
+  doPost<T>(d: PostData<T>): XMLHttpRequest {
+    let r: XMLHttpRequest = new XMLHttpRequest();
     r.onreadystatechange = () => {
       if (r.readyState === 4) {
         if (r.status === 200) {
