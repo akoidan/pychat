@@ -162,7 +162,7 @@ export default class Xhr {
     }
     r.setRequestHeader('session-id', this.sessionHolder.session);
 
-    this.httpLogger.log('POST out {} ::: {} ::: {} ::: {}', url, params, logOut)();
+    this.httpLogger.log('POST out {} ::: {} ::: {}', url, params, logOut)();
     if (process) {
       process(r);
     }

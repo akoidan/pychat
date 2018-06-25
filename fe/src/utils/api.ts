@@ -36,10 +36,8 @@ export default class Api {
   }
 
 
-  public sendLogs(issue) {
-    this.xhr.doPost('/report_issue', {issue}, cb => {
-
-    });
+  public sendLogs(issue: string, browser: string, cb: SingleParamCB<string> = null) {
+    this.xhr.doPost('/report_issue', {issue, browser}, this.getResponseSuccessCB(cb));
   }
 
   public logout(cb: SingleParamCB<string>, registration_id: string = null) {
@@ -89,9 +87,10 @@ export default class Api {
     this.xhr.doPost('/validate_user', {username},  this.getResponseSuccessCB(cb));
   }
 
-  private getResponseSuccessCB(cb: SingleParamCB<String>) {
+  private getResponseSuccessCB(cb: SingleParamCB<string>) {
     return (data, error) => {
-      if (error) {
+      if (!cb) {
+      } else if (error) {
         cb(error);
       } else if (data === RESPONSE_SUCCESS) {
         cb(null);
@@ -103,7 +102,7 @@ export default class Api {
     };
   }
 
-  public sendRoomSettings(roomName, volume, notifications, roomId, cb: SingleParamCB<String>) {
+  public sendRoomSettings(roomName, volume, notifications, roomId, cb: SingleParamCB<string>) {
     this.xhr.doPost(
         '/save_room_settings',
         {roomName, volume, notifications, roomId},

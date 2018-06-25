@@ -10,6 +10,7 @@ import Login from './components/singup/Login.vue';
 import SignUp from './components/singup/SignUp.vue';
 import UserProfile from './components/pages/UserProfile.vue';
 import InviteUser from './components/pages/InviteUser.vue';
+import ReportIssue from './components/pages/ReportIssue.vue';
 import CreatePrivateRoom from './components/pages/CreatePrivateRoom.vue';
 import CreatePublicRoom from './components/pages/CreatePublicRoom.vue';
 import RoomSettings from './components/pages/RoomSettings.vue';
@@ -60,6 +61,10 @@ const router = new VueRouter({
         {
           component: InviteUser,
           path: '/invite-user/:id',
+        },
+        {
+          component: ReportIssue,
+          path: '/report-issue',
         }
       ]
     }, {
