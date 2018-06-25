@@ -57,7 +57,7 @@
 
     @Watch('editedMessage')
     onActiveRoomIdChange(val: EditingMessage) {
-      this.$logger.log("editedMessage changed")();
+      this.logger.log("editedMessage changed")();
       if (val && val.isEditingNow) {
         this.$refs.userMessage.innerHTML = encodeP(this.editingMessageModel);
         this.$refs.userMessage.focus();
@@ -83,7 +83,7 @@
 
 
     addSmiley(code: string) {
-      this.$logger.log("Adding smiley {}", code)();
+      this.logger.log("Adding smiley {}", code)();
       pasteHtmlAtCaret(getSmileyHtml(code), this.$refs.userMessage);
     }
 
@@ -93,7 +93,7 @@
         if (!this.$ws.isWsOpen()) {
           this.growlError(`Can't send message, can't connect to the server`);
         } else {
-          this.$logger.log('Sending message')();
+          this.logger.log('Sending message')();
           let messageId = this.editedMessage && this.editedMessage.isEditingNow ? this.editedMessage.messageId : null;
           let currSymbol;
           if (messageId) {

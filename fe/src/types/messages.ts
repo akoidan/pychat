@@ -25,24 +25,29 @@ export interface DeleteRoomMessage extends DefaultMessage {
 export interface AddOnlineUserMessage extends ChangeUserOnline {}
 export interface RemoveOnlineUserMessage extends ChangeUserOnline {}
 
-export interface InviteUserMessage extends DefaultMessage {
+
+interface RoomExistedBefore {
   inviteeUserId: number[];
+}
+
+interface NewRoom extends DefaultMessage {
   inviterUserId: number;
   roomId: number;
   time: number;
   users: number[];
 }
-
-interface AddRoomBase extends  InviteUserMessage{
+interface AddRoomBase extends  NewRoom {
   name: string;
   notifications: boolean;
   volume: number;
 }
 
-export interface AddInviteMessage extends AddRoomBase {
 
+
+export interface InviteUserMessage extends NewRoom, RoomExistedBefore {
 }
-
+export interface AddInviteMessage extends AddRoomBase, RoomExistedBefore {
+}
 export interface AddRoomMessage extends AddRoomBase {
 }
 

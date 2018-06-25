@@ -29,7 +29,7 @@
     };
 
     setActiveUser(evt: Event) {
-      this.$logger.log("setActiveUserId {}", this.message.userId)();
+      this.logger.log("setActiveUserId {}", this.message.userId)();
       evt.stopPropagation();
       this.setActiveUserId(this.message.userId);
     }

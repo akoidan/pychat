@@ -9,7 +9,7 @@ declare module 'vue/types/vue' {
   interface Vue {
     $ws: WsHandler;
     $api: Api;
-    $logger: Logger;
+    logger: Logger;
     $router: VueRouter;
     $route: Route;
   }

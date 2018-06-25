@@ -53,7 +53,7 @@
     }
 
     get messages() {
-      this.$logger.debug("Reevaluating messages in room #{}", this.room.id)();
+      this.logger.debug("Reevaluating messages in room #{}", this.room.id)();
       let newArray = [];
       let dates = {};
       this.room.messages.forEach(m => {

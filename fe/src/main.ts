@@ -40,7 +40,6 @@ Vue.mixin({
 
 Vue.prototype.$api = api;
 Vue.prototype.$ws = ws;
-Vue.prototype.$logger = globalLogger;
 document.addEventListener('DOMContentLoaded', function () {
   storage.connect(finished => {
     new Vue({

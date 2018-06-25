@@ -64,7 +64,7 @@
     @Mutation setRoomSettings;
 
     leave() {
-      this.$logger.log("Leaving room {}", this.roomId)();
+      this.logger.log("Leaving room {}", this.roomId)();
       this.running = true;
       this.$ws.sendLeaveRoom(this.roomId, () => {
         this.running = false;
@@ -78,7 +78,7 @@
     }
 
     private setVars() {
-      this.$logger.log("Updated for room settings {} ", this.room)();
+      this.logger.log("Updated for room settings {} ", this.room)();
       if (this.room) {
         this.roomName = this.room.name;
         this.isPublic = !!this.roomName;
@@ -93,13 +93,13 @@
 
     get roomId() : number {
       let id = this.$route.params.id;
-      this.$logger.log("Rending room settings for {}", id)();
+      this.logger.log("Rending room settings for {}", id)();
       return parseInt(id);
     }
 
 
     apply() {
-      this.$logger.log("Applying room {} settings", this.roomId)();
+      this.logger.log("Applying room {} settings", this.roomId)();
       this.running = true;
       this.$api.sendRoomSettings(this.roomName, this.sound, this.notifications, this.roomId, (err) => {
         if (err) {

@@ -47,7 +47,7 @@
     }
 
     toggle() {
-      this.$logger.log('Toggle nav')();
+      this.logger.log('Toggle nav')();
       this.expanded = !this.expanded;
     }
 
