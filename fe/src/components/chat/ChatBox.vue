@@ -53,7 +53,7 @@
     }
 
     get messages() {
-      this.logger.debug("Reevaluating messages in room #{}", this.room.id)();
+      this.$logger.debug("Reevaluating messages in room #{}", this.room.id)();
       let newArray = [];
       let dates = {};
       this.room.messages.forEach(m => {
@@ -74,7 +74,7 @@
           && (e.detail < 0 || e.wheelDelta > 0)
           && this.$refs.chatbox.scrollTop === 0) {
         this.loading = true;
-        this.ws.sendLoadMessages(this.room.id, this.maxId(this.room.id), 10, () => {
+        this.$ws.sendLoadMessages(this.room.id, this.maxId(this.room.id), 10, () => {
           this.loading = false;
         });
       }

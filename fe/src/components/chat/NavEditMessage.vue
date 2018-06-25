@@ -20,7 +20,7 @@
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
 
     m2DeleteMessage() {
-      this.ws.sendDeleteMessage(this.editedMessage.messageId);
+      this.$ws.sendDeleteMessage(this.editedMessage.messageId);
       this.setEditedMessage(null);
     }
 

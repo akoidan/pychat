@@ -18,7 +18,7 @@ from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
-from chat.utils import get_max_key, do_db, validate_edit_message, get_or_create_room, \
+from chat.utils import get_max_key, do_db, validate_edit_message, \
 	get_message_images_videos, update_symbols, up_files_to_img, evaluate
 
 parent_logger = logging.getLogger(__name__)
@@ -72,6 +72,7 @@ class MessagesHandler(MessagesCreator):
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
 			Actions.INVITE_USER: self.send_client_new_channel,
+			Actions.ADD_INVITE: self.send_client_new_channel,
 			Actions.PING: self.process_ping_message,
 		}
 
@@ -153,6 +154,9 @@ class MessagesHandler(MessagesCreator):
 
 	def publish(self, message, channel, parsable=False):
 		jsoned_mess = encode_message(message, parsable)
+		self.raw_publish(jsoned_mess, channel)
+
+	def raw_publish(self, jsoned_mess, channel):
 		self.logger.debug('<%s> %s', channel, jsoned_mess)
 		self.async_redis_publisher.publish(channel, jsoned_mess)
 
@@ -276,7 +280,6 @@ class MessagesHandler(MessagesCreator):
 		users = message.get(VarNames.ROOM_USERS)
 		users.append(self.user_id)
 		users = list(set(users))
-		max_id =Message.objects.all().aggregate(Max('id'))['id__max']
 		if room_name and len(room_name) > 16:
 			raise ValidationError('Incorrect room name "{}"'.format(room_name))
 		create_user_rooms = True
@@ -299,6 +302,7 @@ class MessagesHandler(MessagesCreator):
 			room = Room(name=room_name)
 			do_db(room.save)
 			room_id = room.id
+			max_id = Message.objects.all().aggregate(Max('id'))['id__max']
 			ru = [RoomUsers(
 				user_id=user_id,
 				room_id=room_id,
@@ -320,25 +324,70 @@ class MessagesHandler(MessagesCreator):
 			VarNames.ROOM_NAME: room_name,
 			VarNames.TIME: get_milliseconds(),
 		}
-		self.publish(m, self.channel, True)
+		jsoned_mess = encode_message(m, True)
 		m[VarNames.JS_MESSAGE_ID] = message[VarNames.JS_MESSAGE_ID]
 		self.ws_write(m)
+		for user in users:
+			self.raw_publish(jsoned_mess, RedisPrefix.generate_user(user))
 
 	def invite_user(self, message):
 		room_id = message[VarNames.ROOM_ID]
-		user_id = message[VarNames.USER_ID]
-		room = get_or_create_room(self.channels, room_id, user_id)
+		if room_id not in self.channels:
+			raise ValidationError("Access denied, only allowed for channels {}".format(self.channels))
+		room = do_db(Room.objects.get, id=room_id)
+		if room.is_private:
+			raise ValidationError("You can't add users to direct room, create a new room instead")
+		users = message.get(VarNames.ROOM_USERS)
 		users_in_room = list(RoomUsers.objects.filter(room_id=room_id).values_list('user_id', flat=True))
-		notify_others = self.add_user_to_room(
-			room_id,
-			room.name,
-			self.user_id,
-			user_id,
-			users_in_room
-		)
-		self.publish(notify_others, room_id)
-		if user_id != self.user_id:
-			self.publish(notify_others, RedisPrefix.generate_user(user_id), True)
+		intersect = set(users_in_room) & set(users)
+		if bool(intersect):
+			raise ValidationError("Users %s are already in the room", intersect)
+		users_in_room.extend(users)
+
+		max_id = Message.objects.filter(room_id=room_id).aggregate(Max('id'))['id__max']
+		if not max_id:
+			max_id = Message.objects.all().aggregate(Max('id'))['id__max']
+		ru = [RoomUsers(
+			user_id=user_id,
+			room_id=room_id,
+			last_read_message_id=max_id,
+			volume=1,
+			notifications=False
+		) for user_id in users]
+		RoomUsers.objects.bulk_create(ru)
+
+
+
+		notify_others = {
+			VarNames.EVENT: Actions.ADD_INVITE,
+			VarNames.ROOM_ID: room_id,
+			VarNames.ROOM_NAME: room.name,
+			VarNames.INVITEE_USER_ID: users,
+			VarNames.CB_BY_SENDER: self.id,
+			VarNames.INVITER_USER_ID: self.user_id,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.ROOM_USERS: users_in_room,
+			VarNames.TIME: get_milliseconds(),
+			VarNames.VOLUME: 1,
+			VarNames.NOTIFICATIONS: False,
+		}
+
+		jsoned_mess = encode_message(notify_others, True)
+
+		notify_others[VarNames.JS_MESSAGE_ID] = message[VarNames.JS_MESSAGE_ID]
+		self.ws_write(notify_others)
+		for user in users:
+			self.raw_publish(jsoned_mess, RedisPrefix.generate_user(user))
+		self.publish({
+			VarNames.EVENT: Actions.INVITE_USER,
+			VarNames.ROOM_ID: room_id,
+			VarNames.INVITEE_USER_ID: users,
+			VarNames.CB_BY_SENDER: None,
+			VarNames.INVITER_USER_ID: self.user_id,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.ROOM_USERS: users_in_room,
+			VarNames.TIME: get_milliseconds()
+		}, room_id, True)
 
 	def respond_ping(self, message):
 		self.ws_write(self.responde_pong(message[VarNames.JS_MESSAGE_ID]))

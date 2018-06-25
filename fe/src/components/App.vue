@@ -19,7 +19,7 @@
     @State growls: string[];
 
     created() {
-      this.logger.log("rendering app")();
+      this.$logger.log("rendering app")();
     }
 
   }

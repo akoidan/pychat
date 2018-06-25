@@ -136,7 +136,7 @@
     i:before
       transform: translate(0, 3px)
 
-  .chat-user-table > ul, ul.directUserTable
+  .chat-user-table, .directUserTable
     display: flex
     flex-direction: column
     .online
@@ -172,8 +172,6 @@
       margin-top: 5px
       margin-bottom: 5px
       padding-left: 0
-    > *
-      display: block
 
     .channelsStateText, .directStateText, .usersStateText
       font-size: 13px

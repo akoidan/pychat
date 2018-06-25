@@ -41,19 +41,6 @@ def is_blank(check_str):
 		return True
 
 
-def get_or_create_room(channels, room_id, user_id):
-	if room_id not in channels:
-		raise ValidationError("Access denied, only allowed for channels {}".format(channels))
-	room = do_db(Room.objects.get, id=room_id)
-	if room.is_private:
-		raise ValidationError("You can't add users to direct room, create a new room instead")
-	try:
-		Room.users.through.objects.create(room_id=room_id, user_id=user_id)
-	except IntegrityError:
-		raise ValidationError("User is already in channel")
-	return room
-
-
 def update_room(room_id, disabled):
 	if not disabled:
 		raise ValidationError('This room already exist')

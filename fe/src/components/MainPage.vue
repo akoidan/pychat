@@ -29,7 +29,7 @@
     }
 
     created() {
-      this.ws.startListening();
+      this.$ws.startListening();
     }
 
     destroy() {

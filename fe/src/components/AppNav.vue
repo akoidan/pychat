@@ -47,12 +47,12 @@
     }
 
     toggle() {
-      this.logger.log('Toggle nav')();
+      this.$logger.log('Toggle nav')();
       this.expanded = !this.expanded;
     }
 
     signOut() {
-      this.api.logout(logout);
+      this.$api.logout(logout);
     }
   }
 </script>

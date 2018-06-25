@@ -64,9 +64,9 @@
     @Mutation setRoomSettings;
 
     leave() {
-      this.logger.log("Leaving room {}", this.roomId)();
+      this.$logger.log("Leaving room {}", this.roomId)();
       this.running = true;
-      this.ws.sendLeaveRoom(this.roomId, () => {
+      this.$ws.sendLeaveRoom(this.roomId, () => {
         this.running = false;
         this.$router.replace('/chat/1');
       });
@@ -78,7 +78,7 @@
     }
 
     private setVars() {
-      this.logger.log("Updated for room settings {} ", this.room)();
+      this.$logger.log("Updated for room settings {} ", this.room)();
       if (this.room) {
         this.roomName = this.room.name;
         this.isPublic = !!this.roomName;
@@ -93,15 +93,15 @@
 
     get roomId() : number {
       let id = this.$route.params.id;
-      this.logger.log("Rending room settings for {}", id)();
+      this.$logger.log("Rending room settings for {}", id)();
       return parseInt(id);
     }
 
 
     apply() {
-      this.logger.log("Applying room {} settings", this.roomId)();
+      this.$logger.log("Applying room {} settings", this.roomId)();
       this.running = true;
-      this.api.sendRoomSettings(this.roomName, this.sound, this.notifications, this.roomId, (err) => {
+      this.$api.sendRoomSettings(this.roomName, this.sound, this.notifications, this.roomId, (err) => {
         if (err) {
           this.growlError(err);
         } else {

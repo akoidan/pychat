@@ -75,7 +75,7 @@
 
 
     checkUserName(username: string) {
-      this.api.validateUsername(username, errors => {
+      this.$api.validateUsername(username, errors => {
         this.userCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
         this.$refs.username.setCustomValidity(errors ? errors : "");
         this.userDescription = errors ? errors : `Username ${username} is available`;
@@ -154,7 +154,7 @@
 
     checkEmail(username: string) {
       console.log('asd');
-      this.api.validateEmail(username, errors => {
+      this.$api.validateEmail(username, errors => {
         this.emailCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
         this.$refs.email.setCustomValidity(errors ? errors : "");
         this.emailDescription = errors ? errors : `Email ${username} is not registered`;
@@ -203,7 +203,7 @@
 
     register() {
       this.running = true;
-      this.api.register(this.$refs.form, (session, error )=> {
+      this.$api.register(this.$refs.form, (session, error )=> {
         this.running = false;
         login(session, error);
       })

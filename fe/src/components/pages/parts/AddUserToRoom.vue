@@ -44,7 +44,7 @@
           users.push(u);
         }
       });
-      this.logger.debug("Reeval users in CreatePrivateRoom")();
+      this.$logger.debug("Reeval users in CreatePrivateRoom")();
       return users;
     }
 
@@ -59,7 +59,7 @@
 
 
     get filteredUsers(): UserModel[] {
-      this.logger.debug("Reeval filter CreatePrivateRoom")();
+      this.$logger.debug("Reeval filter CreatePrivateRoom")();
       let s = this.search.toLowerCase();
       return this.users.filter(u => u.user.toLowerCase().indexOf(s) >= 0);
     }

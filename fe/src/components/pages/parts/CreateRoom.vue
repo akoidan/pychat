@@ -40,7 +40,7 @@
   import AppSubmit from "../../ui/AppSubmit";
   import AddUserToRoom from "./AddUserToRoom.vue";
   import {UserModel} from "../../../types/model";
-  import {AddRoomMessage} from "../../../utils/messages";
+  import {AddRoomMessage} from "../../../types/messages";
 
   @Component({components: {AppInputRange, AppSubmit, AddUserToRoom}})
   export default class CreateRoom extends Vue {
@@ -79,7 +79,7 @@
         this.growlError('Please add user');
       } else {
         this.running = true;
-        this.ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), (e: AddRoomMessage)=> {
+        this.$ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), (e: AddRoomMessage)=> {
           if (e && e.roomId) {
             this.$router.replace(`/chat/${e.roomId}`);
           }

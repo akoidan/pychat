@@ -6,15 +6,16 @@ import {AddMessagePayload, MessageLocation, SetRoomsUsers} from '../types/types'
 import {MessageModel, RoomDictModel, RoomModel, RootState, SexModel, UserDictModel, UserModel} from '../types/model';
 import {Logger} from 'lines-logger';
 import {
+  AddInviteMessage,
   AddOnlineUserMessage,
   AddRoomMessage,
   DeleteMessage,
   DeleteRoomMessage,
-  EditMessage,
+  EditMessage, InviteUserMessage,
   LeaveUserMessage,
   LoadMessages,
   RemoveOnlineUserMessage
-} from './messages';
+} from '../types/messages';
 import {MessageModelDto, RoomDto, SexModelDto, UserDto} from '../types/dto';
 import {getMessageById} from './utils';
 
@@ -116,7 +117,22 @@ export default class ChannelsHandler extends MessageHandler {
         users: message.users
       };
       this.store.commit('addRoom', r);
-    }
+    },
+    inviteUser(message: InviteUserMessage) {
+      this.store.commit('setRoomsUsers', {roomId: message.roomId, users: message.users} as SetRoomsUsers);
+    },
+    addInvite(message: AddInviteMessage) {
+      let r: RoomModel = {
+        id: message.roomId,
+        volume: message.volume,
+        notifications: message.notifications,
+        name: message.name,
+        messages: [],
+        allLoaded: true,
+        users: message.users
+      };
+      this.store.commit('addRoom', r);
+    },
   };
 
   constructor(store: Store<RootState>, api: Api) {

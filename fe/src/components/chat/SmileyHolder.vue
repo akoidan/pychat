@@ -35,7 +35,7 @@
     activeTab: string = Object.keys(smileys)[0];
 
     created() {
-      this.logger.log("Smiley inited {}", this.smileys)();
+      this.$logger.log("Smiley inited {}", this.smileys)();
     }
 
     buildUrl(smiley: SmileyStructure, tabName: string) {

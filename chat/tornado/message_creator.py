@@ -159,20 +159,6 @@ class MessagesCreator(object):
 			VarNames.JS_MESSAGE_ID: js_id
 		}
 
-
-	@staticmethod
-	def add_user_to_room(channel, channel_name, inviter, invitee, all_users):
-		return {
-			VarNames.EVENT: Actions.INVITE_USER,
-			VarNames.ROOM_ID: channel,
-			VarNames.ROOM_NAME: channel_name,
-			VarNames.INVITEE_USER_ID: invitee,
-			VarNames.INVITER_USER_ID: inviter,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
-			VarNames.ROOM_USERS: all_users,
-			VarNames.TIME: get_milliseconds(),
-		}
-
 	def unsubscribe_direct_message(self, room_id, js_id, myws_id, users):
 		return {
 			VarNames.EVENT: Actions.DELETE_ROOM,

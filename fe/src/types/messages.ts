@@ -1,4 +1,4 @@
-import {CurrentUserInfoDto, FileModelDto, MessageModelDto, RoomDto, UserDto} from '../types/dto';
+import {CurrentUserInfoDto, FileModelDto, MessageModelDto, RoomDto, UserDto} from './dto';
 
 export interface DefaultMessage {
   action: string;
@@ -25,14 +25,25 @@ export interface DeleteRoomMessage extends DefaultMessage {
 export interface AddOnlineUserMessage extends ChangeUserOnline {}
 export interface RemoveOnlineUserMessage extends ChangeUserOnline {}
 
-export interface AddRoomMessage extends DefaultMessage {
+export interface InviteUserMessage extends DefaultMessage {
+  inviteeUserId: number[];
+  inviterUserId: number;
   roomId: number;
-  users: number[];
-  userId: number;
-  volume: number;
-  notifications: boolean;
-  name: string;
   time: number;
+  users: number[];
+}
+
+interface AddRoomBase extends  InviteUserMessage{
+  name: string;
+  notifications: boolean;
+  volume: number;
+}
+
+export interface AddInviteMessage extends AddRoomBase {
+
+}
+
+export interface AddRoomMessage extends AddRoomBase {
 }
 
 export interface LeaveUserMessage extends DefaultMessage {

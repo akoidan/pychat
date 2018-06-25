@@ -21,6 +21,7 @@ class Actions(object):
 	DELETE_MESSAGE = 'deleteMessage'
 	CREATE_ROOM_CHANNEL = 'addRoom'
 	INVITE_USER = 'inviteUser'
+	ADD_INVITE = 'addInvite'
 	SET_WEBRTC_ID = 'setConnectionId'
 	SET_WEBRTC_ERROR = 'setError'
 	OFFER_FILE_CONNECTION = 'offerFile'

@@ -37,7 +37,7 @@
 
     restorePassword(event) {
       this.running = true;
-      this.api.sendRestorePassword(this.$refs.form, error => {
+      this.$api.sendRestorePassword(this.$refs.form, error => {
         this.running = false;
         if (error) {
           this.growlError(error);

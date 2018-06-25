@@ -1,4 +1,4 @@
-import {DefaultMessage} from './messages';
+import {DefaultMessage} from '../types/messages';
 
 export default abstract class MessageHandler {
 

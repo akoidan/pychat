@@ -10,12 +10,12 @@ import {
   EditingMessage,
   GrowlModel,
   GrowlType,
-  MessageModel,
+  MessageModel, RoomDictModel,
   RoomModel, RoomSettingsModel,
   RootState, UserDictModel,
   UserModel
 } from './types/model';
-import {AddMessagePayload, MessageLocation} from './types/types';
+import {AddMessagePayload, SetRoomsUsers} from './types/types';
 import {getMessageById} from './utils/utils';
 
 interface State extends ActionContext<RootState, RootState> {}
@@ -124,8 +124,8 @@ const store: StoreOptions<RootState> = {
       let a = 'delete'; // TODO
       Vue[a](state.roomsDict, roomId);
     },
-    setRoomsUsers(state: RootState, {roomId, users}) {
-      state.roomsDict[roomId].users = users;
+    setRoomsUsers(state: RootState, ru: SetRoomsUsers) {
+      state.roomsDict[ru.roomId].users = ru.users;
     },
     addMessage(state: RootState, m: AddMessagePayload) {
       state.roomsDict[m.message.roomId].messages.splice(m.index, 0, m.message);
@@ -169,7 +169,7 @@ const store: StoreOptions<RootState> = {
     setUserInfo(state: RootState, userInfo: CurrentUserInfoModel) {
       state.userInfo = userInfo;
     },
-    setRooms(state: RootState, rooms: { [id: number]: RoomModel }) {
+    setRooms(state: RootState, rooms: RoomDictModel) {
       state.roomsDict = rooms;
     },
     addRoom(state: RootState, room: RoomModel) {

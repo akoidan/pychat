@@ -9,7 +9,7 @@ import {default as MessageHandler} from './MesageHandler';
 import {logout} from './utils';
 import {CurrentUserInfoModel, RootState} from '../types/model';
 import {IStorage, SessionHolder} from '../types/types';
-import {DefaultMessage, GrowlMessage, SetWsIdMessage} from './messages';
+import {DefaultMessage, GrowlMessage, SetWsIdMessage} from '../types/messages';
 import {Logger} from 'lines-logger';
 
 enum WsState {
@@ -236,7 +236,7 @@ export class WsHandler extends MessageHandler {
       volume,
       notifications
     });
-    this.callBacks[this.messageId] = cb;
+    this.appendCB(cb);
   }
 
   public sendLoadMessages(roomId: number, headerId: number, count: number, cb: Function) {
@@ -246,7 +246,22 @@ export class WsHandler extends MessageHandler {
       action: 'loadMessages',
       roomId
     });
+    this.appendCB(cb);
+  }
+
+  private appendCB(cb: Function) {
     this.callBacks[this.messageId] = cb;
+    this.logger.log('Appending cb {}', cb)();
+  }
+
+
+  public inviteUser(roomId: number, users: number[], cb: Function) {
+    this.sendToServer({
+      roomId,
+      users,
+      action: 'inviteUser',
+    });
+    this.appendCB(cb);
   }
 
   public sendLeaveRoom(roomId, cb: Function) {
@@ -254,24 +269,25 @@ export class WsHandler extends MessageHandler {
       roomId,
       action: 'deleteRoom',
     });
-    this.callBacks[this.messageId] = cb;
+    this.appendCB(cb);
   }
 
   onWsClose(e) {
     this.ws = null;
     this.setStatus(false);
-    for (let k in this.progressInterval) {
-      this.hideGrowlProgress(k);
-    }
     for (let cb in this.callBacks) {
       try {
         this.logger.log('Resolving cb {}', cb)();
-        this.callBacks[cb]();
-        this.logger.log('Cb {} has been resolved', cb)();
+        let cbFn = this.callBacks[cb];
         delete this.callBacks[cb];
+        cbFn({});
+        this.logger.log('Cb {} has been resolved', cb)();
       } catch (e) {
-        this.logger.log('Error during resolving cb', cb)();
+        this.logger.log('Error {} during resolving cb {}', e, cb)();
       }
+    }
+    for (let k in this.progressInterval) {
+      this.hideGrowlProgress(k);
     }
     if (this.noServerPingTimeout) {
       clearTimeout(this.noServerPingTimeout);
@@ -282,6 +298,7 @@ export class WsHandler extends MessageHandler {
       let message = `Server has forbidden request because '${reason}'. Logging out...`;
       this.logger.error('onWsClose {}', message)();
       logout(message);
+      return;
     } else if (this.wsState === WsState.NOT_INITED) {
       this.store.dispatch('growlError', 'Can\'t establish connection with server');
       this.logger.error('Chat server is down because {}', reason)();
@@ -292,8 +309,8 @@ export class WsHandler extends MessageHandler {
           'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
           e.reason, CONNECTION_RETRY_TIME)();
     }
-    if (this.wsState !== 1) {
-      this.wsState = 2;
+    if (this.wsState !== WsState.TRIED_TO_CONNECT) {
+      this.wsState = WsState.CONNECTION_IS_LOST;
     }
     // Try to reconnect in 10 seconds
     this.listenWsTimeout = setTimeout(this.listenWS.bind(this), CONNECTION_RETRY_TIME);
@@ -345,11 +362,11 @@ export class WsHandler extends MessageHandler {
       this.ws.onopen = () => {
         this.setStatus(true);
         let message = 'Connection to server has been established';
-        if (this.wsState === 2) { // if not inited don't growl message on page load
-          // alert(message); TODO
+        if (this.wsState === WsState.CONNECTION_IS_LOST) { // if not inited don't growl message on page load
+           this.store.dispatch('growlSuccess', 'Connection established');
         }
         this.startNoPingTimeout();
-        this.wsState = 9;
+        this.wsState = WsState.CONNECTED;
         this.logger.log(message)();
       };
     });
