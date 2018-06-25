@@ -36,7 +36,7 @@ interface NewRoom extends DefaultMessage {
   time: number;
   users: number[];
 }
-interface AddRoomBase extends  NewRoom {
+export interface AddRoomBase extends  NewRoom {
   name: string;
   notifications: boolean;
   volume: number;

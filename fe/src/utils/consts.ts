@@ -5,4 +5,4 @@ export const API_URL = 'wss://localhost:8889/?id=';
 export const API_URL_DEFAULT = 'https://localhost:8001';
 export const RESPONSE_SUCCESS = 'ok';
 export const PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
-  
+export const MESSAGES_PER_SEARCH = 10;

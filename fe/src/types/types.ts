@@ -1,4 +1,4 @@
-import {MessageModel} from './model';
+import {MessageModel, SearchModel} from './model';
 
 export interface MessageDb {
   id: number;
@@ -61,14 +61,10 @@ export interface MessagesLocation {
   messages: MessageModel[];
 }
 
-export interface SearchedMessagesIds {
-  roomId: number;
-  messagesIds: number[];
-}
 
 export interface SetSearchTo {
   roomId: number;
-  searchActive: boolean;
+  search: SearchModel;
 }
 
 export interface AddMessagePayload {

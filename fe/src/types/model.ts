@@ -75,12 +75,18 @@ export interface RoomDictModel {
 }
 
 
+export interface SearchModel {
+  searchActive: boolean;
+  searchedIds: number[];
+  searchText: string;
+  locked: boolean;
+}
+
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
   messages: MessageModel[];
   allLoaded: boolean;
-  searchActive: boolean;
-  searchedIds: number[];
+  search: SearchModel;
 }
 
 export interface RootState {

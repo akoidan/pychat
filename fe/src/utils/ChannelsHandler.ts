@@ -7,7 +7,7 @@ import {MessageModel, RoomDictModel, RoomModel, RootState, SexModel, UserDictMod
 import {Logger} from 'lines-logger';
 import {
   AddInviteMessage,
-  AddOnlineUserMessage,
+  AddOnlineUserMessage, AddRoomBase,
   AddRoomMessage,
   DeleteMessage,
   DeleteRoomMessage,
@@ -100,37 +100,34 @@ export default class ChannelsHandler extends MessageHandler {
       }
     },
     addRoom(message: AddRoomMessage) {
-      let r: RoomModel = {
-        id: message.roomId,
-        volume: message.volume,
-        notifications: message.notifications,
-        name: message.name,
-        messages: [],
-        allLoaded: true,
-        searchedIds: [],
-        searchActive: false,
-        users: message.users
-      };
-      this.store.commit('addRoom', r);
+      this.mutateRoomAddition(message);
     },
     inviteUser(message: InviteUserMessage) {
       this.store.commit('setRoomsUsers', {roomId: message.roomId, users: message.users} as SetRoomsUsers);
     },
     addInvite(message: AddInviteMessage) {
-      let r: RoomModel = {
-        id: message.roomId,
-        volume: message.volume,
-        notifications: message.notifications,
-        name: message.name,
-        messages: [],
-        searchedIds: [],
-        searchActive: false,
-        allLoaded: true,
-        users: message.users
-      };
-      this.store.commit('addRoom', r);
+      this.mutateRoomAddition(message);
     },
   };
+
+  private mutateRoomAddition(message: AddRoomBase) {
+    let r: RoomModel = {
+      id: message.roomId,
+      volume: message.volume,
+      notifications: message.notifications,
+      name: message.name,
+      messages: [],
+      allLoaded: true,
+      search: {
+        searchActive: false,
+        searchText: '',
+        searchedIds: [],
+        locked: false,
+      },
+      users: message.users
+    };
+    this.store.commit('addRoom', r);
+  }
 
   public addMessages(roomId: number, inMessages: MessageModelDto[]) {
     let oldMessages: MessageModel[] = this.store.state.roomsDict[roomId].messages;
@@ -201,8 +198,12 @@ export default class ChannelsHandler extends MessageHandler {
         id: newRoom.roomId,
         messages: oldRoom ? oldRoom.messages : [],
         name: newRoom.name,
-        searchedIds: oldRoom ? oldRoom.searchedIds: [],
-        searchActive: oldRoom ? oldRoom.searchActive : false,
+        search: oldRoom ? oldRoom.search : {
+          searchActive: false,
+          searchText: '',
+          searchedIds: [],
+          locked: false
+        },
         notifications: newRoom.notifications,
         users: [...newRoom.users],
         volume: newRoom.volume,

@@ -1,27 +1,33 @@
 <template>
   <div class="holder">
     <search-messages :room="room"/>
-    <div class="chatbox" :class="{'display-search-only': room.searchActive}" tabindex="1" @mousewheel="onScroll" ref="chatbox">
+    <div class="chatbox" :class="{'display-search-only': room.search.searchActive}" tabindex="1" @mousewheel="onScroll" ref="chatbox">
       <template v-for="message in messages">
         <fieldset v-if="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
         </fieldset>
-        <chat-message v-else :key="message.id"  :message="message" :searched="room.searchedIds"/>
+        <chat-message v-else :key="message.id"  :message="message" :searched="room.search.searchedIds"/>
       </template>
     </div>
   </div>
 </template>
 <script lang="ts">
-  import {Getter} from "vuex-class";
+  import {Getter, Action, Mutation} from "vuex-class";
   import {Component, Prop, Vue ,Watch } from "vue-property-decorator";
   import ChatMessage from "./ChatMessage.vue";
   import SearchMessages from "./SearchMessages.vue";
-  import {RoomModel} from "../../types/model";
+  import {RoomModel, SearchModel} from "../../types/model";
+  import {MessageModelDto} from '../../types/dto';
+  import {channelsHandler} from '../../utils/singletons';
+  import {SetSearchTo} from '../../types/types';
+  import {MESSAGES_PER_SEARCH} from '../../utils/consts';
 
   @Component({components: {ChatMessage, SearchMessages}})
   export default class ChatBox extends Vue {
     @Prop() room: RoomModel;
+    @Action growlError;
     @Getter maxId;
+    @Mutation setSearchTo;
 
     loading: boolean = false;
     $refs: {
@@ -41,7 +47,7 @@
 
     updated() {
       this.$nextTick(function () {
-        if (this.scrollBottom) {
+        if (this.$refs.chatbox && this.scrollBottom) {
           this.$refs.chatbox.scrollTop = this.$refs.chatbox.scrollHeight;
           // globalLogger.debug("Scrolling to bottom")();
         }
@@ -65,14 +71,45 @@
 
     onScroll(e) {
       // globalLogger.debug("Handling scroll {}, scrollTop {}", e, this.$refs.chatbox.scrollTop)();
-      if (!this.room.allLoaded
-          && !this.loading
+      if (!this.loading
           && (e.detail < 0 || e.wheelDelta > 0)
           && this.$refs.chatbox.scrollTop === 0) {
         this.loading = true;
-        this.$ws.sendLoadMessages(this.room.id, this.maxId(this.room.id), 10, () => {
-          this.loading = false;
-        });
+        let s = this.room.search;
+        if (s.searchActive && !s.locked) {
+          this.$api.search(s.searchText, this.room.id, s.searchedIds.length, (a: MessageModelDto[], e: string) => {
+            this.loading = false;
+            if (e) {
+              this.growlError(e);
+            } else if (a.length) {
+              channelsHandler.addMessages(this.room.id, a);
+              let searchedIds = this.room.search.searchedIds.concat(a.map(a => a.id));
+              this.setSearchTo({
+                roomId: this.room.id,
+                search: {
+                  searchActive: s.searchActive,
+                  searchedIds,
+                  locked: a.length < MESSAGES_PER_SEARCH,
+                  searchText: s.searchText
+                } as SearchModel
+              } as SetSearchTo);
+            } else {
+              this.setSearchTo({
+                roomId: this.room.id,
+                search: {
+                  searchActive: s.searchActive,
+                  searchedIds: s.searchedIds,
+                  locked: true,
+                  searchText: s.searchText
+                } as SearchModel
+              } as SetSearchTo);
+            }
+          });
+        } else if (!s.searchActive && !this.room.allLoaded) {
+          this.$ws.sendLoadMessages(this.room.id, this.maxId(this.room.id), 10, () => {
+            this.loading = false;
+          });
+        }
       }
     }
 

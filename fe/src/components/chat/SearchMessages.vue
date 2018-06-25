@@ -1,5 +1,5 @@
 <template>
-  <div class="search" v-show="room.searchActive" :class="{loading}">
+  <div class="search" v-show="room.search.searchActive" :class="{loading}">
     <input type="search" class="input" v-model.trim="search"/>
     <div class="search-loading" v-show="loading"></div>
     <div class="search_result" v-if="searchResult">{{searchResult}}</div>
@@ -9,16 +9,17 @@
   import {State, Action, Mutation} from "vuex-class";
   import {debounce} from 'lodash';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-  import {RoomModel} from '../../types/model';
+  import {RoomModel, SearchModel} from "../../types/model";
   import {MessageModelDto} from "../../types/dto";
   import {channelsHandler} from "../../utils/singletons";
-  import {SearchedMessagesIds} from "../../types/types";
+  import {SetSearchTo} from "../../types/types";
+
 
   @Component
   export default class SearchMessages extends Vue {
 
     @Prop() room: RoomModel;
-    @Mutation setSearchedIds;
+    @Mutation setSearchTo;
 
     debouncedSearch: Function;
     search: string = '';
@@ -29,11 +30,21 @@
 
 
     created() {
+      this.search = this.room.search.searchText;
       this.debouncedSearch = debounce(this.doSearch, 500);
     }
 
-    private mutateSearchedIds(a: number[]) {
-      this.setSearchedIds({roomId: this.room.id, messagesIds: a} as SearchedMessagesIds);
+    private mutateSearchedIds(searchedIds: number[], searchText: string) {
+      let search: SearchModel = {
+        searchActive: this.room.search.searchActive,
+        searchedIds,
+        searchText,
+        locked: false
+      };
+      this.setSearchTo({
+        roomId: this.room.id,
+        search
+      } as SetSearchTo);
     }
 
     doSearch(search: string) {
@@ -43,19 +54,19 @@
           this.loading = false;
           if (e) {
             this.searchResult = e;
-            this.mutateSearchedIds([]);
+            this.mutateSearchedIds([], search);
           } else if (a.length) {
             channelsHandler.addMessages(this.room.id, a);
-            let ids = this.room.searchedIds.concat([]);
-            this.mutateSearchedIds(a.map(a => a.id));
+            let ids = this.room.search.searchedIds.concat([]);
+            this.mutateSearchedIds(a.map(a => a.id), search);
             this.searchResult = null;
           } else {
-            this.mutateSearchedIds([]);
+            this.mutateSearchedIds([], search);
             this.searchResult = 'No results found';
           }
         });
       } else {
-        this.mutateSearchedIds([]);
+        this.mutateSearchedIds([], search);
         this.searchResult = 'Start typing and messages will appear';
       }
     }

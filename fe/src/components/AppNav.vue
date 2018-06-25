@@ -32,6 +32,7 @@
   import {Component, Vue} from "vue-property-decorator";
   import {RoomModel, UserModel} from "../types/model";
   import {logout} from "../utils/utils";
+  import {SetSearchTo} from '../types/types';
 
   @Component
   export default class AppNav extends Vue {
@@ -49,7 +50,10 @@
     }
 
     invertSearch() {
-      this.setSearchTo({roomId: this.activeRoom.id, searchActive: !this.activeRoom.searchActive})
+      this.setSearchTo({
+        roomId: this.activeRoom.id,
+        search: { ...this.activeRoom.search, searchActive: !this.activeRoom.search.searchActive}
+        } as SetSearchTo);
     }
 
     toggle() {
