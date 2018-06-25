@@ -1,7 +1,7 @@
 <template>
   <div class="holder">
     <search-messages :room="room"/>
-    <div class="chatbox" tabindex="1" @mousewheel="onScroll" ref="chatbox">
+    <div class="chatbox" :class="{'display-search-only': room.searchActive}" tabindex="1" @mousewheel="onScroll" ref="chatbox">
       <template v-for="message in messages">
         <fieldset v-if="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
@@ -101,7 +101,7 @@
     &:focus
       outline: none
 
-    &.display-search-only
+    &.display-search-only /deep/
       >:not(.filter-search)
         display: none
 

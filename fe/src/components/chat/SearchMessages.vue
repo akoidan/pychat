@@ -32,6 +32,10 @@
       this.debouncedSearch = debounce(this.doSearch, 500);
     }
 
+    private mutateSearchedIds(a: number[]) {
+      this.setSearchedIds({roomId: this.room.id, messagesIds: a} as SearchedMessagesIds);
+    }
+
     doSearch(search: string) {
       if (search) {
         this.loading = true;
@@ -39,16 +43,19 @@
           this.loading = false;
           if (e) {
             this.searchResult = e;
+            this.mutateSearchedIds([]);
           } else if (a.length) {
             channelsHandler.addMessages(this.room.id, a);
-            let ids = this.room.searchedIds.concat(a.map(a => a.id));
-            this.setSearchedIds({roomId: this.room.id, messagesIds: ids} as SearchedMessagesIds);
+            let ids = this.room.searchedIds.concat([]);
+            this.mutateSearchedIds(a.map(a => a.id));
             this.searchResult = null;
           } else {
+            this.mutateSearchedIds([]);
             this.searchResult = 'No results found';
           }
         });
       } else {
+        this.mutateSearchedIds([]);
         this.searchResult = 'Start typing and messages will appear';
       }
     }

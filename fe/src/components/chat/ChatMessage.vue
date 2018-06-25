@@ -80,7 +80,7 @@
         "message-others": !this.isSelf,
         "removed-message": this.message.deleted,
         "highLightMessage": this.isEditing,
-        "filter-search": this.searched.indexOf(this.message.id),
+        "filter-search": this.searched.indexOf(this.message.id) >= 0,
       }
     }
 
