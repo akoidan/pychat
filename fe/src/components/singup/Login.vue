@@ -2,11 +2,11 @@
   <form @submit.prevent='login' ref="form">
     <div>
       <i class='icon-user'></i>
-      <input type='text' maxlength='254' class="input" required placeholder='Username/Email' name='username'/>
+      <input type='text' maxlength='254' class="input" autocomplete="username" required placeholder='Username/Email' name='username'/>
     </div>
     <div>
       <i class='icon-key'></i>
-      <input type='password' name='password' class="input" placeholder='Password' required/>
+      <input type='password' name='password' autocomplete="password" class="input" placeholder='Password' required/>
     </div>
       <router-link class='forg-pass' to="/auth/reset-password">Forgot Password?</router-link>
     <div>
