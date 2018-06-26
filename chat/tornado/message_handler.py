@@ -358,11 +358,10 @@ class MessagesHandler(MessagesCreator):
 
 
 
-		notify_others = {
+		add_invitee = {
 			VarNames.EVENT: Actions.ADD_INVITE,
 			VarNames.ROOM_ID: room_id,
 			VarNames.ROOM_USERS: users_in_room,
-			VarNames.CB_BY_SENDER: self.id,
 			VarNames.ROOM_NAME: room.name,
 			VarNames.INVITEE_USER_ID: users,
 			VarNames.INVITER_USER_ID: self.user_id,
@@ -371,23 +370,24 @@ class MessagesHandler(MessagesCreator):
 			VarNames.VOLUME: 1,
 			VarNames.NOTIFICATIONS: False,
 		}
-
-		jsoned_mess = encode_message(notify_others, True)
-
-		notify_others[VarNames.JS_MESSAGE_ID] = message[VarNames.JS_MESSAGE_ID]
-		self.ws_write(notify_others)
+		add_invitee_dumped = encode_message(add_invitee, True)
 		for user in users:
-			self.raw_publish(jsoned_mess, RedisPrefix.generate_user(user))
-		self.publish({
+			self.raw_publish(add_invitee_dumped, RedisPrefix.generate_user(user))
+
+		invite = {
 			VarNames.EVENT: Actions.INVITE_USER,
 			VarNames.ROOM_ID: room_id,
 			VarNames.INVITEE_USER_ID: users,
-			VarNames.CB_BY_SENDER: None,
 			VarNames.INVITER_USER_ID: self.user_id,
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
 			VarNames.ROOM_USERS: users_in_room,
-			VarNames.TIME: get_milliseconds()
-		}, room_id, True)
+			VarNames.TIME: get_milliseconds(),
+			VarNames.CB_BY_SENDER: self.id
+		}
+		self.publish(invite, room_id, True)
+		invite[VarNames.JS_MESSAGE_ID] = message[VarNames.JS_MESSAGE_ID]
+		self.ws_write(invite)
+
 
 	def respond_ping(self, message):
 		self.ws_write(self.responde_pong(message[VarNames.JS_MESSAGE_ID]))
