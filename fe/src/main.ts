@@ -14,13 +14,13 @@ window.addEventListener('focus', () => {
     // ws.pingServer();
   }
 });
-store.watch(s => s.userInfo && s.userInfo.theme || 'color-reg', (v, o) => {
+store.watch(s => s.userSettings && s.userSettings.theme || 'color-reg', (v, o) => {
   document.body.parentElement.className = v;
 });
 
 window.onerror = function (msg, url, linenumber, column, errorObj) {
   let message = `Error occurred in ${url}:${linenumber}\n${msg}`;
-  if (!!store.state.userInfo || store.state.userInfo.sendLogs) {
+  if (!!store.state.userSettings || store.state.userSettings.sendLogs) {
     api.sendLogs(`${url}:${linenumber}:${column || '?'}\n${msg}\n\nOBJ:  ${errorObj || '?'}`, browserVersion);
   }
   store.dispatch('growlError', message);

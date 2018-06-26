@@ -9,7 +9,14 @@
 <script lang="ts">
   import {Mutation, State, Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {CurrentUserInfoModel, EditingMessage, MessageModel, UserDictModel, UserModel} from "../../types/model";
+  import {
+    CurrentUserInfoModel,
+    CurrentUserSettingsModel,
+    EditingMessage,
+    MessageModel,
+    UserDictModel,
+    UserModel
+  } from "../../types/model";
   import {encodeHTML, encodeMessage, highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
   import {sem} from '../../utils/utils';
 
@@ -17,6 +24,7 @@
   @Component
   export default class ChatMessage extends Vue {
 
+    @State userSettings: CurrentUserSettingsModel;
     @State userInfo: CurrentUserInfoModel;
     @Prop() message: MessageModel;
     @Prop() searched: number[];
@@ -60,10 +68,10 @@
 
     private setEvents() {
       this.$nextTick(function () {
-        if (this.userInfo.highlightCode) {
+        if (this.userSettings.highlightCode) {
           highlightCode(this.$refs.content);
         }
-        if (this.userInfo.embeddedYoutube) {
+        if (this.userSettings.embeddedYoutube) {
           setYoutubeEvent(this.$refs.content)
         }
         setVideoEvent(this.$refs.content);

@@ -1,48 +1,129 @@
 <template>
-  <form method="post" id="changeProfileForm" enctype="multipart/form-data" onsubmit="saveProfile(event)">
-    <input type="hidden" name="csrfmiddlewaretoken" value="7VA4zTASE4wcz37pCnH7qROXPaKgKTXg">
-    <div class="padding10">
-      <table class="biginputtext" id="userProfileData">
-        <tbody>
-        <tr><th><label for="id_suggestions">Suggestions:</label></th><td><input id="id_suggestions" name="suggestions" type="checkbox"><label for="id_suggestions"></label></td></tr>
-        <tr><th><label for="id_embedded_youtube">Embedded youtube:</label></th><td><input checked="checked" id="id_embedded_youtube" name="embedded_youtube" type="checkbox"><label for="id_embedded_youtube"></label></td></tr>
-        <tr><th><label for="id_highlight_code">Highlight code:</label></th><td><input checked="checked" id="id_highlight_code" name="highlight_code" type="checkbox"><label for="id_highlight_code"></label><br><span class="helptext">```console.log('Highlight code like this')```</span></td></tr>
-        <tr><th><label for="id_message_sound">Message sound:</label></th><td><input checked="checked" id="id_message_sound" name="message_sound" type="checkbox"><label for="id_message_sound"></label></td></tr>
-        <tr><th><label for="id_incoming_file_call_sound">Incoming file call sound:</label></th><td><input id="id_incoming_file_call_sound" name="incoming_file_call_sound" type="checkbox"><label for="id_incoming_file_call_sound"></label></td></tr>
-        <tr><th><label for="id_online_change_sound">Online change sound:</label></th><td><input id="id_online_change_sound" name="online_change_sound" type="checkbox"><label for="id_online_change_sound"></label></td></tr>
-        <tr><th><label for="id_logs">Logs:</label></th><td><input checked="checked" id="id_logs" name="logs" type="checkbox"><label for="id_logs"></label></td></tr>
-        <tr><th><label for="id_send_logs">Send logs:</label></th><td><input checked="checked" id="id_send_logs" name="send_logs" type="checkbox"><label for="id_send_logs"></label></td></tr>
-        <tr><th><label for="id_theme">Theme:</label></th><td><select id="id_theme" name="theme">
-          <option value="color-reg" selected="selected">Modern</option>
-          <option value="color-lor">Simple</option>
-          <option value="color-white">Light(Beta)</option>
-        </select></td></tr>
-        <tr>
-          <th><label>Clear history</label></th>
-          <td style="padding: 10px 0">
-            <input type="button" class="button lor-btn" value="clear now" onclick="channelsHandler.clearChannelHistory()">
-          </td>
-        </tr>
-        <tr>
-          <td colspan="2">
-            <app-submit class="green-btn" value='Apply Settings' :running="running"/>
-          </td>
-        </tr>
-        </tbody></table>
-    </div>
-  </form>
+  <div>
+    <table>
+      <tbody>
+      <tr>
+        <th>Suggestions:</th>
+        <td>
+          <app-checkbox v-model="model.suggestions"/>
+        </td>
+      </tr>
+      <tr>
+        <th>Embedded youtube:</th>
+        <td>
+          <app-checkbox v-model="model.youtube"/>
+        </td>
+      </tr>
+      <tr>
+        <th>Highlight code</th>
+        <td>
+          <app-checkbox v-model="model.highlight"/>
+          ```console.log('Highlight code like this')```
+        </td>
+      </tr>
+      <tr>
+        <th>Message sound:</th>
+        <td>
+          <app-checkbox v-model="model.messageSound"/>
+        </td>
+      </tr>
+      <tr>
+        <th>Incoming file call sound:</th>
+        <td>
+          <app-checkbox v-model="model.incomingFileCallSound"/>
+        </td>
+      </tr>
+      <tr>
+        <th>Online change sound:</th>
+        <td>
+          <app-checkbox v-model="model.onlineChangeSound"/>
+        </td>
+      </tr>
+      <tr>
+        <th>Devtools logs:</th>
+        <td>
+          <app-checkbox v-model="model.logs"/>
+        </td>
+      </tr>
+      <tr>
+        <th>Automatical error report:</th>
+        <td>
+          <app-checkbox v-model="model.sendLogs"/>
+        </td>
+      </tr>
+      <tr>
+        <th>Theme:</th>
+        <td>
+          <select name="theme" class="input" v-model="model.theme">
+            <option value="color-reg" selected="selected">Modern</option>
+            <option value="color-lor">Simple</option>
+            <option value="color-white">Light(Beta)</option>
+          </select>
+        </td>
+      </tr>
+      <tr>
+        <th><label>Clear history</label></th>
+        <td style="padding: 10px 0">
+          <input type="button" class="lor-btn" value="clear now"
+                 @click="clearHistory">
+        </td>
+      </tr>
+      <tr>
+        <td colspan="2">
+          <app-submit class="green-btn" value='Apply Settings' @click.native="save" :running="running"/>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
 </template>
 <script lang="ts">
   import {Component, Vue} from "vue-property-decorator";
+  import {State, Action, Mutation} from "vuex-class";
   import AppSubmit from "../ui/AppSubmit";
+  import AppCheckbox from "../ui/AppCheckbox";
+  import {CurrentUserInfoModel, CurrentUserSettingsModel} from "../../types/model";
+  import {currentUserInfoDtoToModel, currentUserInfoModelToDto, userSettingsDtoToModel} from "../../types/converters";
+  import {UserSettingsDto} from "../../types/dto";
 
   @Component({
-    components: {AppSubmit}
+    components: {AppSubmit, AppCheckbox}
   })
   export default class UserProfileSettings extends Vue {
     running: boolean = false;
+    @State userSettings: CurrentUserSettingsModel;
+    @Action growlError;
+    @Action growlSuccess;
+
+    model: UserSettingsDto;
+
+    created() {
+      this.logger.debug("Created userprofile page")();
+      this.model = userSettingsDtoToModel(this.userSettings);
+    }
+
+    clearHistory() {
+
+    }
+
+    save() {
+      this.running = true;
+      let cui : UserSettingsDto = {...this.userSettings};
+      this.$ws.saveSettings(cui, e => {
+        this.running = false;
+        if (e) {
+          this.growlError(e);
+        } else {
+          this.growlSuccess("Settings have been saved");
+        }
+      })
+    }
   }
+
+
 </script>
 
 <style lang="sass" scoped>
+  .lor-btn
+    width: 100%
 </style>

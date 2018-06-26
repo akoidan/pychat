@@ -1,56 +1,89 @@
 <template>
-  <form method="post" @submit="saveProfile">
-    <div class="padding10">
+  <form method="post" @submit.prevent="save">
       <table class="biginputtext" id="userProfileData">
         <tbody>
         <tr>
-          <th><label for="id_username">Username:</label></th>
-          <td><input id="id_username" maxlength="30" name="username" type="text" value="AAdmin"></td>
+          <th>Username:</th>
+          <td><input maxlength="30" class="input" v-model="model.user" type="text"></td>
         </tr>
         <tr>
-          <th><label for="id_name">Name:</label></th>
-          <td><input id="id_name" maxlength="30" name="name" type="text" value="Andrew"></td>
+          <th>Name:</th>
+          <td><input maxlength="30" class="input" v-model="model.name" type="text"></td>
         </tr>
         <tr>
-          <th><label for="id_city">City:</label></th>
-          <td><input id="id_city" maxlength="50" name="city" type="text" value="Chernihiv"></td>
+          <th>City:</th>
+          <td><input maxlength="50" class="input" v-model="model.city" type="text"></td>
         </tr>
         <tr>
-          <th><label for="id_surname">Surname:</label></th>
-          <td><input id="id_surname" maxlength="30" name="surname" type="text"></td>
+          <th>Surname</th>
+          <td><input maxlength="30" class="input" v-model="model.surname" type="text"></td>
         </tr>
         <tr>
-          <th><label for="id_email">Email:</label></th>
-          <td><input id="id_email" maxlength="190" name="email" type="email" value="deathangel908@gmail.com"></td>
+          <th>Email:</th>
+          <td><input maxlength="190" class="input" v-model="model.email" type="email"></td>
         </tr>
         <tr>
-          <th><label for="id_birthday">Birthday:</label></th>
-          <td><input id="id_birthday" name="birthday" type="date" value="1991-09-21"></td>
+          <th>Birthday</th>
+          <td><input class="input" v-model="model.birthday" type="date"></td>
         </tr>
         <tr>
-          <th><label for="id_contacts">Contacts:</label></th>
-          <td><input id="id_contacts" maxlength="100" name="contacts" type="text"></td>
+          <th>Contacts:</th>
+          <td><input maxlength="100" class="input" v-model="model.contacts" type="text"></td>
         </tr>
         <tr>
-          <th><label for="id_sex">Sex:</label></th>
-          <td><select id="id_sex" name="sex">
+          <th>Sex:</th>
+          <td><select  class="input" v-model="model.sex">
             <option value="1" selected="selected">Male</option>
             <option value="2">Female</option>
             <option value="0">Alien</option>
           </select></td>
         </tr>
+        <tr>
+          <td colspan="2">
+            <app-submit type="button" class="green-btn" value="LEAVE THIS ROOM" :running="running"/>
+          </td>
+        </tr>
         </tbody>
       </table>
-    </div>
   </form>
 </template>
 <script lang="ts">
   import {State, Action, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-
-  @Component
+  import AppSubmit from '../ui/AppSubmit';
+  import {CurrentUserInfoModel} from "../../types/model";
+  import {UserProfileDto} from '../../types/dto';
+  import {currentUserInfoModelToDto, userSettingsDtoToModel} from "../../types/converters";
+  @Component({
+    components: {AppSubmit}
+  })
   export default class UserProfileInfo extends Vue {
+    running: boolean = false;
+    @State userInfo: CurrentUserInfoModel;
+    model: UserProfileDto;
 
+    @Action growlError;
+    @Action growlSuccess;
+
+
+    created() {
+      this.logger.debug("Created userprofile page")();
+      this.model = currentUserInfoModelToDto(this.userInfo);
+    }
+
+
+    save() {
+      this.running = true;
+      let cui : UserProfileDto = {...this.model};
+      this.$ws.saveUser(cui, e => {
+        this.running = false;
+        if (e) {
+          this.growlError(e);
+        } else {
+          this.growlSuccess("Settings have been saved");
+        }
+      })
+    }
   }
 </script>
 

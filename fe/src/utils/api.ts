@@ -1,7 +1,8 @@
 import Xhr from './Xhr';
 import {RESPONSE_SUCCESS} from './consts';
 import {UploadFile} from '../types/types';
-import {FileModelXhr, MessageModelDto} from '../types/dto';
+import {FileModelXhr, MessageModelDto, UserProfileDto, UserSettingsDto} from '../types/dto';
+import {UserModel} from '../types/model';
 
 export default class Api {
   private xhr: Xhr;

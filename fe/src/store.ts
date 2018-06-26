@@ -6,7 +6,7 @@ Vue.use(Vuex);
 
 import loggerFactory from './utils/loggerFactory';
 import {
-  CurrentUserInfoModel,
+  CurrentUserInfoModel, CurrentUserSettingsModel,
   EditingMessage,
   GrowlModel,
   GrowlType,
@@ -32,6 +32,8 @@ const store: StoreOptions<RootState> = {
     roomsDict: {},
     activeUserId: null,
     userInfo: null,
+    userSettings: null,
+    userImage: null,
     online: [],
     activeRoomId: null,
     editedMessage: null,
@@ -171,6 +173,12 @@ const store: StoreOptions<RootState> = {
     },
     setUserInfo(state: RootState, userInfo: CurrentUserInfoModel) {
       state.userInfo = userInfo;
+    },
+    setUserSettings(state: RootState, userInfo: CurrentUserSettingsModel) {
+      state.userSettings = userInfo;
+    },
+    setUserImage(state: RootState, userImage: string) {
+      state.userImage = userImage;
     },
     setRooms(state: RootState, rooms: RoomDictModel) {
       state.roomsDict = rooms;

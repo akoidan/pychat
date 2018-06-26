@@ -15,8 +15,7 @@
           Notifications
         </th>
         <td>
-          <input v-model="notifications" type="checkbox" id="createPrivateRoomCheckbox">
-          <label for="createPrivateRoomCheckbox"></label>
+          <app-checkbox v-model="notifications"/>
         </td>
       </tr>
       <tr>
@@ -41,8 +40,9 @@
   import AddUserToRoom from "./AddUserToRoom.vue";
   import {UserModel} from "../../../types/model";
   import {AddRoomMessage} from "../../../types/messages";
+  import AppCheckbox from '../../ui/AppCheckbox';
 
-  @Component({components: {AppInputRange, AppSubmit, AddUserToRoom}})
+  @Component({components: {AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})
   export default class CreateRoom extends Vue {
     @Action growlError;
     @Getter privateRooms: { [id: string]: UserModel };
@@ -107,6 +107,5 @@
   .green-btn
     width: 100%
     flex-shrink: 0
-  input[type=checkbox]
-    @extend %checkbox
+
 </style>

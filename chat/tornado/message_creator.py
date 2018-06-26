@@ -1,5 +1,6 @@
 from chat.models import get_milliseconds
-from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
+from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, UserSettingsVarNames, \
+	UserProfileVarNames
 
 
 class MessagesCreator(object):
@@ -41,27 +42,69 @@ class MessagesCreator(object):
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 			VarNames.EVENT: Actions.SET_WS_ID,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.CURRENT_USER_INFO: {
-				VarNames.USER: self.sender_name,
-				VarNames.USER_ID: self.user_id,
-				'suggestions': up.suggestions,
-				'sendLogs': up.send_logs,
-				'embeddedYoutube': up.embedded_youtube,
-				'incomingFileCallSound': up.incoming_file_call_sound,
-				'messageSound': up.message_sound,
-				'theme': up.theme,
-				'highlightCode': up.highlight_code,
-				'onlineChangeSound': up.online_change_sound,
-			}
+			VarNames.CURRENT_USER_SETTINGS: self.get_user_settings(up),
+			VarNames.CURRENT_USER_INFO: self.get_user_profile(up),
 		}
 
-	def room_online(self, online, event):
+	def set_settings(self, js_message_id,  message):
+		return  {
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.SET_SETTINGS,
+			VarNames.CB_BY_SENDER: self.id,
+			VarNames.JS_MESSAGE_ID: js_message_id,
+			VarNames.CONTENT: message,
+		}
+
+	def set_user_profile(self, js_message_id,  message):
+		return  {
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.SET_USER_PROFILE,
+			VarNames.CB_BY_SENDER: self.id,
+			VarNames.JS_MESSAGE_ID: js_message_id,
+			VarNames.CONTENT: message,
+		}
+
+
+	def get_user_settings(self, up):
+		return {
+			UserSettingsVarNames.SUGGESTIONS: up.suggestions,
+			UserSettingsVarNames.SEND_LOGS: up.send_logs,
+			UserSettingsVarNames.LOGS: up.logs,
+			UserSettingsVarNames.EMBEDDED_YOUTUBE: up.embedded_youtube,
+			UserSettingsVarNames.INCOMING_FILE_CALL_SOUND: up.incoming_file_call_sound,
+			UserSettingsVarNames.MESSAGE_SOUND: up.message_sound,
+			UserSettingsVarNames.THEME: up.theme,
+			UserSettingsVarNames.HIGHLIGHT_CODE: up.highlight_code,
+			UserSettingsVarNames.ONLINE_CHANGE_SOUND: up.online_change_sound
+		}
+
+	def get_user_profile(self, up):
+		return {
+			UserProfileVarNames.USERNAME: up.username,
+			UserProfileVarNames.USER_ID: up.id,
+			UserProfileVarNames.NAME: up.name,
+			UserProfileVarNames.CITY: up.city,
+			UserProfileVarNames.SEX: up.sex,
+			UserProfileVarNames.CONTACTS: up.contacts,
+			UserProfileVarNames.BIRTHDAY: up.birthday,
+			UserProfileVarNames.EMAIL: up.email,
+			UserProfileVarNames.SURNAME: up.surname,
+		}
+
+	def room_online_logout(self, online):
 		"""
 		:return: {"action": event, "content": content, "time": "20:48:57"}
 		"""
-		room_less = self.default(online, event, HandlerNames.CHANNELS)
-		room_less[VarNames.USER] = self.sender_name
-		room_less[VarNames.GENDER] = self.sex
+		room_less = self.default(online, Actions.LOGOUT, HandlerNames.CHANNELS)
+		return room_less
+
+	def room_online_login(self, online, sender_name, sex):
+		"""
+		:return: {"action": event, "content": content, "time": "20:48:57"}
+		"""
+		room_less = self.default(online, Actions.LOGIN, HandlerNames.CHANNELS)
+		room_less[VarNames.USER] = sender_name
+		room_less[VarNames.GENDER] = sex
 		return room_less
 
 	@classmethod
@@ -192,7 +235,6 @@ class WebRtcMessageCreator(object):
 			VarNames.CONTENT: content,
 			VarNames.USER_ID: self.user_id,
 			VarNames.HANDLER_NAME: HandlerNames.WEBRTC,
-			VarNames.USER: self.sender_name,
 			VarNames.CONNECTION_ID: connection_id,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
 			VarNames.ROOM_ID: room_id
@@ -239,7 +281,6 @@ class WebRtcMessageCreator(object):
 			VarNames.EVENT: event,
 			VarNames.CONNECTION_ID: connection_id,
 			VarNames.USER_ID: self.user_id,
-			VarNames.USER: self.sender_name,
 			VarNames.CONTENT: content,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
 			VarNames.HANDLER_NAME: handler,

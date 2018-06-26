@@ -4,13 +4,20 @@ import {VueRouter} from 'vue-router/types/router';
 
 import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
-import {CurrentUserInfoDto} from '../types/dto';
 import {default as MessageHandler} from './MesageHandler';
 import {logout} from './utils';
-import {CurrentUserInfoModel, RootState} from '../types/model';
+import {CurrentUserInfoModel, CurrentUserSettingsModel, RootState} from '../types/model';
 import {IStorage, SessionHolder} from '../types/types';
-import {DefaultMessage, GrowlMessage, SetWsIdMessage} from '../types/messages';
+import {
+  DefaultMessage,
+  GrowlMessage,
+  SetSettingsMessage,
+  SetUserProfileMessage,
+  SetWsIdMessage
+} from '../types/messages';
 import {Logger} from 'lines-logger';
+import {currentUserInfoDtoToModel, userSettingsDtoToModel} from '../types/converters';
+import {UserProfileDto, UserSettingsDto} from '../types/dto';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
@@ -43,12 +50,22 @@ export class WsHandler extends MessageHandler {
     growl(gm: GrowlMessage) {
       this.store.dispatch('growlError', gm.content);
     },
+    setSettings(m: SetSettingsMessage) {
+      let a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
+      this.store.dispatch('setUserSettings', a);
+    },
+    setUserProfile(m: SetUserProfileMessage) {
+      let a: CurrentUserInfoModel = currentUserInfoDtoToModel(m.content);
+      a.userId = this.store.state.userInfo.userId;
+      this.store.dispatch('setUserInfo', a);
+    },
     setWsId(message: SetWsIdMessage) {
       this.wsConnectionId = message.opponentWsId;
       this.handlers.channels.setRooms(message.rooms);
       this.handlers.channels.setOnline(message.online);
       this.handlers.channels.setUsers(message.users);
       this.setUserInfo(message.userInfo);
+      this.setUserSettings(message.userSettings);
       this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
     },
     ping(message) {
@@ -60,9 +77,15 @@ export class WsHandler extends MessageHandler {
     }
   };
 
-  private setUserInfo(userInfo: CurrentUserInfoDto) {
-    let um: CurrentUserInfoModel = {...userInfo};
+  private setUserInfo(userInfo: UserProfileDto) {
+    let um: CurrentUserInfoModel = currentUserInfoDtoToModel(userInfo);
     this.store.commit('setUserInfo', um);
+  }
+
+
+  private setUserSettings(userInfo: UserSettingsDto) {
+    let um: UserSettingsDto = userSettingsDtoToModel(userInfo);
+    this.store.commit('setUserSettings', um);
   }
 
   private answerPong() {
@@ -130,7 +153,7 @@ export class WsHandler extends MessageHandler {
 
   handleMessage(data) {
     this.handlers[data.handler].handle(data);
-    if (this.callBacks[data.messageId]) {
+    if (this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.wsConnectionId)) {
       this.logger.debug('resolving cb')();
       this.callBacks[data.messageId](data);
       delete this.callBacks[data.messageId];
@@ -226,6 +249,23 @@ export class WsHandler extends MessageHandler {
       content,
       roomId
     });
+  }
+
+
+  public saveSettings(content: UserSettingsDto, cb: SingleParamCB<SetSettingsMessage>) {
+    this.sendToServer({
+      action: 'setSettings',
+      content,
+    });
+    this.appendCB(cb);
+  }
+
+  public saveUser(content: UserProfileDto, cb: SingleParamCB<SetUserProfileMessage>) {
+    this.sendToServer({
+      action: 'saveUserProfile',
+      content,
+    });
+    this.appendCB(cb);
   }
 
   public sendAddRoom(name, volume, notifications, users, cb: Function) {

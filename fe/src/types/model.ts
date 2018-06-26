@@ -14,7 +14,7 @@ export interface EditingMessage {
   isEditingNow: boolean;
 }
 
-export interface CurrentUserInfoModel {
+export interface CurrentUserSettingsModel {
   embeddedYoutube: boolean;
   highlightCode: boolean;
   incomingFileCallSound: boolean;
@@ -23,7 +23,18 @@ export interface CurrentUserInfoModel {
   sendLogs: boolean;
   suggestions: boolean;
   theme: string;
+  logs: boolean;
+}
+
+export interface CurrentUserInfoModel {
   user: string;
+  name: string;
+  city: string;
+  surname: string;
+  email: string;
+  birthday: string;
+  contacts: string;
+  sex: string;
   userId: number;
 }
 
@@ -96,6 +107,8 @@ export interface RootState {
   activeRoomId: number;
   activeUserId: number;
   userInfo: CurrentUserInfoModel;
+  userSettings: CurrentUserSettingsModel;
+  userImage: string;
   allUsersDict: UserDictModel;
   regHeader: string;
   online: number[];

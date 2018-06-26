@@ -13,10 +13,11 @@ from tornadoredis import Client
 from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
-	UploadedFile, Image, get_milliseconds
+	UploadedFile, Image, get_milliseconds, UserProfile
 from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
-from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
+from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates, \
+	UserSettingsVarNames, UserProfileVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, \
 	get_message_images_videos, update_symbols, up_files_to_img, evaluate
@@ -42,9 +43,7 @@ class MessagesHandler(MessagesCreator):
 		super(MessagesHandler, self).__init__()
 		self.webrtc_ids = {}
 		self.id = None  # child init
-		self.sex = None
 		self.last_client_ping = 0
-		self.sender_name = None
 		self.user_id = 0  # anonymous by default
 		self.ip = None
 		from chat import global_redis
@@ -323,12 +322,56 @@ class MessagesHandler(MessagesCreator):
 			VarNames.NOTIFICATIONS: message[VarNames.NOTIFICATIONS],
 			VarNames.ROOM_NAME: room_name,
 			VarNames.TIME: get_milliseconds(),
+			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
 		}
 		jsoned_mess = encode_message(m, True)
-		m[VarNames.JS_MESSAGE_ID] = message[VarNames.JS_MESSAGE_ID]
-		self.ws_write(m)
 		for user in users:
 			self.raw_publish(jsoned_mess, RedisPrefix.generate_user(user))
+
+
+	def profile_save_settings(self, message):
+		UserProfile.objects.filter(id=self.user_id).update(
+			suggestions=message[UserSettingsVarNames.SUGGESTIONS],
+			embedded_youtube=message[UserSettingsVarNames.EMBEDDED_YOUTUBE],
+			highlight_code=message[UserSettingsVarNames.HIGHLIGHT_CODE],
+			message_sound=message[UserSettingsVarNames.MESSAGE_SOUND],
+			incoming_file_call_sound=message[UserSettingsVarNames.INCOMING_FILE_CALL_SOUND],
+			online_change_sound=message[UserSettingsVarNames.ONLINE_CHANGE_SOUND],
+			logs=message[UserSettingsVarNames.LOGS],
+			send_logs=message[UserSettingsVarNames.SEND_LOGS],
+			theme=message[UserSettingsVarNames.THEME],
+		)
+		self.publish(self.set_settings(message[VarNames.JS_MESSAGE_ID], message), self.channel)
+
+
+	def profile_save_user(self, message):
+		UserProfile.objects.filter(id=self.user_id).update(
+			username=message[UserProfileVarNames.USERNAME],
+			name=message[UserProfileVarNames.NAME],
+			city=message[UserProfileVarNames.CITY],
+			surname=message[UserProfileVarNames.SURNAME],
+			email=message[UserProfileVarNames.EMAIL],
+			birthday=message[UserProfileVarNames.BIRTHDAY],
+			contacts=message[UserProfileVarNames.CONTACTS],
+			sex=message[UserProfileVarNames.SEX]
+		)
+		self.publish(self.set_user_profile(message[VarNames.JS_MESSAGE_ID], message), self.channel)
+
+
+	def profile_save_image(self, request):
+		pass
+		# UserProfile.objects.filter(id=request.user.id).update(
+		# 	suggestions=request.POST['suggestions'],
+		# 	embedded_youtube=request.POST['embedded_youtube'],
+		# 	highlight_code=request.POST['highlight_code'],
+		# 	message_sound=request.POST['message_sound'],
+		# 	incoming_file_call_sound=request.POST['incoming_file_call_sound'],
+		# 	online_change_sound=request.POST['online_change_sound'],
+		# 	logs=request.POST['logs'],
+		# 	send_logs=request.POST['send_logs'],
+		# 	theme=request.POST['theme'],
+		# )
+		# return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 	def invite_user(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -356,8 +399,6 @@ class MessagesHandler(MessagesCreator):
 		) for user_id in users]
 		RoomUsers.objects.bulk_create(ru)
 
-
-
 		add_invitee = {
 			VarNames.EVENT: Actions.ADD_INVITE,
 			VarNames.ROOM_ID: room_id,
@@ -382,11 +423,10 @@ class MessagesHandler(MessagesCreator):
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
 			VarNames.ROOM_USERS: users_in_room,
 			VarNames.TIME: get_milliseconds(),
-			VarNames.CB_BY_SENDER: self.id
+			VarNames.CB_BY_SENDER: self.id,
+			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID]
 		}
 		self.publish(invite, room_id, True)
-		invite[VarNames.JS_MESSAGE_ID] = message[VarNames.JS_MESSAGE_ID]
-		self.ws_write(invite)
 
 
 	def respond_ping(self, message):
@@ -465,8 +505,6 @@ class MessagesHandler(MessagesCreator):
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		self.add_channel(room_id)
-		if message[VarNames.CB_BY_SENDER] == self.id:
-			return True
 
 	def send_client_delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
@@ -476,10 +514,9 @@ class MessagesHandler(MessagesCreator):
 			channels = {
 				VarNames.EVENT: Actions.DELETE_MY_ROOM,
 				VarNames.ROOM_ID: room_id,
-				VarNames.HANDLER_NAME: HandlerNames.CHANNELS
+				VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+				VarNames.JS_MESSAGE_ID: VarNames.JS_MESSAGE_ID,
 			}
-			if self.id == message[VarNames.CB_BY_SENDER]:
-				channels[VarNames.JS_MESSAGE_ID] = message[VarNames.JS_MESSAGE_ID]
 			self.ws_write(channels)
 		else:
 			self.ws_write({

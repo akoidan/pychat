@@ -16,8 +16,7 @@
           Notifications
         </th>
         <td>
-          <input v-model="notifications" type="checkbox" id="roomSettingsCheckbox">
-          <label for="roomSettingsCheckbox"></label>
+          <app-checkbox v-model="notifications"/>
         </td>
       </tr>
       <tr>
@@ -48,8 +47,9 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppInputRange from '../ui/AppInputRange';
   import AppSubmit from '../ui/AppSubmit';
+  import AppCheckbox from '../ui/AppCheckbox';
   import {RoomDictModel, RoomModel, RoomSettingsModel} from "../../types/model";
-  @Component({components: {AppInputRange, AppSubmit}})
+  @Component({components: {AppInputRange, AppSubmit, AppCheckbox}})
   export default class RoomSettings extends Vue {
 
     roomName: string = "";
@@ -129,8 +129,6 @@
     display: flex
     justify-content: center
     align-items: center
-  input[type=checkbox]
-    @extend %checkbox
 
   input[type=text]
     width: 150px

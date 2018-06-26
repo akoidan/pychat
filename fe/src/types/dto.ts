@@ -18,7 +18,7 @@ export interface UserDto {
   sex: SexModelDto;
 }
 
-export interface CurrentUserInfoDto {
+export interface UserSettingsDto {
   embeddedYoutube: boolean;
   highlightCode: boolean;
   incomingFileCallSound: boolean;
@@ -26,8 +26,19 @@ export interface CurrentUserInfoDto {
   onlineChangeSound: boolean;
   sendLogs: boolean;
   suggestions: boolean;
+  logs: boolean;
   theme: string;
+}
+
+export interface UserProfileDto {
   user: string;
+  name: string;
+  city: string;
+  surname: string;
+  email: string;
+  birthday: string;
+  contacts: string;
+  sex: string;
   userId: number;
 }
 

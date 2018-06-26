@@ -7,7 +7,9 @@
       <router-link to="/profile/change-password">Change password</router-link>
     </div>
     <div class="container">
-      <router-view class="profileInner"></router-view>
+      <keep-alive>
+        <router-view class="profileInner"></router-view>
+      </keep-alive>
     </div>
   </div>
 </template>
@@ -48,10 +50,9 @@
         color: #ffc000
         text-decoration: underline
 
-  .container /deep/ button
-    width: 100%
-
   .profileInner /deep/
+    button
+      width: 100%
     padding-top: 10px
     padding-bottom: 10px
     table
@@ -60,8 +61,8 @@
       text-align: right
     td, th
       padding: 4px
-  .input
-    @extend %big-input
+    .input
+      @extend %big-input
 
 
 </style>

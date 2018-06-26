@@ -92,7 +92,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		is_online, online = self.get_online_and_status_from_redis()
 		if self.connected:
 			if not is_online:
-				message = self.room_online(online, Actions.LOGOUT)
+				message = self.room_online_logout(online)
 				self.publish(message, settings.ALL_ROOM_ID)
 			res = do_db(execute_query, settings.UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
@@ -136,17 +136,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			except:
 				raise Error401()
 			self.ip = self.get_client_ip()
-			user_db = do_db(UserProfile.objects.defer(
-				'suggestions',
-				'highlight_code',
-				'embedded_youtube',
-				'online_change_sound',
-				'incoming_file_call_sound',
-				'message_sound',
-				'theme',
-				'username',
-				'sex'
-			).get, id=self.user_id)
+			user_db = do_db(UserProfile.objects.get, id=self.user_id)
 			self.generate_self_id()
 			self._logger = logging.LoggerAdapter(parent_logger, {
 				'id': self.id,
@@ -158,8 +148,6 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.async_redis_publisher.sadd(RedisPrefix.ONLINE_VAR, self.id)
 			# since we add user to online first, latest trigger will always show correct online
 			was_online, online = self.get_online_and_status_from_redis()
-			self.sender_name = user_db.username
-			self.sex = user_db.sex_str
 			user_rooms_query = Room.objects.filter(users__id=self.user_id, disabled=False) \
 				.values('id', 'name', 'roomusers__notifications', 'roomusers__volume')
 			room_users = [{
@@ -195,10 +183,10 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 
 			self.ws_write(self.set_room(room_users, user_dict, online, user_db))
 			if not was_online:  # if a new tab has been opened
-				online_user_names_mes = self.room_online(online, Actions.LOGIN)
+				online_user_names_mes = self.room_online_login(online, user_db.username, user_db.sex_str)
 				self.logger.info('!! First tab, sending refresh online for all')
 				self.publish(online_user_names_mes, settings.ALL_ROOM_ID)
-			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
+			self.logger.info("!! User %s subscribes for %s", self.user_id, self.channels)
 			self.connected = True
 		except Error401:
 			self.logger.warning('!! Session key %s has been rejected' % session_key)

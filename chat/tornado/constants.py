@@ -20,6 +20,9 @@ class Actions(object):
 	EDIT_MESSAGE = 'editMessage'
 	DELETE_MESSAGE = 'deleteMessage'
 	CREATE_ROOM_CHANNEL = 'addRoom'
+	SET_SETTINGS = 'setSettings'
+	SET_USER_PROFILE = 'setUserProfile'
+	SET_PROFILE_IMAGE = 'setProfileImage'
 	INVITE_USER = 'inviteUser'
 	ADD_INVITE = 'addInvite'
 	SET_WEBRTC_ID = 'setConnectionId'
@@ -32,6 +35,8 @@ class Actions(object):
 	PING = 'ping'
 	PONG = 'pong'
 	CHECK_PING = 'check_ping'
+
+
 
 
 class VarNames(object):
@@ -54,6 +59,7 @@ class VarNames(object):
 	NOTIFICATIONS = 'notifications'
 	VOLUME = 'volume'
 	CURRENT_USER_INFO = 'userInfo'
+	CURRENT_USER_SETTINGS = 'userSettings'
 	ROOM_ID = 'roomId'
 	ROOMS = 'rooms'
 	ROOM_USERS = 'users'
@@ -73,6 +79,28 @@ class VarNames(object):
 	PREVIEW = 'preview'
 	DELETED = 'deleted'
 
+
+class UserSettingsVarNames(object):
+	SUGGESTIONS = 'suggestions'
+	EMBEDDED_YOUTUBE = 'embeddedYoutube'
+	HIGHLIGHT_CODE = 'highlightCode'
+	MESSAGE_SOUND = 'messageSound'
+	INCOMING_FILE_CALL_SOUND = 'incomingFileCallSound'
+	ONLINE_CHANGE_SOUND = 'onlineChangeSound'
+	LOGS = 'logs'
+	SEND_LOGS = 'send_logs'
+	THEME = 'theme'
+
+class UserProfileVarNames(object):
+	USERNAME = VarNames.USER
+	USER_ID = VarNames.USER_ID
+	NAME = 'name'
+	CITY = 'city'
+	SURNAME = 'surname'
+	EMAIL = 'email'
+	BIRTHDAY = 'birthday'
+	CONTACTS = 'contacts'
+	SEX = 'sex'
 
 class HandlerNames:
 	CHANNELS = 'channels'

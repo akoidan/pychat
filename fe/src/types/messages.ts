@@ -1,4 +1,4 @@
-import {CurrentUserInfoDto, FileModelDto, MessageModelDto, RoomDto, UserDto} from './dto';
+import {FileModelDto, MessageModelDto, RoomDto, UserDto, UserProfileDto, UserSettingsDto} from './dto';
 
 export interface DefaultMessage {
   action: string;
@@ -10,8 +10,17 @@ export interface SetWsIdMessage extends DefaultMessage {
   users: UserDto[];
   online: number[];
   opponentWsId: string;
-  userInfo: CurrentUserInfoDto;
+  userInfo: UserProfileDto;
+  userSettings: UserSettingsDto;
 }
+
+export interface SetSettingsMessage extends DefaultMessage {
+  content: UserSettingsDto;
+}
+export interface SetUserProfileMessage extends DefaultMessage {
+  content: UserProfileDto;
+}
+
 
 interface ChangeUserOnline extends DefaultMessage, UserDto {
   content: number[];
