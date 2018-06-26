@@ -422,68 +422,8 @@ def profile_change_password(request):
 	User.objects.filter(id=request.user.id).update(
 		password=hash_pass
 	)
+	send_password_changed(request, request.user.email)
 	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
-
-class ProfileView(View):
-
-	@login_required_no_redirect()
-	def get(self, request):
-		user_profile = UserProfile.objects.get(pk=request.user.id)
-		form = UserProfileForm(instance=user_profile)
-		c = csrf(request)
-		c['form'] = form
-		c['date_format'] = settings.DATE_INPUT_FORMATS_JS
-		return render_to_response('change_profile.html', c, context_instance=RequestContext(request))
-
-
-
-	@transaction.atomic
-	@login_required_no_redirect()
-	@validation # should follow after transaciton.atomic, thus ValidationError doesn't rollback
-	def post(self, request):
-		logger.info('Saving profile: %s', hide_fields(request.POST, ("base64_image", ), huge=True))
-		image_base64 = request.POST.get('base64_image')
-		new_email = request.POST['email']
-		passwd = request.POST['password']
-		username = request.POST['username']
-		user_profile = UserProfile.objects.get(pk=request.user.id)
-		if new_email:
-			utils.validate_email(new_email)
-		utils.validate_user(username)
-		if image_base64:
-			image = extract_photo(image_base64)
-			request.FILES['photo'] = image
-		form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
-		if form.is_valid():
-			if not passwd:
-				form.instance.password = form.initial['password']
-			if new_email != form.initial['email']:
-				self.send_email_if_needed(form, new_email, request, user_profile)
-			profile = form.save()
-			if passwd and form.initial['email']:
-				send_password_changed(request, form.initial['email'])
-			response = profile. photo.url if 'photo' in  request.FILES else settings.VALIDATION_IS_OK
-		else:
-			response = form.errors
-		return HttpResponse(response, content_type='text/plain')
-
-
-	@staticmethod
-	def send_email_if_needed(form, new_email, request, user_profile):
-		if form.initial['email'] and form.instance.email_verification and form.instance.email_verification.verified:
-			verification = Verification(
-				type_enum=Verification.TypeChoices.email,
-				user_id=user_profile.id,
-				email=new_email
-			)
-			verification.save()
-			send_email_change(request, request.user.username, form.initial['email'], verification, new_email)
-			raise ValidationError(
-				"In order to change an email please confirm it from you current address. We send you an verification email to {}.".format(
-					form.initial['email']))
-		if new_email:
-			new_ver = send_new_email_ver(request, request.user, new_email)
-			form.instance.email_verification = new_ver
 
 
 class RegisterView(View):

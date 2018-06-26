@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 
 from chat import settings
 from chat.socials import GoogleAuth, FacebookAuth
-from chat.views import RegisterView, ProfileView, RestorePassword
+from chat.views import RegisterView, RestorePassword
 
 logger = logging.getLogger(__name__)
 admin.autodiscover()
@@ -31,7 +31,6 @@ urlpatterns = patterns(
 	url(r'^change_email$', 'chat.views.proceed_email_changed'),
 	url(r'^send_restore_password$', 'chat.views.send_restore_password'),
 	url(r'^validate_email$', 'chat.views.validate_email'),
-	url(r'^profile$', ProfileView.as_view(), name='profile'),
 	url(r'^profile/(\d{1,5})$', 'chat.views.show_profile'),
 	url(r'^report_issue$', 'chat.views.report_issue'),
 	url(r'^statistics$', 'chat.views.statistics'),

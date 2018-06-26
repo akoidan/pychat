@@ -13,14 +13,15 @@ from tornadoredis import Client
 from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
-	UploadedFile, Image, get_milliseconds, UserProfile, User
+	UploadedFile, Image, get_milliseconds, UserProfile, User, Verification
 from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates, \
 	UserSettingsVarNames, UserProfileVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, \
-	get_message_images_videos, update_symbols, up_files_to_img, evaluate
+	get_message_images_videos, update_symbols, up_files_to_img, evaluate, check_user, check_email, send_email_change, \
+	send_new_email_ver
 
 parent_logger = logging.getLogger(__name__)
 base_logger = logging.LoggerAdapter(parent_logger, {
@@ -348,23 +349,42 @@ class MessagesHandler(MessagesCreator):
 
 	def profile_save_user(self, in_message):
 		message = in_message[VarNames.CONTENT]
-		user = User.objects.get(id=self.user_id)
+		userprofile = UserProfile.objects.get(id=self.user_id)
+		email_verification_id = userprofile.email_verification_id
 		un = message[UserProfileVarNames.USERNAME]
-		if user.username != un and User.objects.filter(username=un).exists():
-			raise ValidationError("User with name '{}' already exists".format(un))
+		email = message[UserProfileVarNames.EMAIL]
+		if userprofile.username != un:
+			check_user(un)
+		if userprofile.email != email:
+			check_email(email)
+			if userprofile.email and userprofile.email_verification and userprofile.email_verification.verified:
+				verification = Verification(
+					type_enum=Verification.TypeChoices.email,
+					user_id=self.id,
+					email=email
+				)
+				verification.save()
+				send_email_change(self.request, un, userprofile.email, verification, email)
+				self.ws_write(self.default("In order to change an email please confirm it from you current address. We send you an verification email to {}.".format(userprofile.email), Actions.GROWL_MESSAGE, HandlerNames.WS))
+				email = userprofile.email # Don't change email, we need to verify it!
+			elif email:
+				new_ver = send_new_email_ver(self.request, userprofile, email)
+				email_verification_id = new_ver.id
+
 		sex = message[UserProfileVarNames.SEX]
 		UserProfile.objects.filter(id=self.user_id).update(
 			username=un,
 			name=message[UserProfileVarNames.NAME],
 			city=message[UserProfileVarNames.CITY],
 			surname=message[UserProfileVarNames.SURNAME],
-			email=message[UserProfileVarNames.EMAIL],
+			email=email,
 			birthday=message[UserProfileVarNames.BIRTHDAY],
 			contacts=message[UserProfileVarNames.CONTACTS],
-			sex=settings.GENDERS_STR[sex]
+			sex=settings.GENDERS_STR[sex],
+			email_verification=email_verification_id
 		)
 		self.publish(self.set_user_profile(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
-		if user.sex_str != sex or user.username != un:
+		if userprofile.sex_str != sex or userprofile.username != un:
 			self.publish(self.changed_user_profile(sex, self.user_id, un), settings.ALL_ROOM_ID)
 
 

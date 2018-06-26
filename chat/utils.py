@@ -306,7 +306,11 @@ def get_user_by_code(token, type):
 def send_new_email_ver(request, user, email):
 	new_ver = Verification(user=user, type_enum=Verification.TypeChoices.confirm_email, email=email)
 	new_ver.save()
-	link = "{}://{}/confirm_email?token={}".format(settings.SITE_PROTOCOL, request.get_host(), new_ver.token)
+	try:
+		host = request.get_host()
+	except:
+		host = request.host_name # TODO we should know request PORT
+	link = "{}://{}/confirm_email?token={}".format(settings.SITE_PROTOCOL, host, new_ver.token)
 	text = ('Hi {}, you have changed email to curren on pychat \nTo verify it, please click on the url: {}') \
 		.format(user.username, link)
 	start_message = mark_safe("You have changed email to current one in  <b>Pychat</b>. \n"
@@ -317,10 +321,10 @@ def send_new_email_ver(request, user, email):
 		'btnText': "CONFIRM THIS EMAIL",
 		'greetings': start_message
 	}
-	html_message = render_to_string('sign_up_email.html', context, context_instance=RequestContext(request))
+	html_message = render_to_string('sign_up_email.html', context)
 	logger.info('Sending verification email to userId %s (email %s)', user.id, email)
 	try:
-		send_mail("Confirm this email", text, request.get_host(), [email, ], html_message=html_message,
+		send_mail("Confirm this email", text, host, [email, ], html_message=html_message,
 				 fail_silently=False)
 		return new_ver
 	except Exception as e:
