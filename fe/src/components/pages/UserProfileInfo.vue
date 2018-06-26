@@ -33,14 +33,12 @@
         <tr>
           <th>Sex:</th>
           <td><select  class="input" v-model="model.sex">
-            <option value="1" selected="selected">Male</option>
-            <option value="2">Female</option>
-            <option value="0">Alien</option>
+            <option :value="s" v-for="s in sex" >{{s}}</option>
           </select></td>
         </tr>
         <tr>
           <td colspan="2">
-            <app-submit type="button" class="green-btn" value="LEAVE THIS ROOM" :running="running"/>
+            <app-submit class="green-btn" value="Save Profile" :running="running"/>
           </td>
         </tr>
         </tbody>
@@ -51,7 +49,7 @@
   import {State, Action, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from '../ui/AppSubmit';
-  import {CurrentUserInfoModel} from "../../types/model";
+  import {CurrentUserInfoModel, SexModel} from "../../types/model";
   import {UserProfileDto} from '../../types/dto';
   import {currentUserInfoModelToDto, userSettingsDtoToModel} from "../../types/converters";
   @Component({
@@ -62,6 +60,7 @@
     @State userInfo: CurrentUserInfoModel;
     model: UserProfileDto;
 
+    sex = SexModel;
     @Action growlError;
     @Action growlSuccess;
 
@@ -77,10 +76,8 @@
       let cui : UserProfileDto = {...this.model};
       this.$ws.saveUser(cui, e => {
         this.running = false;
-        if (e) {
-          this.growlError(e);
-        } else {
-          this.growlSuccess("Settings have been saved");
+        if (e && e.action == 'setUserInfo') {
+          this.growlSuccess("User profile has been saved");
         }
       })
     }

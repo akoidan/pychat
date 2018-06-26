@@ -1,4 +1,4 @@
-import {FileModelDto, MessageModelDto, RoomDto, UserDto, UserProfileDto, UserSettingsDto} from './dto';
+import {FileModelDto, MessageModelDto, RoomDto, SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from './dto';
 
 export interface DefaultMessage {
   action: string;
@@ -19,6 +19,10 @@ export interface SetSettingsMessage extends DefaultMessage {
 }
 export interface SetUserProfileMessage extends DefaultMessage {
   content: UserProfileDto;
+}
+
+export interface UserProfileChangedMessage extends DefaultMessage, UserDto {
+
 }
 
 

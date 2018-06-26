@@ -21,6 +21,7 @@ class Actions(object):
 	DELETE_MESSAGE = 'deleteMessage'
 	CREATE_ROOM_CHANNEL = 'addRoom'
 	SET_SETTINGS = 'setSettings'
+	USER_PROFILE_CHANGED = 'userProfileChanged'
 	SET_USER_PROFILE = 'setUserProfile'
 	SET_PROFILE_IMAGE = 'setProfileImage'
 	INVITE_USER = 'inviteUser'

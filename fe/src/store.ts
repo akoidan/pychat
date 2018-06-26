@@ -171,6 +171,10 @@ const store: StoreOptions<RootState> = {
     setUsers(state: RootState, users: UserDictModel) {
       state.allUsersDict = users;
     },
+    setUser(state: RootState, user: UserModel) {
+      state.allUsersDict[user.id].user = user.user;
+      state.allUsersDict[user.id].sex = user.sex;
+    },
     setUserInfo(state: RootState, userInfo: CurrentUserInfoModel) {
       state.userInfo = userInfo;
     },

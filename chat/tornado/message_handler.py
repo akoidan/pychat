@@ -13,7 +13,7 @@ from tornadoredis import Client
 from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
-	UploadedFile, Image, get_milliseconds, UserProfile
+	UploadedFile, Image, get_milliseconds, UserProfile, User
 from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates, \
@@ -61,6 +61,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.DELETE_ROOM: self.delete_channel,
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
+			Actions.SET_USER_PROFILE: self.profile_save_user,
+			Actions.SET_SETTINGS: self.profile_save_settings,
 			Actions.INVITE_USER: self.invite_user,
 			Actions.PING: self.respond_ping,
 			Actions.PONG: self.process_pong_message,
@@ -344,18 +346,26 @@ class MessagesHandler(MessagesCreator):
 		self.publish(self.set_settings(message[VarNames.JS_MESSAGE_ID], message), self.channel)
 
 
-	def profile_save_user(self, message):
+	def profile_save_user(self, in_message):
+		message = in_message[VarNames.CONTENT]
+		user = User.objects.get(id=self.user_id)
+		un = message[UserProfileVarNames.USERNAME]
+		if user.username != un and User.objects.filter(username=un).exists():
+			raise ValidationError("User with name '{}' already exists".format(un))
+		sex = message[UserProfileVarNames.SEX]
 		UserProfile.objects.filter(id=self.user_id).update(
-			username=message[UserProfileVarNames.USERNAME],
+			username=un,
 			name=message[UserProfileVarNames.NAME],
 			city=message[UserProfileVarNames.CITY],
 			surname=message[UserProfileVarNames.SURNAME],
 			email=message[UserProfileVarNames.EMAIL],
 			birthday=message[UserProfileVarNames.BIRTHDAY],
 			contacts=message[UserProfileVarNames.CONTACTS],
-			sex=message[UserProfileVarNames.SEX]
+			sex=settings.GENDERS_STR[sex]
 		)
-		self.publish(self.set_user_profile(message[VarNames.JS_MESSAGE_ID], message), self.channel)
+		self.publish(self.set_user_profile(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
+		if user.sex_str != sex or user.username != un:
+			self.publish(self.changed_user_profile(sex, self.user_id, un), settings.ALL_ROOM_ID)
 
 
 	def profile_save_image(self, request):

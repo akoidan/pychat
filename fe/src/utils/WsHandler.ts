@@ -6,17 +6,17 @@ import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
 import {default as MessageHandler} from './MesageHandler';
 import {logout} from './utils';
-import {CurrentUserInfoModel, CurrentUserSettingsModel, RootState} from '../types/model';
+import {CurrentUserInfoModel, CurrentUserSettingsModel, RootState, UserModel} from '../types/model';
 import {IStorage, SessionHolder} from '../types/types';
 import {
   DefaultMessage,
   GrowlMessage,
   SetSettingsMessage,
   SetUserProfileMessage,
-  SetWsIdMessage
+  SetWsIdMessage, UserProfileChangedMessage
 } from '../types/messages';
 import {Logger} from 'lines-logger';
-import {currentUserInfoDtoToModel, userSettingsDtoToModel} from '../types/converters';
+import {convertUser, currentUserInfoDtoToModel, userSettingsDtoToModel} from '../types/converters';
 import {UserProfileDto, UserSettingsDto} from '../types/dto';
 
 enum WsState {
@@ -52,12 +52,12 @@ export class WsHandler extends MessageHandler {
     },
     setSettings(m: SetSettingsMessage) {
       let a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
-      this.store.dispatch('setUserSettings', a);
+      this.store.commit('setUserSettings', a);
     },
     setUserProfile(m: SetUserProfileMessage) {
       let a: CurrentUserInfoModel = currentUserInfoDtoToModel(m.content);
       a.userId = this.store.state.userInfo.userId;
-      this.store.dispatch('setUserInfo', a);
+      this.store.commit('setUserInfo', a);
     },
     setWsId(message: SetWsIdMessage) {
       this.wsConnectionId = message.opponentWsId;
@@ -67,6 +67,10 @@ export class WsHandler extends MessageHandler {
       this.setUserInfo(message.userInfo);
       this.setUserSettings(message.userSettings);
       this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
+    },
+    userProfileChanged(message: UserProfileChangedMessage) {
+      let user: UserModel = convertUser(message);
+      this.store.commit('setUser', user);
     },
     ping(message) {
       this.startNoPingTimeout();
@@ -262,7 +266,7 @@ export class WsHandler extends MessageHandler {
 
   public saveUser(content: UserProfileDto, cb: SingleParamCB<SetUserProfileMessage>) {
     this.sendToServer({
-      action: 'saveUserProfile',
+      action: 'setUserProfile',
       content,
     });
     this.appendCB(cb);

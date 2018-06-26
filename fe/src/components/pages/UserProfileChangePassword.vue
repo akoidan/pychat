@@ -3,25 +3,25 @@
     <table>
       <tbody>
       <tr>
-        <th><label for="userProfileOldPassword">Old password:</label></th>
+        <th>Old password:</th>
         <td>
           <input type="text" name="username" autocomplete="username" v-model="username" v-show="false"/>
-          <input autocomplete="password" class="input" minlength="3" required type="password" id="userProfileOldPassword" v-model="oldPassword">
+          <input autocomplete="password" class="input" minlength="3" required type="password" v-model="oldPassword">
         </td>
       </tr>
       <tr>
-        <th><label for="userProfileNewPassword">New password:</label></th>
+        <th>New password:</th>
         <td>
-          <input autocomplete="new-password" required class="input" id="userProfileNewPassword" type="password" name="password" minlength="3" v-model="newPassword">
+          <input autocomplete="new-password" required class="input" type="password" name="password" minlength="3" v-model="newPassword">
         </td>
       </tr>
       <tr>
-        <th><label for="userProfileConfirmPassword">Confirm password:</label></th>
-        <td><input autocomplete="new-password" required class="input" id="userProfileConfirmPassword" type="password" minlength="3" v-model="confirmPassword"></td>
+        <th>Confirm password:</th>
+        <td><input autocomplete="new-password" required class="input" type="password" minlength="3" v-model="confirmPassword"></td>
       </tr>
       </tbody>
       <tr><td colspan="2">
-        <app-submit class="green-btn" value='Apply password' :running="running"/>
+        <app-submit class="green-btn" value='Apply Password' :running="running"/>
       </td></tr>
     </table>
   </form>

@@ -2,22 +2,25 @@ import loggerFactory from './loggerFactory';
 import {Store} from 'vuex';
 import Api from './api';
 import MessageHandler from './MesageHandler';
-import {AddMessagePayload, MessageLocation, MessagesLocation, SetRoomsUsers} from '../types/types';
-import {MessageModel, RoomDictModel, RoomModel, RootState, SexModel, UserDictModel, UserModel} from '../types/model';
+import {AddMessagePayload, MessagesLocation, SetRoomsUsers} from '../types/types';
+import {MessageModel, RoomDictModel, RoomModel, RootState, UserDictModel, UserModel} from '../types/model';
 import {Logger} from 'lines-logger';
 import {
   AddInviteMessage,
-  AddOnlineUserMessage, AddRoomBase,
+  AddOnlineUserMessage,
+  AddRoomBase,
   AddRoomMessage,
   DeleteMessage,
   DeleteRoomMessage,
-  EditMessage, InviteUserMessage,
+  EditMessage,
+  InviteUserMessage,
   LeaveUserMessage,
   LoadMessages,
   RemoveOnlineUserMessage
 } from '../types/messages';
-import {MessageModelDto, RoomDto, SexModelDto, UserDto} from '../types/dto';
+import {MessageModelDto, RoomDto, UserDto} from '../types/dto';
 import {getMessageById} from './utils';
+import {convertUser} from '../types/converters';
 
 
 export default class ChannelsHandler extends MessageHandler {
@@ -55,7 +58,7 @@ export default class ChannelsHandler extends MessageHandler {
     },
     addOnlineUser(message: AddOnlineUserMessage) {
       if (!this.store.state.allUsersDict[message.userId]) {
-        let newVar: UserModel = this.convertUser(message);
+        let newVar: UserModel = convertUser(message);
         this.store.commit('addUser', newVar);
       }
       this.store.commit('setOnline', [...message.content]);
@@ -155,22 +158,12 @@ export default class ChannelsHandler extends MessageHandler {
     this.logger.log('set users {}', users)();
     let um: UserDictModel = {};
     users.forEach(u => {
-      um[u.userId] = this.convertUser(u);
+      um[u.userId] = convertUser(u);
     });
     this.store.commit('setUsers', um);
   }
 
-  private convertSex(dto: SexModelDto): SexModel {
-    return <SexModel>SexModel[dto];
-  }
 
-  private convertUser(u: UserDto): UserModel {
-    return {
-      user: u.user,
-      id: u.userId,
-      sex: this.convertSex(u.sex),
-    };
-  }
 
   private getMessage(message: EditMessage): MessageModel {
     return {

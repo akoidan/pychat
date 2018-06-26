@@ -55,6 +55,15 @@ class MessagesCreator(object):
 			VarNames.CONTENT: message,
 		}
 
+	def changed_user_profile(self, sex,  user_id, username):
+		return  {
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.USER_PROFILE_CHANGED,
+			UserProfileVarNames.SEX: sex,
+			UserProfileVarNames.USER_ID: user_id,
+			UserProfileVarNames.USERNAME: username,
+		}
+
 	def set_user_profile(self, js_message_id,  message):
 		return  {
 			VarNames.HANDLER_NAME: HandlerNames.WS,
@@ -84,9 +93,9 @@ class MessagesCreator(object):
 			UserProfileVarNames.USER_ID: up.id,
 			UserProfileVarNames.NAME: up.name,
 			UserProfileVarNames.CITY: up.city,
-			UserProfileVarNames.SEX: up.sex,
+			UserProfileVarNames.SEX: up.sex_str,
 			UserProfileVarNames.CONTACTS: up.contacts,
-			UserProfileVarNames.BIRTHDAY: up.birthday,
+			UserProfileVarNames.BIRTHDAY: str(up.birthday),
 			UserProfileVarNames.EMAIL: up.email,
 			UserProfileVarNames.SURNAME: up.surname,
 		}
