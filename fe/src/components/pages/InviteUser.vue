@@ -53,4 +53,7 @@
 
   .holder
     @extend %room-settings-holder
+
+  .green-btn
+    flex-shrink: 0
 </style>

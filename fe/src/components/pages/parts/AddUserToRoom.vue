@@ -86,6 +86,8 @@
   .color-lor .icon-cancel
     color: #a94442
 
+  .spanHo
+    max-width: 300px
 
   ul
     min-height: 50px

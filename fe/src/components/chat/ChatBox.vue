@@ -1,7 +1,7 @@
 <template>
   <div class="holder">
     <search-messages :room="room"/>
-    <div class="chatbox" :class="{'display-search-only': room.search.searchActive}" tabindex="1" @mousewheel="onScroll" ref="chatbox">
+    <div class="chatbox" @keydown="keyDownLoadUp" :class="{'display-search-only': room.search.searchActive}" tabindex="1" @mousewheel="onScroll" ref="chatbox">
       <template v-for="message in messages">
         <fieldset v-if="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
@@ -69,11 +69,18 @@
       return newArray;
     }
 
-    onScroll(e) {
-      // globalLogger.debug("Handling scroll {}, scrollTop {}", e, this.$refs.chatbox.scrollTop)();
-      if (!this.loading
-          && (e.detail < 0 || e.wheelDelta > 0)
-          && this.$refs.chatbox.scrollTop === 0) {
+    keyDownLoadUp(e) {
+      if (e.which === 33) {    // page up
+        this.loadUpHistory(25);
+      } else if (e.which === 38) { // up
+        this.loadUpHistory(10);
+      } else if (e.ctrlKey && e.which === 36) {
+        this.loadUpHistory(35);
+      }
+    };
+
+    private loadUpHistory(n) {
+      if (!this.loading && this.$refs.chatbox.scrollTop === 0) {
         let s = this.room.search;
         if (s.searchActive && !s.locked) {
           this.loading = true;
@@ -107,13 +114,19 @@
           });
         } else if (!s.searchActive && !this.room.allLoaded) {
           this.loading = true;
-          this.$ws.sendLoadMessages(this.room.id, this.maxId(this.room.id), 10, () => {
+          this.$ws.sendLoadMessages(this.room.id, this.maxId(this.room.id), n, () => {
             this.loading = false;
           });
         }
       }
     }
 
+    onScroll(e) {
+      // globalLogger.debug("Handling scroll {}, scrollTop {}", e, this.$refs.chatbox.scrollTop)();
+      if (e.detail < 0 || e.wheelDelta > 0) {
+        this.loadUpHistory(10);
+      }
+    }
   }
 </script>
 

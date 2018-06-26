@@ -106,6 +106,7 @@
 
   .green-btn
     width: 100%
+    flex-shrink: 0
   input[type=checkbox]
     @extend %checkbox
 </style>
