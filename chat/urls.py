@@ -26,6 +26,7 @@ urlpatterns = patterns(
 	url(r'^register_fcb', 'chat.views.register_subscription'),
 	url(r'^sw\.js$', 'chat.views.get_service_worker'),
 	url(r'^get_firebase_playback', 'chat.views.get_firebase_playback'),
+	url(r'^change_password', 'chat.views.profile_change_password'),
 	url(r'^restore_password$', RestorePassword.as_view(), name='restore_pass'),
 	url(r'^change_email$', 'chat.views.proceed_email_changed'),
 	url(r'^send_restore_password$', 'chat.views.send_restore_password'),

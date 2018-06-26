@@ -117,7 +117,7 @@ export default class ChannelsHandler extends MessageHandler {
       notifications: message.notifications,
       name: message.name,
       messages: [],
-      allLoaded: true,
+      allLoaded: false,
       search: {
         searchActive: false,
         searchText: '',

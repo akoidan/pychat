@@ -47,6 +47,14 @@ export default class Api {
     });
   }
 
+  public changePassword(old_password: string, password: string, cb: SingleParamCB<string>) {
+    return this.xhr.doPost<MessageModelDto[]>({
+      url: '/change_password',
+      params: {old_password, password},
+      cb: this.getResponseSuccessCB(cb)
+    });
+  }
+
   public logout(cb: SingleParamCB<string>, registration_id: string = null) {
     this.xhr.doPost({
       url: '/logout',

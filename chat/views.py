@@ -30,7 +30,7 @@ from chat import utils
 from chat.decorators import login_required_no_redirect, validation
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
-	SubscriptionMessages, RoomUsers, Room, UserJoinedInfo, UploadedFile
+	SubscriptionMessages, RoomUsers, Room, UserJoinedInfo, UploadedFile, User
 from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
 	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip, \
@@ -408,6 +408,22 @@ def report_issue(request):
 	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 
+@login_required_no_redirect()
+@validation
+def profile_change_password(request):
+	passwd = request.POST['password']
+	old_password = request.POST['old_password']
+	if request.user.password:
+		is_valid = authenticate(username=request.user.username, password=old_password)
+		if not is_valid:
+			raise ValidationError("Invalid old password")
+	utils.check_password(passwd)
+	hash_pass = make_password(passwd)
+	User.objects.filter(id=request.user.id).update(
+		password=hash_pass
+	)
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+
 class ProfileView(View):
 
 	@login_required_no_redirect()
@@ -418,6 +434,7 @@ class ProfileView(View):
 		c['form'] = form
 		c['date_format'] = settings.DATE_INPUT_FORMATS_JS
 		return render_to_response('change_profile.html', c, context_instance=RequestContext(request))
+
 
 
 	@transaction.atomic
@@ -436,8 +453,6 @@ class ProfileView(View):
 		if image_base64:
 			image = extract_photo(image_base64)
 			request.FILES['photo'] = image
-		if passwd:
-			self.change_password(passwd, request)
 		form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
 		if form.is_valid():
 			if not passwd:
@@ -452,14 +467,6 @@ class ProfileView(View):
 			response = form.errors
 		return HttpResponse(response, content_type='text/plain')
 
-	@staticmethod
-	def change_password(passwd, request):
-		if request.user.password:
-			is_valid = authenticate(username=request.user.username, password=request.POST['old_password'])
-			if not is_valid:
-				raise ValidationError("Invalid old password")
-		utils.check_password(passwd)
-		request.POST['password'] = make_password(passwd)
 
 	@staticmethod
 	def send_email_if_needed(form, new_email, request, user_profile):

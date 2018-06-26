@@ -165,7 +165,7 @@
     /deep/ :visited
       color: #7572CF
     /deep/ :link
-      color: #729fcf
+      color: $link-color
     /deep/ a
       &:hover
         text-decoration: underline

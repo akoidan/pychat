@@ -84,6 +84,7 @@ export function encodeP(data: MessageModel) {
   return encodeSmileys(html);
 }
 
+export const canvasBuffer = document.createElement('canvas')
 
 export function encodeMessage(data: MessageModel) {
   globalLogger.debug('Encoding message {}: {}', data.id, data)();

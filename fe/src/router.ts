@@ -11,6 +11,10 @@ import SignUp from './components/singup/SignUp.vue';
 import UserProfile from './components/pages/UserProfile.vue';
 import InviteUser from './components/pages/InviteUser.vue';
 import ReportIssue from './components/pages/ReportIssue.vue';
+import UserProfileChangePassword from './components/pages/UserProfileChangePassword.vue';
+import UserProfileImage from './components/pages/UserProfileImage.vue';
+import UserProfileInfo from './components/pages/UserProfileInfo.vue';
+import UserProfileSettings from './components/pages/UserProfileSettings.vue';
 import CreatePrivateRoom from './components/pages/CreatePrivateRoom.vue';
 import CreatePublicRoom from './components/pages/CreatePublicRoom.vue';
 import RoomSettings from './components/pages/RoomSettings.vue';
@@ -44,7 +48,29 @@ const router = new VueRouter({
         },
         {
           component: UserProfile,
-          path: '/profile'
+          path: '/profile',
+          children: [
+            {
+              path: '',
+              beforeEnter: (to, from, next) => next('/profile/change-password')
+            },
+            {
+              path: 'user-info',
+              component: UserProfileInfo
+            },
+            {
+              path: 'change-password',
+              component: UserProfileChangePassword
+            },
+            {
+              path: 'image',
+              component: UserProfileImage,
+            },
+            {
+              path: 'settings',
+              component: UserProfileSettings
+            }
+          ]
         },
         {
           component: RoomSettings,
