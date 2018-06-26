@@ -76,6 +76,17 @@
         this.loadUpHistory(10);
       } else if (e.ctrlKey && e.which === 36) {
         this.loadUpHistory(35);
+      } else if (e.shiftKey && e.ctrlKey && e.keyCode === 70) {
+        let s = this.room.search;
+        this.setSearchTo({
+          roomId: this.room.id,
+          search: {
+            searchActive: !s.searchActive,
+            searchedIds: s.searchedIds,
+            locked: s.locked,
+            searchText: s.searchText
+          } as SearchModel
+        } as SetSearchTo);
       }
     };
 

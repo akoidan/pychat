@@ -1,6 +1,6 @@
 <template>
-  <div class="search" v-show="room.search.searchActive" :class="{'loading': !!currentRequest}">
-    <input type="search" class="input" v-model.trim="search"/>
+  <div class="search" v-show="searchActive" :class="{'loading': !!currentRequest}">
+    <input type="search" class="input" ref="inputSearch" v-model.trim="search"/>
     <div class="search-loading"></div>
     <div class="search_result" v-if="searchResultText">{{searchResultText}}</div>
   </div>
@@ -24,6 +24,10 @@
     @Prop() room: RoomModel;
     @Mutation setSearchTo;
 
+    $refs: {
+      inputSearch: HTMLInputElement
+    };
+
     debouncedSearch: Function;
     search: string = '';
     offset: number = 0;
@@ -41,6 +45,19 @@
       }
     }
 
+    get searchActive() {
+      return this.room.search.searchActive;
+    }
+
+    @Watch('searchActive')
+    onSearchActiveChange(value) {
+      if (value) {
+        this.$nextTick(function () {
+          this.$refs.inputSearch.focus();
+        })
+      }
+    }
+
 
     created() {
       this.search = this.room.search.searchText;
@@ -52,7 +69,7 @@
 
     private mutateSearchedIds(searchedIds: number[], searchText: string) {
       let search: SearchModel = {
-        searchActive: this.room.search.searchActive,
+        searchActive: this.searchActive,
         searchedIds,
         searchText,
         locked: searchedIds.length < MESSAGES_PER_SEARCH
