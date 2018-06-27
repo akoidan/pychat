@@ -1,4 +1,4 @@
-import {FileModel, MessageModel, SearchModel, SentMessageModel, UploadProgressModel} from './model';
+import {FileModel, MessageModel, SearchModel, UploadProgressModel} from './model';
 
 export interface MessageDb {
   id: number;
@@ -59,8 +59,8 @@ export interface SetRoomsUsers {
 }
 
 export interface SetMessageProgress {
-  roomId: number;
   messageId: number;
+  roomId: number;
   upload: UploadProgressModel;
 }
 

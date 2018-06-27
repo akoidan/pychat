@@ -100,6 +100,10 @@
       return a;
     }
 
+    updated() {
+      this.logger.debug("updating ")();
+    }
+
     get onlineText() {
       return this.onlineShowOnlyOnline ? 'Room Users' : 'Room Online'
     }

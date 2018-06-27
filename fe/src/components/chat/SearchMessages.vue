@@ -28,6 +28,10 @@
       inputSearch: HTMLInputElement
     };
 
+    updated() {
+      this.logger.debug('updated')();
+    }
+
     debouncedSearch: Function;
     search: string = '';
     offset: number = 0;

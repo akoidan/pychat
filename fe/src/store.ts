@@ -10,9 +10,12 @@ import {
   EditingMessage,
   GrowlModel,
   GrowlType,
-  MessageModel, RoomDictModel,
-  RoomModel, RoomSettingsModel,
-  RootState, SentMessageModel, UserDictModel,
+  MessageModel,
+  RoomDictModel,
+  RoomModel,
+  RoomSettingsModel,
+  RootState, UploadProgressModel,
+  UserDictModel,
   UserModel
 } from './types/model';
 import {
@@ -110,12 +113,16 @@ const store: StoreOptions<RootState> = {
       state.editedMessage = editedMessage;
       state.activeUserId = null;
     },
-    addSentMessage(state: RootState, message: SentMessageModel) {
+    addSentMessage(state: RootState, payload: MessageModel) {
+      state.roomsDict[payload.roomId].sentMessages.push(payload);
+    },
+    setMessageProgressInitial(state: RootState, payload: SetMessageProgress) {
       let newVar = 'set';
-      Vue[newVar](state.roomsDict[message.roomId].sentMessages, message.id, message);
+      Vue[newVar](state.roomsDict[payload.roomId].progressBars, payload.messageId, payload.upload);
     },
     setMessageProgress(state: RootState, payload: SetMessageProgress) {
-      state.roomsDict[payload.roomId].sentMessages[payload.messageId].progress = payload.upload;
+      // let newVar = 'set';
+      state.roomsDict[payload.roomId].progressBars[payload.messageId] = payload.upload;
     },
     setSearchTo(state: RootState, payload: SetSearchTo) {
       state.roomsDict[payload.roomId].search = payload.search;

@@ -19,6 +19,11 @@
     @Prop() editedMessage : EditingMessage;
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
 
+
+    updated() {
+      this.logger.debug('updated')();
+    }
+
     m2DeleteMessage() {
       this.$ws.sendDeleteMessage(this.editedMessage.messageId);
       this.setEditedMessage(null);

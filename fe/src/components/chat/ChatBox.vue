@@ -6,7 +6,10 @@
         <fieldset v-if="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
         </fieldset>
-        <chat-message v-else-if="message.id" :key="message.id"  :message="message" :searched="room.search.searchedIds"/>
+        <chat-message :message="message" :searched="[]" v-else/>
+        <div v-else-if="message.id > 1000000" :key="message.id">
+          <!--<app-progress-bar :value="room.progressBars[message.id].uploaded" v-if="room.progressBars[message.id]" :total="room.progressBars[message.id].total"/>-->
+        </div>
         <chat-message v-else :key="message.id"  :message="message" :searched="room.search.searchedIds"/>
       </template>
     </div>
@@ -17,13 +20,14 @@
   import {Component, Prop, Vue ,Watch } from "vue-property-decorator";
   import ChatMessage from "./ChatMessage.vue";
   import SearchMessages from "./SearchMessages.vue";
-  import {RoomModel, SearchModel, SentMessageModel} from "../../types/model";
+  import {RoomModel, SearchModel} from "../../types/model";
   import {MessageModelDto} from '../../types/dto';
   import {channelsHandler} from '../../utils/singletons';
   import {SetSearchTo} from '../../types/types';
   import {MESSAGES_PER_SEARCH} from '../../utils/consts';
+  import AppProgressBar from '../ui/AppProgressBar';
 
-  @Component({components: {ChatMessage, SearchMessages}})
+  @Component({components: {AppProgressBar, ChatMessage, SearchMessages}})
   export default class ChatBox extends Vue {
     @Prop() room: RoomModel;
     @Action growlError;
@@ -47,6 +51,7 @@
     }
 
     updated() {
+      this.logger.debug("updated")();
       this.$nextTick(function () {
         if (this.$refs.chatbox && this.scrollBottom) {
           this.$refs.chatbox.scrollTop = this.$refs.chatbox.scrollHeight;
@@ -67,9 +72,10 @@
         }
         newArray.push(m);
       });
-      for (let k in this.room.sentMessages) {
-        newArray.push(this.room.sentMessages[k])
-      }
+      this.room.sentMessages.forEach(m => {
+        newArray.push(m);
+      })
+      // newArray.push(...this.room.sentMessages);
       return newArray;
     }
 

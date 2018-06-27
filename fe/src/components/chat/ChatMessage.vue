@@ -67,7 +67,7 @@
     }
 
     private setEvents() {
-      this.logger.log('setEvents')();
+      this.logger.debug('updated')();
       this.$nextTick(function () {
         if (this.userSettings.highlightCode) {
           highlightCode(this.$refs.content);

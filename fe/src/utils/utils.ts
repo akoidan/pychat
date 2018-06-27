@@ -24,6 +24,13 @@ export function login(session, errMessage) {
   }
 }
 
+export function bytesToSize(bytes: number): string {
+  let sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  if (bytes < 1) return '0 Byte';
+  let power: number = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${Math.round(bytes / Math.pow(1024, power))} ${sizes[power]}`;
+}
+
 
 
 const ONE_DAY = 24 * 60 * 60 * 1000;

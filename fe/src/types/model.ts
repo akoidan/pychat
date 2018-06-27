@@ -56,10 +56,6 @@ export interface UploadProgressModel {
   uploaded: number;
 }
 
-export interface SentMessageModel extends MessageModel {
-  progress: UploadProgressModel;
-}
-
 export  interface MessageModel {
   id: number;
   time: number;
@@ -105,7 +101,8 @@ export interface SearchModel {
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
   messages: MessageModel[];
-  sentMessages: { [id: number]: SentMessageModel };
+  sentMessages: MessageModel[];
+  progressBars: { [id: number]: UploadProgressModel };
   allLoaded: boolean;
   search: SearchModel;
 }

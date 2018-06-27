@@ -22,6 +22,10 @@
     closeActiveUser() {
       this.setActiveUserId(null);
     }
+
+    updated() {
+      this.logger.debug('updated')();
+    }
   }
 </script>
 

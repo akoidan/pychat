@@ -3,7 +3,7 @@
     <nav-edit-message v-if="editedMessage" :edited-message="editedMessage" />
     <nav-user-show v-if="activeUser" :active-user="activeUser"/>
     <div class="wrapper">
-      <div class="chatBoxHolder">
+      <div class="chatBoxHolder" @drop.prevent="dropPhoto">
         <template v-for="room in roomsArray">
           <chat-box :room="room" :key="room.id" v-show="activeRoomId === room.id"/>
         </template>
@@ -30,20 +30,20 @@
   import RoomUsers from "./RoomUsers.vue"
   import ChatBox from "./ChatBox.vue"
   import SmileyHolder from "./SmileyHolder.vue"
-  import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel, SentMessageModel} from "../../types/model";
+  import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from "../../types/model";
   import {
     encodeP,
     getMessageData,
     getSmileyHtml,
     getUniqueId,
     pasteHtmlAtCaret,
-    pasteImgToTextArea
+    pasteImgToTextArea, Utils
   } from "../../utils/htmlApi";
   import NavEditMessage from './NavEditMessage.vue';
   import NavUserShow from './NavUserShow.vue';
   import {sem} from '../../utils/utils';
   import {FileModelDto, FileModelXhr} from "../../types/dto";
-  import {SetMessageProgress} from "../../types/types";
+  import {MessageDataEncode, SetMessageProgress} from "../../types/types";
 
   @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Vue {
@@ -60,6 +60,7 @@
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
     @Mutation addSentMessage;
     @Mutation setMessageProgress;
+    @Mutation setMessageProgressInitial;
 
     $refs: {
       userMessage: HTMLTextAreaElement;
@@ -81,6 +82,27 @@
       this.$refs.imgInput.click();
     }
 
+    updated() {
+      this.logger.debug('updated')();
+    }
+
+    dropPhoto(evt) {
+      this.logger.debug("Drop photo {} ", evt.dataTransfer.files)();
+      if (evt.dataTransfer.files) {
+        this.logger.debug("if")();
+        for (var i = 0; i < evt.dataTransfer.files.length; i++) {
+          this.logger.debug("loop")();
+          var file = evt.dataTransfer.files[i];
+          if (file.type.indexOf("image") >= 0) {
+            pasteImgToTextArea(file, this.$refs.userMessage, err => {
+              this.growlError(err);
+            });
+          } else {
+            this.logger.error("Not implemented yet webrtc")();
+          }
+        }
+      }
+    }
 
     handleFileSelect (evt) {
       let files: File[] = evt.target.files;
@@ -131,12 +153,12 @@
       }
       let arId = this.activeRoomId;
       let um = this.$refs.userMessage;
-      let md = getMessageData(currSymbol, um);
+      let md: MessageDataEncode= getMessageData(currSymbol, um);
+      let size: number = 0;
+      let id = 10_000_000 + getUniqueId();
       if (md.files.length) {
-        let gr;
-        let db;
-        let text;
-        this.$api.uploadFiles(md.files, (res: FileModelXhr[], err: string) => {
+        md.files.forEach(f => size+= f.file.size);
+        let request = this.$api.uploadFiles(md.files, (res: FileModelXhr[], err: string) => {
           if (err) { // TOdo async should move to vuex
             this.growlError(err);
           } else {
@@ -145,8 +167,8 @@
         }, evt => {
           if (evt.lengthComputable) {
             let newVar: SetMessageProgress = {
-              messageId: mc.id,
-              roomId: mc.roomId,
+              messageId: id,
+              roomId: arId,
               upload: {
                 total: evt.total,
                 uploaded: evt.loaded,
@@ -155,17 +177,23 @@
             this.setMessageProgress(newVar)
           }
         });
+        let mc: SetMessageProgress = {
+          roomId: arId,
+          messageId: id,
+          upload: {
+            total: size,
+            uploaded: 0
+          },
+        };
+        this.setMessageProgressInitial(mc)
+        this.logger.debug("Uploading files request ()")(request);
       } else {
         this.send(messageId, md.messageContent, arId, []);
       }
-      let mc: SentMessageModel = {
-        roomId: this.activeRoomId,
+      let mm: MessageModel = {
+        roomId: arId,
         deleted: false,
-        id: 10_000_000 + getUniqueId(),
-        progress: {
-          total: 0,
-          uploaded: 0
-        },
+        id,
         time: Date.now(),
         content: md.messageContent,
         symbol: md.currSymbol,
@@ -174,11 +202,11 @@
         files: md.fileModels,
         userId: this.userInfo.userId
       };
-      this.addSentMessage(mc);
+      this.addSentMessage(mm);
     }
 
     private send(messageId: number, messageContent: string, arId: number, files: FileModelXhr[]) {
-      return;
+      return
       if (messageId) {
         this.$ws.sendEditMessage(messageContent, messageId, files);
       } else if (messageContent) {

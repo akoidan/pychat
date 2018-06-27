@@ -117,7 +117,8 @@ export default class ChannelsHandler extends MessageHandler {
     let r: RoomModel = {
       id: message.roomId,
       volume: message.volume,
-      sentMessages: {},
+      sentMessages: [],
+      progressBars: {},
       notifications: message.notifications,
       name: message.name,
       messages: [],
@@ -190,8 +191,9 @@ export default class ChannelsHandler extends MessageHandler {
       let oldRoom = roomsDict[newRoom.roomId];
       let rm: RoomModel = {
         id: newRoom.roomId,
-        sentMessages: oldRoom ? oldRoom.sentMessages : {},
+        sentMessages: oldRoom ? oldRoom.sentMessages : [],
         messages: oldRoom ? oldRoom.messages : [],
+        progressBars: {},
         name: newRoom.name,
         search: oldRoom ? oldRoom.search : {
           searchActive: false,

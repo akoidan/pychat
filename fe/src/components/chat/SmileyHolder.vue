@@ -38,6 +38,10 @@
       this.logger.log("Smiley inited {}", this.smileys)();
     }
 
+    updated() {
+      this.logger.debug('updated')();
+    }
+
     buildUrl(smiley: SmileyStructure, tabName: string) {
       return getSmileyPath(smiley);
     }
