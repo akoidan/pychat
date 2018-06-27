@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "lib": ["es2017", "dom"],
-    "module": "es2015",
+    "module": "esnext",
     "moduleResolution": "node",
     "target": "es5",
     "sourceMap": true,
@@ -9,7 +9,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "types": [
-      "websql", "lodash", "webpack-env"
+      "websql", "lodash"
     ]
   },
   "exclude": [

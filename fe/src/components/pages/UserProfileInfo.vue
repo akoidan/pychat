@@ -1,6 +1,6 @@
 <template>
-  <form method="post" @submit.prevent="save">
-      <table class="biginputtext" id="userProfileData">
+  <form class="holder" method="post" @submit.prevent="save">
+      <table>
         <tbody>
         <tr>
           <th>Username:</th>
@@ -24,7 +24,7 @@
         </tr>
         <tr>
           <th>Birthday</th>
-          <td><input class="input" v-model="model.birthday" type="date"></td>
+          <td><app-input-date input-class-datepicker="input-date" input-class="input" v-model="model.birthday"/></td>
         </tr>
         <tr>
           <th>Contacts:</th>
@@ -52,8 +52,9 @@
   import {CurrentUserInfoModel, SexModel} from "../../types/model";
   import {UserProfileDto} from '../../types/dto';
   import {currentUserInfoModelToDto, userSettingsDtoToModel} from "../../types/converters";
+  import AppInputDate from '../ui/AppInputDate';
   @Component({
-    components: {AppSubmit}
+    components: {AppInputDate, AppSubmit}
   })
   export default class UserProfileInfo extends Vue {
     running: boolean = false;
@@ -86,4 +87,6 @@
 </script>
 
 <style lang="sass" scoped>
+  .holder /deep/ .input.input-date
+    width: 100%
 </style>

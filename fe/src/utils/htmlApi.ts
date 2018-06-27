@@ -295,14 +295,11 @@ export function highlightCode(element) {
   let s = element.querySelectorAll('pre');
   globalLogger.debug('hightlightning code')();
   if (s.length) {
-    require.ensure(['highlightjs'], function(require) {
-      let hljs = require('highlightjs');
+    import( /* webpackChunkName: "highlightjs" */ 'highlightjs').then(hljs => {
       for (let i = 0; i < s.length; i++) {
         hljs.highlightBlock(s[i]);
       }
-    }, error => {
-      globalLogger.error('Error resolving highlightjs {}', error)();
-    }, 'highlightjs');
+    });
   }
 }
 
