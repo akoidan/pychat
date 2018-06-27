@@ -16,6 +16,7 @@ fe/src/assets/font
 fe/src/assets/sass/partials/fontello.scss
 fe/src/assets/sass/fonts
 chat/production.py
+fe/yarn-error.log
 chat/static/font/*
 !/chat/static/font/OpenSans.ttf
 !/chat/static/font/Oswald.ttf
