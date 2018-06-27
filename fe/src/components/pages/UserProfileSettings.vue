@@ -17,7 +17,7 @@
       <tr>
         <th>Highlight code</th>
         <td>
-          <app-checkbox v-model="model.highlight"/>
+          <app-checkbox v-model="model.highlightCode"/>
           ```console.log('Highlight code like this')```
         </td>
       </tr>
@@ -95,7 +95,7 @@
     @Action growlError;
     @Action growlSuccess;
 
-    model: UserSettingsDto;
+    model: UserSettingsDto = null;
 
     created() {
       this.logger.debug("Created userprofile page")();
@@ -108,12 +108,11 @@
 
     save() {
       this.running = true;
-      let cui : UserSettingsDto = {...this.userSettings};
+      this.logger.debug("Saving userSettings")();
+      let cui : UserSettingsDto = {...this.model};
       this.$ws.saveSettings(cui, e => {
         this.running = false;
-        if (e) {
-          this.growlError(e);
-        } else {
+        if (e.action === 'setSettings') {
           this.growlSuccess("Settings have been saved");
         }
       })

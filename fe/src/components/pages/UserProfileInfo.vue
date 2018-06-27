@@ -58,7 +58,7 @@
   export default class UserProfileInfo extends Vue {
     running: boolean = false;
     @State userInfo: CurrentUserInfoModel;
-    model: UserProfileDto;
+    model: UserProfileDto = null;
 
     sex = SexModel;
     @Action growlError;
@@ -73,6 +73,7 @@
 
     save() {
       this.running = true;
+      this.logger.debug("Saving userProfile")();
       let cui : UserProfileDto = {...this.model};
       this.$ws.saveUser(cui, e => {
         this.running = false;

@@ -1,5 +1,4 @@
 import {globalLogger} from './singletons';
-import hljs from 'highlightjs';
 import smileys from '../assets/smileys/info.json';
 
 import {API_URL_DEFAULT, PASTED_IMG_CLASS} from './consts';
@@ -294,8 +293,14 @@ export function pasteImgToTextArea(file: File, textArea: HTMLTextAreaElement, er
 
 export function highlightCode(element) {
   let s = element.querySelectorAll('pre');
-  for (let i = 0; i < s.length; i++) {
-    hljs.highlightBlock(s[i]);
+  globalLogger.debug('hightlightning code')();
+  if (s.length) {
+    require.ensure(['highlightjs'], function(require) {
+      let hljs = require('highlightjs');
+      for (let i = 0; i < s.length; i++) {
+        hljs.highlightBlock(s[i]);
+      }
+    });
   }
 }
 

@@ -8,7 +8,8 @@
   },
   "scripts": {
     "prod": "webpack --progress --mode production ",
-    "dev": "webpack-dev-server --mode development --hot"
+    "dev": "webpack-dev-server --mode development --hot",
+    "test": "mocha test/index.ts"
   },
   "repository": {
     "type": "git",
@@ -40,18 +41,28 @@
       "webpack-dev-server: serves files from node server",
       "webpack-cli: required by webpack to run builds",
       "file-loader: allows to copy files specifies as urls in css to output directory",
-      "url-loader: allows to copy files speicified as urls into base64 data"
+      "url-loader: allows to copy files speicified as urls into base64 data",
+      "chai + @types/chai: assertions ",
+      "ts-node: ability to run ts-code without transpiling it to files on fs first",
+      "mocha: test library"
     ],
+    "@types/chai": "^4.1.4",
     "@types/lodash": "^4.14.109",
+    "@types/mocha": "^5.2.3",
+    "@types/node": "^10.3.5",
+    "@types/webpack-env": "^1.13.6",
     "@types/websql": "0.0.27",
+    "chai": "^4.1.2",
     "css-loader": "^0.28.11",
     "file-loader": "^1.1.11",
     "html-webpack-plugin": "^3.2.0",
     "mini-css-extract-plugin": "^0.4.0",
+    "mocha": "^5.2.0",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.3",
     "style-loader": "^0.21.0",
     "ts-loader": "^4.3.1",
+    "ts-node": "^7.0.0",
     "tslint": "^5.10.0",
     "typescript": "^2.9.1",
     "url-loader": "^1.0.1",
@@ -66,12 +77,14 @@
   },
   "dependencies": {
     "highlightjs": "^9.10.0",
+    "is-mobile": "^1.0.0",
     "lines-logger": "^1.0.2",
     "lodash": "^4.17.10",
     "npm-font-open-sans": "^1.1.0",
     "typeface-oswald": "^0.0.54",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
+    "vuejs-datepicker": "^1.5.2",
     "vuex": "^3.0.1"
   }
 }
