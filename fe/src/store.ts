@@ -12,10 +12,16 @@ import {
   GrowlType,
   MessageModel, RoomDictModel,
   RoomModel, RoomSettingsModel,
-  RootState, UserDictModel,
+  RootState, SentMessageModel, UserDictModel,
   UserModel
 } from './types/model';
-import {AddMessagePayload, MessagesLocation, SetRoomsUsers, SetSearchTo} from './types/types';
+import {
+  AddMessagePayload,
+  MessagesLocation,
+  SetMessageProgress,
+  SetRoomsUsers,
+  SetSearchTo
+} from './types/types';
 import {getMessageById} from './utils/utils';
 
 interface State extends ActionContext<RootState, RootState> {}
@@ -103,6 +109,13 @@ const store: StoreOptions<RootState> = {
     setEditedMessage(state: RootState, editedMessage: EditingMessage) {
       state.editedMessage = editedMessage;
       state.activeUserId = null;
+    },
+    addSentMessage(state: RootState, message: SentMessageModel) {
+      let newVar = 'set';
+      Vue[newVar](state.roomsDict[message.roomId].sentMessages, message.id, message);
+    },
+    setMessageProgress(state: RootState, payload: SetMessageProgress) {
+      state.roomsDict[payload.roomId].sentMessages[payload.messageId].progress = payload.upload;
     },
     setSearchTo(state: RootState, payload: SetSearchTo) {
       state.roomsDict[payload.roomId].search = payload.search;

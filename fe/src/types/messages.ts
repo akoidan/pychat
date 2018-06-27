@@ -1,4 +1,5 @@
 import {FileModelDto, MessageModelDto, RoomDto, SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from './dto';
+import {FileModel} from './model';
 
 export interface DefaultMessage {
   action: string;
@@ -95,7 +96,7 @@ export interface EditMessage extends DeleteMessage {
   userId: number;
   content: string;
   time: number;
-  files: Map<number, FileModelDto>;
+  files: {[id: number]: FileModelDto};
   symbol: string;
   giphy: string;
   deleted: boolean;

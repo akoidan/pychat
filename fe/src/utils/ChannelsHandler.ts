@@ -20,7 +20,7 @@ import {
 } from '../types/messages';
 import {MessageModelDto, RoomDto, UserDto} from '../types/dto';
 import {getMessageById} from './utils';
-import {convertUser} from '../types/converters';
+import {convertFiles, convertUser} from '../types/converters';
 
 
 export default class ChannelsHandler extends MessageHandler {
@@ -117,6 +117,7 @@ export default class ChannelsHandler extends MessageHandler {
     let r: RoomModel = {
       id: message.roomId,
       volume: message.volume,
+      sentMessages: {},
       notifications: message.notifications,
       name: message.name,
       messages: [],
@@ -169,7 +170,7 @@ export default class ChannelsHandler extends MessageHandler {
     return {
       id: message.id,
       time: message.time,
-      files: message.files || null,
+      files: message.files ? convertFiles(message.files) : null,
       content: message.content || null,
       symbol: message.symbol || null,
       edited: message.edited || null,
@@ -189,6 +190,7 @@ export default class ChannelsHandler extends MessageHandler {
       let oldRoom = roomsDict[newRoom.roomId];
       let rm: RoomModel = {
         id: newRoom.roomId,
+        sentMessages: oldRoom ? oldRoom.sentMessages : {},
         messages: oldRoom ? oldRoom.messages : [],
         name: newRoom.name,
         search: oldRoom ? oldRoom.search : {

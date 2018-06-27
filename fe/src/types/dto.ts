@@ -1,3 +1,5 @@
+import {FileModel} from './model';
+
 export enum SexModelDto {
   Male = 'Male',
   Female = 'Female',
@@ -56,7 +58,7 @@ export interface FileModelXhr {
 export interface MessageModelDto {
   id: number;
   time: number;
-  files: Map<number, FileModelDto>;
+  files: {[id: number]: FileModelDto};
   content: string;
   symbol: string;
   deleted: boolean;

@@ -3,7 +3,7 @@ import smileys from '../assets/smileys/info.json';
 
 import {API_URL_DEFAULT, PASTED_IMG_CLASS} from './consts';
 import {MessageDataEncode, SmileyStructure, UploadFile} from '../types/types';
-import {MessageModel} from '../types/model';
+import {FileModel, MessageModel} from '../types/model';
 
 const tmpCanvasContext = document.createElement('canvas').getContext('2d');
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -78,7 +78,7 @@ export const isDateMissing = (function() {
 
 
 export function resolveUrl(src: string): string {
-  return `${API_URL_DEFAULT}${src}`;
+  return src.indexOf('blob:http') === 0 ? src : `${API_URL_DEFAULT}${src}`;
 }
 
 export function encodeSmileys(html: string): string {
@@ -293,7 +293,6 @@ export function pasteImgToTextArea(file: File, textArea: HTMLTextAreaElement, er
 
 export function highlightCode(element) {
   let s = element.querySelectorAll('pre');
-  globalLogger.debug('hightlightning code')();
   if (s.length) {
     import( /* webpackChunkName: "highlightjs" */ 'highlightjs').then(hljs => {
       for (let i = 0; i < s.length; i++) {
@@ -312,6 +311,7 @@ function nextChar(c: string): string {
 export function getMessageData (currSymbol: string, userMessage: HTMLTextAreaElement): MessageDataEncode {
   let files: UploadFile[] = []; // return array from nodeList
   let images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
+  let fileModels: {[id: number]: FileModel} = {};
   for (let i = 0; i < images.length; i++) {
     let img = images[i];
     let elSymbol = img.getAttribute('symbol');
@@ -334,28 +334,42 @@ export function getMessageData (currSymbol: string, userMessage: HTMLTextAreaEle
           type: 'p',
           symbol:  elSymbol
         });
+        let fileModel: FileModel = {
+          id: null,
+          preview: img.getAttribute('src'),
+          url: assVideo,
+          type: 'v'
+        };
+        fileModels[elSymbol] = fileModel;
       } else {
         files.push({
           file: Utils.imagesFiles[img.getAttribute('src')],
           type: 'i',
           symbol:  elSymbol
         });
+        let fileModel: FileModel = {
+          id: null,
+          preview: null,
+          url: img.getAttribute('src'),
+          type: 'i'
+        };
+        fileModels[elSymbol] = fileModel;
       }
     }
   }
-  let urls = [Utils.imagesFiles, Utils.videoFiles, Utils.previewFiles];
-  urls.forEach((url) => {
-    for (let k in url) {
-      globalLogger.log('Revoking url {}', k)();
-      URL.revokeObjectURL(k);
-      delete urls[k];
-    }
-  });
+  // let urls = [Utils.imagesFiles, Utils.videoFiles, Utils.previewFiles];
+  // urls.forEach((url) => {
+  //   for (let k in url) {
+  //     globalLogger.log('Revoking url {}', k)();
+  //     URL.revokeObjectURL(k);
+  //     delete urls[k];
+  //   }
+  // }); TODO
   userMessage.innerHTML = userMessage.innerHTML.replace(/<img[^>]*symbol="([^"]+)"[^>]*>/g, '$1');
   let messageContent: string = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
   messageContent = /^\s*$/.test(messageContent) ? null : messageContent;
   userMessage.innerHTML = '';
-  return {files, messageContent};
+  return {files, messageContent, currSymbol, fileModels};
 }
 
 export const Utils = {

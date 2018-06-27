@@ -78,7 +78,7 @@
       let cui : UserProfileDto = {...this.model};
       this.$ws.saveUser(cui, e => {
         this.running = false;
-        if (e && e.action == 'setUserInfo') {
+        if (e && e.action == 'setUserProfile') {
           this.growlSuccess("User profile has been saved");
         }
       })

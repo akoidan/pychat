@@ -1,5 +1,5 @@
-import {CurrentUserInfoModel, CurrentUserSettingsModel, SexModel, UserModel} from './model';
-import {SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from './dto';
+import {CurrentUserInfoModel, CurrentUserSettingsModel, FileModel, RoomModel, SexModel, UserModel} from './model';
+import {FileModelDto, RoomDto, SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from './dto';
 
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDto): CurrentUserInfoModel {
@@ -16,6 +16,17 @@ export function currentUserInfoModelToDto(userInfo: CurrentUserInfoModel): UserP
 
 export function convertSex(dto: SexModelDto): SexModel {
   return <SexModel>SexModel[dto];
+}
+export function convertFile(dto: FileModelDto): FileModel {
+  return {...dto};
+}
+
+export function convertFiles(dto: {[id: number]: FileModelDto}): {[id: number]: FileModel} {
+  let res: {[id: number]: FileModel} = {};
+  for (let k in dto) {
+    res[k] = convertFile(dto[k]);
+  }
+  return res;
 }
 
 export function convertUser(u: UserDto): UserModel {

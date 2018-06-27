@@ -30,12 +30,20 @@
   import RoomUsers from "./RoomUsers.vue"
   import ChatBox from "./ChatBox.vue"
   import SmileyHolder from "./SmileyHolder.vue"
-  import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from "../../types/model";
-  import {encodeP, getMessageData, getSmileyHtml, pasteHtmlAtCaret, pasteImgToTextArea} from "../../utils/htmlApi";
+  import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel, SentMessageModel} from "../../types/model";
+  import {
+    encodeP,
+    getMessageData,
+    getSmileyHtml,
+    getUniqueId,
+    pasteHtmlAtCaret,
+    pasteImgToTextArea
+  } from "../../utils/htmlApi";
   import NavEditMessage from './NavEditMessage.vue';
   import NavUserShow from './NavUserShow.vue';
   import {sem} from '../../utils/utils';
   import {FileModelDto, FileModelXhr} from "../../types/dto";
+  import {SetMessageProgress} from "../../types/types";
 
   @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Vue {
@@ -50,6 +58,8 @@
     @Action growlError;
     // used in mixin from event.keyCode === 38
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
+    @Mutation addSentMessage;
+    @Mutation setMessageProgress;
 
     $refs: {
       userMessage: HTMLTextAreaElement;
@@ -91,58 +101,7 @@
     checkAndSendMessage(event: KeyboardEvent) {
       if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
         event.preventDefault();
-        if (!this.$ws.isWsOpen()) {
-          this.growlError(`Can't send message, can't connect to the server`);
-        } else {
-          this.logger.log('Sending message')();
-          let messageId = this.editedMessage && this.editedMessage.isEditingNow ? this.editedMessage.messageId : null;
-          let currSymbol;
-          if (messageId) {
-            currSymbol = this.editingMessageModel.symbol;
-          }
-          this.setEditedMessage(null);
-          if (!currSymbol) {
-            currSymbol = '\u3500'
-          }
-          let arId = this.activeRoomId;
-          let um = this.$refs.userMessage;
-          let md = getMessageData(currSymbol, um);
-          if (md.files.length) {
-            let gr;
-            let db;
-            let text;
-            this.$api.uploadFiles(md.files, (res: FileModelXhr[], err: string) => {
-              if (err) { // TOdo async should move to vuex
-                this.growlError(err);
-              } else  {
-                this.send(messageId, md.messageContent, arId, res)
-              }
-            }, evt => {
-              if (evt.lengthComputable) {
-
-                // TODO evt.loaded
-                // if (!db) {
-                //   let div = document.createElement("DIV");
-                //   let holder = document.createElement("DIV");
-                //   text = document.createElement("SPAN");
-                //   holder.appendChild(text);
-                //   holder.appendChild(div);
-                //   text.innerText = "Uploading files...";
-                //   db = new DownloadBar(div, evt.total);
-                //   gr = new Growl(null, null, holder);
-                //   gr.show();
-                // }
-                // db.setValue(evt.loaded);
-                // if (evt.loaded === evt.total) {
-                //   text.innerText = "Server is processing files...";
-                // }
-              }
-            });
-          } else {
-            this.send(messageId, md.messageContent, arId, []);
-          }
-        }
-
+        this.sendWsMessage();
       } else if (event.keyCode === 27) { // 27 = escape
         this.showSmileys = false;
         if (this.editedMessage) {
@@ -159,7 +118,67 @@
       }
     }
 
+    private sendWsMessage() {
+      this.logger.log("Sending message")();
+      let messageId = this.editedMessage && this.editedMessage.isEditingNow ? this.editedMessage.messageId : null;
+      let currSymbol;
+      if (messageId) {
+        currSymbol = this.editingMessageModel.symbol;
+      }
+      this.setEditedMessage(null);
+      if (!currSymbol) {
+        currSymbol = "\u3500"
+      }
+      let arId = this.activeRoomId;
+      let um = this.$refs.userMessage;
+      let md = getMessageData(currSymbol, um);
+      if (md.files.length) {
+        let gr;
+        let db;
+        let text;
+        this.$api.uploadFiles(md.files, (res: FileModelXhr[], err: string) => {
+          if (err) { // TOdo async should move to vuex
+            this.growlError(err);
+          } else {
+            this.send(messageId, md.messageContent, arId, res)
+          }
+        }, evt => {
+          if (evt.lengthComputable) {
+            let newVar: SetMessageProgress = {
+              messageId: mc.id,
+              roomId: mc.roomId,
+              upload: {
+                total: evt.total,
+                uploaded: evt.loaded,
+              }
+            };
+            this.setMessageProgress(newVar)
+          }
+        });
+      } else {
+        this.send(messageId, md.messageContent, arId, []);
+      }
+      let mc: SentMessageModel = {
+        roomId: this.activeRoomId,
+        deleted: false,
+        id: 10_000_000 + getUniqueId(),
+        progress: {
+          total: 0,
+          uploaded: 0
+        },
+        time: Date.now(),
+        content: md.messageContent,
+        symbol: md.currSymbol,
+        giphy: null,
+        edited: 0,
+        files: md.fileModels,
+        userId: this.userInfo.userId
+      };
+      this.addSentMessage(mc);
+    }
+
     private send(messageId: number, messageContent: string, arId: number, files: FileModelXhr[]) {
+      return;
       if (messageId) {
         this.$ws.sendEditMessage(messageContent, messageId, files);
       } else if (messageContent) {

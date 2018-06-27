@@ -51,10 +51,19 @@ export  interface FileModel {
   preview: string;
 }
 
+export interface UploadProgressModel {
+  total: number;
+  uploaded: number;
+}
+
+export interface SentMessageModel extends MessageModel {
+  progress: UploadProgressModel;
+}
+
 export  interface MessageModel {
   id: number;
   time: number;
-  files: Map<number, FileModel>;
+  files: {[id: number]: FileModel};
   content: string;
   symbol: string;
   deleted: boolean;
@@ -96,6 +105,7 @@ export interface SearchModel {
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
   messages: MessageModel[];
+  sentMessages: { [id: number]: SentMessageModel };
   allLoaded: boolean;
   search: SearchModel;
 }

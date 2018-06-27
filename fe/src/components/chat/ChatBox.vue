@@ -6,6 +6,7 @@
         <fieldset v-if="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
         </fieldset>
+        <chat-message v-else-if="message.id" :key="message.id"  :message="message" :searched="room.search.searchedIds"/>
         <chat-message v-else :key="message.id"  :message="message" :searched="room.search.searchedIds"/>
       </template>
     </div>
@@ -16,7 +17,7 @@
   import {Component, Prop, Vue ,Watch } from "vue-property-decorator";
   import ChatMessage from "./ChatMessage.vue";
   import SearchMessages from "./SearchMessages.vue";
-  import {RoomModel, SearchModel} from "../../types/model";
+  import {RoomModel, SearchModel, SentMessageModel} from "../../types/model";
   import {MessageModelDto} from '../../types/dto';
   import {channelsHandler} from '../../utils/singletons';
   import {SetSearchTo} from '../../types/types';
@@ -66,6 +67,9 @@
         }
         newArray.push(m);
       });
+      for (let k in this.room.sentMessages) {
+        newArray.push(this.room.sentMessages[k])
+      }
       return newArray;
     }
 

@@ -1,4 +1,4 @@
-import {MessageModel, SearchModel} from './model';
+import {FileModel, MessageModel, SearchModel, SentMessageModel, UploadProgressModel} from './model';
 
 export interface MessageDb {
   id: number;
@@ -22,6 +22,8 @@ export interface UploadFile {
 export interface MessageDataEncode {
   messageContent: string;
   files: UploadFile[];
+  fileModels: { [id: number]: FileModel };
+  currSymbol: string;
 }
 
 
@@ -45,22 +47,22 @@ export interface PostData<T> {
   process?: Function;
 }
 
-export interface SetRoomsUsers {
-  roomId: number;
-  users: number[];
-}
-
-export interface MessageLocation {
-  roomId: number;
-  id: number;
-  edited: number;
-}
 
 export interface MessagesLocation {
   roomId: number;
   messages: MessageModel[];
 }
 
+export interface SetRoomsUsers {
+  roomId: number;
+  users: number[];
+}
+
+export interface SetMessageProgress {
+  roomId: number;
+  messageId: number;
+  upload: UploadProgressModel;
+}
 
 export interface SetSearchTo {
   roomId: number;
