@@ -127,6 +127,26 @@ export default class Api {
     });
   }
 
+  public uploadProfileImage(file: Blob, cb: ErrorCB<string>) {
+    let fd = new FormData();
+    fd.append('file', file);
+    this.xhr.doPost<string>( {
+      url: '/upload_profile_image',
+      formData: fd,
+      cb: (data, error) => {
+        if (!data && error) {
+          cb(null, error);
+        } else if (!data) {
+          cb(null, 'Server error');
+        } else if (error) {
+          cb(null, error);
+        } else {
+          cb(data, null);
+        }
+      }
+    });
+  }
+
 
   public uploadFiles(files: UploadFile[], cb: ErrorCB<FileModelXhr[]>, progress: Function) {
     let fd = new FormData();

@@ -42,6 +42,7 @@ class MessagesCreator(object):
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 			VarNames.EVENT: Actions.SET_WS_ID,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
+			VarNames.USER_IMAGE: up.photo.url if up.photo else None,
 			VarNames.CURRENT_USER_SETTINGS: self.get_user_settings(up),
 			VarNames.CURRENT_USER_INFO: self.get_user_profile(up),
 		}
@@ -53,6 +54,14 @@ class MessagesCreator(object):
 			VarNames.CB_BY_SENDER: self.id,
 			VarNames.JS_MESSAGE_ID: js_message_id,
 			VarNames.CONTENT: message,
+		}
+
+	@staticmethod
+	def set_profile_image(url):
+		return {
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.SET_PROFILE_IMAGE,
+			VarNames.CONTENT: url,
 		}
 
 	def changed_user_profile(self, sex,  user_id, username):

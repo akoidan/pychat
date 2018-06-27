@@ -10,7 +10,7 @@ import {CurrentUserInfoModel, CurrentUserSettingsModel, RootState, UserModel} fr
 import {IStorage, SessionHolder} from '../types/types';
 import {
   DefaultMessage,
-  GrowlMessage,
+  GrowlMessage, SetProfileImageMessage,
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage, UserProfileChangedMessage
@@ -59,6 +59,9 @@ export class WsHandler extends MessageHandler {
       a.userId = this.store.state.userInfo.userId;
       this.store.commit('setUserInfo', a);
     },
+    setProfileImage(m: SetProfileImageMessage) {
+      this.setUserImage(m.content);
+    },
     setWsId(message: SetWsIdMessage) {
       this.wsConnectionId = message.opponentWsId;
       this.handlers.channels.setRooms(message.rooms);
@@ -66,6 +69,7 @@ export class WsHandler extends MessageHandler {
       this.handlers.channels.setUsers(message.users);
       this.setUserInfo(message.userInfo);
       this.setUserSettings(message.userSettings);
+      this.setUserImage(message.userImage);
       this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
     },
     userProfileChanged(message: UserProfileChangedMessage) {
@@ -90,6 +94,10 @@ export class WsHandler extends MessageHandler {
   private setUserSettings(userInfo: UserSettingsDto) {
     let um: UserSettingsDto = userSettingsDtoToModel(userInfo);
     this.store.commit('setUserSettings', um);
+  }
+
+  private setUserImage(image: string) {
+    this.store.commit('setUserImage', image);
   }
 
   private answerPong() {

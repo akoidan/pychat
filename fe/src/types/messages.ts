@@ -10,6 +10,7 @@ export interface SetWsIdMessage extends DefaultMessage {
   users: UserDto[];
   online: number[];
   opponentWsId: string;
+  userImage: string;
   userInfo: UserProfileDto;
   userSettings: UserSettingsDto;
 }
@@ -24,7 +25,9 @@ export interface SetUserProfileMessage extends DefaultMessage {
 export interface UserProfileChangedMessage extends DefaultMessage, UserDto {
 
 }
-
+export interface SetProfileImageMessage extends DefaultMessage {
+  content: string;
+}
 
 interface ChangeUserOnline extends DefaultMessage, UserDto {
   content: number[];

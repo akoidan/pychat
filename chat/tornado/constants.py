@@ -65,6 +65,7 @@ class VarNames(object):
 	ROOMS = 'rooms'
 	ROOM_USERS = 'users'
 	WEBRTC_OPPONENT_ID = 'opponentWsId'
+	USER_IMAGE = 'userImage'
 	CB_BY_SENDER = 'cbBySender'
 	GET_MESSAGES_COUNT = 'count'
 	GET_MESSAGES_HEADER_ID = 'headerId'

@@ -69,8 +69,16 @@ export function getSmileyHtml (symbol: string) {
   return `<img src="${getSmileyPath(smiley)}" symbol="${symbol}" alt="${smiley.alt}">`;
 }
 
+export const isDateMissing = (function() {
+  let input = document.createElement('input');
+  input.setAttribute('type', 'date');
+  let notADateValue = 'not-a-date';
+  input.setAttribute('value', notADateValue);
+  return input.value === notADateValue;
+})();
 
-function resolveUrl(src: string): string {
+
+export function resolveUrl(src: string): string {
   return `${API_URL_DEFAULT}${src}`;
 }
 
@@ -84,7 +92,7 @@ export function encodeP(data: MessageModel) {
   return encodeSmileys(html);
 }
 
-export const canvasBuffer = document.createElement('canvas')
+export const canvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d');
 
 export function encodeMessage(data: MessageModel) {
   globalLogger.debug('Encoding message {}: {}', data.id, data)();
