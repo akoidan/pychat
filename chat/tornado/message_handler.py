@@ -332,7 +332,8 @@ class MessagesHandler(MessagesCreator):
 			self.raw_publish(jsoned_mess, RedisPrefix.generate_user(user))
 
 
-	def profile_save_settings(self, message):
+	def profile_save_settings(self, in_message):
+		message = in_message[VarNames.CONTENT]
 		UserProfile.objects.filter(id=self.user_id).update(
 			suggestions=message[UserSettingsVarNames.SUGGESTIONS],
 			embedded_youtube=message[UserSettingsVarNames.EMBEDDED_YOUTUBE],
@@ -344,7 +345,7 @@ class MessagesHandler(MessagesCreator):
 			send_logs=message[UserSettingsVarNames.SEND_LOGS],
 			theme=message[UserSettingsVarNames.THEME],
 		)
-		self.publish(self.set_settings(message[VarNames.JS_MESSAGE_ID], message), self.channel)
+		self.publish(self.set_settings(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
 
 
 	def profile_save_user(self, in_message):

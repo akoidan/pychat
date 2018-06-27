@@ -300,7 +300,9 @@ export function highlightCode(element) {
       for (let i = 0; i < s.length; i++) {
         hljs.highlightBlock(s[i]);
       }
-    });
+    }, error => {
+      globalLogger.error('Error resolving highlightjs {}', error)();
+    }, 'highlightjs');
   }
 }
 

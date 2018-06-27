@@ -9,7 +9,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "types": [
-      "websql"
+      "websql", "lodash", "webpack-env"
     ]
   },
   "exclude": [
