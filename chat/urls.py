@@ -33,6 +33,7 @@ urlpatterns = patterns(
 	url(r'^validate_email$', 'chat.views.validate_email'),
 	url(r'^profile/(\d{1,5})$', 'chat.views.show_profile'),
 	url(r'^report_issue$', 'chat.views.report_issue'),
+	url(r'^upload_profile_image', 'chat.views.upload_profile_image'),
 	url(r'^statistics$', 'chat.views.statistics'),
 	url(r'^test$', 'chat.views.test'),
 	url(r'^search_messages$', 'chat.views.search_messages'),

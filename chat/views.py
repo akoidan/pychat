@@ -11,6 +11,7 @@ from django.contrib.auth.hashers import make_password
 from django.core.mail import mail_admins
 
 from chat.templatetags.md5url import md5url
+from chat.tornado.constants import RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
 
 try:
@@ -26,7 +27,7 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 from django.views.generic import View
-from chat import utils
+from chat import utils, global_redis
 from chat.decorators import login_required_no_redirect, validation
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
@@ -75,6 +76,23 @@ def upload_file(request):
 		res.append(uf.id)
 	return HttpResponse(json.dumps(res), content_type='application/json')
 
+
+
+@require_http_methods(['POST'])
+@login_required_no_redirect()
+@validation
+def upload_profile_image(request):
+	"""
+	POST only, validates email during registration
+	"""
+
+	up = UserProfile(photo=request.FILES['file'], id=request.user.id)
+	up.save(update_fields=('photo',))
+	url = up.photo.url
+	message = json.dumps(MessagesCreator.set_profile_image(url))
+	channel = RedisPrefix.generate_user(request.user.id)
+	global_redis.sync_redis.publish(channel, message)
+	return HttpResponse(url, content_type='application/text')
 
 @require_http_methods(['POST'])
 @login_required_no_redirect(False)

@@ -13,7 +13,7 @@
 </template>
 <script lang="ts">
   import {State, Action, Mutation} from "vuex-class";
-  import {Component, Prop, Vue} from "vue-property-decorator";
+  import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {canvasContext, resolveUrl} from "../../utils/htmlApi";
   import AppSubmit from '../ui/AppSubmit';
   @Component({
@@ -24,6 +24,19 @@
     @Action growlError;
     @Action growlSuccess;
     @Action growlInfo;
+
+
+    @State userImage: string;
+
+    @Watch('userImage')
+    onUserImageChange(value: string) {
+      this.srcImg = resolveUrl(value);
+      this.growlInfo("New image has been set");
+    }
+
+    created() {
+      this.srcImg = this.userImage ? resolveUrl(this.userImage) : null;
+    }
 
     running: boolean = false;
     srcImg: string = '';
