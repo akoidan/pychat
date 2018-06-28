@@ -50,7 +50,14 @@
   import NavUserShow from './NavUserShow.vue';
   import {sem} from '../../utils/utils';
   import {FileModelDto, FileModelXhr} from "../../types/dto";
-  import {AddMessagePayload, MessageDataEncode, SetMessageProgress} from "../../types/types";
+  import {
+    AddMessagePayload,
+    MessageDataEncode, RemoveMessageProgress,
+    SetMessageProgress,
+    SetMessageProgressError,
+    UploadFile
+  } from "../../types/types";
+  import {channelsHandler} from '../../utils/singletons';
 
   @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Vue {
@@ -68,7 +75,8 @@
     @Mutation addSentMessage;
     @Mutation addMessage;
     @Mutation setMessageProgress;
-    @Mutation setMessageProgressInitial;
+    @Mutation setMessageProgressError;
+    @Mutation removeMessageProgress;
 
     $refs: {
       userMessage: HTMLTextAreaElement;
@@ -160,58 +168,78 @@
       if (!md.messageContent && !md.files.length) {
         return
       }
-      let size: number = 0;
-      let id =  getUniqueId();
+      let now = Date.now();
+      let id =  this.$ws.getMessageId();
+      let upload: UploadProgressModel = null;
+      let send = (files: FileModelXhr[]) => {
+        if (messageId) {
+          channelsHandler.sendEditMessage(md.messageContent, messageId, files, id);
+        } else {
+          channelsHandler.sendSendMessage(md.messageContent, arId, files, id, now);
+        }
+      };
       if (md.files.length) {
-        md.files.forEach(f => size+= f.file.size);
-        this.$api.uploadFiles(md.files, (res: FileModelXhr[], err: string) => {
-          if (err) { // TOdo async should move to vuex
-            this.growlError(err);
-          } else {
-            this.send(messageId, md.messageContent, arId, res)
-          }
-        }, evt => {
-          if (evt.lengthComputable) {
-            let newVar: SetMessageProgress = {
-              messageId: id,
-              roomId: arId,
-              upload: {
-                total: evt.total,
-                uploaded: evt.loaded,
-              }
-            };
-            this.setMessageProgress(newVar)
+        upload = this.uploadFiles(id, arId, md.files, (res: FileModelXhr[]) => {
+          if (res) {
+            send(res);
           }
         });
       } else {
-        this.send(messageId, md.messageContent, arId, []);
+        send([]);
       }
       let mm: SentMessageModel = {
         roomId: arId,
         deleted: false,
         id,
-        time: Date.now(),
+        sending: true,
+        time: now,
         content: md.messageContent,
         symbol: md.currSymbol,
         giphy: null,
         edited: 0,
-        upload: {
-          total: size,
-          uploaded: 0
-        },
+        upload,
         files: md.fileModels,
         userId: this.userInfo.userId
       };
       this.addSentMessage(mm);
     }
 
-    private send(messageId: number, messageContent: string, arId: number, files: FileModelXhr[]) {
-      return
-      if (messageId) {
-        this.$ws.sendEditMessage(messageContent, messageId, files);
-      } else if (messageContent) {
-        this.$ws.sendSendMessage(messageContent, arId, files);
-      }
+    private uploadFiles(
+        messageId: number,
+        roomId: number,
+        files: UploadFile[],
+        cb: SingleParamCB<FileModelXhr[]>
+    ): UploadProgressModel {
+      files.forEach(f => size += f.file.size);
+      let size: number = 0;
+      this.$api.uploadFiles(files, (res: FileModelXhr[], error: string) => {
+        if (error) {
+          let newVar: SetMessageProgressError = {
+            messageId,
+            roomId,
+            error,
+          };
+          this.setMessageProgressError(newVar);
+          cb(null)
+        } else {
+          let newVar: RemoveMessageProgress = {
+            messageId, roomId
+          };
+          this.removeMessageProgress(newVar);
+          cb(res);
+        }
+      }, evt => {
+        if (evt.lengthComputable) {
+          let newVar: SetMessageProgress = {
+            messageId,
+            roomId,
+            total: evt.total,
+            uploaded: evt.loaded
+          };
+          this.setMessageProgress(newVar)
+        }
+      });
+      return {uploaded: 0, total: size, error: null};
     }
   }
 </script>

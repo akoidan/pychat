@@ -87,6 +87,7 @@ export interface GrowlMessage extends DefaultMessage {
 export interface DeleteMessage extends DefaultMessage {
   roomId: number;
   id: number;
+  cbBySender: string;
   edited: number;
 }
 

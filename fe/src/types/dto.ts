@@ -51,7 +51,7 @@ export interface FileModelDto {
   preview: string;
 }
 
-export interface FileModelXhr {
+export interface FileModelXhr extends File{
 
 }
 

@@ -6,10 +6,7 @@
         <fieldset v-if="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
         </fieldset>
-        <div v-else-if="message.upload" :key="'p'+message.id">
-          <chat-message  :message="message" :key="message.id" :searched="emptyArray"/>
-          <app-progress-bar :value="message.upload.uploaded" v-if="message.upload.total" :total="message.upload.total"/>
-        </div>
+        <chat-sending-message v-else-if="message.sending" :message="message" :key="'p'+message.id"/>
         <chat-message :key="'m'+message.id" v-else :message="message" :searched="room.search.searchedIds" />
       </template>
     </div>
@@ -26,8 +23,9 @@
   import {SetSearchTo} from '../../types/types';
   import {MESSAGES_PER_SEARCH} from '../../utils/consts';
   import AppProgressBar from '../ui/AppProgressBar';
+  import ChatSendingMessage from './ChatSendingMessage';
 
-  @Component({components: {AppProgressBar, ChatMessage, SearchMessages}})
+  @Component({components: {ChatSendingMessage, AppProgressBar, ChatMessage, SearchMessages}})
   export default class ChatBox extends Vue {
     @Prop() room: RoomModel;
     @Action growlError;

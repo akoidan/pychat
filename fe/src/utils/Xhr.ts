@@ -116,25 +116,23 @@ export default class Xhr {
         }
         if (typeof(d.cb) === 'function') {
           let error;
+          let data;
           if (r.status === 0) {
-            error = `Can't connect to the server`;
+            error = `Connection error`;
           } else if (r.status === 200) {
-            error = null;
+            if (d.isJsonDecoded) {
+              try {
+                data = JSON.parse(r.response);
+              } catch (e) {
+                error =  `Unable to parse response ${e}`;
+              }
+            } else {
+              data = r.response;
+            }
           } else {
             error = 'Server error';
           }
-          if (d.isJsonDecoded) {
-            let parsed;
-            try {
-              parsed = JSON.parse(r.response);
-            } catch (e) {
-              d.cb(null, `Unable to parse response ${e}`);
-              return;
-            }
-            d.cb(parsed, error);
-          } else {
-            d.cb(r.response, error);
-          }
+          d.cb(data, error);
         } else {
           this.httpLogger.warn('Skipping {} callback for POST {}', d.cb, d.url)();
         }

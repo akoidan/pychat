@@ -1,33 +1,32 @@
 <template>
-  <div class="progress-wrap" :class="{animated: !finished, success: finished}">
+  <div class="progress-wrap" :class="{animated: !finished && ! upload.error, success: finished, error: upload.error}">
     <a :style="style"></a>
     <span>{{text}}</span>
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {bytesToSize} from '../../utils/utils';
+  import {bytesToSize} from "../../utils/utils";
+  import {UploadProgressModel} from "../../types/model";
 
   @Component
   export default class AppProgressBar extends Vue {
-    @Prop() total: number;
-    @Prop() value: number;
+    @Prop() upload: UploadProgressModel;
 
     get totalMb() {
-      return bytesToSize(this.total);
+      return bytesToSize(this.upload.total);
     }
 
     get valueMb() {
-      return bytesToSize(this.value);
+      return bytesToSize(this.upload.uploaded);
     }
 
     get finished() {
-      return this.total === this.value;
+      return this.upload.total === this.upload.uploaded;
     }
 
     get text() {
-      return this.finished ? 'Finished' : `${this.valueMb} / ${this.totalMb} (${this.percents})`;
+      return this.upload.error ? this.upload.error : this.finished ? "Finished" : `${this.valueMb} / ${this.totalMb} (${this.percents})`;
     }
 
     get style() {
@@ -37,7 +36,7 @@
     }
 
     get percents() {
-      return `${Math.round(this.value * 100 / this.total)}%`;
+      return this.upload.total ? `${Math.round(this.upload.uploaded * 100 / this.upload.total)}%` : 0;
     }
   }
 </script>
@@ -100,8 +99,6 @@
       background-position: 0 0
     to
       background-position: $stripe-size 0
-
-
 
 
 </style>

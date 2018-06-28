@@ -12,6 +12,7 @@
   import {Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {EditingMessage} from "../../types/model";
+  import {channelsHandler} from '../../utils/singletons';
 
 
   @Component
@@ -21,7 +22,7 @@
 
 
     m2DeleteMessage() {
-      this.$ws.sendDeleteMessage(this.editedMessage.messageId);
+      channelsHandler.sendDeleteMessage(this.editedMessage.messageId, this.editedMessage.originId);
       this.setEditedMessage(null);
     }
 

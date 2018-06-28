@@ -37,4 +37,5 @@ export const isChrome = browserVersion.indexOf('Chrome') >= 0;
 export const storage: IStorage = window.openDatabase ? new DatabaseWrapper( 'userName') : new LocalStorage();
 export  const globalLogger: Logger = loggerFactory.getLoggerColor('global', '#007a70');
 export const ws = new WsHandler(sessionHolder, channelsHandler, null, storage, store, router);
+channelsHandler.seWsHandler(ws);
 

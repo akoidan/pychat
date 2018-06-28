@@ -1,3 +1,5 @@
+import {UploadFile} from './types';
+
 export enum GrowlType {
   SUCCESS = 'col-success', INFO = 'col-info', ERROR = 'col-error'
 }
@@ -11,6 +13,7 @@ export  interface GrowlModel {
 export interface EditingMessage {
   messageId: number;
   roomId: number;
+  originId: number;
   isEditingNow: boolean;
 }
 
@@ -54,6 +57,7 @@ export  interface FileModel {
 export interface UploadProgressModel {
   total: number;
   uploaded: number;
+  error: string;
 }
 
 export  interface MessageModel {
@@ -72,6 +76,7 @@ export  interface MessageModel {
 
 export  interface SentMessageModel extends MessageModel{
   upload: UploadProgressModel;
+  sending: boolean;
 }
 
 

@@ -27,6 +27,17 @@ export interface MessageDataEncode {
 }
 
 
+export interface SetMessageProgressError {
+  messageId: number;
+  roomId: number;
+  error: string;
+}
+
+export interface RemoveSendingMessage {
+  messageId: number;
+  roomId: number;
+}
+
 export  interface IStorage {
   getIds(cb: SingleParamCB<object>);
   saveMessages(messages: MessageModel[]);
@@ -58,10 +69,14 @@ export interface SetRoomsUsers {
   users: number[];
 }
 
-export interface SetMessageProgress {
+export interface RemoveMessageProgress {
   messageId: number;
   roomId: number;
-  upload: UploadProgressModel;
+}
+
+export interface SetMessageProgress extends RemoveMessageProgress{
+  total: number;
+  uploaded: number;
 }
 
 export interface SetSearchTo {

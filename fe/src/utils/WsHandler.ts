@@ -6,7 +6,7 @@ import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
 import {default as MessageHandler} from './MesageHandler';
 import {logout} from './utils';
-import {CurrentUserInfoModel, CurrentUserSettingsModel, RootState, UserModel} from '../types/model';
+import {CurrentUserInfoModel, CurrentUserSettingsModel, RootState, SentMessageModel, UserModel} from '../types/model';
 import {IStorage, SessionHolder} from '../types/types';
 import {
   DefaultMessage,
@@ -141,6 +141,11 @@ export class WsHandler extends MessageHandler {
     return loggerFactory.getSingleLoggerColor(tag, '#006c00', console.log)('{} {}', raw, obj);
   }
 
+  public getMessageId () {
+    this.messageId++;
+    return this.messageId;
+  }
+
   // this.dom = {
   //   onlineStatus: $('onlineStatus'),
   //   onlineClass: 'online',
@@ -149,6 +154,10 @@ export class WsHandler extends MessageHandler {
   private progressInterval = {};
   private wsConnectionId = '';
 
+
+  public getWsConnectionId () {
+    return this.wsConnectionId;
+  }
 
   onWsMessage(message) {
     let jsonData = message.data;
@@ -174,8 +183,9 @@ export class WsHandler extends MessageHandler {
 
 
   private sendToServer(messageRequest, skipGrowl = false) {
-    this.messageId++;
-    messageRequest.messageId = this.messageId;
+    if (!messageRequest.messageId) {
+      messageRequest.messageId = this.getMessageId();
+    }
     let jsonRequest = JSON.stringify(messageRequest);
     return this.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
   }
@@ -202,28 +212,26 @@ export class WsHandler extends MessageHandler {
       if (!skipGrowl) {
         this.store.dispatch('growlError', 'Can\'t send message, because connection is lost :(');
       }
-      return false;
     } else {
-      this.logData('ws-out', objData, jsonRequest)();
+      this.logData('ws-out', objData, logEntry)();
       this.ws.send(jsonRequest);
-      return true;
     }
   }
 
-  sendPreventDuplicates(data, skipGrowl) {
-    this.messageId++;
-    data.messageId = this.messageId;
-    let jsonRequest = JSON.stringify(data);
-    if (!this.duplicates[jsonRequest]) {
-      this.duplicates[jsonRequest] = Date.now();
-      this.sendRawTextToServer(jsonRequest, skipGrowl, data);
-      setTimeout(() => {
-        delete this.duplicates[jsonRequest];
-      }, 5000);
-    } else {
-      this.logger.warn('blocked duplicate from sending: {}', jsonRequest)();
-    }
-  }
+  // sendPreventDuplicates(data, skipGrowl) {
+  //   this.messageId++;
+  //   data.messageId = this.messageId;
+  //   let jsonRequest = JSON.stringify(data);
+  //   if (!this.duplicates[jsonRequest]) {
+  //     this.duplicates[jsonRequest] = Date.now();
+  //     this.sendRawTextToServer(jsonRequest, skipGrowl, data);
+  //     setTimeout(() => {
+  //       delete this.duplicates[jsonRequest];
+  //     }, 5000);
+  //   } else {
+  //     this.logger.warn('blocked duplicate from sending: {}', jsonRequest)();
+  //   }
+  // }
 
 
   setStatus(isOnline) {
@@ -237,30 +245,29 @@ export class WsHandler extends MessageHandler {
     }
   }
 
-  public sendEditMessage(content: string, id: number, files: any[]) {
-    this.sendToServer({
+  public sendEditMessage(content: string, id: number, files: any[], messageId) {
+    let newVar = {
       id,
       action: 'editMessage',
       files,
+      messageId,
       content
-    });
+    };
+    this.sendToServer(newVar, true);
+    return newVar;
   }
 
-  public sendDeleteMessage(id: number) {
-    this.sendToServer({
-      id,
-      action: 'editMessage',
-      content: null
-    });
-  }
-
-  public sendSendMessage(content: string, roomId: number, files: any[]) {
-    this.sendToServer({
+  public sendSendMessage(content: string, roomId: number, files: any[], messageId: number, timeDiff) {
+    let newVar = {
       files,
+      messageId,
+      timeDiff,
       action: 'sendMessage',
       content,
       roomId
-    });
+    };
+    this.sendToServer(newVar, true);
+    return newVar;
   }
 
 
