@@ -44,7 +44,6 @@ export class WsHandler extends MessageHandler {
   private router: VueRouter;
   private sessionHolder: SessionHolder;
   private listenWsTimeout: number;
-  private sendingMessage: {} = {};
   private callBacks: { [id: number]: Function } = {};
   private handlers: AllHandlers;
   private methodHandlers = {
@@ -72,7 +71,6 @@ export class WsHandler extends MessageHandler {
       this.setUserSettings(message.userSettings);
       this.setUserImage(message.userImage);
       this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
-      this.resendMessages();
     },
     userProfileChanged(message: UserProfileChangedMessage) {
       let user: UserModel = convertUser(message);
@@ -183,7 +181,7 @@ export class WsHandler extends MessageHandler {
   }
 
 
-  private sendToServer(messageRequest, skipGrowl = false) {
+  public sendToServer(messageRequest, skipGrowl = false) {
     if (!messageRequest.messageId) {
       messageRequest.messageId = this.getMessageId();
     }
@@ -268,25 +266,7 @@ export class WsHandler extends MessageHandler {
       roomId
     };
     this.sendToServer(newVar, true);
-    this.sendingMessage[messageId] = newVar;
-  }
-
-  public removeSendingMessage(messageId) {
-    if (this.sendingMessage[messageId]) {
-      delete this.sendingMessage[messageId];
-      return true;
-    } else {
-      this.logger.warn('Got unknown message {}', messageId)();
-      return false;
-    }
-  }
-
-  private resendMessages() {
-    for (let k in this.sendingMessage) {
-      let m = this.sendingMessage[k];
-      this.logger.debug('Resending message {}', m)();
-      this.sendToServer(m, true);
-    }
+    return newVar;
   }
 
   public saveSettings(content: UserSettingsDto, cb: SingleParamCB<SetSettingsMessage>) {

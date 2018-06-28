@@ -47,6 +47,7 @@ export default class ChannelsHandler extends MessageHandler {
   private api: Api;
   private ws: WsHandler;
   private sendingFiles: {} = {};
+  private sendingMessage: {} = {};
 
   public seWsHandler(ws: WsHandler) {
     this.ws = ws;
@@ -114,7 +115,7 @@ export default class ChannelsHandler extends MessageHandler {
         }
         this.store.commit('addMessage', {message, index} as AddMessagePayload);
         if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-          let removed = this.ws.removeSendingMessage(inMessage.messageId);
+          let removed = this.removeSendingMessage(inMessage.messageId);
           if (removed) {
             this.store.commit(
                 'removeSendingMessage',
@@ -166,6 +167,26 @@ export default class ChannelsHandler extends MessageHandler {
     this.ws.sendEditMessage(null, id, null, originId);
   }
 
+  private resendMessages() {
+    for (let k in this.sendingMessage) {
+      let m = this.sendingMessage[k];
+      this.logger.debug('Resending message {}', m)();
+      m.data.timeDiff = Date.now() - m.originTime;
+      this.ws.sendToServer(m.data, true);
+    }
+  }
+
+  private removeSendingMessage(messageId) {
+    if (this.sendingMessage[messageId]) {
+      delete this.sendingMessage[messageId];
+      return true;
+    } else {
+      this.logger.warn('Got unknown message {}', messageId)();
+      return false;
+    }
+  }
+
+
   public resendFiles(id) {
     this.logger.log('resending files {}, args {} ', id, this.sendingFiles[id].args)();
     this.sendingFiles[id].cb.apply(this, this.sendingFiles[id].args);
@@ -181,7 +202,10 @@ export default class ChannelsHandler extends MessageHandler {
     let res: UploadProgressModel = null;
     let args = arguments;
     let send = (filesIds: number[]) => {
-      this.ws.sendSendMessage(content, roomId, filesIds, originId, Date.now() - originTime);
+      this.sendingMessage[originId] = {
+        originTime,
+        data: this.ws.sendSendMessage(content, roomId, filesIds, originId, Date.now() - originTime)
+      };
     };
     if (uploadfiles.length) {
       res = this.uploadFiles(originId, roomId, uploadfiles, (files: number[]) => {
@@ -328,6 +352,7 @@ export default class ChannelsHandler extends MessageHandler {
       };
       storeRooms[rm.id] = rm;
     });
+    this.resendMessages();
     this.store.commit('setRooms', storeRooms);
   }
 
