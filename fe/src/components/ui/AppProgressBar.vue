@@ -23,17 +23,21 @@
     }
 
     get finished() {
-      return this.valueMb === this.totalMb;
+      return this.total === this.value;
     }
 
     get text() {
-      return this.finished ? 'Finished' : `${this.valueMb} / ${this.totalMb}`;
+      return this.finished ? 'Finished' : `${this.valueMb} / ${this.totalMb} (${this.percents})`;
     }
 
     get style() {
       return {
-        width: `${Math.round(this.value*100/this.total)}%`
+        width: this.percents
       }
+    }
+
+    get percents() {
+      return `${Math.round(this.value * 100 / this.total)}%`;
     }
   }
 </script>

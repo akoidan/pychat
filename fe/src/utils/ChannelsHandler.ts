@@ -118,7 +118,6 @@ export default class ChannelsHandler extends MessageHandler {
       id: message.roomId,
       volume: message.volume,
       sentMessages: [],
-      progressBars: {},
       notifications: message.notifications,
       name: message.name,
       messages: [],
@@ -193,7 +192,6 @@ export default class ChannelsHandler extends MessageHandler {
         id: newRoom.roomId,
         sentMessages: oldRoom ? oldRoom.sentMessages : [],
         messages: oldRoom ? oldRoom.messages : [],
-        progressBars: {},
         name: newRoom.name,
         search: oldRoom ? oldRoom.search : {
           searchActive: false,

@@ -1,8 +1,8 @@
 <template>
   <p :class="mainCls" @contextmenu="contextmenu">
       <span class="message-header">
-        <span class="timeMess">({{getTime(message.time)}})</span>
-        <span @contextmenu.prevent="setActiveUser">{{allUsersDict[message.userId].user}}</span>: </span>
+        <span class="timeMess">({{getTime}})</span>
+        <span @contextmenu.prevent="setActiveUser">{{username}}</span>: </span>
     <span class="message-text-style" v-html="encoded" ref="content"></span>
   </p>
 </template>
@@ -43,8 +43,16 @@
       this.setActiveUserId(this.message.userId);
     }
 
-    getTime(timeMillis: number) {
-      let date = new Date(timeMillis);
+    get id() {
+      return this.message.id;
+    }
+
+    get username() {
+      return this.allUsersDict[this.message.userId].user;
+    }
+
+    get getTime() {
+      let date = new Date(this.message.time);
       return [this.sliceZero(date.getHours()), this.sliceZero(date.getMinutes()), this.sliceZero(date.getSeconds())].join(":");
     }
 
@@ -63,11 +71,9 @@
 
     created() {
       this.setEvents();
-
     }
 
     private setEvents() {
-      this.logger.debug('updated')();
       this.$nextTick(function () {
         if (this.userSettings.highlightCode) {
           highlightCode(this.$refs.content);

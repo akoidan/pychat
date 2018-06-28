@@ -70,6 +70,11 @@ export  interface MessageModel {
 }
 
 
+export  interface SentMessageModel extends MessageModel{
+  upload: UploadProgressModel;
+}
+
+
 export enum SexModel {
   Male = 'Male', Female = 'Female', Secret = 'Secret'
 }
@@ -101,8 +106,7 @@ export interface SearchModel {
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
   messages: MessageModel[];
-  sentMessages: MessageModel[];
-  progressBars: { [id: number]: UploadProgressModel };
+  sentMessages: SentMessageModel[];
   allLoaded: boolean;
   search: SearchModel;
 }

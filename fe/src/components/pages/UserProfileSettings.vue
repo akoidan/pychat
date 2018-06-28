@@ -98,7 +98,6 @@
     model: UserSettingsDto = null;
 
     created() {
-      this.logger.debug("Created userprofile page")();
       this.model = userSettingsDtoToModel(this.userSettings);
     }
 

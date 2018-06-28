@@ -6,11 +6,11 @@
         <fieldset v-if="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
         </fieldset>
-        <chat-message :message="message" :searched="[]" v-else/>
-        <div v-else-if="message.id > 1000000" :key="message.id">
-          <!--<app-progress-bar :value="room.progressBars[message.id].uploaded" v-if="room.progressBars[message.id]" :total="room.progressBars[message.id].total"/>-->
+        <div v-else-if="message.upload" :key="'p'+message.id">
+          <chat-message  :message="message" :key="message.id" :searched="emptyArray"/>
+          <app-progress-bar :value="message.upload.uploaded" v-if="message.upload.total" :total="message.upload.total"/>
         </div>
-        <chat-message v-else :key="message.id"  :message="message" :searched="room.search.searchedIds"/>
+        <chat-message :key="'m'+message.id" v-else :message="message" :searched="room.search.searchedIds" />
       </template>
     </div>
   </div>
@@ -22,7 +22,7 @@
   import SearchMessages from "./SearchMessages.vue";
   import {RoomModel, SearchModel} from "../../types/model";
   import {MessageModelDto} from '../../types/dto';
-  import {channelsHandler} from '../../utils/singletons';
+  import {channelsHandler, globalLogger} from "../../utils/singletons";
   import {SetSearchTo} from '../../types/types';
   import {MESSAGES_PER_SEARCH} from '../../utils/consts';
   import AppProgressBar from '../ui/AppProgressBar';
@@ -33,6 +33,8 @@
     @Action growlError;
     @Getter maxId;
     @Mutation setSearchTo;
+
+    emptyArray: number[] = [];
 
     loading: boolean = false;
     $refs: {
@@ -50,32 +52,29 @@
       }
     }
 
-    updated() {
-      this.logger.debug("updated")();
-      this.$nextTick(function () {
-        if (this.$refs.chatbox && this.scrollBottom) {
-          this.$refs.chatbox.scrollTop = this.$refs.chatbox.scrollHeight;
-          // globalLogger.debug("Scrolling to bottom")();
-        }
-      })
+    get id() {
+      return this.room.id;
     }
-
     get messages() {
       this.logger.debug("Reevaluating messages in room #{}", this.room.id)();
       let newArray = [];
       let dates = {};
-      this.room.messages.forEach(m => {
+      let callbackfn = m => {
         let d = new Date(m.time).toDateString();
         if (!dates[d]) {
           dates[d] = true;
           newArray.push({fieldDay: d});
         }
         newArray.push(m);
-      });
-      this.room.sentMessages.forEach(m => {
-        newArray.push(m);
+      };
+      this.room.messages.forEach(callbackfn);
+      this.room.sentMessages.forEach(callbackfn);
+      this.$nextTick(function () {
+        if (this.$refs.chatbox && this.scrollBottom) {
+          this.$refs.chatbox.scrollTop = this.$refs.chatbox.scrollHeight;
+          this.logger.debug("Scrolling to bottom")();
+        }
       })
-      // newArray.push(...this.room.sentMessages);
       return newArray;
     }
 

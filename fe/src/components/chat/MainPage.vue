@@ -30,7 +30,14 @@
   import RoomUsers from "./RoomUsers.vue"
   import ChatBox from "./ChatBox.vue"
   import SmileyHolder from "./SmileyHolder.vue"
-  import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from "../../types/model";
+  import {
+    CurrentUserInfoModel,
+    EditingMessage,
+    MessageModel,
+    RoomModel,
+    SentMessageModel,
+    UploadProgressModel
+  } from "../../types/model";
   import {
     encodeP,
     getMessageData,
@@ -43,7 +50,7 @@
   import NavUserShow from './NavUserShow.vue';
   import {sem} from '../../utils/utils';
   import {FileModelDto, FileModelXhr} from "../../types/dto";
-  import {MessageDataEncode, SetMessageProgress} from "../../types/types";
+  import {AddMessagePayload, MessageDataEncode, SetMessageProgress} from "../../types/types";
 
   @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Vue {
@@ -59,6 +66,7 @@
     // used in mixin from event.keyCode === 38
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
     @Mutation addSentMessage;
+    @Mutation addMessage;
     @Mutation setMessageProgress;
     @Mutation setMessageProgressInitial;
 
@@ -80,10 +88,6 @@
 
     addImage() {
       this.$refs.imgInput.click();
-    }
-
-    updated() {
-      this.logger.debug('updated')();
     }
 
     dropPhoto(evt) {
@@ -141,24 +145,26 @@
     }
 
     private sendWsMessage() {
-      this.logger.log("Sending message")();
+      this.logger.debug("Checking sending message")();
       let messageId = this.editedMessage && this.editedMessage.isEditingNow ? this.editedMessage.messageId : null;
       let currSymbol;
       if (messageId) {
         currSymbol = this.editingMessageModel.symbol;
       }
-      this.setEditedMessage(null);
       if (!currSymbol) {
         currSymbol = "\u3500"
       }
       let arId = this.activeRoomId;
       let um = this.$refs.userMessage;
       let md: MessageDataEncode= getMessageData(currSymbol, um);
+      if (!md.messageContent && !md.files.length) {
+        return
+      }
       let size: number = 0;
-      let id = 10_000_000 + getUniqueId();
+      let id =  getUniqueId();
       if (md.files.length) {
         md.files.forEach(f => size+= f.file.size);
-        let request = this.$api.uploadFiles(md.files, (res: FileModelXhr[], err: string) => {
+        this.$api.uploadFiles(md.files, (res: FileModelXhr[], err: string) => {
           if (err) { // TOdo async should move to vuex
             this.growlError(err);
           } else {
@@ -177,20 +183,10 @@
             this.setMessageProgress(newVar)
           }
         });
-        let mc: SetMessageProgress = {
-          roomId: arId,
-          messageId: id,
-          upload: {
-            total: size,
-            uploaded: 0
-          },
-        };
-        this.setMessageProgressInitial(mc)
-        this.logger.debug("Uploading files request ()")(request);
       } else {
         this.send(messageId, md.messageContent, arId, []);
       }
-      let mm: MessageModel = {
+      let mm: SentMessageModel = {
         roomId: arId,
         deleted: false,
         id,
@@ -199,6 +195,10 @@
         symbol: md.currSymbol,
         giphy: null,
         edited: 0,
+        upload: {
+          total: size,
+          uploaded: 0
+        },
         files: md.fileModels,
         userId: this.userInfo.userId
       };

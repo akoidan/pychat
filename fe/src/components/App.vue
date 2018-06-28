@@ -17,11 +17,6 @@
   })
   export default class App extends Vue {
     @State growls: string[];
-
-    created() {
-      this.logger.log("rendering app")();
-    }
-
   }
 </script>
 <style lang="sass" scoped>

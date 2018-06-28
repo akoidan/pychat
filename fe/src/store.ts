@@ -14,7 +14,7 @@ import {
   RoomDictModel,
   RoomModel,
   RoomSettingsModel,
-  RootState, UploadProgressModel,
+  RootState, SentMessageModel, UploadProgressModel,
   UserDictModel,
   UserModel
 } from './types/model';
@@ -109,20 +109,19 @@ const store: StoreOptions<RootState> = {
     }
   },
   mutations: {
+    setMessageProgress(state: RootState, payload: SetMessageProgress) {
+      let upload = state.roomsDict[payload.roomId].sentMessages.find(m => m.id === payload.messageId).upload;
+      upload.uploaded = payload.upload.uploaded;
+      upload.total = payload.upload.total;
+      state.editedMessage = null;
+      state.activeUserId = null;
+    },
     setEditedMessage(state: RootState, editedMessage: EditingMessage) {
       state.editedMessage = editedMessage;
       state.activeUserId = null;
     },
-    addSentMessage(state: RootState, payload: MessageModel) {
+    addSentMessage(state: RootState, payload: SentMessageModel) {
       state.roomsDict[payload.roomId].sentMessages.push(payload);
-    },
-    setMessageProgressInitial(state: RootState, payload: SetMessageProgress) {
-      let newVar = 'set';
-      Vue[newVar](state.roomsDict[payload.roomId].progressBars, payload.messageId, payload.upload);
-    },
-    setMessageProgress(state: RootState, payload: SetMessageProgress) {
-      // let newVar = 'set';
-      state.roomsDict[payload.roomId].progressBars[payload.messageId] = payload.upload;
     },
     setSearchTo(state: RootState, payload: SetSearchTo) {
       state.roomsDict[payload.roomId].search = payload.search;

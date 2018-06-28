@@ -23,9 +23,6 @@
 
   @Component({components: {UserProfileChangePassword, UserProfileImage, UserProfileInfo, UserProfileSettings}})
   export default class UserProfile extends Vue {
-    created() {
-     this.logger.debug("Created userProfile page")();
-    }
   }
 </script>
 

@@ -34,14 +34,6 @@
     smileys: {[id: string]: {[id: string]: SmileyStructure[]}} = smileys;
     activeTab: string = Object.keys(smileys)[0];
 
-    created() {
-      this.logger.log("Smiley inited {}", this.smileys)();
-    }
-
-    updated() {
-      this.logger.debug('updated')();
-    }
-
     buildUrl(smiley: SmileyStructure, tabName: string) {
       return getSmileyPath(smiley);
     }

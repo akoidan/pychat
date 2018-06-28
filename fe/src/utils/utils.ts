@@ -37,6 +37,7 @@ const ONE_DAY = 24 * 60 * 60 * 1000;
 
 
 export function sem(event, message: MessageModel, isEditingNow: boolean, userInfo: CurrentUserInfoModel, setEditedMessage: SingleParamCB<EditingMessage>) {
+  globalLogger.debug('sem {}', message.id)();
   if (message.userId === userInfo.userId && !message.deleted && message.time + ONE_DAY > Date.now()) {
     event.preventDefault();
     event.stopPropagation();

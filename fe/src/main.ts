@@ -28,14 +28,24 @@ window.onerror = function (msg, url, linenumber, column, errorObj) {
 };
 
 Vue.mixin({
-  data: function() {
-    let lg = loggerFactory.getLoggerColor(this.$options['_componentTag'] || 'vue-comp', '#35495e');
-    return {
-      get logger() {
-        return lg;
+  computed: {
+    logger() {
+      if (!this.__logger) {
+        let name = this.$options['_componentTag'] || 'vue-comp';
+        if (this.id) {
+          name += `:${this.id}`;
+        }
+        this.__logger = loggerFactory.getLoggerColor(name, '#35495e');
       }
-    };
-  }
+      return this.__logger;
+    }
+  },
+  updated: function() {
+    this.logger.debug('Updated')();
+  },
+  created: function() {
+    this.logger.debug('Created')();
+  },
 });
 
 Vue.prototype.$api = api;

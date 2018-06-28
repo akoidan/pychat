@@ -67,7 +67,6 @@
 
 
     created() {
-      this.logger.debug("Created userprofile page")();
       this.model = currentUserInfoModelToDto(this.userInfo);
     }
 
