@@ -158,21 +158,12 @@ export default class ChannelsHandler extends MessageHandler {
     },
   };
 
-  public sendEditMessage(content: string, id: number, filesIds: UploadFile[], originId: number): UploadProgressModel {
-    // this.ws.sendEditMessage(content, id, filesIds, originId);
-    return null;
-  }
-
-  public sendDeleteMessage(id: number, originId: number) {
-    this.ws.sendEditMessage(null, id, null, originId);
-  }
 
   private resendMessages() {
     for (let k in this.sendingMessage) {
       let m = this.sendingMessage[k];
       this.logger.debug('Resending message {}', m)();
-      m.data.timeDiff = Date.now() - m.originTime;
-      this.ws.sendToServer(m.data, true);
+      m();
     }
   }
 
@@ -188,8 +179,42 @@ export default class ChannelsHandler extends MessageHandler {
 
 
   public resendFiles(id) {
-    this.logger.log('resending files {}, args {} ', id, this.sendingFiles[id].args)();
-    this.sendingFiles[id].cb.apply(this, this.sendingFiles[id].args);
+    this.logger.log('resending files {} ', id)();
+    this.sendingFiles[id]();
+  }
+
+  private uploadAndSend(originId: number, cbWs, cbMethod, uploadfiles: UploadFile[], roomId: number) {
+    let res: UploadProgressModel = null;
+    let send = (filesIds: number[]) => {
+      this.sendingMessage[originId] = cbWs(filesIds);
+      this.sendingMessage[originId]();
+    };
+    if (uploadfiles.length) {
+      res = this.uploadFiles(originId, roomId, uploadfiles, (filesIds: number[]) => {
+        if (filesIds) {
+          send(filesIds);
+        } else {
+          this.sendingFiles[originId] = cbMethod;
+        }
+      });
+    } else {
+      send([]);
+    }
+    return res;
+
+  }
+
+  public sendDeleteMessage(id: number, originId: number) {
+    this.sendingMessage[originId] = () => this.ws.sendEditMessage(null, id, null, originId);
+    this.sendingMessage[originId]();
+  }
+
+  public sendEditMessage(content: string, roomId: number, id: number, uploadfiles: UploadFile[], originId: number): UploadProgressModel {
+    return this.uploadAndSend(originId, (filesIds) => {
+      return () => this.ws.sendEditMessage(content, id, filesIds, originId);
+    }, () => {
+      this.sendEditMessage(content, roomId, id, uploadfiles, originId);
+    }, uploadfiles, roomId);
   }
 
   public sendSendMessage(
@@ -199,32 +224,12 @@ export default class ChannelsHandler extends MessageHandler {
       originId: number,
       originTime
   ): UploadProgressModel {
-    let res: UploadProgressModel = null;
-    let args = arguments;
-    let send = (filesIds: number[]) => {
-      this.sendingMessage[originId] = {
-        originTime,
-        data: this.ws.sendSendMessage(content, roomId, filesIds, originId, Date.now() - originTime)
-      };
-    };
-    if (uploadfiles.length) {
-      res = this.uploadFiles(originId, roomId, uploadfiles, (files: number[]) => {
-        if (files) {
-          send(files);
-        } else {
-          this.sendingFiles[originId] = {
-            cb: this.sendSendMessage,
-            args
-          };
-        }
-      });
-    } else {
-      send([]);
-    }
-    return res;
+    return this.uploadAndSend(originId, (filesIds) => {
+      return () => this.ws.sendSendMessage(content, roomId, filesIds, originId, Date.now() - originTime);
+    }, () => {
+      this.sendSendMessage(content, roomId, uploadfiles, originId, originTime);
+    }, uploadfiles, roomId);
   }
-
-
 
   public uploadFiles(
       messageId: number,

@@ -170,26 +170,43 @@
       let now = Date.now();
       let id =  this.$ws.getMessageId();
       let upload: UploadProgressModel = null;
-
+      let mm: SentMessageModel;
       if (messageId) {
-        upload = channelsHandler.sendEditMessage(md.messageContent, messageId, md.files, id);
+        upload = channelsHandler.sendEditMessage(md.messageContent, arId, messageId, md.files, id);
+        if (this.editingMessageModel.files) {
+          Object.assign(md.fileModels, this.editingMessageModel.files);
+        }
+        mm = {
+          roomId: arId,
+          deleted: false,
+          id: messageId,
+          sending: true,
+          time: this.editingMessageModel.time,
+          content: md.messageContent,
+          symbol: md.currSymbol,
+          giphy: null,
+          edited: this.editingMessageModel.edited,
+          upload,
+          files: md.fileModels,
+          userId: this.userInfo.userId
+        };
       } else {
         upload = channelsHandler.sendSendMessage(md.messageContent, arId, md.files, id, now);
+        mm = {
+          roomId: arId,
+          deleted: false,
+          id,
+          sending: true,
+          time: now,
+          content: md.messageContent,
+          symbol: md.currSymbol,
+          giphy: null,
+          edited: 0,
+          upload,
+          files: md.fileModels,
+          userId: this.userInfo.userId
+        };
       }
-      let mm: SentMessageModel = {
-        roomId: arId,
-        deleted: false,
-        id,
-        sending: true,
-        time: now,
-        content: md.messageContent,
-        symbol: md.currSymbol,
-        giphy: null,
-        edited: 0,
-        upload,
-        files: md.fileModels,
-        userId: this.userInfo.userId
-      };
       this.addSentMessage(mm);
     }
 

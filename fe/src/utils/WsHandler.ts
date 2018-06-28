@@ -253,7 +253,6 @@ export class WsHandler extends MessageHandler {
       content
     };
     this.sendToServer(newVar, true);
-    return newVar;
   }
 
   public sendSendMessage(content: string, roomId: number, files: number[], messageId: number, timeDiff) {
@@ -266,7 +265,6 @@ export class WsHandler extends MessageHandler {
       roomId
     };
     this.sendToServer(newVar, true);
-    return newVar;
   }
 
   public saveSettings(content: UserSettingsDto, cb: SingleParamCB<SetSettingsMessage>) {
