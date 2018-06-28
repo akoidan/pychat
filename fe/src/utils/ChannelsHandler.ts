@@ -4,8 +4,10 @@ import Api from './api';
 import MessageHandler from './MesageHandler';
 import {
   AddMessagePayload,
-  MessagesLocation, RemoveMessageProgress,
-  RemoveSendingMessage, SetMessageProgress,
+  MessagesLocation,
+  RemoveMessageProgress,
+  RemoveSendingMessage,
+  SetMessageProgress,
   SetMessageProgressError,
   SetRoomsUsers,
   UploadFile
@@ -44,7 +46,6 @@ export default class ChannelsHandler extends MessageHandler {
   private store: Store<RootState>;
   private api: Api;
   private ws: WsHandler;
-  private sendingMessage: {} = {};
   private sendingFiles: {} = {};
 
   public seWsHandler(ws: WsHandler) {
@@ -113,8 +114,8 @@ export default class ChannelsHandler extends MessageHandler {
         }
         this.store.commit('addMessage', {message, index} as AddMessagePayload);
         if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-          if (this.sendingMessage[inMessage.messageId]) {
-            delete this.sendingMessage[inMessage.messageId];
+          let removed = this.ws.removeSendingMessage(inMessage.messageId);
+          if (removed) {
             this.store.commit(
                 'removeSendingMessage',
                 {
@@ -122,8 +123,6 @@ export default class ChannelsHandler extends MessageHandler {
                   roomId: inMessage.roomId
                 } as RemoveSendingMessage
             );
-          } else {
-            this.logger.warn('Got unknown message {}, known are {}', inMessage, JSON.stringify(this.sendingMessage))();
           }
         }
       }
@@ -182,8 +181,7 @@ export default class ChannelsHandler extends MessageHandler {
     let res: UploadProgressModel = null;
     let args = arguments;
     let send = (filesIds: number[]) => {
-      let m = this.ws.sendSendMessage(content, roomId, filesIds, originId, Date.now() - originTime);
-      this.sendingMessage[originId] = m;
+      this.ws.sendSendMessage(content, roomId, filesIds, originId, Date.now() - originTime);
     };
     if (uploadfiles.length) {
       res = this.uploadFiles(originId, roomId, uploadfiles, (files: number[]) => {

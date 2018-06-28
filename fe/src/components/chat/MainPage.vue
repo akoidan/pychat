@@ -176,7 +176,6 @@
       } else {
         upload = channelsHandler.sendSendMessage(md.messageContent, arId, md.files, id, now);
       }
-      this.logger.error("{} ", upload)();
       let mm: SentMessageModel = {
         roomId: arId,
         deleted: false,

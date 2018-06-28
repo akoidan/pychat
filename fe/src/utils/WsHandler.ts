@@ -44,6 +44,7 @@ export class WsHandler extends MessageHandler {
   private router: VueRouter;
   private sessionHolder: SessionHolder;
   private listenWsTimeout: number;
+  private sendingMessage: {} = {};
   private callBacks: { [id: number]: Function } = {};
   private handlers: AllHandlers;
   private methodHandlers = {
@@ -71,6 +72,7 @@ export class WsHandler extends MessageHandler {
       this.setUserSettings(message.userSettings);
       this.setUserImage(message.userImage);
       this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
+      this.resendMessages();
     },
     userProfileChanged(message: UserProfileChangedMessage) {
       let user: UserModel = convertUser(message);
@@ -131,7 +133,6 @@ export class WsHandler extends MessageHandler {
 
   private messageId: number = 0;
   private wsState: WsState = WsState.NOT_INITED;
-  private duplicates = {};
 
 
   private logData(tag, obj, raw) {
@@ -159,7 +160,7 @@ export class WsHandler extends MessageHandler {
     return this.wsConnectionId;
   }
 
-  onWsMessage(message) {
+  private onWsMessage(message) {
     let jsonData = message.data;
     let data: DefaultMessage;
     try {
@@ -172,7 +173,7 @@ export class WsHandler extends MessageHandler {
     this.handleMessage(data);
   }
 
-  handleMessage(data) {
+  private handleMessage(data) {
     this.handlers[data.handler].handle(data);
     if (this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.wsConnectionId)) {
       this.logger.debug('resolving cb')();
@@ -202,11 +203,11 @@ export class WsHandler extends MessageHandler {
     }
   }
 
-  isWsOpen() {
+  public isWsOpen() {
     return this.ws && this.ws.readyState === WebSocket.OPEN;
   }
 
-  sendRawTextToServer(jsonRequest, skipGrowl, objData) {
+  private sendRawTextToServer(jsonRequest, skipGrowl, objData) {
     let logEntry = jsonRequest.substring(0, 500);
     if (!this.isWsOpen()) {
       if (!skipGrowl) {
@@ -234,11 +235,11 @@ export class WsHandler extends MessageHandler {
   // }
 
 
-  setStatus(isOnline) {
+  private setStatus(isOnline) {
     this.store.commit('setIsOnline', isOnline);
   }
 
-  close() {
+  private close() {
     if (this.ws) {
       this.ws.onclose = null;
       this.ws.close();
@@ -267,9 +268,26 @@ export class WsHandler extends MessageHandler {
       roomId
     };
     this.sendToServer(newVar, true);
-    return newVar;
+    this.sendingMessage[messageId] = newVar;
   }
 
+  public removeSendingMessage(messageId) {
+    if (this.sendingMessage[messageId]) {
+      delete this.sendingMessage[messageId];
+      return true;
+    } else {
+      this.logger.warn('Got unknown message {}', messageId)();
+      return false;
+    }
+  }
+
+  private resendMessages() {
+    for (let k in this.sendingMessage) {
+      let m = this.sendingMessage[k];
+      this.logger.debug('Resending message {}', m)();
+      this.sendToServer(m, true);
+    }
+  }
 
   public saveSettings(content: UserSettingsDto, cb: SingleParamCB<SetSettingsMessage>) {
     this.sendToServer({
@@ -331,7 +349,7 @@ export class WsHandler extends MessageHandler {
     this.appendCB(cb);
   }
 
-  onWsClose(e) {
+  private onWsClose(e) {
     this.ws = null;
     this.setStatus(false);
     for (let cb in this.callBacks) {
@@ -398,7 +416,7 @@ export class WsHandler extends MessageHandler {
   }
 
 
-  public listenWS() {
+  private listenWS() {
     if (typeof WebSocket === 'undefined') {
       // TODO
       // alert('Your browser ({}) doesn\'t support webSockets. Supported browsers: ' +
@@ -432,7 +450,7 @@ export class WsHandler extends MessageHandler {
   }
 
 
-  startNoPingTimeout() {
+  private startNoPingTimeout() {
     if (this.noServerPingTimeout) {
       clearTimeout(this.noServerPingTimeout);
       this.logger.log('Clearing noServerPingTimeout')();
@@ -444,7 +462,7 @@ export class WsHandler extends MessageHandler {
     }, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
   }
 
-  pingServer() {
+  public pingServer() {
     if (this.sendToServer({action: 'ping'}, true)) {
       this.answerPong();
       this.pingTimeoutFunction = setTimeout(() => {
