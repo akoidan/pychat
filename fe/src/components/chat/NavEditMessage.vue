@@ -22,7 +22,7 @@
 
 
     m2DeleteMessage() {
-      channelsHandler.sendDeleteMessage(this.editedMessage.messageId, this.editedMessage.originId);
+      channelsHandler.sendDeleteMessage(this.editedMessage.messageId, this.editedMessage.messageId);
       this.setEditedMessage(null);
     }
 

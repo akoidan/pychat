@@ -1,6 +1,6 @@
 <template>
-  <div :class="{sendingMessage: !message.upload, uploadMessage: !!message.upload}">
-    <chat-message  :message="message" :searched="[]"/>
+  <div :class="cls">
+    <chat-message  :message="message" :searched="searchedIds"/>
     <app-progress-bar v-if="message.upload" @retry="retry" :upload="message.upload"/>
     <div v-else class="spinner">
     </div>
@@ -9,18 +9,30 @@
 <script lang="ts">
   import {State, Action, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {SentMessageModel} from '../../types/model';
   import ChatMessage from './ChatMessage';
   import AppProgressBar from '../ui/AppProgressBar';
   import {channelsHandler} from '../../utils/singletons';
   import {SetMessageProgressError} from '../../types/types';
+  import {MessageModel} from "../../types/model";
   @Component({
     components: {AppProgressBar, ChatMessage}
   })
   export default class ChatSendingMessage extends Vue {
-    @Prop() message: SentMessageModel;
+    @Prop() message: MessageModel;
     @Mutation setMessageProgressError;
     @Action growlInfo;
+    @State roomsDict;
+
+    get searchedIds() {
+      return this.roomsDict[this.message.roomId].search.searchedIds;
+    }
+
+    get cls() {
+      return {
+        sendingMessage: this.message.sending && !this.message.upload,
+        uploadMessage: this.message.sending && !!this.message.upload
+      }
+    }
 
     retry() {
       let newVar: SetMessageProgressError = {

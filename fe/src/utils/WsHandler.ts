@@ -6,7 +6,7 @@ import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
 import {default as MessageHandler} from './MesageHandler';
 import {logout} from './utils';
-import {CurrentUserInfoModel, CurrentUserSettingsModel, RootState, SentMessageModel, UserModel} from '../types/model';
+import {CurrentUserInfoModel, CurrentUserSettingsModel, RootState, UserModel} from '../types/model';
 import {IStorage, SessionHolder} from '../types/types';
 import {
   DefaultMessage,

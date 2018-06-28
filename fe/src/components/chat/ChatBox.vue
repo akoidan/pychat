@@ -6,8 +6,7 @@
         <fieldset v-if="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
         </fieldset>
-        <chat-sending-message v-else-if="message.sending" :message="message" :key="'p'+message.id"/>
-        <chat-message :key="'m'+message.id" v-else :message="message" :searched="room.search.searchedIds" />
+        <chat-sending-message v-else :message="message" :key="message.id"/>
       </template>
     </div>
   </div>
@@ -57,22 +56,22 @@
       this.logger.debug("Reevaluating messages in room #{}", this.room.id)();
       let newArray = [];
       let dates = {};
-      let callbackfn = m => {
-        let d = new Date(m.time).toDateString();
+      for (let m in this.room.messages) {
+        let message = this.room.messages[m];
+        let d = new Date(message.time).toDateString();
         if (!dates[d]) {
           dates[d] = true;
-          newArray.push({fieldDay: d});
+          newArray.push({fieldDay: d, time: Date.parse(d)});
         }
-        newArray.push(m);
-      };
-      this.room.messages.forEach(callbackfn);
-      this.room.sentMessages.forEach(callbackfn);
+        newArray.push(message);
+      }
+      newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
       this.$nextTick(function () {
         if (this.$refs.chatbox && this.scrollBottom) {
           this.$refs.chatbox.scrollTop = this.$refs.chatbox.scrollHeight;
           this.logger.debug("Scrolling to bottom")();
         }
-      })
+      });
       return newArray;
     }
 

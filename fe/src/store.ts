@@ -14,7 +14,7 @@ import {
   RoomDictModel,
   RoomModel,
   RoomSettingsModel,
-  RootState, SentMessageModel,
+  RootState,
   UserDictModel,
   UserModel
 } from './types/model';
@@ -25,7 +25,6 @@ import {
   SetRoomsUsers,
   SetSearchTo
 } from './types/types';
-import {getMessageById} from './utils/utils';
 
 interface State extends ActionContext<RootState, RootState> {}
 
@@ -81,17 +80,17 @@ const store: StoreOptions<RootState> = {
     maxId(state: RootState): SingleParamCB<number> {
       return (id: number) => {
         let messages = state.roomsDict[id].messages;
-        return messages.length > 0 ? messages[0].id : null;
+        let maxId = null;
+        for (let m in messages ) {
+          if (!(messages[m].id <= maxId)) {
+            maxId = messages[m].id;
+          }
+        }
+        return maxId;
       };
     },
     activeRoom(state: RootState): RoomModel {
       return state.roomsDict[state.activeRoomId];
-    },
-    minId(state: RootState): SingleParamCB<number> {
-      return (id: number) => {
-        let messages = state.roomsDict[id].messages;
-        return messages.length > 0 ? messages[messages.length - 1].id : null;
-      };
     },
     activeUser(state: RootState): UserModel {
       return state.allUsersDict[state.activeUserId];
@@ -102,7 +101,7 @@ const store: StoreOptions<RootState> = {
     editingMessageModel(state: RootState): MessageModel {
       logger.debug('Eval editingMessageModel')();
       if (state.editedMessage) {
-        return getMessageById(state, state.editedMessage.roomId, state.editedMessage.messageId);
+        return state.roomsDict[state.editedMessage.roomId].messages[state.editedMessage.messageId];
       } else {
         return null;
       }
@@ -110,30 +109,39 @@ const store: StoreOptions<RootState> = {
   },
   mutations: {
     setMessageProgress(state: RootState, payload: SetMessageProgress) {
-      let upload = state.roomsDict[payload.roomId].sentMessages.find(m => m.id === payload.messageId).upload;
+      let upload = state.roomsDict[payload.roomId].messages[payload.messageId].upload;
       upload.uploaded = payload.uploaded;
       upload.total = payload.total;
     },
     removeMessageProgress(state: RootState, payload: RemoveMessageProgress) {
-      let message: SentMessageModel = state.roomsDict[payload.roomId].sentMessages.find(m => m.id === payload.messageId);
+      let message: MessageModel = state.roomsDict[payload.roomId].messages[payload.messageId];
       message.upload  = null;
     },
-    removeSendingMessage(state: RootState, payload: RemoveSendingMessage) {
-      let sentMessages = state.roomsDict[payload.roomId].sentMessages;
-      let i = sentMessages.findIndex(m => m.id === payload.messageId);
-      sentMessages.splice(i, 1);
-    },
     setMessageProgressError(state: RootState, payload: SetMessageProgressError) {
-      let upload = state.roomsDict[payload.roomId].sentMessages.find(m => m.id === payload.messageId).upload;
+      let upload = state.roomsDict[payload.roomId].messages[payload.messageId].upload;
       upload.error = payload.error;
+    },
+    addMessage(state: RootState, m: MessageModel) {
+      let om: { [id: number]: MessageModel } = state.roomsDict[m.roomId].messages;
+      let a = 'set';
+      Vue[a](om, m.id, m);
+    },
+    deleteMessage(state: RootState, rm: RemoveSendingMessage) {
+      let a = 'delete';
+      Vue[a](state.roomsDict[rm.roomId].messages, rm.messageId);
+    },
+    editMessage(state: RootState, rm: MessageModel) {
+      Object.assign(state.roomsDict[rm.roomId].messages[rm.id], rm);
+    },
+    addMessages(state: RootState, ml: MessagesLocation) {
+      let om: { [id: number]: MessageModel } = state.roomsDict[ml.roomId].messages;
+      ml.messages.forEach(m => {
+        let a = 'set';
+        Vue[a](om, m.id, m);
+      });
     },
     setEditedMessage(state: RootState, editedMessage: EditingMessage) {
       state.editedMessage = editedMessage;
-      state.activeUserId = null;
-    },
-    addSentMessage(state: RootState, payload: SentMessageModel) {
-      state.roomsDict[payload.roomId].sentMessages.push(payload);
-      state.editedMessage = null;
       state.activeUserId = null;
     },
     setSearchTo(state: RootState, payload: SetSearchTo) {
@@ -142,11 +150,6 @@ const store: StoreOptions<RootState> = {
     setActiveUserId(state: RootState, activeUserId: number) {
       state.activeUserId = activeUserId;
       state.editedMessage = null;
-    },
-    addMessages(state: RootState, ml: MessagesLocation) {
-      let om: MessageModel[] = state.roomsDict[ml.roomId].messages;
-      om.push(...ml.messages);
-      om.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
     },
     setAllLoaded(state, roomId: number) {
       state.roomsDict[roomId].allLoaded = true;
@@ -163,17 +166,6 @@ const store: StoreOptions<RootState> = {
     },
     setRoomsUsers(state: RootState, ru: SetRoomsUsers) {
       state.roomsDict[ru.roomId].users = ru.users;
-    },
-    addMessage(state: RootState, m: AddMessagePayload) {
-      state.roomsDict[m.message.roomId].messages.splice(m.index, 0, m.message);
-    },
-    deleteMessage(state: RootState, rm: MessageModel) {
-      let m: MessageModel =  getMessageById(state, rm.roomId, rm.id);
-      Object.assign(m, rm);
-    },
-    editMessage(state: RootState, rm: MessageModel) {
-      let message = getMessageById(state, rm.roomId, rm.id);
-      Object.assign(message, rm);
     },
     setIsOnline(state: RootState, isOnline: boolean) {
       state.isOnline = isOnline;

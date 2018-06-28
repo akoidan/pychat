@@ -89,11 +89,11 @@ export interface DeleteMessage extends DefaultMessage {
   id: number;
   cbBySender: string;
   edited: number;
+  messageId: number;
 }
 
 
 export interface EditMessage extends DeleteMessage {
-  messageId: number;
   userId: number;
   content: string;
   time: number;

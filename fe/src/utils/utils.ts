@@ -2,7 +2,7 @@ import store from '../store';
 import router from '../router';
 import sessionHolder from './sessionHolder';
 import {globalLogger, ws} from './singletons';
-import {CurrentUserInfoModel, EditingMessage, MessageModel, RootState, SentMessageModel} from '../types/model';
+import {CurrentUserInfoModel, EditingMessage, MessageModel, RootState} from '../types/model';
 
 export function logout(errMessage: string) {
   store.dispatch('logout');
@@ -41,22 +41,11 @@ export function sem(event, message: MessageModel, isEditingNow: boolean, userInf
   if (message.userId === userInfo.userId && !message.deleted && message.time + ONE_DAY > Date.now()) {
     event.preventDefault();
     event.stopPropagation();
-    let originId: number = null;
-    if (message['originId']) {
-      let sm: SentMessageModel = message as SentMessageModel;
-      originId = sm.id;
-    }
     let newVar: EditingMessage = {
       messageId: message.id,
       isEditingNow,
-      originId,
       roomId: message.roomId
     };
     setEditedMessage(newVar);
   }
-}
-
-
-export function getMessageById(state: RootState, roomId: number, messageId: number): MessageModel {
-  return state.roomsDict[roomId].messages.find(r => r.id === messageId);
 }

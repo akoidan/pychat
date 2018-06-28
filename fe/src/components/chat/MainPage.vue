@@ -26,37 +26,17 @@
 
 <script lang='ts'>
   import {Component, Vue, Watch} from "vue-property-decorator";
-  import {Action, Getter, State, Mutation} from "vuex-class";
+  import {Action, Getter, Mutation, State} from "vuex-class";
   import RoomUsers from "./RoomUsers.vue"
   import ChatBox from "./ChatBox.vue"
   import SmileyHolder from "./SmileyHolder.vue"
-  import {
-    CurrentUserInfoModel,
-    EditingMessage,
-    MessageModel,
-    RoomModel,
-    SentMessageModel,
-    UploadProgressModel
-  } from "../../types/model";
-  import {
-    encodeP,
-    getMessageData,
-    getSmileyHtml,
-    getUniqueId,
-    pasteHtmlAtCaret,
-    pasteImgToTextArea, Utils
-  } from "../../utils/htmlApi";
-  import NavEditMessage from './NavEditMessage.vue';
-  import NavUserShow from './NavUserShow.vue';
-  import {sem} from '../../utils/utils';
-  import {
-    AddMessagePayload,
-    MessageDataEncode, RemoveMessageProgress,
-    SetMessageProgress,
-    SetMessageProgressError,
-    UploadFile
-  } from "../../types/types";
-  import {channelsHandler} from '../../utils/singletons';
+  import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel, UploadProgressModel} from "../../types/model";
+  import {encodeP, getMessageData, getSmileyHtml, pasteHtmlAtCaret, pasteImgToTextArea} from "../../utils/htmlApi";
+  import NavEditMessage from "./NavEditMessage.vue";
+  import NavUserShow from "./NavUserShow.vue";
+  import {sem} from "../../utils/utils";
+  import {MessageDataEncode} from "../../types/types";
+  import {channelsHandler} from "../../utils/singletons";
 
   @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Vue {
@@ -71,7 +51,6 @@
     @Action growlError;
     // used in mixin from event.keyCode === 38
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
-    @Mutation addSentMessage;
     @Mutation addMessage;
     @Mutation setMessageProgress;
     @Mutation setMessageProgressError;
@@ -100,7 +79,6 @@
     dropPhoto(evt) {
       this.logger.debug("Drop photo {} ", evt.dataTransfer.files)();
       if (evt.dataTransfer.files) {
-        this.logger.debug("if")();
         for (var i = 0; i < evt.dataTransfer.files.length; i++) {
           this.logger.debug("loop")();
           var file = evt.dataTransfer.files[i];
@@ -143,10 +121,15 @@
 
         }
       } else if (event.keyCode === 38 && this.$refs.userMessage.innerHTML == "") { // up arrow
-        let ms = this.activeRoom.messages;
-        if (ms.length > 0) {
-          let m = ms[ms.length-1];
-          sem(event, m, true, this.userInfo, this.setEditedMessage);
+        let messages = this.activeRoom.messages;
+        if (Object.keys(messages).length > 0) {
+          let maxId: MessageModel = null;
+          for (let m in messages ) {
+            if (!maxId || (messages[m].time >= maxId.time)) {
+              maxId = messages[m];
+            }
+          }
+          sem(event, maxId, true, this.userInfo, this.setEditedMessage);
         }
       }
     }
@@ -168,11 +151,11 @@
         return
       }
       let now = Date.now();
-      let id =  this.$ws.getMessageId();
+      let id =  -this.$ws.getMessageId();
       let upload: UploadProgressModel = null;
-      let mm: SentMessageModel;
+      let mm: MessageModel;
       if (messageId) {
-        upload = channelsHandler.sendEditMessage(md.messageContent, arId, messageId, md.files, id);
+        upload = channelsHandler.sendEditMessage(md.messageContent, arId, messageId, md.files);
         if (this.editingMessageModel.files) {
           Object.assign(md.fileModels, this.editingMessageModel.files);
         }
@@ -207,7 +190,7 @@
           userId: this.userInfo.userId
         };
       }
-      this.addSentMessage(mm);
+      this.addMessage(mm);
     }
 
 

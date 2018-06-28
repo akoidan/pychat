@@ -17,7 +17,7 @@ import {
   RoomDictModel,
   RoomModel,
   RootState,
-  SentMessageModel, UploadProgressModel,
+   UploadProgressModel,
   UserDictModel,
   UserModel
 } from '../types/model';
@@ -36,7 +36,6 @@ import {
   RemoveOnlineUserMessage
 } from '../types/messages';
 import {MessageModelDto, RoomDto, UserDto} from '../types/dto';
-import {getMessageById} from './utils';
 import {convertFiles, convertUser} from '../types/converters';
 import {WsHandler} from './WsHandler';
 
@@ -68,25 +67,31 @@ export default class ChannelsHandler extends MessageHandler {
         this.store.commit('setAllLoaded', lm.roomId);
       }
     },
-    deleteMessage(message: DeleteMessage) {
-      let existingMessage = getMessageById(this.store.state, message.roomId, message.id);
-      if (existingMessage) {
-        this.logger.debug('Deleting message {}', message)();
-        let newBody: MessageModel = this.getMessage(message);
-        newBody.deleted = true;
-        this.store.commit('deleteMessage', newBody);
+    deleteMessage(inMessage: DeleteMessage) {
+      let message: MessageModel = this.store.state.roomsDict[inMessage.roomId].messages[inMessage.id];
+      if (!message) {
+        this.logger.debug('Unable to find message {} to delete it', inMessage)();
       } else {
-        this.logger.debug('Unable to find message {} to delete it', message)();
+        let message: MessageModel = this.getMessage(inMessage);
+        message.deleted = true;
+        this.logger.debug('Adding message to storage {}', message)();
+        this.store.commit('editMessage', message);
+        if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
+          let removed = this.removeSendingMessage(inMessage.messageId);
+        }
       }
-      this.store.commit('deleteMessage', message);
     },
-    editMessage(message: EditMessage) {
-      let existingMessage = getMessageById(this.store.state, message.roomId, message.id);
-      if (existingMessage) {
-        this.logger.debug('Editing message {}', message)();
-        this.store.commit('editMessage', this.getMessage(message));
+    editMessage(inMessage: EditMessage) {
+      let message: MessageModel = this.store.state.roomsDict[inMessage.roomId].messages[inMessage.id];
+      if (!message) {
+        this.logger.debug('Unable to find message {} to edit it', inMessage)();
       } else {
-        this.logger.debug('Unable to find message {} to edit it', message)();
+        let message: MessageModel = this.getMessage(inMessage);
+        this.logger.debug('Adding message to storage {}', message)();
+        this.store.commit('editMessage', message);
+        if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
+          let removed = this.removeSendingMessage(inMessage.messageId);
+        }
       }
     },
     addOnlineUser(message: AddOnlineUserMessage) {
@@ -100,34 +105,22 @@ export default class ChannelsHandler extends MessageHandler {
       this.store.commit('setOnline', message.content);
     },
     printMessage(inMessage: EditMessage) {
-      let r: RoomModel = this.store.state.roomsDict[inMessage.roomId];
-      if (r && r.messages.find(m => m.id === inMessage.id)) {
+      let message: MessageModel = this.store.state.roomsDict[inMessage.roomId].messages[inMessage.id];
+      if (message) {
         this.logger.debug('Skipping printing message {}, because it\'s already in list', inMessage.id)();
       } else {
         let message: MessageModel = this.getMessage(inMessage);
         this.logger.debug('Adding message to storage {}', message)();
-        let room = this.store.state.roomsDict[message.roomId];
-        let index = 0;
-        for (; index < room.messages.length; index++) {
-          if (room.messages[index].time > message.time) {
-            break;
-          }
-        }
-        this.store.commit('addMessage', {message, index} as AddMessagePayload);
+        this.store.commit('addMessage', message);
         if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-          let removed = this.removeSendingMessage(inMessage.messageId);
-          if (removed) {
-            this.store.commit(
-                'removeSendingMessage',
-                {
-                  messageId: inMessage.messageId,
-                  roomId: inMessage.roomId
-                } as RemoveSendingMessage
-            );
-          }
+          this.removeSendingMessage(inMessage.messageId);
+          let rmMes: RemoveSendingMessage = {
+            messageId: inMessage.messageId,
+            roomId: inMessage.roomId
+          };
+          this.store.commit('deleteMessage', rmMes);
         }
       }
-
     },
     deleteRoom(message: DeleteRoomMessage) {
       if (this.store.state.roomsDict[message.roomId]) {
@@ -209,11 +202,11 @@ export default class ChannelsHandler extends MessageHandler {
     this.sendingMessage[originId]();
   }
 
-  public sendEditMessage(content: string, roomId: number, id: number, uploadfiles: UploadFile[], originId: number): UploadProgressModel {
-    return this.uploadAndSend(originId, (filesIds) => {
-      return () => this.ws.sendEditMessage(content, id, filesIds, originId);
+  public sendEditMessage(content: string, roomId: number, id: number, uploadfiles: UploadFile[]): UploadProgressModel {
+    return this.uploadAndSend(id, (filesIds) => {
+      return () => this.ws.sendEditMessage(content, id, filesIds, id);
     }, () => {
-      this.sendEditMessage(content, roomId, id, uploadfiles, originId);
+      this.sendEditMessage(content, roomId, id, uploadfiles);
     }, uploadfiles, roomId);
   }
 
@@ -275,10 +268,9 @@ export default class ChannelsHandler extends MessageHandler {
     let r: RoomModel = {
       id: message.roomId,
       volume: message.volume,
-      sentMessages: [],
       notifications: message.notifications,
       name: message.name,
-      messages: [],
+      messages: {},
       allLoaded: false,
       search: {
         searchActive: false,
@@ -292,12 +284,8 @@ export default class ChannelsHandler extends MessageHandler {
   }
 
   public addMessages(roomId: number, inMessages: MessageModelDto[]) {
-    let oldMessages: MessageModel[] = this.store.state.roomsDict[roomId].messages;
-    let oldMessagesDist = {};
-    oldMessages.forEach(m => {
-      oldMessagesDist[m.id] = true;
-    });
-    let newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessagesDist[i.id]);
+    let oldMessages: { [id: number]: MessageModel } = this.store.state.roomsDict[roomId].messages;
+    let newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessages[i.id]);
     let messages: MessageModel[] = newMesages.map(this.getMessage.bind(this));
     this.store.commit('addMessages', {messages, roomId: roomId} as MessagesLocation);
   }
@@ -327,6 +315,8 @@ export default class ChannelsHandler extends MessageHandler {
       edited: message.edited || null,
       roomId: message.roomId,
       userId: message.userId,
+      upload: null,
+      sending: false,
       giphy: message.giphy || null,
       deleted: message.deleted || null
     };
@@ -341,8 +331,7 @@ export default class ChannelsHandler extends MessageHandler {
       let oldRoom = roomsDict[newRoom.roomId];
       let rm: RoomModel = {
         id: newRoom.roomId,
-        sentMessages: oldRoom ? oldRoom.sentMessages : [],
-        messages: oldRoom ? oldRoom.messages : [],
+        messages: oldRoom ? oldRoom.messages : {},
         name: newRoom.name,
         search: oldRoom ? oldRoom.search : {
           searchActive: false,

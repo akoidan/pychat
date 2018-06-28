@@ -13,7 +13,6 @@ export  interface GrowlModel {
 export interface EditingMessage {
   messageId: number;
   roomId: number;
-  originId: number;
   isEditingNow: boolean;
 }
 
@@ -71,14 +70,9 @@ export  interface MessageModel {
   edited: number;
   roomId: number;
   userId: number;
-}
-
-
-export  interface SentMessageModel extends MessageModel{
   upload: UploadProgressModel;
   sending: boolean;
 }
-
 
 export enum SexModel {
   Male = 'Male', Female = 'Female', Secret = 'Secret'
@@ -110,8 +104,7 @@ export interface SearchModel {
 
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
-  messages: MessageModel[];
-  sentMessages: SentMessageModel[];
+  messages: { [id: number]: MessageModel };
   allLoaded: boolean;
   search: SearchModel;
 }
