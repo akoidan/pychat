@@ -1,7 +1,7 @@
 <template>
   <div :class="{sendingMessage: !message.upload, uploadMessage: !!message.upload}">
     <chat-message  :message="message" :searched="[]"/>
-    <app-progress-bar v-if="message.upload" :upload="message.upload"/>
+    <app-progress-bar v-if="message.upload" @retry="retry" :upload="message.upload"/>
     <div v-else class="spinner">
     </div>
   </div>
@@ -12,11 +12,26 @@
   import {SentMessageModel} from '../../types/model';
   import ChatMessage from './ChatMessage';
   import AppProgressBar from '../ui/AppProgressBar';
+  import {channelsHandler} from '../../utils/singletons';
+  import {SetMessageProgressError} from '../../types/types';
   @Component({
     components: {AppProgressBar, ChatMessage}
   })
   export default class ChatSendingMessage extends Vue {
     @Prop() message: SentMessageModel;
+    @Mutation setMessageProgressError;
+    @Action growlInfo;
+
+    retry() {
+      let newVar: SetMessageProgressError = {
+        messageId: this.message.id,
+        roomId: this.message.roomId,
+        error: null
+      };
+      this.setMessageProgressError(newVar);
+      channelsHandler.resendFiles(this.message.id);
+      this.growlInfo("Trying to upload files again");
+    }
   }
 </script>
 

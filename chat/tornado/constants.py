@@ -77,6 +77,7 @@ class VarNames(object):
 	LOAD_MESSAGES_HISTORY = 'history'
 	LOAD_MESSAGES_OFFLINE = 'offline'
 	ONLINE = 'online'
+	TIME_DIFF ='timeDiff'
 	EDITED_TIMES = 'edited'
 	PREVIEW = 'preview'
 	DELETED = 'deleted'

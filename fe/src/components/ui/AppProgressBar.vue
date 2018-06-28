@@ -1,7 +1,12 @@
 <template>
-  <div class="progress-wrap" :class="{animated: !finished && ! upload.error, success: finished, error: upload.error}">
-    <a :style="style"></a>
-    <span>{{text}}</span>
+  <div class="holder">
+    <div class="progress-wrap"
+         :class="{animated: !finished && ! upload.error, success: finished, error: upload.error}">
+      <a :style="style"></a>
+      <span>{{text}}</span>
+    </div>
+    <i v-if="upload.error" class="icon-repeat" @click="click">
+    </i>
   </div>
 </template>
 <script lang="ts">
@@ -21,8 +26,14 @@
       return bytesToSize(this.upload.uploaded);
     }
 
+    click() {
+      if (this.upload.error) {
+        this.$emit('retry');
+      }
+    }
+
     get finished() {
-      return this.upload.total === this.upload.uploaded;
+      return this.upload.total === this.upload.uploaded && this.upload.total !== 0;
     }
 
     get text() {
@@ -45,13 +56,21 @@
   @import "partials/mixins"
   $height: 20px
   $stripe-size: $height * 2
+  .holder
+    text-align: center
+    > *
+      display: inline-block
+
+  .icon-repeat
+    position: relative
+    top: -2px
+    cursor: pointer
+
   .progress-wrap
     $border-radius: 10px
     $padding: 2px
     $inner-border-radius: $border-radius - $padding
-    display: block
     width: 200px
-    margin: 0 auto
     position: relative
     height: $height
     background: #1a1e22

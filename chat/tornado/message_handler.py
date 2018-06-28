@@ -248,6 +248,8 @@ class MessagesHandler(MessagesCreator):
 
 		# @transaction.atomic mysql has gone away
 		def send_message(message, giphy=None):
+			if message[VarNames.TIME_DIFF] < 0:
+				raise ValidationError("Back to the future?")
 			files = UploadedFile.objects.filter(id__in=message.get(VarNames.FILES), user_id=self.user_id)
 			symbol = get_max_key(files)
 			channel = message[VarNames.ROOM_ID]
@@ -259,6 +261,7 @@ class MessagesHandler(MessagesCreator):
 				giphy=giphy,
 				room_id=channel
 			)
+			message_db.time -= message[VarNames.TIME_DIFF]
 			res_files = []
 			do_db(message_db.save)
 			if files:

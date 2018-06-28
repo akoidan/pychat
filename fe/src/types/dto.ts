@@ -51,10 +51,6 @@ export interface FileModelDto {
   preview: string;
 }
 
-export interface FileModelXhr extends File{
-
-}
-
 export interface MessageModelDto {
   id: number;
   time: number;

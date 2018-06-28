@@ -145,8 +145,7 @@ class MessagesCreator(object):
 			res[VarNames.GIPHY] = message.giphy
 		return res
 
-	@classmethod
-	def create_send_message(cls, message, event, files, js_id):
+	def create_send_message(self, message, event, files, js_id):
 		"""
 		:type message: chat.models.Message
 		:type imgs: dict
@@ -154,9 +153,10 @@ class MessagesCreator(object):
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
 		"sex": "Alien", "user": "tRD6emzs", "time": "20:48:57"}
 		"""
-		res = cls.create_message(message, files)
+		res = self.create_message(message, files)
 		res[VarNames.EVENT] = event
 		res[VarNames.JS_MESSAGE_ID] = js_id
+		res[VarNames.CB_BY_SENDER] = self.id
 		res[VarNames.HANDLER_NAME] = HandlerNames.CHANNELS
 		return res
 

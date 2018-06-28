@@ -49,7 +49,6 @@
   import NavEditMessage from './NavEditMessage.vue';
   import NavUserShow from './NavUserShow.vue';
   import {sem} from '../../utils/utils';
-  import {FileModelDto, FileModelXhr} from "../../types/dto";
   import {
     AddMessagePayload,
     MessageDataEncode, RemoveMessageProgress,
@@ -171,22 +170,13 @@
       let now = Date.now();
       let id =  this.$ws.getMessageId();
       let upload: UploadProgressModel = null;
-      let send = (files: FileModelXhr[]) => {
-        if (messageId) {
-          channelsHandler.sendEditMessage(md.messageContent, messageId, files, id);
-        } else {
-          channelsHandler.sendSendMessage(md.messageContent, arId, files, id, now);
-        }
-      };
-      if (md.files.length) {
-        upload = this.uploadFiles(id, arId, md.files, (res: FileModelXhr[]) => {
-          if (res) {
-            send(res);
-          }
-        });
+
+      if (messageId) {
+        upload = channelsHandler.sendEditMessage(md.messageContent, messageId, md.files, id);
       } else {
-        send([]);
+        upload = channelsHandler.sendSendMessage(md.messageContent, arId, md.files, id, now);
       }
+      this.logger.error("{} ", upload)();
       let mm: SentMessageModel = {
         roomId: arId,
         deleted: false,
@@ -204,43 +194,7 @@
       this.addSentMessage(mm);
     }
 
-    private uploadFiles(
-        messageId: number,
-        roomId: number,
-        files: UploadFile[],
-        cb: SingleParamCB<FileModelXhr[]>
-    ): UploadProgressModel {
-      files.forEach(f => size += f.file.size);
-      let size: number = 0;
-      this.$api.uploadFiles(files, (res: FileModelXhr[], error: string) => {
-        if (error) {
-          let newVar: SetMessageProgressError = {
-            messageId,
-            roomId,
-            error,
-          };
-          this.setMessageProgressError(newVar);
-          cb(null)
-        } else {
-          let newVar: RemoveMessageProgress = {
-            messageId, roomId
-          };
-          this.removeMessageProgress(newVar);
-          cb(res);
-        }
-      }, evt => {
-        if (evt.lengthComputable) {
-          let newVar: SetMessageProgress = {
-            messageId,
-            roomId,
-            total: evt.total,
-            uploaded: evt.loaded
-          };
-          this.setMessageProgress(newVar)
-        }
-      });
-      return {uploaded: 0, total: size, error: null};
-    }
+
   }
 </script>
 <style lang="sass" scoped>

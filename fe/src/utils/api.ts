@@ -1,7 +1,7 @@
 import Xhr from './Xhr';
 import {RESPONSE_SUCCESS} from './consts';
 import {UploadFile} from '../types/types';
-import {FileModelXhr, MessageModelDto, UserProfileDto, UserSettingsDto} from '../types/dto';
+import {MessageModelDto, UserProfileDto, UserSettingsDto} from '../types/dto';
 import {UserModel} from '../types/model';
 
 export default class Api {
@@ -148,12 +148,12 @@ export default class Api {
   }
 
 
-  public uploadFiles(files: UploadFile[], cb: ErrorCB<FileModelXhr[]>, progress: Function) {
+  public uploadFiles(files: UploadFile[], cb: ErrorCB<number[]>, progress: Function) {
     let fd = new FormData();
     files.forEach(function(sd) {
       fd.append(sd.type + sd.symbol, sd.file, sd.file.name);
     });
-    this.xhr.doPost<FileModelXhr[]>({
+    this.xhr.doPost<number[]>({
       url: '/upload_file',
       isJsonDecoded: true,
       formData: fd,

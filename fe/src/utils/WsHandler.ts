@@ -245,7 +245,7 @@ export class WsHandler extends MessageHandler {
     }
   }
 
-  public sendEditMessage(content: string, id: number, files: any[], messageId) {
+  public sendEditMessage(content: string, id: number, files: number[], messageId) {
     let newVar = {
       id,
       action: 'editMessage',
@@ -257,7 +257,7 @@ export class WsHandler extends MessageHandler {
     return newVar;
   }
 
-  public sendSendMessage(content: string, roomId: number, files: any[], messageId: number, timeDiff) {
+  public sendSendMessage(content: string, roomId: number, files: number[], messageId: number, timeDiff) {
     let newVar = {
       files,
       messageId,

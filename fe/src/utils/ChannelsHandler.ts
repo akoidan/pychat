@@ -2,13 +2,20 @@ import loggerFactory from './loggerFactory';
 import {Store} from 'vuex';
 import Api from './api';
 import MessageHandler from './MesageHandler';
-import {AddMessagePayload, MessagesLocation, RemoveSendingMessage, SetRoomsUsers} from '../types/types';
+import {
+  AddMessagePayload,
+  MessagesLocation, RemoveMessageProgress,
+  RemoveSendingMessage, SetMessageProgress,
+  SetMessageProgressError,
+  SetRoomsUsers,
+  UploadFile
+} from '../types/types';
 import {
   MessageModel,
   RoomDictModel,
   RoomModel,
   RootState,
-  SentMessageModel,
+  SentMessageModel, UploadProgressModel,
   UserDictModel,
   UserModel
 } from '../types/model';
@@ -26,7 +33,7 @@ import {
   LoadMessages,
   RemoveOnlineUserMessage
 } from '../types/messages';
-import {FileModelXhr, MessageModelDto, RoomDto, UserDto} from '../types/dto';
+import {MessageModelDto, RoomDto, UserDto} from '../types/dto';
 import {getMessageById} from './utils';
 import {convertFiles, convertUser} from '../types/converters';
 import {WsHandler} from './WsHandler';
@@ -38,6 +45,7 @@ export default class ChannelsHandler extends MessageHandler {
   private api: Api;
   private ws: WsHandler;
   private sendingMessage: {} = {};
+  private sendingFiles: {} = {};
 
   public seWsHandler(ws: WsHandler) {
     this.ws = ws;
@@ -150,17 +158,90 @@ export default class ChannelsHandler extends MessageHandler {
     },
   };
 
-  public sendEditMessage(content: string, id: number, files: FileModelXhr[], originId: number) {
-    this.ws.sendEditMessage(content, id, files, originId);
+  public sendEditMessage(content: string, id: number, filesIds: UploadFile[], originId: number): UploadProgressModel {
+    // this.ws.sendEditMessage(content, id, filesIds, originId);
+    return null;
   }
 
   public sendDeleteMessage(id: number, originId: number) {
     this.ws.sendEditMessage(null, id, null, originId);
   }
 
-  public sendSendMessage(content: string, roomId: number, files: FileModelXhr[], originId: number, originTime) {
-    let m = this.ws.sendSendMessage(content, roomId, files, originId, Date.now() - originTime);
-    this.sendingMessage[originId] = m;
+  public resendFiles(id) {
+    this.logger.log('resending files {}, args {} ', id, this.sendingFiles[id].args)();
+    this.sendingFiles[id].cb.apply(this, this.sendingFiles[id].args);
+  }
+
+  public sendSendMessage(
+      content: string,
+      roomId: number,
+      uploadfiles: UploadFile[],
+      originId: number,
+      originTime
+  ): UploadProgressModel {
+    let res: UploadProgressModel = null;
+    let args = arguments;
+    let send = (filesIds: number[]) => {
+      let m = this.ws.sendSendMessage(content, roomId, filesIds, originId, Date.now() - originTime);
+      this.sendingMessage[originId] = m;
+    };
+    if (uploadfiles.length) {
+      res = this.uploadFiles(originId, roomId, uploadfiles, (files: number[]) => {
+        if (files) {
+          send(files);
+        } else {
+          this.sendingFiles[originId] = {
+            cb: this.sendSendMessage,
+            args
+          };
+        }
+      });
+    } else {
+      send([]);
+    }
+    return res;
+  }
+
+
+
+  public uploadFiles(
+      messageId: number,
+      roomId: number,
+      files: UploadFile[],
+      cb: SingleParamCB<number[]>
+  ): UploadProgressModel {
+    let size: number = 0;
+    files.forEach(f => {
+      return size += f.file.size;
+    });
+    this.api.uploadFiles(files, (res: number[], error: string) => {
+      if (error) {
+        let newVar: SetMessageProgressError = {
+          messageId,
+          roomId,
+          error,
+        };
+        this.store.commit('setMessageProgressError', newVar);
+        cb(null);
+      } else {
+        let newVar: RemoveMessageProgress = {
+          messageId, roomId
+        };
+        this.store.commit('removeMessageProgress', newVar);
+        cb(res);
+      }
+    }, evt => {
+      if (evt.lengthComputable) {
+        let newVar: SetMessageProgress = {
+          messageId,
+          roomId,
+          total: evt.total,
+          uploaded: evt.loaded
+        };
+        this.store.commit('setMessageProgress', newVar);
+      }
+    });
+    return {uploaded: 0, total: size, error: null};
   }
 
   private mutateRoomAddition(message: AddRoomBase) {
