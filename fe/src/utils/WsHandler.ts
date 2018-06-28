@@ -1,10 +1,16 @@
-import {API_URL, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT, CONNECTION_RETRY_TIME, PING_CLOSE_JS_DELAY} from './consts';
+import {
+  API_URL,
+  CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT,
+  CONNECTION_RETRY_TIME,
+  IS_DEBUG,
+  PING_CLOSE_JS_DELAY
+} from './consts';
 import {Store} from 'vuex';
 import {VueRouter} from 'vue-router/types/router';
-
+import {LogStrict} from 'lines-logger';
 import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
-import {default as MessageHandler} from './MesageHandler';
+import MessageHandler from './MesageHandler';
 import {logout} from './utils';
 import {CurrentUserInfoModel, CurrentUserSettingsModel, RootState, UserModel} from '../types/model';
 import {IStorage, SessionHolder} from '../types/types';
@@ -52,7 +58,7 @@ export class WsHandler extends MessageHandler {
     },
     setSettings(m: SetSettingsMessage) {
       let a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
-      this.store.commit('setUserSettings', a);
+      this.setUserSettings(a);
     },
     setUserProfile(m: SetUserProfileMessage) {
       let a: CurrentUserInfoModel = currentUserInfoDtoToModel(m.content);
@@ -93,6 +99,9 @@ export class WsHandler extends MessageHandler {
 
   private setUserSettings(userInfo: UserSettingsDto) {
     let um: UserSettingsDto = userSettingsDtoToModel(userInfo);
+    if (!IS_DEBUG) {
+      loggerFactory.setLogWarnings(userInfo.logs ? LogStrict.LOG_WITHOUT_WARNINGS : LogStrict.DISABLE_LOGS);
+    }
     this.store.commit('setUserSettings', um);
   }
 

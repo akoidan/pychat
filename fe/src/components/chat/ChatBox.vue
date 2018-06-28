@@ -28,10 +28,8 @@
   export default class ChatBox extends Vue {
     @Prop() room: RoomModel;
     @Action growlError;
-    @Getter maxId;
+    @Getter minId;
     @Mutation setSearchTo;
-
-    emptyArray: number[] = [];
 
     loading: boolean = false;
     $refs: {
@@ -131,7 +129,7 @@
           });
         } else if (!s.searchActive && !this.room.allLoaded) {
           this.loading = true;
-          this.$ws.sendLoadMessages(this.room.id, this.maxId(this.room.id), n, () => {
+          this.$ws.sendLoadMessages(this.room.id, this.minId(this.room.id), n, () => {
             this.loading = false;
           });
         }

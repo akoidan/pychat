@@ -33,7 +33,7 @@
   @import "partials/mixins"
   @import "partials/variables"
 
-  input[type=checkbox]
+  .color-reg input[type=checkbox], .color-lor input[type=checkbox]
     display: none
     + label
       display: block

@@ -27,7 +27,6 @@
     @State userSettings: CurrentUserSettingsModel;
     @State userInfo: CurrentUserInfoModel;
     @Prop() message: MessageModel;
-    @Prop() searched: number[];
     @State allUsersDict: UserDictModel;
     @State editedMessage : EditingMessage;
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
@@ -95,7 +94,6 @@
         "message-others": !this.isSelf,
         "removed-message": this.message.deleted,
         "highLightMessage": this.isEditing,
-        "filter-search": this.searched.indexOf(this.message.id) >= 0,
       }
     }
 

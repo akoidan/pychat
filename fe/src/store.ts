@@ -79,11 +79,26 @@ const store: StoreOptions<RootState> = {
     },
     maxId(state: RootState): SingleParamCB<number> {
       return (id: number) => {
+        logger.debug('maxId {}', id)();
         let messages = state.roomsDict[id].messages;
         let maxId = null;
         for (let m in messages ) {
           if (!(messages[m].id <= maxId)) {
             maxId = messages[m].id;
+          }
+        }
+        return maxId;
+      };
+    },
+    minId(state: RootState): SingleParamCB<number> {
+      return (id: number) => {
+        logger.debug('minId {}', id)();
+        let messages = state.roomsDict[id].messages;
+        let maxId;
+        for (let m in messages ) {
+          let id = messages[m].id;
+          if (id > 0 && (!maxId || id < maxId)) {
+            maxId = id;
           }
         }
         return maxId;

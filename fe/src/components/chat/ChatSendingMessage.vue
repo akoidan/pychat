@@ -1,6 +1,6 @@
 <template>
   <div :class="cls">
-    <chat-message  :message="message" :searched="searchedIds"/>
+    <chat-message :message="message"/>
     <app-progress-bar v-if="message.upload" @retry="retry" :upload="message.upload"/>
     <div v-else class="spinner">
     </div>
@@ -30,7 +30,8 @@
     get cls() {
       return {
         sendingMessage: this.message.sending && !this.message.upload,
-        uploadMessage: this.message.sending && !!this.message.upload
+        uploadMessage: this.message.sending && !!this.message.upload,
+        "filter-search": this.searchedIds.indexOf(this.message.id) >= 0,
       }
     }
 
