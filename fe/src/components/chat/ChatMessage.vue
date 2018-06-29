@@ -17,7 +17,14 @@
     UserDictModel,
     UserModel
   } from "../../types/model";
-  import {encodeHTML, encodeMessage, highlightCode, setVideoEvent, setYoutubeEvent} from "../../utils/htmlApi";
+  import {
+    encodeHTML,
+    encodeMessage,
+    highlightCode,
+    setImageFailEvents,
+    setVideoEvent,
+    setYoutubeEvent
+  } from "../../utils/htmlApi";
   import {sem} from '../../utils/utils';
 
 
@@ -81,6 +88,7 @@
           setYoutubeEvent(this.$refs.content)
         }
         setVideoEvent(this.$refs.content);
+        setImageFailEvents(this.$refs.content);
       })
     }
 
@@ -152,10 +160,13 @@
       .icon-youtube-play
         position: absolute
         z-index: 13
-        top: 50%
-        left: 50%
-        margin-top: -50px
-        margin-left: -55px
+        cursor: pointer
+        max-width: 100%
+        max-height: 100%
+        bottom: 50%
+        right: 50%
+        margin-bottom: -50px
+        margin-right: -55px
         font-size: 50px
         color: black
         height: 100px
@@ -221,6 +232,12 @@
     /deep/ .B4j2ContentEditableImg
       @include margin-img-def
       @include margin-img
+      &.failed
+        min-width: 200px
+        min-height: 100px
+        + div.icon-youtube-play
+          width: 50px
+          margin-right: -30px
   p
     margin-top: 0.8em
     margin-bottom: 0.8em

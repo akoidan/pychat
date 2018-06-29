@@ -301,6 +301,10 @@
     /deep/ .B4j2ContentEditableImg
       max-height: 200px
       max-width: 400px
+      &.failed
+        min-width: 200px
+        min-height: 100px
+
 
     /deep/ *
       background-color: transparent !important

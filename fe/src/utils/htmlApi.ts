@@ -184,6 +184,17 @@ export function setVideoEvent(e: HTMLElement) {
   }
 }
 
+export function setImageFailEvents(e: HTMLElement) {
+  let r = e.querySelectorAll('img');
+  for (let i = 0; i < r.length; i++) {
+    (function (img) {
+      img.onerror = function() {
+        this.className += ' failed';
+      };
+    })(r[i]);
+  }
+}
+
 
 function getTime(time: string): number {
   let start = 0;

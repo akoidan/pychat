@@ -41,6 +41,8 @@ interface AllHandlers {
 export class WsHandler extends MessageHandler {
 
   private logger: Logger;
+  private loggerIn: Logger;
+  private loggerOut: Logger;
   private pingTimeoutFunction;
   private ws: WebSocket;
   private noServerPingTimeout: any;
@@ -125,6 +127,8 @@ export class WsHandler extends MessageHandler {
   constructor(sessionHolder: SessionHolder, channelsHandler: ChannelsHandler, webRtcApi, storage: IStorage, store: Store<RootState>, router: VueRouter) {
     super();
     this.logger = loggerFactory.getLoggerColor('ws', '#2e631e');
+    this.loggerIn = loggerFactory.getLoggerColor('ws:in', '#2e631e');
+    this.loggerOut = loggerFactory.getLoggerColor('ws:out', '#2e631e');
     this.storage = storage;
     this.sessionHolder = sessionHolder;
     this.store = store;
@@ -142,12 +146,6 @@ export class WsHandler extends MessageHandler {
   private wsState: WsState = WsState.NOT_INITED;
 
 
-  private logData(tag, obj, raw) {
-    if (raw.length > 1000) {
-      raw = '';
-    }
-    return loggerFactory.getSingleLoggerColor(tag, '#006c00', console.log)('{} {}', raw, obj);
-  }
 
   public getMessageId () {
     this.messageId++;
@@ -172,12 +170,24 @@ export class WsHandler extends MessageHandler {
     let data: DefaultMessage;
     try {
       data = JSON.parse(jsonData);
-      this.logData('ws-in', data, jsonData)();
+      this.logData(this.loggerIn, jsonData, data);
     } catch (e) {
       this.logger.error('Unable to parse incomming message {}', jsonData)();
       return;
     }
     this.handleMessage(data);
+  }
+
+  private logData(logger: Logger, jsonData: string, message: DefaultMessage) {
+    let raw = jsonData;
+    if (raw.length > 1000) {
+      raw = '';
+    }
+    if (message.action === 'ping' || message.action === 'pong') {
+      logger.debug('{} {}', raw, message)();
+    } else {
+      logger.log('{} {}', raw, message)();
+    }
   }
 
   private handleMessage(data) {
@@ -215,13 +225,12 @@ export class WsHandler extends MessageHandler {
   }
 
   private sendRawTextToServer(jsonRequest, skipGrowl, objData) {
-    let logEntry = jsonRequest.substring(0, 500);
     if (!this.isWsOpen()) {
       if (!skipGrowl) {
         this.store.dispatch('growlError', 'Can\'t send message, because connection is lost :(');
       }
     } else {
-      this.logData('ws-out', objData, logEntry)();
+      this.logData(this.loggerOut, jsonRequest, objData);
       this.ws.send(jsonRequest);
     }
   }
