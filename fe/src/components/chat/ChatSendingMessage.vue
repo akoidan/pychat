@@ -1,8 +1,8 @@
 <template>
-  <div :class="cls">
+  <div :class="cls" class="msgHolder">
     <chat-message :message="message"/>
     <app-progress-bar v-if="message.upload" @retry="retry" :upload="message.upload"/>
-    <div v-else class="spinner">
+    <div v-else-if="message.sending" class="spinner">
     </div>
   </div>
 </template>
@@ -42,7 +42,7 @@
         error: null
       };
       this.setMessageProgressError(newVar);
-      channelsHandler.resendFiles(this.message.id);
+      channelsHandler.resendMessage(this.message.id);
       this.growlInfo("Trying to upload files again");
     }
   }
@@ -56,6 +56,9 @@
     position: relative
     > p
       padding-right: 30px
+
+  .msgHolder
+    position: relative
 
   .spinner
     position: absolute

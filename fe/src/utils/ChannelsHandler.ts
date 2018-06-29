@@ -9,7 +9,7 @@ import {
   RemoveSendingMessage,
   SetMessageProgress,
   SetMessageProgressError,
-  SetRoomsUsers,
+  SetRoomsUsers, SetUploadProgress,
   UploadFile
 } from '../types/types';
 import {
@@ -45,7 +45,6 @@ export default class ChannelsHandler extends MessageHandler {
   private store: Store<RootState>;
   private api: Api;
   private ws: WsHandler;
-  private sendingFiles: {} = {};
   private sendingMessage: {} = {};
 
   public seWsHandler(ws: WsHandler) {
@@ -154,9 +153,7 @@ export default class ChannelsHandler extends MessageHandler {
 
   private resendMessages() {
     for (let k in this.sendingMessage) {
-      let m = this.sendingMessage[k];
-      this.logger.debug('Resending message {}', m)();
-      m();
+      this.resendMessage(k);
     }
   }
 
@@ -170,40 +167,54 @@ export default class ChannelsHandler extends MessageHandler {
     }
   }
 
-
-  public resendFiles(id) {
-    this.logger.log('resending files {} ', id)();
-    this.sendingFiles[id]();
+  public resendMessage(id) {
+    this.logger.log('resending message {} ', id)();
+    let cb = this.sendingMessage[id].cb;
+    cb();
   }
 
-  private uploadAndSend(originId: number, cbWs, cbMethod, uploadfiles: UploadFile[], roomId: number) {
-    let res: UploadProgressModel = null;
+  public getMessageFiles(messageId): UploadFile[] {
+    if (this.sendingMessage[messageId]) {
+      return this.sendingMessage[messageId].files;
+    } else {
+      this.logger.error('Asking for unkown files {}', messageId);
+      return [];
+    }
+  }
+
+  private uploadAndSend(originId: number, cbWs, cbMethod, uploadfiles: UploadFile[], roomId: number): void {
     let send = (filesIds: number[]) => {
-      this.sendingMessage[originId] = cbWs(filesIds);
-      this.sendingMessage[originId]();
+      this.sendingMessage[originId] = {
+        cb: cbWs(filesIds),
+        files: uploadfiles
+      };
+      this.sendingMessage[originId].cb();
     };
     if (uploadfiles.length) {
-      res = this.uploadFiles(originId, roomId, uploadfiles, (filesIds: number[]) => {
+      this.uploadFiles(originId, roomId, uploadfiles, (filesIds: number[]) => {
         if (filesIds) {
           send(filesIds);
         } else {
-          this.sendingFiles[originId] = cbMethod;
+          this.sendingMessage[originId] = {
+            cb: cbMethod,
+            files: uploadfiles
+          };
         }
       });
     } else {
       send([]);
     }
-    return res;
-
   }
 
-  public sendDeleteMessage(id: number, originId: number) {
-    this.sendingMessage[originId] = () => this.ws.sendEditMessage(null, id, null, originId);
-    this.sendingMessage[originId]();
+  public sendDeleteMessage(id: number, originId: number): void {
+    this.sendingMessage[originId] = {
+      cb: () => this.ws.sendEditMessage(null, id, null, originId),
+    };
+    this.sendingMessage[originId].cb();
   }
 
-  public sendEditMessage(content: string, roomId: number, id: number, uploadfiles: UploadFile[]): UploadProgressModel {
-    return this.uploadAndSend(id, (filesIds) => {
+  public sendEditMessage(content: string, roomId: number, id: number, uploadfiles: UploadFile[]): void {
+    this.uploadAndSend(id, (filesIds) => {
       return () => this.ws.sendEditMessage(content, id, filesIds, id);
     }, () => {
       this.sendEditMessage(content, roomId, id, uploadfiles);
@@ -216,8 +227,8 @@ export default class ChannelsHandler extends MessageHandler {
       uploadfiles: UploadFile[],
       originId: number,
       originTime
-  ): UploadProgressModel {
-    return this.uploadAndSend(originId, (filesIds) => {
+  ):  void {
+    this.uploadAndSend(originId, (filesIds) => {
       return () => this.ws.sendSendMessage(content, roomId, filesIds, originId, Date.now() - originTime);
     }, () => {
       this.sendSendMessage(content, roomId, uploadfiles, originId, originTime);
@@ -229,11 +240,9 @@ export default class ChannelsHandler extends MessageHandler {
       roomId: number,
       files: UploadFile[],
       cb: SingleParamCB<number[]>
-  ): UploadProgressModel {
+  ): void {
     let size: number = 0;
-    files.forEach(f => {
-      return size += f.file.size;
-    });
+    files.forEach(f => size += f.file.size);
     this.api.uploadFiles(files, (res: number[], error: string) => {
       if (error) {
         let newVar: SetMessageProgressError = {
@@ -261,7 +270,16 @@ export default class ChannelsHandler extends MessageHandler {
         this.store.commit('setMessageProgress', newVar);
       }
     });
-    return {uploaded: 0, total: size, error: null};
+    let sup: SetUploadProgress = {
+      upload: {
+        error: null,
+        total: size,
+        uploaded: 0
+      },
+      messageId,
+      roomId
+    };
+    this.store.commit('setUploadProgress', sup);
   }
 
   private mutateRoomAddition(message: AddRoomBase) {

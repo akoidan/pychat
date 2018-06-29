@@ -26,6 +26,11 @@ export interface MessageDataEncode {
   currSymbol: string;
 }
 
+export interface SetUploadProgress {
+  upload: UploadProgressModel;
+  roomId: number;
+  messageId: number;
+}
 
 export interface SetMessageProgressError {
   messageId: number;

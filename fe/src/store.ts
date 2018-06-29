@@ -23,7 +23,7 @@ import {
   MessagesLocation, RemoveMessageProgress, RemoveSendingMessage,
   SetMessageProgress, SetMessageProgressError,
   SetRoomsUsers,
-  SetSearchTo
+  SetSearchTo, SetUploadProgress
 } from './types/types';
 
 interface State extends ActionContext<RootState, RootState> {}
@@ -127,6 +127,9 @@ const store: StoreOptions<RootState> = {
       let upload = state.roomsDict[payload.roomId].messages[payload.messageId].upload;
       upload.uploaded = payload.uploaded;
       upload.total = payload.total;
+    },
+    setUploadProgress(state: RootState, payload: SetUploadProgress) {
+      state.roomsDict[payload.roomId].messages[payload.messageId].upload = payload.upload;
     },
     removeMessageProgress(state: RootState, payload: RemoveMessageProgress) {
       let message: MessageModel = state.roomsDict[payload.roomId].messages[payload.messageId];

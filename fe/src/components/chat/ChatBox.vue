@@ -154,7 +154,6 @@
   .holder
     height: 100%
 
-
   .chatbox
     overflow-y: scroll
     height: 100%

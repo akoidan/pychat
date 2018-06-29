@@ -35,7 +35,7 @@
   import NavEditMessage from "./NavEditMessage.vue";
   import NavUserShow from "./NavUserShow.vue";
   import {sem} from "../../utils/utils";
-  import {MessageDataEncode} from "../../types/types";
+  import {MessageDataEncode, RemoveSendingMessage, UploadFile} from "../../types/types";
   import {channelsHandler} from "../../utils/singletons";
 
   @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
@@ -52,6 +52,7 @@
     // used in mixin from event.keyCode === 38
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
     @Mutation addMessage;
+    @Mutation deleteMessage;
     @Mutation setMessageProgress;
     @Mutation setMessageProgressError;
     @Mutation removeMessageProgress;
@@ -137,63 +138,83 @@
     private sendWsMessage() {
       this.logger.debug("Checking sending message")();
       let messageId = this.editedMessage && this.editedMessage.isEditingNow ? this.editedMessage.messageId : null;
-      let currSymbol;
+      let currSymbol = messageId && this.editingMessageModel.symbol || "\u3500";
+      let md: MessageDataEncode= getMessageData(currSymbol, this.$refs.userMessage);
       if (messageId) {
-        currSymbol = this.editingMessageModel.symbol;
-      }
-      if (!currSymbol) {
-        currSymbol = "\u3500"
-      }
-      let arId = this.activeRoomId;
-      let um = this.$refs.userMessage;
-      let md: MessageDataEncode= getMessageData(currSymbol, um);
-      if (!md.messageContent && !md.files.length) {
-        return
-      }
-      let now = Date.now();
-      let id =  -this.$ws.getMessageId();
-      let upload: UploadProgressModel = null;
-      let mm: MessageModel;
-      if (messageId) {
-        upload = channelsHandler.sendEditMessage(md.messageContent, arId, messageId, md.files);
-        if (this.editingMessageModel.files) {
-          Object.assign(md.fileModels, this.editingMessageModel.files);
-        }
-        mm = {
-          roomId: arId,
-          deleted: false,
+        this.appendPreviousMessagesFiles(md, messageId);
+        let mm: MessageModel = {
+          roomId: this.activeRoomId,
+          deleted: !md.messageContent,
           id: messageId,
           sending: true,
           time: this.editingMessageModel.time,
           content: md.messageContent,
           symbol: md.currSymbol,
           giphy: null,
-          edited: this.editingMessageModel.edited,
-          upload,
+          edited: this.editingMessageModel.edited + 1,
+          upload: null,
           files: md.fileModels,
           userId: this.userInfo.userId
         };
+        this.setEditedMessage(null);
+        if (md.messageContent) {
+          this.addMessage(mm);
+        } else {
+          let rms : RemoveSendingMessage = {
+            roomId: this.activeRoomId,
+            messageId: messageId
+          };
+          this.deleteMessage(rms);
+        }
+        if (messageId < 0 && md.messageContent) {
+          channelsHandler.sendSendMessage(md.messageContent, this.activeRoomId, md.files, messageId, this.editingMessageModel.time);
+        } else if (messageId > 0 && md.messageContent) {
+          channelsHandler.sendEditMessage(md.messageContent, this.activeRoomId, messageId, md.files);
+        } else if (!md.messageContent && messageId > 0) {
+          channelsHandler.sendDeleteMessage(messageId, -this.$ws.getMessageId());
+        }
       } else {
-        upload = channelsHandler.sendSendMessage(md.messageContent, arId, md.files, id, now);
-        mm = {
-          roomId: arId,
+        if (!md.messageContent && !md.files.length) {
+          return
+        }
+        let now = Date.now();
+        let id = -this.$ws.getMessageId();
+        let mm: MessageModel = {
+          roomId: this.activeRoomId,
           deleted: false,
           id,
           sending: true,
-          time: now,
+          time: Date.now(),
           content: md.messageContent,
           symbol: md.currSymbol,
           giphy: null,
           edited: 0,
-          upload,
+          upload: null,
           files: md.fileModels,
           userId: this.userInfo.userId
         };
+        this.addMessage(mm);
+        channelsHandler.sendSendMessage(md.messageContent, this.activeRoomId, md.files, id, now);
       }
-      this.addMessage(mm);
+
     }
 
 
+    private appendPreviousMessagesFiles(md: MessageDataEncode, messageId) {
+      if (this.editingMessageModel.files) {
+        for (let f in this.editingMessageModel.files) {
+          if (md.messageContent.indexOf(f) >= 0) {
+            md.fileModels[f] = this.editingMessageModel.files[f];
+          }
+        }
+      }
+      let messageFiles: UploadFile[] = channelsHandler.getMessageFiles(messageId);
+      messageFiles.forEach(f => {
+        if (md.messageContent.indexOf(f.symbol) >= 0) {
+          md.files.push(f);
+        }
+      });
+    }
   }
 </script>
 <style lang="sass" scoped>
