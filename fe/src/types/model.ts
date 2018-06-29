@@ -29,6 +29,7 @@ export interface CurrentUserSettingsModel {
 }
 
 export interface CurrentUserInfoModel {
+  userId: number;
   user: string;
   name: string;
   city: string;
@@ -37,7 +38,6 @@ export interface CurrentUserInfoModel {
   birthday: string;
   contacts: string;
   sex: string;
-  userId: number;
 }
 
 export interface UserModel {
@@ -79,10 +79,10 @@ export enum SexModel {
 }
 
 export interface RoomSettingsModel {
+  id: number;
   name: string;
   notifications: boolean;
   volume: number;
-  id: number;
 }
 
 export interface UserDictModel {
