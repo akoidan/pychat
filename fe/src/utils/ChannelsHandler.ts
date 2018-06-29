@@ -74,7 +74,7 @@ export default class ChannelsHandler extends MessageHandler {
         let message: MessageModel = this.getMessage(inMessage);
         message.deleted = true;
         this.logger.debug('Adding message to storage {}', message)();
-        this.store.commit('editMessage', message);
+        this.store.commit('addMessage', message);
         if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
           let removed = this.removeSendingMessage(inMessage.messageId);
         }
@@ -87,7 +87,7 @@ export default class ChannelsHandler extends MessageHandler {
       } else {
         let message: MessageModel = this.getMessage(inMessage);
         this.logger.debug('Adding message to storage {}', message)();
-        this.store.commit('editMessage', message);
+        this.store.commit('addMessage', message);
         if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
           let removed = this.removeSendingMessage(inMessage.messageId);
         }

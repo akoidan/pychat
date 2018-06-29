@@ -252,7 +252,9 @@ export class WsHandler extends MessageHandler {
 
 
   private setStatus(isOnline) {
-    this.store.commit('setIsOnline', isOnline);
+    if (this.store.state.isOnline !== isOnline) {
+      this.store.commit('setIsOnline', isOnline);
+    }
   }
 
   private close() {

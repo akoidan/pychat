@@ -148,9 +148,6 @@ const store: StoreOptions<RootState> = {
       let a = 'delete';
       Vue[a](state.roomsDict[rm.roomId].messages, rm.messageId);
     },
-    editMessage(state: RootState, rm: MessageModel) {
-      Object.assign(state.roomsDict[rm.roomId].messages[rm.id], rm);
-    },
     addMessages(state: RootState, ml: MessagesLocation) {
       let om: { [id: number]: MessageModel } = state.roomsDict[ml.roomId].messages;
       ml.messages.forEach(m => {

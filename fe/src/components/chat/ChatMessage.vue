@@ -81,14 +81,19 @@
 
     private setEvents() {
       this.$nextTick(function () {
-        if (this.userSettings.highlightCode) {
-          highlightCode(this.$refs.content);
+        if (this.$refs.content) {
+          this.logger.debug("Setting events")();
+          if (this.userSettings.highlightCode) {
+            highlightCode(this.$refs.content);
+          }
+          if (this.userSettings.embeddedYoutube) {
+            setYoutubeEvent(this.$refs.content)
+          }
+          setVideoEvent(this.$refs.content);
+          setImageFailEvents(this.$refs.content);
+        } else {
+          this.logger.debug("Skipping event settings, because node is gone")();
         }
-        if (this.userSettings.embeddedYoutube) {
-          setYoutubeEvent(this.$refs.content)
-        }
-        setVideoEvent(this.$refs.content);
-        setImageFailEvents(this.$refs.content);
       })
     }
 
