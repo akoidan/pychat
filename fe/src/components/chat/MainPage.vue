@@ -10,7 +10,7 @@
     <div class="wrapper">
       <div class="chatBoxHolder" @drop.prevent="dropPhoto">
         <keep-alive>
-          <router-view></router-view>
+          <router-view :key="$route.fullPath"></router-view>
         </keep-alive>
         <div v-if="!activeRoom" class="noRoom" >
           <router-link to="/chat/1">This room doesn't exist, or you don't have access to it. Click to go to main room</router-link>
