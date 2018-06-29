@@ -9,9 +9,9 @@
     <nav-user-show v-if="activeUser" :active-user="activeUser"/>
     <div class="wrapper">
       <div class="chatBoxHolder" @drop.prevent="dropPhoto">
-        <template v-for="room in roomsArray">
-          <chat-box :room="room" :key="room.id" v-show="activeRoomId === room.id"/>
-        </template>
+        <keep-alive>
+          <router-view></router-view>
+        </keep-alive>
         <div v-if="!activeRoom" class="noRoom" >
           <router-link to="/chat/1">This room doesn't exist, or you don't have access to it. Click to go to main room</router-link>
         </div>

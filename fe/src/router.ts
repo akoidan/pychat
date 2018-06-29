@@ -4,6 +4,7 @@ import sessionHolder from './utils/sessionHolder';
 import store from './store';
 import MainPage from './components/MainPage.vue';
 import ChannelsPage from './components/chat/MainPage.vue';
+import ChatBox from './components/chat/ChatBox.vue';
 import SignupPage from './components/singup/MainPage.vue';
 import ResetPassword from './components/singup/ResetPassword.vue';
 import Login from './components/singup/Login.vue';
@@ -37,14 +38,24 @@ const router = new VueRouter({
         },
         {
           component: ChannelsPage,
-          meta: {
-            beforeEnter: (to, from, next) => {
-              globalLogger.log('setActiveRoomId {}', to.params.id)();
-              store.commit('setActiveRoomId', parseInt(to.params.id));
-              next();
+          path: '/chat',
+          children: [
+            {
+              path: '',
+              beforeEnter: (to, from, next) => next('/chat/1')
             },
-          },
-          path: '/chat/:id'
+            {
+              path: ':id',
+              component: ChatBox,
+              meta: {
+                beforeEnter: (to, from, next) => {
+                  globalLogger.log('setActiveRoomId {}', to.params.id)();
+                  store.commit('setActiveRoomId', parseInt(to.params.id));
+                  next();
+                },
+              },
+            }
+          ]
         },
         {
           component: UserProfile,

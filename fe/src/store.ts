@@ -90,6 +90,12 @@ const store: StoreOptions<RootState> = {
         return maxId;
       };
     },
+    roomById(state: RootState): SingleParamCB<number> {
+      return (id: number) => {
+        logger.debug('roomById {}', id)();
+        return state.roomsDict[id];
+      };
+    },
     minId(state: RootState): SingleParamCB<number> {
       return (id: number) => {
         logger.debug('minId {}', id)();

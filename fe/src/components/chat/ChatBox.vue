@@ -26,9 +26,9 @@
 
   @Component({components: {ChatSendingMessage, AppProgressBar, ChatMessage, SearchMessages}})
   export default class ChatBox extends Vue {
-    @Prop() room: RoomModel;
     @Action growlError;
     @Getter minId;
+    @Getter roomById;
     @Mutation setSearchTo;
 
     loading: boolean = false;
@@ -47,9 +47,15 @@
       }
     }
 
-    get id() {
-      return this.room.id;
+    get id(): number{
+      return parseInt(this.$route.params['id']);
     }
+
+    get room(): RoomModel {
+      return this.roomById(this.id);
+    }
+
+
     get messages() {
       this.logger.debug("Reevaluating messages in room #{}", this.room.id)();
       let newArray = [];
