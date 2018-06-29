@@ -199,6 +199,7 @@ const store: StoreOptions<RootState> = {
     },
     setActiveRoomId(state: RootState, id: number) {
       state.activeRoomId = id;
+      state.editedMessage = null;
     },
     setRegHeader(state: RootState, regHeader: string) {
       state.regHeader = regHeader;

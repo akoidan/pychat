@@ -157,7 +157,7 @@ export default class ChannelsHandler extends MessageHandler {
     }
   }
 
-  private removeSendingMessage(messageId) {
+  public removeSendingMessage(messageId) {
     if (this.sendingMessage[messageId]) {
       delete this.sendingMessage[messageId];
       return true;

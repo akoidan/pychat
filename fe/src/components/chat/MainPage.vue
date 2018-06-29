@@ -1,6 +1,11 @@
 <template>
   <div class="holder">
-    <nav-edit-message v-if="editedMessage" :edited-message="editedMessage" />
+    <nav-edit-message
+        v-if="editedMessage"
+        :edited-message="editedMessage"
+        @close="closeEditing"
+        @delete-message="navDeleteMessage"
+        @edit-message="navEditMessage"/>
     <nav-user-show v-if="activeUser" :active-user="activeUser"/>
     <div class="wrapper">
       <div class="chatBoxHolder" @drop.prevent="dropPhoto">
@@ -12,7 +17,7 @@
         </div>
       </div>
       <room-users/>
-      <smiley-holder v-show="showSmileys" v-on:add-smiley="addSmiley"/>
+      <smiley-holder v-show="showSmileys" @add-smiley="addSmiley"/>
     </div>
 
     <div class="userMessageWrapper" >
@@ -77,6 +82,20 @@
       this.$refs.imgInput.click();
     }
 
+    navDeleteMessage() {
+      let messageId = this.editedMessage.messageId;
+      this.setEditedMessage(null);
+      this.editMessageWs(null, null, messageId, this.editedMessage.roomId);
+    }
+
+    navEditMessage() {
+      this.setEditedMessage({...this.editedMessage, isEditingNow: true});
+    }
+
+    closeEditing() {
+      this.setEditedMessage(null);
+    }
+
     dropPhoto(evt) {
       this.logger.debug("Drop photo {} ", evt.dataTransfer.files)();
       if (evt.dataTransfer.files) {
@@ -113,7 +132,14 @@
     checkAndSendMessage(event: KeyboardEvent) {
       if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
         event.preventDefault();
-        this.sendWsMessage();
+        this.logger.debug("Checking sending message")();
+        if (this.editedMessage && this.editedMessage.isEditingNow) {
+          let md: MessageDataEncode = getMessageData(this.$refs.userMessage, this.editingMessageModel.symbol);
+          this.editMessage(md, this.editedMessage.messageId);
+        } else {
+          let md: MessageDataEncode = getMessageData(this.$refs.userMessage);
+          this.sendNewMessage(md);
+        }
       } else if (event.keyCode === 27) { // 27 = escape
         this.showSmileys = false;
         if (this.editedMessage) {
@@ -135,15 +161,36 @@
       }
     }
 
-    private sendWsMessage() {
-      this.logger.debug("Checking sending message")();
-      let messageId = this.editedMessage && this.editedMessage.isEditingNow ? this.editedMessage.messageId : null;
-      let currSymbol = messageId && this.editingMessageModel.symbol || "\u3500";
-      let md: MessageDataEncode= getMessageData(currSymbol, this.$refs.userMessage);
-      if (messageId) {
-        this.appendPreviousMessagesFiles(md, messageId);
+
+    private sendNewMessage(md: MessageDataEncode) {
+      if (!md.messageContent && !md.files.length) {
+        return
+      }
+      let now = Date.now();
+      let id = -this.$ws.getMessageId();
+      let mm: MessageModel = {
+        roomId: this.activeRoomId,
+        deleted: false,
+        id,
+        sending: true,
+        time: Date.now(),
+        content: md.messageContent,
+        symbol: md.currSymbol,
+        giphy: null,
+        edited: 0,
+        upload: null,
+        files: md.fileModels,
+        userId: this.userInfo.userId
+      };
+      this.addMessage(mm);
+      channelsHandler.sendSendMessage(md.messageContent, this.activeRoomId, md.files, id, now);
+    }
+
+    private editMessage(md: MessageDataEncode, messageId) {
+      this.appendPreviousMessagesFiles(md, messageId);
+      if (md.messageContent) {
         let mm: MessageModel = {
-          roomId: this.activeRoomId,
+          roomId: this.editingMessageModel.roomId,
           deleted: !md.messageContent,
           id: messageId,
           sending: true,
@@ -157,48 +204,28 @@
           userId: this.userInfo.userId
         };
         this.setEditedMessage(null);
-        if (md.messageContent) {
-          this.addMessage(mm);
-        } else {
-          let rms : RemoveSendingMessage = {
-            roomId: this.activeRoomId,
-            messageId: messageId
-          };
-          this.deleteMessage(rms);
-        }
-        if (messageId < 0 && md.messageContent) {
-          channelsHandler.sendSendMessage(md.messageContent, this.activeRoomId, md.files, messageId, this.editingMessageModel.time);
-        } else if (messageId > 0 && md.messageContent) {
-          channelsHandler.sendEditMessage(md.messageContent, this.activeRoomId, messageId, md.files);
-        } else if (!md.messageContent && messageId > 0) {
-          channelsHandler.sendDeleteMessage(messageId, -this.$ws.getMessageId());
-        }
-      } else {
-        if (!md.messageContent && !md.files.length) {
-          return
-        }
-        let now = Date.now();
-        let id = -this.$ws.getMessageId();
-        let mm: MessageModel = {
-          roomId: this.activeRoomId,
-          deleted: false,
-          id,
-          sending: true,
-          time: Date.now(),
-          content: md.messageContent,
-          symbol: md.currSymbol,
-          giphy: null,
-          edited: 0,
-          upload: null,
-          files: md.fileModels,
-          userId: this.userInfo.userId
-        };
         this.addMessage(mm);
-        channelsHandler.sendSendMessage(md.messageContent, this.activeRoomId, md.files, id, now);
       }
-
+      this.editMessageWs(md.messageContent, md.files, messageId, this.activeRoomId);
     }
 
+    private editMessageWs(messageContent: string, files: UploadFile[], messageId: number, roomId) {
+      if (!messageContent) {
+        let rms: RemoveSendingMessage = {
+          roomId,
+          messageId
+        };
+        this.deleteMessage(rms);
+        channelsHandler.removeSendingMessage(messageId);
+      }
+      if (messageId < 0 && messageContent) {
+        channelsHandler.sendSendMessage(messageContent, roomId, files, messageId, this.editingMessageModel.time);
+      } else if (messageId > 0 && messageContent) {
+        channelsHandler.sendEditMessage(messageContent, roomId, messageId, files);
+      } else if (!messageContent && messageId > 0) {
+        channelsHandler.sendDeleteMessage(messageId, -this.$ws.getMessageId());
+      }
+    }
 
     private appendPreviousMessagesFiles(md: MessageDataEncode, messageId) {
       if (this.editingMessageModel.files) {

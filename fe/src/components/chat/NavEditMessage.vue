@@ -18,20 +18,17 @@
   @Component
   export default class NavEditMessage extends Vue {
     @Prop() editedMessage : EditingMessage;
-    @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
-
 
     m2DeleteMessage() {
-      channelsHandler.sendDeleteMessage(this.editedMessage.messageId, this.editedMessage.messageId);
-      this.setEditedMessage(null);
+      this.$emit('delete-message');
     }
 
     m2EditMessage() {
-      this.setEditedMessage({...this.editedMessage, isEditingNow: true});
+      this.$emit('edit-message');
     }
 
     m2Close() {
-      this.setEditedMessage(null);
+      this.$emit('close');
     }
   }
 </script>

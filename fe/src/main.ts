@@ -3,10 +3,11 @@ import Vue from 'vue';
 import './assets/sass/common.sass';
 import './assets/smileys.js';
 import App from './components/App.vue';
-import {api, browserVersion, globalLogger, storage, ws} from './utils/singletons';
+import {api, browserVersion, channelsHandler, globalLogger, storage, ws, xhr} from './utils/singletons';
 import store from './store';
 import router from './router';
 import loggerFactory from './utils/loggerFactory';
+import {IS_DEBUG} from './utils/consts';
 
 
 window.addEventListener('focus', () => {
@@ -17,6 +18,14 @@ window.addEventListener('focus', () => {
 store.watch(s => s.userSettings && s.userSettings.theme || 'color-reg', (v, o) => {
   document.body.parentElement.className = v;
 });
+
+if (IS_DEBUG) {
+  window['channelsHandler'] = channelsHandler;
+  window['ws'] = ws;
+  window['api'] = api;
+  window['xhr'] = xhr;
+  window['storage'] = storage;
+}
 
 window.onerror = function (msg, url, linenumber, column, errorObj) {
   let message = `Error occurred in ${url}:${linenumber}\n${msg}`;

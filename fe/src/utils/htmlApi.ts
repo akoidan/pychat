@@ -308,7 +308,10 @@ function nextChar(c: string): string {
 }
 
 
-export function getMessageData (currSymbol: string, userMessage: HTMLTextAreaElement): MessageDataEncode {
+export function getMessageData(userMessage: HTMLTextAreaElement, currSymbol: string = null): MessageDataEncode {
+  if (!currSymbol) {
+    currSymbol = '\u3500';
+  }
   let files: UploadFile[] = []; // return array from nodeList
   let images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
   let fileModels: {[id: number]: FileModel} = {};
