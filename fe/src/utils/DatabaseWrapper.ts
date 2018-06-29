@@ -34,11 +34,15 @@ export default class DatabaseWrapper implements IStorage {
         });
       })).then((t: SQLTransaction)  => {
         return new Promise((resolve, reject) => {
+          t.executeSql('CREATE TABLE user (id integer primary key, user text, sex integer)', [], (t) => resolve(t));
+        });
+      }).then((t: SQLTransaction)  => {
+        return new Promise((resolve, reject) => {
           t.executeSql('CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer)', [], (t) => resolve(t));
         });
       }).then((t: SQLTransaction)  => {
         return new Promise((resolve, reject) => {
-          t.executeSql('CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer)', [], (t) => resolve(t));
+          t.executeSql('CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id))', [], (t) => resolve(t));
         });
       }).then((t: SQLTransaction)  => {
         return new Promise((resolve, reject) => {
@@ -47,10 +51,6 @@ export default class DatabaseWrapper implements IStorage {
       }).then((t: SQLTransaction)  => {
         return new Promise((resolve, reject) => {
           t.executeSql('CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))', [], (t) => resolve(t));
-        });
-      }).then((t: SQLTransaction)  => {
-        return new Promise((resolve, reject) => {
-          t.executeSql('CREATE TABLE user (id integer primary key, user text, sex integer)', [], (t) => resolve(t));
         });
       }).then((t: SQLTransaction)  => {
         return new Promise((resolve, reject) => {
