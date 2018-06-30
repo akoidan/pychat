@@ -108,6 +108,11 @@ const store: StoreOptions<RootState> = {
     activeRoom(state: RootState): RoomModel {
       return state.roomsDict[state.activeRoomId];
     },
+    roomById(state: RootState) {
+      return (id: number) => {
+        return state.roomsDict[state.activeRoomId];
+      };
+    },
     activeUser(state: RootState): UserModel {
       return state.allUsersDict[state.activeUserId];
     },
