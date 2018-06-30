@@ -63,7 +63,6 @@ document.addEventListener('DOMContentLoaded', function () {
   document.body.addEventListener('drop', e => e.preventDefault());
   document.body.addEventListener('dragover', e => e.preventDefault());
   storage.connect(finished => {
-    console.log(finished);
     let vue = new Vue({
       router,
       store,

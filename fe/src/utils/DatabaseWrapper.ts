@@ -8,7 +8,7 @@ import {
   RoomSettingsModel,
   UserModel
 } from '../types/model';
-import {convertSexToNumber} from '../types/converters';
+import {convertSexStrToNumber, convertSexToNumber} from '../types/converters';
 interface TransactionCb { (t: SQLTransaction, ...rest): void; }
 
 export default class DatabaseWrapper implements IStorage {
@@ -22,9 +22,14 @@ export default class DatabaseWrapper implements IStorage {
     this.dbName = dbName;
   }
 
-  private executeSql(t: SQLTransaction, sql: string, args: any[] = [], cb, e) {
-    this.logger.debug('{} {}', sql, args)();
+  private executeSql(t: SQLTransaction, sql: string, args: any[] = [], cb = undefined, e = undefined): Function {
+    if (!e) {
+      e = (t: SQLTransaction, e: SQLError) => {
+        return this.logger.error('{} {}, error: {}, message {}', sql, args, e, e && e.message)();
+      };
+    }
     t.executeSql(sql, args, cb, e);
+    return this.logger.debug('{} {}', sql, args);
   }
 
   public connect(cb: Function) {
@@ -32,43 +37,40 @@ export default class DatabaseWrapper implements IStorage {
     this.db = window.openDatabase(this.dbName, '', 'Messages database', 10 * 1024 * 1024);
     if (this.db.version === '') {
       Promise.resolve().then(() => new Promise((resolve, reject) => {
-        this.db.changeVersion(this.db.version, '1.0',  (t) => {
-          resolve(t);
-        }, e => {
-          reject(`Error during creating database {} ${e}`);
-        });
-      })).then((t: SQLTransaction)  => {
+        this.db.changeVersion(this.db.version, '1.0', (t) => resolve(t), e => reject(e));
+      })).then((t: SQLTransaction) => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)) )', [], (t) => resolve(t), e => reject(e));
+          this.executeSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2,3)), deleted boolean NOT NULL CHECK (deleted IN (0,1)) )', [], (t) => resolve(t), (t, e) => reject(e))();
         });
-      }).then((t: SQLTransaction)  => {
+      }).then((t: SQLTransaction) => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)))', [], (t) => resolve(t),e => reject(e));
+          this.executeSql(t, 'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)))', [], (t) => resolve(t), (t, e) => reject(e))();
         });
-      }).then((t: SQLTransaction)  => {
+      }).then((t: SQLTransaction) => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id))', [], (t) => resolve(t), e => reject(e));
+          this.executeSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id))', [], (t) => resolve(t), (t, e) => reject(e))();
         });
-      }).then((t: SQLTransaction)  => {
+      }).then((t: SQLTransaction) => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text);', [], (t) => resolve(t), e => reject(e));
+          this.executeSql(t, 'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text);', [], (t) => resolve(t), (t, e) => reject(e))();
         });
-      }).then((t: SQLTransaction)  => {
+      }).then((t: SQLTransaction) => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREAT1E TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))', [], (t) => resolve(t), e => reject(e));
+          this.executeSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))', [], (t) => resolve(t), (t, e) => reject(e))();
         });
-      }).then((t: SQLTransaction)  => {
+      }).then((t: SQLTransaction) => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer)', [], (t) => resolve(t), e => reject(e));
+          this.executeSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2,3)))', [], (t) => resolve(t), (t, e) => reject(e))();
         });
-      }).then((t: SQLTransaction)  => {
+      }).then((t: SQLTransaction) => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))', [], (t) => resolve(t), e => reject(e));
+          this.executeSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))', [], (t) => resolve(t), (t, e) => reject(e))();
         });
       }).then((t: SQLTransaction)  => {
         cb(true);
         this.logger.log('DatabaseWrapper has been initialized with version {}', this.db.version)();
       }).catch(reason => {
+        this.logger.error('Failed creating db {}, message {}', reason, reason.message)();
         cb(false);
       });
     } else if (this.db.version === '1.0') {
@@ -116,13 +118,13 @@ export default class DatabaseWrapper implements IStorage {
 
   public clearStorage () {
     this.write(t => {
-      this.executeSql(t, 'delete from room_users');
-      this.executeSql(t, 'delete from user');
-      this.executeSql(t, 'delete from room');
-      this.executeSql(t, 'delete from file');
-      this.executeSql(t, 'delete from message');
-      this.executeSql(t, 'delete from settings');
-      this.executeSql(t, 'delete from profile');
+      this.executeSql(t, 'delete from room_users')();
+      this.executeSql(t, 'delete from user')();
+      this.executeSql(t, 'delete from room')();
+      this.executeSql(t, 'delete from file')();
+      this.executeSql(t, 'delete from message')();
+      this.executeSql(t, 'delete from settings')();
+      this.executeSql(t, 'delete from profile')();
       this.logger.log('Db has been cleared')();
     });
   }
@@ -143,8 +145,8 @@ export default class DatabaseWrapper implements IStorage {
           mid[e.message_id].files[e.symbol] = e;
         }
         cb(messages);
-      });
-    });
+      })();
+    })();
     return cb;
   }
 
@@ -154,14 +156,14 @@ export default class DatabaseWrapper implements IStorage {
         [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId], (t, d) => {
           for (let k in message.files) {
             let f = message.files[k];
-            this.executeSql(t, 'insert or replace into file (id, symbol, url, message_id, type, preview) values (?, ?, ?, ?, ?, ?)', [f.id, k, f.url, message.id, f.type, f.preview]);
+            this.executeSql(t, 'insert or replace into file (id, symbol, url, message_id, type, preview) values (?, ?, ?, ?, ?, ?)', [f.id, k, f.url, message.id, f.type, f.preview])();
           }
-        });
+        })();
   }
 
 
   private setRoom(t: SQLTransaction, room: RoomSettingsModel) {
-    this.executeSql(t, 'insert or replace into room (id, name, notifications, volume, deleted) values (?, ?, ?, ?, 0)', [room.id, room.name, room.notifications ? 1 : 0, room.volume]);
+    this.executeSql(t, 'insert or replace into room (id, name, notifications, volume, deleted) values (?, ?, ?, ?, 0)', [room.id, room.name, room.notifications ? 1 : 0, room.volume])();
   }
 
   public saveRoom(room: RoomModel) {
@@ -173,23 +175,25 @@ export default class DatabaseWrapper implements IStorage {
 
   public setRooms(rooms: RoomModel[]) {
     this.write(t => {
-      this.executeSql(t, 'update room set deleted = 1');
-      rooms.forEach(r => this.setRoom(t, r));
-      this.executeSql(t, 'delete from room_users');
-      rooms.forEach(r => {
-        r.users.forEach(u => {
-          this.insertRoomUsers(t, r.id, u);
+      this.executeSql(t, 'update room set deleted = 1', [], (t) => {
+        rooms.forEach(r => this.setRoom(t, r));
+      })();
+      this.executeSql(t, 'delete from room_users', [], (t) => {
+        rooms.forEach(r => {
+          r.users.forEach(u => {
+            this.insertRoomUsers(t, r.id, u);
+          });
         });
-      });
+      })();
     });
   }
 
   private insertRoomUsers(t, roomId, userId) {
-    this.executeSql(t, 'insert into room_users (room_id, user_id) values (?, ?)', [roomId, userId]);
+    this.executeSql(t, 'insert into room_users (room_id, user_id) values (?, ?)', [roomId, userId])();
   }
 
   public insertUser(t: SQLTransaction, user: UserModel) {
-    this.executeSql(t, 'insert or replace into user (id, user, sex, deleted) values (?, ?, ?, 0)', [user.id, user.user, convertSexToNumber(user.sex)]);
+    this.executeSql(t, 'insert or replace into user (id, user, sex, deleted) values (?, ?, ?, 0)', [user.id, user.user, convertSexToNumber(user.sex)])();
   }
 
   public saveUser(user: UserModel) {
@@ -198,33 +202,33 @@ export default class DatabaseWrapper implements IStorage {
 
   public setUsers(users: UserModel[]) {
     this.write(t => {
-      this.executeSql(t, 'update user set deleted = 1', []);
+      this.executeSql(t, 'update user set deleted = 1', [])();
       users.forEach(u => this.insertUser(t, u));
     });
   }
 
   public setUserProfile(user: CurrentUserInfoModel) {
     this.write(t => {
-      this.executeSql(t, 'insert or replace into profile (userId, user, name, city, surname, email, birthday, contacts, sex) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [user.userId, user.user, user.name, user.city, user.surname, user.email, user.birthday, user.contacts, user.sex]);
+      this.executeSql(t, 'insert or replace into profile (userId, user, name, city, surname, email, birthday, contacts, sex) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [user.userId, user.user, user.name, user.city, user.surname, user.email, user.birthday, user.contacts, convertSexStrToNumber(user.sex)])();
     });
   }
 
   public setUserSettings(settings: CurrentUserSettingsModel) {
     this.write(t => {
-      this.executeSql(t, 'insert or replace into settings (userId, embeddedYoutube, highlightCode, incomingFileCallSound, messageSound, onlineChangeSound, sendLogs, suggestions, theme, logs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [1, settings.embeddedYoutube ? 1 : 0, settings.highlightCode ? 1 : 0, settings.incomingFileCallSound ? 1 : 0, settings.messageSound ? 1 : 0, settings.onlineChangeSound ? 1 : 0, settings.sendLogs ? 1 : 0, settings.suggestions ? 1 : 0, settings.theme, settings.logs ? 1 : 0]);
+      this.executeSql(t, 'insert or replace into settings (userId, embeddedYoutube, highlightCode, incomingFileCallSound, messageSound, onlineChangeSound, sendLogs, suggestions, theme, logs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [1, settings.embeddedYoutube ? 1 : 0, settings.highlightCode ? 1 : 0, settings.incomingFileCallSound ? 1 : 0, settings.messageSound ? 1 : 0, settings.onlineChangeSound ? 1 : 0, settings.sendLogs ? 1 : 0, settings.suggestions ? 1 : 0, settings.theme, settings.logs ? 1 : 0])();
     });
   }
 
 
   public deleteMessage(id: number) {
     this.write(t => {
-      this.executeSql(t, 'update message set deleted = 1 where id = ? ', [id]);
+      this.executeSql(t, 'update message set deleted = 1 where id = ? ', [id])();
     });
   }
 
   public deleteRoom(id: number) {
     this.write(t => {
-      this.executeSql(t, 'update room set deleted = 1 where id = ? ', [id]);
+      this.executeSql(t, 'update room set deleted = 1 where id = ? ', [id])();
     });
   }
 
@@ -239,12 +243,12 @@ export default class DatabaseWrapper implements IStorage {
       users.forEach(u => {
         this.insertRoomUsers(t, roomId, u);
       });
-    });
+    })();
   }
 
   public updateRoom(r: RoomSettingsModel) {
     this.write(t => {
-      this.executeSql(t, 'update room set name = ?, volume = ?, notifications = ? where id = ? ', [r.name, r.volume, r.notifications, r.id]);
+      this.executeSql(t, 'update room set name = ?, volume = ?, notifications = ? where id = ? ', [r.name, r.volume, r.notifications, r.id])();
     });
   }
 

@@ -29,6 +29,19 @@ export function convertSexToNumber(m: SexModel): number {
     return 3;
   }
 }
+
+export function convertSexStrToNumber(m: string): number {
+  if (m === 'Secret') {
+    return 0;
+  } else if (m === 'Male') {
+    return 1;
+  } else if (m === 'Female') {
+    return 2;
+  } else {
+    return 3;
+  }
+}
+
 export function convertFile(dto: FileModelDto): FileModel {
   return {...dto};
 }

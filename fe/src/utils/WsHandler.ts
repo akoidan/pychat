@@ -421,31 +421,33 @@ export class WsHandler extends MessageHandler {
       //     'Android, Chrome, Opera, Safari, IE11, Edge, Firefox'.format(window.browserVersion));
       return;
     }
-    this.store.state.
-    this.storage.getIds((ids) => {
-      let s = API_URL + this.wsConnectionId;
-      if (Object.keys(ids).length > 0) {
-        s += `&messages=${encodeURI(JSON.stringify(ids))}`;
-      }
-      if (this.loadHistoryFromWs && this.wsState !== WsState.CONNECTION_IS_LOST) {
-        s += '&history=true';
-      }
-      s += `&sessionId=${this.sessionHolder.session}`;
 
-      this.ws = new WebSocket(s);
-      this.ws.onmessage = this.onWsMessage.bind(this);
-      this.ws.onclose = this.onWsClose.bind(this);
-      this.ws.onopen = () => {
-        this.setStatus(true);
-        let message = 'Connection to server has been established';
-        if (this.wsState === WsState.CONNECTION_IS_LOST) { // if not inited don't growl message on page load
-           this.store.dispatch('growlSuccess', 'Connection established');
-        }
-        this.startNoPingTimeout();
-        this.wsState = WsState.CONNECTED;
-        this.logger.log(message)();
-      };
-    });
+    let ids = {};
+    for (let k in this.store.state.roomsDict) {
+      ids[k] = this.store.getters.maxId(k);
+    }
+    let s = API_URL + this.wsConnectionId;
+    if (Object.keys(ids).length > 0) {
+      s += `&messages=${encodeURI(JSON.stringify(ids))}`;
+    }
+    if (this.loadHistoryFromWs && this.wsState !== WsState.CONNECTION_IS_LOST) {
+      s += '&history=true';
+    }
+    s += `&sessionId=${this.sessionHolder.session}`;
+
+    this.ws = new WebSocket(s);
+    this.ws.onmessage = this.onWsMessage.bind(this);
+    this.ws.onclose = this.onWsClose.bind(this);
+    this.ws.onopen = () => {
+      this.setStatus(true);
+      let message = 'Connection to server has been established';
+      if (this.wsState === WsState.CONNECTION_IS_LOST) { // if not inited don't growl message on page load
+         this.store.dispatch('growlSuccess', 'Connection established');
+      }
+      this.startNoPingTimeout();
+      this.wsState = WsState.CONNECTED;
+      this.logger.log(message)();
+    }
   }
 
 
