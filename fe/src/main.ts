@@ -59,36 +59,22 @@ Vue.mixin({
 
 Vue.prototype.$api = api;
 Vue.prototype.$ws = ws;
+
+storage.connect(finished => {
+  storage.getAllTree();
+});
+
+
 document.addEventListener('DOMContentLoaded', function () {
   document.body.addEventListener('drop', e => e.preventDefault());
   document.body.addEventListener('dragover', e => e.preventDefault());
-  storage.connect(finished => {
-    let vue = new Vue({
-      router,
-      store,
-      render: h => h(App)
-    });
-    vue.$mount('#app');
-    if (IS_DEBUG) {
-      window['vue'] = vue;
-    }
+  let vue = new Vue({
+    router,
+    store,
+    render: h => h(App)
   });
+  vue.$mount('#app');
+  if (IS_DEBUG) {
+    window['vue'] = vue;
+  }
 });
-
-//
-// storage.connect(finished => {
-//   storage.getAllTree()
-// });
-// document.addEventListener('DOMContentLoaded', function () {
-//   document.body.addEventListener('drop', e => e.preventDefault());
-//   document.body.addEventListener('dragover', e => e.preventDefault());
-//   let vue = new Vue({
-//     router,
-//     store,
-//     render: h => h(App)
-//   });
-//   vue.$mount('#app');
-//   if (IS_DEBUG) {
-//     window['vue'] = vue;
-//   }
-// });

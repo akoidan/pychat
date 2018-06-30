@@ -4,11 +4,11 @@ import {Logger} from 'lines-logger';
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
-  MessageModel, RoomModel,
+  MessageModel, RoomDictModel, RoomModel,
   RoomSettingsModel,
   UserModel
 } from '../types/model';
-import {convertSexStrToNumber, convertSexToNumber} from '../types/converters';
+import {convertSexStrToNumber, convertSexToNumber, convertSexToString} from '../types/converters';
 interface TransactionCb { (t: SQLTransaction, ...rest): void; }
 
 export default class DatabaseWrapper implements IStorage {
@@ -40,7 +40,7 @@ export default class DatabaseWrapper implements IStorage {
         this.db.changeVersion(this.db.version, '1.0', (t) => resolve(t), e => reject(e));
       })).then((t: SQLTransaction) => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2,3)), deleted boolean NOT NULL CHECK (deleted IN (0,1)) )', [], (t) => resolve(t), (t, e) => reject(e))();
+          this.executeSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN ((0,1,2))), deleted boolean NOT NULL CHECK (deleted IN (0,1)) )', [], (t) => resolve(t), (t, e) => reject(e))();
         });
       }).then((t: SQLTransaction) => {
         return new Promise((resolve, reject) => {
@@ -60,7 +60,7 @@ export default class DatabaseWrapper implements IStorage {
         });
       }).then((t: SQLTransaction) => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2,3)))', [], (t) => resolve(t), (t, e) => reject(e))();
+          this.executeSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN ((0,1,2))))', [], (t) => resolve(t), (t, e) => reject(e))();
         });
       }).then((t: SQLTransaction) => {
         return new Promise((resolve, reject) => {
@@ -83,26 +83,75 @@ export default class DatabaseWrapper implements IStorage {
     this.read(t => {
           Promise.all([
             new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from users', [], (t) => resolve(t), (t, e) => reject(e))();
+              this.executeSql(t, 'select * from file', [], (t, d) => resolve(d), (t, e) => reject(e))();
             }),
             new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from file', [], (t) => resolve(t), (t, e) => reject(e))();
+              this.executeSql(t, 'select * from profile', [], (t, d) => {
+
+              }, (t, e) => reject(e))();
             }),
             new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from profile', [], (t) => resolve(t), (t, e) => reject(e))();
+              this.executeSql(t, 'select * from room', [], (t, d) => resolve(d), (t, e) => reject(e))();
             }),
             new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from room', [], (t) => resolve(t), (t, e) => reject(e))();
+              this.executeSql(t, 'select * from room_users', [], (t, d) => resolve(d), (t, e) => reject(e))();
             }),
             new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from room_users', [], (t) => resolve(t), (t, e) => reject(e))();
+              this.executeSql(t, 'select * from settings', [], (t, d) => resolve(d), (t, e) => reject(e))();
             }),
             new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from settings', [], (t) => resolve(t), (t, e) => reject(e))();
-              this.executeSql(t, 'select * from user', [], (t) => resolve(t), (t, e) => reject(e))();
+              this.executeSql(t, 'select * from user', [], (t, d) => resolve(d), (t, e) => reject(e))();
+            }),
+            new Promise((resolve, reject) => {
+              this.executeSql(t, 'select * from message', [], (t, d) => resolve(d), (t, e) => reject(e))();
             })
-          ]).then(f => {
-            this.logger.log('{}', f)();
+          ]).then((f: any ) => {
+            let files = f[0].rows;
+            let profile = f[1].rows;
+            let rooms = f[2].rows;
+            let roomUsers = f[3].rows;
+            let settings = f[4].rows;
+            let users = f[5].rows;
+            let messages = f[6].rows;
+            let up: CurrentUserInfoModel = {
+              sex: convertSexToString(profile.sex),
+              contacts: profile.contacts,
+              birthday: profile.birthday,
+              email: profile.email,
+              surname: profile.surname,
+              city: profile.city,
+              name: profile.name,
+              userId: profile.userId,
+              user: profile.user
+            };
+            let us: CurrentUserSettingsModel = {
+              embeddedYoutube: settings.embeddedYoutube ? true : false,
+              highlightCode: settings.highlightCode ? true : false,
+              incomingFileCallSound: settings.incomingFileCallSound ? true : false,
+              messageSound: settings.messageSound ? true : false,
+              onlineChangeSound: settings.onlineChangeSound ? true : false,
+              sendLogs: settings.sendLogs ? true : false,
+              suggestions: settings.suggestions ? true : false,
+              theme: settings.theme,
+              logs: settings.logs ? true : false,
+            };
+            let ro: RoomDictModel = {};
+            rooms.forEach(r => {
+              let rm: RoomModel = {
+                id: r.id,
+                allLoaded: false,
+                users: [],
+                volume: r.volume,
+                notifications: r.notifications ? true : false,
+                name: r.name,
+                messages: {},
+                search: null
+              };
+              ro[r.id] = rm;
+            });
+            this.logger.log('restored state from db {}', f)();
+          }).catch(reason => {
+            this.logger.error('Unable to load state from db, because {}')();
           });
         }
     );

@@ -64,6 +64,7 @@ export default class LocalStorage implements IStorage {
   saveRoomUsers(ru: SetRoomsUsers)  {}
   setUsers(users: UserModel[])  {}
   saveUser(users: UserModel)  {}
+  getAllTree() {}
 
   public clearStorage() {
     localStorage.setItem(this.STORAGE_NAME, '{}');

@@ -64,6 +64,7 @@ export  interface IStorage {
   setUserSettings( settings: CurrentUserSettingsModel);
   saveRoomUsers(ru: SetRoomsUsers);
   setUsers(users: UserModel[]);
+  getAllTree();
   saveUser(users: UserModel);
   clearStorage();
   connect(cb: Function);

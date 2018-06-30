@@ -26,20 +26,16 @@ export function convertSexToNumber(m: SexModel): number {
   } else if (SexModel.Female === m) {
     return 2;
   } else {
-    return 3;
+    throw `Unknown gender ${m}`;
   }
 }
 
-export function convertSexStrToNumber(m: string): number {
-  if (m === 'Secret') {
-    return 0;
-  } else if (m === 'Male') {
-    return 1;
-  } else if (m === 'Female') {
-    return 2;
-  } else {
-    return 3;
-  }
+export function convertSexToString(m: string): string {
+  return {
+    '0': 'Secret',
+    '1': 'Male',
+    '2': 'Male',
+  }[m];
 }
 
 export function convertFile(dto: FileModelDto): FileModel {
