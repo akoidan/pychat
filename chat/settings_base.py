@@ -204,7 +204,6 @@ STATIC_URL = '/static/'
 PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
-SMILEYS_ROOT = os.path.join(STATIC_ROOT, 'smileys')
 MESSAGES_PER_SEARCH = 10
 AUTH_PROFILE_MODULE = 'chat.UserProfile'
 

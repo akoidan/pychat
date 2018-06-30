@@ -13,6 +13,7 @@ chat/migrations
 .venv
 chat.log
 fe/src/assets/font
+fe/src/assets/demo.html
 fe/src/assets/sass/partials/fontello.scss
 fe/src/assets/sass/fonts
 chat/production.py
