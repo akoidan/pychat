@@ -52,7 +52,7 @@ export interface RemoveSendingMessage {
 }
 
 export  interface IStorage {
-  getIds(cb: SingleParamCB<object>);
+  // getIds(cb: SingleParamCB<object>);
   saveMessages(messages: MessageModel[]);
   deleteMessage(id: number);
   deleteRoom(id: number);
@@ -67,7 +67,7 @@ export  interface IStorage {
   saveUser(users: UserModel);
   clearStorage();
   connect(cb: Function);
-  getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
+  // getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
   setRoomHeaderId(roomId: number, value: number);
 }
 

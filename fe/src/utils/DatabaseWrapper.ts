@@ -22,9 +22,9 @@ export default class DatabaseWrapper implements IStorage {
     this.dbName = dbName;
   }
 
-  private executeSql(t: SQLTransaction, sql: string, args: any[] = [], cb = undefined) {
+  private executeSql(t: SQLTransaction, sql: string, args: any[] = [], cb, e) {
     this.logger.debug('{} {}', sql, args)();
-    t.executeSql(sql, args, cb);
+    t.executeSql(sql, args, cb, e);
   }
 
   public connect(cb: Function) {
@@ -39,35 +39,37 @@ export default class DatabaseWrapper implements IStorage {
         });
       })).then((t: SQLTransaction)  => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)) )', [], (t) => resolve(t));
+          this.executeSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)) )', [], (t) => resolve(t), e => reject(e));
         });
       }).then((t: SQLTransaction)  => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)))', [], (t) => resolve(t));
+          this.executeSql(t, 'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)))', [], (t) => resolve(t),e => reject(e));
         });
       }).then((t: SQLTransaction)  => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id))', [], (t) => resolve(t));
+          this.executeSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id))', [], (t) => resolve(t), e => reject(e));
         });
       }).then((t: SQLTransaction)  => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text);', [], (t) => resolve(t));
+          this.executeSql(t, 'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text);', [], (t) => resolve(t), e => reject(e));
         });
       }).then((t: SQLTransaction)  => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))', [], (t) => resolve(t));
+          this.executeSql(t, 'CREAT1E TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))', [], (t) => resolve(t), e => reject(e));
         });
       }).then((t: SQLTransaction)  => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer)', [], (t) => resolve(t));
+          this.executeSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer)', [], (t) => resolve(t), e => reject(e));
         });
       }).then((t: SQLTransaction)  => {
         return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))', [], (t) => resolve(t));
+          this.executeSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))', [], (t) => resolve(t), e => reject(e));
         });
       }).then((t: SQLTransaction)  => {
         cb(true);
         this.logger.log('DatabaseWrapper has been initialized with version {}', this.db.version)();
+      }).catch(reason => {
+        cb(false);
       });
     } else if (this.db.version === '1.0') {
       this.logger.log('Created new db connection')();
@@ -91,26 +93,26 @@ export default class DatabaseWrapper implements IStorage {
     return this. transaction('transaction', cb);
   }
 
-  public getRoomHeaderId (id: number, cb: Function) {
-    this.read((t, id, cb ) => {
-      this.executeSql(t, 'select min(id) as min from message where roomId = ?', [id], function(t, d) {
-        cb(d.rows.length ? d.rows[0].min : null);
-      });
-    });
-  }
+  // public getRoomHeaderId (id: number, cb: Function) {
+  //   this.read((t, id, cb ) => {
+  //     this.executeSql(t, 'select min(id) as min from message where roomId = ?', [id], (t, d) => {
+  //       cb(d.rows.length ? d.rows[0].min : null);
+  //     });
+  //   });
+  // }
 
-  public getIds (cb) {
-    this.read(t => {
-      this.executeSql(t, 'select max(id) as max, roomId, min(id) as min from message group by roomId', [],  (t, d) => {
-        let res = {};
-        for (let i = 0; i < d.rows.length; i++) {
-          let e = d.rows[i];
-          res[e.roomId] = {h: e.min, f: this.cache[e.roomId] || e.max};
-        }
-        cb(res);
-      });
-    });
-  }
+  // public getIds (cb) {
+  //   this.read(t => {
+  //     this.executeSql(t, 'select max(id) as max, roomId, min(id) as min from message group by roomId', [],  (t, d) => {
+  //       let res = {};
+  //       for (let i = 0; i < d.rows.length; i++) {
+  //         let e = d.rows[i];
+  //         res[e.roomId] = {h: e.min, f: this.cache[e.roomId] || e.max};
+  //       }
+  //       cb(res);
+  //     });
+  //   });
+  // }
 
   public clearStorage () {
     this.write(t => {

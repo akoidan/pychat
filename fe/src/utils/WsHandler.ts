@@ -421,6 +421,7 @@ export class WsHandler extends MessageHandler {
       //     'Android, Chrome, Opera, Safari, IE11, Edge, Firefox'.format(window.browserVersion));
       return;
     }
+    this.store.state.
     this.storage.getIds((ids) => {
       let s = API_URL + this.wsConnectionId;
       if (Object.keys(ids).length > 0) {

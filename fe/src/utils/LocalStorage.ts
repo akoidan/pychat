@@ -33,9 +33,9 @@ export default class LocalStorage implements IStorage {
     }
   }
 
-  public getIds(cb: SingleParamCB<object>) {
-    cb(this.cache);
-  }
+  // public getIds(cb: SingleParamCB<object>) {
+  //   cb(this.cache);
+  // }
 
   public saveMessage(message: MessageModel) {
     this.setRoomHeaderId(message.roomId, message.id);
@@ -70,9 +70,9 @@ export default class LocalStorage implements IStorage {
     this.cache = {};
   }
 
-  public getRoomHeaderId(roomId: number, cb: SingleParamCB<number>) {
-    cb(this.cache[roomId] ? this.cache[roomId].h : null);
-  }
+  // public getRoomHeaderId(roomId: number, cb: SingleParamCB<number>) {
+  //   cb(this.cache[roomId] ? this.cache[roomId].h : null);
+  // }
 
   private applyCache(roomId, value) {
     if (!this.cache[roomId]) {
