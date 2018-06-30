@@ -1,4 +1,12 @@
-import {FileModel, MessageModel, SearchModel, UploadProgressModel} from './model';
+import {
+  CurrentUserInfoModel, CurrentUserSettingsModel,
+  FileModel,
+  MessageModel, RoomModel,
+  RoomSettingsModel,
+  SearchModel,
+  UploadProgressModel,
+  UserModel
+} from './model';
 
 export interface MessageDb {
   id: number;
@@ -47,6 +55,16 @@ export  interface IStorage {
   getIds(cb: SingleParamCB<object>);
   saveMessages(messages: MessageModel[]);
   deleteMessage(id: number);
+  deleteRoom(id: number);
+  saveMessage(m: MessageModel);
+  updateRoom(m: RoomSettingsModel);
+  setRooms(rooms: RoomSettingsModel[]);
+  saveRoom(room: RoomModel);
+  setUserProfile(user: CurrentUserInfoModel);
+  setUserSettings( settings: CurrentUserSettingsModel);
+  saveRoomUsers(ru: SetRoomsUsers);
+  setUsers(users: UserModel[]);
+  saveUser(users: UserModel);
   clearStorage();
   connect(cb: Function);
   getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);

@@ -25,6 +25,7 @@ import {
   SetRoomsUsers,
   SetSearchTo, SetUploadProgress
 } from './types/types';
+import {storage} from './utils/singletons';
 
 interface State extends ActionContext<RootState, RootState> {}
 
@@ -143,10 +144,12 @@ const store: StoreOptions<RootState> = {
       let om: { [id: number]: MessageModel } = state.roomsDict[m.roomId].messages;
       let a = 'set';
       Vue[a](om, m.id, m);
+      storage.saveMessage(m);
     },
     deleteMessage(state: RootState, rm: RemoveSendingMessage) {
       let a = 'delete';
       Vue[a](state.roomsDict[rm.roomId].messages, rm.messageId);
+      storage.deleteMessage(rm.messageId);
     },
     addMessages(state: RootState, ml: MessagesLocation) {
       let om: { [id: number]: MessageModel } = state.roomsDict[ml.roomId].messages;
@@ -154,6 +157,7 @@ const store: StoreOptions<RootState> = {
         let a = 'set';
         Vue[a](om, m.id, m);
       });
+      storage.saveMessages(ml.messages);
     },
     setEditedMessage(state: RootState, editedMessage: EditingMessage) {
       state.editedMessage = editedMessage;
@@ -174,13 +178,16 @@ const store: StoreOptions<RootState> = {
       room.notifications = srm.notifications;
       room.volume = srm.volume;
       room.name = srm.name;
+      storage.updateRoom(srm);
     },
     deleteRoom(state: RootState, roomId: number) {
       let a = 'delete'; // TODO
       Vue[a](state.roomsDict, roomId);
+      storage.deleteRoom(roomId);
     },
     setRoomsUsers(state: RootState, ru: SetRoomsUsers) {
       state.roomsDict[ru.roomId].users = ru.users;
+      storage.saveRoomUsers(ru);
     },
     setIsOnline(state: RootState, isOnline: boolean) {
       state.isOnline = isOnline;
@@ -204,32 +211,39 @@ const store: StoreOptions<RootState> = {
     addUser(state: RootState, u: UserModel) {
       let newVar = 'set';
       Vue[newVar](state.allUsersDict, u.id, u);
+      storage.saveUser(u);
     },
     setOnline(state: RootState, ids: number[]) {
       state.online = ids;
     },
     setUsers(state: RootState, users: UserDictModel) {
       state.allUsersDict = users;
+      storage.setUsers(Object.values(users));
     },
     setUser(state: RootState, user: UserModel) {
       state.allUsersDict[user.id].user = user.user;
       state.allUsersDict[user.id].sex = user.sex;
+      storage.saveUser(user);
     },
     setUserInfo(state: RootState, userInfo: CurrentUserInfoModel) {
       state.userInfo = userInfo;
+      storage.setUserProfile(userInfo);
     },
     setUserSettings(state: RootState, userInfo: CurrentUserSettingsModel) {
       state.userSettings = userInfo;
+      storage.setUserSettings(userInfo);
     },
     setUserImage(state: RootState, userImage: string) {
       state.userImage = userImage;
     },
     setRooms(state: RootState, rooms: RoomDictModel) {
       state.roomsDict = rooms;
+      storage.setRooms(Object.values(rooms));
     },
     addRoom(state: RootState, room: RoomModel) {
       let newVar = 'set';
       Vue[newVar](state.roomsDict, room.id, room);
+      storage.saveRoom(room);
     }
   },
   actions: {
@@ -258,6 +272,7 @@ const store: StoreOptions<RootState> = {
       context.commit('setUserInfo', null);
       context.commit('setEditedMessage', null);
       context.commit('setRooms', {});
+      storage.clearStorage();
     }
   },
 };

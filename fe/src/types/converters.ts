@@ -17,6 +17,18 @@ export function currentUserInfoModelToDto(userInfo: CurrentUserInfoModel): UserP
 export function convertSex(dto: SexModelDto): SexModel {
   return <SexModel>SexModel[dto];
 }
+
+export function convertSexToNumber(m: SexModel): number {
+  if (SexModel.Secret === m) {
+    return 0;
+  } else if (SexModel.Male === m) {
+    return 1;
+  } else if (SexModel.Female === m) {
+    return 2;
+  } else {
+    return 3;
+  }
+}
 export function convertFile(dto: FileModelDto): FileModel {
   return {...dto};
 }

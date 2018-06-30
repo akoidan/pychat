@@ -63,10 +63,14 @@ document.addEventListener('DOMContentLoaded', function () {
   document.body.addEventListener('drop', e => e.preventDefault());
   document.body.addEventListener('dragover', e => e.preventDefault());
   storage.connect(finished => {
-    new Vue({
+    let vue = new Vue({
       router,
       store,
       render: h => h(App)
-    }).$mount('#app');
+    });
+    vue.$mount('#app');
+    if (IS_DEBUG) {
+      window['vue'] = vue;
+    }
   });
 });

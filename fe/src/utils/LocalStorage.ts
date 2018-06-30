@@ -1,7 +1,13 @@
 
 import loggerFactory from './loggerFactory';
-import {IStorage} from '../types/types';
-import {MessageModel} from '../types/model';
+import {IStorage, SetRoomsUsers} from '../types/types';
+import {
+  CurrentUserInfoModel,
+  CurrentUserSettingsModel,
+  MessageModel,
+  RoomSettingsModel,
+  UserModel
+} from '../types/model';
 import {Logger} from 'lines-logger';
 
 export default class LocalStorage implements IStorage {
@@ -48,9 +54,16 @@ export default class LocalStorage implements IStorage {
     localStorage.setItem(this.STORAGE_NAME, JSON.stringify(lm));
   }
 
-  public deleteMessage(id: number) {
-
-  }
+  deleteMessage(id: number) {}
+  deleteRoom(id: number) {}
+  updateRoom(m: RoomSettingsModel)  {}
+  setRooms(rooms: RoomSettingsModel[])  {}
+  saveRoom(room: RoomSettingsModel)  {}
+  setUserProfile(user: CurrentUserInfoModel)  {}
+  setUserSettings( settings: CurrentUserSettingsModel)  {}
+  saveRoomUsers(ru: SetRoomsUsers)  {}
+  setUsers(users: UserModel[])  {}
+  saveUser(users: UserModel)  {}
 
   public clearStorage() {
     localStorage.setItem(this.STORAGE_NAME, '{}');
