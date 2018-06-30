@@ -5,7 +5,7 @@ import {globalLogger, ws} from './singletons';
 import {CurrentUserInfoModel, EditingMessage, MessageModel, RootState} from '../types/model';
 
 export function logout(errMessage: string) {
-  store.dispatch('logout');
+  store.commit('logout');
   if (errMessage) {
     store.dispatch('growlError', errMessage);
   }
@@ -17,10 +17,12 @@ export function logout(errMessage: string) {
 export function login(session, errMessage) {
   if (errMessage) {
     store.dispatch('growlError', errMessage);
-  } else {
+  } else if (/\w{32}/.exec(session)) {
     sessionHolder.session = session;
     globalLogger.log('Proceeding to /')();
     router.replace('/chat/1');
+  } else {
+    store.dispatch('growlError', session);
   }
 }
 

@@ -92,7 +92,7 @@ def upload_profile_image(request):
 	message = json.dumps(MessagesCreator.set_profile_image(url))
 	channel = RedisPrefix.generate_user(request.user.id)
 	global_redis.sync_redis.publish(channel, message)
-	return HttpResponse(url, content_type='application/text')
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 @require_http_methods(['POST'])
 @login_required_no_redirect(False)
@@ -251,6 +251,7 @@ def logout(request):
 
 
 @require_http_methods(['POST'])
+@validation
 def auth(request):
 	"""
 	Logs in into system.
@@ -259,12 +260,12 @@ def auth(request):
 	password = request.POST.get('password')
 	logger.debug('Auth request %s', hide_fields(request.POST, ('password',)))
 	user = authenticate(username=username, password=password)
-	if user is not None:
-		djangologin(request, user)
-		request.session.save()
-		return HttpResponse(json.dumps({"session": request.session.session_key}), content_type='application/json')
-	else:
-		return HttpResponse('Login or password is wrong', content_type='text/plain')
+	if user is None:
+		raise ValidationError('login or password is wrong');
+	djangologin(request, user)
+	request.session.save()
+	return HttpResponse(request.session.session_key, content_type='text/plain')
+
 
 
 def send_restore_password(request):
@@ -446,20 +447,6 @@ def profile_change_password(request):
 
 class RegisterView(View):
 
-	def get(self, request):
-		logger.debug(
-			'Rendering register page with captcha site key %s and oauth key %s',
-			RECAPTCHA_PUBLIC_KEY, GOOGLE_OAUTH_2_CLIENT_ID
-		)
-		c = csrf(request)
-		c['captcha_key'] = RECAPTCHA_PUBLIC_KEY
-		c['captcha_url'] = RECAPTHCA_SITE_URL
-		c['oauth_url'] = GOOGLE_OAUTH_2_JS_URL
-		c['oauth_token'] = GOOGLE_OAUTH_2_CLIENT_ID
-		c['fb_app_id'] = FACEBOOK_APP_ID
-		c['fb_js_url'] = FACEBOOK_JS_URL
-		return render_to_response("register.html", c, context_instance=RequestContext(request))
-
 	@transaction.atomic
 	@validation
 	def post(self, request):
@@ -478,4 +465,4 @@ class RegisterView(View):
 			send_sign_up_email(user_profile, request.get_host(), request)
 		djangologin(request, auth_user)
 		request.session.save()
-		return HttpResponse(json.dumps({"session": request.session.session_key}), content_type='application/json')
+		return HttpResponse(request.session.session_key, content_type='text/plain')

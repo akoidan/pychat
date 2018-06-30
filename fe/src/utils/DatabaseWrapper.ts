@@ -78,6 +78,35 @@ export default class DatabaseWrapper implements IStorage {
       cb(true);
     }
   }
+
+  public getAllTree() {
+    this.read(t => {
+          Promise.all([
+            new Promise((resolve, reject) => {
+              this.executeSql(t, 'select * from users', [], (t) => resolve(t), (t, e) => reject(e))();
+            }),
+            new Promise((resolve, reject) => {
+              this.executeSql(t, 'select * from file', [], (t) => resolve(t), (t, e) => reject(e))();
+            }),
+            new Promise((resolve, reject) => {
+              this.executeSql(t, 'select * from profile', [], (t) => resolve(t), (t, e) => reject(e))();
+            }),
+            new Promise((resolve, reject) => {
+              this.executeSql(t, 'select * from room', [], (t) => resolve(t), (t, e) => reject(e))();
+            }),
+            new Promise((resolve, reject) => {
+              this.executeSql(t, 'select * from room_users', [], (t) => resolve(t), (t, e) => reject(e))();
+            }),
+            new Promise((resolve, reject) => {
+              this.executeSql(t, 'select * from settings', [], (t) => resolve(t), (t, e) => reject(e))();
+              this.executeSql(t, 'select * from user', [], (t) => resolve(t), (t, e) => reject(e))();
+            })
+          ]).then(f => {
+            this.logger.log('{}', f)();
+          });
+        }
+    );
+  }
   
   private transaction(transactionType: string, cb: TransactionCb) {
     this.db[transactionType]( t => {

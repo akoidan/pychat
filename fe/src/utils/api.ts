@@ -15,18 +15,7 @@ export default class Api {
     this.xhr.doPost<any>({
       url: '/auth',
       formData: new FormData(form),
-      isJsonDecoded: true,
-      cb: (pr, error) => {
-        if (error) {
-          cb(null, error);
-        } else if (pr.session) {
-          cb(pr.session, null);
-        } else if (pr.error) {
-          cb(null, pr.error);
-        } else {
-          cb(null, 'Unknown error');
-        }
-      },
+      cb
     });
   }
 
@@ -78,21 +67,10 @@ export default class Api {
   }
 
   public register(form: HTMLFormElement, cb: ErrorCB<string>) {
-    this.xhr.doPost<any>({
+    this.xhr.doPost<string>({
       url: '/register',
-      isJsonDecoded: true,
       formData: new FormData(form),
-      cb: (pr, error) => {
-        if (error) {
-          cb(null, error);
-        } else if (pr.session) {
-          cb(pr.session, null);
-        } else if (pr.error) {
-          cb(null, pr.error);
-        } else {
-          cb(null, 'Unknown error');
-        }
-      }
+      cb
     });
   }
 
@@ -127,23 +105,13 @@ export default class Api {
     });
   }
 
-  public uploadProfileImage(file: Blob, cb: ErrorCB<string>) {
+  public uploadProfileImage(file: Blob, cb: SingleParamCB<string>) {
     let fd = new FormData();
     fd.append('file', file);
     this.xhr.doPost<string>( {
       url: '/upload_profile_image',
       formData: fd,
-      cb: (data, error) => {
-        if (!data && error) {
-          cb(null, error);
-        } else if (!data) {
-          cb(null, 'Server error');
-        } else if (error) {
-          cb(null, error);
-        } else {
-          cb(data, null);
-        }
-      }
+      cb: this.getResponseSuccessCB(cb)
     });
   }
 

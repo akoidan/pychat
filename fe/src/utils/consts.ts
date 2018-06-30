@@ -7,4 +7,4 @@ export const API_URL_DEFAULT_XHR = 'https://localhost:8001/api';
 export const RESPONSE_SUCCESS = 'ok';
 export const PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
 export const MESSAGES_PER_SEARCH = 10;
-export const IS_DEBUG = 10;
+export const IS_DEBUG = true;

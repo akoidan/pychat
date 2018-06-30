@@ -54,7 +54,7 @@
 
     login() {
       this.running = true;
-      this.$api.login(this.$refs.form, (session, err) => {
+      this.$api.login(this.$refs.form, (session: string, err: string) => {
         this.running = false;
         login(session, err);
       });

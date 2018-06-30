@@ -162,13 +162,12 @@
         this.growlError("Please select image first")
       } else {
         this.running = true;
-        this.$api.uploadProfileImage(this.blob, (src, e) => {
+        this.$api.uploadProfileImage(this.blob, (e) => {
           this.running = false;
           if (e) {
             this.growlError(e)
           } else {
             this.growlSuccess("Image uploaded")
-            this.srcImg = resolveUrl(src);
           }
         })
       }

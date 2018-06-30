@@ -34,7 +34,7 @@ const logger = loggerFactory.getLoggerColor('store', '#6a6400');
 
 const store: StoreOptions<RootState> = {
   state: {
-    isOnline: true,
+    isOnline: false,
     growls: [],
     allUsersDict: {},
     regHeader: null,
@@ -244,6 +244,18 @@ const store: StoreOptions<RootState> = {
       let newVar = 'set';
       Vue[newVar](state.roomsDict, room.id, room);
       storage.saveRoom(room);
+    },
+    logout(state: RootState) {
+      state.userInfo = null;
+      state.userSettings = null;
+      state.userImage = null;
+      state.roomsDict = {};
+      state.allUsersDict = {};
+      state.activeUserId = null;
+      state.online = [];
+      state.activeRoomId = null;
+      state.editedMessage = null;
+      storage.clearStorage();
     }
   },
   actions: {
@@ -268,12 +280,6 @@ const store: StoreOptions<RootState> = {
         context.commit('removeGrowl', growl);
       }, 4000);
     },
-    logout(context: State) {
-      context.commit('setUserInfo', null);
-      context.commit('setEditedMessage', null);
-      context.commit('setRooms', {});
-      storage.clearStorage();
-    }
   },
 };
 
