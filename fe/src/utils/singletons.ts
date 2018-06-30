@@ -2,7 +2,7 @@ import Xhr from './Xhr';
 import {WsHandler} from './WsHandler';
 import ChannelsHandler from './ChannelsHandler';
 import DatabaseWrapper from './DatabaseWrapper';
-import {API_URL_DEFAULT} from './consts';
+import {API_URL_DEFAULT, API_URL_DEFAULT_XHR} from './consts';
 import mobile from 'is-mobile';
 import LocalStorage from './LocalStorage';
 import store from '../store';
@@ -13,7 +13,7 @@ import loggerFactory from './loggerFactory';
 import sessionHolder from './sessionHolder';
 import {Logger} from 'lines-logger';
 
-export const xhr: Xhr = new Xhr(API_URL_DEFAULT, sessionHolder);
+export const xhr: Xhr = new Xhr(API_URL_DEFAULT_XHR, sessionHolder);
 export const api: Api = new Api(xhr);
 export const channelsHandler = new ChannelsHandler(store, api);
 export const isMobile = mobile.isMobile();
