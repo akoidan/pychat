@@ -33,7 +33,7 @@ const router = new VueRouter({
       children: [
         {
           path: '',
-          beforeEnter: (to, from, next) => next('/chat/1')
+          redirect: '/chat/1'
         },
         {
           component: ChannelsPage,
@@ -52,7 +52,7 @@ const router = new VueRouter({
           children: [
             {
               path: '',
-              beforeEnter: (to, from, next) => next('/profile/change-password')
+              redirect: '/profile/settings'
             },
             {
               path: 'user-info',
@@ -102,7 +102,7 @@ const router = new VueRouter({
       children: [
         {
           path: '',
-          beforeEnter: (to, from, next) => next('/auth/login')
+          redirect: '/auth/login',
         },
         {
           path: 'login',

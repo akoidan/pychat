@@ -38,6 +38,14 @@ export function convertSexToString(m: string): string {
   }[m];
 }
 
+export function convertStringSexToNumber(m: string): string {
+  return {
+    'Secret': 0,
+    'Male': 1,
+    'Female': 2,
+  }[m];
+}
+
 export function convertFile(dto: FileModelDto): FileModel {
   return {...dto};
 }

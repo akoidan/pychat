@@ -8,7 +8,7 @@ import {
   RoomSettingsModel,
   UserModel
 } from '../types/model';
-import {convertSexStrToNumber, convertSexToNumber, convertSexToString} from '../types/converters';
+import {convertSexToNumber, convertSexToString, convertStringSexToNumber} from '../types/converters';
 interface TransactionCb { (t: SQLTransaction, ...rest): void; }
 
 export default class DatabaseWrapper implements IStorage {
@@ -287,7 +287,7 @@ export default class DatabaseWrapper implements IStorage {
 
   public setUserProfile(user: CurrentUserInfoModel) {
     this.write(t => {
-      this.executeSql(t, 'insert or replace into profile (userId, user, name, city, surname, email, birthday, contacts, sex) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [user.userId, user.user, user.name, user.city, user.surname, user.email, user.birthday, user.contacts, convertSexStrToNumber(user.sex)])();
+      this.executeSql(t, 'insert or replace into profile (userId, user, name, city, surname, email, birthday, contacts, sex) values (?, ?, ?, ?, ?, ?, ?, ?, ?)', [user.userId, user.user, user.name, user.city, user.surname, user.email, user.birthday, user.contacts, convertStringSexToNumber(user.sex)])();
     });
   }
 
