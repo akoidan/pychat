@@ -1,6 +1,6 @@
 
 import loggerFactory from './loggerFactory';
-import {IStorage, SetRoomsUsers} from '../types/types';
+import {IStorage, SetRoomsUsers, StorageData} from '../types/types';
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
@@ -9,7 +9,6 @@ import {
   UserModel
 } from '../types/model';
 import {Logger} from 'lines-logger';
-import {SetRooms} from '../types/dto';
 
 export default class LocalStorage implements IStorage {
 
@@ -65,7 +64,7 @@ export default class LocalStorage implements IStorage {
   saveRoomUsers(ru: SetRoomsUsers)  {}
   setUsers(users: UserModel[])  {}
   saveUser(users: UserModel)  {}
-  getAllTree(cb: SingleParamCB<SetRooms>) {}
+  getAllTree(cb: SingleParamCB<StorageData>) {}
 
   public clearStorage() {
     localStorage.setItem(this.STORAGE_NAME, '{}');

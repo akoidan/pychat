@@ -44,12 +44,6 @@ export interface UserProfileDto {
   userId: number;
 }
 
-export interface SetRooms {
-  roomsDict: RoomDictModel;
-  settings: CurrentUserSettingsModel;
-  profile: CurrentUserInfoModel;
-  allUsersDict: {[id: number]: UserModel};
-}
 
 export interface FileModelDto {
   id: number;

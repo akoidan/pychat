@@ -1,4 +1,4 @@
-import {IStorage, SetRoomsUsers} from '../types/types';
+import {IStorage, SetRoomsUsers, StorageData} from '../types/types';
 import loggerFactory from './loggerFactory';
 import {Logger} from 'lines-logger';
 import {
@@ -14,7 +14,6 @@ import {
   convertSexToString,
   convertStringSexToNumber
 } from '../types/converters';
-import {SetRooms} from '../types/dto';
 interface TransactionCb { (t: SQLTransaction, ...rest): void; }
 
 export default class DatabaseWrapper implements IStorage {
@@ -45,7 +44,7 @@ export default class DatabaseWrapper implements IStorage {
       let tables = [
         'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)) )',
         'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)))',
-        'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id))',
+        'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (deleted IN (0,1)))',
         'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text);',
         'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))',
         'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2)))',
@@ -62,19 +61,17 @@ export default class DatabaseWrapper implements IStorage {
         });
       });
       start.then((t: SQLTransaction)  => {
-        cb(true);
         this.logger.log('DatabaseWrapper has been initialized')();
       }).catch(reason => {
         this.logger.error('Failed creating db: {}', reason)();
-        cb(false);
       });
     } else if (this.db.version === '1.0') {
       this.logger.log('Created new db connection')();
-      cb(true);
+      cb();
     }
   }
 
-  public getAllTree(onReady: SingleParamCB<SetRooms>) {
+  public getAllTree(onReady: SingleParamCB<StorageData>) {
     this.read(t => {
           Promise.all([
             'select * from file',
@@ -83,7 +80,7 @@ export default class DatabaseWrapper implements IStorage {
             'select * from room_users',
             'select * from settings',
             'select * from user where deleted = 0',
-            'select * from message where deleted = 0'
+            'select * from message'
           ].map(sql => new Promise((resolve, reject) => {
             this.executeSql(t, sql, [], (t, d) => {
               this.logger.debug('sql {} fetched {} ', sql, d)();
@@ -158,13 +155,14 @@ export default class DatabaseWrapper implements IStorage {
               });
 
               let am: { [id: string]: MessageModel } = {};
+              let sendingMessages: MessageModel[] = [];
               dbMessages.forEach(m => {
                 let message: MessageModel = {
                   id: m.id,
                   roomId: m.roomId,
                   time: m.time,
                   deleted: m.deleted ? true : false,
-                  sending: m.id < 0,
+                  sending: m.sending,
                   upload: null,
                   files: {},
                   edited: m.edited,
@@ -173,6 +171,9 @@ export default class DatabaseWrapper implements IStorage {
                   userId: m.userId,
                   giphy: m.giphy
                 };
+                if (message.sending) {
+                  sendingMessages.push(message);
+                }
                 if (roomsDict[m.roomId]) {
                   roomsDict[m.roomId].messages[m.id] = message;
                 }
@@ -189,7 +190,7 @@ export default class DatabaseWrapper implements IStorage {
                   am[f.message_id].files[f.symbol] = file;
                 }
               });
-              let newVar: SetRooms = {roomsDict, settings, profile, allUsersDict};
+              let newVar: StorageData = {sendingMessages, setRooms: {roomsDict, settings, profile, allUsersDict}};
               onReady(newVar);
             } else {
               this.logger.warn('Missing profile from db, not injecting root state')();
@@ -251,31 +252,31 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
-  private getMessages (t, cb) {
-    this.executeSql(t, 'SELECT * FROM message', [], (t, m) => {
-      this.executeSql(t, 'SELECT * from file', [],  (t, i) => {
-        let mid = {};
-        let messages = [];
-        for (let j = 0; j < m.rows.length; j++) {
-          let e = m.rows[j];
-          mid[e.id] = e;
-          e.files = {};
-          messages.push(e);
-        }
-        for (let j = 0; j < i.rows.length; j++) {
-          let e = i.rows[j];
-          mid[e.message_id].files[e.symbol] = e;
-        }
-        cb(messages);
-      })();
-    })();
-    return cb;
-  }
+  // private getMessages (t, cb) {
+  //   this.executeSql(t, 'SELECT * FROM message', [], (t, m) => {
+  //     this.executeSql(t, 'SELECT * from file', [],  (t, i) => {
+  //       let mid = {};
+  //       let messages = [];
+  //       for (let j = 0; j < m.rows.length; j++) {
+  //         let e = m.rows[j];
+  //         mid[e.id] = e;
+  //         e.files = {};
+  //         messages.push(e);
+  //       }
+  //       for (let j = 0; j < i.rows.length; j++) {
+  //         let e = i.rows[j];
+  //         mid[e.message_id].files[e.symbol] = e;
+  //       }
+  //       cb(messages);
+  //     })();
+  //   })();
+  //   return cb;
+  // }
 
   public insertMessage (t, message: MessageModel) {
     this.setRoomHeaderId(message.roomId, message.id);
-    this.executeSql(t, 'insert or replace into message (id, time, content, symbol, deleted, giphy, edited, roomId, userId) values (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId], (t, d) => {
+    this.executeSql(t, 'insert or replace into message (id, time, content, symbol, deleted, giphy, edited, roomId, userId, sending) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId, message.sending ? 1 : 0], (t, d) => {
           for (let k in message.files) {
             let f = message.files[k];
             this.executeSql(t, 'insert or replace into file (id, symbol, url, message_id, type, preview) values (?, ?, ?, ?, ?, ?)', [f.id, k, f.url, message.id, f.type, f.preview])();
@@ -344,7 +345,9 @@ export default class DatabaseWrapper implements IStorage {
 
   public deleteMessage(id: number) {
     this.write(t => {
-      this.executeSql(t, 'update message set deleted = 1 where id = ? ', [id])();
+      this.executeSql(t, 'delete from file where message_id = ?', [id], (t) => {
+        this.executeSql(t, 'delete from message where id = ? ', [id])();
+      });
     });
   }
 

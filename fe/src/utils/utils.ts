@@ -1,7 +1,7 @@
 import store from '../store';
 import router from '../router';
 import sessionHolder from './sessionHolder';
-import {globalLogger, ws} from './singletons';
+import {channelsHandler, globalLogger, ws} from './singletons';
 import {CurrentUserInfoModel, EditingMessage, MessageModel, RootState} from '../types/model';
 
 export function logout(errMessage: string) {
@@ -12,6 +12,7 @@ export function logout(errMessage: string) {
   sessionHolder.session = '';
   router.replace('/auth/login');
   ws.stopListening();
+  channelsHandler.removeAllSendingMessages();
 }
 
 export function login(session, errMessage) {

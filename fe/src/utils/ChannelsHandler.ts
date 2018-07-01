@@ -167,6 +167,14 @@ export default class ChannelsHandler extends MessageHandler {
     }
   }
 
+  public removeAllSendingMessages() {
+    let length = Object.keys(this.sendingMessage).length;
+    for (let k in this.sendingMessage) {
+      this.removeSendingMessage(k);
+    }
+    this.logger.log('Flushed {} sending messages', length);
+  }
+
   public resendMessage(id) {
     this.logger.log('resending message {} ', id)();
     let cb = this.sendingMessage[id].cb;

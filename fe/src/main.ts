@@ -8,7 +8,9 @@ import store from './store';
 import router from './router';
 import loggerFactory from './utils/loggerFactory';
 import {IS_DEBUG} from './utils/consts';
-import {SetRooms} from './types/dto';
+import sessionHolder from './utils/sessionHolder';
+import {StorageData} from './types/types';
+import {MessageModel} from './types/model';
 
 
 window.addEventListener('focus', () => {
@@ -61,11 +63,25 @@ Vue.mixin({
 Vue.prototype.$api = api;
 Vue.prototype.$ws = ws;
 
-storage.connect(finished => {
-  storage.getAllTree((data: SetRooms) => {
+storage.connect(() => {
+  storage.getAllTree((data: StorageData) => {
     globalLogger.log('restored state from db {}', data)();
-    if (!store.state.userInfo) {
-      store.commit('init', data);
+    if (!store.state.userInfo && sessionHolder.session) {
+      store.commit('init', data.setRooms);
+    } else {
+      globalLogger.debug('Skipping settings state {}', data.setRooms)();
+    }
+    if (sessionHolder.session) {
+      globalLogger.debug('Appending sending messages {}', data.sendingMessages)();
+      data.sendingMessages.forEach((m: MessageModel) => {
+        if (m.content && m.id > 0) {
+          channelsHandler.sendEditMessage(m.content, m.roomId, m.id, []);
+        } else if (m.content) {
+          channelsHandler.sendSendMessage(m.content, m.roomId, [], ws.getMessageId(), m.time);
+        } else if (m.id > 0) {
+          channelsHandler.sendDeleteMessage(m.id, ws.getMessageId());
+        }
+      });
     }
   });
 });

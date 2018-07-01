@@ -21,12 +21,11 @@ import {
 import {
   AddMessagePayload,
   MessagesLocation, RemoveMessageProgress, RemoveSendingMessage,
-  SetMessageProgress, SetMessageProgressError,
+  SetMessageProgress, SetMessageProgressError, SetRooms,
   SetRoomsUsers,
   SetSearchTo, SetUploadProgress
 } from './types/types';
 import {storage} from './utils/singletons';
-import {SetRooms} from './types/dto';
 
 interface State extends ActionContext<RootState, RootState> {}
 

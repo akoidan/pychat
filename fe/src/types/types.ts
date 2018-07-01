@@ -1,13 +1,12 @@
 import {
   CurrentUserInfoModel, CurrentUserSettingsModel,
   FileModel,
-  MessageModel, RoomModel,
+  MessageModel, RoomDictModel, RoomModel,
   RoomSettingsModel,
   SearchModel,
   UploadProgressModel,
   UserModel
 } from './model';
-import {SetRooms} from './dto';
 
 export interface MessageDb {
   id: number;
@@ -65,7 +64,7 @@ export  interface IStorage {
   setUserSettings( settings: CurrentUserSettingsModel);
   saveRoomUsers(ru: SetRoomsUsers);
   setUsers(users: UserModel[]);
-  getAllTree(onReady: SingleParamCB<SetRooms>);
+  getAllTree(onReady: SingleParamCB<StorageData>);
   saveUser(users: UserModel);
   clearStorage();
   connect(cb: Function);
@@ -83,6 +82,17 @@ export interface PostData<T> {
   process?: Function;
 }
 
+export interface SetRooms {
+  roomsDict: RoomDictModel;
+  settings: CurrentUserSettingsModel;
+  profile: CurrentUserInfoModel;
+  allUsersDict: {[id: number]: UserModel};
+}
+
+export interface StorageData {
+  setRooms: SetRooms;
+  sendingMessages: MessageModel[];
+}
 
 export interface MessagesLocation {
   roomId: number;
