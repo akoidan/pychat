@@ -158,12 +158,14 @@
     }
 
     private stopVideo() {
-      if (this.stream.stop) {
-        this.stream.stop();
-      } else {
-        this.stream.getVideoTracks()[0].stop();
+      if (this.stream) {
+        if (this.stream.stop) {
+          this.stream.stop();
+        } else {
+          this.stream.getVideoTracks()[0].stop();
+        }
+        this.stream = null;
       }
-      this.stream = null;
     }
 
     upload() {

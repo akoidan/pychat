@@ -55,10 +55,11 @@ export  interface IStorage {
   setUserSettings( settings: CurrentUserSettingsModel);
   saveRoomUsers(ru: SetRoomsUsers);
   setUsers(users: UserModel[]);
-  getAllTree(onReady: SingleParamCB<StorageData>);
+
+  getAllTree(): Promise<StorageData>;
   saveUser(users: UserModel);
   clearStorage();
-  connect(cb: Function);
+  connect();
   // getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
   setRoomHeaderId(roomId: number, value: number);
 }

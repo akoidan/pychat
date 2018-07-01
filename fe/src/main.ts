@@ -63,27 +63,40 @@ Vue.mixin({
 Vue.prototype.$api = api;
 Vue.prototype.$ws = ws;
 
-storage.connect(() => {
-  storage.getAllTree((data: StorageData) => {
-    globalLogger.log('restored state from db {}', data)();
-    if (!store.state.userInfo && sessionHolder.session) {
-      store.commit('init', data.setRooms);
-    } else {
-      globalLogger.debug('Skipping settings state {}', data.setRooms)();
+async function initStore() {
+  let isNew = await storage.connect();
+  if (!isNew) {
+    let data: StorageData = await storage.getAllTree();
+    let session = sessionHolder.session;
+    globalLogger.log('restored state from db {}, userId: {}, session {}', data, store.state.userInfo && store.state.userInfo.userId, session)();
+    if (data) {
+      if (!store.state.userInfo && session) {
+        store.commit('init', data.setRooms);
+      } else {
+        globalLogger.debug('Skipping settings state {}', data.setRooms)();
+      }
+      if (session) {
+        globalLogger.debug('Appending sending messages {}', data.sendingMessages)();
+        data.sendingMessages.forEach((m: MessageModel) => {
+          if (m.content && m.id > 0) {
+            channelsHandler.sendEditMessage(m.content, m.roomId, m.id, []);
+          } else if (m.content) {
+            channelsHandler.sendSendMessage(m.content, m.roomId, [], ws.getMessageId(), m.time);
+          } else if (m.id > 0) {
+            channelsHandler.sendDeleteMessage(m.id, ws.getMessageId());
+          }
+        });
+      } else {
+        globalLogger.debug('No pending messages found')();
+      }
     }
-    if (sessionHolder.session) {
-      globalLogger.debug('Appending sending messages {}', data.sendingMessages)();
-      data.sendingMessages.forEach((m: MessageModel) => {
-        if (m.content && m.id > 0) {
-          channelsHandler.sendEditMessage(m.content, m.roomId, m.id, []);
-        } else if (m.content) {
-          channelsHandler.sendSendMessage(m.content, m.roomId, [], ws.getMessageId(), m.time);
-        } else if (m.id > 0) {
-          channelsHandler.sendDeleteMessage(m.id, ws.getMessageId());
-        }
-      });
-    }
-  });
+  }
+}
+
+initStore().then(value => {
+  globalLogger.debug('Exiting from initing store')();
+}).catch(e => {
+  globalLogger.error('Unable to init store from db, because of', e)();
 });
 
 

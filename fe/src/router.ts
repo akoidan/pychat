@@ -39,7 +39,7 @@ const router = new VueRouter({
           component: ChannelsPage,
           meta: {
             beforeEnter: (to, from, next) => {
-              globalLogger.log('setActiveRoomId {}', to.params.id)();
+              globalLogger.debug('setActiveRoomId {}', to.params.id)();
               store.commit('setActiveRoomId', parseInt(to.params.id));
               next();
             },

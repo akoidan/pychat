@@ -64,7 +64,9 @@ export default class LocalStorage implements IStorage {
   saveRoomUsers(ru: SetRoomsUsers)  {}
   setUsers(users: UserModel[])  {}
   saveUser(users: UserModel)  {}
-  getAllTree(cb: SingleParamCB<StorageData>) {}
+  async getAllTree(): Promise<StorageData> {
+    return new Promise<StorageData>(resolve => resolve(null));
+  }
 
   public clearStorage() {
     localStorage.setItem(this.STORAGE_NAME, '{}');
@@ -107,7 +109,6 @@ export default class LocalStorage implements IStorage {
     }
   }
 
-  connect(cb: Function) {
-    cb(true);
+  async connect() {
   }
 }
