@@ -1,5 +1,4 @@
 import {
-  API_URL,
   CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT,
   CONNECTION_RETRY_TIME,
   IS_DEBUG,
@@ -52,6 +51,7 @@ export class WsHandler extends MessageHandler {
   private router: VueRouter;
   private sessionHolder: SessionHolder;
   private listenWsTimeout: number;
+  private API_URL: string;
   private callBacks: { [id: number]: Function } = {};
   private handlers: AllHandlers;
   private methodHandlers = {
@@ -124,8 +124,9 @@ export class WsHandler extends MessageHandler {
     return this.methodHandlers;
   }
 
-  constructor(sessionHolder: SessionHolder, channelsHandler: ChannelsHandler, webRtcApi, storage: IStorage, store: Store<RootState>, router: VueRouter) {
+  constructor(API_URL: string, sessionHolder: SessionHolder, channelsHandler: ChannelsHandler, webRtcApi, storage: IStorage, store: Store<RootState>, router: VueRouter) {
     super();
+    this.API_URL = API_URL;
     this.logger = loggerFactory.getLoggerColor('ws', '#2e631e');
     this.loggerIn = loggerFactory.getLoggerColor('ws:in', '#2e631e');
     this.loggerOut = loggerFactory.getLoggerColor('ws:out', '#2e631e');
@@ -426,7 +427,7 @@ export class WsHandler extends MessageHandler {
     for (let k in this.store.state.roomsDict) {
       ids[k] = this.store.getters.maxId(k);
     }
-    let s = API_URL + this.wsConnectionId;
+    let s = this.API_URL + this.wsConnectionId;
     if (Object.keys(ids).length > 0) {
       s += `&messages=${encodeURI(JSON.stringify(ids))}`;
     }
@@ -447,7 +448,7 @@ export class WsHandler extends MessageHandler {
       this.startNoPingTimeout();
       this.wsState = WsState.CONNECTED;
       this.logger.debug(message)();
-    }
+    };
   }
 
 

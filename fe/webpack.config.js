@@ -2,6 +2,7 @@ const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const chalk = require('chalk');
+const webpack = require('webpack');
 
 module.exports = (env, argv) => {
 
@@ -9,6 +10,12 @@ module.exports = (env, argv) => {
   let sasscPlugins;
   plugins = [
     new VueLoaderPlugin(),
+    new webpack.DefinePlugin({
+      WS_API_URL: JSON.stringify(argv.WS_API_URL),
+      STATIC_API_URL: JSON.stringify(argv.STATIC_API_URL),
+      XHR_API_URL: JSON.stringify(argv.XHR_API_URL),
+      IS_DEBUG: argv.mode === 'development'
+    }),
     new HtmlWebpackPlugin({hash: true, favicon: 'src/assets/img/favicon.ico',  template: 'src/index.ejs', inject: false}),
   ];
   if (argv.mode === 'production') {

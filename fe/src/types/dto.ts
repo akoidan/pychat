@@ -32,6 +32,13 @@ export interface UserSettingsDto {
   theme: string;
 }
 
+export interface SetRooms {
+  roomsDict: RoomDictModel;
+  settings: CurrentUserSettingsModel;
+  profile: CurrentUserInfoModel;
+  allUsersDict: {[id: number]: UserModel};
+}
+
 export interface UserProfileDto {
   user: string;
   name: string;

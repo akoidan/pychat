@@ -1,24 +1,15 @@
 import {
-  CurrentUserInfoModel, CurrentUserSettingsModel,
+  CurrentUserInfoModel,
+  CurrentUserSettingsModel,
   FileModel,
-  MessageModel, RoomDictModel, RoomModel,
+  MessageModel,
+  RoomModel,
   RoomSettingsModel,
   SearchModel,
   UploadProgressModel,
   UserModel
 } from './model';
-
-export interface MessageDb {
-  id: number;
-  time: number;
-  content: string;
-  symbol: string;
-  deleted: number;
-  giphy: string;
-  edited: number;
-  roomId: number;
-  userId: number;
-}
+import {SetRooms} from './dto';
 
 
 export interface UploadFile {
@@ -82,12 +73,6 @@ export interface PostData<T> {
   process?: Function;
 }
 
-export interface SetRooms {
-  roomsDict: RoomDictModel;
-  settings: CurrentUserSettingsModel;
-  profile: CurrentUserInfoModel;
-  allUsersDict: {[id: number]: UserModel};
-}
 
 export interface StorageData {
   setRooms: SetRooms;
@@ -109,7 +94,7 @@ export interface RemoveMessageProgress {
   roomId: number;
 }
 
-export interface SetMessageProgress extends RemoveMessageProgress{
+export interface SetMessageProgress extends RemoveMessageProgress {
   total: number;
   uploaded: number;
 }

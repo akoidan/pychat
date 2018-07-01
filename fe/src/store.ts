@@ -1,12 +1,10 @@
 import Vue from 'vue';
-import Vuex, { StoreOptions } from 'vuex';
+import Vuex, {StoreOptions} from 'vuex';
 import {ActionContext} from 'vuex/types';
-
-Vue.use(Vuex);
-
 import loggerFactory from './utils/loggerFactory';
 import {
-  CurrentUserInfoModel, CurrentUserSettingsModel,
+  CurrentUserInfoModel,
+  CurrentUserSettingsModel,
   EditingMessage,
   GrowlModel,
   GrowlType,
@@ -19,13 +17,19 @@ import {
   UserModel
 } from './types/model';
 import {
-  AddMessagePayload,
-  MessagesLocation, RemoveMessageProgress, RemoveSendingMessage,
-  SetMessageProgress, SetMessageProgressError, SetRooms,
+  MessagesLocation,
+  RemoveMessageProgress,
+  RemoveSendingMessage,
+  SetMessageProgress,
+  SetMessageProgressError,
   SetRoomsUsers,
-  SetSearchTo, SetUploadProgress
+  SetSearchTo,
+  SetUploadProgress
 } from './types/types';
 import {storage} from './utils/singletons';
+import {SetRooms} from './types/dto';
+
+Vue.use(Vuex);
 
 interface State extends ActionContext<RootState, RootState> {}
 

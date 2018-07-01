@@ -1,7 +1,7 @@
 import {globalLogger} from './singletons';
 import smileys from '../assets/smileys/info.json';
 
-import {API_URL_DEFAULT, PASTED_IMG_CLASS} from './consts';
+import {STATIC_API_URL, PASTED_IMG_CLASS} from './consts';
 import {MessageDataEncode, SmileyStructure, UploadFile} from '../types/types';
 import {FileModel, MessageModel} from '../types/model';
 
@@ -78,7 +78,7 @@ export const isDateMissing = (function() {
 
 
 export function resolveUrl(src: string): string {
-  return src.indexOf('blob:http') === 0 ? src : `${API_URL_DEFAULT}${src}`;
+  return src.indexOf('blob:http') === 0 ? src : `${STATIC_API_URL}${src}`;
 }
 
 export function encodeSmileys(html: string): string {

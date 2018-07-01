@@ -2,7 +2,6 @@ import Xhr from './Xhr';
 import {WsHandler} from './WsHandler';
 import ChannelsHandler from './ChannelsHandler';
 import DatabaseWrapper from './DatabaseWrapper';
-import {API_URL_DEFAULT, API_URL_DEFAULT_XHR} from './consts';
 import mobile from 'is-mobile';
 import LocalStorage from './LocalStorage';
 import store from '../store';
@@ -12,8 +11,9 @@ import {IStorage} from '../types/types';
 import loggerFactory from './loggerFactory';
 import sessionHolder from './sessionHolder';
 import {Logger} from 'lines-logger';
+import {WS_API_URL, XHR_API_URL} from './consts';
 
-export const xhr: Xhr = new Xhr(API_URL_DEFAULT_XHR, sessionHolder);
+export const xhr: Xhr = new Xhr(XHR_API_URL, sessionHolder);
 export const api: Api = new Api(xhr);
 export const channelsHandler = new ChannelsHandler(store, api);
 export const isMobile = mobile.isMobile();
@@ -36,6 +36,6 @@ export const isFirefox = browserVersion.indexOf('Firefox') >= 0;
 export const isChrome = browserVersion.indexOf('Chrome') >= 0;
 export const storage: IStorage = window.openDatabase ? new DatabaseWrapper('v123x') : new LocalStorage();
 export  const globalLogger: Logger = loggerFactory.getLoggerColor('global', '#007a70');
-export const ws = new WsHandler(sessionHolder, channelsHandler, null, storage, store, router);
+export const ws = new WsHandler(WS_API_URL, sessionHolder, channelsHandler, null, storage, store, router);
 channelsHandler.seWsHandler(ws);
 
