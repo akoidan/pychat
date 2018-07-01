@@ -131,6 +131,10 @@
       }
     }
 
+    destroyed() {
+      this.stopVideo();
+    }
+
 
     startCapturingVideo() {
       if (this.isStopped) {
@@ -146,15 +150,20 @@
           this.growlError(`Unable to use your webcam because ${e.message || e.name }`);
         });
       } else {
-        if (this.stream.stop) {
-          this.stream.stop();
-        } else {
-          this.stream.getVideoTracks()[0].stop();
-        }
+        this.stopVideo();
         this.growlInfo("To apply photo click on save");
         this.showVideo = false;
         this.isStopped = true;
       }
+    }
+
+    private stopVideo() {
+      if (this.stream.stop) {
+        this.stream.stop();
+      } else {
+        this.stream.getVideoTracks()[0].stop();
+      }
+      this.stream = null;
     }
 
     upload() {

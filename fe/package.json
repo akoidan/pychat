@@ -7,8 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "prod": "webpack --progress --mode production --WS_API_URL=wss://vue.pychat.org/ws/?id= --STATIC_API_URL=https://vue.pychat.org --XHR_API_URL=https://vue.pychat.org/api",
-    "dev": "webpack-dev-server --mode development --hot --WS_API_URL=wss://localhost:8889/?id= --STATIC_API_URL=https://localhost:8001 --XHR_API_URL=https://localhost:8001/api",
+    "prod": "webpack --progress --mode production --WS_API_URL=wss://vue.pychat.org/ws --STATIC_API_URL=https://vue.pychat.org --XHR_API_URL=https://vue.pychat.org/api",
+    "dev": "webpack-dev-server --mode development --hot --WS_API_URL=wss://localhost:8889 --STATIC_API_URL=https://localhost:8001 --XHR_API_URL=https://localhost:8001/api",
     "test": "mocha test/index.ts"
   },
   "repository": {
