@@ -15,7 +15,7 @@ This is free web (browser) chat, that features:
  - Admin interface with django-admin
 
 Live demo: [pychat.org](http://pychat.org/)
-
+8000
 # Table of contents
   * [Breaf description](#brief-description)
   * [How to run on my own server](#how-to-run-on-my-own-server)
@@ -183,7 +183,10 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
-* room_users.last_message_id shoud be set when room is  created, if last_message_id is null, we should propagade all messages to history/offline_messages
+* Ability to select language to hightlight js
+* If self assigned certificate was used, mb add user an option to click on iframe or smth?
+* Giphy: The gif-picture won't change after editing and leaving it's name. But there are tons of other gifs under every tag. 
+* If user A was online in Brower BA and he didn't have any history, when he joins online from browser B and send the message, it won't appear on browser BA when he opens ba.
 * RoomUsers should have disabled instead of Room, so when user leaves direct messages, another one doesn't exit it. But in case of new message, user just doesn't receive any... Mb we can make them hidden in UI
 * Merge base.js into chat.js so 1 request less
 * https://github.com/tornadoweb/tornado/issues/2243

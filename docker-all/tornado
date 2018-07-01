@@ -11,6 +11,6 @@ depend() {
 }
 
 start_pre() {
-   su -c 'python3 /srv/http/manage.py init_db'
-   su -c 'python3 /srv/http/manage.py sync_db'
+   su - http -c 'PYCHAT_CONFIG=docker_all python3 /srv/http/manage.py init_db'
+   su - http -c 'PYCHAT_CONFIG=docker_all python3 /srv/http/manage.py sync_db'
 }
