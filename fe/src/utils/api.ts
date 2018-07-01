@@ -3,6 +3,7 @@ import {RESPONSE_SUCCESS} from './consts';
 import {UploadFile} from '../types/types';
 import {MessageModelDto, UserProfileDto, UserSettingsDto} from '../types/dto';
 import {UserModel} from '../types/model';
+import {xhr} from './singletons';
 
 export default class Api {
   private xhr: Xhr;
@@ -72,6 +73,20 @@ export default class Api {
       formData: new FormData(form),
       cb
     });
+  }
+
+  public googleAuth(token, cb) {
+    this.xhr.doPost({
+      url: '/google-auth',
+      params: {
+        token
+      },
+      cb: this.getResponseSuccessCB(cb),
+    });
+  }
+
+  public loadGoogle(cb) {
+    this.xhr.doGet('https://apis.google.com/js/platform.js', cb);
   }
 
   public validateUsername(username: string, cb: SingleParamCB<string>) {

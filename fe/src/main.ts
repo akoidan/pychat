@@ -32,7 +32,7 @@ if (IS_DEBUG) {
 
 window.onerror = function (msg, url, linenumber, column, errorObj) {
   let message = `Error occurred in ${url}:${linenumber}\n${msg}`;
-  if (!!store.state.userSettings || store.state.userSettings.sendLogs && api) {
+  if ((!!store.state.userSettings || store.state.userSettings.sendLogs) && api) {
     api.sendLogs(`${url}:${linenumber}:${column || '?'}\n${msg}\n\nOBJ:  ${errorObj || '?'}`, browserVersion);
   }
   store.dispatch('growlError', message);

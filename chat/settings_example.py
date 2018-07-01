@@ -74,6 +74,7 @@ globals().update(importlib.import_module(config).__dict__)
 # INSTALLED_APPS = ('snowpenguin.django.recaptcha2', 'multi_captcha_admin') + INSTALLED_APPS # Uncomment this row as well so you have django admin login with captcha as well
 
 ### For google auth follow the instructions here https://developers.google.com/identity/sign-in/web/devconsole-project
+### Select Web Browser type
 # GOOGLE_OAUTH_2_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com'
 # GOOGLE_OAUTH_2_HOST = 'your.domain.com'
 

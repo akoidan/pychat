@@ -60,7 +60,7 @@ const store: StoreOptions<RootState> = {
         getters.roomsArray
             .filter((r: RoomModel) => !r.name)
             .forEach((r: RoomModel) => {
-              let id = myId === r.users[0] ? r.users[1] : r.users[0];
+              let id = myId === r.users[0] && r.users.length === 2 ? r.users[1] : r.users[0];
               res[r.id] = ud[id];
             });
       }

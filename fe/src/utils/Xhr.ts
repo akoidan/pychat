@@ -44,7 +44,7 @@ export default class Xhr {
   private getUrl(url: string): string {
     if (!url) {
       url = this.apiUrl;
-    } else if (/^http:?\/\//.exec(url)) {
+    } else if (/^https?:\/\//.exec(url)) {
       return url;
     } else {
       return this.apiUrl + url;
@@ -54,7 +54,7 @@ export default class Xhr {
 
   /**
    * Loads file from server on runtime */
-  doGet(fileUrl: string, callback: Function) {
+  public doGet(fileUrl: string, callback: Function) {
     fileUrl = this.getUrl(fileUrl);
     this.httpLogger.log('GET out {}', fileUrl)();
     let regexRes = /\.(\w+)(\?.*)?$/.exec(fileUrl);

@@ -10,8 +10,8 @@
     </div>
       <router-link class='forg-pass' to="/auth/reset-password">Forgot Password?</router-link>
     <div>
-      <button v-if='oauth_token' class='g-icon lor-btn' title='Sign in using google account'
-              onclick='googleLogin'>Via Google
+      <button v-if='oauth_token' class='g-icon lor-btn' type="button" title='Sign in using google account'
+              @click='logWithGoogle'>Via Google
       </button>
       <button v-if='fb_app_id' title='Sign in using facebook account' class='f-icon lor-btn'
               @click='facebookLogin'>
@@ -27,6 +27,8 @@
   import AppSubmit from "../ui/AppSubmit.vue"
   import {Action, Mutation} from "vuex-class";
   import {login} from "../../utils/utils";
+  import {GOOGLE_OAUTH_2_CLIENT_ID} from '../../utils/consts';
+  import {googleLogin, initGoogle} from "../../utils/oauth";
 
   @Component({components: {AppSubmit}})
   export default class Register extends Vue {
@@ -35,8 +37,9 @@
       form: HTMLFormElement
     };
 
+    oauth_token: String = GOOGLE_OAUTH_2_CLIENT_ID;
+
     @Prop() captcha_key: String;
-    @Prop() oauth_token: String;
     @Prop() fb_app_id: String;
 
     @Action growlError;
@@ -44,12 +47,21 @@
 
     running: boolean = false;
 
+    logWithGoogle() {
+      this.running = true;
+      googleLogin(cb => {
+        this.running = false;
+        login(cb, null);
+      });
+    }
+
     facebookLogin() {
       alert('todo');
     }
 
     created() {
       this.setRegHeader('Welcome back!');
+      initGoogle();
     }
 
     login() {
