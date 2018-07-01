@@ -60,6 +60,7 @@ EMAIL_SUBJECT_PREFIX = '[Pychat] '
 
 REDIS_PORT = 6379
 REDIS_HOST ='localhost'
+REDIS_DB = 0
 REDIS_SESSION_DB = 3
 
 SESSION_ENGINE = 'redis_sessions.session'

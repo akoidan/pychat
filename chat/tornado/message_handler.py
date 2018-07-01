@@ -15,7 +15,7 @@ from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
 	UploadedFile, Image, get_milliseconds, UserProfile, User, Verification
 from chat.py2_3 import str_type, quote
-from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
+from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST, REDIS_DB
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates, \
 	UserSettingsVarNames, UserProfileVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
@@ -52,7 +52,7 @@ class MessagesHandler(MessagesCreator):
 		self.sync_redis = global_redis.sync_redis
 		self.channels = []
 		self._logger = None
-		self.async_redis = Client(host=REDIS_HOST, port=REDIS_PORT)
+		self.async_redis = Client(host=REDIS_HOST, port=REDIS_PORT, selected_db=REDIS_DB)
 		self.patch_tornadoredis()
 		# input websocket messages handlers
 		# The handler is determined by @VarNames.EVENT
