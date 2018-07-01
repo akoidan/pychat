@@ -38,3 +38,5 @@ meta_directory = /etc/postfix
 shlib_directory = /usr/lib/postfix
 virtual_alias_maps = hash:/etc/postfix/virtual,  regexp:/etc/postfix/virtual-regexp
 relayhost = [smtprelay.kyivstar.ua]:25
+smtpd_relay_restrictions = ${{$compatibility_level} < {1} ? {} : {permit_mynetwornauth_destination}}
+smtpd_recipient_restrictions= permit_mynetworks, permit_sasl_authenticated, defer_unauth_destination
