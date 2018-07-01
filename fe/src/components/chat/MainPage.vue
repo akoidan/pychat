@@ -227,6 +227,9 @@
     }
 
     private appendPreviousMessagesFiles(md: MessageDataEncode, messageId) {
+      if (!md.messageContent) {
+        return
+      }
       if (this.editingMessageModel.files) {
         for (let f in this.editingMessageModel.files) {
           if (md.messageContent.indexOf(f) >= 0) {
