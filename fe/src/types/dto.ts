@@ -1,4 +1,4 @@
-import {FileModel} from './model';
+import {CurrentUserInfoModel, CurrentUserSettingsModel, FileModel, RoomDictModel, UserModel} from './model';
 
 export enum SexModelDto {
   Male = 'Male',
@@ -42,6 +42,13 @@ export interface UserProfileDto {
   contacts: string;
   sex: string;
   userId: number;
+}
+
+export interface SetRooms {
+  roomsDict: RoomDictModel;
+  settings: CurrentUserSettingsModel;
+  profile: CurrentUserInfoModel;
+  allUsersDict: {[id: number]: UserModel};
 }
 
 export interface FileModelDto {

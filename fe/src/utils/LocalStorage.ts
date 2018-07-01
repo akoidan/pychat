@@ -9,6 +9,7 @@ import {
   UserModel
 } from '../types/model';
 import {Logger} from 'lines-logger';
+import {SetRooms} from '../types/dto';
 
 export default class LocalStorage implements IStorage {
 
@@ -64,7 +65,7 @@ export default class LocalStorage implements IStorage {
   saveRoomUsers(ru: SetRoomsUsers)  {}
   setUsers(users: UserModel[])  {}
   saveUser(users: UserModel)  {}
-  getAllTree() {}
+  getAllTree(cb: SingleParamCB<SetRooms>) {}
 
   public clearStorage() {
     localStorage.setItem(this.STORAGE_NAME, '{}');

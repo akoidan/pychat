@@ -78,7 +78,7 @@ export class WsHandler extends MessageHandler {
       this.setUserInfo(message.userInfo);
       this.setUserSettings(message.userSettings);
       this.setUserImage(message.userImage);
-      this.logger.log('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
+      this.logger.debug('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
     },
     userProfileChanged(message: UserProfileChangedMessage) {
       let user: UserModel = convertUser(message);
@@ -211,7 +211,7 @@ export class WsHandler extends MessageHandler {
   private hideGrowlProgress(key) {
     let progInter = this.progressInterval[key];
     if (progInter) {
-      this.logger.log('Removing progressInterval {}', key)();
+      this.logger.debug('Removing progressInterval {}', key)();
       progInter.growl.hide();
       if (progInter.interval) {
         clearInterval(progInter.interval);
@@ -326,7 +326,7 @@ export class WsHandler extends MessageHandler {
 
   private appendCB(cb: Function) {
     this.callBacks[this.messageId] = cb;
-    this.logger.log('Appending cb {}', cb)();
+    this.logger.debug('Appending cb {}', cb)();
   }
 
 
@@ -352,13 +352,13 @@ export class WsHandler extends MessageHandler {
     this.setStatus(false);
     for (let cb in this.callBacks) {
       try {
-        this.logger.log('Resolving cb {}', cb)();
+        this.logger.debug('Resolving cb {}', cb)();
         let cbFn = this.callBacks[cb];
         delete this.callBacks[cb];
         cbFn({});
-        this.logger.log('Cb {} has been resolved', cb)();
+        this.logger.debug('Cb {} has been resolved', cb)();
       } catch (e) {
-        this.logger.log('Error {} during resolving cb {}', e, cb)();
+        this.logger.debug('Error {} during resolving cb {}', e, cb)();
       }
     }
     for (let k in this.progressInterval) {
@@ -392,7 +392,7 @@ export class WsHandler extends MessageHandler {
   }
 
   public startListening() {
-    this.logger.log('Starting webSocket')();
+    this.logger.debug('Starting webSocket')();
     if (!this.listenWsTimeout && !this.ws) {
       this.listenWS();
     }
@@ -410,7 +410,7 @@ export class WsHandler extends MessageHandler {
       this.ws.close();
       this.ws = null;
     }
-    this.logger.log('Finished ws: {}', info.join(', '))();
+    this.logger.debug('Finished ws: {}', info.join(', '))();
   }
 
 
@@ -446,7 +446,7 @@ export class WsHandler extends MessageHandler {
       }
       this.startNoPingTimeout();
       this.wsState = WsState.CONNECTED;
-      this.logger.log(message)();
+      this.logger.debug(message)();
     }
   }
 
@@ -454,7 +454,7 @@ export class WsHandler extends MessageHandler {
   private startNoPingTimeout() {
     if (this.noServerPingTimeout) {
       clearTimeout(this.noServerPingTimeout);
-      this.logger.log('Clearing noServerPingTimeout')();
+      this.logger.debug('Clearing noServerPingTimeout')();
       this.noServerPingTimeout = null;
     }
     this.noServerPingTimeout = setTimeout(() => {

@@ -26,6 +26,7 @@ import {
   SetSearchTo, SetUploadProgress
 } from './types/types';
 import {storage} from './utils/singletons';
+import {SetRooms} from './types/dto';
 
 interface State extends ActionContext<RootState, RootState> {}
 
@@ -239,6 +240,12 @@ const store: StoreOptions<RootState> = {
     setRooms(state: RootState, rooms: RoomDictModel) {
       state.roomsDict = rooms;
       storage.setRooms(Object.values(rooms));
+    },
+    init(state: RootState, setRooms: SetRooms) {
+      state.roomsDict = setRooms.roomsDict;
+      state.userInfo = setRooms.profile;
+      state.userSettings = setRooms.settings;
+      state.allUsersDict = setRooms.allUsersDict;
     },
     addRoom(state: RootState, room: RoomModel) {
       let newVar = 'set';

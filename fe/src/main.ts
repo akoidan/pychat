@@ -8,6 +8,7 @@ import store from './store';
 import router from './router';
 import loggerFactory from './utils/loggerFactory';
 import {IS_DEBUG} from './utils/consts';
+import {SetRooms} from './types/dto';
 
 
 window.addEventListener('focus', () => {
@@ -61,7 +62,12 @@ Vue.prototype.$api = api;
 Vue.prototype.$ws = ws;
 
 storage.connect(finished => {
-  storage.getAllTree();
+  storage.getAllTree((data: SetRooms) => {
+    globalLogger.log('restored state from db {}', data)();
+    if (!store.state.userInfo) {
+      store.commit('init', data);
+    }
+  });
 });
 
 

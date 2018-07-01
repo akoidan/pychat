@@ -30,11 +30,20 @@ export function convertSexToNumber(m: SexModel): number {
   }
 }
 
+
+export function convertNumberToSex(m: number): SexModel {
+  return {
+    '0': SexModel.Secret,
+    '1': SexModel.Male,
+    '2': SexModel.Female,
+  }[m];
+}
+
 export function convertSexToString(m: string): string {
   return {
     '0': 'Secret',
     '1': 'Male',
-    '2': 'Male',
+    '2': 'Female',
   }[m];
 }
 

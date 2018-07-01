@@ -7,6 +7,7 @@ import {
   UploadProgressModel,
   UserModel
 } from './model';
+import {SetRooms} from './dto';
 
 export interface MessageDb {
   id: number;
@@ -64,7 +65,7 @@ export  interface IStorage {
   setUserSettings( settings: CurrentUserSettingsModel);
   saveRoomUsers(ru: SetRoomsUsers);
   setUsers(users: UserModel[]);
-  getAllTree();
+  getAllTree(onReady: SingleParamCB<SetRooms>);
   saveUser(users: UserModel);
   clearStorage();
   connect(cb: Function);

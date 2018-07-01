@@ -3,12 +3,18 @@ import loggerFactory from './loggerFactory';
 import {Logger} from 'lines-logger';
 import {
   CurrentUserInfoModel,
-  CurrentUserSettingsModel,
+  CurrentUserSettingsModel, FileModel,
   MessageModel, RoomDictModel, RoomModel,
   RoomSettingsModel,
   UserModel
 } from '../types/model';
-import {convertSexToNumber, convertSexToString, convertStringSexToNumber} from '../types/converters';
+import {
+  convertNumberToSex,
+  convertSexToNumber,
+  convertSexToString,
+  convertStringSexToNumber
+} from '../types/converters';
+import {SetRooms} from '../types/dto';
 interface TransactionCb { (t: SQLTransaction, ...rest): void; }
 
 export default class DatabaseWrapper implements IStorage {
@@ -33,44 +39,33 @@ export default class DatabaseWrapper implements IStorage {
   }
 
   public connect(cb: Function) {
-    this.logger.log('Initializing database')();
     this.db = window.openDatabase(this.dbName, '', 'Messages database', 10 * 1024 * 1024);
     if (this.db.version === '') {
-      Promise.resolve().then(() => new Promise((resolve, reject) => {
+      this.logger.log('Initializing database')();
+      let tables = [
+        'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)) )',
+        'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)))',
+        'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id))',
+        'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text);',
+        'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))',
+        'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2)))',
+        'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))'
+      ];
+      let start = Promise.resolve().then(() => new Promise((resolve, reject) => {
         this.db.changeVersion(this.db.version, '1.0', (t) => resolve(t), e => reject(e));
-      })).then((t: SQLTransaction) => {
-        return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN ((0,1,2))), deleted boolean NOT NULL CHECK (deleted IN (0,1)) )', [], (t) => resolve(t), (t, e) => reject(e))();
+      }));
+      tables.forEach(sql => {
+        start = start.then((t: SQLTransaction) => {
+          return new Promise((resolve, reject) => {
+            this.executeSql(t, sql, [], (t) => resolve(t), (t, e) => reject({sql, e}))();
+          });
         });
-      }).then((t: SQLTransaction) => {
-        return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)))', [], (t) => resolve(t), (t, e) => reject(e))();
-        });
-      }).then((t: SQLTransaction) => {
-        return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id))', [], (t) => resolve(t), (t, e) => reject(e))();
-        });
-      }).then((t: SQLTransaction) => {
-        return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text);', [], (t) => resolve(t), (t, e) => reject(e))();
-        });
-      }).then((t: SQLTransaction) => {
-        return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))', [], (t) => resolve(t), (t, e) => reject(e))();
-        });
-      }).then((t: SQLTransaction) => {
-        return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN ((0,1,2))))', [], (t) => resolve(t), (t, e) => reject(e))();
-        });
-      }).then((t: SQLTransaction) => {
-        return new Promise((resolve, reject) => {
-          this.executeSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))', [], (t) => resolve(t), (t, e) => reject(e))();
-        });
-      }).then((t: SQLTransaction)  => {
+      });
+      start.then((t: SQLTransaction)  => {
         cb(true);
-        this.logger.log('DatabaseWrapper has been initialized with version {}', this.db.version)();
+        this.logger.log('DatabaseWrapper has been initialized')();
       }).catch(reason => {
-        this.logger.error('Failed creating db {}, message {}', reason, reason.message)();
+        this.logger.error('Failed creating db: {}', reason)();
         cb(false);
       });
     } else if (this.db.version === '1.0') {
@@ -79,79 +74,128 @@ export default class DatabaseWrapper implements IStorage {
     }
   }
 
-  public getAllTree() {
+  public getAllTree(onReady: SingleParamCB<SetRooms>) {
     this.read(t => {
           Promise.all([
-            new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from file', [], (t, d) => resolve(d), (t, e) => reject(e))();
-            }),
-            new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from profile', [], (t, d) => {
-
-              }, (t, e) => reject(e))();
-            }),
-            new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from room', [], (t, d) => resolve(d), (t, e) => reject(e))();
-            }),
-            new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from room_users', [], (t, d) => resolve(d), (t, e) => reject(e))();
-            }),
-            new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from settings', [], (t, d) => resolve(d), (t, e) => reject(e))();
-            }),
-            new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from user', [], (t, d) => resolve(d), (t, e) => reject(e))();
-            }),
-            new Promise((resolve, reject) => {
-              this.executeSql(t, 'select * from message', [], (t, d) => resolve(d), (t, e) => reject(e))();
-            })
-          ]).then((f: any ) => {
-            let files = f[0].rows;
-            let profile = f[1].rows;
-            let rooms = f[2].rows;
-            let roomUsers = f[3].rows;
-            let settings = f[4].rows;
-            let users = f[5].rows;
-            let messages = f[6].rows;
-            let up: CurrentUserInfoModel = {
-              sex: convertSexToString(profile.sex),
-              contacts: profile.contacts,
-              birthday: profile.birthday,
-              email: profile.email,
-              surname: profile.surname,
-              city: profile.city,
-              name: profile.name,
-              userId: profile.userId,
-              user: profile.user
-            };
-            let us: CurrentUserSettingsModel = {
-              embeddedYoutube: settings.embeddedYoutube ? true : false,
-              highlightCode: settings.highlightCode ? true : false,
-              incomingFileCallSound: settings.incomingFileCallSound ? true : false,
-              messageSound: settings.messageSound ? true : false,
-              onlineChangeSound: settings.onlineChangeSound ? true : false,
-              sendLogs: settings.sendLogs ? true : false,
-              suggestions: settings.suggestions ? true : false,
-              theme: settings.theme,
-              logs: settings.logs ? true : false,
-            };
-            let ro: RoomDictModel = {};
-            rooms.forEach(r => {
-              let rm: RoomModel = {
-                id: r.id,
-                allLoaded: false,
-                users: [],
-                volume: r.volume,
-                notifications: r.notifications ? true : false,
-                name: r.name,
-                messages: {},
-                search: null
+            'select * from file',
+            'select * from profile',
+            'select * from room where deleted = 0',
+            'select * from room_users',
+            'select * from settings',
+            'select * from user where deleted = 0',
+            'select * from message where deleted = 0'
+          ].map(sql => new Promise((resolve, reject) => {
+            this.executeSql(t, sql, [], (t, d) => {
+              this.logger.debug('sql {} fetched {} ', sql, d)();
+              let res = [];
+              for (let i = 0; i < d.rows.length; i++) {
+                res.push(d.rows[i]);
+              }
+              resolve(res);
+            }, (t, e) => reject(e))();
+          }))).then((f: any) => {
+            this.logger.debug('resolved all sqls')();
+            let dbFiles = f[0],
+                dbProfile = f[1],
+                dbRooms = f[2],
+                dbRoomUsers = f[3],
+                dbSettings = f[4],
+                dbUsers = f[5],
+                dbMessages = f[6];
+            if (dbProfile.length) {
+              let profile: CurrentUserInfoModel = {
+                sex: convertSexToString(dbProfile[0].sex),
+                contacts: dbProfile[0].contacts,
+                birthday: dbProfile[0].birthday,
+                email: dbProfile[0].email,
+                surname: dbProfile[0].surname,
+                city: dbProfile[0].city,
+                name: dbProfile[0].name,
+                userId: dbProfile[0].userId,
+                user: dbProfile[0].user
               };
-              ro[r.id] = rm;
-            });
-            this.logger.log('restored state from db {}', f)();
+              let settings: CurrentUserSettingsModel = {
+                embeddedYoutube: dbSettings[0].embeddedYoutube ? true : false,
+                highlightCode: dbSettings[0].highlightCode ? true : false,
+                incomingFileCallSound: dbSettings[0].incomingFileCallSound ? true : false,
+                messageSound: dbSettings[0].messageSound ? true : false,
+                onlineChangeSound: dbSettings[0].onlineChangeSound ? true : false,
+                sendLogs: dbSettings[0].sendLogs ? true : false,
+                suggestions: dbSettings[0].suggestions ? true : false,
+                theme: dbSettings[0].theme,
+                logs: dbSettings[0].logs ? true : false,
+              };
+              let roomsDict: RoomDictModel = {};
+              dbRooms.forEach(r => {
+                let rm: RoomModel = {
+                  id: r.id,
+                  allLoaded: false,
+                  users: [],
+                  volume: r.volume,
+                  notifications: r.notifications ? true : false,
+                  name: r.name,
+                  messages: {},
+                  search: {
+                    searchActive: false,
+                    searchText: '',
+                    searchedIds: [],
+                    locked: false
+                  }
+                };
+                roomsDict[r.id] = rm;
+              });
+              dbRoomUsers.forEach(ru => {
+                roomsDict[ru.room_id].users.push(ru.user_id);
+              });
+              let allUsersDict: { [id: number]: UserModel } = {};
+              dbUsers.forEach(u => {
+                let user: UserModel = {
+                  id: u.id,
+                  sex: convertNumberToSex(u.sex),
+                  user: u.user
+                };
+                allUsersDict[u.id] = user;
+              });
+
+              let am: { [id: string]: MessageModel } = {};
+              dbMessages.forEach(m => {
+                let message: MessageModel = {
+                  id: m.id,
+                  roomId: m.roomId,
+                  time: m.time,
+                  deleted: m.deleted ? true : false,
+                  sending: m.id < 0,
+                  upload: null,
+                  files: {},
+                  edited: m.edited,
+                  symbol: m.symbol,
+                  content: m.content,
+                  userId: m.userId,
+                  giphy: m.giphy
+                };
+                if (roomsDict[m.roomId]) {
+                  roomsDict[m.roomId].messages[m.id] = message;
+                }
+                am[m.id] = message;
+              });
+              dbFiles.forEach(f => {
+                if (am[f.message_id]) {
+                  let file: FileModel = {
+                    url: f.url,
+                    type: f.type,
+                    preview: f.preview,
+                    id: f.id
+                  };
+                  am[f.message_id].files[f.symbol] = file;
+                }
+              });
+              let newVar: SetRooms = {roomsDict, settings, profile, allUsersDict};
+              onReady(newVar);
+            } else {
+              this.logger.warn('Missing profile from db, not injecting root state')();
+            }
           }).catch(reason => {
-            this.logger.error('Unable to load state from db, because {}')();
+            this.logger.error('Unable to load state from db, because {}', reason)();
           });
         }
     );
