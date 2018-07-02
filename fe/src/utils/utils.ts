@@ -1,10 +1,10 @@
 import store from '../store';
 import router from '../router';
 import sessionHolder from './sessionHolder';
-import {channelsHandler, ws} from './singletons';
+import {api, channelsHandler, ws} from './singletons';
 import {CurrentUserInfoModel, EditingMessage, MessageModel} from '../types/model';
 import loggerFactory from './loggerFactory';
-
+import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from './consts';
 
 let logger = loggerFactory.getLoggerColor('utils', '#007a70');
 
@@ -28,6 +28,63 @@ export function login(session, errMessage) {
     router.replace('/chat/1');
   } else {
     store.dispatch('growlError', session);
+  }
+}
+
+declare const gapi: any;
+declare const FB: any;
+
+let googleInited: boolean = false;
+let fbInited: boolean = false;
+let captchaInited: boolean = false;
+
+
+export function loadCaptcha(cb) {
+  if (captchaInited) {
+    cb();
+  } else {
+    api.loadRecaptcha(cb2 => {
+      captchaInited = true;
+      cb();
+    });
+  }
+}
+
+export function initGoogle(cb) {
+  if (!googleInited && GOOGLE_OAUTH_2_CLIENT_ID) {
+    logger.log('Initializing google sdk')();
+    api.loadGoogle(() => {
+      gapi.load('client:auth2', () => {
+        logger.log('gapi 2 is ready')();
+        gapi.auth2.init({client_id: GOOGLE_OAUTH_2_CLIENT_ID}).then(() => {
+          logger.log('gauth 2 is ready')();
+          googleInited = true;
+          cb();
+        }).catch(e => {
+          logger.error('Unable to init google {}', e)();
+          cb(e);
+        });
+      });
+    });
+  } else {
+    cb();
+  }
+}
+
+export function initFaceBook(cb) {
+  if (!fbInited && FACEBOOK_APP_ID) {
+    api.loadFacebook(e => {
+      logger.log('Initing facebook sdk...')();
+      FB.init({
+        appId: FACEBOOK_APP_ID,
+        xfbml: true,
+        version: 'v2.7'
+      });
+      fbInited = true;
+      cb();
+    });
+  } else {
+    cb();
   }
 }
 

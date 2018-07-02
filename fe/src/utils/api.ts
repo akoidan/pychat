@@ -103,6 +103,12 @@ export default class Api {
     this.xhr.doGet('//connect.facebook.net/en_US/sdk.js', cb);
   }
 
+  public loadRecaptcha(cb) {
+    this.xhr.doGet('https://www.google.com/recaptcha/api.js', cb);
+  }
+
+
+
   public validateUsername(username: string, cb: SingleParamCB<string>) {
     this.xhr.doPost({
       url: '/validate_user',

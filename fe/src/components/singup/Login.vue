@@ -30,8 +30,6 @@
       form: HTMLFormElement
     };
 
-    @Prop() captcha_key: String;
-
     @Action growlError;
     @Mutation setRegHeader;
 
@@ -52,10 +50,10 @@
   }
 </script>
 <style lang="sass" scoped>
-  .forg-pass
-    color: #249BA3
 
   .forg-pass
+    display: block
+    color: #249BA3
     text-align: right
     font: 12px Open Sans
     padding-right: 10px

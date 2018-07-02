@@ -18,7 +18,6 @@ from chat.settings import VALIDATION_IS_OK, AUTHENTICATION_BACKENDS
 from chat.utils import create_user_model, check_user
 
 GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
-GOOGLE_OAUTH_2_HOST = getattr(settings, "GOOGLE_OAUTH_2_HOST", None)
 FACEBOOK_ACCESS_TOKEN = getattr(settings, "FACEBOOK_ACCESS_TOKEN", None)
 
 logger = logging.getLogger(__name__)

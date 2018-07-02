@@ -38,7 +38,6 @@
   @Component({components: {SocialAuth, AppSubmit, RegisterFieldSet}})
   export default class SignUp extends Vue {
 
-    @Prop() captcha_key: string;
     @Prop() oauth_token: string;
     @Prop() fb_app_id: string;
     @Mutation setRegHeader;

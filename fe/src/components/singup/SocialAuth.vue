@@ -26,7 +26,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from '../ui/AppSubmit';
   import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from "../../utils/consts";
-  import {login} from '../../utils/utils';
+  import {initFaceBook, initGoogle, login} from "../../utils/utils";
 
   declare const gapi: any;
   declare const FB: any;
@@ -54,41 +54,19 @@
     }
 
     created() {
-      this.initGoogle();
-      this.initFaceBook()
+      initGoogle(e => {
+        this.googleApiLoaded = !e;
+        if (e) {
+          this.growlError("Unable to load google" + e);
+        }
+      });
+      initFaceBook(e => {
+        this.facebookApiLoaded = !e;
+        if (e) {
+          this.growlError("Unable to load fb" + e);
+        }
+      });
     }
-
-    initGoogle() {
-      if (GOOGLE_OAUTH_2_CLIENT_ID) {
-        this.logger.log("Initializing google sdk")();
-        this.$api.loadGoogle(() => {
-          gapi.load("client:auth2", () => {
-            this.logger.log("gapi 2 is ready")();
-            gapi.auth2.init({client_id: GOOGLE_OAUTH_2_CLIENT_ID}).then(() => {
-              this.logger.log("gauth 2 is ready")();
-              this.googleApiLoaded = true;
-            }).catch(e => {
-              this.growlError("Unable to init google oauth" + e);
-              this.logger.error("Unable to init google oauth {}" + e);
-            });
-          });
-        })
-      }
-    };
-
-    initFaceBook() {
-      if (FACEBOOK_APP_ID) {
-        this.$api.loadFacebook(e => {
-          this.logger.log("Initing facebook sdk...")();
-          FB.init({
-            appId: FACEBOOK_APP_ID,
-            xfbml: true,
-            version: 'v2.7'
-          });
-          this.facebookApiLoaded = true;
-        })
-      }
-    };
 
     sendGoogleTokenToServer(token, redirectToNextPage) {
       this.growlInfo('Successfully logged into google successfully, proceeding...');
