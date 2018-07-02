@@ -3,7 +3,7 @@ import smileys from '../assets/smileys/info.json';
 
 import {STATIC_API_URL, PASTED_IMG_CLASS} from './consts';
 import {MessageDataEncode, SmileyStructure, UploadFile} from '../types/types';
-import {FileModel, MessageModel} from '../types/model';
+import {FileModel, MessageModel, SexModel, UserModel} from '../types/model';
 
 const tmpCanvasContext = document.createElement('canvas').getContext('2d');
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -61,6 +61,18 @@ export function getSmileyPath(s: SmileyStructure) {
 let uniqueId = 1;
 export function getUniqueId() {
   return uniqueId++;
+}
+
+export function getUserSexClass(user: UserModel) {
+  if (user.sex === SexModel.Male) {
+    return 'icon-man';
+  } else if (user.sex === SexModel.Female) {
+    return 'icon-girl';
+  } else if (user.sex === SexModel.Secret) {
+    return 'icon-user-secret';
+  } else {
+    throw `Invalid sex ${user.sex}`;
+  }
 }
 
 export function getSmileyHtml (symbol: string) {

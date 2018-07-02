@@ -33,19 +33,21 @@
   </div>
 </template>
 <script lang="ts">
-  import {Action, Getter} from "vuex-class";
+  import {Action, Getter, State} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppInputRange from "../../ui/AppInputRange";
   import AppSubmit from "../../ui/AppSubmit";
   import AddUserToRoom from "./AddUserToRoom.vue";
-  import {UserModel} from "../../../types/model";
+  import {CurrentUserInfoModel, RoomModel, UserModel} from "../../../types/model";
   import {AddRoomMessage} from "../../../types/messages";
   import AppCheckbox from '../../ui/AppCheckbox';
+  import {getOppositeUserIdInPrivateRoom} from '../../../utils/utils';
 
   @Component({components: {AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})
   export default class CreateRoom extends Vue {
     @Action growlError;
-    @Getter privateRooms: { [id: string]: UserModel };
+    @Getter privateRooms: RoomModel[];
+    @State userInfo: CurrentUserInfoModel;
     currentUsers: UserModel[] = [];
     notifications: boolean = false;
     sound: number = 0;
@@ -63,11 +65,14 @@
     }
 
     get excludeUsersIds() {
-      let uids: number[] = [];
+      let uids: number[];
       if (!this.isPublic) {
+        uids = this.privateRooms.map(r => getOppositeUserIdInPrivateRoom(this.userInfo.userId, r.users));
         for (let user in this.privateRooms) {
           uids.push(this.privateRooms[user].id)
         }
+      } else {
+        uids = []
       }
       return uids;
     }

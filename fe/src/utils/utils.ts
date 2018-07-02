@@ -39,6 +39,12 @@ let fbInited: boolean = false;
 let captchaInited: boolean = false;
 
 
+
+export function getOppositeUserIdInPrivateRoom(myId: number, users: number[]): number {
+  return myId === users[0] && users.length === 2 ? users[1] : users[0];
+}
+
+
 export function loadCaptcha(cb) {
   if (captchaInited) {
     cb();

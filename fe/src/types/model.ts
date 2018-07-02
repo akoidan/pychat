@@ -102,11 +102,19 @@ export interface SearchModel {
   locked: boolean;
 }
 
+export interface ChangeOnline {
+  userId: number;
+  isWentOnline: boolean;
+  time: number;
+}
+
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
   messages: { [id: number]: MessageModel };
   allLoaded: boolean;
   search: SearchModel;
+  newMessagesCount: number;
+  changeOnline: ChangeOnline[];
 }
 
 export interface RootState {

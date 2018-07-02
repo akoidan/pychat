@@ -6,15 +6,7 @@
         <router-link to="/create-private-room" class="icon-plus-squared" title="Create direct room"/>
       </span>
     <ul class="directUserTable" v-show="!directMinified">
-      <li :class="getOnlineActiveClass(user.id, parseInt(id))" :key="id" v-for="(user, id) in privateRooms">
-        <router-link :to="`/chat/${id}`">
-          <i :class="getUserSexClass(user)"></i>{{user.user}}
-        </router-link>
-        <router-link :to="`/room-settings/${id}`">
-          <span class="icon-cog"></span>
-        </router-link>
-        <span class="newMessagesCount"></span>
-      </li>
+      <room-users-private :key="room.id" v-for="room in privateRooms" :room="room"/>
     </ul>
     <span>
         <span name="channel" :class="roomsClass" @click="roomsMinified = !roomsMinified"></span>
@@ -22,15 +14,7 @@
         <router-link to="/create-public-room" class="icon-plus-squared" title="Create public room"/>
     </span>
     <ul class="rooms" v-show="!roomsMinified">
-      <li v-for="room in publicRooms" :key="room.id" :class="getActiveClass(room.id)">
-        <router-link :to="`/chat/${room.id}`">
-          {{ room.name }}
-        </router-link>
-        <router-link :to="`/room-settings/${room.id}`">
-          <span class="icon-cog"></span>
-        </router-link>
-        <span class="newMessagesCount"></span>
-      </li>
+      <room-users-public v-for="room in publicRooms" :key="room.id" :room="room"/>
     </ul>
     <span>
         <span name="user" :class="onlineClass" @click="onlineMinified = !onlineMinified"></span>
@@ -38,11 +22,7 @@
         <router-link :to="`/invite-user/${activeRoomId}`" class="icon-user-plus" title="Add user to current active channel"/>
       </span>
     <ul class="chat-user-table" v-show="!onlineMinified">
-      <template v-for="user in usersArray">
-        <li :class="getOnlineClass(user.id)" v-show="userIsInActiveRoom(user.id)" :key="user.id">
-          <i :class="getUserSexClass(user)"></i>{{ user.user }}
-        </li>
-      </template>
+      <room-users-user v-for="user in usersArray" :user="user" :key="user.id"></room-users-user>
     </ul>
   </div>
 </template>
@@ -50,15 +30,16 @@
   import {Getter, State} from "vuex-class";
   import {Component, Vue} from "vue-property-decorator";
   import {RoomModel, SexModel, UserDictModel, UserModel} from "../../types/model";
-
-
-  @Component
+  import RoomUsersUser from './RoomUsersUser';
+  import RoomUsersPublic from './RoomUsersPublic';
+  import RoomUsersPrivate from './RoomUsersPrivate';
+  @Component({
+    components: {RoomUsersPrivate, RoomUsersPublic, RoomUsersUser}
+  })
   export default class RoomUsers extends Vue {
 
     @Getter usersArray: UserDictModel;
     @State activeRoomId: number;
-    @Getter activeRoom: RoomModel;
-    @State online: number[];
     @Getter publicRooms: RoomModel[];
     @Getter privateRooms: { [id: string]: UserModel};
 
@@ -67,38 +48,6 @@
     onlineMinified: boolean = false;
     onlineShowOnlyOnline: boolean = false;
 
-    getUserSexClass(user: UserModel) {
-      if (user.sex === SexModel.Male) {
-        return 'icon-man';
-      } else if (user.sex === SexModel.Female) {
-        return 'icon-girl';
-      } else if (user.sex === SexModel.Secret) {
-        return 'icon-user-secret';
-      } else {
-        throw `Invalid sex ${user.sex}`;
-      }
-    }
-
-    userIsInActiveRoom(userId: number) {
-      let ar = this.activeRoom;
-      return ar && ar.users.indexOf(userId) >= 0;
-    }
-
-    getOnlineClass(id: number) : string {
-      return this.online.indexOf(id) < 0 ? 'offline' : 'online';
-    }
-
-    getActiveClass(roomId: number) {
-      return roomId === this.activeRoomId ? 'active-room' : null;
-    }
-
-    getOnlineActiveClass(id: number, roomId: number) : string[] {
-      const a = [this.online.indexOf(id) < 0 ? "offline" : "online"];
-      if (roomId === this.activeRoomId) {
-        a.push('active-room');
-      }
-      return a;
-    }
 
     get onlineText() {
       return this.onlineShowOnlyOnline ? 'Room Users' : 'Room Online'
@@ -123,43 +72,9 @@
   @import "partials/mixins"
   @import "partials/abstract_classes"
 
-  .icon-cog
-    cursor: pointer
-
-  li:not(.active-room)
-    @extend %hovered-user-room
-  a
-    display: flex
-    flex-grow: 1
-
   @mixin fix-user-icon-top-position()
-    i:before
-      transform: translate(0, 3px)
-
-  .chat-user-table, .directUserTable
-    display: flex
-    flex-direction: column
-    .online
-      order: 1
-    .offline
-      order: 2
-
-  .chat-user-table
-    margin: 5px 0
-    li
-      border: 1px solid transparent
-      width: 100%
-      @include ellipsis
-      border-radius: 3px
-      [class^='icon-']
-        opacity: 1
-      @include fix-user-icon-top-position
-      i:hover
-        cursor: inherit
-
-    &.hideOffline li
-      &.offline
-        display: none
+  i:before
+    transform: translate(0, 3px)
 
   .chat-room-users-wrapper
     float: right
@@ -168,21 +83,71 @@
     overflow-x: hidden
     position: relative
     width: 300px
-    ul
+
+    @media screen and (max-width: $collapse-width)
+      width: 100%
+      border-bottom: 8px solid
+      @include flex(1)
+      flex-grow: 2
+
+    /deep/
+      .icon-smile, .icon-picture, .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
+        cursor: pointer
+        font-size: 15px
+
+
+    /deep/ .directUserTable, /deep/ .rooms
+      li
+        @include  fix-user-icon-top-position
+        @include ellipsis
+        border-radius: 3px
+        position: relative
+        height: 30px
+        &:hover
+          padding-right: 25px
+          .icon-cog
+            display: inline
+
+    /deep/ .rooms li
+      padding-left: 7px
+
+
+    /deep/ .rooms, /deep/ .directUserTable, /deep/  .chat-user-table > ul
+      $padding: 2px
+      margin-left: $padding
+      margin-right: $padding
+
+      .icon-cog
+        display: none
+        position: absolute
+        top: 2px
+        right: 0
+        background: transparent
+
+    /deep/ .newMessagesCount
+      color: white
+      border-radius: 5px
+      display: inline-block
+      padding: 2px 10px 2px 10px
+      right: 10px
+      top: 5px
+      font-size: 12px
+      position: absolute
+    /deep/ ul
       margin-top: 5px
       margin-bottom: 5px
       padding-left: 0
 
-    .channelsStateText, .directStateText, .usersStateText
+    /deep/.channelsStateText, /deep/ .directStateText, /deep/ .usersStateText
       font-size: 13px
       font-weight: bold
       text-transform: uppercase
       vertical-align: middle
 
-    .icon-angle-circled-down, .icon-angle-circled-up
+    /deep/ .icon-angle-circled-down, /deep/ .icon-angle-circled-up
       font-size: 15px
 
-    .icon-plus-squared, .icon-user-plus
+    /deep/ .icon-plus-squared, /deep/ .icon-user-plus
       float: right
       margin-top: 7px
       margin-right: 5px
@@ -191,12 +156,51 @@
       @extend %user-select-none
       border-radius: 2px
 
-    .usersStateText:hover
+    /deep/ .usersStateText:hover
       cursor: pointer
       color: #f1f1f1
 
+    /deep/ .icon-cog
+      cursor: pointer
 
-  .color-lor
+    /deep/ li:not(.active-room)
+      @extend %hovered-user-room
+    /deep/ a
+      display: flex
+      flex-grow: 1
+
+    /deep/ .chat-user-table, /deep/  .directUserTable
+      display: flex
+      flex-direction: column
+      .online
+        order: 1
+      .offline
+        order: 2
+
+    /deep/ .chat-user-table
+      margin: 5px 0
+      li
+        border: 1px solid transparent
+        width: 100%
+        @include ellipsis
+        border-radius: 3px
+        [class^='icon-']
+          opacity: 1
+        @include fix-user-icon-top-position
+        i:hover
+          cursor: inherit
+
+      &.hideOffline li
+        &.offline
+          display: none
+
+
+  .color-lor .chat-room-users-wrapper /deep/
+    @media screen and (max-width: $collapse-width)
+      border-bottom-color: $color-lor-scroll
+      > span
+        background-color: #221f1f
+        color: #8f8f8f
     .icon-cog
       color: #59b2c1
     .active-room
@@ -206,12 +210,6 @@
         color: #a93331
       &:before
         color: #2e9154
-    .chat-room-users-wrapper
-      @media screen and (max-width: $collapse-width)
-        border-bottom-color: $color-lor-scroll
-      > span
-        background-color: #221f1f
-        color: #8f8f8f
     .online
       .icon-man, .icon-girl, .icon-user-secret
         color: #2e9154
@@ -221,7 +219,9 @@
   .chat-room-users-wrapper > span
     display: block
 
-  .color-reg
+  .color-reg .chat-room-users-wrapper /deep/
+    .newMessagesCount
+      background-color: #891313
     a
       color: $color-lor-main
     .icon-cog
@@ -239,15 +239,14 @@
         color: #801615
       &:before
         color: #28671d
-    .chat-room-users-wrapper
-      .icon-smile, .icon-picture, .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
+    .icon-smile, .icon-picture, .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
         @include hover-click(#e3e3e3)
-      @media screen and (max-width: $collapse-width)
-        border-bottom-color: $mostly-black
-      > span
-        background-color: #171717
+    @media screen and (max-width: $collapse-width)
+      border-bottom-color: $mostly-black
+    > span
+      background-color: #171717
 
-  .color-white
+  .color-white .chat-room-users-wrapper /deep/
     a
       color: $color-white-main
     .icon-cog
@@ -271,44 +270,5 @@
         background-color: #414141
         color: white
 
-  @media screen and (max-width: $collapse-width)
-    .chat-room-users-wrapper
-      width: 100%
-      border-bottom: 8px solid
-      @include flex(1)
-      flex-grow: 2
-
-  .icon-smile, .icon-picture, .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
-    cursor: pointer
-    font-size: 15px
-
-
-  .directUserTable, .rooms
-    li
-      @include  fix-user-icon-top-position
-      @include ellipsis
-      border-radius: 3px
-      position: relative
-      height: 30px
-      &:hover
-        padding-right: 25px
-        .icon-cog
-          display: inline
-
-  .rooms li
-    padding-left: 7px
-
-
-  .rooms, .directUserTable, .chat-user-table > ul
-    $padding: 2px
-    margin-left: $padding
-    margin-right: $padding
-
-    .icon-cog
-      display: none
-      position: absolute
-      top: 2px
-      right: 0
-      background: transparent
 
 </style>

@@ -88,9 +88,12 @@
 
   .spanHo
     max-width: 300px
+    max-height: calc(50vh - 100px)
+    overflow: auto
 
   ul
     min-height: 50px
+    max-height: calc(50vh - 100px)
     margin-top: 5px
     overflow-y: scroll
     padding-left: 0

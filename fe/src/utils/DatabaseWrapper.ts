@@ -134,6 +134,8 @@ export default class DatabaseWrapper implements IStorage {
           notifications: r.notifications ? true : false,
           name: r.name,
           messages: {},
+          changeOnline: [],
+          newMessagesCount: 0,
           search: {
             searchActive: false,
             searchText: '',

@@ -52,20 +52,10 @@ const store: StoreOptions<RootState> = {
     editedMessage: null,
   },
   getters: {
-    privateRooms(state: RootState, getters): { [id: string]: UserModel } {
-      let ud: UserDictModel = state.allUsersDict;
-      let res: { [id: string]: UserModel } = {};
-      if (state.userInfo) {
-        let myId: number = state.userInfo.userId;
-        getters.roomsArray
-            .filter((r: RoomModel) => !r.name)
-            .forEach((r: RoomModel) => {
-              let id = myId === r.users[0] && r.users.length === 2 ? r.users[1] : r.users[0];
-              res[r.id] = ud[id];
-            });
-      }
-      logger.debug('privateRooms {}', res)();
-      return res;
+    privateRooms(state: RootState, getters): RoomModel[] {
+      let roomModels: RoomModel[] = getters.roomsArray.filter(r => !r.name);
+      logger.debug('privateRooms {} ', roomModels)();
+      return roomModels;
     },
     roomsArray(state: RootState): RoomModel[] {
       let anies = Object.values(state.roomsDict);
@@ -132,6 +122,12 @@ const store: StoreOptions<RootState> = {
       let upload = state.roomsDict[payload.roomId].messages[payload.messageId].upload;
       upload.uploaded = payload.uploaded;
       upload.total = payload.total;
+    },
+    incNewMessagesCount(state: RootState, roomId: number) {
+      state.roomsDict[roomId].newMessagesCount++;
+    },
+    resetNewMessagesCount(state: RootState, roomId: number) {
+      state.roomsDict[roomId].newMessagesCount = 0;
     },
     setUploadProgress(state: RootState, payload: SetUploadProgress) {
       state.roomsDict[payload.roomId].messages[payload.messageId].upload = payload.upload;
@@ -207,6 +203,9 @@ const store: StoreOptions<RootState> = {
     },
     setActiveRoomId(state: RootState, id: number) {
       state.activeRoomId = id;
+      if (state.roomsDict[id]) {
+        state.roomsDict[id].newMessagesCount = 0;
+      }
       state.editedMessage = null;
     },
     setRegHeader(state: RootState, regHeader: string) {

@@ -13,11 +13,12 @@ import {
   UploadFile
 } from '../types/types';
 import {
+  CurrentUserInfoModel,
   MessageModel,
   RoomDictModel,
   RoomModel,
   RootState,
-   UploadProgressModel,
+  UploadProgressModel,
   UserDictModel,
   UserModel
 } from '../types/model';
@@ -104,21 +105,24 @@ export default class ChannelsHandler extends MessageHandler {
       this.store.commit('setOnline', message.content);
     },
     printMessage(inMessage: EditMessage) {
-      let message: MessageModel = this.store.state.roomsDict[inMessage.roomId].messages[inMessage.id];
-      if (message) {
-        this.logger.debug('Skipping printing message {}, because it\'s already in list', inMessage.id)();
-      } else {
-        let message: MessageModel = this.getMessage(inMessage);
-        this.logger.debug('Adding message to storage {}', message)();
-        this.store.commit('addMessage', message);
-        if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-          this.removeSendingMessage(inMessage.messageId);
-          let rmMes: RemoveSendingMessage = {
-            messageId: inMessage.messageId,
-            roomId: inMessage.roomId
-          };
-          this.store.commit('deleteMessage', rmMes);
-        }
+      let message: MessageModel = this.getMessage(inMessage);
+      this.logger.debug('Adding message to storage {}', message)();
+      this.store.commit('addMessage', message);
+      let activeRoom: RoomModel = this.store.getters.activeRoom;
+      let userInfo: CurrentUserInfoModel = this.store.state.userInfo;
+      if (activeRoom
+          && userInfo
+          && activeRoom.id !== inMessage.roomId
+          && inMessage.userId !== userInfo.userId) {
+        this.store.commit('incNewMessagesCount', inMessage.roomId);
+      }
+      if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
+        this.removeSendingMessage(inMessage.messageId);
+        let rmMes: RemoveSendingMessage = {
+          messageId: inMessage.messageId,
+          roomId: inMessage.roomId
+        };
+        this.store.commit('deleteMessage', rmMes);
       }
     },
     deleteRoom(message: DeleteRoomMessage) {
@@ -297,6 +301,8 @@ export default class ChannelsHandler extends MessageHandler {
       notifications: message.notifications,
       name: message.name,
       messages: {},
+      newMessagesCount: 0,
+      changeOnline: [],
       allLoaded: false,
       search: {
         searchActive: false,
@@ -358,6 +364,8 @@ export default class ChannelsHandler extends MessageHandler {
       let rm: RoomModel = {
         id: newRoom.roomId,
         messages: oldRoom ? oldRoom.messages : {},
+        newMessagesCount: oldRoom ? oldRoom.newMessagesCount : 0,
+        changeOnline: oldRoom ? oldRoom.changeOnline : [],
         name: newRoom.name,
         search: oldRoom ? oldRoom.search : {
           searchActive: false,
