@@ -35,18 +35,14 @@ export default class NotifierHandler {
     this.isMobile = isMobile;
     this.ws = ws;
     this.store = store;
-    this.logger = loggerFactory.getLoggerColor('NOTIFY', '#ffb500');
+    this.logger = loggerFactory.getLoggerColor('NOTIFY', '#e39800');
     this.currentTabId = Date.now().toString();
     window.addEventListener('blur', this.onFocusOut.bind(this));
     window.addEventListener('focus', this.onFocus.bind(this));
     window.addEventListener('beforeunload', this.onUnload.bind(this));
     window.addEventListener('unload', this.onUnload.bind(this));
     this.onFocus();
-    if (!(<any>window).Notification) {
-      this.logger.warn('Notifications are not supported')();
-    } else {
-      this.tryAgainRegisterServiceWorker();
-    }
+
   }
 
 
@@ -77,7 +73,7 @@ export default class NotifierHandler {
           this.logger.debug('res {}', r)(); // TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
         });
       } else {
-        let data = {title: title, options: options};
+        let data = {title, options};
         this.replaceIfMultiple(data);
         let not = new Notification(data.title, data.options);
         this.popedNotifQueue.push(not);
@@ -172,6 +168,10 @@ export default class NotifierHandler {
 
 
   tryAgainRegisterServiceWorker() {
+    if (!(<any>window).Notification) {
+      this.logger.warn('Notifications are not supported')();
+      return;
+    }
     this.checkPermissions( (result) => {
       if (!this.serviceWorkedTried) {
         this.serviceWorkedTried = true;

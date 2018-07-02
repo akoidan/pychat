@@ -16,7 +16,7 @@
   import {Component, Vue} from "vue-property-decorator";
   import {UserModel} from "../types/model";
   import NotifierHandler from "../utils/NotificationHandler";
-  import {browserVersion, isChrome, isMobile} from "../utils/singletons";
+  import {browserVersion, isChrome, isMobile, notifier} from "../utils/singletons";
   import store from '../store';
 
   @Component({
@@ -33,7 +33,7 @@
     }
 
     created() {
-      this.handler = new NotifierHandler(this.$api, browserVersion, isChrome, isMobile, this.$ws, store);
+      notifier.tryAgainRegisterServiceWorker();
       this.$ws.startListening();
     }
 

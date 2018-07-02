@@ -102,6 +102,14 @@ module.exports = (env, argv) => {
           }
         },
         {
+          test: /^favicon.ico$/,
+          loader: 'file-loader',
+          options: {
+            outputPath: '/',
+            name: '[name].[ext]?[sha512:hash:base64:6]',
+          }
+        },
+        {
           test: /\.(png|jpg|svg)$/,
           loader: 'url-loader',
           options: {

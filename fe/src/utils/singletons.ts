@@ -12,12 +12,13 @@ import loggerFactory from './loggerFactory';
 import sessionHolder from './sessionHolder';
 import {Logger} from 'lines-logger';
 import {WS_API_URL, XHR_API_URL} from './consts';
+import NotifierHandler from './NotificationHandler';
 
 export const xhr: Xhr = new Xhr(XHR_API_URL, sessionHolder);
 export const api: Api = new Api(xhr);
-export const channelsHandler = new ChannelsHandler(store, api);
-export const isMobile = mobile.isMobile();
-export const browserVersion = (function() {
+export const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api);
+export const isMobile: boolean = mobile.isMobile();
+export const browserVersion: string = (function () {
   let ua = navigator.userAgent, tem,
       M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
   if (/trident/i.test(M[1])) {
@@ -36,6 +37,7 @@ export const isFirefox = browserVersion.indexOf('Firefox') >= 0;
 export const isChrome = browserVersion.indexOf('Chrome') >= 0;
 export const storage: IStorage = window.openDatabase ? new DatabaseWrapper('v123x') : new LocalStorage();
 export  const globalLogger: Logger = loggerFactory.getLoggerColor('global', '#007a70');
-export const ws = new WsHandler(WS_API_URL, sessionHolder, channelsHandler, null, storage, store, router);
-channelsHandler.seWsHandler(ws);
+export const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, channelsHandler, null, storage, store, router);
+export const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
+channelsHandler.inject(ws, notifier);
 

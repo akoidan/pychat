@@ -39,7 +39,9 @@ import {
 import {MessageModelDto, RoomDto, UserDto} from '../types/dto';
 import {convertFiles, convertUser} from '../types/converters';
 import {WsHandler} from './WsHandler';
+import NotifierHandler from './NotificationHandler';
 
+import favicon from '../assets/img/favicon.ico';
 
 export default class ChannelsHandler extends MessageHandler {
   private logger: Logger;
@@ -47,9 +49,11 @@ export default class ChannelsHandler extends MessageHandler {
   private api: Api;
   private ws: WsHandler;
   private sendingMessage: {} = {};
+  private notifier: NotifierHandler;
 
-  public seWsHandler(ws: WsHandler) {
+  public inject(ws: WsHandler, notifier: NotifierHandler) {
     this.ws = ws;
+    this.notifier = notifier;
   }
 
   constructor(store: Store<RootState>, api: Api) {
@@ -110,12 +114,26 @@ export default class ChannelsHandler extends MessageHandler {
       this.store.commit('addMessage', message);
       let activeRoom: RoomModel = this.store.getters.activeRoom;
       let userInfo: CurrentUserInfoModel = this.store.state.userInfo;
-      if (activeRoom
-          && userInfo
-          && activeRoom.id !== inMessage.roomId
-          && inMessage.userId !== userInfo.userId) {
-        this.store.commit('incNewMessagesCount', inMessage.roomId);
+      if (activeRoom && userInfo) {
+        if (activeRoom.id !== inMessage.roomId && inMessage.userId !== userInfo.userId) {
+          this.store.commit('incNewMessagesCount', inMessage.roomId);
+        }
+        if (this.store.state.roomsDict[inMessage.roomId].notifications
+            && inMessage.userId !== userInfo.userId) {
+          let title = this.store.state.allUsersDict[inMessage.userId].user;
+          this.notifier.notify(title, {
+            body: inMessage.content || 'Image',
+            data: {
+              replaced: 1,
+              title,
+              roomId: inMessage.roomId
+            },
+            requireInteraction: true,
+            icon: inMessage.files || favicon
+          });
+        }
       }
+
       if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
         this.removeSendingMessage(inMessage.messageId);
         let rmMes: RemoveSendingMessage = {
