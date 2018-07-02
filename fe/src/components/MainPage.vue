@@ -15,6 +15,9 @@
   import AppNav from "./AppNav.vue";
   import {Component, Vue} from "vue-property-decorator";
   import {UserModel} from "../types/model";
+  import NotifierHandler from "../utils/NotificationHandler";
+  import {browserVersion, isChrome, isMobile} from "../utils/singletons";
+  import store from '../store';
 
   @Component({
     components: {AppNav}
@@ -22,6 +25,7 @@
   export default class MainPage extends Vue {
 
     @Getter showNav: boolean;
+    handler: any = null;
     @State userInfo: UserModel;
 
     get inited() {
@@ -29,6 +33,7 @@
     }
 
     created() {
+      this.handler = new NotifierHandler(this.$api, browserVersion, isChrome, isMobile, this.$ws, store);
       this.$ws.startListening();
     }
 

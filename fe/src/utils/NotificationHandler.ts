@@ -6,7 +6,7 @@ import {RootState} from '../types/model';
 import Api from './api';
 import {WsHandler} from './WsHandler';
 import store from '../store';
-import {IS_DEBUG} from './consts';
+import {IS_DEBUG, MANIFEST} from './consts';
 
 const LAST_TAB_ID_VARNAME = 'lastTabId';
 
@@ -28,18 +28,19 @@ export default class NotifierHandler {
   private readonly isMobile: boolean;
   private readonly ws: WsHandler;
 
-  constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler) {
+  constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: Store<RootState>) {
     this.api = api;
     this.browserVersion = browserVersion;
     this.isChrome = isChrome;
     this.isMobile = isMobile;
     this.ws = ws;
+    this.store = store;
     this.logger = loggerFactory.getLoggerColor('NOTIFY', '#ffb500');
     this.currentTabId = Date.now().toString();
-    window.addEventListener('blur', this.onFocusOut);
-    window.addEventListener('focus', this.onFocus);
-    window.addEventListener('beforeunload', this.onUnload);
-    window.addEventListener('unload', this.onUnload);
+    window.addEventListener('blur', this.onFocusOut.bind(this));
+    window.addEventListener('focus', this.onFocus.bind(this));
+    window.addEventListener('beforeunload', this.onUnload.bind(this));
+    window.addEventListener('unload', this.onUnload.bind(this));
     this.onFocus();
     if (!(<any>window).Notification) {
       this.logger.warn('Notifications are not supported')();
@@ -73,7 +74,7 @@ export default class NotifierHandler {
         // TODO  options should contain page id here but it's not
         // so we open unfefined url
         this.serviceWorkerRegistration.showNotification(title, options).then( (r) => {
-          this.logger.log('res {}', r)(); // TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
+          this.logger.debug('res {}', r)(); // TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
         });
       } else {
         let data = {title: title, options: options};
@@ -90,7 +91,7 @@ export default class NotifierHandler {
         not.onclose = () => {
           this.popedNotifQueue.splice(this.popedNotifQueue.indexOf(not), 1);
         };
-        this.logger.log('Notification {} {} has been spawned, current queue {}', title, options, this.popedNotifQueue)();
+        this.logger.debug('Notification {} {} has been spawned, current queue {}', title, options, this.popedNotifQueue)();
       }
     } catch (e) {
       this.logger.error('Failed to show notification {}', e)();
@@ -135,18 +136,18 @@ export default class NotifierHandler {
   registerWorker(cb) { // todo async
     if (!navigator.serviceWorker) {
       return cb(false, 'Service worker is not supported', true);
-    } else if (!(<any>window).manifest) {
+    } else if (!MANIFEST) {
       return cb(false, 'FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing', false);
     }
     navigator.serviceWorker.register('/sw.js', {scope: '/'}).then( (r) => {
-      this.logger.log('Registered service worker {}', r)();
+      this.logger.debug('Registered service worker {}', r)();
       return navigator.serviceWorker.ready;
     }).then( (serviceWorkerRegistration) => {
-      this.logger.log('Service worker is ready {}', serviceWorkerRegistration)();
+      this.logger.debug('Service worker is ready {}', serviceWorkerRegistration)();
       this.serviceWorkerRegistration = serviceWorkerRegistration;
       return serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true});
     }).then( (subscription) => {
-      this.logger.log('Got subscription {}', subscription)();
+      this.logger.debug('Got subscription {}', subscription)();
       this.subscriptionId = this.getSubscriptionId(subscription);
       if (!this.subscriptionId) {
         throw 'Current browser doesnt support offline notifications';
@@ -154,7 +155,7 @@ export default class NotifierHandler {
         return new Promise( (resolve, reject) => {
           this.api.registerFCB(this.subscriptionId, this.browserVersion, this.isMobile, e => {
             if (e) {
-              reject(e);
+              reject('Unable to save subscription to server because of' + e);
             } else {
               resolve();
             }
