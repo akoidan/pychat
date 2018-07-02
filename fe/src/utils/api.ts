@@ -81,12 +81,26 @@ export default class Api {
       params: {
         token
       },
-      cb: this.getResponseSuccessCB(cb),
+      cb,
+    });
+  }
+
+  public facebookAuth(token, cb) {
+    this.xhr.doPost({
+      url: '/facebook-auth',
+      params: {
+        token
+      },
+      cb,
     });
   }
 
   public loadGoogle(cb) {
     this.xhr.doGet('https://apis.google.com/js/platform.js', cb);
+  }
+
+  public loadFacebook(cb) {
+    this.xhr.doGet('//connect.facebook.net/en_US/sdk.js', cb);
   }
 
   public validateUsername(username: string, cb: SingleParamCB<string>) {

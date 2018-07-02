@@ -1,7 +1,7 @@
 <template>
   <button :disabled="running" :class="btnClass">
     <div class="spinner" v-if="running"></div>
-    {{value}}
+    <slot></slot>{{value}}
   </button>
 </template>
 

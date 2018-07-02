@@ -459,8 +459,10 @@ export class WsHandler extends MessageHandler {
       this.noServerPingTimeout = null;
     }
     this.noServerPingTimeout = setTimeout(() => {
-      this.logger.error('Force closing socket coz server didn\'t ping us')();
-      this.ws.close(1000, 'Sever didn\'t ping us');
+      if (this.ws) {
+        this.logger.error('Force closing socket coz server didn\'t ping us')();
+        this.ws.close(1000, 'Sever didn\'t ping us');
+      }
     }, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
   }
 

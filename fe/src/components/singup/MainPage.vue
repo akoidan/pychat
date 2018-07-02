@@ -48,7 +48,6 @@
     text-align: center
 
     > *
-      display: block
       margin: auto
       position: relative
       width: 100%

@@ -11,7 +11,8 @@ const _XHR_API_URL = XHR_API_URL;
 const _IS_DEBUG = XHR_API_URL;
 
 export const PING_CLOSE_JS_DELAY = 5000;
-export const GOOGLE_OAUTH_2_CLIENT_ID = '633211918756-268r6n5m95pi7tnrqglkjhob1ar3c0u2.apps.googleusercontent.com'
+export const GOOGLE_OAUTH_2_CLIENT_ID = '633211918756-268r6n5m95pi7tnrqglkjhob1ar3c0u2.apps.googleusercontent.com';
+export const FACEBOOK_APP_ID = '399077730606196';
 
 export const CONNECTION_RETRY_TIME = 5000;
 export const CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = 313000;

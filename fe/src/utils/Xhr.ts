@@ -43,8 +43,8 @@ export default class Xhr {
 
   private getUrl(url: string): string {
     if (!url) {
-      url = this.apiUrl;
-    } else if (/^https?:\/\//.exec(url)) {
+      return this.apiUrl;
+    } else if (/^https?:\/\//.exec(url) || (url && url.indexOf('//') === 0) /*cdn*/) {
       return url;
     } else {
       return this.apiUrl + url;

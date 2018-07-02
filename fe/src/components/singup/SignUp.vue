@@ -19,14 +19,7 @@
         <option value='Female'>Female</option>
       </select>
     </register-field-set>
-
-    <button v-if='oauth_token' class='g-icon lor-btn' title='Sign up using google account'
-            @click='googleLogin'>With Google
-    </button>
-    <button v-if='fb_app_id' title='Sign up using facebook account' class='f-icon lor-btn'
-            @click='facebookLogin'>
-      <i class='icon-facebook-squared'></i>With Facebook
-    </button>
+    <social-auth/>
     <app-submit class='submit-button' value='REGISTER' :running="running"/>
   </form>
 </template>
@@ -40,8 +33,9 @@
   import {IconColor} from '../../types/types';
   import sessionHolder from '../../utils/sessionHolder';
   import {login} from '../../utils/utils';
+  import SocialAuth from './SocialAuth';
 
-  @Component({components: {AppSubmit, RegisterFieldSet}})
+  @Component({components: {SocialAuth, AppSubmit, RegisterFieldSet}})
   export default class SignUp extends Vue {
 
     @Prop() captcha_key: string;
@@ -190,16 +184,6 @@
         this.sexDescription = "Well, let's hope you are being serious...";
       }
     }
-
-
-    facebookLogin() {
-      alert('TODO');
-    }
-
-    googleLogin() {
-      alert('TODO');
-    }
-
 
     register() {
       this.running = true;
