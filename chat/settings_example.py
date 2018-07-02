@@ -68,15 +68,15 @@ globals().update(importlib.import_module(config).__dict__)
 # GIPHY_API_KEY = '********************************'
 
 
-### If you want recaptcha: Open https://www.google.com/recaptcha/admin#list and register new domain
-# RECAPTCHA_PUBLIC_KEY = '****************************************' # REPLACE_THIS_WITH_DATA-SITEKEY_DIV_ATTRIBUTE
-# RECAPTCHA_PRIVATE_KEY = '****************************************' # REPLACE_THIS_WITH_KEY_FOR_RETRIEVING_RESULT
+### If you want recaptcha: Open https://www.google.com/recaptcha/admin#list and register new domain, type is web captcha
+# RECAPTCHA_PUBLIC_KEY = '****************************************' # Site key
+# RECAPTCHA_PRIVATE_KEY = '****************************************' # Secret key
 # INSTALLED_APPS = ('snowpenguin.django.recaptcha2', 'multi_captcha_admin') + INSTALLED_APPS # Uncomment this row as well so you have django admin login with captcha as well
 
 ### For google auth follow the instructions here https://developers.google.com/identity/sign-in/web/devconsole-project
 ### Select Web Browser type
 # GOOGLE_OAUTH_2_CLIENT_ID = 'YOUR_CLIENT_ID.apps.googleusercontent.com'
-# GOOGLE_OAUTH_2_HOST = 'your.domain.com'
+
 
 ### For facebook auth:
 # FACEBOOK_ACCESS_TOKEN = '***************|***************************' # https://developers.facebook.com/tools/access_token/

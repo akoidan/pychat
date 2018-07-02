@@ -281,7 +281,10 @@ def send_restore_password(request):
 			raise ValidationError("You didn't specify email address for this user")
 		verification = Verification(type_enum=Verification.TypeChoices.password, user_id=user_profile.id)
 		verification.save()
-		send_reset_password_email(request, user_profile, verification)
+		try:
+			send_reset_password_email(request, user_profile, verification)
+		except Exception as e:
+			raise ValidationError('Unable to send email: ' + str(e))
 		message = settings.VALIDATION_IS_OK
 		logger.debug('Verification email has been send for token %s to user %s(id=%d)',
 				verification.token, user_profile.username, user_profile.id)
