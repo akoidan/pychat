@@ -11,10 +11,7 @@ module.exports = (env, argv) => {
   plugins = [
     new VueLoaderPlugin(),
     new webpack.DefinePlugin({
-      WS_API_URL: JSON.stringify(argv.WS_API_URL),
-      STATIC_API_URL: JSON.stringify(argv.STATIC_API_URL),
-      XHR_API_URL: JSON.stringify(argv.XHR_API_URL),
-      IS_DEBUG: argv.mode === 'development'
+      PYCHAT_CONSTS: JSON.stringify(require(`./${argv.mode}.json`)),
     }),
     new HtmlWebpackPlugin({hash: true, favicon: 'src/assets/img/favicon.ico',  template: 'src/index.ejs', inject: false}),
   ];

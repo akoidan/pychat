@@ -11,6 +11,7 @@ photos
 django.db
 chat/migrations
 .venv
+fe/production.json
 chat.log
 fe/src/assets/demo.html
 fe/src/assets/sass/partials/fontello.scss
