@@ -1,7 +1,6 @@
 import Vue from 'vue';
 
 import './assets/sass/common.sass';
-import './assets/smileys.js';
 import App from './components/App.vue';
 import {api, browserVersion, channelsHandler, globalLogger, storage, ws, xhr} from './utils/singletons';
 import store from './store';
@@ -13,11 +12,6 @@ import {StorageData} from './types/types';
 import {MessageModel} from './types/model';
 
 
-window.addEventListener('focus', () => {
-  if (store.state.userInfo && ws.isWsOpen() && !IS_DEBUG) {
-    ws.pingServer();
-  }
-});
 store.watch(s => s.userSettings && s.userSettings.theme || 'color-reg', (v, o) => {
   document.body.parentElement.className = v;
 });

@@ -56,6 +56,28 @@ export function loadCaptcha(cb) {
   }
 }
 
+
+export function  extractError (args) {
+  try {
+    if (typeof args === 'string') {
+      return args;
+    } else if (args.length > 1) {
+      return Array.prototype.join.call(args, ' ');
+    } else if (args.length === 1) {
+      args = args[0];
+    }
+    if (args && (args.name || args.message) ) {
+      return `${args.name}: ${args.message}`;
+    } else if (args.rawError) {
+      return args.rawError;
+    } else {
+      return JSON.stringify(args);
+    }
+  } catch (e) {
+    return `Error during parsing error ${e}, :(`;
+  }
+}
+
 export function initGoogle(cb) {
   if (!googleInited && GOOGLE_OAUTH_2_CLIENT_ID) {
     logger.log('Initializing google sdk')();

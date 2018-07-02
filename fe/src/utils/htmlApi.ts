@@ -3,15 +3,25 @@ import smileys from '../assets/smileys/info.json';
 
 import {STATIC_API_URL, PASTED_IMG_CLASS} from './consts';
 import {MessageDataEncode, SmileyStructure, UploadFile} from '../types/types';
-import {FileModel, MessageModel, SexModel, UserModel} from '../types/model';
+import {FileModel, MessageModel, RoomModel, SexModel, UserModel} from '../types/model';
 
 const tmpCanvasContext = document.createElement('canvas').getContext('2d');
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
 const smileysTabNames = Object.keys(smileys);
+
 let codes = {};
 smileysTabNames.forEach(tb => {
-  codes = {...smileys[tb], ...codes};
+  let smileyElement = smileys[tb];
+  for (let k in smileys[tb]) {
+    let innerSM = smileyElement[k];
+    codes[k] = {
+      alt: innerSM.alt,
+      tabName: tb,
+      src: innerSM.src,
+    };
+  }
 });
+
 const escapeMap = {
   '&': '&amp;',
   '<': '&lt;',
@@ -55,8 +65,8 @@ export function encodeHTML(html: string) {
   return html.replace(replaceHtmlRegex, s => escapeMap[s]);
 }
 
-export function getSmileyPath(s: SmileyStructure) {
-  return `/${s.src}`;
+export function getSmileyPath(tabName: string, src: string) {
+  return `/smileys/${tabName}/${src}`;
 }
 let uniqueId = 1;
 export function getUniqueId() {
@@ -77,7 +87,7 @@ export function getUserSexClass(user: UserModel) {
 
 export function getSmileyHtml (symbol: string) {
   let smiley = codes[symbol];
-  return `<img src="${getSmileyPath(smiley)}" symbol="${symbol}" alt="${smiley.alt}">`;
+  return `<img src="${getSmileyPath(smiley.tabName, smiley.src)}" symbol="${symbol}" alt="${smiley.alt}">`;
 }
 
 export const isDateMissing = (function() {

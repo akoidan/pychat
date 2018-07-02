@@ -108,6 +108,18 @@ export default class Api {
   }
 
 
+  public registerFCB(registration_id: string, agent: string, is_mobile: boolean, cb: SingleParamCB<string>) {
+    this.xhr.doPost({
+      url: '/register_fcb',
+      params: {
+        registration_id,
+        agent,
+        is_mobile
+      },
+      cb: this.getResponseSuccessCB(cb)
+    });
+  }
+
 
   public validateUsername(username: string, cb: SingleParamCB<string>) {
     this.xhr.doPost({

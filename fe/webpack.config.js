@@ -3,20 +3,36 @@ const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const chalk = require('chalk');
 const webpack = require('webpack');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
 
 module.exports = (env, argv) => {
-
   let plugins;
   let sasscPlugins;
+  let options = require(`./${argv.mode}.json`);
+  let webpackOptions = {
+    hash: true,
+    favicon: 'src/assets/img/favicon.ico',
+    template: 'src/index.ejs',
+    inject: false
+  };
+  if (options.MANIFEST) {
+    webpackOptions.manifest = options.MANIFEST
+  }
   plugins = [
     new VueLoaderPlugin(),
+    new CopyWebpackPlugin([
+      {from: './src/assets/smileys', to: 'smileys'},
+      {from: './src/assets/manifest.json', to: ''},
+    ]),
     new webpack.DefinePlugin({
-      PYCHAT_CONSTS: JSON.stringify(require(`./${argv.mode}.json`)),
+      PYCHAT_CONSTS: JSON.stringify(options),
     }),
-    new HtmlWebpackPlugin({hash: true, favicon: 'src/assets/img/favicon.ico',  template: 'src/index.ejs', inject: false}),
+    new HtmlWebpackPlugin(webpackOptions),
   ];
   if (argv.mode === 'production') {
     const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+    plugins.push(new CleanWebpackPlugin('./dist'));
     plugins.push(new MiniCssExtractPlugin());
     sasscPlugins = [
       MiniCssExtractPlugin.loader,
@@ -77,9 +93,10 @@ module.exports = (env, argv) => {
           use: sasscPlugins
         },
         {
-          test: /\.(woff2?|eot|ttf|otf|gif)(\?.*)?$/,
+          test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
           loader: 'file-loader',
           options: {
+            outputPath: 'font/',
             name: '[name].[ext]?[sha512:hash:base64:6]',
           }
         },
@@ -87,7 +104,8 @@ module.exports = (env, argv) => {
           test: /\.(png|jpg|svg)$/,
           loader: 'url-loader',
           options: {
-            limit: 32000
+            limit: 32000,
+            name: 'img/[name].[ext]?[sha512:hash:base64:6]'
           }
         },
       ],

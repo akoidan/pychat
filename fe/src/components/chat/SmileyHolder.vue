@@ -35,7 +35,7 @@
     activeTab: string = Object.keys(smileys)[0];
 
     buildUrl(smiley: SmileyStructure, tabName: string) {
-      return getSmileyPath(smiley);
+      return getSmileyPath(tabName, smiley.src);
     }
   }
 </script>
