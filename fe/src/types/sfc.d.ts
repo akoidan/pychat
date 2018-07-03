@@ -12,3 +12,11 @@ declare module '*.json' {
 declare module '*.ico' {
 
 }
+
+declare module '*.wav' {
+
+}
+
+declare module '*.mp3' {
+
+}

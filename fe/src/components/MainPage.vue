@@ -25,7 +25,6 @@
   export default class MainPage extends Vue {
 
     @Getter showNav: boolean;
-    handler: any = null;
     @State userInfo: UserModel;
 
     get inited() {

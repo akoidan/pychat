@@ -2,6 +2,8 @@ import loggerFactory from './loggerFactory';
 import {Store} from 'vuex';
 import Api from './api';
 import MessageHandler from './MesageHandler';
+import {checkAndPlay, incoming, outgoing} from './audio';
+
 import {
   AddMessagePayload,
   MessagesLocation,
@@ -113,24 +115,31 @@ export default class ChannelsHandler extends MessageHandler {
       this.logger.debug('Adding message to storage {}', message)();
       this.store.commit('addMessage', message);
       let activeRoom: RoomModel = this.store.getters.activeRoom;
+      let room = this.store.state.roomsDict[inMessage.roomId];
       let userInfo: CurrentUserInfoModel = this.store.state.userInfo;
-      if (activeRoom && userInfo) {
-        if (activeRoom.id !== inMessage.roomId && inMessage.userId !== userInfo.userId) {
-          this.store.commit('incNewMessagesCount', inMessage.roomId);
-        }
-        if (this.store.state.roomsDict[inMessage.roomId].notifications
-            && inMessage.userId !== userInfo.userId) {
-          let title = this.store.state.allUsersDict[inMessage.userId].user;
-          this.notifier.notify(title, {
-            body: inMessage.content || 'Image',
-            data: {
-              replaced: 1,
-              title,
-              roomId: inMessage.roomId
-            },
-            requireInteraction: true,
-            icon: inMessage.files || favicon
-          });
+      let isSelf = inMessage.userId === userInfo.userId
+      if (activeRoom.id !== inMessage.roomId && !isSelf) {
+        this.store.commit('incNewMessagesCount', inMessage.roomId);
+      }
+      if (room.notifications && !isSelf) {
+        let title = this.store.state.allUsersDict[inMessage.userId].user;
+        this.notifier.notify(title, {
+          body: inMessage.content || 'Image',
+          data: {
+            replaced: 1,
+            title,
+            roomId: inMessage.roomId
+          },
+          requireInteraction: true,
+          icon: inMessage.files || favicon
+        });
+      }
+
+      if (this.store.state.userSettings.messageSound) {
+        if (message.userId === userInfo.userId) {
+          checkAndPlay(outgoing, room.volume);
+        } else {
+          checkAndPlay(incoming, room.volume);
         }
       }
 

@@ -23,7 +23,7 @@
           Sound
         </th>
         <td>
-          <app-input-range min="0" max="3" v-model="sound"/>
+          <app-input-range min="0" max="100" v-model="sound"/>
         </td>
       </tr>
       </tbody>

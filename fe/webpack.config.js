@@ -5,7 +5,7 @@ const chalk = require('chalk');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-
+const name = '[name].[ext]?[sha512:hash:base64:6]';
 module.exports = (env, argv) => {
   let plugins;
   let sasscPlugins;
@@ -97,16 +97,24 @@ module.exports = (env, argv) => {
           test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
           loader: 'file-loader',
           options: {
-            outputPath: 'font/',
-            name: '[name].[ext]?[sha512:hash:base64:6]',
+            outputPath: 'font',
+            name,
           }
         },
         {
-          test: /^favicon.ico$/,
+          test: /favicon\.ico$/,
           loader: 'file-loader',
           options: {
             outputPath: '/',
-            name: '[name].[ext]?[sha512:hash:base64:6]',
+            name,
+          }
+        },
+        {
+          test: /\.(mp3|wav)$/,
+          loader: 'file-loader',
+          options: {
+            outputPath: 'sounds',
+            name,
           }
         },
         {
@@ -114,9 +122,11 @@ module.exports = (env, argv) => {
           loader: 'url-loader',
           options: {
             limit: 32000,
-            name: 'img/[name].[ext]?[sha512:hash:base64:6]'
+            fallback: "file-loader",
+            name,
+            outputPath: "img"
           }
-        },
+        }
       ],
     },
   };
