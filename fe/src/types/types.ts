@@ -1,4 +1,5 @@
 import {
+  ChangeOnline,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   FileModel,
@@ -29,6 +30,11 @@ export interface SetUploadProgress {
   upload: UploadProgressModel;
   roomId: number;
   messageId: number;
+}
+
+export interface ChangeOnlineEntry {
+  changeOnline: ChangeOnline;
+  roomIds: number[];
 }
 
 export interface SetMessageProgressError {

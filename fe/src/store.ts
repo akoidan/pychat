@@ -3,6 +3,7 @@ import Vuex, {StoreOptions} from 'vuex';
 import {ActionContext} from 'vuex/types';
 import loggerFactory from './utils/loggerFactory';
 import {
+  ChangeOnline,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   EditingMessage,
@@ -17,6 +18,7 @@ import {
   UserModel
 } from './types/model';
 import {
+  ChangeOnlineEntry,
   MessagesLocation,
   RemoveMessageProgress,
   RemoveSendingMessage,
@@ -215,6 +217,11 @@ const store: StoreOptions<RootState> = {
       let newVar = 'set';
       Vue[newVar](state.allUsersDict, u.id, u);
       storage.saveUser(u);
+    },
+    addChangeOnlineEntry(state: RootState, payload: ChangeOnlineEntry) {
+      payload.roomIds.forEach(r => {
+        state.roomsDict[r].changeOnline.push(payload.changeOnline);
+      });
     },
     setOnline(state: RootState, ids: number[]) {
       state.online = ids;

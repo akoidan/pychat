@@ -2,7 +2,7 @@
   <p :class="mainCls" @contextmenu="contextmenu">
       <span class="message-header">
         <span class="timeMess">({{getTime}})</span>
-        <span @contextmenu.prevent="setActiveUser">{{username}}</span>: </span>
+        <span @contextmenu.prevent.stop="setActiveUser">{{username}}</span>: </span>
     <span class="message-text-style" v-html="encoded" ref="content"></span>
   </p>
 </template>
@@ -23,7 +23,7 @@
     highlightCode,
     setImageFailEvents,
     setVideoEvent,
-    setYoutubeEvent
+    setYoutubeEvent, timeToString
   } from "../../utils/htmlApi";
   import {sem} from '../../utils/utils';
 
@@ -43,9 +43,7 @@
       content: HTMLElement
     };
 
-    setActiveUser(evt: Event) {
-      this.logger.log("setActiveUserId {}", this.message.userId)();
-      evt.stopPropagation();
+    setActiveUser() {
       this.setActiveUserId(this.message.userId);
     }
 
@@ -58,8 +56,7 @@
     }
 
     get getTime() {
-      let date = new Date(this.message.time);
-      return [this.sliceZero(date.getHours()), this.sliceZero(date.getMinutes()), this.sliceZero(date.getSeconds())].join(":");
+      return timeToString(this.message.time);
     }
 
     get encoded() {
@@ -118,9 +115,6 @@
       return this.editedMessage && this.editedMessage.messageId === this.message.id;
     }
 
-    sliceZero(number: number, count: number = -2) {
-      return String("00" + number).slice(count);
-    }
   }
 </script>
 <style lang="sass" scoped>
@@ -243,37 +237,12 @@
         + div.icon-youtube-play
           width: 50px
           margin-right: -30px
-  p
-    margin-top: 0.8em
-    margin-bottom: 0.8em
-
-  .message-header
-    font-weight: bold
-
-  .message-self, .message-others
-    position: relative
 
   .color-lor p /deep/, .color-reg p /deep/
     @import "~highlightjs/styles/railscasts"
   .color-white p /deep/
     @import "~highlightjs/styles/default"
 
-  .color-lor
-
-    .message-others .message-header
-      color: #729fcf
-    .message-self .message-header
-      color: #e29722
-    .message-system .message-header
-      color: #9DD3DD
-
-  .color-reg
-    .message-others .message-header
-      color: #729fcf
-    .message-self .message-header
-      color: #e29722
-    .message-system .message-header
-      color: #84B7C0
 
   .color-white
     .highLightMessage

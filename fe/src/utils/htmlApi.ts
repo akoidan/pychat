@@ -57,7 +57,14 @@ const patterns = [
   }
 ];
 
+export function sliceZero(n: number, count: number = -2) {
+  return String('00' + n).slice(count);
+}
 
+export function timeToString(time: number) {
+  let date = new Date(time);
+  return [sliceZero(date.getHours()), sliceZero(date.getMinutes()), sliceZero(date.getSeconds())].join(':');
+}
 
 const replaceHtmlRegex = new RegExp('[' + Object.keys(escapeMap).join('') + ']', 'g');
 

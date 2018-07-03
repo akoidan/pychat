@@ -2,10 +2,10 @@ import loggerFactory from './loggerFactory';
 import {Store} from 'vuex';
 import Api from './api';
 import MessageHandler from './MesageHandler';
-import {checkAndPlay, incoming, outgoing} from './audio';
+import {checkAndPlay, incoming, outgoing, login, logout} from './audio';
 
 import {
-  AddMessagePayload,
+  AddMessagePayload, ChangeOnlineEntry,
   MessagesLocation,
   RemoveMessageProgress,
   RemoveSendingMessage,
@@ -15,6 +15,7 @@ import {
   UploadFile
 } from '../types/types';
 import {
+  ChangeOnline,
   CurrentUserInfoModel,
   MessageModel,
   RoomDictModel,
@@ -105,9 +106,11 @@ export default class ChannelsHandler extends MessageHandler {
         let newVar: UserModel = convertUser(message);
         this.store.commit('addUser', newVar);
       }
+      this.addChangeOnlineEntry(message.userId, message.time, true);
       this.store.commit('setOnline', [...message.content]);
     },
     removeOnlineUser(message: RemoveOnlineUserMessage) {
+      this.addChangeOnlineEntry(message.userId, message.time, false);
       this.store.commit('setOnline', message.content);
     },
     printMessage(inMessage: EditMessage) {
@@ -117,7 +120,7 @@ export default class ChannelsHandler extends MessageHandler {
       let activeRoom: RoomModel = this.store.getters.activeRoom;
       let room = this.store.state.roomsDict[inMessage.roomId];
       let userInfo: CurrentUserInfoModel = this.store.state.userInfo;
-      let isSelf = inMessage.userId === userInfo.userId
+      let isSelf = inMessage.userId === userInfo.userId;
       if (activeRoom.id !== inMessage.roomId && !isSelf) {
         this.store.commit('incNewMessagesCount', inMessage.roomId);
       }
@@ -181,6 +184,26 @@ export default class ChannelsHandler extends MessageHandler {
     },
   };
 
+  private addChangeOnlineEntry(userId: number, time: number, isWentOnline: boolean) {
+    let roomIds = [];
+    this.store.getters.roomsArray.forEach(r => {
+      if (r.users.indexOf(userId)) {
+        roomIds.push(r.id);
+      }
+    });
+    let entry:  ChangeOnlineEntry = {
+      roomIds,
+      changeOnline: {
+        isWentOnline,
+        time,
+        userId
+      }
+    };
+    if (this.store.state.userSettings.onlineChangeSound) {
+      checkAndPlay(isWentOnline ? login : logout, 50);
+    }
+    this.store.commit('addChangeOnlineEntry', entry);
+  }
 
   private resendMessages() {
     for (let k in this.sendingMessage) {

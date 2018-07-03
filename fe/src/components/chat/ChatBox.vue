@@ -3,7 +3,8 @@
     <search-messages :room="room"/>
     <div class="chatbox" @keydown="keyDownLoadUp" :class="{'display-search-only': room.search.searchActive}" tabindex="1" @mousewheel="onScroll" ref="chatbox">
       <template v-for="message in messages">
-        <fieldset v-if="message.fieldDay">
+        <chat-change-online-message v-if="message.isChangeOnline" :key="message.time" :time="message.time" :user-id="message.userId" :is-went-online="message.isWentOnline"/>
+        <fieldset v-else-if="message.fieldDay" :key="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
         </fieldset>
         <chat-sending-message v-else :message="message" :key="message.id"/>
@@ -12,19 +13,28 @@
   </div>
 </template>
 <script lang="ts">
-  import {Getter, Action, Mutation} from "vuex-class";
-  import {Component, Prop, Vue ,Watch } from "vue-property-decorator";
+  import {Action, Getter, Mutation} from "vuex-class";
+  import {Component, Prop, Vue} from "vue-property-decorator";
   import ChatMessage from "./ChatMessage.vue";
   import SearchMessages from "./SearchMessages.vue";
   import {RoomModel, SearchModel} from "../../types/model";
-  import {MessageModelDto} from '../../types/dto';
-  import {channelsHandler, globalLogger} from "../../utils/singletons";
-  import {SetSearchTo} from '../../types/types';
-  import {MESSAGES_PER_SEARCH} from '../../utils/consts';
-  import AppProgressBar from '../ui/AppProgressBar';
-  import ChatSendingMessage from './ChatSendingMessage';
+  import {MessageModelDto} from "../../types/dto";
+  import {channelsHandler} from "../../utils/singletons";
+  import {SetSearchTo} from "../../types/types";
+  import {MESSAGES_PER_SEARCH} from "../../utils/consts";
+  import AppProgressBar from "../ui/AppProgressBar";
+  import ChatSendingMessage from "./ChatSendingMessage";
+  import ChatChangeOnlineMessage from "./ChatChangeOnlineMessage";
 
-  @Component({components: {ChatSendingMessage, AppProgressBar, ChatMessage, SearchMessages}})
+  @Component({
+    components: {
+      ChatChangeOnlineMessage,
+      ChatSendingMessage,
+      AppProgressBar,
+      ChatMessage,
+      SearchMessages
+    }
+  })
   export default class ChatBox extends Vue {
     @Prop() room: RoomModel;
     @Action growlError;
@@ -50,9 +60,10 @@
     get id() {
       return this.room.id;
     }
+
     get messages() {
       this.logger.debug("Reevaluating messages in room #{}", this.room.id)();
-      let newArray = [];
+      let newArray: any[] = this.room.changeOnline.map(value => ({isChangeOnline: true, ...value}));
       let dates = {};
       for (let m in this.room.messages) {
         let message = this.room.messages[m];
@@ -153,6 +164,14 @@
 
   .holder
     height: 100%
+    /deep/ p
+      margin-top: 0.8em
+      margin-bottom: 0.8em
+    /deep/ .message-header
+      font-weight: bold
+
+    /deep/ .message-self, /deep/ .message-others
+      position: relative
 
   .chatbox
     overflow-y: scroll
@@ -169,6 +188,22 @@
     &.display-search-only /deep/
       >:not(.filter-search)
         display: none
+
+  .color-lor .holder /deep/
+    .message-others .message-header
+      color: #729fcf
+    .message-self .message-header
+      color: #e29722
+    .message-system .message-header
+      color: #9DD3DD
+
+  .color-reg .holder /deep/
+    .message-others .message-header
+      color: #729fcf
+    .message-self .message-header
+      color: #e29722
+    .message-system .message-header
+      color: #84B7C0
 
 
   fieldset
