@@ -1,7 +1,9 @@
 <template>
   <nav>
-    <i class="icon-user" onclick="channelsHandler.viewProfile()"> <span
-        class="activeUserName">{{activeUser.user}}</span><span class="mText">Profile</span></i>
+    <router-link :to="`/user/${activeUser.id}`">
+      <i class="icon-user"> <span
+          class="activeUserName">{{activeUser.user}}</span><span class="mText">Profile</span></i>
+    </router-link>
     <i class="icon-quote-left" onclick="channelsHandler.m2QuoteMessage(event)"><span class="mText">Quote</span> </i>
     <i class="icon-comment" onclick="channelsHandler.createDirectChannel()"><span class="mText">Write message</span></i>
     <i class="icon-phone-circled" onclick="channelsHandler.m2Call()"><span class="mText">Call</span></i>

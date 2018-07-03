@@ -4,6 +4,7 @@ import {UploadFile} from '../types/types';
 import {MessageModelDto, UserProfileDto, UserSettingsDto} from '../types/dto';
 import {UserModel} from '../types/model';
 import {xhr} from './singletons';
+import {ViewUserProfileDto} from '../types/messages';
 
 export default class Api {
   private xhr: Xhr;
@@ -160,6 +161,10 @@ export default class Api {
       formData: fd,
       cb: this.getResponseSuccessCB(cb)
     });
+  }
+
+  public showProfile(id: number, cb: ErrorCB<ViewUserProfileDto>) {
+    this.xhr.doGet<ViewUserProfileDto>(`/profile/${id}`, cb, true);
   }
 
 

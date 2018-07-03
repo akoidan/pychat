@@ -4,10 +4,7 @@
     <keep-alive v-if="inited" :include="['ChannelsPage']">
       <router-view class="body"/>
     </keep-alive>
-    <div v-else class="spinner">
-      <div class="text">Connecting...</div>
-      <div class="sp"></div>
-    </div>
+    <app-spinner v-else text="Connecting..."/>
   </div>
 </template>
 <script lang="ts">
@@ -18,9 +15,10 @@
   import NotifierHandler from "../utils/NotificationHandler";
   import {browserVersion, isChrome, isMobile, notifier} from "../utils/singletons";
   import store from '../store';
+  import AppSpinner from './ui/AppSpinner';
 
   @Component({
-    components: {AppNav}
+    components: {AppSpinner, AppNav}
   })
   export default class MainPage extends Vue {
 
@@ -56,14 +54,5 @@
   .body
     height: 100%
 
-  .spinner
-    height: 100%
-    display: flex
-    align-items: center
-    justify-content: center
-    .sp
-      @include spinner(10px, white)
-    .text
-      padding-right: 20px
-      font-size: 40px
+
 </style>

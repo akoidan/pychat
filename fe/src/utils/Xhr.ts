@@ -54,7 +54,7 @@ export default class Xhr {
 
   /**
    * Loads file from server on runtime */
-  public doGet(fileUrl: string, callback: Function) {
+  public doGet<T>(fileUrl: string, callback: ErrorCB<T>, isJsonDecoded: boolean = false) {
     fileUrl = this.getUrl(fileUrl);
     this.httpLogger.log('GET out {}', fileUrl)();
     let regexRes = /\.(\w+)(\?.*)?$/.exec(fileUrl);
@@ -80,23 +80,14 @@ export default class Xhr {
           xobj.overrideMimeType('application/json');
         }
         xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
-        xobj.onreadystatechange = () => {
-          if (xobj.readyState === 4) {
-            if (xobj.status === 200) {
-              this.httpLogger.log('GET in {} ::: "{}"...', fileUrl, xobj.responseText.substr(0, 100))();
-              if (callback) {
-                if (fileType === 'json') {
-                  callback(JSON.parse(xobj.responseText));
-                } else {
-                  callback(xobj.responseText);
-                }
-              }
-            } else {
-              this.httpLogger.error('Unable to load {}, XMLHttpRequest: {}', fileUrl, xobj)();
-              // growlError('<span>Unable to load {}, response code is <b>{}</b>, response: {} <span>'.format(fileUrl, xobj.status, xobj.response));
-            }
-          }
-        };
+
+        xobj.onreadystatechange = this.getOnreadystatechange<T>(
+            xobj,
+            fileUrl,
+            isJsonDecoded || fileType === 'json',
+            'GET',
+            callback
+        );
         xobj.send(null);
     }
     if (fileRef) {
@@ -107,37 +98,7 @@ export default class Xhr {
 
   doPost<T>(d: PostData<T>): XMLHttpRequest {
     let r: XMLHttpRequest = new XMLHttpRequest();
-    r.onreadystatechange = () => {
-      if (r.readyState === 4) {
-        if (r.status === 200) {
-          this.httpLogger.log('POST in {} ::: {};', d.url, r.response)();
-        } else {
-          this.httpLogger.error('POST out: {} ::: {}, status: {}', d.url, r.response, r.status)();
-        }
-        if (typeof(d.cb) === 'function') {
-          let error;
-          let data;
-          if (r.status === 0) {
-            error = `Connection error`;
-          } else if (r.status === 200) {
-            if (d.isJsonDecoded) {
-              try {
-                data = JSON.parse(r.response);
-              } catch (e) {
-                error =  `Unable to parse response ${e}`;
-              }
-            } else {
-              data = r.response;
-            }
-          } else {
-            error = 'Server error';
-          }
-          d.cb(data, error);
-        } else {
-          this.httpLogger.warn('Skipping {} callback for POST {}', d.cb, d.url)();
-        }
-      }
-    };
+    r.onreadystatechange = this.getOnreadystatechange(r, d.url, d.isJsonDecoded, 'POST', d.cb);
 
     let url = this.getUrl(d.url);
 
@@ -177,5 +138,39 @@ export default class Xhr {
     }
     r.send(data);
     return r;
+  }
+
+  private getOnreadystatechange<T>(r: XMLHttpRequest, url: string, isJsonDecoded: boolean, type: string, cb: ErrorCB<T>) {
+    return () => {
+      if (r.readyState === 4) {
+        if (r.status === 200) {
+          this.httpLogger.log('{} in {} ::: {};', type, url, r.response)();
+        } else {
+          this.httpLogger.error('{} out: {} ::: {}, status: {}', type, url, r.response, r.status)();
+        }
+        if (typeof(cb) === 'function') {
+          let error;
+          let data;
+          if (r.status === 0) {
+            error = `Connection error`;
+          } else if (r.status === 200) {
+            if (isJsonDecoded) {
+              try {
+                data = JSON.parse(r.response);
+              } catch (e) {
+                error = `Unable to parse response ${e}`;
+              }
+            } else {
+              data = r.response;
+            }
+          } else {
+            error = 'Server error';
+          }
+          cb(data, error);
+        } else {
+          this.httpLogger.warn('Skipping {} callback for {} {}', cb, type, url)();
+        }
+      }
+    };
   }
 }

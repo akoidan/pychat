@@ -26,6 +26,11 @@ export interface SetUserProfileMessage extends DefaultMessage {
 export interface UserProfileChangedMessage extends DefaultMessage, UserDto {
 
 }
+
+export interface ViewUserProfileDto extends UserProfileDto {
+  image: string;
+}
+
 export interface SetProfileImageMessage extends DefaultMessage {
   content: string;
 }

@@ -64,9 +64,10 @@
     sex = SexModel;
     @Action growlError;
     @Action growlSuccess;
-
+    @Mutation setActiveUserId: SingleParamCB<number>;
 
     created() {
+      this.setActiveUserId(null);
       this.model = currentUserInfoModelToDto(this.userInfo);
     }
 
@@ -74,7 +75,7 @@
     save() {
       this.running = true;
       this.logger.debug("Saving userProfile")();
-      let cui : UserProfileDto = {...this.model};
+      let cui: UserProfileDto = {...this.model};
       this.$ws.saveUser(cui, e => {
         this.running = false;
         if (e && e.action == 'setUserProfile') {

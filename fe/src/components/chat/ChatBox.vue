@@ -105,6 +105,10 @@
       }
     };
 
+    get minIdCalc() {
+      return this.minId(this.room.id);
+    }
+
     private loadUpHistory(n) {
       if (!this.loading && this.$refs.chatbox.scrollTop === 0) {
         let s = this.room.search;
@@ -140,7 +144,7 @@
           });
         } else if (!s.searchActive && !this.room.allLoaded) {
           this.loading = true;
-          this.$ws.sendLoadMessages(this.room.id, this.minId(this.room.id), n, () => {
+          this.$ws.sendLoadMessages(this.room.id, this.minIdCalc, n, () => {
             this.loading = false;
           });
         }

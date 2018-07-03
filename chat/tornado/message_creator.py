@@ -83,7 +83,8 @@ class MessagesCreator(object):
 		}
 
 
-	def get_user_settings(self, up):
+	@staticmethod
+	def get_user_settings(up):
 		return {
 			UserSettingsVarNames.SUGGESTIONS: up.suggestions,
 			UserSettingsVarNames.SEND_LOGS: up.send_logs,
@@ -96,7 +97,8 @@ class MessagesCreator(object):
 			UserSettingsVarNames.ONLINE_CHANGE_SOUND: up.online_change_sound
 		}
 
-	def get_user_profile(self, up):
+	@staticmethod
+	def get_user_profile(up):
 		return {
 			UserProfileVarNames.USERNAME: up.username,
 			UserProfileVarNames.USER_ID: up.id,

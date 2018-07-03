@@ -17,6 +17,7 @@ import UserProfileInfo from './components/pages/UserProfileInfo.vue';
 import UserProfileSettings from './components/pages/UserProfileSettings.vue';
 import CreatePrivateRoom from './components/pages/CreatePrivateRoom.vue';
 import CreatePublicRoom from './components/pages/CreatePublicRoom.vue';
+import ViewProfilePage from './components/pages/ViewProfilePage.vue';
 import RoomSettings from './components/pages/RoomSettings.vue';
 import ApplyResetPassword from './components/singup/ApplyResetPassword.vue';
 import {globalLogger} from './utils/singletons';
@@ -45,6 +46,10 @@ const router = new VueRouter({
             },
           },
           path: '/chat/:id'
+        },
+        {
+          component: ViewProfilePage,
+          path: '/user/:id'
         },
         {
           component: UserProfile,

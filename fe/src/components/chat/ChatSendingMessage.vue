@@ -27,6 +27,10 @@
       return this.roomsDict[this.message.roomId].search.searchedIds;
     }
 
+    get id() {
+      return this.message.id;
+    }
+
     get cls() {
       return {
         sendingMessage: this.message.sending && !this.message.upload,

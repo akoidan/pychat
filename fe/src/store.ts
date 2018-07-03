@@ -76,7 +76,6 @@ const store: StoreOptions<RootState> = {
     },
     maxId(state: RootState): SingleParamCB<number> {
       return (id: number) => {
-        logger.debug('maxId {}', id)();
         let messages = state.roomsDict[id].messages;
         let maxId = null;
         for (let m in messages ) {
@@ -84,21 +83,22 @@ const store: StoreOptions<RootState> = {
             maxId = messages[m].id;
           }
         }
+        logger.debug('maxId #{}={}', id, maxId)();
         return maxId;
       };
     },
     minId(state: RootState): SingleParamCB<number> {
       return (id: number) => {
-        logger.debug('minId {}', id)();
         let messages = state.roomsDict[id].messages;
-        let maxId;
+        let minId;
         for (let m in messages ) {
           let id = messages[m].id;
-          if (id > 0 && (!maxId || id < maxId)) {
-            maxId = id;
+          if (id > 0 && (!minId || id < minId)) {
+            minId = id;
           }
         }
-        return maxId;
+        logger.debug('minId #{}={}', id, minId)();
+        return minId;
       };
     },
     activeRoom(state: RootState): RoomModel {

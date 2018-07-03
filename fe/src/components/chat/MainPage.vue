@@ -57,7 +57,6 @@
     @State userInfo: CurrentUserInfoModel;
     @State activeRoomId: number;
     @Getter roomsArray: RoomModel[];
-    @Getter maxId: SingleParamCB<number>;
     @Getter activeRoom: RoomModel;
     @Getter editingMessageModel: MessageModel;
     @Action growlError;
@@ -156,13 +155,13 @@
       } else if (event.keyCode === 38 && this.$refs.userMessage.innerHTML == "") { // up arrow
         let messages = this.activeRoom.messages;
         if (Object.keys(messages).length > 0) {
-          let maxId: MessageModel = null;
+          let maxTime: MessageModel = null;
           for (let m in messages ) {
-            if (!maxId || (messages[m].time >= maxId.time)) {
-              maxId = messages[m];
+            if (!maxTime || (messages[m].time >= maxTime.time)) {
+              maxTime = messages[m];
             }
           }
-          sem(event, maxId, true, this.userInfo, this.setEditedMessage);
+          sem(event, maxTime, true, this.userInfo, this.setEditedMessage);
         }
       }
     }

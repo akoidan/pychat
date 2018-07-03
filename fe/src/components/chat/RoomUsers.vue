@@ -73,8 +73,8 @@
   @import "partials/abstract_classes"
 
   @mixin fix-user-icon-top-position()
-  i:before
-    transform: translate(0, 3px)
+    i:before
+      transform: translate(0, 3px)
 
   .chat-room-users-wrapper
     float: right

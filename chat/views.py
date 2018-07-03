@@ -394,13 +394,9 @@ def confirm_email(request):
 def show_profile(request, profile_id):
 	try:
 		user_profile = UserProfile.objects.get(pk=profile_id)
-		form = UserProfileReadOnlyForm(instance=user_profile)
-		form.username = user_profile.username
-		return render_to_response(
-			'show_profile.html',
-			{'form': form},
-			context_instance=RequestContext(request)
-		)
+		profile = MessagesCreator.get_user_profile(user_profile)
+		profile['image'] = user_profile.photo.url if user_profile.photo.url else None
+		return HttpResponse(json.dumps(profile), content_type='application/json')
 	except ObjectDoesNotExist:
 		raise Http404
 
