@@ -1,6 +1,7 @@
 import loggerFactory from './loggerFactory';
 import {Store} from 'vuex';
 import Api from './api';
+import Vue from 'vue';
 import MessageHandler from './MesageHandler';
 import {checkAndPlay, incoming, login, logout, outgoing} from './audio';
 
@@ -41,7 +42,7 @@ import {
 } from '../types/messages';
 import {MessageModelDto, RoomDto, UserDto} from '../types/dto';
 import {convertFiles, convertUser} from '../types/converters';
-import {WsHandler} from './WsHandler';
+import WsHandler from './WsHandler';
 import NotifierHandler from './NotificationHandler';
 
 import favicon from '../assets/img/favicon.ico';
@@ -56,13 +57,15 @@ export default class ChannelsHandler extends MessageHandler {
   private readonly ws: WsHandler;
   private readonly sendingMessage: {} = {};
   private readonly notifier: NotifierHandler;
+  private messageBus: Vue;
 
-  constructor(store: Store<RootState>, api: Api, ws: WsHandler, notifier: NotifierHandler) {
+  constructor(store: Store<RootState>, api: Api, ws: WsHandler, notifier: NotifierHandler, messageBus: Vue) {
     super();
     this.store = store;
     this.api = api;
     this.logger = loggerFactory.getLoggerColor('chat', '#940500');
     this.ws = ws;
+    this.messageBus = messageBus;
     this.notifier = notifier;
   }
 
@@ -165,6 +168,7 @@ export default class ChannelsHandler extends MessageHandler {
         };
         this.store.commit('deleteMessage', rmMes);
       }
+      this.messageBus.$emit('scroll');
     },
     deleteRoom(message: DeleteRoomMessage) {
       if (this.store.state.roomsDict[message.roomId]) {

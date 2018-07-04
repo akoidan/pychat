@@ -1,7 +1,7 @@
 <template>
   <p :class="mainCls" @contextmenu="contextmenu">
       <span class="message-header">
-        <span class="timeMess">({{getTime}})</span>
+        <span class="timeMess" @click="quote">({{getTime}})</span>
         <span @contextmenu.prevent.stop="setActiveUser">{{username}}</span>: </span>
     <span class="message-text-style" v-html="encoded" ref="content"></span>
   </p>
@@ -26,6 +26,7 @@
     setYoutubeEvent, timeToString
   } from "../../utils/htmlApi";
   import {sem} from '../../utils/utils';
+  import {messageBus} from '../../utils/singletons';
 
 
   @Component
@@ -63,6 +64,9 @@
       return this.message.content ? encodeMessage(this.message) : encodeHTML("This message has been removed");
     }
 
+    quote() {
+      messageBus.$emit('quote', this.message);
+    }
 
     contextmenu(event) {
       sem(event, this.message, false, this.userInfo, this.setEditedMessage);
@@ -87,7 +91,7 @@
             setYoutubeEvent(this.$refs.content)
           }
           setVideoEvent(this.$refs.content);
-          setImageFailEvents(this.$refs.content);
+          setImageFailEvents(this.$refs.content, messageBus);
         } else {
           this.logger.debug("Skipping event settings, because node is gone")();
         }
@@ -244,7 +248,18 @@
     @import "~highlightjs/styles/default"
 
 
+
+  .timeMess
+    @media screen and (max-width: 400px)
+      display: none !important
+    &:hover
+      cursor: pointer
+      color: #979797
+
   .color-white
+    .timeMess
+      color: #85d379
+      font-weight: normal
     .highLightMessage
       border: 1px solid #3f3f3f
       box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5), 0 3px 10px 0 rgba(0,0,0,0.5)

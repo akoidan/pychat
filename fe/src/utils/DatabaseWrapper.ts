@@ -286,7 +286,7 @@ export default class DatabaseWrapper implements IStorage {
 
 
   private setRoom(t: SQLTransaction, room: RoomSettingsModel) {
-    this.executeSql(t, 'insert or replace into room (id, name, notifications, volume, deleted) values (?, ?, ?, ?, 0)', [room.id, room.name, room.notifications ? 1 : 0, room.volume])();
+    this.executeSql(t, 'insert or replace into room (id, name, notifications, volume, deleted) values (?, ?, ?, ?, ?)', [room.id, room.name, room.notifications ? 1 : 0, room.volume, 0])();
   }
 
   public saveRoom(room: RoomModel) {
@@ -373,7 +373,7 @@ export default class DatabaseWrapper implements IStorage {
 
   public updateRoom(r: RoomSettingsModel) {
     this.write(t => {
-      this.executeSql(t, 'update room set name = ?, volume = ?, notifications = ? where id = ? ', [r.name, r.volume, r.notifications, r.id])();
+      this.executeSql(t, 'update room set name = ?, volume = ?, notifications = ? where id = ? ', [r.name, r.volume, r.notifications ? 1 : 0, r.id])();
     });
   }
 

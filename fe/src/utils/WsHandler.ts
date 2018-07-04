@@ -29,7 +29,7 @@ enum WsState {
 }
 
 
-export class WsHandler extends MessageHandler {
+export default class WsHandler extends MessageHandler {
 
   protected readonly logger: Logger;
   private loggerIn: Logger;

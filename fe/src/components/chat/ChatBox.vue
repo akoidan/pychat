@@ -25,6 +25,7 @@
   import AppProgressBar from "../ui/AppProgressBar";
   import ChatSendingMessage from "./ChatSendingMessage";
   import ChatChangeOnlineMessage from "./ChatChangeOnlineMessage";
+  import {messageBus } from '../../utils/singletons'
 
   @Component({
     components: {
@@ -57,6 +58,17 @@
       }
     }
 
+    created() {
+      messageBus.$on('scroll', () => {
+        this.$nextTick(function () {
+          if (this.$refs.chatbox && this.scrollBottom) {
+            this.$refs.chatbox.scrollTop = this.$refs.chatbox.scrollHeight;
+            this.logger.debug("Scrolling to bottom")();
+          }
+        });
+      })
+    }
+
     get id() {
       return this.room.id;
     }
@@ -75,12 +87,6 @@
         newArray.push(message);
       }
       newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
-      this.$nextTick(function () {
-        if (this.$refs.chatbox && this.scrollBottom) {
-          this.$refs.chatbox.scrollTop = this.$refs.chatbox.scrollHeight;
-          this.logger.debug("Scrolling to bottom")();
-        }
-      });
       return newArray;
     }
 

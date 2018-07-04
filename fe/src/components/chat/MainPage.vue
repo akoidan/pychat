@@ -43,33 +43,41 @@
     RoomModel,
     UploadProgressModel
   } from "../../types/model";
-  import {encodeP, getMessageData, getSmileyHtml, pasteHtmlAtCaret, pasteImgToTextArea} from "../../utils/htmlApi";
+  import {
+    encodeHTML,
+    encodeMessage,
+    encodeP,
+    getMessageData,
+    getSmileyHtml,
+    pasteHtmlAtCaret,
+    pasteImgToTextArea, placeCaretAtEnd, timeToString
+  } from "../../utils/htmlApi";
   import NavEditMessage from "./NavEditMessage.vue";
   import NavUserShow from "./NavUserShow.vue";
   import {sem} from "../../utils/utils";
   import {MessageDataEncode, RemoveSendingMessage, UploadFile} from "../../types/types";
-  import {channelsHandler} from "../../utils/singletons";
+  import {channelsHandler, messageBus} from "../../utils/singletons";
 
+
+  const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
   @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Vue {
-    @Getter activeUser;
     @State editedMessage: EditingMessage;
+    @State allUsersDict: EditingMessage;
     @State userInfo: CurrentUserInfoModel;
     @State activeRoomId: number;
     @Getter roomsArray: RoomModel[];
+    @Getter activeUser;
     @Getter activeRoom: RoomModel;
     @Getter editingMessageModel: MessageModel;
     @Action growlError;
     // used in mixin from event.keyCode === 38
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
     @Mutation addMessage;
-    @Mutation deleteMessage;
-    @Mutation setMessageProgress;
-    @Mutation setMessageProgressError;
-    @Mutation removeMessageProgress;
+
 
     $refs: {
-      userMessage: HTMLTextAreaElement;
+      userMessage: HTMLElement;
       imgInput: HTMLInputElement;
     };
 
@@ -78,8 +86,20 @@
       this.logger.log("editedMessage changed")();
       if (val && val.isEditingNow) {
         this.$refs.userMessage.innerHTML = encodeP(this.editingMessageModel);
-        this.$refs.userMessage.focus();
+        placeCaretAtEnd(this.$refs.userMessage);
       }
+    }
+
+    created() {
+      messageBus.$on('quote', (message :MessageModel) => {
+        this.$refs.userMessage.focus();
+        let oldValue = this.$refs.userMessage.innerHTML;
+        let match = oldValue.match(timePattern);
+        let user = this.allUsersDict[message.userId];
+        oldValue = match ? oldValue.substr(match[0].length + 1) : oldValue;
+        this.$refs.userMessage.innerHTML = encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message) + encodeHTML(' >>>') + String.fromCharCode(13) +' '+ oldValue;
+        placeCaretAtEnd(this.$refs.userMessage);
+      });
     }
 
     showSmileys: boolean = false;

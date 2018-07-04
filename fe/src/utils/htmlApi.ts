@@ -1,5 +1,6 @@
 import {globalLogger} from './singletons';
 import smileys from '../assets/smileys/info.json';
+import Vue from 'vue';
 
 import {STATIC_API_URL, PASTED_IMG_CLASS} from './consts';
 import {MessageDataEncode, SmileyStructure, UploadFile} from '../types/types';
@@ -126,6 +127,16 @@ export function encodeP(data: MessageModel) {
 
 export const canvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d');
 
+
+export function placeCaretAtEnd (userMessage: HTMLElement) {
+    let range = document.createRange();
+    range.selectNodeContents(userMessage);
+    range.collapse(false);
+    let sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(range);
+}
+
 export function encodeMessage(data: MessageModel) {
   globalLogger.debug('Encoding message {}: {}', data.id, data)();
   if (data.giphy) {
@@ -170,7 +181,7 @@ function encodeFiles(html, files) {
 
 
 
-export function pasteNodeAtCaret(img: Node, div: HTMLTextAreaElement) {
+export function pasteNodeAtCaret(img: Node, div: HTMLElement) {
   div.focus();
   let sel = window.getSelection();
   let range = sel.getRangeAt(0);
@@ -189,7 +200,7 @@ export function pasteNodeAtCaret(img: Node, div: HTMLTextAreaElement) {
 }
 
 
-export function pasteHtmlAtCaret(html: string, div: HTMLTextAreaElement) {
+export function pasteHtmlAtCaret(html: string, div: HTMLElement) {
   let divOuter = document.createElement('div');
   divOuter.innerHTML = html;
   let img = divOuter.firstChild;
@@ -217,12 +228,15 @@ export function setVideoEvent(e: HTMLElement) {
   }
 }
 
-export function setImageFailEvents(e: HTMLElement) {
+export function setImageFailEvents(e: HTMLElement, bus: Vue) {
   let r = e.querySelectorAll('img');
   for (let i = 0; i < r.length; i++) {
     (function (img) {
       img.onerror = function() {
         this.className += ' failed';
+      };
+      img.onload = function() {
+        bus.$emit('scroll');
       };
     })(r[i]);
   }
@@ -285,7 +299,7 @@ function setBlobName(blob: Blob) {
   }
 }
 
-function pasteBlobImgToTextArea(blob: Blob, textArea: HTMLTextAreaElement) {
+function pasteBlobImgToTextArea(blob: Blob, textArea: HTMLElement) {
   let img = document.createElement('img');
   img.className = PASTED_IMG_CLASS;
   let src = URL.createObjectURL(blob);
@@ -296,7 +310,7 @@ function pasteBlobImgToTextArea(blob: Blob, textArea: HTMLTextAreaElement) {
   return img;
 }
 
-function pasteBlobVideoToTextArea(file: File, textArea: HTMLTextAreaElement, errCb: Function) {
+function pasteBlobVideoToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
   let video = document.createElement('video');
   if (video.canPlayType(file.type)) {
     video.autoplay = false;
@@ -325,7 +339,7 @@ function pasteBlobVideoToTextArea(file: File, textArea: HTMLTextAreaElement, err
 }
 
 
-export function pasteImgToTextArea(file: File, textArea: HTMLTextAreaElement, errCb: Function) {
+export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
   if (file.type.indexOf('image') >= 0) {
     pasteBlobImgToTextArea(file, textArea);
   } else if (file.type.indexOf('video') >= 0) {
@@ -352,7 +366,7 @@ function nextChar(c: string): string {
 }
 
 
-export function getMessageData(userMessage: HTMLTextAreaElement, currSymbol: string = null): MessageDataEncode {
+export function getMessageData(userMessage: HTMLElement, currSymbol: string = null): MessageDataEncode {
   if (!currSymbol) {
     currSymbol = '\u3500';
   }

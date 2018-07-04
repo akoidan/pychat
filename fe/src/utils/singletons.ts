@@ -1,5 +1,5 @@
 import Xhr from './Xhr';
-import {WsHandler} from './WsHandler';
+import WsHandler from './WsHandler';
 import ChannelsHandler from './ChannelsHandler';
 import DatabaseWrapper from './DatabaseWrapper';
 import mobile from 'is-mobile';
@@ -14,11 +14,13 @@ import {Logger} from 'lines-logger';
 import {WS_API_URL, XHR_API_URL} from './consts';
 import NotifierHandler from './NotificationHandler';
 import Subscription from './Subscription';
+import Vue from 'vue';
 
 export const xhr: Xhr = new Xhr(XHR_API_URL, sessionHolder);
 export const api: Api = new Api(xhr);
 const sub: Subscription = new Subscription();
 export const isMobile: boolean = mobile.isMobile();
+export const messageBus = new Vue();
 export const browserVersion: string = (function () {
   let ua = navigator.userAgent, tem,
       M = ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
@@ -40,7 +42,7 @@ export const storage: IStorage = window.openDatabase ? new DatabaseWrapper('v123
 export  const globalLogger: Logger = loggerFactory.getLoggerColor('global', '#007a70');
 export const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, sub, store);
 export const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
-export const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier);
+export const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier, messageBus);
 
 sub.subscribe('ws', ws);
 sub.subscribe('channels', channelsHandler);

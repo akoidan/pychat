@@ -4,7 +4,7 @@ import {extractError} from './utils';
 import {Store} from 'vuex';
 import {RootState} from '../types/model';
 import Api from './api';
-import {WsHandler} from './WsHandler';
+import WsHandler from './WsHandler';
 import store from '../store';
 import {IS_DEBUG, MANIFEST} from './consts';
 import {getStaticUrl} from './htmlApi';
