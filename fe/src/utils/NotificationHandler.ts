@@ -7,6 +7,7 @@ import Api from './api';
 import {WsHandler} from './WsHandler';
 import store from '../store';
 import {IS_DEBUG, MANIFEST} from './consts';
+import {getStaticUrl} from './htmlApi';
 
 const LAST_TAB_ID_VARNAME = 'lastTabId';
 
@@ -64,48 +65,44 @@ export default class NotifierHandler {
   }
 
 // Permissions are granted here!
-  showNot(title, options) {
-    try {
-      if (this.serviceWorkerRegistration && this.isMobile && this.isChrome) {
-        // TODO  options should contain page id here but it's not
-        // so we open unfefined url
-        this.serviceWorkerRegistration.showNotification(title, options).then( (r) => {
-          this.logger.debug('res {}', r)(); // TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
-        });
-      } else {
-        let data = {title, options};
-        this.replaceIfMultiple(data);
-        let not = new Notification(data.title, data.options);
-        this.popedNotifQueue.push(not);
-        not.onclick = () => {
-          window.focus();
-          if (not.data && not.data.roomId) {
-            this.store.commit('setActiveRoomId', parseInt(not.data.roomId));
-          }
-          not.close();
-        };
-        not.onclose = () => {
-          this.popedNotifQueue.splice(this.popedNotifQueue.indexOf(not), 1);
-        };
-        this.logger.debug('Notification {} {} has been spawned, current queue {}', title, options, this.popedNotifQueue)();
-      }
-    } catch (e) {
-      this.logger.error('Failed to show notification {}', e)();
+  private async showNot(title, options) {
+    this.logger.debug('Showing notification {} {}', title, options);
+    if (this.serviceWorkerRegistration && this.isMobile && this.isChrome) {
+      // TODO  options should contain page id here but it's not
+      // so we open unfefined url
+      let r = await this.serviceWorkerRegistration.showNotification(title, options);
+      this.logger.debug('res {}', r)(); // TODO https://stackoverflow.com/questions/39717947/service-worker-notification-promise-broken#comment83407282_39717947
+    } else {
+      let data = {title, options};
+      this.replaceIfMultiple(data);
+      let not = new Notification(data.title, data.options);
+      this.popedNotifQueue.push(not);
+      not.onclick = () => {
+        window.focus();
+        if (not.data && not.data.roomId) {
+          this.store.commit('setActiveRoomId', parseInt(not.data.roomId));
+        }
+        not.close();
+      };
+      not.onclose = () => {
+        this.popedNotifQueue.splice(this.popedNotifQueue.indexOf(not), 1);
+      };
+      this.logger.debug('Notification {} {} has been spawned, current queue {}', title, options, this.popedNotifQueue)();
     }
   }
 
-  checkPermissions(cb) {
+  /**
+   * @return true if Permissions were asked and user granted them
+   * */
+  async checkPermissions() {
     if ((<any>Notification).permission !== 'granted') { // TODO
-      Notification.requestPermission((result) => {
-        if (result === 'granted') {
-          cb(true);
-        } else {
-          this.logger.warn('User blocked notification permission. Notifications won\'t be available')();
-        }
-      });
-    } else {
-      cb(false);
+      let result = await Notification.requestPermission();
+      if (result !== 'granted') {
+        throw `User blocked notification permission. Notifications won't be available`;
+      }
+      return true;
     }
+    return false;
   }
 
   getSubscriptionId(pushSubscription) {
@@ -129,86 +126,73 @@ export default class NotifierHandler {
     }
   }
 
-  registerWorker(cb) { // todo async
+  private async registerWorker() {
     if (!navigator.serviceWorker) {
-      return cb(false, 'Service worker is not supported', true);
+      throw 'Service worker is not supported';
     } else if (!MANIFEST) {
-      return cb(false, 'FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing', false);
+     throw 'FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing';
     }
-    navigator.serviceWorker.register('/sw.js', {scope: '/'}).then( (r) => {
-      this.logger.debug('Registered service worker {}', r)();
-      return navigator.serviceWorker.ready;
-    }).then( (serviceWorkerRegistration) => {
-      this.logger.debug('Service worker is ready {}', serviceWorkerRegistration)();
-      this.serviceWorkerRegistration = serviceWorkerRegistration;
-      return serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true});
-    }).then( (subscription) => {
-      this.logger.debug('Got subscription {}', subscription)();
-      this.subscriptionId = this.getSubscriptionId(subscription);
-      if (!this.subscriptionId) {
-        throw 'Current browser doesnt support offline notifications';
-      } else {
-        return new Promise( (resolve, reject) => {
-          this.api.registerFCB(this.subscriptionId, this.browserVersion, this.isMobile, e => {
-            if (e) {
-              reject('Unable to save subscription to server because of' + e);
-            } else {
-              resolve();
-            }
-          });
-        });
-      }
-    }).then( () => {
-      this.logger.log('Saved subscription to server')();
-      cb(true);
-    }).catch(function (e) {
-      cb(false, e, true);
+    let r = await navigator.serviceWorker.register('/sw.js', {scope: '/'});
+    this.logger.debug('Registered service worker {}', r)();
+    this.serviceWorkerRegistration = await navigator.serviceWorker.ready;
+    this.logger.debug('Service worker is ready {}', this.serviceWorkerRegistration)();
+    let subscription = await this.serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true});
+    this.logger.debug('Got subscription {}', subscription)();
+    this.subscriptionId = this.getSubscriptionId(subscription);
+    if (!this.subscriptionId) {
+      throw 'Current browser doesnt support offline notifications';
+    }
+    await new Promise((resolve, reject) => {
+      this.api.registerFCB(this.subscriptionId, this.browserVersion, this.isMobile, e => {
+        if (e) {
+          reject('Unable to save subscription to server because of' + e);
+        } else {
+          resolve();
+        }
+      });
     });
+    this.logger.log('Saved subscription to server')();
+
   }
 
 
-  tryAgainRegisterServiceWorker() {
-    if (!(<any>window).Notification) {
-      this.logger.warn('Notifications are not supported')();
-      return;
-    }
-    this.checkPermissions( (result) => {
+  async tryAgainRegisterServiceWorker() {
+    try {
+      if (!(<any>window).Notification) {
+        throw 'Notifications are not supported';
+      }
+      let granted = await this.checkPermissions();
+      if (granted) {
+        await this.showNot('Pychat notifications enabled', {
+          body: 'You can disable them in room\'s settings',
+        });
+      }
       if (!this.serviceWorkedTried) {
-        this.serviceWorkedTried = true;
-        this.registerWorker( (succ, error, growl) => {
-          // if (growl) {
-          //   this.store.dispatch('growlError', `Offline notifications won\'t work, because ${extractError(error)}`);
-          // }
-          if (!succ) {
-            this.logger.error('Unable to load serviceWorker to show notification because {}', error)();
-          }
-          if (result) {
-            this.showNot('Pychat notifications enabled', {
-              body: 'You can disable them in room\'s settings',
-            });
-          }
-        });
+        await this.registerWorker();
       }
-    });
+    } finally {
+      this.serviceWorkedTried = true;
+    }
   }
 
-  notify(title, options) {
+  async showNotification(title, options) {
     if (this.isCurrentTabActive) {
       return;
     }
     this.newMessagesCount++;
     document.title = this.newMessagesCount + ' new messages';
-    if (navigator.vibrate) {
+    try {
       navigator.vibrate(200);
+    } catch (e) {
+      this.logger.debug('Vibration skipped, because ', e);
     }
     // last opened tab not this one, leave the oppotunity to show notification from last tab
     if (!(<any>window).Notification
         || !this.isTabMain()) {
       return;
     }
-    this.checkPermissions( (withGranted) => {
-      this.showNot(title, options);
-    });
+    await this.checkPermissions();
+    await this.showNot(title, options);
   }
 
   isTabMain() {

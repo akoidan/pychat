@@ -105,7 +105,7 @@ module.exports = (env, argv) => {
           test: /favicon\.ico$/,
           loader: 'file-loader',
           options: {
-            outputPath: '/',
+            outputPath: '',
             name,
           }
         },

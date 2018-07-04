@@ -2,26 +2,26 @@ import loggerFactory from './loggerFactory';
 import {Store} from 'vuex';
 import Api from './api';
 import MessageHandler from './MesageHandler';
-import {checkAndPlay, incoming, outgoing, login, logout} from './audio';
+import {checkAndPlay, incoming, login, logout, outgoing} from './audio';
 
 import {
-  AddMessagePayload, ChangeOnlineEntry,
-  MessagesLocation, PubSetRooms,
+  ChangeOnlineEntry,
+  MessagesLocation,
+  PubSetRooms,
   RemoveMessageProgress,
   RemoveSendingMessage,
   SetMessageProgress,
   SetMessageProgressError,
-  SetRoomsUsers, SetUploadProgress,
+  SetRoomsUsers,
+  SetUploadProgress,
   UploadFile
 } from '../types/types';
 import {
-  ChangeOnline,
   CurrentUserInfoModel,
   MessageModel,
   RoomDictModel,
   RoomModel,
   RootState,
-  UploadProgressModel,
   UserDictModel,
   UserModel
 } from '../types/model';
@@ -45,6 +45,9 @@ import {WsHandler} from './WsHandler';
 import NotifierHandler from './NotificationHandler';
 
 import favicon from '../assets/img/favicon.ico';
+import {getStaticUrl} from './htmlApi';
+
+let faviconUrl = getStaticUrl(favicon as string);
 
 export default class ChannelsHandler extends MessageHandler {
   protected readonly logger: Logger;
@@ -133,7 +136,7 @@ export default class ChannelsHandler extends MessageHandler {
       }
       if (room.notifications && !isSelf) {
         let title = this.store.state.allUsersDict[inMessage.userId].user;
-        this.notifier.notify(title, {
+        this.notifier.showNotification(title, {
           body: inMessage.content || 'Image',
           data: {
             replaced: 1,
@@ -141,7 +144,7 @@ export default class ChannelsHandler extends MessageHandler {
             roomId: inMessage.roomId
           },
           requireInteraction: true,
-          icon: inMessage.files || favicon
+          icon: inMessage.files || faviconUrl
         });
       }
 
