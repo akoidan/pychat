@@ -128,10 +128,11 @@ export default class ChannelsHandler extends MessageHandler {
       this.logger.debug('Adding message to storage {}', message)();
       this.store.commit('addMessage', message);
       let activeRoom: RoomModel = this.store.getters.activeRoom;
+      let activeRoomId = activeRoom && activeRoom.id; // if no channels page first
       let room = this.store.state.roomsDict[inMessage.roomId];
       let userInfo: CurrentUserInfoModel = this.store.state.userInfo;
       let isSelf = inMessage.userId === userInfo.userId;
-      if (activeRoom.id !== inMessage.roomId && !isSelf) {
+      if (activeRoomId !== inMessage.roomId && !isSelf) {
         this.store.commit('incNewMessagesCount', inMessage.roomId);
       }
       if (room.notifications && !isSelf) {

@@ -3,9 +3,11 @@
   <div v-else-if="error">
     {{error}}
   </div>
-  <div v-else-if="userProfileInfo">
-    <img :src="resolveUrl(userProfileInfo.image)"/>
+  <div v-else-if="userProfileInfo" class="profileHolder">
     <div>
+      <img :src="resolveUrl(userProfileInfo.image)"/>
+    </div>
+    <div class="tableHolder">
       <table>
         <tbody>
         <tr>
@@ -90,6 +92,30 @@
 </script>
 
 <style lang="sass" scoped>
+
+  @import "partials/variables"
+  th
+    text-align: right
+  th, td
+    padding: 0 5px
+
+  .profileHolder
+    display: flex
+    flex-direction: row
+    > div
+      flex-grow: 1
+      flex-basis: 0
+      padding: 10px
+
+  .tableHolder
+    display: flex
+    justify-content: center
+
   img
-    padding: 10px
+    width: 100%
+
+  @media screen and (max-width: $collapse-width)
+    .profileHolder
+      flex-direction: column
+
 </style>
