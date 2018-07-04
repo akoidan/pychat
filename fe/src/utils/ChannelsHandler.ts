@@ -6,7 +6,7 @@ import {checkAndPlay, incoming, outgoing, login, logout} from './audio';
 
 import {
   AddMessagePayload, ChangeOnlineEntry,
-  MessagesLocation,
+  MessagesLocation, PubSetRooms,
   RemoveMessageProgress,
   RemoveSendingMessage,
   SetMessageProgress,
@@ -47,26 +47,33 @@ import NotifierHandler from './NotificationHandler';
 import favicon from '../assets/img/favicon.ico';
 
 export default class ChannelsHandler extends MessageHandler {
-  private logger: Logger;
-  private store: Store<RootState>;
-  private api: Api;
-  private ws: WsHandler;
-  private sendingMessage: {} = {};
-  private notifier: NotifierHandler;
+  protected readonly logger: Logger;
+  private readonly store: Store<RootState>;
+  private readonly api: Api;
+  private readonly ws: WsHandler;
+  private readonly sendingMessage: {} = {};
+  private readonly notifier: NotifierHandler;
 
-  public inject(ws: WsHandler, notifier: NotifierHandler) {
-    this.ws = ws;
-    this.notifier = notifier;
-  }
-
-  constructor(store: Store<RootState>, api: Api) {
+  constructor(store: Store<RootState>, api: Api, ws: WsHandler, notifier: NotifierHandler) {
     super();
     this.store = store;
     this.api = api;
     this.logger = loggerFactory.getLoggerColor('chat', '#940500');
+    this.ws = ws;
+    this.notifier = notifier;
   }
 
-  private handlers = {
+  protected readonly handlers = {
+    init(m: PubSetRooms) {
+      this.store.commit('setOnline', [...m.online]);
+      this.initUsers(m.users);
+      this.initRooms(m.rooms);
+    },
+    internetAppear() {
+      for (let k in this.sendingMessage) {
+        this.resendMessage(k);
+      }
+    },
     loadMessages(lm: LoadMessages) {
       if (lm.content.length > 0) {
         this.addMessages(lm.roomId, lm.content);
@@ -205,11 +212,6 @@ export default class ChannelsHandler extends MessageHandler {
     this.store.commit('addChangeOnlineEntry', entry);
   }
 
-  private resendMessages() {
-    for (let k in this.sendingMessage) {
-      this.resendMessage(k);
-    }
-  }
 
   public removeSendingMessage(messageId) {
     if (this.sendingMessage[messageId]) {
@@ -376,7 +378,7 @@ export default class ChannelsHandler extends MessageHandler {
     return this.handlers;
   }
 
-  public setUsers(users: UserDto[]) {
+  public initUsers(users: UserDto[]) {
     this.logger.debug('set users {}', users)();
     let um: UserDictModel = {};
     users.forEach(u => {
@@ -405,7 +407,7 @@ export default class ChannelsHandler extends MessageHandler {
   }
 
 
-  public setRooms(rooms: RoomDto[]) {
+  public initRooms(rooms: RoomDto[]) {
     this.logger.debug('Setting rooms')();
     let storeRooms: RoomDictModel = {};
     let roomsDict: RoomDictModel = this.store.state.roomsDict;
@@ -430,12 +432,7 @@ export default class ChannelsHandler extends MessageHandler {
       };
       storeRooms[rm.id] = rm;
     });
-    this.resendMessages();
     this.store.commit('setRooms', storeRooms);
-  }
-
-  public setOnline(online: number[]) {
-    this.store.commit('setOnline', [...online]);
   }
 
 

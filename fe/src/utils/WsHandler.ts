@@ -5,17 +5,16 @@ import {
   PING_CLOSE_JS_DELAY
 } from './consts';
 import {Store} from 'vuex';
-import {VueRouter} from 'vue-router/types/router';
 import {LogStrict} from 'lines-logger';
 import ChannelsHandler from './ChannelsHandler';
 import loggerFactory from './loggerFactory';
 import MessageHandler from './MesageHandler';
 import {logout} from './utils';
 import {CurrentUserInfoModel, CurrentUserSettingsModel, RootState, UserModel} from '../types/model';
-import {IStorage, SessionHolder} from '../types/types';
+import {IStorage, PubSetRooms, SessionHolder} from '../types/types';
 import {
   DefaultMessage,
-  GrowlMessage, SetProfileImageMessage,
+  GrowlMessage, PingMessage, SetProfileImageMessage,
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage, UserProfileChangedMessage
@@ -23,38 +22,29 @@ import {
 import {Logger} from 'lines-logger';
 import {convertUser, currentUserInfoDtoToModel, userSettingsDtoToModel} from '../types/converters';
 import {UserProfileDto, UserSettingsDto} from '../types/dto';
+import Subscription from './Subscription';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
 }
 
-interface AllHandlers {
-  channels: ChannelsHandler;
-  ws: WsHandler;
-  webrtc: MessageHandler;
-  webrtcTransfer: MessageHandler;
-  peerConnection: MessageHandler;
-}
-
 
 export class WsHandler extends MessageHandler {
 
-  private logger: Logger;
+  protected readonly logger: Logger;
   private loggerIn: Logger;
   private loggerOut: Logger;
   private pingTimeoutFunction;
   private ws: WebSocket;
   private noServerPingTimeout: any;
   private loadHistoryFromWs: boolean;
-  private storage: IStorage;
   private store: Store<RootState>;
-  private router: VueRouter;
   private sessionHolder: SessionHolder;
   private listenWsTimeout: number;
   private API_URL: string;
+  private sub: Subscription;
   private callBacks: { [id: number]: Function } = {};
-  private handlers: AllHandlers;
-  private methodHandlers = {
+  protected readonly handlers: { [id: string]: SingleParamCB<DefaultMessage> } = {
     growl(gm: GrowlMessage) {
       this.store.dispatch('growlError', gm.content);
     },
@@ -72,19 +62,29 @@ export class WsHandler extends MessageHandler {
     },
     setWsId(message: SetWsIdMessage) {
       this.wsConnectionId = message.opponentWsId;
-      this.handlers.channels.setRooms(message.rooms);
-      this.handlers.channels.setOnline(message.online);
-      this.handlers.channels.setUsers(message.users);
       this.setUserInfo(message.userInfo);
       this.setUserSettings(message.userSettings);
       this.setUserImage(message.userImage);
+      let pubSetRooms: PubSetRooms = {
+        action: 'init',
+        handler: 'channels',
+        rooms: message.rooms,
+        online: message.online,
+        users: message.users
+      };
+      this.sub.notify(pubSetRooms);
+      let inetAppear: DefaultMessage = {
+        action: 'internetAppear',
+        handler: 'lan'
+      };
+      this.sub.notify(inetAppear);
       this.logger.debug('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
     },
     userProfileChanged(message: UserProfileChangedMessage) {
       let user: UserModel = convertUser(message);
       this.store.commit('setUser', user);
     },
-    ping(message) {
+    ping(message: PingMessage) {
       this.startNoPingTimeout();
       this.sendToServer({action: 'pong', time: message.time});
     },
@@ -119,28 +119,15 @@ export class WsHandler extends MessageHandler {
     }
   }
 
-
-  protected getMethodHandlers() {
-    return this.methodHandlers;
-  }
-
-  constructor(API_URL: string, sessionHolder: SessionHolder, channelsHandler: ChannelsHandler, webRtcApi, storage: IStorage, store: Store<RootState>, router: VueRouter) {
+  constructor(API_URL: string, sessionHolder: SessionHolder, sub: Subscription, store: Store<RootState>) {
     super();
     this.API_URL = API_URL;
+    this.sub = sub;
     this.logger = loggerFactory.getLoggerColor('ws', '#2e631e');
     this.loggerIn = loggerFactory.getLoggerColor('ws:in', '#2e631e');
     this.loggerOut = loggerFactory.getLoggerColor('ws:out', '#2e631e');
-    this.storage = storage;
     this.sessionHolder = sessionHolder;
     this.store = store;
-    this.router = router;
-    this.handlers = {
-      channels: channelsHandler,
-      ws: this,
-      webrtc: webRtcApi,
-      webrtcTransfer: webRtcApi,
-      peerConnection: webRtcApi
-    };
   }
 
   private messageId: number = 0;
@@ -176,6 +163,10 @@ export class WsHandler extends MessageHandler {
       this.logger.error('Unable to parse incomming message {}', jsonData)();
       return;
     }
+    if (!data.handler || !data.action) {
+      this.logger.error('Invalid message structure')();
+      return;
+    }
     this.handleMessage(data);
   }
 
@@ -191,8 +182,8 @@ export class WsHandler extends MessageHandler {
     }
   }
 
-  private handleMessage(data) {
-    this.handlers[data.handler].handle(data);
+  private handleMessage(data: DefaultMessage) {
+    this.sub.notify(data);
     if (this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.wsConnectionId)) {
       this.logger.debug('resolving cb')();
       this.callBacks[data.messageId](data);
@@ -376,11 +367,11 @@ export class WsHandler extends MessageHandler {
       logout(message);
       return;
     } else if (this.wsState === WsState.NOT_INITED) {
-      this.store.dispatch('growlError', 'Can\'t establish connection with server');
+      // this.store.dispatch('growlError', 'Can\'t establish connection with server');
       this.logger.error('Chat server is down because {}', reason)();
       this.wsState = WsState.TRIED_TO_CONNECT;
     } else if (this.wsState === WsState.CONNECTED) {
-      this.store.dispatch('growlError', `Connection to chat server has been lost, because ${reason}`);
+      // this.store.dispatch('growlError', `Connection to chat server has been lost, because ${reason}`);
       this.logger.error(
           'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
           e.reason, CONNECTION_RETRY_TIME)();

@@ -4,6 +4,8 @@ import {FileModel} from './model';
 export interface DefaultMessage {
   action: string;
   handler: string;
+  messageId?: number;
+  cbBySender?: string;
 }
 
 export interface SetWsIdMessage extends DefaultMessage {
@@ -29,6 +31,10 @@ export interface UserProfileChangedMessage extends DefaultMessage, UserDto {
 
 export interface ViewUserProfileDto extends UserProfileDto {
   image: string;
+}
+
+export interface PingMessage extends DefaultMessage {
+  time: string;
 }
 
 export interface SetProfileImageMessage extends DefaultMessage {
@@ -92,9 +98,7 @@ export interface GrowlMessage extends DefaultMessage {
 export interface DeleteMessage extends DefaultMessage {
   roomId: number;
   id: number;
-  cbBySender: string;
   edited: number;
-  messageId: number;
 }
 
 

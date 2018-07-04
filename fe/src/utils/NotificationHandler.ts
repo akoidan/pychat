@@ -176,9 +176,9 @@ export default class NotifierHandler {
       if (!this.serviceWorkedTried) {
         this.serviceWorkedTried = true;
         this.registerWorker( (succ, error, growl) => {
-          if (growl) {
-            this.store.dispatch('growlError', `Offline notifications won\'t work, because ${extractError(error)}`);
-          }
+          // if (growl) {
+          //   this.store.dispatch('growlError', `Offline notifications won\'t work, because ${extractError(error)}`);
+          // }
           if (!succ) {
             this.logger.error('Unable to load serviceWorker to show notification because {}', error)();
           }

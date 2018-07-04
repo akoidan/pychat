@@ -1,15 +1,18 @@
 import {DefaultMessage} from '../types/messages';
+import {Logger} from 'lines-logger';
 
 export default abstract class MessageHandler {
 
-  protected abstract getMethodHandlers();
+  protected abstract readonly logger: Logger;
+
+  protected abstract readonly handlers: { [id: string]: SingleParamCB<DefaultMessage> };
 
   public handle(message: DefaultMessage) {
-    let handler = this.getMethodHandlers()[message.action];
+    let handler: SingleParamCB<DefaultMessage> = this.handlers[message.action];
     if (handler) {
       handler.bind(this)(message);
     } else {
-      throw `Can't find handler for ${message.action} for message ${JSON.stringify(message)}`;
+      this.logger.error(`Can't find handler for {}`, message);
     }
   }
 }

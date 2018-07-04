@@ -79,7 +79,9 @@
       this.loading = true;
       this.$api.showProfile(this.id, (d: ViewUserProfileDto, e: string) => {
         this.loading = false;
-        this.error = e;
+        if (e) {
+          this.error = `Unable to load ${this.username} profile, because: ${e}`;
+        }
         this.userProfileInfo = d;
       });
     }

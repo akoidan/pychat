@@ -1,6 +1,7 @@
 import loggerFactory from './loggerFactory';
 import {PostData, SessionHolder} from '../types/types';
 import {Logger} from 'lines-logger';
+import {CONNECTION_ERROR} from './consts';
 
 
 /**
@@ -152,7 +153,7 @@ export default class Xhr {
           let error;
           let data;
           if (r.status === 0) {
-            error = `Connection error`;
+            error = CONNECTION_ERROR;
           } else if (r.status === 200) {
             if (isJsonDecoded) {
               try {

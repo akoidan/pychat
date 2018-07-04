@@ -1,15 +1,31 @@
 import Xhr from './Xhr';
-import {RESPONSE_SUCCESS} from './consts';
+import {CONNECTION_ERROR, RESPONSE_SUCCESS} from './consts';
 import {UploadFile} from '../types/types';
 import {MessageModelDto, UserProfileDto, UserSettingsDto} from '../types/dto';
 import {UserModel} from '../types/model';
-import {xhr} from './singletons';
-import {ViewUserProfileDto} from '../types/messages';
+import {globalLogger, xhr} from './singletons';
+import {DefaultMessage, ViewUserProfileDto} from '../types/messages';
+import MessageHandler from './MesageHandler';
+import loggerFactory from './loggerFactory';
+import {Logger} from 'lines-logger';
 
-export default class Api {
-  private xhr: Xhr;
+export default class Api extends MessageHandler {
+  private readonly  xhr: Xhr;
+  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
+    internetAppear(m: DefaultMessage) {
+      if (this.retryFcb) {
+        this.retryFcb();
+      }
+    }
+  };
+
+  private retryFcb: Function = null;
+
+  protected readonly logger: Logger;
 
   constructor(xhr: Xhr) {
+    super();
+    this.logger = loggerFactory.getLoggerColor('api', 'red');
     this.xhr = xhr;
   }
 
@@ -109,7 +125,7 @@ export default class Api {
   }
 
 
-  public registerFCB(registration_id: string, agent: string, is_mobile: boolean, cb: SingleParamCB<string>) {
+  public registerFCB(registration_id: string, agent: string, is_mobile: boolean, cb: SingleParamCB<string> = undefined) {
     this.xhr.doPost({
       url: '/register_fcb',
       params: {
@@ -117,7 +133,18 @@ export default class Api {
         agent,
         is_mobile
       },
-      cb: this.getResponseSuccessCB(cb)
+      cb: this.getResponseSuccessCB(d => {
+        if (d === CONNECTION_ERROR) {
+          this.retryFcb = () => {
+            this.registerFCB(registration_id, agent, is_mobile);
+          };
+        } else {
+          this.retryFcb = null;
+        }
+        if (cb) {
+          cb(d);
+        }
+      })
     });
   }
 

@@ -13,10 +13,11 @@ import sessionHolder from './sessionHolder';
 import {Logger} from 'lines-logger';
 import {WS_API_URL, XHR_API_URL} from './consts';
 import NotifierHandler from './NotificationHandler';
+import Subscription from './Subscription';
 
 export const xhr: Xhr = new Xhr(XHR_API_URL, sessionHolder);
 export const api: Api = new Api(xhr);
-export const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api);
+const sub: Subscription = new Subscription();
 export const isMobile: boolean = mobile.isMobile();
 export const browserVersion: string = (function () {
   let ua = navigator.userAgent, tem,
@@ -37,7 +38,12 @@ export const isFirefox = browserVersion.indexOf('Firefox') >= 0;
 export const isChrome = browserVersion.indexOf('Chrome') >= 0;
 export const storage: IStorage = window.openDatabase ? new DatabaseWrapper('v123x') : new LocalStorage();
 export  const globalLogger: Logger = loggerFactory.getLoggerColor('global', '#007a70');
-export const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, channelsHandler, null, storage, store, router);
+export const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, sub, store);
 export const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
-channelsHandler.inject(ws, notifier);
+export const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier);
+
+sub.subscribe('ws', ws);
+sub.subscribe('channels', channelsHandler);
+sub.subscribe('lan', channelsHandler);
+sub.subscribe('lan', api);
 

@@ -10,7 +10,8 @@ import {
   UploadProgressModel,
   UserModel
 } from './model';
-import {SetRooms} from './dto';
+import {RoomDto, SetRooms, UserDto} from './dto';
+import {DefaultMessage} from './messages';
 
 
 export interface UploadFile {
@@ -99,6 +100,12 @@ export interface SetRoomsUsers {
 export interface RemoveMessageProgress {
   messageId: number;
   roomId: number;
+}
+
+export interface PubSetRooms extends DefaultMessage {
+  rooms:  RoomDto[];
+  users: UserDto[];
+  online: number[];
 }
 
 export interface SetMessageProgress extends RemoveMessageProgress {

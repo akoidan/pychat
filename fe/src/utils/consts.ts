@@ -23,3 +23,4 @@ export {_MANIFEST as MANIFEST};
 export const RESPONSE_SUCCESS = 'ok';
 export const PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
 export const MESSAGES_PER_SEARCH = 10;
+export const CONNECTION_ERROR = `Connection error`;
