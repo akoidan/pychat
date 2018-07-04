@@ -4,22 +4,59 @@
       <i class="icon-user"> <span
           class="activeUserName">{{activeUser.user}}</span><span class="mText">Profile</span></i>
     </router-link>
-    <i class="icon-quote-left" onclick="channelsHandler.m2QuoteMessage(event)"><span class="mText">Quote</span> </i>
-    <i class="icon-comment" onclick="channelsHandler.createDirectChannel()"><span class="mText">Write message</span></i>
-    <i class="icon-phone-circled" onclick="channelsHandler.m2Call()"><span class="mText">Call</span></i>
-    <i class="icon-doc-inv" onclick="channelsHandler.m2TransferFile()"><span class="mText">Transfer file</span></i>
-    <i class="icon-cancel" @click.stop="closeActiveUser"><span class="mText">Close</span></i>
+
+    <template v-if="oppositeRoomId">
+      <router-link :to="`/chat/${oppositeRoomId}`" >
+        <i class="icon-comment"><span class="mText">Write message</span></i>
+      </router-link>
+
+      <i class="icon-phone-circled" onclick="channelsHandler.m2Call()"><span class="mText">Call</span></i>
+      <i class="icon-doc-inv" onclick="channelsHandler.m2TransferFile()"><span class="mText">Transfer file</span></i>
+    </template>
+    <template v-else>
+      <i class="icon-comment" @click="writeMessage"><span class="mText">Write message</span></i>
+    </template>
+    <div class="right">
+      <app-spinner-small v-if="running" :text="running"/>
+      <i class="icon-cancel" @click.stop="closeActiveUser"><span class="mText">Close</span></i>
+    </div>
   </nav>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {Getter, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {UserModel} from "../../types/model";
-
-  @Component
+  import {PrivateRoomsIds} from '../../types/types';
+  import {AddRoomMessage} from '../../types/messages';
+  import AppSpinner from '../ui/AppSpinner';
+  import AppSpinnerSmall from '../ui/AppSpinnerSmall';
+  @Component({
+    components: {AppSpinnerSmall, AppSpinner}
+  })
   export default class NavUserShow extends Vue {
     @Mutation setActiveUserId: SingleParamCB<number>;
     @Prop() activeUser: UserModel;
+    @Prop() privateRooms: UserModel;
+    running: string = null;
+    @Getter privateRoomsUsersIds: PrivateRoomsIds;
+
+    get oppositeRoomId() {
+      return this.privateRoomsUsersIds.userRooms[this.activeUser.id];
+    }
+
+    writeMessage() {
+      if (!this.running) {
+        this.running = 'Creating room...';
+        this.$ws.sendAddRoom(null, 50, true, [this.activeUser.id], (e: AddRoomMessage)=> {
+          if (e && e.roomId) {
+            this.$router.replace(`/chat/${e.roomId}`);
+          }
+          this.setActiveUserId(null);
+          this.running = null;
+        });
+      }
+    }
+
 
     closeActiveUser() {
       this.setActiveUserId(null);
@@ -41,11 +78,12 @@
     > *
       cursor: pointer
 
-  .icon-cancel
+  .right
+    display: flex
     margin-left: auto
 
   @media screen and (max-width: $collapse-width)
-    .icon-cancel
+    .right
       margin: 0
 
   .color-reg

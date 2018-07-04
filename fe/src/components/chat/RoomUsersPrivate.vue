@@ -14,7 +14,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfoModel, RoomModel, UserModel} from "../../types/model";
   import {getUserSexClass} from '../../utils/htmlApi';
-  import {getOppositeUserIdInPrivateRoom} from '../../utils/utils';
+  import {PrivateRoomsIds} from '../../types/types';
 
   @Component
   export default class RoomUsersPrivate extends Vue {
@@ -22,11 +22,12 @@
     @Prop() room: RoomModel;
     @State online: number[];
     @State activeRoomId: number;
+    @Getter privateRoomsUsersIds: PrivateRoomsIds;
     @State userInfo: CurrentUserInfoModel;
     @State allUsersDict: { [id: number]: UserModel };
 
     get user() {
-      return this.allUsersDict[getOppositeUserIdInPrivateRoom(this.userInfo.userId, this.room.users)];
+      return this.allUsersDict[this.privateRoomsUsersIds.roomUsers[this.room.id]];
     }
 
     get onlineActiveClass () : string[] {

@@ -19,7 +19,7 @@ import {
 } from './types/model';
 import {
   ChangeOnlineEntry,
-  MessagesLocation,
+  MessagesLocation, PrivateRoomsIds,
   RemoveMessageProgress,
   RemoveSendingMessage,
   SetMessageProgress,
@@ -58,6 +58,19 @@ const store: StoreOptions<RootState> = {
       let roomModels: RoomModel[] = getters.roomsArray.filter(r => !r.name);
       logger.debug('privateRooms {} ', roomModels)();
       return roomModels;
+    },
+    privateRoomsUsersIds(state: RootState, getters): PrivateRoomsIds {
+      let roomUsers = {};
+      let userRooms = {};
+      if (state.userInfo) {
+        let myId = state.userInfo.userId;
+        getters.privateRooms.forEach((r: RoomModel) => {
+          let anotherUId = myId === r.users[0] && r.users.length === 2 ? r.users[1] : r.users[0];
+          roomUsers[r.id] = anotherUId;
+          userRooms[anotherUId] = r.id;
+        });
+      }
+      return {roomUsers, userRooms};
     },
     roomsArray(state: RootState): RoomModel[] {
       let anies = Object.values(state.roomsDict);

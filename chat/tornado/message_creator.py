@@ -222,10 +222,14 @@ class MessagesCreator(object):
 			VarNames.JS_MESSAGE_ID: js_id
 		}
 
-	def unsubscribe_direct_message(self, room_id, js_id, myws_id, users):
+	def unsubscribe_direct_message(self, room_id, js_id, myws_id, users, name):
+		"""
+		:param name: so we can determine on pubsub message if it's private
+		"""
 		return {
 			VarNames.EVENT: Actions.DELETE_ROOM,
 			VarNames.ROOM_ID: room_id,
+			VarNames.ROOM_NAME: name,
 			VarNames.JS_MESSAGE_ID: js_id,
 			VarNames.USER_ID: self.user_id,
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,

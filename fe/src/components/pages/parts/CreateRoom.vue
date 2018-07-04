@@ -40,13 +40,14 @@
   import AddUserToRoom from "./AddUserToRoom.vue";
   import {CurrentUserInfoModel, RoomModel, UserModel} from "../../../types/model";
   import {AddRoomMessage} from "../../../types/messages";
-  import AppCheckbox from '../../ui/AppCheckbox';
-  import {getOppositeUserIdInPrivateRoom} from '../../../utils/utils';
+  import AppCheckbox from "../../ui/AppCheckbox";
+  import {PrivateRoomsIds} from '../../../types/types';
 
   @Component({components: {AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})
   export default class CreateRoom extends Vue {
     @Action growlError;
     @Getter privateRooms: RoomModel[];
+    @Getter privateRoomsUsersIds: PrivateRoomsIds;
     @State userInfo: CurrentUserInfoModel;
     currentUsers: UserModel[] = [];
     notifications: boolean = false;
@@ -67,10 +68,7 @@
     get excludeUsersIds() {
       let uids: number[];
       if (!this.isPublic) {
-        uids = this.privateRooms.map(r => getOppositeUserIdInPrivateRoom(this.userInfo.userId, r.users));
-        for (let user in this.privateRooms) {
-          uids.push(this.privateRooms[user].id)
-        }
+        uids = Object.values(this.privateRoomsUsersIds.roomUsers);
       } else {
         uids = []
       }

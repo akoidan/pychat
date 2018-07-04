@@ -489,7 +489,7 @@ class MessagesHandler(MessagesCreator):
 		else:  # if public -> leave the room, delete the link
 			RoomUsers.objects.filter(room_id=room.id, user_id=self.user_id).delete()
 		ru = list(RoomUsers.objects.filter(room_id=room.id).values_list('user_id', flat=True))
-		message = self.unsubscribe_direct_message(room_id, js_id, self.id, ru)
+		message = self.unsubscribe_direct_message(room_id, js_id, self.id, ru, room.name)
 		self.publish(message, room_id, True)
 
 	def edit_message(self, data):
@@ -549,7 +549,7 @@ class MessagesHandler(MessagesCreator):
 				VarNames.EVENT: Actions.DELETE_MY_ROOM,
 				VarNames.ROOM_ID: room_id,
 				VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
-				VarNames.JS_MESSAGE_ID: VarNames.JS_MESSAGE_ID,
+				VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
 			}
 			self.ws_write(channels)
 		else:

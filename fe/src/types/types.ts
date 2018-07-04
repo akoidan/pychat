@@ -92,6 +92,10 @@ export interface MessagesLocation {
   messages: MessageModel[];
 }
 
+export interface PrivateRoomsIds {
+  userRooms: {};
+  roomUsers: {};
+}
 export interface SetRoomsUsers {
   roomId: number;
   users: number[];

@@ -19,6 +19,10 @@
       return getUserSexClass(this.user);
     }
 
+    get id() {
+      return this.user.id;
+    }
+
     get userIsInActiveRoom() {
       let ar = this.activeRoom;
       return ar && ar.users.indexOf(this.user.id) >= 0;
