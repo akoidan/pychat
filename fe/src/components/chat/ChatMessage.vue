@@ -73,29 +73,29 @@
     }
 
     updated() {
-      this.setEvents();
-    }
-
-    created() {
-      this.setEvents();
-    }
-
-    private setEvents() {
       this.$nextTick(function () {
         if (this.$refs.content) {
-          this.logger.debug("Setting events")();
-          if (this.userSettings.highlightCode) {
-            highlightCode(this.$refs.content);
-          }
-          if (this.userSettings.embeddedYoutube) {
-            setYoutubeEvent(this.$refs.content)
-          }
-          setVideoEvent(this.$refs.content);
-          setImageFailEvents(this.$refs.content, messageBus);
+          this.seEvents();
         } else {
           this.logger.debug("Skipping event settings, because node is gone")();
         }
-      })
+      });
+    }
+
+    mounted() {
+      this.seEvents()
+    }
+
+    private seEvents() {
+      this.logger.debug("Setting events")();
+      if (this.userSettings.highlightCode) {
+        highlightCode(this.$refs.content);
+      }
+      if (this.userSettings.embeddedYoutube) {
+        setYoutubeEvent(this.$refs.content)
+      }
+      setVideoEvent(this.$refs.content);
+      setImageFailEvents(this.$refs.content, messageBus);
     }
 
     encodeMessage(message: MessageModel) {

@@ -1,3 +1,4 @@
+import './utils/classComponentHooks.ts';
 import Vue from 'vue';
 
 import './assets/sass/common.sass';

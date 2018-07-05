@@ -299,7 +299,7 @@ function setBlobName(blob: Blob) {
   }
 }
 
-function pasteBlobImgToTextArea(blob: Blob, textArea: HTMLElement) {
+export function pasteBlobImgToTextArea(blob: Blob, textArea: HTMLElement) {
   let img = document.createElement('img');
   img.className = PASTED_IMG_CLASS;
   let src = URL.createObjectURL(blob);

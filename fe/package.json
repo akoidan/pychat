@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "prod": "webpack --progress --mode production ",
+    "prod": "webpack --progress --mode production  --hide-modules",
     "dev": "webpack-dev-server --mode development --hot",
     "test": "mocha test/index.ts"
   },
@@ -82,6 +82,7 @@
     "lines-logger": "^1.0.2",
     "lodash": "^4.17.10",
     "npm-font-open-sans": "^1.1.0",
+    "spainter": "^0.0.4",
     "typeface-oswald": "^0.0.54",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",

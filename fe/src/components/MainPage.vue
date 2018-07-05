@@ -1,7 +1,7 @@
 <template>
   <div class="flex">
     <app-nav v-show="showNav"/>
-    <keep-alive v-if="inited" :include="['ChannelsPage']">
+    <keep-alive v-if="inited" :include="['ChannelsPage', 'Painter']">
       <router-view class="body"/>
     </keep-alive>
     <app-spinner v-else text="Connecting..."/>

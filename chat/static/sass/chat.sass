@@ -53,76 +53,6 @@
 	height: 20px
 	border: 1px solid #8d8d8d
 
-.bottomTools
-	padding-top: 7px
-	.paintXYdimens
-		float: right
-		font-size: 12px
-		position: relative
-		padding: 5px 10px
-		display: inline-block
-		> *
-			display: block !important
-	%hideEl
-		display: inline-block
-		vertical-align: top
-		input[type=text]
-			width: 30px
-			padding: 5px
-			vertical-align: top
-		> span
-			vertical-align: top
-			display: inline-block
-			padding-top: 3px
-		> input
-			margin-right: 0
-		div
-			display: inline-block
-			overflow: hidden
-			width: 0
-			@include transition(width 0.5s)
-		&:hover div
-			width: 120px
-
-	margin-left: 24px
-	height: 30px
-
-	#paintFont
-		@extend %hideEl
-		select
-			display: inline-block
-			text-decoration: none
-			text-overflow: ellipsis
-			overflow: hidden
-			white-space: nowrap
-			width: 120px
-			font-size: 14px
-			height: 25px
-			border: 1px solid grey
-
-	#paintOpacity, #paintFillOpacity
-		@extend %hideEl
-
-	#paintRadius
-		@extend %hideEl
-
-	#paintApplyText
-		display: inline-block
-
-	#paintColor, #paintColorFill
-		@extend %hideEl
-		input[type=color]
-			-webkit-appearance: none
-			padding: 0
-			border: 1px solid grey
-			border-radius: 1px
-			height: 25px
-			width: 25px
-			&::-webkit-color-swatch-wrapper
-				padding: 0
-			&::-webkit-color-swatch
-				border: none
-
 .settingsContainer
 	width: 200px
 	margin: auto
@@ -150,56 +80,6 @@
 			left: 5px
 			color: #24768e !important
 
-.toolsAndCanvas
-	display: flex
-	$two-columns-painter: 600px
-	#painterTools
-		display: flex
-		margin-left: -5px
-		flex-direction: column
-		height: fit-content
-		*
-			display: flex
-			padding: 5px 5px 5px 0
-		@media screen and (max-height: $two-columns-painter)
-			width: 60px
-			flex-direction: row
-			flex-wrap: wrap
-	.canvasWrapper
-		position: relative
-		overflow: auto
-		// select none prevent paste event  https://stackoverflow.com/questions/31207253/onpaste-paste-event-not-firing-for-table-on-first-few-attempts
-		//@extend %user-select-none
-		background-color: #313131
-		max-height: calc(100vh - 95px)
-		max-width: calc(100vw - 60px)
-		@media screen and (max-height: $two-columns-painter)
-			max-width: calc(100vw - 90px)
-		border: 1px solid transparent
-		//border: 1px solid #697075
-		#painter
-			touch-action: none
-		canvas
-			$c1: #cacacc
-			$c2: transparent
-			@extend %user-select-none
-			background-color: #868686
-			background-image: -moz-linear-gradient(45deg, $c1 25%, $c2 25%), -moz-linear-gradient(-45deg, $c1 25%, $c2 25%), -moz-linear-gradient(45deg, $c2 75%, $c1 75%), -moz-linear-gradient(-45deg, $c2 75%, $c1 75%)
-			background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, $c1), color-stop(.25, $c2)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, $c1), color-stop(.25, $c2)), -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, $c2), color-stop(.75, $c1)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, $c2), color-stop(.75, $c1))
-			$width: 50px
-			$h_width: $width/2
-			-moz-background-size: $width $width
-			background-size: $width $width
-			-webkit-background-size: $width $width /* override value for shitty webkit */
-
-			background-position: 0 0, $h_width 0, $h_width -#{$h_width}, 0px $h_width
-		.text
-			position: absolute
-			border: 1px dashed
-			width: auto
-			min-width: 5px
-			word-wrap: normal
-			padding: 0 1px
 
 .mobile
 	#painterTools
@@ -213,13 +93,6 @@
 	&.disabled
 		color: #616161
 
-#canvasResize
-	cursor: se-resize
-	position: absolute
-	bottom: -5px
-	right: -5px
-	width: 10px
-	height: 10px
 
 .icon-cancel
 	position: absolute

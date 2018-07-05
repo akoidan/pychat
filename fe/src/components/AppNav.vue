@@ -1,16 +1,20 @@
 <template>
   <nav @click="toggle" :class="{expanded}">
-    <router-link to="/" class="icon-home" title="Go home"><span class="mText">Home</span></router-link>
-    <i class="icon-brush" title="Draw an Image">
+    <router-link to="/" class="icon-home" title="Go home">
+      <span class="mText">Home</span>
+    </router-link>
+    <router-link to="/painter" class="icon-brush" title="Draw an Image">
       <span class="mText">Painter</span>
-    </i>
-    <router-link to="/report-issue" class="icon-pencil" title="Report an issue"><span class="mText">Issue</span>
+    </router-link>
+    <router-link to="/report-issue" class="icon-pencil" title="Report an issue">
+      <span class="mText">Issue</span>
     </router-link>
     <i class="icon-phone" title="Make a video/mic call"><span class="mText">Call</span></i>
     <i class="icon-search" v-if="activeRoom" @click='invertSearch' title="Search messages in current room (Shift+Ctrl+F)"><span
         class="mText">Search</span></i>
 
-    <router-link to="/statistics" class="icon-chart-pie" title="Show user countries statistics"><span class="mText">Statistics</span>
+    <router-link to="/statistics" class="icon-chart-pie" title="Show user countries statistics">
+      <span class="mText">Statistics</span>
     </router-link>
     <i class="icon-doc-inv"><span class="mText">Send File</span></i>
     <i class="icon-popup"><span class="mText">Minimized Windows</span></i>
@@ -22,7 +26,9 @@
         <span class="username"><b>{{userInfo.user}}</b></span>
         <i class="icon-menu" title="Open Menu"></i>
       </div>
-      <router-link to="/profile" class="icon-wrench" title="Settings"><span class="mText">Profile</span></router-link>
+      <router-link to="/profile" class="icon-wrench" title="Settings">
+        <span class="mText">Profile</span>
+      </router-link>
       <i title="Sign out" class="icon-sign-out" @click="signOut"><span class="mText">Sign out</span></i>
     </template>
   </nav>

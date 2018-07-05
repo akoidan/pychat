@@ -16,6 +16,7 @@ import UserProfileImage from './components/pages/UserProfileImage.vue';
 import UserProfileInfo from './components/pages/UserProfileInfo.vue';
 import UserProfileSettings from './components/pages/UserProfileSettings.vue';
 import CreatePrivateRoom from './components/pages/CreatePrivateRoom.vue';
+import Painter from './components/pages/Painter.vue';
 import CreatePublicRoom from './components/pages/CreatePublicRoom.vue';
 import ViewProfilePage from './components/pages/ViewProfilePage.vue';
 import RoomSettings from './components/pages/RoomSettings.vue';
@@ -46,6 +47,10 @@ const router = new VueRouter({
             },
           },
           path: '/chat/:id'
+        },
+        {
+          component: Painter,
+          path: '/painter'
         },
         {
           component: ViewProfilePage,
@@ -128,7 +133,7 @@ const router = new VueRouter({
       ]
     }, {
       path: '*',
-      beforeEnter: (to, from, next) => next('/chat/1')
+      redirect: '/chat/1'
     }
     ]
 });

@@ -19,9 +19,10 @@
       this.style = document.createElement('style');
       document.head.appendChild(this.style);
       this.cls = `wbktRange${getUniqueId()}`;
-      this.$nextTick(function() {
-        this.fixStyle();
-      });
+    }
+
+    mounted () {
+      this.fixStyle();
     }
 
     destroy() {

@@ -48,7 +48,7 @@
     encodeMessage,
     encodeP,
     getMessageData,
-    getSmileyHtml,
+    getSmileyHtml, pasteBlobImgToTextArea,
     pasteHtmlAtCaret,
     pasteImgToTextArea, placeCaretAtEnd, timeToString
   } from "../../utils/htmlApi";
@@ -100,6 +100,12 @@
         this.$refs.userMessage.innerHTML = encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message) + encodeHTML(' >>>') + String.fromCharCode(13) +' '+ oldValue;
         placeCaretAtEnd(this.$refs.userMessage);
       });
+      messageBus.$on("blob", (e: Blob) => {
+        this.logger.debug("Pasting blob {}", e)();
+        this.$nextTick(function () {
+          pasteBlobImgToTextArea(e, this.$refs.userMessage);
+        });
+      })
     }
 
     showSmileys: boolean = false;

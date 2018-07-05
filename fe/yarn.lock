@@ -4555,6 +4555,10 @@ source-map@^0.6.0, source-map@^0.6.1, source-map@~0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
 
+spainter@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/spainter/-/spainter-0.0.4.tgz#e2e0de7fd6290505bfb42d4acb6ab9197d8907b2"
+
 spdx-correct@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/spdx-correct/-/spdx-correct-3.0.0.tgz#05a5b4d7153a195bc92c3c425b69f3b2a9524c82"
