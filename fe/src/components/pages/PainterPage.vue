@@ -6,18 +6,19 @@
 <script lang="ts">
   import {State, Action, Mutation, Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import PainterObj from 'spainter';
+  import Painter from 'spainter';
   import {messageBus} from '../../utils/singletons';
+  import loggerFactory from "../../utils/loggerFactory";
 
   @Component
-  export default class Painter extends Vue {
+  export default class PainterPage extends Vue {
     $refs: {
       div: HTMLElement
     };
 
     prevPage: string = null;
 
-    painter;
+    painter: Painter;
 
     beforeRouteEnter (to, frm, next) {
       next(vm => {
@@ -33,9 +34,12 @@
 
 
     mounted() {
-      this.painter = new (<any>PainterObj)(this.$refs.div, e=> {
-        this.$router.replace(this.prevPage);
-        messageBus.$emit('blob', e);
+      this.painter = new Painter(this.$refs.div, {
+        onBlobPaste: (e: Blob) => {
+          this.$router.replace(this.prevPage);
+          messageBus.$emit("blob", e);
+        },
+        logger: loggerFactory.getLoggerColor('painter', '#d507bd')
       });
     }
   }

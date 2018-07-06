@@ -39,6 +39,9 @@ Vue.mixin({
     logger() {
       if (!this.__logger) {
         let name = this.$options['_componentTag'] || 'vue-comp';
+        if (!this.$options['_componentTag']) {
+          globalLogger.warn('Can\'t detect tag of {}', this)();
+        }
         if (this.id) {
           name += `:${this.id}`;
         }

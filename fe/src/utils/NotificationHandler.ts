@@ -36,7 +36,7 @@ export default class NotifierHandler {
     this.isMobile = isMobile;
     this.ws = ws;
     this.store = store;
-    this.logger = loggerFactory.getLoggerColor('NOTIFY', '#e39800');
+    this.logger = loggerFactory.getLoggerColor('notify', '#e39800');
     this.currentTabId = Date.now().toString();
     window.addEventListener('blur', this.onFocusOut.bind(this));
     window.addEventListener('focus', this.onFocus.bind(this));
