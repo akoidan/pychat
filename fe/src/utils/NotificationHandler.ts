@@ -145,7 +145,7 @@ export default class NotifierHandler {
     await new Promise((resolve, reject) => {
       this.api.registerFCB(this.subscriptionId, this.browserVersion, this.isMobile, e => {
         if (e) {
-          reject('Unable to save subscription to server because of' + e);
+          reject('Unable to save subscription to server because: ' + e);
         } else {
           resolve();
         }

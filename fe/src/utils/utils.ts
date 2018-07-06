@@ -1,10 +1,11 @@
 import store from '../store';
 import router from '../router';
 import sessionHolder from './sessionHolder';
-import {api, channelsHandler, ws} from './singletons';
+import {api, channelsHandler, globalLogger, storage, ws} from './singletons';
 import {CurrentUserInfoModel, EditingMessage, MessageModel} from '../types/model';
 import loggerFactory from './loggerFactory';
 import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from './consts';
+import {StorageData} from '../types/types';
 
 let logger = loggerFactory.getLoggerColor('utils', '#007a70');
 
@@ -17,6 +18,36 @@ export function logout(errMessage: string) {
   router.replace('/auth/login');
   ws.stopListening();
   channelsHandler.removeAllSendingMessages();
+}
+
+export async function initStore() {
+  let isNew = await storage.connect();
+  if (!isNew) {
+    let data: StorageData = await storage.getAllTree();
+    let session = sessionHolder.session;
+    globalLogger.log('restored state from db {}, userId: {}, session {}', data, store.state.userInfo && store.state.userInfo.userId, session)();
+    if (data) {
+      if (!store.state.userInfo && session) {
+        store.commit('init', data.setRooms);
+      } else {
+        globalLogger.debug('Skipping settings state {}', data.setRooms)();
+      }
+      if (session) {
+        globalLogger.debug('Appending sending messages {}', data.sendingMessages)();
+        data.sendingMessages.forEach((m: MessageModel) => {
+          if (m.content && m.id > 0) {
+            channelsHandler.sendEditMessage(m.content, m.roomId, m.id, []);
+          } else if (m.content) {
+            channelsHandler.sendSendMessage(m.content, m.roomId, [], ws.getMessageId(), m.time);
+          } else if (m.id > 0) {
+            channelsHandler.sendDeleteMessage(m.id, ws.getMessageId());
+          }
+        });
+      } else {
+        globalLogger.debug('No pending messages found')();
+      }
+    }
+  }
 }
 
 export function login(session, errMessage) {

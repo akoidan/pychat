@@ -299,15 +299,19 @@ function setBlobName(blob: Blob) {
   }
 }
 
-export function pasteBlobImgToTextArea(blob: Blob, textArea: HTMLElement) {
+function blobToImg(blob: Blob) {
   let img = document.createElement('img');
   img.className = PASTED_IMG_CLASS;
   let src = URL.createObjectURL(blob);
   img.src = src;
   setBlobName(blob);
   Utils.imagesFiles[src] = blob;
-  pasteNodeAtCaret(img, textArea);
   return img;
+}
+
+export function pasteBlobToContentEditable(blob: Blob, textArea: HTMLElement) {
+  let img = blobToImg(blob);
+  textArea.appendChild(img);
 }
 
 function pasteBlobVideoToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
@@ -341,7 +345,8 @@ function pasteBlobVideoToTextArea(file: File, textArea: HTMLElement, errCb: Func
 
 export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
   if (file.type.indexOf('image') >= 0) {
-    pasteBlobImgToTextArea(file, textArea);
+    let img = blobToImg(file);
+    pasteNodeAtCaret(img, textArea);
   } else if (file.type.indexOf('video') >= 0) {
     pasteBlobVideoToTextArea(file, textArea, errCb);
   } else {

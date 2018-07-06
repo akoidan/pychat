@@ -9,7 +9,7 @@
   import Painter from 'spainter';
   import {messageBus} from '../../utils/singletons';
   import loggerFactory from "../../utils/loggerFactory";
-
+  import AppInputRange from '../ui/AppInputRange';
   @Component
   export default class PainterPage extends Vue {
     $refs: {
@@ -17,29 +17,48 @@
     };
 
     prevPage: string = null;
+    blob: Blob = null;
 
     painter: Painter;
 
-    beforeRouteEnter (to, frm, next) {
+    beforeRouteEnter(to, frm, next) {
       next(vm => {
         if (/^\/chat\/\d+$/.exec(frm.path)) {
           vm.prevPage = frm.path;
         } else {
-          vm.prevPage = '/chat/1';
+          vm.prevPage = "/chat/1";
         }
-        vm.logger.debug('Painter prev is set to {}, we came from {}', vm.prevPage, frm.path)();
+        vm.logger.debug("Painter prev is set to {}, we came from {}", vm.prevPage, frm.path)();
         next();
       });
+    }
+
+    created() {
+      messageBus.$on('main-join', e => {
+        this.logger.error('main-join')();
+        if (this.blob) {
+          messageBus.$emit('blob', this.blob);
+          this.blob = null;
+        }
+      })
     }
 
 
     mounted() {
       this.painter = new Painter(this.$refs.div, {
         onBlobPaste: (e: Blob) => {
+          this.blob = e;
           this.$router.replace(this.prevPage);
-          messageBus.$emit("blob", e);
         },
-        logger: loggerFactory.getLoggerColor('painter', '#d507bd')
+        textClass: 'input',
+        buttonClass: 'lor-btn',
+        logger: loggerFactory.getLoggerColor('painter', '#d507bd'),
+        rangeFactory: (): HTMLInputElement => {
+          var ComponentClass = Vue.extend(AppInputRange);
+          var instance = new ComponentClass();
+          instance.$mount();
+          return instance.$el as HTMLInputElement;
+        }
       });
     }
   }

@@ -15,8 +15,10 @@ import {WS_API_URL, XHR_API_URL} from './consts';
 import NotifierHandler from './NotificationHandler';
 import Subscription from './Subscription';
 import Vue from 'vue';
+import Http from './Http';
+import Fetch from './Fetch';
 
-export const xhr: Xhr = new Xhr(XHR_API_URL, sessionHolder);
+export const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(XHR_API_URL, sessionHolder);
 export const api: Api = new Api(xhr);
 const sub: Subscription = new Subscription();
 export const isMobile: boolean = mobile.isMobile();

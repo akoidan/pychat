@@ -1,16 +1,15 @@
 import Xhr from './Xhr';
 import {CONNECTION_ERROR, RESPONSE_SUCCESS} from './consts';
 import {UploadFile} from '../types/types';
-import {MessageModelDto, UserProfileDto, UserSettingsDto} from '../types/dto';
-import {UserModel} from '../types/model';
-import {globalLogger, xhr} from './singletons';
+import {MessageModelDto} from '../types/dto';
 import {DefaultMessage, ViewUserProfileDto} from '../types/messages';
 import MessageHandler from './MesageHandler';
 import loggerFactory from './loggerFactory';
 import {Logger} from 'lines-logger';
+import Http from './Http';
 
 export default class Api extends MessageHandler {
-  private readonly  xhr: Xhr;
+  private readonly  xhr: Http;
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
     internetAppear(m: DefaultMessage) {
       if (this.retryFcb) {
@@ -23,7 +22,7 @@ export default class Api extends MessageHandler {
 
   protected readonly logger: Logger;
 
-  constructor(xhr: Xhr) {
+  constructor(xhr: Http) {
     super();
     this.logger = loggerFactory.getLoggerColor('api', 'red');
     this.xhr = xhr;
@@ -113,15 +112,15 @@ export default class Api extends MessageHandler {
   }
 
   public loadGoogle(cb) {
-    this.xhr.doGet('https://apis.google.com/js/platform.js', cb);
+    this.xhr.loadJs('https://apis.google.com/js/platform.js', cb);
   }
 
   public loadFacebook(cb) {
-    this.xhr.doGet('//connect.facebook.net/en_US/sdk.js', cb);
+    this.xhr.loadJs('//connect.facebook.net/en_US/sdk.js', cb);
   }
 
   public loadRecaptcha(cb) {
-    this.xhr.doGet('https://www.google.com/recaptcha/api.js', cb);
+    this.xhr.loadJs('https://www.google.com/recaptcha/api.js', cb);
   }
 
 

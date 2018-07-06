@@ -48,7 +48,7 @@
     encodeMessage,
     encodeP,
     getMessageData,
-    getSmileyHtml, pasteBlobImgToTextArea,
+    getSmileyHtml, pasteBlobToContentEditable,
     pasteHtmlAtCaret,
     pasteImgToTextArea, placeCaretAtEnd, timeToString
   } from "../../utils/htmlApi";
@@ -56,7 +56,8 @@
   import NavUserShow from "./NavUserShow.vue";
   import {sem} from "../../utils/utils";
   import {MessageDataEncode, RemoveSendingMessage, UploadFile} from "../../types/types";
-  import {channelsHandler, messageBus} from "../../utils/singletons";
+  import {channelsHandler, globalLogger, messageBus} from "../../utils/singletons";
+  import store from '../../store';
 
 
   const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
@@ -90,6 +91,12 @@
       }
     }
 
+    beforeRouteEnter(to, frm, next) {
+      next(vm => {
+        messageBus.$emit("main-join");
+      });
+    }
+
     created() {
       messageBus.$on('quote', (message :MessageModel) => {
         this.$refs.userMessage.focus();
@@ -101,9 +108,9 @@
         placeCaretAtEnd(this.$refs.userMessage);
       });
       messageBus.$on("blob", (e: Blob) => {
-        this.logger.debug("Pasting blob {}", e)();
+        this.logger.error("Pasting blob {}", e)();
         this.$nextTick(function () {
-          pasteBlobImgToTextArea(e, this.$refs.userMessage);
+          pasteBlobToContentEditable(e, this.$refs.userMessage);
         });
       })
     }

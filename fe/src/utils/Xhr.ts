@@ -2,6 +2,7 @@ import loggerFactory from './loggerFactory';
 import {PostData, SessionHolder} from '../types/types';
 import {Logger} from 'lines-logger';
 import {CONNECTION_ERROR} from './consts';
+import Http from './Http';
 
 
 /**
@@ -11,47 +12,11 @@ import {CONNECTION_ERROR} from './consts';
  * @param formData : form in canse form is used
  * */
 
-export default class Xhr {
-
-  private httpLogger: Logger;
-  private apiUrl: string;
-  private sessionHolder: SessionHolder;
+export default class Xhr extends Http {
 
   constructor(apiUrl: string, sessionHolder: SessionHolder) {
-    this.sessionHolder = sessionHolder;
-    this.httpLogger = loggerFactory.getLoggerColor('http', '#680061');
-    this.apiUrl = apiUrl;
+    super(apiUrl, sessionHolder);
   }
-
-
-  static readCookie(): Map<String, any> {
-    let c, C, i;
-    c = document.cookie.split('; ');
-    let cookies = new Map<String, any>();
-    for (i = c.length - 1; i >= 0; i--) {
-      C = c[i].split('=');
-      if (C[1]) {
-        let length = C[1].length - 1;
-        // if cookie is wrapped with quotes (for ex api)
-        if (C[1][0] === '"' && C[1][length] === '"') {
-          C[1] = C[1].substring(1, length);
-        }
-      }
-      cookies[C[0]] = C[1];
-    }
-    return cookies;
-  }
-
-  private getUrl(url: string): string {
-    if (!url) {
-      return this.apiUrl;
-    } else if (/^https?:\/\//.exec(url) || (url && url.indexOf('//') === 0) /*cdn*/) {
-      return url;
-    } else {
-      return this.apiUrl + url;
-    }
-  }
-
 
   /**
    * Loads file from server on runtime */
@@ -60,41 +25,21 @@ export default class Xhr {
     this.httpLogger.log('GET out {}', fileUrl)();
     let regexRes = /\.(\w+)(\?.*)?$/.exec(fileUrl);
     let fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
-    let fileRef = null;
-    switch (fileType) {
-      case 'js':
-        fileRef = document.createElement('script');
-        fileRef.setAttribute('type', 'text/javascript');
-        fileRef.setAttribute('src', fileUrl);
-        break;
-      case 'css':
-        fileRef = document.createElement('link');
-        fileRef.setAttribute('rel', 'stylesheet');
-        fileRef.setAttribute('type', 'text/css');
-        fileRef.setAttribute('href', fileUrl);
-        break;
-      case 'json':
-      default:
-        let xobj = new XMLHttpRequest();
-        // special for IE
-        if (xobj.overrideMimeType) {
-          xobj.overrideMimeType('application/json');
-        }
-        xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
+    let xobj = new XMLHttpRequest();
+    // special for IE
+    if (xobj.overrideMimeType) {
+      xobj.overrideMimeType('application/json');
+    }
+    xobj.open('GET', fileUrl, true); // Replace 'my_data' with the path to your file
 
-        xobj.onreadystatechange = this.getOnreadystatechange<T>(
-            xobj,
-            fileUrl,
-            isJsonDecoded || fileType === 'json',
-            'GET',
-            callback
-        );
-        xobj.send(null);
-    }
-    if (fileRef) {
-      document.getElementsByTagName('head')[0].appendChild(fileRef);
-      fileRef.onload = callback;
-    }
+    xobj.onreadystatechange = this.getOnreadystatechange<T>(
+        xobj,
+        fileUrl,
+        isJsonDecoded || fileType === 'json',
+        'GET',
+        callback
+    );
+    xobj.send(null);
   }
 
   doPost<T>(d: PostData<T>): XMLHttpRequest {
