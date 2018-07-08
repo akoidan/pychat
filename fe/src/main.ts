@@ -9,7 +9,7 @@ import router from './router';
 import loggerFactory from './utils/loggerFactory';
 import {IS_DEBUG} from './utils/consts';
 import {initStore} from './utils/utils';
-
+import './sw';
 
 store.watch(s => s.userSettings && s.userSettings.theme || 'color-reg', (v, o) => {
   document.body.parentElement.className = v;

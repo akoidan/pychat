@@ -37,7 +37,7 @@
     }
 
     get text() {
-      return this.upload.error ? this.upload.error : this.finished ? "Finished" : `${this.valueMb} / ${this.totalMb} (${this.percents})`;
+      return this.upload.error ? this.upload.error : this.finished ? "File is processing..." : `${this.valueMb} / ${this.totalMb} (${this.percents})`;
     }
 
     get style() {

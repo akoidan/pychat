@@ -24,6 +24,8 @@
       <input type="file" @change="handleFileSelect" accept="image/*,video/*" ref="imgInput" multiple="multiple" v-show="false"/>
       <i class="icon-picture" title="Share Video/Image" @click="addImage"></i>
       <i class="icon-smile" title="Add a smile :)" @click="showSmileys = !showSmileys"></i>
+      <i class="icon-webrtc-video" title="Hold on to send video" v-show="isRecordingVideo" @click="switchRecord"></i>
+      <i class="icon-mic-1" title="Hold on to send audio" v-show="!isRecordingVideo" @click="switchRecord"></i>
       <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage"></div>
     </div>
   </div>
@@ -75,8 +77,13 @@
     // used in mixin from event.keyCode === 38
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
     @Mutation addMessage;
+    isRecordingVideo = false;
 
 
+
+    switchRecord() {
+      this.isRecordingVideo = !this.isRecordingVideo;
+    }
     $refs: {
       userMessage: HTMLElement;
       imgInput: HTMLInputElement;
@@ -307,6 +314,7 @@
     @mixin chat-icon
       display: inline
       float: right
+      cursor: pointer
       position: absolute
       height: 16px
       top: 13px
@@ -316,6 +324,11 @@
     .icon-picture
       @include chat-icon
       left: 15px
+    .icon-webrtc-video, .icon-mic-1
+      @include chat-icon
+      right: 30px
+    .icon-webrtc-video
+      font-size: 20px
 
   .usermsg
     margin-left: 4px
@@ -370,5 +383,6 @@
     flex: 1
     @include flex-direction(column)
     width: 100%
+
 
 </style>

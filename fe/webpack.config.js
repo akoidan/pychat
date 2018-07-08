@@ -24,7 +24,7 @@ module.exports = (env, argv) => {
     new CopyWebpackPlugin([
       {from: './src/assets/smileys', to: 'smileys'},
       {from: './src/assets/manifest.json', to: ''},
-      {from: './src/assets/sw.js', to: ''},
+      {from: './src/assets/static', to: ''},
     ]),
     new webpack.DefinePlugin({
       PYCHAT_CONSTS: JSON.stringify(options),
@@ -67,7 +67,9 @@ module.exports = (env, argv) => {
     resolve: {
       extensions: ['.ts', '.js', '.vue', '.json'],
       alias: {
-        vue: 'vue/dist/vue.js'
+        'vue': 'vue/dist/vue.js',
+        '~': path.resolve(__dirname, 'src'),
+        'Sass': path.resolve(__dirname, 'src/assets/sass')
       }
     },
     output: {
@@ -76,6 +78,15 @@ module.exports = (env, argv) => {
     devtool: '#source-map',
     module: {
       rules: [
+        {
+          test: /sw\.ts$/,
+          exclude: /node_modules/,
+          loader: 'file-loader',
+          options: {
+            outputPath: '',
+            name: 'sw.js?[sha512:hash:base64:6]',
+          }
+        },
         {
           test: /\.ts$/,
           loader: 'ts-loader',
