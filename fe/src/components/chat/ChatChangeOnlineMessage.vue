@@ -3,7 +3,7 @@
     <span class="message-header">
     <span class="timeMess">({{getTime}})</span>
     <span>System</span>: </span>
-    <span class="message-text-style">User <b @contextmenu.prevent.stop="setActiveUser">{{user}}</b> has gone {{where}}</span>
+    <span class="message-text-style">User <b @contextmenu.prevent.stop="setActiveUser">{{user}}</b> {{where}}</span>
   </p>
 </template>
 <script lang="ts">
@@ -22,7 +22,7 @@
     @State allUsersDict: {[id: number]: UserModel};
 
     get where () {
-      return this.isWentOnline ? "online" : "offline";
+      return this.isWentOnline ? "has appeared online" : "has gone offline";
     }
 
     setActiveUser() {

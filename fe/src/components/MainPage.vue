@@ -1,5 +1,6 @@
 <template>
   <div class="flex">
+    <div v-if="dim" class="wait"></div>
     <app-nav v-show="showNav"/>
     <keep-alive v-if="inited" :include="['ChannelsPage', 'Painter']">
       <router-view class="body"/>
@@ -24,6 +25,7 @@
 
     @Getter showNav: boolean;
     @State userInfo: UserModel;
+    @State dim: boolean;
 
     get inited() {
       return this.userInfo;
@@ -53,6 +55,20 @@
 
   .body
     height: 100%
+
+  .wait
+    cursor: wait
+    display: block
+    position: fixed
+    z-index: 1
+    background-color: #000
+    opacity: 0.5
+    background-repeat: no-repeat
+    background-position: center
+    left: 0
+    bottom: 0
+    right: 0
+    top: 0
 
 
 </style>

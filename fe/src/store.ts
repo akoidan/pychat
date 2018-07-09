@@ -45,6 +45,7 @@ const store: StoreOptions<RootState> = {
     allUsersDict: {},
     regHeader: null,
     roomsDict: {},
+    dim: false,
     activeUserId: null,
     userInfo: null,
     userSettings: null,
@@ -137,6 +138,9 @@ const store: StoreOptions<RootState> = {
       let upload = state.roomsDict[payload.roomId].messages[payload.messageId].upload;
       upload.uploaded = payload.uploaded;
       upload.total = payload.total;
+    },
+    setDim(state: RootState, payload: boolean) {
+      state.dim = payload;
     },
     incNewMessagesCount(state: RootState, roomId: number) {
       state.roomsDict[roomId].newMessagesCount++;

@@ -8,12 +8,17 @@
         @edit-message="navEditMessage"/>
     <nav-user-show v-if="activeUser" :active-user="activeUser"/>
     <div class="wrapper">
-      <div class="chatBoxHolder" @drop.prevent="dropPhoto">
+      <div class="chatBoxHolder" @drop.prevent="dropPhoto" v-show="!dim">
         <template v-for="room in roomsArray">
           <chat-box :room="room" :key="room.id" v-show="activeRoomId === room.id"/>
         </template>
         <div v-if="!activeRoom" class="noRoom" >
           <router-link to="/chat/1">This room doesn't exist, or you don't have access to it. Click to go to main room</router-link>
+        </div>
+      </div>
+      <div v-show="dim" class="videoHolder" >
+        <div>
+          <video :src="srcVideo"  autoplay="" ref="video" v-show="isRecordingVideo && dim"></video>
         </div>
       </div>
       <room-users/>
@@ -24,8 +29,10 @@
       <input type="file" @change="handleFileSelect" accept="image/*,video/*" ref="imgInput" multiple="multiple" v-show="false"/>
       <i class="icon-picture" title="Share Video/Image" @click="addImage"></i>
       <i class="icon-smile" title="Add a smile :)" @click="showSmileys = !showSmileys"></i>
-      <i class="icon-webrtc-video" title="Hold on to send video" v-show="isRecordingVideo" @click="switchRecord"></i>
-      <i class="icon-mic-1" title="Hold on to send audio" v-show="!isRecordingVideo" @click="switchRecord"></i>
+      <div @contextmenu.prevent @drag.prevent="" @mouseup="releaseRecord" @mouseout="releaseRecord" @mousedown="switchRecord" @touchstart="switchRecord" @touchend="releaseRecord">
+        <i class="icon-webrtc-video" title="Hold on to send video" v-show="isRecordingVideo"></i>
+        <i class="icon-mic-1" title="Hold on to send audio" v-show="!isRecordingVideo"></i>
+      </div>
       <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage"></div>
     </div>
   </div>
@@ -52,7 +59,7 @@
     getMessageData,
     getSmileyHtml, pasteBlobToContentEditable,
     pasteHtmlAtCaret,
-    pasteImgToTextArea, placeCaretAtEnd, timeToString
+    pasteImgToTextArea, placeCaretAtEnd, stopVideo, timeToString
   } from "../../utils/htmlApi";
   import NavEditMessage from "./NavEditMessage.vue";
   import NavUserShow from "./NavUserShow.vue";
@@ -63,12 +70,14 @@
 
 
   const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
+  const HOLD_TIMEOUT = 500;
   @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Vue {
     @State editedMessage: EditingMessage;
     @State allUsersDict: EditingMessage;
     @State userInfo: CurrentUserInfoModel;
     @State activeRoomId: number;
+    @State dim: boolean;
     @Getter roomsArray: RoomModel[];
     @Getter activeUser;
     @Getter activeRoom: RoomModel;
@@ -77,17 +86,71 @@
     // used in mixin from event.keyCode === 38
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
     @Mutation addMessage;
-    isRecordingVideo = false;
+    @Mutation setDim;
+    isRecordingVideo = true;
 
+    // started: number = null;
+    timeout: number = 0;
+    stream: MediaStream;
+    srcVideo: string = null;
 
-
-    switchRecord() {
-      this.isRecordingVideo = !this.isRecordingVideo;
-    }
     $refs: {
       userMessage: HTMLElement;
       imgInput: HTMLInputElement;
+      video: HTMLVideoElement;
     };
+
+    switchRecord() {
+      this.logger.debug("switch recrod...")();
+      // this.started = Date.now();
+      this.timeout = setTimeout(() => {
+        this.startRecord();
+        this.logger.debug("switch record timeouted...")();
+        this.timeout = null;
+      }, HOLD_TIMEOUT);
+    }
+
+    private stopVideo() {
+      this.stream
+      stopVideo(this.stream);
+      this.stream = null;
+      this.$refs.video.play();
+    }
+
+
+
+    startRecord() {
+      this.logger.debug("Starting recording...")();
+      this.setDim(true)
+      navigator.getUserMedia({video: this.isRecordingVideo, audio: true}, (localMediaStream: MediaStream) => {
+        this.stream = localMediaStream; // stream available to console
+        this.srcVideo = URL.createObjectURL(localMediaStream);
+        this.$refs.video.play();
+      }, (error) => {
+        this.logger.error("navigator.getUserMedia error: {}", error)();
+      });
+
+
+    }
+
+    finishRecord() {
+      this.logger.debug("Finishing recording...")();
+      this.setDim(false);
+      this.stopVideo();
+    }
+
+    releaseRecord() {
+      this.logger.debug("releaseRecord now {}, timeout {}", this.dim, this.timeout)();
+      if (this.dim) {
+        this.finishRecord();
+      } else if (this.timeout) {
+        clearTimeout(this.timeout);
+        this.timeout = null;
+        this.isRecordingVideo = !this.isRecordingVideo;
+      }
+    }
+
+
 
     @Watch('editedMessage')
     onActiveRoomIdChange(val: EditingMessage) {
@@ -121,6 +184,11 @@
         });
       })
     }
+
+    // mounted() {
+    //   this.isRecordingVideo = true;
+    //   this.startRecord();
+    // }
 
     showSmileys: boolean = false;
 
@@ -317,7 +385,7 @@
       cursor: pointer
       position: absolute
       height: 16px
-      top: 13px
+      top: 11px
     .icon-smile
       @include chat-icon
       right: 10px
@@ -326,6 +394,7 @@
       left: 15px
     .icon-webrtc-video, .icon-mic-1
       @include chat-icon
+      z-index: 2
       right: 30px
     .icon-webrtc-video
       font-size: 20px
@@ -376,13 +445,26 @@
     @media screen and (max-width: $collapse-width)
       flex-direction: column-reverse
 
-
-  .chatBoxHolder
-    overflow-y: auto
+  =wrapper-inner
     @include display-flex
     flex: 1
-    @include flex-direction(column)
     width: 100%
 
+  .chatBoxHolder
+    +wrapper-inner
+    overflow-y: auto
+    position: relative
+    @include flex-direction(column)
+
+  .videoHolder
+    z-index: 2
+    +wrapper-inner
+    justify-content: center
+    position: relative
+    video
+      position: relative
+      top: 50%
+      transform: translateY(-50%)
+      border: 1px solid rgba(126, 126, 126, 0.5)
 
 </style>

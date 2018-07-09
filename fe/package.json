@@ -62,6 +62,7 @@
     "mini-css-extract-plugin": "^0.4.0",
     "mocha": "^5.2.0",
     "node-sass": "^4.9.0",
+    "sass-lint": "^1.12.1",
     "sass-loader": "^7.0.3",
     "serviceworker-webpack-plugin": "^1.0.0-alpha02",
     "style-loader": "^0.21.0",

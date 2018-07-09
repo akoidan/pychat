@@ -120,6 +120,7 @@ export interface RoomModel extends RoomSettingsModel {
 export interface RootState {
   isOnline: boolean;
   growls: GrowlModel[];
+  dim: boolean;
   editedMessage: EditingMessage;
   activeRoomId: number;
   activeUserId: number;

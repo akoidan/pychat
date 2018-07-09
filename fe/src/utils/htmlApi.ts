@@ -292,6 +292,17 @@ export function setYoutubeEvent(e: HTMLElement) {
   }
 }
 
+export function stopVideo(stream) {
+  if (stream) {
+    globalLogger.debug('Stopping stream {}', {})();
+    if (stream.stop) {
+      stream.stop();
+    } else {
+      stream.getVideoTracks()[0].stop();
+    }
+  }
+}
+
 
 function setBlobName(blob: Blob) {
   if (!blob['name'] && blob.type.indexOf('/') > 1) {

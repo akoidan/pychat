@@ -14,7 +14,7 @@
 <script lang="ts">
   import {State, Action, Mutation} from "vuex-class";
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-  import {canvasContext, resolveUrl} from "../../utils/htmlApi";
+  import {canvasContext, resolveUrl, stopVideo} from "../../utils/htmlApi";
   import AppSubmit from '../ui/AppSubmit';
   @Component({
     components: {AppSubmit}
@@ -44,7 +44,7 @@
     blob: Blob = null;
     fileInputValue: string = '';
     showVideo: boolean = false;
-    stream: any;
+    stream: MediaStream;
     isStopped: boolean = true;
 
     $refs: {
@@ -104,7 +104,7 @@
     }
 
     startSharingVideo() {
-      navigator.getUserMedia({video: true}, (localMediaStream) => {
+      navigator.getUserMedia({video: true}, (localMediaStream: MediaStream) => {
         this.stream = localMediaStream; // stream available to console
         this.srcVideo = window.URL.createObjectURL(localMediaStream);
         this.$refs.changeProfileVideo.play();
@@ -158,14 +158,8 @@
     }
 
     private stopVideo() {
-      if (this.stream) {
-        if (this.stream.stop) {
-          this.stream.stop();
-        } else {
-          this.stream.getVideoTracks()[0].stop();
-        }
-        this.stream = null;
-      }
+      stopVideo(this.stream);
+      this.stream = null;
     }
 
     upload() {
