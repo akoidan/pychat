@@ -35,7 +35,7 @@ window.onerror = function (msg, url, linenumber, column, errorObj) {
 Vue.mixin({
   computed: {
     logger() {
-      if (!this.__logger) {
+      if (!this.__logger && this.$options['_componentTag'] !== 'router-link') {
         let name = this.$options['_componentTag'] || 'vue-comp';
         if (!this.$options['_componentTag']) {
           globalLogger.warn('Can\'t detect tag of {}', this)();
@@ -49,10 +49,10 @@ Vue.mixin({
     }
   },
   updated: function() {
-    this.logger.debug('Updated')();
+    this.logger && this.logger.debug('Updated')();
   },
   created: function() {
-    this.logger.debug('Created')();
+    this.logger &&  this.logger.debug('Created')();
   },
 });
 

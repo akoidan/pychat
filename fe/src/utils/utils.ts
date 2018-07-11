@@ -19,6 +19,13 @@ export function logout(errMessage: string) {
   ws.stopListening();
   channelsHandler.removeAllSendingMessages();
 }
+export function forEach(array, cb) {
+  if (array && array.length) {
+    for (let i = 0; i < array.length; i++) {
+      cb(array[i]);
+    }
+  }
+}
 
 export async function initStore() {
   let isNew = await storage.connect();

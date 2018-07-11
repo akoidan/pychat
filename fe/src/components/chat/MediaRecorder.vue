@@ -1,0 +1,89 @@
+<template>
+  <div @contextmenu.prevent @drag.prevent @mouseup="releaseRecord" @mouseout="releaseRecord" @mousedown="switchRecord" @touchstart="switchRecord" @touchend="releaseRecord">
+    <i class="icon-webrtc-video" title="Hold on to send video" v-show="isRecordingVideo"></i>
+    <i class="icon-mic-1" title="Hold on to send audio" v-show="!isRecordingVideo"></i>
+  </div>
+</template>
+<script lang="ts">
+  import
+  {State, Action, Mutation, Getter} from "vuex-class";
+  import {Component, Prop, Vue} from "vue-property-decorator";
+  import {stopVideo} from '../../utils/htmlApi';
+
+  const HOLD_TIMEOUT = 500;
+
+  @Component
+  export default class MediaRecorder extends Vue {
+
+    @Mutation setDim;
+    isRecordingVideo = true;
+    @State dim: boolean;
+
+    // started: number = null;
+    timeout: number = 0;
+    stream: MediaStream;
+    @Prop() value: string;
+    @Prop() videoRef: HTMLVideoElement;
+
+
+    switchRecord() {
+      this.logger.debug("switch recrod...")();
+      // this.started = Date.now();
+      this.timeout = setTimeout(() => {
+        this.startRecord();
+        this.logger.debug("switch record timeouted...")();
+        this.timeout = null;
+      }, HOLD_TIMEOUT);
+    }
+
+    private stopVideo() {
+      stopVideo(this.stream);
+      this.stream = null;
+      this.videoRef.pause();
+    }
+
+
+
+    startRecord() {
+      this.logger.debug("Starting recording...")();
+      this.setDim(true)
+      navigator.getUserMedia({video: this.isRecordingVideo, audio: true}, (localMediaStream: MediaStream) => {
+        this.stream = localMediaStream; // stream available to console
+        let srcVideo = URL.createObjectURL(localMediaStream);
+        this.$emit('input', srcVideo)
+        this.videoRef.play();
+      }, (error) => {
+        this.logger.error("navigator.getUserMedia error: {}", error)();
+      });
+
+
+    }
+
+    finishRecord() {
+      this.logger.debug("Finishing recording...")();
+      this.setDim(false);
+      this.stopVideo();
+    }
+
+    releaseRecord() {
+      this.logger.debug("releaseRecord now {}, timeout {}", this.dim, this.timeout)();
+      if (this.dim) {
+        this.finishRecord();
+      } else if (this.timeout) {
+        clearTimeout(this.timeout);
+        this.timeout = null;
+        this.isRecordingVideo = !this.isRecordingVideo;
+      }
+    }
+
+  }
+</script>
+
+<style lang="sass" scoped>
+  @import "partials/abstract_classes"
+
+  .icon-webrtc-video, .icon-mic-1
+    @extend %chat-icon
+    z-index: 2
+    right: 30px
+</style>

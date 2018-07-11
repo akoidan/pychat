@@ -18,7 +18,7 @@
       </div>
       <div v-show="dim" class="videoHolder" >
         <div>
-          <video :src="srcVideo"  autoplay="" ref="video" v-show="isRecordingVideo && dim"></video>
+          <video :src="srcVideo"  autoplay="" ref="video"></video>
         </div>
       </div>
       <room-users/>
@@ -29,10 +29,7 @@
       <input type="file" @change="handleFileSelect" accept="image/*,video/*" ref="imgInput" multiple="multiple" v-show="false"/>
       <i class="icon-picture" title="Share Video/Image" @click="addImage"></i>
       <i class="icon-smile" title="Add a smile :)" @click="showSmileys = !showSmileys"></i>
-      <div @contextmenu.prevent @drag.prevent="" @mouseup="releaseRecord" @mouseout="releaseRecord" @mousedown="switchRecord" @touchstart="switchRecord" @touchend="releaseRecord">
-        <i class="icon-webrtc-video" title="Hold on to send video" v-show="isRecordingVideo"></i>
-        <i class="icon-mic-1" title="Hold on to send audio" v-show="!isRecordingVideo"></i>
-      </div>
+      <media-recorder :video-ref="$refs.video" v-model="srcVideo"/>
       <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage"></div>
     </div>
   </div>
@@ -67,11 +64,12 @@
   import {MessageDataEncode, RemoveSendingMessage, UploadFile} from "../../types/types";
   import {channelsHandler, globalLogger, messageBus} from "../../utils/singletons";
   import store from '../../store';
+  import MediaRecorder from './MediaRecorder';
 
 
   const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
-  const HOLD_TIMEOUT = 500;
-  @Component({components: {RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
+
+  @Component({components: {MediaRecorder, RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Vue {
     @State editedMessage: EditingMessage;
     @State allUsersDict: EditingMessage;
@@ -86,12 +84,6 @@
     // used in mixin from event.keyCode === 38
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
     @Mutation addMessage;
-    @Mutation setDim;
-    isRecordingVideo = true;
-
-    // started: number = null;
-    timeout: number = 0;
-    stream: MediaStream;
     srcVideo: string = null;
 
     $refs: {
@@ -99,57 +91,6 @@
       imgInput: HTMLInputElement;
       video: HTMLVideoElement;
     };
-
-    switchRecord() {
-      this.logger.debug("switch recrod...")();
-      // this.started = Date.now();
-      this.timeout = setTimeout(() => {
-        this.startRecord();
-        this.logger.debug("switch record timeouted...")();
-        this.timeout = null;
-      }, HOLD_TIMEOUT);
-    }
-
-    private stopVideo() {
-      this.stream
-      stopVideo(this.stream);
-      this.stream = null;
-      this.$refs.video.play();
-    }
-
-
-
-    startRecord() {
-      this.logger.debug("Starting recording...")();
-      this.setDim(true)
-      navigator.getUserMedia({video: this.isRecordingVideo, audio: true}, (localMediaStream: MediaStream) => {
-        this.stream = localMediaStream; // stream available to console
-        this.srcVideo = URL.createObjectURL(localMediaStream);
-        this.$refs.video.play();
-      }, (error) => {
-        this.logger.error("navigator.getUserMedia error: {}", error)();
-      });
-
-
-    }
-
-    finishRecord() {
-      this.logger.debug("Finishing recording...")();
-      this.setDim(false);
-      this.stopVideo();
-    }
-
-    releaseRecord() {
-      this.logger.debug("releaseRecord now {}, timeout {}", this.dim, this.timeout)();
-      if (this.dim) {
-        this.finishRecord();
-      } else if (this.timeout) {
-        clearTimeout(this.timeout);
-        this.timeout = null;
-        this.isRecordingVideo = !this.isRecordingVideo;
-      }
-    }
-
 
 
     @Watch('editedMessage')
@@ -379,25 +320,12 @@
     position: relative
     width: calc(100% - 16px)
 
-    @mixin chat-icon
-      display: inline
-      float: right
-      cursor: pointer
-      position: absolute
-      height: 16px
-      top: 11px
     .icon-smile
-      @include chat-icon
+      @extend %chat-icon
       right: 10px
     .icon-picture
-      @include chat-icon
+      @extend %chat-icon
       left: 15px
-    .icon-webrtc-video, .icon-mic-1
-      @include chat-icon
-      z-index: 2
-      right: 30px
-    .icon-webrtc-video
-      font-size: 20px
 
   .usermsg
     margin-left: 4px

@@ -1,14 +1,13 @@
 import loggerFactory from './loggerFactory';
 import {Logger} from 'lines-logger';
-import {extractError} from './utils';
+import {extractError, forEach} from './utils';
 import {Store} from 'vuex';
 import {RootState} from '../types/model';
 import Api from './api';
 import WsHandler from './WsHandler';
 import store from '../store';
 import {IS_DEBUG, MANIFEST} from './consts';
-import {getStaticUrl} from './htmlApi';
-
+import swUrl from '../sw';
 const LAST_TAB_ID_VARNAME = 'lastTabId';
 
 export default class NotifierHandler {
@@ -51,12 +50,12 @@ export default class NotifierHandler {
     let count = 1;
     let newMessData = data.options.data;
     if (newMessData && newMessData.replaced) {
-      for (let i = 0; i < this.popedNotifQueue.length; i++) {
-        if (this.popedNotifQueue[i].data.title === newMessData.title) {
-          count += this.popedNotifQueue[i].data.replaced;
-          this.popedNotifQueue[i].close();
+      forEach(this.popedNotifQueue, e => {
+        if (e.data.title === newMessData.title) {
+          count += e.data.replaced;
+          e.close();
         }
-      }
+      });
       if (count > 1) {
         newMessData.replaced = count;
         data.title = newMessData.title + '(+' + count + ')';
@@ -132,7 +131,7 @@ export default class NotifierHandler {
     } else if (!MANIFEST) {
      throw 'FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing';
     }
-    let r = await navigator.serviceWorker.register('/sw.js', {scope: '/'});
+    let r = await navigator.serviceWorker.register((<any>swUrl) as string, {scope: '/'});
     this.logger.debug('Registered service worker {}', r)();
     this.serviceWorkerRegistration = await navigator.serviceWorker.ready;
     this.logger.debug('Service worker is ready {}', this.serviceWorkerRegistration)();

@@ -5,6 +5,7 @@ import Vue from 'vue';
 import {STATIC_API_URL, PASTED_IMG_CLASS} from './consts';
 import {MessageDataEncode, SmileyStructure, UploadFile} from '../types/types';
 import {FileModel, MessageModel, RoomModel, SexModel, UserModel} from '../types/model';
+import {forEach} from './utils';
 
 const tmpCanvasContext = document.createElement('canvas').getContext('2d');
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -292,13 +293,14 @@ export function setYoutubeEvent(e: HTMLElement) {
   }
 }
 
-export function stopVideo(stream) {
+export function stopVideo(stream: MediaStream) {
   if (stream) {
-    globalLogger.debug('Stopping stream {}', {})();
+    globalLogger.debug('Stopping stream {}', stream)();
     if (stream.stop) {
       stream.stop();
     } else {
-      stream.getVideoTracks()[0].stop();
+      forEach(stream.getVideoTracks(), e => e.stop());
+      forEach(stream.getAudioTracks(), e => e.stop());
     }
   }
 }
