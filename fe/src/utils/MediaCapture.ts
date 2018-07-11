@@ -9,7 +9,7 @@ declare class MediaRecorder {
   onstop: Function;
   stop();
   ondataavailable: Function;
-  start(time: number);
+  start(time?: number );
 }
 
 export default class MediaCapture {
@@ -44,9 +44,12 @@ export default class MediaCapture {
         }
       }
     }
+    await new Promise(resolve => {
+      setTimeout(resolve, 500); // wait until videocam opens
+    });
     this.mediaRecorder = new MediaRecorder(this.stream, options);
     this.mediaRecorder.onstop = this.handleStop.bind(this);
-    this.mediaRecorder.ondataavailable = this.handleStop.bind(this);
+    this.mediaRecorder.ondataavailable = this.handleDataAvailable.bind(this);
     this.mediaRecorder.start(10); // collect 10ms of data
     this.logger.debug('MediaRecorder started {}', this.mediaRecorder)();
     return URL.createObjectURL(this.stream);
@@ -59,7 +62,15 @@ export default class MediaCapture {
   private handleStop(event) {
     this.logger.debug('Recorder stopped: {}', event)();
     stopVideo(this.stream);
-    this.onFinish(this.recordedBlobs);
+    if (this.recordedBlobs.length === 1) {
+      this.onFinish(this.recordedBlobs[0]);
+    } else if (this.recordedBlobs.length > 1) {
+      let blob: Blob = new Blob(this.recordedBlobs, {type: this.recordedBlobs[0].type});
+      this.logger.debug('Assembled blobs {} into {}', this.recordedBlobs, blob)();
+      this.onFinish(blob);
+    } else {
+      this.onFinish(null);
+    }
   }
 
   private handleDataAvailable(event) {

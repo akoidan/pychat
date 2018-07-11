@@ -327,7 +327,7 @@ export function pasteBlobToContentEditable(blob: Blob, textArea: HTMLElement) {
   textArea.appendChild(img);
 }
 
-function pasteBlobVideoToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
+export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, errCb: Function) {
   let video = document.createElement('video');
   if (video.canPlayType(file.type)) {
     video.autoplay = false;

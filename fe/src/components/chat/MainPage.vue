@@ -29,7 +29,7 @@
       <input type="file" @change="handleFileSelect" accept="image/*,video/*" ref="imgInput" multiple="multiple" v-show="false"/>
       <i class="icon-picture" title="Share Video/Image" @click="addImage"></i>
       <i class="icon-smile" title="Add a smile :)" @click="showSmileys = !showSmileys"></i>
-      <media-recorder :video-ref="$refs.video" v-model="srcVideo"/>
+      <media-recorder :video-ref="$refs.video" v-model="srcVideo" @video="handleAddVideo"/>
       <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage"></div>
     </div>
   </div>
@@ -54,7 +54,7 @@
     encodeMessage,
     encodeP,
     getMessageData,
-    getSmileyHtml, pasteBlobToContentEditable,
+    getSmileyHtml, pasteBlobToContentEditable, pasteBlobVideoToTextArea,
     pasteHtmlAtCaret,
     pasteImgToTextArea, placeCaretAtEnd, stopVideo, timeToString
   } from "../../utils/htmlApi";
@@ -147,6 +147,12 @@
 
     closeEditing() {
       this.setEditedMessage(null);
+    }
+
+    handleAddVideo(file: Blob) {
+      pasteBlobVideoToTextArea(file, this.$refs.userMessage, e => {
+        this.growlError(e);
+      })
     }
 
     dropPhoto(evt) {

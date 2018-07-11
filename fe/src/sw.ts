@@ -7,7 +7,7 @@ let logger: Logger = loggerFactory.getLoggerColor('SW_S', 'color: #ffb500; font-
 
 //
 let SW_VERSION = '1.5';
-logger.log('startup, version {}', SW_VERSION)();
+logger.debug('startup, version {}', SW_VERSION)();
 
 let subScr = null;
 
@@ -107,3 +107,8 @@ self.addEventListener('notificationclick', function (event: any) {
     }
   }));
 });
+
+
+export default function asf() {
+  console.log('sw');
+}

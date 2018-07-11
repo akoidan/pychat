@@ -46,8 +46,12 @@
         this.logger.debug("Finishing recording... {}", data)();
         this.setDim(false);
         this.videoRef.pause();
+        if (data) {
+          this.$emit('video', data);
+        }
       });
       this.navigatorRecord.record().then((srcVideo: string) => {
+        this.logger.debug("Resolved record emitting video")();
         this.$emit("input", srcVideo);
         this.videoRef.play();
       }).catch(error => this.logger.error("Error during capturing media {}", error))
