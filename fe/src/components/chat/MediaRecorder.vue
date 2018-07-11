@@ -39,28 +39,18 @@
       }, HOLD_TIMEOUT);
     }
 
-    private stopVideo() {
-      this.videoRef.pause();
-    }
-
-
-
     startRecord() {
       this.logger.debug("Starting recording...")();
-      this.setDim(true)
+      this.setDim(true);
       this.navigatorRecord = new MediaCapture(this.isRecordingVideo, (data) => {
-
+        this.logger.debug("Finishing recording... {}", data)();
+        this.setDim(false);
+        this.videoRef.pause();
       });
       this.navigatorRecord.record().then((srcVideo: string) => {
         this.$emit("input", srcVideo);
         this.videoRef.play();
       }).catch(error => this.logger.error("Error during capturing media {}", error))
-    }
-
-    finishRecord() {
-      this.logger.debug("Finishing recording...")();
-      this.setDim(false);
-      this.stopVideo();
     }
 
     releaseRecord() {

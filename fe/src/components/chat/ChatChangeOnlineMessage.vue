@@ -3,13 +3,13 @@
     <span class="message-header">
     <span class="timeMess">({{getTime}})</span>
     <span>System</span>: </span>
-    <span class="message-text-style">User <b @contextmenu.prevent.stop="setActiveUser">{{user}}</b> {{where}}</span>
+    <span class="message-text-style">{{isUser}} <b @contextmenu.prevent.stop="setActiveUser">{{user}}</b> {{where}}</span>
   </p>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {State, Action, Mutation, Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {UserModel} from "../../types/model";
+  import {CurrentUserInfoModel, UserModel} from "../../types/model";
   import {timeToString} from "../../utils/htmlApi";
 
   @Component
@@ -20,17 +20,27 @@
     @Mutation setActiveUserId;
 
     @State allUsersDict: {[id: number]: UserModel};
+    @Getter myId: number;
 
     get where () {
-      return this.isWentOnline ? "has appeared online" : "has gone offline";
+      let has = this.isMe ? "have " : "has ";
+      return has + (this.isWentOnline ?  "appeared online" : "gone offline");
     }
 
     setActiveUser() {
       this.setActiveUserId(this.userId);
     }
 
+    get isUser() {
+      return this.isMe ? '': 'User';
+    }
+
     get user () {
-      return this.allUsersDict[this.userId].user;
+      return this.isMe ? 'You' : this.allUsersDict[this.userId].user;
+    }
+
+    get isMe() {
+      return this.userId === this.myId;
     }
 
     get getTime() {

@@ -60,11 +60,14 @@ const store: StoreOptions<RootState> = {
       logger.debug('privateRooms {} ', roomModels)();
       return roomModels;
     },
+    myId(state: RootState): number {
+      return state.userInfo && state.userInfo.userId;
+    },
     privateRoomsUsersIds(state: RootState, getters): PrivateRoomsIds {
       let roomUsers = {};
       let userRooms = {};
       if (state.userInfo) {
-        let myId = state.userInfo.userId;
+        let myId = getters.myId;
         getters.privateRooms.forEach((r: RoomModel) => {
           let anotherUId = myId === r.users[0] && r.users.length === 2 ? r.users[1] : r.users[0];
           roomUsers[r.id] = anotherUId;

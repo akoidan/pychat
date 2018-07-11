@@ -214,7 +214,7 @@ export default class ChannelsHandler extends MessageHandler {
         userId
       }
     };
-    if (this.store.state.userSettings.onlineChangeSound) {
+    if (this.store.state.userSettings.onlineChangeSound && this.store.getters.myId !== userId) {
       checkAndPlay(isWentOnline ? login : logout, 50);
     }
     this.store.commit('addChangeOnlineEntry', entry);
