@@ -9,11 +9,14 @@
   {State, Action, Mutation, Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {stopVideo} from '../../utils/htmlApi';
+  import MediaCapture from '../../utils/MediaCapture';
 
   const HOLD_TIMEOUT = 500;
 
+  declare var MediaRecorder: any;
+
   @Component
-  export default class MediaRecorder extends Vue {
+  export default class MediaRecorderDiv extends Vue {
 
     @Mutation setDim;
     isRecordingVideo = true;
@@ -21,9 +24,9 @@
 
     // started: number = null;
     timeout: number = 0;
-    stream: MediaStream;
     @Prop() value: string;
     @Prop() videoRef: HTMLVideoElement;
+    navigatorRecord: MediaCapture;
 
 
     switchRecord() {
@@ -37,8 +40,6 @@
     }
 
     private stopVideo() {
-      stopVideo(this.stream);
-      this.stream = null;
       this.videoRef.pause();
     }
 
@@ -47,16 +48,13 @@
     startRecord() {
       this.logger.debug("Starting recording...")();
       this.setDim(true)
-      navigator.getUserMedia({video: this.isRecordingVideo, audio: true}, (localMediaStream: MediaStream) => {
-        this.stream = localMediaStream; // stream available to console
-        let srcVideo = URL.createObjectURL(localMediaStream);
-        this.$emit('input', srcVideo)
-        this.videoRef.play();
-      }, (error) => {
-        this.logger.error("navigator.getUserMedia error: {}", error)();
+      this.navigatorRecord = new MediaCapture(this.isRecordingVideo, (data) => {
+
       });
-
-
+      this.navigatorRecord.record().then((srcVideo: string) => {
+        this.$emit("input", srcVideo);
+        this.videoRef.play();
+      }).catch(error => this.logger.error("Error during capturing media {}", error))
     }
 
     finishRecord() {
@@ -68,7 +66,7 @@
     releaseRecord() {
       this.logger.debug("releaseRecord now {}, timeout {}", this.dim, this.timeout)();
       if (this.dim) {
-        this.finishRecord();
+        this.navigatorRecord.stopRecording();
       } else if (this.timeout) {
         clearTimeout(this.timeout);
         this.timeout = null;
