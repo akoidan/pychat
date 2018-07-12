@@ -17,9 +17,11 @@
         </div>
       </div>
       <div v-show="dim" class="videoHolder" >
-        <div>
-          <video :src="srcVideo"  autoplay="" ref="video"></video>
+        <div v-show="recordingNow">
+          <video :src="srcVideo" v-show="srcVideo" autoplay="" ref="video"></video>
+          <img v-show="!srcVideo" src="../../assets/img/audio.svg" class="audio-recording-now">
         </div>
+        <span v-show="!recordingNow">Starting recording...</span>
       </div>
       <room-users/>
       <smiley-holder v-show="showSmileys" @add-smiley="addSmiley"/>
@@ -29,7 +31,7 @@
       <input type="file" @change="handleFileSelect" accept="image/*,video/*" ref="imgInput" multiple="multiple" v-show="false"/>
       <i class="icon-picture" title="Share Video/Image" @click="addImage"></i>
       <i class="icon-smile" title="Add a smile :)" @click="showSmileys = !showSmileys"></i>
-      <media-recorder :video-ref="$refs.video" v-model="srcVideo" @video="handleAddVideo" @audio="handleAddAudio"/>
+      <media-recorder @record="handleRecord" @video="handleAddVideo" @audio="handleAddAudio"/>
       <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage"></div>
     </div>
   </div>
@@ -91,6 +93,7 @@
       imgInput: HTMLInputElement;
       video: HTMLVideoElement;
     };
+    recordingNow: boolean = false;
 
 
     @Watch('editedMessage')
@@ -126,11 +129,6 @@
       })
     }
 
-    // mounted() {
-    //   this.isRecordingVideo = true;
-    //   this.startRecord();
-    // }
-
     showSmileys: boolean = false;
 
     addImage() {
@@ -150,12 +148,23 @@
     }
 
     handleAddVideo(file: Blob) {
+      this.srcVideo = null;
+      this.recordingNow = false;
+      this.$refs.video.pause();
       pasteBlobVideoToTextArea(file, this.$refs.userMessage, 'm', e => {
         this.growlError(e);
       })
     }
 
+    handleRecord({src, isVideo}) {
+      this.recordingNow = true;
+      if (isVideo) {
+        this.srcVideo = src
+      }
+    }
+
     handleAddAudio(file: Blob) {
+      this.recordingNow = false;
       pasteBlobAudioToTextArea(file, this.$refs.userMessage);
     }
 
@@ -400,10 +409,13 @@
     +wrapper-inner
     justify-content: center
     position: relative
-    video
+    video, .audio-recording-now
       position: relative
       top: 50%
       transform: translateY(-50%)
+    video
       border: 1px solid rgba(126, 126, 126, 0.5)
+    .audio-recording-now
+      height: 200px
 
 </style>

@@ -24,8 +24,6 @@
 
     // started: number = null;
     timeout: number = 0;
-    @Prop() value: string;
-    @Prop() videoRef: HTMLVideoElement;
     navigatorRecord: MediaCapture;
 
 
@@ -45,7 +43,6 @@
       this.navigatorRecord = new MediaCapture(this.isRecordingVideo, (data) => {
         this.logger.debug("Finishing recording... {}", data)();
         this.setDim(false);
-        this.videoRef.pause();
         if (data) {
           if (this.isRecordingVideo) {
             this.$emit('video', data);
@@ -54,10 +51,9 @@
           }
         }
       });
-      this.navigatorRecord.record().then((srcVideo: string) => {
+      this.navigatorRecord.record().then((src: string) => {
         this.logger.debug("Resolved record emitting video")();
-        this.$emit("input", srcVideo);
-        this.videoRef.play();
+        this.$emit("record", {isVideo: this.isRecordingVideo, src: src});
       }).catch(error => this.logger.error("Error during capturing media {}", error))
     }
 

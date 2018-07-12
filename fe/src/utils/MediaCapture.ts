@@ -16,6 +16,7 @@ export default class MediaCapture {
   private isRecordingVideo: boolean;
   private onFinish: Function;
   private mediaRecorder: MediaRecorder;
+  private timeout: number;
 
   constructor(isRecordingVideo: boolean, onFinish: Function) {
     this.isRecordingVideo = isRecordingVideo;
@@ -45,8 +46,9 @@ export default class MediaCapture {
       }
     }
     await new Promise(resolve => {
-      setTimeout(resolve, 500); // wait until videocam opens
+      this.timeout = setTimeout(resolve, 500); // wait until videocam opens
     });
+    this.timeout = null;
     this.mediaRecorder = new MediaRecorder(this.stream, options);
     this.mediaRecorder.onstop = this.handleStop.bind(this);
     this.mediaRecorder.ondataavailable = this.handleDataAvailable.bind(this);
@@ -56,7 +58,12 @@ export default class MediaCapture {
   }
 
   public stopRecording() {
-    this.mediaRecorder.stop();
+    if (this.timeout) {
+      clearTimeout(this.timeout);
+      this.timeout = null;
+    } else {
+      this.mediaRecorder.stop();
+    }
   }
 
   private handleStop(event) {

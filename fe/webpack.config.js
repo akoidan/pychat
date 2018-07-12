@@ -24,7 +24,7 @@ module.exports = (env, argv) => {
     new CopyWebpackPlugin([
       {from: './src/assets/smileys', to: 'smileys'},
       {from: './src/assets/manifest.json', to: ''},
-      {from: './src/assets/static', to: ''},
+      // {from: './src/assets/static', to: ''},
     ]),
     new webpack.DefinePlugin({
       PYCHAT_CONSTS: JSON.stringify(options),
