@@ -5,7 +5,6 @@ import DatabaseWrapper from './DatabaseWrapper';
 import mobile from 'is-mobile';
 import LocalStorage from './LocalStorage';
 import store from '../store';
-import router from '../router';
 import Api from './api';
 import {IStorage} from '../types/types';
 import loggerFactory from './loggerFactory';
@@ -16,7 +15,7 @@ import NotifierHandler from './NotificationHandler';
 import Subscription from './Subscription';
 import Vue from 'vue';
 import Http from './Http';
-import Fetch from './Fetch';
+
 
 export const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(XHR_API_URL, sessionHolder);
 export const api: Api = new Api(xhr);
@@ -39,9 +38,10 @@ export const browserVersion: string = (function () {
   return M.join(' ');
 })() + (isMobile ? ' mobile' : '');
 export const isFirefox = browserVersion.indexOf('Firefox') >= 0;
+export const WEBRTC_STUNT_URL = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 export const isChrome = browserVersion.indexOf('Chrome') >= 0;
 export const storage: IStorage = window.openDatabase ? new DatabaseWrapper('v123x') : new LocalStorage();
-export  const globalLogger: Logger = loggerFactory.getLoggerColor('global', '#007a70');
+export const globalLogger: Logger = loggerFactory.getLoggerColor('global', '#007a70');
 export const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, sub, store);
 export const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
 export const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier, messageBus);
