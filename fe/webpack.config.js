@@ -81,11 +81,7 @@ module.exports = (env, argv) => {
         {
           test: /sw\.ts$/,
           exclude: /node_modules/,
-          loader: 'file-loader',
-          options: {
-            outputPath: '',
-            name: 'sw.js?[sha512:hash:base64:6]',
-          }
+          loader: 'sw-loader',
         },
         {
           test: /\.ts$/,

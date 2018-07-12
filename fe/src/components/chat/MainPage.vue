@@ -29,7 +29,7 @@
       <input type="file" @change="handleFileSelect" accept="image/*,video/*" ref="imgInput" multiple="multiple" v-show="false"/>
       <i class="icon-picture" title="Share Video/Image" @click="addImage"></i>
       <i class="icon-smile" title="Add a smile :)" @click="showSmileys = !showSmileys"></i>
-      <media-recorder :video-ref="$refs.video" v-model="srcVideo" @video="handleAddVideo"/>
+      <media-recorder :video-ref="$refs.video" v-model="srcVideo" @video="handleAddVideo" @audio="handleAddAudio"/>
       <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage"></div>
     </div>
   </div>
@@ -54,7 +54,7 @@
     encodeMessage,
     encodeP,
     getMessageData,
-    getSmileyHtml, pasteBlobToContentEditable, pasteBlobVideoToTextArea,
+    getSmileyHtml, pasteBlobAudioToTextArea, pasteBlobToContentEditable, pasteBlobVideoToTextArea,
     pasteHtmlAtCaret,
     pasteImgToTextArea, placeCaretAtEnd, stopVideo, timeToString
   } from "../../utils/htmlApi";
@@ -150,9 +150,13 @@
     }
 
     handleAddVideo(file: Blob) {
-      pasteBlobVideoToTextArea(file, this.$refs.userMessage, e => {
+      pasteBlobVideoToTextArea(file, this.$refs.userMessage, 'm', e => {
         this.growlError(e);
       })
+    }
+
+    handleAddAudio(file: Blob) {
+      pasteBlobAudioToTextArea(file, this.$refs.userMessage);
     }
 
     dropPhoto(evt) {
@@ -354,7 +358,8 @@
       &.failed
         min-width: 200px
         min-height: 100px
-
+    /deep/ .recorded-audio
+      height: 50px
 
     /deep/ *
       background-color: transparent !important

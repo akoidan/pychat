@@ -47,7 +47,11 @@
         this.setDim(false);
         this.videoRef.pause();
         if (data) {
-          this.$emit('video', data);
+          if (this.isRecordingVideo) {
+            this.$emit('video', data);
+          } else {
+            this.$emit('audio', data);
+          }
         }
       });
       this.navigatorRecord.record().then((srcVideo: string) => {

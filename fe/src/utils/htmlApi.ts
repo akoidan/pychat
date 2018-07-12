@@ -6,11 +6,13 @@ import {STATIC_API_URL, PASTED_IMG_CLASS} from './consts';
 import {MessageDataEncode, SmileyStructure, UploadFile} from '../types/types';
 import {FileModel, MessageModel, RoomModel, SexModel, UserModel} from '../types/model';
 import {forEach} from './utils';
+import recordIcon from '../assets/img/audio.svg';
 
 const tmpCanvasContext = document.createElement('canvas').getContext('2d');
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
 const smileysTabNames = Object.keys(smileys);
 
+const savedFiles = {};
 let codes = {};
 smileysTabNames.forEach(tb => {
   let smileyElement = smileys[tb];
@@ -167,8 +169,11 @@ function encodeFiles(html, files) {
       if (v) {
         if (v.type === 'i') {
           return `<img src='${resolveUrl(v.url)}' imageId='${v.id}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
-        } else if (v.type === 'v') {
-          return `<div class='video-player' associatedVideo='${v.url}'><div><img src='${resolveUrl(v.preview)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
+        } else if (v.type === 'v' || v.type === 'm') {
+          let className = v.type === 'v' ? 'video-player' : 'video-player video-record';
+          return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveUrl(v.preview)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
+        } else if (v.type === 'a') {
+         return `<img src='${getStaticUrl(recordIcon as string)}' imageId='${v.id}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
         } else {
           globalLogger.error('Invalid type {}', v.type)();
         }
@@ -211,22 +216,37 @@ export function pasteHtmlAtCaret(html: string, div: HTMLElement) {
 
 export function setVideoEvent(e: HTMLElement) {
   let r = e.querySelectorAll('.video-player');
-  for (let i = 0; i < r.length; i++) {
-    (function (e) {
-      let querySelector: HTMLElement = e.querySelector('.icon-youtube-play');
-      let url = e.getAttribute('associatedVideo');
-      globalLogger.debug('Embedding video url {}', url)();
-      querySelector.onclick = function (event) {
-        let video = document.createElement('video');
-        video.setAttribute('controls', '');
-        video.className = 'video-player-ready';
-        globalLogger.debug('Replacing video url {}', url)();
-        video.src = resolveUrl(url);
-        e.parentNode.replaceChild(video, e);
-        video.play();
-      };
-    })(r[i]);
-  }
+  forEach(r, e => {
+    let querySelector: HTMLElement = e.querySelector('.icon-youtube-play');
+    let url = e.getAttribute('associatedVideo');
+    globalLogger.debug('Embedding video url {}', url)();
+    querySelector.onclick = function (event) {
+      let video = document.createElement('video');
+      video.setAttribute('controls', '');
+      video.className = 'video-player-ready';
+      globalLogger.debug('Replacing video url {}', url)();
+      video.src = resolveUrl(url);
+      e.parentNode.replaceChild(video, e);
+      video.play();
+    };
+  });
+}
+
+export function setAudioEvent(e: HTMLElement) {
+  let r = e.querySelectorAll('.audio-record');
+  forEach(r, e => {
+    e.onclick = function (event) {
+      let associatedAudio: string = e.getAttribute('associatedAudio');
+      let url: string = resolveUrl(associatedAudio);
+      let audio = document.createElement('audio');
+      audio.setAttribute('controls', '');
+      audio.className = 'audio-player-ready';
+      globalLogger.debug('Replacing audio url {}', url)();
+      audio.src = url;
+      e.parentNode.replaceChild(audio, e);
+      audio.play();
+    };
+  });
 }
 
 export function setImageFailEvents(e: HTMLElement, bus: Vue) {
@@ -318,7 +338,7 @@ function blobToImg(blob: Blob) {
   let src = URL.createObjectURL(blob);
   img.src = src;
   setBlobName(blob);
-  Utils.imagesFiles[src] = blob;
+  savedFiles[src] = blob;
   return img;
 }
 
@@ -327,7 +347,7 @@ export function pasteBlobToContentEditable(blob: Blob, textArea: HTMLElement) {
   textArea.appendChild(img);
 }
 
-export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, errCb: Function) {
+export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, videoType, errCb: Function) {
   let video = document.createElement('video');
   if (video.canPlayType(file.type)) {
     video.autoplay = false;
@@ -342,10 +362,11 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, errC
         let img = document.createElement('img');
         img.className = PASTED_IMG_CLASS;
         img.src = url;
+        img.setAttribute('videoType', videoType);
         blob['name'] = '.jpg';
         img.setAttribute('associatedVideo', src);
-        Utils.videoFiles[src] = file;
-        Utils.previewFiles[url] = blob;
+        savedFiles[src] = file;
+        savedFiles[url] = blob;
         pasteNodeAtCaret(img, textArea);
       }, 'image/jpeg', 0.95);
     }, false);
@@ -356,12 +377,24 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, errC
 }
 
 
+
+export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
+  let img = document.createElement('img');
+  let associatedAudio = URL.createObjectURL(file);
+  img.setAttribute('associatedAudio', associatedAudio);
+  img.className = `recorded-audio ${PASTED_IMG_CLASS}`;
+  setBlobName(file);
+  savedFiles[associatedAudio] = file;
+  img.src = getStaticUrl(recordIcon as string);
+  pasteNodeAtCaret(img, textArea);
+}
+
 export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
   if (file.type.indexOf('image') >= 0) {
     let img = blobToImg(file);
     pasteNodeAtCaret(img, textArea);
   } else if (file.type.indexOf('video') >= 0) {
-    pasteBlobVideoToTextArea(file, textArea, errCb);
+    pasteBlobVideoToTextArea(file, textArea, 'v', errCb);
   } else {
     errCb(`Pasted file type ${file.type}, which is not an image`);
   }
@@ -391,8 +424,7 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = nu
   let files: UploadFile[] = []; // return array from nodeList
   let images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
   let fileModels: {[id: number]: FileModel} = {};
-  for (let i = 0; i < images.length; i++) {
-    let img = images[i];
+  forEach(images, img => {
     let elSymbol = img.getAttribute('symbol');
     if (!elSymbol) {
       currSymbol = nextChar(currSymbol);
@@ -402,14 +434,16 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = nu
     img.parentNode.replaceChild(textNode, img);
     if (!img.getAttribute('symbol')) { // don't send image again, it's already in server
       let assVideo = img.getAttribute('associatedVideo');
+      let assAudio = img.getAttribute('associatedAudio');
+      let type = img.getAttribute('videoType');
       if (assVideo) {
         files.push({
-          file: Utils.videoFiles[assVideo],
-          type: 'v',
+          file: savedFiles[assVideo],
+          type: type,
           symbol:  elSymbol
         });
         files.push({
-          file: Utils.previewFiles[img.getAttribute('src')],
+          file: savedFiles[img.getAttribute('src')],
           type: 'p',
           symbol:  elSymbol
         });
@@ -420,9 +454,22 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = nu
           type: 'v'
         };
         fileModels[elSymbol] = fileModel;
+      } else if (assAudio) {
+        files.push({
+          file: savedFiles[assAudio],
+          type: 'a',
+          symbol: elSymbol
+        });
+        let fileModel: FileModel = {
+          id: null,
+          preview: null,
+          url: assAudio,
+          type: 'a'
+        };
+        fileModels[elSymbol] = fileModel;
       } else {
         files.push({
-          file: Utils.imagesFiles[img.getAttribute('src')],
+          file: savedFiles[img.getAttribute('src')],
           type: 'i',
           symbol:  elSymbol
         });
@@ -435,8 +482,8 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = nu
         fileModels[elSymbol] = fileModel;
       }
     }
-  }
-  // let urls = [Utils.imagesFiles, Utils.videoFiles, Utils.previewFiles];
+  });
+  // let urls = [savedFiles, savedFiles, savedFiles];
   // urls.forEach((url) => {
   //   for (let k in url) {
   //     globalLogger.log('Revoking url {}', k)();
@@ -450,9 +497,3 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = nu
   userMessage.innerHTML = '';
   return {files, messageContent, currSymbol, fileModels};
 }
-
-export const Utils = {
-  videoFiles: {},
-  previewFiles: {},
-  imagesFiles: {}
-};

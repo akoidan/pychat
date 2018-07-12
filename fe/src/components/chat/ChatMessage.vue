@@ -20,7 +20,7 @@
   import {
     encodeHTML,
     encodeMessage,
-    highlightCode,
+    highlightCode, setAudioEvent,
     setImageFailEvents,
     setVideoEvent,
     setYoutubeEvent, timeToString
@@ -96,6 +96,7 @@
       }
       setVideoEvent(this.$refs.content);
       setImageFailEvents(this.$refs.content, messageBus);
+      setAudioEvent(this.$refs.content);
     }
 
     encodeMessage(message: MessageModel) {
@@ -241,13 +242,22 @@
         + div.icon-youtube-play
           width: 50px
           margin-right: -30px
+    /deep/ .video-record
+      img
+        border-radius: 50%
+      div
+        background-color: transparent
+    /deep/ .audio-record
+      vertical-align: middle
+      height: 50px
+      cursor: pointer
+    /deep/ .audio-player-ready
+      vertical-align: middle
 
   .color-lor p /deep/, .color-reg p /deep/
     @import "~highlightjs/styles/railscasts"
   .color-white p /deep/
     @import "~highlightjs/styles/default"
-
-
 
   .timeMess
     @media screen and (max-width: 400px)
