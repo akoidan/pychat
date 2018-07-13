@@ -3,7 +3,11 @@
 // import {faviconUrl} from '../utils/utils';
 // import {checkAndPlay, file} from '../utils/audio';
 //
-// export default  class FileReceiver extends FileTransferHandler {
+import FileTransferHandler from './FileTransferHandler';
+
+export default  class FileReceiver extends FileTransferHandler {
+
+}
 //   private fileSize: number;
 //   private fileName: string;
 //

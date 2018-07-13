@@ -7,7 +7,8 @@
         <fieldset v-else-if="message.fieldDay" :key="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
         </fieldset>
-        <chat-sending-file v-else-if="message.connId" :sending-file="message"/>
+        <chat-sending-file v-else-if="message.transfers" :sending-file="message"/>
+        <chat-receiving-file v-else-if="message.connId" :receiving-file="message"/>
         <chat-sending-message v-else :message="message" :key="message.id"/>
       </template>
     </div>
@@ -27,9 +28,11 @@
   import ChatSendingMessage from "./ChatSendingMessage";
   import ChatChangeOnlineMessage from "./ChatChangeOnlineMessage";
   import ChatSendingFile from "./ChatSendingFile";
+  import ChatReceivingFile from './ChatReceivingFile';
 
   @Component({
     components: {
+      ChatReceivingFile,
       ChatSendingFile,
       ChatChangeOnlineMessage,
       ChatSendingMessage,

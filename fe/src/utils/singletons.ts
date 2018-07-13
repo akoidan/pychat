@@ -52,5 +52,5 @@ sub.subscribe('ws', ws);
 sub.subscribe('channels', channelsHandler);
 sub.subscribe('lan', channelsHandler);
 sub.subscribe('lan', api);
-sub.subscribe('webrtc', api);
+sub.subscribe('webrtc', webrtcApi);
 

@@ -114,6 +114,13 @@ export interface SendingFileTransfer extends UploadProgressModel {
   userId: number;
 }
 
+export interface ReceivingFile extends UploadProgressModel {
+  time: number;
+  fileName: string;
+  connId: string;
+  userId: number;
+}
+
 export interface SendingFile {
   time: number;
   fileName: string;
@@ -125,6 +132,7 @@ export interface SendingFile {
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
   sendingFiles:  { [id: string]: SendingFile };
+  receivingFiles:  { [id: string]: ReceivingFile };
   messages: { [id: number]: MessageModel };
   allLoaded: boolean;
   search: SearchModel;

@@ -31,6 +31,28 @@ export function convertSexToNumber(m: SexModel): number {
 }
 
 
+export function getRoomsBaseDict({roomId, volume, notifications, name, users}): RoomModel {
+  return {
+    receivingFiles: {},
+    id: roomId,
+    sendingFiles: {},
+    volume,
+    notifications,
+    name,
+    messages: {},
+    newMessagesCount: 0,
+    changeOnline: [],
+    allLoaded: false,
+    search: {
+      searchActive: false,
+      searchText: '',
+      searchedIds: [],
+      locked: false,
+    },
+    users
+  };
+}
+
 export function convertNumberToSex(m: number): SexModel {
   return {
     '0': SexModel.Secret,

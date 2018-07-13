@@ -1,7 +1,7 @@
 import loggerFactory from '../utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import {IMessageHandler, SetSendingFile} from '../types/types';
-import {DefaultMessage, WebRtcDefaultMessage, WebRtcSetConnectionIdMessage} from '../types/messages';
+import {IMessageHandler, SetReceivingFile, SetSendingFile} from '../types/types';
+import {DefaultMessage, OfferFile, WebRtcDefaultMessage, WebRtcSetConnectionIdMessage} from '../types/messages';
 import WsHandler from '../utils/WsHandler';
 import {RootState} from '../types/model';
 import {Store} from 'vuex';
@@ -10,6 +10,7 @@ import FileSender from './FileSender';
 import NotifierHandler from '../utils/NotificationHandler';
 import {browserVersion} from '../utils/singletons';
 import MessageHandler from '../utils/MesageHandler';
+import FileReceiver from './FileReceiver';
 
 export default class WebRtcApi extends MessageHandler {
 
@@ -31,33 +32,24 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> }  = {
-
+    offerFile(message: OfferFile) {
+      let handler = new FileReceiver(this.removeChildReference, this.wsHandler, this.notifier, this.store);
+      this.connections[message.connId] = handler;
+      let payload: SetReceivingFile = {
+        receivingFile: {
+          uploaded: 0,
+          userId: message.userId,
+          total: message.content.size,
+          error: null,
+          connId: message.connId,
+          fileName: message.content.name,
+          time: message.time
+        },
+        roomId: message.roomId
+      };
+      this.store.commit('addReceivingFile', payload);
+    }
   };
-
-  onofferFile(message) {
-    // let handler = new FileReceiver(this.removeChildReference);
-    // this.connections[message.connId] = handler;
-    // handler.initAndDisplayOffer(message);
-  }
-
-  onofferCall(message) {
-    // if (handler) {
-    //   this.connections[message.connId] = handler;
-    //   handler.initAndDisplayOffer(message, chatHandler.roomName);
-    // } else {
-    //   this.wsHandler.sendToServer({
-    //     action: 'cancelCallConnection',
-    //     connId: message.connId
-    //   });
-    //   this.store.dispatch('growlInfo', `User ${message.user} tried to call`);
-    // }
-  }
-
-  addCallHandler (callHandler) {
-    // let newId = this.createQuedId();
-    // this.quedConnections[newId] = callHandler;
-    // return newId;
-  }
 
   offerFile(file, channel) {
     let fileSender = new FileSender(this.removeChildReference, this.wsHandler, this.notifier, this.store, file);

@@ -261,7 +261,8 @@ class WebRtcMessageCreator(object):
 			VarNames.HANDLER_NAME: HandlerNames.WEBRTC,
 			VarNames.CONNECTION_ID: connection_id,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.ROOM_ID: room_id
+			VarNames.ROOM_ID: room_id,
+			VarNames.TIME: get_milliseconds()
 		}
 
 	def set_webrtc_error(self, error, connection_id, qued_id=None):

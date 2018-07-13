@@ -23,7 +23,7 @@ import {
   RemoveMessageProgress,
   RemoveSendingMessage,
   SetMessageProgress,
-  SetMessageProgressError,
+  SetMessageProgressError, SetReceivingFile,
   SetRoomsUsers,
   SetSearchTo, SetSendingFile,
   SetUploadProgress
@@ -147,6 +147,9 @@ const store: StoreOptions<RootState> = {
     },
     addSendingFile(state: RootState, payload: SetSendingFile) {
       Vue.set(state.roomsDict[payload.roomId].sendingFiles, payload.sendingFile.connId, payload.sendingFile);
+    },
+    addReceivingFile(state: RootState, payload: SetReceivingFile) {
+      Vue.set(state.roomsDict[payload.roomId].receivingFiles, payload.receivingFile.connId, payload.receivingFile);
     },
     incNewMessagesCount(state: RootState, roomId: number) {
       state.roomsDict[roomId].newMessagesCount++;

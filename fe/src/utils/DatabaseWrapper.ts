@@ -12,7 +12,7 @@ import {
   convertNumberToSex,
   convertSexToNumber,
   convertSexToString,
-  convertStringSexToNumber
+  convertStringSexToNumber, getRoomsBaseDict
 } from '../types/converters';
 interface TransactionCb { (t: SQLTransaction, ...rest): void; }
 
@@ -126,24 +126,13 @@ export default class DatabaseWrapper implements IStorage {
       };
       let roomsDict: RoomDictModel = {};
       dbRooms.forEach(r => {
-        let rm: RoomModel = {
-          id: r.id,
-          sendingFiles: {},
-          allLoaded: false,
-          users: [],
-          volume: r.volume,
+        let rm: RoomModel = getRoomsBaseDict({
+          roomId: r.id,
           notifications: r.notifications ? true : false,
           name: r.name,
-          messages: {},
-          changeOnline: [],
-          newMessagesCount: 0,
-          search: {
-            searchActive: false,
-            searchText: '',
-            searchedIds: [],
-            locked: false
-          }
-        };
+          users: [],
+          volume: r.volume
+        });
         roomsDict[r.id] = rm;
       });
       dbRoomUsers.forEach(ru => {

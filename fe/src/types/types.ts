@@ -3,7 +3,7 @@ import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   FileModel,
-  MessageModel,
+  MessageModel, ReceivingFile,
   RoomModel,
   RoomSettingsModel,
   SearchModel, SendingFile,
@@ -88,6 +88,11 @@ export interface PostData<T> {
 export interface SetSendingFile {
   roomId: number;
   sendingFile: SendingFile;
+}
+
+export interface SetReceivingFile {
+  roomId: number;
+  receivingFile: ReceivingFile;
 }
 
 export interface StorageData {

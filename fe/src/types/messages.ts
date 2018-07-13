@@ -26,6 +26,21 @@ export interface SetWsIdMessage extends DefaultMessage {
   userSettings: UserSettingsDto;
 }
 
+
+export interface OfferFileContent {
+  size: number;
+  name: string;
+  browser: string;
+}
+
+export interface OfferFile extends WebRtcDefaultMessage {
+  content: OfferFileContent;
+  opponentWsId: string;
+  roomId: number;
+  userId: number;
+  time: number;
+}
+
 export interface SetSettingsMessage extends DefaultMessage {
   content: UserSettingsDto;
 }

@@ -41,7 +41,7 @@ import {
   RemoveOnlineUserMessage
 } from '../types/messages';
 import {MessageModelDto, RoomDto, UserDto} from '../types/dto';
-import {convertFiles, convertUser} from '../types/converters';
+import {convertFiles, convertUser, getRoomsBaseDict} from '../types/converters';
 import WsHandler from './WsHandler';
 import NotifierHandler from './NotificationHandler';
 import {faviconUrl} from './htmlApi';
@@ -351,24 +351,7 @@ export default class ChannelsHandler extends MessageHandler {
   }
 
   private mutateRoomAddition(message: AddRoomBase) {
-    let r: RoomModel = {
-      id: message.roomId,
-      sendingFiles: {},
-      volume: message.volume,
-      notifications: message.notifications,
-      name: message.name,
-      messages: {},
-      newMessagesCount: 0,
-      changeOnline: [],
-      allLoaded: false,
-      search: {
-        searchActive: false,
-        searchText: '',
-        searchedIds: [],
-        locked: false,
-      },
-      users: message.users
-    };
+    let r: RoomModel = getRoomsBaseDict(message);
     this.store.commit('addRoom', r);
   }
 
@@ -420,7 +403,8 @@ export default class ChannelsHandler extends MessageHandler {
       let oldRoom = roomsDict[newRoom.roomId];
       let rm: RoomModel = {
         id: newRoom.roomId,
-        sendingFiles: {},
+        sendingFiles: oldRoom ? oldRoom.sendingFiles : {},
+        receivingFiles: oldRoom ? oldRoom.receivingFiles : {},
         messages: oldRoom ? oldRoom.messages : {},
         newMessagesCount: oldRoom ? oldRoom.newMessagesCount : 0,
         changeOnline: oldRoom ? oldRoom.changeOnline : [],
