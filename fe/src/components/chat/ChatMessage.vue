@@ -1,8 +1,9 @@
 <template>
   <p :class="mainCls" @contextmenu="contextmenu">
-      <span class="message-header">
-        <span class="timeMess" @click="quote">({{getTime}})</span>
-        <span @contextmenu.prevent.stop="setActiveUser">{{username}}</span>: </span>
+    <chat-message-header
+        :time="message.time"
+        :user-id="message.userId"
+        @quote="quote"/>
     <span class="message-text-style" v-html="encoded" ref="content"></span>
   </p>
 </template>
@@ -27,37 +28,24 @@
   } from "../../utils/htmlApi";
   import {sem} from '../../utils/utils';
   import {messageBus} from '../../utils/singletons';
-
-
-  @Component
+  import ChatMessageHeader from './ChatMessageHeader';
+  @Component({
+    components: {ChatMessageHeader}
+  })
   export default class ChatMessage extends Vue {
 
     @State userSettings: CurrentUserSettingsModel;
     @State userInfo: CurrentUserInfoModel;
     @Prop() message: MessageModel;
-    @State allUsersDict: UserDictModel;
     @State editedMessage : EditingMessage;
     @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
-    @Mutation setActiveUserId: SingleParamCB<number>;
 
     $refs: {
       content: HTMLElement
     };
 
-    setActiveUser() {
-      this.setActiveUserId(this.message.userId);
-    }
-
     get id() {
       return this.message.id;
-    }
-
-    get username() {
-      return this.allUsersDict[this.message.userId].user;
-    }
-
-    get getTime() {
-      return timeToString(this.message.time);
     }
 
     get encoded() {
@@ -259,17 +247,7 @@
   .color-white p /deep/
     @import "~highlightjs/styles/default"
 
-  .timeMess
-    @media screen and (max-width: 400px)
-      display: none !important
-    &:hover
-      cursor: pointer
-      color: #979797
-
   .color-white
-    .timeMess
-      color: #85d379
-      font-weight: normal
     .highLightMessage
       border: 1px solid #3f3f3f
       box-shadow: 0 4px 8px 0 rgba(0,0,0,0.5), 0 3px 10px 0 rgba(0,0,0,0.5)

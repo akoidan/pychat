@@ -1,5 +1,9 @@
 <template>
-  <div>
+  <div :class="mainClass">
+    <chat-message-header
+        :time="receivingFile.time"
+        :user-id="receivingFile.userId"
+    />
     <table class="table">
       <tbody>
       <tr>
@@ -11,12 +15,8 @@
         <td>{{size}}</td>
       </tr>
       <tr>
-        <th>From</th>
-        <td>{{user}}</td>
-      </tr>
-      <tr>
         <td colspan="2">
-          <app-progress-bar v-if="!transfer.finished" @retry="retry" :upload="transfer"/>
+          <app-progress-bar @retry="retry" :upload="receivingFile"/>
         </td>
       </tr>
       </tbody>
@@ -28,24 +28,30 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation, Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {ReceivingFile, SendingFile, UserModel} from "../../types/model";
-  import {bytesToSize} from '../../utils/utils';
-  import AppProgressBar from '../ui/AppProgressBar';
+  import {Getter} from 'vuex-class';
+  import {ReceivingFile} from "../../types/model";
+  import {bytesToSize} from "../../utils/utils";
+  import AppProgressBar from "../ui/AppProgressBar";
+  import ChatMessageHeader from "./ChatMessageHeader";
+
   @Component({
-    components: {AppProgressBar}
+    components: {ChatMessageHeader, AppProgressBar}
   })
   export default class ChatSendingFile extends Vue {
     @Prop() receivingFile: ReceivingFile;
-    @State allUsersDict: {[id: number]: UserModel};
+    @Getter myId: number;
 
-    get size() {
+    get size() :string {
       return bytesToSize(this.receivingFile.total)
     }
 
-    user() {
-      this.allUsersDict[this.receivingFile.userId].user;
+    get mainClass(): string {
+      if (this.receivingFile.userId === this.myId) {
+        return 'message-self';
+      } else {
+        return 'message-others';
+      }
     }
 
     retry() {

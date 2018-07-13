@@ -38,6 +38,7 @@ export default class WebRtcApi extends MessageHandler {
       let payload: SetReceivingFile = {
         receivingFile: {
           uploaded: 0,
+          finished: false,
           userId: message.userId,
           total: message.content.size,
           error: null,

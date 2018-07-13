@@ -116,6 +116,7 @@ export interface SendingFileTransfer extends UploadProgressModel {
 
 export interface ReceivingFile extends UploadProgressModel {
   time: number;
+  finished: boolean;
   fileName: string;
   connId: string;
   userId: number;

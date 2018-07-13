@@ -1,0 +1,55 @@
+<template>
+   <span class="message-header">
+    <span class="timeMess" @click="quote">({{getTime}})</span>
+    <span @contextmenu.prevent.stop="setActiveUser">{{username}}</span>:
+   </span>
+</template>
+<script lang="ts">
+  import {State, Action, Mutation, Getter} from "vuex-class";
+  import {Component, Prop, Vue} from "vue-property-decorator";
+  import {messageBus} from '../../utils/singletons';
+  import {UserDictModel} from '../../types/model';
+  import {timeToString} from '../../utils/htmlApi';
+
+  @Component
+  export default class ChatMessageHeader extends Vue {
+
+    @Prop() userId: number;
+    @Prop() time: number;
+    @Mutation setActiveUserId: SingleParamCB<number>;
+
+    @State allUsersDict: UserDictModel;
+
+    setActiveUser() {
+      this.setActiveUserId(this.userId);
+    }
+
+
+    get username() {
+      return this.allUsersDict[this.userId].user;
+    }
+
+    get getTime() {
+      return timeToString(this.time);
+    }
+
+
+    quote() {
+      this.$emit('quote');
+    }
+  }
+</script>
+
+<style lang="sass" scoped>
+  .timeMess
+    @media screen and (max-width: 400px)
+      display: none !important
+    &:hover
+      cursor: pointer
+      color: #979797
+
+    .color-white
+      .timeMess
+        color: #85d379
+        font-weight: normal
+</style>

@@ -19,7 +19,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import ChatMessage from "./ChatMessage.vue";
   import SearchMessages from "./SearchMessages.vue";
-  import {RoomModel, SearchModel, SendingFile} from "../../types/model";
+  import {ReceivingFile, RoomModel, SearchModel, SendingFile} from "../../types/model";
   import {MessageModelDto} from "../../types/dto";
   import {channelsHandler, messageBus} from "../../utils/singletons";
   import {SetSearchTo} from "../../types/types";
@@ -84,6 +84,10 @@
       for (let m in this.room.sendingFiles) {
         let sendingFile: SendingFile = this.room.sendingFiles[m];
         newArray.push(sendingFile);
+      }
+      for (let m in this.room.receivingFiles) {
+        let receivingFile: ReceivingFile = this.room.receivingFiles[m];
+        newArray.push(receivingFile);
       }
       for (let m in this.room.messages) {
         let message = this.room.messages[m];
