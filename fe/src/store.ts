@@ -146,7 +146,7 @@ const store: StoreOptions<RootState> = {
       state.dim = payload;
     },
     addSendingFile(state: RootState, payload: SetSendingFile) {
-      state.roomsDict[payload.roomId].sendingFiles[payload.sendingFile.coonId] = payload.sendingFile;
+      Vue.set(state.roomsDict[payload.roomId].sendingFiles, payload.sendingFile.connId, payload.sendingFile);
     },
     incNewMessagesCount(state: RootState, roomId: number) {
       state.roomsDict[roomId].newMessagesCount++;
@@ -167,20 +167,17 @@ const store: StoreOptions<RootState> = {
     },
     addMessage(state: RootState, m: MessageModel) {
       let om: { [id: number]: MessageModel } = state.roomsDict[m.roomId].messages;
-      let a = 'set';
-      Vue[a](om, m.id, m);
+      Vue.set(om, String(m.id), m);
       storage.saveMessage(m);
     },
     deleteMessage(state: RootState, rm: RemoveSendingMessage) {
-      let a = 'delete';
-      Vue[a](state.roomsDict[rm.roomId].messages, rm.messageId);
+      Vue.delete(state.roomsDict[rm.roomId].messages, String(rm.messageId));
       storage.deleteMessage(rm.messageId);
     },
     addMessages(state: RootState, ml: MessagesLocation) {
       let om: { [id: number]: MessageModel } = state.roomsDict[ml.roomId].messages;
       ml.messages.forEach(m => {
-        let a = 'set';
-        Vue[a](om, m.id, m);
+        Vue.set(om, String(m.id), m);
       });
       storage.saveMessages(ml.messages);
     },
@@ -205,9 +202,14 @@ const store: StoreOptions<RootState> = {
       room.name = srm.name;
       storage.updateRoom(srm);
     },
+    clearStorage(state: RootState) {
+      for (let m in state.roomsDict) {
+        state.roomsDict[m].messages = {};
+      }
+      storage.clearStorage();
+    },
     deleteRoom(state: RootState, roomId: number) {
-      let a = 'delete'; // TODO
-      Vue[a](state.roomsDict, roomId);
+      Vue.delete(state.roomsDict, String(roomId));
       storage.deleteRoom(roomId);
     },
     setRoomsUsers(state: RootState, ru: SetRoomsUsers) {
@@ -237,8 +239,7 @@ const store: StoreOptions<RootState> = {
       state.regHeader = regHeader;
     },
     addUser(state: RootState, u: UserModel) {
-      let newVar = 'set';
-      Vue[newVar](state.allUsersDict, u.id, u);
+      Vue.set(state.allUsersDict, String(u.id), u);
       storage.saveUser(u);
     },
     addChangeOnlineEntry(state: RootState, payload: ChangeOnlineEntry) {
@@ -280,8 +281,7 @@ const store: StoreOptions<RootState> = {
       state.allUsersDict = setRooms.allUsersDict;
     },
     addRoom(state: RootState, room: RoomModel) {
-      let newVar = 'set';
-      Vue[newVar](state.roomsDict, room.id, room);
+      Vue.set(state.roomsDict, String(room.id), room);
       storage.saveRoom(room);
     },
     logout(state: RootState) {

@@ -67,7 +67,7 @@ export default class WebRtcApi extends MessageHandler {
         let payload: SetSendingFile = {
           roomId: channel,
           sendingFile: {
-            coonId: e.connId,
+            connId: e.connId,
             fileName: file.name,
             fileSize: file.size,
             time: e.time,

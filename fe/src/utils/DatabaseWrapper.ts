@@ -355,6 +355,7 @@ export default class DatabaseWrapper implements IStorage {
   public deleteRoom(id: number) {
     this.write(t => {
       this.executeSql(t, 'update room set deleted = 1 where id = ? ', [id])();
+      this.executeSql(t, 'delete from room_users where room_id = ? ', [id])();
     });
   }
 

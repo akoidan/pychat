@@ -118,7 +118,7 @@ export interface SendingFileTransfer {
 export interface SendingFile {
   time: number;
   fileName: string;
-  coonId: string;
+  connId: string;
   fileSize: number;
   transfers: { [id: string]: SendingFileTransfer };
 }

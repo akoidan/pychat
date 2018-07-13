@@ -612,13 +612,13 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.ROOM_ID]
 		content = in_message.get(VarNames.CONTENT)
-		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
+		js_id = in_message[VarNames.JS_MESSAGE_ID]
 		connection_id = id_generator(RedisPrefix.CONNECTION_ID_LENGTH)
 		# use list because sets dont have 1st element which is offerer
 		self.async_redis_publisher.hset(WEBRTC_CONNECTION, connection_id, self.id)
 		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
 		opponents_message = self.offer_webrtc(content, connection_id, room_id, in_message[VarNames.EVENT])
-		self_message = self.set_connection_id(qued_id, connection_id)
+		self_message = self.set_connection_id(js_id, connection_id)
 		self.ws_write(self_message)
 		self.logger.info('!! Offering a webrtc, connection_id %s', connection_id)
 		self.publish(opponents_message, room_id, True)

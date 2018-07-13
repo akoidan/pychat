@@ -85,6 +85,7 @@
   import {CurrentUserInfoModel, CurrentUserSettingsModel} from "../../types/model";
   import {currentUserInfoDtoToModel, currentUserInfoModelToDto, userSettingsDtoToModel} from "../../types/converters";
   import {UserSettingsDto} from "../../types/dto";
+  import {storage} from '../../utils/singletons';
 
   @Component({
     components: {AppSubmit, AppCheckbox}
@@ -94,6 +95,7 @@
     @State userSettings: CurrentUserSettingsModel;
     @Action growlError;
     @Action growlSuccess;
+    @Mutation clearStorage;
 
     model: UserSettingsDto = null;
 
@@ -102,7 +104,7 @@
     }
 
     clearHistory() {
-
+      this.clearStorage();
     }
 
     save() {

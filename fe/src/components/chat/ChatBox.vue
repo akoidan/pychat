@@ -7,6 +7,7 @@
         <fieldset v-else-if="message.fieldDay" :key="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
         </fieldset>
+        <chat-sending-file v-else-if="message.connId" :sending-file="message"/>
         <chat-sending-message v-else :message="message" :key="message.id"/>
       </template>
     </div>
@@ -17,18 +18,19 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import ChatMessage from "./ChatMessage.vue";
   import SearchMessages from "./SearchMessages.vue";
-  import {RoomModel, SearchModel} from "../../types/model";
+  import {RoomModel, SearchModel, SendingFile} from "../../types/model";
   import {MessageModelDto} from "../../types/dto";
-  import {channelsHandler} from "../../utils/singletons";
+  import {channelsHandler, messageBus} from "../../utils/singletons";
   import {SetSearchTo} from "../../types/types";
   import {MESSAGES_PER_SEARCH} from "../../utils/consts";
   import AppProgressBar from "../ui/AppProgressBar";
   import ChatSendingMessage from "./ChatSendingMessage";
   import ChatChangeOnlineMessage from "./ChatChangeOnlineMessage";
-  import {messageBus } from '../../utils/singletons'
+  import ChatSendingFile from "./ChatSendingFile";
 
   @Component({
     components: {
+      ChatSendingFile,
       ChatChangeOnlineMessage,
       ChatSendingMessage,
       AppProgressBar,
@@ -74,9 +76,12 @@
     }
 
     get messages() {
-      this.logger.trace("Reevaluating messages in room #{}", this.room.id)();
       let newArray: any[] = this.room.changeOnline.map(value => ({isChangeOnline: true, ...value}));
       let dates = {};
+      for (let m in this.room.sendingFiles) {
+        let sendingFile: SendingFile = this.room.sendingFiles[m];
+        newArray.push(sendingFile);
+      }
       for (let m in this.room.messages) {
         let message = this.room.messages[m];
         let d = new Date(message.time).toDateString();
@@ -86,17 +91,8 @@
         }
         newArray.push(message);
       }
-      for (let m in this.room.sendingFiles) {
-
-        let message = this.room.messages[m];
-        let d = new Date(message.time).toDateString();
-        if (!dates[d]) {
-          dates[d] = true;
-          newArray.push({fieldDay: d, time: Date.parse(d)});
-        }
-        newArray.push(message);
-      }
       newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
+      this.logger.debug("Reevaluating messages in room #{}: {}", this.room.id, newArray)();
       return newArray;
     }
 

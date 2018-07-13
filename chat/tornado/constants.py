@@ -111,6 +111,7 @@ class HandlerNames:
 	PEER_CONNECTION = 'peerConnection'
 	WEBRTC_TRANSFER = 'webrtcTransfer'
 	WS = 'ws'
+	NULL = 'void'
 
 
 class WebRtcRedisStates:

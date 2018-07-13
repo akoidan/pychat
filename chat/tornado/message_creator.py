@@ -275,12 +275,13 @@ class WebRtcMessageCreator(object):
 		}
 
 	@staticmethod
-	def set_connection_id(qued_id, connection_id):
+	def set_connection_id(js_message_id, connection_id):
 		return {
 			VarNames.EVENT: Actions.SET_WEBRTC_ID,
-			VarNames.HANDLER_NAME: HandlerNames.WEBRTC,
+			VarNames.HANDLER_NAME: HandlerNames.NULL,
 			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_QUED_ID: qued_id
+			VarNames.JS_MESSAGE_ID: js_message_id,
+			VarNames.TIME: get_milliseconds(),
 		}
 
 	def get_close_file_sender_message(self, connection_id):
