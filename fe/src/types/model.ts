@@ -108,8 +108,7 @@ export interface ChangeOnline {
   time: number;
 }
 
-export interface SendingFileTransfer {
-  sent: number;
+export interface SendingFileTransfer extends UploadProgressModel {
   finished: boolean;
   accepted: boolean;
   userId: number;
