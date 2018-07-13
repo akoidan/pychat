@@ -128,6 +128,7 @@ export default class DatabaseWrapper implements IStorage {
       dbRooms.forEach(r => {
         let rm: RoomModel = {
           id: r.id,
+          sendingFiles: {},
           allLoaded: false,
           users: [],
           volume: r.volume,

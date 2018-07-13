@@ -25,7 +25,7 @@ import {
   SetMessageProgress,
   SetMessageProgressError,
   SetRoomsUsers,
-  SetSearchTo,
+  SetSearchTo, SetSendingFile,
   SetUploadProgress
 } from './types/types';
 import {storage} from './utils/singletons';
@@ -144,6 +144,9 @@ const store: StoreOptions<RootState> = {
     },
     setDim(state: RootState, payload: boolean) {
       state.dim = payload;
+    },
+    addSendingFile(state: RootState, payload: SetSendingFile) {
+      state.roomsDict[payload.roomId].sendingFiles[payload.sendingFile.coonId] = payload.sendingFile;
     },
     incNewMessagesCount(state: RootState, roomId: number) {
       state.roomsDict[roomId].newMessagesCount++;

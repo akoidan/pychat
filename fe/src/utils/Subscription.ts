@@ -29,6 +29,9 @@ export default class Subscription {
   }
 
   public notify(message: DefaultMessage) {
+    if (message.handler === 'void') {
+      return;
+    }
     if (this.channels[message.handler] &&  this.channels[message.handler].length) {
       this.channels[message.handler].forEach((h: IMessageHandler) => {
         h.handle(message);

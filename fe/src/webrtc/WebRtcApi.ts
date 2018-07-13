@@ -1,26 +1,28 @@
 import loggerFactory from '../utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import {IMessageHandler} from '../types/types';
-import {WebRtcDefaultMessage} from '../types/messages';
+import {IMessageHandler, SetSendingFile} from '../types/types';
+import {DefaultMessage, WebRtcDefaultMessage, WebRtcSetConnectionIdMessage} from '../types/messages';
 import WsHandler from '../utils/WsHandler';
 import {RootState} from '../types/model';
 import {Store} from 'vuex';
 import Subscription from '../utils/Subscription';
 import FileSender from './FileSender';
 import NotifierHandler from '../utils/NotificationHandler';
+import {browserVersion} from '../utils/singletons';
+import MessageHandler from '../utils/MesageHandler';
 
-export default class WebRtcApi implements IMessageHandler {
-  logger: Logger;
-  private quedId = 0;
+export default class WebRtcApi extends MessageHandler {
+
+  protected logger: Logger;
 
   private connections = {};
-  private quedConnections = {};
   private wsHandler: WsHandler;
   private store: Store<RootState>;
   private sub: Subscription;
   private notifier: NotifierHandler;
 
   constructor(ws: WsHandler, store: Store<RootState>, notifier: NotifierHandler, sub: Subscription) {
+    super();
     this.wsHandler = ws;
     this.sub = sub;
     this.notifier = notifier;
@@ -28,20 +30,9 @@ export default class WebRtcApi implements IMessageHandler {
     this.store = store;
   }
 
-  createQuedId() {
-    return this.quedId++;
-  }
+  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> }  = {
 
-  proxyHandler  (data) {
-    this.connections[data.connId]['on' + data.type](data);
-  }
-
-  onsetConnectionId(message) {
-    let el = this.quedConnections[message.id];
-    delete this.quedConnections[message.id];
-    this.connections[message.connId] = el;
-    el.setConnectionId(message.connId);
-  }
+  };
 
   onofferFile(message) {
     // let handler = new FileReceiver(this.removeChildReference);
@@ -62,31 +53,35 @@ export default class WebRtcApi implements IMessageHandler {
     // }
   }
 
-  handle(data: WebRtcDefaultMessage) {
-    if (data.handler === 'webrtc') {
-      self['on' + data.action](data);
-    } else if (this.connections[data.connId]) {
-      this.connections[data.connId].handle(data);
-    } else {
-      this.logger.error('Unable to handle "{}" because connection "{}" is unknown.' +
-          ' Available connections: "{}". Skipping message:',
-          data.action, data.connId, Object.keys(this.connections))();
-    }
+  addCallHandler (callHandler) {
+    // let newId = this.createQuedId();
+    // this.quedConnections[newId] = callHandler;
+    // return newId;
   }
 
-  addCallHandler (callHandler) {
-    let newId = this.createQuedId();
-    this.quedConnections[newId] = callHandler;
-    return newId;
-  }
   offerFile(file, channel) {
-    let newId = this.createQuedId();
-    this.quedConnections[newId] = new FileSender(this.removeChildReference, this.wsHandler, this.notifier, this.store, file);
-    this.quedConnections[newId].sendOffer(newId, channel);
-    return this.quedConnections[newId];
+    let fileSender = new FileSender(this.removeChildReference, this.wsHandler, this.notifier, this.store, file);
+    this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, (e: WebRtcSetConnectionIdMessage) => {
+      if (e.connId) {
+        this.connections[e.connId] = fileSender;
+        let payload: SetSendingFile = {
+          roomId: channel,
+          sendingFile: {
+            coonId: e.connId,
+            fileName: file.name,
+            fileSize: file.size,
+            time: e.time,
+            transfers: {},
+          },
+        };
+        this.store.commit('addSendingFile', payload);
+      }
+    });
   }
+
   removeChildReference(id) {
     this.logger.log('Removing transferHandler with id {}', id)();
     delete this.connections[id];
   }
+
 }

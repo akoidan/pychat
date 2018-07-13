@@ -216,12 +216,12 @@ export default class NotifierHandler {
   onFocus(e: Event = undefined) {
     localStorage.setItem(LAST_TAB_ID_VARNAME, this.currentTabId);
     if (e) {
-      this.logger.debug('Marking current tab as active, pinging server')();
+      this.logger.trace('Marking current tab as active, pinging server')();
       if (store.state.userInfo && this.ws.isWsOpen() && !IS_DEBUG) {
         this.ws.pingServer(); // if no event = call from init();
       }
     } else {
-      this.logger.debug('Marking current tab as active')();
+      this.logger.trace('Marking current tab as active')();
     }
     this.isCurrentTabActive = true;
     this.newMessagesCount = 0;
@@ -233,6 +233,6 @@ export default class NotifierHandler {
 
   onFocusOut() {
     this.isCurrentTabActive = false;
-    this.logger.debug('Deactivating current tab')();
+    this.logger.trace('Deactivating current tab')();
   }
 }

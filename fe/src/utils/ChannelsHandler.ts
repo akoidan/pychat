@@ -353,6 +353,7 @@ export default class ChannelsHandler extends MessageHandler {
   private mutateRoomAddition(message: AddRoomBase) {
     let r: RoomModel = {
       id: message.roomId,
+      sendingFiles: {},
       volume: message.volume,
       notifications: message.notifications,
       name: message.name,
@@ -419,6 +420,7 @@ export default class ChannelsHandler extends MessageHandler {
       let oldRoom = roomsDict[newRoom.roomId];
       let rm: RoomModel = {
         id: newRoom.roomId,
+        sendingFiles: {},
         messages: oldRoom ? oldRoom.messages : {},
         newMessagesCount: oldRoom ? oldRoom.newMessagesCount : 0,
         changeOnline: oldRoom ? oldRoom.changeOnline : [],

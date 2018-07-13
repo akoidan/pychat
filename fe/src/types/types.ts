@@ -6,7 +6,7 @@ import {
   MessageModel,
   RoomModel,
   RoomSettingsModel,
-  SearchModel,
+  SearchModel, SendingFile,
   UploadProgressModel,
   UserModel
 } from './model';
@@ -85,6 +85,10 @@ export interface PostData<T> {
   process?: Function;
 }
 
+export interface SetSendingFile {
+  roomId: number;
+  sendingFile: SendingFile;
+}
 
 export interface StorageData {
   setRooms: SetRooms;

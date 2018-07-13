@@ -12,6 +12,10 @@ export interface WebRtcDefaultMessage extends DefaultMessage {
   connId: string;
 }
 
+export interface WebRtcSetConnectionIdMessage extends WebRtcDefaultMessage {
+  time: number;
+}
+
 export interface SetWsIdMessage extends DefaultMessage {
   rooms:  RoomDto[];
   users: UserDto[];

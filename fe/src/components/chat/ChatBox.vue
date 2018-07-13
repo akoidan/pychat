@@ -86,6 +86,16 @@
         }
         newArray.push(message);
       }
+      for (let m in this.room.sendingFiles) {
+
+        let message = this.room.messages[m];
+        let d = new Date(message.time).toDateString();
+        if (!dates[d]) {
+          dates[d] = true;
+          newArray.push({fieldDay: d, time: Date.parse(d)});
+        }
+        newArray.push(message);
+      }
       newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
       return newArray;
     }

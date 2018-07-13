@@ -3,7 +3,7 @@ import Vue from 'vue';
 
 import './assets/sass/common.sass';
 import App from './components/App.vue';
-import {api, browserVersion, channelsHandler, globalLogger, storage, ws, xhr} from './utils/singletons';
+import {api, browserVersion, channelsHandler, globalLogger, storage, webrtcApi, ws, xhr} from './utils/singletons';
 import store from './store';
 import router from './router';
 import loggerFactory from './utils/loggerFactory';
@@ -21,6 +21,7 @@ if (IS_DEBUG) {
   window['api'] = api;
   window['xhr'] = xhr;
   window['storage'] = storage;
+  window['webrtcApi'] = webrtcApi;
 }
 
 window.onerror = function (msg, url, linenumber, column, errorObj) {

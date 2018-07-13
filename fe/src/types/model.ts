@@ -108,8 +108,24 @@ export interface ChangeOnline {
   time: number;
 }
 
+export interface SendingFileTransfer {
+  sent: number;
+  finished: boolean;
+  accepted: boolean;
+  userId: number;
+}
+
+export interface SendingFile {
+  time: number;
+  fileName: string;
+  coonId: string;
+  fileSize: number;
+  transfers: { [id: string]: SendingFileTransfer };
+}
+
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
+  sendingFiles:  { [id: string]: SendingFile };
   messages: { [id: number]: MessageModel };
   allLoaded: boolean;
   search: SearchModel;

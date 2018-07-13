@@ -12,10 +12,4 @@ export default class FileSender extends BaseTransferHandler {
     super(removeReferenceFn, wsHandler, notifier, store);
     this.file = file;
   }
-  sendOffer(quedId, channel, cb) {
-    this.wsHandler.offerFile(channel, browserVersion, this.file.name, this.file.size, e => {
-      this.logger.debug('cb {}', e)();
-    });
-
-  }
 }
