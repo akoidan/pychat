@@ -46,6 +46,7 @@ const router = new VueRouter({
               next();
             },
           },
+          name: 'chat',
           path: '/chat/:id'
         },
         {

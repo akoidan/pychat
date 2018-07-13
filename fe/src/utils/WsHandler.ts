@@ -191,6 +191,14 @@ export default class WsHandler extends MessageHandler {
     }
   }
 
+  public offerFile(roomId, browser, name, size, cb) {
+    this.sendToServer({
+      'action': 'offerFile',
+      'roomId': roomId,
+      'content': {browser, name, size}
+    });
+    this.appendCB(cb);
+  }
 
   public sendToServer(messageRequest, skipGrowl = false) {
     if (!messageRequest.messageId) {

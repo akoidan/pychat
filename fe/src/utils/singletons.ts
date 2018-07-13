@@ -15,6 +15,7 @@ import NotifierHandler from './NotificationHandler';
 import Subscription from './Subscription';
 import Vue from 'vue';
 import Http from './Http';
+import WebRtcApi from '../webrtc/WebRtcApi';
 
 
 export const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(XHR_API_URL, sessionHolder);
@@ -45,9 +46,11 @@ export const globalLogger: Logger = loggerFactory.getLoggerColor('global', '#007
 export const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, sub, store);
 export const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
 export const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier, messageBus);
+export const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, sub);
 
 sub.subscribe('ws', ws);
 sub.subscribe('channels', channelsHandler);
 sub.subscribe('lan', channelsHandler);
 sub.subscribe('lan', api);
+sub.subscribe('webrtc', api);
 

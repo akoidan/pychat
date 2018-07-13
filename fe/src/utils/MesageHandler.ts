@@ -1,7 +1,8 @@
 import {DefaultMessage} from '../types/messages';
 import {Logger} from 'lines-logger';
+import {IMessageHandler} from '../types/types';
 
-export default abstract class MessageHandler {
+export default abstract class MessageHandler implements IMessageHandler {
 
   protected abstract readonly logger: Logger;
 

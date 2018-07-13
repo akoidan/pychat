@@ -12,6 +12,10 @@ const tmpCanvasContext = document.createElement('canvas').getContext('2d');
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
 const smileysTabNames = Object.keys(smileys);
 
+import favicon from '../assets/img/favicon.ico';
+
+export const faviconUrl = getStaticUrl(favicon as string);
+
 const savedFiles = {};
 let codes = {};
 smileysTabNames.forEach(tb => {

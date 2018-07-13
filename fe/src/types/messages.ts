@@ -8,6 +8,10 @@ export interface DefaultMessage {
   cbBySender?: string;
 }
 
+export interface WebRtcDefaultMessage extends DefaultMessage {
+  connId: string;
+}
+
 export interface SetWsIdMessage extends DefaultMessage {
   rooms:  RoomDto[];
   users: UserDto[];

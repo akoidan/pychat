@@ -20,6 +20,10 @@ export interface UploadFile {
    file: File;
 }
 
+export interface IMessageHandler {
+  handle(message: DefaultMessage);
+}
+
 export interface MessageDataEncode {
   messageContent: string;
   files: UploadFile[];

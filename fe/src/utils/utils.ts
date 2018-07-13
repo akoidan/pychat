@@ -7,6 +7,7 @@ import loggerFactory from './loggerFactory';
 import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from './consts';
 import {StorageData} from '../types/types';
 
+
 let logger = loggerFactory.getLoggerColor('utils', '#007a70');
 
 export function logout(errMessage: string) {

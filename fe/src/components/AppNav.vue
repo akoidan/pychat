@@ -9,16 +9,19 @@
     <router-link to="/report-issue" class="icon-pencil" title="Report an issue">
       <span class="mText">Issue</span>
     </router-link>
-    <i class="icon-phone" title="Make a video/mic call"><span class="mText">Call</span></i>
-    <i class="icon-search" v-if="activeRoom" @click='invertSearch' title="Search messages in current room (Shift+Ctrl+F)"><span
-        class="mText">Search</span></i>
-
-    <router-link to="/statistics" class="icon-chart-pie" title="Show user countries statistics">
+    <i class="icon-phone" v-if="$route.name === 'chat'" title="Make a video/mic call"><span class="mText">Call</span></i>
+    <i class="icon-search" v-if="activeRoom && $route.name === 'chat'" @click='invertSearch' title="Search messages in current room (Shift+Ctrl+F)"><span
+        class="mText">Search</span>
+    </i>
+    <router-link to="/statistics" v-if="false" class="icon-chart-pie" title="Show user countries statistics">
       <span class="mText">Statistics</span>
     </router-link>
-    <i class="icon-doc-inv"><span class="mText">Send File</span></i>
-    <i class="icon-popup"><span class="mText">Minimized Windows</span></i>
-    <a href="https://github.com/Deathangel908/pychat" target="_blank" class="icon-github"><span
+    <i class="icon-doc-inv" v-if="$route.name === 'chat'" @click='sendFileClick'>
+      <input type="file" v-show="false" @change="sendFile" ref="inputFile"/>
+      <span class="mText">Send File</span>
+    </i>
+    <i class="icon-popup" v-if="false"><span class="mText">Minimized Windows</span></i>
+    <a :href="githubUrl" target="_blank" v-if="githubUrl" class="icon-github"><span
         class="mText">Github</span></a>
     <template v-if="userInfo">
       <div class="navMenu">
@@ -39,6 +42,8 @@
   import {RoomModel, UserModel} from "../types/model";
   import {logout} from "../utils/utils";
   import {SetSearchTo} from '../types/types';
+  import {GITHUB_URL} from '../utils/consts';
+  import {webrtcApi} from '../utils/singletons';
 
   @Component
   export default class AppNav extends Vue {
@@ -48,6 +53,22 @@
     @Action growlError;
     @Action logout;
     @Mutation setSearchTo;
+
+
+    $refs: {
+      inputFile: HTMLInputElement
+    };
+
+    sendFileClick() {
+      this.$refs.inputFile.value = null;
+      this.$refs.inputFile.click();
+    }
+
+    sendFile(event) {
+      webrtcApi.offerFile(this.$refs.inputFile.files[0], this.activeRoom.id)
+    }
+
+    githubUrl : string = GITHUB_URL;
 
     expanded: boolean = false;
 

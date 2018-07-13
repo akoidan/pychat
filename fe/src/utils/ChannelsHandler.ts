@@ -44,11 +44,7 @@ import {MessageModelDto, RoomDto, UserDto} from '../types/dto';
 import {convertFiles, convertUser} from '../types/converters';
 import WsHandler from './WsHandler';
 import NotifierHandler from './NotificationHandler';
-
-import favicon from '../assets/img/favicon.ico';
-import {getStaticUrl} from './htmlApi';
-
-let faviconUrl = getStaticUrl(favicon as string);
+import {faviconUrl} from './htmlApi';
 
 export default class ChannelsHandler extends MessageHandler {
   protected readonly logger: Logger;
