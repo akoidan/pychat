@@ -3030,9 +3030,9 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-lines-logger@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/lines-logger/-/lines-logger-1.0.2.tgz#918ff9475bc32bd4840020ce9afaf91d0fe55894"
+lines-logger@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/lines-logger/-/lines-logger-1.0.4.tgz#5ad6e03c37c5747eedaf90fded24c1e010880bc7"
 
 load-json-file@^1.0.0:
   version "1.1.0"

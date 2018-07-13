@@ -85,7 +85,7 @@
   "dependencies": {
     "highlightjs": "^9.10.0",
     "is-mobile": "^1.0.0",
-    "lines-logger": "^1.0.2",
+    "lines-logger": "^1.0.4",
     "lodash": "^4.17.10",
     "npm-font-open-sans": "^1.1.0",
     "spainter": "^0.0.7",

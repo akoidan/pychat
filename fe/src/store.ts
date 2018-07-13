@@ -57,7 +57,7 @@ const store: StoreOptions<RootState> = {
   getters: {
     privateRooms(state: RootState, getters): RoomModel[] {
       let roomModels: RoomModel[] = getters.roomsArray.filter(r => !r.name);
-      logger.debug('privateRooms {} ', roomModels)();
+      logger.trace('privateRooms {} ', roomModels)();
       return roomModels;
     },
     myId(state: RootState): number {
@@ -78,17 +78,17 @@ const store: StoreOptions<RootState> = {
     },
     roomsArray(state: RootState): RoomModel[] {
       let anies = Object.values(state.roomsDict);
-      logger.debug('roomsArray {}', anies)();
+      logger.trace('roomsArray {}', anies)();
       return anies;
     },
     publicRooms(state: RootState, getters): RoomModel[] {
       let roomModels: RoomModel[] = getters.roomsArray.filter(r => r.name);
-      logger.debug('publicRooms {} ', roomModels)();
+      logger.trace('publicRooms {} ', roomModels)();
       return roomModels;
     },
     usersArray(state: RootState): UserModel[] {
       let res: UserModel[] = Object.values(state.allUsersDict);
-      logger.debug('usersArray {}', res)();
+      logger.trace('usersArray {}', res)();
       return res;
     },
     maxId(state: RootState): SingleParamCB<number> {
@@ -100,7 +100,7 @@ const store: StoreOptions<RootState> = {
             maxId = messages[m].id;
           }
         }
-        logger.debug('maxId #{}={}', id, maxId)();
+        logger.trace('maxId #{}={}', id, maxId)();
         return maxId;
       };
     },
@@ -114,7 +114,7 @@ const store: StoreOptions<RootState> = {
             minId = id;
           }
         }
-        logger.debug('minId #{}={}', id, minId)();
+        logger.trace('minId #{}={}', id, minId)();
         return minId;
       };
     },
@@ -128,7 +128,7 @@ const store: StoreOptions<RootState> = {
       return !state.editedMessage && !state.activeUserId;
     },
     editingMessageModel(state: RootState): MessageModel {
-      logger.debug('Eval editingMessageModel')();
+      logger.trace('Eval editingMessageModel')();
       if (state.editedMessage) {
         return state.roomsDict[state.editedMessage.roomId].messages[state.editedMessage.messageId];
       } else {

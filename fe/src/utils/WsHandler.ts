@@ -102,7 +102,7 @@ export default class WsHandler extends MessageHandler {
   private setUserSettings(userInfo: UserSettingsDto) {
     let um: UserSettingsDto = userSettingsDtoToModel(userInfo);
     if (!IS_DEBUG) {
-      loggerFactory.setLogWarnings(userInfo.logs ? LogStrict.LOG_WITHOUT_WARNINGS : LogStrict.DISABLE_LOGS);
+      loggerFactory.setLogWarnings(userInfo.logs ? LogStrict.TRACE : LogStrict.DISABLE_LOGS);
     }
     this.store.commit('setUserSettings', um);
   }

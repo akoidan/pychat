@@ -49,10 +49,10 @@ Vue.mixin({
     }
   },
   updated: function() {
-    this.logger && this.logger.debug('Updated')();
+    this.logger && this.logger.trace('Updated')();
   },
   created: function() {
-    this.logger &&  this.logger.debug('Created')();
+    this.logger &&  this.logger.trace('Created')();
   },
 });
 

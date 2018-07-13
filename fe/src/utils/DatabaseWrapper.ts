@@ -34,7 +34,7 @@ export default class DatabaseWrapper implements IStorage {
       };
     }
     t.executeSql(sql, args, cb, e);
-    return this.logger.debug('{} {}', sql, args);
+    return this.logger.trace('{} {}', sql, args);
   }
 
   private async runSql(t: SQLTransaction, sql: string): Promise<SQLTransaction> {
@@ -83,7 +83,7 @@ export default class DatabaseWrapper implements IStorage {
       'select * from message'
     ].map(sql => new Promise((resolve, reject) => {
       this.executeSql(t, sql, [], (t, d) => {
-        this.logger.debug('sql {} fetched {} ', sql, d)();
+        this.logger.trace('sql {} fetched {} ', sql, d)();
         let res = [];
         for (let i = 0; i < d.rows.length; i++) {
           res.push(d.rows[i]);

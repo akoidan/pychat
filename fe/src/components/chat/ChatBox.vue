@@ -63,7 +63,7 @@
         this.$nextTick(function () {
           if (this.$refs.chatbox && this.scrollBottom) {
             this.$refs.chatbox.scrollTop = this.$refs.chatbox.scrollHeight;
-            this.logger.debug("Scrolling to bottom")();
+            this.logger.trace("Scrolling to bottom")();
           }
         });
       })
@@ -74,7 +74,7 @@
     }
 
     get messages() {
-      this.logger.debug("Reevaluating messages in room #{}", this.room.id)();
+      this.logger.trace("Reevaluating messages in room #{}", this.room.id)();
       let newArray: any[] = this.room.changeOnline.map(value => ({isChangeOnline: true, ...value}));
       let dates = {};
       for (let m in this.room.messages) {
