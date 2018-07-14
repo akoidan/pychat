@@ -17,6 +17,7 @@ export default class MediaCapture {
   private onFinish: Function;
   private mediaRecorder: MediaRecorder;
   private timeout: number;
+  private stopped: boolean = false;
 
   constructor(isRecordingVideo: boolean, onFinish: Function) {
     this.isRecordingVideo = isRecordingVideo;
@@ -32,6 +33,12 @@ export default class MediaCapture {
     this.stream = await new Promise<MediaStream>((resolve, reject) => {
       navigator.getUserMedia({video: this.isRecordingVideo, audio: true}, resolve, reject);
     });
+    await new Promise(resolve => {
+      this.timeout = setTimeout(resolve, 500); // wait until videocam opens
+    });
+    if (this.stopped) {
+      return;
+    }
     let options = {mimeType: 'video/webm;codecs=vp9'};
     if (!MediaRecorder.isTypeSupported(options.mimeType)) {
       this.logger.debug('{} is not Supported', options.mimeType)();
@@ -45,9 +52,6 @@ export default class MediaCapture {
         }
       }
     }
-    await new Promise(resolve => {
-      this.timeout = setTimeout(resolve, 500); // wait until videocam opens
-    });
     this.timeout = null;
     this.mediaRecorder = new MediaRecorder(this.stream, options);
     this.mediaRecorder.onstop = this.handleStop.bind(this);
@@ -58,11 +62,14 @@ export default class MediaCapture {
   }
 
   public stopRecording() {
+    this.stopped = true;
     if (this.timeout) {
       clearTimeout(this.timeout);
       this.timeout = null;
-    } else {
+    } else if ( this.mediaRecorder) {
       this.mediaRecorder.stop();
+    } else {
+      this.onFinish(null);
     }
   }
 
