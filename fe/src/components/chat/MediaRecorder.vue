@@ -44,17 +44,25 @@
         this.logger.debug("Finishing recording... {}", data)();
         this.setDim(false);
         if (data) {
-          if (this.isRecordingVideo) {
-            this.$emit('video', data);
-          } else {
-            this.$emit('audio', data);
-          }
+          this.emitData(data);
         }
       });
       this.navigatorRecord.record().then((src: string) => {
         this.logger.debug("Resolved record emitting video")();
         this.$emit("record", {isVideo: this.isRecordingVideo, src: src});
-      }).catch(error => this.logger.error("Error during capturing media {}", error))
+      }).catch(error => {
+        this.setDim(false);
+        this.emitData(null);
+        this.logger.error("Error during capturing media {}", error);
+      })
+    }
+
+    private emitData(data) {
+      if (this.isRecordingVideo) {
+        this.$emit("video", data);
+      } else {
+        this.$emit("audio", data);
+      }
     }
 
     releaseRecord() {

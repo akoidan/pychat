@@ -2,6 +2,7 @@ import {globalLogger} from './singletons';
 import loggerFactory from './loggerFactory';
 import {Logger} from 'lines-logger';
 import {stopVideo} from './htmlApi';
+import store from '../store';
 
 declare class MediaRecorder {
   constructor(stream: MediaStream, options: {});
@@ -29,10 +30,14 @@ export default class MediaCapture {
   private stream: MediaStream;
 
   public async record(): Promise<string> {
-
     this.stream = await new Promise<MediaStream>((resolve, reject) => {
-      navigator.getUserMedia({video: this.isRecordingVideo, audio: true}, resolve, reject);
+      navigator.getUserMedia({video: this.isRecordingVideo, audio: true}, resolve, (e) => {
+        store.dispatch('growlError', `Please allow to use audio ${this.isRecordingVideo ? 'and video ' : ''} to make a record`);
+        this.logger.warn('User blocked permissions {}', e)();
+        reject(e);
+      });
     });
+    this.logger.debug('Permissions are granted')();
     await new Promise(resolve => {
       this.timeout = setTimeout(resolve, 500); // wait until videocam opens
     });

@@ -33,8 +33,7 @@ export default class WebRtcApi extends MessageHandler {
 
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> }  = {
     offerFile(message: OfferFile) {
-      let handler = new FileReceiver(this.removeChildReference, this.wsHandler, this.notifier, this.store);
-      this.connections[message.connId] = handler;
+      this.connections[message.connId] = new FileReceiver(this.removeChildReference, this.wsHandler, this.notifier, this.store);
       let payload: SetReceivingFile = {
         receivingFile: {
           uploaded: 0,
@@ -51,6 +50,11 @@ export default class WebRtcApi extends MessageHandler {
       this.store.commit('addReceivingFile', payload);
     }
   };
+
+
+  acceptFile(connId: string) {
+    this.connections[connId]; // TODO
+  }
 
   offerFile(file, channel) {
     let fileSender = new FileSender(this.removeChildReference, this.wsHandler, this.notifier, this.store, file);

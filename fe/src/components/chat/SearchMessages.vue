@@ -7,7 +7,7 @@
 </template>
 <script lang="ts">
   import {State, Action, Mutation} from "vuex-class";
-  import {debounce} from 'lodash';
+  import debounce from 'lodash.debounce';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {RoomModel, SearchModel} from "../../types/model";
   import {MessageModelDto} from "../../types/dto";

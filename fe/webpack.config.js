@@ -9,6 +9,9 @@ const name = '[name].[ext]?[sha512:hash:base64:6]';
 module.exports = (env, argv) => {
   let plugins;
   let sasscPlugins;
+  if (!argv.mode) {
+    throw `Pass --mode production/development, current ${argv.mode} is invalid`
+  }
   let options = require(`./${argv.mode}.json`);
   let webpackOptions = {
     hash: true,
@@ -57,8 +60,6 @@ module.exports = (env, argv) => {
         }
       }
     ];
-  } else {
-    throw `Pass --mode production/development, current ${argv.mode} is invalid`
   }
 
   const conf =  {

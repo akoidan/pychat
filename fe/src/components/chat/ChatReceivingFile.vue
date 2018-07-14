@@ -16,7 +16,7 @@
       </tr>
       <tr>
         <td colspan="2">
-          <app-progress-bar @retry="retry" :upload="receivingFile"/>
+          <app-progress-bar @retry="retry"  class="progress-wrap-file" :upload="receivingFile"/>
         </td>
       </tr>
       </tbody>
@@ -72,8 +72,11 @@
       max-width: 250px
       overflow: hidden
 
+  .progress-wrap-file /deep/ .progress-wrap
+    width: 100%
   .yesNo
     padding-top: 15px
+    padding-bottom: 5px
     display: flex
     justify-content: space-around
     input[type=button]
