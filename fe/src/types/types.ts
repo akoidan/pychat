@@ -1,4 +1,5 @@
 import {
+  ReceivingFileStatus,
   ChangeOnline,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
@@ -90,9 +91,11 @@ export interface SetSendingFile {
   sendingFile: SendingFile;
 }
 
-export interface SetReceivingFile {
+export interface SetReceivingFileStatus {
   roomId: number;
-  receivingFile: ReceivingFile;
+  connId: string;
+  status: ReceivingFileStatus;
+  error?: string;
 }
 
 export interface StorageData {

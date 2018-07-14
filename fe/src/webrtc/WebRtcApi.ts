@@ -1,9 +1,9 @@
 import loggerFactory from '../utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import {IMessageHandler, SetReceivingFile, SetSendingFile} from '../types/types';
-import {DefaultMessage, OfferFile, WebRtcDefaultMessage, WebRtcSetConnectionIdMessage} from '../types/messages';
+import {SetReceivingFileStatus, SetSendingFile} from '../types/types';
+import {DefaultMessage, OfferFile, WebRtcSetConnectionIdMessage} from '../types/messages';
 import WsHandler from '../utils/WsHandler';
-import {RootState} from '../types/model';
+import {ReceivingFile, ReceivingFileStatus, RootState} from '../types/model';
 import {Store} from 'vuex';
 import Subscription from '../utils/Subscription';
 import FileSender from './FileSender';
@@ -34,26 +34,33 @@ export default class WebRtcApi extends MessageHandler {
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> }  = {
     offerFile(message: OfferFile) {
       this.connections[message.connId] = new FileReceiver(this.removeChildReference, this.wsHandler, this.notifier, this.store);
-      let payload: SetReceivingFile = {
-        receivingFile: {
-          uploaded: 0,
-          finished: false,
-          userId: message.userId,
-          total: message.content.size,
-          error: null,
-          connId: message.connId,
-          fileName: message.content.name,
-          time: message.time
-        },
-        roomId: message.roomId
+      let payload: ReceivingFile = {
+        roomId: message.roomId,
+        uploaded: 0,
+        status: ReceivingFileStatus.NOT_DECIDED_YET,
+        userId: message.userId,
+        total: message.content.size,
+        error: null,
+        connId: message.connId,
+        fileName: message.content.name,
+        time: message.time
       };
       this.store.commit('addReceivingFile', payload);
     }
   };
 
 
-  acceptFile(connId: string) {
+  acceptFile(connId: string, roomId: number) {
     this.connections[connId]; // TODO
+  }
+
+  declineFile(connId: string, roomId: number) {
+    this.wsHandler.declineFile(connId);
+    this.removeChildReference(connId);
+    let rf: SetReceivingFileStatus = {
+      roomId, connId, status: ReceivingFileStatus.DECLINED
+    };
+    this.store.commit('setReceivingFileDecline', rf);
   }
 
   offerFile(file, channel) {
@@ -77,7 +84,7 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   removeChildReference(id) {
-    this.logger.log('Removing transferHandler with id {}', id)();
+    this.logger.log('Removing transferHandler with id {}, current connects are {}', id, this.connections)();
     delete this.connections[id];
   }
 

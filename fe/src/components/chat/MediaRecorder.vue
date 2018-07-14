@@ -10,6 +10,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {stopVideo} from '../../utils/htmlApi';
   import MediaCapture from '../../utils/MediaCapture';
+  import {isChrome, isMobile} from "../../utils/singletons";
 
   const HOLD_TIMEOUT = 500;
 
@@ -19,6 +20,7 @@
   export default class MediaRecorderDiv extends Vue {
 
     @Mutation setDim;
+    @Action growlError;
     isRecordingVideo = true;
     @State dim: boolean;
 
@@ -53,6 +55,15 @@
       }).catch(error => {
         this.setDim(false);
         this.emitData(null);
+        if (String(error).indexOf("Permission denied") >= 0) {
+          if (isChrome && !isMobile) {
+            this.growlError(`Please allow access for ${document.location.origin} in chrome://settings/content/microphone`);
+          } else {
+            this.growlError(`You blocked the access to microphone/video. Please Allow it to continue`);
+          }
+        } else {
+          this.growlError("Unable to capture input device because " + error);
+        }
         this.logger.error("Error during capturing media {}", error);
       })
     }

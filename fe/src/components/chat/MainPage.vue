@@ -151,9 +151,11 @@
       this.srcVideo = null;
       this.recordingNow = false;
       this.$refs.video.pause();
-      pasteBlobVideoToTextArea(file, this.$refs.userMessage, 'm', e => {
-        this.growlError(e);
-      })
+      if (file) {
+        pasteBlobVideoToTextArea(file, this.$refs.userMessage, 'm', e => {
+          this.growlError(e);
+        })
+      }
     }
 
     handleRecord({src, isVideo}) {
@@ -165,7 +167,9 @@
 
     handleAddAudio(file: Blob) {
       this.recordingNow = false;
-      pasteBlobAudioToTextArea(file, this.$refs.userMessage);
+      if (file) {
+        pasteBlobAudioToTextArea(file, this.$refs.userMessage);
+      }
     }
 
     dropPhoto(evt) {

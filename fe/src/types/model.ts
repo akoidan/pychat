@@ -114,10 +114,15 @@ export interface SendingFileTransfer extends UploadProgressModel {
   userId: number;
 }
 
+export enum ReceivingFileStatus {
+  NOT_DECIDED_YET, DECLINED, FINISHED, ERROR, IN_PROGRESS
+}
+
 export interface ReceivingFile extends UploadProgressModel {
   time: number;
-  finished: boolean;
+  status: ReceivingFileStatus;
   fileName: string;
+  roomId: number;
   connId: string;
   userId: number;
 }

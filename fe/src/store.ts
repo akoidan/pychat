@@ -3,13 +3,13 @@ import Vuex, {StoreOptions} from 'vuex';
 import {ActionContext} from 'vuex/types';
 import loggerFactory from './utils/loggerFactory';
 import {
-  ChangeOnline,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   EditingMessage,
   GrowlModel,
   GrowlType,
   MessageModel,
+  ReceivingFile,
   RoomDictModel,
   RoomModel,
   RoomSettingsModel,
@@ -19,13 +19,15 @@ import {
 } from './types/model';
 import {
   ChangeOnlineEntry,
-  MessagesLocation, PrivateRoomsIds,
+  MessagesLocation,
+  PrivateRoomsIds,
   RemoveMessageProgress,
   RemoveSendingMessage,
   SetMessageProgress,
-  SetMessageProgressError, SetReceivingFile,
+  SetMessageProgressError, SetReceivingFileStatus,
   SetRoomsUsers,
-  SetSearchTo, SetSendingFile,
+  SetSearchTo,
+  SetSendingFile,
   SetUploadProgress
 } from './types/types';
 import {storage} from './utils/singletons';
@@ -148,8 +150,15 @@ const store: StoreOptions<RootState> = {
     addSendingFile(state: RootState, payload: SetSendingFile) {
       Vue.set(state.roomsDict[payload.roomId].sendingFiles, payload.sendingFile.connId, payload.sendingFile);
     },
-    addReceivingFile(state: RootState, payload: SetReceivingFile) {
-      Vue.set(state.roomsDict[payload.roomId].receivingFiles, payload.receivingFile.connId, payload.receivingFile);
+    addReceivingFile(state: RootState, payload: ReceivingFile) {
+      Vue.set(state.roomsDict[payload.roomId].receivingFiles, payload.connId, payload);
+    },
+    setReceivingFileDecline(state: RootState, payload: SetReceivingFileStatus) {
+      let receivingFile = state.roomsDict[payload.roomId].receivingFiles[payload.connId];
+      receivingFile.status = payload.status;
+      if (payload.error) {
+        receivingFile.error = payload.error;
+      }
     },
     incNewMessagesCount(state: RootState, roomId: number) {
       state.roomsDict[roomId].newMessagesCount++;
