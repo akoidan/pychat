@@ -2,6 +2,8 @@
 
 [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/pychat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/pychat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/pychat/master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)
 
+# COMING SOON [VuePychat](https://github.com/Deathangel908/pychat/tree/cordova) with electron(windows/linux/macos)/cordova(android/ios) clients.
+
 This is free web (browser) chat, that features:
  - Send instant text messages via websockets.
  - Send: images, smiles, anchors, embedded youtube, [giphy](https://giphy.com/), code [highlight](https://highlightjs.org/)
@@ -40,9 +42,9 @@ Pychat is written in **Python** with [django](https://www.djangoproject.com/). F
 
 # When should I use pychat:
 By this time there're a lot of chats: skype, telegram, discord, slack, viber... What is the purpose of one more? Well, here's why:
- - You need a private chat for your componany. Maybe you want to share it over private network, so only some category of user can access it.
+ - You need a private chat for your company. Maybe you want to share it over private network, so only some people can access it.
  - You don't want your entire chat to be managable by 3rd party SaaS. 3rd party services can compromise your data or just dissapear at one day. You may also google for history leaks. Only with pychat you gain full controll over your chat.
- - You don't want to spend a penny on chat. While most of service come free in community edition, they  still are making money from you somehow. And when you've been using them a while, once you will discover that the feature that you need is paid. Forget about it all! Every single feature is free in pychat!
+ - You don't want to spend a penny on chat. While most of service come free in standard edition, they are still making money from you somehow. And when you've been using them a while, once you will discover that the feature that you need is paid. Forget about it all! Every single feature is free in pychat!
  - You need a custom feature in your chat that no other solutions provide. Codding chat from the scratch is really long-way-ticket (oh believe me). Just fork pychat and code anything you want there.
  - You just want the running chat and you don't have time on this nonsence. Follow the [Build docker](#build-docker) section. It's takes only a few minutes to setup an instance.
 
