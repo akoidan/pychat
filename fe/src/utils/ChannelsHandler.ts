@@ -45,6 +45,7 @@ import {convertFiles, convertUser, getRoomsBaseDict} from '../types/converters';
 import WsHandler from './WsHandler';
 import NotifierHandler from './NotificationHandler';
 import {faviconUrl} from './htmlApi';
+import {sub} from './sub';
 
 export default class ChannelsHandler extends MessageHandler {
   protected readonly logger: Logger;
@@ -59,6 +60,8 @@ export default class ChannelsHandler extends MessageHandler {
     super();
     this.store = store;
     this.api = api;
+    sub.subscribe('channels', this);
+    sub.subscribe('lan', this);
     this.logger = loggerFactory.getLoggerColor('chat', '#940500');
     this.ws = ws;
     this.messageBus = messageBus;

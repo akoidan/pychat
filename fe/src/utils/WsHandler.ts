@@ -1,28 +1,24 @@
-import {
-  CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT,
-  CONNECTION_RETRY_TIME,
-  IS_DEBUG,
-  PING_CLOSE_JS_DELAY
-} from './consts';
+import {CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT, CONNECTION_RETRY_TIME, IS_DEBUG, PING_CLOSE_JS_DELAY} from './consts';
 import {Store} from 'vuex';
-import {LogStrict} from 'lines-logger';
-import ChannelsHandler from './ChannelsHandler';
+import {Logger, LogStrict} from 'lines-logger';
 import loggerFactory from './loggerFactory';
 import MessageHandler from './MesageHandler';
 import {logout} from './utils';
 import {CurrentUserInfoModel, CurrentUserSettingsModel, RootState, UserModel} from '../types/model';
-import {IStorage, PubSetRooms, SessionHolder} from '../types/types';
+import {PubSetRooms, SessionHolder} from '../types/types';
 import {
   DefaultMessage,
-  GrowlMessage, PingMessage, SetProfileImageMessage,
+  GrowlMessage,
+  PingMessage,
+  SetProfileImageMessage,
   SetSettingsMessage,
   SetUserProfileMessage,
-  SetWsIdMessage, UserProfileChangedMessage
+  SetWsIdMessage,
+  UserProfileChangedMessage
 } from '../types/messages';
-import {Logger} from 'lines-logger';
 import {convertUser, currentUserInfoDtoToModel, userSettingsDtoToModel} from '../types/converters';
 import {UserProfileDto, UserSettingsDto} from '../types/dto';
-import Subscription from './Subscription';
+import {sub} from './sub';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
@@ -42,7 +38,6 @@ export default class WsHandler extends MessageHandler {
   private sessionHolder: SessionHolder;
   private listenWsTimeout: number;
   private API_URL: string;
-  private sub: Subscription;
   private callBacks: { [id: number]: Function } = {};
   protected readonly handlers: { [id: string]: SingleParamCB<DefaultMessage> } = {
     growl(gm: GrowlMessage) {
@@ -72,12 +67,12 @@ export default class WsHandler extends MessageHandler {
         online: message.online,
         users: message.users
       };
-      this.sub.notify(pubSetRooms);
+      sub.notify(pubSetRooms);
       let inetAppear: DefaultMessage = {
         action: 'internetAppear',
         handler: 'lan'
       };
-      this.sub.notify(inetAppear);
+      sub.notify(inetAppear);
       this.logger.debug('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
     },
     userProfileChanged(message: UserProfileChangedMessage) {
@@ -119,10 +114,10 @@ export default class WsHandler extends MessageHandler {
     }
   }
 
-  constructor(API_URL: string, sessionHolder: SessionHolder, sub: Subscription, store: Store<RootState>) {
+  constructor(API_URL: string, sessionHolder: SessionHolder, store: Store<RootState>) {
     super();
+    sub.subscribe( 'ws', this);
     this.API_URL = API_URL;
-    this.sub = sub;
     this.logger = loggerFactory.getLoggerColor('ws', '#2e631e');
     this.loggerIn = loggerFactory.getLoggerColor('ws:in', '#2e631e');
     this.loggerOut = loggerFactory.getLoggerColor('ws:out', '#2e631e');
@@ -183,7 +178,7 @@ export default class WsHandler extends MessageHandler {
   }
 
   private handleMessage(data: DefaultMessage) {
-    this.sub.notify(data);
+    sub.notify(data);
     if (this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.wsConnectionId)) {
       this.logger.debug('resolving cb')();
       this.callBacks[data.messageId](data);
@@ -193,12 +188,31 @@ export default class WsHandler extends MessageHandler {
 
   public offerFile(roomId, browser, name, size, cb) {
     this.sendToServer({
-      'action': 'offerFile',
-      'roomId': roomId,
-      'content': {browser, name, size}
+      action: 'offerFile',
+      roomId: roomId,
+      content: {browser, name, size}
     });
     this.appendCB(cb);
   }
+
+  public acceptFile(connId) {
+    this.sendToServer({
+      action: 'acceptFile',
+      connId,
+      content: {
+        received: 0
+      }
+    });
+  }
+
+  public replyFile(connId, browser) {
+    this.sendToServer({
+      action: 'replyFile',
+      connId,
+      content: {browser}
+    });
+  }
+
 
   public declineFile(connId) {
     this.sendToServer({

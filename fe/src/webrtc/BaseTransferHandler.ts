@@ -4,8 +4,10 @@ import WsHandler from '../utils/WsHandler';
 import NotifierHandler from '../utils/NotificationHandler';
 import {RootState} from '../types/model';
 import {Store} from 'vuex';
+import MessageHandler from '../utils/MesageHandler';
+import {sub} from '../utils/sub';
 
-export default abstract class BaseTransferHandler {
+export default abstract class BaseTransferHandler extends MessageHandler {
 
   protected connectionId: string;
   protected wsHandler: WsHandler;
@@ -15,7 +17,9 @@ export default abstract class BaseTransferHandler {
   protected peerConnections: {} = {};
   protected store: Store<RootState>;
 
-  constructor(removeReferenceFn: Function, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>) {
+  constructor(connId: string, removeReferenceFn: Function, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>) {
+    super();
+    sub.subscribe('webrtcTransfer:' + connId, this)
     this.removeReferenceFn = removeReferenceFn;
     this.notifier = notifier;
     this.wsHandler = wsHandler;
@@ -29,19 +33,8 @@ export default abstract class BaseTransferHandler {
 
   removeChildPeerReference (id) {
     this.logger.log('Removing peer connection {}', id)();
+    sub.unsubscribe('peerConnection:' + id);
     delete this.peerConnections[id];
-  }
-
-  handle(data) {
-    if (data.handler === 'webrtcTransfer') {
-      self['on' + data.action](data);
-    } else if (this.peerConnections[data.opponentWsId]) {
-      this.peerConnections[data.opponentWsId]['on' + data.action](data);
-    } else { // this is only supposed to be for destroyPeerConnection
-      // when this.pc.iceConnectionState === 'disconnected' fired before destroyCallConnection action came
-      this.logger.error('Can\'t execute {} on {}, because such PC doesn\'t exist. Existing PC:{}',
-          data.action, data.opponentWsId, Object.keys(this.peerConnections))();
-    }
   }
 
   setConnectionId(id) {

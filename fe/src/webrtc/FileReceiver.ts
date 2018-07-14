@@ -4,8 +4,10 @@
 // import {checkAndPlay, file} from '../utils/audio';
 //
 import FileTransferHandler from './FileTransferHandler';
+import {DefaultMessage} from '../types/messages';
 
 export default  class FileReceiver extends FileTransferHandler {
+  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> };
 
 }
 //   private fileSize: number;

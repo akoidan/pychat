@@ -9,7 +9,7 @@ import {
   RoomSettingsModel,
   SearchModel, SendingFile,
   UploadProgressModel,
-  UserModel
+  UserModel, SendingFileTransfer
 } from './model';
 import {RoomDto, SetRooms, UserDto} from './dto';
 import {DefaultMessage} from './messages';
@@ -86,9 +86,11 @@ export interface PostData<T> {
   process?: Function;
 }
 
-export interface SetSendingFile {
+export interface AddSendingFileTransfer {
   roomId: number;
-  sendingFile: SendingFile;
+  connId: string;
+  transferId: string;
+  transfer: SendingFileTransfer;
 }
 
 export interface SetReceivingFileStatus {

@@ -15,16 +15,10 @@ export default class Subscription {
     }
   }
 
-  public unsubscribe(channel: string, messageHandler: IMessageHandler) {
+  public unsubscribe(channel: string) {
     let c = this.channels[channel];
     if (c) {
-      let i = c.indexOf(messageHandler);
-      if (i >= 0 ) {
-        c.splice(i, 1);
-      }
-      if (c.length === 0) {
-        delete this.channels[channel];
-      }
+      delete this.channels[channel];
     }
   }
 

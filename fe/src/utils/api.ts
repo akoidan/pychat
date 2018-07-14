@@ -7,6 +7,7 @@ import MessageHandler from './MesageHandler';
 import loggerFactory from './loggerFactory';
 import {Logger} from 'lines-logger';
 import Http from './Http';
+import {sub} from './sub';
 
 export default class Api extends MessageHandler {
   private readonly  xhr: Http;
@@ -24,6 +25,7 @@ export default class Api extends MessageHandler {
 
   constructor(xhr: Http) {
     super();
+    sub.subscribe('lan', this);
     this.logger = loggerFactory.getLoggerColor('api', 'red');
     this.xhr = xhr;
   }

@@ -5757,6 +5757,10 @@ vuex-class@^0.3.1:
   version "0.3.1"
   resolved "https://registry.yarnpkg.com/vuex-class/-/vuex-class-0.3.1.tgz#3c0b946bcff4cf2be1904de5b0cab1a3dd5c41d5"
 
+vuex-module-decorators@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/vuex-module-decorators/-/vuex-module-decorators-0.3.0.tgz#e2b89d0277bb32e6c772de063a2f18cf4bee520f"
+
 vuex-typescript@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/vuex-typescript/-/vuex-typescript-3.0.2.tgz#d0b23acf7c046bce36ddfef756a7110d4551f9a9"

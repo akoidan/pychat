@@ -5,17 +5,19 @@ import WsHandler from '../utils/WsHandler';
 import {extractError} from '../utils/utils';
 import {RootState} from '../types/model';
 import {Store} from 'vuex';
+import {sub} from '../utils/sub';
+import MessageHandler from '../utils/MesageHandler';
 
-export default abstract class AbstractPeerConnection {
+export default abstract class AbstractPeerConnection extends MessageHandler {
   private offerCreator: boolean;
   private sendRtcDataQueue = [];
-  private opponentWsId;
+  private opponentWsId: string;
   private connectionId;
-  private logger: Logger;
+  protected logger: Logger;
   private removeChildPeerReferenceFn: Function;
-  private pc = null;
+  protected pc = null;
   private connectionStatus = 'new';
-  private removeChildPeerReference;
+  protected removeChildPeerReference;
   private webRtcUrl = WEBRTC_STUNT_URL;
   private pc_config = {
     iceServers: [{
@@ -34,7 +36,9 @@ export default abstract class AbstractPeerConnection {
   private store: Store<RootState>;
 
   constructor(connectionId: string, opponentWsId: string, removeChildPeerReferenceFn: Function, ws: WsHandler, store: Store<RootState>) {
+    super();
     this.connectionId = connectionId;
+    sub.subscribe('peerConnection:' + connectionId, this);
     this.opponentWsId = opponentWsId;
     this.wsHandler = ws;
     this.store = store;
@@ -95,7 +99,7 @@ export default abstract class AbstractPeerConnection {
 
   abstract oniceconnectionstatechange(): void;
 
-  closePeerConnection(text) {
+  protected closePeerConnection(text?) {
     this.setConnectionStatus('closed');
     if (this.pc && this.pc.signalingState !== 'closed') {
       this.logger.log('Closing peer connection')();

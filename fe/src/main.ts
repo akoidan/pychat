@@ -10,6 +10,7 @@ import loggerFactory from './utils/loggerFactory';
 import {IS_DEBUG} from './utils/consts';
 import {initStore} from './utils/utils';
 import './sw';
+import {sub} from './utils/sub';
 
 store.watch(s => s.userSettings && s.userSettings.theme || 'color-reg', (v, o) => {
   document.body.parentElement.className = v;
@@ -22,6 +23,7 @@ if (IS_DEBUG) {
   window['xhr'] = xhr;
   window['storage'] = storage;
   window['webrtcApi'] = webrtcApi;
+  window['sub'] = sub;
 }
 
 window.onerror = function (msg, url, linenumber, column, errorObj) {

@@ -718,8 +718,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		if not sender_status:
 			raise Exception("Access denied")
 		if sender_status != WebRtcRedisStates.CLOSED:
-			in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
-			in_message[VarNames.HANDLER_NAME] = HandlerNames.PEER_CONNECTION
+			in_message[VarNames.HANDLER_NAME] = HandlerNames.PEER_CONNECTION + ":" + self.id
 			self.publish(in_message, sender_id)
 
 	def close_file_sender(self, connection_id):

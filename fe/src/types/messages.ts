@@ -27,9 +27,12 @@ export interface SetWsIdMessage extends DefaultMessage {
 }
 
 
-export interface OfferFileContent {
+export interface OfferFileContent extends BrowserBase {
   size: number;
   name: string;
+}
+
+export interface BrowserBase {
   browser: string;
 }
 
@@ -46,6 +49,12 @@ export interface SetSettingsMessage extends DefaultMessage {
 }
 export interface SetUserProfileMessage extends DefaultMessage {
   content: UserProfileDto;
+}
+
+export interface ReplyFileMessage extends WebRtcDefaultMessage {
+  content: BrowserBase;
+  opponentWsId: string;
+  userId: number;
 }
 
 export interface UserProfileChangedMessage extends DefaultMessage, UserDto {

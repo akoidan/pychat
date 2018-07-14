@@ -13,11 +13,12 @@ import {
   RoomDictModel,
   RoomModel,
   RoomSettingsModel,
-  RootState,
+  RootState, SendingFile,
   UserDictModel,
   UserModel
 } from './types/model';
 import {
+  AddSendingFileTransfer,
   ChangeOnlineEntry,
   MessagesLocation,
   PrivateRoomsIds,
@@ -27,7 +28,6 @@ import {
   SetMessageProgressError, SetReceivingFileStatus,
   SetRoomsUsers,
   SetSearchTo,
-  SetSendingFile,
   SetUploadProgress
 } from './types/types';
 import {storage} from './utils/singletons';
@@ -147,11 +147,14 @@ const store: StoreOptions<RootState> = {
     setDim(state: RootState, payload: boolean) {
       state.dim = payload;
     },
-    addSendingFile(state: RootState, payload: SetSendingFile) {
-      Vue.set(state.roomsDict[payload.roomId].sendingFiles, payload.sendingFile.connId, payload.sendingFile);
+    addSendingFile(state: RootState, payload: SendingFile) {
+      Vue.set(state.roomsDict[payload.roomId].sendingFiles, payload.connId, payload);
     },
     addReceivingFile(state: RootState, payload: ReceivingFile) {
       Vue.set(state.roomsDict[payload.roomId].receivingFiles, payload.connId, payload);
+    },
+    addSendingFileTransfer(state: RootState, payload: AddSendingFileTransfer) {
+      Vue.set(state.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers, payload.transferId, payload.transfer);
     },
     setReceivingFileDecline(state: RootState, payload: SetReceivingFileStatus) {
       let receivingFile = state.roomsDict[payload.roomId].receivingFiles[payload.connId];

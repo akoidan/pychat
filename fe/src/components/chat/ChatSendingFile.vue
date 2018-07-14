@@ -1,29 +1,20 @@
 <template>
-  <div>
+  <div class="message-self">
+    <chat-message-header
+        :time="sendingFile.time"
+        :user-id="myId"/>
     <table class="table">
       <tbody>
-      <tr>
-        <th>Name:</th>
-        <td>{{sendingFile.fileName}}</td>
-      </tr>
-      <tr>
-        <th>Size:</th>
-        <td>{{size}}</td>
-      </tr>
-      <template  v-for="(transfer, id) in sendingFile.transfers">
-        <tr :key="'h'+id">
-          <th>To {{getUser(transfer.userId)}}</th>
-          <td v-if="!transfer.accepted">Waiting to accept..</td>
-          <td v-else-if="!transfer.finished">Transferring...</td>
-          <td v-else>Transferred</td>
+        <tr>
+          <th>Name:</th>
+          <td>{{sendingFile.fileName}}</td>
         </tr>
-        <tr :key="'v'+id">
-          <td colspan="2">
-            <app-progress-bar v-if="!transfer.finished" @retry="retry" :upload="transfer"/>
-          </td>
+        <tr>
+          <th>Size:</th>
+          <td>{{size}}</td>
         </tr>
-      </template>
       </tbody>
+      <chat-sending-file-transfer v-for="(transfer, key) in sendingFile.transfers" :key="key" :transfer="transfer"/>
     </table>
   </div>
 </template>
@@ -33,19 +24,18 @@
   import {SendingFile, UserModel} from "../../types/model";
   import {bytesToSize} from '../../utils/utils';
   import AppProgressBar from '../ui/AppProgressBar';
+  import ChatSendingFileTransfer from './ChatSendingFileTransfer';
+  import ChatMessageHeader from './ChatMessageHeader';
   @Component({
-    components: {AppProgressBar}
+    components: {ChatMessageHeader, ChatSendingFileTransfer, AppProgressBar}
   })
   export default class ChatSendingFile extends Vue {
     @Prop() sendingFile: SendingFile;
-    @State allUsersDict: {[id: number]: UserModel};
+    @Getter myId: number;
+
 
     get size() {
       return bytesToSize(this.sendingFile.fileSize)
-    }
-
-    getUser(userId: number) {
-      this.allUsersDict[userId].user;
     }
 
     retry() {
@@ -56,7 +46,7 @@
 </script>
 
 <style lang="sass" scoped>
-  table
+  table /deep/
     width: 100%
     th
       color: #79aeb6

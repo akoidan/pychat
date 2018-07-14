@@ -109,8 +109,7 @@ export interface ChangeOnline {
 }
 
 export interface SendingFileTransfer extends UploadProgressModel {
-  finished: boolean;
-  accepted: boolean;
+  status: ReceivingFileStatus;
   userId: number;
 }
 
@@ -130,6 +129,7 @@ export interface ReceivingFile extends UploadProgressModel {
 export interface SendingFile {
   time: number;
   fileName: string;
+  roomId: number;
   connId: string;
   fileSize: number;
   transfers: { [id: string]: SendingFileTransfer };
