@@ -14,10 +14,9 @@ This is free web (browser) chat, that features:
  - Responsive interface (bs like)+ themes
  - Admin interface with django-admin
 
-Live demo: [pychat.org](http://pychat.org/)
-8000
 # Table of contents
   * [Breaf description](#brief-description)
+  * [When should I use pychat](#when-should-i-use-pychat)
   * [How to run on my own server](#how-to-run-on-my-own-server)
     * [Run test docker image](#run-test-docker-image)
     * [Build docker](#build-docker)
@@ -38,6 +37,14 @@ Live demo: [pychat.org](http://pychat.org/)
 
 # Brief description
 Pychat is written in **Python** with [django](https://www.djangoproject.com/). For handling realtime messages [WebSockets](https://en.wikipedia.org/wiki/WebSocket) are used: browser support on client part and asynchronous framework [Tornado](http://www.tornadoweb.org/) on server part. Messages are being broadcast by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using [tornado-redis](https://github.com/leporo/tornado-redis) backend. Redis is also used as django session backend and for storing current users online.  For video call [WebRTC](https://webrtc.org/) technology was used with stun server to make a connection, which means you will always get the lowest ping and the best possible connection channel. Client part doesn't use any javascript frameworks (like jquery or angular) in order to get best performance. Pychat written as a singlePage application, so even if user navigates across different pages websocket connection doesn't break. Pychat also supports OAuth2 login standard via FaceBook/Google. Css is compiled from [sass](http://sass-lang.com/guide). Server side can be run on any platform **Windows**, **Linux**, **Mac** with **Python 2.7** and **Python 3.x**.Client (users) can use the Pychat from any browser with websocket support: IE11, Edge, Chrome, Firefox, Android, Opera, Safari...
+
+# When should I use pychat:
+By this time there're a lot of chats: skype, telegram, discord, slack, viber... What is the purpose of one more? Well, here's why:
+ - You need a private chat for your componany. Maybe you want to share it over private network, so only some category of user can access it.
+ - You don't want your entire chat to be managable by 3rd party SaaS. 3rd party services can compromise your data or just dissapear at one day. You may also google for history leaks. Only with pychat you gain full controll over your chat.
+ - You don't want to spend a penny on chat. While most of service come free in community edition, they  still are making money from you somehow. And when you've been using them a while, once you will discover that the feature that you need is paid. Forget about it all! Every single feature is free in pychat!
+ - You need a custom feature in your chat that no other solutions provide. Codding chat from the scratch is really long-way-ticket (oh believe me). Just fork pychat and code anything you want there.
+ - You just want the running chat and you don't have time on this nonsence. Follow the [Build docker](#build-docker) section. It's takes only a few minutes to setup an instance.
 
 # How to run on my own server:
 You can always use [pychat.org](https://pychat.org), but if you want run Pychat yourself you have 3 options:
