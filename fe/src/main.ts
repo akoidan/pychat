@@ -24,6 +24,7 @@ if (IS_DEBUG) {
   window['storage'] = storage;
   window['webrtcApi'] = webrtcApi;
   window['sub'] = sub;
+  window['store'] = store;
 }
 
 window.onerror = function (msg, url, linenumber, column, errorObj) {

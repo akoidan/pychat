@@ -109,17 +109,17 @@ export interface ChangeOnline {
 }
 
 export interface SendingFileTransfer extends UploadProgressModel {
-  status: ReceivingFileStatus;
+  status: FileTransferStatus;
   userId: number;
 }
 
-export enum ReceivingFileStatus {
+export enum FileTransferStatus {
   NOT_DECIDED_YET, DECLINED, FINISHED, ERROR, IN_PROGRESS
 }
 
 export interface ReceivingFile extends UploadProgressModel {
   time: number;
-  status: ReceivingFileStatus;
+  status: FileTransferStatus;
   fileName: string;
   roomId: number;
   connId: string;

@@ -91,7 +91,7 @@ class UserSettingsVarNames(object):
 	INCOMING_FILE_CALL_SOUND = 'incomingFileCallSound'
 	ONLINE_CHANGE_SOUND = 'onlineChangeSound'
 	LOGS = 'logs'
-	SEND_LOGS = 'send_logs'
+	SEND_LOGS = 'sendLogs'
 	THEME = 'theme'
 
 class UserProfileVarNames(object):
@@ -108,8 +108,8 @@ class UserProfileVarNames(object):
 class HandlerNames:
 	CHANNELS = 'channels'
 	WEBRTC = 'webrtc'
-	PEER_CONNECTION = 'peerConnection'
-	WEBRTC_TRANSFER = 'webrtcTransfer'
+	PEER_CONNECTION = 'peerConnection:{}:{}'
+	WEBRTC_TRANSFER = 'webrtcTransfer:{}'
 	WS = 'ws'
 	NULL = 'void'
 

@@ -1,5 +1,5 @@
 import {
-  ReceivingFileStatus,
+  FileTransferStatus,
   ChangeOnline,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
@@ -71,6 +71,7 @@ export  interface IStorage {
   getAllTree(): Promise<StorageData>;
   saveUser(users: UserModel);
   clearStorage();
+  clearMessages();
   connect();
   // getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
   setRoomHeaderId(roomId: number, value: number);
@@ -96,7 +97,15 @@ export interface AddSendingFileTransfer {
 export interface SetReceivingFileStatus {
   roomId: number;
   connId: string;
-  status: ReceivingFileStatus;
+  status: FileTransferStatus;
+  error?: string;
+}
+
+export interface SetSendingFileStatus {
+  roomId: number;
+  connId: string;
+  transfer: string;
+  status: FileTransferStatus;
   error?: string;
 }
 

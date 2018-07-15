@@ -56,6 +56,22 @@ export default class ChannelsHandler extends MessageHandler {
   private readonly notifier: NotifierHandler;
   private messageBus: Vue;
 
+  protected readonly handlers = {
+    init: this.init,
+    internetAppear: this.internetAppear,
+    loadMessages: this.loadMessages,
+    deleteMessage: this.deleteMessage,
+    editMessage: this.editMessage,
+    addOnlineUser: this.addOnlineUser,
+    removeOnlineUser: this.removeOnlineUser,
+    printMessage: this.printMessage,
+    deleteRoom: this.deleteRoom,
+    leaveUser: this.leaveUser,
+    addRoom: this.addRoom,
+    inviteUser: this.inviteUser,
+    addInvite: this.addInvite,
+  };
+
   constructor(store: Store<RootState>, api: Api, ws: WsHandler, notifier: NotifierHandler, messageBus: Vue) {
     super();
     this.store = store;
@@ -66,157 +82,6 @@ export default class ChannelsHandler extends MessageHandler {
     this.ws = ws;
     this.messageBus = messageBus;
     this.notifier = notifier;
-  }
-
-  protected readonly handlers = {
-    init(m: PubSetRooms) {
-      this.store.commit('setOnline', [...m.online]);
-      this.initUsers(m.users);
-      this.initRooms(m.rooms);
-    },
-    internetAppear() {
-      for (let k in this.sendingMessage) {
-        this.resendMessage(k);
-      }
-    },
-    loadMessages(lm: LoadMessages) {
-      if (lm.content.length > 0) {
-        this.addMessages(lm.roomId, lm.content);
-      } else {
-        this.store.commit('setAllLoaded', lm.roomId);
-      }
-    },
-    deleteMessage(inMessage: DeleteMessage) {
-      let message: MessageModel = this.store.state.roomsDict[inMessage.roomId].messages[inMessage.id];
-      if (!message) {
-        this.logger.debug('Unable to find message {} to delete it', inMessage)();
-      } else {
-        let message: MessageModel = this.getMessage(inMessage);
-        message.deleted = true;
-        this.logger.debug('Adding message to storage {}', message)();
-        this.store.commit('addMessage', message);
-        if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-          let removed = this.removeSendingMessage(inMessage.messageId);
-        }
-      }
-    },
-    editMessage(inMessage: EditMessage) {
-      let message: MessageModel = this.store.state.roomsDict[inMessage.roomId].messages[inMessage.id];
-      if (!message) {
-        this.logger.debug('Unable to find message {} to edit it', inMessage)();
-      } else {
-        let message: MessageModel = this.getMessage(inMessage);
-        this.logger.debug('Adding message to storage {}', message)();
-        this.store.commit('addMessage', message);
-        if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-          let removed = this.removeSendingMessage(inMessage.messageId);
-        }
-      }
-    },
-    addOnlineUser(message: AddOnlineUserMessage) {
-      if (!this.store.state.allUsersDict[message.userId]) {
-        let newVar: UserModel = convertUser(message);
-        this.store.commit('addUser', newVar);
-      }
-      this.addChangeOnlineEntry(message.userId, message.time, true);
-      this.store.commit('setOnline', [...message.content]);
-    },
-    removeOnlineUser(message: RemoveOnlineUserMessage) {
-      this.addChangeOnlineEntry(message.userId, message.time, false);
-      this.store.commit('setOnline', message.content);
-    },
-    printMessage(inMessage: EditMessage) {
-      let message: MessageModel = this.getMessage(inMessage);
-      this.logger.debug('Adding message to storage {}', message)();
-      this.store.commit('addMessage', message);
-      let activeRoom: RoomModel = this.store.getters.activeRoom;
-      let activeRoomId = activeRoom && activeRoom.id; // if no channels page first
-      let room = this.store.state.roomsDict[inMessage.roomId];
-      let userInfo: CurrentUserInfoModel = this.store.state.userInfo;
-      let isSelf = inMessage.userId === userInfo.userId;
-      if (activeRoomId !== inMessage.roomId && !isSelf) {
-        this.store.commit('incNewMessagesCount', inMessage.roomId);
-      }
-      if (room.notifications && !isSelf) {
-        let title = this.store.state.allUsersDict[inMessage.userId].user;
-        this.notifier.showNotification(title, {
-          body: inMessage.content || 'Image',
-          data: {
-            replaced: 1,
-            title,
-            roomId: inMessage.roomId
-          },
-          requireInteraction: true,
-          icon: inMessage.files || faviconUrl
-        });
-      }
-
-      if (this.store.state.userSettings.messageSound) {
-        if (message.userId === userInfo.userId) {
-          checkAndPlay(outgoing, room.volume);
-        } else {
-          checkAndPlay(incoming, room.volume);
-        }
-      }
-
-      if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-        this.removeSendingMessage(inMessage.messageId);
-        let rmMes: RemoveSendingMessage = {
-          messageId: inMessage.messageId,
-          roomId: inMessage.roomId
-        };
-        this.store.commit('deleteMessage', rmMes);
-      }
-      this.messageBus.$emit('scroll');
-    },
-    deleteRoom(message: DeleteRoomMessage) {
-      if (this.store.state.roomsDict[message.roomId]) {
-        this.store.commit('deleteRoom', message.roomId);
-      } else {
-        this.logger.error('Unable to find room {} to delete', message.roomId)();
-      }
-    },
-    leaveUser(message: LeaveUserMessage) {
-      if (this.store.state.roomsDict[message.roomId]) {
-        let m: SetRoomsUsers = {
-          roomId: message.roomId,
-          users: message.users
-        };
-        this.store.commit('setRoomsUsers', m);
-      } else {
-        this.logger.error('Unable to find room {} to kick user', message.roomId)();
-      }
-    },
-    addRoom(message: AddRoomMessage) {
-      this.mutateRoomAddition(message);
-    },
-    inviteUser(message: InviteUserMessage) {
-      this.store.commit('setRoomsUsers', {roomId: message.roomId, users: message.users} as SetRoomsUsers);
-    },
-    addInvite(message: AddInviteMessage) {
-      this.mutateRoomAddition(message);
-    },
-  };
-
-  private addChangeOnlineEntry(userId: number, time: number, isWentOnline: boolean) {
-    let roomIds = [];
-    this.store.getters.roomsArray.forEach(r => {
-      if (r.users.indexOf(userId)) {
-        roomIds.push(r.id);
-      }
-    });
-    let entry:  ChangeOnlineEntry = {
-      roomIds,
-      changeOnline: {
-        isWentOnline,
-        time,
-        userId
-      }
-    };
-    if (this.store.state.userSettings.onlineChangeSound && this.store.getters.myId !== userId) {
-      checkAndPlay(isWentOnline ? login : logout, 50);
-    }
-    this.store.commit('addChangeOnlineEntry', entry);
   }
 
 
@@ -253,29 +118,6 @@ export default class ChannelsHandler extends MessageHandler {
     }
   }
 
-  private uploadAndSend(originId: number, cbWs, cbMethod, uploadfiles: UploadFile[], roomId: number): void {
-    let send = (filesIds: number[]) => {
-      this.sendingMessage[originId] = {
-        cb: cbWs(filesIds),
-        files: uploadfiles
-      };
-      this.sendingMessage[originId].cb();
-    };
-    if (uploadfiles.length) {
-      this.uploadFiles(originId, roomId, uploadfiles, (filesIds: number[]) => {
-        if (filesIds) {
-          send(filesIds);
-        } else {
-          this.sendingMessage[originId] = {
-            cb: cbMethod,
-            files: uploadfiles
-          };
-        }
-      });
-    } else {
-      send([]);
-    }
-  }
 
   public sendDeleteMessage(id: number, originId: number): void {
     this.sendingMessage[originId] = {
@@ -353,10 +195,6 @@ export default class ChannelsHandler extends MessageHandler {
     this.store.commit('setUploadProgress', sup);
   }
 
-  private mutateRoomAddition(message: AddRoomBase) {
-    let r: RoomModel = getRoomsBaseDict(message);
-    this.store.commit('addRoom', r);
-  }
 
   public addMessages(roomId: number, inMessages: MessageModelDto[]) {
     let oldMessages: { [id: number]: MessageModel } = this.store.state.roomsDict[roomId].messages;
@@ -364,11 +202,6 @@ export default class ChannelsHandler extends MessageHandler {
     let messages: MessageModel[] = newMesages.map(this.getMessage.bind(this));
     this.store.commit('addMessages', {messages, roomId: roomId} as MessagesLocation);
   }
-
-  protected getMethodHandlers() {
-    return this.handlers;
-  }
-
   public initUsers(users: UserDto[]) {
     this.logger.debug('set users {}', users)();
     let um: UserDictModel = {};
@@ -377,26 +210,6 @@ export default class ChannelsHandler extends MessageHandler {
     });
     this.store.commit('setUsers', um);
   }
-
-
-
-  private getMessage(message: EditMessage): MessageModel {
-    return {
-      id: message.id,
-      time: message.time,
-      files: message.files ? convertFiles(message.files) : null,
-      content: message.content || null,
-      symbol: message.symbol || null,
-      edited: message.edited || null,
-      roomId: message.roomId,
-      userId: message.userId,
-      upload: null,
-      sending: false,
-      giphy: message.giphy || null,
-      deleted: message.deleted || null
-    };
-  }
-
 
   public initRooms(rooms: RoomDto[]) {
     this.logger.debug('Setting rooms')();
@@ -427,6 +240,227 @@ export default class ChannelsHandler extends MessageHandler {
     });
     this.store.commit('setRooms', storeRooms);
   }
+
+
+  init(m: PubSetRooms) {
+    this.store.commit('setOnline', [...m.online]);
+    this.initUsers(m.users);
+    this.initRooms(m.rooms);
+  }
+  private internetAppear() {
+    for (let k in this.sendingMessage) {
+      this.resendMessage(k);
+    }
+  }
+  private loadMessages(lm: LoadMessages) {
+    if (lm.content.length > 0) {
+      this.addMessages(lm.roomId, lm.content);
+    } else {
+      this.store.commit('setAllLoaded', lm.roomId);
+    }
+  }
+  private deleteMessage(inMessage: DeleteMessage) {
+    let message: MessageModel = this.store.state.roomsDict[inMessage.roomId].messages[inMessage.id];
+    if (!message) {
+      this.logger.debug('Unable to find message {} to delete it', inMessage)();
+    } else {
+      message = {
+        id: message.id,
+        time: message.time,
+        files: message.files,
+        content: message.content || null,
+        symbol: message.symbol || null,
+        edited: inMessage.edited,
+        roomId: message.roomId,
+        userId: message.userId,
+        upload: null,
+        sending: false,
+        giphy: message.giphy || null,
+        deleted: true
+      };
+      this.logger.debug('Adding message to storage {}', message)();
+      this.store.commit('addMessage', message);
+      if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
+        let removed = this.removeSendingMessage(inMessage.messageId);
+      }
+    }
+  }
+  private editMessage(inMessage: EditMessage) {
+    let message: MessageModel = this.store.state.roomsDict[inMessage.roomId].messages[inMessage.id];
+    if (!message) {
+      this.logger.debug('Unable to find message {} to edit it', inMessage)();
+    } else {
+      let message: MessageModel = this.getMessage(inMessage);
+      this.logger.debug('Adding message to storage {}', message)();
+      this.store.commit('addMessage', message);
+      if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
+        let removed = this.removeSendingMessage(inMessage.messageId);
+      }
+    }
+  }
+  private addOnlineUser(message: AddOnlineUserMessage) {
+    if (!this.store.state.allUsersDict[message.userId]) {
+      let newVar: UserModel = convertUser(message);
+      this.store.commit('addUser', newVar);
+    }
+    this.addChangeOnlineEntry(message.userId, message.time, true);
+    this.store.commit('setOnline', [...message.content]);
+  }
+  private removeOnlineUser(message: RemoveOnlineUserMessage) {
+    this.addChangeOnlineEntry(message.userId, message.time, false);
+    this.store.commit('setOnline', message.content);
+  }
+  private printMessage(inMessage: EditMessage) {
+    let message: MessageModel = this.getMessage(inMessage);
+    this.logger.debug('Adding message to storage {}', message)();
+    this.store.commit('addMessage', message);
+    let activeRoom: RoomModel = this.store.getters.activeRoom;
+    let activeRoomId = activeRoom && activeRoom.id; // if no channels page first
+    let room = this.store.state.roomsDict[inMessage.roomId];
+    let userInfo: CurrentUserInfoModel = this.store.state.userInfo;
+    let isSelf = inMessage.userId === userInfo.userId;
+    if (activeRoomId !== inMessage.roomId && !isSelf) {
+      this.store.commit('incNewMessagesCount', inMessage.roomId);
+    }
+    if (room.notifications && !isSelf) {
+      let title = this.store.state.allUsersDict[inMessage.userId].user;
+      this.notifier.showNotification(title, {
+        body: inMessage.content || 'Image',
+        data: {
+          replaced: 1,
+          title,
+          roomId: inMessage.roomId
+        },
+        requireInteraction: true,
+        icon: inMessage.files || faviconUrl
+      });
+    }
+
+    if (this.store.state.userSettings.messageSound) {
+      if (message.userId === userInfo.userId) {
+        checkAndPlay(outgoing, room.volume);
+      } else {
+        checkAndPlay(incoming, room.volume);
+      }
+    }
+
+    if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
+      this.removeSendingMessage(inMessage.messageId);
+      let rmMes: RemoveSendingMessage = {
+        messageId: inMessage.messageId,
+        roomId: inMessage.roomId
+      };
+      this.store.commit('deleteMessage', rmMes);
+    }
+    this.messageBus.$emit('scroll');
+  }
+  private deleteRoom(message: DeleteRoomMessage) {
+    if (this.store.state.roomsDict[message.roomId]) {
+      this.store.commit('deleteRoom', message.roomId);
+    } else {
+      this.logger.error('Unable to find room {} to delete', message.roomId)();
+    }
+  }
+  private leaveUser(message: LeaveUserMessage) {
+    if (this.store.state.roomsDict[message.roomId]) {
+      let m: SetRoomsUsers = {
+        roomId: message.roomId,
+        users: message.users
+      };
+      this.store.commit('setRoomsUsers', m);
+    } else {
+      this.logger.error('Unable to find room {} to kick user', message.roomId)();
+    }
+  }
+  private addRoom(message: AddRoomMessage) {
+    this.mutateRoomAddition(message);
+  }
+  private inviteUser(message: InviteUserMessage) {
+    this.store.commit('setRoomsUsers', {roomId: message.roomId, users: message.users} as SetRoomsUsers);
+  }
+  private addInvite(message: AddInviteMessage) {
+    this.mutateRoomAddition(message);
+  }
+
+  private  addChangeOnlineEntry(userId: number, time: number, isWentOnline: boolean) {
+    let roomIds = [];
+    this.store.getters.roomsArray.forEach(r => {
+      if (r.users.indexOf(userId)) {
+        roomIds.push(r.id);
+      }
+    });
+    let entry:  ChangeOnlineEntry = {
+      roomIds,
+      changeOnline: {
+        isWentOnline,
+        time,
+        userId
+      }
+    };
+    if (this.store.state.userSettings.onlineChangeSound && this.store.getters.myId !== userId) {
+      checkAndPlay(isWentOnline ? login : logout, 50);
+    }
+    this.store.commit('addChangeOnlineEntry', entry);
+  }
+
+
+
+  private uploadAndSend(originId: number, cbWs, cbMethod, uploadfiles: UploadFile[], roomId: number): void {
+    let send = (filesIds: number[]) => {
+      this.sendingMessage[originId] = {
+        cb: cbWs(filesIds),
+        files: uploadfiles
+      };
+      this.sendingMessage[originId].cb();
+    };
+    if (uploadfiles.length) {
+      this.uploadFiles(originId, roomId, uploadfiles, (filesIds: number[]) => {
+        if (filesIds) {
+          send(filesIds);
+        } else {
+          this.sendingMessage[originId] = {
+            cb: cbMethod,
+            files: uploadfiles
+          };
+        }
+      });
+    } else {
+      send([]);
+    }
+  }
+
+
+  private mutateRoomAddition(message: AddRoomBase) {
+    let r: RoomModel = getRoomsBaseDict(message);
+    this.store.commit('addRoom', r);
+  }
+
+
+  protected getMethodHandlers() {
+    return this.handlers;
+  }
+
+
+
+
+  private getMessage(message: EditMessage): MessageModel {
+    return {
+      id: message.id,
+      time: message.time,
+      files: message.files ? convertFiles(message.files) : null,
+      content: message.content || null,
+      symbol: message.symbol || null,
+      edited: message.edited || null,
+      roomId: message.roomId,
+      userId: message.userId,
+      upload: null,
+      sending: false,
+      giphy: message.giphy || null,
+      deleted: message.deleted || null
+    };
+  }
+
+
 
 
 }

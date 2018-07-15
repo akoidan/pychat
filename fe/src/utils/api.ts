@@ -12,12 +12,14 @@ import {sub} from './sub';
 export default class Api extends MessageHandler {
   private readonly  xhr: Http;
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
-    internetAppear(m: DefaultMessage) {
-      if (this.retryFcb) {
-        this.retryFcb();
-      }
-    }
+    internetAppear: this.internetAppear
   };
+
+  private internetAppear(m: DefaultMessage) {
+    if (this.retryFcb) {
+      this.retryFcb();
+    }
+  }
 
   private retryFcb: Function = null;
 

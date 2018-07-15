@@ -11,7 +11,7 @@
       <tr>
         <th>Embedded youtube:</th>
         <td>
-          <app-checkbox v-model="model.youtube"/>
+          <app-checkbox v-model="model.embeddedYoutube"/>
         </td>
       </tr>
       <tr>
@@ -78,7 +78,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Vue} from "vue-property-decorator";
+  import {Component, Vue, Watch} from "vue-property-decorator";
   import {State, Action, Mutation} from "vuex-class";
   import AppSubmit from "../ui/AppSubmit";
   import AppCheckbox from "../ui/AppCheckbox";
@@ -95,7 +95,7 @@
     @State userSettings: CurrentUserSettingsModel;
     @Action growlError;
     @Action growlSuccess;
-    @Mutation clearStorage;
+    @Mutation clearMessages;
 
     model: UserSettingsDto = null;
 
@@ -103,8 +103,14 @@
       this.model = userSettingsDtoToModel(this.userSettings);
     }
 
+    @Watch('userSettings', {deep: true})
+    onUserSettingsChange() {
+      this.model = userSettingsDtoToModel(this.userSettings);
+    }
+
+
     clearHistory() {
-      this.clearStorage();
+      this.clearMessages();
     }
 
     save() {

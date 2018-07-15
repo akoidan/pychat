@@ -3,7 +3,7 @@ import {Logger} from 'lines-logger';
 import {SetReceivingFileStatus} from '../types/types';
 import {DefaultMessage, OfferFile, WebRtcSetConnectionIdMessage} from '../types/messages';
 import WsHandler from '../utils/WsHandler';
-import {ReceivingFile, ReceivingFileStatus, RootState, SendingFile} from '../types/model';
+import {ReceivingFile, FileTransferStatus, RootState, SendingFile} from '../types/model';
 import {Store} from 'vuex';
 import FileSender from './FileSender';
 import NotifierHandler from '../utils/NotificationHandler';
@@ -31,46 +31,47 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> }  = {
-    offerFile(message: OfferFile) {
-      this.connections[message.connId] = new FileReceiver(message.connId, this.removeChildReference, this.wsHandler, this.notifier, this.store);
-      let payload: ReceivingFile = {
-        roomId: message.roomId,
-        uploaded: 0,
-        status: ReceivingFileStatus.NOT_DECIDED_YET,
-        userId: message.userId,
-        total: message.content.size,
-        error: null,
-        connId: message.connId,
-        fileName: message.content.name,
-        time: message.time
-      };
-      this.store.commit('addReceivingFile', payload);
-      this.wsHandler.replyFile(message.connId, browserVersion);
-    }
+    offerfile: this.onofferFile
   };
 
+  private onofferFile(message: OfferFile) {
+    this.connections[message.connId] = new FileReceiver(message.roomId, message.connId, this.removeChildReference, this.wsHandler, this.notifier, this.store);
+    let payload: ReceivingFile = {
+      roomId: message.roomId,
+      uploaded: 0,
+      status: FileTransferStatus.NOT_DECIDED_YET,
+      userId: message.userId,
+      total: message.content.size,
+      error: null,
+      connId: message.connId,
+      fileName: message.content.name,
+      time: message.time
+    };
+    this.store.commit('addReceivingFile', payload);
+    this.wsHandler.replyFile(message.connId, browserVersion);
+  }
 
   acceptFile(connId: string, roomId: number) {
     this.wsHandler.acceptFile(connId);
     let rf: SetReceivingFileStatus = {
-      roomId, connId, status: ReceivingFileStatus.IN_PROGRESS
+      roomId, connId, status: FileTransferStatus.IN_PROGRESS
     };
-    this.store.commit('setReceivingFileDecline', rf);
+    this.store.commit('setReceivingFileStatus', rf);
   }
 
   declineFile(connId: string, roomId: number) {
     this.wsHandler.declineFile(connId);
     this.removeChildReference(connId);
     let rf: SetReceivingFileStatus = {
-      roomId, connId, status: ReceivingFileStatus.DECLINED
+      roomId, connId, status: FileTransferStatus.DECLINED
     };
-    this.store.commit('setReceivingFileDecline', rf);
+    this.store.commit('setReceivingFileStatus', rf);
   }
 
   offerFile(file, channel) {
     this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, (e: WebRtcSetConnectionIdMessage) => {
       if (e.connId) {
-        this.connections[e.connId] = new FileSender(e.connId, this.removeChildReference, this.wsHandler, this.notifier, this.store, file);;
+        this.connections[e.connId] = new FileSender(channel, e.connId, this.removeChildReference, this.wsHandler, this.notifier, this.store, file);
         let payload: SendingFile = {
           roomId: channel,
           connId: e.connId,

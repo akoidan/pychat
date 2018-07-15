@@ -40,79 +40,15 @@ export default class WsHandler extends MessageHandler {
   private API_URL: string;
   private callBacks: { [id: number]: Function } = {};
   protected readonly handlers: { [id: string]: SingleParamCB<DefaultMessage> } = {
-    growl(gm: GrowlMessage) {
-      this.store.dispatch('growlError', gm.content);
-    },
-    setSettings(m: SetSettingsMessage) {
-      let a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
-      this.setUserSettings(a);
-    },
-    setUserProfile(m: SetUserProfileMessage) {
-      let a: CurrentUserInfoModel = currentUserInfoDtoToModel(m.content);
-      a.userId = this.store.state.userInfo.userId;
-      this.store.commit('setUserInfo', a);
-    },
-    setProfileImage(m: SetProfileImageMessage) {
-      this.setUserImage(m.content);
-    },
-    setWsId(message: SetWsIdMessage) {
-      this.wsConnectionId = message.opponentWsId;
-      this.setUserInfo(message.userInfo);
-      this.setUserSettings(message.userSettings);
-      this.setUserImage(message.userImage);
-      let pubSetRooms: PubSetRooms = {
-        action: 'init',
-        handler: 'channels',
-        rooms: message.rooms,
-        online: message.online,
-        users: message.users
-      };
-      sub.notify(pubSetRooms);
-      let inetAppear: DefaultMessage = {
-        action: 'internetAppear',
-        handler: 'lan'
-      };
-      sub.notify(inetAppear);
-      this.logger.debug('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
-    },
-    userProfileChanged(message: UserProfileChangedMessage) {
-      let user: UserModel = convertUser(message);
-      this.store.commit('setUser', user);
-    },
-    ping(message: PingMessage) {
-      this.startNoPingTimeout();
-      this.sendToServer({action: 'pong', time: message.time});
-    },
-    pong() {
-      this.answerPong();
-    }
+    growl: this.growl,
+    setSettings: this.setSettings,
+    setUserProfile: this.setUserProfile,
+    setProfileImage: this.setProfileImage,
+    setWsId: this.setWsId,
+    userProfileChanged: this.userProfileChanged,
+    ping: this.ping,
+    pong: this.pong,
   };
-
-  private setUserInfo(userInfo: UserProfileDto) {
-    let um: CurrentUserInfoModel = currentUserInfoDtoToModel(userInfo);
-    this.store.commit('setUserInfo', um);
-  }
-
-
-  private setUserSettings(userInfo: UserSettingsDto) {
-    let um: UserSettingsDto = userSettingsDtoToModel(userInfo);
-    if (!IS_DEBUG) {
-      loggerFactory.setLogWarnings(userInfo.logs ? LogStrict.TRACE : LogStrict.DISABLE_LOGS);
-    }
-    this.store.commit('setUserSettings', um);
-  }
-
-  private setUserImage(image: string) {
-    this.store.commit('setUserImage', image);
-  }
-
-  private answerPong() {
-    if (this.pingTimeoutFunction) {
-      this.logger.debug('Clearing pingTimeoutFunction')();
-      clearTimeout(this.pingTimeoutFunction);
-      this.pingTimeoutFunction = null;
-    }
-  }
 
   constructor(API_URL: string, sessionHolder: SessionHolder, store: Store<RootState>) {
     super();
@@ -125,65 +61,10 @@ export default class WsHandler extends MessageHandler {
     this.store = store;
   }
 
-  private messageId: number = 0;
-  private wsState: WsState = WsState.NOT_INITED;
-
-
-
-  public getMessageId () {
-    this.messageId++;
-    return this.messageId;
-  }
-
-  // this.dom = {
-  //   onlineStatus: $('onlineStatus'),
-  //   onlineClass: 'online',
-  //   offlineClass: OFFLINE_CLASS
-  // };
-  private progressInterval = {};
-  private wsConnectionId = '';
 
 
   public getWsConnectionId () {
     return this.wsConnectionId;
-  }
-
-  private onWsMessage(message) {
-    let jsonData = message.data;
-    let data: DefaultMessage;
-    try {
-      data = JSON.parse(jsonData);
-      this.logData(this.loggerIn, jsonData, data);
-    } catch (e) {
-      this.logger.error('Unable to parse incomming message {}', jsonData)();
-      return;
-    }
-    if (!data.handler || !data.action) {
-      this.logger.error('Invalid message structure')();
-      return;
-    }
-    this.handleMessage(data);
-  }
-
-  private logData(logger: Logger, jsonData: string, message: DefaultMessage) {
-    let raw = jsonData;
-    if (raw.length > 1000) {
-      raw = '';
-    }
-    if (message.action === 'ping' || message.action === 'pong') {
-      logger.debug('{} {}', raw, message)();
-    } else {
-      logger.log('{} {}', raw, message)();
-    }
-  }
-
-  private handleMessage(data: DefaultMessage) {
-    sub.notify(data);
-    if (this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.wsConnectionId)) {
-      this.logger.debug('resolving cb')();
-      this.callBacks[data.messageId](data);
-      delete this.callBacks[data.messageId];
-    }
   }
 
   public offerFile(roomId, browser, name, size, cb) {
@@ -222,69 +103,6 @@ export default class WsHandler extends MessageHandler {
     });
   }
 
-  public sendToServer(messageRequest, skipGrowl = false) {
-    if (!messageRequest.messageId) {
-      messageRequest.messageId = this.getMessageId();
-    }
-    let jsonRequest = JSON.stringify(messageRequest);
-    return this.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
-  }
-
-  private hideGrowlProgress(key) {
-    let progInter = this.progressInterval[key];
-    if (progInter) {
-      this.logger.debug('Removing progressInterval {}', key)();
-      progInter.growl.hide();
-      if (progInter.interval) {
-        clearInterval(progInter.interval);
-      }
-      delete this.progressInterval[key];
-    }
-  }
-
-  public isWsOpen() {
-    return this.ws && this.ws.readyState === WebSocket.OPEN;
-  }
-
-  private sendRawTextToServer(jsonRequest, skipGrowl, objData) {
-    if (!this.isWsOpen()) {
-      if (!skipGrowl) {
-        this.store.dispatch('growlError', 'Can\'t send message, because connection is lost :(');
-      }
-    } else {
-      this.logData(this.loggerOut, jsonRequest, objData);
-      this.ws.send(jsonRequest);
-    }
-  }
-
-  // sendPreventDuplicates(data, skipGrowl) {
-  //   this.messageId++;
-  //   data.messageId = this.messageId;
-  //   let jsonRequest = JSON.stringify(data);
-  //   if (!this.duplicates[jsonRequest]) {
-  //     this.duplicates[jsonRequest] = Date.now();
-  //     this.sendRawTextToServer(jsonRequest, skipGrowl, data);
-  //     setTimeout(() => {
-  //       delete this.duplicates[jsonRequest];
-  //     }, 5000);
-  //   } else {
-  //     this.logger.warn('blocked duplicate from sending: {}', jsonRequest)();
-  //   }
-  // }
-
-
-  private setStatus(isOnline) {
-    if (this.store.state.isOnline !== isOnline) {
-      this.store.commit('setIsOnline', isOnline);
-    }
-  }
-
-  private close() {
-    if (this.ws) {
-      this.ws.onclose = null;
-      this.ws.close();
-    }
-  }
 
   public sendEditMessage(content: string, id: number, files: number[], messageId) {
     let newVar = {
@@ -336,21 +154,6 @@ export default class WsHandler extends MessageHandler {
     this.appendCB(cb);
   }
 
-  public sendLoadMessages(roomId: number, headerId: number, count: number, cb: Function) {
-    this.sendToServer({
-      headerId,
-      count,
-      action: 'loadMessages',
-      roomId
-    });
-    this.appendCB(cb);
-  }
-
-  private appendCB(cb: Function) {
-    this.callBacks[this.messageId] = cb;
-    this.logger.debug('Appending cb {}', cb)();
-  }
-
 
   public inviteUser(roomId: number, users: number[], cb: Function) {
     this.sendToServer({
@@ -361,6 +164,39 @@ export default class WsHandler extends MessageHandler {
     this.appendCB(cb);
   }
 
+  public startListening() {
+    this.logger.debug('Starting webSocket')();
+    if (!this.listenWsTimeout && !this.ws) {
+      this.listenWS();
+    }
+  }
+
+  public pingServer() {
+    if (this.sendToServer({action: 'ping'}, true)) {
+      this.answerPong();
+      this.pingTimeoutFunction = setTimeout(() => {
+        this.logger.error('Force closing socket coz pong time out')();
+        this.ws.close(1000, 'Ping timeout');
+      }, PING_CLOSE_JS_DELAY);
+    }
+  }
+
+  public stopListening() {
+    let info = [];
+    if (this.listenWsTimeout) {
+      this.listenWsTimeout = null;
+      info.push('purged timeout');
+    }
+    if (this.ws) {
+      this.ws.onclose = null;
+      info.push('closed ws');
+      this.ws.close();
+      this.ws = null;
+    }
+    this.logger.debug('Finished ws: {}', info.join(', '))();
+  }
+
+
   public sendLeaveRoom(roomId, cb: Function) {
     this.sendToServer({
       roomId,
@@ -368,6 +204,232 @@ export default class WsHandler extends MessageHandler {
     });
     this.appendCB(cb);
   }
+
+
+  public sendLoadMessages(roomId: number, headerId: number, count: number, cb: Function) {
+    this.sendToServer({
+      headerId,
+      count,
+      action: 'loadMessages',
+      roomId
+    });
+    this.appendCB(cb);
+  }
+
+  public isWsOpen() {
+    return this.ws && this.ws.readyState === WebSocket.OPEN;
+  }
+
+  public sendToServer(messageRequest, skipGrowl = false) {
+    if (!messageRequest.messageId) {
+      messageRequest.messageId = this.getMessageId();
+    }
+    let jsonRequest = JSON.stringify(messageRequest);
+    return this.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
+  }
+
+
+
+  public getMessageId () {
+    this.messageId++;
+    return this.messageId;
+  }
+
+
+  private growl(gm: GrowlMessage) {
+    this.store.dispatch('growlError', gm.content);
+  }
+
+  private setSettings(m: SetSettingsMessage) {
+    let a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
+    this.setUserSettings(a);
+  }
+
+  private setUserProfile(m: SetUserProfileMessage) {
+    let a: CurrentUserInfoModel = currentUserInfoDtoToModel(m.content);
+    a.userId = this.store.state.userInfo.userId;
+    this.store.commit('setUserInfo', a);
+  }
+
+  private setProfileImage(m: SetProfileImageMessage) {
+    this.setUserImage(m.content);
+  }
+
+  private setWsId(message: SetWsIdMessage) {
+    this.wsConnectionId = message.opponentWsId;
+    this.setUserInfo(message.userInfo);
+    this.setUserSettings(message.userSettings);
+    this.setUserImage(message.userImage);
+    let pubSetRooms: PubSetRooms = {
+      action: 'init',
+      handler: 'channels',
+      rooms: message.rooms,
+      online: message.online,
+      users: message.users
+    };
+    sub.notify(pubSetRooms);
+    let inetAppear: DefaultMessage = {
+      action: 'internetAppear',
+      handler: 'lan'
+    };
+    sub.notify(inetAppear);
+    this.logger.debug('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
+  }
+
+  private userProfileChanged(message: UserProfileChangedMessage) {
+    let user: UserModel = convertUser(message);
+    this.store.commit('setUser', user);
+  }
+
+  private ping(message: PingMessage) {
+    this.startNoPingTimeout();
+    this.sendToServer({action: 'pong', time: message.time});
+  }
+
+  private pong() {
+    this.answerPong();
+  }
+
+  private setUserInfo(userInfo: UserProfileDto) {
+    let um: CurrentUserInfoModel = currentUserInfoDtoToModel(userInfo);
+    this.store.commit('setUserInfo', um);
+  }
+
+
+  private setUserSettings(userInfo: UserSettingsDto) {
+    let um: UserSettingsDto = userSettingsDtoToModel(userInfo);
+    if (!IS_DEBUG) {
+      loggerFactory.setLogWarnings(userInfo.logs ? LogStrict.TRACE : LogStrict.DISABLE_LOGS);
+    }
+    this.store.commit('setUserSettings', um);
+  }
+
+  private setUserImage(image: string) {
+    this.store.commit('setUserImage', image);
+  }
+
+  private answerPong() {
+    if (this.pingTimeoutFunction) {
+      this.logger.debug('Clearing pingTimeoutFunction')();
+      clearTimeout(this.pingTimeoutFunction);
+      this.pingTimeoutFunction = null;
+    }
+  }
+
+
+
+  private messageId: number = 0;
+  private wsState: WsState = WsState.NOT_INITED;
+
+
+  // this.dom = {
+  //   onlineStatus: $('onlineStatus'),
+  //   onlineClass: 'online',
+  //   offlineClass: OFFLINE_CLASS
+  // };
+  private progressInterval = {};
+  private wsConnectionId = '';
+
+
+
+  private onWsMessage(message) {
+    let jsonData = message.data;
+    let data: DefaultMessage;
+    try {
+      data = JSON.parse(jsonData);
+      this.logData(this.loggerIn, jsonData, data);
+    } catch (e) {
+      this.logger.error('Unable to parse incomming message {}', jsonData)();
+      return;
+    }
+    if (!data.handler || !data.action) {
+      this.logger.error('Invalid message structure')();
+      return;
+    }
+    this.handleMessage(data);
+  }
+
+  private logData(logger: Logger, jsonData: string, message: DefaultMessage) {
+    let raw = jsonData;
+    if (raw.length > 1000) {
+      raw = '';
+    }
+    if (message.action === 'ping' || message.action === 'pong') {
+      logger.debug('{} {}', raw, message)();
+    } else {
+      logger.log('{} {}', raw, message)();
+    }
+  }
+
+  private handleMessage(data: DefaultMessage) {
+    sub.notify(data);
+    if (this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.wsConnectionId)) {
+      this.logger.debug('resolving cb')();
+      this.callBacks[data.messageId](data);
+      delete this.callBacks[data.messageId];
+    }
+  }
+
+
+  private hideGrowlProgress(key) {
+    let progInter = this.progressInterval[key];
+    if (progInter) {
+      this.logger.debug('Removing progressInterval {}', key)();
+      progInter.growl.hide();
+      if (progInter.interval) {
+        clearInterval(progInter.interval);
+      }
+      delete this.progressInterval[key];
+    }
+  }
+
+
+  private sendRawTextToServer(jsonRequest, skipGrowl, objData) {
+    if (!this.isWsOpen()) {
+      if (!skipGrowl) {
+        this.store.dispatch('growlError', 'Can\'t send message, because connection is lost :(');
+      }
+    } else {
+      this.logData(this.loggerOut, jsonRequest, objData);
+      this.ws.send(jsonRequest);
+    }
+  }
+
+  // sendPreventDuplicates(data, skipGrowl) {
+  //   this.messageId++;
+  //   data.messageId = this.messageId;
+  //   let jsonRequest = JSON.stringify(data);
+  //   if (!this.duplicates[jsonRequest]) {
+  //     this.duplicates[jsonRequest] = Date.now();
+  //     this.sendRawTextToServer(jsonRequest, skipGrowl, data);
+  //     setTimeout(() => {
+  //       delete this.duplicates[jsonRequest];
+  //     }, 5000);
+  //   } else {
+  //     this.logger.warn('blocked duplicate from sending: {}', jsonRequest)();
+  //   }
+  // }
+
+
+  private setStatus(isOnline) {
+    if (this.store.state.isOnline !== isOnline) {
+      this.store.commit('setIsOnline', isOnline);
+    }
+  }
+
+  private close() {
+    if (this.ws) {
+      this.ws.onclose = null;
+      this.ws.close();
+    }
+  }
+
+
+  private appendCB(cb: Function) {
+    this.callBacks[this.messageId] = cb;
+    this.logger.debug('Appending cb {}', cb)();
+  }
+
 
   private onWsClose(e) {
     this.ws = null;
@@ -413,27 +475,6 @@ export default class WsHandler extends MessageHandler {
     this.listenWsTimeout = setTimeout(this.listenWS.bind(this), CONNECTION_RETRY_TIME);
   }
 
-  public startListening() {
-    this.logger.debug('Starting webSocket')();
-    if (!this.listenWsTimeout && !this.ws) {
-      this.listenWS();
-    }
-  }
-
-  public stopListening() {
-    let info = [];
-    if (this.listenWsTimeout) {
-      this.listenWsTimeout = null;
-      info.push('purged timeout');
-    }
-    if (this.ws) {
-      this.ws.onclose = null;
-      info.push('closed ws');
-      this.ws.close();
-      this.ws = null;
-    }
-    this.logger.debug('Finished ws: {}', info.join(', '))();
-  }
 
 
   private listenWS() {
@@ -487,14 +528,5 @@ export default class WsHandler extends MessageHandler {
     }, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
   }
 
-  public pingServer() {
-    if (this.sendToServer({action: 'ping'}, true)) {
-      this.answerPong();
-      this.pingTimeoutFunction = setTimeout(() => {
-        this.logger.error('Force closing socket coz pong time out')();
-        this.ws.close(1000, 'Ping timeout');
-      }, PING_CLOSE_JS_DELAY);
-    }
-  }
 
 }

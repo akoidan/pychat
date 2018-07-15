@@ -265,15 +265,14 @@ class WebRtcMessageCreator(object):
 			VarNames.TIME: get_milliseconds()
 		}
 
-	def set_webrtc_error(self, error, connection_id, qued_id=None):
-		return {
-			VarNames.EVENT: Actions.SET_WEBRTC_ERROR,
-			VarNames.CONTENT: error,
-			VarNames.USER_ID: self.user_id,
-			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
-			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_QUED_ID: qued_id
-		}
+	# def set_webrtc_error(self, error, connection_id, qued_id=None):
+	# 	return {
+	# 		VarNames.EVENT: Actions.SET_WEBRTC_ERROR,
+	# 		VarNames.CONTENT: error,
+	# 		VarNames.USER_ID: self.user_id,
+	# 		VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION.format(connection_id),
+	# 		VarNames.WEBRTC_QUED_ID: qued_id
+	# 	}
 
 	@staticmethod
 	def set_connection_id(js_message_id, connection_id):
@@ -288,17 +287,13 @@ class WebRtcMessageCreator(object):
 	def get_close_file_sender_message(self, connection_id):
 		return {
 			VarNames.EVENT: Actions.CLOSE_FILE_CONNECTION,
-			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER + ":" + connection_id,
+			VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER.format(connection_id, self.id),
 		}
 
 	def get_accept_file_message(self, connection_id, content):
 		return {
 			VarNames.EVENT: Actions.ACCEPT_FILE,
-			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
+			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION.format(connection_id, self.id),
 			VarNames.CONTENT: content,
 		}
 
@@ -309,13 +304,13 @@ class WebRtcMessageCreator(object):
 			VarNames.USER_ID: self.user_id,
 			VarNames.CONTENT: content,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: handler + ":" + connection_id,
+			VarNames.HANDLER_NAME: handler.format(connection_id), #  TODO
 		}
 
 	def retry_file(self, connection_id):
 		return {
 			VarNames.EVENT: Actions.RETRY_FILE_CONNECTION,
-			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
+			# VarNames.CONNECTION_ID: connection_id,
+			# VarNames.WEBRTC_OPPONENT_ID: self.id,
+			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION.format(connection_id, self.id),
 		}

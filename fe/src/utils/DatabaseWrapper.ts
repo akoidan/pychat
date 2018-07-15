@@ -202,7 +202,7 @@ export default class DatabaseWrapper implements IStorage {
     return this.transaction('transaction', cb);
   }
 
-  private async asyncWrite() {
+  private async asyncWrite(): Promise<SQLTransaction> {
     return new Promise<SQLTransaction>((resolve, reject) => {
       this.transaction('transaction', resolve);
     });
@@ -228,6 +228,14 @@ export default class DatabaseWrapper implements IStorage {
   //     });
   //   });
   // }
+
+
+  public async clearMessages() {
+    let t: SQLTransaction = await this.asyncWrite();
+    t = await this.runSql(t, 'delete from file');
+    t = await this.runSql(t, 'delete from message');
+    this.logger.log('Db has messages removed')();
+  }
 
   public clearStorage () {
     this.write(t => {

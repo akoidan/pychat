@@ -25,7 +25,7 @@
       </tr>
       </tbody>
     </table>
-    <div class="yesNo" v-if="receivingFile.status === ReceivingFileStatus.NOT_DECIDED_YET">
+    <div class="yesNo" v-if="receivingFile.status === FileTransferStatus.NOT_DECIDED_YET">
       <input type="button" value="Accept" @click="accept" class="green-btn">
       <input type="button" value="Decline" @click="decline" class="red-btn">
     </div>
@@ -34,7 +34,7 @@
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {Getter} from 'vuex-class';
-  import {ReceivingFile, ReceivingFileStatus} from "../../types/model";
+  import {ReceivingFile, FileTransferStatus} from "../../types/model";
   import {bytesToSize} from "../../utils/utils";
   import AppProgressBar from "../ui/AppProgressBar";
   import ChatMessageHeader from "./ChatMessageHeader";
@@ -46,28 +46,28 @@
   export default class ChatReceivingFile extends Vue {
     @Prop() receivingFile: ReceivingFile;
     @Getter myId: number;
-    ReceivingFileStatus = ReceivingFileStatus;
+    ReceivingFileStatus = FileTransferStatus;
 
     get size() :string {
       return bytesToSize(this.receivingFile.total)
     }
     get showProgress () {
-      return ReceivingFileStatus.ERROR === this.receivingFile.status
-          || ReceivingFileStatus.IN_PROGRESS === this.receivingFile.status
-          || ReceivingFileStatus.FINISHED === this.receivingFile.status;
+      return FileTransferStatus.ERROR === this.receivingFile.status
+          || FileTransferStatus.IN_PROGRESS === this.receivingFile.status
+          || FileTransferStatus.FINISHED === this.receivingFile.status;
     }
 
     get status() {
       switch (this.receivingFile.status) {
-        case ReceivingFileStatus.ERROR:
+        case FileTransferStatus.ERROR:
           return 'Error';
-        case ReceivingFileStatus.IN_PROGRESS:
+        case FileTransferStatus.IN_PROGRESS:
           return 'Downloading...';
-        case ReceivingFileStatus.DECLINED:
+        case FileTransferStatus.DECLINED:
           return 'Declined';
-        case ReceivingFileStatus.FINISHED:
+        case FileTransferStatus.FINISHED:
           return 'Finished';
-        case ReceivingFileStatus.NOT_DECIDED_YET:
+        case FileTransferStatus.NOT_DECIDED_YET:
           return 'Waiting for approval';
       }
     }

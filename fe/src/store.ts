@@ -13,7 +13,7 @@ import {
   RoomDictModel,
   RoomModel,
   RoomSettingsModel,
-  RootState, SendingFile,
+  RootState, SendingFile, SendingFileTransfer,
   UserDictModel,
   UserModel
 } from './types/model';
@@ -27,11 +27,12 @@ import {
   SetMessageProgress,
   SetMessageProgressError, SetReceivingFileStatus,
   SetRoomsUsers,
-  SetSearchTo,
+  SetSearchTo, SetSendingFileStatus,
   SetUploadProgress
 } from './types/types';
 import {storage} from './utils/singletons';
 import {SetRooms} from './types/dto';
+import {SetSettingsMessage} from './types/messages';
 
 Vue.use(Vuex);
 
@@ -156,11 +157,18 @@ const store: StoreOptions<RootState> = {
     addSendingFileTransfer(state: RootState, payload: AddSendingFileTransfer) {
       Vue.set(state.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers, payload.transferId, payload.transfer);
     },
-    setReceivingFileDecline(state: RootState, payload: SetReceivingFileStatus) {
+    setReceivingFileStatus(state: RootState, payload: SetReceivingFileStatus) {
       let receivingFile = state.roomsDict[payload.roomId].receivingFiles[payload.connId];
       receivingFile.status = payload.status;
       if (payload.error) {
         receivingFile.error = payload.error;
+      }
+    },
+    setSendingFileStatus(state: RootState, payload: SetSendingFileStatus) {
+      let transfer: SendingFileTransfer = state.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers[payload.transfer];
+      transfer.status = payload.status;
+      if (payload.error) {
+        transfer.error = payload.error;
       }
     },
     incNewMessagesCount(state: RootState, roomId: number) {
@@ -217,11 +225,11 @@ const store: StoreOptions<RootState> = {
       room.name = srm.name;
       storage.updateRoom(srm);
     },
-    clearStorage(state: RootState) {
+    clearMessages(state: RootState) {
       for (let m in state.roomsDict) {
         state.roomsDict[m].messages = {};
       }
-      storage.clearStorage();
+      storage.clearMessages();
     },
     deleteRoom(state: RootState, roomId: number) {
       Vue.delete(state.roomsDict, String(roomId));

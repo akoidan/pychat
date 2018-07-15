@@ -9,16 +9,22 @@ import {sub} from '../utils/sub';
 import MessageHandler from '../utils/MesageHandler';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
-  private offerCreator: boolean;
-  private sendRtcDataQueue = [];
-  private opponentWsId: string;
-  private connectionId;
-  protected logger: Logger;
-  private removeChildPeerReferenceFn: Function;
+  protected offerCreator: boolean;
+  protected sendRtcDataQueue = [];
+  protected readonly opponentWsId: string;
+  protected readonly connectionId: string;
+  protected readonly logger: Logger;
+  protected readonly removeChildPeerReferenceFn: Function;
   protected pc = null;
-  private connectionStatus = 'new';
+  protected connectionStatus = 'new';
   protected removeChildPeerReference;
-  private webRtcUrl = WEBRTC_STUNT_URL;
+  protected webRtcUrl = WEBRTC_STUNT_URL;
+  protected connectedToRemote: boolean = false;
+  protected sdpConstraints: boolean;
+  protected readonly wsHandler: WsHandler;
+  protected readonly store: Store<RootState>;
+  protected readonly roomId: number;
+
   private pc_config = {
     iceServers: [{
       url: this.webRtcUrl
@@ -30,15 +36,12 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       {RtpDataChannels: false /*true*/}
     ]
   };
-  private connectedToRemote: boolean = false;
-  private sdpConstraints: boolean;
-  private wsHandler: WsHandler;
-  private store: Store<RootState>;
 
-  constructor(connectionId: string, opponentWsId: string, removeChildPeerReferenceFn: Function, ws: WsHandler, store: Store<RootState>) {
+  constructor(roomId: number, connectionId: string, opponentWsId: string, removeChildPeerReferenceFn: Function, ws: WsHandler, store: Store<RootState>) {
     super();
+    this.roomId = roomId;
     this.connectionId = connectionId;
-    sub.subscribe('peerConnection:' + connectionId, this);
+    sub.subscribe(`peerConnection:${connectionId}:${opponentWsId}`, this);
     this.opponentWsId = opponentWsId;
     this.wsHandler = ws;
     this.store = store;

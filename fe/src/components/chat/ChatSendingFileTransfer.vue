@@ -13,14 +13,14 @@
   import {State, Action, Mutation, Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppProgressBar from '../ui/AppProgressBar';
-  import {ReceivingFileStatus, SendingFileTransfer, UserModel} from "../../types/model";
+  import {FileTransferStatus, SendingFileTransfer, UserModel} from "../../types/model";
 
   const fileStatusDict: {} = {};
- fileStatusDict[ReceivingFileStatus.NOT_DECIDED_YET] = 'Waiting to accept';
- fileStatusDict[ReceivingFileStatus.IN_PROGRESS] = 'Sending...';
- fileStatusDict[ReceivingFileStatus.FINISHED] = 'Successfully sent';
- fileStatusDict[ReceivingFileStatus.DECLINED] = 'Declined by user';
- fileStatusDict[ReceivingFileStatus.ERROR] = 'Error';
+ fileStatusDict[FileTransferStatus.NOT_DECIDED_YET] = 'Waiting to accept';
+ fileStatusDict[FileTransferStatus.IN_PROGRESS] = 'Sending...';
+ fileStatusDict[FileTransferStatus.FINISHED] = 'Successfully sent';
+ fileStatusDict[FileTransferStatus.DECLINED] = 'Declined by user';
+ fileStatusDict[FileTransferStatus.ERROR] = 'Error';
 
   @Component({
     components: {AppProgressBar}
@@ -31,7 +31,7 @@
     @State allUsersDict: {[id: number]: UserModel};
 
     get showBar(): boolean {
-      return this.transfer.status === ReceivingFileStatus.IN_PROGRESS;
+      return this.transfer.status === FileTransferStatus.IN_PROGRESS;
     }
 
     retry() {

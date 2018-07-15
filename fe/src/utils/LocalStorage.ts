@@ -68,6 +68,10 @@ export default class LocalStorage implements IStorage {
     return new Promise<StorageData>(resolve => resolve(null));
   }
 
+  public clearMessages() {
+    this.clearStorage();
+  }
+
   public clearStorage() {
     localStorage.setItem(this.STORAGE_NAME, '{}');
     this.cache = {};

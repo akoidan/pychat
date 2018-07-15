@@ -57,6 +57,10 @@ export interface ReplyFileMessage extends WebRtcDefaultMessage {
   userId: number;
 }
 
+export interface DestroyFileConnectionMessage extends DefaultMessage {
+  content: string;
+}
+
 export interface UserProfileChangedMessage extends DefaultMessage, UserDto {
 
 }

@@ -9,17 +9,20 @@ import {sub} from '../utils/sub';
 
 export default abstract class BaseTransferHandler extends MessageHandler {
 
-  protected connectionId: string;
-  protected wsHandler: WsHandler;
-  protected notifier: NotifierHandler;
-  protected logger: Logger;
-  protected removeReferenceFn: Function;
+  protected readonly connectionId: string;
+  protected readonly wsHandler: WsHandler;
+  protected readonly notifier: NotifierHandler;
+  protected readonly logger: Logger;
+  protected readonly removeReferenceFn: Function;
   protected peerConnections: {} = {};
-  protected store: Store<RootState>;
+  protected readonly store: Store<RootState>;
+  protected readonly roomId: number;
 
-  constructor(connId: string, removeReferenceFn: Function, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>) {
+  constructor(roomId: number, connId: string, removeReferenceFn: Function, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>) {
     super();
-    sub.subscribe('webrtcTransfer:' + connId, this)
+    this.roomId = roomId;
+    this.connectionId = connId;
+    sub.subscribe(`webrtcTransfer:${connId}`, this)
     this.removeReferenceFn = removeReferenceFn;
     this.notifier = notifier;
     this.wsHandler = wsHandler;
@@ -35,12 +38,6 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     this.logger.log('Removing peer connection {}', id)();
     sub.unsubscribe('peerConnection:' + id);
     delete this.peerConnections[id];
-  }
-
-  setConnectionId(id) {
-    this.connectionId = id;
-    this.logger = loggerFactory.getLogger(this.connectionId, 'color: #960055');
-    this.logger.log('CallHandler initialized')();
   }
 
   closeAllPeerConnections(text) {
