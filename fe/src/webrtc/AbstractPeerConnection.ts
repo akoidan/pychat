@@ -100,6 +100,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   }
 
   abstract oniceconnectionstatechange(): void;
+  abstract setError(text): void;
 
   public closePeerConnection(text?) {
     this.setConnectionStatus('closed');
@@ -112,12 +113,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   }
 
   sendWebRtcEvent(message) {
-    this.wsHandler.sendToServer({
-      content: message,
-      action: 'sendRtcData',
-      connId: this.connectionId,
-      opponentWsId: this.opponentWsId
-    });
+    this.wsHandler.sendRtcData(message, this.connectionId, this.opponentWsId);
   }
 
   failWebRtc(parent) {

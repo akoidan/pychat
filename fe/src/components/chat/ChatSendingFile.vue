@@ -38,9 +38,6 @@
       return bytesToSize(this.sendingFile.fileSize)
     }
 
-    retry() {
-
-    }
 
   }
 </script>

@@ -36,9 +36,6 @@
       this.$ws.startListening();
     }
 
-    destroy() {
-
-    }
   }
 </script>
 

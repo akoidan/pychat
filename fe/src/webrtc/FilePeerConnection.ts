@@ -44,6 +44,10 @@ export default class FilePeerConnection {
   //
 
   closeEvents (text?) {
+    if (text) {
+      this.asp.setError(text);
+    }
+    this.asp.logger.error('Closing event from {}', text)();
     this.asp.closePeerConnection();
     if (this.asp.sendChannel && this.asp.sendChannel.readyState !== 'closed') {
       this.asp.logger.log('Closing chanel')();

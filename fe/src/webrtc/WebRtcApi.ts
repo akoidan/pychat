@@ -11,7 +11,7 @@ import {browserVersion, webrtcApi} from '../utils/singletons';
 import MessageHandler from '../utils/MesageHandler';
 import {sub} from '../utils/sub';
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from '../utils/consts';
-import {requestFileSystem} from '../utils/htmlApi';
+import {faviconUrl, requestFileSystem} from '../utils/htmlApi';
 import {bytesToSize} from '../utils/utils';
 import FileReceiverPeerConnection from './FileReceiveerPeerConnection';
 
@@ -53,6 +53,11 @@ export default class WebRtcApi extends MessageHandler {
         total: message.content.size
       }
     };
+    this.notifier.showNotification(this.store.state.allUsersDict[message.userId].user, {
+      body: `Sends file ${message.content.name}`,
+      requireInteraction: true,
+      icon: faviconUrl
+    });
     this.store.commit('addReceivingFile', payload);
     this.wsHandler.replyFile(message.connId, browserVersion);
     if (!limitExceeded) {
@@ -93,4 +98,8 @@ export default class WebRtcApi extends MessageHandler {
     delete this.connections[id];
   }
 
+  public retryFile(connId: string) {
+    this.connections[connId].retryFilePeerConn();
+
+  }
 }

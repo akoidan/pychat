@@ -55,11 +55,12 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
       this.logger.log('Created send data channel.')();
     } catch (e) {
       let error = `Failed to create data channel because ${e.message || e}`;
-      this.store.dispatch('growlError', error);
+      this.setError(error);
       this.logger.error('acceptFile {}', e)();
       return;
     }
     this.createOffer();
+    this.wsHandler.retry(this.connectionId, this.opponentWsId);
   }
 
   onreceiveChannelOpen() {
@@ -127,17 +128,10 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
           }
         }
       } else {
-        throw `sendChannel status is ${this.sendChannel.readyState} which is not equals to "open"`;
+        throw `Can't write data into ${this.sendChannel.readyState} channel`;
       }
     } catch (error) {
-      let ssfs: SetSendingFileStatus = {
-        status: FileTransferStatus.ERROR,
-        roomId: this.roomId,
-        error: 'Error: Connection has been lost',
-        connId: this.connectionId,
-        transfer: this.opponentWsId
-      };
-      this.store.commit('setSendingFileStatus', ssfs);
+      this.setError('Connection has been lost');
       this.filePeerConnection.closeEvents(String(error));
       this.logger.error('sendData {}', error)();
     }
@@ -173,5 +167,16 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
       status: isDecline ? FileTransferStatus.DECLINED : FileTransferStatus.ERROR
     };
     this.store.commit('setSendingFileStatus', payload);
+  }
+
+  public setError(error): void {
+    let ssfs: SetSendingFileStatus = {
+      status: FileTransferStatus.ERROR,
+      roomId: this.roomId,
+      error,
+      connId: this.connectionId,
+      transfer: this.opponentWsId
+    };
+    this.store.commit('setSendingFileStatus', ssfs);
   }
 }

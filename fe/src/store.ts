@@ -165,10 +165,10 @@ const store: StoreOptions<RootState> = {
     setReceivingFileStatus(state: RootState, payload: SetReceivingFileStatus) {
       let receivingFile: ReceivingFile = state.roomsDict[payload.roomId].receivingFiles[payload.connId];
       receivingFile.status = payload.status;
-      if (payload.error) {
+      if (payload.error !== undefined) {
         receivingFile.error = payload.error;
       }
-      if (payload.anchor) {
+      if (payload.anchor !== undefined) {
         receivingFile.anchor = payload.anchor;
       }
     },

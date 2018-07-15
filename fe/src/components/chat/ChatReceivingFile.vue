@@ -18,13 +18,24 @@
         <th>Status:</th>
         <td>{{status}}</td>
       </tr>
+      <tr v-if="receivingFile.error">
+        <th>Error:</th>
+        <td>{{receivingFile.error}}</td>
+      </tr>
       <tr v-if="receivingFile.anchor">
         <th>Download:</th>
         <td><a class="green-btn" :href="receivingFile.anchor" :download="receivingFile.fileName">Save</a></td>
       </tr>
+
+      <tr v-if="isError">
+        <th>
+          Retry
+        </th>
+        <td><i class="icon-repeat" @click="retry"></i></td>
+      </tr>
       </tbody>
     </table>
-    <app-progress-bar v-if="showProgress" @retry="retry"  class="progress-wrap-file" :upload="receivingFile.upload"/>
+    <app-progress-bar v-if="showProgress"  class="progress-wrap-file" :upload="receivingFile.upload"/>
     <div class="yesNo" v-if="showYesNo">
       <input type="button" value="Accept" @click="accept" class="green-btn">
       <input type="button" value="Decline" @click="decline" class="red-btn">
@@ -51,14 +62,19 @@
     get showYesNo(): boolean {
       return this.receivingFile.status === FileTransferStatus.NOT_DECIDED_YET;
     }
-    get size() :string {
+    get size(): string {
       return bytesToSize(this.receivingFile.upload.total);
     }
-    get showProgress () {
+
+    get showProgress(): boolean {
       return FileTransferStatus.IN_PROGRESS === this.receivingFile.status;
     }
 
-    get status() {
+    get isError(): boolean {
+      return this.receivingFile.status === FileTransferStatus.ERROR;
+    }
+
+    get status(): string {
       switch (this.receivingFile.status) {
         case FileTransferStatus.ERROR:
           return 'Error';
@@ -81,6 +97,10 @@
       }
     }
 
+    retry() {
+      webrtcApi.retryFile(this.receivingFile.connId);
+    }
+
     accept() {
       webrtcApi.acceptFile(this.receivingFile.connId);
     }
@@ -89,14 +109,14 @@
       webrtcApi.declineFile(this.receivingFile.connId);
     }
 
-    retry() {
-
-    }
 
   }
 </script>
 
 <style lang="sass" scoped>
+
+  .icon-repeat
+    cursor: pointer
 
   a
     width: calc(100% - 50px)

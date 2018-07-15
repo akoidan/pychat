@@ -2,7 +2,7 @@
   <tbody>
     <tr>
       <th>To {{user}}</th>
-      <td v-if="showBar"> <app-progress-bar @retry="retry" :upload="transfer.upload"/></td>
+      <td v-if="showBar"> <app-progress-bar :upload="transfer.upload"/></td>
       <td v-else>
         {{status}}
       </td>
@@ -32,10 +32,6 @@
 
     get showBar(): boolean {
       return this.transfer.status === FileTransferStatus.IN_PROGRESS;
-    }
-
-    retry() {
-      alert('retry');
     }
 
     get user () {

@@ -76,12 +76,12 @@ export default class WsHandler extends MessageHandler {
     this.appendCB(cb);
   }
 
-  public acceptFile(connId) {
+  public acceptFile(connId, received) {
     this.sendToServer({
       action: 'acceptFile',
       connId,
       content: {
-        received: 0
+        received
       }
     });
   }
@@ -220,7 +220,15 @@ export default class WsHandler extends MessageHandler {
     return this.ws && this.ws.readyState === WebSocket.OPEN;
   }
 
-  public sendToServer(messageRequest, skipGrowl = false) {
+  public sendRtcData(content, connId, opponentWsId) {
+    this.sendToServer({
+      content,
+      connId,
+      opponentWsId,
+      action: 'sendRtcData'
+    });
+  }
+  private sendToServer(messageRequest, skipGrowl = false) {
     if (!messageRequest.messageId) {
       messageRequest.messageId = this.getMessageId();
     }
@@ -229,6 +237,9 @@ export default class WsHandler extends MessageHandler {
   }
 
 
+  public retry(connId, opponentWsId) {
+    this.sendToServer({action: 'retryFile',  connId, opponentWsId});
+  }
 
   public getMessageId () {
     this.messageId++;
@@ -503,13 +514,9 @@ export default class WsHandler extends MessageHandler {
     this.ws.onclose = this.onWsClose.bind(this);
     this.ws.onopen = () => {
       this.setStatus(true);
-      let message = 'Connection to server has been established';
-      if (this.wsState === WsState.CONNECTION_IS_LOST) { // if not inited don't growl message on page load
-         this.store.dispatch('growlSuccess', 'Connection established');
-      }
       this.startNoPingTimeout();
       this.wsState = WsState.CONNECTED;
-      this.logger.debug(message)();
+      this.logger.debug('Connection has been established')();
     };
   }
 
