@@ -95,9 +95,9 @@ export default class WsHandler extends MessageHandler {
   }
 
 
-  public declineFile(connId) {
+  public destroyFileConnection(connId, content) {
     this.sendToServer({
-      content: 'decline',
+      content,
       action: 'destroyFileConnection',
       connId
     });

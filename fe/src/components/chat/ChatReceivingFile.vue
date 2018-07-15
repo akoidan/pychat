@@ -25,7 +25,7 @@
       </tr>
       </tbody>
     </table>
-    <div class="yesNo" v-if="receivingFile.status === FileTransferStatus.NOT_DECIDED_YET">
+    <div class="yesNo" v-if="showYesNo">
       <input type="button" value="Accept" @click="accept" class="green-btn">
       <input type="button" value="Decline" @click="decline" class="red-btn">
     </div>
@@ -46,8 +46,11 @@
   export default class ChatReceivingFile extends Vue {
     @Prop() receivingFile: ReceivingFile;
     @Getter myId: number;
-    ReceivingFileStatus = FileTransferStatus;
+    FileTransferStatus = FileTransferStatus;
 
+    get showYesNo(): boolean {
+      return this.receivingFile.status === FileTransferStatus.NOT_DECIDED_YET;
+    }
     get size() :string {
       return bytesToSize(this.receivingFile.total)
     }
@@ -81,11 +84,11 @@
     }
 
     accept() {
-      webrtcApi.acceptFile(this.receivingFile.connId, this.receivingFile.roomId);
+      webrtcApi.acceptFile(this.receivingFile.connId);
     }
 
     decline() {
-      webrtcApi.declineFile(this.receivingFile.connId, this.receivingFile.roomId);
+      webrtcApi.declineFile(this.receivingFile.connId);
     }
 
     retry() {

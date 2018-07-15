@@ -1,18 +1,22 @@
 import store from '../store';
 import AbstractPeerConnection from './AbstractPeerConnection';
+import {Logger} from 'lines-logger';
+import {RootState} from '../types/model';
+import {Store} from 'vuex';
 
-const SEND_CHUNK_SIZE = 16384;
-const READ_CHUNK_SIZE = SEND_CHUNK_SIZE * 64;
-const MAX_BUFFER_SIZE = 256;
+export default class FilePeerConnection {
+  private asp: AbstractPeerConnection;
 
 
-export default abstract class FilePeerConnection extends AbstractPeerConnection {
-  // oniceconnectionstatechange() {
-  //   if (this.pc.iceConnectionState === 'disconnected') {
-  //     this.closeEvents();
-  //     store.dispatch('growlError', 'Error: Connection has been lost');
-  //   }
-  // }
+  constructor(asp: AbstractPeerConnection) {
+    this.asp = asp;
+  }
+
+  public oniceconnectionstatechange() {
+    if (this.asp.pc.iceConnectionState === 'disconnected') {
+      this.closeEvents('Connection has been lost');
+    }
+  }
   //
   //
   // ondestroyFileConnection() {
@@ -38,13 +42,14 @@ export default abstract class FilePeerConnection extends AbstractPeerConnection 
   //   this.downloadBar.setValue(value);
   // }
   //
-  // closeEvents () {
-  //   this.closePeerConnection();
-  //   if (this.sendChannel && this.sendChannel.readyState !== 'closed') {
-  //     logger.log("Closing chanel")();
-  //     this.sendChannel.close();
-  //   } else {
-  //     logger.log("No channels to close")();
-  //   }
-  // }
+
+  closeEvents (text?) {
+    this.asp.closePeerConnection();
+    if (this.asp.sendChannel && this.asp.sendChannel.readyState !== 'closed') {
+      this.asp.logger.log('Closing chanel')();
+      this.asp.sendChannel.close();
+    } else {
+      this.asp.logger.log('No channels to close')();
+    }
+  }
 }

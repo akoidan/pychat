@@ -25,3 +25,7 @@ export const RESPONSE_SUCCESS = 'ok';
 export const PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
 export const MESSAGES_PER_SEARCH = 10;
 export const CONNECTION_ERROR = `Connection error`;
+export const SEND_CHUNK_SIZE = 16384;
+export const READ_CHUNK_SIZE = SEND_CHUNK_SIZE * 64;
+export const MAX_BUFFER_SIZE = 256;
+export const MAX_ACCEPT_FILE_SIZE_WO_FS_API = Math.pow(2, 28); // 256 MB

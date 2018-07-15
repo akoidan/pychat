@@ -28,6 +28,13 @@ export function forEach(array, cb) {
   }
 }
 
+export function getDay(dateObj) {
+  let month = dateObj.getUTCMonth() + 1; // months from 1-12
+  let day = dateObj.getUTCDate();
+  let year = dateObj.getUTCFullYear();
+  return `${year}/${month}/${day}`;
+}
+
 export async function initStore() {
   let isNew = await storage.connect();
   if (!isNew) {

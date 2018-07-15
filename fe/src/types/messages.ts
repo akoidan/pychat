@@ -106,6 +106,13 @@ export interface AddRoomBase extends  NewRoom {
   volume: number;
 }
 
+export interface AcceptFileContent {
+  received: number;
+}
+
+export interface AcceptFileMessage extends DefaultMessage {
+ content: AcceptFileContent;
+}
 
 
 export interface InviteUserMessage extends NewRoom, RoomExistedBefore {

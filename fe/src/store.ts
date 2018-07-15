@@ -13,7 +13,9 @@ import {
   RoomDictModel,
   RoomModel,
   RoomSettingsModel,
-  RootState, SendingFile, SendingFileTransfer,
+  RootState,
+  SendingFile,
+  SendingFileTransfer,
   UserDictModel,
   UserModel
 } from './types/model';
@@ -25,14 +27,16 @@ import {
   RemoveMessageProgress,
   RemoveSendingMessage,
   SetMessageProgress,
-  SetMessageProgressError, SetReceivingFileStatus,
+  SetMessageProgressError,
+  SetReceivingFileStatus, SetReceivingFileUploaded,
   SetRoomsUsers,
-  SetSearchTo, SetSendingFileStatus,
+  SetSearchTo,
+  SetSendingFileStatus,
+  SetSendingFileUploaded,
   SetUploadProgress
 } from './types/types';
 import {storage} from './utils/singletons';
 import {SetRooms} from './types/dto';
-import {SetSettingsMessage} from './types/messages';
 
 Vue.use(Vuex);
 
@@ -158,10 +162,13 @@ const store: StoreOptions<RootState> = {
       Vue.set(state.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers, payload.transferId, payload.transfer);
     },
     setReceivingFileStatus(state: RootState, payload: SetReceivingFileStatus) {
-      let receivingFile = state.roomsDict[payload.roomId].receivingFiles[payload.connId];
+      let receivingFile: ReceivingFile = state.roomsDict[payload.roomId].receivingFiles[payload.connId];
       receivingFile.status = payload.status;
       if (payload.error) {
         receivingFile.error = payload.error;
+      }
+      if (payload.anchor) {
+        receivingFile.anchor = payload.anchor;
       }
     },
     setSendingFileStatus(state: RootState, payload: SetSendingFileStatus) {
@@ -170,6 +177,14 @@ const store: StoreOptions<RootState> = {
       if (payload.error) {
         transfer.error = payload.error;
       }
+    },
+    setSendingFileUploaded(state: RootState, payload: SetSendingFileUploaded) {
+      let transfer: SendingFileTransfer = state.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers[payload.transfer];
+      transfer.uploaded = payload.uploaded;
+    },
+    setReceivingFileUploaded(state: RootState, payload: SetReceivingFileUploaded) {
+      let transfer: ReceivingFile = state.roomsDict[payload.roomId].receivingFiles[payload.connId]
+      transfer.uploaded = payload.uploaded;
     },
     incNewMessagesCount(state: RootState, roomId: number) {
       state.roomsDict[roomId].newMessagesCount++;

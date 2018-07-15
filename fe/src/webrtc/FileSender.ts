@@ -21,7 +21,7 @@ export default class FileSender extends BaseTransferHandler {
 
   replyFile(message: ReplyFileMessage) {
     this.logger.debug('got mes {}', message)();
-    this.peerConnections[message.opponentWsId] = new FileSenderPeerConnection(this.roomId, message.connId, message.opponentWsId, this.removeChildPeerReference, this.wsHandler, this.store);
+    this.peerConnections[message.opponentWsId] = new FileSenderPeerConnection(this.roomId, message.connId, message.opponentWsId, this.removeChildPeerReference, this.wsHandler, this.store, this.file);
     let asft:  AddSendingFileTransfer = {
       connId: message.connId,
       transferId: message.opponentWsId,

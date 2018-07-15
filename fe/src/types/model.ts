@@ -123,6 +123,7 @@ export interface ReceivingFile extends UploadProgressModel {
   fileName: string;
   roomId: number;
   connId: string;
+  anchor: string;
   userId: number;
 }
 

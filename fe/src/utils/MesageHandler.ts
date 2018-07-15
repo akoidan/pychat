@@ -13,7 +13,7 @@ export default abstract class MessageHandler implements IMessageHandler {
     if (handler) {
       handler.bind(this)(message);
     } else {
-      this.logger.error(`Can't find handler for {}`, message)();
+      this.logger.error(`{} can't find handler for {}, available handlers {}. Message: {}`, this.constructor.name, message.action, Object.keys(this.handlers), message)();
     }
   }
 }

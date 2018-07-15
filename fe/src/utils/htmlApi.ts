@@ -30,6 +30,7 @@ smileysTabNames.forEach(tb => {
   }
 });
 
+export const requestFileSystem = window['webkitRequestFileSystem'] || window['mozRequestFileSystem'] || window['requestFileSystem'];
 const escapeMap = {
   '&': '&amp;',
   '<': '&lt;',

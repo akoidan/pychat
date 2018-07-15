@@ -13,18 +13,17 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected sendRtcDataQueue = [];
   protected readonly opponentWsId: string;
   protected readonly connectionId: string;
-  protected readonly logger: Logger;
+  public readonly logger: Logger;
   protected readonly removeChildPeerReferenceFn: Function;
-  protected pc = null;
+  public pc = null;
   protected connectionStatus = 'new';
-  protected removeChildPeerReference;
   protected webRtcUrl = WEBRTC_STUNT_URL;
   protected connectedToRemote: boolean = false;
   protected sdpConstraints: boolean;
   protected readonly wsHandler: WsHandler;
   protected readonly store: Store<RootState>;
   protected readonly roomId: number;
-
+  public sendChannel: RTCDataChannel = null;
   private pc_config = {
     iceServers: [{
       url: this.webRtcUrl
@@ -63,7 +62,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.logger.log('Call message {}', message)();
   }
 
-  onsendRtcData(message) {
+  protected onsendRtcData(message) {
     if (!this.connectedToRemote) {
       this.logger.log('Connection is not accepted yet, pushing data to queue')();
       this.sendRtcDataQueue.push(message); // TODO https://stackoverflow.com/questions/47496922/tornado-redis-garantee-order-of-published-messages
@@ -102,7 +101,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
 
   abstract oniceconnectionstatechange(): void;
 
-  protected closePeerConnection(text?) {
+  public closePeerConnection(text?) {
     this.setConnectionStatus('closed');
     if (this.pc && this.pc.signalingState !== 'closed') {
       this.logger.log('Closing peer connection')();

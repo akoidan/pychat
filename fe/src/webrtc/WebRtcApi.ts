@@ -7,10 +7,13 @@ import {ReceivingFile, FileTransferStatus, RootState, SendingFile} from '../type
 import {Store} from 'vuex';
 import FileSender from './FileSender';
 import NotifierHandler from '../utils/NotificationHandler';
-import {browserVersion} from '../utils/singletons';
+import {browserVersion, webrtcApi} from '../utils/singletons';
 import MessageHandler from '../utils/MesageHandler';
-import FileReceiver from './FileReceiver';
 import {sub} from '../utils/sub';
+import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from '../utils/consts';
+import {requestFileSystem} from '../utils/htmlApi';
+import {bytesToSize} from '../utils/utils';
+import FileReceiverPeerConnection from './FileReceiveerPeerConnection';
 
 export default class WebRtcApi extends MessageHandler {
 
@@ -31,47 +34,44 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> }  = {
-    offerfile: this.onofferFile
+    offerFile: this.onofferFile
   };
 
   private onofferFile(message: OfferFile) {
-    this.connections[message.connId] = new FileReceiver(message.roomId, message.connId, this.removeChildReference, this.wsHandler, this.notifier, this.store);
+    let limitExceeded = message.content.size > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem;
     let payload: ReceivingFile = {
       roomId: message.roomId,
       uploaded: 0,
-      status: FileTransferStatus.NOT_DECIDED_YET,
+      anchor: null,
+      status: limitExceeded ? FileTransferStatus.ERROR : FileTransferStatus.NOT_DECIDED_YET,
       userId: message.userId,
       total: message.content.size,
-      error: null,
+      error: limitExceeded ? `Your browser doesn't support receiving files over ${bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API)}` : null,
       connId: message.connId,
       fileName: message.content.name,
       time: message.time
     };
     this.store.commit('addReceivingFile', payload);
     this.wsHandler.replyFile(message.connId, browserVersion);
+    if (!limitExceeded) {
+      this.connections[message.connId] = new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.removeChildReference.bind(this), this.wsHandler, this.store, message.content.size);
+    }
   }
 
-  acceptFile(connId: string, roomId: number) {
-    this.wsHandler.acceptFile(connId);
-    let rf: SetReceivingFileStatus = {
-      roomId, connId, status: FileTransferStatus.IN_PROGRESS
-    };
-    this.store.commit('setReceivingFileStatus', rf);
+
+  acceptFile(connId: string) {
+    this.connections[connId].acceptFileReply();
+
   }
 
-  declineFile(connId: string, roomId: number) {
-    this.wsHandler.declineFile(connId);
-    this.removeChildReference(connId);
-    let rf: SetReceivingFileStatus = {
-      roomId, connId, status: FileTransferStatus.DECLINED
-    };
-    this.store.commit('setReceivingFileStatus', rf);
+  declineFile(connId: string) {
+    this.connections[connId].declineFileReply();
   }
 
   offerFile(file, channel) {
     this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, (e: WebRtcSetConnectionIdMessage) => {
       if (e.connId) {
-        this.connections[e.connId] = new FileSender(channel, e.connId, this.removeChildReference, this.wsHandler, this.notifier, this.store, file);
+        this.connections[e.connId] = new FileSender(channel, e.connId, this.removeChildReference.bind(this), this.wsHandler, this.notifier, this.store, file);
         let payload: SendingFile = {
           roomId: channel,
           connId: e.connId,

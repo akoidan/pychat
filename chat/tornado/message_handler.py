@@ -672,8 +672,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 			))  # todo receiver should only accept proxy_webrtc from sender, sender can accept all
 		# I mean somebody if there're 3 ppl in 1 channel and first is initing transfer to 2nd and 3rd,
 		# 2nd guy can fraud 3rd guy webrtc traffic, which is allowed during the call, but not while transering file
-		in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
-		in_message[VarNames.HANDLER_NAME] = HandlerNames.PEER_CONNECTION
+		in_message[VarNames.HANDLER_NAME] = HandlerNames.PEER_CONNECTION.format(connection_id, self.id)
 		self.logger.debug(
 			"!! Forwarding message to channel %s, self %s, other status %s",
 			channel,
@@ -722,7 +721,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 				VarNames.HANDLER_NAME:  HandlerNames.PEER_CONNECTION.format(in_message[VarNames.CONNECTION_ID], self.id),
 				VarNames.EVENT: Actions.CLOSE_FILE_CONNECTION,
 				VarNames.CONTENT: in_message[VarNames.CONTENT]
-			}, sender_id) 
+			}, sender_id)
 
 	def close_file_sender(self, connection_id):
 		values = self.sync_redis.shgetall(connection_id)

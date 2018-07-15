@@ -99,12 +99,26 @@ export interface SetReceivingFileStatus {
   connId: string;
   status: FileTransferStatus;
   error?: string;
+  anchor?: string;
 }
 
-export interface SetSendingFileStatus {
+interface SetSendingFileBase {
   roomId: number;
   connId: string;
   transfer: string;
+}
+
+export interface SetSendingFileUploaded extends SetSendingFileBase {
+  uploaded: number;
+}
+
+export interface SetReceivingFileUploaded {
+  roomId: number;
+  connId: string;
+  uploaded: number;
+}
+
+export interface SetSendingFileStatus extends SetSendingFileBase {
   status: FileTransferStatus;
   error?: string;
 }
