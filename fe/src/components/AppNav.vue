@@ -65,7 +65,7 @@
     }
 
     sendFile(event) {
-      webrtcApi.offerFile(this.$refs.inputFile.files[0], this.activeRoom.id)
+      webrtcApi.offerFile(this.$refs.inputFile.files[0], this.activeRoom.id);
     }
 
     githubUrl : string = GITHUB_URL;

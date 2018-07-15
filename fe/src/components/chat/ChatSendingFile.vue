@@ -48,10 +48,15 @@
 <style lang="sass" scoped>
   table /deep/
     width: 100%
+    th, td
+      text-align: left
     th
       color: #79aeb6
       font-weight: bold
+      padding-left: 5px
     td
+      padding-left: 10px
+      width: 100%
       text-overflow: ellipsis
       max-width: 250px
       overflow: hidden

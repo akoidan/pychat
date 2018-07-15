@@ -2,7 +2,7 @@
   <tbody>
     <tr>
       <th>To {{user}}</th>
-      <td v-if="showBar"> <app-progress-bar @retry="retry" :upload="transfer"/></td>
+      <td v-if="showBar"> <app-progress-bar @retry="retry" :upload="transfer.upload"/></td>
       <td v-else>
         {{status}}
       </td>
@@ -52,4 +52,6 @@
 </script>
 
 <style lang="sass" scoped>
+  tr /deep/ .progress-wrap
+    width: calc(100% - 40px)
 </style>

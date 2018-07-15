@@ -64,7 +64,7 @@
   import NavUserShow from "./NavUserShow.vue";
   import {sem} from "../../utils/utils";
   import {MessageDataEncode, RemoveSendingMessage, UploadFile} from "../../types/types";
-  import {channelsHandler, globalLogger, messageBus} from "../../utils/singletons";
+  import {channelsHandler, globalLogger, messageBus, webrtcApi} from "../../utils/singletons";
   import store from '../../store';
   import MediaRecorder from './MediaRecorder';
 
@@ -183,7 +183,7 @@
               this.growlError(err);
             });
           } else {
-            this.logger.error("Not implemented yet webrtc")();
+            webrtcApi.offerFile(file, this.activeRoom.id);
           }
         }
       }

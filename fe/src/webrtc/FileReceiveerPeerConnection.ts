@@ -54,7 +54,6 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
   }
 
   protected  onChannelMessage(event) {
-    super.onChannelMessage(event);
     this.receiveBuffer.push(event.data);
     // chrome accepts bufferArray (.byteLength). firefox accepts blob (.size)
     var receivedSize = event.data.byteLength ? event.data.byteLength : event.data.size;

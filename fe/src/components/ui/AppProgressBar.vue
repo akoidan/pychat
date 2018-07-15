@@ -1,8 +1,8 @@
 <template>
   <div class="holder">
     <div class="progress-wrap">
-      <div :style="style"></div>
-      <span>{{text}}</span>
+      <div :style="style" class="bar"></div>
+      <div class="text">{{text}}</div>
     </div>
   </div>
 </template>
@@ -52,10 +52,12 @@
     > *
       display: inline-block
 
+  $border-radius: 10px
+  $padding: 2px
+  $inner-border-radius: $border-radius - $padding
+
   .progress-wrap
-    $border-radius: 10px
-    $padding: 2px
-    $inner-border-radius: $border-radius - $padding
+
     width: 200px
     position: relative
     height: $height
@@ -63,31 +65,41 @@
     border-radius: $border-radius
     padding: $padding
     box-shadow: inset 0 1px 1px 0 black, 0 1px 1px 0 #36393F
-    > div
-      overflow: hidden
-      height: 100%
-      line-height: $height
-      font-size: 14px
-      display: inline-block
-      margin: 0
-      color: #e7e7e7
-      float: left
+
+
+  .text
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+    text-align: center
+
+  .bar
+    overflow: hidden
+    height: 100%
+    line-height: $height
+    font-size: 14px
+    display: inline-block
+    margin: 0
+    color: #e7e7e7
+    float: left
+    border-radius: $inner-border-radius
+    position: relative
+    text-align: center
+    background: #1c3859
+    @include linear-gradient-values(135deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)
+    @include raw-animation(animate-bars 2s linear infinite)
+    background-size: $stripe-size $stripe-size
+    &:before
+      content: ""
+      position: absolute
       border-radius: $inner-border-radius
-      position: relative
-      text-align: center
-      background: #1c3859
-      @include linear-gradient-values(135deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)
-      @include raw-animation(animate-bars 2s linear infinite)
-      background-size: $stripe-size $stripe-size
-      &:before
-        content: ""
-        position: absolute
-        border-radius: $inner-border-radius
-        height: 100%
-        width: 100%
-        left: 0
-        top: 0
-        @include linear-gradient-values(top, rgba(255, 255, 255, 0.30), rgba(0, 0, 0, 0.3))
+      height: 100%
+      width: 100%
+      left: 0
+      top: 0
+      @include linear-gradient-values(top, rgba(255, 255, 255, 0.30), rgba(0, 0, 0, 0.3))
 
   @include keyframes(animate-bars)
     from

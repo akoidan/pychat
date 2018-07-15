@@ -4,7 +4,7 @@
         :time="receivingFile.time"
         :user-id="receivingFile.userId"
     />
-    <table class="table">
+    <table>
       <tbody>
       <tr>
         <th>Name:</th>
@@ -18,13 +18,13 @@
         <th>Status:</th>
         <td>{{status}}</td>
       </tr>
-      <tr v-if="showProgress">
-        <td colspan="2">
-          <app-progress-bar @retry="retry"  class="progress-wrap-file" :upload="receivingFile"/>
-        </td>
+      <tr v-if="receivingFile.anchor">
+        <th>Download:</th>
+        <td><a class="green-btn" :href="receivingFile.anchor" :download="receivingFile.fileName">Save</a></td>
       </tr>
       </tbody>
     </table>
+    <app-progress-bar v-if="showProgress" @retry="retry"  class="progress-wrap-file" :upload="receivingFile.upload"/>
     <div class="yesNo" v-if="showYesNo">
       <input type="button" value="Accept" @click="accept" class="green-btn">
       <input type="button" value="Decline" @click="decline" class="red-btn">
@@ -55,9 +55,7 @@
       return bytesToSize(this.receivingFile.upload.total);
     }
     get showProgress () {
-      return FileTransferStatus.ERROR === this.receivingFile.status
-          || FileTransferStatus.IN_PROGRESS === this.receivingFile.status
-          || FileTransferStatus.FINISHED === this.receivingFile.status;
+      return FileTransferStatus.IN_PROGRESS === this.receivingFile.status;
     }
 
     get status() {
@@ -99,18 +97,29 @@
 </script>
 
 <style lang="sass" scoped>
+
+  a
+    width: calc(100% - 50px)
+    display: block
+    text-align: center
+    margin-left: 10px
+    margin-right: 10px
   table
     width: 100%
+    text-align: left
     th
       color: #79aeb6
       font-weight: bold
+      padding-left: 5px
     td
       text-overflow: ellipsis
       max-width: 250px
       overflow: hidden
+      width: 100%
+      padding-left: 10px
 
   .progress-wrap-file /deep/ .progress-wrap
-    width: 100%
+    width: calc(100% - 40px)
   .yesNo
     padding-top: 15px
     padding-bottom: 5px

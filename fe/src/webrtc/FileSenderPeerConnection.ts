@@ -97,17 +97,15 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
   setTranseferdAmount(value: number) {
     let now = Date.now();
     let timeDiff = now - this.lastMonitored;
-    if (timeDiff > 1000) {
-      let ssfu: SetSendingFileUploaded = {
-        roomId: this.roomId,
-        uploaded: value,
-        connId: this.connectionId,
-        transfer: this.opponentWsId
-      };
-      this.store.commit('setSendingFileUploaded', ssfu);
-      this.lastMonitoredValue = value;
-      this.lastMonitored = now;
-    }
+    let ssfu: SetSendingFileUploaded = {
+      roomId: this.roomId,
+      uploaded: value,
+      connId: this.connectionId,
+      transfer: this.opponentWsId
+    };
+    this.store.commit('setSendingFileUploaded', ssfu);
+    this.lastMonitoredValue = value;
+    this.lastMonitored = now;
   }
   
 

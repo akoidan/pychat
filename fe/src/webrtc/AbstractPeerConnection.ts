@@ -171,12 +171,12 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       line++;
     }
     if (lines[line].indexOf('b') === 0) {
-      this.logger.log('Replaced b line at line', line)();
+      this.logger.log('Replaced b line at line {}', line)();
       lines[line] = 'b=AS:' + bitrate;
       return lines.join('\n');
     } else {
       // Add a new b line
-      this.logger.log('Adding new b line before line', line)();
+      this.logger.log('Adding new b line before line {}', line)();
       let newLines = lines.slice(0, line);
       newLines.push('b=AS:' + bitrate);
       newLines = newLines.concat(lines.slice(line, lines.length));
