@@ -16,17 +16,6 @@ store.watch(s => s.userSettings && s.userSettings.theme || 'color-reg', (v, o) =
   document.body.parentElement.className = v;
 });
 
-if (IS_DEBUG) {
-  window['channelsHandler'] = channelsHandler;
-  window['ws'] = ws;
-  window['api'] = api;
-  window['xhr'] = xhr;
-  window['storage'] = storage;
-  window['webrtcApi'] = webrtcApi;
-  window['sub'] = sub;
-  window['store'] = store;
-}
-
 window.onerror = function (msg, url, linenumber, column, errorObj) {
   let message = `Error occurred in ${url}:${linenumber}\n${msg}`;
   if ((!!store.state.userSettings || store.state.userSettings.sendLogs) && api) {
@@ -82,5 +71,13 @@ document.addEventListener('DOMContentLoaded', function () {
   vue.$mount('#app');
   if (IS_DEBUG) {
     window['vue'] = vue;
+    window['channelsHandler'] = channelsHandler;
+    window['ws'] = ws;
+    window['api'] = api;
+    window['xhr'] = xhr;
+    window['storage'] = storage;
+    window['webrtcApi'] = webrtcApi;
+    window['sub'] = sub;
+    window['store'] = store;
   }
 });

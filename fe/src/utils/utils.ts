@@ -2,7 +2,7 @@ import store from '../store';
 import router from '../router';
 import sessionHolder from './sessionHolder';
 import {api, channelsHandler, globalLogger, storage, ws} from './singletons';
-import {CurrentUserInfoModel, EditingMessage, MessageModel} from '../types/model';
+import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from '../types/model';
 import loggerFactory from './loggerFactory';
 import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from './consts';
 import {StorageData} from '../types/types';
@@ -38,6 +38,15 @@ export async function initStore() {
       if (!store.state.userInfo && session) {
         store.commit('init', data.setRooms);
       } else {
+        store.getters.roomsArray.forEach((storeRoom: RoomModel) => {
+          if (data.setRooms.roomsDict[storeRoom.id]) {
+            let dbMessages: {[id: number]: MessageModel} = data.setRooms.roomsDict[storeRoom.id].messages;
+            for (let dbMessagesKey in dbMessages) {
+              if (!storeRoom.messages[dbMessagesKey])
+              store.commit('addMessage', dbMessages[dbMessagesKey]);
+            }
+          }
+        });
         globalLogger.debug('Skipping settings state {}', data.setRooms)();
       }
       if (session) {
