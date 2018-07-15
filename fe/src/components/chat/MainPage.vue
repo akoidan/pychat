@@ -249,15 +249,17 @@
         roomId: this.activeRoomId,
         deleted: false,
         id,
-        sending: true,
         time: Date.now(),
         content: md.messageContent,
         symbol: md.currSymbol,
         giphy: null,
         edited: 0,
-        upload: null,
         files: md.fileModels,
-        userId: this.userInfo.userId
+        userId: this.userInfo.userId,
+        transfer: {
+          upload: null,
+          error: null
+        }
       };
       this.addMessage(mm);
       channelsHandler.sendSendMessage(md.messageContent, this.activeRoomId, md.files, id, now);
@@ -274,13 +276,15 @@
           roomId,
           deleted: !messageContent,
           id: messageId,
-          sending: !!messageContent || messageId > 0,
+          transfer: !!messageContent || messageId > 0 ? {
+            error: null,
+            upload: null
+          } : null,
           time: this.editingMessageModel.time,
           content: messageContent,
           symbol: symbol,
           giphy: null,
           edited: this.editingMessageModel.edited + 1,
-          upload: null,
           files,
           userId: this.userInfo.userId
         };

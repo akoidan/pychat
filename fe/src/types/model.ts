@@ -56,6 +56,10 @@ export  interface FileModel {
 export interface UploadProgressModel {
   total: number;
   uploaded: number;
+}
+
+export interface MessageTransferInfo {
+  upload: UploadProgressModel;
   error: string;
 }
 
@@ -70,8 +74,7 @@ export  interface MessageModel {
   edited: number;
   roomId: number;
   userId: number;
-  upload: UploadProgressModel;
-  sending: boolean;
+  transfer: MessageTransferInfo;
 }
 
 export enum SexModel {
@@ -108,22 +111,26 @@ export interface ChangeOnline {
   time: number;
 }
 
-export interface SendingFileTransfer extends UploadProgressModel {
+export interface SendingFileTransfer {
   status: FileTransferStatus;
   userId: number;
+  upload: UploadProgressModel;
+  error: string;
 }
 
 export enum FileTransferStatus {
   NOT_DECIDED_YET, DECLINED, FINISHED, ERROR, IN_PROGRESS
 }
 
-export interface ReceivingFile extends UploadProgressModel {
+export interface ReceivingFile {
   time: number;
+  upload: UploadProgressModel;
   status: FileTransferStatus;
   fileName: string;
   roomId: number;
   connId: string;
   anchor: string;
+  error: string;
   userId: number;
 }
 

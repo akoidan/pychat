@@ -145,9 +145,10 @@ const store: StoreOptions<RootState> = {
   },
   mutations: {
     setMessageProgress(state: RootState, payload: SetMessageProgress) {
-      let upload = state.roomsDict[payload.roomId].messages[payload.messageId].upload;
-      upload.uploaded = payload.uploaded;
-      upload.total = payload.total;
+      state.roomsDict[payload.roomId].messages[payload.messageId].transfer.upload.uploaded = payload.uploaded;
+    },
+    setUploadProgress(state: RootState, payload: SetUploadProgress) {
+      state.roomsDict[payload.roomId].messages[payload.messageId].transfer.upload = payload.upload;
     },
     setDim(state: RootState, payload: boolean) {
       state.dim = payload;
@@ -180,11 +181,11 @@ const store: StoreOptions<RootState> = {
     },
     setSendingFileUploaded(state: RootState, payload: SetSendingFileUploaded) {
       let transfer: SendingFileTransfer = state.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers[payload.transfer];
-      transfer.uploaded = payload.uploaded;
+      transfer.upload.uploaded = payload.uploaded;
     },
     setReceivingFileUploaded(state: RootState, payload: SetReceivingFileUploaded) {
-      let transfer: ReceivingFile = state.roomsDict[payload.roomId].receivingFiles[payload.connId]
-      transfer.uploaded = payload.uploaded;
+      let transfer: ReceivingFile = state.roomsDict[payload.roomId].receivingFiles[payload.connId];
+      transfer.upload.uploaded = payload.uploaded;
     },
     incNewMessagesCount(state: RootState, roomId: number) {
       state.roomsDict[roomId].newMessagesCount++;
@@ -192,16 +193,13 @@ const store: StoreOptions<RootState> = {
     resetNewMessagesCount(state: RootState, roomId: number) {
       state.roomsDict[roomId].newMessagesCount = 0;
     },
-    setUploadProgress(state: RootState, payload: SetUploadProgress) {
-      state.roomsDict[payload.roomId].messages[payload.messageId].upload = payload.upload;
-    },
     removeMessageProgress(state: RootState, payload: RemoveMessageProgress) {
       let message: MessageModel = state.roomsDict[payload.roomId].messages[payload.messageId];
-      message.upload  = null;
+      message.transfer.upload = null;
     },
     setMessageProgressError(state: RootState, payload: SetMessageProgressError) {
-      let upload = state.roomsDict[payload.roomId].messages[payload.messageId].upload;
-      upload.error = payload.error;
+      let mm: MessageModel = state.roomsDict[payload.roomId].messages[payload.messageId];
+      mm.transfer.error = payload.error;
     },
     addMessage(state: RootState, m: MessageModel) {
       let om: { [id: number]: MessageModel } = state.roomsDict[m.roomId].messages;

@@ -154,7 +154,6 @@ export interface PubSetRooms extends DefaultMessage {
 }
 
 export interface SetMessageProgress extends RemoveMessageProgress {
-  total: number;
   uploaded: number;
 }
 

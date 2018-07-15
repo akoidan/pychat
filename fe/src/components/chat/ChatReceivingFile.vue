@@ -52,7 +52,7 @@
       return this.receivingFile.status === FileTransferStatus.NOT_DECIDED_YET;
     }
     get size() :string {
-      return bytesToSize(this.receivingFile.total)
+      return bytesToSize(this.receivingFile.upload.total);
     }
     get showProgress () {
       return FileTransferStatus.ERROR === this.receivingFile.status

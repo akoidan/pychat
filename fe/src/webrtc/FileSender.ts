@@ -29,9 +29,11 @@ export default class FileSender extends BaseTransferHandler {
       transfer: {
         status: FileTransferStatus.NOT_DECIDED_YET,
         error: null,
-        total: this.file.size,
-        uploaded: 0,
         userId: message.userId,
+        upload: {
+          total: this.file.size,
+          uploaded: 0,
+        }
       }
     };
     this.store.commit('addSendingFileTransfer', asft);

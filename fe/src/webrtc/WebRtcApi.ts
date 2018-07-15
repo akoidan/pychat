@@ -41,15 +41,17 @@ export default class WebRtcApi extends MessageHandler {
     let limitExceeded = message.content.size > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem;
     let payload: ReceivingFile = {
       roomId: message.roomId,
-      uploaded: 0,
       anchor: null,
       status: limitExceeded ? FileTransferStatus.ERROR : FileTransferStatus.NOT_DECIDED_YET,
       userId: message.userId,
-      total: message.content.size,
       error: limitExceeded ? `Your browser doesn't support receiving files over ${bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API)}` : null,
       connId: message.connId,
       fileName: message.content.name,
-      time: message.time
+      time: message.time,
+      upload: {
+        uploaded: 0,
+        total: message.content.size
+      }
     };
     this.store.commit('addReceivingFile', payload);
     this.wsHandler.replyFile(message.connId, browserVersion);

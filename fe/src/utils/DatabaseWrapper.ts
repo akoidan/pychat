@@ -14,7 +14,10 @@ import {
   convertSexToString,
   convertStringSexToNumber, getRoomsBaseDict
 } from '../types/converters';
-interface TransactionCb { (t: SQLTransaction, ...rest): void; }
+
+interface TransactionCb {
+  (t: SQLTransaction, ...rest): void;
+}
 
 export default class DatabaseWrapper implements IStorage {
   private logger: Logger;
@@ -22,7 +25,7 @@ export default class DatabaseWrapper implements IStorage {
   private db: Database;
   private cache: object = {};
 
-  constructor(dbName: String ) {
+  constructor(dbName: String) {
     this.logger = loggerFactory.getLoggerColor('db', '#753e01');
     this.dbName = dbName;
   }
@@ -47,18 +50,18 @@ export default class DatabaseWrapper implements IStorage {
     this.db = window.openDatabase(this.dbName, '', 'Messages database', 10 * 1024 * 1024);
     if (this.db.version === '') {
       this.logger.log('Initializing database')();
-        let t: SQLTransaction = await new Promise<SQLTransaction>((resolve, reject) => {
-          this.db.changeVersion(this.db.version, '1.0', (t) => resolve(t), e => reject(e));
-        });
-        t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)) )');
-        t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)))');
-        t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (deleted IN (0,1)))');
-        t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
-        t = await this.runSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))');
-        t = await this.runSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2)))');
-        t = await this.runSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))');
-        this.logger.log('DatabaseWrapper has been initialized')();
-        return true;
+      let t: SQLTransaction = await new Promise<SQLTransaction>((resolve, reject) => {
+        this.db.changeVersion(this.db.version, '1.0', (t) => resolve(t), e => reject(e));
+      });
+      t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)) )');
+      t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)))');
+      t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (deleted IN (0,1)))');
+      t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
+      t = await this.runSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))');
+      t = await this.runSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2)))');
+      t = await this.runSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))');
+      this.logger.log('DatabaseWrapper has been initialized')();
+      return true;
     } else if (this.db.version === '1.0') {
       this.logger.log('Created new db connection')();
       return false;
@@ -156,8 +159,10 @@ export default class DatabaseWrapper implements IStorage {
           roomId: m.roomId,
           time: m.time,
           deleted: m.deleted ? true : false,
-          sending: m.sending,
-          upload: null,
+          transfer: m.sending ? {
+            error: null,
+            upload: null
+          } : null,
           files: {},
           edited: m.edited,
           symbol: m.symbol,
@@ -165,7 +170,7 @@ export default class DatabaseWrapper implements IStorage {
           userId: m.userId,
           giphy: m.giphy
         };
-        if (message.sending) {
+        if (m.sending) {
           sendingMessages.push(message);
         }
         if (roomsDict[m.roomId]) {
@@ -189,9 +194,9 @@ export default class DatabaseWrapper implements IStorage {
       return null;
     }
   }
-  
+
   private transaction(transactionType: string, cb: TransactionCb) {
-    this.db[transactionType]( t => {
+    this.db[transactionType](t => {
       cb(t);
     }, (e) => {
       this.logger.error('Error during saving message {}', e)();
@@ -237,7 +242,7 @@ export default class DatabaseWrapper implements IStorage {
     this.logger.log('Db has messages removed')();
   }
 
-  public clearStorage () {
+  public clearStorage() {
     this.write(t => {
       this.executeSql(t, 'delete from room_users')();
       this.executeSql(t, 'delete from user')();
@@ -271,10 +276,10 @@ export default class DatabaseWrapper implements IStorage {
   //   return cb;
   // }
 
-  public insertMessage (t, message: MessageModel) {
+  public insertMessage(t, message: MessageModel) {
     this.setRoomHeaderId(message.roomId, message.id);
     this.executeSql(t, 'insert or replace into message (id, time, content, symbol, deleted, giphy, edited, roomId, userId, sending) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId, message.sending ? 1 : 0], (t, d) => {
+        [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId, message.transfer ? 1 : 0], (t, d) => {
           for (let k in message.files) {
             let f = message.files[k];
             this.executeSql(t, 'insert or replace into file (id, symbol, url, message_id, type, preview) values (?, ?, ?, ?, ?, ?)', [f.id, k, f.url, message.id, f.type, f.preview])();
@@ -376,7 +381,7 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
-  public saveMessages( messages: MessageModel[]) {
+  public saveMessages(messages: MessageModel[]) {
     this.write(t => {
       messages.forEach(m => {
         this.insertMessage(t, m);
@@ -386,7 +391,7 @@ export default class DatabaseWrapper implements IStorage {
 
   public saveMessage(m: MessageModel) {
     this.write(t => {
-        this.insertMessage(t, m);
+      this.insertMessage(t, m);
     });
   }
 

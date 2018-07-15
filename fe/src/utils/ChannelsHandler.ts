@@ -177,7 +177,6 @@ export default class ChannelsHandler extends MessageHandler {
         let newVar: SetMessageProgress = {
           messageId,
           roomId,
-          total: evt.total,
           uploaded: evt.loaded
         };
         this.store.commit('setMessageProgress', newVar);
@@ -185,7 +184,6 @@ export default class ChannelsHandler extends MessageHandler {
     });
     let sup: SetUploadProgress = {
       upload: {
-        error: null,
         total: size,
         uploaded: 0
       },
@@ -273,8 +271,7 @@ export default class ChannelsHandler extends MessageHandler {
         edited: inMessage.edited,
         roomId: message.roomId,
         userId: message.userId,
-        upload: null,
-        sending: false,
+        transfer: null,
         giphy: message.giphy || null,
         deleted: true
       };
@@ -453,8 +450,7 @@ export default class ChannelsHandler extends MessageHandler {
       edited: message.edited || null,
       roomId: message.roomId,
       userId: message.userId,
-      upload: null,
-      sending: false,
+      transfer: null,
       giphy: message.giphy || null,
       deleted: message.deleted || null
     };

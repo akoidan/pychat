@@ -1,12 +1,9 @@
 <template>
   <div class="holder">
-    <div class="progress-wrap"
-         :class="{animated: !finished && ! upload.error, success: finished, error: upload.error}">
-      <a :style="style"></a>
+    <div class="progress-wrap">
+      <div :style="style"></div>
       <span>{{text}}</span>
     </div>
-    <i v-if="upload.error" class="icon-repeat" @click="click">
-    </i>
   </div>
 </template>
 <script lang="ts">
@@ -26,18 +23,12 @@
       return bytesToSize(this.upload.uploaded);
     }
 
-    click() {
-      if (this.upload.error) {
-        this.$emit('retry');
-      }
-    }
-
     get finished() {
       return this.upload.total === this.upload.uploaded && this.upload.total !== 0;
     }
 
     get text() {
-      return this.upload.error ? this.upload.error : this.finished ? "File is processing..." : `${this.valueMb} / ${this.totalMb} (${this.percents})`;
+      return `${this.valueMb} / ${this.totalMb} (${this.percents})`;
     }
 
     get style() {
@@ -61,11 +52,6 @@
     > *
       display: inline-block
 
-  .icon-repeat
-    position: relative
-    top: -2px
-    cursor: pointer
-
   .progress-wrap
     $border-radius: 10px
     $padding: 2px
@@ -77,7 +63,7 @@
     border-radius: $border-radius
     padding: $padding
     box-shadow: inset 0 1px 1px 0 black, 0 1px 1px 0 #36393F
-    > a
+    > div
       overflow: hidden
       height: 100%
       line-height: $height
@@ -89,6 +75,10 @@
       border-radius: $inner-border-radius
       position: relative
       text-align: center
+      background: #1c3859
+      @include linear-gradient-values(135deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)
+      @include raw-animation(animate-bars 2s linear infinite)
+      background-size: $stripe-size $stripe-size
       &:before
         content: ""
         position: absolute
@@ -98,20 +88,6 @@
         left: 0
         top: 0
         @include linear-gradient-values(top, rgba(255, 255, 255, 0.30), rgba(0, 0, 0, 0.3))
-    span
-      position: absolute
-      text-align: center
-      left: 0
-      width: 100%
-    &.animated > a
-      background: #1c3859
-      @include linear-gradient-values(135deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent)
-      @include raw-animation(animate-bars 2s linear infinite)
-      background-size: $stripe-size $stripe-size
-    &.success > a
-      background-color: #18611f
-    &.error > a
-      background-color: #700000
 
   @include keyframes(animate-bars)
     from

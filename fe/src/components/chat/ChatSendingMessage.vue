@@ -1,9 +1,11 @@
 <template>
   <div :class="cls" class="msgHolder">
     <chat-message :message="message"/>
-    <app-progress-bar v-if="message.upload" @retry="retry" :upload="message.upload"/>
-    <div v-else-if="message.sending" class="spinner">
-    </div>
+    <template v-if="message.transfer">
+      <app-progress-bar v-if="message.transfer.upload  && !message.transfer.error" :upload="message.transfer.upload"/>
+      <i v-else class="icon-repeat" @click="retry">{{message.transfer.error}}</i>
+      <div class="spinner"></div>
+    </template>
   </div>
 </template>
 <script lang="ts">
@@ -33,8 +35,8 @@
 
     get cls() {
       return {
-        sendingMessage: this.message.sending && !this.message.upload,
-        uploadMessage: this.message.sending && !!this.message.upload,
+        sendingMessage: this.message.transfer && !this.message.transfer.upload,
+        uploadMessage: this.message.transfer && !!this.message.transfer.upload,
         "filter-search": this.searchedIds.indexOf(this.message.id) >= 0,
       }
     }
@@ -71,4 +73,8 @@
     display: inline-block
     margin: -4px 10px -4px 10px
     @include spinner(3px, white)
+  .icon-repeat
+    display: block
+    text-align: center
+    cursor: pointer
 </style>
