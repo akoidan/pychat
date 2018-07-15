@@ -46,6 +46,7 @@ import WsHandler from './WsHandler';
 import NotifierHandler from './NotificationHandler';
 import {faviconUrl} from './htmlApi';
 import {sub} from './sub';
+import {bounce} from './utils';
 
 export default class ChannelsHandler extends MessageHandler {
   protected readonly logger: Logger;
@@ -156,6 +157,7 @@ export default class ChannelsHandler extends MessageHandler {
   ): void {
     let size: number = 0;
     files.forEach(f => size += f.file.size);
+    let noSpam = bounce(100);
     this.api.uploadFiles(files, (res: number[], error: string) => {
       if (error) {
         let newVar: SetMessageProgressError = {
@@ -174,12 +176,14 @@ export default class ChannelsHandler extends MessageHandler {
       }
     }, evt => {
       if (evt.lengthComputable) {
-        let newVar: SetMessageProgress = {
-          messageId,
-          roomId,
-          uploaded: evt.loaded
-        };
-        this.store.commit('setMessageProgress', newVar);
+        noSpam(() => {
+          let newVar: SetMessageProgress = {
+            messageId,
+            roomId,
+            uploaded: evt.loaded
+          };
+          this.store.commit('setMessageProgress', newVar);
+        });
       }
     });
     let sup: SetUploadProgress = {

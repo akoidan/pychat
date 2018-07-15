@@ -8,7 +8,7 @@
   },
   "scripts": {
     "prod": "webpack --progress --mode production  --hide-modules",
-    "dev": "webpack-dev-server --mode development --inline --hot --https",
+    "dev": "webpack-dev-server --mode development --inline --hot --https --host 0.0.0.0",
     "deploy": "scp -rP 8886 ./dist/ http@192.168.1.12:/srv/http/vue/fe",
     "publish": "yarn run prod && yarn run deploy",
     "test": "mocha test/index.ts",

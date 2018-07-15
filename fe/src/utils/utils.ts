@@ -35,6 +35,19 @@ export function getDay(dateObj) {
   return `${year}/${month}/${day}`;
 }
 
+export function bounce(ms): (cb) => void {
+  let stack;
+  let lastCall;
+  return function(cb) {
+    lastCall = cb;
+    if (!stack) {
+      stack = setTimeout(() => {
+        stack = null;
+        lastCall();
+      }, ms);
+    }
+  }
+}
 export async function initStore() {
   let isNew = await storage.connect();
   if (!isNew) {

@@ -4,7 +4,7 @@ import {SetSendingFileStatus, SetSendingFileUploaded} from '../types/types';
 import {FileTransferStatus, RootState} from '../types/model';
 import WsHandler from '../utils/WsHandler';
 import {Store} from 'vuex';
-import {bytesToSize, getDay} from '../utils/utils';
+import {bounce, bytesToSize, getDay} from '../utils/utils';
 import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE} from '../utils/consts';
 import FilePeerConnection from './FilePeerConnection';
 
@@ -23,11 +23,13 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
     sendRtcData: this.onsendRtcData
   };
   private filePeerConnection: FilePeerConnection;
+  private noSpam: (cb) => void;
 
   constructor(roomId: number, connId: string, opponentWsId: string, removeChildPeerReference: (id) => void, wsHandler: WsHandler, store: Store<RootState>, file: File) {
     super(roomId, connId, opponentWsId, removeChildPeerReference, wsHandler, store);
     this.file = file;
     this.filePeerConnection = new FilePeerConnection(this);
+    this.noSpam = bounce(100);
   }
 
   oniceconnectionstatechange(): void {
@@ -45,13 +47,7 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
       transfer: this.opponentWsId
     };
     this.store.commit('setSendingFileStatus', ssfs);
-    let ssfu: SetSendingFileUploaded = {
-      roomId: this.roomId,
-      uploaded: message.content.received,
-      connId: this.connectionId,
-      transfer: this.opponentWsId
-    };
-    this.store.commit('setSendingFileUploaded', ssfu);
+    this.setTranseferdAmount(message.content.received);
     try {
       // Reliable data channels not supported by Chrome
       this.sendChannel = this.pc.createDataChannel('sendDataChannel', {reliable: false});
@@ -95,17 +91,15 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
 
 
   setTranseferdAmount(value: number) {
-    let now = Date.now();
-    let timeDiff = now - this.lastMonitored;
-    let ssfu: SetSendingFileUploaded = {
-      roomId: this.roomId,
-      uploaded: value,
-      connId: this.connectionId,
-      transfer: this.opponentWsId
-    };
-    this.store.commit('setSendingFileUploaded', ssfu);
-    this.lastMonitoredValue = value;
-    this.lastMonitored = now;
+    this.noSpam(() => {
+      let ssfu: SetSendingFileUploaded = {
+        roomId: this.roomId,
+        uploaded: value,
+        connId: this.connectionId,
+        transfer: this.opponentWsId
+      };
+      this.store.commit('setSendingFileUploaded', ssfu);
+    });
   }
   
 

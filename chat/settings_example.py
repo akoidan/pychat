@@ -82,6 +82,10 @@ globals().update(importlib.import_module(config).__dict__)
 # FACEBOOK_ACCESS_TOKEN = '***************|***************************' # https://developers.facebook.com/tools/access_token/
 # FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
 
+
+### you only need to edit this settings if you have issues with CORS, see django-cors-headers
+# CORS_ORIGIN_WHITELIST = ['192.168.1.100:8080']
+
 ###<<<<<
 SESSION_REDIS = {
 	'host': REDIS_HOST,

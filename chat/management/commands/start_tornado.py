@@ -60,7 +60,7 @@ class Command(BaseCommand):
 		], debug=settings.DEBUG, default_host=options['host'])
 		self.http_server = HTTPServer(application, ssl_options=TORNADO_SSL_OPTIONS)
 		self.http_server.bind(options['port'])
-		print('Listening port {}'.format(options['port']))
+		print('tornado server started at {}:{}'.format(options['host'], options['port']))
 		#  uncomment me for multiple process
 		self.http_server.start(1)
 		# Init signals handler

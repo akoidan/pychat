@@ -2,7 +2,7 @@ import ReceiverPeerConnection from './ReceiverPeerConnection';
 import {SetReceivingFileStatus, SetReceivingFileUploaded} from '../types/types';
 import {FileTransferStatus, RootState} from '../types/model';
 import {DefaultMessage} from '../types/messages';
-import {bytesToSize} from '../utils/utils';
+import {bounce, bytesToSize} from '../utils/utils';
 import WsHandler from '../utils/WsHandler';
 import {Store} from 'vuex';
 import {requestFileSystem} from '../utils/htmlApi';
@@ -22,10 +22,12 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
     sendRtcData: this.onsendRtcData
   };
+  private noSpam: (cb) => void;
 
   constructor(roomId: number, connId: string, opponentWsId: string, removeChildReference: (id) => void, wsHandler: WsHandler, store: Store<RootState>, size: number) {
     super(roomId, connId, opponentWsId, removeChildReference, wsHandler, store);
     this.fileSize = size;
+    this.noSpam = bounce(100);
     this.filePeerConnection = new FilePeerConnection(this);
   }
 
@@ -53,18 +55,20 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
     }
   }
 
-  protected  onChannelMessage(event) {
+  protected onChannelMessage(event) {
     this.receiveBuffer.push(event.data);
     // chrome accepts bufferArray (.byteLength). firefox accepts blob (.size)
     var receivedSize = event.data.byteLength ? event.data.byteLength : event.data.size;
     this.receivedSize += receivedSize;
     this.syncBufferWithFs();
-    let payload: SetReceivingFileUploaded = {
-      connId: this.connectionId,
-      roomId: this.roomId,
-      uploaded: this.receivedSize
-    };
-    this.store.commit('setReceivingFileUploaded', payload);
+    this.noSpam(() => {
+      let payload: SetReceivingFileUploaded = {
+        connId: this.connectionId,
+        roomId: this.roomId,
+        uploaded: this.receivedSize
+      };
+      this.store.commit('setReceivingFileUploaded', payload);
+    });
     this.assembleFileIfDone();
   };
   
