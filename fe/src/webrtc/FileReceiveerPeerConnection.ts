@@ -169,7 +169,7 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
     this.initFileSystemApi((fileSystemSucess) => {
         if (fileSystemSucess || this.fileSize < MAX_ACCEPT_FILE_SIZE_WO_FS_API) {
           this.createPeerConnection();
-          this.pc.ondatachannel =  this.gotReceiveChannel;
+          this.pc.ondatachannel =  this.gotReceiveChannel.bind(this);
           this.wsHandler.acceptFile(this.connectionId);
           let rf: SetReceivingFileStatus = {
             roomId: this.roomId,

@@ -20,6 +20,7 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
     destroyFileConnection: this.destroyFileConnection,
     acceptFile: this.acceptFile,
+    sendRtcData: this.onsendRtcData
   };
   private filePeerConnection: FilePeerConnection;
 
@@ -54,7 +55,7 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
     try {
       // Reliable data channels not supported by Chrome
       this.sendChannel = this.pc.createDataChannel('sendDataChannel', {reliable: false});
-      this.sendChannel.onopen = this.onreceiveChannelOpen;
+      this.sendChannel.onopen = this.onreceiveChannelOpen.bind(this);
       this.logger.log('Created send data channel.')();
     } catch (e) {
       let error = `Failed to create data channel because ${e.message || e}`;

@@ -18,7 +18,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   public pc = null;
   protected connectionStatus = 'new';
   protected webRtcUrl = WEBRTC_STUNT_URL;
-  protected connectedToRemote: boolean = false;
+  protected connectedToRemote: boolean = true; // TODO should be false in callhandler
   protected sdpConstraints: boolean;
   protected readonly wsHandler: WsHandler;
   protected readonly store: Store<RootState>;
@@ -72,7 +72,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       this.logger.log('onsendRtcData')();
       if (this.pc.iceConnectionState && this.pc.iceConnectionState !== 'closed') {
         if (data.sdp) {
-          this.pc.setRemoteDescription(new RTCSessionDescription(data), this.handleAnswer, this.failWebRtc('setRemoteDescription'));
+          this.pc.setRemoteDescription(new RTCSessionDescription(data), this.handleAnswer.bind(this), this.failWebRtc('setRemoteDescription'));
         } else if (data.candidate) {
           this.pc.addIceCandidate(new RTCIceCandidate(data));
         } else if (data.message) {
@@ -90,7 +90,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       throw 'Your browser doesn\'t support RTCPeerConnection';
     }
     this.pc = new (<any>RTCPeerConnection)(this.pc_config, this.pc_constraints);
-    this.pc.oniceconnectionstatechange = this.oniceconnectionstatechange;
+    this.pc.oniceconnectionstatechange = this.oniceconnectionstatechange.bind(this);
     this.pc.onicecandidate = (event) => {
       this.logger.log('onicecandidate')();
       if (event.candidate) {
