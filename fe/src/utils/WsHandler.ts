@@ -103,6 +103,15 @@ export default class WsHandler extends MessageHandler {
     });
   }
 
+  public destroyPeerFileConnection(connId, content, opponentWsId) {
+    this.sendToServer({
+      content,
+      opponentWsId,
+      action: 'destroyFileConnection',
+      connId
+    });
+  }
+
 
   public sendEditMessage(content: string, id: number, files: number[], messageId) {
     let newVar = {

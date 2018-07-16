@@ -64,7 +64,7 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
       transfer: this.opponentWsId
     };
     this.store.commit('setSendingFileStatus', ssfs);
-    this.wsHandler.destroyFileConnection(this.connectionId, 'decline');
+    this.wsHandler.destroyPeerFileConnection(this.connectionId, 'decline', this.opponentWsId);
   }
 
   oniceconnectionstatechange(): void {

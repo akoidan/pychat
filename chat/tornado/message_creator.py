@@ -287,7 +287,7 @@ class WebRtcMessageCreator(object):
 	def get_close_file_sender_message(self, connection_id):
 		return {
 			VarNames.EVENT: Actions.CLOSE_FILE_CONNECTION,
-			VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER.format(connection_id, self.id),
+			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION.format(connection_id, self.id),
 		}
 
 	def get_accept_file_message(self, connection_id, content):

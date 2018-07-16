@@ -682,16 +682,18 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 
 	def close_file_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
+		opponent_id = in_message.get(VarNames.WEBRTC_OPPONENT_ID, None)
 		self_channel_status = self.sync_redis.shget(connection_id, self.id)
 		if not self_channel_status:
 			raise Exception("Access Denied")
 		if self_channel_status != WebRtcRedisStates.CLOSED:
 			sender_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
 			if sender_id == self.id:
-				self.close_file_sender(connection_id)
+				message = self.get_close_file_sender_message(connection_id)
+				self.publish(message, opponent_id)
 			else:
 				self.close_file_receiver(connection_id, in_message, sender_id)
-			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.CLOSED)
+				self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.CLOSED)
 
 	def close_call_connection(self, in_message):
 		self.send_call_answer(
@@ -722,14 +724,6 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 				VarNames.CONTENT: in_message[VarNames.CONTENT]
 			}, sender_id)
 
-	def close_file_sender(self, connection_id):
-		values = self.sync_redis.shgetall(connection_id)
-		del values[self.id]
-		message = self.get_close_file_sender_message(connection_id)
-		for ws_id in values:
-			if values[ws_id] == WebRtcRedisStates.CLOSED:
-				continue
-			self.publish(message, ws_id)
 
 	def accept_file(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
