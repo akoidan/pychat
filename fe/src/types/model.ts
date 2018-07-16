@@ -146,6 +146,7 @@ export interface SendingFile {
 
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
+  callContainer: boolean;
   sendingFiles:  { [id: string]: SendingFile };
   receivingFiles:  { [id: string]: ReceivingFile };
   messages: { [id: number]: MessageModel };

@@ -9,7 +9,7 @@
     <router-link to="/report-issue" class="icon-pencil" title="Report an issue">
       <span class="mText">Issue</span>
     </router-link>
-    <i class="icon-phone" v-if="$route.name === 'chat'" title="Make a video/mic call"><span class="mText">Call</span></i>
+    <i class="icon-phone" v-if="$route.name === 'chat'" title="Make a video/mic call" @click="toggleContainer(activeRoom.id)"><span class="mText">Call</span></i>
     <i class="icon-search" v-if="activeRoom && $route.name === 'chat'" @click='invertSearch' title="Search messages in current room (Shift+Ctrl+F)"><span
         class="mText">Search</span>
     </i>
@@ -53,6 +53,7 @@
     @Action growlError;
     @Action logout;
     @Mutation setSearchTo;
+    @Mutation toggleContainer;
 
 
     $refs: {

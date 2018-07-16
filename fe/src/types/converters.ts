@@ -37,6 +37,7 @@ export function getRoomsBaseDict({roomId, volume, notifications, name, users}): 
     id: roomId,
     sendingFiles: {},
     volume,
+    callContainer: false,
     notifications,
     name,
     messages: {},

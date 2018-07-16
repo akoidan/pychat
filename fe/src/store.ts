@@ -156,6 +156,9 @@ const store: StoreOptions<RootState> = {
     addSendingFile(state: RootState, payload: SendingFile) {
       Vue.set(state.roomsDict[payload.roomId].sendingFiles, payload.connId, payload);
     },
+    toggleContainer(state: RootState, roomId: number) {
+      state.roomsDict[roomId].callContainer = !state.roomsDict[roomId].callContainer;
+    },
     addReceivingFile(state: RootState, payload: ReceivingFile) {
       Vue.set(state.roomsDict[payload.roomId].receivingFiles, payload.connId, payload);
     },

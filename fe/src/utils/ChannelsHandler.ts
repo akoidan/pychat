@@ -221,6 +221,7 @@ export default class ChannelsHandler extends MessageHandler {
       let oldRoom = roomsDict[newRoom.roomId];
       let rm: RoomModel = {
         id: newRoom.roomId,
+        callContainer: oldRoom ? oldRoom.callContainer : false,
         sendingFiles: oldRoom ? oldRoom.sendingFiles : {},
         receivingFiles: oldRoom ? oldRoom.receivingFiles : {},
         messages: oldRoom ? oldRoom.messages : {},

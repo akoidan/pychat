@@ -1,5 +1,6 @@
 <template>
   <div class="holder">
+    <chat-call v-show="room.callContainer"/>
     <search-messages :room="room"/>
     <div class="chatbox" @keydown="keyDownLoadUp" :class="{'display-search-only': room.search.searchActive}" tabindex="1" @mousewheel="onScroll" ref="chatbox">
       <template v-for="message in messages">
@@ -29,9 +30,11 @@
   import ChatChangeOnlineMessage from "./ChatChangeOnlineMessage";
   import ChatSendingFile from "./ChatSendingFile";
   import ChatReceivingFile from './ChatReceivingFile';
+  import ChatCall from './ChatCall';
 
   @Component({
     components: {
+      ChatCall,
       ChatReceivingFile,
       ChatSendingFile,
       ChatChangeOnlineMessage,
