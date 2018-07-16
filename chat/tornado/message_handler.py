@@ -690,6 +690,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 			sender_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
 			if sender_id == self.id:
 				message = self.get_close_file_sender_message(connection_id)
+				self.async_redis_publisher.hset(connection_id, opponent_id, WebRtcRedisStates.CLOSED)
 				self.publish(message, opponent_id)
 			else:
 				self.close_file_receiver(connection_id, in_message, sender_id)
