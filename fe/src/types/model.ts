@@ -119,7 +119,7 @@ export interface SendingFileTransfer {
 }
 
 export enum FileTransferStatus {
-  NOT_DECIDED_YET, DECLINED, FINISHED, ERROR, IN_PROGRESS
+  NOT_DECIDED_YET, DECLINED_BY_OPPONENT, DECLINED_BY_YOU, FINISHED, ERROR, IN_PROGRESS
 }
 
 export interface ReceivingFile {
@@ -127,6 +127,7 @@ export interface ReceivingFile {
   upload: UploadProgressModel;
   status: FileTransferStatus;
   fileName: string;
+  opponentWsId: string;
   roomId: number;
   connId: string;
   anchor: string;

@@ -1,12 +1,19 @@
 import SenderPeerConnection from './SenderPeerConnection';
 import {AcceptFileMessage, DefaultMessage, DestroyFileConnectionMessage} from '../types/messages';
-import {SetSendingFileStatus, SetSendingFileUploaded} from '../types/types';
+import {
+  AddSendingFileTransfer,
+  RemovePeerConnection,
+  SetSendingFileStatus,
+  SetSendingFileUploaded
+} from '../types/types';
 import {FileTransferStatus, RootState} from '../types/model';
 import WsHandler from '../utils/WsHandler';
 import {Store} from 'vuex';
 import {bounce, bytesToSize, getDay} from '../utils/utils';
 import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE} from '../utils/consts';
 import FilePeerConnection from './FilePeerConnection';
+import {sub} from '../utils/sub';
+import Subscription from '../utils/Subscription';
 
 export default class FileSenderPeerConnection extends SenderPeerConnection {
 
@@ -14,26 +21,58 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
   private reader: FileReader;
   private offset: number;
   private lastPrinted: number = 0;
-  private lastMonitored: number = 0;
-  private lastMonitoredValue: number = 0;
 
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
     destroyFileConnection: this.destroyFileConnection,
     acceptFile: this.acceptFile,
-    sendRtcData: this.onsendRtcData
+    sendRtcData: this.onsendRtcData,
+    destroy: this.closeEvents,
+    declineSending: this.declineSending,
   };
   private filePeerConnection: FilePeerConnection;
   private noSpam: (cb) => void;
 
-  constructor(roomId: number, connId: string, opponentWsId: string, removeChildPeerReference: (id) => void, wsHandler: WsHandler, store: Store<RootState>, file: File) {
-    super(roomId, connId, opponentWsId, removeChildPeerReference, wsHandler, store);
+  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>, file: File, userId: number) {
+    super(roomId, connId, opponentWsId, wsHandler, store);
     this.file = file;
     this.filePeerConnection = new FilePeerConnection(this);
     this.noSpam = bounce(100);
+    let asft:  AddSendingFileTransfer = {
+      connId,
+      transferId: opponentWsId,
+      roomId: 1,
+      transfer: {
+        status: FileTransferStatus.NOT_DECIDED_YET,
+        error: null,
+        userId: userId,
+        upload: {
+          total: this.file.size,
+          uploaded: 0,
+        }
+      }
+    };
+    this.store.commit('addSendingFileTransfer', asft);
+  }
+
+  private declineSending() {
+    this.onDestroy();
+    let ssfs: SetSendingFileStatus = {
+      status: FileTransferStatus.DECLINED_BY_YOU,
+      roomId: this.roomId,
+      error: null,
+      connId: this.connectionId,
+      transfer: this.opponentWsId
+    };
+    this.store.commit('setSendingFileStatus', ssfs);
+    this.wsHandler.destroyFileConnection(this.connectionId, 'decline');
   }
 
   oniceconnectionstatechange(): void {
     this.filePeerConnection.oniceconnectionstatechange();
+  }
+
+  closeEvents() {
+    this.filePeerConnection.closeEvents();
   }
 
   acceptFile(message: AcceptFileMessage) {
@@ -55,7 +94,7 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
       this.logger.log('Created send data channel.')();
     } catch (e) {
       let error = `Failed to create data channel because ${e.message || e}`;
-      this.setError(error);
+      this.commitErrorIntoStore(error);
       this.logger.error('acceptFile {}', e)();
       return;
     }
@@ -65,24 +104,10 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
 
   onreceiveChannelOpen() {
     this.logger.log('Channel is open, slicing file: {} {} {} {}', this.file.name, bytesToSize(this.file.size), this.file.type, getDay(this.file.lastModifiedDate))();
-    if (this.file.size === 0) {
-      let ssfs: SetSendingFileStatus = {
-        status: FileTransferStatus.ERROR,
-        roomId: this.roomId,
-        error: `Can't send empty file`,
-        connId: this.connectionId,
-        transfer: this.opponentWsId
-      };
-      this.store.commit('setSendingFileStatus', ssfs);
-      this.filePeerConnection.closeEvents(`Can't send empty file`);
-    } else {
-      this.reader = new FileReader();
-      this.reader.onload = this.onFileReaderLoad.bind(this);
-      this.sendCurrentSlice();
-      this.lastPrinted = 0;
-      this.lastMonitored = 0;
-      this.lastMonitoredValue = 0;
-    }
+    this.reader = new FileReader();
+    this.reader.onload = this.onFileReaderLoad.bind(this);
+    this.sendCurrentSlice();
+    this.lastPrinted = 0;
   }
 
   sendCurrentSlice() {
@@ -131,7 +156,7 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
         throw `Can't write data into ${this.sendChannel.readyState} channel`;
       }
     } catch (error) {
-      this.setError('Connection has been lost');
+      this.commitErrorIntoStore('Connection has been lost');
       this.filePeerConnection.closeEvents(String(error));
       this.logger.error('sendData {}', error)();
     }
@@ -157,19 +182,43 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
     }
   }
 
+
+  onDestroy() {
+    super.onDestroy();
+    let message: RemovePeerConnection = {
+      handler: Subscription.getTransferId(this.connectionId),
+      action: 'removePeerConnection',
+      opponentWsId: this.opponentWsId,
+    };
+    sub.notify(message);
+  }
+
   destroyFileConnection(message: DestroyFileConnectionMessage) {
     let isDecline = message.content === 'decline';
+    let isSuccess = message.content === 'success';
+    let isError = false;
+    let status;
+    if (isDecline) {
+      status = FileTransferStatus.DECLINED_BY_OPPONENT;
+      this.onDestroy();
+    } else if (isSuccess) {
+      status = FileTransferStatus.FINISHED;
+      this.onDestroy();
+    } else {
+      status = FileTransferStatus.ERROR;
+      isError = true;
+    }
     let payload: SetSendingFileStatus = {
       transfer: this.opponentWsId,
       connId: this.connectionId,
-      error: isDecline ? null : message.content,
+      error: isError ? message.content : null,
       roomId: this.roomId,
-      status: isDecline ? FileTransferStatus.DECLINED : FileTransferStatus.ERROR
+      status
     };
     this.store.commit('setSendingFileStatus', payload);
   }
 
-  public setError(error): void {
+  private commitErrorIntoStore(error) {
     let ssfs: SetSendingFileStatus = {
       status: FileTransferStatus.ERROR,
       roomId: this.roomId,
@@ -178,5 +227,12 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
       transfer: this.opponentWsId
     };
     this.store.commit('setSendingFileStatus', ssfs);
+  }
+
+  public ondatachannelclose(error): void {
+    // channel could be closed in success and in error, we don't know why it was closed
+    if (this.store.state.roomsDict[this.roomId].sendingFiles[this.connectionId].transfers[this.opponentWsId].status !== FileTransferStatus.FINISHED) {
+      this.commitErrorIntoStore(error);
+    }
   }
 }

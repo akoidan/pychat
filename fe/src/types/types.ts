@@ -38,6 +38,10 @@ export interface SetUploadProgress {
   messageId: number;
 }
 
+export interface RemovePeerConnection extends DefaultMessage {
+  opponentWsId: string;
+}
+
 export interface ChangeOnlineEntry {
   changeOnline: ChangeOnline;
   roomIds: number[];

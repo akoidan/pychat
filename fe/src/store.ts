@@ -175,7 +175,7 @@ const store: StoreOptions<RootState> = {
     setSendingFileStatus(state: RootState, payload: SetSendingFileStatus) {
       let transfer: SendingFileTransfer = state.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers[payload.transfer];
       transfer.status = payload.status;
-      if (payload.error) {
+      if (payload.error !== undefined) {
         transfer.error = payload.error;
       }
     },

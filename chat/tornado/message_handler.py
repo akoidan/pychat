@@ -627,8 +627,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		connection_id = in_message[VarNames.CONNECTION_ID]
 		opponent_ws_id = in_message[VarNames.WEBRTC_OPPONENT_ID]
 		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
-		receiver_ws_status = self.sync_redis.shget(connection_id, opponent_ws_id)
-		if receiver_ws_status == WebRtcRedisStates.READY and self.id == sender_ws_id:
+		if sender_ws_id == self.id:
 			self.publish(self.retry_file(connection_id), opponent_ws_id)
 		else:
 			raise ValidationError("Invalid channel status.")

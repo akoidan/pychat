@@ -14,12 +14,12 @@ import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from '../utils/consts';
 import {faviconUrl, requestFileSystem} from '../utils/htmlApi';
 import {bytesToSize} from '../utils/utils';
 import FileReceiverPeerConnection from './FileReceiveerPeerConnection';
+import Subscription from '../utils/Subscription';
 
 export default class WebRtcApi extends MessageHandler {
 
   protected logger: Logger;
 
-  private connections = {};
   private wsHandler: WsHandler;
   private store: Store<RootState>;
   private notifier: NotifierHandler;
@@ -41,6 +41,7 @@ export default class WebRtcApi extends MessageHandler {
     let limitExceeded = message.content.size > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem;
     let payload: ReceivingFile = {
       roomId: message.roomId,
+      opponentWsId: message.opponentWsId,
       anchor: null,
       status: limitExceeded ? FileTransferStatus.ERROR : FileTransferStatus.NOT_DECIDED_YET,
       userId: message.userId,
@@ -61,45 +62,38 @@ export default class WebRtcApi extends MessageHandler {
     this.store.commit('addReceivingFile', payload);
     this.wsHandler.replyFile(message.connId, browserVersion);
     if (!limitExceeded) {
-      this.connections[message.connId] = new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.removeChildReference.bind(this), this.wsHandler, this.store, message.content.size);
+      new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, message.content.size);
     }
   }
 
 
-  acceptFile(connId: string) {
-    this.connections[connId].acceptFileReply();
+  acceptFile(connId: string, webRtcOpponentId: string) {
+    sub.notify({action: 'acceptFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
 
   }
 
-  declineFile(connId: string) {
-    this.connections[connId].declineFileReply();
+  declineSending(connId: string, webRtcOpponentId: string) {
+    sub.notify({action: 'declineSending', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
+  }
+
+  declineFile(connId: string, webRtcOpponentId: string) {
+    sub.notify({action: 'declineFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
   }
 
   offerFile(file, channel) {
-    this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, (e: WebRtcSetConnectionIdMessage) => {
-      if (e.connId) {
-        this.connections[e.connId] = new FileSender(channel, e.connId, this.removeChildReference.bind(this), this.wsHandler, this.notifier, this.store, file);
-        let payload: SendingFile = {
-          roomId: channel,
-          connId: e.connId,
-          fileName: file.name,
-          fileSize: file.size,
-          time: e.time,
-          transfers: {},
-        };
-        this.store.commit('addSendingFile', payload);
-      }
-    });
+    if (file.size > 0) {
+      this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, (e: WebRtcSetConnectionIdMessage) => {
+        if (e.connId) {
+          new FileSender(channel, e.connId, this.wsHandler, this.notifier, this.store, file, e.time);
+        }
+      });
+    } else {
+      this.store.dispatch('growlError', `File ${file.name} size is 0. Skipping sending it...`);
+    }
   }
 
-  removeChildReference(id) {
-    this.logger.log('Removing transferHandler with id {}, current connects are {}', id, this.connections)();
-    sub.unsubscribe('webrtcTransfer:' + id);
-    delete this.connections[id];
-  }
-
-  public retryFile(connId: string) {
-    this.connections[connId].retryFilePeerConn();
+  public retryFile(connId: string, webRtcOpponentId: string) {
+    sub.notify({action: 'retryFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
 
   }
 }

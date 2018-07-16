@@ -14,7 +14,7 @@
           <td>{{size}}</td>
         </tr>
       </tbody>
-      <chat-sending-file-transfer v-for="(transfer, key) in sendingFile.transfers" :key="key" :transfer="transfer"/>
+      <chat-sending-file-transfer :connId="sendingFile.connId" :opponentId="key" v-for="(transfer, key) in sendingFile.transfers" :key="key" :transfer="transfer"/>
     </table>
   </div>
 </template>

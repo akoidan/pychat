@@ -6,6 +6,7 @@ import {RootState} from '../types/model';
 import {Store} from 'vuex';
 import MessageHandler from '../utils/MesageHandler';
 import {sub} from '../utils/sub';
+import Subscription from '../utils/Subscription';
 
 export default abstract class BaseTransferHandler extends MessageHandler {
 
@@ -13,41 +14,21 @@ export default abstract class BaseTransferHandler extends MessageHandler {
   protected readonly wsHandler: WsHandler;
   protected readonly notifier: NotifierHandler;
   protected readonly logger: Logger;
-  protected readonly removeReferenceFn: Function;
-  protected peerConnections: {} = {};
   protected readonly store: Store<RootState>;
   protected readonly roomId: number;
 
-  constructor(roomId: number, connId: string, removeReferenceFn: Function, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>) {
+  constructor(roomId: number, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>) {
     super();
     this.roomId = roomId;
     this.connectionId = connId;
-    sub.subscribe(`webrtcTransfer:${connId}`, this)
-    this.removeReferenceFn = removeReferenceFn;
+    sub.subscribe(Subscription.getTransferId(connId), this);
     this.notifier = notifier;
     this.wsHandler = wsHandler;
     this.store = store;
     this.logger = loggerFactory.getLogger('WRTC', 'color: #960055');
   }
 
-  removeReference() {
-    this.removeReferenceFn(this.connectionId);
+   onDestroy() {
+     sub.unsubscribe(Subscription.getTransferId(this.connectionId));
   }
-
-  removeChildPeerReference (id) {
-    this.logger.log('Removing peer connection {}', id)();
-    sub.unsubscribe('peerConnection:' + id);
-    delete this.peerConnections[id];
-  }
-
-  closeAllPeerConnections(text) {
-    let hasConnections = false;
-    for (let pc in this.peerConnections) {
-      if (!this.peerConnections.hasOwnProperty(pc)) continue;
-      this.peerConnections[pc].closeEvents(text);
-      hasConnections = true;
-    }
-    return hasConnections;
-  }
-
 }

@@ -22,17 +22,32 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
     sendRtcData: this.onsendRtcData,
     retryFile: this.retryFileAccepted,
+    retryFileReply: this.retryFileReply,
+    acceptFileReply: this.acceptFileReply,
+    declineFileReply: this.declineFileReply,
+    destroyFileConnection: this.destroyFileConnection,
   };
+
   private noSpam: (cb) => void;
   private retryFileSend: number = 0;
 
-  constructor(roomId: number, connId: string, opponentWsId: string, removeChildReference: (id) => void, wsHandler: WsHandler, store: Store<RootState>, size: number) {
-    super(roomId, connId, opponentWsId, removeChildReference, wsHandler, store);
+  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>, size: number) {
+    super(roomId, connId, opponentWsId, wsHandler, store);
     this.fileSize = size;
     this.noSpam = bounce(100);
     this.filePeerConnection = new FilePeerConnection(this);
   }
 
+  private destroyFileConnection() {
+    let payload: SetReceivingFileStatus = {
+      error: null,
+      status: FileTransferStatus.DECLINED_BY_OPPONENT,
+      connId: this.connectionId,
+      roomId: this.roomId
+    };
+    this.store.commit('setReceivingFileStatus', payload);
+    this.onDestroy();
+  }
 
   private initFileSystemApi(cb) {
     this.logger.debug('Creating temp location {}', bytesToSize(this.fileSize))();
@@ -84,7 +99,7 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
     this.assembleFileIfDone();
   };
 
-  public retryFilePeerConn() {
+  public retryFileReply() {
     let now = Date.now();
     if (now - this.retryFileSend > 5000) {
       this.retryFileSend = now;
@@ -117,7 +132,7 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
     return this.receivedSize === this.fileSize;
   };
 
-  private  assembleFileIfDone () {
+  private assembleFileIfDone () {
     if (this.isDone()) {
       let received = this.recevedUsingFile ? this.fileEntry.toURL() : URL.createObjectURL(new window.Blob(this.receiveBuffer));
       this.logger.log("File is received")();
@@ -133,6 +148,7 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
       };
       this.store.commit('setReceivingFileStatus', payload);
       this.filePeerConnection.closeEvents();
+      this.onDestroy();
     }
   };
 
@@ -154,8 +170,7 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
     });
   }
 
-
-  private  fileSystemErr(errN, cb, fs) {
+  private fileSystemErr(errN, cb, fs) {
     return  (e) => {
       this.logger.error('FileSystemApi Error {}: {}, code {}', errN, e.message || e, e.code)();
       if (fs && e.code === 22) {
@@ -179,13 +194,13 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
 
   public declineFileReply() {
     this.wsHandler.destroyFileConnection(this.connectionId, 'decline');
-    this.removeChildPeerReferenceFn(this.connectionId);
     let rf: SetReceivingFileStatus = {
       roomId: this.roomId,
       connId: this.connectionId,
-      status: FileTransferStatus.DECLINED
+      status: FileTransferStatus.DECLINED_BY_YOU
     };
     this.store.commit('setReceivingFileStatus', rf);
+    this.onDestroy();
   }
 
   public acceptFileReply() {
@@ -203,7 +218,7 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
         } else {
           let content = `Browser doesn't support acepting file sizes over ${bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API)}`;
           this.wsHandler.destroyFileConnection(this.connectionId, content);
-          this.removeChildPeerReferenceFn(content);
+          this.onDestroy();
         }
     });
   }
@@ -214,45 +229,11 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
     this.wsHandler.acceptFile(this.connectionId, this.receivedSize);
   }
 
-// public acceptFileReply() {
-  //   this.peerConnections[this.offerOpponentWsId] = new FileReceiverPeerConnection(
-  //       this.connectionId,
-  //       this.offerOpponentWsId,
-  //       this.fileName,
-  //       this.fileSize,
-  //       this.removeChildPeerReference
-  //   );
-  //
-  //   this.peerConnections[this.offerOpponentWsId].initFileSystemApi(this.sendAccessFileSuccess);
-  //   this.connections[connId].acceptFileReply()
-  //
-  //
-  //   this.wsHandler.acceptFile(connId);
-  //   let rf: SetReceivingFileStatus = {
-  //     roomId, connId, status: FileTransferStatus.IN_PROGRESS
-  //   };
-  //   this.store.commit('setReceivingFileStatus', rf);
-  //
-  //   this.peerConnections[this.offerOpponentWsId] = new FileReceiverPeerConnection(
-  //       this.connectionId,
-  //       this.offerOpponentWsId,
-  //       this.fileName,
-  //       this.fileSize,
-  //       this.removeChildPeerReference
-  //   );
-  //   let div = document.createElement('DIV');
-  //   this.dom.body.appendChild(div);
-  //   let db = new DownloadBar(div, this.fileSize, this.dom.connectionStatus);
-  //   this.peerConnections[this.offerOpponentWsId].setDownloadBar(db); // should be before initFileSystemApi
-  //   this.peerConnections[this.offerOpponentWsId].initFileSystemApi(this.sendAccessFileSuccess);
-  // }
-
-
   oniceconnectionstatechange(): void {
     this.filePeerConnection.oniceconnectionstatechange();
   }
 
-  setError(text): void {
+  ondatachannelclose(text): void {
     let rf: SetReceivingFileStatus = {
       roomId: this.roomId,
       connId: this.connectionId,

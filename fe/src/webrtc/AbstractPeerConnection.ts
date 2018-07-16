@@ -7,6 +7,7 @@ import {RootState} from '../types/model';
 import {Store} from 'vuex';
 import {sub} from '../utils/sub';
 import MessageHandler from '../utils/MesageHandler';
+import Subscription from '../utils/Subscription';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean;
@@ -14,7 +15,6 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected readonly opponentWsId: string;
   protected readonly connectionId: string;
   public readonly logger: Logger;
-  protected readonly removeChildPeerReferenceFn: Function;
   public pc = null;
   protected connectionStatus = 'new';
   protected webRtcUrl = WEBRTC_STUNT_URL;
@@ -36,15 +36,14 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     ]
   };
 
-  constructor(roomId: number, connectionId: string, opponentWsId: string, removeChildPeerReferenceFn: Function, ws: WsHandler, store: Store<RootState>) {
+  constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: Store<RootState>) {
     super();
     this.roomId = roomId;
     this.connectionId = connectionId;
-    sub.subscribe(`peerConnection:${connectionId}:${opponentWsId}`, this);
     this.opponentWsId = opponentWsId;
+    sub.subscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
     this.wsHandler = ws;
     this.store = store;
-    this.removeChildPeerReferenceFn = removeChildPeerReferenceFn;
     this.logger = loggerFactory.getLogger(this.connectionId + ':' + this.opponentWsId, 'color: #960055');
   }
 
@@ -55,6 +54,10 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
 
   getConnectionStatus() {
     return this.connectionStatus;
+  }
+
+  onDestroy() {
+    sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId));
   }
 
 
@@ -100,7 +103,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   }
 
   abstract oniceconnectionstatechange(): void;
-  abstract setError(text): void;
+  abstract ondatachannelclose(text): void;
 
   public closePeerConnection(text?) {
     this.setConnectionStatus('closed');

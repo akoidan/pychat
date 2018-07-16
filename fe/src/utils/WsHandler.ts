@@ -373,7 +373,9 @@ export default class WsHandler extends MessageHandler {
   }
 
   private handleMessage(data: DefaultMessage) {
-    sub.notify(data);
+    if (data.handler !== 'void') {
+      sub.notify(data);
+    }
     if (this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.wsConnectionId)) {
       this.logger.debug('resolving cb')();
       this.callBacks[data.messageId](data);

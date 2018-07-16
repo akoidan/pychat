@@ -80,8 +80,10 @@
           return 'Error';
         case FileTransferStatus.IN_PROGRESS:
           return 'Downloading...';
-        case FileTransferStatus.DECLINED:
-          return 'Declined';
+        case FileTransferStatus.DECLINED_BY_OPPONENT:
+          return 'Declined by opponent';
+        case FileTransferStatus.DECLINED_BY_YOU:
+          return 'Declined by you';
         case FileTransferStatus.FINISHED:
           return 'Finished';
         case FileTransferStatus.NOT_DECIDED_YET:
@@ -98,15 +100,15 @@
     }
 
     retry() {
-      webrtcApi.retryFile(this.receivingFile.connId);
+      webrtcApi.retryFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
     }
 
     accept() {
-      webrtcApi.acceptFile(this.receivingFile.connId);
+      webrtcApi.acceptFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
     }
 
     decline() {
-      webrtcApi.declineFile(this.receivingFile.connId);
+      webrtcApi.declineFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
     }
 
 
