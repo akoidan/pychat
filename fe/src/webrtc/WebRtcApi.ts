@@ -1,7 +1,7 @@
 import loggerFactory from '../utils/loggerFactory';
 import {Logger} from 'lines-logger';
 import {SetReceivingFileStatus} from '../types/types';
-import {DefaultMessage, OfferFile, WebRtcSetConnectionIdMessage} from '../types/messages';
+import {DefaultMessage, OfferCall, OfferFile, WebRtcSetConnectionIdMessage} from '../types/messages';
 import WsHandler from '../utils/WsHandler';
 import {ReceivingFile, FileTransferStatus, RootState, SendingFile} from '../types/model';
 import {Store} from 'vuex';
@@ -36,7 +36,8 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> }  = {
-    offerFile: this.onofferFile
+    offerFile: this.onofferFile,
+    offerCall: this.offerCall,
   };
 
   private onofferFile(message: OfferFile) {
@@ -66,6 +67,13 @@ export default class WebRtcApi extends MessageHandler {
     if (!limitExceeded) {
       new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, message.content.size);
     }
+  }
+
+  offerCall(message: OfferCall) {
+    if (!this.callHandlers[message.roomId]) {
+      this.callHandlers[message.roomId] = new CallHandler(message.roomId, this.wsHandler, this.notifier, this.store);
+    }
+    this.callHandlers[message.roomId].initAndDisplayOffer(message);
   }
 
 

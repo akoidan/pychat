@@ -1,5 +1,5 @@
 import BaseTransferHandler from './BaseTransferHandler';
-import {DefaultMessage, WebRtcSetConnectionIdMessage} from '../types/messages';
+import {DefaultMessage, OfferCall, WebRtcSetConnectionIdMessage} from '../types/messages';
 import {browserVersion, isChrome, isMobile} from '../utils/singletons';
 import {sub} from '../utils/sub';
 import Subscription from '../utils/Subscription';
@@ -283,5 +283,23 @@ export default class CallHandler extends BaseTransferHandler {
     } catch (e) {
       this.handleStream(e, stream);
     }
+  }
+
+  initAndDisplayOffer(message: OfferCall) {
+    this.connectionId = message.connId;
+    let payload: BooleanIdentifier = {
+      state: true,
+      id: this.roomId,
+    };
+    this.store.commit('setCallActiveToState', payload);
+    sub.subscribe(Subscription.getTransferId(message.connId), this);
+
+
+    this.logger.log('CallHandler initialized')();
+    this.wsHandler.replyCall(message.connId, browserVersion);
+    //
+    // this.acceptedPeers.push(message.opponentWsId);
+    // this.createCallPeerConnection(message);
+    // this.showOffer(message, channelName);
   }
 }

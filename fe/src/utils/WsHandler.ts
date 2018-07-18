@@ -19,6 +19,7 @@ import {
 import {convertUser, currentUserInfoDtoToModel, userSettingsDtoToModel} from '../types/converters';
 import {UserProfileDto, UserSettingsDto} from '../types/dto';
 import {sub} from './sub';
+import {browserVersion} from './singletons';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
@@ -557,4 +558,12 @@ public acceptFile(connId, received) {
   }
 
 
+  replyCall(connId, browser) {
+    this.sendToServer({
+      action: 'replyCall',
+      content: {
+        browser
+      }
+    });
+  }
 }

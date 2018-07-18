@@ -44,6 +44,14 @@ export interface OfferFile extends WebRtcDefaultMessage {
   time: number;
 }
 
+export interface OfferCall extends WebRtcDefaultMessage {
+  content: BrowserBase;
+  opponentWsId: string;
+  roomId: number;
+  userId: number;
+  time: number;
+}
+
 export interface SetSettingsMessage extends DefaultMessage {
   content: UserSettingsDto;
 }
