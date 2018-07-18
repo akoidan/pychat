@@ -10,18 +10,16 @@ import Subscription from '../utils/Subscription';
 
 export default abstract class BaseTransferHandler extends MessageHandler {
 
-  protected readonly connectionId: string;
+  protected connectionId: string;
   protected readonly wsHandler: WsHandler;
   protected readonly notifier: NotifierHandler;
   protected readonly logger: Logger;
   protected readonly store: Store<RootState>;
   protected readonly roomId: number;
 
-  constructor(roomId: number, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>) {
+  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>) {
     super();
     this.roomId = roomId;
-    this.connectionId = connId;
-    sub.subscribe(Subscription.getTransferId(connId), this);
     this.notifier = notifier;
     this.wsHandler = wsHandler;
     this.store = store;

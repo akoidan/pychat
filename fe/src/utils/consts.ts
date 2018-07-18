@@ -22,6 +22,9 @@ export {_RECAPTCHA_PUBLIC_KEY as RECAPTCHA_PUBLIC_KEY};
 export {_GOOGLE_OAUTH_2_CLIENT_ID as GOOGLE_OAUTH_2_CLIENT_ID};
 export {_MANIFEST as MANIFEST};
 export const RESPONSE_SUCCESS = 'ok';
+
+export const CHROME_EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn';
+export const CHROME_EXTENSION_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + CHROME_EXTENSION_ID
 export const PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
 export const MESSAGES_PER_SEARCH = 10;
 export const CONNECTION_ERROR = `Connection error`;

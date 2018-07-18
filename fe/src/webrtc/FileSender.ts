@@ -14,8 +14,10 @@ export default class FileSender extends BaseTransferHandler {
   private webrtcConnnectionsIds: string[] = [];
 
   constructor(roomId: number, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>, file: File, time: number) {
-    super(roomId, connId, wsHandler, notifier, store);
+    super(roomId, wsHandler, notifier, store);
     this.file = file;
+    this.connectionId = connId;
+    sub.subscribe(Subscription.getTransferId(connId), this);
     let payload: SendingFile = {
       roomId,
       connId,

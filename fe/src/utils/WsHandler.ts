@@ -76,7 +76,16 @@ export default class WsHandler extends MessageHandler {
     this.appendCB(cb);
   }
 
-  public acceptFile(connId, received) {
+  public offerCall(roomId, browser, cb) {
+    this.sendToServer({
+      action: 'offerCall',
+      roomId: roomId,
+      content: {browser}
+    });
+    this.appendCB(cb);
+  }
+
+public acceptFile(connId, received) {
     this.sendToServer({
       action: 'acceptFile',
       connId,
@@ -237,6 +246,7 @@ export default class WsHandler extends MessageHandler {
       action: 'sendRtcData'
     });
   }
+
   private sendToServer(messageRequest, skipGrowl = false) {
     if (!messageRequest.messageId) {
       messageRequest.messageId = this.getMessageId();

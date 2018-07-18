@@ -21,14 +21,18 @@ import {
 } from './types/model';
 import {
   AddSendingFileTransfer,
+  BooleanIdentifier,
   ChangeOnlineEntry,
   MessagesLocation,
+  NumberIdentifier,
   PrivateRoomsIds,
   RemoveMessageProgress,
   RemoveSendingMessage,
+  SetDevices,
   SetMessageProgress,
   SetMessageProgressError,
-  SetReceivingFileStatus, SetReceivingFileUploaded,
+  SetReceivingFileStatus,
+  SetReceivingFileUploaded,
   SetRoomsUsers,
   SetSearchTo,
   SetSendingFileStatus,
@@ -37,6 +41,7 @@ import {
 } from './types/types';
 import {storage} from './utils/singletons';
 import {SetRooms} from './types/dto';
+import {encodeHTML} from './utils/htmlApi';
 
 Vue.use(Vuex);
 
@@ -51,6 +56,9 @@ const store: StoreOptions<RootState> = {
     growls: [],
     allUsersDict: {},
     regHeader: null,
+    microphones: {},
+    speakers: {},
+    webcams: {},
     roomsDict: {},
     dim: false,
     activeUserId: null,
@@ -157,7 +165,34 @@ const store: StoreOptions<RootState> = {
       Vue.set(state.roomsDict[payload.roomId].sendingFiles, payload.connId, payload);
     },
     toggleContainer(state: RootState, roomId: number) {
-      state.roomsDict[roomId].callContainer = !state.roomsDict[roomId].callContainer;
+      state.roomsDict[roomId].callInfo.callContainer = !state.roomsDict[roomId].callInfo.callContainer;
+    },
+    setCurrentMicLevel(state: RootState, payload: NumberIdentifier) {
+      state.roomsDict[payload.id].callInfo.currentMicLevel = payload.state;
+    },
+    setMicToState(state: RootState, payload: BooleanIdentifier) {
+      state.roomsDict[payload.id].callInfo.showMic = payload.state;
+    },
+    setVideoToState(state: RootState, payload: BooleanIdentifier) {
+      let ci = state.roomsDict[payload.id].callInfo;
+      ci.showVideo = payload.state;
+      ci.shareScreen = false;
+    },
+    setDevices(state: RootState, payload: SetDevices) {
+      state.microphones = payload.microphones;
+      state.webcams = payload.webcams;
+      state.speakers = payload.speakers;
+    },
+    setShareScreenToState(state: RootState, payload: BooleanIdentifier) {
+      let ci = state.roomsDict[payload.id].callInfo;
+      ci.shareScreen = payload.state;
+      ci.showVideo = false;
+    },
+    setFullScreenToState(state: RootState, payload: BooleanIdentifier) {
+      state.roomsDict[payload.id].callInfo.fullScreen = payload.state;
+    },
+    setCallActiveToState(state: RootState, payload: BooleanIdentifier) {
+      state.roomsDict[payload.id].callInfo.callActive = payload.state;
     },
     addReceivingFile(state: RootState, payload: ReceivingFile) {
       Vue.set(state.roomsDict[payload.roomId].receivingFiles, payload.connId, payload);
@@ -337,22 +372,29 @@ const store: StoreOptions<RootState> = {
     }
   },
   actions: {
+    growlErrorRaw(context: State, html) {
+      let growl: GrowlModel = {id: Date.now(), html, type: GrowlType.ERROR};
+      context.commit('addGrowl', growl);
+      setTimeout(f => {
+        context.commit('removeGrowl', growl);
+      }, 4000);
+    },
     growlError(context: State, title) {
-      let growl: GrowlModel = {id: Date.now(), title, type: GrowlType.ERROR};
+      let growl: GrowlModel = {id: Date.now(), html: encodeHTML(title), type: GrowlType.ERROR};
       context.commit('addGrowl', growl);
       setTimeout(f => {
         context.commit('removeGrowl', growl);
       }, 4000);
     },
     growlInfo(context: State, title) {
-      let growl: GrowlModel = {id: Date.now(), title, type: GrowlType.INFO};
+      let growl: GrowlModel = {id: Date.now(), html: encodeHTML(title), type: GrowlType.INFO};
       context.commit('addGrowl', growl);
       setTimeout(f => {
         context.commit('removeGrowl', growl);
       }, 4000);
     },
     growlSuccess(context: State, title) {
-      let growl: GrowlModel = {id: Date.now(), title, type: GrowlType.SUCCESS};
+      let growl: GrowlModel = {id: Date.now(), html: encodeHTML(title), type: GrowlType.SUCCESS};
       context.commit('addGrowl', growl);
       setTimeout(f => {
         context.commit('removeGrowl', growl);

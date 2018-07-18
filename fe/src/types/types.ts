@@ -32,10 +32,32 @@ export interface MessageDataEncode {
   currSymbol: string;
 }
 
+export interface SetDevices {
+  microphones: { [id: string]: string };
+  speakers: { [id: string]: string };
+  webcams: { [id: string]: string };
+}
+
+export interface JsAudioAnalyzer {
+  analyser: any;
+  javascriptNode: any;
+  prevVolumeValues: any;
+  volumeValuesCount: any;
+}
 export interface SetUploadProgress {
   upload: UploadProgressModel;
   roomId: number;
   messageId: number;
+}
+
+export interface BooleanIdentifier {
+  id: number;
+  state: boolean;
+}
+
+export interface NumberIdentifier {
+  id: number;
+  state: number;
 }
 
 export interface RemovePeerConnection extends DefaultMessage {

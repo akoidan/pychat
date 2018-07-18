@@ -50,6 +50,7 @@
       "mocha: test library"
     ],
     "@types/chai": "^4.1.4",
+    "@types/chrome": "^0.0.69",
     "@types/lodash": "^4.14.109",
     "@types/mocha": "^5.2.3",
     "@types/node": "^10.3.5",

@@ -1,11 +1,11 @@
 import store from '../store';
 import router from '../router';
 import sessionHolder from './sessionHolder';
-import {api, channelsHandler, globalLogger, storage, ws} from './singletons';
+import {api, channelsHandler, globalLogger, isMobile, storage, ws} from './singletons';
 import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from '../types/model';
 import loggerFactory from './loggerFactory';
 import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from './consts';
-import {StorageData} from '../types/types';
+import {JsAudioAnalyzer, StorageData} from '../types/types';
 
 
 let logger = loggerFactory.getLoggerColor('utils', '#007a70');
@@ -195,11 +195,11 @@ export function sem(event, message: MessageModel, isEditingNow: boolean, userInf
   if (message.userId === userInfo.userId && !message.deleted && message.time + ONE_DAY > Date.now()) {
     event.preventDefault();
     event.stopPropagation();
-    let newVar: EditingMessage = {
+    let newlet: EditingMessage = {
       messageId: message.id,
       isEditingNow,
       roomId: message.roomId
     };
-    setEditedMessage(newVar);
+    setEditedMessage(newlet);
   }
 }

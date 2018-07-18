@@ -31,20 +31,32 @@ export function convertSexToNumber(m: SexModel): number {
 }
 
 
-export function getRoomsBaseDict({roomId, volume, notifications, name, users}): RoomModel {
+export function getRoomsBaseDict({roomId, volume, notifications, name, users}, oldRoom: RoomModel = null): RoomModel {
   return {
-    receivingFiles: {},
     id: roomId,
-    sendingFiles: {},
+    receivingFiles: oldRoom ? oldRoom.receivingFiles : {},
+    sendingFiles: oldRoom ? oldRoom.sendingFiles : {},
     volume,
-    callContainer: false,
+    callInfo: {
+      calls: {},
+      showMic: true,
+      callContainer: false,
+      callActive: false,
+      fullScreen: false,
+      shareScreen: false,
+      showVideo: true,
+      currentMic: null,
+      currentSpeaker: null,
+      currentWebcam: null,
+      currentMicLevel: 0,
+    },
     notifications,
     name,
-    messages: {},
-    newMessagesCount: 0,
-    changeOnline: [],
-    allLoaded: false,
-    search: {
+    messages: oldRoom ? oldRoom.messages : {},
+    newMessagesCount: oldRoom ? oldRoom.newMessagesCount : 0,
+    changeOnline: oldRoom ? oldRoom.changeOnline : [],
+    allLoaded: oldRoom ? oldRoom.allLoaded : false,
+    search: oldRoom ? oldRoom.search : {
       searchActive: false,
       searchText: '',
       searchedIds: [],

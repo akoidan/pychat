@@ -9,7 +9,7 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "types": [
-      "websql", "webrtc"
+      "websql", "webrtc", "chrome"
     ]
   },
   "exclude": [

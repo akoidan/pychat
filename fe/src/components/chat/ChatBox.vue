@@ -1,6 +1,6 @@
 <template>
   <div class="holder">
-    <chat-call v-show="room.callContainer"/>
+    <chat-call :call-info="room.callInfo" :room-id="room.id"/>
     <search-messages :room="room"/>
     <div class="chatbox" @keydown="keyDownLoadUp" :class="{'display-search-only': room.search.searchActive}" tabindex="1" @mousewheel="onScroll" ref="chatbox">
       <template v-for="message in messages">

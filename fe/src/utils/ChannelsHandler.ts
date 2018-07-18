@@ -219,26 +219,7 @@ export default class ChannelsHandler extends MessageHandler {
     let roomsDict: RoomDictModel = this.store.state.roomsDict;
     rooms.forEach((newRoom: RoomDto) => {
       let oldRoom = roomsDict[newRoom.roomId];
-      let rm: RoomModel = {
-        id: newRoom.roomId,
-        callContainer: oldRoom ? oldRoom.callContainer : false,
-        sendingFiles: oldRoom ? oldRoom.sendingFiles : {},
-        receivingFiles: oldRoom ? oldRoom.receivingFiles : {},
-        messages: oldRoom ? oldRoom.messages : {},
-        newMessagesCount: oldRoom ? oldRoom.newMessagesCount : 0,
-        changeOnline: oldRoom ? oldRoom.changeOnline : [],
-        name: newRoom.name,
-        search: oldRoom ? oldRoom.search : {
-          searchActive: false,
-          searchText: '',
-          searchedIds: [],
-          locked: false
-        },
-        notifications: newRoom.notifications,
-        users: [...newRoom.users],
-        volume: newRoom.volume,
-        allLoaded: oldRoom ? oldRoom.allLoaded : false
-      };
+      let rm : RoomModel = getRoomsBaseDict(newRoom, oldRoom);
       storeRooms[rm.id] = rm;
     });
     this.store.commit('setRooms', storeRooms);

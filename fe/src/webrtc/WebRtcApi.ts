@@ -15,6 +15,7 @@ import {faviconUrl, requestFileSystem} from '../utils/htmlApi';
 import {bytesToSize} from '../utils/utils';
 import FileReceiverPeerConnection from './FileReceiveerPeerConnection';
 import Subscription from '../utils/Subscription';
+import CallHandler from './CallHandler';
 
 export default class WebRtcApi extends MessageHandler {
 
@@ -23,6 +24,7 @@ export default class WebRtcApi extends MessageHandler {
   private wsHandler: WsHandler;
   private store: Store<RootState>;
   private notifier: NotifierHandler;
+  private callHandlers: {[id: number]: CallHandler} = {};
 
   constructor(ws: WsHandler, store: Store<RootState>, notifier: NotifierHandler) {
     super();
@@ -95,5 +97,13 @@ export default class WebRtcApi extends MessageHandler {
   public retryFile(connId: string, webRtcOpponentId: string) {
     sub.notify({action: 'retryFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
 
+  }
+
+  startCall(roomId: number) {
+
+    if (!this.callHandlers[roomId]) {
+      this.callHandlers[roomId] = new CallHandler(roomId, this.wsHandler, this.notifier, this.store);
+    }
+    this.callHandlers[roomId].offerCall();
   }
 }

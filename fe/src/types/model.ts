@@ -6,7 +6,7 @@ export enum GrowlType {
 
 export  interface GrowlModel {
   id: number;
-  title: string;
+  html: string;
   type: GrowlType;
 }
 
@@ -144,9 +144,27 @@ export interface SendingFile {
   transfers: { [id: string]: SendingFileTransfer };
 }
 
+export interface CallInfo {
+  anchor: string;
+}
+
+export interface CallsInfoModel {
+  calls: { [id: string]: CallInfo };
+  callContainer: boolean;
+  showMic: boolean;
+  currentMicLevel: number;
+  currentMic: string;
+  currentSpeaker: string;
+  currentWebcam: string;
+  showVideo: boolean;
+  shareScreen: boolean;
+  fullScreen: boolean;
+  callActive: boolean;
+}
+
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
-  callContainer: boolean;
+  callInfo: CallsInfoModel;
   sendingFiles:  { [id: string]: SendingFile };
   receivingFiles:  { [id: string]: ReceivingFile };
   messages: { [id: number]: MessageModel };
@@ -160,6 +178,9 @@ export interface RootState {
   isOnline: boolean;
   growls: GrowlModel[];
   dim: boolean;
+  microphones: { [id: string]: string };
+  speakers: { [id: string]: string };
+  webcams: { [id: string]: string };
   editedMessage: EditingMessage;
   activeRoomId: number;
   activeUserId: number;

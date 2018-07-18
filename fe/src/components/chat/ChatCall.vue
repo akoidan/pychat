@@ -1,5 +1,5 @@
 <template>
-  <div class="callContainer">
+  <div class="callContainer" v-show="callInfo.callContainer">
     <div class="callContainerContent">
       <div class="videoContainer">
         <div class="icon-webrtc-cont">
@@ -10,33 +10,46 @@
           <i class="icon-no-desktop" title="Capture your desktop screen and start sharing it"></i>
         </div>
         <div>
-          <video muted="true" class="localVideo hidden"></video>
+          <video muted="muted" class="localVideo"></video>
         </div>
       </div>
-      <table class="settingsContainer">
+      <table class="settingsContainer" v-show="showSettings">
         <tbody>
         <tr>
-          <td><i class="icon-quote-left"></i><span class="callInfo">Call info</span></td>
+          <td>
+            <i class="icon-quote-left"></i>
+            <span class="callInfo">Call info</span>
+          </td>
         </tr>
         <tr>
-          <td><i class="icon-volume-2"></i><select class="input"></select><span class="playTestSound">Play test sound</span></td>
+          <td>
+            <i class="icon-volume-2"></i>
+            <select class="input"></select>
+            <span class="playTestSound">Play test sound</span>
+          </td>
         </tr>
         <tr>
-          <td><i class="icon-videocam"></i><select class="input"></select></td>
+          <td>
+            <i class="icon-videocam"></i>
+            <select class="input"></select>
+          </td>
         </tr>
         <tr>
-          <td><i class="icon-mic"></i><select class="input"></select></td>
+          <td>
+            <i class="icon-mic"></i>
+            <select class="input"></select>
+          </td>
         </tr>
         </tbody>
       </table>
       <div class="callContainerIcons">
-        <i class="icon-phone-circled"></i>
-        <i class="icon-mic" title="Turn off your microphone"></i>
-        <i class="icon-no-videocam callActiveIcon" title="Turn on your webcam"></i>
-        <i class="icon-desktop callActiveIcon" title="Capture your desktop screen and start sharing it"></i>
-        <i class="icon-cog"></i>
+        <i class="icon-phone-circled" v-show="!callInfo.callActive" @click="startCall"></i>
+        <i :class="iconMicClass" :title="micTitle" @click="micClick"></i>
+        <i :class="iconVideoClass" :title="videoTitle" @click="videoClick"></i>
+        <i class="icon-desktop" title="Capture your desktop screen and start sharing it"></i>
+        <i class="icon-cog" @click="showSettings = !showSettings"></i>
         <div class="enterFullScreenHolder"><i class="icon-webrtc-fullscreen" title="Fullscreen"></i></div>
-        <div class="hangUpHolder"><i class="icon-hang-up callActiveIcon" title="Hang up"></i></div>
+        <div class="hangUpHolder"><i class="icon-hang-up callActiveIcon" title="Hang up" v-show="callInfo.callActive"></i></div>
         <progress max="15" value="0" title="Your microphone level" class="microphoneLevel"></progress>
       </div>
     </div>
@@ -45,9 +58,59 @@
 <script lang="ts">
   import {State, Action, Mutation, Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
+  import {CallInfo, CallsInfoModel} from "../../types/model";
+  import {BooleanIdentifier} from "../../types/types";
+  import {webrtcApi} from '../../utils/singletons';
 
   @Component
   export default class ChatCall extends Vue {
+    @Prop() callInfo: CallsInfoModel;
+    @Prop() roomId: number;
+    showSettings: boolean = false;
+    @Mutation setMicToState;
+    @Mutation setVideoToState;
+
+    get iconMicClass () : {} {
+      return {
+        'icon-mic': this.callInfo.showMic,
+        'icon-mute': !this.callInfo.showMic,
+      }
+    }
+
+    get videoTitle() {
+      return `Turn ${this.callInfo.showVideo ? 'off': 'on'} your webcam`
+    }
+
+    get micTitle() {
+      return `Turn ${this.callInfo.showMic ? 'off': 'on'} your microphone`
+    }
+
+    startCall() {
+      webrtcApi.startCall(this.roomId);
+    }
+
+    get iconVideoClass () : {} {
+      return {
+        'icon-no-videocam': !this.callInfo.showVideo,
+        'icon-videocam': this.callInfo.showVideo,
+      }
+    }
+
+    videoClick() {
+      let payload: BooleanIdentifier = {
+        state: !this.callInfo.showVideo,
+        id: this.roomId,
+      };
+      this.setVideoToState(payload);
+    }
+
+    micClick() {
+      let payload: BooleanIdentifier = {
+        state: !this.callInfo.showMic,
+        id: this.roomId,
+      };
+      this.setMicToState(payload);
+    }
 
   }
 </script>
