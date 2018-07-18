@@ -10,7 +10,7 @@
           <i class="icon-no-desktop" title="Capture your desktop screen and start sharing it"></i>
         </div>
         <div>
-          <video muted="muted" class="localVideo"></video>
+          <video muted="muted" class="localVideo" :src="callInfo.localStreamSrc"></video>
         </div>
       </div>
       <table class="settingsContainer" v-show="showSettings">
@@ -24,20 +24,26 @@
         <tr>
           <td>
             <i class="icon-volume-2"></i>
-            <select class="input"></select>
+            <select class="input" :value="callInfo.currentSpeaker" @change="setCurrentSpeakerProxy">
+              <option v-for="(speaker, id) in speakers" :key="id" :value="id">{{speaker}}</option>
+            </select>
             <span class="playTestSound">Play test sound</span>
           </td>
         </tr>
         <tr>
           <td>
             <i class="icon-videocam"></i>
-            <select class="input"></select>
+            <select class="input" :value="callInfo.currentWebcam" @change="setCurrentWebcamProxy">
+              <option v-for="(webcam, id) in webcams" :key="id" :value="id">{{webcam}}</option>
+            </select>
           </td>
         </tr>
         <tr>
           <td>
             <i class="icon-mic"></i>
-            <select class="input"></select>
+            <select class="input" :value="callInfo.currentMic" @change="setCurrentMicProxy">
+              <option v-for="(mic, id) in microphones" :key="id" :value="id">{{mic}}</option>
+            </select>
           </td>
         </tr>
         </tbody>
@@ -59,7 +65,7 @@
   import {State, Action, Mutation, Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CallInfo, CallsInfoModel} from "../../types/model";
-  import {BooleanIdentifier} from "../../types/types";
+  import {BooleanIdentifier, StringIdentifier} from "../../types/types";
   import {webrtcApi} from '../../utils/singletons';
 
   @Component
@@ -69,6 +75,37 @@
     showSettings: boolean = false;
     @Mutation setMicToState;
     @Mutation setVideoToState;
+    @Mutation setCurrentWebcam;
+    @Mutation setCurrentSpeaker;
+    @Mutation setCurrentMic;
+
+    @State microphones: { [id: string]: string };
+    @State speakers: { [id: string]: string };
+    @State webcams: { [id: string]: string };
+
+
+    setCurrentMicProxy(event) {
+      let payload: StringIdentifier = {
+        id: this.roomId,
+        state: event.target.value
+      };
+      this.setCurrentMic(payload);
+    }
+    setCurrentWebcamProxy(event) {
+      let payload: StringIdentifier = {
+        id: this.roomId,
+        state: event.target.value
+      };
+      this.setCurrentWebcam(payload);
+    }
+
+    setCurrentSpeakerProxy(event) {
+      let payload: StringIdentifier = {
+        id: this.roomId,
+        state: event.target.value
+      };
+      this.setCurrentSpeaker(payload);
+    }
 
     get iconMicClass () : {} {
       return {
@@ -118,6 +155,9 @@
 <style lang="sass" scoped>
 
   @import "partials/mixins.sass"
+
+  select
+    padding: 5px 5px 5px 25px
   .inactive .icon-webrtc-cont > i
     transform: translateX(calc(-2vw - 70px))
     @include transition(all 0.1s ease-in-out)

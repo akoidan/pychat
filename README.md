@@ -14,8 +14,8 @@ This is free web (browser) chat, that features:
  - Responsive interface (bs like)+ themes
  - Admin interface with django-admin
 
-Live demo: [pychat.org](http://pychat.org/)
-8000
+Live demo: [pychat.org](http://vue.pychat.org/)
+
 # Table of contents
   * [Breaf description](#brief-description)
   * [How to run on my own server](#how-to-run-on-my-own-server)

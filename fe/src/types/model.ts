@@ -153,6 +153,7 @@ export interface CallsInfoModel {
   callContainer: boolean;
   showMic: boolean;
   currentMicLevel: number;
+  localStreamSrc: string;
   currentMic: string;
   currentSpeaker: string;
   currentWebcam: string;

@@ -37,7 +37,7 @@ import {
   SetSearchTo,
   SetSendingFileStatus,
   SetSendingFileUploaded,
-  SetUploadProgress
+  SetUploadProgress, StringIdentifier
 } from './types/types';
 import {storage} from './utils/singletons';
 import {SetRooms} from './types/dto';
@@ -170,6 +170,15 @@ const store: StoreOptions<RootState> = {
     setCurrentMicLevel(state: RootState, payload: NumberIdentifier) {
       state.roomsDict[payload.id].callInfo.currentMicLevel = payload.state;
     },
+    setCurrentMic(state: RootState, payload: StringIdentifier) {
+      state.roomsDict[payload.id].callInfo.currentMic = payload.state;
+    },
+    setCurrentSpeaker(state: RootState, payload: StringIdentifier) {
+      state.roomsDict[payload.id].callInfo.currentSpeaker = payload.state;
+    },
+    setCurrentWebcam(state: RootState, payload: StringIdentifier) {
+      state.roomsDict[payload.id].callInfo.currentWebcam = payload.state;
+    },
     setMicToState(state: RootState, payload: BooleanIdentifier) {
       state.roomsDict[payload.id].callInfo.showMic = payload.state;
     },
@@ -193,6 +202,9 @@ const store: StoreOptions<RootState> = {
     },
     setCallActiveToState(state: RootState, payload: BooleanIdentifier) {
       state.roomsDict[payload.id].callInfo.callActive = payload.state;
+    },
+    setLocalStreamSrc(state: RootState, payload: StringIdentifier) {
+      state.roomsDict[payload.id].callInfo.localStreamSrc = payload.state;
     },
     addReceivingFile(state: RootState, payload: ReceivingFile) {
       Vue.set(state.roomsDict[payload.roomId].receivingFiles, payload.connId, payload);

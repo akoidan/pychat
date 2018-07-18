@@ -60,6 +60,11 @@ export interface NumberIdentifier {
   state: number;
 }
 
+export interface StringIdentifier {
+  id: number;
+  state: string;
+}
+
 export interface RemovePeerConnection extends DefaultMessage {
   opponentWsId: string;
 }

@@ -4,7 +4,7 @@ import {browserVersion, isChrome, isMobile} from '../utils/singletons';
 import {sub} from '../utils/sub';
 import Subscription from '../utils/Subscription';
 import {CallsInfoModel} from '../types/model';
-import {BooleanIdentifier, JsAudioAnalyzer, NumberIdentifier, SetDevices} from '../types/types';
+import {BooleanIdentifier, JsAudioAnalyzer, NumberIdentifier, SetDevices, StringIdentifier} from '../types/types';
 import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from '../utils/consts';
 import { extractError, forEach} from '../utils/utils';
 import {createMicrophoneLevelVoice, getAverageAudioLevel} from '../utils/audioprocc';
@@ -196,6 +196,11 @@ export default class CallHandler extends BaseTransferHandler {
       this.logger.log('Local stream has been attached')();
       this.localStream = stream;
       this.audioProcessor = createMicrophoneLevelVoice(stream, this.processAudio);
+      let payload: StringIdentifier = {
+        id: this.roomId,
+        state: URL.createObjectURL(stream)
+      };
+      this.store.commit('setLocalStreamSrc', payload);
     }
     this.setCallIconsState();
   }
