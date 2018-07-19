@@ -21,6 +21,7 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
   private reader: FileReader;
   private offset: number;
   private lastPrinted: number = 0;
+  protected connectedToRemote: boolean = true;
 
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
     destroyFileConnection: this.destroyFileConnection,

@@ -18,7 +18,6 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   public pc = null;
   protected connectionStatus = 'new';
   protected webRtcUrl = WEBRTC_STUNT_URL;
-  protected connectedToRemote: boolean = true; // TODO should be false in callhandler
   protected sdpConstraints: boolean;
   protected readonly wsHandler: WsHandler;
   protected readonly store: Store<RootState>;
@@ -45,6 +44,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.wsHandler = ws;
     this.store = store;
     this.logger = loggerFactory.getLogger(this.connectionId + ':' + this.opponentWsId, 'color: #960055');
+    this.logger.debug('Created {}', this.constructor.name)();
   }
 
   setConnectionStatus(newStatus) {
@@ -64,6 +64,8 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   print(message) {
     this.logger.log('Call message {}', message)();
   }
+
+  protected abstract connectedToRemote: boolean;
 
   protected onsendRtcData(message) {
     if (!this.connectedToRemote) {
@@ -87,7 +89,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     }
   }
 
-  createPeerConnection() {
+  createPeerConnection(arg?) {
     this.logger.log('Creating RTCPeerConnection')();
     if (!RTCPeerConnection) {
       throw 'Your browser doesn\'t support RTCPeerConnection';

@@ -561,9 +561,18 @@ public acceptFile(connId, received) {
   replyCall(connId, browser) {
     this.sendToServer({
       action: 'replyCall',
+      connId,
       content: {
         browser
       }
+    });
+  }
+
+  declineCall(connId: string) {
+    this.sendToServer({
+      content: 'decline',
+      action: 'destroyCallConnection',
+      connId,
     });
   }
 }

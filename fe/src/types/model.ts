@@ -175,10 +175,17 @@ export interface RoomModel extends RoomSettingsModel {
   changeOnline: ChangeOnline[];
 }
 
+export interface IncomingCallModel {
+  roomId: number;
+  userId: number;
+  connId: string;
+}
+
 export interface RootState {
   isOnline: boolean;
   growls: GrowlModel[];
   dim: boolean;
+  incomingCall: IncomingCallModel;
   microphones: { [id: string]: string };
   speakers: { [id: string]: string };
   webcams: { [id: string]: string };

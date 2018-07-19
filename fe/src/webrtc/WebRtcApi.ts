@@ -108,10 +108,21 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   startCall(roomId: number) {
-
     if (!this.callHandlers[roomId]) {
       this.callHandlers[roomId] = new CallHandler(roomId, this.wsHandler, this.notifier, this.store);
     }
     this.callHandlers[roomId].offerCall();
+  }
+
+  answerCall(connId: string) {
+    sub.notify({action: 'answerCall', handler: Subscription.getTransferId(connId)});
+  }
+
+  declineCall(connId: string) {
+    sub.notify({action: 'declineCall', handler: Subscription.getTransferId(connId)});
+  }
+
+  videoAnswerCall(connId: string) {
+    sub.notify({action: 'videoAnswerCall', handler: Subscription.getTransferId(connId)});
   }
 }

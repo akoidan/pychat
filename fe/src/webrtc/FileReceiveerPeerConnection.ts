@@ -16,6 +16,7 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
   private blobsQueue = [];
   private receiveBuffer = [];
   private receivedSize = 0;
+  protected connectedToRemote: boolean = true;
   private recevedUsingFile = false;
   private filePeerConnection: FilePeerConnection;
 

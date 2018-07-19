@@ -7,7 +7,7 @@ import {
   CurrentUserSettingsModel,
   EditingMessage,
   GrowlModel,
-  GrowlType,
+  GrowlType, IncomingCallModel,
   MessageModel,
   ReceivingFile,
   RoomDictModel,
@@ -54,6 +54,7 @@ const store: StoreOptions<RootState> = {
   state: {
     isOnline: false,
     growls: [],
+    incomingCall: null,
     allUsersDict: {},
     regHeader: null,
     microphones: {},
@@ -157,6 +158,9 @@ const store: StoreOptions<RootState> = {
     },
     setUploadProgress(state: RootState, payload: SetUploadProgress) {
       state.roomsDict[payload.roomId].messages[payload.messageId].transfer.upload = payload.upload;
+    },
+    setIncomingCall(state: RootState, payload: IncomingCallModel) {
+      state.incomingCall = payload;
     },
     setDim(state: RootState, payload: boolean) {
       state.dim = payload;

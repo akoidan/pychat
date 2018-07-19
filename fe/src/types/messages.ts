@@ -59,10 +59,18 @@ export interface SetUserProfileMessage extends DefaultMessage {
   content: UserProfileDto;
 }
 
-export interface ReplyFileMessage extends WebRtcDefaultMessage {
+interface ReplyWebRtc extends WebRtcDefaultMessage{
   content: BrowserBase;
   opponentWsId: string;
   userId: number;
+}
+
+export interface ReplyFileMessage extends ReplyWebRtc {
+
+}
+
+export interface ReplyCallMessage  extends ReplyWebRtc {
+
 }
 
 export interface DestroyFileConnectionMessage extends DefaultMessage {

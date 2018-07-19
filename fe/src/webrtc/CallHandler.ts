@@ -1,17 +1,23 @@
 import BaseTransferHandler from './BaseTransferHandler';
-import {DefaultMessage, OfferCall, WebRtcSetConnectionIdMessage} from '../types/messages';
+import {DefaultMessage, OfferCall, ReplyCallMessage, WebRtcSetConnectionIdMessage} from '../types/messages';
 import {browserVersion, isChrome, isMobile} from '../utils/singletons';
 import {sub} from '../utils/sub';
 import Subscription from '../utils/Subscription';
-import {CallsInfoModel} from '../types/model';
+import {CallsInfoModel, IncomingCallModel} from '../types/model';
 import {BooleanIdentifier, JsAudioAnalyzer, NumberIdentifier, SetDevices, StringIdentifier} from '../types/types';
 import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from '../utils/consts';
 import { extractError, forEach} from '../utils/utils';
 import {createMicrophoneLevelVoice, getAverageAudioLevel} from '../utils/audioprocc';
+import CallSenderPeerConnection from './CallSenderPeerConnection';
+import CallReceiverPeerConnection from './CallReceiverPeerConnection';
+import AbstractPeerConnection from './AbstractPeerConnection';
 
 export default class CallHandler extends BaseTransferHandler {
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
-
+    answerCall: this.answerCall,
+    videoAnswerCall: this.videoAnswerCall,
+    declineCall: this.declineCall,
+    replyCall: this.replyCall
   };
   private localStream: MediaStream;
   private audioProcessor: JsAudioAnalyzer;
@@ -221,7 +227,7 @@ export default class CallHandler extends BaseTransferHandler {
         if (isShare && kind === 'share') {
           track = tracks[0];
         } else if (!isShare && kind === 'video') {
-          track = tracks[0]
+          track = tracks[0];
         } else if (kind === 'audio') {
           track = tracks[0];
         }
@@ -285,21 +291,64 @@ export default class CallHandler extends BaseTransferHandler {
     }
   }
 
+
+  createCallPeerConnection(message: ReplyCallMessage) {
+    if (message.opponentWsId > this.wsHandler.getWsConnectionId()) {
+      new CallSenderPeerConnection(this.roomId, this.connectionId, message.opponentWsId, this.wsHandler, this.store);
+    }  else {
+      new CallReceiverPeerConnection(this.roomId, this.connectionId, message.opponentWsId, this.wsHandler, this.store);
+    }
+  }
+
+  replyCall(message: ReplyCallMessage) {
+    this.createCallPeerConnection(message);
+  }
+
   initAndDisplayOffer(message: OfferCall) {
+    if (this.connectionId) {
+      this.logger.error('Old connId still exists {}', this.connectionId)();
+    }
     this.connectionId = message.connId;
+    sub.subscribe(Subscription.getTransferId(message.connId), this);
+    this.logger.log('CallHandler initialized')();
+    this.wsHandler.replyCall(message.connId, browserVersion);
+    let payload2: IncomingCallModel = {
+      connId: message.connId,
+      roomId: message.roomId,
+      userId: message.userId
+    };
+    this.store.commit('setIncomingCall', payload2);
+    // this.acceptedPeers.push(message.opponentWsId);
+    // this.createCallPeerConnection(message);
+    // this.showOffer(message, channelName);
+  }
+
+  answerCall() {
     let payload: BooleanIdentifier = {
       state: true,
       id: this.roomId,
     };
+    this.store.commit('setIncomingCall', null);
     this.store.commit('setCallActiveToState', payload);
-    sub.subscribe(Subscription.getTransferId(message.connId), this);
+  }
 
+  videoAnswerCall() {
+    let payload: BooleanIdentifier = {
+      state: true,
+      id: this.roomId,
+    };
+    this.store.commit('setIncomingCall', null);
+    this.store.commit('setCallActiveToState', payload);
+  }
 
-    this.logger.log('CallHandler initialized')();
-    this.wsHandler.replyCall(message.connId, browserVersion);
-    //
-    // this.acceptedPeers.push(message.opponentWsId);
-    // this.createCallPeerConnection(message);
-    // this.showOffer(message, channelName);
+  onDestroy() {
+    this.connectionId = null;
+    super.onDestroy();
+  }
+
+  declineCall() {
+    this.store.commit('setIncomingCall', null);
+    this.wsHandler.declineCall(this.connectionId);
+    this.onDestroy();
   }
 }

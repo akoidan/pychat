@@ -2,6 +2,7 @@
   <div class="flex">
     <div v-if="dim" class="wait"></div>
     <app-nav v-show="showNav"/>
+    <incoming-call v-if="incomingCall" :call="incomingCall"/>
     <keep-alive v-if="inited" :include="['ChannelsPage', 'Painter']">
       <router-view class="body"/>
     </keep-alive>
@@ -12,19 +13,21 @@
   import {Getter, State} from "vuex-class";
   import AppNav from "./AppNav.vue";
   import {Component, Vue} from "vue-property-decorator";
-  import {UserModel} from "../types/model";
+  import {IncomingCallModel, UserModel} from "../types/model";
   import NotifierHandler from "../utils/NotificationHandler";
   import {browserVersion, isChrome, isMobile, notifier} from "../utils/singletons";
   import store from '../store';
   import AppSpinner from './ui/AppSpinner';
+  import IncomingCall from './chat/IncomingCall';
 
   @Component({
-    components: {AppSpinner, AppNav}
+    components: {IncomingCall, AppSpinner, AppNav}
   })
   export default class MainPage extends Vue {
 
     @Getter showNav: boolean;
     @State userInfo: UserModel;
+    @State incomingCall: IncomingCallModel;
     @State dim: boolean;
 
     get inited() {
