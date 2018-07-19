@@ -64,7 +64,7 @@
 <script lang="ts">
   import {State, Action, Mutation, Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {CallInfo, CallsInfoModel} from "../../types/model";
+  import {CallInfoModel, CallsInfoModel} from "../../types/model";
   import {BooleanIdentifier, StringIdentifier} from "../../types/types";
   import {webrtcApi} from '../../utils/singletons';
 

@@ -144,12 +144,15 @@ export interface SendingFile {
   transfers: { [id: string]: SendingFileTransfer };
 }
 
-export interface CallInfo {
+
+export interface CallInfoModel {
   anchor: string;
+  opponentVolume: number;
+  opponentCurrentVoice: number;
 }
 
 export interface CallsInfoModel {
-  calls: { [id: string]: CallInfo };
+  calls: { [id: string]: CallInfoModel };
   callContainer: boolean;
   showMic: boolean;
   currentMicLevel: number;

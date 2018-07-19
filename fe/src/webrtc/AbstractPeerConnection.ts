@@ -13,15 +13,15 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean;
   protected sendRtcDataQueue = [];
   protected readonly opponentWsId: string;
-  protected readonly connectionId: string;
+  public readonly connectionId: string;
   public readonly logger: Logger;
   public pc = null;
   protected connectionStatus = 'new';
   protected webRtcUrl = WEBRTC_STUNT_URL;
-  protected sdpConstraints: boolean;
+  protected sdpConstraints: any;
   protected readonly wsHandler: WsHandler;
-  protected readonly store: Store<RootState>;
-  protected readonly roomId: number;
+  public readonly store: Store<RootState>;
+  public readonly roomId: number;
   public sendChannel: RTCDataChannel = null;
   private pc_config = {
     iceServers: [{

@@ -9,7 +9,7 @@ import {
   RoomSettingsModel,
   SearchModel, SendingFile,
   UploadProgressModel,
-  UserModel, SendingFileTransfer
+  UserModel, SendingFileTransfer, CallInfoModel
 } from './model';
 import {RoomDto, SetRooms, UserDto} from './dto';
 import {DefaultMessage} from './messages';
@@ -48,6 +48,30 @@ export interface SetUploadProgress {
   upload: UploadProgressModel;
   roomId: number;
   messageId: number;
+}
+
+export interface SetCallOpponent {
+  roomId: number;
+  connId: string;
+  callInfoModel: CallInfoModel;
+}
+
+export interface SetOpponentVolume {
+  roomId: number;
+  connId: string;
+  volume: number;
+}
+
+export interface SetOpponentVoice {
+  roomId: number;
+  connId: string;
+  voice: number;
+}
+
+export interface SetOpponentAnchor {
+  roomId: number;
+  connId: string;
+  anchor: string;
 }
 
 export interface BooleanIdentifier {

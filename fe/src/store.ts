@@ -3,6 +3,7 @@ import Vuex, {StoreOptions} from 'vuex';
 import {ActionContext} from 'vuex/types';
 import loggerFactory from './utils/loggerFactory';
 import {
+  CallInfoModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   EditingMessage,
@@ -27,10 +28,10 @@ import {
   NumberIdentifier,
   PrivateRoomsIds,
   RemoveMessageProgress,
-  RemoveSendingMessage,
+  RemoveSendingMessage, SetCallOpponent,
   SetDevices,
   SetMessageProgress,
-  SetMessageProgressError,
+  SetMessageProgressError, SetOpponentAnchor, SetOpponentVoice, SetOpponentVolume,
   SetReceivingFileStatus,
   SetReceivingFileUploaded,
   SetRoomsUsers,
@@ -161,6 +162,18 @@ const store: StoreOptions<RootState> = {
     },
     setIncomingCall(state: RootState, payload: IncomingCallModel) {
       state.incomingCall = payload;
+    },
+    setOpponentVolume(state: RootState, payload: SetOpponentVolume) {
+      state.roomsDict[payload.roomId].callInfo.calls[payload.connId].opponentVolume = payload.volume;
+    },
+    setCallOpponent(state: RootState, payload: SetCallOpponent) {
+      Vue.set(state.roomsDict[payload.roomId].callInfo.calls, payload.connId, payload.callInfoModel);
+    },
+    setOpponentVoice(state: RootState, payload: SetOpponentVoice) {
+      state.roomsDict[payload.roomId].callInfo.calls[payload.connId].opponentCurrentVoice = payload.voice;
+    },
+    setOpponentAnchor(state: RootState, payload: SetOpponentAnchor) {
+      state.roomsDict[payload.roomId].callInfo.calls[payload.connId].anchor = payload.anchor;
     },
     setDim(state: RootState, payload: boolean) {
       state.dim = payload;
