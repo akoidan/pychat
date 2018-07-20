@@ -300,11 +300,11 @@ class WebRtcMessageCreator(object):
 	def reply_webrtc(self, event, connection_id, handler, content):
 		return {
 			VarNames.EVENT: event,
-			VarNames.CONNECTION_ID: connection_id,
+			VarNames.CONNECTION_ID: connection_id,  # required
 			VarNames.USER_ID: self.user_id,
 			VarNames.CONTENT: content,
-			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: handler.format(connection_id), #  TODO
+			VarNames.WEBRTC_OPPONENT_ID: self.id,  # required
+			VarNames.HANDLER_NAME: handler.format(connection_id, self.id), #  TODO
 		}
 
 	def retry_file(self, connection_id):

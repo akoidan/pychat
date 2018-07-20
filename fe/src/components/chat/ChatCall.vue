@@ -10,7 +10,7 @@
           <i class="icon-no-desktop" title="Capture your desktop screen and start sharing it"></i>
         </div>
         <div>
-          <video muted="muted" class="localVideo" :src="callInfo.localStreamSrc"></video>
+          <video muted="muted" class="localVideo" ref="localVideo" :src="callInfo.localStreamSrc"></video>
         </div>
       </div>
       <table class="settingsContainer" v-show="showSettings">
@@ -63,7 +63,7 @@
 </template>
 <script lang="ts">
   import {State, Action, Mutation, Getter} from "vuex-class";
-  import {Component, Prop, Vue} from "vue-property-decorator";
+  import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {CallInfoModel, CallsInfoModel} from "../../types/model";
   import {BooleanIdentifier, StringIdentifier} from "../../types/types";
   import {webrtcApi} from '../../utils/singletons';
@@ -83,6 +83,21 @@
     @State speakers: { [id: string]: string };
     @State webcams: { [id: string]: string };
 
+    @Watch('callInfo.localStreamSrc')
+    onLocalStreamChange(newValue) {
+      this.$nextTick(function () {
+        if (newValue) {
+          this.$refs.localVideo.play();
+        } else {
+          this.$refs.localVideo.pause();
+        }
+      })
+    }
+
+
+    $refs: {
+      localVideo: HTMLVideoElement
+    };
 
     setCurrentMicProxy(event) {
       let payload: StringIdentifier = {

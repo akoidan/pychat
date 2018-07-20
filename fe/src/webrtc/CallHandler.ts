@@ -112,6 +112,7 @@ export default class CallHandler extends BaseTransferHandler {
 
   async captureInput() {
     let endStream;
+    this.logger.debug('capturing input')();
     if (this.callInfo.showMic || this.callInfo.showVideo) {
       let audio: any = this.callInfo.showMic;
       if (this.callInfo.currentMic && audio) {
@@ -121,7 +122,8 @@ export default class CallHandler extends BaseTransferHandler {
       if (this.callInfo.currentWebcam && video) {
         video = {deviceId: this.callInfo.currentWebcam};
       }
-      let endStream = await navigator.mediaDevices.getUserMedia({audio, video});
+      endStream = await navigator.mediaDevices.getUserMedia({audio, video});
+      this.logger.debug('navigator.mediaDevices.getUserMedia({audio, video})')();
       if (navigator.mediaDevices.enumerateDevices) {
         let devices = await navigator.mediaDevices.enumerateDevices();
         this.inflateDevices(devices);
@@ -129,7 +131,7 @@ export default class CallHandler extends BaseTransferHandler {
     }
     if (this.callInfo.shareScreen) {
       let share = await this.getDesktopShareFromExtension();
-      this.logger.log('Resolving userMedia from dekstopShare')();
+      this.logger.debug('Resolving userMedia from dekstopShare')();
       let stream = await navigator.mediaDevices.getUserMedia(share);
       let tracks: any[] = stream.getVideoTracks();
       if (!(tracks && tracks.length > 0)) {
@@ -200,9 +202,8 @@ export default class CallHandler extends BaseTransferHandler {
 
   private attachLocalStream(stream: MediaStream) {
     if (stream) {
-      this.logger.log('Local stream has been attached')();
       this.localStream = stream;
-      this.audioProcessor = createMicrophoneLevelVoice(stream, this.processAudio);
+      this.audioProcessor = createMicrophoneLevelVoice(stream, this.processAudio.bind(this));
       let payload: StringIdentifier = {
         id: this.roomId,
         state: URL.createObjectURL(stream)
@@ -273,6 +274,7 @@ export default class CallHandler extends BaseTransferHandler {
     let stream;
     try {
       stream = await this.captureInput();
+      this.logger.log('got local stream {}', stream)();
       if (stream) {
         this.attachLocalStream(stream);
       }
