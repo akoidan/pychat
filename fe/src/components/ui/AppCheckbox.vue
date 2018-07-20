@@ -65,5 +65,5 @@
       padding-left: 25px
       padding-right: 0
       width: 50px
-      z-index: 2
+
 </style>

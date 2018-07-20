@@ -11,7 +11,6 @@ import Subscription from '../utils/Subscription';
 
 export default class FileSender extends BaseTransferHandler {
   private file: File;
-  private webrtcConnnectionsIds: string[] = [];
 
   constructor(roomId: number, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>, file: File, time: number) {
     super(roomId, wsHandler, notifier, store);
@@ -33,23 +32,6 @@ export default class FileSender extends BaseTransferHandler {
     replyFile: this.replyFile,
     removePeerConnection: this.removePeerConnection
   };
-
-  private removePeerConnection(payload: RemovePeerConnection) {
-    this.webrtcConnnectionsIds.splice(this.webrtcConnnectionsIds.indexOf(payload.opponentWsId), 1);
-    if (this.webrtcConnnectionsIds.length === 0) {
-      this.onDestroy();
-    }
-  }
-
-  closeAllPeerConnections(text) {
-    this.webrtcConnnectionsIds.forEach(id => {
-      sub.notify({
-        action: 'destroy',
-        handler: Subscription.getPeerConnectionId(this.connectionId, id)
-      });
-    });
-  }
-
 
   replyFile(message: ReplyFileMessage) {
     this.logger.debug('got mes {}', message)();

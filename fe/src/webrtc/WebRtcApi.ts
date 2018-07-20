@@ -125,4 +125,8 @@ export default class WebRtcApi extends MessageHandler {
   videoAnswerCall(connId: string) {
     sub.notify({action: 'videoAnswerCall', handler: Subscription.getTransferId(connId)});
   }
+
+  hangCall(roomId: number) {
+    this.callHandlers[roomId].hangCall();
+  }
 }

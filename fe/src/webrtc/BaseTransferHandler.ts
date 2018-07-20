@@ -7,6 +7,7 @@ import {Store} from 'vuex';
 import MessageHandler from '../utils/MesageHandler';
 import {sub} from '../utils/sub';
 import Subscription from '../utils/Subscription';
+import {RemovePeerConnection} from '../types/types';
 
 export default abstract class BaseTransferHandler extends MessageHandler {
 
@@ -16,6 +17,7 @@ export default abstract class BaseTransferHandler extends MessageHandler {
   protected readonly logger: Logger;
   protected readonly store: Store<RootState>;
   protected readonly roomId: number;
+  protected webrtcConnnectionsIds: string[] = [];
 
   constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>) {
     super();
@@ -26,7 +28,24 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     this.logger = loggerFactory.getLogger('WRTC', 'color: #960055');
   }
 
-   onDestroy() {
+  protected  onDestroy() {
      sub.unsubscribe(Subscription.getTransferId(this.connectionId));
   }
+
+  protected removePeerConnection(payload: RemovePeerConnection) {
+    this.webrtcConnnectionsIds.splice(this.webrtcConnnectionsIds.indexOf(payload.opponentWsId), 1);
+    if (this.webrtcConnnectionsIds.length === 0) {
+      this.onDestroy();
+    }
+  }
+
+  protected closeAllPeerConnections() {
+    this.webrtcConnnectionsIds.forEach(id => {
+      sub.notify({
+        action: 'destroy',
+        handler: Subscription.getPeerConnectionId(this.connectionId, id)
+      });
+    });
+  }
+
 }

@@ -10,6 +10,8 @@ dump.rdb
 photos
 django.db
 chat/migrations
+fe/src/assets/font/*
+!fe/src/assets/font/.gitkeep
 .venv
 fe/production.json
 chat.log

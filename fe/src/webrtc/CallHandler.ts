@@ -17,7 +17,8 @@ export default class CallHandler extends BaseTransferHandler {
     answerCall: this.answerCall,
     videoAnswerCall: this.videoAnswerCall,
     declineCall: this.declineCall,
-    replyCall: this.replyCall
+    replyCall: this.replyCall,
+    removePeerConnection: this.removePeerConnection
   };
   private localStream: MediaStream;
   private audioProcessor: JsAudioAnalyzer;
@@ -298,6 +299,7 @@ export default class CallHandler extends BaseTransferHandler {
     }  else {
       new CallReceiverPeerConnection(this.roomId, this.connectionId, message.opponentWsId, this.wsHandler, this.store);
     }
+    this.webrtcConnnectionsIds.push(message.opponentWsId);
   }
 
   replyCall(message: ReplyCallMessage) {
@@ -342,13 +344,24 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   onDestroy() {
-    this.connectionId = null;
     super.onDestroy();
+    this.closeAllPeerConnections();
+    this.connectionId = null;
+    let payload: BooleanIdentifier = {
+      state: false,
+      id: this.roomId,
+    };
+    this.store.commit('setCallActiveToState', payload);
   }
 
   declineCall() {
     this.store.commit('setIncomingCall', null);
     this.wsHandler.declineCall(this.connectionId);
     this.onDestroy();
+  }
+
+  hangCall() {
+    this.onDestroy();
+
   }
 }

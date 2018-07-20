@@ -55,7 +55,7 @@
         <i class="icon-desktop" title="Capture your desktop screen and start sharing it"></i>
         <i class="icon-cog" @click="showSettings = !showSettings"></i>
         <div class="enterFullScreenHolder"><i class="icon-webrtc-fullscreen" title="Fullscreen"></i></div>
-        <div class="hangUpHolder"><i class="icon-hang-up callActiveIcon" title="Hang up" v-show="callInfo.callActive"></i></div>
+        <div class="hangUpHolder"><i class="icon-hang-up" @click="hangUpCall" title="Hang up" v-show="callInfo.callActive"></i></div>
         <progress max="15" value="0" title="Your microphone level" class="microphoneLevel"></progress>
       </div>
     </div>
@@ -124,6 +124,10 @@
 
     startCall() {
       webrtcApi.startCall(this.roomId);
+    }
+
+    hangUpCall() {
+      webrtcApi.hangCall(this.roomId);
     }
 
     get iconVideoClass () : {} {

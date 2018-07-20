@@ -3,7 +3,7 @@ import {Logger, LoggerFactory, LogStrict} from 'lines-logger';
 declare var clients: any;
 
 let loggerFactory: LoggerFactory = new LoggerFactory(LogStrict.LOG_WITH_WARNINGS);
-let logger: Logger = loggerFactory.getLoggerColor('SW_S', 'color: #ffb500; font-weight: bold');
+let logger: Logger = loggerFactory.getLoggerColor('SW_S', '#a76f00');
 
 //
 let SW_VERSION = '1.5';

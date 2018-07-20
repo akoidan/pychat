@@ -32,7 +32,9 @@ export default class CallReceiverPeerConnection extends ReceiverPeerConnection {
     this.cpc.createPeerConnection(stream);
   }
 
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> };
+  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
+    destroy: this.onDestroy,
+  };
 
   ondatachannelclose(text): void {
   }
