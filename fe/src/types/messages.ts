@@ -25,7 +25,9 @@ export interface SetWsIdMessage extends DefaultMessage {
   userInfo: UserProfileDto;
   userSettings: UserSettingsDto;
 }
-
+export interface ConnectToRemoteMessage extends DefaultMessage  {
+  stream: MediaStream;
+}
 
 export interface OfferFileContent extends BrowserBase {
   size: number;

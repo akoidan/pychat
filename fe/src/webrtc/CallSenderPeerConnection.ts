@@ -7,11 +7,11 @@ import CallPeerConnection from './CallPeerConnection';
 export default class CallSenderPeerConnection extends CallPeerConnection {
 
   protected connectedToRemote: boolean = false;
-  private cpc: CallPeerConnection;
 
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
     destroy: this.onDestroy,
     streamChanged: this.onStreamChanged,
+    connectToRemote: this.connectToRemote,
   };
 
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>) {
@@ -34,13 +34,6 @@ export default class CallSenderPeerConnection extends CallPeerConnection {
     this.createOffer();
     this.createPeerConnection(stream);
   }
-
-  createPeerConnection(stream: MediaStream) {
-    super.createPeerConnection(stream);
-    this.cpc.createPeerConnection(stream);
-  }
-
-
 
   ondatachannelclose(text): void {
   }

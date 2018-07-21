@@ -33,13 +33,18 @@ export default abstract class BaseTransferHandler extends MessageHandler {
   }
 
   protected removePeerConnection(payload: RemovePeerConnection) {
-    this.webrtcConnnectionsIds.splice(this.webrtcConnnectionsIds.indexOf(payload.opponentWsId), 1);
+    this.logger.log('Removing pc {}', payload);
+    let start = this.webrtcConnnectionsIds.indexOf(payload.opponentWsId);
+    if (start < 0 ) {
+      throw 'Can\'t remove unexisting payload ' + payload.opponentWsId;
+    }
+    this.webrtcConnnectionsIds.splice(start, 1);
     if (this.webrtcConnnectionsIds.length === 0) {
       this.onDestroy();
     }
   }
 
-  protected closeAllPeerConnections() {
+  protected closeAllPeerConnections() { // calls on destroy
     this.webrtcConnnectionsIds.forEach(id => {
       sub.notify({
         action: 'destroy',

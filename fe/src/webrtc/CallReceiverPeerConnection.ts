@@ -8,6 +8,12 @@ export default class CallReceiverPeerConnection extends CallPeerConnection {
 
   protected connectedToRemote: boolean = false;
 
+  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
+    destroy: this.onDestroy,
+    streamChanged: this.onStreamChanged,
+    connectToRemote: this.connectToRemote,
+  };
+
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.connectedToRemote = false;
@@ -23,11 +29,6 @@ export default class CallReceiverPeerConnection extends CallPeerConnection {
     this.connectedToRemote = true;
     this.createPeerConnection(stream);
   }
-
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
-    destroy: this.onDestroy,
-    streamChanged: this.onStreamChanged,
-  };
 
   ondatachannelclose(text): void {
   }

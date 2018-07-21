@@ -1,5 +1,11 @@
 import BaseTransferHandler from './BaseTransferHandler';
-import {DefaultMessage, OfferCall, ReplyCallMessage, WebRtcSetConnectionIdMessage} from '../types/messages';
+import {
+  ConnectToRemoteMessage,
+  DefaultMessage,
+  OfferCall,
+  ReplyCallMessage,
+  WebRtcSetConnectionIdMessage
+} from '../types/messages';
 import {browserVersion, isChrome, isMobile} from '../utils/singletons';
 import {sub} from '../utils/sub';
 import Subscription from '../utils/Subscription';
@@ -18,6 +24,7 @@ import {createMicrophoneLevelVoice, getAverageAudioLevel} from '../utils/audiopr
 import CallSenderPeerConnection from './CallSenderPeerConnection';
 import CallReceiverPeerConnection from './CallReceiverPeerConnection';
 import AbstractPeerConnection from './AbstractPeerConnection';
+import router from '../router';
 
 export default class CallHandler extends BaseTransferHandler {
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
@@ -25,10 +32,13 @@ export default class CallHandler extends BaseTransferHandler {
     videoAnswerCall: this.videoAnswerCall,
     declineCall: this.declineCall,
     replyCall: this.replyCall,
-    removePeerConnection: this.removePeerConnection
+    acceptCall: this.onacceptCall,
+    removePeerConnection: this.removePeerConnection,
   };
   private localStream: MediaStream;
   private audioProcessor: JsAudioAnalyzer;
+  private callStatus: string;
+  private acceptedPeers: string[] = [];
 
   inflateDevices(devices) {
     let n, k, c = 0;
@@ -58,6 +68,23 @@ export default class CallHandler extends BaseTransferHandler {
     this.store.commit('setDevices', payload);
   }
 
+  onacceptCall(message/*TODO :type*/) {
+    if (this.callStatus !== 'received_offer') { // if we're call initiator
+      let payload: ConnectToRemoteMessage = {
+        action: 'connectToRemote',
+        handler: Subscription.getPeerConnectionId(this.connectionId, message.opponentWsId),
+        stream: this.localStream
+      };
+      // if (pc.sendRtcDataQueue.length > 0) {
+      //   logger.log("Connection accepted, consuming sendRtcDataQueue")();
+      //   var queue = pc.sendRtcDataQueue;
+      //   pc.sendRtcDataQueue = [];
+      //   queue.forEach(pc.onsendRtcData);
+      // }
+    } else {
+      this.acceptedPeers.push(message.opponentWsId);
+    }
+  }
 
   pingExtension(cb) {
     if (chrome.runtime && chrome.runtime.sendMessage) {
@@ -206,6 +233,7 @@ export default class CallHandler extends BaseTransferHandler {
       this.store.commit('setCurrentMicLevel', payload);
     };
   }
+
   async updateConnection() {
     let stream;
     if (this.localStream && this.localStream.active) {
@@ -307,14 +335,15 @@ export default class CallHandler extends BaseTransferHandler {
       if (stream) {
         this.attachLocalStream(stream);
       }
+      let payload: BooleanIdentifier = {
+        state: true,
+        id: this.roomId,
+      };
+      this.setCallStatus('sent_offer');
+      this.store.commit('setCallActiveToState', payload);
       this.wsHandler.offerCall(this.roomId, browserVersion, (e: WebRtcSetConnectionIdMessage) => {
         if (e.connId) {
           this.connectionId = e.connId;
-          let payload: BooleanIdentifier = {
-            state: true,
-            id: this.roomId,
-          };
-          this.store.commit('setCallActiveToState', payload);
           sub.subscribe(Subscription.getTransferId(e.connId), this);
         }
       });
@@ -338,6 +367,7 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   initAndDisplayOffer(message: OfferCall) {
+    this.setCallStatus('received_offer');
     if (this.connectionId) {
       this.logger.error('Old connId still exists {}', this.connectionId)();
     }
@@ -350,19 +380,31 @@ export default class CallHandler extends BaseTransferHandler {
       roomId: message.roomId,
       userId: message.userId
     };
+    this.acceptedPeers.push(message.opponentWsId);
     this.store.commit('setIncomingCall', payload2);
-    // this.acceptedPeers.push(message.opponentWsId);
-    // this.createCallPeerConnection(message);
-    // this.showOffer(message, channelName);
+    this.createCallPeerConnection(message);
   }
 
-  answerCall() {
+  async answerCall() {
     let payload: BooleanIdentifier = {
       state: true,
       id: this.roomId,
     };
     this.store.commit('setIncomingCall', null);
     this.store.commit('setCallActiveToState', payload);
+    this.setCallStatus('accepted');
+    let stream = await this.captureInput();
+    this.attachLocalStream(stream);
+    this.wsHandler.acceptCall(this.connectionId);
+    this.acceptedPeers.forEach( (e) => {
+      let message: ConnectToRemoteMessage = {
+        action: 'connectToRemote',
+        stream: this.localStream,
+        handler: Subscription.getPeerConnectionId(this.connectionId, e)
+      };
+      sub.notify(message);
+    });
+    router.replace(`/chat/${this.roomId}`);
   }
 
   videoAnswerCall() {
@@ -387,14 +429,12 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   onDestroy() {
-    super.onDestroy();
     this.stopLocalStream();
     let payload2: StringIdentifier = {
       id: this.roomId,
       state: null
     };
     this.store.commit('setLocalStreamSrc', payload2);
-    this.closeAllPeerConnections();
     this.connectionId = null;
     let payload: BooleanIdentifier = {
       state: false,
@@ -410,7 +450,16 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   hangCall() {
-    this.onDestroy();
+    this.logger.debug('on hangCall called')();
+    let hadConnections = this.webrtcConnnectionsIds.length >= 0;
+    if (hadConnections) {
+      this.closeAllPeerConnections();
+    } else {
+      this.onDestroy();
+    }
+  }
 
+  private setCallStatus(status: string) {
+    this.callStatus = status;
   }
 }

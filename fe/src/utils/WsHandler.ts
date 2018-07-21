@@ -575,4 +575,11 @@ public acceptFile(connId, received) {
       connId,
     });
   }
+
+  acceptCall(connId: string) {
+    this.sendToServer({
+      action: 'acceptCall',
+      connId
+    });
+  }
 }

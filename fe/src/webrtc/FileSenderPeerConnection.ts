@@ -172,17 +172,6 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     }
   }
 
-
-  onDestroy() {
-    super.onDestroy();
-    let message: RemovePeerConnection = {
-      handler: Subscription.getTransferId(this.connectionId),
-      action: 'removePeerConnection',
-      opponentWsId: this.opponentWsId,
-    };
-    sub.notify(message);
-  }
-
   destroyFileConnection(message: DestroyFileConnectionMessage) {
     let isDecline = message.content === 'decline';
     let isSuccess = message.content === 'success';

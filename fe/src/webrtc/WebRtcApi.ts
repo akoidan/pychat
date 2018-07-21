@@ -107,11 +107,15 @@ export default class WebRtcApi extends MessageHandler {
 
   }
 
-  startCall(roomId: number) {
+  getCallHandler(roomId: number) {
     if (!this.callHandlers[roomId]) {
       this.callHandlers[roomId] = new CallHandler(roomId, this.wsHandler, this.notifier, this.store);
     }
-    this.callHandlers[roomId].offerCall();
+    return this.callHandlers[roomId];
+  }
+
+  startCall(roomId: number) {
+    this.getCallHandler(roomId).offerCall();
   }
 
   answerCall(connId: string) {
@@ -128,6 +132,10 @@ export default class WebRtcApi extends MessageHandler {
 
   hangCall(roomId: number) {
     this.callHandlers[roomId].hangCall();
+  }
+
+  updateConnection(roomId: number) {
+    this.callHandlers[roomId].updateConnection();
   }
 
   closeAllConnections() {

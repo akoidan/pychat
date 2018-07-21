@@ -104,7 +104,9 @@
         id: this.roomId,
         state: event.target.value
       };
-      this.setCurrentMic(payload);
+      this.setCurrentMic(payload);if (this.callInfo.callActive) {
+        webrtcApi.updateConnection(this.roomId);
+      }
     }
     setCurrentWebcamProxy(event) {
       let payload: StringIdentifier = {
@@ -112,6 +114,9 @@
         state: event.target.value
       };
       this.setCurrentWebcam(payload);
+      if (this.callInfo.callActive) {
+        webrtcApi.updateConnection(this.roomId);
+      }
     }
 
     setCurrentSpeakerProxy(event) {
@@ -120,6 +125,9 @@
         state: event.target.value
       };
       this.setCurrentSpeaker(payload);
+      if (this.callInfo.callActive) {
+        webrtcApi.updateConnection(this.roomId);
+      }
     }
 
     get iconMicClass () : {} {

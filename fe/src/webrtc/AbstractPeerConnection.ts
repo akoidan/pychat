@@ -8,6 +8,7 @@ import {Store} from 'vuex';
 import {sub} from '../utils/sub';
 import MessageHandler from '../utils/MesageHandler';
 import Subscription from '../utils/Subscription';
+import {RemovePeerConnection} from '../types/types';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean;
@@ -61,6 +62,12 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   }
 
   onDestroy() {
+    let message: RemovePeerConnection = {
+      handler: Subscription.getTransferId(this.connectionId),
+      action: 'removePeerConnection',
+      opponentWsId: this.opponentWsId,
+    };
+    sub.notify(message);
     sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId));
   }
 

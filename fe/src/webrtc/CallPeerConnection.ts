@@ -21,25 +21,26 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     this.store.commit('setCallOpponent', payload);
   }
 
- oniceconnectionstatechange () {
-   if (this.pc.iceConnectionState === 'disconnected') {
-     this.logger.log('disconnected')();
-     this.closeEvents('Connection has been lost');
-   } else if (['completed', 'connected'].indexOf(this.pc.iceConnectionState) >= 0) {
-     this.logger.log('running')();
-   }
- }
+  oniceconnectionstatechange() {
+    if (this.pc.iceConnectionState === 'disconnected') {
+      this.logger.log('disconnected')();
+      this.closeEvents('Connection has been lost');
+    } else if (['completed', 'connected'].indexOf(this.pc.iceConnectionState) >= 0) {
+      this.logger.log('running')();
+    }
+  }
 
- onStreamChanged(payload: ChangeStreamMessage) {
-   if (this.pc) {
-     payload.oldStream && this.pc.removeStream(payload.oldStream);
-     this.pc.addStream(payload.newStream);
-     this.createOffer();
-   }
- }
+  onStreamChanged(payload: ChangeStreamMessage) {
+    if (this.pc) {
+      payload.oldStream && this.pc.removeStream(payload.oldStream);
+      this.pc.addStream(payload.newStream);
+      this.createOffer();
+    }
+  }
 
 
-  createPeerConnection (stream) {
+  createPeerConnection (event) {
+    super.createPeerConnection();
     this.pc.onaddstream =  (event) => {
       this.logger.log('onaddstream')();
       let payload: SetOpponentAnchor = {
@@ -62,7 +63,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       // this.audioProcessor = Utils.createMicrophoneLevelVoice(event.stream, this.processAudio);
       // onStreamAttached(this.opponentWsId);
     };
-    stream && this.pc.addStream(stream);
+    event && this.pc.addStream(event.stream);
   }
 
   processAudio (audioProc) {
