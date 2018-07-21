@@ -1,44 +1,53 @@
 import {getAverageAudioLevel} from '../utils/audioprocc';
 import AbstractPeerConnection from './AbstractPeerConnection';
-import {SetCallOpponent, SetOpponentAnchor, SetOpponentVoice} from '../types/types';
+import {ChangeStreamMessage, SetCallOpponent, SetOpponentAnchor, SetOpponentVoice} from '../types/types';
+import WsHandler from '../utils/WsHandler';
+import {RootState} from '../types/model';
+import {Store} from 'vuex';
 
-export default class CallPeerConnection {
+export default abstract class CallPeerConnection extends AbstractPeerConnection {
 
-  private asp: AbstractPeerConnection;
-
-  constructor(asp: AbstractPeerConnection) {
-    this.asp = asp;
+  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>) {
+    super(roomId, connId, opponentWsId, wsHandler, store);
     let payload:  SetCallOpponent = {
-      connId: this.asp.connectionId,
-      roomId: this.asp.roomId,
+      connId: this.connectionId,
+      roomId: this.roomId,
       callInfoModel: {
         anchor: null,
         opponentCurrentVoice: 0,
         opponentVolume: 100
       }
     };
-    this.asp.store.commit('setCallOpponent', payload);
+    this.store.commit('setCallOpponent', payload);
   }
 
  oniceconnectionstatechange () {
-   if (this.asp.pc.iceConnectionState === 'disconnected') {
-     this.asp.logger.log('disconnected')();
+   if (this.pc.iceConnectionState === 'disconnected') {
+     this.logger.log('disconnected')();
      this.closeEvents('Connection has been lost');
-   } else if (['completed', 'connected'].indexOf(this.asp.pc.iceConnectionState) >= 0) {
-     this.asp.logger.log('running')();
+   } else if (['completed', 'connected'].indexOf(this.pc.iceConnectionState) >= 0) {
+     this.logger.log('running')();
+   }
+ }
+
+ onStreamChanged(payload: ChangeStreamMessage) {
+   if (this.pc) {
+     payload.oldStream && this.pc.removeStream(payload.oldStream);
+     this.pc.addStream(payload.newStream);
+     this.createOffer();
    }
  }
 
 
   createPeerConnection (stream) {
-    this.asp.pc.onaddstream =  (event) => {
-      this.asp.logger.log('onaddstream')();
+    this.pc.onaddstream =  (event) => {
+      this.logger.log('onaddstream')();
       let payload: SetOpponentAnchor = {
         anchor: URL.createObjectURL(event.stream),
-        connId: this.asp.connectionId,
-        roomId: this.asp.roomId
+        connId: this.connectionId,
+        roomId: this.roomId
       };
-      this.asp.store.commit('setOpponentAnchor', payload);
+      this.store.commit('setOpponentAnchor', payload);
       //
       // if (p) { //firefox video.play doesn't return promise
       //   // chrome returns promise, if it's on mobile devices video sound would be muted
@@ -53,7 +62,7 @@ export default class CallPeerConnection {
       // this.audioProcessor = Utils.createMicrophoneLevelVoice(event.stream, this.processAudio);
       // onStreamAttached(this.opponentWsId);
     };
-    stream && this.asp.pc.addStream(stream);
+    stream && this.pc.addStream(stream);
   }
 
   processAudio (audioProc) {
@@ -84,10 +93,10 @@ export default class CallPeerConnection {
 
       let payload: SetOpponentVoice = {
         voice: clasNu,
-        connId: this.asp.connectionId,
-        roomId: this.asp.roomId
+        connId: this.connectionId,
+        roomId: this.roomId
       };
-      this.asp.store.commit('setOpponentVoice', payload);
+      this.store.commit('setOpponentVoice', payload);
     };
   }
 
@@ -104,16 +113,16 @@ export default class CallPeerConnection {
     //   this.timeoutedPeerConnectionDisconnected = null;
     //   logger.log("Removing connections lost timeout")();
     // }
-    this.asp.logger.log('Destroying CallPeerConnection because', reason)();
-    this.asp.closePeerConnection();
+    this.logger.log('Destroying CallPeerConnection because', reason)();
+    this.closePeerConnection();
     this.removeAudioProcessor();
-    this.asp.onDestroy();
+    this.onDestroy();
     let payload:  SetCallOpponent = {
-      connId: this.asp.connectionId,
-      roomId: this.asp.roomId,
+      connId: this.connectionId,
+      roomId: this.roomId,
       callInfoModel: null,
     };
-    this.asp.store.commit('setCallOpponent', payload);
+    this.store.commit('setCallOpponent', payload);
   }
 
   ondestroyCallConnection (message) {

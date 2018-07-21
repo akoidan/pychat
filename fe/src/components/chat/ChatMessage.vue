@@ -151,7 +151,7 @@
         @include margin-img-def
       .icon-youtube-play
         position: absolute
-        z-index: 13
+        /*z-index: 13*/
         cursor: pointer
         max-width: 100%
         max-height: 100%

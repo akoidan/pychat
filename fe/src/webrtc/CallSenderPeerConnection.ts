@@ -1,20 +1,22 @@
-import ReceiverPeerConnection from './ReceiverPeerConnection';
 import {DefaultMessage} from '../types/messages';
 import {RootState} from '../types/model';
 import WsHandler from '../utils/WsHandler';
 import {Store} from 'vuex';
-import SenderPeerConnection from './SenderPeerConnection';
 import CallPeerConnection from './CallPeerConnection';
 
-export default class CallSenderPeerConnection extends SenderPeerConnection {
+export default class CallSenderPeerConnection extends CallPeerConnection {
 
   protected connectedToRemote: boolean = false;
   private cpc: CallPeerConnection;
 
+  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
+    destroy: this.onDestroy,
+    streamChanged: this.onStreamChanged,
+  };
+
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.connectedToRemote = false;
-    this.cpc = new CallPeerConnection(this);
     this.sdpConstraints = {
       'mandatory': {
         'OfferToReceiveAudio': true,
@@ -34,17 +36,13 @@ export default class CallSenderPeerConnection extends SenderPeerConnection {
   }
 
   createPeerConnection(stream: MediaStream) {
-    super.createPeerConnection();
+    super.createPeerConnection(stream);
     this.cpc.createPeerConnection(stream);
   }
 
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
-    destroy: this.onDestroy,
-  };
+
 
   ondatachannelclose(text): void {
   }
 
-  oniceconnectionstatechange(): void {
-  }
 }

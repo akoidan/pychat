@@ -1,4 +1,3 @@
-import SenderPeerConnection from './SenderPeerConnection';
 import {AcceptFileMessage, DefaultMessage, DestroyFileConnectionMessage} from '../types/messages';
 import {
   AddSendingFileTransfer,
@@ -15,7 +14,7 @@ import FilePeerConnection from './FilePeerConnection';
 import {sub} from '../utils/sub';
 import Subscription from '../utils/Subscription';
 
-export default class FileSenderPeerConnection extends SenderPeerConnection {
+export default class FileSenderPeerConnection extends FilePeerConnection {
 
   private file: File;
   private reader: FileReader;
@@ -30,13 +29,11 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
     destroy: this.closeEvents,
     declineSending: this.declineSending,
   };
-  private filePeerConnection: FilePeerConnection;
   private noSpam: (cb) => void;
 
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>, file: File, userId: number) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.file = file;
-    this.filePeerConnection = new FilePeerConnection(this);
     this.noSpam = bounce(100);
     let asft:  AddSendingFileTransfer = {
       connId,
@@ -66,14 +63,6 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
     };
     this.store.commit('setSendingFileStatus', ssfs);
     this.wsHandler.destroyPeerFileConnection(this.connectionId, 'decline', this.opponentWsId);
-  }
-
-  oniceconnectionstatechange(): void {
-    this.filePeerConnection.oniceconnectionstatechange();
-  }
-
-  closeEvents() {
-    this.filePeerConnection.closeEvents();
   }
 
   acceptFile(message: AcceptFileMessage) {
@@ -158,7 +147,7 @@ export default class FileSenderPeerConnection extends SenderPeerConnection {
       }
     } catch (error) {
       this.commitErrorIntoStore('Connection has been lost');
-      this.filePeerConnection.closeEvents(String(error));
+      this.closeEvents(String(error));
       this.logger.error('sendData {}', error)();
     }
   }

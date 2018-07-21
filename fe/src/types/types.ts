@@ -25,6 +25,11 @@ export interface IMessageHandler {
   handle(message: DefaultMessage);
 }
 
+export interface ChangeStreamMessage extends DefaultMessage{
+  newStream: MediaStream;
+  oldStream: MediaStream;
+}
+
 export interface MessageDataEncode {
   messageContent: string;
   files: UploadFile[];

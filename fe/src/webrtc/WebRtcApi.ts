@@ -129,4 +129,10 @@ export default class WebRtcApi extends MessageHandler {
   hangCall(roomId: number) {
     this.callHandlers[roomId].hangCall();
   }
+
+  closeAllConnections() {
+    for (let k in this.callHandlers) {
+      this.callHandlers[k].hangCall();
+    }
+  }
 }

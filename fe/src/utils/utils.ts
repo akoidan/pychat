@@ -1,7 +1,7 @@
 import store from '../store';
 import router from '../router';
 import sessionHolder from './sessionHolder';
-import {api, channelsHandler, globalLogger, isMobile, storage, ws} from './singletons';
+import {api, channelsHandler, globalLogger, isMobile, storage, webrtcApi, ws} from './singletons';
 import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from '../types/model';
 import loggerFactory from './loggerFactory';
 import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from './consts';
@@ -15,6 +15,7 @@ export function logout(errMessage: string) {
   if (errMessage) {
     store.dispatch('growlError', errMessage);
   }
+  webrtcApi.closeAllConnections();
   sessionHolder.session = '';
   router.replace('/auth/login');
   ws.stopListening();
@@ -46,7 +47,7 @@ export function bounce(ms): (cb) => void {
         lastCall();
       }, ms);
     }
-  }
+  };
 }
 export async function initStore() {
   let isNew = await storage.connect();

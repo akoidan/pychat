@@ -20,7 +20,6 @@
   .spinner
     height: 20px
     display: flex
-    z-index: 1
     align-items: center
     justify-content: center
     .sp

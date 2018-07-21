@@ -2,7 +2,7 @@ import {WEBRTC_STUNT_URL} from '../utils/singletons';
 import {Logger} from 'lines-logger';
 import loggerFactory from '../utils/loggerFactory';
 import WsHandler from '../utils/WsHandler';
-import {extractError} from '../utils/utils';
+import {bytesToSize, extractError} from '../utils/utils';
 import {RootState} from '../types/model';
 import {Store} from 'vuex';
 import {sub} from '../utils/sub';
@@ -13,16 +13,16 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean;
   protected sendRtcDataQueue = [];
   protected readonly opponentWsId: string;
-  public readonly connectionId: string;
-  public readonly logger: Logger;
-  public pc = null;
+  protected readonly connectionId: string;
+  protected readonly logger: Logger;
+  protected pc = null;
   protected connectionStatus = 'new';
   protected webRtcUrl = WEBRTC_STUNT_URL;
   protected sdpConstraints: any;
   protected readonly wsHandler: WsHandler;
-  public readonly store: Store<RootState>;
-  public readonly roomId: number;
-  public sendChannel: RTCDataChannel = null;
+  protected readonly store: Store<RootState>;
+  protected readonly roomId: number;
+  protected sendChannel: RTCDataChannel = null;
   private pc_config = {
     iceServers: [{
       url: this.webRtcUrl
@@ -34,6 +34,10 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       {RtpDataChannels: false /*true*/}
     ]
   };
+
+  protected onChannelMessage(event) {
+    this.logger.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();
+  }
 
   constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: Store<RootState>) {
     super();

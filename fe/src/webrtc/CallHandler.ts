@@ -4,7 +4,14 @@ import {browserVersion, isChrome, isMobile} from '../utils/singletons';
 import {sub} from '../utils/sub';
 import Subscription from '../utils/Subscription';
 import {CallsInfoModel, IncomingCallModel} from '../types/model';
-import {BooleanIdentifier, JsAudioAnalyzer, NumberIdentifier, SetDevices, StringIdentifier} from '../types/types';
+import {
+  BooleanIdentifier,
+  ChangeStreamMessage,
+  JsAudioAnalyzer,
+  NumberIdentifier,
+  SetDevices,
+  StringIdentifier
+} from '../types/types';
 import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from '../utils/consts';
 import { extractError, forEach} from '../utils/utils';
 import {createMicrophoneLevelVoice, getAverageAudioLevel} from '../utils/audioprocc';
@@ -199,6 +206,28 @@ export default class CallHandler extends BaseTransferHandler {
       this.store.commit('setCurrentMicLevel', payload);
     };
   }
+  async updateConnection() {
+    let stream;
+    if (this.localStream && this.localStream.active) {
+      try {
+        stream = this.captureInput();
+        this.stopLocalStream();
+        this.attachLocalStream(stream);
+
+        this.webrtcConnnectionsIds.forEach(pcName => {
+          let message: ChangeStreamMessage = {
+            handler: pcName,
+            action: 'streamChanged',
+            newStream: stream,
+            oldStream: this.localStream
+          };
+          sub.notify(message);
+        });
+      } catch (e) {
+        this.handleStream(e, stream);
+      }
+    }
+  }
 
   private attachLocalStream(stream: MediaStream) {
     if (stream) {
@@ -345,8 +374,26 @@ export default class CallHandler extends BaseTransferHandler {
     this.store.commit('setCallActiveToState', payload);
   }
 
+  destroyAudioProcessor() {
+    if (this.audioProcessor && this.audioProcessor.javascriptNode && this.audioProcessor.javascriptNode.onaudioprocess) {
+      this.logger.debug('Removing local audioproc')();
+      this.audioProcessor.javascriptNode.onaudioprocess = null;
+    }
+  }
+
+  stopLocalStream () {
+    this.destroyAudioProcessor();
+    this.destroyStreamData(this.localStream);
+  }
+
   onDestroy() {
     super.onDestroy();
+    this.stopLocalStream();
+    let payload2: StringIdentifier = {
+      id: this.roomId,
+      state: null
+    };
+    this.store.commit('setLocalStreamSrc', payload2);
     this.closeAllPeerConnections();
     this.connectionId = null;
     let payload: BooleanIdentifier = {

@@ -1,4 +1,3 @@
-import ReceiverPeerConnection from './ReceiverPeerConnection';
 import {SetReceivingFileStatus, SetReceivingFileUploaded} from '../types/types';
 import {FileTransferStatus, RootState} from '../types/model';
 import {DefaultMessage} from '../types/messages';
@@ -9,7 +8,7 @@ import {requestFileSystem} from '../utils/htmlApi';
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API, MAX_BUFFER_SIZE} from '../utils/consts';
 import FilePeerConnection from './FilePeerConnection';
 
-export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
+export default class FileReceiverPeerConnection extends FilePeerConnection {
   private fileSize: number;
   private fileEntry: any;
   private fileWriter: any;
@@ -18,7 +17,6 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
   private receivedSize = 0;
   protected connectedToRemote: boolean = true;
   private recevedUsingFile = false;
-  private filePeerConnection: FilePeerConnection;
 
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
     sendRtcData: this.onsendRtcData,
@@ -36,7 +34,6 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.fileSize = size;
     this.noSpam = bounce(100);
-    this.filePeerConnection = new FilePeerConnection(this);
   }
 
   private destroyFileConnection() {
@@ -148,7 +145,7 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
         roomId: this.roomId
       };
       this.store.commit('setReceivingFileStatus', payload);
-      this.filePeerConnection.closeEvents();
+      this.closeEvents();
       this.onDestroy();
     }
   };
@@ -230,9 +227,6 @@ export default class FileReceiverPeerConnection extends ReceiverPeerConnection {
     this.wsHandler.acceptFile(this.connectionId, this.receivedSize);
   }
 
-  oniceconnectionstatechange(): void {
-    this.filePeerConnection.oniceconnectionstatechange();
-  }
 
   ondatachannelclose(text): void {
     let rf: SetReceivingFileStatus = {

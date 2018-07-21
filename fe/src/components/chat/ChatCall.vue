@@ -56,7 +56,7 @@
         <i class="icon-cog" @click="showSettings = !showSettings"></i>
         <div class="enterFullScreenHolder"><i class="icon-webrtc-fullscreen" title="Fullscreen"></i></div>
         <div class="hangUpHolder"><i class="icon-hang-up" @click="hangUpCall" title="Hang up" v-show="callInfo.callActive"></i></div>
-        <progress max="15" value="0" title="Your microphone level" class="microphoneLevel"></progress>
+        <progress max="15" :value="callInfo.currentMicLevel" title="Your microphone level" class="microphoneLevel"></progress>
       </div>
     </div>
   </div>
@@ -175,6 +175,13 @@
 
   @import "partials/mixins.sass"
 
+  .localVideo
+    position: absolute
+    max-width: 35%
+    max-height: 35%
+    background: #555
+    margin-bottom: 4px
+
   select
     padding: 5px 5px 5px 25px
   .inactive .icon-webrtc-cont > i
@@ -238,7 +245,7 @@
 
   .icon-webrtc-cont
     display: none
-    z-index: 1 // override webrtc fullscreen z-index
+    // z-index: 1 // override webrtc fullscreen z-index
     position: absolute
     bottom: 2vh
     left: 2vw
@@ -351,7 +358,7 @@
     margin: 1px
     $color: rgba(24, 24, 25, 0.82)
     %asbolute
-      z-index: 3
+      z-index: 1
       position: absolute
       background-color: $color
       box-shadow: 0 0 6px 6px $color

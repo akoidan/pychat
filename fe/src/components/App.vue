@@ -29,7 +29,7 @@
     left: 10px
     position: absolute
     max-width: 50%
-    z-index: 4
+    z-index: 1
     width: 400px
     max-height: calc(100% - 60px)
 
