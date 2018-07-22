@@ -19,7 +19,6 @@ import {
 import {convertUser, currentUserInfoDtoToModel, userSettingsDtoToModel} from '../types/converters';
 import {UserProfileDto, UserSettingsDto} from '../types/dto';
 import {sub} from './sub';
-import {browserVersion} from './singletons';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
@@ -50,6 +49,7 @@ export default class WsHandler extends MessageHandler {
     ping: this.ping,
     pong: this.pong,
   };
+  public timeDiff: number;
 
   constructor(API_URL: string, sessionHolder: SessionHolder, store: Store<RootState>) {
     super();
@@ -291,6 +291,7 @@ public acceptFile(connId, received) {
     this.setUserInfo(message.userInfo);
     this.setUserSettings(message.userSettings);
     this.setUserImage(message.userImage);
+    this.setTime(message.time);
     let pubSetRooms: PubSetRooms = {
       action: 'init',
       handler: 'channels',
@@ -581,5 +582,9 @@ public acceptFile(connId, received) {
       action: 'acceptCall',
       connId
     });
+  }
+
+  private setTime(time: number) {
+    this.timeDiff = Date.now() - time;
   }
 }

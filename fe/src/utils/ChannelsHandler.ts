@@ -217,7 +217,7 @@ export default class ChannelsHandler extends MessageHandler {
     let roomsDict: RoomDictModel = this.store.state.roomsDict;
     rooms.forEach((newRoom: RoomDto) => {
       let oldRoom = roomsDict[newRoom.roomId];
-      let rm : RoomModel = getRoomsBaseDict(newRoom, oldRoom);
+      let rm: RoomModel = getRoomsBaseDict(newRoom, oldRoom);
       storeRooms[rm.id] = rm;
     });
     this.store.commit('setRooms', storeRooms);
@@ -292,6 +292,14 @@ export default class ChannelsHandler extends MessageHandler {
     this.store.commit('setOnline', message.content);
   }
   private printMessage(inMessage: EditMessage) {
+    if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
+      this.removeSendingMessage(inMessage.messageId);
+      let rmMes: RemoveSendingMessage = {
+        messageId: inMessage.messageId,
+        roomId: inMessage.roomId
+      };
+      this.store.commit('deleteMessage', rmMes);
+    }
     let message: MessageModel = this.getMessage(inMessage);
     this.logger.debug('Adding message to storage {}', message)();
     this.store.commit('addMessage', message);
@@ -325,14 +333,6 @@ export default class ChannelsHandler extends MessageHandler {
       }
     }
 
-    if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-      this.removeSendingMessage(inMessage.messageId);
-      let rmMes: RemoveSendingMessage = {
-        messageId: inMessage.messageId,
-        roomId: inMessage.roomId
-      };
-      this.store.commit('deleteMessage', rmMes);
-    }
     this.messageBus.$emit('scroll');
   }
   private deleteRoom(message: DeleteRoomMessage) {

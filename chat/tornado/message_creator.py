@@ -42,6 +42,7 @@ class MessagesCreator(object):
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 			VarNames.EVENT: Actions.SET_WS_ID,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
+			VarNames.TIME: get_milliseconds(),
 			VarNames.USER_IMAGE: up.photo.url if up.photo else None,
 			VarNames.CURRENT_USER_SETTINGS: self.get_user_settings(up),
 			VarNames.CURRENT_USER_INFO: self.get_user_profile(up),

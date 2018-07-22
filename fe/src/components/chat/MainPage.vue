@@ -249,7 +249,7 @@
         roomId: this.activeRoomId,
         deleted: false,
         id,
-        time: Date.now(),
+        time: now - this.$ws.timeDiff,
         content: md.messageContent,
         symbol: md.currSymbol,
         giphy: null,

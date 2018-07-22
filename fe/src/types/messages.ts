@@ -20,6 +20,7 @@ export interface SetWsIdMessage extends DefaultMessage {
   rooms:  RoomDto[];
   users: UserDto[];
   online: number[];
+  time: number;
   opponentWsId: string;
   userImage: string;
   userInfo: UserProfileDto;
