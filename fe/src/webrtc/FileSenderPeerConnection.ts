@@ -1,18 +1,11 @@
 import {AcceptFileMessage, DefaultMessage, DestroyFileConnectionMessage} from '../types/messages';
-import {
-  AddSendingFileTransfer,
-  RemovePeerConnection,
-  SetSendingFileStatus,
-  SetSendingFileUploaded
-} from '../types/types';
+import {AddSendingFileTransfer, SetSendingFileStatus, SetSendingFileUploaded} from '../types/types';
 import {FileTransferStatus, RootState} from '../types/model';
 import WsHandler from '../utils/WsHandler';
 import {Store} from 'vuex';
-import {bounce, bytesToSize, getDay} from '../utils/utils';
+import {bytesToSize, getDay} from '../utils/utils';
 import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE} from '../utils/consts';
 import FilePeerConnection from './FilePeerConnection';
-import {sub} from '../utils/sub';
-import Subscription from '../utils/Subscription';
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
 
@@ -29,12 +22,10 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     destroy: this.closeEvents,
     declineSending: this.declineSending,
   };
-  private noSpam: (cb) => void;
 
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>, file: File, userId: number) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.file = file;
-    this.noSpam = bounce(100);
     let asft:  AddSendingFileTransfer = {
       connId,
       transferId: opponentWsId,
@@ -107,15 +98,13 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
 
 
   setTranseferdAmount(value: number) {
-    this.noSpam(() => {
-      let ssfu: SetSendingFileUploaded = {
-        roomId: this.roomId,
-        uploaded: value,
-        connId: this.connectionId,
-        transfer: this.opponentWsId
-      };
-      this.store.commit('setSendingFileUploaded', ssfu);
-    });
+    let ssfu: SetSendingFileUploaded = {
+      roomId: this.roomId,
+      uploaded: value,
+      connId: this.connectionId,
+      transfer: this.opponentWsId
+    };
+    this.store.commit('setSendingFileUploaded', ssfu);
   }
   
 

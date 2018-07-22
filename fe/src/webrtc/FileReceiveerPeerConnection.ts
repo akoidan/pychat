@@ -1,7 +1,7 @@
 import {SetReceivingFileStatus, SetReceivingFileUploaded} from '../types/types';
 import {FileTransferStatus, RootState} from '../types/model';
 import {DefaultMessage} from '../types/messages';
-import {bounce, bytesToSize} from '../utils/utils';
+import {bytesToSize} from '../utils/utils';
 import WsHandler from '../utils/WsHandler';
 import {Store} from 'vuex';
 import {requestFileSystem} from '../utils/htmlApi';
@@ -27,13 +27,11 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     destroyFileConnection: this.destroyFileConnection,
   };
 
-  private noSpam: (cb) => void;
   private retryFileSend: number = 0;
 
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>, size: number) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.fileSize = size;
-    this.noSpam = bounce(100);
   }
 
   private destroyFileConnection() {
@@ -86,14 +84,12 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     var receivedSize = event.data.byteLength ? event.data.byteLength : event.data.size;
     this.receivedSize += receivedSize;
     this.syncBufferWithFs();
-    this.noSpam(() => {
-      let payload: SetReceivingFileUploaded = {
-        connId: this.connectionId,
-        roomId: this.roomId,
-        uploaded: this.receivedSize
-      };
-      this.store.commit('setReceivingFileUploaded', payload);
-    });
+    let payload: SetReceivingFileUploaded = {
+      connId: this.connectionId,
+      roomId: this.roomId,
+      uploaded: this.receivedSize
+    };
+    this.store.commit('setReceivingFileUploaded', payload);
     this.assembleFileIfDone();
   };
 

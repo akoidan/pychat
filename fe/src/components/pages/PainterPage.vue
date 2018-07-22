@@ -35,7 +35,6 @@
 
     created() {
       messageBus.$on('main-join', e => {
-        this.logger.error('main-join')();
         if (this.blob) {
           messageBus.$emit('blob', this.blob);
           this.blob = null;

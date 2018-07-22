@@ -3,12 +3,12 @@ import Vuex, {StoreOptions} from 'vuex';
 import {ActionContext} from 'vuex/types';
 import loggerFactory from './utils/loggerFactory';
 import {
-  CallInfoModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   EditingMessage,
   GrowlModel,
-  GrowlType, IncomingCallModel,
+  GrowlType,
+  IncomingCallModel,
   MessageModel,
   ReceivingFile,
   RoomDictModel,
@@ -28,17 +28,22 @@ import {
   NumberIdentifier,
   PrivateRoomsIds,
   RemoveMessageProgress,
-  RemoveSendingMessage, SetCallOpponent,
+  RemoveSendingMessage,
+  SetCallOpponent,
   SetDevices,
   SetMessageProgress,
-  SetMessageProgressError, SetOpponentAnchor, SetOpponentVoice, SetOpponentVolume,
+  SetMessageProgressError,
+  SetOpponentAnchor,
+  SetOpponentVoice,
+  SetOpponentVolume,
   SetReceivingFileStatus,
   SetReceivingFileUploaded,
   SetRoomsUsers,
   SetSearchTo,
   SetSendingFileStatus,
   SetSendingFileUploaded,
-  SetUploadProgress, StringIdentifier
+  SetUploadProgress,
+  StringIdentifier
 } from './types/types';
 import {storage} from './utils/singletons';
 import {SetRooms} from './types/dto';

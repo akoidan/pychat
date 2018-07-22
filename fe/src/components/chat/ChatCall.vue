@@ -11,6 +11,7 @@
         </div>
         <div>
           <video muted="muted" class="localVideo" ref="localVideo" :src="callInfo.localStreamSrc"></video>
+          <chat-remote-peer v-for="(call, id) in callInfo.calls" :call-info="call" :key="id"/>
         </div>
       </div>
       <table class="settingsContainer" v-show="showSettings">
@@ -67,8 +68,10 @@
   import {CallInfoModel, CallsInfoModel} from "../../types/model";
   import {BooleanIdentifier, StringIdentifier} from "../../types/types";
   import {webrtcApi} from '../../utils/singletons';
-
-  @Component
+  import ChatRemotePeer from './ChatRemotePeer';
+  @Component({
+    components: {ChatRemotePeer}
+  })
   export default class ChatCall extends Vue {
     @Prop() callInfo: CallsInfoModel;
     @Prop() roomId: number;

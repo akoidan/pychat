@@ -19,11 +19,10 @@ import {
   StringIdentifier
 } from '../types/types';
 import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from '../utils/consts';
-import { extractError, forEach} from '../utils/utils';
+import {extractError, forEach} from '../utils/utils';
 import {createMicrophoneLevelVoice, getAverageAudioLevel} from '../utils/audioprocc';
 import CallSenderPeerConnection from './CallSenderPeerConnection';
 import CallReceiverPeerConnection from './CallReceiverPeerConnection';
-import AbstractPeerConnection from './AbstractPeerConnection';
 import router from '../router';
 
 export default class CallHandler extends BaseTransferHandler {
@@ -215,20 +214,20 @@ export default class CallHandler extends BaseTransferHandler {
       if (!this.callInfo.showMic) {
         return;
       }
-      let value = getAverageAudioLevel(audioProc);
-      audioProc.prevVolumeValues += value;
-      audioProc.volumeValuesCount++;
-      if (audioProc.volumeValuesCount === 100 && audioProc.prevVolumeValues === 0) {
-        let url = isChrome ? 'setting in chrome://settings/content' : 'your browser settings';
-        url += navigator.platform.indexOf('Linux') >= 0 ?
-            '. Open pavucontrol for more info' :
-            ' . Right click on volume icon in system tray -> record devices -> input -> microphone';
-        this.store.dispatch('growlError', `Unable to capture input from microphone. Check your microphone connection or ${url}`);
+      if (audioProc.volumeValuesCount < 101) {
+        audioProc.prevVolumeValues += getAverageAudioLevel(audioProc);
+        audioProc.volumeValuesCount++;
+        if (audioProc.volumeValuesCount === 100 && audioProc.prevVolumeValues === 0) {
+          let url = isChrome ? 'setting in chrome://settings/content' : 'your browser settings';
+          url += navigator.platform.indexOf('Linux') >= 0 ?
+              '. Open pavucontrol for more info' :
+              ' . Right click on volume icon in system tray -> record devices -> input -> microphone';
+          this.store.dispatch('growlError', `Unable to capture input from microphone. Check your microphone connection or ${url}`);
+        }
       }
-
       let payload: NumberIdentifier = {
         id: this.roomId,
-        state: Math.sqrt(value),
+        state: Math.sqrt(getAverageAudioLevel(audioProc)),
       };
       this.store.commit('setCurrentMicLevel', payload);
     };

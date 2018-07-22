@@ -1,11 +1,11 @@
 import store from '../store';
 import router from '../router';
 import sessionHolder from './sessionHolder';
-import {api, channelsHandler, globalLogger, isMobile, storage, webrtcApi, ws} from './singletons';
+import {api, channelsHandler, globalLogger, storage, webrtcApi, ws} from './singletons';
 import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from '../types/model';
 import loggerFactory from './loggerFactory';
 import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from './consts';
-import {JsAudioAnalyzer, StorageData} from '../types/types';
+import {StorageData} from '../types/types';
 
 
 let logger = loggerFactory.getLoggerColor('utils', '#007a70');

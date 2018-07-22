@@ -34,6 +34,7 @@ module.exports = (env, argv) => {
     }),
     new HtmlWebpackPlugin(webpackOptions),
   ];
+  let devServer;
   if (argv.mode === 'production') {
     const MiniCssExtractPlugin = require("mini-css-extract-plugin");
     plugins.push(new CleanWebpackPlugin('./dist'));
@@ -50,6 +51,12 @@ module.exports = (env, argv) => {
       }
     ];
   } else if (argv.mode === 'development') {
+    var openInEditor = require('launch-editor-middleware');
+    devServer =  {
+      before (app) {
+        app.use('/__open-in-editor', openInEditor())
+      }
+    };
     sasscPlugins = [
       "style-loader", 'css-loader?sourceMap',
       {
@@ -63,6 +70,7 @@ module.exports = (env, argv) => {
   }
 
   const conf =  {
+    devServer,
     entry: ['./src/main.ts'],
     plugins,
     resolve: {

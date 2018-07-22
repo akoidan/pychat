@@ -70,10 +70,7 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   offerCall(message: OfferCall) {
-    if (!this.callHandlers[message.roomId]) {
-      this.callHandlers[message.roomId] = new CallHandler(message.roomId, this.wsHandler, this.notifier, this.store);
-    }
-    this.callHandlers[message.roomId].initAndDisplayOffer(message);
+    this.getCallHandler(message.roomId).initAndDisplayOffer(message);
   }
 
 
@@ -107,7 +104,7 @@ export default class WebRtcApi extends MessageHandler {
 
   }
 
-  getCallHandler(roomId: number) {
+  getCallHandler(roomId: number): CallHandler {
     if (!this.callHandlers[roomId]) {
       this.callHandlers[roomId] = new CallHandler(roomId, this.wsHandler, this.notifier, this.store);
     }
@@ -119,7 +116,7 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   answerCall(connId: string) {
-    sub.notify({action: 'answerCall', handler: Subscription.getTransferId(connId)});
+    sub.notify({action: 'f', handler: Subscription.getTransferId(connId)});
   }
 
   declineCall(connId: string) {
