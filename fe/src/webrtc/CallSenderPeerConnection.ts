@@ -12,6 +12,7 @@ export default class CallSenderPeerConnection extends CallPeerConnection {
     destroy: this.onDestroy,
     streamChanged: this.onStreamChanged,
     connectToRemote: this.connectToRemote,
+    sendRtcData: this.onsendRtcData,
   };
 
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>) {
@@ -31,8 +32,8 @@ export default class CallSenderPeerConnection extends CallPeerConnection {
 
   connectToRemote(stream) {
     this.connectedToRemote = true;
-    this.createOffer();
     this.createPeerConnection(stream);
+    this.createOffer();
   }
 
   ondatachannelclose(text): void {

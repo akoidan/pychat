@@ -49,6 +49,13 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
         roomId: this.roomId
       };
       this.store.commit('setOpponentAnchor', payload);
+
+      if (this.sendRtcDataQueue.length > 0) {
+        this.logger.log('Connection accepted, consuming sendRtcDataQueue')();
+        let queue = this.sendRtcDataQueue;
+        this.sendRtcDataQueue = [];
+        queue.forEach(this.onsendRtcData);
+      }
       //
       // if (p) { //firefox video.play doesn't return promise
       //   // chrome returns promise, if it's on mobile devices video sound would be muted
@@ -63,6 +70,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       // this.audioProcessor = Utils.createMicrophoneLevelVoice(event.stream, this.processAudio);
       // onStreamAttached(this.opponentWsId);
     };
+    this.logger.log('Sending local stream to remote')();
     event && this.pc.addStream(event.stream);
   }
 

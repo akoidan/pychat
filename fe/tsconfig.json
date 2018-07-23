@@ -3,7 +3,7 @@
     "lib": ["es2017", "dom"],
     "module": "esnext",
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "es6",
     "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,

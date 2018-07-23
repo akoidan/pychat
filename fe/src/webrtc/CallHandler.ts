@@ -74,12 +74,6 @@ export default class CallHandler extends BaseTransferHandler {
         handler: Subscription.getPeerConnectionId(this.connectionId, message.opponentWsId),
         stream: this.localStream
       };
-      // if (pc.sendRtcDataQueue.length > 0) {
-      //   logger.log("Connection accepted, consuming sendRtcDataQueue")();
-      //   var queue = pc.sendRtcDataQueue;
-      //   pc.sendRtcDataQueue = [];
-      //   queue.forEach(pc.onsendRtcData);
-      // }
     } else {
       this.acceptedPeers.push(message.opponentWsId);
     }
@@ -257,6 +251,7 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   private attachLocalStream(stream: MediaStream) {
+    this.logger.log('Local stream has been attached');
     if (stream) {
       this.localStream = stream;
       this.audioProcessor = createMicrophoneLevelVoice(stream, this.processAudio.bind(this));
@@ -459,6 +454,7 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   private setCallStatus(status: string) {
+    this.logger.log("Setting call status to {}", status)();
     this.callStatus = status;
   }
 }

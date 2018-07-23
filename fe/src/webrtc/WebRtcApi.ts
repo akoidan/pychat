@@ -116,7 +116,7 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   answerCall(connId: string) {
-    sub.notify({action: 'f', handler: Subscription.getTransferId(connId)});
+    sub.notify({action: 'answerCall', handler: Subscription.getTransferId(connId)});
   }
 
   declineCall(connId: string) {
