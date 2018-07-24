@@ -1,5 +1,6 @@
 import BaseTransferHandler from './BaseTransferHandler';
 import {
+  AcceptCallMessage,
   ConnectToRemoteMessage,
   DefaultMessage,
   OfferCall,
@@ -67,13 +68,14 @@ export default class CallHandler extends BaseTransferHandler {
     this.store.commit('setDevices', payload);
   }
 
-  onacceptCall(message/*TODO :type*/) {
+  onacceptCall(message: AcceptCallMessage) {
     if (this.callStatus !== 'received_offer') { // if we're call initiator
       let payload: ConnectToRemoteMessage = {
         action: 'connectToRemote',
         handler: Subscription.getPeerConnectionId(this.connectionId, message.opponentWsId),
         stream: this.localStream
       };
+      sub.notify(payload);
     } else {
       this.acceptedPeers.push(message.opponentWsId);
     }
@@ -386,6 +388,7 @@ export default class CallHandler extends BaseTransferHandler {
     };
     this.store.commit('setIncomingCall', null);
     this.store.commit('setCallActiveToState', payload);
+    this.store.commit('setContainerToState', payload);
     this.setCallStatus('accepted');
     let stream = await this.captureInput();
     this.attachLocalStream(stream);

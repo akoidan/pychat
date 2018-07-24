@@ -16,6 +16,7 @@ export interface WebRtcSetConnectionIdMessage extends WebRtcDefaultMessage {
   time: number;
 }
 
+
 export interface SetWsIdMessage extends DefaultMessage {
   rooms:  RoomDto[];
   users: UserDto[];
@@ -131,6 +132,10 @@ export interface AcceptFileContent {
 
 export interface AcceptFileMessage extends DefaultMessage {
  content: AcceptFileContent;
+}
+
+export interface AcceptCallMessage extends WebRtcDefaultMessage {
+  opponentWsId: string;
 }
 
 

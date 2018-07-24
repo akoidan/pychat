@@ -189,6 +189,9 @@ const store: StoreOptions<RootState> = {
     toggleContainer(state: RootState, roomId: number) {
       state.roomsDict[roomId].callInfo.callContainer = !state.roomsDict[roomId].callInfo.callContainer;
     },
+    setContainerToState(state: RootState, payload: BooleanIdentifier) {
+      state.roomsDict[payload.id].callInfo.callContainer = payload.state;
+    },
     setCurrentMicLevel(state: RootState, payload: NumberIdentifier) {
       state.roomsDict[payload.id].callInfo.currentMicLevel = payload.state;
     },

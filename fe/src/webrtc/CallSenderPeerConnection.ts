@@ -31,6 +31,7 @@ export default class CallSenderPeerConnection extends CallPeerConnection {
   };
 
   connectToRemote(stream) {
+    this.logger.log('Connect to remote')();
     this.connectedToRemote = true;
     this.createPeerConnection(stream);
     this.createOffer();
