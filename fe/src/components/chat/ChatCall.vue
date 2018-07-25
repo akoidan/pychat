@@ -217,6 +217,7 @@
     display: inline-block
     min-width: 150px
   .callContainer
+    border-right: 7.5px solid #1a1a1a
     display: inline-block
     max-width: 100%
     text-align: center

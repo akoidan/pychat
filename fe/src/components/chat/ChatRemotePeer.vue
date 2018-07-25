@@ -2,7 +2,7 @@
   <div class="micVideoWrapper">
     <video :src="callInfo.anchor" ref="video"></video>
     <div>
-      <app-input-range :value="volumeLevel" title="Volume level"/>
+      <app-input-range :value="volumeLevel" min="0" max="100" title="Volume level" class="volLevelClass"/>
       <span>{{userNameValue}}</span>
     </div>
   </div>
@@ -23,7 +23,16 @@
     get userNameValue() :string {
       return this.userName(this.callInfo.userId);
     }
+
+    get volLevelClass() {
+      return `vol-level-${this.callInfo.opponentCurrentVoice}`;
+    }
     volumeLevel: number = 100;
+
+    @Watch('volumeLevel')
+    onVolumeChanged(newValue) {
+      this.$refs.video.volume = newValue / 100;
+    }
 
     $refs : {
       video: HTMLVideoElement
