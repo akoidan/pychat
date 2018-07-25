@@ -381,14 +381,24 @@ export default class CallHandler extends BaseTransferHandler {
     this.createCallPeerConnection(message);
   }
 
-  async answerCall() {
-    let payload: BooleanIdentifier = {
+  answerCall() {
+    this.doAnswer(false);
+  }
+
+  async doAnswer(withVideo: boolean) {
+    let trueBoolean: BooleanIdentifier = {
       state: true,
       id: this.roomId,
     };
+    let falseBoolean: BooleanIdentifier = {
+      state: false,
+      id: this.roomId,
+    }
     this.store.commit('setIncomingCall', null);
-    this.store.commit('setCallActiveToState', payload);
-    this.store.commit('setContainerToState', payload);
+    this.store.commit('setCallActiveToState', trueBoolean);
+    this.store.commit('setContainerToState', trueBoolean);
+    this.store.commit('setVideoToState', withVideo ? trueBoolean : falseBoolean);
+    this.store.commit('setMicToState', trueBoolean);
     this.setCallStatus('accepted');
     let stream = await this.captureInput();
     this.attachLocalStream(stream);
@@ -405,12 +415,7 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   videoAnswerCall() {
-    let payload: BooleanIdentifier = {
-      state: true,
-      id: this.roomId,
-    };
-    this.store.commit('setIncomingCall', null);
-    this.store.commit('setCallActiveToState', payload);
+    this.doAnswer(true);
   }
 
   destroyAudioProcessor() {
