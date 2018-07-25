@@ -147,7 +147,8 @@ export interface SendingFile {
 
 export interface CallInfoModel {
   anchor: string;
-  opponentVolume: number;
+  connected: boolean;
+  userId: number;
   opponentCurrentVoice: number;
 }
 
@@ -155,7 +156,7 @@ export interface CallsInfoModel {
   calls: { [id: string]: CallInfoModel };
   callContainer: boolean;
   showMic: boolean;
-  currentMicLevel: number;
+  currentMicLevel: number; // voice
   localStreamSrc: string;
   currentMic: string;
   currentSpeaker: string;

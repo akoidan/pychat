@@ -9,9 +9,9 @@
           <i class="icon-webrtc-hangup" title="Hang up"></i>
           <i class="icon-no-desktop" title="Capture your desktop screen and start sharing it"></i>
         </div>
-        <div>
-          <video muted="muted" class="localVideo" ref="localVideo" :src="callInfo.localStreamSrc"></video>
+        <div class="micVideoHolder">
           <chat-remote-peer v-for="(call, id) in callInfo.calls" :call-info="call" :key="id"/>
+          <video muted="muted" class="localVideo" ref="localVideo" :src="callInfo.localStreamSrc"></video>
         </div>
       </div>
       <table class="settingsContainer" v-show="showSettings">
@@ -203,7 +203,7 @@
     &.videoContainer
       background-color: black
 
-    .micVideoWrapper > video
+    /deep/ .micVideoWrapper > video
       max-height: 99vh
       height: 99vh
 
@@ -395,120 +395,120 @@
       div, span
         display: block
 
-  @mixin selectIfHasAmountOfChild($child) // renders style depending on amount of children
-    $realChild: $child +1
-    // select first element, and nth element from the end
-    // if it's the same element, e.g. 321 , if 3rd element from the end = first element then container has 3 elements
-    // note selector applies to all siblings with class .micVideoWrapper
-    .micVideoWrapper:first-child:nth-last-child(#{$realChild}), .micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ .micVideoWrapper
-      @content
+  .micVideoHolder /deep/
+    @mixin selectIfHasAmountOfChild($child) // renders style depending on amount of children
+      $realChild: $child +1
+      // select first element, and nth element from the end
+      // if it's the same element, e.g. 321 , if 3rd element from the end = first element then container has 3 elements
+      // note selector applies to all siblings with class .micVideoWrapper
+      .micVideoWrapper:first-child:nth-last-child(#{$realChild}), .micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ .micVideoWrapper
+        @content
 
-  @mixin selectVideoIfhasAmountOfChild($child) // renders style depending on amount of children
-    $realChild: $child +1
-    .micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ video
-      @content
+    @mixin selectVideoIfhasAmountOfChild($child) // renders style depending on amount of children
+      $realChild: $child +1
+      .micVideoWrapper:first-child:nth-last-child(#{$realChild}) ~ video
+        @content
 
-  @mixin selectNthIfHasAmountOfChildren($amountOfChild, $nth)
-    .micVideoWrapper:first-child:nth-last-child(#{$amountOfChild +1}) ~ .micVideoWrapper:nth-child(#{$nth})
-      @content
+    @mixin selectNthIfHasAmountOfChildren($amountOfChild, $nth)
+      .micVideoWrapper:first-child:nth-last-child(#{$amountOfChild +1}) ~ .micVideoWrapper:nth-child(#{$nth})
+        @content
 
-  //default
-  .micVideoWrapper
-    max-width: calc(33% - 5px)
+    //default
+    .micVideoWrapper
+      max-width: calc(33% - 5px)
 
-  //1
-  @include selectIfHasAmountOfChild(1)
-    max-width: 100%
+    //1
+    @include selectIfHasAmountOfChild(1)
+      max-width: 100%
 
-  @include selectVideoIfhasAmountOfChild(1)
-    bottom: 0
-    right: 0
-  //2
-  @include selectIfHasAmountOfChild(2)
-    max-width: calc(50% - 5px)
+    @include selectVideoIfhasAmountOfChild(1)
+      bottom: 0
+      right: 0
+    //2
+    @include selectIfHasAmountOfChild(2)
+      max-width: calc(50% - 5px)
 
-  @include selectVideoIfhasAmountOfChild(2)
-    bottom: 0
-    left: 50%
-    transform: translateX(-50%)
+    @include selectVideoIfhasAmountOfChild(2)
+      bottom: 0
+      left: 50%
+      transform: translateX(-50%)
 
-  //3
-  @include selectIfHasAmountOfChild(3)
-    max-width: calc(50% - 5px)
-    display: table-cell
+    //3
+    @include selectIfHasAmountOfChild(3)
+      max-width: calc(50% - 5px)
+      display: table-cell
 
-  @include selectVideoIfhasAmountOfChild(3)
-    bottom: 0
-    right: 0
+    @include selectVideoIfhasAmountOfChild(3)
+      bottom: 0
+      right: 0
 
-  @include selectNthIfHasAmountOfChildren(3,3)
-    margin-right: calc(50% - 2px)
+    @include selectNthIfHasAmountOfChildren(3,3)
+      margin-right: calc(50% - 2px)
 
-  //4
-  @include selectIfHasAmountOfChild(4)
-    max-width: calc(50% - 5px)
-    display: inline-block
+    //4
+    @include selectIfHasAmountOfChild(4)
+      max-width: calc(50% - 5px)
+      display: inline-block
 
-  @include selectVideoIfhasAmountOfChild(4)
-    top: 50%
-    left: 50%
-    transform: translate(-50%, -50%)
+    @include selectVideoIfhasAmountOfChild(4)
+      top: 50%
+      left: 50%
+      transform: translate(-50%, -50%)
 
-  //5
-  @include selectIfHasAmountOfChild(5)
-    max-width: calc(50% - 5px)
-    display: inline-block
+    //5
+    @include selectIfHasAmountOfChild(5)
+      max-width: calc(50% - 5px)
+      display: inline-block
 
-  @include selectNthIfHasAmountOfChildren(5,5)
-    margin-right: calc(50% - 2px)
+    @include selectNthIfHasAmountOfChildren(5,5)
+      margin-right: calc(50% - 2px)
 
-  @include selectVideoIfhasAmountOfChild(5)
-    right: 0
-    bottom: 0
+    @include selectVideoIfhasAmountOfChild(5)
+      right: 0
+      bottom: 0
 
-  //6
-  @include selectIfHasAmountOfChild(6)
-    max-width: calc(50% - 5px)
-    display: inline-block
+    //6
+    @include selectIfHasAmountOfChild(6)
+      max-width: calc(50% - 5px)
+      display: inline-block
 
-  @include selectVideoIfhasAmountOfChild(6)
-    left: 50%
-    transform: translateX(-50%)
-    bottom: 0
+    @include selectVideoIfhasAmountOfChild(6)
+      left: 50%
+      transform: translateX(-50%)
+      bottom: 0
 
-  //7
-  @include selectIfHasAmountOfChild(7)
-    max-width: calc(33% - 6px)
-    display: inline-block
+    //7
+    @include selectIfHasAmountOfChild(7)
+      max-width: calc(33% - 6px)
+      display: inline-block
 
-  @include selectVideoIfhasAmountOfChild(7)
-    right: 0
-    bottom: 0
+    @include selectVideoIfhasAmountOfChild(7)
+      right: 0
+      bottom: 0
 
-  @include selectNthIfHasAmountOfChildren(7, 7)
-    margin-right: calc(66% - 4px)
+    @include selectNthIfHasAmountOfChildren(7, 7)
+      margin-right: calc(66% - 4px)
 
-  //8
-  @include selectIfHasAmountOfChild(8)
-    max-width: calc(33% - 6px)
-    display: inline-block
+    //8
+    @include selectIfHasAmountOfChild(8)
+      max-width: calc(33% - 6px)
+      display: inline-block
 
-  @include selectVideoIfhasAmountOfChild(8)
-    right: 0
-    bottom: 0
+    @include selectVideoIfhasAmountOfChild(8)
+      right: 0
+      bottom: 0
 
-  @include selectNthIfHasAmountOfChildren(8,8)
-    margin-right: calc(33% - 2px)
+    @include selectNthIfHasAmountOfChildren(8,8)
+      margin-right: calc(33% - 2px)
 
-  //9
-  @include selectIfHasAmountOfChild(9)
-    max-width: calc(33% - 6px)
-    display: inline-block
+    //9
+    @include selectIfHasAmountOfChild(9)
+      max-width: calc(33% - 6px)
+      display: inline-block
 
-  @include selectVideoIfhasAmountOfChild(9)
-    left: 33%
-    max-height: 20%
-    transform: translateX(-50%)
-    bottom: 0
-
+    @include selectVideoIfhasAmountOfChild(9)
+      left: 33%
+      max-height: 20%
+      transform: translateX(-50%)
+      bottom: 0
 </style>

@@ -15,8 +15,8 @@ export default class CallReceiverPeerConnection extends CallPeerConnection {
     sendRtcData: this.onsendRtcData,
   };
 
-  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>) {
-    super(roomId, connId, opponentWsId, wsHandler, store);
+  constructor(roomId: number, connId: string, opponentWsId: string, userId: number, wsHandler: WsHandler, store: Store<RootState>) {
+    super(roomId, connId, opponentWsId, userId, wsHandler, store);
     this.connectedToRemote = false;
     this.sdpConstraints = {
       'mandatory': {

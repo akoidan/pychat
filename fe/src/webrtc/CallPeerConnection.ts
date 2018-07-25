@@ -7,15 +7,16 @@ import {Store} from 'vuex';
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
 
-  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>) {
+  constructor(roomId: number, connId: string, opponentWsId: string, userId: number, wsHandler: WsHandler, store: Store<RootState>) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     let payload:  SetCallOpponent = {
-      connId: this.connectionId,
+      opponentWsId: this.opponentWsId,
       roomId: this.roomId,
       callInfoModel: {
+        connected: false,
         anchor: null,
-        opponentCurrentVoice: 0,
-        opponentVolume: 100
+        userId,
+        opponentCurrentVoice: 0
       }
     };
     this.store.commit('setCallOpponent', payload);
@@ -45,7 +46,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       this.logger.log('onaddstream')();
       let payload: SetOpponentAnchor = {
         anchor: URL.createObjectURL(event.stream),
-        connId: this.connectionId,
+        opponentWsId: this.opponentWsId,
         roomId: this.roomId
       };
       this.store.commit('setOpponentAnchor', payload);
@@ -102,7 +103,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
 
       let payload: SetOpponentVoice = {
         voice: clasNu,
-        connId: this.connectionId,
+        opponentWsId: this.opponentWsId,
         roomId: this.roomId
       };
       this.store.commit('setOpponentVoice', payload);
@@ -127,7 +128,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     this.removeAudioProcessor();
     this.onDestroy();
     let payload:  SetCallOpponent = {
-      connId: this.connectionId,
+      opponentWsId: this.opponentWsId,
       roomId: this.roomId,
       callInfoModel: null,
     };

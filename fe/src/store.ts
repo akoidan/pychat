@@ -77,6 +77,9 @@ const store: StoreOptions<RootState> = {
     editedMessage: null,
   },
   getters: {
+    userName(state: RootState) {
+      return (id: number): string =>  state.allUsersDict[id].user;
+    },
     privateRooms(state: RootState, getters): RoomModel[] {
       let roomModels: RoomModel[] = getters.roomsArray.filter(r => !r.name);
       logger.trace('privateRooms {} ', roomModels)();
@@ -168,17 +171,14 @@ const store: StoreOptions<RootState> = {
     setIncomingCall(state: RootState, payload: IncomingCallModel) {
       state.incomingCall = payload;
     },
-    setOpponentVolume(state: RootState, payload: SetOpponentVolume) {
-      state.roomsDict[payload.roomId].callInfo.calls[payload.connId].opponentVolume = payload.volume;
-    },
     setCallOpponent(state: RootState, payload: SetCallOpponent) {
-      Vue.set(state.roomsDict[payload.roomId].callInfo.calls, payload.connId, payload.callInfoModel);
+      Vue.set(state.roomsDict[payload.roomId].callInfo.calls, payload.opponentWsId, payload.callInfoModel);
     },
     setOpponentVoice(state: RootState, payload: SetOpponentVoice) {
-      state.roomsDict[payload.roomId].callInfo.calls[payload.connId].opponentCurrentVoice = payload.voice;
+      state.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].opponentCurrentVoice = payload.voice;
     },
     setOpponentAnchor(state: RootState, payload: SetOpponentAnchor) {
-      state.roomsDict[payload.roomId].callInfo.calls[payload.connId].anchor = payload.anchor;
+      state.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].anchor = payload.anchor;
     },
     setDim(state: RootState, payload: boolean) {
       state.dim = payload;

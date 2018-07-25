@@ -351,9 +351,9 @@ export default class CallHandler extends BaseTransferHandler {
 
   createCallPeerConnection(message: ReplyCallMessage) {
     if (message.opponentWsId > this.wsHandler.getWsConnectionId()) {
-      new CallSenderPeerConnection(this.roomId, this.connectionId, message.opponentWsId, this.wsHandler, this.store);
+      new CallSenderPeerConnection(this.roomId, this.connectionId, message.opponentWsId,  message.userId,  this.wsHandler, this.store);
     }  else {
-      new CallReceiverPeerConnection(this.roomId, this.connectionId, message.opponentWsId, this.wsHandler, this.store);
+      new CallReceiverPeerConnection(this.roomId, this.connectionId, message.opponentWsId, message.userId, this.wsHandler, this.store);
     }
     this.webrtcConnnectionsIds.push(message.opponentWsId);
   }

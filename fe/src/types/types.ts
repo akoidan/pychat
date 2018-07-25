@@ -57,25 +57,25 @@ export interface SetUploadProgress {
 
 export interface SetCallOpponent {
   roomId: number;
-  connId: string;
+  opponentWsId: string;
   callInfoModel: CallInfoModel;
 }
 
 export interface SetOpponentVolume {
   roomId: number;
-  connId: string;
+  opponentWsId: string;
   volume: number;
 }
 
 export interface SetOpponentVoice {
   roomId: number;
-  connId: string;
+  opponentWsId: string;
   voice: number;
 }
 
 export interface SetOpponentAnchor {
   roomId: number;
-  connId: string;
+  opponentWsId: string;
   anchor: string;
 }
 
