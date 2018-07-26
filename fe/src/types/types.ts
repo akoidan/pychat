@@ -37,6 +37,10 @@ export interface MessageDataEncode {
   currSymbol: string;
 }
 
+export enum VideoType {
+  AUDIO, VIDEO, SHARE
+}
+
 export interface SetDevices {
   microphones: { [id: string]: string };
   speakers: { [id: string]: string };

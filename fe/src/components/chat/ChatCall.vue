@@ -66,7 +66,7 @@
   import {State, Action, Mutation, Getter} from "vuex-class";
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {CallInfoModel, CallsInfoModel} from "../../types/model";
-  import {BooleanIdentifier, StringIdentifier} from "../../types/types";
+  import {BooleanIdentifier, StringIdentifier, VideoType} from "../../types/types";
   import {webrtcApi} from '../../utils/singletons';
   import ChatRemotePeer from './ChatRemotePeer';
   @Component({
@@ -172,7 +172,7 @@
       };
       this.setShareScreenToState(payload);
       if (this.callInfo.callActive) {
-        webrtcApi.updateConnection(this.roomId);
+        webrtcApi.toggleDevice(this.roomId, VideoType.SHARE);
       }
     }
 
@@ -183,7 +183,7 @@
       };
       this.setVideoToState(payload);
       if (this.callInfo.callActive) {
-        webrtcApi.updateConnection(this.roomId);
+        webrtcApi.toggleDevice(this.roomId, VideoType.VIDEO);
       }
     }
 
@@ -194,7 +194,7 @@
       };
       this.setMicToState(payload);
       if (this.callInfo.callActive) {
-        webrtcApi.updateConnection(this.roomId);
+        webrtcApi.toggleDevice(this.roomId, VideoType.AUDIO);
       }
     }
 

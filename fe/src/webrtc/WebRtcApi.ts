@@ -1,6 +1,6 @@
 import loggerFactory from '../utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import {SetReceivingFileStatus} from '../types/types';
+import {SetReceivingFileStatus, VideoType} from '../types/types';
 import {DefaultMessage, OfferCall, OfferFile, WebRtcSetConnectionIdMessage} from '../types/messages';
 import WsHandler from '../utils/WsHandler';
 import {ReceivingFile, FileTransferStatus, RootState, SendingFile} from '../types/model';
@@ -133,6 +133,10 @@ export default class WebRtcApi extends MessageHandler {
 
   updateConnection(roomId: number) {
     this.callHandlers[roomId].updateConnection();
+  }
+
+  toggleDevice(roomId: number, videoType: VideoType) {
+    this.callHandlers[roomId].toggleDevice(videoType);
   }
 
   closeAllConnections() {

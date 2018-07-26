@@ -268,7 +268,7 @@ elif [ "$1" = "generate_certificate" ]; then
     else
         generate_certificate "$2"
     fi
-elif [ "$1" = "extension" ]; then
+elif [ "$1" = "zip_extension" ]; then
     zip_extension
 elif [ "$1" = "update_docker" ]; then
     update_docker

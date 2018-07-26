@@ -17,7 +17,7 @@ import {
   JsAudioAnalyzer,
   NumberIdentifier,
   SetDevices,
-  StringIdentifier
+  StringIdentifier, VideoType
 } from '../types/types';
 import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from '../utils/consts';
 import {extractError, forEach} from '../utils/utils';
@@ -229,6 +229,24 @@ export default class CallHandler extends BaseTransferHandler {
     };
   }
 
+  async toggleDevice(videoType: VideoType) {
+    let track = this.getTrack(videoType);
+    if (track && track.readyState === 'live') {
+      this.logger.log('toggleDevice')();
+      let state = false;
+      if (videoType === VideoType.AUDIO) {
+        state = this.callInfo.showMic;
+      } else if (videoType === VideoType.SHARE) {
+        state = this.callInfo.shareScreen;
+      } else if (videoType === VideoType.VIDEO) {
+        state = this.callInfo.showVideo;
+      }
+      track.enabled = state;
+    } else {
+      await this.updateConnection();
+    }
+  }
+
   async updateConnection() {
     this.logger.log('updateConnection')();
     let stream;
@@ -267,24 +285,24 @@ export default class CallHandler extends BaseTransferHandler {
     this.setCallIconsState();
   }
 
-  getTrack (kind) {
+  getTrack (kind: VideoType) {
     let track = null;
     let tracks = [];
     if (this.localStream) {
-      if (kind === 'video' || kind === 'share') {
+      if (kind === VideoType.VIDEO || kind === VideoType.SHARE) {
         tracks = this.localStream.getVideoTracks();
-      } else if (kind === 'audio') {
+      } else if (kind === VideoType.AUDIO) {
         tracks = this.localStream.getAudioTracks();
       } else {
         throw 'invalid track name';
       }
       if (tracks.length > 0) {
         let isShare = tracks[0].isShare;
-        if (isShare && kind === 'share') {
+        if (isShare && kind === VideoType.SHARE) {
           track = tracks[0];
-        } else if (!isShare && kind === 'video') {
+        } else if (!isShare && kind === VideoType.VIDEO) {
           track = tracks[0];
-        } else if (kind === 'audio') {
+        } else if (kind === VideoType.AUDIO) {
           track = tracks[0];
         }
       }
