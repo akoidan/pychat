@@ -117,7 +117,7 @@ zip_extension() {
     printOut "Zipping extension"
     EX_FILE="$PROJECT_ROOT/extension.zip"
     rm -f "$EX_FILE"
-    zip -j -r "EX_FILE" ./screen_cast_extension/*
+    zip -j -r "$EX_FILE" ./screen_cast_extension/background.js ./screen_cast_extension/icon-16.png ./screen_cast_extension/icon-128.png ./screen_cast_extension/manifest.json
     printOut "Extension is created in $EX_FILE"
 }
 
