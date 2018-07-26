@@ -53,7 +53,7 @@
         <i class="icon-phone-circled" v-show="!callInfo.callActive" @click="startCall"></i>
         <i :class="iconMicClass" :title="micTitle" @click="micClick"></i>
         <i :class="iconVideoClass" :title="videoTitle" @click="videoClick"></i>
-        <i class="icon-desktop" title="Capture your desktop screen and start sharing it" @click="desktopClick"></i>
+        <i class="icon-desktop" :class="iconDesktopClass" title="Capture your desktop screen and start sharing it" @click="desktopClick"></i>
         <i class="icon-cog" @click="showSettings = !showSettings"></i>
         <div class="enterFullScreenHolder"><i class="icon-webrtc-fullscreen" title="Fullscreen"></i></div>
         <div class="hangUpHolder"><i class="icon-hang-up" @click="hangUpCall" title="Hang up" v-show="callInfo.callActive"></i></div>
@@ -165,6 +165,10 @@
       }
     }
 
+    get iconDesktopClass() {
+      return this.callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon';
+    }
+
     desktopClick() {
       let payload: BooleanIdentifier = {
         state: !this.callInfo.shareScreen,
@@ -204,6 +208,18 @@
 <style lang="sass" scoped>
 
   @import "partials/mixins.sass"
+
+  .icon-mic, .icon-videocam, .activeIcon, .icon-phone-circled
+    cursor: pointer
+    @include hover-click(#3aa130)
+
+  .icon-mute, .icon-no-videocam, .noactiveIcon, .icon-hang-up
+    cursor: pointer
+    @include hover-click(#c72727)
+
+  .icon-cog, .icon-webrtc-fullscreen
+    cursor: pointer
+    @include hover-click(#2a8f9c)
 
   .localVideo
     position: absolute
