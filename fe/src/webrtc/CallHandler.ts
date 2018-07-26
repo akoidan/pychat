@@ -230,16 +230,17 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   async updateConnection() {
+    this.logger.log('updateConnection')();
     let stream;
     if (this.localStream && this.localStream.active) {
       try {
-        stream = this.captureInput();
+        stream = await this.captureInput();
         this.stopLocalStream();
         this.attachLocalStream(stream);
 
         this.webrtcConnnectionsIds.forEach(pcName => {
           let message: ChangeStreamMessage = {
-            handler: pcName,
+            handler: Subscription.getPeerConnectionId(this.connectionId, pcName),
             action: 'streamChanged',
             newStream: stream,
             oldStream: this.localStream

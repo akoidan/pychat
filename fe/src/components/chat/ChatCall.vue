@@ -53,7 +53,7 @@
         <i class="icon-phone-circled" v-show="!callInfo.callActive" @click="startCall"></i>
         <i :class="iconMicClass" :title="micTitle" @click="micClick"></i>
         <i :class="iconVideoClass" :title="videoTitle" @click="videoClick"></i>
-        <i class="icon-desktop" title="Capture your desktop screen and start sharing it"></i>
+        <i class="icon-desktop" title="Capture your desktop screen and start sharing it" @click="desktopClick"></i>
         <i class="icon-cog" @click="showSettings = !showSettings"></i>
         <div class="enterFullScreenHolder"><i class="icon-webrtc-fullscreen" title="Fullscreen"></i></div>
         <div class="hangUpHolder"><i class="icon-hang-up" @click="hangUpCall" title="Hang up" v-show="callInfo.callActive"></i></div>
@@ -78,6 +78,7 @@
     showSettings: boolean = false;
     @Mutation setMicToState;
     @Mutation setVideoToState;
+    @Mutation setShareScreenToState;
     @Mutation setCurrentWebcam;
     @Mutation setCurrentSpeaker;
     @Mutation setCurrentMic;
@@ -107,7 +108,8 @@
         id: this.roomId,
         state: event.target.value
       };
-      this.setCurrentMic(payload);if (this.callInfo.callActive) {
+      this.setCurrentMic(payload);
+      if (this.callInfo.callActive) {
         webrtcApi.updateConnection(this.roomId);
       }
     }
@@ -163,12 +165,26 @@
       }
     }
 
+    desktopClick() {
+      let payload: BooleanIdentifier = {
+        state: !this.callInfo.shareScreen,
+        id: this.roomId,
+      };
+      this.setShareScreenToState(payload);
+      if (this.callInfo.callActive) {
+        webrtcApi.updateConnection(this.roomId);
+      }
+    }
+
     videoClick() {
       let payload: BooleanIdentifier = {
         state: !this.callInfo.showVideo,
         id: this.roomId,
       };
       this.setVideoToState(payload);
+      if (this.callInfo.callActive) {
+        webrtcApi.updateConnection(this.roomId);
+      }
     }
 
     micClick() {
@@ -177,6 +193,9 @@
         id: this.roomId,
       };
       this.setMicToState(payload);
+      if (this.callInfo.callActive) {
+        webrtcApi.updateConnection(this.roomId);
+      }
     }
 
   }
