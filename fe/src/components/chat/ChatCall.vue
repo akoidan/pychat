@@ -28,7 +28,7 @@
             <select class="input" :value="callInfo.currentSpeaker" @change="setCurrentSpeakerProxy">
               <option v-for="(speaker, id) in speakers" :key="id" :value="id">{{speaker}}</option>
             </select>
-            <span class="playTestSound">Play test sound</span>
+            <span class="playTestSound" @click="playTest">Play test sound</span>
           </td>
         </tr>
         <tr>
@@ -69,6 +69,7 @@
   import {BooleanIdentifier, StringIdentifier, VideoType} from "../../types/types";
   import {webrtcApi} from '../../utils/singletons';
   import ChatRemotePeer from './ChatRemotePeer';
+  import {file} from '../../utils/audio';
   @Component({
     components: {ChatRemotePeer}
   })
@@ -82,6 +83,8 @@
     @Mutation setCurrentWebcam;
     @Mutation setCurrentSpeaker;
     @Mutation setCurrentMic;
+
+    @Action growlError;
 
     @State microphones: { [id: string]: string };
     @State speakers: { [id: string]: string };
@@ -121,6 +124,20 @@
       this.setCurrentWebcam(payload);
       if (this.callInfo.callActive) {
         webrtcApi.updateConnection(this.roomId);
+      }
+    }
+
+    playTest() {
+      if (file['setSinkId']) {
+        file['setSinkId'](this.callInfo.currentSpeaker);
+        file.pause();
+        file.currentTime = 0;
+        file.volume = 1;
+        var prom = file.play();
+        prom && prom.catch(function (e) {
+        });
+      } else {
+        this.growlError("Your browser doesn't support changing output channel")
       }
     }
 
