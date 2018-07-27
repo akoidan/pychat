@@ -56,7 +56,7 @@
         <i class="icon-desktop" :class="iconDesktopClass" title="Capture your desktop screen and start sharing it" @click="desktopClick"></i>
         <i class="icon-cog" @click="showSettings = !showSettings"></i>
         <div class="enterFullScreenHolder"><i class="icon-webrtc-fullscreen" title="Fullscreen"></i></div>
-        <div class="hangUpHolder"><i class="icon-hang-up" @click="hangUpCall" title="Hang up" v-show="callInfo.callActive"></i></div>
+        <div class="hangUpHolder" v-show="callInfo.callActive"><i class="icon-hang-up" @click="hangUpCall" title="Hang up" ></i></div>
         <progress max="15" :value="callInfo.currentMicLevel" title="Your microphone level" class="microphoneLevel"></progress>
       </div>
     </div>
@@ -97,6 +97,17 @@
           this.$refs.localVideo.play();
         } else {
           this.$refs.localVideo.pause();
+        }
+      })
+    }
+
+    @Watch('callInfo.currentSpeaker')
+    onSpeakerChange(newValue) {
+      this.$nextTick(function () {
+        if (this.$refs.localVideo['setSinkId']) {
+          this.$refs.localVideo['setSinkId'](newValue);
+        } else  {
+          this.logger.error("SetSinkId doesn't exist")();
         }
       })
     }

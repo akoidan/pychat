@@ -1,9 +1,13 @@
 import {JsAudioAnalyzer} from '../types/types';
 import {extractError} from './utils';
 import {globalLogger, isMobile} from './singletons';
+import {IS_DEBUG } from './consts';
 
 let audioContext: AudioContext;
 let audioProcesssors = [];
+if (IS_DEBUG) {
+  window['audioProcesssors'] = audioProcesssors;
+}
 
 export function createMicrophoneLevelVoice (stream: MediaStream, onaudioprocess: Function): JsAudioAnalyzer {
   try {

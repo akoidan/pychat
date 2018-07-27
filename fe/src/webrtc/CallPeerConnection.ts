@@ -1,4 +1,4 @@
-import {getAverageAudioLevel} from '../utils/audioprocc';
+import {createMicrophoneLevelVoice, getAverageAudioLevel} from '../utils/audioprocc';
 import AbstractPeerConnection from './AbstractPeerConnection';
 import {ChangeStreamMessage, SetCallOpponent, SetOpponentAnchor, SetOpponentVoice} from '../types/types';
 import WsHandler from '../utils/WsHandler';
@@ -6,6 +6,7 @@ import {RootState} from '../types/model';
 import {Store} from 'vuex';
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
+  private audioProcessor: any;
 
   constructor(roomId: number, connId: string, opponentWsId: string, userId: number, wsHandler: WsHandler, store: Store<RootState>) {
     super(roomId, connId, opponentWsId, wsHandler, store);
@@ -25,7 +26,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   oniceconnectionstatechange() {
     if (this.pc.iceConnectionState === 'disconnected') {
       this.logger.log('disconnected')();
-      this.closeEvents('Connection has been lost');
+      this.onDestroy('Connection has been lost');
     } else if (['completed', 'connected'].indexOf(this.pc.iceConnectionState) >= 0) {
       this.logger.log('running')();
     }
@@ -63,12 +64,8 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       //   // coz it initialized from network instead of user gesture
       //   p.catch(Utils.clickToPlay(this.dom.remote))
       // }
-      // var speakerId = getSpeakerId();
-      // if (speakerId && this.dom.remote.setSinkId) {
-      //   this.dom.remote.setSinkId(speakerId);
-      // }
-      // this.removeAudioProcessor();
-      // this.audioProcessor = Utils.createMicrophoneLevelVoice(event.stream, this.processAudio);
+      this.removeAudioProcessor();
+      this.audioProcessor = createMicrophoneLevelVoice(event.stream, this.processAudio.bind(this));
       // onStreamAttached(this.opponentWsId);
     };
     this.logger.log('Sending local stream to remote')();
@@ -111,22 +108,17 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   }
 
   removeAudioProcessor () {
-    // if (this.audioProcessor && this.audioProcessor.javascriptNode && this.audioProcessor.javascriptNode.onaudioprocess) {
-    //   this.audioProcessor.javascriptNode.onaudioprocess = null;
-    //   this.logger.log("Removed remote audioProcessor")();
-    // }
+    if (this.audioProcessor && this.audioProcessor.javascriptNode && this.audioProcessor.javascriptNode.onaudioprocess) {
+      this.audioProcessor.javascriptNode.onaudioprocess = null;
+      this.logger.log('Removed remote audioProcessor')();
+    }
   }
 
-  closeEvents(reason) {
-    // if (this.timeoutedPeerConnectionDisconnected) {
-    //   clearTimeout(this.timeoutedPeerConnectionDisconnected);
-    //   this.timeoutedPeerConnectionDisconnected = null;
-    //   logger.log("Removing connections lost timeout")();
-    // }
-    this.logger.log('Destroying CallPeerConnection because', reason)();
+  onDestroy(reason?) {
+    this.logger.log('Destroying {}, because', this.constructor.name, reason)();
     this.closePeerConnection();
     this.removeAudioProcessor();
-    this.onDestroy();
+    super.onDestroy();
     let payload:  SetCallOpponent = {
       opponentWsId: this.opponentWsId,
       roomId: this.roomId,
@@ -135,7 +127,4 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     this.store.commit('setCallOpponent', payload);
   }
 
-  ondestroyCallConnection (message) {
-    this.closeEvents('Opponent hang up');
-  }
 }

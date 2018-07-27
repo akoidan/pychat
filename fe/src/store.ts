@@ -172,7 +172,11 @@ const store: StoreOptions<RootState> = {
       state.incomingCall = payload;
     },
     setCallOpponent(state: RootState, payload: SetCallOpponent) {
-      Vue.set(state.roomsDict[payload.roomId].callInfo.calls, payload.opponentWsId, payload.callInfoModel);
+      if (payload.callInfoModel) {
+        Vue.set(state.roomsDict[payload.roomId].callInfo.calls, payload.opponentWsId, payload.callInfoModel);
+      } else {
+        Vue.delete(state.roomsDict[payload.roomId].callInfo.calls, payload.opponentWsId)
+      }
     },
     setOpponentVoice(state: RootState, payload: SetOpponentVoice) {
       state.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].opponentCurrentVoice = payload.voice;

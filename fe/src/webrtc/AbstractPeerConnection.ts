@@ -61,7 +61,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     return this.connectionStatus;
   }
 
-  onDestroy() {
+  onDestroy(reason?) {
     let message: RemovePeerConnection = {
       handler: Subscription.getTransferId(this.connectionId),
       action: 'removePeerConnection',
