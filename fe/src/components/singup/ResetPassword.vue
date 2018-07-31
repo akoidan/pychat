@@ -47,7 +47,7 @@
       if (this.captcha_key) {
         loadCaptcha( e => {
           this.captchaInited = true;
-          if (grecaptcha &&  grecaptcha.render) {
+          if (window['grecaptcha'] &&  grecaptcha.render) {
             this.$nextTick(function () {
               grecaptcha.render(this.$refs.repactha);
             })
@@ -60,7 +60,7 @@
       this.running = true;
       this.$api.sendRestorePassword(this.$refs.form, error => {
         this.running = false;
-        if (grecaptcha) {
+        if (window['grecaptcha']) {
           grecaptcha.reset();
         }
         if (error) {

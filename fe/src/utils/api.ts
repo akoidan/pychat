@@ -220,4 +220,29 @@ export default class Api extends MessageHandler {
       cb: this.getResponseSuccessCB(cb)
     });
   }
+
+  public verifyToken(token: string, cb) {
+    this.xhr.doPost({
+      url: '/verify_token',
+      isJsonDecoded: true,
+      params: {token},
+      cb: (d: any, e) => {
+        if (e) {
+          cb(null, e);
+        } else if (d && d.messsage === RESPONSE_SUCCESS) {
+          cb(d.restoreUser);
+        } else {
+          cb(null, d.message);
+        }
+      }
+    });
+  }
+
+  acceptToken(token: string, password: string, cb) {
+    this.xhr.doPost({
+      url: '/accept_token',
+      params: {token, password},
+      cb: this.getResponseSuccessCB(cb)
+    });
+  }
 }
