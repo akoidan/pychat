@@ -229,7 +229,7 @@ export default class Api extends MessageHandler {
       cb: (d: any, e) => {
         if (e) {
           cb(null, e);
-        } else if (d && d.messsage === RESPONSE_SUCCESS) {
+        } else if (d && d.message === RESPONSE_SUCCESS) {
           cb(d.restoreUser);
         } else {
           cb(null, d.message);

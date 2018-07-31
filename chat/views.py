@@ -326,7 +326,7 @@ def proceed_email_changed(request):
 
 @transaction.atomic
 @validation
-def accept_token(self, request):
+def accept_token(request):
 	"""
 	Sends email verification token
 	"""
