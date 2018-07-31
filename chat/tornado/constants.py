@@ -12,16 +12,20 @@ class Actions(object):
 	CANCEL_CALL_CONNECTION = 'cancelCallConnection'
 	ACCEPT_CALL = 'acceptCall'
 	ACCEPT_FILE = 'acceptFile'
-	ROOMS = 'setRooms'
 	GROWL_MESSAGE = 'growl'
 	GET_MESSAGES = 'loadMessages'
-	CREATE_DIRECT_CHANNEL = 'addDirectChannel'
 	DELETE_ROOM = 'deleteRoom'
+	DELETE_MY_ROOM = DELETE_ROOM
+	USER_LEAVES_ROOM = 'leaveUser'
 	EDIT_MESSAGE = 'editMessage'
 	DELETE_MESSAGE = 'deleteMessage'
 	CREATE_ROOM_CHANNEL = 'addRoom'
+	SET_SETTINGS = 'setSettings'
+	USER_PROFILE_CHANGED = 'userProfileChanged'
+	SET_USER_PROFILE = 'setUserProfile'
+	SET_PROFILE_IMAGE = 'setProfileImage'
 	INVITE_USER = 'inviteUser'
-	ADD_USER = 'addUserToDom'
+	ADD_INVITE = 'addInvite'
 	SET_WEBRTC_ID = 'setConnectionId'
 	SET_WEBRTC_ERROR = 'setError'
 	OFFER_FILE_CONNECTION = 'offerFile'
@@ -32,6 +36,8 @@ class Actions(object):
 	PING = 'ping'
 	PONG = 'pong'
 	CHECK_PING = 'check_ping'
+
+
 
 
 class VarNames(object):
@@ -53,9 +59,14 @@ class VarNames(object):
 	ROOM_NAME = 'name'
 	NOTIFICATIONS = 'notifications'
 	VOLUME = 'volume'
+	CURRENT_USER_INFO = 'userInfo'
+	CURRENT_USER_SETTINGS = 'userSettings'
 	ROOM_ID = 'roomId'
+	ROOMS = 'rooms'
 	ROOM_USERS = 'users'
 	WEBRTC_OPPONENT_ID = 'opponentWsId'
+	USER_IMAGE = 'userImage'
+	CB_BY_SENDER = 'cbBySender'
 	GET_MESSAGES_COUNT = 'count'
 	GET_MESSAGES_HEADER_ID = 'headerId'
 	IS_ROOM_PRIVATE = 'private'
@@ -66,19 +77,41 @@ class VarNames(object):
 	LOAD_MESSAGES_HISTORY = 'history'
 	LOAD_MESSAGES_OFFLINE = 'offline'
 	ONLINE = 'online'
+	TIME_DIFF ='timeDiff'
 	EDITED_TIMES = 'edited'
 	PREVIEW = 'preview'
 	DELETED = 'deleted'
 
 
+class UserSettingsVarNames(object):
+	SUGGESTIONS = 'suggestions'
+	EMBEDDED_YOUTUBE = 'embeddedYoutube'
+	HIGHLIGHT_CODE = 'highlightCode'
+	MESSAGE_SOUND = 'messageSound'
+	INCOMING_FILE_CALL_SOUND = 'incomingFileCallSound'
+	ONLINE_CHANGE_SOUND = 'onlineChangeSound'
+	LOGS = 'logs'
+	SEND_LOGS = 'sendLogs'
+	THEME = 'theme'
+
+class UserProfileVarNames(object):
+	USERNAME = VarNames.USER
+	USER_ID = VarNames.USER_ID
+	NAME = 'name'
+	CITY = 'city'
+	SURNAME = 'surname'
+	EMAIL = 'email'
+	BIRTHDAY = 'birthday'
+	CONTACTS = 'contacts'
+	SEX = 'sex'
+
 class HandlerNames:
 	CHANNELS = 'channels'
-	CHAT = 'chat'
-	GROWL = 'growl'
 	WEBRTC = 'webrtc'
-	PEER_CONNECTION = 'peerConnection'
-	WEBRTC_TRANSFER = 'webrtcTransfer'
+	PEER_CONNECTION = 'peerConnection:{}:{}'
+	WEBRTC_TRANSFER = 'webrtcTransfer:{}'
 	WS = 'ws'
+	NULL = 'void'
 
 
 class WebRtcRedisStates:
@@ -95,9 +128,10 @@ class RedisPrefix:
 	CONNECTION_ID_LENGTH = 8  # should be secure
 
 	@staticmethod
-	def set_js_user_structure(name, sex):
+	def set_js_user_structure(id, name, sex):
 		return {
 			VarNames.USER: name,
+			VarNames.USER_ID: id,
 			VarNames.GENDER: settings.GENDERS[sex]
 		}
 

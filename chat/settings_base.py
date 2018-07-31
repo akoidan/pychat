@@ -60,6 +60,7 @@ EMAIL_SUBJECT_PREFIX = '[Pychat] '
 
 REDIS_PORT = 6379
 REDIS_HOST ='localhost'
+REDIS_DB = 0
 REDIS_SESSION_DB = 3
 
 SESSION_ENGINE = 'redis_sessions.session'
@@ -144,12 +145,9 @@ GIPHY_REGEX = r"^\s*\/giphy (.+)"
 # SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 MIDDLEWARE_CLASSES = (
-	'django.middleware.csrf.CsrfViewMiddleware',
-	'django.contrib.sessions.middleware.SessionMiddleware',
 	'django.middleware.common.CommonMiddleware',
-	'django.contrib.auth.middleware.AuthenticationMiddleware',
-	'django.contrib.messages.middleware.MessageMiddleware',
-	'chat.cookies_middleware.UserCookieMiddleWare',
+	'chat.auth_middleware.AuthorizationMiddleware',
+	'chat.cookies_middleware.RandomMiddleware',
 )
 
 ROOT_URLCONF = 'chat.urls'
@@ -207,7 +205,6 @@ STATIC_URL = '/static/'
 PROJECT_DIR = os.path.dirname(os.path.realpath(project_module.__file__))
 
 STATIC_ROOT = os.path.join(PROJECT_DIR, 'static')
-SMILEYS_ROOT = os.path.join(STATIC_ROOT, 'smileys')
 MESSAGES_PER_SEARCH = 10
 AUTH_PROFILE_MODULE = 'chat.UserProfile'
 
@@ -283,6 +280,7 @@ VALIDATION_IS_OK = 'ok'
 MAX_USERNAME_LENGTH = 16
 MAX_MESSAGE_SIZE = 100000
 GENDERS = {0: 'Secret', 1: 'Male', 2: 'Female', }
+GENDERS_STR = { 'Secret': 0, 'Male': 1, 'Female':2 }
 #
 DATE_INPUT_FORMATS = ('%Y-%m-%d',)  # html5 input date default format, see also Pikaday in js
 DATE_INPUT_FORMATS_JS = 'YYYY-MM-DD'  # html5 input date default format, see also Pikaday in js, TODO webrtc.js

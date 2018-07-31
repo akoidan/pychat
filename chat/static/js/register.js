@@ -326,21 +326,6 @@ function onsdkError(message) {
 		growlError(message + error);
 	}
 }
-function googleInit() {
-	// Load the API client and auth library
-	if (window.G_OAUTH_URL) {
-		logger.log("Initializing google sdk")();
-		doGet(G_OAUTH_URL, function () {
-			gapi.load('client:auth2', function () {
-				logger.log("gapi 2 is ready")();
-				gapi.auth2.init().then(function () {
-					logger.log("gauth 2 is ready")();
-					googleApiLoaded = true;
-				}).catch(onsdkError("Unable to init gauth2 sdk: "))
-			})
-		});
-	}
-}
 
 function facebookLogin(event) {
 	if (event) event.preventDefault();

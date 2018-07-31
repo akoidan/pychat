@@ -1,5 +1,6 @@
 from chat.models import get_milliseconds
-from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
+from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, UserSettingsVarNames, \
+	UserProfileVarNames
 
 
 class MessagesCreator(object):
@@ -33,20 +34,98 @@ class MessagesCreator(object):
 			VarNames.WEBRTC_OPPONENT_ID: self_id
 		}
 
-	@classmethod
-	def set_room(cls, rooms, users, online):
-		res = cls.base_default(Actions.ROOMS, rooms, HandlerNames.CHANNELS)
-		res[VarNames.ROOM_USERS] = users
-		res[VarNames.ONLINE] = online
-		return res
+	def set_room(self, rooms, users, online, up):
+		return {
+			VarNames.ROOM_USERS: users,
+			VarNames.ONLINE: online,
+			VarNames.ROOMS: rooms,
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.SET_WS_ID,
+			VarNames.WEBRTC_OPPONENT_ID: self.id,
+			VarNames.TIME: get_milliseconds(),
+			VarNames.USER_IMAGE: up.photo.url if up.photo else None,
+			VarNames.CURRENT_USER_SETTINGS: self.get_user_settings(up),
+			VarNames.CURRENT_USER_INFO: self.get_user_profile(up),
+		}
 
-	def room_online(self, online, event):
+	def set_settings(self, js_message_id,  message):
+		return  {
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.SET_SETTINGS,
+			VarNames.CB_BY_SENDER: self.id,
+			VarNames.JS_MESSAGE_ID: js_message_id,
+			VarNames.CONTENT: message,
+		}
+
+	@staticmethod
+	def set_profile_image(url):
+		return {
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.SET_PROFILE_IMAGE,
+			VarNames.CONTENT: url,
+		}
+
+	def changed_user_profile(self, sex,  user_id, username):
+		return  {
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.USER_PROFILE_CHANGED,
+			UserProfileVarNames.SEX: sex,
+			UserProfileVarNames.USER_ID: user_id,
+			UserProfileVarNames.USERNAME: username,
+		}
+
+	def set_user_profile(self, js_message_id,  message):
+		return  {
+			VarNames.HANDLER_NAME: HandlerNames.WS,
+			VarNames.EVENT: Actions.SET_USER_PROFILE,
+			VarNames.CB_BY_SENDER: self.id,
+			VarNames.JS_MESSAGE_ID: js_message_id,
+			VarNames.CONTENT: message,
+		}
+
+
+	@staticmethod
+	def get_user_settings(up):
+		return {
+			UserSettingsVarNames.SUGGESTIONS: up.suggestions,
+			UserSettingsVarNames.SEND_LOGS: up.send_logs,
+			UserSettingsVarNames.LOGS: up.logs,
+			UserSettingsVarNames.EMBEDDED_YOUTUBE: up.embedded_youtube,
+			UserSettingsVarNames.INCOMING_FILE_CALL_SOUND: up.incoming_file_call_sound,
+			UserSettingsVarNames.MESSAGE_SOUND: up.message_sound,
+			UserSettingsVarNames.THEME: up.theme,
+			UserSettingsVarNames.HIGHLIGHT_CODE: up.highlight_code,
+			UserSettingsVarNames.ONLINE_CHANGE_SOUND: up.online_change_sound
+		}
+
+	@staticmethod
+	def get_user_profile(up):
+		return {
+			UserProfileVarNames.USERNAME: up.username,
+			UserProfileVarNames.USER_ID: up.id,
+			UserProfileVarNames.NAME: up.name,
+			UserProfileVarNames.CITY: up.city,
+			UserProfileVarNames.SEX: up.sex_str,
+			UserProfileVarNames.CONTACTS: up.contacts,
+			UserProfileVarNames.BIRTHDAY: str(up.birthday),
+			UserProfileVarNames.EMAIL: up.email,
+			UserProfileVarNames.SURNAME: up.surname,
+		}
+
+	def room_online_logout(self, online):
 		"""
 		:return: {"action": event, "content": content, "time": "20:48:57"}
 		"""
-		room_less = self.default(online, event, HandlerNames.CHANNELS)
-		room_less[VarNames.USER] = self.sender_name
-		room_less[VarNames.GENDER] = self.sex
+		room_less = self.default(online, Actions.LOGOUT, HandlerNames.CHANNELS)
+		return room_less
+
+	def room_online_login(self, online, sender_name, sex):
+		"""
+		:return: {"action": event, "content": content, "time": "20:48:57"}
+		"""
+		room_less = self.default(online, Actions.LOGIN, HandlerNames.CHANNELS)
+		room_less[VarNames.USER] = sender_name
+		room_less[VarNames.GENDER] = sex
 		return room_less
 
 	@classmethod
@@ -69,8 +148,7 @@ class MessagesCreator(object):
 			res[VarNames.GIPHY] = message.giphy
 		return res
 
-	@classmethod
-	def create_send_message(cls, message, event, files, js_id):
+	def create_send_message(self, message, event, files, js_id):
 		"""
 		:type message: chat.models.Message
 		:type imgs: dict
@@ -78,10 +156,11 @@ class MessagesCreator(object):
 		:return: "action": "joined", "content": {"v5bQwtWp": "alien", "tRD6emzs": "Alien"},
 		"sex": "Alien", "user": "tRD6emzs", "time": "20:48:57"}
 		"""
-		res = cls.create_message(message, files)
+		res = self.create_message(message, files)
 		res[VarNames.EVENT] = event
 		res[VarNames.JS_MESSAGE_ID] = js_id
-		res[VarNames.HANDLER_NAME] = HandlerNames.CHAT
+		res[VarNames.CB_BY_SENDER] = self.id
+		res[VarNames.HANDLER_NAME] = HandlerNames.CHANNELS
 		return res
 
 	@classmethod
@@ -95,8 +174,9 @@ class MessagesCreator(object):
 			res_mess.append(cls.create_message(message, prepare_img(files, message.id)))
 		return res_mess
 
+
 	@classmethod
-	def get_messages(cls, messages, channel, files, prepare_img):
+	def get_messages(cls, messages, channel, files, prepare_img, message_id):
 		"""
 		:type images: list[chat.models.Image]
 		:type messages: list[chat.models.Message]
@@ -106,7 +186,8 @@ class MessagesCreator(object):
 			VarNames.CONTENT: cls.append_images(messages, files, prepare_img),
 			VarNames.EVENT: Actions.GET_MESSAGES,
 			VarNames.ROOM_ID: channel,
-			VarNames.HANDLER_NAME: HandlerNames.CHAT
+			VarNames.JS_MESSAGE_ID: message_id,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS
 		}
 
 	@staticmethod
@@ -135,17 +216,6 @@ class MessagesCreator(object):
 	def channel(self):
 		return RedisPrefix.generate_user(self.user_id)
 
-	def subscribe_direct_channel_message(self, room_id, users_id, notifications):
-		return {
-			VarNames.EVENT: Actions.CREATE_DIRECT_CHANNEL,
-			VarNames.VOLUME: 2,
-			VarNames.NOTIFICATIONS: notifications,
-			VarNames.ROOM_ID: room_id,
-			VarNames.TIME: get_milliseconds(),
-			VarNames.ROOM_USERS: users_id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS
-		}
-
 	def responde_pong(self, js_id):
 		return {
 			VarNames.EVENT: Actions.PONG,
@@ -153,39 +223,19 @@ class MessagesCreator(object):
 			VarNames.JS_MESSAGE_ID: js_id
 		}
 
-	def subscribe_room_channel_message(self, room_id, room_name):
-		return {
-			VarNames.EVENT: Actions.CREATE_ROOM_CHANNEL,
-			VarNames.ROOM_ID: room_id,
-			VarNames.ROOM_USERS: [self.user_id],
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
-			VarNames.VOLUME: 2,
-			VarNames.NOTIFICATIONS: True,
-			VarNames.ROOM_NAME: room_name
-		}
-
-	@staticmethod
-	def add_user_to_room(channel, channel_name, inviter, invitee, all_users):
-		return {
-			VarNames.EVENT: Actions.INVITE_USER,
-			VarNames.ROOM_ID: channel,
-			VarNames.ROOM_NAME: channel_name,
-			VarNames.INVITEE_USER_ID: invitee,
-			VarNames.INVITER_USER_ID: inviter,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
-			VarNames.ROOM_USERS: all_users,
-			VarNames.TIME: get_milliseconds(),
-		}
-
-	def unsubscribe_direct_message(self, room_id, room_user_ids, room_name):
+	def unsubscribe_direct_message(self, room_id, js_id, myws_id, users, name):
+		"""
+		:param name: so we can determine on pubsub message if it's private
+		"""
 		return {
 			VarNames.EVENT: Actions.DELETE_ROOM,
 			VarNames.ROOM_ID: room_id,
+			VarNames.ROOM_NAME: name,
+			VarNames.JS_MESSAGE_ID: js_id,
 			VarNames.USER_ID: self.user_id,
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
-			VarNames.ROOM_USERS: room_user_ids,
-			VarNames.ROOM_NAME: room_name,
-			VarNames.TIME: get_milliseconds()
+			VarNames.CB_BY_SENDER: myws_id,
+			VarNames.ROOM_USERS: users
 		}
 
 	@staticmethod
@@ -210,63 +260,58 @@ class WebRtcMessageCreator(object):
 			VarNames.CONTENT: content,
 			VarNames.USER_ID: self.user_id,
 			VarNames.HANDLER_NAME: HandlerNames.WEBRTC,
-			VarNames.USER: self.sender_name,
 			VarNames.CONNECTION_ID: connection_id,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.ROOM_ID: room_id
+			VarNames.ROOM_ID: room_id,
+			VarNames.TIME: get_milliseconds()
 		}
 
-	def set_webrtc_error(self, error, connection_id, qued_id=None):
-		return {
-			VarNames.EVENT: Actions.SET_WEBRTC_ERROR,
-			VarNames.CONTENT: error,
-			VarNames.USER_ID: self.user_id,
-			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
-			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_QUED_ID: qued_id
-		}
+	# def set_webrtc_error(self, error, connection_id, qued_id=None):
+	# 	return {
+	# 		VarNames.EVENT: Actions.SET_WEBRTC_ERROR,
+	# 		VarNames.CONTENT: error,
+	# 		VarNames.USER_ID: self.user_id,
+	# 		VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION.format(connection_id),
+	# 		VarNames.WEBRTC_QUED_ID: qued_id
+	# 	}
 
 	@staticmethod
-	def set_connection_id(qued_id, connection_id):
+	def set_connection_id(js_message_id, connection_id):
 		return {
 			VarNames.EVENT: Actions.SET_WEBRTC_ID,
-			VarNames.HANDLER_NAME: HandlerNames.WEBRTC,
+			VarNames.HANDLER_NAME: HandlerNames.NULL,
 			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_QUED_ID: qued_id
+			VarNames.JS_MESSAGE_ID: js_message_id,
+			VarNames.TIME: get_milliseconds(),
 		}
 
 	def get_close_file_sender_message(self, connection_id):
 		return {
 			VarNames.EVENT: Actions.CLOSE_FILE_CONNECTION,
-			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: HandlerNames.WEBRTC_TRANSFER,
+			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION.format(connection_id, self.id),
 		}
 
 	def get_accept_file_message(self, connection_id, content):
 		return {
 			VarNames.EVENT: Actions.ACCEPT_FILE,
-			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
+			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION.format(connection_id, self.id),
 			VarNames.CONTENT: content,
 		}
 
 	def reply_webrtc(self, event, connection_id, handler, content):
 		return {
 			VarNames.EVENT: event,
-			VarNames.CONNECTION_ID: connection_id,
+			VarNames.CONNECTION_ID: connection_id,  # required
 			VarNames.USER_ID: self.user_id,
-			VarNames.USER: self.sender_name,
 			VarNames.CONTENT: content,
-			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: handler,
+			VarNames.WEBRTC_OPPONENT_ID: self.id,  # required
+			VarNames.HANDLER_NAME: handler.format(connection_id, self.id), #  TODO
 		}
 
 	def retry_file(self, connection_id):
 		return {
 			VarNames.EVENT: Actions.RETRY_FILE_CONNECTION,
-			VarNames.CONNECTION_ID: connection_id,
-			VarNames.WEBRTC_OPPONENT_ID: self.id,
-			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION,
+			# VarNames.CONNECTION_ID: connection_id,
+			# VarNames.WEBRTC_OPPONENT_ID: self.id,
+			VarNames.HANDLER_NAME: HandlerNames.PEER_CONNECTION.format(connection_id, self.id),
 		}

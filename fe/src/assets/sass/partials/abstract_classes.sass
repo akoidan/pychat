@@ -1,0 +1,157 @@
+$img-path: "../../img" !default
+@import "variables"
+@import "mixins"
+
+%i
+  position: absolute
+  top: 15px
+  color: #6E6E6E
+  left: 5px
+  &.error
+    color: #922727
+
+  &.success
+    color: #387933
+
+  &.warn
+    color: #6D6B2C
+
+%hovered-user-room
+  &:hover
+    cursor: pointer
+    background-color:  rgba(135, 135, 135, 0.3)
+    opacity: 1
+    i
+      opacity: inherit
+
+%chat-icon
+  display: inline
+  float: right
+  cursor: pointer
+  position: absolute
+  height: 16px
+  top: 11px
+
+%img-code
+  margin-top: -17px
+  margin-bottom: -10px
+  /*remove background if someones copies smile
+  background-color: rgba(255, 255, 255, 0)
+  vertical-align: middle
+
+%img-play > div
+  .icon-youtube-play
+    background: url('#{$img-path}/icon-play-black.svg') no-repeat center
+  .icon-youtube-play:hover
+    background: url('#{$img-path}/icon-play-red.svg') no-repeat center
+  background: black
+
+%window-white
+  color: black
+  background-color: rgba(227, 227, 218, 0.9)
+  border: 1px #c3bec2 solid
+
+%window-reg
+  background-color: rgba(33, 33, 31, 0.9)
+  border: 1px #696951 solid
+
+%window-lor
+  background-color: rgba(34, 31, 31, 0.86)
+  border: 1px #775E39 solid
+
+.color-lor %nav
+  background-color: $color-lor-nav-color
+  background-image: linear-gradient(#232323 0%, #151515 100%)
+
+.color-white %nav
+  background-color: #333
+  border-color: #080808
+  color: $color-white-main
+
+.color-reg %nav
+  background-image: linear-gradient(#232323 0%, #151515 100%)
+
+%nav
+  padding: 10px 4px 9px 10px
+  font-size: 26px
+  overflow: hidden
+  transition: max-height 0.4s ease-out
+  flex-shrink: 0
+  margin: 0
+  @include display-flex
+  align-items: center
+  display: flex
+  position: relative
+  flex-direction: row
+  @media screen and (min-width: $collapse-width) and (max-width: $collapse-no-mtext)
+    .mText
+      display: none !important
+  @media screen and (max-width: $collapse-width)
+    flex-direction: column
+    > *
+      margin-right: auto !important
+
+%img
+  margin-top: -17px
+  margin-bottom: -10px
+  /*remove background if someones copies smile
+  background-color: rgba(255, 255, 255, 0)
+  vertical-align: middle
+
+%slider
+  font: 13px Open Sans
+  color: #6E6E6E
+  text-shadow: #000 0 1px 5px
+  margin-top: -7px
+  margin-bottom: 7px
+  padding-left: 10px
+  font-size: 10px
+  text-align: left
+
+
+//%context-menu
+//  z-index: 3
+//  font-size: 16px
+//  border: $user-context-border
+//  li
+//    padding: 2px 5px
+//    &:hover
+//      cursor: pointer
+//      border-radius: 3px
+//
+//.color-lor %context-menu
+//  @include box-shadow(3px 3px 3px rgba(6, 3, 8, 0.77))
+//  background-color: #2C2B2A
+//  color: #ACACAC
+//  &:hover
+//    color: #c7c7c7
+//
+//  li:hover
+//    background-color: $color-lor-nav-color
+//
+//.color-reg %context-menu
+//  @include box-shadow(3px 3px 3px rgba(6, 3, 8, 0.77))
+//  @include linear-gradient(#214341 , #193237)
+//  color: #ACACAC
+//  &:hover
+//    color: #c7c7c7
+//  li:hover
+//    background-color: #0F201F
+
+
+%room-settings-holder
+  display: flex
+  flex-direction: column
+  padding-top: 10px
+  height: calc(100% - 100px)
+  align-self: center
+  padding-bottom: 10px
+
+%big-input
+  border-radius: 5px
+  padding: 8px
+  font-size: 16px
+  width: calc(100% - 16px)
+
+select%big-input
+  width: 100%

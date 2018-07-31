@@ -3,7 +3,7 @@ import logging
 import re
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models import Q
+from django.db.models import Q, Max
 from tornado.gen import engine, Task
 from tornado.httpclient import HTTPRequest
 from tornado.ioloop import IOLoop
@@ -13,13 +13,15 @@ from tornadoredis import Client
 from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
-	UploadedFile, Image
+	UploadedFile, Image, get_milliseconds, UserProfile, User, Verification
 from chat.py2_3 import str_type, quote
-from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST
-from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates
+from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST, REDIS_DB
+from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates, \
+	UserSettingsVarNames, UserProfileVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
-from chat.utils import get_max_key, do_db, validate_edit_message, get_or_create_room, \
-	create_room, get_message_images_videos, update_symbols, up_files_to_img, create_simple_room_users
+from chat.utils import get_max_key, do_db, validate_edit_message, \
+	get_message_images_videos, update_symbols, up_files_to_img, evaluate, check_user, check_email, send_email_change, \
+	send_new_email_ver
 
 parent_logger = logging.getLogger(__name__)
 base_logger = logging.LoggerAdapter(parent_logger, {
@@ -42,9 +44,7 @@ class MessagesHandler(MessagesCreator):
 		super(MessagesHandler, self).__init__()
 		self.webrtc_ids = {}
 		self.id = None  # child init
-		self.sex = None
 		self.last_client_ping = 0
-		self.sender_name = None
 		self.user_id = 0  # anonymous by default
 		self.ip = None
 		from chat import global_redis
@@ -52,17 +52,18 @@ class MessagesHandler(MessagesCreator):
 		self.sync_redis = global_redis.sync_redis
 		self.channels = []
 		self._logger = None
-		self.async_redis = Client(host=REDIS_HOST, port=REDIS_PORT)
+		self.async_redis = Client(host=REDIS_HOST, port=REDIS_PORT, selected_db=REDIS_DB)
 		self.patch_tornadoredis()
 		# input websocket messages handlers
 		# The handler is determined by @VarNames.EVENT
 		self.process_ws_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
-			Actions.CREATE_DIRECT_CHANNEL: self.create_user_channel,
 			Actions.DELETE_ROOM: self.delete_channel,
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
+			Actions.SET_USER_PROFILE: self.profile_save_user,
+			Actions.SET_SETTINGS: self.profile_save_settings,
 			Actions.INVITE_USER: self.invite_user,
 			Actions.PING: self.respond_ping,
 			Actions.PONG: self.process_pong_message,
@@ -70,10 +71,10 @@ class MessagesHandler(MessagesCreator):
 		# Handlers for redis messages, if handler returns true - message won't be sent to client
 		# The handler is determined by @VarNames.EVENT
 		self.process_pubsub_message = {
-			Actions.CREATE_DIRECT_CHANNEL: self.send_client_new_channel,
 			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
 			Actions.INVITE_USER: self.send_client_new_channel,
+			Actions.ADD_INVITE: self.send_client_new_channel,
 			Actions.PING: self.process_ping_message,
 		}
 
@@ -155,6 +156,9 @@ class MessagesHandler(MessagesCreator):
 
 	def publish(self, message, channel, parsable=False):
 		jsoned_mess = encode_message(message, parsable)
+		self.raw_publish(jsoned_mess, channel)
+
+	def raw_publish(self, jsoned_mess, channel):
 		self.logger.debug('<%s> %s', channel, jsoned_mess)
 		self.async_redis_publisher.publish(channel, jsoned_mess)
 
@@ -244,6 +248,8 @@ class MessagesHandler(MessagesCreator):
 
 		# @transaction.atomic mysql has gone away
 		def send_message(message, giphy=None):
+			if message[VarNames.TIME_DIFF] < 0:
+				raise ValidationError("Back to the future?")
 			files = UploadedFile.objects.filter(id__in=message.get(VarNames.FILES), user_id=self.user_id)
 			symbol = get_max_key(files)
 			channel = message[VarNames.ROOM_ID]
@@ -255,6 +261,7 @@ class MessagesHandler(MessagesCreator):
 				giphy=giphy,
 				room_id=channel
 			)
+			message_db.time -= message[VarNames.TIME_DIFF]
 			res_files = []
 			do_db(message_db.save)
 			if files:
@@ -274,30 +281,187 @@ class MessagesHandler(MessagesCreator):
 			send_message(message)
 
 	def create_new_room(self, message):
-		room_name = message[VarNames.ROOM_NAME]
-		if not room_name or len(room_name) > 16:
+		room_name = message.get(VarNames.ROOM_NAME)
+		users = message.get(VarNames.ROOM_USERS)
+		users.append(self.user_id)
+		users = list(set(users))
+		if room_name and len(room_name) > 16:
 			raise ValidationError('Incorrect room name "{}"'.format(room_name))
-		room = Room(name=room_name)
-		do_db(room.save)
-		create_simple_room_users(self.user_id, room.id)
-		subscribe_message = self.subscribe_room_channel_message(room.id, room_name)
-		self.publish(subscribe_message, self.channel, True)
+		create_user_rooms = True
+		if not room_name and  len(users) == 2:
+			user_rooms = evaluate(Room.users.through.objects.filter(user_id=self.user_id, room__name__isnull=True).values('room_id'))
+			user_id = users[0] if users[1] == self.user_id else users[1]
+			try:
+				room = RoomUsers.objects.filter(user_id=user_id, room__in=user_rooms).values('room__id', 'room__disabled').get()
+				room_id = room['room__id']
+				if room['room__disabled']:
+					Room.objects.filter(id=room_id).update(disabled=False)
+				else:
+					raise ValidationError('This room already exist')
+				create_user_rooms = False
+			except RoomUsers.DoesNotExist:
+				pass
+		elif not room_name:
+			raise ValidationError('At least one user should be selected, or room should be public')
+		if create_user_rooms:
+			room = Room(name=room_name)
+			do_db(room.save)
+			room_id = room.id
+			max_id = Message.objects.all().aggregate(Max('id'))['id__max']
+			ru = [RoomUsers(
+				user_id=user_id,
+				room_id=room_id,
+				last_read_message_id=max_id,
+				volume=message[VarNames.VOLUME],
+				notifications=message[VarNames.NOTIFICATIONS]
+			) for user_id in users]
+			RoomUsers.objects.bulk_create(ru)
+
+		m = {
+			VarNames.EVENT: Actions.CREATE_ROOM_CHANNEL,
+			VarNames.ROOM_ID: room_id,
+			VarNames.ROOM_USERS: users,
+			VarNames.CB_BY_SENDER: self.id,
+			VarNames.INVITER_USER_ID: self.user_id,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.VOLUME: message[VarNames.VOLUME],
+			VarNames.NOTIFICATIONS: message[VarNames.NOTIFICATIONS],
+			VarNames.ROOM_NAME: room_name,
+			VarNames.TIME: get_milliseconds(),
+			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
+		}
+		jsoned_mess = encode_message(m, True)
+		for user in users:
+			self.raw_publish(jsoned_mess, RedisPrefix.generate_user(user))
+
+
+	def profile_save_settings(self, in_message):
+		message = in_message[VarNames.CONTENT]
+		UserProfile.objects.filter(id=self.user_id).update(
+			suggestions=message[UserSettingsVarNames.SUGGESTIONS],
+			embedded_youtube=message[UserSettingsVarNames.EMBEDDED_YOUTUBE],
+			highlight_code=message[UserSettingsVarNames.HIGHLIGHT_CODE],
+			message_sound=message[UserSettingsVarNames.MESSAGE_SOUND],
+			incoming_file_call_sound=message[UserSettingsVarNames.INCOMING_FILE_CALL_SOUND],
+			online_change_sound=message[UserSettingsVarNames.ONLINE_CHANGE_SOUND],
+			logs=message[UserSettingsVarNames.LOGS],
+			send_logs=message[UserSettingsVarNames.SEND_LOGS],
+			theme=message[UserSettingsVarNames.THEME],
+		)
+		self.publish(self.set_settings(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
+
+
+	def profile_save_user(self, in_message):
+		message = in_message[VarNames.CONTENT]
+		userprofile = UserProfile.objects.get(id=self.user_id)
+		email_verification_id = userprofile.email_verification_id
+		un = message[UserProfileVarNames.USERNAME]
+		email = message[UserProfileVarNames.EMAIL]
+		if userprofile.username != un:
+			check_user(un)
+		if userprofile.email != email:
+			check_email(email)
+			if userprofile.email and userprofile.email_verification and userprofile.email_verification.verified:
+				verification = Verification(
+					type_enum=Verification.TypeChoices.email,
+					user_id=self.id,
+					email=email
+				)
+				verification.save()
+				send_email_change(self.request, un, userprofile.email, verification, email)
+				self.ws_write(self.default("In order to change an email please confirm it from you current address. We send you an verification email to {}.".format(userprofile.email), Actions.GROWL_MESSAGE, HandlerNames.WS))
+				email = userprofile.email # Don't change email, we need to verify it!
+			elif email:
+				new_ver = send_new_email_ver(self.request, userprofile, email)
+				email_verification_id = new_ver.id
+
+		sex = message[UserProfileVarNames.SEX]
+		UserProfile.objects.filter(id=self.user_id).update(
+			username=un,
+			name=message[UserProfileVarNames.NAME],
+			city=message[UserProfileVarNames.CITY],
+			surname=message[UserProfileVarNames.SURNAME],
+			email=email,
+			birthday=message[UserProfileVarNames.BIRTHDAY],
+			contacts=message[UserProfileVarNames.CONTACTS],
+			sex=settings.GENDERS_STR[sex],
+			email_verification=email_verification_id
+		)
+		self.publish(self.set_user_profile(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
+		if userprofile.sex_str != sex or userprofile.username != un:
+			self.publish(self.changed_user_profile(sex, self.user_id, un), settings.ALL_ROOM_ID)
+
+
+	def profile_save_image(self, request):
+		pass
+		# UserProfile.objects.filter(id=request.user.id).update(
+		# 	suggestions=request.POST['suggestions'],
+		# 	embedded_youtube=request.POST['embedded_youtube'],
+		# 	highlight_code=request.POST['highlight_code'],
+		# 	message_sound=request.POST['message_sound'],
+		# 	incoming_file_call_sound=request.POST['incoming_file_call_sound'],
+		# 	online_change_sound=request.POST['online_change_sound'],
+		# 	logs=request.POST['logs'],
+		# 	send_logs=request.POST['send_logs'],
+		# 	theme=request.POST['theme'],
+		# )
+		# return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 	def invite_user(self, message):
 		room_id = message[VarNames.ROOM_ID]
-		user_id = message[VarNames.USER_ID]
-		room = get_or_create_room(self.channels, room_id, user_id)
+		if room_id not in self.channels:
+			raise ValidationError("Access denied, only allowed for channels {}".format(self.channels))
+		room = do_db(Room.objects.get, id=room_id)
+		if room.is_private:
+			raise ValidationError("You can't add users to direct room, create a new room instead")
+		users = message.get(VarNames.ROOM_USERS)
 		users_in_room = list(RoomUsers.objects.filter(room_id=room_id).values_list('user_id', flat=True))
-		notify_others = self.add_user_to_room(
-			room_id,
-			room.name,
-			self.user_id,
-			user_id,
-			users_in_room
-		)
-		self.publish(notify_others, room_id)
-		if user_id != self.user_id:
-			self.publish(notify_others, RedisPrefix.generate_user(user_id), True)
+		intersect = set(users_in_room) & set(users)
+		if bool(intersect):
+			raise ValidationError("Users %s are already in the room", intersect)
+		users_in_room.extend(users)
+
+		max_id = Message.objects.filter(room_id=room_id).aggregate(Max('id'))['id__max']
+		if not max_id:
+			max_id = Message.objects.all().aggregate(Max('id'))['id__max']
+		ru = [RoomUsers(
+			user_id=user_id,
+			room_id=room_id,
+			last_read_message_id=max_id,
+			volume=1,
+			notifications=False
+		) for user_id in users]
+		RoomUsers.objects.bulk_create(ru)
+
+		add_invitee = {
+			VarNames.EVENT: Actions.ADD_INVITE,
+			VarNames.ROOM_ID: room_id,
+			VarNames.ROOM_USERS: users_in_room,
+			VarNames.ROOM_NAME: room.name,
+			VarNames.INVITEE_USER_ID: users,
+			VarNames.INVITER_USER_ID: self.user_id,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.TIME: get_milliseconds(),
+			VarNames.VOLUME: 1,
+			VarNames.NOTIFICATIONS: False,
+		}
+		add_invitee_dumped = encode_message(add_invitee, True)
+		for user in users:
+			self.raw_publish(add_invitee_dumped, RedisPrefix.generate_user(user))
+
+		invite = {
+			VarNames.EVENT: Actions.INVITE_USER,
+			VarNames.ROOM_ID: room_id,
+			VarNames.INVITEE_USER_ID: users,
+			VarNames.INVITER_USER_ID: self.user_id,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.ROOM_USERS: users_in_room,
+			VarNames.TIME: get_milliseconds(),
+			VarNames.CB_BY_SENDER: self.id,
+			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID]
+		}
+		self.publish(invite, room_id, True)
+
 
 	def respond_ping(self, message):
 		self.ws_write(self.responde_pong(message[VarNames.JS_MESSAGE_ID]))
@@ -311,21 +475,9 @@ class MessagesHandler(MessagesCreator):
 				self.close(408, "Ping timeout")
 		IOLoop.instance().call_later(settings.PING_CLOSE_SERVER_DELAY, call_check)
 
-	def create_user_channel(self, message):
-		user_id = message[VarNames.USER_ID]
-		room_id = create_room(self.user_id, user_id)
-		multiple_users = user_id != self.user_id
-		subscribe_message = self.subscribe_direct_channel_message(
-			room_id,
-			[user_id, self.user_id] if multiple_users else [self.user_id],
-			self.user_id != user_id
-		)
-		self.publish(subscribe_message, self.channel, True)
-		if multiple_users:
-			self.publish(subscribe_message, RedisPrefix.generate_user(user_id), True)
-
 	def delete_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]
+		js_id = message[VarNames.JS_MESSAGE_ID]
 		if room_id not in self.channels or room_id == ALL_ROOM_ID:
 			raise ValidationError('You are not allowed to exit this room')
 		room = do_db(Room.objects.get, id=room_id)
@@ -337,7 +489,7 @@ class MessagesHandler(MessagesCreator):
 		else:  # if public -> leave the room, delete the link
 			RoomUsers.objects.filter(room_id=room.id, user_id=self.user_id).delete()
 		ru = list(RoomUsers.objects.filter(room_id=room.id).values_list('user_id', flat=True))
-		message = self.unsubscribe_direct_message(room_id, ru, room.name)
+		message = self.unsubscribe_direct_message(room_id, js_id, self.id, ru, room.name)
 		self.publish(message, room_id, True)
 
 	def edit_message(self, data):
@@ -393,6 +545,24 @@ class MessagesHandler(MessagesCreator):
 		if message[VarNames.USER_ID] == self.user_id or message[VarNames.ROOM_NAME] is None:
 			self.async_redis.unsubscribe((room_id,))
 			self.channels.remove(room_id)
+			channels = {
+				VarNames.EVENT: Actions.DELETE_MY_ROOM,
+				VarNames.ROOM_ID: room_id,
+				VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+				VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
+			}
+			self.ws_write(channels)
+		else:
+			self.ws_write({
+				{
+					VarNames.EVENT: Actions.USER_LEAVES_ROOM,
+					VarNames.ROOM_ID: room_id,
+					VarNames.USER_ID: message[VarNames.USER_ID],
+					VarNames.ROOM_USERS: message[VarNames.ROOM_USERS],
+					VarNames.HANDLER_NAME: HandlerNames.CHANNELS
+				}
+			})
+		return True
 
 	def process_get_messages(self, data):
 		"""
@@ -407,7 +577,7 @@ class MessagesHandler(MessagesCreator):
 		else:
 			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id)).order_by('-pk')[:count]
 		imv = do_db(get_message_images_videos, messages)
-		response = self.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video)
+		response = self.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video, data[VarNames.JS_MESSAGE_ID])
 		self.ws_write(response)
 
 
@@ -442,13 +612,13 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.ROOM_ID]
 		content = in_message.get(VarNames.CONTENT)
-		qued_id = in_message[VarNames.WEBRTC_QUED_ID]
+		js_id = in_message[VarNames.JS_MESSAGE_ID]
 		connection_id = id_generator(RedisPrefix.CONNECTION_ID_LENGTH)
 		# use list because sets dont have 1st element which is offerer
 		self.async_redis_publisher.hset(WEBRTC_CONNECTION, connection_id, self.id)
 		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
 		opponents_message = self.offer_webrtc(content, connection_id, room_id, in_message[VarNames.EVENT])
-		self_message = self.set_connection_id(qued_id, connection_id)
+		self_message = self.set_connection_id(js_id, connection_id)
 		self.ws_write(self_message)
 		self.logger.info('!! Offering a webrtc, connection_id %s', connection_id)
 		self.publish(opponents_message, room_id, True)
@@ -457,8 +627,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		connection_id = in_message[VarNames.CONNECTION_ID]
 		opponent_ws_id = in_message[VarNames.WEBRTC_OPPONENT_ID]
 		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
-		receiver_ws_status = self.sync_redis.shget(connection_id, opponent_ws_id)
-		if receiver_ws_status == WebRtcRedisStates.READY and self.id == sender_ws_id:
+		if sender_ws_id == self.id:
 			self.publish(self.retry_file(connection_id), opponent_ws_id)
 		else:
 			raise ValidationError("Invalid channel status.")
@@ -473,7 +642,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 			self.publish(self.reply_webrtc(
 				Actions.REPLY_FILE_CONNECTION,
 				connection_id,
-				HandlerNames.WEBRTC_TRANSFER,
+				HandlerNames.WEBRTC_TRANSFER.format(connection_id),
 				in_message[VarNames.CONTENT]
 			), sender_ws_id)
 		else:
@@ -502,8 +671,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 			))  # todo receiver should only accept proxy_webrtc from sender, sender can accept all
 		# I mean somebody if there're 3 ppl in 1 channel and first is initing transfer to 2nd and 3rd,
 		# 2nd guy can fraud 3rd guy webrtc traffic, which is allowed during the call, but not while transering file
-		in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
-		in_message[VarNames.HANDLER_NAME] = HandlerNames.PEER_CONNECTION
+		in_message[VarNames.HANDLER_NAME] = HandlerNames.PEER_CONNECTION.format(connection_id, self.id)
 		self.logger.debug(
 			"!! Forwarding message to channel %s, self %s, other status %s",
 			channel,
@@ -514,16 +682,19 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 
 	def close_file_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
+		opponent_id = in_message.get(VarNames.WEBRTC_OPPONENT_ID, None)
 		self_channel_status = self.sync_redis.shget(connection_id, self.id)
 		if not self_channel_status:
 			raise Exception("Access Denied")
 		if self_channel_status != WebRtcRedisStates.CLOSED:
 			sender_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
 			if sender_id == self.id:
-				self.close_file_sender(connection_id)
+				message = self.get_close_file_sender_message(connection_id)
+				self.async_redis_publisher.hset(connection_id, opponent_id, WebRtcRedisStates.CLOSED)
+				self.publish(message, opponent_id)
 			else:
 				self.close_file_receiver(connection_id, in_message, sender_id)
-			self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.CLOSED)
+				self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.CLOSED)
 
 	def close_call_connection(self, in_message):
 		self.send_call_answer(
@@ -548,18 +719,12 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		if not sender_status:
 			raise Exception("Access denied")
 		if sender_status != WebRtcRedisStates.CLOSED:
-			in_message[VarNames.WEBRTC_OPPONENT_ID] = self.id
-			in_message[VarNames.HANDLER_NAME] = HandlerNames.PEER_CONNECTION
-			self.publish(in_message, sender_id)
+			self.publish({
+				VarNames.HANDLER_NAME:  HandlerNames.PEER_CONNECTION.format(in_message[VarNames.CONNECTION_ID], self.id),
+				VarNames.EVENT: Actions.CLOSE_FILE_CONNECTION,
+				VarNames.CONTENT: in_message[VarNames.CONTENT]
+			}, sender_id)
 
-	def close_file_sender(self, connection_id):
-		values = self.sync_redis.shgetall(connection_id)
-		del values[self.id]
-		message = self.get_close_file_sender_message(connection_id)
-		for ws_id in values:
-			if values[ws_id] == WebRtcRedisStates.CLOSED:
-				continue
-			self.publish(message, ws_id)
 
 	def accept_file(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]

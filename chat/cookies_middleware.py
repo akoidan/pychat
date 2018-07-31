@@ -14,7 +14,7 @@ def create_id(user_id, random=None):
 	return "{:04d}:{}".format(user_id, random), random
 
 
-class UserCookieMiddleWare(object):
+class RandomMiddleware(object):
 	"""
 	Middleware to set user cookie
 	If user is authenticated and there is no cookie, set the cookie,

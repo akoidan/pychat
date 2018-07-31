@@ -1,0 +1,10 @@
+{
+  "WS_API_URL": "wss://localhost:8889",
+  "STATIC_API_URL": "https://localhost:8001",
+  "XHR_API_URL": "https://localhost:8001/api",
+  "IS_DEBUG": true,
+  "GOOGLE_OAUTH_2_CLIENT_ID" : false,
+  "FACEBOOK_APP_ID": false,
+  "MANIFEST": "/manifest.json",
+  "RECAPTCHA_PUBLIC_KEY": false
+}

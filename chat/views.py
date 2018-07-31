@@ -4,13 +4,14 @@ import json
 import logging
 import os
 
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, SESSION_KEY, BACKEND_SESSION_KEY, HASH_SESSION_KEY
 from django.contrib.auth import login as djangologin
 from django.contrib.auth import logout as djangologout
 from django.contrib.auth.hashers import make_password
 from django.core.mail import mail_admins
 
 from chat.templatetags.md5url import md5url
+from chat.tornado.constants import RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
 
 try:
@@ -26,11 +27,11 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.http import require_http_methods
 from django.views.generic import View
-from chat import utils
+from chat import utils, global_redis
 from chat.decorators import login_required_no_redirect, validation
 from chat.forms import UserProfileForm, UserProfileReadOnlyForm
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
-	SubscriptionMessages, RoomUsers, Room, UserJoinedInfo, UploadedFile
+	SubscriptionMessages, RoomUsers, Room, UserJoinedInfo, UploadedFile, User
 from django.conf import settings
 from chat.utils import hide_fields, check_user, check_password, check_email, extract_photo, send_sign_up_email, \
 	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip, \
@@ -43,6 +44,7 @@ GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
 GOOGLE_OAUTH_2_JS_URL = getattr(settings, "GOOGLE_OAUTH_2_JS_URL", None)
 FACEBOOK_APP_ID = getattr(settings, "FACEBOOK_APP_ID", None)
 FACEBOOK_JS_URL = getattr(settings, "FACEBOOK_JS_URL", None)
+
 
 # TODO doesn't work
 def handler404(request):
@@ -60,7 +62,7 @@ def validate_email(request):
 
 
 @require_http_methods(['POST'])
-@login_required_no_redirect(False)
+@login_required_no_redirect()
 @transaction.atomic
 def upload_file(request):
 	"""
@@ -75,9 +77,27 @@ def upload_file(request):
 	return HttpResponse(json.dumps(res), content_type='application/json')
 
 
+
+@require_http_methods(['POST'])
+@login_required_no_redirect()
+@validation
+def upload_profile_image(request):
+	"""
+	POST only, validates email during registration
+	"""
+
+	up = UserProfile(photo=request.FILES['file'], id=request.user.id)
+	up.save(update_fields=('photo',))
+	url = up.photo.url
+	message = json.dumps(MessagesCreator.set_profile_image(url))
+	channel = RedisPrefix.generate_user(request.user.id)
+	global_redis.sync_redis.publish(channel, message)
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+
 @require_http_methods(['POST'])
 @login_required_no_redirect(False)
 @transaction.atomic
+@validation
 def save_room_settings(request):
 	"""
 	POST only, validates email during registration
@@ -90,7 +110,7 @@ def save_room_settings(request):
 		notifications=request.POST['notifications'] == 'true',
 	)
 	if updated != 1:
-		raise PermissionDenied
+		raise ValidationError("You don't have access to this room")
 	if room_name is not None:
 		room_name = room_name.strip()
 		if room_name and int(room_id) != settings.ALL_ROOM_ID:
@@ -218,6 +238,7 @@ def home(request):
 
 
 @login_required_no_redirect(True)
+@require_http_methods(['POST'])
 def logout(request):
 	"""
 	POST. Logs out into system.
@@ -230,20 +251,21 @@ def logout(request):
 
 
 @require_http_methods(['POST'])
+@validation
 def auth(request):
 	"""
 	Logs in into system.
 	"""
 	username = request.POST.get('username')
 	password = request.POST.get('password')
+	logger.debug('Auth request %s', hide_fields(request.POST, ('password',)))
 	user = authenticate(username=username, password=password)
-	if user is not None:
-		djangologin(request, user)
-		message = settings.VALIDATION_IS_OK
-	else:
-		message = 'Login or password is wrong'
-	logger.debug('Auth request %s ; Response: %s', hide_fields(request.POST, ('password',)), message)
-	return HttpResponse(message, content_type='text/plain')
+	if user is None:
+		raise ValidationError('login or password is wrong');
+	djangologin(request, user)
+	request.session.save()
+	return HttpResponse(request.session.session_key, content_type='text/plain')
+
 
 
 def send_restore_password(request):
@@ -259,7 +281,10 @@ def send_restore_password(request):
 			raise ValidationError("You didn't specify email address for this user")
 		verification = Verification(type_enum=Verification.TypeChoices.password, user_id=user_profile.id)
 		verification.save()
-		send_reset_password_email(request, user_profile, verification)
+		try:
+			send_reset_password_email(request, user_profile, verification)
+		except Exception as e:
+			raise ValidationError('Unable to send email: ' + str(e))
 		message = settings.VALIDATION_IS_OK
 		logger.debug('Verification email has been send for token %s to user %s(id=%d)',
 				verification.token, user_profile.username, user_profile.id)
@@ -369,13 +394,9 @@ def confirm_email(request):
 def show_profile(request, profile_id):
 	try:
 		user_profile = UserProfile.objects.get(pk=profile_id)
-		form = UserProfileReadOnlyForm(instance=user_profile)
-		form.username = user_profile.username
-		return render_to_response(
-			'show_profile.html',
-			{'form': form},
-			context_instance=RequestContext(request)
-		)
+		profile = MessagesCreator.get_user_profile(user_profile)
+		profile['image'] = user_profile.photo.url if user_profile.photo.url else None
+		return HttpResponse(json.dumps(profile), content_type='application/json')
 	except ObjectDoesNotExist:
 		raise Http404
 
@@ -405,92 +426,25 @@ def report_issue(request):
 	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 
-class ProfileView(View):
-
-	@login_required_no_redirect()
-	def get(self, request):
-		user_profile = UserProfile.objects.get(pk=request.user.id)
-		form = UserProfileForm(instance=user_profile)
-		c = csrf(request)
-		c['form'] = form
-		c['date_format'] = settings.DATE_INPUT_FORMATS_JS
-		return render_to_response('change_profile.html', c, context_instance=RequestContext(request))
-
-
-	@transaction.atomic
-	@login_required_no_redirect()
-	@validation # should follow after transaciton.atomic, thus ValidationError doesn't rollback
-	def post(self, request):
-		logger.info('Saving profile: %s', hide_fields(request.POST, ("base64_image", ), huge=True))
-		image_base64 = request.POST.get('base64_image')
-		new_email = request.POST['email']
-		passwd = request.POST['password']
-		username = request.POST['username']
-		user_profile = UserProfile.objects.get(pk=request.user.id)
-		if new_email:
-			utils.validate_email(new_email)
-		utils.validate_user(username)
-		if image_base64:
-			image = extract_photo(image_base64)
-			request.FILES['photo'] = image
-		if passwd:
-			self.change_password(passwd, request)
-		form = UserProfileForm(request.POST, request.FILES, instance=user_profile)
-		if form.is_valid():
-			if not passwd:
-				form.instance.password = form.initial['password']
-			if new_email != form.initial['email']:
-				self.send_email_if_needed(form, new_email, request, user_profile)
-			profile = form.save()
-			if passwd and form.initial['email']:
-				send_password_changed(request, form.initial['email'])
-			response = profile. photo.url if 'photo' in  request.FILES else settings.VALIDATION_IS_OK
-		else:
-			response = form.errors
-		return HttpResponse(response, content_type='text/plain')
-
-	@staticmethod
-	def change_password(passwd, request):
-		if request.user.password:
-			is_valid = authenticate(username=request.user.username, password=request.POST['old_password'])
-			if not is_valid:
-				raise ValidationError("Invalid old password")
-		utils.check_password(passwd)
-		request.POST['password'] = make_password(passwd)
-
-	@staticmethod
-	def send_email_if_needed(form, new_email, request, user_profile):
-		if form.initial['email'] and form.instance.email_verification and form.instance.email_verification.verified:
-			verification = Verification(
-				type_enum=Verification.TypeChoices.email,
-				user_id=user_profile.id,
-				email=new_email
-			)
-			verification.save()
-			send_email_change(request, request.user.username, form.initial['email'], verification, new_email)
-			raise ValidationError(
-				"In order to change an email please confirm it from you current address. We send you an verification email to {}.".format(
-					form.initial['email']))
-		if new_email:
-			new_ver = send_new_email_ver(request, request.user, new_email)
-			form.instance.email_verification = new_ver
+@login_required_no_redirect()
+@validation
+def profile_change_password(request):
+	passwd = request.POST['password']
+	old_password = request.POST['old_password']
+	if request.user.password:
+		is_valid = authenticate(username=request.user.username, password=old_password)
+		if not is_valid:
+			raise ValidationError("Invalid old password")
+	utils.check_password(passwd)
+	hash_pass = make_password(passwd)
+	User.objects.filter(id=request.user.id).update(
+		password=hash_pass
+	)
+	send_password_changed(request, request.user.email)
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
 
 class RegisterView(View):
-
-	def get(self, request):
-		logger.debug(
-			'Rendering register page with captcha site key %s and oauth key %s',
-			RECAPTCHA_PUBLIC_KEY, GOOGLE_OAUTH_2_CLIENT_ID
-		)
-		c = csrf(request)
-		c['captcha_key'] = RECAPTCHA_PUBLIC_KEY
-		c['captcha_url'] = RECAPTHCA_SITE_URL
-		c['oauth_url'] = GOOGLE_OAUTH_2_JS_URL
-		c['oauth_token'] = GOOGLE_OAUTH_2_CLIENT_ID
-		c['fb_app_id'] = FACEBOOK_APP_ID
-		c['fb_js_url'] = FACEBOOK_JS_URL
-		return render_to_response("register.html", c, context_instance=RequestContext(request))
 
 	@transaction.atomic
 	@validation
@@ -509,4 +463,5 @@ class RegisterView(View):
 		if email:
 			send_sign_up_email(user_profile, request.get_host(), request)
 		djangologin(request, auth_user)
-		return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
+		request.session.save()
+		return HttpResponse(request.session.session_key, content_type='text/plain')

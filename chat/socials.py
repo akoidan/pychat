@@ -18,7 +18,6 @@ from chat.settings import VALIDATION_IS_OK, AUTHENTICATION_BACKENDS
 from chat.utils import create_user_model, check_user
 
 GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
-GOOGLE_OAUTH_2_HOST = getattr(settings, "GOOGLE_OAUTH_2_HOST", None)
 FACEBOOK_ACCESS_TOKEN = getattr(settings, "FACEBOOK_ACCESS_TOKEN", None)
 
 logger = logging.getLogger(__name__)
@@ -84,7 +83,9 @@ class SocialAuth(View):
 			user_profile = self.generate_user_profile(token)
 			user_profile.backend = AUTHENTICATION_BACKENDS[0]
 			djangologin(request, user_profile)
-			return HttpResponse(content=VALIDATION_IS_OK, content_type='text/plain')
+			request.session.save()
+
+			return HttpResponse(content=request.session.session_key, content_type='text/plain')
 		except ValidationError as e:
 			logger.warn("Unable to proceed %s sing in because %s", self.instance, e.message)
 			return HttpResponse(content="Unable to sign in via {} because '{}'".format(self.instance, e.message), content_type='text/plain')
@@ -109,8 +110,6 @@ class GoogleAuth(SocialAuth):
 				raise ValidationError("Unrecognized client.")
 			if response['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
 				raise ValidationError("Wrong issuer.")
-			if GOOGLE_OAUTH_2_HOST is not None and response['hd'] != GOOGLE_OAUTH_2_HOST:
-				raise ValidationError("Wrong hosted domain.")
 			if response['email'] is None:
 				raise ValidationError("Google didn't provide an email")
 			return response

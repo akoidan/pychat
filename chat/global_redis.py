@@ -7,7 +7,7 @@ import redis
 import tornadoredis
 
 from chat.models import get_milliseconds
-from chat.settings import ALL_REDIS_ROOM, REDIS_PORT, REDIS_HOST
+from chat.settings import ALL_REDIS_ROOM, REDIS_PORT, REDIS_HOST, REDIS_DB
 from chat.settings_base import ALL_ROOM_ID
 from chat.tornado.constants import RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
@@ -85,11 +85,11 @@ def ping_online():
 
 
 # # global connection to read synchronously
-sync_redis = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT)
+sync_redis = redis.StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=REDIS_DB)
 patch_hget(sync_redis)
 patch_hgetall(sync_redis)
 patch_smembers(sync_redis)
 # patch(sync_redis)
 # Redis connection cannot be shared between publishers and subscribers.
-async_redis_publisher = tornadoredis.Client(host=REDIS_HOST, port=REDIS_PORT)
+async_redis_publisher = tornadoredis.Client(host=REDIS_HOST, port=REDIS_PORT, selected_db=REDIS_DB)
 patch_read(async_redis_publisher)

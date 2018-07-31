@@ -15,7 +15,7 @@ from tornado.web import asynchronous
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
 from chat.cookies_middleware import create_id
-from chat.models import User, Message, UserJoinedInfo, IpAddress, Room, RoomUsers
+from chat.models import User, Message, UserJoinedInfo, IpAddress, Room, RoomUsers, UserProfile
 from chat.py2_3 import str_type, urlparse
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
@@ -27,6 +27,10 @@ from chat.utils import execute_query, do_db, \
 sessionStore = SessionStore()
 
 parent_logger = logging.getLogger(__name__)
+
+
+class Error401(Exception):
+	pass
 
 
 class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
@@ -57,6 +61,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		pass
 
 	def on_message(self, json_message):
+		message = None
 		try:
 			if not self.connected:
 				raise ValidationError('Skipping message %s, as websocket is not initialized yet' % json_message)
@@ -72,7 +77,9 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				raise ValidationError('Access denied for channel {}. Allowed channels: {}'.format(channel, self.channels))
 			self.process_ws_message[message[VarNames.EVENT]](message)
 		except ValidationError as e:
-			error_message = self.default(str(e.message), Actions.GROWL_MESSAGE, HandlerNames.GROWL)
+			error_message = self.default(str(e.message), Actions.GROWL_MESSAGE, HandlerNames.WS)
+			if message:
+				error_message[VarNames.JS_MESSAGE_ID] = message.get(VarNames.JS_MESSAGE_ID, None)
 			self.ws_write(error_message)
 
 	def on_close(self):
@@ -85,7 +92,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		is_online, online = self.get_online_and_status_from_redis()
 		if self.connected:
 			if not is_online:
-				message = self.room_online(online, Actions.LOGOUT)
+				message = self.room_online_logout(online)
 				self.publish(message, settings.ALL_ROOM_ID)
 			res = do_db(execute_query, settings.UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
@@ -114,18 +121,22 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		"""
 		conn_arg = self.get_argument('id', None)
 		self.id, random = create_id(self.user_id, conn_arg)
-		if random != conn_arg:
-			self.restored_connection = False
-			self.ws_write(self.set_ws_id(random, self.id))
-		else:
-			self.restored_connection = True
+		self.restored_connection =  random == conn_arg
+		self.restored_connection = False
+		self.save_ip()
 
 	def open(self):
-		session_key = self.get_cookie(settings.SESSION_COOKIE_NAME)
-		if sessionStore.exists(session_key):
-			self.ip = self.get_client_ip()
+		session_key = self.get_argument('sessionId', None)
+		try:
+			if session_key is None:
+				raise Error401()
 			session = SessionStore(session_key)
-			self.user_id = int(session["_auth_user_id"])
+			try:
+				self.user_id = int(session["_auth_user_id"])
+			except:
+				raise Error401()
+			self.ip = self.get_client_ip()
+			user_db = do_db(UserProfile.objects.get, id=self.user_id)
 			self.generate_self_id()
 			self._logger = logging.LoggerAdapter(parent_logger, {
 				'id': self.id,
@@ -137,43 +148,48 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			self.async_redis_publisher.sadd(RedisPrefix.ONLINE_VAR, self.id)
 			# since we add user to online first, latest trigger will always show correct online
 			was_online, online = self.get_online_and_status_from_redis()
-			user_db = do_db(User.objects.get, id=self.user_id)
-			self.sender_name = user_db.username
-			self.sex = user_db.sex_str
-			user_rooms1 = Room.objects.filter(users__id=self.user_id, disabled=False)\
+			user_rooms_query = Room.objects.filter(users__id=self.user_id, disabled=False) \
 				.values('id', 'name', 'roomusers__notifications', 'roomusers__volume')
-			user_rooms = MessagesCreator.create_user_rooms(user_rooms1)
-			room_ids = [room_id for room_id in user_rooms]
+			room_users = [{
+				VarNames.ROOM_ID: room['id'],
+				VarNames.ROOM_NAME: room['name'],
+				VarNames.NOTIFICATIONS: room['roomusers__notifications'],
+				VarNames.VOLUME: room['roomusers__volume'],
+				VarNames.ROOM_USERS: []
+			} for room in user_rooms_query]
+			user_rooms_dict = {room[VarNames.ROOM_ID]: room for room in room_users}
+			room_ids = [room_id[VarNames.ROOM_ID] for room_id in room_users]
 			rooms_users = RoomUsers.objects.filter(room_id__in=room_ids).values('user_id', 'room_id')
 			for ru in rooms_users:
-				user_rooms[ru['room_id']][VarNames.ROOM_USERS].append(ru['user_id'])
+				user_rooms_dict[ru['room_id']][VarNames.ROOM_USERS].append(ru['user_id'])
 			# get all missed messages
 			self.channels = room_ids  # py2 doesn't support clear()
 			self.channels.append(self.channel)
 			self.channels.append(self.id)
 			self.listen(self.channels)
-			off_messages, history = self.get_offline_messages(user_rooms, was_online, self.get_argument('history', False))
-			for room_id in user_rooms:
+			off_messages, history = self.get_offline_messages(room_users, was_online, self.get_argument('history', False))
+			for room in room_users:
+				room_id = room[VarNames.ROOM_ID]
 				h = history.get(room_id)
 				o = off_messages.get(room_id)
 				if h:
-					user_rooms[room_id][VarNames.LOAD_MESSAGES_HISTORY] = h
+					room[VarNames.LOAD_MESSAGES_HISTORY] = h
 				if o:
-					user_rooms[room_id][VarNames.LOAD_MESSAGES_OFFLINE] = o
-			user_dict = {}
-			for user in User.objects.values('id', 'username', 'sex'):
-				user_dict[user['id']] = RedisPrefix.set_js_user_structure(user['username'], user['sex'])
+					room[VarNames.LOAD_MESSAGES_OFFLINE] = o
+			user_dict = [RedisPrefix.set_js_user_structure(user['id'], user['username'], user['sex'])
+					for user in User.objects.values('id', 'username', 'sex')]
 			if self.user_id not in online:
 				online.append(self.user_id)
-			self.ws_write(self.set_room(user_rooms, user_dict, online))
+
+			self.ws_write(self.set_room(room_users, user_dict, online, user_db))
 			if not was_online:  # if a new tab has been opened
-				online_user_names_mes = self.room_online(online, Actions.LOGIN)
+				online_user_names_mes = self.room_online_login(online, user_db.username, user_db.sex_str)
 				self.logger.info('!! First tab, sending refresh online for all')
 				self.publish(online_user_names_mes, settings.ALL_ROOM_ID)
-			self.logger.info("!! User %s subscribes for %s", self.sender_name, self.channels)
+			self.logger.info("!! User %s subscribes for %s", self.user_id, self.channels)
 			self.connected = True
-		else:
-			self.logger.warning('!! Session key %s has been rejected', str(session_key))
+		except Error401:
+			self.logger.warning('!! Session key %s has been rejected' % session_key)
 			self.close(403, "Session key %s has been rejected" % session_key)
 
 	def get_offline_messages(self, user_rooms, was_online, with_history):

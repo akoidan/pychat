@@ -226,6 +226,8 @@ class Message(models.Model):
 class UploadedFile(models.Model):
 	class UploadedFileChoices(Enum):
 		video = 'v'
+		media_record= 'm'
+		audio_record = 'a'
 		image = 'i'
 		preview = 'p'
 		issue = 's'

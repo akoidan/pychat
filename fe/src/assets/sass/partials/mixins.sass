@@ -1,3 +1,5 @@
+@import "./variables"
+
 @mixin border-radius($radius...)
 	-webkit-border-radius: $radius
 	-moz-border-radius: $radius
@@ -17,6 +19,9 @@
 	transition: $text
 
 @mixin spinner($size, $color)
+	@-webkit-keyframes pychat-rotate
+		to
+			-webkit-transform: rotate(360deg)
 	width: $size * 7
 	height: $size * 7
 	-webkit-animation: pychat-rotate 1s infinite linear
@@ -42,6 +47,8 @@
 	outline: none
 	color: $textColor
 	border: 1px solid transparent
+	&:disabled
+		cursor: not-allowed
 	&:not(:hover):not(:active)
 		border-top: 1px solid lighten($backgroundColor, 20%)
 		border-left: 1px solid lighten($backgroundColor, 5%)
@@ -49,14 +56,14 @@
 		border-right: 1px solid darken($backgroundColor, 25%)
 		@include linear-gradient-values($backgroundColor 0%, $bgEnd 100%)
 	&:hover:not(:active)
-		cursor: pointer
 		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19)
 		color: lighten($textColor, 8%)
 		//background-color: desaturate(darken($backgroundColor, 5%), 5%)
 		background-color: darken($backgroundColor, 8%)
+		&:not(:disabled)
+			cursor: pointer
 	&:active
 		border: 1px solid transparent
-		cursor: pointer
 		border-top: 1px solid darken($backgroundColor, 25%)
 		border-left: 1px solid darken($backgroundColor, 25%)
 		border-right: 1px solid transparent
@@ -64,6 +71,8 @@
 		@include box-shadow(1px 1px 1px rgba(255, 255, 255, 0.2))
 		color: lighten($textColor, 15%)
 		@include linear-gradient-values(darken($backgroundColor, 8.7%) 0%, darken($backgroundColor, 1.7%) 100%)
+		&:not(:disabled)
+			cursor: pointer
 	padding: $padding-vert $padding-hori
 	&:active:not([disabled])
 		@include drop-padding($padding-vert, $padding-hori)
@@ -203,3 +212,24 @@
 	scrollbar-3dlight-color: $ie-3dlight
 	scrollbar-highlight-color: $ie-highlight
 	scrollbar-arrow-color: $ie-arrow
+
+
+@mixin lor-button-style
+	color: $grayish-green
+	outline: none
+	border-radius: 3px
+	border: 1px solid transparent
+	&:not(:hover)
+		background-color: rgb(62, 65, 58)
+	&:hover
+		color: #000000
+		background: linear-gradient($grayish-green, #abbdab) repeat scroll 0 0 transparent
+		@include box-shadow($default-box-shadow)
+
+@mixin color-lor-submit
+	@include lor-button-style
+	padding: 10px 12px
+	font-size: 18px
+@mixin color-lor-btn
+	@include lor-button-style
+	padding: 6px 12px

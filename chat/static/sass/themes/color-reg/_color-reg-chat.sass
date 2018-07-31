@@ -2,12 +2,6 @@
 @import "../../partials/variables"
 
 .color-reg
-	.message-others .message-header
-		color: #729fcf
-	.message-self .message-header
-		color: #e29722
-	.message-system .message-header
-		color: #84B7C0
 
 	.icon-cancel:hover
 		color: #440000
@@ -18,14 +12,9 @@
 	//	&.active-user
 	//		background-color: #181818
 
-	.context-menu
-		@include box-shadow(3px 3px 3px rgba(6, 3, 8, 0.77))
-		@include linear-gradient(#214341 , #193237)
-		li:hover
-			background-color: #0F201F
 
-	.activeTab
-		color: #C6B955
+
+
 
 	.window
 		@include linear-gradient(#1e3348, #0f1922)
@@ -150,15 +139,6 @@
 		// end call container
 
 
-	.icon-man, .icon-girl, .icon-user-secret
-		color: #1f772c !important
-	.offline
-		.icon-man, .icon-girl, .icon-user-secret
-			color: #b32c1c !important
-
-	#chat-room-users-wrapper > span
-		background-color: #171717
-
 	#directUserTable,
 	#rooms
 		.icon-cancel-circled-outline
@@ -166,22 +146,3 @@
 				opacity: 1
 				color: #ff5e5c
 
-	.active-room
-		background-color: rgba(33, 158, 147, 0.45)
-
-	#chat-user-table li
-		&.offline:before
-			color: #801615
-		&:before
-			color: #28671d
-
-	#onlineStatus
-		padding: 0 10px
-		&.offline
-			color: #ee2d2d
-		&.online
-			color: #53a045
-
-	@media screen and (max-width: $collapse-width)
-		#chat-room-users-wrapper
-			border-bottom-color: $mostly-black

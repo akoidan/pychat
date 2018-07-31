@@ -1,0 +1,7 @@
+{
+  "name": "PyChat Push Notification",
+  "short_name": "PyPush",
+  "start_url": "/",
+  "display": "standalone",
+  "gcm_sender_id": "620421656154"
+}

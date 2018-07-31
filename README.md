@@ -2,8 +2,6 @@
 
 [![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/pychat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Code Health](https://landscape.io/github/Deathangel908/pychat/master/landscape.svg?style=flat)](https://landscape.io/github/Deathangel908/pychat/master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)
 
-# COMING SOON [VuePychat](https://github.com/Deathangel908/pychat/tree/cordova) with electron(windows/linux/macos)/cordova(android/ios) clients.
-
 This is free web (browser) chat, that features:
  - Send instant text messages via websockets.
  - Send: images, smiles, anchors, embedded youtube, [giphy](https://giphy.com/), code [highlight](https://highlightjs.org/)
@@ -15,6 +13,8 @@ This is free web (browser) chat, that features:
  - Send offline messages with Firebase push notifications
  - Responsive interface (bs like)+ themes
  - Admin interface with django-admin
+
+## Live demo: [pychat.org](http://pychat.org/)
 
 # Table of contents
   * [Breaf description](#brief-description)
@@ -192,7 +192,6 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
-* Ability to select language to hightlight js
 * If self assigned certificate was used, mb add user an option to click on iframe or smth?
 * Giphy: The gif-picture won't change after editing and leaving it's name. But there are tons of other gifs under every tag. 
 * If user A was online in Brower BA and he didn't have any history, when he joins online from browser B and send the message, it won't appear on browser BA when he opens ba.

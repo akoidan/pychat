@@ -8,279 +8,16 @@
 @import "partials/variables"
 @import "partials/powered_by_giphy"
 @import "partials/youtube_player"
-.message-header
-	font-weight: bold
 
 
-%hovered-user-room
-	&:hover:not(.active-room)
-		cursor: pointer
-		background-color:  rgba(135, 135, 135, 0.3)
-		opacity: 1
-		i
-			opacity: inherit
-
-@mixin fix-user-icon-top-position()
-	i:before
-		transform: translate(0, 3px)
-
-.search
-	padding: 5px
-	> *
-		display: inline-block
-	input
-		width: calc(100% - 10px)
-	&.loading
-		.search-loading
-			margin-left: 5px
-			margin-bottom: -5px
-			margin-top: -3px
-			@include spinner(3px, white)
-		input
-			width: calc(100% - 40px)
-
-	.search_result
-		display: flex
-		justify-content: center
-		padding-top: 10px
-
-
-fieldset
-	border-top: 1px solid #e8e8e8
-	border-bottom: none
-	border-left: none
-	border-right: none
-	display: block
-	text-align: center
-	padding: 0
-	margin-left: 3px
-	margin-right: 10px
-
-	legend
-		padding: 0 10px
-		font-weight: bold
-
-#userMessageWrapper
-	padding: 8px
-	width: calc(100% - 16px)
-
-	@mixin chat-icon
-		display: inline
-		float: right
-		position: absolute
-		height: 16px
-		top: 13px
-	.icon-smile
-		@include chat-icon
-		right: 10px
-	#imgInputIcon
-		@include chat-icon
-		left: 15px
-
-
-#wrapper
-	@include flex(1)
-	@include display-flex
-	min-height: 0
-
-#chatBoxHolder
-	@include display-flex
-	@include flex-direction(column)
-	width: 100%
-
-.chatbox
-	overflow-y: scroll
-	height: 100%
-	min-height: 50px
-	padding-left: 8px
-	word-wrap: break-word
-	font-size: 18px
-	@include flex(1) // Fix Safari's 0 height
-
-	.quote
-		border-left: 5px solid #4d4d4d
-		padding-left: 5px
-		margin: 5px
-		span
-			font-weight: bold
-
-	&:focus
-		outline: none
-	a:hover
-		text-decoration: underline
-	&.display-search-only
-		>:not(.filter-search)
-			display: none
-
-	pre
-		margin: 10px
-		max-width: calc(100% - 15px)
-		overflow-x: auto
-
-	@mixin margin-img
-		margin: 5px 0 0 15px
-	@mixin margin-img-def
-		max-width: calc(100% - 25px)
-		max-height: 400px
-		display: block
-
-	.video-player-ready
-		border: none
-		@include margin-img-def
-		width: 500px
-		height: 350px
-		@include margin-img
-
-	%img-play
-		@extend %user-select-none
-		display: block
-		@include margin-img
-		> div
-			position: relative
-			display: inline-block
-			zoom: 1
-			&:not(:hover)
-				-webkit-filter: brightness(90%)
-
-			img
-				@include margin-img-def
-			.icon-youtube-play
-				position: absolute
-				z-index: 13
-				top: 50%
-				left: 50%
-				margin-top: -50px
-				margin-left: -55px
-				font-size: 50px
-				color: black
-				height: 100px
-				width: 100px
-				@media screen and (max-width: $collapse-width)
-					margin-top: -35px
-					margin-left: -45px
-					height: 70px
-					width: 70px
-	.youtube-player
-		@extend %img-play
-	.video-player
-		@extend %img-play
-
-	.giphy
-		position: relative
-		img
-			@include margin-img-def
-			@include margin-img
-		&:not(:hover) .giphy_hover
-			display: none
-		.giphy_hover
-			bottom: 5px
-			position: absolute
-			left: 20px
-			width: 100px
-			height: 36px
-
-	.B4j2ContentEditableImg
-		@include margin-img-def
-		@include margin-img
-	p
-		margin-top: 0.8em
-		margin-bottom: 0.8em
 
 .minimizedList
 	min-width: 200px
 	min-height: 20px
 	padding: 5px
 
-#wrapper
-	position: relative
 
-#chat-room-users-wrapper
-	float: right
-	font-size: 24px
-	overflow-y: auto
-	overflow-x: hidden
-	position: relative
-	width: 300px
-	ul
-		margin-top: 5px
-		margin-bottom: 5px
-	> *
-		display: block
 
-	#channelsStateText, #directStateText, #usersStateText
-		font-size: 13px
-		font-weight: bold
-		text-transform: uppercase
-		vertical-align: middle
-
-	.icon-angle-circled-down, .icon-angle-circled-up
-		font-size: 15px
-
-	.icon-plus-squared, .icon-user-plus
-		float: right
-		margin-top: 7px
-		margin-right: 5px
-
-	> span
-		@extend %user-select-none
-		border-radius: 2px
-
-	#usersStateText:hover
-		cursor: pointer
-		color: #f1f1f1
-
-.removed-message
-	.message-text-style
-		color: #5d5d5d
-		text-decoration: line-through
-
-.context-menu
-	z-index: 3
-	font-size: 16px
-	border: $user-context-border
-	li
-		padding: 2px 5px
-		&:hover
-			cursor: pointer
-			border-radius: 3px
-
-#m2Message
-	@extend .context-menu
-	border-radius: 3px
-	position: fixed
-
-nav
-	display: flex
-	position: relative
-	flex-direction: row
-	overflow: hidden
-	max-height: 30px
-	transition: max-height 0.4s ease-out
-	> *
-		order: 2
-	#navMenu
-		margin-left: auto
-		.icon-menu
-			display: none
-	@media screen and (min-width: $collapse-width) and (max-width: $collapse-no-mtext)
-		.mText
-			display: none !important
-	@media screen and (max-width: $collapse-width)
-		flex-direction: column
-		> *
-			margin-right: auto !important
-		#navMenu
-			position: relative
-			width: 100%
-			margin-bottom: 10px
-			order: 1
-			.icon-menu
-				display: inline-block
-				position: absolute
-				top: 0
-				right: 5px
-		&.expanded
-			max-height: $collapse-height
 
 #user-context-menu
 	@extend .context-menu
@@ -309,30 +46,6 @@ nav
 	transition: 0.3s
 	transition-property: background-color, border
 
-#chat-user-table > ul,
-ul#directUserTable
-	display: flex
-	flex-direction: column
-	li:not(.offline)
-		order: 1
-	li.offline
-		order: 2
-#chat-user-table
-	margin: 5px 0
-	li
-		border: 1px solid transparent
-		width: 100%
-		@include ellipsis
-		border-radius: 3px
-		[class^='icon-']
-			opacity: 1
-		@include fix-user-icon-top-position
-		i:hover
-			cursor: inherit
-
-	&.hideOffline li
-		&.offline
-			display: none
 
 .iconColorPicker
 	display: inline-block
@@ -340,153 +53,8 @@ ul#directUserTable
 	height: 20px
 	border: 1px solid #8d8d8d
 
-.bottomTools
-	padding-top: 7px
-	.paintXYdimens
-		float: right
-		font-size: 12px
-		position: relative
-		padding: 5px 10px
-		display: inline-block
-		> *
-			display: block !important
-	%hideEl
-		display: inline-block
-		vertical-align: top
-		input[type=text]
-			width: 30px
-			padding: 5px
-			vertical-align: top
-		> span
-			vertical-align: top
-			display: inline-block
-			padding-top: 3px
-		> input
-			margin-right: 0
-		div
-			display: inline-block
-			overflow: hidden
-			width: 0
-			@include transition(width 0.5s)
-		&:hover div
-			width: 120px
 
-	margin-left: 24px
-	height: 30px
 
-	#paintFont
-		@extend %hideEl
-		select
-			display: inline-block
-			text-decoration: none
-			text-overflow: ellipsis
-			overflow: hidden
-			white-space: nowrap
-			width: 120px
-			font-size: 14px
-			height: 25px
-			border: 1px solid grey
-
-	#paintOpacity, #paintFillOpacity
-		@extend %hideEl
-
-	#paintRadius
-		@extend %hideEl
-
-	#paintApplyText
-		display: inline-block
-
-	#paintColor, #paintColorFill
-		@extend %hideEl
-		input[type=color]
-			-webkit-appearance: none
-			padding: 0
-			border: 1px solid grey
-			border-radius: 1px
-			height: 25px
-			width: 25px
-			&::-webkit-color-swatch-wrapper
-				padding: 0
-			&::-webkit-color-swatch
-				border: none
-
-.settingsContainer
-	width: 200px
-	margin: auto
-	.callInfo
-		padding-left: 20px
-		display: block
-	.playTestSound
-		color: grey
-		display: block
-		font-size: 12px
-		text-align: left
-		padding-left: 10px
-		&:hover
-			color: #d7d7d7
-			cursor: pointer
-	td
-		position: relative
-		padding: 3px
-		select
-			width: 200px
-			padding-left: 30px
-		[class^='icon-']
-			position: absolute
-			top: 7px
-			left: 5px
-			color: #24768e !important
-
-.toolsAndCanvas
-	display: flex
-	$two-columns-painter: 600px
-	#painterTools
-		display: flex
-		margin-left: -5px
-		flex-direction: column
-		height: fit-content
-		*
-			display: flex
-			padding: 5px 5px 5px 0
-		@media screen and (max-height: $two-columns-painter)
-			width: 60px
-			flex-direction: row
-			flex-wrap: wrap
-	.canvasWrapper
-		position: relative
-		overflow: auto
-		// select none prevent paste event  https://stackoverflow.com/questions/31207253/onpaste-paste-event-not-firing-for-table-on-first-few-attempts
-		//@extend %user-select-none
-		background-color: #313131
-		max-height: calc(100vh - 95px)
-		max-width: calc(100vw - 60px)
-		@media screen and (max-height: $two-columns-painter)
-			max-width: calc(100vw - 90px)
-		border: 1px solid transparent
-		//border: 1px solid #697075
-		#painter
-			touch-action: none
-		canvas
-			$c1: #cacacc
-			$c2: transparent
-			@extend %user-select-none
-			background-color: #868686
-			background-image: -moz-linear-gradient(45deg, $c1 25%, $c2 25%), -moz-linear-gradient(-45deg, $c1 25%, $c2 25%), -moz-linear-gradient(45deg, $c2 75%, $c1 75%), -moz-linear-gradient(-45deg, $c2 75%, $c1 75%)
-			background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, $c1), color-stop(.25, $c2)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.25, $c1), color-stop(.25, $c2)), -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.75, $c2), color-stop(.75, $c1)), -webkit-gradient(linear, 0 0, 100% 100%, color-stop(.75, $c2), color-stop(.75, $c1))
-			$width: 50px
-			$h_width: $width/2
-			-moz-background-size: $width $width
-			background-size: $width $width
-			-webkit-background-size: $width $width /* override value for shitty webkit */
-
-			background-position: 0 0, $h_width 0, $h_width -#{$h_width}, 0px $h_width
-		.text
-			position: absolute
-			border: 1px dashed
-			width: auto
-			min-width: 5px
-			word-wrap: normal
-			padding: 0 1px
 
 .mobile
 	#painterTools
@@ -500,13 +68,6 @@ ul#directUserTable
 	&.disabled
 		color: #616161
 
-#canvasResize
-	cursor: se-resize
-	position: absolute
-	bottom: -5px
-	right: -5px
-	width: 10px
-	height: 10px
 
 .icon-cancel
 	position: absolute
@@ -579,20 +140,7 @@ ul#directUserTable
 			.icon-cog
 				display: inline
 
-#rooms li
-	padding-left: 7px
 
-#rooms, #directUserTable, #chat-user-table > ul
-	$padding: 2px
-	margin-left: $padding
-	margin-right: $padding
-
-	.icon-cog
-		display: none
-		position: absolute
-		top: 2px
-		right: 0
-		background: transparent
 
 #roomSettings
 	table
@@ -606,18 +154,7 @@ ul#directUserTable
 		margin: auto
 
 
-@media screen and (max-width: $collapse-width)
-	#wrapper
-		@include flex-direction(column-reverse)
-	#chat-room-users-wrapper
-		width: 100%
-		border-bottom: 8px solid
-	#chatBoxHolder, #chat-room-users-wrapper
-		@include flex(1)
-	#chatBoxHolder
-		flex-grow: 3
-	#chat-room-users-wrapper
-		flex-grow: 2
+
 
 .icon-user-plus
 	font-size: 15px
@@ -634,15 +171,6 @@ ul#directUserTable
 		&:first-child
 			height: 100%
 
-#smileParentHolder
-	position: absolute
-	right: 5px
-	bottom: 0
-	border-radius: 10px
-	width: 50%
-
-	img
-		cursor: pointer
 
 
 #paint-crp-rect
@@ -751,12 +279,7 @@ ul#directUserTable
 	padding-right: 10px
 	> input
 		width: 50px
-.chatbox img[code], #usermsg img[code]
-	margin-top: -17px
-	margin-bottom: -10px
-	/*remove background if someones copies smile
-	background-color: rgba(255, 255, 255, 0)
-	vertical-align: middle
+
 
 .dbRetrHolder
 	display: flex
@@ -766,45 +289,6 @@ ul#directUserTable
 		margin-top: 5px
 		margin-right: 8px
 
-#tabNames
-	margin: 0
-
-	> li
-		display: inline
-		padding-left: 10px
-		padding-right: 10px
-
-		&:hover
-			cursor: pointer
-			text-decoration: underline
-
-#usermsg
-	margin-left: 4px
-	padding-left: 25px
-	padding-right: 20px // before smiley
-	max-height: 200px
-
-	/*fallback
-	max-height: 30vh
-	min-height: 1.15em
-
-	/*Firefox
-	overflow-y: auto
-	white-space: pre-wrap
-
-	.B4j2ContentEditableImg
-		max-height: 200px
-		max-width: 400px
-
-	*
-		background-color: transparent !important
-		color: inherit !important
-		font-size: inherit !important
-		font-family: inherit !important
-		cursor: inherit !important
-		font-weight: inherit !important
-		margin: 0 !important
-		padding: 0 !important
 
 
 	/*chrome keep \n, no horizontal scroll
@@ -892,71 +376,6 @@ ul#directUserTable
 		transform: scale(1.1)
 		filter: url(#shadow)
 
-#callContainer
-	display: inline-block
-	max-width: 100%
-	text-align: center
-
-	label
-		cursor: pointer
-
-.callContainerContent
-	padding: 5px
-	display: inline-block
-	min-width: 150px
-
-.callContainerIcons
-	display: inline-block
-	font-size: 25px
-	width: 100%
-	padding-top: 10px
-
-	.hangUpHolder
-		display: inline-block
-		position: relative
-		width: 46px
-		height: 28px
-		margin-left: 10px
-		margin-top: -7px
-		.icon-hang-up
-			position: absolute
-			font-size: 35px
-			top: 0
-			left: 0
-
-=microphone-after
-	background-color: rgb(28, 30, 29)
-	border-radius: 3px
-
-=microphone-progress
-	border-radius: 3px 0 0 3px
-
-.microphoneLevel
-	display: block
-	$color: #4b9637
-	$height: 6px
-	$transition-time: all 0.1s
-	height: $height
-	@include appearance(none)
-	width: 100%
-	background-size: auto
-	border: solid 1px
-	box-shadow: 0 1px 1px rgba(250, 255, 253, 0.2),  inset 0 1px 1px rgba(0, 0, 0, 0.41)
-	border-color: #0c0d0f #1b1c1e #222423
-	+microphone-after
-	&::-webkit-progress-value
-		background-image: -webkit-linear-gradient(darken($color, 20%), lighten($color, 15%) 30%, darken($color, 15%) 100%)
-		-webkit-transition: $transition-time
-		+microphone-progress
-	&::-moz-progress-bar
-		background-image: -moz-linear-gradient(darken($color, 20%), lighten($color, 15%) 30%, darken($color, 15%) 100%)
-		-moz-transition: $transition-time
-		+microphone-progress
-	&::-webkit-progress-bar
-		+microphone-after
-		border: none
-	@-moz-document url-prefix()
-		height: $height - 2px
 
 #callUserList
 	margin: 0
@@ -967,9 +386,6 @@ ul#directUserTable
 	max-height: calc(100vh - 90px)
 	overflow-y: auto
 	width: 100%
-
-.icon-plus-squared
-	font-size: 15px
 
 #callUserList > li
 	border-radius: 2px
@@ -1020,20 +436,6 @@ ul#directUserTable
 		font-size: 10px
 		color: grey
 
-.highLightMessage
-	border: 1px solid grey
-	border-radius: 3px
-	padding: 3px
-
-.videoContainer
-	min-height: 100px
-	position: relative
-	width: 100%
-	text-align: center
-
-	video
-		background: #272C2D
-		border: 1px solid grey
 
 #changeProfileVideo
 	position: absolute
@@ -1106,93 +508,12 @@ ul#directUserTable
 			&.video-answer-btn
 				margin: 8px 0
 
-.fullscreen
-	&.videoContainer
-		background-color: black
-
-	.micVideoWrapper > video
-		max-height: 99vh
-		height: 99vh
-
-	&.videoContainer video
-		border-color: #272727
-	.icon-webrtc-cont
-		display: block
 
 
-.micVideoWrapper
-	display: inline-block
-	position: relative
-	margin: 1px
-	$color: rgba(24, 24, 25, 0.82)
-	%asbolute
-		z-index: 3
-		position: absolute
-		background-color: $color
-		box-shadow: 0 0 6px 6px $color
-		border-radius: 6px
-		display: none
-	video
-		max-height: calc(60vh - 120px)
-		max-width: 100%
-		background-color: #630000
-		&.connected
-			background-color: #165620
-	> div
-		@extend %asbolute
-		bottom: 5px
-		left: calc(50% - 55px)
-	> span
-		@extend %asbolute
-		top: calc(5px + 10%)
-		font-size: 20px
-		left: 50%
-		transform: translateX(-50%)
-	&:hover
-		div, span
-			display: block
+
 
 @import "partials/chat-videos"
 
-.icon-webrtc-cont
-	display: none
-	z-index: 1 // override webrtc fullscreen z-index
-	position: absolute
-	bottom: 2vh
-	left: 2vw
-	i:hover, .icon-webrtc-mic, .icon-webrtc-video, .icon-desktop
-		&:before
-			background-color: rgba(88, 143, 255, 0.6)
-			opacity: 1
-			color: white
-			box-shadow: 6px 6px 36px #666
-
-	i.icon-desktop, i.icon-no-desktop
-		font-size: 25px
-		&:before
-			padding-top: 13px !important
-			padding-bottom: 3px !important
-	i.icon-webrtc-hangup:hover:before
-		background: rgba(217, 24, 24, 0.6)
-	> i
-		display: block
-		font-size: 36px
-		opacity: 1
-
-		&:before
-			border-radius: 50%
-			width: 36px
-			height: 36px
-			padding: 8px
-			background: rgba(102, 102, 102, 0.6)
-			text-align: center
-			box-shadow: 3px 3px 12px #444
-			color: white
-			margin: 7px 30px 15px 7px
-
-.inactive .icon-webrtc-cont > i
-	transform: translateX(calc(-2vw - 70px))
-	@include transition(all 0.1s ease-in-out)
 
 .icon-webrtc-fullscreen
 	position: absolute
@@ -1200,28 +521,6 @@ ul#directUserTable
 	font-size: 40px
 	top: -10px
 
-.transferFile
-	min-width: 200px
-	.yesNo
-		padding-top: 15px
-		display: flex
-		justify-content: space-around
-		input[type=button]
-			width: 100%
-			&[value=Accept]
-				@extend .green-btn
-				margin-right: 10px
-			&[value=Decline]
-				@extend .red-btn
-	.progress-wrap
-		width: calc(100% - 20px)
-		margin: auto
-	.success
-		color: #5cc75c
-		font-weight: bold
-	.error
-		color: #f15e5e
-		font-weight: bold
 
 .table
 	width: 100%
@@ -1233,14 +532,7 @@ ul#directUserTable
 		max-width: 250px
 		overflow: hidden
 
-.enterFullScreenHolder
-	position: relative
-	display: inline
-	margin-left: 20px
-	padding-left: 5px
 
 
-/*--------------- END CALL DIALOG -----------------------
-@media screen and (max-height: 300px), screen and (max-width: 600px)
-	#smileParentHolder
-		width: calc(100% - 30px)
+
+

@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "lib": ["es2017", "dom"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "target": "es6",
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "types": [
+      "websql", "webrtc", "chrome"
+    ]
+  },
+  "exclude": [
+    "node_modules"
+  ]
+}
