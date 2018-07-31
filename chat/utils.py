@@ -258,7 +258,7 @@ def send_sign_up_email(user, site_address, request):
 
 
 def send_reset_password_email(request, user_profile, verification):
-	link = "{}://{}/restore_password?token={}".format(settings.SITE_PROTOCOL, request.get_host(), verification.token)
+	link = "{}://{}/#/auth/proceed-reset-password?token={}".format(settings.SITE_PROTOCOL, request.get_host(), verification.token)
 	message = "{},\n" \
 				 "You requested to change a password on site {}.\n" \
 				 "To proceed click on the link {}\n" \

@@ -324,40 +324,38 @@ def proceed_email_changed(request):
 		)
 
 
-class RestorePassword(View):
+@transaction.atomic
+@validation
+def accept_token(self, request):
+	"""
+	Sends email verification token
+	"""
+	token = request.POST.get('token', False)
+	logger.debug('Proceed Recover password with token %s', token)
+	user, verification = utils.get_user_by_code(token, Verification.TypeChoices.password)
+	password = request.POST.get('password')
+	check_password(password)
+	user.set_password(password)
+	user.save(update_fields=('password',))
+	verification.verified = True
+	verification.save(update_fields=('verified',))
+	logger.info('Password has been change for token %s user %s(id=%d)', token, user.username, user.id)
+	return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
 
-	@transaction.atomic
-	@validation
-	def post(self, request):
-		"""
-		Sends email verification token
-		"""
-		token = request.POST.get('token', False)
-		logger.debug('Proceed Recover password with token %s', token)
-		user, verification = utils.get_user_by_code(token, Verification.TypeChoices.password)
-		password = request.POST.get('password')
-		check_password(password)
-		user.set_password(password)
-		user.save(update_fields=('password',))
-		verification.verified = True
-		verification.save(update_fields=('verified',))
-		logger.info('Password has been change for token %s user %s(id=%d)', token, user.username, user.id)
-		return HttpResponse(settings.VALIDATION_IS_OK, content_type='text/plain')
-
-	def get(self, request):
-		token = request.GET.get('token', False)
+@require_http_methods('POST')
+def verify_token(request):
+	token = request.POST.get('token', False)
+	try:
 		logger.debug('Rendering restore password page with token  %s', token)
-		try:
-			user = utils.get_user_by_code(token, Verification.TypeChoices.password)[0]
-			response = {
-				'message': settings.VALIDATION_IS_OK,
-				'restore_user': user.username,
-				'token': token
-			}
-		except ValidationError as e:
-			logger.debug('Rejecting verification token %s because %s', token, e)
-			response = {'message': "Unable to confirm email with token {} because {}".format(token, e)}
-		return render_to_response('reset_password.html', response, context_instance=RequestContext(request))
+		user = utils.get_user_by_code(token, Verification.TypeChoices.password)[0]
+		return HttpResponse(json.dumps({
+			'message': settings.VALIDATION_IS_OK,
+			'restoreUser': user.username
+		}), content_type='application/json')
+	except ValidationError as e :
+		return HttpResponse(json.dumps({
+			'message': e.message,
+		}), content_type='application/json')
 
 
 @require_http_methods('GET')

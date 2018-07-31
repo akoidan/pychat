@@ -1,12 +1,11 @@
 import logging
-
-from django.contrib import admin
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, url
 from django.conf.urls.static import static
+from django.contrib import admin
 
 from chat import settings
 from chat.socials import GoogleAuth, FacebookAuth
-from chat.views import RegisterView, RestorePassword
+from chat.views import RegisterView
 
 logger = logging.getLogger(__name__)
 admin.autodiscover()
@@ -26,7 +25,8 @@ urlpatterns = patterns(
 	url(r'^api/sw\.js$', 'chat.views.get_service_worker'),
 	url(r'^api/get_firebase_playback', 'chat.views.get_firebase_playback'),
 	url(r'^api/change_password', 'chat.views.profile_change_password'),
-	url(r'^api/restore_password$', RestorePassword.as_view(), name='restore_pass'),
+	url(r'^api/accept_token', 'chat.views.accept_token'),
+	url(r'^api/verify_token', 'chat.views.verify_token'),
 	url(r'^api/change_email$', 'chat.views.proceed_email_changed'),
 	url(r'^api/send_restore_password$', 'chat.views.send_restore_password'),
 	url(r'^api/validate_email$', 'chat.views.validate_email'),
