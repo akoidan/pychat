@@ -13,7 +13,6 @@ admin.autodiscover()
 
 urlpatterns = patterns(
 	'',
-	url(r'^api/admin/', include(admin.site.urls)),
 	url(r'^api/$', 'chat.views.home'),  # url(r'^login$', 'story.views.login'),
 	url(r'^api/logout$', 'chat.views.logout'),
 	url(r'^api/auth$', 'chat.views.auth'),
