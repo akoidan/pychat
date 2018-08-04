@@ -11,7 +11,7 @@ WORKDIR /srv/http
 RUN set -x  &&\
 adduser -D -g '' http &&\
 apk update &&\
-apk add redis python3 python3-dev openrc mariadb-dev mariadb-client mariadb build-base curl nginx sassc linux-headers pcre-dev sassc bash &&\
+apk add redis yarn nodejs python3 python3-dev openrc mariadb-dev mariadb-client mariadb build-base curl nginx sassc linux-headers pcre-dev sassc bash &&\
 pip3 install mysqlclient &&\
 pip3 install uwsgi &&\
 apk del mariadb-dev python3-dev build-base linux-headers &&\
@@ -44,6 +44,8 @@ RUN pip3 install -r requirements.txt
 
 COPY ./manage.py ./config.json ./DefaultSmilies.cfpack ./docker-all/chat-uwsgi.ini ./download_content.sh ./
 COPY ./chat ./chat/
+COPY ./fe/src ./fe/src
+COPY ./fe/production.json ./fe/package.json  ./fe/tsconfig.json  ./fe/webpack.config.js  ./fe/yarn.lock ./fe/
 COPY ./docker-all/uwsgi ./docker-all/tornado /etc/init.d/
 COPY ./templates  ./templates
 COPY ./docker-all/nginx.conf /etc/nginx
@@ -60,7 +62,10 @@ cp ./chat/settings_example.py ./chat/settings.py &&\
 bash download_content.sh generate_secret_key &&\
 bash download_content.sh all &&\
 chown -R http:http /srv/http/ &&\
-rm ./chat/settings.py
+rm ./chat/settings.py && \
+cd ./fe &&\
+yarn install &&\
+yarn run prod
 
 EXPOSE 443
 CMD ["/sbin/init"]

@@ -41,7 +41,8 @@ export const WEBRTC_STUNT_URL = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.
 export const isChrome = browserVersion.indexOf('Chrome') >= 0;
 export const storage: IStorage = window.openDatabase ? new DatabaseWrapper('v123x') : new LocalStorage();
 export const globalLogger: Logger = loggerFactory.getLoggerColor('global', '#007a70');
-export const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, store);
+const WS_URL = WS_API_URL.replace('{}', window.location.host);
+export const ws: WsHandler = new WsHandler(WS_URL, sessionHolder, store);
 export const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
 export const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier, messageBus);
 export const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier);
