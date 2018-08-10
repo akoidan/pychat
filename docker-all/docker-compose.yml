@@ -7,6 +7,7 @@ services:
       - ../chat/settings.py:/srv/http/chat/settings.py
       - ../rootfs/etc/nginx/ssl/server.key:/etc/nginx/ssl/server.key
       - ../rootfs/etc/nginx/ssl/certificate.crt:/etc/nginx/ssl/certificate.crt
+      - ../fe/production.json:/srv/http/fe/production.json
       - ./volumes/photos:/srv/http/photos
       - ./volumes/mysql:/var/lib/mysql
       - ./volumes/redis:/var/lib/redis

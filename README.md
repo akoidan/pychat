@@ -65,17 +65,15 @@ Please don't use this build for production, as it uses debug ssl certificate, la
  - Generate ssl certificates:
    - If you have bash installed: `./download_content.sh generate_certificate`
    - You can also generate them manually and put into `./rootfs/etc/nginx/ssl/server.key` and `./rootfs/etc/nginx/ssl/certificate.crt`
- - Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. Execute `bash download_content.sh generate_secret_key`. If you need additional features like oauth/push notifications you can set those up by editing `chat/settings.py`.
- - Build/run docker images, choose **ONE** of methods below:
-   - Run my built image: `docker-compose -f ./docker-all/docker-compose.yml up`.
-   - Build and run multiple containers: `docker-compose -f docker/docker-compose.yml up`. This build contains 1 process per container. I'm using docker-compose 2.3 for health-check feature, make sure you have latest installation of docker to support it.
+ - Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. Execute `bash download_content.sh generate_secret_key`. If you need additional features like oauth/push notifications you can set those up by editing `chat/settings.py` and `fe/production.json`
+- Run my built image: `docker-compose -f ./docker-all/docker-compose.yml up`.
  - Open https://localhost . If something is broken you can check /srv/http/log/ in docker `docker exec -it containerId bash`
 
 ## Development setup
 The flow is the following
  - Install OS packages depending on your OS type
  - Bootstrap files
- - Configure Pycharm if you use it
+ - Follow instructions in `fe/README.md`
  - Start services and check if it works
 
 ### Install OS packages
@@ -123,12 +121,6 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  4. Add start scripts:
  - Add server script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `runsslserver` . Leave port 8000 as it it. Click on Environment Variable and set `PYCHAT_CONFIG=local`
  - Add tornado script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `start_tornado`. Remove port value. Click on Environment Variable and set `PYCHAT_CONFIG=local`
- 5. Pycharm sassc fewatcher.  I use the latest [sassc](https://github.com/sass/sassc) implementation for libsass, since it's the fastest ones, along with chrome workspace feature you can edit sass directly in browser or with jetbrains filewatcher. Latest sassc also allows inline sourcemap (base64 map directly in css file) that correctly shows source files in chrome. `--sourcemap=inline` does that. If your sassc doesn't have inline sourcemap support, please remove flag from argument command below. Also you you use any implementation you want, it's just a suggestion.
-
- - Go to Jetbrains `Settings` -> `Tools` -> `FileWatchers` -> `Click add` -> `Sass`:
- - arguments: `--no-cache --update $FilePath$:$ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --style expanded`. Or for newest sass `$FilePath$ $ProjectFileDir$/chat/static/css/$FileNameWithoutExtension$.css --sourcemap=inline`
- - working directory: `$ProjectFileDir$/chat/static/sass`
- - output files to refresh: `$ProjectFileDir$/chat/static/css/`
 
 
 ### Start services and run:

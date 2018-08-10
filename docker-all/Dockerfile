@@ -64,8 +64,7 @@ bash download_content.sh all &&\
 chown -R http:http /srv/http/ &&\
 rm ./chat/settings.py && \
 cd ./fe &&\
-yarn install &&\
-yarn run prod
+yarn install
 
 EXPOSE 443
 CMD ["/sbin/init"]
