@@ -89,7 +89,7 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`). Also add there new environment variable `PYCHAT_CONFIG=local`
 
 #### [Ubuntu](http://www.ubuntu.com/):
- 1. Install required packages: `apt-get install python pip mysql-server ruby`
+ 1. Install required packages: `apt-get install python pip mysql-server ruby` If pip is missing check `python-pip`.
  2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
  3. Install **sassc**. You can find instructions [here](http://crocodillon.com/blog/how-to-install-sassc-and-libsass-on-ubuntu). Or maybe you can find packet in ubuntu repository. Alternatively you can use any other sass.
  4. `echo 'export PYCHAT_CONFIG=local' >> /etc/profile`
