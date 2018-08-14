@@ -1,7 +1,7 @@
 <template>
   <div class="callContainer" v-show="callInfo.callContainer">
-    <div class="callContainerContent">
-      <div class="videoContainer">
+    <div class="callContainerContent" :class="{fullScreen}">
+      <div class="videoContainer" ref="videoContainer">
         <div class="icon-webrtc-cont">
           <i class="icon-webrtc-novideo" title="Turn on your webcam"></i>
           <i class="icon-webrtc-mic" title="Turn off your microphone"></i>
@@ -55,7 +55,7 @@
         <i :class="iconVideoClass" :title="videoTitle" @click="videoClick"></i>
         <i class="icon-desktop" :class="iconDesktopClass" title="Capture your desktop screen and start sharing it" @click="desktopClick"></i>
         <i class="icon-cog" @click="showSettings = !showSettings"></i>
-        <div class="enterFullScreenHolder"><i class="icon-webrtc-fullscreen" title="Fullscreen"></i></div>
+        <div class="enterFullScreenHolder" @click="enterFullscreen"><i class="icon-webrtc-fullscreen" title="Fullscreen"></i></div>
         <div class="hangUpHolder" v-show="callInfo.callActive"><i class="icon-hang-up" @click="hangUpCall" title="Hang up" ></i></div>
         <progress max="15" :value="callInfo.currentMicLevel" title="Your microphone level" class="microphoneLevel"></progress>
       </div>
@@ -100,6 +100,27 @@
         }
       })
     }
+    fullscreen: boolean = false;
+
+    enterFullscreen() {
+      let elem: any = this.$refs.videoContainer;
+      if (elem.requestFullscreen) {
+      } else if (elem.msRequestFullscreen) {
+        elem.requestFullscreen = elem.msRequestFullscreen;
+        document['cancelFullScreen'] = document['msCancelFullScreen'];
+      } else if (elem.mozRequestFullScreen) {
+        elem.requestFullscreen = elem.mozRequestFullScreen;
+        document['cancelFullScreen'] = document['mozCancelFullScreen'];
+      } else if (elem.webkitRequestFullscreen) {
+        elem.requestFullscreen = elem.webkitRequestFullscreen;
+        document['cancelFullScreen'] = document.webkitCancelFullScreen;
+      } else {
+        this.growlError("Can't enter fullscreen");
+        return;
+      }
+      this.fullscreen = true;
+      elem.requestFullscreen()
+    }
 
     @Watch('callInfo.currentSpeaker')
     onSpeakerChange(newValue) {
@@ -114,7 +135,8 @@
 
 
     $refs: {
-      localVideo: HTMLVideoElement
+      localVideo: HTMLVideoElement,
+      videoContainer: HTMLElement,
     };
 
     setCurrentMicProxy(event) {

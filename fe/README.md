@@ -13,4 +13,4 @@ add test
 add tslint
 add sass-lint
 resolve sw.ts imports doesn't work with ts-loader + file-loaders
-- Move everything to tornado?
+- Move everything to tornadoс?
