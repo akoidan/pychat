@@ -13,6 +13,8 @@ declare interface Document {
   cancelFullScreen(): void;
   msCancelFullScreen(): void;
   mozCancelFullScreen(): void;
+  mozFullscreenElement: any;
+  msFullscreenElement: any;
 }
 
 declare interface HTMLElement {

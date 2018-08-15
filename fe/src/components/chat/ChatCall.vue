@@ -98,6 +98,28 @@
     @State webcams: { [id: string]: string };
     fullscreen: boolean = false;
 
+
+    fullScreenChange(event) {
+      this.logger.log("fs change")();
+      if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
+        this.fullscreen = false;
+      }
+    }
+
+    created() {
+      ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
+        document.addEventListener(e, this.listener, false);
+      })
+    }
+
+    listener = this.fullScreenChange.bind(this);
+
+    destroyed() {
+      ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
+        document.removeEventListener(e, this.listener, false);
+      })
+    }
+
     @Watch('callInfo.localStreamSrc')
     onLocalStreamChange(newValue) {
       this.$nextTick(function () {
