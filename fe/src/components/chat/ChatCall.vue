@@ -58,10 +58,12 @@
           <i class="icon-desktop" :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'"
              title="Capture your desktop screen and start sharing it" @click="desktopClick"></i>
           <i class="icon-cog" @click="showSettings = !showSettings"></i>
-          <div class="enterFullScreenHolder" @click="enterFullscreen" v-show="callInfo.callActive"><i class="icon-webrtc-fullscreen"
-                                                                         title="Fullscreen"></i></div>
-          <div class="hangUpHolder" v-show="callInfo.callActive"><i class="icon-hang-up" @click="hangUpCall"
-                                                                    title="Hang up"></i></div>
+          <div class="enterFullScreenHolder" @click="enterFullscreen" v-show="callInfo.callActive">
+            <i class="icon-webrtc-fullscreen" title="Fullscreen"></i>
+          </div>
+          <div class="hangUpHolder" v-show="callInfo.callActive">
+            <i class="icon-hang-up" @click="hangUpCall" title="Hang up"></i>
+          </div>
         </div>
       </div>
     </div>
