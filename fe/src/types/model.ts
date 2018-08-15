@@ -163,7 +163,6 @@ export interface CallsInfoModel {
   currentWebcam: string;
   showVideo: boolean;
   shareScreen: boolean;
-  fullScreen: boolean;
   callActive: boolean;
 }
 

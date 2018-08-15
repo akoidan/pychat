@@ -9,6 +9,17 @@ declare module '*.json' {
 }
 
 
+declare interface Document {
+  cancelFullScreen(): void;
+  msCancelFullScreen(): void;
+  mozCancelFullScreen(): void;
+}
+
+declare interface HTMLElement {
+  msRequestFullscreen(): void;
+  mozRequestFullScreen(): void;
+}
+
 declare module '*.ico' {
 
 }

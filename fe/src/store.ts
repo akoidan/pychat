@@ -35,7 +35,6 @@ import {
   SetMessageProgressError,
   SetOpponentAnchor,
   SetOpponentVoice,
-  SetOpponentVolume,
   SetReceivingFileStatus,
   SetReceivingFileUploaded,
   SetRoomsUsers,
@@ -175,7 +174,7 @@ const store: StoreOptions<RootState> = {
       if (payload.callInfoModel) {
         Vue.set(state.roomsDict[payload.roomId].callInfo.calls, payload.opponentWsId, payload.callInfoModel);
       } else {
-        Vue.delete(state.roomsDict[payload.roomId].callInfo.calls, payload.opponentWsId)
+        Vue.delete(state.roomsDict[payload.roomId].callInfo.calls, payload.opponentWsId);
       }
     },
     setOpponentVoice(state: RootState, payload: SetOpponentVoice) {
@@ -226,9 +225,6 @@ const store: StoreOptions<RootState> = {
       ci.shareScreen = payload.state;
       ci.showVideo = false;
     },
-    setFullScreenToState(state: RootState, payload: BooleanIdentifier) {
-      state.roomsDict[payload.id].callInfo.fullScreen = payload.state;
-    },
     setCallActiveToState(state: RootState, payload: BooleanIdentifier) {
       state.roomsDict[payload.id].callInfo.callActive = payload.state;
     },
@@ -269,9 +265,9 @@ const store: StoreOptions<RootState> = {
     incNewMessagesCount(state: RootState, roomId: number) {
       state.roomsDict[roomId].newMessagesCount++;
     },
-    resetNewMessagesCount(state: RootState, roomId: number) {
-      state.roomsDict[roomId].newMessagesCount = 0;
-    },
+    // resetNewMessagesCount(state: RootState, roomId: number) {
+    //   state.roomsDict[roomId].newMessagesCount = 0;
+    // },
     removeMessageProgress(state: RootState, payload: RemoveMessageProgress) {
       let message: MessageModel = state.roomsDict[payload.roomId].messages[payload.messageId];
       message.transfer.upload = null;
@@ -416,28 +412,28 @@ const store: StoreOptions<RootState> = {
     growlErrorRaw(context: State, html) {
       let growl: GrowlModel = {id: Date.now(), html, type: GrowlType.ERROR};
       context.commit('addGrowl', growl);
-      setTimeout(f => {
+      setTimeout(() => {
         context.commit('removeGrowl', growl);
       }, 4000);
     },
     growlError(context: State, title) {
       let growl: GrowlModel = {id: Date.now(), html: encodeHTML(title), type: GrowlType.ERROR};
       context.commit('addGrowl', growl);
-      setTimeout(f => {
+      setTimeout(() => {
         context.commit('removeGrowl', growl);
       }, 4000);
     },
     growlInfo(context: State, title) {
       let growl: GrowlModel = {id: Date.now(), html: encodeHTML(title), type: GrowlType.INFO};
       context.commit('addGrowl', growl);
-      setTimeout(f => {
+      setTimeout(() => {
         context.commit('removeGrowl', growl);
       }, 4000);
     },
     growlSuccess(context: State, title) {
       let growl: GrowlModel = {id: Date.now(), html: encodeHTML(title), type: GrowlType.SUCCESS};
       context.commit('addGrowl', growl);
-      setTimeout(f => {
+      setTimeout(() => {
         context.commit('removeGrowl', growl);
       }, 4000);
     },

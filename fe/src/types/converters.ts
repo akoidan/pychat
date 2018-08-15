@@ -43,7 +43,6 @@ export function getRoomsBaseDict({roomId, volume, notifications, name, users}, o
       showMic: true,
       callContainer: false,
       callActive: false,
-      fullScreen: false,
       shareScreen: false,
       showVideo: true,
       currentMic: null,

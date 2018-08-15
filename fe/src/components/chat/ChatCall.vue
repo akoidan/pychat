@@ -1,18 +1,19 @@
 <template>
   <div class="callContainer" v-show="callInfo.callContainer">
-    <div class="callContainerContent" :class="{fullScreen}">
+    <div class="callContainerContent" :class="{fullscreen}">
       <div class="videoContainer" ref="videoContainer">
         <div class="icon-webrtc-cont">
-          <i class="icon-webrtc-novideo" title="Turn on your webcam"></i>
-          <i class="icon-webrtc-mic" title="Turn off your microphone"></i>
-          <i class="icon-webrtc-minimizedscreen" title="Exit fullscreen"></i>
-          <i class="icon-webrtc-hangup" title="Hang up"></i>
-          <i class="icon-no-desktop" title="Capture your desktop screen and start sharing it"></i>
+          <i class="icon-webrtc-novideo" @click="videoClick" :class="callInfo.showVideo ? 'activeIcon' : 'noactiveIcon'" title="Turn on your webcam"></i>
+          <i class="icon-webrtc-mic" :class="callInfo.showMic ? 'activeIcon' : 'noactiveIcon'" title="Turn off your microphone" @click="micClick"></i>
+          <i class="icon-webrtc-minimizedscreen" title="Exit fullscreen" @click="exitFullscreen"></i>
+          <i class="icon-webrtc-hangup" @click="hangUpCall" title="Hang up"></i>
+          <i class="icon-no-desktop" @click='desktopClick' :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'" title="Capture your desktop screen and start sharing it"></i>
         </div>
         <div class="micVideoHolder">
           <chat-remote-peer v-for="(call, id) in callInfo.calls" :call-info="call" :key="id"/>
           <video muted="muted" class="localVideo" ref="localVideo" :src="callInfo.localStreamSrc"></video>
         </div>
+        <progress max="15" :value="callInfo.currentMicLevel" title="Your microphone level" class="microphoneLevel"></progress>
       </div>
       <table class="settingsContainer" v-show="showSettings">
         <tbody>
@@ -50,14 +51,18 @@
         </tbody>
       </table>
       <div class="callContainerIcons">
-        <i class="icon-phone-circled" v-show="!callInfo.callActive" @click="startCall"></i>
-        <i :class="iconMicClass" :title="micTitle" @click="micClick"></i>
-        <i :class="iconVideoClass" :title="videoTitle" @click="videoClick"></i>
-        <i class="icon-desktop" :class="iconDesktopClass" title="Capture your desktop screen and start sharing it" @click="desktopClick"></i>
-        <i class="icon-cog" @click="showSettings = !showSettings"></i>
-        <div class="enterFullScreenHolder" @click="enterFullscreen"><i class="icon-webrtc-fullscreen" title="Fullscreen"></i></div>
-        <div class="hangUpHolder" v-show="callInfo.callActive"><i class="icon-hang-up" @click="hangUpCall" title="Hang up" ></i></div>
-        <progress max="15" :value="callInfo.currentMicLevel" title="Your microphone level" class="microphoneLevel"></progress>
+        <div class="callContainerIconsInner">
+          <i class="icon-phone-circled" v-show="!callInfo.callActive" @click="startCall"></i>
+          <i :class="iconMicClass" :title="micTitle" @click="micClick"></i>
+          <i :class="iconVideoClass" :title="videoTitle" @click="videoClick"></i>
+          <i class="icon-desktop" :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'"
+             title="Capture your desktop screen and start sharing it" @click="desktopClick"></i>
+          <i class="icon-cog" @click="showSettings = !showSettings"></i>
+          <div class="enterFullScreenHolder" @click="enterFullscreen" v-show="callInfo.callActive"><i class="icon-webrtc-fullscreen"
+                                                                         title="Fullscreen"></i></div>
+          <div class="hangUpHolder" v-show="callInfo.callActive"><i class="icon-hang-up" @click="hangUpCall"
+                                                                    title="Hang up"></i></div>
+        </div>
       </div>
     </div>
   </div>
@@ -89,6 +94,7 @@
     @State microphones: { [id: string]: string };
     @State speakers: { [id: string]: string };
     @State webcams: { [id: string]: string };
+    fullscreen: boolean = false;
 
     @Watch('callInfo.localStreamSrc')
     onLocalStreamChange(newValue) {
@@ -100,26 +106,35 @@
         }
       })
     }
-    fullscreen: boolean = false;
+
+    exitFullscreen() {
+      if (document.cancelFullScreen) {
+        document.cancelFullScreen();
+      } else if (document.msCancelFullScreen) {
+        document.msCancelFullScreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitCancelFullScreen) {
+        document.webkitCancelFullScreen();
+      }
+      this.fullscreen = false;
+    }
 
     enterFullscreen() {
-      let elem: any = this.$refs.videoContainer;
+      let elem: HTMLElement = this.$refs.videoContainer;
       if (elem.requestFullscreen) {
+        elem.requestFullscreen();
       } else if (elem.msRequestFullscreen) {
-        elem.requestFullscreen = elem.msRequestFullscreen;
-        document['cancelFullScreen'] = document['msCancelFullScreen'];
+        elem.msRequestFullscreen();
       } else if (elem.mozRequestFullScreen) {
-        elem.requestFullscreen = elem.mozRequestFullScreen;
-        document['cancelFullScreen'] = document['mozCancelFullScreen'];
+        elem.mozRequestFullScreen();
       } else if (elem.webkitRequestFullscreen) {
-        elem.requestFullscreen = elem.webkitRequestFullscreen;
-        document['cancelFullScreen'] = document.webkitCancelFullScreen;
+        elem.webkitRequestFullscreen()
       } else {
         this.growlError("Can't enter fullscreen");
         return;
       }
       this.fullscreen = true;
-      elem.requestFullscreen()
     }
 
     @Watch('callInfo.currentSpeaker')
@@ -206,6 +221,8 @@
 
     hangUpCall() {
       webrtcApi.hangCall(this.roomId);
+      this.fullscreen = false;
+      this.exitFullscreen();
     }
 
     get iconVideoClass () : {} {
@@ -213,10 +230,6 @@
         'icon-no-videocam': !this.callInfo.showVideo,
         'icon-videocam': this.callInfo.showVideo,
       }
-    }
-
-    get iconDesktopClass() {
-      return this.callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon';
     }
 
     desktopClick() {
@@ -311,11 +324,16 @@
       cursor: pointer
 
   .callContainerIcons
-    display: inline-block
+    display: flex
+    flex-direction: column
     font-size: 25px
     @extend %user-select-none
     width: 100%
     padding-top: 10px
+
+    .callContainerIconsInner
+      display: flex
+      justify-content: space-between
 
     .hangUpHolder
       display: inline-block
@@ -342,17 +360,18 @@
 
   .icon-webrtc-cont
     display: none
-    // z-index: 1 // override webrtc fullscreen z-index
+    z-index: 1 // override webrtc fullscreen z-index
     position: absolute
+
     bottom: 2vh
     left: 2vw
     i:hover, .icon-webrtc-mic, .icon-webrtc-video, .icon-desktop
       &:before
-        background-color: rgba(88, 143, 255, 0.6)
         opacity: 1
         color: white
         box-shadow: 6px 6px 36px #666
-
+    .activeIcon:before
+      background-color: rgba(88, 143, 255, 0.6)
     i.icon-desktop, i.icon-no-desktop
       font-size: 25px
       &:before
@@ -364,6 +383,7 @@
       display: block
       font-size: 36px
       opacity: 1
+      cursor: pointer
 
       &:before
         border-radius: 50%
@@ -422,8 +442,12 @@
   =microphone-progress
     border-radius: 3px 0 0 3px
 
+  progress
+    bottom: 0
+    position: absolute
+
   .microphoneLevel
-    display: block
+    display: flex
     $color: #4b9637
     $height: 6px
     $transition-time: all 0.1s
