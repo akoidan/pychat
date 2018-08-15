@@ -34,7 +34,8 @@ trash
 docker/volumes
 docker-all/volumes
 fe/node_modules
-fe/dist
+fe/www
+fe/platforms
 rootfs/etc/nginx/ssl/*
 chat/static/demo.html
 rootfs/etc/nginx/ssl/server.key

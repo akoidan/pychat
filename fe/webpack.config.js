@@ -37,7 +37,7 @@ module.exports = (env, argv) => {
   let devServer;
   if (argv.mode === 'production') {
     const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-    plugins.push(new CleanWebpackPlugin('./dist'));
+    plugins.push(new CleanWebpackPlugin('./www'));
     plugins.push(new MiniCssExtractPlugin());
     sasscPlugins = [
       MiniCssExtractPlugin.loader,
@@ -82,6 +82,7 @@ module.exports = (env, argv) => {
       }
     },
     output: {
+      path: __dirname + "/www",
       publicPath: '/' //https://github.com/webpack/webpack-dev-server/issues/851#issuecomment-399227814
     },
     devtool: '#source-map',
