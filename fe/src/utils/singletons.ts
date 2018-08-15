@@ -17,7 +17,7 @@ import Http from './Http';
 import WebRtcApi from '../webrtc/WebRtcApi';
 
 
-export const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(XHR_API_URL, sessionHolder);
+export const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
 export const api: Api = new Api(xhr);
 export const isMobile: boolean = mobile.isMobile();
 export const messageBus = new Vue();

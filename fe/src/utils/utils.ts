@@ -4,9 +4,8 @@ import sessionHolder from './sessionHolder';
 import {api, channelsHandler, globalLogger, storage, webrtcApi, ws} from './singletons';
 import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from '../types/model';
 import loggerFactory from './loggerFactory';
-import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from './consts';
+import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID, XHR_API_URL} from './consts';
 import {StorageData} from '../types/types';
-
 
 let logger = loggerFactory.getLoggerColor('utils', '#007a70');
 
@@ -26,6 +25,15 @@ export function forEach(array, cb) {
     for (let i = 0; i < array.length; i++) {
       cb(array[i]);
     }
+  }
+}
+
+export function getUrl(url: string): string {
+  if (!url) {
+  } else if (/^https?:\/\//.exec(url) || (url && url.indexOf('//') === 0) /*cdn*/) {
+    return url;
+  } else {
+    return XHR_API_URL + url;
   }
 }
 

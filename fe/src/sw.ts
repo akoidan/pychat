@@ -1,5 +1,5 @@
 import {Logger, LoggerFactory, LogStrict} from 'lines-logger';
-
+import {getUrl} from './utils/utils';
 declare var clients: any;
 
 let loggerFactory: LoggerFactory = new LoggerFactory(LogStrict.LOG_WITH_WARNINGS);
@@ -48,13 +48,13 @@ async function getPlayBack(event) {
   if (!subScr) {
     throw 'Unable to get subscription';
   }
-  let response = await fetch('/get_firebase_playback', {
+  let response = await fetch(getUrl('/get_firebase_playback'), {
     credentials: 'omit',
     headers: {auth: subScr}
   });
   logger.log('Fetching finished {}', response)();
-  let m = await response.json();
-
+  let t = await response.text();
+  let m = JSON.parse(t);
   logger.log('Parsed response {}', m)();
   let notifications = await (<any>self).registration.getNotifications();
   let count = 1;

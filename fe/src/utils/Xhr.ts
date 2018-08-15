@@ -3,6 +3,7 @@ import {PostData, SessionHolder} from '../types/types';
 import {Logger} from 'lines-logger';
 import {CONNECTION_ERROR} from './consts';
 import Http from './Http';
+import {getUrl} from './utils';
 
 
 /**
@@ -14,14 +15,14 @@ import Http from './Http';
 
 export default class Xhr extends Http {
 
-  constructor(apiUrl: string, sessionHolder: SessionHolder) {
-    super(apiUrl, sessionHolder);
+  constructor(sessionHolder: SessionHolder) {
+    super(sessionHolder);
   }
 
   /**
    * Loads file from server on runtime */
   public doGet<T>(fileUrl: string, callback: ErrorCB<T>, isJsonDecoded: boolean = false) {
-    fileUrl = this.getUrl(fileUrl);
+    fileUrl = getUrl(fileUrl);
     this.httpLogger.log('GET out {}', fileUrl)();
     let regexRes = /\.(\w+)(\?.*)?$/.exec(fileUrl);
     let fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
@@ -46,7 +47,7 @@ export default class Xhr extends Http {
     let r: XMLHttpRequest = new XMLHttpRequest();
     r.onreadystatechange = this.getOnreadystatechange(r, d.url, d.isJsonDecoded, 'POST', d.cb);
 
-    let url = this.getUrl(d.url);
+    let url = getUrl(d.url);
 
     r.open('POST', url, true);
     let data;
