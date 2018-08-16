@@ -1,5 +1,5 @@
 import {Logger, LoggerFactory, LogStrict} from 'lines-logger';
-import {getUrl} from './utils/utils';
+import {XHR_API_URL} from './utils/consts';
 declare var clients: any;
 
 let loggerFactory: LoggerFactory = new LoggerFactory(LogStrict.LOG_WITH_WARNINGS);
@@ -48,7 +48,7 @@ async function getPlayBack(event) {
   if (!subScr) {
     throw 'Unable to get subscription';
   }
-  let response = await fetch(getUrl('/get_firebase_playback'), {
+  let response = await fetch(`${XHR_API_URL}/get_firebase_playback`, {
     credentials: 'omit',
     headers: {auth: subScr}
   });
@@ -77,12 +77,11 @@ async function getPlayBack(event) {
         m.title = sender + '(+' + count + ')';
       }
     }
-  }
-  (<any>self).registration.showNotification(m.title, m.options);
-  logger.log('Spawned notification {}', m)();
+  }  logger.log('Spawned notification {}', m)();
+  await (<any>self).registration.showNotification(m.title, m.options);
 }
 
-self.addEventListener('push', (e) => getPlayBack(e));
+self.addEventListener('push', (e: any) => e.waitUntil(getPlayBack(e)));
 
 self.addEventListener('notificationclick', function (event: any) {
   logger.log('On notification click: {}', event.notification.tag)();

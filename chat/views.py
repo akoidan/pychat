@@ -131,7 +131,7 @@ def get_firebase_playback(request):
 		'title': message.sender.username,
 		'options': {
 			'body': message.content,
-			'icon': md5url('images/favicon.ico'),
+			'icon': '/favicon.ico',
 			'data': {
 				'id': sub_message.message_id,
 				'sender': message.sender.username,
