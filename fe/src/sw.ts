@@ -54,6 +54,7 @@ async function getPlayBack(event) {
   });
   logger.log('Fetching finished {}', response)();
   let t = await response.text();
+  logger.debug('response is {}', t)();
   let m = JSON.parse(t);
   logger.log('Parsed response {}', m)();
   let notifications = await (<any>self).registration.getNotifications();
