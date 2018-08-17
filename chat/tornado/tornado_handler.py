@@ -228,12 +228,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		"""
 		check whether browser set domain matches origin
 		"""
-		parsed_origin = urlparse(origin)
-		origin = parsed_origin.netloc
-		origin_domain = origin.split(':')[0].lower()
-		browser_set = self.request.headers.get("Host")
-		browser_domain = browser_set.split(':')[0]
-		return browser_domain == origin_domain
+		return True # we don't use cookies
 
 	def save_ip(self):
 		"""
