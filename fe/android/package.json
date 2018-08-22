@@ -1,17 +1,13 @@
 {
-  "name": "io.cordova.hellocordova",
+  "name": "org.pychat",
   "version": "1.0.0",
-  "displayName": "HelloCordova",
+  "displayName": "pychat",
   "cordova": {
     "platforms": [
       "android"
-    ],
-    "plugins": {
-      "cordova-plugin-whitelist": {}
-    }
+    ]
   },
   "dependencies": {
-    "cordova-android": "^7.0.0",
-    "cordova-plugin-whitelist": "1"
+    "cordova-android": "~7.0.0"
   }
 }

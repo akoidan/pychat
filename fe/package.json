@@ -13,7 +13,8 @@
     "publish": "yarn run prod && yarn run deploy",
     "test": "mocha test/index.ts",
     "stats": "webpack --mode production --profile --json > compilation-stats.json && webpack-bundle-analyzer ./compilation-stats.json",
-    "android": "webpack --config ./android/webpack.config.js --progress --mode production  --hide-modules"
+    "android": "webpack --config ./android/webpack.config.js --progress --mode production  --hide-modules",
+    "watch": "webpack --config ./android/webpack.config.js --mode production  --watch"
   },
   "repository": {
     "type": "git",

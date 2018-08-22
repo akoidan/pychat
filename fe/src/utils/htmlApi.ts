@@ -82,7 +82,7 @@ export function encodeHTML(html: string) {
 }
 
 export function getSmileyPath(tabName: string, src: string) {
-  return getStaticUrl(`/smileys/${tabName}/${src}`);
+  return getStaticUrl(`./smileys/${tabName}/${src}`);
 }
 
 export function getStaticUrl(src) {

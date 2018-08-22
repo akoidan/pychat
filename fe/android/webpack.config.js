@@ -60,11 +60,6 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          test: /sw\.ts$/,
-          exclude: /node_modules/,
-          loader: 'sw-loader',
-        },
-        {
           test: /\.ts$/,
           loader: 'ts-loader',
           exclude: /node_modules/,
@@ -86,6 +81,7 @@ module.exports = (env, argv) => {
           loader: 'file-loader',
           options: {
             outputPath: 'font',
+            publicPath: './font/',
             name,
           }
         },
@@ -102,17 +98,17 @@ module.exports = (env, argv) => {
           loader: 'file-loader',
           options: {
             outputPath: 'sounds',
+            publicPath: './sounds/',
             name,
           }
         },
         {
           test: /\.(png|jpg|svg)$/,
-          loader: 'url-loader',
+          loader: 'file-loader',
           options: {
-            limit: 32000,
-            fallback: "file-loader",
+            outputPath: 'img',
+            publicPath: './img/',
             name,
-            outputPath: "img"
           }
         }
       ],
