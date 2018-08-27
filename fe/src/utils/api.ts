@@ -115,6 +115,10 @@ export default class Api extends MessageHandler {
     });
   }
 
+  public statistics(cb) {
+    this.xhr.doGet('/statistics', cb, true);
+  }
+
   public loadGoogle(cb) {
     this.xhr.loadJs('https://apis.google.com/js/platform.js', cb);
   }
