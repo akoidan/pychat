@@ -77,5 +77,10 @@
       color: red
 
     @import "~spainter/no-fonts.sass"
+  @media screen and (max-height: 600px)
+    .container /deep/ .painterTools
+      width: 80px !important
+      flex-direction: row !important
+      flex-wrap: wrap
 
 </style>

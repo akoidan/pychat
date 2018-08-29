@@ -82,7 +82,6 @@ module.exports = (env, argv) => {
       }
     },
     output: {
-      path: __dirname + "/www",
       publicPath: '/' //https://github.com/webpack/webpack-dev-server/issues/851#issuecomment-399227814
     },
     optimization: { minimize: false},
