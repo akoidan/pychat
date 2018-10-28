@@ -216,6 +216,8 @@
     .offline
       .icon-man, .icon-girl, .icon-user-secret
         color: #c53432
+    > span
+      background-color: #221f1f
   .chat-room-users-wrapper > span
     display: block
 

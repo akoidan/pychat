@@ -251,6 +251,10 @@ alphanum-sort@^1.0.1, alphanum-sort@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/alphanum-sort/-/alphanum-sort-1.0.2.tgz#97a1119649b211ad33691d9f9f486a8ec9fbe0a3"
 
+amcharts3@^3.21.13:
+  version "3.21.13"
+  resolved "https://registry.yarnpkg.com/amcharts3/-/amcharts3-3.21.13.tgz#ff0e876dcef63bca93f5d69eac17fd6703ace655"
+
 amdefine@>=0.0.4:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/amdefine/-/amdefine-1.0.1.tgz#4a5282ac164729e93619bcfd3ad151f817ce91f5"

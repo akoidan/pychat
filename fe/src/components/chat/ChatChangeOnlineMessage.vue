@@ -50,4 +50,6 @@
 </script>
 
 <style lang="sass" scoped>
+  .color-white .message-system
+    background-color: #f2fbff
 </style>

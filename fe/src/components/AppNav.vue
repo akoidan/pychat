@@ -152,28 +152,28 @@
       [class^='icon-']:hover
         text-shadow: 0 0 0.2em #FFF, 0 0 0.2em #3D3D3D
 
-      .icon-home
-        color: rgb(51, 122, 183)
-      .icon-brush
-        color: #960000
-      .icon-pencil
-        color: rgb(85, 26, 139)
-      .icon-santa-hat
-        color: rgb(207, 80, 80)
-      .icon-chart-pie
-        color: rgb(121, 144, 15)
-      .icon-sign-out
-        color: $red-cancel-lor
-      .icon-trash-circled
-        color: #2d88c4
-      .icon-wrench
-        color: rgb(70, 133, 117)
-      .icon-phone
-        color: #136C00
-      .icon-doc-inv
-        color: #40b2b2
-      .icon-popup
-        color: #c58446
+    .icon-home
+      color: rgb(51, 122, 183)
+    .icon-brush
+      color: #960000
+    .icon-pencil
+      color: rgb(85, 26, 139)
+    .icon-santa-hat
+      color: rgb(207, 80, 80)
+    .icon-chart-pie
+      color: rgb(121, 144, 15)
+    .icon-sign-out
+      color: $red-cancel-lor
+    .icon-trash-circled
+      color: #2d88c4
+    .icon-wrench
+      color: rgb(70, 133, 117)
+    .icon-phone
+      color: #136C00
+    .icon-doc-inv
+      color: #40b2b2
+    .icon-popup
+      color: #c58446
   .color-white
     .onlineStatus
       &.online
@@ -184,6 +184,25 @@
   .onlineStatus
     padding: 0 10px
 
+  .color-white
+    .icon-home
+      color: #20A0FF
+    .icon-brush
+      color: #c51900
+    .icon-pencil
+      color: #ae49ff
+    .icon-chart-pie
+      color: #8a9c2c
+    .icon-sign-out
+      color: #F5504C
+    .icon-wrench
+      color: #67C8B0
+    .icon-phone
+      color: #257517 /*override .		color-lor :link*/
+    .icon-doc-inv
+      color: #0095ad
+    .icon-popup
+      color: #ff9900
   .color-reg
     .onlineStatus
       &.offline

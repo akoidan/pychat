@@ -2,7 +2,8 @@
 @import "partials/mixins"
 
 .color-lor
-  color: $color-lor-main
+  color: white
+  background-color: #87a59d
   a
     color: $color-lor-main
 
@@ -10,3 +11,11 @@
 
   .lor-btn, .blue-btn, .green-btn, .red-btn
     @include color-lor-btn
+
+  .input
+    background-color: $default-lor-background
+    border: 1px solid rgba(96, 90, 90, 0.31)
+    color: #C7C7C7
+
+  .input option
+    background-color: $default-lor-background

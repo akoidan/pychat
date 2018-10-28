@@ -66,6 +66,9 @@
       }
     }
 
+
+
+
     created() {
       messageBus.$on('scroll', () => {
         this.$nextTick(function () {
@@ -207,6 +210,20 @@
     word-wrap: break-word
     font-size: 18px
     @include flex(1) // Fix Safari's 0 height
+
+
+
+  .color-white
+    .msgHolder, .message-system
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19)
+      color: black
+      display: table
+      padding: 0.4em
+      border-radius: 4px
+      margin-top: 0.4em
+      margin-bottom: 0.4em
+      .msg-self
+        margin-left: auto
 
     &:focus
       outline: none

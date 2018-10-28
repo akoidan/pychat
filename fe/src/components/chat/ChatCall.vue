@@ -322,14 +322,14 @@
     @include transition(all 0.1s ease-in-out)
 
   .fullscreen
-    &.videoContainer
+    .videoContainer
       background-color: black
 
     /deep/ .micVideoWrapper > video
       max-height: 99vh
       height: 99vh
 
-    &.videoContainer video
+    .videoContainer video
       border-color: #272727
     .icon-webrtc-cont
       display: block

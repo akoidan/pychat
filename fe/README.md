@@ -5,7 +5,7 @@
 ## TODO
 
 ADD ability to change theme during registration
-generate fonts from npm??
+
 
 add ability to cancel filetransfer on sender side
 add aliases to webpack
