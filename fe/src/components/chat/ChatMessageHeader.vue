@@ -48,8 +48,8 @@
       cursor: pointer
       color: #979797
 
-    .color-white
-      .timeMess
-        color: #85d379
-        font-weight: normal
+  .color-white
+    .timeMess
+      color: #85d379
+      font-weight: normal
 </style>

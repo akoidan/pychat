@@ -249,6 +249,18 @@
       background-color: #171717
 
   .color-white .chat-room-users-wrapper /deep/
+    color: $color-white-main
+    @media screen and (max-width: $collapse-width)
+      border-bottom: 2px solid grey
+    > span
+      background-color: #414141
+      color: white
+    .offline
+      .icon-man, .icon-girl, .icon-user-secret
+        color: #fa9d9b
+    .online
+      .icon-man, .icon-girl, .icon-user-secret
+        color: #78f584
     a
       color: $color-white-main
     .icon-cog
@@ -264,13 +276,7 @@
           color: #90e690
     .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
       color: #cccccc
-    .chat-room-users-wrapper
-      color: $color-white-main
-      @media screen and (max-width: $collapse-width)
-        border-bottom: 2px solid grey
-      > span
-        background-color: #414141
-        color: white
+
 
 
 </style>
