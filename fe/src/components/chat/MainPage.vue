@@ -327,6 +327,11 @@
   @import "partials/variables"
   @import "partials/abstract_classes"
 
+  .color-white .userMessageWrapper /deep/
+    .usermsg
+      background-color: white
+    .icon-picture, .icon-smile, .icon-webrtc-video
+      color: #7b7979
   .noRoom
     justify-content: center
     align-items: center

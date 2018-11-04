@@ -31,6 +31,12 @@
   @import "partials/variables"
   @import "partials/abstract_classes"
 
+  .color-white .links
+    color: $link-color
+    &.router-link-active
+      color: #a47300
+
+
   .links
     display: flex
     max-width: 450px

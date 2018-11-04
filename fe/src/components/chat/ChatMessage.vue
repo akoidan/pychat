@@ -93,16 +93,12 @@
 
     get mainCls() {
       return {
-        "message-self": this.isSelf,
-        "message-others": !this.isSelf,
         "removed-message": this.message.deleted,
         "highLightMessage": this.isEditing,
       }
     }
 
-    get isSelf() {
-      return this.message.userId === this.userInfo.userId;
-    }
+
 
     get isEditing() {
       return this.editedMessage && this.editedMessage.messageId === this.message.id;

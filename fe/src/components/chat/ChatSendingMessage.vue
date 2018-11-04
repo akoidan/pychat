@@ -1,5 +1,5 @@
 <template>
-  <div :class="cls" class="msgHolder">
+  <div :class="cls">
     <chat-message :message="message"/>
     <template v-if="message.transfer">
       <app-progress-bar v-if="message.transfer.upload  && !message.transfer.error" :upload="message.transfer.upload"/>
@@ -15,7 +15,7 @@
   import AppProgressBar from '../ui/AppProgressBar';
   import {channelsHandler} from '../../utils/singletons';
   import {SetMessageProgressError} from '../../types/types';
-  import {MessageModel} from "../../types/model";
+  import {CurrentUserInfoModel, MessageModel} from "../../types/model";
   @Component({
     components: {AppProgressBar, ChatMessage}
   })
@@ -24,6 +24,7 @@
     @Mutation setMessageProgressError;
     @Action growlInfo;
     @State roomsDict;
+    @State userInfo: CurrentUserInfoModel;
 
     get searchedIds() {
       return this.roomsDict[this.message.roomId].search.searchedIds;
@@ -38,8 +39,17 @@
         sendingMessage: this.message.transfer && !this.message.transfer.upload,
         uploadMessage: this.message.transfer && !!this.message.transfer.upload,
         "filter-search": this.searchedIds.indexOf(this.message.id) >= 0,
+        "message-self": this.isSelf,
+        "message-others": !this.isSelf,
+        "removed-message": this.message.deleted,
       }
     }
+
+    get isSelf() {
+      return this.message.userId === this.userInfo.userId;
+    }
+
+
 
     retry() {
       let newVar: SetMessageProgressError = {
@@ -63,8 +73,6 @@
     > p
       padding-right: 30px
 
-  .msgHolder
-    position: relative
 
   .spinner
     position: absolute
@@ -77,4 +85,5 @@
     display: block
     text-align: center
     cursor: pointer
+
 </style>

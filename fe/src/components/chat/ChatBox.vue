@@ -214,7 +214,8 @@
 
 
   .color-white
-    .msgHolder, .message-system
+    .message-self, .message-system, .message-others
+      background-color: #f2fbff
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19)
       color: black
       display: table
@@ -222,8 +223,11 @@
       border-radius: 4px
       margin-top: 0.4em
       margin-bottom: 0.4em
-      .msg-self
-        margin-left: auto
+      /deep/ p
+        margin: 0 !important
+    .message-self
+      margin-left: auto
+      margin-right: 5px
 
     &:focus
       outline: none

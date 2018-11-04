@@ -7,3 +7,33 @@
   border: 1px solid #50547b
   a
     color: #50547b
+
+  @mixin button($bg, $br, $bgh, $brh, $bga, $bra)
+    color: #fff
+    background-color: $bg
+    border: 1px solid $br
+    outline: none
+    display: inline-block
+    padding: 6px 12px
+    margin-bottom: 0
+    font-size: 14px
+    font-weight: 400
+    line-height: 1.42857143
+    cursor: pointer
+    user-select: none
+    background-image: none
+    border-radius: 4px
+    &:hover
+      background-color: $bgh
+      border: 1px solid $brh
+      box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 3px 10px 0 rgba(0,0,0,0.19)
+    &:active
+      background-color: $bga
+      border: 1px solid $bra
+
+  .lor-btn
+    @include button(#286090, #204d74, #286090, #204d74, #204d74, #122b40)
+  .green-btn
+    @include button(#2e8512, #2b7812, #2a7411, #266a10, #2b7812, #2b7812)
+  input::-webkit-file-upload-button
+    @include button(#286090, #204d74, #286090, #204d74, #204d74, #122b40)
