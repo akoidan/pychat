@@ -31,10 +31,10 @@
   @import "partials/variables"
   @import "partials/abstract_classes"
 
-  .color-white .links
-    color: $link-color
+  .color-white .links a
+    color: #c3fffd
     &.router-link-active
-      color: #a47300
+      color: #e8e156
 
 
   .links
