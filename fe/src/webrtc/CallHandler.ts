@@ -472,7 +472,7 @@ export default class CallHandler extends BaseTransferHandler {
 
   hangCall() {
     this.logger.debug('on hangCall called')();
-    let hadConnections = this.webrtcConnnectionsIds.length >= 0;
+    let hadConnections = this.webrtcConnnectionsIds.length > 0;
     if (hadConnections) {
       this.closeAllPeerConnections();
     } else {
