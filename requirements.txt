@@ -8,7 +8,7 @@ tornado-redis==2.4.18
 django-redis-sessions==0.6.1
 #selenium # optional for testing, comment this if you don't go for tests
 websocket-client==0.46.0
-requests==2.18.4
+requests==2.20.0
 enum34==1.1.6
 django-sslserver==0.19
 #django-redis-cache
