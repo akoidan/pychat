@@ -156,6 +156,7 @@ export interface CallsInfoModel {
   calls: { [id: string]: CallInfoModel };
   callContainer: boolean;
   showMic: boolean;
+  isCallInBackground: number;
   currentMicLevel: number; // voice
   localStreamSrc: string;
   currentMic: string;

@@ -1,7 +1,17 @@
 import loggerFactory from '../utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import {SetReceivingFileStatus, VideoType} from '../types/types';
-import {DefaultMessage, OfferCall, OfferFile, WebRtcSetConnectionIdMessage} from '../types/messages';
+import {
+  SetCallToState,
+  SetReceivingFileStatus,
+  VideoType
+} from '../types/types';
+import {
+  DefaultMessage,
+  OfferCall,
+  OfferFile,
+  SetPingMessage,
+  WebRtcSetConnectionIdMessage
+} from '../types/messages';
 import WsHandler from '../utils/WsHandler';
 import {ReceivingFile, FileTransferStatus, RootState, SendingFile} from '../types/model';
 import {Store} from 'vuex';
@@ -38,7 +48,33 @@ export default class WebRtcApi extends MessageHandler {
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> }  = {
     offerFile: this.onofferFile,
     offerCall: this.offerCall,
+    pingCall: this.pingCall
   };
+
+  joinCall(roomId) {
+    this.getCallHandler(roomId).joinCall();
+    this.startCall(roomId);
+  }
+
+
+  pingCall(message: SetPingMessage) {
+    let state = Date.now();
+    let scts: SetCallToState = {
+      roomId: message.roomId,
+      state: state
+    };
+    this.getCallHandler(message.roomId).setConnectionId(message.connId);
+    this.store.commit('setCallInBackground', scts);
+    setTimeout(() => {
+      if (this.store.state.roomsDict[message.roomId].callInfo.isCallInBackground === state) {
+        let scts: SetCallToState = {
+          roomId: message.roomId,
+          state:  null
+        };
+        this.store.commit('setCallInBackground', scts);
+      }
+    }, 6000);
+  }
 
   private onofferFile(message: OfferFile) {
     let limitExceeded = message.content.size > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem;

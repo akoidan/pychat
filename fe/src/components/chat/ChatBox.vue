@@ -1,5 +1,8 @@
 <template>
   <div class="holder">
+    <div v-if="!room.callInfo.callActive && room.callInfo.isCallInBackground" @click="joinCall">
+      JOIN CALL
+    </div>
     <chat-call :call-info="room.callInfo" :room-id="room.id"/>
     <search-messages :room="room"/>
     <div class="chatbox" @keydown="keyDownLoadUp" :class="{'display-search-only': room.search.searchActive}" tabindex="1" @mousewheel="onScroll" ref="chatbox">
@@ -22,7 +25,7 @@
   import SearchMessages from "./SearchMessages.vue";
   import {ReceivingFile, RoomModel, SearchModel, SendingFile} from "../../types/model";
   import {MessageModelDto} from "../../types/dto";
-  import {channelsHandler, messageBus} from "../../utils/singletons";
+  import {channelsHandler, messageBus, webrtcApi} from "../../utils/singletons";
   import {SetSearchTo} from "../../types/types";
   import {MESSAGES_PER_SEARCH} from "../../utils/consts";
   import AppProgressBar from "../ui/AppProgressBar";
@@ -66,7 +69,9 @@
       }
     }
 
-
+    joinCall() {
+        webrtcApi.joinCall(this.room.id);
+    }
 
 
     created() {

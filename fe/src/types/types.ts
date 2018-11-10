@@ -47,6 +47,11 @@ export interface SetDevices {
   webcams: { [id: string]: string };
 }
 
+export interface SetCallToState {
+  roomId: number;
+  state: number;
+}
+
 export interface JsAudioAnalyzer {
   analyser: any;
   javascriptNode: any;

@@ -38,6 +38,7 @@ export function getRoomsBaseDict({roomId, volume, notifications, name, users}, o
     sendingFiles: oldRoom ? oldRoom.sendingFiles : {},
     volume,
     callInfo: {
+      isCallInBackground: oldRoom ? oldRoom.callInfo.isCallInBackground : null,
       calls: {},
       localStreamSrc: null,
       showMic: true,

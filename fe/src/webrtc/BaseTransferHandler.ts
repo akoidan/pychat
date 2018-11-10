@@ -28,7 +28,7 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     this.logger = loggerFactory.getLogger('WRTC', 'color: #960055');
   }
 
-  protected  onDestroy() {
+  protected onDestroy() {
      sub.unsubscribe(Subscription.getTransferId(this.connectionId));
   }
 
@@ -42,6 +42,10 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     if (this.webrtcConnnectionsIds.length === 0) {
       this.onDestroy();
     }
+  }
+
+  setConnectionId(newId) {
+    this.connectionId = newId;
   }
 
   protected closeAllPeerConnections() { // calls on destroy

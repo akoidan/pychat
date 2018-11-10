@@ -86,6 +86,15 @@ export default class WsHandler extends MessageHandler {
     this.appendCB(cb);
   }
 
+
+    public pingCall(roomId, connectionId) {
+        this.sendToServer({
+            action: 'pingCall',
+            roomId: roomId,
+            connId:  connectionId
+        });
+    }
+
 public acceptFile(connId, received) {
     this.sendToServer({
       action: 'acceptFile',

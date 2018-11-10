@@ -36,6 +36,7 @@ class Actions(object):
 	PING = 'ping'
 	PONG = 'pong'
 	CHECK_PING = 'check_ping'
+	PING_CALL = 'pingCall'
 
 
 

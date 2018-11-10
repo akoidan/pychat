@@ -29,7 +29,7 @@ import {
   PrivateRoomsIds,
   RemoveMessageProgress,
   RemoveSendingMessage,
-  SetCallOpponent,
+  SetCallOpponent, SetCallToState,
   SetDevices,
   SetMessageProgress,
   SetMessageProgressError,
@@ -233,6 +233,9 @@ const store: StoreOptions<RootState> = {
     },
     addReceivingFile(state: RootState, payload: ReceivingFile) {
       Vue.set(state.roomsDict[payload.roomId].receivingFiles, payload.connId, payload);
+    },
+    setCallInBackground(state: RootState, payload: SetCallToState) {
+      state.roomsDict[payload.roomId].callInfo.isCallInBackground = payload.state;
     },
     addSendingFileTransfer(state: RootState, payload: AddSendingFileTransfer) {
       Vue.set(state.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers, payload.transferId, payload.transfer);

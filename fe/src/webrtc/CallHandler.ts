@@ -342,9 +342,12 @@ export default class CallHandler extends BaseTransferHandler {
     // this.autoSetLocalVideoVisibility();
   }
 
+  private pingInterval: number;
+
   async offerCall() {
     let stream;
     try {
+      this.setupPingInterval();
       stream = await this.captureInput();
       this.logger.log('got local stream {}', stream)();
       if (stream) {
@@ -367,6 +370,15 @@ export default class CallHandler extends BaseTransferHandler {
     }
   }
 
+
+  private setupPingInterval() {
+    if (this.pingInterval) {
+      clearInterval(this.pingInterval);
+      this.logger.debug('Cleared interval {}', this.pingInterval)();
+      this.pingInterval = null;
+    }
+    this.pingInterval = setInterval(() => this.wsHandler.pingCall(this.roomId, this.connectionId), 5000);
+  }
 
   createCallPeerConnection(message: ReplyCallMessage) {
     if (message.opponentWsId > this.wsHandler.getWsConnectionId()) {
@@ -404,7 +416,9 @@ export default class CallHandler extends BaseTransferHandler {
     this.doAnswer(false);
   }
 
-  async doAnswer(withVideo: boolean) {
+
+  async joinCall() {
+    this.setupPingInterval();
     let trueBoolean: BooleanIdentifier = {
       state: true,
       id: this.roomId,
@@ -412,7 +426,28 @@ export default class CallHandler extends BaseTransferHandler {
     let falseBoolean: BooleanIdentifier = {
       state: false,
       id: this.roomId,
-    }
+    };
+    this.store.commit('setIncomingCall', null);
+    this.store.commit('setCallActiveToState', trueBoolean);
+    this.store.commit('setContainerToState', trueBoolean);
+    this.store.commit('setVideoToState', falseBoolean);
+    this.store.commit('setMicToState', trueBoolean);
+    this.setCallStatus('accepted');
+    let stream = await this.captureInput();
+    this.attachLocalStream(stream);
+
+  }
+
+  async doAnswer(withVideo: boolean) {
+    this.setupPingInterval();
+    let trueBoolean: BooleanIdentifier = {
+      state: true,
+      id: this.roomId,
+    };
+    let falseBoolean: BooleanIdentifier = {
+      state: false,
+      id: this.roomId,
+    };
     this.store.commit('setIncomingCall', null);
     this.store.commit('setCallActiveToState', trueBoolean);
     this.store.commit('setContainerToState', trueBoolean);
@@ -451,6 +486,8 @@ export default class CallHandler extends BaseTransferHandler {
 
   onDestroy() {
     this.stopLocalStream();
+    clearInterval(this.pingInterval);
+    this.pingInterval = null;
     let payload2: StringIdentifier = {
       id: this.roomId,
       state: null
@@ -481,7 +518,7 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   private setCallStatus(status: string) {
-    this.logger.log("Setting call status to {}", status)();
+    this.logger.log('Setting call status to {}', status)();
     this.callStatus = status;
   }
 }

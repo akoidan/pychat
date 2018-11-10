@@ -597,11 +597,16 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 			Actions.REPLY_FILE_CONNECTION: self.reply_file_connection,
 			Actions.RETRY_FILE_CONNECTION: self.retry_file_connection,
 			Actions.REPLY_CALL_CONNECTION: self.reply_call_connection,
+			Actions.PING_CALL: self.ping_call,
 		})
 		self.process_pubsub_message.update({
 			Actions.OFFER_FILE_CONNECTION: self.set_opponent_call_channel,
 			Actions.OFFER_CALL_CONNECTION: self.set_opponent_call_channel
 		})
+
+	def ping_call(self, message):
+		message[VarNames.HANDLER_NAME] = HandlerNames.WEBRTC
+		self.publish(message, message[VarNames.ROOM_ID])
 
 	def set_opponent_call_channel(self, message):
 		connection_id = message[VarNames.CONNECTION_ID]

@@ -1,5 +1,11 @@
-import {FileModelDto, MessageModelDto, RoomDto, SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from './dto';
-import {FileModel} from './model';
+import {
+  FileModelDto,
+  MessageModelDto,
+  RoomDto,
+  UserDto,
+  UserProfileDto,
+  UserSettingsDto
+} from './dto';
 
 export interface DefaultMessage {
   action: string;
@@ -48,6 +54,10 @@ export interface OfferFile extends WebRtcDefaultMessage {
   time: number;
 }
 
+export interface SetPingMessage extends WebRtcDefaultMessage {
+  roomId: number;
+}
+
 export interface OfferCall extends WebRtcDefaultMessage {
   content: BrowserBase;
   opponentWsId: string;
@@ -63,7 +73,7 @@ export interface SetUserProfileMessage extends DefaultMessage {
   content: UserProfileDto;
 }
 
-interface ReplyWebRtc extends WebRtcDefaultMessage{
+interface ReplyWebRtc extends WebRtcDefaultMessage {
   content: BrowserBase;
   opponentWsId: string;
   userId: number;
