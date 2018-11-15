@@ -5,7 +5,9 @@ const chalk = require('chalk');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const name = '[name].[ext]?[sha512:hash:base64:6]';
+
 module.exports = (env, argv) => {
   let plugins;
   let sasscPlugins;
@@ -69,7 +71,8 @@ module.exports = (env, argv) => {
     ];
   }
 
-  const conf =  {
+  const smp = new SpeedMeasurePlugin();
+  const conf =  smp.wrap({
     devServer,
     entry: ['./src/main.ts'],
     plugins,
@@ -146,7 +149,7 @@ module.exports = (env, argv) => {
         }
       ],
     },
-  };
+  });
 
     // create vendor.js file for development so webpack doesn't need to reassemble it every time
     // you can remove `argv.mode === 'development'` if you want it for prod. Or remove this if at all

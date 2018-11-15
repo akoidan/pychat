@@ -71,6 +71,7 @@
     "null-loader": "^0.1.1",
     "sass-lint": "^1.12.1",
     "sass-loader": "^7.0.3",
+    "speed-measure-webpack-plugin": "^1.2.3",
     "style-loader": "^0.21.0",
     "sw-loader": "^0.1.2",
     "ts-loader": "^4.3.1",

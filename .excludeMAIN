@@ -30,6 +30,7 @@ chat/static/sass/partials/_highlight.scss
 chat/static/sass/themes/_highlight-dark.scss
 chat/static/sass/themes/_highlight-light.scss
 trash
+fe/awesome-typescript-loader
 .fontello
 docker/volumes
 docker-all/volumes

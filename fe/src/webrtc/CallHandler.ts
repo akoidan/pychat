@@ -102,13 +102,13 @@ export default class CallHandler extends BaseTransferHandler {
 
 
   async getDesktopShareFromExtension() {
-    return new Promise( (res, rej) => {
+    return new Promise((res, rej) => {
       if (!isChrome) {
         rej('ScreenCast feature is only available from chrome atm');
       } else if (isMobile) {
         rej('ScreenCast is not available for mobile phones yet');
       } else {
-        this.pingExtension( (success) => {
+        this.pingExtension((success) => {
           this.logger.log('Ping to extension succeeded')();
           if (success) {
             chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
@@ -205,8 +205,8 @@ export default class CallHandler extends BaseTransferHandler {
     }
   }
 
-  processAudio (audioProc)  {
-    return  () => {
+  processAudio(audioProc) {
+    return () => {
       if (!this.callInfo.showMic) {
         return;
       }
@@ -285,7 +285,7 @@ export default class CallHandler extends BaseTransferHandler {
     this.setCallIconsState();
   }
 
-  getTrack (kind: VideoType) {
+  getTrack(kind: VideoType) {
     let track = null;
     let tracks = [];
     if (this.localStream) {
@@ -323,7 +323,7 @@ export default class CallHandler extends BaseTransferHandler {
   // }
 
 
-  setCallIconsState  () {
+  setCallIconsState() {
     // if (this.callInfo.showMic) {
     //   let audioTrack = this.getTrack('audio');
     //   if (!audioTrack) {
@@ -370,8 +370,8 @@ export default class CallHandler extends BaseTransferHandler {
 
   createCallPeerConnection(message: ReplyCallMessage) {
     if (message.opponentWsId > this.wsHandler.getWsConnectionId()) {
-      new CallSenderPeerConnection(this.roomId, this.connectionId, message.opponentWsId,  message.userId,  this.wsHandler, this.store);
-    }  else {
+      new CallSenderPeerConnection(this.roomId, this.connectionId, message.opponentWsId, message.userId, this.wsHandler, this.store);
+    } else {
       new CallReceiverPeerConnection(this.roomId, this.connectionId, message.opponentWsId, message.userId, this.wsHandler, this.store);
     }
     this.webrtcConnnectionsIds.push(message.opponentWsId);
@@ -422,7 +422,7 @@ export default class CallHandler extends BaseTransferHandler {
     let stream = await this.captureInput();
     this.attachLocalStream(stream);
     this.wsHandler.acceptCall(this.connectionId);
-    this.acceptedPeers.forEach( (e) => {
+    this.acceptedPeers.forEach((e) => {
       let message: ConnectToRemoteMessage = {
         action: 'connectToRemote',
         stream: this.localStream,
@@ -444,7 +444,7 @@ export default class CallHandler extends BaseTransferHandler {
     }
   }
 
-  stopLocalStream () {
+  stopLocalStream() {
     this.destroyAudioProcessor();
     this.destroyStreamData(this.localStream);
   }
