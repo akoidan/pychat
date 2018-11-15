@@ -35,6 +35,7 @@ export default class WebRtcApi extends MessageHandler {
   private store: Store<RootState>;
   private notifier: NotifierHandler;
   private callHandlers: {[id: number]: CallHandler} = {};
+  private callTimeout: number;
 
   constructor(ws: WsHandler, store: Store<RootState>, notifier: NotifierHandler) {
     super();
@@ -52,12 +53,17 @@ export default class WebRtcApi extends MessageHandler {
   };
 
   joinCall(roomId) {
+    // TODO
     this.getCallHandler(roomId).joinCall();
     this.startCall(roomId);
   }
 
 
   pingCall(message: SetPingMessage) {
+    if (this.callTimeout) {
+      clearInterval(this.callTimeout);
+      this.callTimeout = null;
+    }
     let state = Date.now();
     let scts: SetCallToState = {
       roomId: message.roomId,
@@ -65,14 +71,13 @@ export default class WebRtcApi extends MessageHandler {
     };
     this.getCallHandler(message.roomId).setConnectionId(message.connId);
     this.store.commit('setCallInBackground', scts);
-    setTimeout(() => {
-      if (this.store.state.roomsDict[message.roomId].callInfo.isCallInBackground === state) {
-        let scts: SetCallToState = {
-          roomId: message.roomId,
-          state:  null
-        };
-        this.store.commit('setCallInBackground', scts);
-      }
+    this.callTimeout = setTimeout(() => {
+      let scts: SetCallToState = {
+        roomId: message.roomId,
+        state:  null
+      };
+      this.store.commit('setCallInBackground', scts);
+      this.callTimeout = null;
     }, 6000);
   }
 

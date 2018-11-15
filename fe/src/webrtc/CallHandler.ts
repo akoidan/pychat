@@ -377,6 +377,7 @@ export default class CallHandler extends BaseTransferHandler {
       this.logger.debug('Cleared interval {}', this.pingInterval)();
       this.pingInterval = null;
     }
+    this.logger.log('Creating new ping interval')();
     this.pingInterval = setInterval(() => this.wsHandler.pingCall(this.roomId, this.connectionId), 5000);
   }
 
