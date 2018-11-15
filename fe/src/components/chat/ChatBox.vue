@@ -211,7 +211,27 @@
     font-size: 18px
     @include flex(1) // Fix Safari's 0 height
 
+    &:focus
+      outline: none
 
+    &.display-search-only /deep/
+      >:not(.filter-search)
+        display: none
+
+  fieldset
+    border-top: 1px solid #e8e8e8
+    border-bottom: none
+    border-left: none
+    border-right: none
+    display: block
+    text-align: center
+    padding: 0
+    margin-left: 3px
+    margin-right: 10px
+
+    legend
+      padding: 0 10px
+      font-weight: bold
 
   .color-white
     .message-self, .message-system, .message-others
@@ -229,12 +249,6 @@
       margin-left: auto
       margin-right: 5px
 
-    &:focus
-      outline: none
-
-    &.display-search-only /deep/
-      >:not(.filter-search)
-        display: none
 
   .color-lor .holder /deep/
     .message-others .message-header
@@ -242,6 +256,8 @@
     .message-self .message-header
       color: #e29722
     .message-system .message-header
+      color: #9DD3DD
+    fieldset legend
       color: #9DD3DD
 
   .color-reg .holder /deep/
@@ -251,28 +267,10 @@
       color: #e29722
     .message-system .message-header
       color: #84B7C0
+    fieldset legend
+      color: #9DD3DD
 
 
-  fieldset
-    border-top: 1px solid #e8e8e8
-    border-bottom: none
-    border-left: none
-    border-right: none
-    display: block
-    text-align: center
-    padding: 0
-    margin-left: 3px
-    margin-right: 10px
-
-    legend
-      padding: 0 10px
-      font-weight: bold
-
-  .color-lor fieldset legend
-    color: #9DD3DD
-
-  .color-reg fieldset legend
-    color: #9DD3DD
 
 
 </style>
