@@ -14,7 +14,7 @@ import {CallsInfoModel, IncomingCallModel} from '../types/model';
 import {
   BooleanIdentifier,
   ChangeStreamMessage,
-  JsAudioAnalyzer,
+  JsAudioAnalyzer, MediaIdentifier,
   NumberIdentifier,
   SetDevices,
   StringIdentifier, VideoType
@@ -276,9 +276,9 @@ export default class CallHandler extends BaseTransferHandler {
     if (stream) {
       this.localStream = stream;
       this.audioProcessor = createMicrophoneLevelVoice(stream, this.processAudio.bind(this));
-      let payload: StringIdentifier = {
+      let payload: MediaIdentifier = {
         id: this.roomId,
-        state: URL.createObjectURL(stream)
+        media: stream
       };
       this.store.commit('setLocalStreamSrc', payload);
     }
