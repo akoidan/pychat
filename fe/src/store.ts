@@ -23,7 +23,7 @@ import {
 import {
   AddSendingFileTransfer,
   BooleanIdentifier,
-  ChangeOnlineEntry,
+  ChangeOnlineEntry, MediaIdentifier,
   MessagesLocation,
   NumberIdentifier,
   PrivateRoomsIds,
@@ -52,8 +52,14 @@ Vue.use(Vuex);
 
 interface State extends ActionContext<RootState, RootState> {}
 
-const logger = loggerFactory.getLoggerColor('store', '#6a6400');
 
+const logger = loggerFactory.getLoggerColor('store', '#6a6400');
+const mediaLinkIdGetter: Function = (function () {
+  let i = 0;
+  return function () {
+    return String(i++);
+  };
+})();
 
 const store: StoreOptions<RootState> = {
   state: {
@@ -74,6 +80,7 @@ const store: StoreOptions<RootState> = {
     online: [],
     activeRoomId: null,
     editedMessage: null,
+    mediaObjects: {}
   },
   getters: {
     userName(state: RootState) {
@@ -181,7 +188,9 @@ const store: StoreOptions<RootState> = {
       state.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].opponentCurrentVoice = payload.voice;
     },
     setOpponentAnchor(state: RootState, payload: SetOpponentAnchor) {
-      state.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].anchor = payload.anchor;
+      let key: string = mediaLinkIdGetter();
+      state.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
+      Vue.set(state.mediaObjects, key, payload.anchor);
     },
     setDim(state: RootState, payload: boolean) {
       state.dim = payload;
@@ -228,8 +237,10 @@ const store: StoreOptions<RootState> = {
     setCallActiveToState(state: RootState, payload: BooleanIdentifier) {
       state.roomsDict[payload.id].callInfo.callActive = payload.state;
     },
-    setLocalStreamSrc(state: RootState, payload: StringIdentifier) {
-      state.roomsDict[payload.id].callInfo.localStreamSrc = payload.state;
+    setLocalStreamSrc(state: RootState, payload: MediaIdentifier) {
+      let key: string = mediaLinkIdGetter();
+      Vue.set(state.mediaObjects, key, payload.media);
+      state.roomsDict[payload.id].callInfo.mediaStreamLink = key;
     },
     addReceivingFile(state: RootState, payload: ReceivingFile) {
       Vue.set(state.roomsDict[payload.roomId].receivingFiles, payload.connId, payload);
