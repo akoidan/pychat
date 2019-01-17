@@ -1,6 +1,6 @@
 <template>
   <div class="micVideoWrapper">
-    <video :src="callInfo.anchor" ref="video"></video>
+    <video-object :muted="null" :media-stream-link="callInfo.mediaStreamLink"/>
     <div>
       <app-input-range :value="volumeLevel" min="0" max="100" title="Volume level" :class="volLevelClass"/>
       <span>{{userNameValue}}</span>
@@ -12,8 +12,9 @@
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {CallInfoModel} from '../../types/model';
   import AppInputRange from '../ui/AppInputRange';
+  import VideoObject from './VideoObject.vue';
   @Component({
-    components: {AppInputRange}
+    components: {VideoObject, AppInputRange}
   })
   export default class ChatRemotePeer extends Vue {
     @Prop() callInfo: CallInfoModel;
@@ -31,23 +32,13 @@
 
     @Watch('volumeLevel')
     onVolumeChanged(newValue) {
-      this.$refs.video.volume = newValue / 100;
+      this.$refs.video.$refs.video.volume = newValue / 100;
     }
 
     $refs : {
-      video: HTMLVideoElement
+      video: VideoObject
     };
 
-    @Watch('callInfo.anchor')
-    onAnchorChanged(value) {
-      this.$nextTick(function () {
-        if (value) {
-          this.$refs.video.play();
-        } else {
-          this.$refs.video.pause();
-        }
-      })
-    }
   }
 </script>
 

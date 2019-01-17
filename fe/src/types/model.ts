@@ -146,7 +146,7 @@ export interface SendingFile {
 
 
 export interface CallInfoModel {
-  anchor: string;
+  mediaStreamLink: string;
   connected: boolean;
   userId: number;
   opponentCurrentVoice: number;
@@ -157,7 +157,7 @@ export interface CallsInfoModel {
   callContainer: boolean;
   showMic: boolean;
   currentMicLevel: number; // voice
-  localStreamSrc: string;
+  mediaStreamLink: string;
   currentMic: string;
   currentSpeaker: string;
   currentWebcam: string;
@@ -202,5 +202,6 @@ export interface RootState {
   regHeader: string;
   online: number[];
   roomsDict: RoomDictModel;
+  mediaObjects: { [id: string]: MediaStream };
 }
 

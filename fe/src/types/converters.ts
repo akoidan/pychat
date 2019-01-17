@@ -39,7 +39,7 @@ export function getRoomsBaseDict({roomId, volume, notifications, name, users}, o
     volume,
     callInfo: {
       calls: {},
-      localStreamSrc: null,
+      mediaStreamLink: null,
       showMic: true,
       callContainer: false,
       callActive: false,

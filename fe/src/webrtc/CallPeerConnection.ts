@@ -15,7 +15,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       roomId: this.roomId,
       callInfoModel: {
         connected: false,
-        anchor: null,
+        mediaStreamLink: null,
         userId,
         opponentCurrentVoice: 0
       }
@@ -46,7 +46,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     this.pc.onaddstream =  (event) => {
       this.logger.log('onaddstream')();
       let payload: SetOpponentAnchor = {
-        anchor: URL.createObjectURL(event.stream),
+        anchor: event.stream,
         opponentWsId: this.opponentWsId,
         roomId: this.roomId
       };

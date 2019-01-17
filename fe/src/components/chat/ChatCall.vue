@@ -11,7 +11,7 @@
         </div>
         <div class="micVideoHolder">
           <chat-remote-peer v-for="(call, id) in callInfo.calls" :call-info="call" :key="id"/>
-          <video muted="muted" class="localVideo" ref="localVideo" :src="callInfo.localStreamSrc"></video>
+          <video-object muted="muted" :media-stream-link="callInfo.mediaStreamLink" class="localVideo" ref="localVideo" />
         </div>
         <progress max="15" :value="callInfo.currentMicLevel" title="Your microphone level" class="microphoneLevel"></progress>
       </div>
@@ -77,8 +77,9 @@
   import {webrtcApi} from '../../utils/singletons';
   import ChatRemotePeer from './ChatRemotePeer';
   import {file} from '../../utils/audio';
+  import VideoObject from "./VideoObject.vue";
   @Component({
-    components: {ChatRemotePeer}
+    components: {VideoObject, ChatRemotePeer}
   })
   export default class ChatCall extends Vue {
     @Prop() callInfo: CallsInfoModel;
@@ -98,7 +99,6 @@
     @State webcams: { [id: string]: string };
     fullscreen: boolean = false;
 
-
     fullScreenChange(event) {
       this.logger.log("fs change")();
       if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
@@ -117,17 +117,6 @@
     destroyed() {
       ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
         document.removeEventListener(e, this.listener, false);
-      })
-    }
-
-    @Watch('callInfo.localStreamSrc')
-    onLocalStreamChange(newValue) {
-      this.$nextTick(function () {
-        if (newValue) {
-          this.$refs.localVideo.play();
-        } else {
-          this.$refs.localVideo.pause();
-        }
       })
     }
 
@@ -164,8 +153,8 @@
     @Watch('callInfo.currentSpeaker')
     onSpeakerChange(newValue) {
       this.$nextTick(function () {
-        if (this.$refs.localVideo['setSinkId']) {
-          this.$refs.localVideo['setSinkId'](newValue);
+        if (this.$refs.localVideo.$refs.video['setSinkId']) {
+          this.$refs.localVideo.$refs.video['setSinkId'](newValue);
         } else  {
           this.logger.error("SetSinkId doesn't exist")();
         }
@@ -174,7 +163,7 @@
 
 
     $refs: {
-      localVideo: HTMLVideoElement,
+      localVideo: VideoObject,
       videoContainer: HTMLElement,
     };
 

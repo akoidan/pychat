@@ -80,7 +80,7 @@ export interface SetOpponentVoice {
 export interface SetOpponentAnchor {
   roomId: number;
   opponentWsId: string;
-  anchor: string;
+  anchor: MediaStream;
 }
 
 export interface BooleanIdentifier {
@@ -96,6 +96,11 @@ export interface NumberIdentifier {
 export interface StringIdentifier {
   id: number;
   state: string;
+}
+
+export interface MediaIdentifier {
+  id: number;
+  media: MediaStream;
 }
 
 export interface RemovePeerConnection extends DefaultMessage {
