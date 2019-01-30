@@ -98,7 +98,7 @@
     "lines-logger": "^1.0.4",
     "lodash.debounce": "^4.0.8",
     "npm-font-open-sans": "^1.1.0",
-    "spainter": "^0.0.7",
+    "spainter": "^0.0.8",
     "typeface-oswald": "^0.0.54",
     "vue": "^2.5.16",
     "vue-router": "^3.0.1",
