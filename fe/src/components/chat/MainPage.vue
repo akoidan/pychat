@@ -32,7 +32,7 @@
       <i class="icon-picture" title="Share Video/Image" @click="addImage"></i>
       <i class="icon-smile" title="Add a smile :)" @click="showSmileys = !showSmileys"></i>
       <media-recorder @record="handleRecord" @video="handleAddVideo" @audio="handleAddAudio"/>
-      <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage"></div>
+      <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage" @paste="onImagePaste"></div>
     </div>
   </div>
 </template>
@@ -111,6 +111,21 @@
       });
     }
 
+    onImagePaste(evt: ClipboardEvent) {
+      this.logger.debug("Clipboard has {} files", evt.clipboardData.files.length)();
+      if (evt.clipboardData.files.length) {
+        for (var i = 0; i < evt.clipboardData.files.length; i++) {
+          var file = evt.clipboardData.files[i];
+          this.logger.debug("loop {}", file)();
+          if (file.type.indexOf("image") >= 0) {
+            pasteImgToTextArea(file, this.$refs.userMessage, err => {
+              this.growlError(err);
+            });
+          }
+        }
+      }
+    }
+
     created() {
       messageBus.$on('quote', (message :MessageModel) => {
         this.$refs.userMessage.focus();
@@ -172,7 +187,7 @@
       }
     }
 
-    dropPhoto(evt) {
+    dropPhoto(evt: DragEvent) {
       this.logger.debug("Drop photo {} ", evt.dataTransfer.files)();
       if (evt.dataTransfer.files) {
         for (var i = 0; i < evt.dataTransfer.files.length; i++) {
