@@ -122,7 +122,7 @@
         placeCaretAtEnd(this.$refs.userMessage);
       });
       messageBus.$on("blob", (e: Blob) => {
-        this.logger.info("Pasting blob {}", e)();
+        this.logger.log("Pasting blob {}", e)();
         this.$nextTick(function () {
           pasteBlobToContentEditable(e, this.$refs.userMessage);
         });
