@@ -54,7 +54,8 @@
     @extend %nav
 
   .body
-    height: 100%
+    flex: 1
+    min-height: 0
 
   .wait
     cursor: wait

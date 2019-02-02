@@ -34,6 +34,7 @@ LOGGING['loggers'] = {
 		'propagate': False,
 	},
 }
+CORS_ORIGIN_ALLOW_ALL = True
 
 MIDDLEWARE_CLASSES = ('corsheaders.middleware.CorsMiddleware', ) + MIDDLEWARE_CLASSES
 CORS_ORIGIN_WHITELIST = (
