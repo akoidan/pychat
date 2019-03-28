@@ -183,6 +183,7 @@ Services commands for Archlinux:
 Take a look at [Contributing.md](/CONTRIBUTING.md) for more info details.
  
 # TODO list
+* auto generate docker image on commit
 * If new user register on sites and join to public room, he  adds online but he aint present in room `all` therefore he aint present in user list at all.
 * If self assigned certificate was used, mb add user an option to click on iframe or smth?
 * Giphy: The gif-picture won't change after editing and leaving it's name. But there are tons of other gifs under every tag. 
