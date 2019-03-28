@@ -12,10 +12,25 @@
 <script lang='ts'>
   import {Component, Vue} from "vue-property-decorator";
   import {State} from "vuex-class";
+  import {AUTO_REGISTRATION} from '../../utils/consts';
+  import {api} from '../../utils/singletons';
+  import {login} from '../../utils/utils';
 
   @Component
-  export default class Main extends Vue {
+  export default class MainPage extends Vue {
     @State regHeader: string;
+
+    getRandom(): string {
+      return Math.random().toString(36).substring(7);
+    }
+
+    created() {
+      if (AUTO_REGISTRATION) {
+        this.$api.registerDict(this.getRandom(), this.getRandom(), (session, error)=> {
+          login(session, error);
+        })
+      }
+    }
 
   }
 </script>

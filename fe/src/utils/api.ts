@@ -95,6 +95,14 @@ export default class Api extends MessageHandler {
     });
   }
 
+  public registerDict(password: string, username: string, cb: ErrorCB<string>) {
+    this.xhr.doPost<string>({
+      url: '/register',
+      params: {username, password},
+      cb
+    });
+  }
+
   public googleAuth(token, cb) {
     this.xhr.doPost({
       url: '/google-auth',
