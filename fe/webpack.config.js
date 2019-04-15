@@ -39,7 +39,7 @@ module.exports = (env, argv) => {
   let devServer;
   if (argv.mode === 'production') {
     const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-    plugins.push(new CleanWebpackPlugin('./dist'));
+    plugins.push(new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns : ['./dist']}));
     plugins.push(new MiniCssExtractPlugin());
     sasscPlugins = [
       MiniCssExtractPlugin.loader,
