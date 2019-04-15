@@ -92,7 +92,7 @@
       if (file && file.type && file.type.match(/image.*/)) {
         let reader = new FileReader();
         reader.onload = (e) => {
-          this.srcImg = e.target.result;
+          this.srcImg = reader.result as string;
           this.growlSuccess("Photo has been rendered, click save to apply it");
         };
         reader.readAsDataURL(file);

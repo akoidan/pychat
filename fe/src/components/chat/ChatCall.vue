@@ -101,7 +101,7 @@
 
     fullScreenChange(event) {
       this.logger.log("fs change")();
-      if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
+      if (!(document.fullscreenElement || document['webkitFullscreenElement'] || document.mozFullscreenElement || document.msFullscreenElement)) {
         this.fullscreen = false;
       }
     }
@@ -127,8 +127,8 @@
         document.msCancelFullScreen();
       } else if (document.mozCancelFullScreen) {
         document.mozCancelFullScreen();
-      } else if (document.webkitCancelFullScreen) {
-        document.webkitCancelFullScreen();
+      } else if (document['webkitCancelFullScreen']) {
+        document['webkitCancelFullScreen']();
       }
       this.fullscreen = false;
     }
@@ -141,8 +141,8 @@
         elem.msRequestFullscreen();
       } else if (elem.mozRequestFullScreen) {
         elem.mozRequestFullScreen();
-      } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen()
+      } else if (elem['webkitRequestFullscreen']) {
+        elem['webkitRequestFullscreen']()
       } else {
         this.growlError("Can't enter fullscreen");
         return;

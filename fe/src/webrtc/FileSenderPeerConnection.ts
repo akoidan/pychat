@@ -84,7 +84,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
   }
 
   onreceiveChannelOpen() {
-    this.logger.log('Channel is open, slicing file: {} {} {} {}', this.file.name, bytesToSize(this.file.size), this.file.type, getDay(this.file.lastModifiedDate))();
+    this.logger.log('Channel is open, slicing file: {} {} {} {}', this.file.name, bytesToSize(this.file.size), this.file.type, getDay(new Date(this.file.lastModified)))();
     this.reader = new FileReader();
     this.reader.onload = this.onFileReaderLoad.bind(this);
     this.sendCurrentSlice();

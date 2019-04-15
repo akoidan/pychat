@@ -1,4 +1,6 @@
 ## To run
+
+ - If you have issues with node, use version 8.0.0, `nvm use 8.0.0`. You can install nvm with [archlinux](https://wiki.archlinux.org/index.php/Node.js_) [ubuntu](https://qiita.com/shaching/items/6e398140432d4133c866) [windows](https://github.com/coreybutler/nvm-windows)
  - yarn install
  - yarn run dev
 

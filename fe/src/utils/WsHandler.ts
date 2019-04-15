@@ -191,13 +191,14 @@ public acceptFile(connId, received) {
   }
 
   public pingServer() {
-    if (this.sendToServer({action: 'ping'}, true)) {
-      this.answerPong();
-      this.pingTimeoutFunction = setTimeout(() => {
-        this.logger.error('Force closing socket coz pong time out')();
-        this.ws.close(1000, 'Ping timeout');
-      }, PING_CLOSE_JS_DELAY);
-    }
+    this.sendToServer({action: 'ping'}, true);
+    // TODO not used
+    // this.answerPong();
+    // this.pingTimeoutFunction = setTimeout(() => {
+    //   this.logger.error('Force closing socket coz pong time out')();
+    //   this.ws.close(1000, 'Ping timeout');
+    // }, PING_CLOSE_JS_DELAY);
+    //
   }
 
   public stopListening() {
@@ -248,12 +249,12 @@ public acceptFile(connId, received) {
     });
   }
 
-  private sendToServer(messageRequest, skipGrowl = false) {
+  private sendToServer(messageRequest, skipGrowl = false): void {
     if (!messageRequest.messageId) {
       messageRequest.messageId = this.getMessageId();
     }
     let jsonRequest = JSON.stringify(messageRequest);
-    return this.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
+    this.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
   }
 
 
@@ -418,7 +419,7 @@ public acceptFile(connId, received) {
   }
 
 
-  private sendRawTextToServer(jsonRequest, skipGrowl, objData) {
+  private sendRawTextToServer(jsonRequest, skipGrowl, objData) : void {
     if (!this.isWsOpen()) {
       if (!skipGrowl) {
         this.store.dispatch('growlError', 'Can\'t send message, because connection is lost :(');
