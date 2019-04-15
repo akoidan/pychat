@@ -128,8 +128,8 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  - Start session holder: `redis-server`
  - Start webSocket listener: `python manage.py start_tornado`
  - Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
- - Open in browser [http**s**://127.0.0.1:8000](https://127.0.0.1:8000).
- - If you get an ssl error on establishing websocket connection in browser (at least in Firefox, chrome should be fine), that's because you're using self-assigned certificate (provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt)).You need to add security exception for websocket `API_PORT` (8888). Open [https://localhost:8888](https://localhost:8888) to do that.
+ - Open in browser [http**s**://127.0.0.1:8080](https://127.0.0.1:8080).
+ - Add self signed ssl certificate provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt) to browser exception. Open [https://localhost:8888](https://localhost:8888) and [https://localhost:8000](https://localhost:8000). Where `8888` is `API_PORT` and `8000` is `manage.py` argument.
 
 ## Production setup
 Further instructions assume that you're executing them from project directory. First of of you need to install packages for Archlinux/CentOS and then follow the [Common](#common) flow
