@@ -149,6 +149,11 @@ export function  extractError (args) {
   }
 }
 
+export function getChromeVersion () {
+  let raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+  return raw ? parseInt(raw[2], 10) : false;
+}
+
 export function initGoogle(cb) {
   if (!googleInited && GOOGLE_OAUTH_2_CLIENT_ID) {
     logger.log('Initializing google sdk')();

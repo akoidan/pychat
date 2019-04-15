@@ -97,7 +97,7 @@ export default class NotifierHandler {
     if ((<any>Notification).permission !== 'granted') { // TODO
       let result = await Notification.requestPermission();
       if (result !== 'granted') {
-        throw `User blocked notification permission. Notifications won't be available`;
+        throw Error(`User blocked notification permission. Notifications won't be available`);
       }
       return true;
     }
@@ -127,9 +127,9 @@ export default class NotifierHandler {
 
   private async registerWorker() {
     if (!navigator.serviceWorker) {
-      throw 'Service worker is not supported';
+      throw Error('Service worker is not supported');
     } else if (!MANIFEST) {
-     throw 'FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing';
+     throw Error('FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing');
     }
     let r = await navigator.serviceWorker.register((<any>swUrl) as string, {scope: '/'});
     this.logger.debug('Registered service worker {}', r)();
@@ -139,7 +139,7 @@ export default class NotifierHandler {
     this.logger.debug('Got subscription {}', subscription)();
     this.subscriptionId = this.getSubscriptionId(subscription);
     if (!this.subscriptionId) {
-      throw 'Current browser doesnt support offline notifications';
+      throw Error('Current browser doesnt support offline notifications');
     }
     await new Promise((resolve, reject) => {
       this.api.registerFCB(this.subscriptionId, this.browserVersion, this.isMobile, e => {
@@ -158,7 +158,7 @@ export default class NotifierHandler {
   async tryAgainRegisterServiceWorker() {
     try {
       if (!(<any>window).Notification) {
-        throw 'Notifications are not supported';
+        throw Error('Notifications are not supported');
       }
       let granted = await this.checkPermissions();
       if (granted) {

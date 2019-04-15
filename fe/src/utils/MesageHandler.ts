@@ -10,7 +10,7 @@ export default abstract class MessageHandler implements IMessageHandler {
 
   public handle(message: DefaultMessage) {
     if (!this.handlers) {
-      throw `${this.constructor.name} has empty handlers`;
+      throw Error(`${this.constructor.name} has empty handlers`);
     }
     let handler: SingleParamCB<DefaultMessage> = this.handlers[message.action];
     if (handler) {

@@ -17,7 +17,7 @@ export function createMicrophoneLevelVoice (stream: MediaStream, onaudioprocess:
     }
     let audioTracks: MediaStreamTrack[] = stream && stream.getAudioTracks();
     if (audioTracks.length === 0) {
-      throw 'Stream has no audio tracks';
+      throw Error('Stream has no audio tracks');
     }
     let audioTrack: MediaStreamTrack = audioTracks[0];
     if (!audioContext) {

@@ -46,7 +46,7 @@ async function getPlayBack(event) {
     subScr = getSubscriptionId(r);
   }
   if (!subScr) {
-    throw 'Unable to get subscription';
+    throw Error('Unable to get subscription');
   }
   let response = await fetch(`${XHR_API_URL}/get_firebase_playback`, {
     credentials: 'omit',

@@ -101,7 +101,7 @@ export function getUserSexClass(user: UserModel) {
   } else if (user.sex === SexModel.Secret) {
     return 'icon-user-secret';
   } else {
-    throw `Invalid sex ${user.sex}`;
+    throw Error(`Invalid sex ${user.sex}`);
   }
 }
 

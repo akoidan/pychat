@@ -36,7 +36,7 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     this.logger.log('Removing pc {}', payload);
     let start = this.webrtcConnnectionsIds.indexOf(payload.opponentWsId);
     if (start < 0 ) {
-      throw 'Can\'t remove unexisting payload ' + payload.opponentWsId;
+      throw Error('Can\'t remove unexisting payload ' + payload.opponentWsId);
     }
     this.webrtcConnnectionsIds.splice(start, 1);
     if (this.webrtcConnnectionsIds.length === 0) {

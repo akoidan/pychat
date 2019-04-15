@@ -20,7 +20,7 @@ import {
   StringIdentifier, VideoType
 } from '../types/types';
 import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from '../utils/consts';
-import {extractError, forEach} from '../utils/utils';
+import {extractError, forEach, getChromeVersion} from '../utils/utils';
 import {createMicrophoneLevelVoice, getAverageAudioLevel} from '../utils/audioprocc';
 import CallSenderPeerConnection from './CallSenderPeerConnection';
 import CallReceiverPeerConnection from './CallReceiverPeerConnection';
@@ -159,12 +159,22 @@ export default class CallHandler extends BaseTransferHandler {
       }
     }
     if (this.callInfo.shareScreen) {
-      let share = await this.getDesktopShareFromExtension();
-      this.logger.debug('Resolving userMedia from dekstopShare')();
-      let stream = await navigator.mediaDevices.getUserMedia(share);
+      let stream;
+      let chromeVersion = getChromeVersion();
+      if (navigator.mediaDevices && navigator.mediaDevices['getDisplayMedia']) {
+        this.logger.debug('Getting shareScreen from  navigator.getDisplayMedia')();
+        stream = await navigator.mediaDevices['getDisplayMedia']({video: true});
+      } else {
+        if (chromeVersion && chromeVersion > 70) {
+          this.store.dispatch('growlInfo', 'You can now use chrome://flags/#enable-experimental-web-platform-features to share your screen');
+        }
+        let share = await this.getDesktopShareFromExtension();
+        this.logger.debug('Resolving userMedia from dekstopShare')();
+        stream = await navigator.mediaDevices.getUserMedia(share);
+      }
       let tracks: any[] = stream.getVideoTracks();
       if (!(tracks && tracks.length > 0)) {
-        throw 'No video tracks from captured screen';
+        throw Error('No video tracks from captured screen');
       }
       tracks[0].isShare = true;
       if (endStream) {
@@ -294,7 +304,7 @@ export default class CallHandler extends BaseTransferHandler {
       } else if (kind === VideoType.AUDIO) {
         tracks = this.localStream.getAudioTracks();
       } else {
-        throw 'invalid track name';
+        throw Error('invalid track name');
       }
       if (tracks.length > 0) {
         let isShare = tracks[0].isShare;

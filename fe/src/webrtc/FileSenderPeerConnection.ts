@@ -132,7 +132,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
           }
         }
       } else {
-        throw `Can't write data into ${this.sendChannel.readyState} channel`;
+        throw Error(`Can't write data into ${this.sendChannel.readyState} channel`);
       }
     } catch (error) {
       this.commitErrorIntoStore('Connection has been lost');

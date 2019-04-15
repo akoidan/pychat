@@ -103,7 +103,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   createPeerConnection(arg?) {
     this.logger.log('Creating RTCPeerConnection')();
     if (!window.RTCPeerConnection) {
-      throw 'Your browser doesn\'t support RTCPeerConnection';
+      throw Error('Your browser doesn\'t support RTCPeerConnection');
     }
     this.pc = new (<any>RTCPeerConnection)(this.pc_config, this.pc_constraints);
     this.pc.oniceconnectionstatechange = this.oniceconnectionstatechange.bind(this);

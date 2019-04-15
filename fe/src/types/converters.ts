@@ -26,7 +26,7 @@ export function convertSexToNumber(m: SexModel): number {
   } else if (SexModel.Female === m) {
     return 2;
   } else {
-    throw `Unknown gender ${m}`;
+    throw Error(`Unknown gender ${m}`);
   }
 }
 
