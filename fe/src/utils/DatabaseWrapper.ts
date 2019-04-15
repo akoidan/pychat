@@ -14,6 +14,7 @@ import {
   convertSexToString,
   convertStringSexToNumber, getRoomsBaseDict
 } from '../types/converters';
+import {browserVersion} from './singletons';
 
 interface TransactionCb {
   (t: SQLTransaction, ...rest): void;
@@ -196,6 +197,9 @@ export default class DatabaseWrapper implements IStorage {
   }
 
   private transaction(transactionType: string, cb: TransactionCb) {
+    if (!this.db) { // TODO TypeError: undefined is not an object (evaluating 'this.db[transactionType]')
+      throw Error(`${browserVersion} failed to get db`);
+    }
     this.db[transactionType](t => {
       cb(t);
     }, (e) => {

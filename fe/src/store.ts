@@ -178,6 +178,9 @@ const store: StoreOptions<RootState> = {
       state.incomingCall = payload;
     },
     setCallOpponent(state: RootState, payload: SetCallOpponent) {
+      if (!state.roomsDict[payload.roomId]) { // TODO
+        throw Error(`setCallOpponent state: ${JSON.stringify(state)}; payload ${JSON.stringify(payload)}`);
+      }
       if (payload.callInfoModel) {
         Vue.set(state.roomsDict[payload.roomId].callInfo.calls, payload.opponentWsId, payload.callInfoModel);
       } else {
@@ -185,11 +188,19 @@ const store: StoreOptions<RootState> = {
       }
     },
     setOpponentVoice(state: RootState, payload: SetOpponentVoice) {
-      state.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].opponentCurrentVoice = payload.voice;
+      let roomsDictElement = state.roomsDict[payload.roomId]; // TODO
+      if (!roomsDictElement || ! roomsDictElement.callInfo || ! roomsDictElement.callInfo.calls || !roomsDictElement.callInfo.calls[payload.opponentWsId]) {
+        throw Error(`setOpponentVoice state: ${JSON.stringify(state)}; payload ${JSON.stringify(payload)}`);
+      }
+      roomsDictElement.callInfo.calls[payload.opponentWsId].opponentCurrentVoice = payload.voice;
     },
     setOpponentAnchor(state: RootState, payload: SetOpponentAnchor) {
       let key: string = mediaLinkIdGetter();
-      state.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
+      let roomsDictElement = state.roomsDict[payload.roomId]; // TODO
+      if (!roomsDictElement || ! roomsDictElement.callInfo || ! roomsDictElement.callInfo.calls || !roomsDictElement.callInfo.calls[payload.opponentWsId]) {
+        throw Error(`setOpponentAnchor state: ${JSON.stringify(state)}; payload ${JSON.stringify(payload)}`);
+      }
+      roomsDictElement.callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
       Vue.set(state.mediaObjects, key, payload.anchor);
     },
     setDim(state: RootState, payload: boolean) {
@@ -240,12 +251,18 @@ const store: StoreOptions<RootState> = {
     setLocalStreamSrc(state: RootState, payload: MediaIdentifier) {
       let key: string = mediaLinkIdGetter();
       Vue.set(state.mediaObjects, key, payload.media);
+      if (!state.roomsDict[payload.id]) { // TODO
+        throw Error(`setLocalStreamSrc roomDict ${JSON.stringify(state.roomsDict)}, ${JSON.stringify(payload)}`);
+      }
       state.roomsDict[payload.id].callInfo.mediaStreamLink = key;
     },
     addReceivingFile(state: RootState, payload: ReceivingFile) {
       Vue.set(state.roomsDict[payload.roomId].receivingFiles, payload.connId, payload);
     },
     addSendingFileTransfer(state: RootState, payload: AddSendingFileTransfer) {
+      if (!state.roomsDict[payload.roomId].sendingFiles[payload.connId])  { // TODO
+        throw Error(`addSendingFileTransfer state: ${JSON.stringify(state)}; payload ${JSON.stringify(payload)}`);
+      }
       Vue.set(state.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers, payload.transferId, payload.transfer);
     },
     setReceivingFileStatus(state: RootState, payload: SetReceivingFileStatus) {
@@ -260,6 +277,9 @@ const store: StoreOptions<RootState> = {
     },
     setSendingFileStatus(state: RootState, payload: SetSendingFileStatus) {
       let transfer: SendingFileTransfer = state.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers[payload.transfer];
+      if (!transfer)  {  // TODO
+        throw Error(`setSendingFileStatus state: ${JSON.stringify(state)}; payload ${JSON.stringify(payload)}`);
+      }
       transfer.status = payload.status;
       if (payload.error !== undefined) {
         transfer.error = payload.error;

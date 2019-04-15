@@ -152,7 +152,10 @@ export function  extractError (args) {
 export function initGoogle(cb) {
   if (!googleInited && GOOGLE_OAUTH_2_CLIENT_ID) {
     logger.log('Initializing google sdk')();
-    api.loadGoogle(() => {
+    api.loadGoogle((e) => {
+      if (typeof gapi.load !== 'function') { // TODO
+        throw Error(`Gapi doesnt have load function ${JSON.stringify(Object.keys(gapi))}`);
+      }
       gapi.load('client:auth2', () => {
         logger.log('gapi 2 is ready')();
         gapi.auth2.init({client_id: GOOGLE_OAUTH_2_CLIENT_ID}).then(() => {

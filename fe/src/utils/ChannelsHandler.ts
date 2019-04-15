@@ -378,6 +378,8 @@ export default class ChannelsHandler extends MessageHandler {
         userId
       }
     };
+
+    // TODO Uncaught TypeError: Cannot read property 'onlineChangeSound' of null
     if (this.store.state.userSettings.onlineChangeSound && this.store.getters.myId !== userId) {
       checkAndPlay(isWentOnline ? login : logout, 50);
     }
