@@ -1,6 +1,6 @@
 <p align="center"><img src="./logo/logo.svg"></p>
 
-[![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/pychat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat)](https://landscape.io/github/akoidan/pychat/master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)
+[![Scrutinizer Build pass](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/build.png)](https://scrutinizer-ci.com/g/Deathangel908/pychat) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)
 
 This is free web (browser) chat, that features:
  - Send instant text messages via websockets.
@@ -32,7 +32,7 @@ This is free web (browser) chat, that features:
        * [Configure Pycharm if you use it](#configure-pycharm-if-you-use-it)
        * [Start services and run](#start-services-and-run)
     * [Production setup](#production-setup)
-       * [Archlinux prod](#archlinux-prod)
+       * [Archlinux prod](#archlinux-prod)/edit/master/README.md
        * [CentOs prod](#centos-prod)
   * [Contributing](#contributing)
   * [TODO list](#todo-list)
