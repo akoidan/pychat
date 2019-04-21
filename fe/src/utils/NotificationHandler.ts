@@ -169,6 +169,8 @@ export default class NotifierHandler {
       if (!this.serviceWorkedTried) {
         await this.registerWorker();
       }
+    } catch (e) {
+      this.logger.error('Error registering service worker {}', extractError(e))();
     } finally {
       this.serviceWorkedTried = true;
     }
