@@ -16,7 +16,7 @@
 The flow is the following
  - Install OS packages depending on your OS type
  - Bootstrap files
- - Follow instructions in `fe/README.md`
+ - Follow instructions in [fe](fe/README.md)
  - Start services and check if it works
 
 ### Install OS packages
