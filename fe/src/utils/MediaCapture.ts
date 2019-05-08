@@ -27,7 +27,7 @@ export default class MediaCapture {
   private recordedBlobs: any[] = [];
   private stream: MediaStream;
 
-  public async record(): Promise<string> {
+  public async record(): Promise<MediaStream> {
     this.stream = await new Promise<MediaStream>((resolve, reject) => {
       navigator.getUserMedia({video: this.isRecordingVideo, audio: true}, resolve, reject);
     });
@@ -57,7 +57,7 @@ export default class MediaCapture {
     this.mediaRecorder.ondataavailable = this.handleDataAvailable.bind(this);
     this.mediaRecorder.start(10); // collect 10ms of data
     this.logger.debug('MediaRecorder started {}', this.mediaRecorder)();
-    return URL.createObjectURL(this.stream);
+    return this.stream;
   }
 
   public stopRecording() {

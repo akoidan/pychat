@@ -18,7 +18,7 @@
       </div>
       <div v-show="dim" class="videoHolder" >
         <div v-show="recordingNow">
-          <video :src="srcVideo" v-show="srcVideo" autoplay="" ref="video"></video>
+          <video v-show="srcVideo" autoplay="" ref="video"></video>
           <img v-show="!srcVideo" src="../../assets/img/audio.svg" class="audio-recording-now">
         </div>
         <span v-show="!recordingNow">Starting recording...</span>
@@ -105,6 +105,13 @@
       }
     }
 
+    @Watch('srcVideo')
+    onSrcChange(value) {
+      if (this.$refs.video) {
+        this.$refs.video.srcObject = value;
+      }
+    }
+
     beforeRouteEnter(to, frm, next) {
       next(vm => {
         messageBus.$emit("main-join");
@@ -176,7 +183,7 @@
     handleRecord({src, isVideo}) {
       this.recordingNow = true;
       if (isVideo) {
-        this.srcVideo = src
+        this.srcVideo = src;
       }
     }
 

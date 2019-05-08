@@ -49,7 +49,7 @@
           this.emitData(data);
         }
       });
-      this.navigatorRecord.record().then((src: string) => {
+      this.navigatorRecord.record().then((src: MediaStream) => {
         this.logger.debug("Resolved record emitting video")();
         this.$emit("record", {isVideo: this.isRecordingVideo, src: src});
       }).catch(error => {
@@ -65,6 +65,8 @@
           this.growlError("Unable to capture input device because " + error);
         }
         this.logger.error("Error during capturing media {}", error);
+        this.navigatorRecord.stopRecording();
+        throw error;
       })
     }
 
