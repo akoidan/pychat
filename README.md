@@ -2,6 +2,18 @@
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)
 
+# Live demo: [pychat.org](https://pychat.org/)
+
+# Table of contents
+  * [About](#about)
+  * [Breaf description](#brief-description
+  * [When should I use pychat](#when-should-i-use-pychat)
+  * [How to run on my own server](#how-to-run-on-my-own-server)
+    * [Run test docker image](#run-test-docker-image)
+    * [Build docker](#build-docker)
+  * [Contributing](#contributing)
+  
+# About
 This is free web (browser) chat, that features:
  - Send instant text messages via websockets.
  - Send: images, smiles, anchors, embedded youtube, [giphy](https://giphy.com/), code [highlight](https://highlightjs.org/)
@@ -13,16 +25,6 @@ This is free web (browser) chat, that features:
  - Send offline messages with Firebase push notifications
  - Responsive interface (bs like)+ themes
  - Admin interface with django-admin
-
-## Live demo: [pychat.org](https://pychat.org/)
-
-# Table of contents
-  * [Breaf description](#brief-description)
-  * [When should I use pychat](#when-should-i-use-pychat)
-  * [How to run on my own server](#how-to-run-on-my-own-server)
-    * [Run test docker image](#run-test-docker-image)
-    * [Build docker](#build-docker)
-  * [Contributing](#contributing)
 
 # Brief description
 Pychat is written in **Python** with [django](https://www.djangoproject.com/). For handling realtime messages [WebSockets](https://en.wikipedia.org/wiki/WebSocket) are used: browser support on client part and asynchronous framework [Tornado](http://www.tornadoweb.org/) on server part. Messages are being broadcast by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using [tornado-redis](https://github.com/leporo/tornado-redis) backend. Redis is also used as django session backend and for storing current users online.  For video call [WebRTC](https://webrtc.org/) technology was used with stun server to make a connection, which means you will always get the lowest ping and the best possible connection channel. Client part is written with progressive js framework [VueJs](https://vuejs.org/) which means that pychat is SPA, so even if user navigates across different pages websocket connection doesn't break. Pychat also supports OAuth2 login standard via FaceBook/Google. Css is compiled from [sass](http://sass-lang.com/guide). Server side can be run on any platform **Windows**, **Linux**, **Mac** with **Python 2.7** and **Python 3.x**.Client (users) can use the Pychat from any browser with websocket support: IE11, Edge, Chrome, Firefox, Android, Opera, Safari...
