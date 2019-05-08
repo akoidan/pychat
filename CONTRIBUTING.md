@@ -145,3 +145,16 @@ TODO list
 * SELECT_SELF_ROOM  https://github.com/Deathangel908/pychat/blob/master/chat/settings.py#L292-L303 doesnt work with mariadb engine 10.1
 * also admin email wasn't triggered while SELECT_SELF_ROOM has failed
 
+
+
+
+## FE TODO
+
+- ADD ability to change theme during registration
+- add ability to cancel filetransfer on sender side
+- add aliases to webpack
+- add test
+- add tslint
+- add sass-lint
+- resolve sw.ts imports doesn't work with ts-loader + file-loaders
+- Move everything to tornadoс?
