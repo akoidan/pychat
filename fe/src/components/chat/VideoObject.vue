@@ -23,11 +23,7 @@
       let stream: MediaStream = this.mediaObjects[newValue];
       this.logger.log("Media stream changed {} {}", newValue, stream)();
       if (stream) {
-        try {
-          this.$refs.video.src = URL.createObjectURL(stream);
-        } catch (e) {
-          this.$refs.video.srcObject = stream;
-        }
+        this.$refs.video.srcObject = stream;
         this.$refs.video.play();
       } else {
         this.$refs.video.src = '';

@@ -3,7 +3,7 @@
     <span>{{helpText}}</span>
     <div class="imgHolder">
       <img :src="srcImg" @drop.prevent="dropPhoto" @click="takeSnapshot">
-      <video :src="srcVideo" autoplay="" ref="changeProfileVideo" v-show="showVideo"></video>
+      <video autoplay="" ref="changeProfileVideo" v-show="showVideo"></video>
     </div>
     <input accept="image/*" ref="inputFile" type="file" v-show="false" @change="photoInputChanged">
     <input type="button" class="lor-btn" value="Select file" @click="selectFile">
@@ -40,11 +40,10 @@
 
     running: boolean = false;
     srcImg: string = '';
-    srcVideo: string = '';
+    srcVideo: MediaStream = null;
     blob: Blob = null;
     fileInputValue: string = '';
     showVideo: boolean = false;
-    stream: MediaStream;
     isStopped: boolean = true;
 
     $refs: {
@@ -103,10 +102,16 @@
       }
     }
 
+    @Watch('srcVideo')
+    onSrcVideoChange(value) {
+      if (this.$refs.changeProfileVideo) {
+        this.$refs.changeProfileVideo.srcObject = value;
+      }
+    }
+
     startSharingVideo() {
       navigator.getUserMedia({video: true}, (localMediaStream: MediaStream) => {
-        this.stream = localMediaStream; // stream available to console
-        this.srcVideo = window.URL.createObjectURL(localMediaStream);
+        this.srcVideo = localMediaStream;
         this.$refs.changeProfileVideo.play();
       }, (error) => {
         this.logger.log("navigator.getUserMedia error: {}", error)();
@@ -115,7 +120,7 @@
 
 
     takeSnapshot() {
-      if (this.stream) {
+      if (this.srcVideo) {
         canvasContext.canvas.width = this.$refs.changeProfileVideo.videoWidth;
         canvasContext.canvas.height = this.$refs.changeProfileVideo.videoHeight;
         canvasContext.drawImage(this.$refs.changeProfileVideo, 0, 0);
@@ -140,8 +145,7 @@
       if (this.isStopped) {
         // Not showing vendor prefixes or code that works cross-browser.
         navigator.getUserMedia({video: true},  (stream)  => {
-          this.srcVideo = window.URL.createObjectURL(stream);
-          this.stream = stream;
+          this.srcVideo = stream;
           this.showVideo = true;
           this.isStopped = false;
           this.growlInfo("Click on your video to take a photo")
@@ -158,8 +162,8 @@
     }
 
     private stopVideo() {
-      stopVideo(this.stream);
-      this.stream = null;
+      stopVideo(this.srcVideo);
+      this.srcVideo = null;
     }
 
     upload() {

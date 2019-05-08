@@ -19,7 +19,7 @@ Webpack-dev-server is used for development purposes with hot reloading, every ti
 ### Production setup
 To build project for production take a look at [production.json](production.json) and run `npm run prod`. This generates static files in `./dist` directory.
 
-### Dev server exists
+### Dev server exits with system error like `class FastBuffer extends Uint8Array {}`
 If you have issues with node, use version 8.0.0, `nvm use 8.0.0`. You can install nvm with [archlinux](https://wiki.archlinux.org/index.php/Node.js_) [ubuntu](https://qiita.com/shaching/items/6e398140432d4133c866) [windows](https://github.com/coreybutler/nvm-windows)
 
 ### Build configuration
