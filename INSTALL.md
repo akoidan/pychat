@@ -8,7 +8,7 @@
    * [Configure Pycharm if you use it](#configure-pycharm-if-you-use-it)
    * [Start services and run](#start-services-and-run)
 * [Production setup](#production-setup)
-   * [Archlinux prod](#archlinux-prod)/edit/master/README.md
+   * [Archlinux prod](#archlinux-prod)
    * [CentOs prod](#centos-prod)
 * [TODO list](#todo-list)
   
