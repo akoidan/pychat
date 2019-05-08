@@ -1,16 +1,16 @@
-    * [Development setup](#development-setup)
-       * [Install OS packages](#install-os-packages)
-         * [Windows](#windows)
-         * [Ubuntu](#ubuntu)
-         * [Archlinux](#archlinux)
-         * [CentOs](#centos)
-       * [Bootstrap files](#bootstrap-files)
-       * [Configure Pycharm if you use it](#configure-pycharm-if-you-use-it)
-       * [Start services and run](#start-services-and-run)
-    * [Production setup](#production-setup)
-       * [Archlinux prod](#archlinux-prod)/edit/master/README.md
-       * [CentOs prod](#centos-prod)
-    * [TODO list](#todo-list)
+* [Development setup](#development-setup)
+   * [Install OS packages](#install-os-packages)
+     * [Windows](#windows)
+     * [Ubuntu](#ubuntu)
+     * [Archlinux](#archlinux)
+     * [CentOs](#centos)
+   * [Bootstrap files](#bootstrap-files)
+   * [Configure Pycharm if you use it](#configure-pycharm-if-you-use-it)
+   * [Start services and run](#start-services-and-run)
+* [Production setup](#production-setup)
+   * [Archlinux prod](#archlinux-prod)/edit/master/README.md
+   * [CentOs prod](#centos-prod)
+* [TODO list](#todo-list)
   
 ## Development setup
 The flow is the following
