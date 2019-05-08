@@ -60,5 +60,7 @@ Please don't use this build for production, as it uses debug ssl certificate, la
 
 
 # Contributing:
+
 To run chat in development or in production w/o docker take a look at [INSTALL.md](INSTALL.md)
+
 For development tips also check [Contributing.md](/CONTRIBUTING.md)
