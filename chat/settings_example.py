@@ -39,8 +39,8 @@ globals().update(importlib.import_module(config).__dict__)
 #EMAIL_USE_TLS = True
 #EMAIL_HOST = 'smtp.gmail.com' # For gmail settings example
 #EMAIL_PORT = '587' # google smpt port
-#EMAIL_HOST_USER = 'chat.django@gmail.com'
-#EMAIL_HOST_PASSWORD = 'Ilovepython'
+#EMAIL_HOST_USER = 'yourgmailaccont@gmail.com'
+#EMAIL_HOST_PASSWORD = 'yourgmailpassword'
 #SERVER_EMAIL = 'chat.django@gmail.com'
 #EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
