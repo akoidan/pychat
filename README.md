@@ -6,7 +6,7 @@
 
 # Table of contents
   * [About](#about)
-  * [Breaf description](#brief-description
+  * [Breaf description](#brief-description)
   * [When should I use pychat](#when-should-i-use-pychat)
   * [How to run on my own server](#how-to-run-on-my-own-server)
     * [Run test docker image](#run-test-docker-image)
