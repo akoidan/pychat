@@ -1,13 +1,8 @@
-## To run
-
- - If you have issues with node, use version 8.0.0, `nvm use 8.0.0`. You can install nvm with [archlinux](https://wiki.archlinux.org/index.php/Node.js_) [ubuntu](https://qiita.com/shaching/items/6e398140432d4133c866) [windows](https://github.com/coreybutler/nvm-windows)
-
 ### To get started install dependencies first:
 ```bash
 yarn install
 # npm install # if you don't have yarn
 ```
-
 ### Stack
 The technologies stack used in project:
 - Typescript
@@ -23,6 +18,9 @@ Webpack-dev-server is used for development purposes with hot reloading, every ti
 
 ### Production setup
 To build project for production take a look at [production.json](production.json) and run `npm run prod`. This generates static files in `./dist` directory.
+
+### Dev server exists
+If you have issues with node, use version 8.0.0, `nvm use 8.0.0`. You can install nvm with [archlinux](https://wiki.archlinux.org/index.php/Node.js_) [ubuntu](https://qiita.com/shaching/items/6e398140432d4133c866) [windows](https://github.com/coreybutler/nvm-windows)
 
 ### Build configuration
 [webpack.config.js](webpack.config.js) is used to build project. Take a look at it to understand how source files are being processed. Its start point is `entry: ['./src/main.ts']`. Everything is imported in this files are being processed by section `loaders`.
