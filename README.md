@@ -10,7 +10,7 @@
   * [When should I use pychat](#when-should-i-use-pychat)
   * [How to run on my own server](#how-to-run-on-my-own-server)
     * [Run test docker image](#run-test-docker-image)
-    * [Run prod docker image](#build-docker)
+    * [Run prod docker image](#run-prod-docker-image)
     * [Run without docker](#run-without-docker)
   * [Contributing and development setup](#contributing-and-development-setup)
   
