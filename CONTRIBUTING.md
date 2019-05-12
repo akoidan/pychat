@@ -149,7 +149,7 @@ TODO list
 
 
 ## FE TODO
-
+- Add linters like on webpack-vue-typescript
 - ADD ability to change theme during registration
 - add ability to cancel filetransfer on sender side
 - add aliases to webpack
