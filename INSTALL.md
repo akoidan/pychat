@@ -129,4 +129,4 @@ You can alway use [my docker](https://cloud.docker.com/u/deathangel908/repositor
    - You can also generate them manually and put into `./rootfs/etc/nginx/ssl/server.key` and `./rootfs/etc/nginx/ssl/certificate.crt`	
  - Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. Execute `bash download_content.sh generate_secret_key`. If you need additional features like oauth/push notifications you can set those up by editing `chat/settings.py` and `fe/production.json`	
 - Run my built image: `docker-compose -f ./docker-all/docker-compose.yml up`.	
- - Open https://localhost . If something is broken you can check `/srv/http/log/ in docker `docker exec -it containerId bash`
+ - Open https://localhost . If something is broken you can check `/srv/http/log/` in docker: `docker exec -it containerId bash`
