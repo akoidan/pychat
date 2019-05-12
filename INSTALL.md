@@ -11,7 +11,9 @@
    * [Archlinux prod](#archlinux-prod)
    * [CentOs prod](#centos-prod)
 * [Docker](#docker)
-  
+ 
+Further instructions assume you already cloned the repo, and `cd` into it.
+
 ## Development setup
 The flow is the following
  - Install OS packages depending on your OS type
@@ -33,12 +35,12 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 #### [Ubuntu](http://www.ubuntu.com/):
  1. Install required packages: `apt-get install python pip mysql-server` If pip is missing check `python-pip`.
  2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
- 3. `echo 'export PYCHAT_CONFIG=local' >> /etc/profile`
+ 3. `export PYCHAT_CONFIG=local`. You can add it to `/etc/bash.bashrc` or the shell you use.
 
 #### [Archlinux](https://www.archlinux.org/):
  1. With py3:  `pacman -S unzip python python-pip redis mariadb python-mysqlclient`. For py2 use `extra/mysql-python`
  2. If you just installed mariadb you need to initialize it: `mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`.
- 3. `echo 'export PYCHAT_CONFIG=local' >> /etc/profile`
+ 3. `export PYCHAT_CONFIG=local`. You can add it to `/etc/bash.bashrc` or the shell you use.
 
 ### Bootstrap files:
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
