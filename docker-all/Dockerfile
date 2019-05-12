@@ -47,7 +47,7 @@ RUN pip3 install -r requirements.txt
 COPY ./manage.py ./config.json ./DefaultSmilies.cfpack ./docker-all/chat-uwsgi.ini ./download_content.sh ./
 COPY ./chat ./chat/
 COPY ./fe/src ./fe/src
-COPY ./fe/production.json ./fe/package.json  ./fe/tsconfig.json  ./fe/webpack.config.js  ./fe/yarn.lock ./fe/
+COPY ./fe/package.json  ./fe/tsconfig.json  ./fe/webpack.config.js  ./fe/yarn.lock ./fe/
 COPY ./docker-all/uwsgi ./docker-all/tornado /etc/init.d/
 COPY ./templates  ./templates
 COPY ./docker-all/nginx.conf /etc/nginx
@@ -65,7 +65,6 @@ bash download_content.sh generate_secret_key &&\
 bash download_content.sh all &&\
 chown -R http:http /srv/http/ &&\
 rm ./chat/settings.py && \
-rm ./fe/production.json && \
 cd ./fe &&\
 yarn install
 
