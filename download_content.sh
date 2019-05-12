@@ -152,6 +152,7 @@ show_fontello_session() {
 
 
 safeRunCommand() {
+  printf "\e[95m$*\e[0;33;40m\n"
   eval "$@"
   ret_code=$?
   if [ $ret_code != 0 ]; then
@@ -276,6 +277,9 @@ elif [ "$1" = "smileys" ]; then
     generate_smileys
 elif [ "$1" = "print_icon_session" ]; then
     show_fontello_session
+elif [ "$1" = "redirect" ]; then
+    safeRunCommand sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8080
+    safeRunCommand sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 443 -j REDIRECT --to-ports 8080
 elif [ "$1" = "download_icon" ]; then
     download_fontello
     delete_tmp_dir
@@ -305,6 +309,7 @@ else
  chp generate_secret_key "Creates django secret key into \e[96m$PROJECT_ROOT/chat/settings.py\e[0;33;40m"
  chp create_db "Creates database pychat to mysql, the following environment variable should be defined \e[94mDB_ROOT_PASS DB_USER DB_PASS DB_DATA_PATH"
  chp update_docker "Builds docker images for deathangel908/pychat"
+ chp redirect "Redirects port 443 to port 8080, so you can use \e[96mhttps://pychat.org\e[0;33;40m for localhost if you have it in \e[96m/etc/hosts\e[0;33;40m"
 fi
 
 
