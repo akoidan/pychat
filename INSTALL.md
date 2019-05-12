@@ -72,7 +72,7 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  - Start webSocket listener: `python manage.py start_tornado`
  - Start the Chat: `python manage.py runsslserver 0.0.0.0:8000`
  - Open in browser [http**s**://127.0.0.1:8080](https://127.0.0.1:8080).
- - Add self signed ssl certificate provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt) to browser exception. Open [https://localhost:8888](https://localhost:8888) and [https://localhost:8000](https://localhost:8000). Where `8888` is `API_PORT` and `8000` is `manage.py` argument.
+ - Add self signed ssl certificate provided by [django-sslserver](https://github.com/teddziuba/django-sslserver/blob/master/sslserver/certs/development.crt) to browser exception. For chrome you can enable invalid certificates for localohost in [chrome://flags/#allow-insecure-localhost](chrome://flags/#allow-insecure-localhost). Or for others open [https://localhost:8888](https://localhost:8888) and [https://localhost:8000](https://localhost:8000). Where `8888` is `API_PORT` and `8000` is `manage.py` argument.
 
 ## Production setup
 Further instructions assume that you're executing them from project directory. First of of you need to install packages for Archlinux/CentOS and then follow the [Common](#common) flow
