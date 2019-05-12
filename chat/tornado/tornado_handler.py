@@ -2,12 +2,10 @@ import json
 import logging
 from datetime import timedelta
 from itertools import chain
-from numbers import Number
-from threading import Thread
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models import F, Q
+from django.db.models import F, Q, Count, QuerySet
 from redis_sessions.session import SessionStore
 from tornado import ioloop
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
@@ -176,8 +174,17 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 					room[VarNames.LOAD_MESSAGES_HISTORY] = h
 				if o:
 					room[VarNames.LOAD_MESSAGES_OFFLINE] = o
-			user_dict = [RedisPrefix.set_js_user_structure(user['id'], user['username'], user['sex'])
-					for user in User.objects.values('id', 'username', 'sex')]
+
+			fetched_users  = User.objects.annotate(user_c=Count('id')).values('id', 'username', 'sex', 'userjoinedinfo__ip__country_code', 'userjoinedinfo__ip__country', 'userjoinedinfo__ip__region', 'userjoinedinfo__ip__city')
+			user_dict = [RedisPrefix.set_js_user_structure(
+				user['id'],
+				user['username'],
+				user['sex'],
+				user['userjoinedinfo__ip__country_code'],
+				user['userjoinedinfo__ip__country'],
+				user['userjoinedinfo__ip__region'],
+				user['userjoinedinfo__ip__city']
+			) for user in fetched_users]
 			if self.user_id not in online:
 				online.append(self.user_id)
 

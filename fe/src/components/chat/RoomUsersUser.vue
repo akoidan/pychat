@@ -1,13 +1,18 @@
 <template>
   <li :class="onlineClass" v-show="userIsInActiveRoom">
-    <i :class="userSexClass"></i>{{ user.user }}
+    <div><i :class="userSexClass"></i>{{ user.user }}</div>
+    <img v-if="user.location.countryCode" class="country" :src='getFlag(user)'/>
   </li>
 </template>
 <script lang="ts">
   import {Getter, State} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {RoomModel, UserModel} from "../../types/model";
-  import {getUserSexClass} from "../../utils/htmlApi";
+  import {
+    getFlagPath,
+    getStaticUrl,
+    getUserSexClass
+  } from "../../utils/htmlApi";
 
   @Component
   export default class RoomUsersUser extends Vue {
@@ -17,6 +22,10 @@
 
     get userSexClass () {
       return getUserSexClass(this.user);
+    }
+
+    getFlag(user: UserModel) {
+      return getFlagPath(user.location.countryCode.toLowerCase());
     }
 
     get id() {
@@ -36,4 +45,11 @@
 </script>
 
 <style lang="sass" scoped>
+  li
+    display: flex
+    justify-content: space-between
+  div
+    text-overflow: ellipsis
+    word-break: break-all
+    overflow: hidden
 </style>

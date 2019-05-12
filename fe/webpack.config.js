@@ -29,6 +29,7 @@ module.exports = (env, argv) => {
     new CopyWebpackPlugin([
       {from: './src/assets/smileys', to: 'smileys'},
       {from: './src/assets/manifest.json', to: ''},
+      {from: './src/assets/flags', to: 'flags'},
       // {from: './src/assets/static', to: ''},
     ]),
     new webpack.DefinePlugin({

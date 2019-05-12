@@ -56,6 +56,7 @@ class VarNames(object):
 	MESSAGE_ID = 'id'
 	IMAGE_ID = 'id'
 	GENDER = 'sex'
+	LOCATION = 'location'
 	ROOM_NAME = 'name'
 	NOTIFICATIONS = 'notifications'
 	VOLUME = 'volume'
@@ -82,6 +83,12 @@ class VarNames(object):
 	PREVIEW = 'preview'
 	DELETED = 'deleted'
 
+
+class IpVarNames(object):
+	COUNTRY = 'country'
+	REGION = 'region'
+	CITY = 'city'
+	COUNTRY_CODE = 'countryCode'
 
 class UserSettingsVarNames(object):
 	SUGGESTIONS = 'suggestions'
@@ -128,11 +135,17 @@ class RedisPrefix:
 	CONNECTION_ID_LENGTH = 8  # should be secure
 
 	@staticmethod
-	def set_js_user_structure(id, name, sex):
+	def set_js_user_structure(id, name, sex, flag, country, region, city):
 		return {
 			VarNames.USER: name,
 			VarNames.USER_ID: id,
-			VarNames.GENDER: settings.GENDERS[sex]
+			VarNames.GENDER: settings.GENDERS[sex],
+			VarNames.LOCATION: {
+				IpVarNames.COUNTRY_CODE: flag,
+				IpVarNames.COUNTRY: country,
+				IpVarNames.REGION: region,
+				IpVarNames.CITY: city
+			}
 		}
 
 	@classmethod

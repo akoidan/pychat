@@ -44,6 +44,14 @@ export interface UserModel {
   user: string;
   id: number;
   sex: SexModel;
+  location: Location;
+}
+
+export interface Location {
+  city: string;
+  country: string;
+  countryCode: string;
+  region: string;
 }
 
 export  interface FileModel {

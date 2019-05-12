@@ -1,5 +1,13 @@
-import {CurrentUserInfoModel, CurrentUserSettingsModel, FileModel, RoomModel, SexModel, UserModel} from './model';
-import {FileModelDto, RoomDto, SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from './dto';
+import {CurrentUserInfoModel, CurrentUserSettingsModel, FileModel, RoomModel, SexModel, UserModel, Location} from './model';
+import {
+  FileModelDto,
+  LocationDto,
+  RoomDto,
+  SexModelDto,
+  UserDto,
+  UserProfileDto,
+  UserSettingsDto
+} from './dto';
 
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDto): CurrentUserInfoModel {
@@ -16,6 +24,10 @@ export function currentUserInfoModelToDto(userInfo: CurrentUserInfoModel): UserP
 
 export function convertSex(dto: SexModelDto): SexModel {
   return <SexModel>SexModel[dto];
+}
+
+export function convertLocation(dto: LocationDto): Location {
+  return {...dto};
 }
 
 export function convertSexToNumber(m: SexModel): number {
@@ -107,5 +119,11 @@ export function convertUser(u: UserDto): UserModel {
     user: u.user,
     id: u.userId,
     sex: convertSex(u.sex),
+    location: u.location ? convertLocation(u.location) : {
+      city: null,
+      country: null,
+      countryCode: null,
+      region: null
+    }
   };
 }

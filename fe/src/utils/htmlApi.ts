@@ -85,6 +85,10 @@ export function getSmileyPath(tabName: string, src: string) {
   return getStaticUrl(`./smileys/${tabName}/${src}`);
 }
 
+export function getFlagPath(countryCode: string) {
+  return getStaticUrl(`./flags/${countryCode}.png`);
+}
+
 export function getStaticUrl(src) {
   return PUBLIC_PATH ? `${PUBLIC_PATH}/${src}` : src;
 }

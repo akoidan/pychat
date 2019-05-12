@@ -39,7 +39,7 @@ export const browserVersion: string = (function () {
 export const isFirefox = browserVersion.indexOf('Firefox') >= 0;
 export const WEBRTC_STUNT_URL = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 export const isChrome = browserVersion.indexOf('Chrome') >= 0;
-export const storage: IStorage = window.openDatabase ? new DatabaseWrapper('v123x') : new LocalStorage();
+export const storage: IStorage = window.openDatabase ? new DatabaseWrapper('v124x') : new LocalStorage();
 export const globalLogger: Logger = loggerFactory.getLoggerColor('global', '#007a70');
 const WS_URL = WS_API_URL.replace('{}', window.location.host);
 export const ws: WsHandler = new WsHandler(WS_URL, sessionHolder, store);

@@ -18,6 +18,14 @@ export interface UserDto {
   user: string;
   userId: number;
   sex: SexModelDto;
+  location: LocationDto;
+}
+
+export interface LocationDto {
+  city: string;
+  country: string;
+  countryCode: string;
+  region: string;
 }
 
 export interface UserSettingsDto {

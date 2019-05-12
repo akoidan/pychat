@@ -54,7 +54,7 @@ export default class DatabaseWrapper implements IStorage {
       let t: SQLTransaction = await new Promise<SQLTransaction>((resolve, reject) => {
         this.db.changeVersion(this.db.version, '1.0', (t) => resolve(t), e => reject(e));
       });
-      t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)) )');
+      t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text)');
       t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)))');
       t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (deleted IN (0,1)))');
       t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
@@ -147,7 +147,13 @@ export default class DatabaseWrapper implements IStorage {
         let user: UserModel = {
           id: u.id,
           sex: convertNumberToSex(u.sex),
-          user: u.user
+          user: u.user,
+          location: {
+            region: u.region,
+            city: u.city,
+            countryCode: u.country_code,
+            country: u.country
+          }
         };
         allUsersDict[u.id] = user;
       });
@@ -323,7 +329,7 @@ export default class DatabaseWrapper implements IStorage {
   }
 
   public insertUser(t: SQLTransaction, user: UserModel) {
-    this.executeSql(t, 'insert or replace into user (id, user, sex, deleted) values (?, ?, ?, 0)', [user.id, user.user, convertSexToNumber(user.sex)])();
+    this.executeSql(t, 'insert or replace into user (id, user, sex, deleted, country_code, country, region, city) values (?, ?, ?, 0, ?, ?, ?, ?)', [user.id, user.user, convertSexToNumber(user.sex), user.location.countryCode, user.location.country, user.location.region, user.location.city])();
   }
 
   public saveUser(user: UserModel) {
