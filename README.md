@@ -10,8 +10,9 @@
   * [When should I use pychat](#when-should-i-use-pychat)
   * [How to run on my own server](#how-to-run-on-my-own-server)
     * [Run test docker image](#run-test-docker-image)
-    * [Build docker](#build-docker)
-  * [Contributing](#contributing)
+    * [Run prod docker image](#build-docker)
+    * [Run without docker](#run-without-docker)
+  * [Contributing and development setup](#contributing-and-development-setup)
   
 # About
 This is free web (browser) chat, that features:
@@ -53,19 +54,19 @@ Please don't use this build for production, as it uses debug ssl certificate, la
  ```
  - Open https://localhost
 
-## Build docker
+## Run prod docker image
 
  - You need create ssl certificates, place `server.key` and `certificate.crt` in current directory. For example 
 ```
 openssl req -nodes -new -x509 -keyout server.key -out certificate.crt -days 3650
 ```
 
- - Download [settings_example.py](https://raw.githubusercontent.com/akoidan/pychat/master/chat/settings_example.py) into current directory and edit it according comments in it. You need at least to set `SECRET_KEY`, you can use command below to generate it:
+ - Download [settings_example.py](chat/settings_example.py) into current directory and edit it according comments in it. You need at least to set `SECRET_KEY`, you can use command below to generate it:
 ```
 tr -dc 'A-Za-z0-9!@#$%^&*(\-\_\=\+)' < /dev/urandom | head -c 50
 ``` 
 
- - Download [production.json](https://raw.githubusercontent.com/akoidan/pychat/master/docker-all/pychat.org/production.json) into current directory and edit it according [wiki](https://github.com/akoidan/pychat/tree/master/fe#build-configuration)
+ - Download [production.json](docker-all/pychat.org/production.json) into current directory and edit it according [wiki](fe#build-configuration)
 
  - Run image with:
 ```
@@ -73,8 +74,11 @@ docker run -v $PWD/production.json:/srv/http/fe/production.json -v $PWD/settings
 ```
  - Open [https://localhost](https://localhost) and enjoy it! If something is broken you can check `/srv/http/log/` in docker `docker exec -it containerId bash`
 
-# Contributing:
+## Run without docker
+Take a look at [INSTALL.md](INSTALL.md#production-setup)
 
-To run chat in development or in production w/o docker take a look at [INSTALL.md](INSTALL.md)
+# Contributing and development setup:
+
+To run chat in development take a look at [INSTALL.md](INSTALL.md) 
 
 For development tips also check [Contributing.md](/CONTRIBUTING.md)
