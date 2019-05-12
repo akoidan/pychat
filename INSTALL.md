@@ -10,7 +10,7 @@
 * [Production setup](#production-setup)
    * [Archlinux prod](#archlinux-prod)
    * [CentOs prod](#centos-prod)
-* [TODO list](#todo-list)
+* [Docker](#docker)
   
 ## Development setup
 The flow is the following
@@ -119,3 +119,12 @@ Services commands for Archlinux:
  - Execute start services and if you need enablign autostart commands described for [Archlinux](#archliunux-prod) or [CentOS](#centos-prod)
  - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
  - If something doesn't work you want to check `pychat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
+
+## Docker
+You can alway use [my docker](https://cloud.docker.com/u/deathangel908/repository/docker/deathangel908/pychat) image described in [README](https://github.com/akoidan/pychat#build-docker), but you can also build it yourself:
+ - Generate ssl certificates:	
+   - If you have bash installed: `./download_content.sh generate_certificate`	
+   - You can also generate them manually and put into `./rootfs/etc/nginx/ssl/server.key` and `./rootfs/etc/nginx/ssl/certificate.crt`	
+ - Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. Execute `bash download_content.sh generate_secret_key`. If you need additional features like oauth/push notifications you can set those up by editing `chat/settings.py` and `fe/production.json`	
+- Run my built image: `docker-compose -f ./docker-all/docker-compose.yml up`.	
+ - Open https://localhost . If something is broken you can check `/srv/http/log/ in docker `docker exec -it containerId bash`
