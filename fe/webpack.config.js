@@ -55,6 +55,9 @@ module.exports = (env, argv) => {
   } else if (argv.mode === 'development') {
     var openInEditor = require('launch-editor-middleware');
     devServer =  {
+      allowedHosts: [
+        'pychat.org'
+      ],
       before (app) {
         app.use('/__open-in-editor', openInEditor())
       }
