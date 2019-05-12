@@ -140,8 +140,6 @@
         if (this.fbStatusChangeIfReAuth(response)) {
           this.logger.log("Fblogin")();
           FB.login(this.fbStatusChangeIfReAuth, {auth_type: "reauthenticate",  scope: 'email'});
-        } else {
-          this.frunning = false;
         }
       });
     }
