@@ -19,6 +19,10 @@ globals().update(importlib.import_module(config).__dict__)
 # SECRET_KEY = '**************************************************'
 
 
+### Whether to show country image right near to user
+SHOW_COUNTRY_CODE = True
+
+
 ### Replace with your timezone. You can find list of timezones here https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
 # TIME_ZONE = 'Europe/Kiev'
 

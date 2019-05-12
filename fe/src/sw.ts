@@ -23,14 +23,14 @@ self.addEventListener('activate', () => {
 
 function getSubscriptionId(pushSubscription: any) {
   let mergedEndpoint = pushSubscription.endpoint;
-  if (pushSubscription.endpoint.indexOf('https://android.googleapis.com/gcm/send') === 0
+  if (pushSubscription.endpoint.indexOf('https://fcm.googleapis.com/fcm/send') === 0
       && pushSubscription.subscriptionId
       && pushSubscription.endpoint.indexOf(pushSubscription.subscriptionId) === -1) {
       mergedEndpoint = pushSubscription.endpoint + '/' +
           pushSubscription.subscriptionId;
     }
 
-  let GCM_ENDPOINT = 'https://android.googleapis.com/gcm/send';
+  let GCM_ENDPOINT = 'https://fcm.googleapis.com/fcm/send';
   if (mergedEndpoint.indexOf(GCM_ENDPOINT) !== 0) {
     return null;
   } else {

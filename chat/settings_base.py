@@ -158,7 +158,7 @@ AUTH_USER_MODEL = 'chat.User'
 AUTHENTICATION_BACKENDS = ['chat.utils.EmailOrUsernameModelBackend']
 
 LOGIN_URL = '/'
-FIREBASE_URL = 'https://android.googleapis.com/gcm/send'
+FIREBASE_URL = 'https://fcm.googleapis.com/fcm/send'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases

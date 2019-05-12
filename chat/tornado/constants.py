@@ -134,18 +134,23 @@ class RedisPrefix:
 	ONLINE_VAR = 'online'
 	CONNECTION_ID_LENGTH = 8  # should be secure
 
+	@classmethod
+	def set_js_user_structure_flag(cls, id, name, sex, flag, country, region, city):
+		res = cls.set_js_user_structure(id, name, sex)
+		res[VarNames.LOCATION] = {
+			IpVarNames.COUNTRY_CODE: flag,
+			IpVarNames.COUNTRY: country,
+			IpVarNames.REGION: region,
+			IpVarNames.CITY: city
+		}
+		return res
+
 	@staticmethod
-	def set_js_user_structure(id, name, sex, flag, country, region, city):
+	def set_js_user_structure(id, name, sex):
 		return {
 			VarNames.USER: name,
 			VarNames.USER_ID: id,
-			VarNames.GENDER: settings.GENDERS[sex],
-			VarNames.LOCATION: {
-				IpVarNames.COUNTRY_CODE: flag,
-				IpVarNames.COUNTRY: country,
-				IpVarNames.REGION: region,
-				IpVarNames.CITY: city
-			}
+			VarNames.GENDER: settings.GENDERS[sex]
 		}
 
 	@classmethod

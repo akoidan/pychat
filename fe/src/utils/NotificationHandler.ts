@@ -104,26 +104,6 @@ export default class NotifierHandler {
     return false;
   }
 
-  getSubscriptionId(pushSubscription) {
-    let mergedEndpoint = pushSubscription.endpoint;
-    if (pushSubscription.endpoint.indexOf('https://android.googleapis.com/gcm/send') === 0) {
-      // Make sure we only mess with GCM
-      // Chrome 42 + 43 will not have the subscriptionId attached
-      // to the endpoint.
-      if (pushSubscription.subscriptionId &&
-          pushSubscription.endpoint.indexOf(pushSubscription.subscriptionId) === -1) {
-        // Handle version 42 where you have separate subId and Endpoint
-        mergedEndpoint = pushSubscription.endpoint + '/' +
-            pushSubscription.subscriptionId;
-      }
-    }
-    let GCM_ENDPOINT = 'https://android.googleapis.com/gcm/send';
-    if (mergedEndpoint.indexOf(GCM_ENDPOINT) !== 0) {
-      return null;
-    } else {
-      return mergedEndpoint.split('/').pop();
-    }
-  }
 
   private async registerWorker() {
     if (!navigator.serviceWorker) {
@@ -137,7 +117,7 @@ export default class NotifierHandler {
     this.logger.debug('Service worker is ready {}', this.serviceWorkerRegistration)();
     let subscription = await this.serviceWorkerRegistration.pushManager.subscribe({userVisibleOnly: true});
     this.logger.debug('Got subscription {}', subscription)();
-    this.subscriptionId = this.getSubscriptionId(subscription);
+    this.subscriptionId = subscription.toJSON();
     if (!this.subscriptionId) {
       throw Error('Current browser doesnt support offline notifications');
     }

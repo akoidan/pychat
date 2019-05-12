@@ -9,6 +9,7 @@ from tornado.httpclient import HTTPRequest
 from tornado.ioloop import IOLoop
 from tornado.web import asynchronous
 from tornadoredis import Client
+# from pywebpush import webpush
 
 from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
@@ -231,6 +232,13 @@ class MessagesHandler(MessagesCreator):
 		headers = {"Content-Type": "application/json", "Authorization": "key=%s" % FIREBASE_API_KEY}
 		body = json.dumps({"registration_ids": reg_ids})
 		self.logger.debug("!! post_fire_message %s", body)
+
+		# TODO
+		# webpush(subscription_info,
+		# 		  data,
+		# 		  vapid_private_key="Private Key or File Path[1]",
+		# 		  vapid_claims={"sub": "mailto:YourEmailAddress"})
+
 		r = HTTPRequest(FIREBASE_URL, method="POST", headers=headers, body=body)
 		self.http_client.fetch(r, callback=on_reply)
 
