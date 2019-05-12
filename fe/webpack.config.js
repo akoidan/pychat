@@ -41,13 +41,14 @@ module.exports = (env, argv) => {
     const MiniCssExtractPlugin = require("mini-css-extract-plugin");
     plugins.push(new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns : ['./dist']}));
     plugins.push(new MiniCssExtractPlugin());
+    let minicssPlugin = {
+      loader: MiniCssExtractPlugin.loader,
+    };
+    if (options.PUBLIC_PATH) {
+      minicssPlugin.publicPath = options.PUBLIC_PATH;
+    }
     sasscPlugins = [
-      {
-        loader: MiniCssExtractPlugin.loader,
-        options: {
-          publicPath: options.PUBLIC_PATH,
-        }
-      },
+      minicssPlugin,
       'css-loader',
       {
         loader: "sass-loader",
@@ -80,11 +81,14 @@ module.exports = (env, argv) => {
   }
 
   function getOptions(path, additionalArgs = {}) {
-    return Object.assign({
+    let res = Object.assign({
       outputPath: path,
-      name,
-      publicPath: options.PUBLIC_PATH ? `${options.PUBLIC_PATH}/${path}` : null
-    }, additionalArgs)
+      name
+    }, additionalArgs);
+    if (options.PUBLIC_PATH) {
+      res.publicPath = `${options.PUBLIC_PATH}/${path}`;
+    }
+    return res;
   }
 
   const smp = new SpeedMeasurePlugin();
@@ -182,5 +186,6 @@ module.exports = (env, argv) => {
     // };
     // conf.
   // }
+  console.log(JSON.stringify(conf, null, 2));
   return conf;
 };
