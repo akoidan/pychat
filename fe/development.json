@@ -5,6 +5,7 @@
   "IS_DEBUG": true,
   "GOOGLE_OAUTH_2_CLIENT_ID" : false,
   "FACEBOOK_APP_ID": false,
+  "PUBLIC_PATH": null,
   "MANIFEST": "/manifest.json",
   "RECAPTCHA_PUBLIC_KEY": false,
   "AUTO_REGISTRATION": false
