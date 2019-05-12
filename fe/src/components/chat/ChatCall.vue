@@ -10,7 +10,7 @@
           <i class="icon-no-desktop" @click='desktopClick' :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'" title="Capture your desktop screen and start sharing it"></i>
         </div>
         <div class="micVideoHolder">
-          <chat-remote-peer v-for="(call, id) in callInfo.calls" :call-info="call" :key="id"/>
+          <chat-remote-peer v-for="(call, id) in callInfo.calls" :call-info="call" :key="id" @click.native="setCurrentVideo(id)" :class="{'current-video-active': id === currentVideoActive, 'current-video-inactive': currentVideoActive && currentVideoActive !== id}"/>
           <video-object muted="muted" :media-stream-link="callInfo.mediaStreamLink" class="localVideo" ref="localVideo" />
         </div>
         <progress max="15" :value="callInfo.currentMicLevel" title="Your microphone level" class="microphoneLevel"></progress>
@@ -98,6 +98,16 @@
     @State speakers: { [id: string]: string };
     @State webcams: { [id: string]: string };
     fullscreen: boolean = false;
+
+    currentVideoActive: string = null;
+
+    setCurrentVideo(id) {
+      if (this.currentVideoActive === id) {
+        this.currentVideoActive = null;
+      } else {
+        this.currentVideoActive = id;
+      }
+    }
 
     fullScreenChange(event) {
       this.logger.log("fs change")();
@@ -284,6 +294,14 @@
 <style lang="sass" scoped>
 
   @import "partials/mixins.sass"
+
+  .current-video-active
+    width: 100% !important
+    height: 100% !important
+    max-width: 100% !important
+    max-height: 100% !important
+  .current-video-inactive
+    display: none !important
 
   .icon-mic, .icon-videocam, .activeIcon, .icon-phone-circled
     cursor: pointer
