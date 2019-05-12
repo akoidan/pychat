@@ -2,7 +2,7 @@ import {globalLogger} from './singletons';
 import smileys from '../assets/smileys/info.json';
 import Vue from 'vue';
 
-import {STATIC_API_URL, PASTED_IMG_CLASS} from './consts';
+import {STATIC_API_URL, PASTED_IMG_CLASS, PUBLIC_PATH} from './consts';
 import {MessageDataEncode, SmileyStructure, UploadFile} from '../types/types';
 import {FileModel, MessageModel, RoomModel, SexModel, UserModel} from '../types/model';
 import {forEach} from './utils';
@@ -86,7 +86,7 @@ export function getSmileyPath(tabName: string, src: string) {
 }
 
 export function getStaticUrl(src) {
-  return src;
+  return PUBLIC_PATH ? `${PUBLIC_PATH}/${src}` : src;
 }
 let uniqueId = 1;
 export function getUniqueId() {

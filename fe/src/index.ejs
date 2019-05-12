@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta property="og:description" content="Chat with your friends, make video calls or transfer files with Pychat!"/>
   <% if (htmlWebpackPlugin.options.manifest ) { %><link rel="manifest" href="<%= htmlWebpackPlugin.options.manifest %>"><% } %>
-<script crossorigin="anonymous" type="text/javascript" src="<%= htmlWebpackPlugin.files.js[0] %>"></script>
+  <script crossorigin="anonymous" type="text/javascript" src="<%= htmlWebpackPlugin.files.js[0] %>"></script>
   <% for (key in htmlWebpackPlugin.files.css) { %><link rel="stylesheet" type="text/css" href="<%= htmlWebpackPlugin.files.css[key] %>"><% } %>
 </head>
 <body>

@@ -42,7 +42,12 @@ module.exports = (env, argv) => {
     plugins.push(new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns : ['./dist']}));
     plugins.push(new MiniCssExtractPlugin());
     sasscPlugins = [
-      MiniCssExtractPlugin.loader,
+      {
+        loader: MiniCssExtractPlugin.loader,
+        options: {
+          publicPath: options.PUBLIC_PATH,
+        }
+      },
       'css-loader',
       {
         loader: "sass-loader",
@@ -74,6 +79,14 @@ module.exports = (env, argv) => {
     ];
   }
 
+  function getOptions(path, additionalArgs = {}) {
+    return Object.assign({
+      outputPath: path,
+      name,
+      publicPath: options.PUBLIC_PATH ? `${options.PUBLIC_PATH}/${path}` : null
+    }, additionalArgs)
+  }
+
   const smp = new SpeedMeasurePlugin();
   const conf =  smp.wrap({
     devServer,
@@ -88,7 +101,7 @@ module.exports = (env, argv) => {
       }
     },
     output: {
-      publicPath: '/' //https://github.com/webpack/webpack-dev-server/issues/851#issuecomment-399227814
+      publicPath: options.PUBLIC_PATH || '/' //https://github.com/webpack/webpack-dev-server/issues/851#issuecomment-399227814
     },
     optimization: { minimize: false},
     devtool: '#source-map',
@@ -98,6 +111,9 @@ module.exports = (env, argv) => {
           test: /sw\.ts$/,
           exclude: /node_modules/,
           loader: 'sw-loader',
+          options: {
+            publicPath: '/'
+          }
         },
         {
           test: /\.ts$/,
@@ -119,36 +135,25 @@ module.exports = (env, argv) => {
         {
           test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
           loader: 'file-loader',
-          options: {
-            outputPath: 'font',
-            name,
-          }
+          options: getOptions('font')
         },
         {
           test: /favicon\.ico$/,
           loader: 'file-loader',
-          options: {
-            outputPath: '',
-            name,
-          }
+          options: getOptions('')
         },
         {
           test: /\.(mp3|wav)$/,
           loader: 'file-loader',
-          options: {
-            outputPath: 'sounds',
-            name,
-          }
+          options: getOptions('sounds')
         },
         {
           test: /\.(png|jpg|svg)$/,
           loader: 'url-loader',
-          options: {
+          options: getOptions('img', {
             limit: 32000,
-            fallback: "file-loader",
-            name,
-            outputPath: "img"
-          }
+            fallback: "file-loader"
+          })
         }
       ],
     },
