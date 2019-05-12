@@ -152,7 +152,7 @@ show_fontello_session() {
 
 
 safeRunCommand() {
-  printf "\e[95m$*\e[0;33;40m\n"
+  printf '\e[95m%s\e[0;33;40m\n' "$*"
   eval "$@"
   ret_code=$?
   if [ $ret_code != 0 ]; then
