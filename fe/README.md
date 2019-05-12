@@ -35,7 +35,8 @@ development.json and production.json have the following format:
   "FACEBOOK_APP_ID": "check chat/settings_example.py",
   "MANIFEST": "manifest for firebase push notifications",
   "RECAPTCHA_PUBLIC_KEY": "google recaptcha key",
-  "AUTO_REGISTRATION": "if set to true, for non loggined user registration page will be skipped with loggining with random generated username"
+  "AUTO_REGISTRATION": "if set to true, for non loggined user registration page will be skipped with loggining with random generated username",
+  "PUBLIC_PATH": "Set this path if you have different domains/IPs for index.html and other static assets, e.g. I serve index.html directly from my server and all sttatic assets like main.js from CDN, so in my case it's 'https://static.pychat.org'"
 }
 ```
 
