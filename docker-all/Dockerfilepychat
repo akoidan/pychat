@@ -1,9 +1,0 @@
-FROM deathangel908/pychat
-COPY ./rootfs/etc/nginx/ssl/certificate.crt ./rootfs/etc/nginx/ssl/server.key /etc/nginx/ssl/
-COPY ./chat/settings.py /srv/http/chat/
-COPY ./docker-all/production.json /srv/http/fe/production.json
-RUN chown http:http /srv/http/chat/settings.py
-RUN chown http:http /srv/http/fe/production.json
-
-
-

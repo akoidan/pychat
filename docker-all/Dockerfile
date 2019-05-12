@@ -11,11 +11,13 @@ WORKDIR /srv/http
 RUN set -x  &&\
 adduser -D -g '' http &&\
 apk update &&\
-apk add redis yarn nodejs python3 python3-dev openrc mariadb-dev mariadb-client mariadb build-base curl nginx sassc linux-headers pcre-dev sassc bash &&\
+apk add redis yarn nodejs python3 python3-dev openrc mariadb-dev mariadb-client mariadb build-base curl nginx sassc linux-headers pcre-dev sassc bash libffi-dev &&\
 pip3 install mysqlclient &&\
 pip3 install uwsgi &&\
-apk del mariadb-dev python3-dev build-base linux-headers &&\
-apk add mariadb-client-libs &&\
+# https://github.com/gliderlabs/docker-alpine/issues/297#issuecomment-368695866 libffi-dev
+# command below deletes gcc and libff-dev so just leave it as it is
+#apk del mariadb-dev python3-dev build-base linux-headers &&\
+#apk add mariadb-client-libs &&\
 ln -s `which python3` "$(dirname `which python3`)/python" &&\
 sed -i 's/^\(tty\d\:\:\)/#\1/g' /etc/inittab &&\
 sed -i \
@@ -63,6 +65,7 @@ bash download_content.sh generate_secret_key &&\
 bash download_content.sh all &&\
 chown -R http:http /srv/http/ &&\
 rm ./chat/settings.py && \
+rm ./fe/production.json && \
 cd ./fe &&\
 yarn install
 

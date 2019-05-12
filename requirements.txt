@@ -15,6 +15,7 @@ django-sslserver==0.19
 django-multi-captcha-admin
 django-recaptcha2
 django-cors-headers==2.3.0
+pywebpush==1.9.3
 # PyMySQL
 # mysql-connector-python
 # for windows you can install client with mysql installer or via whl file specified in readme
