@@ -144,7 +144,7 @@ TODO list
 * add pictures preview if user post an url that's content-type =image
 * SELECT_SELF_ROOM  https://github.com/Deathangel908/pychat/blob/master/chat/settings.py#L292-L303 doesnt work with mariadb engine 10.1
 * also admin email wasn't triggered while SELECT_SELF_ROOM has failed
-
+* Remove django server and leave only tornado
 
 
 
