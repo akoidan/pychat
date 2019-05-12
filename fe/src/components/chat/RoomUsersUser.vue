@@ -1,7 +1,7 @@
 <template>
   <li :class="onlineClass" v-show="userIsInActiveRoom">
     <div><i :class="userSexClass"></i>{{ user.user }}</div>
-    <img v-if="user.location.countryCode" class="country" :src='getFlag(user)'/>
+    <img v-if="user.location.countryCode" class="country" :src='getFlag(user)' :title="title"/>
   </li>
 </template>
 <script lang="ts">
@@ -22,6 +22,12 @@
 
     get userSexClass () {
       return getUserSexClass(this.user);
+    }
+
+    get title() {
+      return this.user.location.region === this.user.location.city ?
+        `${this.user.location.country} ${this.user.location.city}` :
+        `${this.user.location.country} ${this.user.location.region} ${this.user.location.city}`;
     }
 
     getFlag(user: UserModel) {

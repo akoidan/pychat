@@ -19,8 +19,8 @@ globals().update(importlib.import_module(config).__dict__)
 # SECRET_KEY = '**************************************************'
 
 
-### Whether to show country image right near to user
-SHOW_COUNTRY_CODE = True
+### Uncomment this setting if you don't need user location info to be shown for all
+### SHOW_COUNTRY_CODE = false
 
 
 ### Replace with your timezone. You can find list of timezones here https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
