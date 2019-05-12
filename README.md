@@ -45,9 +45,13 @@ You can always use [pychat.org](https://pychat.org), but if you want run Pychat 
  - Set up for production w/o docker
 
 ## Run test docker image
- - Download and run image: `docker run -p 443:443 deathangel908/pychat:test`
- - Open https://localhost
 Please don't use this build for production, as it uses debug ssl certificate, lacks a few features and all files are located inside of container, meaning you will lose all data on container destroy.
+
+ - Download and run image: 
+ ```
+ docker run -p 443:443 deathangel908/pychat:test
+ ```
+ - Open https://localhost
 
 ## Build docker
 
