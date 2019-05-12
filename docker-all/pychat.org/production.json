@@ -6,5 +6,7 @@
     "GOOGLE_OAUTH_2_CLIENT_ID": false,
     "FACEBOOK_APP_ID": false,
     "RECAPTCHA_PUBLIC_KEY": false,
-    "MANIFEST": false
+    "MANIFEST": false,
+    "AUTO_REGISTRATION": false,
+    "PUBLIC_PATH": null
 }

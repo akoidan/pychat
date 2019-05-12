@@ -43,8 +43,9 @@ rename_root_directory() {
 
 update_docker() {
     safeRunCommand docker build -f ./docker-all/Dockerfile -t deathangel908/pychat .
-    safeRunCommand docker build -f ./docker-all/pychat.org/Dockerfile -t deathangel908/pychat:test .
+    safeRunCommand docker build -f ./docker-all/pychat.org/Dockerfile -t deathangel908/pychat-test .
     safeRunCommand docker push deathangel908/pychat
+    safeRunCommand docker push deathangel908/pychat-test
 }
 
 rename_domain() {

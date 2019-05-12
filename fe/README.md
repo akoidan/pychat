@@ -17,7 +17,7 @@ It's highly recommended to get familiar with each of this technologies before st
 Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like webpack.config.js or development.json aren't affected. Take a look at [development.json](development.json). To run dev-server use `npm run dev`. You can navigate to http://localhost:9084
 
 ### Production setup
-To build project for production take a look at [production.json](production.json) and run `npm run prod`. This generates static files in `./dist` directory.
+To build project for production take a look at copy development.json [production.json](production.json) and run `npm run prod`. This generates static files in `./dist` directory.
 
 ### Dev server exits with system error like `class FastBuffer extends Uint8Array {}`
 If you have issues with node, use version 8.0.0, `nvm use 8.0.0`. You can install nvm with [archlinux](https://wiki.archlinux.org/index.php/Node.js_) [ubuntu](https://qiita.com/shaching/items/6e398140432d4133c866) [windows](https://github.com/coreybutler/nvm-windows)

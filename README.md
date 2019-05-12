@@ -50,7 +50,7 @@ Please don't use this build for production, as it uses debug ssl certificate, la
 
  - Download and run image: 
  ```
- docker run -p 443:443 deathangel908/pychat:test
+ docker run -p 443:443 deathangel908/pychat-test
  ```
  - Open https://localhost
 
