@@ -123,7 +123,7 @@ Services commands for Archlinux:
  - If something doesn't work you want to check `pychat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
 
 ## Docker
-You can alway use [my docker](https://cloud.docker.com/u/deathangel908/repository/docker/deathangel908/pychat) image described in [README](https://github.com/akoidan/pychat#build-docker), but you can also build it yourself:
+You can alway use [my docker](https://cloud.docker.com/u/deathangel908/repository/docker/deathangel908/pychat) image described in [README](https://github.com/akoidan/pychat#run-prod-docker-image), but you can also build it yourself:
  - Generate ssl certificates:	
    - If you have bash installed: `./download_content.sh generate_certificate`	
    - You can also generate them manually and put into `./rootfs/etc/nginx/ssl/server.key` and `./rootfs/etc/nginx/ssl/certificate.crt`	
