@@ -44,7 +44,11 @@ module.exports = (env, argv) => {
     let minicssPlugin = {
       loader: MiniCssExtractPlugin.loader,
     };
-    minicssPlugin.publicPath = options.PUBLIC_PATH;
+    if (options.PUBLIC_PATH) {
+      minicssPlugin.options = {
+        publicPath: `${options.PUBLIC_PATH}/${path}`
+      }
+    }
     sasscPlugins = [
       minicssPlugin,
       'css-loader',
