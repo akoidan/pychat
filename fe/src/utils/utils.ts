@@ -4,7 +4,12 @@ import sessionHolder from './sessionHolder';
 import {api, channelsHandler, globalLogger, storage, webrtcApi, ws} from './singletons';
 import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from '../types/model';
 import loggerFactory from './loggerFactory';
-import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID, XHR_API_URL} from './consts';
+import {
+  ALL_ROOM_ID,
+  FACEBOOK_APP_ID,
+  GOOGLE_OAUTH_2_CLIENT_ID,
+  XHR_API_URL
+} from './consts';
 import {StorageData} from '../types/types';
 
 let logger = loggerFactory.getLoggerColor('utils', '#007a70');
@@ -102,7 +107,7 @@ export function login(session, errMessage) {
   } else if (/\w{32}/.exec(session)) {
     sessionHolder.session = session;
     logger.log('Proceeding to /')();
-    router.replace('/chat/1');
+    router.replace(`/chat/${ALL_ROOM_ID}`);
   } else {
     store.dispatch('growlError', session);
   }

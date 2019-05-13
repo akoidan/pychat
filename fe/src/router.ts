@@ -23,6 +23,7 @@ import ViewProfilePage from './components/pages/ViewProfilePage.vue';
 import RoomSettings from './components/pages/RoomSettings.vue';
 import ApplyResetPassword from './components/singup/ApplyResetPassword.vue';
 import {globalLogger} from './utils/singletons';
+import {ALL_ROOM_ID} from './utils/consts';
 
 Vue.use(VueRouter);
 const router = new VueRouter({
@@ -36,7 +37,7 @@ const router = new VueRouter({
       children: [
         {
           path: '',
-          redirect: '/chat/1'
+          redirect: `/chat/${ALL_ROOM_ID}`
         },
         {
           component: ChannelsPage,
@@ -139,7 +140,7 @@ const router = new VueRouter({
       ]
     }, {
       path: '*',
-      redirect: '/chat/1'
+      redirect: `/chat/${ALL_ROOM_ID}`
     }
     ]
 });
