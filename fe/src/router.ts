@@ -24,6 +24,7 @@ import RoomSettings from './components/pages/RoomSettings.vue';
 import ApplyResetPassword from './components/singup/ApplyResetPassword.vue';
 import {globalLogger} from './utils/singletons';
 import {ALL_ROOM_ID} from './utils/consts';
+import ConfirmMail from './components/email/ConfirmMail.vue';
 
 Vue.use(VueRouter);
 const router = new VueRouter({
@@ -138,6 +139,9 @@ const router = new VueRouter({
           component: ApplyResetPassword
         }
       ]
+    }, {
+      path: '/confirm_mail',
+      component: ConfirmMail
     }, {
       path: '*',
       redirect: `/chat/${ALL_ROOM_ID}`

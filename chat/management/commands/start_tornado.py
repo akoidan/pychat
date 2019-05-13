@@ -6,7 +6,7 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop, PeriodicCallback
-from tornado.web import Application
+from tornado.web import Application, StaticFileHandler
 from chat.global_redis import ping_online
 from chat.tornado.http_handler import HttpHandler
 import logging
@@ -55,8 +55,9 @@ class Command(BaseCommand):
 
 	def handle(self, *args, **options):
 		application = Application([
-			(r'/test', HttpHandler),
-			(r'.*', TornadoHandler),
+			(r'/api/.*', HttpHandler),
+			(r'/photo/(.*)', StaticFileHandler, {'path': settings.MEDIA_ROOT}),
+			(r'/ws', TornadoHandler),
 		], debug=settings.DEBUG, default_host=options['host'])
 		self.http_server = HTTPServer(application, ssl_options=TORNADO_SSL_OPTIONS)
 		self.http_server.bind(options['port'])

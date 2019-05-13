@@ -15,13 +15,15 @@ from django.core.validators import validate_email
 from django.db import IntegrityError
 from django.db import connection, OperationalError, InterfaceError
 from django.db.models import Q, Max
-from django.template import RequestContext
+from django.template import RequestContext, Context
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.timezone import utc
 from io import BytesIO
 
 from chat import local
+from chat.global_redis import sync_redis
+from chat.log_filters import id_generator
 from chat.models import Image, UploadedFile, get_milliseconds, Message
 from chat.models import Room
 from chat.models import User
@@ -226,7 +228,7 @@ def check_captcha(request):
 		raise ValidationError('Unable to check captcha because {}'.format(e))
 
 
-def send_sign_up_email(user, site_address, request):
+def send_sign_up_email(user, site_address):
 	if user.email is not None:
 		verification = Verification(user=user, type_enum=Verification.TypeChoices.register)
 		verification.save()
@@ -247,7 +249,7 @@ def send_sign_up_email(user, site_address, request):
 			'btnText': "CONFIRM SIGN UP",
 			'greetings': start_message
 		}
-		html_message = render_to_string('sign_up_email.html', context, context_instance=RequestContext(request))
+		html_message = render_to_string('sign_up_email.html', Context(context))
 		logger.info('Sending verification email to userId %s (email %s)', user.id, user.email)
 		try:
 			send_mail("Confirm chat registration", text, site_address, [user.email, ], html_message=html_message, fail_silently=True)
@@ -303,6 +305,11 @@ def get_user_by_code(token, type):
 		raise ValidationError('Unknown verification token')
 
 
+def generate_session(user_id):
+	session = id_generator(32)
+	sync_redis.hset('sessions', session, user_id)
+	return session
+
 def send_new_email_ver(request, user, email):
 	new_ver = Verification(user=user, type_enum=Verification.TypeChoices.confirm_email, email=email)
 	new_ver.save()
@@ -310,7 +317,7 @@ def send_new_email_ver(request, user, email):
 		host = request.get_host()
 	except:
 		host = request.host_name # TODO we should know request PORT
-	link = "{}://{}/confirm_email?token={}".format(settings.SITE_PROTOCOL, host, new_ver.token)
+	link = "{}://{}#/confirm_email?token={}".format(settings.SITE_PROTOCOL, host, new_ver.token)
 	text = ('Hi {}, you have changed email to curren on pychat \nTo verify it, please click on the url: {}') \
 		.format(user.username, link)
 	start_message = mark_safe("You have changed email to current one in  <b>Pychat</b>. \n"

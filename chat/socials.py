@@ -15,7 +15,7 @@ from chat.log_filters import id_generator
 from chat.models import UserProfile, get_random_path
 from chat.py2_3 import urlopen
 from chat.settings import VALIDATION_IS_OK, AUTHENTICATION_BACKENDS
-from chat.utils import create_user_model, check_user
+from chat.utils import create_user_model, check_user, generate_session
 
 GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
 FACEBOOK_ACCESS_TOKEN = getattr(settings, "FACEBOOK_ACCESS_TOKEN", None)
@@ -23,7 +23,7 @@ FACEBOOK_ACCESS_TOKEN = getattr(settings, "FACEBOOK_ACCESS_TOKEN", None)
 logger = logging.getLogger(__name__)
 
 
-class SocialAuth(View):
+class SocialAuth():
 
 	@property
 	def app_token(self):
@@ -74,21 +74,6 @@ class SocialAuth(View):
 			user_profile.save()
 			create_user_model(user_profile)
 		return user_profile
-
-	def post(self, request):
-		try:
-			rp = request.POST
-			logger.info('Got %s request: %s', self.instance, rp)
-			token = rp.get('token')
-			user_profile = self.generate_user_profile(token)
-			user_profile.backend = AUTHENTICATION_BACKENDS[0]
-			djangologin(request, user_profile)
-			request.session.save()
-
-			return HttpResponse(content=request.session.session_key, content_type='text/plain')
-		except ValidationError as e:
-			logger.warn("Unable to proceed %s sing in because %s", self.instance, e.message)
-			return HttpResponse(content="Unable to sign in via {} because '{}'".format(self.instance, e.message), content_type='text/plain')
 
 
 class GoogleAuth(SocialAuth):

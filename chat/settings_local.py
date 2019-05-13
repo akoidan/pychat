@@ -34,16 +34,6 @@ LOGGING['loggers'] = {
 		'propagate': False,
 	},
 }
-CORS_ORIGIN_ALLOW_ALL = True
-
-MIDDLEWARE_CLASSES = ('corsheaders.middleware.CorsMiddleware', ) + MIDDLEWARE_CLASSES
-CORS_ORIGIN_WHITELIST = (
-	'localhost:8080'
-)
-
-CORS_ALLOW_HEADERS = default_headers + (
-    'session-id',
-)
 
 # Don't close socket if we're in debug
 PING_CLOSE_JS_DELAY = 100000

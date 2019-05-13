@@ -62,7 +62,7 @@ services:
     command:
       python manage.py start_tornado
     healthcheck:
-      test: sh -c "[ '`curl -s http://localhost:8888/test`' = 'ok' ]"
+      test: sh -c "[ '`curl -s http://localhost:8888/api/test`' = 'ok' ]"
       timeout: 3s
       interval: 5s
       retries: 3
