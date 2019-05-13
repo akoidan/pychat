@@ -140,7 +140,7 @@ module.exports = (env, argv) => {
           use: sasscPlugins
         },
         {
-          test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+          test: /((fonts?\/.*\.svg)|(\.(woff2?|eot|ttf|otf)))(\?.*)?$/,
           loader: 'file-loader',
           options: getOptions('font')
         },
@@ -155,7 +155,7 @@ module.exports = (env, argv) => {
           options: getOptions('sounds')
         },
         {
-          test: /\.(png|jpg|svg)$/,
+          test: /assets\/img\/.*\.(png|jpg|svg)$/,
           loader: 'url-loader',
           options: getOptions('img', {
             limit: 32000,

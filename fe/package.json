@@ -9,7 +9,7 @@
   "scripts": {
     "prod": "webpack --progress --mode production  --hide-modules",
     "dev": "webpack-dev-server --mode development --inline --hot --https --host 0.0.0.0",
-    "cp-prod-files": "scp -rP 8886 ./dist http@192.168.1.11:/srv/http/pychat/fe/",
+    "cp-prod-files": "tar c dist/ | ssh http@192.168.1.11 -p 8886 \"rm -rf /srv/http/pychat/fe/dist && tar x -C /srv/http/pychat/fe/\"",
     "publish": "yarn run prod && yarn run cp-prod-files",
     "test": "mocha test/index.ts",
     "stats": "webpack --mode production --profile --json > compilation-stats.json && webpack-bundle-analyzer ./compilation-stats.json",
