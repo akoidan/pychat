@@ -5,6 +5,8 @@
 .pydevproject
 .idea
 .vscode
+md5
+md5-wasm-example
 test/
 dump.rdb
 photos
@@ -13,6 +15,8 @@ chat/migrations
 fe/src/assets/font/*
 !fe/src/assets/font/.gitkeep
 .venv
+video.txt
+fe/package-lock.json
 fe/production.json
 chat.log
 fe/src/assets/demo.html

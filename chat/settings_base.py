@@ -27,15 +27,12 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 ALLOWED_HOSTS = ["*",]
 
-username_processor = 'chat.context_processors.add_user_name'
-
 # Application definition
 
 INSTALLED_APPS = (
 	'django.contrib.admin',
 	'django.contrib.auth',
 	'django.contrib.contenttypes',
-	'django.contrib.sessions',
 	'django.contrib.messages',
 	'django.contrib.staticfiles',
 	'django.db.migrations',
@@ -64,8 +61,6 @@ REDIS_PORT = 6379
 REDIS_HOST ='localhost'
 REDIS_DB = 0
 REDIS_SESSION_DB = 3
-
-SESSION_ENGINE = 'redis_sessions.session'
 
 
 # BROKER_URL = str(SESSION_REDIS_PORT).join(('redis://localhost:','/0'))
@@ -215,7 +210,7 @@ TEMPLATES = [{
 	'BACKEND': 'django.template.backends.django.DjangoTemplates',
 	'DIRS': [join(BASE_DIR, 'templates')],
 	'OPTIONS': {
-		'context_processors': global_settings.TEMPLATE_CONTEXT_PROCESSORS + [username_processor]
+		'context_processors': global_settings.TEMPLATE_CONTEXT_PROCESSORS
 	}
 }]
 
@@ -226,8 +221,6 @@ WS_ID_CHAR_LENGTH = 4
 DEFAULT_PROFILE_ID = 1
 
 ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/pychat/issues/new'
-
-SESSION_COOKIE_NAME = "sessionid"
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 

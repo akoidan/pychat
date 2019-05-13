@@ -7,7 +7,7 @@
       <input ref="password" type= 'password' autocomplete="new-password" required name='password' class="input" placeholder='Password'  @focus="passwordFoc = false"  v-model="password" @blur="passwordFoc = true"/>
     </register-field-set>
     <register-field-set icon="icon-lock" :validation="repPassCheckValue" :closed="repPassFoc" :description="repPassDescription" >
-      <input ref="repPass" autocomplete="new-password" type='password' required name='repPass' class="input" placeholder='Repeat password'  @focus="repPassFoc = false"  v-model="repPass" @blur="repPassFoc = true"/>
+      <input ref="repPass" autocomplete="new-password" type='password' required class="input" placeholder='Repeat password'  @focus="repPassFoc = false"  v-model="repPass" @blur="repPassFoc = true"/>
     </register-field-set>
     <register-field-set icon="icon-mail" :validation="emailCheckValue" :closed="emailFoc" :description="emailDescription" >
       <input type='email' ref="email" autocomplete="email" placeholder='Email' name='email' class="input" @focus="emailFoc = false"  v-model.trim="email" @blur="emailFoc = true"/>

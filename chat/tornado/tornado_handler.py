@@ -125,87 +125,82 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 
 	def open(self):
 		session_key = self.get_argument('sessionId', None)
-		try:
-			if session_key is None:
-				raise Error401()
-			session = SessionStore(session_key)
-			try:
-				self.user_id = int(session["_auth_user_id"])
-			except:
-				raise Error401()
-			self.ip = self.get_client_ip()
-			user_db = do_db(UserProfile.objects.get, id=self.user_id)
-			self.generate_self_id()
-			self._logger = logging.LoggerAdapter(parent_logger, {
-				'id': self.id,
-				'ip': self.ip
-			})
-			cookies = ["{}={}".format(k, self.request.cookies[k].value) for k in self.request.cookies]
-			self.logger.debug("!! Incoming connection, session %s, thread hash %s, cookies: %s", session_key, self.id, ";".join(cookies))
-			self.async_redis.connect()
-			self.async_redis_publisher.sadd(RedisPrefix.ONLINE_VAR, self.id)
-			# since we add user to online first, latest trigger will always show correct online
-			was_online, online = self.get_online_and_status_from_redis()
-			user_rooms_query = Room.objects.filter(users__id=self.user_id, disabled=False) \
-				.values('id', 'name', 'roomusers__notifications', 'roomusers__volume')
-			room_users = [{
-				VarNames.ROOM_ID: room['id'],
-				VarNames.ROOM_NAME: room['name'],
-				VarNames.NOTIFICATIONS: room['roomusers__notifications'],
-				VarNames.VOLUME: room['roomusers__volume'],
-				VarNames.ROOM_USERS: []
-			} for room in user_rooms_query]
-			user_rooms_dict = {room[VarNames.ROOM_ID]: room for room in room_users}
-			room_ids = [room_id[VarNames.ROOM_ID] for room_id in room_users]
-			rooms_users = RoomUsers.objects.filter(room_id__in=room_ids).values('user_id', 'room_id')
-			for ru in rooms_users:
-				user_rooms_dict[ru['room_id']][VarNames.ROOM_USERS].append(ru['user_id'])
-			# get all missed messages
-			self.channels = room_ids  # py2 doesn't support clear()
-			self.channels.append(self.channel)
-			self.channels.append(self.id)
-			self.listen(self.channels)
-			off_messages, history = self.get_offline_messages(room_users, was_online, self.get_argument('history', False))
-			for room in room_users:
-				room_id = room[VarNames.ROOM_ID]
-				h = history.get(room_id)
-				o = off_messages.get(room_id)
-				if h:
-					room[VarNames.LOAD_MESSAGES_HISTORY] = h
-				if o:
-					room[VarNames.LOAD_MESSAGES_OFFLINE] = o
-
-			if settings.SHOW_COUNTRY_CODE:
-				fetched_users  = User.objects.annotate(user_c=Count('id')).values('id', 'username', 'sex', 'userjoinedinfo__ip__country_code', 'userjoinedinfo__ip__country', 'userjoinedinfo__ip__region', 'userjoinedinfo__ip__city')
-				user_dict = [RedisPrefix.set_js_user_structure_flag(
-					user['id'],
-					user['username'],
-					user['sex'],
-					user['userjoinedinfo__ip__country_code'],
-					user['userjoinedinfo__ip__country'],
-					user['userjoinedinfo__ip__region'],
-					user['userjoinedinfo__ip__city']
-				) for user in fetched_users]
-			else:
-				fetched_users = User.objects.values('id', 'username', 'sex')
-				user_dict = [RedisPrefix.set_js_user_structure(
-					user['id'],
-					user['username'],
-					user['sex']
-				) for user in fetched_users]
-			if self.user_id not in online:
-				online.append(self.user_id)
-
-			self.ws_write(self.set_room(room_users, user_dict, online, user_db))
-			if not was_online:  # if a new tab has been opened
-				online_user_names_mes = self.room_online_login(online, user_db.username, user_db.sex_str)
-				self.logger.info('!! First tab, sending refresh online for all')
-				self.publish(online_user_names_mes, settings.ALL_ROOM_ID)
-			self.logger.info("!! User %s subscribes for %s", self.user_id, self.channels)
-			self.connected = True
-		except Error401:
+		user_id = self.sync_redis.hget('sessions', session_key)
+		if user_id is None:
 			self.logger.warning('!! Session key %s has been rejected' % session_key)
 			self.close(403, "Session key %s has been rejected" % session_key)
+			return
+		self.user_id = int(user_id)
+		self.ip = self.get_client_ip()
+		user_db = do_db(UserProfile.objects.get, id=self.user_id)
+		self.generate_self_id()
+		self._logger = logging.LoggerAdapter(parent_logger, {
+			'id': self.id,
+			'ip': self.ip
+		})
+		cookies = ["{}={}".format(k, self.request.cookies[k].value) for k in self.request.cookies]
+		self.logger.debug("!! Incoming connection, session %s, thread hash %s, cookies: %s", session_key, self.id, ";".join(cookies))
+		self.async_redis.connect()
+		self.async_redis_publisher.sadd(RedisPrefix.ONLINE_VAR, self.id)
+		# since we add user to online first, latest trigger will always show correct online
+		was_online, online = self.get_online_and_status_from_redis()
+		user_rooms_query = Room.objects.filter(users__id=self.user_id, disabled=False) \
+			.values('id', 'name', 'roomusers__notifications', 'roomusers__volume')
+		room_users = [{
+			VarNames.ROOM_ID: room['id'],
+			VarNames.ROOM_NAME: room['name'],
+			VarNames.NOTIFICATIONS: room['roomusers__notifications'],
+			VarNames.VOLUME: room['roomusers__volume'],
+			VarNames.ROOM_USERS: []
+		} for room in user_rooms_query]
+		user_rooms_dict = {room[VarNames.ROOM_ID]: room for room in room_users}
+		room_ids = [room_id[VarNames.ROOM_ID] for room_id in room_users]
+		rooms_users = RoomUsers.objects.filter(room_id__in=room_ids).values('user_id', 'room_id')
+		for ru in rooms_users:
+			user_rooms_dict[ru['room_id']][VarNames.ROOM_USERS].append(ru['user_id'])
+		# get all missed messages
+		self.channels = room_ids  # py2 doesn't support clear()
+		self.channels.append(self.channel)
+		self.channels.append(self.id)
+		self.listen(self.channels)
+		off_messages, history = self.get_offline_messages(room_users, was_online, self.get_argument('history', False))
+		for room in room_users:
+			room_id = room[VarNames.ROOM_ID]
+			h = history.get(room_id)
+			o = off_messages.get(room_id)
+			if h:
+				room[VarNames.LOAD_MESSAGES_HISTORY] = h
+			if o:
+				room[VarNames.LOAD_MESSAGES_OFFLINE] = o
+
+		if settings.SHOW_COUNTRY_CODE:
+			fetched_users  = User.objects.annotate(user_c=Count('id')).values('id', 'username', 'sex', 'userjoinedinfo__ip__country_code', 'userjoinedinfo__ip__country', 'userjoinedinfo__ip__region', 'userjoinedinfo__ip__city')
+			user_dict = [RedisPrefix.set_js_user_structure_flag(
+				user['id'],
+				user['username'],
+				user['sex'],
+				user['userjoinedinfo__ip__country_code'],
+				user['userjoinedinfo__ip__country'],
+				user['userjoinedinfo__ip__region'],
+				user['userjoinedinfo__ip__city']
+			) for user in fetched_users]
+		else:
+			fetched_users = User.objects.values('id', 'username', 'sex')
+			user_dict = [RedisPrefix.set_js_user_structure(
+				user['id'],
+				user['username'],
+				user['sex']
+			) for user in fetched_users]
+		if self.user_id not in online:
+			online.append(self.user_id)
+
+		self.ws_write(self.set_room(room_users, user_dict, online, user_db))
+		if not was_online:  # if a new tab has been opened
+			online_user_names_mes = self.room_online_login(online, user_db.username, user_db.sex_str)
+			self.logger.info('!! First tab, sending refresh online for all')
+			self.publish(online_user_names_mes, settings.ALL_ROOM_ID)
+		self.logger.info("!! User %s subscribes for %s", self.user_id, self.channels)
+		self.connected = True
 
 	def get_offline_messages(self, user_rooms, was_online, with_history):
 		q_objects = get_history_message_query(self.get_argument('messages', None), user_rooms, with_history)

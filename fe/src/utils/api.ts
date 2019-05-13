@@ -8,6 +8,7 @@ import loggerFactory from './loggerFactory';
 import {Logger} from 'lines-logger';
 import Http from './Http';
 import {sub} from './sub';
+import sessionHolder from './sessionHolder';
 
 export default class Api extends MessageHandler {
   private readonly  xhr: Http;
@@ -105,7 +106,7 @@ export default class Api extends MessageHandler {
 
   public googleAuth(token, cb) {
     this.xhr.doPost({
-      url: '/google-auth',
+      url: '/google_auth',
       params: {
         token
       },
@@ -115,7 +116,7 @@ export default class Api extends MessageHandler {
 
   public facebookAuth(token, cb) {
     this.xhr.doPost({
-      url: '/facebook-auth',
+      url: '/facebook_auth',
       params: {
         token
       },
@@ -206,9 +207,12 @@ export default class Api extends MessageHandler {
   }
 
   public showProfile(id: number, cb: ErrorCB<ViewUserProfileDto>) {
-    this.xhr.doGet<ViewUserProfileDto>(`/profile/${id}`, cb, true);
+    this.xhr.doGet<ViewUserProfileDto>(`/profile?id=${id}`, cb, true);
   }
 
+  public confirmEmail(token, cb: ErrorCB<string> ) {
+    this.xhr.doGet<string>(`/confirm_email?token=${token}`, cb, false);
+  }
 
   public uploadFiles(files: UploadFile[], cb: ErrorCB<number[]>, progress: Function) {
     let fd = new FormData();
