@@ -27,6 +27,7 @@ export {_MANIFEST as MANIFEST};
 export {_AUTO_REGISTRATION as AUTO_REGISTRATION};
 export const RESPONSE_SUCCESS = 'ok';
 
+export const ALL_ROOM_ID = 1;
 export const CHROME_EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn';
 export const CHROME_EXTENSION_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + CHROME_EXTENSION_ID
 export const PASTED_IMG_CLASS = 'B4j2ContentEditableImg';

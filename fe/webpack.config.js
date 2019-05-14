@@ -47,7 +47,7 @@ module.exports = (env, argv) => {
     };
     if (options.PUBLIC_PATH) {
       minicssPlugin.options = {
-        publicPath: `${options.PUBLIC_PATH}/${path}`
+        publicPath: `${options.PUBLIC_PATH}${path}`
       }
     }
     sasscPlugins = [
@@ -89,7 +89,7 @@ module.exports = (env, argv) => {
       name
     }, additionalArgs);
     if (options.PUBLIC_PATH) {
-      res.publicPath = `${options.PUBLIC_PATH}/${path}`;
+      res.publicPath = `${options.PUBLIC_PATH}${path}`;
     }
     return res;
   }
@@ -140,7 +140,7 @@ module.exports = (env, argv) => {
           use: sasscPlugins
         },
         {
-          test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/,
+          test: /((fonts?\/.*\.svg)|(\.(woff2?|eot|ttf|otf)))(\?.*)?$/,
           loader: 'file-loader',
           options: getOptions('font')
         },
@@ -155,7 +155,7 @@ module.exports = (env, argv) => {
           options: getOptions('sounds')
         },
         {
-          test: /\.(png|jpg|svg)$/,
+          test: /assets\/img\/.*\.(png|jpg|svg)$/,
           loader: 'url-loader',
           options: getOptions('img', {
             limit: 32000,

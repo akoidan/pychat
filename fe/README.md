@@ -36,7 +36,7 @@ development.json and production.json have the following format:
   "MANIFEST": "manifest path for firebase push notifications e.g.`/manifest.json`",
   "RECAPTCHA_PUBLIC_KEY": "check chat/settings_example.py RECAPTCHA_SITE_KEY",
   "AUTO_REGISTRATION": "if set to true, for non loggined user registration page will be skipped with loggining with random generated username",
-  "PUBLIC_PATH": "Set this path if you have different domains/IPs for index.html and other static assets, e.g. I serve index.html directly from my server and all sttatic assets like main.js from CDN, so in my case it's 'https://static.pychat.org'"
+  "PUBLIC_PATH": "Set this path if you have different domains/IPs for index.html and other static assets, e.g. I serve index.html directly from my server and all sttatic assets like main.js from CDN, so in my case it's 'https://static.pychat.org/' note ending slash"
 }
 ```
 

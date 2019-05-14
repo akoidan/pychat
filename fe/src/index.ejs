@@ -4,6 +4,8 @@
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
   <title>PyChat</title>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta http-equiv="Cache-control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
   <meta property="og:title" content="Open Source Chat"/>
   <meta property="og:image" content="favicon.ico"/>
   <meta property="og:site_name" content="Pychat"/>
@@ -11,6 +13,7 @@
   <meta name="msapplication-navbutton-color" content="#232323">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <link rel="shortcut icon" href="<%= htmlWebpackPlugin.files.favicon %>">
   <meta property="og:description" content="Chat with your friends, make video calls or transfer files with Pychat!"/>
   <% if (htmlWebpackPlugin.options.manifest ) { %><link rel="manifest" href="<%= htmlWebpackPlugin.options.manifest %>"><% } %>
   <script crossorigin="anonymous" type="text/javascript" src="<%= htmlWebpackPlugin.files.js[0] %>"></script>

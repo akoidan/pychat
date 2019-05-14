@@ -82,15 +82,15 @@ export function encodeHTML(html: string) {
 }
 
 export function getSmileyPath(tabName: string, src: string) {
-  return getStaticUrl(`./smileys/${tabName}/${src}`);
+  return getStaticUrl(`smileys/${tabName}/${src}`);
 }
 
 export function getFlagPath(countryCode: string) {
-  return getStaticUrl(`./flags/${countryCode}.png`);
+  return getStaticUrl(`flags/${countryCode}.png`);
 }
 
 export function getStaticUrl(src) {
-  return PUBLIC_PATH ? `${PUBLIC_PATH}/${src}` : src;
+  return PUBLIC_PATH ? `${PUBLIC_PATH}${src}` : src;
 }
 let uniqueId = 1;
 export function getUniqueId() {

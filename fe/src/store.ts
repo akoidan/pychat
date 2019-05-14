@@ -47,6 +47,7 @@ import {
 import {storage} from './utils/singletons';
 import {SetRooms} from './types/dto';
 import {encodeHTML} from './utils/htmlApi';
+import {ALL_ROOM_ID} from './utils/consts';
 
 Vue.use(Vuex);
 
@@ -382,6 +383,9 @@ const store: StoreOptions<RootState> = {
     },
     addUser(state: RootState, u: UserModel) {
       Vue.set(state.allUsersDict, String(u.id), u);
+      if (state.roomsDict[ALL_ROOM_ID] && state.roomsDict[ALL_ROOM_ID].users.indexOf(u.id) < 0) {
+        state.roomsDict[ALL_ROOM_ID].users.push(u.id);
+      }
       storage.saveUser(u);
     },
     addChangeOnlineEntry(state: RootState, payload: ChangeOnlineEntry) {
