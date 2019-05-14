@@ -47,7 +47,7 @@ module.exports = (env, argv) => {
     };
     if (options.PUBLIC_PATH) {
       minicssPlugin.options = {
-        publicPath: `${options.PUBLIC_PATH}${path}`
+        publicPath: options.PUBLIC_PATH
       }
     }
     sasscPlugins = [
