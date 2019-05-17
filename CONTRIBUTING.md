@@ -77,6 +77,8 @@ The string `rsok33GN:0005:EJAd` describes:
 TODO list
 =========
 
+* https://www.nginx.com/resources/wiki/modules/upload/
+* Store image in filstream api
 * add srcset and minify uploaded image 
 * autoupdate pychat.org from github webhook and expose port http to build
 * If self assigned certificate was used, mb add user an option to click on iframe or smth?
