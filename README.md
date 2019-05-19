@@ -35,7 +35,7 @@ By this time there're a lot of chats: skype, telegram, discord, slack, viber... 
  - You need a private chat for your company. Maybe you want to share it over private network, so only some people can access it.
  - You don't want your entire chat to be managable by 3rd party SaaS. 3rd party services can compromise your data or just disappear one day. You may also google for history leaks. Only with pychat you gain full controll over your chat.
  - You don't want to spend a penny on chat. While most of service come free in standard edition, they are still making money from you somehow. And when you've been using them a while, once you will discover that the feature that you need is paid. Forget about it all! Every single feature is free in pychat!
- - You need a custom feature in your chat that no other solutions provide. Codding chat from the scratch is really long-way-ticket (oh believe me). Just fork pychat and code anything you want there.
+ - You need a custom feature in your chat that no other solutions provide. Codding chat from the scratch is really a quite long way (oh believe me). Just fork pychat and code anything you want there.
  - You just want the running chat and you don't have time on this nonsence. Follow the [Build docker](#build-docker) section. It's takes only a few minutes to setup an instance.
 
 # How to run on my own server:
