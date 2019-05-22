@@ -77,6 +77,7 @@ The string `rsok33GN:0005:EJAd` describes:
 TODO list
 =========
 
+* https://www.w3.org/TR/css-scrollbars-1/
 * Search add user to room should container user icon
 * add webhooks, move giphy to webhooks, add help command
 * https://www.nginx.com/resources/wiki/modules/upload/
