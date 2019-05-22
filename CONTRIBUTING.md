@@ -77,6 +77,7 @@ The string `rsok33GN:0005:EJAd` describes:
 TODO list
 =========
 
+* add webhooks, move giphy to webhooks, add help command
 * https://www.nginx.com/resources/wiki/modules/upload/
 * Store image in filstream api
 * add srcset and minify uploaded image 
