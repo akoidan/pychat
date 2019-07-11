@@ -76,6 +76,9 @@ The string `rsok33GN:0005:EJAd` describes:
  
 TODO list
 =========
+* Update to tornado 6.0 and detect blocking loops https://stackoverflow.com/a/26638397/3872976
+* https://stackoverflow.com/questions/33170016/how-to-use-django-1-8-5-orm-without-creating-a-django-project
+* tornado uses blocking operation like django orm or sync_redis (strict redis). While this operations are executed main thread awaits IO and prevents new messages and connections from execution. async_redis create cb wrapper. django orm: https://docs.djangoproject.com/en/dev/releases/3.0/#asgi-support
 
 * Add smile reaction to the message below it, like in slack
 * https://www.w3.org/TR/css-scrollbars-1/
