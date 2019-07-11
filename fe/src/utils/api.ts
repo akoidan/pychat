@@ -210,6 +210,18 @@ export default class Api extends MessageHandler {
     this.xhr.doGet<ViewUserProfileDto>(`/profile?id=${id}`, cb, true);
   }
 
+  public changeEmail(token, cb: ErrorCB<string> ) {
+    this.xhr.doGet<string>(`/change_email?token=${token}`, cb, false);
+  }
+
+  public changeEmailLogin(email, password, cb: SingleParamCB<string> ) {
+    this.xhr.doPost({
+      url: '/change_email_login',
+      cb: this.getResponseSuccessCB(cb),
+      params: {email, password}
+    });
+  }
+
   public confirmEmail(token, cb: ErrorCB<string> ) {
     this.xhr.doGet<string>(`/confirm_email?token=${token}`, cb, false);
   }
@@ -229,8 +241,8 @@ export default class Api extends MessageHandler {
       cb});
   }
 
-  public validateEmail(email: string, cb: SingleParamCB<string>) {
-    this.xhr.doPost({
+  public validateEmail(email: string, cb: SingleParamCB<string>): XMLHttpRequest {
+    return this.xhr.doPost({
       url: '/validate_email',
       params: {email},
       cb: this.getResponseSuccessCB(cb)

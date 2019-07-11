@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="saveProfile" class="holder">
+  <form @submit.prevent="saveProfile" class="holder" method="post">
     <table>
       <tbody>
       <tr>

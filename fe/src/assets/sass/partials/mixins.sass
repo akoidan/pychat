@@ -195,6 +195,7 @@
 
 @mixin scrollbar($background, $thumb, $ie-3dlight, $ie-highlight, $ie-arrow)
 
+	// chrome and other webkit like opera/safari
 	::-webkit-scrollbar
 		background-color: $background
 		height: 8px
@@ -206,12 +207,16 @@
 	::-webkit-scrollbar-corner
 		background-color: #1c1c1c
 
-	// IE scrollbar
+	// IE
 	scrollbar-base-color: $thumb
 	scrollbar-track-color: $background
 	scrollbar-3dlight-color: $ie-3dlight
 	scrollbar-highlight-color: $ie-highlight
 	scrollbar-arrow-color: $ie-arrow
+
+	// firefox
+	scrollbar-color: $thumb $background
+	scrollbar-width: thin
 
 
 @mixin lor-button-style

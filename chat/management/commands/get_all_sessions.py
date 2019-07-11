@@ -1,4 +1,4 @@
-from django.conf import settings
+from chat.settings_base import REDIS_PORT, REDIS_HOST, REDIS_DB
 
 __author__ = 'andrew'
 import base64
@@ -12,8 +12,7 @@ class Command(BaseCommand):
 	help = 'Print every session fetched from redis backend'
 
 	def get_values_from_redis(self):
-		v = settings.SESSION_REDIS
-		sync_redis = redis.StrictRedis(v.get('host'), v.get('port'), v.get('db'))
+		sync_redis = redis.StrictRedis(REDIS_HOST, REDIS_PORT, REDIS_DB)
 		keys = sync_redis.keys()
 		for key in keys:
 			try:

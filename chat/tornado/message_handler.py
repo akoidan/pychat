@@ -1,28 +1,30 @@
 import json
 import logging
 import re
+
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db.models import Q, Max
-from tornado.gen import engine, Task
+from tornado import gen
+from tornado.gen import Task
 from tornado.httpclient import HTTPRequest
 from tornado.ioloop import IOLoop
-from tornado.web import asynchronous
 from tornadoredis import Client
-# from pywebpush import webpush
 
 from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
-	UploadedFile, Image, get_milliseconds, UserProfile, User, Verification
+	UploadedFile, Image, get_milliseconds, UserProfile
 from chat.py2_3 import str_type, quote
-from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST, REDIS_DB
+from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST, \
+	REDIS_DB
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates, \
 	UserSettingsVarNames, UserProfileVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, \
-	get_message_images_videos, update_symbols, up_files_to_img, evaluate, check_user, check_email, send_email_change, \
-	send_new_email_ver
+	get_message_images_videos, update_symbols, up_files_to_img, evaluate, check_user
+
+# from pywebpush import webpush
 
 parent_logger = logging.getLogger(__name__)
 base_logger = logging.LoggerAdapter(parent_logger, {
@@ -115,7 +117,7 @@ class MessagesHandler(MessagesCreator):
 	def http_client(self):
 		raise NotImplemented
 
-	@engine
+	@gen.engine
 	def listen(self, channels):
 		yield Task(
 			self.async_redis.subscribe, channels)
@@ -125,7 +127,7 @@ class MessagesHandler(MessagesCreator):
 	def logger(self):
 		return self._logger if self._logger else base_logger
 
-	@engine
+	@gen.engine
 	def add_channel(self, channel):
 		self.channels.append(channel)
 		yield Task(self.async_redis.subscribe, (channel,))
@@ -148,7 +150,6 @@ class MessagesHandler(MessagesCreator):
 		result = set()
 		user_is_online = False
 		for decoded in online:  # py2 iteritems
-			# : char specified in cookies_middleware.py.create_id
 			user_id = int(decoded.split(':')[0])
 			if user_id == self.user_id and decoded != self.id:
 				user_is_online = True
@@ -183,7 +184,6 @@ class MessagesHandler(MessagesCreator):
 	def ws_write(self, message):
 		raise NotImplementedError('WebSocketHandler implements')
 
-	@asynchronous
 	def search_giphy(self, message, query, cb):
 		self.logger.debug("!! Asking giphy for: %s", query)
 		def on_giphy_reply(response):
@@ -212,7 +212,6 @@ class MessagesHandler(MessagesCreator):
 		SubscriptionMessages.objects.bulk_create(new_sub_mess)
 		self.post_firebase(list(reg_ids))
 
-	@asynchronous
 	def post_firebase(self, reg_ids):
 		def on_reply(response):
 			try:
@@ -362,26 +361,9 @@ class MessagesHandler(MessagesCreator):
 	def profile_save_user(self, in_message):
 		message = in_message[VarNames.CONTENT]
 		userprofile = UserProfile.objects.get(id=self.user_id)
-		email_verification_id = userprofile.email_verification_id
 		un = message[UserProfileVarNames.USERNAME]
-		email = message[UserProfileVarNames.EMAIL]
 		if userprofile.username != un:
 			check_user(un)
-		if userprofile.email != email:
-			check_email(email)
-			if userprofile.email and userprofile.email_verification and userprofile.email_verification.verified:
-				verification = Verification(
-					type_enum=Verification.TypeChoices.email,
-					user_id=self.id,
-					email=email
-				)
-				verification.save()
-				send_email_change(self.request, un, userprofile.email, verification, email)
-				self.ws_write(self.default("In order to change an email please confirm it from you current address. We send you an verification email to {}.".format(userprofile.email), Actions.GROWL_MESSAGE, HandlerNames.WS))
-				email = userprofile.email # Don't change email, we need to verify it!
-			elif email:
-				new_ver = send_new_email_ver(self.request, userprofile, email)
-				email_verification_id = new_ver.id
 
 		sex = message[UserProfileVarNames.SEX]
 		UserProfile.objects.filter(id=self.user_id).update(
@@ -389,11 +371,9 @@ class MessagesHandler(MessagesCreator):
 			name=message[UserProfileVarNames.NAME],
 			city=message[UserProfileVarNames.CITY],
 			surname=message[UserProfileVarNames.SURNAME],
-			email=email,
 			birthday=message[UserProfileVarNames.BIRTHDAY],
 			contacts=message[UserProfileVarNames.CONTACTS],
 			sex=settings.GENDERS_STR[sex],
-			email_verification=email_verification_id
 		)
 		self.publish(self.set_user_profile(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
 		if userprofile.sex_str != sex or userprofile.username != un:

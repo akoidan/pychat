@@ -2,8 +2,6 @@ import random
 import string
 from logging import Filter
 
-from chat import local
-
 __author__ = 'andrew'
 
 
@@ -15,9 +13,9 @@ class ContextFilter(Filter):
 
 	def filter(self, record):
 		if not hasattr(record, 'user_id'):
-			record.user_id = getattr(local, 'user_id', None)
+			record.user_id = None
 		if not hasattr(record, 'id'):
-			record.id = getattr(local, 'random', None)
+			record.id = None
 		if not hasattr(record, 'ip'):
-			record.ip = getattr(local, 'client_ip', None)
+			record.ip = None
 		return True

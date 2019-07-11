@@ -28,7 +28,7 @@ This is free web (browser) chat, that features:
  - Admin interface with django-admin
 
 # Brief description
-Pychat is written in **Python** with [django](https://www.djangoproject.com/). For handling realtime messages [WebSockets](https://en.wikipedia.org/wiki/WebSocket) are used: browser support on client part and asynchronous framework [Tornado](http://www.tornadoweb.org/) on server part. Messages are being broadcast by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using [tornado-redis](https://github.com/leporo/tornado-redis) backend. Redis is also used as django session backend and for storing current users online. For video call [WebRTC](https://webrtc.org/) technology was used with stun server to make a connection, which means you will always get the lowest ping and the best possible connection channel. Client part is written with progressive js framework [VueJs](https://vuejs.org/) which means that pychat is SPA, so even if user navigates across different pages websocket connection doesn't break. Pychat also supports OAuth2 login standard via FaceBook/Google. Css is compiled from [sass](http://sass-lang.com/guide). Server side can be run on any platform **Windows**, **Linux**, **Mac** with **Python 2.7** and **Python 3.x**.Client (users) can use the Pychat from any browser with websocket support: IE11, Edge, Chrome, Firefox, Android, Opera, Safari...
+Pychat is written in **Python** with [django](https://www.djangoproject.com/). For handling realtime messages [WebSockets](https://en.wikipedia.org/wiki/WebSocket) are used: browser support on client part and asynchronous framework [Tornado](http://www.tornadoweb.org/) on server part. Messages are being broadcast by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using [tornado-redis](https://github.com/leporo/tornado-redis) backend. Redis is also used as django session backend and for storing current users online. For video call [WebRTC](https://webrtc.org/) technology was used with stun server to make a connection, which means you will always get the lowest ping and the best possible connection channel. Client part is written with progressive js framework [VueJs](https://vuejs.org/) which means that pychat is SPA, so even if user navigates across different pages websocket connection doesn't break. Pychat also supports OAuth2 login standard via FaceBook/Google. Css is compiled from [sass](http://sass-lang.com/guide). Server side can be run on any platform **Windows**, **Linux**, **Mac**. Client (users) can use Pychat from any browser with websocket support: IE11, Edge, Chrome, Firefox, Android, Opera, Safari...
 
 # When should I use pychat:
 By this time there're a lot of chats: skype, telegram, discord, slack, viber... What is the purpose of one more? Well, here's why:
@@ -49,30 +49,42 @@ You can always use [pychat.org](https://pychat.org), but if you want run Pychat 
 Please don't use this build for production, as it uses debug ssl certificate, lacks a few features and all files are located inside of container, meaning you will lose all data on container destroy.
 
  - Download and run image: 
- ```
+ ```bash
  docker run -p 443:443 deathangel908/pychat-test
  ```
  - Open https://localhost
 
 ## Run prod docker image
 
- - You need create ssl certificates, place `server.key` and `certificate.crt` in current directory. For example 
-```
+ - You need create ssl certificates: `server.key` and `certificate.crt`. For example 
+```bash
 openssl req -nodes -new -x509 -keyout server.key -out certificate.crt -days 3650
 ```
 
- - Download [settings_example.py](chat/settings_example.py) into current directory and edit it according comments in it. You need at least to set `SECRET_KEY`, you can use command below to generate it:
+ - Download [settings_example.py](chat/settings_example.py) into `settings.py` and edit it according comments in it.
+  
+ - Download [production.json](docker/pychat.org/production.json) and edit it according [wiki](fe#build-configuration)
+ 
+ - Create volume and copy files there
+ ```bash
+ docker volume create pychat_data
+ containerid=`docker container create --name dummy -v pychat_data:/data hello-world`
+ docker cp settings.py dummy:/data
+ docker cp production.json dummy:/data
+ docker cp certificate.crt dummy:/data
+ docker cp server.key dummy:/data
+ docker rm dummy
+ ```
+ If you need to edit files inside container you can use 
+ ```bash
+docker run -i -t -v pychat_data:/tmp -it alpine /bin/sh
 ```
-tr -dc 'A-Za-z0-9!@#$%^&*(\-\_\=\+)' < /dev/urandom | head -c 50
-``` 
-
- - Download [production.json](docker-all/pychat.org/production.json) into current directory and edit it according [wiki](fe#build-configuration)
 
  - Run image with:
+```bash
+docker run -v pychat_data:/data -p 443:443 deathangel908/pychat
 ```
-docker run -v $PWD/production.json:/srv/http/fe/production.json -v $PWD/settings_example.py:/srv/http/chat/settings.py -v $PWD/server.key:/etc/nginx/ssl/server.key -v $PWD/certificate.crt:/etc/nginx/ssl/certificate.crt -v $PWD/volumes/mysql:/var/lib/mysql -v $PWD/volumes/photos:/srv/http/photos -v $PWD/volumes/redis:/var/lib/redis -v $PWD/volumes/migrations:/srv/http/chat/migrations -p 443:443 deathangel908/pychat
-```
- - Open [https://localhost](https://localhost) and enjoy it! If something is broken you can check `/srv/http/log/` in docker `docker exec -it containerId bash`
+ - Open [https://localhost](https://localhost) and enjoy it!
 
 ## Run without docker
 Take a look at [INSTALL.md](INSTALL.md#production-setup)

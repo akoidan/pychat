@@ -1,26 +1,38 @@
 ### Rename this file to chat/settings.py
 ### 3 hashtag in this file tells you want to do, while single hastag is required to uncomment
 
-### DON't EDIT THIS SECTION
-###<<<<<
-import importlib
-import os
 
-get = os.environ.get('PYCHAT_CONFIG')
-configs = ['docker', 'local', 'prod', 'docker_all']
-if get not in configs:
-	raise Exception("Expected environment variable PYCHAT_CONFIG to be one of {}. Please execute `export PYCHAT_CONFIG=local` if you don't know what to do.".format(configs))
-config = 'chat.settings_{}'.format(get)
-globals().update(importlib.import_module(config).__dict__)
-###>>>>
+########################################################################################################################
+############################################# START REQUIRED SECTION ###################################################
+
+
+# from chat.settings_docker import * # If you run pychat inside of docker container uncomment this
+# from chat.settings_local import * # If you run development server on your local machine uncomment this one
+# from chat.settings_prod import * # if you run this in production without docker uncomment this
+
+### Prevent host header attacks in emails
+### this will used to sent emails with magic link, replce to your ip/domain
+# SERVER_ADDRESS = 'https://192.168.1.15:8080'
+
 
 ### Replace with your django secret key, use the command bellow to audogenerate it
 ### bash download_content.sh generate_secret_key
 # SECRET_KEY = '**************************************************'
 
 
+############################################# END REQUIRED SECTION #####################################################
+########################################################################################################################
+
+
+########################################################################################################################
+##################################### EVERYTHING BELOW IS OPTIONAL #####################################################
+
+
+### Every email (like magic link will be marked with this lable)
+# FROM_EMAIL = 'pychat'
+
 ### Uncomment this setting if you don't need user location info to be shown for all
-### SHOW_COUNTRY_CODE = false
+# SHOW_COUNTRY_CODE = false
 
 
 ### Replace with your timezone. You can find list of timezones here https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
@@ -69,13 +81,13 @@ globals().update(importlib.import_module(config).__dict__)
 
 #### If you want to use giphy images that appears if user types "/giphy example".
 ### To get those -sign up in https://developers.giphy.com/, create a new app and replaced with its key.
-# GIPHY_API_KEY = '********************************'
+### you can use mine, so w/e
+GIPHY_API_KEY = 'thZMTtWsaBQAPDIAY461GzYTctuYIeIj'
 
 
 ### If you want recaptcha: Open https://www.google.com/recaptcha/admin#list and register new domain, type is web captcha
-# RECAPTCHA_PUBLIC_KEY = '****************************************' # Site key
+### If you set RECAPTCHA_PRIVATE_KEY you should set RECAPTCHA_PUBLIC_KEY in fe/development.json and fe/production.json
 # RECAPTCHA_PRIVATE_KEY = '****************************************' # Secret key
-# INSTALLED_APPS = ('snowpenguin.django.recaptcha2', 'multi_captcha_admin') + INSTALLED_APPS # Uncomment this row as well so you have django admin login with captcha as well
 
 ### For google auth follow the instructions here https://developers.google.com/identity/sign-in/web/devconsole-project
 ### Select Web Browser type
@@ -85,15 +97,3 @@ globals().update(importlib.import_module(config).__dict__)
 ### For facebook auth:
 # FACEBOOK_ACCESS_TOKEN = '************************************************************************************************************************************************************************************' # USER TOKEN from  https://developers.facebook.com/tools/access_token/
 # FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
-
-
-### you only need to edit this settings if you have issues with CORS, see django-cors-headers
-# CORS_ORIGIN_WHITELIST = ['192.168.1.100:8080']
-
-###<<<<<
-SESSION_REDIS = {
-	'host': REDIS_HOST,
-	'port': REDIS_PORT,
-	'db': REDIS_SESSION_DB
-}
-###>>>>

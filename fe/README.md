@@ -3,6 +3,9 @@
 yarn install
 # npm install # if you don't have yarn
 ```
+
+If you have issues with node on compile time, either some module is incompatible or e.g. compression plugin requires version 8.9.0+, use node-8.9.0 (nvm use 8.9.0)
+```
 ### Stack
 The technologies stack used in project:
 - Typescript

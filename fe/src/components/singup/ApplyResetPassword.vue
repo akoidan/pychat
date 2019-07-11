@@ -37,7 +37,7 @@
 
     created() {
       this.checkingToken = true;
-      this.$api.verifyToken(this.$route.query["token"], (user: string, error: string) => {
+      this.$api.verifyToken(<string>this.$route.query["token"] , (user: string, error: string) => {
         this.checkingToken = false;
         if (error) {
           this.error = error;
@@ -51,7 +51,7 @@
         this.growlError("Passords don't match");
       } else {
         this.running = true;
-        this.$api.acceptToken(this.$route.query["token"], this.password, cb => {
+        this.$api.acceptToken(<string>this.$route.query["token"], this.password, cb => {
           this.running = false;
           if (cb) {
             this.growlError(cb);

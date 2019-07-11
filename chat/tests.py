@@ -80,7 +80,7 @@ class WebSocketLoadTest(TestCase):
 	def threaded_function(self, session, num):
 		cookies = '{}={}'.format(settings.SESSION_COOKIE_NAME, session)
 
-		ws = create_connection("{}://{}".format(settings.WEBSOCKET_PROTOCOL, self.SITE_TO_SPAM), cookie=cookies, sslopt={"cert_reqs": ssl.CERT_NONE})
+		ws = create_connection("wss://{}".format(self.SITE_TO_SPAM), cookie=cookies, sslopt={"cert_reqs": ssl.CERT_NONE})
 		print("Connected #{}  with sessions {}".format(num, session))
 		for i in range(randint(30, 50)):
 			if i % 10 == 0:

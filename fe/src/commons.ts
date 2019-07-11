@@ -6,7 +6,7 @@ import {api, browserVersion, channelsHandler, globalLogger, storage, webrtcApi, 
 import store from './store';
 import router from './router';
 import loggerFactory from './utils/loggerFactory';
-import {IS_DEBUG} from './utils/consts';
+import {GIT_HASH, IS_DEBUG} from './utils/consts';
 import {initStore} from './utils/utils';
 import {sub} from './utils/sub';
 
@@ -70,16 +70,17 @@ export function init() {
     render: h => h(App)
   });
   vue.$mount('#app');
-  if (IS_DEBUG) {
-    window['vue'] = vue;
+  window.GIT_VERSION = GIT_HASH;
+  if (IS_DEBUG) { // TODO
+    window.vue = vue;
     window['channelsHandler'] = channelsHandler;
     window['ws'] = ws;
-    window['api'] = api;
+    window.api = api;
     window['xhr'] = xhr;
     window['storage'] = storage;
     window['webrtcApi'] = webrtcApi;
     window['sub'] = sub;
-    window['store'] = store;
+    window.store = store;
   }
 
 }

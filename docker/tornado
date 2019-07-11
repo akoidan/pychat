@@ -1,0 +1,25 @@
+#!/sbin/openrc-run
+
+command="python3"
+command_args="/srv/http/manage.py start_tornado --host localhost"
+command_background="yes"
+command_user="http"
+pidfile="/tmp/tornado.pid"
+
+depend() {
+    need mariadb redis
+}
+
+start() {
+    ebegin "Starting tornado"
+    start-stop-daemon --start \
+            --user ${command_user}:${command_user} \
+            --make-pidfile \
+            --pidfile "${pidfile}" \
+            --exec "${command}" \
+            --background \
+            --stdout /dev/stdout \
+            --stderr /dev/stderr \
+            -- ${command_args}
+    eend $?
+}

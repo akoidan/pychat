@@ -1,17 +1,36 @@
 #!/bin/bash
 
 # defining the project structure
-PROJECT_ROOT=`pwd`
+set +x
+safeRunCommand() {
+  printf '\e[95m%s\e[0;33;40m\n' "$*"
+  eval "$@"
+  ret_code=$?
+  if [ $ret_code != 0 ]; then
+    printf "\e[91mExecution of command below has failed \e[93m\n"
+    >&2 echo "$@"
+    printf "\e[91mResult code is $ret_code \e[0;37;40m\n"
+    exit $ret_code
+  fi
+}
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 
-RANDOM_DIR=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
-TMP_DIR="${TMP_DIR:-/tmp/$RANDOM_DIR}"
-ASSETS_DIR="${ASSETS_DIR:-$PROJECT_ROOT/fe/src/assets}"
-FONT_DIR="${FONT_DIR:-$ASSETS_DIR/font}"
-SMILEYS_DIR="${SMILEYS_DIR:-$ASSETS_DIR/smileys}"
-SASS_DIR="${SASS_DIR:-$ASSETS_DIR/sass}"
+if [ -z ${PROJECT_ROOT+x} ]; then
+   PROJECT_ROOT="`dirname \"$0\"`"
+fi
+
+safeRunCommand cd "$PROJECT_ROOT"
+
+PROJECT_ROOT=`pwd`
+TMP_DIR="${TMP_DIR:-/tmp/pychat_tmp_dir}"
+FE_DIRECTORY="$PROJECT_ROOT/fe"
+DIST_DIRECTORY="$FE_DIRECTORY/dist"
+ASSETS_DIR="$FE_DIRECTORY/src/assets"
+FONT_DIR="$ASSETS_DIR/font"
+SMILEYS_DIR="$ASSETS_DIR/smileys"
+SASS_DIR="$ASSETS_DIR/sass"
 # Implementing installed files
 declare -a files=(\
     "$FONT_DIR/fontello.eot"
@@ -26,7 +45,12 @@ declare -a files=(\
     "$SMILEYS_DIR/base/000a.gif"
 )
 
-cd "$PROJECT_ROOT"
+create_venv() {
+    rm -rf .venv
+    virtualenv --system-site-packages .venv --python=`which python3`
+    source .venv/bin/activate
+    pip install -r requirements.txt
+}
 
 generate_certificate() {
     key_path="$1/server.key"
@@ -42,8 +66,8 @@ rename_root_directory() {
 }
 
 update_docker() {
-    safeRunCommand docker build -f ./docker-all/Dockerfile -t deathangel908/pychat .
-    safeRunCommand docker build -f ./docker-all/pychat.org/Dockerfile -t deathangel908/pychat-test .
+    safeRunCommand docker build -f ./docker/Dockerfile -t deathangel908/pychat .
+    safeRunCommand docker build -f ./docker/pychat.org/Dockerfile -t deathangel908/pychat-test .
     safeRunCommand docker push deathangel908/pychat
     safeRunCommand docker push deathangel908/pychat-test
 }
@@ -84,8 +108,17 @@ check_files() {
         if [ "$1" = "remove_script" ]; then
             printSuccess "All files are installed. Population succeeded"
         else
-            echo "All files are present"
+            printOut "All files are present"
         fi
+    fi
+}
+
+compile_js() {
+    if [ -z "$(ls $DIST_DIRECTORY)" ]; then
+       safeRunCommand cd "$FE_DIRECTORY"
+       safeRunCommand yarn run prod
+    else
+        printOut "Js is already compiled in $DIST_DIRECTORY"
     fi
 }
 
@@ -124,14 +157,14 @@ zip_extension() {
 
 
 chp(){
- size=${#1}
- indent=$((25 - $size))
- printf "\e[1;37;40m$1\e[0;36;40m"
- printf " "
- for (( c=1; c<= $indent; c++))  ; do
- printf "."
- done
- printf " \e[0;33;40m$2\n\e[0;37;40m"
+    size=${#1}
+    indent=$((25 - $size))
+    printf "\e[1;37;40m$1\e[0;36;40m"
+    printf " "
+    for (( c=1; c<= $indent; c++))  ; do
+    printf "."
+    done
+    printf " \e[0;33;40m$2\n\e[0;37;40m"
 }
 
 
@@ -151,18 +184,6 @@ show_fontello_session() {
     python -mwebbrowser $url
 }
 
-
-safeRunCommand() {
-  printf '\e[95m%s\e[0;33;40m\n' "$*"
-  eval "$@"
-  ret_code=$?
-  if [ $ret_code != 0 ]; then
-    printf "\e[91mExecution of command below has failed \e[93m\n"
-    >&2 echo "$@"
-    printf "\e[91mResult code is $ret_code \e[0;37;40m\n"
-    exit $ret_code
-  fi
-}
 
 download_fontello() {
     fontello_session=$(cat .fontello)
@@ -185,7 +206,7 @@ download_fontello() {
 
 generate_smileys() {
     printOut "Generating smileys"
-    safeRunCommand python manage.py extract_cfpack
+    safeRunCommand python $PROJECT_ROOT/extract_cfpack.py
 }
 
 delete_tmp_dir() {
@@ -193,6 +214,113 @@ delete_tmp_dir() {
          printOut "Removing temporary files in $TMP_DIR"
          rm -rfv "$TMP_DIR"
     fi
+}
+
+build_nginx() {
+    NGINX_VERSION="$1"
+    NGINX_UPLOAD_MODULE_VERSION="$2"
+    RUN_DEPS="$3"
+    GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8
+    safeRunCommand mkdir -p /tmp/nginx
+    safeRunCommand cd /tmp/nginx
+    safeRunCommand curl -fSL https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -o nginx.tar.gz
+    safeRunCommand curl -fSL https://nginx.org/download/nginx-$NGINX_VERSION.tar.gz.asc -o nginx.tar.gz.asc
+    export GNUPGHOME="$(mktemp -d)"
+    found='';
+    for server in \
+        ha.pool.sks-keyservers.net \
+        hkp://keyserver.ubuntu.com:80 \
+        hkp://p80.pool.sks-keyservers.net:80 \
+        pgp.mit.edu \
+    ; do
+        echo "Fetching GPG key $GPG_KEYS from $server";
+        gpg --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$GPG_KEYS" && found=yes && break;
+    done;
+    test -z "$found" && echo >&2 "error: failed to fetch GPG key $GPG_KEYS" && exit 1;
+    safeRunCommand gpg --batch --verify nginx.tar.gz.asc nginx.tar.gz
+    safeRunCommand rm -rf "$GNUPGHOME" nginx.tar.gz.asc
+    safeRunCommand tar -zxC /tmp/nginx -f nginx.tar.gz
+    safeRunCommand rm nginx.tar.gz
+    safeRunCommand curl -fSLO https://github.com/fdintino/nginx-upload-module/archive/$NGINX_UPLOAD_MODULE_VERSION.zip
+    safeRunCommand unzip $NGINX_UPLOAD_MODULE_VERSION.zip
+    safeRunCommand cd /tmp/nginx/nginx-$NGINX_VERSION
+    CONFIG="\
+        --prefix=/etc/nginx \
+        --add-module=/tmp/nginx/nginx-upload-module-$NGINX_UPLOAD_MODULE_VERSION/ \
+        --sbin-path=/usr/sbin/nginx \
+        --modules-path=/usr/lib/nginx/modules \
+        --conf-path=/etc/nginx/nginx.conf \
+        --error-log-path=/var/log/nginx/error.log \
+        --http-log-path=/var/log/nginx/access.log \
+        --pid-path=/var/run/nginx.pid \
+        --lock-path=/var/run/nginx.lock \
+        --http-client-body-temp-path=/var/cache/nginx/client_temp \
+        --http-proxy-temp-path=/var/cache/nginx/proxy_temp \
+        --http-fastcgi-temp-path=/var/cache/nginx/fastcgi_temp \
+        --http-uwsgi-temp-path=/var/cache/nginx/uwsgi_temp \
+        --http-scgi-temp-path=/var/cache/nginx/scgi_temp \
+        --user=nginx \
+        --group=nginx \
+        --with-http_ssl_module \
+        --with-http_realip_module \
+        --with-http_addition_module \
+        --with-http_sub_module \
+        --with-http_dav_module \
+        --with-http_flv_module \
+        --with-http_mp4_module \
+        --with-http_gunzip_module \
+        --with-http_gzip_static_module \
+        --with-http_random_index_module \
+        --with-http_secure_link_module \
+        --with-http_stub_status_module \
+        --with-http_auth_request_module \
+        --with-http_xslt_module=dynamic \
+        --with-http_image_filter_module=dynamic \
+        --with-http_geoip_module=dynamic \
+        --with-threads \
+        --with-stream \
+        --with-stream_ssl_module \
+        --with-stream_ssl_preread_module \
+        --with-stream_realip_module \
+        --with-stream_geoip_module=dynamic \
+        --with-http_slice_module \
+        --with-mail \
+        --with-mail_ssl_module \
+        --with-compat \
+        --with-file-aio \
+        --with-http_v2_module \
+    "
+    safeRunCommand ./configure $CONFIG --with-debug
+    safeRunCommand make -j$(getconf _NPROCESSORS_ONLN)
+    safeRunCommand mv objs/nginx objs/nginx-debug
+    safeRunCommand mv objs/ngx_http_xslt_filter_module.so objs/ngx_http_xslt_filter_module-debug.so
+    safeRunCommand mv objs/ngx_http_image_filter_module.so objs/ngx_http_image_filter_module-debug.so
+    safeRunCommand mv objs/ngx_http_geoip_module.so objs/ngx_http_geoip_module-debug.so
+    safeRunCommand mv objs/ngx_stream_geoip_module.so objs/ngx_stream_geoip_module-debug.so
+    safeRunCommand ./configure $CONFIG
+    safeRunCommand make -j$(getconf _NPROCESSORS_ONLN)
+    safeRunCommand make install
+    safeRunCommand rm -rf /etc/nginx/html/
+    safeRunCommand mkdir -p /usr/share/nginx/html/
+    safeRunCommand install -m644 html/index.html /usr/share/nginx/html/
+    safeRunCommand install -m644 html/50x.html /usr/share/nginx/html/
+    safeRunCommand install -m755 objs/nginx-debug /usr/sbin/nginx-debug
+    safeRunCommand install -m755 objs/ngx_http_xslt_filter_module-debug.so /usr/lib/nginx/modules/ngx_http_xslt_filter_module-debug.so
+    safeRunCommand install -m755 objs/ngx_http_image_filter_module-debug.so /usr/lib/nginx/modules/ngx_http_image_filter_module-debug.so
+    safeRunCommand install -m755 objs/ngx_http_geoip_module-debug.so /usr/lib/nginx/modules/ngx_http_geoip_module-debug.so
+    safeRunCommand install -m755 objs/ngx_stream_geoip_module-debug.so /usr/lib/nginx/modules/ngx_stream_geoip_module-debug.so
+    safeRunCommand ln -s ../../usr/lib/nginx/modules /etc/nginx/modules
+    safeRunCommand strip /usr/sbin/nginx*
+    safeRunCommand strip /usr/lib/nginx/modules/*.so
+    safeRunCommand rm -rf /tmp/nginx
+    safeRunCommand mv /usr/bin/envsubst /tmp/
+    runDeps="$( \
+        scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /tmp/envsubst \
+            | tr ',' '\n' \
+            | sort -u \
+            | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
+    )"
+    echo $runDeps > "$RUN_DEPS"
 }
 
 
@@ -221,7 +349,7 @@ create_db() {
         if (( $mysqlFinish == 0 )); then \
             echo -ne "Mysql startup failed"; \
             exit 2; \
-        fi'
+        fi' || exit 3
 
         printOut "Creating pychat database"
         mysqladmin -u root password "${DB_ROOT_PASS}"
@@ -231,12 +359,21 @@ create_db() {
         create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; \
         DELETE FROM mysql.user WHERE User='';\
         DROP DATABASE test;\
-        FLUSH PRIVILEGES;"| mysql -u root --password="${DB_ROOT_PASS}"
+        FLUSH PRIVILEGES;"| mysql -u root --password="${DB_ROOT_PASS}" || exit 4
         printOut "Database has been created"
-        mysqladmin  -u root --password="${DB_ROOT_PASS}" shutdown
+        create_django_tables
+        safeRunCommand mysqladmin  -u root --password="${DB_ROOT_PASS}" shutdown
     fi
 }
 
+create_django_tables() {
+    safeRunCommand python3 ./manage.py makemigrations chat
+    safeRunCommand python3 ./manage.py migrate auth
+    # because w/o second  `makemigrations chat` it doesn't work
+    safeRunCommand python3 ./manage.py makemigrations chat
+    safeRunCommand python3 ./manage.py migrate
+    safeRunCommand python3 ./manage.py fill_data
+}
 
 generate_secret_key() {
     if [ ! -f "$PROJECT_ROOT/chat/settings.py" ]; then
@@ -245,7 +382,7 @@ generate_secret_key() {
     fi
     echo "" >> $PROJECT_ROOT/chat/settings.py
     echo -n "SECRET_KEY = '" >> $PROJECT_ROOT/chat/settings.py
-    tr -dc 'A-Za-z0-9!@#$%^&*(\-\_\=\+)' </dev/urandom | head -c 50 >> $PROJECT_ROOT/chat/settings.py
+    tr -dc 'A-Za-z0-9!@#$%^&*(-_=+)' </dev/urandom | head -c 50 >> $PROJECT_ROOT/chat/settings.py
     echo "'" >> $PROJECT_ROOT/chat/settings.py
 }
 
@@ -254,6 +391,19 @@ if [ "$1" = "generate_icon_session" ]; then
     python -mwebbrowser "http://fontello.com/`cat .fontello`"
 elif [ "$1" = "check_files" ]; then
     check_files
+elif [ "$1" = "create_django_tables" ]; then
+    create_django_tables
+elif [ "$1" = "compile_js" ]; then
+    compile_js
+elif [ "$1" = "create_venv" ]; then
+    create_venv
+elif [ "$1" = "build_nginx" ]; then
+    if [ -z "$4" ]
+    then
+        printError "pass exactly 4 variables"
+        exit 1;
+    fi
+    build_nginx "$2" "$3" "$4"
 elif [ "$1" = "create_db" ]; then
     create_db
 elif [ "$1" = "rename_domain" ]; then
@@ -296,21 +446,26 @@ elif [ "$1" == "all" ]; then
 elif [ "$1" == "generate_secret_key" ]; then
     generate_secret_key
 else
- printf " \e[93mWellcome to pychat download manager, available commands are:\n"
- chp generate_certificate "Create self-singed ssl certificate"
- chp rename_domain "Rename all occurrences of \e[96mpychat.org\e[0;33;40m in \e[96m$PROJECT_ROOT\e[0;33;40m for your domain name. Usage: \e[92mrename_domain your.domain.com"
- chp rename_root_directory "Rename all occurrences of \e[96m/srv/http\e[0;33;40m to \e[96m$PROJECT_ROOT\e[0;33;40m in \e[96m$PROJECT_ROOT/rootfs\e[0;33;40m"
- chp all "Downloads all content required for project"
- chp check_files "Verifies if all files are installed"
- chp zip_extension "Creates zip acrhive for ChromeWebStore from \e[96mscreen_cast_extension \e[0;33;40mdirectory"
- printf " \e[93mIcons:\n\e[0;37;40mTo edit icons execute \e[92mgenerate_icon_session\e[0;37;40m, edit icons in opened browser and click Save session button. Afterwords execute \e[92mdownload_icon\n"
- chp generate_icon_session "Creates fontello session from config.json and saves it to \e[96m .fontello \e[0;33;40mfile"
- chp print_icon_session "Shows current used url for editing fonts"
- chp download_icon "Downloads and extracts fonts from fontello to project"
- chp generate_secret_key "Creates django secret key into \e[96m$PROJECT_ROOT/chat/settings.py\e[0;33;40m"
- chp create_db "Creates database pychat to mysql, the following environment variable should be defined \e[94mDB_ROOT_PASS DB_USER DB_PASS DB_DATA_PATH"
- chp update_docker "Builds docker images for deathangel908/pychat"
- chp redirect "Redirects port 443 to port 8080, so you can use \e[96mhttps://pychat.org\e[0;33;40m for localhost if you have it in \e[96m/etc/hosts\e[0;33;40m"
+    printf " \e[93mWellcome to pychat download manager running in `pwd`, available commands are:\n"
+    chp generate_certificate "Create self-singed ssl certificate"
+    chp rename_domain "Rename all occurrences of \e[96mpychat.org\e[0;33;40m in \e[96m$PROJECT_ROOT\e[0;33;40m for your domain name. Usage: \e[92mrename_domain your.domain.com"
+    chp rename_root_directory "Rename all occurrences of \e[96m/srv/http\e[0;33;40m to \e[96m$PROJECT_ROOT\e[0;33;40m in \e[96m$PROJECT_ROOT/rootfs\e[0;33;40m"
+    chp all "Downloads all content required for project"
+    chp check_files "Verifies if all files are installed"
+    chp zip_extension "Creates zip acrhive for ChromeWebStore from \e[96mscreen_cast_extension \e[0;33;40mdirectory"
+    printf " \e[93mIcons:\n\e[0;37;40mTo edit icons execute \e[92mgenerate_icon_session\e[0;37;40m, edit icons in opened browser and click Save session button. Afterwords execute \e[92mdownload_icon\n"
+    chp generate_icon_session "Creates fontello session from config.json and saves it to \e[96m .fontello \e[0;33;40mfile"
+    chp print_icon_session "Shows current used url for editing fonts"
+    chp download_icon "Downloads and extracts fonts from fontello to project"
+    chp generate_secret_key "Creates django secret key into \e[96m$PROJECT_ROOT/chat/settings.py\e[0;33;40m"
+    chp create_db "Creates database pychat to mysql, the following environment variable should be defined \e[94mDB_ROOT_PASS DB_USER DB_PASS DB_DATA_PATH"
+    chp update_docker "Builds docker images for deathangel908/pychat"
+    chp redirect "Redirects port 443 to port 8080, so you can use \e[96mhttps://pychat.org\e[0;33;40m for localhost if you have it in \e[96m/etc/hosts\e[0;33;40m"
+    chp compile_js "Compiles frontend SPA javascript if $DIST_DIRECTORY is empty"
+    chp create_venv "removes .venv and creates a new one with dependencies"-
+    chp build_nginx "Build nginx with http-upload-module and installs it; . Usage: \e[92msh download_content.sh build_nginx 1.15.3 2.3.0  /tmp/depsFileList.txt\e[0;33;40m where 1.15 is nginx version, 2.3.0 is upload-http-module version"
+    chp create_django_tables "Creates database tables and data"
+    exit 1
 fi
 
 
@@ -319,3 +474,4 @@ fi
 # http://www.mineks.com/assets/admin/css/fonts/glyphicons.social.pro/
 # Sounds
 #curl -L -o $TMP_DIR/sounds.zip https://www.dropbox.com/sh/0whi1oo782noit1/AAC-F14YggOFqx3DO3e0AvqGa?dl=1 && unzip $TMP_DIR/sounds.zip -d $SOUNDS_DIR
+set -x
