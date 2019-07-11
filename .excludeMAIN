@@ -10,6 +10,8 @@ md5-wasm-example
 test/
 dump.rdb
 photos
+fe/yarn.lock
+fe/npm.lock
 django.db
 chat/migrations
 fe/src/assets/font/*
