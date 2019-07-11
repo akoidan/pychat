@@ -5,6 +5,7 @@
       <router-link to="/profile/image">Profile image</router-link>
       <router-link to="/profile/settings">Chat settings</router-link>
       <router-link to="/profile/change-password">Change password</router-link>
+      <router-link to="/profile/change-email">Change email</router-link>
     </div>
     <div class="container">
       <keep-alive>
@@ -39,7 +40,7 @@
 
   .links
     display: flex
-    max-width: 450px
+    max-width: 550px
     margin: auto
     margin-top: 10px
     padding: 8px

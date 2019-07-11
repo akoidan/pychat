@@ -67,11 +67,17 @@
     debouncedValidateUserName: Function;
 
 
+    private currentValidateUsernameRequest: XMLHttpRequest;
     checkUserName(username: string) {
+      if (this.currentValidateUsernameRequest) {
+        this.currentValidateUsernameRequest.abort();
+        this.currentValidateUsernameRequest = null;
+      }
       this.$api.validateUsername(username, errors => {
         this.userCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
         this.$refs.username.setCustomValidity(errors ? errors : "");
-        this.userDescription = errors ? errors : `Username ${username} is available`;
+        this.currentValidateUsernameRequest = null;
+        this.userDescription = errors ? errors : `Username is ok!`;
       });
     }
 
@@ -112,7 +118,7 @@
         this.$refs.password.setCustomValidity("");
         this.passwordCheckValue = IconColor.WARN;
       } else {
-        this.passwordDescription = "Password is good!";
+        this.passwordDescription = "Password is ok!";
         this.$refs.password.setCustomValidity("");
         this.passwordCheckValue = IconColor.SUCCESS;
       }
@@ -145,14 +151,34 @@
     emailCheckValue: IconColor = IconColor.NOT_SET;
     debouncedValidateEmail: Function;
 
+    private currentValidateEmailRequest: XMLHttpRequest;
+
     checkEmail(username: string) {
       console.log('asd');
-      this.$api.validateEmail(username, errors => {
+      if(this.currentValidateEmailRequest) {
+        this.currentValidateEmailRequest.abort();
+        this.currentValidateEmailRequest = null;
+      }
+      this.currentValidateEmailRequest = this.$api.validateEmail(username, errors => {
         this.emailCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
         this.$refs.email.setCustomValidity(errors ? errors : "");
-        this.emailDescription = errors ? errors : `Email ${username} is not registered`;
+        this.emailDescription = errors ? errors : `Email is ok!`;
+        this.currentValidateEmailRequest = null;
       });
     }
+
+
+    destroy(): void {
+      if(this.currentValidateEmailRequest) {
+        this.currentValidateEmailRequest.abort();
+        this.currentValidateEmailRequest = null;
+      }
+      if(this.currentValidateUsernameRequest) {
+        this.currentValidateUsernameRequest.abort();
+        this.currentValidateUsernameRequest = null;
+      }
+    }
+
 
     @Watch('email')
     onEmailChange(email: string) {
@@ -170,7 +196,7 @@
 
     sexFoc: boolean = true;
     sex: string = "";
-    sexDescription: string = 'Are you sure about your gender?';
+    sexDescription: string = 'Need a help?';
     sexCheckValue: IconColor = IconColor.NOT_SET;
 
     @Watch('sex')
@@ -180,7 +206,7 @@
         this.sexCheckValue = IconColor.WARN;
       } else {
         this.sexCheckValue = IconColor.SUCCESS;
-        this.sexDescription = "Well, let's hope you are being serious...";
+        this.sexDescription = "Gender is ok";
       }
     }
 

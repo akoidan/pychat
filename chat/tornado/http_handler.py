@@ -1,56 +1,268 @@
 # -*- encoding: utf-8 -*-
+
 import datetime
 import json
-import logging
+import re
+from concurrent.futures import ThreadPoolExecutor
+
 import tornado.web
 from django.conf import settings
-from django.contrib.auth import authenticate, login as djangologin
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
-from django.core.files import File
-from django.core.files.base import ContentFile
-from django.core.mail import mail_admins
-from django.db import transaction
+from django.core.mail import mail_admins, send_mail
+from django.core.validators import validate_email
 from django.db.models import Count, Q
-from django.shortcuts import render_to_response
-from django.template import RequestContext
-from django.views.decorators.http import require_http_methods
+from django.db.utils import OperationalError
+from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
+from django.utils.timezone import utc
+from redis import ConnectionError
+from tornado import ioloop
+from tornado.concurrent import run_on_executor
 
 from chat import settings
 from chat import utils, global_redis
-from chat.decorators import validation
 from chat.global_redis import sync_redis
+from chat.log_filters import id_generator
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
 	SubscriptionMessages, RoomUsers, Room, UploadedFile, User
 from chat.socials import GoogleAuth, FacebookAuth
 from chat.tornado.constants import RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
-from chat.utils import check_user, check_password, check_email, send_sign_up_email, \
-	create_user_model, check_captcha, send_reset_password_email, get_client_ip, get_or_create_ip, \
-	send_password_changed, send_new_email_ver, get_message_images_videos, generate_session
-
-logger = logging.getLogger(__name__)
-RECAPTCHA_PUBLIC_KEY = getattr(settings, "RECAPTCHA_PUBLIC_KEY", None)
-RECAPTHCA_SITE_URL = getattr(settings, "RECAPTHCA_SITE_URL", None)
-GOOGLE_OAUTH_2_CLIENT_ID = getattr(settings, "GOOGLE_OAUTH_2_CLIENT_ID", None)
-GOOGLE_OAUTH_2_JS_URL = getattr(settings, "GOOGLE_OAUTH_2_JS_URL", None)
-FACEBOOK_APP_ID = getattr(settings, "FACEBOOK_APP_ID", None)
-FACEBOOK_JS_URL = getattr(settings, "FACEBOOK_JS_URL", None)
-
-
-logger = logging.getLogger(__name__)
-
-
 from chat.tornado.method_dispatcher import MethodDispatcher, require_http_method, login_required_no_redirect, \
-	add_missing_fields
+	add_missing_fields, extract_nginx_files, check_captcha
+from chat.utils import check_user, get_message_images_videos, is_blank, get_or_create_ip_model, authenticate
 
+SERVER_ADDRESS = getattr(settings, "SERVER_ADDRESS", None)
+
+if not SERVER_ADDRESS:
+	print("!!!!\nPLEASE SET SERVER_ADDRESS in settings.py\n!!!!")
 
 class HttpHandler(MethodDispatcher):
 
-	@require_http_methods('GET')
+	executor = ThreadPoolExecutor(max_workers=settings.CONCURRENT_THREAD_WORKERS)
+
+	def __init__(self, application, request, **kwargs):
+		self.io_loop = ioloop.IOLoop.current()
+		self.user_id = None
+		super(HttpHandler, self).__init__(application, request, **kwargs)
+
+	def __check_password(self, password):
+		"""
+		Checks if password is secure
+		:raises ValidationError exception if password is not valid
+		"""
+		if is_blank(password):
+			raise ValidationError("password can't be empty")
+		if not re.match(u'^\S.+\S$', password):
+			raise ValidationError("password should be at least 3 symbols")
+
+	def __generate_session__(self, user_id):
+		session = id_generator(32)
+		sync_redis.hset('sessions', session, user_id)
+		return session
+
+	def __get_user_by_code(self, token, type):
+		"""
+		:param token: token code to verify
+		:type token: str
+		:raises ValidationError: if token is not usable
+		:return: UserProfile, Verification: if token is usable
+		"""
+		try:
+			v = Verification.objects.get(token=token)
+			if v.type_enum != type:
+				raise ValidationError("it's not for this operation ")
+			if v.verified:
+				raise ValidationError("it's already used")
+			# TODO move to sql query or leave here?
+			if v.time < datetime.datetime.utcnow().replace(tzinfo=utc) - datetime.timedelta(days=1):
+				raise ValidationError("it's expired")
+			return UserProfile.objects.get(id=v.user_id), v
+		except Verification.DoesNotExist:
+			raise ValidationError('Unknown verification token')
+
+	@staticmethod
+	def __check_email__(email):
+		"""
+		:raises ValidationError if specified email is registered or not valid
+		"""
+		if not email:
+			return
+		try:
+			validate_email(email)
+			# theoretically can throw returning 'more than 1' error
+			UserProfile.objects.get(email=email)
+			raise ValidationError('Email {} is already used'.format(email))
+		except User.DoesNotExist:
+			pass
+
+	@property
+	def __host(self):
+		if SERVER_ADDRESS:
+			return SERVER_ADDRESS
+		else:
+			self.logger.error("SERVER_ADDRESS is missing, this could lead to HOST header attacks")
+			return self.request.headers['Host']
+
+	@run_on_executor
+	def __send_mail(self, subject, body_text, receiver, html_body, fail_silently):
+		try:
+			send_mail(
+				subject=subject,
+				message=body_text,
+				from_email=settings.FROM_EMAIL,
+				recipient_list=[receiver],
+				fail_silently=fail_silently,
+				html_message=html_body
+			)
+		except Exception as e:
+			self.logger.error("Failed to send email %s to %s because %s", subject, receiver, e)
+			raise e
+		else:
+			self.logger.info("Email %s has been sent to %s", subject, receiver)
+
+	@run_on_executor
+	def __mail_admins(self, *args, **kwargs):
+		mail_admins(*args, **kwargs)
+
+	def __send_sign_up_email(self, user):
+		verification = Verification(user=user, type_enum=Verification.TypeChoices.register)
+		verification.save()
+		user.email_verification = verification
+		user.save(update_fields=['email_verification'])
+		link = "{}#/confirm_email?token={}".format(self.__host, verification.token)
+		text = ('Hi {}, you have registered pychat'
+						'\nTo complete your registration please click on the url bellow: {}'
+						'\n\nIf you find any bugs or propositions you can post them {}').format(
+			user.username, link, settings.ISSUES_REPORT_LINK)
+		start_message = mark_safe((
+			"You have registered in <b>Pychat</b>. If you find any bugs or propositions you can post them"
+			" <a href='{}'>here</a>. To complete your registration please click on the link below.").format(
+			settings.ISSUES_REPORT_LINK))
+		context = {
+			'username': user.username,
+			'magicLink': link,
+			'btnText': "CONFIRM SIGN UP",
+			'greetings': start_message
+		}
+		html_message = render_to_string('sign_up_email.html', context)
+		self.logger.info('Sending verification email to userId %s (email %s)', user.id, user.email)
+		yield self.__send_mail(
+			"Confirm chat registration",
+			text,
+			user.email,
+			html_message,
+			True
+		)
+
+	def __send_password_changed(self, username, email):
+		message = "Password has been changed for user {}".format(username)
+		ip_info = yield from self.__get_or_create_ip()
+		context = {
+			'username': username,
+			'ipInfo': ip_info.info,
+			'ip': ip_info.ip,
+			'timeCreated': datetime.datetime.now(),
+		}
+		html_message = render_to_string('change_password.html', context)
+		yield self.__send_mail(
+			"Pychat: password change",
+			message,
+			email,
+			html_message,
+			False
+		)
+
+	def __get_or_create_ip(self):
+		return (yield from get_or_create_ip_model(self.client_ip, self.logger))
+
+	def __send_reset_password_email(self, email, username, verification):
+		link = "{}#/auth/proceed-reset-password?token={}".format(self.__host, verification.token)
+		message = "{},\n" \
+							"You requested to change a password on site {}.\n" \
+							"To proceed click on the link {}\n" \
+							"If you didn't request the password change just ignore this mail" \
+			.format(username, self.__host, link)
+		ip_info = yield from self.__get_or_create_ip()
+		start_message = mark_safe(
+			"You have requested to send you a magic link to quickly restore password to <b>Pychat</b>. "
+			"If it wasn't you, you can safely ignore this email")
+		context = {
+			'username': username,
+			'magicLink': link,
+			'ipInfo': ip_info.info,
+			'ip': ip_info.ip,
+			'btnText': "CHANGE PASSWORD",
+			'timeCreated': verification.time,
+			'greetings': start_message
+		}
+		html_message = render_to_string('token_email.html', context)
+		yield self.__send_mail(
+			"Pychat: restore password",
+			message,
+			email,
+			html_message,
+			False
+		)
+
+	def __send_new_email_ver(self, user, email):
+		new_ver = Verification(user=user, type_enum=Verification.TypeChoices.confirm_email, email=email)
+		new_ver.save()
+		link = "{}#/confirm_email?token={}".format(self.__host, new_ver.token)
+		text = ('Hi {}, you have changed email to curren on pychat \nTo verify it, please click on the url: {}') \
+			.format(user.username, link)
+		start_message = mark_safe(
+			"You have changed email to current one in  <b>Pychat</b>. \n"
+			"To stay safe please verify it by clicking on the url below."
+		)
+		context = {
+			'username': user.username,
+			'magicLink': link,
+			'btnText': "CONFIRM THIS EMAIL",
+			'greetings': start_message
+		}
+		html_message = render_to_string('sign_up_email.html', context)
+		self.logger.info('Sending verification email to userId %s (email %s)', user.id, email)
+		yield self.__send_mail(
+			"Confirm this email",
+			text,
+			email,
+			html_message,
+			False
+		)
+		return new_ver
+
+	def __send_email_changed(self, old_email, new_email, username):
+		message = "Mail been changed for user {}".format(username)
+		ip_info = yield from self.__get_or_create_ip()
+		context = {
+			'username': username,
+			'ipInfo': ip_info.info,
+			'ip': ip_info.ip,
+			'timeCreated': datetime.datetime.now(),
+			'email': new_email,
+		}
+		html_message = render_to_string('change_email.html', context)
+		yield self.__send_mail(
+			"Pychat: email change",
+			message,
+			old_email,
+			html_message,
+			False
+		)
+
+	@require_http_method('GET')
 	def test(self):
-		sync_redis.ping()
-		self.write(settings.VALIDATION_IS_OK)
+		try:
+			Room.objects.get(id=settings.ALL_ROOM_ID)
+		except OperationalError:
+			raise ValidationError("mysql is down")
+		try:
+			sync_redis.ping()
+		except ConnectionError:
+			raise ValidationError("redis is down")
+		return settings.VALIDATION_IS_OK
 
 	@login_required_no_redirect
 	@require_http_method('POST')
@@ -59,42 +271,38 @@ class HttpHandler(MethodDispatcher):
 		sync_redis.hdel('sessions', session_id)
 		if registration_id is not None:
 			Subscription.objects.filter(registration_id=registration_id).delete()
-		self.finish(settings.VALIDATION_IS_OK)
+		return settings.VALIDATION_IS_OK
 
 	@require_http_method('POST')
-	@validation
+	@check_captcha()
 	def auth(self, username, password):
 		"""
 		Logs in into system.
 		"""
-		user = authenticate(username=username, password=password)
-		if user is None:
-			raise ValidationError('login or password is wrong')
-		self.finish(generate_session(user.id))
+		user = authenticate(username, password)
+
+		return self.__generate_session__(user.id)
 
 	@add_missing_fields('email', 'sex')
-	@transaction.atomic
-	@validation
+	# @transaction.atomic TODO, is this works in single thread?
 	def register(self, username, password, email, sex):
 		check_user(username)
-		check_password(password)
-		check_email(email)
+		self.__check_password(password)
+		self.__check_email__(email)
 		user_profile = UserProfile(username=username, email=email, sex_str=sex)
 		user_profile.set_password(password)
-		create_user_model(user_profile)
-		# You must call authenticate before you can call login
-		auth_user = authenticate(username=username, password=password)
+		user_profile.save()
+		RoomUsers(user_id=user_profile.id, room_id=settings.ALL_ROOM_ID, notifications=False).save()
 		if email:
-			send_sign_up_email(user_profile, self.request.headers.get('host'))  # TODO req context
-		self.finish(generate_session(auth_user.id))
+			yield from self.__send_sign_up_email(user_profile)
+		return self.__generate_session__(user_profile.id)
 
-	@require_http_methods('GET')
-	@validation
+	@require_http_method('GET')
 	def confirm_email(self, token):
 		"""
 		Accept the verification token sent to email
 		"""
-		logger.debug('Processing email confirm with token  %s', token)
+		self.logger.debug('Processing email confirm with token  %s', token)
 		try:
 			v = Verification.objects.get(token=token)
 		except Verification.DoesNotExist:
@@ -108,40 +316,37 @@ class HttpHandler(MethodDispatcher):
 			raise ValidationError('Verification token expired because you generated another one')
 		v.verified = True
 		v.save(update_fields=['verified'])
-		message = settings.VALIDATION_IS_OK
-		logger.info('Email verification token %s has been accepted for user %s(id=%d)', token, user.username, user.id)
-		response = {'message': message}
-		self.finish(response)
+		self.logger.info('Email verification token %s has been accepted for user %s(id=%d)', token, user.username, user.id)
+		return settings.VALIDATION_IS_OK
 
-	@require_http_methods('POST')
+	@require_http_method('POST')
 	def google_auth(self, token):
-		self.oauth(token, GoogleAuth())
+		return (yield self.__oauth(token, GoogleAuth(self.logger)))
 
-	@validation
-	def oauth(self, token, handler):
+	@run_on_executor
+	def __oauth(self, token, handler):
 		user_profile = handler.generate_user_profile(token)
-		session = generate_session(user_profile.id)
-		self.finish(session)
+		return self.__generate_session__(user_profile.id)
 
-	@require_http_methods('POST')
-	def facook_auth(self, token):
-		self.oauth(token, FacebookAuth())
+	@require_http_method('POST')
+	def facebook_auth(self, token):
+		return (yield self.__oauth(token, FacebookAuth(self.logger)))
 
-	@require_http_methods('POST')
-	@validation
+	@require_http_method('POST')
 	def validate_user(self, username):
 		"""
 		Validates user during registration
 		"""
 		utils.check_user(username)
 		# hardcoded ok check in register.js
-		self.finish(settings.VALIDATION_IS_OK)
+		return settings.VALIDATION_IS_OK
 
-	@require_http_methods('POST')
+	@require_http_method('POST')
+	@login_required_no_redirect
 	def register_fcb(self, registration_id, agent, is_mobile):
-		ip = get_or_create_ip(get_client_ip(self.request), logger)
+		ip = yield from self.__get_or_create_ip()
 		Subscription.objects.update_or_create(
-			registration_id=registration_id,
+			registration_id=registration_id, # TODO FCM
 			defaults={
 				'user_id': self.user_id,
 				'inactive': False,
@@ -151,15 +356,17 @@ class HttpHandler(MethodDispatcher):
 				'ip': ip
 			}
 		)
-		self.finish(settings.VALIDATION_IS_OK)
+		return settings.VALIDATION_IS_OK
 
-	@require_http_methods('GET')
-	@transaction.atomic
+	@require_http_method('GET')
+	# @transaction.atomic TODO, is this works in single thread?
 	def get_firebase_playback(self):
-		registration_id = self.request.headers('HTTP_AUTH')
-		logger.debug('Firebase playback, id %s', registration_id)
-		query_sub_message = SubscriptionMessages.objects.filter(subscription__registration_id=registration_id,
-																				  received=False).order_by('-message__time')[:1]
+		registration_id = self.request.headers('HTTP_AUTH')  # TODO FCM
+		self.logger.debug('Firebase playback, id %s', registration_id)
+		query_sub_message = SubscriptionMessages.objects.filter(
+			subscription__registration_id=registration_id,
+			received=False
+		).order_by('-message__time')[:1]
 		sub_message = query_sub_message[0]
 		SubscriptionMessages.objects.filter(id=sub_message.id).update(received=True)
 		message = Message.objects.select_related("sender__username", "room__name").get(id=sub_message.message_id)
@@ -177,172 +384,169 @@ class HttpHandler(MethodDispatcher):
 				'requireInteraction': True
 			},
 		}
-		self.finish(json.dumps(data))
+		return data
 
 	@login_required_no_redirect
-	@validation
-	def change_password(self):
-		passwd = self.get_argument('password')
-		old_password = self.get_argument('old_password')
-		user = User.objects.get(id=self.user_id)
-		if user.password:
-			is_valid = authenticate(username=user.username, password=old_password)
-			if not is_valid:
-				raise ValidationError("Invalid old password")
-		utils.check_password(passwd)
-		hash_pass = make_password(passwd)
+	def change_password(self, password, old_password):
+		user = UserProfile.objects.get(id=self.user_id)
+		if not user.check_password(old_password):
+			raise ValidationError("Invalid old password")
+		self.__check_password(password)
+		hash_pass = make_password(password)
 		User.objects.filter(id=user.id).update(
 			password=hash_pass
 		)
-		send_password_changed(self.request, user.email)
-		self.finish(settings.VALIDATION_IS_OK)
+		if user.email is not None:
+			yield from self.__send_password_changed(user.username, user.email)
+		return settings.VALIDATION_IS_OK
 
-	@transaction.atomic
-	@validation
-	def accept_token(self):
+	# @transaction.atomic TODO, is this works in single thread?
+	def accept_token(self, token, password):
 		"""
 		Sends email verification token
 		"""
-		token = self.get_argument('token', False)
-		logger.debug('Proceed Recover password with token %s', token)
-		user, verification = utils.get_user_by_code(token, Verification.TypeChoices.password)
-		password = self.get_argument('password')
-		check_password(password)
+		self.logger.debug('Proceed Recover password with token %s', token)
+		user, verification = self.__get_user_by_code(token, Verification.TypeChoices.password)
+		self.__check_password(password)
 		user.set_password(password)
 		user.save(update_fields=('password',))
 		verification.verified = True
 		verification.save(update_fields=('verified',))
-		logger.info('Password has been change for token %s user %s(id=%d)', token, user.username, user.id)
-		self.finish(settings.VALIDATION_IS_OK)
-
-	@require_http_methods('POST')
-	def verify_token(self):
-		token = self.get_argument('token', False)
-		try:
-			logger.debug('Rendering restore password page with token  %s', token)
-			user = utils.get_user_by_code(token, Verification.TypeChoices.password)[0]
-			self.finish(json.dumps({
-				'message': settings.VALIDATION_IS_OK,
-				'restoreUser': user.username
-			}))
-		except ValidationError as e:
-			self.finish(json.dumps({
-				'message': e.message,
-			}))
-
-	@require_http_method('GET')
-	def change_email(self):
-		try:
-			with transaction.atomic():
-				token = self.get_argument('token')
-				logger.debug('Proceed change email with token %s', token)
-				user, verification = utils.get_user_by_code(token, Verification.TypeChoices.email)
-				new_ver = send_new_email_ver(self.request, user, verification.email)
-				user.email = verification.email
-				user.email_verification = new_ver
-				user.save(update_fields=('email', 'email_verification'))
-				verification.verified = True
-				verification.save(update_fields=('verified',))
-				logger.info('Email has been change for token %s user %s(id=%d)', token, user.username, user.id)
-				return render_to_response(
-					'email_changed.html',
-					{'text': 'Your email has been changed to {}.'.format(verification.email)},
-					context_instance=RequestContext(self.request)
-				)
-		except Exception as e:
-			return render_to_response(
-				'email_changed.html',
-				{'text': 'Unable to change your email because {}'.format(e.message)}
-				, context_instance=RequestContext(self.request)
-			)
+		self.logger.info('Password has been change for token %s user %s(id=%d)', token, user.username, user.id)
+		return settings.VALIDATION_IS_OK
 
 	@require_http_method('POST')
-	def send_restore_password(self):
+	def verify_token(self, token):
 		try:
-			username_or_password = self.get_argument('username_or_password')
-			check_captcha(self.request)
+			self.logger.debug('Rendering restore password page with token  %s', token)
+			user = self.__get_user_by_code(token, Verification.TypeChoices.password)[0]
+			return {
+				'message': settings.VALIDATION_IS_OK,
+				'restoreUser': user.username
+			}
+		except ValidationError as e:
+			return {
+				'message': e.message,
+			}
+
+	@login_required_no_redirect
+	def change_email_login(self, email, password):
+		userprofile = UserProfile.objects.get(id=self.user_id)
+		authenticate(username=userprofile.username, password=password)
+		if userprofile.email != email:
+			self.__check_email__(email)
+			if userprofile.email and userprofile.email_verification and userprofile.email_verification.verified:
+				verification = Verification(
+					type_enum=Verification.TypeChoices.email,
+					user_id=self.user_id,
+					email=email
+				)
+				verification.save()
+			elif email:
+				new_ver = yield from self.__send_new_email_ver(userprofile, email)
+				UserProfile.objects.filter(id=self.user_id).update(email_verification_id=new_ver.id, email=email)
+			yield from self.__send_email_changed(
+				userprofile.email,
+				email,
+				userprofile.username
+			)
+		return settings.VALIDATION_IS_OK
+
+	@require_http_method('GET')
+	# @transaction.atomic TODO, is this works in single thread?
+	def change_email(self, token):
+		self.logger.debug('Proceed change email with token %s', token)
+		user, verification = self.__get_user_by_code(token, Verification.TypeChoices.email)
+		new_ver = yield from self.__send_new_email_ver(user, verification.email)
+		user.email = verification.email
+		user.email_verification = new_ver
+		user.save(update_fields=('email', 'email_verification'))
+		verification.verified = True
+		verification.save(update_fields=('verified',))
+		return settings.VALIDATION_IS_OK
+
+	@require_http_method('POST')
+	@check_captcha()
+	def send_restore_password(self, username_or_password):
+		try:
 			user_profile = UserProfile.objects.get(Q(username=username_or_password) | Q(email=username_or_password))
 			if not user_profile.email:
 				raise ValidationError("You didn't specify email address for this user")
 			verification = Verification(type_enum=Verification.TypeChoices.password, user_id=user_profile.id)
 			verification.save()
 			try:
-				send_reset_password_email(self.request, user_profile, verification)
+				yield from self.__send_reset_password_email(user_profile.email, user_profile.username, verification)
 			except Exception as e:
 				raise ValidationError('Unable to send email: ' + str(e))
 			message = settings.VALIDATION_IS_OK
-			logger.debug('Verification email has been send for token %s to user %s(id=%d)',
-							 verification.token, user_profile.username, user_profile.id)
+			self.logger.debug(
+				'Verification email has been send for token %s to user %s(id=%d)',
+				verification.token,
+				user_profile.username,
+				user_profile.id
+			)
 		except UserProfile.DoesNotExist:
 			message = "User with this email or username doesn't exist"
-			logger.debug("Skipping password recovery request for nonexisting user")
+			self.logger.debug("Skipping password recovery request for nonexisting user")
 		except (UserProfile.DoesNotExist, ValidationError) as e:
-			logger.debug('Not sending verification email because %s', e)
+			self.logger.debug('Not sending verification email because %s', e)
 			message = 'Unfortunately we were not able to send you restore password email because {}'.format(e)
-		self.finish(message)
+		return message
 
 	@require_http_method('POST')
-	@validation
 	def validate_email(self, email):
 		"""
 		POST only, validates email during registration
 		"""
-		utils.check_email(email)
-		self.finish(settings.VALIDATION_IS_OK)
+		self.__check_email__(email)
+		return settings.VALIDATION_IS_OK
 
-	@require_http_methods('GET')
-	def profile(self):
+	@require_http_method('GET')
+	def profile(self, id):
 		try:
-			user_profile = UserProfile.objects.get(pk=self.get_argument('id'))
+			user_profile = UserProfile.objects.get(pk=id)
 			profile = MessagesCreator.get_user_profile(user_profile)
 			profile['image'] = user_profile.photo.url if user_profile.photo.url else None
-			self.finish(json.dumps(profile))
+			return profile
 		except ObjectDoesNotExist:
 			raise tornado.web.HTTPError(404)
 
-	@transaction.atomic
+	# @transaction.atomic TODO, is this works in single thread?
 	@login_required_no_redirect
-	@require_http_methods('POST')
-	def report_issue(self):
-		issue_text = self.get_argument('issue')
-		issue = Issue.objects.get_or_create(content=issue_text)[0]
+	@require_http_method('POST')
+	def report_issue(self, issue, browser):
+		issue_object = Issue.objects.get_or_create(content=issue)[0]
 		issue_details = IssueDetails(
 			sender_id=self.user_id,
-			browser=self.get_argument('browser'),
-			issue=issue,
-			log=self.get_argument('log')
+			browser=browser,
+			issue=issue_object
 		)
-		try:
-			mail_admins("{} reported issue".format(User.objects.get(id = self.user_id).username), issue_text, fail_silently=True)
-		except Exception as e:
-			logging.error("Failed to send issue email because {}".format(e))
+		yield self.__mail_admins("{} reported issue".format(User.objects.get(id = self.user_id).username), issue, fail_silently=True)
 		issue_details.save()
-		self.finish(settings.VALIDATION_IS_OK)
+		return settings.VALIDATION_IS_OK
 
 	@require_http_method('POST')
 	@login_required_no_redirect
-	@validation
-	def upload_profile_image(self):
+	@extract_nginx_files
+	def upload_profile_image(self, files):
 		"""
 		POST only, validates email during registration
 		"""
-
-		up = UserProfile(photo=File(ContentFile(self.request.files['file'][0]['body']), name=self.request.files['file'][0]['filename']), id=self.user_id)
+		up = UserProfile(photo=files['file'], id=self.user_id)
 		up.save(update_fields=('photo',))
 		url = up.photo.url
 		message = json.dumps(MessagesCreator.set_profile_image(url))
 		channel = RedisPrefix.generate_user(self.user_id)
 		global_redis.sync_redis.publish(channel, message)
-		self.finish(settings.VALIDATION_IS_OK)
+		return settings.VALIDATION_IS_OK
 
-	@require_http_methods('GET')
+	@require_http_method('GET')
 	def statistics(self):
 		pie_data = IpAddress.objects.values('country').filter(country__isnull=False).annotate(count=Count("country"))
-		self.finish(json.dumps(list(pie_data)))
+		return list(pie_data)
 
-	@require_http_methods('POST')
+	@require_http_method('POST')
 	@login_required_no_redirect
-	@validation
 	def search_messages(self, data, room, offset):
 		offset = int(offset)
 		if not RoomUsers.objects.filter(room_id=room, user_id=self.user_id).exists():
@@ -355,23 +559,21 @@ class HttpHandler(MethodDispatcher):
 			files = MessagesCreator.prepare_img_video(imv, message.id)
 			prep_m = MessagesCreator.create_message(message, files)
 			result.append(prep_m)
-		response = json.dumps(result)
-		self.finish(response)
+		return result
 
 	@require_http_method('POST')
 	@login_required_no_redirect
-	@transaction.atomic
-	@validation
-	def save_room_settings(self):
+	# @transaction.atomic TODO, is this works in single thread?
+	def save_room_settings(self, roomId, roomName, volume, notifications):
 
 		"""
 		POST only, validates email during registration
 		"""
-		room_id = self.get_argument('roomId')
-		room_name = self.get_argument('roomName')
+		room_id = roomId
+		room_name = roomName
 		updated = RoomUsers.objects.filter(room_id=room_id, user_id=self.user_id).update(
-			volume=self.get_argument('volume'),
-			notifications=self.get_argument('notifications') == 'true',
+			volume=volume,
+			notifications=notifications == 'true',
 		)
 		if updated != 1:
 			raise ValidationError("You don't have access to this room")
@@ -379,20 +581,24 @@ class HttpHandler(MethodDispatcher):
 			room_name = room_name.strip()
 			if room_name and int(room_id) != settings.ALL_ROOM_ID:
 				Room.objects.filter(id=room_id).update(name=room_name)
-		self.finish(settings.VALIDATION_IS_OK)
+		return settings.VALIDATION_IS_OK
 
 	@require_http_method('POST')
 	@login_required_no_redirect
-	@transaction.atomic
-	def upload_file(self):
-
+	@extract_nginx_files
+	# @transaction.atomic TODO, is this works in single thread?
+	def upload_file(self, files):
 		"""
 		POST only, validates email during registration
 		"""
-		res = []
-		for file in self.request.files:
-			uf = UploadedFile(symbol=file[1], user_id=self.user_id, file=self.request.files[file],
-									type_enum=UploadedFile.UploadedFileChoices(file[0]))
-			uf.save()
-			res.append(uf.id)
-		self.finish(json.dumps(res))
+		ufs = []
+		for name, value in files.items():
+			up = UploadedFile(
+				symbol=name[1],
+				user_id=self.user_id,
+				file=value,
+				type_enum=UploadedFile.UploadedFileChoices(name[0])
+			)
+			up.save()
+			ufs.append(up.id)
+		return ufs

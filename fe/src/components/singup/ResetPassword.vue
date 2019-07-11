@@ -5,9 +5,9 @@
              value=''/>
       <div class='slider'>Enter your username or email</div>
     </div>
-    <div v-if='captcha_key' ref="repactha" class='g-recaptcha' data-theme='dark' :data-sitekey='captcha_key'></div>
+    <captcha-component v-model="running"/>
     <div>
-      <app-submit class='submit-button' value='Recover password' :running="showRunning"/>
+      <app-submit class='submit-button' value='Recover password' :running="running"/>
     </div>
   </form>
 </template>
@@ -17,11 +17,9 @@
   import AppSubmit from "../ui/AppSubmit.vue"
   import {Action, Mutation} from "vuex-class";
 
-  import { RECAPTCHA_PUBLIC_KEY} from "../../utils/consts";
-  import {loadCaptcha} from "../../utils/utils";
-  declare const grecaptcha: any;
+  import CaptchaComponent from './CaptchaComponent.vue';
 
-  @Component({components: {AppSubmit}})
+  @Component({components: {CaptchaComponent, AppSubmit}})
   export default class ResetPassword extends Vue {
 
     $refs: {
@@ -31,38 +29,18 @@
 
     @Mutation setRegHeader;
 
-    captcha_key: string = RECAPTCHA_PUBLIC_KEY;
     @Action growlError;
     @Action growlSuccess;
     running: boolean = false;
-    captchaInited: boolean = false;
-
-    get showRunning() {
-      return (this.captcha_key && !this.captchaInited) || this.running;
-    }
 
     created() {
-      this.logger.debug("initing captcha with key {}", RECAPTCHA_PUBLIC_KEY)();
       this.setRegHeader('Restore password');
-      if (this.captcha_key) {
-        loadCaptcha( e => {
-          this.captchaInited = true;
-          if (window['grecaptcha'] &&  grecaptcha.render) {
-            this.$nextTick(function () {
-              grecaptcha.render(this.$refs.repactha);
-            })
-          }
-        });
-      }
     }
 
     restorePassword(event) {
       this.running = true;
       this.$api.sendRestorePassword(this.$refs.form, error => {
         this.running = false;
-        if (window['grecaptcha']) {
-          grecaptcha.reset();
-        }
         if (error) {
           this.growlError(error);
         } else {

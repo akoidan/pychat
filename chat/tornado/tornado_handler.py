@@ -1,28 +1,22 @@
 import json
 import logging
 from datetime import timedelta
-from itertools import chain
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db.models import F, Q, Count, QuerySet
-from redis_sessions.session import SessionStore
-from tornado import ioloop
-from tornado.httpclient import AsyncHTTPClient, HTTPRequest
-from tornado.web import asynchronous
+from django.db.models import F, Q, Count
+from itertools import chain
+from tornado import ioloop, gen
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
-from chat.cookies_middleware import create_id
-from chat.models import User, Message, UserJoinedInfo, IpAddress, Room, RoomUsers, UserProfile
-from chat.py2_3 import str_type, urlparse
+from chat.models import User, Message, UserJoinedInfo, Room, RoomUsers, UserProfile
+from chat.py2_3 import str_type
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
-from chat.utils import execute_query, do_db, \
-	get_message_images_videos, get_or_create_ip_wrapper, create_ip_structure, get_history_message_query
-
-sessionStore = SessionStore()
+from chat.utils import execute_query, do_db, get_message_images_videos, get_history_message_query, create_id, \
+	get_or_create_ip_model
 
 parent_logger = logging.getLogger(__name__)
 
@@ -37,7 +31,6 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		super(TornadoHandler, self).__init__(*args, **kwargs)
 		self.__connected__ = False
 		self.restored_connection = False
-		self.__http_client__ = AsyncHTTPClient()
 		self.anti_spam = AntiSpam()
 
 	@property
@@ -47,13 +40,6 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 	@connected.setter
 	def connected(self, value):
 		self.__connected__ = value
-
-	@property
-	def http_client(self):
-		"""
-		@type: AsyncHTTPClient
-		"""
-		return self.__http_client__
 
 	def data_received(self, chunk):
 		pass
@@ -138,8 +124,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			'id': self.id,
 			'ip': self.ip
 		})
-		cookies = ["{}={}".format(k, self.request.cookies[k].value) for k in self.request.cookies]
-		self.logger.debug("!! Incoming connection, session %s, thread hash %s, cookies: %s", session_key, self.id, ";".join(cookies))
+		self.logger.debug("!! Incoming connection, session %s, thread hash %s", session_key, self.id)
 		self.async_redis.connect()
 		self.async_redis_publisher.sadd(RedisPrefix.ONLINE_VAR, self.id)
 		# since we add user to online first, latest trigger will always show correct online
@@ -240,30 +225,15 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		"""
 		return True # we don't use cookies
 
+	@gen.coroutine
 	def save_ip(self):
 		"""
 		This code is not used anymore
 		"""
 		if not do_db(UserJoinedInfo.objects.filter(
 				Q(ip__ip=self.ip) & Q(user_id=self.user_id)).exists):
-			res = get_or_create_ip_wrapper(self.ip, self.logger, self.fetch_and_save_ip_http)
-			if res is not None:
-				UserJoinedInfo.objects.create(ip=res, user_id=self.user_id)
-
-	@asynchronous
-	def fetch_and_save_ip_http(self):
-		"""
-			This code is not used anymore
-		"""
-		def fetch_response(response):
-			try:
-				ip_record = create_ip_structure(self.ip, response.body)
-			except Exception as e:
-				self.logger.error("Error while creating ip with country info, because %s", e)
-				ip_record = IpAddress.objects.create(ip=self.ip)
-			UserJoinedInfo.objects.create(ip=ip_record, user_id=self.user_id)
-		r = HTTPRequest(settings.IP_API_URL % self.ip, method="GET")
-		self.http_client.fetch(r, callback=fetch_response)
+			ip = yield from get_or_create_ip_model(self.ip, self.logger)
+			UserJoinedInfo.objects.create(ip=ip, user_id=self.user_id)
 
 	def ws_write(self, message):
 		"""

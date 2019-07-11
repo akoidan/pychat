@@ -3,6 +3,10 @@
     <table class="">
       <tbody>
       <tr>
+        <th><label for="reportIssueIssue">Git revision</label></th>
+        <td><input class="input" type="text" disabled :value="git"></td>
+      </tr>
+      <tr>
         <th><label for="reportIssueIssue">The problem you discovered:</label></th>
         <td><textarea v-model="issue" class="input" ref="textarea" id="reportIssueIssue" tabindex="-1" required=""></textarea></td>
       </tr>
@@ -20,6 +24,7 @@
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import AppSubmit from "../ui/AppSubmit.vue"
   import {browserVersion} from '../../utils/singletons';
+  import {GIT_HASH} from '../../utils/consts';
   @Component({components: {AppSubmit}})
   export default class ReportIssue extends Vue {
     running: boolean = false;
@@ -34,6 +39,9 @@
 
     textAreaStyle: string = null;
 
+    get git(){
+      return GIT_HASH;
+    }
 
     @Watch('issue')
     fixStyle() {

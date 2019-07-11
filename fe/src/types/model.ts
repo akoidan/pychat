@@ -28,6 +28,11 @@ export interface CurrentUserSettingsModel {
   logs: boolean;
 }
 
+export interface GoogleCaptcha {
+  render(div: HTMLElement);
+  reset();
+}
+
 export interface CurrentUserInfoModel {
   userId: number;
   user: string;

@@ -36,8 +36,6 @@ chat/static/sass/themes/_highlight-light.scss
 trash
 fe/awesome-typescript-loader
 .fontello
-docker/volumes
-docker-all/volumes
 fe/node_modules
 fe/dist
 fe/android/www

@@ -1,32 +1,47 @@
 import logging.config
+import sys
 
 from chat.settings_base import *
 
 TEMPLATE_DEBUG = False
 DEBUG = False
 
-REDIS_HOST = 'redis'
+TEMPLATES[0]['OPTIONS']['loaders'] = [(
+	'django.template.loaders.cached.Loader',
+	[
+		'django.template.loaders.filesystem.Loader',
+		'django.template.loaders.app_directories.Loader',
+	]
+)]
 
 DATABASES = {
 	'default': {
-		'ENGINE': 'django.db.backends.mysql',
+		'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
 		'NAME': 'pychat',
 		'USER': 'pychat',
 		'PASSWORD': 'pypass',
-		'HOST': 'db',
-		'PORT': '3306',  # mysql uses socket if host is localhost
+		'HOST': 'localhost',
+		'default-character-set': 'utf8',
 		'OPTIONS': {
 			'autocommit': True,
 		},
 	}
 }
-TEMPLATES[0]['OPTIONS']['loaders'] = [
-	('django.template.loaders.cached.Loader', [
-		'django.template.loaders.filesystem.Loader',
-		'django.template.loaders.app_directories.Loader',
-	])]
-LOGGING['handlers'] = console_handlers
-console_handlers.update(mail_admins)
+
+LOGGING['handlers'] = {
+	'default': {
+		'level': 'DEBUG',
+		'class': 'logging.StreamHandler',
+		'stream': sys.stdout,
+		'filters': ['id', ],
+		'formatter': 'django',
+	},
+	'mail_admins': {
+		'level': 'ERROR',
+		'class': 'django.utils.log.AdminEmailHandler',
+	}
+}
+
 LOGGING['loggers'] = {
 	'': {
 		'handlers': ['default', 'mail_admins'],

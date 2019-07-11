@@ -9,11 +9,11 @@ By default each user has turned off browser (console) logs. You can turn them on
 
 Smileys
 =======
-By default pychat uses standard  [commfort](http://www.commfort.com/en/) chat  [smileys](DefaultSmilies.cfpack) . `python manage.py extract_cfpack.py` extracts files from this pack and generates [info.json](chat/static/smileys/info.json), if you want to add/delete smileys - just edit `info.json`
+By default pychat uses standard  [commfort](http://www.commfort.com/en/) chat  [smileys](DefaultSmilies.cfpack) . `python manage.py extract_cfpack.py` extracts files from this pack and generates [info.json](fe/src/assets/smileys/info.json), if you want to add/delete smileys - just edit `info.json`
 
 Icons
 =====
-Chat uses [fontello](fontello.com) and its api for icons. The desiciong is based on requierment for different icons that come from different fonts and ability to add custom assets. For this purpose we need to generate font itself. W/o this sass we chat would need to download a lot of different fonts which would slow down the loading process. You can easily edit fonts via your browser, just execute `bash download_content.sh fonts_session`. Make your changes and hit "Save session". Then execute `sh download_content.sh download_fontello`. If you did everything right new icons should appear in [demo.html](https://127.0.0.1:8000/static/demo.html)
+Chat uses [fontello](fontello.com) and its api for icons. The desiciong is based on requierment for different icons that come from different fonts and ability to add custom assets. For this purpose we need to generate font itself. W/o this chat would need to download a lot of different fonts which would slow down the loading process. You can easily edit fonts via your browser, just execute `bash download_content.sh fonts_session`. Make your changes and hit "Save session". Then execute `bash download_content.sh download_fontello`. If you did everything right new icons should appear in [demo.html](https://127.0.0.1:8000/static/demo.html)
 
 Sustaining online protocol
 =============
@@ -84,6 +84,9 @@ TODO list
 * https://www.nginx.com/resources/wiki/modules/upload/
 * Store image in filstream api
 * add srcset and minify uploaded image 
+* Update to tornado 6.0 and detect blocking loops https://stackoverflow.com/a/26638397/3872976
+* https://stackoverflow.com/questions/33170016/how-to-use-django-1-8-5-orm-without-creating-a-django-project
+* tornado uses blocking operation like django orm or sync_redis (strict redis). While this operations are executed main thread awaits IO and prevents new messages and connections from execution. async_redis create cb wrapper. django orm: https://docs.djangoproject.com/en/dev/releases/3.0/#asgi-support
 * autoupdate pychat.org from github webhook and expose port http to build
 * If self assigned certificate was used, mb add user an option to click on iframe or smth?
 * Giphy: The gif-picture won't change after editing and leaving it's name. But there are tons of other gifs under every tag. 
@@ -94,7 +97,6 @@ TODO list
 * Add sound/video messages like in telegram
 * Add webrtc peer to peer secure chats (like telegrams)
 * output logs to kibana
-* openrc is not getting killed in docker https://github.com/dockage/alpine-openrc/issues/2
 * Store userOnline in a single list, refactor All channel for online storing
 * Add "last seen" feature and status afk/online/dnd
 * blink icon in title on new message
@@ -155,6 +157,7 @@ TODO list
 
 
 ## FE TODO
+- send image to chat if error on server or inet goes down while uploading - we don't have an option to retry
 - Add linters like on webpack-vue-typescript
 - ADD ability to change theme during registration
 - add ability to cancel filetransfer on sender side
