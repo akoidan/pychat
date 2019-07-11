@@ -118,19 +118,7 @@ declare const FB: any;
 
 let googleInited: boolean = false;
 let fbInited: boolean = false;
-let captchaInited: boolean = false;
 
-
-export function loadCaptcha(cb) {
-  if (captchaInited) {
-    cb();
-  } else {
-    api.loadRecaptcha(cb2 => {
-      captchaInited = true;
-      cb();
-    });
-  }
-}
 
 
 export function  extractError (args) {

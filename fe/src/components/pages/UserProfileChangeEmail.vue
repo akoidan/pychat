@@ -1,0 +1,61 @@
+<template>
+  <form @submit.prevent="saveProfile" class="holder" method="post">
+    <table>
+      <tbody>
+      <tr>
+        <th>Enter your password:</th>
+        <td>
+          <input autocomplete="password" required class="input" type="password" name="password" minlength="3" v-model="password">
+        </td>
+      </tr>
+      <tr>
+        <th>Email:</th>
+        <td><input maxlength="190" class="input" v-model="email" type="email"></td>
+      </tr>
+      </tbody>
+      <tr><td colspan="2">
+        <app-submit class="green-btn" value='Apply Password' :running="running"/>
+      </td></tr>
+    </table>
+  </form>
+</template>
+<script lang="ts">
+  import {State, Action, Mutation} from "vuex-class";
+  import {Component, Prop, Vue} from "vue-property-decorator";
+  import AppSubmit from '../ui/AppSubmit';
+  import {CurrentUserInfoModel} from "../../types/model";
+  @Component({
+    components: {AppSubmit}
+  })
+  export default class UserProfileChangeEmail extends Vue {
+
+    password: string = '';
+    email: string = '';
+    running: boolean = false;
+    @Action growlError;
+    @Action growlSuccess;
+
+    @State userInfo: CurrentUserInfoModel;
+
+
+    created() {
+      this.email = this.userInfo.email;
+    }
+
+    saveProfile() {
+      this.running = true;
+      this.$api.changeEmailLogin(this.email,this.password, (e) => {
+        this.running = false;
+        if (e) {
+          this.growlError(e);
+        } else {
+          this.growlSuccess("Email has been changed");
+        }
+      });
+    }
+  }
+</script>
+
+<style lang="sass" scoped>
+
+</style>

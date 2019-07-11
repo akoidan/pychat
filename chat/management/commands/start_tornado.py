@@ -6,7 +6,7 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from tornado.httpserver import HTTPServer
 from tornado.ioloop import IOLoop, PeriodicCallback
-from tornado.web import Application
+from tornado.web import Application, StaticFileHandler
 from chat.global_redis import ping_online
 from chat.tornado.http_handler import HttpHandler
 import logging
@@ -26,13 +26,13 @@ class Command(BaseCommand):
 		parser.add_argument(
 			'--port',
 			dest='port',
-			default=settings.API_PORT,
+			default=8888,
 			type=int,
 		)
 		parser.add_argument(
 			'--host',
 			dest='host',
-			default=None,
+			default='0.0.0.0',
 			type=str,
 		)
 		parser.add_argument(
@@ -43,7 +43,7 @@ class Command(BaseCommand):
 			help='Execute flush command as well',
 		)
 
-	def sig_handler(self):
+	def sig_handler(self, a, b):
 		"""Catch signal and init callback"""
 		IOLoop.instance().add_callback(self.shutdown)
 
@@ -55,11 +55,12 @@ class Command(BaseCommand):
 
 	def handle(self, *args, **options):
 		application = Application([
-			(r'/test', HttpHandler),
-			(r'.*', TornadoHandler),
+			(r'/api/.*', HttpHandler),
+			(r'/photo/(.*)', StaticFileHandler, {'path': settings.MEDIA_ROOT}),
+			(r'/ws', TornadoHandler),
 		], debug=settings.DEBUG, default_host=options['host'])
-		self.http_server = HTTPServer(application, ssl_options=TORNADO_SSL_OPTIONS)
-		self.http_server.bind(options['port'])
+		self.http_server = HTTPServer(application, ssl_options=TORNADO_SSL_OPTIONS, max_buffer_size=1000000000) # 1GB, limit in nginx if u need
+		self.http_server.bind(options['port'], options['host'])
 		print('tornado server started at {}:{}'.format(options['host'], options['port']))
 		#  uncomment me for multiple process
 		self.http_server.start(1)

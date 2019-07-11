@@ -1,21 +1,18 @@
 setuptools==38.4.0
 oauth2client==4.1.2
-django==1.9.12
-simplejson==3.13.2
+Django==2.2.3
+#git+https://github.com/django/django.git@52545e788d664040abf4f1a5d77cdfc61152ffca
 redis==2.10.6
 tornado==4.5.3
 tornado-redis==2.4.18
-django-redis-sessions==0.6.1
 #selenium # optional for testing, comment this if you don't go for tests
 websocket-client==0.46.0
-requests==2.20.0
+#test
 enum34==1.1.6
 django-sslserver==0.19
+# for tornado ssl certificate
 #django-redis-cache
-django-multi-captcha-admin
-django-recaptcha2
-django-cors-headers==2.3.0
-pywebpush==1.9.3
+# pywebpush==1.9.3
 # PyMySQL
 # mysql-connector-python
 # for windows you can install client with mysql installer or via whl file specified in readme

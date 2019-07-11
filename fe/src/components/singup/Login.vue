@@ -11,6 +11,7 @@
       <router-link class='forg-pass' to="/auth/reset-password">Forgot Password?</router-link>
     <div>
       <social-auth/>
+      <captcha-component v-model="running"/>
       <app-submit class='submit-button' value='LOG IN' :running="running"/>
     </div>
   </form>
@@ -21,9 +22,10 @@
   import AppSubmit from "../ui/AppSubmit.vue"
   import {Action, Mutation} from "vuex-class";
   import {login} from "../../utils/utils";
-  import SocialAuth from './SocialAuth';
+  import SocialAuth from './SocialAuth.vue';
+  import CaptchaComponent from './CaptchaComponent.vue';
 
-  @Component({components: {SocialAuth, AppSubmit}})
+  @Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
   export default class Register extends Vue {
 
     $refs: {

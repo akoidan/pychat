@@ -24,6 +24,9 @@ import RoomSettings from './components/pages/RoomSettings.vue';
 import ApplyResetPassword from './components/singup/ApplyResetPassword.vue';
 import {globalLogger} from './utils/singletons';
 import {ALL_ROOM_ID} from './utils/consts';
+import ConfirmMail from './components/email/ConfirmMail.vue';
+import UserProfileChangeEmail
+  from './components/pages/UserProfileChangeEmail.vue';
 
 Vue.use(VueRouter);
 const router = new VueRouter({
@@ -78,6 +81,10 @@ const router = new VueRouter({
             {
               path: 'change-password',
               component: UserProfileChangePassword
+            },
+            {
+              path: 'change-email',
+              component: UserProfileChangeEmail
             },
             {
               path: 'image',
@@ -138,6 +145,9 @@ const router = new VueRouter({
           component: ApplyResetPassword
         }
       ]
+    }, {
+      path: '/confirm_email',
+      component: ConfirmMail
     }, {
       path: '*',
       redirect: `/chat/${ALL_ROOM_ID}`

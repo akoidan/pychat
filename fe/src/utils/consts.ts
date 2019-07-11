@@ -11,6 +11,7 @@ const _RECAPTCHA_PUBLIC_KEY = PYCHAT_CONSTS.RECAPTCHA_PUBLIC_KEY;
 const _MANIFEST = PYCHAT_CONSTS.MANIFEST;
 const _AUTO_REGISTRATION = PYCHAT_CONSTS.AUTO_REGISTRATION;
 const _PUBLIC_PATH = PYCHAT_CONSTS.PUBLIC_PATH;
+const _GIT_HASH = PYCHAT_CONSTS.GIT_HASH;
 export const GITHUB_URL = 'https://github.com/Deathangel908/pychat';
 export const PING_CLOSE_JS_DELAY = 5000;
 export const CONNECTION_RETRY_TIME = 5000;
@@ -25,15 +26,16 @@ export {_RECAPTCHA_PUBLIC_KEY as RECAPTCHA_PUBLIC_KEY};
 export {_GOOGLE_OAUTH_2_CLIENT_ID as GOOGLE_OAUTH_2_CLIENT_ID};
 export {_MANIFEST as MANIFEST};
 export {_AUTO_REGISTRATION as AUTO_REGISTRATION};
+export {_GIT_HASH as GIT_HASH};
 export const RESPONSE_SUCCESS = 'ok';
 
 export const ALL_ROOM_ID = 1;
 export const CHROME_EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn';
-export const CHROME_EXTENSION_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + CHROME_EXTENSION_ID
+export const CHROME_EXTENSION_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + CHROME_EXTENSION_ID;
 export const PASTED_IMG_CLASS = 'B4j2ContentEditableImg';
 export const MESSAGES_PER_SEARCH = 10;
 export const CONNECTION_ERROR = `Connection error`;
 export const SEND_CHUNK_SIZE = 16384;
 export const READ_CHUNK_SIZE = SEND_CHUNK_SIZE * 64;
 export const MAX_BUFFER_SIZE = 256;
-export const MAX_ACCEPT_FILE_SIZE_WO_FS_API = Math.pow(2, 28); // 256 MB
+export const MAX_ACCEPT_FILE_SIZE_WO_FS_API = 268435456; // Math.pow(2, 28) = 256 MB

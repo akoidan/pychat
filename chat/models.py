@@ -17,7 +17,7 @@ def get_random_path(instance, filename):
 	:param filename base string for generated name
 	:return: a unique string filename
 	"""
-	return "{}_{}".format(id_generator(8), filename)
+	return u"{}_{}".format(id_generator(8), filename) # support nonenglish characters with u'
 
 def myoverridenmeta(name, bases, adict):
 	newClass = type(name, bases, adict)
@@ -74,14 +74,14 @@ class User(AbstractBaseUser):
 
 
 class Subscription(models.Model):
-	user = models.ForeignKey(User, null=False)
+	user = models.ForeignKey(User, models.CASCADE, null=False)
 	inactive = BooleanField(default=False, null=False)
 	registration_id = models.CharField(null=False, max_length=191, unique=True)
 	created = models.DateTimeField(default=datetime.datetime.now)
 	updated = models.DateTimeField(default=datetime.datetime.now)
 	agent = models.CharField(max_length=64, null=True, blank=True)
 	is_mobile = BooleanField(default=False, null=False, blank=True)
-	ip = models.ForeignKey('IpAddress', null=True, blank=True)
+	ip = models.ForeignKey('IpAddress', models.CASCADE, null=True, blank=True)
 
 	def __unicode__(self):
 		return self.__str__()
@@ -101,7 +101,7 @@ class Verification(models.Model):
 	# a - account activation, r - recover
 	type = models.CharField(null=False, max_length=1)
 	token = models.CharField(max_length=17, null=False, default=id_generator)
-	user = models.ForeignKey(User, null=False)
+	user = models.ForeignKey(User, models.CASCADE, null=False)
 	time = models.DateTimeField(default=datetime.datetime.now)
 	verified = BooleanField(default=False)
 	email = models.EmailField(null=True, unique=False, blank=True, max_length=190)
@@ -145,7 +145,7 @@ class UserProfile(User):
 	message_sound = BooleanField(null=False, default=True)
 	send_logs = BooleanField(null=False, default=True)
 
-	email_verification = models.ForeignKey(Verification, null=True, blank=True)
+	email_verification = models.ForeignKey(Verification, models.CASCADE, null=True, blank=True)
 
 	def save(self, *args, **kwargs):
 		"""
@@ -185,7 +185,7 @@ def get_milliseconds(dt=None):
 
 class MessageHistory(models.Model):
 	time = models.BigIntegerField(default=get_milliseconds)
-	message = models.ForeignKey('Message', null=False)
+	message = models.ForeignKey('Message', models.CASCADE, null=False)
 	content = models.TextField(null=True, blank=True)
 	giphy = URLField(null=True, blank=True)
 
@@ -194,8 +194,8 @@ class Message(models.Model):
 	"""
 	Contains all public messages
 	"""
-	sender = models.ForeignKey(User, related_name='sender')
-	room = models.ForeignKey(Room, null=True)
+	sender = models.ForeignKey(User, models.CASCADE, related_name='sender')
+	room = models.ForeignKey(Room, models.CASCADE, null=True)
 	# DateField.auto_now
 	time = models.BigIntegerField(default=get_milliseconds)
 	content = models.TextField(null=True, blank=True)
@@ -233,7 +233,7 @@ class UploadedFile(models.Model):
 		issue = 's'
 	symbol = models.CharField(null=False, max_length=1)
 	file = FileField(upload_to=get_random_path, null=True)
-	user = models.ForeignKey(User, null=False)
+	user = models.ForeignKey(User, models.CASCADE, null=False)
 	type = models.CharField(null=False, max_length=1)
 
 	@property
@@ -253,7 +253,7 @@ class Image(models.Model):
 
 	# character in Message.content that will be replaced with this image
 	symbol = models.CharField(null=False, max_length=1)
-	message = models.ForeignKey(Message, related_name='message', null=False)
+	message = models.ForeignKey(Message, models.CASCADE, related_name='message', null=False)
 	img = FileField(upload_to=get_random_path, null=True)
 	preview = FileField(upload_to=get_random_path, null=True)
 	type = models.CharField(null=False, max_length=1, default=MediaTypeChoices.image.value)
@@ -271,9 +271,9 @@ class Image(models.Model):
 
 
 class RoomUsers(models.Model):
-	room = models.ForeignKey(Room, null=False)
-	user = models.ForeignKey(User, null=False)
-	last_read_message = models.ForeignKey(Message, null=True)
+	room = models.ForeignKey(Room, models.CASCADE, null=False)
+	user = models.ForeignKey(User, models.CASCADE, null=False)
+	last_read_message = models.ForeignKey(Message, models.CASCADE, null=True)
 	volume = models.IntegerField(default=2, null=False)
 	notifications = BooleanField(null=False, default=True)
 
@@ -283,8 +283,8 @@ class RoomUsers(models.Model):
 
 
 class SubscriptionMessages(models.Model):
-	message = models.ForeignKey(Message, null=False)
-	subscription = models.ForeignKey(Subscription, null=False)
+	message = models.ForeignKey(Message, models.CASCADE, null=False)
+	subscription = models.ForeignKey(Subscription, models.CASCADE, null=False)
 	received = BooleanField(null=False, default=False)
 
 	class Meta:  # pylint: disable=C1001
@@ -300,11 +300,10 @@ class Issue(models.Model):
 
 
 class IssueDetails(models.Model):
-	sender = models.ForeignKey(User, null=True)
+	sender = models.ForeignKey(User, models.CASCADE, null=True)
 	browser = models.CharField(null=True, max_length=32, blank=True)
 	time = models.DateField(default=datetime.datetime.now, blank=True)
-	issue = models.ForeignKey(Issue, related_name='issue')
-	log = models.TextField(null=True, blank=True)
+	issue = models.ForeignKey(Issue, models.CASCADE, related_name='issue')
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((User._meta.app_label, '_issue_detail'))
@@ -317,6 +316,10 @@ class IpAddress(models.Model):
 	country = models.CharField(null=True, max_length=32, blank=True)
 	region = models.CharField(null=True, max_length=32, blank=True)
 	city = models.CharField(null=True, max_length=32, blank=True)
+	lat = models.FloatField(null=True, blank=True)
+	lon = models.FloatField(null=True, blank=True)
+	zip = models.CharField(null=True, max_length=32, blank=True)
+	timezone = models.CharField(null=True, max_length=32, blank=True)
 
 	def __str__(self):
 		return self.ip
@@ -334,8 +337,8 @@ class IpAddress(models.Model):
 
 
 class UserJoinedInfo(models.Model):
-	ip = models.ForeignKey(IpAddress, null=True)
-	user = models.ForeignKey(User, null=True)
+	ip = models.ForeignKey(IpAddress, models.CASCADE, null=True)
+	user = models.ForeignKey(User, models.CASCADE, null=True)
 	time = models.DateField(default=datetime.datetime.now)
 
 	class Meta:  # pylint: disable=C1001

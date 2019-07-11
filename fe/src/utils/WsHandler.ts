@@ -524,7 +524,7 @@ public acceptFile(connId, received) {
     for (let k in this.store.state.roomsDict) {
       ids[k] = this.store.getters.maxId(k);
     }
-    let s = this.API_URL + `/?id=${this.wsConnectionId}`;
+    let s = this.API_URL + `?id=${this.wsConnectionId}`;
     if (Object.keys(ids).length > 0) {
       s += `&messages=${encodeURI(JSON.stringify(ids))}`;
     }

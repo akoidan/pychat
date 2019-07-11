@@ -1,20 +1,29 @@
 const path = require('path');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const chalk = require('chalk');
 const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 const name = '[name].[ext]?[sha512:hash:base64:6]';
+const child_process = require('child_process');
 
 module.exports = (env, argv) => {
   let plugins;
   let sasscPlugins;
-  if (!argv.mode) {
+  let isProd = argv.mode === 'production';
+  let isDev = argv.mode === 'development';
+  if (!isProd && !isDev) {
     throw `Pass --mode production/development, current ${argv.mode} is invalid`
   }
   let options = require(`./${argv.mode}.json`);
+  let gitHash;
+  try {
+    gitHash = child_process.execSync('git rev-parse --short=10 HEAD', {encoding: 'utf8'});
+    gitHash = gitHash.trim();
+    options.GIT_HASH = gitHash;
+    console.log(`Git hash = ${gitHash}`)
+  } catch (e) {
+    console.error("Git hash is unavailable");
+  }
   let webpackOptions = {
     hash: true,
     favicon: 'src/assets/img/favicon.ico',
@@ -30,7 +39,6 @@ module.exports = (env, argv) => {
       {from: './src/assets/smileys', to: 'smileys'},
       {from: './src/assets/manifest.json', to: ''},
       {from: './src/assets/flags', to: 'flags'},
-      // {from: './src/assets/static', to: ''},
     ]),
     new webpack.DefinePlugin({
       PYCHAT_CONSTS: JSON.stringify(options),
@@ -38,8 +46,11 @@ module.exports = (env, argv) => {
     new HtmlWebpackPlugin(webpackOptions),
   ];
   let devServer;
-  if (argv.mode === 'production') {
+  if (isProd) {
     const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+    const CleanWebpackPlugin = require('clean-webpack-plugin');
+    const CompressionPlugin = require('compression-webpack-plugin');
+    plugins.push(new CompressionPlugin())
     plugins.push(new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns : ['./dist']}));
     plugins.push(new MiniCssExtractPlugin());
     let minicssPlugin = {
@@ -61,13 +72,23 @@ module.exports = (env, argv) => {
         }
       }
     ];
-  } else if (argv.mode === 'development') {
+  } else if (isDev) {
     var openInEditor = require('launch-editor-middleware');
-    devServer =  {
+    const HardSourceWebpackPlugin = require('hard-source-webpack-plugin');
+    plugins.push(new HardSourceWebpackPlugin({
+      environmentHash: {
+        root: process.cwd(),
+        directories: [],
+        files: ['package.json', `${argv.mode}.json`],
+      }
+    }))
+    devServer = {
       allowedHosts: [
-        'pychat.org'
+        'pychat.org',
+        'vue.pychat.org',
+        "mycoolsite.org"
       ],
-      before (app) {
+      before(app) {
         app.use('/__open-in-editor', openInEditor())
       }
     };
@@ -94,8 +115,7 @@ module.exports = (env, argv) => {
     return res;
   }
 
-  const smp = new SpeedMeasurePlugin();
-  const conf =  smp.wrap({
+  let conf = {
     devServer,
     entry: ['./src/main.ts'],
     plugins,
@@ -164,7 +184,12 @@ module.exports = (env, argv) => {
         }
       ],
     },
-  });
+  }
+  if (isProd) {
+    const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
+    const spm = new SpeedMeasurePlugin();
+    conf = spm.wrap(conf);
+  }
 
     // create vendor.js file for development so webpack doesn't need to reassemble it every time
     // you can remove `argv.mode === 'development'` if you want it for prod. Or remove this if at all

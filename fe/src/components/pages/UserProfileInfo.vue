@@ -19,10 +19,6 @@
           <td><input maxlength="30" class="input" v-model="model.surname" type="text"></td>
         </tr>
         <tr>
-          <th>Email:</th>
-          <td><input maxlength="190" class="input" v-model="model.email" type="email"></td>
-        </tr>
-        <tr>
           <th>Birthday</th>
           <td><app-input-date input-class-datepicker="input-date" input-class="input" v-model="model.birthday"/></td>
         </tr>
