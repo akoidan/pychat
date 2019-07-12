@@ -141,20 +141,6 @@ def get_or_create_ip_model(user_ip, logger):
 			return IpAddress.objects.create(ip=user_ip)
 
 
-
-
-def authenticate(username, password):
-	try:
-		if '@' in username:
-			user = UserProfile.objects.get(email=username)
-		else:
-			user = UserProfile.objects.get(username=username)
-		if user.check_password(password):
-			return user
-	except User.DoesNotExist:
-		raise ValidationError("Invalid password")
-
-
 def create_id(user_id=0, random=None):
 	if not random or len(random) != settings.WS_ID_CHAR_LENGTH:
 		random = id_generator(settings.WS_ID_CHAR_LENGTH)

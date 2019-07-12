@@ -31,7 +31,7 @@ from chat.tornado.constants import RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.method_dispatcher import MethodDispatcher, require_http_method, login_required_no_redirect, \
 	add_missing_fields, extract_nginx_files, check_captcha
-from chat.utils import check_user, get_message_images_videos, is_blank, get_or_create_ip_model, authenticate
+from chat.utils import check_user, get_message_images_videos, is_blank, get_or_create_ip_model
 
 SERVER_ADDRESS = getattr(settings, "SERVER_ADDRESS", None)
 
@@ -279,7 +279,15 @@ class HttpHandler(MethodDispatcher):
 		"""
 		Logs in into system.
 		"""
-		user = authenticate(username, password)
+		try:
+			if '@' in username:
+				user = UserProfile.objects.get(email=username)
+			else:
+				user = UserProfile.objects.get(username=username)
+			if not user.check_password(password):
+				raise ValidationError("Invalid password")
+		except User.DoesNotExist:
+			raise ValidationError("User {} doesn't exist".format(username))
 
 		return self.__generate_session__(user.id)
 
@@ -432,7 +440,8 @@ class HttpHandler(MethodDispatcher):
 	@login_required_no_redirect
 	def change_email_login(self, email, password):
 		userprofile = UserProfile.objects.get(id=self.user_id)
-		authenticate(username=userprofile.username, password=password)
+		if not userprofile.check_password(password):
+			raise ValidationError("Invalid password")
 		if userprofile.email != email:
 			self.__check_email__(email)
 			if userprofile.email and userprofile.email_verification and userprofile.email_verification.verified:
