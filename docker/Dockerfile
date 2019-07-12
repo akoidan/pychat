@@ -90,7 +90,6 @@ RUN set -x && \
 COPY . ./
 
 RUN set -x && \
-
     mv ./docker/populate /etc/init.d/  &&\
     mv ./docker/tornado /etc/init.d/ &&\
     mv ./docker/nginx /etc/init.d/ &&\
