@@ -7,6 +7,7 @@
 !DefaultSmilies.cfpack
 !extract_cfpack.py
 !chat
+!templates
 !fe/src
 !fe/package.json
 !fe/tsconfig.json
