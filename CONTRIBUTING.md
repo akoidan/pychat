@@ -79,6 +79,7 @@ The string `rsok33GN:0005:EJAd` describes:
  
 TODO list
 =========
+* Add search for roomname in rooms list and username for user in direct messages and user in room
 * [![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master)
 * Add linter badges for typescript, test badges for tornado and backend, code coverage etc
 * Update to tornado 6.0 and detect blocking loops https://stackoverflow.com/a/26638397/3872976
