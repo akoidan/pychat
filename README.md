@@ -41,6 +41,8 @@ This is free web (browser) chat, that features:
 | P2P file sharing       | +      | -     | -     | -        | -     |
 | Desktop/mobile clients | -      | +     | +     | +        | +/-   |
 
+Desktop/mobile application will be released soon on cordova/electron soon...
+
 # Get started:
 You can always use [pychat.org](https://pychat.org), but if you want to run Pychat yourself you have options below:
 
