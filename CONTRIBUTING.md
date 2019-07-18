@@ -1,7 +1,10 @@
+Brief description
+=================
+Pychat is written in [Python](https://www.python.org/) and [typescript](https://www.typescriptlang.org/). For handling realtime messages [WebSockets](https://en.wikipedia.org/wiki/WebSocket) are used: browser support on client part and asynchronous framework [Tornado](http://www.tornadoweb.org/) on server part. For ORM [django](https://www.djangoproject.com/) was used with [MySql](https://www.mysql.com/) backend. Messages are being broadcast by means of [redis](http://redis.io/) [pub/sub](http://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern) feature using [tornado-redis](https://github.com/leporo/tornado-redis) backend. Redis is also used as django session backend and for storing current users online. For video call [WebRTC](https://webrtc.org/) technology was used with stun server to make a connection, which means you will always get the lowest ping and the best possible connection channel. Client part is written with progressive js framework [VueJs](https://vuejs.org/) which means that pychat is SPA, so even if user navigates across different pages websocket connection doesn't break. Pychat also supports OAuth2 login standard via FaceBook/Google. Css is compiled from [sass](http://sass-lang.com/guide). Server side can be run on any platform **Windows**, **Linux**, **Mac**. Client (users) can use Pychat from any browser with websocket support: IE11, Edge, Chrome, Firefox, Android, Opera, Safari...
+
 download_content.sh
 ===================
 Execute `bash download_content.sh` it will show you help.
-
 
 Frontend logging
 =================
@@ -81,7 +84,7 @@ TODO list
 * Update to tornado 6.0 and detect blocking loops https://stackoverflow.com/a/26638397/3872976
 * https://stackoverflow.com/questions/33170016/how-to-use-django-1-8-5-orm-without-creating-a-django-project
 * tornado uses blocking operation like django orm or sync_redis (strict redis). While this operations are executed main thread awaits IO and prevents new messages and connections from execution. async_redis create cb wrapper. django orm: https://docs.djangoproject.com/en/dev/releases/3.0/#asgi-support
-
+* Replace email login to google_user_id and fb_user_id so we could detach oauth2 account
 * Add smile reaction to the message below it, like in slack
 * https://www.w3.org/TR/css-scrollbars-1/
 * Search add user to room should container user icon
@@ -158,17 +161,12 @@ TODO list
 * SELECT_SELF_ROOM  https://github.com/Deathangel908/pychat/blob/master/chat/settings.py#L292-L303 doesnt work with mariadb engine 10.1
 * also admin email wasn't triggered while SELECT_SELF_ROOM has failed
 * Remove django server and leave only tornado
-
-
-
-## FE TODO
-- send image to chat if error on server or inet goes down while uploading - we don't have an option to retry
-- Add linters like on webpack-vue-typescript
-- ADD ability to change theme during registration
-- add ability to cancel filetransfer on sender side
-- add aliases to webpack
-- add test
-- add tslint
-- add sass-lint
-- resolve sw.ts imports doesn't work with ts-loader + file-loaders
-- Move everything to tornadoс?
+* send image to chat if error on server or inet goes down while uploading - we don't have an option to retry
+* Add linters like on webpack-vue-typescript
+* ADD ability to change theme during registration
+* add ability to cancel filetransfer on sender side
+* add aliases to webpack
+* add test
+* add tslint
+* add sass-lint
+* resolve sw.ts imports doesn't work with ts-loader + file-loaders

@@ -27,6 +27,8 @@ If you have issues with node, use version 8.0.0, `nvm use 8.0.0`. You can instal
 
 ### Build configuration
 [webpack.config.js](webpack.config.js) is used to build project. Take a look at it to understand how source files are being processed. Its start point is `entry: ['./src/main.ts']`. Everything is imported in this files are being processed by section `loaders`.
+
+### Configuration
 development.json and production.json have the following format:
 ```javascript
 {
