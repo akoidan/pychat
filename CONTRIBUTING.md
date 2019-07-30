@@ -79,6 +79,7 @@ The string `rsok33GN:0005:EJAd` describes:
  
 TODO list
 =========
+* "unable to begin transaction (3850 disk I/O error)" when 2 tabs are opened
 * Add search for roomname in rooms list and username for user in direct messages and user in room
 * [![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master)
 * Add linter badges for typescript, test badges for tornado and backend, code coverage etc
