@@ -39,9 +39,10 @@ This is free web (browser) chat, that features:
 | Can run on your server | +      | -     | -     | -        | -     |
 | Audio/Video messages   | +      | -     | -     | +        | +     |
 | P2P file sharing       | +      | -     | -     | -        | -     |
-| Desktop/mobile clients | -      | +     | +     | +        | +/-   |
+| Desktop/mobile clients*| -      | +     | +     | +        | +/-   |
 | 3rd-party integration  | -      | +     | -     | -        | -     | 
-Desktop/mobile application will be released on cordova/electron soon...
+
+* coming soon...
 
 # Get started:
 You can always use [pychat.org](https://pychat.org), but if you want to run Pychat yourself you have options below:
