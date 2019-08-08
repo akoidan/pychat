@@ -40,7 +40,7 @@ This is free web (browser) chat, that features:
 | Audio/Video messages   | +      | -     | -     | +        | +     |
 | P2P file sharing       | +      | -     | -     | -        | -     |
 | Desktop/mobile clients*| -      | +     | +     | +        | +/-   |
-| 3rd-party integration  | -      | +     | -     | -        | -     | 
+| 3rd-party integration* | -      | +     | -     | -        | -     | 
 
 \* coming soon...
 
