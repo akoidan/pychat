@@ -42,7 +42,7 @@ This is free web (browser) chat, that features:
 | Desktop/mobile clients*| -      | +     | +     | +        | +/-   |
 | 3rd-party integration  | -      | +     | -     | -        | -     | 
 
-* coming soon...
+\* coming soon...
 
 # Get started:
 You can always use [pychat.org](https://pychat.org), but if you want to run Pychat yourself you have options below:
