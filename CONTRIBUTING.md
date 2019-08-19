@@ -79,6 +79,7 @@ The string `rsok33GN:0005:EJAd` describes:
  
 TODO list
 =========
+* Add codepart to live code
 * https://static.pychat.org/main.js?5db3927a045ba970fade:17390:17 Uncaught Error: setLocalStreamSrc roomDict {}, {"id":1,"state":null} OBJ:  Error: setLocalStreamSrc roomDict {}, {"id":1,"state":null}
 * "unable to begin transaction (3850 disk I/O error)" when 2 tabs are opened
 * Add search for roomname in rooms list and username for user in direct messages and user in room
