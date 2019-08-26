@@ -52,7 +52,7 @@ Please don't use this build for production, as it uses debug ssl certificate, la
 
  - Download and run image: 
  ```bash
- docker run -p 443:443 deathangel908/pychat-test
+ docker run -tp 443:443 deathangel908/pychat-test
  ```
  - Open [https://localhost](https://localhost)
 
@@ -80,7 +80,7 @@ docker run -i -t -v pychat_data:/tmp -it alpine /bin/sh
 ```
  - Run image with:
 ```bash
-docker run -v pychat_data:/data -p 443:443 deathangel908/pychat
+docker run -t -v pychat_data:/data -p 443:443 deathangel908/pychat
 ```
  - Open [https://localhost](https://localhost) and enjoy it!
 
