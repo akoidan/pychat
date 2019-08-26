@@ -118,5 +118,6 @@ You can alway use [my docker](https://cloud.docker.com/u/deathangel908/repositor
    - If you have bash installed: `./download_content.sh generate_certificate`
    - You can also generate them manually and put into `./rootfs/etc/nginx/ssl/server.key` and `./rootfs/etc/nginx/ssl/certificate.crt`	
  - Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py` and edit it according comments. Also check `fe/production.json`
-- `docker build -f ./docker/Dockerfile -t deathangel908/pychat .`
+- `docker build -f ./docker/Dockerfile -t pychat .`
+- `docker run -tp 443:443 deathangel908/pychat .
  - Open https://localhost .
