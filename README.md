@@ -34,11 +34,11 @@ This is free web (browser) chat, that features:
 | Screen sharing         | +      | +     | -     | -        | -     |
 | Syntax highlight       | +      | -     | -     | -        | -     |
 | Unlimited history      | +      | +/-   | +     | +        | +     |
-| Mobile phone call      | -      | -     | +/-   | -        | +/-   |
 | Audio/Video conference | +      | +     | +     | +        | -     |
 | Can run on your server | +      | -     | -     | -        | -     |
 | Audio/Video messages   | +      | -     | -     | +        | +     |
 | P2P file sharing       | +      | -     | -     | -        | -     |
+| Mobile phone call      | -      | -     | +/-   | -        | +/-   |
 | Desktop/mobile clients*| -      | +     | +     | +        | +/-   |
 | 3rd-party integration* | -      | +     | -     | -        | -     | 
 
