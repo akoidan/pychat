@@ -38,9 +38,9 @@ This is free web (browser) chat, that features:
 | Can run on your server | +      | -     | -     | -        | -     |
 | Audio/Video messages   | +      | -     | -     | +        | +     |
 | P2P file sharing       | +      | -     | -     | -        | -     |
-| Mobile phone call      | -      | -     | +/-   | -        | +/-   |
 | Desktop client         | +      | +     | +     | +        | +/-   |
 | Mobile client*         | -      | +     | +     | +        | +/-   |
+| Mobile phone call      | -      | -     | +/-   | -        | +/-   |
 | 3rd-party integration  | -      | +     | -     | -        | -     | 
 
 *1 - Cordova project is in fe directory, coming soon
