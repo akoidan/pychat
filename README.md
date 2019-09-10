@@ -94,7 +94,7 @@ Pychat uses websql and built the way so it renders everything possible w/o netwo
 ```bash
 npx run nativifier pychat.org
 ```
-If you're bulding a client for server, use it instead of pychat.org
+If you're bulding a client for your server, use it instead of pychat.org
 
 # Contributing and development setup:
 
