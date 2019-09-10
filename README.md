@@ -39,10 +39,11 @@ This is free web (browser) chat, that features:
 | Audio/Video messages   | +      | -     | -     | +        | +     |
 | P2P file sharing       | +      | -     | -     | -        | -     |
 | Mobile phone call      | -      | -     | +/-   | -        | +/-   |
-| Desktop/mobile clients*| -      | +     | +     | +        | +/-   |
-| 3rd-party integration* | -      | +     | -     | -        | -     | 
+| Desktop client         | +      | +     | +     | +        | +/-   |
+| Mobile client*         | -      | +     | +     | +        | +/-   |
+| 3rd-party integration  | -      | +     | -     | -        | -     | 
 
-\* coming soon...
+*1 - Cordova project is in fe directory, coming soon
 
 # Get started:
 You can always use [pychat.org](https://pychat.org), but if you want to run Pychat yourself you have options below:
@@ -86,6 +87,14 @@ docker run -t -v pychat_data:/data -p 443:443 deathangel908/pychat
 
 ## Run without docker
 Take a look at [INSTALL.md](https://github.com/akoidan/pychat/blob/master/INSTALL.md)
+
+# Desktop client
+Pychat uses websql and built the way so it renders everything possible w/o network. Use [nativifier](https://github.com/jiahaog/nativefier#installation) to create a client:
+
+```bash
+npx run nativifier pychat.org
+```
+If you're bulding a client for server, use it instead of pychat.org
 
 # Contributing and development setup:
 
