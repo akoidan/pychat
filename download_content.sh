@@ -55,6 +55,8 @@ create_venv() {
 generate_certificate() {
     key_path="$1/server.key"
     cert_path="$1/certificate.crt"
+    #openssl req -newkey rsa:2048 -new -nodes -keyout ./docker/pychat.org/server.key -out ./docker/pychat.org/csr.pem
+    #openssl x509 -req -days 365 -in ./docker/pychat.org/csr.pem -signkey ./docker/pychat.org/server.key -out ./docker/pychat.org/certificate.crt
     safeRunCommand openssl req -nodes  -new -x509 -keyout "$key_path" -out "$cert_path" -days 3650
     printOut "Generated server.key in $key_path\nGenerated certificate in $cert_path"
 }
@@ -313,7 +315,7 @@ build_nginx() {
     safeRunCommand strip /usr/sbin/nginx*
     safeRunCommand strip /usr/lib/nginx/modules/*.so
     safeRunCommand rm -rf /tmp/nginx
-    safeRunCommand mv /usr/bin/envsubst /tmp/
+    safeRunCommand cp /usr/bin/envsubst /tmp/
     runDeps="$( \
         scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /tmp/envsubst \
             | tr ',' '\n' \

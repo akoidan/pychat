@@ -52,7 +52,7 @@ LOGGING = {
 	'disable_existing_loggers': True,
 	'filters': {
 		'id': {
-			'()': 'chat.log_filters.ContextFilter',
+			'()': 'chat.utils.ContextFilter',
 		}
 	},
 	'formatters': {

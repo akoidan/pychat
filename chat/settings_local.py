@@ -1,5 +1,4 @@
 from chat.settings_base import *
-import sslserver
 import logging.config
 
 DEBUG = True
@@ -17,8 +16,8 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 	'django.template.loaders.app_directories.Loader',
 ]
 
-CRT_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.crt"))
-KEY_PATH = os.sep.join((sslserver.__path__[0], "certs", "development.key"))
+CRT_PATH = os.sep.join((PROJECT_DIR, "fe", "certs", "certificate.crt"))
+KEY_PATH = os.sep.join((PROJECT_DIR, "fe", "certs", "server.key"))
 TORNADO_SSL_OPTIONS = {
 	"certfile": CRT_PATH,
 	"keyfile": KEY_PATH

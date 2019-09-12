@@ -8,8 +8,8 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.db import models
 from django.db.models import CharField, DateField, FileField, BooleanField, URLField
 
-from chat.log_filters import id_generator
 from chat.settings import GENDERS, DEFAULT_PROFILE_ID, JS_CONSOLE_LOGS
+from chat.utils import id_generator
 
 
 def get_random_path(instance, filename):

@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const VueLoaderPlugin = require('vue-loader/lib/plugin');
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require('webpack');
@@ -6,7 +7,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const name = '[name].[ext]?[sha512:hash:base64:6]';
 const child_process = require('child_process');
 
-module.exports = (env, argv) => {
+module.exports = async (env, argv) => {
   let plugins;
   let sasscPlugins;
   let isProd = argv.mode === 'production';
@@ -82,12 +83,15 @@ module.exports = (env, argv) => {
         files: ['package.json', `${argv.mode}.json`],
       }
     }))
-    devServer = {
+    let [key, cert, ca] = await Promise.all(['key.pem', 'server.crt', 'csr.pem'].map(e => new Promise(resolve =>
+        fs.readFile(path.resolve(__dirname, 'certs', e), (err, data) => resolve(data))
+      )))
+    ;devServer = {
       allowedHosts: [
         'pychat.org',
-        'vue.pychat.org',
-        "mycoolsite.org"
       ],
+      http2: true,
+      https: { key, cert, ca},
       before(app) {
         app.use('/__open-in-editor', openInEditor())
       }

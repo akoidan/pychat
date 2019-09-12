@@ -83,6 +83,7 @@ TODO list
 * https://static.pychat.org/main.js?5db3927a045ba970fade:17390:17 Uncaught Error: setLocalStreamSrc roomDict {}, {"id":1,"state":null} OBJ:  Error: setLocalStreamSrc roomDict {}, {"id":1,"state":null}
 * "unable to begin transaction (3850 disk I/O error)" when 2 tabs are opened
 * Add search for roomname in rooms list and username for user in direct messages and user in room
+* Save message upon typing in localstorage and restore it on page load, be aware of pasted files
 * [![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master)
 * Add linter badges for typescript, test badges for tornado and backend, code coverage etc
 * Update to tornado 6.0 and detect blocking loops https://stackoverflow.com/a/26638397/3872976

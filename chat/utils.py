@@ -1,7 +1,9 @@
 import json
 import logging
 import re
-
+import random
+import string
+from logging import Filter
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -9,7 +11,6 @@ from django.db import connection, OperationalError, InterfaceError
 from django.db.models import Q
 from tornado.httpclient import AsyncHTTPClient, HTTPRequest
 
-from chat.log_filters import id_generator
 from chat.models import Image, UploadedFile, get_milliseconds
 from chat.models import User
 from chat.models import UserProfile, IpAddress
@@ -141,10 +142,26 @@ def get_or_create_ip_model(user_ip, logger):
 			return IpAddress.objects.create(ip=user_ip)
 
 
+def id_generator(size=16, chars=string.ascii_letters + string.digits):
+	return ''.join(random.choice(chars) for _ in range(size))
+
+
 def create_id(user_id=0, random=None):
 	if not random or len(random) != settings.WS_ID_CHAR_LENGTH:
 		random = id_generator(settings.WS_ID_CHAR_LENGTH)
 	return "{:04d}:{}".format(user_id, random), random
+
+
+class ContextFilter(Filter):
+
+	def filter(self, record):
+		if not hasattr(record, 'user_id'):
+			record.user_id = None
+		if not hasattr(record, 'id'):
+			record.id = None
+		if not hasattr(record, 'ip'):
+			record.ip = None
+		return True
 
 
 def get_max_key(files):
