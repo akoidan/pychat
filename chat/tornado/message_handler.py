@@ -12,6 +12,7 @@ from tornado.ioloop import IOLoop
 from tornadoredis import Client
 
 from chat.global_redis import remove_parsable_prefix, encode_message
+from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
 	UploadedFile, Image, get_milliseconds, UserProfile
 from chat.py2_3 import str_type, quote
@@ -21,7 +22,7 @@ from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix,
 	UserSettingsVarNames, UserProfileVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, \
-	get_message_images_videos, update_symbols, up_files_to_img, evaluate, check_user, id_generator
+	get_message_images_videos, update_symbols, up_files_to_img, evaluate, check_user
 
 # from pywebpush import webpush
 

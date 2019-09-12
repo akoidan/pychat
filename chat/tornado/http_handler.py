@@ -23,6 +23,7 @@ from tornado.concurrent import run_on_executor
 from chat import settings
 from chat import utils, global_redis
 from chat.global_redis import sync_redis
+from chat.log_filters import id_generator
 from chat.models import Issue, IssueDetails, IpAddress, UserProfile, Verification, Message, Subscription, \
 	SubscriptionMessages, RoomUsers, Room, UploadedFile, User
 from chat.socials import GoogleAuth, FacebookAuth
@@ -30,7 +31,7 @@ from chat.tornado.constants import RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.method_dispatcher import MethodDispatcher, require_http_method, login_required_no_redirect, \
 	add_missing_fields, extract_nginx_files, check_captcha
-from chat.utils import check_user, get_message_images_videos, is_blank, get_or_create_ip_model, id_generator
+from chat.utils import check_user, get_message_images_videos, is_blank, get_or_create_ip_model
 
 SERVER_ADDRESS = getattr(settings, "SERVER_ADDRESS", None)
 
