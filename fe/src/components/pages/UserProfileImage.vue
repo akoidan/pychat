@@ -14,7 +14,7 @@
 <script lang="ts">
   import {State, Action, Mutation} from "vuex-class";
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-  import {canvasContext, resolveUrl, stopVideo} from "../../utils/htmlApi";
+  import {canvasContext, resolveMediaUrl, stopVideo} from "../../utils/htmlApi";
   import AppSubmit from '../ui/AppSubmit';
   @Component({
     components: {AppSubmit}
@@ -30,12 +30,12 @@
 
     @Watch('userImage')
     onUserImageChange(value: string) {
-      this.srcImg = resolveUrl(value);
+      this.srcImg = resolveMediaUrl(value);
       this.growlInfo("New image has been set");
     }
 
     created() {
-      this.srcImg = this.userImage ? resolveUrl(this.userImage) : null;
+      this.srcImg = this.userImage ? resolveMediaUrl(this.userImage) : null;
     }
 
     running: boolean = false;

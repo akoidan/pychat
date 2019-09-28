@@ -30,7 +30,7 @@ from chat.socials import GoogleAuth, FacebookAuth
 from chat.tornado.constants import RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.method_dispatcher import MethodDispatcher, require_http_method, login_required_no_redirect, \
-	add_missing_fields, extract_nginx_files, check_captcha
+	add_missing_fields, extract_nginx_files, check_captcha, get_user_id
 from chat.utils import check_user, get_message_images_videos, is_blank, get_or_create_ip_model
 
 SERVER_ADDRESS = getattr(settings, "SERVER_ADDRESS", None)
@@ -521,16 +521,22 @@ class HttpHandler(MethodDispatcher):
 			raise tornado.web.HTTPError(404)
 
 	# @transaction.atomic TODO, is this works in single thread?
-	@login_required_no_redirect
 	@require_http_method('POST')
 	def report_issue(self, issue, browser):
+		user_id = get_user_id(self.request)
 		issue_object = Issue.objects.get_or_create(content=issue)[0]
 		issue_details = IssueDetails(
-			sender_id=self.user_id,
+			sender_id=user_id,
 			browser=browser,
 			issue=issue_object
 		)
-		yield self.__mail_admins("{} reported issue".format(User.objects.get(id = self.user_id).username), issue, fail_silently=True)
+		username = User.objects.get(id=self.user_id).username if user_id else None
+
+		yield self.__mail_admins(
+			"{} reported issue".format(username),
+			issue,
+			fail_silently=True
+		)
 		issue_details.save()
 		return settings.VALIDATION_IS_OK
 

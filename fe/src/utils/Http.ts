@@ -1,8 +1,6 @@
 import loggerFactory from './loggerFactory';
 import {PostData, SessionHolder} from '../types/types';
 import {Logger} from 'lines-logger';
-import {CONNECTION_ERROR} from './consts';
-import {getUrl} from './utils';
 
 
 export default abstract class Http {
@@ -19,12 +17,11 @@ export default abstract class Http {
 
   public abstract doPost<T>(d: PostData<T>): XMLHttpRequest;
 
-  public loadJs(fileUrl: string, callback): void {
-    fileUrl = getUrl(fileUrl);
-    this.httpLogger.log('GET out {}', fileUrl)();
+  public loadJs(fullFileUrlWithProtocol: string, callback): void {
+    this.httpLogger.log('GET out {}', fullFileUrlWithProtocol)();
     let fileRef = document.createElement('script');
     fileRef.setAttribute('type', 'text/javascript');
-    fileRef.setAttribute('src', fileUrl);
+    fileRef.setAttribute('src', fullFileUrlWithProtocol);
 
     document.getElementsByTagName('head')[0].appendChild(fileRef);
     fileRef.onload = callback;

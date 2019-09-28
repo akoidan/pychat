@@ -6,8 +6,11 @@ import {RootState} from '../types/model';
 import Api from './api';
 import WsHandler from './WsHandler';
 import store from '../store';
-import {IS_DEBUG, MANIFEST} from './consts';
-import swUrl from '../sw';
+import {
+  IS_DEBUG,
+  MANIFEST,
+  SERVICE_WORKER_URL
+} from './consts';
 const LAST_TAB_ID_VARNAME = 'lastTabId';
 
 export default class NotifierHandler {
@@ -108,10 +111,10 @@ export default class NotifierHandler {
   private async registerWorker() {
     if (!navigator.serviceWorker) {
       throw Error('Service worker is not supported');
-    } else if (!MANIFEST) {
+    } else if (!MANIFEST || ! SERVICE_WORKER_URL) {
      throw Error('FIREBASE_API_KEY is missing in settings.py or file chat/static/manifest.json is missing');
     }
-    let r = await navigator.serviceWorker.register((<any>swUrl) as string, {scope: '/'});
+    let r = await navigator.serviceWorker.register(SERVICE_WORKER_URL, {scope: '/'});
     this.logger.debug('Registered service worker {}', r)();
     this.serviceWorkerRegistration = await navigator.serviceWorker.ready;
     this.logger.debug('Service worker is ready {}', this.serviceWorkerRegistration)();

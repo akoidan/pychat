@@ -13,6 +13,7 @@ photos
 fe/yarn.lock
 fe/npm.lock
 django.db
+fe/wwww
 chat/migrations
 fe/src/assets/font/*
 !fe/src/assets/font/.gitkeep

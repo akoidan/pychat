@@ -33,7 +33,7 @@ export default class MediaCapture {
     });
     this.logger.debug('Permissions are granted')();
     await new Promise(resolve => {
-      this.timeout = setTimeout(resolve, 500); // wait until videocam opens
+      this.timeout = window.setTimeout(resolve, 500); // wait until videocam opens
     });
     if (this.stopped) {
       return;

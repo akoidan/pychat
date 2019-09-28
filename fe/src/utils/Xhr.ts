@@ -1,9 +1,6 @@
-import loggerFactory from './loggerFactory';
 import {PostData, SessionHolder} from '../types/types';
-import {Logger} from 'lines-logger';
-import {CONNECTION_ERROR} from './consts';
+import {CONNECTION_ERROR, XHR_API_URL} from './consts';
 import Http from './Http';
-import {getUrl} from './utils';
 
 
 /**
@@ -19,10 +16,14 @@ export default class Xhr extends Http {
     super(sessionHolder);
   }
 
+  getApiUrl(url) {
+    return `${XHR_API_URL}${url}`.replace('{}', window.location.host);
+  }
+
   /**
    * Loads file from server on runtime */
   public doGet<T>(fileUrl: string, callback: ErrorCB<T>, isJsonDecoded: boolean = false) {
-    fileUrl = getUrl(fileUrl);
+    fileUrl = this.getApiUrl(fileUrl);
     this.httpLogger.log('GET out {}', fileUrl)();
     let regexRes = /\.(\w+)(\?.*)?$/.exec(fileUrl);
     let fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
@@ -47,7 +48,7 @@ export default class Xhr extends Http {
     let r: XMLHttpRequest = new XMLHttpRequest();
     r.onreadystatechange = this.getOnreadystatechange(r, d.url, d.isJsonDecoded, 'POST', d.cb);
 
-    let url = getUrl(d.url);
+    let url = this.getApiUrl(d.url);
 
     r.open('POST', url, true);
     let data;

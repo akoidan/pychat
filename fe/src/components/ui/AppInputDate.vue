@@ -6,8 +6,14 @@
   import {State, Action, Mutation} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {isDateMissing} from '../../utils/htmlApi';
+  import {ELECTRON_MAIN_FILE} from '../../utils/consts'
 
-  const Datepicker = () => import( /* webpackChunkName: "vuejs-datepicker" */ 'vuejs-datepicker');
+  let Datepicker;
+  if (!ELECTRON_MAIN_FILE) {
+    Datepicker = () => import( /* webpackChunkName: "vuejs-datepicker" */ 'vuejs-datepicker');
+  } else {
+    Datepicker = Promise.resolve();
+  }
 
   @Component({components: {Datepicker}})
   export default class AppInputDate extends Vue {

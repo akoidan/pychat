@@ -23,11 +23,14 @@
 <div id="app">
   <div>
     <style>
+      html {
+        background-color: #222222;
+      }
       .lds-hourglass {
-        display: inline-block;
         position: relative;
-        width: 64px;
-        height: 64px;
+        width: 1px;
+        margin: 100px auto auto;
+        transform: translateX(-100px);
       }
       .lds-hourglass:after {
         content: " ";
@@ -37,7 +40,7 @@
         height: 0;
         margin: 6px;
         box-sizing: border-box;
-        border: 26px solid #fff;
+        border: 100px solid #fff;
         border-color: #fff transparent #fff transparent;
         animation: lds-hourglass 1.2s infinite;
       }

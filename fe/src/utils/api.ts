@@ -133,7 +133,7 @@ export default class Api extends MessageHandler {
   }
 
   public loadFacebook(cb) {
-    this.xhr.loadJs('//connect.facebook.net/en_US/sdk.js', cb);
+    this.xhr.loadJs('https://connect.facebook.net/en_US/sdk.js', cb);
   }
 
   public loadRecaptcha(cb) {

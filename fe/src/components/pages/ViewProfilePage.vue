@@ -5,7 +5,7 @@
   </div>
   <div v-else-if="userProfileInfo" class="profileHolder">
     <div>
-      <img :src="resolveUrl(userProfileInfo.image)"/>
+      <img :src="resolveMediaUrl(userProfileInfo.image)"/>
     </div>
     <div class="tableHolder">
       <table>
@@ -52,7 +52,7 @@
   import {State} from 'vuex-class';
   import AppSpinner from "../ui/AppSpinner";
   import {ViewUserProfileDto} from "../../types/messages";
-  import {resolveUrl} from '../../utils/htmlApi';
+  import {resolveMediaUrl} from '../../utils/htmlApi';
   import {UserModel} from '../../types/model';
 
   @Component({
@@ -73,8 +73,8 @@
       return this.allUsersDict[this.id].user;
     }
 
-    resolveUrl(src: string) {
-      return resolveUrl(src);
+    resolveMediaUrl(src: string) {
+      return resolveMediaUrl(src);
     }
 
     created() {
