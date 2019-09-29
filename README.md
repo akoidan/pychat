@@ -148,7 +148,8 @@ Services commands for CentOs:
    - Don't forget to change owner of files to http user `chown -R http:http /etc/nginx/ssl/`
  - Copy config files to rootfs `cp rootfs / -r `. Change owner of project to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`.
  - Generate postfix postman: `postmap /etc/postfix/virtual; postman /etc/aliases`
- - Execute start services and if you need enablign autostart commands described for [Archlinux](#archliunux-prod) or [CentOS](#centos-prod)
+ - If you want to use native file-uploader instead of python you should build nginx with nginx_upload_module, use `bash download_content.sh build_nginx 1.15.3 2.3.0 /tmp/runDepsFile`. In that case don't install nginx in OS packages steps
+ - Execute start services and if you need enabling autostart commands described for [Archlinux](#archliunux-prod) or [CentOS](#centos-prod)
  - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
  - If something doesn't work you want to check `pychat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
 
