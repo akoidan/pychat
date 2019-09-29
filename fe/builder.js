@@ -68,18 +68,20 @@ const {options, definePlugin, optimization, configFile, startCordova} = function
       throw Error(`env ${mode} is not defined`);
     }
   }
+  const startCordova = process.argv[2];
 
   const isProd = getEnv('BUILD_MODE', 'production', ['development']);
-  let options = require(isProd ? `./production.json` : './development.json');
+  // cordova is built for production atm
+  let options = require(isProd && !startCordova ? `./production.json` : './development.json');
   options.IS_PROD = isProd;
   options.IS_ELECTRON = getEnv('PLATFORM', 'electron', ['web', 'android']);
   options.IS_ANDROID = getEnv('PLATFORM', 'android', ['electron', 'web']);
   options.IS_WEB = getEnv('PLATFORM', 'web', ['electron', 'android']);
   options.SERVICE_WORKER_URL = options.IS_WEB ? '/sw.js' : false;
-  const startCordova = process.argv[2];
+
   if (options.IS_ANDROID)  {
     if (startCordova) {
-      options.BACKEND_ADDRESS = `${startCordova}:8888`;
+      options.BACKEND_ADDRESS = `${startCordova}:${options.BACKEND_ADDRESS.split(':')[1]}`;
     } else {
       console.error(`To start emulation use \nnpm run android 192.168.1.17\n where AVD is in bridge mode and 17 is your IP`);
     }
