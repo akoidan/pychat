@@ -144,7 +144,8 @@ def get_or_create_ip_model(user_ip, logger):
 def create_id(user_id=0, random=None):
 	if not random or len(random) != settings.WS_ID_CHAR_LENGTH:
 		random = id_generator(settings.WS_ID_CHAR_LENGTH)
-	return "{:04d}:{}".format(user_id, random), random
+	# if user is not authorized user_id would be None, and we would get unsupported format string
+	return "{:04d}:{}".format(user_id if user_id else 0, random), random
 
 
 def get_max_key(files):
