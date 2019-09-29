@@ -9,6 +9,7 @@ import loggerFactory from './utils/loggerFactory';
 import {GIT_HASH, IS_DEBUG} from './utils/consts';
 import {initStore} from './utils/utils';
 import {sub} from './utils/sub';
+import * as constants from './utils/consts';
 
 if (!Object.values) Object.values = o => Object.keys(o).map(k => o[k]);
 
@@ -81,6 +82,8 @@ export function init() {
     window['webrtcApi'] = webrtcApi;
     window['sub'] = sub;
     window.store = store;
+    window['consts'] = constants;
+    globalLogger.log('Constants {}', constants)();
   }
 
 }

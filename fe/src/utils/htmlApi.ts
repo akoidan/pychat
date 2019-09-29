@@ -2,7 +2,7 @@ import {globalLogger} from './singletons';
 import smileys from '../assets/smileys/info.json';
 import Vue from 'vue';
 
-import {STATIC_API_URL, PASTED_IMG_CLASS, PUBLIC_PATH} from './consts';
+import {MEDIA_API_URL, PASTED_IMG_CLASS, PUBLIC_PATH} from './consts';
 import {MessageDataEncode, SmileyStructure, UploadFile} from '../types/types';
 import {FileModel, MessageModel, RoomModel, SexModel, UserModel} from '../types/model';
 import {forEach} from './utils';
@@ -123,8 +123,9 @@ export const isDateMissing = (function() {
 })();
 
 
-export function resolveUrl(src: string): string {
-  return src.indexOf('blob:http') === 0 ? src : `${STATIC_API_URL}${src}`;
+export function resolveMediaUrl(src: string): string {
+  return src.indexOf('blob:http') === 0 ? src :
+      `${MEDIA_API_URL}${src}`.replace('{}', window.location.host);
 }
 
 export function encodeSmileys(html: string): string {
@@ -152,7 +153,7 @@ export function placeCaretAtEnd (userMessage: HTMLElement) {
 export function encodeMessage(data: MessageModel) {
   globalLogger.debug('Encoding message {}: {}', data.id, data)();
   if (data.giphy) {
-    return `<div class="giphy"><img src='${resolveUrl(data.giphy)}' /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>`;
+    return `<div class="giphy"><img src='${data.giphy}' /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>`;
   } else {
     let html = encodeHTML(data.content);
     let replaceElements = [];
@@ -177,10 +178,10 @@ function encodeFiles(html, files) {
       let v = files[s];
       if (v) {
         if (v.type === 'i') {
-          return `<img src='${resolveUrl(v.url)}' imageId='${v.id}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
+          return `<img src='${resolveMediaUrl(v.url)}' imageId='${v.id}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
         } else if (v.type === 'v' || v.type === 'm') {
           let className = v.type === 'v' ? 'video-player' : 'video-player video-record';
-          return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveUrl(v.preview)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
+          return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
         } else if (v.type === 'a') {
          return `<img src='${getStaticUrl(recordIcon as string)}' imageId='${v.id}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
         } else {
@@ -234,7 +235,7 @@ export function setVideoEvent(e: HTMLElement) {
       video.setAttribute('controls', '');
       video.className = 'video-player-ready';
       globalLogger.debug('Replacing video url {}', url)();
-      video.src = resolveUrl(url);
+      video.src = resolveMediaUrl(url);
       e.parentNode.replaceChild(video, e);
       video.play();
     };
@@ -246,7 +247,7 @@ export function setAudioEvent(e: HTMLElement) {
   forEach(r, e => {
     e.onclick = function (event) {
       let associatedAudio: string = e.getAttribute('associatedAudio');
-      let url: string = resolveUrl(associatedAudio);
+      let url: string = resolveMediaUrl(associatedAudio);
       let audio = document.createElement('audio');
       audio.setAttribute('controls', '');
       audio.className = 'audio-player-ready';

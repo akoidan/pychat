@@ -1,8 +1,8 @@
 import {Logger, LoggerFactory, LogStrict} from 'lines-logger';
 import {XHR_API_URL} from './utils/consts';
+import loggerFactory from './utils/loggerFactory';
 declare var clients: any;
 
-let loggerFactory: LoggerFactory = new LoggerFactory(LogStrict.LOG_WITH_WARNINGS);
 let logger: Logger = loggerFactory.getLoggerColor('SW_S', '#a76f00');
 
 //

@@ -86,18 +86,25 @@ def check_captcha(field='g-recaptcha-response'):
 	return method_wrapper
 
 
+def get_user_id(request):
+	session_id = request.headers.get('session_id')
+	if session_id is None:
+		return None
+	user_id_raw = sync_redis.hget('sessions', session_id)
+	if user_id_raw is None:
+		return None
+	return int(user_id_raw)
+
+
 def login_required_no_redirect(func):
 	def wrapper(self, *a, **ka):
-		session_id = self.request.headers.get('session_id')
-		if session_id is None:
-			raise tornado.web.HTTPError(403, 'session_id header is missing')
-		self.user_id = int(sync_redis.hget('sessions', session_id))
+		self.user_id = get_user_id(self.request)
 		self.logger = logging.LoggerAdapter(parent_logger, {
 			'id': create_id(self.user_id, self.id),
 			'ip': self.client_ip
 		})
 		if self.user_id is None:
-			raise tornado.web.HTTPError(403, 'session {} is invalid'.format(session_id))
+			raise tornado.web.HTTPError(403, 'Missing or expired session_id header')
 		return func(self, *a, **ka)
 	return wrapper
 

@@ -1,34 +1,33 @@
 // webpack global consts
 declare const PYCHAT_CONSTS: any;
 
-const _WS_API_URL = PYCHAT_CONSTS.WS_API_URL;
-const _STATIC_API_URL = PYCHAT_CONSTS.STATIC_API_URL;
-const _XHR_API_URL = PYCHAT_CONSTS.XHR_API_URL;
-const _IS_DEBUG = PYCHAT_CONSTS.IS_DEBUG;
-const _GOOGLE_OAUTH_2_CLIENT_ID = PYCHAT_CONSTS.GOOGLE_OAUTH_2_CLIENT_ID;
-const _FACEBOOK_APP_ID = PYCHAT_CONSTS.FACEBOOK_APP_ID;
-const _RECAPTCHA_PUBLIC_KEY = PYCHAT_CONSTS.RECAPTCHA_PUBLIC_KEY;
-const _MANIFEST = PYCHAT_CONSTS.MANIFEST;
-const _AUTO_REGISTRATION = PYCHAT_CONSTS.AUTO_REGISTRATION;
-const _PUBLIC_PATH = PYCHAT_CONSTS.PUBLIC_PATH;
-const _GIT_HASH = PYCHAT_CONSTS.GIT_HASH;
+let allConsts = PYCHAT_CONSTS;
+export const {
+  IS_DEBUG,
+  IS_SSL,
+  BACKEND_ADDRESS,
+  GOOGLE_OAUTH_2_CLIENT_ID,
+  FACEBOOK_APP_ID,
+  RECAPTCHA_PUBLIC_KEY,
+  MANIFEST,
+  AUTO_REGISTRATION,
+  PUBLIC_PATH,
+  GIT_HASH,
+  IS_PROD,
+  ELECTRON_MAIN_FILE,
+  SERVICE_WORKER_URL,
+  ELECTRON_IGNORE_SSL
+} = allConsts;
+
+export const WS_API_URL = `ws${IS_SSL ? 's' : ''}://${BACKEND_ADDRESS}/ws`;
+export const XHR_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_ADDRESS}/api`;
+export const MEDIA_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_ADDRESS}`;
+
 export const GITHUB_URL = 'https://github.com/Deathangel908/pychat';
 export const PING_CLOSE_JS_DELAY = 5000;
 export const CONNECTION_RETRY_TIME = 5000;
 export const CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = 313000;
-export {_WS_API_URL as WS_API_URL};
-export {_PUBLIC_PATH as PUBLIC_PATH};
-export {_STATIC_API_URL as STATIC_API_URL};
-export {_XHR_API_URL as XHR_API_URL};
-export {_IS_DEBUG as IS_DEBUG};
-export {_FACEBOOK_APP_ID as FACEBOOK_APP_ID};
-export {_RECAPTCHA_PUBLIC_KEY as RECAPTCHA_PUBLIC_KEY};
-export {_GOOGLE_OAUTH_2_CLIENT_ID as GOOGLE_OAUTH_2_CLIENT_ID};
-export {_MANIFEST as MANIFEST};
-export {_AUTO_REGISTRATION as AUTO_REGISTRATION};
-export {_GIT_HASH as GIT_HASH};
 export const RESPONSE_SUCCESS = 'ok';
-
 export const ALL_ROOM_ID = 1;
 export const CHROME_EXTENSION_ID = 'cnlplcfdldebgdlcmpkafcialnbopedn';
 export const CHROME_EXTENSION_URL = 'https://chrome.google.com/webstore/detail/pychat-screensharing-exte/' + CHROME_EXTENSION_ID;

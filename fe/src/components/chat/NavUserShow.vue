@@ -17,7 +17,7 @@
       <i class="icon-comment" @click="writeMessage"><span class="mText">Write message</span></i>
     </template>
     <div class="right">
-      <app-spinner-small v-if="running" :text="running"/>
+      <div class="spinner" v-if="running" />
       <i class="icon-cancel" @click.stop="closeActiveUser"><span class="mText">Close</span></i>
     </div>
   </nav>
@@ -28,16 +28,12 @@
   import {UserModel} from "../../types/model";
   import {PrivateRoomsIds} from '../../types/types';
   import {AddRoomMessage} from '../../types/messages';
-  import AppSpinner from '../ui/AppSpinner';
-  import AppSpinnerSmall from '../ui/AppSpinnerSmall';
-  @Component({
-    components: {AppSpinnerSmall, AppSpinner}
-  })
+  @Component
   export default class NavUserShow extends Vue {
     @Mutation setActiveUserId: SingleParamCB<number>;
     @Prop() activeUser: UserModel;
     @Prop() privateRooms: UserModel;
-    running: string = null;
+    running: boolean = false;
     @Getter privateRoomsUsersIds: PrivateRoomsIds;
 
     get oppositeRoomId() {
@@ -46,13 +42,13 @@
 
     writeMessage() {
       if (!this.running) {
-        this.running = 'Creating room...';
+        this.running = true;
         this.$ws.sendAddRoom(null, 50, true, [this.activeUser.id], (e: AddRoomMessage)=> {
           if (e && e.roomId) {
             this.$router.replace(`/chat/${e.roomId}`);
           }
           this.setActiveUserId(null);
-          this.running = null;
+          this.running = false;
         });
       }
     }
@@ -69,6 +65,9 @@
 
   @import "partials/abstract_classes"
   @import "partials/mixins"
+
+  .spinner
+    @include lds-spinner(15px, 'Creating room...', true)
 
   .activeUserName
     font-weight: bold

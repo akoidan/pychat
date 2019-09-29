@@ -10,7 +10,7 @@ import {IStorage} from '../types/types';
 import loggerFactory from './loggerFactory';
 import sessionHolder from './sessionHolder';
 import {Logger} from 'lines-logger';
-import {WS_API_URL, XHR_API_URL} from './consts';
+import {WS_API_URL} from './consts';
 import NotifierHandler from './NotificationHandler';
 import Vue from 'vue';
 import Http from './Http';

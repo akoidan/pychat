@@ -507,7 +507,7 @@ public acceptFile(connId, received) {
       this.wsState = WsState.CONNECTION_IS_LOST;
     }
     // Try to reconnect in 10 seconds
-    this.listenWsTimeout = setTimeout(this.listenWS.bind(this), CONNECTION_RETRY_TIME);
+    this.listenWsTimeout = window.setTimeout(this.listenWS.bind(this), CONNECTION_RETRY_TIME);
   }
 
 
