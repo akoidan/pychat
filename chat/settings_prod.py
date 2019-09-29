@@ -5,7 +5,7 @@ import logging.config
 
 TEMPLATE_DEBUG = False
 DEBUG = False
-MAIN_TORNADO_PROCESS_PORT = 8882
+MAIN_TORNADO_PROCESS_PORT = 8888
 
 TEMPLATES[0]['OPTIONS']['loaders'] = [(
 	'django.template.loaders.cached.Loader',
