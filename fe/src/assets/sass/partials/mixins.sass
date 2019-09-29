@@ -41,6 +41,60 @@
 @mixin linear-gradient($begin, $end)
 	@include linear-gradient-values($begin 0%, $end 100%)
 
+
+@mixin lds-spinner($radius, $text, $is-in-line)
+
+	text-align: center
+	display: flex
+	align-items: center
+	justify-content: center
+
+	@if $is-in-line
+		flex-direction: row
+	@else
+		flex-direction: column
+
+	&:before
+		content: " "
+		display: inline-block
+		border-radius: 50%
+		width: 0
+		height: 0
+		box-sizing: border-box
+		border: $radius solid #fff
+		border-color: #fff transparent #fff transparent
+		animation: lds-hourglass 1.2s infinite
+
+	&:after
+		@if $is-in-line
+			margin-left: $radius/4
+		@else
+			margin-top: $radius/4
+		content: $text
+		font-size: 18px
+		text-align: center
+		animation: lds-blinker 1.2s infinite
+
+	@keyframes lds-blinker
+		0%
+			opacity: 1
+		50%
+			opacity: 0.5
+
+	@keyframes lds-hourglass
+		0%
+			transform: rotate(0)
+			animation-timing-function: cubic-bezier(0.55, 0.055, 0.675, 0.19)
+		50%
+			transform: rotate(900deg)
+			animation-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1)
+			opacity: 0.5
+		100%
+			transform: rotate(1800deg)
+
+@mixin lds-30-spinner-vertical($text)
+	@include lds-spinner(30px, $text, false)
+
 @mixin linear-gradient-hover($textColor, $backgroundColor, $padding-vert: 7px, $padding-hori: 14px, $bgEnd: darken($backgroundColor, 15.7%))
 	text-shadow: #000 0 1px 5px
 	border-radius: 4px

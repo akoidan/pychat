@@ -6,7 +6,7 @@
     <keep-alive v-if="inited" :include="['ChannelsPage', 'Painter']">
       <router-view class="body"/>
     </keep-alive>
-    <app-spinner v-else text="Connecting..."/>
+    <div v-else class="spinner"/>
   </div>
 </template>
 <script lang="ts">
@@ -17,11 +17,10 @@
   import NotifierHandler from "../utils/NotificationHandler";
   import {browserVersion, isChrome, isMobile, notifier} from "../utils/singletons";
   import store from '../store';
-  import AppSpinner from './ui/AppSpinner';
   import IncomingCall from './chat/IncomingCall';
 
   @Component({
-    components: {IncomingCall, AppSpinner, AppNav}
+    components: {IncomingCall, AppNav}
   })
   export default class MainPage extends Vue {
 
@@ -45,6 +44,11 @@
 <style lang="sass" scoped>
   @import "partials/mixins"
   @import "partials/abstract_classes"
+
+  .spinner
+    margin: auto
+    @include lds-30-spinner-vertical('Loading user data...')
+
   .flex
     height: 100%
     @include display-flex()

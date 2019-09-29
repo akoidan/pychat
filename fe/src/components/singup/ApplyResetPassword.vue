@@ -1,5 +1,5 @@
 <template>
-  <app-spinner v-if="checkingToken" text="Checking token..."/>
+  <div class="spinner" v-if="checkingToken"/>
   <h1 v-else-if="error" class="error">
     {{error}}
   </h1>
@@ -18,9 +18,8 @@
   import Vue from 'vue';
   import {Action } from 'vuex-class';
   import AppSubmit from '../ui/AppSubmit.vue';
-  import AppSpinner from '../ui/AppSpinner';
 
-  @Component({components: {AppSpinner, AppSubmit}})
+  @Component({components: {AppSubmit}})
   export default class ApplyResetPassword extends Vue {
 
     @Action growlError;
@@ -67,6 +66,11 @@
 <style scoped lang="sass">
 
   $restPassMargin: 20px
+
+  @import "partials/mixins"
+
+  .spinner
+    @include lds-30-spinner-vertical('Checking token...')
 
   .restoreHeader
     font-size: 25px

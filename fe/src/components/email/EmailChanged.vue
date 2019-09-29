@@ -4,19 +4,17 @@
             {{ message }}<br/>
             <router-link to="/">Go to main page</router-link>
         </div>
-        <app-spinner v-if="loading" text="Changing email..."/>
+        <div v-if="loading" class="spinner"/>
     </div>
 </template>
 
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {Mutation, State} from "vuex-class";
-  import AppSpinner from '../ui/AppSpinner';
 
 
-  @Component({
-    components: { AppSpinner}
-  })
+
+  @Component
   export default class ConfirmMail extends Vue {
 
     loading: boolean = true;
@@ -30,6 +28,11 @@
   }
 </script>
 <style lang="sass" scoped>
+
+    @import "partials/mixins"
+
+    .spinner
+        @include lds-30-spinner-vertical('Changing email...')
 
     .message
         text-align: center

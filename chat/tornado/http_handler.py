@@ -515,7 +515,7 @@ class HttpHandler(MethodDispatcher):
 		try:
 			user_profile = UserProfile.objects.get(pk=id)
 			profile = MessagesCreator.get_user_profile(user_profile)
-			profile['image'] = user_profile.photo.url if user_profile.photo.url else None
+			profile['image'] = user_profile.photo.url if user_profile.photo.name else None
 			return profile
 		except ObjectDoesNotExist:
 			raise tornado.web.HTTPError(404)

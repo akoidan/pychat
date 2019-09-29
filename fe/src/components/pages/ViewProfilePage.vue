@@ -1,10 +1,10 @@
 <template>
-  <app-spinner v-if="loading" :text="`Fetching ${username} profile...`"/>
+  <div v-if="loading" class="spinner" />
   <div v-else-if="error">
     {{error}}
   </div>
   <div v-else-if="userProfileInfo" class="profileHolder">
-    <div>
+    <div v-if="userProfileInfo.image">
       <img :src="resolveMediaUrl(userProfileInfo.image)"/>
     </div>
     <div class="tableHolder">
@@ -50,14 +50,11 @@
 <script lang="ts">
   import {Component, Vue} from "vue-property-decorator";
   import {State} from 'vuex-class';
-  import AppSpinner from "../ui/AppSpinner";
   import {ViewUserProfileDto} from "../../types/messages";
   import {resolveMediaUrl} from '../../utils/htmlApi';
   import {UserModel} from '../../types/model';
 
-  @Component({
-    components: {AppSpinner}
-  })
+  @Component
   export default class ViewProfilePage extends Vue {
 
     loading: boolean = false;
@@ -94,10 +91,15 @@
 <style lang="sass" scoped>
 
   @import "partials/variables"
+  @import "partials/mixins"
+
   th
     text-align: right
   th, td
     padding: 0 5px
+
+  .spinner
+    @include lds-30-spinner-vertical('Loading user profile...')
 
   .profileHolder
     display: flex
