@@ -83,6 +83,7 @@
   "dependencies": {
     "cordova": "^9.0.0",
     "cordova-android": "^8.1.0",
+    "electron-devtools-installer": "^2.2.4",
     "highlightjs": "^9.10.0",
     "is-mobile": "^2.0.0",
     "lines-logger": "^1.0.4",

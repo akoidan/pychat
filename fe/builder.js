@@ -87,10 +87,10 @@ const {options, definePlugin, optimization, configFile, startCordova} = function
     }
   }
   if (options.IS_ELECTRON || options.IS_ANDROID) {
-    // oauth and recaptha don't work from file:// protocol
+    // oauth doesn't work from file:// protocol
     // we need to load the http page for registration where they are used
     // temporary stabbing them as null
-    ["GOOGLE_OAUTH_2_CLIENT_ID", "FACEBOOK_APP_ID", "RECAPTCHA_PUBLIC_KEY"].forEach((v) => {
+    ["GOOGLE_OAUTH_2_CLIENT_ID", "FACEBOOK_APP_ID"].forEach((v) => {
       if (options[v]) {
         console.error(`${v}=${options[v]} is not implemented yet, the value would be ignored`);
         options[v] = false;
@@ -167,6 +167,7 @@ const getConfig = async () => {
     new VueLoaderPlugin(),
     new CopyWebpackPlugin([
       {from: './src/assets/manifest.json', to: ''},
+      {from: './src/assets/recaptcha.html', to: ''},
     ]),
     htmlWebpackPlugin,
   ];

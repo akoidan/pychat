@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Pychat Captcha</title>
+    <script async src="https://www.google.com/recaptcha/api.js"></script>
+</head>
+<body>
+<script>
+  function recaptchaCallBack() {
+    let response = grecaptcha.getResponse();
+    console.log("iframe recaptcha callback ", response);
+    window.parent.postMessage({'g-recaptcha-response': response}, '*');
+  }
+</script>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const siteKey = urlParams.get('site_key');
+  let div = document.createElement('div');
+  div.className = 'g-recaptcha';
+  div.setAttribute('data-theme', 'dark');
+  div.setAttribute('data-callback', 'recaptchaCallBack');
+  div.setAttribute('data-sitekey', siteKey);
+  document.body.appendChild(div);
+  window.addEventListener('message', (e) => {
+    console.log("iframe recaptcha message ", e);
+    if (e.data === 'reset-captcha') {
+      window.grecaptcha.reset()
+    }
+  })
+</script>
+<style>
+    body {margin: 0}
+</style>
+</body>
+</html>
