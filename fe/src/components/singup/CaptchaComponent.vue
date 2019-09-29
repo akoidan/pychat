@@ -21,7 +21,11 @@
 
 <script lang="ts">
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-  import {RECAPTCHA_PUBLIC_KEY, PUBLIC_PATH} from "../../utils/consts";
+  import {
+    RECAPTCHA_PUBLIC_KEY,
+    PUBLIC_PATH,
+    CAPTCHA_IFRAME
+  } from "../../utils/consts";
   import {GoogleCaptcha} from "../../types/model";
 
   let captchaInited: boolean = false; // don't init captcha again, if it was inited in another component
@@ -46,7 +50,7 @@
     @Prop() value;
     private event: (E: MessageEvent) => any = null;
 
-    private ifIframeUrl: string = `https://pychat.org:8080/recaptcha.html?site_key=${RECAPTCHA_PUBLIC_KEY}`;
+    private ifIframeUrl: string = CAPTCHA_IFRAME;
 
 
     @Watch('value')

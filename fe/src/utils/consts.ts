@@ -22,6 +22,7 @@ export const {
 export const WS_API_URL = `ws${IS_SSL ? 's' : ''}://${BACKEND_ADDRESS}/ws`;
 export const XHR_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_ADDRESS}/api`;
 export const MEDIA_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_ADDRESS}`;
+export const CAPTCHA_IFRAME = `${PUBLIC_PATH}recaptcha.html?site_key=${RECAPTCHA_PUBLIC_KEY}`;
 
 export const GITHUB_URL = 'https://github.com/Deathangel908/pychat';
 export const PING_CLOSE_JS_DELAY = 5000;
