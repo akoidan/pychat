@@ -15,7 +15,7 @@
         <img
             @click="$emit('add-smiley', code)"
             v-for="(smiley, code) in allSmileys"
-            :src="buildUrl(smiley, tabName)"
+            :src="smiley.src"
             :alt="smiley.alt"
             :code="code"
             :key="code">
@@ -25,18 +25,14 @@
 </template>
 <script lang="ts">
   import {Component, Vue} from "vue-property-decorator";
-  import smileys from "../../assets/smileys/info.json";
+  import {smileys} from '../../utils/smileys';
   import {SmileyStructure} from '../../types/types';
-  import {getSmileyPath} from '../../utils/htmlApi';
 
   @Component
   export default class SmileyHolder extends Vue {
-    smileys: {[id: string]: {[id: string]: SmileyStructure[]}} = smileys;
+    smileys = smileys;
     activeTab: string = Object.keys(smileys)[0];
 
-    buildUrl(smiley: SmileyStructure, tabName: string) {
-      return getSmileyPath(tabName, smiley.src);
-    }
   }
 </script>
 

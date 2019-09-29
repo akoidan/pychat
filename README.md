@@ -251,9 +251,6 @@ Execute `bash download_content.sh` it will show you help.
 ## Frontend logging
 By default each user has turned off browser (console) logs. You can turn them on in [/#/profile](https://localhost:8000/#/profile) page (`logs` checkbox). All logs are logged with `window.logger` object, for ex: `window.logger('message')()`. Note that logger returns a function which is binded to params, that kind of binding shows corrent lines in browser, especially it's handy when all source comes w/o libraries/webpack or other things that transpiles or overhead it. You can also inspect ws messages [here](ws_messages.jpeg) for chromium. You can play with `window.wsHandler.handleMessage(object)` and `window.wsHandler.handle(string)` methods in debug with messages from log to see what's going on
 
-## Smileys
-By default pychat uses standard  [commfort](http://www.commfort.com/en/) chat  [smileys](DefaultSmilies.cfpack) . `python manage.py extract_cfpack.py` extracts files from this pack and generates [info.json](fe/src/assets/smileys/info.json), if you want to add/delete smileys - just edit `info.json`
-
 ## Icons
 Chat uses [fontello](fontello.com) and its api for icons. The desiciong is based on requierment for different icons that come from different fonts and ability to add custom assets. For this purpose we need to generate font itself. W/o this chat would need to download a lot of different fonts which would slow down the loading process. You can easily edit fonts via your browser, just execute `bash download_content.sh fonts_session`. Make your changes and hit "Save session". Then execute `bash download_content.sh download_fontello`. If you did everything right new icons should appear in [demo.html](https://127.0.0.1:8000/static/demo.html)
 

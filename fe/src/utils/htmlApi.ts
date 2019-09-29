@@ -1,34 +1,20 @@
 import {globalLogger} from './singletons';
-import smileys from '../assets/smileys/info.json';
+
 import Vue from 'vue';
 
-import {MEDIA_API_URL, PASTED_IMG_CLASS, PUBLIC_PATH} from './consts';
+import {MEDIA_API_URL, PASTED_IMG_CLASS} from './consts';
 import {MessageDataEncode, SmileyStructure, UploadFile} from '../types/types';
 import {FileModel, MessageModel, RoomModel, SexModel, UserModel} from '../types/model';
 import {forEach} from './utils';
 import recordIcon from '../assets/img/audio.svg';
+import {getFlag} from './flags';
+import {Smile, smileys} from './smileys';
 
 const tmpCanvasContext = document.createElement('canvas').getContext('2d');
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
-const smileysTabNames = Object.keys(smileys);
 
-import favicon from '../assets/img/favicon.ico';
-
-export const faviconUrl = getStaticUrl(favicon as string);
 
 const savedFiles = {};
-let codes = {};
-smileysTabNames.forEach(tb => {
-  let smileyElement = smileys[tb];
-  for (let k in smileys[tb]) {
-    let innerSM = smileyElement[k];
-    codes[k] = {
-      alt: innerSM.alt,
-      tabName: tb,
-      src: innerSM.src,
-    };
-  }
-});
 
 export const requestFileSystem = window['webkitRequestFileSystem'] || window['mozRequestFileSystem'] || window['requestFileSystem'];
 const escapeMap = {
@@ -81,17 +67,11 @@ export function encodeHTML(html: string) {
   return html.replace(replaceHtmlRegex, s => escapeMap[s]);
 }
 
-export function getSmileyPath(tabName: string, src: string) {
-  return getStaticUrl(`smileys/${tabName}/${src}`);
-}
 
 export function getFlagPath(countryCode: string) {
-  return getStaticUrl(`flags/${countryCode}.png`);
+  return getFlag(countryCode);
 }
 
-export function getStaticUrl(src) {
-  return PUBLIC_PATH ? `${PUBLIC_PATH}${src}` : src;
-}
 let uniqueId = 1;
 export function getUniqueId() {
   return uniqueId++;
@@ -110,8 +90,12 @@ export function getUserSexClass(user: UserModel) {
 }
 
 export function getSmileyHtml (symbol: string) {
-  let smiley = codes[symbol];
-  return `<img src="${getSmileyPath(smiley.tabName, smiley.src)}" symbol="${symbol}" alt="${smiley.alt}">`;
+  let smile: Smile;
+  Object.keys(smileys).forEach(k => {
+    smile = smile || smileys[k][symbol];
+  });
+
+  return `<img src="${smile.src}" symbol="${symbol}" alt="${smile.alt}">`;
 }
 
 export const isDateMissing = (function() {
@@ -183,7 +167,7 @@ function encodeFiles(html, files) {
           let className = v.type === 'v' ? 'video-player' : 'video-player video-record';
           return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
         } else if (v.type === 'a') {
-         return `<img src='${getStaticUrl(recordIcon as string)}' imageId='${v.id}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
+         return `<img src='${recordIcon}' imageId='${v.id}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
         } else {
           globalLogger.error('Invalid type {}', v.type)();
         }
@@ -395,7 +379,7 @@ export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
   img.className = `recorded-audio ${PASTED_IMG_CLASS}`;
   setBlobName(file);
   savedFiles[associatedAudio] = file;
-  img.src = getStaticUrl(recordIcon as string);
+  img.src = recordIcon as string;
   pasteNodeAtCaret(img, textArea);
 }
 

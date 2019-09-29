@@ -4,6 +4,7 @@ import Api from './api';
 import Vue from 'vue';
 import MessageHandler from './MesageHandler';
 import {checkAndPlay, incoming, login, logout, outgoing} from './audio';
+import faviconUrl from '../assets/img/favicon.ico';
 
 import {
   ChangeOnlineEntry,
@@ -44,7 +45,6 @@ import {MessageModelDto, RoomDto, UserDto} from '../types/dto';
 import {convertFiles, convertUser, getRoomsBaseDict} from '../types/converters';
 import WsHandler from './WsHandler';
 import NotifierHandler from './NotificationHandler';
-import {faviconUrl} from './htmlApi';
 import {sub} from './sub';
 
 export default class ChannelsHandler extends MessageHandler {

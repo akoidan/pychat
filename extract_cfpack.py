@@ -56,8 +56,18 @@ def write_smile( cats, count, f, item, smileys, start_char):
 
 def create_json_info( info):
 
-	info_file_name = os.sep.join((SMILEYS_ROOT, 'info.json'))
-	with open(info_file_name, 'w') as f:
+
+	out = ""
+	with open(OUTPUT_TS_FILE, 'w') as f:
+		for (group,values) in info.items():
+			for (k,v) in values.items():
+				filename = v['src']
+				if not filename.endswith('.gif'):
+					raise Exception("Invalid file name {}".format(filename))
+				file_without_gif = filename[:-len('.gif')]
+				out += "import {group}_{value} from '../assets/smileys/{group}/{filename}';\n".format(group=group, value=file_without_gif, filename=filename)
+				v['src'] = '{group}_{value}'.format(group=group, value=file_without_gif)
+		f.write(out)
 		f.write(json.dumps(info))
 
 def handle():
@@ -84,6 +94,7 @@ file_names_pattern = {
 START_CHAR = 13313
 root_path=os.path.dirname(os.path.realpath(__file__))
 SMILEYS_ROOT = os.sep.join((root_path,'fe', 'src', 'assets', 'smileys'))
+OUTPUT_TS_FILE = os.sep.join((root_path,'fe', 'src', 'utils', 'staticFiles.ts'))
 smiley_pattern = re.compile(r'^:.*:$')
 pack_path = os.sep.join((root_path, 'DefaultSmilies.cfpack'))
 

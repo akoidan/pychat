@@ -40,9 +40,6 @@ declare -a files=(\
     "$FONT_DIR/fontello.woff2"
     "$FONT_DIR/fontello.woff2"
     "$SASS_DIR/partials/fontello.scss"
-    "$SMILEYS_DIR"
-    "$SMILEYS_DIR/info.json"
-    "$SMILEYS_DIR/base/000a.gif"
 )
 
 create_venv() {
@@ -103,7 +100,7 @@ check_files() {
         printError "$path_failed2 is missing"
       done
       if [ "$1" = "remove_script" ]; then
-        printError "Please report for missing files at https://github.com/Deathangel908/pychat/issues/new"
+        printError "Please report for missing files at https://github.com/akoidan/pychat/issues/new"
       fi
       exit 1
     else
@@ -441,7 +438,6 @@ elif [ "$1" = "download_icon" ]; then
     printOut "You can view them at https://localhost:8000/static/demo.html"
 elif [ "$1" == "all" ]; then
     remove_old_files
-    generate_smileys
     post_fontello_conf
     download_fontello
     check_files "remove_script"

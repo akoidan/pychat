@@ -11,12 +11,12 @@ import {browserVersion, webrtcApi} from '../utils/singletons';
 import MessageHandler from '../utils/MesageHandler';
 import {sub} from '../utils/sub';
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from '../utils/consts';
-import {faviconUrl, requestFileSystem} from '../utils/htmlApi';
+import {requestFileSystem} from '../utils/htmlApi';
 import {bytesToSize} from '../utils/utils';
 import FileReceiverPeerConnection from './FileReceiveerPeerConnection';
 import Subscription from '../utils/Subscription';
 import CallHandler from './CallHandler';
-
+import faviconUrl from '../assets/img/favicon.ico';
 export default class WebRtcApi extends MessageHandler {
 
   protected logger: Logger;

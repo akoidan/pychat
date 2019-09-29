@@ -10,7 +10,6 @@
   import {RoomModel, UserModel} from "../../types/model";
   import {
     getFlagPath,
-    getStaticUrl,
     getUserSexClass
   } from "../../utils/htmlApi";
 

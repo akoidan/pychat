@@ -192,7 +192,7 @@ export default class NotifierHandler {
     if (this.unloaded) {
       return;
     }
-    if (this.isTabMain) {
+    if (this.isTabMain()) {
       localStorage.setItem(LAST_TAB_ID_VARNAME, '0');
     }
     this.unloaded = true;

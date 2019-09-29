@@ -166,9 +166,7 @@ const getConfig = async () => {
     definePlugin,
     new VueLoaderPlugin(),
     new CopyWebpackPlugin([
-      {from: './src/assets/smileys', to: 'smileys'},
       {from: './src/assets/manifest.json', to: ''},
-      {from: './src/assets/flags', to: 'flags'},
     ]),
     htmlWebpackPlugin,
   ];
@@ -230,7 +228,7 @@ const getConfig = async () => {
     entry: ['./src/main.ts'],
     plugins,
     resolve: {
-      extensions: ['.ts', '.js', '.vue', '.json'],
+      extensions: ['.ts', '.js', '.vue'],
       alias: {
         'vue': 'vue/dist/vue.js',
         '~': path.resolve(__dirname, 'src'),
@@ -280,13 +278,32 @@ const getConfig = async () => {
           options: getOptions('sounds')
         },
         {
-          test: /assets\/img\/.*\.(png|jpg|svg)$/,
-          loader: 'url-loader',
-          options: getOptions('img', {
-            limit: 32000,
-            fallback: "file-loader"
-          })
+          test: /assets\/flags\/.*\.png$/,
+          loader: 'file-loader',
+          options: getOptions('flags')
+        },
+        {
+          test: /assets\/smileys\/.*\.gif$/,
+          loader: 'file-loader',
+          options: getOptions('smileys')
+        },
+        {
+          test: /assets\/img\/.*\.(png|jpg|svg|gif)$/,
+          loader: 'file-loader',
+          options: getOptions('img')
         }
+        // FUCK url loader, http2 works competely fine,
+        // we get rid of bugs like https://data:image
+        // we don't need to increase file size of main.js that loads CPU
+        // we don't need that nor for electron/cordova
+        // {
+        //   test: /assets\/img\/.*\.(png|jpg|svg|gif)$/,
+        //   loader: 'url-loader',
+        //   options: getOptions('img', {
+        //     limit: options.IS_ANDROID || options.IS_ELECTRON ? 1: 32000,
+        //     fallback: "file-loader"
+        //   })
+        // }
       ],
     },
   };
