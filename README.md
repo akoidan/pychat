@@ -374,10 +374,8 @@ export class MyComp extends Vue {
 development.json and production.json have the following format:
 ```json
 {
-  "WS_API_URL": "websocket adress",
-  "STATIC_API_URL": "url for static files",
-  "XHR_API_URL": "ajax url",
-  "IS_DEBUG": "set true for development",
+  "BACKEND_ADDRESS": "e.g. pychat.org:443, protocol shouldn't be there, note there's no trailing slash, you can specify '{}' to use the same host as files served with",
+  "IS_DEBUG": "set true for development and debug mode enabled",
   "GOOGLE_OAUTH_2_CLIENT_ID" : "check chat/settings_example.py",
   "FACEBOOK_APP_ID": "check chat/settings_example.py",
   "MANIFEST": "manifest path for firebase push notifications e.g.`/manifest.json`",

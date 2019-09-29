@@ -1,7 +1,5 @@
 {
-    "WS_API_URL": "wss://{}/ws",
-    "STATIC_API_URL": "",
-    "XHR_API_URL": "/api",
+    "BACKEND_ADDRESS": "{}",
     "IS_DEBUG": true,
     "GOOGLE_OAUTH_2_CLIENT_ID": false,
     "FACEBOOK_APP_ID": false,
