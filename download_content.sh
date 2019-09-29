@@ -374,6 +374,15 @@ create_django_tables() {
     safeRunCommand python3 ./manage.py fill_data
 }
 
+android() {
+  cd ./fe
+  yarn run android
+  ./node_modules/.bin/cordova build
+  adb -d push ./platforms/android/app/build/outputs/apk/debug/app-debug.apk /data/local/tmp/
+  adb -d shell pm uninstall org.pychat
+  adb -d shell pm install /data/local/tmp/app-debug.apk
+}
+
 generate_secret_key() {
     if [ ! -f "$PROJECT_ROOT/chat/settings.py" ]; then
         printError "File $PROJECT_ROOT/chat/settings.py doesn't exist. Create it before running the command"
@@ -427,6 +436,8 @@ elif [ "$1" = "smileys" ]; then
     generate_smileys
 elif [ "$1" = "print_icon_session" ]; then
     show_fontello_session
+elif [ "$1" = "android" ]; then
+    android
 elif [ "$1" = "redirect" ]; then
     safeRunCommand sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8080
     safeRunCommand sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 443 -j REDIRECT --to-ports 8080
@@ -451,6 +462,7 @@ else
     chp all "Downloads all content required for project"
     chp check_files "Verifies if all files are installed"
     chp zip_extension "Creates zip acrhive for ChromeWebStore from \e[96mscreen_cast_extension \e[0;33;40mdirectory"
+    chp android "Deploys android app"
     printf " \e[93mIcons:\n\e[0;37;40mTo edit icons execute \e[92mgenerate_icon_session\e[0;37;40m, edit icons in opened browser and click Save session button. Afterwords execute \e[92mdownload_icon\n"
     chp generate_icon_session "Creates fontello session from config.json and saves it to \e[96m .fontello \e[0;33;40mfile"
     chp print_icon_session "Shows current used url for editing fonts"

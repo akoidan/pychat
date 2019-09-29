@@ -50,7 +50,7 @@
     @Prop() value;
     private event: (E: MessageEvent) => any = null;
 
-    private ifIframeUrl: string = CAPTCHA_IFRAME;
+    private ifIframeUrl: string = `${CAPTCHA_IFRAME}?site_key=${RECAPTCHA_PUBLIC_KEY}`;
 
 
     @Watch('value')

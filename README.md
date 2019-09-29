@@ -170,10 +170,9 @@ This is harsh. If you're not familiar with android SDK I would recommend doing t
  - `./fe/node_modules/.bin/cordova platforms add android`
  -  Create production.json based on [Frontend config](#frontend-config)
  - `yarn run android`
- - `./node_modules/.bin/cordova run`
- - Transfer apk file to your android device. `adb push ./fe/platforms/android/app/build/outputs/apk/debug/app-debug.apk
- /data/local/tmp/`  You can use `adb -d` for real device, or `adb -e` for emulator if you run both)
- - Install transferred apk file to your android device: `adb shell pm install "/data/local/tmp/app-debug.apk`
+ - `./node_modules`
+ - `bash download_content.sh android`
+
 
 # Development setup
 Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like webpack.config.js or development.json aren't affected. Take a look at [development.json](development.json). To run dev-server use `yarn run dev`. You can navigate to http://localhost:9084

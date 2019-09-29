@@ -108,10 +108,17 @@ const {options, definePlugin, optimization, configFile, startCordova} = function
   }
   options.IS_SSL = true;
   if (options.IS_ELECTRON || options.IS_ANDROID) {
-    if (isProd) {
+    if (isProd && !startCordova) {
+      // before we reassigned PUBLIC_PATH
+      if (options.PUBLIC_PATH) {
+        options.CAPTCHA_IFRAME = `${options.PUBLIC_PATH}/recaptcha.html`;
+      } else {
+        options.CAPTCHA_IFRAME = `${options.IS_SSL? 'https': 'http'}://${options.BACKEND_ADDRESS}/recaptcha.html`;
+      }
       options.PUBLIC_PATH = './'
     } else {
-      options.PUBLIC_PATH = `https://localhost:${DEV_PORT}/`
+      options.PUBLIC_PATH = `https://localhost:${DEV_PORT}/`;
+      options.CAPTCHA_IFRAME = `${options.PUBLIC_PATH}/recaptcha.html`;
     }
   }
 
