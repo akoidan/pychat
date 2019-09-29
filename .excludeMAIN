@@ -11,10 +11,9 @@ test/
 dump.rdb
 
 fe/electron_dist/
-fe/platforms/
-fe/plugins/
 
 !fe/www/.gitkeep
+fe/platforms/android/app/src/main/assets
 fe/www/*
 
 photos

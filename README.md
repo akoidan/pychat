@@ -167,12 +167,8 @@ Use [nativifier](https://github.com/jiahaog/nativefier#installation) to create a
 ## Android app
 This is harsh. If you're not familiar with android SDK I would recommend doing the steps below from AndroidStudio:
  - Install android sdk, android platform tools. accept license
- - `./fe/node_modules/.bin/cordova platforms add android`
  -  Create production.json based on [Frontend config](#frontend-config)
- - `yarn run android`
- - `./node_modules`
  - `bash download_content.sh android`
-
 
 # Development setup
 Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like webpack.config.js or development.json aren't affected. Take a look at [development.json](development.json). To run dev-server use `yarn run dev`. You can navigate to http://localhost:9084
