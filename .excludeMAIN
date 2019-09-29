@@ -13,7 +13,9 @@ dump.rdb
 fe/electron_dist/
 fe/platforms/
 fe/plugins/
-fe/www/
+
+!fe/www/.gitkeep
+fe/www/*
 
 photos
 fe/yarn.lock
@@ -46,10 +48,6 @@ fe/awesome-typescript-loader
 .fontello
 fe/node_modules
 fe/dist
-fe/android/www
-fe/android/plugins
-fe/android/platforms
-fe/android/node_modules
 rootfs/etc/nginx/ssl/*
 chat/static/demo.html
 rootfs/etc/nginx/ssl/server.key
