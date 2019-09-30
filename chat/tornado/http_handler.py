@@ -530,7 +530,7 @@ class HttpHandler(MethodDispatcher):
 			browser=browser,
 			issue=issue_object
 		)
-		username = User.objects.get(id=self.user_id).username if user_id else None
+		username = User.objects.get(id=user_id).username if user_id else None
 
 		yield self.__mail_admins(
 			"{} reported issue".format(username),
