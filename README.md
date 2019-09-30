@@ -23,7 +23,6 @@
        * [Windows](#windows)
        * [Ubuntu](#ubuntu)
        * [Archlinux](#archlinux)
-       * [CentOs](#centos)
      * [Bootstrap files](#bootstrap-files)
      * [Configure Pycharm if you use it](#configure-pycharm-if-you-use-it)
      * [Start services and run](#start-services-and-run)
@@ -222,7 +221,7 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
    - Put `Settings:` to `chat/settings.py`
  2. `Settings` -> `Project pychat` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `pychatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
  3. `Settings` -> `Project: pychat` -> `Project structure`
-  - You might want to exclude: `.idea`, `chat/static/css`
+  - You might want to exclude: `.idea`
   - mark `templates` directory as `Template Folder`
  4. Add tornado script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `start_tornado`. Remove port value.
 
