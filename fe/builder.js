@@ -328,7 +328,7 @@ const getConfig = async () => {
 };
 
 
-const getSimpleConfig = async (mainFile, dist, entry, target) => {
+function getSimpleConfig(mainFile, dist, entry, target) {
   return {
     entry,
     target,
@@ -356,7 +356,7 @@ const getSimpleConfig = async (mainFile, dist, entry, target) => {
     ],
     devtool: '#source-map'
   };
-};
+}
 
 async function runElectron(mainPath) {
   return new Promise((resolve, reject) => {
@@ -384,30 +384,31 @@ async function runElectron(mainPath) {
 }
 
 
+function runWebpack(config) {
+  return new Promise((resolve, reject) => {
+    webpack(config, (err, stats) => {
+      if (err) {
+        reject(err);
+      }
+      if (stats.compilation.errors.length) {
+        reject(stats.compilation.errors)
+      } else {
+        console.log(stats.toString({
+          chunks: false,  // Makes the build much quieter
+          colors: true    // Shows colors in the console
+        }));
+        resolve();
+      }
+    })
+  });
+}
+
 async function setup() {
 
   let config = await getConfig();
 
   if (options.IS_PROD) {
-    const webpack = require('webpack');
-    let stats = await new Promise((resolve, reject) => {
-      webpack(config, (err, stats,asd ) => {
-        if (err) {
-          reject(err);
-        }
-        if (stats.compilation.errors.length) {
-          reject(stats.compilation.errors)
-        } else {
-          resolve(stats);
-        }
-      })
-    });
-    console.log(stats.toString({
-      chunks: false,  // Makes the build much quieter
-      colors: true    // Shows colors in the console
-    }));
-
-
+    await runWebpack(config);
   } else {
     let [key, cert, ca] = await Promise.all(
       ['key.pem', 'server.crt', 'csr.pem'].map(e => new Promise(
@@ -447,29 +448,14 @@ async function setup() {
     });
 
   }
-  let processSingleFile = async function (electronConfig) {
-    let stats = await new Promise((resolve, reject) => {
-      webpack(electronConfig, (err, stats) => {
-        if (err) {
-          reject(err)
-        } else {
-          resolve(stats)
-        }
-      })
-    });
-    console.log(stats.toString({
-      chunks: false,  // Makes the build much quieter
-      colors: true    // Shows colors in the console
-    }));
-  };
   if (options.IS_ELECTRON) {
-    let config = await getSimpleConfig(
+    let config = getSimpleConfig(
       'electron.js',
       options.IS_PROD ? getDist() : '/tmp/',
       ['./src/electron.ts'],
       'electron-main',
     );
-    await processSingleFile(config);
+    await runWebpack(config);
     if (options.IS_PROD) {
 
     } else {
@@ -477,19 +463,16 @@ async function setup() {
     }
   } else if(startCordova) {
     require('loud-rejection/register');
-    const util = require('util');
-    const { events, CordovaError } = require('cordova-common');
     const cli = require('cordova/src/cli');
-
     await cli([null, null, 'run']);
 
   } else if (options.IS_WEB) {
-    let config = await getSimpleConfig(
+    let config = getSimpleConfig(
       'sw.js',
       options.IS_PROD ? getDist() : '/tmp/',
       ['./src/sw.ts']
     );
-    await processSingleFile(config);
+    await runWebpack(config);
   }
 }
 
