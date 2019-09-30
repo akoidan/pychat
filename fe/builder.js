@@ -391,11 +391,15 @@ async function setup() {
   if (options.IS_PROD) {
     const webpack = require('webpack');
     let stats = await new Promise((resolve, reject) => {
-      webpack(config, (err, stats) => {
+      webpack(config, (err, stats,asd ) => {
         if (err) {
           reject(err);
         }
-        resolve(stats);
+        if (stats.compilation.errors.length) {
+          reject(stats.compilation.errors)
+        } else {
+          resolve(stats);
+        }
       })
     });
     console.log(stats.toString({
@@ -490,5 +494,5 @@ async function setup() {
 }
 
 setup().catch(e => {
-  throw e
+  process.exit(1);
 });

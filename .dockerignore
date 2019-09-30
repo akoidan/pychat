@@ -11,6 +11,7 @@
 !fe/src
 !fe/package.json
 !fe/tsconfig.json
+!fe/tsconfig.esnext.json
 !fe/webpack.config.js
 !fe/builder.js
 !docker/populate
