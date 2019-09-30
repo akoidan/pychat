@@ -26,6 +26,7 @@ fe/src/assets/font/*
 .venv
 video.txt
 fe/package-lock.json
+fe/platforms/android/cordova/node_modules
 fe/production.json
 chat.log
 fe/src/assets/demo.html
