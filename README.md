@@ -3,7 +3,7 @@
  [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat.svg?label=docker%3Aprod)](https://hub.docker.com/r/deathangel908/pychat)
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat-test.svg?label=docker%3Atest)](https://hub.docker.com/r/deathangel908/pychat-test) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)
 
-# Live demo: [pychat.org](https://pychat.org/) [Tutorial video](https://www.youtube.com/watch?v=m6sJ-blTidg)
+# Live demo: [pychat.org](https://pychat.org/), [video](https://www.youtube.com/watch?v=m6sJ-blTidg)
 
 # Table of contents
   * [About](#about)
@@ -15,6 +15,7 @@
           * [Archlinux prod](#archlinux-prod)
           * [CentOs prod](#centos-prod)
           * [Common](#common)
+      # [Frontend](#frontend)
       * [Desktop app](#desktop-app)
       * [Android app](#android-app)
   * [Development setup](#development-setup)
@@ -153,6 +154,11 @@ Services commands for CentOs:
  - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
  - If something doesn't work you want to check `pychat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
 
+## Frontend
+ - `cd fe; nvm use 8.9.0`
+ - `yarn install`
+ - Create production.json based on [Frontend config](#frontend-config)
+ - Run `yarn run prod`. This generates static files in `fe/dist` directory.
 
 ## Desktop app
 Pychat uses websql and built the way so it renders everything possible w/o network. You have 2 options:
@@ -167,20 +173,18 @@ Use [nativifier](https://github.com/jiahaog/nativefier#installation) to create a
 ## Android app
 This is harsh. If you're not familiar with android SDK I would recommend doing the steps below from AndroidStudio:
  - Install android sdk, android platform tools. accept license
- -  Create production.json based on [Frontend config](#frontend-config)
+ - Create production.json based on [Frontend config](#frontend-config)
  - `bash download_content.sh android`
 
 # Development setup
-Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. Take a look at [development.json](development.json). To run dev-server use `yarn run dev`. You can navigate to http://localhost:9084
 
-Further instructions assume you already cloned the repo, and `cd` into it.
-
-# Development setup
 The flow is the following
  - Install OS packages depending on your OS type
  - Bootstrap files
  - Follow instructions in [fe](fe/README.md)
  - Start services and check if it works
+
+Further instructions assume you already cloned the repo, and `cd` into it.
 
 ## Install OS packages
 This section depends on the OS you use. I tested full install on Windows/Ubuntu/CentOs/Archlinux/Archlinux(rpi2 armv7). [pychat.org](https://pychat.org) currently runs on Archlinux rpi2.
@@ -224,10 +228,9 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 
 ## Build frontend
 I would recommend to use version node 8.9.0, `nvm use 8.9.0`. You can install nvm with [archlinux](https://wiki.archlinux.org/index.php/Node.js_) [ubuntu](https://qiita.com/shaching/items/6e398140432d4133c866) [windows](https://github.com/coreybutler/nvm-windows). 
-
  - To get started install dependencies first: `yarn install` # or use npm if you're old and cranky
- - Take a look at copy [development.json](fe/development.json], copy it to `fe/production.json`. The description is at [Frontend config](#frontend-config)
- - Run `yarn run prod`. This generates static files in `fe/dist` directory.
+ - Take a look at copy [development.json](fe/development.json]`. The description is at [Frontend config](#frontend-config)
+ - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. Take a look at [development.json](development.json). To run dev-server use `yarn run dev`. You can navigate to http://localhost:8080
  - To build android use `yarn run android -- 192.168.1.55` where 55 is your bridge ip address
  - To run electron use `yarn run electronDev`. This will start electron dev. and generate `/tmp/electron.html` and `/tmp/electron.js` 
   
