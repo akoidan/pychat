@@ -12,6 +12,7 @@
 !fe/package.json
 !fe/tsconfig.json
 !fe/webpack.config.js
+!fe/builder.js
 !docker/populate
 !docker/tornado
 !docker/nginx.conf
