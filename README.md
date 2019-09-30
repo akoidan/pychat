@@ -15,7 +15,7 @@
           * [Archlinux prod](#archlinux-prod)
           * [CentOs prod](#centos-prod)
           * [Common](#common)
-      # [Frontend](#frontend)
+      * [Frontend](#frontend)
       * [Desktop app](#desktop-app)
       * [Android app](#android-app)
   * [Development setup](#development-setup)
@@ -385,6 +385,7 @@ development.json and production.json have the following format:
 ```
 
 # TODO
+* Add google and fb auth via iframe 
 * compile to bytenode for electron https://github.com/OsamaAbbas/bytenode
 * Add codepart to live code
 * https://static.pychat.org/main.js?5db3927a045ba970fade:17390:17 Uncaught Error: setLocalStreamSrc roomDict {}, {"id":1,"state":null} OBJ:  Error: setLocalStreamSrc roomDict {}, {"id":1,"state":null}
