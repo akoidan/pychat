@@ -384,6 +384,7 @@ development.json and production.json have the following format:
 ```
 
 # TODO
+* npm run stats
 * Add google and fb auth via iframe 
 * compile to bytenode for electron https://github.com/OsamaAbbas/bytenode
 * Add codepart to live code

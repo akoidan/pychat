@@ -12,7 +12,7 @@
     "electronDev": "PLATFORM=electron BUILD_MODE=development node ./builder.js",
     "electronProd": "PLATFORM=electron BUILD_MODE=production node ./builder.js",
     "android": "PLATFORM=android BUILD_MODE=production node ./builder.js",
-    "cp-prod-files": "tar c dist/ | ssh http@192.168.1.11 -p 8886 \"rm -rf /srv/http/pychat/fe/dist && tar x -C /srv/http/pychat/fe/\"",
+    "cp-prod-files": "tar c dist/ | ssh http@pychat.org -p 8886 \"rm -rf /srv/http/pychat/fe/dist && tar x -C /srv/http/pychat/fe/\"",
     "publish": "yarn run prod && yarn run cp-prod-files",
     "test": "mocha test/index.ts",
     "clean": "rm -rf ./node_modules/.cache",
