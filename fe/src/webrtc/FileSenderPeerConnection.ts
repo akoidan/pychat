@@ -29,7 +29,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     let asft:  AddSendingFileTransfer = {
       connId,
       transferId: opponentWsId,
-      roomId: 1,
+      roomId,
       transfer: {
         status: FileTransferStatus.NOT_DECIDED_YET,
         error: null,
