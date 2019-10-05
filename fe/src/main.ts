@@ -37,6 +37,10 @@ Vue.mixin({
   },
 });
 
+Vue.directive('validity', function (el: HTMLInputElement, binding) {
+  el.setCustomValidity(binding.value);
+});
+
 Vue.prototype.$api = api;
 Vue.prototype.$ws = ws;
 

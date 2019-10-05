@@ -1,19 +1,19 @@
 <template>
   <form id='register-form' method='post' @submit.prevent='register' ref="form">
     <register-field-set icon="icon-user" :validation="userCheckValue" :closed="userFoc" :description="userDescription" >
-      <input type='text' maxlength='16' autocomplete="username" required placeholder='Username' ref="username" v-model.trim="username" name='username' class="input" @focus="userFoc = false" @blur="userFoc = true"/>
+      <input type='text' v-validity="usernameValidity" maxlength='16' autocomplete="username" required placeholder='Username'  v-model.trim="username" name='username' class="input" @focus="userFoc = false" @blur="userFoc = true"/>
     </register-field-set>
     <register-field-set icon="icon-lock" :validation="passwordCheckValue" :closed="passwordFoc" :description="passwordDescription" >
-      <input ref="password" type= 'password' autocomplete="new-password" required name='password' class="input" placeholder='Password'  @focus="passwordFoc = false"  v-model="password" @blur="passwordFoc = true"/>
+      <input type= 'password' v-validity="passwordValidity" autocomplete="new-password" required name='password' class="input" placeholder='Password'  @focus="passwordFoc = false" v-model="password" @blur="passwordFoc = true"/>
     </register-field-set>
     <register-field-set icon="icon-lock" :validation="repPassCheckValue" :closed="repPassFoc" :description="repPassDescription" >
-      <input ref="repPass" autocomplete="new-password" type='password' required class="input" placeholder='Repeat password'  @focus="repPassFoc = false"  v-model="repPass" @blur="repPassFoc = true"/>
+      <input  autocomplete="new-password" v-validity="repPassValidity" type='password' required class="input" placeholder='Repeat password'  @focus="repPassFoc = false"  v-model="repPass" @blur="repPassFoc = true"/>
     </register-field-set>
     <register-field-set icon="icon-mail" :validation="emailCheckValue" :closed="emailFoc" :description="emailDescription" >
-      <input type='email' ref="email" autocomplete="email" placeholder='Email' name='email' class="input" @focus="emailFoc = false"  v-model.trim="email" @blur="emailFoc = true"/>
+      <input type='email' autocomplete="email" v-validity="emailValidity" placeholder='Email' name='email' class="input" @focus="emailFoc = false"  v-model.trim="email" @blur="emailFoc = true"/>
     </register-field-set>
     <register-field-set icon="icon-user-pair" :validation="sexCheckValue" :closed="sexFoc" :description="sexDescription">
-      <select ref="sex" name='sex' class="input" @focus="sexFoc = false" v-model.trim="sex" @blur="sexFoc = true">
+      <select name='sex' class="input" @focus="sexFoc = false" v-model.trim="sex" @blur="sexFoc = true">
         <option value='Secret' disabled selected hidden>Gender</option>
         <option value='Male'>Male</option>
         <option value='Female'>Female</option>
@@ -46,10 +46,6 @@
 
     $refs: {
       form: HTMLFormElement,
-      username: HTMLInputElement,
-      password: HTMLInputElement,
-      repPass: HTMLInputElement,
-      email: HTMLInputElement,
     };
 
     created() {
@@ -61,6 +57,10 @@
 
     userFoc: boolean = true;
     username: string = "";
+    usernameValidity: string = "";
+    passwordValidity: string = "";
+    repPassValidity: string = "";
+    emailValidity: string = "";
     userDescription: string = 'Please select username';
     userCheckValue: IconColor = IconColor.NOT_SET;
     debouncedValidateUserName: Function;
@@ -74,7 +74,7 @@
       }
       this.$api.validateUsername(username, errors => {
         this.userCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
-        this.$refs.username.setCustomValidity(errors ? errors : "");
+        this.usernameValidity = errors ? errors : "";
         this.currentValidateUsernameRequest = null;
         this.userDescription = errors ? errors : `Username is ok!`;
       });
@@ -85,13 +85,13 @@
       if (username === "") {
         this.userCheckValue = IconColor.ERROR;
         this.userDescription = "Username can't be empty";
-        this.$refs.username.setCustomValidity(this.userDescription);
+        this.usernameValidity = this.userDescription;
       } else if (!/^[a-zA-Z-_0-9]{1,16}$/.test(username)) {
         this.userDescription = "Username can only contain latin letters, numbers, dashes or underscore";
-        this.$refs.username.setCustomValidity(this.userDescription);
+        this.usernameValidity = this.userDescription;
         this.userCheckValue = IconColor.ERROR;
       } else {
-        this.$refs.username.setCustomValidity("checking...");
+        this.usernameValidity = "checking...";
         this.userCheckValue = IconColor.NOT_SET;
         this.debouncedValidateUserName(username)
       }
@@ -106,19 +106,19 @@
     onPasswordChange(pswd: string) {
       if (pswd.length === 0) {
         this.passwordDescription = 'Come up with strong password';
-        this.$refs.password.setCustomValidity(this.passwordDescription);
+        this.passwordValidity = this.passwordDescription;
         this.passwordCheckValue = IconColor.ERROR;
       } else if (!/^\S.+\S$/.test(pswd)) {
         this.passwordCheckValue = IconColor.ERROR;
         this.passwordDescription = "Password is too short";
-        this.$refs.password.setCustomValidity(this.passwordDescription);
+        this.passwordValidity = this.passwordDescription;
       } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{5,}$/.test(pswd) && pswd.length < 11) {
         this.passwordDescription = "Password is weak! Good one contains at least 5 characters, one big letter small letter and a digit";
-        this.$refs.password.setCustomValidity("");
+        this.passwordValidity = "";
         this.passwordCheckValue = IconColor.WARN;
       } else {
         this.passwordDescription = "Password is ok!";
-        this.$refs.password.setCustomValidity("");
+        this.passwordValidity = "";
         this.passwordCheckValue = IconColor.SUCCESS;
       }
     }
@@ -136,10 +136,10 @@
       if (this.repPass != this.password) {
         this.repPassCheckValue = IconColor.ERROR;
         this.repPassDescription = "Passwords don't match"
-        this.$refs.repPass.setCustomValidity(this.repPassDescription);
+        this.repPassValidity = this.repPassDescription;
       } else {
         this.repPassCheckValue = IconColor.SUCCESS;
-        this.$refs.repPass.setCustomValidity("");
+        this.repPassValidity =  "";
         this.repPassDescription = "Passwords match";
       }
     }
@@ -160,7 +160,7 @@
       }
       this.currentValidateEmailRequest = this.$api.validateEmail(username, errors => {
         this.emailCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
-        this.$refs.email.setCustomValidity(errors ? errors : "");
+        this.emailValidity = errors ? errors : "";
         this.emailDescription = errors ? errors : `Email is ok!`;
         this.currentValidateEmailRequest = null;
       });
@@ -183,11 +183,11 @@
     onEmailChange(email: string) {
       if (email === "") {
         this.emailCheckValue = IconColor.WARN;
-        this.$refs.email.setCustomValidity("");
+        this.emailValidity = "";
         this.userDescription = "Well, it's still fine to leave it blank...";
       } else {
         this.emailCheckValue = IconColor.NOT_SET;
-        this.$refs.email.setCustomValidity("checking...");
+        this.emailValidity = "checking...";
         this.debouncedValidateEmail(email)
       }
     }
