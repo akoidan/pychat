@@ -112,7 +112,6 @@ export default class ChannelsHandler extends MessageHandler {
     if (this.sendingMessage[messageId]) {
       return this.sendingMessage[messageId].files;
     } else {
-      this.logger.error('Asking for unkown files {}', messageId)();
       return [];
     }
   }
