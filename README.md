@@ -324,49 +324,32 @@ The technologies stack used in project:
 
 Every vue component has injected `.$logger` object, to log something to console use `this.logger.log('Hello {}', {1:'world'})();` Note calling function again in the end. Logger is disabled for production. For more info visit [lines-logger](https://github.com/akoidan/lines-logger)
 
-This project uses [vue-property-decorator](https://github.com/kaorun343/vue-property-decorator) (that's has a dependency [vue-class-component](https://github.com/vuejs/vue-class-component)) [vuex-class](https://github.com/ktsn/vuex-class). You should write your component as the following:
+This project uses [vue-property-decorator](https://github.com/kaorun343/vue-property-decorator) (that's has a dependency [vue-class-component](https://github.com/vuejs/vue-class-component)) [vuex-module-decorators](https://github.com/championswimmer/vuex-module-decorators). You should write your component as the following:
 
 ```typescript
 import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator'
-import Component from 'vue-class-component'
-import {
-  State,
-  Getter,
-  Action,
-  Mutation,
-  namespace
-} from 'vuex-class'
 
 @Component
 export class MyComp extends Vue {
 
-  @State
-  private foo!: number;
-
-  @Getter
-  private readonly bar!: number;
-
-  @Action
-  private readonly baz!: Function;
-
-  @Mutation
-  private readonly qux!: Function;
-
   @Prop(Number) readonly propA!: number;
+  dataA: number = 0; // data directly maps to this
 
   @Watch('child')
   onChildChanged(val: string, oldVal: string) { }
 
   @Emit()
   changedProps() {}
+  
+  // getter example
+  get stateFoo() { // -> $store.state.foo
+    return this.store.foo; // this.$store.state.foo
+  }
 
   created () {
-    this.stateFoo // -> store.state.foo
-    this.stateBar // -> store.state.bar
-    this.getterFoo // -> store.getters.foo
-    this.actionFoo({ value: true }) // -> store.dispatch('foo', { value: true })
-    this.mutationFoo({ value: true }) // -> store.commit('foo', { value: true })
-    this.moduleGetterFoo // -> store.getters['path/to/module/foo']
+    this.propA // this.props.propA 
+    this.store.actionFoo({ value: true }) // -> this.$store.dispatch('foo', { value: true })
+    this.store.mutateA({ value: true }) // -> this.$store.commit('mutateA', { value: true })
   }
 }
 ```
@@ -387,6 +370,7 @@ development.json and production.json have the following format:
 ```
 
 # TODO
+* 
 * purge all callbacks to async code
 * move backend to be directory, fe to fe, docker to docker and etc
 * npm run stats
