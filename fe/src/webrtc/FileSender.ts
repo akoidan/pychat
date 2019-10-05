@@ -1,18 +1,17 @@
-import BaseTransferHandler from './BaseTransferHandler';
-import NotifierHandler from '../utils/NotificationHandler';
-import {FileTransferStatus, RootState, SendingFile} from '../types/model';
-import WsHandler from '../utils/WsHandler';
-import {Store} from 'vuex';
-import {DefaultMessage, ReplyFileMessage} from '../types/messages';
-import FileSenderPeerConnection from './FileSenderPeerConnection';
-import {AddSendingFileTransfer, RemovePeerConnection} from '../types/types';
-import {sub} from '../utils/sub';
-import Subscription from '../utils/Subscription';
+import BaseTransferHandler from '@/webrtc/BaseTransferHandler';
+import NotifierHandler from '@/utils/NotificationHandler';
+import {SendingFile} from '@/types/model';
+import WsHandler from '@/utils/WsHandler';
+import {DefaultMessage, ReplyFileMessage} from '@/types/messages';
+import FileSenderPeerConnection from '@/webrtc/FileSenderPeerConnection';
+import {sub} from '@/utils/sub';
+import Subscription from '@/utils/Subscription';
+import {DefaultStore} from'@/utils/store';
 
 export default class FileSender extends BaseTransferHandler {
   private file: File;
 
-  constructor(roomId: number, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>, file: File, time: number) {
+  constructor(roomId: number, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, file: File, time: number) {
     super(roomId, wsHandler, notifier, store);
     this.file = file;
     this.connectionId = connId;
@@ -25,7 +24,7 @@ export default class FileSender extends BaseTransferHandler {
       time,
       transfers: {},
     };
-    this.store.commit('addSendingFile', payload);
+    this.store.addSendingFile(payload);
   }
 
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {

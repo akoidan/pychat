@@ -28,23 +28,23 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation, Getter} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {IncomingCallModel, RoomDictModel, UserModel} from "../../types/model";
-  import {webrtcApi} from '../../utils/singletons';
+  import {IncomingCallModel, RoomDictModel, UserModel} from "@/types/model";
+  import {webrtcApi} from '@/utils/singletons';
 
   @Component
   export default class IncomingCall extends Vue {
 
     @Prop() call: IncomingCallModel;
-    @State allUsersDict : {[id: number]: UserModel};
-    @State roomsDict : RoomDictModel;
+    get allUsersDict(): {[id: number]: UserModel}  { return store.allUsersDict }
+    get roomsDict (): RoomDictModel  { return store.roomsDict  }
 
     get caller() {
       return this.allUsersDict[this.call.userId].user;
     }
 
-    get room() {
+    get room(): string {
       return this.roomsDict[this.call.roomId].name;
     }
 

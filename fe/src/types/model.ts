@@ -1,5 +1,3 @@
-import {UploadFile} from './types';
-
 export enum GrowlType {
   SUCCESS = 'col-success', INFO = 'col-info', ERROR = 'col-error'
 }
@@ -197,24 +195,4 @@ export interface IncomingCallModel {
   connId: string;
 }
 
-export interface RootState {
-  isOnline: boolean;
-  growls: GrowlModel[];
-  dim: boolean;
-  incomingCall: IncomingCallModel;
-  microphones: { [id: string]: string };
-  speakers: { [id: string]: string };
-  webcams: { [id: string]: string };
-  editedMessage: EditingMessage;
-  activeRoomId: number;
-  activeUserId: number;
-  userInfo: CurrentUserInfoModel;
-  userSettings: CurrentUserSettingsModel;
-  userImage: string;
-  allUsersDict: UserDictModel;
-  regHeader: string;
-  online: number[];
-  roomsDict: RoomDictModel;
-  mediaObjects: { [id: string]: MediaStream };
-}
 

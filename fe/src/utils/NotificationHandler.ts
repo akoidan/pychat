@@ -1,16 +1,12 @@
-import loggerFactory from './loggerFactory';
+import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import {extractError, forEach} from './utils';
-import {Store} from 'vuex';
-import {RootState} from '../types/model';
-import Api from './api';
-import WsHandler from './WsHandler';
-import store from '../store';
-import {
-  IS_DEBUG,
-  MANIFEST,
-  SERVICE_WORKER_URL
-} from './consts';
+import {extractError} from '@/utils/utils';
+import Api from '@/utils/api';
+import WsHandler from '@/utils/WsHandler';
+import {DefaultStore} from '@/utils/store';
+import {IS_DEBUG, MANIFEST, SERVICE_WORKER_URL} from '@/utils/consts';
+import {forEach} from '@/utils/htmlApi';
+
 const LAST_TAB_ID_VARNAME = 'lastTabId';
 
 export default class NotifierHandler {
@@ -24,14 +20,14 @@ export default class NotifierHandler {
   private isCurrentTabActive: boolean = false;
   private newMessagesCount: number = 0;
   private unloaded: boolean = false;
-  private store: Store<RootState>;
+  private store: DefaultStore;
   private readonly api: Api;
   private readonly browserVersion: string;
   private readonly isChrome: boolean;
   private readonly isMobile: boolean;
   private readonly ws: WsHandler;
 
-  constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: Store<RootState>) {
+  constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore) {
     this.api = api;
     this.browserVersion = browserVersion;
     this.isChrome = isChrome;
@@ -82,7 +78,7 @@ export default class NotifierHandler {
       not.onclick = () => {
         window.focus();
         if (not.data && not.data.roomId) {
-          this.store.commit('setActiveRoomId', parseInt(not.data.roomId));
+          this.store.setActiveRoomId(parseInt(not.data.roomId));
         }
         not.close();
       };
@@ -202,7 +198,7 @@ export default class NotifierHandler {
     localStorage.setItem(LAST_TAB_ID_VARNAME, this.currentTabId);
     if (e) {
       this.logger.trace('Marking current tab as active, pinging server')();
-      if (store.state.userInfo && this.ws.isWsOpen() && !IS_DEBUG) {
+      if (this.store.userInfo && this.ws.isWsOpen() && !IS_DEBUG) {
         this.ws.pingServer(); // if no event = call from init();
       }
     } else {

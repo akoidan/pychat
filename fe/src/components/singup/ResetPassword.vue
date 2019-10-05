@@ -14,10 +14,10 @@
 
 <script lang='ts'>
   import {Vue, Component, Prop} from "vue-property-decorator";
-  import AppSubmit from "../ui/AppSubmit.vue"
-  import {Action, Mutation} from "vuex-class";
+  import AppSubmit from "@/components/ui/AppSubmit.vue"
+  import {store} from '@/utils/storeHolder';
 
-  import CaptchaComponent from './CaptchaComponent.vue';
+  import CaptchaComponent from '@/components/singup/CaptchaComponent.vue';
 
   @Component({components: {CaptchaComponent, AppSubmit}})
   export default class ResetPassword extends Vue {
@@ -27,14 +27,10 @@
       repactha: HTMLElement;
     };
 
-    @Mutation setRegHeader;
-
-    @Action growlError;
-    @Action growlSuccess;
     running: boolean = false;
 
     created() {
-      this.setRegHeader('Restore password');
+      store.setRegHeader('Restore password');
     }
 
     restorePassword(event) {
@@ -42,9 +38,9 @@
       this.$api.sendRestorePassword(this.$refs.form, error => {
         this.running = false;
         if (error) {
-          this.growlError(error);
+          store.growlError(error)
         } else {
-          this.growlSuccess("We send you an reset password email, please follow the instruction in it");
+          store.growlSuccess("We send you an reset password email, please follow the instruction in it");
         }
       })
     }
@@ -54,9 +50,9 @@
 </script>
 <style lang="sass" scoped>
 
-  @import "partials/mixins"
-  @import "partials/variables"
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/mixins"
+  @import "~@/assets/sass/partials/variables"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   .slider
     @extend %slider

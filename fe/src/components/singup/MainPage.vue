@@ -11,14 +11,14 @@
 
 <script lang='ts'>
   import {Component, Vue} from "vue-property-decorator";
-  import {State} from "vuex-class";
-  import {AUTO_REGISTRATION} from '../../utils/consts';
-  import {api} from '../../utils/singletons';
-  import {login} from '../../utils/utils';
+  import {store} from '@/utils/storeHolder';
+  import {AUTO_REGISTRATION} from '@/utils/consts';
+  import {api} from '@/utils/singletons';
+  import {login} from '@/utils/utils';
 
   @Component
   export default class MainPage extends Vue {
-    @State regHeader: string;
+    get regHeader(): string  { return store.regHeader }
 
     getRandom(): string {
       return Math.random().toString(36).substring(7);
@@ -38,7 +38,7 @@
 <style lang="sass" scoped>
 
   @import 'partials/mixins.sass'
-  @import "partials/variables"
+  @import "~@/assets/sass/partials/variables"
   %top-btn-register
     border-top: 1px solid rgba(255, 255, 255, 0.6)
     border-left: 1px solid rgba(171, 171, 171, 0.83)

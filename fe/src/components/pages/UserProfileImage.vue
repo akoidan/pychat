@@ -12,26 +12,26 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-  import {canvasContext, resolveMediaUrl, stopVideo} from "../../utils/htmlApi";
-  import AppSubmit from '../ui/AppSubmit';
+  import {canvasContext, resolveMediaUrl, stopVideo} from "@/utils/htmlApi";
+  import AppSubmit from '@/components/ui/AppSubmit';
   @Component({
     components: {AppSubmit}
   })
   export default class UserProfileImage extends Vue {
 
-    @Action growlError;
-    @Action growlSuccess;
-    @Action growlInfo;
 
 
-    @State userImage: string;
+
+
+
+    get userImage(): string  { return store.userImage }
 
     @Watch('userImage')
     onUserImageChange(value: string) {
       this.srcImg = resolveMediaUrl(value);
-      this.growlInfo("New image has been set");
+      store.growlInfo("New image has been set");
     }
 
     created() {
@@ -69,7 +69,7 @@
           this.$refs.inputFile.value = '';
         }
       } else {
-        this.growlError("No files found in draggable object");
+        store.growlError("No files found in draggable object");
       }
     }
 
@@ -92,12 +92,12 @@
         let reader = new FileReader();
         reader.onload = (e) => {
           this.srcImg = reader.result as string;
-          this.growlSuccess("Photo has been rendered, click save to apply it");
+          store.growlSuccess("Photo has been rendered, click save to apply it");
         };
         reader.readAsDataURL(file);
         return true;
       } else {
-        this.growlError("Invalid file type " + file.type);
+        store.growlError("Invalid file type " + file.type);
         return false;
       }
     }
@@ -132,7 +132,7 @@
           this.blob = blob;
         },  'image/jpeg', 0.95);
         this.$refs.inputFile.value = '';
-        this.growlInfo('Image has been set. Click on "Finish" to hide video');
+        store.growlInfo('Image has been set. Click on "Finish" to hide video');
       }
     }
 
@@ -148,14 +148,14 @@
           this.srcVideo = stream;
           this.showVideo = true;
           this.isStopped = false;
-          this.growlInfo("Click on your video to take a photo")
+          store.growlInfo("Click on your video to take a photo")
         }, (e) => {
           this.logger.error('Error while trying to capture a picture "{}"', e.message || e.name)();
-          this.growlError(`Unable to use your webcam because ${e.message || e.name }`);
+          store.growlError(`Unable to use your webcam because ${e.message || e.name }`);
         });
       } else {
         this.stopVideo();
-        this.growlInfo("To apply photo click on save");
+        store.growlInfo("To apply photo click on save");
         this.showVideo = false;
         this.isStopped = true;
       }
@@ -168,15 +168,15 @@
 
     upload() {
       if (!this.blob) {
-        this.growlError("Please select image first")
+        store.growlError("Please select image first")
       } else {
         this.running = true;
         this.$api.uploadProfileImage(this.blob, (e) => {
           this.running = false;
           if (e) {
-            this.growlError(e)
+            store.growlError(e)
           } else {
-            this.growlSuccess("Image uploaded")
+            store.growlSuccess("Image uploaded")
           }
         })
       }

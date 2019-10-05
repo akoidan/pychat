@@ -26,22 +26,21 @@
 
 <script lang='ts'>
   import {Vue, Component, Prop, Watch} from "vue-property-decorator";
-  import {Mutation, Action} from "vuex-class";
-  import AppSubmit from "../ui/AppSubmit.vue"
-  import RegisterFieldSet from './RegisterFieldSet.vue'
+  import {store} from '@/utils/storeHolder';
+  import AppSubmit from "@/components/ui/AppSubmit.vue"
+  import RegisterFieldSet from '@/components/singup/RegisterFieldSet.vue'
   import debounce from 'lodash.debounce';
-  import {IconColor} from '../../types/types';
-  import sessionHolder from '../../utils/sessionHolder';
-  import {login} from '../../utils/utils';
-  import SocialAuth from './SocialAuth';
+  import {IconColor} from '@/types/types';
+  import sessionHolder from '@/utils/sessionHolder';
+  import {login} from '@/utils/utils';
+  import SocialAuth from '@/components/singup/SocialAuth';
 
   @Component({components: {SocialAuth, AppSubmit, RegisterFieldSet}})
   export default class SignUp extends Vue {
 
     @Prop() oauth_token: string;
     @Prop() fb_app_id: string;
-    @Mutation setRegHeader;
-    @Action growlError;
+
 
     running: boolean = false;
 
@@ -54,7 +53,7 @@
     };
 
     created() {
-      this.setRegHeader('Create new account');
+      store.setRegHeader('Create new account');
       this.debouncedValidateUserName = debounce(this.checkUserName, 500);
       this.debouncedValidateEmail = debounce(this.checkEmail, 500);
     }

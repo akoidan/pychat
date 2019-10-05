@@ -27,21 +27,21 @@
   </div>
 </template>
 <script lang="ts">
-  import {Getter, State} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Vue} from "vue-property-decorator";
-  import {RoomModel, SexModel, UserDictModel, UserModel} from "../../types/model";
-  import RoomUsersUser from './RoomUsersUser';
-  import RoomUsersPublic from './RoomUsersPublic';
-  import RoomUsersPrivate from './RoomUsersPrivate';
+  import {RoomModel, SexModel, UserDictModel, UserModel} from "@/types/model";
+  import RoomUsersUser from '@/components/chat/RoomUsersUser';
+  import RoomUsersPublic from '@/components/chat/RoomUsersPublic';
+  import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate';
   @Component({
     components: {RoomUsersPrivate, RoomUsersPublic, RoomUsersUser}
   })
   export default class RoomUsers extends Vue {
 
-    @Getter usersArray: UserDictModel;
-    @State activeRoomId: number;
-    @Getter publicRooms: RoomModel[];
-    @Getter privateRooms: { [id: string]: UserModel};
+    get usersArray(): UserModel[]  { return store.usersArray };
+    get activeRoomId(): number  { return store.activeRoomId }
+    get publicRooms(): RoomModel[]  { return store.publicRooms };
+    get privateRooms(): RoomModel[]  { return store.privateRooms };
 
     directMinified: boolean = false;
     roomsMinified: boolean = false;
@@ -68,9 +68,9 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/variables"
-  @import "partials/mixins"
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/variables"
+  @import "~@/assets/sass/partials/mixins"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   @mixin fix-user-icon-top-position()
     i:before

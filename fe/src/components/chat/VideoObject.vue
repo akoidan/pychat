@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts">
-  import {Mutation, State} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
 
   @Component
@@ -15,12 +15,10 @@
       video: HTMLVideoElement
     }
 
-    @State mediaObjects;
-
 
     @Watch("mediaStreamLink")
     onMediaStreamChanged(newValue) {
-      let stream: MediaStream = this.mediaObjects[newValue];
+      let stream: MediaStream = store.mediaObjects[newValue];
       this.logger.log("Media stream changed {} {}", newValue, stream)();
       if (stream) {
         this.$refs.video.srcObject = stream;

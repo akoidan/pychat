@@ -22,11 +22,11 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import AppSubmit from '../ui/AppSubmit';
-  import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from "../../utils/consts";
-  import {initFaceBook, initGoogle, login} from "../../utils/utils";
+  import AppSubmit from '@/components/ui/AppSubmit';
+  import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from "@/utils/consts";
+  import {initFaceBook, initGoogle, login} from "@/utils/utils";
 
   declare const gapi: any;
   declare const FB: any;
@@ -42,8 +42,8 @@
     googleToken: string = null;
     oauth_token: string = GOOGLE_OAUTH_2_CLIENT_ID;
     fb_app_id: string = FACEBOOK_APP_ID;
-    @Action growlInfo;
-    @Action growlError;
+
+
 
     get googleRunning() {
       return this.grunning || !this.googleApiLoaded;
@@ -57,19 +57,19 @@
       initGoogle(e => {
         this.googleApiLoaded = !e;
         if (e) {
-          this.growlError("Unable to load google" + e);
+          store.growlError("Unable to load google" + e);
         }
       });
       initFaceBook(e => {
         this.facebookApiLoaded = !e;
         if (e) {
-          this.growlError("Unable to load fb" + e);
+          store.growlError("Unable to load fb" + e);
         }
       });
     }
 
     sendGoogleTokenToServer(token, redirectToNextPage) {
-      this.growlInfo('Successfully logged into google successfully, proceeding...');
+      store.growlInfo('Successfully logged into google successfully, proceeding...');
       this.$api.googleAuth(token, redirectToNextPage);
     }
 
@@ -108,7 +108,7 @@
         auth2.signIn().catch( e=> {
           this.grunning = false;
           this.logger.error("auth2.signIn().catch {}", e)();
-          this.growlError("Initing error " + e);
+          store.growlError("Initing error " + e);
         });
       }
     }
@@ -118,14 +118,14 @@
       this.logger.debug('fbStatusChangeIfReAuth {}', response)();
       if (response.status === 'connected') {
         // Logged into your app and Facebook.
-        this.growlInfo("Successfully logged in into facebook, proceeding...");
+        store.growlInfo("Successfully logged in into facebook, proceeding...");
         this.$api.facebookAuth(response.authResponse.accessToken, (s, e) => {
           this.frunning = false;
           login(s, e);
         });
       } else if (response.status === "not_authorized") {
         this.frunning = false;
-        this.growlInfo("Allow facebook application to use your data");
+        store.growlInfo("Allow facebook application to use your data");
       } else {
         return true;
       }
@@ -147,8 +147,6 @@
 </script>
 
 <style lang="sass" scoped>
-
-  $img-path: "../../assets/img"
 
   div
     display: flex
@@ -176,7 +174,7 @@
 
   .g-icon
     &:before
-      background: url('#{$img-path}/g-icon.svg') no-repeat
+      background: url('~@/assets/img/g-icon.svg') no-repeat
       top: -8px
       left: -5px
     &:active:before
@@ -184,7 +182,7 @@
       left: -3px
   .f-icon
     &:before
-      background: url('#{$img-path}/f-icon.svg') no-repeat
+      background: url('~@/assets/img/f-icon.svg') no-repeat
       top: 5px
       left: 10px
     &:active:before

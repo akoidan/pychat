@@ -7,20 +7,19 @@
   </p>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation, Getter} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {CurrentUserInfoModel, UserModel} from "../../types/model";
-  import {timeToString} from "../../utils/htmlApi";
+  import {CurrentUserInfoModel, UserModel} from "@/types/model";
+  import {timeToString} from "@/utils/htmlApi";
 
   @Component
   export default class ChatChangeOnlineMessage extends Vue {
     @Prop() time: number;
     @Prop() userId: number;
     @Prop() isWentOnline: boolean;
-    @Mutation setActiveUserId;
 
-    @State allUsersDict: {[id: number]: UserModel};
-    @Getter myId: number;
+    get allUsersDict(): {[id: number]: UserModel}  { return store.allUsersDict }
+    get myId(): number  { return store.myId };
 
     get where () {
       let has = this.isMe ? "have " : "has ";
@@ -28,7 +27,7 @@
     }
 
     setActiveUser() {
-      this.setActiveUserId(this.userId);
+      store.setActiveUserId(this.userId);
     }
 
     get isUser() {

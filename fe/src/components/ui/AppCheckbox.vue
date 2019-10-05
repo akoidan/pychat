@@ -6,7 +6,7 @@
 </template>
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {getUniqueId} from "../../utils/htmlApi";
+  import {getUniqueId} from "@/utils/htmlApi";
 
   @Component
   export default class AppCheckbox extends Vue {
@@ -30,8 +30,8 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/mixins"
-  @import "partials/variables"
+  @import "~@/assets/sass/partials/mixins"
+  @import "~@/assets/sass/partials/variables"
 
   .color-reg input[type=checkbox], .color-lor input[type=checkbox]
     display: none

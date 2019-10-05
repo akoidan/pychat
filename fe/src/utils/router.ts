@@ -1,32 +1,32 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import sessionHolder from './utils/sessionHolder';
-import store from './store';
-import MainPage from './components/MainPage.vue';
-import ChannelsPage from './components/chat/MainPage.vue';
-import SignupPage from './components/singup/MainPage.vue';
-import ResetPassword from './components/singup/ResetPassword.vue';
-import Login from './components/singup/Login.vue';
-import SignUp from './components/singup/SignUp.vue';
-import UserProfile from './components/pages/UserProfile.vue';
-import InviteUser from './components/pages/InviteUser.vue';
-import ReportIssue from './components/pages/ReportIssue.vue';
-import UserProfileChangePassword from './components/pages/UserProfileChangePassword.vue';
-import UserProfileImage from './components/pages/UserProfileImage.vue';
-import UserProfileInfo from './components/pages/UserProfileInfo.vue';
-import UserProfileSettings from './components/pages/UserProfileSettings.vue';
-import CreatePrivateRoom from './components/pages/CreatePrivateRoom.vue';
-import PainterPage from './components/pages/PainterPage.vue';
-import AmChart from './components/pages/AmChart.vue';
-import CreatePublicRoom from './components/pages/CreatePublicRoom.vue';
-import ViewProfilePage from './components/pages/ViewProfilePage.vue';
-import RoomSettings from './components/pages/RoomSettings.vue';
-import ApplyResetPassword from './components/singup/ApplyResetPassword.vue';
-import {globalLogger} from './utils/singletons';
-import {ALL_ROOM_ID} from './utils/consts';
-import ConfirmMail from './components/email/ConfirmMail.vue';
+import sessionHolder from '@/utils/sessionHolder';
+import {store} from '@/utils/storeHolder';
+import MainPage from '@/components/MainPage.vue';
+import ChannelsPage from '@/components/chat/MainPage.vue';
+import SignupPage from '@/components/singup/MainPage.vue';
+import ResetPassword from '@/components/singup/ResetPassword.vue';
+import Login from '@/components/singup/Login.vue';
+import SignUp from '@/components/singup/SignUp.vue';
+import UserProfile from '@/components/pages/UserProfile.vue';
+import InviteUser from '@/components/pages/InviteUser.vue';
+import ReportIssue from '@/components/pages/ReportIssue.vue';
+import UserProfileChangePassword from '@/components/pages/UserProfileChangePassword.vue';
+import UserProfileImage from '@/components/pages/UserProfileImage.vue';
+import UserProfileInfo from '@/components/pages/UserProfileInfo.vue';
+import UserProfileSettings from '@/components/pages/UserProfileSettings.vue';
+import CreatePrivateRoom from '@/components/pages/CreatePrivateRoom.vue';
+import PainterPage from '@/components/pages/PainterPage.vue';
+import AmChart from '@/components/pages/AmChart.vue';
+import CreatePublicRoom from '@/components/pages/CreatePublicRoom.vue';
+import ViewProfilePage from '@/components/pages/ViewProfilePage.vue';
+import RoomSettings from '@/components/pages/RoomSettings.vue';
+import ApplyResetPassword from '@/components/singup/ApplyResetPassword.vue';
+import {globalLogger} from '@/utils/singletons';
+import {ALL_ROOM_ID} from '@/utils/consts';
+import ConfirmMail from '@/components/email/ConfirmMail.vue';
 import UserProfileChangeEmail
-  from './components/pages/UserProfileChangeEmail.vue';
+  from '@/components/pages/UserProfileChangeEmail.vue';
 
 Vue.use(VueRouter);
 const router = new VueRouter({
@@ -47,7 +47,7 @@ const router = new VueRouter({
           meta: {
             beforeEnter: (to, from, next) => {
               globalLogger.debug('setActiveRoomId {}', to.params.id)();
-              store.commit('setActiveRoomId', parseInt(to.params.id));
+              store.setActiveRoomId(parseInt(to.params.id));
               next();
             },
           },

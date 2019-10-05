@@ -19,19 +19,19 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation, Getter} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {SendingFile, UserModel} from "../../types/model";
-  import {bytesToSize} from '../../utils/utils';
-  import AppProgressBar from '../ui/AppProgressBar';
-  import ChatSendingFileTransfer from './ChatSendingFileTransfer';
-  import ChatMessageHeader from './ChatMessageHeader';
+  import {SendingFile, UserModel} from "@/types/model";
+  import {bytesToSize} from '@/utils/utils';
+  import AppProgressBar from '@/components/ui/AppProgressBar';
+  import ChatSendingFileTransfer from '@/components/chat/ChatSendingFileTransfer';
+  import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
   @Component({
     components: {ChatMessageHeader, ChatSendingFileTransfer, AppProgressBar}
   })
   export default class ChatSendingFile extends Vue {
     @Prop() sendingFile: SendingFile;
-    @Getter myId: number;
+    get myId(): number  { return store.myId };
 
 
     get size() {

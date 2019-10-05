@@ -25,8 +25,8 @@
 </template>
 <script lang="ts">
   import {Component, Vue} from "vue-property-decorator";
-  import {smileys} from '../../utils/smileys';
-  import {SmileyStructure} from '../../types/types';
+  import {smileys} from '@/utils/smileys';
+  import {SmileyStructure} from '@/types/types';
 
   @Component
   export default class SmileyHolder extends Vue {
@@ -38,7 +38,7 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   .tabNames
     margin: 0

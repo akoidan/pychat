@@ -1,10 +1,10 @@
-import ChatCall from '../assets/sounds/Call.mp3';
-import ChatIncoming from '../assets/sounds/ChatIncoming.wav';
-import ChatLogin from '../assets/sounds/ChatLogin.wav';
-import ChatLogout from '../assets/sounds/ChatLogout.wav';
-import ChatOutgoing from '../assets/sounds/ChatOutgoing.wav';
-import ChatFile from '../assets/sounds/File.mp3';
-import {globalLogger, notifier} from './singletons';
+import ChatCall from '@/assets/sounds/Call.mp3';
+import ChatIncoming from '@/assets/sounds/ChatIncoming.wav';
+import ChatLogin from '@/assets/sounds/ChatLogin.wav';
+import ChatLogout from '@/assets/sounds/ChatLogout.wav';
+import ChatOutgoing from '@/assets/sounds/ChatOutgoing.wav';
+import ChatFile from '@/assets/sounds/File.mp3';
+import {globalLogger, notifier} from '@/utils/singletons';
 
 export const call = new Audio(<any>ChatCall);
 export const incoming = new Audio(<any>ChatIncoming);

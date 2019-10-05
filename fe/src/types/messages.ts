@@ -1,5 +1,5 @@
-import {FileModelDto, MessageModelDto, RoomDto, SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from './dto';
-import {FileModel} from './model';
+import {FileModelDto, MessageModelDto, RoomDto, SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from '@/types/dto';
+import {FileModel} from '@/types/model';
 
 export interface DefaultMessage {
   action: string;

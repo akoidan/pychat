@@ -8,15 +8,29 @@
 </template>
 
 <script lang='ts'>
-  import {Component, Vue} from "vue-property-decorator";
-  import Growl from "./ui/AppGrowl";
-  import {State} from "vuex-class";
+
+  import Growl from "@/components/ui/AppGrowl";
+  import {Component, Vue, Watch} from "vue-property-decorator";
+  import {GrowlModel} from "@/types/model";
 
   @Component({
     components: {Growl}
   })
   export default class App extends Vue {
-    @State growls: string[];
+
+    get mainClass(): string {
+      return this.store.userSettings && this.store.userSettings.theme || 'color-reg';
+    }
+
+    get growls(): GrowlModel[] {
+      return this.store.growls;
+    }
+
+    @Watch('mainClass')
+    onMainClassChange(value) {
+      document.body.parentElement.className = value;
+    }
+
   }
 </script>
 <style lang="sass" scoped>

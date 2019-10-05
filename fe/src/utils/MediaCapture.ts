@@ -1,6 +1,6 @@
-import loggerFactory from './loggerFactory';
+import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import {stopVideo} from './htmlApi';
+import {stopVideo} from '@/utils/htmlApi';
 
 declare class MediaRecorder {
   constructor(stream: MediaStream, options: {});

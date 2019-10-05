@@ -1,5 +1,5 @@
-import loggerFactory from './loggerFactory';
-import {PostData, SessionHolder} from '../types/types';
+import loggerFactory from '@/utils/loggerFactory';
+import {PostData, SessionHolder} from '@/types/types';
 import {Logger} from 'lines-logger';
 
 

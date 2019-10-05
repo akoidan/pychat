@@ -44,19 +44,19 @@
 </template>
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {Getter} from 'vuex-class';
-  import {ReceivingFile, FileTransferStatus} from "../../types/model";
-  import {bytesToSize} from "../../utils/utils";
-  import AppProgressBar from "../ui/AppProgressBar";
-  import ChatMessageHeader from "./ChatMessageHeader";
-  import {webrtcApi} from '../../utils/singletons';
+  import {store} from '@/utils/storeHolder';;
+  import {ReceivingFile, FileTransferStatus} from "@/types/model";
+  import {bytesToSize} from "@/utils/utils";
+  import AppProgressBar from "@/components/ui/AppProgressBar";
+  import ChatMessageHeader from "@/components/chat/ChatMessageHeader";
+  import {webrtcApi} from '@/utils/singletons';
 
   @Component({
     components: {ChatMessageHeader, AppProgressBar}
   })
   export default class ChatReceivingFile extends Vue {
     @Prop() receivingFile: ReceivingFile;
-    @Getter myId: number;
+    get myId(): number  { return store.myId };
     FileTransferStatus = FileTransferStatus;
 
     get showYesNo(): boolean {

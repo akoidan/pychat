@@ -1,5 +1,5 @@
-import {IStorage, SetRoomsUsers, StorageData} from '../types/types';
-import loggerFactory from './loggerFactory';
+import {IStorage, SetRoomsUsers, StorageData} from '@/types/types';
+import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
 import {
   CurrentUserInfoModel,
@@ -7,14 +7,14 @@ import {
   MessageModel, RoomDictModel, RoomModel,
   RoomSettingsModel,
   UserModel
-} from '../types/model';
+} from '@/types/model';
 import {
   convertNumberToSex,
   convertSexToNumber,
   convertSexToString,
   convertStringSexToNumber, getRoomsBaseDict
-} from '../types/converters';
-import {browserVersion} from './singletons';
+} from '@/types/converters';
+import {browserVersion} from '@/utils/singletons';
 
 interface TransactionCb {
   (t: SQLTransaction, ...rest): void;

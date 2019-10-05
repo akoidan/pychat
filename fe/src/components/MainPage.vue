@@ -10,24 +10,28 @@
   </div>
 </template>
 <script lang="ts">
-  import {Getter, State} from "vuex-class";
-  import AppNav from "./AppNav.vue";
+
+  import AppNav from "@/components/AppNav.vue";
   import {Component, Vue} from "vue-property-decorator";
-  import {IncomingCallModel, UserModel} from "../types/model";
-  import NotifierHandler from "../utils/NotificationHandler";
-  import {browserVersion, isChrome, isMobile, notifier} from "../utils/singletons";
-  import store from '../store';
-  import IncomingCall from './chat/IncomingCall';
+  import {
+    CurrentUserInfoModel,
+    IncomingCallModel,
+    UserModel
+  } from "@/types/model";
+  import NotifierHandler from "@/utils/NotificationHandler";
+  import {browserVersion, isChrome, isMobile, notifier} from "@/utils/singletons";
+  import {store} from '@/utils/storeHolder';
+  import IncomingCall from '@/components/chat/IncomingCall';
 
   @Component({
     components: {IncomingCall, AppNav}
   })
   export default class MainPage extends Vue {
 
-    @Getter showNav: boolean;
-    @State userInfo: UserModel;
-    @State incomingCall: IncomingCallModel;
-    @State dim: boolean;
+    get showNav(): boolean  { return store.showNav };
+    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
+    get incomingCall(): IncomingCallModel  { return store.incomingCall }
+    get dim(): boolean  { return store.dim }
 
     get inited() {
       return this.userInfo;
@@ -42,8 +46,8 @@
 </script>
 
 <style lang="sass" scoped>
-  @import "partials/mixins"
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/mixins"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   .spinner
     margin: auto

@@ -1,4 +1,4 @@
-import {CurrentUserInfoModel, CurrentUserSettingsModel, FileModel, RoomModel, SexModel, UserModel, Location} from './model';
+import {CurrentUserInfoModel, CurrentUserSettingsModel, FileModel, RoomModel, SexModel, UserModel, Location} from '@/types/model';
 import {
   FileModelDto,
   LocationDto,
@@ -7,7 +7,7 @@ import {
   UserDto,
   UserProfileDto,
   UserSettingsDto
-} from './dto';
+} from '@/types/dto';
 
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDto): CurrentUserInfoModel {

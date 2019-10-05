@@ -10,11 +10,11 @@
   </tbody>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation, Getter} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import AppProgressBar from '../ui/AppProgressBar';
-  import {FileTransferStatus, SendingFileTransfer, UserModel} from "../../types/model";
-  import {webrtcApi} from '../../utils/singletons';
+  import AppProgressBar from '@/components/ui/AppProgressBar';
+  import {FileTransferStatus, SendingFileTransfer, UserModel} from "@/types/model";
+  import {webrtcApi} from '@/utils/singletons';
 
   const fileStatusDict: {} = {};
  fileStatusDict[FileTransferStatus.NOT_DECIDED_YET] = 'Waiting to accept';
@@ -32,7 +32,7 @@
     @Prop() transfer: SendingFileTransfer;
     @Prop() connId: string;
     @Prop() opponentId: string;
-    @State allUsersDict: {[id: number]: UserModel};
+    get allUsersDict(): {[id: number]: UserModel}  { return store.allUsersDict }
 
     get showBar(): boolean {
       return this.transfer.status === FileTransferStatus.IN_PROGRESS;

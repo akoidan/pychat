@@ -9,22 +9,25 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import ChatMessage from './ChatMessage';
-  import AppProgressBar from '../ui/AppProgressBar';
-  import {channelsHandler} from '../../utils/singletons';
-  import {SetMessageProgressError} from '../../types/types';
-  import {CurrentUserInfoModel, MessageModel} from "../../types/model";
+  import ChatMessage from '@/components/chat/ChatMessage';
+  import AppProgressBar from '@/components/ui/AppProgressBar';
+  import {channelsHandler} from '@/utils/singletons';
+  import {SetMessageProgressError} from '@/types/types';
+  import {
+    CurrentUserInfoModel,
+    MessageModel,
+    RoomDictModel
+  } from "@/types/model";
   @Component({
     components: {AppProgressBar, ChatMessage}
   })
   export default class ChatSendingMessage extends Vue {
     @Prop() message: MessageModel;
-    @Mutation setMessageProgressError;
-    @Action growlInfo;
-    @State roomsDict;
-    @State userInfo: CurrentUserInfoModel;
+
+    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
+    get roomsDict(): RoomDictModel  { return store.roomsDict }
 
     get searchedIds() {
       return this.roomsDict[this.message.roomId].search.searchedIds;
@@ -57,16 +60,16 @@
         roomId: this.message.roomId,
         error: null
       };
-      this.setMessageProgressError(newVar);
+      store.setMessageProgressError(newVar);
       channelsHandler.resendMessage(this.message.id);
-      this.growlInfo("Trying to upload files again");
+      store.growlInfo("Trying to upload files again");
     }
   }
 </script>
 
 <style lang="sass" scoped>
 
-  @import "partials/mixins"
+  @import "~@/assets/sass/partials/mixins"
 
   .sendingMessage
     position: relative

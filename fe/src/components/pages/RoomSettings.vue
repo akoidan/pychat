@@ -43,12 +43,12 @@
   <div v-else>Room #{{roomId}} doesn't exist </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import AppInputRange from '../ui/AppInputRange';
-  import AppSubmit from '../ui/AppSubmit';
-  import AppCheckbox from '../ui/AppCheckbox';
-  import {RoomDictModel, RoomModel, RoomSettingsModel} from "../../types/model";
+  import AppInputRange from '@/components/ui/AppInputRange';
+  import AppSubmit from '@/components/ui/AppSubmit';
+  import AppCheckbox from '@/components/ui/AppCheckbox';
+  import {RoomDictModel, RoomModel, RoomSettingsModel} from "@/types/model";
   @Component({components: {AppInputRange, AppSubmit, AppCheckbox}})
   export default class RoomSettings extends Vue {
 
@@ -57,11 +57,8 @@
     notifications: boolean = false;
     running: boolean = false;
     isPublic: boolean = false;
-    @State roomsDict: RoomDictModel;
+    get roomsDict(): RoomDictModel  { return store.roomsDict }
 
-    @Action growlError;
-    @Action growlSuccess;
-    @Mutation setRoomSettings;
 
     leave() {
       this.logger.log("Leaving room {}", this.roomId)();
@@ -103,7 +100,7 @@
       this.running = true;
       this.$api.sendRoomSettings(this.roomName, this.sound, this.notifications, this.roomId, (err) => {
         if (err) {
-          this.growlError(err);
+          store.growlError(err)
         } else {
           let payload: RoomSettingsModel = {
             id: this.roomId,
@@ -111,8 +108,8 @@
             notifications: this.notifications,
             volume: this.sound
           };
-          this.setRoomSettings(payload);
-          this.growlSuccess('Settings has been saved');
+          store.setRoomSettings(payload);
+          store.growlSuccess('Settings has been saved');
           this.$router.go(-1);
         }
         this.running = false;
@@ -122,7 +119,7 @@
 </script>
 
 <style lang="sass" scoped>
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   .holder
     overflow-y: auto

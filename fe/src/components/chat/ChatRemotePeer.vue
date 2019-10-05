@@ -8,21 +8,19 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation, Getter} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-  import {CallInfoModel} from '../../types/model';
-  import AppInputRange from '../ui/AppInputRange';
-  import VideoObject from './VideoObject.vue';
+  import {CallInfoModel} from '@/types/model';
+  import AppInputRange from '@/components/ui/AppInputRange';
+  import VideoObject from '@/components/chat/VideoObject.vue';
   @Component({
     components: {VideoObject, AppInputRange}
   })
   export default class ChatRemotePeer extends Vue {
     @Prop() callInfo: CallInfoModel;
 
-    @Getter userName;
-
     get userNameValue() :string {
-      return this.userName(this.callInfo.userId);
+      return store.userName(this.callInfo.userId);
     }
 
     get volLevelClass() {
@@ -44,7 +42,7 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/variables"
+  @import "~@/assets/sass/partials/variables"
 
   .micVideoWrapper
     display: inline-block

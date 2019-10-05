@@ -62,7 +62,7 @@ const {options, definePlugin, optimization, configFile, startCordova} = function
   function getEnv(mode, trueValue, falseValues) {
     if (process.env[mode] === trueValue) {
       return true;
-    } else if (falseValues.includes(process.env[mode])) {
+    } else if (!falseValues || falseValues.includes(process.env[mode])) {
       return false;
     } else {
       throw Error(`env ${mode} is not defined`);
@@ -78,7 +78,7 @@ const {options, definePlugin, optimization, configFile, startCordova} = function
   options.IS_ANDROID = getEnv('PLATFORM', 'android', ['electron', 'web']);
   options.IS_WEB = getEnv('PLATFORM', 'web', ['electron', 'android']);
   options.SERVICE_WORKER_URL = options.IS_WEB ? '/sw.js' : false;
-
+  options.IS_PROFILE = getEnv('PROFILE', 'true');
   if (options.IS_ANDROID)  {
     if (startCordova) {
       options.BACKEND_ADDRESS = `${startCordova}:${options.BACKEND_ADDRESS.split(':')[1]}`;
@@ -235,12 +235,12 @@ const getConfig = async () => {
   let conf = {
     entry: ['./src/main.ts'],
     plugins,
+    profile: !!options.IS_PROFILE,
     resolve: {
       extensions: ['.ts', '.js', '.vue'],
       alias: {
         'vue': 'vue/dist/vue.js',
-        '~': path.resolve(__dirname, 'src'),
-        'Sass': path.resolve(__dirname, 'src/assets/sass')
+        '@': path.resolve(__dirname, 'src')
       }
     },
     mode: options.IS_PROD ? 'production' : 'development',
@@ -333,7 +333,10 @@ function getSimpleConfig(mainFile, dist, entry, target) {
     entry,
     target,
     resolve: {
-      extensions: ['.ts', '.js', '.json']
+      extensions: ['.ts', '.js', '.json'],
+      alias: {
+        '@': path.resolve(__dirname, 'src')
+      },
     },
     watch: !options.IS_PROD,
     mode: options.IS_PROD ? 'production' : 'development',
@@ -387,16 +390,29 @@ async function runElectron(mainPath) {
 function runWebpack(config) {
   return new Promise((resolve, reject) => {
     webpack(config, (err, stats) => {
+      process.stdout.write('\x1Bc');
+      console.log(stats.toString({
+        chunks: false,  // Makes the build much quieter
+        colors: true    // Shows colors in the console
+      }));
+      if (options.IS_PROFILE) {
+        fs.writeFile("compilation-stats.json", JSON.stringify(stats.toJson(), null, 2), function(err) {
+          if(err) {
+            return console.log(err);
+          }
+
+          console.log("The file was saved!");
+        });
+      }
+      console.log(Date.now());
       if (err) {
         reject(err);
       }
       if (stats.compilation.errors.length) {
-        reject(stats.compilation.errors)
+        if (options.IS_PROD) {
+          reject(stats.compilation.errors)
+        }
       } else {
-        console.log(stats.toString({
-          chunks: false,  // Makes the build much quieter
-          colors: true    // Shows colors in the console
-        }));
         resolve();
       }
     })
@@ -434,11 +450,16 @@ async function setup() {
       }
     };
 
-    let server = new WebpackDevServer(webpack(config), devServer);
-    server.listen(devServer.port, devServer.host, function (err) {
-      if (err) {
-        throw err;
-      }
+    let compiler = webpack(config);
+    let server = new WebpackDevServer(compiler, devServer);
+    let devapp = await new Promise((resolve, reject) => {
+      server.listen(devServer.port, devServer.host, function (out, err) {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(out);
+        }
+      });
     });
 
     ['SIGINT', 'SIGTERM'].forEach(signal => {
@@ -477,5 +498,9 @@ async function setup() {
 }
 
 setup().catch(e => {
-  process.exit(1);
+  try {
+    console.error(e);
+  } finally {
+    process.exit(1);
+  }
 });

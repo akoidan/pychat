@@ -1,18 +1,16 @@
-import {globalLogger} from './singletons';
-
 import Vue from 'vue';
-
-import {MEDIA_API_URL, PASTED_IMG_CLASS} from './consts';
-import {MessageDataEncode, SmileyStructure, UploadFile} from '../types/types';
-import {FileModel, MessageModel, RoomModel, SexModel, UserModel} from '../types/model';
-import {forEach} from './utils';
-import recordIcon from '../assets/img/audio.svg';
-import {getFlag} from './flags';
-import {Smile, smileys} from './smileys';
+import {MEDIA_API_URL, PASTED_IMG_CLASS} from '@/utils/consts';
+import {MessageDataEncode, UploadFile} from '@/types/types';
+import {FileModel, MessageModel, SexModel, UserModel} from '@/types/model';
+import recordIcon from '@/assets/img/audio.svg';
+import {getFlag} from '@/utils/flags';
+import {Smile, smileys} from '@/utils/smileys';
+import loggerFactory from '@/utils/loggerFactory';
+import {Logger} from 'lines-logger';
 
 const tmpCanvasContext = document.createElement('canvas').getContext('2d');
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
-
+const logger: Logger = loggerFactory.getLoggerColor('htmlApi', '#007a70');
 
 const savedFiles = {};
 
@@ -27,6 +25,13 @@ const escapeMap = {
   '/': '&#x2F;'
 };
 
+export function forEach(array, cb) {
+  if (array && array.length) {
+    for (let i = 0; i < array.length; i++) {
+      cb(array[i]);
+    }
+  }
+}
 
 const smileUnicodeRegex = /[\u3400-\u3500]/g;
 const imageUnicodeRegex = /[\u3501-\u3600]/g;
@@ -135,7 +140,7 @@ export function placeCaretAtEnd (userMessage: HTMLElement) {
 }
 
 export function encodeMessage(data: MessageModel) {
-  globalLogger.debug('Encoding message {}: {}', data.id, data)();
+  logger.debug('Encoding message {}: {}', data.id, data)();
   if (data.giphy) {
     return `<div class="giphy"><img src='${data.giphy}' /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>`;
   } else {
@@ -149,7 +154,7 @@ export function encodeMessage(data: MessageModel) {
       }
     });
     if (replaceElements.length) {
-      globalLogger.debug('Replaced {} in message #{}', replaceElements.join(', '), data.id)();
+      logger.debug('Replaced {} in message #{}', replaceElements.join(', '), data.id)();
     }
     html = encodeFiles(html, data.files);
     return encodeSmileys(html);
@@ -169,7 +174,7 @@ function encodeFiles(html, files) {
         } else if (v.type === 'a') {
          return `<img src='${recordIcon}' imageId='${v.id}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
         } else {
-          globalLogger.error('Invalid type {}', v.type)();
+          logger.error('Invalid type {}', v.type)();
         }
       }
       return s;
@@ -213,12 +218,12 @@ export function setVideoEvent(e: HTMLElement) {
   forEach(r, e => {
     let querySelector: HTMLElement = e.querySelector('.icon-youtube-play');
     let url = e.getAttribute('associatedVideo');
-    globalLogger.debug('Embedding video url {}', url)();
+    logger.debug('Embedding video url {}', url)();
     querySelector.onclick = function (event) {
       let video = document.createElement('video');
       video.setAttribute('controls', '');
       video.className = 'video-player-ready';
-      globalLogger.debug('Replacing video url {}', url)();
+      logger.debug('Replacing video url {}', url)();
       video.src = resolveMediaUrl(url);
       e.parentNode.replaceChild(video, e);
       video.play();
@@ -235,7 +240,7 @@ export function setAudioEvent(e: HTMLElement) {
       let audio = document.createElement('audio');
       audio.setAttribute('controls', '');
       audio.className = 'audio-player-ready';
-      globalLogger.debug('Replacing audio url {}', url)();
+      logger.debug('Replacing audio url {}', url)();
       audio.src = url;
       e.parentNode.replaceChild(audio, e);
       audio.play();
@@ -285,7 +290,7 @@ export function setYoutubeEvent(e: HTMLElement) {
   for (let i = 0; i < r.length; i++) {
     let querySelector: HTMLElement = r[i].querySelector('.icon-youtube-play');
     let id = r[i].getAttribute('data-id');
-    globalLogger.debug('Embedding youtube view {}', id)();
+    logger.debug('Embedding youtube view {}', id)();
     querySelector.onclick = (function (e) {
       return function (event) {
         let iframe = document.createElement('iframe');
@@ -299,7 +304,7 @@ export function setYoutubeEvent(e: HTMLElement) {
         iframe.setAttribute('src', src);
         iframe.setAttribute('frameborder', '0');
         iframe.className = 'video-player-ready';
-        globalLogger.log('Replacing youtube url {}', src)();
+        logger.log('Replacing youtube url {}', src)();
         iframe.setAttribute('allowfullscreen', '1');
         e.parentNode.replaceChild(iframe, e);
       };
@@ -309,7 +314,7 @@ export function setYoutubeEvent(e: HTMLElement) {
 
 export function stopVideo(stream: MediaStream) {
   if (stream) {
-    globalLogger.debug('Stopping stream {}', stream)();
+    logger.debug('Stopping stream {}', stream)();
     if (stream.stop) {
       stream.stop();
     } else {
@@ -480,7 +485,7 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = nu
   // let urls = [savedFiles, savedFiles, savedFiles];
   // urls.forEach((url) => {
   //   for (let k in url) {
-  //     globalLogger.log('Revoking url {}', k)();
+  //     logger.log('Revoking url {}', k)();
   //     URL.revokeObjectURL(k);
   //     delete urls[k];
   //   }

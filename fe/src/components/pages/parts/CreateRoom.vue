@@ -33,22 +33,22 @@
   </div>
 </template>
 <script lang="ts">
-  import {Action, Getter, State} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import AppInputRange from "../../ui/AppInputRange";
-  import AppSubmit from "../../ui/AppSubmit";
-  import AddUserToRoom from "./AddUserToRoom.vue";
-  import {CurrentUserInfoModel, RoomModel, UserModel} from "../../../types/model";
-  import {AddRoomMessage} from "../../../types/messages";
-  import AppCheckbox from "../../ui/AppCheckbox";
-  import {PrivateRoomsIds} from '../../../types/types';
+  import AppInputRange from "@/components/ui/AppInputRange";
+  import AppSubmit from "@/components/ui/AppSubmit";
+  import AddUserToRoom from "@/components/pages/parts/AddUserToRoom.vue";
+  import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
+  import {AddRoomMessage} from "@/types/messages";
+  import AppCheckbox from "@/components/ui/AppCheckbox";
+  import {PrivateRoomsIds} from '@/types/types';
 
   @Component({components: {AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})
   export default class CreateRoom extends Vue {
-    @Action growlError;
-    @Getter privateRooms: RoomModel[];
-    @Getter privateRoomsUsersIds: PrivateRoomsIds;
-    @State userInfo: CurrentUserInfoModel;
+
+    get privateRooms(): RoomModel[]  { return store.privateRooms };
+    get privateRoomsUsersIds(): PrivateRoomsIds  { return store.privateRoomsUsersIds };
+    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
     currentUsers: UserModel[] = [];
     notifications: boolean = false;
     sound: number = 0;
@@ -77,9 +77,9 @@
 
     add() {
       if (this.isPublic && !this.roomName) {
-        this.growlError('Please specify room name');
+        store.growlError('Please specify room name');
       } else if (!this.isPublic && this.currentUsers.length === 0) {
-        this.growlError('Please add user');
+        store.growlError('Please add user');
       } else {
         this.running = true;
         this.$ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), (e: AddRoomMessage)=> {
@@ -96,7 +96,7 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   input[type="text"]
     max-width: calc(100vw - 140px)

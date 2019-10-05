@@ -224,6 +224,9 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
   - You might want to exclude: `.idea`
   - mark `templates` directory as `Template Folder`
  4. Add tornado script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `start_tornado`. Remove port value.
+ 
+## Configure Webstorm
+ - to resolve absolute path for webpack webstorm requires webpack.config.js. Go to settings -> javascript -> webpack -> Webpack config file  
 
 ## Build frontend
 I would recommend to use version node 8.9.0, `nvm use 8.9.0`. You can install nvm with [archlinux](https://wiki.archlinux.org/index.php/Node.js_) [ubuntu](https://qiita.com/shaching/items/6e398140432d4133c866) [windows](https://github.com/coreybutler/nvm-windows). 
@@ -384,6 +387,8 @@ development.json and production.json have the following format:
 ```
 
 # TODO
+* purge all callbacks to async code
+* move backend to be directory, fe to fe, docker to docker and etc
 * npm run stats
 * Add google and fb auth via iframe 
 * compile to bytenode for electron https://github.com/OsamaAbbas/bytenode

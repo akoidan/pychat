@@ -16,15 +16,11 @@
 
   import {Prop, Component} from "vue-property-decorator";
   import Vue from 'vue';
-  import {Action } from 'vuex-class';
-  import AppSubmit from '../ui/AppSubmit.vue';
+  import {store} from '@/utils/storeHolder';
+  import AppSubmit from '@/components/ui/AppSubmit.vue';
 
   @Component({components: {AppSubmit}})
   export default class ApplyResetPassword extends Vue {
-
-    @Action growlError;
-    @Action growlSuccess;
-
 
     restoreUser: string = '';
     error: string = null;
@@ -47,15 +43,15 @@
     }
     submitResetPassword() {
       if (this.password != this.repeatPassword) {
-        this.growlError("Passords don't match");
+        store.growlError("Passords don't match");
       } else {
         this.running = true;
         this.$api.acceptToken(<string>this.$route.query["token"], this.password, cb => {
           this.running = false;
           if (cb) {
-            this.growlError(cb);
+            store.growlError(cb);
           } else {
-            this.growlSuccess("Password has been reset");
+            store.growlSuccess("Password has been reset");
             this.$router.replace('/auth/login');
           }
         })
@@ -67,7 +63,7 @@
 
   $restPassMargin: 20px
 
-  @import "partials/mixins"
+  @import "~@/assets/sass/partials/mixins"
 
   .spinner
     @include lds-30-spinner-vertical('Checking token...')

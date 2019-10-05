@@ -6,14 +6,14 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import debounce from 'lodash.debounce';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-  import {RoomModel, SearchModel} from "../../types/model";
-  import {MessageModelDto} from "../../types/dto";
-  import {channelsHandler} from "../../utils/singletons";
-  import {SetSearchTo} from "../../types/types";
-  import {MESSAGES_PER_SEARCH} from '../../utils/consts';
+  import {RoomModel, SearchModel} from "@/types/model";
+  import {MessageModelDto} from "@/types/dto";
+  import {channelsHandler} from "@/utils/singletons";
+  import {SetSearchTo} from "@/types/types";
+  import {MESSAGES_PER_SEARCH} from '@/utils/consts';
 
 
   const START_TYPING = 'Start typing and messages will appear';
@@ -22,7 +22,6 @@
   export default class SearchMessages extends Vue {
 
     @Prop() room: RoomModel;
-    @Mutation setSearchTo;
 
     $refs: {
       inputSearch: HTMLInputElement
@@ -74,7 +73,7 @@
         searchText,
         locked: searchedIds.length < MESSAGES_PER_SEARCH
       };
-      this.setSearchTo({
+      store.setSearchTo({
         roomId: this.room.id,
         search
       } as SetSearchTo);
@@ -116,7 +115,7 @@
 </script>
 
 <style lang="sass" scoped>
-  @import "partials/mixins"
+  @import "~@/assets/sass/partials/mixins"
   .search
     padding: 5px
     > *

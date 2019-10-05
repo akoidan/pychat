@@ -1,4 +1,4 @@
-import BaseTransferHandler from './BaseTransferHandler';
+import BaseTransferHandler from '@/webrtc/BaseTransferHandler';
 import {
   AcceptCallMessage,
   ConnectToRemoteMessage,
@@ -6,11 +6,11 @@ import {
   OfferCall,
   ReplyCallMessage,
   WebRtcSetConnectionIdMessage
-} from '../types/messages';
-import {browserVersion, isChrome, isMobile} from '../utils/singletons';
-import {sub} from '../utils/sub';
-import Subscription from '../utils/Subscription';
-import {CallsInfoModel, IncomingCallModel} from '../types/model';
+} from '@/types/messages';
+import {browserVersion, isChrome, isMobile} from '@/utils/singletons';
+import {sub} from '@/utils/sub';
+import Subscription from '@/utils/Subscription';
+import {CallsInfoModel, IncomingCallModel} from '@/types/model';
 import {
   BooleanIdentifier,
   ChangeStreamMessage,
@@ -18,13 +18,14 @@ import {
   NumberIdentifier,
   SetDevices,
   StringIdentifier, VideoType
-} from '../types/types';
-import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from '../utils/consts';
-import {extractError, forEach, getChromeVersion} from '../utils/utils';
-import {createMicrophoneLevelVoice, getAverageAudioLevel} from '../utils/audioprocc';
-import CallSenderPeerConnection from './CallSenderPeerConnection';
-import CallReceiverPeerConnection from './CallReceiverPeerConnection';
-import router from '../router';
+} from '@/types/types';
+import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from '@/utils/consts';
+import {extractError, getChromeVersion} from '@/utils/utils';
+import {createMicrophoneLevelVoice, getAverageAudioLevel} from '@/utils/audioprocc';
+import CallSenderPeerConnection from '@/webrtc/CallSenderPeerConnection';
+import CallReceiverPeerConnection from '@/webrtc/CallReceiverPeerConnection';
+import router from '@/utils/router';
+import {forEach} from '@/utils/htmlApi';
 
 export default class CallHandler extends BaseTransferHandler {
   protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
@@ -65,7 +66,7 @@ export default class CallHandler extends BaseTransferHandler {
         }
       });
     }
-    this.store.commit('setDevices', payload);
+    this.store.setDevices(payload);
   }
 
   onacceptCall(message: AcceptCallMessage) {
@@ -166,7 +167,7 @@ export default class CallHandler extends BaseTransferHandler {
         stream = await navigator.mediaDevices['getDisplayMedia']({video: true});
       } else {
         if (chromeVersion && chromeVersion > 70) {
-          this.store.dispatch('growlInfo', 'You can now use chrome://flags/#enable-experimental-web-platform-features to share your screen');
+          this.store.growlInfo( 'You can now use chrome://flags/#enable-experimental-web-platform-features to share your screen');
         }
         let share = await this.getDesktopShareFromExtension();
         this.logger.debug('Resolving userMedia from dekstopShare')();
@@ -199,12 +200,12 @@ export default class CallHandler extends BaseTransferHandler {
     }
     let message = `<span>Failed to capture ${what.join(', ')} source</span>, because ${extractError(e)}`;
     this.destroyStreamData(endStream);
-    this.store.dispatch('growlErrorRaw', message);
+    this.store.growlErrorRaw( message);
     this.logger.error('onFailedCaptureSource {}', e)();
   }
 
   private get callInfo(): CallsInfoModel {
-    return this.store.state.roomsDict[this.roomId].callInfo;
+    return this.store.roomsDict[this.roomId].callInfo;
   }
 
   private destroyStreamData(endStream) {
@@ -228,14 +229,14 @@ export default class CallHandler extends BaseTransferHandler {
           url += navigator.platform.indexOf('Linux') >= 0 ?
               '. Open pavucontrol for more info' :
               ' . Right click on volume icon in system tray -> record devices -> input -> microphone';
-          this.store.dispatch('growlError', `Unable to capture input from microphone. Check your microphone connection or ${url}`);
+          this.store.growlError( `Unable to capture input from microphone. Check your microphone connection or ${url}`);
         }
       }
       let payload: NumberIdentifier = {
         id: this.roomId,
         state: Math.sqrt(getAverageAudioLevel(audioProc)),
       };
-      this.store.commit('setCurrentMicLevel', payload);
+      this.store.setCurrentMicLevel(payload);
     };
   }
 
@@ -290,7 +291,7 @@ export default class CallHandler extends BaseTransferHandler {
         id: this.roomId,
         media: stream
       };
-      this.store.commit('setLocalStreamSrc', payload);
+      this.store.setLocalStreamSrc(payload);
     }
     this.setCallIconsState();
   }
@@ -328,7 +329,7 @@ export default class CallHandler extends BaseTransferHandler {
   //       id: this.roomId,
   //       state: false,
   //     };
-  //     this.store.commit('setMicToState', payload);
+  //     this.store.setMicToState(payload);
   //   }
   // }
 
@@ -341,7 +342,7 @@ export default class CallHandler extends BaseTransferHandler {
     //       id: this.roomId,
     //       state: false,
     //     }
-    //     this.store.commit('setMicToState', payload);
+    //     this.store.setMicToState(payload);
     //   }
     // }
     // let videoTrack = this.getTrack('video');
@@ -365,7 +366,7 @@ export default class CallHandler extends BaseTransferHandler {
         id: this.roomId,
       };
       this.setCallStatus('sent_offer');
-      this.store.commit('setCallActiveToState', payload);
+      this.store.setCallActiveToState(payload);
       this.wsHandler.offerCall(this.roomId, browserVersion, (e: WebRtcSetConnectionIdMessage) => {
         if (e.connId) {
           this.connectionId = e.connId;
@@ -406,7 +407,7 @@ export default class CallHandler extends BaseTransferHandler {
       userId: message.userId
     };
     this.acceptedPeers.push(message.opponentWsId);
-    this.store.commit('setIncomingCall', payload2);
+    this.store.setIncomingCall(payload2);
     this.createCallPeerConnection(message);
   }
 
@@ -422,12 +423,12 @@ export default class CallHandler extends BaseTransferHandler {
     let falseBoolean: BooleanIdentifier = {
       state: false,
       id: this.roomId,
-    }
-    this.store.commit('setIncomingCall', null);
-    this.store.commit('setCallActiveToState', trueBoolean);
-    this.store.commit('setContainerToState', trueBoolean);
-    this.store.commit('setVideoToState', withVideo ? trueBoolean : falseBoolean);
-    this.store.commit('setMicToState', trueBoolean);
+    };
+    this.store.setIncomingCall(null);
+    this.store.setCallActiveToState(trueBoolean);
+    this.store.setContainerToState(trueBoolean);
+    this.store.setVideoToState(withVideo ? trueBoolean : falseBoolean);
+    this.store.setMicToState(trueBoolean);
     this.setCallStatus('accepted');
     let stream = await this.captureInput();
     this.attachLocalStream(stream);
@@ -461,21 +462,21 @@ export default class CallHandler extends BaseTransferHandler {
 
   onDestroy() {
     this.stopLocalStream();
-    let payload2: StringIdentifier = {
+    let payload2: MediaIdentifier = {
       id: this.roomId,
-      state: null
+      media: null
     };
-    this.store.commit('setLocalStreamSrc', payload2);
+    this.store.setLocalStreamSrc(payload2);
     this.connectionId = null;
     let payload: BooleanIdentifier = {
       state: false,
       id: this.roomId,
     };
-    this.store.commit('setCallActiveToState', payload);
+    this.store.setCallActiveToState(payload);
   }
 
   declineCall() {
-    this.store.commit('setIncomingCall', null);
+    this.store.setIncomingCall(null);
     this.wsHandler.declineCall(this.connectionId);
     this.onDestroy();
   }
@@ -491,7 +492,7 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   private setCallStatus(status: string) {
-    this.logger.log("Setting call status to {}", status)();
+    this.logger.log('Setting call status to {}', status)();
     this.callStatus = status;
   }
 }

@@ -3,7 +3,7 @@
 </template>
 <script lang="ts">
   import {Component, Vue, Prop} from "vue-property-decorator";
-  import {getUniqueId} from "../../utils/htmlApi";
+  import {getUniqueId} from "@/utils/htmlApi";
 
   @Component
   export default class AppInputRange extends Vue {

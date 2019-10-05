@@ -9,10 +9,10 @@
 </template>
 <script lang="ts">
 
-  import {Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {EditingMessage} from "../../types/model";
-  import {channelsHandler} from '../../utils/singletons';
+  import {EditingMessage} from "@/types/model";
+  import {channelsHandler} from '@/utils/singletons';
 
 
   @Component
@@ -34,7 +34,7 @@
 </script>
 
 <style lang="sass" scoped>
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/abstract_classes"
   nav
     @extend %nav
     > *

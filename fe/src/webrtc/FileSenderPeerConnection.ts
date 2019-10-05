@@ -1,11 +1,19 @@
-import {AcceptFileMessage, DefaultMessage, DestroyFileConnectionMessage} from '../types/messages';
-import {AddSendingFileTransfer, SetSendingFileStatus, SetSendingFileUploaded} from '../types/types';
-import {FileTransferStatus, RootState} from '../types/model';
-import WsHandler from '../utils/WsHandler';
-import {Store} from 'vuex';
-import {bytesToSize, getDay} from '../utils/utils';
-import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE} from '../utils/consts';
-import FilePeerConnection from './FilePeerConnection';
+import {
+  AcceptFileMessage,
+  DefaultMessage,
+  DestroyFileConnectionMessage
+} from '@/types/messages';
+import {
+  AddSendingFileTransfer,
+  SetSendingFileStatus,
+  SetSendingFileUploaded
+} from '@/types/types';
+import {FileTransferStatus} from '@/types/model';
+import WsHandler from '@/utils/WsHandler';
+import {bytesToSize, getDay} from '@/utils/utils';
+import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE} from '@/utils/consts';
+import FilePeerConnection from '@/webrtc/FilePeerConnection';
+import {DefaultStore} from'@/utils/store';
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
 
@@ -23,7 +31,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     declineSending: this.declineSending,
   };
 
-  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: Store<RootState>, file: File, userId: number) {
+  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, file: File, userId: number) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.file = file;
     let asft:  AddSendingFileTransfer = {
@@ -40,7 +48,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
         }
       }
     };
-    this.store.commit('addSendingFileTransfer', asft);
+    this.store.addSendingFileTransfer(asft);
   }
 
   private declineSending() {
@@ -52,7 +60,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
       connId: this.connectionId,
       transfer: this.opponentWsId
     };
-    this.store.commit('setSendingFileStatus', ssfs);
+    this.store.setSendingFileStatus(ssfs);
     this.wsHandler.destroyPeerFileConnection(this.connectionId, 'decline', this.opponentWsId);
   }
 
@@ -66,7 +74,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
       connId: this.connectionId,
       transfer: this.opponentWsId
     };
-    this.store.commit('setSendingFileStatus', ssfs);
+    this.store.setSendingFileStatus(ssfs);
     this.setTranseferdAmount(message.content.received);
     try {
       // Reliable data channels not supported by Chrome
@@ -104,7 +112,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
       connId: this.connectionId,
       transfer: this.opponentWsId
     };
-    this.store.commit('setSendingFileUploaded', ssfu);
+    this.store.setSendingFileUploaded(ssfu);
   }
   
 
@@ -183,7 +191,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
       roomId: this.roomId,
       status
     };
-    this.store.commit('setSendingFileStatus', payload);
+    this.store.setSendingFileStatus(payload);
   }
 
   private commitErrorIntoStore(error) {
@@ -194,12 +202,12 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
       connId: this.connectionId,
       transfer: this.opponentWsId
     };
-    this.store.commit('setSendingFileStatus', ssfs);
+    this.store.setSendingFileStatus(ssfs);
   }
 
   public ondatachannelclose(error): void {
     // channel could be closed in success and in error, we don't know why it was closed
-    if (this.store.state.roomsDict[this.roomId].sendingFiles[this.connectionId].transfers[this.opponentWsId].status !== FileTransferStatus.FINISHED) {
+    if (this.store.roomsDict[this.roomId].sendingFiles[this.connectionId].transfers[this.opponentWsId].status !== FileTransferStatus.FINISHED) {
       this.commitErrorIntoStore(error);
     }
   }

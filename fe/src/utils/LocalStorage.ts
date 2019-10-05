@@ -1,13 +1,13 @@
 
-import loggerFactory from './loggerFactory';
-import {IStorage, SetRoomsUsers, StorageData} from '../types/types';
+import loggerFactory from '@/utils/loggerFactory';
+import {IStorage, SetRoomsUsers, StorageData} from '@/types/types';
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   MessageModel,
   RoomSettingsModel,
   UserModel
-} from '../types/model';
+} from '@/types/model';
 import {Logger} from 'lines-logger';
 
 export default class LocalStorage implements IStorage {

@@ -10,9 +10,9 @@ import {
   SearchModel, SendingFile,
   UploadProgressModel,
   UserModel, SendingFileTransfer, CallInfoModel
-} from './model';
-import {RoomDto, SetRooms, UserDto} from './dto';
-import {DefaultMessage} from './messages';
+} from '@/types/model';
+import {RoomDto, SetRooms, UserDto} from '@/types/dto';
+import {DefaultMessage} from '@/types/messages';
 
 
 export interface UploadFile {
@@ -25,7 +25,7 @@ export interface IMessageHandler {
   handle(message: DefaultMessage);
 }
 
-export interface ChangeStreamMessage extends DefaultMessage{
+export interface ChangeStreamMessage extends DefaultMessage {
   newStream: MediaStream;
   oldStream: MediaStream;
 }

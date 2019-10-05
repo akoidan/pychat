@@ -8,24 +8,25 @@
 </template>
 
 <script lang='ts'>
-  import {Vue, Component, Prop} from "vue-property-decorator";
-  import {GrowlModel, GrowlType} from "../../types/model";
-  import {Mutation} from "vuex-class";
+  import {Component, Prop, Vue} from "vue-property-decorator";
+  import {GrowlModel} from "@/types/model";
+  import {getModule} from "vuex-module-decorators";
+  import {store} from '@/utils/storeHolder';
+
 
   @Component
   export default class AppGrowl extends Vue {
     @Prop() growl: GrowlModel;
 
-    @Mutation removeGrowl;
     close() {
-      this.removeGrowl(this.growl);
+      store.removeGrowl(this.growl);
     }
   }
 </script>
 <style lang="sass" scoped>
 
-  @import "partials/mixins"
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/mixins"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   .growl-leave-active
     @include transition(0.5s opacity)

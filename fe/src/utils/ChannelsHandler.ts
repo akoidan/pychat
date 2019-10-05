@@ -1,14 +1,13 @@
-import loggerFactory from './loggerFactory';
-import {Store} from 'vuex';
-import Api from './api';
+import loggerFactory from '@/utils/loggerFactory';
+import Api from '@/utils/api';
 import Vue from 'vue';
-import MessageHandler from './MesageHandler';
-import {checkAndPlay, incoming, login, logout, outgoing} from './audio';
-import faviconUrl from '../assets/img/favicon.ico';
+import MessageHandler from '@/utils/MesageHandler';
+import {checkAndPlay, incoming, login, logout, outgoing} from '@/utils/audio';
+import faviconUrl from '@/assets/img/favicon.ico';
+
 
 import {
   ChangeOnlineEntry,
-  MessagesLocation,
   PubSetRooms,
   RemoveMessageProgress,
   RemoveSendingMessage,
@@ -17,16 +16,15 @@ import {
   SetRoomsUsers,
   SetUploadProgress,
   UploadFile
-} from '../types/types';
+} from '@/types/types';
 import {
   CurrentUserInfoModel,
   MessageModel,
   RoomDictModel,
   RoomModel,
-  RootState,
   UserDictModel,
   UserModel
-} from '../types/model';
+} from '@/types/model';
 import {Logger} from 'lines-logger';
 import {
   AddInviteMessage,
@@ -40,16 +38,17 @@ import {
   LeaveUserMessage,
   LoadMessages,
   RemoveOnlineUserMessage
-} from '../types/messages';
-import {MessageModelDto, RoomDto, UserDto} from '../types/dto';
-import {convertFiles, convertUser, getRoomsBaseDict} from '../types/converters';
-import WsHandler from './WsHandler';
-import NotifierHandler from './NotificationHandler';
-import {sub} from './sub';
+} from '@/types/messages';
+import {MessageModelDto, RoomDto, UserDto} from '@/types/dto';
+import {convertFiles, convertUser, getRoomsBaseDict} from '@/types/converters';
+import WsHandler from '@/utils/WsHandler';
+import NotifierHandler from '@/utils/NotificationHandler';
+import {sub} from '@/utils/sub';
+import {DefaultStore} from'@/utils/store';
 
 export default class ChannelsHandler extends MessageHandler {
   protected readonly logger: Logger;
-  private readonly store: Store<RootState>;
+  private readonly store: DefaultStore;
   private readonly api: Api;
   private readonly ws: WsHandler;
   private readonly sendingMessage: {} = {};
@@ -72,7 +71,7 @@ export default class ChannelsHandler extends MessageHandler {
     addInvite: this.addInvite,
   };
 
-  constructor(store: Store<RootState>, api: Api, ws: WsHandler, notifier: NotifierHandler, messageBus: Vue) {
+  constructor(store: DefaultStore, api: Api, ws: WsHandler, notifier: NotifierHandler, messageBus: Vue) {
     super();
     this.store = store;
     this.api = api;
@@ -113,7 +112,7 @@ export default class ChannelsHandler extends MessageHandler {
     if (this.sendingMessage[messageId]) {
       return this.sendingMessage[messageId].files;
     } else {
-      this.logger.error('Asking for unkown files {}', messageId);
+      this.logger.error('Asking for unkown files {}', messageId)();
       return [];
     }
   }
@@ -163,25 +162,23 @@ export default class ChannelsHandler extends MessageHandler {
           roomId,
           error,
         };
-        this.store.commit('setMessageProgressError', newVar);
+        this.store.setMessageProgressError(newVar);
         cb(null);
       } else {
         let newVar: RemoveMessageProgress = {
           messageId, roomId
         };
-        this.store.commit('removeMessageProgress', newVar);
+        this.store.removeMessageProgress(newVar);
         cb(res);
       }
     }, evt => {
       if (evt.lengthComputable) {
-        let newVar =  {
+        let payload: SetMessageProgress = {
           messageId,
           roomId,
-          type: 'setMessageProgress',
           uploaded: evt.loaded,
-          silent: true,
         };
-        this.store.commit(newVar);
+        this.store.setMessageProgress(payload);
       }
     });
     let sup: SetUploadProgress = {
@@ -192,15 +189,15 @@ export default class ChannelsHandler extends MessageHandler {
       messageId,
       roomId
     };
-    this.store.commit('setUploadProgress', sup);
+    this.store.setUploadProgress(sup);
   }
 
 
   public addMessages(roomId: number, inMessages: MessageModelDto[]) {
-    let oldMessages: { [id: number]: MessageModel } = this.store.state.roomsDict[roomId].messages;
+    let oldMessages: { [id: number]: MessageModel } = this.store.roomsDict[roomId].messages;
     let newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessages[i.id]);
     let messages: MessageModel[] = newMesages.map(this.getMessage.bind(this));
-    this.store.commit('addMessages', {messages, roomId: roomId} as MessagesLocation);
+    this.store.addMessages({messages, roomId: roomId});
   }
   public initUsers(users: UserDto[]) {
     this.logger.debug('set users {}', users)();
@@ -208,24 +205,24 @@ export default class ChannelsHandler extends MessageHandler {
     users.forEach(u => {
       um[u.userId] = convertUser(u);
     });
-    this.store.commit('setUsers', um);
+    this.store.setUsers(um);
   }
 
   public initRooms(rooms: RoomDto[]) {
     this.logger.debug('Setting rooms')();
     let storeRooms: RoomDictModel = {};
-    let roomsDict: RoomDictModel = this.store.state.roomsDict;
+    let roomsDict: RoomDictModel = this.store.roomsDict;
     rooms.forEach((newRoom: RoomDto) => {
       let oldRoom = roomsDict[newRoom.roomId];
       let rm: RoomModel = getRoomsBaseDict(newRoom, oldRoom);
       storeRooms[rm.id] = rm;
     });
-    this.store.commit('setRooms', storeRooms);
+    this.store.setRooms(storeRooms);
   }
 
 
   init(m: PubSetRooms) {
-    this.store.commit('setOnline', [...m.online]);
+    this.store.setOnline([...m.online]);
     this.initUsers(m.users);
     this.initRooms(m.rooms);
   }
@@ -238,11 +235,11 @@ export default class ChannelsHandler extends MessageHandler {
     if (lm.content.length > 0) {
       this.addMessages(lm.roomId, lm.content);
     } else {
-      this.store.commit('setAllLoaded', lm.roomId);
+      this.store.setAllLoaded(lm.roomId);
     }
   }
   private deleteMessage(inMessage: DeleteMessage) {
-    let message: MessageModel = this.store.state.roomsDict[inMessage.roomId].messages[inMessage.id];
+    let message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
       this.logger.debug('Unable to find message {} to delete it', inMessage)();
     } else {
@@ -260,36 +257,36 @@ export default class ChannelsHandler extends MessageHandler {
         deleted: true
       };
       this.logger.debug('Adding message to storage {}', message)();
-      this.store.commit('addMessage', message);
+      this.store.addMessage(message);
       if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
         let removed = this.removeSendingMessage(inMessage.messageId);
       }
     }
   }
   private editMessage(inMessage: EditMessage) {
-    let message: MessageModel = this.store.state.roomsDict[inMessage.roomId].messages[inMessage.id];
+    let message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
       this.logger.debug('Unable to find message {} to edit it', inMessage)();
     } else {
       let message: MessageModel = this.getMessage(inMessage);
       this.logger.debug('Adding message to storage {}', message)();
-      this.store.commit('addMessage', message);
+      this.store.addMessage(message);
       if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
         let removed = this.removeSendingMessage(inMessage.messageId);
       }
     }
   }
   private addOnlineUser(message: AddOnlineUserMessage) {
-    if (!this.store.state.allUsersDict[message.userId]) {
+    if (!this.store.allUsersDict[message.userId]) {
       let newVar: UserModel = convertUser(message);
-      this.store.commit('addUser', newVar);
+      this.store.addUser(newVar);
     }
     this.addChangeOnlineEntry(message.userId, message.time, true);
-    this.store.commit('setOnline', [...message.content]);
+    this.store.setOnline([...message.content]);
   }
   private removeOnlineUser(message: RemoveOnlineUserMessage) {
     this.addChangeOnlineEntry(message.userId, message.time, false);
-    this.store.commit('setOnline', message.content);
+    this.store.setOnline(message.content);
   }
   private printMessage(inMessage: EditMessage) {
     if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
@@ -298,21 +295,21 @@ export default class ChannelsHandler extends MessageHandler {
         messageId: inMessage.messageId,
         roomId: inMessage.roomId
       };
-      this.store.commit('deleteMessage', rmMes);
+      this.store.deleteMessage(rmMes);
     }
     let message: MessageModel = this.getMessage(inMessage);
     this.logger.debug('Adding message to storage {}', message)();
-    this.store.commit('addMessage', message);
-    let activeRoom: RoomModel = this.store.getters.activeRoom;
+    this.store.addMessage(message);
+    let activeRoom: RoomModel = this.store.activeRoom;
     let activeRoomId = activeRoom && activeRoom.id; // if no channels page first
-    let room = this.store.state.roomsDict[inMessage.roomId];
-    let userInfo: CurrentUserInfoModel = this.store.state.userInfo;
+    let room = this.store.roomsDict[inMessage.roomId];
+    let userInfo: CurrentUserInfoModel = this.store.userInfo;
     let isSelf = inMessage.userId === userInfo.userId;
     if (activeRoomId !== inMessage.roomId && !isSelf) {
-      this.store.commit('incNewMessagesCount', inMessage.roomId);
+      this.store.incNewMessagesCount(inMessage.roomId);
     }
     if (room.notifications && !isSelf) {
-      let title = this.store.state.allUsersDict[inMessage.userId].user;
+      let title = this.store.allUsersDict[inMessage.userId].user;
       this.notifier.showNotification(title, {
         body: inMessage.content || 'Image',
         data: {
@@ -325,7 +322,7 @@ export default class ChannelsHandler extends MessageHandler {
       });
     }
 
-    if (this.store.state.userSettings.messageSound) {
+    if (this.store.userSettings.messageSound) {
       if (message.userId === userInfo.userId) {
         checkAndPlay(outgoing, room.volume);
       } else {
@@ -336,19 +333,19 @@ export default class ChannelsHandler extends MessageHandler {
     this.messageBus.$emit('scroll');
   }
   private deleteRoom(message: DeleteRoomMessage) {
-    if (this.store.state.roomsDict[message.roomId]) {
-      this.store.commit('deleteRoom', message.roomId);
+    if (this.store.roomsDict[message.roomId]) {
+      this.store.deleteRoom(message.roomId);
     } else {
       this.logger.error('Unable to find room {} to delete', message.roomId)();
     }
   }
   private leaveUser(message: LeaveUserMessage) {
-    if (this.store.state.roomsDict[message.roomId]) {
+    if (this.store.roomsDict[message.roomId]) {
       let m: SetRoomsUsers = {
         roomId: message.roomId,
         users: message.users
       };
-      this.store.commit('setRoomsUsers', m);
+      this.store.setRoomsUsers(m);
     } else {
       this.logger.error('Unable to find room {} to kick user', message.roomId)();
     }
@@ -357,7 +354,7 @@ export default class ChannelsHandler extends MessageHandler {
     this.mutateRoomAddition(message);
   }
   private inviteUser(message: InviteUserMessage) {
-    this.store.commit('setRoomsUsers', {roomId: message.roomId, users: message.users} as SetRoomsUsers);
+    this.store.setRoomsUsers({roomId: message.roomId, users: message.users} as SetRoomsUsers);
   }
   private addInvite(message: AddInviteMessage) {
     this.mutateRoomAddition(message);
@@ -365,7 +362,7 @@ export default class ChannelsHandler extends MessageHandler {
 
   private  addChangeOnlineEntry(userId: number, time: number, isWentOnline: boolean) {
     let roomIds = [];
-    this.store.getters.roomsArray.forEach(r => {
+    this.store.roomsArray.forEach(r => {
       if (r.users.indexOf(userId)) {
         roomIds.push(r.id);
       }
@@ -380,10 +377,10 @@ export default class ChannelsHandler extends MessageHandler {
     };
 
     // TODO Uncaught TypeError: Cannot read property 'onlineChangeSound' of null
-    if (this.store.state.userSettings.onlineChangeSound && this.store.getters.myId !== userId) {
+    if (this.store.userSettings.onlineChangeSound && this.store.myId !== userId) {
       checkAndPlay(isWentOnline ? login : logout, 50);
     }
-    this.store.commit('addChangeOnlineEntry', entry);
+    this.store.addChangeOnlineEntry(entry);
   }
 
 
@@ -415,7 +412,7 @@ export default class ChannelsHandler extends MessageHandler {
 
   private mutateRoomAddition(message: AddRoomBase) {
     let r: RoomModel = getRoomsBaseDict(message);
-    this.store.commit('addRoom', r);
+    this.store.addRoom(r);
   }
 
 

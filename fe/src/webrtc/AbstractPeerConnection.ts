@@ -1,14 +1,14 @@
-import {WEBRTC_STUNT_URL} from '../utils/singletons';
+import {WEBRTC_STUNT_URL} from '@/utils/singletons';
 import {Logger} from 'lines-logger';
-import loggerFactory from '../utils/loggerFactory';
-import WsHandler from '../utils/WsHandler';
-import {bytesToSize, extractError} from '../utils/utils';
-import {RootState} from '../types/model';
-import {Store} from 'vuex';
-import {sub} from '../utils/sub';
-import MessageHandler from '../utils/MesageHandler';
-import Subscription from '../utils/Subscription';
-import {RemovePeerConnection} from '../types/types';
+import loggerFactory from '@/utils/loggerFactory';
+import WsHandler from '@/utils/WsHandler';
+import {bytesToSize, extractError} from '@/utils/utils';
+
+import {sub} from '@/utils/sub';
+import MessageHandler from '@/utils/MesageHandler';
+import Subscription from '@/utils/Subscription';
+import {RemovePeerConnection} from '@/types/types';
+import {DefaultStore} from'@/utils/store';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean;
@@ -21,7 +21,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected webRtcUrl = WEBRTC_STUNT_URL;
   protected sdpConstraints: any;
   protected readonly wsHandler: WsHandler;
-  protected readonly store: Store<RootState>;
+  protected readonly store: DefaultStore;
   protected readonly roomId: number;
   protected sendChannel: RTCDataChannel = null;
   private pc_config = {
@@ -40,7 +40,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.logger.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();
   }
 
-  constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: Store<RootState>) {
+  constructor(roomId: number, connectionId: string, opponentWsId: string, ws: WsHandler, store: DefaultStore) {
     super();
     this.roomId = roomId;
     this.connectionId = connectionId;
@@ -92,7 +92,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
         } else if (data.candidate) {
           this.pc.addIceCandidate(new RTCIceCandidate(data));
         } else if (data.message) {
-          this.store.dispatch('growlInfo', data.message);
+          this.store.growlInfo(data.message);
         }
       } else {
         this.logger.error('Skipping ws message for closed connection')();
@@ -135,7 +135,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   failWebRtc(parent) {
     return (...args) => {
       let message = `An error occurred while ${parent}: ${extractError(args)}`;
-      this.store.dispatch('growlError', message);
+      this.store.growlError(message);
       this.logger.error('failWebRtc {}', message)();
     };
   }

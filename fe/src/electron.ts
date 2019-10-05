@@ -1,6 +1,6 @@
 import {app, BrowserWindow} from 'electron';
-import {IS_DEBUG, ELECTRON_MAIN_FILE, IS_PROD, ELECTRON_IGNORE_SSL} from './utils/consts';
-import * as constants from './utils/consts';
+import {IS_DEBUG, ELECTRON_MAIN_FILE, IS_PROD, ELECTRON_IGNORE_SSL} from '@/utils/consts';
+import * as constants from '@/utils/consts';
 
 let mainWindow;
 

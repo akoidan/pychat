@@ -1,14 +1,16 @@
-$FontPathOpenSans: "../../../node_modules/npm-font-open-sans/fonts" !default
-@import '../../../node_modules/npm-font-open-sans/open-sans.scss'
-@import "../../../node_modules/typeface-oswald/index.css"
-@import "partials/fontello"
-
-@import "themes/common_lor"
-@import "themes/common_reg"
-@import "themes/common_white"
+$FontPathOpenSans: "~npm-font-open-sans/fonts" !default
+@import '~npm-font-open-sans/open-sans.scss'
+@import "~typeface-oswald/index.css"
 
 
-$FontelloPath: "../font"
+@import "~@/assets/sass/partials/fontello"
+
+@import "~@/assets/sass/themes/common_lor"
+@import "~@/assets/sass/themes/common_reg"
+@import "~@/assets/sass/themes/common_white"
+
+
+$FontelloPath: "~@/assets/font"
 
 @font-face
   font-family: 'fontello'
@@ -53,8 +55,8 @@ $FontelloPath: "../font"
   -webkit-font-smoothing: antialiased
   -moz-osx-font-smoothing: grayscale
 
-  /* Uncomment for 3D effect */
-  /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+/* Uncomment for 3D effect */
+/* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
 
 
 a

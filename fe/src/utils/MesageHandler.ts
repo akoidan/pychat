@@ -1,6 +1,6 @@
-import {DefaultMessage} from '../types/messages';
+import {DefaultMessage} from '@/types/messages';
 import {Logger} from 'lines-logger';
-import {IMessageHandler} from '../types/types';
+import {IMessageHandler} from '@/types/types';
 
 export default abstract class MessageHandler implements IMessageHandler {
 

@@ -1,35 +1,28 @@
-import store from '../store';
-import router from '../router';
-import sessionHolder from './sessionHolder';
-import {api, channelsHandler, globalLogger, storage, webrtcApi, ws} from './singletons';
-import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from '../types/model';
-import loggerFactory from './loggerFactory';
+import {store} from '@/utils/storeHolder';
+import router from '@/utils/router';
+import sessionHolder from '@/utils/sessionHolder';
+import {api, channelsHandler, globalLogger, storage, webrtcApi, ws} from '@/utils/singletons';
+import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from '@/types/model';
+import loggerFactory from '@/utils/loggerFactory';
 import {
   ALL_ROOM_ID,
   FACEBOOK_APP_ID,
   GOOGLE_OAUTH_2_CLIENT_ID,
-} from './consts';
-import {StorageData} from '../types/types';
+} from '@/utils/consts';
+import {StorageData} from '@/types/types';
 
 let logger = loggerFactory.getLoggerColor('utils', '#007a70');
 
 export function logout(errMessage: string) {
-  store.commit('logout');
+  store.logout();
   if (errMessage) {
-    store.dispatch('growlError', errMessage);
+    store.growlError( errMessage);
   }
   webrtcApi.closeAllConnections();
   sessionHolder.session = '';
   router.replace('/auth/login');
   ws.stopListening();
   channelsHandler.removeAllSendingMessages();
-}
-export function forEach(array, cb) {
-  if (array && array.length) {
-    for (let i = 0; i < array.length; i++) {
-      cb(array[i]);
-    }
-  }
 }
 
 export function getDay(dateObj) {
@@ -57,17 +50,17 @@ export async function initStore() {
   if (!isNew) {
     let data: StorageData = await storage.getAllTree();
     let session = sessionHolder.session;
-    globalLogger.log('restored state from db {}, userId: {}, session {}', data, store.state.userInfo && store.state.userInfo.userId, session)();
+    globalLogger.log('restored state from db {}, userId: {}, session {}', data, store.userInfo && store.userInfo.userId, session)();
     if (data) {
-      if (!store.state.userInfo && session) {
-        store.commit('init', data.setRooms);
+      if (!store.userInfo && session) {
+        store.init(data.setRooms);
       } else {
-        store.getters.roomsArray.forEach((storeRoom: RoomModel) => {
+        store.roomsArray.forEach((storeRoom: RoomModel) => {
           if (data.setRooms.roomsDict[storeRoom.id]) {
             let dbMessages: {[id: number]: MessageModel} = data.setRooms.roomsDict[storeRoom.id].messages;
             for (let dbMessagesKey in dbMessages) {
               if (!storeRoom.messages[dbMessagesKey])
-              store.commit('addMessage', dbMessages[dbMessagesKey]);
+              store.addMessage(dbMessages[dbMessagesKey]);
             }
           }
         });
@@ -93,13 +86,13 @@ export async function initStore() {
 
 export function login(session, errMessage) {
   if (errMessage) {
-    store.dispatch('growlError', errMessage);
+    store.growlError( errMessage);
   } else if (/\w{32}/.exec(session)) {
     sessionHolder.session = session;
     logger.log('Proceeding to /')();
     router.replace(`/chat/${ALL_ROOM_ID}`);
   } else {
-    store.dispatch('growlError', session);
+    store.growlError( session);
   }
 }
 

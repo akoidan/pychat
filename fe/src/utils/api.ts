@@ -1,14 +1,14 @@
-import Xhr from './Xhr';
-import {CONNECTION_ERROR, RESPONSE_SUCCESS} from './consts';
-import {UploadFile} from '../types/types';
-import {MessageModelDto} from '../types/dto';
-import {DefaultMessage, ViewUserProfileDto} from '../types/messages';
-import MessageHandler from './MesageHandler';
-import loggerFactory from './loggerFactory';
+import Xhr from '@/utils/Xhr';
+import {CONNECTION_ERROR, RESPONSE_SUCCESS} from '@/utils/consts';
+import {UploadFile} from '@/types/types';
+import {MessageModelDto} from '@/types/dto';
+import {DefaultMessage, ViewUserProfileDto} from '@/types/messages';
+import MessageHandler from '@/utils/MesageHandler';
+import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import Http from './Http';
-import {sub} from './sub';
-import sessionHolder from './sessionHolder';
+import Http from '@/utils/Http';
+import {sub} from '@/utils/sub';
+import sessionHolder from '@/utils/sessionHolder';
 
 export default class Api extends MessageHandler {
   private readonly  xhr: Http;

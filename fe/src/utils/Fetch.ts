@@ -1,8 +1,8 @@
-import loggerFactory from './loggerFactory';
-import {PostData, SessionHolder} from '../types/types';
+import loggerFactory from '@/utils/loggerFactory';
+import {PostData, SessionHolder} from '@/types/types';
 import {Logger} from 'lines-logger';
-import {CONNECTION_ERROR} from './consts';
-import Http from './Http';
+import {CONNECTION_ERROR} from '@/utils/consts';
+import Http from '@/utils/Http';
 
 
 /**

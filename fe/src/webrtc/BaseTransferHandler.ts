@@ -1,13 +1,12 @@
-import loggerFactory from '../utils/loggerFactory';
+import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import WsHandler from '../utils/WsHandler';
-import NotifierHandler from '../utils/NotificationHandler';
-import {RootState} from '../types/model';
-import {Store} from 'vuex';
-import MessageHandler from '../utils/MesageHandler';
-import {sub} from '../utils/sub';
-import Subscription from '../utils/Subscription';
-import {RemovePeerConnection} from '../types/types';
+import WsHandler from '@/utils/WsHandler';
+import NotifierHandler from '@/utils/NotificationHandler';
+import MessageHandler from '@/utils/MesageHandler';
+import {sub} from '@/utils/sub';
+import Subscription from '@/utils/Subscription';
+import {RemovePeerConnection} from '@/types/types';
+import {DefaultStore} from'@/utils/store';
 
 export default abstract class BaseTransferHandler extends MessageHandler {
 
@@ -15,11 +14,11 @@ export default abstract class BaseTransferHandler extends MessageHandler {
   protected readonly wsHandler: WsHandler;
   protected readonly notifier: NotifierHandler;
   protected readonly logger: Logger;
-  protected readonly store: Store<RootState>;
+  protected readonly store: DefaultStore;
   protected readonly roomId: number;
   protected webrtcConnnectionsIds: string[] = [];
 
-  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: Store<RootState>) {
+  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore) {
     super();
     this.roomId = roomId;
     this.notifier = notifier;

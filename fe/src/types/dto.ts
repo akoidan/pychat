@@ -1,4 +1,4 @@
-import {CurrentUserInfoModel, CurrentUserSettingsModel, FileModel, RoomDictModel, UserModel} from './model';
+import {CurrentUserInfoModel, CurrentUserSettingsModel, FileModel, RoomDictModel, UserModel} from '@/types/model';
 
 export enum SexModelDto {
   Male = 'Male',

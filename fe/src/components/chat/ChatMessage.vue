@@ -8,7 +8,7 @@
   </p>
 </template>
 <script lang="ts">
-  import {Mutation, State, Getter} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {
     CurrentUserInfoModel,
@@ -17,7 +17,7 @@
     MessageModel,
     UserDictModel,
     UserModel
-  } from "../../types/model";
+  } from "@/types/model";
   import {
     encodeHTML,
     encodeMessage,
@@ -25,20 +25,19 @@
     setImageFailEvents,
     setVideoEvent,
     setYoutubeEvent, timeToString
-  } from "../../utils/htmlApi";
-  import {sem} from '../../utils/utils';
-  import {messageBus} from '../../utils/singletons';
-  import ChatMessageHeader from './ChatMessageHeader';
+  } from "@/utils/htmlApi";
+  import {sem} from '@/utils/utils';
+  import {messageBus} from '@/utils/singletons';
+  import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
   @Component({
     components: {ChatMessageHeader}
   })
   export default class ChatMessage extends Vue {
 
-    @State userSettings: CurrentUserSettingsModel;
-    @State userInfo: CurrentUserInfoModel;
+    get userSettings(): CurrentUserSettingsModel  { return store.userSettings }
+    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
     @Prop() message: MessageModel;
-    @State editedMessage : EditingMessage;
-    @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
+    get editedMessage(): EditingMessage  { return store.editedMessage }
 
     $refs: {
       content: HTMLElement
@@ -57,7 +56,7 @@
     }
 
     contextmenu(event) {
-      sem(event, this.message, false, this.userInfo, this.setEditedMessage);
+      sem(event, this.message, false, this.userInfo, store.setEditedMessage);
     }
 
     updated() {
@@ -108,10 +107,8 @@
 </script>
 <style lang="sass" scoped>
 
-
-  $img-path: "../../assets/img"
-  @import "partials/mixins"
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/mixins"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   @mixin margin-img
     margin: 5px 0 0 15px

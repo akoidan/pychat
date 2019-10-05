@@ -1,4 +1,4 @@
-import AbstractPeerConnection from './AbstractPeerConnection';
+import AbstractPeerConnection from '@/webrtc/AbstractPeerConnection';
 
 export default abstract class FilePeerConnection extends AbstractPeerConnection {
 

@@ -1,32 +1,38 @@
-import loggerFactory from '../utils/loggerFactory';
+import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import {SetReceivingFileStatus, VideoType} from '../types/types';
-import {DefaultMessage, OfferCall, OfferFile, WebRtcSetConnectionIdMessage} from '../types/messages';
-import WsHandler from '../utils/WsHandler';
-import {ReceivingFile, FileTransferStatus, RootState, SendingFile} from '../types/model';
-import {Store} from 'vuex';
-import FileSender from './FileSender';
-import NotifierHandler from '../utils/NotificationHandler';
-import {browserVersion, webrtcApi} from '../utils/singletons';
-import MessageHandler from '../utils/MesageHandler';
-import {sub} from '../utils/sub';
-import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from '../utils/consts';
-import {requestFileSystem} from '../utils/htmlApi';
-import {bytesToSize} from '../utils/utils';
-import FileReceiverPeerConnection from './FileReceiveerPeerConnection';
-import Subscription from '../utils/Subscription';
-import CallHandler from './CallHandler';
-import faviconUrl from '../assets/img/favicon.ico';
+import {VideoType} from '@/types/types';
+import {
+  DefaultMessage,
+  OfferCall,
+  OfferFile,
+  WebRtcSetConnectionIdMessage
+} from '@/types/messages';
+import WsHandler from '@/utils/WsHandler';
+import {FileTransferStatus, ReceivingFile} from '@/types/model';
+import FileSender from '@/webrtc/FileSender';
+import NotifierHandler from '@/utils/NotificationHandler';
+import {browserVersion} from '@/utils/singletons';
+import MessageHandler from '@/utils/MesageHandler';
+import {sub} from '@/utils/sub';
+import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from '@/utils/consts';
+import {requestFileSystem} from '@/utils/htmlApi';
+import {bytesToSize} from '@/utils/utils';
+import FileReceiverPeerConnection from '@/webrtc/FileReceiveerPeerConnection';
+import Subscription from '@/utils/Subscription';
+import CallHandler from '@/webrtc/CallHandler';
+import faviconUrl from '@/assets/img/favicon.ico';
+import {DefaultStore} from'@/utils/store';
+
 export default class WebRtcApi extends MessageHandler {
 
   protected logger: Logger;
 
   private wsHandler: WsHandler;
-  private store: Store<RootState>;
+  private store: DefaultStore;
   private notifier: NotifierHandler;
   private callHandlers: {[id: number]: CallHandler} = {};
 
-  constructor(ws: WsHandler, store: Store<RootState>, notifier: NotifierHandler) {
+  constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler) {
     super();
     sub.subscribe('webrtc', this);
     this.wsHandler = ws;
@@ -57,12 +63,12 @@ export default class WebRtcApi extends MessageHandler {
         total: message.content.size
       }
     };
-    this.notifier.showNotification(this.store.state.allUsersDict[message.userId].user, {
+    this.notifier.showNotification(this.store.allUsersDict[message.userId].user, {
       body: `Sends file ${message.content.name}`,
       requireInteraction: true,
       icon: faviconUrl
     });
-    this.store.commit('addReceivingFile', payload);
+    this.store.addReceivingFile(payload);
     this.wsHandler.replyFile(message.connId, browserVersion);
     if (!limitExceeded) {
       new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, message.content.size);
@@ -95,7 +101,7 @@ export default class WebRtcApi extends MessageHandler {
         }
       });
     } else {
-      this.store.dispatch('growlError', `File ${file.name} size is 0. Skipping sending it...`);
+      this.store.growlError( `File ${file.name} size is 0. Skipping sending it...`);
     }
   }
 

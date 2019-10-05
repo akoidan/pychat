@@ -10,7 +10,7 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {Mutation, State} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
 
 
   @Component
@@ -28,7 +28,7 @@
 </script>
 <style lang="sass" scoped>
 
-    @import "partials/mixins"
+    @import "~@/assets/sass/partials/mixins"
 
     .spinner
         @include lds-30-spinner-vertical('Verifying email...')

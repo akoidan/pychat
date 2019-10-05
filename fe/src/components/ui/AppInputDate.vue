@@ -3,10 +3,10 @@
   <input type="date" :class="inputClass" v-else v-bind:value="value" @input="oninputnative"/>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {isDateMissing} from '../../utils/htmlApi';
-  import {ELECTRON_MAIN_FILE} from '../../utils/consts'
+  import {isDateMissing} from '@/utils/htmlApi';
+  import {ELECTRON_MAIN_FILE} from '@/utils/consts'
 
   let Datepicker;
   if (!ELECTRON_MAIN_FILE) {

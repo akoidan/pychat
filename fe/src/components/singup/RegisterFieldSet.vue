@@ -11,7 +11,7 @@
 
   import Vue from "vue";
   import {Prop, Component} from "vue-property-decorator";
-  import {IconColor} from '../../types/types';
+  import {IconColor} from '@/types/types';
 
 
   @Component
@@ -25,7 +25,7 @@
 </script>
 <style lang="sass" scoped>
 
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/abstract_classes"
   .slider
     @extend %slider
     overflow-y: hidden

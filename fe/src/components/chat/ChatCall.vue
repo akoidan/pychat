@@ -70,14 +70,14 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation, Getter} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-  import {CallInfoModel, CallsInfoModel} from "../../types/model";
-  import {BooleanIdentifier, StringIdentifier, VideoType} from "../../types/types";
-  import {webrtcApi} from '../../utils/singletons';
-  import ChatRemotePeer from './ChatRemotePeer';
-  import {file} from '../../utils/audio';
-  import VideoObject from "./VideoObject.vue";
+  import {CallInfoModel, CallsInfoModel} from "@/types/model";
+  import {BooleanIdentifier, StringIdentifier, VideoType} from "@/types/types";
+  import {webrtcApi} from '@/utils/singletons';
+  import ChatRemotePeer from '@/components/chat/ChatRemotePeer';
+  import {file} from '@/utils/audio';
+  import VideoObject from "@/components/chat/VideoObject.vue";
   @Component({
     components: {VideoObject, ChatRemotePeer}
   })
@@ -85,18 +85,11 @@
     @Prop() callInfo: CallsInfoModel;
     @Prop() roomId: number;
     showSettings: boolean = false;
-    @Mutation setMicToState;
-    @Mutation setVideoToState;
-    @Mutation setShareScreenToState;
-    @Mutation setCurrentWebcam;
-    @Mutation setCurrentSpeaker;
-    @Mutation setCurrentMic;
 
-    @Action growlError;
 
-    @State microphones: { [id: string]: string };
-    @State speakers: { [id: string]: string };
-    @State webcams: { [id: string]: string };
+    get microphones(): { [id: string]: string }  { return store.microphones }
+    get speakers(): { [id: string]: string }  { return store.speakers }
+    get webcams(): { [id: string]: string }  { return store.webcams }
     fullscreen: boolean = false;
 
     currentVideoActive: string = null;
@@ -154,7 +147,7 @@
       } else if (elem['webkitRequestFullscreen']) {
         elem['webkitRequestFullscreen']()
       } else {
-        this.growlError("Can't enter fullscreen");
+        store.growlError("Can't enter fullscreen");
         return;
       }
       this.fullscreen = true;
@@ -182,7 +175,7 @@
         id: this.roomId,
         state: event.target.value
       };
-      this.setCurrentMic(payload);
+      store.setCurrentMic(payload);
       if (this.callInfo.callActive) {
         webrtcApi.updateConnection(this.roomId);
       }
@@ -192,7 +185,7 @@
         id: this.roomId,
         state: event.target.value
       };
-      this.setCurrentWebcam(payload);
+      store.setCurrentWebcam(payload);
       if (this.callInfo.callActive) {
         webrtcApi.updateConnection(this.roomId);
       }
@@ -208,7 +201,7 @@
         prom && prom.catch(function (e) {
         });
       } else {
-        this.growlError("Your browser doesn't support changing output channel")
+        store.growlError("Your browser doesn't support changing output channel")
       }
     }
 
@@ -217,7 +210,7 @@
         id: this.roomId,
         state: event.target.value
       };
-      this.setCurrentSpeaker(payload);
+      store.setCurrentSpeaker(payload);
       if (this.callInfo.callActive) {
         webrtcApi.updateConnection(this.roomId);
       }
@@ -260,7 +253,7 @@
         state: !this.callInfo.shareScreen,
         id: this.roomId,
       };
-      this.setShareScreenToState(payload);
+      store.setShareScreenToState(payload);
       if (this.callInfo.callActive) {
         webrtcApi.toggleDevice(this.roomId, VideoType.SHARE);
       }
@@ -271,7 +264,7 @@
         state: !this.callInfo.showVideo,
         id: this.roomId,
       };
-      this.setVideoToState(payload);
+      store.setVideoToState(payload);
       if (this.callInfo.callActive) {
         webrtcApi.toggleDevice(this.roomId, VideoType.VIDEO);
       }
@@ -282,7 +275,7 @@
         state: !this.callInfo.showMic,
         id: this.roomId,
       };
-      this.setMicToState(payload);
+      store.setMicToState(payload);
       if (this.callInfo.callActive) {
         webrtcApi.toggleDevice(this.roomId, VideoType.AUDIO);
       }
@@ -293,7 +286,7 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/mixins.sass"
+  @import "~@/assets/sass/partials/mixins.sass"
 
   .current-video-active
     width: 100% !important

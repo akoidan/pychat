@@ -49,10 +49,10 @@
 </template>
 <script lang="ts">
   import {Component, Vue} from "vue-property-decorator";
-  import {State} from 'vuex-class';
-  import {ViewUserProfileDto} from "../../types/messages";
-  import {resolveMediaUrl} from '../../utils/htmlApi';
-  import {UserModel} from '../../types/model';
+  import {store} from '@/utils/storeHolder';;
+  import {ViewUserProfileDto} from "@/types/messages";
+  import {resolveMediaUrl} from '@/utils/htmlApi';
+  import {UserModel} from '@/types/model';
 
   @Component
   export default class ViewProfilePage extends Vue {
@@ -60,7 +60,7 @@
     loading: boolean = false;
     error: string = null;
     userProfileInfo: ViewUserProfileDto = null;
-    @State allUsersDict: {[id: number]: UserModel};
+    get allUsersDict(): {[id: number]: UserModel}  { return store.allUsersDict }
 
     get id(): number {
       return parseInt(this.$route.params['id']);
@@ -90,8 +90,8 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/variables"
-  @import "partials/mixins"
+  @import "~@/assets/sass/partials/variables"
+  @import "~@/assets/sass/partials/mixins"
 
   th
     text-align: right

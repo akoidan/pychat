@@ -21,7 +21,7 @@
 </script>
 <style lang="sass" scoped>
 
-  @import "partials/mixins"
+  @import "~@/assets/sass/partials/mixins"
 
   .spinner
     display: inline-block

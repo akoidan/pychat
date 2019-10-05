@@ -19,11 +19,11 @@
 
 <script lang='ts'>
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import AppSubmit from "../ui/AppSubmit.vue"
-  import {Action, Mutation} from "vuex-class";
-  import {login} from "../../utils/utils";
-  import SocialAuth from './SocialAuth.vue';
-  import CaptchaComponent from './CaptchaComponent.vue';
+  import AppSubmit from "@/components/ui/AppSubmit.vue"
+  import {store} from '@/utils/storeHolder';
+  import {login} from "@/utils/utils";
+  import SocialAuth from '@/components/singup/SocialAuth.vue';
+  import CaptchaComponent from '@/components/singup/CaptchaComponent.vue';
 
   @Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
   export default class Register extends Vue {
@@ -32,13 +32,10 @@
       form: HTMLFormElement
     };
 
-    @Action growlError;
-    @Mutation setRegHeader;
-
     running: boolean = false;
 
     created() {
-      this.setRegHeader('Welcome back!');
+      store.setRegHeader('Welcome back!');
     }
 
     login() {
@@ -67,7 +64,7 @@
       text-decoration: underline
       cursor: pointer
 
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/abstract_classes"
   i
     @extend %i
 </style>

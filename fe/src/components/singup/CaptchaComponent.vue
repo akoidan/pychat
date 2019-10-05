@@ -25,8 +25,8 @@
     RECAPTCHA_PUBLIC_KEY,
     PUBLIC_PATH,
     CAPTCHA_IFRAME
-  } from "../../utils/consts";
-  import {GoogleCaptcha} from "../../types/model";
+  } from "@/utils/consts";
+  import {GoogleCaptcha} from "@/types/model";
 
   let captchaInited: boolean = false; // don't init captcha again, if it was inited in another component
   let captchaId = 1; // just random id to diff one comp fro another
@@ -68,7 +68,6 @@
       }
       this.skipInitReset = false;
     }
-
 
     get grecaptcha(): GoogleCaptcha {
       if (window.grecaptcha) {

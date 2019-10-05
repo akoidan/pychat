@@ -1,6 +1,6 @@
-import {PostData, SessionHolder} from '../types/types';
-import {CONNECTION_ERROR, XHR_API_URL} from './consts';
-import Http from './Http';
+import {PostData, SessionHolder} from '@/types/types';
+import {CONNECTION_ERROR, XHR_API_URL} from '@/utils/consts';
+import Http from '@/utils/Http';
 
 
 /**

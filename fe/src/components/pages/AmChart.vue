@@ -4,12 +4,11 @@
   </div>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation, Getter} from "vuex-class";
   import {Component, Prop, Vue} from "vue-property-decorator";
   import Painter from 'spainter';
-  import {messageBus} from '../../utils/singletons';
-  import loggerFactory from "../../utils/loggerFactory";
-  import AppInputRange from '../ui/AppInputRange';
+  import {messageBus} from '@/utils/singletons';
+  import loggerFactory from "@/utils/loggerFactory";
+  import AppInputRange from '@/components/ui/AppInputRange';
   @Component
   export default class PainterPage extends Vue {
 
@@ -56,7 +55,7 @@
       };
       this.$api.statistics((cb, err) => {
         data.dataProvider = cb;
-        import( /* webpackChunkName: "amcharts" */ '../../utils/amchart.js').then(amcharts => {
+        import( /* webpackChunkName: "amcharts" */ '@/utils/amchart.js').then(amcharts => {
           var chart = window['AmCharts'].makeChart("chartdiv", data);
 
           chart.addListener("init", handleInit);
@@ -81,7 +80,7 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   .container
     height: calc(100% - 55px)

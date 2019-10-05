@@ -79,23 +79,20 @@
 </template>
 <script lang="ts">
   import {Component, Vue, Watch} from "vue-property-decorator";
-  import {State, Action, Mutation} from "vuex-class";
-  import AppSubmit from "../ui/AppSubmit";
-  import AppCheckbox from "../ui/AppCheckbox";
-  import {CurrentUserInfoModel, CurrentUserSettingsModel} from "../../types/model";
-  import {currentUserInfoDtoToModel, currentUserInfoModelToDto, userSettingsDtoToModel} from "../../types/converters";
-  import {UserSettingsDto} from "../../types/dto";
-  import {storage} from '../../utils/singletons';
+  import {store} from '@/utils/storeHolder';
+  import AppSubmit from "@/components/ui/AppSubmit";
+  import AppCheckbox from "@/components/ui/AppCheckbox";
+  import {CurrentUserInfoModel, CurrentUserSettingsModel} from "@/types/model";
+  import {currentUserInfoDtoToModel, currentUserInfoModelToDto, userSettingsDtoToModel} from "@/types/converters";
+  import {UserSettingsDto} from "@/types/dto";
+  import {storage} from '@/utils/singletons';
 
   @Component({
     components: {AppSubmit, AppCheckbox}
   })
   export default class UserProfileSettings extends Vue {
     running: boolean = false;
-    @State userSettings: CurrentUserSettingsModel;
-    @Action growlError;
-    @Action growlSuccess;
-    @Mutation clearMessages;
+    get userSettings(): CurrentUserSettingsModel  { return store.userSettings }
 
     model: UserSettingsDto = null;
 
@@ -110,7 +107,7 @@
 
 
     clearHistory() {
-      this.clearMessages();
+      store.clearMessages();
     }
 
     save() {
@@ -120,7 +117,7 @@
       this.$ws.saveSettings(cui, e => {
         this.running = false;
         if (e.action === 'setSettings') {
-          this.growlSuccess("Settings have been saved");
+          store.growlSuccess("Settings have been saved");
         }
       })
     }

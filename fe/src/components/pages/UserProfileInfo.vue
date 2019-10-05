@@ -42,28 +42,25 @@
   </form>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import AppSubmit from '../ui/AppSubmit';
-  import {CurrentUserInfoModel, SexModel} from "../../types/model";
-  import {UserProfileDto} from '../../types/dto';
-  import {currentUserInfoModelToDto, userSettingsDtoToModel} from "../../types/converters";
-  import AppInputDate from '../ui/AppInputDate';
+  import AppSubmit from '@/components/ui/AppSubmit';
+  import {CurrentUserInfoModel, SexModel} from "@/types/model";
+  import {UserProfileDto} from '@/types/dto';
+  import {currentUserInfoModelToDto, userSettingsDtoToModel} from "@/types/converters";
+  import AppInputDate from '@/components/ui/AppInputDate';
   @Component({
     components: {AppInputDate, AppSubmit}
   })
   export default class UserProfileInfo extends Vue {
     running: boolean = false;
-    @State userInfo: CurrentUserInfoModel;
+    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
     model: UserProfileDto = null;
 
     sex = SexModel;
-    @Action growlError;
-    @Action growlSuccess;
-    @Mutation setActiveUserId: SingleParamCB<number>;
 
     created() {
-      this.setActiveUserId(null);
+      store.setActiveUserId(null);
       this.model = currentUserInfoModelToDto(this.userInfo);
     }
 
@@ -75,7 +72,7 @@
       this.$ws.saveUser(cui, e => {
         this.running = false;
         if (e && e.action == 'setUserProfile') {
-          this.growlSuccess("User profile has been saved");
+          store.growlSuccess("User profile has been saved");
         }
       })
     }

@@ -5,12 +5,12 @@
   </div>
 </template>
 <script lang="ts">
-  import
-  {State, Action, Mutation, Getter} from "vuex-class";
+
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {stopVideo} from '../../utils/htmlApi';
-  import MediaCapture from '../../utils/MediaCapture';
-  import {isChrome, isMobile} from "../../utils/singletons";
+  import {stopVideo} from '@/utils/htmlApi';
+  import MediaCapture from '@/utils/MediaCapture';
+  import {isChrome, isMobile} from "@/utils/singletons";
 
   const HOLD_TIMEOUT = 500;
 
@@ -19,55 +19,54 @@
   @Component
   export default class MediaRecorderDiv extends Vue {
 
-    @Mutation setDim;
-    @Action growlError;
     isRecordingVideo = true;
-    @State dim: boolean;
+    get dim(): boolean  { return store.dim }
 
     // started: number = null;
     timeout: number = 0;
     navigatorRecord: MediaCapture;
 
 
-    switchRecord() {
+    async switchRecord() {
       this.logger.debug("switch recrod...")();
       // this.started = Date.now();
-      this.timeout = setTimeout(() => {
-        this.startRecord();
-        this.logger.debug("switch record timeouted...")();
-        this.timeout = null;
-      }, HOLD_TIMEOUT);
+      await new Promise((resolve) => this.timeout = setTimeout(resolve, HOLD_TIMEOUT));
+      this.timeout = null;
+      await this.startRecord();
+      this.logger.debug("switch record timeouted...")();
+      this.timeout = null;
     }
 
-    startRecord() {
+    async startRecord() {
       this.logger.debug("Starting recording...")();
-      this.setDim(true);
+      store.setDim(true);
       this.navigatorRecord = new MediaCapture(this.isRecordingVideo, (data) => {
         this.logger.debug("Finishing recording... {}", data)();
-        this.setDim(false);
+        store.setDim(false);
         if (data) {
           this.emitData(data);
         }
       });
-      this.navigatorRecord.record().then((src: MediaStream) => {
+      try {
+        let src: MediaStream = await this.navigatorRecord.record();
         this.logger.debug("Resolved record emitting video")();
         this.$emit("record", {isVideo: this.isRecordingVideo, src: src});
-      }).catch(error => {
-        this.setDim(false);
+      } catch (error) {
+        store.setDim(false);
         this.emitData(null);
-        if (String(error).indexOf("Permission denied") >= 0) {
+        if (String(error.message).indexOf("Permission denied") >= 0) {
           if (isChrome && !isMobile) {
-            this.growlError(`Please allow access for ${document.location.origin} in chrome://settings/content/microphone`);
+            store.growlError(`Please allow access for ${document.location.origin} in chrome://settings/content/microphone`);
           } else {
-            this.growlError(`You blocked the access to microphone/video. Please Allow it to continue`);
+            store.growlError(`You blocked the access to microphone/video. Please Allow it to continue`);
           }
         } else {
-          this.growlError("Unable to capture input device because " + error);
+          store.growlError("Unable to capture input device because " + error.message);
         }
-        this.logger.error("Error during capturing media {}", error);
+        this.logger.error("Error during capturing media {} {}", error, error.message)();
         this.navigatorRecord.stopRecording();
         throw error;
-      })
+      }
     }
 
     private emitData(data) {
@@ -93,7 +92,7 @@
 </script>
 
 <style lang="sass" scoped>
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   .icon-webrtc-video, .icon-mic-1
     @extend %chat-icon

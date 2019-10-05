@@ -1,6 +1,6 @@
-$img-path: "../../img" !default
-@import "variables"
-@import "mixins"
+@import "~@/assets/sass/partials/variables"
+@import "~@/assets/sass/partials/mixins"
+
 
 %i
   position: absolute
@@ -41,9 +41,9 @@ $img-path: "../../img" !default
 
 %img-play > div
   .icon-youtube-play
-    background: url('#{$img-path}/icon-play-black.svg') no-repeat center
+    background: url('~@/assets/img/icon-play-black.svg') no-repeat center
   .icon-youtube-play:hover
-    background: url('#{$img-path}/icon-play-red.svg') no-repeat center
+    background: url('~@/assets/img/icon-play-red.svg') no-repeat center
   background: black
 
 %window-white

@@ -10,14 +10,14 @@
   </li>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation, Getter} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {RoomModel} from "../../types/model";
+  import {RoomModel} from "@/types/model";
 
   @Component
   export default class RoomUsersPublic extends Vue {
     @Prop() room: RoomModel;
-    @State activeRoomId: number;
+    get activeRoomId(): number  { return store.activeRoomId }
 
     get activeClass() {
       return this.room.id === this.activeRoomId ? 'active-room' : null;

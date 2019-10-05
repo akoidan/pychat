@@ -16,21 +16,21 @@
   </div>
 </template>
 <script lang="ts">
-  import {Action, Getter, Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import ChatMessage from "./ChatMessage.vue";
-  import SearchMessages from "./SearchMessages.vue";
-  import {ReceivingFile, RoomModel, SearchModel, SendingFile} from "../../types/model";
-  import {MessageModelDto} from "../../types/dto";
-  import {channelsHandler, messageBus} from "../../utils/singletons";
-  import {SetSearchTo} from "../../types/types";
-  import {MESSAGES_PER_SEARCH} from "../../utils/consts";
-  import AppProgressBar from "../ui/AppProgressBar";
-  import ChatSendingMessage from "./ChatSendingMessage";
-  import ChatChangeOnlineMessage from "./ChatChangeOnlineMessage";
-  import ChatSendingFile from "./ChatSendingFile";
-  import ChatReceivingFile from './ChatReceivingFile';
-  import ChatCall from './ChatCall';
+  import ChatMessage from "@/components/chat/ChatMessage.vue";
+  import SearchMessages from "@/components/chat/SearchMessages.vue";
+  import {ReceivingFile, RoomModel, SearchModel, SendingFile} from "@/types/model";
+  import {MessageModelDto} from "@/types/dto";
+  import {channelsHandler, messageBus} from "@/utils/singletons";
+  import {SetSearchTo} from "@/types/types";
+  import {MESSAGES_PER_SEARCH} from "@/utils/consts";
+  import AppProgressBar from "@/components/ui/AppProgressBar";
+  import ChatSendingMessage from "@/components/chat/ChatSendingMessage";
+  import ChatChangeOnlineMessage from "@/components/chat/ChatChangeOnlineMessage";
+  import ChatSendingFile from "@/components/chat/ChatSendingFile";
+  import ChatReceivingFile from '@/components/chat/ChatReceivingFile';
+  import ChatCall from '@/components/chat/ChatCall';
 
   @Component({
     components: {
@@ -46,9 +46,7 @@
   })
   export default class ChatBox extends Vue {
     @Prop() room: RoomModel;
-    @Action growlError;
-    @Getter minId;
-    @Mutation setSearchTo;
+
 
     loading: boolean = false;
     $refs: {
@@ -118,20 +116,20 @@
         this.loadUpHistory(35);
       } else if (e.shiftKey && e.ctrlKey && e.keyCode === 70) {
         let s = this.room.search;
-        this.setSearchTo({
+        store.setSearchTo({
           roomId: this.room.id,
           search: {
             searchActive: !s.searchActive,
             searchedIds: s.searchedIds,
             locked: s.locked,
             searchText: s.searchText
-          } as SearchModel
-        } as SetSearchTo);
+          }
+        });
       }
     };
 
-    get minIdCalc() {
-      return this.minId(this.room.id);
+    get minIdCalc(): number {
+      return store.minId(this.room.id);
     }
 
     private loadUpHistory(n) {
@@ -142,11 +140,11 @@
           this.$api.search(s.searchText, this.room.id, s.searchedIds.length, (a: MessageModelDto[], e: string) => {
             this.loading = false;
             if (e) {
-              this.growlError(e);
+              store.growlError(e)
             } else if (a.length) {
               channelsHandler.addMessages(this.room.id, a);
               let searchedIds = this.room.search.searchedIds.concat(a.map(a => a.id));
-              this.setSearchTo({
+              store.setSearchTo({
                 roomId: this.room.id,
                 search: {
                   searchActive: s.searchActive,
@@ -154,17 +152,17 @@
                   locked: a.length < MESSAGES_PER_SEARCH,
                   searchText: s.searchText
                 } as SearchModel
-              } as SetSearchTo);
+              });
             } else {
-              this.setSearchTo({
+              store.setSearchTo({
                 roomId: this.room.id,
                 search: {
                   searchActive: s.searchActive,
                   searchedIds: s.searchedIds,
                   locked: true,
                   searchText: s.searchText
-                } as SearchModel
-              } as SetSearchTo);
+                }
+              });
             }
           });
         } else if (!s.searchActive && !this.room.allLoaded) {
@@ -187,9 +185,8 @@
 
 <style lang="sass" scoped>
 
-  $img-path: "../../assets/img"
-  @import "partials/mixins"
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/mixins"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   .holder
     height: 100%

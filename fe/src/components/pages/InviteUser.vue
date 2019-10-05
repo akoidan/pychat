@@ -7,17 +7,17 @@
 <script lang="ts">
 
   import {Component, Vue} from "vue-property-decorator";
-  import {State, Action} from "vuex-class";
-  import AppSubmit from "../ui/AppSubmit.vue";
-  import AddUserToRoom from "./parts/AddUserToRoom.vue";
-  import {RoomDictModel, RoomModel, UserModel} from "../../types/model";
-  import {AddInviteMessage} from "../../types/messages";
+  import {store} from '@/utils/storeHolder';
+  import AppSubmit from "@/components/ui/AppSubmit.vue";
+  import AddUserToRoom from "@/components/pages/parts/AddUserToRoom.vue";
+  import {RoomDictModel, RoomModel, UserModel} from "@/types/model";
+  import {AddInviteMessage} from "@/types/messages";
 
   @Component({components: { AppSubmit, AddUserToRoom}})
   export default class InviteUser extends Vue {
 
-    @State roomsDict: RoomDictModel;
-    @Action growlError;
+    get roomsDict(): RoomDictModel  { return store.roomsDict }
+
     currentUsers: UserModel[] = [];
     running: boolean = false;
 
@@ -43,13 +43,13 @@
           }
         });
       } else {
-        this.growlError("Please select at least one user");
+        store.growlError("Please select at least one user");
       }
     }
   }
 </script>
 <style lang="sass" scoped>
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   .holder
     @extend %room-settings-holder

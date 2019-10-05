@@ -16,15 +16,14 @@
 </template>
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {Getter, State} from 'vuex-class';
-  import {CurrentUserInfoModel, UserModel} from "../../../types/model";
+  import {CurrentUserInfoModel, UserModel} from "@/types/model";
+  import {store} from "@/utils/storeHolder";
 
   @Component
   export default class AddUserToRoom extends Vue {
 
     search: string = '';
-    @Getter usersArray;
-    @State userInfo: CurrentUserInfoModel;
+
     @Prop() value: UserModel[];
     @Prop() text: string;
     @Prop() excludeUsersIds: number[];
@@ -36,10 +35,10 @@
 
     get users(): UserModel[] {
       let uids: number[] = this.value.map(a => a.id);
-      uids.push(this.userInfo.userId);
+      uids.push(store.userInfo.userId);
       uids.push(...this.excludeUsersIds);
       let users: UserModel[] = [];
-      this.usersArray.forEach(u => {
+      store.usersArray.forEach(u => {
         if (uids.indexOf(u.id) < 0) {
           users.push(u);
         }
@@ -68,7 +67,7 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/abstract_classes"
   .spann
     @extend %hovered-user-room
 

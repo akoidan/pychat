@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
     "lib": ["es2017", "dom"],
     "module": "esnext",
     "moduleResolution": "node",

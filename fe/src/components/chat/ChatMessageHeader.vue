@@ -5,23 +5,22 @@
    </span>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation, Getter} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {messageBus} from '../../utils/singletons';
-  import {UserDictModel} from '../../types/model';
-  import {timeToString} from '../../utils/htmlApi';
+  import {messageBus} from '@/utils/singletons';
+  import {UserDictModel} from '@/types/model';
+  import {timeToString} from '@/utils/htmlApi';
 
   @Component
   export default class ChatMessageHeader extends Vue {
 
     @Prop() userId: number;
     @Prop() time: number;
-    @Mutation setActiveUserId: SingleParamCB<number>;
 
-    @State allUsersDict: UserDictModel;
+    get allUsersDict(): UserDictModel  { return store.allUsersDict }
 
     setActiveUser() {
-      this.setActiveUserId(this.userId);
+      store.setActiveUserId(this.userId);
     }
 
 

@@ -20,18 +20,18 @@
   </form>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-  import AppSubmit from "../ui/AppSubmit.vue"
-  import {browserVersion} from '../../utils/singletons';
-  import {GIT_HASH} from '../../utils/consts';
+  import AppSubmit from "@/components/ui/AppSubmit.vue"
+  import {browserVersion} from '@/utils/singletons';
+  import {GIT_HASH} from '@/utils/consts';
   @Component({components: {AppSubmit}})
   export default class ReportIssue extends Vue {
     running: boolean = false;
     browser: string = browserVersion;
     issue: string = '';
-    @Action growlError;
-    @Action growlSuccess;
+
+
 
     $refs: {
       textarea: HTMLTextAreaElement
@@ -55,9 +55,9 @@
       this.$api.sendLogs(this.issue, this.browser, e => {
         this.running = false;
         if (e) {
-          this.growlError(e)
+          store.growlError(e)
         } else {
-          this.growlSuccess("Your issue has ben submitted");
+          store.growlSuccess("Your issue has ben submitted");
           this.$router.go(-1);
         }
       })
@@ -66,7 +66,7 @@
 </script>
 
 <style lang="sass" scoped>
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/abstract_classes"
   .holder
     @extend %room-settings-holder
     width: calc(100% - 100px)

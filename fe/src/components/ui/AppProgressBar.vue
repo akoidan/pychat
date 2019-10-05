@@ -8,8 +8,8 @@
 </template>
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {bytesToSize} from "../../utils/utils";
-  import {UploadProgressModel} from "../../types/model";
+  import {bytesToSize} from "@/utils/utils";
+  import {UploadProgressModel} from "@/types/model";
 
   @Component
   export default class AppProgressBar extends Vue {
@@ -44,7 +44,7 @@
 </script>
 
 <style lang="sass" scoped>
-  @import "partials/mixins"
+  @import "~@/assets/sass/partials/mixins"
   $height: 20px
   $stripe-size: $height * 2
   .holder

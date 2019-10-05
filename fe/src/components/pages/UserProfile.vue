@@ -16,10 +16,10 @@
 </template>
 <script lang="ts">
   import {Component, Vue} from "vue-property-decorator";
-  import UserProfileChangePassword from "./UserProfileChangePassword.vue"
-  import UserProfileImage from "./UserProfileImage.vue"
-  import UserProfileInfo from "./UserProfileInfo.vue"
-  import UserProfileSettings from "./UserProfileSettings.vue"
+  import UserProfileChangePassword from "@/components/pages/UserProfileChangePassword.vue"
+  import UserProfileImage from "@/components/pages/UserProfileImage.vue"
+  import UserProfileInfo from "@/components/pages/UserProfileInfo.vue"
+  import UserProfileSettings from "@/components/pages/UserProfileSettings.vue"
 
 
   @Component({components: {UserProfileChangePassword, UserProfileImage, UserProfileInfo, UserProfileSettings}})
@@ -29,8 +29,8 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/variables"
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/variables"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   .color-white .links a
     color: #c3fffd

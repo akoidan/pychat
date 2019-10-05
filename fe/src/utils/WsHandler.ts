@@ -1,11 +1,18 @@
-import {CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT, CONNECTION_RETRY_TIME, IS_DEBUG, PING_CLOSE_JS_DELAY} from './consts';
-import {Store} from 'vuex';
+import {
+  CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT,
+  CONNECTION_RETRY_TIME,
+  IS_DEBUG
+} from '@/utils/consts';
 import {Logger, LogStrict} from 'lines-logger';
-import loggerFactory from './loggerFactory';
-import MessageHandler from './MesageHandler';
-import {logout} from './utils';
-import {CurrentUserInfoModel, CurrentUserSettingsModel, RootState, UserModel} from '../types/model';
-import {PubSetRooms, SessionHolder} from '../types/types';
+import loggerFactory from '@/utils/loggerFactory';
+import MessageHandler from '@/utils/MesageHandler';
+import {logout} from '@/utils/utils';
+import {
+  CurrentUserInfoModel,
+  CurrentUserSettingsModel,
+  UserModel
+} from '@/types/model';
+import {PubSetRooms, SessionHolder} from '@/types/types';
 import {
   DefaultMessage,
   GrowlMessage,
@@ -15,10 +22,15 @@ import {
   SetUserProfileMessage,
   SetWsIdMessage,
   UserProfileChangedMessage
-} from '../types/messages';
-import {convertUser, currentUserInfoDtoToModel, userSettingsDtoToModel} from '../types/converters';
-import {UserProfileDto, UserSettingsDto} from '../types/dto';
-import {sub} from './sub';
+} from '@/types/messages';
+import {
+  convertUser,
+  currentUserInfoDtoToModel,
+  userSettingsDtoToModel
+} from '@/types/converters';
+import {UserProfileDto, UserSettingsDto} from '@/types/dto';
+import {sub} from '@/utils/sub';
+import {DefaultStore} from'@/utils/store';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
@@ -34,7 +46,7 @@ export default class WsHandler extends MessageHandler {
   private ws: WebSocket;
   private noServerPingTimeout: any;
   private loadHistoryFromWs: boolean;
-  private store: Store<RootState>;
+  private store: DefaultStore;
   private sessionHolder: SessionHolder;
   private listenWsTimeout: number;
   private API_URL: string;
@@ -51,7 +63,7 @@ export default class WsHandler extends MessageHandler {
   };
   public timeDiff: number;
 
-  constructor(API_URL: string, sessionHolder: SessionHolder, store: Store<RootState>) {
+  constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore) {
     super();
     sub.subscribe( 'ws', this);
     this.API_URL = API_URL;
@@ -269,7 +281,7 @@ public acceptFile(connId, received) {
 
 
   private growl(gm: GrowlMessage) {
-    this.store.dispatch('growlError', gm.content);
+    this.store.growlError( gm.content);
   }
 
   private setSettings(m: SetSettingsMessage) {
@@ -279,8 +291,8 @@ public acceptFile(connId, received) {
 
   private setUserProfile(m: SetUserProfileMessage) {
     let a: CurrentUserInfoModel = currentUserInfoDtoToModel(m.content);
-    a.userId = this.store.state.userInfo.userId;
-    this.store.commit('setUserInfo', a);
+    a.userId = this.store.userInfo.userId;
+    this.store.setUserInfo(a);
   }
 
   private setProfileImage(m: SetProfileImageMessage) {
@@ -311,7 +323,7 @@ public acceptFile(connId, received) {
 
   private userProfileChanged(message: UserProfileChangedMessage) {
     let user: UserModel = convertUser(message);
-    this.store.commit('setUser', user);
+    this.store.setUser(user);
   }
 
   private ping(message: PingMessage) {
@@ -325,7 +337,7 @@ public acceptFile(connId, received) {
 
   private setUserInfo(userInfo: UserProfileDto) {
     let um: CurrentUserInfoModel = currentUserInfoDtoToModel(userInfo);
-    this.store.commit('setUserInfo', um);
+    this.store.setUserInfo(um);
   }
 
 
@@ -334,11 +346,11 @@ public acceptFile(connId, received) {
     if (!IS_DEBUG) {
       loggerFactory.setLogWarnings(userInfo.logs ? LogStrict.TRACE : LogStrict.DISABLE_LOGS);
     }
-    this.store.commit('setUserSettings', um);
+    this.store.setUserSettings(um);
   }
 
   private setUserImage(image: string) {
-    this.store.commit('setUserImage', image);
+    this.store.setUserImage(image);
   }
 
   private answerPong() {
@@ -422,7 +434,7 @@ public acceptFile(connId, received) {
   private sendRawTextToServer(jsonRequest, skipGrowl, objData) : void {
     if (!this.isWsOpen()) {
       if (!skipGrowl) {
-        this.store.dispatch('growlError', 'Can\'t send message, because connection is lost :(');
+        this.store.growlError( 'Can\'t send message, because connection is lost :(');
       }
     } else {
       this.logData(this.loggerOut, jsonRequest, objData);
@@ -447,8 +459,8 @@ public acceptFile(connId, received) {
 
 
   private setStatus(isOnline) {
-    if (this.store.state.isOnline !== isOnline) {
-      this.store.commit('setIsOnline', isOnline);
+    if (this.store.isOnline !== isOnline) {
+      this.store.setIsOnline(isOnline);
     }
   }
 
@@ -494,11 +506,11 @@ public acceptFile(connId, received) {
       logout(message);
       return;
     } else if (this.wsState === WsState.NOT_INITED) {
-      // this.store.dispatch('growlError', 'Can\'t establish connection with server');
+      // this.store.growlError( 'Can\'t establish connection with server');
       this.logger.error('Chat server is down because {}', reason)();
       this.wsState = WsState.TRIED_TO_CONNECT;
     } else if (this.wsState === WsState.CONNECTED) {
-      // this.store.dispatch('growlError', `Connection to chat server has been lost, because ${reason}`);
+      // this.store.growlError( `Connection to chat server has been lost, because ${reason}`);
       this.logger.error(
           'Connection to WebSocket has failed because "{}". Trying to reconnect every {}ms',
           e.reason, CONNECTION_RETRY_TIME)();
@@ -521,8 +533,8 @@ public acceptFile(connId, received) {
     }
 
     let ids = {};
-    for (let k in this.store.state.roomsDict) {
-      ids[k] = this.store.getters.maxId(k);
+    for (let k in this.store.roomsDict) {
+      ids[k] = this.store.maxId(parseInt(k));
     }
     let s = this.API_URL + `?id=${this.wsConnectionId}`;
     if (Object.keys(ids).length > 0) {

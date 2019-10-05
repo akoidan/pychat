@@ -5,19 +5,19 @@
   </li>
 </template>
 <script lang="ts">
-  import {Getter, State} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {RoomModel, UserModel} from "../../types/model";
+  import {RoomModel, UserModel} from "@/types/model";
   import {
     getFlagPath,
     getUserSexClass
-  } from "../../utils/htmlApi";
+  } from "@/utils/htmlApi";
 
   @Component
   export default class RoomUsersUser extends Vue {
     @Prop() user: UserModel;
-    @Getter activeRoom: RoomModel;
-    @State online: number[];
+    get activeRoom(): RoomModel  { return store.activeRoom };
+    get online(): number[]  { return store.online }
 
     get userSexClass () {
       return getUserSexClass(this.user);

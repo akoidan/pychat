@@ -40,28 +40,34 @@
   </nav>
 </template>
 <script lang="ts">
-  import {Action, State, Getter, Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Vue} from "vue-property-decorator";
-  import {RoomModel, UserModel} from "../types/model";
-  import {logout} from "../utils/utils";
-  import {SetSearchTo} from '../types/types';
-  import {GITHUB_URL} from '../utils/consts';
-  import {webrtcApi} from '../utils/singletons';
+  import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
+  import {logout} from "@/utils/utils";
+  import {SetSearchTo} from '@/types/types';
+  import {GITHUB_URL} from '@/utils/consts';
+  import {webrtcApi} from '@/utils/singletons';
 
   @Component
   export default class AppNav extends Vue {
-    @State isOnline: boolean;
-    @State userInfo: UserModel;
-    @Getter activeRoom: RoomModel;
-    @Action growlError;
-    @Action logout;
-    @Mutation setSearchTo;
-    @Mutation toggleContainer;
+    get activeRoom(): RoomModel  { return store.activeRoom };
 
 
     $refs: {
       inputFile: HTMLInputElement
     };
+
+    get isOnline(): boolean {
+      return store.isOnline;
+    }
+
+    get userInfo(): CurrentUserInfoModel {
+      return store.userInfo;
+    }
+
+    toggleContainer(roomd) {
+      store.toggleContainer(roomd);
+    }
 
     sendFileClick() {
       this.$refs.inputFile.value = null;
@@ -81,10 +87,10 @@
     }
 
     invertSearch() {
-      this.setSearchTo({
+      store.setSearchTo({
         roomId: this.activeRoom.id,
         search: { ...this.activeRoom.search, searchActive: !this.activeRoom.search.searchActive}
-        } as SetSearchTo);
+        });
     }
 
     toggle() {
@@ -100,9 +106,9 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/variables"
-  @import "partials/mixins"
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/variables"
+  @import "~@/assets/sass/partials/mixins"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   .username
     font-size: 22px

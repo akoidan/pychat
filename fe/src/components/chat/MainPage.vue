@@ -19,7 +19,7 @@
       <div v-show="dim" class="videoHolder" >
         <div v-show="recordingNow">
           <video v-show="srcVideo" autoplay="" ref="video"></video>
-          <img v-show="!srcVideo" src="../../assets/img/audio.svg" class="audio-recording-now">
+          <img v-show="!srcVideo" src="@/assets/img/audio.svg" class="audio-recording-now">
         </div>
         <span v-show="!recordingNow">Starting recording...</span>
       </div>
@@ -39,18 +39,18 @@
 
 <script lang='ts'>
   import {Component, Vue, Watch} from "vue-property-decorator";
-  import {Action, Getter, Mutation, State} from "vuex-class";
-  import RoomUsers from "./RoomUsers.vue"
-  import ChatBox from "./ChatBox.vue"
-  import SmileyHolder from "./SmileyHolder.vue"
+
+  import RoomUsers from "@/components/chat/RoomUsers.vue"
+  import ChatBox from "@/components/chat/ChatBox.vue"
+  import SmileyHolder from "@/components/chat/SmileyHolder.vue"
   import {
     CurrentUserInfoModel,
     EditingMessage,
     FileModel,
     MessageModel,
     RoomModel,
-    UploadProgressModel
-  } from "../../types/model";
+    UploadProgressModel, UserDictModel, UserModel
+  } from "@/types/model";
   import {
     encodeHTML,
     encodeMessage,
@@ -59,33 +59,32 @@
     getSmileyHtml, pasteBlobAudioToTextArea, pasteBlobToContentEditable, pasteBlobVideoToTextArea,
     pasteHtmlAtCaret,
     pasteImgToTextArea, placeCaretAtEnd, stopVideo, timeToString
-  } from "../../utils/htmlApi";
-  import NavEditMessage from "./NavEditMessage.vue";
-  import NavUserShow from "./NavUserShow.vue";
-  import {sem} from "../../utils/utils";
-  import {MessageDataEncode, RemoveSendingMessage, UploadFile} from "../../types/types";
-  import {channelsHandler, globalLogger, messageBus, webrtcApi} from "../../utils/singletons";
-  import store from '../../store';
-  import MediaRecorder from './MediaRecorder';
+  } from "@/utils/htmlApi";
+  import NavEditMessage from "@/components/chat/NavEditMessage.vue";
+  import NavUserShow from "@/components/chat/NavUserShow.vue";
+  import {sem} from "@/utils/utils";
+  import {MessageDataEncode, RemoveSendingMessage, UploadFile} from "@/types/types";
+  import {channelsHandler, globalLogger, messageBus, webrtcApi} from "@/utils/singletons";
+  import {store} from '@/utils/storeHolder';
+  import MediaRecorder from '@/components/chat/MediaRecorder';
 
 
   const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
   @Component({components: {MediaRecorder, RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Vue {
-    @State editedMessage: EditingMessage;
-    @State allUsersDict: EditingMessage;
-    @State userInfo: CurrentUserInfoModel;
-    @State activeRoomId: number;
-    @State dim: boolean;
-    @Getter roomsArray: RoomModel[];
-    @Getter activeUser;
-    @Getter activeRoom: RoomModel;
-    @Getter editingMessageModel: MessageModel;
-    @Action growlError;
+    get editedMessage(): EditingMessage  { return store.editedMessage }
+    get allUsersDict(): UserDictModel  { return store.allUsersDict }
+    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
+    get activeRoomId(): number  { return store.activeRoomId }
+    get dim(): boolean  { return store.dim }
+    get roomsArray(): RoomModel[] { return store.roomsArray };
+    get activeUser(): UserModel  { return store.activeUser }
+    get activeRoom(): RoomModel  { return store.activeRoom };
+    get editingMessageModel(): MessageModel  { return store.editingMessageModel };
+
     // used in mixin from event.keyCode === 38
-    @Mutation setEditedMessage: SingleParamCB<EditingMessage>;
-    @Mutation addMessage;
+
     srcVideo: string = null;
 
     $refs: {
@@ -126,7 +125,7 @@
           this.logger.debug("loop {}", file)();
           if (file.type.indexOf("image") >= 0) {
             pasteImgToTextArea(file, this.$refs.userMessage, err => {
-              this.growlError(err);
+              store.growlError(err)
             });
           }
         }
@@ -162,11 +161,11 @@
     }
 
     navEditMessage() {
-      this.setEditedMessage({...this.editedMessage, isEditingNow: true});
+      store.setEditedMessage({...this.editedMessage, isEditingNow: true});
     }
 
     closeEditing() {
-      this.setEditedMessage(null);
+      store.setEditedMessage(null);
     }
 
     handleAddVideo(file: Blob) {
@@ -175,7 +174,7 @@
       this.$refs.video.pause();
       if (file) {
         pasteBlobVideoToTextArea(file, this.$refs.userMessage, 'm', e => {
-          this.growlError(e);
+          store.growlError(e)
         })
       }
     }
@@ -202,7 +201,7 @@
           var file = evt.dataTransfer.files[i];
           if (file.type.indexOf("image") >= 0) {
             pasteImgToTextArea(file, this.$refs.userMessage, err => {
-              this.growlError(err);
+              store.growlError(err)
             });
           } else {
             webrtcApi.offerFile(file, this.activeRoom.id);
@@ -215,7 +214,7 @@
       let files: File[] = evt.target.files;
       for (let i = 0; i < evt.target.files.length; i++) {
         pasteImgToTextArea(files[i], this.$refs.userMessage, err => {
-          this.growlError(err);
+          store.growlError(err)
         });
       }
       this.$refs.imgInput.value = "";
@@ -243,7 +242,7 @@
         this.showSmileys = false;
         if (this.editedMessage) {
           this.$refs.userMessage.innerHTML = "";
-          this.setEditedMessage(null);
+          store.setEditedMessage(null);
 
         }
       } else if (event.keyCode === 38 && this.$refs.userMessage.innerHTML == "") { // up arrow
@@ -255,7 +254,7 @@
               maxTime = messages[m];
             }
           }
-          sem(event, maxTime, true, this.userInfo, this.setEditedMessage);
+          sem(event, maxTime, true, this.userInfo, store.setEditedMessage);
         }
       }
     }
@@ -283,7 +282,7 @@
           error: null
         }
       };
-      this.addMessage(mm);
+      store.addMessage(mm);
       channelsHandler.sendSendMessage(md.messageContent, this.activeRoomId, md.files, id, now);
     }
 
@@ -310,7 +309,7 @@
           files,
           userId: this.userInfo.userId
         };
-        this.addMessage(mm);
+      store.addMessage(mm);
       if (messageId < 0 && messageContent) {
         channelsHandler.sendSendMessage(messageContent, roomId, uploadFiles, messageId, this.editingMessageModel.time);
       } else if (messageId > 0 && messageContent) {
@@ -320,7 +319,7 @@
       } else if(!messageContent && messageId < 0) {
         channelsHandler.removeSendingMessage(messageId);
       }
-      this.setEditedMessage(null);
+      store.setEditedMessage(null);
     }
 
     private appendPreviousMessagesFiles(md: MessageDataEncode, messageId) {
@@ -345,9 +344,9 @@
 </script>
 <style lang="sass" scoped>
 
-  @import "partials/mixins"
-  @import "partials/variables"
-  @import "partials/abstract_classes"
+  @import "~@/assets/sass/partials/mixins"
+  @import "~@/assets/sass/partials/variables"
+  @import "~@/assets/sass/partials/abstract_classes"
 
   .color-white .userMessageWrapper /deep/
     .usermsg

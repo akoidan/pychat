@@ -20,10 +20,10 @@
   </form>
 </template>
 <script lang="ts">
-  import {State, Action, Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import AppSubmit from '../ui/AppSubmit';
-  import {CurrentUserInfoModel} from "../../types/model";
+  import AppSubmit from '@/components/ui/AppSubmit';
+  import {CurrentUserInfoModel} from "@/types/model";
   @Component({
     components: {AppSubmit}
   })
@@ -32,10 +32,10 @@
     password: string = '';
     email: string = '';
     running: boolean = false;
-    @Action growlError;
-    @Action growlSuccess;
 
-    @State userInfo: CurrentUserInfoModel;
+
+
+    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
 
 
     created() {
@@ -47,9 +47,9 @@
       this.$api.changeEmailLogin(this.email,this.password, (e) => {
         this.running = false;
         if (e) {
-          this.growlError(e);
+          store.growlError(e)
         } else {
-          this.growlSuccess("Email has been changed");
+          store.growlSuccess("Email has been changed");
         }
       });
     }

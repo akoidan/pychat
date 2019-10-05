@@ -1,14 +1,21 @@
-import {createMicrophoneLevelVoice, getAverageAudioLevel} from '../utils/audioprocc';
-import AbstractPeerConnection from './AbstractPeerConnection';
-import {ChangeStreamMessage, SetCallOpponent, SetOpponentAnchor, SetOpponentVoice} from '../types/types';
-import WsHandler from '../utils/WsHandler';
-import {RootState} from '../types/model';
-import {Store} from 'vuex';
+import {
+  createMicrophoneLevelVoice,
+  getAverageAudioLevel
+} from '@/utils/audioprocc';
+import AbstractPeerConnection from '@/webrtc/AbstractPeerConnection';
+import {
+  ChangeStreamMessage,
+  SetCallOpponent,
+  SetOpponentAnchor,
+  SetOpponentVoice
+} from '@/types/types';
+import WsHandler from '@/utils/WsHandler';
+import {DefaultStore} from'@/utils/store';
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
   private audioProcessor: any;
 
-  constructor(roomId: number, connId: string, opponentWsId: string, userId: number, wsHandler: WsHandler, store: Store<RootState>) {
+  constructor(roomId: number, connId: string, opponentWsId: string, userId: number, wsHandler: WsHandler, store: DefaultStore) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     let payload:  SetCallOpponent = {
       opponentWsId: this.opponentWsId,
@@ -20,7 +27,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
         opponentCurrentVoice: 0
       }
     };
-    this.store.commit('setCallOpponent', payload);
+    this.store.setCallOpponent(payload);
   }
 
   oniceconnectionstatechange() {
@@ -50,7 +57,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
         opponentWsId: this.opponentWsId,
         roomId: this.roomId
       };
-      this.store.commit('setOpponentAnchor', payload);
+      this.store.setOpponentAnchor(payload);
 
       if (this.sendRtcDataQueue.length > 0) {
         this.logger.log('Connection accepted, consuming sendRtcDataQueue')();
@@ -103,7 +110,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
         opponentWsId: this.opponentWsId,
         roomId: this.roomId
       };
-      this.store.commit('setOpponentVoice', payload);
+      this.store.setOpponentVoice(payload);
     };
   }
 
@@ -124,7 +131,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       roomId: this.roomId,
       callInfoModel: null,
     };
-    this.store.commit('setCallOpponent', payload);
+    this.store.setCallOpponent(payload);
   }
 
 }

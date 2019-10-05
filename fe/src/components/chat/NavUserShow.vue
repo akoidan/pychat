@@ -23,18 +23,18 @@
   </nav>
 </template>
 <script lang="ts">
-  import {Getter, Mutation} from "vuex-class";
+  import {store} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {UserModel} from "../../types/model";
-  import {PrivateRoomsIds} from '../../types/types';
-  import {AddRoomMessage} from '../../types/messages';
+  import {UserModel} from "@/types/model";
+  import {PrivateRoomsIds} from '@/types/types';
+  import {AddRoomMessage} from '@/types/messages';
   @Component
   export default class NavUserShow extends Vue {
-    @Mutation setActiveUserId: SingleParamCB<number>;
+
     @Prop() activeUser: UserModel;
     @Prop() privateRooms: UserModel;
     running: boolean = false;
-    @Getter privateRoomsUsersIds: PrivateRoomsIds;
+    get privateRoomsUsersIds(): PrivateRoomsIds  { return store.privateRoomsUsersIds };
 
     get oppositeRoomId() {
       return this.privateRoomsUsersIds.userRooms[this.activeUser.id];
@@ -47,7 +47,7 @@
           if (e && e.roomId) {
             this.$router.replace(`/chat/${e.roomId}`);
           }
-          this.setActiveUserId(null);
+          store.setActiveUserId(null);
           this.running = false;
         });
       }
@@ -55,7 +55,7 @@
 
 
     closeActiveUser() {
-      this.setActiveUserId(null);
+      store.setActiveUserId(null);
     }
 
   }
@@ -63,8 +63,8 @@
 
 <style lang="sass" scoped>
 
-  @import "partials/abstract_classes"
-  @import "partials/mixins"
+  @import "~@/assets/sass/partials/abstract_classes"
+  @import "~@/assets/sass/partials/mixins"
 
   .spinner
     @include lds-spinner(15px, 'Creating room...', true)
