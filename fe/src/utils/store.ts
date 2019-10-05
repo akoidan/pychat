@@ -74,6 +74,18 @@ export const vueStore = new Vuex.Store({
 });
 
 
+function Validate(target, propertyKey: string, descriptor: PropertyDescriptor) {
+  const original = descriptor.value;
+  descriptor.value = function(...args: unknown[]) {
+    try {
+      original.apply(this, args);
+    } catch (e) {
+      throw Error(`store.${propertyKey}(${JSON.stringify(args)})\n\n ${JSON.stringify(this)}\n`);
+    }
+  };
+}
+
+
 @Module({
   dynamic: true,
   namespaced: true,
@@ -219,10 +231,8 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  @Validate
   setCallOpponent(payload: SetCallOpponent) {
-    if (!this.roomsDict[payload.roomId]) { // TODO
-      throw Error(`setCallOpponent state: ${JSON.stringify(this.state)}; payload ${JSON.stringify(payload)}`);
-    }
     if (payload.callInfoModel) {
       Vue.set(this.roomsDict[payload.roomId].callInfo.calls, payload.opponentWsId, payload.callInfoModel);
     } else {
@@ -231,22 +241,15 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  @Validate
   setOpponentVoice(payload: SetOpponentVoice) {
-    let roomsDictElement = this.roomsDict[payload.roomId]; // TODO
-    if (!roomsDictElement || !roomsDictElement.callInfo || !roomsDictElement.callInfo.calls || !roomsDictElement.callInfo.calls[payload.opponentWsId]) {
-      throw Error(`setOpponentVoice state: ${JSON.stringify(this.state)}; payload ${JSON.stringify(payload)}`);
-    }
-    roomsDictElement.callInfo.calls[payload.opponentWsId].opponentCurrentVoice = payload.voice;
+    this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].opponentCurrentVoice = payload.voice;
   }
 
   @Mutation
   setOpponentAnchor(payload: SetOpponentAnchor) {
     let key: string = mediaLinkIdGetter();
-    let roomsDictElement = this.roomsDict[payload.roomId]; // TODO
-    if (!roomsDictElement || !roomsDictElement.callInfo || !roomsDictElement.callInfo.calls || !roomsDictElement.callInfo.calls[payload.opponentWsId]) {
-      throw Error(`setOpponentAnchor state: ${JSON.stringify(this.state)}; payload ${JSON.stringify(payload)}`);
-    }
-    roomsDictElement.callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
+    this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
     Vue.set(this.mediaObjects, key, payload.anchor);
   }
 
@@ -322,12 +325,10 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  @Validate
   setLocalStreamSrc(payload: MediaIdentifier) {
     let key: string = mediaLinkIdGetter();
     Vue.set(this.mediaObjects, key, payload.media);
-    if (!this.roomsDict[payload.id]) { // TODO
-      throw Error(`setLocalStreamSrc roomDict ${JSON.stringify(this.roomsDict)}, ${JSON.stringify(payload)}`);
-    }
     this.roomsDict[payload.id].callInfo.mediaStreamLink = key;
   }
 
@@ -337,10 +338,8 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  @Validate
   addSendingFileTransfer(payload: AddSendingFileTransfer) {
-    if (!this.roomsDict[payload.roomId].sendingFiles[payload.connId]) { // TODO
-      throw Error(`addSendingFileTransfer state: ${JSON.stringify(this.state)}; payload ${JSON.stringify(payload)}`);
-    }
     Vue.set(this.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers, payload.transferId, payload.transfer);
   }
 
@@ -357,11 +356,9 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  @Validate
   setSendingFileStatus(payload: SetSendingFileStatus) {
     let transfer: SendingFileTransfer = this.roomsDict[payload.roomId].sendingFiles[payload.connId].transfers[payload.transfer];
-    if (!transfer) {  // TODO
-      throw Error(`setSendingFileStatus state: ${JSON.stringify(this.state)}; payload ${JSON.stringify(payload)}`);
-    }
     transfer.status = payload.status;
     if (payload.error !== undefined) {
       transfer.error = payload.error;
