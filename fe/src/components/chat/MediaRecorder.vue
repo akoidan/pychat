@@ -6,7 +6,7 @@
 </template>
 <script lang="ts">
 
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {stopVideo} from '@/utils/htmlApi';
   import MediaCapture from '@/utils/MediaCapture';
@@ -20,7 +20,7 @@
   export default class MediaRecorderDiv extends Vue {
 
     isRecordingVideo = true;
-    get dim(): boolean  { return store.dim }
+    get dim(): boolean  { return this.store.dim }
 
     // started: number = null;
     timeout: number = 0;
@@ -39,10 +39,10 @@
 
     async startRecord() {
       this.logger.debug("Starting recording...")();
-      store.setDim(true);
+      this.store.setDim(true);
       this.navigatorRecord = new MediaCapture(this.isRecordingVideo, (data) => {
         this.logger.debug("Finishing recording... {}", data)();
-        store.setDim(false);
+        this.store.setDim(false);
         if (data) {
           this.emitData(data);
         }
@@ -52,16 +52,16 @@
         this.logger.debug("Resolved record emitting video")();
         this.$emit("record", {isVideo: this.isRecordingVideo, src: src});
       } catch (error) {
-        store.setDim(false);
+        this.store.setDim(false);
         this.emitData(null);
         if (String(error.message).indexOf("Permission denied") >= 0) {
           if (isChrome && !isMobile) {
-            store.growlError(`Please allow access for ${document.location.origin} in chrome://settings/content/microphone`);
+            this.store.growlError(`Please allow access for ${document.location.origin} in chrome://settings/content/microphone`);
           } else {
-            store.growlError(`You blocked the access to microphone/video. Please Allow it to continue`);
+            this.store.growlError(`You blocked the access to microphone/video. Please Allow it to continue`);
           }
         } else {
-          store.growlError("Unable to capture input device because " + error.message);
+          this.store.growlError("Unable to capture input device because " + error.message);
         }
         this.logger.error("Error during capturing media {} {}", error, error.message)();
         this.navigatorRecord.stopRecording();

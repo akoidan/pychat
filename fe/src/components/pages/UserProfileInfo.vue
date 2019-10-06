@@ -42,7 +42,7 @@
   </form>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from '@/components/ui/AppSubmit';
   import {CurrentUserInfoModel, SexModel} from "@/types/model";
@@ -54,13 +54,13 @@
   })
   export default class UserProfileInfo extends Vue {
     running: boolean = false;
-    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
+    get userInfo(): CurrentUserInfoModel  { return this.store.userInfo }
     model: UserProfileDto = null;
 
     sex = SexModel;
 
     created() {
-      store.setActiveUserId(null);
+      this.store.setActiveUserId(null);
       this.model = currentUserInfoModelToDto(this.userInfo);
     }
 
@@ -72,7 +72,7 @@
       this.$ws.saveUser(cui, e => {
         this.running = false;
         if (e && e.action == 'setUserProfile') {
-          store.growlSuccess("User profile has been saved");
+          this.store.growlSuccess("User profile has been saved");
         }
       })
     }

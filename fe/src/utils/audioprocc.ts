@@ -4,16 +4,16 @@ import {globalLogger, isMobile} from '@/utils/singletons';
 import {IS_DEBUG } from '@/utils/consts';
 
 let audioContext: AudioContext;
-let audioProcesssors = [];
+let audioProcesssors: JsAudioAnalyzer[] = [];
 if (IS_DEBUG) {
-  window['audioProcesssors'] = audioProcesssors;
+  window.audioProcesssors = audioProcesssors;
 }
 
-export function createMicrophoneLevelVoice (stream: MediaStream, onaudioprocess: Function): JsAudioAnalyzer {
+export function createMicrophoneLevelVoice (stream: MediaStream, onaudioprocess: Function): JsAudioAnalyzer|null {
   try {
     if (isMobile) {
       globalLogger.log('Current phone is mobile, audio processor won\'t be created')();
-      return;
+      return null;
     }
     let audioTracks: MediaStreamTrack[] = stream && stream.getAudioTracks();
     if (audioTracks.length === 0) {

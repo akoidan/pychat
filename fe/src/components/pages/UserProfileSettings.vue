@@ -79,7 +79,7 @@
 </template>
 <script lang="ts">
   import {Component, Vue, Watch} from "vue-property-decorator";
-  import {store} from '@/utils/storeHolder';
+
   import AppSubmit from "@/components/ui/AppSubmit";
   import AppCheckbox from "@/components/ui/AppCheckbox";
   import {CurrentUserInfoModel, CurrentUserSettingsModel} from "@/types/model";
@@ -92,7 +92,7 @@
   })
   export default class UserProfileSettings extends Vue {
     running: boolean = false;
-    get userSettings(): CurrentUserSettingsModel  { return store.userSettings }
+    get userSettings(): CurrentUserSettingsModel  { return this.store.userSettings }
 
     model: UserSettingsDto = null;
 
@@ -107,7 +107,7 @@
 
 
     clearHistory() {
-      store.clearMessages();
+      this.store.clearMessages();
     }
 
     save() {
@@ -117,7 +117,7 @@
       this.$ws.saveSettings(cui, e => {
         this.running = false;
         if (e.action === 'setSettings') {
-          store.growlSuccess("Settings have been saved");
+          this.store.growlSuccess("Settings have been saved");
         }
       })
     }

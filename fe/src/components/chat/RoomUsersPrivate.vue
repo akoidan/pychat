@@ -10,7 +10,7 @@
   </li>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
   import {getUserSexClass} from '@/utils/htmlApi';
@@ -20,11 +20,11 @@
   export default class RoomUsersPrivate extends Vue {
 
     @Prop() room: RoomModel;
-    get online(): number[]  { return store.online }
-    get activeRoomId(): number  { return store.activeRoomId }
-    get privateRoomsUsersIds(): PrivateRoomsIds  { return store.privateRoomsUsersIds };
-    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
-    get allUsersDict(): { [id: number]: UserModel }  { return store.allUsersDict }
+    get online(): number[]  { return this.store.online }
+    get activeRoomId(): number  { return this.store.activeRoomId }
+    get privateRoomsUsersIds(): PrivateRoomsIds  { return this.store.privateRoomsUsersIds };
+    get userInfo(): CurrentUserInfoModel  { return this.store.userInfo }
+    get allUsersDict(): { [id: number]: UserModel }  { return this.store.allUsersDict }
 
     get user() {
       return this.allUsersDict[this.privateRoomsUsersIds.roomUsers[this.room.id]];

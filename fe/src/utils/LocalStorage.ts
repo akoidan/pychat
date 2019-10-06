@@ -10,11 +10,16 @@ import {
 } from '@/types/model';
 import {Logger} from 'lines-logger';
 
+
+interface LocalStorageMessage {
+  f: number;
+  h: number;
+}
 export default class LocalStorage implements IStorage {
 
   private logger: Logger;
   private STORAGE_NAME = 'wsHeaderIds';
-  private cache = {};
+  private cache: { [id: number]: LocalStorageMessage } = {};
 
 
   constructor() {
@@ -23,7 +28,7 @@ export default class LocalStorage implements IStorage {
     if (ms) {
       let loaded = JSON.parse(ms);
       for (let k in loaded) {
-        this.cache[k] = {
+        this.cache[parseInt(k)] = {
           h: loaded[k],
           f: loaded[k]
         };
@@ -45,7 +50,7 @@ export default class LocalStorage implements IStorage {
     messages.forEach((message) => {
       this.applyCache(message.roomId, message.id);
     });
-    let lm = JSON.parse(localStorage.getItem(this.STORAGE_NAME));
+    let lm = JSON.parse(localStorage.getItem(this.STORAGE_NAME) || '{}');
     for (let k in this.cache) {
       if (!lm[k] || this.cache[k].h < lm[k]) {
         lm[k] = this.cache[k].h;
@@ -64,8 +69,9 @@ export default class LocalStorage implements IStorage {
   saveRoomUsers(ru: SetRoomsUsers)  {}
   setUsers(users: UserModel[])  {}
   saveUser(users: UserModel)  {}
-  async getAllTree(): Promise<StorageData> {
-    return new Promise<StorageData>(resolve => resolve(null));
+
+  async getAllTree(): Promise<StorageData|null> {
+    return null;
   }
 
   public clearMessages() {
@@ -81,7 +87,7 @@ export default class LocalStorage implements IStorage {
   //   cb(this.cache[roomId] ? this.cache[roomId].h : null);
   // }
 
-  private applyCache(roomId, value) {
+  private applyCache(roomId: number, value: number): boolean {
     if (!this.cache[roomId]) {
       this.cache[roomId] = {
         h: value,
@@ -94,6 +100,7 @@ export default class LocalStorage implements IStorage {
     } else {
       return true;
     }
+    return false;
   }
 
   public setRoomHeaderId(roomId: number, value: number) {
@@ -103,7 +110,7 @@ export default class LocalStorage implements IStorage {
   }
 
   private saveJson(roomId: number, value: number) {
-    let lm = JSON.parse(localStorage.getItem(this.STORAGE_NAME));
+    let lm = JSON.parse(localStorage.getItem(this.STORAGE_NAME) || '{}');
     if (!lm[roomId] || value < lm[roomId]) {
       lm[roomId] = value;
       this.logger.debug('Updating headerId {} -> {} for room {}. LS: {}', lm[roomId], value, roomId, lm)();

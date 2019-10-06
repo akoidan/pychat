@@ -70,7 +70,7 @@
     }
 
     get grecaptcha(): GoogleCaptcha {
-      if (window.grecaptcha) {
+      if (grecaptcha) {
         return window.grecaptcha;
       } else {
         return {

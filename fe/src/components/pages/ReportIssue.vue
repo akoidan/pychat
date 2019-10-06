@@ -20,7 +20,7 @@
   </form>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import AppSubmit from "@/components/ui/AppSubmit.vue"
   import {browserVersion} from '@/utils/singletons';
@@ -55,9 +55,9 @@
       this.$api.sendLogs(this.issue, this.browser, e => {
         this.running = false;
         if (e) {
-          store.growlError(e)
+          this.store.growlError(e)
         } else {
-          store.growlSuccess("Your issue has ben submitted");
+          this.store.growlSuccess("Your issue has ben submitted");
           this.$router.go(-1);
         }
       })

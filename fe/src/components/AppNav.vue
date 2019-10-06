@@ -40,7 +40,7 @@
   </nav>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Vue} from "vue-property-decorator";
   import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
   import {logout} from "@/utils/utils";
@@ -50,7 +50,7 @@
 
   @Component
   export default class AppNav extends Vue {
-    get activeRoom(): RoomModel  { return store.activeRoom };
+    get activeRoom(): RoomModel  { return this.store.activeRoom };
 
 
     $refs: {
@@ -58,15 +58,15 @@
     };
 
     get isOnline(): boolean {
-      return store.isOnline;
+      return this.store.isOnline;
     }
 
     get userInfo(): CurrentUserInfoModel {
-      return store.userInfo;
+      return this.store.userInfo;
     }
 
     toggleContainer(roomd) {
-      store.toggleContainer(roomd);
+      this.store.toggleContainer(roomd);
     }
 
     sendFileClick() {
@@ -87,7 +87,7 @@
     }
 
     invertSearch() {
-      store.setSearchTo({
+      this.store.setSearchTo({
         roomId: this.activeRoom.id,
         search: { ...this.activeRoom.search, searchActive: !this.activeRoom.search.searchActive}
         });

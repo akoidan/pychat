@@ -27,8 +27,10 @@ import {ALL_ROOM_ID} from '@/utils/consts';
 import ConfirmMail from '@/components/email/ConfirmMail.vue';
 import UserProfileChangeEmail
   from '@/components/pages/UserProfileChangeEmail.vue';
+import {Route} from 'vue-router/types';
 
 Vue.use(VueRouter);
+
 const router = new VueRouter({
   routes: [
     {
@@ -45,7 +47,7 @@ const router = new VueRouter({
         {
           component: ChannelsPage,
           meta: {
-            beforeEnter: (to, from, next) => {
+            beforeEnter: (to: Route, from: Route, next: Function) => {
               globalLogger.debug('setActiveRoomId {}', to.params.id)();
               store.setActiveRoomId(parseInt(to.params.id));
               next();

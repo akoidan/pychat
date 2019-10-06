@@ -11,7 +11,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {GrowlModel} from "@/types/model";
   import {getModule} from "vuex-module-decorators";
-  import {store} from '@/utils/storeHolder';
+
 
 
   @Component
@@ -19,7 +19,7 @@
     @Prop() growl: GrowlModel;
 
     close() {
-      store.removeGrowl(this.growl);
+      this.store.removeGrowl(this.growl);
     }
   }
 </script>

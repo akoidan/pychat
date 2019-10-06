@@ -7,7 +7,7 @@
 <script lang="ts">
 
   import {Component, Vue} from "vue-property-decorator";
-  import {store} from '@/utils/storeHolder';
+
   import AppSubmit from "@/components/ui/AppSubmit.vue";
   import AddUserToRoom from "@/components/pages/parts/AddUserToRoom.vue";
   import {RoomDictModel, RoomModel, UserModel} from "@/types/model";
@@ -16,7 +16,7 @@
   @Component({components: { AppSubmit, AddUserToRoom}})
   export default class InviteUser extends Vue {
 
-    get roomsDict(): RoomDictModel  { return store.roomsDict }
+    get roomsDict(): RoomDictModel  { return this.store.roomsDict }
 
     currentUsers: UserModel[] = [];
     running: boolean = false;
@@ -43,7 +43,7 @@
           }
         });
       } else {
-        store.growlError("Please select at least one user");
+        this.store.growlError("Please select at least one user");
       }
     }
   }

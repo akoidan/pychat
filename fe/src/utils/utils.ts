@@ -25,20 +25,20 @@ export function logout(errMessage: string) {
   channelsHandler.removeAllSendingMessages();
 }
 
-export function getDay(dateObj) {
+export function getDay(dateObj: Date) {
   let month = dateObj.getUTCMonth() + 1; // months from 1-12
   let day = dateObj.getUTCDate();
   let year = dateObj.getUTCFullYear();
   return `${year}/${month}/${day}`;
 }
 
-export function bounce(ms): (cb) => void {
-  let stack;
-  let lastCall;
+export function bounce(ms: number): (cb: Function) => void {
+  let stack: number | null;
+  let lastCall: Function;
   return function(cb) {
     lastCall = cb;
     if (!stack) {
-      stack = setTimeout(() => {
+      stack = window.setTimeout(() => {
         stack = null;
         lastCall();
       }, ms);
@@ -84,7 +84,7 @@ export async function initStore() {
   }
 }
 
-export function login(session, errMessage) {
+export function login(session: string, errMessage: string) {
   if (errMessage) {
     store.growlError( errMessage);
   } else if (/\w{32}/.exec(session)) {
@@ -103,22 +103,22 @@ let googleInited: boolean = false;
 let fbInited: boolean = false;
 
 
-
-export function  extractError (args) {
+export function  extractError (args: unknown |unknown[]| {name: string}) {
   try {
+    let value: { name: string, message: string, rawError: string } = args as { name: string, message: string, rawError: string };
     if (typeof args === 'string') {
       return args;
-    } else if (args.length > 1) {
+    } else if ((<unknown[]>args).length > 1) {
       return Array.prototype.join.call(args, ' ');
-    } else if (args.length === 1) {
-      args = args[0];
+    } else if ((<unknown[]>args).length === 1) {
+      value = (<unknown[]>args)[0] as { name: string, message: string, rawError: string };
     }
-    if (args && (args.name || args.message) ) {
-      return `${args.name}: ${args.message}`;
-    } else if (args.rawError) {
-      return args.rawError;
+    if (value && (value.name || value.message) ) {
+      return `${value.name}: ${value.message}`;
+    } else if (value.rawError) {
+      return value.rawError;
     } else {
-      return JSON.stringify(args);
+      return JSON.stringify(value);
     }
   } catch (e) {
     return `Error during parsing error ${e}, :(`;
@@ -130,10 +130,10 @@ export function getChromeVersion () {
   return raw ? parseInt(raw[2], 10) : false;
 }
 
-export function initGoogle(cb) {
+export function initGoogle(cb: Function) {
   if (!googleInited && GOOGLE_OAUTH_2_CLIENT_ID) {
     logger.log('Initializing google sdk')();
-    api.loadGoogle((e) => {
+    api.loadGoogle((e: string) => {
       if (typeof gapi.load !== 'function') { // TODO
         throw Error(`Gapi doesnt have load function ${JSON.stringify(Object.keys(gapi))}`);
       }
@@ -143,7 +143,7 @@ export function initGoogle(cb) {
           logger.log('gauth 2 is ready')();
           googleInited = true;
           cb();
-        }).catch(e => {
+        }).catch((e: string) => {
           logger.error('Unable to init google {}', e)();
           cb(e);
         });
@@ -154,9 +154,9 @@ export function initGoogle(cb) {
   }
 }
 
-export function initFaceBook(cb) {
+export function initFaceBook(cb: Function) {
   if (!fbInited && FACEBOOK_APP_ID) {
-    api.loadFacebook(e => {
+    api.loadFacebook((e: unknown) => {
       logger.log('Initing facebook sdk...')();
       FB.init({
         appId: FACEBOOK_APP_ID,
@@ -183,9 +183,14 @@ export function bytesToSize(bytes: number): string {
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
 
-export function sem(event, message: MessageModel, isEditingNow: boolean, userInfo: CurrentUserInfoModel, setEditedMessage: SingleParamCB<EditingMessage>) {
+export function sem(event: MouseEvent, message: MessageModel, isEditingNow: boolean, userInfo: CurrentUserInfoModel, setEditedMessage: SingleParamCB<EditingMessage>) {
   logger.debug('sem {}', message.id)();
-  if (event.target.tagName !== 'IMG' && message.userId === userInfo.userId && !message.deleted && message.time + ONE_DAY > Date.now()) {
+  if (event.target
+      && (<HTMLElement>event.target).tagName !== 'IMG'
+      && message.userId === userInfo.userId
+      && !message.deleted
+      && message.time + ONE_DAY > Date.now()
+  ) {
     event.preventDefault();
     event.stopPropagation();
     let newlet: EditingMessage = {

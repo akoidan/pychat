@@ -23,7 +23,7 @@
   </nav>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {UserModel} from "@/types/model";
   import {PrivateRoomsIds} from '@/types/types';
@@ -34,7 +34,7 @@
     @Prop() activeUser: UserModel;
     @Prop() privateRooms: UserModel;
     running: boolean = false;
-    get privateRoomsUsersIds(): PrivateRoomsIds  { return store.privateRoomsUsersIds };
+    get privateRoomsUsersIds(): PrivateRoomsIds  { return this.store.privateRoomsUsersIds };
 
     get oppositeRoomId() {
       return this.privateRoomsUsersIds.userRooms[this.activeUser.id];
@@ -47,7 +47,7 @@
           if (e && e.roomId) {
             this.$router.replace(`/chat/${e.roomId}`);
           }
-          store.setActiveUserId(null);
+          this.store.setActiveUserId(null);
           this.running = false;
         });
       }
@@ -55,7 +55,7 @@
 
 
     closeActiveUser() {
-      store.setActiveUserId(null);
+      this.store.setActiveUserId(null);
     }
 
   }

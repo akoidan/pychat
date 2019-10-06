@@ -60,7 +60,7 @@
     loading: boolean = false;
     error: string = null;
     userProfileInfo: ViewUserProfileDto = null;
-    get allUsersDict(): {[id: number]: UserModel}  { return store.allUsersDict }
+    get allUsersDict(): {[id: number]: UserModel}  { return this.store.allUsersDict }
 
     get id(): number {
       return parseInt(this.$route.params['id']);

@@ -19,7 +19,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {SendingFile, UserModel} from "@/types/model";
   import {bytesToSize} from '@/utils/utils';
@@ -31,7 +31,7 @@
   })
   export default class ChatSendingFile extends Vue {
     @Prop() sendingFile: SendingFile;
-    get myId(): number  { return store.myId };
+    get myId(): number  { return this.store.myId };
 
 
     get size() {

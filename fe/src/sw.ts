@@ -9,7 +9,7 @@ let logger: Logger = loggerFactory.getLoggerColor('SW_S', '#a76f00');
 let SW_VERSION = '1.5';
 logger.debug('startup, version {}', SW_VERSION)();
 
-let subScr = null;
+let subScr: null | string = null;
 
 // Install Service Worker
 self.addEventListener('install', () => {
@@ -39,7 +39,7 @@ function getSubscriptionId(pushSubscription: any) {
 }
 
 
-async function getPlayBack(event) {
+async function getPlayBack(event: unknown) {
   logger.log('Received a push message {}', event)();
   if (!subScr) {
     let r = await (<any>self).registration.pushManager.getSubscription();
@@ -82,6 +82,7 @@ async function getPlayBack(event) {
   await (<any>self).registration.showNotification(m.title, m.options);
 }
 
+
 self.addEventListener('push', (e: any) => e.waitUntil(getPlayBack(e)));
 
 self.addEventListener('notificationclick', function (event: any) {
@@ -94,12 +95,12 @@ self.addEventListener('notificationclick', function (event: any) {
   // focuses if it is
   event.waitUntil(clients.matchAll({
     type: 'window'
-  }).then(function (clientList) {
+  }).then(function (clientList: ReadonlyArray<Response>) {
     let roomId = event.notification.data && event.notification.data.roomId;
     if (clientList && clientList[0] && roomId) {
-      clientList[0].navigate('/#/chat/' + roomId);
+      (<{navigate: Function}>(<unknown>clientList[0])).navigate('/#/chat/' + roomId); // TODO
     } else if (clientList && clientList[0]) {
-      clientList[0].focus();
+      (<{focus: Function}>(<unknown>clientList[0])).focus(); // TODO
     } else if (roomId) {
       clients.openWindow('/#/chat/' + roomId);
     } else {

@@ -43,7 +43,7 @@
   <div v-else>Room #{{roomId}} doesn't exist </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppInputRange from '@/components/ui/AppInputRange';
   import AppSubmit from '@/components/ui/AppSubmit';
@@ -57,7 +57,7 @@
     notifications: boolean = false;
     running: boolean = false;
     isPublic: boolean = false;
-    get roomsDict(): RoomDictModel  { return store.roomsDict }
+    get roomsDict(): RoomDictModel  { return this.store.roomsDict }
 
 
     leave() {
@@ -100,7 +100,7 @@
       this.running = true;
       this.$api.sendRoomSettings(this.roomName, this.sound, this.notifications, this.roomId, (err) => {
         if (err) {
-          store.growlError(err)
+          this.store.growlError(err)
         } else {
           let payload: RoomSettingsModel = {
             id: this.roomId,
@@ -108,8 +108,8 @@
             notifications: this.notifications,
             volume: this.sound
           };
-          store.setRoomSettings(payload);
-          store.growlSuccess('Settings has been saved');
+          this.store.setRoomSettings(payload);
+          this.store.growlSuccess('Settings has been saved');
           this.$router.go(-1);
         }
         this.running = false;

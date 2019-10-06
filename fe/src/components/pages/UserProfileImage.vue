@@ -12,7 +12,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {canvasContext, resolveMediaUrl, stopVideo} from "@/utils/htmlApi";
   import AppSubmit from '@/components/ui/AppSubmit';
@@ -26,12 +26,12 @@
 
 
 
-    get userImage(): string  { return store.userImage }
+    get userImage(): string  { return this.store.userImage }
 
     @Watch('userImage')
     onUserImageChange(value: string) {
       this.srcImg = resolveMediaUrl(value);
-      store.growlInfo("New image has been set");
+      this.store.growlInfo("New image has been set");
     }
 
     created() {
@@ -69,7 +69,7 @@
           this.$refs.inputFile.value = '';
         }
       } else {
-        store.growlError("No files found in draggable object");
+        this.store.growlError("No files found in draggable object");
       }
     }
 
@@ -92,12 +92,12 @@
         let reader = new FileReader();
         reader.onload = (e) => {
           this.srcImg = reader.result as string;
-          store.growlSuccess("Photo has been rendered, click save to apply it");
+          this.store.growlSuccess("Photo has been rendered, click save to apply it");
         };
         reader.readAsDataURL(file);
         return true;
       } else {
-        store.growlError("Invalid file type " + file.type);
+        this.store.growlError("Invalid file type " + file.type);
         return false;
       }
     }
@@ -132,7 +132,7 @@
           this.blob = blob;
         },  'image/jpeg', 0.95);
         this.$refs.inputFile.value = '';
-        store.growlInfo('Image has been set. Click on "Finish" to hide video');
+        this.store.growlInfo('Image has been set. Click on "Finish" to hide video');
       }
     }
 
@@ -148,14 +148,14 @@
           this.srcVideo = stream;
           this.showVideo = true;
           this.isStopped = false;
-          store.growlInfo("Click on your video to take a photo")
+          this.store.growlInfo("Click on your video to take a photo")
         }, (e) => {
           this.logger.error('Error while trying to capture a picture "{}"', e.message || e.name)();
-          store.growlError(`Unable to use your webcam because ${e.message || e.name }`);
+          this.store.growlError(`Unable to use your webcam because ${e.message || e.name }`);
         });
       } else {
         this.stopVideo();
-        store.growlInfo("To apply photo click on save");
+        this.store.growlInfo("To apply photo click on save");
         this.showVideo = false;
         this.isStopped = true;
       }
@@ -168,15 +168,15 @@
 
     upload() {
       if (!this.blob) {
-        store.growlError("Please select image first")
+        this.store.growlError("Please select image first")
       } else {
         this.running = true;
         this.$api.uploadProfileImage(this.blob, (e) => {
           this.running = false;
           if (e) {
-            store.growlError(e)
+            this.store.growlError(e)
           } else {
-            store.growlSuccess("Image uploaded")
+            this.store.growlSuccess("Image uploaded")
           }
         })
       }

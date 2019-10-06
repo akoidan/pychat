@@ -22,7 +22,7 @@ export interface UploadFile {
 }
 
 export interface IMessageHandler {
-  handle(message: DefaultMessage);
+  handle(message: DefaultMessage): void;
 }
 
 export interface ChangeStreamMessage extends DefaultMessage {
@@ -125,35 +125,37 @@ export interface RemoveSendingMessage {
 
 export  interface IStorage {
   // getIds(cb: SingleParamCB<object>);
-  saveMessages(messages: MessageModel[]);
-  deleteMessage(id: number);
-  deleteRoom(id: number);
-  saveMessage(m: MessageModel);
-  updateRoom(m: RoomSettingsModel);
-  setRooms(rooms: RoomSettingsModel[]);
-  saveRoom(room: RoomModel);
-  setUserProfile(user: CurrentUserInfoModel);
-  setUserSettings( settings: CurrentUserSettingsModel);
-  saveRoomUsers(ru: SetRoomsUsers);
-  setUsers(users: UserModel[]);
+  saveMessages(messages: MessageModel[]): void;
+  deleteMessage(id: number): void;
+  deleteRoom(id: number): void;
+  saveMessage(m: MessageModel): void;
+  updateRoom(m: RoomSettingsModel): void;
+  setRooms(rooms: RoomSettingsModel[]): void;
+  saveRoom(room: RoomModel): void;
+  setUserProfile(user: CurrentUserInfoModel): void;
+  setUserSettings( settings: CurrentUserSettingsModel): void;
+  saveRoomUsers(ru: SetRoomsUsers): void;
+  setUsers(users: UserModel[]): void;
 
-  getAllTree(): Promise<StorageData>;
-  saveUser(users: UserModel);
-  clearStorage();
-  clearMessages();
-  connect();
+  getAllTree(): Promise<StorageData|null>;
+  saveUser(users: UserModel): void;
+  clearStorage(): void;
+  clearMessages(): void;
+  connect(): void;
   // getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
-  setRoomHeaderId(roomId: number, value: number);
+  setRoomHeaderId(roomId: number, value: number): void;
 }
 
-export interface PostData<T> {
+export interface  PostData<T> {
   url: string;
-  params?: object;
-  cb: ErrorCB<T>;
+  params?: {[id: string]: string|Blob|null|number|boolean};
   formData?: FormData;
   isJsonEncoded?: boolean;
   isJsonDecoded?: boolean;
-  process?: Function;
+  checkOkString?: boolean;
+  requestInterceptor?: (a: XMLHttpRequest) => void;
+  errorDescription?: string;
+  process?: (R: XMLHttpRequest) => void;
 }
 
 export interface AddSendingFileTransfer {

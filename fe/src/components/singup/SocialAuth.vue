@@ -22,7 +22,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from '@/components/ui/AppSubmit';
   import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from "@/utils/consts";
@@ -57,19 +57,19 @@
       initGoogle(e => {
         this.googleApiLoaded = !e;
         if (e) {
-          store.growlError("Unable to load google" + e);
+          this.store.growlError("Unable to load google" + e);
         }
       });
       initFaceBook(e => {
         this.facebookApiLoaded = !e;
         if (e) {
-          store.growlError("Unable to load fb" + e);
+          this.store.growlError("Unable to load fb" + e);
         }
       });
     }
 
     sendGoogleTokenToServer(token, redirectToNextPage) {
-      store.growlInfo('Successfully logged into google successfully, proceeding...');
+      this.store.growlInfo('Successfully logged into google successfully, proceeding...');
       this.$api.googleAuth(token, redirectToNextPage);
     }
 
@@ -108,7 +108,7 @@
         auth2.signIn().catch( e=> {
           this.grunning = false;
           this.logger.error("auth2.signIn().catch {}", e)();
-          store.growlError("Initing error " + e);
+          this.store.growlError("Initing error " + e);
         });
       }
     }
@@ -118,14 +118,14 @@
       this.logger.debug('fbStatusChangeIfReAuth {}', response)();
       if (response.status === 'connected') {
         // Logged into your app and Facebook.
-        store.growlInfo("Successfully logged in into facebook, proceeding...");
+        this.store.growlInfo("Successfully logged in into facebook, proceeding...");
         this.$api.facebookAuth(response.authResponse.accessToken, (s, e) => {
           this.frunning = false;
           login(s, e);
         });
       } else if (response.status === "not_authorized") {
         this.frunning = false;
-        store.growlInfo("Allow facebook application to use your data");
+        this.store.growlInfo("Allow facebook application to use your data");
       } else {
         return true;
       }

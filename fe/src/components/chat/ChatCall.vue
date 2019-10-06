@@ -70,7 +70,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {CallInfoModel, CallsInfoModel} from "@/types/model";
   import {BooleanIdentifier, StringIdentifier, VideoType} from "@/types/types";
@@ -87,9 +87,9 @@
     showSettings: boolean = false;
 
 
-    get microphones(): { [id: string]: string }  { return store.microphones }
-    get speakers(): { [id: string]: string }  { return store.speakers }
-    get webcams(): { [id: string]: string }  { return store.webcams }
+    get microphones(): { [id: string]: string }  { return this.store.microphones }
+    get speakers(): { [id: string]: string }  { return this.store.speakers }
+    get webcams(): { [id: string]: string }  { return this.store.webcams }
     fullscreen: boolean = false;
 
     currentVideoActive: string = null;
@@ -147,7 +147,7 @@
       } else if (elem['webkitRequestFullscreen']) {
         elem['webkitRequestFullscreen']()
       } else {
-        store.growlError("Can't enter fullscreen");
+        this.store.growlError("Can't enter fullscreen");
         return;
       }
       this.fullscreen = true;
@@ -175,7 +175,7 @@
         id: this.roomId,
         state: event.target.value
       };
-      store.setCurrentMic(payload);
+      this.store.setCurrentMic(payload);
       if (this.callInfo.callActive) {
         webrtcApi.updateConnection(this.roomId);
       }
@@ -185,7 +185,7 @@
         id: this.roomId,
         state: event.target.value
       };
-      store.setCurrentWebcam(payload);
+      this.store.setCurrentWebcam(payload);
       if (this.callInfo.callActive) {
         webrtcApi.updateConnection(this.roomId);
       }
@@ -201,7 +201,7 @@
         prom && prom.catch(function (e) {
         });
       } else {
-        store.growlError("Your browser doesn't support changing output channel")
+        this.store.growlError("Your browser doesn't support changing output channel")
       }
     }
 
@@ -210,7 +210,7 @@
         id: this.roomId,
         state: event.target.value
       };
-      store.setCurrentSpeaker(payload);
+      this.store.setCurrentSpeaker(payload);
       if (this.callInfo.callActive) {
         webrtcApi.updateConnection(this.roomId);
       }
@@ -253,7 +253,7 @@
         state: !this.callInfo.shareScreen,
         id: this.roomId,
       };
-      store.setShareScreenToState(payload);
+      this.store.setShareScreenToState(payload);
       if (this.callInfo.callActive) {
         webrtcApi.toggleDevice(this.roomId, VideoType.SHARE);
       }
@@ -264,7 +264,7 @@
         state: !this.callInfo.showVideo,
         id: this.roomId,
       };
-      store.setVideoToState(payload);
+      this.store.setVideoToState(payload);
       if (this.callInfo.callActive) {
         webrtcApi.toggleDevice(this.roomId, VideoType.VIDEO);
       }
@@ -275,7 +275,7 @@
         state: !this.callInfo.showMic,
         id: this.roomId,
       };
-      store.setMicToState(payload);
+      this.store.setMicToState(payload);
       if (this.callInfo.callActive) {
         webrtcApi.toggleDevice(this.roomId, VideoType.AUDIO);
       }

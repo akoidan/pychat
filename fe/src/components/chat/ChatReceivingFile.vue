@@ -56,7 +56,7 @@
   })
   export default class ChatReceivingFile extends Vue {
     @Prop() receivingFile: ReceivingFile;
-    get myId(): number  { return store.myId };
+    get myId(): number  { return this.store.myId };
     FileTransferStatus = FileTransferStatus;
 
     get showYesNo(): boolean {

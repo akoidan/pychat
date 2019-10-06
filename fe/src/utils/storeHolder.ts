@@ -4,4 +4,4 @@ import Vue from 'vue';
 
 export const store: DefaultStore = getModule(DefaultStore);
 
-Vue.prototype.store = store;
+Vue.prototype.$store = store;

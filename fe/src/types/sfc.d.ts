@@ -17,6 +17,10 @@ declare interface Document {
   msFullscreenElement: any;
 }
 
+declare interface FormData {
+  entries?(): Iterator<[unknown| Blob]>;
+}
+
 declare interface HTMLElement {
   msRequestFullscreen(): void;
   mozRequestFullScreen(): void;

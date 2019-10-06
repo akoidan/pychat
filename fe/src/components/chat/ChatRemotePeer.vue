@@ -8,7 +8,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {CallInfoModel} from '@/types/model';
   import AppInputRange from '@/components/ui/AppInputRange';
@@ -20,7 +20,7 @@
     @Prop() callInfo: CallInfoModel;
 
     get userNameValue() :string {
-      return store.userName(this.callInfo.userId);
+      return this.store.userName(this.callInfo.userId);
     }
 
     get volLevelClass() {

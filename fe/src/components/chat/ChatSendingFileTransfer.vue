@@ -10,7 +10,7 @@
   </tbody>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppProgressBar from '@/components/ui/AppProgressBar';
   import {FileTransferStatus, SendingFileTransfer, UserModel} from "@/types/model";
@@ -32,7 +32,7 @@
     @Prop() transfer: SendingFileTransfer;
     @Prop() connId: string;
     @Prop() opponentId: string;
-    get allUsersDict(): {[id: number]: UserModel}  { return store.allUsersDict }
+    get allUsersDict(): {[id: number]: UserModel}  { return this.store.allUsersDict }
 
     get showBar(): boolean {
       return this.transfer.status === FileTransferStatus.IN_PROGRESS;

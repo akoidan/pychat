@@ -15,7 +15,7 @@
 <script lang='ts'>
   import {Vue, Component, Prop} from "vue-property-decorator";
   import AppSubmit from "@/components/ui/AppSubmit.vue"
-  import {store} from '@/utils/storeHolder';
+
 
   import CaptchaComponent from '@/components/singup/CaptchaComponent.vue';
 
@@ -30,7 +30,7 @@
     running: boolean = false;
 
     created() {
-      store.setRegHeader('Restore password');
+      this.store.setRegHeader('Restore password');
     }
 
     restorePassword(event) {
@@ -38,9 +38,9 @@
       this.$api.sendRestorePassword(this.$refs.form, error => {
         this.running = false;
         if (error) {
-          store.growlError(error)
+          this.store.growlError(error)
         } else {
-          store.growlSuccess("We send you an reset password email, please follow the instruction in it");
+          this.store.growlSuccess("We send you an reset password email, please follow the instruction in it");
         }
       })
     }

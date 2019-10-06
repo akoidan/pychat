@@ -35,10 +35,10 @@
 
     get users(): UserModel[] {
       let uids: number[] = this.value.map(a => a.id);
-      uids.push(store.userInfo.userId);
+      uids.push(this.store.userInfo.userId);
       uids.push(...this.excludeUsersIds);
       let users: UserModel[] = [];
-      store.usersArray.forEach(u => {
+      this.store.usersArray.forEach(u => {
         if (uids.indexOf(u.id) < 0) {
           users.push(u);
         }

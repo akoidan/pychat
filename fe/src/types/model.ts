@@ -27,8 +27,8 @@ export interface CurrentUserSettingsModel {
 }
 
 export interface GoogleCaptcha {
-  render(div: HTMLElement);
-  reset();
+  render(div: HTMLElement): void;
+  reset(): void;
 }
 
 export interface CurrentUserInfoModel {
@@ -40,8 +40,10 @@ export interface CurrentUserInfoModel {
   email: string;
   birthday: string;
   contacts: string;
-  sex: string;
+  sex: SexModelString;
 }
+
+export type SexModelString = 'Secret' | 'Male' | 'Female';
 
 export interface UserModel {
   user: string;
@@ -51,10 +53,10 @@ export interface UserModel {
 }
 
 export interface Location {
-  city: string;
-  country: string;
-  countryCode: string;
-  region: string;
+  city: string |null;
+  country: string|null;
+  countryCode: string|null;
+  region: string|null;
 }
 
 export  interface FileModel {
@@ -70,22 +72,22 @@ export interface UploadProgressModel {
 }
 
 export interface MessageTransferInfo {
-  upload: UploadProgressModel;
-  error: string;
+  upload: UploadProgressModel| null;
+  error: string|null;
 }
 
 export  interface MessageModel {
   id: number;
   time: number;
-  files: {[id: number]: FileModel};
-  content: string;
-  symbol: string;
+  files: {[id: string]: FileModel}| null;
+  content: string|null;
+  symbol: string|null;
   deleted: boolean;
-  giphy: string;
-  edited: number;
+  giphy: string|null;
+  edited: number|null;
   roomId: number;
   userId: number;
-  transfer: MessageTransferInfo;
+  transfer: MessageTransferInfo|null;
 }
 
 export enum SexModel {
@@ -168,10 +170,10 @@ export interface CallsInfoModel {
   callContainer: boolean;
   showMic: boolean;
   currentMicLevel: number; // voice
-  mediaStreamLink: string;
-  currentMic: string;
-  currentSpeaker: string;
-  currentWebcam: string;
+  mediaStreamLink: string|null;
+  currentMic: string|null;
+  currentSpeaker: string|null;
+  currentWebcam: string|null;
   showVideo: boolean;
   shareScreen: boolean;
   callActive: boolean;

@@ -22,7 +22,7 @@ export default class Api extends MessageHandler {
     }
   }
 
-  private retryFcb: Function = null;
+  private retryFcb: Function|null = null;
 
   protected readonly logger: Logger;
 
@@ -33,244 +33,214 @@ export default class Api extends MessageHandler {
     this.xhr = xhr;
   }
 
-  public login(form: HTMLFormElement, cb: ErrorCB<string>) {
-    this.xhr.doPost<any>({
+  public async login(form: HTMLFormElement): Promise<string> {
+    return await this.xhr.doPost<string>({
       url: '/auth',
-      formData: new FormData(form),
-      cb
+      formData: new FormData(form)
     });
   }
 
 
-  public sendLogs(issue: string, browser: string, cb: SingleParamCB<string> = null) {
-    this.xhr.doPost<string>({
+  public async sendLogs(issue: string, browser: string, cb: SingleParamCB<string> | null = null): Promise<void> {
+    let result: string = await this.xhr.doPost<string>({
       url: '/report_issue',
       params: {issue, browser},
-      cb: this.getResponseSuccessCB(cb),
+      checkOkString: true,
     });
   }
 
-  public search(data: string, room: number, offset: number, cb: ErrorCB<MessageModelDto[]>): XMLHttpRequest {
-   return this.xhr.doPost<MessageModelDto[]>({
+  public async search(data: string, room: number, offset: number): Promise<MessageModelDto[]> {
+   return await this.xhr.doPost<MessageModelDto[]>({
       url: '/search_messages',
       params: {data, room, offset},
       isJsonDecoded: true,
-      cb
     });
   }
 
-  public changePassword(old_password: string, password: string, cb: SingleParamCB<string>) {
-    return this.xhr.doPost<MessageModelDto[]>({
+  public async changePassword(old_password: string, password: string): Promise<void> {
+    return await this.xhr.doPost<void>({
       url: '/change_password',
       params: {old_password, password},
-      cb: this.getResponseSuccessCB(cb)
+      checkOkString: true,
     });
   }
 
-  public logout(cb: SingleParamCB<string>, registration_id: string = null) {
-    this.xhr.doPost({
+  public async logout(cb: SingleParamCB<string>, registration_id: string |null= null): Promise<void> {
+    return this.xhr.doPost({
       url: '/logout',
       params: {registration_id},
-      cb: (d, e) => {
-        if (e) {
-          e = `Error while logging out ${e}`;
-        }
-        cb(e);
-      }
+      errorDescription: `Error while logging out: `
     });
   }
 
-  public sendRestorePassword(form: HTMLFormElement, cb: SingleParamCB<string>) {
-    this.xhr.doPost({
+  public async sendRestorePassword(form: HTMLFormElement): Promise<void> {
+    return await this.xhr.doPost<void>({
       url: '/send_restore_password',
       formData: new FormData(form),
-      cb: this.getResponseSuccessCB(cb)
+      checkOkString: true,
     });
   }
 
-  public register(form: HTMLFormElement, cb: ErrorCB<string>) {
-    this.xhr.doPost<string>({
+  public async register(form: HTMLFormElement): Promise<string> {
+    return await this.xhr.doPost<string>({
       url: '/register',
       formData: new FormData(form),
-      cb
     });
   }
 
-  public registerDict(password: string, username: string, cb: ErrorCB<string>) {
-    this.xhr.doPost<string>({
+  public async registerDict(password: string, username: string): Promise<string> {
+    return await this.xhr.doPost<string>({
       url: '/register',
-      params: {username, password},
-      cb
+      params: {username, password}
     });
   }
 
-  public googleAuth(token, cb) {
-    this.xhr.doPost({
+  public async googleAuth(token: string, cb: string): Promise<string> {
+    return await this.xhr.doPost<string>({
       url: '/google_auth',
       params: {
         token
-      },
-      cb,
+      }
     });
   }
 
-  public facebookAuth(token, cb) {
-    this.xhr.doPost({
+  public async facebookAuth(token: string): Promise<string> {
+    return await this.xhr.doPost({
       url: '/facebook_auth',
       params: {
         token
-      },
-      cb,
+      }
     });
   }
 
-  public statistics(cb) {
-    this.xhr.doGet('/statistics', cb, true);
+  public async statistics(): Promise<void> {
+    return await this.xhr.doGet('/statistics', true);
   }
 
-  public loadGoogle(cb) {
-    this.xhr.loadJs('https://apis.google.com/js/platform.js', cb);
+  public async loadGoogle(): Promise<void> {
+    return await this.xhr.loadJs('https://apis.google.com/js/platform.js');
   }
 
-  public loadFacebook(cb) {
-    this.xhr.loadJs('https://connect.facebook.net/en_US/sdk.js', cb);
+  public async loadFacebook(): Promise<void> {
+    return await this.xhr.loadJs('https://connect.facebook.net/en_US/sdk.js');
   }
 
-  public loadRecaptcha(cb) {
-    this.xhr.loadJs('https://www.google.com/recaptcha/api.js', cb);
-  }
-
-
-  public registerFCB(registration_id: string, agent: string, is_mobile: boolean, cb: SingleParamCB<string> = undefined) {
-    this.xhr.doPost({
-      url: '/register_fcb',
-      params: {
-        registration_id,
-        agent,
-        is_mobile
-      },
-      cb: this.getResponseSuccessCB(d => {
-        if (d === CONNECTION_ERROR) {
-          this.retryFcb = () => {
-            this.registerFCB(registration_id, agent, is_mobile);
-          };
-        } else {
-          this.retryFcb = null;
-        }
-        if (cb) {
-          cb(d);
-        }
-      })
-    });
+  public async loadRecaptcha(): Promise<void> {
+    return await this.xhr.loadJs('https://www.google.com/recaptcha/api.js');
   }
 
 
-  public validateUsername(username: string, cb: SingleParamCB<string>) {
-    this.xhr.doPost({
+  public async registerFCB(registration_id: string, agent: string, is_mobile: boolean): Promise<void> {
+    try {
+      return await this.xhr.doPost({
+        url: '/register_fcb',
+        params: {
+          registration_id,
+          agent,
+          is_mobile
+        },
+        checkOkString: true,
+      });
+    } catch (e) {
+      if (e === CONNECTION_ERROR) {
+        this.retryFcb = () => {
+          this.registerFCB(registration_id, agent, is_mobile);
+        };
+      } else {
+        this.retryFcb = null;
+      }
+      throw e;
+    }
+  }
+
+
+  public async validateUsername(username: string): Promise<void> {
+    return await this.xhr.doPost({
       url: '/validate_user',
       params: {username},
-      cb: this.getResponseSuccessCB(cb)
+      checkOkString: true,
     });
   }
 
-  private getResponseSuccessCB(cb: SingleParamCB<string>) {
-    return (data, error) => {
-      if (!cb) {
-      } else if (error) {
-        cb(error);
-      } else if (data === RESPONSE_SUCCESS) {
-        cb(null);
-      } else if (data) {
-        cb(data);
-      } else {
-        cb('Unknown error');
-      }
-    };
-  }
 
-  public sendRoomSettings(roomName, volume, notifications, roomId, cb: SingleParamCB<string>) {
-    this.xhr.doPost( {
+  public async sendRoomSettings(roomName: string, volume: number, notifications: boolean, roomId: number): Promise<void> {
+    return await this.xhr.doPost( {
       url: '/save_room_settings',
       params: {roomName, volume, notifications, roomId},
-      cb: this.getResponseSuccessCB(cb)
+      checkOkString: true,
     });
   }
 
-  public uploadProfileImage(file: Blob, cb: SingleParamCB<string>) {
+  public async uploadProfileImage(file: Blob): Promise<void> {
     let fd = new FormData();
     fd.append('file', file);
-    this.xhr.doPost<string>( {
+    return await this.xhr.doPost<void>( {
       url: '/upload_profile_image',
       formData: fd,
-      cb: this.getResponseSuccessCB(cb)
+      checkOkString: true,
     });
   }
 
-  public showProfile(id: number, cb: ErrorCB<ViewUserProfileDto>) {
-    this.xhr.doGet<ViewUserProfileDto>(`/profile?id=${id}`, cb, true);
+  public async showProfile(id: number): Promise<ViewUserProfileDto> {
+    return await this.xhr.doGet<ViewUserProfileDto>(`/profile?id=${id}`, true);
   }
 
-  public changeEmail(token, cb: ErrorCB<string> ) {
-    this.xhr.doGet<string>(`/change_email?token=${token}`, cb, false);
+  public async changeEmail(token: string): Promise<void> {
+    this.xhr.doGet<string>(`/change_email?token=${token}`, false);
   }
 
-  public changeEmailLogin(email, password, cb: SingleParamCB<string> ) {
-    this.xhr.doPost({
+  public async changeEmailLogin(email: string, password: string): Promise<void> {
+    return await this.xhr.doPost({
       url: '/change_email_login',
-      cb: this.getResponseSuccessCB(cb),
+      checkOkString: true,
       params: {email, password}
     });
   }
 
-  public confirmEmail(token, cb: ErrorCB<string> ) {
-    this.xhr.doGet<string>(`/confirm_email?token=${token}`, cb, false);
+  public async confirmEmail(token: string): Promise<string> {
+    return await this.xhr.doGet<string>(`/confirm_email?token=${token}`, false);
   }
 
-  public uploadFiles(files: UploadFile[], cb: ErrorCB<number[]>, progress: Function) {
+  public async uploadFiles(files: UploadFile[], cb: ErrorCB<number[]>, progress: (e: ProgressEvent) => void): Promise<number[]> {
     let fd = new FormData();
-    files.forEach(function(sd) {
-      fd.append(sd.type + sd.symbol, sd.file, sd.file.name);
-    });
-    this.xhr.doPost<number[]>({
+    files.forEach(sd => fd.append(sd.type + sd.symbol, sd.file, sd.file.name));
+    return await this.xhr.doPost<number[]>({
       url: '/upload_file',
       isJsonDecoded: true,
       formData: fd,
       process: r => {
         r.upload.addEventListener('progress', progress);
-      },
-      cb});
-  }
-
-  public validateEmail(email: string, cb: SingleParamCB<string>): XMLHttpRequest {
-    return this.xhr.doPost({
-      url: '/validate_email',
-      params: {email},
-      cb: this.getResponseSuccessCB(cb)
-    });
-  }
-
-  public verifyToken(token: string, cb) {
-    this.xhr.doPost({
-      url: '/verify_token',
-      isJsonDecoded: true,
-      params: {token},
-      cb: (d: any, e) => {
-        if (e) {
-          cb(null, e);
-        } else if (d && d.message === RESPONSE_SUCCESS) {
-          cb(d.restoreUser);
-        } else {
-          cb(null, d.message);
-        }
       }
     });
   }
 
-  acceptToken(token: string, password: string, cb) {
-    this.xhr.doPost({
+  public async alidateEmail(email: string, requestInterceptor: (r: XMLHttpRequest) => void): Promise<void> {
+    return this.xhr.doPost({
+      url: '/validate_email',
+      params: {email},
+      checkOkString: true,
+      requestInterceptor,
+    });
+  }
+
+  public async verifyToken(token: string): Promise<string> {
+    let value: { message: string, restoreUser: string } = await this.xhr.doPost<{ message: string, restoreUser: string}>({
+      url: '/verify_token',
+      isJsonDecoded: true,
+      params: {token}
+    });
+    if (value && value.message === RESPONSE_SUCCESS) {
+      return value.restoreUser;
+    } else {
+      throw value.message;
+    }
+  }
+
+  public async acceptToken(token: string, password: string): Promise<void> {
+    return await this.xhr.doPost({
       url: '/accept_token',
       params: {token, password},
-      cb: this.getResponseSuccessCB(cb)
+      checkOkString: true,
     });
   }
 }

@@ -20,7 +20,7 @@
 <script lang='ts'>
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from "@/components/ui/AppSubmit.vue"
-  import {store} from '@/utils/storeHolder';
+
   import {login} from "@/utils/utils";
   import SocialAuth from '@/components/singup/SocialAuth.vue';
   import CaptchaComponent from '@/components/singup/CaptchaComponent.vue';
@@ -35,7 +35,7 @@
     running: boolean = false;
 
     created() {
-      store.setRegHeader('Welcome back!');
+      this.store.setRegHeader('Welcome back!');
     }
 
     login() {

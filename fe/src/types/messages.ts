@@ -1,10 +1,14 @@
 import {FileModelDto, MessageModelDto, RoomDto, SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from '@/types/dto';
 import {FileModel} from '@/types/model';
 
-export interface DefaultMessage {
+
+export interface DefaultSentMessage {
   action: string;
-  handler: string;
   messageId?: number;
+}
+
+export interface DefaultMessage extends DefaultSentMessage {
+  handler: string;
   cbBySender?: string;
 }
 
@@ -63,7 +67,7 @@ export interface SetUserProfileMessage extends DefaultMessage {
   content: UserProfileDto;
 }
 
-interface ReplyWebRtc extends WebRtcDefaultMessage{
+interface ReplyWebRtc extends WebRtcDefaultMessage {
   content: BrowserBase;
   opponentWsId: string;
   userId: number;

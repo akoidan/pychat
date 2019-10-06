@@ -16,7 +16,7 @@
 
   import {Prop, Component} from "vue-property-decorator";
   import Vue from 'vue';
-  import {store} from '@/utils/storeHolder';
+
   import AppSubmit from '@/components/ui/AppSubmit.vue';
 
   @Component({components: {AppSubmit}})
@@ -43,15 +43,15 @@
     }
     submitResetPassword() {
       if (this.password != this.repeatPassword) {
-        store.growlError("Passords don't match");
+        this.store.growlError("Passords don't match");
       } else {
         this.running = true;
         this.$api.acceptToken(<string>this.$route.query["token"], this.password, cb => {
           this.running = false;
           if (cb) {
-            store.growlError(cb);
+            this.store.growlError(cb);
           } else {
-            store.growlSuccess("Password has been reset");
+            this.store.growlSuccess("Password has been reset");
             this.$router.replace('/auth/login');
           }
         })

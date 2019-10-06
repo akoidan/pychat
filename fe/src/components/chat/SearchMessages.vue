@@ -6,7 +6,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import debounce from 'lodash.debounce';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {RoomModel, SearchModel} from "@/types/model";
@@ -73,7 +73,7 @@
         searchText,
         locked: searchedIds.length < MESSAGES_PER_SEARCH
       };
-      store.setSearchTo({
+      this.store.setSearchTo({
         roomId: this.room.id,
         search
       } as SetSearchTo);

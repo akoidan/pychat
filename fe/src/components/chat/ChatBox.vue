@@ -16,7 +16,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue} from "vue-property-decorator";
   import ChatMessage from "@/components/chat/ChatMessage.vue";
   import SearchMessages from "@/components/chat/SearchMessages.vue";
@@ -116,7 +116,7 @@
         this.loadUpHistory(35);
       } else if (e.shiftKey && e.ctrlKey && e.keyCode === 70) {
         let s = this.room.search;
-        store.setSearchTo({
+        this.store.setSearchTo({
           roomId: this.room.id,
           search: {
             searchActive: !s.searchActive,
@@ -129,7 +129,7 @@
     };
 
     get minIdCalc(): number {
-      return store.minId(this.room.id);
+      return this.store.minId(this.room.id);
     }
 
     private loadUpHistory(n) {
@@ -140,11 +140,11 @@
           this.$api.search(s.searchText, this.room.id, s.searchedIds.length, (a: MessageModelDto[], e: string) => {
             this.loading = false;
             if (e) {
-              store.growlError(e)
+              this.store.growlError(e)
             } else if (a.length) {
               channelsHandler.addMessages(this.room.id, a);
               let searchedIds = this.room.search.searchedIds.concat(a.map(a => a.id));
-              store.setSearchTo({
+              this.store.setSearchTo({
                 roomId: this.room.id,
                 search: {
                   searchActive: s.searchActive,
@@ -154,7 +154,7 @@
                 } as SearchModel
               });
             } else {
-              store.setSearchTo({
+              this.store.setSearchTo({
                 roomId: this.room.id,
                 search: {
                   searchActive: s.searchActive,

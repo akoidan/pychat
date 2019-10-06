@@ -27,7 +27,7 @@
   </form>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from '@/components/ui/AppSubmit';
   import {CurrentUserInfoModel} from "@/types/model";
@@ -44,7 +44,7 @@
 
 
 
-    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
+    get userInfo(): CurrentUserInfoModel  { return this.store.userInfo }
 
     created() {
       this.username = this.userInfo.user;
@@ -52,15 +52,15 @@
 
     saveProfile() {
       if (this.newPassword != this.confirmPassword) {
-        store.growlError("Passwords don't match");
+        this.store.growlError("Passwords don't match");
       } else {
         this.running = true;
         this.$api.changePassword(this.oldPassword, this.newPassword, e => {
           this.running = false;
           if (e) {
-            store.growlError(e)
+            this.store.growlError(e)
           } else {
-            store.growlSuccess("Password has been changed");
+            this.store.growlSuccess("Password has been changed");
           }
         });
       }

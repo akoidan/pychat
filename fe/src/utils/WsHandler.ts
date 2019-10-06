@@ -12,9 +12,10 @@ import {
   CurrentUserSettingsModel,
   UserModel
 } from '@/types/model';
-import {PubSetRooms, SessionHolder} from '@/types/types';
+import {PubSetRooms, SessionHolder, UploadFile} from '@/types/types';
 import {
   DefaultMessage,
+  DefaultSentMessage,
   GrowlMessage,
   PingMessage,
   SetProfileImageMessage,
@@ -42,26 +43,28 @@ export default class WsHandler extends MessageHandler {
   protected readonly logger: Logger;
   private loggerIn: Logger;
   private loggerOut: Logger;
-  private pingTimeoutFunction;
-  private ws: WebSocket;
+  private pingTimeoutFunction: number|null = null;
+  private ws: WebSocket | null = null;
   private noServerPingTimeout: any;
-  private loadHistoryFromWs: boolean;
+  private loadHistoryFromWs: boolean = false;
   private store: DefaultStore;
   private sessionHolder: SessionHolder;
-  private listenWsTimeout: number;
+  private listenWsTimeout: number|null = null;
   private API_URL: string;
   private callBacks: { [id: number]: Function } = {};
+  public timeDiff: number = 0;
+
+  // TODO remove this as SingleParamCB<DefaultMessage, void>
   protected readonly handlers: { [id: string]: SingleParamCB<DefaultMessage> } = {
-    growl: this.growl,
-    setSettings: this.setSettings,
-    setUserProfile: this.setUserProfile,
-    setProfileImage: this.setProfileImage,
-    setWsId: this.setWsId,
-    userProfileChanged: this.userProfileChanged,
-    ping: this.ping,
-    pong: this.pong,
+    growl: this.growl as SingleParamCB<DefaultMessage>,
+    setSettings: this.setSettings as SingleParamCB<DefaultMessage>,
+    setUserProfile: this.setUserProfile as SingleParamCB<DefaultMessage>,
+    setProfileImage: this.setProfileImage as SingleParamCB<DefaultMessage>,
+    setWsId: this.setWsId as SingleParamCB<DefaultMessage>,
+    userProfileChanged: this.userProfileChanged as SingleParamCB<DefaultMessage>,
+    ping: this.ping as SingleParamCB<DefaultMessage>,
+    pong: this.pong as SingleParamCB<DefaultMessage>,
   };
-  public timeDiff: number;
 
   constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore) {
     super();
@@ -80,7 +83,7 @@ export default class WsHandler extends MessageHandler {
     return this.wsConnectionId;
   }
 
-  public offerFile(roomId, browser, name, size, cb) {
+  public offerFile(roomId: number, browser: string, name: string, size: number, cb: Function) {
     this.sendToServer({
       action: 'offerFile',
       roomId: roomId,
@@ -89,7 +92,7 @@ export default class WsHandler extends MessageHandler {
     this.appendCB(cb);
   }
 
-  public offerCall(roomId, browser, cb) {
+  public offerCall(roomId: number, browser: string, cb: Function) {
     this.sendToServer({
       action: 'offerCall',
       roomId: roomId,
@@ -98,7 +101,7 @@ export default class WsHandler extends MessageHandler {
     this.appendCB(cb);
   }
 
-public acceptFile(connId, received) {
+public acceptFile(connId: string, received: number) {
     this.sendToServer({
       action: 'acceptFile',
       connId,
@@ -108,7 +111,7 @@ public acceptFile(connId, received) {
     });
   }
 
-  public replyFile(connId, browser) {
+  public replyFile(connId: string, browser: string) {
     this.sendToServer({
       action: 'replyFile',
       connId,
@@ -117,7 +120,7 @@ public acceptFile(connId, received) {
   }
 
 
-  public destroyFileConnection(connId, content) {
+  public destroyFileConnection(connId: string, content: unknown) {
     this.sendToServer({
       content,
       action: 'destroyFileConnection',
@@ -125,7 +128,7 @@ public acceptFile(connId, received) {
     });
   }
 
-  public destroyPeerFileConnection(connId, content, opponentWsId) {
+  public destroyPeerFileConnection(connId: string, content: any, opponentWsId: string) {
     this.sendToServer({
       content,
       opponentWsId,
@@ -135,7 +138,7 @@ public acceptFile(connId, received) {
   }
 
 
-  public sendEditMessage(content: string, id: number, files: number[], messageId) {
+  public sendEditMessage(content: string|null, id: number, files: number[] | null, messageId: number) {
     let newVar = {
       id,
       action: 'editMessage',
@@ -146,7 +149,7 @@ public acceptFile(connId, received) {
     this.sendToServer(newVar, true);
   }
 
-  public sendSendMessage(content: string, roomId: number, files: number[], messageId: number, timeDiff) {
+  public sendSendMessage(content: string, roomId: number, files: number[], messageId: number, timeDiff: number) {
     let newVar = {
       files,
       messageId,
@@ -174,7 +177,7 @@ public acceptFile(connId, received) {
     this.appendCB(cb);
   }
 
-  public sendAddRoom(name, volume, notifications, users, cb: Function) {
+  public sendAddRoom(name: string, volume: number, notifications: boolean, users: number[], cb: Function) {
     this.sendToServer({
       users,
       name,
@@ -229,7 +232,7 @@ public acceptFile(connId, received) {
   }
 
 
-  public sendLeaveRoom(roomId, cb: Function) {
+  public sendLeaveRoom(roomId: number, cb: Function) {
     this.sendToServer({
       roomId,
       action: 'deleteRoom',
@@ -252,7 +255,7 @@ public acceptFile(connId, received) {
     return this.ws && this.ws.readyState === WebSocket.OPEN;
   }
 
-  public sendRtcData(content, connId, opponentWsId) {
+  public sendRtcData(content: string, connId: string, opponentWsId: string) {
     this.sendToServer({
       content,
       connId,
@@ -261,7 +264,7 @@ public acceptFile(connId, received) {
     });
   }
 
-  private sendToServer(messageRequest, skipGrowl = false): void {
+  private sendToServer<T extends DefaultSentMessage>(messageRequest: T, skipGrowl = false): void {
     if (!messageRequest.messageId) {
       messageRequest.messageId = this.getMessageId();
     }
@@ -270,7 +273,7 @@ public acceptFile(connId, received) {
   }
 
 
-  public retry(connId, opponentWsId) {
+  public retry(connId: string, opponentWsId: string) {
     this.sendToServer({action: 'retryFile',  connId, opponentWsId});
   }
 
@@ -291,7 +294,7 @@ public acceptFile(connId, received) {
 
   private setUserProfile(m: SetUserProfileMessage) {
     let a: CurrentUserInfoModel = currentUserInfoDtoToModel(m.content);
-    a.userId = this.store.userInfo.userId;
+    a.userId = this.store.userInfo!.userId; // this could came only when we logged in
     this.store.setUserInfo(a);
   }
 
@@ -372,12 +375,12 @@ public acceptFile(connId, received) {
   //   onlineClass: 'online',
   //   offlineClass: OFFLINE_CLASS
   // };
-  private progressInterval = {};
+  // private progressInterval = {}; TODO this was commented along with usage, check if it breaks anything
   private wsConnectionId = '';
 
 
 
-  private onWsMessage(message) {
+  private onWsMessage(message: MessageEvent) {
     let jsonData = message.data;
     let data: DefaultMessage;
     try {
@@ -394,7 +397,7 @@ public acceptFile(connId, received) {
     this.handleMessage(data);
   }
 
-  private logData(logger: Logger, jsonData: string, message: DefaultMessage) {
+  private logData(logger: Logger, jsonData: string, message: DefaultSentMessage) {
     let raw = jsonData;
     if (raw.length > 1000) {
       raw = '';
@@ -410,7 +413,7 @@ public acceptFile(connId, received) {
     if (data.handler !== 'void') {
       sub.notify(data);
     }
-    if (this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.wsConnectionId)) {
+    if (data.messageId && this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.wsConnectionId)) {
       this.logger.debug('resolving cb')();
       this.callBacks[data.messageId](data);
       delete this.callBacks[data.messageId];
@@ -418,21 +421,21 @@ public acceptFile(connId, received) {
   }
 
 
-  private hideGrowlProgress(key) {
-    let progInter = this.progressInterval[key];
-    if (progInter) {
-      this.logger.debug('Removing progressInterval {}', key)();
-      progInter.growl.hide();
-      if (progInter.interval) {
-        clearInterval(progInter.interval);
-      }
-      delete this.progressInterval[key];
-    }
-  }
+  // private hideGrowlProgress(key: number) {
+  //   let progInter = this.progressInterval[key];
+  //   if (progInter) {
+  //     this.logger.debug('Removing progressInterval {}', key)();
+  //     progInter.growl.hide();
+  //     if (progInter.interval) {
+  //       clearInterval(progInter.interval);
+  //     }
+  //     delete this.progressInterval[key];
+  //   }
+  // }
 
 
-  private sendRawTextToServer(jsonRequest, skipGrowl, objData) : void {
-    if (!this.isWsOpen()) {
+  private sendRawTextToServer(jsonRequest: string, skipGrowl: boolean, objData: DefaultSentMessage): void {
+    if (!this.isWsOpen() || !this.ws) {
       if (!skipGrowl) {
         this.store.growlError( 'Can\'t send message, because connection is lost :(');
       }
@@ -458,7 +461,7 @@ public acceptFile(connId, received) {
   // }
 
 
-  private setStatus(isOnline) {
+  private setStatus(isOnline: boolean) {
     if (this.store.isOnline !== isOnline) {
       this.store.setIsOnline(isOnline);
     }
@@ -478,7 +481,7 @@ public acceptFile(connId, received) {
   }
 
 
-  private onWsClose(e) {
+  private onWsClose(e: CloseEvent) {
     this.ws = null;
     this.setStatus(false);
     for (let cb in this.callBacks) {
@@ -492,9 +495,9 @@ public acceptFile(connId, received) {
         this.logger.debug('Error {} during resolving cb {}', e, cb)();
       }
     }
-    for (let k in this.progressInterval) {
-      this.hideGrowlProgress(k);
-    }
+    // for (let k in this.progressInterval) {
+    //   this.hideGrowlProgress(k);
+    // }
     if (this.noServerPingTimeout) {
       clearTimeout(this.noServerPingTimeout);
       this.noServerPingTimeout = null;
@@ -532,9 +535,12 @@ public acceptFile(connId, received) {
       return;
     }
 
-    let ids = {};
+    let ids: { [id: string]: number } = {};
     for (let k in this.store.roomsDict) {
-      ids[k] = this.store.maxId(parseInt(k));
+      let maxId: number|null = this.store.maxId(parseInt(k));
+      if (maxId) {
+        ids[k] = maxId;
+      }
     }
     let s = this.API_URL + `?id=${this.wsConnectionId}`;
     if (Object.keys(ids).length > 0) {
@@ -572,7 +578,7 @@ public acceptFile(connId, received) {
   }
 
 
-  replyCall(connId, browser) {
+  replyCall(connId: string, browser: string) {
     this.sendToServer({
       action: 'replyCall',
       connId,

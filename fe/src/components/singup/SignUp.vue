@@ -26,7 +26,7 @@
 
 <script lang='ts'>
   import {Vue, Component, Prop, Watch} from "vue-property-decorator";
-  import {store} from '@/utils/storeHolder';
+
   import AppSubmit from "@/components/ui/AppSubmit.vue"
   import RegisterFieldSet from '@/components/singup/RegisterFieldSet.vue'
   import debounce from 'lodash.debounce';
@@ -34,6 +34,7 @@
   import sessionHolder from '@/utils/sessionHolder';
   import {login} from '@/utils/utils';
   import SocialAuth from '@/components/singup/SocialAuth';
+  import {SexModelString} from '@/types/model';
 
   @Component({components: {SocialAuth, AppSubmit, RegisterFieldSet}})
   export default class SignUp extends Vue {
@@ -49,7 +50,7 @@
     };
 
     created() {
-      store.setRegHeader('Create new account');
+      this.store.setRegHeader('Create new account');
       this.debouncedValidateUserName = debounce(this.checkUserName, 500);
       this.debouncedValidateEmail = debounce(this.checkEmail, 500);
     }
@@ -199,7 +200,7 @@
     sexCheckValue: IconColor = IconColor.NOT_SET;
 
     @Watch('sex')
-    onSexChange(gender: string) {
+    onSexChange(gender: SexModelString) {
       if (gender == 'Secret') {
         this.sexDescription = `Need a help?`;
         this.sexCheckValue = IconColor.WARN;

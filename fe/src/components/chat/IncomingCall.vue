@@ -28,7 +28,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {IncomingCallModel, RoomDictModel, UserModel} from "@/types/model";
   import {webrtcApi} from '@/utils/singletons';
@@ -37,8 +37,8 @@
   export default class IncomingCall extends Vue {
 
     @Prop() call: IncomingCallModel;
-    get allUsersDict(): {[id: number]: UserModel}  { return store.allUsersDict }
-    get roomsDict (): RoomDictModel  { return store.roomsDict  }
+    get allUsersDict(): {[id: number]: UserModel}  { return this.store.allUsersDict }
+    get roomsDict (): RoomDictModel  { return this.store.roomsDict  }
 
     get caller() {
       return this.allUsersDict[this.call.userId].user;
