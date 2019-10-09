@@ -5,7 +5,7 @@ import {
 } from '@/utils/consts';
 import {Logger, LogStrict} from 'lines-logger';
 import loggerFactory from '@/utils/loggerFactory';
-import MessageHandler from '@/utils/MesageHandler';
+import MessageHandler, {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 import {logout} from '@/utils/utils';
 import {
   CurrentUserInfoModel,
@@ -54,16 +54,15 @@ export default class WsHandler extends MessageHandler {
   private callBacks: { [id: number]: Function } = {};
   public timeDiff: number = 0;
 
-  // TODO remove this as SingleParamCB<DefaultMessage, void>
-  protected readonly handlers: { [id: string]: SingleParamCB<DefaultMessage> } = {
-    growl: this.growl as SingleParamCB<DefaultMessage>,
-    setSettings: this.setSettings as SingleParamCB<DefaultMessage>,
-    setUserProfile: this.setUserProfile as SingleParamCB<DefaultMessage>,
-    setProfileImage: this.setProfileImage as SingleParamCB<DefaultMessage>,
-    setWsId: this.setWsId as SingleParamCB<DefaultMessage>,
-    userProfileChanged: this.userProfileChanged as SingleParamCB<DefaultMessage>,
-    ping: this.ping as SingleParamCB<DefaultMessage>,
-    pong: this.pong as SingleParamCB<DefaultMessage>,
+  protected readonly handlers: HandlerTypes = {
+    growl: <HandlerType>this.growl,
+    setSettings: <HandlerType>this.setSettings,
+    setUserProfile: <HandlerType>this.setUserProfile,
+    setProfileImage: <HandlerType>this.setProfileImage,
+    setWsId: <HandlerType>this.setWsId,
+    userProfileChanged: <HandlerType>this.userProfileChanged,
+    ping: <HandlerType>this.ping,
+    pong: this.pong,
   };
 
   constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore) {
@@ -255,7 +254,7 @@ public acceptFile(connId: string, received: number) {
     return this.ws && this.ws.readyState === WebSocket.OPEN;
   }
 
-  public sendRtcData(content: string, connId: string, opponentWsId: string) {
+  public sendRtcData(content: RTCSessionDescriptionInit| RTCIceCandidate, connId: string, opponentWsId: string) {
     this.sendToServer({
       content,
       connId,

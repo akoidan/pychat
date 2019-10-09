@@ -1,10 +1,10 @@
 import BaseTransferHandler from '@/webrtc/BaseTransferHandler';
 import {
-  AcceptCallMessage,
+  AcceptCallMessage, CallStatus,
   ConnectToRemoteMessage,
   DefaultMessage,
   OfferCall,
-  ReplyCallMessage,
+  ReplyCallMessage, ScreenShareData,
   WebRtcSetConnectionIdMessage
 } from '@/types/messages';
 import {browserVersion, isChrome, isMobile} from '@/utils/singletons';
@@ -21,38 +21,42 @@ import {
 } from '@/types/types';
 import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from '@/utils/consts';
 import {extractError, getChromeVersion} from '@/utils/utils';
-import {createMicrophoneLevelVoice, getAverageAudioLevel} from '@/utils/audioprocc';
+import {
+  createMicrophoneLevelVoice,
+  getAverageAudioLevel
+} from '@/utils/audioprocc';
 import CallSenderPeerConnection from '@/webrtc/CallSenderPeerConnection';
 import CallReceiverPeerConnection from '@/webrtc/CallReceiverPeerConnection';
 import router from '@/utils/router';
 import {forEach} from '@/utils/htmlApi';
+import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class CallHandler extends BaseTransferHandler {
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
+  protected readonly handlers: HandlerTypes = {
     answerCall: this.answerCall,
     videoAnswerCall: this.videoAnswerCall,
     declineCall: this.declineCall,
-    replyCall: this.replyCall,
-    acceptCall: this.onacceptCall,
-    removePeerConnection: this.removePeerConnection,
+    replyCall: <HandlerType>this.replyCall,
+    acceptCall: <HandlerType>this.onacceptCall,
+    removePeerConnection: <HandlerType>this.removePeerConnection,
   };
-  private localStream: MediaStream;
-  private audioProcessor: JsAudioAnalyzer;
-  private callStatus: string;
+  private localStream: MediaStream | null = null;
+  private audioProcessor: JsAudioAnalyzer | null = null;
+  private callStatus: CallStatus = 'not_inited';
   private acceptedPeers: string[] = [];
 
-  inflateDevices(devices) {
-    let n, k, c = 0;
-    let microphones = {};
-    let speakers = {};
-    let webcams = {};
+  inflateDevices(devices: MediaDeviceInfo[]): void {
+    let n: number, k: number, c: number = 0;
+    let microphones: { [id: string]: string } = {};
+    let speakers: { [id: string]: string } = {};
+    let webcams: { [id: string]: string } = {};
     let payload: SetDevices = {
       microphones,
       webcams,
       speakers
     };
     if (devices) {
-      devices.forEach(function (device) {
+      devices.forEach((device: MediaDeviceInfo) => {
         switch (device.kind) {
           case 'audioinput':
             microphones[device.deviceId] = device.label || 'Microphone ' + (++n);
@@ -71,6 +75,9 @@ export default class CallHandler extends BaseTransferHandler {
 
   onacceptCall(message: AcceptCallMessage) {
     if (this.callStatus !== 'received_offer') { // if we're call initiator
+      if (!this.connectionId) {
+        throw Error('Conn is is null');
+      }
       let payload: ConnectToRemoteMessage = {
         action: 'connectToRemote',
         handler: Subscription.getPeerConnectionId(this.connectionId, message.opponentWsId),
@@ -82,65 +89,58 @@ export default class CallHandler extends BaseTransferHandler {
     }
   }
 
-  pingExtension(cb) {
-    if (chrome.runtime && chrome.runtime.sendMessage) {
-      let triggered = false;
-      let timedCB = setTimeout(function () {
-        !triggered && cb(false);
-        triggered = true;
-      }, 500);
+  private async pingExtension(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      let error = {rawError: `To share your screen you need chrome extension.<b> <a href="${CHROME_EXTENSION_URL}" target="_blank">Click to install</a></b>`};
+      if (chrome.runtime && chrome.runtime.sendMessage) {
+        let triggered = false;
+        let timedCB = setTimeout(function () {
+          !triggered && reject(error);
+          triggered = true;
+        }, 500);
 
-      chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
-        type: 'PYCHAT_SCREEN_SHARE_PING'
-      }, function (response) {
-        !triggered && cb(response && response.data === 'success');
-        clearTimeout(timedCB);
-      });
+        chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
+          type: 'PYCHAT_SCREEN_SHARE_PING'
+        }, (response) => {
+          if (triggered) {
+            this.logger.error('extension responded after timeout')();
+          } else if (response && response.data === 'success') {
+            clearTimeout(timedCB);
+            resolve();
+          } else {
+            clearTimeout(timedCB);
+            reject(response && response.data || error);
+          }
+        });
+      } else {
+        reject(error);
+      }
+    });
+
+  }
+
+
+  async getDesktopShareFromExtension(): Promise<string> {
+    if (!isChrome) {
+      throw 'ScreenCast feature is only available from chrome atm';
+    } else if (isMobile) {
+      throw 'ScreenCast is not available for mobile phones yet';
     } else {
-      cb(false);
+      await this.pingExtension();
+      this.logger.log('Ping to extension succeeded')();
+      let response = await new Promise<{streamId: string, data: string}>((resolve, reject) => {
+        chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {type: 'PYCHAT_SCREEN_SHARE_REQUEST'}, resolve);
+      });
+      if (response && response.data === 'success') {
+        this.logger.log('Getting desktop share succeeded')();
+        return response.streamId;
+      } else {
+        throw 'Failed to capture desktop stream';
+      }
     }
   }
 
-
-  async getDesktopShareFromExtension() {
-    return new Promise((res, rej) => {
-      if (!isChrome) {
-        rej('ScreenCast feature is only available from chrome atm');
-      } else if (isMobile) {
-        rej('ScreenCast is not available for mobile phones yet');
-      } else {
-        this.pingExtension((success) => {
-          this.logger.log('Ping to extension succeeded')();
-          if (success) {
-            chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
-              type: 'PYCHAT_SCREEN_SHARE_REQUEST'
-            }, (response) => {
-              if (response && response.data === 'success') {
-                this.logger.log('Getting desktop share succeeded')();
-                res({
-                  audio: false,
-                  video: {
-                    mandatory: {
-                      chromeMediaSource: 'desktop',
-                      chromeMediaSourceId: response.streamId,
-                      maxWidth: window.screen.width,
-                      maxHeight: window.screen.height
-                    }
-                  }
-                });
-              } else {
-                rej('Failed to capture desktop stream');
-              }
-            });
-          } else {
-            rej({rawError: `To share your screen you need chrome extension.<b> <a href="${CHROME_EXTENSION_URL}" target="_blank">Click to install</a></b>`});
-          }
-        });
-      }
-    });
-  }
-
-  async captureInput() {
+  async captureInput(): Promise<MediaStream> {
     let endStream;
     this.logger.debug('capturing input')();
     if (this.callInfo.showMic || this.callInfo.showVideo) {
@@ -155,23 +155,33 @@ export default class CallHandler extends BaseTransferHandler {
       endStream = await navigator.mediaDevices.getUserMedia({audio, video});
       this.logger.debug('navigator.mediaDevices.getUserMedia({audio, video})')();
       if (navigator.mediaDevices.enumerateDevices) {
-        let devices = await navigator.mediaDevices.enumerateDevices();
+        let devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
         this.inflateDevices(devices);
       }
     }
     if (this.callInfo.shareScreen) {
       let stream;
       let chromeVersion = getChromeVersion();
-      if (navigator.mediaDevices && navigator.mediaDevices['getDisplayMedia']) {
+      if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
         this.logger.debug('Getting shareScreen from  navigator.getDisplayMedia')();
-        stream = await navigator.mediaDevices['getDisplayMedia']({video: true});
+        stream = await navigator.mediaDevices.getDisplayMedia({video: true});
       } else {
         if (chromeVersion && chromeVersion > 70) {
-          this.store.growlInfo( 'You can now use chrome://flags/#enable-experimental-web-platform-features to share your screen');
+          this.store.growlInfo('You can now use chrome://flags/#enable-experimental-web-platform-features to share your screen');
         }
-        let share = await this.getDesktopShareFromExtension();
+        let streamId: string = await this.getDesktopShareFromExtension();
         this.logger.debug('Resolving userMedia from dekstopShare')();
-        stream = await navigator.mediaDevices.getUserMedia(share);
+        stream = await navigator.mediaDevices.getUserMedia(<MediaStreamConstraints><unknown>{ // TODO update ts to support this
+          audio: false,
+          video: {
+            mandatory: {
+              chromeMediaSource: 'desktop',
+              chromeMediaSourceId: streamId,
+              maxWidth: window.screen.width,
+              maxHeight: window.screen.height
+            }
+          }
+        });
       }
       let tracks: any[] = stream.getVideoTracks();
       if (!(tracks && tracks.length > 0)) {
@@ -184,10 +194,13 @@ export default class CallHandler extends BaseTransferHandler {
         endStream = stream;
       }
     }
+    if (!endStream) {
+      throw 'Unable to capture stream';
+    }
     return endStream;
   }
 
-  private handleStream(e, endStream) {
+  private handleStream(e: string, endStream: MediaStream|null) {
     let what = [];
     if (this.callInfo.showMic) {
       what.push('audio');
@@ -200,7 +213,7 @@ export default class CallHandler extends BaseTransferHandler {
     }
     let message = `<span>Failed to capture ${what.join(', ')} source</span>, because ${extractError(e)}`;
     this.destroyStreamData(endStream);
-    this.store.growlErrorRaw( message);
+    this.store.growlErrorRaw(message);
     this.logger.error('onFailedCaptureSource {}', e)();
   }
 
@@ -208,15 +221,16 @@ export default class CallHandler extends BaseTransferHandler {
     return this.store.roomsDict[this.roomId].callInfo;
   }
 
-  private destroyStreamData(endStream) {
+  private destroyStreamData(endStream: MediaStream|null) {
     if (endStream) {
-      forEach(endStream.getTracks(), e => {
-        e.stop();
-      });
+      let tracks: MediaStreamTrack[] = endStream.getTracks();
+      if (tracks) {
+        tracks.forEach(e => e.stop());
+      }
     }
   }
 
-  processAudio(audioProc) {
+  processAudio(audioProc: JsAudioAnalyzer) {
     return () => {
       if (!this.callInfo.showMic) {
         return;
@@ -229,7 +243,7 @@ export default class CallHandler extends BaseTransferHandler {
           url += navigator.platform.indexOf('Linux') >= 0 ?
               '. Open pavucontrol for more info' :
               ' . Right click on volume icon in system tray -> record devices -> input -> microphone';
-          this.store.growlError( `Unable to capture input from microphone. Check your microphone connection or ${url}`);
+          this.store.growlError(`Unable to capture input from microphone. Check your microphone connection or ${url}`);
         }
       }
       let payload: NumberIdentifier = {
@@ -260,7 +274,7 @@ export default class CallHandler extends BaseTransferHandler {
 
   async updateConnection() {
     this.logger.log('updateConnection')();
-    let stream;
+    let stream: MediaStream|null = null;
     if (this.localStream && this.localStream.active) {
       try {
         stream = await this.captureInput();
@@ -269,10 +283,10 @@ export default class CallHandler extends BaseTransferHandler {
 
         this.webrtcConnnectionsIds.forEach(pcName => {
           let message: ChangeStreamMessage = {
-            handler: Subscription.getPeerConnectionId(this.connectionId, pcName),
+            handler: Subscription.getPeerConnectionId(this.connectionId!, pcName),
             action: 'streamChanged',
-            newStream: stream,
-            oldStream: this.localStream
+            newStream: stream!,
+            oldStream: this.localStream!
           };
           sub.notify(message);
         });
@@ -354,7 +368,7 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   async offerCall() {
-    let stream;
+    let stream: MediaStream | null = null;
     try {
       stream = await this.captureInput();
       this.logger.log('got local stream {}', stream)();
@@ -381,9 +395,9 @@ export default class CallHandler extends BaseTransferHandler {
 
   createCallPeerConnection(message: ReplyCallMessage) {
     if (message.opponentWsId > this.wsHandler.getWsConnectionId()) {
-      new CallSenderPeerConnection(this.roomId, this.connectionId, message.opponentWsId, message.userId, this.wsHandler, this.store);
+      new CallSenderPeerConnection(this.roomId, this.connectionId!, message.opponentWsId, message.userId, this.wsHandler, this.store);
     } else {
-      new CallReceiverPeerConnection(this.roomId, this.connectionId, message.opponentWsId, message.userId, this.wsHandler, this.store);
+      new CallReceiverPeerConnection(this.roomId, this.connectionId!, message.opponentWsId, message.userId, this.wsHandler, this.store);
     }
     this.webrtcConnnectionsIds.push(message.opponentWsId);
   }
@@ -432,12 +446,12 @@ export default class CallHandler extends BaseTransferHandler {
     this.setCallStatus('accepted');
     let stream = await this.captureInput();
     this.attachLocalStream(stream);
-    this.wsHandler.acceptCall(this.connectionId);
+    this.wsHandler.acceptCall(this.connectionId!);
     this.acceptedPeers.forEach((e) => {
       let message: ConnectToRemoteMessage = {
         action: 'connectToRemote',
         stream: this.localStream,
-        handler: Subscription.getPeerConnectionId(this.connectionId, e)
+        handler: Subscription.getPeerConnectionId(this.connectionId!, e)
       };
       sub.notify(message);
     });
@@ -477,7 +491,7 @@ export default class CallHandler extends BaseTransferHandler {
 
   declineCall() {
     this.store.setIncomingCall(null);
-    this.wsHandler.declineCall(this.connectionId);
+    this.wsHandler.declineCall(this.connectionId!);
     this.onDestroy();
   }
 
@@ -491,7 +505,7 @@ export default class CallHandler extends BaseTransferHandler {
     }
   }
 
-  private setCallStatus(status: string) {
+  private setCallStatus(status: CallStatus) {
     this.logger.log('Setting call status to {}', status)();
     this.callStatus = status;
   }

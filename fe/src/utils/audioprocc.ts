@@ -9,7 +9,7 @@ if (IS_DEBUG) {
   window.audioProcesssors = audioProcesssors;
 }
 
-export function createMicrophoneLevelVoice (stream: MediaStream, onaudioprocess: Function): JsAudioAnalyzer|null {
+export function createMicrophoneLevelVoice (stream: MediaStream, onaudioprocess: (e: JsAudioAnalyzer) => (e: AudioProcessingEvent) => void): JsAudioAnalyzer|null {
   try {
     if (isMobile) {
       globalLogger.log('Current phone is mobile, audio processor won\'t be created')();

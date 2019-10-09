@@ -2,11 +2,18 @@ import {DefaultMessage} from '@/types/messages';
 import {Logger} from 'lines-logger';
 import {IMessageHandler} from '@/types/types';
 
+
+export type HandlerType = (a: DefaultMessage) => void;
+
+export interface HandlerTypes {
+ [id: string]: HandlerType;
+}
+
 export default abstract class MessageHandler implements IMessageHandler {
 
   protected abstract readonly logger: Logger;
 
-  protected abstract readonly handlers: { [id: string]: SingleParamCB<DefaultMessage> };
+  protected abstract readonly handlers: HandlerTypes;
 
   public handle(message: DefaultMessage) {
     if (!this.handlers) {

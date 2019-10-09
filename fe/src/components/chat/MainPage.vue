@@ -315,7 +315,7 @@
       } else if (messageId > 0 && messageContent) {
         channelsHandler.sendEditMessage(messageContent, roomId, messageId, uploadFiles);
       } else if (!messageContent && messageId > 0) {
-        channelsHandler.sendDeleteMessage(messageId, -this.$ws.getMessageId());
+        channelsHandler.sendDeleteMessage(messageId, - this.$ws.getMessageId());
       } else if(!messageContent && messageId < 0) {
         channelsHandler.removeSendingMessage(messageId);
       }

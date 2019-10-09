@@ -155,6 +155,7 @@ const getConfig = async () => {
     }
     return res;
   }
+  const entry = ['./src/main.ts'];
 
 
   let webpackOptions = {
@@ -180,6 +181,9 @@ const getConfig = async () => {
   ];
   if (!options.IS_PROD && options.IS_ELECTRON) {
     plugins.push(new SaveHtmlToFile('/tmp/electron.html'));
+  }
+  if (!options.IS_DEBUG && options.IS_WEB) {
+    entry.unshift(  'ts-polyfill');
   }
   if (options.IS_PROD) {
     const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -233,7 +237,7 @@ const getConfig = async () => {
   }
 
   let conf = {
-    entry: ['./src/main.ts'],
+    entry,
     plugins,
     profile: !!options.IS_PROFILE,
     resolve: {

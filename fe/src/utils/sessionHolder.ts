@@ -1,11 +1,19 @@
 import {SessionHolder} from '@/types/types';
 
 class SessionHolderImpl {
-  set session(value: string) {
-      localStorage.setItem('session_id', value);
+
+  private static SESSION_KEY = 'session_id';
+
+  set session(value: string|null) {
+    if (value) {
+      localStorage.setItem(SessionHolderImpl.SESSION_KEY, value);
+    } else {
+      localStorage.removeItem(SessionHolderImpl.SESSION_KEY);
+    }
+
   }
-  get session(): string {
-   return localStorage.getItem('session_id');
+  get session(): string|null {
+   return localStorage.getItem(SessionHolderImpl.SESSION_KEY);
   }
 
 }

@@ -3,7 +3,7 @@ import {CONNECTION_ERROR, RESPONSE_SUCCESS} from '@/utils/consts';
 import {UploadFile} from '@/types/types';
 import {MessageModelDto} from '@/types/dto';
 import {DefaultMessage, ViewUserProfileDto} from '@/types/messages';
-import MessageHandler from '@/utils/MesageHandler';
+import MessageHandler, {HandlerTypes} from '@/utils/MesageHandler';
 import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
 import Http from '@/utils/Http';
@@ -12,11 +12,11 @@ import sessionHolder from '@/utils/sessionHolder';
 
 export default class Api extends MessageHandler {
   private readonly  xhr: Http;
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
+  protected readonly handlers: HandlerTypes = {
     internetAppear: this.internetAppear
   };
 
-  private internetAppear(m: DefaultMessage) {
+  private internetAppear(m: DefaultMessage): void{
     if (this.retryFcb) {
       this.retryFcb();
     }
@@ -95,22 +95,33 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async googleAuth(token: string, cb: string): Promise<string> {
-    return await this.xhr.doPost<string>({
+  public async googleAuth(token: string): Promise<string> {
+    let res: string =  await this.xhr.doPost<string>({
       url: '/google_auth',
       params: {
         token
       }
     });
+    this.checkSessionToken(res);
+    return res;
+  }
+
+  private checkSessionToken(token: string) {
+    if (!/\w{32}/.exec(token)) {
+      throw token;
+    }
   }
 
   public async facebookAuth(token: string): Promise<string> {
-    return await this.xhr.doPost({
+    let res: string = await this.xhr.doPost<string>({
       url: '/facebook_auth',
       params: {
         token
       }
     });
+    this.checkSessionToken(res);
+    return res;
+
   }
 
   public async statistics(): Promise<void> {
@@ -201,7 +212,7 @@ export default class Api extends MessageHandler {
     return await this.xhr.doGet<string>(`/confirm_email?token=${token}`, false);
   }
 
-  public async uploadFiles(files: UploadFile[], cb: ErrorCB<number[]>, progress: (e: ProgressEvent) => void): Promise<number[]> {
+  public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void): Promise<number[]> {
     let fd = new FormData();
     files.forEach(sd => fd.append(sd.type + sd.symbol, sd.file, sd.file.name));
     return await this.xhr.doPost<number[]>({

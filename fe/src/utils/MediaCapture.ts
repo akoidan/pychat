@@ -2,20 +2,11 @@ import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
 import {stopVideo} from '@/utils/htmlApi';
 
-declare class MediaRecorder {
-  constructor(stream: MediaStream, options: {});
-  static isTypeSupported(t: string): boolean;
-  onstop: Function;
-  stop();
-  ondataavailable: Function;
-  start(time?: number );
-}
-
 export default class MediaCapture {
   private isRecordingVideo: boolean;
   private onFinish: Function;
-  private mediaRecorder: MediaRecorder;
-  private timeout: number;
+  private mediaRecorder: MediaRecorder|null = null;
+  private timeout: number | null = null;
   private stopped: boolean = false;
 
   constructor(isRecordingVideo: boolean, onFinish: Function) {
@@ -25,9 +16,9 @@ export default class MediaCapture {
 
   private logger: Logger = loggerFactory.getLoggerColor('nav-record', 'brown');
   private recordedBlobs: any[] = [];
-  private stream: MediaStream;
+  private stream: MediaStream|null = null;
 
-  public async record(): Promise<MediaStream> {
+  public async record(): Promise<MediaStream|null> {
     this.stream = await new Promise<MediaStream>((resolve, reject) => {
       navigator.getUserMedia({video: this.isRecordingVideo, audio: true}, resolve, reject);
     });
@@ -36,7 +27,7 @@ export default class MediaCapture {
       this.timeout = window.setTimeout(resolve, 500); // wait until videocam opens
     });
     if (this.stopped) {
-      return;
+      return null;
     }
     let options = {mimeType: 'video/webm;codecs=vp9'};
     if (!MediaRecorder.isTypeSupported(options.mimeType)) {
@@ -72,7 +63,7 @@ export default class MediaCapture {
     }
   }
 
-  private handleStop(event) {
+  private handleStop(event: Event) {
     this.logger.debug('Recorder stopped: {}', event)();
     stopVideo(this.stream);
     if (this.recordedBlobs.length === 1) {
@@ -86,7 +77,7 @@ export default class MediaCapture {
     }
   }
 
-  private handleDataAvailable(event) {
+  private handleDataAvailable(event: MediaRecorderDataAvailableEvent) {
     if (event.data && event.data.size > 0) {
       this.logger.debug('Appending blob: {}', event.data)();
       this.recordedBlobs.push(event.data);

@@ -20,19 +20,29 @@ export interface WebRtcSetConnectionIdMessage extends WebRtcDefaultMessage {
   time: number;
 }
 
+export interface ScreenShareData {
+  audio: boolean;
+  video: {
+    mandatory: {
+      chromeMediaSource: string;
+      chromeMediaSourceId: string;
+      maxWidth: number;
+      maxHeight: number;
+    };
+  };
+}
 
-export interface SetWsIdMessage extends DefaultMessage {
+export interface SetWsIdMessage extends DefaultMessage, OpponentWsId {
   rooms:  RoomDto[];
   users: UserDto[];
   online: number[];
   time: number;
-  opponentWsId: string;
   userImage: string;
   userInfo: UserProfileDto;
   userSettings: UserSettingsDto;
 }
 export interface ConnectToRemoteMessage extends DefaultMessage  {
-  stream: MediaStream;
+  stream: MediaStream|null;
 }
 
 export interface OfferFileContent extends BrowserBase {
@@ -44,17 +54,24 @@ export interface BrowserBase {
   browser: string;
 }
 
-export interface OfferFile extends WebRtcDefaultMessage {
-  content: OfferFileContent;
+export interface OpponentWsId {
   opponentWsId: string;
+}
+export interface OnSendRtcDataMessage extends WebRtcDefaultMessage, OpponentWsId {
+  content: RTCSessionDescriptionInit | RTCIceCandidateInit| {message: unknown};
+}
+
+export type CallStatus = 'not_inited'|'sent_offer'| 'received_offer' | 'accepted';
+
+export interface OfferFile extends WebRtcDefaultMessage, OpponentWsId {
+  content: OfferFileContent;
   roomId: number;
   userId: number;
   time: number;
 }
 
-export interface OfferCall extends WebRtcDefaultMessage {
+export interface OfferCall extends WebRtcDefaultMessage, OpponentWsId {
   content: BrowserBase;
-  opponentWsId: string;
   roomId: number;
   userId: number;
   time: number;
@@ -67,9 +84,8 @@ export interface SetUserProfileMessage extends DefaultMessage {
   content: UserProfileDto;
 }
 
-interface ReplyWebRtc extends WebRtcDefaultMessage {
+interface ReplyWebRtc extends WebRtcDefaultMessage, OpponentWsId {
   content: BrowserBase;
-  opponentWsId: string;
   userId: number;
 }
 
@@ -138,8 +154,7 @@ export interface AcceptFileMessage extends DefaultMessage {
  content: AcceptFileContent;
 }
 
-export interface AcceptCallMessage extends WebRtcDefaultMessage {
-  opponentWsId: string;
+export interface AcceptCallMessage extends WebRtcDefaultMessage, OpponentWsId {
 }
 
 

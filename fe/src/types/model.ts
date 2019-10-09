@@ -159,7 +159,7 @@ export interface SendingFile {
 
 
 export interface CallInfoModel {
-  mediaStreamLink: string;
+  mediaStreamLink: string|null;
   connected: boolean;
   userId: number;
   opponentCurrentVoice: number;

@@ -32,11 +32,11 @@ export default class Subscription {
     }
   }
 
-  public static getPeerConnectionId(connectionId, opponentWsId) {
+  public static getPeerConnectionId(connectionId: string, opponentWsId: string) {
     return `peerConnection:${connectionId}:${opponentWsId}`;
   }
 
-  public static getTransferId(connectionId) {
+  public static getTransferId(connectionId: string) {
     return `webrtcTransfer:${connectionId}`;
   }
 

@@ -51,7 +51,7 @@ export default class ChannelsHandler extends MessageHandler {
   private readonly store: DefaultStore;
   private readonly api: Api;
   private readonly ws: WsHandler;
-  private readonly sendingMessage: {[id: number]: {cb: (...args: unknown[]) => unknown, files: UploadFile[]}, cb?: (ids: number[]) => void} = {};
+  private readonly sendingMessage: {[id: number]: {cb: () => void, files: UploadFile[]}, cb?: (ids: number[]) => void} = {};
   private readonly notifier: NotifierHandler;
   private messageBus: Vue;
 
@@ -128,8 +128,8 @@ export default class ChannelsHandler extends MessageHandler {
   }
 
   public sendEditMessage(content: string, roomId: number, id: number, uploadfiles: UploadFile[]): void {
-    this.uploadAndSend(id, (filesIds: unknown[]) => {
-      return () => this.ws.sendEditMessage(content, id, <number[]>filesIds, id); // TODO
+    this.uploadAndSend(id, (filesIds: number[]) => {
+      return () => this.ws.sendEditMessage(content, id, filesIds, id); // TODO
     }, () => {
       this.sendEditMessage(content, roomId, id, uploadfiles);
     }, uploadfiles, roomId);
@@ -141,49 +141,26 @@ export default class ChannelsHandler extends MessageHandler {
       uploadfiles: UploadFile[],
       originId: number,
       originTime: number
-  ):  void {
-    this.uploadAndSend(originId, (filesIds) => {
-      // TODO cast filesIds
-      return () => this.ws.sendSendMessage(content, roomId, <number[]>filesIds, originId, Date.now() - originTime);
-    }, () => {
-      this.sendSendMessage(content, roomId, uploadfiles, originId, originTime);
-    }, uploadfiles, roomId);
+  ): void {
+    this.uploadAndSend(
+        originId,
+        (filesIds) => {
+          return () => this.ws.sendSendMessage(content, roomId, filesIds, originId, Date.now() - originTime);
+        }, () => {
+          this.sendSendMessage(content, roomId, uploadfiles, originId, originTime);
+        },
+        uploadfiles,
+        roomId
+    );
   }
 
-  public uploadFiles(
+  public async uploadFiles(
       messageId: number,
       roomId: number,
-      files: UploadFile[],
-      cb: SingleParamCB<number[]|null>
-  ): void {
+      files: UploadFile[]
+  ): Promise<number[]> {
     let size: number = 0;
     files.forEach(f => size += f.file.size);
-    this.api.uploadFiles(files, (res: number[], error: string) => {
-      if (error) {
-        let newVar: SetMessageProgressError = {
-          messageId,
-          roomId,
-          error,
-        };
-        this.store.setMessageProgressError(newVar);
-        cb(null);
-      } else {
-        let newVar: RemoveMessageProgress = {
-          messageId, roomId
-        };
-        this.store.removeMessageProgress(newVar);
-        cb(res);
-      }
-    }, evt => {
-      if (evt.lengthComputable) {
-        let payload: SetMessageProgress = {
-          messageId,
-          roomId,
-          uploaded: evt.loaded,
-        };
-        this.store.setMessageProgress(payload);
-      }
-    });
     let sup: SetUploadProgress = {
       upload: {
         total: size,
@@ -193,6 +170,35 @@ export default class ChannelsHandler extends MessageHandler {
       roomId
     };
     this.store.setUploadProgress(sup);
+    try {
+      let res: number[] = await this.api.uploadFiles(files, evt => {
+        if (evt.lengthComputable) {
+          let payload: SetMessageProgress = {
+            messageId,
+            roomId,
+            uploaded: evt.loaded,
+          };
+          this.store.setMessageProgress(payload);
+        }
+      });
+      let newVar: RemoveMessageProgress = {
+        messageId, roomId
+      };
+      this.store.removeMessageProgress(newVar);
+      if (!res || !res.length) {
+        throw Error('Missing files uploads');
+      }
+      return res;
+    } catch (error) {
+      let newVar: SetMessageProgressError = {
+        messageId,
+        roomId,
+        error,
+      };
+      this.store.setMessageProgressError(newVar);
+      throw error;
+    }
+
   }
 
 
@@ -391,28 +397,32 @@ export default class ChannelsHandler extends MessageHandler {
 
 
 
-  private uploadAndSend(originId: number, cbWs: (args: unknown[]) => (...args: unknown[]) => unknown, cbMethod: (fileIds: number[]) => unknown, uploadfiles: UploadFile[], roomId: number): void {
-    let send = (filesIds: number[]) => {
-      this.sendingMessage[originId] = {
-        cb: cbWs(filesIds),
-        files: uploadfiles
-      };
-      this.sendingMessage[originId].cb();
-    };
-    if (uploadfiles.length) {
-      this.uploadFiles(originId, roomId, uploadfiles, (filesIds: number[]|null) => {
-        if (filesIds) {
-          send(filesIds);
-        } else {
-          this.sendingMessage[originId] = {
-            cb: <(fileIds: unknown) => unknown>cbMethod, // TODO
-            files: uploadfiles
-          };
-        }
-      });
-    } else {
-      send([]);
+  private async uploadAndSend(
+      originId: number,
+      getSendFilesToWsCB: (args: number[]) => () => void,
+      repeatWithoutFiles: () => void,
+      uploadFiles: UploadFile[],
+      roomId: number
+  ): Promise<void> {
+    let fileIds: number[] = [];
+    if (uploadFiles.length) {
+      try {
+        fileIds = await this.uploadFiles(originId, roomId, uploadFiles);
+      } catch (e) {
+        this.logger.error('Uploading error, scheduling cb')();
+        this.sendingMessage[originId] = {
+          cb: repeatWithoutFiles, // TODO
+          files: uploadFiles
+        };
+        throw e;
+      }
     }
+    this.sendingMessage[originId] = {
+      cb: getSendFilesToWsCB(fileIds),
+      files: uploadFiles
+    };
+    this.sendingMessage[originId].cb();
+
   }
 
 

@@ -8,6 +8,10 @@ declare module '*.json' {
   export default value;
 }
 
+interface SingleParamCB<T> {
+  (t: T): void;
+}
+
 
 declare interface Document {
   cancelFullScreen(): void;
@@ -16,6 +20,38 @@ declare interface Document {
   mozFullscreenElement: any;
   msFullscreenElement: any;
 }
+
+declare interface MediaDevices {
+  getDisplayMedia(constraints: MediaStreamConstraints): Promise<MediaStream>;
+  getUserMedia(constraints: MediaStreamConstraints, successCallback: NavigatorUserMediaSuccessCallback, errorCallback: NavigatorUserMediaErrorCallback): void;
+}
+
+declare class MediaRecorder {
+  constructor(stream: MediaStream, options: {});
+  static isTypeSupported(t: string): boolean;
+  onstop: Function;
+  stop(): void;
+  ondataavailable: Function;
+  start(time?: number): void;
+}
+
+declare interface MediaStreamTrack {
+  isShare: boolean;
+}
+
+declare class MediaRecorderDataAvailableEvent {
+  data: { size: number };
+}
+
+declare  interface Blob {
+  name?: string;
+}
+
+declare interface LocalFileSystem {
+
+  mozRequestFileSystem(type: number, size: number, successCallback: FileSystemCallback, errorCallback?: ErrorCallback): void;
+}
+
 
 declare interface FormData {
   entries?(): Iterator<[unknown| Blob]>;

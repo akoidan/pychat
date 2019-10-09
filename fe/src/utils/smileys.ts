@@ -120,11 +120,12 @@ export interface Smile {
   src: typeof import('.gif');
 }
 
-export const smileys: {
-  base: { [id: string]: Smile },
-  girls: { [id: string]: Smile },
-  extra: { [id: string]: Smile }
-} = {
+export interface SmileysStructure {
+  base: { [id: string]: Smile };
+  girls: { [id: string]: Smile };
+  extra: { [id: string]: Smile };
+}
+export const smileys: SmileysStructure = {
   base: {
     '\u3402': {alt: '::))):', src: base_0000},
     '\u3403': {alt: '::):', src: base_0001},

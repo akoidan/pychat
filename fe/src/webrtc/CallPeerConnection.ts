@@ -15,7 +15,14 @@ import {DefaultStore} from'@/utils/store';
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
   private audioProcessor: any;
 
-  constructor(roomId: number, connId: string, opponentWsId: string, userId: number, wsHandler: WsHandler, store: DefaultStore) {
+  constructor(
+      roomId: number,
+      connId: string,
+      opponentWsId: string,
+      userId: number,
+      wsHandler: WsHandler,
+      store: DefaultStore
+  ) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     let payload:  SetCallOpponent = {
       opponentWsId: this.opponentWsId,
@@ -31,7 +38,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   }
 
   oniceconnectionstatechange() {
-    if (this.pc.iceConnectionState === 'disconnected') {
+    if (this.pc!.iceConnectionState === 'disconnected') {
       this.logger.log('disconnected')();
       this.onDestroy('Connection has been lost');
     } else if (['completed', 'connected'].indexOf(this.pc.iceConnectionState) >= 0) {

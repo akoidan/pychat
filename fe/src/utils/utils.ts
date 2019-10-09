@@ -11,6 +11,7 @@ import {
 } from '@/utils/consts';
 import {StorageData} from '@/types/types';
 
+
 let logger = loggerFactory.getLoggerColor('utils', '#007a70');
 
 export function logout(errMessage: string) {
@@ -48,7 +49,7 @@ export function bounce(ms: number): (cb: Function) => void {
 export async function initStore() {
   let isNew = await storage.connect();
   if (!isNew) {
-    let data: StorageData = await storage.getAllTree();
+    let data: StorageData | null = await storage.getAllTree();
     let session = sessionHolder.session;
     globalLogger.log('restored state from db {}, userId: {}, session {}', data, store.userInfo && store.userInfo.userId, session)();
     if (data) {
@@ -56,8 +57,8 @@ export async function initStore() {
         store.init(data.setRooms);
       } else {
         store.roomsArray.forEach((storeRoom: RoomModel) => {
-          if (data.setRooms.roomsDict[storeRoom.id]) {
-            let dbMessages: {[id: number]: MessageModel} = data.setRooms.roomsDict[storeRoom.id].messages;
+          if (data!.setRooms.roomsDict[storeRoom.id]) {
+            let dbMessages: {[id: number]: MessageModel} = data!.setRooms.roomsDict[storeRoom.id].messages;
             for (let dbMessagesKey in dbMessages) {
               if (!storeRoom.messages[dbMessagesKey])
               store.addMessage(dbMessages[dbMessagesKey]);
@@ -84,16 +85,10 @@ export async function initStore() {
   }
 }
 
-export function login(session: string, errMessage: string) {
-  if (errMessage) {
-    store.growlError( errMessage);
-  } else if (/\w{32}/.exec(session)) {
-    sessionHolder.session = session;
-    logger.log('Proceeding to /')();
-    router.replace(`/chat/${ALL_ROOM_ID}`);
-  } else {
-    store.growlError( session);
-  }
+export function login(session: string) {
+  sessionHolder.session = session;
+  logger.log('Proceeding to /')();
+  router.replace(`/chat/${ALL_ROOM_ID}`);
 }
 
 declare const gapi: any;
@@ -130,44 +125,65 @@ export function getChromeVersion () {
   return raw ? parseInt(raw[2], 10) : false;
 }
 
-export function initGoogle(cb: Function) {
+export async function initGoogle(): Promise<void> {
   if (!googleInited && GOOGLE_OAUTH_2_CLIENT_ID) {
     logger.log('Initializing google sdk')();
-    api.loadGoogle((e: string) => {
-      if (typeof gapi.load !== 'function') { // TODO
-        throw Error(`Gapi doesnt have load function ${JSON.stringify(Object.keys(gapi))}`);
-      }
-      gapi.load('client:auth2', () => {
-        logger.log('gapi 2 is ready')();
-        gapi.auth2.init({client_id: GOOGLE_OAUTH_2_CLIENT_ID}).then(() => {
-          logger.log('gauth 2 is ready')();
-          googleInited = true;
-          cb();
-        }).catch((e: string) => {
-          logger.error('Unable to init google {}', e)();
-          cb(e);
-        });
-      });
-    });
-  } else {
-    cb();
+    await api.loadGoogle();
+    if (typeof gapi.load !== 'function') { // TODO
+      throw Error(`Gapi doesnt have load function ${JSON.stringify(Object.keys(gapi))}`);
+    }
+    await new Promise(r => gapi.load('client:auth2', r));
+    logger.log('gapi 2 is ready')();
+    await gapi.auth2.init({client_id: GOOGLE_OAUTH_2_CLIENT_ID});
+    logger.log('gauth 2 is ready')();
+    googleInited = true;
   }
 }
 
-export function initFaceBook(cb: Function) {
+// Allow only boolean fields be pass to ApplyGrowlErr
+type ClassType = { new (...args: any[]): any };
+type ValueFilterForKey<T extends InstanceType<ClassType>, U> = {
+  [K in keyof T]: U extends T[K] ? K : never;
+}[keyof T];
+
+
+export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
+      message: string,
+      runningProp: ValueFilterForKey<T, boolean>,
+) {
+  return function (target: T, propertyKey: string, descriptor: PropertyDescriptor) {
+    const original = descriptor.value;
+    descriptor.value = async function(...args: unknown[]) {
+      try {
+        if (runningProp) {
+          target[runningProp] = true;
+        }
+        return await original.apply(this, args);
+      } catch (e) {
+        if (message) {
+          store.growlError(message + (e.message | e));
+        } else {
+          throw e;
+        }
+      } finally {
+        if (runningProp) {
+          target[runningProp] = false;
+        }
+      }
+    };
+  };
+}
+
+export async function initFaceBook() {
   if (!fbInited && FACEBOOK_APP_ID) {
-    api.loadFacebook((e: unknown) => {
-      logger.log('Initing facebook sdk...')();
-      FB.init({
-        appId: FACEBOOK_APP_ID,
-        xfbml: true,
-        version: 'v2.7'
-      });
-      fbInited = true;
-      cb();
+    await api.loadFacebook();
+    logger.log('Initing facebook sdk...')();
+    FB.init({
+      appId: FACEBOOK_APP_ID,
+      xfbml: true,
+      version: 'v2.7'
     });
-  } else {
-    cb();
+    fbInited = true;
   }
 }
 
@@ -183,7 +199,7 @@ export function bytesToSize(bytes: number): string {
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
 
-export function sem(event: MouseEvent, message: MessageModel, isEditingNow: boolean, userInfo: CurrentUserInfoModel, setEditedMessage: SingleParamCB<EditingMessage>) {
+export function sem(event: Event, message: MessageModel, isEditingNow: boolean, userInfo: CurrentUserInfoModel, setEditedMessage: SingleParamCB<EditingMessage>) {
   logger.debug('sem {}', message.id)();
   if (event.target
       && (<HTMLElement>event.target).tagName !== 'IMG'

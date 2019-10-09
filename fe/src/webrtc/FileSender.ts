@@ -27,7 +27,7 @@ export default class FileSender extends BaseTransferHandler {
     this.store.addSendingFile(payload);
   }
 
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
+  protected readonly handlers: { [p: string]: <T super DefaultMessage>(a: DefaultMessage) => void } = {
     replyFile: this.replyFile,
     removePeerConnection: this.removePeerConnection
   };

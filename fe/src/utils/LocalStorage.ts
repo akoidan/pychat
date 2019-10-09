@@ -120,6 +120,7 @@ export default class LocalStorage implements IStorage {
     }
   }
 
-  async connect() {
+  async connect(): Promise<boolean> {
+    return false;
   }
 }

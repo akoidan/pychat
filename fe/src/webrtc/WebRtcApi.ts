@@ -41,12 +41,13 @@ export default class WebRtcApi extends MessageHandler {
     this.store = store;
   }
 
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> }  = {
+  protected readonly handlers: { [p: string]: <T extends DefaultMessage>(a: T) => void }  = {
     offerFile: this.onofferFile,
     offerCall: this.offerCall,
   };
 
-  private onofferFile(message: OfferFile) {
+
+  private onofferFile(message: OfferFile): void {
     let limitExceeded = message.content.size > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem;
     let payload: ReceivingFile = {
       roomId: message.roomId,

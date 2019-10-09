@@ -241,7 +241,7 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  setIncomingCall(payload: IncomingCallModel) {
+  setIncomingCall(payload: IncomingCallModel|null) {
     this.incomingCall = payload;
   }
 

@@ -21,6 +21,10 @@ export interface UploadFile {
    file: File;
 }
 
+export type ValueFilterForKey<T extends object, U> = {
+  [K in keyof T]: U extends T[K] ? K : never;
+}[keyof T];
+
 export interface IMessageHandler {
   handle(message: DefaultMessage): void;
 }
@@ -100,7 +104,7 @@ export interface StringIdentifier {
 
 export interface MediaIdentifier {
   id: number;
-  media: MediaStream;
+  media: MediaStream|null;
 }
 
 export interface RemovePeerConnection extends DefaultMessage {
@@ -141,7 +145,7 @@ export  interface IStorage {
   saveUser(users: UserModel): void;
   clearStorage(): void;
   clearMessages(): void;
-  connect(): void;
+  connect(): Promise<boolean>;
   // getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
   setRoomHeaderId(roomId: number, value: number): void;
 }
@@ -169,9 +173,11 @@ export interface SetReceivingFileStatus {
   roomId: number;
   connId: string;
   status: FileTransferStatus;
-  error?: string;
+  error?: string|null;
   anchor?: string;
 }
+
+export type ConnectionStatus = 'new' | 'closed';
 
 interface SetSendingFileBase {
   roomId: number;
