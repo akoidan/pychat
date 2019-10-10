@@ -21,6 +21,18 @@ declare interface Document {
   msFullscreenElement: any;
 }
 
+declare interface RTCPeerConnection {
+  // obsolete (deprecated) TODO
+  addStream(a: MediaStream): void;
+  removeStream(a: MediaStream): void;
+  onaddstream: (event: MediaStreamEvent) => void;
+}
+
+
+declare interface RTCDataChannelInit {
+  reliable?: boolean;
+}
+
 declare interface MediaDevices {
   getDisplayMedia(constraints: MediaStreamConstraints): Promise<MediaStream>;
   getUserMedia(constraints: MediaStreamConstraints, successCallback: NavigatorUserMediaSuccessCallback, errorCallback: NavigatorUserMediaErrorCallback): void;

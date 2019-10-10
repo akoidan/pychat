@@ -7,6 +7,7 @@ import {requestFileSystem} from '@/utils/htmlApi';
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API, MAX_BUFFER_SIZE} from '@/utils/consts';
 import FilePeerConnection from '@/webrtc/FilePeerConnection';
 import {DefaultStore} from'@/utils/store';
+import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {
   private fileSize: number;
@@ -18,8 +19,8 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
   protected connectedToRemote: boolean = true;
   private recevedUsingFile = false;
 
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
-    sendRtcData: this.onsendRtcData,
+  protected readonly handlers: HandlerTypes = {
+    sendRtcData: <HandlerType>this.onsendRtcData,
     retryFile: this.retryFileAccepted,
     retryFileReply: this.retryFileReply,
     acceptFileReply: this.acceptFileReply,

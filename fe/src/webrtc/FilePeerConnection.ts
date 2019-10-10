@@ -1,16 +1,17 @@
 import AbstractPeerConnection from '@/webrtc/AbstractPeerConnection';
+import {DefaultMessage} from '@/types/messages';
 
 export default abstract class FilePeerConnection extends AbstractPeerConnection {
 
   public oniceconnectionstatechange() {
-    if (this.pc.iceConnectionState === 'disconnected') {
+    if (this.pc!.iceConnectionState === 'disconnected') {
       this.closeEvents('Connection has been lost');
     }
   }
 
-  closeEvents (text?: string) {
+  closeEvents (text?: string|DefaultMessage) {
     if (text) {
-      this.ondatachannelclose(text);
+      this.ondatachannelclose(<string>text); // TODO
     }
     this.logger.error('Closing event from {}', text)();
     this.closePeerConnection();

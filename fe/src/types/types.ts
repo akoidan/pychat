@@ -66,7 +66,7 @@ export interface SetUploadProgress {
 export interface SetCallOpponent {
   roomId: number;
   opponentWsId: string;
-  callInfoModel: CallInfoModel;
+  callInfoModel: CallInfoModel|null;
 }
 
 export interface SetOpponentVolume {
@@ -197,7 +197,7 @@ export interface SetReceivingFileUploaded {
 
 export interface SetSendingFileStatus extends SetSendingFileBase {
   status: FileTransferStatus;
-  error?: string;
+  error: string|null;
 }
 
 export interface StorageData {

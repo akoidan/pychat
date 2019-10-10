@@ -9,7 +9,7 @@ import MessageHandler from '@/utils/MesageHandler';
 import Subscription from '@/utils/Subscription';
 import {ConnectionStatus, RemovePeerConnection} from '@/types/types';
 import {DefaultStore} from '@/utils/store';
-import {OnSendRtcDataMessage} from '@/types/messages';
+import {ConnectToRemoteMessage, OnSendRtcDataMessage} from '@/types/messages';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean = false;
@@ -105,7 +105,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     }
   }
 
-  createPeerConnection(arg?: string) {
+  createPeerConnection(arg?: ConnectToRemoteMessage) {
     this.logger.log('Creating RTCPeerConnection')();
     if (!window.RTCPeerConnection) {
       throw Error('Your browser doesn\'t support RTCPeerConnection');
@@ -151,7 +151,9 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.logger.log('Creating offer...')();
     this.offerCreator = true;
     this.pc!.createOffer((offer: RTCSessionDescriptionInit) => {
-      offer.sdp = this.setMediaBitrate(offer.sdp, 1638400);
+      if (offer.sdp) {
+        offer.sdp = this.setMediaBitrate(offer.sdp!, 1638400);
+      }
       this.logger.log('Created offer, setting local description')();
       this.pc!.setLocalDescription(offer, () => {
         this.logger.log('Sending offer to remote')();
@@ -163,7 +165,9 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   respondeOffer() {
     this.offerCreator = false;
     this.pc!.createAnswer((answer: RTCSessionDescriptionInit) => {
-      answer.sdp = this.setMediaBitrate(answer.sdp, 1638400);
+      if (answer.sdp) {
+        answer.sdp = this.setMediaBitrate(answer.sdp, 1638400);
+      }
       this.logger.log('Sending answer')();
       this.pc!.setLocalDescription(answer, () => {
         this.sendWebRtcEvent(answer);
@@ -172,7 +176,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   }
 
 
-  setMediaBitrate(sdp, bitrate) {
+  setMediaBitrate(sdp: string, bitrate: number) {
     let lines = sdp.split('\n');
     let line = -1;
     for (let i = 0; i < lines.length; i++) {

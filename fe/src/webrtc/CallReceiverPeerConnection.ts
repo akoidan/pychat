@@ -1,17 +1,18 @@
-import {DefaultMessage} from '@/types/messages';
+import {ConnectToRemoteMessage, DefaultMessage} from '@/types/messages';
 import WsHandler from '@/utils/WsHandler';
 import CallPeerConnection from '@/webrtc/CallPeerConnection';
 import {DefaultStore} from'@/utils/store';
+import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class CallReceiverPeerConnection extends CallPeerConnection {
 
   protected connectedToRemote: boolean = false;
 
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
-    destroy: this.onDestroy,
-    streamChanged: this.onStreamChanged,
-    connectToRemote: this.connectToRemote,
-    sendRtcData: this.onsendRtcData,
+  protected readonly handlers: HandlerTypes = {
+    destroy: <HandlerType>this.onDestroy,
+    streamChanged: <HandlerType>this.onStreamChanged,
+    connectToRemote: <HandlerType>this.connectToRemote,
+    sendRtcData: <HandlerType>this.onsendRtcData,
   };
 
   constructor(roomId: number, connId: string, opponentWsId: string, userId: number, wsHandler: WsHandler, store: DefaultStore) {
@@ -25,13 +26,13 @@ export default class CallReceiverPeerConnection extends CallPeerConnection {
     };
   }
 
-  connectToRemote(stream) {
+  connectToRemote(stream: ConnectToRemoteMessage) {
     this.logger.log('Connect to remote')();
     this.connectedToRemote = true;
     this.createPeerConnection(stream);
   }
 
-  ondatachannelclose(text): void {
+  ondatachannelclose(text: string): void {
   }
 
 }

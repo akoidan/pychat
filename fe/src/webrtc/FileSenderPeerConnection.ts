@@ -14,21 +14,22 @@ import {bytesToSize, getDay} from '@/utils/utils';
 import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE} from '@/utils/consts';
 import FilePeerConnection from '@/webrtc/FilePeerConnection';
 import {DefaultStore} from'@/utils/store';
+import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
 
   private file: File;
-  private reader: FileReader;
-  private offset: number;
+  private reader: FileReader | null = null;
+  private offset: number = 0;
   private lastPrinted: number = 0;
   protected connectedToRemote: boolean = true;
 
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
-    destroyFileConnection: this.destroyFileConnection,
-    acceptFile: this.acceptFile,
-    sendRtcData: this.onsendRtcData,
-    destroy: this.closeEvents,
-    declineSending: this.declineSending,
+  protected readonly handlers: HandlerTypes = {
+    destroyFileConnection: <HandlerType>this.destroyFileConnection,
+    acceptFile: <HandlerType>this.acceptFile,
+    sendRtcData: <HandlerType>this.onsendRtcData,
+    destroy: <HandlerType>this.closeEvents,
+    declineSending: <HandlerType>this.declineSending,
   };
 
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, file: File, userId: number) {
@@ -78,7 +79,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     this.setTranseferdAmount(message.content.received);
     try {
       // Reliable data channels not supported by Chrome
-      this.sendChannel = this.pc.createDataChannel('sendDataChannel', {reliable: false});
+      this.sendChannel = this.pc!.createDataChannel('sendDataChannel', {reliable: false});
       this.sendChannel.onopen = this.onreceiveChannelOpen.bind(this);
       this.logger.log('Created send data channel.')();
     } catch (e) {
@@ -101,7 +102,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
 
   sendCurrentSlice() {
     let currentSlice = this.file.slice(this.offset, this.offset + READ_CHUNK_SIZE);
-    this.reader.readAsArrayBuffer(currentSlice);
+    this.reader!.readAsArrayBuffer(currentSlice);
   }
 
 
@@ -116,23 +117,24 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
   }
   
 
-  sendData (data, offset, cb) {
+  private sendData(data: ArrayBuffer, offset: number, cb: () => void): void {
     try {
-      if (this.sendChannel.readyState === 'open') {
-        if (this.sendChannel.bufferedAmount > 10000000) { // prevent chrome buffer overfill
+      if (this.sendChannel!.readyState === 'open') {
+        if (this.sendChannel!.bufferedAmount > 10000000) { // prevent chrome buffer overfill
           // if it happens chrome will just close the datachannel
           let now = Date.now();
           if (now - this.lastPrinted > 1000) {
             this.lastPrinted = now;
             this.logger.debug('Buffer overflow by {}bytes, waiting to flush...',
-                bytesToSize(this.sendChannel.bufferedAmount))();
+                bytesToSize(this.sendChannel!.bufferedAmount))();
           }
-          return setTimeout(this.sendData.bind(this), 100, data, offset, cb);
+          setTimeout(this.sendData.bind(this), 100, data, offset, cb);
+          return;
         } else {
           let buffer = data.slice(offset, offset + SEND_CHUNK_SIZE);
-          this.sendChannel.send(buffer);
+          this.sendChannel!.send(buffer);
           let chunkOffset = offset + buffer.byteLength;
-          this.setTranseferdAmount(this.offset + chunkOffset - this.sendChannel.bufferedAmount);
+          this.setTranseferdAmount(this.offset + chunkOffset - this.sendChannel!.bufferedAmount);
           if (data.byteLength > chunkOffset) {
             this.sendData(data, chunkOffset, cb);
           } else {
@@ -140,7 +142,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
           }
         }
       } else {
-        throw Error(`Can't write data into ${this.sendChannel.readyState} channel`);
+        throw Error(`Can't write data into ${this.sendChannel!.readyState} channel`);
       }
     } catch (error) {
       this.commitErrorIntoStore('Connection has been lost');
@@ -149,18 +151,18 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     }
   }
   
-  onFileReaderLoad(e) {
-    if (e.target.result.byteLength > 0 ) {
-      this.sendData(e.target.result, 0, () => {
-        this.offset += e.target.result.byteLength;
+  onFileReaderLoad(e: ProgressEvent<FileReader>) {
+    if ((<ArrayBuffer>e.target!.result).byteLength > 0 ) { // TODO if it's an str?
+      this.sendData(<ArrayBuffer>e.target!.result, 0, () => {
+        this.offset += (<ArrayBuffer>e.target!.result).byteLength;
         this.sendCurrentSlice();
       });
     } else {
       const trackTransfer = () => {
-        if (this.sendChannel.readyState === 'open' && this.sendChannel.bufferedAmount > 0) {
-          this.setTranseferdAmount(this.offset - this.sendChannel.bufferedAmount);
+        if (this.sendChannel!.readyState === 'open' && this.sendChannel!.bufferedAmount > 0) {
+          this.setTranseferdAmount(this.offset - this.sendChannel!.bufferedAmount);
           setTimeout(trackTransfer, 500);
-        } else if (this.sendChannel.bufferedAmount === 0) {
+        } else if (this.sendChannel!.bufferedAmount === 0) {
           this.setTranseferdAmount(this.offset);
         }
       };
@@ -194,7 +196,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     this.store.setSendingFileStatus(payload);
   }
 
-  private commitErrorIntoStore(error) {
+  private commitErrorIntoStore(error: string) {
     let ssfs: SetSendingFileStatus = {
       status: FileTransferStatus.ERROR,
       roomId: this.roomId,
@@ -205,7 +207,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     this.store.setSendingFileStatus(ssfs);
   }
 
-  public ondatachannelclose(error): void {
+  public ondatachannelclose(error: string): void {
     // channel could be closed in success and in error, we don't know why it was closed
     if (this.store.roomsDict[this.roomId].sendingFiles[this.connectionId].transfers[this.opponentWsId].status !== FileTransferStatus.FINISHED) {
       this.commitErrorIntoStore(error);

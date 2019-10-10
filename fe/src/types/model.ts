@@ -128,7 +128,7 @@ export interface SendingFileTransfer {
   status: FileTransferStatus;
   userId: number;
   upload: UploadProgressModel;
-  error: string;
+  error: string|null;
 }
 
 export enum FileTransferStatus {
@@ -143,8 +143,8 @@ export interface ReceivingFile {
   opponentWsId: string;
   roomId: number;
   connId: string;
-  anchor: string;
-  error: string;
+  anchor: string|null;
+  error: string|null;
   userId: number;
 }
 
