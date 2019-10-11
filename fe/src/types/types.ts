@@ -18,7 +18,7 @@ import {DefaultMessage} from '@/types/messages';
 export interface UploadFile {
    type: string;
    symbol: string;
-   file: File;
+   file: File|Blob;
 }
 
 export type ValueFilterForKey<T extends object, U> = {
@@ -35,7 +35,7 @@ export interface ChangeStreamMessage extends DefaultMessage {
 }
 
 export interface MessageDataEncode {
-  messageContent: string;
+  messageContent: string|null;
   files: UploadFile[];
   fileModels: { [id: number]: FileModel };
   currSymbol: string;

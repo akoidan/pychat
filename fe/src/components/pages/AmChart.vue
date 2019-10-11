@@ -5,14 +5,15 @@
 </template>
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import Painter from 'spainter';
-  import {messageBus} from '@/utils/singletons';
-  import loggerFactory from "@/utils/loggerFactory";
-  import AppInputRange from '@/components/ui/AppInputRange';
+
+
+  interface AmChartI {
+    dataItem: { wedge: { node: HTMLElement } }
+  }
   @Component
   export default class PainterPage extends Vue {
 
-    mounted() {
+    async mounted() {
       var data: any = {
         "type": "pie",
         "startDuration": 0,
@@ -53,27 +54,21 @@
           "enabled": true
         }
       };
-      this.$api.statistics((cb, err) => {
-        data.dataProvider = cb;
-        import( /* webpackChunkName: "amcharts" */ '@/utils/amchart.js').then(amcharts => {
-          var chart = window['AmCharts'].makeChart("chartdiv", data);
+      await this.$api.statistics();
 
-          chart.addListener("init", handleInit);
+      let amcharts = await import( /* webpackChunkName: "amcharts" */ '@/utils/amchart.js');
+      var chart = amcharts.makeChart("chartdiv", data);
+      chart.addListener("init", () => {
+        chart.legend.addListener("rollOverItem", handleRollOver);
+      });
+      chart.addListener("rollOverSlice", function(e: AmChartI) {
+        handleRollOver(e);
+      });
 
-          chart.addListener("rollOverSlice", function(e) {
-            handleRollOver(e);
-          });
-
-          function handleInit(){
-            chart.legend.addListener("rollOverItem", handleRollOver);
-          }
-
-          function handleRollOver(e){
-            var wedge = e.dataItem.wedge.node;
-            wedge.parentNode.appendChild(wedge);
-          }
-        });
-      })
+      function handleRollOver(e: AmChartI) {
+        var wedge = e.dataItem.wedge.node;
+        wedge.parentNode!.appendChild(wedge);
+      }
     }
   }
 </script>

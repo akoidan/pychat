@@ -29,7 +29,7 @@
 <script lang="ts">
 
   import {Component, Vue} from "vue-property-decorator";
-  import {RoomModel, SexModel, UserDictModel, UserModel} from "@/types/model";
+  import {RoomModel, SexModelString, UserDictModel, UserModel} from "@/types/model";
   import RoomUsersUser from '@/components/chat/RoomUsersUser';
   import RoomUsersPublic from '@/components/chat/RoomUsersPublic';
   import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate';

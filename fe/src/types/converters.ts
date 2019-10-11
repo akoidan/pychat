@@ -3,7 +3,6 @@ import {
   CurrentUserSettingsModel,
   FileModel,
   RoomModel,
-  SexModel,
   UserModel,
   Location,
   SexModelString
@@ -32,20 +31,20 @@ export function currentUserInfoModelToDto(userInfo: CurrentUserInfoModel): UserP
   return {...userInfo};
 }
 
-export function convertSex(dto: SexModelDto): SexModel {
-  return <SexModel>SexModel[dto];
+export function convertSex(dto: SexModelDto): SexModelString {
+  return dto;
 }
 
 export function convertLocation(dto: LocationDto): Location {
   return {...dto};
 }
 
-export function convertSexToNumber(m: SexModel): number {
-  if (SexModel.Secret === m) {
+export function convertSexToNumber(m: SexModelString): number {
+  if ('Secret' === m) {
     return 0;
-  } else if (SexModel.Male === m) {
+  } else if ('Male' === m) {
     return 1;
-  } else if (SexModel.Female === m) {
+  } else if ('Female' === m) {
     return 2;
   } else {
     throw Error(`Unknown gender ${m}`);
@@ -103,12 +102,13 @@ export function getRoomsBaseDict(
   };
 }
 
-export function convertNumberToSex(m: SexDB): SexModel {
-  return {
-    '0': SexModel.Secret,
-    '1': SexModel.Male,
-    '2': SexModel.Female,
-  }[m];
+export function convertNumberToSex(m: SexDB): SexModelString {
+  let newVar: { [id: number]: SexModelString } = {
+    '0': 'Secret',
+    '1': 'Male',
+    '2': 'Female',
+  };
+  return newVar[m];
 }
 
 export function convertSexToString(m: SexDB): SexModelString {

@@ -8,17 +8,14 @@ declare module '*.json' {
   export default value;
 }
 
-interface SingleParamCB<T> {
-  (t: T): void;
-}
-
-
 declare interface Document {
   cancelFullScreen(): void;
   msCancelFullScreen(): void;
   mozCancelFullScreen(): void;
   mozFullscreenElement: any;
   msFullscreenElement: any;
+  webkitFullscreenElement: any;
+  webkitCancelFullScreen: any;
 }
 
 declare interface RTCPeerConnection {
@@ -27,7 +24,13 @@ declare interface RTCPeerConnection {
   removeStream(a: MediaStream): void;
   onaddstream: (event: MediaStreamEvent) => void;
 }
-
+declare interface Notification {
+  replaced: number;
+}
+declare interface NotificationOptions {
+  replaced: number;
+}
+type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 declare interface RTCDataChannelInit {
   reliable?: boolean;
@@ -72,6 +75,11 @@ declare interface FormData {
 declare interface HTMLElement {
   msRequestFullscreen(): void;
   mozRequestFullScreen(): void;
+  webkitRequestFullscreen(): void;
+}
+
+declare interface HTMLVideoElement {
+  setSinkId(v: string): void;
 }
 
 declare module '*.ico' {

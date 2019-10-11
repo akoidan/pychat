@@ -82,8 +82,8 @@
     components: {VideoObject, ChatRemotePeer}
   })
   export default class ChatCall extends Vue {
-    @Prop() callInfo: CallsInfoModel;
-    @Prop() roomId: number;
+    @Prop() callInfo!: CallsInfoModel;
+    @Prop() roomId!: number;
     showSettings: boolean = false;
 
 
@@ -92,9 +92,9 @@
     get webcams(): { [id: string]: string }  { return this.store.webcams }
     fullscreen: boolean = false;
 
-    currentVideoActive: string = null;
+    currentVideoActive: string|null = null;
 
-    setCurrentVideo(id) {
+    setCurrentVideo(id: string) {
       if (this.currentVideoActive === id) {
         this.currentVideoActive = null;
       } else {
@@ -102,9 +102,9 @@
       }
     }
 
-    fullScreenChange(event) {
+    fullScreenChange() {
       this.logger.log("fs change")();
-      if (!(document.fullscreenElement || document['webkitFullscreenElement'] || document.mozFullscreenElement || document.msFullscreenElement)) {
+      if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
         this.fullscreen = false;
       }
     }
@@ -130,8 +130,8 @@
         document.msCancelFullScreen();
       } else if (document.mozCancelFullScreen) {
         document.mozCancelFullScreen();
-      } else if (document['webkitCancelFullScreen']) {
-        document['webkitCancelFullScreen']();
+      } else if (document.webkitCancelFullScreen) {
+        document.webkitCancelFullScreen();
       }
       this.fullscreen = false;
     }
@@ -144,8 +144,8 @@
         elem.msRequestFullscreen();
       } else if (elem.mozRequestFullScreen) {
         elem.mozRequestFullScreen();
-      } else if (elem['webkitRequestFullscreen']) {
-        elem['webkitRequestFullscreen']()
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen()
       } else {
         this.store.growlError("Can't enter fullscreen");
         return;
@@ -154,10 +154,10 @@
     }
 
     @Watch('callInfo.currentSpeaker')
-    onSpeakerChange(newValue) {
+    onSpeakerChange(newValue: string) {
       this.$nextTick(function () {
-        if (this.$refs.localVideo.$refs.video['setSinkId']) {
-          this.$refs.localVideo.$refs.video['setSinkId'](newValue);
+        if (this.$refs.localVideo.$refs.video.setSinkId) {
+          this.$refs.localVideo.$refs.video.setSinkId(newValue);
         } else  {
           this.logger.error("SetSinkId doesn't exist")();
         }

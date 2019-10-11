@@ -67,7 +67,8 @@ export default class WebRtcApi extends MessageHandler {
     this.notifier.showNotification(this.store.allUsersDict[message.userId].user, {
       body: `Sends file ${message.content.name}`,
       requireInteraction: true,
-      icon: <string>faviconUrl
+      icon: <string>faviconUrl,
+      replaced: 1,
     });
     this.store.addReceivingFile(payload);
     this.wsHandler.replyFile(message.connId, browserVersion);

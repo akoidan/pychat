@@ -1,7 +1,7 @@
 import loggerFactory from '@/utils/loggerFactory';
 import Api from '@/utils/api';
 import Vue from 'vue';
-import MessageHandler from '@/utils/MesageHandler';
+import MessageHandler, {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 import {checkAndPlay, incoming, login, logout, outgoing} from '@/utils/audio';
 import faviconUrl from '@/assets/img/favicon.ico';
 
@@ -39,36 +39,36 @@ import {
   LoadMessages,
   RemoveOnlineUserMessage
 } from '@/types/messages';
-import {MessageModelDto, RoomDto, UserDto} from '@/types/dto';
+import {FileModelDto, MessageModelDto, RoomDto, UserDto} from '@/types/dto';
 import {convertFiles, convertUser, getRoomsBaseDict} from '@/types/converters';
 import WsHandler from '@/utils/WsHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
 import {sub} from '@/utils/sub';
-import {DefaultStore} from'@/utils/store';
+import {DefaultStore} from '@/utils/store';
 
 export default class ChannelsHandler extends MessageHandler {
   protected readonly logger: Logger;
   private readonly store: DefaultStore;
   private readonly api: Api;
   private readonly ws: WsHandler;
-  private readonly sendingMessage: {[id: number]: {cb: () => void, files: UploadFile[]}, cb?: (ids: number[]) => void} = {};
+  private readonly sendingMessage: { [id: number]: { cb: () => void, files: UploadFile[] }, cb?: (ids: number[]) => void } = {};
   private readonly notifier: NotifierHandler;
   private messageBus: Vue;
 
-  protected readonly handlers = {
-    init: this.init  as SingleParamCB<DefaultMessage>,
-    internetAppear: this.internetAppear   as SingleParamCB<DefaultMessage>,
-    loadMessages: this.loadMessages  as SingleParamCB<DefaultMessage>,
-    deleteMessage: this.deleteMessage  as SingleParamCB<DefaultMessage>,
-    editMessage: this.editMessage  as SingleParamCB<DefaultMessage>,
-    addOnlineUser: this.addOnlineUser  as SingleParamCB<DefaultMessage>,
-    removeOnlineUser: this.removeOnlineUser  as SingleParamCB<DefaultMessage>,
-    printMessage: this.printMessage  as SingleParamCB<DefaultMessage>,
-    deleteRoom: this.deleteRoom  as SingleParamCB<DefaultMessage>,
-    leaveUser: this.leaveUser  as SingleParamCB<DefaultMessage>,
-    addRoom: this.addRoom  as SingleParamCB<DefaultMessage>,
-    inviteUser: this.inviteUser  as SingleParamCB<DefaultMessage>,
-    addInvite: this.addInvite  as SingleParamCB<DefaultMessage>,
+  protected readonly handlers: HandlerTypes = {
+    init: <HandlerType><HandlerType>this.init,
+    internetAppear: <HandlerType>this.internetAppear,
+    loadMessages: <HandlerType>this.loadMessages,
+    deleteMessage: <HandlerType>this.deleteMessage,
+    editMessage: <HandlerType>this.editMessage,
+    addOnlineUser: <HandlerType>this.addOnlineUser,
+    removeOnlineUser: <HandlerType>this.removeOnlineUser,
+    printMessage: <HandlerType>this.printMessage,
+    deleteRoom: <HandlerType>this.deleteRoom,
+    leaveUser: <HandlerType>this.leaveUser,
+    addRoom: <HandlerType>this.addRoom,
+    inviteUser: <HandlerType>this.inviteUser,
+    addInvite: <HandlerType>this.addInvite,
   };
 
   constructor(store: DefaultStore, api: Api, ws: WsHandler, notifier: NotifierHandler, messageBus: Vue) {
@@ -84,7 +84,7 @@ export default class ChannelsHandler extends MessageHandler {
   }
 
 
-  public removeSendingMessage(messageId: number|undefined) {
+  public removeSendingMessage(messageId: number | undefined) {
     if (messageId && this.sendingMessage[messageId]) {
       delete this.sendingMessage[messageId];
       return true;
@@ -208,6 +208,7 @@ export default class ChannelsHandler extends MessageHandler {
     let messages: MessageModel[] = newMesages.map(this.getMessage.bind(this));
     this.store.addMessages({messages, roomId: roomId});
   }
+
   public initUsers(users: UserDto[]) {
     this.logger.debug('set users {}', users)();
     let um: UserDictModel = {};
@@ -235,11 +236,13 @@ export default class ChannelsHandler extends MessageHandler {
     this.initUsers(m.users);
     this.initRooms(m.rooms);
   }
+
   private internetAppear() {
     for (let k in this.sendingMessage) {
       this.resendMessage(parseInt(k));
     }
   }
+
   private loadMessages(lm: LoadMessages) {
     if (lm.content.length > 0) {
       this.addMessages(lm.roomId, lm.content);
@@ -247,6 +250,7 @@ export default class ChannelsHandler extends MessageHandler {
       this.store.setAllLoaded(lm.roomId);
     }
   }
+
   private deleteMessage(inMessage: DeleteMessage) {
     let message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
@@ -272,6 +276,7 @@ export default class ChannelsHandler extends MessageHandler {
       }
     }
   }
+
   private editMessage(inMessage: EditMessage) {
     let message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
@@ -285,6 +290,7 @@ export default class ChannelsHandler extends MessageHandler {
       }
     }
   }
+
   private addOnlineUser(message: AddOnlineUserMessage) {
     if (!this.store.allUsersDict[message.userId]) {
       let newVar: UserModel = convertUser(message);
@@ -293,10 +299,12 @@ export default class ChannelsHandler extends MessageHandler {
     this.addChangeOnlineEntry(message.userId, message.time, true);
     this.store.setOnline([...message.content]);
   }
+
   private removeOnlineUser(message: RemoveOnlineUserMessage) {
     this.addChangeOnlineEntry(message.userId, message.time, false);
     this.store.setOnline(message.content);
   }
+
   private printMessage(inMessage: EditMessage) {
     if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
       this.removeSendingMessage(inMessage.messageId);
@@ -312,7 +320,7 @@ export default class ChannelsHandler extends MessageHandler {
     let message: MessageModel = this.getMessage(inMessage);
     this.logger.debug('Adding message to storage {}', message)();
     this.store.addMessage(message);
-    let activeRoom: RoomModel|null = this.store.activeRoom;
+    let activeRoom: RoomModel | null = this.store.activeRoom;
     let activeRoomId = activeRoom && activeRoom.id; // if no channels page first
     let room = this.store.roomsDict[inMessage.roomId];
     let userInfo: CurrentUserInfoModel = this.store.userInfo!;
@@ -322,15 +330,24 @@ export default class ChannelsHandler extends MessageHandler {
     }
     if (room.notifications && !isSelf) {
       let title = this.store.allUsersDict[inMessage.userId].user;
+
+      let icon: string = <string>faviconUrl;
+      if (inMessage.files) {
+        let fff: FileModelDto = Object.values(inMessage.files)[0];
+        if (fff.url) {
+          icon = fff.url;
+        }
+      }
       this.notifier.showNotification(title, {
         body: inMessage.content || 'Image',
+        replaced: 1,
         data: {
           replaced: 1,
           title,
           roomId: inMessage.roomId
         },
         requireInteraction: true,
-        icon: inMessage.files || faviconUrl
+        icon
       });
     }
 
@@ -344,6 +361,7 @@ export default class ChannelsHandler extends MessageHandler {
 
     this.messageBus.$emit('scroll');
   }
+
   private deleteRoom(message: DeleteRoomMessage) {
     if (this.store.roomsDict[message.roomId]) {
       this.store.deleteRoom(message.roomId);
@@ -351,6 +369,7 @@ export default class ChannelsHandler extends MessageHandler {
       this.logger.error('Unable to find room {} to delete', message.roomId)();
     }
   }
+
   private leaveUser(message: LeaveUserMessage) {
     if (this.store.roomsDict[message.roomId]) {
       let m: SetRoomsUsers = {
@@ -362,24 +381,30 @@ export default class ChannelsHandler extends MessageHandler {
       this.logger.error('Unable to find room {} to kick user', message.roomId)();
     }
   }
+
   private addRoom(message: AddRoomMessage) {
     this.mutateRoomAddition(message);
   }
+
   private inviteUser(message: InviteUserMessage) {
-    this.store.setRoomsUsers({roomId: message.roomId, users: message.users} as SetRoomsUsers);
+    this.store.setRoomsUsers({
+      roomId: message.roomId,
+      users: message.users
+    } as SetRoomsUsers);
   }
+
   private addInvite(message: AddInviteMessage) {
     this.mutateRoomAddition(message);
   }
 
-  private  addChangeOnlineEntry(userId: number, time: number, isWentOnline: boolean) {
+  private addChangeOnlineEntry(userId: number, time: number, isWentOnline: boolean) {
     let roomIds: number[] = [];
     this.store.roomsArray.forEach(r => {
       if (r.users.indexOf(userId)) {
         roomIds.push(r.id);
       }
     });
-    let entry:  ChangeOnlineEntry = {
+    let entry: ChangeOnlineEntry = {
       roomIds,
       changeOnline: {
         isWentOnline,
@@ -394,7 +419,6 @@ export default class ChannelsHandler extends MessageHandler {
     }
     this.store.addChangeOnlineEntry(entry);
   }
-
 
 
   private async uploadAndSend(

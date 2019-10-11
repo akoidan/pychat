@@ -16,8 +16,8 @@
 
   @Component
   export default class RoomUsersPublic extends Vue {
-    @Prop() room: RoomModel;
-    get activeRoomId(): number  { return this.store.activeRoomId }
+    @Prop() room!: RoomModel;
+    get activeRoomId(): number  { return this.store.activeRoomId! }
 
     get activeClass() {
       return this.room.id === this.activeRoomId ? 'active-room' : null;

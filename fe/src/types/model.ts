@@ -48,7 +48,7 @@ export type SexModelString = 'Secret' | 'Male' | 'Female';
 export interface UserModel {
   user: string;
   id: number;
-  sex: SexModel;
+  sex: SexModelString;
   location: Location;
 }
 
@@ -60,10 +60,10 @@ export interface Location {
 }
 
 export  interface FileModel {
-  id: number;
-  url: string;
+  id: number|null;
+  url: string|null;
   type: string;
-  preview: string;
+  preview: string|null;
 }
 
 export interface UploadProgressModel {
@@ -88,10 +88,6 @@ export  interface MessageModel {
   roomId: number;
   userId: number;
   transfer: MessageTransferInfo|null;
-}
-
-export enum SexModel {
-  Male = 'Male', Female = 'Female', Secret = 'Secret'
 }
 
 export interface RoomSettingsModel {

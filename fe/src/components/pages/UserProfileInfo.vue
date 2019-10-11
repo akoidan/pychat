@@ -45,7 +45,7 @@
 
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from '@/components/ui/AppSubmit';
-  import {CurrentUserInfoModel, SexModel} from "@/types/model";
+  import {CurrentUserInfoModel, SexModelString} from "@/types/model";
   import {UserProfileDto} from '@/types/dto';
   import {currentUserInfoModelToDto, userSettingsDtoToModel} from "@/types/converters";
   import AppInputDate from '@/components/ui/AppInputDate';
@@ -57,7 +57,7 @@
     get userInfo(): CurrentUserInfoModel  { return this.store.userInfo }
     model: UserProfileDto = null;
 
-    sex = SexModel;
+    sex: SexModelString[] = ["Male", "Female", "Secret"];
 
     created() {
       this.store.setActiveUserId(null);

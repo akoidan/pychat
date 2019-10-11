@@ -16,7 +16,7 @@ export default class Api extends MessageHandler {
     internetAppear: this.internetAppear
   };
 
-  private internetAppear(m: DefaultMessage): void{
+  private internetAppear(m: DefaultMessage): void {
     if (this.retryFcb) {
       this.retryFcb();
     }
@@ -41,7 +41,7 @@ export default class Api extends MessageHandler {
   }
 
 
-  public async sendLogs(issue: string, browser: string, cb: SingleParamCB<string> | null = null): Promise<void> {
+  public async sendLogs(issue: string, browser: string): Promise<void> {
     let result: string = await this.xhr.doPost<string>({
       url: '/report_issue',
       params: {issue, browser},
@@ -65,8 +65,8 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async logout(cb: SingleParamCB<string>, registration_id: string |null= null): Promise<void> {
-    return this.xhr.doPost({
+  public async logout(registration_id: string |null= null): Promise<void> {
+    await this.xhr.doPost({
       url: '/logout',
       params: {registration_id},
       errorDescription: `Error while logging out: `

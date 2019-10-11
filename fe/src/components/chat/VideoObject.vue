@@ -17,7 +17,7 @@
 
 
     @Watch("mediaStreamLink")
-    onMediaStreamChanged(newValue) {
+    onMediaStreamChanged(newValue: string) {
       let stream: MediaStream = this.store.mediaObjects[newValue];
       this.logger.log("Media stream changed {} {}", newValue, stream)();
       if (stream) {

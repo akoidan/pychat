@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import {MEDIA_API_URL, PASTED_IMG_CLASS} from '@/utils/consts';
 import {MessageDataEncode, UploadFile} from '@/types/types';
-import {FileModel, MessageModel, SexModel, UserModel} from '@/types/model';
+import {FileModel, MessageModel, UserModel} from '@/types/model';
 import recordIcon from '@/assets/img/audio.svg';
 import {getFlag} from '@/utils/flags';
 import {Smile, smileys, SmileysStructure} from '@/utils/smileys';
@@ -80,24 +80,25 @@ export function getFlagPath(countryCode: string) {
 }
 
 let uniqueId = 1;
+
 export function getUniqueId() {
   return uniqueId++;
 }
 
 export function getUserSexClass(user: UserModel) {
-  if (user.sex === SexModel.Male) {
+  if (user.sex === 'Male') {
     return 'icon-man';
-  } else if (user.sex === SexModel.Female) {
+  } else if (user.sex === 'Female') {
     return 'icon-girl';
-  } else if (user.sex === SexModel.Secret) {
+  } else if (user.sex === 'Secret') {
     return 'icon-user-secret';
   } else {
     throw Error(`Invalid sex ${user.sex}`);
   }
 }
 
-export function getSmileyHtml (symbol: string) {
-  let smile: Smile|undefined;
+export function getSmileyHtml(symbol: string) {
+  let smile: Smile | undefined;
   let keys22: (keyof SmileysStructure)[] = Object.keys(smileys) as (keyof SmileysStructure)[];
   keys22.forEach((k: keyof SmileysStructure) => {
     let smiley = smileys[k];
@@ -109,7 +110,7 @@ export function getSmileyHtml (symbol: string) {
   return `<img src="${smile.src}" symbol="${symbol}" alt="${smile.alt}">`;
 }
 
-export const isDateMissing = (function() {
+export const isDateMissing = (function () {
   let input = document.createElement('input');
   input.setAttribute('type', 'date');
   let notADateValue = 'not-a-date';
@@ -139,17 +140,17 @@ export function encodeP(data: MessageModel) {
 export const canvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO wtf it's nullable?
 
 
-export function placeCaretAtEnd (userMessage: HTMLElement) {
-    let range = document.createRange();
-    range.selectNodeContents(userMessage);
-    range.collapse(false);
-    let sel = window.getSelection();
-    if (sel) {
-      sel.removeAllRanges();
-      sel.addRange(range);
-    } else {
-      globalLogger.warn(`Can't place selection`)();
-    }
+export function placeCaretAtEnd(userMessage: HTMLElement) {
+  let range = document.createRange();
+  range.selectNodeContents(userMessage);
+  range.collapse(false);
+  let sel = window.getSelection();
+  if (sel) {
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    globalLogger.warn(`Can't place selection`)();
+  }
 
 }
 
@@ -163,7 +164,7 @@ export function encodeMessage(data: MessageModel) {
     }
     let html = encodeHTML(data.content);
     let replaceElements: unknown[] = [];
-    patterns.forEach( (pattern) => {
+    patterns.forEach((pattern) => {
       let res = html.replace(pattern.search, pattern.replace);
       if (res !== html) {
         replaceElements.push(pattern.name);
@@ -178,18 +179,18 @@ export function encodeMessage(data: MessageModel) {
   }
 }
 
-function encodeFiles(html: string, files: {[id: string]: FileModel}|null) {
+function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
   if (files && Object.keys(files).length) {
-    html = html.replace(imageUnicodeRegex,  (s) => {
+    html = html.replace(imageUnicodeRegex, (s) => {
       let v = files[s];
       if (v) {
         if (v.type === 'i') {
-          return `<img src='${resolveMediaUrl(v.url)}' imageId='${v.id}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
+          return `<img src='${resolveMediaUrl(v.url!)}' imageId='${v.id}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
         } else if (v.type === 'v' || v.type === 'm') {
           let className = v.type === 'v' ? 'video-player' : 'video-player video-record';
-          return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
+          return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview!)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
         } else if (v.type === 'a') {
-         return `<img src='${recordIcon}' imageId='${v.id}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
+          return `<img src='${recordIcon}' imageId='${v.id}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
         } else {
           logger.error('Invalid type {}', v.type)();
         }
@@ -199,8 +200,6 @@ function encodeFiles(html: string, files: {[id: string]: FileModel}|null) {
   }
   return html;
 }
-
-
 
 
 export function pasteNodeAtCaret(img: Node, div: HTMLElement) {
@@ -277,10 +276,10 @@ export function setImageFailEvents(e: HTMLElement, bus: Vue) {
   let r = e.querySelectorAll('img');
   for (let i = 0; i < r.length; i++) {
     (function (img) {
-      img.onerror = function() {
+      img.onerror = function () {
         this.className += ' failed';
       };
-      img.onload = function() {
+      img.onload = function () {
         bus.$emit('scroll');
       };
     })(r[i]);
@@ -336,8 +335,7 @@ export function setYoutubeEvent(e: HTMLElement) {
 }
 
 
-
-export function stopVideo(stream: MediaStream|null) {
+export function stopVideo(stream: MediaStream | null) {
   if (stream) {
     logger.debug('Stopping stream {}', stream)();
     if (stream.stop) {
@@ -352,7 +350,7 @@ export function stopVideo(stream: MediaStream|null) {
 
 function setBlobName(blob: Blob) {
   if (!blob.name && blob.type.indexOf('/') > 1) {
-    blob.name =  '.' + blob.type.split('/')[1];
+    blob.name = '.' + blob.type.split('/')[1];
   }
 }
 
@@ -405,7 +403,6 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
 }
 
 
-
 export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
   let img = document.createElement('img');
   let associatedAudio = URL.createObjectURL(file);
@@ -446,9 +443,9 @@ function nextChar(c: string): string {
 
 
 export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\u3500'): MessageDataEncode {
-  let files: { file: Blob, type: string, symbol: string }[] = []; // return array from nodeList
+  let files: UploadFile[] = []; // return array from nodeList
   let images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
-  let fileModels: {[id: number]: FileModel} = {};
+  let fileModels: { [id: string]: FileModel } = {};
   forEach(images, img => {
     let elSymbol = img.getAttribute('symbol');
     if (!elSymbol) {
@@ -465,12 +462,12 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\
         files.push({
           file: savedFiles[assVideo],
           type: type,
-          symbol:  elSymbol
+          symbol: elSymbol
         });
         files.push({
           file: savedFiles[img.getAttribute('src')!],
           type: 'p',
-          symbol:  elSymbol
+          symbol: elSymbol
         });
         let fileModel: FileModel = {
           id: null,
@@ -494,9 +491,9 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\
         fileModels[elSymbol] = fileModel;
       } else {
         files.push({
-          file: savedFiles[img.getAttribute('src')],
+          file: savedFiles[img.getAttribute('src')!],
           type: 'i',
-          symbol:  elSymbol
+          symbol: elSymbol
         });
         let fileModel: FileModel = {
           id: null,
@@ -517,8 +514,8 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\
   //   }
   // }); TODO
   userMessage.innerHTML = userMessage.innerHTML.replace(/<img[^>]*symbol="([^"]+)"[^>]*>/g, '$1');
-  let messageContent: string = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
-  messageContent = /^\s*$/.test(messageContent) ? null : messageContent;
+  let messageContent: string | null = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
+  messageContent = !messageContent || /^\s*$/.test(messageContent) ? null : messageContent;
   userMessage.innerHTML = '';
   return {files, messageContent, currSymbol, fileModels};
 }

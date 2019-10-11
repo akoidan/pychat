@@ -20,6 +20,9 @@
   export default class RoomUsersPrivate extends Vue {
 
     @Prop() room: RoomModel;
+
+
+    @Prop()
     get online(): number[]  { return this.store.online }
     get activeRoomId(): number  { return this.store.activeRoomId }
     get privateRoomsUsersIds(): PrivateRoomsIds  { return this.store.privateRoomsUsersIds };

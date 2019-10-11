@@ -155,7 +155,7 @@ const getConfig = async () => {
     }
     return res;
   }
-  const entry = ['./src/main.ts'];
+  const entry = ['reflect-metadata', './src/main.ts'];
 
 
   let webpackOptions = {

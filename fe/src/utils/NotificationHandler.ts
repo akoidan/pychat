@@ -44,14 +44,13 @@ export default class NotifierHandler {
 
   }
 
-
   replaceIfMultiple(data: {title: string, options: NotificationOptions}) {
     let count = 1;
     let newMessData = data.options.data;
     if (newMessData && newMessData.replaced) {
-      this.popedNotifQueue.forEach(e => {
-        if (e.data.title === newMessData.title) {
-          count += e.data.replaced;
+      this.popedNotifQueue.forEach((e: Notification) => {
+        if (e.data && e.data.title === newMessData.title || e.title === newMessData.title) {
+          count += e.replaced || e.data.replaced;
           e.close();
         }
       });
@@ -74,6 +73,9 @@ export default class NotifierHandler {
       let data = {title, options};
       this.replaceIfMultiple(data);
       let not = new Notification(data.title, data.options);
+      if (data.options.replaced) {
+        not.replaced = data.options.replaced;
+      }
       this.popedNotifQueue.push(not);
       not.onclick = () => {
         window.focus();
@@ -136,6 +138,7 @@ export default class NotifierHandler {
       if (granted) {
         await this.showNot('Pychat notifications enabled', {
           body: 'You can disable them in room\'s settings',
+          replaced: 1,
         });
       }
       if (!this.serviceWorkedTried) {

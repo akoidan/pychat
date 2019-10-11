@@ -240,14 +240,14 @@ public acceptFile(connId: string, received: number) {
   }
 
 
-  public sendLoadMessages(roomId: number, headerId: number, count: number, cb: Function) {
+  public async sendLoadMessages(roomId: number, headerId: number, count: number) {
     this.sendToServer({
       headerId,
       count,
       action: 'loadMessages',
       roomId
     });
-    this.appendCB(cb);
+    await new Promise((resolve, reject) => this.appendCB(resolve));
   }
 
   public isWsOpen() {
