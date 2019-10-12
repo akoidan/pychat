@@ -11,7 +11,7 @@
 
   import Growl from "@/components/ui/AppGrowl";
   import {Component, Vue, Watch} from "vue-property-decorator";
-  import {GrowlModel} from "@/types/model";
+  import {CurrentUserSettingsModel, GrowlModel} from '@/types/model';
   import {State} from '@/utils/storeHolder';
 
   @Component({
@@ -19,8 +19,11 @@
   })
   export default class App extends Vue {
 
+    @State
+    public readonly userSettings: CurrentUserSettingsModel;
+
     get mainClass(): string {
-      return this.store.userSettings && this.store.userSettings.theme || 'color-reg';
+      return this.userSettings && this.userSettings.theme || 'color-reg';
     }
 
     @State

@@ -17,7 +17,6 @@
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfoModel, UserModel} from "@/types/model";
-  import {store} from "@/utils/storeHolder";
 
   @Component
   export default class AddUserToRoom extends Vue {
