@@ -25,7 +25,6 @@
 
 
     get username() {
-      let a: string =  3;
       return this.allUsersDict[this.userId].user;
     }
 

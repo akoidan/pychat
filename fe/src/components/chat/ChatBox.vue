@@ -146,7 +146,7 @@
               search: {
                 searchActive: s.searchActive,
                 searchedIds,
-                locked                                                                                                    : a.length < MESSAGES_PER_SEARCH,
+                locked: a.length < MESSAGES_PER_SEARCH,
                 searchText: s.searchText
               } as SearchModel
             });

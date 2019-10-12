@@ -10,9 +10,6 @@
 <script lang='ts'>
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {GrowlModel} from "@/types/model";
-  import {getModule} from "vuex-module-decorators";
-
-
 
   @Component
   export default class AppGrowl extends Vue {
