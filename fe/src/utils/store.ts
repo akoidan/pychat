@@ -76,7 +76,7 @@ export const vueStore = new Vuex.Store({
 
 function Validate(target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
   const original = descriptor.value;
-  descriptor.value = function(...args: unknown[]) {
+  descriptor.value = function (...args: unknown[]) {
     try {
       original.apply(this, args);
     } catch (e) {
@@ -102,14 +102,14 @@ export class DefaultStore extends VuexModule {
   microphones: { [id: string]: string } = {};
   speakers: { [id: string]: string } = {};
   webcams: { [id: string]: string } = {};
-  editedMessage: EditingMessage |null = null;
-  activeRoomId: number |null = null;
-  activeUserId: number |null = null;
-  userInfo: CurrentUserInfoModel|null = null;
-  userSettings: CurrentUserSettingsModel |null = null;
-  userImage: string |null = null;
+  editedMessage: EditingMessage | null = null;
+  activeRoomId: number | null = null;
+  activeUserId: number | null = null;
+  userInfo: CurrentUserInfoModel | null = null;
+  userSettings: CurrentUserSettingsModel | null = null;
+  userImage: string | null = null;
   allUsersDict: UserDictModel = {};
-  regHeader: string |null = null;
+  regHeader: string | null = null;
   online: number[] = [];
   roomsDict: RoomDictModel = {};
   mediaObjects: { [id: string]: MediaStream } = {};
@@ -160,10 +160,10 @@ export class DefaultStore extends VuexModule {
     return res;
   }
 
-  get maxId(): (a: number) => number |null {
+  get maxId(): (a: number) => number | null {
     return (id: number) => {
       let messages = this.roomsDict[id].messages;
-      let maxId: number|null = null;
+      let maxId: number | null = null;
       for (let m in messages) {
         if (!maxId || !(messages[m].id <= maxId)) {
           maxId = messages[m].id;
@@ -189,7 +189,7 @@ export class DefaultStore extends VuexModule {
     };
   }
 
-  get activeRoom(): RoomModel|null {
+  get activeRoom(): RoomModel | null {
     if (this.activeRoomId) {
       return this.roomsDict[this.activeRoomId];
     } else {
@@ -197,7 +197,7 @@ export class DefaultStore extends VuexModule {
     }
   }
 
-  get activeUser(): UserModel|null {
+  get activeUser(): UserModel | null {
     return this.activeUserId ? this.allUsersDict[this.activeUserId] : null;
   }
 
@@ -220,7 +220,7 @@ export class DefaultStore extends VuexModule {
     if (transfer && transfer.upload) {
       transfer.upload.uploaded = payload.uploaded;
     } else {
-      throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}` );
+      throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}`);
     }
 
   }
@@ -236,12 +236,12 @@ export class DefaultStore extends VuexModule {
     if (message.transfer) {
       message.transfer.upload = payload.upload;
     } else {
-      throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}` );
+      throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}`);
     }
   }
 
   @Mutation
-  setIncomingCall(payload: IncomingCallModel|null) {
+  setIncomingCall(payload: IncomingCallModel | null) {
     this.incomingCall = payload;
   }
 
@@ -605,7 +605,7 @@ export class DefaultStore extends VuexModule {
 
 
   @Action
-  async showGrowl({html, type}: {html: string, type: GrowlType}) {
+  async showGrowl({html, type}: { html: string, type: GrowlType }) {
     let growl: GrowlModel = {id: Date.now(), html, type};
     this.addGrowl(growl);
     await sleep(4000);
@@ -613,7 +613,7 @@ export class DefaultStore extends VuexModule {
   }
 
   @Action
-  async growlErrorRaw( html: string) {
+  async growlErrorRaw(html: string) {
     await this.showGrowl({html, type: GrowlType.ERROR});
   }
 
@@ -623,7 +623,7 @@ export class DefaultStore extends VuexModule {
   }
 
   @Action
-  async growlInfo( title: string) {
+  async growlInfo(title: string) {
     await this.showGrowl({html: encodeHTML(title), type: GrowlType.INFO});
   }
 

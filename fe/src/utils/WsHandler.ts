@@ -160,20 +160,20 @@ public acceptFile(connId: string, received: number) {
     this.sendToServer(newVar, true);
   }
 
-  public saveSettings(content: UserSettingsDto, cb: SingleParamCB<SetSettingsMessage>) {
+  public async saveSettings(content: UserSettingsDto) {
     this.sendToServer({
       action: 'setSettings',
       content,
     });
-    this.appendCB(cb);
+    return new Promise((resolve, reject) => this.appendCB(resolve));
   }
 
-  public saveUser(content: UserProfileDto, cb: SingleParamCB<SetUserProfileMessage>) {
+  public async saveUser(content: UserProfileDto) {
     this.sendToServer({
       action: 'setUserProfile',
       content,
     });
-    this.appendCB(cb);
+    return new Promise((resolve, reject) => this.appendCB(resolve));
   }
 
   public sendAddRoom(name: string, volume: number, notifications: boolean, users: number[], cb: Function) {

@@ -199,7 +199,7 @@ export function bytesToSize(bytes: number): string {
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
 
-export function sem(event: Event, message: MessageModel, isEditingNow: boolean, userInfo: CurrentUserInfoModel, setEditedMessage: SingleParamCB<EditingMessage>) {
+export function sem(event: Event, message: MessageModel, isEditingNow: boolean, userInfo: CurrentUserInfoModel, setEditedMessage: (a: EditingMessage) => void) {
   logger.debug('sem {}', message.id)();
   if (event.target
       && (<HTMLElement>event.target).tagName !== 'IMG'

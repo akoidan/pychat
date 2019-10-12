@@ -13,10 +13,6 @@ import Http from '@/utils/Http';
 import Vue, { Component } from 'vue';
 import { ExtendedVue } from 'vue/types/vue';
 
-interface SingleParamCB<T> {
-  (t: T): void;
-}
-
 declare global {
   interface Window {
     GIT_VERSION: string|undefined;
