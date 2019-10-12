@@ -14,10 +14,9 @@
 
 <script lang='ts'>
   import {Vue, Component, Prop} from "vue-property-decorator";
-  import AppSubmit from "@/components/ui/AppSubmit.vue"
-  import {store, State} from '@/utils/storeHolder';
-
-  import CaptchaComponent from '@/components/singup/CaptchaComponent.vue';
+  import AppSubmit from "@/components/ui/AppSubmit"
+  import {State} from '@/utils/storeHolder';
+  import CaptchaComponent from '@/components/singup/CaptchaComponent';
 
   @Component({components: {CaptchaComponent, AppSubmit}})
   export default class ResetPassword extends Vue {

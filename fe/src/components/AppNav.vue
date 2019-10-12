@@ -40,7 +40,7 @@
   </nav>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Vue} from "vue-property-decorator";
   import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
   import {logout} from "@/utils/utils";

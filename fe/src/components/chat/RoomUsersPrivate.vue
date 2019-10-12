@@ -10,7 +10,7 @@
   </li>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
   import {getUserSexClass} from '@/utils/htmlApi';

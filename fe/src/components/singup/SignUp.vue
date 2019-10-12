@@ -26,8 +26,8 @@
 
 <script lang='ts'>
   import {Vue, Component, Prop, Watch} from "vue-property-decorator";
-  import {store, State} from '@/utils/storeHolder';
-  import AppSubmit from "@/components/ui/AppSubmit.vue"
+  import {State} from '@/utils/storeHolder';
+  import AppSubmit from "@/components/ui/AppSubmit"
   import RegisterFieldSet from '@/components/singup/RegisterFieldSet.vue'
   import debounce from 'lodash.debounce';
   import {IconColor} from '@/types/types';

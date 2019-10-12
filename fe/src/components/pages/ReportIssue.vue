@@ -20,9 +20,9 @@
   </form>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
-  import AppSubmit from "@/components/ui/AppSubmit.vue"
+  import AppSubmit from "@/components/ui/AppSubmit"
   import {browserVersion} from '@/utils/singletons';
   import {GIT_HASH} from '@/utils/consts';
   @Component({components: {AppSubmit}})

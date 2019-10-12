@@ -10,10 +10,7 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {store, State} from '@/utils/storeHolder';
-
-
-
+  import {State} from '@/utils/storeHolder';
   @Component
   export default class ConfirmMail extends Vue {
 

@@ -79,7 +79,7 @@
 </template>
 <script lang="ts">
   import {Component, Vue, Watch} from "vue-property-decorator";
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import AppSubmit from "@/components/ui/AppSubmit";
   import AppCheckbox from "@/components/ui/AppCheckbox";
   import {CurrentUserInfoModel, CurrentUserSettingsModel} from "@/types/model";

@@ -19,11 +19,11 @@
 
 <script lang='ts'>
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import AppSubmit from "@/components/ui/AppSubmit.vue"
-  import {store, State} from '@/utils/storeHolder';
+  import AppSubmit from "@/components/ui/AppSubmit"
+  import {State} from '@/utils/storeHolder';
   import {login} from "@/utils/utils";
-  import SocialAuth from '@/components/singup/SocialAuth.vue';
-  import CaptchaComponent from '@/components/singup/CaptchaComponent.vue';
+  import SocialAuth from '@/components/singup/SocialAuth';
+  import CaptchaComponent from '@/components/singup/CaptchaComponent';
 
   @Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
   export default class Register extends Vue {

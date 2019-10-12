@@ -8,11 +8,11 @@
   </div>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {CallInfoModel} from '@/types/model';
   import AppInputRange from '@/components/ui/AppInputRange';
-  import VideoObject from '@/components/chat/VideoObject.vue';
+  import VideoObject from '@/components/chat/VideoObject';
   @Component({
     components: {VideoObject, AppInputRange}
   })

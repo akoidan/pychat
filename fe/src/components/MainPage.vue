@@ -11,7 +11,7 @@
 </template>
 <script lang="ts">
 
-  import AppNav from "@/components/AppNav.vue";
+  import AppNav from "@/components/AppNav";
   import {Component, Vue} from "vue-property-decorator";
   import {
     CurrentUserInfoModel,
@@ -20,7 +20,7 @@
   } from "@/types/model";
   import NotifierHandler from "@/utils/NotificationHandler";
   import {browserVersion, isChrome, isMobile, notifier} from "@/utils/singletons";
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import IncomingCall from '@/components/chat/IncomingCall';
 
   @Component({

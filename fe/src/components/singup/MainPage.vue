@@ -11,7 +11,7 @@
 
 <script lang='ts'>
   import {Component, Vue} from "vue-property-decorator";
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {AUTO_REGISTRATION} from '@/utils/consts';
   import {api} from '@/utils/singletons';
   import {login} from '@/utils/utils';

@@ -18,21 +18,20 @@
 <script lang="ts">
 
   import {Component, Prop, Vue, Ref} from "vue-property-decorator";
-  import {store, State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import ChatMessage from "@/components/chat/ChatMessage.vue";
-  import SearchMessages from "@/components/chat/SearchMessages.vue";
+  import {State} from '@/utils/storeHolder';
+  import ChatMessage from "@/components/chat/ChatMessage";
+  import SearchMessages from "@/components/chat/SearchMessages";
   import {ReceivingFile, RoomModel, SearchModel, SendingFile} from "@/types/model";
   import {MessageModelDto} from "@/types/dto";
   import {channelsHandler, messageBus} from "@/utils/singletons";
   import {SetSearchTo} from "@/types/types";
   import {MESSAGES_PER_SEARCH} from "@/utils/consts";
-  import AppProgressBar from "@/components/ui/AppProgressBar.vue";
-  import ChatSendingMessage from "@/components/chat/ChatSendingMessage.vue";
-  import ChatChangeOnlineMessage from "@/components/chat/ChatChangeOnlineMessage.vue";
-  import ChatSendingFile from "@/components/chat/ChatSendingFile.vue";
-  import ChatReceivingFile from '@/components/chat/ChatReceivingFile.vue';
-  import ChatCall from '@/components/chat/ChatCall.vue';
+  import AppProgressBar from "@/components/ui/AppProgressBar";
+  import ChatSendingMessage from "@/components/chat/ChatSendingMessage";
+  import ChatChangeOnlineMessage from "@/components/chat/ChatChangeOnlineMessage";
+  import ChatSendingFile from "@/components/chat/ChatSendingFile";
+  import ChatReceivingFile from '@/components/chat/ChatReceivingFile';
+  import ChatCall from '@/components/chat/ChatCall';
   import {ApplyGrowlErr} from '@/utils/utils';
 
   @Component({

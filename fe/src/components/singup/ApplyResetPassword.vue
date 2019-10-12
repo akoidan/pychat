@@ -16,8 +16,8 @@
 
   import {Prop, Component} from "vue-property-decorator";
   import Vue from 'vue';
-  import {store, State} from '@/utils/storeHolder';
-  import AppSubmit from '@/components/ui/AppSubmit.vue';
+  import {State} from '@/utils/storeHolder';
+  import AppSubmit from '@/components/ui/AppSubmit';
 
   @Component({components: {AppSubmit}})
   export default class ApplyResetPassword extends Vue {

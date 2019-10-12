@@ -9,7 +9,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import ChatMessage from '@/components/chat/ChatMessage';
   import AppProgressBar from '@/components/ui/AppProgressBar';

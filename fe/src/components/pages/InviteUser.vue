@@ -7,9 +7,9 @@
 <script lang="ts">
 
   import {Component, Vue} from "vue-property-decorator";
-  import {store, State} from '@/utils/storeHolder';
-  import AppSubmit from "@/components/ui/AppSubmit.vue";
-  import AddUserToRoom from "@/components/pages/parts/AddUserToRoom.vue";
+  import {State} from '@/utils/storeHolder';
+  import AppSubmit from "@/components/ui/AppSubmit";
+  import AddUserToRoom from "@/components/pages/parts/AddUserToRoom";
   import {RoomDictModel, RoomModel, UserModel} from "@/types/model";
   import {AddInviteMessage} from "@/types/messages";
 

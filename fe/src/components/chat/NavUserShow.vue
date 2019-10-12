@@ -23,7 +23,7 @@
   </nav>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {UserModel} from "@/types/model";
   import {PrivateRoomsIds} from '@/types/types';

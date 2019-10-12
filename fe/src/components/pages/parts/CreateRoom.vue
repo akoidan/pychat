@@ -33,11 +33,11 @@
   </div>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppInputRange from "@/components/ui/AppInputRange";
   import AppSubmit from "@/components/ui/AppSubmit";
-  import AddUserToRoom from "@/components/pages/parts/AddUserToRoom.vue";
+  import AddUserToRoom from "@/components/pages/parts/AddUserToRoom";
   import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
   import {AddRoomMessage} from "@/types/messages";
   import AppCheckbox from "@/components/ui/AppCheckbox";

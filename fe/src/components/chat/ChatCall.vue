@@ -70,14 +70,14 @@
   </div>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {CallInfoModel, CallsInfoModel} from "@/types/model";
   import {BooleanIdentifier, StringIdentifier, VideoType} from "@/types/types";
   import {webrtcApi} from '@/utils/singletons';
   import ChatRemotePeer from '@/components/chat/ChatRemotePeer';
   import {file} from '@/utils/audio';
-  import VideoObject from "@/components/chat/VideoObject.vue";
+  import VideoObject from "@/components/chat/VideoObject";
   @Component({
     components: {VideoObject, ChatRemotePeer}
   })
