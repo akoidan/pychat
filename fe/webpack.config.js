@@ -6,6 +6,7 @@ module.exports = {
 
   // Directory resolution fix
   resolve: {
+    extensions: ['.ts', '.js', '.vue'],
     alias: {
       '@': path.resolve(__dirname, 'src')
     }
