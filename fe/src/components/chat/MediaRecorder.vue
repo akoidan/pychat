@@ -6,7 +6,7 @@
 </template>
 <script lang="ts">
 
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {stopVideo} from '@/utils/htmlApi';
   import MediaCapture from '@/utils/MediaCapture';
@@ -20,7 +20,8 @@
   export default class MediaRecorderDiv extends Vue {
 
     isRecordingVideo = true;
-    get dim(): boolean  { return store.dim }
+    @State
+    public readonly dim!: boolean;
 
     // started: number = null;
     timeout: number = 0;

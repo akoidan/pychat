@@ -16,7 +16,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import ChatMessage from "@/components/chat/ChatMessage.vue";
   import SearchMessages from "@/components/chat/SearchMessages.vue";

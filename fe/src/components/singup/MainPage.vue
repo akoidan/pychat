@@ -11,14 +11,15 @@
 
 <script lang='ts'>
   import {Component, Vue} from "vue-property-decorator";
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {AUTO_REGISTRATION} from '@/utils/consts';
   import {api} from '@/utils/singletons';
   import {login} from '@/utils/utils';
 
   @Component
   export default class MainPage extends Vue {
-    get regHeader(): string  { return store.regHeader }
+    @State
+    public readonly regHeader!: string;
 
     getRandom(): string {
       return Math.random().toString(36).substring(7);

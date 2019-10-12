@@ -9,7 +9,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import ChatMessage from '@/components/chat/ChatMessage';
   import AppProgressBar from '@/components/ui/AppProgressBar';
@@ -26,8 +26,10 @@
   export default class ChatSendingMessage extends Vue {
     @Prop() message: MessageModel;
 
-    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
-    get roomsDict(): RoomDictModel  { return store.roomsDict }
+    @State
+    public readonly userInfo!: CurrentUserInfoModel;
+    @State
+    public readonly roomsDict!: RoomDictModel;
 
     get searchedIds() {
       return this.roomsDict[this.message.roomId].search.searchedIds;

@@ -70,7 +70,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {CallInfoModel, CallsInfoModel} from "@/types/model";
   import {BooleanIdentifier, StringIdentifier, VideoType} from "@/types/types";
@@ -87,9 +87,12 @@
     showSettings: boolean = false;
 
 
-    get microphones(): { [id: string]: string }  { return store.microphones }
-    get speakers(): { [id: string]: string }  { return store.speakers }
-    get webcams(): { [id: string]: string }  { return store.webcams }
+    @State
+    public readonly microphones!: { [id: string]: string } ;
+    @State
+    public readonly speakers!: { [id: string]: string } ;
+    @State
+    public readonly webcams!: { [id: string]: string } ;
     fullscreen: boolean = false;
 
     currentVideoActive: string = null;

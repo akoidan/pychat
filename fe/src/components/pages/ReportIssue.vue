@@ -20,7 +20,7 @@
   </form>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import AppSubmit from "@/components/ui/AppSubmit.vue"
   import {browserVersion} from '@/utils/singletons';

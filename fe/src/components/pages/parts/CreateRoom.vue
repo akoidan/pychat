@@ -33,7 +33,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppInputRange from "@/components/ui/AppInputRange";
   import AppSubmit from "@/components/ui/AppSubmit";
@@ -46,9 +46,12 @@
   @Component({components: {AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})
   export default class CreateRoom extends Vue {
 
-    get privateRooms(): RoomModel[]  { return store.privateRooms };
-    get privateRoomsUsersIds(): PrivateRoomsIds  { return store.privateRoomsUsersIds };
-    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
+    @State
+    public readonly privateRooms!: RoomModel[];
+    @State
+    public readonly privateRoomsUsersIds!: PrivateRoomsIds;
+    @State
+    public readonly userInfo!: CurrentUserInfoModel;
     currentUsers: UserModel[] = [];
     notifications: boolean = false;
     sound: number = 0;

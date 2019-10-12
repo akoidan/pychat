@@ -49,7 +49,7 @@
 </template>
 <script lang="ts">
   import {Component, Vue} from "vue-property-decorator";
-  import {store} from '@/utils/storeHolder';;
+  import {store, State} from '@/utils/storeHolder';;
   import {ViewUserProfileDto} from "@/types/messages";
   import {resolveMediaUrl} from '@/utils/htmlApi';
   import {UserModel} from '@/types/model';
@@ -60,7 +60,8 @@
     loading: boolean = false;
     error: string = null;
     userProfileInfo: ViewUserProfileDto = null;
-    get allUsersDict(): {[id: number]: UserModel}  { return store.allUsersDict }
+    @State
+    public readonly allUsersDict!: {[id: number]: UserModel} ;
 
     get id(): number {
       return parseInt(this.$route.params['id']);

@@ -27,7 +27,7 @@
   </form>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from '@/components/ui/AppSubmit';
   import {CurrentUserInfoModel} from "@/types/model";
@@ -44,7 +44,8 @@
 
 
 
-    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
+    @State
+    public readonly userInfo!: CurrentUserInfoModel;
 
     created() {
       this.username = this.userInfo.user;

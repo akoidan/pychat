@@ -8,7 +8,7 @@
   </p>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {
     CurrentUserInfoModel,
@@ -34,10 +34,13 @@
   })
   export default class ChatMessage extends Vue {
 
-    get userSettings(): CurrentUserSettingsModel  { return store.userSettings }
-    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
+    @State
+    public readonly userSettings!: CurrentUserSettingsModel;
+    @State
+    public readonly userInfo!: CurrentUserInfoModel;
     @Prop() message: MessageModel;
-    get editedMessage(): EditingMessage  { return store.editedMessage }
+    @State
+    public readonly editedMessage!: EditingMessage;
 
     $refs: {
       content: HTMLElement

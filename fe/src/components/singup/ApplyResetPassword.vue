@@ -16,7 +16,7 @@
 
   import {Prop, Component} from "vue-property-decorator";
   import Vue from 'vue';
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import AppSubmit from '@/components/ui/AppSubmit.vue';
 
   @Component({components: {AppSubmit}})

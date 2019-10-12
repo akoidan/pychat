@@ -79,7 +79,7 @@
 </template>
 <script lang="ts">
   import {Component, Vue, Watch} from "vue-property-decorator";
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import AppSubmit from "@/components/ui/AppSubmit";
   import AppCheckbox from "@/components/ui/AppCheckbox";
   import {CurrentUserInfoModel, CurrentUserSettingsModel} from "@/types/model";
@@ -92,7 +92,8 @@
   })
   export default class UserProfileSettings extends Vue {
     running: boolean = false;
-    get userSettings(): CurrentUserSettingsModel  { return store.userSettings }
+    @State
+    public readonly userSettings!: CurrentUserSettingsModel;
 
     model: UserSettingsDto = null;
 

@@ -43,7 +43,7 @@
   <div v-else>Room #{{roomId}} doesn't exist </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppInputRange from '@/components/ui/AppInputRange';
   import AppSubmit from '@/components/ui/AppSubmit';
@@ -57,7 +57,8 @@
     notifications: boolean = false;
     running: boolean = false;
     isPublic: boolean = false;
-    get roomsDict(): RoomDictModel  { return store.roomsDict }
+    @State
+    public readonly roomsDict!: RoomDictModel;
 
 
     leave() {

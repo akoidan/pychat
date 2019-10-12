@@ -42,7 +42,7 @@
   </form>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from '@/components/ui/AppSubmit';
   import {CurrentUserInfoModel, SexModel} from "@/types/model";
@@ -54,7 +54,8 @@
   })
   export default class UserProfileInfo extends Vue {
     running: boolean = false;
-    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
+    @State
+    public readonly userInfo!: CurrentUserInfoModel;
     model: UserProfileDto = null;
 
     sex = SexModel;

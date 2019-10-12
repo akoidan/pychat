@@ -23,7 +23,7 @@
   </nav>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {UserModel} from "@/types/model";
   import {PrivateRoomsIds} from '@/types/types';
@@ -34,7 +34,8 @@
     @Prop() activeUser: UserModel;
     @Prop() privateRooms: UserModel;
     running: boolean = false;
-    get privateRoomsUsersIds(): PrivateRoomsIds  { return store.privateRoomsUsersIds };
+    @State
+    public readonly privateRoomsUsersIds!: PrivateRoomsIds;
 
     get oppositeRoomId() {
       return this.privateRoomsUsersIds.userRooms[this.activeUser.id];

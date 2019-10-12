@@ -8,7 +8,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {CallInfoModel} from '@/types/model';
   import AppInputRange from '@/components/ui/AppInputRange';

@@ -15,7 +15,7 @@
 <script lang='ts'>
   import {Vue, Component, Prop} from "vue-property-decorator";
   import AppSubmit from "@/components/ui/AppSubmit.vue"
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
 
   import CaptchaComponent from '@/components/singup/CaptchaComponent.vue';
 

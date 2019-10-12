@@ -65,7 +65,7 @@
   import {sem} from "@/utils/utils";
   import {MessageDataEncode, RemoveSendingMessage, UploadFile} from "@/types/types";
   import {channelsHandler, globalLogger, messageBus, webrtcApi} from "@/utils/singletons";
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import MediaRecorder from '@/components/chat/MediaRecorder';
 
 
@@ -73,15 +73,24 @@
 
   @Component({components: {MediaRecorder, RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Vue {
-    get editedMessage(): EditingMessage  { return store.editedMessage }
-    get allUsersDict(): UserDictModel  { return store.allUsersDict }
-    get userInfo(): CurrentUserInfoModel  { return store.userInfo }
-    get activeRoomId(): number  { return store.activeRoomId }
-    get dim(): boolean  { return store.dim }
-    get roomsArray(): RoomModel[] { return store.roomsArray };
-    get activeUser(): UserModel  { return store.activeUser }
-    get activeRoom(): RoomModel  { return store.activeRoom };
-    get editingMessageModel(): MessageModel  { return store.editingMessageModel };
+    @State
+    public readonly editedMessage!: EditingMessage;
+    @State
+    public readonly allUsersDict!: UserDictModel;
+    @State
+    public readonly userInfo!: CurrentUserInfoModel;
+    @State
+    public readonly activeRoomId!: number;
+    @State
+    public readonly dim!: boolean;
+    @State
+    public readonly roomsArray!: RoomModel[];
+    @State
+    public readonly activeUser!: UserModel;
+    @State
+    public readonly activeRoom!: RoomModel;
+    @State
+    public readonly editingMessageModel!: MessageModel;
 
     // used in mixin from event.keyCode === 38
 

@@ -7,7 +7,7 @@
   </p>
 </template>
 <script lang="ts">
-  import {store} from '@/utils/storeHolder';
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfoModel, UserModel} from "@/types/model";
   import {timeToString} from "@/utils/htmlApi";
@@ -18,8 +18,10 @@
     @Prop() userId: number;
     @Prop() isWentOnline: boolean;
 
-    get allUsersDict(): {[id: number]: UserModel}  { return store.allUsersDict }
-    get myId(): number  { return store.myId };
+    @State
+    public readonly allUsersDict!: {[id: number]: UserModel} ;
+    @State
+    public readonly myId!: number;
 
     get where () {
       let has = this.isMe ? "have " : "has ";
