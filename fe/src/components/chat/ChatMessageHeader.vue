@@ -5,7 +5,7 @@
    </span>
 </template>
 <script lang="ts">
-
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {messageBus} from '@/utils/singletons';
   import {UserDictModel} from '@/types/model';
@@ -17,7 +17,8 @@
     @Prop() userId: number;
     @Prop() time: number;
 
-    get allUsersDict(): UserDictModel  { return this.store.allUsersDict }
+    @State
+    public readonly allUsersDict!: UserDictModel;
 
     setActiveUser() {
       this.store.setActiveUserId(this.userId);

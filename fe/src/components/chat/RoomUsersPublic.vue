@@ -10,14 +10,15 @@
   </li>
 </template>
 <script lang="ts">
-
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {RoomModel} from "@/types/model";
 
   @Component
   export default class RoomUsersPublic extends Vue {
-    @Prop() room!: RoomModel;
-    get activeRoomId(): number  { return this.store.activeRoomId! }
+    @Prop() room: RoomModel;
+    @State
+    public readonly activeRoomId!: number;
 
     get activeClass() {
       return this.room.id === this.activeRoomId ? 'active-room' : null;

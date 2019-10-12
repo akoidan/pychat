@@ -20,7 +20,7 @@
   } from "@/types/model";
   import NotifierHandler from "@/utils/NotificationHandler";
   import {browserVersion, isChrome, isMobile, notifier} from "@/utils/singletons";
-
+  import {store, State} from '@/utils/storeHolder';
   import IncomingCall from '@/components/chat/IncomingCall';
 
   @Component({
@@ -28,10 +28,14 @@
   })
   export default class MainPage extends Vue {
 
-    get showNav(): boolean  { return this.store.showNav };
-    get userInfo(): CurrentUserInfoModel  { return this.store.userInfo }
-    get incomingCall(): IncomingCallModel  { return this.store.incomingCall }
-    get dim(): boolean  { return this.store.dim }
+    @State
+    public readonly showNav!: boolean;
+    @State
+    public readonly userInfo!: CurrentUserInfoModel;
+    @State
+    public readonly incomingCall!: IncomingCallModel;
+    @State
+    public readonly dim!: boolean;
 
     get inited() {
       return this.userInfo;

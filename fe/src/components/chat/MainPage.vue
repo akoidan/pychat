@@ -65,7 +65,7 @@
   import {sem} from "@/utils/utils";
   import {MessageDataEncode, RemoveSendingMessage, UploadFile} from "@/types/types";
   import {channelsHandler, globalLogger, messageBus, webrtcApi} from "@/utils/singletons";
-
+  import {store, State} from '@/utils/storeHolder';
   import MediaRecorder from '@/components/chat/MediaRecorder';
 
 
@@ -73,15 +73,24 @@
 
   @Component({components: {MediaRecorder, RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
   export default class ChannelsPage extends Vue {
-    get editedMessage(): EditingMessage  { return this.store.editedMessage }
-    get allUsersDict(): UserDictModel  { return this.store.allUsersDict }
-    get userInfo(): CurrentUserInfoModel  { return this.store.userInfo }
-    get activeRoomId(): number  { return this.store.activeRoomId }
-    get dim(): boolean  { return this.store.dim }
-    get roomsArray(): RoomModel[] { return this.store.roomsArray };
-    get activeUser(): UserModel  { return this.store.activeUser }
-    get activeRoom(): RoomModel  { return this.store.activeRoom };
-    get editingMessageModel(): MessageModel  { return this.store.editingMessageModel };
+    @State
+    public readonly editedMessage!: EditingMessage;
+    @State
+    public readonly allUsersDict!: UserDictModel;
+    @State
+    public readonly userInfo!: CurrentUserInfoModel;
+    @State
+    public readonly activeRoomId!: number;
+    @State
+    public readonly dim!: boolean;
+    @State
+    public readonly roomsArray!: RoomModel[];
+    @State
+    public readonly activeUser!: UserModel;
+    @State
+    public readonly activeRoom!: RoomModel;
+    @State
+    public readonly editingMessageModel!: MessageModel;
 
     // used in mixin from event.keyCode === 38
 
@@ -125,7 +134,7 @@
           this.logger.debug("loop {}", file)();
           if (file.type.indexOf("image") >= 0) {
             pasteImgToTextArea(file, this.$refs.userMessage, err => {
-              this.store.growlError(err)
+              store.growlError(err)
             });
           }
         }
@@ -161,11 +170,11 @@
     }
 
     navEditMessage() {
-      this.store.setEditedMessage({...this.editedMessage, isEditingNow: true});
+      store.setEditedMessage({...this.editedMessage, isEditingNow: true});
     }
 
     closeEditing() {
-      this.store.setEditedMessage(null);
+      store.setEditedMessage(null);
     }
 
     handleAddVideo(file: Blob) {
@@ -174,7 +183,7 @@
       this.$refs.video.pause();
       if (file) {
         pasteBlobVideoToTextArea(file, this.$refs.userMessage, 'm', e => {
-          this.store.growlError(e)
+          store.growlError(e)
         })
       }
     }
@@ -201,7 +210,7 @@
           var file = evt.dataTransfer.files[i];
           if (file.type.indexOf("image") >= 0) {
             pasteImgToTextArea(file, this.$refs.userMessage, err => {
-              this.store.growlError(err)
+              store.growlError(err)
             });
           } else {
             webrtcApi.offerFile(file, this.activeRoom.id);
@@ -214,7 +223,7 @@
       let files: File[] = evt.target.files;
       for (let i = 0; i < evt.target.files.length; i++) {
         pasteImgToTextArea(files[i], this.$refs.userMessage, err => {
-          this.store.growlError(err)
+          store.growlError(err)
         });
       }
       this.$refs.imgInput.value = "";
@@ -242,7 +251,7 @@
         this.showSmileys = false;
         if (this.editedMessage) {
           this.$refs.userMessage.innerHTML = "";
-          this.store.setEditedMessage(null);
+          store.setEditedMessage(null);
 
         }
       } else if (event.keyCode === 38 && this.$refs.userMessage.innerHTML == "") { // up arrow
@@ -254,7 +263,7 @@
               maxTime = messages[m];
             }
           }
-          sem(event, maxTime, true, this.userInfo, this.store.setEditedMessage);
+          sem(event, maxTime, true, this.userInfo, store.setEditedMessage);
         }
       }
     }
@@ -282,7 +291,7 @@
           error: null
         }
       };
-      this.store.addMessage(mm);
+      store.addMessage(mm);
       channelsHandler.sendSendMessage(md.messageContent, this.activeRoomId, md.files, id, now);
     }
 
@@ -309,17 +318,17 @@
           files,
           userId: this.userInfo.userId
         };
-      this.store.addMessage(mm);
+      store.addMessage(mm);
       if (messageId < 0 && messageContent) {
         channelsHandler.sendSendMessage(messageContent, roomId, uploadFiles, messageId, this.editingMessageModel.time);
       } else if (messageId > 0 && messageContent) {
         channelsHandler.sendEditMessage(messageContent, roomId, messageId, uploadFiles);
       } else if (!messageContent && messageId > 0) {
-        channelsHandler.sendDeleteMessage(messageId, - this.$ws.getMessageId());
+        channelsHandler.sendDeleteMessage(messageId, -this.$ws.getMessageId());
       } else if(!messageContent && messageId < 0) {
         channelsHandler.removeSendingMessage(messageId);
       }
-      this.store.setEditedMessage(null);
+      store.setEditedMessage(null);
     }
 
     private appendPreviousMessagesFiles(md: MessageDataEncode, messageId) {

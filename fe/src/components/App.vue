@@ -12,6 +12,7 @@
   import Growl from "@/components/ui/AppGrowl";
   import {Component, Vue, Watch} from "vue-property-decorator";
   import {GrowlModel} from "@/types/model";
+  import {State} from '@/utils/storeHolder';
 
   @Component({
     components: {Growl}
@@ -22,9 +23,8 @@
       return this.store.userSettings && this.store.userSettings.theme || 'color-reg';
     }
 
-    get growls(): GrowlModel[] {
-      return this.store.growls;
-    }
+    @State
+    public growls: GrowlModel[];
 
     @Watch('mainClass')
     onMainClassChange(value) {

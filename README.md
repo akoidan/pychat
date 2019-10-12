@@ -316,7 +316,7 @@ The string `rsok33GN:0005:EJAd` describes:
 The technologies stack used in project:
 - Typescript
 - Vue, Vuex, VueRouter, lines-logger
-- Vuex-class, Vue-property-decorator
+- Vuex-module-decorators, Vue-property-decorator
 - Webpack and loaders
 - Sass
 
@@ -370,7 +370,7 @@ development.json and production.json have the following format:
 ```
 
 # TODO
-* 
+* https://www.infoworld.com/article/3443039/typescript-37-beta-debuts-with-optional-chaining.html
 * purge all callbacks to async code
 * move backend to be directory, fe to fe, docker to docker and etc
 * npm run stats

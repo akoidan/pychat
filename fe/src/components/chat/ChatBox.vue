@@ -18,6 +18,8 @@
 <script lang="ts">
 
   import {Component, Prop, Vue, Ref} from "vue-property-decorator";
+  import {store, State} from '@/utils/storeHolder';
+  import {Component, Prop, Vue} from "vue-property-decorator";
   import ChatMessage from "@/components/chat/ChatMessage.vue";
   import SearchMessages from "@/components/chat/SearchMessages.vue";
   import {ReceivingFile, RoomModel, SearchModel, SendingFile} from "@/types/model";

@@ -27,7 +27,7 @@
   </div>
 </template>
 <script lang="ts">
-
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Vue} from "vue-property-decorator";
   import {RoomModel, SexModelString, UserDictModel, UserModel} from "@/types/model";
   import RoomUsersUser from '@/components/chat/RoomUsersUser';
@@ -38,10 +38,14 @@
   })
   export default class RoomUsers extends Vue {
 
-    get usersArray(): UserModel[]  { return this.store.usersArray };
-    get activeRoomId(): number  { return this.store.activeRoomId }
-    get publicRooms(): RoomModel[]  { return this.store.publicRooms };
-    get privateRooms(): RoomModel[]  { return this.store.privateRooms };
+    @State
+    public readonly usersArray!: UserModel[];
+    @State
+    public readonly activeRoomId!: number;
+    @State
+    public readonly publicRooms!: RoomModel[];
+    @State
+    public readonly privateRooms!: RoomModel[];
 
     directMinified: boolean = false;
     roomsMinified: boolean = false;

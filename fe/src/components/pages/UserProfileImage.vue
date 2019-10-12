@@ -12,7 +12,7 @@
   </div>
 </template>
 <script lang="ts">
-
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {canvasContext, resolveMediaUrl, stopVideo} from "@/utils/htmlApi";
   import AppSubmit from '@/components/ui/AppSubmit';
@@ -26,7 +26,8 @@
 
 
 
-    get userImage(): string  { return this.store.userImage }
+    @State
+    public readonly userImage!: string;
 
     @Watch('userImage')
     onUserImageChange(value: string) {

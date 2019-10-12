@@ -6,7 +6,7 @@
   </div>
 </template>
 <script lang="ts">
-
+  import {store, State} from '@/utils/storeHolder';
   import debounce from 'lodash.debounce';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import {RoomModel, SearchModel} from "@/types/model";

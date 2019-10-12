@@ -5,7 +5,7 @@
   </li>
 </template>
 <script lang="ts">
-
+  import {store, State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {RoomModel, UserModel} from "@/types/model";
   import {
@@ -16,8 +16,10 @@
   @Component
   export default class RoomUsersUser extends Vue {
     @Prop() user: UserModel;
-    get activeRoom(): RoomModel  { return this.store.activeRoom };
-    get online(): number[]  { return this.store.online }
+    @State
+    public readonly activeRoom!: RoomModel;
+    @State
+    public readonly online!: number[];
 
     get userSexClass () {
       return getUserSexClass(this.user);
