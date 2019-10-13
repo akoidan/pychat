@@ -17,6 +17,10 @@
     components: {VideoObject, AppInputRange}
   })
   export default class ChatRemotePeer extends Vue {
+
+    @Ref()
+    video!: VideoObject;
+
     @Prop() callInfo!: CallInfoModel;
 
     get userNameValue() :string {
@@ -30,11 +34,8 @@
 
     @Watch('volumeLevel')
     onVolumeChanged(newValue: number) {
-      this.video.$refs.video.volume = newValue / 100;
+      (<HTMLVideoElement>(this.video.$refs.video)).volume = newValue / 100;
     }
-
-    @Ref()
-    video: VideoObject
 
   }
 </script>

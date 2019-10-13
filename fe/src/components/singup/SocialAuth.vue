@@ -52,7 +52,7 @@
       return this.frunning || !this.facebookApiLoaded;
     }
 
-    @ApplyGrowlErr("Unable to load google", null)
+    @ApplyGrowlErr("Unable to load google")
     async loadGoogle(): Promise<void> {
       await initGoogle();
       this.googleApiLoaded = true;

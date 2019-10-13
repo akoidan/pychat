@@ -68,7 +68,7 @@
   import {channelsHandler, globalLogger, messageBus, webrtcApi} from "@/utils/singletons";
   import {State} from '@/utils/storeHolder';
   import MediaRecorder from '@/components/chat/MediaRecorder';
-
+  import {Route, RawLocation} from 'vue-router'
 
   const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
@@ -95,7 +95,7 @@
 
     // used in mixin from event.keyCode === 38
 
-    srcVideo: string = null;
+    srcVideo: string|null = null;
 
     @Ref()
     userMessage!: HTMLElement;
@@ -117,26 +117,26 @@
     }
 
     @Watch('srcVideo')
-    onSrcChange(value) {
+    onSrcChange(value: MediaStream | MediaSource | Blob | null) {
       if (this.video) {
         this.video.srcObject = value;
       }
     }
 
-    beforeRouteEnter(to, frm, next) {
+    beforeRouteEnter(to: Route, frm: Route, next: (to?: RawLocation | false | ((vm: Vue) => any) | void) => void) {
       next(vm => {
         messageBus.$emit("main-join");
       });
     }
 
     onImagePaste(evt: ClipboardEvent) {
-      this.logger.debug("Clipboard has {} files", evt.clipboardData.files.length)();
       if (oc(evt).clipboardData.files.length) {
-        for (var i = 0; i < evt.clipboardData.files.length; i++) {
-          var file = evt.clipboardData.files[i];
+        this.logger.debug("Clipboard has {} files", evt.clipboardData!.files.length)();
+        for (var i = 0; i < evt.clipboardData!.files.length; i++) {
+          var file = evt.clipboardData!.files[i];
           this.logger.debug("loop {}", file)();
           if (file.type.indexOf("image") >= 0) {
-            pasteImgToTextArea(file, this.userMessage, err => {
+            pasteImgToTextArea(file, this.userMessage, (err: string) => {
               this.store.growlError(err)
             });
           }
@@ -185,13 +185,13 @@
       this.recordingNow = false;
       this.video.pause();
       if (file) {
-        pasteBlobVideoToTextArea(file, this.userMessage, 'm', e => {
+        pasteBlobVideoToTextArea(file, this.userMessage, 'm', (e :string)=> {
           this.store.growlError(e)
-        })
+        });
       }
     }
 
-    handleRecord({src, isVideo}) {
+    handleRecord({src, isVideo}: {src: string, isVideo: boolean}) {
       this.recordingNow = true;
       if (isVideo) {
         this.srcVideo = src;
@@ -206,13 +206,15 @@
     }
 
     dropPhoto(evt: DragEvent) {
-      this.logger.debug("Drop photo {} ", evt.dataTransfer.files)();
-      if (evt.dataTransfer.files) {
-        for (var i = 0; i < evt.dataTransfer.files.length; i++) {
+
+      let files : FileList = <FileList><unknown>(oc(evt).dataTransfer.files);
+      this.logger.debug("Drop photo {} ", files)();
+      if (files) {
+        for (var i = 0; i < files.length; i++) {
           this.logger.debug("loop")();
-          var file = evt.dataTransfer.files[i];
+          var file = files[i];
           if (file.type.indexOf("image") >= 0) {
-            pasteImgToTextArea(file, this.userMessage, err => {
+            pasteImgToTextArea(file, this.userMessage, (err: string) => {
               this.store.growlError(err)
             });
           } else {
@@ -222,10 +224,10 @@
       }
     }
 
-    handleFileSelect (evt) {
-      let files: File[] = evt.target.files;
-      for (let i = 0; i < evt.target.files.length; i++) {
-        pasteImgToTextArea(files[i], this.userMessage, err => {
+    handleFileSelect (evt: Event) {
+      let files: FileList = (<HTMLInputElement>evt.target).files!;
+      for (let i = 0; i < files.length; i++) {
+        pasteImgToTextArea(files[i], this.userMessage, (err: string) => {
           this.store.growlError(err)
         });
       }
@@ -243,7 +245,7 @@
         event.preventDefault();
         this.logger.debug("Checking sending message")();
         if (this.editedMessage && this.editedMessage.isEditingNow) {
-          let md: MessageDataEncode = getMessageData(this.userMessage, this.editingMessageModel.symbol);
+          let md: MessageDataEncode = getMessageData(this.userMessage, this.editingMessageModel.symbol!);
           this.appendPreviousMessagesFiles(md, this.editedMessage.messageId);
           this.editMessageWs(md.messageContent, md.files, this.editedMessage.messageId, this.activeRoomId, md.currSymbol, md.fileModels);
         } else {
@@ -260,13 +262,13 @@
       } else if (event.keyCode === 38 && this.userMessage.innerHTML == "") { // up arrow
         let messages = this.activeRoom.messages;
         if (Object.keys(messages).length > 0) {
-          let maxTime: MessageModel = null;
+          let maxTime: MessageModel |null= null;
           for (let m in messages ) {
             if (!maxTime || (messages[m].time >= maxTime.time)) {
               maxTime = messages[m];
             }
           }
-          sem(event, maxTime, true, this.userInfo, this.store.setEditedMessage);
+          sem(event, maxTime!, true, this.userInfo, this.store.setEditedMessage);
         }
       }
     }
@@ -295,16 +297,16 @@
         }
       };
       this.store.addMessage(mm);
-      channelsHandler.sendSendMessage(md.messageContent, this.activeRoomId, md.files, id, now);
+      channelsHandler.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
     }
 
     private editMessageWs(
-        messageContent: string,
+        messageContent: string|null,
         uploadFiles: UploadFile[],
         messageId: number,
         roomId: number,
-        symbol: string,
-        files: {[id: number]: FileModel}): void {
+        symbol: string|null,
+        files: {[id: number]: FileModel}|null): void {
         let mm: MessageModel = {
           roomId,
           deleted: !messageContent,
@@ -317,7 +319,7 @@
           content: messageContent,
           symbol: symbol,
           giphy: null,
-          edited: this.editingMessageModel.edited + 1,
+          edited: this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1,
           files,
           userId: this.userInfo.userId
         };
@@ -334,7 +336,7 @@
       this.store.setEditedMessage(null);
     }
 
-    private appendPreviousMessagesFiles(md: MessageDataEncode, messageId) {
+    private appendPreviousMessagesFiles(md: MessageDataEncode, messageId: number) {
       if (!md.messageContent) {
         return
       }

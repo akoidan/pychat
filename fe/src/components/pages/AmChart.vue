@@ -6,7 +6,6 @@
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
 
-
   interface AmChartI {
     dataItem: { wedge: { node: HTMLElement } }
   }
@@ -56,6 +55,7 @@
       };
       await this.$api.statistics();
 
+      // @ts-ignore: next-line
       let amcharts = await import( /* webpackChunkName: "amcharts" */ '@/utils/amchart.js');
       var chart = amcharts.makeChart("chartdiv", data);
       chart.addListener("init", () => {

@@ -87,7 +87,7 @@
     showSettings: boolean = false;
 
     @Ref()
-    localVideo: VideoObject;
+    localVideo!: VideoObject;
 
     @Ref()
     videoContainer!: HTMLElement;
@@ -164,17 +164,14 @@
     @Watch('callInfo.currentSpeaker')
     onSpeakerChange(newValue: string) {
       this.$nextTick(function () {
-        if (this.localVideo.$refs.video.setSinkId) {
-          this.localVideo.$refs.video.setSinkId(newValue);
+        let video: HTMLVideoElement = <HTMLVideoElement>(this.localVideo.$refs.video);
+        if (video.setSinkId) {
+          video.setSinkId(newValue);
         } else  {
           this.logger.error("SetSinkId doesn't exist")();
         }
       })
     }
-
-
-
-
 
     setCurrentMicProxy(event: Event) {
       let payload: StringIdentifier = {

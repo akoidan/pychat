@@ -10,6 +10,7 @@
 
   let Datepicker: unknown;
   if (!ELECTRON_MAIN_FILE) {
+    // @ts-ignore: next-line
     Datepicker = (() => import( /* webpackChunkName: "vuejs-datepicker" */ 'vuejs-datepicker'));
   } else {
     Datepicker = Promise.resolve();

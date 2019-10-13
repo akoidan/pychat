@@ -24,7 +24,7 @@
     components: {AppProgressBar, ChatMessage}
   })
   export default class ChatSendingMessage extends Vue {
-    @Prop() message: MessageModel;
+    @Prop() message!: MessageModel;
 
     @State
     public readonly userInfo!: CurrentUserInfoModel;

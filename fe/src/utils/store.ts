@@ -436,7 +436,7 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  setEditedMessage(editedMessage: EditingMessage) {
+  setEditedMessage(editedMessage: EditingMessage|null) {
     this.editedMessage = editedMessage;
     this.activeUserId = null;
   }

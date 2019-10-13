@@ -149,8 +149,9 @@ type ValueFilterForKey<T extends InstanceType<ClassType>, U> = {
 
 // TODO add success growl, and specify error property so it reflects forever in comp
 export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
-      message: string,
+      message: string|null,
       runningProp?: ValueFilterForKey<T, boolean>,
+      vueProperty?: ValueFilterForKey<T, string>
 ) {
   return function (target: T, propertyKey: string, descriptor: PropertyDescriptor) {
     const original = descriptor.value;
@@ -163,6 +164,8 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
       } catch (e) {
         if (message) {
           store.growlError(message + (e.message | e));
+        } else if (vueProperty) {
+          target[vueProperty] = String(e);
         } else {
           throw e;
         }

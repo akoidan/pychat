@@ -26,7 +26,7 @@
     @Ref()
     inputSearch!: HTMLInputElement;
 
-    debouncedSearch: Function|null = null;
+    debouncedSearch!: Function;
     search: string = '';
     offset: number = 0;
     currentRequest: XMLHttpRequest|null = null;
@@ -55,7 +55,6 @@
         })
       }
     }
-
 
     created() {
       this.search = this.room.search.searchText;
