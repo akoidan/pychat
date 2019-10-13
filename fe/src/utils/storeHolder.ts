@@ -30,4 +30,4 @@ function StateDecoratorFactory<ProviderType extends VuexModule>(vuexModule: Prov
 export const store: DefaultStore = getModule(DefaultStore);
 export const {State} = StateDecoratorFactory(store);
 
-Vue.prototype.$store = store;
+Vue.prototype.store = store;

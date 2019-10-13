@@ -53,7 +53,6 @@
     @State
     public readonly activeRoom!: RoomModel;
 
-
     @Ref()
     inputFile!: HTMLInputElement
 

@@ -1,6 +1,5 @@
 import '@/utils/classComponentHooks.ts';
 import '@/assets/sass/common.sass';
-import App from '@/components/App.vue';
 import {
   api,
   channelsHandler,
@@ -15,6 +14,7 @@ import loggerFactory from '@/utils/loggerFactory';
 import * as constants from '@/utils/consts';
 import {GIT_HASH, IS_DEBUG} from '@/utils/consts';
 import {initStore} from '@/utils/utils';
+import App from '@/components/App.vue'; // should be after initStore
 import {sub} from '@/utils/sub';
 import Vue, {ComponentOptions} from 'vue';
 import {Logger} from 'lines-logger';
