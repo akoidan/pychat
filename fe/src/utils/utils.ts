@@ -14,7 +14,7 @@ import {StorageData} from '@/types/types';
 
 let logger = loggerFactory.getLoggerColor('utils', '#007a70');
 
-export function logout(errMessage: string) {
+export function logout(errMessage?: string) {
   store.logout();
   if (errMessage) {
     store.growlError( errMessage);
@@ -147,9 +147,10 @@ type ValueFilterForKey<T extends InstanceType<ClassType>, U> = {
 }[keyof T];
 
 
+// TODO add success growl, and specify error property so it reflects forever in comp
 export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
       message: string,
-      runningProp: ValueFilterForKey<T, boolean>,
+      runningProp?: ValueFilterForKey<T, boolean>,
 ) {
   return function (target: T, propertyKey: string, descriptor: PropertyDescriptor) {
     const original = descriptor.value;

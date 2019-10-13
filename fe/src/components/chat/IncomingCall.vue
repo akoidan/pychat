@@ -36,7 +36,7 @@
   @Component
   export default class IncomingCall extends Vue {
 
-    @Prop() call: IncomingCallModel;
+    @Prop() call!: IncomingCallModel;
     @State
     public readonly allUsersDict!: {[id: number]: UserModel} ;
 

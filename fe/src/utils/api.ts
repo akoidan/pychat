@@ -49,11 +49,17 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async search(data: string, room: number, offset: number): Promise<MessageModelDto[]> {
+  public async search(
+      data: string,
+      room: number,
+      offset: number,
+      requestInterceptor?: (a: XMLHttpRequest) => void
+  ): Promise<MessageModelDto[]> {
    return await this.xhr.doPost<MessageModelDto[]>({
       url: '/search_messages',
       params: {data, room, offset},
       isJsonDecoded: true,
+      requestInterceptor,
     });
   }
 
@@ -165,7 +171,7 @@ export default class Api extends MessageHandler {
   }
 
 
-  public async validateUsername(username: string): Promise<void> {
+  public async validateUsername(username: string, requestInterceptor: (r: XMLHttpRequest) => void): Promise<void> {
     return await this.xhr.doPost({
       url: '/validate_user',
       params: {username},
@@ -196,8 +202,8 @@ export default class Api extends MessageHandler {
     return await this.xhr.doGet<ViewUserProfileDto>(`/profile?id=${id}`, true);
   }
 
-  public async changeEmail(token: string): Promise<void> {
-    this.xhr.doGet<string>(`/change_email?token=${token}`, false);
+  public async changeEmail(token: string): Promise<string> {
+    return this.xhr.doGet<string>(`/change_email?token=${token}`, false);
   }
 
   public async changeEmailLogin(email: string, password: string): Promise<void> {
@@ -225,7 +231,7 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async alidateEmail(email: string, requestInterceptor: (r: XMLHttpRequest) => void): Promise<void> {
+  public async validateEmail(email: string, requestInterceptor: (r: XMLHttpRequest) => void): Promise<void> {
     return this.xhr.doPost({
       url: '/validate_email',
       params: {email},

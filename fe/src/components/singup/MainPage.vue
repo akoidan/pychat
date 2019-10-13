@@ -14,7 +14,7 @@
   import {State} from '@/utils/storeHolder';
   import {AUTO_REGISTRATION} from '@/utils/consts';
   import {api} from '@/utils/singletons';
-  import {login} from '@/utils/utils';
+  import {ApplyGrowlErr, login} from '@/utils/utils';
 
   @Component
   export default class MainPage extends Vue {
@@ -25,11 +25,11 @@
       return Math.random().toString(36).substring(7);
     }
 
-    created() {
+    @ApplyGrowlErr('Autoregistration error:')
+    async created() {
       if (AUTO_REGISTRATION) {
-        this.$api.registerDict(this.getRandom(), this.getRandom(), (session, error)=> {
-          login(session, error);
-        })
+        let s: string = await this.$api.registerDict(this.getRandom(), this.getRandom());
+        login(s);
       }
     }
 

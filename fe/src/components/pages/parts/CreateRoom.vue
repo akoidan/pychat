@@ -58,7 +58,7 @@
     roomName: string = '';
     running: boolean = false;
 
-    @Prop() isPublic: boolean;
+    @Prop() isPublic!: boolean;
 
     get inviteUsers(): string {
       return this.isPublic ? "Invite users to new room" : "Select user for private room";

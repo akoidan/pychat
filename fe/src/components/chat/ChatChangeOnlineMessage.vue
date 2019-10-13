@@ -14,9 +14,9 @@
 
   @Component
   export default class ChatChangeOnlineMessage extends Vue {
-    @Prop() time: number;
-    @Prop() userId: number;
-    @Prop() isWentOnline: boolean;
+    @Prop() time!: number;
+    @Prop() userId!: number;
+    @Prop() isWentOnline!: boolean;
 
     @State
     public readonly allUsersDict!: {[id: number]: UserModel} ;

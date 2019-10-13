@@ -39,7 +39,7 @@
     frunning: boolean = false;
     googleApiLoaded: boolean = false;
     facebookApiLoaded: boolean = false;
-    googleToken: string = null;
+    googleToken: string|null = null;
     oauth_token: string = GOOGLE_OAUTH_2_CLIENT_ID;
     fb_app_id: string = FACEBOOK_APP_ID;
 
@@ -58,23 +58,24 @@
       this.googleApiLoaded = true;
     }
 
-    @ApplyGrowlErr("Unable to load facebook", null)
-    async loadGoogle(): Promise<void> {
+    @ApplyGrowlErr("Unable to load facebook")
+    async loadFaceBook(): Promise<void> {
       await initFaceBook();
       this.facebookApiLoaded = true;
     }
 
     async created() {
-      await Promise.all(<Promise<void>[]>[this.loadGoogle(), this.loadGoogle()]);
+      await Promise.all(<Promise<void>[]>[this.loadGoogle(), this.loadFaceBook()]);
     }
 
-    async onGoogleSignIn(auth2) {
+    async onGoogleSignIn(auth2: unknown) {
+      // @ts-ignore: next-line
       let googleUser = auth2.currentUser.get();
       let profile = googleUser.getBasicProfile();
       this.logger.log("Signed as {} with id {} and email {}  ",
           profile.getName(), profile.getId(), profile.getEmail())();
       this.googleToken = googleUser.getAuthResponse().id_token;
-      let s: string = await this.$api.googleAuth(this.googleToken);
+      let s: string = await this.$api.googleAuth(this.googleToken!);
       login(s);
     }
 
@@ -88,7 +89,7 @@
         await auth2.signIn();
       }
       await new Promise((resolve, reject) => {
-        auth2.isSignedIn.listen(async (isSignedIn) => {
+        auth2.isSignedIn.listen(async (isSignedIn: boolean) => {
           if (isSignedIn) {
             resolve()
           } else {
@@ -100,17 +101,20 @@
     }
 
     @ApplyGrowlErr("Unable to login with fb", 'frunning')
-    async fbStatusChangeIfReAuth(response) {
+    async fbStatusChangeIfReAuth(response: {status: string}) {
       this.logger.debug("fbStatusChangeIfReAuth {}", response)();
       if (response.status === "connected") {
         // Logged into your app and Facebook.
         this.store.growlInfo("Successfully logged in into facebook, proceeding...");
+        // TODO
+        // @ts-ignore: next-line
         let s = await this.$api.facebookAuth(response.authResponse.accessToken);
         login(s);
         return false;
       } else if (response.status === "not_authorized") {
         this.frunning = false;
         this.store.growlInfo("Allow facebook application to use your data");
+        return false;
       } else {
         return true;
       }
@@ -120,15 +124,15 @@
     async facebookLogin() {
       this.frunning = true;
 
-      let response = await new Promise(resolve => {
-        FB.getLoginStatus(response => resolve(response));
+      let response: {status: string} = await new Promise(resolve => {
+        FB.getLoginStatus((response: {status: string}) => resolve(response));
       });
 
       this.logger.log("fbStatusChange {}", response)();
       if (await this.fbStatusChangeIfReAuth(response)) {
         this.logger.log("Fblogin")();
-        let response = await new Promise((resolve, reject) => {
-          FB.login(r => resolve(r), {
+        let response:{status: string} = await new Promise((resolve, reject) => {
+          FB.login((r: {status: string}) => resolve(r), {
             auth_type: "reauthenticate",
             scope: "email"
           });

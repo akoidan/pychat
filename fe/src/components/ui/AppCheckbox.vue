@@ -5,23 +5,25 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue} from "vue-property-decorator";
+  import {Component, Prop, Vue, Ref, Emit} from "vue-property-decorator";
   import {getUniqueId} from "@/utils/htmlApi";
 
   @Component
   export default class AppCheckbox extends Vue {
 
-    $refs: {
-      checkbox: HTMLInputElement;
-    };
+    private uniqueId!: string;
 
-    @Prop() value: boolean;
+    @Ref()
+    private checkbox!: HTMLInputElement;
 
-    onchange(e: Event) {
-      this.$emit('input', this.$refs.checkbox.checked);
+    @Prop()
+    public readonly value!: boolean;
+
+    @Emit()
+    input(e: Event) {
+      return this.checkbox.checked;
     }
 
-    uniqueId: string;
     created() {
       this.uniqueId = `checkboxN${getUniqueId()}`;
     }

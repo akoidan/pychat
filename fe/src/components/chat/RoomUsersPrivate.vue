@@ -19,7 +19,7 @@
   @Component
   export default class RoomUsersPrivate extends Vue {
 
-    @Prop() room: RoomModel;
+    @Prop() room!: RoomModel;
     @State
     public readonly online!: number[];
     @State

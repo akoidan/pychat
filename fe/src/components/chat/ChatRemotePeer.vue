@@ -9,7 +9,7 @@
 </template>
 <script lang="ts">
   import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue, Watch} from "vue-property-decorator";
+  import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
   import {CallInfoModel} from '@/types/model';
   import AppInputRange from '@/components/ui/AppInputRange';
   import VideoObject from '@/components/chat/VideoObject';
@@ -17,7 +17,7 @@
     components: {VideoObject, AppInputRange}
   })
   export default class ChatRemotePeer extends Vue {
-    @Prop() callInfo: CallInfoModel;
+    @Prop() callInfo!: CallInfoModel;
 
     get userNameValue() :string {
       return this.store.userName(this.callInfo.userId);
@@ -29,13 +29,12 @@
     volumeLevel: number = 100;
 
     @Watch('volumeLevel')
-    onVolumeChanged(newValue) {
-      this.$refs.video.$refs.video.volume = newValue / 100;
+    onVolumeChanged(newValue: number) {
+      this.video.$refs.video.volume = newValue / 100;
     }
 
-    $refs : {
-      video: VideoObject
-    };
+    @Ref()
+    video: VideoObject
 
   }
 </script>

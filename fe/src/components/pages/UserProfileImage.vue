@@ -13,44 +13,31 @@
 </template>
 <script lang="ts">
   import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue, Watch} from "vue-property-decorator";
+  import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
   import {canvasContext, resolveMediaUrl, stopVideo} from "@/utils/htmlApi";
   import AppSubmit from '@/components/ui/AppSubmit';
+  import {ApplyGrowlErr} from '@/utils/utils';
   @Component({
     components: {AppSubmit}
   })
   export default class UserProfileImage extends Vue {
 
-
-
-
-
-
-    @State
-    public readonly userImage!: string;
-
-    @Watch('userImage')
-    onUserImageChange(value: string) {
-      this.srcImg = resolveMediaUrl(value);
-      this.store.growlInfo("New image has been set");
-    }
-
-    created() {
-      this.srcImg = this.userImage ? resolveMediaUrl(this.userImage) : null;
-    }
-
     running: boolean = false;
     srcImg: string = '';
-    srcVideo: MediaStream = null;
-    blob: Blob = null;
+    srcVideo: MediaStream |null= null;
+    blob: Blob |null= null;
     fileInputValue: string = '';
     showVideo: boolean = false;
     isStopped: boolean = true;
 
-    $refs: {
-      inputFile: HTMLInputElement
-      changeProfileVideo: HTMLVideoElement
-    };
+    @State
+    public readonly userImage!: string;
+
+    @Ref()
+    private inputFile!: HTMLInputElement;
+
+    @Ref()
+    private changeProfileVideo!: HTMLVideoElement;
 
     get helpText(): string {
       return this.showVideo ? 'Click on this zone with white border to capture an image' : 'You can also drag-n-drop image on zone bellow'
@@ -60,14 +47,24 @@
       return this.showVideo ? 'Close webcam' : 'Make a photo from webcam';
     }
 
-    dropPhoto(e) {
+    @Watch('userImage')
+    onUserImageChange(value: string) {
+      this.srcImg = resolveMediaUrl(value);
+      this.store.growlInfo("New image has been set");
+    }
+
+    created() {
+      this.srcImg = this.userImage ? resolveMediaUrl(this.userImage) : '';
+    }
+
+    dropPhoto(e: DragEvent) {
       this.logger.debug("Drop photo")();
-      let file = e.dataTransfer.files[0];
+      let file = e.dataTransfer!.files[0];
       this.blob = file;
       if (file) {
         let ok = this.setPhotoFromReader(file, 'drop');
         if (ok) {
-          this.$refs.inputFile.value = '';
+          this.inputFile.value = '';
         }
       } else {
         this.store.growlError("No files found in draggable object");
@@ -76,19 +73,20 @@
 
     selectFile() {
       this.logger.debug("Selecting file")();
-      this.$refs.inputFile.click()
+      this.inputFile.click()
     }
 
-    photoInputChanged(e) {
-      var ok = this.setPhotoFromReader(e.target.files[0], 'input');
+    photoInputChanged(e: Event) {
+      let f: File = (<HTMLInputElement>e.target)!.files![0];
+      var ok = this.setPhotoFromReader(f, 'input');
       if (!ok) {
         this.fileInputValue = '';
       } else {
-        this.blob = e.target.files[0];
+        this.blob = f;
       }
     }
 
-    setPhotoFromReader(file, type) {
+    setPhotoFromReader(file: File, type: string) {
       if (file && file.type && file.type.match(/image.*/)) {
         let reader = new FileReader();
         reader.onload = (e) => {
@@ -104,16 +102,16 @@
     }
 
     @Watch('srcVideo')
-    onSrcVideoChange(value) {
-      if (this.$refs.changeProfileVideo) {
-        this.$refs.changeProfileVideo.srcObject = value;
+    onSrcVideoChange(value: MediaStream | MediaSource | Blob | null) {
+      if (this.changeProfileVideo) {
+        this.changeProfileVideo.srcObject = value;
       }
     }
 
     startSharingVideo() {
       navigator.getUserMedia({video: true}, (localMediaStream: MediaStream) => {
         this.srcVideo = localMediaStream;
-        this.$refs.changeProfileVideo.play();
+        this.changeProfileVideo.play();
       }, (error) => {
         this.logger.log("navigator.getUserMedia error: {}", error)();
       });
@@ -122,17 +120,17 @@
 
     takeSnapshot() {
       if (this.srcVideo) {
-        canvasContext.canvas.width = this.$refs.changeProfileVideo.videoWidth;
-        canvasContext.canvas.height = this.$refs.changeProfileVideo.videoHeight;
-        canvasContext.drawImage(this.$refs.changeProfileVideo, 0, 0);
+        canvasContext.canvas.width = this.changeProfileVideo.videoWidth;
+        canvasContext.canvas.height = this.changeProfileVideo.videoHeight;
+        canvasContext.drawImage(this.changeProfileVideo, 0, 0);
         // "image/webp" works in Chrome.
         // Other browsers will fall back to image/png.
         canvasContext.canvas.toBlob((blob) => {
           this.srcImg = URL.createObjectURL(blob);
-          blob['name'] = '.jpg';
+          blob!['name'] = '.jpg';
           this.blob = blob;
         },  'image/jpeg', 0.95);
-        this.$refs.inputFile.value = '';
+        this.inputFile.value = '';
         this.store.growlInfo('Image has been set. Click on "Finish" to hide video');
       }
     }
@@ -167,19 +165,13 @@
       this.srcVideo = null;
     }
 
-    upload() {
+    @ApplyGrowlErr('Unable to upload event', 'running')
+    async upload() {
       if (!this.blob) {
         this.store.growlError("Please select image first")
       } else {
-        this.running = true;
-        this.$api.uploadProfileImage(this.blob, (e) => {
-          this.running = false;
-          if (e) {
-            this.store.growlError(e)
-          } else {
-            this.store.growlSuccess("Image uploaded")
-          }
-        })
+        await this.$api.uploadProfileImage(this.blob);
+        this.store.growlSuccess("Image uploaded")
       }
     }
   }

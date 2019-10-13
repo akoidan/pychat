@@ -24,6 +24,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from '@/components/ui/AppSubmit';
   import {CurrentUserInfoModel} from "@/types/model";
+  import {ApplyGrowlErr} from '@/utils/utils';
   @Component({
     components: {AppSubmit}
   })
@@ -43,16 +44,10 @@
       this.email = this.userInfo.email;
     }
 
-    saveProfile() {
-      this.running = true;
-      this.$api.changeEmailLogin(this.email,this.password, (e) => {
-        this.running = false;
-        if (e) {
-          this.store.growlError(e)
-        } else {
-          this.store.growlSuccess("Email has been changed");
-        }
-      });
+    @ApplyGrowlErr('Unable to change email', 'running')
+    async saveProfile() {
+      await this.$api.changeEmailLogin(this.email,this.password);
+      this.store.growlSuccess("Email has been changed");
     }
   }
 </script>

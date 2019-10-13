@@ -41,7 +41,7 @@
 </template>
 <script lang="ts">
   import {State} from '@/utils/storeHolder';
-  import {Component, Vue} from "vue-property-decorator";
+  import {Component, Vue, Ref} from "vue-property-decorator";
   import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
   import {logout} from "@/utils/utils";
   import {SetSearchTo} from '@/types/types';
@@ -54,9 +54,8 @@
     public readonly activeRoom!: RoomModel;
 
 
-    $refs: {
-      inputFile: HTMLInputElement
-    };
+    @Ref()
+    inputFile!: HTMLInputElement
 
     @State
     public readonly isOnline!: boolean;
@@ -64,17 +63,17 @@
     @State
     public readonly userInfo!: CurrentUserInfoModel;
 
-    toggleContainer(roomd) {
+    toggleContainer(roomd: number) {
       this.store.toggleContainer(roomd);
     }
 
     sendFileClick() {
-      this.$refs.inputFile.value = null;
-      this.$refs.inputFile.click();
+      this.inputFile.value = '';
+      this.inputFile.click();
     }
 
-    sendFile(event) {
-      webrtcApi.offerFile(this.$refs.inputFile.files[0], this.activeRoom.id);
+    sendFile(event: FileList) {
+      webrtcApi.offerFile(this.inputFile.files![0], this.activeRoom.id);
     }
 
     githubUrl : string = GITHUB_URL;
@@ -97,8 +96,13 @@
       this.expanded = !this.expanded;
     }
 
-    signOut() {
-      this.$api.logout(logout);
+    async signOut() {
+      try {
+        await this.$api.logout();
+        logout();
+      } catch (e) {
+        logout(e);
+      }
     }
   }
 </script>

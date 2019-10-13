@@ -55,7 +55,7 @@
     components: {ChatMessageHeader, AppProgressBar}
   })
   export default class ChatReceivingFile extends Vue {
-    @Prop() receivingFile: ReceivingFile;
+    @Prop() receivingFile!: ReceivingFile;
     @State
     public readonly myId!: number;
     FileTransferStatus = FileTransferStatus;

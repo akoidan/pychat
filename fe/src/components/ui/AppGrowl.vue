@@ -14,7 +14,7 @@
   import {State} from '@/utils/storeHolder';
   @Component
   export default class AppGrowl extends Vue {
-    @Prop() growl: GrowlModel;
+    @Prop() public readonly growl!: GrowlModel;
 
     close() {
       this.store.removeGrowl(this.growl);

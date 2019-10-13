@@ -16,7 +16,7 @@
 
   @Component
   export default class RoomUsersPublic extends Vue {
-    @Prop() room: RoomModel;
+    @Prop() room!: RoomModel;
     @State
     public readonly activeRoomId!: number;
 

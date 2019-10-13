@@ -31,6 +31,7 @@
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from '@/components/ui/AppSubmit';
   import {CurrentUserInfoModel} from "@/types/model";
+  import {ApplyGrowlErr} from '@/utils/utils';
   @Component({
     components: {AppSubmit}
   })
@@ -39,31 +40,22 @@
     oldPassword: string = '';
     newPassword: string = '';
     confirmPassword: string = "";
-    username: string;
     running: boolean = false;
-
-
 
     @State
     public readonly userInfo!: CurrentUserInfoModel;
 
-    created() {
-      this.username = this.userInfo.user;
+    get username(): string {
+      return this.userInfo.user;
     }
 
-    saveProfile() {
+    @ApplyGrowlErr('Error changing pass:', 'running')
+    async saveProfile() {
       if (this.newPassword != this.confirmPassword) {
-        this.store.growlError("Passwords don't match");
+        this.store.growlError('Passwords don\'t match');
       } else {
-        this.running = true;
-        this.$api.changePassword(this.oldPassword, this.newPassword, e => {
-          this.running = false;
-          if (e) {
-            this.store.growlError(e)
-          } else {
-            this.store.growlSuccess("Password has been changed");
-          }
-        });
+        await this.$api.changePassword(this.oldPassword, this.newPassword);
+        this.store.growlSuccess('Password has been changed');
       }
     }
   }

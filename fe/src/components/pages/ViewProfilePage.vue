@@ -53,13 +53,14 @@
   import {ViewUserProfileDto} from "@/types/messages";
   import {resolveMediaUrl} from '@/utils/htmlApi';
   import {UserModel} from '@/types/model';
+  import {ApplyGrowlErr} from '@/utils/utils';
 
   @Component
   export default class ViewProfilePage extends Vue {
 
     loading: boolean = false;
-    error: string = null;
-    userProfileInfo: ViewUserProfileDto = null;
+    private error: string|null = null;
+    private userProfileInfo: ViewUserProfileDto | null = null;
     @State
     public readonly allUsersDict!: {[id: number]: UserModel} ;
 
@@ -75,15 +76,9 @@
       return resolveMediaUrl(src);
     }
 
-    created() {
-      this.loading = true;
-      this.$api.showProfile(this.id, (d: ViewUserProfileDto, e: string) => {
-        this.loading = false;
-        if (e) {
-          this.error = `Unable to load ${this.username} profile, because: ${e}`;
-        }
-        this.userProfileInfo = d;
-      });
+    @ApplyGrowlErr('Unable to load profile, because', 'loading')
+    async created() {
+      this.userProfileInfo = await this.$api.showProfile(this.id);
     }
 
   }

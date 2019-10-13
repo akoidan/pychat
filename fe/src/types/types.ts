@@ -37,7 +37,7 @@ export interface ChangeStreamMessage extends DefaultMessage {
 export interface MessageDataEncode {
   messageContent: string|null;
   files: UploadFile[];
-  fileModels: { [id: number]: FileModel };
+  fileModels: { [id: string]: FileModel };
   currSymbol: string;
 }
 
@@ -119,7 +119,7 @@ export interface ChangeOnlineEntry {
 export interface SetMessageProgressError {
   messageId: number;
   roomId: number;
-  error: string;
+  error: string|null;
 }
 
 export interface RemoveSendingMessage {
@@ -211,8 +211,8 @@ export interface MessagesLocation {
 }
 
 export interface PrivateRoomsIds {
-  userRooms: {};
-  roomUsers: {};
+  userRooms: {[id: number]: number};
+  roomUsers: {[id: number]: number};
 }
 export interface SetRoomsUsers {
   roomId: number;

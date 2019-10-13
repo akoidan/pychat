@@ -86,6 +86,8 @@
   import {currentUserInfoDtoToModel, currentUserInfoModelToDto, userSettingsDtoToModel} from "@/types/converters";
   import {UserSettingsDto} from "@/types/dto";
   import {storage} from '@/utils/singletons';
+  import {ApplyGrowlErr} from '@/utils/utils';
+  import {SetSettingsMessage} from '@/types/messages';
 
   @Component({
     components: {AppSubmit, AppCheckbox}
@@ -95,7 +97,7 @@
     @State
     public readonly userSettings!: CurrentUserSettingsModel;
 
-    model: UserSettingsDto = null;
+    private model!: UserSettingsDto;
 
     created() {
       this.model = userSettingsDtoToModel(this.userSettings);
@@ -111,16 +113,15 @@
       this.store.clearMessages();
     }
 
-    save() {
-      this.running = true;
+
+    @ApplyGrowlErr('Settings saving error', 'running')
+    async save() {
       this.logger.debug("Saving userSettings")();
       let cui : UserSettingsDto = {...this.model};
-      this.$ws.saveSettings(cui, e => {
-        this.running = false;
-        if (e.action === 'setSettings') {
+      let e: SetSettingsMessage|unknown = await this.$ws.saveSettings(cui);
+      if ((<SetSettingsMessage>e).action === 'setSettings') {
           this.store.growlSuccess("Settings have been saved");
-        }
-      })
+      }
     }
   }
 

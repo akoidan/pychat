@@ -16,7 +16,7 @@
   import {FileTransferStatus, SendingFileTransfer, UserModel} from "@/types/model";
   import {webrtcApi} from '@/utils/singletons';
 
-  const fileStatusDict: {} = {};
+  const fileStatusDict: { [id: number]: string } = {};
    fileStatusDict[FileTransferStatus.NOT_DECIDED_YET] = 'Waiting to accept';
    fileStatusDict[FileTransferStatus.IN_PROGRESS] = 'Sending...';
    fileStatusDict[FileTransferStatus.FINISHED] = 'Successfully sent';
@@ -29,9 +29,9 @@
   })
   export default class ChatSendingFileTransfer extends Vue {
 
-    @Prop() transfer: SendingFileTransfer;
-    @Prop() connId: string;
-    @Prop() opponentId: string;
+    @Prop() transfer!: SendingFileTransfer;
+    @Prop() connId!: string;
+    @Prop() opponentId!: string;
     @State
     public readonly allUsersDict!: {[id: number]: UserModel} ;
 

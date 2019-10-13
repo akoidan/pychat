@@ -71,7 +71,7 @@
 </template>
 <script lang="ts">
   import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue, Watch} from "vue-property-decorator";
+  import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
   import {CallInfoModel, CallsInfoModel} from "@/types/model";
   import {BooleanIdentifier, StringIdentifier, VideoType} from "@/types/types";
   import {webrtcApi} from '@/utils/singletons';
@@ -86,6 +86,11 @@
     @Prop() roomId!: number;
     showSettings: boolean = false;
 
+    @Ref()
+    localVideo: VideoObject;
+
+    @Ref()
+    videoContainer!: HTMLElement;
 
     @State
     public readonly microphones!: { [id: string]: string } ;
@@ -140,7 +145,7 @@
     }
 
     enterFullscreen() {
-      let elem: HTMLElement = this.$refs.videoContainer;
+      let elem: HTMLElement = this.videoContainer;
       if (elem.requestFullscreen) {
         elem.requestFullscreen();
       } else if (elem.msRequestFullscreen) {
@@ -159,8 +164,8 @@
     @Watch('callInfo.currentSpeaker')
     onSpeakerChange(newValue: string) {
       this.$nextTick(function () {
-        if (this.$refs.localVideo.$refs.video.setSinkId) {
-          this.$refs.localVideo.$refs.video.setSinkId(newValue);
+        if (this.localVideo.$refs.video.setSinkId) {
+          this.localVideo.$refs.video.setSinkId(newValue);
         } else  {
           this.logger.error("SetSinkId doesn't exist")();
         }
@@ -168,25 +173,23 @@
     }
 
 
-    $refs: {
-      localVideo: VideoObject,
-      videoContainer: HTMLElement,
-    };
 
-    setCurrentMicProxy(event) {
+
+
+    setCurrentMicProxy(event: Event) {
       let payload: StringIdentifier = {
         id: this.roomId,
-        state: event.target.value
+        state: (<HTMLInputElement>event.target).value
       };
       this.store.setCurrentMic(payload);
       if (this.callInfo.callActive) {
         webrtcApi.updateConnection(this.roomId);
       }
     }
-    setCurrentWebcamProxy(event) {
+    setCurrentWebcamProxy(event: Event) {
       let payload: StringIdentifier = {
         id: this.roomId,
-        state: event.target.value
+        state: (<HTMLInputElement>event.target).value
       };
       this.store.setCurrentWebcam(payload);
       if (this.callInfo.callActive) {
@@ -195,8 +198,8 @@
     }
 
     playTest() {
-      if (file['setSinkId']) {
-        file['setSinkId'](this.callInfo.currentSpeaker);
+      if (file.setSinkId) {
+        file.setSinkId(this.callInfo.currentSpeaker!);
         file.pause();
         file.currentTime = 0;
         file.volume = 1;
@@ -208,10 +211,10 @@
       }
     }
 
-    setCurrentSpeakerProxy(event) {
+    setCurrentSpeakerProxy(event: Event) {
       let payload: StringIdentifier = {
         id: this.roomId,
-        state: event.target.value
+        state: (<HTMLInputElement>event.target).value
       };
       this.store.setCurrentSpeaker(payload);
       if (this.callInfo.callActive) {

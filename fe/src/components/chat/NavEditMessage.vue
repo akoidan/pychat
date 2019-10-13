@@ -17,7 +17,7 @@
 
   @Component
   export default class NavEditMessage extends Vue {
-    @Prop() editedMessage : EditingMessage;
+    @Prop() editedMessage! : EditingMessage;
 
     m2DeleteMessage() {
       this.$emit('delete-message');

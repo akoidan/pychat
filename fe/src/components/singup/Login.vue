@@ -18,19 +18,18 @@
 </template>
 
 <script lang='ts'>
-  import {Component, Prop, Vue} from "vue-property-decorator";
+  import {Component, Prop, Vue, Ref} from "vue-property-decorator";
   import AppSubmit from "@/components/ui/AppSubmit"
   import {State} from '@/utils/storeHolder';
-  import {login} from "@/utils/utils";
+  import {ApplyGrowlErr, login} from '@/utils/utils';
   import SocialAuth from '@/components/singup/SocialAuth';
   import CaptchaComponent from '@/components/singup/CaptchaComponent';
 
   @Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
   export default class Register extends Vue {
 
-    $refs: {
-      form: HTMLFormElement
-    };
+    @Ref()
+    form!: HTMLFormElement;
 
     running: boolean = false;
 
@@ -38,12 +37,10 @@
       this.store.setRegHeader('Welcome back!');
     }
 
-    login() {
-      this.running = true;
-      this.$api.login(this.$refs.form, (session: string, err: string) => {
-        this.running = false;
-        login(session, err);
-      });
+    @ApplyGrowlErr('Logging error', 'running')
+    async login() {
+      let ses: string = await this.$api.login(this.form);
+      login(ses)
     }
 
   }

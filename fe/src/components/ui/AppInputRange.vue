@@ -2,18 +2,17 @@
   <input type="range" @input="oninput" v-bind:value="value" :class="cls" ref="el" />
 </template>
 <script lang="ts">
-  import {Component, Vue, Prop} from "vue-property-decorator";
+  import {Component, Vue, Prop, Ref} from "vue-property-decorator";
   import {getUniqueId} from "@/utils/htmlApi";
 
   @Component
   export default class AppInputRange extends Vue {
-    style: any;
-    cls: string;
-    @Prop() value: number;
+    private style: any;
+    private cls!: string;
+    @Prop() public readonly value!: number;
 
-    $refs: {
-      el: HTMLInputElement
-    };
+    @Ref()
+    el!: HTMLInputElement;
 
     created() {
       this.style = document.createElement('style');
@@ -29,15 +28,15 @@
       document.head.removeChild(this.style);
     }
 
-    oninput(event) {
+    oninput(event: Event) {
       this.fixStyle();
-      this.$emit('input', parseInt(event.target.value));
+      this.$emit('input', parseInt((<HTMLInputElement>event.target).value));
     }
 
     fixStyle() {
-      let min  = parseInt(this.$refs.el.getAttribute('min') || '0');
-      let max = parseInt(this.$refs.el.getAttribute('max') || '100');
-      let v = parseFloat(this.$refs.el.value);
+      let min  = parseInt(this.el.getAttribute('min') || '0');
+      let max = parseInt(this.el.getAttribute('max') || '100');
+      let v = parseFloat(this.el.value);
       let p = Math.round((v - min) / (max - min) * 100);
       this.style.textContent = `.${this.cls}::-webkit-slider-runnable-track {background-size: ${p}% 100%, 100% 100% !important; } `;
     }

@@ -23,10 +23,10 @@
 
     search: string = '';
 
-    @Prop() value: UserModel[];
-    @Prop() text: string;
-    @Prop() excludeUsersIds: number[];
-    @Prop({default: true}) showInviteUsers: boolean;
+    @Prop() value!: UserModel[];
+    @Prop() text!: string;
+    @Prop() excludeUsersIds!: number[];
+    @Prop({default: true}) showInviteUsers!: boolean;
 
     removeUser(currentUser: UserModel) {
       this.value.splice(this.value.indexOf(currentUser), 1);
@@ -34,7 +34,7 @@
 
     get users(): UserModel[] {
       let uids: number[] = this.value.map(a => a.id);
-      uids.push(this.store.userInfo.userId);
+      uids.push(this.store.userInfo!.userId);
       uids.push(...this.excludeUsersIds);
       let users: UserModel[] = [];
       this.store.usersArray.forEach(u => {

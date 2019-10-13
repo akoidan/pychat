@@ -65,9 +65,6 @@
       }
     }
 
-
-
-
     created() {
       messageBus.$on('scroll', () => {
         this.$nextTick(function () {

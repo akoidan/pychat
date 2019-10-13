@@ -28,6 +28,9 @@ declare module 'vue/types/vue' {
   }
 }
 
+function r2d22() {
+
+}
 
 let mixin = {
   computed: {

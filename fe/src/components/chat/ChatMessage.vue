@@ -9,7 +9,7 @@
 </template>
 <script lang="ts">
   import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
+  import {Component, Prop, Vue, Ref} from "vue-property-decorator";
   import {
     CurrentUserInfoModel,
     CurrentUserSettingsModel,
@@ -38,13 +38,12 @@
     public readonly userSettings!: CurrentUserSettingsModel;
     @State
     public readonly userInfo!: CurrentUserInfoModel;
-    @Prop() message: MessageModel;
+    @Prop() message!: MessageModel;
     @State
     public readonly editedMessage!: EditingMessage;
 
-    $refs: {
-      content: HTMLElement
-    };
+    @Ref()
+    content!: HTMLElement
 
     get id() {
       return this.message.id;
@@ -58,13 +57,13 @@
       messageBus.$emit('quote', this.message);
     }
 
-    contextmenu(event) {
+    contextmenu(event: Event) {
       sem(event, this.message, false, this.userInfo, this.store.setEditedMessage);
     }
 
     updated() {
       this.$nextTick(function () {
-        if (this.$refs.content) {
+        if (this.content) {
           this.seEvents();
         } else {
           this.logger.debug("Skipping event settings, because node is gone")();
@@ -79,14 +78,14 @@
     private seEvents() {
       this.logger.debug("Setting events")();
       if (this.userSettings.highlightCode) {
-        highlightCode(this.$refs.content);
+        highlightCode(this.content);
       }
       if (this.userSettings.embeddedYoutube) {
-        setYoutubeEvent(this.$refs.content)
+        setYoutubeEvent(this.content)
       }
-      setVideoEvent(this.$refs.content);
-      setImageFailEvents(this.$refs.content, messageBus);
-      setAudioEvent(this.$refs.content);
+      setVideoEvent(this.content);
+      setImageFailEvents(this.content, messageBus);
+      setAudioEvent(this.content);
     }
 
     encodeMessage(message: MessageModel) {

@@ -20,7 +20,7 @@
 </template>
 
 <script lang="ts">
-  import {Component, Prop, Vue, Watch} from "vue-property-decorator";
+  import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
   import {
     RECAPTCHA_PUBLIC_KEY,
     PUBLIC_PATH,
@@ -38,28 +38,30 @@
     captchaInited: boolean = false;  // if current component was initialized
     resettingAllowed: boolean = false; // prevent resetting on initial load
     isIframe: boolean = window.location.protocol === "file:";
-    $refs: {
-      repactha: HTMLElement;
-      iframe: HTMLIFrameElement;
-    };
+
+    @Ref()
+    repactha!: HTMLElement;
+
+    @Ref()
+    iframe!: HTMLIFrameElement;
 
     skipInitReset: boolean = true;
     id = captchaId++;
 
 
-    @Prop() value;
-    private event: (E: MessageEvent) => any = null;
+    @Prop() public value!: string;
+    private event:( (E: MessageEvent) => void) |null = null;
 
     private ifIframeUrl: string = `${CAPTCHA_IFRAME}?site_key=${RECAPTCHA_PUBLIC_KEY}`;
 
 
     @Watch('value')
-    onValueChange(newValue, oldValue) {
+    onValueChange(newValue: string, oldValue: string) {
       if (!newValue && newValue != oldValue) {
         if (this.resettingAllowed) {
-          if (this.isIframe && this.$refs.iframe) {
+          if (this.isIframe && this.iframe) {
             this.logger.log("Resetting captcha")();
-            this.$refs.iframe.contentWindow.postMessage('reset-captcha', '*');
+            this.iframe.contentWindow!.postMessage('reset-captcha', '*');
           } else {
             this.grecaptcha.reset && this.grecaptcha.reset();
           }
@@ -70,7 +72,7 @@
     }
 
     get grecaptcha(): GoogleCaptcha {
-      if (grecaptcha) {
+      if (window.grecaptcha) {
         return window.grecaptcha;
       } else {
         return {
@@ -94,7 +96,7 @@
     }
 
 
-    created() {
+    async created() {
       this.logger.debug("initing captcha with key {}", RECAPTCHA_PUBLIC_KEY)();
       if (this.captcha_key) {
         if (this.isIframe) {
@@ -103,7 +105,7 @@
             this.logger.log("On message {}", event)();
             if (event.data && event.data['g-recaptcha-response']) {
               this.captchaInited = true;
-              this.value = event.data['g-recaptcha-response'];
+              this.value = event.data['g-recaptcha-response']; // TODO emitting prop
             }
           };
           window.addEventListener('message', this.event, false);
@@ -112,7 +114,8 @@
             this.renderCaptcha();
           } else {
             this.$emit('input', true);
-            this.$api.loadRecaptcha(() => this.renderCaptcha());
+            await this.$api.loadRecaptcha();
+            this.renderCaptcha();
           }
         }
       }

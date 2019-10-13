@@ -12,19 +12,13 @@
       * [Run test docker image](#run-test-docker-image)
       * [Run prod docker image](#run-prod-docker-image)
       * [Native setup](#production-setup-without-docker)
-          * [Archlinux prod](#archlinux-prod)
-          * [CentOs prod](#centos-prod)
-          * [Common](#common)
       * [Frontend](#frontend)
       * [Desktop app](#desktop-app)
       * [Android app](#android-app)
   * [Development setup](#development-setup)
      * [Install OS packages](#install-os-packages)
-       * [Windows](#windows)
-       * [Ubuntu](#ubuntu)
-       * [Archlinux](#archlinux)
      * [Bootstrap files](#bootstrap-files)
-     * [Configure Pycharm if you use it](#configure-pycharm-if-you-use-it)
+     * [Configure IDEs if you use it](#configure-ides-if-you-use-it)
      * [Start services and run](#start-services-and-run)
   * [Contribution guide](#contribution-guide)
      * [Description](#description)
@@ -215,7 +209,9 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  8. Populate project files: `bash download_content.sh all`
 
 
-## Configure Pycharm if you use it:
+## Configure IDEs if you use it:
+
+### Pycharm
  1. Enable django support. Go to Settings -> Django -> Enable django support. 
    - Django project root: root directory of your project. Where .git asides.
    - Put `Settings:` to `chat/settings.py`
@@ -224,6 +220,42 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
   - You might want to exclude: `.idea`
   - mark `templates` directory as `Template Folder`
  4. Add tornado script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `start_tornado`. Remove port value.
+ 
+ 
+### Webstorm
+ 
+#### Set template
+ 1. New
+ 2. Edit files templates...
+ 3. Vue single file component
+
+```vue
+<template>
+    <div>#[[$END$]]#</div>
+</template>
+
+<script lang="ts">
+  import {State} from '@/utils/store';
+  import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
+
+  @Component
+  export default class ${COMPONENT_NAME} extends Vue {
+   
+  }
+</script>
+<style lang="sass" scoped>
+
+</style>
+```
+
+#### Disable tslint
+Tslint is already included to tsconfig so IDEs like webstorm would support linting
+
+ 1. Settings
+ 2. Typescript
+ 3. Tslint
+ 4. Disable tslint
+
  
 ## Configure Webstorm
  - to resolve absolute path for webpack webstorm requires webpack.config.js. Go to settings -> javascript -> webpack -> Webpack config file  
@@ -327,29 +359,29 @@ Every vue component has injected `.$logger` object, to log something to console 
 This project uses [vue-property-decorator](https://github.com/kaorun343/vue-property-decorator) (that's has a dependency [vue-class-component](https://github.com/vuejs/vue-class-component)) [vuex-module-decorators](https://github.com/championswimmer/vuex-module-decorators). You should write your component as the following:
 
 ```typescript
-import { Vue, Component, Prop, Watch, Emit } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch, Emit, Ref } from 'vue-property-decorator'
+import {userModule, State} from '@/utils/storeHolder'; // vuex module example
+
 
 @Component
 export class MyComp extends Vue {
+  
+  @Ref
+  button: HTMLInputElement;
 
-  @Prop(Number) readonly propA!: number;
-  dataA: number = 0; // data directly maps to this
+  @Prop readonly propA!: number;
+  
+  @State
+  public readonly users!: User[];
 
   @Watch('child')
   onChildChanged(val: string, oldVal: string) { }
 
-  @Emit()
+  @Emit() 
   changedProps() {}
-  
-  // getter example
-  get stateFoo() { // -> $store.state.foo
-    return this.store.foo; // this.$store.state.foo
-  }
 
-  created () {
-    this.propA // this.props.propA 
-    this.store.actionFoo({ value: true }) // -> this.$store.dispatch('foo', { value: true })
-    this.store.mutateA({ value: true }) // -> this.$store.commit('mutateA', { value: true })
+  async created() {
+    userModule.setUsers(await this.$api.getUsers());
   }
 }
 ```

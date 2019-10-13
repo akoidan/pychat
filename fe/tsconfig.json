@@ -6,6 +6,9 @@
     "paths": {
       "@/*": ["src/*"]
     },
+    "plugins": [
+      { "transform": "ts-optchain/transform" }
+    ],
     "moduleResolution": "node",
     "target": "es5",
     "sourceMap": true,

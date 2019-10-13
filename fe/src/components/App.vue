@@ -20,18 +20,18 @@
   export default class App extends Vue {
 
     @State
-    public readonly userSettings: CurrentUserSettingsModel;
+    public readonly userSettings!: CurrentUserSettingsModel;
+
+    @State
+    public readonly growls!: GrowlModel[];
 
     get mainClass(): string {
       return this.userSettings && this.userSettings.theme || 'color-reg';
     }
 
-    @State
-    public growls: GrowlModel[];
-
     @Watch('mainClass')
-    onMainClassChange(value) {
-      document.body.parentElement.className = value;
+    onMainClassChange(value: string) {
+      document.body.parentElement!.className = value;
     }
 
   }

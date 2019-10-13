@@ -79,7 +79,7 @@ export interface MessageTransferInfo {
 export  interface MessageModel {
   id: number;
   time: number;
-  files: {[id: string]: FileModel}| null;
+  files: {[id: string]: FileModel}| null; // THIS IS STRING, not number!!
   content: string|null;
   symbol: string|null;
   deleted: boolean;

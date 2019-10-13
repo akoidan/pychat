@@ -30,7 +30,7 @@
     components: {ChatMessageHeader, ChatSendingFileTransfer, AppProgressBar}
   })
   export default class ChatSendingFile extends Vue {
-    @Prop() sendingFile: SendingFile;
+    @Prop() sendingFile!: SendingFile;
     @State
     public readonly myId!: number;
 

@@ -160,7 +160,7 @@ public acceptFile(connId: string, received: number) {
     this.sendToServer(newVar, true);
   }
 
-  public async saveSettings(content: UserSettingsDto) {
+  public async saveSettings(content: UserSettingsDto): Promise<SetSettingsMessage|unknown> {
     this.sendToServer({
       action: 'setSettings',
       content,
@@ -168,7 +168,7 @@ public acceptFile(connId: string, received: number) {
     return new Promise((resolve, reject) => this.appendCB(resolve));
   }
 
-  public async saveUser(content: UserProfileDto) {
+  public async saveUser(content: UserProfileDto) : Promise<SetUserProfileMessage|unknown> {
     this.sendToServer({
       action: 'setUserProfile',
       content,
@@ -176,7 +176,7 @@ public acceptFile(connId: string, received: number) {
     return new Promise((resolve, reject) => this.appendCB(resolve));
   }
 
-  public sendAddRoom(name: string, volume: number, notifications: boolean, users: number[], cb: Function) {
+  public sendAddRoom(name: string|null, volume: number, notifications: boolean, users: number[], cb: Function) {
     this.sendToServer({
       users,
       name,

@@ -9,7 +9,7 @@ function StateDecoratorFactory<ProviderType extends VuexModule>(vuexModule: Prov
       >(vueComponent: ConsumerType,
         fileName: PropName) {
     {
-      Object.defineProperty(vueComponent, fileName, Object.getOwnPropertyDescriptor(vuexModule, fileName));
+      Object.defineProperty(vueComponent, fileName, <PropertyDescriptor>Object.getOwnPropertyDescriptor(vuexModule, fileName));
     }
   }
 
@@ -20,7 +20,7 @@ function StateDecoratorFactory<ProviderType extends VuexModule>(vuexModule: Prov
         fileName: PropName,
         descriptor: PropertyDescriptor) {
     {
-      descriptor.value = Object.getOwnPropertyDescriptor(vuexModule, fileName).value;
+      descriptor.value = Object.getOwnPropertyDescriptor(vuexModule, fileName)!.value;
     }
   }
 

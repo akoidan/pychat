@@ -8,7 +8,7 @@
 <script lang="ts">
   import {State} from '@/utils/storeHolder';
   import debounce from 'lodash.debounce';
-  import {Component, Prop, Vue, Watch} from "vue-property-decorator";
+  import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
   import {RoomModel, SearchModel} from "@/types/model";
   import {MessageModelDto} from "@/types/dto";
   import {channelsHandler} from "@/utils/singletons";
@@ -21,16 +21,15 @@
   @Component
   export default class SearchMessages extends Vue {
 
-    @Prop() room: RoomModel;
+    @Prop() room!: RoomModel;
 
-    $refs: {
-      inputSearch: HTMLInputElement
-    };
+    @Ref()
+    inputSearch!: HTMLInputElement;
 
-    debouncedSearch: Function;
+    debouncedSearch: Function|null = null;
     search: string = '';
     offset: number = 0;
-    currentRequest: XMLHttpRequest = null;
+    currentRequest: XMLHttpRequest|null = null;
     searchResult: string = '';
     searchedIds = [];
 
@@ -49,10 +48,10 @@
     }
 
     @Watch('searchActive')
-    onSearchActiveChange(value) {
+    onSearchActiveChange(value: boolean) {
       if (value) {
         this.$nextTick(function () {
-          this.$refs.inputSearch.focus();
+          this.inputSearch.focus();
         })
       }
     }
@@ -79,24 +78,25 @@
       } as SetSearchTo);
     }
 
-    doSearch(search: string) {
+    async doSearch(search: string) {
       if (search) {
-        this.currentRequest = this.$api.search(search, this.room.id, this.offset, (a: MessageModelDto[], e: string) => {
-          this.logger.debug("http response {} {}", a, e)();
-          this.currentRequest = null;
-          if (e) {
-            this.searchResult = e;
-            this.mutateSearchedIds([], search);
-          } else if (a.length) {
+        try {
+         let a: MessageModelDto[] = await  this.$api.search(search, this.room.id, this.offset, r => this.currentRequest = r);
+         this.logger.debug("http response {} {}", a)();
+         this.currentRequest = null;
+          if (a.length) {
             channelsHandler.addMessages(this.room.id, a);
             let ids = this.room.search.searchedIds.concat([]);
             this.mutateSearchedIds(a.map(a => a.id), search);
-            this.searchResult = null;
+            this.searchResult = '';
           } else {
             this.mutateSearchedIds([], search);
             this.searchResult = 'No results found';
           }
-        });
+        } catch (e) {
+          this.searchResult = e;
+          this.mutateSearchedIds([], search);
+        }
       } else {
         this.mutateSearchedIds([], search);
         this.searchResult = START_TYPING;
