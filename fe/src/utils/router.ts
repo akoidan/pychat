@@ -17,7 +17,6 @@ import UserProfileInfo from '@/components/pages/UserProfileInfo.vue';
 import UserProfileSettings from '@/components/pages/UserProfileSettings.vue';
 import CreatePrivateRoom from '@/components/pages/CreatePrivateRoom.vue';
 import PainterPage from '@/components/pages/PainterPage.vue';
-import AmChart from '@/components/pages/AmChart.vue';
 import CreatePublicRoom from '@/components/pages/CreatePublicRoom.vue';
 import ViewProfilePage from '@/components/pages/ViewProfilePage.vue';
 import RoomSettings from '@/components/pages/RoomSettings.vue';
@@ -61,7 +60,7 @@ const router = new VueRouter({
           path: '/painter'
         },
         {
-          component: AmChart,
+          component: () => import(/* webpackChunkName: "amchart" */ '@/components/pages/AmChart.vue'),
           path: '/statistics'
         },
         {

@@ -9,7 +9,6 @@ import {IStorage, JsAudioAnalyzer} from '@/types/types';
 import WebRtcApi from '@/webrtc/WebRtcApi';
 import Subscription from '@/utils/Subscription';
 import Http from '@/utils/Http';
-
 import Vue, { Component } from 'vue';
 import { ExtendedVue } from 'vue/types/vue';
 

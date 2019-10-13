@@ -67,7 +67,6 @@
       this.model = currentUserInfoModelToDto(this.userInfo);
     }
 
-
     @ApplyGrowlErr('Error saving profile', 'running')
     async save() {
       this.logger.debug('Saving userProfile')();

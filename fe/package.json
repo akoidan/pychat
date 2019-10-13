@@ -37,6 +37,7 @@
   },
   "homepage": "https://github.com/Deathangel908/pychat#readme",
   "devDependencies": {
+    "@types/amcharts": "^3.21.4",
     "@types/chai": "^4.1.4",
     "@types/chrome": "^0.0.82",
     "@types/electron-devtools-installer": "^2.2.0",
@@ -82,6 +83,7 @@
     "workbox-webpack-plugin": "^4.2.0"
   },
   "dependencies": {
+    "amcharts3": "3.21.13",
     "cordova": "^9.0.0",
     "cordova-android": "^8.1.0",
     "electron-devtools-installer": "^2.2.4",

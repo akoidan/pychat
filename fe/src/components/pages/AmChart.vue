@@ -5,6 +5,8 @@
 </template>
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
+  import 'amcharts3/amcharts/amcharts';
+  import 'amcharts3/amcharts/pie';
 
   interface AmChartI {
     dataItem: { wedge: { node: HTMLElement } }
@@ -54,16 +56,14 @@
         }
       };
       await this.$api.statistics();
-
       // @ts-ignore: next-line
-      let amcharts = await import( /* webpackChunkName: "amcharts" */ '@/utils/amchart.js');
-      var chart = amcharts.makeChart("chartdiv", data);
+      var chart = window.AmCharts.makeChart("chartdiv", data);
       chart.addListener("init", () => {
+        // @ts-ignore: next-line
         chart.legend.addListener("rollOverItem", handleRollOver);
       });
-      chart.addListener("rollOverSlice", function(e: AmChartI) {
-        handleRollOver(e);
-      });
+      // @ts-ignore: next-line
+      chart.addListener("rollOverSlice", handleRollOver);
 
       function handleRollOver(e: AmChartI) {
         var wedge = e.dataItem.wedge.node;

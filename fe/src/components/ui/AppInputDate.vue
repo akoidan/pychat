@@ -34,6 +34,10 @@
 
     }
 
+    oninputnative(e: InputEvent) {
+      this.input(e);
+    }
+
     @Emit()
     input(e: InputEvent){
       return (<HTMLInputElement>e.target).value;

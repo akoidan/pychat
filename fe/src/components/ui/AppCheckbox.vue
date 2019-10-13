@@ -19,6 +19,10 @@
     @Prop()
     public readonly value!: boolean;
 
+    onchange(e: Event) {
+      this.input(e);
+    }
+
     @Emit()
     input(e: Event) {
       return this.checkbox.checked;
