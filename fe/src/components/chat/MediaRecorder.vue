@@ -6,7 +6,7 @@
 </template>
 <script lang="ts">
 
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {stopVideo} from '@/utils/htmlApi';
   import MediaCapture from '@/utils/MediaCapture';
@@ -25,44 +25,45 @@
 
     // started: number = null;
     timeout: number = 0;
-    navigatorRecord: MediaCapture;
+    navigatorRecord: MediaCapture|null = null;
 
 
     async switchRecord() {
       this.logger.debug("switch recrod...")();
       // this.started = Date.now();
-      await new Promise((resolve) => this.timeout = setTimeout(resolve, HOLD_TIMEOUT));
-      this.timeout = null;
+      await new Promise((resolve) => this.timeout = window.setTimeout(resolve, HOLD_TIMEOUT));
+      this.timeout = 0;
       await this.startRecord();
       this.logger.debug("switch record timeouted...")();
-      this.timeout = null;
+      this.timeout = 0;
     }
 
     async startRecord() {
       this.logger.debug("Starting recording...")();
-      store.setDim(true);
-      this.navigatorRecord = new MediaCapture(this.isRecordingVideo, (data) => {
+      this.store.setDim(true);
+      // TODO wtf unknown
+      this.navigatorRecord = new MediaCapture(this.isRecordingVideo, (data: unknown) => {
         this.logger.debug("Finishing recording... {}", data)();
-        store.setDim(false);
+        this.store.setDim(false);
         if (data) {
           this.emitData(data);
         }
       });
       try {
-        let src: MediaStream = await this.navigatorRecord.record();
+        let src: MediaStream = (await this.navigatorRecord.record())!;
         this.logger.debug("Resolved record emitting video")();
         this.$emit("record", {isVideo: this.isRecordingVideo, src: src});
       } catch (error) {
-        store.setDim(false);
+        this.store.setDim(false);
         this.emitData(null);
         if (String(error.message).indexOf("Permission denied") >= 0) {
           if (isChrome && !isMobile) {
-            store.growlError(`Please allow access for ${document.location.origin} in chrome://settings/content/microphone`);
+            this.store.growlError(`Please allow access for ${document.location.origin} in chrome://settings/content/microphone`);
           } else {
-            store.growlError(`You blocked the access to microphone/video. Please Allow it to continue`);
+            this.store.growlError(`You blocked the access to microphone/video. Please Allow it to continue`);
           }
         } else {
-          store.growlError("Unable to capture input device because " + error.message);
+          this.store.growlError("Unable to capture input device because " + error.message);
         }
         this.logger.error("Error during capturing media {} {}", error, error.message)();
         this.navigatorRecord.stopRecording();
@@ -70,7 +71,7 @@
       }
     }
 
-    private emitData(data) {
+    private emitData(data:unknown) {
       if (this.isRecordingVideo) {
         this.$emit("video", data);
       } else {
@@ -81,10 +82,10 @@
     releaseRecord() {
       this.logger.debug("releaseRecord now {}, timeout {}", this.dim, this.timeout)();
       if (this.dim) {
-        this.navigatorRecord.stopRecording();
+        this.navigatorRecord!.stopRecording();
       } else if (this.timeout) {
         clearTimeout(this.timeout);
-        this.timeout = null;
+        this.timeout = 0;
         this.isRecordingVideo = !this.isRecordingVideo;
       }
     }

@@ -12,7 +12,7 @@ import {FileTransferStatus, ReceivingFile} from '@/types/model';
 import FileSender from '@/webrtc/FileSender';
 import NotifierHandler from '@/utils/NotificationHandler';
 import {browserVersion} from '@/utils/singletons';
-import MessageHandler from '@/utils/MesageHandler';
+import MessageHandler, {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 import {sub} from '@/utils/sub';
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from '@/utils/consts';
 import {requestFileSystem} from '@/utils/htmlApi';
@@ -41,12 +41,13 @@ export default class WebRtcApi extends MessageHandler {
     this.store = store;
   }
 
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> }  = {
-    offerFile: this.onofferFile,
-    offerCall: this.offerCall,
+  protected readonly handlers: HandlerTypes  = {
+    offerFile: <HandlerType>this.onofferFile,
+    offerCall: <HandlerType>this.offerCall,
   };
 
-  private onofferFile(message: OfferFile) {
+
+  private onofferFile(message: OfferFile): void {
     let limitExceeded = message.content.size > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem;
     let payload: ReceivingFile = {
       roomId: message.roomId,
@@ -66,7 +67,8 @@ export default class WebRtcApi extends MessageHandler {
     this.notifier.showNotification(this.store.allUsersDict[message.userId].user, {
       body: `Sends file ${message.content.name}`,
       requireInteraction: true,
-      icon: faviconUrl
+      icon: <string>faviconUrl,
+      replaced: 1,
     });
     this.store.addReceivingFile(payload);
     this.wsHandler.replyFile(message.connId, browserVersion);
@@ -93,7 +95,7 @@ export default class WebRtcApi extends MessageHandler {
     sub.notify({action: 'declineFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
   }
 
-  offerFile(file, channel) {
+  offerFile(file: File, channel: number) {
     if (file.size > 0) {
       this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, (e: WebRtcSetConnectionIdMessage) => {
         if (e.connId) {

@@ -3,30 +3,29 @@
 </template>
 
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue, Watch} from "vue-property-decorator";
+  import {State} from '@/utils/storeHolder';
+  import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
 
   @Component
   export default class VideoObject extends Vue {
-    @Prop() mediaStreamLink: string;
-    @Prop() muted: string;
+    @Prop() mediaStreamLink!: string;
+    @Prop() muted!: string;
 
-    $refs: {
-      video: HTMLVideoElement
-    }
+    @Ref()
+    video!: HTMLVideoElement;
 
 
     @Watch("mediaStreamLink")
-    onMediaStreamChanged(newValue) {
-      let stream: MediaStream = store.mediaObjects[newValue];
+    onMediaStreamChanged(newValue: string) {
+      let stream: MediaStream = this.store.mediaObjects[newValue];
       this.logger.log("Media stream changed {} {}", newValue, stream)();
       if (stream) {
-        this.$refs.video.srcObject = stream;
-        this.$refs.video.play();
+        this.video.srcObject = stream;
+        this.video.play();
       } else {
-        this.$refs.video.src = '';
-        this.$refs.video.srcObject = null;
-        this.$refs.video.pause();
+        this.video.src = '';
+        this.video.srcObject = null;
+        this.video.pause();
       }
     }
   }

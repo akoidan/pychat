@@ -13,38 +13,32 @@
 </template>
 
 <script lang='ts'>
-  import {Vue, Component, Prop} from "vue-property-decorator";
-  import AppSubmit from "@/components/ui/AppSubmit.vue"
-  import {store, State} from '@/utils/storeHolder';
-
-  import CaptchaComponent from '@/components/singup/CaptchaComponent.vue';
+  import {Vue, Component, Prop, Ref} from "vue-property-decorator";
+  import AppSubmit from "@/components/ui/AppSubmit"
+  import {State} from '@/utils/storeHolder';
+  import CaptchaComponent from '@/components/singup/CaptchaComponent';
+  import {ApplyGrowlErr} from '@/utils/utils';
 
   @Component({components: {CaptchaComponent, AppSubmit}})
   export default class ResetPassword extends Vue {
 
-    $refs: {
-      form: HTMLFormElement;
-      repactha: HTMLElement;
-    };
+    @Ref()
+    form!: HTMLFormElement;
+
+    @Ref()
+    repactha!: HTMLElement;
 
     running: boolean = false;
 
     created() {
-      store.setRegHeader('Restore password');
+      this.store.setRegHeader('Restore password');
     }
 
-    restorePassword(event) {
-      this.running = true;
-      this.$api.sendRestorePassword(this.$refs.form, error => {
-        this.running = false;
-        if (error) {
-          store.growlError(error)
-        } else {
-          store.growlSuccess("We send you an reset password email, please follow the instruction in it");
-        }
-      })
+    @ApplyGrowlErr('Error resettings passwd', 'running')
+    async restorePassword(event: Event) {
+      await this.$api.sendRestorePassword(this.form);
+      this.store.growlSuccess('We send you an reset password email, please follow the instruction in it');
     }
-
 
   }
 </script>

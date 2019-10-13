@@ -28,7 +28,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {IncomingCallModel, RoomDictModel, UserModel} from "@/types/model";
   import {webrtcApi} from '@/utils/singletons';
@@ -36,7 +36,7 @@
   @Component
   export default class IncomingCall extends Vue {
 
-    @Prop() call: IncomingCallModel;
+    @Prop() call!: IncomingCallModel;
     @State
     public readonly allUsersDict!: {[id: number]: UserModel} ;
 

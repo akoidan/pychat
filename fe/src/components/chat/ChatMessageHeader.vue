@@ -5,7 +5,7 @@
    </span>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {messageBus} from '@/utils/singletons';
   import {UserDictModel} from '@/types/model';
@@ -14,16 +14,15 @@
   @Component
   export default class ChatMessageHeader extends Vue {
 
-    @Prop() userId: number;
-    @Prop() time: number;
+    @Prop() userId!: number;
+    @Prop() time!: number;
 
     @State
     public readonly allUsersDict!: UserDictModel;
 
     setActiveUser() {
-      store.setActiveUserId(this.userId);
+      this.store.setActiveUserId(this.userId);
     }
-
 
     get username() {
       return this.allUsersDict[this.userId].user;
@@ -32,7 +31,6 @@
     get getTime() {
       return timeToString(this.time);
     }
-
 
     quote() {
       this.$emit('quote');

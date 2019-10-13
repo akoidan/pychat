@@ -44,7 +44,7 @@
 </template>
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {store, State} from '@/utils/storeHolder';;
+  import {State} from '@/utils/storeHolder';
   import {ReceivingFile, FileTransferStatus} from "@/types/model";
   import {bytesToSize} from "@/utils/utils";
   import AppProgressBar from "@/components/ui/AppProgressBar";
@@ -55,7 +55,7 @@
     components: {ChatMessageHeader, AppProgressBar}
   })
   export default class ChatReceivingFile extends Vue {
-    @Prop() receivingFile: ReceivingFile;
+    @Prop() receivingFile!: ReceivingFile;
     @State
     public readonly myId!: number;
     FileTransferStatus = FileTransferStatus;

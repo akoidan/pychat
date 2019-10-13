@@ -11,9 +11,10 @@ import {
 } from '@/utils/consts';
 import {StorageData} from '@/types/types';
 
+
 let logger = loggerFactory.getLoggerColor('utils', '#007a70');
 
-export function logout(errMessage: string) {
+export function logout(errMessage?: string) {
   store.logout();
   if (errMessage) {
     store.growlError( errMessage);
@@ -25,20 +26,20 @@ export function logout(errMessage: string) {
   channelsHandler.removeAllSendingMessages();
 }
 
-export function getDay(dateObj) {
+export function getDay(dateObj: Date) {
   let month = dateObj.getUTCMonth() + 1; // months from 1-12
   let day = dateObj.getUTCDate();
   let year = dateObj.getUTCFullYear();
   return `${year}/${month}/${day}`;
 }
 
-export function bounce(ms): (cb) => void {
-  let stack;
-  let lastCall;
+export function bounce(ms: number): (cb: Function) => void {
+  let stack: number | null;
+  let lastCall: Function;
   return function(cb) {
     lastCall = cb;
     if (!stack) {
-      stack = setTimeout(() => {
+      stack = window.setTimeout(() => {
         stack = null;
         lastCall();
       }, ms);
@@ -48,7 +49,7 @@ export function bounce(ms): (cb) => void {
 export async function initStore() {
   let isNew = await storage.connect();
   if (!isNew) {
-    let data: StorageData = await storage.getAllTree();
+    let data: StorageData | null = await storage.getAllTree();
     let session = sessionHolder.session;
     globalLogger.log('restored state from db {}, userId: {}, session {}', data, store.userInfo && store.userInfo.userId, session)();
     if (data) {
@@ -56,8 +57,8 @@ export async function initStore() {
         store.init(data.setRooms);
       } else {
         store.roomsArray.forEach((storeRoom: RoomModel) => {
-          if (data.setRooms.roomsDict[storeRoom.id]) {
-            let dbMessages: {[id: number]: MessageModel} = data.setRooms.roomsDict[storeRoom.id].messages;
+          if (data!.setRooms.roomsDict[storeRoom.id]) {
+            let dbMessages: {[id: number]: MessageModel} = data!.setRooms.roomsDict[storeRoom.id].messages;
             for (let dbMessagesKey in dbMessages) {
               if (!storeRoom.messages[dbMessagesKey])
               store.addMessage(dbMessages[dbMessagesKey]);
@@ -84,16 +85,10 @@ export async function initStore() {
   }
 }
 
-export function login(session, errMessage) {
-  if (errMessage) {
-    store.growlError( errMessage);
-  } else if (/\w{32}/.exec(session)) {
-    sessionHolder.session = session;
-    logger.log('Proceeding to /')();
-    router.replace(`/chat/${ALL_ROOM_ID}`);
-  } else {
-    store.growlError( session);
-  }
+export function login(session: string) {
+  sessionHolder.session = session;
+  logger.log('Proceeding to /')();
+  router.replace(`/chat/${ALL_ROOM_ID}`);
 }
 
 declare const gapi: any;
@@ -103,22 +98,22 @@ let googleInited: boolean = false;
 let fbInited: boolean = false;
 
 
-
-export function  extractError (args) {
+export function  extractError (args: unknown |unknown[]| {name: string}) {
   try {
+    let value: { name: string, message: string, rawError: string } = args as { name: string, message: string, rawError: string };
     if (typeof args === 'string') {
       return args;
-    } else if (args.length > 1) {
+    } else if ((<unknown[]>args).length > 1) {
       return Array.prototype.join.call(args, ' ');
-    } else if (args.length === 1) {
-      args = args[0];
+    } else if ((<unknown[]>args).length === 1) {
+      value = (<unknown[]>args)[0] as { name: string, message: string, rawError: string };
     }
-    if (args && (args.name || args.message) ) {
-      return `${args.name}: ${args.message}`;
-    } else if (args.rawError) {
-      return args.rawError;
+    if (value && (value.name || value.message) ) {
+      return `${value.name}: ${value.message}`;
+    } else if (value.rawError) {
+      return value.rawError;
     } else {
-      return JSON.stringify(args);
+      return JSON.stringify(value);
     }
   } catch (e) {
     return `Error during parsing error ${e}, :(`;
@@ -130,44 +125,69 @@ export function getChromeVersion () {
   return raw ? parseInt(raw[2], 10) : false;
 }
 
-export function initGoogle(cb) {
+export async function initGoogle(): Promise<void> {
   if (!googleInited && GOOGLE_OAUTH_2_CLIENT_ID) {
     logger.log('Initializing google sdk')();
-    api.loadGoogle((e) => {
-      if (typeof gapi.load !== 'function') { // TODO
-        throw Error(`Gapi doesnt have load function ${JSON.stringify(Object.keys(gapi))}`);
-      }
-      gapi.load('client:auth2', () => {
-        logger.log('gapi 2 is ready')();
-        gapi.auth2.init({client_id: GOOGLE_OAUTH_2_CLIENT_ID}).then(() => {
-          logger.log('gauth 2 is ready')();
-          googleInited = true;
-          cb();
-        }).catch(e => {
-          logger.error('Unable to init google {}', e)();
-          cb(e);
-        });
-      });
-    });
-  } else {
-    cb();
+    await api.loadGoogle();
+    if (typeof gapi.load !== 'function') { // TODO
+      throw Error(`Gapi doesnt have load function ${JSON.stringify(Object.keys(gapi))}`);
+    }
+    await new Promise(r => gapi.load('client:auth2', r));
+    logger.log('gapi 2 is ready')();
+    await gapi.auth2.init({client_id: GOOGLE_OAUTH_2_CLIENT_ID});
+    logger.log('gauth 2 is ready')();
+    googleInited = true;
   }
 }
 
-export function initFaceBook(cb) {
+// Allow only boolean fields be pass to ApplyGrowlErr
+type ClassType = { new (...args: any[]): any };
+type ValueFilterForKey<T extends InstanceType<ClassType>, U> = {
+  [K in keyof T]: U extends T[K] ? K : never;
+}[keyof T];
+
+
+// TODO add success growl, and specify error property so it reflects forever in comp
+export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
+      message: string|null,
+      runningProp?: ValueFilterForKey<T, boolean>,
+      vueProperty?: ValueFilterForKey<T, string>
+) {
+  return function (target: T, propertyKey: string, descriptor: PropertyDescriptor) {
+    const original = descriptor.value;
+    descriptor.value = async function(...args: unknown[]) {
+      try {
+        if (runningProp) {
+          target[runningProp] = true;
+        }
+        return await original.apply(this, args);
+      } catch (e) {
+        if (message) {
+          store.growlError(message + (e.message | e));
+        } else if (vueProperty) {
+          target[vueProperty] = String(e);
+        } else {
+          throw e;
+        }
+      } finally {
+        if (runningProp) {
+          target[runningProp] = false;
+        }
+      }
+    };
+  };
+}
+
+export async function initFaceBook() {
   if (!fbInited && FACEBOOK_APP_ID) {
-    api.loadFacebook(e => {
-      logger.log('Initing facebook sdk...')();
-      FB.init({
-        appId: FACEBOOK_APP_ID,
-        xfbml: true,
-        version: 'v2.7'
-      });
-      fbInited = true;
-      cb();
+    await api.loadFacebook();
+    logger.log('Initing facebook sdk...')();
+    FB.init({
+      appId: FACEBOOK_APP_ID,
+      xfbml: true,
+      version: 'v2.7'
     });
-  } else {
-    cb();
+    fbInited = true;
   }
 }
 
@@ -183,9 +203,14 @@ export function bytesToSize(bytes: number): string {
 const ONE_DAY = 24 * 60 * 60 * 1000;
 
 
-export function sem(event, message: MessageModel, isEditingNow: boolean, userInfo: CurrentUserInfoModel, setEditedMessage: SingleParamCB<EditingMessage>) {
+export function sem(event: Event, message: MessageModel, isEditingNow: boolean, userInfo: CurrentUserInfoModel, setEditedMessage: (a: EditingMessage) => void) {
   logger.debug('sem {}', message.id)();
-  if (event.target.tagName !== 'IMG' && message.userId === userInfo.userId && !message.deleted && message.time + ONE_DAY > Date.now()) {
+  if (event.target
+      && (<HTMLElement>event.target).tagName !== 'IMG'
+      && message.userId === userInfo.userId
+      && !message.deleted
+      && message.time + ONE_DAY > Date.now()
+  ) {
     event.preventDefault();
     event.stopPropagation();
     let newlet: EditingMessage = {

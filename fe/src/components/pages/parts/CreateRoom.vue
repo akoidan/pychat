@@ -33,11 +33,11 @@
   </div>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppInputRange from "@/components/ui/AppInputRange";
   import AppSubmit from "@/components/ui/AppSubmit";
-  import AddUserToRoom from "@/components/pages/parts/AddUserToRoom.vue";
+  import AddUserToRoom from "@/components/pages/parts/AddUserToRoom";
   import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
   import {AddRoomMessage} from "@/types/messages";
   import AppCheckbox from "@/components/ui/AppCheckbox";
@@ -58,7 +58,7 @@
     roomName: string = '';
     running: boolean = false;
 
-    @Prop() isPublic: boolean;
+    @Prop() isPublic!: boolean;
 
     get inviteUsers(): string {
       return this.isPublic ? "Invite users to new room" : "Select user for private room";
@@ -80,9 +80,9 @@
 
     add() {
       if (this.isPublic && !this.roomName) {
-        store.growlError('Please specify room name');
+        this.store.growlError('Please specify room name');
       } else if (!this.isPublic && this.currentUsers.length === 0) {
-        store.growlError('Please add user');
+        this.store.growlError('Please add user');
       } else {
         this.running = true;
         this.$ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), (e: AddRoomMessage)=> {

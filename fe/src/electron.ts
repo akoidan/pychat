@@ -2,7 +2,7 @@ import {app, BrowserWindow} from 'electron';
 import {IS_DEBUG, ELECTRON_MAIN_FILE, IS_PROD, ELECTRON_IGNORE_SSL} from '@/utils/consts';
 import * as constants from '@/utils/consts';
 
-let mainWindow;
+let mainWindow: BrowserWindow|null;
 
 if (ELECTRON_IGNORE_SSL) {
   app.commandLine.appendSwitch('ignore-certificate-errors', 'true');
@@ -10,8 +10,8 @@ if (ELECTRON_IGNORE_SSL) {
 
 console.log(JSON.stringify(constants));
 
-declare let setImmediate;
-declare let process;
+// declare let setImmediate: () => void;
+// declare let process;
 
 async function createWindow() {
   console.log('creating new window');
@@ -24,12 +24,12 @@ async function createWindow() {
   let url = ELECTRON_MAIN_FILE.replace('{}', app.getAppPath());
   console.log(`loading ${url}`);
 
-  let mainWindow = new BrowserWindow();
+  let mainWindow: BrowserWindow | null = new BrowserWindow();
 
   mainWindow.loadURL(url);
   if (!IS_PROD) {
     mainWindow.webContents.on('did-frame-finish-load', () => {
-      mainWindow.webContents.once('devtools-opened', () => {
+      mainWindow!.webContents.once('devtools-opened', () => {
         if (mainWindow) {
           mainWindow.focus();
           setImmediate(() => {
@@ -39,7 +39,7 @@ async function createWindow() {
           });
         }
       });
-      mainWindow.webContents.openDevTools();
+      mainWindow!.webContents.openDevTools();
     });
   }
 

@@ -3,23 +3,25 @@
   <input type="date" :class="inputClass" v-else v-bind:value="value" @input="oninputnative"/>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
+  import {State} from '@/utils/storeHolder';
+  import {Component, Prop, Vue, Emit} from "vue-property-decorator";
   import {isDateMissing} from '@/utils/htmlApi';
   import {ELECTRON_MAIN_FILE} from '@/utils/consts'
 
-  let Datepicker;
+  let Datepicker: unknown;
   if (!ELECTRON_MAIN_FILE) {
-    Datepicker = () => import( /* webpackChunkName: "vuejs-datepicker" */ 'vuejs-datepicker');
+    // @ts-ignore: next-line
+    Datepicker = (() => import( /* webpackChunkName: "vuejs-datepicker" */ 'vuejs-datepicker'));
   } else {
     Datepicker = Promise.resolve();
   }
 
+  // @ts-ignore: next-line
   @Component({components: {Datepicker}})
   export default class AppInputDate extends Vue {
-    @Prop() value: string;
-    @Prop({default: ''}) inputClass: string;
-    @Prop({default: ''}) inputClassDatepicker: string;
+    @Prop() public value!: string;
+    @Prop({default: ''}) public inputClass!: string;
+    @Prop({default: ''}) public inputClassDatepicker!: string;
 
     get datePickerValue() {
       this.logger.debug("generating date for datepicker {}", this.value)();
@@ -32,10 +34,15 @@
 
     }
 
-    oninputnative(e) {
-      this.$emit('input', e.target.value);
+    oninputnative(e: InputEvent) {
+      this.input(e);
     }
-    oninput(value) {
+
+    @Emit()
+    input(e: InputEvent){
+      return (<HTMLInputElement>e.target).value;
+    }
+    oninput(value: Date) {
       this.logger.debug("generating date for datepicker {}", this.value)();
       this.$emit('input', `${value.getFullYear()}-${value.getMonth()+1}-${value.getDate()}`);
     }

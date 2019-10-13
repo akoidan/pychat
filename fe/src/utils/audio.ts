@@ -14,7 +14,7 @@ export const outgoing = new Audio(<any>ChatOutgoing);
 export const file = new Audio(<any>ChatFile);
 
 
-export  function checkAndPlay(element, volume) {
+export function checkAndPlay(element: HTMLAudioElement, volume: number) {
   if (volume && notifier.isTabMain()) {
     try {
       element.pause();

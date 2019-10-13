@@ -10,19 +10,17 @@
 
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
-  import {store, State} from '@/utils/storeHolder';
-
-
+  import {State} from '@/utils/storeHolder';
+  import {ApplyGrowlErr} from '@/utils/utils';
   @Component
   export default class ConfirmMail extends Vue {
 
-    loading: boolean = true;
-    message: string = null;
-    created() {
-     this.$api.confirmEmail(this.$route.query['token'], (data, error) => {
-        this.loading = false;
-        this.message = data || error;
-     });
+    message: string|null = null;
+    loading!: boolean;
+
+    @ApplyGrowlErr('Confirming email error ', 'loading')
+    async created() {
+      this.message = await this.$api.confirmEmail(<string>this.$route.query['token']);
     }
   }
 </script>

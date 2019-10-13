@@ -25,31 +25,32 @@
 </template>
 
 <script lang='ts'>
-  import {Vue, Component, Prop, Watch} from "vue-property-decorator";
-  import {store, State} from '@/utils/storeHolder';
-  import AppSubmit from "@/components/ui/AppSubmit.vue"
+
+  import {Vue, Component, Prop, Watch, Ref} from "vue-property-decorator";
+  import {State} from '@/utils/storeHolder';
+  import AppSubmit from "@/components/ui/AppSubmit"
   import RegisterFieldSet from '@/components/singup/RegisterFieldSet.vue'
   import debounce from 'lodash.debounce';
   import {IconColor} from '@/types/types';
   import sessionHolder from '@/utils/sessionHolder';
-  import {login} from '@/utils/utils';
+  import {ApplyGrowlErr, login} from '@/utils/utils';
   import SocialAuth from '@/components/singup/SocialAuth';
+  import {SexModelString} from '@/types/model';
 
   @Component({components: {SocialAuth, AppSubmit, RegisterFieldSet}})
   export default class SignUp extends Vue {
 
-    @Prop() oauth_token: string;
-    @Prop() fb_app_id: string;
+    @Prop() public oauth_token!: string;
+    @Prop() public fb_app_id!: string;
 
 
     running: boolean = false;
 
-    $refs: {
-      form: HTMLFormElement,
-    };
+    @Ref()
+    private form!: HTMLFormElement;
 
     created() {
-      store.setRegHeader('Create new account');
+      this.store.setRegHeader('Create new account');
       this.debouncedValidateUserName = debounce(this.checkUserName, 500);
       this.debouncedValidateEmail = debounce(this.checkEmail, 500);
     }
@@ -63,21 +64,24 @@
     emailValidity: string = "";
     userDescription: string = 'Please select username';
     userCheckValue: IconColor = IconColor.NOT_SET;
-    debouncedValidateUserName: Function;
+    debouncedValidateUserName!: Function;
 
 
-    private currentValidateUsernameRequest: XMLHttpRequest;
-    checkUserName(username: string) {
+    private currentValidateUsernameRequest: XMLHttpRequest | null = null;
+
+    async checkUserName(username: string) {
       if (this.currentValidateUsernameRequest) {
         this.currentValidateUsernameRequest.abort();
         this.currentValidateUsernameRequest = null;
       }
-      this.$api.validateUsername(username, errors => {
+      try {
+        this.$api.validateUsername(username, r => this.currentValidateUsernameRequest = r);
+      } catch (errors) {
         this.userCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
         this.usernameValidity = errors ? errors : "";
         this.currentValidateUsernameRequest = null;
         this.userDescription = errors ? errors : `Username is ok!`;
-      });
+      }
     }
 
     @Watch('username')
@@ -148,22 +152,23 @@
     email: string = "";
     emailDescription: string = 'Specify your email. You will be able to join via socials or restore your password later!';
     emailCheckValue: IconColor = IconColor.NOT_SET;
-    debouncedValidateEmail: Function;
+    debouncedValidateEmail!: Function;
 
-    private currentValidateEmailRequest: XMLHttpRequest;
+    private currentValidateEmailRequest: XMLHttpRequest|null = null;
 
-    checkEmail(username: string) {
-      console.log('asd');
-      if(this.currentValidateEmailRequest) {
+    async checkEmail(username: string) {
+      if (this.currentValidateEmailRequest) {
         this.currentValidateEmailRequest.abort();
         this.currentValidateEmailRequest = null;
       }
-      this.currentValidateEmailRequest = this.$api.validateEmail(username, errors => {
+      try {
+         await this.$api.validateEmail(username, r => this.currentValidateEmailRequest = r);
+      } catch (errors) {
         this.emailCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
-        this.emailValidity = errors ? errors : "";
+        this.emailValidity = errors ? errors : '';
         this.emailDescription = errors ? errors : `Email is ok!`;
         this.currentValidateEmailRequest = null;
-      });
+      }
     }
 
 
@@ -199,7 +204,7 @@
     sexCheckValue: IconColor = IconColor.NOT_SET;
 
     @Watch('sex')
-    onSexChange(gender: string) {
+    onSexChange(gender: SexModelString) {
       if (gender == 'Secret') {
         this.sexDescription = `Need a help?`;
         this.sexCheckValue = IconColor.WARN;
@@ -209,12 +214,10 @@
       }
     }
 
-    register() {
-      this.running = true;
-      this.$api.register(this.$refs.form, (session, error )=> {
-        this.running = false;
-        login(session, error);
-      })
+    @ApplyGrowlErr('Error logging in', 'running')
+    async register() {
+      let s: string = await this.$api.register(this.form);
+      login(s);
     }
 
   }

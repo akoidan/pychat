@@ -16,10 +16,10 @@
 
   @Component
   export default class FieldSet extends Vue {
-    @Prop() icon: string;
-    @Prop() validation: IconColor;
-    @Prop() description: string;
-    @Prop() closed: boolean = true;
+    @Prop() public icon!: string;
+    @Prop() public  validation!: IconColor;
+    @Prop() public description!: string;
+    @Prop() public closed: boolean = true; // TODO this doesn't work, default should be in decorator
 
   }
 </script>

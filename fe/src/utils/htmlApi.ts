@@ -1,21 +1,23 @@
 import Vue from 'vue';
 import {MEDIA_API_URL, PASTED_IMG_CLASS} from '@/utils/consts';
 import {MessageDataEncode, UploadFile} from '@/types/types';
-import {FileModel, MessageModel, SexModel, UserModel} from '@/types/model';
+import {FileModel, MessageModel, UserModel} from '@/types/model';
 import recordIcon from '@/assets/img/audio.svg';
 import {getFlag} from '@/utils/flags';
-import {Smile, smileys} from '@/utils/smileys';
+import {Smile, smileys, SmileysStructure} from '@/utils/smileys';
 import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
+import {globalLogger} from '@/utils/singletons';
 
-const tmpCanvasContext = document.createElement('canvas').getContext('2d');
+
+const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
 const logger: Logger = loggerFactory.getLoggerColor('htmlApi', '#007a70');
 
-const savedFiles = {};
+const savedFiles: { [id: string]: Blob } = {};
 
-export const requestFileSystem = window['webkitRequestFileSystem'] || window['mozRequestFileSystem'] || window['requestFileSystem'];
-const escapeMap = {
+export const requestFileSystem: (type: number, size: number, successCallback: FileSystemCallback, errorCallback?: ErrorCallback) => void = window.webkitRequestFileSystem || window.mozRequestFileSystem || window.requestFileSystem;
+const escapeMap: { [id: string]: string } = {
   '&': '&amp;',
   '<': '&lt;',
   '>': '&gt;',
@@ -25,7 +27,7 @@ const escapeMap = {
   '/': '&#x2F;'
 };
 
-export function forEach(array, cb) {
+export function forEach<T extends Node>(array: NodeListOf<T> | undefined, cb: (a: T) => void) {
   if (array && array.length) {
     for (let i = 0; i < array.length; i++) {
       cb(array[i]);
@@ -78,32 +80,37 @@ export function getFlagPath(countryCode: string) {
 }
 
 let uniqueId = 1;
+
 export function getUniqueId() {
   return uniqueId++;
 }
 
 export function getUserSexClass(user: UserModel) {
-  if (user.sex === SexModel.Male) {
+  if (user.sex === 'Male') {
     return 'icon-man';
-  } else if (user.sex === SexModel.Female) {
+  } else if (user.sex === 'Female') {
     return 'icon-girl';
-  } else if (user.sex === SexModel.Secret) {
+  } else if (user.sex === 'Secret') {
     return 'icon-user-secret';
   } else {
     throw Error(`Invalid sex ${user.sex}`);
   }
 }
 
-export function getSmileyHtml (symbol: string) {
-  let smile: Smile;
-  Object.keys(smileys).forEach(k => {
-    smile = smile || smileys[k][symbol];
+export function getSmileyHtml(symbol: string) {
+  let smile: Smile | undefined;
+  let keys22: (keyof SmileysStructure)[] = Object.keys(smileys) as (keyof SmileysStructure)[];
+  keys22.forEach((k: keyof SmileysStructure) => {
+    let smiley = smileys[k];
+    smile = smile || smiley[symbol];
   });
-
+  if (!smile) {
+    throw Error(`Invalid smile ${symbol}`);
+  }
   return `<img src="${smile.src}" symbol="${symbol}" alt="${smile.alt}">`;
 }
 
-export const isDateMissing = (function() {
+export const isDateMissing = (function () {
   let input = document.createElement('input');
   input.setAttribute('type', 'date');
   let notADateValue = 'not-a-date';
@@ -122,21 +129,29 @@ export function encodeSmileys(html: string): string {
 }
 
 export function encodeP(data: MessageModel) {
+  if (!data.content) {
+    throw Error(`Message ${data.id} doesn't have content`);
+  }
   let html = encodeHTML(data.content);
   html = encodeFiles(html, data.files);
   return encodeSmileys(html);
 }
 
-export const canvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d');
+export const canvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO wtf it's nullable?
 
 
-export function placeCaretAtEnd (userMessage: HTMLElement) {
-    let range = document.createRange();
-    range.selectNodeContents(userMessage);
-    range.collapse(false);
-    let sel = window.getSelection();
+export function placeCaretAtEnd(userMessage: HTMLElement) {
+  let range = document.createRange();
+  range.selectNodeContents(userMessage);
+  range.collapse(false);
+  let sel = window.getSelection();
+  if (sel) {
     sel.removeAllRanges();
     sel.addRange(range);
+  } else {
+    globalLogger.warn(`Can't place selection`)();
+  }
+
 }
 
 export function encodeMessage(data: MessageModel) {
@@ -144,9 +159,12 @@ export function encodeMessage(data: MessageModel) {
   if (data.giphy) {
     return `<div class="giphy"><img src='${data.giphy}' /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>`;
   } else {
+    if (!data.content) {
+      throw Error(`Message ${data.id} doesn't have content`);
+    }
     let html = encodeHTML(data.content);
-    let replaceElements = [];
-    patterns.forEach( (pattern) => {
+    let replaceElements: unknown[] = [];
+    patterns.forEach((pattern) => {
       let res = html.replace(pattern.search, pattern.replace);
       if (res !== html) {
         replaceElements.push(pattern.name);
@@ -161,18 +179,18 @@ export function encodeMessage(data: MessageModel) {
   }
 }
 
-function encodeFiles(html, files) {
+function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
   if (files && Object.keys(files).length) {
-    html = html.replace(imageUnicodeRegex,  (s) => {
+    html = html.replace(imageUnicodeRegex, (s) => {
       let v = files[s];
       if (v) {
         if (v.type === 'i') {
-          return `<img src='${resolveMediaUrl(v.url)}' imageId='${v.id}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
+          return `<img src='${resolveMediaUrl(v.url!)}' imageId='${v.id}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
         } else if (v.type === 'v' || v.type === 'm') {
           let className = v.type === 'v' ? 'video-player' : 'video-player video-record';
-          return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
+          return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview!)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
         } else if (v.type === 'a') {
-         return `<img src='${recordIcon}' imageId='${v.id}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
+          return `<img src='${recordIcon}' imageId='${v.id}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
         } else {
           logger.error('Invalid type {}', v.type)();
         }
@@ -184,40 +202,46 @@ function encodeFiles(html, files) {
 }
 
 
-
-
 export function pasteNodeAtCaret(img: Node, div: HTMLElement) {
   div.focus();
   let sel = window.getSelection();
-  let range = sel.getRangeAt(0);
-  range.deleteContents();
-  // Range.createContextualFragment() would be useful here but is
-  // non-standard and not supported in all browsers (IE9, for one)
-  let frag = document.createDocumentFragment();
-  frag.appendChild(img);
-  range.insertNode(frag);
-  // Preserve the selection
-  range = range.cloneRange();
-  range.setStartAfter(img);
-  range.collapse(true);
-  sel.removeAllRanges();
-  sel.addRange(range);
+  if (sel) {
+    let range = sel.getRangeAt(0);
+    range.deleteContents();
+    // Range.createContextualFragment() would be useful here but is
+    // non-standard and not supported in all browsers (IE9, for one)
+    let frag = document.createDocumentFragment();
+    frag.appendChild(img);
+    range.insertNode(frag);
+    // Preserve the selection
+    range = range.cloneRange();
+    range.setStartAfter(img);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  } else {
+    div.appendChild(img);
+    globalLogger.warn(`Can't handle selection`)();
+  }
 }
 
 
 export function pasteHtmlAtCaret(html: string, div: HTMLElement) {
   let divOuter = document.createElement('div');
   divOuter.innerHTML = html;
-  let img = divOuter.firstChild;
+  let img: Node | null = divOuter.firstChild;
+  if (!img) {
+    throw Error(`Can't paste image`);
+  }
   pasteNodeAtCaret(img, div);
 }
 
 
 export function setVideoEvent(e: HTMLElement) {
-  let r = e.querySelectorAll('.video-player');
+  let r: NodeListOf<HTMLElement> = e.querySelectorAll('.video-player');
   forEach(r, e => {
-    let querySelector: HTMLElement = e.querySelector('.icon-youtube-play');
-    let url = e.getAttribute('associatedVideo');
+    let querySelector: HTMLElement = <HTMLElement>e.querySelector('.icon-youtube-play')!;
+    let url: string = e.getAttribute('associatedVideo')!;
     logger.debug('Embedding video url {}', url)();
     querySelector.onclick = function (event) {
       let video = document.createElement('video');
@@ -225,24 +249,24 @@ export function setVideoEvent(e: HTMLElement) {
       video.className = 'video-player-ready';
       logger.debug('Replacing video url {}', url)();
       video.src = resolveMediaUrl(url);
-      e.parentNode.replaceChild(video, e);
+      e.parentNode!.replaceChild(video, e);
       video.play();
     };
   });
 }
 
 export function setAudioEvent(e: HTMLElement) {
-  let r = e.querySelectorAll('.audio-record');
-  forEach(r, e => {
+  let r: NodeListOf<HTMLElement> = e.querySelectorAll('.audio-record');
+  forEach<HTMLElement>(r, (e: HTMLElement) => {
     e.onclick = function (event) {
-      let associatedAudio: string = e.getAttribute('associatedAudio');
+      let associatedAudio: string = e.getAttribute('associatedAudio')!;
       let url: string = resolveMediaUrl(associatedAudio);
       let audio = document.createElement('audio');
       audio.setAttribute('controls', '');
       audio.className = 'audio-player-ready';
       logger.debug('Replacing audio url {}', url)();
       audio.src = url;
-      e.parentNode.replaceChild(audio, e);
+      e.parentNode!.replaceChild(audio, e);
       audio.play();
     };
   });
@@ -252,10 +276,10 @@ export function setImageFailEvents(e: HTMLElement, bus: Vue) {
   let r = e.querySelectorAll('img');
   for (let i = 0; i < r.length; i++) {
     (function (img) {
-      img.onerror = function() {
+      img.onerror = function () {
         this.className += ' failed';
       };
-      img.onload = function() {
+      img.onload = function () {
         bus.$emit('scroll');
       };
     })(r[i]);
@@ -286,48 +310,47 @@ function getTime(time: string): number {
 }
 
 export function setYoutubeEvent(e: HTMLElement) {
-  let r = e.querySelectorAll('.youtube-player');
-  for (let i = 0; i < r.length; i++) {
-    let querySelector: HTMLElement = r[i].querySelector('.icon-youtube-play');
-    let id = r[i].getAttribute('data-id');
+  let r: NodeListOf<HTMLElement> = e.querySelectorAll('.youtube-player');
+  forEach(r, (a: HTMLElement) => {
+    let querySelector: HTMLElement = <HTMLElement>a.querySelector('.icon-youtube-play')!;
+    let id = a.getAttribute('data-id');
     logger.debug('Embedding youtube view {}', id)();
-    querySelector.onclick = (function (e) {
-      return function (event) {
-        let iframe = document.createElement('iframe');
-        let time: string = getTime(e.getAttribute('data-time')).toString();
-        if (time) {
-          time = '&start=' + time;
-        } else {
-          time = '';
-        }
-        let src = `https://www.youtube.com/embed/${id}?autoplay=1${time}`;
-        iframe.setAttribute('src', src);
-        iframe.setAttribute('frameborder', '0');
-        iframe.className = 'video-player-ready';
-        logger.log('Replacing youtube url {}', src)();
-        iframe.setAttribute('allowfullscreen', '1');
-        e.parentNode.replaceChild(iframe, e);
-      };
-    })(r[i]);
-  }
+    querySelector.onclick = function (event: MouseEvent) {
+      let iframe = document.createElement('iframe');
+      let time: string = getTime(e.getAttribute('data-time')!).toString();
+      if (time) {
+        time = '&start=' + time;
+      } else {
+        time = '';
+      }
+      let src = `https://www.youtube.com/embed/${id}?autoplay=1${time}`;
+      iframe.setAttribute('src', src);
+      iframe.setAttribute('frameborder', '0');
+      iframe.className = 'video-player-ready';
+      logger.log('Replacing youtube url {}', src)();
+      iframe.setAttribute('allowfullscreen', '1');
+      e.parentNode!.replaceChild(iframe, e);
+    };
+  });
 }
 
-export function stopVideo(stream: MediaStream) {
+
+export function stopVideo(stream: MediaStream | null) {
   if (stream) {
     logger.debug('Stopping stream {}', stream)();
     if (stream.stop) {
       stream.stop();
     } else {
-      forEach(stream.getVideoTracks(), e => e.stop());
-      forEach(stream.getAudioTracks(), e => e.stop());
+      stream.getVideoTracks().forEach(e => e.stop());
+      stream.getAudioTracks().forEach(e => e.stop());
     }
   }
 }
 
 
 function setBlobName(blob: Blob) {
-  if (!blob['name'] && blob.type.indexOf('/') > 1) {
-    blob['name'] = '.' + blob.type.split('/')[1];
+  if (!blob.name && blob.type.indexOf('/') > 1) {
+    blob.name = '.' + blob.type.split('/')[1];
   }
 }
 
@@ -346,7 +369,7 @@ export function pasteBlobToContentEditable(blob: Blob, textArea: HTMLElement) {
   textArea.appendChild(img);
 }
 
-export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, videoType, errCb: Function) {
+export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, videoType: string, errCb: Function) {
   let video = document.createElement('video');
   if (video.canPlayType(file.type)) {
     video.autoplay = false;
@@ -357,12 +380,16 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
       tmpCanvasContext.canvas.height = video.videoHeight;
       tmpCanvasContext.drawImage(video, 0, 0);
       tmpCanvasContext.canvas.toBlob(function (blob) {
+        if (!blob) {
+          errCb(`Blob for file ${file.name} is not null`);
+          return;
+        }
         let url = URL.createObjectURL(blob);
         let img = document.createElement('img');
         img.className = PASTED_IMG_CLASS;
         img.src = url;
         img.setAttribute('videoType', videoType);
-        blob['name'] = '.jpg';
+        blob.name = '.jpg';
         img.setAttribute('associatedVideo', src);
         savedFiles[src] = file;
         savedFiles[url] = blob;
@@ -374,7 +401,6 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
     errCb(`Browser doesn't support playing ${file.type}`);
   }
 }
-
 
 
 export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
@@ -399,7 +425,7 @@ export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Fun
   }
 }
 
-export function highlightCode(element) {
+export function highlightCode(element: HTMLElement) {
   let s = element.querySelectorAll('pre');
   if (s.length) {
     import( /* webpackChunkName: "highlightjs" */ 'highlightjs').then(hljs => {
@@ -416,13 +442,10 @@ function nextChar(c: string): string {
 }
 
 
-export function getMessageData(userMessage: HTMLElement, currSymbol: string = null): MessageDataEncode {
-  if (!currSymbol) {
-    currSymbol = '\u3500';
-  }
+export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\u3500'): MessageDataEncode {
   let files: UploadFile[] = []; // return array from nodeList
   let images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
-  let fileModels: {[id: number]: FileModel} = {};
+  let fileModels: { [id: string]: FileModel } = {};
   forEach(images, img => {
     let elSymbol = img.getAttribute('symbol');
     if (!elSymbol) {
@@ -430,21 +453,21 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = nu
       elSymbol = currSymbol;
     }
     let textNode = document.createTextNode(elSymbol);
-    img.parentNode.replaceChild(textNode, img);
+    img.parentNode!.replaceChild(textNode, img);
     if (!img.getAttribute('symbol')) { // don't send image again, it's already in server
       let assVideo = img.getAttribute('associatedVideo');
       let assAudio = img.getAttribute('associatedAudio');
-      let type = img.getAttribute('videoType');
+      let type: string = img.getAttribute('videoType')!;
       if (assVideo) {
         files.push({
           file: savedFiles[assVideo],
           type: type,
-          symbol:  elSymbol
+          symbol: elSymbol
         });
         files.push({
-          file: savedFiles[img.getAttribute('src')],
+          file: savedFiles[img.getAttribute('src')!],
           type: 'p',
-          symbol:  elSymbol
+          symbol: elSymbol
         });
         let fileModel: FileModel = {
           id: null,
@@ -468,9 +491,9 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = nu
         fileModels[elSymbol] = fileModel;
       } else {
         files.push({
-          file: savedFiles[img.getAttribute('src')],
+          file: savedFiles[img.getAttribute('src')!],
           type: 'i',
-          symbol:  elSymbol
+          symbol: elSymbol
         });
         let fileModel: FileModel = {
           id: null,
@@ -491,8 +514,8 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = nu
   //   }
   // }); TODO
   userMessage.innerHTML = userMessage.innerHTML.replace(/<img[^>]*symbol="([^"]+)"[^>]*>/g, '$1');
-  let messageContent: string = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
-  messageContent = /^\s*$/.test(messageContent) ? null : messageContent;
+  let messageContent: string | null = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
+  messageContent = !messageContent || /^\s*$/.test(messageContent) ? null : messageContent;
   userMessage.innerHTML = '';
   return {files, messageContent, currSymbol, fileModels};
 }

@@ -7,16 +7,16 @@
   </p>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfoModel, UserModel} from "@/types/model";
   import {timeToString} from "@/utils/htmlApi";
 
   @Component
   export default class ChatChangeOnlineMessage extends Vue {
-    @Prop() time: number;
-    @Prop() userId: number;
-    @Prop() isWentOnline: boolean;
+    @Prop() time!: number;
+    @Prop() userId!: number;
+    @Prop() isWentOnline!: boolean;
 
     @State
     public readonly allUsersDict!: {[id: number]: UserModel} ;
@@ -29,7 +29,7 @@
     }
 
     setActiveUser() {
-      store.setActiveUserId(this.userId);
+      this.store.setActiveUserId(this.userId);
     }
 
     get isUser() {

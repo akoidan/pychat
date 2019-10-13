@@ -6,6 +6,9 @@
     "paths": {
       "@/*": ["src/*"]
     },
+    "plugins": [
+      { "transform": "ts-optchain/transform" }
+    ],
     "moduleResolution": "node",
     "target": "es5",
     "sourceMap": true,
@@ -14,7 +17,18 @@
     "allowSyntheticDefaultImports": true,
     "types": [
       "websql", "webrtc", "chrome"
-    ]
+    ],
+    "resolveJsonModule": true,
+    "declaration": false,
+    "noImplicitAny": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "forceConsistentCasingInFileNames": true,
+    "noEmitOnError": false,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "pretty": true,
+    "strict": true
   },
   "exclude": [
     "node_modules"

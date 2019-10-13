@@ -16,10 +16,11 @@
   </div>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import ChatMessage from "@/components/chat/ChatMessage.vue";
-  import SearchMessages from "@/components/chat/SearchMessages.vue";
+
+  import {Component, Prop, Vue, Ref} from "vue-property-decorator";
+  import {State} from '@/utils/storeHolder';
+  import ChatMessage from "@/components/chat/ChatMessage";
+  import SearchMessages from "@/components/chat/SearchMessages";
   import {ReceivingFile, RoomModel, SearchModel, SendingFile} from "@/types/model";
   import {MessageModelDto} from "@/types/dto";
   import {channelsHandler, messageBus} from "@/utils/singletons";
@@ -31,6 +32,7 @@
   import ChatSendingFile from "@/components/chat/ChatSendingFile";
   import ChatReceivingFile from '@/components/chat/ChatReceivingFile';
   import ChatCall from '@/components/chat/ChatCall';
+  import {ApplyGrowlErr} from '@/utils/utils';
 
   @Component({
     components: {
@@ -45,18 +47,17 @@
     }
   })
   export default class ChatBox extends Vue {
-    @Prop() room: RoomModel;
-
+    @Prop() room!: RoomModel;
 
     loading: boolean = false;
-    $refs: {
-      chatbox: HTMLElement
-    };
+
+    @Ref()
+    private readonly chatbox!: HTMLElement;
 
     scrollBottom: boolean = false;
 
     beforeUpdate() {
-      let el = this.$refs.chatbox;
+      let el = this.chatbox;
       if (el) { // checked, el could be missing
         this.scrollBottom = el.scrollHeight - el.scrollTop <= el.clientHeight + 100;
       } else {
@@ -64,14 +65,11 @@
       }
     }
 
-
-
-
     created() {
       messageBus.$on('scroll', () => {
         this.$nextTick(function () {
-          if (this.$refs.chatbox && this.scrollBottom) {
-            this.$refs.chatbox.scrollTop = this.$refs.chatbox.scrollHeight;
+          if (this.chatbox && this.scrollBottom) {
+            this.chatbox.scrollTop = this.chatbox.scrollHeight;
             this.logger.trace("Scrolling to bottom")();
           }
         });
@@ -84,7 +82,7 @@
 
     get messages() {
       let newArray: any[] = this.room.changeOnline.map(value => ({isChangeOnline: true, ...value}));
-      let dates = {};
+      let dates: {[id: string]: boolean} = {};
       for (let m in this.room.sendingFiles) {
         let sendingFile: SendingFile = this.room.sendingFiles[m];
         newArray.push(sendingFile);
@@ -107,7 +105,7 @@
       return newArray;
     }
 
-    keyDownLoadUp(e) {
+    keyDownLoadUp(e: KeyboardEvent) {
       if (e.which === 33) {    // page up
         this.loadUpHistory(25);
       } else if (e.which === 38) { // up
@@ -116,7 +114,7 @@
         this.loadUpHistory(35);
       } else if (e.shiftKey && e.ctrlKey && e.keyCode === 70) {
         let s = this.room.search;
-        store.setSearchTo({
+        this.store.setSearchTo({
           roomId: this.room.id,
           search: {
             searchActive: !s.searchActive,
@@ -129,54 +127,47 @@
     };
 
     get minIdCalc(): number {
-      return store.minId(this.room.id);
+      return this.store.minId(this.room.id);
     }
 
-    private loadUpHistory(n) {
-      if (!this.loading && this.$refs.chatbox.scrollTop === 0) {
+    @ApplyGrowlErr("Unable to load history", 'loading')
+    private async loadUpHistory(n: number) {
+      if (!this.loading && this.chatbox.scrollTop === 0) {
         let s = this.room.search;
         if (s.searchActive && !s.locked) {
-          this.loading = true;
-          this.$api.search(s.searchText, this.room.id, s.searchedIds.length, (a: MessageModelDto[], e: string) => {
-            this.loading = false;
-            if (e) {
-              store.growlError(e)
-            } else if (a.length) {
-              channelsHandler.addMessages(this.room.id, a);
-              let searchedIds = this.room.search.searchedIds.concat(a.map(a => a.id));
-              store.setSearchTo({
-                roomId: this.room.id,
-                search: {
-                  searchActive: s.searchActive,
-                  searchedIds,
-                  locked: a.length < MESSAGES_PER_SEARCH,
-                  searchText: s.searchText
-                } as SearchModel
-              });
-            } else {
-              store.setSearchTo({
-                roomId: this.room.id,
-                search: {
-                  searchActive: s.searchActive,
-                  searchedIds: s.searchedIds,
-                  locked: true,
-                  searchText: s.searchText
-                }
-              });
-            }
-          });
+          let a: MessageModelDto[] = await this.$api.search(s.searchText, this.room.id, s.searchedIds.length);
+          if (a.length) {
+            channelsHandler.addMessages(this.room.id, a);
+            let searchedIds = this.room.search.searchedIds.concat(a.map(a => a.id));
+            this.store.setSearchTo({
+              roomId: this.room.id,
+              search: {
+                searchActive: s.searchActive,
+                searchedIds,
+                locked: a.length < MESSAGES_PER_SEARCH,
+                searchText: s.searchText
+              } as SearchModel
+            });
+          } else {
+            this.store.setSearchTo({
+              roomId: this.room.id,
+              search: {
+                searchActive: s.searchActive,
+                searchedIds: s.searchedIds,
+                locked: true,
+                searchText: s.searchText
+              }
+            });
+          }
         } else if (!s.searchActive && !this.room.allLoaded) {
-          this.loading = true;
-          this.$ws.sendLoadMessages(this.room.id, this.minIdCalc, n, () => {
-            this.loading = false;
-          });
+          await this.$ws.sendLoadMessages(this.room.id, this.minIdCalc, n);
         }
       }
     }
 
-    onScroll(e) {
-      // globalLogger.debug("Handling scroll {}, scrollTop {}", e, this.$refs.chatbox.scrollTop)();
-      if (e.detail < 0 || e.wheelDelta > 0) {
+    onScroll(e: WheelEvent) {
+      // globalLogger.debug("Handling scroll {}, scrollTop {}", e, this.chatbox.scrollTop)();
+      if (e.detail < 0 || e.deltaY < 0) {
         this.loadUpHistory(10);
       }
     }

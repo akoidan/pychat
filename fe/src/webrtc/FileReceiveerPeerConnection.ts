@@ -7,19 +7,20 @@ import {requestFileSystem} from '@/utils/htmlApi';
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API, MAX_BUFFER_SIZE} from '@/utils/consts';
 import FilePeerConnection from '@/webrtc/FilePeerConnection';
 import {DefaultStore} from'@/utils/store';
+import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {
   private fileSize: number;
-  private fileEntry: any;
-  private fileWriter: any;
-  private blobsQueue = [];
-  private receiveBuffer = [];
+  private fileEntry: FileEntry |null = null;
+  private fileWriter: FileWriter|null = null;
+  private blobsQueue: Blob[] = [];
+  private receiveBuffer: BlobPart[] = [];
   private receivedSize = 0;
   protected connectedToRemote: boolean = true;
   private recevedUsingFile = false;
 
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
-    sendRtcData: this.onsendRtcData,
+  protected readonly handlers: HandlerTypes = {
+    sendRtcData: <HandlerType>this.onsendRtcData,
     retryFile: this.retryFileAccepted,
     retryFileReply: this.retryFileReply,
     acceptFileReply: this.acceptFileReply,
@@ -45,26 +46,41 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.onDestroy();
   }
 
-  private initFileSystemApi(cb) {
+  private async initFileSystemApi() {
     this.logger.debug('Creating temp location {}', bytesToSize(this.fileSize))();
-    if (requestFileSystem) {
-      requestFileSystem(window['TEMPORARY'], this.fileSize, (fs) => {
-        fs.root.getFile(this.connectionId, {create: true}, (fileEntry) => {
-          this.fileEntry = fileEntry;
-          this.fileEntry.createWriter((fileWriter) => {
-            this.fileWriter = fileWriter;
-            if (!this.fileWriter.WRITING) {
-              this.fileWriter.WRITING = 1;
-            }
-            this.fileWriter.onwriteend = this.onWriteEnd.bind(this);
-            this.logger.log('FileWriter is created')();
-            cb(true);
-          }, this.fileSystemErr(1, cb, fs));
+    if (!requestFileSystem) {
+      throw Error('Request FS is not available');
+    }
+    let fs: FileSystem | null = null;
+    try {
+      let fs: FileSystem = await new Promise<FileSystem>((resolve, reject) =>
+          requestFileSystem(
+              window['TEMPORARY'],
+              this.fileSize,
+              resolve,
+              reject
+          )
+      );
+      this.fileEntry = await new Promise<FileEntry>((resolve, reject) =>
+          fs.root.getFile(this.connectionId, {create: true}, resolve, reject)
+      );
+      this.fileWriter = await new Promise<FileWriter>((resolve, reject) =>
+          this.fileEntry!.createWriter(resolve, reject)
+      );
 
-        }, this.fileSystemErr(2, cb, fs));
-      }, this.fileSystemErr(3, cb, null));
-    } else {
-      cb(false);
+      if (!this.fileWriter.WRITING) {
+        this.fileWriter.WRITING = 1;
+      }
+      this.fileWriter.onwriteend = this.onWriteEnd.bind(this);
+      this.logger.log('FileWriter is created')();
+    } catch (e) {
+      this.logger.error('FileSystemApi Error: {}, code {}', e.message || e, e.code)();
+      if (fs && e.code === 22) { // TODO move this to specific entry so we can recreate file
+        await this.clearFS(fs);
+      } else {
+        this.store.growlError('FileSystemApi Error: ' + e.message || e.code || e);
+      }
+      throw e;
     }
   }
 
@@ -78,7 +94,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.store.setReceivingFileStatus(payload);
   }
 
-  protected onChannelMessage(event) {
+  protected onChannelMessage(event: MessageEvent) {
     this.receiveBuffer.push(event.data);
     // chrome accepts bufferArray (.byteLength). firefox accepts blob (.size)
     const receivedSize = event.data.byteLength ? event.data.byteLength : event.data.size;
@@ -117,7 +133,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
 
   private onWriteEnd() {
     if (this.blobsQueue.length > 0) {
-      this.fileWriter.write(this.blobsQueue.shift());
+      this.fileWriter!.write(this.blobsQueue.shift()!);
     } else {
       this.assembleFileIfDone();
     }
@@ -128,7 +144,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
 
   private assembleFileIfDone () {
     if (this.isDone()) {
-      let received = this.recevedUsingFile ? this.fileEntry.toURL() : URL.createObjectURL(new window.Blob(this.receiveBuffer));
+      let received = this.recevedUsingFile ? this.fileEntry!.toURL() : URL.createObjectURL(new window.Blob(this.receiveBuffer));
       this.logger.log('File is received')();
       this.wsHandler.destroyFileConnection(this.connectionId, 'success');
       this.receiveBuffer = []; // clear buffer
@@ -146,37 +162,23 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     }
   }
 
-  private onExceededQuota(fs, cb) {
+  private async clearFS(fs: FileSystem) {
     this.logger.log('Quota exceeded, trying to clear it')();
-    fs.root.createReader().readEntries(function (entries) {
-      entries.forEach( (e) => {
-        function onRemove() {
-          this.logger.log('Removed {}', e.fullPath)();
-        }
-
-        if (e.isFile) {
-          e.remove(onRemove);
-        } else {
-          e.removeRecursively(onRemove);
-        }
-      });
-      cb(true);
-    });
-  }
-
-  private fileSystemErr(errN, cb, fs) {
-    return  (e) => {
-      this.logger.error('FileSystemApi Error {}: {}, code {}', errN, e.message || e, e.code)();
-      if (fs && e.code === 22) {
-        this.onExceededQuota(fs, cb);
+    let entries: Entry[] = await new Promise<Entry[]>((resolve, reject) =>
+        fs.root.createReader().readEntries(resolve, reject)
+    );
+    await Promise.all(entries.map(async (e: Entry) => {
+      if (e.isFile) {
+        await new Promise<void>((resolve, reject) => e.remove(resolve, reject));
+        this.logger.log('Removed file {}', e.fullPath)();
       } else {
-        this.store.growlError('FileSystemApi Error: ' + e.message || e.code || e);
+        await new Promise<void>((resolve, reject) => (<DirectoryEntry>e).removeRecursively(resolve, reject));
+        this.logger.log('Removed directory {}', e.fullPath)();
       }
-      cb(false);
-    };
+    }));
   }
 
-  private  gotReceiveChannel (event) {
+  private gotReceiveChannel(event: RTCDataChannelEvent) {
     this.logger.debug('Received new channel')();
     this.sendChannel = event.channel;
     this.sendChannel.onmessage = this.onChannelMessage.bind(this);
@@ -197,34 +199,35 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.onDestroy();
   }
 
-  public acceptFileReply() {
-    this.initFileSystemApi((fileSystemSucess) => {
-        if (fileSystemSucess || this.fileSize < MAX_ACCEPT_FILE_SIZE_WO_FS_API) {
-          this.waitForAnswer();
-          let rf: SetReceivingFileStatus = {
-            roomId: this.roomId,
-            connId: this.connectionId,
-            error: 'Establishing connection...',
-            status: FileTransferStatus.ERROR
-          };
-          this.store.setReceivingFileStatus(rf);
-
-        } else {
-          let content = `Browser doesn't support acepting file sizes over ${bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API)}`;
+  public async acceptFileReply() {
+    try {
+      await this.initFileSystemApi();
+    } catch (e) {
+        if (this.fileSize > MAX_ACCEPT_FILE_SIZE_WO_FS_API) {
+          let content = `Browser doesn't support accepting file sizes over ${bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API)}`;
           this.wsHandler.destroyFileConnection(this.connectionId, content);
           this.onDestroy();
+          throw e;
         }
-    });
+    }
+    this.waitForAnswer();
+    let rf: SetReceivingFileStatus = {
+      roomId: this.roomId,
+      connId: this.connectionId,
+      error: 'Establishing connection...',
+      status: FileTransferStatus.ERROR
+    };
+    this.store.setReceivingFileStatus(rf);
   }
 
   private waitForAnswer() {
     this.createPeerConnection();
-    this.pc.ondatachannel = this.gotReceiveChannel.bind(this);
+    this.pc!.ondatachannel = this.gotReceiveChannel.bind(this);
     this.wsHandler.acceptFile(this.connectionId, this.receivedSize);
   }
 
 
-  ondatachannelclose(text): void {
+  ondatachannelclose(text: string): void {
     let rf: SetReceivingFileStatus = {
       roomId: this.roomId,
       connId: this.connectionId,

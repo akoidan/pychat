@@ -18,11 +18,15 @@ import {DefaultMessage} from '@/types/messages';
 export interface UploadFile {
    type: string;
    symbol: string;
-   file: File;
+   file: File|Blob;
 }
 
+export type ValueFilterForKey<T extends object, U> = {
+  [K in keyof T]: U extends T[K] ? K : never;
+}[keyof T];
+
 export interface IMessageHandler {
-  handle(message: DefaultMessage);
+  handle(message: DefaultMessage): void;
 }
 
 export interface ChangeStreamMessage extends DefaultMessage {
@@ -31,9 +35,9 @@ export interface ChangeStreamMessage extends DefaultMessage {
 }
 
 export interface MessageDataEncode {
-  messageContent: string;
+  messageContent: string|null;
   files: UploadFile[];
-  fileModels: { [id: number]: FileModel };
+  fileModels: { [id: string]: FileModel };
   currSymbol: string;
 }
 
@@ -62,7 +66,7 @@ export interface SetUploadProgress {
 export interface SetCallOpponent {
   roomId: number;
   opponentWsId: string;
-  callInfoModel: CallInfoModel;
+  callInfoModel: CallInfoModel|null;
 }
 
 export interface SetOpponentVolume {
@@ -100,7 +104,7 @@ export interface StringIdentifier {
 
 export interface MediaIdentifier {
   id: number;
-  media: MediaStream;
+  media: MediaStream|null;
 }
 
 export interface RemovePeerConnection extends DefaultMessage {
@@ -115,7 +119,7 @@ export interface ChangeOnlineEntry {
 export interface SetMessageProgressError {
   messageId: number;
   roomId: number;
-  error: string;
+  error: string|null;
 }
 
 export interface RemoveSendingMessage {
@@ -125,35 +129,37 @@ export interface RemoveSendingMessage {
 
 export  interface IStorage {
   // getIds(cb: SingleParamCB<object>);
-  saveMessages(messages: MessageModel[]);
-  deleteMessage(id: number);
-  deleteRoom(id: number);
-  saveMessage(m: MessageModel);
-  updateRoom(m: RoomSettingsModel);
-  setRooms(rooms: RoomSettingsModel[]);
-  saveRoom(room: RoomModel);
-  setUserProfile(user: CurrentUserInfoModel);
-  setUserSettings( settings: CurrentUserSettingsModel);
-  saveRoomUsers(ru: SetRoomsUsers);
-  setUsers(users: UserModel[]);
+  saveMessages(messages: MessageModel[]): void;
+  deleteMessage(id: number): void;
+  deleteRoom(id: number): void;
+  saveMessage(m: MessageModel): void;
+  updateRoom(m: RoomSettingsModel): void;
+  setRooms(rooms: RoomSettingsModel[]): void;
+  saveRoom(room: RoomModel): void;
+  setUserProfile(user: CurrentUserInfoModel): void;
+  setUserSettings( settings: CurrentUserSettingsModel): void;
+  saveRoomUsers(ru: SetRoomsUsers): void;
+  setUsers(users: UserModel[]): void;
 
-  getAllTree(): Promise<StorageData>;
-  saveUser(users: UserModel);
-  clearStorage();
-  clearMessages();
-  connect();
+  getAllTree(): Promise<StorageData|null>;
+  saveUser(users: UserModel): void;
+  clearStorage(): void;
+  clearMessages(): void;
+  connect(): Promise<boolean>;
   // getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
-  setRoomHeaderId(roomId: number, value: number);
+  setRoomHeaderId(roomId: number, value: number): void;
 }
 
-export interface PostData<T> {
+export interface  PostData<T> {
   url: string;
-  params?: object;
-  cb: ErrorCB<T>;
+  params?: {[id: string]: string|Blob|null|number|boolean};
   formData?: FormData;
   isJsonEncoded?: boolean;
   isJsonDecoded?: boolean;
-  process?: Function;
+  checkOkString?: boolean;
+  requestInterceptor?: (a: XMLHttpRequest) => void;
+  errorDescription?: string;
+  process?: (R: XMLHttpRequest) => void;
 }
 
 export interface AddSendingFileTransfer {
@@ -167,9 +173,11 @@ export interface SetReceivingFileStatus {
   roomId: number;
   connId: string;
   status: FileTransferStatus;
-  error?: string;
+  error?: string|null;
   anchor?: string;
 }
+
+export type ConnectionStatus = 'new' | 'closed';
 
 interface SetSendingFileBase {
   roomId: number;
@@ -189,7 +197,7 @@ export interface SetReceivingFileUploaded {
 
 export interface SetSendingFileStatus extends SetSendingFileBase {
   status: FileTransferStatus;
-  error?: string;
+  error: string|null;
 }
 
 export interface StorageData {
@@ -203,8 +211,8 @@ export interface MessagesLocation {
 }
 
 export interface PrivateRoomsIds {
-  userRooms: {};
-  roomUsers: {};
+  userRooms: {[id: number]: number};
+  roomUsers: {[id: number]: number};
 }
 export interface SetRoomsUsers {
   roomId: number;

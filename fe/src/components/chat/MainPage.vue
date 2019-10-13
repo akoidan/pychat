@@ -38,11 +38,11 @@
 </template>
 
 <script lang='ts'>
-  import {Component, Vue, Watch} from "vue-property-decorator";
+  import {Component, Vue, Watch, Ref} from "vue-property-decorator";
 
-  import RoomUsers from "@/components/chat/RoomUsers.vue"
-  import ChatBox from "@/components/chat/ChatBox.vue"
-  import SmileyHolder from "@/components/chat/SmileyHolder.vue"
+  import RoomUsers from "@/components/chat/RoomUsers"
+  import ChatBox from "@/components/chat/ChatBox"
+  import SmileyHolder from "@/components/chat/SmileyHolder"
   import {
     CurrentUserInfoModel,
     EditingMessage,
@@ -60,14 +60,14 @@
     pasteHtmlAtCaret,
     pasteImgToTextArea, placeCaretAtEnd, stopVideo, timeToString
   } from "@/utils/htmlApi";
-  import NavEditMessage from "@/components/chat/NavEditMessage.vue";
-  import NavUserShow from "@/components/chat/NavUserShow.vue";
+  import NavEditMessage from "@/components/chat/NavEditMessage";
+  import NavUserShow from "@/components/chat/NavUserShow";
   import {sem} from "@/utils/utils";
   import {MessageDataEncode, RemoveSendingMessage, UploadFile} from "@/types/types";
   import {channelsHandler, globalLogger, messageBus, webrtcApi} from "@/utils/singletons";
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import MediaRecorder from '@/components/chat/MediaRecorder';
-
+  import {Route, RawLocation} from 'vue-router'
 
   const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
@@ -94,13 +94,15 @@
 
     // used in mixin from event.keyCode === 38
 
-    srcVideo: string = null;
+    srcVideo: string|null = null;
 
-    $refs: {
-      userMessage: HTMLElement;
-      imgInput: HTMLInputElement;
-      video: HTMLVideoElement;
-    };
+    @Ref()
+    userMessage!: HTMLElement;
+    @Ref()
+    imgInput!: HTMLInputElement;
+    @Ref()
+    video!: HTMLVideoElement;
+
     recordingNow: boolean = false;
 
 
@@ -108,33 +110,33 @@
     onActiveRoomIdChange(val: EditingMessage) {
       this.logger.log("editedMessage changed")();
       if (val && val.isEditingNow) {
-        this.$refs.userMessage.innerHTML = encodeP(this.editingMessageModel);
-        placeCaretAtEnd(this.$refs.userMessage);
+        this.userMessage.innerHTML = encodeP(this.editingMessageModel);
+        placeCaretAtEnd(this.userMessage);
       }
     }
 
     @Watch('srcVideo')
-    onSrcChange(value) {
-      if (this.$refs.video) {
-        this.$refs.video.srcObject = value;
+    onSrcChange(value: MediaStream | MediaSource | Blob | null) {
+      if (this.video) {
+        this.video.srcObject = value;
       }
     }
 
-    beforeRouteEnter(to, frm, next) {
+    beforeRouteEnter(to: Route, frm: Route, next: (to?: RawLocation | false | ((vm: Vue) => any) | void) => void) {
       next(vm => {
         messageBus.$emit("main-join");
       });
     }
 
     onImagePaste(evt: ClipboardEvent) {
-      this.logger.debug("Clipboard has {} files", evt.clipboardData.files.length)();
-      if (evt.clipboardData.files.length) {
-        for (var i = 0; i < evt.clipboardData.files.length; i++) {
-          var file = evt.clipboardData.files[i];
+      if (evt.clipboardData && evt.clipboardData.files && evt.clipboardData.files.length) {
+        this.logger.debug("Clipboard has {} files", evt.clipboardData!.files.length)();
+        for (var i = 0; i < evt.clipboardData!.files.length; i++) {
+          var file = evt.clipboardData!.files[i];
           this.logger.debug("loop {}", file)();
           if (file.type.indexOf("image") >= 0) {
-            pasteImgToTextArea(file, this.$refs.userMessage, err => {
-              store.growlError(err)
+            pasteImgToTextArea(file, this.userMessage, (err: string) => {
+              this.store.growlError(err)
             });
           }
         }
@@ -143,18 +145,18 @@
 
     created() {
       messageBus.$on('quote', (message :MessageModel) => {
-        this.$refs.userMessage.focus();
-        let oldValue = this.$refs.userMessage.innerHTML;
+        this.userMessage.focus();
+        let oldValue = this.userMessage.innerHTML;
         let match = oldValue.match(timePattern);
         let user = this.allUsersDict[message.userId];
         oldValue = match ? oldValue.substr(match[0].length + 1) : oldValue;
-        this.$refs.userMessage.innerHTML = encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message) + encodeHTML(' >>>') + String.fromCharCode(13) +' '+ oldValue;
-        placeCaretAtEnd(this.$refs.userMessage);
+        this.userMessage.innerHTML = encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message) + encodeHTML(' >>>') + String.fromCharCode(13) +' '+ oldValue;
+        placeCaretAtEnd(this.userMessage);
       });
       messageBus.$on("blob", (e: Blob) => {
         this.logger.log("Pasting blob {}", e)();
         this.$nextTick(function () {
-          pasteBlobToContentEditable(e, this.$refs.userMessage);
+          pasteBlobToContentEditable(e, this.userMessage);
         });
       })
     }
@@ -162,7 +164,7 @@
     showSmileys: boolean = false;
 
     addImage() {
-      this.$refs.imgInput.click();
+      this.imgInput.click();
     }
 
     navDeleteMessage() {
@@ -170,25 +172,25 @@
     }
 
     navEditMessage() {
-      store.setEditedMessage({...this.editedMessage, isEditingNow: true});
+      this.store.setEditedMessage({...this.editedMessage, isEditingNow: true});
     }
 
     closeEditing() {
-      store.setEditedMessage(null);
+      this.store.setEditedMessage(null);
     }
 
     handleAddVideo(file: Blob) {
       this.srcVideo = null;
       this.recordingNow = false;
-      this.$refs.video.pause();
+      this.video.pause();
       if (file) {
-        pasteBlobVideoToTextArea(file, this.$refs.userMessage, 'm', e => {
-          store.growlError(e)
-        })
+        pasteBlobVideoToTextArea(file, this.userMessage, 'm', (e :string)=> {
+          this.store.growlError(e)
+        });
       }
     }
 
-    handleRecord({src, isVideo}) {
+    handleRecord({src, isVideo}: {src: string, isVideo: boolean}) {
       this.recordingNow = true;
       if (isVideo) {
         this.srcVideo = src;
@@ -198,19 +200,21 @@
     handleAddAudio(file: Blob) {
       this.recordingNow = false;
       if (file) {
-        pasteBlobAudioToTextArea(file, this.$refs.userMessage);
+        pasteBlobAudioToTextArea(file, this.userMessage);
       }
     }
 
     dropPhoto(evt: DragEvent) {
-      this.logger.debug("Drop photo {} ", evt.dataTransfer.files)();
-      if (evt.dataTransfer.files) {
-        for (var i = 0; i < evt.dataTransfer.files.length; i++) {
+
+      let files : FileList = <FileList><unknown>(evt.dataTransfer && evt.dataTransfer!.files);
+      this.logger.debug("Drop photo {} ", files)();
+      if (files) {
+        for (var i = 0; i < files.length; i++) {
           this.logger.debug("loop")();
-          var file = evt.dataTransfer.files[i];
+          var file = files[i];
           if (file.type.indexOf("image") >= 0) {
-            pasteImgToTextArea(file, this.$refs.userMessage, err => {
-              store.growlError(err)
+            pasteImgToTextArea(file, this.userMessage, (err: string) => {
+              this.store.growlError(err)
             });
           } else {
             webrtcApi.offerFile(file, this.activeRoom.id);
@@ -219,20 +223,20 @@
       }
     }
 
-    handleFileSelect (evt) {
-      let files: File[] = evt.target.files;
-      for (let i = 0; i < evt.target.files.length; i++) {
-        pasteImgToTextArea(files[i], this.$refs.userMessage, err => {
-          store.growlError(err)
+    handleFileSelect (evt: Event) {
+      let files: FileList = (<HTMLInputElement>evt.target).files!;
+      for (let i = 0; i < files.length; i++) {
+        pasteImgToTextArea(files[i], this.userMessage, (err: string) => {
+          this.store.growlError(err)
         });
       }
-      this.$refs.imgInput.value = "";
+      this.imgInput.value = "";
     };
 
 
     addSmiley(code: string) {
       this.logger.log("Adding smiley {}", code)();
-      pasteHtmlAtCaret(getSmileyHtml(code), this.$refs.userMessage);
+      pasteHtmlAtCaret(getSmileyHtml(code), this.userMessage);
     }
 
     checkAndSendMessage(event: KeyboardEvent) {
@@ -240,30 +244,30 @@
         event.preventDefault();
         this.logger.debug("Checking sending message")();
         if (this.editedMessage && this.editedMessage.isEditingNow) {
-          let md: MessageDataEncode = getMessageData(this.$refs.userMessage, this.editingMessageModel.symbol);
+          let md: MessageDataEncode = getMessageData(this.userMessage, this.editingMessageModel.symbol!);
           this.appendPreviousMessagesFiles(md, this.editedMessage.messageId);
           this.editMessageWs(md.messageContent, md.files, this.editedMessage.messageId, this.activeRoomId, md.currSymbol, md.fileModels);
         } else {
-          let md: MessageDataEncode = getMessageData(this.$refs.userMessage);
+          let md: MessageDataEncode = getMessageData(this.userMessage);
           this.sendNewMessage(md);
         }
       } else if (event.keyCode === 27) { // 27 = escape
         this.showSmileys = false;
         if (this.editedMessage) {
-          this.$refs.userMessage.innerHTML = "";
-          store.setEditedMessage(null);
+          this.userMessage.innerHTML = "";
+          this.store.setEditedMessage(null);
 
         }
-      } else if (event.keyCode === 38 && this.$refs.userMessage.innerHTML == "") { // up arrow
+      } else if (event.keyCode === 38 && this.userMessage.innerHTML == "") { // up arrow
         let messages = this.activeRoom.messages;
         if (Object.keys(messages).length > 0) {
-          let maxTime: MessageModel = null;
+          let maxTime: MessageModel |null= null;
           for (let m in messages ) {
             if (!maxTime || (messages[m].time >= maxTime.time)) {
               maxTime = messages[m];
             }
           }
-          sem(event, maxTime, true, this.userInfo, store.setEditedMessage);
+          sem(event, maxTime!, true, this.userInfo, this.store.setEditedMessage);
         }
       }
     }
@@ -291,17 +295,17 @@
           error: null
         }
       };
-      store.addMessage(mm);
-      channelsHandler.sendSendMessage(md.messageContent, this.activeRoomId, md.files, id, now);
+      this.store.addMessage(mm);
+      channelsHandler.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
     }
 
     private editMessageWs(
-        messageContent: string,
+        messageContent: string|null,
         uploadFiles: UploadFile[],
         messageId: number,
         roomId: number,
-        symbol: string,
-        files: {[id: number]: FileModel}): void {
+        symbol: string|null,
+        files: {[id: number]: FileModel}|null): void {
         let mm: MessageModel = {
           roomId,
           deleted: !messageContent,
@@ -314,11 +318,11 @@
           content: messageContent,
           symbol: symbol,
           giphy: null,
-          edited: this.editingMessageModel.edited + 1,
+          edited: this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1,
           files,
           userId: this.userInfo.userId
         };
-      store.addMessage(mm);
+      this.store.addMessage(mm);
       if (messageId < 0 && messageContent) {
         channelsHandler.sendSendMessage(messageContent, roomId, uploadFiles, messageId, this.editingMessageModel.time);
       } else if (messageId > 0 && messageContent) {
@@ -328,10 +332,10 @@
       } else if(!messageContent && messageId < 0) {
         channelsHandler.removeSendingMessage(messageId);
       }
-      store.setEditedMessage(null);
+      this.store.setEditedMessage(null);
     }
 
-    private appendPreviousMessagesFiles(md: MessageDataEncode, messageId) {
+    private appendPreviousMessagesFiles(md: MessageDataEncode, messageId: number) {
       if (!md.messageContent) {
         return
       }
@@ -344,7 +348,7 @@
       }
       let messageFiles: UploadFile[] = channelsHandler.getMessageFiles(messageId);
       messageFiles.forEach(f => {
-        if (md.messageContent.indexOf(f.symbol) >= 0) {
+        if (md.messageContent!.indexOf(f.symbol) >= 0) {
           md.files.push(f);
         }
       });

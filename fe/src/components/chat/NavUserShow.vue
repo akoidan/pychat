@@ -23,7 +23,7 @@
   </nav>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {UserModel} from "@/types/model";
   import {PrivateRoomsIds} from '@/types/types';
@@ -31,8 +31,8 @@
   @Component
   export default class NavUserShow extends Vue {
 
-    @Prop() activeUser: UserModel;
-    @Prop() privateRooms: UserModel;
+    @Prop() activeUser!: UserModel;
+    @Prop() privateRooms!: UserModel;
     running: boolean = false;
     @State
     public readonly privateRoomsUsersIds!: PrivateRoomsIds;
@@ -48,7 +48,7 @@
           if (e && e.roomId) {
             this.$router.replace(`/chat/${e.roomId}`);
           }
-          store.setActiveUserId(null);
+          this.store.setActiveUserId(0);
           this.running = false;
         });
       }
@@ -56,7 +56,7 @@
 
 
     closeActiveUser() {
-      store.setActiveUserId(null);
+      this.store.setActiveUserId(0);
     }
 
   }

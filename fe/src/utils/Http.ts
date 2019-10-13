@@ -13,18 +13,22 @@ export default abstract class Http {
     this.httpLogger = loggerFactory.getLoggerColor('http', '#680061');
   }
 
-  public abstract doGet<T>(fileUrl: string, callback: ErrorCB<T>, isJsonDecoded);
+  public abstract async doGet<T>(fileUrl: string, isJsonDecoded: boolean): Promise<T>;
 
-  public abstract doPost<T>(d: PostData<T>): XMLHttpRequest;
+  public abstract async doPost<T>(d: PostData<T>): Promise<T>;
 
-  public loadJs(fullFileUrlWithProtocol: string, callback): void {
-    this.httpLogger.log('GET out {}', fullFileUrlWithProtocol)();
-    let fileRef = document.createElement('script');
-    fileRef.setAttribute('type', 'text/javascript');
-    fileRef.setAttribute('src', fullFileUrlWithProtocol);
+  public async loadJs(fullFileUrlWithProtocol: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.httpLogger.log('GET out {}', fullFileUrlWithProtocol)();
+      let fileRef = document.createElement('script');
+      fileRef.setAttribute('type', 'text/javascript');
+      fileRef.setAttribute('src', fullFileUrlWithProtocol);
 
-    document.getElementsByTagName('head')[0].appendChild(fileRef);
-    fileRef.onload = callback;
+      document.getElementsByTagName('head')[0].appendChild(fileRef);
+      fileRef.onload = () => resolve();
+      fileRef.onerror = reject;
+    });
+
   }
 
 }

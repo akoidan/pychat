@@ -10,12 +10,13 @@
 
   @Component
   export default class AppSubmit extends Vue {
-    @Prop() value: string;
-    @Prop() running: boolean;
-    get btnClass() {
-      if (this.running) {
-        return "sp-loading";
-      }
+    @Prop()
+    public readonly value!: string;
+    @Prop()
+    public readonly running!: boolean;
+
+    get btnClass(): string {
+      return this.running ? 'sp-loading' : '';
     }
   }
 </script>

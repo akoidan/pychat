@@ -27,8 +27,8 @@ export interface CurrentUserSettingsModel {
 }
 
 export interface GoogleCaptcha {
-  render(div: HTMLElement);
-  reset();
+  render(div: HTMLElement): void;
+  reset(): void;
 }
 
 export interface CurrentUserInfoModel {
@@ -40,28 +40,30 @@ export interface CurrentUserInfoModel {
   email: string;
   birthday: string;
   contacts: string;
-  sex: string;
+  sex: SexModelString;
 }
+
+export type SexModelString = 'Secret' | 'Male' | 'Female';
 
 export interface UserModel {
   user: string;
   id: number;
-  sex: SexModel;
+  sex: SexModelString;
   location: Location;
 }
 
 export interface Location {
-  city: string;
-  country: string;
-  countryCode: string;
-  region: string;
+  city: string |null;
+  country: string|null;
+  countryCode: string|null;
+  region: string|null;
 }
 
 export  interface FileModel {
-  id: number;
-  url: string;
+  id: number|null;
+  url: string|null;
   type: string;
-  preview: string;
+  preview: string|null;
 }
 
 export interface UploadProgressModel {
@@ -70,26 +72,22 @@ export interface UploadProgressModel {
 }
 
 export interface MessageTransferInfo {
-  upload: UploadProgressModel;
-  error: string;
+  upload: UploadProgressModel| null;
+  error: string|null;
 }
 
 export  interface MessageModel {
   id: number;
   time: number;
-  files: {[id: number]: FileModel};
-  content: string;
-  symbol: string;
+  files: {[id: string]: FileModel}| null; // THIS IS STRING, not number!!
+  content: string|null;
+  symbol: string|null;
   deleted: boolean;
-  giphy: string;
-  edited: number;
+  giphy: string|null;
+  edited: number|null;
   roomId: number;
   userId: number;
-  transfer: MessageTransferInfo;
-}
-
-export enum SexModel {
-  Male = 'Male', Female = 'Female', Secret = 'Secret'
+  transfer: MessageTransferInfo|null;
 }
 
 export interface RoomSettingsModel {
@@ -126,7 +124,7 @@ export interface SendingFileTransfer {
   status: FileTransferStatus;
   userId: number;
   upload: UploadProgressModel;
-  error: string;
+  error: string|null;
 }
 
 export enum FileTransferStatus {
@@ -141,8 +139,8 @@ export interface ReceivingFile {
   opponentWsId: string;
   roomId: number;
   connId: string;
-  anchor: string;
-  error: string;
+  anchor: string|null;
+  error: string|null;
   userId: number;
 }
 
@@ -157,7 +155,7 @@ export interface SendingFile {
 
 
 export interface CallInfoModel {
-  mediaStreamLink: string;
+  mediaStreamLink: string|null;
   connected: boolean;
   userId: number;
   opponentCurrentVoice: number;
@@ -168,10 +166,10 @@ export interface CallsInfoModel {
   callContainer: boolean;
   showMic: boolean;
   currentMicLevel: number; // voice
-  mediaStreamLink: string;
-  currentMic: string;
-  currentSpeaker: string;
-  currentWebcam: string;
+  mediaStreamLink: string|null;
+  currentMic: string|null;
+  currentSpeaker: string|null;
+  currentWebcam: string|null;
   showVideo: boolean;
   shareScreen: boolean;
   callActive: boolean;

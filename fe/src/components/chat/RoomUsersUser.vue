@@ -5,7 +5,7 @@
   </li>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {RoomModel, UserModel} from "@/types/model";
   import {
@@ -15,7 +15,7 @@
 
   @Component
   export default class RoomUsersUser extends Vue {
-    @Prop() user: UserModel;
+    @Prop() user!: UserModel;
     @State
     public readonly activeRoom!: RoomModel;
     @State
@@ -32,7 +32,11 @@
     }
 
     getFlag(user: UserModel) {
-      return getFlagPath(user.location.countryCode.toLowerCase());
+      if (user.location.countryCode) {
+        return getFlagPath(user.location.countryCode.toLowerCase());
+      } else {
+        return null;
+      }
     }
 
     get id() {

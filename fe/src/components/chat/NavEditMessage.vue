@@ -9,7 +9,7 @@
 </template>
 <script lang="ts">
 
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {EditingMessage} from "@/types/model";
   import {channelsHandler} from '@/utils/singletons';
@@ -17,7 +17,7 @@
 
   @Component
   export default class NavEditMessage extends Vue {
-    @Prop() editedMessage : EditingMessage;
+    @Prop() editedMessage! : EditingMessage;
 
     m2DeleteMessage() {
       this.$emit('delete-message');

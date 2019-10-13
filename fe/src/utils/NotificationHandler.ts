@@ -12,11 +12,11 @@ const LAST_TAB_ID_VARNAME = 'lastTabId';
 export default class NotifierHandler {
   private logger: Logger;
   private currentTabId: string;
-  private popedNotifQueue: any[] = [];
+  private popedNotifQueue: Notification[] = [];
   /*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
   private serviceWorkedTried = false;
   private serviceWorkerRegistration: any = null;
-  private subscriptionId: string;
+  private subscriptionId: string|null = null;
   private isCurrentTabActive: boolean = false;
   private newMessagesCount: number = 0;
   private unloaded: boolean = false;
@@ -40,18 +40,17 @@ export default class NotifierHandler {
     window.addEventListener('focus', this.onFocus.bind(this));
     window.addEventListener('beforeunload', this.onUnload.bind(this));
     window.addEventListener('unload', this.onUnload.bind(this));
-    this.onFocus();
+    this.onFocus(null);
 
   }
 
-
-  replaceIfMultiple(data) {
+  replaceIfMultiple(data: {title: string, options: NotificationOptions}) {
     let count = 1;
     let newMessData = data.options.data;
     if (newMessData && newMessData.replaced) {
-      forEach(this.popedNotifQueue, e => {
-        if (e.data.title === newMessData.title) {
-          count += e.data.replaced;
+      this.popedNotifQueue.forEach((e: Notification) => {
+        if (e.data && e.data.title === newMessData.title || e.title === newMessData.title) {
+          count += e.replaced || e.data.replaced;
           e.close();
         }
       });
@@ -63,7 +62,7 @@ export default class NotifierHandler {
   }
 
 // Permissions are granted here!
-  private async showNot(title, options) {
+  private async showNot(title: string, options: NotificationOptions) {
     this.logger.debug('Showing notification {} {}', title, options);
     if (this.serviceWorkerRegistration && this.isMobile && this.isChrome) {
       // TODO  options should contain page id here but it's not
@@ -74,6 +73,9 @@ export default class NotifierHandler {
       let data = {title, options};
       this.replaceIfMultiple(data);
       let not = new Notification(data.title, data.options);
+      if (data.options.replaced) {
+        not.replaced = data.options.replaced;
+      }
       this.popedNotifQueue.push(not);
       not.onclick = () => {
         window.focus();
@@ -120,15 +122,8 @@ export default class NotifierHandler {
     if (!this.subscriptionId) {
       throw Error('Current browser doesnt support offline notifications');
     }
-    await new Promise((resolve, reject) => {
-      this.api.registerFCB(this.subscriptionId, this.browserVersion, this.isMobile, e => {
-        if (e) {
-          reject('Unable to save subscription to server because: ' + e);
-        } else {
-          resolve();
-        }
-      });
-    });
+
+    await this.api.registerFCB(this.subscriptionId, this.browserVersion, this.isMobile);
     this.logger.log('Saved subscription to server')();
 
   }
@@ -143,6 +138,7 @@ export default class NotifierHandler {
       if (granted) {
         await this.showNot('Pychat notifications enabled', {
           body: 'You can disable them in room\'s settings',
+          replaced: 1,
         });
       }
       if (!this.serviceWorkedTried) {
@@ -155,7 +151,7 @@ export default class NotifierHandler {
     }
   }
 
-  async showNotification(title, options) {
+  async showNotification(title: string, options: NotificationOptions) {
     if (this.isCurrentTabActive) {
       return;
     }
@@ -194,7 +190,7 @@ export default class NotifierHandler {
     this.unloaded = true;
   }
 
-  onFocus(e: Event = undefined) {
+  onFocus(e: Event|null) {
     localStorage.setItem(LAST_TAB_ID_VARNAME, this.currentTabId);
     if (e) {
       this.logger.trace('Marking current tab as active, pinging server')();

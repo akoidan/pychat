@@ -55,7 +55,7 @@ const logger = loggerFactory.getLoggerColor('store', '#6a6400');
 
 Vue.use(Vuex);
 
-function sleep(ms) {
+function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -74,9 +74,9 @@ export const vueStore = new Vuex.Store({
 });
 
 
-function Validate(target, propertyKey: string, descriptor: PropertyDescriptor) {
+function Validate(target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
   const original = descriptor.value;
-  descriptor.value = function(...args: unknown[]) {
+  descriptor.value = function (...args: unknown[]) {
     try {
       original.apply(this, args);
     } catch (e) {
@@ -94,22 +94,22 @@ function Validate(target, propertyKey: string, descriptor: PropertyDescriptor) {
 })
 export class DefaultStore extends VuexModule {
 
-  storage: IStorage = null;
+  storage: IStorage = null as unknown as IStorage; // We proxy this as soon as we created Storage
   isOnline: boolean = false;
   growls: GrowlModel[] = [];
   dim: boolean = false;
-  incomingCall: IncomingCallModel = null;
+  incomingCall: IncomingCallModel | null = null;
   microphones: { [id: string]: string } = {};
   speakers: { [id: string]: string } = {};
   webcams: { [id: string]: string } = {};
-  editedMessage: EditingMessage = null;
-  activeRoomId: number = null;
-  activeUserId: number = null;
-  userInfo: CurrentUserInfoModel = null;
-  userSettings: CurrentUserSettingsModel = null;
-  userImage: string = null;
+  editedMessage: EditingMessage | null = null;
+  activeRoomId: number | null = null;
+  activeUserId: number | null = null;
+  userInfo: CurrentUserInfoModel | null = null;
+  userSettings: CurrentUserSettingsModel | null = null;
+  userImage: string | null = null;
   allUsersDict: UserDictModel = {};
-  regHeader: string = null;
+  regHeader: string | null = null;
   online: number[] = [];
   roomsDict: RoomDictModel = {};
   mediaObjects: { [id: string]: MediaStream } = {};
@@ -124,13 +124,13 @@ export class DefaultStore extends VuexModule {
     return roomModels;
   }
 
-  get myId(): number {
+  get myId(): number | null {
     return this.userInfo && this.userInfo.userId;
   }
 
   get privateRoomsUsersIds(): PrivateRoomsIds {
-    let roomUsers = {};
-    let userRooms = {};
+    let roomUsers: { [id: number]: number } = {};
+    let userRooms: { [id: number]: number } = {};
     if (this.userInfo) {
       let myId = this.myId;
       this.privateRooms.forEach((r: RoomModel) => {
@@ -160,12 +160,12 @@ export class DefaultStore extends VuexModule {
     return res;
   }
 
-  get maxId(): SingleParamCB<number> {
+  get maxId(): (a: number) => number | null {
     return (id: number) => {
       let messages = this.roomsDict[id].messages;
-      let maxId = null;
+      let maxId: number | null = null;
       for (let m in messages) {
-        if (!(messages[m].id <= maxId)) {
+        if (!maxId || !(messages[m].id <= maxId)) {
           maxId = messages[m].id;
         }
       }
@@ -177,7 +177,7 @@ export class DefaultStore extends VuexModule {
   get minId(): (id: number) => number {
     return (id: number) => {
       let messages = this.roomsDict[id].messages;
-      let minId;
+      let minId = 0;
       for (let m in messages) {
         let id = messages[m].id;
         if (id > 0 && (!minId || id < minId)) {
@@ -189,19 +189,23 @@ export class DefaultStore extends VuexModule {
     };
   }
 
-  get activeRoom(): RoomModel {
-    return this.roomsDict[this.activeRoomId];
+  get activeRoom(): RoomModel | null {
+    if (this.activeRoomId) {
+      return this.roomsDict[this.activeRoomId];
+    } else {
+      return null;
+    }
   }
 
-  get activeUser(): UserModel {
-    return this.allUsersDict[this.activeUserId];
+  get activeUser(): UserModel | null {
+    return this.activeUserId ? this.allUsersDict[this.activeUserId] : null;
   }
 
   get showNav() {
     return !this.editedMessage && !this.activeUserId;
   }
 
-  get editingMessageModel(): MessageModel {
+  get editingMessageModel(): MessageModel | null {
     logger.trace('Eval editingMessageModel')();
     if (this.editedMessage) {
       return this.roomsDict[this.editedMessage.roomId].messages[this.editedMessage.messageId];
@@ -212,7 +216,13 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   setMessageProgress(payload: SetMessageProgress) {
-    this.roomsDict[payload.roomId].messages[payload.messageId].transfer.upload.uploaded = payload.uploaded;
+    let transfer = this.roomsDict[payload.roomId].messages[payload.messageId].transfer;
+    if (transfer && transfer.upload) {
+      transfer.upload.uploaded = payload.uploaded;
+    } else {
+      throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}`);
+    }
+
   }
 
   @Mutation
@@ -222,11 +232,16 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   setUploadProgress(payload: SetUploadProgress) {
-    this.roomsDict[payload.roomId].messages[payload.messageId].transfer.upload = payload.upload;
+    let message = this.roomsDict[payload.roomId].messages[payload.messageId];
+    if (message.transfer) {
+      message.transfer.upload = payload.upload;
+    } else {
+      throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}`);
+    }
   }
 
   @Mutation
-  setIncomingCall(payload: IncomingCallModel) {
+  setIncomingCall(payload: IncomingCallModel | null) {
     this.incomingCall = payload;
   }
 
@@ -389,13 +404,13 @@ export class DefaultStore extends VuexModule {
   @Mutation
   removeMessageProgress(payload: RemoveMessageProgress) {
     let message: MessageModel = this.roomsDict[payload.roomId].messages[payload.messageId];
-    message.transfer.upload = null;
+    message.transfer!.upload = null;
   }
 
   @Mutation
   setMessageProgressError(payload: SetMessageProgressError) {
     let mm: MessageModel = this.roomsDict[payload.roomId].messages[payload.messageId];
-    mm.transfer.error = payload.error;
+    mm.transfer!.error = payload.error;
   }
 
   @Mutation
@@ -421,7 +436,7 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  setEditedMessage(editedMessage: EditingMessage) {
+  setEditedMessage(editedMessage: EditingMessage|null) {
     this.editedMessage = editedMessage;
     this.activeUserId = null;
   }
@@ -590,7 +605,7 @@ export class DefaultStore extends VuexModule {
 
 
   @Action
-  async showGrowl({html, type}) {
+  async showGrowl({html, type}: { html: string, type: GrowlType }) {
     let growl: GrowlModel = {id: Date.now(), html, type};
     this.addGrowl(growl);
     await sleep(4000);
@@ -598,22 +613,22 @@ export class DefaultStore extends VuexModule {
   }
 
   @Action
-  async growlErrorRaw( html) {
+  async growlErrorRaw(html: string) {
     await this.showGrowl({html, type: GrowlType.ERROR});
   }
 
   @Action
-  async growlError(title) {
+  async growlError(title: string) {
     await this.showGrowl({html: encodeHTML(title), type: GrowlType.ERROR});
   }
 
   @Action
-  async growlInfo( title) {
+  async growlInfo(title: string) {
     await this.showGrowl({html: encodeHTML(title), type: GrowlType.INFO});
   }
 
   @Action
-  async growlSuccess(title) {
+  async growlSuccess(title: string) {
     await this.showGrowl({html: encodeHTML(title), type: GrowlType.SUCCESS});
   }
 

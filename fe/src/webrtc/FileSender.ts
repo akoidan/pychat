@@ -7,6 +7,7 @@ import FileSenderPeerConnection from '@/webrtc/FileSenderPeerConnection';
 import {sub} from '@/utils/sub';
 import Subscription from '@/utils/Subscription';
 import {DefaultStore} from'@/utils/store';
+import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class FileSender extends BaseTransferHandler {
   private file: File;
@@ -27,9 +28,9 @@ export default class FileSender extends BaseTransferHandler {
     this.store.addSendingFile(payload);
   }
 
-  protected readonly handlers: { [p: string]: SingleParamCB<DefaultMessage> } = {
-    replyFile: this.replyFile,
-    removePeerConnection: this.removePeerConnection
+  protected readonly handlers: HandlerTypes = {
+    replyFile: <HandlerType>this.replyFile,
+    removePeerConnection: <HandlerType>this.removePeerConnection
   };
 
   replyFile(message: ReplyFileMessage) {

@@ -17,17 +17,16 @@
 <script lang="ts">
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {CurrentUserInfoModel, UserModel} from "@/types/model";
-  import {store} from "@/utils/storeHolder";
 
   @Component
   export default class AddUserToRoom extends Vue {
 
     search: string = '';
 
-    @Prop() value: UserModel[];
-    @Prop() text: string;
-    @Prop() excludeUsersIds: number[];
-    @Prop({default: true}) showInviteUsers: boolean;
+    @Prop() value!: UserModel[];
+    @Prop() text!: string;
+    @Prop() excludeUsersIds!: number[];
+    @Prop({default: true}) showInviteUsers!: boolean;
 
     removeUser(currentUser: UserModel) {
       this.value.splice(this.value.indexOf(currentUser), 1);
@@ -35,10 +34,10 @@
 
     get users(): UserModel[] {
       let uids: number[] = this.value.map(a => a.id);
-      uids.push(store.userInfo.userId);
+      uids.push(this.store.userInfo!.userId);
       uids.push(...this.excludeUsersIds);
       let users: UserModel[] = [];
-      store.usersArray.forEach(u => {
+      this.store.usersArray.forEach(u => {
         if (uids.indexOf(u.id) < 0) {
           users.push(u);
         }

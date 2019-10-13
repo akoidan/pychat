@@ -4,18 +4,26 @@ import {
 } from '@/utils/audioprocc';
 import AbstractPeerConnection from '@/webrtc/AbstractPeerConnection';
 import {
-  ChangeStreamMessage,
+  ChangeStreamMessage, JsAudioAnalyzer,
   SetCallOpponent,
   SetOpponentAnchor,
   SetOpponentVoice
 } from '@/types/types';
 import WsHandler from '@/utils/WsHandler';
 import {DefaultStore} from'@/utils/store';
+import {ConnectToRemoteMessage, DefaultMessage} from '@/types/messages';
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
   private audioProcessor: any;
 
-  constructor(roomId: number, connId: string, opponentWsId: string, userId: number, wsHandler: WsHandler, store: DefaultStore) {
+  constructor(
+      roomId: number,
+      connId: string,
+      opponentWsId: string,
+      userId: number,
+      wsHandler: WsHandler,
+      store: DefaultStore
+  ) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     let payload:  SetCallOpponent = {
       opponentWsId: this.opponentWsId,
@@ -31,10 +39,10 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   }
 
   oniceconnectionstatechange() {
-    if (this.pc.iceConnectionState === 'disconnected') {
+    if (this.pc!.iceConnectionState === 'disconnected') {
       this.logger.log('disconnected')();
       this.onDestroy('Connection has been lost');
-    } else if (['completed', 'connected'].indexOf(this.pc.iceConnectionState) >= 0) {
+    } else if (['completed', 'connected'].indexOf(this.pc!.iceConnectionState) >= 0) {
       this.logger.log('running')();
     }
   }
@@ -48,12 +56,12 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   }
 
 
-  createPeerConnection (event) {
+  createPeerConnection (event: ConnectToRemoteMessage) {
     super.createPeerConnection();
-    this.pc.onaddstream =  (event) => {
+    this.pc!.onaddstream =  (event: MediaStreamEvent) => {
       this.logger.log('onaddstream')();
       let payload: SetOpponentAnchor = {
-        anchor: event.stream,
+        anchor: event.stream!,
         opponentWsId: this.opponentWsId,
         roomId: this.roomId
       };
@@ -72,14 +80,14 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       //   p.catch(Utils.clickToPlay(this.dom.remote))
       // }
       this.removeAudioProcessor();
-      this.audioProcessor = createMicrophoneLevelVoice(event.stream, this.processAudio.bind(this));
+      this.audioProcessor = createMicrophoneLevelVoice(event.stream!, this.processAudio.bind(this));
       // onStreamAttached(this.opponentWsId);
     };
     this.logger.log('Sending local stream to remote')();
-    event && this.pc.addStream(event.stream);
+    event && event.stream && this.pc!.addStream(event.stream);
   }
 
-  processAudio (audioProc) {
+  processAudio (audioProc: JsAudioAnalyzer) {
     return () => {
       let level = getAverageAudioLevel(audioProc); // 256 max
       let clasNu;
@@ -121,7 +129,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     }
   }
 
-  onDestroy(reason?) {
+  onDestroy(reason?: DefaultMessage|string) {
     this.logger.log('Destroying {}, because', this.constructor.name, reason)();
     this.closePeerConnection();
     this.removeAudioProcessor();

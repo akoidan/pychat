@@ -19,7 +19,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import {SendingFile, UserModel} from "@/types/model";
   import {bytesToSize} from '@/utils/utils';
@@ -30,7 +30,7 @@
     components: {ChatMessageHeader, ChatSendingFileTransfer, AppProgressBar}
   })
   export default class ChatSendingFile extends Vue {
-    @Prop() sendingFile: SendingFile;
+    @Prop() sendingFile!: SendingFile;
     @State
     public readonly myId!: number;
 

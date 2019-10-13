@@ -70,22 +70,27 @@
   </div>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue, Watch} from "vue-property-decorator";
+  import {State} from '@/utils/storeHolder';
+  import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
   import {CallInfoModel, CallsInfoModel} from "@/types/model";
   import {BooleanIdentifier, StringIdentifier, VideoType} from "@/types/types";
   import {webrtcApi} from '@/utils/singletons';
   import ChatRemotePeer from '@/components/chat/ChatRemotePeer';
   import {file} from '@/utils/audio';
-  import VideoObject from "@/components/chat/VideoObject.vue";
+  import VideoObject from "@/components/chat/VideoObject";
   @Component({
     components: {VideoObject, ChatRemotePeer}
   })
   export default class ChatCall extends Vue {
-    @Prop() callInfo: CallsInfoModel;
-    @Prop() roomId: number;
+    @Prop() callInfo!: CallsInfoModel;
+    @Prop() roomId!: number;
     showSettings: boolean = false;
 
+    @Ref()
+    localVideo!: VideoObject;
+
+    @Ref()
+    videoContainer!: HTMLElement;
 
     @State
     public readonly microphones!: { [id: string]: string } ;
@@ -95,9 +100,9 @@
     public readonly webcams!: { [id: string]: string } ;
     fullscreen: boolean = false;
 
-    currentVideoActive: string = null;
+    currentVideoActive: string|null = null;
 
-    setCurrentVideo(id) {
+    setCurrentVideo(id: string) {
       if (this.currentVideoActive === id) {
         this.currentVideoActive = null;
       } else {
@@ -105,9 +110,9 @@
       }
     }
 
-    fullScreenChange(event) {
+    fullScreenChange() {
       this.logger.log("fs change")();
-      if (!(document.fullscreenElement || document['webkitFullscreenElement'] || document.mozFullscreenElement || document.msFullscreenElement)) {
+      if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
         this.fullscreen = false;
       }
     }
@@ -133,70 +138,65 @@
         document.msCancelFullScreen();
       } else if (document.mozCancelFullScreen) {
         document.mozCancelFullScreen();
-      } else if (document['webkitCancelFullScreen']) {
-        document['webkitCancelFullScreen']();
+      } else if (document.webkitCancelFullScreen) {
+        document.webkitCancelFullScreen();
       }
       this.fullscreen = false;
     }
 
     enterFullscreen() {
-      let elem: HTMLElement = this.$refs.videoContainer;
+      let elem: HTMLElement = this.videoContainer;
       if (elem.requestFullscreen) {
         elem.requestFullscreen();
       } else if (elem.msRequestFullscreen) {
         elem.msRequestFullscreen();
       } else if (elem.mozRequestFullScreen) {
         elem.mozRequestFullScreen();
-      } else if (elem['webkitRequestFullscreen']) {
-        elem['webkitRequestFullscreen']()
+      } else if (elem.webkitRequestFullscreen) {
+        elem.webkitRequestFullscreen()
       } else {
-        store.growlError("Can't enter fullscreen");
+        this.store.growlError("Can't enter fullscreen");
         return;
       }
       this.fullscreen = true;
     }
 
     @Watch('callInfo.currentSpeaker')
-    onSpeakerChange(newValue) {
+    onSpeakerChange(newValue: string) {
       this.$nextTick(function () {
-        if (this.$refs.localVideo.$refs.video['setSinkId']) {
-          this.$refs.localVideo.$refs.video['setSinkId'](newValue);
+        let video: HTMLVideoElement = <HTMLVideoElement>(this.localVideo.$refs.video);
+        if (video.setSinkId) {
+          video.setSinkId(newValue);
         } else  {
           this.logger.error("SetSinkId doesn't exist")();
         }
       })
     }
 
-
-    $refs: {
-      localVideo: VideoObject,
-      videoContainer: HTMLElement,
-    };
-
-    setCurrentMicProxy(event) {
+    setCurrentMicProxy(event: Event) {
       let payload: StringIdentifier = {
         id: this.roomId,
-        state: event.target.value
+        state: (<HTMLInputElement>event.target).value
       };
-      store.setCurrentMic(payload);
+      this.store.setCurrentMic(payload);
       if (this.callInfo.callActive) {
         webrtcApi.updateConnection(this.roomId);
       }
     }
-    setCurrentWebcamProxy(event) {
+    setCurrentWebcamProxy(event: Event) {
       let payload: StringIdentifier = {
         id: this.roomId,
-        state: event.target.value
+        state: (<HTMLInputElement>event.target).value
       };
-      store.setCurrentWebcam(payload);
+      this.store.setCurrentWebcam(payload);
       if (this.callInfo.callActive) {
         webrtcApi.updateConnection(this.roomId);
       }
     }
 
     playTest() {
-      if (file['setSinkId']) {
-        file['setSinkId'](this.callInfo.currentSpeaker);
+      if (file.setSinkId) {
+        file.setSinkId(this.callInfo.currentSpeaker!);
         file.pause();
         file.currentTime = 0;
         file.volume = 1;
@@ -204,16 +204,16 @@
         prom && prom.catch(function (e) {
         });
       } else {
-        store.growlError("Your browser doesn't support changing output channel")
+        this.store.growlError("Your browser doesn't support changing output channel")
       }
     }
 
-    setCurrentSpeakerProxy(event) {
+    setCurrentSpeakerProxy(event: Event) {
       let payload: StringIdentifier = {
         id: this.roomId,
-        state: event.target.value
+        state: (<HTMLInputElement>event.target).value
       };
-      store.setCurrentSpeaker(payload);
+      this.store.setCurrentSpeaker(payload);
       if (this.callInfo.callActive) {
         webrtcApi.updateConnection(this.roomId);
       }
@@ -256,7 +256,7 @@
         state: !this.callInfo.shareScreen,
         id: this.roomId,
       };
-      store.setShareScreenToState(payload);
+      this.store.setShareScreenToState(payload);
       if (this.callInfo.callActive) {
         webrtcApi.toggleDevice(this.roomId, VideoType.SHARE);
       }
@@ -267,7 +267,7 @@
         state: !this.callInfo.showVideo,
         id: this.roomId,
       };
-      store.setVideoToState(payload);
+      this.store.setVideoToState(payload);
       if (this.callInfo.callActive) {
         webrtcApi.toggleDevice(this.roomId, VideoType.VIDEO);
       }
@@ -278,7 +278,7 @@
         state: !this.callInfo.showMic,
         id: this.roomId,
       };
-      store.setMicToState(payload);
+      this.store.setMicToState(payload);
       if (this.callInfo.callActive) {
         webrtcApi.toggleDevice(this.roomId, VideoType.AUDIO);
       }

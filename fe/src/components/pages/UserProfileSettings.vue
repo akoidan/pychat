@@ -79,13 +79,15 @@
 </template>
 <script lang="ts">
   import {Component, Vue, Watch} from "vue-property-decorator";
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import AppSubmit from "@/components/ui/AppSubmit";
   import AppCheckbox from "@/components/ui/AppCheckbox";
   import {CurrentUserInfoModel, CurrentUserSettingsModel} from "@/types/model";
   import {currentUserInfoDtoToModel, currentUserInfoModelToDto, userSettingsDtoToModel} from "@/types/converters";
   import {UserSettingsDto} from "@/types/dto";
   import {storage} from '@/utils/singletons';
+  import {ApplyGrowlErr} from '@/utils/utils';
+  import {SetSettingsMessage} from '@/types/messages';
 
   @Component({
     components: {AppSubmit, AppCheckbox}
@@ -95,7 +97,7 @@
     @State
     public readonly userSettings!: CurrentUserSettingsModel;
 
-    model: UserSettingsDto = null;
+    private model!: UserSettingsDto;
 
     created() {
       this.model = userSettingsDtoToModel(this.userSettings);
@@ -108,19 +110,18 @@
 
 
     clearHistory() {
-      store.clearMessages();
+      this.store.clearMessages();
     }
 
-    save() {
-      this.running = true;
+
+    @ApplyGrowlErr('Settings saving error', 'running')
+    async save() {
       this.logger.debug("Saving userSettings")();
       let cui : UserSettingsDto = {...this.model};
-      this.$ws.saveSettings(cui, e => {
-        this.running = false;
-        if (e.action === 'setSettings') {
-          store.growlSuccess("Settings have been saved");
-        }
-      })
+      let e: SetSettingsMessage|unknown = await this.$ws.saveSettings(cui);
+      if ((<SetSettingsMessage>e).action === 'setSettings') {
+          this.store.growlSuccess("Settings have been saved");
+      }
     }
   }
 

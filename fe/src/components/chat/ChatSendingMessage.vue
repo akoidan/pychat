@@ -9,7 +9,7 @@
   </div>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import ChatMessage from '@/components/chat/ChatMessage';
   import AppProgressBar from '@/components/ui/AppProgressBar';
@@ -24,7 +24,7 @@
     components: {AppProgressBar, ChatMessage}
   })
   export default class ChatSendingMessage extends Vue {
-    @Prop() message: MessageModel;
+    @Prop() message!: MessageModel;
 
     @State
     public readonly userInfo!: CurrentUserInfoModel;
@@ -62,9 +62,9 @@
         roomId: this.message.roomId,
         error: null
       };
-      store.setMessageProgressError(newVar);
+      this.store.setMessageProgressError(newVar);
       channelsHandler.resendMessage(this.message.id);
-      store.growlInfo("Trying to upload files again");
+      this.store.growlInfo("Trying to upload files again");
     }
   }
 </script>

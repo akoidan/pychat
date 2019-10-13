@@ -43,12 +43,13 @@
   <div v-else>Room #{{roomId}} doesn't exist </div>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppInputRange from '@/components/ui/AppInputRange';
   import AppSubmit from '@/components/ui/AppSubmit';
   import AppCheckbox from '@/components/ui/AppCheckbox';
   import {RoomDictModel, RoomModel, RoomSettingsModel} from "@/types/model";
+  import {ApplyGrowlErr} from '@/utils/utils';
   @Component({components: {AppInputRange, AppSubmit, AppCheckbox}})
   export default class RoomSettings extends Vue {
 
@@ -95,26 +96,19 @@
       return parseInt(id);
     }
 
-
-    apply() {
-      this.logger.log("Applying room {} settings", this.roomId)();
-      this.running = true;
-      this.$api.sendRoomSettings(this.roomName, this.sound, this.notifications, this.roomId, (err) => {
-        if (err) {
-          store.growlError(err)
-        } else {
-          let payload: RoomSettingsModel = {
-            id: this.roomId,
-            name: this.roomName,
-            notifications: this.notifications,
-            volume: this.sound
-          };
-          store.setRoomSettings(payload);
-          store.growlSuccess('Settings has been saved');
-          this.$router.go(-1);
-        }
-        this.running = false;
-      });
+    @ApplyGrowlErr('', 'running')
+    async apply() {
+      this.logger.log('Applying room {} settings', this.roomId)();
+      await this.$api.sendRoomSettings(this.roomName, this.sound, this.notifications, this.roomId);
+      let payload: RoomSettingsModel = {
+        id: this.roomId,
+        name: this.roomName,
+        notifications: this.notifications,
+        volume: this.sound
+      };
+      this.store.setRoomSettings(payload);
+      this.store.growlSuccess('Settings has been saved');
+      this.$router.go(-1);
     }
   }
 </script>

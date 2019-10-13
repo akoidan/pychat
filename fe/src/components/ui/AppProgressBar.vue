@@ -13,7 +13,8 @@
 
   @Component
   export default class AppProgressBar extends Vue {
-    @Prop() upload: UploadProgressModel;
+    @Prop()
+    public readonly upload!: UploadProgressModel;
 
     get totalMb() {
       return bytesToSize(this.upload.total);

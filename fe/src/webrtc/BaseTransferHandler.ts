@@ -10,7 +10,7 @@ import {DefaultStore} from'@/utils/store';
 
 export default abstract class BaseTransferHandler extends MessageHandler {
 
-  protected connectionId: string;
+  protected connectionId: string | null = null;
   protected readonly wsHandler: WsHandler;
   protected readonly notifier: NotifierHandler;
   protected readonly logger: Logger;
@@ -27,8 +27,10 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     this.logger = loggerFactory.getLogger('WRTC', 'color: #960055');
   }
 
-  protected  onDestroy() {
-     sub.unsubscribe(Subscription.getTransferId(this.connectionId));
+  protected onDestroy() {
+    if (this.connectionId) {
+      sub.unsubscribe(Subscription.getTransferId(this.connectionId));
+    }
   }
 
   protected removePeerConnection(payload: RemovePeerConnection) {
@@ -44,10 +46,14 @@ export default abstract class BaseTransferHandler extends MessageHandler {
   }
 
   protected closeAllPeerConnections() { // calls on destroy
+    if (!this.connectionId) {
+      this.logger.error(`Can't close connections since it's null`)();
+      return;
+    }
     this.webrtcConnnectionsIds.forEach(id => {
       sub.notify({
         action: 'destroy',
-        handler: Subscription.getPeerConnectionId(this.connectionId, id)
+        handler: Subscription.getPeerConnectionId(this.connectionId!, id)
       });
     });
   }

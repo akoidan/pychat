@@ -1,10 +1,13 @@
-import {CurrentUserInfoModel, CurrentUserSettingsModel, FileModel, RoomDictModel, UserModel} from '@/types/model';
+import {
+  CurrentUserInfoModel,
+  CurrentUserSettingsModel,
+  FileModel,
+  RoomDictModel,
+  SexModelString,
+  UserModel
+} from '@/types/model';
 
-export enum SexModelDto {
-  Male = 'Male',
-  Female = 'Female',
-  Secret = 'Secret'
-}
+export type SexModelDto = 'Male' | 'Female' |'Secret';
 
 export interface RoomDto {
   name: string;
@@ -17,7 +20,7 @@ export interface RoomDto {
 export interface UserDto {
   user: string;
   userId: number;
-  sex: SexModelDto;
+  sex: SexModelString;
   location: LocationDto;
 }
 
@@ -55,7 +58,7 @@ export interface UserProfileDto {
   email: string;
   birthday: string;
   contacts: string;
-  sex: string;
+  sex: SexModelDto;
   userId: number;
 }
 

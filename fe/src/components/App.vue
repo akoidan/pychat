@@ -11,7 +11,7 @@
 
   import Growl from "@/components/ui/AppGrowl";
   import {Component, Vue, Watch} from "vue-property-decorator";
-  import {GrowlModel} from "@/types/model";
+  import {CurrentUserSettingsModel, GrowlModel} from '@/types/model';
   import {State} from '@/utils/storeHolder';
 
   @Component({
@@ -19,16 +19,19 @@
   })
   export default class App extends Vue {
 
-    get mainClass(): string {
-      return this.store.userSettings && this.store.userSettings.theme || 'color-reg';
-    }
+    @State
+    public readonly userSettings!: CurrentUserSettingsModel;
 
     @State
-    public growls: GrowlModel[];
+    public readonly growls!: GrowlModel[];
+
+    get mainClass(): string {
+      return this.userSettings && this.userSettings.theme || 'color-reg';
+    }
 
     @Watch('mainClass')
-    onMainClassChange(value) {
-      document.body.parentElement.className = value;
+    onMainClassChange(value: string) {
+      document.body.parentElement!.className = value;
     }
 
   }

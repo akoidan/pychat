@@ -16,45 +16,34 @@
 
   import {Prop, Component} from "vue-property-decorator";
   import Vue from 'vue';
-  import {store, State} from '@/utils/storeHolder';
-  import AppSubmit from '@/components/ui/AppSubmit.vue';
+  import {State} from '@/utils/storeHolder';
+  import AppSubmit from '@/components/ui/AppSubmit';
+  import {ApplyGrowlErr} from '@/utils/utils';
 
   @Component({components: {AppSubmit}})
   export default class ApplyResetPassword extends Vue {
 
     restoreUser: string = '';
-    error: string = null;
+    error: string|null = null;
     checkingToken: boolean = false;
     running: boolean = false;
     password: string = '';
     repeatPassword: string = '';
 
 
-    created() {
-      this.checkingToken = true;
-      this.$api.verifyToken(<string>this.$route.query["token"] , (user: string, error: string) => {
-        this.checkingToken = false;
-        if (error) {
-          this.error = error;
-        } else if (user) {
-          this.restoreUser = user;
-        }
-      })
+    @ApplyGrowlErr(null, 'checkingToken', 'error')
+    async created() {
+      this.restoreUser = await this.$api.verifyToken(<string>(this.$route.query['token']));
     }
-    submitResetPassword() {
+
+    @ApplyGrowlErr('Resetting pass err', 'running')
+    async submitResetPassword() {
       if (this.password != this.repeatPassword) {
-        store.growlError("Passords don't match");
+        this.store.growlError("Passords don't match");
       } else {
-        this.running = true;
-        this.$api.acceptToken(<string>this.$route.query["token"], this.password, cb => {
-          this.running = false;
-          if (cb) {
-            store.growlError(cb);
-          } else {
-            store.growlSuccess("Password has been reset");
-            this.$router.replace('/auth/login');
-          }
-        })
+        await this.$api.acceptToken(<string>this.$route.query["token"], this.password);
+        this.store.growlSuccess("Password has been reset");
+        this.$router.replace('/auth/login');
       }
     }
   }

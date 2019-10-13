@@ -42,13 +42,15 @@
   </form>
 </template>
 <script lang="ts">
-  import {store, State} from '@/utils/storeHolder';
+  import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
   import AppSubmit from '@/components/ui/AppSubmit';
-  import {CurrentUserInfoModel, SexModel} from "@/types/model";
+  import {CurrentUserInfoModel, SexModelString} from "@/types/model";
   import {UserProfileDto} from '@/types/dto';
   import {currentUserInfoModelToDto, userSettingsDtoToModel} from "@/types/converters";
   import AppInputDate from '@/components/ui/AppInputDate';
+  import {ApplyGrowlErr} from '@/utils/utils';
+  import {SetUserProfileMessage} from '@/types/messages';
   @Component({
     components: {AppInputDate, AppSubmit}
   })
@@ -56,26 +58,23 @@
     running: boolean = false;
     @State
     public readonly userInfo!: CurrentUserInfoModel;
-    model: UserProfileDto = null;
+    private model!: UserProfileDto;
 
-    sex = SexModel;
+    sex: SexModelString[] = ["Male", "Female", "Secret"];
 
     created() {
-      store.setActiveUserId(null);
+      this.store.setActiveUserId(0);
       this.model = currentUserInfoModelToDto(this.userInfo);
     }
 
-
-    save() {
-      this.running = true;
-      this.logger.debug("Saving userProfile")();
+    @ApplyGrowlErr('Error saving profile', 'running')
+    async save() {
+      this.logger.debug('Saving userProfile')();
       let cui: UserProfileDto = {...this.model};
-      this.$ws.saveUser(cui, e => {
-        this.running = false;
-        if (e && e.action == 'setUserProfile') {
-          store.growlSuccess("User profile has been saved");
-        }
-      })
+      let e: SetUserProfileMessage | unknown = await this.$ws.saveUser(cui);
+      if (e && (<SetUserProfileMessage>e).action == 'setUserProfile') {
+        this.store.growlSuccess('User profile has been saved');
+      }
     }
   }
 </script>
