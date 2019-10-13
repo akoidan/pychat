@@ -241,7 +241,7 @@ export default class DatabaseWrapper implements IStorage {
 
   private async asyncWrite(): Promise<SQLTransaction> {
     return new Promise<SQLTransaction>((resolve, reject) => {
-      this.transaction('transaction', resolve);
+      this.write(resolve);
     });
   }
 

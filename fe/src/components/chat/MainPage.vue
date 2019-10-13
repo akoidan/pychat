@@ -40,7 +40,6 @@
 <script lang='ts'>
   import {Component, Vue, Watch, Ref} from "vue-property-decorator";
 
-  import {oc} from 'ts-optchain';
   import RoomUsers from "@/components/chat/RoomUsers"
   import ChatBox from "@/components/chat/ChatBox"
   import SmileyHolder from "@/components/chat/SmileyHolder"
@@ -130,7 +129,7 @@
     }
 
     onImagePaste(evt: ClipboardEvent) {
-      if (oc(evt).clipboardData.files.length) {
+      if (evt.clipboardData && evt.clipboardData.files && evt.clipboardData.files.length) {
         this.logger.debug("Clipboard has {} files", evt.clipboardData!.files.length)();
         for (var i = 0; i < evt.clipboardData!.files.length; i++) {
           var file = evt.clipboardData!.files[i];
@@ -207,7 +206,7 @@
 
     dropPhoto(evt: DragEvent) {
 
-      let files : FileList = <FileList><unknown>(oc(evt).dataTransfer.files);
+      let files : FileList = <FileList><unknown>(evt.dataTransfer && evt.dataTransfer!.files);
       this.logger.debug("Drop photo {} ", files)();
       if (files) {
         for (var i = 0; i < files.length; i++) {
