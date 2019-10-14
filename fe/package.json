@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "fix": "./node_modules/.bin/eslint \"**.*.vue\"--fix && ./node_modules/.bin/tslint --fix -c ./tslint.json 'src/*.ts'",
+    "fix": "./node_modules/.bin/eslint \"**.*.vue\"--fix ; ./node_modules/.bin/tslint --fix -c ./tslint.json 'src/*.ts' ; ./node_modules/.bin/vue-tslint -g -p . -c tslint.json --fix",
     "prod": "PLATFORM=web BUILD_MODE=production node ./builder.js",
     "dev": "PLATFORM=web BUILD_MODE=development node ./builder.js",
     "electronDev": "PLATFORM=electron BUILD_MODE=development node ./builder.js",
@@ -90,6 +90,7 @@
     "vue-loader": "15.7.1",
     "vue-property-decorator": "8.2.2",
     "vue-template-compiler": "2.6.10",
+    "vue-tslint": "^0.3.2",
     "vuex-module-decorators": "0.10.1",
     "vuex-typescript": "3.0.2",
     "webpack": "4.41.1",
