@@ -44,7 +44,7 @@
       this.email = this.userInfo.email;
     }
 
-    @ApplyGrowlErr('Unable to change email', 'running')
+    @ApplyGrowlErr({ message: 'Unable to change email', runningProp: 'running'})
     async saveProfile() {
       await this.$api.changeEmailLogin(this.email,this.password);
       this.store.growlSuccess("Email has been changed");

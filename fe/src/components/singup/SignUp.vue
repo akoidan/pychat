@@ -75,12 +75,16 @@
         this.currentValidateUsernameRequest = null;
       }
       try {
-        this.$api.validateUsername(username, r => this.currentValidateUsernameRequest = r);
+        await this.$api.validateUsername(username, r => this.currentValidateUsernameRequest = r);
+        this.userCheckValue = IconColor.SUCCESS;
+        this.userDescription = `Username is ok!`;
+        this.usernameValidity = "";
       } catch (errors) {
-        this.userCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
-        this.usernameValidity = errors ? errors : "";
+        this.userCheckValue = IconColor.ERROR;
+        this.usernameValidity = errors;
+        this.userDescription = errors;
+      } finally {
         this.currentValidateUsernameRequest = null;
-        this.userDescription = errors ? errors : `Username is ok!`;
       }
     }
 
@@ -163,10 +167,14 @@
       }
       try {
          await this.$api.validateEmail(username, r => this.currentValidateEmailRequest = r);
+        this.emailCheckValue = IconColor.SUCCESS;
+        this.emailDescription = `Email is ok!`;
+        this.emailValidity = '';
       } catch (errors) {
-        this.emailCheckValue = errors ? IconColor.ERROR : IconColor.SUCCESS;
-        this.emailValidity = errors ? errors : '';
-        this.emailDescription = errors ? errors : `Email is ok!`;
+        this.emailCheckValue = IconColor.ERROR;
+        this.emailValidity = errors;
+        this.emailDescription = errors;
+      } finally {
         this.currentValidateEmailRequest = null;
       }
     }
@@ -214,7 +222,7 @@
       }
     }
 
-    @ApplyGrowlErr('Error logging in', 'running')
+    @ApplyGrowlErr({runningProp: 'running', message: `Can't sign up`})
     async register() {
       let s: string = await this.$api.register(this.form);
       login(s);

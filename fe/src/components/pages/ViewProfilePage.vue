@@ -1,6 +1,6 @@
 <template>
   <div v-if="loading" class="spinner" />
-  <div v-else-if="error">
+  <div v-else-if="error" class="error">
     {{error}}
   </div>
   <div v-else-if="userProfileInfo" class="profileHolder">
@@ -59,7 +59,7 @@
   export default class ViewProfilePage extends Vue {
 
     loading: boolean = false;
-    private error: string|null = null;
+    public error: string|null = null;
     private userProfileInfo: ViewUserProfileDto | null = null;
     @State
     public readonly allUsersDict!: {[id: number]: UserModel} ;
@@ -76,7 +76,7 @@
       return resolveMediaUrl(src);
     }
 
-    @ApplyGrowlErr('Unable to load profile, because', 'loading')
+    @ApplyGrowlErr({ vueProperty: 'error', message: 'Error loading profile', runningProp: 'loading'})
     async created() {
       this.userProfileInfo = await this.$api.showProfile(this.id);
     }
@@ -93,6 +93,12 @@
     text-align: right
   th, td
     padding: 0 5px
+
+  .error
+    padding: 10px
+    display: flex
+    align-self: center
+    font-size: 15px
 
   .spinner
     @include lds-30-spinner-vertical('Loading user profile...')

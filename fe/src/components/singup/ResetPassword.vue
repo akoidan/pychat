@@ -34,10 +34,10 @@
       this.store.setRegHeader('Restore password');
     }
 
-    @ApplyGrowlErr('Error resettings passwd', 'running')
+    @ApplyGrowlErr({runningProp: 'running', message: `Can't reset password`})
     async restorePassword(event: Event) {
       await this.$api.sendRestorePassword(this.form);
-      this.store.growlSuccess('We send you an reset password email, please follow the instruction in it');
+      this.store.growlSuccess('A reset email has been sent to your email address, please follow the instruction in it');
     }
 
   }

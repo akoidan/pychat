@@ -25,7 +25,7 @@
       return Math.random().toString(36).substring(7);
     }
 
-    @ApplyGrowlErr('Autoregistration error:')
+    @ApplyGrowlErr({message: 'Auto-registration error'})
     async created() {
       if (AUTO_REGISTRATION) {
         let s: string = await this.$api.registerDict(this.getRandom(), this.getRandom());

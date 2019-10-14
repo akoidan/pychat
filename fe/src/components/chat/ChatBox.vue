@@ -130,7 +130,7 @@
       return this.store.minId(this.room.id);
     }
 
-    @ApplyGrowlErr("Unable to load history", 'loading')
+    @ApplyGrowlErr({runningProp: 'loading', message: 'Unable to load history'})
     private async loadUpHistory(n: number) {
       if (!this.loading && this.chatbox.scrollTop === 0) {
         let s = this.room.search;

@@ -26,7 +26,7 @@
   import CaptchaComponent from '@/components/singup/CaptchaComponent';
 
   @Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
-  export default class Register extends Vue {
+  export default class Login extends Vue {
 
     @Ref()
     form!: HTMLFormElement;
@@ -37,7 +37,7 @@
       this.store.setRegHeader('Welcome back!');
     }
 
-    @ApplyGrowlErr('Logging error', 'running')
+    @ApplyGrowlErr({runningProp: 'running', message: `Can't log in`})
     async login() {
       let ses: string = await this.$api.login(this.form);
       login(ses)

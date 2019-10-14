@@ -52,13 +52,13 @@
       return this.frunning || !this.facebookApiLoaded;
     }
 
-    @ApplyGrowlErr("Unable to load google")
+    @ApplyGrowlErr({ message: 'Unable to load google'})
     async loadGoogle(): Promise<void> {
       await initGoogle();
       this.googleApiLoaded = true;
     }
 
-    @ApplyGrowlErr("Unable to load facebook")
+    @ApplyGrowlErr({ message: 'Unable to load facebook'})
     async loadFaceBook(): Promise<void> {
       await initFaceBook();
       this.facebookApiLoaded = true;
@@ -79,7 +79,7 @@
       login(s);
     }
 
-    @ApplyGrowlErr("Unable to load facebook", 'grunning')
+    @ApplyGrowlErr({ message: 'Unable to login in with google', runningProp: 'grunning'})
     async logWithGoogle() {
 
       let auth2 = gapi.auth2.getAuthInstance();
@@ -100,7 +100,7 @@
       this.onGoogleSignIn(auth2);
     }
 
-    @ApplyGrowlErr("Unable to login with fb", 'frunning')
+    @ApplyGrowlErr({ message: 'Unable to login in with facebook', runningProp: 'frunning'})
     async fbStatusChangeIfReAuth(response: {status: string}) {
       this.logger.debug("fbStatusChangeIfReAuth {}", response)();
       if (response.status === "connected") {

@@ -114,7 +114,7 @@
     }
 
 
-    @ApplyGrowlErr('Settings saving error', 'running')
+    @ApplyGrowlErr({ message: 'Error saving settings', runningProp: 'running'})
     async save() {
       this.logger.debug("Saving userSettings")();
       let cui : UserSettingsDto = {...this.model};

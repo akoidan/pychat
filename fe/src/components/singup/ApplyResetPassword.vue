@@ -30,13 +30,12 @@
     password: string = '';
     repeatPassword: string = '';
 
-
-    @ApplyGrowlErr(null, 'checkingToken', 'error')
+    @ApplyGrowlErr({runningProp: 'checkingToken', vueProperty: 'error'})
     async created() {
       this.restoreUser = await this.$api.verifyToken(<string>(this.$route.query['token']));
     }
 
-    @ApplyGrowlErr('Resetting pass err', 'running')
+    @ApplyGrowlErr({runningProp: 'running', vueProperty: 'error', message: 'Resetting pass err'})
     async submitResetPassword() {
       if (this.password != this.repeatPassword) {
         this.store.growlError("Passords don't match");

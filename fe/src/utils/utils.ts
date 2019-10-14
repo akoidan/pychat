@@ -86,6 +86,9 @@ export async function initStore() {
 }
 
 export function login(session: string) {
+  if (!/\w{32}/.exec(session)) {
+    throw session;
+  }
   sessionHolder.session = session;
   logger.log('Proceeding to /')();
   router.replace(`/chat/${ALL_ROOM_ID}`);
@@ -149,29 +152,46 @@ type ValueFilterForKey<T extends InstanceType<ClassType>, U> = {
 
 // TODO add success growl, and specify error property so it reflects forever in comp
 export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
-      message: string|null,
+    {message, runningProp, vueProperty}: {
+      message?: string,
       runningProp?: ValueFilterForKey<T, boolean>,
       vueProperty?: ValueFilterForKey<T, string>
+    },
 ) {
+  let processError = function (e: Error|string) {
+    let strError: string = String((<Error>e).message || e);
+    if (vueProperty && message) {
+      // @ts-ignore: next-line
+      this[vueProperty] = `${message}: ${strError}`;
+    } else if (message) {
+      store.growlError(`${message}:  ${strError}`);
+    } else if (vueProperty) {
+      // @ts-ignore: next-line
+      this[vueProperty] = `Error: ${strError}`;
+    } else {
+      throw e;
+    }
+  };
   return function (target: T, propertyKey: string, descriptor: PropertyDescriptor) {
     const original = descriptor.value;
     descriptor.value = async function(...args: unknown[]) {
       try {
         if (runningProp) {
-          target[runningProp] = true;
+          // @ts-ignore: next-line
+          this[runningProp] = true;
         }
-        return await original.apply(this, args);
+        let a =  await original.apply(this, args);
+        if (vueProperty) {
+          // @ts-ignore: next-line
+          this[vueProperty] = '';
+        }
+        return a;
       } catch (e) {
-        if (message) {
-          store.growlError(message + (e.message | e));
-        } else if (vueProperty) {
-          target[vueProperty] = String(e);
-        } else {
-          throw e;
-        }
+        processError.call(this, e);
       } finally {
         if (runningProp) {
-          target[runningProp] = false;
+          // @ts-ignore: next-line
+          this[runningProp] = false;
         }
       }
     };

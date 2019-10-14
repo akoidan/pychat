@@ -49,14 +49,14 @@
     id = captchaId++;
 
 
-    @Prop() public value!: string;
+    @Prop() public value!: boolean;
     private event:( (E: MessageEvent) => void) |null = null;
 
-    private ifIframeUrl: string = `${CAPTCHA_IFRAME}?site_key=${RECAPTCHA_PUBLIC_KEY}`;
+    private ifIframeUrl: string = CAPTCHA_IFRAME ? `${CAPTCHA_IFRAME}?site_key=${RECAPTCHA_PUBLIC_KEY}`: '';
 
 
     @Watch('value')
-    onValueChange(newValue: string, oldValue: string) {
+    onValueChange(newValue: boolean, oldValue: boolean) {
       if (!newValue && newValue != oldValue) {
         if (this.resettingAllowed) {
           if (this.isIframe && this.iframe) {

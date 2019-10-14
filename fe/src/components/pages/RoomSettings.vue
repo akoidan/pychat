@@ -96,7 +96,7 @@
       return parseInt(id);
     }
 
-    @ApplyGrowlErr('', 'running')
+    @ApplyGrowlErr({runningProp: 'running', message: `Can't set room settings`})
     async apply() {
       this.logger.log('Applying room {} settings', this.roomId)();
       await this.$api.sendRoomSettings(this.roomName, this.sound, this.notifications, this.roomId);

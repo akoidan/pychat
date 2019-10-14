@@ -50,7 +50,7 @@
       textarea.style.height = textarea.scrollHeight -16 + 'px';
     }
 
-    @ApplyGrowlErr('', 'running')
+    @ApplyGrowlErr({runningProp: 'running', message: 'Unable to submit issue'})
     async submit() {
       await this.$api.sendLogs(this.issue, this.browser);
       this.store.growlSuccess("Your issue has ben submitted");

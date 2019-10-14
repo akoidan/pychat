@@ -165,7 +165,7 @@
       this.srcVideo = null;
     }
 
-    @ApplyGrowlErr('Unable to upload event', 'running')
+    @ApplyGrowlErr({ message: 'Unable to upload event', runningProp: 'running'})
     async upload() {
       if (!this.blob) {
         this.store.growlError("Please select image first")

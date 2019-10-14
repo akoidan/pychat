@@ -17,7 +17,8 @@
 
     loading!: boolean;
     message: string|null = null;
-    @ApplyGrowlErr('Error chanign mail', 'loading')
+
+    @ApplyGrowlErr({runningProp: 'loading', vueProperty: 'message', message: 'Error changing mail'})
     async created() {
       this.message = await this.$api.changeEmail(<string>this.$route.query['token']);
     }

@@ -67,7 +67,7 @@
       this.model = currentUserInfoModelToDto(this.userInfo);
     }
 
-    @ApplyGrowlErr('Error saving profile', 'running')
+    @ApplyGrowlErr({ message: 'Error saving profile', runningProp: 'running'})
     async save() {
       this.logger.debug('Saving userProfile')();
       let cui: UserProfileDto = {...this.model};

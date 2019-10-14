@@ -102,32 +102,21 @@ export default class Api extends MessageHandler {
   }
 
   public async googleAuth(token: string): Promise<string> {
-    let res: string =  await this.xhr.doPost<string>({
+    return await this.xhr.doPost<string>({
       url: '/google_auth',
       params: {
         token
       }
     });
-    this.checkSessionToken(res);
-    return res;
-  }
-
-  private checkSessionToken(token: string) {
-    if (!/\w{32}/.exec(token)) {
-      throw token;
-    }
   }
 
   public async facebookAuth(token: string): Promise<string> {
-    let res: string = await this.xhr.doPost<string>({
+    return  await this.xhr.doPost<string>({
       url: '/facebook_auth',
       params: {
         token
       }
     });
-    this.checkSessionToken(res);
-    return res;
-
   }
 
   public async statistics(): Promise<void> {
@@ -170,15 +159,14 @@ export default class Api extends MessageHandler {
     }
   }
 
-
   public async validateUsername(username: string, requestInterceptor: (r: XMLHttpRequest) => void): Promise<void> {
     return await this.xhr.doPost({
       url: '/validate_user',
       params: {username},
       checkOkString: true,
+      requestInterceptor,
     });
   }
-
 
   public async sendRoomSettings(roomName: string, volume: number, notifications: boolean, roomId: number): Promise<void> {
     return await this.xhr.doPost( {
@@ -215,7 +203,7 @@ export default class Api extends MessageHandler {
   }
 
   public async confirmEmail(token: string): Promise<string> {
-    return await this.xhr.doGet<string>(`/confirm_email?token=${token}`, false);
+    return await this.xhr.doGet<string>(`/confirm_email?token=${token}`, false, true);
   }
 
   public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void): Promise<number[]> {

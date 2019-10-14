@@ -1,8 +1,10 @@
 <template>
     <div>
         <div class="message">
-            {{ message }}<br/>
-            <router-link to="/">Go to main page</router-link>
+            <div class="green">{{ message }}</div>
+            <div class="red">{{ errorMessage}}</div>
+            <br/>
+            <router-link to="/" v-if="!loading">Go to main page</router-link>
         </div>
         <div class="spinner" v-if="loading" />
     </div>
@@ -16,11 +18,13 @@
   export default class ConfirmMail extends Vue {
 
     message: string|null = null;
+    errorMessage: string|null = null;
     loading!: boolean;
 
-    @ApplyGrowlErr('Confirming email error ', 'loading')
+    @ApplyGrowlErr({runningProp: 'loading', vueProperty: 'errorMessage', message: 'Confirming email error '})
     async created() {
-      this.message = await this.$api.confirmEmail(<string>this.$route.query['token']);
+      await this.$api.confirmEmail(<string>this.$route.query['token']);
+      this.message = 'Email has been confirmed';
     }
   }
 </script>
@@ -28,6 +32,11 @@
 
     @import "~@/assets/sass/partials/mixins"
 
+    .green
+        color: green
+
+    .red
+        color: red
     .spinner
         @include lds-30-spinner-vertical('Verifying email...')
 

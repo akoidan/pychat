@@ -22,7 +22,7 @@ export default class Xhr extends Http {
 
   /**
    * Loads file from server on runtime */
-  public async doGet<T>(fileUrl: string, isJsonDecoded: boolean = false): Promise<T> {
+  public async doGet<T>(fileUrl: string, isJsonDecoded: boolean = false, checkOk: boolean = false): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       fileUrl = this.getApiUrl(fileUrl);
       this.httpLogger.log('GET out {}', fileUrl)();
@@ -38,7 +38,7 @@ export default class Xhr extends Http {
       xobj.onreadystatechange = this.getOnreadystatechange(
           xobj,
           isJsonDecoded || false,
-          false,
+          checkOk,
           fileUrl,
           undefined,
           reject,
@@ -133,13 +133,17 @@ export default class Xhr extends Http {
           } else {
             data = r.response;
           }
-        } else {
+        } else if (r.status === 404) {
+          error = 'Resource not found';
+        } else if (r.status === 500) {
           error = 'Server error';
+        } else {
+          error = 'Unknown server error';
         }
         if (checkOkString && !error && r.response !== RESPONSE_SUCCESS) {
           error = r.response || 'Invalid response';
         }
-        if (errorDescription) {
+        if (errorDescription && error) {
           error = errorDescription + error;
         }
         if (error) {

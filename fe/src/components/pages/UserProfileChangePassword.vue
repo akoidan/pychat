@@ -49,7 +49,7 @@
       return this.userInfo.user;
     }
 
-    @ApplyGrowlErr('Error changing pass:', 'running')
+    @ApplyGrowlErr({ message: 'Error changing pass:', runningProp: 'running'})
     async saveProfile() {
       if (this.newPassword != this.confirmPassword) {
         this.store.growlError('Passwords don\'t match');

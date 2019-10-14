@@ -13,7 +13,7 @@ export default abstract class Http {
     this.httpLogger = loggerFactory.getLoggerColor('http', '#680061');
   }
 
-  public abstract async doGet<T>(fileUrl: string, isJsonDecoded: boolean): Promise<T>;
+  public abstract async doGet<T>(fileUrl: string, isJsonDecoded: boolean, checkOk?: boolean): Promise<T>;
 
   public abstract async doPost<T>(d: PostData<T>): Promise<T>;
 
