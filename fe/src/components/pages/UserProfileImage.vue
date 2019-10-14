@@ -1,14 +1,43 @@
 <template>
   <div class="holder">
-    <span>{{helpText}}</span>
+    <span>{{ helpText }}</span>
     <div class="imgHolder">
-      <img :src="srcImg" @drop.prevent="dropPhoto" @click="takeSnapshot">
-      <video autoplay="" ref="changeProfileVideo" v-show="showVideo"></video>
+      <img
+        :src="srcImg"
+        @drop.prevent="dropPhoto"
+        @click="takeSnapshot"
+      >
+      <video
+        v-show="showVideo"
+        ref="changeProfileVideo"
+        autoplay=""
+      />
     </div>
-    <input accept="image/*" ref="inputFile" type="file" v-show="false" @change="photoInputChanged">
-    <input type="button" class="lor-btn" value="Select file" @click="selectFile">
-    <input type="button" class="lor-btn" :value="buttonText" @click="startCapturingVideo">
-    <app-submit class="green-btn" value='Upload photo' @click.native="upload" :running="running"/>
+    <input
+      v-show="false"
+      ref="inputFile"
+      accept="image/*"
+      type="file"
+      @change="photoInputChanged"
+    >
+    <input
+      type="button"
+      class="lor-btn"
+      value="Select file"
+      @click="selectFile"
+    >
+    <input
+      type="button"
+      class="lor-btn"
+      :value="buttonText"
+      @click="startCapturingVideo"
+    >
+    <app-submit
+      class="green-btn"
+      value="Upload photo"
+      :running="running"
+      @click.native="upload"
+    />
   </div>
 </template>
 <script lang="ts">

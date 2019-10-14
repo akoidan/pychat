@@ -1,41 +1,109 @@
 <template>
-  <nav @click="toggle" :class="{expanded}">
-    <router-link to="/" class="icon-home" title="Go home">
+  <nav
+    :class="{expanded}"
+    @click="toggle"
+  >
+    <router-link
+      to="/"
+      class="icon-home"
+      title="Go home"
+    >
       <span class="mText">Home</span>
     </router-link>
-    <router-link to="/painter" class="icon-brush" title="Draw an Image">
+    <router-link
+      to="/painter"
+      class="icon-brush"
+      title="Draw an Image"
+    >
       <span class="mText">Painter</span>
     </router-link>
-    <router-link to="/report-issue" class="icon-pencil" title="Report an issue">
+    <router-link
+      to="/report-issue"
+      class="icon-pencil"
+      title="Report an issue"
+    >
       <span class="mText">Issue</span>
     </router-link>
-    <router-link to="/statistics" class="icon-chart-pie" title="Statistics">
+    <router-link
+      to="/statistics"
+      class="icon-chart-pie"
+      title="Statistics"
+    >
       <span class="mText">Statistics</span>
     </router-link>
-    <i class="icon-phone" v-if="$route.name === 'chat'" title="Make a video/mic call" @click="toggleContainer(activeRoom.id)"><span class="mText">Call</span></i>
-    <i class="icon-search" v-if="activeRoom && $route.name === 'chat'" @click='invertSearch' title="Search messages in current room (Shift+Ctrl+F)"><span
-        class="mText">Search</span>
+    <i
+      v-if="$route.name === 'chat'"
+      class="icon-phone"
+      title="Make a video/mic call"
+      @click="toggleContainer(activeRoom.id)"
+    ><span class="mText">Call</span></i>
+    <i
+      v-if="activeRoom && $route.name === 'chat'"
+      class="icon-search"
+      title="Search messages in current room (Shift+Ctrl+F)"
+      @click="invertSearch"
+    ><span
+      class="mText"
+    >Search</span>
     </i>
-    <router-link to="/statistics" v-if="false" class="icon-chart-pie" title="Show user countries statistics">
+    <router-link
+      v-if="false"
+      to="/statistics"
+      class="icon-chart-pie"
+      title="Show user countries statistics"
+    >
       <span class="mText">Statistics</span>
     </router-link>
-    <i class="icon-doc-inv" v-if="$route.name === 'chat'" @click='sendFileClick'>
-      <input type="file" v-show="false" @change="sendFile" ref="inputFile"/>
+    <i
+      v-if="$route.name === 'chat'"
+      class="icon-doc-inv"
+      @click="sendFileClick"
+    >
+      <input
+        v-show="false"
+        ref="inputFile"
+        type="file"
+        @change="sendFile"
+      >
       <span class="mText">Send File</span>
     </i>
-    <i class="icon-popup" v-if="false"><span class="mText">Minimized Windows</span></i>
-    <a :href="githubUrl" target="_blank" v-if="githubUrl" class="icon-github"><span
-        class="mText">Github</span></a>
+    <i
+      v-if="false"
+      class="icon-popup"
+    ><span class="mText">Minimized Windows</span></i>
+    <a
+      v-if="githubUrl"
+      :href="githubUrl"
+      target="_blank"
+      class="icon-github"
+    ><span
+      class="mText"
+    >Github</span></a>
     <template v-if="userInfo">
       <div class="navMenu">
-        <span class="onlineStatus" :title="title" :class="{online: isOnline, offline: !isOnline}">●</span>
-        <span class="username"><b>{{userInfo.user}}</b></span>
-        <i class="icon-menu" title="Open Menu"></i>
+        <span
+          class="onlineStatus"
+          :title="title"
+          :class="{online: isOnline, offline: !isOnline}"
+        >●</span>
+        <span class="username"><b>{{ userInfo.user }}</b></span>
+        <i
+          class="icon-menu"
+          title="Open Menu"
+        />
       </div>
-      <router-link to="/profile" class="icon-wrench" title="Settings">
+      <router-link
+        to="/profile"
+        class="icon-wrench"
+        title="Settings"
+      >
         <span class="mText">Profile</span>
       </router-link>
-      <i title="Sign out" class="icon-sign-out" @click="signOut"><span class="mText">Sign out</span></i>
+      <i
+        title="Sign out"
+        class="icon-sign-out"
+        @click="signOut"
+      ><span class="mText">Sign out</span></i>
     </template>
   </nav>
 </template>

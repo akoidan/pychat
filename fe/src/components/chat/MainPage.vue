@@ -1,38 +1,94 @@
 <template>
   <div class="holder">
     <nav-edit-message
-        v-if="editedMessage"
-        :edited-message="editedMessage"
-        @close="closeEditing"
-        @delete-message="navDeleteMessage"
-        @edit-message="navEditMessage"/>
-    <nav-user-show v-if="activeUser" :active-user="activeUser"/>
+      v-if="editedMessage"
+      :edited-message="editedMessage"
+      @close="closeEditing"
+      @delete-message="navDeleteMessage"
+      @edit-message="navEditMessage"
+    />
+    <nav-user-show
+      v-if="activeUser"
+      :active-user="activeUser"
+    />
     <div class="wrapper">
-      <div class="chatBoxHolder" @drop.prevent="dropPhoto" v-show="!dim">
+      <div
+        v-show="!dim"
+        class="chatBoxHolder"
+        @drop.prevent="dropPhoto"
+      >
         <template v-for="room in roomsArray">
-          <chat-box :room="room" :key="room.id" v-show="activeRoomId === room.id"/>
+          <chat-box
+            v-show="activeRoomId === room.id"
+            :key="room.id"
+            :room="room"
+          />
         </template>
-        <div v-if="!activeRoom" class="noRoom" >
-          <router-link to="/chat/1">This room doesn't exist, or you don't have access to it. Click to go to main room</router-link>
+        <div
+          v-if="!activeRoom"
+          class="noRoom"
+        >
+          <router-link to="/chat/1">
+            This room doesn't exist, or you don't have access to it. Click to go to main room
+          </router-link>
         </div>
       </div>
-      <div v-show="dim" class="videoHolder" >
+      <div
+        v-show="dim"
+        class="videoHolder"
+      >
         <div v-show="recordingNow">
-          <video v-show="srcVideo" autoplay="" ref="video"></video>
-          <img v-show="!srcVideo" src="@/assets/img/audio.svg" class="audio-recording-now">
+          <video
+            v-show="srcVideo"
+            ref="video"
+            autoplay=""
+          />
+          <img
+            v-show="!srcVideo"
+            src="@/assets/img/audio.svg"
+            class="audio-recording-now"
+          >
         </div>
         <span v-show="!recordingNow">Starting recording...</span>
       </div>
-      <room-users/>
-      <smiley-holder v-show="showSmileys" @add-smiley="addSmiley"/>
+      <room-users />
+      <smiley-holder
+        v-show="showSmileys"
+        @add-smiley="addSmiley"
+      />
     </div>
 
-    <div class="userMessageWrapper" >
-      <input type="file" @change="handleFileSelect" accept="image/*,video/*" ref="imgInput" multiple="multiple" v-show="false"/>
-      <i class="icon-picture" title="Share Video/Image" @click="addImage"></i>
-      <i class="icon-smile" title="Add a smile :)" @click="showSmileys = !showSmileys"></i>
-      <media-recorder @record="handleRecord" @video="handleAddVideo" @audio="handleAddAudio"/>
-      <div contenteditable="true" ref="userMessage" class="usermsg input" @keydown="checkAndSendMessage" @paste="onImagePaste"></div>
+    <div class="userMessageWrapper">
+      <input
+        ref="imgInput"
+        v-show="false"
+        type="file"
+        accept="image/*,video/*"
+        multiple="multiple"
+        @change="handleFileSelect"
+      >
+      <i
+        class="icon-picture"
+        title="Share Video/Image"
+        @click="addImage"
+      />
+      <i
+        class="icon-smile"
+        title="Add a smile :)"
+        @click="showSmileys = !showSmileys"
+      />
+      <media-recorder
+        @record="handleRecord"
+        @video="handleAddVideo"
+        @audio="handleAddAudio"
+      />
+      <div
+        ref="userMessage"
+        contenteditable="true"
+        class="usermsg input"
+        @keydown="checkAndSendMessage"
+        @paste="onImagePaste"
+      />
     </div>
   </div>
 </template>

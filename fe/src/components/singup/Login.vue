@@ -1,18 +1,45 @@
 <template>
-  <form @submit.prevent='login' ref="form">
+  <form
+    ref="form"
+    @submit.prevent="login"
+  >
     <div>
-      <i class='icon-user'></i>
-      <input type='text' maxlength='254' class="input" autocomplete="username" required placeholder='Username/Email' name='username'/>
+      <i class="icon-user" />
+      <input
+        type="text"
+        maxlength="254"
+        class="input"
+        autocomplete="username"
+        required
+        placeholder="Username/Email"
+        name="username"
+      >
     </div>
     <div>
-      <i class='icon-key'></i>
-      <input type='password' name='password' autocomplete="password" class="input" placeholder='Password' required/>
+      <i class="icon-key" />
+      <input
+        type="password"
+        name="password"
+        autocomplete="password"
+        class="input"
+        placeholder="Password"
+        required
+      >
     </div>
-      <router-link class='forg-pass' to="/auth/reset-password">Forgot Password?</router-link>
+    <router-link
+      class="forg-pass"
+      to="/auth/reset-password"
+    >
+      Forgot Password?
+    </router-link>
     <div>
-      <social-auth/>
-      <captcha-component v-model="running"/>
-      <app-submit class='submit-button' value='LOG IN' :running="running"/>
+      <social-auth />
+      <captcha-component v-model="running" />
+      <app-submit
+        class="submit-button"
+        value="LOG IN"
+        :running="running"
+      />
     </div>
   </form>
 </template>

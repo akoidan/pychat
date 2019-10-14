@@ -1,9 +1,13 @@
 <template>
   <div class="body">
     <div class="growlHolder">
-      <growl v-for="growl in growls" :growl="growl" :key="growl.id"/>
+      <growl
+        v-for="growl in growls"
+        :key="growl.id"
+        :growl="growl"
+      />
     </div>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 

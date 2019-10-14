@@ -1,22 +1,27 @@
 <template>
-    <div>
-        <template v-if='captcha_key'>
-            <template v-if="isIframe" >
-                <iframe :src="ifIframeUrl" ref="iframe">
+  <div>
+    <template v-if="captcha_key">
+      <template v-if="isIframe">
+        <iframe
+          ref="iframe"
+          :src="ifIframeUrl"
+        />
+        <input
+          type="hidden"
+          name="g-recaptcha-response"
+          :value="value"
+        >
+      </template>
 
-                </iframe>
-                <input type="hidden" name="g-recaptcha-response" :value="value"/>
-            </template>
-
-            <div v-else
-                 ref="repactha"
-                 class='g-recaptcha'
-                 data-theme='dark'
-                 :data-sitekey='captcha_key'
-            />
-        </template>
-
-    </div>
+      <div
+        v-else
+        ref="repactha"
+        class="g-recaptcha"
+        data-theme="dark"
+        :data-sitekey="captcha_key"
+      />
+    </template>
+  </div>
 </template>
 
 <script lang="ts">

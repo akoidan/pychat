@@ -1,12 +1,24 @@
 <template>
   <div class="flex">
-    <div v-if="dim" class="wait"></div>
-    <app-nav v-show="showNav"/>
-    <incoming-call v-if="incomingCall" :call="incomingCall"/>
-    <keep-alive v-if="inited" :include="['ChannelsPage', 'Painter']">
-      <router-view class="body"/>
+    <div
+      v-if="dim"
+      class="wait"
+    />
+    <app-nav v-show="showNav" />
+    <incoming-call
+      v-if="incomingCall"
+      :call="incomingCall"
+    />
+    <keep-alive
+      v-if="inited"
+      :include="['ChannelsPage', 'Painter']"
+    >
+      <router-view class="body" />
     </keep-alive>
-    <div v-else class="spinner"/>
+    <div
+      v-else
+      class="spinner"
+    />
   </div>
 </template>
 <script lang="ts">

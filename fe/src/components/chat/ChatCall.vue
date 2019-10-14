@@ -1,68 +1,185 @@
 <template>
-  <div class="callContainer" v-show="callInfo.callContainer">
-    <div class="callContainerContent" :class="{fullscreen}">
-      <div class="videoContainer" ref="videoContainer">
+  <div
+    v-show="callInfo.callContainer"
+    class="callContainer"
+  >
+    <div
+      class="callContainerContent"
+      :class="{fullscreen}"
+    >
+      <div
+        ref="videoContainer"
+        class="videoContainer"
+      >
         <div class="icon-webrtc-cont">
-          <i class="icon-webrtc-novideo" @click="videoClick" :class="callInfo.showVideo ? 'activeIcon' : 'noactiveIcon'" title="Turn on your webcam"></i>
-          <i class="icon-webrtc-mic" :class="callInfo.showMic ? 'activeIcon' : 'noactiveIcon'" title="Turn off your microphone" @click="micClick"></i>
-          <i class="icon-webrtc-minimizedscreen" title="Exit fullscreen" @click="exitFullscreen"></i>
-          <i class="icon-webrtc-hangup" @click="hangUpCall" title="Hang up"></i>
-          <i class="icon-no-desktop" @click='desktopClick' :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'" title="Capture your desktop screen and start sharing it"></i>
+          <i
+            class="icon-webrtc-novideo"
+            :class="callInfo.showVideo ? 'activeIcon' : 'noactiveIcon'"
+            title="Turn on your webcam"
+            @click="videoClick"
+          />
+          <i
+            class="icon-webrtc-mic"
+            :class="callInfo.showMic ? 'activeIcon' : 'noactiveIcon'"
+            title="Turn off your microphone"
+            @click="micClick"
+          />
+          <i
+            class="icon-webrtc-minimizedscreen"
+            title="Exit fullscreen"
+            @click="exitFullscreen"
+          />
+          <i
+            class="icon-webrtc-hangup"
+            title="Hang up"
+            @click="hangUpCall"
+          />
+          <i
+            class="icon-no-desktop"
+            :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'"
+            title="Capture your desktop screen and start sharing it"
+            @click="desktopClick"
+          />
         </div>
         <div class="micVideoHolder">
-          <chat-remote-peer v-for="(call, id) in callInfo.calls" :call-info="call" :key="id" @click.native="setCurrentVideo(id)" :class="{'current-video-active': id === currentVideoActive, 'current-video-inactive': currentVideoActive && currentVideoActive !== id}"/>
-          <video-object muted="muted" :media-stream-link="callInfo.mediaStreamLink" class="localVideo" ref="localVideo" />
+          <chat-remote-peer
+            v-for="(call, id) in callInfo.calls"
+            :key="id"
+            :call-info="call"
+            :class="{'current-video-active': id === currentVideoActive, 'current-video-inactive': currentVideoActive && currentVideoActive !== id}"
+            @click.native="setCurrentVideo(id)"
+          />
+          <video-object
+            ref="localVideo"
+            muted="muted"
+            :media-stream-link="callInfo.mediaStreamLink"
+            class="localVideo"
+          />
         </div>
-        <progress max="15" :value="callInfo.currentMicLevel" title="Your microphone level" class="microphoneLevel"></progress>
+        <progress
+          max="15"
+          :value="callInfo.currentMicLevel"
+          title="Your microphone level"
+          class="microphoneLevel"
+        />
       </div>
-      <table class="settingsContainer" v-show="showSettings">
+      <table
+        v-show="showSettings"
+        class="settingsContainer"
+      >
         <tbody>
-        <tr>
-          <td>
-            <i class="icon-quote-left"></i>
-            <span class="callInfo">Call info</span>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <i class="icon-volume-2"></i>
-            <select class="input" :value="callInfo.currentSpeaker" @change="setCurrentSpeakerProxy">
-              <option v-for="(speaker, id) in speakers" :key="id" :value="id">{{speaker}}</option>
-            </select>
-            <span class="playTestSound" @click="playTest">Play test sound</span>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <i class="icon-videocam"></i>
-            <select class="input" :value="callInfo.currentWebcam" @change="setCurrentWebcamProxy">
-              <option v-for="(webcam, id) in webcams" :key="id" :value="id">{{webcam}}</option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <i class="icon-mic"></i>
-            <select class="input" :value="callInfo.currentMic" @change="setCurrentMicProxy">
-              <option v-for="(mic, id) in microphones" :key="id" :value="id">{{mic}}</option>
-            </select>
-          </td>
-        </tr>
+          <tr>
+            <td>
+              <i class="icon-quote-left" />
+              <span class="callInfo">Call info</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <i class="icon-volume-2" />
+              <select
+                class="input"
+                :value="callInfo.currentSpeaker"
+                @change="setCurrentSpeakerProxy"
+              >
+                <option
+                  v-for="(speaker, id) in speakers"
+                  :key="id"
+                  :value="id"
+                >
+                  {{ speaker }}
+                </option>
+              </select>
+              <span
+                class="playTestSound"
+                @click="playTest"
+              >Play test sound</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <i class="icon-videocam" />
+              <select
+                class="input"
+                :value="callInfo.currentWebcam"
+                @change="setCurrentWebcamProxy"
+              >
+                <option
+                  v-for="(webcam, id) in webcams"
+                  :key="id"
+                  :value="id"
+                >
+                  {{ webcam }}
+                </option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <i class="icon-mic" />
+              <select
+                class="input"
+                :value="callInfo.currentMic"
+                @change="setCurrentMicProxy"
+              >
+                <option
+                  v-for="(mic, id) in microphones"
+                  :key="id"
+                  :value="id"
+                >
+                  {{ mic }}
+                </option>
+              </select>
+            </td>
+          </tr>
         </tbody>
       </table>
       <div class="callContainerIcons">
         <div class="callContainerIconsInner">
-          <i class="icon-phone-circled" v-show="!callInfo.callActive" @click="startCall"></i>
-          <i :class="iconMicClass" :title="micTitle" @click="micClick"></i>
-          <i :class="iconVideoClass" :title="videoTitle" @click="videoClick"></i>
-          <i class="icon-desktop" :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'"
-             title="Capture your desktop screen and start sharing it" @click="desktopClick"></i>
-          <i class="icon-cog" @click="showSettings = !showSettings"></i>
-          <div class="enterFullScreenHolder" @click="enterFullscreen" v-show="callInfo.callActive">
-            <i class="icon-webrtc-fullscreen" title="Fullscreen"></i>
+          <i
+            v-show="!callInfo.callActive"
+            class="icon-phone-circled"
+            @click="startCall"
+          />
+          <i
+            :class="iconMicClass"
+            :title="micTitle"
+            @click="micClick"
+          />
+          <i
+            :class="iconVideoClass"
+            :title="videoTitle"
+            @click="videoClick"
+          />
+          <i
+            class="icon-desktop"
+            :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'"
+            title="Capture your desktop screen and start sharing it"
+            @click="desktopClick"
+          />
+          <i
+            class="icon-cog"
+            @click="showSettings = !showSettings"
+          />
+          <div
+            v-show="callInfo.callActive"
+            class="enterFullScreenHolder"
+            @click="enterFullscreen"
+          >
+            <i
+              class="icon-webrtc-fullscreen"
+              title="Fullscreen"
+            />
           </div>
-          <div class="hangUpHolder" v-show="callInfo.callActive">
-            <i class="icon-hang-up" @click="hangUpCall" title="Hang up"></i>
+          <div
+            v-show="callInfo.callActive"
+            class="hangUpHolder"
+          >
+            <i
+              class="icon-hang-up"
+              title="Hang up"
+              @click="hangUpCall"
+            />
           </div>
         </div>
       </div>

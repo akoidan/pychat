@@ -1,5 +1,5 @@
 <template>
-  <create-room :is-public="true"/>
+  <create-room :is-public="true" />
 </template>
 <script lang="ts">
 

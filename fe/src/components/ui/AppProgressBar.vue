@@ -1,8 +1,13 @@
 <template>
   <div class="holder">
     <div class="progress-wrap">
-      <div :style="style" class="bar"></div>
-      <div class="text">{{text}}</div>
+      <div
+        :style="style"
+        class="bar"
+      />
+      <div class="text">
+        {{ text }}
+      </div>
     </div>
   </div>
 </template>

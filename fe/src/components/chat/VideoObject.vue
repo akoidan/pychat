@@ -1,5 +1,8 @@
 <template>
-    <video :muted="muted" ref="video" ></video>
+  <video
+    ref="video"
+    :muted="muted"
+  />
 </template>
 
 <script lang="ts">

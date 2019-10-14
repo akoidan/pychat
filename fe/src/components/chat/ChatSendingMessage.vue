@@ -1,10 +1,17 @@
 <template>
   <div :class="cls">
-    <chat-message :message="message"/>
+    <chat-message :message="message" />
     <template v-if="message.transfer">
-      <app-progress-bar v-if="message.transfer.upload  && !message.transfer.error" :upload="message.transfer.upload"/>
-      <i v-else-if="message.files.length" class="icon-repeat" @click="retry">{{message.transfer.error}}</i>
-      <div class="spinner"></div>
+      <app-progress-bar
+        v-if="message.transfer.upload && !message.transfer.error"
+        :upload="message.transfer.upload"
+      />
+      <i
+        v-else-if="message.files.length"
+        class="icon-repeat"
+        @click="retry"
+      >{{ message.transfer.error }}</i>
+      <div class="spinner" />
     </template>
   </div>
 </template>

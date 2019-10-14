@@ -1,16 +1,49 @@
 <template>
   <div class="holder">
-    <chat-call :call-info="room.callInfo" :room-id="room.id"/>
-    <search-messages :room="room"/>
-    <div class="chatbox" @keydown="keyDownLoadUp" :class="{'display-search-only': room.search.searchActive}" tabindex="1" @mousewheel="onScroll" ref="chatbox">
+    <chat-call
+      :call-info="room.callInfo"
+      :room-id="room.id"
+    />
+    <search-messages :room="room" />
+    <div
+      ref="chatbox"
+      class="chatbox"
+      :class="{'display-search-only': room.search.searchActive}"
+      tabindex="1"
+      @keydown="keyDownLoadUp"
+      @mousewheel="onScroll"
+    >
       <template v-for="message in messages">
-        <chat-change-online-message v-if="message.isChangeOnline" :key="message.time" :time="message.time" :user-id="message.userId" :is-went-online="message.isWentOnline"/>
-        <fieldset v-else-if="message.fieldDay" :key="message.fieldDay">
-          <legend align="center">{{message.fieldDay}}</legend>
+        <chat-change-online-message
+          v-if="message.isChangeOnline"
+          :key="message.time"
+          :time="message.time"
+          :user-id="message.userId"
+          :is-went-online="message.isWentOnline"
+        />
+        <fieldset
+          v-else-if="message.fieldDay"
+          :key="message.fieldDay"
+        >
+          <legend align="center">
+            {{ message.fieldDay }}
+          </legend>
         </fieldset>
-        <chat-sending-file v-else-if="message.transfers" :sending-file="message" :key="message.id"/>
-        <chat-receiving-file v-else-if="message.connId" :receiving-file="message" :key="message.id"/>
-        <chat-sending-message v-else :message="message" :key="message.id"/>
+        <chat-sending-file
+          v-else-if="message.transfers"
+          :key="message.id"
+          :sending-file="message"
+        />
+        <chat-receiving-file
+          v-else-if="message.connId"
+          :key="message.id"
+          :receiving-file="message"
+        />
+        <chat-sending-message
+          v-else
+          :key="message.id"
+          :message="message"
+        />
       </template>
     </div>
   </div>

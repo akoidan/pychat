@@ -1,22 +1,52 @@
 <template>
-  <form @submit.prevent="submit" class="holder">
+  <form
+    class="holder"
+    @submit.prevent="submit"
+  >
     <table class="">
       <tbody>
-      <tr>
-        <th><label for="reportIssueIssue">Git revision</label></th>
-        <td><input class="input" type="text" disabled :value="git"></td>
-      </tr>
-      <tr>
-        <th><label for="reportIssueIssue">The problem you discovered:</label></th>
-        <td><textarea v-model="issue" class="input" ref="textarea" id="reportIssueIssue" tabindex="-1" required=""></textarea></td>
-      </tr>
-      <tr>
-        <th><label for="reportIssueBrowserVersion">Affected browser:</label></th>
-        <td><input v-model="browser" class="input" type="text" id="reportIssueBrowserVersion"></td>
-      </tr>
+        <tr>
+          <th><label for="reportIssueIssue">Git revision</label></th>
+          <td>
+            <input
+              class="input"
+              type="text"
+              disabled
+              :value="git"
+            >
+          </td>
+        </tr>
+        <tr>
+          <th><label for="reportIssueIssue">The problem you discovered:</label></th>
+          <td>
+            <textarea
+              id="reportIssueIssue"
+              ref="textarea"
+              v-model="issue"
+              class="input"
+              tabindex="-1"
+              required=""
+            />
+          </td>
+        </tr>
+        <tr>
+          <th><label for="reportIssueBrowserVersion">Affected browser:</label></th>
+          <td>
+            <input
+              id="reportIssueBrowserVersion"
+              v-model="browser"
+              class="input"
+              type="text"
+            >
+          </td>
+        </tr>
       </tbody>
     </table>
-    <app-submit class="green-btn" value='Submit Issue' :running="running"/>
+    <app-submit
+      class="green-btn"
+      value="Submit Issue"
+      :running="running"
+    />
   </form>
 </template>
 <script lang="ts">

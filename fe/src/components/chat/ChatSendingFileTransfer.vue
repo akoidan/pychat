@@ -1,10 +1,19 @@
 <template>
   <tbody>
     <tr>
-      <th>To {{user}}</th>
-      <td v-if="showBar"> <app-progress-bar :upload="transfer.upload"/></td>
-      <td v-else :class="cls">
-        {{status}}<span v-if="showCancel" class="icon-cancel" @click="declineSending"></span>
+      <th>To {{ user }}</th>
+      <td v-if="showBar">
+        <app-progress-bar :upload="transfer.upload" />
+      </td>
+      <td
+        v-else
+        :class="cls"
+      >
+        {{ status }}<span
+          v-if="showCancel"
+          class="icon-cancel"
+          @click="declineSending"
+        />
       </td>
     </tr>
   </tbody>

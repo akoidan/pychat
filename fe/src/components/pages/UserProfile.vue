@@ -1,15 +1,25 @@
 <template>
   <div class="holder">
     <div class="links">
-      <router-link to="/profile/user-info">User info</router-link>
-      <router-link to="/profile/image">Profile image</router-link>
-      <router-link to="/profile/settings">Chat settings</router-link>
-      <router-link to="/profile/change-password">Change password</router-link>
-      <router-link to="/profile/change-email">Change email</router-link>
+      <router-link to="/profile/user-info">
+        User info
+      </router-link>
+      <router-link to="/profile/image">
+        Profile image
+      </router-link>
+      <router-link to="/profile/settings">
+        Chat settings
+      </router-link>
+      <router-link to="/profile/change-password">
+        Change password
+      </router-link>
+      <router-link to="/profile/change-email">
+        Change email
+      </router-link>
     </div>
     <div class="container">
       <keep-alive>
-        <router-view class="profileInner"></router-view>
+        <router-view class="profileInner" />
       </keep-alive>
     </div>
   </div>

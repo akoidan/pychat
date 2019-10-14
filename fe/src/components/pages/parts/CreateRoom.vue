@@ -2,34 +2,54 @@
   <div class="holder">
     <table>
       <tbody>
-      <tr v-if="isPublic">
-        <th>
-          Name
-        </th>
-        <td>
-          <input type="text" class="input" v-model="roomName" maxlength="16">
-        </td>
-      </tr>
-      <tr>
-        <th>
-          Notifications
-        </th>
-        <td>
-          <app-checkbox v-model="notifications"/>
-        </td>
-      </tr>
-      <tr>
-        <th>
-          Sound
-        </th>
-        <td>
-          <app-input-range min="0" max="100" v-model="sound"/>
-        </td>
-      </tr>
+        <tr v-if="isPublic">
+          <th>
+            Name
+          </th>
+          <td>
+            <input
+              v-model="roomName"
+              type="text"
+              class="input"
+              maxlength="16"
+            >
+          </td>
+        </tr>
+        <tr>
+          <th>
+            Notifications
+          </th>
+          <td>
+            <app-checkbox v-model="notifications" />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            Sound
+          </th>
+          <td>
+            <app-input-range
+              v-model="sound"
+              min="0"
+              max="100"
+            />
+          </td>
+        </tr>
       </tbody>
     </table>
-    <add-user-to-room v-model="currentUsers" :text="inviteUsers" :exclude-users-ids="excludeUsersIds" :showInviteUsers="showInviteUsers"/>
-    <app-submit type="button" @click.native="add" value="Create Room" class="green-btn" :running="running"/>
+    <add-user-to-room
+      v-model="currentUsers"
+      :text="inviteUsers"
+      :exclude-users-ids="excludeUsersIds"
+      :show-invite-users="showInviteUsers"
+    />
+    <app-submit
+      type="button"
+      value="Create Room"
+      class="green-btn"
+      :running="running"
+      @click.native="add"
+    />
   </div>
 </template>
 <script lang="ts">

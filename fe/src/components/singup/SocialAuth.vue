@@ -1,25 +1,25 @@
 <template>
-    <div>
-        <app-submit
-                v-if='oauth_token'
-                class='g-icon lor-btn'
-                value='Via Google'
-                type="button"
-                :running="googleRunning"
-                title='Sign in using google account'
-                @click.native='logWithGoogle'/>
+  <div>
+    <app-submit
+      v-if="oauth_token"
+      class="g-icon lor-btn"
+      value="Via Google"
+      type="button"
+      :running="googleRunning"
+      title="Sign in using google account"
+      @click.native="logWithGoogle"
+    />
 
-        <app-submit
-                v-if='fb_app_id'
-                class='f-icon lor-btn'
-                value='Via Facebook'
-                type="button"
-                :running="facebookRunning"
-                title='Sign in using facebook account'
-                @click.native='facebookLogin'>
-        </app-submit>
-
-    </div>
+    <app-submit
+      v-if="fb_app_id"
+      class="f-icon lor-btn"
+      value="Via Facebook"
+      type="button"
+      :running="facebookRunning"
+      title="Sign in using facebook account"
+      @click.native="facebookLogin"
+    />
+  </div>
 </template>
 <script lang="ts">
   import {State} from '@/utils/storeHolder';

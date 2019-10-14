@@ -2,23 +2,39 @@
   <nav>
     <router-link :to="`/user/${activeUser.id}`">
       <i class="icon-user"> <span
-          class="activeUserName">{{activeUser.user}}</span><span class="mText">Profile</span></i>
+        class="activeUserName"
+      >{{ activeUser.user }}</span><span class="mText">Profile</span></i>
     </router-link>
 
     <template v-if="oppositeRoomId">
-      <router-link :to="`/chat/${oppositeRoomId}`" >
+      <router-link :to="`/chat/${oppositeRoomId}`">
         <i class="icon-comment"><span class="mText">Write message</span></i>
       </router-link>
 
-      <i class="icon-phone-circled" onclick="channelsHandler.m2Call()"><span class="mText">Call</span></i>
-      <i class="icon-doc-inv" onclick="channelsHandler.m2TransferFile()"><span class="mText">Transfer file</span></i>
+      <i
+        class="icon-phone-circled"
+        onclick="channelsHandler.m2Call()"
+      ><span class="mText">Call</span></i>
+      <i
+        class="icon-doc-inv"
+        onclick="channelsHandler.m2TransferFile()"
+      ><span class="mText">Transfer file</span></i>
     </template>
     <template v-else>
-      <i class="icon-comment" @click="writeMessage"><span class="mText">Write message</span></i>
+      <i
+        class="icon-comment"
+        @click="writeMessage"
+      ><span class="mText">Write message</span></i>
     </template>
     <div class="right">
-      <div class="spinner" v-if="running" />
-      <i class="icon-cancel" @click.stop="closeActiveUser"><span class="mText">Close</span></i>
+      <div
+        v-if="running"
+        class="spinner"
+      />
+      <i
+        class="icon-cancel"
+        @click.stop="closeActiveUser"
+      ><span class="mText">Close</span></i>
     </div>
   </nav>
 </template>

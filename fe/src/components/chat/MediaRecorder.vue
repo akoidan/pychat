@@ -1,7 +1,23 @@
 <template>
-  <div @contextmenu.prevent @drag.prevent @mouseup="releaseRecord" @mouseout="releaseRecord" @mousedown="switchRecord" @touchstart="switchRecord" @touchend="releaseRecord">
-    <i class="icon-webrtc-video" title="Hold on to send video" v-show="isRecordingVideo"></i>
-    <i class="icon-mic-1" title="Hold on to send audio" v-show="!isRecordingVideo"></i>
+  <div
+    @contextmenu.prevent
+    @drag.prevent
+    @mouseup="releaseRecord"
+    @mouseout="releaseRecord"
+    @mousedown="switchRecord"
+    @touchstart="switchRecord"
+    @touchend="releaseRecord"
+  >
+    <i
+      v-show="isRecordingVideo"
+      class="icon-webrtc-video"
+      title="Hold on to send video"
+    />
+    <i
+      v-show="!isRecordingVideo"
+      class="icon-mic-1"
+      title="Hold on to send audio"
+    />
   </div>
 </template>
 <script lang="ts">

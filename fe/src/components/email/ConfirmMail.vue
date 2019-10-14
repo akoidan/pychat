@@ -1,13 +1,25 @@
 <template>
-    <div>
-        <div class="message">
-            <div class="green">{{ message }}</div>
-            <div class="red">{{ errorMessage}}</div>
-            <br/>
-            <router-link to="/" v-if="!loading">Go to main page</router-link>
-        </div>
-        <div class="spinner" v-if="loading" />
+  <div>
+    <div class="message">
+      <div class="green">
+        {{ message }}
+      </div>
+      <div class="red">
+        {{ errorMessage }}
+      </div>
+      <br>
+      <router-link
+        v-if="!loading"
+        to="/"
+      >
+        Go to main page
+      </router-link>
     </div>
+    <div
+      v-if="loading"
+      class="spinner"
+    />
+  </div>
 </template>
 
 <script lang="ts">

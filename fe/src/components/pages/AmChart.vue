@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div ref="div" id="chartdiv"></div>
+    <div
+      id="chartdiv"
+      ref="div"
+    />
   </div>
 </template>
 <script lang="ts">

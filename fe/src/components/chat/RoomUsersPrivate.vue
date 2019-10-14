@@ -1,12 +1,18 @@
 <template>
   <li :class="onlineActiveClass">
     <router-link :to="`/chat/${room.id}`">
-      <i :class="userSexClass"></i>{{user.user}}
+      <i :class="userSexClass" />{{ user.user }}
     </router-link>
-    <router-link :to="`/room-settings/${room.id}`" v-if="!room.newMessagesCount">
-      <span class="icon-cog"></span>
+    <router-link
+      v-if="!room.newMessagesCount"
+      :to="`/room-settings/${room.id}`"
+    >
+      <span class="icon-cog" />
     </router-link>
-    <span class="newMessagesCount" v-if="room.newMessagesCount">{{room.newMessagesCount}}</span>
+    <span
+      v-if="room.newMessagesCount"
+      class="newMessagesCount"
+    >{{ room.newMessagesCount }}</span>
   </li>
 </template>
 <script lang="ts">

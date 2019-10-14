@@ -1,8 +1,11 @@
 <template>
-  <div class='reg-required'>
-    <i v-bind:class="[icon, validation]"></i>
-      <slot/>
-    <div class="slider" :class='{closed}'>
+  <div class="reg-required">
+    <i :class="[icon, validation]" />
+    <slot />
+    <div
+      class="slider"
+      :class="{closed}"
+    >
       {{ description }}
     </div>
   </div>

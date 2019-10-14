@@ -2,7 +2,10 @@
   <transition name="growl">
     <div :class="['growl', growl.type]">
       <!--Single line-->
-      <div class="icon-cancel" @click="close"></div><div v-html="growl.html"></div>
+      <div
+        class="icon-cancel"
+        @click="close"
+      /><div v-html="growl.html" />
     </div>
   </transition>
 </template>

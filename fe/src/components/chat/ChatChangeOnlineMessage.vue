@@ -1,9 +1,9 @@
 <template>
   <p class="message-system">
     <span class="message-header">
-    <span class="timeMess">({{getTime}})</span>
-    <span>System</span>: </span>
-    <span class="message-text-style">{{isUser}} <b @contextmenu.prevent.stop="setActiveUser">{{user}}</b> {{where}}</span>
+      <span class="timeMess">({{ getTime }})</span>
+      <span>System</span>: </span>
+    <span class="message-text-style">{{ isUser }} <b @contextmenu.prevent.stop="setActiveUser">{{ user }}</b> {{ where }}</span>
   </p>
 </template>
 <script lang="ts">

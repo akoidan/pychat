@@ -1,7 +1,15 @@
 <template>
-  <li :class="onlineClass" v-show="userIsInActiveRoom">
-    <div><i :class="userSexClass"></i>{{ user.user }}</div>
-    <img v-if="user.location.countryCode" class="country" :src='getFlag(user)' :title="title"/>
+  <li
+    v-show="userIsInActiveRoom"
+    :class="onlineClass"
+  >
+    <div><i :class="userSexClass" />{{ user.user }}</div>
+    <img
+      v-if="user.location.countryCode"
+      class="country"
+      :src="getFlag(user)"
+      :title="title"
+    >
   </li>
 </template>
 <script lang="ts">

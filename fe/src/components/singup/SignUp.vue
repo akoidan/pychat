@@ -1,26 +1,115 @@
 <template>
-  <form id='register-form' method='post' @submit.prevent='register' ref="form">
-    <register-field-set icon="icon-user" :validation="userCheckValue" :closed="userFoc" :description="userDescription" >
-      <input type='text' v-validity="usernameValidity" maxlength='16' autocomplete="username" required placeholder='Username'  v-model.trim="username" name='username' class="input" @focus="userFoc = false" @blur="userFoc = true"/>
+  <form
+    id="register-form"
+    ref="form"
+    method="post"
+    @submit.prevent="register"
+  >
+    <register-field-set
+      icon="icon-user"
+      :validation="userCheckValue"
+      :closed="userFoc"
+      :description="userDescription"
+    >
+      <input
+        v-model.trim="username"
+        v-validity="usernameValidity"
+        type="text"
+        maxlength="16"
+        autocomplete="username"
+        required
+        placeholder="Username"
+        name="username"
+class="input" @focus="userFoc = false" @blur="userFoc = true"
+      >
     </register-field-set>
-    <register-field-set icon="icon-lock" :validation="passwordCheckValue" :closed="passwordFoc" :description="passwordDescription" >
-      <input type= 'password' v-validity="passwordValidity" autocomplete="new-password" required name='password' class="input" placeholder='Password'  @focus="passwordFoc = false" v-model="password" @blur="passwordFoc = true"/>
+    <register-field-set
+      icon="icon-lock"
+      :validation="passwordCheckValue"
+      :closed="passwordFoc"
+      :description="passwordDescription"
+    >
+      <input
+        v-model="password"
+        v-validity="passwordValidity"
+        type="password"
+        autocomplete="new-password"
+        required
+        name="password"
+        class="input"
+placeholder="Password" @focus="passwordFoc = false" @blur="passwordFoc = true"
+      >
     </register-field-set>
-    <register-field-set icon="icon-lock" :validation="repPassCheckValue" :closed="repPassFoc" :description="repPassDescription" >
-      <input  autocomplete="new-password" v-validity="repPassValidity" type='password' required class="input" placeholder='Repeat password'  @focus="repPassFoc = false"  v-model="repPass" @blur="repPassFoc = true"/>
+    <register-field-set
+      icon="icon-lock"
+      :validation="repPassCheckValue"
+      :closed="repPassFoc"
+      :description="repPassDescription"
+    >
+      <input
+        v-model="repPass"
+        v-validity="repPassValidity"
+        autocomplete="new-password"
+        type="password"
+        required
+        class="input"
+        placeholder="Repeat password"
+        @focus="repPassFoc = false"
+        @blur="repPassFoc = true"
+      >
     </register-field-set>
-    <register-field-set icon="icon-mail" :validation="emailCheckValue" :closed="emailFoc" :description="emailDescription" >
-      <input type='email' autocomplete="email" v-validity="emailValidity" placeholder='Email' name='email' class="input" @focus="emailFoc = false"  v-model.trim="email" @blur="emailFoc = true"/>
+    <register-field-set
+      icon="icon-mail"
+      :validation="emailCheckValue"
+      :closed="emailFoc"
+      :description="emailDescription"
+    >
+      <input
+        v-model.trim="email"
+        v-validity="emailValidity"
+        type="email"
+        autocomplete="email"
+        placeholder="Email"
+        name="email"
+        class="input"
+@focus="emailFoc = false" @blur="emailFoc = true"
+      >
     </register-field-set>
-    <register-field-set icon="icon-user-pair" :validation="sexCheckValue" :closed="sexFoc" :description="sexDescription">
-      <select name='sex' class="input" @focus="sexFoc = false" v-model.trim="sex" @blur="sexFoc = true">
-        <option value='Secret' disabled selected hidden>Gender</option>
-        <option value='Male'>Male</option>
-        <option value='Female'>Female</option>
+    <register-field-set
+      icon="icon-user-pair"
+      :validation="sexCheckValue"
+      :closed="sexFoc"
+      :description="sexDescription"
+    >
+      <select
+        v-model.trim="sex"
+        name="sex"
+        class="input"
+        @focus="sexFoc = false"
+        @blur="sexFoc = true"
+      >
+        <option
+          value="Secret"
+          disabled
+          selected
+          hidden
+        >
+          Gender
+        </option>
+        <option value="Male">
+          Male
+        </option>
+        <option value="Female">
+          Female
+        </option>
       </select>
     </register-field-set>
-    <social-auth/>
-    <app-submit class='submit-button' value='REGISTER' :running="running"/>
+    <social-auth />
+    <app-submit
+      class="submit-button"
+      value="REGISTER"
+      :running="running"
+    />
   </form>
 </template>
 

@@ -1,15 +1,34 @@
 <template>
   <div class="controls">
     <div class="spanHo">
-      <span class="spann" v-for="currentUser in value" :key="currentUser.user">{{ currentUser.user }}
-        <i @click="removeUser(currentUser)" class="icon-cancel"></i>
+      <span
+        v-for="currentUser in value"
+        :key="currentUser.user"
+        class="spann"
+      >{{ currentUser.user }}
+        <i
+          class="icon-cancel"
+          @click="removeUser(currentUser)"
+        />
       </span>
     </div>
     <template v-if="showAddUsersComp">
-      <div>{{text}}</div>
-      <input type="search" class="input" placeholder="Search" v-model="search" title="Filter by username"/>
+      <div>{{ text }}</div>
+      <input
+        v-model="search"
+        type="search"
+        class="input"
+        placeholder="Search"
+        title="Filter by username"
+      >
       <ul>
-        <li v-for="user in filteredUsers" @click="addUser(user)" :key="user.user"> {{user.user}}</li>
+        <li
+          v-for="user in filteredUsers"
+          :key="user.user"
+          @click="addUser(user)"
+        >
+          {{ user.user }}
+        </li>
       </ul>
     </template>
   </div>

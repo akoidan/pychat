@@ -1,44 +1,72 @@
 <template>
   <div :class="mainClass">
     <chat-message-header
-        :time="receivingFile.time"
-        :user-id="receivingFile.userId"
+      :time="receivingFile.time"
+      :user-id="receivingFile.userId"
     />
     <table>
       <tbody>
-      <tr>
-        <th>Name:</th>
-        <td>{{receivingFile.fileName}}</td>
-      </tr>
-      <tr>
-        <th>Size:</th>
-        <td>{{size}}</td>
-      </tr>
-      <tr>
-        <th>Status:</th>
-        <td>{{status}}</td>
-      </tr>
-      <tr v-if="receivingFile.error">
-        <th>Error:</th>
-        <td>{{receivingFile.error}}</td>
-      </tr>
-      <tr v-if="receivingFile.anchor">
-        <th>Download:</th>
-        <td><a class="green-btn" :href="receivingFile.anchor" :download="receivingFile.fileName">Save</a></td>
-      </tr>
+        <tr>
+          <th>Name:</th>
+          <td>{{ receivingFile.fileName }}</td>
+        </tr>
+        <tr>
+          <th>Size:</th>
+          <td>{{ size }}</td>
+        </tr>
+        <tr>
+          <th>Status:</th>
+          <td>{{ status }}</td>
+        </tr>
+        <tr v-if="receivingFile.error">
+          <th>Error:</th>
+          <td>{{ receivingFile.error }}</td>
+        </tr>
+        <tr v-if="receivingFile.anchor">
+          <th>Download:</th>
+          <td>
+            <a
+              class="green-btn"
+              :href="receivingFile.anchor"
+              :download="receivingFile.fileName"
+            >Save</a>
+          </td>
+        </tr>
 
-      <tr v-if="isError">
-        <th>
-          Retry
-        </th>
-        <td><i class="icon-repeat" @click="retry"></i></td>
-      </tr>
+        <tr v-if="isError">
+          <th>
+            Retry
+          </th>
+          <td>
+            <i
+              class="icon-repeat"
+              @click="retry"
+            />
+          </td>
+        </tr>
       </tbody>
     </table>
-    <app-progress-bar v-if="showProgress"  class="progress-wrap-file" :upload="receivingFile.upload"/>
-    <div class="yesNo" v-if="showYesNo">
-      <input type="button" value="Accept" @click="accept" class="green-btn">
-      <input type="button" value="Decline" @click="decline" class="red-btn">
+    <app-progress-bar
+      v-if="showProgress"
+      class="progress-wrap-file"
+      :upload="receivingFile.upload"
+    />
+    <div
+      v-if="showYesNo"
+      class="yesNo"
+    >
+      <input
+        type="button"
+        value="Accept"
+        class="green-btn"
+        @click="accept"
+      >
+      <input
+        type="button"
+        value="Decline"
+        class="red-btn"
+        @click="decline"
+      >
     </div>
   </div>
 </template>

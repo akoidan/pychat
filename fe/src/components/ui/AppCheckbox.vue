@@ -1,7 +1,13 @@
 <template>
   <div>
-    <input v-bind:checked="value" @change='onchange' ref="checkbox" type="checkbox" :id="uniqueId">
-    <label :for="uniqueId"></label>
+    <input
+      :id="uniqueId"
+      ref="checkbox"
+      :checked="value"
+      type="checkbox"
+      @change="onchange"
+    >
+    <label :for="uniqueId" />
   </div>
 </template>
 <script lang="ts">

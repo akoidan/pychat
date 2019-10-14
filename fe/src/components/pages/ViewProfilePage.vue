@@ -1,47 +1,56 @@
 <template>
-  <div v-if="loading" class="spinner" />
-  <div v-else-if="error" class="error">
-    {{error}}
+  <div
+    v-if="loading"
+    class="spinner"
+  />
+  <div
+    v-else-if="error"
+    class="error"
+  >
+    {{ error }}
   </div>
-  <div v-else-if="userProfileInfo" class="profileHolder">
+  <div
+    v-else-if="userProfileInfo"
+    class="profileHolder"
+  >
     <div v-if="userProfileInfo.image">
-      <img :src="resolveMediaUrl(userProfileInfo.image)"/>
+      <img :src="resolveMediaUrl(userProfileInfo.image)">
     </div>
     <div class="tableHolder">
       <table>
         <tbody>
-        <tr>
-          <th>Username:</th>
-          <td>{{username}}</td>
-        </tr>
-        <tr>
-          <th>Name:</th>
-          <td>{{userProfileInfo.name}}</td>
-        </tr>
-        <tr>
-          <th>City:</th>
-          <td>{{userProfileInfo.city}}</td>
-        </tr>
-        <tr>
-          <th>Surname</th>
-          <td>{{userProfileInfo.surname}}</td>
-        </tr>
-        <tr>
-          <th>Email:</th>
-          <td>{{userProfileInfo.email}}</td>
-        </tr>
-        <tr>
-          <th>Birthday</th>
-          <td>{{userProfileInfo.birthday}}</td>
-        </tr>
-        <tr>
-          <th>Contacts:</th>
-          <td>{{userProfileInfo.contacts}}</td>
-        </tr>
-        <tr>
-          <th>Sex:</th>
-          <td>{{userProfileInfo.sex}}</td>
-        </tr>
+          <tr>
+            <th>Username:</th>
+            <td>{{ username }}</td>
+          </tr>
+          <tr>
+            <th>Name:</th>
+            <td>{{ userProfileInfo.name }}</td>
+          </tr>
+          <tr>
+            <th>City:</th>
+            <td>{{ userProfileInfo.city }}</td>
+          </tr>
+          <tr>
+            <th>Surname</th>
+            <td>{{ userProfileInfo.surname }}</td>
+          </tr>
+          <tr>
+            <th>Email:</th>
+            <td>{{ userProfileInfo.email }}</td>
+          </tr>
+          <tr>
+            <th>Birthday</th>
+            <td>{{ userProfileInfo.birthday }}</td>
+          </tr>
+          <tr>
+            <th>Contacts:</th>
+            <td>{{ userProfileInfo.contacts }}</td>
+          </tr>
+          <tr>
+            <th>Sex:</th>
+            <td>{{ userProfileInfo.sex }}</td>
+          </tr>
         </tbody>
       </table>
     </div>

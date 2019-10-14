@@ -1,20 +1,27 @@
 <template>
   <div class="message-self">
     <chat-message-header
-        :time="sendingFile.time"
-        :user-id="myId"/>
+      :time="sendingFile.time"
+      :user-id="myId"
+    />
     <table class="table">
       <tbody>
         <tr>
           <th>Name:</th>
-          <td>{{sendingFile.fileName}}</td>
+          <td>{{ sendingFile.fileName }}</td>
         </tr>
         <tr>
           <th>Size:</th>
-          <td>{{size}}</td>
+          <td>{{ size }}</td>
         </tr>
       </tbody>
-      <chat-sending-file-transfer :connId="sendingFile.connId" :opponentId="key" v-for="(transfer, key) in sendingFile.transfers" :key="key" :transfer="transfer"/>
+      <chat-sending-file-transfer
+        v-for="(transfer, key) in sendingFile.transfers"
+        :key="key"
+        :conn-id="sendingFile.connId"
+        :opponent-id="key"
+        :transfer="transfer"
+      />
     </table>
   </div>
 </template>

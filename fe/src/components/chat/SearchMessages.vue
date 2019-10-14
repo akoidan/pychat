@@ -1,8 +1,22 @@
 <template>
-  <div class="search" v-show="searchActive" :class="{'loading': !!currentRequest}">
-    <input type="search" class="input" ref="inputSearch" v-model.trim="search"/>
-    <div class="search-loading"></div>
-    <div class="search_result" v-if="searchResultText">{{searchResultText}}</div>
+  <div
+    v-show="searchActive"
+    class="search"
+    :class="{'loading': !!currentRequest}"
+  >
+    <input
+      ref="inputSearch"
+      v-model.trim="search"
+      type="search"
+      class="input"
+    >
+    <div class="search-loading" />
+    <div
+      v-if="searchResultText"
+      class="search_result"
+    >
+      {{ searchResultText }}
+    </div>
   </div>
 </template>
 <script lang="ts">

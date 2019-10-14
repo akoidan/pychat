@@ -1,15 +1,42 @@
 <template>
-  <div class="spinner" v-if="checkingToken"/>
-  <h1 v-else-if="error" class="error">
-    {{error}}
+  <div
+    v-if="checkingToken"
+    class="spinner"
+  />
+  <h1
+    v-else-if="error"
+    class="error"
+  >
+    {{ error }}
   </h1>
-  <form v-else method="post" @submit.prevent="submitResetPassword">
-    <div class="restoreHeader">Restore password for
+  <form
+    v-else
+    method="post"
+    @submit.prevent="submitResetPassword"
+  >
+    <div class="restoreHeader">
+      Restore password for
       <b>{{ restoreUser }}</b>
     </div>
-    <input type="password" v-model="password" class="input" required placeholder="password"/>
-    <input type="password" v-model="repeatPassword" class="input" required placeholder="repeat password"/>
-    <app-submit class='submit-button' value='Submit Password' :running="running"/>
+    <input
+      v-model="password"
+      type="password"
+      class="input"
+      required
+      placeholder="password"
+    >
+    <input
+      v-model="repeatPassword"
+      type="password"
+      class="input"
+      required
+      placeholder="repeat password"
+    >
+    <app-submit
+      class="submit-button"
+      value="Submit Password"
+      :running="running"
+    />
   </form>
 </template>
 <script lang="ts">

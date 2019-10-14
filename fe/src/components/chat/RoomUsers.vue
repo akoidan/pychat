@@ -1,28 +1,76 @@
 <template>
   <div class="chat-room-users-wrapper">
-      <span>
-        <span name="direct" :class="directClass" @click="directMinified = !directMinified"></span>
-        <span class="directStateText">direct  messages</span>
-        <router-link to="/create-private-room" class="icon-plus-squared" title="Create direct room"/>
-      </span>
-    <ul class="directUserTable" v-show="!directMinified">
-      <room-users-private :key="room.id" v-for="room in privateRooms" :room="room"/>
-    </ul>
     <span>
-        <span name="channel" :class="roomsClass" @click="roomsMinified = !roomsMinified"></span>
-        <span class="channelsStateText">rooms</span>
-        <router-link to="/create-public-room" class="icon-plus-squared" title="Create public room"/>
+      <span
+        name="direct"
+        :class="directClass"
+        @click="directMinified = !directMinified"
+      />
+      <span class="directStateText">direct  messages</span>
+      <router-link
+        to="/create-private-room"
+        class="icon-plus-squared"
+        title="Create direct room"
+      />
     </span>
-    <ul class="rooms" v-show="!roomsMinified">
-      <room-users-public v-for="room in publicRooms" :key="room.id" :room="room"/>
+    <ul
+      v-show="!directMinified"
+      class="directUserTable"
+    >
+      <room-users-private
+        v-for="room in privateRooms"
+        :key="room.id"
+        :room="room"
+      />
     </ul>
     <span>
-        <span name="user" :class="onlineClass" @click="onlineMinified = !onlineMinified"></span>
-        <span class="usersStateText" @click="onlineShowOnlyOnline = !onlineShowOnlyOnline">{{onlineText}}</span>
-        <router-link :to="`/invite-user/${activeRoomId}`" class="icon-user-plus" title="Add user to current active channel"/>
-      </span>
-    <ul class="chat-user-table" v-show="!onlineMinified">
-      <room-users-user v-for="user in usersArray" :user="user" :key="user.id"></room-users-user>
+      <span
+        name="channel"
+        :class="roomsClass"
+        @click="roomsMinified = !roomsMinified"
+      />
+      <span class="channelsStateText">rooms</span>
+      <router-link
+        to="/create-public-room"
+        class="icon-plus-squared"
+        title="Create public room"
+      />
+    </span>
+    <ul
+      v-show="!roomsMinified"
+      class="rooms"
+    >
+      <room-users-public
+        v-for="room in publicRooms"
+        :key="room.id"
+        :room="room"
+      />
+    </ul>
+    <span>
+      <span
+        name="user"
+        :class="onlineClass"
+        @click="onlineMinified = !onlineMinified"
+      />
+      <span
+        class="usersStateText"
+        @click="onlineShowOnlyOnline = !onlineShowOnlyOnline"
+      >{{ onlineText }}</span>
+      <router-link
+        :to="`/invite-user/${activeRoomId}`"
+        class="icon-user-plus"
+        title="Add user to current active channel"
+      />
+    </span>
+    <ul
+      v-show="!onlineMinified"
+      class="chat-user-table"
+    >
+      <room-users-user
+        v-for="user in usersArray"
+        :key="user.id"
+        :user="user"
+      />
     </ul>
   </div>
 </template>

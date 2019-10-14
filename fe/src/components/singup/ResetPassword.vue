@@ -1,13 +1,28 @@
 <template>
-  <form @submit.prevent='restorePassword' ref="form">
+  <form
+    ref="form"
+    @submit.prevent="restorePassword"
+  >
     <div>
-      <input type='text' class="input" required placeholder='Username or email'  name='username_or_password'
-             value=''/>
-      <div class='slider'>Enter your username or email</div>
+      <input
+        type="text"
+        class="input"
+        required
+        placeholder="Username or email"
+        name="username_or_password"
+        value=""
+      >
+      <div class="slider">
+        Enter your username or email
+      </div>
     </div>
-    <captcha-component v-model="running"/>
+    <captcha-component v-model="running" />
     <div>
-      <app-submit class='submit-button' value='Recover password' :running="running"/>
+      <app-submit
+        class="submit-button"
+        value="Recover password"
+        :running="running"
+      />
     </div>
   </form>
 </template>

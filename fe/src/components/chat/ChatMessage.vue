@@ -1,10 +1,18 @@
 <template>
-  <p :class="mainCls" @contextmenu="contextmenu">
+  <p
+    :class="mainCls"
+    @contextmenu="contextmenu"
+  >
     <chat-message-header
-        :time="message.time"
-        :user-id="message.userId"
-        @quote="quote"/>
-    <span class="message-text-style" v-html="encoded" ref="content"></span>
+      :time="message.time"
+      :user-id="message.userId"
+      @quote="quote"
+    />
+    <span
+      ref="content"
+      class="message-text-style"
+      v-html="encoded"
+    />
   </p>
 </template>
 <script lang="ts">

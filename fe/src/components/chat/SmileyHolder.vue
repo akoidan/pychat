@@ -2,23 +2,27 @@
   <div class="smileParentHolder">
     <ul class="tabNames">
       <li
-          v-for="(_, tabName) in smileys"
-          :key="tabName"
-          :class="{'activeTab': activeTab === tabName}"
-          @click="activeTab = tabName">{{tabName}}
+        v-for="(_, tabName) in smileys"
+        :key="tabName"
+        :class="{'activeTab': activeTab === tabName}"
+        @click="activeTab = tabName"
+      >
+        {{ tabName }}
       </li>
     </ul>
     <template v-for="(allSmileys, tabName) in smileys">
       <div
-          :key="tabName"
-          v-show="activeTab === tabName">
+        v-show="activeTab === tabName"
+        :key="tabName"
+      >
         <img
-            @click="$emit('add-smiley', code)"
-            v-for="(smiley, code) in allSmileys"
-            :src="smiley.src"
-            :alt="smiley.alt"
-            :code="code"
-            :key="code">
+          v-for="(smiley, code) in allSmileys"
+          :key="code"
+          :src="smiley.src"
+          :alt="smiley.alt"
+          :code="code"
+          @click="$emit('add-smiley', code)"
+        >
       </div>
     </template>
   </div>

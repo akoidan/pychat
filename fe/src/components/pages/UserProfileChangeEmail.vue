@@ -1,21 +1,46 @@
 <template>
-  <form @submit.prevent="saveProfile" class="holder" method="post">
+  <form
+    class="holder"
+    method="post"
+    @submit.prevent="saveProfile"
+  >
     <table>
       <tbody>
+        <tr>
+          <th>Enter your password:</th>
+          <td>
+            <input
+              v-model="password"
+              autocomplete="password"
+              required
+              class="input"
+              type="password"
+              name="password"
+              minlength="3"
+            >
+          </td>
+        </tr>
+        <tr>
+          <th>Email:</th>
+          <td>
+            <input
+              v-model="email"
+              maxlength="190"
+              class="input"
+              type="email"
+            >
+          </td>
+        </tr>
+      </tbody>
       <tr>
-        <th>Enter your password:</th>
-        <td>
-          <input autocomplete="password" required class="input" type="password" name="password" minlength="3" v-model="password">
+        <td colspan="2">
+          <app-submit
+            class="green-btn"
+            value="Apply Password"
+            :running="running"
+          />
         </td>
       </tr>
-      <tr>
-        <th>Email:</th>
-        <td><input maxlength="190" class="input" v-model="email" type="email"></td>
-      </tr>
-      </tbody>
-      <tr><td colspan="2">
-        <app-submit class="green-btn" value='Apply Password' :running="running"/>
-      </td></tr>
     </table>
   </form>
 </template>

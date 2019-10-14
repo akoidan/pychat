@@ -1,28 +1,68 @@
 <template>
-  <form @submit.prevent="saveProfile" class="holder" method="post">
+  <form
+    class="holder"
+    method="post"
+    @submit.prevent="saveProfile"
+  >
     <table>
       <tbody>
-      <tr>
-        <th>Old password:</th>
-        <td>
-          <input type="text" name="username" autocomplete="username" v-model="username" v-show="false"/>
-          <input autocomplete="password" class="input" minlength="3" required type="password" v-model="oldPassword">
-        </td>
-      </tr>
-      <tr>
-        <th>New password:</th>
-        <td>
-          <input autocomplete="new-password" required class="input" type="password" name="password" minlength="3" v-model="newPassword">
-        </td>
-      </tr>
-      <tr>
-        <th>Confirm password:</th>
-        <td><input autocomplete="new-password" required class="input" type="password" minlength="3" v-model="confirmPassword"></td>
-      </tr>
+        <tr>
+          <th>Old password:</th>
+          <td>
+            <input
+              v-show="false"
+              v-model="username"
+              type="text"
+              name="username"
+              autocomplete="username"
+            >
+            <input
+              v-model="oldPassword"
+              autocomplete="password"
+              class="input"
+              minlength="3"
+              required
+              type="password"
+            >
+          </td>
+        </tr>
+        <tr>
+          <th>New password:</th>
+          <td>
+            <input
+              v-model="newPassword"
+              autocomplete="new-password"
+              required
+              class="input"
+              type="password"
+              name="password"
+              minlength="3"
+            >
+          </td>
+        </tr>
+        <tr>
+          <th>Confirm password:</th>
+          <td>
+            <input
+              v-model="confirmPassword"
+              autocomplete="new-password"
+              required
+              class="input"
+              type="password"
+              minlength="3"
+            >
+          </td>
+        </tr>
       </tbody>
-      <tr><td colspan="2">
-        <app-submit class="green-btn" value='Apply Password' :running="running"/>
-      </td></tr>
+      <tr>
+        <td colspan="2">
+          <app-submit
+            class="green-btn"
+            value="Apply Password"
+            :running="running"
+          />
+        </td>
+      </tr>
     </table>
   </form>
 </template>

@@ -3,24 +3,36 @@
     <div>
       <table class="table">
         <tbody>
-        <tr>
-          <th>From:</th>
-          <td>{{caller}}</td>
-        </tr>
-        <tr>
-          <th>Room:</th>
-          <td>{{room}}</td>
-        </tr>
+          <tr>
+            <th>From:</th>
+            <td>{{ caller }}</td>
+          </tr>
+          <tr>
+            <th>Room:</th>
+            <td>{{ room }}</td>
+          </tr>
         </tbody>
       </table>
       <div class="answerButtons">
-        <button class="green-btn" @click="answer"><i class="icon-call-aswer"></i>
+        <button
+          class="green-btn"
+          @click="answer"
+        >
+          <i class="icon-call-aswer" />
           <div>Answer</div>
         </button>
-        <button class="green-btn" @click="videoAnswer"><i class="icon-videocam"></i>
+        <button
+          class="green-btn"
+          @click="videoAnswer"
+        >
+          <i class="icon-videocam" />
           <div>With video</div>
         </button>
-        <button class="red-btn" @click="hangUp"><i class="icon-hang-up"></i>
+        <button
+          class="red-btn"
+          @click="hangUp"
+        >
+          <i class="icon-hang-up" />
           <div>Decline</div>
         </button>
       </div>

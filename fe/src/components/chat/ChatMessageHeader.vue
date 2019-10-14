@@ -1,8 +1,11 @@
 <template>
-   <span class="message-header">
-    <span class="timeMess" @click="quote">({{getTime}})</span>
-    <span @contextmenu.prevent.stop="setActiveUser">{{username}}</span>:
-   </span>
+  <span class="message-header">
+    <span
+      class="timeMess"
+      @click="quote"
+    >({{ getTime }})</span>
+    <span @contextmenu.prevent.stop="setActiveUser">{{ username }}</span>:
+  </span>
 </template>
 <script lang="ts">
   import {State} from '@/utils/storeHolder';

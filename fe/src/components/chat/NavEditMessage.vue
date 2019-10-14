@@ -1,10 +1,23 @@
 <template>
   <nav>
-    <i class="icon-pencil" v-if="!editedMessage.isEditingNow" @click.stop="m2EditMessage"><span
-        class="mText">Edit</span></i>
-    <i class="icon-trash-circled" v-if="!editedMessage.isEditingNow" @click.stop="m2DeleteMessage"><span
-        class="mText">Delete</span></i>
-    <i class="icon-cancel" @click.stop="m2Close"><span class="mText">Close</span></i>
+    <i
+      v-if="!editedMessage.isEditingNow"
+      class="icon-pencil"
+      @click.stop="m2EditMessage"
+    ><span
+      class="mText"
+    >Edit</span></i>
+    <i
+      v-if="!editedMessage.isEditingNow"
+      class="icon-trash-circled"
+      @click.stop="m2DeleteMessage"
+    ><span
+      class="mText"
+    >Delete</span></i>
+    <i
+      class="icon-cancel"
+      @click.stop="m2Close"
+    ><span class="mText">Close</span></i>
   </nav>
 </template>
 <script lang="ts">

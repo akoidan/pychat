@@ -1,6 +1,18 @@
 <template>
-  <datepicker v-if="isDateMissing" placeholder="Select Date" v-bind:value="datePickerValue" :input-class="`${inputClass} ${inputClassDatepicker}`" @input="oninput"></datepicker>
-  <input type="date" :class="inputClass" v-else v-bind:value="value" @input="oninputnative"/>
+  <datepicker
+    v-if="isDateMissing"
+    placeholder="Select Date"
+    :value="datePickerValue"
+    :input-class="`${inputClass} ${inputClassDatepicker}`"
+    @input="oninput"
+  />
+  <input
+    v-else
+    type="date"
+    :class="inputClass"
+    :value="value"
+    @input="oninputnative"
+  >
 </template>
 <script lang="ts">
   import {State} from '@/utils/storeHolder';

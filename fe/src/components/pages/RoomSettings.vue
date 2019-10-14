@@ -1,46 +1,74 @@
 <template>
-  <form class="holder" @submit.prevent='apply' v-if="room">
+  <form
+    v-if="room"
+    class="holder"
+    @submit.prevent="apply"
+  >
     <table>
       <tbody>
-      <tr v-if="isPublic">
-        <th>
-          Name
-        </th>
-        <td>
-          <input type="text" :required="isPublic" class="input" v-model="roomName" maxlength="16">
-          <div v-if="!isPublic && roomName">By adding name to this room, you'll make it public </div>
-        </td>
-      </tr>
-      <tr>
-        <th>
-          Notifications
-        </th>
-        <td>
-          <app-checkbox v-model="notifications"/>
-        </td>
-      </tr>
-      <tr>
-        <th>
-          Sound
-        </th>
-        <td>
-          <app-input-range min="0" max="100" v-model="sound"/>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <app-submit type="button" class="red-btn" @click.native="leave" value="LEAVE THIS ROOM" :running="running"/>
-        </td>
-      </tr>
-      <tr>
-        <td colspan="2">
-          <app-submit value="APPLY SETTINGS" class="green-btn" :running="running"/>
-        </td>
-      </tr>
+        <tr v-if="isPublic">
+          <th>
+            Name
+          </th>
+          <td>
+            <input
+              v-model="roomName"
+              type="text"
+              :required="isPublic"
+              class="input"
+              maxlength="16"
+            >
+            <div v-if="!isPublic && roomName">
+              By adding name to this room, you'll make it public
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th>
+            Notifications
+          </th>
+          <td>
+            <app-checkbox v-model="notifications" />
+          </td>
+        </tr>
+        <tr>
+          <th>
+            Sound
+          </th>
+          <td>
+            <app-input-range
+              v-model="sound"
+              min="0"
+              max="100"
+            />
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <app-submit
+              type="button"
+              class="red-btn"
+              value="LEAVE THIS ROOM"
+              :running="running"
+              @click.native="leave"
+            />
+          </td>
+        </tr>
+        <tr>
+          <td colspan="2">
+            <app-submit
+              value="APPLY SETTINGS"
+              class="green-btn"
+              :running="running"
+            />
+          </td>
+        </tr>
       </tbody>
     </table>
   </form>
-  <div v-else>Room #{{roomId}} doesn't exist </div>
+  <div v-else>
+    Room #{{ roomId }} doesn't exist
+  </div>
 </template>
 <script lang="ts">
   import {State} from '@/utils/storeHolder';

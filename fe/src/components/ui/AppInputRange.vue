@@ -1,5 +1,11 @@
 <template>
-  <input type="range" @input="oninput" v-bind:value="value" :class="cls" ref="el" />
+  <input
+    ref="el"
+    type="range"
+    :value="value"
+    :class="cls"
+    @input="oninput"
+  >
 </template>
 <script lang="ts">
   import {Component, Vue, Prop, Ref} from "vue-property-decorator";

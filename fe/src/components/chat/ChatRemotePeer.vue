@@ -1,9 +1,18 @@
 <template>
   <div class="micVideoWrapper">
-    <video-object :muted="null" :media-stream-link="callInfo.mediaStreamLink"/>
+    <video-object
+      :muted="null"
+      :media-stream-link="callInfo.mediaStreamLink"
+    />
     <div>
-      <app-input-range :value="volumeLevel" min="0" max="100" title="Volume level" :class="volLevelClass"/>
-      <span>{{userNameValue}}</span>
+      <app-input-range
+        :value="volumeLevel"
+        min="0"
+        max="100"
+        title="Volume level"
+        :class="volLevelClass"
+      />
+      <span>{{ userNameValue }}</span>
     </div>
   </div>
 </template>

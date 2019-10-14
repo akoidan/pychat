@@ -1,11 +1,15 @@
 <template>
   <div class="reg-log-container">
     <div class="topBtns">
-      <router-link to="/auth/sign-up">Sign Up</router-link>
-      <router-link to="/auth/login">Log In</router-link>
+      <router-link to="/auth/sign-up">
+        Sign Up
+      </router-link>
+      <router-link to="/auth/login">
+        Log In
+      </router-link>
     </div>
-    <h1>{{regHeader}}</h1>
-    <router-view></router-view>
+    <h1>{{ regHeader }}</h1>
+    <router-view />
   </div>
 </template>
 

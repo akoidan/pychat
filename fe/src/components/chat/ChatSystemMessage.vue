@@ -1,6 +1,4 @@
-<template>
-  
-</template>
+<template />
 <script lang="ts">
   import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue} from "vue-property-decorator";
