@@ -26,28 +26,26 @@
   </div>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {SendingFile, UserModel} from "@/types/model";
-  import {bytesToSize} from '@/utils/utils';
-  import AppProgressBar from '@/components/ui/AppProgressBar';
-  import ChatSendingFileTransfer from '@/components/chat/ChatSendingFileTransfer';
-  import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
-  @Component({
-    components: {ChatMessageHeader, ChatSendingFileTransfer, AppProgressBar}
-  })
-  export default class ChatSendingFile extends Vue {
-    @Prop() sendingFile!: SendingFile;
-    @State
-    public readonly myId!: number;
+import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import {SendingFile, UserModel} from '@/types/model';
+import {bytesToSize} from '@/utils/utils';
+import AppProgressBar from '@/components/ui/AppProgressBar';
+import ChatSendingFileTransfer from '@/components/chat/ChatSendingFileTransfer';
+import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
+@Component({
+  components: {ChatMessageHeader, ChatSendingFileTransfer, AppProgressBar}
+})
+export default class ChatSendingFile extends Vue {
+  @Prop() public sendingFile!: SendingFile;
+  @State
+  public readonly myId!: number;
 
-
-    get size() {
-      return bytesToSize(this.sendingFile.fileSize)
-    }
-
-
+  get size() {
+    return bytesToSize(this.sendingFile.fileSize);
   }
+
+}
 </script>
 
 <style lang="sass" scoped>

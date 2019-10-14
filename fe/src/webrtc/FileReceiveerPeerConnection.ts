@@ -6,7 +6,7 @@ import WsHandler from '@/utils/WsHandler';
 import {requestFileSystem} from '@/utils/htmlApi';
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API, MAX_BUFFER_SIZE} from '@/utils/consts';
 import FilePeerConnection from '@/webrtc/FilePeerConnection';
-import {DefaultStore} from'@/utils/store';
+import {DefaultStore} from '@/utils/store';
 import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {
@@ -20,10 +20,10 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     declineFileReply: this.declineFileReply,
     destroyFileConnection: this.destroyFileConnection
   };
-  private fileSize: number;
+  private readonly fileSize: number;
   private fileEntry: FileEntry |null = null;
   private fileWriter: FileWriter|null = null;
-  private blobsQueue: Blob[] = [];
+  private readonly blobsQueue: Blob[] = [];
   private receiveBuffer: BlobPart[] = [];
   private receivedSize = 0;
   private recevedUsingFile = false;

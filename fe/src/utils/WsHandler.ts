@@ -31,7 +31,7 @@ import {
 } from '@/types/converters';
 import {UserProfileDto, UserSettingsDto} from '@/types/dto';
 import {sub} from '@/utils/sub';
-import {DefaultStore} from'@/utils/store';
+import {DefaultStore} from '@/utils/store';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
@@ -52,17 +52,17 @@ export default class WsHandler extends MessageHandler {
     ping: <HandlerType>this.ping,
     pong: this.pong
   };
-  private loggerIn: Logger;
-  private loggerOut: Logger;
+  private readonly loggerIn: Logger;
+  private readonly loggerOut: Logger;
   private pingTimeoutFunction: number|null = null;
   private ws: WebSocket | null = null;
   private noServerPingTimeout: any;
-  private loadHistoryFromWs: boolean = false;
-  private store: DefaultStore;
-  private sessionHolder: SessionHolder;
+  private readonly loadHistoryFromWs: boolean = false;
+  private readonly store: DefaultStore;
+  private readonly sessionHolder: SessionHolder;
   private listenWsTimeout: number|null = null;
-  private API_URL: string;
-  private callBacks: { [id: number]: Function } = {};
+  private readonly API_URL: string;
+  private readonly callBacks: { [id: number]: Function } = {};
 
   private messageId: number = 0;
   private wsState: WsState = WsState.NOT_INITED;

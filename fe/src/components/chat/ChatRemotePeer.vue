@@ -17,36 +17,36 @@
   </div>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
-  import {CallInfoModel} from '@/types/model';
-  import AppInputRange from '@/components/ui/AppInputRange';
-  import VideoObject from '@/components/chat/VideoObject';
-  @Component({
-    components: {VideoObject, AppInputRange}
-  })
-  export default class ChatRemotePeer extends Vue {
+import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
+import {CallInfoModel} from '@/types/model';
+import AppInputRange from '@/components/ui/AppInputRange';
+import VideoObject from '@/components/chat/VideoObject';
+@Component({
+  components: {VideoObject, AppInputRange}
+})
+export default class ChatRemotePeer extends Vue {
 
-    @Ref()
-    video!: VideoObject;
+  @Ref()
+  public video!: VideoObject;
 
-    @Prop() callInfo!: CallInfoModel;
+  @Prop() public callInfo!: CallInfoModel;
 
-    get userNameValue() :string {
-      return this.store.userName(this.callInfo.userId);
-    }
-
-    get volLevelClass() {
-      return `vol-level-${this.callInfo.opponentCurrentVoice}`;
-    }
-    volumeLevel: number = 100;
-
-    @Watch('volumeLevel')
-    onVolumeChanged(newValue: number) {
-      (this.video.$refs.video as HTMLVideoElement).volume = newValue / 100;
-    }
-
+  get userNameValue(): string {
+    return this.store.userName(this.callInfo.userId);
   }
+
+  get volLevelClass() {
+    return `vol-level-${this.callInfo.opponentCurrentVoice}`;
+  }
+  public volumeLevel: number = 100;
+
+  @Watch('volumeLevel')
+  public onVolumeChanged(newValue: number) {
+    (this.video.$refs.video as HTMLVideoElement).volume = newValue / 100;
+  }
+
+}
 </script>
 
 <style lang="sass" scoped>

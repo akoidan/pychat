@@ -14,30 +14,30 @@
 </template>
 
 <script lang='ts'>
-  import {Component, Vue} from "vue-property-decorator";
-  import {State} from '@/utils/storeHolder';
-  import {AUTO_REGISTRATION} from '@/utils/consts';
-  import {api} from '@/utils/singletons';
-  import {ApplyGrowlErr, login} from '@/utils/utils';
+import {Component, Vue} from 'vue-property-decorator';
+import {State} from '@/utils/storeHolder';
+import {AUTO_REGISTRATION} from '@/utils/consts';
+import {api} from '@/utils/singletons';
+import {ApplyGrowlErr, login} from '@/utils/utils';
 
-  @Component
-  export default class MainPage extends Vue {
-    @State
-    public readonly regHeader!: string;
+@Component
+export default class MainPage extends Vue {
+  @State
+  public readonly regHeader!: string;
 
-    getRandom(): string {
-      return Math.random().toString(36).substring(7);
-    }
-
-    @ApplyGrowlErr({message: 'Auto-registration error'})
-    async created() {
-      if (AUTO_REGISTRATION) {
-        let s: string = await this.$api.registerDict(this.getRandom(), this.getRandom());
-        login(s);
-      }
-    }
-
+  public getRandom(): string {
+    return Math.random().toString(36).substring(7);
   }
+
+  @ApplyGrowlErr({message: 'Auto-registration error'})
+  public async created() {
+    if (AUTO_REGISTRATION) {
+      const s: string = await this.$api.registerDict(this.getRandom(), this.getRandom());
+      login(s);
+    }
+  }
+
+}
 </script>
 
 <style lang="sass" scoped>

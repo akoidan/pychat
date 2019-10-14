@@ -12,41 +12,41 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {bytesToSize} from "@/utils/utils";
-  import {UploadProgressModel} from "@/types/model";
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import {bytesToSize} from '@/utils/utils';
+import {UploadProgressModel} from '@/types/model';
 
-  @Component
-  export default class AppProgressBar extends Vue {
-    @Prop()
-    public readonly upload!: UploadProgressModel;
+@Component
+export default class AppProgressBar extends Vue {
+  @Prop()
+  public readonly upload!: UploadProgressModel;
 
-    get totalMb() {
-      return bytesToSize(this.upload.total);
-    }
-
-    get valueMb() {
-      return bytesToSize(this.upload.uploaded);
-    }
-
-    get finished() {
-      return this.upload.total === this.upload.uploaded && this.upload.total !== 0;
-    }
-
-    get text() {
-      return `${this.valueMb} / ${this.totalMb} (${this.percents})`;
-    }
-
-    get style() {
-      return {
-        width: this.percents
-      }
-    }
-
-    get percents() {
-      return this.upload.total ? `${Math.round(this.upload.uploaded * 100 / this.upload.total)}%` : 0;
-    }
+  get totalMb() {
+    return bytesToSize(this.upload.total);
   }
+
+  get valueMb() {
+    return bytesToSize(this.upload.uploaded);
+  }
+
+  get finished() {
+    return this.upload.total === this.upload.uploaded && this.upload.total !== 0;
+  }
+
+  get text() {
+    return `${this.valueMb} / ${this.totalMb} (${this.percents})`;
+  }
+
+  get style() {
+    return {
+      width: this.percents
+    };
+  }
+
+  get percents() {
+    return this.upload.total ? `${Math.round(this.upload.uploaded * 100 / this.upload.total)}%` : 0;
+  }
+}
 </script>
 
 <style lang="sass" scoped>

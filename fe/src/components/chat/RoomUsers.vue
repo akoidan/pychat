@@ -75,47 +75,46 @@
   </div>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Vue} from "vue-property-decorator";
-  import {RoomModel, SexModelString, UserDictModel, UserModel} from "@/types/model";
-  import RoomUsersUser from '@/components/chat/RoomUsersUser';
-  import RoomUsersPublic from '@/components/chat/RoomUsersPublic';
-  import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate';
-  @Component({
-    components: {RoomUsersPrivate, RoomUsersPublic, RoomUsersUser}
-  })
-  export default class RoomUsers extends Vue {
+import {State} from '@/utils/storeHolder';
+import {Component, Vue} from 'vue-property-decorator';
+import {RoomModel, SexModelString, UserDictModel, UserModel} from '@/types/model';
+import RoomUsersUser from '@/components/chat/RoomUsersUser';
+import RoomUsersPublic from '@/components/chat/RoomUsersPublic';
+import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate';
+@Component({
+  components: {RoomUsersPrivate, RoomUsersPublic, RoomUsersUser}
+})
+export default class RoomUsers extends Vue {
 
-    @State
-    public readonly usersArray!: UserModel[];
-    @State
-    public readonly activeRoomId!: number;
-    @State
-    public readonly publicRooms!: RoomModel[];
-    @State
-    public readonly privateRooms!: RoomModel[];
+  @State
+  public readonly usersArray!: UserModel[];
+  @State
+  public readonly activeRoomId!: number;
+  @State
+  public readonly publicRooms!: RoomModel[];
+  @State
+  public readonly privateRooms!: RoomModel[];
 
-    directMinified: boolean = false;
-    roomsMinified: boolean = false;
-    onlineMinified: boolean = false;
-    onlineShowOnlyOnline: boolean = false;
+  public directMinified: boolean = false;
+  public roomsMinified: boolean = false;
+  public onlineMinified: boolean = false;
+  public onlineShowOnlyOnline: boolean = false;
 
-
-    get onlineText() {
-      return this.onlineShowOnlyOnline ? 'Room Users' : 'Room Online'
-    }
-
-    get directClass() {
-      return this.directMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down'
-    }
-    get roomsClass() {
-      return this.roomsMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down'
-    }
-    get onlineClass() {
-      return this.onlineMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down'
-    }
-
+  get onlineText() {
+    return this.onlineShowOnlyOnline ? 'Room Users' : 'Room Online';
   }
+
+  get directClass() {
+    return this.directMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
+  }
+  get roomsClass() {
+    return this.roomsMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
+  }
+  get onlineClass() {
+    return this.onlineMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
+  }
+
+}
 </script>
 
 <style lang="sass" scoped>

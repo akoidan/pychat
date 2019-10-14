@@ -3,14 +3,14 @@ import {Logger} from 'lines-logger';
 import {stopVideo} from '@/utils/htmlApi';
 
 export default class MediaCapture {
-  private isRecordingVideo: boolean;
-  private onFinish: Function;
+  private readonly isRecordingVideo: boolean;
+  private readonly onFinish: Function;
   private mediaRecorder: MediaRecorder|null = null;
   private timeout: number | null = null;
   private stopped: boolean = false;
 
-  private logger: Logger = loggerFactory.getLoggerColor('nav-record', 'brown');
-  private recordedBlobs: any[] = [];
+  private readonly logger: Logger = loggerFactory.getLoggerColor('nav-record', 'brown');
+  private readonly recordedBlobs: any[] = [];
   private stream: MediaStream|null = null;
 
   constructor(isRecordingVideo: boolean, onFinish: Function) {

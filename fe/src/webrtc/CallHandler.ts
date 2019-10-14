@@ -47,7 +47,7 @@ export default class CallHandler extends BaseTransferHandler {
   private localStream: MediaStream | null = null;
   private audioProcessor: JsAudioAnalyzer | null = null;
   private callStatus: CallStatus = 'not_inited';
-  private acceptedPeers: string[] = [];
+  private readonly acceptedPeers: string[] = [];
 
   public inflateDevices(devices: MediaDeviceInfo[]): void {
     let n: number, k: number, c: number = 0;

@@ -102,42 +102,42 @@
   </form>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import AppSubmit from '@/components/ui/AppSubmit';
-  import {CurrentUserInfoModel, SexModelString} from "@/types/model";
-  import {UserProfileDto} from '@/types/dto';
-  import {currentUserInfoModelToDto, userSettingsDtoToModel} from "@/types/converters";
-  import AppInputDate from '@/components/ui/AppInputDate';
-  import {ApplyGrowlErr} from '@/utils/utils';
-  import {SetUserProfileMessage} from '@/types/messages';
+import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import AppSubmit from '@/components/ui/AppSubmit';
+import {CurrentUserInfoModel, SexModelString} from '@/types/model';
+import {UserProfileDto} from '@/types/dto';
+import {currentUserInfoModelToDto, userSettingsDtoToModel} from '@/types/converters';
+import AppInputDate from '@/components/ui/AppInputDate';
+import {ApplyGrowlErr} from '@/utils/utils';
+import {SetUserProfileMessage} from '@/types/messages';
 
-  @Component({
-    components: {AppInputDate, AppSubmit}
-  })
-  export default class UserProfileInfo extends Vue {
-    running: boolean = false;
-    @State
-    public readonly userInfo!: CurrentUserInfoModel;
-    private model!: UserProfileDto;
+@Component({
+  components: {AppInputDate, AppSubmit}
+})
+export default class UserProfileInfo extends Vue {
+  public running: boolean = false;
+  @State
+  public readonly userInfo!: CurrentUserInfoModel;
 
-    sex: SexModelString[] = ["Male", "Female", "Secret"];
+  public sex: SexModelString[] = ['Male', 'Female', 'Secret'];
+  private model!: UserProfileDto;
 
-    public created() {
-      this.store.setActiveUserId(0);
-      this.model = currentUserInfoModelToDto(this.userInfo);
-    }
+  public created() {
+    this.store.setActiveUserId(0);
+    this.model = currentUserInfoModelToDto(this.userInfo);
+  }
 
-    @ApplyGrowlErr({ message: 'Error saving profile', runningProp: 'running'})
-    async save() {
-      this.logger.debug('Saving userProfile')();
-      let cui: UserProfileDto = {...this.model};
-      let e: SetUserProfileMessage | unknown = await this.$ws.saveUser(cui);
-      if (e && (e as SetUserProfileMessage).action === 'setUserProfile') {
-        this.store.growlSuccess('User profile has been saved');
-      }
+  @ApplyGrowlErr({ message: 'Error saving profile', runningProp: 'running'})
+  public async save() {
+    this.logger.debug('Saving userProfile')();
+    const cui: UserProfileDto = {...this.model};
+    const e: SetUserProfileMessage | unknown = await this.$ws.saveUser(cui);
+    if (e && (e as SetUserProfileMessage).action === 'setUserProfile') {
+      this.store.growlSuccess('User profile has been saved');
     }
   }
+}
 </script>
 
 <style lang="sass" scoped>

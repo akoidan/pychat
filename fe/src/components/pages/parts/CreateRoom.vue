@@ -53,68 +53,69 @@
   </div>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import AppInputRange from "@/components/ui/AppInputRange";
-  import AppSubmit from "@/components/ui/AppSubmit";
-  import AddUserToRoom from "@/components/pages/parts/AddUserToRoom";
-  import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
-  import {AddRoomMessage} from "@/types/messages";
-  import AppCheckbox from "@/components/ui/AppCheckbox";
-  import {PrivateRoomsIds} from '@/types/types';
+import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import AppInputRange from '@/components/ui/AppInputRange';
+import AppSubmit from '@/components/ui/AppSubmit';
+import AddUserToRoom from '@/components/pages/parts/AddUserToRoom';
+import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
+import {AddRoomMessage} from '@/types/messages';
+import AppCheckbox from '@/components/ui/AppCheckbox';
+import {PrivateRoomsIds} from '@/types/types';
 
-  @Component({components: {AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})
-  export default class CreateRoom extends Vue {
+@Component({components: {AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})
+export default class CreateRoom extends Vue {
 
-    @State
-    public readonly privateRooms!: RoomModel[];
-    @State
-    public readonly privateRoomsUsersIds!: PrivateRoomsIds;
-    @State
-    public readonly userInfo!: CurrentUserInfoModel;
-    currentUsers: UserModel[] = [];
-    notifications: boolean = false;
-    sound: number = 0;
-    roomName: string = '';
-    running: boolean = false;
+  @State
+  public readonly privateRooms!: RoomModel[];
+  @State
+  public readonly privateRoomsUsersIds!: PrivateRoomsIds;
+  @State
+  public readonly userInfo!: CurrentUserInfoModel;
+  public currentUsers: UserModel[] = [];
+  public notifications: boolean = false;
+  public sound: number = 0;
+  public roomName: string = '';
+  public running: boolean = false;
 
-    @Prop() isPublic!: boolean;
+  @Prop() public isPublic!: boolean;
 
-    get inviteUsers(): string {
-      return this.isPublic ? "Invite users to new room" : "Select user for private room";
-    }
-
-    get showInviteUsers() {
-      return this.isPublic || this.currentUsers.length < 1;
-    }
-
-    get excludeUsersIds() {
-      let uids: number[];
-      if (!this.isPublic) {
-        uids = Object.values(this.privateRoomsUsersIds.roomUsers);
-      } else {
-        uids = []
-      }
-      return uids;
-    }
-
-    add() {
-      if (this.isPublic && !this.roomName) {
-        this.store.growlError('Please specify room name');
-      } else if (!this.isPublic && this.currentUsers.length === 0) {
-        this.store.growlError('Please add user');
-      } else {
-        this.running = true;
-        this.$ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), (e: AddRoomMessage)=> {
-          if (e && e.roomId) {
-            this.$router.replace(`/chat/${e.roomId}`);
-          }
-          this.running = false;
-        });
-      }
-    }
-
+  get inviteUsers(): string {
+    return this.isPublic ? 'Invite users to new room' : 'Select user for private room';
   }
+
+  get showInviteUsers() {
+    return this.isPublic || this.currentUsers.length < 1;
+  }
+
+  get excludeUsersIds() {
+    let uids: number[];
+    if (!this.isPublic) {
+      uids = Object.values(this.privateRoomsUsersIds.roomUsers);
+    } else {
+      uids = [];
+    }
+
+    return uids;
+  }
+
+  public add() {
+    if (this.isPublic && !this.roomName) {
+      this.store.growlError('Please specify room name');
+    } else if (!this.isPublic && this.currentUsers.length === 0) {
+      this.store.growlError('Please add user');
+    } else {
+      this.running = true;
+      this.$ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), (e: AddRoomMessage) => {
+        if (e && e.roomId) {
+          this.$router.replace(`/chat/${e.roomId}`);
+        }
+        this.running = false;
+      });
+    }
+  }
+
+}
 </script>
 
 <style lang="sass" scoped>

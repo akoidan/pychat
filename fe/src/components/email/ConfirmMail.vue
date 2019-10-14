@@ -23,22 +23,22 @@
 </template>
 
 <script lang="ts">
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {State} from '@/utils/storeHolder';
-  import {ApplyGrowlErr} from '@/utils/utils';
-  @Component
-  export default class ConfirmMail extends Vue {
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import {State} from '@/utils/storeHolder';
+import {ApplyGrowlErr} from '@/utils/utils';
+@Component
+export default class ConfirmMail extends Vue {
 
-    message: string|null = null;
-    errorMessage: string|null = null;
-    loading!: boolean;
+  public message: string|null = null;
+  public errorMessage: string|null = null;
+  public loading!: boolean;
 
-    @ApplyGrowlErr({runningProp: 'loading', vueProperty: 'errorMessage', message: 'Confirming email error '})
-    async created() {
-      await this.$api.confirmEmail(this.$route.query['token'] as string);
-      this.message = 'Email has been confirmed';
-    }
+  @ApplyGrowlErr({runningProp: 'loading', vueProperty: 'errorMessage', message: 'Confirming email error '})
+  public async created() {
+    await this.$api.confirmEmail(this.$route.query.token as string);
+    this.message = 'Email has been confirmed';
   }
+}
 </script>
 <style lang="sass" scoped>
 

@@ -39,43 +39,42 @@
   </nav>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {UserModel} from "@/types/model";
-  import {PrivateRoomsIds} from '@/types/types';
-  import {AddRoomMessage} from '@/types/messages';
-  @Component
-  export default class NavUserShow extends Vue {
+import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import {UserModel} from '@/types/model';
+import {PrivateRoomsIds} from '@/types/types';
+import {AddRoomMessage} from '@/types/messages';
+@Component
+export default class NavUserShow extends Vue {
 
-    @Prop() activeUser!: UserModel;
-    @Prop() privateRooms!: UserModel;
-    running: boolean = false;
-    @State
-    public readonly privateRoomsUsersIds!: PrivateRoomsIds;
+  @Prop() public activeUser!: UserModel;
+  @Prop() public privateRooms!: UserModel;
+  public running: boolean = false;
+  @State
+  public readonly privateRoomsUsersIds!: PrivateRoomsIds;
 
-    get oppositeRoomId() {
-      return this.privateRoomsUsersIds.userRooms[this.activeUser.id];
-    }
-
-    writeMessage() {
-      if (!this.running) {
-        this.running = true;
-        this.$ws.sendAddRoom(null, 50, true, [this.activeUser.id], (e: AddRoomMessage)=> {
-          if (e && e.roomId) {
-            this.$router.replace(`/chat/${e.roomId}`);
-          }
-          this.store.setActiveUserId(0);
-          this.running = false;
-        });
-      }
-    }
-
-
-    closeActiveUser() {
-      this.store.setActiveUserId(0);
-    }
-
+  get oppositeRoomId() {
+    return this.privateRoomsUsersIds.userRooms[this.activeUser.id];
   }
+
+  public writeMessage() {
+    if (!this.running) {
+      this.running = true;
+      this.$ws.sendAddRoom(null, 50, true, [this.activeUser.id], (e: AddRoomMessage) => {
+        if (e && e.roomId) {
+          this.$router.replace(`/chat/${e.roomId}`);
+        }
+        this.store.setActiveUserId(0);
+        this.running = false;
+      });
+    }
+  }
+
+  public closeActiveUser() {
+    this.store.setActiveUserId(0);
+  }
+
+}
 </script>
 
 <style lang="sass" scoped>

@@ -181,10 +181,11 @@ const getConfig = async () => {
   let htmlWebpackPlugin = new HtmlWebpackPlugin(webpackOptions);
 
   plugins = [
-    new StyleLintPlugin({
-      files: ['**/*.vue', '**/*.sass'],
-      failOnError: false,
-    }),
+    // TODO LINTING
+    // new StyleLintPlugin({
+    //   files: ['**/*.vue', '**/*.sass'],
+    //   failOnError: false,
+    // }),
     definePlugin,
     new VueLoaderPlugin(),
     new CopyWebpackPlugin([
@@ -268,9 +269,10 @@ const getConfig = async () => {
                 appendTsSuffixTo: [/\.vue$/]
               }
             },
-            {
-              loader: 'tslint-loader'
-            }
+            // TODO LINTING
+            // {
+            //   loader: 'tslint-loader'
+            // }
           ],
         },
         {
@@ -278,12 +280,13 @@ const getConfig = async () => {
           test: /\.vue$/,
           loader: 'vue-loader',
         },
-        {
-          enforce: 'pre',
-          test: /\.vue$/,
-          loader: 'eslint-loader',
-          exclude: /node_modules/
-        },
+        // TODO LINTING
+        // {
+        //   enforce: 'pre',
+        //   test: /\.vue$/,
+        //   loader: 'eslint-loader',
+        //   exclude: /node_modules/
+        // },
         {
           test: /\.sass$/,
           use: sasscPlugins

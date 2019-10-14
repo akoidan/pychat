@@ -6,7 +6,7 @@ import {DefaultMessage, ReplyFileMessage} from '@/types/messages';
 import FileSenderPeerConnection from '@/webrtc/FileSenderPeerConnection';
 import {sub} from '@/utils/sub';
 import Subscription from '@/utils/Subscription';
-import {DefaultStore} from'@/utils/store';
+import {DefaultStore} from '@/utils/store';
 import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class FileSender extends BaseTransferHandler {
@@ -15,7 +15,7 @@ export default class FileSender extends BaseTransferHandler {
     replyFile: <HandlerType>this.replyFile,
     removePeerConnection: <HandlerType>this.removePeerConnection
   };
-  private file: File;
+  private readonly file: File;
 
   constructor(roomId: number, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, file: File, time: number) {
     super(roomId, wsHandler, notifier, store);

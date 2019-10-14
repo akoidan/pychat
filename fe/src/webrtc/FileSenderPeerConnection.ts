@@ -13,7 +13,7 @@ import WsHandler from '@/utils/WsHandler';
 import {bytesToSize, getDay} from '@/utils/utils';
 import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE} from '@/utils/consts';
 import FilePeerConnection from '@/webrtc/FilePeerConnection';
-import {DefaultStore} from'@/utils/store';
+import {DefaultStore} from '@/utils/store';
 import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
@@ -27,7 +27,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     declineSending: <HandlerType>this.declineSending
   };
 
-  private file: File;
+  private readonly file: File;
   private reader: FileReader | null = null;
   private offset: number = 0;
   private lastPrinted: number = 0;

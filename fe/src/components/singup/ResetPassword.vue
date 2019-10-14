@@ -28,34 +28,34 @@
 </template>
 
 <script lang='ts'>
-  import {Vue, Component, Prop, Ref} from "vue-property-decorator";
-  import AppSubmit from "@/components/ui/AppSubmit"
-  import {State} from '@/utils/storeHolder';
-  import CaptchaComponent from '@/components/singup/CaptchaComponent';
-  import {ApplyGrowlErr} from '@/utils/utils';
+import {Vue, Component, Prop, Ref} from 'vue-property-decorator';
+import AppSubmit from '@/components/ui/AppSubmit';
+import {State} from '@/utils/storeHolder';
+import CaptchaComponent from '@/components/singup/CaptchaComponent';
+import {ApplyGrowlErr} from '@/utils/utils';
 
-  @Component({components: {CaptchaComponent, AppSubmit}})
-  export default class ResetPassword extends Vue {
+@Component({components: {CaptchaComponent, AppSubmit}})
+export default class ResetPassword extends Vue {
 
-    @Ref()
-    form!: HTMLFormElement;
+  @Ref()
+  public form!: HTMLFormElement;
 
-    @Ref()
-    repactha!: HTMLElement;
+  @Ref()
+  public repactha!: HTMLElement;
 
-    running: boolean = false;
+  public running: boolean = false;
 
-    created() {
-      this.store.setRegHeader('Restore password');
-    }
-
-    @ApplyGrowlErr({runningProp: 'running', message: `Can't reset password`})
-    async restorePassword(event: Event) {
-      await this.$api.sendRestorePassword(this.form);
-      this.store.growlSuccess('A reset email has been sent to your email address, please follow the instruction in it');
-    }
-
+  public created() {
+    this.store.setRegHeader('Restore password');
   }
+
+  @ApplyGrowlErr({runningProp: 'running', message: `Can't reset password`})
+  public async restorePassword(event: Event) {
+    await this.$api.sendRestorePassword(this.form);
+    this.store.growlSuccess('A reset email has been sent to your email address, please follow the instruction in it');
+  }
+
+}
 </script>
 <style lang="sass" scoped>
 

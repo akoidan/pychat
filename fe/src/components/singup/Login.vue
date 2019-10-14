@@ -45,32 +45,32 @@
 </template>
 
 <script lang='ts'>
-  import {Component, Prop, Vue, Ref} from "vue-property-decorator";
-  import AppSubmit from "@/components/ui/AppSubmit"
-  import {State} from '@/utils/storeHolder';
-  import {ApplyGrowlErr, login} from '@/utils/utils';
-  import SocialAuth from '@/components/singup/SocialAuth';
-  import CaptchaComponent from '@/components/singup/CaptchaComponent';
+import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
+import AppSubmit from '@/components/ui/AppSubmit';
+import {State} from '@/utils/storeHolder';
+import {ApplyGrowlErr, login} from '@/utils/utils';
+import SocialAuth from '@/components/singup/SocialAuth';
+import CaptchaComponent from '@/components/singup/CaptchaComponent';
 
-  @Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
-  export default class Login extends Vue {
+@Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
+export default class Login extends Vue {
 
-    @Ref()
-    form!: HTMLFormElement;
+  @Ref()
+  public form!: HTMLFormElement;
 
-    running: boolean = false;
+  public running: boolean = false;
 
-    created() {
-      this.store.setRegHeader('Welcome back!');
-    }
-
-    @ApplyGrowlErr({runningProp: 'running', message: `Can't log in`})
-    async login() {
-      let ses: string = await this.$api.login(this.form);
-      login(ses)
-    }
-
+  public created() {
+    this.store.setRegHeader('Welcome back!');
   }
+
+  @ApplyGrowlErr({runningProp: 'running', message: `Can't log in`})
+  public async login() {
+    const ses: string = await this.$api.login(this.form);
+    login(ses);
+  }
+
+}
 </script>
 <style lang="sass" scoped>
 

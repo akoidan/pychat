@@ -27,10 +27,10 @@ import {
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 
 export default class DatabaseWrapper implements IStorage {
-  private logger: Logger;
-  private dbName: String;
+  private readonly logger: Logger;
+  private readonly dbName: String;
   private db: Database|null = null;
-  private cache: { [id: number]: number } = {};
+  private readonly cache: { [id: number]: number } = {};
 
   constructor(dbName: String) {
     this.logger = loggerFactory.getLoggerColor('db', '#753e01');

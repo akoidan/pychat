@@ -8,37 +8,37 @@
   </span>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {messageBus} from '@/utils/singletons';
-  import {UserDictModel} from '@/types/model';
-  import {timeToString} from '@/utils/htmlApi';
+import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import {messageBus} from '@/utils/singletons';
+import {UserDictModel} from '@/types/model';
+import {timeToString} from '@/utils/htmlApi';
 
-  @Component
-  export default class ChatMessageHeader extends Vue {
+@Component
+export default class ChatMessageHeader extends Vue {
 
-    @Prop() userId!: number;
-    @Prop() time!: number;
+  @Prop() public userId!: number;
+  @Prop() public time!: number;
 
-    @State
-    public readonly allUsersDict!: UserDictModel;
+  @State
+  public readonly allUsersDict!: UserDictModel;
 
-    setActiveUser() {
-      this.store.setActiveUserId(this.userId);
-    }
-
-    get username() {
-      return this.allUsersDict[this.userId].user;
-    }
-
-    get getTime() {
-      return timeToString(this.time);
-    }
-
-    quote() {
-      this.$emit('quote');
-    }
+  public setActiveUser() {
+    this.store.setActiveUserId(this.userId);
   }
+
+  get username() {
+    return this.allUsersDict[this.userId].user;
+  }
+
+  get getTime() {
+    return timeToString(this.time);
+  }
+
+  public quote() {
+    this.$emit('quote');
+  }
+}
 </script>
 
 <style lang="sass" scoped>

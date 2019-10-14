@@ -71,77 +71,76 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {State} from '@/utils/storeHolder';
-  import {ReceivingFile, FileTransferStatus} from "@/types/model";
-  import {bytesToSize} from "@/utils/utils";
-  import AppProgressBar from "@/components/ui/AppProgressBar";
-  import ChatMessageHeader from "@/components/chat/ChatMessageHeader";
-  import {webrtcApi} from '@/utils/singletons';
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import {State} from '@/utils/storeHolder';
+import {ReceivingFile, FileTransferStatus} from '@/types/model';
+import {bytesToSize} from '@/utils/utils';
+import AppProgressBar from '@/components/ui/AppProgressBar';
+import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
+import {webrtcApi} from '@/utils/singletons';
 
-  @Component({
-    components: {ChatMessageHeader, AppProgressBar}
-  })
-  export default class ChatReceivingFile extends Vue {
-    @Prop() receivingFile!: ReceivingFile;
-    @State
-    public readonly myId!: number;
-    FileTransferStatus = FileTransferStatus;
+@Component({
+  components: {ChatMessageHeader, AppProgressBar}
+})
+export default class ChatReceivingFile extends Vue {
+  @Prop() public receivingFile!: ReceivingFile;
+  @State
+  public readonly myId!: number;
+  public FileTransferStatus = FileTransferStatus;
 
-    get showYesNo(): boolean {
-      return this.receivingFile.status === FileTransferStatus.NOT_DECIDED_YET;
-    }
-    get size(): string {
-      return bytesToSize(this.receivingFile.upload.total);
-    }
-
-    get showProgress(): boolean {
-      return FileTransferStatus.IN_PROGRESS === this.receivingFile.status;
-    }
-
-    get isError(): boolean {
-      return this.receivingFile.status === FileTransferStatus.ERROR;
-    }
-
-    get status(): string {
-      switch (this.receivingFile.status) {
-        case FileTransferStatus.ERROR:
-          return 'Error';
-        case FileTransferStatus.IN_PROGRESS:
-          return 'Downloading...';
-        case FileTransferStatus.DECLINED_BY_OPPONENT:
-          return 'Declined by opponent';
-        case FileTransferStatus.DECLINED_BY_YOU:
-          return 'Declined by you';
-        case FileTransferStatus.FINISHED:
-          return 'Finished';
-        case FileTransferStatus.NOT_DECIDED_YET:
-          return 'Waiting for approval';
-      }
-    }
-
-    get mainClass(): string {
-      if (this.receivingFile.userId === this.myId) {
-        return 'message-self';
-      } else {
-        return 'message-others';
-      }
-    }
-
-    retry() {
-      webrtcApi.retryFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
-    }
-
-    accept() {
-      webrtcApi.acceptFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
-    }
-
-    decline() {
-      webrtcApi.declineFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
-    }
-
-
+  get showYesNo(): boolean {
+    return this.receivingFile.status === FileTransferStatus.NOT_DECIDED_YET;
   }
+  get size(): string {
+    return bytesToSize(this.receivingFile.upload.total);
+  }
+
+  get showProgress(): boolean {
+    return FileTransferStatus.IN_PROGRESS === this.receivingFile.status;
+  }
+
+  get isError(): boolean {
+    return this.receivingFile.status === FileTransferStatus.ERROR;
+  }
+
+  get status(): string {
+    switch (this.receivingFile.status) {
+      case FileTransferStatus.ERROR:
+        return 'Error';
+      case FileTransferStatus.IN_PROGRESS:
+        return 'Downloading...';
+      case FileTransferStatus.DECLINED_BY_OPPONENT:
+        return 'Declined by opponent';
+      case FileTransferStatus.DECLINED_BY_YOU:
+        return 'Declined by you';
+      case FileTransferStatus.FINISHED:
+        return 'Finished';
+      case FileTransferStatus.NOT_DECIDED_YET:
+        return 'Waiting for approval';
+    }
+  }
+
+  get mainClass(): string {
+    if (this.receivingFile.userId === this.myId) {
+      return 'message-self';
+    } else {
+      return 'message-others';
+    }
+  }
+
+  public retry() {
+    webrtcApi.retryFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
+  }
+
+  public accept() {
+    webrtcApi.acceptFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
+  }
+
+  public decline() {
+    webrtcApi.declineFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
+  }
+
+}
 </script>
 
 <style lang="sass" scoped>

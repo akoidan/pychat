@@ -67,38 +67,38 @@
   </form>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import AppSubmit from '@/components/ui/AppSubmit';
-  import {CurrentUserInfoModel} from "@/types/model";
-  import {ApplyGrowlErr} from '@/utils/utils';
-  @Component({
-    components: {AppSubmit}
-  })
-  export default class UserProfileChangePassword extends Vue {
+import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import AppSubmit from '@/components/ui/AppSubmit';
+import {CurrentUserInfoModel} from '@/types/model';
+import {ApplyGrowlErr} from '@/utils/utils';
+@Component({
+  components: {AppSubmit}
+})
+export default class UserProfileChangePassword extends Vue {
 
-    oldPassword: string = '';
-    newPassword: string = '';
-    confirmPassword: string = "";
-    running: boolean = false;
+  public oldPassword: string = '';
+  public newPassword: string = '';
+  public confirmPassword: string = '';
+  public running: boolean = false;
 
-    @State
-    public readonly userInfo!: CurrentUserInfoModel;
+  @State
+  public readonly userInfo!: CurrentUserInfoModel;
 
-    get username(): string {
-      return this.userInfo.user;
-    }
+  get username(): string {
+    return this.userInfo.user;
+  }
 
-    @ApplyGrowlErr({ message: 'Error changing pass:', runningProp: 'running'})
-    async saveProfile() {
-      if (this.newPassword != this.confirmPassword) {
-        this.store.growlError('Passwords don\'t match');
-      } else {
-        await this.$api.changePassword(this.oldPassword, this.newPassword);
-        this.store.growlSuccess('Password has been changed');
-      }
+  @ApplyGrowlErr({ message: 'Error changing pass:', runningProp: 'running'})
+  public async saveProfile() {
+    if (this.newPassword != this.confirmPassword) {
+      this.store.growlError('Passwords don\'t match');
+    } else {
+      await this.$api.changePassword(this.oldPassword, this.newPassword);
+      this.store.growlSuccess('Password has been changed');
     }
   }
+}
 </script>
 
 <style lang="sass" scoped>

@@ -27,12 +27,12 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected sendChannel: RTCDataChannel | null = null;
 
   protected abstract connectedToRemote: boolean;
-  private pc_config = {
+  private readonly pc_config = {
     iceServers: [{
       url: this.webRtcUrl
     }]
   };
-  private pc_constraints: unknown = {
+  private readonly pc_constraints: unknown = {
     optional: [/*Firefox*/
       /*{DtlsSrtpKeyAgreement: true},*/
       {RtpDataChannels: false /*true*/}

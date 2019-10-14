@@ -21,7 +21,7 @@ import FileReceiverPeerConnection from '@/webrtc/FileReceiveerPeerConnection';
 import Subscription from '@/utils/Subscription';
 import CallHandler from '@/webrtc/CallHandler';
 import faviconUrl from '@/assets/img/favicon.ico';
-import {DefaultStore} from'@/utils/store';
+import {DefaultStore} from '@/utils/store';
 
 export default class WebRtcApi extends MessageHandler {
 
@@ -32,10 +32,10 @@ export default class WebRtcApi extends MessageHandler {
     offerCall: <HandlerType>this.offerCall
   };
 
-  private wsHandler: WsHandler;
-  private store: DefaultStore;
-  private notifier: NotifierHandler;
-  private callHandlers: {[id: number]: CallHandler} = {};
+  private readonly wsHandler: WsHandler;
+  private readonly store: DefaultStore;
+  private readonly notifier: NotifierHandler;
+  private readonly callHandlers: {[id: number]: CallHandler} = {};
 
   constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler) {
     super();

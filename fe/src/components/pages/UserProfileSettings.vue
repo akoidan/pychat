@@ -100,54 +100,50 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Vue, Watch} from "vue-property-decorator";
-  import {State} from '@/utils/storeHolder';
-  import AppSubmit from "@/components/ui/AppSubmit";
-  import AppCheckbox from "@/components/ui/AppCheckbox";
-  import {CurrentUserInfoModel, CurrentUserSettingsModel} from "@/types/model";
-  import {currentUserInfoDtoToModel, currentUserInfoModelToDto, userSettingsDtoToModel} from "@/types/converters";
-  import {UserSettingsDto} from "@/types/dto";
-  import {storage} from '@/utils/singletons';
-  import {ApplyGrowlErr} from '@/utils/utils';
-  import {SetSettingsMessage} from '@/types/messages';
+import {Component, Vue, Watch} from 'vue-property-decorator';
+import {State} from '@/utils/storeHolder';
+import AppSubmit from '@/components/ui/AppSubmit';
+import AppCheckbox from '@/components/ui/AppCheckbox';
+import {CurrentUserInfoModel, CurrentUserSettingsModel} from '@/types/model';
+import {currentUserInfoDtoToModel, currentUserInfoModelToDto, userSettingsDtoToModel} from '@/types/converters';
+import {UserSettingsDto} from '@/types/dto';
+import {storage} from '@/utils/singletons';
+import {ApplyGrowlErr} from '@/utils/utils';
+import {SetSettingsMessage} from '@/types/messages';
 
-  @Component({
-    components: {AppSubmit, AppCheckbox}
-  })
-  export default class UserProfileSettings extends Vue {
-    running: boolean = false;
-    @State
-    public readonly userSettings!: CurrentUserSettingsModel;
+@Component({
+  components: {AppSubmit, AppCheckbox}
+})
+export default class UserProfileSettings extends Vue {
+  public running: boolean = false;
+  @State
+  public readonly userSettings!: CurrentUserSettingsModel;
 
-    private model!: UserSettingsDto;
+  private model!: UserSettingsDto;
 
-    created() {
-      this.model = userSettingsDtoToModel(this.userSettings);
-    }
-
-    @Watch('userSettings', {deep: true})
-    onUserSettingsChange() {
-      this.model = userSettingsDtoToModel(this.userSettings);
-    }
-
-
-    clearHistory() {
-      this.store.clearMessages();
-    }
-
-
-    @ApplyGrowlErr({ message: 'Error saving settings', runningProp: 'running'})
-    async save() {
-      this.logger.debug("Saving userSettings")();
-      let cui : UserSettingsDto = {...this.model};
-      let e: SetSettingsMessage|unknown = await this.$ws.saveSettings(cui);
-      if ((e as SetSettingsMessage).action === 'setSettings') {
-          this.store.growlSuccess("Settings have been saved");
-      }
-    }
+  public created() {
+    this.model = userSettingsDtoToModel(this.userSettings);
   }
 
+  @Watch('userSettings', {deep: true})
+  public onUserSettingsChange() {
+    this.model = userSettingsDtoToModel(this.userSettings);
+  }
 
+  public clearHistory() {
+    this.store.clearMessages();
+  }
+
+  @ApplyGrowlErr({ message: 'Error saving settings', runningProp: 'running'})
+  public async save() {
+    this.logger.debug('Saving userSettings')();
+    const cui: UserSettingsDto = {...this.model};
+    const e: SetSettingsMessage|unknown = await this.$ws.saveSettings(cui);
+    if ((e as SetSettingsMessage).action === 'setSettings') {
+        this.store.growlSuccess('Settings have been saved');
+    }
+  }
+}
 </script>
 
 <style lang="sass" scoped>

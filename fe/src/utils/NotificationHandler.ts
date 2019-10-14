@@ -10,9 +10,9 @@ import {forEach} from '@/utils/htmlApi';
 const LAST_TAB_ID_VARNAME = 'lastTabId';
 
 export default class NotifierHandler {
-  private logger: Logger;
-  private currentTabId: string;
-  private popedNotifQueue: Notification[] = [];
+  private readonly logger: Logger;
+  private readonly currentTabId: string;
+  private readonly popedNotifQueue: Notification[] = [];
   /*This is required to know if this tab is the only one and don't spam with same notification for each tab*/
   private serviceWorkedTried = false;
   private serviceWorkerRegistration: any = null;
@@ -20,7 +20,7 @@ export default class NotifierHandler {
   private isCurrentTabActive: boolean = false;
   private newMessagesCount: number = 0;
   private unloaded: boolean = false;
-  private store: DefaultStore;
+  private readonly store: DefaultStore;
   private readonly api: Api;
   private readonly browserVersion: string;
   private readonly isChrome: boolean;

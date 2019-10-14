@@ -16,104 +16,102 @@
   </p>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue, Ref} from "vue-property-decorator";
-  import {
-    CurrentUserInfoModel,
-    CurrentUserSettingsModel,
-    EditingMessage,
-    MessageModel,
-    UserDictModel,
-    UserModel
-  } from "@/types/model";
-  import {
-    encodeHTML,
-    encodeMessage,
-    highlightCode, setAudioEvent,
-    setImageFailEvents,
-    setVideoEvent,
-    setYoutubeEvent, timeToString
-  } from "@/utils/htmlApi";
-  import {sem} from '@/utils/utils';
-  import {messageBus} from '@/utils/singletons';
-  import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
-  @Component({
-    components: {ChatMessageHeader}
-  })
-  export default class ChatMessage extends Vue {
+import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
+import {
+  CurrentUserInfoModel,
+  CurrentUserSettingsModel,
+  EditingMessage,
+  MessageModel,
+  UserDictModel,
+  UserModel
+} from '@/types/model';
+import {
+  encodeHTML,
+  encodeMessage,
+  highlightCode, setAudioEvent,
+  setImageFailEvents,
+  setVideoEvent,
+  setYoutubeEvent, timeToString
+} from '@/utils/htmlApi';
+import {sem} from '@/utils/utils';
+import {messageBus} from '@/utils/singletons';
+import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
+@Component({
+  components: {ChatMessageHeader}
+})
+export default class ChatMessage extends Vue {
 
-    @State
-    public readonly userSettings!: CurrentUserSettingsModel;
-    @State
-    public readonly userInfo!: CurrentUserInfoModel;
-    @Prop() message!: MessageModel;
-    @State
-    public readonly editedMessage!: EditingMessage;
-
-    @Ref()
-    content!: HTMLElement
-
-    get id() {
-      return this.message.id;
-    }
-
-    get encoded() {
-      return this.message.content ? encodeMessage(this.message) : encodeHTML("This message has been removed");
-    }
-
-    quote() {
-      messageBus.$emit('quote', this.message);
-    }
-
-    contextmenu(event: Event) {
-      sem(event, this.message, false, this.userInfo, this.store.setEditedMessage);
-    }
-
-    updated() {
-      this.$nextTick(function () {
-        if (this.content) {
-          this.seEvents();
-        } else {
-          this.logger.debug("Skipping event settings, because node is gone")();
-        }
-      });
-    }
-
-    mounted() {
-      this.seEvents()
-    }
-
-    private seEvents() {
-      this.logger.debug("Setting events")();
-      if (this.userSettings.highlightCode) {
-        highlightCode(this.content);
-      }
-      if (this.userSettings.embeddedYoutube) {
-        setYoutubeEvent(this.content)
-      }
-      setVideoEvent(this.content);
-      setImageFailEvents(this.content, messageBus);
-      setAudioEvent(this.content);
-    }
-
-    encodeMessage(message: MessageModel) {
-      return encodeMessage(message);
-    }
-
-    get mainCls() {
-      return {
-        "removed-message": this.message.deleted,
-        "highLightMessage": this.isEditing,
-      }
-    }
-
-
-
-    get isEditing() {
-      return this.editedMessage && this.editedMessage.messageId === this.message.id;
-    }
-
+  get id() {
+    return this.message.id;
   }
+
+  get encoded() {
+    return this.message.content ? encodeMessage(this.message) : encodeHTML('This message has been removed');
+  }
+
+  get mainCls() {
+    return {
+      'removed-message': this.message.deleted,
+      highLightMessage: this.isEditing
+    };
+  }
+
+  get isEditing() {
+    return this.editedMessage && this.editedMessage.messageId === this.message.id;
+  }
+
+  @State
+  public readonly userSettings!: CurrentUserSettingsModel;
+  @State
+  public readonly userInfo!: CurrentUserInfoModel;
+  @Prop() public message!: MessageModel;
+  @State
+  public readonly editedMessage!: EditingMessage;
+
+  @Ref()
+  public content!: HTMLElement;
+
+  public quote() {
+    messageBus.$emit('quote', this.message);
+  }
+
+  public contextmenu(event: Event) {
+    sem(event, this.message, false, this.userInfo, this.store.setEditedMessage);
+  }
+
+  public updated() {
+    this.$nextTick(function () {
+      if (this.content) {
+        this.seEvents();
+      } else {
+        this.logger.debug('Skipping event settings, because node is gone')();
+      }
+    });
+  }
+
+  public mounted() {
+    this.seEvents();
+  }
+
+  public encodeMessage(message: MessageModel) {
+    return encodeMessage(message);
+  }
+
+  private seEvents() {
+    this.logger.debug('Setting events')();
+    if (this.userSettings.highlightCode) {
+      highlightCode(this.content);
+    }
+    if (this.userSettings.embeddedYoutube) {
+      setYoutubeEvent(this.content);
+    }
+    setVideoEvent(this.content);
+    setImageFailEvents(this.content, messageBus);
+    setAudioEvent(this.content);
+  }
+
+}
 </script>
 <style lang="sass" scoped>
 

@@ -11,18 +11,18 @@
 </template>
 
 <script lang='ts'>
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {GrowlModel} from "@/types/model";
-  import {getModule} from "vuex-module-decorators";
-  import {State} from '@/utils/storeHolder';
-  @Component
-  export default class AppGrowl extends Vue {
-    @Prop() public readonly growl!: GrowlModel;
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import {GrowlModel} from '@/types/model';
+import {getModule} from 'vuex-module-decorators';
+import {State} from '@/utils/storeHolder';
+@Component
+export default class AppGrowl extends Vue {
+  @Prop() public readonly growl!: GrowlModel;
 
-    close() {
-      this.store.removeGrowl(this.growl);
-    }
+  public close() {
+    this.store.removeGrowl(this.growl);
   }
+}
 </script>
 <style lang="sass" scoped>
 

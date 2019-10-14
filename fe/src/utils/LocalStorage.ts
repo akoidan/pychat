@@ -16,8 +16,8 @@ interface LocalStorageMessage {
 }
 export default class LocalStorage implements IStorage {
 
-  private logger: Logger;
-  private STORAGE_NAME = 'wsHeaderIds';
+  private readonly logger: Logger;
+  private readonly STORAGE_NAME = 'wsHeaderIds';
   private cache: { [id: number]: LocalStorageMessage } = {};
 
   constructor() {

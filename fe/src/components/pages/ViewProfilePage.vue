@@ -57,40 +57,40 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Vue} from "vue-property-decorator";
-  import { State} from '@/utils/storeHolder';
-  import {ViewUserProfileDto} from "@/types/messages";
-  import {resolveMediaUrl} from '@/utils/htmlApi';
-  import {UserModel} from '@/types/model';
-  import {ApplyGrowlErr} from '@/utils/utils';
+import {Component, Vue} from 'vue-property-decorator';
+import { State} from '@/utils/storeHolder';
+import {ViewUserProfileDto} from '@/types/messages';
+import {resolveMediaUrl} from '@/utils/htmlApi';
+import {UserModel} from '@/types/model';
+import {ApplyGrowlErr} from '@/utils/utils';
 
-  @Component
-  export default class ViewProfilePage extends Vue {
+@Component
+export default class ViewProfilePage extends Vue {
 
-    loading: boolean = false;
-    public error: string|null = null;
-    private userProfileInfo: ViewUserProfileDto | null = null;
-    @State
-    public readonly allUsersDict!: {[id: number]: UserModel} ;
-
-    get id(): number {
-      return parseInt(this.$route.params['id']);
-    }
-
-    get username(): string {
-      return this.allUsersDict[this.id].user;
-    }
-
-    resolveMediaUrl(src: string) {
-      return resolveMediaUrl(src);
-    }
-
-    @ApplyGrowlErr({ vueProperty: 'error', message: 'Error loading profile', runningProp: 'loading'})
-    async created() {
-      this.userProfileInfo = await this.$api.showProfile(this.id);
-    }
-
+  get id(): number {
+    return parseInt(this.$route.params.id);
   }
+
+  get username(): string {
+    return this.allUsersDict[this.id].user;
+  }
+
+  public loading: boolean = false;
+  public error: string|null = null;
+  @State
+  public readonly allUsersDict!: {[id: number]: UserModel} ;
+  private userProfileInfo: ViewUserProfileDto | null = null;
+
+  public resolveMediaUrl(src: string) {
+    return resolveMediaUrl(src);
+  }
+
+  @ApplyGrowlErr({ vueProperty: 'error', message: 'Error loading profile', runningProp: 'loading'})
+  public async created() {
+    this.userProfileInfo = await this.$api.showProfile(this.id);
+  }
+
+}
 </script>
 
 <style lang="sass" scoped>

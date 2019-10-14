@@ -108,70 +108,70 @@
   </nav>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Vue, Ref} from "vue-property-decorator";
-  import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
-  import {logout} from "@/utils/utils";
-  import {SetSearchTo} from '@/types/types';
-  import {GITHUB_URL} from '@/utils/consts';
-  import {webrtcApi} from '@/utils/singletons';
+import {State} from '@/utils/storeHolder';
+import {Component, Vue, Ref} from 'vue-property-decorator';
+import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
+import {logout} from '@/utils/utils';
+import {SetSearchTo} from '@/types/types';
+import {GITHUB_URL} from '@/utils/consts';
+import {webrtcApi} from '@/utils/singletons';
 
-  @Component
-  export default class AppNav extends Vue {
-    @State
-    public readonly activeRoom!: RoomModel;
+@Component
+export default class AppNav extends Vue {
 
-    @Ref()
-    inputFile!: HTMLInputElement
+  get title() {
+    return this.isOnline ? 'Websocket connection established. You are online' : 'Trying to connect to the server. You\'re offline';
+  }
+  @State
+  public readonly activeRoom!: RoomModel;
 
-    @State
-    public readonly isOnline!: boolean;
+  @Ref()
+  public inputFile!: HTMLInputElement;
 
-    @State
-    public readonly userInfo!: CurrentUserInfoModel;
+  @State
+  public readonly isOnline!: boolean;
 
-    toggleContainer(roomd: number) {
-      this.store.toggleContainer(roomd);
-    }
+  @State
+  public readonly userInfo!: CurrentUserInfoModel;
 
-    sendFileClick() {
-      this.inputFile.value = '';
-      this.inputFile.click();
-    }
+  public githubUrl: string = GITHUB_URL;
 
-    sendFile(event: FileList) {
-      webrtcApi.offerFile(this.inputFile.files![0], this.activeRoom.id);
-    }
+  public expanded: boolean = false;
 
-    githubUrl : string = GITHUB_URL;
+  public toggleContainer(roomd: number) {
+    this.store.toggleContainer(roomd);
+  }
 
-    expanded: boolean = false;
+  public sendFileClick() {
+    this.inputFile.value = '';
+    this.inputFile.click();
+  }
 
-    get title() {
-      return this.isOnline ? "Websocket connection established. You are online": "Trying to connect to the server. You're offline";
-    }
+  public sendFile(event: FileList) {
+    webrtcApi.offerFile(this.inputFile.files![0], this.activeRoom.id);
+  }
 
-    invertSearch() {
-      this.store.setSearchTo({
-        roomId: this.activeRoom.id,
-        search: { ...this.activeRoom.search, searchActive: !this.activeRoom.search.searchActive}
-        });
-    }
+  public invertSearch() {
+    this.store.setSearchTo({
+      roomId: this.activeRoom.id,
+      search: { ...this.activeRoom.search, searchActive: !this.activeRoom.search.searchActive}
+      });
+  }
 
-    toggle() {
-      this.logger.log('Toggle nav')();
-      this.expanded = !this.expanded;
-    }
+  public toggle() {
+    this.logger.log('Toggle nav')();
+    this.expanded = !this.expanded;
+  }
 
-    async signOut() {
-      try {
-        await this.$api.logout();
-        logout();
-      } catch (e) {
-        logout(e);
-      }
+  public async signOut() {
+    try {
+      await this.$api.logout();
+      logout();
+    } catch (e) {
+      logout(e);
     }
   }
+}
 </script>
 
 <style lang="sass" scoped>

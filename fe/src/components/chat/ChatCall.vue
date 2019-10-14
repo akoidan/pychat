@@ -187,221 +187,222 @@
   </div>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
-  import {CallInfoModel, CallsInfoModel} from "@/types/model";
-  import {BooleanIdentifier, StringIdentifier, VideoType} from "@/types/types";
-  import {webrtcApi} from '@/utils/singletons';
-  import ChatRemotePeer from '@/components/chat/ChatRemotePeer';
-  import {file} from '@/utils/audio';
-  import VideoObject from "@/components/chat/VideoObject";
-  @Component({
-    components: {VideoObject, ChatRemotePeer}
-  })
-  export default class ChatCall extends Vue {
-    @Prop() callInfo!: CallsInfoModel;
-    @Prop() roomId!: number;
-    showSettings: boolean = false;
+import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
+import {CallInfoModel, CallsInfoModel} from '@/types/model';
+import {BooleanIdentifier, StringIdentifier, VideoType} from '@/types/types';
+import {webrtcApi} from '@/utils/singletons';
+import ChatRemotePeer from '@/components/chat/ChatRemotePeer';
+import {file} from '@/utils/audio';
+import VideoObject from '@/components/chat/VideoObject';
+@Component({
+  components: {VideoObject, ChatRemotePeer}
+})
+export default class ChatCall extends Vue {
 
-    @Ref()
-    localVideo!: VideoObject;
-
-    @Ref()
-    videoContainer!: HTMLElement;
-
-    @State
-    public readonly microphones!: { [id: string]: string } ;
-    @State
-    public readonly speakers!: { [id: string]: string } ;
-    @State
-    public readonly webcams!: { [id: string]: string } ;
-    fullscreen: boolean = false;
-
-    currentVideoActive: string|null = null;
-
-    setCurrentVideo(id: string) {
-      if (this.currentVideoActive === id) {
-        this.currentVideoActive = null;
-      } else {
-        this.currentVideoActive = id;
-      }
-    }
-
-    fullScreenChange() {
-      this.logger.log("fs change")();
-      if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
-        this.fullscreen = false;
-      }
-    }
-
-    created() {
-      ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
-        document.addEventListener(e, this.listener, false);
-      })
-    }
-
-    listener = this.fullScreenChange.bind(this);
-
-    destroyed() {
-      ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
-        document.removeEventListener(e, this.listener, false);
-      })
-    }
-
-    exitFullscreen() {
-      if (document.cancelFullScreen) {
-        document.cancelFullScreen();
-      } else if (document.msCancelFullScreen) {
-        document.msCancelFullScreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.webkitCancelFullScreen) {
-        document.webkitCancelFullScreen();
-      }
-      this.fullscreen = false;
-    }
-
-    enterFullscreen() {
-      let elem: HTMLElement = this.videoContainer;
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-      } else if (elem.msRequestFullscreen) {
-        elem.msRequestFullscreen();
-      } else if (elem.mozRequestFullScreen) {
-        elem.mozRequestFullScreen();
-      } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen()
-      } else {
-        this.store.growlError("Can't enter fullscreen");
-        return;
-      }
-      this.fullscreen = true;
-    }
-
-    @Watch('callInfo.currentSpeaker')
-    onSpeakerChange(newValue: string) {
-      this.$nextTick(function () {
-        let video: HTMLVideoElement = this.localVideo.$refs.video as HTMLVideoElement;
-        if (video.setSinkId) {
-          video.setSinkId(newValue);
-        } else  {
-          this.logger.error("SetSinkId doesn't exist")();
-        }
-      });
-    }
-
-    setCurrentMicProxy(event: Event) {
-      let payload: StringIdentifier = {
-        id: this.roomId,
-        state: (event.target as HTMLInputElement).value
-      };
-      this.store.setCurrentMic(payload);
-      if (this.callInfo.callActive) {
-        webrtcApi.updateConnection(this.roomId);
-      }
-    }
-    setCurrentWebcamProxy(event: Event) {
-      let payload: StringIdentifier = {
-        id: this.roomId,
-        state: (event.target as HTMLInputElement).value
-      };
-      this.store.setCurrentWebcam(payload);
-      if (this.callInfo.callActive) {
-        webrtcApi.updateConnection(this.roomId);
-      }
-    }
-
-    playTest() {
-      if (file.setSinkId) {
-        file.setSinkId(this.callInfo.currentSpeaker!);
-        file.pause();
-        file.currentTime = 0;
-        file.volume = 1;
-        var prom = file.play();
-        prom && prom.catch(function (e) {
-        });
-      } else {
-        this.store.growlError("Your browser doesn't support changing output channel")
-      }
-    }
-
-    setCurrentSpeakerProxy(event: Event) {
-      let payload: StringIdentifier = {
-        id: this.roomId,
-        state: (event.target as HTMLInputElement).value
-      };
-      this.store.setCurrentSpeaker(payload);
-      if (this.callInfo.callActive) {
-        webrtcApi.updateConnection(this.roomId);
-      }
-    }
-
-    get iconMicClass () : {} {
-      return {
-        'icon-mic': this.callInfo.showMic,
-        'icon-mute': !this.callInfo.showMic,
-      }
-    }
-
-    get videoTitle() {
-      return `Turn ${this.callInfo.showVideo ? 'off': 'on'} your webcam`
-    }
-
-    get micTitle() {
-      return `Turn ${this.callInfo.showMic ? 'off': 'on'} your microphone`
-    }
-
-    startCall() {
-      webrtcApi.startCall(this.roomId);
-    }
-
-    hangUpCall() {
-      webrtcApi.hangCall(this.roomId);
-      this.fullscreen = false;
-      this.exitFullscreen();
-    }
-
-    get iconVideoClass () : {} {
-      return {
-        'icon-no-videocam': !this.callInfo.showVideo,
-        'icon-videocam': this.callInfo.showVideo,
-      }
-    }
-
-    desktopClick() {
-      let payload: BooleanIdentifier = {
-        state: !this.callInfo.shareScreen,
-        id: this.roomId,
-      };
-      this.store.setShareScreenToState(payload);
-      if (this.callInfo.callActive) {
-        webrtcApi.toggleDevice(this.roomId, VideoType.SHARE);
-      }
-    }
-
-    videoClick() {
-      let payload: BooleanIdentifier = {
-        state: !this.callInfo.showVideo,
-        id: this.roomId,
-      };
-      this.store.setVideoToState(payload);
-      if (this.callInfo.callActive) {
-        webrtcApi.toggleDevice(this.roomId, VideoType.VIDEO);
-      }
-    }
-
-    micClick() {
-      let payload: BooleanIdentifier = {
-        state: !this.callInfo.showMic,
-        id: this.roomId,
-      };
-      this.store.setMicToState(payload);
-      if (this.callInfo.callActive) {
-        webrtcApi.toggleDevice(this.roomId, VideoType.AUDIO);
-      }
-    }
-
+  get iconMicClass (): {} {
+    return {
+      'icon-mic': this.callInfo.showMic,
+      'icon-mute': !this.callInfo.showMic
+    };
   }
+
+  get videoTitle() {
+    return `Turn ${this.callInfo.showVideo ? 'off' : 'on'} your webcam`;
+  }
+
+  get micTitle() {
+    return `Turn ${this.callInfo.showMic ? 'off' : 'on'} your microphone`;
+  }
+
+  get iconVideoClass (): {} {
+    return {
+      'icon-no-videocam': !this.callInfo.showVideo,
+      'icon-videocam': this.callInfo.showVideo
+    };
+  }
+  @Prop() public callInfo!: CallsInfoModel;
+  @Prop() public roomId!: number;
+  public showSettings: boolean = false;
+
+  @Ref()
+  public localVideo!: VideoObject;
+
+  @Ref()
+  public videoContainer!: HTMLElement;
+
+  @State
+  public readonly microphones!: { [id: string]: string } ;
+  @State
+  public readonly speakers!: { [id: string]: string } ;
+  @State
+  public readonly webcams!: { [id: string]: string } ;
+  public fullscreen: boolean = false;
+
+  public currentVideoActive: string|null = null;
+
+  public listener = this.fullScreenChange.bind(this);
+
+  public setCurrentVideo(id: string) {
+    if (this.currentVideoActive === id) {
+      this.currentVideoActive = null;
+    } else {
+      this.currentVideoActive = id;
+    }
+  }
+
+  public fullScreenChange() {
+    this.logger.log('fs change')();
+    if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
+      this.fullscreen = false;
+    }
+  }
+
+  public created() {
+    ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
+      document.addEventListener(e, this.listener, false);
+    });
+  }
+
+  public destroyed() {
+    ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
+      document.removeEventListener(e, this.listener, false);
+    });
+  }
+
+  public exitFullscreen() {
+    if (document.cancelFullScreen) {
+      document.cancelFullScreen();
+    } else if (document.msCancelFullScreen) {
+      document.msCancelFullScreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitCancelFullScreen) {
+      document.webkitCancelFullScreen();
+    }
+    this.fullscreen = false;
+  }
+
+  public enterFullscreen() {
+    const elem: HTMLElement = this.videoContainer;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    } else {
+      this.store.growlError('Can\'t enter fullscreen');
+
+      return;
+    }
+    this.fullscreen = true;
+  }
+
+  @Watch('callInfo.currentSpeaker')
+  public onSpeakerChange(newValue: string) {
+    this.$nextTick(function () {
+      const video: HTMLVideoElement = this.localVideo.$refs.video as HTMLVideoElement;
+      if (video.setSinkId) {
+        video.setSinkId(newValue);
+      } else  {
+        this.logger.error('SetSinkId doesn\'t exist')();
+      }
+    });
+  }
+
+  public setCurrentMicProxy(event: Event) {
+    const payload: StringIdentifier = {
+      id: this.roomId,
+      state: (event.target as HTMLInputElement).value
+    };
+    this.store.setCurrentMic(payload);
+    if (this.callInfo.callActive) {
+      webrtcApi.updateConnection(this.roomId);
+    }
+  }
+  public setCurrentWebcamProxy(event: Event) {
+    const payload: StringIdentifier = {
+      id: this.roomId,
+      state: (event.target as HTMLInputElement).value
+    };
+    this.store.setCurrentWebcam(payload);
+    if (this.callInfo.callActive) {
+      webrtcApi.updateConnection(this.roomId);
+    }
+  }
+
+  public playTest() {
+    if (file.setSinkId) {
+      file.setSinkId(this.callInfo.currentSpeaker!);
+      file.pause();
+      file.currentTime = 0;
+      file.volume = 1;
+      const prom = file.play();
+      prom && prom.catch(function (e) {
+      });
+    } else {
+      this.store.growlError('Your browser doesn\'t support changing output channel');
+    }
+  }
+
+  public setCurrentSpeakerProxy(event: Event) {
+    const payload: StringIdentifier = {
+      id: this.roomId,
+      state: (event.target as HTMLInputElement).value
+    };
+    this.store.setCurrentSpeaker(payload);
+    if (this.callInfo.callActive) {
+      webrtcApi.updateConnection(this.roomId);
+    }
+  }
+
+  public startCall() {
+    webrtcApi.startCall(this.roomId);
+  }
+
+  public hangUpCall() {
+    webrtcApi.hangCall(this.roomId);
+    this.fullscreen = false;
+    this.exitFullscreen();
+  }
+
+  public desktopClick() {
+    const payload: BooleanIdentifier = {
+      state: !this.callInfo.shareScreen,
+      id: this.roomId
+    };
+    this.store.setShareScreenToState(payload);
+    if (this.callInfo.callActive) {
+      webrtcApi.toggleDevice(this.roomId, VideoType.SHARE);
+    }
+  }
+
+  public videoClick() {
+    const payload: BooleanIdentifier = {
+      state: !this.callInfo.showVideo,
+      id: this.roomId
+    };
+    this.store.setVideoToState(payload);
+    if (this.callInfo.callActive) {
+      webrtcApi.toggleDevice(this.roomId, VideoType.VIDEO);
+    }
+  }
+
+  public micClick() {
+    const payload: BooleanIdentifier = {
+      state: !this.callInfo.showMic,
+      id: this.roomId
+    };
+    this.store.setMicToState(payload);
+    if (this.callInfo.callActive) {
+      webrtcApi.toggleDevice(this.roomId, VideoType.AUDIO);
+    }
+  }
+
+}
 </script>
 
 <style lang="sass" scoped>

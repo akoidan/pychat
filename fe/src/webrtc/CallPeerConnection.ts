@@ -10,7 +10,7 @@ import {
   SetOpponentVoice
 } from '@/types/types';
 import WsHandler from '@/utils/WsHandler';
-import {DefaultStore} from'@/utils/store';
+import {DefaultStore} from '@/utils/store';
 import {ConnectToRemoteMessage, DefaultMessage} from '@/types/messages';
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {

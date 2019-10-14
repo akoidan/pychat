@@ -6,7 +6,7 @@ import MessageHandler from '@/utils/MesageHandler';
 import {sub} from '@/utils/sub';
 import Subscription from '@/utils/Subscription';
 import {RemovePeerConnection} from '@/types/types';
-import {DefaultStore} from'@/utils/store';
+import {DefaultStore} from '@/utils/store';
 
 export default abstract class BaseTransferHandler extends MessageHandler {
 

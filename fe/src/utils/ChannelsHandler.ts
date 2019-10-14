@@ -49,7 +49,7 @@ export default class ChannelsHandler extends MessageHandler {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes = {
-    init: <HandlerType><HandlerType>this.init,
+    init: <HandlerType>this.init,
     internetAppear: <HandlerType>this.internetAppear,
     loadMessages: <HandlerType>this.loadMessages,
     deleteMessage: <HandlerType>this.deleteMessage,
@@ -68,7 +68,7 @@ export default class ChannelsHandler extends MessageHandler {
   private readonly ws: WsHandler;
   private readonly sendingMessage: { [id: number]: { cb(): void; files: UploadFile[] }; cb?(ids: number[]): void } = {};
   private readonly notifier: NotifierHandler;
-  private messageBus: Vue;
+  private readonly messageBus:  Vue;
 
   constructor(store: DefaultStore, api: Api, ws: WsHandler, notifier: NotifierHandler, messageBus: Vue) {
     super();

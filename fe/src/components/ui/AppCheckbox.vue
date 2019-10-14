@@ -11,33 +11,33 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Ref, Emit} from "vue-property-decorator";
-  import {getUniqueId} from "@/utils/htmlApi";
+import {Component, Prop, Vue, Ref, Emit} from 'vue-property-decorator';
+import {getUniqueId} from '@/utils/htmlApi';
 
-  @Component
-  export default class AppCheckbox extends Vue {
+@Component
+export default class AppCheckbox extends Vue {
 
-    private uniqueId!: string;
+  @Prop()
+  public readonly value!: boolean;
 
-    @Ref()
-    private checkbox!: HTMLInputElement;
+  private uniqueId!: string;
 
-    @Prop()
-    public readonly value!: boolean;
+  @Ref()
+  private checkbox!: HTMLInputElement;
 
-    onchange(e: Event) {
-      this.input(e);
-    }
-
-    @Emit()
-    input(e: Event) {
-      return this.checkbox.checked;
-    }
-
-    created() {
-      this.uniqueId = `checkboxN${getUniqueId()}`;
-    }
+  public onchange(e: Event) {
+    this.input(e);
   }
+
+  @Emit()
+  public input(e: Event) {
+    return this.checkbox.checked;
+  }
+
+  public created() {
+    this.uniqueId = `checkboxN${getUniqueId()}`;
+  }
+}
 </script>
 
 <style lang="sass" scoped>

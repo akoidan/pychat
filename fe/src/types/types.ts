@@ -156,8 +156,8 @@ export interface  PostData<T> {
   isJsonEncoded?: boolean;
   isJsonDecoded?: boolean;
   checkOkString?: boolean;
-  requestInterceptor?(a: XMLHttpRequest): void;
   errorDescription?: string;
+  requestInterceptor?(a: XMLHttpRequest): void;
   process?(R: XMLHttpRequest): void;
 }
 

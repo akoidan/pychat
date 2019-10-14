@@ -6,7 +6,7 @@ import {Logger} from 'lines-logger';
 export default class Subscription {
 
   public channels: { [id: string]: IMessageHandler[] } = {};
-  private logger: Logger;
+  private readonly logger: Logger;
 
   constructor() {
     this.logger = loggerFactory.getLoggerColor('sub', '#3a7a7a');

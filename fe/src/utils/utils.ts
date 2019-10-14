@@ -58,8 +58,8 @@ export async function initStore() {
         store.init(data.setRooms);
       } else {
         store.roomsArray.forEach((storeRoom: RoomModel) => {
-          if (data!.setRooms.roomsDict[storeRoom.id]) {
-            const dbMessages: {[id: number]: MessageModel} = data!.setRooms.roomsDict[storeRoom.id].messages;
+          if (data.setRooms.roomsDict[storeRoom.id]) {
+            const dbMessages: {[id: number]: MessageModel} = data.setRooms.roomsDict[storeRoom.id].messages;
             for (const dbMessagesKey in dbMessages) {
               if (!storeRoom.messages[dbMessagesKey]) {
               store.addMessage(dbMessages[dbMessagesKey]);

@@ -25,16 +25,15 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Vue} from "vue-property-decorator";
-  import UserProfileChangePassword from "@/components/pages/UserProfileChangePassword"
-  import UserProfileImage from "@/components/pages/UserProfileImage"
-  import UserProfileInfo from "@/components/pages/UserProfileInfo"
-  import UserProfileSettings from "@/components/pages/UserProfileSettings"
+import {Component, Vue} from 'vue-property-decorator';
+import UserProfileChangePassword from '@/components/pages/UserProfileChangePassword';
+import UserProfileImage from '@/components/pages/UserProfileImage';
+import UserProfileInfo from '@/components/pages/UserProfileInfo';
+import UserProfileSettings from '@/components/pages/UserProfileSettings';
 
-
-  @Component({components: {UserProfileChangePassword, UserProfileImage, UserProfileInfo, UserProfileSettings}})
-  export default class UserProfile extends Vue {
-  }
+@Component({components: {UserProfileChangePassword, UserProfileImage, UserProfileInfo, UserProfileSettings}})
+export default class UserProfile extends Vue {
+}
 </script>
 
 <style lang="sass" scoped>

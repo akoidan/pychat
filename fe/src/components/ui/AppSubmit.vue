@@ -12,19 +12,19 @@
 </template>
 
 <script lang='ts'>
-  import {Vue, Component, Prop} from "vue-property-decorator";
+import {Vue, Component, Prop} from 'vue-property-decorator';
 
-  @Component
-  export default class AppSubmit extends Vue {
-    @Prop()
-    public readonly value!: string;
-    @Prop()
-    public readonly running!: boolean;
+@Component
+export default class AppSubmit extends Vue {
+  @Prop()
+  public readonly value!: string;
+  @Prop()
+  public readonly running!: boolean;
 
-    get btnClass(): string {
-      return this.running ? 'sp-loading' : '';
-    }
+  get btnClass(): string {
+    return this.running ? 'sp-loading' : '';
   }
+}
 </script>
 <style lang="sass" scoped>
 
