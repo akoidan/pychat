@@ -8,6 +8,7 @@
     "export-name": [true, { "ignore-case": true, "allow": ["LoggerMixin"] }],
 //    "import-name": [ true, true, { "vue-router": "VueRouter", "vuex": "Vuex", "vue": "Vue" }],
     "ordered-imports": false, // TODO breaks webpack bundle
+    "no-null-keyword": false, // TODO vue props couldn't be undefined
     "import-name": false, // TODO tslint autofix
     "no-import-side-effect": [true, {"ignore-module": "(@/utils/classComponentHooks|@/utils/mixins|reflect-metadata)"}],
     "no-plusplus": false,

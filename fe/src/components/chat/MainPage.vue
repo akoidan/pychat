@@ -60,8 +60,8 @@
 
     <div class="userMessageWrapper">
       <input
-        ref="imgInput"
         v-show="false"
+        ref="imgInput"
         type="file"
         accept="image/*,video/*"
         multiple="multiple"

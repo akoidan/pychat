@@ -37,7 +37,9 @@ class="input" @focus="userFoc = false" @blur="userFoc = true"
         required
         name="password"
         class="input"
-placeholder="Password" @focus="passwordFoc = false" @blur="passwordFoc = true"
+        placeholder="Password"
+        @focus="passwordFoc = false"
+        @blur="passwordFoc = true"
       >
     </register-field-set>
     <register-field-set
@@ -72,7 +74,8 @@ placeholder="Password" @focus="passwordFoc = false" @blur="passwordFoc = true"
         placeholder="Email"
         name="email"
         class="input"
-@focus="emailFoc = false" @blur="emailFoc = true"
+        @focus="emailFoc = false"
+        @blur="emailFoc = true"
       >
     </register-field-set>
     <register-field-set
