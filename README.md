@@ -221,7 +221,16 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
   - mark `templates` directory as `Template Folder`
  4. Add tornado script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `start_tornado`. Remove port value.
  
+## Linting
+ - atm frontend linting is only available, so `cd fe`
+ - https://eslint.vuejs.org/rules/this-in-template.html
  
+Current linting supports:
+
+ - Typescript is linted with [tslint-microsoft-contrib](https://github.com/microsoft/tslint-microsoft-contrib) configured with [tslint.json](fe/tslint.json)
+ - Sass is linted with [stylelint](https://stylelint.io/user-guide/rules) configured with [.stylelintrc](fe/.stylelintrc)
+ - Vue files are linted with [eslint-plugin-vue](https://eslint.vuejs.org/rules/this-in-template.html) configured with [.eslintrc.json](fe/.eslintrc.json)
+
 ### Webstorm
  
 #### Set template
