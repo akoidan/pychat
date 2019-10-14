@@ -34,7 +34,7 @@
 
     @Watch('volumeLevel')
     onVolumeChanged(newValue: number) {
-      (<HTMLVideoElement>(this.video.$refs.video)).volume = newValue / 100;
+      (this.video.$refs.video as HTMLVideoElement).volume = newValue / 100;
     }
 
   }

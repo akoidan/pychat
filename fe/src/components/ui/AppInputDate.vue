@@ -40,7 +40,7 @@
 
     @Emit()
     input(e: InputEvent){
-      return (<HTMLInputElement>e.target).value;
+      return (e.target as HTMLInputElement).value;
     }
     oninput(value: Date) {
       this.logger.debug("generating date for datepicker {}", this.value)();

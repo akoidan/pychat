@@ -23,7 +23,7 @@
 
     @ApplyGrowlErr({runningProp: 'loading', vueProperty: 'errorMessage', message: 'Confirming email error '})
     async created() {
-      await this.$api.confirmEmail(<string>this.$route.query['token']);
+      await this.$api.confirmEmail(this.$route.query['token'] as string);
       this.message = 'Email has been confirmed';
     }
   }

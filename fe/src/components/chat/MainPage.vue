@@ -206,7 +206,7 @@
 
     dropPhoto(evt: DragEvent) {
 
-      let files : FileList = <FileList><unknown>(evt.dataTransfer && evt.dataTransfer!.files);
+      let files : FileList = (evt.dataTransfer && evt.dataTransfer!.files) as FileList;
       this.logger.debug("Drop photo {} ", files)();
       if (files) {
         for (var i = 0; i < files.length; i++) {
@@ -224,7 +224,7 @@
     }
 
     handleFileSelect (evt: Event) {
-      let files: FileList = (<HTMLInputElement>evt.target).files!;
+      let files: FileList = (evt.target as HTMLInputElement).files!;
       for (let i = 0; i < files.length; i++) {
         pasteImgToTextArea(files[i], this.userMessage, (err: string) => {
           this.store.growlError(err)

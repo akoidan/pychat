@@ -119,7 +119,7 @@
       this.logger.debug("Saving userSettings")();
       let cui : UserSettingsDto = {...this.model};
       let e: SetSettingsMessage|unknown = await this.$ws.saveSettings(cui);
-      if ((<SetSettingsMessage>e).action === 'setSettings') {
+      if ((e as SetSettingsMessage).action === 'setSettings') {
           this.store.growlSuccess("Settings have been saved");
       }
     }

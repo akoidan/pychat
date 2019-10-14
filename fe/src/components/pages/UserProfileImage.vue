@@ -13,10 +13,11 @@
 </template>
 <script lang="ts">
   import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
-  import {canvasContext, resolveMediaUrl, stopVideo} from "@/utils/htmlApi";
+  import {Component, Ref, Vue, Watch} from 'vue-property-decorator';
+  import {canvasContext, resolveMediaUrl, stopVideo} from '@/utils/htmlApi';
   import AppSubmit from '@/components/ui/AppSubmit';
   import {ApplyGrowlErr} from '@/utils/utils';
+
   @Component({
     components: {AppSubmit}
   })
@@ -77,7 +78,7 @@
     }
 
     photoInputChanged(e: Event) {
-      let f: File = (<HTMLInputElement>e.target)!.files![0];
+      let f: File = (e.target as HTMLInputElement)!.files![0];
       var ok = this.setPhotoFromReader(f, 'input');
       if (!ok) {
         this.fileInputValue = '';
@@ -143,14 +144,14 @@
     startCapturingVideo() {
       if (this.isStopped) {
         // Not showing vendor prefixes or code that works cross-browser.
-        navigator.getUserMedia({video: true},  (stream)  => {
+        navigator.getUserMedia({video: true}, (stream) => {
           this.srcVideo = stream;
           this.showVideo = true;
           this.isStopped = false;
-          this.store.growlInfo("Click on your video to take a photo")
+          this.store.growlInfo('Click on your video to take a photo');
         }, (e) => {
           this.logger.error('Error while trying to capture a picture "{}"', e.message || e.name)();
-          this.store.growlError(`Unable to use your webcam because ${e.message || e.name }`);
+          this.store.growlError(`Unable to use your webcam because ${e.message || e.name}`);
         });
       } else {
         this.stopVideo();

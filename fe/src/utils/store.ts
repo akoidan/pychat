@@ -605,7 +605,7 @@ export class DefaultStore extends VuexModule {
 
 
   @Action
-  async showGrowl({html, type}: { html: string, type: GrowlType }) {
+  async showGrowl({html, type}: { html: string; type: GrowlType }) {
     let growl: GrowlModel = {id: Date.now(), html, type};
     this.addGrowl(growl);
     await sleep(4000);

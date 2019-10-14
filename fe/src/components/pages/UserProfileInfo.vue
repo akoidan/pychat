@@ -29,7 +29,7 @@
         <tr>
           <th>Sex:</th>
           <td><select  class="input" v-model="model.sex">
-            <option :value="s" v-for="s in sex" >{{s}}</option>
+            <option :value="s" v-for="s in sex" :key="s">{{s}}</option>
           </select></td>
         </tr>
         <tr>
@@ -51,6 +51,7 @@
   import AppInputDate from '@/components/ui/AppInputDate';
   import {ApplyGrowlErr} from '@/utils/utils';
   import {SetUserProfileMessage} from '@/types/messages';
+
   @Component({
     components: {AppInputDate, AppSubmit}
   })
@@ -62,7 +63,7 @@
 
     sex: SexModelString[] = ["Male", "Female", "Secret"];
 
-    created() {
+    public created() {
       this.store.setActiveUserId(0);
       this.model = currentUserInfoModelToDto(this.userInfo);
     }
@@ -72,7 +73,7 @@
       this.logger.debug('Saving userProfile')();
       let cui: UserProfileDto = {...this.model};
       let e: SetUserProfileMessage | unknown = await this.$ws.saveUser(cui);
-      if (e && (<SetUserProfileMessage>e).action == 'setUserProfile') {
+      if (e && (e as SetUserProfileMessage).action === 'setUserProfile') {
         this.store.growlSuccess('User profile has been saved');
       }
     }

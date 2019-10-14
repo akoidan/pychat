@@ -1,7 +1,7 @@
 <template>
   <div class="controls">
     <div class="spanHo">
-      <span class="spann" v-for="currentUser in value">{{ currentUser.user }}
+      <span class="spann" v-for="currentUser in value" :key="currentUser.user">{{ currentUser.user }}
         <i @click="removeUser(currentUser)" class="icon-cancel"></i>
       </span>
     </div>
@@ -9,7 +9,7 @@
       <div>{{text}}</div>
       <input type="search" class="input" placeholder="Search" v-model="search" title="Filter by username"/>
       <ul>
-        <li v-for="user in filteredUsers" @click="addUser(user)"> {{user.user}}</li>
+        <li v-for="user in filteredUsers" @click="addUser(user)" :key="user.user"> {{user.user}}</li>
       </ul>
     </template>
   </div>
@@ -54,7 +54,6 @@
       this.search = '';
       this.value.push(user);
     }
-
 
     get filteredUsers(): UserModel[] {
       this.logger.debug("Reeval filter CreatePrivateRoom")();

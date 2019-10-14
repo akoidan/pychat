@@ -164,19 +164,19 @@
     @Watch('callInfo.currentSpeaker')
     onSpeakerChange(newValue: string) {
       this.$nextTick(function () {
-        let video: HTMLVideoElement = <HTMLVideoElement>(this.localVideo.$refs.video);
+        let video: HTMLVideoElement = this.localVideo.$refs.video as HTMLVideoElement;
         if (video.setSinkId) {
           video.setSinkId(newValue);
         } else  {
           this.logger.error("SetSinkId doesn't exist")();
         }
-      })
+      });
     }
 
     setCurrentMicProxy(event: Event) {
       let payload: StringIdentifier = {
         id: this.roomId,
-        state: (<HTMLInputElement>event.target).value
+        state: (event.target as HTMLInputElement).value
       };
       this.store.setCurrentMic(payload);
       if (this.callInfo.callActive) {
@@ -186,7 +186,7 @@
     setCurrentWebcamProxy(event: Event) {
       let payload: StringIdentifier = {
         id: this.roomId,
-        state: (<HTMLInputElement>event.target).value
+        state: (event.target as HTMLInputElement).value
       };
       this.store.setCurrentWebcam(payload);
       if (this.callInfo.callActive) {
@@ -211,7 +211,7 @@
     setCurrentSpeakerProxy(event: Event) {
       let payload: StringIdentifier = {
         id: this.roomId,
-        state: (<HTMLInputElement>event.target).value
+        state: (event.target as HTMLInputElement).value
       };
       this.store.setCurrentSpeaker(payload);
       if (this.callInfo.callActive) {

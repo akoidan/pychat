@@ -65,7 +65,7 @@
     }
 
     async created() {
-      await Promise.all(<Promise<void>[]>[this.loadGoogle(), this.loadFaceBook()]);
+      await Promise.all([this.loadGoogle(), this.loadFaceBook()]);
     }
 
     async onGoogleSignIn(auth2: unknown) {

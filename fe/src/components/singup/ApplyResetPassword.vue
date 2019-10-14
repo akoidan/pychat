@@ -32,15 +32,15 @@
 
     @ApplyGrowlErr({runningProp: 'checkingToken', vueProperty: 'error'})
     async created() {
-      this.restoreUser = await this.$api.verifyToken(<string>(this.$route.query['token']));
+      this.restoreUser = await this.$api.verifyToken((this.$route.query['token']) as string);
     }
 
     @ApplyGrowlErr({runningProp: 'running', vueProperty: 'error', message: 'Resetting pass err'})
     async submitResetPassword() {
-      if (this.password != this.repeatPassword) {
+      if (this.password !== this.repeatPassword) {
         this.store.growlError("Passords don't match");
       } else {
-        await this.$api.acceptToken(<string>this.$route.query["token"], this.password);
+        await this.$api.acceptToken(this.$route.query["token"] as string, this.password);
         this.store.growlSuccess("Password has been reset");
         this.$router.replace('/auth/login');
       }

@@ -1,36 +1,25 @@
 {
+  "extends": ["./node_modules/tslint-microsoft-contrib/tslint.json"],
+  "rulesDirectory": ["node_modules/tslint-microsoft-contrib", "./tslint-rules"],
   "rules": {
-    "class-name": true,
-    "comment-format": [
-      true,
-      "check-space"
-    ],
+    "no-consecutive-blank-lines": false,
+    "vue-no-consecutive-blank-lines": true,
+    "interface-name": false,
+    "export-name": [true, { "ignore-case": true, "allow": ["LoggerMixin"] }],
+    "import-name": [ true, true, { "vue-router": "VueRouter", "vuex": "Vuex", "vue": "Vue" }],
+    "no-import-side-effect": [true, {"ignore-module": "(@/utils/classComponentHooks|@/utils/mixins|reflect-metadata)"}],
+    "no-plusplus": false,
+    "no-default-export": false,
+    "vue-no-default-export": true,
+    "no-implicit-dependencies": [true, ["@"]],
+    "no-submodule-imports": [true, "@"],
     "indent": [
       true,
       "spaces",
       2
     ],
-    "no-duplicate-variable": true,
-    "no-eval": true,
-    "no-internal-module": false,
-    "no-trailing-whitespace": false,
-    "no-var-keyword": true,
-    "one-line": [
-      true,
-      "check-open-brace",
-      "check-whitespace"
-    ],
-    "quotemark": [
-      true,
-      "single"
-    ],
-    "semicolon": [
-      true
-    ],
-    "triple-equals": [
-      true,
-      "allow-null-check"
-    ],
+    "no-increment-decrement": false,
+    "arrow-return-shorthand": true,
     "typedef-whitespace": [
       true,
       {
@@ -40,18 +29,6 @@
         "property-declaration": "nospace",
         "variable-declaration": "nospace"
       }
-    ],
-    "variable-name": [
-      true,
-      "ban-keywords"
-    ],
-    "whitespace": [
-      true,
-      "check-branch",
-      "check-decl",
-      "check-operator",
-      "check-separator",
-      "check-type"
     ]
   }
 }

@@ -8,8 +8,8 @@
         <fieldset v-else-if="message.fieldDay" :key="message.fieldDay">
           <legend align="center">{{message.fieldDay}}</legend>
         </fieldset>
-        <chat-sending-file v-else-if="message.transfers" :sending-file="message"/>
-        <chat-receiving-file v-else-if="message.connId" :receiving-file="message"/>
+        <chat-sending-file v-else-if="message.transfers" :sending-file="message" :key="message.id"/>
+        <chat-receiving-file v-else-if="message.connId" :receiving-file="message" :key="message.id"/>
         <chat-sending-message v-else :message="message" :key="message.id"/>
       </template>
     </div>

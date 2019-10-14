@@ -183,7 +183,7 @@ const getConfig = async () => {
   plugins = [
     new StyleLintPlugin({
       files: ['**/*.vue', '**/*.sass'],
-      emitErrors: false,
+      failOnError: false,
     }),
     definePlugin,
     new VueLoaderPlugin(),

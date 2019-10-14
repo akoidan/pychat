@@ -30,7 +30,7 @@
 
     oninput(event: Event) {
       this.fixStyle();
-      this.$emit('input', parseInt((<HTMLInputElement>event.target).value));
+      this.$emit('input', parseInt((event.target as HTMLInputElement).value));
     }
 
     fixStyle() {
