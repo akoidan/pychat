@@ -21,6 +21,7 @@ const ELECTRON_DIST = path.resolve(__dirname, ELECTRON_DIST_DIRNAME);
 const MAIN_DIST = path.resolve(__dirname, MAIN_DIST_DIRNAME);
 const ANDROID_DIST = path.resolve(__dirname, ANDROID_DIST_DIRNAME);
 const DEV_PORT = 8080;
+const StyleLintPlugin = require('stylelint-webpack-plugin');
 const sassOptionsGlobal = {
   loader: "sass-loader",
   options: {
@@ -180,6 +181,10 @@ const getConfig = async () => {
   let htmlWebpackPlugin = new HtmlWebpackPlugin(webpackOptions);
 
   plugins = [
+    new StyleLintPlugin({
+      files: ['**/*.vue', '**/*.sass'],
+      emitErrors: false,
+    }),
     definePlugin,
     new VueLoaderPlugin(),
     new CopyWebpackPlugin([
@@ -255,17 +260,29 @@ const getConfig = async () => {
       rules: [
         {
           test: /\.ts$/,
-          loader: 'ts-loader',
           exclude: /node_modules/,
-          options: {
-            configFile,
-            appendTsSuffixTo: [/\.vue$/]
-          }
+          use: [
+            {
+              loader: 'ts-loader',
+              options: {
+                appendTsSuffixTo: [/\.vue$/]
+              }
+            },
+            {
+              loader: 'tslint-loader'
+            }
+          ],
         },
         {
           exclude: /node_modules/,
           test: /\.vue$/,
           loader: 'vue-loader',
+        },
+        {
+          enforce: 'pre',
+          test: /\.vue$/,
+          loader: 'eslint-loader',
+          exclude: /node_modules/
         },
         {
           test: /\.sass$/,
@@ -334,7 +351,7 @@ function getSimpleConfig(mainFile, dist, entry, target) {
     entry,
     target,
     resolve: {
-      extensions: ['.ts', '.js', '.json'],
+      extensions: ['.ts', '.vue', '.json', ".js", '.png', ".sass"],
       alias: {
         '@': path.resolve(__dirname, 'src')
       },
