@@ -101,11 +101,9 @@ export interface UserDictModel {
   [id: string]: UserModel;
 }
 
-
 export interface RoomDictModel {
   [id: string]: RoomModel;
 }
-
 
 export interface SearchModel {
   searchActive: boolean;
@@ -153,7 +151,6 @@ export interface SendingFile {
   transfers: { [id: string]: SendingFileTransfer };
 }
 
-
 export interface CallInfoModel {
   mediaStreamLink: string|null;
   connected: boolean;
@@ -192,5 +189,3 @@ export interface IncomingCallModel {
   userId: number;
   connId: string;
 }
-
-

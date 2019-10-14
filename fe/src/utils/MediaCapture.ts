@@ -9,14 +9,14 @@ export default class MediaCapture {
   private timeout: number | null = null;
   private stopped: boolean = false;
 
+  private logger: Logger = loggerFactory.getLoggerColor('nav-record', 'brown');
+  private recordedBlobs: any[] = [];
+  private stream: MediaStream|null = null;
+
   constructor(isRecordingVideo: boolean, onFinish: Function) {
     this.isRecordingVideo = isRecordingVideo;
     this.onFinish = onFinish;
   }
-
-  private logger: Logger = loggerFactory.getLoggerColor('nav-record', 'brown');
-  private recordedBlobs: any[] = [];
-  private stream: MediaStream|null = null;
 
   public async record(): Promise<MediaStream|null> {
     this.stream = await new Promise<MediaStream>((resolve, reject) => {
@@ -48,6 +48,7 @@ export default class MediaCapture {
     this.mediaRecorder.ondataavailable = this.handleDataAvailable.bind(this);
     this.mediaRecorder.start(10); // collect 10ms of data
     this.logger.debug('MediaRecorder started {}', this.mediaRecorder)();
+
     return this.stream;
   }
 
@@ -56,7 +57,7 @@ export default class MediaCapture {
     if (this.timeout) {
       clearTimeout(this.timeout);
       this.timeout = null;
-    } else if ( this.mediaRecorder) {
+    } else if (this.mediaRecorder) {
       this.mediaRecorder.stop();
     } else {
       this.onFinish(null);
@@ -69,7 +70,7 @@ export default class MediaCapture {
     if (this.recordedBlobs.length === 1) {
       this.onFinish(this.recordedBlobs[0]);
     } else if (this.recordedBlobs.length > 1) {
-      let blob: Blob = new Blob(this.recordedBlobs, {type: this.recordedBlobs[0].type});
+      const blob: Blob = new Blob(this.recordedBlobs, {type: this.recordedBlobs[0].type});
       this.logger.debug('Assembled blobs {} into {}', this.recordedBlobs, blob)();
       this.onFinish(blob);
     } else {

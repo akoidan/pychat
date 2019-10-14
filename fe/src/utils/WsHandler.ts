@@ -37,10 +37,21 @@ enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
 }
 
-
 export default class WsHandler extends MessageHandler {
+  public timeDiff: number = 0;
 
   protected readonly logger: Logger;
+
+  protected readonly handlers: HandlerTypes = {
+    growl: <HandlerType>this.growl,
+    setSettings: <HandlerType>this.setSettings,
+    setUserProfile: <HandlerType>this.setUserProfile,
+    setProfileImage: <HandlerType>this.setProfileImage,
+    setWsId: <HandlerType>this.setWsId,
+    userProfileChanged: <HandlerType>this.userProfileChanged,
+    ping: <HandlerType>this.ping,
+    pong: this.pong
+  };
   private loggerIn: Logger;
   private loggerOut: Logger;
   private pingTimeoutFunction: number|null = null;
@@ -52,22 +63,21 @@ export default class WsHandler extends MessageHandler {
   private listenWsTimeout: number|null = null;
   private API_URL: string;
   private callBacks: { [id: number]: Function } = {};
-  public timeDiff: number = 0;
 
-  protected readonly handlers: HandlerTypes = {
-    growl: <HandlerType>this.growl,
-    setSettings: <HandlerType>this.setSettings,
-    setUserProfile: <HandlerType>this.setUserProfile,
-    setProfileImage: <HandlerType>this.setProfileImage,
-    setWsId: <HandlerType>this.setWsId,
-    userProfileChanged: <HandlerType>this.userProfileChanged,
-    ping: <HandlerType>this.ping,
-    pong: this.pong,
-  };
+  private messageId: number = 0;
+  private wsState: WsState = WsState.NOT_INITED;
+
+  // this.dom = {
+  //   onlineStatus: $('onlineStatus'),
+  //   onlineClass: 'online',
+  //   offlineClass: OFFLINE_CLASS
+  // };
+  // private progressInterval = {}; TODO this was commented along with usage, check if it breaks anything
+  private wsConnectionId = '';
 
   constructor(API_URL: string, sessionHolder: SessionHolder, store: DefaultStore) {
     super();
-    sub.subscribe( 'ws', this);
+    sub.subscribe('ws', this);
     this.API_URL = API_URL;
     this.logger = loggerFactory.getLoggerColor('ws', '#2e631e');
     this.loggerIn = loggerFactory.getLoggerColor('ws:in', '#2e631e');
@@ -75,8 +85,6 @@ export default class WsHandler extends MessageHandler {
     this.sessionHolder = sessionHolder;
     this.store = store;
   }
-
-
 
   public getWsConnectionId () {
     return this.wsConnectionId;
@@ -118,7 +126,6 @@ public acceptFile(connId: string, received: number) {
     });
   }
 
-
   public destroyFileConnection(connId: string, content: unknown) {
     this.sendToServer({
       content,
@@ -136,9 +143,8 @@ public acceptFile(connId: string, received: number) {
     });
   }
 
-
   public sendEditMessage(content: string|null, id: number, files: number[] | null, messageId: number) {
-    let newVar = {
+    const newVar = {
       id,
       action: 'editMessage',
       files,
@@ -149,7 +155,7 @@ public acceptFile(connId: string, received: number) {
   }
 
   public sendSendMessage(content: string, roomId: number, files: number[], messageId: number, timeDiff: number) {
-    let newVar = {
+    const newVar = {
       files,
       messageId,
       timeDiff,
@@ -163,16 +169,18 @@ public acceptFile(connId: string, received: number) {
   public async saveSettings(content: UserSettingsDto): Promise<SetSettingsMessage|unknown> {
     this.sendToServer({
       action: 'setSettings',
-      content,
+      content
     });
+
     return new Promise((resolve, reject) => this.appendCB(resolve));
   }
 
-  public async saveUser(content: UserProfileDto) : Promise<SetUserProfileMessage|unknown> {
+  public async saveUser(content: UserProfileDto): Promise<SetUserProfileMessage|unknown> {
     this.sendToServer({
       action: 'setUserProfile',
-      content,
+      content
     });
+
     return new Promise((resolve, reject) => this.appendCB(resolve));
   }
 
@@ -187,12 +195,11 @@ public acceptFile(connId: string, received: number) {
     this.appendCB(cb);
   }
 
-
   public inviteUser(roomId: number, users: number[], cb: Function) {
     this.sendToServer({
       roomId,
       users,
-      action: 'inviteUser',
+      action: 'inviteUser'
     });
     this.appendCB(cb);
   }
@@ -216,7 +223,7 @@ public acceptFile(connId: string, received: number) {
   }
 
   public stopListening() {
-    let info = [];
+    const info = [];
     if (this.listenWsTimeout) {
       this.listenWsTimeout = null;
       info.push('purged timeout');
@@ -230,15 +237,13 @@ public acceptFile(connId: string, received: number) {
     this.logger.debug('Finished ws: {}', info.join(', '))();
   }
 
-
   public sendLeaveRoom(roomId: number, cb: Function) {
     this.sendToServer({
       roomId,
-      action: 'deleteRoom',
+      action: 'deleteRoom'
     });
     this.appendCB(cb);
   }
-
 
   public async sendLoadMessages(roomId: number, headerId: number, count: number) {
     this.sendToServer({
@@ -263,36 +268,60 @@ public acceptFile(connId: string, received: number) {
     });
   }
 
-  private sendToServer<T extends DefaultSentMessage>(messageRequest: T, skipGrowl = false): void {
-    if (!messageRequest.messageId) {
-      messageRequest.messageId = this.getMessageId();
-    }
-    let jsonRequest = JSON.stringify(messageRequest);
-    this.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
-  }
-
-
   public retry(connId: string, opponentWsId: string) {
     this.sendToServer({action: 'retryFile',  connId, opponentWsId});
   }
 
   public getMessageId () {
     this.messageId++;
+
     return this.messageId;
   }
 
+  public replyCall(connId: string, browser: string) {
+    this.sendToServer({
+      action: 'replyCall',
+      connId,
+      content: {
+        browser
+      }
+    });
+  }
+
+  public declineCall(connId: string) {
+    this.sendToServer({
+      content: 'decline',
+      action: 'destroyCallConnection',
+      connId
+    });
+  }
+
+  public acceptCall(connId: string) {
+    this.sendToServer({
+      action: 'acceptCall',
+      connId
+    });
+  }
+
+  private sendToServer<T extends DefaultSentMessage>(messageRequest: T, skipGrowl = false): void {
+    if (!messageRequest.messageId) {
+      messageRequest.messageId = this.getMessageId();
+    }
+    const jsonRequest = JSON.stringify(messageRequest);
+    this.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
+  }
 
   private growl(gm: GrowlMessage) {
-    this.store.growlError( gm.content);
+    this.store.growlError(gm.content);
   }
 
   private setSettings(m: SetSettingsMessage) {
-    let a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
+    const a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
     this.setUserSettings(a);
   }
 
   private setUserProfile(m: SetUserProfileMessage) {
-    let a: CurrentUserInfoModel = currentUserInfoDtoToModel(m.content);
+    const a: CurrentUserInfoModel = currentUserInfoDtoToModel(m.content);
     a.userId = this.store.userInfo!.userId; // this could came only when we logged in
     this.store.setUserInfo(a);
   }
@@ -307,7 +336,7 @@ public acceptFile(connId: string, received: number) {
     this.setUserSettings(message.userSettings);
     this.setUserImage(message.userImage);
     this.setTime(message.time);
-    let pubSetRooms: PubSetRooms = {
+    const pubSetRooms: PubSetRooms = {
       action: 'init',
       handler: 'channels',
       rooms: message.rooms,
@@ -315,7 +344,7 @@ public acceptFile(connId: string, received: number) {
       users: message.users
     };
     sub.notify(pubSetRooms);
-    let inetAppear: DefaultMessage = {
+    const inetAppear: DefaultMessage = {
       action: 'internetAppear',
       handler: 'lan'
     };
@@ -324,7 +353,7 @@ public acceptFile(connId: string, received: number) {
   }
 
   private userProfileChanged(message: UserProfileChangedMessage) {
-    let user: UserModel = convertUser(message);
+    const user: UserModel = convertUser(message);
     this.store.setUser(user);
   }
 
@@ -338,13 +367,12 @@ public acceptFile(connId: string, received: number) {
   }
 
   private setUserInfo(userInfo: UserProfileDto) {
-    let um: CurrentUserInfoModel = currentUserInfoDtoToModel(userInfo);
+    const um: CurrentUserInfoModel = currentUserInfoDtoToModel(userInfo);
     this.store.setUserInfo(um);
   }
 
-
   private setUserSettings(userInfo: UserSettingsDto) {
-    let um: UserSettingsDto = userSettingsDtoToModel(userInfo);
+    const um: UserSettingsDto = userSettingsDtoToModel(userInfo);
     if (!IS_DEBUG) {
       loggerFactory.setLogWarnings(userInfo.logs ? LogStrict.TRACE : LogStrict.DISABLE_LOGS);
     }
@@ -363,34 +391,20 @@ public acceptFile(connId: string, received: number) {
     }
   }
 
-
-
-  private messageId: number = 0;
-  private wsState: WsState = WsState.NOT_INITED;
-
-
-  // this.dom = {
-  //   onlineStatus: $('onlineStatus'),
-  //   onlineClass: 'online',
-  //   offlineClass: OFFLINE_CLASS
-  // };
-  // private progressInterval = {}; TODO this was commented along with usage, check if it breaks anything
-  private wsConnectionId = '';
-
-
-
   private onWsMessage(message: MessageEvent) {
-    let jsonData = message.data;
+    const jsonData = message.data;
     let data: DefaultMessage;
     try {
       data = JSON.parse(jsonData);
       this.logData(this.loggerIn, jsonData, data);
     } catch (e) {
       this.logger.error('Unable to parse incomming message {}', jsonData)();
+
       return;
     }
     if (!data.handler || !data.action) {
       this.logger.error('Invalid message structure')();
+
       return;
     }
     this.handleMessage(data);
@@ -419,7 +433,6 @@ public acceptFile(connId: string, received: number) {
     }
   }
 
-
   // private hideGrowlProgress(key: number) {
   //   let progInter = this.progressInterval[key];
   //   if (progInter) {
@@ -432,11 +445,10 @@ public acceptFile(connId: string, received: number) {
   //   }
   // }
 
-
   private sendRawTextToServer(jsonRequest: string, skipGrowl: boolean, objData: DefaultSentMessage): void {
     if (!this.isWsOpen() || !this.ws) {
       if (!skipGrowl) {
-        this.store.growlError( 'Can\'t send message, because connection is lost :(');
+        this.store.growlError('Can\'t send message, because connection is lost :(');
       }
     } else {
       this.logData(this.loggerOut, jsonRequest, objData);
@@ -459,7 +471,6 @@ public acceptFile(connId: string, received: number) {
   //   }
   // }
 
-
   private setStatus(isOnline: boolean) {
     if (this.store.isOnline !== isOnline) {
       this.store.setIsOnline(isOnline);
@@ -473,20 +484,18 @@ public acceptFile(connId: string, received: number) {
     }
   }
 
-
   private appendCB(cb: Function) {
     this.callBacks[this.messageId] = cb;
     this.logger.debug('Appending cb {}', cb)();
   }
 
-
   private onWsClose(e: CloseEvent) {
     this.ws = null;
     this.setStatus(false);
-    for (let cb in this.callBacks) {
+    for (const cb in this.callBacks) {
       try {
         this.logger.debug('Resolving cb {}', cb)();
-        let cbFn = this.callBacks[cb];
+        const cbFn = this.callBacks[cb];
         delete this.callBacks[cb];
         cbFn({});
         this.logger.debug('Cb {} has been resolved', cb)();
@@ -501,11 +510,12 @@ public acceptFile(connId: string, received: number) {
       clearTimeout(this.noServerPingTimeout);
       this.noServerPingTimeout = null;
     }
-    let reason = e.reason || e;
+    const reason = e.reason || e;
     if (e.code === 403) {
-      let message = `Server has forbidden request because '${reason}'. Logging out...`;
+      const message = `Server has forbidden request because '${reason}'. Logging out...`;
       this.logger.error('onWsClose {}', message)();
       logout(message);
+
       return;
     } else if (this.wsState === WsState.NOT_INITED) {
       // this.store.growlError( 'Can\'t establish connection with server');
@@ -524,8 +534,6 @@ public acceptFile(connId: string, received: number) {
     this.listenWsTimeout = window.setTimeout(this.listenWS.bind(this), CONNECTION_RETRY_TIME);
   }
 
-
-
   private listenWS() {
     if (typeof WebSocket === 'undefined') {
       // TODO
@@ -534,9 +542,9 @@ public acceptFile(connId: string, received: number) {
       return;
     }
 
-    let ids: { [id: string]: number } = {};
-    for (let k in this.store.roomsDict) {
-      let maxId: number|null = this.store.maxId(parseInt(k));
+    const ids: { [id: string]: number } = {};
+    for (const k in this.store.roomsDict) {
+      const maxId: number|null = this.store.maxId(parseInt(k));
       if (maxId) {
         ids[k] = maxId;
       }
@@ -561,7 +569,6 @@ public acceptFile(connId: string, received: number) {
     };
   }
 
-
   private startNoPingTimeout() {
     if (this.noServerPingTimeout) {
       clearTimeout(this.noServerPingTimeout);
@@ -573,33 +580,7 @@ public acceptFile(connId: string, received: number) {
         this.logger.error('Force closing socket coz server didn\'t ping us')();
         this.ws.close(1000, 'Sever didn\'t ping us');
       }
-    }, CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
-  }
-
-
-  replyCall(connId: string, browser: string) {
-    this.sendToServer({
-      action: 'replyCall',
-      connId,
-      content: {
-        browser
-      }
-    });
-  }
-
-  declineCall(connId: string) {
-    this.sendToServer({
-      content: 'decline',
-      action: 'destroyCallConnection',
-      connId,
-    });
-  }
-
-  acceptCall(connId: string) {
-    this.sendToServer({
-      action: 'acceptCall',
-      connId
-    });
+    },                                    CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT);
   }
 
   private setTime(time: number) {

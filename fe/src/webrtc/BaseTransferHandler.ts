@@ -35,8 +35,8 @@ export default abstract class BaseTransferHandler extends MessageHandler {
 
   protected removePeerConnection(payload: RemovePeerConnection) {
     this.logger.log('Removing pc {}', payload);
-    let start = this.webrtcConnnectionsIds.indexOf(payload.opponentWsId);
-    if (start < 0 ) {
+    const start = this.webrtcConnnectionsIds.indexOf(payload.opponentWsId);
+    if (start < 0) {
       throw Error('Can\'t remove unexisting payload ' + payload.opponentWsId);
     }
     this.webrtcConnnectionsIds.splice(start, 1);
@@ -48,6 +48,7 @@ export default abstract class BaseTransferHandler extends MessageHandler {
   protected closeAllPeerConnections() { // calls on destroy
     if (!this.connectionId) {
       this.logger.error(`Can't close connections since it's null`)();
+
       return;
     }
     this.webrtcConnnectionsIds.forEach(id => {

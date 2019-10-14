@@ -25,7 +25,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       store: DefaultStore
   ) {
     super(roomId, connId, opponentWsId, wsHandler, store);
-    let payload:  SetCallOpponent = {
+    const payload:  SetCallOpponent = {
       opponentWsId: this.opponentWsId,
       roomId: this.roomId,
       callInfoModel: {
@@ -38,7 +38,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     this.store.setCallOpponent(payload);
   }
 
-  oniceconnectionstatechange() {
+  public oniceconnectionstatechange() {
     if (this.pc!.iceConnectionState === 'disconnected') {
       this.logger.log('disconnected')();
       this.onDestroy('Connection has been lost');
@@ -47,7 +47,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     }
   }
 
-  onStreamChanged(payload: ChangeStreamMessage) {
+  public onStreamChanged(payload: ChangeStreamMessage) {
     if (this.pc) {
       payload.oldStream && this.pc.removeStream(payload.oldStream);
       this.pc.addStream(payload.newStream);
@@ -55,12 +55,11 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     }
   }
 
-
-  createPeerConnection (event: ConnectToRemoteMessage) {
+  public createPeerConnection (event: ConnectToRemoteMessage) {
     super.createPeerConnection();
     this.pc!.onaddstream =  (event: MediaStreamEvent) => {
       this.logger.log('onaddstream')();
-      let payload: SetOpponentAnchor = {
+      const payload: SetOpponentAnchor = {
         anchor: event.stream!,
         opponentWsId: this.opponentWsId,
         roomId: this.roomId
@@ -69,7 +68,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
 
       if (this.sendRtcDataQueue.length > 0) {
         this.logger.log('Connection accepted, consuming sendRtcDataQueue')();
-        let queue = this.sendRtcDataQueue;
+        const queue = this.sendRtcDataQueue;
         this.sendRtcDataQueue = [];
         queue.forEach(this.onsendRtcData);
       }
@@ -87,9 +86,9 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     event && event.stream && this.pc!.addStream(event.stream);
   }
 
-  processAudio (audioProc: JsAudioAnalyzer) {
+  public processAudio (audioProc: JsAudioAnalyzer) {
     return () => {
-      let level = getAverageAudioLevel(audioProc); // 256 max
+      const level = getAverageAudioLevel(audioProc); // 256 max
       let clasNu;
       if (level < 0.5) {
         clasNu = 0;
@@ -113,7 +112,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
         clasNu = 9;
       }
 
-      let payload: SetOpponentVoice = {
+      const payload: SetOpponentVoice = {
         voice: clasNu,
         opponentWsId: this.opponentWsId,
         roomId: this.roomId
@@ -122,22 +121,22 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     };
   }
 
-  removeAudioProcessor () {
+  public removeAudioProcessor () {
     if (this.audioProcessor && this.audioProcessor.javascriptNode && this.audioProcessor.javascriptNode.onaudioprocess) {
       this.audioProcessor.javascriptNode.onaudioprocess = null;
       this.logger.log('Removed remote audioProcessor')();
     }
   }
 
-  onDestroy(reason?: DefaultMessage|string) {
+  public onDestroy(reason?: DefaultMessage|string) {
     this.logger.log('Destroying {}, because', this.constructor.name, reason)();
     this.closePeerConnection();
     this.removeAudioProcessor();
     super.onDestroy();
-    let payload:  SetCallOpponent = {
+    const payload:  SetCallOpponent = {
       opponentWsId: this.opponentWsId,
       roomId: this.roomId,
-      callInfoModel: null,
+      callInfoModel: null
     };
     this.store.setCallOpponent(payload);
   }

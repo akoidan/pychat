@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "fix": "./node_modules/.bin/eslint \"**.*.vue\"--fix && ./node_modules/.bin/tslint --fix -c ./tslint.json 'src/*.ts'",
     "prod": "PLATFORM=web BUILD_MODE=production node ./builder.js",
     "dev": "PLATFORM=web BUILD_MODE=development node ./builder.js",
     "electronDev": "PLATFORM=electron BUILD_MODE=development node ./builder.js",
@@ -37,6 +38,9 @@
   },
   "homepage": "https://github.com/Deathangel908/pychat#readme",
   "devDependencies": {
+    "@fimbul/valtyr": "^0.21.0",
+    "@fimbul/ve": "^0.21.0",
+    "@fimbul/wotan": "^0.21.1",
     "@types/amcharts": "3.21.4",
     "@types/chai": "4.2.3",
     "@types/chrome": "0.0.89",
@@ -76,10 +80,12 @@
     "stylelint-webpack-plugin": "1.0.2",
     "ts-loader": "6.2.0",
     "ts-node": "8.4.1",
+    "ts-polyfill": "3.5.3",
     "tslint": "5.20.0",
     "tslint-loader": "3.5.4",
     "tslint-microsoft-contrib": "6.2.0",
     "typescript": "3.6.4",
+    "typescript-tslint-plugin": "^0.5.4",
     "url-loader": "2.2.0",
     "vue-loader": "15.7.1",
     "vue-property-decorator": "8.2.2",
@@ -90,9 +96,7 @@
     "webpack-bundle-analyzer": "3.5.2",
     "webpack-cli": "3.3.9",
     "webpack-dev-server": "3.8.2",
-    "workbox-webpack-plugin": "4.3.1",
-    "typescript-tslint-plugin": "^0.5.4",
-    "ts-polyfill": "3.5.3"
+    "workbox-webpack-plugin": "4.3.1"
   },
   "dependencies": {
     "amcharts3": "3.21.15",

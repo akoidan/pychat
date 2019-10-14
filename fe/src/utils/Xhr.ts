@@ -2,7 +2,6 @@ import {PostData, SessionHolder} from '@/types/types';
 import {CONNECTION_ERROR, RESPONSE_SUCCESS, XHR_API_URL} from '@/utils/consts';
 import Http from '@/utils/Http';
 
-
 /**
  * @param params : object dict of params or DOM form
  * @param callback : function calls on response
@@ -16,7 +15,7 @@ export default class Xhr extends Http {
     super(sessionHolder);
   }
 
-  getApiUrl(url: string) {
+  public getApiUrl(url: string) {
     return `${XHR_API_URL}${url}`.replace('{}', window.location.host);
   }
 
@@ -26,9 +25,9 @@ export default class Xhr extends Http {
     return new Promise<T>((resolve, reject) => {
       fileUrl = this.getApiUrl(fileUrl);
       this.httpLogger.log('GET out {}', fileUrl)();
-      let regexRes = /\.(\w+)(\?.*)?$/.exec(fileUrl);
-      let fileType = regexRes != null && regexRes.length === 3 ? regexRes[1] : null;
-      let xobj = new XMLHttpRequest();
+      const regexRes = /\.(\w+)(\?.*)?$/.exec(fileUrl);
+      const fileType = regexRes != undefined && regexRes.length === 3 ? regexRes[1] : null;
+      const xobj = new XMLHttpRequest();
       // special for IE
       if (xobj.overrideMimeType) {
         xobj.overrideMimeType('application/json');
@@ -50,7 +49,7 @@ export default class Xhr extends Http {
 
   public async doPost<T>(d: PostData<T>): Promise<T> {
     return new Promise<T>((resolve, reject) => {
-      let r: XMLHttpRequest = new XMLHttpRequest();
+      const r: XMLHttpRequest = new XMLHttpRequest();
       r.onreadystatechange = this.getOnreadystatechange<T>(
           r,
           d.isJsonDecoded || false,
@@ -61,7 +60,7 @@ export default class Xhr extends Http {
           resolve
       );
 
-      let url = this.getApiUrl(d.url);
+      const url = this.getApiUrl(d.url);
 
       r.open('POST', url, true);
       let data;
@@ -74,12 +73,12 @@ export default class Xhr extends Http {
         data = d.formData ? d.formData : new FormData();
 
         if (d.params) {
-          for (let key in d.params) {
+          for (const key in d.params) {
             data.append(key, <string|Blob>d.params[key]); // TODO null putting?
           }
         }
         if (data.entries) {
-          let entries = data.entries();
+          const entries = data.entries();
           if (entries && entries.next) {
             let d;
             while (d = entries.next()) {
@@ -98,6 +97,7 @@ export default class Xhr extends Http {
         d.process(r);
       }
       r.send(data);
+
       return r;
     });
   }

@@ -1,7 +1,7 @@
 // webpack global consts
 declare const PYCHAT_CONSTS: any;
 
-let allConsts = PYCHAT_CONSTS;
+const allConsts = PYCHAT_CONSTS;
 export const {
   IS_DEBUG,
   IS_SSL,

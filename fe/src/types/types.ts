@@ -14,7 +14,6 @@ import {
 import {RoomDto, SetRooms, UserDto} from '@/types/dto';
 import {DefaultMessage} from '@/types/messages';
 
-
 export interface UploadFile {
    type: string;
    symbol: string;
@@ -137,7 +136,7 @@ export  interface IStorage {
   setRooms(rooms: RoomSettingsModel[]): void;
   saveRoom(room: RoomModel): void;
   setUserProfile(user: CurrentUserInfoModel): void;
-  setUserSettings( settings: CurrentUserSettingsModel): void;
+  setUserSettings(settings: CurrentUserSettingsModel): void;
   saveRoomUsers(ru: SetRoomsUsers): void;
   setUsers(users: UserModel[]): void;
 
@@ -157,9 +156,9 @@ export interface  PostData<T> {
   isJsonEncoded?: boolean;
   isJsonDecoded?: boolean;
   checkOkString?: boolean;
-  requestInterceptor?: (a: XMLHttpRequest) => void;
+  requestInterceptor?(a: XMLHttpRequest): void;
   errorDescription?: string;
-  process?: (R: XMLHttpRequest) => void;
+  process?(R: XMLHttpRequest): void;
 }
 
 export interface AddSendingFileTransfer {
@@ -252,7 +251,6 @@ export interface SmileyStructure {
   alt: string;
   src: string;
 }
-
 
 export interface SessionHolder {
   session: string;

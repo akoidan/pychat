@@ -11,20 +11,14 @@ import {sub} from '@/utils/sub';
 import sessionHolder from '@/utils/sessionHolder';
 
 export default class Api extends MessageHandler {
-  private readonly  xhr: Http;
   protected readonly handlers: HandlerTypes = {
     internetAppear: this.internetAppear
   };
 
-  private internetAppear(m: DefaultMessage): void {
-    if (this.retryFcb) {
-      this.retryFcb();
-    }
-  }
+  protected readonly logger: Logger;
+  private readonly  xhr: Http;
 
   private retryFcb: Function|null = null;
-
-  protected readonly logger: Logger;
 
   constructor(xhr: Http) {
     super();
@@ -34,18 +28,17 @@ export default class Api extends MessageHandler {
   }
 
   public async login(form: HTMLFormElement): Promise<string> {
-    return await this.xhr.doPost<string>({
+    return this.xhr.doPost<string>({
       url: '/auth',
       formData: new FormData(form)
     });
   }
 
-
   public async sendLogs(issue: string, browser: string): Promise<void> {
-    let result: string = await this.xhr.doPost<string>({
+    const result: string = await this.xhr.doPost<string>({
       url: '/report_issue',
       params: {issue, browser},
-      checkOkString: true,
+      checkOkString: true
     });
   }
 
@@ -55,19 +48,19 @@ export default class Api extends MessageHandler {
       offset: number,
       requestInterceptor?: (a: XMLHttpRequest) => void
   ): Promise<MessageModelDto[]> {
-   return await this.xhr.doPost<MessageModelDto[]>({
+   return this.xhr.doPost<MessageModelDto[]>({
       url: '/search_messages',
       params: {data, room, offset},
       isJsonDecoded: true,
-      requestInterceptor,
+      requestInterceptor
     });
   }
 
   public async changePassword(old_password: string, password: string): Promise<void> {
-    return await this.xhr.doPost<void>({
+    return this.xhr.doPost<void>({
       url: '/change_password',
       params: {old_password, password},
-      checkOkString: true,
+      checkOkString: true
     });
   }
 
@@ -80,29 +73,29 @@ export default class Api extends MessageHandler {
   }
 
   public async sendRestorePassword(form: HTMLFormElement): Promise<void> {
-    return await this.xhr.doPost<void>({
+    return this.xhr.doPost<void>({
       url: '/send_restore_password',
       formData: new FormData(form),
-      checkOkString: true,
+      checkOkString: true
     });
   }
 
   public async register(form: HTMLFormElement): Promise<string> {
-    return await this.xhr.doPost<string>({
+    return this.xhr.doPost<string>({
       url: '/register',
-      formData: new FormData(form),
+      formData: new FormData(form)
     });
   }
 
   public async registerDict(password: string, username: string): Promise<string> {
-    return await this.xhr.doPost<string>({
+    return this.xhr.doPost<string>({
       url: '/register',
       params: {username, password}
     });
   }
 
   public async googleAuth(token: string): Promise<string> {
-    return await this.xhr.doPost<string>({
+    return this.xhr.doPost<string>({
       url: '/google_auth',
       params: {
         token
@@ -111,7 +104,7 @@ export default class Api extends MessageHandler {
   }
 
   public async facebookAuth(token: string): Promise<string> {
-    return  await this.xhr.doPost<string>({
+    return  this.xhr.doPost<string>({
       url: '/facebook_auth',
       params: {
         token
@@ -120,21 +113,20 @@ export default class Api extends MessageHandler {
   }
 
   public async statistics(): Promise<void> {
-    return await this.xhr.doGet('/statistics', true);
+    await this.xhr.doGet('/statistics', true);
   }
 
   public async loadGoogle(): Promise<void> {
-    return await this.xhr.loadJs('https://apis.google.com/js/platform.js');
+    await this.xhr.loadJs('https://apis.google.com/js/platform.js');
   }
 
   public async loadFacebook(): Promise<void> {
-    return await this.xhr.loadJs('https://connect.facebook.net/en_US/sdk.js');
+    await this.xhr.loadJs('https://connect.facebook.net/en_US/sdk.js');
   }
 
   public async loadRecaptcha(): Promise<void> {
-    return await this.xhr.loadJs('https://www.google.com/recaptcha/api.js');
+    await this.xhr.loadJs('https://www.google.com/recaptcha/api.js');
   }
-
 
   public async registerFCB(registration_id: string, agent: string, is_mobile: boolean): Promise<void> {
     try {
@@ -145,7 +137,7 @@ export default class Api extends MessageHandler {
           agent,
           is_mobile
         },
-        checkOkString: true,
+        checkOkString: true
       });
     } catch (e) {
       if (e === CONNECTION_ERROR) {
@@ -160,34 +152,35 @@ export default class Api extends MessageHandler {
   }
 
   public async validateUsername(username: string, requestInterceptor: (r: XMLHttpRequest) => void): Promise<void> {
-    return await this.xhr.doPost({
+    return this.xhr.doPost({
       url: '/validate_user',
       params: {username},
       checkOkString: true,
-      requestInterceptor,
+      requestInterceptor
     });
   }
 
   public async sendRoomSettings(roomName: string, volume: number, notifications: boolean, roomId: number): Promise<void> {
-    return await this.xhr.doPost( {
+    return this.xhr.doPost({
       url: '/save_room_settings',
       params: {roomName, volume, notifications, roomId},
-      checkOkString: true,
+      checkOkString: true
     });
   }
 
   public async uploadProfileImage(file: Blob): Promise<void> {
-    let fd = new FormData();
+    const fd = new FormData();
     fd.append('file', file);
-    return await this.xhr.doPost<void>( {
+
+    return this.xhr.doPost<void>({
       url: '/upload_profile_image',
       formData: fd,
-      checkOkString: true,
+      checkOkString: true
     });
   }
 
   public async showProfile(id: number): Promise<ViewUserProfileDto> {
-    return await this.xhr.doGet<ViewUserProfileDto>(`/profile?id=${id}`, true);
+    return this.xhr.doGet<ViewUserProfileDto>(`/profile?id=${id}`, true);
   }
 
   public async changeEmail(token: string): Promise<string> {
@@ -195,7 +188,7 @@ export default class Api extends MessageHandler {
   }
 
   public async changeEmailLogin(email: string, password: string): Promise<void> {
-    return await this.xhr.doPost({
+    return this.xhr.doPost({
       url: '/change_email_login',
       checkOkString: true,
       params: {email, password}
@@ -203,13 +196,14 @@ export default class Api extends MessageHandler {
   }
 
   public async confirmEmail(token: string): Promise<string> {
-    return await this.xhr.doGet<string>(`/confirm_email?token=${token}`, false, true);
+    return this.xhr.doGet<string>(`/confirm_email?token=${token}`, false, true);
   }
 
   public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void): Promise<number[]> {
-    let fd = new FormData();
+    const fd = new FormData();
     files.forEach(sd => fd.append(sd.type + sd.symbol, sd.file, sd.file.name));
-    return await this.xhr.doPost<number[]>({
+
+    return this.xhr.doPost<number[]>({
       url: '/upload_file',
       isJsonDecoded: true,
       formData: fd,
@@ -224,12 +218,12 @@ export default class Api extends MessageHandler {
       url: '/validate_email',
       params: {email},
       checkOkString: true,
-      requestInterceptor,
+      requestInterceptor
     });
   }
 
   public async verifyToken(token: string): Promise<string> {
-    let value: { message: string, restoreUser: string } = await this.xhr.doPost<{ message: string, restoreUser: string}>({
+    const value: { message: string; restoreUser: string } = await this.xhr.doPost<{ message: string; restoreUser: string}>({
       url: '/verify_token',
       isJsonDecoded: true,
       params: {token}
@@ -242,10 +236,16 @@ export default class Api extends MessageHandler {
   }
 
   public async acceptToken(token: string, password: string): Promise<void> {
-    return await this.xhr.doPost({
+    return this.xhr.doPost({
       url: '/accept_token',
       params: {token, password},
-      checkOkString: true,
+      checkOkString: true
     });
+  }
+
+  private internetAppear(m: DefaultMessage): void {
+    if (this.retryFcb) {
+      this.retryFcb();
+    }
   }
 }

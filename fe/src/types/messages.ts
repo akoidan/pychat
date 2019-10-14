@@ -1,7 +1,6 @@
 import {FileModelDto, MessageModelDto, RoomDto, SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from '@/types/dto';
 import {FileModel} from '@/types/model';
 
-
 export interface DefaultSentMessage {
   action: string;
   messageId?: number;
@@ -129,7 +128,6 @@ export interface DeleteRoomMessage extends DefaultMessage {
 export interface AddOnlineUserMessage extends ChangeUserOnline {}
 export interface RemoveOnlineUserMessage extends ChangeUserOnline {}
 
-
 interface RoomExistedBefore {
   inviteeUserId: number[];
 }
@@ -157,7 +155,6 @@ export interface AcceptFileMessage extends DefaultMessage {
 export interface AcceptCallMessage extends WebRtcDefaultMessage, OpponentWsId {
 }
 
-
 export interface InviteUserMessage extends NewRoom, RoomExistedBefore {
 }
 export interface AddInviteMessage extends AddRoomBase, RoomExistedBefore {
@@ -170,7 +167,6 @@ export interface LeaveUserMessage extends DefaultMessage {
   userId: number;
   users: number[];
 }
-
 
 export interface LoadMessages extends DefaultMessage {
   content: MessageModelDto[];
@@ -186,7 +182,6 @@ export interface DeleteMessage extends DefaultMessage {
   id: number;
   edited: number;
 }
-
 
 export interface EditMessage extends DeleteMessage {
   userId: number;

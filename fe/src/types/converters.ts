@@ -18,7 +18,6 @@ import {
 } from '@/types/dto';
 import {BooleanDB, SexDB} from '@/types/db';
 
-
 export function currentUserInfoDtoToModel(userInfo: UserProfileDto): CurrentUserInfoModel {
   return {...userInfo};
 }
@@ -51,7 +50,6 @@ export function convertSexToNumber(m: SexModelString): number {
   }
 }
 
-
 export function getRoomsBaseDict(
     {
       roomId,
@@ -60,11 +58,11 @@ export function getRoomsBaseDict(
       name,
       users
     }: {
-      roomId: number,
-      volume: number,
-      notifications: boolean,
-      name: string,
-      users: number[]
+      roomId: number;
+      volume: number;
+      notifications: boolean;
+      name: string;
+      users: number[];
     },
     oldRoom: RoomModel|null = null
 ): RoomModel {
@@ -84,7 +82,7 @@ export function getRoomsBaseDict(
       currentMic: null,
       currentSpeaker: null,
       currentWebcam: null,
-      currentMicLevel: 0,
+      currentMicLevel: 0
     },
     notifications,
     name,
@@ -96,27 +94,29 @@ export function getRoomsBaseDict(
       searchActive: false,
       searchText: '',
       searchedIds: [],
-      locked: false,
+      locked: false
     },
     users
   };
 }
 
 export function convertNumberToSex(m: SexDB): SexModelString {
-  let newVar: { [id: number]: SexModelString } = {
-    '0': 'Secret',
-    '1': 'Male',
-    '2': 'Female',
+  const newVar: { [id: number]: SexModelString } = {
+    0: 'Secret',
+    1: 'Male',
+    2: 'Female'
   };
+
   return newVar[m];
 }
 
 export function convertSexToString(m: SexDB): SexModelString {
-  let newVar: { [id: number]: SexModelString } = {
+  const newVar: { [id: number]: SexModelString } = {
     0: 'Secret',
     1: 'Male',
-    2: 'Female',
+    2: 'Female'
   };
+
   return newVar[m];
 }
 
@@ -126,9 +126,9 @@ export function convertToBoolean(value: BooleanDB): boolean {
 
 export function convertStringSexToNumber(m: SexModelString): number {
   return {
-    'Secret': 0,
-    'Male': 1,
-    'Female': 2,
+    Secret: 0,
+    Male: 1,
+    Female: 2
   }[m];
 }
 
@@ -137,20 +137,22 @@ export function convertFile(dto: FileModelDto): FileModel {
 }
 
 export function convertFiles(dto: {[id: number]: FileModelDto}): {[id: number]: FileModel} {
-  let res: {[id: number]: FileModel} = {};
-  for (let k in dto) {
+  const res: {[id: number]: FileModel} = {};
+  for (const k in dto) {
     res[k] = convertFile(dto[k]);
   }
+
   return res;
 }
 
 export function convertUser(u: UserDto): UserModel {
-  let location: Location = u.location ? convertLocation(u.location) : {
+  const location: Location = u.location ? convertLocation(u.location) : {
     city: null,
     country: null,
     countryCode: null,
     region: null
   };
+
   return {
     user: u.user,
     id: u.userId,

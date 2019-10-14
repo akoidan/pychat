@@ -62,7 +62,6 @@ export interface UserProfileDto {
   userId: number;
 }
 
-
 export interface FileModelDto {
   id: number;
   url: string;

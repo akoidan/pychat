@@ -50,7 +50,7 @@ const router = new VueRouter({
               globalLogger.debug('setActiveRoomId {}', to.params.id)();
               store.setActiveRoomId(parseInt(to.params.id));
               next();
-            },
+            }
           },
           name: 'chat',
           path: '/chat/:id'
@@ -89,7 +89,7 @@ const router = new VueRouter({
             },
             {
               path: 'image',
-              component: UserProfileImage,
+              component: UserProfileImage
             },
             {
               path: 'settings',
@@ -103,19 +103,19 @@ const router = new VueRouter({
         },
         {
           component: CreatePrivateRoom,
-          path: '/create-private-room',
+          path: '/create-private-room'
         },
         {
           component: CreatePublicRoom,
-          path: '/create-public-room',
+          path: '/create-public-room'
         },
         {
           component: InviteUser,
-          path: '/invite-user/:id',
+          path: '/invite-user/:id'
         },
         {
           component: ReportIssue,
-          path: '/report-issue',
+          path: '/report-issue'
         }
       ]
     }, {
@@ -127,7 +127,7 @@ const router = new VueRouter({
       children: [
         {
           path: '',
-          redirect: '/auth/login',
+          redirect: '/auth/login'
         },
         {
           path: 'login',
@@ -139,7 +139,7 @@ const router = new VueRouter({
         },
         {
           path: 'sign-up',
-          component: SignUp,
+          component: SignUp
         },
         {
           path: 'proceed-reset-password',

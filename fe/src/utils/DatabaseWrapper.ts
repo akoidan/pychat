@@ -24,9 +24,7 @@ import {
   UserDB
 } from '@/types/db';
 
-interface TransactionCb {
-  (t: SQLTransaction, ...rest: unknown[]): void;
-}
+type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 
 export default class DatabaseWrapper implements IStorage {
   private logger: Logger;
@@ -39,36 +37,12 @@ export default class DatabaseWrapper implements IStorage {
     this.dbName = dbName;
   }
 
-  private executeSql(
-      t: SQLTransaction,
-      sql: string,
-      args: unknown[] = [],
-      cb: SQLStatementCallback | undefined = undefined,
-      e: SQLStatementErrorCallback | undefined = undefined
-  ): Function {
-    const err: SQLStatementErrorCallback = e ? e : (t: SQLTransaction, e: SQLError)  => {
-      this.logger.error('{} {}, error: {}, message {}', sql, args, e, e && e.message)();
-      return false;
-    };
-    t.executeSql(sql, args, cb, err);
-    return this.logger.trace('{} {}', sql, args);
-  }
-
-  private async runSql(t: SQLTransaction, sql: string): Promise<SQLTransaction> {
-    return new Promise<SQLTransaction>((resolve, reject) => {
-      this.executeSql(t, sql, [], (t: SQLTransaction) => resolve(t), (t: SQLTransaction, e: SQLError) => {
-        reject({sql, e});
-        return false;
-      });
-    });
-  }
-
   public async connect(): Promise<boolean> {
     this.db = window.openDatabase(this.dbName, '', 'Messages database', 10 * 1024 * 1024);
     if (this.db.version === '') {
       this.logger.log('Initializing database')();
       let t: SQLTransaction = await new Promise<SQLTransaction>((resolve, reject) => {
-        this.db!.changeVersion(this.db!.version, '1.0', (t) => resolve(t), e => reject(e));
+        this.db!.changeVersion(this.db!.version, '1.0', resolve, reject);
       });
       t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text)');
       t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)))');
@@ -78,23 +52,20 @@ export default class DatabaseWrapper implements IStorage {
       t = await this.runSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2)))');
       t = await this.runSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))');
       this.logger.log('DatabaseWrapper has been initialized')();
+
       return true;
     } else if (this.db.version === '1.0') {
       this.logger.log('Created new db connection')();
+
       return false;
     }
+
     return false;
   }
 
-  private getStart() {
-    return Promise.resolve().then(() => new Promise((resolve, reject) => {
-      this.db!.changeVersion(this.db!.version, '1.0', (t) => resolve(t), e => reject(e));
-    }));
-  }
-
   public async getAllTree(): Promise<StorageData|null> {
-    let t: SQLTransaction = await this.asyncWrite();
-    let f: unknown[][] = await Promise.all<unknown[]>([
+    const t: SQLTransaction = await this.asyncWrite();
+    const f: unknown[][] = await Promise.all<unknown[]>([
       'select * from file',
       'select * from profile',
       'select * from room where deleted = 0',
@@ -105,19 +76,20 @@ export default class DatabaseWrapper implements IStorage {
     ].map(sql => new Promise((resolve, reject) => {
       this.executeSql(t, sql, [], (t: SQLTransaction, d: SQLResultSet) => {
         this.logger.trace('sql {} fetched {} ', sql, d)();
-        let res: unknown[] = [];
+        const res: unknown[] = [];
         for (let i = 0; i < d.rows.length; i++) {
-          let rows: SQLResultSetRowList = d.rows;
+          const rows: SQLResultSetRowList = d.rows;
           res.push(rows.item(i)); // TODO does that work
         }
         resolve(res);
-      }, (t: SQLTransaction, e: SQLError) => {
+      },              (t: SQLTransaction, e: SQLError) => {
         reject(e);
+
         return false;
       })();
     })));
 
-    let dbFiles: FileDB[] = f[0] as FileDB[],
+    const dbFiles: FileDB[] = f[0] as FileDB[],
         dbProfile: ProfileDB[] = f[1] as ProfileDB[],
         dbRooms: RoomDB[] = f[2] as RoomDB[],
         dbRoomUsers: RoomUsersDB[] = f[3] as RoomUsersDB[],
@@ -127,7 +99,7 @@ export default class DatabaseWrapper implements IStorage {
     this.logger.debug('resolved all sqls')();
 
     if (dbProfile.length) {
-      let profile: CurrentUserInfoModel = {
+      const profile: CurrentUserInfoModel = {
         sex: convertSexToString(dbProfile[0].sex),
         contacts: dbProfile[0].contacts,
         birthday: dbProfile[0].birthday,
@@ -138,7 +110,7 @@ export default class DatabaseWrapper implements IStorage {
         userId: dbProfile[0].userId,
         user: dbProfile[0].user
       };
-      let settings: CurrentUserSettingsModel = {
+      const settings: CurrentUserSettingsModel = {
         embeddedYoutube: convertToBoolean(dbSettings[0].embeddedYoutube),
         highlightCode: convertToBoolean(dbSettings[0].highlightCode),
         incomingFileCallSound: convertToBoolean(dbSettings[0].incomingFileCallSound),
@@ -149,9 +121,9 @@ export default class DatabaseWrapper implements IStorage {
         theme: dbSettings[0].theme,
         logs: convertToBoolean(dbSettings[0].logs)
       };
-      let roomsDict: RoomDictModel = {};
+      const roomsDict: RoomDictModel = {};
       dbRooms.forEach((r: RoomDB) => {
-        let rm: RoomModel = getRoomsBaseDict({
+        const rm: RoomModel = getRoomsBaseDict({
           roomId: r.id,
           notifications: convertToBoolean(r.notifications),
           name: r.name,
@@ -163,9 +135,9 @@ export default class DatabaseWrapper implements IStorage {
       dbRoomUsers.forEach(ru => {
         roomsDict[ru.room_id].users.push(ru.user_id);
       });
-      let allUsersDict: { [id: number]: UserModel } = {};
+      const allUsersDict: { [id: number]: UserModel } = {};
       dbUsers.forEach(u => {
-        let user: UserModel = {
+        const user: UserModel = {
           id: u.id,
           sex: convertNumberToSex(u.sex),
           user: u.user,
@@ -179,10 +151,10 @@ export default class DatabaseWrapper implements IStorage {
         allUsersDict[u.id] = user;
       });
 
-      let am: { [id: string]: MessageModel } = {};
-      let sendingMessages: MessageModel[] = [];
+      const am: { [id: string]: MessageModel } = {};
+      const sendingMessages: MessageModel[] = [];
       dbMessages.forEach(m => {
-        let message: MessageModel = {
+        const message: MessageModel = {
           id: m.id,
           roomId: m.roomId,
           time: m.time,
@@ -207,9 +179,9 @@ export default class DatabaseWrapper implements IStorage {
         am[m.id] = message;
       });
       dbFiles.forEach(f => {
-        let amElement: MessageModel = am[f.message_id];
+        const amElement: MessageModel = am[f.message_id];
         if (amElement) {
-          let file: FileModel = {
+          const file: FileModel = {
             url: f.url,
             type: f.type,
             preview: f.preview,
@@ -218,31 +190,11 @@ export default class DatabaseWrapper implements IStorage {
           amElement.files![f.symbol] = file;
         }
       });
+
       return {sendingMessages, setRooms: {roomsDict, settings, profile, allUsersDict}};
     } else {
       return null;
     }
-  }
-
-  private transaction(transactionType: TransactionType, cb: TransactionCb) {
-    if (!this.db) { // TODO TypeError: undefined is not an object (evaluating 'this.db[transactionType]')
-      throw Error(`${browserVersion} failed to get db`);
-    }
-    this.db[transactionType](t => {
-      cb(t);
-    }, (e) => {
-      this.logger.error('Error during saving message {}', e)();
-    });
-  }
-
-  private write(cb: TransactionCb) {
-    return this.transaction('transaction', cb);
-  }
-
-  private async asyncWrite(): Promise<SQLTransaction> {
-    return new Promise<SQLTransaction>((resolve, reject) => {
-      this.write(resolve);
-    });
   }
 
   // public getRoomHeaderId (id: number, cb: Function) {
@@ -265,7 +217,6 @@ export default class DatabaseWrapper implements IStorage {
   //     });
   //   });
   // }
-
 
   public async clearMessages() {
     let t: SQLTransaction = await this.asyncWrite();
@@ -311,17 +262,12 @@ export default class DatabaseWrapper implements IStorage {
   public insertMessage(t: SQLTransaction, message: MessageModel) {
     this.setRoomHeaderId(message.roomId, message.id);
     this.executeSql(t, 'insert or replace into message (id, time, content, symbol, deleted, giphy, edited, roomId, userId, sending) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId, message.transfer ? 1 : 0], (t, d) => {
-          for (let k in message.files) {
-            let f = message.files[k];
+                    [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId, message.transfer ? 1 : 0], (t, d) => {
+          for (const k in message.files) {
+            const f = message.files[k];
             this.executeSql(t, 'insert or replace into file (id, symbol, url, message_id, type, preview) values (?, ?, ?, ?, ?, ?)', [f.id, k, f.url, message.id, f.type, f.preview])();
           }
         })();
-  }
-
-
-  private setRoom(t: SQLTransaction, room: RoomSettingsModel) {
-    this.executeSql(t, 'insert or replace into room (id, name, notifications, volume, deleted) values (?, ?, ?, ?, ?)', [room.id, room.name, room.notifications ? 1 : 0, room.volume, 0])();
   }
 
   public saveRoom(room: RoomModel) {
@@ -344,10 +290,6 @@ export default class DatabaseWrapper implements IStorage {
         });
       })();
     });
-  }
-
-  private insertRoomUsers(t: SQLTransaction, roomId: number, userId: number) {
-    this.executeSql(t, 'insert into room_users (room_id, user_id) values (?, ?)', [roomId, userId])();
   }
 
   public insertUser(t: SQLTransaction, user: UserModel) {
@@ -377,7 +319,6 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
-
   public deleteMessage(id: number) {
     this.write(t => {
       this.executeSql(t, 'delete from file where message_id = ?', [id], (t) => {
@@ -397,14 +338,6 @@ export default class DatabaseWrapper implements IStorage {
     this.write((t: SQLTransaction) => {
       this.setRoomUsers(t, ru.roomId, ru.users);
     });
-  }
-
-  private setRoomUsers(t: SQLTransaction, roomId: number, users: number[]) {
-    this.executeSql(t, 'delete from room_users where room_id = ?', [roomId], t => {
-      users.forEach(u => {
-        this.insertRoomUsers(t, roomId, u);
-      });
-    })();
   }
 
   public updateRoom(r: RoomSettingsModel) {
@@ -427,11 +360,80 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
-
   public setRoomHeaderId(roomId: number, headerId: number) {
     if (!this.cache[roomId] || this.cache[roomId] < headerId) {
       this.cache[roomId] = headerId;
     }
+  }
+
+  private executeSql(
+      t: SQLTransaction,
+      sql: string,
+      args: unknown[] = [],
+      cb: SQLStatementCallback | undefined = undefined,
+      e: SQLStatementErrorCallback | undefined = undefined
+  ): Function {
+    const err: SQLStatementErrorCallback = e ? e : (t: SQLTransaction, e: SQLError)  => {
+      this.logger.error('{} {}, error: {}, message {}', sql, args, e, e && e.message)();
+
+      return false;
+    };
+    t.executeSql(sql, args, cb, err);
+
+    return this.logger.trace('{} {}', sql, args);
+  }
+
+  private async runSql(t: SQLTransaction, sql: string): Promise<SQLTransaction> {
+    return new Promise<SQLTransaction>((resolve, reject) => {
+      this.executeSql(t, sql, [], resolve, (t: SQLTransaction, e: SQLError) => {
+        reject({sql, e});
+
+        return false;
+      });
+    });
+  }
+
+  private getStart() {
+    return Promise.resolve().then(() => new Promise((resolve, reject) => {
+      this.db!.changeVersion(this.db!.version, '1.0', resolve, reject);
+    }));
+  }
+
+  private transaction(transactionType: TransactionType, cb: TransactionCb) {
+    if (!this.db) { // TODO TypeError: undefined is not an object (evaluating 'this.db[transactionType]')
+      throw Error(`${browserVersion} failed to get db`);
+    }
+    this.db[transactionType](t => {
+      cb(t);
+    },                       (e) => {
+      this.logger.error('Error during saving message {}', e)();
+    });
+  }
+
+  private write(cb: TransactionCb) {
+    return this.transaction('transaction', cb);
+  }
+
+  private async asyncWrite(): Promise<SQLTransaction> {
+    return new Promise<SQLTransaction>((resolve, reject) => {
+      this.write(resolve);
+    });
+  }
+
+  private setRoom(t: SQLTransaction, room: RoomSettingsModel) {
+    this.executeSql(t, 'insert or replace into room (id, name, notifications, volume, deleted) values (?, ?, ?, ?, ?)', [room.id, room.name, room.notifications ? 1 : 0, room.volume, 0])();
+  }
+
+  private insertRoomUsers(t: SQLTransaction, roomId: number, userId: number) {
+    this.executeSql(t, 'insert into room_users (room_id, user_id) values (?, ?)', [roomId, userId])();
+  }
+
+  private setRoomUsers(t: SQLTransaction, roomId: number, users: number[]) {
+    this.executeSql(t, 'delete from room_users where room_id = ?', [roomId], t => {
+      users.forEach(u => {
+        this.insertRoomUsers(t, roomId, u);
+      });
+    })();
   }
 
 }

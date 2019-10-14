@@ -9,7 +9,6 @@ import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
 import {globalLogger} from '@/utils/singletons';
 
-
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
 const logger: Logger = loggerFactory.getLoggerColor('htmlApi', '#007a70');
@@ -64,7 +63,8 @@ export function sliceZero(n: number, count: number = -2) {
 }
 
 export function timeToString(time: number) {
-  let date = new Date(time);
+  const date = new Date(time);
+
   return [sliceZero(date.getHours()), sliceZero(date.getMinutes()), sliceZero(date.getSeconds())].join(':');
 }
 
@@ -73,7 +73,6 @@ const replaceHtmlRegex = new RegExp('[' + Object.keys(escapeMap).join('') + ']',
 export function encodeHTML(html: string) {
   return html.replace(replaceHtmlRegex, s => escapeMap[s]);
 }
-
 
 export function getFlagPath(countryCode: string) {
   return getFlag(countryCode);
@@ -99,25 +98,26 @@ export function getUserSexClass(user: UserModel) {
 
 export function getSmileyHtml(symbol: string) {
   let smile: Smile | undefined;
-  let keys22: (keyof SmileysStructure)[] = Object.keys(smileys) as (keyof SmileysStructure)[];
+  const keys22: (keyof SmileysStructure)[] = Object.keys(smileys) as (keyof SmileysStructure)[];
   keys22.forEach((k: keyof SmileysStructure) => {
-    let smiley = smileys[k];
+    const smiley = smileys[k];
     smile = smile || smiley[symbol];
   });
   if (!smile) {
     throw Error(`Invalid smile ${symbol}`);
   }
+
   return `<img src="${smile.src}" symbol="${symbol}" alt="${smile.alt}">`;
 }
 
 export const isDateMissing = (function () {
-  let input = document.createElement('input');
+  const input = document.createElement('input');
   input.setAttribute('type', 'date');
-  let notADateValue = 'not-a-date';
+  const notADateValue = 'not-a-date';
   input.setAttribute('value', notADateValue);
+
   return input.value === notADateValue;
 })();
-
 
 export function resolveMediaUrl(src: string): string {
   return src.indexOf('blob:http') === 0 ? src :
@@ -125,7 +125,7 @@ export function resolveMediaUrl(src: string): string {
 }
 
 export function encodeSmileys(html: string): string {
-  return html.replace(smileUnicodeRegex, c => getSmileyHtml(c));
+  return html.replace(smileUnicodeRegex, getSmileyHtml);
 }
 
 export function encodeP(data: MessageModel) {
@@ -134,17 +134,17 @@ export function encodeP(data: MessageModel) {
   }
   let html = encodeHTML(data.content);
   html = encodeFiles(html, data.files);
+
   return encodeSmileys(html);
 }
 
 export const canvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO wtf it's nullable?
 
-
 export function placeCaretAtEnd(userMessage: HTMLElement) {
-  let range = document.createRange();
+  const range = document.createRange();
   range.selectNodeContents(userMessage);
   range.collapse(false);
-  let sel = window.getSelection();
+  const sel = window.getSelection();
   if (sel) {
     sel.removeAllRanges();
     sel.addRange(range);
@@ -163,9 +163,9 @@ export function encodeMessage(data: MessageModel) {
       throw Error(`Message ${data.id} doesn't have content`);
     }
     let html = encodeHTML(data.content);
-    let replaceElements: unknown[] = [];
+    const replaceElements: unknown[] = [];
     patterns.forEach((pattern) => {
-      let res = html.replace(pattern.search, pattern.replace);
+      const res = html.replace(pattern.search, pattern.replace);
       if (res !== html) {
         replaceElements.push(pattern.name);
         html = res;
@@ -175,6 +175,7 @@ export function encodeMessage(data: MessageModel) {
       logger.debug('Replaced {} in message #{}', replaceElements.join(', '), data.id)();
     }
     html = encodeFiles(html, data.files);
+
     return encodeSmileys(html);
   }
 }
@@ -182,12 +183,13 @@ export function encodeMessage(data: MessageModel) {
 function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
   if (files && Object.keys(files).length) {
     html = html.replace(imageUnicodeRegex, (s) => {
-      let v = files[s];
+      const v = files[s];
       if (v) {
         if (v.type === 'i') {
           return `<img src='${resolveMediaUrl(v.url!)}' imageId='${v.id}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
         } else if (v.type === 'v' || v.type === 'm') {
-          let className = v.type === 'v' ? 'video-player' : 'video-player video-record';
+          const className = v.type === 'v' ? 'video-player' : 'video-player video-record';
+
           return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview!)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
         } else if (v.type === 'a') {
           return `<img src='${recordIcon}' imageId='${v.id}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
@@ -195,22 +197,23 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
           logger.error('Invalid type {}', v.type)();
         }
       }
+
       return s;
     });
   }
+
   return html;
 }
 
-
 export function pasteNodeAtCaret(img: Node, div: HTMLElement) {
   div.focus();
-  let sel = window.getSelection();
+  const sel = window.getSelection();
   if (sel) {
     let range = sel.getRangeAt(0);
     range.deleteContents();
     // Range.createContextualFragment() would be useful here but is
     // non-standard and not supported in all browsers (IE9, for one)
-    let frag = document.createDocumentFragment();
+    const frag = document.createDocumentFragment();
     frag.appendChild(img);
     range.insertNode(frag);
     // Preserve the selection
@@ -225,26 +228,24 @@ export function pasteNodeAtCaret(img: Node, div: HTMLElement) {
   }
 }
 
-
 export function pasteHtmlAtCaret(html: string, div: HTMLElement) {
-  let divOuter = document.createElement('div');
+  const divOuter = document.createElement('div');
   divOuter.innerHTML = html;
-  let img: Node | null = divOuter.firstChild;
+  const img: Node | null = divOuter.firstChild;
   if (!img) {
     throw Error(`Can't paste image`);
   }
   pasteNodeAtCaret(img, div);
 }
 
-
 export function setVideoEvent(e: HTMLElement) {
-  let r: NodeListOf<HTMLElement> = e.querySelectorAll('.video-player');
+  const r: NodeListOf<HTMLElement> = e.querySelectorAll('.video-player');
   forEach(r, e => {
-    let querySelector: HTMLElement = <HTMLElement>e.querySelector('.icon-youtube-play')!;
-    let url: string = e.getAttribute('associatedVideo')!;
+    const querySelector: HTMLElement = <HTMLElement>e.querySelector('.icon-youtube-play')!;
+    const url: string = e.getAttribute('associatedVideo')!;
     logger.debug('Embedding video url {}', url)();
     querySelector.onclick = function (event) {
-      let video = document.createElement('video');
+      const video = document.createElement('video');
       video.setAttribute('controls', '');
       video.className = 'video-player-ready';
       logger.debug('Replacing video url {}', url)();
@@ -256,12 +257,12 @@ export function setVideoEvent(e: HTMLElement) {
 }
 
 export function setAudioEvent(e: HTMLElement) {
-  let r: NodeListOf<HTMLElement> = e.querySelectorAll('.audio-record');
+  const r: NodeListOf<HTMLElement> = e.querySelectorAll('.audio-record');
   forEach<HTMLElement>(r, (e: HTMLElement) => {
     e.onclick = function (event) {
-      let associatedAudio: string = e.getAttribute('associatedAudio')!;
-      let url: string = resolveMediaUrl(associatedAudio);
-      let audio = document.createElement('audio');
+      const associatedAudio: string = e.getAttribute('associatedAudio')!;
+      const url: string = resolveMediaUrl(associatedAudio);
+      const audio = document.createElement('audio');
       audio.setAttribute('controls', '');
       audio.className = 'audio-player-ready';
       logger.debug('Replacing audio url {}', url)();
@@ -273,7 +274,7 @@ export function setAudioEvent(e: HTMLElement) {
 }
 
 export function setImageFailEvents(e: HTMLElement, bus: Vue) {
-  let r = e.querySelectorAll('img');
+  const r = e.querySelectorAll('img');
   for (let i = 0; i < r.length; i++) {
     (function (img) {
       img.onerror = function () {
@@ -286,11 +287,10 @@ export function setImageFailEvents(e: HTMLElement, bus: Vue) {
   }
 }
 
-
 function getTime(time: string): number {
   let start = 0;
   if (time) {
-    let res = yotubeTimeRegex.exec(time);
+    const res = yotubeTimeRegex.exec(time);
     if (res) {
       if (res[1]) {
         start += parseInt(res[1]) * 3600;
@@ -306,24 +306,25 @@ function getTime(time: string): number {
       }
     }
   }
+
   return start;
 }
 
 export function setYoutubeEvent(e: HTMLElement) {
-  let r: NodeListOf<HTMLElement> = e.querySelectorAll('.youtube-player');
+  const r: NodeListOf<HTMLElement> = e.querySelectorAll('.youtube-player');
   forEach(r, (a: HTMLElement) => {
-    let querySelector: HTMLElement = <HTMLElement>a.querySelector('.icon-youtube-play')!;
-    let id = a.getAttribute('data-id');
+    const querySelector: HTMLElement = <HTMLElement>a.querySelector('.icon-youtube-play')!;
+    const id = a.getAttribute('data-id');
     logger.debug('Embedding youtube view {}', id)();
     querySelector.onclick = function (event: MouseEvent) {
-      let iframe = document.createElement('iframe');
+      const iframe = document.createElement('iframe');
       let time: string = getTime(e.getAttribute('data-time')!).toString();
       if (time) {
         time = '&start=' + time;
       } else {
         time = '';
       }
-      let src = `https://www.youtube.com/embed/${id}?autoplay=1${time}`;
+      const src = `https://www.youtube.com/embed/${id}?autoplay=1${time}`;
       iframe.setAttribute('src', src);
       iframe.setAttribute('frameborder', '0');
       iframe.className = 'video-player-ready';
@@ -333,7 +334,6 @@ export function setYoutubeEvent(e: HTMLElement) {
     };
   });
 }
-
 
 export function stopVideo(stream: MediaStream | null) {
   if (stream) {
@@ -347,7 +347,6 @@ export function stopVideo(stream: MediaStream | null) {
   }
 }
 
-
 function setBlobName(blob: Blob) {
   if (!blob.name && blob.type.indexOf('/') > 1) {
     blob.name = '.' + blob.type.split('/')[1];
@@ -355,25 +354,26 @@ function setBlobName(blob: Blob) {
 }
 
 function blobToImg(blob: Blob) {
-  let img = document.createElement('img');
+  const img = document.createElement('img');
   img.className = PASTED_IMG_CLASS;
-  let src = URL.createObjectURL(blob);
+  const src = URL.createObjectURL(blob);
   img.src = src;
   setBlobName(blob);
   savedFiles[src] = blob;
+
   return img;
 }
 
 export function pasteBlobToContentEditable(blob: Blob, textArea: HTMLElement) {
-  let img = blobToImg(blob);
+  const img = blobToImg(blob);
   textArea.appendChild(img);
 }
 
 export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, videoType: string, errCb: Function) {
-  let video = document.createElement('video');
+  const video = document.createElement('video');
   if (video.canPlayType(file.type)) {
     video.autoplay = false;
-    let src = URL.createObjectURL(file);
+    const src = URL.createObjectURL(file);
     video.loop = false;
     video.addEventListener('loadeddata', function () {
       tmpCanvasContext.canvas.width = video.videoWidth;
@@ -382,10 +382,11 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
       tmpCanvasContext.canvas.toBlob(function (blob) {
         if (!blob) {
           errCb(`Blob for file ${file.name} is not null`);
+
           return;
         }
-        let url = URL.createObjectURL(blob);
-        let img = document.createElement('img');
+        const url = URL.createObjectURL(blob);
+        const img = document.createElement('img');
         img.className = PASTED_IMG_CLASS;
         img.src = url;
         img.setAttribute('videoType', videoType);
@@ -394,18 +395,17 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
         savedFiles[src] = file;
         savedFiles[url] = blob;
         pasteNodeAtCaret(img, textArea);
-      }, 'image/jpeg', 0.95);
-    }, false);
+      },                             'image/jpeg', 0.95);
+    },                     false);
     video.src = src;
   } else {
     errCb(`Browser doesn't support playing ${file.type}`);
   }
 }
 
-
 export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
-  let img = document.createElement('img');
-  let associatedAudio = URL.createObjectURL(file);
+  const img = document.createElement('img');
+  const associatedAudio = URL.createObjectURL(file);
   img.setAttribute('associatedAudio', associatedAudio);
   img.className = `recorded-audio ${PASTED_IMG_CLASS}`;
   setBlobName(file);
@@ -416,7 +416,7 @@ export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
 
 export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Function) {
   if (file.type.indexOf('image') >= 0) {
-    let img = blobToImg(file);
+    const img = blobToImg(file);
     pasteNodeAtCaret(img, textArea);
   } else if (file.type.indexOf('video') >= 0) {
     pasteBlobVideoToTextArea(file, textArea, 'v', errCb);
@@ -426,9 +426,9 @@ export function pasteImgToTextArea(file: File, textArea: HTMLElement, errCb: Fun
 }
 
 export function highlightCode(element: HTMLElement) {
-  let s = element.querySelectorAll('pre');
+  const s = element.querySelectorAll('pre');
   if (s.length) {
-    import( /* webpackChunkName: "highlightjs" */ 'highlightjs').then(hljs => {
+    import(/* webpackChunkName: "highlightjs" */ 'highlightjs').then(hljs => {
       for (let i = 0; i < s.length; i++) {
         hljs.highlightBlock(s[i]);
       }
@@ -436,28 +436,26 @@ export function highlightCode(element: HTMLElement) {
   }
 }
 
-
 function nextChar(c: string): string {
   return String.fromCharCode(c.charCodeAt(0) + 1);
 }
 
-
 export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\u3500'): MessageDataEncode {
-  let files: UploadFile[] = []; // return array from nodeList
-  let images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
-  let fileModels: { [id: string]: FileModel } = {};
+  const files: UploadFile[] = []; // return array from nodeList
+  const images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
+  const fileModels: { [id: string]: FileModel } = {};
   forEach(images, img => {
     let elSymbol = img.getAttribute('symbol');
     if (!elSymbol) {
       currSymbol = nextChar(currSymbol);
       elSymbol = currSymbol;
     }
-    let textNode = document.createTextNode(elSymbol);
+    const textNode = document.createTextNode(elSymbol);
     img.parentNode!.replaceChild(textNode, img);
     if (!img.getAttribute('symbol')) { // don't send image again, it's already in server
-      let assVideo = img.getAttribute('associatedVideo');
-      let assAudio = img.getAttribute('associatedAudio');
-      let type: string = img.getAttribute('videoType')!;
+      const assVideo = img.getAttribute('associatedVideo');
+      const assAudio = img.getAttribute('associatedAudio');
+      const type: string = img.getAttribute('videoType')!;
       if (assVideo) {
         files.push({
           file: savedFiles[assVideo],
@@ -469,7 +467,7 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\
           type: 'p',
           symbol: elSymbol
         });
-        let fileModel: FileModel = {
+        const fileModel: FileModel = {
           id: null,
           preview: img.getAttribute('src'),
           url: assVideo,
@@ -482,7 +480,7 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\
           type: 'a',
           symbol: elSymbol
         });
-        let fileModel: FileModel = {
+        const fileModel: FileModel = {
           id: null,
           preview: null,
           url: assAudio,
@@ -495,7 +493,7 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\
           type: 'i',
           symbol: elSymbol
         });
-        let fileModel: FileModel = {
+        const fileModel: FileModel = {
           id: null,
           preview: null,
           url: img.getAttribute('src'),
@@ -517,5 +515,6 @@ export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\
   let messageContent: string | null = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
   messageContent = !messageContent || /^\s*$/.test(messageContent) ? null : messageContent;
   userMessage.innerHTML = '';
+
   return {files, messageContent, currSymbol, fileModels};
 }

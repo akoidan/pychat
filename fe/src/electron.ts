@@ -21,7 +21,7 @@ async function createWindow() {
     console.log('vue-devtools installed');
   }
 
-  let url = ELECTRON_MAIN_FILE.replace('{}', app.getAppPath());
+  const url = ELECTRON_MAIN_FILE.replace('{}', app.getAppPath());
   console.log(`loading ${url}`);
 
   let mainWindow: BrowserWindow | null = new BrowserWindow();
@@ -52,14 +52,12 @@ async function createWindow() {
 
 app.on('ready', createWindow);
 
-
 app.on('window-all-closed', () => {
   console.log('window closed');
   if (process.platform !== 'darwin') {
     app.quit();
   }
 });
-
 
 app.on('activate', () => {
   console.log('activate');

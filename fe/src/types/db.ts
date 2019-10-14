@@ -50,7 +50,6 @@ export  interface FileDB {
   preview: string;
 }
 
-
 export interface SettingsDB {
   userId: number;
   embeddedYoutube: BooleanDB;
@@ -82,5 +81,3 @@ export interface RoomUsersDB {
 }
 
 export type TransactionType = 'transaction';
-
-

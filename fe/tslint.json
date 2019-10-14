@@ -6,7 +6,9 @@
     "vue-no-consecutive-blank-lines": true,
     "interface-name": false,
     "export-name": [true, { "ignore-case": true, "allow": ["LoggerMixin"] }],
-    "import-name": [ true, true, { "vue-router": "VueRouter", "vuex": "Vuex", "vue": "Vue" }],
+//    "import-name": [ true, true, { "vue-router": "VueRouter", "vuex": "Vuex", "vue": "Vue" }],
+    "ordered-imports": false, // TODO breaks webpack bundle
+    "import-name": false, // TODO tslint autofix
     "no-import-side-effect": [true, {"ignore-module": "(@/utils/classComponentHooks|@/utils/mixins|reflect-metadata)"}],
     "no-plusplus": false,
     "no-default-export": false,

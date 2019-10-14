@@ -7,17 +7,16 @@ import loggerFactory from '@/utils/loggerFactory';
 import {
   ALL_ROOM_ID,
   FACEBOOK_APP_ID,
-  GOOGLE_OAUTH_2_CLIENT_ID,
+  GOOGLE_OAUTH_2_CLIENT_ID
 } from '@/utils/consts';
 import {StorageData} from '@/types/types';
 
-
-let logger = loggerFactory.getLoggerColor('utils', '#007a70');
+const logger = loggerFactory.getLoggerColor('utils', '#007a70');
 
 export function logout(errMessage?: string) {
   store.logout();
   if (errMessage) {
-    store.growlError( errMessage);
+    store.growlError(errMessage);
   }
   webrtcApi.closeAllConnections();
   sessionHolder.session = '';
@@ -27,30 +26,32 @@ export function logout(errMessage?: string) {
 }
 
 export function getDay(dateObj: Date) {
-  let month = dateObj.getUTCMonth() + 1; // months from 1-12
-  let day = dateObj.getUTCDate();
-  let year = dateObj.getUTCFullYear();
+  const month = dateObj.getUTCMonth() + 1; // months from 1-12
+  const day = dateObj.getUTCDate();
+  const year = dateObj.getUTCFullYear();
+
   return `${year}/${month}/${day}`;
 }
 
 export function bounce(ms: number): (cb: Function) => void {
   let stack: number | null;
   let lastCall: Function;
+
   return function(cb) {
     lastCall = cb;
     if (!stack) {
       stack = window.setTimeout(() => {
         stack = null;
         lastCall();
-      }, ms);
+      },                        ms);
     }
   };
 }
 export async function initStore() {
-  let isNew = await storage.connect();
+  const isNew = await storage.connect();
   if (!isNew) {
-    let data: StorageData | null = await storage.getAllTree();
-    let session = sessionHolder.session;
+    const data: StorageData | null = await storage.getAllTree();
+    const session = sessionHolder.session;
     globalLogger.log('restored state from db {}, userId: {}, session {}', data, store.userInfo && store.userInfo.userId, session)();
     if (data) {
       if (!store.userInfo && session) {
@@ -58,10 +59,11 @@ export async function initStore() {
       } else {
         store.roomsArray.forEach((storeRoom: RoomModel) => {
           if (data!.setRooms.roomsDict[storeRoom.id]) {
-            let dbMessages: {[id: number]: MessageModel} = data!.setRooms.roomsDict[storeRoom.id].messages;
-            for (let dbMessagesKey in dbMessages) {
-              if (!storeRoom.messages[dbMessagesKey])
+            const dbMessages: {[id: number]: MessageModel} = data!.setRooms.roomsDict[storeRoom.id].messages;
+            for (const dbMessagesKey in dbMessages) {
+              if (!storeRoom.messages[dbMessagesKey]) {
               store.addMessage(dbMessages[dbMessagesKey]);
+              }
             }
           }
         });
@@ -100,18 +102,17 @@ declare const FB: any;
 let googleInited: boolean = false;
 let fbInited: boolean = false;
 
-
 export function  extractError (args: unknown |unknown[]| {name: string}) {
   try {
-    let value: { name: string, message: string, rawError: string } = args as { name: string, message: string, rawError: string };
+    let value: { name: string; message: string; rawError: string } = args as { name: string; message: string; rawError: string };
     if (typeof args === 'string') {
       return args;
     } else if ((<unknown[]>args).length > 1) {
       return Array.prototype.join.call(args, ' ');
     } else if ((<unknown[]>args).length === 1) {
-      value = (<unknown[]>args)[0] as { name: string, message: string, rawError: string };
+      value = (<unknown[]>args)[0] as { name: string; message: string; rawError: string };
     }
-    if (value && (value.name || value.message) ) {
+    if (value && (value.name || value.message)) {
       return `${value.name}: ${value.message}`;
     } else if (value.rawError) {
       return value.rawError;
@@ -124,7 +125,8 @@ export function  extractError (args: unknown |unknown[]| {name: string}) {
 }
 
 export function getChromeVersion () {
-  let raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+  const raw = navigator.userAgent.match(/Chrom(e|ium)\/([0-9]+)\./);
+
   return raw ? parseInt(raw[2], 10) : false;
 }
 
@@ -144,22 +146,21 @@ export async function initGoogle(): Promise<void> {
 }
 
 // Allow only boolean fields be pass to ApplyGrowlErr
-type ClassType = { new (...args: any[]): any };
+type ClassType = new (...args: any[]) => any;
 type ValueFilterForKey<T extends InstanceType<ClassType>, U> = {
   [K in keyof T]: U extends T[K] ? K : never;
 }[keyof T];
 
-
 // TODO add success growl, and specify error property so it reflects forever in comp
 export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
     {message, runningProp, vueProperty}: {
-      message?: string,
-      runningProp?: ValueFilterForKey<T, boolean>,
-      vueProperty?: ValueFilterForKey<T, string>
-    },
+      message?: string;
+      runningProp?: ValueFilterForKey<T, boolean>;
+      vueProperty?: ValueFilterForKey<T, string>;
+    }
 ) {
-  let processError = function (e: Error|string) {
-    let strError: string = String((<Error>e).message || e);
+  const processError = function (e: Error|string) {
+    const strError: string = String((<Error>e).message || e);
     if (vueProperty && message) {
       // @ts-ignore: next-line
       this[vueProperty] = `${message}: ${strError}`;
@@ -172,6 +173,7 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
       throw e;
     }
   };
+
   return function (target: T, propertyKey: string, descriptor: PropertyDescriptor) {
     const original = descriptor.value;
     descriptor.value = async function(...args: unknown[]) {
@@ -180,11 +182,12 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
           // @ts-ignore: next-line
           this[runningProp] = true;
         }
-        let a =  await original.apply(this, args);
+        const a =  await original.apply(this, args);
         if (vueProperty) {
           // @ts-ignore: next-line
           this[vueProperty] = '';
         }
+
         return a;
       } catch (e) {
         processError.call(this, e);
@@ -212,16 +215,14 @@ export async function initFaceBook() {
 }
 
 export function bytesToSize(bytes: number): string {
-  let sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-  if (bytes < 1) return '0 Byte';
-  let power: number = Math.floor(Math.log(bytes) / Math.log(1024));
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  if (bytes < 1) { return '0 Byte'; }
+  const power: number = Math.floor(Math.log(bytes) / Math.log(1024));
+
   return `${Math.round(bytes / Math.pow(1024, power))} ${sizes[power]}`;
 }
 
-
-
 const ONE_DAY = 24 * 60 * 60 * 1000;
-
 
 export function sem(event: Event, message: MessageModel, isEditingNow: boolean, userInfo: CurrentUserInfoModel, setEditedMessage: (a: EditingMessage) => void) {
   logger.debug('sem {}', message.id)();
@@ -233,7 +234,7 @@ export function sem(event: Event, message: MessageModel, isEditingNow: boolean, 
   ) {
     event.preventDefault();
     event.stopPropagation();
-    let newlet: EditingMessage = {
+    const newlet: EditingMessage = {
       messageId: message.id,
       isEditingNow,
       roomId: message.roomId

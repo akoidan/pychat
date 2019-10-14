@@ -12,32 +12,32 @@ export default class CallSenderPeerConnection extends CallPeerConnection {
     destroy: this.onDestroy,
     streamChanged: <HandlerType>this.onStreamChanged,
     connectToRemote: <HandlerType>this.connectToRemote,
-    sendRtcData: <HandlerType>this.onsendRtcData,
+    sendRtcData: <HandlerType>this.onsendRtcData
   };
 
   constructor(roomId: number, connId: string, opponentWsId: string, userId: number, wsHandler: WsHandler, store: DefaultStore) {
     super(roomId, connId, opponentWsId, userId, wsHandler, store);
     this.connectedToRemote = false;
     this.sdpConstraints = {
-      'mandatory': {
-        'OfferToReceiveAudio': true,
-        'OfferToReceiveVideo': true
+      mandatory: {
+        OfferToReceiveAudio: true,
+        OfferToReceiveVideo: true
       }
     };
   }
 
-  channelOpen () {
+  public channelOpen () {
     this.logger.log('Opened a new chanel')();
   }
 
-  connectToRemote(stream: ConnectToRemoteMessage) {
+  public connectToRemote(stream: ConnectToRemoteMessage) {
     this.logger.log('Connect to remote')();
     this.connectedToRemote = true;
     this.createPeerConnection(stream);
     this.createOffer();
   }
 
-  ondatachannelclose(text: string): void {
+  public ondatachannelclose(text: string): void {
   }
 
 }

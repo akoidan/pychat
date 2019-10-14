@@ -13,14 +13,13 @@ export const logout = new Audio(<any>ChatLogout);
 export const outgoing = new Audio(<any>ChatOutgoing);
 export const file = new Audio(<any>ChatFile);
 
-
 export function checkAndPlay(element: HTMLAudioElement, volume: number) {
   if (volume && notifier.isTabMain()) {
     try {
       element.pause();
       element.currentTime = 0;
       element.volume = volume * volume / 10_000;
-      let prom = element.play();
+      const prom = element.play();
       prom && prom.catch(function (e) {
       });
     } catch (e) {

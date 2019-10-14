@@ -32,7 +32,7 @@ function r2d22() {
 
 }
 
-let mixin = {
+const mixin = {
   computed: {
     logger(this: Vue): Logger  {
       if (!this.__logger && this.$options._componentTag !== 'router-link') {
@@ -45,6 +45,7 @@ let mixin = {
         }
         this.__logger = loggerFactory.getLoggerColor(name, '#35495e');
       }
+
       return this.__logger;
     }
   },
@@ -53,7 +54,7 @@ let mixin = {
   },
   created: function(this: Vue) {
     this.logger &&  this.logger.trace('Created')();
-  },
+  }
 };
 Vue.mixin(<ComponentOptions<Vue>><unknown>mixin);
 
@@ -64,19 +65,16 @@ Vue.directive('validity', function (el: HTMLElement, binding) {
 Vue.prototype.$api = api;
 Vue.prototype.$ws = ws;
 
-
 initStore().then(value => {
   globalLogger.debug('Exiting from initing store')();
 }).catch(e => {
   globalLogger.error('Unable to init store from db, because of', e)();
 });
 
-
-
 export function init() {
   document.body.addEventListener('drop', e => e.preventDefault());
   document.body.addEventListener('dragover', e => e.preventDefault());
-  const vue: Vue = new Vue( {router, render: (h: Function): typeof Vue.prototype.$createElement => h(App)});
+  const vue: Vue = new Vue({router, render: (h: Function): typeof Vue.prototype.$createElement => h(App)});
   vue.$mount('#app');
 
   window.GIT_VERSION = GIT_HASH;
