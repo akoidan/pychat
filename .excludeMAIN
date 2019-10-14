@@ -17,7 +17,6 @@ fe/platforms/android/app/src/main/assets
 fe/www/*
 
 photos
-fe/yarn.lock
 fe/npm.lock
 django.db
 chat/migrations

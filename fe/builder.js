@@ -21,6 +21,15 @@ const ELECTRON_DIST = path.resolve(__dirname, ELECTRON_DIST_DIRNAME);
 const MAIN_DIST = path.resolve(__dirname, MAIN_DIST_DIRNAME);
 const ANDROID_DIST = path.resolve(__dirname, ANDROID_DIST_DIRNAME);
 const DEV_PORT = 8080;
+const sassOptionsGlobal = {
+  loader: "sass-loader",
+  options: {
+    sassOptions: {
+      indentedSyntax: true,
+      includePaths: [path.resolve(__dirname, 'src/assets/sass')]
+    }
+  }
+}
 
 function getDist() {
   if (options.IS_WEB) {
@@ -187,7 +196,7 @@ const getConfig = async () => {
   }
   if (options.IS_PROD) {
     const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-    const CleanWebpackPlugin = require('clean-webpack-plugin');
+    const {CleanWebpackPlugin} = require('clean-webpack-plugin');
     if (options.IS_WEB) {
       const CompressionPlugin = require('compression-webpack-plugin');
       plugins.push(new CompressionPlugin())
@@ -205,13 +214,7 @@ const getConfig = async () => {
     sasscPlugins = [
       minicssPlugin,
       'css-loader',
-      {
-        loader: "sass-loader",
-        options: {
-          indentedSyntax: true,
-          includePaths: [path.resolve(__dirname, 'src/assets/sass')]
-        }
-      }
+      sassOptionsGlobal,
     ];
   } else {
     // TODO it lags a lot
@@ -226,13 +229,7 @@ const getConfig = async () => {
     // }))
     sasscPlugins = [
       "style-loader", 'css-loader?sourceMap',
-      {
-        loader: "sass-loader",
-        options: {
-          indentedSyntax: true,
-          includePaths: [path.resolve(__dirname, 'src/assets/sass')]
-        }
-      }
+      sassOptionsGlobal
     ];
   }
 
