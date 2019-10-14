@@ -68,7 +68,7 @@ class SaveHtmlToFile {
 }
 
 
-const {options, definePlugin, optimization, configFile, startCordova} = function () {
+const {options, definePlugin, optimization, configFile, startCordova, linting} = function () {
   function getEnv(mode, trueValue, falseValues) {
     if (process.env[mode] === trueValue) {
       return true;
@@ -80,6 +80,7 @@ const {options, definePlugin, optimization, configFile, startCordova} = function
   }
   const startCordova = process.argv[2];
 
+  const linting = process.env.LINTING  === 'on';
   const isProd = getEnv('BUILD_MODE', 'production', ['development']);
   // cordova is built for production atm
   let options = require(isProd && !startCordova ? `./production.json` : './development.json');
@@ -145,7 +146,7 @@ const {options, definePlugin, optimization, configFile, startCordova} = function
 
   const configFile = options.IS_WEB && !options.IS_DEBUG ? 'tsconfig.json' : 'tsconfig.esnext.json' ;
   let definePlugin = new webpack.DefinePlugin({PYCHAT_CONSTS: JSON.stringify(options)});
-  return {options, definePlugin, optimization, configFile, startCordova};
+  return {options, definePlugin, optimization, configFile, startCordova, linting};
 }();
 
 
@@ -181,11 +182,6 @@ const getConfig = async () => {
   let htmlWebpackPlugin = new HtmlWebpackPlugin(webpackOptions);
 
   plugins = [
-    // TODO LINTING
-    // new StyleLintPlugin({
-    //   files: ['**/*.vue', '**/*.sass'],
-    //   failOnError: false,
-    // }),
     definePlugin,
     new VueLoaderPlugin(),
     new CopyWebpackPlugin([
@@ -194,6 +190,12 @@ const getConfig = async () => {
     ]),
     htmlWebpackPlugin,
   ];
+  if (linting) {
+    plugins.unshift(new StyleLintPlugin({
+      files: ['**/*.vue', '**/*.sass'],
+      failOnError: false,
+    }))
+  }
   if (!options.IS_PROD && options.IS_ELECTRON) {
     plugins.push(new SaveHtmlToFile('/tmp/electron.html'));
   }
@@ -239,6 +241,22 @@ const getConfig = async () => {
     ];
   }
 
+  let tsConfig = function () {
+    const res =  [
+      {
+        loader: 'ts-loader',
+        options: {
+          appendTsSuffixTo: [/\.vue$/]
+        }
+      },
+    ];
+    if (linting) {
+      res.push({
+        loader: 'tslint-loader'
+      })
+    }
+    return res;
+  };
   let conf = {
     entry,
     plugins,
@@ -262,31 +280,13 @@ const getConfig = async () => {
         {
           test: /\.ts$/,
           exclude: /node_modules/,
-          use: [
-            {
-              loader: 'ts-loader',
-              options: {
-                appendTsSuffixTo: [/\.vue$/]
-              }
-            },
-            // TODO LINTING
-            // {
-            //   loader: 'tslint-loader'
-            // }
-          ],
+          use: tsConfig(),
         },
         {
           exclude: /node_modules/,
           test: /\.vue$/,
           loader: 'vue-loader',
         },
-        // TODO LINTING
-        // {
-        //   enforce: 'pre',
-        //   test: /\.vue$/,
-        //   loader: 'eslint-loader',
-        //   exclude: /node_modules/
-        // },
         {
           test: /\.sass$/,
           use: sasscPlugins
@@ -336,7 +336,14 @@ const getConfig = async () => {
       ],
     },
   };
-
+  if (linting) {
+    conf.module.rules.push({
+      enforce: 'pre',
+        test: /\.vue$/,
+      loader: 'eslint-loader',
+      exclude: /node_modules/
+    });
+  }
 
   // if (options.IS_PROD) {
   //   const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
