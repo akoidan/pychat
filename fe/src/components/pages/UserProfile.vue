@@ -1,30 +1,39 @@
 <template>
   <div class="holder">
     <div class="links">
-      <router-link to="/profile/user-info">User info</router-link>
-      <router-link to="/profile/image">Profile image</router-link>
-      <router-link to="/profile/settings">Chat settings</router-link>
-      <router-link to="/profile/change-password">Change password</router-link>
-      <router-link to="/profile/change-email">Change email</router-link>
+      <router-link to="/profile/user-info">
+        User info
+      </router-link>
+      <router-link to="/profile/image">
+        Profile image
+      </router-link>
+      <router-link to="/profile/settings">
+        Chat settings
+      </router-link>
+      <router-link to="/profile/change-password">
+        Change password
+      </router-link>
+      <router-link to="/profile/change-email">
+        Change email
+      </router-link>
     </div>
     <div class="container">
       <keep-alive>
-        <router-view class="profileInner"></router-view>
+        <router-view class="profileInner" />
       </keep-alive>
     </div>
   </div>
 </template>
 <script lang="ts">
-  import {Component, Vue} from "vue-property-decorator";
-  import UserProfileChangePassword from "@/components/pages/UserProfileChangePassword"
-  import UserProfileImage from "@/components/pages/UserProfileImage"
-  import UserProfileInfo from "@/components/pages/UserProfileInfo"
-  import UserProfileSettings from "@/components/pages/UserProfileSettings"
+import {Component, Vue} from 'vue-property-decorator';
+import UserProfileChangePassword from '@/components/pages/UserProfileChangePassword';
+import UserProfileImage from '@/components/pages/UserProfileImage';
+import UserProfileInfo from '@/components/pages/UserProfileInfo';
+import UserProfileSettings from '@/components/pages/UserProfileSettings';
 
-
-  @Component({components: {UserProfileChangePassword, UserProfileImage, UserProfileInfo, UserProfileSettings}})
-  export default class UserProfile extends Vue {
-  }
+@Component({components: {UserProfileChangePassword, UserProfileImage, UserProfileInfo, UserProfileSettings}})
+export default class UserProfile extends Vue {
+}
 </script>
 
 <style lang="sass" scoped>

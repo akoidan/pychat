@@ -1,68 +1,185 @@
 <template>
-  <div class="callContainer" v-show="callInfo.callContainer">
-    <div class="callContainerContent" :class="{fullscreen}">
-      <div class="videoContainer" ref="videoContainer">
+  <div
+    v-show="callInfo.callContainer"
+    class="callContainer"
+  >
+    <div
+      class="callContainerContent"
+      :class="{fullscreen}"
+    >
+      <div
+        ref="videoContainer"
+        class="videoContainer"
+      >
         <div class="icon-webrtc-cont">
-          <i class="icon-webrtc-novideo" @click="videoClick" :class="callInfo.showVideo ? 'activeIcon' : 'noactiveIcon'" title="Turn on your webcam"></i>
-          <i class="icon-webrtc-mic" :class="callInfo.showMic ? 'activeIcon' : 'noactiveIcon'" title="Turn off your microphone" @click="micClick"></i>
-          <i class="icon-webrtc-minimizedscreen" title="Exit fullscreen" @click="exitFullscreen"></i>
-          <i class="icon-webrtc-hangup" @click="hangUpCall" title="Hang up"></i>
-          <i class="icon-no-desktop" @click='desktopClick' :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'" title="Capture your desktop screen and start sharing it"></i>
+          <i
+            class="icon-webrtc-novideo"
+            :class="callInfo.showVideo ? 'activeIcon' : 'noactiveIcon'"
+            title="Turn on your webcam"
+            @click="videoClick"
+          />
+          <i
+            class="icon-webrtc-mic"
+            :class="callInfo.showMic ? 'activeIcon' : 'noactiveIcon'"
+            title="Turn off your microphone"
+            @click="micClick"
+          />
+          <i
+            class="icon-webrtc-minimizedscreen"
+            title="Exit fullscreen"
+            @click="exitFullscreen"
+          />
+          <i
+            class="icon-webrtc-hangup"
+            title="Hang up"
+            @click="hangUpCall"
+          />
+          <i
+            class="icon-no-desktop"
+            :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'"
+            title="Capture your desktop screen and start sharing it"
+            @click="desktopClick"
+          />
         </div>
         <div class="micVideoHolder">
-          <chat-remote-peer v-for="(call, id) in callInfo.calls" :call-info="call" :key="id" @click.native="setCurrentVideo(id)" :class="{'current-video-active': id === currentVideoActive, 'current-video-inactive': currentVideoActive && currentVideoActive !== id}"/>
-          <video-object muted="muted" :media-stream-link="callInfo.mediaStreamLink" class="localVideo" ref="localVideo" />
+          <chat-remote-peer
+            v-for="(call, id) in callInfo.calls"
+            :key="id"
+            :call-info="call"
+            :class="{'current-video-active': id === currentVideoActive, 'current-video-inactive': currentVideoActive && currentVideoActive !== id}"
+            @click.native="setCurrentVideo(id)"
+          />
+          <video-object
+            ref="localVideo"
+            muted="muted"
+            :media-stream-link="callInfo.mediaStreamLink"
+            class="localVideo"
+          />
         </div>
-        <progress max="15" :value="callInfo.currentMicLevel" title="Your microphone level" class="microphoneLevel"></progress>
+        <progress
+          max="15"
+          :value="callInfo.currentMicLevel"
+          title="Your microphone level"
+          class="microphoneLevel"
+        />
       </div>
-      <table class="settingsContainer" v-show="showSettings">
+      <table
+        v-show="showSettings"
+        class="settingsContainer"
+      >
         <tbody>
-        <tr>
-          <td>
-            <i class="icon-quote-left"></i>
-            <span class="callInfo">Call info</span>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <i class="icon-volume-2"></i>
-            <select class="input" :value="callInfo.currentSpeaker" @change="setCurrentSpeakerProxy">
-              <option v-for="(speaker, id) in speakers" :key="id" :value="id">{{speaker}}</option>
-            </select>
-            <span class="playTestSound" @click="playTest">Play test sound</span>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <i class="icon-videocam"></i>
-            <select class="input" :value="callInfo.currentWebcam" @change="setCurrentWebcamProxy">
-              <option v-for="(webcam, id) in webcams" :key="id" :value="id">{{webcam}}</option>
-            </select>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <i class="icon-mic"></i>
-            <select class="input" :value="callInfo.currentMic" @change="setCurrentMicProxy">
-              <option v-for="(mic, id) in microphones" :key="id" :value="id">{{mic}}</option>
-            </select>
-          </td>
-        </tr>
+          <tr>
+            <td>
+              <i class="icon-quote-left" />
+              <span class="callInfo">Call info</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <i class="icon-volume-2" />
+              <select
+                class="input"
+                :value="callInfo.currentSpeaker"
+                @change="setCurrentSpeakerProxy"
+              >
+                <option
+                  v-for="(speaker, id) in speakers"
+                  :key="id"
+                  :value="id"
+                >
+                  {{ speaker }}
+                </option>
+              </select>
+              <span
+                class="playTestSound"
+                @click="playTest"
+              >Play test sound</span>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <i class="icon-videocam" />
+              <select
+                class="input"
+                :value="callInfo.currentWebcam"
+                @change="setCurrentWebcamProxy"
+              >
+                <option
+                  v-for="(webcam, id) in webcams"
+                  :key="id"
+                  :value="id"
+                >
+                  {{ webcam }}
+                </option>
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <i class="icon-mic" />
+              <select
+                class="input"
+                :value="callInfo.currentMic"
+                @change="setCurrentMicProxy"
+              >
+                <option
+                  v-for="(mic, id) in microphones"
+                  :key="id"
+                  :value="id"
+                >
+                  {{ mic }}
+                </option>
+              </select>
+            </td>
+          </tr>
         </tbody>
       </table>
       <div class="callContainerIcons">
         <div class="callContainerIconsInner">
-          <i class="icon-phone-circled" v-show="!callInfo.callActive" @click="startCall"></i>
-          <i :class="iconMicClass" :title="micTitle" @click="micClick"></i>
-          <i :class="iconVideoClass" :title="videoTitle" @click="videoClick"></i>
-          <i class="icon-desktop" :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'"
-             title="Capture your desktop screen and start sharing it" @click="desktopClick"></i>
-          <i class="icon-cog" @click="showSettings = !showSettings"></i>
-          <div class="enterFullScreenHolder" @click="enterFullscreen" v-show="callInfo.callActive">
-            <i class="icon-webrtc-fullscreen" title="Fullscreen"></i>
+          <i
+            v-show="!callInfo.callActive"
+            class="icon-phone-circled"
+            @click="startCall"
+          />
+          <i
+            :class="iconMicClass"
+            :title="micTitle"
+            @click="micClick"
+          />
+          <i
+            :class="iconVideoClass"
+            :title="videoTitle"
+            @click="videoClick"
+          />
+          <i
+            class="icon-desktop"
+            :class="callInfo.shareScreen ? 'activeIcon' : 'noactiveIcon'"
+            title="Capture your desktop screen and start sharing it"
+            @click="desktopClick"
+          />
+          <i
+            class="icon-cog"
+            @click="showSettings = !showSettings"
+          />
+          <div
+            v-show="callInfo.callActive"
+            class="enterFullScreenHolder"
+            @click="enterFullscreen"
+          >
+            <i
+              class="icon-webrtc-fullscreen"
+              title="Fullscreen"
+            />
           </div>
-          <div class="hangUpHolder" v-show="callInfo.callActive">
-            <i class="icon-hang-up" @click="hangUpCall" title="Hang up"></i>
+          <div
+            v-show="callInfo.callActive"
+            class="hangUpHolder"
+          >
+            <i
+              class="icon-hang-up"
+              title="Hang up"
+              @click="hangUpCall"
+            />
           </div>
         </div>
       </div>
@@ -70,221 +187,222 @@
   </div>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue, Watch, Ref} from "vue-property-decorator";
-  import {CallInfoModel, CallsInfoModel} from "@/types/model";
-  import {BooleanIdentifier, StringIdentifier, VideoType} from "@/types/types";
-  import {webrtcApi} from '@/utils/singletons';
-  import ChatRemotePeer from '@/components/chat/ChatRemotePeer';
-  import {file} from '@/utils/audio';
-  import VideoObject from "@/components/chat/VideoObject";
-  @Component({
-    components: {VideoObject, ChatRemotePeer}
-  })
-  export default class ChatCall extends Vue {
-    @Prop() callInfo!: CallsInfoModel;
-    @Prop() roomId!: number;
-    showSettings: boolean = false;
+import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
+import {CallInfoModel, CallsInfoModel} from '@/types/model';
+import {BooleanIdentifier, StringIdentifier, VideoType} from '@/types/types';
+import {webrtcApi} from '@/utils/singletons';
+import ChatRemotePeer from '@/components/chat/ChatRemotePeer';
+import {file} from '@/utils/audio';
+import VideoObject from '@/components/chat/VideoObject';
+@Component({
+  components: {VideoObject, ChatRemotePeer}
+})
+export default class ChatCall extends Vue {
 
-    @Ref()
-    localVideo!: VideoObject;
-
-    @Ref()
-    videoContainer!: HTMLElement;
-
-    @State
-    public readonly microphones!: { [id: string]: string } ;
-    @State
-    public readonly speakers!: { [id: string]: string } ;
-    @State
-    public readonly webcams!: { [id: string]: string } ;
-    fullscreen: boolean = false;
-
-    currentVideoActive: string|null = null;
-
-    setCurrentVideo(id: string) {
-      if (this.currentVideoActive === id) {
-        this.currentVideoActive = null;
-      } else {
-        this.currentVideoActive = id;
-      }
-    }
-
-    fullScreenChange() {
-      this.logger.log("fs change")();
-      if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
-        this.fullscreen = false;
-      }
-    }
-
-    created() {
-      ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
-        document.addEventListener(e, this.listener, false);
-      })
-    }
-
-    listener = this.fullScreenChange.bind(this);
-
-    destroyed() {
-      ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
-        document.removeEventListener(e, this.listener, false);
-      })
-    }
-
-    exitFullscreen() {
-      if (document.cancelFullScreen) {
-        document.cancelFullScreen();
-      } else if (document.msCancelFullScreen) {
-        document.msCancelFullScreen();
-      } else if (document.mozCancelFullScreen) {
-        document.mozCancelFullScreen();
-      } else if (document.webkitCancelFullScreen) {
-        document.webkitCancelFullScreen();
-      }
-      this.fullscreen = false;
-    }
-
-    enterFullscreen() {
-      let elem: HTMLElement = this.videoContainer;
-      if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-      } else if (elem.msRequestFullscreen) {
-        elem.msRequestFullscreen();
-      } else if (elem.mozRequestFullScreen) {
-        elem.mozRequestFullScreen();
-      } else if (elem.webkitRequestFullscreen) {
-        elem.webkitRequestFullscreen()
-      } else {
-        this.store.growlError("Can't enter fullscreen");
-        return;
-      }
-      this.fullscreen = true;
-    }
-
-    @Watch('callInfo.currentSpeaker')
-    onSpeakerChange(newValue: string) {
-      this.$nextTick(function () {
-        let video: HTMLVideoElement = <HTMLVideoElement>(this.localVideo.$refs.video);
-        if (video.setSinkId) {
-          video.setSinkId(newValue);
-        } else  {
-          this.logger.error("SetSinkId doesn't exist")();
-        }
-      })
-    }
-
-    setCurrentMicProxy(event: Event) {
-      let payload: StringIdentifier = {
-        id: this.roomId,
-        state: (<HTMLInputElement>event.target).value
-      };
-      this.store.setCurrentMic(payload);
-      if (this.callInfo.callActive) {
-        webrtcApi.updateConnection(this.roomId);
-      }
-    }
-    setCurrentWebcamProxy(event: Event) {
-      let payload: StringIdentifier = {
-        id: this.roomId,
-        state: (<HTMLInputElement>event.target).value
-      };
-      this.store.setCurrentWebcam(payload);
-      if (this.callInfo.callActive) {
-        webrtcApi.updateConnection(this.roomId);
-      }
-    }
-
-    playTest() {
-      if (file.setSinkId) {
-        file.setSinkId(this.callInfo.currentSpeaker!);
-        file.pause();
-        file.currentTime = 0;
-        file.volume = 1;
-        var prom = file.play();
-        prom && prom.catch(function (e) {
-        });
-      } else {
-        this.store.growlError("Your browser doesn't support changing output channel")
-      }
-    }
-
-    setCurrentSpeakerProxy(event: Event) {
-      let payload: StringIdentifier = {
-        id: this.roomId,
-        state: (<HTMLInputElement>event.target).value
-      };
-      this.store.setCurrentSpeaker(payload);
-      if (this.callInfo.callActive) {
-        webrtcApi.updateConnection(this.roomId);
-      }
-    }
-
-    get iconMicClass () : {} {
-      return {
-        'icon-mic': this.callInfo.showMic,
-        'icon-mute': !this.callInfo.showMic,
-      }
-    }
-
-    get videoTitle() {
-      return `Turn ${this.callInfo.showVideo ? 'off': 'on'} your webcam`
-    }
-
-    get micTitle() {
-      return `Turn ${this.callInfo.showMic ? 'off': 'on'} your microphone`
-    }
-
-    startCall() {
-      webrtcApi.startCall(this.roomId);
-    }
-
-    hangUpCall() {
-      webrtcApi.hangCall(this.roomId);
-      this.fullscreen = false;
-      this.exitFullscreen();
-    }
-
-    get iconVideoClass () : {} {
-      return {
-        'icon-no-videocam': !this.callInfo.showVideo,
-        'icon-videocam': this.callInfo.showVideo,
-      }
-    }
-
-    desktopClick() {
-      let payload: BooleanIdentifier = {
-        state: !this.callInfo.shareScreen,
-        id: this.roomId,
-      };
-      this.store.setShareScreenToState(payload);
-      if (this.callInfo.callActive) {
-        webrtcApi.toggleDevice(this.roomId, VideoType.SHARE);
-      }
-    }
-
-    videoClick() {
-      let payload: BooleanIdentifier = {
-        state: !this.callInfo.showVideo,
-        id: this.roomId,
-      };
-      this.store.setVideoToState(payload);
-      if (this.callInfo.callActive) {
-        webrtcApi.toggleDevice(this.roomId, VideoType.VIDEO);
-      }
-    }
-
-    micClick() {
-      let payload: BooleanIdentifier = {
-        state: !this.callInfo.showMic,
-        id: this.roomId,
-      };
-      this.store.setMicToState(payload);
-      if (this.callInfo.callActive) {
-        webrtcApi.toggleDevice(this.roomId, VideoType.AUDIO);
-      }
-    }
-
+  get iconMicClass (): {} {
+    return {
+      'icon-mic': this.callInfo.showMic,
+      'icon-mute': !this.callInfo.showMic
+    };
   }
+
+  get videoTitle() {
+    return `Turn ${this.callInfo.showVideo ? 'off' : 'on'} your webcam`;
+  }
+
+  get micTitle() {
+    return `Turn ${this.callInfo.showMic ? 'off' : 'on'} your microphone`;
+  }
+
+  get iconVideoClass (): {} {
+    return {
+      'icon-no-videocam': !this.callInfo.showVideo,
+      'icon-videocam': this.callInfo.showVideo
+    };
+  }
+  @Prop() public callInfo!: CallsInfoModel;
+  @Prop() public roomId!: number;
+  public showSettings: boolean = false;
+
+  @Ref()
+  public localVideo!: VideoObject;
+
+  @Ref()
+  public videoContainer!: HTMLElement;
+
+  @State
+  public readonly microphones!: { [id: string]: string } ;
+  @State
+  public readonly speakers!: { [id: string]: string } ;
+  @State
+  public readonly webcams!: { [id: string]: string } ;
+  public fullscreen: boolean = false;
+
+  public currentVideoActive: string|null = null;
+
+  public listener = this.fullScreenChange.bind(this);
+
+  public setCurrentVideo(id: string) {
+    if (this.currentVideoActive === id) {
+      this.currentVideoActive = null;
+    } else {
+      this.currentVideoActive = id;
+    }
+  }
+
+  public fullScreenChange() {
+    this.logger.log('fs change')();
+    if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
+      this.fullscreen = false;
+    }
+  }
+
+  public created() {
+    ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
+      document.addEventListener(e, this.listener, false);
+    });
+  }
+
+  public destroyed() {
+    ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
+      document.removeEventListener(e, this.listener, false);
+    });
+  }
+
+  public exitFullscreen() {
+    if (document.cancelFullScreen) {
+      document.cancelFullScreen();
+    } else if (document.msCancelFullScreen) {
+      document.msCancelFullScreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.webkitCancelFullScreen) {
+      document.webkitCancelFullScreen();
+    }
+    this.fullscreen = false;
+  }
+
+  public enterFullscreen() {
+    const elem: HTMLElement = this.videoContainer;
+    if (elem.requestFullscreen) {
+      elem.requestFullscreen();
+    } else if (elem.msRequestFullscreen) {
+      elem.msRequestFullscreen();
+    } else if (elem.mozRequestFullScreen) {
+      elem.mozRequestFullScreen();
+    } else if (elem.webkitRequestFullscreen) {
+      elem.webkitRequestFullscreen();
+    } else {
+      this.store.growlError('Can\'t enter fullscreen');
+
+      return;
+    }
+    this.fullscreen = true;
+  }
+
+  @Watch('callInfo.currentSpeaker')
+  public onSpeakerChange(newValue: string) {
+    this.$nextTick(function () {
+      const video: HTMLVideoElement = this.localVideo.$refs.video as HTMLVideoElement;
+      if (video.setSinkId) {
+        video.setSinkId(newValue);
+      } else  {
+        this.logger.error('SetSinkId doesn\'t exist')();
+      }
+    });
+  }
+
+  public setCurrentMicProxy(event: Event) {
+    const payload: StringIdentifier = {
+      id: this.roomId,
+      state: (event.target as HTMLInputElement).value
+    };
+    this.store.setCurrentMic(payload);
+    if (this.callInfo.callActive) {
+      webrtcApi.updateConnection(this.roomId);
+    }
+  }
+  public setCurrentWebcamProxy(event: Event) {
+    const payload: StringIdentifier = {
+      id: this.roomId,
+      state: (event.target as HTMLInputElement).value
+    };
+    this.store.setCurrentWebcam(payload);
+    if (this.callInfo.callActive) {
+      webrtcApi.updateConnection(this.roomId);
+    }
+  }
+
+  public playTest() {
+    if (file.setSinkId) {
+      file.setSinkId(this.callInfo.currentSpeaker!);
+      file.pause();
+      file.currentTime = 0;
+      file.volume = 1;
+      const prom = file.play();
+      prom && prom.catch(function (e) {
+      });
+    } else {
+      this.store.growlError('Your browser doesn\'t support changing output channel');
+    }
+  }
+
+  public setCurrentSpeakerProxy(event: Event) {
+    const payload: StringIdentifier = {
+      id: this.roomId,
+      state: (event.target as HTMLInputElement).value
+    };
+    this.store.setCurrentSpeaker(payload);
+    if (this.callInfo.callActive) {
+      webrtcApi.updateConnection(this.roomId);
+    }
+  }
+
+  public startCall() {
+    webrtcApi.startCall(this.roomId);
+  }
+
+  public hangUpCall() {
+    webrtcApi.hangCall(this.roomId);
+    this.fullscreen = false;
+    this.exitFullscreen();
+  }
+
+  public desktopClick() {
+    const payload: BooleanIdentifier = {
+      state: !this.callInfo.shareScreen,
+      id: this.roomId
+    };
+    this.store.setShareScreenToState(payload);
+    if (this.callInfo.callActive) {
+      webrtcApi.toggleDevice(this.roomId, VideoType.SHARE);
+    }
+  }
+
+  public videoClick() {
+    const payload: BooleanIdentifier = {
+      state: !this.callInfo.showVideo,
+      id: this.roomId
+    };
+    this.store.setVideoToState(payload);
+    if (this.callInfo.callActive) {
+      webrtcApi.toggleDevice(this.roomId, VideoType.VIDEO);
+    }
+  }
+
+  public micClick() {
+    const payload: BooleanIdentifier = {
+      state: !this.callInfo.showMic,
+      id: this.roomId
+    };
+    this.store.setMicToState(payload);
+    if (this.callInfo.callActive) {
+      webrtcApi.toggleDevice(this.roomId, VideoType.AUDIO);
+    }
+  }
+
+}
 </script>
 
 <style lang="sass" scoped>

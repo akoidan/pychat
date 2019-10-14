@@ -4,7 +4,6 @@ import {Logger} from 'lines-logger';
 import {CONNECTION_ERROR} from '@/utils/consts';
 import Http from '@/utils/Http';
 
-
 /**
  * @param params : object dict of params or DOM form
  * @param callback : function calls on response
@@ -13,7 +12,6 @@ import Http from '@/utils/Http';
  * */
 
 export default class Fetch /*extends Http*/ {
-
 
   constructor(apiUrl: string, sessionHolder: SessionHolder) {
     // super(apiUrl, sessionHolder);

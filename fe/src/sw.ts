@@ -3,10 +3,10 @@ import {XHR_API_URL} from '@/utils/consts';
 import loggerFactory from '@/utils/loggerFactory';
 declare var clients: any;
 
-let logger: Logger = loggerFactory.getLoggerColor('SW_S', '#a76f00');
+const logger: Logger = loggerFactory.getLoggerColor('SW_S', '#a76f00');
 
 //
-let SW_VERSION = '1.5';
+const SW_VERSION = '1.5';
 logger.debug('startup, version {}', SW_VERSION)();
 
 let subScr: null | string = null;
@@ -30,7 +30,7 @@ function getSubscriptionId(pushSubscription: any) {
           pushSubscription.subscriptionId;
     }
 
-  let GCM_ENDPOINT = 'https://fcm.googleapis.com/fcm/send';
+  const GCM_ENDPOINT = 'https://fcm.googleapis.com/fcm/send';
   if (mergedEndpoint.indexOf(GCM_ENDPOINT) !== 0) {
     return null;
   } else {
@@ -38,30 +38,29 @@ function getSubscriptionId(pushSubscription: any) {
   }
 }
 
-
 async function getPlayBack(event: unknown) {
   logger.log('Received a push message {}', event)();
   if (!subScr) {
-    let r = await (<any>self).registration.pushManager.getSubscription();
+    const r = await (<any>self).registration.pushManager.getSubscription();
     subScr = getSubscriptionId(r);
   }
   if (!subScr) {
     throw Error('Unable to get subscription');
   }
-  let response = await fetch(`${XHR_API_URL}/get_firebase_playback`, {
+  const response = await fetch(`${XHR_API_URL}/get_firebase_playback`, {
     credentials: 'omit',
     headers: {auth: subScr}
   });
   logger.log('Fetching finished {}', response)();
-  let t = await response.text();
+  const t = await response.text();
   logger.debug('response is {}', t)();
-  let m = JSON.parse(t);
+  const m = JSON.parse(t);
   logger.log('Parsed response {}', m)();
-  let notifications = await (<any>self).registration.getNotifications();
+  const notifications = await (<any>self).registration.getNotifications();
   let count = 1;
   if (m.options && m.options.data) {
-    let room = m.options.data.room;
-    let sender = m.options.data.sender;
+    const room = m.options.data.room;
+    const sender = m.options.data.sender;
     for (let i = 0; i < notifications.length; i++) {
       if (room && notifications[i].data.room === room
           || (sender && notifications[i].data.sender === sender)) {
@@ -82,7 +81,6 @@ async function getPlayBack(event: unknown) {
   await (<any>self).registration.showNotification(m.title, m.options);
 }
 
-
 self.addEventListener('push', (e: any) => e.waitUntil(getPlayBack(e)));
 
 self.addEventListener('notificationclick', function (event: any) {
@@ -96,7 +94,7 @@ self.addEventListener('notificationclick', function (event: any) {
   event.waitUntil(clients.matchAll({
     type: 'window'
   }).then(function (clientList: ReadonlyArray<Response>) {
-    let roomId = event.notification.data && event.notification.data.roomId;
+    const roomId = event.notification.data && event.notification.data.roomId;
     if (clientList && clientList[0] && roomId) {
       (<{navigate: Function}>(<unknown>clientList[0])).navigate('/#/chat/' + roomId); // TODO
     } else if (clientList && clientList[0]) {
@@ -108,7 +106,6 @@ self.addEventListener('notificationclick', function (event: any) {
     }
   }));
 });
-
 
 export default function asf() {
   console.log('sw');

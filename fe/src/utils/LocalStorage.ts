@@ -10,24 +10,22 @@ import {
 } from '@/types/model';
 import {Logger} from 'lines-logger';
 
-
 interface LocalStorageMessage {
   f: number;
   h: number;
 }
 export default class LocalStorage implements IStorage {
 
-  private logger: Logger;
-  private STORAGE_NAME = 'wsHeaderIds';
+  private readonly logger: Logger;
+  private readonly STORAGE_NAME = 'wsHeaderIds';
   private cache: { [id: number]: LocalStorageMessage } = {};
-
 
   constructor() {
     this.logger = loggerFactory.getLoggerColor('ls', '#006263');
-    let ms = localStorage.getItem(this.STORAGE_NAME);
+    const ms = localStorage.getItem(this.STORAGE_NAME);
     if (ms) {
-      let loaded = JSON.parse(ms);
-      for (let k in loaded) {
+      const loaded = JSON.parse(ms);
+      for (const k in loaded) {
         this.cache[parseInt(k)] = {
           h: loaded[k],
           f: loaded[k]
@@ -46,12 +44,12 @@ export default class LocalStorage implements IStorage {
     this.setRoomHeaderId(message.roomId, message.id);
   }
 
-  saveMessages(messages: MessageModel[]) {
+  public saveMessages(messages: MessageModel[]) {
     messages.forEach((message) => {
       this.applyCache(message.roomId, message.id);
     });
-    let lm = JSON.parse(localStorage.getItem(this.STORAGE_NAME) || '{}');
-    for (let k in this.cache) {
+    const lm = JSON.parse(localStorage.getItem(this.STORAGE_NAME) || '{}');
+    for (const k in this.cache) {
       if (!lm[k] || this.cache[k].h < lm[k]) {
         lm[k] = this.cache[k].h;
       }
@@ -59,18 +57,18 @@ export default class LocalStorage implements IStorage {
     localStorage.setItem(this.STORAGE_NAME, JSON.stringify(lm));
   }
 
-  deleteMessage(id: number) {}
-  deleteRoom(id: number) {}
-  updateRoom(m: RoomSettingsModel)  {}
-  setRooms(rooms: RoomSettingsModel[])  {}
-  saveRoom(room: RoomSettingsModel)  {}
-  setUserProfile(user: CurrentUserInfoModel)  {}
-  setUserSettings( settings: CurrentUserSettingsModel)  {}
-  saveRoomUsers(ru: SetRoomsUsers)  {}
-  setUsers(users: UserModel[])  {}
-  saveUser(users: UserModel)  {}
+  public deleteMessage(id: number) {}
+  public deleteRoom(id: number) {}
+  public updateRoom(m: RoomSettingsModel)  {}
+  public setRooms(rooms: RoomSettingsModel[])  {}
+  public saveRoom(room: RoomSettingsModel)  {}
+  public setUserProfile(user: CurrentUserInfoModel)  {}
+  public setUserSettings(settings: CurrentUserSettingsModel)  {}
+  public saveRoomUsers(ru: SetRoomsUsers)  {}
+  public setUsers(users: UserModel[])  {}
+  public saveUser(users: UserModel)  {}
 
-  async getAllTree(): Promise<StorageData|null> {
+  public async getAllTree(): Promise<StorageData|null> {
     return null;
   }
 
@@ -81,6 +79,16 @@ export default class LocalStorage implements IStorage {
   public clearStorage() {
     localStorage.setItem(this.STORAGE_NAME, '{}');
     this.cache = {};
+  }
+
+  public setRoomHeaderId(roomId: number, value: number) {
+    if (!this.applyCache(roomId, value)) {
+      this.saveJson(roomId, value);
+    }
+  }
+
+  public async connect(): Promise<boolean> {
+    return false;
   }
 
   // public getRoomHeaderId(roomId: number, cb: SingleParamCB<number>) {
@@ -100,17 +108,12 @@ export default class LocalStorage implements IStorage {
     } else {
       return true;
     }
+
     return false;
   }
 
-  public setRoomHeaderId(roomId: number, value: number) {
-    if (!this.applyCache(roomId, value)) {
-      this.saveJson(roomId, value);
-    }
-  }
-
   private saveJson(roomId: number, value: number) {
-    let lm = JSON.parse(localStorage.getItem(this.STORAGE_NAME) || '{}');
+    const lm = JSON.parse(localStorage.getItem(this.STORAGE_NAME) || '{}');
     if (!lm[roomId] || value < lm[roomId]) {
       lm[roomId] = value;
       this.logger.debug('Updating headerId {} -> {} for room {}. LS: {}', lm[roomId], value, roomId, lm)();
@@ -118,9 +121,5 @@ export default class LocalStorage implements IStorage {
     } else {
       this.logger.debug('Loaded header ids for room {} from local storage {} . Update is not needed since stored header {} is lower than current ', roomId, lm, lm[roomId], value)();
     }
-  }
-
-  async connect(): Promise<boolean> {
-    return false;
   }
 }

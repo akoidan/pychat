@@ -1,73 +1,120 @@
 <template>
   <div class="chat-room-users-wrapper">
-      <span>
-        <span name="direct" :class="directClass" @click="directMinified = !directMinified"></span>
-        <span class="directStateText">direct  messages</span>
-        <router-link to="/create-private-room" class="icon-plus-squared" title="Create direct room"/>
-      </span>
-    <ul class="directUserTable" v-show="!directMinified">
-      <room-users-private :key="room.id" v-for="room in privateRooms" :room="room"/>
-    </ul>
     <span>
-        <span name="channel" :class="roomsClass" @click="roomsMinified = !roomsMinified"></span>
-        <span class="channelsStateText">rooms</span>
-        <router-link to="/create-public-room" class="icon-plus-squared" title="Create public room"/>
+      <span
+        name="direct"
+        :class="directClass"
+        @click="directMinified = !directMinified"
+      />
+      <span class="directStateText">direct  messages</span>
+      <router-link
+        to="/create-private-room"
+        class="icon-plus-squared"
+        title="Create direct room"
+      />
     </span>
-    <ul class="rooms" v-show="!roomsMinified">
-      <room-users-public v-for="room in publicRooms" :key="room.id" :room="room"/>
+    <ul
+      v-show="!directMinified"
+      class="directUserTable"
+    >
+      <room-users-private
+        v-for="room in privateRooms"
+        :key="room.id"
+        :room="room"
+      />
     </ul>
     <span>
-        <span name="user" :class="onlineClass" @click="onlineMinified = !onlineMinified"></span>
-        <span class="usersStateText" @click="onlineShowOnlyOnline = !onlineShowOnlyOnline">{{onlineText}}</span>
-        <router-link :to="`/invite-user/${activeRoomId}`" class="icon-user-plus" title="Add user to current active channel"/>
-      </span>
-    <ul class="chat-user-table" v-show="!onlineMinified">
-      <room-users-user v-for="user in usersArray" :user="user" :key="user.id"></room-users-user>
+      <span
+        name="channel"
+        :class="roomsClass"
+        @click="roomsMinified = !roomsMinified"
+      />
+      <span class="channelsStateText">rooms</span>
+      <router-link
+        to="/create-public-room"
+        class="icon-plus-squared"
+        title="Create public room"
+      />
+    </span>
+    <ul
+      v-show="!roomsMinified"
+      class="rooms"
+    >
+      <room-users-public
+        v-for="room in publicRooms"
+        :key="room.id"
+        :room="room"
+      />
+    </ul>
+    <span>
+      <span
+        name="user"
+        :class="onlineClass"
+        @click="onlineMinified = !onlineMinified"
+      />
+      <span
+        class="usersStateText"
+        @click="onlineShowOnlyOnline = !onlineShowOnlyOnline"
+      >{{ onlineText }}</span>
+      <router-link
+        :to="`/invite-user/${activeRoomId}`"
+        class="icon-user-plus"
+        title="Add user to current active channel"
+      />
+    </span>
+    <ul
+      v-show="!onlineMinified"
+      class="chat-user-table"
+    >
+      <room-users-user
+        v-for="user in usersArray"
+        :key="user.id"
+        :user="user"
+      />
     </ul>
   </div>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Vue} from "vue-property-decorator";
-  import {RoomModel, SexModelString, UserDictModel, UserModel} from "@/types/model";
-  import RoomUsersUser from '@/components/chat/RoomUsersUser';
-  import RoomUsersPublic from '@/components/chat/RoomUsersPublic';
-  import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate';
-  @Component({
-    components: {RoomUsersPrivate, RoomUsersPublic, RoomUsersUser}
-  })
-  export default class RoomUsers extends Vue {
+import {State} from '@/utils/storeHolder';
+import {Component, Vue} from 'vue-property-decorator';
+import {RoomModel, SexModelString, UserDictModel, UserModel} from '@/types/model';
+import RoomUsersUser from '@/components/chat/RoomUsersUser';
+import RoomUsersPublic from '@/components/chat/RoomUsersPublic';
+import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate';
+@Component({
+  components: {RoomUsersPrivate, RoomUsersPublic, RoomUsersUser}
+})
+export default class RoomUsers extends Vue {
 
-    @State
-    public readonly usersArray!: UserModel[];
-    @State
-    public readonly activeRoomId!: number;
-    @State
-    public readonly publicRooms!: RoomModel[];
-    @State
-    public readonly privateRooms!: RoomModel[];
+  @State
+  public readonly usersArray!: UserModel[];
+  @State
+  public readonly activeRoomId!: number;
+  @State
+  public readonly publicRooms!: RoomModel[];
+  @State
+  public readonly privateRooms!: RoomModel[];
 
-    directMinified: boolean = false;
-    roomsMinified: boolean = false;
-    onlineMinified: boolean = false;
-    onlineShowOnlyOnline: boolean = false;
+  public directMinified: boolean = false;
+  public roomsMinified: boolean = false;
+  public onlineMinified: boolean = false;
+  public onlineShowOnlyOnline: boolean = false;
 
-
-    get onlineText() {
-      return this.onlineShowOnlyOnline ? 'Room Users' : 'Room Online'
-    }
-
-    get directClass() {
-      return this.directMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down'
-    }
-    get roomsClass() {
-      return this.roomsMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down'
-    }
-    get onlineClass() {
-      return this.onlineMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down'
-    }
-
+  get onlineText() {
+    return this.onlineShowOnlyOnline ? 'Room Users' : 'Room Online';
   }
+
+  get directClass() {
+    return this.directMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
+  }
+  get roomsClass() {
+    return this.roomsMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
+  }
+  get onlineClass() {
+    return this.onlineMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
+  }
+
+}
 </script>
 
 <style lang="sass" scoped>

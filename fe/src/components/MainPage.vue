@@ -1,52 +1,63 @@
 <template>
   <div class="flex">
-    <div v-if="dim" class="wait"></div>
-    <app-nav v-show="showNav"/>
-    <incoming-call v-if="incomingCall" :call="incomingCall"/>
-    <keep-alive v-if="inited" :include="['ChannelsPage', 'Painter']">
-      <router-view class="body"/>
+    <div
+      v-if="dim"
+      class="wait"
+    />
+    <app-nav v-show="showNav" />
+    <incoming-call
+      v-if="incomingCall"
+      :call="incomingCall"
+    />
+    <keep-alive
+      v-if="inited"
+      :include="['ChannelsPage', 'Painter']"
+    >
+      <router-view class="body" />
     </keep-alive>
-    <div v-else class="spinner"/>
+    <div
+      v-else
+      class="spinner"
+    />
   </div>
 </template>
 <script lang="ts">
+import AppNav from '@/components/AppNav';
+import {Component, Vue} from 'vue-property-decorator';
+import {
+  CurrentUserInfoModel,
+  IncomingCallModel,
+  UserModel
+} from '@/types/model';
+import NotifierHandler from '@/utils/NotificationHandler';
+import {browserVersion, isChrome, isMobile, notifier} from '@/utils/singletons';
+import {State} from '@/utils/storeHolder';
+import IncomingCall from '@/components/chat/IncomingCall';
 
-  import AppNav from "@/components/AppNav";
-  import {Component, Vue} from "vue-property-decorator";
-  import {
-    CurrentUserInfoModel,
-    IncomingCallModel,
-    UserModel
-  } from "@/types/model";
-  import NotifierHandler from "@/utils/NotificationHandler";
-  import {browserVersion, isChrome, isMobile, notifier} from "@/utils/singletons";
-  import {State} from '@/utils/storeHolder';
-  import IncomingCall from '@/components/chat/IncomingCall';
+@Component({
+  components: {IncomingCall, AppNav}
+})
+export default class MainPage extends Vue {
 
-  @Component({
-    components: {IncomingCall, AppNav}
-  })
-  export default class MainPage extends Vue {
+  @State
+  public readonly showNav!: boolean;
+  @State
+  public readonly userInfo!: CurrentUserInfoModel;
+  @State
+  public readonly incomingCall!: IncomingCallModel;
+  @State
+  public readonly dim!: boolean;
 
-    @State
-    public readonly showNav!: boolean;
-    @State
-    public readonly userInfo!: CurrentUserInfoModel;
-    @State
-    public readonly incomingCall!: IncomingCallModel;
-    @State
-    public readonly dim!: boolean;
-
-    get inited() {
-      return this.userInfo;
-    }
-
-    created() {
-      notifier.tryAgainRegisterServiceWorker();
-      this.$ws.startListening();
-    }
-
+  get inited() {
+    return this.userInfo;
   }
+
+  public created() {
+    notifier.tryAgainRegisterServiceWorker();
+    this.$ws.startListening();
+  }
+
+}
 </script>
 
 <style lang="sass" scoped>

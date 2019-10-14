@@ -2,24 +2,27 @@
   <transition name="growl">
     <div :class="['growl', growl.type]">
       <!--Single line-->
-      <div class="icon-cancel" @click="close"></div><div v-html="growl.html"></div>
+      <div
+        class="icon-cancel"
+        @click="close"
+      /><div v-html="growl.html" />
     </div>
   </transition>
 </template>
 
 <script lang='ts'>
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {GrowlModel} from "@/types/model";
-  import {getModule} from "vuex-module-decorators";
-  import {State} from '@/utils/storeHolder';
-  @Component
-  export default class AppGrowl extends Vue {
-    @Prop() public readonly growl!: GrowlModel;
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import {GrowlModel} from '@/types/model';
+import {getModule} from 'vuex-module-decorators';
+import {State} from '@/utils/storeHolder';
+@Component
+export default class AppGrowl extends Vue {
+  @Prop() public readonly growl!: GrowlModel;
 
-    close() {
-      this.store.removeGrowl(this.growl);
-    }
+  public close() {
+    this.store.removeGrowl(this.growl);
   }
+}
 </script>
 <style lang="sass" scoped>
 

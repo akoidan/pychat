@@ -1,0 +1,9 @@
+{
+  "extends": [
+    "plugin:vue/recommended"
+  ],
+  "parserOptions": {
+    "parser": "@typescript-eslint/parser",
+    "sourceType": "module"
+  }
+}

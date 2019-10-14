@@ -21,16 +21,21 @@ import FileReceiverPeerConnection from '@/webrtc/FileReceiveerPeerConnection';
 import Subscription from '@/utils/Subscription';
 import CallHandler from '@/webrtc/CallHandler';
 import faviconUrl from '@/assets/img/favicon.ico';
-import {DefaultStore} from'@/utils/store';
+import {DefaultStore} from '@/utils/store';
 
 export default class WebRtcApi extends MessageHandler {
 
   protected logger: Logger;
 
-  private wsHandler: WsHandler;
-  private store: DefaultStore;
-  private notifier: NotifierHandler;
-  private callHandlers: {[id: number]: CallHandler} = {};
+  protected readonly handlers: HandlerTypes  = {
+    offerFile: <HandlerType>this.onofferFile,
+    offerCall: <HandlerType>this.offerCall
+  };
+
+  private readonly wsHandler: WsHandler;
+  private readonly store: DefaultStore;
+  private readonly notifier: NotifierHandler;
+  private readonly callHandlers: {[id: number]: CallHandler} = {};
 
   constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler) {
     super();
@@ -41,15 +46,85 @@ export default class WebRtcApi extends MessageHandler {
     this.store = store;
   }
 
-  protected readonly handlers: HandlerTypes  = {
-    offerFile: <HandlerType>this.onofferFile,
-    offerCall: <HandlerType>this.offerCall,
-  };
+  public offerCall(message: OfferCall) {
+    this.getCallHandler(message.roomId).initAndDisplayOffer(message);
+  }
 
+  public acceptFile(connId: string, webRtcOpponentId: string) {
+    sub.notify({action: 'acceptFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
+
+  }
+
+  public declineSending(connId: string, webRtcOpponentId: string) {
+    sub.notify({action: 'declineSending', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
+  }
+
+  public declineFile(connId: string, webRtcOpponentId: string) {
+    sub.notify({action: 'declineFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
+  }
+
+  public offerFile(file: File, channel: number) {
+    if (file.size > 0) {
+      this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, (e: WebRtcSetConnectionIdMessage) => {
+        if (e.connId) {
+          new FileSender(channel, e.connId, this.wsHandler, this.notifier, this.store, file, e.time);
+        }
+      });
+    } else {
+      this.store.growlError(`File ${file.name} size is 0. Skipping sending it...`);
+    }
+  }
+
+  public retryFile(connId: string, webRtcOpponentId: string) {
+    sub.notify({action: 'retryFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
+
+  }
+
+  public getCallHandler(roomId: number): CallHandler {
+    if (!this.callHandlers[roomId]) {
+      this.callHandlers[roomId] = new CallHandler(roomId, this.wsHandler, this.notifier, this.store);
+    }
+
+    return this.callHandlers[roomId];
+  }
+
+  public startCall(roomId: number) {
+    this.getCallHandler(roomId).offerCall();
+  }
+
+  public answerCall(connId: string) {
+    sub.notify({action: 'answerCall', handler: Subscription.getTransferId(connId)});
+  }
+
+  public declineCall(connId: string) {
+    sub.notify({action: 'declineCall', handler: Subscription.getTransferId(connId)});
+  }
+
+  public videoAnswerCall(connId: string) {
+    sub.notify({action: 'videoAnswerCall', handler: Subscription.getTransferId(connId)});
+  }
+
+  public hangCall(roomId: number) {
+    this.callHandlers[roomId].hangCall();
+  }
+
+  public updateConnection(roomId: number) {
+    this.callHandlers[roomId].updateConnection();
+  }
+
+  public toggleDevice(roomId: number, videoType: VideoType) {
+    this.callHandlers[roomId].toggleDevice(videoType);
+  }
+
+  public closeAllConnections() {
+    for (const k in this.callHandlers) {
+      this.callHandlers[k].hangCall();
+    }
+  }
 
   private onofferFile(message: OfferFile): void {
-    let limitExceeded = message.content.size > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem;
-    let payload: ReceivingFile = {
+    const limitExceeded = message.content.size > MAX_ACCEPT_FILE_SIZE_WO_FS_API && !requestFileSystem;
+    const payload: ReceivingFile = {
       roomId: message.roomId,
       opponentWsId: message.opponentWsId,
       anchor: null,
@@ -68,88 +143,12 @@ export default class WebRtcApi extends MessageHandler {
       body: `Sends file ${message.content.name}`,
       requireInteraction: true,
       icon: <string>faviconUrl,
-      replaced: 1,
+      replaced: 1
     });
     this.store.addReceivingFile(payload);
     this.wsHandler.replyFile(message.connId, browserVersion);
     if (!limitExceeded) {
       new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, message.content.size);
-    }
-  }
-
-  offerCall(message: OfferCall) {
-    this.getCallHandler(message.roomId).initAndDisplayOffer(message);
-  }
-
-
-  acceptFile(connId: string, webRtcOpponentId: string) {
-    sub.notify({action: 'acceptFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
-
-  }
-
-  declineSending(connId: string, webRtcOpponentId: string) {
-    sub.notify({action: 'declineSending', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
-  }
-
-  declineFile(connId: string, webRtcOpponentId: string) {
-    sub.notify({action: 'declineFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
-  }
-
-  offerFile(file: File, channel: number) {
-    if (file.size > 0) {
-      this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, (e: WebRtcSetConnectionIdMessage) => {
-        if (e.connId) {
-          new FileSender(channel, e.connId, this.wsHandler, this.notifier, this.store, file, e.time);
-        }
-      });
-    } else {
-      this.store.growlError( `File ${file.name} size is 0. Skipping sending it...`);
-    }
-  }
-
-  public retryFile(connId: string, webRtcOpponentId: string) {
-    sub.notify({action: 'retryFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
-
-  }
-
-  getCallHandler(roomId: number): CallHandler {
-    if (!this.callHandlers[roomId]) {
-      this.callHandlers[roomId] = new CallHandler(roomId, this.wsHandler, this.notifier, this.store);
-    }
-    return this.callHandlers[roomId];
-  }
-
-  startCall(roomId: number) {
-    this.getCallHandler(roomId).offerCall();
-  }
-
-  answerCall(connId: string) {
-    sub.notify({action: 'answerCall', handler: Subscription.getTransferId(connId)});
-  }
-
-  declineCall(connId: string) {
-    sub.notify({action: 'declineCall', handler: Subscription.getTransferId(connId)});
-  }
-
-  videoAnswerCall(connId: string) {
-    sub.notify({action: 'videoAnswerCall', handler: Subscription.getTransferId(connId)});
-  }
-
-  hangCall(roomId: number) {
-    this.callHandlers[roomId].hangCall();
-  }
-
-  updateConnection(roomId: number) {
-    this.callHandlers[roomId].updateConnection();
-  }
-
-  toggleDevice(roomId: number, videoType: VideoType) {
-    this.callHandlers[roomId].toggleDevice(videoType);
-  }
-
-  closeAllConnections() {
-    for (let k in this.callHandlers) {
-      this.callHandlers[k].hangCall();
     }
   }
 }

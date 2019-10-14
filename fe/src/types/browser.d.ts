@@ -1,18 +1,18 @@
 declare interface Document {
-  cancelFullScreen(): void;
-  msCancelFullScreen(): void;
-  mozCancelFullScreen(): void;
   mozFullscreenElement: any;
   msFullscreenElement: any;
   webkitFullscreenElement: any;
   webkitCancelFullScreen: any;
+  cancelFullScreen(): void;
+  msCancelFullScreen(): void;
+  mozCancelFullScreen(): void;
 }
 
 declare interface RTCPeerConnection {
+  onaddstream(event: MediaStreamEvent): void;
   // obsolete (deprecated) TODO
   addStream(a: MediaStream): void;
   removeStream(a: MediaStream): void;
-  onaddstream: (event: MediaStreamEvent) => void;
 }
 declare interface Notification {
   replaced: number;
@@ -32,12 +32,12 @@ declare interface MediaDevices {
 }
 
 declare class MediaRecorder {
+  public onstop: Function;
+  public ondataavailable: Function;
   constructor(stream: MediaStream, options: {});
-  static isTypeSupported(t: string): boolean;
-  onstop: Function;
-  stop(): void;
-  ondataavailable: Function;
-  start(time?: number): void;
+  public static isTypeSupported(t: string): boolean;
+  public stop(): void;
+  public start(time?: number): void;
 }
 
 declare interface MediaStreamTrack {
@@ -45,7 +45,7 @@ declare interface MediaStreamTrack {
 }
 
 declare class MediaRecorderDataAvailableEvent {
-  data: { size: number };
+  public data: { size: number };
 }
 
 declare  interface Blob {
@@ -56,7 +56,6 @@ declare interface LocalFileSystem {
 
   mozRequestFileSystem(type: number, size: number, successCallback: FileSystemCallback, errorCallback?: ErrorCallback): void;
 }
-
 
 declare interface FormData {
   entries?(): Iterator<[unknown| Blob]>;

@@ -3,24 +3,36 @@
     <div>
       <table class="table">
         <tbody>
-        <tr>
-          <th>From:</th>
-          <td>{{caller}}</td>
-        </tr>
-        <tr>
-          <th>Room:</th>
-          <td>{{room}}</td>
-        </tr>
+          <tr>
+            <th>From:</th>
+            <td>{{ caller }}</td>
+          </tr>
+          <tr>
+            <th>Room:</th>
+            <td>{{ room }}</td>
+          </tr>
         </tbody>
       </table>
       <div class="answerButtons">
-        <button class="green-btn" @click="answer"><i class="icon-call-aswer"></i>
+        <button
+          class="green-btn"
+          @click="answer"
+        >
+          <i class="icon-call-aswer" />
           <div>Answer</div>
         </button>
-        <button class="green-btn" @click="videoAnswer"><i class="icon-videocam"></i>
+        <button
+          class="green-btn"
+          @click="videoAnswer"
+        >
+          <i class="icon-videocam" />
           <div>With video</div>
         </button>
-        <button class="red-btn" @click="hangUp"><i class="icon-hang-up"></i>
+        <button
+          class="red-btn"
+          @click="hangUp"
+        >
+          <i class="icon-hang-up" />
           <div>Decline</div>
         </button>
       </div>
@@ -28,42 +40,42 @@
   </div>
 </template>
 <script lang="ts">
-  import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {IncomingCallModel, RoomDictModel, UserModel} from "@/types/model";
-  import {webrtcApi} from '@/utils/singletons';
+import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import {IncomingCallModel, RoomDictModel, UserModel} from '@/types/model';
+import {webrtcApi} from '@/utils/singletons';
 
-  @Component
-  export default class IncomingCall extends Vue {
+@Component
+export default class IncomingCall extends Vue {
 
-    @Prop() call!: IncomingCallModel;
-    @State
-    public readonly allUsersDict!: {[id: number]: UserModel} ;
+  @Prop() public call!: IncomingCallModel;
+  @State
+  public readonly allUsersDict!: {[id: number]: UserModel} ;
 
-    @State
-    public readonly roomsDict!: RoomDictModel;
+  @State
+  public readonly roomsDict!: RoomDictModel;
 
-    get caller() {
-      return this.allUsersDict[this.call.userId].user;
-    }
-
-    get room(): string {
-      return this.roomsDict[this.call.roomId].name;
-    }
-
-    answer() {
-      webrtcApi.answerCall(this.call.connId);
-    }
-
-    hangUp() {
-      webrtcApi.declineCall(this.call.connId);
-    }
-
-    videoAnswer() {
-      webrtcApi.videoAnswerCall(this.call.connId);
-    }
-
+  get caller() {
+    return this.allUsersDict[this.call.userId].user;
   }
+
+  get room(): string {
+    return this.roomsDict[this.call.roomId].name;
+  }
+
+  public answer() {
+    webrtcApi.answerCall(this.call.connId);
+  }
+
+  public hangUp() {
+    webrtcApi.declineCall(this.call.connId);
+  }
+
+  public videoAnswer() {
+    webrtcApi.videoAnswerCall(this.call.connId);
+  }
+
+}
 </script>
 
 <style lang="sass" scoped>

@@ -9,20 +9,20 @@
 </template>
 
 <script lang="ts">
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {State} from '@/utils/storeHolder';
-  import {ApplyGrowlErr} from '@/utils/utils';
-  @Component
-  export default class ConfirmMail extends Vue {
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import {State} from '@/utils/storeHolder';
+import {ApplyGrowlErr} from '@/utils/utils';
+@Component
+export default class ConfirmMail extends Vue {
 
-    loading!: boolean;
-    message: string|null = null;
+  public loading!: boolean;
+  public message: string|null = null;
 
-    @ApplyGrowlErr({runningProp: 'loading', vueProperty: 'message', message: 'Error changing mail'})
-    async created() {
-      this.message = await this.$api.changeEmail(<string>this.$route.query['token']);
-    }
+  @ApplyGrowlErr({runningProp: 'loading', vueProperty: 'message', message: 'Error changing mail'})
+  public async created() {
+    this.message = await this.$api.changeEmail(<string>this.$route.query.token);
   }
+}
 </script>
 <style lang="sass" scoped>
 

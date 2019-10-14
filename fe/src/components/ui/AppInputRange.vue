@@ -1,46 +1,52 @@
 <template>
-  <input type="range" @input="oninput" v-bind:value="value" :class="cls" ref="el" />
+  <input
+    ref="el"
+    type="range"
+    :value="value"
+    :class="cls"
+    @input="oninput"
+  >
 </template>
 <script lang="ts">
-  import {Component, Vue, Prop, Ref} from "vue-property-decorator";
-  import {getUniqueId} from "@/utils/htmlApi";
+import {Component, Vue, Prop, Ref} from 'vue-property-decorator';
+import {getUniqueId} from '@/utils/htmlApi';
 
-  @Component
-  export default class AppInputRange extends Vue {
-    private style: any;
-    private cls!: string;
-    @Prop() public readonly value!: number;
+@Component
+export default class AppInputRange extends Vue {
+  @Prop() public readonly value!: number;
 
-    @Ref()
-    el!: HTMLInputElement;
+  @Ref()
+  public el!: HTMLInputElement;
+  private style: any;
+  private cls!: string;
 
-    created() {
-      this.style = document.createElement('style');
-      document.head.appendChild(this.style);
-      this.cls = `wbktRange${getUniqueId()}`;
-    }
-
-    mounted () {
-      this.fixStyle();
-    }
-
-    destroy() {
-      document.head.removeChild(this.style);
-    }
-
-    oninput(event: Event) {
-      this.fixStyle();
-      this.$emit('input', parseInt((<HTMLInputElement>event.target).value));
-    }
-
-    fixStyle() {
-      let min  = parseInt(this.el.getAttribute('min') || '0');
-      let max = parseInt(this.el.getAttribute('max') || '100');
-      let v = parseFloat(this.el.value);
-      let p = Math.round((v - min) / (max - min) * 100);
-      this.style.textContent = `.${this.cls}::-webkit-slider-runnable-track {background-size: ${p}% 100%, 100% 100% !important; } `;
-    }
+  public created() {
+    this.style = document.createElement('style');
+    document.head.appendChild(this.style);
+    this.cls = `wbktRange${getUniqueId()}`;
   }
+
+  public mounted () {
+    this.fixStyle();
+  }
+
+  public destroy() {
+    document.head.removeChild(this.style);
+  }
+
+  public oninput(event: Event) {
+    this.fixStyle();
+    this.$emit('input', parseInt((event.target as HTMLInputElement).value));
+  }
+
+  public fixStyle() {
+    const min  = parseInt(this.el.getAttribute('min') || '0');
+    const max = parseInt(this.el.getAttribute('max') || '100');
+    const v = parseFloat(this.el.value);
+    const p = Math.round((v - min) / (max - min) * 100);
+    this.style.textContent = `.${this.cls}::-webkit-slider-runnable-track {background-size: ${p}% 100%, 100% 100% !important; } `;
+  }
+}
 </script>
 
 <style lang="sass" scoped>

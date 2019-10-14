@@ -1,36 +1,47 @@
 <template>
   <nav>
-    <i class="icon-pencil" v-if="!editedMessage.isEditingNow" @click.stop="m2EditMessage"><span
-        class="mText">Edit</span></i>
-    <i class="icon-trash-circled" v-if="!editedMessage.isEditingNow" @click.stop="m2DeleteMessage"><span
-        class="mText">Delete</span></i>
-    <i class="icon-cancel" @click.stop="m2Close"><span class="mText">Close</span></i>
+    <i
+      v-if="!editedMessage.isEditingNow"
+      class="icon-pencil"
+      @click.stop="m2EditMessage"
+    ><span
+      class="mText"
+    >Edit</span></i>
+    <i
+      v-if="!editedMessage.isEditingNow"
+      class="icon-trash-circled"
+      @click.stop="m2DeleteMessage"
+    ><span
+      class="mText"
+    >Delete</span></i>
+    <i
+      class="icon-cancel"
+      @click.stop="m2Close"
+    ><span class="mText">Close</span></i>
   </nav>
 </template>
 <script lang="ts">
+import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue} from 'vue-property-decorator';
+import {EditingMessage} from '@/types/model';
+import {channelsHandler} from '@/utils/singletons';
 
-  import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {EditingMessage} from "@/types/model";
-  import {channelsHandler} from '@/utils/singletons';
+@Component
+export default class NavEditMessage extends Vue {
+  @Prop() public editedMessage! : EditingMessage;
 
-
-  @Component
-  export default class NavEditMessage extends Vue {
-    @Prop() editedMessage! : EditingMessage;
-
-    m2DeleteMessage() {
-      this.$emit('delete-message');
-    }
-
-    m2EditMessage() {
-      this.$emit('edit-message');
-    }
-
-    m2Close() {
-      this.$emit('close');
-    }
+  public m2DeleteMessage() {
+    this.$emit('delete-message');
   }
+
+  public m2EditMessage() {
+    this.$emit('edit-message');
+  }
+
+  public m2Close() {
+    this.$emit('close');
+  }
+}
 </script>
 
 <style lang="sass" scoped>

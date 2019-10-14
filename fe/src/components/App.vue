@@ -1,40 +1,43 @@
 <template>
   <div class="body">
     <div class="growlHolder">
-      <growl v-for="growl in growls" :growl="growl" :key="growl.id"/>
+      <growl
+        v-for="growl in growls"
+        :key="growl.id"
+        :growl="growl"
+      />
     </div>
-    <router-view/>
+    <router-view />
   </div>
 </template>
 
 <script lang='ts'>
+import Growl from '@/components/ui/AppGrowl';
+import {Component, Vue, Watch} from 'vue-property-decorator';
+import {CurrentUserSettingsModel, GrowlModel} from '@/types/model';
+import {State} from '@/utils/storeHolder';
 
-  import Growl from "@/components/ui/AppGrowl";
-  import {Component, Vue, Watch} from "vue-property-decorator";
-  import {CurrentUserSettingsModel, GrowlModel} from '@/types/model';
-  import {State} from '@/utils/storeHolder';
+@Component({
+  components: {Growl}
+})
+export default class App extends Vue {
 
-  @Component({
-    components: {Growl}
-  })
-  export default class App extends Vue {
+  @State
+  public readonly userSettings!: CurrentUserSettingsModel;
 
-    @State
-    public readonly userSettings!: CurrentUserSettingsModel;
+  @State
+  public readonly growls!: GrowlModel[];
 
-    @State
-    public readonly growls!: GrowlModel[];
-
-    get mainClass(): string {
-      return this.userSettings && this.userSettings.theme || 'color-reg';
-    }
-
-    @Watch('mainClass')
-    onMainClassChange(value: string) {
-      document.body.parentElement!.className = value;
-    }
-
+  get mainClass(): string {
+    return this.userSettings && this.userSettings.theme || 'color-reg';
   }
+
+  @Watch('mainClass')
+  public onMainClassChange(value: string) {
+    document.body.parentElement!.className = value;
+  }
+
+}
 </script>
 <style lang="sass" scoped>
   .body

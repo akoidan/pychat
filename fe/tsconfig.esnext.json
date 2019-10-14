@@ -1,13 +1,17 @@
 {
   "compilerOptions": {
+    "lib": ["es2017", "dom"],
+    "module": "esnext",
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"]
     },
-    "lib": ["es2017", "dom"],
-    "module": "esnext",
+    "plugins": [
+      { "transform": "ts-optchain/transform" },
+      { "name": "typescript-tslint-plugin"}
+    ],
     "moduleResolution": "node",
-    "target": "es2019",
+    "target": "esnext",
     "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,

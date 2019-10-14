@@ -1,7 +1,17 @@
 <template>
   <div class="holder">
-    <add-user-to-room v-model="currentUsers" :text="`Add users to room ${currentRoom.name}`" :exclude-users-ids="excludeUsersIds"/>
-    <app-submit type="button" @click.native="add" value="Apply" class="green-btn" :running="running"/>
+    <add-user-to-room
+      v-model="currentUsers"
+      :text="`Add users to room ${currentRoom.name}`"
+      :exclude-users-ids="excludeUsersIds"
+    />
+    <app-submit
+      type="button"
+      value="Apply"
+      class="green-btn"
+      :running="running"
+      @click.native="add"
+    />
   </div>
 </template>
 <script lang="ts">

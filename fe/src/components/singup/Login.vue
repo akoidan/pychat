@@ -1,49 +1,76 @@
 <template>
-  <form @submit.prevent='login' ref="form">
+  <form
+    ref="form"
+    @submit.prevent="login"
+  >
     <div>
-      <i class='icon-user'></i>
-      <input type='text' maxlength='254' class="input" autocomplete="username" required placeholder='Username/Email' name='username'/>
+      <i class="icon-user" />
+      <input
+        type="text"
+        maxlength="254"
+        class="input"
+        autocomplete="username"
+        required
+        placeholder="Username/Email"
+        name="username"
+      >
     </div>
     <div>
-      <i class='icon-key'></i>
-      <input type='password' name='password' autocomplete="password" class="input" placeholder='Password' required/>
+      <i class="icon-key" />
+      <input
+        type="password"
+        name="password"
+        autocomplete="password"
+        class="input"
+        placeholder="Password"
+        required
+      >
     </div>
-      <router-link class='forg-pass' to="/auth/reset-password">Forgot Password?</router-link>
+    <router-link
+      class="forg-pass"
+      to="/auth/reset-password"
+    >
+      Forgot Password?
+    </router-link>
     <div>
-      <social-auth/>
-      <captcha-component v-model="running"/>
-      <app-submit class='submit-button' value='LOG IN' :running="running"/>
+      <social-auth />
+      <captcha-component v-model="running" />
+      <app-submit
+        class="submit-button"
+        value="LOG IN"
+        :running="running"
+      />
     </div>
   </form>
 </template>
 
 <script lang='ts'>
-  import {Component, Prop, Vue, Ref} from "vue-property-decorator";
-  import AppSubmit from "@/components/ui/AppSubmit"
-  import {State} from '@/utils/storeHolder';
-  import {ApplyGrowlErr, login} from '@/utils/utils';
-  import SocialAuth from '@/components/singup/SocialAuth';
-  import CaptchaComponent from '@/components/singup/CaptchaComponent';
+import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
+import AppSubmit from '@/components/ui/AppSubmit';
+import {State} from '@/utils/storeHolder';
+import {ApplyGrowlErr, login} from '@/utils/utils';
+import SocialAuth from '@/components/singup/SocialAuth';
+import CaptchaComponent from '@/components/singup/CaptchaComponent';
 
-  @Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
-  export default class Login extends Vue {
+@Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
+export default class Login extends Vue {
 
-    @Ref()
-    form!: HTMLFormElement;
+  @Ref()
+  public form!: HTMLFormElement;
 
-    running: boolean = false;
+  public running: boolean = false;
 
-    created() {
-      this.store.setRegHeader('Welcome back!');
-    }
-
-    @ApplyGrowlErr({runningProp: 'running', message: `Can't log in`})
-    async login() {
-      let ses: string = await this.$api.login(this.form);
-      login(ses)
-    }
-
+  public created() {
+    this.store.setRegHeader('Welcome back!');
   }
+
+  @ApplyGrowlErr({runningProp: 'running', message: `Can't log in`})
+  public async login() {
+    const ses: string = await this.$api.login(this.form);
+    login(ses);
+  }
+
+}
 </script>
 <style lang="sass" scoped>
 

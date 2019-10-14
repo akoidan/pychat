@@ -2,7 +2,7 @@ import {SessionHolder} from '@/types/types';
 
 class SessionHolderImpl {
 
-  private static SESSION_KEY = 'session_id';
+  private static readonly SESSION_KEY = 'session_id';
 
   set session(value: string|null) {
     if (value) {

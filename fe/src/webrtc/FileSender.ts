@@ -6,34 +6,34 @@ import {DefaultMessage, ReplyFileMessage} from '@/types/messages';
 import FileSenderPeerConnection from '@/webrtc/FileSenderPeerConnection';
 import {sub} from '@/utils/sub';
 import Subscription from '@/utils/Subscription';
-import {DefaultStore} from'@/utils/store';
+import {DefaultStore} from '@/utils/store';
 import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class FileSender extends BaseTransferHandler {
-  private file: File;
+
+  protected readonly handlers: HandlerTypes = {
+    replyFile: <HandlerType>this.replyFile,
+    removePeerConnection: <HandlerType>this.removePeerConnection
+  };
+  private readonly file: File;
 
   constructor(roomId: number, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, file: File, time: number) {
     super(roomId, wsHandler, notifier, store);
     this.file = file;
     this.connectionId = connId;
     sub.subscribe(Subscription.getTransferId(connId), this);
-    let payload: SendingFile = {
+    const payload: SendingFile = {
       roomId,
       connId,
       fileName: file.name,
       fileSize: file.size,
       time,
-      transfers: {},
+      transfers: {}
     };
     this.store.addSendingFile(payload);
   }
 
-  protected readonly handlers: HandlerTypes = {
-    replyFile: <HandlerType>this.replyFile,
-    removePeerConnection: <HandlerType>this.removePeerConnection
-  };
-
-  replyFile(message: ReplyFileMessage) {
+  public replyFile(message: ReplyFileMessage) {
     this.logger.debug('got mes {}', message)();
     new FileSenderPeerConnection(this.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, this.file, message.userId);
     this.webrtcConnnectionsIds.push(message.opponentWsId);

@@ -2,38 +2,42 @@
   <div class="smileParentHolder">
     <ul class="tabNames">
       <li
-          v-for="(_, tabName) in smileys"
-          :key="tabName"
-          :class="{'activeTab': activeTab === tabName}"
-          @click="activeTab = tabName">{{tabName}}
+        v-for="(_, tabName) in smileys"
+        :key="tabName"
+        :class="{'activeTab': activeTab === tabName}"
+        @click="activeTab = tabName"
+      >
+        {{ tabName }}
       </li>
     </ul>
     <template v-for="(allSmileys, tabName) in smileys">
       <div
-          :key="tabName"
-          v-show="activeTab === tabName">
+        v-show="activeTab === tabName"
+        :key="tabName"
+      >
         <img
-            @click="$emit('add-smiley', code)"
-            v-for="(smiley, code) in allSmileys"
-            :src="smiley.src"
-            :alt="smiley.alt"
-            :code="code"
-            :key="code">
+          v-for="(smiley, code) in allSmileys"
+          :key="code"
+          :src="smiley.src"
+          :alt="smiley.alt"
+          :code="code"
+          @click="$emit('add-smiley', code)"
+        >
       </div>
     </template>
   </div>
 </template>
 <script lang="ts">
-  import {Component, Vue} from "vue-property-decorator";
-  import {smileys} from '@/utils/smileys';
-  import {SmileyStructure} from '@/types/types';
+import {Component, Vue} from 'vue-property-decorator';
+import {smileys} from '@/utils/smileys';
+import {SmileyStructure} from '@/types/types';
 
-  @Component
-  export default class SmileyHolder extends Vue {
-    smileys = smileys;
-    activeTab: string = Object.keys(smileys)[0];
+@Component
+export default class SmileyHolder extends Vue {
+  public smileys = smileys;
+  public activeTab: string = Object.keys(smileys)[0];
 
-  }
+}
 </script>
 
 <style lang="sass" scoped>

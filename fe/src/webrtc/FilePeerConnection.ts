@@ -9,7 +9,7 @@ export default abstract class FilePeerConnection extends AbstractPeerConnection 
     }
   }
 
-  closeEvents (text?: string|DefaultMessage) {
+  public closeEvents (text?: string|DefaultMessage) {
     if (text) {
       this.ondatachannelclose(<string>text); // TODO
     }

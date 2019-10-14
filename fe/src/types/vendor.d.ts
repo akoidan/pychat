@@ -48,7 +48,7 @@ declare module 'vue/types/vue' {
   interface VueConstructor<V extends Vue = Vue> {
     component<Data, Methods, Computed, Props>(
         id: string,
-        definition: Component<Data, Methods, Computed, Props>,
+        definition: Component<Data, Methods, Computed, Props>
     ): ExtendedVue<V, Data, Methods, Computed, Props>;
   }
 
@@ -61,4 +61,3 @@ declare module 'vue/types/vue' {
     $route: Route;
   }
 }
-

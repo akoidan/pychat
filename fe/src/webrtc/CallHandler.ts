@@ -32,25 +32,29 @@ import {forEach} from '@/utils/htmlApi';
 import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class CallHandler extends BaseTransferHandler {
+
+  private get callInfo(): CallsInfoModel {
+    return this.store.roomsDict[this.roomId].callInfo;
+  }
   protected readonly handlers: HandlerTypes = {
     answerCall: this.answerCall,
     videoAnswerCall: this.videoAnswerCall,
     declineCall: this.declineCall,
     replyCall: <HandlerType>this.replyCall,
     acceptCall: <HandlerType>this.onacceptCall,
-    removePeerConnection: <HandlerType>this.removePeerConnection,
+    removePeerConnection: <HandlerType>this.removePeerConnection
   };
   private localStream: MediaStream | null = null;
   private audioProcessor: JsAudioAnalyzer | null = null;
   private callStatus: CallStatus = 'not_inited';
-  private acceptedPeers: string[] = [];
+  private readonly acceptedPeers: string[] = [];
 
-  inflateDevices(devices: MediaDeviceInfo[]): void {
+  public inflateDevices(devices: MediaDeviceInfo[]): void {
     let n: number, k: number, c: number = 0;
-    let microphones: { [id: string]: string } = {};
-    let speakers: { [id: string]: string } = {};
-    let webcams: { [id: string]: string } = {};
-    let payload: SetDevices = {
+    const microphones: { [id: string]: string } = {};
+    const speakers: { [id: string]: string } = {};
+    const webcams: { [id: string]: string } = {};
+    const payload: SetDevices = {
       microphones,
       webcams,
       speakers
@@ -66,19 +70,18 @@ export default class CallHandler extends BaseTransferHandler {
             break;
           case 'videoinput':
             webcams[device.deviceId] = device.label || 'Camera ' + (++c);
-            break;
         }
       });
     }
     this.store.setDevices(payload);
   }
 
-  onacceptCall(message: AcceptCallMessage) {
+  public onacceptCall(message: AcceptCallMessage) {
     if (this.callStatus !== 'received_offer') { // if we're call initiator
       if (!this.connectionId) {
         throw Error('Conn is is null');
       }
-      let payload: ConnectToRemoteMessage = {
+      const payload: ConnectToRemoteMessage = {
         action: 'connectToRemote',
         handler: Subscription.getPeerConnectionId(this.connectionId, message.opponentWsId),
         stream: this.localStream
@@ -89,58 +92,28 @@ export default class CallHandler extends BaseTransferHandler {
     }
   }
 
-  private async pingExtension(): Promise<void> {
-    return new Promise<void>((resolve, reject) => {
-      let error = {rawError: `To share your screen you need chrome extension.<b> <a href="${CHROME_EXTENSION_URL}" target="_blank">Click to install</a></b>`};
-      if (chrome.runtime && chrome.runtime.sendMessage) {
-        let triggered = false;
-        let timedCB = setTimeout(function () {
-          !triggered && reject(error);
-          triggered = true;
-        }, 500);
-
-        chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
-          type: 'PYCHAT_SCREEN_SHARE_PING'
-        }, (response) => {
-          if (triggered) {
-            this.logger.error('extension responded after timeout')();
-          } else if (response && response.data === 'success') {
-            clearTimeout(timedCB);
-            resolve();
-          } else {
-            clearTimeout(timedCB);
-            reject(response && response.data || error);
-          }
-        });
-      } else {
-        reject(error);
-      }
-    });
-
-  }
-
-
-  async getDesktopShareFromExtension(): Promise<string> {
+  public async getDesktopShareFromExtension(): Promise<string> {
     if (!isChrome) {
-      throw 'ScreenCast feature is only available from chrome atm';
+      throw new Error('ScreenCast feature is only available from chrome atm');
     } else if (isMobile) {
-      throw 'ScreenCast is not available for mobile phones yet';
+      throw new Error('ScreenCast is not available for mobile phones yet');
     } else {
       await this.pingExtension();
       this.logger.log('Ping to extension succeeded')();
-      let response = await new Promise<{streamId: string, data: string}>((resolve, reject) => {
+      const response = await new Promise<{streamId: string; data: string}>((resolve, reject) => {
         chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {type: 'PYCHAT_SCREEN_SHARE_REQUEST'}, resolve);
       });
       if (response && response.data === 'success') {
         this.logger.log('Getting desktop share succeeded')();
+
         return response.streamId;
       } else {
-        throw 'Failed to capture desktop stream';
+        throw new Error('Failed to capture desktop stream');
       }
     }
   }
 
-  async captureInput(): Promise<MediaStream> {
+  public async captureInput(): Promise<MediaStream> {
     let endStream;
     this.logger.debug('capturing input')();
     if (this.callInfo.showMic || this.callInfo.showVideo) {
@@ -155,13 +128,13 @@ export default class CallHandler extends BaseTransferHandler {
       endStream = await navigator.mediaDevices.getUserMedia({audio, video});
       this.logger.debug('navigator.mediaDevices.getUserMedia({audio, video})')();
       if (navigator.mediaDevices.enumerateDevices) {
-        let devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
+        const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
         this.inflateDevices(devices);
       }
     }
     if (this.callInfo.shareScreen) {
       let stream;
-      let chromeVersion = getChromeVersion();
+      const chromeVersion = getChromeVersion();
       if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
         this.logger.debug('Getting shareScreen from  navigator.getDisplayMedia')();
         stream = await navigator.mediaDevices.getDisplayMedia({video: true});
@@ -169,7 +142,7 @@ export default class CallHandler extends BaseTransferHandler {
         if (chromeVersion && chromeVersion > 70) {
           this.store.growlInfo('You can now use chrome://flags/#enable-experimental-web-platform-features to share your screen');
         }
-        let streamId: string = await this.getDesktopShareFromExtension();
+        const streamId: string = await this.getDesktopShareFromExtension();
         this.logger.debug('Resolving userMedia from dekstopShare')();
         stream = await navigator.mediaDevices.getUserMedia(<MediaStreamConstraints><unknown>{ // TODO update ts to support this
           audio: false,
@@ -183,7 +156,7 @@ export default class CallHandler extends BaseTransferHandler {
           }
         });
       }
-      let tracks: any[] = stream.getVideoTracks();
+      const tracks: any[] = stream.getVideoTracks();
       if (!(tracks && tracks.length > 0)) {
         throw Error('No video tracks from captured screen');
       }
@@ -195,42 +168,13 @@ export default class CallHandler extends BaseTransferHandler {
       }
     }
     if (!endStream) {
-      throw 'Unable to capture stream';
+      throw new Error('Unable to capture stream');
     }
+
     return endStream;
   }
 
-  private handleStream(e: string, endStream: MediaStream|null) {
-    let what = [];
-    if (this.callInfo.showMic) {
-      what.push('audio');
-    }
-    if (this.callInfo.showVideo) {
-      what.push('video');
-    }
-    if (this.callInfo.shareScreen) {
-      what.push('screenshare');
-    }
-    let message = `<span>Failed to capture ${what.join(', ')} source</span>, because ${extractError(e)}`;
-    this.destroyStreamData(endStream);
-    this.store.growlErrorRaw(message);
-    this.logger.error('onFailedCaptureSource {}', e)();
-  }
-
-  private get callInfo(): CallsInfoModel {
-    return this.store.roomsDict[this.roomId].callInfo;
-  }
-
-  private destroyStreamData(endStream: MediaStream|null) {
-    if (endStream) {
-      let tracks: MediaStreamTrack[] = endStream.getTracks();
-      if (tracks) {
-        tracks.forEach(e => e.stop());
-      }
-    }
-  }
-
-  processAudio(audioProc: JsAudioAnalyzer) {
+  public processAudio(audioProc: JsAudioAnalyzer) {
     return () => {
       if (!this.callInfo.showMic) {
         return;
@@ -246,16 +190,16 @@ export default class CallHandler extends BaseTransferHandler {
           this.store.growlError(`Unable to capture input from microphone. Check your microphone connection or ${url}`);
         }
       }
-      let payload: NumberIdentifier = {
+      const payload: NumberIdentifier = {
         id: this.roomId,
-        state: Math.sqrt(getAverageAudioLevel(audioProc)),
+        state: Math.sqrt(getAverageAudioLevel(audioProc))
       };
       this.store.setCurrentMicLevel(payload);
     };
   }
 
-  async toggleDevice(videoType: VideoType) {
-    let track = this.getTrack(videoType);
+  public async toggleDevice(videoType: VideoType) {
+    const track = this.getTrack(videoType);
     if (track && track.readyState === 'live') {
       this.logger.log('toggleDevice')();
       let state = false;
@@ -272,7 +216,7 @@ export default class CallHandler extends BaseTransferHandler {
     }
   }
 
-  async updateConnection() {
+  public async updateConnection() {
     this.logger.log('updateConnection')();
     let stream: MediaStream|null = null;
     if (this.localStream && this.localStream.active) {
@@ -282,7 +226,7 @@ export default class CallHandler extends BaseTransferHandler {
         this.attachLocalStream(stream);
 
         this.webrtcConnnectionsIds.forEach(pcName => {
-          let message: ChangeStreamMessage = {
+          const message: ChangeStreamMessage = {
             handler: Subscription.getPeerConnectionId(this.connectionId!, pcName),
             action: 'streamChanged',
             newStream: stream!,
@@ -296,21 +240,7 @@ export default class CallHandler extends BaseTransferHandler {
     }
   }
 
-  private attachLocalStream(stream: MediaStream) {
-    this.logger.log('Local stream has been attached');
-    if (stream) {
-      this.localStream = stream;
-      this.audioProcessor = createMicrophoneLevelVoice(stream, this.processAudio.bind(this));
-      let payload: MediaIdentifier = {
-        id: this.roomId,
-        media: stream
-      };
-      this.store.setLocalStreamSrc(payload);
-    }
-    this.setCallIconsState();
-  }
-
-  getTrack(kind: VideoType) {
+  public getTrack(kind: VideoType) {
     let track = null;
     let tracks = [];
     if (this.localStream) {
@@ -322,7 +252,7 @@ export default class CallHandler extends BaseTransferHandler {
         throw Error('invalid track name');
       }
       if (tracks.length > 0) {
-        let isShare = tracks[0].isShare;
+        const isShare = tracks[0].isShare;
         if (isShare && kind === VideoType.SHARE) {
           track = tracks[0];
         } else if (!isShare && kind === VideoType.VIDEO) {
@@ -332,9 +262,9 @@ export default class CallHandler extends BaseTransferHandler {
         }
       }
     }
+
     return track;
   }
-
 
   // setAudio(value) {
   //   let audioTrack = this.getTrack('audio');
@@ -347,8 +277,7 @@ export default class CallHandler extends BaseTransferHandler {
   //   }
   // }
 
-
-  setCallIconsState() {
+  public setCallIconsState() {
     // if (this.callInfo.showMic) {
     //   let audioTrack = this.getTrack('audio');
     //   if (!audioTrack) {
@@ -367,7 +296,7 @@ export default class CallHandler extends BaseTransferHandler {
     // this.autoSetLocalVideoVisibility();
   }
 
-  async offerCall() {
+  public async offerCall() {
     let stream: MediaStream | null = null;
     try {
       stream = await this.captureInput();
@@ -375,9 +304,9 @@ export default class CallHandler extends BaseTransferHandler {
       if (stream) {
         this.attachLocalStream(stream);
       }
-      let payload: BooleanIdentifier = {
+      const payload: BooleanIdentifier = {
         state: true,
-        id: this.roomId,
+        id: this.roomId
       };
       this.setCallStatus('sent_offer');
       this.store.setCallActiveToState(payload);
@@ -392,8 +321,7 @@ export default class CallHandler extends BaseTransferHandler {
     }
   }
 
-
-  createCallPeerConnection(message: ReplyCallMessage) {
+  public createCallPeerConnection(message: ReplyCallMessage) {
     if (message.opponentWsId > this.wsHandler.getWsConnectionId()) {
       new CallSenderPeerConnection(this.roomId, this.connectionId!, message.opponentWsId, message.userId, this.wsHandler, this.store);
     } else {
@@ -402,11 +330,11 @@ export default class CallHandler extends BaseTransferHandler {
     this.webrtcConnnectionsIds.push(message.opponentWsId);
   }
 
-  replyCall(message: ReplyCallMessage) {
+  public replyCall(message: ReplyCallMessage) {
     this.createCallPeerConnection(message);
   }
 
-  initAndDisplayOffer(message: OfferCall) {
+  public initAndDisplayOffer(message: OfferCall) {
     this.setCallStatus('received_offer');
     if (this.connectionId) {
       this.logger.error('Old connId still exists {}', this.connectionId)();
@@ -415,7 +343,7 @@ export default class CallHandler extends BaseTransferHandler {
     sub.subscribe(Subscription.getTransferId(message.connId), this);
     this.logger.log('CallHandler initialized')();
     this.wsHandler.replyCall(message.connId, browserVersion);
-    let payload2: IncomingCallModel = {
+    const payload2: IncomingCallModel = {
       connId: message.connId,
       roomId: message.roomId,
       userId: message.userId
@@ -425,18 +353,18 @@ export default class CallHandler extends BaseTransferHandler {
     this.createCallPeerConnection(message);
   }
 
-  answerCall() {
+  public answerCall() {
     this.doAnswer(false);
   }
 
-  async doAnswer(withVideo: boolean) {
-    let trueBoolean: BooleanIdentifier = {
+  public async doAnswer(withVideo: boolean) {
+    const trueBoolean: BooleanIdentifier = {
       state: true,
-      id: this.roomId,
+      id: this.roomId
     };
-    let falseBoolean: BooleanIdentifier = {
+    const falseBoolean: BooleanIdentifier = {
       state: false,
-      id: this.roomId,
+      id: this.roomId
     };
     this.store.setIncomingCall(null);
     this.store.setCallActiveToState(trueBoolean);
@@ -444,11 +372,11 @@ export default class CallHandler extends BaseTransferHandler {
     this.store.setVideoToState(withVideo ? trueBoolean : falseBoolean);
     this.store.setMicToState(trueBoolean);
     this.setCallStatus('accepted');
-    let stream = await this.captureInput();
+    const stream = await this.captureInput();
     this.attachLocalStream(stream);
     this.wsHandler.acceptCall(this.connectionId!);
     this.acceptedPeers.forEach((e) => {
-      let message: ConnectToRemoteMessage = {
+      const message: ConnectToRemoteMessage = {
         action: 'connectToRemote',
         stream: this.localStream,
         handler: Subscription.getPeerConnectionId(this.connectionId!, e)
@@ -458,51 +386,121 @@ export default class CallHandler extends BaseTransferHandler {
     router.replace(`/chat/${this.roomId}`);
   }
 
-  videoAnswerCall() {
+  public videoAnswerCall() {
     this.doAnswer(true);
   }
 
-  destroyAudioProcessor() {
+  public destroyAudioProcessor() {
     if (this.audioProcessor && this.audioProcessor.javascriptNode && this.audioProcessor.javascriptNode.onaudioprocess) {
       this.logger.debug('Removing local audioproc')();
       this.audioProcessor.javascriptNode.onaudioprocess = null;
     }
   }
 
-  stopLocalStream() {
+  public stopLocalStream() {
     this.destroyAudioProcessor();
     this.destroyStreamData(this.localStream);
   }
 
-  onDestroy() {
+  public onDestroy() {
     this.stopLocalStream();
-    let payload2: MediaIdentifier = {
+    const payload2: MediaIdentifier = {
       id: this.roomId,
       media: null
     };
     this.store.setLocalStreamSrc(payload2);
     this.connectionId = null;
-    let payload: BooleanIdentifier = {
+    const payload: BooleanIdentifier = {
       state: false,
-      id: this.roomId,
+      id: this.roomId
     };
     this.store.setCallActiveToState(payload);
   }
 
-  declineCall() {
+  public declineCall() {
     this.store.setIncomingCall(null);
     this.wsHandler.declineCall(this.connectionId!);
     this.onDestroy();
   }
 
-  hangCall() {
+  public hangCall() {
     this.logger.debug('on hangCall called')();
-    let hadConnections = this.webrtcConnnectionsIds.length > 0;
+    const hadConnections = this.webrtcConnnectionsIds.length > 0;
     if (hadConnections) {
       this.closeAllPeerConnections();
     } else {
       this.onDestroy();
     }
+  }
+
+  private async pingExtension(): Promise<void> {
+    return new Promise<void>((resolve, reject) => {
+      const error = {rawError: `To share your screen you need chrome extension.<b> <a href="${CHROME_EXTENSION_URL}" target="_blank">Click to install</a></b>`};
+      if (chrome.runtime && chrome.runtime.sendMessage) {
+        let triggered = false;
+        const timedCB = setTimeout(function () {
+          !triggered && reject(error);
+          triggered = true;
+        },                         500);
+
+        chrome.runtime.sendMessage(CHROME_EXTENSION_ID, {
+          type: 'PYCHAT_SCREEN_SHARE_PING'
+        },                         (response) => {
+          if (triggered) {
+            this.logger.error('extension responded after timeout')();
+          } else if (response && response.data === 'success') {
+            clearTimeout(timedCB);
+            resolve();
+          } else {
+            clearTimeout(timedCB);
+            reject(response && response.data || error);
+          }
+        });
+      } else {
+        reject(error);
+      }
+    });
+
+  }
+
+  private handleStream(e: string, endStream: MediaStream|null) {
+    const what = [];
+    if (this.callInfo.showMic) {
+      what.push('audio');
+    }
+    if (this.callInfo.showVideo) {
+      what.push('video');
+    }
+    if (this.callInfo.shareScreen) {
+      what.push('screenshare');
+    }
+    const message = `<span>Failed to capture ${what.join(', ')} source</span>, because ${extractError(e)}`;
+    this.destroyStreamData(endStream);
+    this.store.growlErrorRaw(message);
+    this.logger.error('onFailedCaptureSource {}', e)();
+  }
+
+  private destroyStreamData(endStream: MediaStream|null) {
+    if (endStream) {
+      const tracks: MediaStreamTrack[] = endStream.getTracks();
+      if (tracks) {
+        tracks.forEach(e => e.stop());
+      }
+    }
+  }
+
+  private attachLocalStream(stream: MediaStream) {
+    this.logger.log('Local stream has been attached');
+    if (stream) {
+      this.localStream = stream;
+      this.audioProcessor = createMicrophoneLevelVoice(stream, this.processAudio.bind(this));
+      const payload: MediaIdentifier = {
+        id: this.roomId,
+        media: stream
+      };
+      this.store.setLocalStreamSrc(payload);
+    }
+    this.setCallIconsState();
   }
 
   private setCallStatus(status: CallStatus) {

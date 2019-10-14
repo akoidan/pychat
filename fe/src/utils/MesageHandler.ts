@@ -2,7 +2,6 @@ import {DefaultMessage} from '@/types/messages';
 import {Logger} from 'lines-logger';
 import {IMessageHandler} from '@/types/types';
 
-
 export type HandlerType = (a: DefaultMessage) => void;
 
 export interface HandlerTypes {
@@ -19,7 +18,7 @@ export default abstract class MessageHandler implements IMessageHandler {
     if (!this.handlers) {
       throw Error(`${this.constructor.name} has empty handlers`);
     }
-    let handler: HandlerType = this.handlers[message.action];
+    const handler: HandlerType = this.handlers[message.action];
     if (handler) {
       handler.bind(this)(message);
     } else {
