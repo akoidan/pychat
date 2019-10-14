@@ -11,7 +11,7 @@
 # from chat.settings_prod import * # if you run this in production without docker uncomment this
 
 ### Prevent host header attacks in emails
-### this will used to sent emails with magic link, replce to your ip/domain
+### this will used to sent emails with magic link, replce to your ip/domain , notice no trailing slash!
 # SERVER_ADDRESS = 'https://192.168.1.15:8080'
 
 

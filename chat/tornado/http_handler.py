@@ -103,7 +103,7 @@ class HttpHandler(MethodDispatcher):
 			return SERVER_ADDRESS
 		else:
 			self.logger.error("SERVER_ADDRESS is missing, this could lead to HOST header attacks")
-			return self.request.headers['Host']
+			return '{}://{}'.format(self.request.protocol,self.request.host)
 
 	@run_on_executor
 	def __send_mail(self, subject, body_text, receiver, html_body, fail_silently):
@@ -131,7 +131,7 @@ class HttpHandler(MethodDispatcher):
 		verification.save()
 		user.email_verification = verification
 		user.save(update_fields=['email_verification'])
-		link = "{}#/confirm_email?token={}".format(self.__host, verification.token)
+		link = "{}/#/confirm_email?token={}".format(self.__host, verification.token)
 		text = ('Hi {}, you have registered pychat'
 						'\nTo complete your registration please click on the url bellow: {}'
 						'\n\nIf you find any bugs or propositions you can post them {}').format(
@@ -178,7 +178,7 @@ class HttpHandler(MethodDispatcher):
 		return (yield from get_or_create_ip_model(self.client_ip, self.logger))
 
 	def __send_reset_password_email(self, email, username, verification):
-		link = "{}#/auth/proceed-reset-password?token={}".format(self.__host, verification.token)
+		link = "{}/#/auth/proceed-reset-password?token={}".format(self.__host, verification.token)
 		message = "{},\n" \
 							"You requested to change a password on site {}.\n" \
 							"To proceed click on the link {}\n" \
@@ -209,7 +209,7 @@ class HttpHandler(MethodDispatcher):
 	def __send_new_email_ver(self, user, email):
 		new_ver = Verification(user=user, type_enum=Verification.TypeChoices.confirm_email, email=email)
 		new_ver.save()
-		link = "{}#/confirm_email?token={}".format(self.__host, new_ver.token)
+		link = "{}/#/confirm_email?token={}".format(self.__host, new_ver.token)
 		text = ('Hi {}, you have changed email to curren on pychat \nTo verify it, please click on the url: {}') \
 			.format(user.username, link)
 		start_message = mark_safe(
@@ -249,7 +249,7 @@ class HttpHandler(MethodDispatcher):
 			message,
 			old_email,
 			html_message,
-			False
+			True
 		)
 
 	@require_http_method('GET')
@@ -318,7 +318,7 @@ class HttpHandler(MethodDispatcher):
 		if v.type_enum not in (Verification.TypeChoices.register, Verification.TypeChoices.confirm_email):
 			raise ValidationError('This is not confirm email token')
 		if v.verified:
-			raise ValidationError('This verification token already accepted')
+			raise ValidationError('This verification token is already accepted')
 		user = UserProfile.objects.get(id=v.user_id)
 		if user.email_verification_id != v.id:
 			raise ValidationError('Verification token expired because you generated another one')
