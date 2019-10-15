@@ -23,7 +23,7 @@
         />
     <% } %>
     <% for (var index in htmlWebpackPlugin.files.js) { %>
-        <% if (htmlWebpackPlugin.files.jsIntegrity) { %><
+        <% if (htmlWebpackPlugin.files.jsIntegrity) { %>
             <script
                     async
                     src="<%= htmlWebpackPlugin.files.js[index] %>"
@@ -40,7 +40,7 @@
         <% } %>
     <% } %>
     <% for (var index in htmlWebpackPlugin.files.css) { %>
-        <% if (htmlWebpackPlugin.files.cssIntegrity) { %><
+        <% if (htmlWebpackPlugin.files.cssIntegrity) { %>
             <link
                     rel="stylesheet"
                     href="<%= htmlWebpackPlugin.files.css[index] %>"
