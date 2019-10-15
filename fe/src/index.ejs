@@ -15,38 +15,45 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <link rel="shortcut icon" href="<%= htmlWebpackPlugin.files.favicon %>">
   <meta property="og:description" content="Chat with your friends, make video calls or transfer files with Pychat!"/>
-  <% if (htmlWebpackPlugin.options.manifest ) { %><link rel="manifest" href="<%= htmlWebpackPlugin.options.manifest %>"><% } %>
-  <% for (var index in htmlWebpackPlugin.files.js) { %>
-    <% if (htmlWebpackPlugin.files.jsIntegrity) { %><
-    <script
-            async
-            src="<%= htmlWebpackPlugin.files.js[index] %>"
-            integrity="<%= htmlWebpackPlugin.files.jsIntegrity[index] %>"
-            crossorigin="<%= webpackConfig.output.crossOriginLoading %>"
-    ></script>
-    <% }  else { %>
-      <script async
-              crossorigin="<%= webpackConfig.output.crossOriginLoading %>"
-              type="text/javascript"
-              src="<%= htmlWebpackPlugin.files.js[0] %>"></script>
+    <% if (htmlWebpackPlugin.options.manifest ) { %>
+        <link
+                rel="manifest"
+                href="<%= htmlWebpackPlugin.options.manifest %>"
+        />
     <% } %>
-  <% } %>
-  <% for (var index in htmlWebpackPlugin.files.css) { %>
-    <% if (htmlWebpackPlugin.files.cssIntegrity) { %><
-    <link
-            rel="stylesheet"
-            href="<%= htmlWebpackPlugin.files.css[index] %>"
-            integrity="<%= htmlWebpackPlugin.files.cssIntegrity[index] %>"
-            crossorigin="<%= webpackConfig.output.crossOriginLoading %>"
-    />
-    <% }  else { %>
-      <link
-              rel="stylesheet"
-              href="<%= htmlWebpackPlugin.files.css[index] %>"
-              crossorigin="<%= webpackConfig.output.crossOriginLoading %>"
-      />
+    <% for (var index in htmlWebpackPlugin.files.js) { %>
+        <% if (htmlWebpackPlugin.files.jsIntegrity) { %><
+        <script
+                async
+                src="<%= htmlWebpackPlugin.files.js[index] %>"
+                integrity="<%= htmlWebpackPlugin.files.jsIntegrity[index] %>"
+                crossorigin="anonymous"
+        ></script>
+        <% }  else { %>
+            <script
+                    async
+                    crossorigin="anonymous"
+                    type="text/javascript"
+                    src="<%= htmlWebpackPlugin.files.js[0] %>"
+            ></script>
+        <% } %>
     <% } %>
-  <% } %>
+    <% for (var index in htmlWebpackPlugin.files.css) { %>
+        <% if (htmlWebpackPlugin.files.cssIntegrity) { %><
+        <link
+                rel="stylesheet"
+                href="<%= htmlWebpackPlugin.files.css[index] %>"
+                integrity="<%= htmlWebpackPlugin.files.cssIntegrity[index] %>"
+                crossorigin="anonymous"
+        />
+        <% }  else { %>
+            <link
+                    rel="stylesheet"
+                    href="<%= htmlWebpackPlugin.files.css[index] %>"
+                    crossorigin="anonymous"
+            />
+        <% } %>
+    <% } %>
 </head>
 <body>
 <div id="app">

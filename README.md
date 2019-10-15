@@ -401,6 +401,7 @@ development.json and production.json have the following format:
 {
   "BACKEND_ADDRESS": "e.g. pychat.org:443, protocol shouldn't be there, note there's no trailing slash, you can specify '{}' to use the same host as files served with",
   "IS_DEBUG": "set true for development and debug mode enabled",
+  "UGLIFY": "true/false uglifies js/css so it has less weight, set this for production.json only, when you're sue you don't need to debug the output",
   "GOOGLE_OAUTH_2_CLIENT_ID" : "check chat/settings_example.py",
   "FACEBOOK_APP_ID": "check chat/settings_example.py",
   "MANIFEST": "manifest path for firebase push notifications e.g.`/manifest.json`",

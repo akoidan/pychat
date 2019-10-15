@@ -214,6 +214,11 @@ const getConfig = async () => {
     entry.unshift(  'ts-polyfill');
   }
   if (options.IS_PROD) {
+    const SriPlugin = require('webpack-subresource-integrity');
+    plugins.push(new SriPlugin({
+      hashFuncNames: ['sha256', 'sha384'],
+      enabled: true,
+    }));
     const MiniCssExtractPlugin = require("mini-css-extract-plugin");
     const {CleanWebpackPlugin} = require('clean-webpack-plugin');
     if (options.IS_WEB) {
