@@ -134,7 +134,7 @@ const {options, definePlugin, optimization, configFile, startCordova, linting} =
   }
 
   options.ELECTRON_MAIN_FILE = options.IS_PROD ? `file://{}/index.html` : `file:///tmp/electron.html`;
-  const optimization = options.IS_WEB && !options.IS_DEBUG ? {
+  const optimization = options.IS_WEB && options.UGLIFY ? {
     minimize: true,
     usedExports: true,
     sideEffects: true
@@ -179,6 +179,17 @@ const getConfig = async () => {
     webpackOptions.manifest = options.MANIFEST
   }
 
+  if (options.UGLIFY || !options.IS_DEBUG) { // uglyging this is not that important as reducing file that's always refreshing
+    webpackOptions.minify = {
+      collapseWhitespace: true,
+      removeComments: true,
+      removeRedundantAttributes: true,
+      removeScriptTypeAttributes: true,
+      removeStyleLinkTypeAttributes: true,
+      useShortDoctype: true
+    };
+  }
+
   let htmlWebpackPlugin = new HtmlWebpackPlugin(webpackOptions);
 
   plugins = [
@@ -208,6 +219,16 @@ const getConfig = async () => {
     if (options.IS_WEB) {
       const CompressionPlugin = require('compression-webpack-plugin');
       plugins.push(new CompressionPlugin())
+    }
+    if (options.IS_WEB && options.UGLIFY) {
+      const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+      plugins.push(new OptimizeCSSAssetsPlugin({
+        cssProcessorOptions: {
+          map: {
+            inline: false
+          }
+        }
+      }));
     }
     plugins.push(new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns: getDist()}));
     plugins.push(new MiniCssExtractPlugin());

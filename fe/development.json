@@ -1,6 +1,7 @@
 {
   "BACKEND_ADDRESS": "localhost:8888",
   "IS_DEBUG": true,
+  "UGLIFY": false,
   "ELECTRON_IGNORE_SSL": true,
   "PUBLIC_PATH": null,
   "MANIFEST": "/manifest.json",
