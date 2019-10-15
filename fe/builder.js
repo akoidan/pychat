@@ -296,6 +296,7 @@ const getConfig = async () => {
     },
     mode: options.IS_PROD ? 'production' : 'development',
     output: {
+      crossOriginLoading: 'anonymous',
       path: getDist(),
       publicPath: options.PUBLIC_PATH || '/' //https://github.com/webpack/webpack-dev-server/issues/851#issuecomment-399227814
     },
