@@ -5085,10 +5085,10 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-lines-logger@1.2.0:
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/lines-logger/-/lines-logger-1.2.0.tgz#a3affb2b2e0bf49b7d87de731aa232ecac85b8cd"
-  integrity sha512-cs8XDGX57arpyVTxnnREWNqvc071xC43F2tq4/fRi/qi7Py+LQLhjP/LzkWWvM+8S1Sy6BWD1WqUhhxPIuHtXQ==
+lines-logger@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/lines-logger/-/lines-logger-1.3.0.tgz#d2f955759d3c9c7f58b239f7bad66616f6054f88"
+  integrity sha512-206MoZiVTKeZJbfRjXz0BTp9+gz1ZAVsSX/8rdG/8EWNfFRjXJcJMvlCbo0mx71V4cd2k5QA+bB5ghtxV7cbuA==
 
 load-json-file@^1.0.0:
   version "1.1.0"
