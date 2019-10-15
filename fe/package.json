@@ -113,7 +113,7 @@
     "lodash.debounce": "4.0.8",
     "npm-font-open-sans": "1.1.0",
     "reflect-metadata": "0.1.13",
-    "spainter": "1.0.4",
+    "spainter": "^1.1.0",
     "ts-optchain": "0.1.8",
     "typeface-oswald": "0.0.75",
     "vue": "2.6.10",

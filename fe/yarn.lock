@@ -8404,10 +8404,10 @@ source-map@^0.6.0, source-map@^0.6.1, source-map@~0.6.0, source-map@~0.6.1:
   resolved "https://registry.yarnpkg.com/source-map/-/source-map-0.6.1.tgz#74722af32e9614e9c287a8d0bbde48b5e2f1a263"
   integrity sha512-UjgapumWlbMhkBgzT7Ykc5YXUT46F0iKu8SGXq0bcwP5dz/h0Plj6enJqjz1Zbq2l5WaqYnrVbwWOWMyF3F47g==
 
-spainter@1.0.4:
-  version "1.0.4"
-  resolved "https://registry.yarnpkg.com/spainter/-/spainter-1.0.4.tgz#f7f41fe72acf08fde4f8b470b8590508fd301526"
-  integrity sha512-lk0HSduPFVvjXrvqJtjG4WVDCQwpqELTU0+OZX+7JB4xTSzmpBMdDGyrBDrKSV6ORpIxdg1I1J/gNx1ZCpHSAg==
+spainter@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/spainter/-/spainter-1.1.0.tgz#627310899e9a7dda3c16cb0bb8f870694a73315b"
+  integrity sha512-B3R9gNaF69n814weJEPCtFtiKxzT2rptSGFeiu6qhz+BxQ/Z99J0ScMsUzr0yXcKMlUTIvtZcG2DAKdAaMQdiA==
 
 spdx-correct@^3.0.0:
   version "3.1.0"
@@ -9956,7 +9956,7 @@ webpack-sources@^1.0.1, webpack-sources@^1.1.0, webpack-sources@^1.3.0, webpack-
     source-list-map "^2.0.0"
     source-map "~0.6.1"
 
-webpack-subresource-integrity@^1.3.4:
+webpack-subresource-integrity@1.3.4:
   version "1.3.4"
   resolved "https://registry.yarnpkg.com/webpack-subresource-integrity/-/webpack-subresource-integrity-1.3.4.tgz#4554e0c622d6787f880eba009cdb73139c107bad"
   integrity sha512-6XbGYzjh30cGQT/NsC+9IAkJP8IL7/t47sbwR5DLSsamiD56Rwv4/+hsgEHsviPvrEFZ0JRAQtCRN3UsR2Pw9g==
