@@ -150,8 +150,6 @@ const {options, definePlugin, optimization, configFile, startCordova, linting} =
 }();
 
 
-
-
 const getConfig = async () => {
   let plugins;
   let sasscPlugins;
@@ -273,6 +271,7 @@ const getConfig = async () => {
       {
         loader: 'ts-loader',
         options: {
+          configFile,
           appendTsSuffixTo: [/\.vue$/]
         }
       },
