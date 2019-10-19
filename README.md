@@ -206,7 +206,6 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  5. Install python packages with `pip install -r requirements.txt`.
  6. Create database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`.If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
  7. Fill database with tables: `bash download_content.sh create_django_tables`
- 8. Populate project files: `bash download_content.sh all`
 
 
 ## Configure IDEs if you use it:

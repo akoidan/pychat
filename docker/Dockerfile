@@ -97,7 +97,6 @@ RUN set -x && \
     cp ./chat/settings_docker.py ./chat/settings.py &&\
     echo 'SECRET_KEY="123"'>> ./chat/settings.py &&\
     bash download_content.sh create_db && \
-    bash download_content.sh all &&\
     rm ./chat/settings.py && \
     rm -rf ./docker &&\
     mv /var/lib/mysql ./mysql &&\
