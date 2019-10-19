@@ -394,7 +394,7 @@ generate_secret_key() {
     echo "'" >> $PROJECT_ROOT/chat/settings.py
 }
 
-if [ "$1" = "generate_icon_session" ]; then
+if [ "$1" = "post_fontello_conf" ]; then
     post_fontello_conf
     python -mwebbrowser "http://fontello.com/`cat .fontello`"
 elif [ "$1" = "check_files" ]; then
@@ -441,17 +441,12 @@ elif [ "$1" = "android" ]; then
 elif [ "$1" = "redirect" ]; then
     safeRunCommand sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8080
     safeRunCommand sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 443 -j REDIRECT --to-ports 8080
-elif [ "$1" = "download_icon" ]; then
+elif [ "$1" = "download_fontello" ]; then
     download_fontello
     delete_tmp_dir
     git --no-pager diff "$PROJECT_ROOT/config.json"
     printSuccess "Fonts have been installed"
     printOut "You can view them at https://localhost:8000/static/demo.html"
-elif [ "$1" == "all" ]; then
-    remove_old_files
-    post_fontello_conf
-    download_fontello
-    check_files "remove_script"
 elif [ "$1" == "generate_secret_key" ]; then
     generate_secret_key
 else
@@ -459,14 +454,13 @@ else
     chp generate_certificate "Create self-singed ssl certificate"
     chp rename_domain "Rename all occurrences of \e[96mpychat.org\e[0;33;40m in \e[96m$PROJECT_ROOT\e[0;33;40m for your domain name. Usage: \e[92mrename_domain your.domain.com"
     chp rename_root_directory "Rename all occurrences of \e[96m/srv/http\e[0;33;40m to \e[96m$PROJECT_ROOT\e[0;33;40m in \e[96m$PROJECT_ROOT/rootfs\e[0;33;40m"
-    chp all "Downloads all content required for project"
     chp check_files "Verifies if all files are installed"
     chp zip_extension "Creates zip acrhive for ChromeWebStore from \e[96mscreen_cast_extension \e[0;33;40mdirectory"
     chp android "Deploys android app"
-    printf " \e[93mIcons:\n\e[0;37;40mTo edit icons execute \e[92mgenerate_icon_session\e[0;37;40m, edit icons in opened browser and click Save session button. Afterwords execute \e[92mdownload_icon\n"
-    chp generate_icon_session "Creates fontello session from config.json and saves it to \e[96m .fontello \e[0;33;40mfile"
+    printf " \e[93mIcons:\n\e[0;37;40mTo edit icons execute \e[92mpost_fontello_conf\e[0;37;40m, edit icons in opened browser and click Save session button. Afterwords execute \e[92mdownload_icon\n"
+    chp post_fontello_conf "Creates fontello session from config.json and saves it to \e[96m .fontello \e[0;33;40mfile"
     chp print_icon_session "Shows current used url for editing fonts"
-    chp download_icon "Downloads and extracts fonts from fontello to project"
+    chp download_fontello "Downloads and extracts fonts from fontello to project"
     chp generate_secret_key "Creates django secret key into \e[96m$PROJECT_ROOT/chat/settings.py\e[0;33;40m"
     chp create_db "Creates database pychat to mysql, the following environment variable should be defined \e[94mDB_ROOT_PASS DB_USER DB_PASS DB_DATA_PATH"
     chp update_docker "Builds docker images for deathangel908/pychat"

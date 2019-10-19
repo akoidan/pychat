@@ -1,6 +1,6 @@
-import {getModule} from 'vuex-module-decorators';
+import {getModule, VuexModule} from 'vuex-module-decorators';
 import {DefaultStore} from '@/utils/store';
-import {VuexModule} from 'vuex-module-decorators';
+import {IS_DEBUG} from '@/utils/consts';
 import Vue from 'vue';
 
 function StateDecoratorFactory<ProviderType extends VuexModule>(vuexModule: ProviderType) {
@@ -31,3 +31,7 @@ export const store: DefaultStore = getModule(DefaultStore);
 export const {State} = StateDecoratorFactory(store);
 
 Vue.prototype.store = store;
+
+if (IS_DEBUG) {
+  window.store = store;
+}

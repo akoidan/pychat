@@ -22,6 +22,7 @@ declare global {
     xhr: Http;
     ws: WsHandler;
     storage: IStorage;
+    store: DefaultStore;
     webrtcApi: WebRtcApi;
     grecaptcha: GoogleCaptcha;
     audioProcesssors: JsAudioAnalyzer[];

@@ -1,7 +1,7 @@
 import {JsAudioAnalyzer} from '@/types/types';
 import {extractError} from '@/utils/utils';
 import {globalLogger, isMobile} from '@/utils/singletons';
-import {IS_DEBUG } from '@/utils/consts';
+import {IS_DEBUG} from '@/utils/consts';
 
 let audioContext: AudioContext;
 const audioProcesssors: JsAudioAnalyzer[] = [];
@@ -9,7 +9,10 @@ if (IS_DEBUG) {
   window.audioProcesssors = audioProcesssors;
 }
 
-export function createMicrophoneLevelVoice (stream: MediaStream, onaudioprocess: (e: JsAudioAnalyzer) => (e: AudioProcessingEvent) => void): JsAudioAnalyzer|null {
+export function createMicrophoneLevelVoice (
+    stream: MediaStream,
+    onaudioprocess: (e: JsAudioAnalyzer) => (e: AudioProcessingEvent) => void
+): JsAudioAnalyzer|null {
   try {
     if (isMobile) {
       globalLogger.log('Current phone is mobile, audio processor won\'t be created')();
@@ -26,7 +29,7 @@ export function createMicrophoneLevelVoice (stream: MediaStream, onaudioprocess:
     }
     const analyser = audioContext.createAnalyser();
     const microphone = audioContext.createMediaStreamSource(stream);
-    const javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+    const javascriptNode = audioContext.createScriptProcessor(4096, 1, 1);
     analyser.smoothingTimeConstant = 0.3;
     analyser.fftSize = 1024;
     microphone.connect(analyser);
