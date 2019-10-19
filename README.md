@@ -148,7 +148,7 @@ Services commands for CentOs:
  - If something doesn't work you want to check `pychat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
 
 ## Frontend
- - `cd fe; nvm use 8.9.0`
+ - `cd fe; nvm use 12.10`
  - `yarn install`
  - Create production.json based on [Frontend config](#frontend-config)
  - Run `yarn run prod`. This generates static files in `fe/dist` directory.
@@ -269,7 +269,7 @@ Tslint is already included to tsconfig so IDEs like webstorm would support linti
  - to resolve absolute path for webpack webstorm requires webpack.config.js. Go to settings -> javascript -> webpack -> Webpack config file  
 
 ## Build frontend
-I would recommend to use version node 8.9.0, `nvm use 8.9.0`. You can install nvm with [archlinux](https://wiki.archlinux.org/index.php/Node.js_) [ubuntu](https://qiita.com/shaching/items/6e398140432d4133c866) [windows](https://github.com/coreybutler/nvm-windows). 
+I would recommend to use version node 12.10, `nvm use 12.10`. You can install nvm with [archlinux](https://wiki.archlinux.org/index.php/Node.js_) [ubuntu](https://qiita.com/shaching/items/6e398140432d4133c866) [windows](https://github.com/coreybutler/nvm-windows). 
  - To get started install dependencies first: `yarn install` # or use npm if you're old and cranky
  - Take a look at copy [development.json](fe/development.json]`. The description is at [Frontend config](#frontend-config)
  - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. Take a look at [development.json](development.json). To run dev-server use `yarn run dev`. You can navigate to http://localhost:8080
