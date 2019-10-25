@@ -60,8 +60,8 @@ This is free web (browser) chat, that features:
 | Audio/Video messages   | +      | -     | -     | +        | +     |
 | P2P file sharing       | +      | -     | -     | -        | -     |
 | Desktop client         | +      | +     | +     | +        | +/-   |
-| Mobile client          | +      | +     | +     | +        | +/-   |
-| Mobile phone call      | -      | -     | +/-   | -        | +/-   |
+| Mobile client          | +      | +     | +     | +        | +     |
+| GCM phone call         | -      | -     | +/-   | -        | +/-   |
 | 3rd-party integration  | -      | +     | -     | -        | -     | 
 
 
