@@ -61,6 +61,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   }
 
   public onDestroy(reason?: string) {
+    this.logger.log('Destroying {}, because {}', this.constructor.name, reason)();
     const message: RemovePeerConnection = {
       handler: Subscription.getTransferId(this.connectionId),
       action: 'removePeerConnection',
@@ -132,6 +133,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   }
 
   public respondeOffer() {
+    this.logger.log('Responding to offer')();
     this.offerCreator = false;
     this.pc!.createAnswer((answer: RTCSessionDescriptionInit) => {
       if (answer.sdp) {
@@ -140,8 +142,8 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       this.logger.log('Sending answer')();
       this.pc!.setLocalDescription(answer, () => {
         this.sendWebRtcEvent(answer);
-      },                           this.failWebRtc('setLocalDescription'));
-    },                    this.failWebRtc('createAnswer') /*,this.sdpConstraints*/); // TODO wtf it that?
+      }, this.failWebRtc('setLocalDescription'));
+    }, this.failWebRtc('createAnswer') /*,this.sdpConstraints*/); // TODO wtf it that?
   }
 
   public setMediaBitrate(sdp: string, bitrate: number) {

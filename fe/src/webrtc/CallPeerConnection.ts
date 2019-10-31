@@ -4,7 +4,8 @@ import {
 } from '@/utils/audioprocc';
 import AbstractPeerConnection from '@/webrtc/AbstractPeerConnection';
 import {
-  ChangeStreamMessage, JsAudioAnalyzer,
+  ChangeStreamMessage,
+  JsAudioAnalyzer,
   SetCallOpponent,
   SetOpponentAnchor,
   SetOpponentVoice
@@ -48,6 +49,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   }
 
   public onStreamChanged(payload: ChangeStreamMessage) {
+    this.logger.log('onStreamChanged {}', payload)();
     if (this.pc) {
       payload.oldStream && this.pc.removeStream(payload.oldStream);
       this.pc.addStream(payload.newStream);
@@ -125,6 +127,8 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     if (this.audioProcessor && this.audioProcessor.javascriptNode && this.audioProcessor.javascriptNode.onaudioprocess) {
       this.audioProcessor.javascriptNode.onaudioprocess = null;
       this.logger.log('Removed remote audioProcessor')();
+    } else {
+      this.logger.log('Audoprops are already removed')();
     }
   }
 
