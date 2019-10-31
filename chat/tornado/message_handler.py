@@ -22,7 +22,7 @@ from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix,
 	UserSettingsVarNames, UserProfileVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
 from chat.utils import get_max_key, do_db, validate_edit_message, \
-	get_message_images_videos, update_symbols, up_files_to_img, evaluate, check_user
+	get_message_images_videos, update_symbols, up_files_to_img, evaluate, check_user, http_client
 
 # from pywebpush import webpush
 
@@ -113,10 +113,6 @@ class MessagesHandler(MessagesCreator):
 	def connected(self, value):
 		raise NotImplemented
 
-	@property
-	def http_client(self):
-		raise NotImplemented
-
 	@gen.engine
 	def listen(self, channels):
 		yield Task(
@@ -195,7 +191,7 @@ class MessagesHandler(MessagesCreator):
 				giphy = None
 			cb(message, giphy)
 		url = GIPHY_URL.format(GIPHY_API_KEY, quote(query, safe=''))
-		self.http_client.fetch(url, callback=on_giphy_reply)
+		http_client.fetch(url, callback=on_giphy_reply)
 
 	def notify_offline(self, channel, message_id):
 		if FIREBASE_API_KEY is None:
@@ -239,7 +235,7 @@ class MessagesHandler(MessagesCreator):
 		# 		  vapid_claims={"sub": "mailto:YourEmailAddress"})
 
 		r = HTTPRequest(FIREBASE_URL, method="POST", headers=headers, body=body)
-		self.http_client.fetch(r, callback=on_reply)
+		http_client.fetch(r, callback=on_reply)
 
 	def isGiphy(self, content):
 		if GIPHY_API_KEY is not None and content is not None:
