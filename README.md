@@ -60,8 +60,8 @@ This is free web (browser) chat, that features:
 | Audio/Video messages   | +      | -     | -     | +        | +     |
 | P2P file sharing       | +      | -     | -     | -        | -     |
 | Desktop client         | +      | +     | +     | +        | +/-   |
-| Mobile client          | +      | +     | +     | +        | +/-   |
-| Mobile phone call      | -      | -     | +/-   | -        | +/-   |
+| Mobile client          | +      | +     | +     | +        | +     |
+| GCM phone call         | -      | -     | +/-   | -        | +/-   |
 | 3rd-party integration  | -      | +     | -     | -        | -     | 
 
 
@@ -412,7 +412,7 @@ development.json and production.json have the following format:
 
 # TODO
 * ctrl+c on builder leaves the process in foreground
-* .stylelintignore https://github.com/kristerkari/stylelint-scss/issues/380
+* .stylelintignore @for loops doesn't work in linter https://github.com/AleshaOleg/postcss-sass/issues/53
 * https://www.infoworld.com/article/3443039/typescript-37-beta-debuts-with-optional-chaining.html
 * get\s+(\w+)\(\):\s+((\w|\[|\])+)\s+\{\s+return\s+store\.\w+\;?\s+\}\;?        @State\n    public readonly $1!: $2;
 * purge all callbacks to async code
