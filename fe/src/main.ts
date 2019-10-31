@@ -28,17 +28,13 @@ declare module 'vue/types/vue' {
   }
 }
 
-function r2d22() {
-
-}
-
 const mixin = {
   computed: {
     logger(this: Vue): Logger  {
       if (!this.__logger && this.$options._componentTag !== 'router-link') {
         let name = this.$options._componentTag || 'vue-comp';
         if (!this.$options._componentTag) {
-          globalLogger.warn('Can\'t detect tag of {}', this)();
+          globalLogger.warn('Can\'t detect tag of {}', this);
         }
         if (this.id) {
           name += `:${this.id}`;
