@@ -177,6 +177,12 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
   return function (target: T, propertyKey: string, descriptor: PropertyDescriptor) {
     const original = descriptor.value;
     descriptor.value = async function(...args: unknown[]) {
+      // @ts-ignore: next-line
+      if (this[runningProp]) {
+        // @ts-ignore: next-line
+        this.logger.warn('Skipping {} as it\'s loading', descriptor.value)();
+        return;
+      }
       try {
         if (runningProp) {
           // @ts-ignore: next-line

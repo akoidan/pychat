@@ -165,36 +165,37 @@
 
     @ApplyGrowlErr({runningProp: 'loading', message: 'Unable to load history'})
     private async loadUpHistory(n: number) {
-      if (!this.loading && this.chatbox.scrollTop === 0) {
-        let s = this.room.search;
-        if (s.searchActive && !s.locked) {
-          let a: MessageModelDto[] = await this.$api.search(s.searchText, this.room.id, s.searchedIds.length);
-          if (a.length) {
-            channelsHandler.addMessages(this.room.id, a);
-            let searchedIds = this.room.search.searchedIds.concat(a.map(a => a.id));
-            this.store.setSearchTo({
-              roomId: this.room.id,
-              search: {
-                searchActive: s.searchActive,
-                searchedIds,
-                locked: a.length < MESSAGES_PER_SEARCH,
-                searchText: s.searchText
-              } as SearchModel
-            });
-          } else {
-            this.store.setSearchTo({
-              roomId: this.room.id,
-              search: {
-                searchActive: s.searchActive,
-                searchedIds: s.searchedIds,
-                locked: true,
-                searchText: s.searchText
-              }
-            });
-          }
-        } else if (!s.searchActive && !this.room.allLoaded) {
-          await this.$ws.sendLoadMessages(this.room.id, this.minIdCalc, n);
+      if (this.chatbox.scrollTop !== 0) {
+        return; // we're just scrolling up
+      }
+      let s = this.room.search;
+      if (s.searchActive && !s.locked) {
+        let a: MessageModelDto[] = await this.$api.search(s.searchText, this.room.id, s.searchedIds.length);
+        if (a.length) {
+          channelsHandler.addMessages(this.room.id, a);
+          let searchedIds = this.room.search.searchedIds.concat(a.map(a => a.id));
+          this.store.setSearchTo({
+            roomId: this.room.id,
+            search: {
+              searchActive: s.searchActive,
+              searchedIds,
+              locked: a.length < MESSAGES_PER_SEARCH,
+              searchText: s.searchText
+            } as SearchModel
+          });
+        } else {
+          this.store.setSearchTo({
+            roomId: this.room.id,
+            search: {
+              searchActive: s.searchActive,
+              searchedIds: s.searchedIds,
+              locked: true,
+              searchText: s.searchText
+            }
+          });
         }
+      } else if (!s.searchActive && !this.room.allLoaded) {
+        await this.$ws.sendLoadMessages(this.room.id, this.minIdCalc, n);
       }
     }
 
