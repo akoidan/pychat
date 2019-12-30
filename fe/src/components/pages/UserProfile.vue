@@ -26,10 +26,10 @@
 </template>
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import UserProfileChangePassword from '@/components/pages/UserProfileChangePassword';
-import UserProfileImage from '@/components/pages/UserProfileImage';
-import UserProfileInfo from '@/components/pages/UserProfileInfo';
-import UserProfileSettings from '@/components/pages/UserProfileSettings';
+import UserProfileChangePassword from '@/components/pages/UserProfileChangePassword.vue';
+import UserProfileImage from '@/components/pages/UserProfileImage.vue';
+import UserProfileInfo from '@/components/pages/UserProfileInfo.vue';
+import UserProfileSettings from '@/components/pages/UserProfileSettings.vue';
 
 @Component({components: {UserProfileChangePassword, UserProfileImage, UserProfileInfo, UserProfileSettings}})
 export default class UserProfile extends Vue {

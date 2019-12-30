@@ -75,8 +75,8 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import {State} from '@/utils/storeHolder';
 import {ReceivingFile, FileTransferStatus} from '@/types/model';
 import {bytesToSize} from '@/utils/utils';
-import AppProgressBar from '@/components/ui/AppProgressBar';
-import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
+import AppProgressBar from '@/components/ui/AppProgressBar.vue';
+import ChatMessageHeader from '@/components/chat/ChatMessageHeader.vue';
 import {webrtcApi} from '@/utils/singletons';
 
 @Component({

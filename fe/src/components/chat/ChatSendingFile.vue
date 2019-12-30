@@ -30,9 +30,9 @@ import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {SendingFile, UserModel} from '@/types/model';
 import {bytesToSize} from '@/utils/utils';
-import AppProgressBar from '@/components/ui/AppProgressBar';
-import ChatSendingFileTransfer from '@/components/chat/ChatSendingFileTransfer';
-import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
+import AppProgressBar from '@/components/ui/AppProgressBar.vue';
+import ChatSendingFileTransfer from '@/components/chat/ChatSendingFileTransfer.vue';
+import ChatMessageHeader from '@/components/chat/ChatMessageHeader.vue';
 @Component({
   components: {ChatMessageHeader, ChatSendingFileTransfer, AppProgressBar}
 })

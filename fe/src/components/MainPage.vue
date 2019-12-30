@@ -22,7 +22,7 @@
   </div>
 </template>
 <script lang="ts">
-import AppNav from '@/components/AppNav';
+import AppNav from '@/components/AppNav.vue';
 import {Component, Vue} from 'vue-property-decorator';
 import {
   CurrentUserInfoModel,
@@ -32,7 +32,7 @@ import {
 import NotifierHandler from '@/utils/NotificationHandler';
 import {browserVersion, isChrome, isMobile, notifier} from '@/utils/singletons';
 import {State} from '@/utils/storeHolder';
-import IncomingCall from '@/components/chat/IncomingCall';
+import IncomingCall from '@/components/chat/IncomingCall.vue';
 
 @Component({
   components: {IncomingCall, AppNav}

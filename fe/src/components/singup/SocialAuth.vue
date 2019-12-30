@@ -24,7 +24,7 @@
 <script lang="ts">
 import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/components/ui/AppSubmit';
+import AppSubmit from '@/components/ui/AppSubmit.vue';
 import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from '@/utils/consts';
 import {ApplyGrowlErr, initFaceBook, initGoogle, login} from '@/utils/utils';
 

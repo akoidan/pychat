@@ -120,13 +120,13 @@ class="input" @focus="userFoc = false" @blur="userFoc = true"
 
   import {Vue, Component, Prop, Watch, Ref} from "vue-property-decorator";
   import {State} from '@/utils/storeHolder';
-  import AppSubmit from "@/components/ui/AppSubmit"
+  import AppSubmit from "@/components/ui/AppSubmit.vue"
   import RegisterFieldSet from '@/components/singup/RegisterFieldSet.vue'
   import debounce from 'lodash.debounce';
   import {IconColor} from '@/types/types';
   import sessionHolder from '@/utils/sessionHolder';
   import {ApplyGrowlErr, login} from '@/utils/utils';
-  import SocialAuth from '@/components/singup/SocialAuth';
+  import SocialAuth from '@/components/singup/SocialAuth.vue';
   import {SexModelString} from '@/types/model';
 
   @Component({components: {SocialAuth, AppSubmit, RegisterFieldSet}})

@@ -192,9 +192,9 @@ import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
 import {CallInfoModel, CallsInfoModel} from '@/types/model';
 import {BooleanIdentifier, StringIdentifier, VideoType} from '@/types/types';
 import {webrtcApi} from '@/utils/singletons';
-import ChatRemotePeer from '@/components/chat/ChatRemotePeer';
+import ChatRemotePeer from '@/components/chat/ChatRemotePeer.vue';
 import {file} from '@/utils/audio';
-import VideoObject from '@/components/chat/VideoObject';
+import VideoObject from '@/components/chat/VideoObject.vue';
 @Component({
   components: {VideoObject, ChatRemotePeer}
 })

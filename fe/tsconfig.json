@@ -5,10 +5,8 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": [
-      "websql", "webrtc", "chrome"
-    ],
     "lib": ["es2017", "dom"],
+    "types": ["webrtc", "websql", "chrome"],
     "declaration": false,
     "target": "esnext",
     "emitDecoratorMetadata": true,
@@ -22,14 +20,10 @@
     "noImplicitReturns": true,
     "pretty": true,
     "sourceMap": true,
+    "module": "esnext",
     "strict": true,
     "moduleResolution": "node"
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.vue",
-    "test/*.ts"
-  ],
   "exclude": [
     "node_modules"
   ]

@@ -55,12 +55,12 @@
 <script lang="ts">
 import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppInputRange from '@/components/ui/AppInputRange';
-import AppSubmit from '@/components/ui/AppSubmit';
-import AddUserToRoom from '@/components/pages/parts/AddUserToRoom';
+import AppInputRange from '@/components/ui/AppInputRange.vue';
+import AppSubmit from '@/components/ui/AppSubmit.vue';
+import AddUserToRoom from '@/components/pages/parts/AddUserToRoom.vue';
 import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
 import {AddRoomMessage} from '@/types/messages';
-import AppCheckbox from '@/components/ui/AppCheckbox';
+import AppCheckbox from '@/components/ui/AppCheckbox.vue';
 import {PrivateRoomsIds} from '@/types/types';
 
 @Component({components: {AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})

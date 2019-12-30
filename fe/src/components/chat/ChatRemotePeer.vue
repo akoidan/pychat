@@ -20,8 +20,8 @@
 import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
 import {CallInfoModel} from '@/types/model';
-import AppInputRange from '@/components/ui/AppInputRange';
-import VideoObject from '@/components/chat/VideoObject';
+import AppInputRange from '@/components/ui/AppInputRange.vue';
+import VideoObject from '@/components/chat/VideoObject.vue';
 @Component({
   components: {VideoObject, AppInputRange}
 })

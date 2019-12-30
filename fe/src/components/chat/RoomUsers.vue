@@ -78,9 +78,9 @@
 import {State} from '@/utils/storeHolder';
 import {Component, Vue} from 'vue-property-decorator';
 import {RoomModel, SexModelString, UserDictModel, UserModel} from '@/types/model';
-import RoomUsersUser from '@/components/chat/RoomUsersUser';
-import RoomUsersPublic from '@/components/chat/RoomUsersPublic';
-import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate';
+import RoomUsersUser from '@/components/chat/RoomUsersUser.vue';
+import RoomUsersPublic from '@/components/chat/RoomUsersPublic.vue';
+import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate.vue';
 @Component({
   components: {RoomUsersPrivate, RoomUsersPublic, RoomUsersUser}
 })

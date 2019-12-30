@@ -22,7 +22,7 @@
 
 import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppProgressBar from '@/components/ui/AppProgressBar';
+import AppProgressBar from '@/components/ui/AppProgressBar.vue';
 import {FileTransferStatus, SendingFileTransfer, UserModel} from '@/types/model';
 import {webrtcApi} from '@/utils/singletons';
 

@@ -44,7 +44,7 @@
   import {Prop, Component} from "vue-property-decorator";
   import Vue from 'vue';
   import {State} from '@/utils/storeHolder';
-  import AppSubmit from '@/components/ui/AppSubmit';
+  import AppSubmit from '@/components/ui/AppSubmit.vue';
   import {ApplyGrowlErr} from '@/utils/utils';
 
   @Component({components: {AppSubmit}})

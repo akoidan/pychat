@@ -96,9 +96,9 @@
 <script lang='ts'>
 import {Component, Vue, Watch, Ref} from 'vue-property-decorator';
 
-import RoomUsers from '@/components/chat/RoomUsers';
-import ChatBox from '@/components/chat/ChatBox';
-import SmileyHolder from '@/components/chat/SmileyHolder';
+import RoomUsers from '@/components/chat/RoomUsers.vue';
+import ChatBox from '@/components/chat/ChatBox.vue';
+import SmileyHolder from '@/components/chat/SmileyHolder.vue';
 import {
   CurrentUserInfoModel,
   EditingMessage,
@@ -116,13 +116,13 @@ import {
   pasteHtmlAtCaret,
   pasteImgToTextArea, placeCaretAtEnd, stopVideo, timeToString
 } from '@/utils/htmlApi';
-import NavEditMessage from '@/components/chat/NavEditMessage';
-import NavUserShow from '@/components/chat/NavUserShow';
+import NavEditMessage from '@/components/chat/NavEditMessage.vue';
+import NavUserShow from '@/components/chat/NavUserShow.vue';
 import {sem} from '@/utils/utils';
 import {MessageDataEncode, RemoveSendingMessage, UploadFile} from '@/types/types';
 import {channelsHandler, globalLogger, messageBus, webrtcApi} from '@/utils/singletons';
 import {State} from '@/utils/storeHolder';
-import MediaRecorder from '@/components/chat/MediaRecorder';
+import MediaRecorder from '@/components/chat/MediaRecorder.vue';
 import {Route, RawLocation} from 'vue-router';
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;

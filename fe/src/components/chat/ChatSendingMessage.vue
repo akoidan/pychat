@@ -18,8 +18,8 @@
 <script lang="ts">
 import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import ChatMessage from '@/components/chat/ChatMessage';
-import AppProgressBar from '@/components/ui/AppProgressBar';
+import ChatMessage from '@/components/chat/ChatMessage.vue';
+import AppProgressBar from '@/components/ui/AppProgressBar.vue';
 import {channelsHandler} from '@/utils/singletons';
 import {SetMessageProgressError} from '@/types/types';
 import {

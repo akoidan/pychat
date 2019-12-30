@@ -9,7 +9,7 @@ import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
 import Painter from 'spainter';
 import {messageBus} from '@/utils/singletons';
 import loggerFactory from '@/utils/loggerFactory';
-import AppInputRange from '@/components/ui/AppInputRange';
+import AppInputRange from '@/components/ui/AppInputRange.vue';
 import {Route, RawLocation} from 'vue-router';
 @Component
 export default class PainterPage extends Vue {

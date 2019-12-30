@@ -104,11 +104,11 @@
 <script lang="ts">
 import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/components/ui/AppSubmit';
+import AppSubmit from '@/components/ui/AppSubmit.vue';
 import {CurrentUserInfoModel, SexModelString} from '@/types/model';
 import {UserProfileDto} from '@/types/dto';
 import {currentUserInfoModelToDto, userSettingsDtoToModel} from '@/types/converters';
-import AppInputDate from '@/components/ui/AppInputDate';
+import AppInputDate from '@/components/ui/AppInputDate.vue';
 import {ApplyGrowlErr} from '@/utils/utils';
 import {SetUserProfileMessage} from '@/types/messages';
 

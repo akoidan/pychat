@@ -36,7 +36,7 @@ import {
 } from '@/utils/htmlApi';
 import {sem} from '@/utils/utils';
 import {messageBus} from '@/utils/singletons';
-import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
+import ChatMessageHeader from '@/components/chat/ChatMessageHeader.vue';
 @Component({
   components: {ChatMessageHeader}
 })
