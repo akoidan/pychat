@@ -14,6 +14,7 @@ const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const name = '[name].[ext]?[sha512:hash:base64:6]';
 const child_process = require('child_process');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ELECTRON_DIST_DIRNAME = 'electron_dist';
 const MAIN_DIST_DIRNAME = 'dist';
 const ANDROID_DIST_DIRNAME = 'www';
@@ -193,6 +194,10 @@ const getConfig = async () => {
   plugins = [
     definePlugin,
     new VueLoaderPlugin(),
+    new ForkTsCheckerWebpackPlugin({
+      vue: true,
+      tslint: false,
+    }),
     new CopyWebpackPlugin([
       {from: './src/assets/manifest.json', to: ''},
       {from: './src/assets/recaptcha.html', to: ''},
@@ -266,29 +271,14 @@ const getConfig = async () => {
     ];
   }
 
-  let tsConfig = function () {
-    const res =  [
-      {
-        loader: 'ts-loader',
-        options: {
-          configFile,
-          appendTsSuffixTo: [/\.vue$/]
-        }
-      },
-    ];
-    if (linting) {
-      res.push({
-        loader: 'tslint-loader'
-      })
-    }
-    return res;
-  };
+  const isCoverage = false;
+
   let conf = {
     entry,
     plugins,
     profile: !!options.IS_PROFILE,
     resolve: {
-      extensions: ['.ts', '.js', '.vue'],
+      extensions: ['.ts', '.vue', '.json', ".js", '.png', ".sass"],
       alias: {
         'vue': 'vue/dist/vue.js',
         '@': path.resolve(__dirname, 'src')
@@ -306,8 +296,25 @@ const getConfig = async () => {
       rules: [
         {
           test: /\.ts$/,
-          exclude: /node_modules/,
-          use: tsConfig(),
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                presets: [
+                  'babel-preset-typescript-vue',
+                ],
+                plugins: [
+                  "@babel/plugin-syntax-dynamic-import",
+                  "@babel/plugin-proposal-numeric-separator",
+                  ["@babel/plugin-proposal-decorators", {"legacy": true}],
+                  ["@babel/plugin-proposal-class-properties", {"loose": true}],
+
+                  ...(isCoverage ? ['istanbul'] : []),
+                ],
+                babelrc: false,
+              },
+            },
+          ],
         },
         {
           exclude: /node_modules/,
@@ -365,8 +372,7 @@ const getConfig = async () => {
   };
   if (linting) {
     conf.module.rules.push({
-      enforce: 'pre',
-        test: /\.vue$/,
+      test: /\.(ts|vue)$/,
       loader: 'eslint-loader',
       exclude: /node_modules/
     });
@@ -404,9 +410,23 @@ function getSimpleConfig(mainFile, dist, entry, target) {
       rules: [
         {
           test: /\.ts$/,
-          loader: 'ts-loader',
-          options: {configFile}
-        }
+          use: [
+            {
+              loader: 'babel-loader',
+              options: {
+                presets: [
+                  'babel-preset-typescript-vue',
+                ],
+                plugins: [
+                  "@babel/plugin-proposal-numeric-separator",
+                  ["@babel/plugin-proposal-decorators", {"legacy": true}],
+                  ["@babel/plugin-proposal-class-properties", {"loose": true}],
+                ],
+                babelrc: false,
+              },
+            },
+          ],
+        },
       ]
     },
     plugins: [

@@ -60,13 +60,13 @@
         value="Accept"
         class="green-btn"
         @click="accept"
-      >
+      />
       <input
         type="button"
         value="Decline"
         class="red-btn"
         @click="decline"
-      >
+      />
     </div>
   </div>
 </template>

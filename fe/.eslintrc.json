@@ -1,9 +1,138 @@
 {
   "extends": [
-    "plugin:vue/recommended"
+    "plugin:vue/recommended",
+    "eslint:all",
+    "@vue/typescript",
+    "plugin:@typescript-eslint/all",
+    "plugin:import/errors",
+    "plugin:import/warnings",
+    "plugin:import/typescript",
+    "plugin:sonarjs/recommended"
   ],
+  "plugins": [
+    "only-warn",
+    "babel",
+    "sonarjs"
+  ],
+  "parser": "vue-eslint-parser",
   "parserOptions": {
     "parser": "@typescript-eslint/parser",
-    "sourceType": "module"
-  }
+    "sourceType": "module",
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "init-declarations": 0, // poor choice
+    "one-var": 0, // poor choice
+    "multiline-comment-style": 1, // turned off by default
+    "no-plusplus": 0, // too aggresive
+    "quote-props": [1, "as-needed"],
+    "no-ternary": 0, // to aggressive
+    "multiline-ternary": 0,
+    "new-cap": 0, // babel/new-cap
+    "array-element-newline": [1, "consistent"],
+    "comma-dangle": [1, "always-multiline"],
+    "function-call-argument-newline": [1, "consistent"],
+    "max-len": [1, { "code": 120 }], // override 80 that is too low
+    "padded-blocks": [1, "never"],
+    "babel/new-cap": 1,
+    "babel/camelcase": 1,
+    "babel/no-invalid-this": 1,
+    "no-inline-comments": 0,
+    "babel/object-curly-spacing": 1,
+    "babel/quotes": 1,
+    "babel/semi": 1,
+    "babel/no-unused-expressions": 1,
+    "babel/valid-typeof": 1,
+    "@typescript-eslint/no-untyped-public-signature": 0, // this breaks a lot: constructions public, ES6 setter should have return type etc
+    "@typescript-eslint/ban-ts-ignore": 0, // who cares, we explicitly define it.
+    "@typescript-eslint/space-before-function-paren": [1, "never"],
+    "@typescript-eslint/strict-boolean-expressions": 0,
+    "@typescript-eslint/indent": [1, 2], //replace 4 spaces
+    "@typescript-eslint/no-inferrable-types": 0, // @typescript-eslint/typedef
+    "@typescript-eslint/no-unused-vars-experimental": 0, // doesn't work with vue
+    "import/no-named-as-default": 1, //is not part of default sert
+    "import/no-unresolved": 0,
+    "import/no-relative-parent-imports": 1,
+    "import/dynamic-import-chunkname": 1,
+    "import/exports-last":1,
+    "import/extensions": [1, "never", {"json":  "always", "vue": "always"}], // w/o  extensiosn ts would not work
+    "import/first":1,
+    "import/group-exports": 1,
+    "import/max-dependencies":1,
+    "import/newline-after-import": 1,
+    "import/no-absolute-path":1,
+    "import/no-amd": 1,
+    "import/no-anonymous-default-export":1,
+    "import/no-commonjs": 1,
+    "import/no-cycle":1,
+    "import/no-default-export": 1,
+    "import/no-deprecated":1,
+    "import/no-dynamic-require": 1,
+    "import/no-extraneous-dependencies":1,
+    "import/no-internal-modules": 1,
+    "import/no-mutable-exports":1,
+    "import/no-named-default": 1,
+    "import/no-named-export":0, // we want them
+    "import/no-namespace": 1,
+    "import/no-nodejs-modules":1,
+    "import/no-restricted-paths": 1,
+    "import/no-self-import":1,
+    "import/no-unassigned-import": 1,
+    "import/no-unused-modules":1,
+    "import/no-useless-path-segments": 1,
+    "import/no-webpack-loader-syntax":1,
+    "import/order": 0, // doesn't work with sorted-import
+    "import/prefer-default-export":0, // default exports are hell to IDE refactor support
+    "import/unambiguous": 1,
+    "vue/array-bracket-spacing":1,
+    "vue/arrow-spacing": 1,
+    "vue/block-spacing":1,
+    "vue/brace-style": 1,
+    "vue/camelcase":1,
+    "vue/comma-dangle": 0, // comma-spacing works fine
+    "vue/component-name-in-template-casing":1,
+    "vue/dot-location": 1,
+    "vue/eqeqeq":1,
+    "vue/key-spacing": 1,
+    "vue/keyword-spacing":1,
+    "vue/match-component-file-name": 1,
+    "vue/no-boolean-default":1,
+    "vue/no-deprecated-scope-attribute": 1,
+    "vue/no-empty-pattern":1,
+    "vue/no-restricted-syntax": 1,
+    "vue/object-curly-spacing":1,
+    "vue/require-direct-export": 0, // doesn't work with vue-class-comp
+    "vue/script-indent":1,
+    "vue/space-infix-ops": 1,
+    "vue/space-unary-ops":1,
+    "vue/v-on-function-call": 1,
+    "vue/html-closing-bracket-spacing": [1, {"endTag": "never", "selfClosingTag":  "never", "startTag": "never"}],
+    "vue/v-slot-style":1,
+    "vue/valid-v-slot": 1,
+    "vue/max-attributes-per-line": [1, {
+      "singleline": 3, // don't spawn multiline content of elements, template will grow huge very soon. 3 element is easy to grasp
+      "multiline": {
+        "max": 1,
+        "allowFirstLine": false
+      }
+    }],
+    "vue/html-self-closing": [
+      1,
+      {
+        "html": {
+          "void": "always", // vue-ts template requires valid xml <this> is not valid but <this/> is
+          "normal": "always",
+          "component": "always"
+        }
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["*.vue", "*.d.ts"],
+      "rules": {
+        "import/no-default-export": 0
+      }
+    }
+  ]
 }

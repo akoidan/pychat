@@ -13,7 +13,7 @@
               type="text"
               disabled
               :value="git"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -37,7 +37,7 @@
               v-model="browser"
               class="input"
               type="text"
-            >
+            />
           </td>
         </tr>
       </tbody>

@@ -12,7 +12,7 @@
     :class="inputClass"
     :value="value"
     @input="oninputnative"
-  >
+  />
 </template>
 <script lang="ts">
 import {State} from '@/utils/storeHolder';

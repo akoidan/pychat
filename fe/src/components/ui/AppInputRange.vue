@@ -5,7 +5,7 @@
     :value="value"
     :class="cls"
     @input="oninput"
-  >
+  />
 </template>
 <script lang="ts">
 import {Component, Vue, Prop, Ref} from 'vue-property-decorator';

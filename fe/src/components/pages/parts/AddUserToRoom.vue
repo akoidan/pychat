@@ -20,7 +20,7 @@
         class="input"
         placeholder="Search"
         title="Filter by username"
-      >
+      />
       <ul>
         <li
           v-for="user in filteredUsers"

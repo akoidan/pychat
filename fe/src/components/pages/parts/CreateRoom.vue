@@ -12,7 +12,7 @@
               type="text"
               class="input"
               maxlength="16"
-            >
+            />
           </td>
         </tr>
         <tr>

@@ -17,7 +17,7 @@
               :required="isPublic"
               class="input"
               maxlength="16"
-            >
+            />
             <div v-if="!isPublic && roomName">
               By adding name to this room, you'll make it public
             </div>

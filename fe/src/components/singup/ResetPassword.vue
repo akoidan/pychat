@@ -11,7 +11,7 @@
         placeholder="Username or email"
         name="username_or_password"
         value=""
-      >
+      />
       <div class="slider">
         Enter your username or email
       </div>

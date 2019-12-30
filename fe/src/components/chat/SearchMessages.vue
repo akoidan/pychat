@@ -9,7 +9,7 @@
       v-model.trim="search"
       type="search"
       class="input"
-    >
+    />
     <div class="search-loading" />
     <div
       v-if="searchResultText"

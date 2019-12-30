@@ -14,7 +14,7 @@
     class="profileHolder"
   >
     <div v-if="userProfileInfo.image">
-      <img :src="resolveMediaUrl(userProfileInfo.image)">
+      <img :src="resolveMediaUrl(userProfileInfo.image)"/>
     </div>
     <div class="tableHolder">
       <table>

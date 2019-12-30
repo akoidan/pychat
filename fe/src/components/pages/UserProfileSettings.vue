@@ -82,7 +82,7 @@
               class="lor-btn"
               value="clear now"
               @click="clearHistory"
-            >
+            />
           </td>
         </tr>
         <tr>

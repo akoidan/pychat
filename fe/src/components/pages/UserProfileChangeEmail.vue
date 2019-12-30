@@ -17,7 +17,7 @@
               type="password"
               name="password"
               minlength="3"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -28,7 +28,7 @@
               maxlength="190"
               class="input"
               type="email"
-            >
+            />
           </td>
         </tr>
       </tbody>

@@ -24,14 +24,14 @@
       class="input"
       required
       placeholder="password"
-    >
+    />
     <input
       v-model="repeatPassword"
       type="password"
       class="input"
       required
       placeholder="repeat password"
-    >
+    />
     <app-submit
       class="submit-button"
       value="Submit Password"

@@ -14,7 +14,7 @@
               maxlength="30"
               class="input"
               type="text"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -25,7 +25,7 @@
               maxlength="30"
               class="input"
               type="text"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -36,7 +36,7 @@
               maxlength="50"
               class="input"
               type="text"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -47,7 +47,7 @@
               maxlength="30"
               class="input"
               type="text"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -68,7 +68,7 @@
               maxlength="100"
               class="input"
               type="text"
-            >
+            />
           </td>
         </tr>
         <tr>

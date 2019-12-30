@@ -22,7 +22,7 @@
           :alt="smiley.alt"
           :code="code"
           @click="$emit('add-smiley', code)"
-        >
+        />
       </div>
     </template>
   </div>

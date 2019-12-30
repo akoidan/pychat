@@ -13,7 +13,7 @@
         required
         placeholder="Username/Email"
         name="username"
-      >
+      />
     </div>
     <div>
       <i class="icon-key" />
@@ -24,7 +24,7 @@
         class="input"
         placeholder="Password"
         required
-      >
+      />
     </div>
     <router-link
       class="forg-pass"

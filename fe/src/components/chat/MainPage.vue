@@ -47,7 +47,7 @@
             v-show="!srcVideo"
             src="@/assets/img/audio.svg"
             class="audio-recording-now"
-          >
+          />
         </div>
         <span v-show="!recordingNow">Starting recording...</span>
       </div>
@@ -66,7 +66,7 @@
         accept="image/*,video/*"
         multiple="multiple"
         @change="handleFileSelect"
-      >
+      />
       <i
         class="icon-picture"
         title="Share Video/Image"

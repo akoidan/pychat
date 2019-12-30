@@ -6,7 +6,7 @@
         :src="srcImg"
         @drop.prevent="dropPhoto"
         @click="takeSnapshot"
-      >
+      />
       <video
         v-show="showVideo"
         ref="changeProfileVideo"
@@ -19,19 +19,19 @@
       accept="image/*"
       type="file"
       @change="photoInputChanged"
-    >
+    />
     <input
       type="button"
       class="lor-btn"
       value="Select file"
       @click="selectFile"
-    >
+    />
     <input
       type="button"
       class="lor-btn"
       :value="buttonText"
       @click="startCapturingVideo"
-    >
+    />
     <app-submit
       class="green-btn"
       value="Upload photo"

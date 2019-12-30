@@ -15,7 +15,7 @@
               type="text"
               name="username"
               autocomplete="username"
-            >
+            />
             <input
               v-model="oldPassword"
               autocomplete="password"
@@ -23,7 +23,7 @@
               minlength="3"
               required
               type="password"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -37,7 +37,7 @@
               type="password"
               name="password"
               minlength="3"
-            >
+            />
           </td>
         </tr>
         <tr>
@@ -50,7 +50,7 @@
               class="input"
               type="password"
               minlength="3"
-            >
+            />
           </td>
         </tr>
       </tbody>

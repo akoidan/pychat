@@ -64,7 +64,7 @@
         ref="inputFile"
         type="file"
         @change="sendFile"
-      >
+      />
       <span class="mText">Send File</span>
     </i>
     <i

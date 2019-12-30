@@ -21,7 +21,7 @@
         placeholder="Username"
         name="username"
 class="input" @focus="userFoc = false" @blur="userFoc = true"
-      >
+      />
     </register-field-set>
     <register-field-set
       icon="icon-lock"
@@ -40,7 +40,7 @@ class="input" @focus="userFoc = false" @blur="userFoc = true"
         placeholder="Password"
         @focus="passwordFoc = false"
         @blur="passwordFoc = true"
-      >
+      />
     </register-field-set>
     <register-field-set
       icon="icon-lock"
@@ -58,7 +58,7 @@ class="input" @focus="userFoc = false" @blur="userFoc = true"
         placeholder="Repeat password"
         @focus="repPassFoc = false"
         @blur="repPassFoc = true"
-      >
+      />
     </register-field-set>
     <register-field-set
       icon="icon-mail"
@@ -76,7 +76,7 @@ class="input" @focus="userFoc = false" @blur="userFoc = true"
         class="input"
         @focus="emailFoc = false"
         @blur="emailFoc = true"
-      >
+      />
     </register-field-set>
     <register-field-set
       icon="icon-user-pair"

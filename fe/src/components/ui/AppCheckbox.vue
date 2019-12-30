@@ -6,7 +6,7 @@
       :checked="value"
       type="checkbox"
       @change="onchange"
-    >
+    />
     <label :for="uniqueId" />
   </div>
 </template>

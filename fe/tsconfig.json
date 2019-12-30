@@ -1,37 +1,37 @@
 {
   "compilerOptions": {
-    "lib": ["es2017", "dom"],
-    "module": "esnext",
     "baseUrl": ".",
+    "resolveJsonModule": true,
     "paths": {
       "@/*": ["src/*"]
     },
-    "plugins": [
-      { "transform": "ts-optchain/transform" },
-      { "name": "typescript-tslint-plugin"}
-    ],
-    "moduleResolution": "node",
-    "target": "es5",
-    "sourceMap": true,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
     "types": [
       "websql", "webrtc", "chrome"
     ],
-    "resolveJsonModule": true,
+    "lib": ["es2017", "dom"],
     "declaration": false,
-    "noImplicitAny": true,
+    "target": "esnext",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
     "forceConsistentCasingInFileNames": true,
-    "noEmitOnError": false,
+    "noEmitOnError": false, // without it, webpack wouldn't resolve vue files without exxtension
     "noFallthroughCasesInSwitch": true,
     "noImplicitReturns": true,
     "pretty": true,
-    "strict": true
+    "sourceMap": true,
+    "strict": true,
+    "moduleResolution": "node"
   },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.vue",
+    "test/*.ts"
+  ],
   "exclude": [
     "node_modules"
   ]
 }
+

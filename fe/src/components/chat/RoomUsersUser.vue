@@ -9,7 +9,7 @@
       class="country"
       :src="getFlag(user)"
       :title="title"
-    >
+    />
   </li>
 </template>
 <script lang="ts">

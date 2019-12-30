@@ -7,7 +7,7 @@
       <div class="red">
         {{ errorMessage }}
       </div>
-      <br>
+      <br/>
       <router-link
         v-if="!loading"
         to="/"
