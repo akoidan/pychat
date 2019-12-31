@@ -32,6 +32,10 @@ const sassOptionsGlobal = {
     }
   }
 }
+// const defaultWRite = process.stdout.write;
+// process.stdout.write = function(...arugs) {
+//   defaultWRite.apply(process.stdout, arugs);
+// }
 
 function getDist() {
   if (options.IS_WEB) {
@@ -377,6 +381,7 @@ const getConfig = async () => {
       exclude: /node_modules/
     });
   }
+  conf.stats = getStats();
 
   // if (options.IS_PROD) {
   //   const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
@@ -388,10 +393,14 @@ const getConfig = async () => {
 
 };
 
+function getStats() {
+  return !options.IS_PROD ? 'errors-warnings': 'normal';
+}
 
 function getSimpleConfig(mainFile, dist, entry, target) {
   return {
     entry,
+    stats: getStats(),
     target,
     resolve: {
       extensions: ['.ts', '.vue', '.json', ".js", '.png', ".sass"],
@@ -465,21 +474,29 @@ async function runElectron(mainPath) {
 function runWebpack(config) {
   return new Promise((resolve, reject) => {
     webpack(config, (err, stats) => {
-      process.stdout.write('\x1Bc');
-      console.log(stats.toString({
-        chunks: false,  // Makes the build much quieter
-        colors: true    // Shows colors in the console
-      }));
+
+      const statsString = stats.toString(getStats());
+
+      // displayStats only logged
+      if (statsString.trim().length) {
+        if (stats.hasErrors()) {
+          log.error(statsString);
+        } else if (stats.hasWarnings()) {
+          log.warn(statsString);
+        } else {
+          log.info(statsString);
+        }
+      }
+
       if (options.IS_PROFILE) {
         fs.writeFile("compilation-stats.json", JSON.stringify(stats.toJson(), null, 2), function(err) {
           if(err) {
             return console.log(err);
           }
 
-          console.log("The file was saved!");
+          console.log("written compilation-stats.json");
         });
       }
-      console.log(Date.now());
       if (err) {
         reject(err);
       }
@@ -515,6 +532,7 @@ async function setup() {
       public: `https://localhost:${DEV_PORT}`,
       historyApiFallback: true,
       inline: true,
+      stats: getStats(),
       host: '0.0.0.0',
       port: DEV_PORT,
       http2: options.IS_SSL,
