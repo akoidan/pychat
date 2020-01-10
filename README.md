@@ -112,18 +112,8 @@ If you don't or unable to run docker you can alway do the setup w/o it. You defi
  - Follow [Bootstrap files](#bootstrap-files) flow.
  - I preconfigued native setup for domain `pychat.org`, you want to replace all occurrences of `pychat.org` in [rootfs](rootfs) directory for your domain. To simplify replacing use my script: `./download_content.sh rename_domain your.new.domain.com`. Also check `rootfs/etc/nginx/sites-enabled/pychat.conf` if `server_name` section is correct after renaming.
  - HTTPS is required for webrtc calls so you need to enable ssl:
-   - Obtain ceritifcate.
-       - Register online. There're a lot of free and paid services. Like comodo or startssl(only 1 year free). Here's instructions for startssl.
-         - Follow the instructions in https://www.startssl.com.
-         - Start postfix service (it's required to verify that you have access to domain)
-         - Send validation email to domain `webmaster@pychat.org`
-         - Apply verification code from `/root/Maildir/new/<<time>>` (you may also need to  disable ssl in /etc/postfix/main.cf since it's enabled by default).
-         - You can generate server.key and get certificate from  https://www.startssl.com/Certificates/ApplySSLCert .
-       - Generate custom certificate.
-         - execute `./download_content.sh generate_certificate`
-         - You can also generate them manually and put into `./rootfs/etc/nginx/ssl/server.key` and `./rootfs/etc/nginx/ssl/certificate.crt`
-   - Now you got certificate and you want to put files according to [pychat.conf](rootfs/etc/nginx/sites-enabled/pychat.conf) ssl_certificate/ssl_certificate_key. Copy server key into `./rootfs/etc/nginx/ssl/server.key` and certificate into `./rootfs/etc/nginx/ssl/certificate.crt`.
-   - Don't forget to change owner of files to http user `chown -R http:http /etc/nginx/ssl/`
+   - Either create your certificates and put according to [pychat.conf](rootfs/etc/nginx/sites-enabled/pychat.conf) ssl_certificate/ssl_certificate_key.
+   - Either use something like [certbot](https://certbot.eff.org/lets-encrypt/arch-nginx)
  - Copy config files to rootfs with  `sh download_content.sh copy_root_fs`. 
  - Don't forget to change the owner of current (project) directory to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`.
  - Generate postfix postman: `install -d -m 0555 -o postfix -g postfix /etc/postfix/virtual; postmap /etc/postfix/virtual;`
