@@ -19,6 +19,7 @@ fe/www/*
 photos
 fe/npm.lock
 django.db
+downloading_photos
 chat/migrations
 .venv
 video.txt
