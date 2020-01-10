@@ -201,11 +201,10 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 ## Bootstrap files:
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
  2. Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. Modify file according to the comments in it.
- 3. Install VirtualEnv if you don't have it. `pip install virtualenv`. 
- 4. Create virtualEnv `virtualenv --system-site-packages .venv` and activate it: `source .venv/bin/activate`
- 5. Install python packages with `pip install -r requirements.txt`.
- 6. Create database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`.If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
- 7. Fill database with tables: `bash download_content.sh create_django_tables`
+ 3. Create virtualEnv `python3 -m venv --system-site-packages .venv` and activate it: `source .venv/bin/activate`
+ 4. Install python packages with `pip install -r requirements.txt`.
+ 5. Create database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci" | mysql`.If you need to add remote access to mysql: `CREATE USER 'root'@'192.168.1.0/255.255.255.0';` `GRANT ALL ON * TO root@'192.168.1.0/255.255.255.0';`
+ 6. Fill database with tables: `bash download_content.sh create_django_tables`
 
 
 ## Configure IDEs if you use it:
