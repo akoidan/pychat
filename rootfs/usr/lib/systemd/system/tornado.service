@@ -2,7 +2,7 @@
     Description=Tornado supervisor
 [Service]
     Type=oneshot
-    ExecStart=/srv/http/pychat/manage.py flush_online
+    ExecStart=/srv/http/pychat/.venv/bin/python /srv/http/pychat/manage.py flush_online
     RemainAfterExit=yes
     User=http
 
