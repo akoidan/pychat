@@ -10,7 +10,7 @@
       type="search"
       class="input"
     />
-    <div class="search-loading" />
+    <div class="search-loading"/>
     <div
       v-if="searchResultText"
       class="search_result"
@@ -20,28 +20,26 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import debounce from 'lodash.debounce';
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-import {RoomModel, SearchModel} from '@/types/model';
-import {MessageModelDto} from '@/types/dto';
-import {channelsHandler} from '@/utils/singletons';
-import {SetSearchTo} from '@/types/types';
-import {MESSAGES_PER_SEARCH} from '@/utils/consts';
+import {State} from "@/utils/storeHolder";
+import debounce from "lodash.debounce";
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import {RoomModel, SearchModel} from "@/types/model";
+import {MessageModelDto} from "@/types/dto";
+import {channelsHandler} from "@/utils/singletons";
+import {SetSearchTo} from "@/types/types";
+import {MESSAGES_PER_SEARCH} from "@/utils/consts";
 
-const START_TYPING = 'Start typing and messages will appear';
+const START_TYPING = "Start typing and messages will appear";
 
 @Component
 export default class SearchMessages extends Vue {
-
   get searchResultText() {
     if (this.searchResult) {
       return this.searchResult;
     } else if (!this.room.search.locked) {
-      return 'More messages are available, scroll top to load them';
-    } else {
-      return '';
+      return "More messages are available, scroll top to load them";
     }
+    return "";
   }
 
   get searchActive() {
@@ -54,16 +52,21 @@ export default class SearchMessages extends Vue {
   public inputSearch!: HTMLInputElement;
 
   public debouncedSearch!: Function;
-  public search: string = '';
+
+  public search: string = "";
+
   public offset: number = 0;
+
   public currentRequest: XMLHttpRequest|null = null;
-  public searchResult: string = '';
+
+  public searchResult: string = "";
+
   public searchedIds = [];
 
-  @Watch('searchActive')
+  @Watch("searchActive")
   public onSearchActiveChange(value: boolean) {
     if (value) {
-      this.$nextTick(function () {
+      this.$nextTick(function() {
         this.inputSearch.focus();
       });
     }
@@ -80,17 +83,17 @@ export default class SearchMessages extends Vue {
   public async doSearch(search: string) {
     if (search) {
       try {
-       const a: MessageModelDto[] = await  this.$api.search(search, this.room.id, this.offset, r => this.currentRequest = r);
-       this.logger.debug('http response {} {}', a)();
-       this.currentRequest = null;
-       if (a.length) {
+        const a: MessageModelDto[] = await this.$api.search(search, this.room.id, this.offset, (r) => this.currentRequest = r);
+        this.logger.debug("http response {} {}", a)();
+        this.currentRequest = null;
+        if (a.length) {
           channelsHandler.addMessages(this.room.id, a);
           const ids = this.room.search.searchedIds.concat([]);
-          this.mutateSearchedIds(a.map(a => a.id), search);
-          this.searchResult = '';
+          this.mutateSearchedIds(a.map((a) => a.id), search);
+          this.searchResult = "";
         } else {
           this.mutateSearchedIds([], search);
-          this.searchResult = 'No results found';
+          this.searchResult = "No results found";
         }
       } catch (e) {
         this.searchResult = e;
@@ -102,7 +105,7 @@ export default class SearchMessages extends Vue {
     }
   }
 
-  @Watch('search')
+  @Watch("search")
   public onSearchChange(search: string) {
     if (this.currentRequest) {
       this.currentRequest.abort();
@@ -116,11 +119,11 @@ export default class SearchMessages extends Vue {
       searchActive: this.searchActive,
       searchedIds,
       searchText,
-      locked: searchedIds.length < MESSAGES_PER_SEARCH
+      locked: searchedIds.length < MESSAGES_PER_SEARCH,
     };
     this.store.setSearchTo({
       roomId: this.room.id,
-      search
+      search,
     } as SetSearchTo);
   }
 }

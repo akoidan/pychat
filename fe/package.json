@@ -18,6 +18,9 @@
     "publish": "yarn run prod && yarn run cp-prod-files",
     "test": "mocha test/index.ts",
     "clean": "rm -rf ./node_modules/.cache",
+    "lint:style": "stylelint 'src/**/*.vue' 'src/**/*.sass'",
+    "lint:es": "eslint --ext .ts,.vue --max-warnings=0 src",
+    "lint": "run-s -c lint:style lint:es",
     "stats": "PROFILE=true PLATFORM=web BUILD_MODE=production node ./builder.js && webpack-bundle-analyzer ./compilation-stats.json"
   },
   "cordova": {
@@ -41,7 +44,7 @@
   "devDependencies": {
     "@babel/plugin-proposal-class-properties": "7.7.4",
     "@babel/plugin-proposal-decorators": "7.7.4",
-    "@babel/plugin-proposal-numeric-separator": "^7.7.4",
+    "@babel/plugin-proposal-numeric-separator": "7.7.4",
     "@babel/plugin-syntax-dynamic-import": "7.7.4",
     "@babel/preset-env": "7.7.7",
     "@cypress/code-coverage": "1.10.4",

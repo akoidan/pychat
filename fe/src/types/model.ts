@@ -1,8 +1,8 @@
 export enum GrowlType {
-  SUCCESS = 'col-success', INFO = 'col-info', ERROR = 'col-error'
+  SUCCESS = "col-success", INFO = "col-info", ERROR = "col-error"
 }
 
-export  interface GrowlModel {
+export interface GrowlModel {
   id: number;
   html: string;
   type: GrowlType;
@@ -43,7 +43,7 @@ export interface CurrentUserInfoModel {
   sex: SexModelString;
 }
 
-export type SexModelString = 'Secret' | 'Male' | 'Female';
+export type SexModelString = "Secret" | "Male" | "Female";
 
 export interface UserModel {
   user: string;
@@ -59,7 +59,7 @@ export interface Location {
   region: string|null;
 }
 
-export  interface FileModel {
+export interface FileModel {
   id: number|null;
   url: string|null;
   type: string;
@@ -76,7 +76,7 @@ export interface MessageTransferInfo {
   error: string|null;
 }
 
-export  interface MessageModel {
+export interface MessageModel {
   id: number;
   time: number;
   files: {[id: string]: FileModel}| null; // THIS IS STRING, not number!!
@@ -162,7 +162,7 @@ export interface CallsInfoModel {
   calls: { [id: string]: CallInfoModel };
   callContainer: boolean;
   showMic: boolean;
-  currentMicLevel: number; // voice
+  currentMicLevel: number; // Voice
   mediaStreamLink: string|null;
   currentMic: string|null;
   currentSpeaker: string|null;
@@ -175,8 +175,8 @@ export interface CallsInfoModel {
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
   callInfo: CallsInfoModel;
-  sendingFiles:  { [id: string]: SendingFile };
-  receivingFiles:  { [id: string]: ReceivingFile };
+  sendingFiles: { [id: string]: SendingFile };
+  receivingFiles: { [id: string]: ReceivingFile };
   messages: { [id: number]: MessageModel };
   allLoaded: boolean;
   search: SearchModel;

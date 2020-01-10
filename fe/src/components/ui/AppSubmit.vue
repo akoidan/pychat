@@ -7,22 +7,23 @@
       v-if="running"
       class="spinner"
     />
-    <slot />{{ value }}
+    <slot/>{{ value }}
   </button>
 </template>
 
 <script lang='ts'>
-import {Vue, Component, Prop} from 'vue-property-decorator';
+import {Component, Prop, Vue} from "vue-property-decorator";
 
 @Component
 export default class AppSubmit extends Vue {
   @Prop()
   public readonly value!: string;
+
   @Prop()
   public readonly running!: boolean;
 
   get btnClass(): string {
-    return this.running ? 'sp-loading' : '';
+    return this.running ? "sp-loading" : "";
   }
 }
 </script>

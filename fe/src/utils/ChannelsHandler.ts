@@ -1,9 +1,9 @@
-import loggerFactory from '@/utils/loggerFactory';
-import Api from '@/utils/api';
-import Vue from 'vue';
-import MessageHandler, {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
-import {checkAndPlay, incoming, login, logout, outgoing} from '@/utils/audio';
-import faviconUrl from '@/assets/img/favicon.ico';
+import loggerFactory from "@/utils/loggerFactory";
+import Api from "@/utils/api";
+import Vue from "vue";
+import MessageHandler, {HandlerType, HandlerTypes} from "@/utils/MesageHandler";
+import {checkAndPlay, incoming, login, logout, outgoing} from "@/utils/audio";
+import faviconUrl from "@/assets/img/favicon.ico";
 
 import {
   ChangeOnlineEntry,
@@ -14,17 +14,17 @@ import {
   SetMessageProgressError,
   SetRoomsUsers,
   SetUploadProgress,
-  UploadFile
-} from '@/types/types';
+  UploadFile,
+} from "@/types/types";
 import {
   CurrentUserInfoModel,
   MessageModel,
   RoomDictModel,
   RoomModel,
   UserDictModel,
-  UserModel
-} from '@/types/model';
-import {Logger} from 'lines-logger';
+  UserModel,
+} from "@/types/model";
+import {Logger} from "lines-logger";
 import {
   AddInviteMessage,
   AddOnlineUserMessage,
@@ -36,47 +36,53 @@ import {
   InviteUserMessage,
   LeaveUserMessage,
   LoadMessages,
-  RemoveOnlineUserMessage
-} from '@/types/messages';
-import {FileModelDto, MessageModelDto, RoomDto, UserDto} from '@/types/dto';
-import {convertFiles, convertUser, getRoomsBaseDict} from '@/types/converters';
-import WsHandler from '@/utils/WsHandler';
-import NotifierHandler from '@/utils/NotificationHandler';
-import {sub} from '@/utils/sub';
-import {DefaultStore} from '@/utils/store';
+  RemoveOnlineUserMessage,
+} from "@/types/messages";
+import {FileModelDto, MessageModelDto, RoomDto, UserDto} from "@/types/dto";
+import {convertFiles, convertUser, getRoomsBaseDict} from "@/types/converters";
+import WsHandler from "@/utils/WsHandler";
+import NotifierHandler from "@/utils/NotificationHandler";
+import {sub} from "@/utils/sub";
+import {DefaultStore} from "@/utils/store";
 
 export default class ChannelsHandler extends MessageHandler {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes = {
-    init: <HandlerType>this.init,
-    internetAppear: <HandlerType>this.internetAppear,
-    loadMessages: <HandlerType>this.loadMessages,
-    deleteMessage: <HandlerType>this.deleteMessage,
-    editMessage: <HandlerType>this.editMessage,
-    addOnlineUser: <HandlerType>this.addOnlineUser,
-    removeOnlineUser: <HandlerType>this.removeOnlineUser,
-    printMessage: <HandlerType>this.printMessage,
-    deleteRoom: <HandlerType>this.deleteRoom,
-    leaveUser: <HandlerType>this.leaveUser,
-    addRoom: <HandlerType>this.addRoom,
-    inviteUser: <HandlerType>this.inviteUser,
-    addInvite: <HandlerType>this.addInvite
+    init: <HandlerType> this.init,
+    internetAppear: <HandlerType> this.internetAppear,
+    loadMessages: <HandlerType> this.loadMessages,
+    deleteMessage: <HandlerType> this.deleteMessage,
+    editMessage: <HandlerType> this.editMessage,
+    addOnlineUser: <HandlerType> this.addOnlineUser,
+    removeOnlineUser: <HandlerType> this.removeOnlineUser,
+    printMessage: <HandlerType> this.printMessage,
+    deleteRoom: <HandlerType> this.deleteRoom,
+    leaveUser: <HandlerType> this.leaveUser,
+    addRoom: <HandlerType> this.addRoom,
+    inviteUser: <HandlerType> this.inviteUser,
+    addInvite: <HandlerType> this.addInvite,
   };
+
   private readonly store: DefaultStore;
+
   private readonly api: Api;
+
   private readonly ws: WsHandler;
+
   private readonly sendingMessage: { [id: number]: { cb(): void; files: UploadFile[] }; cb?(ids: number[]): void } = {};
+
   private readonly notifier: NotifierHandler;
-  private readonly messageBus:  Vue;
+
+  private readonly messageBus: Vue;
 
   constructor(store: DefaultStore, api: Api, ws: WsHandler, notifier: NotifierHandler, messageBus: Vue) {
     super();
     this.store = store;
     this.api = api;
-    sub.subscribe('channels', this);
-    sub.subscribe('lan', this);
-    this.logger = loggerFactory.getLoggerColor('chat', '#940500');
+    sub.subscribe("channels", this);
+    sub.subscribe("lan", this);
+    this.logger = loggerFactory.getLoggerColor("chat", "#940500");
     this.ws = ws;
     this.messageBus = messageBus;
     this.notifier = notifier;
@@ -88,104 +94,103 @@ export default class ChannelsHandler extends MessageHandler {
 
       return true;
     } else if (!messageId) {
-      this.logger.warn('Got unknown message {}', messageId)();
+      this.logger.warn("Got unknown message {}", messageId)();
 
       return false;
-    } else {
-      throw Error(`Unknown message ${messageId}`);
     }
+    throw Error(`Unknown message ${messageId}`);
   }
 
   public removeAllSendingMessages() {
-    const length = Object.keys(this.sendingMessage).length;
+    const {length} = Object.keys(this.sendingMessage);
     for (const k in this.sendingMessage) {
       this.removeSendingMessage(parseInt(k));
     }
-    this.logger.log('Flushed {} sending messages', length);
+    this.logger.log("Flushed {} sending messages", length);
   }
 
   public resendMessage(id: number) {
-    this.logger.log('resending message {} ', id)();
-    const cb = this.sendingMessage[id].cb;
+    this.logger.log("resending message {} ", id)();
+    const {cb} = this.sendingMessage[id];
     cb();
   }
 
   public getMessageFiles(messageId: number): UploadFile[] {
     if (this.sendingMessage[messageId]) {
       return this.sendingMessage[messageId].files;
-    } else {
-      return [];
     }
+    return [];
   }
 
   public sendDeleteMessage(id: number, originId: number): void {
     this.sendingMessage[originId] = {
       cb: () => this.ws.sendEditMessage(null, id, null, originId),
-      files: []
+      files: [],
     };
     this.sendingMessage[originId].cb();
   }
 
   public sendEditMessage(content: string, roomId: number, id: number, uploadfiles: UploadFile[]): void {
-    this.uploadAndSend(id, (filesIds: number[]) => {
-      return () => this.ws.sendEditMessage(content, id, filesIds, id); // TODO
-    },                 () => {
-      this.sendEditMessage(content, roomId, id, uploadfiles);
-    },                 uploadfiles, roomId);
+    this.uploadAndSend(
+      id, (filesIds: number[]) => () => this.ws.sendEditMessage(content, id, filesIds, id) // TODO
+      , () => {
+        this.sendEditMessage(content, roomId, id, uploadfiles);
+      }, uploadfiles, roomId,
+    );
   }
 
   public sendSendMessage(
-      content: string,
-      roomId: number,
-      uploadfiles: UploadFile[],
-      originId: number,
-      originTime: number
+    content: string,
+    roomId: number,
+    uploadfiles: UploadFile[],
+    originId: number,
+    originTime: number,
   ): void {
     this.uploadAndSend(
-        originId,
-        (filesIds) => {
-          return () => this.ws.sendSendMessage(content, roomId, filesIds, originId, Date.now() - originTime);
-        }, () => {
-          this.sendSendMessage(content, roomId, uploadfiles, originId, originTime);
-        },
-        uploadfiles,
-        roomId
+      originId,
+      (filesIds) => () => this.ws.sendSendMessage(content, roomId, filesIds, originId, Date.now() - originTime),
+      () => {
+        this.sendSendMessage(content, roomId, uploadfiles, originId, originTime);
+      },
+      uploadfiles,
+      roomId,
     );
   }
 
   public async uploadFiles(
-      messageId: number,
-      roomId: number,
-      files: UploadFile[]
+    messageId: number,
+    roomId: number,
+    files: UploadFile[],
   ): Promise<number[]> {
     let size: number = 0;
-    files.forEach(f => size += f.file.size);
+    files.forEach((f) => size += f.file.size);
     const sup: SetUploadProgress = {
       upload: {
         total: size,
-        uploaded: 0
+        uploaded: 0,
       },
       messageId,
-      roomId
+      roomId,
     };
     this.store.setUploadProgress(sup);
     try {
-      const res: number[] = await this.api.uploadFiles(files, evt => {
+      const res: number[] = await this.api.uploadFiles(files, (evt) => {
         if (evt.lengthComputable) {
           const payload: SetMessageProgress = {
             messageId,
             roomId,
-            uploaded: evt.loaded
+            uploaded: evt.loaded,
           };
           this.store.setMessageProgress(payload);
         }
       });
       const newVar: RemoveMessageProgress = {
-        messageId, roomId
+        messageId,
+        roomId,
       };
       this.store.removeMessageProgress(newVar);
       if (!res || !res.length) {
-        throw Error('Missing files uploads');
+        throw Error("Missing files uploads");
       }
 
       return res;
@@ -193,34 +198,34 @@ export default class ChannelsHandler extends MessageHandler {
       const newVar: SetMessageProgressError = {
         messageId,
         roomId,
-        error
+        error,
       };
       this.store.setMessageProgressError(newVar);
       throw error;
     }
-
   }
 
   public addMessages(roomId: number, inMessages: MessageModelDto[]) {
     const oldMessages: { [id: number]: MessageModel } = this.store.roomsDict[roomId].messages;
-    const newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessages[i.id]);
+    const newMesages: MessageModelDto[] = inMessages.filter((i) => !oldMessages[i.id]);
     const messages: MessageModel[] = newMesages.map(this.getMessage.bind(this));
-    this.store.addMessages({messages, roomId: roomId});
+    this.store.addMessages({messages,
+      roomId});
   }
 
   public initUsers(users: UserDto[]) {
-    this.logger.debug('set users {}', users)();
+    this.logger.debug("set users {}", users)();
     const um: UserDictModel = {};
-    users.forEach(u => {
+    users.forEach((u) => {
       um[u.userId] = convertUser(u);
     });
     this.store.setUsers(um);
   }
 
   public initRooms(rooms: RoomDto[]) {
-    this.logger.debug('Setting rooms')();
+    this.logger.debug("Setting rooms")();
     const storeRooms: RoomDictModel = {};
-    const roomsDict: RoomDictModel = this.store.roomsDict;
+    const {roomsDict} = this.store;
     rooms.forEach((newRoom: RoomDto) => {
       const oldRoom = roomsDict[newRoom.roomId];
       const rm: RoomModel = getRoomsBaseDict(newRoom, oldRoom);
@@ -256,22 +261,22 @@ export default class ChannelsHandler extends MessageHandler {
   private deleteMessage(inMessage: DeleteMessage) {
     let message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
-      this.logger.debug('Unable to find message {} to delete it', inMessage)();
+      this.logger.debug("Unable to find message {} to delete it", inMessage)();
     } else {
       message = {
         id: message.id,
         time: message.time,
         files: message.files,
-        content: message.content || null,
-        symbol: message.symbol || null,
+        content: message.content ?? null,
+        symbol: message.symbol ?? null,
         edited: inMessage.edited,
         roomId: message.roomId,
         userId: message.userId,
         transfer: null,
-        giphy: message.giphy || null,
-        deleted: true
+        giphy: message.giphy ?? null,
+        deleted: true,
       };
-      this.logger.debug('Adding message to storage {}', message)();
+      this.logger.debug("Adding message to storage {}", message)();
       this.store.addMessage(message);
       if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
         const removed = this.removeSendingMessage(inMessage.messageId);
@@ -282,10 +287,10 @@ export default class ChannelsHandler extends MessageHandler {
   private editMessage(inMessage: EditMessage) {
     const message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
-      this.logger.debug('Unable to find message {} to edit it', inMessage)();
+      this.logger.debug("Unable to find message {} to edit it", inMessage)();
     } else {
       const message: MessageModel = this.getMessage(inMessage);
-      this.logger.debug('Adding message to storage {}', message)();
+      this.logger.debug("Adding message to storage {}", message)();
       this.store.addMessage(message);
       if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
         const removed = this.removeSendingMessage(inMessage.messageId);
@@ -315,15 +320,15 @@ export default class ChannelsHandler extends MessageHandler {
       }
       const rmMes: RemoveSendingMessage = {
         messageId: inMessage.messageId,
-        roomId: inMessage.roomId
+        roomId: inMessage.roomId,
       };
       this.store.deleteMessage(rmMes);
     }
     const message: MessageModel = this.getMessage(inMessage);
-    this.logger.debug('Adding message to storage {}', message)();
+    this.logger.debug("Adding message to storage {}", message)();
     this.store.addMessage(message);
-    const activeRoom: RoomModel | null = this.store.activeRoom;
-    const activeRoomId = activeRoom && activeRoom.id; // if no channels page first
+    const {activeRoom} = this.store;
+    const activeRoomId = activeRoom?.id; // If no channels page first
     const room = this.store.roomsDict[inMessage.roomId];
     const userInfo: CurrentUserInfoModel = this.store.userInfo!;
     const isSelf = inMessage.userId === userInfo.userId;
@@ -341,15 +346,15 @@ export default class ChannelsHandler extends MessageHandler {
         }
       }
       this.notifier.showNotification(title, {
-        body: inMessage.content || 'Image',
+        body: inMessage.content || "Image",
         replaced: 1,
         data: {
           replaced: 1,
           title,
-          roomId: inMessage.roomId
+          roomId: inMessage.roomId,
         },
         requireInteraction: true,
-        icon
+        icon,
       });
     }
 
@@ -361,14 +366,14 @@ export default class ChannelsHandler extends MessageHandler {
       }
     }
 
-    this.messageBus.$emit('scroll');
+    this.messageBus.$emit("scroll");
   }
 
   private deleteRoom(message: DeleteRoomMessage) {
     if (this.store.roomsDict[message.roomId]) {
       this.store.deleteRoom(message.roomId);
     } else {
-      this.logger.error('Unable to find room {} to delete', message.roomId)();
+      this.logger.error("Unable to find room {} to delete", message.roomId)();
     }
   }
 
@@ -376,11 +381,11 @@ export default class ChannelsHandler extends MessageHandler {
     if (this.store.roomsDict[message.roomId]) {
       const m: SetRoomsUsers = {
         roomId: message.roomId,
-        users: message.users
+        users: message.users,
       };
       this.store.setRoomsUsers(m);
     } else {
-      this.logger.error('Unable to find room {} to kick user', message.roomId)();
+      this.logger.error("Unable to find room {} to kick user", message.roomId)();
     }
   }
 
@@ -391,7 +396,7 @@ export default class ChannelsHandler extends MessageHandler {
   private inviteUser(message: InviteUserMessage) {
     this.store.setRoomsUsers({
       roomId: message.roomId,
-      users: message.users
+      users: message.users,
     } as SetRoomsUsers);
   }
 
@@ -401,7 +406,7 @@ export default class ChannelsHandler extends MessageHandler {
 
   private addChangeOnlineEntry(userId: number, time: number, isWentOnline: boolean) {
     const roomIds: number[] = [];
-    this.store.roomsArray.forEach(r => {
+    this.store.roomsArray.forEach((r) => {
       if (r.users.indexOf(userId)) {
         roomIds.push(r.id);
       }
@@ -411,8 +416,8 @@ export default class ChannelsHandler extends MessageHandler {
       changeOnline: {
         isWentOnline,
         time,
-        userId
-      }
+        userId,
+      },
     };
 
     // TODO Uncaught TypeError: Cannot read property 'onlineChangeSound' of null
@@ -423,31 +428,30 @@ export default class ChannelsHandler extends MessageHandler {
   }
 
   private async uploadAndSend(
-      originId: number,
-      getSendFilesToWsCB: (args: number[]) => () => void,
-      repeatWithoutFiles: () => void,
-      uploadFiles: UploadFile[],
-      roomId: number
+    originId: number,
+    getSendFilesToWsCB: (args: number[]) => () => void,
+    repeatWithoutFiles: () => void,
+    uploadFiles: UploadFile[],
+    roomId: number,
   ): Promise<void> {
     let fileIds: number[] = [];
     if (uploadFiles.length) {
       try {
         fileIds = await this.uploadFiles(originId, roomId, uploadFiles);
       } catch (e) {
-        this.logger.error('Uploading error, scheduling cb')();
+        this.logger.error("Uploading error, scheduling cb")();
         this.sendingMessage[originId] = {
           cb: repeatWithoutFiles, // TODO
-          files: uploadFiles
+          files: uploadFiles,
         };
         throw e;
       }
     }
     this.sendingMessage[originId] = {
       cb: getSendFilesToWsCB(fileIds),
-      files: uploadFiles
+      files: uploadFiles,
     };
     this.sendingMessage[originId].cb();
-
   }
 
   private mutateRoomAddition(message: AddRoomBase) {
@@ -467,8 +471,7 @@ export default class ChannelsHandler extends MessageHandler {
       userId: message.userId,
       transfer: null,
       giphy: message.giphy || null,
-      deleted: message.deleted || false
+      deleted: message.deleted || false,
     };
   }
-
 }

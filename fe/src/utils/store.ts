@@ -1,7 +1,7 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
+import Vue from "vue";
+import Vuex from "vuex";
 
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from "@/utils/loggerFactory";
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
@@ -17,8 +17,8 @@ import {
   SendingFile,
   SendingFileTransfer,
   UserDictModel,
-  UserModel
-} from '@/types/model';
+  UserModel,
+} from "@/types/model";
 import {
   AddSendingFileTransfer,
   BooleanIdentifier,
@@ -43,14 +43,14 @@ import {
   SetSendingFileStatus,
   SetSendingFileUploaded,
   SetUploadProgress,
-  StringIdentifier
-} from '@/types/types';
-import {SetRooms} from '@/types/dto';
-import {encodeHTML} from '@/utils/htmlApi';
-import {ALL_ROOM_ID} from '@/utils/consts';
-import {Action, Module, Mutation, VuexModule} from 'vuex-module-decorators';
+  StringIdentifier,
+} from "@/types/types";
+import {SetRooms} from "@/types/dto";
+import {encodeHTML} from "@/utils/htmlApi";
+import {ALL_ROOM_ID} from "@/utils/consts";
+import {Action, Module, Mutation, VuexModule} from "vuex-module-decorators";
 
-const logger = loggerFactory.getLoggerColor('store', '#6a6400');
+const logger = loggerFactory.getLoggerColor("store", "#6a6400");
 
 Vue.use(Vuex);
 
@@ -58,23 +58,23 @@ function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const mediaLinkIdGetter: Function = (function () {
+const mediaLinkIdGetter: Function = (function() {
   let i = 0;
 
-  return function () {
+  return function() {
     return String(i++);
   };
-})();
+}());
 
 export const vueStore = new Vuex.Store({
   state: {},
   mutations: {},
-  actions: {}
+  actions: {},
 });
 
 function Validate(target: unknown, propertyKey: string, descriptor: PropertyDescriptor) {
   const original = descriptor.value;
-  descriptor.value = function (...args: unknown[]) {
+  descriptor.value = function(...args: unknown[]) {
     try {
       original.apply(this, args);
     } catch (e) {
@@ -86,29 +86,46 @@ function Validate(target: unknown, propertyKey: string, descriptor: PropertyDesc
 @Module({
   dynamic: true,
   namespaced: true,
-  name: 'default',
-  store: vueStore
+  name: "default",
+  store: vueStore,
 })
 export class DefaultStore extends VuexModule {
-
   public storage: IStorage = null as unknown as IStorage; // We proxy this as soon as we created Storage
+
   public isOnline: boolean = false;
+
   public growls: GrowlModel[] = [];
+
   public dim: boolean = false;
+
   public incomingCall: IncomingCallModel | null = null;
+
   public microphones: { [id: string]: string } = {};
+
   public speakers: { [id: string]: string } = {};
+
   public webcams: { [id: string]: string } = {};
+
   public editedMessage: EditingMessage | null = null;
+
   public activeRoomId: number | null = null;
+
   public activeUserId: number | null = null;
+
   public userInfo: CurrentUserInfoModel | null = null;
+
   public userSettings: CurrentUserSettingsModel | null = null;
+
   public userImage: string | null = null;
+
   public allUsersDict: UserDictModel = {};
+
   public regHeader: string | null = null;
+
   public online: number[] = [];
+
   public roomsDict: RoomDictModel = {};
+
   public mediaObjects: { [id: string]: MediaStream } = {};
 
   get userName(): (id: number) => string {
@@ -116,8 +133,8 @@ export class DefaultStore extends VuexModule {
   }
 
   get privateRooms(): RoomModel[] {
-    const roomModels: RoomModel[] = this.roomsArray.filter(r => !r.name);
-    logger.trace('privateRooms {} ', roomModels)();
+    const roomModels: RoomModel[] = this.roomsArray.filter((r) => !r.name);
+    logger.trace("privateRooms {} ", roomModels)();
 
     return roomModels;
   }
@@ -130,7 +147,7 @@ export class DefaultStore extends VuexModule {
     const roomUsers: { [id: number]: number } = {};
     const userRooms: { [id: number]: number } = {};
     if (this.userInfo) {
-      const myId = this.myId;
+      const {myId} = this;
       this.privateRooms.forEach((r: RoomModel) => {
         const anotherUId = myId === r.users[0] && r.users.length === 2 ? r.users[1] : r.users[0];
         roomUsers[r.id] = anotherUId;
@@ -138,40 +155,41 @@ export class DefaultStore extends VuexModule {
       });
     }
 
-    return {roomUsers, userRooms};
+    return {roomUsers,
+      userRooms};
   }
 
   get roomsArray(): RoomModel[] {
     const anies = Object.values(this.roomsDict);
-    logger.trace('roomsArray {}', anies)();
+    logger.trace("roomsArray {}", anies)();
 
     return anies;
   }
 
   get publicRooms(): RoomModel[] {
-    const roomModels: RoomModel[] = this.roomsArray.filter(r => r.name);
-    logger.trace('publicRooms {} ', roomModels)();
+    const roomModels: RoomModel[] = this.roomsArray.filter((r) => r.name);
+    logger.trace("publicRooms {} ", roomModels)();
 
     return roomModels;
   }
 
   get usersArray(): UserModel[] {
     const res: UserModel[] = Object.values(this.allUsersDict);
-    logger.trace('usersArray {}', res)();
+    logger.trace("usersArray {}", res)();
 
     return res;
   }
 
   get maxId(): (a: number) => number | null {
     return (id: number) => {
-      const messages = this.roomsDict[id].messages;
+      const {messages} = this.roomsDict[id];
       let maxId: number | null = null;
       for (const m in messages) {
-        if (!maxId || !(messages[m].id <= maxId)) {
+        if (!maxId || messages[m].id > maxId) {
           maxId = messages[m].id;
         }
       }
-      logger.trace('maxId #{}={}', id, maxId)();
+      logger.trace("maxId #{}={}", id, maxId)();
 
       return maxId;
     };
@@ -179,15 +197,15 @@ export class DefaultStore extends VuexModule {
 
   get minId(): (id: number) => number {
     return (id: number) => {
-      const messages = this.roomsDict[id].messages;
+      const {messages} = this.roomsDict[id];
       let minId = 0;
       for (const m in messages) {
-        const id = messages[m].id;
+        const {id} = messages[m];
         if (id > 0 && (!minId || id < minId)) {
           minId = id;
         }
       }
-      logger.trace('minId #{}={}', id, minId)();
+      logger.trace("minId #{}={}", id, minId)();
 
       return minId;
     };
@@ -196,9 +214,8 @@ export class DefaultStore extends VuexModule {
   get activeRoom(): RoomModel | null {
     if (this.activeRoomId) {
       return this.roomsDict[this.activeRoomId];
-    } else {
-      return null;
     }
+    return null;
   }
 
   get activeUser(): UserModel | null {
@@ -210,23 +227,21 @@ export class DefaultStore extends VuexModule {
   }
 
   get editingMessageModel(): MessageModel | null {
-    logger.trace('Eval editingMessageModel')();
+    logger.trace("Eval editingMessageModel")();
     if (this.editedMessage) {
       return this.roomsDict[this.editedMessage.roomId].messages[this.editedMessage.messageId];
-    } else {
-      return null;
     }
+    return null;
   }
 
   @Mutation
   public setMessageProgress(payload: SetMessageProgress) {
-    const transfer = this.roomsDict[payload.roomId].messages[payload.messageId].transfer;
-    if (transfer && transfer.upload) {
+    const {transfer} = this.roomsDict[payload.roomId].messages[payload.messageId];
+    if (transfer?.upload) {
       transfer.upload.uploaded = payload.uploaded;
     } else {
       throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}`);
     }
-
   }
 
   @Mutation
@@ -401,9 +416,11 @@ export class DefaultStore extends VuexModule {
     this.roomsDict[roomId].newMessagesCount++;
   }
 
-  // resetNewMessagesCount(roomId: number) {
-  //   this.roomsDict[roomId].newMessagesCount = 0;
-  // }
+  /*
+   * ResetNewMessagesCount(roomId: number) {
+   *   this.roomsDict[roomId].newMessagesCount = 0;
+   * }
+   */
 
   @Mutation
   public removeMessageProgress(payload: RemoveMessageProgress) {
@@ -433,7 +450,7 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public addMessages(ml: MessagesLocation) {
     const om: { [id: number]: MessageModel } = this.roomsDict[ml.roomId].messages;
-    ml.messages.forEach(m => {
+    ml.messages.forEach((m) => {
       Vue.set(om, String(m.id), m);
     });
     this.storage.saveMessages(ml.messages);
@@ -525,7 +542,7 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public addUser(u: UserModel) {
     Vue.set(this.allUsersDict, String(u.id), u);
-    if (this.roomsDict[ALL_ROOM_ID] && this.roomsDict[ALL_ROOM_ID].users.indexOf(u.id) < 0) {
+    if (this.roomsDict[ALL_ROOM_ID] && !this.roomsDict[ALL_ROOM_ID].users.includes(u.id)) {
       this.roomsDict[ALL_ROOM_ID].users.push(u.id);
     }
     this.storage.saveUser(u);
@@ -533,7 +550,7 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public addChangeOnlineEntry(payload: ChangeOnlineEntry) {
-    payload.roomIds.forEach(r => {
+    payload.roomIds.forEach((r) => {
       this.roomsDict[r].changeOnline.push(payload.changeOnline);
     });
   }
@@ -609,7 +626,9 @@ export class DefaultStore extends VuexModule {
 
   @Action
   public async showGrowl({html, type}: { html: string; type: GrowlType }) {
-    const growl: GrowlModel = {id: Date.now(), html, type};
+    const growl: GrowlModel = {id: Date.now(),
+      html,
+      type};
     this.addGrowl(growl);
     await sleep(4000);
     this.removeGrowl(growl);
@@ -617,22 +636,25 @@ export class DefaultStore extends VuexModule {
 
   @Action
   public async growlErrorRaw(html: string) {
-    await this.showGrowl({html, type: GrowlType.ERROR});
+    await this.showGrowl({html,
+      type: GrowlType.ERROR});
   }
 
   @Action
   public async growlError(title: string) {
-    await this.showGrowl({html: encodeHTML(title), type: GrowlType.ERROR});
+    await this.showGrowl({html: encodeHTML(title),
+      type: GrowlType.ERROR});
   }
 
   @Action
   public async growlInfo(title: string) {
-    await this.showGrowl({html: encodeHTML(title), type: GrowlType.INFO});
+    await this.showGrowl({html: encodeHTML(title),
+      type: GrowlType.INFO});
   }
 
   @Action
   public async growlSuccess(title: string) {
-    await this.showGrowl({html: encodeHTML(title), type: GrowlType.SUCCESS});
+    await this.showGrowl({html: encodeHTML(title),
+      type: GrowlType.SUCCESS});
   }
-
 }

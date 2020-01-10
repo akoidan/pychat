@@ -7,26 +7,29 @@
   </p>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {CurrentUserInfoModel, UserModel} from '@/types/model';
-import {timeToString} from '@/utils/htmlApi';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {CurrentUserInfoModel, UserModel} from "@/types/model";
+import {timeToString} from "@/utils/htmlApi";
 
 @Component
 export default class ChatChangeOnlineMessage extends Vue {
   @Prop() public time!: number;
+
   @Prop() public userId!: number;
+
   @Prop() public isWentOnline!: boolean;
 
   @State
   public readonly allUsersDict!: {[id: number]: UserModel} ;
+
   @State
   public readonly myId!: number;
 
-  get where () {
-    const has = this.isMe ? 'have ' : 'has ';
+  get where() {
+    const has = this.isMe ? "have " : "has ";
 
-    return has + (this.isWentOnline ?  'appeared online' : 'gone offline');
+    return has + (this.isWentOnline ? "appeared online" : "gone offline");
   }
 
   public setActiveUser() {
@@ -34,11 +37,11 @@ export default class ChatChangeOnlineMessage extends Vue {
   }
 
   get isUser() {
-    return this.isMe ? '' : 'User';
+    return this.isMe ? "" : "User";
   }
 
-  get user () {
-    return this.isMe ? 'You' : this.allUsersDict[this.userId].user;
+  get user() {
+    return this.isMe ? "You" : this.allUsersDict[this.userId].user;
   }
 
   get isMe() {

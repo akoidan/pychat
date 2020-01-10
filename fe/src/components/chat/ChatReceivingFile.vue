@@ -71,26 +71,30 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {State} from '@/utils/storeHolder';
-import {ReceivingFile, FileTransferStatus} from '@/types/model';
-import {bytesToSize} from '@/utils/utils';
-import AppProgressBar from '@/components/ui/AppProgressBar.vue';
-import ChatMessageHeader from '@/components/chat/ChatMessageHeader.vue';
-import {webrtcApi} from '@/utils/singletons';
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {State} from "@/utils/storeHolder";
+import {FileTransferStatus, ReceivingFile} from "@/types/model";
+import {bytesToSize} from "@/utils/utils";
+import AppProgressBar from "@/components/ui/AppProgressBar.vue";
+import ChatMessageHeader from "@/components/chat/ChatMessageHeader.vue";
+import {webrtcApi} from "@/utils/singletons";
 
 @Component({
-  components: {ChatMessageHeader, AppProgressBar}
+  components: {ChatMessageHeader,
+    AppProgressBar},
 })
 export default class ChatReceivingFile extends Vue {
   @Prop() public receivingFile!: ReceivingFile;
+
   @State
   public readonly myId!: number;
+
   public FileTransferStatus = FileTransferStatus;
 
   get showYesNo(): boolean {
     return this.receivingFile.status === FileTransferStatus.NOT_DECIDED_YET;
   }
+
   get size(): string {
     return bytesToSize(this.receivingFile.upload.total);
   }
@@ -106,26 +110,25 @@ export default class ChatReceivingFile extends Vue {
   get status(): string {
     switch (this.receivingFile.status) {
       case FileTransferStatus.ERROR:
-        return 'Error';
+        return "Error";
       case FileTransferStatus.IN_PROGRESS:
-        return 'Downloading...';
+        return "Downloading...";
       case FileTransferStatus.DECLINED_BY_OPPONENT:
-        return 'Declined by opponent';
+        return "Declined by opponent";
       case FileTransferStatus.DECLINED_BY_YOU:
-        return 'Declined by you';
+        return "Declined by you";
       case FileTransferStatus.FINISHED:
-        return 'Finished';
+        return "Finished";
       case FileTransferStatus.NOT_DECIDED_YET:
-        return 'Waiting for approval';
+        return "Waiting for approval";
     }
   }
 
   get mainClass(): string {
     if (this.receivingFile.userId === this.myId) {
-      return 'message-self';
-    } else {
-      return 'message-others';
+      return "message-self";
     }
+    return "message-others";
   }
 
   public retry() {
@@ -139,7 +142,6 @@ export default class ChatReceivingFile extends Vue {
   public decline() {
     webrtcApi.declineFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
   }
-
 }
 </script>
 

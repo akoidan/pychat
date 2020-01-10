@@ -1,55 +1,55 @@
 import {
   createMicrophoneLevelVoice,
-  getAverageAudioLevel
-} from '@/utils/audioprocc';
-import AbstractPeerConnection from '@/webrtc/AbstractPeerConnection';
+  getAverageAudioLevel,
+} from "@/utils/audioprocc";
+import AbstractPeerConnection from "@/webrtc/AbstractPeerConnection";
 import {
   ChangeStreamMessage,
   JsAudioAnalyzer,
   SetCallOpponent,
   SetOpponentAnchor,
-  SetOpponentVoice
-} from '@/types/types';
-import WsHandler from '@/utils/WsHandler';
-import {DefaultStore} from '@/utils/store';
-import {ConnectToRemoteMessage, DefaultMessage} from '@/types/messages';
+  SetOpponentVoice,
+} from "@/types/types";
+import WsHandler from "@/utils/WsHandler";
+import {DefaultStore} from "@/utils/store";
+import {ConnectToRemoteMessage, DefaultMessage} from "@/types/messages";
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
   private audioProcessor: any;
 
   constructor(
-      roomId: number,
-      connId: string,
-      opponentWsId: string,
-      userId: number,
-      wsHandler: WsHandler,
-      store: DefaultStore
+    roomId: number,
+    connId: string,
+    opponentWsId: string,
+    userId: number,
+    wsHandler: WsHandler,
+    store: DefaultStore,
   ) {
     super(roomId, connId, opponentWsId, wsHandler, store);
-    const payload:  SetCallOpponent = {
+    const payload: SetCallOpponent = {
       opponentWsId: this.opponentWsId,
       roomId: this.roomId,
       callInfoModel: {
         connected: false,
         mediaStreamLink: null,
         userId,
-        opponentCurrentVoice: 0
-      }
+        opponentCurrentVoice: 0,
+      },
     };
     this.store.setCallOpponent(payload);
   }
 
   public oniceconnectionstatechange() {
-    if (this.pc!.iceConnectionState === 'disconnected') {
-      this.logger.log('disconnected')();
-      this.onDestroy('Connection has been lost');
-    } else if (['completed', 'connected'].indexOf(this.pc!.iceConnectionState) >= 0) {
-      this.logger.log('running')();
+    if (this.pc!.iceConnectionState === "disconnected") {
+      this.logger.log("disconnected")();
+      this.onDestroy("Connection has been lost");
+    } else if (["completed", "connected"].includes(this.pc!.iceConnectionState)) {
+      this.logger.log("running")();
     }
   }
 
   public onStreamChanged(payload: ChangeStreamMessage) {
-    this.logger.log('onStreamChanged {}', payload)();
+    this.logger.log("onStreamChanged {}", payload)();
     if (this.pc) {
       payload.oldStream && this.pc.removeStream(payload.oldStream);
       this.pc.addStream(payload.newStream);
@@ -57,38 +57,41 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     }
   }
 
-  public createPeerConnection (event: ConnectToRemoteMessage) {
+  public createPeerConnection(event: ConnectToRemoteMessage) {
     super.createPeerConnection();
-    this.pc!.onaddstream =  (event: MediaStreamEvent) => {
-      this.logger.log('onaddstream')();
+    this.pc!.onaddstream = (event: MediaStreamEvent) => {
+      this.logger.log("onaddstream")();
       const payload: SetOpponentAnchor = {
         anchor: event.stream!,
         opponentWsId: this.opponentWsId,
-        roomId: this.roomId
+        roomId: this.roomId,
       };
       this.store.setOpponentAnchor(payload);
 
       if (this.sendRtcDataQueue.length > 0) {
-        this.logger.log('Connection accepted, consuming sendRtcDataQueue')();
+        this.logger.log("Connection accepted, consuming sendRtcDataQueue")();
         const queue = this.sendRtcDataQueue;
         this.sendRtcDataQueue = [];
         queue.forEach(this.onsendRtcData);
       }
-      //
-      // if (p) { //firefox video.play doesn't return promise
-      //   // chrome returns promise, if it's on mobile devices video sound would be muted
-      //   // coz it initialized from network instead of user gesture
-      //   p.catch(Utils.clickToPlay(this.dom.remote))
-      // }
+
+      /*
+       *
+       * If (p) { //firefox video.play doesn't return promise
+       *   // chrome returns promise, if it's on mobile devices video sound would be muted
+       *   // coz it initialized from network instead of user gesture
+       *   p.catch(Utils.clickToPlay(this.dom.remote))
+       * }
+       */
       this.removeAudioProcessor();
       this.audioProcessor = createMicrophoneLevelVoice(event.stream!, this.processAudio.bind(this));
-      // onStreamAttached(this.opponentWsId);
+      // OnStreamAttached(this.opponentWsId);
     };
-    this.logger.log('Sending local stream to remote')();
-    event && event.stream && this.pc!.addStream(event.stream);
+    this.logger.log("Sending local stream to remote")();
+    event?.stream && this.pc!.addStream(event.stream);
   }
 
-  public processAudio (audioProc: JsAudioAnalyzer) {
+  public processAudio(audioProc: JsAudioAnalyzer) {
     return () => {
       const level = getAverageAudioLevel(audioProc); // 256 max
       let clasNu;
@@ -117,32 +120,31 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       const payload: SetOpponentVoice = {
         voice: clasNu,
         opponentWsId: this.opponentWsId,
-        roomId: this.roomId
+        roomId: this.roomId,
       };
       this.store.setOpponentVoice(payload);
     };
   }
 
-  public removeAudioProcessor () {
+  public removeAudioProcessor() {
     if (this.audioProcessor && this.audioProcessor.javascriptNode && this.audioProcessor.javascriptNode.onaudioprocess) {
       this.audioProcessor.javascriptNode.onaudioprocess = null;
-      this.logger.log('Removed remote audioProcessor')();
+      this.logger.log("Removed remote audioProcessor")();
     } else {
-      this.logger.log('Audoprops are already removed')();
+      this.logger.log("Audoprops are already removed")();
     }
   }
 
   public onDestroy(reason?: DefaultMessage|string) {
-    this.logger.log('Destroying {}, because', this.constructor.name, reason)();
+    this.logger.log("Destroying {}, because", this.constructor.name, reason)();
     this.closePeerConnection();
     this.removeAudioProcessor();
     super.onDestroy();
-    const payload:  SetCallOpponent = {
+    const payload: SetCallOpponent = {
       opponentWsId: this.opponentWsId,
       roomId: this.roomId,
-      callInfoModel: null
+      callInfoModel: null,
     };
     this.store.setCallOpponent(payload);
   }
-
 }

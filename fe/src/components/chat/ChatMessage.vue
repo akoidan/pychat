@@ -16,44 +16,43 @@
   </p>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Ref, Vue} from "vue-property-decorator";
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   EditingMessage,
   MessageModel,
   UserDictModel,
-  UserModel
-} from '@/types/model';
+  UserModel,
+} from "@/types/model";
 import {
   encodeHTML,
   encodeMessage,
   highlightCode, setAudioEvent,
   setImageFailEvents,
   setVideoEvent,
-  setYoutubeEvent, timeToString
-} from '@/utils/htmlApi';
-import {sem} from '@/utils/utils';
-import {messageBus} from '@/utils/singletons';
-import ChatMessageHeader from '@/components/chat/ChatMessageHeader.vue';
+  setYoutubeEvent, timeToString,
+} from "@/utils/htmlApi";
+import {sem} from "@/utils/utils";
+import {messageBus} from "@/utils/singletons";
+import ChatMessageHeader from "@/components/chat/ChatMessageHeader.vue";
 @Component({
-  components: {ChatMessageHeader}
+  components: {ChatMessageHeader},
 })
 export default class ChatMessage extends Vue {
-
   get id() {
     return this.message.id;
   }
 
   get encoded() {
-    return this.message.content ? encodeMessage(this.message) : encodeHTML('This message has been removed');
+    return this.message.content ? encodeMessage(this.message) : encodeHTML("This message has been removed");
   }
 
   get mainCls() {
     return {
-      'removed-message': this.message.deleted,
-      highLightMessage: this.isEditing
+      "removed-message": this.message.deleted,
+      highLightMessage: this.isEditing,
     };
   }
 
@@ -63,9 +62,12 @@ export default class ChatMessage extends Vue {
 
   @State
   public readonly userSettings!: CurrentUserSettingsModel;
+
   @State
   public readonly userInfo!: CurrentUserInfoModel;
+
   @Prop() public message!: MessageModel;
+
   @State
   public readonly editedMessage!: EditingMessage;
 
@@ -73,7 +75,7 @@ export default class ChatMessage extends Vue {
   public content!: HTMLElement;
 
   public quote() {
-    messageBus.$emit('quote', this.message);
+    messageBus.$emit("quote", this.message);
   }
 
   public contextmenu(event: Event) {
@@ -81,11 +83,11 @@ export default class ChatMessage extends Vue {
   }
 
   public updated() {
-    this.$nextTick(function () {
+    this.$nextTick(function() {
       if (this.content) {
         this.seEvents();
       } else {
-        this.logger.debug('Skipping event settings, because node is gone')();
+        this.logger.debug("Skipping event settings, because node is gone")();
       }
     });
   }
@@ -99,7 +101,7 @@ export default class ChatMessage extends Vue {
   }
 
   private seEvents() {
-    this.logger.debug('Setting events')();
+    this.logger.debug("Setting events")();
     if (this.userSettings.highlightCode) {
       highlightCode(this.content);
     }
@@ -110,7 +112,6 @@ export default class ChatMessage extends Vue {
     setImageFailEvents(this.content, messageBus);
     setAudioEvent(this.content);
   }
-
 }
 </script>
 <style lang="sass" scoped>

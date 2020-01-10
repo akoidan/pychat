@@ -39,17 +39,19 @@
   </nav>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {UserModel} from '@/types/model';
-import {PrivateRoomsIds} from '@/types/types';
-import {AddRoomMessage} from '@/types/messages';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {UserModel} from "@/types/model";
+import {PrivateRoomsIds} from "@/types/types";
+import {AddRoomMessage} from "@/types/messages";
 @Component
 export default class NavUserShow extends Vue {
-
   @Prop() public activeUser!: UserModel;
+
   @Prop() public privateRooms!: UserModel;
+
   public running: boolean = false;
+
   @State
   public readonly privateRoomsUsersIds!: PrivateRoomsIds;
 
@@ -61,7 +63,7 @@ export default class NavUserShow extends Vue {
     if (!this.running) {
       this.running = true;
       this.$ws.sendAddRoom(null, 50, true, [this.activeUser.id], (e: AddRoomMessage) => {
-        if (e && e.roomId) {
+        if (e.roomId) {
           this.$router.replace(`/chat/${e.roomId}`);
         }
         this.store.setActiveUserId(0);
@@ -73,7 +75,6 @@ export default class NavUserShow extends Vue {
   public closeActiveUser() {
     this.store.setActiveUserId(0);
   }
-
 }
 </script>
 

@@ -57,16 +57,15 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
-import { State} from '@/utils/storeHolder';
-import {ViewUserProfileDto} from '@/types/messages';
-import {resolveMediaUrl} from '@/utils/htmlApi';
-import {UserModel} from '@/types/model';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {Component, Vue} from "vue-property-decorator";
+import {State} from "@/utils/storeHolder";
+import {ViewUserProfileDto} from "@/types/messages";
+import {resolveMediaUrl} from "@/utils/htmlApi";
+import {UserModel} from "@/types/model";
+import {ApplyGrowlErr} from "@/utils/utils";
 
 @Component
 export default class ViewProfilePage extends Vue {
-
   get id(): number {
     return parseInt(this.$route.params.id);
   }
@@ -76,20 +75,24 @@ export default class ViewProfilePage extends Vue {
   }
 
   public loading: boolean = false;
+
   public error: string|null = null;
+
   @State
   public readonly allUsersDict!: {[id: number]: UserModel} ;
+
   private userProfileInfo: ViewUserProfileDto | null = null;
 
   public resolveMediaUrl(src: string) {
     return resolveMediaUrl(src);
   }
 
-  @ApplyGrowlErr({ vueProperty: 'error', message: 'Error loading profile', runningProp: 'loading'})
+  @ApplyGrowlErr({vueProperty: "error",
+    message: "Error loading profile",
+    runningProp: "loading"})
   public async created() {
     this.userProfileInfo = await this.$api.showProfile(this.id);
   }
-
 }
 </script>
 

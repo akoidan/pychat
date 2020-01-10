@@ -50,38 +50,41 @@
   </form>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-import AppSubmit from '@/components/ui/AppSubmit.vue';
-import {browserVersion} from '@/utils/singletons';
-import {GIT_HASH} from '@/utils/consts';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import AppSubmit from "@/components/ui/AppSubmit.vue";
+import {browserVersion} from "@/utils/singletons";
+import {GIT_HASH} from "@/utils/consts";
+import {ApplyGrowlErr} from "@/utils/utils";
 @Component({components: {AppSubmit}})
 export default class ReportIssue extends Vue {
-
   get git() {
     return GIT_HASH;
   }
-  public running: boolean = false;
-  public browser: string = browserVersion;
-  public issue: string = '';
 
-  public textAreaStyle: string = '';
+  public running: boolean = false;
+
+  public browser: string = browserVersion;
+
+  public issue: string = "";
+
+  public textAreaStyle: string = "";
 
   @Ref()
   private readonly textarea!: HTMLTextAreaElement;
 
-  @Watch('issue')
+  @Watch("issue")
   public fixStyle() {
-    const textarea = this.textarea;
-    textarea.style.height = 'auto';
-    textarea.style.height = textarea.scrollHeight - 16 + 'px';
+    const {textarea} = this;
+    textarea.style.height = "auto";
+    textarea.style.height = `${textarea.scrollHeight - 16}px`;
   }
 
-  @ApplyGrowlErr({runningProp: 'running', message: 'Unable to submit issue'})
+  @ApplyGrowlErr({runningProp: "running",
+    message: "Unable to submit issue"})
   public async submit() {
     await this.$api.sendLogs(this.issue, this.browser);
-    this.store.growlSuccess('Your issue has ben submitted');
+    this.store.growlSuccess("Your issue has ben submitted");
     this.$router.go(-1);
   }
 }

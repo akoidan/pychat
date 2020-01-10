@@ -5,16 +5,16 @@
       <div
         class="icon-cancel"
         @click="close"
-      /><div v-html="growl.html" />
+      /><div v-html="growl.html"/>
     </div>
   </transition>
 </template>
 
 <script lang='ts'>
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {GrowlModel} from '@/types/model';
-import {getModule} from 'vuex-module-decorators';
-import {State} from '@/utils/storeHolder';
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {GrowlModel} from "@/types/model";
+import {getModule} from "vuex-module-decorators";
+import {State} from "@/utils/storeHolder";
 @Component
 export default class AppGrowl extends Vue {
   @Prop() public readonly growl!: GrowlModel;

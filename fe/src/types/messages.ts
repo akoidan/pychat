@@ -1,5 +1,5 @@
-import {FileModelDto, MessageModelDto, RoomDto, SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from '@/types/dto';
-import {FileModel} from '@/types/model';
+import {FileModelDto, MessageModelDto, RoomDto, SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from "@/types/dto";
+import {FileModel} from "@/types/model";
 
 export interface DefaultSentMessage {
   action: string;
@@ -32,7 +32,7 @@ export interface ScreenShareData {
 }
 
 export interface SetWsIdMessage extends DefaultMessage, OpponentWsId {
-  rooms:  RoomDto[];
+  rooms: RoomDto[];
   users: UserDto[];
   online: number[];
   time: number;
@@ -40,7 +40,7 @@ export interface SetWsIdMessage extends DefaultMessage, OpponentWsId {
   userInfo: UserProfileDto;
   userSettings: UserSettingsDto;
 }
-export interface ConnectToRemoteMessage extends DefaultMessage  {
+export interface ConnectToRemoteMessage extends DefaultMessage {
   stream: MediaStream|null;
 }
 
@@ -60,7 +60,7 @@ export interface OnSendRtcDataMessage extends WebRtcDefaultMessage, OpponentWsId
   content: RTCSessionDescriptionInit | RTCIceCandidateInit| {message: unknown};
 }
 
-export type CallStatus = 'not_inited'|'sent_offer'| 'received_offer' | 'accepted';
+export type CallStatus = "not_inited"|"sent_offer"| "received_offer" | "accepted";
 
 export interface OfferFile extends WebRtcDefaultMessage, OpponentWsId {
   content: OfferFileContent;
@@ -88,13 +88,9 @@ interface ReplyWebRtc extends WebRtcDefaultMessage, OpponentWsId {
   userId: number;
 }
 
-export interface ReplyFileMessage extends ReplyWebRtc {
+export type ReplyFileMessage = ReplyWebRtc;
 
-}
-
-export interface ReplyCallMessage  extends ReplyWebRtc {
-
-}
+export type ReplyCallMessage = ReplyWebRtc;
 
 export interface DestroyFileConnectionMessage extends DefaultMessage {
   content: string;
@@ -125,8 +121,8 @@ export interface DeleteRoomMessage extends DefaultMessage {
   roomId: number;
 }
 
-export interface AddOnlineUserMessage extends ChangeUserOnline {}
-export interface RemoveOnlineUserMessage extends ChangeUserOnline {}
+export type AddOnlineUserMessage = ChangeUserOnline;
+export type RemoveOnlineUserMessage = ChangeUserOnline;
 
 interface RoomExistedBefore {
   inviteeUserId: number[];
@@ -138,7 +134,7 @@ interface NewRoom extends DefaultMessage {
   time: number;
   users: number[];
 }
-export interface AddRoomBase extends  NewRoom {
+export interface AddRoomBase extends NewRoom {
   name: string;
   notifications: boolean;
   volume: number;
@@ -149,7 +145,7 @@ export interface AcceptFileContent {
 }
 
 export interface AcceptFileMessage extends DefaultMessage {
- content: AcceptFileContent;
+  content: AcceptFileContent;
 }
 
 export interface AcceptCallMessage extends WebRtcDefaultMessage, OpponentWsId {
@@ -159,8 +155,7 @@ export interface InviteUserMessage extends NewRoom, RoomExistedBefore {
 }
 export interface AddInviteMessage extends AddRoomBase, RoomExistedBefore {
 }
-export interface AddRoomMessage extends AddRoomBase {
-}
+export type AddRoomMessage = AddRoomBase;
 
 export interface LeaveUserMessage extends DefaultMessage {
   roomId: number;

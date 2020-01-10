@@ -1,10 +1,10 @@
-import ChatCall from '@/assets/sounds/Call.mp3';
-import ChatIncoming from '@/assets/sounds/ChatIncoming.wav';
-import ChatLogin from '@/assets/sounds/ChatLogin.wav';
-import ChatLogout from '@/assets/sounds/ChatLogout.wav';
-import ChatOutgoing from '@/assets/sounds/ChatOutgoing.wav';
-import ChatFile from '@/assets/sounds/File.mp3';
-import {globalLogger, notifier} from '@/utils/singletons';
+import ChatCall from "@/assets/sounds/Call.mp3";
+import ChatIncoming from "@/assets/sounds/ChatIncoming.wav";
+import ChatLogin from "@/assets/sounds/ChatLogin.wav";
+import ChatLogout from "@/assets/sounds/ChatLogout.wav";
+import ChatOutgoing from "@/assets/sounds/ChatOutgoing.wav";
+import ChatFile from "@/assets/sounds/File.mp3";
+import {globalLogger, notifier} from "@/utils/singletons";
 
 export const call = new Audio(<any>ChatCall);
 export const incoming = new Audio(<any>ChatIncoming);
@@ -20,10 +20,10 @@ export function checkAndPlay(element: HTMLAudioElement, volume: number) {
       element.currentTime = 0;
       element.volume = volume * volume / 10_000;
       const prom = element.play();
-      prom && prom.catch(function (e) {
+      prom.catch((e) => {
       });
     } catch (e) {
-      globalLogger.error('Skipping playing message, because {}', e)();
+      globalLogger.error("Skipping playing message, because {}", e)();
     }
   }
 }

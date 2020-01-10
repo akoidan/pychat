@@ -1,143 +1,149 @@
-import Xhr from '@/utils/Xhr';
-import {CONNECTION_ERROR, RESPONSE_SUCCESS} from '@/utils/consts';
-import {UploadFile} from '@/types/types';
-import {MessageModelDto} from '@/types/dto';
-import {DefaultMessage, ViewUserProfileDto} from '@/types/messages';
-import MessageHandler, {HandlerTypes} from '@/utils/MesageHandler';
-import loggerFactory from '@/utils/loggerFactory';
-import {Logger} from 'lines-logger';
-import Http from '@/utils/Http';
-import {sub} from '@/utils/sub';
-import sessionHolder from '@/utils/sessionHolder';
+import Xhr from "@/utils/Xhr";
+import {CONNECTION_ERROR, RESPONSE_SUCCESS} from "@/utils/consts";
+import {UploadFile} from "@/types/types";
+import {MessageModelDto} from "@/types/dto";
+import {DefaultMessage, ViewUserProfileDto} from "@/types/messages";
+import MessageHandler, {HandlerTypes} from "@/utils/MesageHandler";
+import loggerFactory from "@/utils/loggerFactory";
+import {Logger} from "lines-logger";
+import Http from "@/utils/Http";
+import {sub} from "@/utils/sub";
+import sessionHolder from "@/utils/sessionHolder";
 
 export default class Api extends MessageHandler {
   protected readonly handlers: HandlerTypes = {
-    internetAppear: this.internetAppear
+    internetAppear: this.internetAppear,
   };
 
   protected readonly logger: Logger;
-  private readonly  xhr: Http;
+
+  private readonly xhr: Http;
 
   private retryFcb: Function|null = null;
 
   constructor(xhr: Http) {
     super();
-    sub.subscribe('lan', this);
-    this.logger = loggerFactory.getLoggerColor('api', 'red');
+    sub.subscribe("lan", this);
+    this.logger = loggerFactory.getLoggerColor("api", "red");
     this.xhr = xhr;
   }
 
   public async login(form: HTMLFormElement): Promise<string> {
     return this.xhr.doPost<string>({
-      url: '/auth',
-      formData: new FormData(form)
+      url: "/auth",
+      formData: new FormData(form),
     });
   }
 
   public async sendLogs(issue: string, browser: string): Promise<void> {
     const result: string = await this.xhr.doPost<string>({
-      url: '/report_issue',
-      params: {issue, browser},
-      checkOkString: true
+      url: "/report_issue",
+      params: {issue,
+        browser},
+      checkOkString: true,
     });
   }
 
   public async search(
-      data: string,
-      room: number,
-      offset: number,
-      requestInterceptor?: (a: XMLHttpRequest) => void
+    data: string,
+    room: number,
+    offset: number,
+    requestInterceptor?: (a: XMLHttpRequest) => void,
   ): Promise<MessageModelDto[]> {
-   return this.xhr.doPost<MessageModelDto[]>({
-      url: '/search_messages',
-      params: {data, room, offset},
+    return this.xhr.doPost<MessageModelDto[]>({
+      url: "/search_messages",
+      params: {data,
+        room,
+        offset},
       isJsonDecoded: true,
-      requestInterceptor
+      requestInterceptor,
     });
   }
 
   public async changePassword(old_password: string, password: string): Promise<void> {
     return this.xhr.doPost<void>({
-      url: '/change_password',
-      params: {old_password, password},
-      checkOkString: true
+      url: "/change_password",
+      params: {old_password,
+        password},
+      checkOkString: true,
     });
   }
 
-  public async logout(registration_id: string |null= null): Promise<void> {
+  public async logout(registration_id: string |null = null): Promise<void> {
     await this.xhr.doPost({
-      url: '/logout',
+      url: "/logout",
       params: {registration_id},
-      errorDescription: `Error while logging out: `
+      errorDescription: "Error while logging out: ",
     });
   }
 
   public async sendRestorePassword(form: HTMLFormElement): Promise<void> {
     return this.xhr.doPost<void>({
-      url: '/send_restore_password',
+      url: "/send_restore_password",
       formData: new FormData(form),
-      checkOkString: true
+      checkOkString: true,
     });
   }
 
   public async register(form: HTMLFormElement): Promise<string> {
     return this.xhr.doPost<string>({
-      url: '/register',
-      formData: new FormData(form)
+      url: "/register",
+      formData: new FormData(form),
     });
   }
 
   public async registerDict(password: string, username: string): Promise<string> {
     return this.xhr.doPost<string>({
-      url: '/register',
-      params: {username, password}
+      url: "/register",
+      params: {username,
+        password},
     });
   }
 
   public async googleAuth(token: string): Promise<string> {
     return this.xhr.doPost<string>({
-      url: '/google_auth',
+      url: "/google_auth",
       params: {
-        token
-      }
+        token,
+      },
     });
   }
 
   public async facebookAuth(token: string): Promise<string> {
-    return  this.xhr.doPost<string>({
-      url: '/facebook_auth',
+    return this.xhr.doPost<string>({
+      url: "/facebook_auth",
       params: {
-        token
-      }
+        token,
+      },
     });
   }
 
   public async statistics(): Promise<void> {
-    await this.xhr.doGet('/statistics', true);
+    await this.xhr.doGet("/statistics", true);
   }
 
   public async loadGoogle(): Promise<void> {
-    await this.xhr.loadJs('https://apis.google.com/js/platform.js');
+    await this.xhr.loadJs("https://apis.google.com/js/platform.js");
   }
 
   public async loadFacebook(): Promise<void> {
-    await this.xhr.loadJs('https://connect.facebook.net/en_US/sdk.js');
+    await this.xhr.loadJs("https://connect.facebook.net/en_US/sdk.js");
   }
 
   public async loadRecaptcha(): Promise<void> {
-    await this.xhr.loadJs('https://www.google.com/recaptcha/api.js');
+    await this.xhr.loadJs("https://www.google.com/recaptcha/api.js");
   }
 
   public async registerFCB(registration_id: string, agent: string, is_mobile: boolean): Promise<void> {
     try {
       return await this.xhr.doPost({
-        url: '/register_fcb',
+        url: "/register_fcb",
         params: {
           registration_id,
           agent,
-          is_mobile
+          is_mobile,
         },
-        checkOkString: true
+        checkOkString: true,
       });
     } catch (e) {
       if (e === CONNECTION_ERROR) {
@@ -153,29 +159,32 @@ export default class Api extends MessageHandler {
 
   public async validateUsername(username: string, requestInterceptor: (r: XMLHttpRequest) => void): Promise<void> {
     return this.xhr.doPost({
-      url: '/validate_user',
+      url: "/validate_user",
       params: {username},
       checkOkString: true,
-      requestInterceptor
+      requestInterceptor,
     });
   }
 
   public async sendRoomSettings(roomName: string, volume: number, notifications: boolean, roomId: number): Promise<void> {
     return this.xhr.doPost({
-      url: '/save_room_settings',
-      params: {roomName, volume, notifications, roomId},
-      checkOkString: true
+      url: "/save_room_settings",
+      params: {roomName,
+        volume,
+        notifications,
+        roomId},
+      checkOkString: true,
     });
   }
 
   public async uploadProfileImage(file: Blob): Promise<void> {
     const fd = new FormData();
-    fd.append('file', file);
+    fd.append("file", file);
 
     return this.xhr.doPost<void>({
-      url: '/upload_profile_image',
+      url: "/upload_profile_image",
       formData: fd,
-      checkOkString: true
+      checkOkString: true,
     });
   }
 
@@ -189,9 +198,10 @@ export default class Api extends MessageHandler {
 
   public async changeEmailLogin(email: string, password: string): Promise<void> {
     return this.xhr.doPost({
-      url: '/change_email_login',
+      url: "/change_email_login",
       checkOkString: true,
-      params: {email, password}
+      params: {email,
+        password},
     });
   }
 
@@ -201,45 +211,45 @@ export default class Api extends MessageHandler {
 
   public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void): Promise<number[]> {
     const fd = new FormData();
-    files.forEach(sd => fd.append(sd.type + sd.symbol, sd.file, sd.file.name));
+    files.forEach((sd) => fd.append(sd.type + sd.symbol, sd.file, sd.file.name));
 
     return this.xhr.doPost<number[]>({
-      url: '/upload_file',
+      url: "/upload_file",
       isJsonDecoded: true,
       formData: fd,
-      process: r => {
-        r.upload.addEventListener('progress', progress);
-      }
+      process: (r) => {
+        r.upload.addEventListener("progress", progress);
+      },
     });
   }
 
   public async validateEmail(email: string, requestInterceptor: (r: XMLHttpRequest) => void): Promise<void> {
     return this.xhr.doPost({
-      url: '/validate_email',
+      url: "/validate_email",
       params: {email},
       checkOkString: true,
-      requestInterceptor
+      requestInterceptor,
     });
   }
 
   public async verifyToken(token: string): Promise<string> {
     const value: { message: string; restoreUser: string } = await this.xhr.doPost<{ message: string; restoreUser: string}>({
-      url: '/verify_token',
+      url: "/verify_token",
       isJsonDecoded: true,
-      params: {token}
+      params: {token},
     });
     if (value && value.message === RESPONSE_SUCCESS) {
       return value.restoreUser;
-    } else {
-      throw value.message;
     }
+    throw value.message;
   }
 
   public async acceptToken(token: string, password: string): Promise<void> {
     return this.xhr.doPost({
-      url: '/accept_token',
-      params: {token, password},
-      checkOkString: true
+      url: "/accept_token",
+      params: {token,
+        password},
+      checkOkString: true,
     });
   }
 

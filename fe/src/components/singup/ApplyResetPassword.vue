@@ -41,38 +41,45 @@
 </template>
 <script lang="ts">
 
-  import {Prop, Component} from "vue-property-decorator";
-  import Vue from 'vue';
-  import {State} from '@/utils/storeHolder';
-  import AppSubmit from '@/components/ui/AppSubmit.vue';
-  import {ApplyGrowlErr} from '@/utils/utils';
+import {Component, Prop} from "vue-property-decorator";
+import Vue from "vue";
+import {State} from "@/utils/storeHolder";
+import AppSubmit from "@/components/ui/AppSubmit.vue";
+import {ApplyGrowlErr} from "@/utils/utils";
 
-  @Component({components: {AppSubmit}})
-  export default class ApplyResetPassword extends Vue {
+@Component({components: {AppSubmit}})
+export default class ApplyResetPassword extends Vue {
+  restoreUser: string = "";
 
-    restoreUser: string = '';
-    error: string|null = null;
-    checkingToken: boolean = false;
-    running: boolean = false;
-    password: string = '';
-    repeatPassword: string = '';
+  error: string|null = null;
 
-    @ApplyGrowlErr({runningProp: 'checkingToken', vueProperty: 'error'})
-    async created() {
-      this.restoreUser = await this.$api.verifyToken((this.$route.query['token']) as string);
-    }
+  checkingToken: boolean = false;
 
-    @ApplyGrowlErr({runningProp: 'running', vueProperty: 'error', message: 'Resetting pass err'})
-    async submitResetPassword() {
-      if (this.password !== this.repeatPassword) {
-        this.store.growlError("Passords don't match");
-      } else {
-        await this.$api.acceptToken(this.$route.query["token"] as string, this.password);
-        this.store.growlSuccess("Password has been reset");
-        this.$router.replace('/auth/login');
-      }
+  running: boolean = false;
+
+  password: string = "";
+
+  repeatPassword: string = "";
+
+  @ApplyGrowlErr({runningProp: "checkingToken",
+    vueProperty: "error"})
+  async created() {
+    this.restoreUser = await this.$api.verifyToken((this.$route.query.token) as string);
+  }
+
+  @ApplyGrowlErr({runningProp: "running",
+    vueProperty: "error",
+    message: "Resetting pass err"})
+  async submitResetPassword() {
+    if (this.password !== this.repeatPassword) {
+      this.store.growlError("Passords don't match");
+    } else {
+      await this.$api.acceptToken(this.$route.query.token as string, this.password);
+      this.store.growlSuccess("Password has been reset");
+      this.$router.replace("/auth/login");
     }
   }
+}
 </script>
 <style scoped lang="sass">
 

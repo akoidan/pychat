@@ -9,16 +9,16 @@
       </router-link>
     </div>
     <h1>{{ regHeader }}</h1>
-    <router-view />
+    <router-view/>
   </div>
 </template>
 
 <script lang='ts'>
-import {Component, Vue} from 'vue-property-decorator';
-import {State} from '@/utils/storeHolder';
-import {AUTO_REGISTRATION} from '@/utils/consts';
-import {api} from '@/utils/singletons';
-import {ApplyGrowlErr, login} from '@/utils/utils';
+import {Component, Vue} from "vue-property-decorator";
+import {State} from "@/utils/storeHolder";
+import {AUTO_REGISTRATION} from "@/utils/consts";
+import {api} from "@/utils/singletons";
+import {ApplyGrowlErr, login} from "@/utils/utils";
 
 @Component
 export default class MainPage extends Vue {
@@ -26,17 +26,17 @@ export default class MainPage extends Vue {
   public readonly regHeader!: string;
 
   public getRandom(): string {
-    return Math.random().toString(36).substring(7);
+    return Math.random().toString(36).
+      substring(7);
   }
 
-  @ApplyGrowlErr({message: 'Auto-registration error'})
+  @ApplyGrowlErr({message: "Auto-registration error"})
   public async created() {
     if (AUTO_REGISTRATION) {
       const s: string = await this.$api.registerDict(this.getRandom(), this.getRandom());
       login(s);
     }
   }
-
 }
 </script>
 

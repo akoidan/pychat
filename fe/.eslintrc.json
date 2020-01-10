@@ -36,6 +36,7 @@
     "padded-blocks": [1, "never"],
     "babel/new-cap": 1,
     "babel/camelcase": 1,
+    "max-statements": [1, {"max":  15}],
     "babel/no-invalid-this": 1,
     "no-inline-comments": 0,
     "babel/object-curly-spacing": 1,

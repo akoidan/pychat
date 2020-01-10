@@ -18,21 +18,21 @@
           class="green-btn"
           @click="answer"
         >
-          <i class="icon-call-aswer" />
+          <i class="icon-call-aswer"/>
           <div>Answer</div>
         </button>
         <button
           class="green-btn"
           @click="videoAnswer"
         >
-          <i class="icon-videocam" />
+          <i class="icon-videocam"/>
           <div>With video</div>
         </button>
         <button
           class="red-btn"
           @click="hangUp"
         >
-          <i class="icon-hang-up" />
+          <i class="icon-hang-up"/>
           <div>Decline</div>
         </button>
       </div>
@@ -40,15 +40,15 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {IncomingCallModel, RoomDictModel, UserModel} from '@/types/model';
-import {webrtcApi} from '@/utils/singletons';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {IncomingCallModel, RoomDictModel, UserModel} from "@/types/model";
+import {webrtcApi} from "@/utils/singletons";
 
 @Component
 export default class IncomingCall extends Vue {
-
   @Prop() public call!: IncomingCallModel;
+
   @State
   public readonly allUsersDict!: {[id: number]: UserModel} ;
 
@@ -74,7 +74,6 @@ export default class IncomingCall extends Vue {
   public videoAnswer() {
     webrtcApi.videoAnswerCall(this.call.connId);
   }
-
 }
 </script>
 

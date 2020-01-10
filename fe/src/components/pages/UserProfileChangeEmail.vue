@@ -45,18 +45,19 @@
   </form>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/components/ui/AppSubmit.vue';
-import {CurrentUserInfoModel} from '@/types/model';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import AppSubmit from "@/components/ui/AppSubmit.vue";
+import {CurrentUserInfoModel} from "@/types/model";
+import {ApplyGrowlErr} from "@/utils/utils";
 @Component({
-  components: {AppSubmit}
+  components: {AppSubmit},
 })
 export default class UserProfileChangeEmail extends Vue {
+  public password: string = "";
 
-  public password: string = '';
-  public email: string = '';
+  public email: string = "";
+
   public running: boolean = false;
 
   @State
@@ -66,10 +67,13 @@ export default class UserProfileChangeEmail extends Vue {
     this.email = this.userInfo.email;
   }
 
-  @ApplyGrowlErr({ message: 'Unable to change email', runningProp: 'running'})
+  @ApplyGrowlErr({
+    message: "Unable to change email",
+    runningProp: "running",
+  })
   public async saveProfile() {
     await this.$api.changeEmailLogin(this.email, this.password);
-    this.store.growlSuccess('Email has been changed');
+    this.store.growlSuccess("Email has been changed");
   }
 }
 </script>

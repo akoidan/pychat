@@ -67,19 +67,21 @@
   </form>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/components/ui/AppSubmit.vue';
-import {CurrentUserInfoModel} from '@/types/model';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import AppSubmit from "@/components/ui/AppSubmit.vue";
+import {CurrentUserInfoModel} from "@/types/model";
+import {ApplyGrowlErr} from "@/utils/utils";
 @Component({
-  components: {AppSubmit}
+  components: {AppSubmit},
 })
 export default class UserProfileChangePassword extends Vue {
+  public oldPassword: string = "";
 
-  public oldPassword: string = '';
-  public newPassword: string = '';
-  public confirmPassword: string = '';
+  public newPassword: string = "";
+
+  public confirmPassword: string = "";
+
   public running: boolean = false;
 
   @State
@@ -89,13 +91,14 @@ export default class UserProfileChangePassword extends Vue {
     return this.userInfo.user;
   }
 
-  @ApplyGrowlErr({ message: 'Error changing pass:', runningProp: 'running'})
+  @ApplyGrowlErr({message: "Error changing pass:",
+    runningProp: "running"})
   public async saveProfile() {
     if (this.newPassword != this.confirmPassword) {
-      this.store.growlError('Passwords don\'t match');
+      this.store.growlError("Passwords don't match");
     } else {
       await this.$api.changePassword(this.oldPassword, this.newPassword);
-      this.store.growlSuccess('Password has been changed');
+      this.store.growlSuccess("Password has been changed");
     }
   }
 }

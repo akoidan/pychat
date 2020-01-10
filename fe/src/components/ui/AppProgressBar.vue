@@ -12,9 +12,9 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {bytesToSize} from '@/utils/utils';
-import {UploadProgressModel} from '@/types/model';
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {bytesToSize} from "@/utils/utils";
+import {UploadProgressModel} from "@/types/model";
 
 @Component
 export default class AppProgressBar extends Vue {
@@ -39,7 +39,7 @@ export default class AppProgressBar extends Vue {
 
   get style() {
     return {
-      width: this.percents
+      width: this.percents,
     };
   }
 

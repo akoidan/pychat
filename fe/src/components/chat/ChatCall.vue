@@ -70,13 +70,13 @@
         <tbody>
           <tr>
             <td>
-              <i class="icon-quote-left" />
+              <i class="icon-quote-left"/>
               <span class="callInfo">Call info</span>
             </td>
           </tr>
           <tr>
             <td>
-              <i class="icon-volume-2" />
+              <i class="icon-volume-2"/>
               <select
                 class="input"
                 :value="callInfo.currentSpeaker"
@@ -98,7 +98,7 @@
           </tr>
           <tr>
             <td>
-              <i class="icon-videocam" />
+              <i class="icon-videocam"/>
               <select
                 class="input"
                 :value="callInfo.currentWebcam"
@@ -116,7 +116,7 @@
           </tr>
           <tr>
             <td>
-              <i class="icon-mic" />
+              <i class="icon-mic"/>
               <select
                 class="input"
                 :value="callInfo.currentMic"
@@ -187,42 +187,45 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-import {CallInfoModel, CallsInfoModel} from '@/types/model';
-import {BooleanIdentifier, StringIdentifier, VideoType} from '@/types/types';
-import {webrtcApi} from '@/utils/singletons';
-import ChatRemotePeer from '@/components/chat/ChatRemotePeer.vue';
-import {file} from '@/utils/audio';
-import VideoObject from '@/components/chat/VideoObject.vue';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import {CallInfoModel, CallsInfoModel} from "@/types/model";
+import {BooleanIdentifier, StringIdentifier, VideoType} from "@/types/types";
+import {webrtcApi} from "@/utils/singletons";
+import ChatRemotePeer from "@/components/chat/ChatRemotePeer.vue";
+import {file} from "@/utils/audio";
+import VideoObject from "@/components/chat/VideoObject.vue";
 @Component({
-  components: {VideoObject, ChatRemotePeer}
+  components: {VideoObject,
+    ChatRemotePeer},
 })
 export default class ChatCall extends Vue {
-
-  get iconMicClass (): {} {
+  get iconMicClass(): {} {
     return {
-      'icon-mic': this.callInfo.showMic,
-      'icon-mute': !this.callInfo.showMic
+      "icon-mic": this.callInfo.showMic,
+      "icon-mute": !this.callInfo.showMic,
     };
   }
 
   get videoTitle() {
-    return `Turn ${this.callInfo.showVideo ? 'off' : 'on'} your webcam`;
+    return `Turn ${this.callInfo.showVideo ? "off" : "on"} your webcam`;
   }
 
   get micTitle() {
-    return `Turn ${this.callInfo.showMic ? 'off' : 'on'} your microphone`;
+    return `Turn ${this.callInfo.showMic ? "off" : "on"} your microphone`;
   }
 
-  get iconVideoClass (): {} {
+  get iconVideoClass(): {} {
     return {
-      'icon-no-videocam': !this.callInfo.showVideo,
-      'icon-videocam': this.callInfo.showVideo
+      "icon-no-videocam": !this.callInfo.showVideo,
+      "icon-videocam": this.callInfo.showVideo,
     };
   }
+
   @Prop() public callInfo!: CallsInfoModel;
+
   @Prop() public roomId!: number;
+
   public showSettings: boolean = false;
 
   @Ref()
@@ -233,10 +236,13 @@ export default class ChatCall extends Vue {
 
   @State
   public readonly microphones!: { [id: string]: string } ;
+
   @State
   public readonly speakers!: { [id: string]: string } ;
+
   @State
   public readonly webcams!: { [id: string]: string } ;
+
   public fullscreen: boolean = false;
 
   public currentVideoActive: string|null = null;
@@ -252,20 +258,20 @@ export default class ChatCall extends Vue {
   }
 
   public fullScreenChange() {
-    this.logger.log('fs change')();
+    this.logger.log("fs change")();
     if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
       this.fullscreen = false;
     }
   }
 
   public created() {
-    ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
+    ["webkitfullscreenchange", "mozfullscreenchange", "fullscreenchange", "MSFullscreenChange"].forEach((e) => {
       document.addEventListener(e, this.listener, false);
     });
   }
 
   public destroyed() {
-    ['webkitfullscreenchange', 'mozfullscreenchange', 'fullscreenchange', 'MSFullscreenChange'].forEach(e => {
+    ["webkitfullscreenchange", "mozfullscreenchange", "fullscreenchange", "MSFullscreenChange"].forEach((e) => {
       document.removeEventListener(e, this.listener, false);
     });
   }
@@ -294,21 +300,21 @@ export default class ChatCall extends Vue {
     } else if (elem.webkitRequestFullscreen) {
       elem.webkitRequestFullscreen();
     } else {
-      this.store.growlError('Can\'t enter fullscreen');
+      this.store.growlError("Can't enter fullscreen");
 
       return;
     }
     this.fullscreen = true;
   }
 
-  @Watch('callInfo.currentSpeaker')
+  @Watch("callInfo.currentSpeaker")
   public onSpeakerChange(newValue: string) {
-    this.$nextTick(function () {
+    this.$nextTick(function() {
       const video: HTMLVideoElement = this.localVideo.$refs.video as HTMLVideoElement;
       if (video.setSinkId) {
         video.setSinkId(newValue);
-      } else  {
-        this.logger.error('SetSinkId doesn\'t exist')();
+      } else {
+        this.logger.error("SetSinkId doesn't exist")();
       }
     });
   }
@@ -316,17 +322,18 @@ export default class ChatCall extends Vue {
   public setCurrentMicProxy(event: Event) {
     const payload: StringIdentifier = {
       id: this.roomId,
-      state: (event.target as HTMLInputElement).value
+      state: (event.target as HTMLInputElement).value,
     };
     this.store.setCurrentMic(payload);
     if (this.callInfo.callActive) {
       webrtcApi.updateConnection(this.roomId);
     }
   }
+
   public setCurrentWebcamProxy(event: Event) {
     const payload: StringIdentifier = {
       id: this.roomId,
-      state: (event.target as HTMLInputElement).value
+      state: (event.target as HTMLInputElement).value,
     };
     this.store.setCurrentWebcam(payload);
     if (this.callInfo.callActive) {
@@ -341,17 +348,17 @@ export default class ChatCall extends Vue {
       file.currentTime = 0;
       file.volume = 1;
       const prom = file.play();
-      prom && prom.catch(function (e) {
+      prom.catch((e) => {
       });
     } else {
-      this.store.growlError('Your browser doesn\'t support changing output channel');
+      this.store.growlError("Your browser doesn't support changing output channel");
     }
   }
 
   public setCurrentSpeakerProxy(event: Event) {
     const payload: StringIdentifier = {
       id: this.roomId,
-      state: (event.target as HTMLInputElement).value
+      state: (event.target as HTMLInputElement).value,
     };
     this.store.setCurrentSpeaker(payload);
     if (this.callInfo.callActive) {
@@ -372,7 +379,7 @@ export default class ChatCall extends Vue {
   public desktopClick() {
     const payload: BooleanIdentifier = {
       state: !this.callInfo.shareScreen,
-      id: this.roomId
+      id: this.roomId,
     };
     this.store.setShareScreenToState(payload);
     if (this.callInfo.callActive) {
@@ -383,7 +390,7 @@ export default class ChatCall extends Vue {
   public videoClick() {
     const payload: BooleanIdentifier = {
       state: !this.callInfo.showVideo,
-      id: this.roomId
+      id: this.roomId,
     };
     this.store.setVideoToState(payload);
     if (this.callInfo.callActive) {
@@ -394,14 +401,13 @@ export default class ChatCall extends Vue {
   public micClick() {
     const payload: BooleanIdentifier = {
       state: !this.callInfo.showMic,
-      id: this.roomId
+      id: this.roomId,
     };
     this.store.setMicToState(payload);
     if (this.callInfo.callActive) {
       webrtcApi.toggleDevice(this.roomId, VideoType.AUDIO);
     }
   }
-
 }
 </script>
 

@@ -21,25 +21,25 @@
   </nav>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {EditingMessage} from '@/types/model';
-import {channelsHandler} from '@/utils/singletons';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {EditingMessage} from "@/types/model";
+import {channelsHandler} from "@/utils/singletons";
 
 @Component
 export default class NavEditMessage extends Vue {
-  @Prop() public editedMessage! : EditingMessage;
+  @Prop() public editedMessage!: EditingMessage;
 
   public m2DeleteMessage() {
-    this.$emit('delete-message');
+    this.$emit("delete-message");
   }
 
   public m2EditMessage() {
-    this.$emit('edit-message');
+    this.$emit("edit-message");
   }
 
   public m2Close() {
-    this.$emit('close');
+    this.$emit("close");
   }
 }
 </script>

@@ -28,7 +28,7 @@ export interface RoomSettingsDB {
   deleted: BooleanDB ;
 }
 
-export  interface MessageDB {
+export interface MessageDB {
   id: number;
   time: number;
   content: string;
@@ -41,7 +41,7 @@ export  interface MessageDB {
   sending: BooleanDB;
 }
 
-export  interface FileDB {
+export interface FileDB {
   id: number;
   symbol: string;
   url: string;
@@ -80,4 +80,4 @@ export interface RoomUsersDB {
   user_id: number;
 }
 
-export type TransactionType = 'transaction';
+export type TransactionType = "transaction";

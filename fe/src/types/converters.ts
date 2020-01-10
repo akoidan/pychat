@@ -2,11 +2,11 @@ import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   FileModel,
-  RoomModel,
-  UserModel,
   Location,
-  SexModelString
-} from '@/types/model';
+  RoomModel,
+  SexModelString,
+  UserModel,
+} from "@/types/model";
 import {
   FileModelDto,
   LocationDto,
@@ -14,9 +14,9 @@ import {
   SexModelDto,
   UserDto,
   UserProfileDto,
-  UserSettingsDto
-} from '@/types/dto';
-import {BooleanDB, SexDB} from '@/types/db';
+  UserSettingsDto,
+} from "@/types/dto";
+import {BooleanDB, SexDB} from "@/types/db";
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDto): CurrentUserInfoModel {
   return {...userInfo};
@@ -39,32 +39,31 @@ export function convertLocation(dto: LocationDto): Location {
 }
 
 export function convertSexToNumber(m: SexModelString): number {
-  if ('Secret' === m) {
+  if (m === "Secret") {
     return 0;
-  } else if ('Male' === m) {
+  } else if (m === "Male") {
     return 1;
-  } else if ('Female' === m) {
+  } else if (m === "Female") {
     return 2;
-  } else {
-    throw Error(`Unknown gender ${m}`);
   }
+  throw Error(`Unknown gender ${m}`);
 }
 
 export function getRoomsBaseDict(
-    {
-      roomId,
-      volume,
-      notifications,
-      name,
-      users
-    }: {
-      roomId: number;
-      volume: number;
-      notifications: boolean;
-      name: string;
-      users: number[];
-    },
-    oldRoom: RoomModel|null = null
+  {
+    roomId,
+    volume,
+    notifications,
+    name,
+    users,
+  }: {
+    roomId: number;
+    volume: number;
+    notifications: boolean;
+    name: string;
+    users: number[];
+  },
+  oldRoom: RoomModel|null = null,
 ): RoomModel {
   return {
     id: roomId,
@@ -82,7 +81,7 @@ export function getRoomsBaseDict(
       currentMic: null,
       currentSpeaker: null,
       currentWebcam: null,
-      currentMicLevel: 0
+      currentMicLevel: 0,
     },
     notifications,
     name,
@@ -92,19 +91,19 @@ export function getRoomsBaseDict(
     allLoaded: oldRoom ? oldRoom.allLoaded : false,
     search: oldRoom ? oldRoom.search : {
       searchActive: false,
-      searchText: '',
+      searchText: "",
       searchedIds: [],
-      locked: false
+      locked: false,
     },
-    users
+    users,
   };
 }
 
 export function convertNumberToSex(m: SexDB): SexModelString {
   const newVar: { [id: number]: SexModelString } = {
-    0: 'Secret',
-    1: 'Male',
-    2: 'Female'
+    0: "Secret",
+    1: "Male",
+    2: "Female",
   };
 
   return newVar[m];
@@ -112,9 +111,9 @@ export function convertNumberToSex(m: SexDB): SexModelString {
 
 export function convertSexToString(m: SexDB): SexModelString {
   const newVar: { [id: number]: SexModelString } = {
-    0: 'Secret',
-    1: 'Male',
-    2: 'Female'
+    0: "Secret",
+    1: "Male",
+    2: "Female",
   };
 
   return newVar[m];
@@ -128,7 +127,7 @@ export function convertStringSexToNumber(m: SexModelString): number {
   return {
     Secret: 0,
     Male: 1,
-    Female: 2
+    Female: 2,
   }[m];
 }
 
@@ -150,13 +149,13 @@ export function convertUser(u: UserDto): UserModel {
     city: null,
     country: null,
     countryCode: null,
-    region: null
+    region: null,
   };
 
   return {
     user: u.user,
     id: u.userId,
     sex: convertSex(u.sex),
-    location
+    location,
   };
 }

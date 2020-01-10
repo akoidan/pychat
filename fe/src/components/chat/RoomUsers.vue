@@ -75,45 +75,53 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Vue} from 'vue-property-decorator';
-import {RoomModel, SexModelString, UserDictModel, UserModel} from '@/types/model';
-import RoomUsersUser from '@/components/chat/RoomUsersUser.vue';
-import RoomUsersPublic from '@/components/chat/RoomUsersPublic.vue';
-import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate.vue';
+import {State} from "@/utils/storeHolder";
+import {Component, Vue} from "vue-property-decorator";
+import {RoomModel, SexModelString, UserDictModel, UserModel} from "@/types/model";
+import RoomUsersUser from "@/components/chat/RoomUsersUser.vue";
+import RoomUsersPublic from "@/components/chat/RoomUsersPublic.vue";
+import RoomUsersPrivate from "@/components/chat/RoomUsersPrivate.vue";
 @Component({
-  components: {RoomUsersPrivate, RoomUsersPublic, RoomUsersUser}
+  components: {RoomUsersPrivate,
+    RoomUsersPublic,
+    RoomUsersUser},
 })
 export default class RoomUsers extends Vue {
-
   @State
   public readonly usersArray!: UserModel[];
+
   @State
   public readonly activeRoomId!: number;
+
   @State
   public readonly publicRooms!: RoomModel[];
+
   @State
   public readonly privateRooms!: RoomModel[];
 
   public directMinified: boolean = false;
+
   public roomsMinified: boolean = false;
+
   public onlineMinified: boolean = false;
+
   public onlineShowOnlyOnline: boolean = false;
 
   get onlineText() {
-    return this.onlineShowOnlyOnline ? 'Room Users' : 'Room Online';
+    return this.onlineShowOnlyOnline ? "Room Users" : "Room Online";
   }
 
   get directClass() {
-    return this.directMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
-  }
-  get roomsClass() {
-    return this.roomsMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
-  }
-  get onlineClass() {
-    return this.onlineMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
+    return this.directMinified ? "icon-angle-circled-up" : "icon-angle-circled-down";
   }
 
+  get roomsClass() {
+    return this.roomsMinified ? "icon-angle-circled-up" : "icon-angle-circled-down";
+  }
+
+  get onlineClass() {
+    return this.onlineMinified ? "icon-angle-circled-up" : "icon-angle-circled-down";
+  }
 }
 </script>
 
@@ -327,7 +335,6 @@ export default class RoomUsers extends Vue {
           color: #90e690
     .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
       color: #cccccc
-
 
 
 </style>

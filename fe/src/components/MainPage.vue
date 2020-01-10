@@ -4,7 +4,7 @@
       v-if="dim"
       class="wait"
     />
-    <app-nav v-show="showNav" />
+    <app-nav v-show="showNav"/>
     <incoming-call
       v-if="incomingCall"
       :call="incomingCall"
@@ -13,7 +13,7 @@
       v-if="inited"
       :include="['ChannelsPage', 'Painter']"
     >
-      <router-view class="body" />
+      <router-view class="body"/>
     </keep-alive>
     <div
       v-else
@@ -22,29 +22,32 @@
   </div>
 </template>
 <script lang="ts">
-import AppNav from '@/components/AppNav.vue';
-import {Component, Vue} from 'vue-property-decorator';
+import AppNav from "@/components/AppNav.vue";
+import {Component, Vue} from "vue-property-decorator";
 import {
   CurrentUserInfoModel,
   IncomingCallModel,
-  UserModel
-} from '@/types/model';
-import NotifierHandler from '@/utils/NotificationHandler';
-import {browserVersion, isChrome, isMobile, notifier} from '@/utils/singletons';
-import {State} from '@/utils/storeHolder';
-import IncomingCall from '@/components/chat/IncomingCall.vue';
+  UserModel,
+} from "@/types/model";
+import NotifierHandler from "@/utils/NotificationHandler";
+import {browserVersion, isChrome, isMobile, notifier} from "@/utils/singletons";
+import {State} from "@/utils/storeHolder";
+import IncomingCall from "@/components/chat/IncomingCall.vue";
 
 @Component({
-  components: {IncomingCall, AppNav}
+  components: {IncomingCall,
+    AppNav},
 })
 export default class MainPage extends Vue {
-
   @State
   public readonly showNav!: boolean;
+
   @State
   public readonly userInfo!: CurrentUserInfoModel;
+
   @State
   public readonly incomingCall!: IncomingCallModel;
+
   @State
   public readonly dim!: boolean;
 
@@ -56,7 +59,6 @@ export default class MainPage extends Vue {
     notifier.tryAgainRegisterServiceWorker();
     this.$ws.startListening();
   }
-
 }
 </script>
 

@@ -20,7 +20,7 @@
             Notifications
           </th>
           <td>
-            <app-checkbox v-model="notifications" />
+            <app-checkbox v-model="notifications"/>
           </td>
         </tr>
         <tr>
@@ -53,35 +53,44 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppInputRange from '@/components/ui/AppInputRange.vue';
-import AppSubmit from '@/components/ui/AppSubmit.vue';
-import AddUserToRoom from '@/components/pages/parts/AddUserToRoom.vue';
-import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
-import {AddRoomMessage} from '@/types/messages';
-import AppCheckbox from '@/components/ui/AppCheckbox.vue';
-import {PrivateRoomsIds} from '@/types/types';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import AppInputRange from "@/components/ui/AppInputRange.vue";
+import AppSubmit from "@/components/ui/AppSubmit.vue";
+import AddUserToRoom from "@/components/pages/parts/AddUserToRoom.vue";
+import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
+import {AddRoomMessage} from "@/types/messages";
+import AppCheckbox from "@/components/ui/AppCheckbox.vue";
+import {PrivateRoomsIds} from "@/types/types";
 
-@Component({components: {AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})
+@Component({components: {AppCheckbox,
+  AppInputRange,
+  AppSubmit,
+  AddUserToRoom}})
 export default class CreateRoom extends Vue {
-
   @State
   public readonly privateRooms!: RoomModel[];
+
   @State
   public readonly privateRoomsUsersIds!: PrivateRoomsIds;
+
   @State
   public readonly userInfo!: CurrentUserInfoModel;
+
   public currentUsers: UserModel[] = [];
+
   public notifications: boolean = false;
+
   public sound: number = 0;
-  public roomName: string = '';
+
+  public roomName: string = "";
+
   public running: boolean = false;
 
   @Prop() public isPublic!: boolean;
 
   get inviteUsers(): string {
-    return this.isPublic ? 'Invite users to new room' : 'Select user for private room';
+    return this.isPublic ? "Invite users to new room" : "Select user for private room";
   }
 
   get showInviteUsers() {
@@ -101,20 +110,19 @@ export default class CreateRoom extends Vue {
 
   public add() {
     if (this.isPublic && !this.roomName) {
-      this.store.growlError('Please specify room name');
+      this.store.growlError("Please specify room name");
     } else if (!this.isPublic && this.currentUsers.length === 0) {
-      this.store.growlError('Please add user');
+      this.store.growlError("Please add user");
     } else {
       this.running = true;
-      this.$ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), (e: AddRoomMessage) => {
-        if (e && e.roomId) {
+      this.$ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map((u) => u.id), (e: AddRoomMessage) => {
+        if (e.roomId) {
           this.$router.replace(`/chat/${e.roomId}`);
         }
         this.running = false;
       });
     }
   }
-
 }
 </script>
 

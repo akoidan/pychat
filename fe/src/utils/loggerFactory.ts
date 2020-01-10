@@ -1,3 +1,3 @@
-import { LoggerFactory, LogStrict } from 'lines-logger';
+import {LogStrict, LoggerFactory} from "lines-logger";
 
 export default new LoggerFactory(LogStrict.DEBUG);

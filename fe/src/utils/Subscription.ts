@@ -1,15 +1,15 @@
-import {DefaultMessage} from '@/types/messages';
-import {IMessageHandler} from '@/types/types';
-import loggerFactory from '@/utils/loggerFactory';
-import {Logger} from 'lines-logger';
+import {DefaultMessage} from "@/types/messages";
+import {IMessageHandler} from "@/types/types";
+import loggerFactory from "@/utils/loggerFactory";
+import {Logger} from "lines-logger";
 
 export default class Subscription {
-
   public channels: { [id: string]: IMessageHandler[] } = {};
+
   private readonly logger: Logger;
 
   constructor() {
-    this.logger = loggerFactory.getLoggerColor('sub', '#3a7a7a');
+    this.logger = loggerFactory.getLoggerColor("sub", "#3a7a7a");
   }
 
   public static getPeerConnectionId(connectionId: string, opponentWsId: string) {
@@ -24,8 +24,8 @@ export default class Subscription {
     if (!this.channels[channel]) {
       this.channels[channel] = [];
     }
-    if (this.channels[channel].indexOf(messageHandler) < 0) {
-      this.logger.debug('subscribing to {}, subscribeer {}', channel, messageHandler)();
+    if (!this.channels[channel].includes(messageHandler)) {
+      this.logger.debug("subscribing to {}, subscribeer {}", channel, messageHandler)();
       this.channels[channel].push(messageHandler);
     }
   }
@@ -33,25 +33,23 @@ export default class Subscription {
   public unsubscribe(channel: string) {
     const c = this.channels[channel];
     if (c) {
-      this.logger.debug('Unsubscribing from channel {}', channel)();
+      this.logger.debug("Unsubscribing from channel {}", channel)();
       delete this.channels[channel];
     } else {
-      this.logger.error('Unable to find channel to delete {}', channel)();
+      this.logger.error("Unable to find channel to delete {}", channel)();
     }
   }
 
   public notify(message: DefaultMessage): boolean {
-    if (this.channels[message.handler] &&  this.channels[message.handler].length) {
+    if (this.channels[message.handler] && this.channels[message.handler].length) {
       this.channels[message.handler].forEach((h: IMessageHandler) => {
         h.handle(message);
       });
 
       return true;
-    } else {
-      this.logger.error('Can\'t handle message {} because no channels found, available channels {}', message, this.channels)();
-
-      return false;
     }
-  }
+    this.logger.error("Can't handle message {} because no channels found, available channels {}", message, this.channels)();
 
+    return false;
+  }
 }

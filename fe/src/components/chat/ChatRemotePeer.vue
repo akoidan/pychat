@@ -17,16 +17,16 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-import {CallInfoModel} from '@/types/model';
-import AppInputRange from '@/components/ui/AppInputRange.vue';
-import VideoObject from '@/components/chat/VideoObject.vue';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Ref, Vue, Watch} from "vue-property-decorator";
+import {CallInfoModel} from "@/types/model";
+import AppInputRange from "@/components/ui/AppInputRange.vue";
+import VideoObject from "@/components/chat/VideoObject.vue";
 @Component({
-  components: {VideoObject, AppInputRange}
+  components: {VideoObject,
+    AppInputRange},
 })
 export default class ChatRemotePeer extends Vue {
-
   @Ref()
   public video!: VideoObject;
 
@@ -39,13 +39,13 @@ export default class ChatRemotePeer extends Vue {
   get volLevelClass() {
     return `vol-level-${this.callInfo.opponentCurrentVoice}`;
   }
+
   public volumeLevel: number = 100;
 
-  @Watch('volumeLevel')
+  @Watch("volumeLevel")
   public onVolumeChanged(newValue: number) {
     (this.video.$refs.video as HTMLVideoElement).volume = newValue / 100;
   }
-
 }
 </script>
 

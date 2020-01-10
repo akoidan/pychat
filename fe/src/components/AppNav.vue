@@ -108,20 +108,20 @@
   </nav>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Vue, Ref} from 'vue-property-decorator';
-import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
-import {logout} from '@/utils/utils';
-import {SetSearchTo} from '@/types/types';
-import {GITHUB_URL} from '@/utils/consts';
-import {webrtcApi} from '@/utils/singletons';
+import {State} from "@/utils/storeHolder";
+import {Component, Ref, Vue} from "vue-property-decorator";
+import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
+import {logout} from "@/utils/utils";
+import {SetSearchTo} from "@/types/types";
+import {GITHUB_URL} from "@/utils/consts";
+import {webrtcApi} from "@/utils/singletons";
 
 @Component
 export default class AppNav extends Vue {
-
   get title() {
-    return this.isOnline ? 'Websocket connection established. You are online' : 'Trying to connect to the server. You\'re offline';
+    return this.isOnline ? "Websocket connection established. You are online" : "Trying to connect to the server. You're offline";
   }
+
   @State
   public readonly activeRoom!: RoomModel;
 
@@ -143,7 +143,7 @@ export default class AppNav extends Vue {
   }
 
   public sendFileClick() {
-    this.inputFile.value = '';
+    this.inputFile.value = "";
     this.inputFile.click();
   }
 
@@ -154,12 +154,13 @@ export default class AppNav extends Vue {
   public invertSearch() {
     this.store.setSearchTo({
       roomId: this.activeRoom.id,
-      search: { ...this.activeRoom.search, searchActive: !this.activeRoom.search.searchActive}
-      });
+      search: {...this.activeRoom.search,
+        searchActive: !this.activeRoom.search.searchActive},
+    });
   }
 
   public toggle() {
-    this.logger.log('Toggle nav')();
+    this.logger.log("Toggle nav")();
     this.expanded = !this.expanded;
   }
 

@@ -1,23 +1,23 @@
 import {
-  FileTransferStatus,
+  CallInfoModel,
   ChangeOnline,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   FileModel,
-  MessageModel, ReceivingFile,
+  FileTransferStatus, MessageModel,
+  ReceivingFile,
   RoomModel,
-  RoomSettingsModel,
-  SearchModel, SendingFile,
-  UploadProgressModel,
-  UserModel, SendingFileTransfer, CallInfoModel
-} from '@/types/model';
-import {RoomDto, SetRooms, UserDto} from '@/types/dto';
-import {DefaultMessage} from '@/types/messages';
+  RoomSettingsModel, SearchModel,
+  SendingFile,
+  SendingFileTransfer, UploadProgressModel, UserModel,
+} from "@/types/model";
+import {RoomDto, SetRooms, UserDto} from "@/types/dto";
+import {DefaultMessage} from "@/types/messages";
 
 export interface UploadFile {
-   type: string;
-   symbol: string;
-   file: File|Blob;
+  type: string;
+  symbol: string;
+  file: File|Blob;
 }
 
 export type ValueFilterForKey<T extends object, U> = {
@@ -126,8 +126,8 @@ export interface RemoveSendingMessage {
   roomId: number;
 }
 
-export  interface IStorage {
-  // getIds(cb: SingleParamCB<object>);
+export interface IStorage {
+  // GetIds(cb: SingleParamCB<object>);
   saveMessages(messages: MessageModel[]): void;
   deleteMessage(id: number): void;
   deleteRoom(id: number): void;
@@ -145,11 +145,11 @@ export  interface IStorage {
   clearStorage(): void;
   clearMessages(): void;
   connect(): Promise<boolean>;
-  // getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
+  // GetRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
   setRoomHeaderId(roomId: number, value: number): void;
 }
 
-export interface  PostData<T> {
+export interface PostData<T> {
   url: string;
   params?: {[id: string]: string|Blob|null|number|boolean};
   formData?: FormData;
@@ -176,7 +176,7 @@ export interface SetReceivingFileStatus {
   anchor?: string;
 }
 
-export type ConnectionStatus = 'new' | 'closed';
+export type ConnectionStatus = "new" | "closed";
 
 interface SetSendingFileBase {
   roomId: number;
@@ -224,7 +224,7 @@ export interface RemoveMessageProgress {
 }
 
 export interface PubSetRooms extends DefaultMessage {
-  rooms:  RoomDto[];
+  rooms: RoomDto[];
   users: UserDto[];
   online: number[];
 }
@@ -244,7 +244,7 @@ export interface AddMessagePayload {
 }
 
 export enum IconColor {
-  SUCCESS = 'success', ERROR = 'error', WARN = 'warn', NOT_SET = ''
+  SUCCESS = "success", ERROR = "error", WARN = "warn", NOT_SET = ""
 }
 
 export interface SmileyStructure {

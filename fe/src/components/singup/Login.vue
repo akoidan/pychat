@@ -4,7 +4,7 @@
     @submit.prevent="login"
   >
     <div>
-      <i class="icon-user" />
+      <i class="icon-user"/>
       <input
         type="text"
         maxlength="254"
@@ -16,7 +16,7 @@
       />
     </div>
     <div>
-      <i class="icon-key" />
+      <i class="icon-key"/>
       <input
         type="password"
         name="password"
@@ -33,8 +33,8 @@
       Forgot Password?
     </router-link>
     <div>
-      <social-auth />
-      <captcha-component v-model="running" />
+      <social-auth/>
+      <captcha-component v-model="running"/>
       <app-submit
         class="submit-button"
         value="LOG IN"
@@ -45,31 +45,32 @@
 </template>
 
 <script lang='ts'>
-import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
-import AppSubmit from '@/components/ui/AppSubmit.vue';
-import {State} from '@/utils/storeHolder';
-import {ApplyGrowlErr, login} from '@/utils/utils';
-import SocialAuth from '@/components/singup/SocialAuth.vue';
-import CaptchaComponent from '@/components/singup/CaptchaComponent.vue';
+import {Component, Prop, Ref, Vue} from "vue-property-decorator";
+import AppSubmit from "@/components/ui/AppSubmit.vue";
+import {State} from "@/utils/storeHolder";
+import {ApplyGrowlErr, login} from "@/utils/utils";
+import SocialAuth from "@/components/singup/SocialAuth.vue";
+import CaptchaComponent from "@/components/singup/CaptchaComponent.vue";
 
-@Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
+@Component({components: {CaptchaComponent,
+  SocialAuth,
+  AppSubmit}})
 export default class Login extends Vue {
-
   @Ref()
   public form!: HTMLFormElement;
 
   public running: boolean = false;
 
   public created() {
-    this.store.setRegHeader('Welcome back!');
+    this.store.setRegHeader("Welcome back!");
   }
 
-  @ApplyGrowlErr({runningProp: 'running', message: `Can't log in`})
+  @ApplyGrowlErr({runningProp: "running",
+    message: "Can't log in"})
   public async login() {
     const ses: string = await this.$api.login(this.form);
     login(ses);
   }
-
 }
 </script>
 <style lang="sass" scoped>

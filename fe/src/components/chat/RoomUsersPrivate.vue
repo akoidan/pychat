@@ -1,13 +1,13 @@
 <template>
   <li :class="onlineActiveClass">
     <router-link :to="`/chat/${room.id}`">
-      <i :class="userSexClass" />{{ user.user }}
+      <i :class="userSexClass"/>{{ user.user }}
     </router-link>
     <router-link
       v-if="!room.newMessagesCount"
       :to="`/room-settings/${room.id}`"
     >
-      <span class="icon-cog" />
+      <span class="icon-cog"/>
     </router-link>
     <span
       v-if="room.newMessagesCount"
@@ -16,24 +16,28 @@
   </li>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
-import {getUserSexClass} from '@/utils/htmlApi';
-import {PrivateRoomsIds} from '@/types/types';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {CurrentUserInfoModel, RoomModel, UserModel} from "@/types/model";
+import {getUserSexClass} from "@/utils/htmlApi";
+import {PrivateRoomsIds} from "@/types/types";
 
 @Component
 export default class RoomUsersPrivate extends Vue {
-
   @Prop() public room!: RoomModel;
+
   @State
   public readonly online!: number[];
+
   @State
   public readonly activeRoomId!: number;
+
   @State
   public readonly privateRoomsUsersIds!: PrivateRoomsIds;
+
   @State
   public readonly userInfo!: CurrentUserInfoModel;
+
   @State
   public readonly allUsersDict!: { [id: number]: UserModel } ;
 
@@ -41,16 +45,16 @@ export default class RoomUsersPrivate extends Vue {
     return this.allUsersDict[this.privateRoomsUsersIds.roomUsers[this.room.id]];
   }
 
-  get onlineActiveClass (): string[] {
-    const a = [this.online.indexOf(this.user.id) < 0 ? 'offline' : 'online'];
+  get onlineActiveClass(): string[] {
+    const a = [!this.online.includes(this.user.id) ? "offline" : "online"];
     if (this.room.id === this.activeRoomId) {
-      a.push('active-room');
+      a.push("active-room");
     }
 
     return a;
   }
 
-  get userSexClass () {
+  get userSexClass() {
     return getUserSexClass(this.user);
   }
 }

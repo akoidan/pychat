@@ -22,25 +22,31 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/components/ui/AppSubmit.vue';
-import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from '@/utils/consts';
-import {ApplyGrowlErr, initFaceBook, initGoogle, login} from '@/utils/utils';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import AppSubmit from "@/components/ui/AppSubmit.vue";
+import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from "@/utils/consts";
+import {ApplyGrowlErr, initFaceBook, initGoogle, login} from "@/utils/utils";
 
 declare const gapi: any;
 declare const FB: any;
 
 @Component({
-  components: {AppSubmit}
+  components: {AppSubmit},
 })
 export default class SocialAuth extends Vue {
   public grunning: boolean = false;
+
   public frunning: boolean = false;
+
   public googleApiLoaded: boolean = false;
+
   public facebookApiLoaded: boolean = false;
+
   public googleToken: string|null = null;
+
   public oauth_token: string = GOOGLE_OAUTH_2_CLIENT_ID;
+
   public fb_app_id: string = FACEBOOK_APP_ID;
 
   get googleRunning() {
@@ -51,13 +57,13 @@ export default class SocialAuth extends Vue {
     return this.frunning || !this.facebookApiLoaded;
   }
 
-  @ApplyGrowlErr({ message: 'Unable to load google'})
+  @ApplyGrowlErr({message: "Unable to load google"})
   public async loadGoogle(): Promise<void> {
     await initGoogle();
     this.googleApiLoaded = true;
   }
 
-  @ApplyGrowlErr({ message: 'Unable to load facebook'})
+  @ApplyGrowlErr({message: "Unable to load facebook"})
   public async loadFaceBook(): Promise<void> {
     await initFaceBook();
     this.facebookApiLoaded = true;
@@ -71,16 +77,20 @@ export default class SocialAuth extends Vue {
     // @ts-ignore: next-line
     const googleUser = auth2.currentUser.get();
     const profile = googleUser.getBasicProfile();
-    this.logger.log('Signed as {} with id {} and email {}  ',
-                    profile.getName(), profile.getId(), profile.getEmail())();
+    this.logger.log(
+      "Signed as {} with id {} and email {}  ",
+      profile.getName(),
+      profile.getId(),
+      profile.getEmail(),
+    )();
     this.googleToken = googleUser.getAuthResponse().id_token;
     const s: string = await this.$api.googleAuth(this.googleToken!);
     login(s);
   }
 
-  @ApplyGrowlErr({ message: 'Unable to login in with google', runningProp: 'grunning'})
+  @ApplyGrowlErr({message: "Unable to login in with google",
+    runningProp: "grunning"})
   public async logWithGoogle() {
-
     const auth2 = gapi.auth2.getAuthInstance();
     if (auth2.isSignedIn.get()) {
       await this.onGoogleSignIn(auth2);
@@ -88,7 +98,7 @@ export default class SocialAuth extends Vue {
       await auth2.signIn();
     }
     await new Promise((resolve, reject) => {
-      auth2.isSignedIn.listen(async (isSignedIn: boolean) => {
+      auth2.isSignedIn.listen(async(isSignedIn: boolean) => {
         if (isSignedIn) {
           resolve();
         } else {
@@ -99,42 +109,45 @@ export default class SocialAuth extends Vue {
     this.onGoogleSignIn(auth2);
   }
 
-  @ApplyGrowlErr({ message: 'Unable to login in with facebook', runningProp: 'frunning'})
+  @ApplyGrowlErr({message: "Unable to login in with facebook",
+    runningProp: "frunning"})
   public async fbStatusChangeIfReAuth(response: {status: string}) {
-    this.logger.debug('fbStatusChangeIfReAuth {}', response)();
-    if (response.status === 'connected') {
+    this.logger.debug("fbStatusChangeIfReAuth {}", response)();
+    if (response.status === "connected") {
       // Logged into your app and Facebook.
-      this.store.growlInfo('Successfully logged in into facebook, proceeding...');
-      // TODO
-      // @ts-ignore: next-line
+      this.store.growlInfo("Successfully logged in into facebook, proceeding...");
+
+      /*
+       * TODO
+       * @ts-ignore: next-line
+       */
       const s = await this.$api.facebookAuth(response.authResponse.accessToken);
       login(s);
 
       return false;
-    } else if (response.status === 'not_authorized') {
+    } else if (response.status === "not_authorized") {
       this.frunning = false;
-      this.store.growlInfo('Allow facebook application to use your data');
+      this.store.growlInfo("Allow facebook application to use your data");
 
       return false;
-    } else {
-      return true;
     }
+    return true;
   }
 
   public async facebookLogin() {
     this.frunning = true;
 
-    const response: {status: string} = await new Promise(resolve => {
+    const response: {status: string} = await new Promise((resolve) => {
       FB.getLoginStatus(resolve);
     });
 
-    this.logger.log('fbStatusChange {}', response)();
+    this.logger.log("fbStatusChange {}", response)();
     if (await this.fbStatusChangeIfReAuth(response)) {
-      this.logger.log('Fblogin')();
+      this.logger.log("Fblogin")();
       const response: {status: string} = await new Promise((resolve, reject) => {
         FB.login(resolve, {
-          auth_type: 'reauthenticate',
-          scope: 'email'
+          auth_type: "reauthenticate",
+          scope: "email",
         });
       });
       await this.fbStatusChangeIfReAuth(response);

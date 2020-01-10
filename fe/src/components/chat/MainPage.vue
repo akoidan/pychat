@@ -51,7 +51,7 @@
         </div>
         <span v-show="!recordingNow">Starting recording...</span>
       </div>
-      <room-users />
+      <room-users/>
       <smiley-holder
         v-show="showSmileys"
         @add-smiley="addSmiley"
@@ -94,19 +94,19 @@
 </template>
 
 <script lang='ts'>
-import {Component, Vue, Watch, Ref} from 'vue-property-decorator';
+import {Component, Ref, Vue, Watch} from "vue-property-decorator";
 
-import RoomUsers from '@/components/chat/RoomUsers.vue';
-import ChatBox from '@/components/chat/ChatBox.vue';
-import SmileyHolder from '@/components/chat/SmileyHolder.vue';
+import RoomUsers from "@/components/chat/RoomUsers.vue";
+import ChatBox from "@/components/chat/ChatBox.vue";
+import SmileyHolder from "@/components/chat/SmileyHolder.vue";
 import {
   CurrentUserInfoModel,
   EditingMessage,
   FileModel,
   MessageModel,
   RoomModel,
-  UploadProgressModel, UserDictModel, UserModel
-} from '@/types/model';
+  UploadProgressModel, UserDictModel, UserModel,
+} from "@/types/model";
 import {
   encodeHTML,
   encodeMessage,
@@ -114,49 +114,63 @@ import {
   getMessageData,
   getSmileyHtml, pasteBlobAudioToTextArea, pasteBlobToContentEditable, pasteBlobVideoToTextArea,
   pasteHtmlAtCaret,
-  pasteImgToTextArea, placeCaretAtEnd, stopVideo, timeToString
-} from '@/utils/htmlApi';
-import NavEditMessage from '@/components/chat/NavEditMessage.vue';
-import NavUserShow from '@/components/chat/NavUserShow.vue';
-import {sem} from '@/utils/utils';
-import {MessageDataEncode, RemoveSendingMessage, UploadFile} from '@/types/types';
-import {channelsHandler, globalLogger, messageBus, webrtcApi} from '@/utils/singletons';
-import {State} from '@/utils/storeHolder';
-import MediaRecorder from '@/components/chat/MediaRecorder.vue';
-import {Route, RawLocation} from 'vue-router';
+  pasteImgToTextArea, placeCaretAtEnd, stopVideo, timeToString,
+} from "@/utils/htmlApi";
+import NavEditMessage from "@/components/chat/NavEditMessage.vue";
+import NavUserShow from "@/components/chat/NavUserShow.vue";
+import {sem} from "@/utils/utils";
+import {MessageDataEnode, RemoveSendingMessage, UploadFile} from "@/types/types";
+import {channelsHandler, globalLogger, messageBus, webrtcApi} from "@/utils/singletons";
+import {State} from "@/utils/storeHolder";
+import MediaRecorder from "@/components/chat/MediaRecorder.vue";
+import {RawLocation, Route} from "vue-router";
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-@Component({components: {MediaRecorder, RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
+@Component({components: {MediaRecorder,
+RoomUsers,
+ChatBox,
+SmileyHolder,
+NavEditMessage,
+NavUserShow}})
 export default class ChannelsPage extends Vue {
-
   @State
   public readonly editedMessage!: EditingMessage;
+
   @State
   public readonly allUsersDict!: UserDictModel;
+
   @State
   public readonly userInfo!: CurrentUserInfoModel;
+
   @State
   public readonly activeRoomId!: number;
+
   @State
   public readonly dim!: boolean;
+
   @State
   public readonly roomsArray!: RoomModel[];
+
   @State
   public readonly activeUser!: UserModel;
+
   @State
   public readonly activeRoom!: RoomModel;
+
   @State
   public readonly editingMessageModel!: MessageModel;
 
-  // used in mixin from event.keyCode === 38
+  // Used in mixin from event.keyCode === 38
 
   public srcVideo: string|null = null;
 
   @Ref()
   public userMessage!: HTMLElement;
+
   @Ref()
   public imgInput!: HTMLInputElement;
+
   @Ref()
   public video!: HTMLVideoElement;
 
@@ -164,16 +178,16 @@ export default class ChannelsPage extends Vue {
 
   public showSmileys: boolean = false;
 
-  @Watch('editedMessage')
+  @Watch("editedMessage")
   public onActiveRoomIdChange(val: EditingMessage) {
-    this.logger.log('editedMessage changed')();
-    if (val && val.isEditingNow) {
+    this.logger.log("editedMessage changed")();
+    if (val?.isEditingNow) {
       this.userMessage.innerHTML = encodeP(this.editingMessageModel);
       placeCaretAtEnd(this.userMessage);
     }
   }
 
-  @Watch('srcVideo')
+  @Watch("srcVideo")
   public onSrcChange(value: MediaStream | MediaSource | Blob | null) {
     if (this.video) {
       this.video.srcObject = value;
@@ -181,18 +195,18 @@ export default class ChannelsPage extends Vue {
   }
 
   public beforeRouteEnter(to: Route, frm: Route, next: (to?: RawLocation | false | ((vm: Vue) => any) | void) => void) {
-    next(vm => {
-      messageBus.$emit('main-join');
+    next((vm) => {
+      messageBus.$emit("main-join");
     });
   }
 
   public onImagePaste(evt: ClipboardEvent) {
     if (evt.clipboardData && evt.clipboardData.files && evt.clipboardData.files.length) {
-      this.logger.debug('Clipboard has {} files', evt.clipboardData!.files.length)();
+      this.logger.debug("Clipboard has {} files", evt.clipboardData!.files.length)();
       for (let i = 0; i < evt.clipboardData!.files.length; i++) {
         const file = evt.clipboardData!.files[i];
-        this.logger.debug('loop {}', file)();
-        if (file.type.indexOf('image') >= 0) {
+        this.logger.debug("loop {}", file)();
+        if (file.type.includes('image')) {
           pasteImgToTextArea(file, this.userMessage, (err: string) => {
             this.store.growlError(err);
           });
@@ -202,18 +216,18 @@ export default class ChannelsPage extends Vue {
   }
 
   public created() {
-    messageBus.$on('quote', (message: MessageModel) => {
+    messageBus.$on("quote", (message: MessageModel) => {
       this.userMessage.focus();
       let oldValue = this.userMessage.innerHTML;
       const match = oldValue.match(timePattern);
       const user = this.allUsersDict[message.userId];
       oldValue = match ? oldValue.substr(match[0].length + 1) : oldValue;
-      this.userMessage.innerHTML = encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message) + encodeHTML(' >>>') + String.fromCharCode(13) + ' ' + oldValue;
+      this.userMessage.innerHTML = `${encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message) + encodeHTML(' >>>') + String.fromCharCode(13)  } ${  oldValue}`;
       placeCaretAtEnd(this.userMessage);
     });
-    messageBus.$on('blob', (e: Blob) => {
-      this.logger.log('Pasting blob {}', e)();
-      this.$nextTick(function () {
+    messageBus.$on("blob", (e: Blob) => {
+      this.logger.log("Pasting blob {}", e)();
+      this.$nextTick(function() {
         pasteBlobToContentEditable(e, this.userMessage);
       });
     });
@@ -228,7 +242,8 @@ export default class ChannelsPage extends Vue {
   }
 
   public navEditMessage() {
-    this.store.setEditedMessage({...this.editedMessage, isEditingNow: true});
+    this.store.setEditedMessage({...this.editedMessage,
+isEditingNow: true});
   }
 
   public closeEditing() {
@@ -240,7 +255,7 @@ export default class ChannelsPage extends Vue {
     this.recordingNow = false;
     this.video.pause();
     if (file) {
-      pasteBlobVideoToTextArea(file, this.userMessage, 'm', (e: string) => {
+      pasteBlobVideoToTextArea(file, this.userMessage, "m", (e: string) => {
         this.store.growlError(e);
       });
     }
@@ -261,14 +276,13 @@ export default class ChannelsPage extends Vue {
   }
 
   public dropPhoto(evt: DragEvent) {
-
     const files: FileList = (evt.dataTransfer && evt.dataTransfer!.files) as FileList;
-    this.logger.debug('Drop photo {} ', files)();
+    this.logger.debug("Drop photo {} ", files)();
     if (files) {
       for (let i = 0; i < files.length; i++) {
-        this.logger.debug('loop')();
+        this.logger.debug("loop")();
         const file = files[i];
-        if (file.type.indexOf('image') >= 0) {
+        if (file.type.includes('image')) {
           pasteImgToTextArea(file, this.userMessage, (err: string) => {
             this.store.growlError(err);
           });
@@ -279,25 +293,25 @@ export default class ChannelsPage extends Vue {
     }
   }
 
-  public handleFileSelect (evt: Event) {
+  public handleFileSelect(evt: Event) {
     const files: FileList = (evt.target as HTMLInputElement).files!;
     for (let i = 0; i < files.length; i++) {
       pasteImgToTextArea(files[i], this.userMessage, (err: string) => {
         this.store.growlError(err);
       });
     }
-    this.imgInput.value = '';
+    this.imgInput.value = "";
   }
 
   public addSmiley(code: string) {
-    this.logger.log('Adding smiley {}', code)();
+    this.logger.log("Adding smiley {}", code)();
     pasteHtmlAtCaret(getSmileyHtml(code), this.userMessage);
   }
 
   public checkAndSendMessage(event: KeyboardEvent) {
     if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
       event.preventDefault();
-      this.logger.debug('Checking sending message')();
+      this.logger.debug("Checking sending message")();
       if (this.editedMessage && this.editedMessage.isEditingNow) {
         const md: MessageDataEncode = getMessageData(this.userMessage, this.editingMessageModel.symbol!);
         this.appendPreviousMessagesFiles(md, this.editedMessage.messageId);
@@ -309,16 +323,15 @@ export default class ChannelsPage extends Vue {
     } else if (event.keyCode === 27) { // 27 = escape
       this.showSmileys = false;
       if (this.editedMessage) {
-        this.userMessage.innerHTML = '';
+        this.userMessage.innerHTML = "";
         this.store.setEditedMessage(null);
-
       }
-    } else if (event.keyCode === 38 && this.userMessage.innerHTML == '') { // up arrow
-      const messages = this.activeRoom.messages;
+    } else if (event.keyCode === 38 && this.userMessage.innerHTML == "") { // Up arrow
+      const {messages} = this.activeRoom;
       if (Object.keys(messages).length > 0) {
         let maxTime: MessageModel |null = null;
         for (const m in messages) {
-          if (!maxTime || (messages[m].time >= maxTime.time)) {
+          if (!maxTime || messages[m].time >= maxTime.time) {
             maxTime = messages[m];
           }
         }
@@ -346,38 +359,39 @@ export default class ChannelsPage extends Vue {
       userId: this.userInfo.userId,
       transfer: {
         upload: null,
-        error: null
-      }
+        error: null,
+      },
     };
     this.store.addMessage(mm);
     channelsHandler.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
   }
 
   private editMessageWs(
-      messageContent: string|null,
-      uploadFiles: UploadFile[],
-      messageId: number,
-      roomId: number,
-      symbol: string|null,
-      files: {[id: number]: FileModel}|null): void {
-      const mm: MessageModel = {
-        roomId,
-        deleted: !messageContent,
-        id: messageId,
-        transfer: !!messageContent || messageId > 0 ? {
-          error: null,
-          upload: null
-        } : null,
-        time: this.editingMessageModel.time,
-        content: messageContent,
-        symbol: symbol,
-        giphy: null,
-        edited: this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1,
-        files,
-        userId: this.userInfo.userId
-      };
-      this.store.addMessage(mm);
-      if (messageId < 0 && messageContent) {
+    messageContent: string|null,
+    uploadFiles: UploadFile[],
+    messageId: number,
+    roomId: number,
+    symbol: string|null,
+    files: {[id: number]: FileModel}|null
+): void {
+    const mm: MessageModel = {
+      roomId,
+      deleted: !messageContent,
+      id: messageId,
+      transfer: Boolean(messageContent) || messageId > 0 ? {
+        error: null,
+        upload: null,
+      } : null,
+      time: this.editingMessageModel.time,
+      content: messageContent,
+      symbol: symbol,
+      giphy: null,
+      edited: this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1,
+      files,
+      userId: this.userInfo.userId,
+    };
+    this.store.addMessage(mm);
+    if (messageId < 0 && messageContent) {
       channelsHandler.sendSendMessage(messageContent, roomId, uploadFiles, messageId, this.editingMessageModel.time);
     } else if (messageId > 0 && messageContent) {
       channelsHandler.sendEditMessage(messageContent, roomId, messageId, uploadFiles);
@@ -386,7 +400,7 @@ export default class ChannelsPage extends Vue {
     } else if (!messageContent && messageId < 0) {
       channelsHandler.removeSendingMessage(messageId);
     }
-      this.store.setEditedMessage(null);
+    this.store.setEditedMessage(null);
   }
 
   private appendPreviousMessagesFiles(md: MessageDataEncode, messageId: number) {
@@ -395,14 +409,14 @@ export default class ChannelsPage extends Vue {
     }
     if (this.editingMessageModel.files) {
       for (const f in this.editingMessageModel.files) {
-        if (md.messageContent.indexOf(f) >= 0) {
+        if (md.messageContent.includes(f)) {
           md.fileModels[f] = this.editingMessageModel.files[f];
         }
       }
     }
     const messageFiles: UploadFile[] = channelsHandler.getMessageFiles(messageId);
-    messageFiles.forEach(f => {
-      if (md.messageContent!.indexOf(f.symbol) >= 0) {
+    messageFiles.forEach((f) => {
+      if (md.messageContent!.includes(f.symbol)) {
         md.files.push(f);
       }
     });

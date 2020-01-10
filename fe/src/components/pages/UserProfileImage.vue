@@ -41,31 +41,36 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Ref, Vue, Watch} from 'vue-property-decorator';
-import {canvasContext, resolveMediaUrl, stopVideo} from '@/utils/htmlApi';
-import AppSubmit from '@/components/ui/AppSubmit.vue';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {State} from "@/utils/storeHolder";
+import {Component, Ref, Vue, Watch} from "vue-property-decorator";
+import {canvasContext, resolveMediaUrl, stopVideo} from "@/utils/htmlApi";
+import AppSubmit from "@/components/ui/AppSubmit.vue";
+import {ApplyGrowlErr} from "@/utils/utils";
 
 @Component({
-  components: {AppSubmit}
+  components: {AppSubmit},
 })
 export default class UserProfileImage extends Vue {
-
   get helpText(): string {
-    return this.showVideo ? 'Click on this zone with white border to capture an image' : 'You can also drag-n-drop image on zone bellow';
+    return this.showVideo ? "Click on this zone with white border to capture an image" : "You can also drag-n-drop image on zone bellow";
   }
 
   get buttonText(): string {
-    return this.showVideo ? 'Close webcam' : 'Make a photo from webcam';
+    return this.showVideo ? "Close webcam" : "Make a photo from webcam";
   }
 
   public running: boolean = false;
-  public srcImg: string = '';
+
+  public srcImg: string = "";
+
   public srcVideo: MediaStream |null = null;
+
   public blob: Blob |null = null;
-  public fileInputValue: string = '';
+
+  public fileInputValue: string = "";
+
   public showVideo: boolean = false;
+
   public isStopped: boolean = true;
 
   @State
@@ -77,63 +82,62 @@ export default class UserProfileImage extends Vue {
   @Ref()
   private changeProfileVideo!: HTMLVideoElement;
 
-  @Watch('userImage')
+  @Watch("userImage")
   public onUserImageChange(value: string) {
     this.srcImg = resolveMediaUrl(value);
-    this.store.growlInfo('New image has been set');
+    this.store.growlInfo("New image has been set");
   }
 
   public created() {
-    this.srcImg = this.userImage ? resolveMediaUrl(this.userImage) : '';
+    this.srcImg = this.userImage ? resolveMediaUrl(this.userImage) : "";
   }
 
   public dropPhoto(e: DragEvent) {
-    this.logger.debug('Drop photo')();
+    this.logger.debug("Drop photo")();
     const file = e.dataTransfer!.files[0];
     this.blob = file;
     if (file) {
-      const ok = this.setPhotoFromReader(file, 'drop');
+      const ok = this.setPhotoFromReader(file, "drop");
       if (ok) {
-        this.inputFile.value = '';
+        this.inputFile.value = "";
       }
     } else {
-      this.store.growlError('No files found in draggable object');
+      this.store.growlError("No files found in draggable object");
     }
   }
 
   public selectFile() {
-    this.logger.debug('Selecting file')();
+    this.logger.debug("Selecting file")();
     this.inputFile.click();
   }
 
   public photoInputChanged(e: Event) {
     const f: File = (e.target as HTMLInputElement)!.files![0];
-    const ok = this.setPhotoFromReader(f, 'input');
+    const ok = this.setPhotoFromReader(f, "input");
     if (!ok) {
-      this.fileInputValue = '';
+      this.fileInputValue = "";
     } else {
       this.blob = f;
     }
   }
 
   public setPhotoFromReader(file: File, type: string) {
-    if (file && file.type && file.type.match(/image.*/)) {
+    if (file.type.match(/image.*/)) {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.srcImg = reader.result as string;
-        this.store.growlSuccess('Photo has been rendered, click save to apply it');
+        this.store.growlSuccess("Photo has been rendered, click save to apply it");
       };
       reader.readAsDataURL(file);
 
       return true;
-    } else {
-      this.store.growlError('Invalid file type ' + file.type);
-
-      return false;
     }
+    this.store.growlError(`Invalid file type ${file.type}`);
+
+    return false;
   }
 
-  @Watch('srcVideo')
+  @Watch("srcVideo")
   public onSrcVideoChange(value: MediaStream | MediaSource | Blob | null) {
     if (this.changeProfileVideo) {
       this.changeProfileVideo.srcObject = value;
@@ -144,8 +148,8 @@ export default class UserProfileImage extends Vue {
     navigator.getUserMedia({video: true}, (localMediaStream: MediaStream) => {
       this.srcVideo = localMediaStream;
       this.changeProfileVideo.play();
-    },                     (error) => {
-      this.logger.log('navigator.getUserMedia error: {}', error)();
+    }, (error) => {
+      this.logger.log("navigator.getUserMedia error: {}", error)();
     });
   }
 
@@ -154,15 +158,18 @@ export default class UserProfileImage extends Vue {
       canvasContext.canvas.width = this.changeProfileVideo.videoWidth;
       canvasContext.canvas.height = this.changeProfileVideo.videoHeight;
       canvasContext.drawImage(this.changeProfileVideo, 0, 0);
-      // "image/webp" works in Chrome.
-      // Other browsers will fall back to image/png.
+
+      /*
+       * "image/webp" works in Chrome.
+       * Other browsers will fall back to image/png.
+       */
       canvasContext.canvas.toBlob((blob) => {
         this.srcImg = URL.createObjectURL(blob);
-        blob!.name = '.jpg';
+        blob!.name = ".jpg";
         this.blob = blob;
-      },                          'image/jpeg', 0.95);
-      this.inputFile.value = '';
-      this.store.growlInfo('Image has been set. Click on "Finish" to hide video');
+      }, "image/jpeg", 0.95);
+      this.inputFile.value = "";
+      this.store.growlInfo("Image has been set. Click on \"Finish\" to hide video");
     }
   }
 
@@ -177,26 +184,27 @@ export default class UserProfileImage extends Vue {
         this.srcVideo = stream;
         this.showVideo = true;
         this.isStopped = false;
-        this.store.growlInfo('Click on your video to take a photo');
-      },                     (e) => {
-        this.logger.error('Error while trying to capture a picture "{}"', e.message || e.name)();
-        this.store.growlError(`Unable to use your webcam because ${e.message || e.name}`);
+        this.store.growlInfo("Click on your video to take a photo");
+      }, (e) => {
+        this.logger.error("Error while trying to capture a picture \"{}\"", e.message ?? e.name)();
+        this.store.growlError(`Unable to use your webcam because ${e.message ?? e.name}`);
       });
     } else {
       this.stopVideo();
-      this.store.growlInfo('To apply photo click on save');
+      this.store.growlInfo("To apply photo click on save");
       this.showVideo = false;
       this.isStopped = true;
     }
   }
 
-  @ApplyGrowlErr({ message: 'Unable to upload event', runningProp: 'running'})
+  @ApplyGrowlErr({message: "Unable to upload event",
+    runningProp: "running"})
   public async upload() {
     if (!this.blob) {
-      this.store.growlError('Please select image first');
+      this.store.growlError("Please select image first");
     } else {
       await this.$api.uploadProfileImage(this.blob);
-      this.store.growlSuccess('Image uploaded');
+      this.store.growlSuccess("Image uploaded");
     }
   }
 

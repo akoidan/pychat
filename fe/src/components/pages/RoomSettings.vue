@@ -28,7 +28,7 @@
             Notifications
           </th>
           <td>
-            <app-checkbox v-model="notifications" />
+            <app-checkbox v-model="notifications"/>
           </td>
         </tr>
         <tr>
@@ -71,41 +71,47 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppInputRange from '@/components/ui/AppInputRange.vue';
-import AppSubmit from '@/components/ui/AppSubmit.vue';
-import AppCheckbox from '@/components/ui/AppCheckbox.vue';
-import {RoomDictModel, RoomModel, RoomSettingsModel} from '@/types/model';
-import {ApplyGrowlErr} from '@/utils/utils';
-@Component({components: {AppInputRange, AppSubmit, AppCheckbox}})
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import AppInputRange from "@/components/ui/AppInputRange.vue";
+import AppSubmit from "@/components/ui/AppSubmit.vue";
+import AppCheckbox from "@/components/ui/AppCheckbox.vue";
+import {RoomDictModel, RoomModel, RoomSettingsModel} from "@/types/model";
+import {ApplyGrowlErr} from "@/utils/utils";
+@Component({components: {AppInputRange,
+  AppSubmit,
+  AppCheckbox}})
 export default class RoomSettings extends Vue {
-
   get room(): RoomModel {
     return this.roomsDict[this.roomId];
   }
 
   get roomId(): number {
-    const id = this.$route.params.id;
-    this.logger.log('Rending room settings for {}', id)();
+    const {id} = this.$route.params;
+    this.logger.log("Rending room settings for {}", id)();
 
     return parseInt(id);
   }
 
-  public roomName: string = '';
+  public roomName: string = "";
+
   public sound: number = 0;
+
   public notifications: boolean = false;
+
   public running: boolean = false;
+
   public isPublic: boolean = false;
+
   @State
   public readonly roomsDict!: RoomDictModel;
 
   public leave() {
-    this.logger.log('Leaving room {}', this.roomId)();
+    this.logger.log("Leaving room {}", this.roomId)();
     this.running = true;
     this.$ws.sendLeaveRoom(this.roomId, () => {
       this.running = false;
-      this.$router.replace('/chat/1');
+      this.$router.replace("/chat/1");
     });
   }
 
@@ -113,26 +119,27 @@ export default class RoomSettings extends Vue {
     this.setVars();
   }
 
-  @ApplyGrowlErr({runningProp: 'running', message: `Can't set room settings`})
+  @ApplyGrowlErr({runningProp: "running",
+    message: "Can't set room settings"})
   public async apply() {
-    this.logger.log('Applying room {} settings', this.roomId)();
+    this.logger.log("Applying room {} settings", this.roomId)();
     await this.$api.sendRoomSettings(this.roomName, this.sound, this.notifications, this.roomId);
     const payload: RoomSettingsModel = {
       id: this.roomId,
       name: this.roomName,
       notifications: this.notifications,
-      volume: this.sound
+      volume: this.sound,
     };
     this.store.setRoomSettings(payload);
-    this.store.growlSuccess('Settings has been saved');
+    this.store.growlSuccess("Settings has been saved");
     this.$router.go(-1);
   }
 
   private setVars() {
-    this.logger.log('Updated for room settings {} ', this.room)();
+    this.logger.log("Updated for room settings {} ", this.room)();
     if (this.room) {
       this.roomName = this.room.name;
-      this.isPublic = !!this.roomName;
+      this.isPublic = Boolean(this.roomName);
       this.sound = this.room.volume;
       this.notifications = this.room.notifications;
     }

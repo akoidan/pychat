@@ -1,6 +1,6 @@
 <template>
   <div :class="cls">
-    <chat-message :message="message" />
+    <chat-message :message="message"/>
     <template v-if="message.transfer">
       <app-progress-bar
         v-if="message.transfer.upload && !message.transfer.error"
@@ -11,30 +11,32 @@
         class="icon-repeat"
         @click="retry"
       >{{ message.transfer.error }}</i>
-      <div class="spinner" />
+      <div class="spinner"/>
     </template>
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import ChatMessage from '@/components/chat/ChatMessage.vue';
-import AppProgressBar from '@/components/ui/AppProgressBar.vue';
-import {channelsHandler} from '@/utils/singletons';
-import {SetMessageProgressError} from '@/types/types';
+import {State} from "@/utils/storeHolder";
+import {Component, Prop, Vue} from "vue-property-decorator";
+import ChatMessage from "@/components/chat/ChatMessage.vue";
+import AppProgressBar from "@/components/ui/AppProgressBar.vue";
+import {channelsHandler} from "@/utils/singletons";
+import {SetMessageProgressError} from "@/types/types";
 import {
   CurrentUserInfoModel,
   MessageModel,
-  RoomDictModel
-} from '@/types/model';
+  RoomDictModel,
+} from "@/types/model";
 @Component({
-  components: {AppProgressBar, ChatMessage}
+  components: {AppProgressBar,
+    ChatMessage},
 })
 export default class ChatSendingMessage extends Vue {
   @Prop() public message!: MessageModel;
 
   @State
   public readonly userInfo!: CurrentUserInfoModel;
+
   @State
   public readonly roomsDict!: RoomDictModel;
 
@@ -49,11 +51,11 @@ export default class ChatSendingMessage extends Vue {
   get cls() {
     return {
       sendingMessage: this.message.transfer && !this.message.transfer.upload,
-      uploadMessage: this.message.transfer && !!this.message.transfer.upload,
-      'filter-search': this.searchedIds.indexOf(this.message.id) >= 0,
-      'message-self': this.isSelf,
-      'message-others': !this.isSelf,
-      'removed-message': this.message.deleted
+      uploadMessage: this.message.transfer && Boolean(this.message.transfer.upload),
+      "filter-search": this.searchedIds.includes(this.message.id),
+      "message-self": this.isSelf,
+      "message-others": !this.isSelf,
+      "removed-message": this.message.deleted,
     };
   }
 
@@ -65,11 +67,11 @@ export default class ChatSendingMessage extends Vue {
     const newVar: SetMessageProgressError = {
       messageId: this.message.id,
       roomId: this.message.roomId,
-      error: null
+      error: null,
     };
     this.store.setMessageProgressError(newVar);
     channelsHandler.resendMessage(this.message.id);
-    this.store.growlInfo('Trying to upload files again');
+    this.store.growlInfo("Trying to upload files again");
   }
 }
 </script>

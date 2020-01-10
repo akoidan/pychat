@@ -1,9 +1,9 @@
 <template>
-  <create-room :is-public="true" />
+  <create-room :is-public="true"/>
 </template>
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
-import CreateRoom from '@/components/pages/parts/CreateRoom.vue';
+import {Component, Vue} from "vue-property-decorator";
+import CreateRoom from "@/components/pages/parts/CreateRoom.vue";
 
 @Component({components: {CreateRoom}})
 export default class CreatePublicRoom extends Vue {

@@ -4,10 +4,10 @@ import {
   FileModel,
   RoomDictModel,
   SexModelString,
-  UserModel
-} from '@/types/model';
+  UserModel,
+} from "@/types/model";
 
-export type SexModelDto = 'Male' | 'Female' |'Secret';
+export type SexModelDto = "Male" | "Female" |"Secret";
 
 export interface RoomDto {
   name: string;

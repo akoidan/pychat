@@ -7,21 +7,20 @@
         :growl="growl"
       />
     </div>
-    <router-view />
+    <router-view/>
   </div>
 </template>
 
 <script lang='ts'>
-import Growl from '@/components/ui/AppGrowl.vue';
-import {Component, Vue, Watch} from 'vue-property-decorator';
-import {CurrentUserSettingsModel, GrowlModel} from '@/types/model';
-import {State} from '@/utils/storeHolder';
+import Growl from "@/components/ui/AppGrowl.vue";
+import {Component, Vue, Watch} from "vue-property-decorator";
+import {CurrentUserSettingsModel, GrowlModel} from "@/types/model";
+import {State} from "@/utils/storeHolder";
 
 @Component({
-  components: {Growl}
+  components: {Growl},
 })
 export default class App extends Vue {
-
   @State
   public readonly userSettings!: CurrentUserSettingsModel;
 
@@ -29,14 +28,13 @@ export default class App extends Vue {
   public readonly growls!: GrowlModel[];
 
   get mainClass(): string {
-    return this.userSettings && this.userSettings.theme || 'color-reg';
+    return this.userSettings && this.userSettings.theme || "color-reg";
   }
 
-  @Watch('mainClass')
+  @Watch("mainClass")
   public onMainClassChange(value: string) {
     document.body.parentElement!.className = value;
   }
-
 }
 </script>
 <style lang="sass" scoped>

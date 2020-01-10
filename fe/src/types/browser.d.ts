@@ -10,7 +10,7 @@ declare interface Document {
 
 declare interface RTCPeerConnection {
   onaddstream(event: MediaStreamEvent): void;
-  // obsolete (deprecated) TODO
+  // Obsolete (deprecated) TODO
   addStream(a: MediaStream): void;
   removeStream(a: MediaStream): void;
 }
@@ -33,10 +33,15 @@ declare interface MediaDevices {
 
 declare class MediaRecorder {
   public onstop: Function;
+
   public ondataavailable: Function;
+
   constructor(stream: MediaStream, options: {});
+
   public static isTypeSupported(t: string): boolean;
+
   public stop(): void;
+
   public start(time?: number): void;
 }
 
@@ -48,7 +53,7 @@ declare class MediaRecorderDataAvailableEvent {
   public data: { size: number };
 }
 
-declare  interface Blob {
+declare interface Blob {
   name?: string;
 }
 

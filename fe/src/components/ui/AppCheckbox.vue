@@ -7,23 +7,22 @@
       type="checkbox"
       @change="onchange"
     />
-    <label :for="uniqueId" />
+    <label :for="uniqueId"/>
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue, Ref, Emit} from 'vue-property-decorator';
-import {getUniqueId} from '@/utils/htmlApi';
+import {Component, Emit, Prop, Ref, Vue} from "vue-property-decorator";
+import {getUniqueId} from "@/utils/htmlApi";
 
 @Component
 export default class AppCheckbox extends Vue {
-
   @Prop()
   public readonly value!: boolean;
 
   private uniqueId!: string;
 
   @Ref()
-  private checkbox!: HTMLInputElement;
+  private readonly checkbox!: HTMLInputElement;
 
   public onchange(e: Event) {
     this.input(e);

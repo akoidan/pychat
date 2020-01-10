@@ -34,17 +34,19 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {CurrentUserInfoModel, UserModel} from '@/types/model';
+import {Component, Prop, Vue} from "vue-property-decorator";
+import {CurrentUserInfoModel, UserModel} from "@/types/model";
 
 @Component
 export default class AddUserToRoom extends Vue {
-
-  public search: string = '';
+  public search: string = "";
 
   @Prop() public value!: UserModel[];
+
   @Prop() public text!: string;
+
   @Prop() public excludeUsersIds!: number[];
+
   @Prop({default: true}) public showInviteUsers!: boolean;
 
   public removeUser(currentUser: UserModel) {
@@ -52,16 +54,16 @@ export default class AddUserToRoom extends Vue {
   }
 
   get users(): UserModel[] {
-    const uids: number[] = this.value.map(a => a.id);
+    const uids: number[] = this.value.map((a) => a.id);
     uids.push(this.store.userInfo!.userId);
     uids.push(...this.excludeUsersIds);
     const users: UserModel[] = [];
-    this.store.usersArray.forEach(u => {
-      if (uids.indexOf(u.id) < 0) {
+    this.store.usersArray.forEach((u) => {
+      if (!uids.includes(u.id)) {
         users.push(u);
       }
     });
-    this.logger.debug('Reeval users in CreatePrivateRoom')();
+    this.logger.debug("Reeval users in CreatePrivateRoom")();
 
     return users;
   }
@@ -71,15 +73,15 @@ export default class AddUserToRoom extends Vue {
   }
 
   public addUser(user: UserModel) {
-    this.search = '';
+    this.search = "";
     this.value.push(user);
   }
 
   get filteredUsers(): UserModel[] {
-    this.logger.debug('Reeval filter CreatePrivateRoom')();
+    this.logger.debug("Reeval filter CreatePrivateRoom")();
     const s = this.search.toLowerCase();
 
-    return this.users.filter(u => u.user.toLowerCase().indexOf(s) >= 0);
+    return this.users.filter((u) => u.user.toLowerCase().includes(s));
   }
 }
 </script>

@@ -19,19 +19,22 @@
     </div>
     <div class="container">
       <keep-alive>
-        <router-view class="profileInner" />
+        <router-view class="profileInner"/>
       </keep-alive>
     </div>
   </div>
 </template>
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
-import UserProfileChangePassword from '@/components/pages/UserProfileChangePassword.vue';
-import UserProfileImage from '@/components/pages/UserProfileImage.vue';
-import UserProfileInfo from '@/components/pages/UserProfileInfo.vue';
-import UserProfileSettings from '@/components/pages/UserProfileSettings.vue';
+import {Component, Vue} from "vue-property-decorator";
+import UserProfileChangePassword from "@/components/pages/UserProfileChangePassword.vue";
+import UserProfileImage from "@/components/pages/UserProfileImage.vue";
+import UserProfileInfo from "@/components/pages/UserProfileInfo.vue";
+import UserProfileSettings from "@/components/pages/UserProfileSettings.vue";
 
-@Component({components: {UserProfileChangePassword, UserProfileImage, UserProfileInfo, UserProfileSettings}})
+@Component({components: {UserProfileChangePassword,
+  UserProfileImage,
+  UserProfileInfo,
+  UserProfileSettings}})
 export default class UserProfile extends Vue {
 }
 </script>
