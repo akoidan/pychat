@@ -90,8 +90,8 @@ DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
 		'NAME': 'pychat',
-		'USER': 'root',
-		'PASSWORD': '',
+		'USER': 'pychat',
+		'PASSWORD': 'pypass',
 		'HOST': 'localhost',
 		'default-character-set': 'utf8',
 		'OPTIONS': {
@@ -141,7 +141,7 @@ WS_ID_CHAR_LENGTH = 4
 
 DEFAULT_PROFILE_ID = 1
 
-ISSUES_REPORT_LINK = 'https://github.com/Deathangel908/pychat/issues/new'
+ISSUES_REPORT_LINK = 'https://github.com/akoidan/pychat/issues/new'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'photos')
 
