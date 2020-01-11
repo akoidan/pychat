@@ -31,8 +31,8 @@ readme_directory = /usr/share/doc/postfix
 ## SSL
 smtpd_use_tls = yes
 smtpd_tls_auth_only = yes
-smtpd_tls_key_file = /etc/nginx/ssl/server.key
-smtpd_tls_cert_file = /etc/nginx/ssl/certificate.crt
+smtpd_tls_key_file = /etc/letsencrypt/live/pychat.org/privkey.pem
+smtpd_tls_cert_file = /etc/letsencrypt/live/pychat.org/fullchain.pem
 smtpd_tls_loglevel = 1
 meta_directory = /etc/postfix
 shlib_directory = /usr/lib/postfix
