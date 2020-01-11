@@ -116,7 +116,7 @@ If you don't or unable to run docker you can alway do the setup w/o it. You defi
    - Either use something like [certbot](https://certbot.eff.org/lets-encrypt/arch-nginx)
  - Copy config files to rootfs with  `sh download_content.sh copy_root_fs`.
  - Don't forget to change the owner of current (project) directory to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`.
- - Generate postfix files: `install -d -m 0555 -o postfix -g postfix /etc/postfix/virtual; postmap /etc/postfix/virtual; newaliases; echo '/.+@.+/ root@pychat.org' > /etc/postfix/virtual-regexp; echo 'root postmaster' > /etc/aliases`
+ - Generate postfix files: `install -d -m 0555 -o postfix -g postfix /etc/postfix/virtual; postmap /etc/postfix/virtual; newaliases; touch /etc/postfix/virtual-regexp; echo 'root postmaster' > /etc/aliases`
  - For archlinux start this services: `packages=( mysqld  redis systemctl tornado@8888 nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`
  - For centos start that services: `packages=( redis-server  nginx postfix mysqld tornado@8888) ; for package in "${packages[@]}" ; do service $package start; done;`
  - If you want to enable autostart (after reboot) for archlinux: `packages=( redis  nginx postfix mysqld tornado) ; for package in "${packages[@]}" ; do systemctl start $package; done;`
