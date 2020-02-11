@@ -1,6 +1,6 @@
 setuptools==38.4.0
 oauth2client==4.1.2
-Django==2.2.4
+Django==2.2.10
 #git+https://github.com/django/django.git@52545e788d664040abf4f1a5d77cdfc61152ffca
 redis==2.10.6
 tornado==4.5.3
