@@ -40,6 +40,7 @@ base_logger = logging.LoggerAdapter(parent_logger, {
 GIPHY_API_KEY = getattr(settings, "GIPHY_API_KEY", None)
 FIREBASE_API_KEY = getattr(settings, "FIREBASE_API_KEY", None)
 
+
 class MessagesHandler(MessagesCreator):
 
 	def __init__(self, *args, **kwargs):
@@ -352,7 +353,6 @@ class MessagesHandler(MessagesCreator):
 			theme=message[UserSettingsVarNames.THEME],
 		)
 		self.publish(self.set_settings(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
-
 
 	def profile_save_user(self, in_message):
 		message = in_message[VarNames.CONTENT]
