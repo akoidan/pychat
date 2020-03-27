@@ -156,7 +156,7 @@ The flow is the following
  - Start services and check if it works
 
 ## Install OS packages
-This section depends on the OS you use. I tested full install on Windows/Ubuntu/CentOs/Archlinux/Archlinux(rpi3 armv7). [pychat.org](https://pychat.org) currently runs on Archlinux Raspberry Pi 3.
+This section depends on the OS you use. I tested full install on Windows/Ubuntu/CentOs/MacOS/Archlinux/Archlinux(rpi3 armv7). [pychat.org](https://pychat.org) currently runs on Archlinux Raspberry Pi 3.
 
 ### [Windows](https://www.microsoft.com/en-us/download/windows.aspx):
  1. Install [python](https://www.python.org/downloads/) with pip. only **Python 3.6-3.8** is supported.
@@ -173,13 +173,18 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 ### [Archlinux](https://www.archlinux.org/):
  1. Install system packages:  `pacman -S unzip python python-pip redis mariadb python-mysqlclient nvm`.
  2. If you just installed mariadb you need to initialize it: `mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`.
+ 
+### [MacOS](https://en.wikipedia.org/wiki/MacOS)
+ 1. Install packages: `brew install mysql redis python3` 
+ 1. Start services `brew services run mysql redis`
+ 2. Install mysqlclient `pip install mysqlclient`
 
 ## Bootstrap files:
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
- 2. Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. Modify file according to the comments in it.
+ 2. Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. **Modify file according to the comments in it.**
  3. Create virtualEnv `python3 -m venv --system-site-packages .venv` and activate it: `source .venv/bin/activate`
  4. Install python packages with `pip install -r requirements.txt`.
- 5. From root user create the database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL PRIVILEGES ON pychat.* TO 'pychat'@'localhost';" | mysql`.  If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
+ 5. From root user create the database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL PRIVILEGES ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`.  If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
  6. Fill database with tables: `bash download_content.sh create_django_tables`
 
 ## Follow the [Frontend](#frontend) steps

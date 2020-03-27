@@ -15,7 +15,7 @@ from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.message_handler import MessagesHandler, WebRtcMessageHandler
-from chat.utils import execute_query, do_db, get_message_images_videos, get_history_message_query, create_id, \
+from chat.utils import execute_query, get_message_images_videos, get_history_message_query, create_id, \
 	get_or_create_ip_model
 
 parent_logger = logging.getLogger(__name__)
@@ -78,7 +78,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			if not is_online:
 				message = self.room_online_logout(online)
 				self.publish(message, settings.ALL_ROOM_ID)
-			res = do_db(execute_query, settings.UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
+			res = execute_query(settings.UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
 		self.disconnect()
 
@@ -118,7 +118,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 			return
 		self.user_id = int(user_id)
 		self.ip = self.get_client_ip()
-		user_db = do_db(UserProfile.objects.get, id=self.user_id)
+		user_db = UserProfile.objects.get(id=self.user_id)
 		self.generate_self_id()
 		self._logger = logging.LoggerAdapter(parent_logger, {
 			'id': self.id,
@@ -230,8 +230,8 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		"""
 		This code is not used anymore
 		"""
-		if not do_db(UserJoinedInfo.objects.filter(
-				Q(ip__ip=self.ip) & Q(user_id=self.user_id)).exists):
+		if not UserJoinedInfo.objects.filter(
+				Q(ip__ip=self.ip) & Q(user_id=self.user_id)).exists():
 			ip = yield from get_or_create_ip_model(self.ip, self.logger)
 			UserJoinedInfo.objects.create(ip=ip, user_id=self.user_id)
 

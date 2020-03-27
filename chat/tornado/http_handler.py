@@ -31,7 +31,7 @@ from chat.tornado.constants import RedisPrefix
 from chat.tornado.message_creator import MessagesCreator
 from chat.tornado.method_dispatcher import MethodDispatcher, require_http_method, login_required_no_redirect, \
 	add_missing_fields, extract_nginx_files, check_captcha, get_user_id
-from chat.utils import check_user, get_message_images_videos, is_blank, get_or_create_ip_model, do_db
+from chat.utils import check_user, get_message_images_videos, is_blank, get_or_create_ip_model
 
 SERVER_ADDRESS = getattr(settings, "SERVER_ADDRESS", None)
 
@@ -281,9 +281,9 @@ class HttpHandler(MethodDispatcher):
 		"""
 		try:
 			if '@' in username:
-				user = do_db(UserProfile.objects.get, email=username)
+				user = UserProfile.objects.get(email=username)
 			else:
-				user = do_db(UserProfile.objects.get, username=username)
+				user = UserProfile.objects.get(username=username)
 			if not user.check_password(password):
 				raise ValidationError("Invalid password")
 		except User.DoesNotExist:

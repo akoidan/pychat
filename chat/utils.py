@@ -51,7 +51,7 @@ def no_history_q(q_objects, room_id, h, f):
 
 
 def evaluate(query_set):
-	do_db(len, query_set)
+	len(query_set)
 	return query_set
 
 
@@ -62,18 +62,6 @@ def validate_edit_message(self_id, message):
 		raise ValidationError("You can only edit messages that were send not more than 1 day")
 	if message.deleted:
 		raise ValidationError("Already deleted")
-
-
-def do_db(callback, *args, **kwargs):
-	try:
-		return callback(*args, **kwargs)
-	except (OperationalError, InterfaceError) as e:
-		if 'MySQL server has gone away' in str(e):
-			logger.warning('%s, reconnecting' % e)
-			connection.close()
-			return callback(*args, **kwargs)
-		else:
-			raise e
 
 
 def execute_query(query, *args, **kwargs):

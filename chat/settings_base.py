@@ -88,7 +88,7 @@ CONCURRENT_THREAD_WORKERS = 10
 
 DATABASES = {
 	'default': {
-		'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
+		'ENGINE': 'chat.backend',  # django.db.backends.sqlite3
 		'NAME': 'pychat',
 		'USER': 'pychat',
 		'PASSWORD': 'pypass',
