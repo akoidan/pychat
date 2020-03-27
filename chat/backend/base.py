@@ -1,5 +1,4 @@
 from django.db.backends.mysql import base
-from django.db import connection
 
 
 def check_mysql_gone_away(db_wrapper):
