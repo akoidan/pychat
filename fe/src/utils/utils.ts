@@ -178,11 +178,13 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
     const original = descriptor.value;
     descriptor.value = async function(...args: unknown[]) {
       // @ts-ignore: next-line
-      if (this[runningProp]) {
-        // @ts-ignore: next-line
-        this.logger.warn('Skipping {} as it\'s loading', descriptor.value)();
-        return;
-      }
+
+      // TODO this thing breaks fb login
+      // if (this[runningProp]) {
+      //   // @ts-ignore: next-line
+      //   this.logger.warn('Skipping {} as it\'s loading', descriptor.value)();
+      //   return;
+      // }
       try {
         if (runningProp) {
           // @ts-ignore: next-line
