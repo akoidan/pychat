@@ -80,7 +80,7 @@ export default class ReportIssue extends Vue {
 
   @ApplyGrowlErr({runningProp: 'running', message: 'Unable to submit issue'})
   public async submit() {
-    await this.$api.sendLogs(this.issue, this.browser);
+    await this.$api.sendLogs(this.issue, this.browser, this.git);
     this.store.growlSuccess('Your issue has ben submitted');
     this.$router.go(-1);
   }

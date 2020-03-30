@@ -302,6 +302,7 @@ class Issue(models.Model):
 class IssueDetails(models.Model):
 	sender = models.ForeignKey(User, models.CASCADE, null=True)
 	browser = models.CharField(null=True, max_length=32, blank=True)
+	version = models.CharField(null=True, max_length=32, blank=True)
 	time = models.DateField(default=datetime.datetime.now, blank=True)
 	issue = models.ForeignKey(Issue, models.CASCADE, related_name='issue')
 
