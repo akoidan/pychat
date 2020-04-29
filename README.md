@@ -81,7 +81,7 @@ Please don't use this build for production, as it uses debug ssl certificate, la
 openssl req -nodes -new -x509 -keyout server.key -out certificate.crt -days 3650
 ```
  - Download [settings.py](https://github.com/akoidan/pychat/blob/master/chat/settings_example.py) and edit it according comments in it.
- - Download [production.json](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/production.json)  and edit it according [wiki](https://github.com/akoidan/pychat/tree/master/fe#configuration)
+ - Download [production.json](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/production.json)  and edit it according [wiki](https://github.com/akoidan/pychat#frontend-config)
  - Create volume and copy files there
  ```bash
  docker volume create pychat_data
