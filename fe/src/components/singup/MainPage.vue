@@ -72,6 +72,9 @@ export default class MainPage extends Vue {
       position: relative
       width: 100%
 
+  .reg-log-container /deep/ select.input
+      -webkit-appearance: none // paddings don't work on devices like macos chrome, but work on windows
+
   .reg-log-container /deep/
     .input
       border-radius: 5px

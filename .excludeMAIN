@@ -16,9 +16,11 @@ fe/electron_dist/
 fe/platforms/android/app/src/main/assets
 fe/www/*
 
+README.txt
 photos
 fe/npm.lock
 django.db
+downloading_photos
 chat/migrations
 .venv
 video.txt

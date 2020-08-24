@@ -21,7 +21,7 @@ from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL,
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates, \
 	UserSettingsVarNames, UserProfileVarNames
 from chat.tornado.message_creator import WebRtcMessageCreator, MessagesCreator
-from chat.utils import get_max_key, do_db, validate_edit_message, \
+from chat.utils import get_max_key, validate_edit_message, \
 	get_message_images_videos, update_symbols, up_files_to_img, evaluate, check_user, http_client
 
 # from pywebpush import webpush
@@ -39,6 +39,7 @@ base_logger = logging.LoggerAdapter(parent_logger, {
 
 GIPHY_API_KEY = getattr(settings, "GIPHY_API_KEY", None)
 FIREBASE_API_KEY = getattr(settings, "FIREBASE_API_KEY", None)
+
 
 class MessagesHandler(MessagesCreator):
 
@@ -266,7 +267,7 @@ class MessagesHandler(MessagesCreator):
 			)
 			message_db.time -= message[VarNames.TIME_DIFF]
 			res_files = []
-			do_db(message_db.save)
+			message_db.save()
 			if files:
 				images = up_files_to_img(files, message_db.id)
 				res_files = MessagesCreator.prepare_img_video(images, message_db.id)
@@ -308,7 +309,7 @@ class MessagesHandler(MessagesCreator):
 			raise ValidationError('At least one user should be selected, or room should be public')
 		if create_user_rooms:
 			room = Room(name=room_name)
-			do_db(room.save)
+			room.save()
 			room_id = room.id
 			max_id = Message.objects.all().aggregate(Max('id'))['id__max']
 			ru = [RoomUsers(
@@ -353,7 +354,6 @@ class MessagesHandler(MessagesCreator):
 		)
 		self.publish(self.set_settings(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
 
-
 	def profile_save_user(self, in_message):
 		message = in_message[VarNames.CONTENT]
 		userprofile = UserProfile.objects.get(id=self.user_id)
@@ -395,7 +395,7 @@ class MessagesHandler(MessagesCreator):
 		room_id = message[VarNames.ROOM_ID]
 		if room_id not in self.channels:
 			raise ValidationError("Access denied, only allowed for channels {}".format(self.channels))
-		room = do_db(Room.objects.get, id=room_id)
+		room = Room.objects.get(id=room_id)
 		if room.is_private:
 			raise ValidationError("You can't add users to direct room, create a new room instead")
 		users = message.get(VarNames.ROOM_USERS)
@@ -464,7 +464,7 @@ class MessagesHandler(MessagesCreator):
 		js_id = message[VarNames.JS_MESSAGE_ID]
 		if room_id not in self.channels or room_id == ALL_ROOM_ID:
 			raise ValidationError('You are not allowed to exit this room')
-		room = do_db(Room.objects.get, id=room_id)
+		room = Room.objects.get(id=room_id)
 		if room.disabled:
 			raise ValidationError('Room is already deleted')
 		if room.name is None:  # if private then disable
@@ -478,7 +478,7 @@ class MessagesHandler(MessagesCreator):
 
 	def edit_message(self, data):
 		js_id = data[VarNames.JS_MESSAGE_ID]
-		message = do_db(Message.objects.get, id=data[VarNames.MESSAGE_ID])
+		message = Message.objects.get(id=data[VarNames.MESSAGE_ID])
 		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
 		MessageHistory(message=message, content=message.content, giphy=message.giphy).save()
@@ -498,8 +498,12 @@ class MessagesHandler(MessagesCreator):
 
 	def edit_message_giphy(self, giphy_match, message, js_id):
 		def edit_glyphy(message, giphy):
-			do_db(Message.objects.filter(id=message.id).update, content=message.content, symbol=message.symbol, giphy=giphy,
-					edited_times=message.edited_times)
+			Message.objects.filter(id=message.id).update(
+				content=message.content,
+				symbol=message.symbol,
+				giphy=giphy,
+				edited_times=message.edited_times
+			)
 			message.giphy = giphy
 			self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None, js_id), message.room_id)
 
@@ -560,7 +564,7 @@ class MessagesHandler(MessagesCreator):
 			messages = Message.objects.filter(room_id=room_id).order_by('-pk')[:count]
 		else:
 			messages = Message.objects.filter(Q(id__lt=header_id), Q(room_id=room_id)).order_by('-pk')[:count]
-		imv = do_db(get_message_images_videos, messages)
+		imv = get_message_images_videos(messages)
 		response = self.get_messages(messages, room_id, imv, MessagesCreator.prepare_img_video, data[VarNames.JS_MESSAGE_ID])
 		self.ws_write(response)
 

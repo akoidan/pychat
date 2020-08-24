@@ -14,20 +14,6 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [(
 	]
 )]
 
-DATABASES = {
-	'default': {
-		'ENGINE': 'django.db.backends.mysql',  # django.db.backends.sqlite3
-		'NAME': 'pychat',
-		'USER': 'pychat',
-		'PASSWORD': 'pypass',
-		'HOST': 'localhost',
-		'default-character-set': 'utf8',
-		'OPTIONS': {
-			'autocommit': True,
-		},
-	}
-}
-
 LOGGING['handlers'] = {
 	'default': {
 		'level': 'DEBUG',

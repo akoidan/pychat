@@ -264,7 +264,7 @@ export default class WsHandler extends MessageHandler {
     this.appendCB(cb);
   }
 
-  public async sendLoadMessages(roomId: number, headerId: number, count: number) {
+  public async sendLoadMessages(roomId: number, headerId: number|undefined, count: number) {
     this.sendToServer({
       headerId,
       count,

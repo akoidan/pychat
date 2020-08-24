@@ -312,14 +312,16 @@ build_nginx() {
     safeRunCommand strip /usr/sbin/nginx*
     safeRunCommand strip /usr/lib/nginx/modules/*.so
     safeRunCommand rm -rf /tmp/nginx
-    safeRunCommand cp /usr/bin/envsubst /tmp/
-    runDeps="$( \
-        scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /tmp/envsubst \
+    if [ -f "$RUN_DEPS" ]; then
+        safeRunCommand cp /usr/bin/envsubst /tmp/
+        runDeps="$( \
+          scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /tmp/envsubst \
             | tr ',' '\n' \
             | sort -u \
             | awk 'system("[ -e /usr/local/lib/" $1 " ]") == 0 { next } { print "so:" $1 }' \
-    )"
-    echo $runDeps > "$RUN_DEPS"
+        )"
+        echo $runDeps > "$RUN_DEPS"
+    fi
 }
 
 
@@ -365,6 +367,22 @@ create_db() {
     fi
 }
 
+
+link_from_current_to_root() {
+  for f in $(find . -type f); do
+    dest=$(echo "$f"| cut -c2-)
+    destdir="`dirname $dest`"
+    mkdir -pv "$destdir"
+    source="`readlink -f $f`"
+    ln -svf "$source" "$dest"
+  done
+}
+
+copy_root_fs() {
+  cd ./rootfs
+  link_from_current_to_root
+}
+
 create_django_tables() {
     safeRunCommand python3 ./manage.py makemigrations chat
     safeRunCommand python3 ./manage.py migrate auth
@@ -406,9 +424,9 @@ elif [ "$1" = "compile_js" ]; then
 elif [ "$1" = "create_venv" ]; then
     create_venv
 elif [ "$1" = "build_nginx" ]; then
-    if [ -z "$4" ]
+    if [ -z "$3" ]
     then
-        printError "pass exactly 4 variables"
+        printError "pass minimum 3 variables"
         exit 1;
     fi
     build_nginx "$2" "$3" "$4"
@@ -438,6 +456,8 @@ elif [ "$1" = "print_icon_session" ]; then
     show_fontello_session
 elif [ "$1" = "android" ]; then
     android
+elif [ "$1" = "copy_root_fs" ]; then
+    copy_root_fs
 elif [ "$1" = "redirect" ]; then
     safeRunCommand sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8080
     safeRunCommand sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 443 -j REDIRECT --to-ports 8080
@@ -466,7 +486,8 @@ else
     chp update_docker "Builds docker images for deathangel908/pychat"
     chp redirect "Redirects port 443 to port 8080, so you can use \e[96mhttps://pychat.org\e[0;33;40m for localhost if you have it in \e[96m/etc/hosts\e[0;33;40m"
     chp compile_js "Compiles frontend SPA javascript if $DIST_DIRECTORY is empty"
-    chp create_venv "removes .venv and creates a new one with dependencies"-
+    chp create_venv "removes .venv and creates a new one with dependencies"
+    chp copy_root_fs "Creates soft links from \e[96m$PROJECT_ROOT/rootfs\e[0;33;40m to \e[96m/\e[0;33;40m"
     chp build_nginx "Build nginx with http-upload-module and installs it; . Usage: \e[92msh download_content.sh build_nginx 1.15.3 2.3.0  /tmp/depsFileList.txt\e[0;33;40m where 1.15 is nginx version, 2.3.0 is upload-http-module version"
     chp create_django_tables "Creates database tables and data"
     exit 1

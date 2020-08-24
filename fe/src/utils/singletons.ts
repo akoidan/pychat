@@ -10,7 +10,7 @@ import {IStorage} from "@/types/types";
 import loggerFactory from "@/utils/loggerFactory";
 import sessionHolder from "@/utils/sessionHolder";
 import {Logger} from "lines-logger";
-import {WS_API_URL} from "@/utils/consts";
+import {WS_API_URL, GIT_HASH} from "@/utils/consts";
 import NotifierHandler from "@/utils/NotificationHandler";
 import Vue from "vue";
 import Http from "@/utils/Http";
@@ -59,7 +59,7 @@ export const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier);
 window.onerror = function(msg, url, linenumber, column, errorObj) {
   const message = `Error occurred in ${url}:${linenumber}\n${msg}`;
   if ((!store.userSettings || store.userSettings.sendLogs) && api) {
-    api.sendLogs(`${url}:${linenumber}:${column ?? "?"}\n${msg}\n\nOBJ:  ${errorObj ?? "?"}`, browserVersion);
+    api.sendLogs(`${url}:${linenumber}:${column ?? "?"}\n${msg}\n\nOBJ:  ${errorObj ?? "?"}`, browserVersion, GIT_HASH);
   }
   store.growlError(message);
 

@@ -218,7 +218,6 @@ const getConfig = async () => {
     plugins.push(new SaveHtmlToFile('/tmp/electron.html'));
   }
   if (!options.IS_DEBUG && options.IS_WEB) {
-    entry.unshift(  'ts-polyfill');
     entry.unshift('./src/polyfills/inputEvent.ts')
   }
   if (options.IS_PROD) {
