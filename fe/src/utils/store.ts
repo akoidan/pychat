@@ -177,10 +177,10 @@ export class DefaultStore extends VuexModule {
     };
   }
 
-  get minId(): (id: number) => number {
+  get minId(): (id: number) => number|undefined{
     return (id: number) => {
       const messages = this.roomsDict[id].messages;
-      let minId = 0;
+      let minId: number|undefined = undefined; // should be undefined otherwise we will trigger less than 0
       for (const m in messages) {
         const id = messages[m].id;
         if (id > 0 && (!minId || id < minId)) {

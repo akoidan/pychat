@@ -522,12 +522,13 @@ class HttpHandler(MethodDispatcher):
 
 	# @transaction.atomic TODO, is this works in single thread?
 	@require_http_method('POST')
-	def report_issue(self, issue, browser):
+	def report_issue(self, issue, browser, version):
 		user_id = get_user_id(self.request)
 		issue_object = Issue.objects.get_or_create(content=issue)[0]
 		issue_details = IssueDetails(
 			sender_id=user_id,
 			browser=browser,
+			version=version,
 			issue=issue_object
 		)
 		username = User.objects.get(id=user_id).username if user_id else None

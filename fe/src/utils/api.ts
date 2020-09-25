@@ -34,10 +34,10 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async sendLogs(issue: string, browser: string): Promise<void> {
+  public async sendLogs(issue: string, browser: string, version: string): Promise<void> {
     const result: string = await this.xhr.doPost<string>({
       url: '/report_issue',
-      params: {issue, browser},
+      params: {issue, browser, version},
       checkOkString: true
     });
   }

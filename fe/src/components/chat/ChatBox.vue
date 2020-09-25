@@ -159,7 +159,7 @@
       }
     };
 
-    get minIdCalc(): number {
+    get minIdCalc(): number|undefined {
       return this.store.minId(this.room.id);
     }
 
