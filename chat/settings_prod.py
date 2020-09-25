@@ -45,5 +45,5 @@ LOGGING['loggers'] = {
 		'propagate': False,
 	},
 }
-
+LOGGING['loggers']['']['handlers'] = ['default']
 logging.config.dictConfig(LOGGING)
