@@ -312,7 +312,7 @@ build_nginx() {
     safeRunCommand strip /usr/sbin/nginx*
     safeRunCommand strip /usr/lib/nginx/modules/*.so
     safeRunCommand rm -rf /tmp/nginx
-    if [ -f "$RUN_DEPS" ]; then
+    if [ ! -z "$RUN_DEPS" ]; then
         safeRunCommand cp /usr/bin/envsubst /tmp/
         runDeps="$( \
           scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /tmp/envsubst \
