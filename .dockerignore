@@ -1,8 +1,6 @@
 # https://github.com/docker/hub-feedback/issues/1843
 **
 !download_content.sh
-!DefaultSmilies.cfpack
-!extract_cfpack.py
 !backend/requirements.txt
 !backend/manage.py
 !backend/chat
@@ -10,6 +8,8 @@
 !frontend/src
 !frontend/package.json
 !frontend/tsconfig.json
+!frontend/DefaultSmilies.cfpack
+!frontend/extract_cfpack.py
 !frontend/tsconfig.esnext.json
 !frontend/webpack.config.js
 !frontend/builder.js

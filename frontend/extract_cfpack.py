@@ -2,9 +2,14 @@ import json
 import os
 import re
 import struct
+import sys
 from time import strftime
 
-from backend.chat.py2_3 import get_unicode
+def get_unicode(ch):
+	if sys.version > '3':
+		return chr(ch)
+	else:
+		return unichr(ch)
 
 def extract_file():
 	with open(pack_path, 'rb') as f:
@@ -93,8 +98,8 @@ file_names_pattern = {
 
 START_CHAR = 13313
 root_path=os.path.dirname(os.path.realpath(__file__))
-SMILEYS_ROOT = os.sep.join((root_path,'fe', 'src', 'assets', 'smileys'))
-OUTPUT_TS_FILE = os.sep.join((root_path,'fe', 'src', 'utils', 'staticFiles.ts'))
+SMILEYS_ROOT = os.sep.join((root_path, 'src', 'assets', 'smileys'))
+OUTPUT_TS_FILE = os.sep.join((root_path, 'src', 'utils', 'staticFiles.ts'))
 smiley_pattern = re.compile(r'^:.*:$')
 pack_path = os.sep.join((root_path, 'DefaultSmilies.cfpack'))
 
