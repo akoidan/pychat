@@ -409,7 +409,7 @@ generate_secret_key() {
     fi
     echo "" >> $BE_DIRECTORY/chat/settings.py
     echo -n "SECRET_KEY = '" >> $BE_DIRECTORY/chat/settings.py
-    tr -dc 'A-Za-z0-9!@#$%^&*(-_=+)' </dev/urandom | head -c 50 >> $BE_DIRECTORY/chat/settings.py
+    LC_ALL=C LC_CTYPE=C tr -dc 'A-Za-z0-9!@#$%^&*(\-\_\=\+)' </dev/urandom | head -c 50 >> $BE_DIRECTORY/chat/settings.py
     echo "'" >> $BE_DIRECTORY/chat/settings.py
 }
 
