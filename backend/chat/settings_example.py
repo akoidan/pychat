@@ -86,7 +86,7 @@ GIPHY_API_KEY = 'thZMTtWsaBQAPDIAY461GzYTctuYIeIj'
 
 
 ### If you want recaptcha: Open https://www.google.com/recaptcha/admin#list and register new domain, type is web captcha
-### If you set RECAPTCHA_PRIVATE_KEY you should set RECAPTCHA_PUBLIC_KEY in fe/development.json and fe/production.json
+### If you set RECAPTCHA_PRIVATE_KEY you should set RECAPTCHA_PUBLIC_KEY in frontend/development.json and frontend/production.json
 # RECAPTCHA_PRIVATE_KEY = '****************************************' # Secret key
 
 ### For google auth follow the instructions here https://developers.google.com/identity/sign-in/web/devconsole-project

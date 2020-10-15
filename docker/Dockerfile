@@ -54,11 +54,11 @@ RUN  set -x && \
 
 # https://github.com/gliderlabs/docker-alpine/issues/297#issuecomment-368695866 libffi-dev
 
-COPY ./requirements.txt ./
+COPY ./backend/requirements.txt ./backend
 
 RUN set -x && \
     pip3 install mysqlclient &&\
-    pip3 install -r requirements.txt && \
+    pip3 install -r backend/requirements.txt && \
     ln -s `which python3` "$(dirname `which python3`)/python" &&\
     sed -i 's/^\(tty\d\:\:\)/#\1/g' /etc/inittab &&\
     sed -i \
@@ -94,10 +94,10 @@ RUN set -x && \
     mv ./docker/tornado /etc/init.d/ &&\
     mv ./docker/nginx /etc/init.d/ &&\
     mv ./docker/nginx.conf /etc/nginx/ && \
-    cp ./chat/settings_docker.py ./chat/settings.py &&\
-    echo 'SECRET_KEY="123"'>> ./chat/settings.py &&\
+    cp ./backend/chat/settings_docker.py ./backend/chat/settings.py &&\
+    echo 'SECRET_KEY="123"'>> ./backend/chat/settings.py &&\
     bash download_content.sh create_db && \
-    rm ./chat/settings.py && \
+    rm ./backend/chat/settings.py && \
     rm -rf ./docker &&\
     mv /var/lib/mysql ./mysql &&\
     chmod a+x /etc/init.d/tornado &&\
@@ -110,10 +110,9 @@ RUN set -x && \
     rc-update add redis default &&\
     chown -R http:http . &&\
     rm -rf /var/lib/redis &&\
-    rm -rf ./http/photos &&\
-    mv ./chat/migrations . &&\
-    ln -sf /data/settings.py ./chat/settings.py && \
-    ln -sf /data/production.json ./fe/production.json && \
+    mv ./backend/chat/migrations . &&\
+    ln -sf /data/settings.py ./backend/chat/settings.py && \
+    ln -sf /data/production.json ./frontend/production.json && \
     mkdir /etc/nginx/ssl &&\
     ln -sf /data/certificate.crt /etc/nginx/ssl && \
     ln -sf /data/server.key /etc/nginx/ssl && \
@@ -122,8 +121,8 @@ RUN set -x && \
     ln -sf /data/mysql /var/lib && \
     ln -sf /dev/stderr /dev/mysql.err && \
     ln -sf /dev/stderr /var/log/nginx/error.log && \
-    ln -sf /data/migrations ./chat &&\
-    cd fe &&\
+    ln -sf /data/migrations ./backend/chat &&\
+    cd frontend &&\
     yarn install
 
 VOLUME [ "/sys/fs/cgroup" ]

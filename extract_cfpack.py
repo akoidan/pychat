@@ -4,7 +4,7 @@ import re
 import struct
 from time import strftime
 
-from chat.py2_3 import get_unicode
+from backend.chat.py2_3 import get_unicode
 
 def extract_file():
 	with open(pack_path, 'rb') as f:

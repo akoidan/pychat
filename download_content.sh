@@ -25,7 +25,7 @@ safeRunCommand cd "$PROJECT_ROOT"
 
 PROJECT_ROOT=`pwd`
 TMP_DIR="${TMP_DIR:-/tmp/pychat_tmp_dir}"
-FE_DIRECTORY="$PROJECT_ROOT/fe"
+FE_DIRECTORY="$PROJECT_ROOT/frontend"
 DIST_DIRECTORY="$FE_DIRECTORY/dist"
 ASSETS_DIR="$FE_DIRECTORY/src/assets"
 FONT_DIR="$ASSETS_DIR/font"
@@ -169,15 +169,15 @@ chp(){
 
 post_fontello_conf() {
     printOut "Creating fontello config"
-    safeRunCommand curl --silent --show-error --fail --form "config=@./config.json" --output .fontello http://fontello.com
-    fontello_session=$(cat .fontello)
-    url="http://fontello.com/`cat .fontello`"
+    safeRunCommand curl --silent --show-error --fail --form "config=@./frontend/font-config.json" --output $FE_DIRECTORY/.fontello http://fontello.com
+    fontello_session=$(cat $FE_DIRECTORY/.fontello)
+    url="http://fontello.com/`cat $FE_DIRECTORY/.fontello`"
     echo "Genereted fontello url: $url"
 }
 
 show_fontello_session() {
-    fontello_session=$(cat .fontello)
-    url="http://fontello.com/`cat .fontello`"
+    fontello_session=$(cat $FE_DIRECTORY/.fontello)
+    url="http://fontello.com/`cat $FE_DIRECTORY/.fontello`"
     printOut "Fonts url is: $url"
     echo "It has been opened in new browser tab"
     python -mwebbrowser $url
@@ -185,7 +185,7 @@ show_fontello_session() {
 
 
 download_fontello() {
-    fontello_session=$(cat .fontello)
+    fontello_session=$(cat $FE_DIRECTORY/.fontello)
     printOut "Downloading fontello using fontello session '$fontello_session'"
     mkdir -p "$TMP_DIR/fontello"
     safeRunCommand curl -X GET "http://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
@@ -464,7 +464,7 @@ elif [ "$1" = "redirect" ]; then
 elif [ "$1" = "download_fontello" ]; then
     download_fontello
     delete_tmp_dir
-    git --no-pager diff "$PROJECT_ROOT/config.json"
+    git --no-pager diff "$FE_DIRECTORY/font-config.json"
     printSuccess "Fonts have been installed"
     printOut "You can view them at https://localhost:8000/static/demo.html"
 elif [ "$1" == "generate_secret_key" ]; then
@@ -478,7 +478,7 @@ else
     chp zip_extension "Creates zip acrhive for ChromeWebStore from \e[96mscreen_cast_extension \e[0;33;40mdirectory"
     chp android "Deploys android app"
     printf " \e[93mIcons:\n\e[0;37;40mTo edit icons execute \e[92mpost_fontello_conf\e[0;37;40m, edit icons in opened browser and click Save session button. Afterwords execute \e[92mdownload_icon\n"
-    chp post_fontello_conf "Creates fontello session from config.json and saves it to \e[96m .fontello \e[0;33;40mfile"
+    chp post_fontello_conf "Creates fontello session from config.json and saves it to \e[96m $FE_DIRECTORY/.fontello \e[0;33;40mfile"
     chp print_icon_session "Shows current used url for editing fonts"
     chp download_fontello "Downloads and extracts fonts from fontello to project"
     chp generate_secret_key "Creates django secret key into \e[96m$PROJECT_ROOT/chat/settings.py\e[0;33;40m"
