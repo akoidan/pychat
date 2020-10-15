@@ -116,7 +116,7 @@ RUN set -x && \
     mkdir /etc/nginx/ssl &&\
     ln -sf /data/certificate.crt /etc/nginx/ssl && \
     ln -sf /data/server.key /etc/nginx/ssl && \
-    ln -sf /data/photos ./ && \
+    ln -sf /data/photos ./backend && \
     ln -sf /data/redis /var/lib && \
     ln -sf /data/mysql /var/lib && \
     ln -sf /dev/stderr /dev/mysql.err && \

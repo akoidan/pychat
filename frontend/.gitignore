@@ -2,7 +2,6 @@ node_modules
 package-lock.json
 platforms/android/cordova/node_modules
 production.json
-npm.lock
 electron_dist/
 !www/.gitkeep
 platforms/android/app/src/main/assets

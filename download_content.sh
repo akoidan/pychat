@@ -23,9 +23,9 @@ fi
 
 safeRunCommand cd "$PROJECT_ROOT"
 
-PROJECT_ROOT=`pwd`
 TMP_DIR="${TMP_DIR:-/tmp/pychat_tmp_dir}"
 FE_DIRECTORY="$PROJECT_ROOT/frontend"
+BE_DIRECTORY="$PROJECT_ROOT/backend"
 DIST_DIRECTORY="$FE_DIRECTORY/dist"
 ASSETS_DIR="$FE_DIRECTORY/src/assets"
 FONT_DIR="$ASSETS_DIR/font"
@@ -43,7 +43,8 @@ declare -a files=(\
 )
 
 create_venv() {
-    rm -rf .venv
+    cd $BE_DIRECTORY
+    rm -rf $BE_DIRECTORY/.venv
     virtualenv --system-site-packages .venv --python=`which python3`
     source .venv/bin/activate
     pip install -r requirements.txt
@@ -194,7 +195,7 @@ download_fontello() {
     cat "$TMP_DIR/fontello/$dir/css/fontello.css" | grep ^.icon >  "$SASS_DIR/partials/fontello.scss"
     cp -v "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
     cp -v "$TMP_DIR/fontello"/$dir/demo.html "$ASSETS_DIR/demo.html"
-    cp -v "$TMP_DIR/fontello"/$dir/config.json "$PROJECT_ROOT"
+    cp -v "$TMP_DIR/fontello"/$dir/config.json "$FE_DIRECTORY/font-config.json"
 
     if type "sed" &> /dev/null; then
         sed -i '1i\@charset "UTF-8";' "$SASS_DIR/partials/fontello.scss"
@@ -205,7 +206,7 @@ download_fontello() {
 
 generate_smileys() {
     printOut "Generating smileys"
-    safeRunCommand python $PROJECT_ROOT/extract_cfpack.py
+    safeRunCommand python $FE_DIRECTORY/extract_cfpack.py
 }
 
 delete_tmp_dir() {
@@ -384,16 +385,16 @@ copy_root_fs() {
 }
 
 create_django_tables() {
-    safeRunCommand python3 ./manage.py makemigrations chat
-    safeRunCommand python3 ./manage.py migrate auth
+    safeRunCommand python3 $BE_DIRECTORY/manage.py makemigrations chat
+    safeRunCommand python3 $BE_DIRECTORY/manage.py migrate auth
     # because w/o second  `makemigrations chat` it doesn't work
-    safeRunCommand python3 ./manage.py makemigrations chat
-    safeRunCommand python3 ./manage.py migrate
-    safeRunCommand python3 ./manage.py fill_data
+    safeRunCommand python3 $BE_DIRECTORY/manage.py makemigrations chat
+    safeRunCommand python3 $BE_DIRECTORY/manage.py migrate
+    safeRunCommand python3 $BE_DIRECTORY/manage.py fill_data
 }
 
 android() {
-  cd ./fe
+  cd $FE_DIRECTORY
   yarn run android
   ./node_modules/.bin/cordova build
   adb -d push ./platforms/android/app/build/outputs/apk/debug/app-debug.apk /data/local/tmp/
@@ -402,14 +403,14 @@ android() {
 }
 
 generate_secret_key() {
-    if [ ! -f "$PROJECT_ROOT/chat/settings.py" ]; then
-        printError "File $PROJECT_ROOT/chat/settings.py doesn't exist. Create it before running the command"
+    if [ ! -f "$BE_DIRECTORY/chat/settings.py" ]; then
+        printError "File $BE_DIRECTORY/chat/settings.py doesn't exist. Create it before running the command"
         exit 1;
     fi
-    echo "" >> $PROJECT_ROOT/chat/settings.py
-    echo -n "SECRET_KEY = '" >> $PROJECT_ROOT/chat/settings.py
-    tr -dc 'A-Za-z0-9!@#$%^&*(-_=+)' </dev/urandom | head -c 50 >> $PROJECT_ROOT/chat/settings.py
-    echo "'" >> $PROJECT_ROOT/chat/settings.py
+    echo "" >> $BE_DIRECTORY/chat/settings.py
+    echo -n "SECRET_KEY = '" >> $BE_DIRECTORY/chat/settings.py
+    tr -dc 'A-Za-z0-9!@#$%^&*(-_=+)' </dev/urandom | head -c 50 >> $BE_DIRECTORY/chat/settings.py
+    echo "'" >> $BE_DIRECTORY/chat/settings.py
 }
 
 if [ "$1" = "post_fontello_conf" ]; then
@@ -481,7 +482,7 @@ else
     chp post_fontello_conf "Creates fontello session from config.json and saves it to \e[96m $FE_DIRECTORY/.fontello \e[0;33;40mfile"
     chp print_icon_session "Shows current used url for editing fonts"
     chp download_fontello "Downloads and extracts fonts from fontello to project"
-    chp generate_secret_key "Creates django secret key into \e[96m$PROJECT_ROOT/chat/settings.py\e[0;33;40m"
+    chp generate_secret_key "Creates django secret key into \e[96m$BE_DIRECTORY/chat/settings.py\e[0;33;40m"
     chp create_db "Creates database pychat to mysql, the following environment variable should be defined \e[94mDB_ROOT_PASS DB_USER DB_PASS DB_DATA_PATH"
     chp update_docker "Builds docker images for deathangel908/pychat"
     chp redirect "Redirects port 443 to port 8080, so you can use \e[96mhttps://pychat.org\e[0;33;40m for localhost if you have it in \e[96m/etc/hosts\e[0;33;40m"

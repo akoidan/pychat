@@ -78,7 +78,7 @@ Please don't use this build for production, as it uses debug ssl certificate, la
 ```bash
 openssl req -nodes -new -x509 -keyout server.key -out certificate.crt -days 3650
 ```
- - Download [settings.py](https://github.com/akoidan/pychat/blob/master/chat/settings_example.py) and edit it according comments in it.
+ - Download [settings.py](https://github.com/akoidan/pychat/blob/master/backend/chat/settings_example.py) and edit it according comments in it.
  - Download [production.json](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/production.json)  and edit it according [wiki](https://github.com/akoidan/pychat#frontend-config)
  - Create volume and copy files there
  ```bash
@@ -105,8 +105,8 @@ If you don't or unable to run docker you can alway do the setup w/o it. You defi
  
  - For production I would recommend to clone repository to `/srv/http/pychat`.  If you want to close the project into a different directory, replace all absolute paths in config files. You can use `download_content.sh rename_root_directory` to do that.
  - For archlinux follow [Install OS packages](#install-os-packages), add add these ones: `pacman -S postfix gcc jansson`. 
- - For centos use add `alias yum="python2 $(which yum)"` to /etc/bashrc if you use python3. And then install that packages `yum install python34u, python34u-pip, redis, mysql-server, mysql-devel, postfix, mailx`
-  - If you want to use native file-uploader (nginx_upload_module written in `C`) instead of python uploader (which is a lot slower) you should build nginx yourself. For archlinux setup requires `pacman -S python-lxml gd make geoip`. To build nginx with this module run from the root user: `bash download_content.sh build_nginx 1.15.3 2.3.0`. And create dir + user `useradd nginx; install -d -m 0500 -o http -g http /var/cache/nginx/`. If you don't, just install nginx with your package manager: `pacman -S nginx` or `yum install nginx`
+ - For centos use add `alias yum="python2 $(which yum)"` to `/etc/bashrc` if you use python3. And then install that packages `yum install python34u, python34u-pip, redis, mysql-server, mysql-devel, postfix, mailx`
+ - If you want to use native file-uploader (`nginx_upload_module` written in `C`) instead of python uploader (which is a lot slower) you should build nginx yourself. For archlinux setup requires `pacman -S python-lxml gd make geoip`. To build nginx with this module run from the root user: `bash download_content.sh build_nginx 1.15.3 2.3.0`. And create dir + user `useradd nginx; install -d -m 0500 -o http -g http /var/cache/nginx/`. If you don't, just install nginx with your package manager: `pacman -S nginx` or `yum install nginx`
  - Follow [Bootstrap files](#bootstrap-files) flow.
  - I preconfigued native setup for domain `pychat.org`, you want to replace all occurrences of `pychat.org` in [rootfs](rootfs) directory for your domain. To simplify replacing use my script: `./download_content.sh rename_domain your.new.domain.com`. Also check `rootfs/etc/nginx/sites-enabled/pychat.conf` if `server_name` section is correct after renaming.
  - HTTPS is required for webrtc calls so you need to enable ssl:
@@ -121,13 +121,13 @@ If you don't or unable to run docker you can alway do the setup w/o it. You defi
  - If you want to enable autostart (after reboot) for centos: `chkconfig mysqld on; chkconfig on; chkconfig tornado on; chkconfig redis on; chkconfig postfix on`
  - Follow the [Frontend](#frontend) steps
  - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
- - If something doesn't work you want to check `pychat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
+ - If something doesn't work you want to check `pychat/backend/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
 
 ## Frontend
- - `cd fe; nvm use 12.10`
+ - `cd frontend; nvm use`
  - `yarn install`
  - Create production.json based on [Frontend config](#frontend-config)
- - Run `yarn run prod`. This generates static files in `fe/dist` directory.
+ - Run `yarn run prod`. This generates static files in `frotnend/dist` directory.
 
 ## Desktop app
 Pychat uses websql and built the way so it renders everything possible w/o network. You have 2 options:
@@ -137,7 +137,7 @@ Use [nativifier](https://github.com/jiahaog/nativefier#installation) to create a
 
 ### Electron
  - Create production.json based on [Frontend config](#frontend-config)
- - Run `cd fe; yarn run electronProd`.
+ - Run `cd frontend; yarn run electronProd`.
 
 ## Android app
 This is harsh. If you're not familiar with android SDK I would recommend doing the steps below from AndroidStudio:
@@ -200,13 +200,13 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  4. Add tornado script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `start_tornado`. Remove port value.
  
 ## Linting
- - atm frontend linting is only available, so `cd fe`
+ - atm frontend linting is only available, so `cd frotnend`
  - https://eslint.vuejs.org/rules/this-in-template.html
  
 Current linting supports:
 
- - Sass is linted with [stylelint](https://stylelint.io/user-guide/rules) configured with [.stylelintrc](fe/.stylelintrc)
- - Typescript are linted with eslint, along with .vue files [eslint-plugin-vue](https://eslint.vuejs.org/rules/this-in-template.html) configured with [.eslintrc.json](fe/.eslintrc.json)
+ - Sass is linted with [stylelint](https://stylelint.io/user-guide/rules) configured with [.stylelintrc](frontend/.stylelintrc)
+ - Typescript are linted with eslint, along with .vue files [eslint-plugin-vue](https://eslint.vuejs.org/rules/this-in-template.html) configured with [.eslintrc.json](frontend/.eslintrc.json)
 
 ### Webstorm
  
@@ -250,7 +250,7 @@ Disable tslint, since it's not used, and enable eslint:
 ## Build frontend
 I would recommend to use version node 12.10, `nvm use 12.10`. You can install nvm with [archlinux](https://wiki.archlinux.org/index.php/Node.js_) [ubuntu](https://qiita.com/shaching/items/6e398140432d4133c866) [windows](https://github.com/coreybutler/nvm-windows). 
  - To get started install dependencies first: `yarn install` # or use npm if you're old and cranky
- - Take a look at copy [development.json](fe/development.json]`. The description is at [Frontend config](#frontend-config)
+ - Take a look at copy [development.json](frontend/development.json]. The description is at [Frontend config](#frontend-config)
  - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. Take a look at [development.json](development.json). To run dev-server use `yarn run dev`. You can navigate to http://localhost:8080
  - To build android use `yarn run android -- 192.168.1.55` where 55 is your bridge ip address
  - To run electron use `yarn run electronDev`. This will start electron dev. and generate `/tmp/electron.html` and `/tmp/electron.js` 
@@ -275,7 +275,7 @@ Execute `bash download_content.sh` it will show you help.
 By default each user has turned off browser (console) logs. You can turn them on in [/#/profile](https://localhost:8000/#/profile) page (`logs` checkbox). All logs are logged with `window.logger` object, for ex: `window.logger('message')()`. Note that logger returns a function which is binded to params, that kind of binding shows corrent lines in browser, especially it's handy when all source comes w/o libraries/webpack or other things that transpiles or overhead it. You can also inspect ws messages [here](ws_messages.jpeg) for chromium. You can play with `window.wsHandler.handleMessage(object)` and `window.wsHandler.handle(string)` methods in debug with messages from log to see what's going on
 
 ## Icons
-Chat uses [fontello](fontello.com) and its api for icons. The decision is based on requirements for different icons that come from different fonts and ability to add custom assets. Thus the fonts should be generated (`.wolf` etc). W/o this chat would need to download a lot of different fonts which would slow down the loading process. You can easily edit fonts via your browser, just execute `bash download_content.sh post_fontello_conf`. Make your changes and hit "Save session". Then execute `bash download_content.sh download_fontello`. If you did everything right new icons should appear under [fe/src/assets/demo.html](fe/src/assets/demo.html)
+Chat uses [fontello](fontello.com) and its api for icons. The decision is based on requirements for different icons that come from different fonts and ability to add custom assets. Thus the fonts should be generated (`.wolf` etc). W/o this chat would need to download a lot of different fonts which would slow down the loading process. You can easily edit fonts via your browser, just execute `bash download_content.sh post_fontello_conf`. Make your changes and hit "Save session". Then execute `bash download_content.sh download_fontello`. If you did everything right new icons should appear under [frontend/src/assets/demo.html](frontend/src/assets/demo.html)
 
 ## Sustaining online protocol
 Server pings clients every PING_INTERVAL miliseconds. If client doesn't respond with pong in PING_CLOSE_JS_DELAY, server closes the connection. If ther're multiple tornado processes if can specify port for main process with MAIN_TORNADO_PROCESS_PORT. In turn the client expects to be pinged by the server, if client doesn't receive ping event it will close the connection as well. As well page has window listens for focus and sends ping event when it receives it, this is handy for situation when pc suspends from ram.
@@ -339,7 +339,7 @@ The technologies stack used in project:
 - Webpack and loaders
 - Sass
 
-[builder.js](fe/builder.js) is used to build project. Take a look at it to understand how source files are being processed. Its start point is `entry: ['./src/main.ts']`. Everything is imported in this files are being processed by section `loaders`.
+[builder.js](frontend/builder.js) is used to build project. Take a look at it to understand how source files are being processed. Its start point is `entry: ['./src/main.ts']`. Everything is imported in this files are being processed by section `loaders`.
 
 Every vue component has injected `.$logger` object, to log something to console use `this.logger.log('Hello {}', {1:'world'})();` Note calling function again in the end. Logger is disabled for production. For more info visit [lines-logger](https://github.com/akoidan/lines-logger)
 
@@ -395,7 +395,6 @@ development.json and production.json have the following format:
 * https://www.infoworld.com/article/3443039/typescript-37-beta-debuts-with-optional-chaining.html
 * get\s+(\w+)\(\):\s+((\w|\[|\])+)\s+\{\s+return\s+store\.\w+\;?\s+\}\;?        @State\n    public readonly $1!: $2;
 * purge all callbacks to async code
-* move backend to be directory, fe to fe, docker to docker and etc
 * npm run stats
 * Add google and fb auth via iframe 
 * compile to bytenode for electron https://github.com/OsamaAbbas/bytenode
