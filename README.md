@@ -104,29 +104,33 @@ docker run -t -v pychat_data:/data -p 443:443 deathangel908/pychat
 If you don't or unable to run docker you can alway do the setup w/o it. You definitely spend more time, so I would recommend to use docker if possible. But if you're still sure,  here's the setup for cent-os/archlinux based system:
  
  - For production I would recommend to clone repository to `/srv/http/pychat`.  If you want to close the project into a different directory, replace all absolute paths in config files. You can use `download_content.sh rename_root_directory` to do that.
- - For archlinux follow [Install OS packages](#install-os-packages), add add these ones: `pacman -S postfix gcc jansson`. 
- - For centos use add `alias yum="python2 $(which yum)"` to `/etc/bashrc` if you use python3. And then install that packages `yum install python34u, python34u-pip, redis, mysql-server, mysql-devel, postfix, mailx`
- - If you want to use native file-uploader (`nginx_upload_module` written in `C`) instead of python uploader (which is a lot slower) you should build nginx yourself. For archlinux setup requires `pacman -S python-lxml gd make geoip`. To build nginx with this module run from the root user: `bash download_content.sh build_nginx 1.15.3 2.3.0`. And create dir + user `useradd nginx; install -d -m 0500 -o http -g http /var/cache/nginx/`. If you don't, just install nginx with your package manager: `pacman -S nginx` or `yum install nginx`
+ - Install packages:
+     - For archlinux follow [Install OS packages](#install-os-packages), add add these ones: `pacman -S postfix gcc jansson`. 
+     - For centos use add `alias yum="python2 $(which yum)"` to `/etc/bashrc` if you use python3. And then install that packages `yum install python34u, python34u-pip, redis, mysql-server, mysql-devel, postfix, mailx`
+     - If you use another OS, try to figure out from [Install OS packages](#install-os-packages) guide which things you need
+ - If you want to use native file-uploader (`nginx_upload_module` written in `C`) instead of python uploader (which is a lot slower) you should build nginx yourself. For archlinux setup requires `pacman -S python-lxml gd make geoip`. To build nginx with this module run from the **root** user: `bash download_content.sh build_nginx 1.15.3 2.3.0`. And create dir + user `useradd nginx; install -d -m 0500 -o http -g http /var/cache/nginx/`. If you don't, just install nginx with your package manager: e.g. `pacman -S nginx` or `yum install nginx` on centos
  - Follow [Bootstrap files](#bootstrap-files) flow.
  - I preconfigued native setup for domain `pychat.org`, you want to replace all occurrences of `pychat.org` in [rootfs](rootfs) directory for your domain. To simplify replacing use my script: `./download_content.sh rename_domain your.new.domain.com`. Also check `rootfs/etc/nginx/sites-enabled/pychat.conf` if `server_name` section is correct after renaming.
  - HTTPS is required for webrtc calls so you need to enable ssl:
    - Either create your certificates and put according to [pychat.conf](rootfs/etc/nginx/sites-enabled/pychat.conf) ssl_certificate/ssl_certificate_key.
    - Either use something like [certbot](https://certbot.eff.org/lets-encrypt/arch-nginx)
- - Copy config files to rootfs with  `sh download_content.sh copy_root_fs`.
+ - Change to parent directory (which contains frontend and backend) and Copy config files to rootfs with from **root** user `sh download_content.sh copy_root_fs`.
  - Don't forget to change the owner of current (project) directory to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`.
  - Generate postfix files: `install -d -m 0555 -o postfix -g postfix /etc/postfix/virtual; postmap /etc/postfix/virtual; newaliases; touch /etc/postfix/virtual-regexp; echo 'root postmaster' > /etc/aliases`
- - For archlinux start this services: `packages=( mysqld  redis systemctl tornado@8888 nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`
- - For centos start that services: `packages=( redis-server  nginx postfix mysqld tornado@8888) ; for package in "${packages[@]}" ; do service $package start; done;`
- - If you want to enable autostart (after reboot) for archlinux: `packages=( redis  nginx postfix mysqld tornado) ; for package in "${packages[@]}" ; do systemctl start $package; done;`
- - If you want to enable autostart (after reboot) for centos: `chkconfig mysqld on; chkconfig on; chkconfig tornado on; chkconfig redis on; chkconfig postfix on`
+ - Start services:
+     - For archlinux: `packages=( mysqld  redis systemctl tornado@8888 nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`
+     - For centos: `packages=( redis-server  nginx postfix mysqld tornado@8888) ; for package in "${packages[@]}" ; do service $package start; done;`
+ - You can also enable autostart (after reboot)
+    - For archlinux: `packages=( redis  nginx postfix mysqld tornado) ; for package in "${packages[@]}" ; do systemctl start $package; done;`
+    - For centos: `chkconfig mysqld on; chkconfig on; chkconfig tornado on; chkconfig redis on; chkconfig postfix on`
  - Follow the [Frontend](#frontend) steps
  - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
  - If something doesn't work you want to check `pychat/backend/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
 
 ## Frontend
- - `cd frontend; nvm use`
+ - `cd frontend; nvm use`. Apply `nvm install` before it if node of specified version is not installed
  - `yarn install`
- - Create production.json based on [Frontend config](#frontend-config)
+ - Create production.json based on [Frontend config](#frontend-config). Also you can use and modify `cp docker/pychat.org/production.json ./frontend/`
  - Run `yarn run prod`. This generates static files in `frotnend/dist` directory.
 
 ## Desktop app
@@ -169,7 +173,7 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
 
 ### [Archlinux](https://www.archlinux.org/):
- 1. Install system packages:  `pacman -S unzip python python-pip redis mariadb python-mysqlclient nvm`.
+ 1. Install system packages:  `pacman -S unzip python python-pip redis yarn mariadb python-mysqlclient`. nvm is located in [aur](https://aur.archlinux.org/packages/nvm/) so `yay -S nvm` (or use another aur package)
  2. If you just installed mariadb you need to initialize it: `mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`.
  
 ### [MacOS](https://en.wikipedia.org/wiki/MacOS)
@@ -179,10 +183,10 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 
 ## Bootstrap files:
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
- 2. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.**
+ 2. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.** 
  3. From backend dir (`cd backend`). Create virtualEnv `python3 -m venv --system-site-packages .venv` and activate it: `source .venv/bin/activate`
  4. Install python packages with `pip install -r requirements.txt`.
- 5. From root user create the database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL PRIVILEGES ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`.  If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
+ 5. From **root** user create the database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL PRIVILEGES ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
  6. Fill database with tables: `bash ../download_content.sh create_django_tables`
 
 ## Follow the [Frontend](#frontend) steps
@@ -190,14 +194,15 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 ## Configure IDEs if you use it:
 
 ### Pycharm
+ 1. I recommend open backend as root directory for pycharm.
  1. Enable django support. Go to Settings -> Django -> Enable django support. 
    - Django project root: root directory of your project. Where .git asides.
    - Put `Settings:` to `chat/settings.py`
- 2. `Settings` -> `Project pychat` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `pychatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
- 3. `Settings` -> `Project: pychat` -> `Project structure`
+ 1. `Settings` -> `Project pychat` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `pychatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
+ 1. `Settings` -> `Project: pychat` -> `Project structure`
   - You might want to exclude: `.idea`
   - mark `templates` directory as `Template Folder`
- 4. Add tornado script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `start_tornado`. Remove port value.
+ 1. Add tornado script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `start_tornado`. Remove port value.
  
 ## Linting
  - atm frontend linting is only available, so `cd frotnend`
