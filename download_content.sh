@@ -23,6 +23,7 @@ fi
 
 safeRunCommand cd "$PROJECT_ROOT"
 
+PROJECT_ROOT=$PWD # otherwise it's gonna be `.` instead of full path
 TMP_DIR="${TMP_DIR:-/tmp/pychat_tmp_dir}"
 FE_DIRECTORY="$PROJECT_ROOT/frontend"
 BE_DIRECTORY="$PROJECT_ROOT/backend"
@@ -385,12 +386,13 @@ copy_root_fs() {
 }
 
 create_django_tables() {
-    safeRunCommand python3 $BE_DIRECTORY/manage.py makemigrations chat
-    safeRunCommand python3 $BE_DIRECTORY/manage.py migrate auth
+    cd $BE_DIRECTORY
+    safeRunCommand python3 ./manage.py makemigrations chat
+    safeRunCommand python3 ./manage.py migrate auth
     # because w/o second  `makemigrations chat` it doesn't work
-    safeRunCommand python3 $BE_DIRECTORY/manage.py makemigrations chat
-    safeRunCommand python3 $BE_DIRECTORY/manage.py migrate
-    safeRunCommand python3 $BE_DIRECTORY/manage.py fill_data
+    safeRunCommand python3 ./manage.py makemigrations chat
+    safeRunCommand python3 ./manage.py migrate
+    safeRunCommand python3 ./manage.py fill_data
 }
 
 android() {
