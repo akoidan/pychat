@@ -103,29 +103,38 @@ docker run -t -v pychat_data:/data -p 443:443 deathangel908/pychat
 ## Native setup
 If you don't or unable to run docker you can alway do the setup w/o it. You definitely spend more time, so I would recommend to use docker if possible. But if you're still sure,  here's the setup for cent-os/archlinux based system:
  
- - For production I would recommend to clone repository to `/srv/http/pychat`.  If you want to close the project into a different directory, replace all absolute paths in config files. You can use `download_content.sh rename_root_directory` to do that.
- - Install packages:
+ 1. For production I would recommend to clone repository to `/srv/http/pychat`.  If you want to close the project into a different directory, replace all absolute paths in config files. You can use `download_content.sh rename_root_directory` to do that.
+ 1. Install packages:
      - For archlinux follow [Install OS packages](#install-os-packages), add add these ones: `pacman -S postfix gcc jansson`. 
      - For centos use add `alias yum="python2 $(which yum)"` to `/etc/bashrc` if you use python3. And then install that packages `yum install python34u, python34u-pip, redis, mysql-server, mysql-devel, postfix, mailx`
      - If you use another OS, try to figure out from [Install OS packages](#install-os-packages) guide which things you need
- - If you want to use native file-uploader (`nginx_upload_module` written in `C`) instead of python uploader (which is a lot slower) you should build nginx yourself. For archlinux setup requires `pacman -S python-lxml gd make geoip`. To build nginx with this module run from the **root** user: `bash download_content.sh build_nginx 1.15.3 2.3.0`. And create dir + user `useradd nginx; install -d -m 0500 -o http -g http /var/cache/nginx/`. If you don't, just install nginx with your package manager: e.g. `pacman -S nginx` or `yum install nginx` on centos
- - Follow [Bootstrap files](#bootstrap-files) flow.
- - I preconfigued native setup for domain `pychat.org`, you want to replace all occurrences of `pychat.org` in [rootfs](rootfs) directory for your domain. To simplify replacing use my script: `./download_content.sh rename_domain your.new.domain.com`. Also check `rootfs/etc/nginx/sites-enabled/pychat.conf` if `server_name` section is correct after renaming.
- - HTTPS is required for webrtc calls so you need to enable ssl:
-   - Either create your certificates and put according to [pychat.conf](rootfs/etc/nginx/sites-enabled/pychat.conf) ssl_certificate/ssl_certificate_key.
+ 1. If you want to use native file-uploader (`nginx_upload_module` written in `C`) instead of python uploader (which is a lot slower) you should build nginx yourself. For archlinux setup requires `pacman -S python-lxml gd make geoip`. To build nginx with this module run from the **root** user: `bash download_content.sh build_nginx 1.15.3 2.3.0`. And create dir + user `useradd nginx; install -d -m 0500 -o http -g http /var/cache/nginx/`. If you don't, just install nginx with your package manager: e.g. `pacman -S nginx` or `yum install nginx` on centos
+ 1. Follow [Bootstrap files](#bootstrap-files) flow.
+ 1. I preconfigued native setup for domain `pychat.org`, you want to replace all occurrences of `pychat.org` in [rootfs](rootfs) directory for your domain. To simplify replacing use my script: `./download_content.sh rename_domain your.new.domain.com`. Also check `rootfs/etc/nginx/sites-enabled/pychat.conf` if `server_name` section is correct after renaming.
+ 1. HTTPS is required for webrtc calls so you need to enable ssl:
+   - Either create your certificates e.g. `openssl req -nodes -new -x509 -keyout server.key -out certificate.crt -days 3650`
    - Either use something like [certbot](https://certbot.eff.org/lets-encrypt/arch-nginx)
- - Change to parent directory (which contains frontend and backend) and Copy config files to rootfs with from **root** user `sh download_content.sh copy_root_fs`.
- - Don't forget to change the owner of current (project) directory to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`.
- - Generate postfix files: `install -d -m 0555 -o postfix -g postfix /etc/postfix/virtual; postmap /etc/postfix/virtual; newaliases; touch /etc/postfix/virtual-regexp; echo 'root postmaster' > /etc/aliases`
- - Start services:
-     - For archlinux: `packages=( mysqld  redis systemctl tornado@8888 nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`
-     - For centos: `packages=( redis-server  nginx postfix mysqld tornado@8888) ; for package in "${packages[@]}" ; do service $package start; done;`
- - You can also enable autostart (after reboot)
-    - For archlinux: `packages=( redis  nginx postfix mysqld tornado) ; for package in "${packages[@]}" ; do systemctl start $package; done;`
-    - For centos: `chkconfig mysqld on; chkconfig on; chkconfig tornado on; chkconfig redis on; chkconfig postfix on`
- - Follow the [Frontend](#frontend) steps
- - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
- - If something doesn't work you want to check `pychat/backend/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
+   - Either you already have certificates or already know how to do it.
+ 1. Open `/etc/nginx/sites-enabled/pychat.conf` and modify it by:
+   - change `server_name` to one matching your domain/ip address
+   - remove check for host below it, if you're using ip 
+   - change `ssl_certificate` and `ssl_certificate_key` path to ones that you generated   
+   - if you didn't compile nginx with `upload_file` module, remove locations `api/upload_file` and `@upload_file`, otherwise leave it as it is.
+ 1. Change to parent directory (which contains frontend and backend) and Copy config files to rootfs with from **root** user `sh download_content.sh copy_root_fs`.
+ 1. Create a directory `mkdir backend/downloading_photos` in the backend directory and give it access chmod 777 `downloading_photos` cDon't forget to change the owner of current (project) directory to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`. Also you
+ 1. Follow the [Frontend](#frontend) steps
+ 1. Generate postfix files: `install -d -m 0555 -o postfix -g postfix /etc/postfix/virtual; postmap /etc/postfix/virtual; newaliases; touch /etc/postfix/virtual-regexp; echo 'root postmaster' > /etc/aliases`
+ 1. Start services:
+   - For archlinux: `packages=( mysqld  redis systemctl tornado@8888 nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`
+   - For centos: `packages=( redis-server  nginx postfix mysqld tornado@8888) ; for package in "${packages[@]}" ; do service $package start; done;`
+ 1. You can also enable autostart (after reboot)
+   - For archlinux: `packages=( redis  nginx postfix mysqld tornado) ; for package in "${packages[@]}" ; do systemctl start $package; done;`
+   - For centos: `chkconfig mysqld on; chkconfig on; chkconfig tornado on; chkconfig redis on; chkconfig postfix on`
+ 1. Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
+ 1. If something doesn't work you want to check logs:
+   - Check logs in `pychat/backend/logs` directory. 
+   - Check daemon logs: e.g. on Archlinux  `sudo journalctl -u YOUR_SERVICE`. Where YOUR_SERVICE could be: `nginx`, `mysql`, `tornado`
+   - Check that user `http` has access to you project directory, and all directories inside, especially to `/photos` 
 
 ## Frontend
  - `cd frontend; nvm use`. Apply `nvm install` before it if node of specified version is not installed
