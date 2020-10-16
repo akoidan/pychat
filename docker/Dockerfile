@@ -54,7 +54,7 @@ RUN  set -x && \
 
 # https://github.com/gliderlabs/docker-alpine/issues/297#issuecomment-368695866 libffi-dev
 
-COPY ./backend/requirements.txt ./backend
+COPY ./backend/requirements.txt ./backend/
 
 RUN set -x && \
     pip3 install mysqlclient &&\

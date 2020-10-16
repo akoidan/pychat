@@ -5,7 +5,7 @@ command_user="root"
 mv_db() {
    if [ -z "$(ls /var/lib/mysql)" ]; then
        echo "Moving mysql volume"
-       mv /srv/http/mysql/* /var/lib/mysql/ && chown -R mysql:mysql /data/mysql &&  mv /srv/http/migrations/* /srv/http/chat/migrations/ && rm -r /srv/http/migrations && rm -r /srv/http/mysql || return 1
+       mv /srv/http/mysql/* /var/lib/mysql/ && chown -R mysql:mysql /data/mysql &&  mv /srv/http/migrations/* /srv/http/backend/chat/migrations/ && rm -r /srv/http/migrations && rm -r /srv/http/mysql || return 1
    fi
 }
 
