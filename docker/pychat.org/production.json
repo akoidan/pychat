@@ -6,5 +6,10 @@
     "RECAPTCHA_PUBLIC_KEY": false,
     "MANIFEST": false,
     "AUTO_REGISTRATION": false,
-    "PUBLIC_PATH": null
+    "PUBLIC_PATH": null,
+    "ISSUES": false,
+    "STATISTICS": false,
+    "GITHUB_LINK": "https://github.com/Deathangel908/pychat",
+    "PAINTER": true,
+    "FLAGS": false
 }

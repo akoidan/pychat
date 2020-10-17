@@ -334,7 +334,7 @@ const getConfig = async () => {
         },
         {
           test: /assets\/flags\/.*\.png$/,
-          loader: 'file-loader',
+          loader: options.FLAGS ? 'file-loader': 'null-loader',
           options: getOptions('flags')
         },
         {

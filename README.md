@@ -180,6 +180,7 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 ### [Ubuntu](http://www.ubuntu.com/):
  1. Install required packages: `apt-get install python pip mysql-server` (python should be 3.6-3.8) If pip is missing check `python-pip`.
  2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
+ 1. Install mysqlclient `pip install mysqlclient`
 
 ### [Archlinux](https://www.archlinux.org/):
  1. Install system packages:  `pacman -S unzip python python-pip redis yarn mariadb python-mysqlclient`. nvm is located in [aur](https://aur.archlinux.org/packages/nvm/) so `yay -S nvm` (or use another aur package)
@@ -188,7 +189,7 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 ### [MacOS](https://en.wikipedia.org/wiki/MacOS)
  1. Install packages: `brew install mysql redis python3` 
  1. Start services `brew services run mysql redis`
- 2. Install mysqlclient `pip install mysqlclient`
+ 1. Install mysqlclient `pip install mysqlclient`
 
 ## Bootstrap files:
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
@@ -207,8 +208,8 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  1. Enable django support. Go to Settings -> Django -> Enable django support. 
    - Django project root: root directory of your project. Where .git asides.
    - Put `Settings:` to `chat/settings.py`
- 1. `Settings` -> `Project pychat` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `pychatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
- 1. `Settings` -> `Project: pychat` -> `Project structure`
+ 1. If pycharm didn't configure virtualenv itself. Go to `Settings` -> `Project backend` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `pychatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
+ 1. `Settings` -> `Project backend` -> `Project structure`
   - You might want to exclude: `.idea`
   - mark `templates` directory as `Template Folder`
  1. Add tornado script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `start_tornado`. Remove port value.
@@ -399,7 +400,12 @@ development.json and production.json have the following format:
   "MANIFEST": "manifest path for firebase push notifications e.g.`/manifest.json`",
   "RECAPTCHA_PUBLIC_KEY": "check chat/settings_example.py RECAPTCHA_SITE_KEY",
   "AUTO_REGISTRATION": "if set to true, for non loggined user registration page will be skipped with loggining with random generated username. Don't use RECAPTCHA with this key",
-  "PUBLIC_PATH": "Set this path if you have different domains/IPs for index.html and other static assets, e.g. I serve index.html directly from my server and all sttatic assets like main.js from CDN, so in my case it's 'https://static.pychat.org/' note ending slash"
+  "PUBLIC_PATH": "Set this path if you have different domains/IPs for index.html and other static assets, e.g. I serve index.html directly from my server and all sttatic assets like main.js from CDN, so in my case it's 'https://static.pychat.org/' note ending slash",
+  "ISSUES": "if true navigation bar will display link to reporting a issue page",
+  "STATISTICS": "if true navigation bar will display a link to a page with statistics user by country",
+  "GITHUB_LINK": "an external link to project source files, in my case https://github.com/Deathangel908/pychat . Set to false if you don't wanna see it in the navbar",
+  "PAINTER": "if true chat will contain a link to painter page in the navbar. This you can draw any images and send to chat",
+  "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen"
 }
 ```
 

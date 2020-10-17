@@ -15,7 +15,7 @@ interface AmChartI {
   dataItem: { wedge: { node: HTMLElement } };
 }
 @Component
-export default class PainterPage extends Vue {
+export default class AmChart extends Vue {
 
   public async mounted() {
     let data: any = {
@@ -88,7 +88,5 @@ export default class PainterPage extends Vue {
   .container /deep/
     .active-icon
       color: red
-
-    @import "~spainter/no-fonts.sass"
 
 </style>

@@ -11,6 +11,7 @@
       <span class="mText">Home</span>
     </router-link>
     <router-link
+      v-if="consts.PAINTER"
       to="/painter"
       class="icon-brush"
       title="Draw an Image"
@@ -18,6 +19,7 @@
       <span class="mText">Painter</span>
     </router-link>
     <router-link
+      v-if="consts.ISSUES"
       to="/report-issue"
       class="icon-pencil"
       title="Report an issue"
@@ -25,6 +27,7 @@
       <span class="mText">Issue</span>
     </router-link>
     <router-link
+      v-if="consts.STATISTICS"
       to="/statistics"
       class="icon-chart-pie"
       title="Statistics"
@@ -46,14 +49,6 @@
       class="mText"
     >Search</span>
     </i>
-    <router-link
-      v-if="false"
-      to="/statistics"
-      class="icon-chart-pie"
-      title="Show user countries statistics"
-    >
-      <span class="mText">Statistics</span>
-    </router-link>
     <i
       v-if="$route.name === 'chat'"
       class="icon-doc-inv"
@@ -72,8 +67,8 @@
       class="icon-popup"
     ><span class="mText">Minimized Windows</span></i>
     <a
-      v-if="githubUrl"
-      :href="githubUrl"
+      v-if="consts.GITHUB_LINK"
+      :href="consts.GITHUB_LINK"
       target="_blank"
       class="icon-github"
     ><span
@@ -113,7 +108,7 @@ import {Component, Vue, Ref} from 'vue-property-decorator';
 import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
 import {logout} from '@/utils/utils';
 import {SetSearchTo} from '@/types/types';
-import {GITHUB_URL} from '@/utils/consts';
+import {ISSUES, GITHUB_LINK, PAINTER, STATISTICS} from '@/utils/consts';
 import {webrtcApi} from '@/utils/singletons';
 
 @Component
@@ -134,7 +129,14 @@ export default class AppNav extends Vue {
   @State
   public readonly userInfo!: CurrentUserInfoModel;
 
-  public githubUrl: string = GITHUB_URL;
+  public get consts(): object {
+    return {
+      GITHUB_LINK,
+      PAINTER,
+      ISSUES,
+      STATISTICS
+    }
+  }
 
   public expanded: boolean = false;
 

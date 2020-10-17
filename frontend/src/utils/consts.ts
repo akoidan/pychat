@@ -12,6 +12,11 @@ export const {
   RECAPTCHA_PUBLIC_KEY,
   MANIFEST,
   AUTO_REGISTRATION,
+  ISSUES,
+  STATISTICS,
+  GITHUB_LINK,
+  PAINTER,
+  FLAGS,
   GIT_HASH,
   IS_PROD,
   ELECTRON_MAIN_FILE,
@@ -24,7 +29,6 @@ export const WS_API_URL = `ws${IS_SSL ? 's' : ''}://${BACKEND_ADDRESS}/ws`;
 export const XHR_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_ADDRESS}/api`;
 export const MEDIA_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_ADDRESS}`;
 
-export const GITHUB_URL = 'https://github.com/Deathangel908/pychat';
 export const PING_CLOSE_JS_DELAY = 5000;
 export const CONNECTION_RETRY_TIME = 5000;
 export const CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = 313000;

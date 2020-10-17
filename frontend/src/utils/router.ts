@@ -16,13 +16,12 @@ import UserProfileImage from '@/components/pages/UserProfileImage.vue';
 import UserProfileInfo from '@/components/pages/UserProfileInfo.vue';
 import UserProfileSettings from '@/components/pages/UserProfileSettings.vue';
 import CreatePrivateRoom from '@/components/pages/CreatePrivateRoom.vue';
-import PainterPage from '@/components/pages/PainterPage.vue';
 import CreatePublicRoom from '@/components/pages/CreatePublicRoom.vue';
 import ViewProfilePage from '@/components/pages/ViewProfilePage.vue';
 import RoomSettings from '@/components/pages/RoomSettings.vue';
 import ApplyResetPassword from '@/components/singup/ApplyResetPassword.vue';
 import {globalLogger} from '@/utils/singletons';
-import {ALL_ROOM_ID} from '@/utils/consts';
+import {ALL_ROOM_ID, PAINTER, STATISTICS} from '@/utils/consts';
 import ConfirmMail from '@/components/email/ConfirmMail.vue';
 import UserProfileChangeEmail
   from '@/components/pages/UserProfileChangeEmail.vue';
@@ -55,14 +54,14 @@ const router = new VueRouter({
           name: 'chat',
           path: '/chat/:id'
         },
-        {
-          component: PainterPage,
+        ...PAINTER ? [{
+          component: () => import(/* webpackChunkName: "spainter" */'@/components/pages/PainterPage.vue'),
           path: '/painter'
-        },
-        {
+        }]: [],
+        ...STATISTICS ? [{
           component: () => import(/* webpackChunkName: "amchart" */ '@/components/pages/AmChart.vue'),
           path: '/statistics'
-        },
+        }]: [],
         {
           component: ViewProfilePage,
           path: '/user/:id'
