@@ -54,7 +54,7 @@
       />
       <span
         class="usersStateText"
-        @click="onlineShowOnlyOnline = !onlineShowOnlyOnline"
+        @click="switchUserState"
       >{{ onlineText }}</span>
       <router-link
         :to="`/invite-user/${activeRoomId}`"
@@ -112,6 +112,11 @@ export default class RoomUsers extends Vue {
   }
   get onlineClass() {
     return this.onlineMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
+  }
+
+  private switchUserState(): void {
+    this.onlineShowOnlyOnline = !this.onlineShowOnlyOnline;
+    this.onlineMinified = false;
   }
 
 }
