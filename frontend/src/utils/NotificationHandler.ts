@@ -26,6 +26,7 @@ export default class NotifierHandler {
   private readonly isChrome: boolean;
   private readonly isMobile: boolean;
   private readonly ws: WsHandler;
+  private readonly documentTitle: string;
 
   constructor(api: Api, browserVersion: string, isChrome: boolean, isMobile: boolean, ws: WsHandler, store: DefaultStore) {
     this.api = api;
@@ -33,6 +34,7 @@ export default class NotifierHandler {
     this.isChrome = isChrome;
     this.isMobile = isMobile;
     this.ws = ws;
+    this.documentTitle = document.title;
     this.store = store;
     this.logger = loggerFactory.getLoggerColor('notify', '#e39800');
     this.currentTabId = Date.now().toString();
@@ -151,7 +153,7 @@ export default class NotifierHandler {
     }
     this.isCurrentTabActive = true;
     this.newMessagesCount = 0;
-    document.title = 'PyChat';
+    document.title = this.documentTitle;
     this.popedNotifQueue.forEach((n) => {
       n.close();
     });

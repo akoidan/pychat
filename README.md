@@ -125,10 +125,10 @@ If you don't or unable to run docker you can alway do the setup w/o it. You defi
  1. Follow the [Frontend](#frontend) steps
  1. Generate postfix files: `install -d -m 0555 -o postfix -g postfix /etc/postfix/virtual; postmap /etc/postfix/virtual; newaliases; touch /etc/postfix/virtual-regexp; echo 'root postmaster' > /etc/aliases`
  1. Start services:
-   - For archlinux: `packages=( mysqld  redis systemctl tornado@8888 nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`
+   - For archlinux/ubuntu: `packages=( mysqld redis tornado@8888 nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`. Service `mysqld` could be named `mysql` on Ubuntu.
    - For centos: `packages=( redis-server  nginx postfix mysqld tornado@8888) ; for package in "${packages[@]}" ; do service $package start; done;`
  1. You can also enable autostart (after reboot)
-   - For archlinux: `packages=( redis  nginx postfix mysqld tornado) ; for package in "${packages[@]}" ; do systemctl start $package; done;`
+   - For archlinux/ubuntu: `packages=( redis  nginx postfix mysqld tornado) ; for package in "${packages[@]}" ; do systemctl start $package; done;`
    - For centos: `chkconfig mysqld on; chkconfig on; chkconfig tornado on; chkconfig redis on; chkconfig postfix on`
  1. Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
  1. If something doesn't work you want to check logs:
@@ -178,9 +178,9 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`).
 
 ### [Ubuntu](http://www.ubuntu.com/):
- 1. Install required packages: `apt-get install python pip mysql-server` (python should be 3.6-3.8) If pip is missing check `python-pip`.
+ 1. Install required packages: `apt-get install python pip mysql-server libmysqlclient-dev` (python should be 3.5-3.8) If pip is missing check `python-pip`.
  2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
- 1. Install mysqlclient `pip install mysqlclient`
+ 1. Install mysqlclient `pip install mysqlclient==1.3.13`
 
 ### [Archlinux](https://www.archlinux.org/):
  1. Install system packages:  `pacman -S unzip python python-pip redis yarn mariadb python-mysqlclient`. nvm is located in [aur](https://aur.archlinux.org/packages/nvm/) so `yay -S nvm` (or use another aur package)
@@ -194,7 +194,7 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 ## Bootstrap files:
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
  2. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.** 
- 3. From backend dir (`cd backend`). Create virtualEnv `python3 -m venv --system-site-packages .venv` and activate it: `source .venv/bin/activate`
+ 3. From backend dir (`cd backend`). Create virtualEnv `python3 -m venv --system-site-packages .venv`. For ubuntu you can omit `--system-site-packages `. Activate it: `source .venv/bin/activate`
  4. Install python packages with `pip install -r requirements.txt`.
  5. From **root** user create the database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL PRIVILEGES ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
  6. Fill database with tables: `bash ../download_content.sh create_django_tables`
