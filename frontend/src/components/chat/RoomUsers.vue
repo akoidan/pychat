@@ -138,8 +138,7 @@ export default class RoomUsers extends Vue {
     @media screen and (max-width: $collapse-width)
       width: 100%
       border-bottom: 8px solid
-      @include flex(1)
-      flex-grow: 2
+      max-height: 50%
 
     /deep/
       .icon-smile, .icon-picture, .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up
