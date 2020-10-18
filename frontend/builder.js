@@ -235,6 +235,20 @@ const getConfig = async () => {
     }
     plugins.push(new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns: getDist()}));
     plugins.push(new MiniCssExtractPlugin());
+    plugins.push(new webpack.ProgressPlugin(function (percentage, msg, current, active, modulepath) {
+        if (process.stdout.isTTY && percentage < 1) {
+          process.stdout.cursorTo(0);
+          modulepath = modulepath ? ' …' + modulepath.substr(modulepath.length - process.stdout.columns + 45) : '';
+          current = current ? ' ' + current : '';
+          active = active ? ' ' + active : '';
+          process.stdout.write((percentage * 100).toFixed(0) + '% ' + msg + current + active + modulepath + ' ')
+          process.stdout.clearLine(1)
+        } else if (percentage === 1) {
+          process.stdout.write('\n');
+          console.log('webpack: done.')
+        }
+      })
+    );
     let minicssPlugin = {
       loader: MiniCssExtractPlugin.loader,
     };
