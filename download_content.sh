@@ -397,11 +397,12 @@ create_django_tables() {
 
 android() {
   cd $FE_DIRECTORY
-  yarn run android
   ./node_modules/.bin/cordova build
-  adb -d push ./platforms/android/app/build/outputs/apk/debug/app-debug.apk /data/local/tmp/
-  adb -d shell pm uninstall org.pychat
-  adb -d shell pm install /data/local/tmp/app-debug.apk
+  adb push ./platforms/android/app/build/outputs/apk/debug/app-debug.apk /data/local/tmp/
+  adb shell pm uninstall org.pychat
+  adb shell pm install /data/local/tmp/app-debug.apk
+  adb reverse tcp:8888 tcp:8888
+  adb reverse tcp:8080 tcp:8080
 }
 
 generate_secret_key() {
