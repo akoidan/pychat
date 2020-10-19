@@ -41,6 +41,7 @@ export const browserVersion: string = (function () {
 export const isFirefox = browserVersion.indexOf('Firefox') >= 0;
 export const WEBRTC_STUNT_URL = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 export const isChrome = browserVersion.indexOf('Chrome') >= 0;
+// @ts-ignore: next-line
 export const storage: IStorage = window.openDatabase ? new DatabaseWrapper('v124x') : new LocalStorage();
 store.setStorage(storage); // TODO mvoe to main
 export const globalLogger: Logger = loggerFactory.getLoggerColor('global', '#007a70');

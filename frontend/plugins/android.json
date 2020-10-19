@@ -9,6 +9,9 @@
   "installed_plugins": {
     "cordova-plugin-whitelist": {
       "PACKAGE_NAME": "org.pychat"
+    },
+    "cordova-plugin-android-permissions": {
+      "PACKAGE_NAME": "org.pychat"
     }
   },
   "dependent_plugins": {}

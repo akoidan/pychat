@@ -176,6 +176,9 @@ const getConfig = async () => {
   if (options.MANIFEST && options.IS_WEB) {
     webpackOptions.manifest = options.MANIFEST
   }
+  if (options.IS_ANDROID) {
+    webpackOptions.IS_ANDROID = options.IS_ANDROID;
+  }
 
   if (options.UGLIFY || !options.IS_DEBUG) { // uglyging this is not that important as reducing file that's always refreshing
     webpackOptions.minify = {

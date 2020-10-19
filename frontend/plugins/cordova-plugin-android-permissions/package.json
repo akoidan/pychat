@@ -1,0 +1,63 @@
+{
+  "_from": "cordova-plugin-android-permissions",
+  "_id": "cordova-plugin-android-permissions@1.1.0",
+  "_inBundle": false,
+  "_integrity": "sha512-5zw+sMEak3iqZkl5/L0Q3n7d2qe/KjKm1P7qb7BhvsxT3r+05YiTPdfXC5dSdg6ZW8ObRTRH+CdMC1nBjwb5Pg==",
+  "_location": "/cordova-plugin-android-permissions",
+  "_phantomChildren": {},
+  "_requested": {
+    "type": "tag",
+    "registry": true,
+    "raw": "cordova-plugin-android-permissions",
+    "name": "cordova-plugin-android-permissions",
+    "escapedName": "cordova-plugin-android-permissions",
+    "rawSpec": "",
+    "saveSpec": null,
+    "fetchSpec": "latest"
+  },
+  "_requiredBy": [
+    "#DEV:/",
+    "#USER"
+  ],
+  "_resolved": "https://registry.npmjs.org/cordova-plugin-android-permissions/-/cordova-plugin-android-permissions-1.1.0.tgz",
+  "_shasum": "cdd4bf7c40d15c5e55ae27a18a782d5ebebf0230",
+  "_spec": "cordova-plugin-android-permissions",
+  "_where": "/Users/deathangel908/PycharmProjects/djangochat/frontend",
+  "author": {
+    "name": "Jason Yang"
+  },
+  "bugs": {
+    "url": "https://github.com/NeoLSN/cordova-plugin-android-permission/issues"
+  },
+  "bundleDependencies": false,
+  "cordova": {
+    "id": "cordova-plugin-android-permissions",
+    "platforms": [
+      "android",
+      "ios",
+      "browser"
+    ]
+  },
+  "deprecated": false,
+  "description": "Android 6.0 permissions check.",
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=5.0.0"
+    }
+  ],
+  "homepage": "https://github.com/NeoLSN/cordova-plugin-android-permission#readme",
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-browser",
+    "cordova-ios"
+  ],
+  "license": "Apache 2.0",
+  "name": "cordova-plugin-android-permissions",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NeoLSN/cordova-plugin-android-permission.git"
+  },
+  "version": "1.1.0"
+}

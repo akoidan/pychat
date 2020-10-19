@@ -85,6 +85,7 @@ export default class Xhr extends Http {
               if (d.done) {
                 break;
               }
+              // @ts-ignore: next-line
               logOut += `${d.value[0]}= ${d.value[1]};`;
             }
           }

@@ -27,6 +27,7 @@
   import {stopVideo} from '@/utils/htmlApi';
   import MediaCapture from '@/utils/MediaCapture';
   import {isChrome, isMobile} from "@/utils/singletons";
+  import {askAudioPermissions} from '@/utils/android';
 
   const HOLD_TIMEOUT = 500;
 
@@ -57,6 +58,7 @@
     async startRecord() {
       this.logger.debug("Starting recording...")();
       this.store.setDim(true);
+      await askAudioPermissions(this.isRecordingVideo);
       // TODO wtf unknown
       this.navigatorRecord = new MediaCapture(this.isRecordingVideo, (data: unknown) => {
         this.logger.debug("Finishing recording... {}", data)();

@@ -156,6 +156,7 @@ Use [nativifier](https://github.com/jiahaog/nativefier#installation) to create a
 This is harsh. If you're not familiar with android SDK I would recommend doing the steps below from AndroidStudio:
  - Install android sdk, android platform tools. accept license
  - Create production.json based on [Frontend config](#frontend-config)
+ - production.json `"PUBLIC_PATH": "./"`,  `"BACKEND_ADDRESS": "pychat.org"` build into dist, rm .gz. , copy to `www`. In index.html include ` <script src="cordova.js"></script>`
  - `bash download_content.sh android`
  
 Example for mac:
@@ -168,12 +169,7 @@ Example for mac:
  1. Open `frontend/platforms/android` with androidStudio
  1. Start android emulator / connect device
  1. put index.html into www
- 1. Run dev server with `yarn run dev`
- 1. `adb reverse tcp:8080 tcp:8080` `adb reverse tcp:8888 tcp:8888`
- 1. `./node_modules/.bin/cordova build android`
- 1.  `adb -d push ./platforms/android/app/build/outputs/apk/debug/app-debug.apk /data/local/tmp/ ;
-  adb -d shell pm uninstall org.pychat;
-  adb -d shell pm install /data/local/tmp/app-debug.apk;`
+ 1. Run dev server with `yarn run dev`; `bash download_content.sh android`
  1. TO debug java files you can run it directory from android studio. `Debug` button should be available out of the box after openning a project
  1. To debug js you can open `chrome://inspect/#devices` in chrome 
  1. For any question check [cordova docs](https://cordova.apache.org/docs/en/latest/guide/platforms/android/index.html#installing-the-requirements)

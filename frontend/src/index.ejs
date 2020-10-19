@@ -23,6 +23,9 @@
                 href="<%= htmlWebpackPlugin.options.manifest %>"
         />
     <% } %>
+    <% if (htmlWebpackPlugin.options.IS_ANDROID ) { %>
+        <script src="cordova.js"></script>
+    <% } %>
     <% for (var index in htmlWebpackPlugin.files.js) { %>
         <% if (htmlWebpackPlugin.files.jsIntegrity) { %>
             <script
