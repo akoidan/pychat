@@ -18,7 +18,7 @@ rootfs/etc/nginx/ssl/*
 rootfs/etc/nginx/ssl/server.key
 rootfs/etc/nginx/ssl/certificate.key
 backend/downloading_photos
-backend/chat/migrations
+backend/chat/migrations/*
 backend/.venv
 backend/chat.log
 backend/chat/production.py
