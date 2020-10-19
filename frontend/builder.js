@@ -241,11 +241,11 @@ const getConfig = async () => {
           modulepath = modulepath ? ' …' + modulepath.substr(modulepath.length - process.stdout.columns + 45) : '';
           current = current ? ' ' + current : '';
           active = active ? ' ' + active : '';
-          process.stdout.write((percentage * 100).toFixed(0) + '% ' + msg + current + active + modulepath + ' ')
+          process.stdout.write((percentage * 100).toFixed(0) + '% ' + msg + current + active + modulepath + ' ');
           process.stdout.clearLine(1)
         } else if (percentage === 1) {
-          process.stdout.write('\n');
-          console.log('webpack: done.')
+          process.stdout.cursorTo(0);
+          process.stdout.clearLine(1);
         }
       })
     );
@@ -458,7 +458,6 @@ async function runElectron(mainPath) {
 function runWebpack(config) {
   return new Promise((resolve, reject) => {
     webpack(config, (err, stats) => {
-      process.stdout.write('\x1Bc');
       console.log(stats.toString({
         chunks: false,  // Makes the build much quieter
         colors: true    // Shows colors in the console

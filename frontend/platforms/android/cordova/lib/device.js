@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /*
        Licensed to the Apache Software Foundation (ASF) under one
        or more contributor license agreements.  See the NOTICE file
@@ -19,11 +17,11 @@
        under the License.
 */
 
+const execa = require('execa');
 var build = require('./build');
 var path = require('path');
 var Adb = require('./Adb');
 var AndroidManifest = require('./AndroidManifest');
-var spawn = require('cordova-common').superspawn.spawn;
 var CordovaError = require('cordova-common').CordovaError;
 var events = require('cordova-common').events;
 
@@ -37,7 +35,7 @@ module.exports.list = function (lookHarder) {
             // adb kill-server doesn't seem to do the trick.
             // Could probably find a x-platform version of killall, but I'm not actually
             // sure that this scenario even happens on non-OSX machines.
-            return spawn('killall', ['adb']).then(function () {
+            return execa('killall', ['adb']).then(function () {
                 events.emit('verbose', 'Restarting adb to see if more devices are detected.');
                 return Adb.devices();
             }, function () {

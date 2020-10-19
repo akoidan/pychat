@@ -21,12 +21,12 @@
     "stats": "PROFILE=true PLATFORM=web BUILD_MODE=production node ./builder.js && webpack-bundle-analyzer ./compilation-stats.json"
   },
   "cordova": {
-    "platforms": [
-      "android"
-    ],
     "plugins": {
       "cordova-plugin-whitelist": {}
-    }
+    },
+    "platforms": [
+      "android"
+    ]
   },
   "repository": {
     "type": "git",
@@ -104,8 +104,8 @@
   },
   "dependencies": {
     "amcharts3": "3.21.15",
-    "cordova": "9.0.0",
-    "cordova-android": "8.1.0",
+    "cordova": "10.0.0",
+    "cordova-android": "^9.0.0",
     "electron-devtools-installer": "2.2.4",
     "highlightjs": "9.12.0",
     "is-mobile": "2.1.0",

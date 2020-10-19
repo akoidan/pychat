@@ -19,7 +19,31 @@
 
 apply plugin: 'com.android.application'
 
+if (cdvHelpers.getConfigPreference('GradlePluginKotlinEnabled', 'false').toBoolean()) {
+    apply plugin: 'kotlin-android'
+    apply plugin: 'kotlin-android-extensions'
+}
+
 buildscript {
+    apply from: '../CordovaLib/cordova.gradle'
+
+    if(cdvHelpers.getConfigPreference('GradlePluginKotlinEnabled', 'false').toBoolean()) {
+        String defaultGradlePluginKotlinVersion = kotlin_version
+
+        /**
+         * Fetches the user's defined Kotlin Version from config.xml.
+         * If the version is not set or invalid, it will default to the ${defaultGradlePluginKotlinVersion}
+         */
+        String gradlePluginKotlinVersion = cdvHelpers.getConfigPreference('GradlePluginKotlinVersion', defaultGradlePluginKotlinVersion)
+        if(!cdvHelpers.isVersionValid(gradlePluginKotlinVersion)) {
+            println("The defined Kotlin version (${gradlePluginKotlinVersion}) does not appear to be a valid version. Falling back to version: ${defaultGradlePluginKotlinVersion}.")
+            gradlePluginKotlinVersion = defaultGradlePluginKotlinVersion
+        }
+
+        // Change the version to be used.
+        ext.kotlin_version = gradlePluginKotlinVersion
+    }
+
     repositories {
         mavenCentral()
         google()
@@ -27,7 +51,32 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.0'
+        apply from: '../CordovaLib/cordova.gradle'
+
+        classpath 'com.android.tools.build:gradle:4.0.0'
+
+        if (cdvHelpers.getConfigPreference('GradlePluginKotlinEnabled', 'false').toBoolean()) {
+            classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        }
+
+        if(cdvHelpers.getConfigPreference('GradlePluginGoogleServicesEnabled', 'false').toBoolean()) {
+            String defaultGradlePluginGoogleServicesVersion = '4.2.0'
+
+            /**
+             * Fetches the user's defined Google Services Plugin Version from config.xml.
+             * If the version is not set or invalid, it will default to the ${defaultGradlePluginGoogleServicesVersion}
+             */
+            String gradlePluginGoogleServicesVersion = cdvHelpers.getConfigPreference('GradlePluginGoogleServicesVersion', defaultGradlePluginGoogleServicesVersion)
+            if(!cdvHelpers.isVersionValid(gradlePluginGoogleServicesVersion)) {
+                println("The defined Google Services plugin version (${gradlePluginGoogleServicesVersion}) does not appear to be a valid version. Falling back to version: ${defaultGradlePluginGoogleServicesVersion}.")
+                gradlePluginGoogleServicesVersion = defaultGradlePluginGoogleServicesVersion
+            }
+
+            // Create the Google Services classpath and set it.
+            String gradlePluginGoogleServicesClassPath = "com.google.gms:google-services:${gradlePluginGoogleServicesVersion}"
+            println "Adding classpath: ${gradlePluginGoogleServicesClassPath}"
+            classpath gradlePluginGoogleServicesClassPath
+        }
     }
 }
 
@@ -40,7 +89,7 @@ allprojects {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '4.10.3'
+    gradleVersion = '6.5'
 }
 
 // Configuration properties. Set these via environment variables, build-extras.gradle, or gradle.properties.
@@ -112,9 +161,9 @@ if (hasBuildExtras2) {
 
 // Set property defaults after extension .gradle files.
 ext.cdvCompileSdkVersion = cdvCompileSdkVersion == null ? (
-    defaultCompileSdkVersion == null 
+    defaultCompileSdkVersion == null
         ? privateHelpers.getProjectTarget()
-        : defaultCompileSdkVersion 
+        : defaultCompileSdkVersion
 ) : Integer.parseInt('' + cdvCompileSdkVersion);
 
 if (ext.cdvBuildToolsVersion == null) {
@@ -280,6 +329,10 @@ android {
     if (cdvDebugSigningPropertiesFile) {
         addSigningProps(cdvDebugSigningPropertiesFile, signingConfigs.debug)
     }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
 }
 
 /*
@@ -291,6 +344,11 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: '*.jar')
+
+    if (cdvHelpers.getConfigPreference('GradlePluginKotlinEnabled', 'false').toBoolean()) {
+        implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    }
+
     // SUB-PROJECT DEPENDENCIES START
     implementation(project(path: ":CordovaLib"))
     // SUB-PROJECT DEPENDENCIES END
@@ -354,4 +412,8 @@ for (def func : cdvPluginPostBuildExtras) {
 //     ext.postBuildExtras = { ... code here ... }
 if (hasProperty('postBuildExtras')) {
     postBuildExtras()
+}
+
+if (cdvHelpers.getConfigPreference('GradlePluginGoogleServicesEnabled', 'false').toBoolean()) {
+    apply plugin: 'com.google.gms.google-services'
 }

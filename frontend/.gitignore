@@ -3,6 +3,7 @@ package-lock.json
 platforms/android/cordova/node_modules
 electron_dist/
 !www/.gitkeep
+.DS_STORE
 platforms/android/app/src/main/assets
 www/*
 .fontello

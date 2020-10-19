@@ -4,7 +4,7 @@
         <param name="android-package" value="org.apache.cordova.whitelist.WhitelistPlugin" />
         <param name="onload" value="true" />
     </feature>
-    <name>pychat</name>
+    <name>Pychat</name>
     <description>
         A sample Apache Cordova application that responds to the deviceready event.
     </description>
