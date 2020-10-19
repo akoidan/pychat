@@ -1,7 +1,5 @@
-<p align="center"><img src="./logo/logo.svg"></p>
-
- [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat.svg?label=docker%3Aprod)](https://hub.docker.com/r/deathangel908/pychat)
-[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat-test.svg?label=docker%3Atest)](https://hub.docker.com/r/deathangel908/pychat-test) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)
+[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat.svg?label=docker%3Aprod)](https://hub.docker.com/r/deathangel908/pychat)
+[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat-test.svg?label=docker%3Atest)](https://hub.docker.com/r/deathangel908/pychat-test) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)[![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master)
 
 # Live demo: [pychat.org](https://pychat.org/), [video](https://www.youtube.com/watch?v=m6sJ-blTidg)
 
@@ -80,7 +78,7 @@ Please don't use this build for production, as it uses debug ssl certificate, la
 ```bash
 openssl req -nodes -new -x509 -keyout server.key -out certificate.crt -days 3650
 ```
- - Download [settings.py](https://github.com/akoidan/pychat/blob/master/chat/settings_example.py) and edit it according comments in it.
+ - Download [settings.py](https://github.com/akoidan/pychat/blob/master/backend/chat/settings_example.py) and edit it according comments in it.
  - Download [production.json](https://github.com/akoidan/pychat/blob/master/docker/pychat.org/production.json)  and edit it according [wiki](https://github.com/akoidan/pychat#frontend-config)
  - Create volume and copy files there
  ```bash
@@ -105,31 +103,44 @@ docker run -t -v pychat_data:/data -p 443:443 deathangel908/pychat
 ## Native setup
 If you don't or unable to run docker you can alway do the setup w/o it. You definitely spend more time, so I would recommend to use docker if possible. But if you're still sure,  here's the setup for cent-os/archlinux based system:
  
- - For production I would recommend to clone repository to `/srv/http/pychat`.  If you want to close the project into a different directory, replace all absolute paths in config files. You can use `download_content.sh rename_root_directory` to do that.
- - For archlinux follow [Install OS packages](#install-os-packages), add add these ones: `pacman -S postfix gcc jansson`. 
- - For centos use add `alias yum="python2 $(which yum)"` to /etc/bashrc if you use python3. And then install that packages `yum install python34u, python34u-pip, redis, mysql-server, mysql-devel, postfix, mailx`
-  - If you want to use native file-uploader (nginx_upload_module written in `C`) instead of python uploader (which is a lot slower) you should build nginx yourself. For archlinux setup requires `pacman -S python-lxml gd make geoip`. To build nginx with this module run from the root user: `bash download_content.sh build_nginx 1.15.3 2.3.0`. And create dir + user `useradd nginx; install -d -m 0500 -o http -g http /var/cache/nginx/`. If you don't, just install nginx with your package manager: `pacman -S nginx` or `yum install nginx`
- - Follow [Bootstrap files](#bootstrap-files) flow.
- - I preconfigued native setup for domain `pychat.org`, you want to replace all occurrences of `pychat.org` in [rootfs](rootfs) directory for your domain. To simplify replacing use my script: `./download_content.sh rename_domain your.new.domain.com`. Also check `rootfs/etc/nginx/sites-enabled/pychat.conf` if `server_name` section is correct after renaming.
- - HTTPS is required for webrtc calls so you need to enable ssl:
-   - Either create your certificates and put according to [pychat.conf](rootfs/etc/nginx/sites-enabled/pychat.conf) ssl_certificate/ssl_certificate_key.
+ 1. For production I would recommend to clone repository to `/srv/http/pychat`.  If you want to close the project into a different directory, replace all absolute paths in config files. You can use `download_content.sh rename_root_directory` to do that.
+ 1. Install packages:
+     - For archlinux follow [Install OS packages](#install-os-packages), add add these ones: `pacman -S postfix gcc jansson`. 
+     - For centos use add `alias yum="python2 $(which yum)"` to `/etc/bashrc` if you use python3. And then install that packages `yum install python34u, python34u-pip, redis, mysql-server, mysql-devel, postfix, mailx`
+     - If you use another OS, try to figure out from [Install OS packages](#install-os-packages) guide which things you need
+ 1. If you want to use native file-uploader (`nginx_upload_module` written in `C`) instead of python uploader (which is a lot slower) you should build nginx yourself. For archlinux setup requires `pacman -S python-lxml gd make geoip`. To build nginx with this module run from the **root** user: `bash download_content.sh build_nginx 1.15.3 2.3.0`. And create dir + user `useradd nginx; install -d -m 0500 -o http -g http /var/cache/nginx/`. If you don't, just install nginx with your package manager: e.g. `pacman -S nginx` or `yum install nginx` on centos
+ 1. Follow [Bootstrap files](#bootstrap-files) flow.
+ 1. I preconfigued native setup for domain `pychat.org`, you want to replace all occurrences of `pychat.org` in [rootfs](rootfs) directory for your domain. To simplify replacing use my script: `./download_content.sh rename_domain your.new.domain.com`. Also check `rootfs/etc/nginx/sites-enabled/pychat.conf` if `server_name` section is correct after renaming.
+ 1. HTTPS is required for webrtc calls so you need to enable ssl:
+   - Either create your certificates e.g. `openssl req -nodes -new -x509 -keyout server.key -out certificate.crt -days 3650`
    - Either use something like [certbot](https://certbot.eff.org/lets-encrypt/arch-nginx)
- - Copy config files to rootfs with  `sh download_content.sh copy_root_fs`.
- - Don't forget to change the owner of current (project) directory to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`.
- - Generate postfix files: `install -d -m 0555 -o postfix -g postfix /etc/postfix/virtual; postmap /etc/postfix/virtual; newaliases; touch /etc/postfix/virtual-regexp; echo 'root postmaster' > /etc/aliases`
- - For archlinux start this services: `packages=( mysqld  redis systemctl tornado@8888 nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`
- - For centos start that services: `packages=( redis-server  nginx postfix mysqld tornado@8888) ; for package in "${packages[@]}" ; do service $package start; done;`
- - If you want to enable autostart (after reboot) for archlinux: `packages=( redis  nginx postfix mysqld tornado) ; for package in "${packages[@]}" ; do systemctl start $package; done;`
- - If you want to enable autostart (after reboot) for centos: `chkconfig mysqld on; chkconfig on; chkconfig tornado on; chkconfig redis on; chkconfig postfix on`
- - Follow the [Frontend](#frontend) steps
- - Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
- - If something doesn't work you want to check `pychat/logs` directory. If there's no logs in directory you may want to check service stdout: `sudo journalctl -u YOUR_SERVICE`. Check that user `http` has access to you project directory.
+   - Either you already have certificates or already know how to do it.
+ 1. Open `/etc/nginx/sites-enabled/pychat.conf` and modify it by:
+   - change `server_name` to one matching your domain/ip address
+   - remove check for host below it, if you're using ip 
+   - change `ssl_certificate` and `ssl_certificate_key` path to ones that you generated   
+   - if you didn't compile nginx with `upload_file` module, remove locations `api/upload_file` and `@upload_file`, otherwise leave it as it is.
+ 1. Change to parent directory (which contains frontend and backend) and Copy config files to rootfs with from **root** user `sh download_content.sh copy_root_fs`.
+ 1. Create a directory `mkdir backend/downloading_photos` in the backend directory and give it access chmod 777 `downloading_photos` cDon't forget to change the owner of current (project) directory to `http` user: `chown -R http:http`. And reload systemd config `systemctl daemon-reload`. Also you
+ 1. Follow the [Frontend](#frontend) steps
+ 1. Generate postfix files: `install -d -m 0555 -o postfix -g postfix /etc/postfix/virtual; postmap /etc/postfix/virtual; newaliases; touch /etc/postfix/virtual-regexp; echo 'root postmaster' > /etc/aliases`
+ 1. Start services:
+   - For archlinux/ubuntu: `packages=( mysqld redis tornado@8888 nginx postfix ) ; for package in "${packages[@]}" ; do systemctl enable $package; done;`. Service `mysqld` could be named `mysql` on Ubuntu.
+   - For centos: `packages=( redis-server  nginx postfix mysqld tornado@8888) ; for package in "${packages[@]}" ; do service $package start; done;`
+ 1. You can also enable autostart (after reboot)
+   - For archlinux/ubuntu: `packages=( redis  nginx postfix mysqld tornado) ; for package in "${packages[@]}" ; do systemctl start $package; done;`
+   - For centos: `chkconfig mysqld on; chkconfig on; chkconfig tornado on; chkconfig redis on; chkconfig postfix on`
+ 1. Open in browser [http**s**://your.domain.com](https://127.0.0.1). Note that by default nginx accepts request by domain.name rather than ip.
+ 1. If something doesn't work you want to check logs:
+   - Check logs in `pychat/backend/logs` directory. 
+   - Check daemon logs: e.g. on Archlinux  `sudo journalctl -u YOUR_SERVICE`. Where YOUR_SERVICE could be: `nginx`, `mysql`, `tornado`
+   - Check that user `http` has access to you project directory, and all directories inside, especially to `/photos` 
 
 ## Frontend
- - `cd fe; nvm use 12.10`
+ - `cd frontend; nvm use`. Apply `nvm install` before it if node of specified version is not installed
  - `yarn install`
- - Create production.json based on [Frontend config](#frontend-config)
- - Run `yarn run prod`. This generates static files in `fe/dist` directory.
+ - Create production.json based on [Frontend config](#frontend-config). Also you can use and modify `cp docker/pychat.org/production.json ./frontend/`
+ - Run `yarn run prod`. This generates static files in `frotnend/dist` directory.
 
 ## Desktop app
 Pychat uses websql and built the way so it renders everything possible w/o network. You have 2 options:
@@ -139,7 +150,7 @@ Use [nativifier](https://github.com/jiahaog/nativefier#installation) to create a
 
 ### Electron
  - Create production.json based on [Frontend config](#frontend-config)
- - Run `cd fe; yarn run electronProd`.
+ - Run `cd frontend; yarn run electronProd`.
 
 ## Android app
 This is harsh. If you're not familiar with android SDK I would recommend doing the steps below from AndroidStudio:
@@ -167,48 +178,50 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  7. Add bash commands to `PATH` variable. **Cygwin** or **git's** will do find.(for example if you use only git **PATH=**`C:\Program Files\Git\usr\bin;C:\Program Files\Git\bin`).
 
 ### [Ubuntu](http://www.ubuntu.com/):
- 1. Install required packages: `apt-get install python pip mysql-server` (python should be 3.6-3.8) If pip is missing check `python-pip`.
+ 1. Install required packages: `apt-get install python pip mysql-server libmysqlclient-dev` (python should be 3.5-3.8) If pip is missing check `python-pip`.
  2. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
+ 1. Install mysqlclient `pip install mysqlclient==1.3.13`
 
 ### [Archlinux](https://www.archlinux.org/):
- 1. Install system packages:  `pacman -S unzip python python-pip redis mariadb python-mysqlclient nvm`.
+ 1. Install system packages:  `pacman -S unzip python python-pip redis yarn mariadb python-mysqlclient`. nvm is located in [aur](https://aur.archlinux.org/packages/nvm/) so `yay -S nvm` (or use another aur package)
  2. If you just installed mariadb you need to initialize it: `mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql`.
  
 ### [MacOS](https://en.wikipedia.org/wiki/MacOS)
  1. Install packages: `brew install mysql redis python3` 
  1. Start services `brew services run mysql redis`
- 2. Install mysqlclient `pip install mysqlclient`
+ 1. Install mysqlclient `pip install mysqlclient`
 
 ## Bootstrap files:
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
- 2. Rename [chat/settings_example.py](chat/settings_example.py) to `chat/settings.py`. **Modify file according to the comments in it.**
- 3. Create virtualEnv `python3 -m venv --system-site-packages .venv` and activate it: `source .venv/bin/activate`
+ 2. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.** 
+ 3. From backend dir (`cd backend`). Create virtualEnv `python3 -m venv --system-site-packages .venv`. For ubuntu you can omit `--system-site-packages `. Activate it: `source .venv/bin/activate`
  4. Install python packages with `pip install -r requirements.txt`.
- 5. From root user create the database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL PRIVILEGES ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`.  If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
- 6. Fill database with tables: `bash download_content.sh create_django_tables`
+ 5. From **root** user create the database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL PRIVILEGES ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
+ 6. Fill database with tables: `bash ../download_content.sh create_django_tables`
 
 ## Follow the [Frontend](#frontend) steps
 
 ## Configure IDEs if you use it:
 
 ### Pycharm
+ 1. I recommend open backend as root directory for pycharm.
  1. Enable django support. Go to Settings -> Django -> Enable django support. 
    - Django project root: root directory of your project. Where .git asides.
    - Put `Settings:` to `chat/settings.py`
- 2. `Settings` -> `Project pychat` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `pychatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
- 3. `Settings` -> `Project: pychat` -> `Project structure`
+ 1. If pycharm didn't configure virtualenv itself. Go to `Settings` -> `Project backend` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `pychatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
+ 1. `Settings` -> `Project backend` -> `Project structure`
   - You might want to exclude: `.idea`
   - mark `templates` directory as `Template Folder`
- 4. Add tornado script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `start_tornado`. Remove port value.
+ 1. Add tornado script: `Run` -> `Edit configuration` ->  `Django server` -> Checkbox `Custom run command` `start_tornado`. Remove port value.
  
 ## Linting
- - atm frontend linting is only available, so `cd fe`
+ - atm frontend linting is only available, so `cd frotnend`
  - https://eslint.vuejs.org/rules/this-in-template.html
  
 Current linting supports:
 
- - Sass is linted with [stylelint](https://stylelint.io/user-guide/rules) configured with [.stylelintrc](fe/.stylelintrc)
- - Typescript are linted with eslint, along with .vue files [eslint-plugin-vue](https://eslint.vuejs.org/rules/this-in-template.html) configured with [.eslintrc.json](fe/.eslintrc.json)
+ - Sass is linted with [stylelint](https://stylelint.io/user-guide/rules) configured with [.stylelintrc](frontend/.stylelintrc)
+ - Typescript are linted with eslint, along with .vue files [eslint-plugin-vue](https://eslint.vuejs.org/rules/this-in-template.html) configured with [.eslintrc.json](frontend/.eslintrc.json)
 
 ### Webstorm
  
@@ -252,7 +265,7 @@ Disable tslint, since it's not used, and enable eslint:
 ## Build frontend
 I would recommend to use version node 12.10, `nvm use 12.10`. You can install nvm with [archlinux](https://wiki.archlinux.org/index.php/Node.js_) [ubuntu](https://qiita.com/shaching/items/6e398140432d4133c866) [windows](https://github.com/coreybutler/nvm-windows). 
  - To get started install dependencies first: `yarn install` # or use npm if you're old and cranky
- - Take a look at copy [development.json](fe/development.json]`. The description is at [Frontend config](#frontend-config)
+ - Take a look at copy [development.json](frontend/development.json]. The description is at [Frontend config](#frontend-config)
  - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. Take a look at [development.json](development.json). To run dev-server use `yarn run dev`. You can navigate to http://localhost:8080
  - To build android use `yarn run android -- 192.168.1.55` where 55 is your bridge ip address
  - To run electron use `yarn run electronDev`. This will start electron dev. and generate `/tmp/electron.html` and `/tmp/electron.js` 
@@ -277,7 +290,7 @@ Execute `bash download_content.sh` it will show you help.
 By default each user has turned off browser (console) logs. You can turn them on in [/#/profile](https://localhost:8000/#/profile) page (`logs` checkbox). All logs are logged with `window.logger` object, for ex: `window.logger('message')()`. Note that logger returns a function which is binded to params, that kind of binding shows corrent lines in browser, especially it's handy when all source comes w/o libraries/webpack or other things that transpiles or overhead it. You can also inspect ws messages [here](ws_messages.jpeg) for chromium. You can play with `window.wsHandler.handleMessage(object)` and `window.wsHandler.handle(string)` methods in debug with messages from log to see what's going on
 
 ## Icons
-Chat uses [fontello](fontello.com) and its api for icons. The decision is based on requirements for different icons that come from different fonts and ability to add custom assets. Thus the fonts should be generated (`.wolf` etc). W/o this chat would need to download a lot of different fonts which would slow down the loading process. You can easily edit fonts via your browser, just execute `bash download_content.sh post_fontello_conf`. Make your changes and hit "Save session". Then execute `bash download_content.sh download_fontello`. If you did everything right new icons should appear under [fe/src/assets/demo.html](fe/src/assets/demo.html)
+Chat uses [fontello](fontello.com) and its api for icons. The decision is based on requirements for different icons that come from different fonts and ability to add custom assets. Thus the fonts should be generated (`.wolf` etc). W/o this chat would need to download a lot of different fonts which would slow down the loading process. You can easily edit fonts via your browser, just execute `bash download_content.sh post_fontello_conf`. Make your changes and hit "Save session". Then execute `bash download_content.sh download_fontello`. If you did everything right new icons should appear under [frontend/src/assets/demo.html](frontend/src/assets/demo.html)
 
 ## Sustaining online protocol
 Server pings clients every PING_INTERVAL miliseconds. If client doesn't respond with pong in PING_CLOSE_JS_DELAY, server closes the connection. If ther're multiple tornado processes if can specify port for main process with MAIN_TORNADO_PROCESS_PORT. In turn the client expects to be pinged by the server, if client doesn't receive ping event it will close the connection as well. As well page has window listens for focus and sends ping event when it receives it, this is handy for situation when pc suspends from ram.
@@ -341,7 +354,7 @@ The technologies stack used in project:
 - Webpack and loaders
 - Sass
 
-[builder.js](fe/builder.js) is used to build project. Take a look at it to understand how source files are being processed. Its start point is `entry: ['./src/main.ts']`. Everything is imported in this files are being processed by section `loaders`.
+[builder.js](frontend/builder.js) is used to build project. Take a look at it to understand how source files are being processed. Its start point is `entry: ['./src/main.ts']`. Everything is imported in this files are being processed by section `loaders`.
 
 Every vue component has injected `.$logger` object, to log something to console use `this.logger.log('Hello {}', {1:'world'})();` Note calling function again in the end. Logger is disabled for production. For more info visit [lines-logger](https://github.com/akoidan/lines-logger)
 
@@ -387,7 +400,12 @@ development.json and production.json have the following format:
   "MANIFEST": "manifest path for firebase push notifications e.g.`/manifest.json`",
   "RECAPTCHA_PUBLIC_KEY": "check chat/settings_example.py RECAPTCHA_SITE_KEY",
   "AUTO_REGISTRATION": "if set to true, for non loggined user registration page will be skipped with loggining with random generated username. Don't use RECAPTCHA with this key",
-  "PUBLIC_PATH": "Set this path if you have different domains/IPs for index.html and other static assets, e.g. I serve index.html directly from my server and all sttatic assets like main.js from CDN, so in my case it's 'https://static.pychat.org/' note ending slash"
+  "PUBLIC_PATH": "Set this path if you have different domains/IPs for index.html and other static assets, e.g. I serve index.html directly from my server and all sttatic assets like main.js from CDN, so in my case it's 'https://static.pychat.org/' note ending slash",
+  "ISSUES": "if true navigation bar will display link to reporting a issue page",
+  "STATISTICS": "if true navigation bar will display a link to a page with statistics user by country",
+  "GITHUB_LINK": "an external link to project source files, in my case https://github.com/Deathangel908/pychat . Set to false if you don't wanna see it in the navbar",
+  "PAINTER": "if true chat will contain a link to painter page in the navbar. This you can draw any images and send to chat",
+  "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen"
 }
 ```
 
@@ -397,7 +415,6 @@ development.json and production.json have the following format:
 * https://www.infoworld.com/article/3443039/typescript-37-beta-debuts-with-optional-chaining.html
 * get\s+(\w+)\(\):\s+((\w|\[|\])+)\s+\{\s+return\s+store\.\w+\;?\s+\}\;?        @State\n    public readonly $1!: $2;
 * purge all callbacks to async code
-* move backend to be directory, fe to fe, docker to docker and etc
 * npm run stats
 * Add google and fb auth via iframe 
 * compile to bytenode for electron https://github.com/OsamaAbbas/bytenode
@@ -406,7 +423,6 @@ development.json and production.json have the following format:
 * "unable to begin transaction (3850 disk I/O error)" when 2 tabs are opened
 * Add search for roomname in rooms list and username for user in direct messages and user in room
 * Save message upon typing in localstorage and restore it on page load, be aware of pasted files
-* [![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master)
 * Add linter badges for typescript, test badges for tornado and backend, code coverage etc
 * Update to tornado 6.0 and detect blocking loops https://stackoverflow.com/a/26638397/3872976
 * https://stackoverflow.com/questions/33170016/how-to-use-django-1-8-5-orm-without-creating-a-django-project

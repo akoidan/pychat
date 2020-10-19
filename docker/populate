@@ -5,7 +5,7 @@ command_user="root"
 mv_db() {
    if [ -z "$(ls /var/lib/mysql)" ]; then
        echo "Moving mysql volume"
-       mv /srv/http/mysql/* /var/lib/mysql/ && chown -R mysql:mysql /data/mysql &&  mv /srv/http/migrations/* /srv/http/chat/migrations/ && rm -r /srv/http/migrations && rm -r /srv/http/mysql || return 1
+       mv /srv/http/mysql/* /var/lib/mysql/ && chown -R mysql:mysql /data/mysql &&  mv /srv/http/migrations/* /srv/http/backend/chat/migrations/ && rm -r /srv/http/migrations && rm -r /srv/http/mysql || return 1
    fi
 }
 
@@ -17,10 +17,10 @@ start() {
    install -d -m 0755 -o redis -g redis /data/redis &&\
    install -d -m 0755 -o mysql -g mysql /data/mysql &&\
    chmod 777 /data &&\
-   chown http:http /srv/http/chat/settings.py &&\
-   chown http:http /srv/http/fe/production.json &&\
-   chown http:http /srv/http/photos &&\
-   chown http:http /srv/http/chat/migrations &&\
+   chown http:http /srv/http/backend/chat/settings.py &&\
+   chown http:http /srv/http/frontend/production.json &&\
+   chown http:http /srv/http/backend/photos &&\
+   chown http:http /srv/http/backend/chat/migrations &&\
    chmod 777 /dev/stdout &&\
    chmod 777 `readlink /dev/stdout` &&\
    chmod 777 /dev/stderr &&\

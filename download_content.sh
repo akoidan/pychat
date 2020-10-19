@@ -23,9 +23,10 @@ fi
 
 safeRunCommand cd "$PROJECT_ROOT"
 
-PROJECT_ROOT=`pwd`
+PROJECT_ROOT=$PWD # otherwise it's gonna be `.` instead of full path
 TMP_DIR="${TMP_DIR:-/tmp/pychat_tmp_dir}"
-FE_DIRECTORY="$PROJECT_ROOT/fe"
+FE_DIRECTORY="$PROJECT_ROOT/frontend"
+BE_DIRECTORY="$PROJECT_ROOT/backend"
 DIST_DIRECTORY="$FE_DIRECTORY/dist"
 ASSETS_DIR="$FE_DIRECTORY/src/assets"
 FONT_DIR="$ASSETS_DIR/font"
@@ -43,7 +44,8 @@ declare -a files=(\
 )
 
 create_venv() {
-    rm -rf .venv
+    cd $BE_DIRECTORY
+    rm -rf $BE_DIRECTORY/.venv
     virtualenv --system-site-packages .venv --python=`which python3`
     source .venv/bin/activate
     pip install -r requirements.txt
@@ -169,15 +171,15 @@ chp(){
 
 post_fontello_conf() {
     printOut "Creating fontello config"
-    safeRunCommand curl --silent --show-error --fail --form "config=@./config.json" --output .fontello http://fontello.com
-    fontello_session=$(cat .fontello)
-    url="http://fontello.com/`cat .fontello`"
+    safeRunCommand curl --silent --show-error --fail --form "config=@./frontend/font-config.json" --output $FE_DIRECTORY/.fontello http://fontello.com
+    fontello_session=$(cat $FE_DIRECTORY/.fontello)
+    url="http://fontello.com/`cat $FE_DIRECTORY/.fontello`"
     echo "Genereted fontello url: $url"
 }
 
 show_fontello_session() {
-    fontello_session=$(cat .fontello)
-    url="http://fontello.com/`cat .fontello`"
+    fontello_session=$(cat $FE_DIRECTORY/.fontello)
+    url="http://fontello.com/`cat $FE_DIRECTORY/.fontello`"
     printOut "Fonts url is: $url"
     echo "It has been opened in new browser tab"
     python -mwebbrowser $url
@@ -185,7 +187,7 @@ show_fontello_session() {
 
 
 download_fontello() {
-    fontello_session=$(cat .fontello)
+    fontello_session=$(cat $FE_DIRECTORY/.fontello)
     printOut "Downloading fontello using fontello session '$fontello_session'"
     mkdir -p "$TMP_DIR/fontello"
     safeRunCommand curl -X GET "http://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
@@ -194,7 +196,7 @@ download_fontello() {
     cat "$TMP_DIR/fontello/$dir/css/fontello.css" | grep ^.icon >  "$SASS_DIR/partials/fontello.scss"
     cp -v "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
     cp -v "$TMP_DIR/fontello"/$dir/demo.html "$ASSETS_DIR/demo.html"
-    cp -v "$TMP_DIR/fontello"/$dir/config.json "$PROJECT_ROOT"
+    cp -v "$TMP_DIR/fontello"/$dir/config.json "$FE_DIRECTORY/font-config.json"
 
     if type "sed" &> /dev/null; then
         sed -i '1i\@charset "UTF-8";' "$SASS_DIR/partials/fontello.scss"
@@ -205,7 +207,7 @@ download_fontello() {
 
 generate_smileys() {
     printOut "Generating smileys"
-    safeRunCommand python $PROJECT_ROOT/extract_cfpack.py
+    safeRunCommand python $FE_DIRECTORY/extract_cfpack.py
 }
 
 delete_tmp_dir() {
@@ -312,7 +314,7 @@ build_nginx() {
     safeRunCommand strip /usr/sbin/nginx*
     safeRunCommand strip /usr/lib/nginx/modules/*.so
     safeRunCommand rm -rf /tmp/nginx
-    if [ -f "$RUN_DEPS" ]; then
+    if [ ! -z "$RUN_DEPS" ]; then
         safeRunCommand cp /usr/bin/envsubst /tmp/
         runDeps="$( \
           scanelf --needed --nobanner --format '%n#p' /usr/sbin/nginx /usr/lib/nginx/modules/*.so /tmp/envsubst \
@@ -384,6 +386,7 @@ copy_root_fs() {
 }
 
 create_django_tables() {
+    cd $BE_DIRECTORY
     safeRunCommand python3 ./manage.py makemigrations chat
     safeRunCommand python3 ./manage.py migrate auth
     # because w/o second  `makemigrations chat` it doesn't work
@@ -393,7 +396,7 @@ create_django_tables() {
 }
 
 android() {
-  cd ./fe
+  cd $FE_DIRECTORY
   yarn run android
   ./node_modules/.bin/cordova build
   adb -d push ./platforms/android/app/build/outputs/apk/debug/app-debug.apk /data/local/tmp/
@@ -402,14 +405,14 @@ android() {
 }
 
 generate_secret_key() {
-    if [ ! -f "$PROJECT_ROOT/chat/settings.py" ]; then
-        printError "File $PROJECT_ROOT/chat/settings.py doesn't exist. Create it before running the command"
+    if [ ! -f "$BE_DIRECTORY/chat/settings.py" ]; then
+        printError "File $BE_DIRECTORY/chat/settings.py doesn't exist. Create it before running the command"
         exit 1;
     fi
-    echo "" >> $PROJECT_ROOT/chat/settings.py
-    echo -n "SECRET_KEY = '" >> $PROJECT_ROOT/chat/settings.py
-    tr -dc 'A-Za-z0-9!@#$%^&*(-_=+)' </dev/urandom | head -c 50 >> $PROJECT_ROOT/chat/settings.py
-    echo "'" >> $PROJECT_ROOT/chat/settings.py
+    echo "" >> $BE_DIRECTORY/chat/settings.py
+    echo -n "SECRET_KEY = '" >> $BE_DIRECTORY/chat/settings.py
+    LC_ALL=C LC_CTYPE=C tr -dc 'A-Za-z0-9!@#$%^&*(\-\_\=\+)' </dev/urandom | head -c 50 >> $BE_DIRECTORY/chat/settings.py
+    echo "'" >> $BE_DIRECTORY/chat/settings.py
 }
 
 if [ "$1" = "post_fontello_conf" ]; then
@@ -464,7 +467,7 @@ elif [ "$1" = "redirect" ]; then
 elif [ "$1" = "download_fontello" ]; then
     download_fontello
     delete_tmp_dir
-    git --no-pager diff "$PROJECT_ROOT/config.json"
+    git --no-pager diff "$FE_DIRECTORY/font-config.json"
     printSuccess "Fonts have been installed"
     printOut "You can view them at https://localhost:8000/static/demo.html"
 elif [ "$1" == "generate_secret_key" ]; then
@@ -478,10 +481,10 @@ else
     chp zip_extension "Creates zip acrhive for ChromeWebStore from \e[96mscreen_cast_extension \e[0;33;40mdirectory"
     chp android "Deploys android app"
     printf " \e[93mIcons:\n\e[0;37;40mTo edit icons execute \e[92mpost_fontello_conf\e[0;37;40m, edit icons in opened browser and click Save session button. Afterwords execute \e[92mdownload_icon\n"
-    chp post_fontello_conf "Creates fontello session from config.json and saves it to \e[96m .fontello \e[0;33;40mfile"
+    chp post_fontello_conf "Creates fontello session from config.json and saves it to \e[96m $FE_DIRECTORY/.fontello \e[0;33;40mfile"
     chp print_icon_session "Shows current used url for editing fonts"
     chp download_fontello "Downloads and extracts fonts from fontello to project"
-    chp generate_secret_key "Creates django secret key into \e[96m$PROJECT_ROOT/chat/settings.py\e[0;33;40m"
+    chp generate_secret_key "Creates django secret key into \e[96m$BE_DIRECTORY/chat/settings.py\e[0;33;40m"
     chp create_db "Creates database pychat to mysql, the following environment variable should be defined \e[94mDB_ROOT_PASS DB_USER DB_PASS DB_DATA_PATH"
     chp update_docker "Builds docker images for deathangel908/pychat"
     chp redirect "Redirects port 443 to port 8080, so you can use \e[96mhttps://pychat.org\e[0;33;40m for localhost if you have it in \e[96m/etc/hosts\e[0;33;40m"

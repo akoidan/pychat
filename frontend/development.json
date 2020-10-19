@@ -5,8 +5,13 @@
   "ELECTRON_IGNORE_SSL": true,
   "PUBLIC_PATH": null,
   "MANIFEST": "/manifest.json",
-  "AUTO_REGISTRATION": false,
   "GOOGLE_OAUTH_2_CLIENT_ID": false,
   "FACEBOOK_APP_ID": false,
-  "RECAPTCHA_PUBLIC_KEY": false
+  "RECAPTCHA_PUBLIC_KEY": false,
+  "AUTO_REGISTRATION": false,
+  "ISSUES": true,
+  "STATISTICS": true,
+  "GITHUB_LINK": "https://github.com/Deathangel908/pychat",
+  "PAINTER": true,
+  "FLAGS": true
 }

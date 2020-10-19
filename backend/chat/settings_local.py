@@ -16,8 +16,8 @@ TEMPLATES[0]['OPTIONS']['loaders'] = [
 	'django.template.loaders.app_directories.Loader',
 ]
 
-CRT_PATH = os.sep.join((PROJECT_DIR, os.pardir, "fe", "certs", "server.crt"))
-KEY_PATH = os.sep.join((PROJECT_DIR, os.pardir, "fe", "certs", "key.pem"))
+CRT_PATH = os.sep.join((PROJECT_DIR, os.pardir, "..", "frontend", "certs", "server.crt"))
+KEY_PATH = os.sep.join((PROJECT_DIR, os.pardir, "..", "frontend", "certs", "key.pem"))
 TORNADO_SSL_OPTIONS = {
 	"certfile": CRT_PATH,
 	"keyfile": KEY_PATH

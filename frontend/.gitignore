@@ -1,0 +1,14 @@
+node_modules
+package-lock.json
+platforms/android/cordova/node_modules
+production.json
+electron_dist/
+!www/.gitkeep
+platforms/android/app/src/main/assets
+www/*
+.fontello
+yarn-error.log
+compilation-stats.json
+awesome-typescript-loader
+vue-property-decorator
+dist

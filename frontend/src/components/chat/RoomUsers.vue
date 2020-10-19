@@ -54,7 +54,7 @@
       />
       <span
         class="usersStateText"
-        @click="onlineShowOnlyOnline = !onlineShowOnlyOnline"
+        @click="switchUserState"
       >{{ onlineText }}</span>
       <router-link
         :to="`/invite-user/${activeRoomId}`"
@@ -114,6 +114,11 @@ export default class RoomUsers extends Vue {
     return this.onlineMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
   }
 
+  private switchUserState(): void {
+    this.onlineShowOnlyOnline = !this.onlineShowOnlyOnline;
+    this.onlineMinified = false;
+  }
+
 }
 </script>
 
@@ -138,8 +143,7 @@ export default class RoomUsers extends Vue {
     @media screen and (max-width: $collapse-width)
       width: 100%
       border-bottom: 8px solid
-      @include flex(1)
-      flex-grow: 2
+      max-height: 50%
 
     /deep/
       .icon-smile, .icon-picture, .icon-user-plus, .icon-plus-squared, .icon-angle-circled-down, .icon-angle-circled-up

@@ -5,7 +5,7 @@
   >
     <div><i :class="userSexClass" />{{ user.user }}</div>
     <img
-      v-if="user.location.countryCode"
+      v-if="consts.FLAGS && user.location.countryCode"
       class="country"
       :src="getFlag(user)"
       :title="title"
@@ -20,6 +20,7 @@ import {
   getFlagPath,
   getUserSexClass
 } from '@/utils/htmlApi';
+import {FLAGS} from '@/utils/consts';
 
 @Component
 export default class RoomUsersUser extends Vue {
@@ -31,6 +32,12 @@ export default class RoomUsersUser extends Vue {
 
   get userSexClass () {
     return getUserSexClass(this.user);
+  }
+
+  public get consts(): object {
+    return {
+      FLAGS,
+    }
   }
 
   get title() {
