@@ -14,6 +14,7 @@ data.sql
 cron-bu
 pycharm-debug-py3k.egg
 trash
+README.txt
 rootfs/etc/nginx/ssl/*
 rootfs/etc/nginx/ssl/server.key
 rootfs/etc/nginx/ssl/certificate.key
@@ -26,3 +27,4 @@ backend/sessionsids.txt
 backend/chat/settings.py
 backend/photos/*
 !backend/photos/.gitkeep
+frontend/production.json
