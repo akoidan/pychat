@@ -473,6 +473,10 @@ async function runElectron(mainPath) {
 function runWebpack(config) {
   return new Promise((resolve, reject) => {
     webpack(config, (err, stats) => {
+      if (err && ! stats) {
+        reject(err)
+        return;
+      }
       console.log(stats.toString({
         chunks: false,  // Makes the build much quieter
         colors: true    // Shows colors in the console
@@ -486,15 +490,19 @@ function runWebpack(config) {
           console.log("The file was saved!");
         });
       }
-      if (err) {
-        reject(err);
-      }
       if (stats.compilation.errors.length) {
         if (options.IS_PROD) {
           reject(stats.compilation.errors)
+          return
         }
       } else {
         resolve();
+        return
+      }
+      if (err) {
+        reject()
+      } else {
+        resolve()
       }
     })
   });
