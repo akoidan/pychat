@@ -7,7 +7,10 @@ export  interface GrowlModel {
   html: string;
   type: GrowlType;
 }
-
+export type permissions_type = ('audio' | 'video')[]
+export interface PlatformUtil {
+  askPermissions(...askedPermissions: permissions_type): Promise<void>
+}
 export interface EditingMessage {
   messageId: number;
   roomId: number;

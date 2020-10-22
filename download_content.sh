@@ -403,6 +403,7 @@ android() {
   adb shell pm install /data/local/tmp/app-debug.apk
   adb reverse tcp:8888 tcp:8888
   adb reverse tcp:8080 tcp:8080
+  adb shell am start -n org.pychat/org.pychat.MainActivity
 }
 
 generate_secret_key() {

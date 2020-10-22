@@ -1,7 +1,7 @@
 import {store} from '@/utils/storeHolder';
 import router from '@/utils/router';
 import sessionHolder from '@/utils/sessionHolder';
-import {api, channelsHandler, globalLogger, storage, webrtcApi, ws} from '@/utils/singletons';
+import {api, channelsHandler, globalLogger, storage, webrtcApi, ws, platformUtil} from '@/utils/singletons';
 import {CurrentUserInfoModel, EditingMessage, MessageModel, RoomModel} from '@/types/model';
 import loggerFactory from '@/utils/loggerFactory';
 import {
@@ -12,6 +12,12 @@ import {
 import {StorageData} from '@/types/types';
 
 const logger = loggerFactory.getLoggerColor('utils', '#007a70');
+
+
+export async function getUserMedia({video, audio}: {video: boolean, audio: boolean}): Promise<MediaStream> {
+  await platformUtil.askPermissions();
+  return navigator.mediaDevices.getUserMedia({audio, video});
+}
 
 export function logout(errMessage?: string) {
   store.logout();

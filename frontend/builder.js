@@ -238,20 +238,6 @@ const getConfig = async () => {
     }
     plugins.push(new CleanWebpackPlugin({cleanOnceBeforeBuildPatterns: getDist()}));
     plugins.push(new MiniCssExtractPlugin());
-    plugins.push(new webpack.ProgressPlugin(function (percentage, msg, current, active, modulepath) {
-        if (process.stdout.isTTY && percentage < 1) {
-          process.stdout.cursorTo(0);
-          modulepath = modulepath ? ' …' + modulepath.substr(modulepath.length - process.stdout.columns + 45) : '';
-          current = current ? ' ' + current : '';
-          active = active ? ' ' + active : '';
-          process.stdout.write((percentage * 100).toFixed(0) + '% ' + msg + current + active + modulepath + ' ');
-          process.stdout.clearLine(1)
-        } else if (percentage === 1) {
-          process.stdout.cursorTo(0);
-          process.stdout.clearLine(1);
-        }
-      })
-    );
     let minicssPlugin = {
       loader: MiniCssExtractPlugin.loader,
     };
@@ -281,6 +267,20 @@ const getConfig = async () => {
       sassOptionsGlobal
     ];
   }
+  plugins.push(new webpack.ProgressPlugin(function (percentage, msg, current, active, modulepath) {
+      if (process.stdout.isTTY && percentage < 1) {
+        process.stdout.cursorTo(0);
+        modulepath = modulepath ? ' …' + modulepath.substr(modulepath.length - process.stdout.columns + 45) : '';
+        current = current ? ' ' + current : '';
+        active = active ? ' ' + active : '';
+        process.stdout.write((percentage * 100).toFixed(0) + '% ' + msg + current + active + modulepath + ' ');
+        process.stdout.clearLine(1)
+      } else if (process.stdout.isTTY && percentage === 1) {
+        process.stdout.cursorTo(0);
+        process.stdout.clearLine(1);
+      }
+    })
+  );
 
   let tsConfig = function () {
     const res =  [
@@ -299,9 +299,16 @@ const getConfig = async () => {
     }
     return res;
   };
+
+
   let conf = {
     entry,
     plugins,
+    stats: options.IS_PROD ? {
+      entrypoints: false,
+      children: false,
+      logging: 'info'
+    }: 'minimal', // TODO DOESN WORK
     profile: !!options.IS_PROFILE,
     resolve: {
       extensions: ['.ts', '.js', '.vue'],
@@ -403,6 +410,11 @@ function getSimpleConfig(mainFile, dist, entry, target) {
   return {
     entry,
     target,
+    stats: options.IS_PROD ? {
+      entrypoints: false,
+      children: false,
+      logging: 'info'
+    }: 'minimal',// TODO DOESN WORK
     resolve: {
       extensions: ['.ts', '.vue', '.json', ".js", '.png', ".sass"],
       alias: {
@@ -474,7 +486,6 @@ function runWebpack(config) {
           console.log("The file was saved!");
         });
       }
-      console.log(Date.now());
       if (err) {
         reject(err);
       }

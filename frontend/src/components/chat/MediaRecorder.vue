@@ -2,11 +2,7 @@
   <div
     @contextmenu.prevent
     @drag.prevent
-    @mouseup="releaseRecord"
-    @mouseout="releaseRecord"
-    @mousedown="switchRecord"
-    @touchstart="switchRecord"
-    @touchend="releaseRecord"
+    v-switcher="{start: startRecord, stop: releaseRecord, switch: switchRecord, activeFlag: dim}"
   >
     <i
       v-show="isRecordingVideo"
@@ -23,58 +19,36 @@
 <script lang="ts">
 
   import {State} from '@/utils/storeHolder';
-  import {Component, Prop, Vue} from "vue-property-decorator";
-  import {stopVideo} from '@/utils/htmlApi';
+  import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import MediaCapture from '@/utils/MediaCapture';
-  import {isChrome, isMobile} from "@/utils/singletons";
-  import {askAudioPermissions} from '@/utils/android';
+  import {isChrome, isMobile, platformUtil} from '@/utils/singletons';
 
-  const HOLD_TIMEOUT = 500;
-
-  declare var MediaRecorder: any;
 
   @Component
-  export default class MediaRecorderDiv extends Vue {
+  export default class MediaRecorder extends Vue {
 
     isRecordingVideo = true;
     @State
     public readonly dim!: boolean;
 
-    // started: number = null;
-    timeout: number = 0;
     navigatorRecord: MediaCapture|null = null;
 
 
-    async switchRecord() {
-      this.logger.debug("switch recrod...")();
-      // this.started = Date.now();
-      await new Promise((resolve) => this.timeout = window.setTimeout(resolve, HOLD_TIMEOUT));
-      this.timeout = 0;
-      await this.startRecord();
-      this.logger.debug("switch record timeouted...")();
-      this.timeout = 0;
+    switchRecord() {
+      this.isRecordingVideo = !this.isRecordingVideo;
     }
 
     async startRecord() {
-      this.logger.debug("Starting recording...")();
+      this.logger.debug("Starting recording... {}")();
       this.store.setDim(true);
-      await askAudioPermissions(this.isRecordingVideo);
-      // TODO wtf unknown
-      this.navigatorRecord = new MediaCapture(this.isRecordingVideo, (data: unknown) => {
-        this.logger.debug("Finishing recording... {}", data)();
-        this.store.setDim(false);
-        if (data) {
-          this.emitData(data);
-        }
-      });
+      this.navigatorRecord = new MediaCapture(this.isRecordingVideo, platformUtil);
       try {
         let src: MediaStream = (await this.navigatorRecord.record())!;
-        this.logger.debug("Resolved record emitting video")();
         this.$emit("record", {isVideo: this.isRecordingVideo, src: src});
       } catch (error) {
         this.store.setDim(false);
         this.emitData(null);
-        if (String(error.message).indexOf("Permission denied") >= 0) {
+        if (String(error.message).includes("Permission denied")) {
           if (isChrome && !isMobile) {
             this.store.growlError(`Please allow access for ${document.location.origin} in chrome://settings/content/microphone`);
           } else {
@@ -97,14 +71,12 @@
       }
     }
 
-    releaseRecord() {
-      this.logger.debug("releaseRecord now {}, timeout {}", this.dim, this.timeout)();
-      if (this.dim) {
-        this.navigatorRecord!.stopRecording();
-      } else if (this.timeout) {
-        clearTimeout(this.timeout);
-        this.timeout = 0;
-        this.isRecordingVideo = !this.isRecordingVideo;
+    async releaseRecord() {
+      this.store.setDim(false);
+      let data: Blob|null = await this.navigatorRecord!.stopRecording();
+      this.logger.debug("Finishing recording... {}", data)();
+      if (data) {
+        this.emitData(data);
       }
     }
 

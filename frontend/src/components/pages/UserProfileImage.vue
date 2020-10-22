@@ -10,6 +10,7 @@
       <video
         v-show="showVideo"
         ref="changeProfileVideo"
+        muted
         autoplay=""
       />
     </div>
@@ -45,7 +46,8 @@ import {State} from '@/utils/storeHolder';
 import {Component, Ref, Vue, Watch} from 'vue-property-decorator';
 import {canvasContext, resolveMediaUrl, stopVideo} from '@/utils/htmlApi';
 import AppSubmit from '@/components/ui/AppSubmit';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {ApplyGrowlErr, getUserMedia} from '@/utils/utils';
+import {platformUtil} from '@/utils/singletons';
 
 @Component({
   components: {AppSubmit}
@@ -140,14 +142,15 @@ export default class UserProfileImage extends Vue {
     }
   }
 
-  public startSharingVideo() {
-    navigator.getUserMedia({video: true}, (localMediaStream: MediaStream) => {
-      this.srcVideo = localMediaStream;
-      this.changeProfileVideo.play();
-    },                     (error) => {
-      this.logger.log('navigator.getUserMedia error: {}', error)();
-    });
-  }
+  // public startSharingVideo() {
+  //platformutils.askpermissions
+  //   navigator.getUserMedia({video: true}, (localMediaStream: MediaStream) => {
+  //     this.srcVideo = localMediaStream;
+  //     this.changeProfileVideo.play();
+  //   },                     (error) => {
+  //     this.logger.log('navigator.getUserMedia error: {}', error)();
+  //   });
+  // }
 
   public takeSnapshot() {
     if (this.srcVideo) {
@@ -170,18 +173,21 @@ export default class UserProfileImage extends Vue {
     this.stopVideo();
   }
 
-  public startCapturingVideo() {
+  public async startCapturingVideo() {
+    // Not showing vendor prefixes or code that works cross-browser.
     if (this.isStopped) {
-      // Not showing vendor prefixes or code that works cross-browser.
-      navigator.getUserMedia({video: true}, (stream) => {
-        this.srcVideo = stream;
+      try {
+        this.logger.debug("checking perms")();
+        await platformUtil.askPermissions('video');
+        this.logger.debug("Capturing media")();
+        this.srcVideo = await getUserMedia({video: true, audio: false});
         this.showVideo = true;
         this.isStopped = false;
         this.store.growlInfo('Click on your video to take a photo');
-      },                     (e) => {
+      } catch (e) {
         this.logger.error('Error while trying to capture a picture "{}"', e.message || e.name)();
         this.store.growlError(`Unable to use your webcam because ${e.message || e.name}`);
-      });
+      }
     } else {
       this.stopVideo();
       this.store.growlInfo('To apply photo click on save');

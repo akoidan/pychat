@@ -16,10 +16,13 @@ import Vue from 'vue';
 import Http from '@/utils/Http';
 import WebRtcApi from '@/webrtc/WebRtcApi';
 import {store} from '@/utils/storeHolder';
-
+import {PlatformUtil} from '@/types/model';
+import {IS_ANDROID} from '@/utils/consts'
+import {AndroidPlatformUtil, NullPlatformUtil} from '@/utils/nativeUtils';
 export const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
 export const api: Api = new Api(xhr);
 export const isMobile: boolean = mobile.isMobile();
+console.error({isMobile})
 export const messageBus = new Vue();
 export const browserVersion: string = (function () {
   let ua = navigator.userAgent, tem,
@@ -50,7 +53,7 @@ export const ws: WsHandler = new WsHandler(WS_URL, sessionHolder, store);
 export const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
 export const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier, messageBus);
 export const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier);
-
+export const platformUtil: PlatformUtil = IS_ANDROID ? new AndroidPlatformUtil(): new NullPlatformUtil();
 window.onerror = function (msg, url, linenumber, column, errorObj) {
   const message = `Error occurred in ${url}:${linenumber}\n${msg}`;
   if ((!store.userSettings || store.userSettings.sendLogs) && api) {

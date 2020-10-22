@@ -41,6 +41,7 @@
           <video
             v-show="srcVideo"
             ref="video"
+            muted="muted"
             autoplay=""
           />
           <img

@@ -6,60 +6,23 @@ import {
   globalLogger,
   storage,
   webrtcApi,
+  isMobile,
   ws,
   xhr
 } from '@/utils/singletons';
 import router from '@/utils/router';
-import loggerFactory from '@/utils/loggerFactory';
 import * as constants from '@/utils/consts';
-import {GIT_HASH, IS_DEBUG} from '@/utils/consts';
+import {GIT_HASH, IS_DEBUG, IS_ANDROID} from '@/utils/consts';
 import {initStore} from '@/utils/utils';
 import App from '@/components/App.vue'; // should be after initStore
 import {sub} from '@/utils/sub';
-import Vue, {ComponentOptions} from 'vue';
-import {Logger} from 'lines-logger';
-import { VueConstructor } from 'vue/types/vue';
-
-declare module 'vue/types/vue' {
-
-  interface Vue {
-    __logger: Logger;
-    id?: number|string;
-  }
-}
-
-const mixin = {
-  computed: {
-    logger(this: Vue): Logger  {
-      if (!this.__logger && this.$options._componentTag !== 'router-link') {
-        let name = this.$options._componentTag || 'vue-comp';
-        if (!this.$options._componentTag) {
-          globalLogger.warn('Can\'t detect tag of {}', this)();
-        }
-        if (this.id) {
-          name += `:${this.id}`;
-        }
-        this.__logger = loggerFactory.getLoggerColor(name, '#35495e');
-      }
-
-      return this.__logger;
-    }
-  },
-  updated: function (this: Vue): void {
-    this.logger && this.logger.trace('Updated')();
-  },
-  created: function(this: Vue) {
-    this.logger &&  this.logger.trace('Created')();
-  }
-};
-Vue.mixin(<ComponentOptions<Vue>><unknown>mixin);
-
-Vue.directive('validity', function (el: HTMLElement, binding) {
-  (<HTMLInputElement>el).setCustomValidity(binding.value);
-});
+import Vue from 'vue';
+import {declareDirectives, declareMixins} from '@/utils/vuehelpers';
 
 Vue.prototype.$api = api;
 Vue.prototype.$ws = ws;
+declareMixins();
+declareDirectives();
 
 initStore().then(value => {
   globalLogger.debug('Exiting from initing store')();
