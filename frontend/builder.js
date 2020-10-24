@@ -14,6 +14,7 @@ const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const name = '[name].[ext]?[sha512:hash:base64:6]';
 const child_process = require('child_process');
+const PreloadWebpackPlugin = require('preload-webpack-plugin')
 const ELECTRON_DIST_DIRNAME = 'electron_dist';
 const MAIN_DIST_DIRNAME = 'dist';
 const ANDROID_DIST_DIRNAME = 'www';
@@ -201,6 +202,13 @@ const getConfig = async () => {
       {from: './src/assets/recaptcha.html', to: ''},
     ]),
     htmlWebpackPlugin,
+    new PreloadWebpackPlugin({
+      rel: 'preload',
+      as: 'font',
+      include: 'allAssets',
+      fileWhitelist: [/fontello\.woff2/i], // preload font wince it's required all the time https://developers.google.com/speed/pagespeed/insights/?url=https%3A%2F%2Fpychat.org%2F%23%2Fpainter
+
+    }),
   ];
   if (linting) {
     plugins.unshift(new StyleLintPlugin({
