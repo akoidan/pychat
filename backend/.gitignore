@@ -1,0 +1,7 @@
+*.pyc
+.venv
+backend/downloading_photos
+backend/sessionsids.txt
+pycharm-debug-py3k.egg
+log/*
+!log/concat_logs.py
