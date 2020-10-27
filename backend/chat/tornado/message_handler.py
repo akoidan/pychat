@@ -14,7 +14,7 @@ from tornadoredis import Client
 from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
-	UploadedFile, Image, get_milliseconds, UserProfile
+	UploadedFile, Image, get_milliseconds, UserProfile, Channel
 from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST, \
 	REDIS_DB
@@ -65,7 +65,8 @@ class MessagesHandler(MessagesCreator):
 			Actions.SEND_MESSAGE: self.process_send_message,
 			Actions.DELETE_ROOM: self.delete_channel,
 			Actions.EDIT_MESSAGE: self.edit_message,
-			Actions.CREATE_ROOM_CHANNEL: self.create_new_room,
+			Actions.CREATE_ROOM: self.create_new_room,
+			Actions.CREATE_CHANNEL: self.create_new_channel,
 			Actions.SET_USER_PROFILE: self.profile_save_user,
 			Actions.SET_SETTINGS: self.profile_save_settings,
 			Actions.INVITE_USER: self.invite_user,
@@ -75,7 +76,7 @@ class MessagesHandler(MessagesCreator):
 		# Handlers for redis messages, if handler returns true - message won't be sent to client
 		# The handler is determined by @VarNames.EVENT
 		self.process_pubsub_message = {
-			Actions.CREATE_ROOM_CHANNEL: self.send_client_new_channel,
+			Actions.CREATE_ROOM: self.send_client_new_channel,
 			Actions.DELETE_ROOM: self.send_client_delete_channel,
 			Actions.INVITE_USER: self.send_client_new_channel,
 			Actions.ADD_INVITE: self.send_client_new_channel,
@@ -284,9 +285,29 @@ class MessagesHandler(MessagesCreator):
 		else:
 			send_message(message)
 
+	def create_new_channel(self, message):
+		channel_name = message.get(VarNames.CHANNEL_NAME)
+		if not channel_name or len(channel_name) > 16:
+			raise ValidationError('Incorrect channel name name "{}"'.format(channel_name))
+
+		channel = Channel(name=channel_name, creator_id=self.user_id)
+		channel.save()
+		channel_id = channel.id
+		m = {
+			VarNames.EVENT: Actions.CREATE_CHANNEL,
+			VarNames.CHANNEL_ID: channel_id,
+			VarNames.CB_BY_SENDER: self.id,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.CHANNEL_NAME: channel_name,
+			VarNames.TIME: get_milliseconds(),
+			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
+		}
+		self.publish(m, self.channel)
+		
 	def create_new_room(self, message):
 		room_name = message.get(VarNames.ROOM_NAME)
 		users = message.get(VarNames.ROOM_USERS)
+		channel_id = message.get(VarNames.CHANNEL_ID)
 		users.append(self.user_id)
 		users = list(set(users))
 		if room_name and len(room_name) > 16:
@@ -307,8 +328,9 @@ class MessagesHandler(MessagesCreator):
 				pass
 		elif not room_name:
 			raise ValidationError('At least one user should be selected, or room should be public')
+		channel_name = Channel.objects.get(id=channel_id).name if channel_id else None
 		if create_user_rooms:
-			room = Room(name=room_name)
+			room = Room(name=room_name, channel_id=channel_id)
 			room.save()
 			room_id = room.id
 			max_id = Message.objects.all().aggregate(Max('id'))['id__max']
@@ -322,7 +344,7 @@ class MessagesHandler(MessagesCreator):
 			RoomUsers.objects.bulk_create(ru)
 
 		m = {
-			VarNames.EVENT: Actions.CREATE_ROOM_CHANNEL,
+			VarNames.EVENT: Actions.CREATE_ROOM,
 			VarNames.ROOM_ID: room_id,
 			VarNames.ROOM_USERS: users,
 			VarNames.CB_BY_SENDER: self.id,
@@ -334,10 +356,12 @@ class MessagesHandler(MessagesCreator):
 			VarNames.TIME: get_milliseconds(),
 			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
 		}
+		if channel_id:
+			m[VarNames.CHANNEL_NAME] = channel_name
+			m[VarNames.CHANNEL_ID] = channel_id
 		jsoned_mess = encode_message(m, True)
 		for user in users:
 			self.raw_publish(jsoned_mess, RedisPrefix.generate_user(user))
-
 
 	def profile_save_settings(self, in_message):
 		message = in_message[VarNames.CONTENT]

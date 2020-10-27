@@ -60,7 +60,7 @@ export default class NavUserShow extends Vue {
   public writeMessage() {
     if (!this.running) {
       this.running = true;
-      this.$ws.sendAddRoom(null, 50, true, [this.activeUser.id], (e: AddRoomMessage) => {
+      this.$ws.sendAddRoom(null, 50, true, [this.activeUser.id], null,(e: AddRoomMessage) => {
         if (e && e.roomId) {
           this.$router.replace(`/chat/${e.roomId}`);
         }

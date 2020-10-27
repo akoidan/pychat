@@ -5,9 +5,10 @@ import {
   RoomModel,
   UserModel,
   Location,
-  SexModelString
+  SexModelString, ChannelModel
 } from '@/types/model';
 import {
+  ChannelDto,
   FileModelDto,
   LocationDto,
   RoomDto,
@@ -50,16 +51,28 @@ export function convertSexToNumber(m: SexModelString): number {
   }
 }
 
+export function getChannelDict(
+  {
+    channelName,
+    channelId
+  }: ChannelDto,
+  oldChannel: ChannelModel|null = null
+): ChannelModel {
+  return {name: channelName, id: channelId!, expanded: oldChannel?.expanded ?? false};
+}
+
 export function getRoomsBaseDict(
     {
       roomId,
       volume,
+      channelId,
       notifications,
       name,
       users
     }: {
       roomId: number;
       volume: number;
+      channelId: number|null;
       notifications: boolean;
       name: string;
       users: number[];
@@ -70,6 +83,7 @@ export function getRoomsBaseDict(
     id: roomId,
     receivingFiles: oldRoom ? oldRoom.receivingFiles : {},
     sendingFiles: oldRoom ? oldRoom.sendingFiles : {},
+    channelId,
     volume,
     callInfo: {
       calls: {},

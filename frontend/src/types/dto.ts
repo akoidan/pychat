@@ -1,4 +1,5 @@
 import {
+  ChannelsDictModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   FileModel,
@@ -12,9 +13,15 @@ export type SexModelDto = 'Male' | 'Female' |'Secret';
 export interface RoomDto {
   name: string;
   users: number[];
+  channelId: number;
   notifications: boolean;
   volume: number;
   roomId: number;
+}
+
+export interface ChannelDto {
+  channelName: string;
+  channelId: number;
 }
 
 export interface UserDto {
@@ -43,8 +50,17 @@ export interface UserSettingsDto {
   theme: string;
 }
 
-export interface SetRooms {
+
+export interface SetStateFromWS {
   roomsDict: RoomDictModel;
+  channelsDict: ChannelsDictModel;
+  allUsersDict: {[id: number]: UserModel};
+}
+
+
+export interface SetStateFromStorage {
+  roomsDict: RoomDictModel;
+  channelsDict: ChannelsDictModel;
   settings: CurrentUserSettingsModel;
   profile: CurrentUserInfoModel;
   allUsersDict: {[id: number]: UserModel};

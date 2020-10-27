@@ -78,6 +78,7 @@ import AppSubmit from '@/components/ui/AppSubmit';
 import AppCheckbox from '@/components/ui/AppCheckbox';
 import {RoomDictModel, RoomModel, RoomSettingsModel} from '@/types/model';
 import {ApplyGrowlErr} from '@/utils/utils';
+import {ALL_ROOM_ID} from '@/utils/consts';
 @Component({components: {AppInputRange, AppSubmit, AppCheckbox}})
 export default class RoomSettings extends Vue {
 
@@ -105,7 +106,7 @@ export default class RoomSettings extends Vue {
     this.running = true;
     this.$ws.sendLeaveRoom(this.roomId, () => {
       this.running = false;
-      this.$router.replace('/chat/1');
+      this.$router.replace(`/chat/${ALL_ROOM_ID}`);
     });
   }
 
@@ -120,6 +121,7 @@ export default class RoomSettings extends Vue {
     const payload: RoomSettingsModel = {
       id: this.roomId,
       name: this.roomName,
+      channelId: this.room.channelId,
       notifications: this.notifications,
       volume: this.sound
     };

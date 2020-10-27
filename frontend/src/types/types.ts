@@ -9,9 +9,9 @@ import {
   RoomSettingsModel,
   SearchModel, SendingFile,
   UploadProgressModel,
-  UserModel, SendingFileTransfer, CallInfoModel
+  UserModel, SendingFileTransfer, CallInfoModel, ChannelModel
 } from '@/types/model';
-import {RoomDto, SetRooms, UserDto} from '@/types/dto';
+import {ChannelDto, RoomDto, SetStateFromStorage, UserDto} from '@/types/dto';
 import {DefaultMessage} from '@/types/messages';
 
 export interface UploadFile {
@@ -134,7 +134,9 @@ export  interface IStorage {
   saveMessage(m: MessageModel): void;
   updateRoom(m: RoomSettingsModel): void;
   setRooms(rooms: RoomSettingsModel[]): void;
+  setChannels(channels: ChannelModel[]): void;
   saveRoom(room: RoomModel): void;
+  saveChannel(room: ChannelModel): void;
   setUserProfile(user: CurrentUserInfoModel): void;
   setUserSettings(settings: CurrentUserSettingsModel): void;
   saveRoomUsers(ru: SetRoomsUsers): void;
@@ -200,7 +202,7 @@ export interface SetSendingFileStatus extends SetSendingFileBase {
 }
 
 export interface StorageData {
-  setRooms: SetRooms;
+  setRooms: SetStateFromStorage;
   sendingMessages: MessageModel[];
 }
 
@@ -225,6 +227,7 @@ export interface RemoveMessageProgress {
 
 export interface PubSetRooms extends DefaultMessage {
   rooms:  RoomDto[];
+  channels: ChannelDto[];
   users: UserDto[];
   online: number[];
 }

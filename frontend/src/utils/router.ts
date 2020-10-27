@@ -26,6 +26,8 @@ import ConfirmMail from '@/components/email/ConfirmMail.vue';
 import UserProfileChangeEmail
   from '@/components/pages/UserProfileChangeEmail.vue';
 import {Route} from 'vue-router/types';
+import CreateRoomChannel from '@/components/pages/CreateRoomChannel.vue';
+import CreateChannel from '@/components/pages/CreateChannel.vue';
 
 Vue.use(VueRouter);
 
@@ -67,6 +69,24 @@ const router = new VueRouter({
           path: '/user/:id'
         },
         {
+          component: CreateRoomChannel,
+          path: '/create-room',
+          children: [
+            {
+              path: '',
+              redirect: '/create-room/public'
+            },
+            {
+              component: CreatePublicRoom,
+              path: 'public'
+            },
+            {
+              path: 'channel',
+              component: CreateChannel
+            }
+          ]
+        },
+        {
           component: UserProfile,
           path: '/profile',
           children: [
@@ -103,10 +123,6 @@ const router = new VueRouter({
         {
           component: CreatePrivateRoom,
           path: '/create-private-room'
-        },
-        {
-          component: CreatePublicRoom,
-          path: '/create-public-room'
         },
         {
           component: InviteUser,

@@ -26,12 +26,8 @@
 </template>
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import UserProfileChangePassword from '@/components/pages/UserProfileChangePassword';
-import UserProfileImage from '@/components/pages/UserProfileImage';
-import UserProfileInfo from '@/components/pages/UserProfileInfo';
-import UserProfileSettings from '@/components/pages/UserProfileSettings';
 
-@Component({components: {UserProfileChangePassword, UserProfileImage, UserProfileInfo, UserProfileSettings}})
+@Component
 export default class UserProfile extends Vue {
 }
 </script>

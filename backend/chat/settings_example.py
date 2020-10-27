@@ -31,7 +31,7 @@
 ### Every email (like magic link will be marked with this lable)
 # FROM_EMAIL = 'pychat'
 
-### Uncomment this setting if you don't need user location info to be shown for all
+### Uncomment this setting if you don't need user location info to be shown for all. You may also want to disable FLAGS in production.json inside frontend
 # SHOW_COUNTRY_CODE = false
 
 

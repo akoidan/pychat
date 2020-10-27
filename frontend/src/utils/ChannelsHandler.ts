@@ -17,6 +17,8 @@ import {
   UploadFile
 } from '@/types/types';
 import {
+  ChannelModel,
+  ChannelsDictModel,
   CurrentUserInfoModel,
   MessageModel,
   RoomDictModel,
@@ -26,6 +28,7 @@ import {
 } from '@/types/model';
 import {Logger} from 'lines-logger';
 import {
+  AddChannelMessage,
   AddInviteMessage,
   AddOnlineUserMessage,
   AddRoomBase,
@@ -38,8 +41,19 @@ import {
   LoadMessages,
   RemoveOnlineUserMessage
 } from '@/types/messages';
-import {FileModelDto, MessageModelDto, RoomDto, UserDto} from '@/types/dto';
-import {convertFiles, convertUser, getRoomsBaseDict} from '@/types/converters';
+import {
+  ChannelDto,
+  FileModelDto,
+  MessageModelDto,
+  RoomDto, SetStateFromWS,
+  UserDto
+} from '@/types/dto';
+import {
+  convertFiles,
+  convertUser,
+  getChannelDict,
+  getRoomsBaseDict
+} from '@/types/converters';
 import WsHandler from '@/utils/WsHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
 import {sub} from '@/utils/sub';
@@ -60,6 +74,7 @@ export default class ChannelsHandler extends MessageHandler {
     deleteRoom: <HandlerType>this.deleteRoom,
     leaveUser: <HandlerType>this.leaveUser,
     addRoom: <HandlerType>this.addRoom,
+    addChannel: <HandlerType>this.addChannel,
     inviteUser: <HandlerType>this.inviteUser,
     addInvite: <HandlerType>this.addInvite
   };
@@ -208,16 +223,19 @@ export default class ChannelsHandler extends MessageHandler {
     this.store.addMessages({messages, roomId: roomId});
   }
 
-  public initUsers(users: UserDto[]) {
+
+
+  public init(m: PubSetRooms) {
+
+    const {rooms, channels, users} = m;
+    this.store.setOnline([...m.online]);
+
     this.logger.debug('set users {}', users)();
     const um: UserDictModel = {};
     users.forEach(u => {
       um[u.userId] = convertUser(u);
     });
-    this.store.setUsers(um);
-  }
 
-  public initRooms(rooms: RoomDto[]) {
     this.logger.debug('Setting rooms')();
     const storeRooms: RoomDictModel = {};
     const roomsDict: RoomDictModel = this.store.roomsDict;
@@ -226,13 +244,23 @@ export default class ChannelsHandler extends MessageHandler {
       const rm: RoomModel = getRoomsBaseDict(newRoom, oldRoom);
       storeRooms[rm.id] = rm;
     });
-    this.store.setRooms(storeRooms);
-  }
 
-  public init(m: PubSetRooms) {
-    this.store.setOnline([...m.online]);
-    this.initUsers(m.users);
-    this.initRooms(m.rooms);
+    this.logger.debug('Setting channels')();
+    const channelsDict: ChannelsDictModel = this.store.channelsDict;
+    const storeChannel: ChannelsDictModel = channels.reduce((dict: ChannelsDictModel, newChannel: ChannelDto) => {
+      const oldChannel = channelsDict[newChannel.channelId];
+      const cm: ChannelModel = getChannelDict(newChannel, oldChannel);
+      dict[cm.id] = cm;
+      return dict;
+    }, {});
+
+    const newState: SetStateFromWS = {
+      allUsersDict: um,
+      channelsDict: storeChannel,
+      roomsDict: storeRooms
+    };
+
+    this.store.setStateFromWS(newState);
   }
 
   protected getMethodHandlers() {
@@ -386,6 +414,15 @@ export default class ChannelsHandler extends MessageHandler {
 
   private addRoom(message: AddRoomMessage) {
     this.mutateRoomAddition(message);
+    if (message.channelId) {
+      let channelDict: ChannelModel = getChannelDict(message);
+      this.store.addChannel(channelDict);
+    }
+  }
+
+  private addChannel(message: AddChannelMessage) {
+    let channelDict: ChannelModel = getChannelDict(message);
+    this.store.addChannel(channelDict);
   }
 
   private inviteUser(message: InviteUserMessage) {

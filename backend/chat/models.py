@@ -158,9 +158,20 @@ class UserProfile(User):
 		super(UserProfile, self).save(*args, **kwargs)
 
 
+class Channel(models.Model):
+	"""
+	Groups room.
+	"""
+	name = CharField(max_length=16, null=False, blank=False)
+	disabled = BooleanField(default=False, null=False)
+	creator = models.ForeignKey(User, models.CASCADE, related_name='creator')
+
+
 class Room(models.Model):
 	name = CharField(max_length=16, null=True, blank=True)
+	channel = models.ForeignKey(Channel, models.PROTECT, null=True)
 	users = models.ManyToManyField(User, related_name='rooms', through='RoomUsers')
+	# We don't delete private rooms, in order when a person creates a room again he sees his prev history
 	disabled = BooleanField(default=False, null=False)
 
 	@property

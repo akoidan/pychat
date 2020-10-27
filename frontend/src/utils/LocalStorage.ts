@@ -2,6 +2,7 @@
 import loggerFactory from '@/utils/loggerFactory';
 import {IStorage, SetRoomsUsers, StorageData} from '@/types/types';
 import {
+  ChannelModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   MessageModel,
@@ -61,7 +62,9 @@ export default class LocalStorage implements IStorage {
   public deleteRoom(id: number) {}
   public updateRoom(m: RoomSettingsModel)  {}
   public setRooms(rooms: RoomSettingsModel[])  {}
+  public setChannels(channels: ChannelModel[]) {}
   public saveRoom(room: RoomSettingsModel)  {}
+  public saveChannel(room: ChannelModel)  {}
   public setUserProfile(user: CurrentUserInfoModel)  {}
   public setUserSettings(settings: CurrentUserSettingsModel)  {}
   public saveRoomUsers(ru: SetRoomsUsers)  {}

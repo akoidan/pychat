@@ -184,13 +184,22 @@ public acceptFile(connId: string, received: number) {
     return new Promise((resolve, reject) => this.appendCB(resolve));
   }
 
-  public sendAddRoom(name: string|null, volume: number, notifications: boolean, users: number[], cb: Function) {
+  public sendAddRoom(name: string|null, volume: number, notifications: boolean, users: number[], channelId: number|null, cb: Function) {
     this.sendToServer({
       users,
       name,
+      channelId,
       action: 'addRoom',
       volume,
       notifications
+    });
+    this.appendCB(cb);
+  }
+
+  public sendAddChannel(channelName: string, cb: Function) {
+    this.sendToServer({
+      channelName,
+      action: 'addChannel'
     });
     this.appendCB(cb);
   }
@@ -338,6 +347,7 @@ public acceptFile(connId: string, received: number) {
     this.setTime(message.time);
     const pubSetRooms: PubSetRooms = {
       action: 'init',
+      channels: message.channels,
       handler: 'channels',
       rooms: message.rooms,
       online: message.online,

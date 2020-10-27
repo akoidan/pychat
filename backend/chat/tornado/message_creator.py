@@ -25,20 +25,12 @@ class MessagesCreator(object):
 			VarNames.HANDLER_NAME: handler
 		}
 
-	@staticmethod
-	def set_ws_id(random, self_id):
-		return {
-			VarNames.HANDLER_NAME: HandlerNames.WS,
-			VarNames.EVENT: Actions.SET_WS_ID,
-			VarNames.CONTENT: random,
-			VarNames.WEBRTC_OPPONENT_ID: self_id
-		}
-
-	def set_room(self, rooms, users, online, up):
+	def set_room(self, rooms, users, online, up, channels):
 		return {
 			VarNames.ROOM_USERS: users,
 			VarNames.ONLINE: online,
 			VarNames.ROOMS: rooms,
+			VarNames.CHANNELS: channels,
 			VarNames.HANDLER_NAME: HandlerNames.WS,
 			VarNames.EVENT: Actions.SET_WS_ID,
 			VarNames.WEBRTC_OPPONENT_ID: self.id,

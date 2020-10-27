@@ -96,6 +96,7 @@ export  interface MessageModel {
 export interface RoomSettingsModel {
   id: number;
   name: string;
+  channelId: null | number;
   notifications: boolean;
   volume: number;
 }
@@ -106,6 +107,10 @@ export interface UserDictModel {
 
 export interface RoomDictModel {
   [id: string]: RoomModel;
+}
+
+export interface ChannelsDictModel {
+  [id: string]: ChannelModel;
 }
 
 export interface SearchModel {
@@ -173,6 +178,16 @@ export interface CallsInfoModel {
   showVideo: boolean;
   shareScreen: boolean;
   callActive: boolean;
+}
+
+export interface ChannelModel {
+  expanded: boolean;
+  id: number;
+  name: string;
+}
+
+export interface ChannelUIModel extends ChannelModel {
+  rooms: RoomModel[];
 }
 
 export interface RoomModel extends RoomSettingsModel {

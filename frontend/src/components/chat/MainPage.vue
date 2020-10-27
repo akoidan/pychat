@@ -28,7 +28,7 @@
           v-if="!activeRoom"
           class="noRoom"
         >
-          <router-link to="/chat/1">
+          <router-link :to="`/chat/${ALL_ROOM_ID}`">
             This room doesn't exist, or you don't have access to it. Click to go to main room
           </router-link>
         </div>
@@ -96,7 +96,7 @@
 
 <script lang='ts'>
 import {Component, Vue, Watch, Ref} from 'vue-property-decorator';
-
+import {ALL_ROOM_ID} from '@/utils/consts';
 import RoomUsers from '@/components/chat/RoomUsers';
 import ChatBox from '@/components/chat/ChatBox';
 import SmileyHolder from '@/components/chat/SmileyHolder';
@@ -164,6 +164,10 @@ export default class ChannelsPage extends Vue {
   public recordingNow: boolean = false;
 
   public showSmileys: boolean = false;
+
+  get ALL_ROOM_ID(): number {
+    return ALL_ROOM_ID;
+  }
 
   @Watch('editedMessage')
   public onActiveRoomIdChange(val: EditingMessage) {

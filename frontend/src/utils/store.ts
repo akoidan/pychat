@@ -3,6 +3,8 @@ import Vuex from 'vuex';
 
 import loggerFactory from '@/utils/loggerFactory';
 import {
+  ChannelModel,
+  ChannelsDictModel, ChannelUIModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   EditingMessage,
@@ -45,7 +47,7 @@ import {
   SetUploadProgress,
   StringIdentifier
 } from '@/types/types';
-import {SetRooms} from '@/types/dto';
+import {SetStateFromStorage, SetStateFromWS} from '@/types/dto';
 import {encodeHTML} from '@/utils/htmlApi';
 import {ALL_ROOM_ID} from '@/utils/consts';
 import {Action, Module, Mutation, VuexModule} from 'vuex-module-decorators';
@@ -109,6 +111,7 @@ export class DefaultStore extends VuexModule {
   public regHeader: string | null = null;
   public online: number[] = [];
   public roomsDict: RoomDictModel = {};
+  public channelsDict: ChannelsDictModel = {};
   public mediaObjects: { [id: string]: MediaStream } = {};
 
   get userName(): (id: number) => string {
@@ -116,10 +119,45 @@ export class DefaultStore extends VuexModule {
   }
 
   get privateRooms(): RoomModel[] {
-    const roomModels: RoomModel[] = this.roomsArray.filter(r => !r.name);
-    logger.trace('privateRooms {} ', roomModels)();
+    const roomModels: RoomModel[] = this.roomsArray.filter(r => !r.name && !r.channelId);
+    logger.debug('privateRooms {} ', roomModels)();
 
     return roomModels;
+  }
+
+  get channels(): ChannelUIModel[] {
+    let result : {[id: string]: ChannelUIModel} = this.roomsArray.reduce((dict, current: RoomModel) => {
+      let channelId = current.channelId;
+      if (channelId) {
+        if (!dict[channelId]) {
+          let channel = this.channelsDict[channelId];
+          if (!channel) {
+            throw Error(`Unknown channel ${channelId}`)
+          }
+          dict[channelId] = {
+            id: channel.id,
+            expanded: channel.expanded,
+            rooms: [],
+            name: channel.name
+          };
+        }
+        dict[channelId].rooms.push(current);
+      }
+      return dict;
+    } , {} as {[id: string]: ChannelUIModel})
+
+
+    const roomLessChannels: ChannelUIModel[] = Object.keys(this.channelsDict)
+        .filter(k => !result[k])
+        .map(k => ({
+          ...this.channelsDict[k],
+          rooms: []
+        }));
+
+    const channelsArray: ChannelUIModel[] = [...Object.values(result), ...roomLessChannels];
+    logger.debug('Channels array {} ', channelsArray)();
+
+    return channelsArray;
   }
 
   get myId(): number | null {
@@ -143,21 +181,21 @@ export class DefaultStore extends VuexModule {
 
   get roomsArray(): RoomModel[] {
     const anies = Object.values(this.roomsDict);
-    logger.trace('roomsArray {}', anies)();
+    logger.debug('roomsArray {}', anies)();
 
     return anies;
   }
 
   get publicRooms(): RoomModel[] {
-    const roomModels: RoomModel[] = this.roomsArray.filter(r => r.name);
-    logger.trace('publicRooms {} ', roomModels)();
+    const roomModels: RoomModel[] = this.roomsArray.filter(r => r.name && !r.channelId);
+    logger.debug('publicRooms {} ', roomModels)();
 
     return roomModels;
   }
 
   get usersArray(): UserModel[] {
     const res: UserModel[] = Object.values(this.allUsersDict);
-    logger.trace('usersArray {}', res)();
+    logger.debug('usersArray {}', res)();
 
     return res;
   }
@@ -171,7 +209,7 @@ export class DefaultStore extends VuexModule {
           maxId = messages[m].id;
         }
       }
-      logger.trace('maxId #{}={}', id, maxId)();
+      logger.debug('maxId #{}={}', id, maxId)();
 
       return maxId;
     };
@@ -187,7 +225,7 @@ export class DefaultStore extends VuexModule {
           minId = id;
         }
       }
-      logger.trace('minId #{}={}', id, minId)();
+      logger.debug('minId #{}={}', id, minId)();
 
       return minId;
     };
@@ -210,7 +248,7 @@ export class DefaultStore extends VuexModule {
   }
 
   get editingMessageModel(): MessageModel | null {
-    logger.trace('Eval editingMessageModel')();
+    logger.debug('Eval editingMessageModel')();
     if (this.editedMessage) {
       return this.roomsDict[this.editedMessage.roomId].messages[this.editedMessage.messageId];
     } else {
@@ -280,6 +318,11 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public addSendingFile(payload: SendingFile) {
     Vue.set(this.roomsDict[payload.roomId].sendingFiles, payload.connId, payload);
+  }
+
+  @Mutation
+  public expandChannel(channelid: number) {
+    this.channelsDict[channelid].expanded = !this.channelsDict[channelid].expanded;
   }
 
   @Mutation
@@ -544,12 +587,6 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setUsers(users: UserDictModel) {
-    this.allUsersDict = users;
-    this.storage.setUsers(Object.values(users));
-  }
-
-  @Mutation
   public setUser(user: UserModel) {
     this.allUsersDict[user.id].user = user.user;
     this.allUsersDict[user.id].sex = user.sex;
@@ -574,23 +611,39 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setRooms(rooms: RoomDictModel) {
-    this.roomsDict = rooms;
-    this.storage.setRooms(Object.values(rooms));
+  public setStateFromWS(state: SetStateFromWS) {
+    logger.error('init store from WS')();
+
+    this.roomsDict = state.roomsDict;
+    this.channelsDict = state.channelsDict;
+    this.allUsersDict = state.allUsersDict;
+
+    this.storage.setChannels(Object.values(state.channelsDict));
+    this.storage.setRooms(Object.values(state.roomsDict));
+    this.storage.setUsers(Object.values(state.allUsersDict));
   }
 
   @Mutation
-  public init(setRooms: SetRooms) {
+  // called while restoring from db
+  public setStateFromStorage(setRooms: SetStateFromStorage) {
+    logger.error('init store from database')();
     this.roomsDict = setRooms.roomsDict;
     this.userInfo = setRooms.profile;
     this.userSettings = setRooms.settings;
     this.allUsersDict = setRooms.allUsersDict;
+    this.channelsDict = setRooms.channelsDict;
   }
 
   @Mutation
   public addRoom(room: RoomModel) {
     Vue.set(this.roomsDict, String(room.id), room);
     this.storage.saveRoom(room);
+  }
+
+  @Mutation
+  public addChannel(channel: ChannelModel) {
+    Vue.set(this.channelsDict, String(channel.id), channel);
+    this.storage.saveChannel(channel);
   }
 
   @Mutation

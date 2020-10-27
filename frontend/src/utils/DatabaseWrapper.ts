@@ -2,6 +2,7 @@ import {IStorage, SetRoomsUsers, StorageData} from '@/types/types';
 import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
 import {
+  ChannelModel, ChannelsDictModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel, FileModel,
   MessageModel, RoomDictModel, RoomModel,
@@ -12,10 +13,11 @@ import {
   convertNumberToSex,
   convertSexToNumber,
   convertSexToString,
-  convertStringSexToNumber, convertToBoolean, getRoomsBaseDict
+  convertStringSexToNumber, convertToBoolean, getChannelDict, getRoomsBaseDict
 } from '@/types/converters';
 import {browserVersion} from '@/utils/singletons';
 import {
+  ChannelDB,
   FileDB, MessageDB,
   ProfileDB,
   RoomDB,
@@ -45,7 +47,8 @@ export default class DatabaseWrapper implements IStorage {
         this.db!.changeVersion(this.db!.version, '1.0', resolve, reject);
       });
       t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text)');
-      t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)))');
+      t = await this.runSql(t, 'CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)))');
+      t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id))');
       t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (deleted IN (0,1)))');
       t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
       t = await this.runSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))');
@@ -72,7 +75,8 @@ export default class DatabaseWrapper implements IStorage {
       'select * from room_users',
       'select * from settings',
       'select * from user where deleted = 0',
-      'select * from message'
+      'select * from message',
+      'select * from channel'
     ].map(sql => new Promise((resolve, reject) => {
       this.executeSql(t, sql, [], (t: SQLTransaction, d: SQLResultSet) => {
         this.logger.trace('sql {} fetched {} ', sql, d)();
@@ -95,7 +99,8 @@ export default class DatabaseWrapper implements IStorage {
         dbRoomUsers: RoomUsersDB[] = f[3] as RoomUsersDB[],
         dbSettings: SettingsDB[] = f[4] as SettingsDB[],
         dbUsers: UserDB[] = f[5] as UserDB[],
-        dbMessages: MessageDB[] = f[6] as MessageDB[];
+        dbMessages: MessageDB[] = f[6] as MessageDB[],
+        dbChannels: ChannelDB[] = f[7] as ChannelDB[];
     this.logger.debug('resolved all sqls')();
 
     if (dbProfile.length) {
@@ -127,6 +132,7 @@ export default class DatabaseWrapper implements IStorage {
           roomId: r.id,
           notifications: convertToBoolean(r.notifications),
           name: r.name,
+          channelId: r.channel_id,
           users: [],
           volume: r.volume
         });
@@ -191,7 +197,15 @@ export default class DatabaseWrapper implements IStorage {
         }
       });
 
-      return {sendingMessages, setRooms: {roomsDict, settings, profile, allUsersDict}};
+      const channelsDict: ChannelsDictModel = {};
+      dbChannels.forEach((c: ChannelDB) => {
+        const chm: ChannelModel = getChannelDict({
+          channelId: c.id,
+          channelName: c.name
+        });
+        channelsDict[c.id] = chm;
+      });
+      return {sendingMessages, setRooms: {roomsDict, settings, profile, channelsDict, allUsersDict}};
     } else {
       return null;
     }
@@ -228,8 +242,9 @@ export default class DatabaseWrapper implements IStorage {
   public clearStorage() {
     this.write(t => {
       this.executeSql(t, 'delete from room_users')();
-      this.executeSql(t, 'delete from user')();
       this.executeSql(t, 'delete from room')();
+      this.executeSql(t, 'delete from channel')();
+      this.executeSql(t, 'delete from user')();
       this.executeSql(t, 'delete from file')();
       this.executeSql(t, 'delete from message')();
       this.executeSql(t, 'delete from settings')();
@@ -274,6 +289,20 @@ export default class DatabaseWrapper implements IStorage {
     this.write((t: SQLTransaction) => {
       this.setRoom(t, room);
       this.setRoomUsers(t, room.id, room.users);
+    });
+  }
+
+  public saveChannel(channel: ChannelModel): void {
+    this.write((t: SQLTransaction) => {
+      this.setChannel(t, channel);
+    });
+  }
+
+  public setChannels(channels:ChannelModel[]) {
+    this.write(t => {
+      this.executeSql(t, 'update channel set deleted = 1', [], (t) => {
+        channels.forEach(c => this.setChannel(t, c));
+      })();
     });
   }
 
@@ -421,7 +450,11 @@ export default class DatabaseWrapper implements IStorage {
   }
 
   private setRoom(t: SQLTransaction, room: RoomSettingsModel) {
-    this.executeSql(t, 'insert or replace into room (id, name, notifications, volume, deleted) values (?, ?, ?, ?, ?)', [room.id, room.name, room.notifications ? 1 : 0, room.volume, 0])();
+    this.executeSql(t, 'insert or replace into room (id, name, notifications, volume, deleted, channel_id) values (?, ?, ?, ?, ?, ?)', [room.id, room.name, room.notifications ? 1 : 0, room.volume, 0, room.channelId])();
+  }
+
+  private setChannel(t: SQLTransaction, channel: ChannelModel) {
+    this.executeSql(t, 'insert or replace into channel (id, name, deleted) values (?, ?, ?)', [channel.id, channel.name, 0])();
   }
 
   private insertRoomUsers(t: SQLTransaction, roomId: number, userId: number) {

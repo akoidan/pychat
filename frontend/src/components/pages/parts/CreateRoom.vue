@@ -16,6 +16,21 @@
           </td>
         </tr>
         <tr>
+          <th>Parent channel</th>
+          <td>
+            <select class="input" v-model="selectedChannelId">
+              <option :value="null" selected>W/o channel</option>
+              <option
+                  v-for="channel in channels"
+                  :key="channel.id"
+                  :value="channel.id"
+              >
+                {{ channel.name }}
+              </option>
+            </select>
+          </td>
+        </tr>
+        <tr>
           <th>
             Notifications
           </th>
@@ -58,7 +73,12 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import AppInputRange from '@/components/ui/AppInputRange';
 import AppSubmit from '@/components/ui/AppSubmit';
 import AddUserToRoom from '@/components/pages/parts/AddUserToRoom';
-import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
+import {
+  ChannelUIModel,
+  CurrentUserInfoModel,
+  RoomModel,
+  UserModel
+} from '@/types/model';
 import {AddRoomMessage} from '@/types/messages';
 import AppCheckbox from '@/components/ui/AppCheckbox';
 import {PrivateRoomsIds} from '@/types/types';
@@ -67,14 +87,15 @@ import {PrivateRoomsIds} from '@/types/types';
 export default class CreateRoom extends Vue {
 
   @State
-  public readonly privateRooms!: RoomModel[];
-  @State
   public readonly privateRoomsUsersIds!: PrivateRoomsIds;
   @State
   public readonly userInfo!: CurrentUserInfoModel;
+  @State
+  public readonly channels!: ChannelUIModel[];
   public currentUsers: UserModel[] = [];
   public notifications: boolean = false;
   public sound: number = 0;
+  public selectedChannelId: number|null = null;
   public roomName: string = '';
   public running: boolean = false;
 
@@ -106,12 +127,19 @@ export default class CreateRoom extends Vue {
       this.store.growlError('Please add user');
     } else {
       this.running = true;
-      this.$ws.sendAddRoom(this.roomName ? this.roomName : null, this.sound, this.notifications, this.currentUsers.map(u => u.id), (e: AddRoomMessage) => {
-        if (e && e.roomId) {
-          this.$router.replace(`/chat/${e.roomId}`);
-        }
-        this.running = false;
-      });
+      this.$ws.sendAddRoom(
+          this.roomName ? this.roomName : null,
+          this.sound,
+          this.notifications,
+          this.currentUsers.map(u => u.id),
+          this.selectedChannelId,
+          (e: AddRoomMessage) => {
+            if (e && e.roomId) {
+              this.$router.replace(`/chat/${e.roomId}`);
+            }
+            this.running = false;
+          }
+      );
     }
   }
 
@@ -128,6 +156,8 @@ export default class CreateRoom extends Vue {
   .holder
     @extend %room-settings-holder
 
+  select
+    width: 100%
   th, td
     padding: 5px
 

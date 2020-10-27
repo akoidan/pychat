@@ -6,7 +6,7 @@
         :class="directClass"
         @click="directMinified = !directMinified"
       />
-      <span class="directStateText">direct  messages</span>
+      <span class="directStateText">direct messages</span>
       <router-link
         to="/create-private-room"
         class="icon-plus-squared"
@@ -31,7 +31,7 @@
       />
       <span class="channelsStateText">rooms</span>
       <router-link
-        to="/create-public-room"
+        to="/create-room/public"
         class="icon-plus-squared"
         title="Create public room"
       />
@@ -40,6 +40,18 @@
       v-show="!roomsMinified"
       class="rooms"
     >
+      <template v-for="channel in channels">
+        <li :key="'c'+ channel.id" @click="expandChannel(channel.id)" class="channel">
+          {{ channel.name }}
+        </li>
+        <room-users-public
+          class="channel-room"
+          v-show="channel.expanded"
+          v-for="room in channel.rooms"
+          :key="'r'+room.id"
+          :room="room"
+        />
+      </template>
       <room-users-public
         v-for="room in publicRooms"
         :key="room.id"
@@ -77,7 +89,13 @@
 <script lang="ts">
 import {State} from '@/utils/storeHolder';
 import {Component, Vue} from 'vue-property-decorator';
-import {RoomModel, SexModelString, UserDictModel, UserModel} from '@/types/model';
+import {
+  ChannelUIModel,
+  RoomModel,
+  SexModelString,
+  UserDictModel,
+  UserModel
+} from '@/types/model';
 import RoomUsersUser from '@/components/chat/RoomUsersUser';
 import RoomUsersPublic from '@/components/chat/RoomUsersPublic';
 import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate';
@@ -94,11 +112,18 @@ export default class RoomUsers extends Vue {
   public readonly publicRooms!: RoomModel[];
   @State
   public readonly privateRooms!: RoomModel[];
+  @State
+  public readonly channels!: ChannelUIModel[];
 
   public directMinified: boolean = false;
   public roomsMinified: boolean = false;
   public onlineMinified: boolean = false;
   public onlineShowOnlyOnline: boolean = false;
+
+
+  public expandChannel(id: number) {
+    this.store.expandChannel(id);
+  }
 
   get onlineText() {
     return this.onlineShowOnlyOnline ? 'Room Users' : 'Room Online';
@@ -250,6 +275,8 @@ export default class RoomUsers extends Vue {
           display: none
 
 
+  .channel
+    color: #b89e00
   .color-lor .chat-room-users-wrapper /deep/
     @media screen and (max-width: $collapse-width)
       border-bottom-color: $color-lor-scroll

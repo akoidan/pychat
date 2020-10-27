@@ -11,7 +11,7 @@
       { "name": "typescript-tslint-plugin"}
     ],
     "moduleResolution": "node",
-    "target": "esnext",
+    "target": "es2019",
     "sourceMap": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,

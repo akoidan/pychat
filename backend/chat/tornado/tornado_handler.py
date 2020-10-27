@@ -9,7 +9,7 @@ from itertools import chain
 from tornado import ioloop, gen
 from tornado.websocket import WebSocketHandler, WebSocketClosedError
 
-from chat.models import User, Message, UserJoinedInfo, Room, RoomUsers, UserProfile
+from chat.models import User, Message, UserJoinedInfo, Room, RoomUsers, UserProfile, Channel
 from chat.py2_3 import str_type
 from chat.tornado.anti_spam import AntiSpam
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix
@@ -130,15 +130,22 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		# since we add user to online first, latest trigger will always show correct online
 		was_online, online = self.get_online_and_status_from_redis()
 		user_rooms_query = Room.objects.filter(users__id=self.user_id, disabled=False) \
-			.values('id', 'name', 'roomusers__notifications', 'roomusers__volume')
+			.values('id', 'name', 'channel_id', 'roomusers__notifications', 'roomusers__volume')
 		room_users = [{
 			VarNames.ROOM_ID: room['id'],
 			VarNames.ROOM_NAME: room['name'],
+			VarNames.CHANNEL_ID: room['channel_id'],
 			VarNames.NOTIFICATIONS: room['roomusers__notifications'],
 			VarNames.VOLUME: room['roomusers__volume'],
 			VarNames.ROOM_USERS: []
 		} for room in user_rooms_query]
 		user_rooms_dict = {room[VarNames.ROOM_ID]: room for room in room_users}
+		channels_ids = [channel[VarNames.CHANNEL_ID] for channel in room_users if channel[VarNames.CHANNEL_ID]]
+		channels_db = Channel.objects.filter(Q(id__in=channels_ids) | Q(creator=self.user_id), disabled=False).values('id', 'name')
+		channels = [{
+			VarNames.CHANNEL_ID: channel['id'],
+			VarNames.CHANNEL_NAME: channel['name']
+		} for channel in channels_db]
 		room_ids = [room_id[VarNames.ROOM_ID] for room_id in room_users]
 		rooms_users = RoomUsers.objects.filter(room_id__in=room_ids).values('user_id', 'room_id')
 		for ru in rooms_users:
@@ -179,7 +186,7 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		if self.user_id not in online:
 			online.append(self.user_id)
 
-		self.ws_write(self.set_room(room_users, user_dict, online, user_db))
+		self.ws_write(self.set_room(room_users, user_dict, online, user_db, channels))
 		if not was_online:  # if a new tab has been opened
 			online_user_names_mes = self.room_online_login(online, user_db.username, user_db.sex_str)
 			self.logger.info('!! First tab, sending refresh online for all')

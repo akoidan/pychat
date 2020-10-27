@@ -7,6 +7,7 @@
 import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
 import Painter from 'spainter';
+import {ALL_ROOM_ID} from '@/utils/consts';
 import {messageBus} from '@/utils/singletons';
 import loggerFactory from '@/utils/loggerFactory';
 import AppInputRange from '@/components/ui/AppInputRange';
@@ -29,7 +30,7 @@ export default class PainterPage extends Vue {
         vm.prevPage = frm.path;
       } else {
         // @ts-ignore: next-line
-        vm.prevPage = '/chat/1';
+        vm.prevPage = `/chat/${ALL_ROOM_ID}`;
       }
       // @ts-ignore: next-line
       vm.logger.debug('Painter prev is set to {}, we came from {}', vm.prevPage, frm.path)();

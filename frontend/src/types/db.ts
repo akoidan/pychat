@@ -17,6 +17,7 @@ export interface RoomDB {
   name: string;
   notifications: BooleanDB;
   volume: number;
+  channel_id: number;
   deleted: BooleanDB ;
 }
 
@@ -26,6 +27,11 @@ export interface RoomSettingsDB {
   notifications: BooleanDB;
   volume: number;
   deleted: BooleanDB ;
+}
+
+export  interface ChannelDB {
+  id: number;
+  name: string;
 }
 
 export  interface MessageDB {

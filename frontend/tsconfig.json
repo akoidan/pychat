@@ -7,7 +7,6 @@
       "@/*": ["src/*"]
     },
     "plugins": [
-      { "transform": "ts-optchain/transform" },
       { "name": "typescript-tslint-plugin"}
     ],
     "moduleResolution": "node",

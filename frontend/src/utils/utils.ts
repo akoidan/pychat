@@ -61,7 +61,7 @@ export async function initStore() {
     globalLogger.log('restored state from db {}, userId: {}, session {}', data, store.userInfo && store.userInfo.userId, session)();
     if (data) {
       if (!store.userInfo && session) {
-        store.init(data.setRooms);
+        store.setStateFromStorage(data.setRooms);
       } else {
         store.roomsArray.forEach((storeRoom: RoomModel) => {
           if (data.setRooms.roomsDict[storeRoom.id]) {

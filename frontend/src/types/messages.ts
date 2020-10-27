@@ -1,4 +1,13 @@
-import {FileModelDto, MessageModelDto, RoomDto, SexModelDto, UserDto, UserProfileDto, UserSettingsDto} from '@/types/dto';
+import {
+  ChannelDto,
+  FileModelDto,
+  MessageModelDto,
+  RoomDto,
+  SexModelDto,
+  UserDto,
+  UserProfileDto,
+  UserSettingsDto
+} from '@/types/dto';
 import {FileModel} from '@/types/model';
 
 export interface DefaultSentMessage {
@@ -33,6 +42,7 @@ export interface ScreenShareData {
 
 export interface SetWsIdMessage extends DefaultMessage, OpponentWsId {
   rooms:  RoomDto[];
+  channels: ChannelDto[];
   users: UserDto[];
   online: number[];
   time: number;
@@ -138,7 +148,7 @@ interface NewRoom extends DefaultMessage {
   time: number;
   users: number[];
 }
-export interface AddRoomBase extends  NewRoom {
+export interface AddRoomBase extends  NewRoom, ChannelDto {
   name: string;
   notifications: boolean;
   volume: number;
@@ -160,6 +170,9 @@ export interface InviteUserMessage extends NewRoom, RoomExistedBefore {
 export interface AddInviteMessage extends AddRoomBase, RoomExistedBefore {
 }
 export interface AddRoomMessage extends AddRoomBase {
+}
+
+export interface AddChannelMessage extends DefaultMessage , ChannelDto {
 }
 
 export interface LeaveUserMessage extends DefaultMessage {
