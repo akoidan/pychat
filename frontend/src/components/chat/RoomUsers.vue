@@ -40,18 +40,8 @@
       v-show="!roomsMinified"
       class="rooms"
     >
-      <template v-for="channel in channels">
-        <li :key="'c'+ channel.id" @click="expandChannel(channel.id)" class="channel">
-          {{ channel.name }}
-        </li>
-        <room-users-public
-          class="channel-room"
-          v-show="channel.expanded"
-          v-for="room in channel.rooms"
-          :key="'r'+room.id"
-          :room="room"
-        />
-      </template>
+      <channel-li class="channel" v-for="channel in channels" :channel="channel" :key="'c'+channel.id"/>
+
       <room-users-public
         v-for="room in publicRooms"
         :key="room.id"
@@ -99,8 +89,9 @@ import {
 import RoomUsersUser from '@/components/chat/RoomUsersUser';
 import RoomUsersPublic from '@/components/chat/RoomUsersPublic';
 import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate';
+import ChannelLi from '@/components/chat/ChannelLi.vue';
 @Component({
-  components: {RoomUsersPrivate, RoomUsersPublic, RoomUsersUser}
+  components: {ChannelLi, RoomUsersPrivate, RoomUsersPublic, RoomUsersUser}
 })
 export default class RoomUsers extends Vue {
 
@@ -119,11 +110,6 @@ export default class RoomUsers extends Vue {
   public roomsMinified: boolean = false;
   public onlineMinified: boolean = false;
   public onlineShowOnlyOnline: boolean = false;
-
-
-  public expandChannel(id: number) {
-    this.store.expandChannel(id);
-  }
 
   get onlineText() {
     return this.onlineShowOnlyOnline ? 'Room Users' : 'Room Online';

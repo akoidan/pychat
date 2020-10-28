@@ -7,6 +7,7 @@ import {
   SexModelString,
   UserModel
 } from '@/types/model';
+import {DefaultMessage} from '@/types/messages';
 
 export type SexModelDto = 'Male' | 'Female' |'Secret';
 

@@ -82,6 +82,7 @@ import {
 import {AddRoomMessage} from '@/types/messages';
 import AppCheckbox from '@/components/ui/AppCheckbox';
 import {PrivateRoomsIds} from '@/types/types';
+import {ApplyGrowlErr} from '@/utils/utils';
 
 @Component({components: {AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})
 export default class CreateRoom extends Vue {
@@ -120,26 +121,23 @@ export default class CreateRoom extends Vue {
     return uids;
   }
 
-  public add() {
+  @ApplyGrowlErr({runningProp: 'running'})
+  public async add() {
     if (this.isPublic && !this.roomName) {
-      this.store.growlError('Please specify room name');
+      throw Error('Please specify room name');
     } else if (!this.isPublic && this.currentUsers.length === 0) {
-      this.store.growlError('Please add user');
+      throw Error('Please add user');
     } else {
-      this.running = true;
-      this.$ws.sendAddRoom(
+      const e = await this.$ws.sendAddRoom(
           this.roomName ? this.roomName : null,
           this.sound,
           this.notifications,
           this.currentUsers.map(u => u.id),
-          this.selectedChannelId,
-          (e: AddRoomMessage) => {
-            if (e && e.roomId) {
-              this.$router.replace(`/chat/${e.roomId}`);
-            }
-            this.running = false;
-          }
+          this.selectedChannelId
       );
+      if (e && e.roomId) {
+        this.$router.replace(`/chat/${e.roomId}`);
+      }
     }
   }
 

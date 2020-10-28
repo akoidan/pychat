@@ -67,6 +67,7 @@ class MessagesHandler(MessagesCreator):
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM: self.create_new_room,
 			Actions.CREATE_CHANNEL: self.create_new_channel,
+			Actions.SAVE_CHANNEL_SETTINGS: self.save_channels_settings,
 			Actions.SET_USER_PROFILE: self.profile_save_user,
 			Actions.SET_SETTINGS: self.profile_save_settings,
 			Actions.INVITE_USER: self.invite_user,
@@ -285,6 +286,31 @@ class MessagesHandler(MessagesCreator):
 		else:
 			send_message(message)
 
+	def save_channels_settings(self, message):
+		channel_id = message[VarNames.CHANNEL_ID]
+		channel_name = message.get(VarNames.CHANNEL_NAME)
+		if not channel_name or len(channel_name) > 16:
+			raise ValidationError('Incorrect channel name name "{}"'.format(channel_name))
+		channel = Channel.objects.get(id=channel_id)
+		users_id = list(RoomUsers.objects.filter(room__channel_id=channel_id).values_list('user_id', flat=True))
+		if channel.creator_id != self.user_id and self.user_id not in users_id:
+			raise ValidationError("You are not allowed to edit this channel")
+		if self.user_id not in users_id: # if channel has no rooms
+			users_id.append(self.user_id)
+		channel.name = channel_name
+		channel.save()
+		m = {
+			VarNames.EVENT: Actions.SAVE_CHANNEL_SETTINGS,
+			VarNames.CHANNEL_ID: channel_id,
+			VarNames.CB_BY_SENDER: self.id,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.CHANNEL_NAME: channel_name,
+			VarNames.TIME: get_milliseconds(),
+			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
+		}
+		for user_id in users_id:
+			self.publish(m, RedisPrefix.generate_user(user_id))
+
 	def create_new_channel(self, message):
 		channel_name = message.get(VarNames.CHANNEL_NAME)
 		if not channel_name or len(channel_name) > 16:
@@ -469,7 +495,6 @@ class MessagesHandler(MessagesCreator):
 			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID]
 		}
 		self.publish(invite, room_id, True)
-
 
 	def respond_ping(self, message):
 		self.ws_write(self.responde_pong(message[VarNames.JS_MESSAGE_ID]))

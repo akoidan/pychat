@@ -63,13 +63,12 @@ export default class WebRtcApi extends MessageHandler {
     sub.notify({action: 'declineFileReply', handler: Subscription.getPeerConnectionId(connId, webRtcOpponentId)});
   }
 
-  public offerFile(file: File, channel: number) {
+  public async offerFile(file: File, channel: number) {
     if (file.size > 0) {
-      this.wsHandler.offerFile(channel, browserVersion, file.name, file.size, (e: WebRtcSetConnectionIdMessage) => {
-        if (e.connId) {
-          new FileSender(channel, e.connId, this.wsHandler, this.notifier, this.store, file, e.time);
-        }
-      });
+      const e = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size);
+      if (e.connId) {
+        new FileSender(channel, e.connId, this.wsHandler, this.notifier, this.store, file, e.time);
+      }
     } else {
       this.store.growlError(`File ${file.name} size is 0. Skipping sending it...`);
     }

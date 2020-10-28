@@ -101,13 +101,12 @@ export default class RoomSettings extends Vue {
   @State
   public readonly roomsDict!: RoomDictModel;
 
-  public leave() {
+
+  @ApplyGrowlErr({runningProp: 'running'})
+  public async leave() {
     this.logger.log('Leaving room {}', this.roomId)();
-    this.running = true;
-    this.$ws.sendLeaveRoom(this.roomId, () => {
-      this.running = false;
-      this.$router.replace(`/chat/${ALL_ROOM_ID}`);
-    });
+    await this.$ws.sendLeaveRoom(this.roomId);
+    this.$router.replace(`/chat/${ALL_ROOM_ID}`);
   }
 
   public created() {

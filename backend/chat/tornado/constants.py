@@ -37,8 +37,7 @@ class Actions(object):
 	PING = 'ping'
 	PONG = 'pong'
 	CHECK_PING = 'check_ping'
-
-
+	SAVE_CHANNEL_SETTINGS = 'saveChannelSettings'
 
 
 class VarNames(object):

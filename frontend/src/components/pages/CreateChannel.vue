@@ -31,23 +31,22 @@
   import {AddChannelMessage, AddRoomMessage} from '@/types/messages';
   import AppSubmit from '@/components/ui/AppSubmit.vue';
   import {ALL_ROOM_ID} from '@/utils/consts';
+  import {ApplyGrowlErr} from '@/utils/utils';
 
   @Component({components: {AppSubmit}})
   export default class CreateChannel extends Vue {
     public channelName: string = '';
     public running: boolean = false;
 
-    public add() {
+
+    @ApplyGrowlErr({runningProp: 'running', message: 'Unable to add channel'})
+    public async add() {
       if (!this.channelName) {
-        this.store.growlError('Please specify a channel name');
-      } else {
-        this.running = true;
-        this.$ws.sendAddChannel(this.channelName, (e: AddChannelMessage) => {
-          this.running = false;
-          this.store.growlSuccess(`Channel '${this.channelName}' has been created`);
-          this.$router.replace(`/chat/${ALL_ROOM_ID}`);
-        });
+        throw Error('Please specify a channel name');
       }
+      let e = await this.$ws.sendAddChannel(this.channelName);
+      this.store.growlSuccess(`Channel '${this.channelName}' has been created`);
+      this.$router.replace(`/chat/${ALL_ROOM_ID}`);
     }
   }
 </script>

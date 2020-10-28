@@ -10573,10 +10573,10 @@ vuejs-datepicker@1.6.2:
   resolved "https://registry.yarnpkg.com/vuejs-datepicker/-/vuejs-datepicker-1.6.2.tgz#83c1e8fd4108e7f1d01c061a7e344918f25e47ae"
   integrity sha512-PkC4vxzFBo7i6FSCUAJfnaWOx6VkKbOqxijSGHHlWxh8FIUKEZVtFychkonVWtK3iwWfhmYtqHcwsmgxefLpLQ==
 
-vuex-module-decorators-state@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/vuex-module-decorators-state/-/vuex-module-decorators-state-1.1.0.tgz#9af1f7b84fca65da6a78dfff5343b071457614ca"
-  integrity sha512-VAdQ9JPSKqgJsHDAnV5Uu+19LoeFEv63E8ldm0mo6aUFCsiNYP4w1M+VB+HVWOYQrQmyFtovcgSRke+tFEZn+A==
+vuex-module-decorators-state@^1.2.2:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/vuex-module-decorators-state/-/vuex-module-decorators-state-1.2.2.tgz#7873d9419c6e0149c8f9677979f8a0ef5e41c902"
+  integrity sha512-9F0eZUU/Rjx3NcSORzS5eaf9daUUd+gBHww/7w4s2bdTxjOOaftp9ZagwtoMJlc0gVTIJd9uNB9uqaaEXej9zQ==
 
 vuex-module-decorators@0.10.1:
   version "0.10.1"

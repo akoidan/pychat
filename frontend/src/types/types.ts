@@ -4,12 +4,15 @@ import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   FileModel,
-  MessageModel, ReceivingFile,
+  MessageModel,
   RoomModel,
   RoomSettingsModel,
-  SearchModel, SendingFile,
+  SearchModel,
   UploadProgressModel,
-  UserModel, SendingFileTransfer, CallInfoModel, ChannelModel
+  UserModel,
+  SendingFileTransfer,
+  CallInfoModel,
+  ChannelModel
 } from '@/types/model';
 import {ChannelDto, RoomDto, SetStateFromStorage, UserDto} from '@/types/dto';
 import {DefaultMessage} from '@/types/messages';

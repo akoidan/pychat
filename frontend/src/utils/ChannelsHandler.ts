@@ -39,13 +39,14 @@ import {
   InviteUserMessage,
   LeaveUserMessage,
   LoadMessages,
-  RemoveOnlineUserMessage
+  RemoveOnlineUserMessage, SaveChannelSettings
 } from '@/types/messages';
 import {
   ChannelDto,
   FileModelDto,
   MessageModelDto,
-  RoomDto, SetStateFromWS,
+  RoomDto,
+  SetStateFromWS,
   UserDto
 } from '@/types/dto';
 import {
@@ -76,7 +77,8 @@ export default class ChannelsHandler extends MessageHandler {
     addRoom: <HandlerType>this.addRoom,
     addChannel: <HandlerType>this.addChannel,
     inviteUser: <HandlerType>this.inviteUser,
-    addInvite: <HandlerType>this.addInvite
+    addInvite: <HandlerType>this.addInvite,
+    saveChannelSettings: <HandlerType>this.saveChannelSettings
   };
   private readonly store: DefaultStore;
   private readonly api: Api;
@@ -417,6 +419,15 @@ export default class ChannelsHandler extends MessageHandler {
     if (message.channelId) {
       let channelDict: ChannelModel = getChannelDict(message);
       this.store.addChannel(channelDict);
+    }
+  }
+
+  private saveChannelSettings(message: SaveChannelSettings) {
+    if (!this.store.channelsDict[message.channelId]) {
+      this.logger.error('Unable to find channel to edit {} to kick user, available are {}', message.channelId, Object.keys(this.store.channelsDict))();
+    } else {
+      const c: ChannelModel = getChannelDict(message);
+      this.store.addChannel(c);
     }
   }
 

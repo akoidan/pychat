@@ -28,6 +28,7 @@ import UserProfileChangeEmail
 import {Route} from 'vue-router/types';
 import CreateRoomChannel from '@/components/pages/CreateRoomChannel.vue';
 import CreateChannel from '@/components/pages/CreateChannel.vue';
+import ChannelSettings from '@/components/pages/ChannelSettings.vue';
 
 Vue.use(VueRouter);
 
@@ -119,6 +120,10 @@ const router = new VueRouter({
         {
           component: RoomSettings,
           path: '/room-settings/:id'
+        },
+        {
+          component: ChannelSettings,
+          path: '/channel-settings/:id'
         },
         {
           component: CreatePrivateRoom,

@@ -8,7 +8,6 @@ import {
   UserProfileDto,
   UserSettingsDto
 } from '@/types/dto';
-import {FileModel} from '@/types/model';
 
 export interface DefaultSentMessage {
   action: string;
@@ -18,6 +17,9 @@ export interface DefaultSentMessage {
 export interface DefaultMessage extends DefaultSentMessage {
   handler: string;
   cbBySender?: string;
+}
+
+export interface SaveChannelSettings extends DefaultMessage, ChannelDto {
 }
 
 export interface WebRtcDefaultMessage extends DefaultMessage {

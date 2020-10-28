@@ -310,12 +310,11 @@ export default class CallHandler extends BaseTransferHandler {
       };
       this.setCallStatus('sent_offer');
       this.store.setCallActiveToState(payload);
-      this.wsHandler.offerCall(this.roomId, browserVersion, (e: WebRtcSetConnectionIdMessage) => {
-        if (e.connId) {
-          this.connectionId = e.connId;
-          sub.subscribe(Subscription.getTransferId(e.connId), this);
-        }
-      });
+      let e = await this.wsHandler.offerCall(this.roomId, browserVersion);
+      if (e.connId) {
+        this.connectionId = e.connId;
+        sub.subscribe(Subscription.getTransferId(e.connId), this);
+      }
     } catch (e) {
       this.handleStream(e, stream);
     }

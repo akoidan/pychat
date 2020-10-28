@@ -4,7 +4,7 @@ import Vuex from 'vuex';
 import loggerFactory from '@/utils/loggerFactory';
 import {
   ChannelModel,
-  ChannelsDictModel, ChannelUIModel,
+  ChannelsDictModel, ChannelsDictUIModel, ChannelUIModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   EditingMessage,
@@ -125,8 +125,8 @@ export class DefaultStore extends VuexModule {
     return roomModels;
   }
 
-  get channels(): ChannelUIModel[] {
-    let result : {[id: string]: ChannelUIModel} = this.roomsArray.reduce((dict, current: RoomModel) => {
+  get channelsDictUI(): ChannelsDictUIModel {
+    let result : ChannelsDictUIModel = this.roomsArray.reduce((dict, current: RoomModel) => {
       let channelId = current.channelId;
       if (channelId) {
         if (!dict[channelId]) {
@@ -144,20 +144,24 @@ export class DefaultStore extends VuexModule {
         dict[channelId].rooms.push(current);
       }
       return dict;
-    } , {} as {[id: string]: ChannelUIModel})
+    } , {} as ChannelsDictUIModel)
 
+    const allChannels: ChannelsDictUIModel = Object.keys(this.channelsDict)
+        .filter(k => !result[k]).reduce(((previousValue, currentValue) => {
+            previousValue[currentValue] = {
+              ...this.channelsDict[currentValue],
+              rooms: []
+            };
+            return previousValue;
+          }), result);
 
-    const roomLessChannels: ChannelUIModel[] = Object.keys(this.channelsDict)
-        .filter(k => !result[k])
-        .map(k => ({
-          ...this.channelsDict[k],
-          rooms: []
-        }));
+    logger.debug('Channels dict {} ', allChannels)();
 
-    const channelsArray: ChannelUIModel[] = [...Object.values(result), ...roomLessChannels];
-    logger.debug('Channels array {} ', channelsArray)();
+    return allChannels;
+  }
 
-    return channelsArray;
+  get channels(): ChannelUIModel[] {
+    return Object.values(this.channelsDictUI);
   }
 
   get myId(): number | null {
@@ -612,7 +616,7 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public setStateFromWS(state: SetStateFromWS) {
-    logger.error('init store from WS')();
+    logger.debug('init store from WS')();
 
     this.roomsDict = state.roomsDict;
     this.channelsDict = state.channelsDict;
@@ -626,7 +630,7 @@ export class DefaultStore extends VuexModule {
   @Mutation
   // called while restoring from db
   public setStateFromStorage(setRooms: SetStateFromStorage) {
-    logger.error('init store from database')();
+    logger.debug('init store from database')();
     this.roomsDict = setRooms.roomsDict;
     this.userInfo = setRooms.profile;
     this.userSettings = setRooms.settings;

@@ -14,22 +14,26 @@ import {
 } from '@/types/model';
 import {PubSetRooms, SessionHolder, UploadFile} from '@/types/types';
 import {
+  AddChannelMessage, AddInviteMessage, AddRoomMessage,
   DefaultMessage,
   DefaultSentMessage,
   GrowlMessage,
-  PingMessage,
+  PingMessage, SaveChannelSettings,
   SetProfileImageMessage,
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage,
-  UserProfileChangedMessage
+  UserProfileChangedMessage, WebRtcSetConnectionIdMessage
 } from '@/types/messages';
 import {
   convertUser,
   currentUserInfoDtoToModel,
   userSettingsDtoToModel
 } from '@/types/converters';
-import {UserProfileDto, UserSettingsDto} from '@/types/dto';
+import {
+  UserProfileDto,
+  UserSettingsDto
+} from '@/types/dto';
 import {sub} from '@/utils/sub';
 import {DefaultStore} from '@/utils/store';
 
@@ -90,22 +94,20 @@ export default class WsHandler extends MessageHandler {
     return this.wsConnectionId;
   }
 
-  public offerFile(roomId: number, browser: string, name: string, size: number, cb: Function) {
-    this.sendToServer({
+  public async offerFile(roomId: number, browser: string, name: string, size: number): Promise<WebRtcSetConnectionIdMessage> {
+    return this.sendToServerAndAwait({
       action: 'offerFile',
       roomId: roomId,
       content: {browser, name, size}
     });
-    this.appendCB(cb);
   }
 
-  public offerCall(roomId: number, browser: string, cb: Function) {
-    this.sendToServer({
+  public async offerCall(roomId: number, browser: string): Promise<WebRtcSetConnectionIdMessage> {
+    return this.sendToServerAndAwait({
       action: 'offerCall',
       roomId: roomId,
       content: {browser}
     });
-    this.appendCB(cb);
   }
 
 public acceptFile(connId: string, received: number) {
@@ -167,25 +169,21 @@ public acceptFile(connId: string, received: number) {
   }
 
   public async saveSettings(content: UserSettingsDto): Promise<SetSettingsMessage|unknown> {
-    this.sendToServer({
+    return this.sendToServerAndAwait({
       action: 'setSettings',
       content
     });
-
-    return new Promise((resolve, reject) => this.appendCB(resolve));
   }
 
   public async saveUser(content: UserProfileDto): Promise<SetUserProfileMessage|unknown> {
-    this.sendToServer({
+    return this.sendToServerAndAwait({
       action: 'setUserProfile',
       content
     });
-
-    return new Promise((resolve, reject) => this.appendCB(resolve));
   }
 
-  public sendAddRoom(name: string|null, volume: number, notifications: boolean, users: number[], channelId: number|null, cb: Function) {
-    this.sendToServer({
+  public async sendAddRoom(name: string|null, volume: number, notifications: boolean, users: number[], channelId: number|null): Promise<AddRoomMessage> {
+    return this.sendToServerAndAwait({
       users,
       name,
       channelId,
@@ -193,24 +191,36 @@ public acceptFile(connId: string, received: number) {
       volume,
       notifications
     });
-    this.appendCB(cb);
   }
 
-  public sendAddChannel(channelName: string, cb: Function) {
-    this.sendToServer({
+  public async sendAddChannel(channelName: string): Promise<AddChannelMessage> {
+    return this.sendToServerAndAwait({
       channelName,
       action: 'addChannel'
     });
-    this.appendCB(cb);
   }
 
-  public inviteUser(roomId: number, users: number[], cb: Function) {
-    this.sendToServer({
+  public async sendDeleteChannel(channelId: number): Promise<unknown> {
+    return this.sendToServerAndAwait({
+      channelId,
+      action: 'deleteChannel'
+    });
+  }
+
+  public async saveChannelSettings(channelName: string, channelId: number): Promise<SaveChannelSettings> {
+    return this.sendToServerAndAwait({
+      action: 'saveChannelSettings',
+      channelId,
+      channelName
+    });
+  }
+
+  public async inviteUser(roomId: number, users: number[]): Promise<AddInviteMessage> {
+    return this.sendToServerAndAwait({
       roomId,
       users,
       action: 'inviteUser'
     });
-    this.appendCB(cb);
   }
 
   public startListening() {
@@ -246,22 +256,20 @@ public acceptFile(connId: string, received: number) {
     this.logger.debug('Finished ws: {}', info.join(', '))();
   }
 
-  public sendLeaveRoom(roomId: number, cb: Function) {
-    this.sendToServer({
+  public async sendLeaveRoom(roomId: number) {
+    return this.sendToServerAndAwait({
       roomId,
       action: 'deleteRoom'
     });
-    this.appendCB(cb);
   }
 
   public async sendLoadMessages(roomId: number, headerId: number|undefined, count: number) {
-    this.sendToServer({
+    return this.sendToServerAndAwait({
       headerId,
       count,
       action: 'loadMessages',
       roomId
     });
-    await new Promise((resolve, reject) => this.appendCB(resolve));
   }
 
   public isWsOpen() {
@@ -494,9 +502,13 @@ public acceptFile(connId: string, received: number) {
     }
   }
 
-  private appendCB(cb: Function) {
-    this.callBacks[this.messageId] = cb;
-    this.logger.debug('Appending cb {}', cb)();
+  private sendToServerAndAwait<T extends DefaultSentMessage> (messageRequest: T): Promise<any> {
+    return new Promise((resolve, reject) => {
+      messageRequest.messageId = this.getMessageId();
+      this.sendToServer(messageRequest);
+      this.callBacks[messageRequest.messageId] = resolve;
+    })
+
   }
 
   private onWsClose(e: CloseEvent) {

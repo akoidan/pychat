@@ -22,6 +22,7 @@
   import AddUserToRoom from "@/components/pages/parts/AddUserToRoom";
   import {RoomDictModel, RoomModel, UserModel} from "@/types/model";
   import {AddInviteMessage} from "@/types/messages";
+  import {ApplyGrowlErr} from '@/utils/utils';
 
   @Component({components: { AppSubmit, AddUserToRoom}})
   export default class InviteUser extends Vue {
@@ -44,15 +45,13 @@
       return this.currentRoom.users;
     }
 
-    add() {
+    @ApplyGrowlErr({runningProp: 'running'})
+    async add() {
       if (this.currentUsers.length > 0) {
-        this.running = true;
-        this.$ws.inviteUser(this.currentRoomId, this.currentUsers.map(u => u.id), (e: AddInviteMessage) => {
-          this.running = false;
-          if (e.roomId) {
-            this.$router.replace(`/chat/${e.roomId}`);
-          }
-        });
+        const e = await this.$ws.inviteUser(this.currentRoomId, this.currentUsers.map(u => u.id));
+        if (e.roomId) {
+          this.$router.replace(`/chat/${e.roomId}`);
+        }
       } else {
         this.store.growlError("Please select at least one user");
       }

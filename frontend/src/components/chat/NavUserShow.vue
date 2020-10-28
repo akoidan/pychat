@@ -44,6 +44,7 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import {UserModel} from '@/types/model';
 import {PrivateRoomsIds} from '@/types/types';
 import {AddRoomMessage} from '@/types/messages';
+import {ApplyGrowlErr} from '@/utils/utils';
 @Component
 export default class NavUserShow extends Vue {
 
@@ -57,17 +58,13 @@ export default class NavUserShow extends Vue {
     return this.privateRoomsUsersIds.userRooms[this.activeUser.id];
   }
 
-  public writeMessage() {
-    if (!this.running) {
-      this.running = true;
-      this.$ws.sendAddRoom(null, 50, true, [this.activeUser.id], null,(e: AddRoomMessage) => {
-        if (e && e.roomId) {
-          this.$router.replace(`/chat/${e.roomId}`);
-        }
-        this.store.setActiveUserId(0);
-        this.running = false;
-      });
+  @ApplyGrowlErr({runningProp: 'running'})
+  public async writeMessage() {
+    let e = await this.$ws.sendAddRoom(null, 50, true, [this.activeUser.id], null);
+    if (e && e.roomId) {
+      this.$router.replace(`/chat/${e.roomId}`);
     }
+    this.store.setActiveUserId(0);
   }
 
   public closeActiveUser() {

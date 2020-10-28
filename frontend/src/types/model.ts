@@ -113,6 +113,10 @@ export interface ChannelsDictModel {
   [id: string]: ChannelModel;
 }
 
+export interface ChannelsDictUIModel {
+  [id: string]: ChannelUIModel;
+}
+
 export interface SearchModel {
   searchActive: boolean;
   searchedIds: number[];
