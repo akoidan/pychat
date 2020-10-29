@@ -67,7 +67,9 @@ export default class PainterPage extends Vue {
   }
 }
 </script>
-
+<style lang="sass">
+  @import "~spainter/no-fonts.sass"
+</style>
 <style lang="sass" scoped>
 
   @import "~@/assets/sass/partials/abstract_classes"
@@ -81,7 +83,6 @@ export default class PainterPage extends Vue {
     .active-icon
       color: red
 
-  @import "~spainter/no-fonts.sass"
 
   @media screen and (max-height: 600px)
     .container /deep/ .painterTools
