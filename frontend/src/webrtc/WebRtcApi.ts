@@ -66,9 +66,7 @@ export default class WebRtcApi extends MessageHandler {
   public async offerFile(file: File, channel: number) {
     if (file.size > 0) {
       const e = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size);
-      if (e.connId) {
-        new FileSender(channel, e.connId, this.wsHandler, this.notifier, this.store, file, e.time);
-      }
+      new FileSender(channel, e.connId, this.wsHandler, this.notifier, this.store, file, e.time);
     } else {
       this.store.growlError(`File ${file.name} size is 0. Skipping sending it...`);
     }

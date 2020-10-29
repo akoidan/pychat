@@ -47,7 +47,7 @@ export default class WsHandler extends MessageHandler {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes = {
-    growl: <HandlerType>this.growl,
+    growlError: <HandlerType>this.growl,
     setSettings: <HandlerType>this.setSettings,
     setUserProfile: <HandlerType>this.setUserProfile,
     setProfileImage: <HandlerType>this.setProfileImage,
@@ -66,7 +66,7 @@ export default class WsHandler extends MessageHandler {
   private readonly sessionHolder: SessionHolder;
   private listenWsTimeout: number|null = null;
   private readonly API_URL: string;
-  private readonly callBacks: { [id: number]: Function } = {};
+  private readonly callBacks: { [id: number]: {resolve: Function; reject: Function} } = {};
 
   private messageId: number = 0;
   private wsState: WsState = WsState.NOT_INITED;
@@ -110,7 +110,7 @@ export default class WsHandler extends MessageHandler {
     });
   }
 
-public acceptFile(connId: string, received: number) {
+  public acceptFile(connId: string, received: number) {
     this.sendToServer({
       action: 'acceptFile',
       connId,
@@ -446,7 +446,11 @@ public acceptFile(connId: string, received: number) {
     }
     if (data.messageId && this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.wsConnectionId)) {
       this.logger.debug('resolving cb')();
-      this.callBacks[data.messageId](data);
+      if (data.action === 'growlError') {
+        this.callBacks[data.messageId].reject(data);
+      } else {
+        this.callBacks[data.messageId].resolve(data);
+      }
       delete this.callBacks[data.messageId];
     }
   }
@@ -506,7 +510,7 @@ public acceptFile(connId: string, received: number) {
     return new Promise((resolve, reject) => {
       messageRequest.messageId = this.getMessageId();
       this.sendToServer(messageRequest);
-      this.callBacks[messageRequest.messageId] = resolve;
+      this.callBacks[messageRequest.messageId] = {resolve, reject}
     })
 
   }
@@ -519,7 +523,7 @@ public acceptFile(connId: string, received: number) {
         this.logger.debug('Resolving cb {}', cb)();
         const cbFn = this.callBacks[cb];
         delete this.callBacks[cb];
-        cbFn({});
+        cbFn.reject();
         this.logger.debug('Cb {} has been resolved', cb)();
       } catch (e) {
         this.logger.debug('Error {} during resolving cb {}', e, cb)();

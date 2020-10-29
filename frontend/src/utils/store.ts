@@ -651,6 +651,12 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  public deleteChannel(channelId: number) {
+    Vue.delete(this.channelsDict, String(channelId));
+    this.storage.deleteChannel(channelId);
+  }
+
+  @Mutation
   public logout() {
     this.userInfo = null;
     this.userSettings = null;

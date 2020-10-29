@@ -139,9 +139,7 @@ export default class UserProfileSettings extends Vue {
     this.logger.debug('Saving userSettings')();
     const cui: UserSettingsDto = {...this.model};
     const e: SetSettingsMessage|unknown = await this.$ws.saveSettings(cui);
-    if ((e as SetSettingsMessage).action === 'setSettings') {
-        this.store.growlSuccess('Settings have been saved');
-    }
+    this.store.growlSuccess('Settings have been saved');
   }
 }
 </script>

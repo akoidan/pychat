@@ -363,6 +363,12 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
+  public deleteChannel(id: number) {
+    this.write(t => {
+      this.executeSql(t, 'update channel set deleted = 1 where id = ? ', [id])();
+    });
+  }
+
   public saveRoomUsers(ru: SetRoomsUsers) {
     this.write((t: SQLTransaction) => {
       this.setRoomUsers(t, ru.roomId, ru.users);

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="top-div">
     <form
         class="holder"
         v-if="channel"
@@ -21,10 +21,9 @@
             >
           </td>
         </tr>
-        <tr>
+        <tr v-if="showDelete">
           <td colspan="2">
             <app-submit
-                v-if="showDelete"
                 type="button"
                 class="red-btn"
                 value="DELETE THIS CHANNEL"
@@ -46,7 +45,7 @@
       </table>
     </form>
     <div v-else>
-      Room #{{ channelId }} doesn't exist
+      Channel #{{ channelId }} doesn't exist
     </div>
   </div>
 </template>
@@ -101,6 +100,8 @@
     @ApplyGrowlErr({runningProp: 'running'})
     public async deleteChannel(): Promise<void> {
       await this.$ws.sendDeleteChannel(this.channelId);
+      this.store.growlSuccess('Channel has been deleted');
+      this.$router.go(-1);
     }
 
     created() {
@@ -112,8 +113,29 @@
   }
 </script>
 <!-- eslint-disable -->
-<style
-    lang="sass"
-    scoped
->
+<style lang="sass" scoped>
+
+  .top-div
+    display: flex
+    justify-content: center
+
+  .holder
+    overflow-y: auto
+    display: flex
+    justify-content: center
+    align-items: center
+
+    input[type=text]
+      width: 150px
+
+    th
+      text-align: right
+    th, td
+      padding: 5px
+    td
+      text-align: center
+      > *
+        margin: auto
+      &[colspan="2"] > *
+        width: 100%
 </style>

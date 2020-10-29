@@ -49,9 +49,7 @@
     async add() {
       if (this.currentUsers.length > 0) {
         const e = await this.$ws.inviteUser(this.currentRoomId, this.currentUsers.map(u => u.id));
-        if (e.roomId) {
-          this.$router.replace(`/chat/${e.roomId}`);
-        }
+        this.$router.replace(`/chat/${e.roomId}`);
       } else {
         this.store.growlError("Please select at least one user");
       }

@@ -134,6 +134,7 @@ export  interface IStorage {
   saveMessages(messages: MessageModel[]): void;
   deleteMessage(id: number): void;
   deleteRoom(id: number): void;
+  deleteChannel(id: number): void;
   saveMessage(m: MessageModel): void;
   updateRoom(m: RoomSettingsModel): void;
   setRooms(rooms: RoomSettingsModel[]): void;

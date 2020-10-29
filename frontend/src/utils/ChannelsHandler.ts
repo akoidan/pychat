@@ -32,7 +32,9 @@ import {
   AddInviteMessage,
   AddOnlineUserMessage,
   AddRoomBase,
-  AddRoomMessage, DefaultMessage,
+  AddRoomMessage,
+  DefaultMessage,
+  DeleteChannel,
   DeleteMessage,
   DeleteRoomMessage,
   EditMessage,
@@ -78,7 +80,8 @@ export default class ChannelsHandler extends MessageHandler {
     addChannel: <HandlerType>this.addChannel,
     inviteUser: <HandlerType>this.inviteUser,
     addInvite: <HandlerType>this.addInvite,
-    saveChannelSettings: <HandlerType>this.saveChannelSettings
+    saveChannelSettings: <HandlerType>this.saveChannelSettings,
+    deleteChannel: <HandlerType>this.deleteChannel
   };
   private readonly store: DefaultStore;
   private readonly api: Api;
@@ -441,6 +444,10 @@ export default class ChannelsHandler extends MessageHandler {
       roomId: message.roomId,
       users: message.users
     } as SetRoomsUsers);
+  }
+
+  private deleteChannel(message: DeleteChannel) {
+    this.store.deleteChannel(message.channelId);
   }
 
   private addInvite(message: AddInviteMessage) {

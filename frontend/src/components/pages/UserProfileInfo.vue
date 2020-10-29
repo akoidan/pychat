@@ -133,9 +133,7 @@ export default class UserProfileInfo extends Vue {
     this.logger.debug('Saving userProfile')();
     const cui: UserProfileDto = {...this.model};
     const e: SetUserProfileMessage | unknown = await this.$ws.saveUser(cui);
-    if (e && (e as SetUserProfileMessage).action === 'setUserProfile') {
-      this.store.growlSuccess('User profile has been saved');
-    }
+    this.store.growlSuccess('User profile has been saved');
   }
 }
 </script>

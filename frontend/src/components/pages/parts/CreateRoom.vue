@@ -135,9 +135,7 @@ export default class CreateRoom extends Vue {
           this.currentUsers.map(u => u.id),
           this.selectedChannelId
       );
-      if (e && e.roomId) {
-        this.$router.replace(`/chat/${e.roomId}`);
-      }
+      this.$router.replace(`/chat/${e.roomId}`);
     }
   }
 

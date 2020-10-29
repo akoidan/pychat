@@ -60,6 +60,7 @@ export default class LocalStorage implements IStorage {
 
   public deleteMessage(id: number) {}
   public deleteRoom(id: number) {}
+  public deleteChannel(id: number) {}
   public updateRoom(m: RoomSettingsModel)  {}
   public setRooms(rooms: RoomSettingsModel[])  {}
   public setChannels(channels: ChannelModel[]) {}

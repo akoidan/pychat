@@ -1,5 +1,6 @@
 from django.conf import settings
 
+
 class Actions(object):
 	LOGIN = 'addOnlineUser'
 	SET_WS_ID = 'setWsId'
@@ -12,7 +13,7 @@ class Actions(object):
 	CANCEL_CALL_CONNECTION = 'cancelCallConnection'
 	ACCEPT_CALL = 'acceptCall'
 	ACCEPT_FILE = 'acceptFile'
-	GROWL_MESSAGE = 'growl'
+	GROWL_ERROR_MESSAGE = 'growlError'
 	GET_MESSAGES = 'loadMessages'
 	DELETE_ROOM = 'deleteRoom'
 	DELETE_MY_ROOM = DELETE_ROOM
@@ -38,6 +39,7 @@ class Actions(object):
 	PONG = 'pong'
 	CHECK_PING = 'check_ping'
 	SAVE_CHANNEL_SETTINGS = 'saveChannelSettings'
+	DELETE_CHANNEL = 'deleteChannel'
 
 
 class VarNames(object):

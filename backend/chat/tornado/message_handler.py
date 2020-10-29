@@ -14,7 +14,7 @@ from tornadoredis import Client
 from chat.global_redis import remove_parsable_prefix, encode_message
 from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
-	UploadedFile, Image, get_milliseconds, UserProfile, Channel
+	UploadedFile, Image, get_milliseconds, UserProfile, Channel, User
 from chat.py2_3 import str_type, quote
 from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST, \
 	REDIS_DB
@@ -63,11 +63,12 @@ class MessagesHandler(MessagesCreator):
 		self.process_ws_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
 			Actions.SEND_MESSAGE: self.process_send_message,
-			Actions.DELETE_ROOM: self.delete_channel,
+			Actions.DELETE_ROOM: self.delete_room,
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM: self.create_new_room,
 			Actions.CREATE_CHANNEL: self.create_new_channel,
 			Actions.SAVE_CHANNEL_SETTINGS: self.save_channels_settings,
+			Actions.DELETE_CHANNEL: self.delete_channel,
 			Actions.SET_USER_PROFILE: self.profile_save_user,
 			Actions.SET_SETTINGS: self.profile_save_settings,
 			Actions.INVITE_USER: self.invite_user,
@@ -509,6 +510,29 @@ class MessagesHandler(MessagesCreator):
 		IOLoop.instance().call_later(settings.PING_CLOSE_SERVER_DELAY, call_check)
 
 	def delete_channel(self, message):
+		channel_id = message[VarNames.CHANNEL_ID]
+		channel = Channel.objects.get(id=channel_id)
+		if channel.creator_id != self.user_id:
+			raise ValidationError(f"Only creator can delete this channel. Please ask ${User.objects.get(id=channel.creator_id).username}")
+		# if Room.objects.filter(channel_id=channel_id).count() > 0:
+		users_id = list(RoomUsers.objects.filter(room__channel_id=channel_id).values_list('user_id', flat=True))
+		if len(users_id) > 0:
+			raise ValidationError(f"Some users are still in the rooms on this channel Please ask them to leave")
+		Room.objects.filter(channel_id=channel_id).update(disabled=True)
+		channel.disabled = True
+		channel.save()
+
+		message = {
+			VarNames.EVENT: Actions.DELETE_CHANNEL,
+			VarNames.CHANNEL_ID: channel_id,
+			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+			VarNames.TIME: get_milliseconds(),
+			VarNames.CB_BY_SENDER: self.id,
+			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID]
+		}
+		self.publish(message, self.channel)
+
+	def delete_room(self, message):
 		room_id = message[VarNames.ROOM_ID]
 		js_id = message[VarNames.JS_MESSAGE_ID]
 		if room_id not in self.channels or room_id == ALL_ROOM_ID:

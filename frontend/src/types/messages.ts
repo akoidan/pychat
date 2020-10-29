@@ -22,6 +22,10 @@ export interface DefaultMessage extends DefaultSentMessage {
 export interface SaveChannelSettings extends DefaultMessage, ChannelDto {
 }
 
+export interface DeleteChannel extends DefaultMessage {
+  channelId: number;
+}
+
 export interface WebRtcDefaultMessage extends DefaultMessage {
   connId: string;
 }
