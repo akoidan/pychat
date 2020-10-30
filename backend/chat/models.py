@@ -5,8 +5,24 @@ from enum import Enum
 from time import mktime
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
-from django.db import models
-from django.db.models import CharField, DateField, FileField, BooleanField, URLField
+from django.db.models import \
+	CharField,\
+	DateField,\
+	FileField,\
+	BooleanField,\
+	URLField,\
+	ForeignKey,\
+	Model,\
+	CASCADE, \
+	DateTimeField,\
+	EmailField,\
+	PROTECT,\
+	ManyToManyField,\
+	BigIntegerField,\
+	TextField, \
+	IntegerField,\
+	FloatField, \
+	SmallIntegerField
 
 from chat.log_filters import id_generator
 from chat.settings import GENDERS, DEFAULT_PROFILE_ID, JS_CONSOLE_LOGS
@@ -55,7 +71,7 @@ class User(AbstractBaseUser):
 	objects = BaseUserManager()
 
 	# ISO/IEC 5218 1 male, 2 - female
-	sex = models.SmallIntegerField(null=False, default=0)
+	sex = SmallIntegerField(null=False, default=0)
 
 	@property
 	def sex_str(self):
@@ -73,15 +89,15 @@ class User(AbstractBaseUser):
 	__metaclass__ = myoverridenmeta
 
 
-class Subscription(models.Model):
-	user = models.ForeignKey(User, models.CASCADE, null=False)
+class Subscription(Model):
+	user = ForeignKey(User, CASCADE, null=False)
 	inactive = BooleanField(default=False, null=False)
-	registration_id = models.CharField(null=False, max_length=191, unique=True)
-	created = models.DateTimeField(default=datetime.datetime.now)
-	updated = models.DateTimeField(default=datetime.datetime.now)
-	agent = models.CharField(max_length=64, null=True, blank=True)
+	registration_id = CharField(null=False, max_length=191, unique=True)
+	created = DateTimeField(default=datetime.datetime.now)
+	updated = DateTimeField(default=datetime.datetime.now)
+	agent = CharField(max_length=64, null=True, blank=True)
 	is_mobile = BooleanField(default=False, null=False, blank=True)
-	ip = models.ForeignKey('IpAddress', models.CASCADE, null=True, blank=True)
+	ip = ForeignKey('IpAddress', CASCADE, null=True, blank=True)
 
 	def __unicode__(self):
 		return self.__str__()
@@ -90,7 +106,7 @@ class Subscription(models.Model):
 		return str(self.id)
 
 
-class Verification(models.Model):
+class Verification(Model):
 
 	class TypeChoices(Enum):
 		register = 'r'
@@ -99,12 +115,12 @@ class Verification(models.Model):
 		confirm_email = 'c'
 
 	# a - account activation, r - recover
-	type = models.CharField(null=False, max_length=1)
-	token = models.CharField(max_length=17, null=False, default=id_generator)
-	user = models.ForeignKey(User, models.CASCADE, null=False)
-	time = models.DateTimeField(default=datetime.datetime.now)
+	type = CharField(null=False, max_length=1)
+	token = CharField(max_length=17, null=False, default=id_generator)
+	user = ForeignKey(User, CASCADE, null=False)
+	time = DateTimeField(default=datetime.datetime.now)
 	verified = BooleanField(default=False)
-	email = models.EmailField(null=True, unique=False, blank=True, max_length=190)
+	email = EmailField(null=True, unique=False, blank=True, max_length=190)
 
 	def __unicode__(self):
 		return self.__str__()
@@ -128,7 +144,7 @@ class UserProfile(User):
 	name = CharField(max_length=30, null=True, blank=True)
 	surname = CharField(max_length=30, null=True, blank=True)
 	# tho email max length is 254 characted mysql supports unique keys only 767 bytes long (utf8 4 bytes = 767/4 = 191)
-	email = models.EmailField(null=True, unique=True, blank=True, max_length=190)
+	email = EmailField(null=True, unique=True, blank=True, max_length=190)
 	city = CharField(max_length=50, null=True, blank=True)
 
 	birthday = DateField(null=True, blank=True)
@@ -145,7 +161,7 @@ class UserProfile(User):
 	message_sound = BooleanField(null=False, default=True)
 	send_logs = BooleanField(null=False, default=True)
 
-	email_verification = models.ForeignKey(Verification, models.CASCADE, null=True, blank=True)
+	email_verification = ForeignKey(Verification, CASCADE, null=True, blank=True)
 
 	def save(self, *args, **kwargs):
 		"""
@@ -158,19 +174,20 @@ class UserProfile(User):
 		super(UserProfile, self).save(*args, **kwargs)
 
 
-class Channel(models.Model):
+class Channel(Model):
 	"""
 	Groups room.
 	"""
 	name = CharField(max_length=16, null=False, blank=False)
 	disabled = BooleanField(default=False, null=False)
-	creator = models.ForeignKey(User, models.CASCADE, related_name='creator')
+	creator = ForeignKey(User, CASCADE, related_name='creator')
 
 
-class Room(models.Model):
+class Room(Model):
 	name = CharField(max_length=16, null=True, blank=True)
-	channel = models.ForeignKey(Channel, models.PROTECT, null=True)
-	users = models.ManyToManyField(User, related_name='rooms', through='RoomUsers')
+	channel = ForeignKey(Channel, PROTECT, null=True)
+	p2p = BooleanField(default=False, null=False)
+	users = ManyToManyField(User, related_name='rooms', through='RoomUsers')
 	# We don't delete private rooms, in order when a person creates a room again he sees his prev history
 	disabled = BooleanField(default=False, null=False)
 
@@ -194,30 +211,30 @@ def get_milliseconds(dt=None):
 		return mktime(dt.time.timetuple()) * 1000 + int(dt.time.microsecond / 1000)
 
 
-class MessageHistory(models.Model):
-	time = models.BigIntegerField(default=get_milliseconds)
-	message = models.ForeignKey('Message', models.CASCADE, null=False)
-	content = models.TextField(null=True, blank=True)
+class MessageHistory(Model):
+	time = BigIntegerField(default=get_milliseconds)
+	message = ForeignKey('Message', CASCADE, null=False)
+	content = TextField(null=True, blank=True)
 	giphy = URLField(null=True, blank=True)
 
 
-class Message(models.Model):
+class Message(Model):
 	"""
 	Contains all public messages
 	"""
-	sender = models.ForeignKey(User, models.CASCADE, related_name='sender')
-	room = models.ForeignKey(Room, models.CASCADE, null=True)
+	sender = ForeignKey(User, CASCADE, related_name='sender')
+	room = ForeignKey(Room, CASCADE, null=True)
 	# DateField.auto_now
-	time = models.BigIntegerField(default=get_milliseconds)
-	content = models.TextField(null=True, blank=True)
+	time = BigIntegerField(default=get_milliseconds)
+	content = TextField(null=True, blank=True)
 	# if symbol = null - no images refers this row
 	# symbol is the same as "select max(symbol) from images where message_id = message.id
 	# we store symbol in this table in case if user edits message
 	# - images that refers same message always have unique symbols
-	symbol = models.CharField(null=True, max_length=1, blank=True)
+	symbol = CharField(null=True, max_length=1, blank=True)
 	deleted = BooleanField(default=False)
 	giphy = URLField(null=True, blank=True)
-	edited_times = models.IntegerField(default=0, null=False)
+	edited_times = IntegerField(default=0, null=False)
 
 	def __unicode__(self):
 		return self.__str__()
@@ -234,7 +251,7 @@ class Message(models.Model):
 		return "{}/{}".format(self.id, v)
 
 
-class UploadedFile(models.Model):
+class UploadedFile(Model):
 	class UploadedFileChoices(Enum):
 		video = 'v'
 		media_record= 'm'
@@ -242,10 +259,10 @@ class UploadedFile(models.Model):
 		image = 'i'
 		preview = 'p'
 		issue = 's'
-	symbol = models.CharField(null=False, max_length=1)
+	symbol = CharField(null=False, max_length=1)
 	file = FileField(upload_to=get_random_path, null=True)
-	user = models.ForeignKey(User, models.CASCADE, null=False)
-	type = models.CharField(null=False, max_length=1)
+	user = ForeignKey(User, CASCADE, null=False)
+	type = CharField(null=False, max_length=1)
 
 	@property
 	def type_enum(self):
@@ -256,18 +273,18 @@ class UploadedFile(models.Model):
 		self.type = p_type.value
 
 
-class Image(models.Model):
+class Image(Model):
 
 	class MediaTypeChoices(Enum):
 		video = 'v'
 		image = 'i'
 
 	# character in Message.content that will be replaced with this image
-	symbol = models.CharField(null=False, max_length=1)
-	message = models.ForeignKey(Message, models.CASCADE, related_name='message', null=False)
+	symbol = CharField(null=False, max_length=1)
+	message = ForeignKey(Message, CASCADE, related_name='message', null=False)
 	img = FileField(upload_to=get_random_path, null=True)
 	preview = FileField(upload_to=get_random_path, null=True)
-	type = models.CharField(null=False, max_length=1, default=MediaTypeChoices.image.value)
+	type = CharField(null=False, max_length=1, default=MediaTypeChoices.image.value)
 
 	@property
 	def type_enum(self):
@@ -281,11 +298,11 @@ class Image(models.Model):
 		unique_together = ('symbol', 'message')
 
 
-class RoomUsers(models.Model):
-	room = models.ForeignKey(Room, models.CASCADE, null=False)
-	user = models.ForeignKey(User, models.CASCADE, null=False)
-	last_read_message = models.ForeignKey(Message, models.CASCADE, null=True)
-	volume = models.IntegerField(default=2, null=False)
+class RoomUsers(Model):
+	room = ForeignKey(Room, CASCADE, null=False)
+	user = ForeignKey(User, CASCADE, null=False)
+	last_read_message = ForeignKey(Message, CASCADE, null=True)
+	volume = IntegerField(default=2, null=False)
 	notifications = BooleanField(null=False, default=True)
 
 	class Meta:  # pylint: disable=C1001
@@ -293,9 +310,9 @@ class RoomUsers(models.Model):
 		db_table = ''.join((User._meta.app_label, '_room_users'))
 
 
-class SubscriptionMessages(models.Model):
-	message = models.ForeignKey(Message, models.CASCADE, null=False)
-	subscription = models.ForeignKey(Subscription, models.CASCADE, null=False)
+class SubscriptionMessages(Model):
+	message = ForeignKey(Message, CASCADE, null=False)
+	subscription = ForeignKey(Subscription, CASCADE, null=False)
 	received = BooleanField(null=False, default=False)
 
 	class Meta:  # pylint: disable=C1001
@@ -303,35 +320,35 @@ class SubscriptionMessages(models.Model):
 		db_table = ''.join((User._meta.app_label, '_subscription_message'))
 
 
-class Issue(models.Model):
-	content = models.TextField(null=False)  # unique = true, but mysql doesnt allow unique fields for unspecified size
+class Issue(Model):
+	content = TextField(null=False)  # unique = true, but mysql doesnt allow unique fields for unspecified size
 
 	def __str__(self):
 		return self.content
 
 
-class IssueDetails(models.Model):
-	sender = models.ForeignKey(User, models.CASCADE, null=True)
-	browser = models.CharField(null=True, max_length=32, blank=True)
-	version = models.CharField(null=True, max_length=32, blank=True)
-	time = models.DateField(default=datetime.datetime.now, blank=True)
-	issue = models.ForeignKey(Issue, models.CASCADE, related_name='issue')
+class IssueDetails(Model):
+	sender = ForeignKey(User, CASCADE, null=True)
+	browser = CharField(null=True, max_length=32, blank=True)
+	version = CharField(null=True, max_length=32, blank=True)
+	time = DateField(default=datetime.datetime.now, blank=True)
+	issue = ForeignKey(Issue, CASCADE, related_name='issue')
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((User._meta.app_label, '_issue_detail'))
 
 
-class IpAddress(models.Model):
-	ip = models.CharField(null=False, max_length=32, unique=True)
-	isp = models.CharField(null=True, max_length=32, blank=True)
-	country_code = models.CharField(null=True, max_length=16, blank=True)
-	country = models.CharField(null=True, max_length=32, blank=True)
-	region = models.CharField(null=True, max_length=32, blank=True)
-	city = models.CharField(null=True, max_length=32, blank=True)
-	lat = models.FloatField(null=True, blank=True)
-	lon = models.FloatField(null=True, blank=True)
-	zip = models.CharField(null=True, max_length=32, blank=True)
-	timezone = models.CharField(null=True, max_length=32, blank=True)
+class IpAddress(Model):
+	ip = CharField(null=False, max_length=32, unique=True)
+	isp = CharField(null=True, max_length=32, blank=True)
+	country_code = CharField(null=True, max_length=16, blank=True)
+	country = CharField(null=True, max_length=32, blank=True)
+	region = CharField(null=True, max_length=32, blank=True)
+	city = CharField(null=True, max_length=32, blank=True)
+	lat = FloatField(null=True, blank=True)
+	lon = FloatField(null=True, blank=True)
+	zip = CharField(null=True, max_length=32, blank=True)
+	timezone = CharField(null=True, max_length=32, blank=True)
 
 	def __str__(self):
 		return self.ip
@@ -348,10 +365,10 @@ class IpAddress(models.Model):
 		db_table = ''.join((User._meta.app_label, '_ip_address'))
 
 
-class UserJoinedInfo(models.Model):
-	ip = models.ForeignKey(IpAddress, models.CASCADE, null=True)
-	user = models.ForeignKey(User, models.CASCADE, null=True)
-	time = models.DateField(default=datetime.datetime.now)
+class UserJoinedInfo(Model):
+	ip = ForeignKey(IpAddress, CASCADE, null=True)
+	user = ForeignKey(User, CASCADE, null=True)
+	time = DateField(default=datetime.datetime.now)
 
 	class Meta:  # pylint: disable=C1001
 		db_table = ''.join((User._meta.app_label, '_user_joined_info'))
