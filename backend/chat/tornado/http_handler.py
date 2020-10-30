@@ -579,28 +579,6 @@ class HttpHandler(MethodDispatcher):
 
 	@require_http_method('POST')
 	@login_required_no_redirect
-	# @transaction.atomic TODO, is this works in single thread?
-	def save_room_settings(self, roomId, roomName, volume, notifications):
-
-		"""
-		POST only, validates email during registration
-		"""
-		room_id = roomId
-		room_name = roomName
-		updated = RoomUsers.objects.filter(room_id=room_id, user_id=self.user_id).update(
-			volume=volume,
-			notifications=notifications == 'true',
-		)
-		if updated != 1:
-			raise ValidationError("You don't have access to this room")
-		if room_name is not None:
-			room_name = room_name.strip()
-			if room_name and int(room_id) != settings.ALL_ROOM_ID:
-				Room.objects.filter(id=room_id).update(name=room_name)
-		return settings.VALIDATION_IS_OK
-
-	@require_http_method('POST')
-	@login_required_no_redirect
 	@extract_nginx_files
 	# @transaction.atomic TODO, is this works in single thread?
 	def upload_file(self, files):

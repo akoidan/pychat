@@ -11,13 +11,18 @@ import {DefaultMessage} from '@/types/messages';
 
 export type SexModelDto = 'Male' | 'Female' |'Secret';
 
-export interface RoomDto {
-  name: string;
-  users: number[];
+
+export interface RoomNoUsersDto {
   channelId: number;
   notifications: boolean;
+  p2p: boolean;
   volume: number;
   roomId: number;
+  name: string;
+}
+
+export interface RoomDto  extends  RoomNoUsersDto {
+  users: number[];
 }
 
 export interface ChannelDto {

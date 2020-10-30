@@ -23,6 +23,7 @@ import {
   MessageModel,
   RoomDictModel,
   RoomModel,
+  RoomSettingsModel,
   UserDictModel,
   UserModel
 } from '@/types/model';
@@ -41,7 +42,7 @@ import {
   InviteUserMessage,
   LeaveUserMessage,
   LoadMessages,
-  RemoveOnlineUserMessage, SaveChannelSettings
+  RemoveOnlineUserMessage, SaveChannelSettings, SaveRoomSettings
 } from '@/types/messages';
 import {
   ChannelDto,
@@ -54,7 +55,7 @@ import {
 import {
   convertFiles,
   convertUser,
-  getChannelDict,
+  getChannelDict, getRoom,
   getRoomsBaseDict
 } from '@/types/converters';
 import WsHandler from '@/utils/WsHandler';
@@ -81,7 +82,8 @@ export default class ChannelsHandler extends MessageHandler {
     inviteUser: <HandlerType>this.inviteUser,
     addInvite: <HandlerType>this.addInvite,
     saveChannelSettings: <HandlerType>this.saveChannelSettings,
-    deleteChannel: <HandlerType>this.deleteChannel
+    deleteChannel: <HandlerType>this.deleteChannel,
+    saveRoomSettings: <HandlerType>this.saveRoomSettings
   };
   private readonly store: DefaultStore;
   private readonly api: Api;
@@ -431,6 +433,15 @@ export default class ChannelsHandler extends MessageHandler {
     } else {
       const c: ChannelModel = getChannelDict(message);
       this.store.addChannel(c);
+    }
+  }
+
+  private saveRoomSettings(message: SaveRoomSettings) {
+    if (!this.store.roomsDict[message.roomId]) {
+      this.logger.error('Unable to find channel to edit {} to kick user, available are {}', message.roomId, Object.keys(this.store.roomsDict))();
+    } else {
+      const r: RoomSettingsModel = getRoom(message);
+      this.store.setRoomSettings(r);
     }
   }
 

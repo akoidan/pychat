@@ -15,22 +15,21 @@
             >
           </td>
         </tr>
-        <tr>
-          <th>Parent channel</th>
+        <tr v-if="!isPublic">
+          <th>
+            Peer to peer
+          </th>
           <td>
-            <select class="input" v-model="selectedChannelId">
-              <option :value="null" selected>W/o channel</option>
-              <option
-                  v-for="channel in channels"
-                  :key="channel.id"
-                  :value="channel.id"
-              >
-                {{ channel.name }}
-              </option>
-            </select>
+            <app-checkbox v-model="p2p" />
           </td>
         </tr>
-        <tr>
+        <tr v-if="isPublic">
+          <th>Parent channel</th>
+          <td>
+            <parent-channel v-model="selectedChannelId"/>
+          </td>
+        </tr>
+        <tr v-if="!p2p">
           <th>
             Notifications
           </th>
@@ -83,19 +82,22 @@ import {AddRoomMessage} from '@/types/messages';
 import AppCheckbox from '@/components/ui/AppCheckbox';
 import {PrivateRoomsIds} from '@/types/types';
 import {ApplyGrowlErr} from '@/utils/utils';
+import ParentChannel from '@/components/pages/parts/ParentChannel.vue';
 
-@Component({components: {AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})
+@Component({components: {
+    ParentChannel,
+    AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})
 export default class CreateRoom extends Vue {
 
   @State
   public readonly privateRoomsUsersIds!: PrivateRoomsIds;
   @State
   public readonly userInfo!: CurrentUserInfoModel;
-  @State
-  public readonly channels!: ChannelUIModel[];
+
   public currentUsers: UserModel[] = [];
   public notifications: boolean = false;
   public sound: number = 0;
+  public p2p: boolean = false;
   public selectedChannelId: number|null = null;
   public roomName: string = '';
   public running: boolean = false;
@@ -125,18 +127,19 @@ export default class CreateRoom extends Vue {
   public async add() {
     if (this.isPublic && !this.roomName) {
       throw Error('Please specify room name');
-    } else if (!this.isPublic && this.currentUsers.length === 0) {
-      throw Error('Please add user');
-    } else {
-      const e = await this.$ws.sendAddRoom(
-          this.roomName ? this.roomName : null,
-          this.sound,
-          this.notifications,
-          this.currentUsers.map(u => u.id),
-          this.selectedChannelId
-      );
-      this.$router.replace(`/chat/${e.roomId}`);
     }
+    if (!this.isPublic && this.currentUsers.length === 0) {
+      throw Error('Please add user');
+    }
+    const e = await this.$ws.sendAddRoom(
+        this.roomName ? this.roomName : null,
+        this.isPublic ? false : this.p2p,
+        this.sound,
+        !this.p2p && this.notifications,
+        this.currentUsers.map(u => u.id),
+        this.selectedChannelId
+    );
+    this.$router.replace(`/chat/${e.roomId}`);
   }
 
 }

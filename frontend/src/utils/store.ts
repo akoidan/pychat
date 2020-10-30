@@ -4,7 +4,9 @@ import Vuex from 'vuex';
 import loggerFactory from '@/utils/loggerFactory';
 import {
   ChannelModel,
-  ChannelsDictModel, ChannelsDictUIModel, ChannelUIModel,
+  ChannelsDictModel,
+  ChannelsDictUIModel,
+  ChannelUIModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   EditingMessage,
@@ -511,9 +513,18 @@ export class DefaultStore extends VuexModule {
   @Mutation
   public setRoomSettings(srm: RoomSettingsModel) {
     const room = this.roomsDict[srm.id];
+    if (room.name !== srm.name) {
+      room.changeName.push({
+        newName: srm.name,
+        oldName: room.name,
+        time: Date.now()
+      });
+    }
     room.notifications = srm.notifications;
     room.volume = srm.volume;
     room.name = srm.name;
+    room.p2p = srm.p2p;
+    room.channelId = srm.channelId;
     this.storage.updateRoom(srm);
   }
 

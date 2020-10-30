@@ -68,6 +68,7 @@ class MessagesHandler(MessagesCreator):
 			Actions.CREATE_ROOM: self.create_new_room,
 			Actions.CREATE_CHANNEL: self.create_new_channel,
 			Actions.SAVE_CHANNEL_SETTINGS: self.save_channels_settings,
+			Actions.SAVE_ROOM_SETTINGS: self.save_room_settings,
 			Actions.DELETE_CHANNEL: self.delete_channel,
 			Actions.SET_USER_PROFILE: self.profile_save_user,
 			Actions.SET_SETTINGS: self.profile_save_settings,
@@ -339,25 +340,35 @@ class MessagesHandler(MessagesCreator):
 		users = list(set(users))
 		if room_name and len(room_name) > 16:
 			raise ValidationError('Incorrect room name "{}"'.format(room_name))
-		create_user_rooms = True
-		if not room_name and  len(users) == 2:
+		create_room = True
+		if not room_name and len(users) == 2:
 			user_rooms = evaluate(Room.users.through.objects.filter(user_id=self.user_id, room__name__isnull=True).values('room_id'))
 			user_id = users[0] if users[1] == self.user_id else users[1]
 			try:
 				room = RoomUsers.objects.filter(user_id=user_id, room__in=user_rooms).values('room__id', 'room__disabled').get()
 				room_id = room['room__id']
-				if room['room__disabled']:
-					Room.objects.filter(id=room_id).update(disabled=False)
+				if room['room__disabled']: # only a private room can be disabled
+					Room.objects.filter(id=room_id).update(disabled=False, p2p=message[VarNames.P2P])
+					RoomUsers.objects.filter(
+						user_id=self.user_id,
+						room_id=room_id
+					).update(
+						volume=message[VarNames.VOLUME],
+						notifications=message[VarNames.NOTIFICATIONS]
+					)
 				else:
 					raise ValidationError('This room already exist')
-				create_user_rooms = False
+				create_room = False
 			except RoomUsers.DoesNotExist:
 				pass
 		elif not room_name:
 			raise ValidationError('At least one user should be selected, or room should be public')
+
+		if channel_id and channel_id not in self.get_users_channels_ids():
+			raise ValidationError("You don't have access to this channel")
 		channel_name = Channel.objects.get(id=channel_id).name if channel_id else None
-		if create_user_rooms:
-			room = Room(name=room_name, channel_id=channel_id)
+		if create_room:
+			room = Room(name=room_name, channel_id=channel_id, p2p=message[VarNames.P2P])
 			room.save()
 			room_id = room.id
 			max_id = Message.objects.all().aggregate(Max('id'))['id__max']
@@ -378,6 +389,7 @@ class MessagesHandler(MessagesCreator):
 			VarNames.INVITER_USER_ID: self.user_id,
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
 			VarNames.VOLUME: message[VarNames.VOLUME],
+			VarNames.P2P: message[VarNames.P2P],
 			VarNames.NOTIFICATIONS: message[VarNames.NOTIFICATIONS],
 			VarNames.ROOM_NAME: room_name,
 			VarNames.TIME: get_milliseconds(),
@@ -389,6 +401,74 @@ class MessagesHandler(MessagesCreator):
 		jsoned_mess = encode_message(m, True)
 		for user in users:
 			self.raw_publish(jsoned_mess, RedisPrefix.generate_user(user))
+
+	def save_room_settings(self, message):
+		"""
+		POST only, validates email during registration
+		"""
+		room_id = message[VarNames.ROOM_ID]
+		room_name = message[VarNames.ROOM_NAME]
+		updated = RoomUsers.objects.filter(room_id=room_id, user_id=self.user_id).update(
+			volume=message[VarNames.VOLUME],
+			notifications=message[VarNames.NOTIFICATIONS]
+		)
+		if updated != 1:
+			raise ValidationError("You don't have access to this room")
+		room = Room.objects.get(id=room_id)
+		update_all = False
+		if not room.name:
+			if room.p2p != message[VarNames.P2P]:
+				room.p2p = message[VarNames.P2P]
+				update_all = True
+		elif room_id != settings.ALL_ROOM_ID:
+			if room_name != room.name:
+				room.name = room_name
+				update_all = True
+
+			if room.channel_id != message[VarNames.CHANNEL_ID]:
+				room.channel_id = message[VarNames.CHANNEL_ID]
+				if room.channel_id and room.channel_id not in self.get_users_channels_ids():
+					raise ValidationError("You don't have access to this channel")
+				update_all = True
+
+		channel_name = Channel.objects.get(id=message[VarNames.CHANNEL_ID]).name if message[VarNames.CHANNEL_ID] else None
+		if update_all:
+			room.save()
+			room_users = list(RoomUsers.objects.filter(room_id=room_id))
+			for room_user in room_users:
+				self.publish({
+					VarNames.EVENT: Actions.SAVE_ROOM_SETTINGS,
+					VarNames.CHANNEL_ID: room.channel_id,
+					VarNames.CB_BY_SENDER: self.id,
+					VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+					VarNames.CHANNEL_NAME: channel_name,
+					VarNames.ROOM_ID: room.id,
+					VarNames.VOLUME: room_user.volume,
+					VarNames.NOTIFICATIONS: room_user.notifications,
+					VarNames.P2P: message[VarNames.P2P],
+					VarNames.ROOM_NAME: room_name,
+					VarNames.TIME: get_milliseconds(),
+					VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
+				}, RedisPrefix.generate_user(room_user.user_id))
+		else:
+			self.publish({
+				VarNames.EVENT: Actions.SAVE_ROOM_SETTINGS,
+				VarNames.CHANNEL_ID: room.channel_id,
+				VarNames.CB_BY_SENDER: self.id,
+				VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
+				VarNames.CHANNEL_NAME: channel_name,
+				VarNames.ROOM_ID: room.id,
+				VarNames.VOLUME: message[VarNames.VOLUME],
+				VarNames.NOTIFICATIONS: message[VarNames.NOTIFICATIONS],
+				VarNames.P2P: message[VarNames.P2P],
+				VarNames.ROOM_NAME: room_name,
+				VarNames.TIME: get_milliseconds(),
+				VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
+			}, self.channel)
+
+	def get_users_channels_ids(self):
+		channels_ids = Room.objects.filter(users__id=self.user_id, disabled=False).values_list('channel_id', flat=True)
+		return Channel.objects.filter(Q(id__in=channels_ids) | Q(creator=self.user_id), disabled=False).values_list('id', flat=True)
 
 	def profile_save_settings(self, in_message):
 		message = in_message[VarNames.CONTENT]
@@ -425,7 +505,6 @@ class MessagesHandler(MessagesCreator):
 		self.publish(self.set_user_profile(in_message[VarNames.JS_MESSAGE_ID], message), self.channel)
 		if userprofile.sex_str != sex or userprofile.username != un:
 			self.publish(self.changed_user_profile(sex, self.user_id, un), settings.ALL_ROOM_ID)
-
 
 	def profile_save_image(self, request):
 		pass

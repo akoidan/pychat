@@ -97,6 +97,7 @@ export interface RoomSettingsModel {
   id: number;
   name: string;
   channelId: null | number;
+  p2p: boolean;
   notifications: boolean;
   volume: number;
 }
@@ -127,6 +128,12 @@ export interface SearchModel {
 export interface ChangeOnline {
   userId: number;
   isWentOnline: boolean;
+  time: number;
+}
+
+export interface ChangeRoomName {
+  oldName: string;
+  newName: string;
   time: number;
 }
 
@@ -204,6 +211,7 @@ export interface RoomModel extends RoomSettingsModel {
   search: SearchModel;
   newMessagesCount: number;
   changeOnline: ChangeOnline[];
+  changeName: ChangeRoomName[];
 }
 
 export interface IncomingCallModel {

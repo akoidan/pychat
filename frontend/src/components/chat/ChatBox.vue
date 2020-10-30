@@ -21,6 +21,13 @@
           :user-id="message.userId"
           :is-went-online="message.isWentOnline"
         />
+        <chat-change-name-message
+          v-if="message.isChangeName"
+          :key="message.time"
+          :time="message.time"
+          :old-name="message.oldName"
+          :new-name="message.newName"
+        />
         <fieldset
           v-else-if="message.fieldDay"
           :key="message.fieldDay"
@@ -66,9 +73,12 @@
   import ChatReceivingFile from '@/components/chat/ChatReceivingFile';
   import ChatCall from '@/components/chat/ChatCall';
   import {ApplyGrowlErr} from '@/utils/utils';
+  import ChatChangeNameMessage
+    from '@/components/chat/ChatChangeNameMessage.vue';
 
   @Component({
     components: {
+      ChatChangeNameMessage,
       ChatCall,
       ChatReceivingFile,
       ChatSendingFile,
@@ -115,6 +125,7 @@
 
     get messages() {
       let newArray: any[] = this.room.changeOnline.map(value => ({isChangeOnline: true, ...value}));
+      newArray.push(...this.room.changeName.map(value => ({isChangeName: true, ...value})));
       let dates: {[id: string]: boolean} = {};
       for (let m in this.room.sendingFiles) {
         let sendingFile: SendingFile = this.room.sendingFiles[m];

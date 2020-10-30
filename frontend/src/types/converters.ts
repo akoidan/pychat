@@ -5,13 +5,14 @@ import {
   RoomModel,
   UserModel,
   Location,
-  SexModelString, ChannelModel
+  SexModelString, ChannelModel, RoomSettingsModel
 } from '@/types/model';
 import {
   ChannelDto,
   FileModelDto,
   LocationDto,
   RoomDto,
+  RoomNoUsersDto,
   SexModelDto,
   UserDto,
   UserProfileDto,
@@ -61,12 +62,24 @@ export function getChannelDict(
   return {name: channelName, id: channelId!, expanded: oldChannel?.expanded ?? false};
 }
 
+export function getRoom(r: RoomNoUsersDto): RoomSettingsModel {
+  return  {
+    channelId: r.channelId,
+    p2p: r.p2p,
+    id: r.roomId,
+    name: r.name,
+    notifications: r.notifications,
+    volume: r.volume
+  }
+}
+
 export function getRoomsBaseDict(
     {
       roomId,
       volume,
       channelId,
       notifications,
+      p2p,
       name,
       users
     }: {
@@ -74,6 +87,7 @@ export function getRoomsBaseDict(
       volume: number;
       channelId: number|null;
       notifications: boolean;
+      p2p: boolean;
       name: string;
       users: number[];
     },
@@ -85,6 +99,7 @@ export function getRoomsBaseDict(
     sendingFiles: oldRoom ? oldRoom.sendingFiles : {},
     channelId,
     volume,
+    p2p,
     callInfo: {
       calls: {},
       mediaStreamLink: null,
@@ -103,6 +118,7 @@ export function getRoomsBaseDict(
     messages: oldRoom ? oldRoom.messages : {},
     newMessagesCount: oldRoom ? oldRoom.newMessagesCount : 0,
     changeOnline: oldRoom ? oldRoom.changeOnline : [],
+    changeName: oldRoom ? oldRoom.changeName : [],
     allLoaded: oldRoom ? oldRoom.allLoaded : false,
     search: oldRoom ? oldRoom.search : {
       searchActive: false,

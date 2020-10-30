@@ -14,6 +14,7 @@
             <input
               v-model="roomName"
               type="text"
+              :disabled="isMainRoom"
               :required="isPublic"
               class="input"
               maxlength="16"
@@ -43,7 +44,21 @@
             />
           </td>
         </tr>
-        <tr>
+        <tr v-if="!isPublic">
+          <th>
+            Peer to peer
+          </th>
+          <td>
+            <app-checkbox v-model="p2p" />
+          </td>
+        </tr>
+        <tr v-if="isPublic && !isMainRoom">
+          <th>Parent channel</th>
+          <td>
+            <parent-channel v-model="channelId"/>
+          </td>
+        </tr>
+        <tr v-if="!isMainRoom">
           <td colspan="2">
             <app-submit
               type="button"
@@ -79,7 +94,9 @@ import AppCheckbox from '@/components/ui/AppCheckbox';
 import {RoomDictModel, RoomModel, RoomSettingsModel} from '@/types/model';
 import {ApplyGrowlErr} from '@/utils/utils';
 import {ALL_ROOM_ID} from '@/utils/consts';
-@Component({components: {AppInputRange, AppSubmit, AppCheckbox}})
+import ParentChannel from '@/components/pages/parts/ParentChannel.vue';
+
+@Component({components: {ParentChannel, AppInputRange, AppSubmit, AppCheckbox}})
 export default class RoomSettings extends Vue {
 
   get room(): RoomModel {
@@ -95,12 +112,14 @@ export default class RoomSettings extends Vue {
 
   public roomName: string = '';
   public sound: number = 0;
+  public channelId: number|null = null;
   public notifications: boolean = false;
   public running: boolean = false;
   public isPublic: boolean = false;
+  public p2p: boolean = false;
+
   @State
   public readonly roomsDict!: RoomDictModel;
-
 
   @ApplyGrowlErr({runningProp: 'running'})
   public async leave() {
@@ -113,18 +132,14 @@ export default class RoomSettings extends Vue {
     this.setVars();
   }
 
+  get isMainRoom(): boolean {
+    return this.roomId === ALL_ROOM_ID;
+  }
+
   @ApplyGrowlErr({runningProp: 'running', message: `Can't set room settings`})
   public async apply() {
     this.logger.log('Applying room {} settings', this.roomId)();
-    await this.$api.sendRoomSettings(this.roomName, this.sound, this.notifications, this.roomId);
-    const payload: RoomSettingsModel = {
-      id: this.roomId,
-      name: this.roomName,
-      channelId: this.room.channelId,
-      notifications: this.notifications,
-      volume: this.sound
-    };
-    this.store.setRoomSettings(payload);
+    await this.$ws.sendRoomSettings(this.roomName, this.p2p, this.sound, this.notifications, this.roomId, this.channelId);
     this.store.growlSuccess('Settings has been saved');
     this.$router.go(-1);
   }
@@ -136,6 +151,8 @@ export default class RoomSettings extends Vue {
       this.isPublic = !!this.roomName;
       this.sound = this.room.volume;
       this.notifications = this.room.notifications;
+      this.p2p = this.room.p2p;
+      this.channelId = this.room.channelId;
     }
   }
 }

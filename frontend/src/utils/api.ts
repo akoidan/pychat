@@ -160,14 +160,6 @@ export default class Api extends MessageHandler {
     });
   }
 
-  public async sendRoomSettings(roomName: string, volume: number, notifications: boolean, roomId: number): Promise<void> {
-    return this.xhr.doPost({
-      url: '/save_room_settings',
-      params: {roomName, volume, notifications, roomId},
-      checkOkString: true
-    });
-  }
-
   public async uploadProfileImage(file: Blob): Promise<void> {
     const fd = new FormData();
     fd.append('file', file);

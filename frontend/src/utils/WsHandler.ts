@@ -47,7 +47,6 @@ export default class WsHandler extends MessageHandler {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes = {
-    growlError: <HandlerType>this.growl,
     setSettings: <HandlerType>this.setSettings,
     setUserProfile: <HandlerType>this.setUserProfile,
     setProfileImage: <HandlerType>this.setProfileImage,
@@ -182,10 +181,11 @@ export default class WsHandler extends MessageHandler {
     });
   }
 
-  public async sendAddRoom(name: string|null, volume: number, notifications: boolean, users: number[], channelId: number|null): Promise<AddRoomMessage> {
+  public async sendAddRoom(name: string|null, p2p: boolean, volume: number, notifications: boolean, users: number[], channelId: number|null): Promise<AddRoomMessage> {
     return this.sendToServerAndAwait({
       users,
       name,
+      p2p,
       channelId,
       action: 'addRoom',
       volume,
@@ -197,6 +197,18 @@ export default class WsHandler extends MessageHandler {
     return this.sendToServerAndAwait({
       channelName,
       action: 'addChannel'
+    });
+  }
+
+  public async sendRoomSettings(name: string, p2p: boolean, volume: number, notifications: boolean, roomId: number, channelId: number|null): Promise<void> {
+    return this.sendToServerAndAwait({
+      p2p,
+      action: 'saveRoomSettings',
+      name,
+      volume,
+      channelId,
+      notifications,
+      roomId
     });
   }
 
@@ -328,10 +340,6 @@ export default class WsHandler extends MessageHandler {
     this.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
   }
 
-  private growl(gm: GrowlMessage) {
-    this.store.growlError(gm.content);
-  }
-
   private setSettings(m: SetSettingsMessage) {
     const a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
     this.setUserSettings(a);
@@ -441,17 +449,20 @@ export default class WsHandler extends MessageHandler {
   }
 
   private handleMessage(data: DefaultMessage) {
-    if (data.handler !== 'void') {
+    if (data.handler !== 'void' && data.action !== 'growlError') {
       sub.notify(data);
     }
     if (data.messageId && this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.wsConnectionId)) {
       this.logger.debug('resolving cb')();
       if (data.action === 'growlError') {
-        this.callBacks[data.messageId].reject(data);
+        this.callBacks[data.messageId].reject(Error((data as GrowlMessage).content));
       } else {
         this.callBacks[data.messageId].resolve(data);
       }
       delete this.callBacks[data.messageId];
+    } else if (data.action === 'growlError') {
+      // growlError is used only in case above, so this is just a fallback that will never happen
+      this.store.growlError((data as GrowlMessage).content);
     }
   }
 

@@ -130,12 +130,13 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		# since we add user to online first, latest trigger will always show correct online
 		was_online, online = self.get_online_and_status_from_redis()
 		user_rooms_query = Room.objects.filter(users__id=self.user_id, disabled=False) \
-			.values('id', 'name', 'channel_id', 'roomusers__notifications', 'roomusers__volume')
+			.values('id', 'name', 'channel_id', 'p2p', 'roomusers__notifications', 'roomusers__volume')
 		room_users = [{
 			VarNames.ROOM_ID: room['id'],
 			VarNames.ROOM_NAME: room['name'],
 			VarNames.CHANNEL_ID: room['channel_id'],
 			VarNames.NOTIFICATIONS: room['roomusers__notifications'],
+			VarNames.P2P: room['p2p'],
 			VarNames.VOLUME: room['roomusers__volume'],
 			VarNames.ROOM_USERS: []
 		} for room in user_rooms_query]

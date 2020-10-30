@@ -60,7 +60,7 @@ export default class NavUserShow extends Vue {
 
   @ApplyGrowlErr({runningProp: 'running'})
   public async writeMessage() {
-    let e = await this.$ws.sendAddRoom(null, 50, true, [this.activeUser.id], null);
+    let e = await this.$ws.sendAddRoom(null, false,50, true, [this.activeUser.id], null);
     this.$router.replace(`/chat/${e.roomId}`);
     this.store.setActiveUserId(0);
   }

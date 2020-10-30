@@ -176,7 +176,7 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
       // @ts-ignore: next-line
       this[vueProperty] = `Error: ${strError}`;
     } else {
-      throw e;
+      store.growlError(strError);
     }
   };
 

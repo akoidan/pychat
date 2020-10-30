@@ -16,6 +16,7 @@ export interface RoomDB {
   id: number;
   name: string;
   notifications: BooleanDB;
+  p2p: BooleanDB;
   volume: number;
   channel_id: number;
   deleted: BooleanDB ;

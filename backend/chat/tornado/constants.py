@@ -39,6 +39,7 @@ class Actions(object):
 	PONG = 'pong'
 	CHECK_PING = 'check_ping'
 	SAVE_CHANNEL_SETTINGS = 'saveChannelSettings'
+	SAVE_ROOM_SETTINGS = 'saveRoomSettings'
 	DELETE_CHANNEL = 'deleteChannel'
 
 
@@ -87,6 +88,7 @@ class VarNames(object):
 	EDITED_TIMES = 'edited'
 	PREVIEW = 'preview'
 	DELETED = 'deleted'
+	P2P = 'p2p'
 
 
 class IpVarNames(object):

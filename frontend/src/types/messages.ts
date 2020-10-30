@@ -2,7 +2,8 @@ import {
   ChannelDto,
   FileModelDto,
   MessageModelDto,
-  RoomDto,
+  RoomDto, 
+  RoomNoUsersDto,
   SexModelDto,
   UserDto,
   UserProfileDto,
@@ -20,6 +21,9 @@ export interface DefaultMessage extends DefaultSentMessage {
 }
 
 export interface SaveChannelSettings extends DefaultMessage, ChannelDto {
+}
+
+export interface SaveRoomSettings extends DefaultMessage, RoomNoUsersDto {
 }
 
 export interface DeleteChannel extends DefaultMessage {
@@ -156,6 +160,7 @@ interface NewRoom extends DefaultMessage {
 }
 export interface AddRoomBase extends  NewRoom, ChannelDto {
   name: string;
+  p2p: boolean;
   notifications: boolean;
   volume: number;
 }

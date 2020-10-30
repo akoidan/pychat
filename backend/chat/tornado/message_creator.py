@@ -230,16 +230,6 @@ class MessagesCreator(object):
 			VarNames.ROOM_USERS: users
 		}
 
-	@staticmethod
-	def create_user_rooms(user_rooms):
-		res = {room['id']: {
-			VarNames.ROOM_NAME: room['name'],
-			VarNames.NOTIFICATIONS: room['roomusers__notifications'],
-			VarNames.VOLUME: room['roomusers__volume'],
-			VarNames.ROOM_USERS: []
-		} for room in user_rooms}
-		return res
-
 
 class WebRtcMessageCreator(object):
 
