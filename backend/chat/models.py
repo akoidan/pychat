@@ -208,6 +208,10 @@ class Room(Model):
 			CheckConstraint(
 				check=Q(creator__isnull=False) | Q(name__isnull=False),
 				name='creator_not_null_if_room_public'
+			),
+			CheckConstraint(
+				check=Q(p2p=False) | Q(name__isnull=True),
+				name='p2p_only_if_private'
 			)
 		]
 

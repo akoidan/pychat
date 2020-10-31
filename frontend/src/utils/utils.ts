@@ -166,7 +166,7 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
     }
 ) {
   const processError = function (e: Error|string) {
-    const strError: string = String((<Error>e).message || e);
+    const strError: string = String((<Error>e)?.message || e || 'Unknown error');
     if (vueProperty && message) {
       // @ts-ignore: next-line
       this[vueProperty] = `${message}: ${strError}`;
