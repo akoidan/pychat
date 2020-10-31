@@ -51,10 +51,10 @@
         </tr>
       </tbody>
     </table>
-    <add-user-to-room
+    <pick-user
       v-model="currentUsers"
       :text="inviteUsers"
-      :exclude-users-ids="excludeUsersIds"
+      :users-ids="userIds"
       :show-invite-users="showInviteUsers"
     />
     <app-submit
@@ -71,7 +71,7 @@ import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import AppInputRange from '@/components/ui/AppInputRange';
 import AppSubmit from '@/components/ui/AppSubmit';
-import AddUserToRoom from '@/components/pages/parts/AddUserToRoom';
+import PickUser from '@/components/pages/parts/PickUser';
 import {
   ChannelUIModel,
   CurrentUserInfoModel,
@@ -86,7 +86,7 @@ import ParentChannel from '@/components/pages/parts/ParentChannel.vue';
 
 @Component({components: {
     ParentChannel,
-    AppCheckbox, AppInputRange, AppSubmit, AddUserToRoom}})
+    AppCheckbox, AppInputRange, AppSubmit, PickUser}})
 export default class CreateRoom extends Vue {
 
   @State
@@ -94,7 +94,7 @@ export default class CreateRoom extends Vue {
   @State
   public readonly userInfo!: CurrentUserInfoModel;
 
-  public currentUsers: UserModel[] = [];
+  public currentUsers: number[] = [];
   public notifications: boolean = false;
   public sound: number = 0;
   public p2p: boolean = false;
@@ -112,16 +112,26 @@ export default class CreateRoom extends Vue {
     return this.isPublic || this.currentUsers.length < 1;
   }
 
-  get excludeUsersIds() {
+
+  get userIds(): number[] {
+
     let uids: number[];
     if (!this.isPublic) {
       uids = Object.values(this.privateRoomsUsersIds.roomUsers);
     } else {
       uids = [];
     }
+    uids.push(this.userInfo.userId);
 
-    return uids;
+    const users: number[] = [];
+    this.store.usersArray.forEach(a => {
+      if (uids.indexOf(a.id) < 0) {
+        users.push(a.id);
+      }
+    });
+    return users;
   }
+
 
   @ApplyGrowlErr({runningProp: 'running'})
   public async add() {
@@ -136,7 +146,7 @@ export default class CreateRoom extends Vue {
         this.isPublic ? false : this.p2p,
         this.sound,
         !this.p2p && this.notifications,
-        this.currentUsers.map(u => u.id),
+        this.currentUsers,
         this.selectedChannelId
     );
     this.$router.replace(`/chat/${e.roomId}`);

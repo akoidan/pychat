@@ -2,13 +2,13 @@
   <div class="controls">
     <div class="spanHo">
       <span
-        v-for="currentUser in value"
-        :key="currentUser.user"
+        v-for="currentUser in valueUsers"
+        :key="currentUser.id"
         class="spann"
       >{{ currentUser.user }}
         <i
           class="icon-cancel"
-          @click="removeUser(currentUser)"
+          @click="removeUser(currentUser.id)"
         />
       </span>
     </div>
@@ -24,8 +24,8 @@
       <ul>
         <li
           v-for="user in filteredUsers"
-          :key="user.user"
-          @click="addUser(user)"
+          :key="user.id"
+          @click="addUser(user.id)"
         >
           {{ user.user }}
         </li>
@@ -36,50 +36,51 @@
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {CurrentUserInfoModel, UserModel} from '@/types/model';
+import {State} from '@/utils/storeHolder';
 
 @Component
-export default class AddUserToRoom extends Vue {
+export default class PickUser extends Vue {
+
+  @Prop() public value!: number[];
+  @Prop() public text!: string;
+  @Prop() public usersIds!: number[];
+  @Prop({default: true}) public showInviteUsers!: boolean;
+
+  @State
+  public readonly allUsersDict!: {[id: number]: UserModel} ;
 
   public search: string = '';
 
-  @Prop() public value!: UserModel[];
-  @Prop() public text!: string;
-  @Prop() public excludeUsersIds!: number[];
-  @Prop({default: true}) public showInviteUsers!: boolean;
-
-  public removeUser(currentUser: UserModel) {
-    this.value.splice(this.value.indexOf(currentUser), 1);
+  get valueUsers(): UserModel[] {
+    return this.value.map(id => this.allUsersDict[id]);
   }
 
-  get users(): UserModel[] {
-    const uids: number[] = this.value.map(a => a.id);
-    uids.push(this.store.userInfo!.userId);
-    uids.push(...this.excludeUsersIds);
-    const users: UserModel[] = [];
-    this.store.usersArray.forEach(u => {
-      if (uids.indexOf(u.id) < 0) {
-        users.push(u);
-      }
-    });
-    this.logger.debug('Reeval users in CreatePrivateRoom')();
+  get displayedUserIds(): number[] {
+    return this.usersIds.filter(a => this.value.indexOf(a) < 0);
+  }
 
-    return users;
+  get displayedUsers(): UserModel[] {
+    return this.displayedUserIds.map(id => this.allUsersDict[id]);
   }
 
   get showAddUsersComp() {
-    return this.showInviteUsers && this.users.length > 0;
-  }
-
-  public addUser(user: UserModel) {
-    this.search = '';
-    this.value.push(user);
+    return this.showInviteUsers && this.displayedUserIds.length > 0;
   }
 
   get filteredUsers(): UserModel[] {
     this.logger.debug('Reeval filter CreatePrivateRoom')();
     const s = this.search.toLowerCase();
 
-    return this.users.filter(u => u.user.toLowerCase().indexOf(s) >= 0);
+    return this.displayedUsers.filter(u => u.user.toLowerCase().indexOf(s) >= 0);
+  }
+
+  public removeUser(id: number) {
+    this.value.splice(this.value.indexOf(id), 1);
+  }
+
+  public addUser(id: number) {
+    this.search = '';
+    this.value.push(id);
   }
 }
 </script>
@@ -121,6 +122,7 @@ export default class AddUserToRoom extends Vue {
     border-radius: 2px
     text-overflow: ellipsis
     overflow: hidden
+    text-align: left
     white-space: nowrap
     @extend %hovered-user-room
 </style>

@@ -13,12 +13,13 @@ export type SexModelDto = 'Male' | 'Female' |'Secret';
 
 
 export interface RoomNoUsersDto {
-  channelId: number;
+  channelId: number|null;
   notifications: boolean;
   p2p: boolean;
   volume: number;
   roomId: number;
   name: string;
+  roomCreatorId: number;
 }
 
 export interface RoomDto  extends  RoomNoUsersDto {
@@ -28,6 +29,7 @@ export interface RoomDto  extends  RoomNoUsersDto {
 export interface ChannelDto {
   channelName: string;
   channelId: number;
+  channelCreatorId: number;
 }
 
 export interface UserDto {

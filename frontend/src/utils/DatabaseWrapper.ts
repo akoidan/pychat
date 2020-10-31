@@ -47,8 +47,8 @@ export default class DatabaseWrapper implements IStorage {
         this.db!.changeVersion(this.db!.version, '1.0', resolve, reject);
       });
       t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text)');
-      t = await this.runSql(t, 'CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)))');
-      t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, p2p boolean NOT NULL CHECK (p2p IN (0,1)), notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id))');
+      t = await this.runSql(t, 'CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), creator INTEGER REFERENCES user(id))');
+      t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, p2p boolean NOT NULL CHECK (p2p IN (0,1)), notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id), creator INTEGER REFERENCES user(id))');
       t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (deleted IN (0,1)))');
       t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
       t = await this.runSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))');
@@ -134,6 +134,7 @@ export default class DatabaseWrapper implements IStorage {
           notifications: convertToBoolean(r.notifications),
           name: r.name,
           channelId: r.channel_id,
+          roomCreatorId: r.creator,
           users: [],
           volume: r.volume
         });
@@ -202,7 +203,8 @@ export default class DatabaseWrapper implements IStorage {
       dbChannels.forEach((c: ChannelDB) => {
         const chm: ChannelModel = getChannelDict({
           channelId: c.id,
-          channelName: c.name
+          channelName: c.name,
+          channelCreatorId: c.creator
         });
         channelsDict[c.id] = chm;
       });
@@ -378,7 +380,7 @@ export default class DatabaseWrapper implements IStorage {
 
   public updateRoom(r: RoomSettingsModel) {
     this.write(t => {
-      this.executeSql(t, 'update room set name = ?, volume = ?, notifications = ?, p2p = ? where id = ? ', [r.name, r.volume, r.notifications ? 1 : 0, r.p2p ? 1 : 0, r.id])();
+      this.executeSql(t, 'update room set name = ?, volume = ?, notifications = ?, p2p = ?, creator = ? where id = ? ', [r.name, r.volume, r.notifications ? 1 : 0, r.p2p ? 1 : 0, r.creator, r.id])();
     });
   }
 
@@ -457,11 +459,11 @@ export default class DatabaseWrapper implements IStorage {
   }
 
   private setRoom(t: SQLTransaction, room: RoomSettingsModel) {
-    this.executeSql(t, 'insert or replace into room (id, name, notifications, volume, deleted, channel_id, p2p) values (?, ?, ?, ?, ?, ?, ?)', [room.id, room.name, room.notifications ? 1 : 0, room.volume, 0, room.channelId, room.p2p ? 1 : 0])();
+    this.executeSql(t, 'insert or replace into room (id, name, notifications, volume, deleted, channel_id, p2p, creator) values (?, ?, ?, ?, ?, ?, ?, ?)', [room.id, room.name, room.notifications ? 1 : 0, room.volume, 0, room.channelId, room.p2p ? 1 : 0, room.creator])();
   }
 
   private setChannel(t: SQLTransaction, channel: ChannelModel) {
-    this.executeSql(t, 'insert or replace into channel (id, name, deleted) values (?, ?, ?)', [channel.id, channel.name, 0])();
+    this.executeSql(t, 'insert or replace into channel (id, name, deleted, creator) values (?, ?, ?, ?)', [channel.id, channel.name, 0, channel.creator])();
   }
 
   private insertRoomUsers(t: SQLTransaction, roomId: number, userId: number) {

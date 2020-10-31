@@ -130,11 +130,12 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		# since we add user to online first, latest trigger will always show correct online
 		was_online, online = self.get_online_and_status_from_redis()
 		user_rooms_query = Room.objects.filter(users__id=self.user_id, disabled=False) \
-			.values('id', 'name', 'channel_id', 'p2p', 'roomusers__notifications', 'roomusers__volume')
+			.values('id', 'name', 'creator_id', 'channel_id', 'p2p', 'roomusers__notifications', 'roomusers__volume')
 		room_users = [{
 			VarNames.ROOM_ID: room['id'],
 			VarNames.ROOM_NAME: room['name'],
 			VarNames.CHANNEL_ID: room['channel_id'],
+			VarNames.ROOM_CREATOR_ID: room['creator_id'],
 			VarNames.NOTIFICATIONS: room['roomusers__notifications'],
 			VarNames.P2P: room['p2p'],
 			VarNames.VOLUME: room['roomusers__volume'],
@@ -142,10 +143,11 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		} for room in user_rooms_query]
 		user_rooms_dict = {room[VarNames.ROOM_ID]: room for room in room_users}
 		channels_ids = [channel[VarNames.CHANNEL_ID] for channel in room_users if channel[VarNames.CHANNEL_ID]]
-		channels_db = Channel.objects.filter(Q(id__in=channels_ids) | Q(creator=self.user_id), disabled=False).values('id', 'name')
+		channels_db = Channel.objects.filter(Q(id__in=channels_ids) | Q(creator=self.user_id), disabled=False)
 		channels = [{
-			VarNames.CHANNEL_ID: channel['id'],
-			VarNames.CHANNEL_NAME: channel['name']
+			VarNames.CHANNEL_ID: channel.id,
+			VarNames.CHANNEL_NAME: channel.name,
+			VarNames.CHANNEL_CREATOR_ID: channel.creator_id
 		} for channel in channels_db]
 		room_ids = [room_id[VarNames.ROOM_ID] for room_id in room_users]
 		rooms_users = RoomUsers.objects.filter(room_id__in=room_ids).values('user_id', 'room_id')

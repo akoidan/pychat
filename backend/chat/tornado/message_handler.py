@@ -290,13 +290,20 @@ class MessagesHandler(MessagesCreator):
 
 	def save_channels_settings(self, message):
 		channel_id = message[VarNames.CHANNEL_ID]
-		channel_name = message.get(VarNames.CHANNEL_NAME)
+		channel_name = message[VarNames.CHANNEL_NAME]
+		new_creator = message[VarNames.CHANNEL_CREATOR_ID]
 		if not channel_name or len(channel_name) > 16:
 			raise ValidationError('Incorrect channel name name "{}"'.format(channel_name))
 		channel = Channel.objects.get(id=channel_id)
 		users_id = list(RoomUsers.objects.filter(room__channel_id=channel_id).values_list('user_id', flat=True))
 		if channel.creator_id != self.user_id and self.user_id not in users_id:
 			raise ValidationError("You are not allowed to edit this channel")
+		if new_creator != channel.creator_id:
+			if self.user_id != channel.creator_id:
+				raise ValidationError("Only admin can change the admin of this channel")
+			if new_creator not in users_id:
+				raise ValidationError("You can only change admin to one of the users in this channels room")
+			channel.creator_id = new_creator
 		if self.user_id not in users_id: # if channel has no rooms
 			users_id.append(self.user_id)
 		channel.name = channel_name
@@ -307,6 +314,7 @@ class MessagesHandler(MessagesCreator):
 			VarNames.CB_BY_SENDER: self.id,
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
 			VarNames.CHANNEL_NAME: channel_name,
+			VarNames.CHANNEL_CREATOR_ID: channel.creator_id,
 			VarNames.TIME: get_milliseconds(),
 			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID],
 		}
@@ -324,6 +332,7 @@ class MessagesHandler(MessagesCreator):
 		m = {
 			VarNames.EVENT: Actions.CREATE_CHANNEL,
 			VarNames.CHANNEL_ID: channel_id,
+			VarNames.CHANNEL_CREATOR_ID: channel.creator_id,
 			VarNames.CB_BY_SENDER: self.id,
 			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
 			VarNames.CHANNEL_NAME: channel_name,
@@ -366,9 +375,17 @@ class MessagesHandler(MessagesCreator):
 
 		if channel_id and channel_id not in self.get_users_channels_ids():
 			raise ValidationError("You don't have access to this channel")
-		channel_name = Channel.objects.get(id=channel_id).name if channel_id else None
+		if channel_id:
+			channel = Channel.objects.get(id=channel_id)
+			channel_name = channel.name
+			channel_creator_id = channel.creator_id
+		else:
+			channel_name = None
+			channel_creator_id = None
 		if create_room:
 			room = Room(name=room_name, channel_id=channel_id, p2p=message[VarNames.P2P])
+			if not room_name:
+				room.creator_id = self.user_id
 			room.save()
 			room_id = room.id
 			max_id = Message.objects.all().aggregate(Max('id'))['id__max']
@@ -398,6 +415,7 @@ class MessagesHandler(MessagesCreator):
 		if channel_id:
 			m[VarNames.CHANNEL_NAME] = channel_name
 			m[VarNames.CHANNEL_ID] = channel_id
+			m[VarNames.CHANNEL_CREATOR_ID] = channel_creator_id
 		jsoned_mess = encode_message(m, True)
 		for user in users:
 			self.raw_publish(jsoned_mess, RedisPrefix.generate_user(user))
@@ -408,6 +426,7 @@ class MessagesHandler(MessagesCreator):
 		"""
 		room_id = message[VarNames.ROOM_ID]
 		room_name = message[VarNames.ROOM_NAME]
+		creator_id = message[VarNames.ROOM_CREATOR_ID]
 		updated = RoomUsers.objects.filter(room_id=room_id, user_id=self.user_id).update(
 			volume=message[VarNames.VOLUME],
 			notifications=message[VarNames.NOTIFICATIONS]
@@ -430,8 +449,21 @@ class MessagesHandler(MessagesCreator):
 				if room.channel_id and room.channel_id not in self.get_users_channels_ids():
 					raise ValidationError("You don't have access to this channel")
 				update_all = True
-
-		channel_name = Channel.objects.get(id=message[VarNames.CHANNEL_ID]).name if message[VarNames.CHANNEL_ID] else None
+			if creator_id != room.creator_id:
+				if room.creator_id != self.user_id:
+					raise ValidationError("Only an owner of this room can change its admin")
+				users_id = RoomUsers.objects.filter(room_id=room.id).values_list('user_id', flat=True)
+				if creator_id not in users_id:
+					raise ValidationError("You can only change admin to one of the users in this channels room")
+				room.creator_id = creator_id
+				update_all = True
+		if message[VarNames.CHANNEL_ID]:
+			channel = Channel.objects.get(id=message[VarNames.CHANNEL_ID])
+			channel_name = channel.name
+			channel_creator_id = channel.creator_id
+		else:
+			channel_name = None
+			channel_creator_id = None
 		if update_all:
 			room.save()
 			room_users = list(RoomUsers.objects.filter(room_id=room_id))
@@ -442,6 +474,8 @@ class MessagesHandler(MessagesCreator):
 					VarNames.CB_BY_SENDER: self.id,
 					VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
 					VarNames.CHANNEL_NAME: channel_name,
+					VarNames.CHANNEL_CREATOR_ID: channel_creator_id,
+					VarNames.ROOM_CREATOR_ID: room.creator_id,
 					VarNames.ROOM_ID: room.id,
 					VarNames.VOLUME: room_user.volume,
 					VarNames.NOTIFICATIONS: room_user.notifications,
@@ -455,6 +489,8 @@ class MessagesHandler(MessagesCreator):
 				VarNames.EVENT: Actions.SAVE_ROOM_SETTINGS,
 				VarNames.CHANNEL_ID: room.channel_id,
 				VarNames.CB_BY_SENDER: self.id,
+				VarNames.CHANNEL_CREATOR_ID: channel_creator_id,
+				VarNames.ROOM_CREATOR_ID: room.creator_id,
 				VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
 				VarNames.CHANNEL_NAME: channel_name,
 				VarNames.ROOM_ID: room.id,
@@ -592,7 +628,7 @@ class MessagesHandler(MessagesCreator):
 		channel_id = message[VarNames.CHANNEL_ID]
 		channel = Channel.objects.get(id=channel_id)
 		if channel.creator_id != self.user_id:
-			raise ValidationError(f"Only creator can delete this channel. Please ask ${User.objects.get(id=channel.creator_id).username}")
+			raise ValidationError(f"Only admin can delete this channel. Please ask ${User.objects.get(id=channel.creator_id).username}")
 		# if Room.objects.filter(channel_id=channel_id).count() > 0:
 		users_id = list(RoomUsers.objects.filter(room__channel_id=channel_id).values_list('user_id', flat=True))
 		if len(users_id) > 0:
@@ -864,7 +900,6 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 				VarNames.EVENT: Actions.CLOSE_FILE_CONNECTION,
 				VarNames.CONTENT: in_message[VarNames.CONTENT]
 			}, sender_id)
-
 
 	def accept_file(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]

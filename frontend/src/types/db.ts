@@ -20,19 +20,13 @@ export interface RoomDB {
   volume: number;
   channel_id: number;
   deleted: BooleanDB ;
-}
-
-export interface RoomSettingsDB {
-  id: number;
-  name: string;
-  notifications: BooleanDB;
-  volume: number;
-  deleted: BooleanDB ;
+  creator: number;
 }
 
 export  interface ChannelDB {
   id: number;
   name: string;
+  creator: number;
 }
 
 export  interface MessageDB {

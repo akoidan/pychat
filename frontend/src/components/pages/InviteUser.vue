@@ -1,9 +1,9 @@
 <template>
   <div class="holder">
-    <add-user-to-room
+    <pick-user
       v-model="currentUsers"
       :text="`Add users to room ${currentRoom.name}`"
-      :exclude-users-ids="excludeUsersIds"
+      :users-ids="userIds"
     />
     <app-submit
       type="button"
@@ -19,18 +19,18 @@
   import {Component, Vue} from "vue-property-decorator";
   import {State} from '@/utils/storeHolder';
   import AppSubmit from "@/components/ui/AppSubmit";
-  import AddUserToRoom from "@/components/pages/parts/AddUserToRoom";
+  import PickUser from "@/components/pages/parts/PickUser";
   import {RoomDictModel, RoomModel, UserModel} from "@/types/model";
   import {AddInviteMessage} from "@/types/messages";
   import {ApplyGrowlErr} from '@/utils/utils';
 
-  @Component({components: { AppSubmit, AddUserToRoom}})
+  @Component({components: { AppSubmit, PickUser}})
   export default class InviteUser extends Vue {
 
     @State
     public readonly roomsDict!: RoomDictModel;
 
-    currentUsers: UserModel[] = [];
+    currentUsers: number[] = [];
     running: boolean = false;
 
     get currentRoomId(): number {
@@ -41,14 +41,20 @@
       return this.roomsDict[this.currentRoomId];
     }
 
-    get excludeUsersIds(): number[] {
-      return this.currentRoom.users;
+    get userIds(): number[] {
+      const users: number[] = [];
+      this.store.usersArray.forEach(a => {
+        if (this.currentRoom.users.indexOf(a.id) < 0) {
+          users.push(a.id);
+        }
+      });
+      return users;
     }
 
     @ApplyGrowlErr({runningProp: 'running'})
     async add() {
       if (this.currentUsers.length > 0) {
-        const e = await this.$ws.inviteUser(this.currentRoomId, this.currentUsers.map(u => u.id));
+        const e = await this.$ws.inviteUser(this.currentRoomId, this.currentUsers);
         this.$router.replace(`/chat/${e.roomId}`);
       } else {
         this.store.growlError("Please select at least one user");

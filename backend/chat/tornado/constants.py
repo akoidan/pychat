@@ -63,6 +63,8 @@ class VarNames(object):
 	ROOM_NAME = 'name'
 	CHANNEL_NAME = 'channelName'
 	CHANNEL_ID = 'channelId'
+	ROOM_CREATOR_ID = 'roomCreatorId'
+	CHANNEL_CREATOR_ID = 'channelCreatorId'
 	NOTIFICATIONS = 'notifications'
 	VOLUME = 'volume'
 	CURRENT_USER_INFO = 'userInfo'

@@ -55,11 +55,12 @@ export function convertSexToNumber(m: SexModelString): number {
 export function getChannelDict(
   {
     channelName,
+    channelCreatorId,
     channelId
   }: ChannelDto,
   oldChannel: ChannelModel|null = null
 ): ChannelModel {
-  return {name: channelName, id: channelId!, expanded: oldChannel?.expanded ?? false};
+  return {name: channelName, id: channelId!, creator: channelCreatorId, expanded: oldChannel?.expanded ?? false};
 }
 
 export function getRoom(r: RoomNoUsersDto): RoomSettingsModel {
@@ -69,7 +70,8 @@ export function getRoom(r: RoomNoUsersDto): RoomSettingsModel {
     id: r.roomId,
     name: r.name,
     notifications: r.notifications,
-    volume: r.volume
+    volume: r.volume,
+    creator: r.roomCreatorId
   }
 }
 
@@ -79,18 +81,11 @@ export function getRoomsBaseDict(
       volume,
       channelId,
       notifications,
+      roomCreatorId ,
       p2p,
       name,
       users
-    }: {
-      roomId: number;
-      volume: number;
-      channelId: number|null;
-      notifications: boolean;
-      p2p: boolean;
-      name: string;
-      users: number[];
-    },
+    }: RoomDto,
     oldRoom: RoomModel|null = null
 ): RoomModel {
   return {
@@ -115,6 +110,7 @@ export function getRoomsBaseDict(
     },
     notifications,
     name,
+    creator: roomCreatorId,
     messages: oldRoom ? oldRoom.messages : {},
     newMessagesCount: oldRoom ? oldRoom.newMessagesCount : 0,
     changeOnline: oldRoom ? oldRoom.changeOnline : [],

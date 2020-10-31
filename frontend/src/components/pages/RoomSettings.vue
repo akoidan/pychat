@@ -24,6 +24,22 @@
             </div>
           </td>
         </tr>
+        <tr v-if="isPublic">
+          <th>Admin</th>
+          <td v-if="canChangeAdmin">
+            <pick-user
+              v-model="admin"
+              :show-invite-users="showInviteUsers"
+              :users-ids="userIds"
+            />
+          </td>
+          <td v-else-if="oldAdmin">
+            {{oldAdmin.user}}
+          </td>
+          <td v-else>
+            This room doesn't have an admin
+          </td>
+        </tr>
         <tr>
           <th>
             Notifications
@@ -91,17 +107,32 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import AppInputRange from '@/components/ui/AppInputRange';
 import AppSubmit from '@/components/ui/AppSubmit';
 import AppCheckbox from '@/components/ui/AppCheckbox';
-import {RoomDictModel, RoomModel, RoomSettingsModel} from '@/types/model';
+import {
+  CurrentUserInfoModel,
+  RoomDictModel,
+  RoomModel,
+  RoomSettingsModel,
+  UserDictModel, UserModel
+} from '@/types/model';
 import {ApplyGrowlErr} from '@/utils/utils';
 import {ALL_ROOM_ID} from '@/utils/consts';
 import ParentChannel from '@/components/pages/parts/ParentChannel.vue';
+import PickUser from '@/components/pages/parts/PickUser.vue';
 
-@Component({components: {ParentChannel, AppInputRange, AppSubmit, AppCheckbox}})
+@Component({components: {
+    PickUser,
+    ParentChannel,
+    AppInputRange,
+    AppSubmit,
+    AppCheckbox
+}})
 export default class RoomSettings extends Vue {
 
   get room(): RoomModel {
     return this.roomsDict[this.roomId];
   }
+
+  public admin: number[] = [];
 
   get roomId(): number {
     const id = this.$route.params.id;
@@ -119,7 +150,13 @@ export default class RoomSettings extends Vue {
   public p2p: boolean = false;
 
   @State
+  public readonly userInfo!: CurrentUserInfoModel;
+
+  @State
   public readonly roomsDict!: RoomDictModel;
+
+  @State
+  public readonly allUsersDict!: UserDictModel;
 
   @ApplyGrowlErr({runningProp: 'running'})
   public async leave() {
@@ -128,20 +165,56 @@ export default class RoomSettings extends Vue {
     this.$router.replace(`/chat/${ALL_ROOM_ID}`);
   }
 
+  get showInviteUsers() {
+    return  this.admin.length < 1;
+  }
+
   public created() {
     this.setVars();
+  }
+
+  get canChangeAdmin() {
+    return this.isPublic && (!this.room.creator || this.userInfo.userId === this.room.creator);
+  }
+
+  get userIds(): number[] {
+    return [...this.room.users];
+  }
+
+  get oldAdmin(): UserModel|null {
+    if (this.room.creator) {
+      return this.allUsersDict[this.room.creator];
+    } else {
+      return null;
+    }
   }
 
   get isMainRoom(): boolean {
     return this.roomId === ALL_ROOM_ID;
   }
 
+  get singleAdmin(): number {
+    if (this.admin.length > 0) {
+      return this.admin[0];
+    } else {
+      return this.room.creator;
+    }
+  }
+
   @ApplyGrowlErr({runningProp: 'running', message: `Can't set room settings`})
   public async apply() {
     this.logger.log('Applying room {} settings', this.roomId)();
-    await this.$ws.sendRoomSettings(this.roomName, this.p2p, this.sound, this.notifications, this.roomId, this.channelId);
+    await this.$ws.sendRoomSettings({
+      roomCreatorId: this.singleAdmin,
+      volume: this.sound,
+      notifications: this.notifications,
+      name: this.roomName,
+      roomId: this.roomId,
+      p2p: this.p2p,
+      channelId: this.channelId
+    });
     this.store.growlSuccess('Settings has been saved');
-    this.$router.go(-1);
+    this.$router.replace(`/chat/${this.roomId}`);
   }
 
   private setVars() {
@@ -153,6 +226,11 @@ export default class RoomSettings extends Vue {
       this.notifications = this.room.notifications;
       this.p2p = this.room.p2p;
       this.channelId = this.room.channelId;
+      if (this.room.creator) {
+        this.admin = [this.room.creator];
+      } else {
+        this.admin = []
+      }
     }
   }
 }

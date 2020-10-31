@@ -42,7 +42,9 @@ import {
   InviteUserMessage,
   LeaveUserMessage,
   LoadMessages,
-  RemoveOnlineUserMessage, SaveChannelSettings, SaveRoomSettings
+  RemoveOnlineUserMessage,
+  SaveChannelSettings,
+  SaveRoomSettings
 } from '@/types/messages';
 import {
   ChannelDto,
@@ -422,7 +424,7 @@ export default class ChannelsHandler extends MessageHandler {
   private addRoom(message: AddRoomMessage) {
     this.mutateRoomAddition(message);
     if (message.channelId) {
-      let channelDict: ChannelModel = getChannelDict(message);
+      let channelDict: ChannelModel = getChannelDict(message as  Omit<AddRoomMessage, 'channelId'> & { channelId: number; });
       this.store.addChannel(channelDict);
     }
   }

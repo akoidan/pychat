@@ -21,7 +21,24 @@
             >
           </td>
         </tr>
-        <tr v-if="showDelete">
+        <tr>
+          <th>Admin</th>
+          <td v-if="isAdmin">
+            <pick-user
+                v-model="admin"
+                :show-invite-users="showInviteUsers"
+                :users-ids="userIds"
+            />
+          </td>
+          <td v-else-if="currentAdmin">
+            {{currentAdmin.user}}
+          </td>
+              <!-- TODO remove fallback in future-->
+          <td v-else>
+            This channel doesnt have an admin
+          </td>
+        </tr>
+        <tr v-if="noRooms && isAdmin">
           <td colspan="2">
             <app-submit
                 type="button"
@@ -53,22 +70,34 @@
   import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
   import {
     ChannelModel,
-    ChannelsDictModel, ChannelsDictUIModel, ChannelUIModel,
+    ChannelsDictModel,
+    ChannelsDictUIModel,
+    ChannelUIModel,
+    CurrentUserInfoModel,
     RoomDictModel,
-    RoomModel
+    RoomModel, UserModel
   } from '@/types/model';
   import {State} from '@/utils/storeHolder';
   import AppSubmit from '@/components/ui/AppSubmit.vue';
   import {ApplyGrowlErr} from '@/utils/utils';
+  import PickUser from '@/components/pages/parts/PickUser.vue';
 
   @Component({
-    components: {AppSubmit}
+    components: {PickUser, AppSubmit}
   })
   export default class ChannelSettings extends Vue {
 
     public running: boolean = false;
 
     public channelName!: string;
+
+    public admin: number[] = [];
+
+    @State
+    public readonly userInfo!: CurrentUserInfoModel;
+
+    @State
+    public readonly allUsersDict!: {[id: number]: UserModel} ;
 
     @State
     public readonly channelsDictUI!: ChannelsDictUIModel;
@@ -77,14 +106,42 @@
       return this.channelsDictUI[this.channelId];
     }
 
-    get showDelete(): boolean {
+    get showInviteUsers() {
+      return  this.admin.length < 1;
+    }
+
+    get singleAdmin(): number {
+      if (this.admin.length > 0) {
+        return this.admin[0];
+      } else {
+        return this.channel.creator;
+      }
+    }
+
+    get noRooms(): boolean {
       return this.channel.rooms.length === 0;
     }
 
+    get isAdmin(): boolean {
+      return this.channel.creator === this.userInfo.userId;
+    }
+
+    get userIds(): number[] {
+      let results: number[] = [this.userInfo.userId]; // channel can have no rooms,
+      this.channel.rooms.forEach(r => results.push(...r.users));
+      return Array.from(new Set(results));
+    }
+
+    get currentAdmin(): UserModel {
+      return this.allUsersDict[this.channel.creator];
+    }
 
     @ApplyGrowlErr({runningProp: 'running'})
     async apply() {
-      await this.$ws.saveChannelSettings(this.channelName, this.channelId);
+      if (this.isAdmin && this.admin.length === 0) {
+        throw Error("Pick an admin");
+      }
+      await this.$ws.saveChannelSettings(this.channelName, this.channelId, this.singleAdmin);
       this.store.growlSuccess('Settings has been saved');
       this.$router.go(-1);
     }
@@ -105,10 +162,9 @@
     }
 
     created() {
-      this.logger.log('Updated for room settings {} ', this.channel)();
-      if (this.channel) {
-        this.channelName = this.channel.name;
-      }
+      this.logger.log('Updated for channel settings {} ', this.channel)();
+      this.channelName = this.channel.name;
+      this.admin = [this.channel.creator];
     }
   }
 </script>

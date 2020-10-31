@@ -31,6 +31,7 @@ import {
   userSettingsDtoToModel
 } from '@/types/converters';
 import {
+  RoomNoUsersDto,
   UserProfileDto,
   UserSettingsDto
 } from '@/types/dto';
@@ -200,15 +201,10 @@ export default class WsHandler extends MessageHandler {
     });
   }
 
-  public async sendRoomSettings(name: string, p2p: boolean, volume: number, notifications: boolean, roomId: number, channelId: number|null): Promise<void> {
+  public async sendRoomSettings(message: RoomNoUsersDto): Promise<void> {
     return this.sendToServerAndAwait({
-      p2p,
-      action: 'saveRoomSettings',
-      name,
-      volume,
-      channelId,
-      notifications,
-      roomId
+      ...message,
+      action: 'saveRoomSettings'
     });
   }
 
@@ -219,10 +215,11 @@ export default class WsHandler extends MessageHandler {
     });
   }
 
-  public async saveChannelSettings(channelName: string, channelId: number): Promise<SaveChannelSettings> {
+  public async saveChannelSettings(channelName: string, channelId: number, channelCreatorId: number): Promise<SaveChannelSettings> {
     return this.sendToServerAndAwait({
       action: 'saveChannelSettings',
       channelId,
+      channelCreatorId,
       channelName
     });
   }
@@ -534,7 +531,12 @@ export default class WsHandler extends MessageHandler {
         this.logger.debug('Resolving cb {}', cb)();
         const cbFn = this.callBacks[cb];
         delete this.callBacks[cb];
-        cbFn.reject();
+        if (e.code === 1006) {
+          // tornado drops connection if exception occurs during processing an event we send from WsHandler
+          cbFn.reject('Server error');
+        } else {
+          cbFn.reject('Connection to server is lost')
+        }
         this.logger.debug('Cb {} has been resolved', cb)();
       } catch (e) {
         this.logger.debug('Error {} during resolving cb {}', e, cb)();

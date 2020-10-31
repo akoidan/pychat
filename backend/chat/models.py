@@ -6,23 +6,23 @@ from time import mktime
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
 from django.db.models import \
-	CharField,\
-	DateField,\
-	FileField,\
-	BooleanField,\
-	URLField,\
-	ForeignKey,\
-	Model,\
+	CharField, \
+	DateField, \
+	FileField, \
+	BooleanField, \
+	URLField, \
+	ForeignKey, \
+	Model, \
 	CASCADE, \
-	DateTimeField,\
-	EmailField,\
-	PROTECT,\
-	ManyToManyField,\
-	BigIntegerField,\
+	DateTimeField, \
+	EmailField, \
+	PROTECT, \
+	ManyToManyField, \
+	BigIntegerField, \
 	TextField, \
-	IntegerField,\
+	IntegerField, \
 	FloatField, \
-	SmallIntegerField
+	SmallIntegerField, CheckConstraint, Q
 
 from chat.log_filters import id_generator
 from chat.settings import GENDERS, DEFAULT_PROFILE_ID, JS_CONSOLE_LOGS
@@ -180,7 +180,7 @@ class Channel(Model):
 	"""
 	name = CharField(max_length=16, null=False, blank=False)
 	disabled = BooleanField(default=False, null=False)
-	creator = ForeignKey(User, CASCADE, related_name='creator')
+	creator = ForeignKey(User, CASCADE, null=False)
 
 
 class Room(Model):
@@ -188,8 +188,10 @@ class Room(Model):
 	channel = ForeignKey(Channel, PROTECT, null=True)
 	p2p = BooleanField(default=False, null=False)
 	users = ManyToManyField(User, related_name='rooms', through='RoomUsers')
-	# We don't delete private rooms, in order when a person creates a room again he sees his prev history
+	# We don't delete private rooms, in order when a person
+	# creates a room again he sees his prev history
 	disabled = BooleanField(default=False, null=False)
+	creator = ForeignKey(User, PROTECT, null=True)
 
 	@property
 	def is_private(self):
@@ -200,6 +202,14 @@ class Room(Model):
 
 	def __str__(self):
 		return "{}/{}".format(self.id, self.name)
+
+	class Meta:
+		constraints = [
+			CheckConstraint(
+				check=Q(creator__isnull=False) | Q(name__isnull=False),
+				name='creator_not_null_if_room_public'
+			)
+		]
 
 
 def get_milliseconds(dt=None):

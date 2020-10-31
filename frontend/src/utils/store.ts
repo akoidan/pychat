@@ -140,7 +140,8 @@ export class DefaultStore extends VuexModule {
             id: channel.id,
             expanded: channel.expanded,
             rooms: [],
-            name: channel.name
+            name: channel.name,
+            creator: channel.creator,
           };
         }
         dict[channelId].rooms.push(current);

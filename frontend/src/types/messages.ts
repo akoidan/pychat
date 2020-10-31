@@ -2,7 +2,7 @@ import {
   ChannelDto,
   FileModelDto,
   MessageModelDto,
-  RoomDto, 
+  RoomDto,
   RoomNoUsersDto,
   SexModelDto,
   UserDto,
@@ -154,15 +154,10 @@ interface RoomExistedBefore {
 
 interface NewRoom extends DefaultMessage {
   inviterUserId: number;
-  roomId: number;
   time: number;
-  users: number[];
 }
-export interface AddRoomBase extends  NewRoom, ChannelDto {
-  name: string;
-  p2p: boolean;
-  notifications: boolean;
-  volume: number;
+
+export interface AddRoomBase extends NewRoom,  Omit<ChannelDto, 'channelId'>, RoomDto {
 }
 
 export interface AcceptFileContent {
@@ -177,9 +172,13 @@ export interface AcceptCallMessage extends WebRtcDefaultMessage, OpponentWsId {
 }
 
 export interface InviteUserMessage extends NewRoom, RoomExistedBefore {
+  roomId: number;
+  users: number[];
 }
+
 export interface AddInviteMessage extends AddRoomBase, RoomExistedBefore {
 }
+
 export interface AddRoomMessage extends AddRoomBase {
 }
 

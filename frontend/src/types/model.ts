@@ -100,6 +100,7 @@ export interface RoomSettingsModel {
   p2p: boolean;
   notifications: boolean;
   volume: number;
+  creator: number;
 }
 
 export interface UserDictModel {
@@ -195,6 +196,7 @@ export interface ChannelModel {
   expanded: boolean;
   id: number;
   name: string;
+  creator: number;
 }
 
 export interface ChannelUIModel extends ChannelModel {
