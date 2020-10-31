@@ -426,6 +426,8 @@ development.json and production.json have the following format:
 ```
 
 # TODO
+* download files with backgroun fetch https://developers.google.com/web/updates/2018/12/background-fetch
+* use native filesystemAPI to send files, so after refreshing the page we still have access https://www.youtube.com/watch?v=GNuG-5m4Ud0&ab_channel=GoogleChromeDevelopers
 * ctrl+c on builder leaves the process in foreground
 * .stylelintignore @for loops doesn't work in linter https://github.com/AleshaOleg/postcss-sass/issues/53
 * https://www.infoworld.com/article/3443039/typescript-37-beta-debuts-with-optional-chaining.html
