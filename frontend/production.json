@@ -1,0 +1,15 @@
+{
+  "BACKEND_ADDRESS": "{}",
+  "IS_DEBUG": true,
+  "GOOGLE_OAUTH_2_CLIENT_ID": false,
+  "FACEBOOK_APP_ID": false,
+  "RECAPTCHA_PUBLIC_KEY": false,
+  "MANIFEST": false,
+  "AUTO_REGISTRATION": false,
+  "PUBLIC_PATH": null,
+  "ISSUES": false,
+  "STATISTICS": false,
+  "GITHUB_LINK": false,
+  "PAINTER": false,
+  "FLAGS": false
+}
