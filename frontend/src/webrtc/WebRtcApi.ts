@@ -9,19 +9,20 @@ import {
 } from '@/types/messages';
 import WsHandler from '@/utils/WsHandler';
 import {FileTransferStatus, ReceivingFile} from '@/types/model';
-import FileSender from '@/webrtc/FileSender';
+import FileSender from '@/webrtc/file/FileSender';
 import NotifierHandler from '@/utils/NotificationHandler';
-import {browserVersion} from '@/utils/singletons';
 import MessageHandler, {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 import {sub} from '@/utils/sub';
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from '@/utils/consts';
 import {requestFileSystem} from '@/utils/htmlApi';
 import {bytesToSize} from '@/utils/utils';
-import FileReceiverPeerConnection from '@/webrtc/FileReceiveerPeerConnection';
+import FileReceiverPeerConnection from '@/webrtc/file/FileReceiveerPeerConnection';
 import Subscription from '@/utils/Subscription';
-import CallHandler from '@/webrtc/CallHandler';
+import CallHandler from '@/webrtc/call/CallHandler';
 import faviconUrl from '@/assets/img/favicon.ico';
 import {DefaultStore} from '@/utils/store';
+import {browserVersion} from '@/utils/runtimeConsts';
+import P2pMessageHandler from '@/webrtc/message/P2pMessageHandler';
 
 export default class WebRtcApi extends MessageHandler {
 
@@ -36,6 +37,7 @@ export default class WebRtcApi extends MessageHandler {
   private readonly store: DefaultStore;
   private readonly notifier: NotifierHandler;
   private readonly callHandlers: {[id: number]: CallHandler} = {};
+  private readonly messageHandlers: {[id: number]: P2pMessageHandler} = {};
 
   constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler) {
     super();
@@ -83,6 +85,14 @@ export default class WebRtcApi extends MessageHandler {
     }
 
     return this.callHandlers[roomId];
+  }
+
+  public getMessageHandler(roomId: number): P2pMessageHandler {
+    if (!this.messageHandlers[roomId]) {
+      this.messageHandlers[roomId] = new P2pMessageHandler(roomId, this.wsHandler, this.notifier, this.store);
+    }
+
+    return this.messageHandlers[roomId];
   }
 
   public startCall(roomId: number) {

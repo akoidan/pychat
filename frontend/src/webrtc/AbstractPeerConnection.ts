@@ -1,4 +1,3 @@
-import {WEBRTC_STUNT_URL} from '@/utils/singletons';
 import {Logger} from 'lines-logger';
 import loggerFactory from '@/utils/loggerFactory';
 import WsHandler from '@/utils/WsHandler';
@@ -10,6 +9,7 @@ import Subscription from '@/utils/Subscription';
 import {ConnectionStatus, RemovePeerConnection} from '@/types/types';
 import {DefaultStore} from '@/utils/store';
 import {ConnectToRemoteMessage, OnSendRtcDataMessage} from '@/types/messages';
+import {WEBRTC_STUNT_URL} from '@/utils/runtimeConsts';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean = false;
@@ -195,7 +195,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected onsendRtcData(message: OnSendRtcDataMessage) {
     if (!this.connectedToRemote) {
       this.logger.log('Connection is not accepted yet, pushing data to queue')();
-      this.sendRtcDataQueue.push(message); 
+      this.sendRtcDataQueue.push(message);
       return;
     } else {
       const data: RTCSessionDescriptionInit | RTCIceCandidateInit | { message: unknown } = message.content;

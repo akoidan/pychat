@@ -24,7 +24,7 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     this.notifier = notifier;
     this.wsHandler = wsHandler;
     this.store = store;
-    this.logger = loggerFactory.getLogger('WRTC', 'color: #960055');
+    this.logger = loggerFactory.getLoggerColor('WRTC', '#960055');
   }
 
   protected onDestroy() {

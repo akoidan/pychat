@@ -3,7 +3,7 @@ import VueRouter from 'vue-router';
 import sessionHolder from '@/utils/sessionHolder';
 import {store} from '@/utils/storeHolder';
 import MainPage from '@/components/MainPage.vue';
-import ChannelsPage from '@/components/chat/MainPage.vue';
+import ChannelsPage from '@/components/chat/ChannelsPage.vue';
 import SignupPage from '@/components/singup/MainPage.vue';
 import ResetPassword from '@/components/singup/ResetPassword.vue';
 import Login from '@/components/singup/Login.vue';
@@ -23,8 +23,7 @@ import ApplyResetPassword from '@/components/singup/ApplyResetPassword.vue';
 import {globalLogger} from '@/utils/singletons';
 import {ALL_ROOM_ID, PAINTER, STATISTICS} from '@/utils/consts';
 import ConfirmMail from '@/components/email/ConfirmMail.vue';
-import UserProfileChangeEmail
-  from '@/components/pages/UserProfileChangeEmail.vue';
+import UserProfileChangeEmail from '@/components/pages/UserProfileChangeEmail.vue';
 import {Route} from 'vue-router/types';
 import CreateRoomChannel from '@/components/pages/CreateRoomChannel.vue';
 import CreateChannel from '@/components/pages/CreateChannel.vue';

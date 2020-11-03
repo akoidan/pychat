@@ -3,7 +3,7 @@ import NotifierHandler from '@/utils/NotificationHandler';
 import {SendingFile} from '@/types/model';
 import WsHandler from '@/utils/WsHandler';
 import {DefaultMessage, ReplyFileMessage} from '@/types/messages';
-import FileSenderPeerConnection from '@/webrtc/FileSenderPeerConnection';
+import FileSenderPeerConnection from '@/webrtc/file/FileSenderPeerConnection';
 import {sub} from '@/utils/sub';
 import Subscription from '@/utils/Subscription';
 import {DefaultStore} from '@/utils/store';

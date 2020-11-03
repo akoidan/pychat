@@ -7,7 +7,7 @@ import {
   ReplyCallMessage, ScreenShareData,
   WebRtcSetConnectionIdMessage
 } from '@/types/messages';
-import {browserVersion, isChrome, isMobile} from '@/utils/singletons';
+import {browserVersion, isChrome, isMobile} from '@/utils/runtimeConsts';
 import {sub} from '@/utils/sub';
 import Subscription from '@/utils/Subscription';
 import {CallsInfoModel, IncomingCallModel} from '@/types/model';
@@ -25,8 +25,8 @@ import {
   createMicrophoneLevelVoice,
   getAverageAudioLevel
 } from '@/utils/audioprocc';
-import CallSenderPeerConnection from '@/webrtc/CallSenderPeerConnection';
-import CallReceiverPeerConnection from '@/webrtc/CallReceiverPeerConnection';
+import CallSenderPeerConnection from '@/webrtc/call/CallSenderPeerConnection';
+import CallReceiverPeerConnection from '@/webrtc/call/CallReceiverPeerConnection';
 import router from '@/utils/router';
 import {forEach} from '@/utils/htmlApi';
 import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';

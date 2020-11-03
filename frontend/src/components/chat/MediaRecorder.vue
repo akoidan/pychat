@@ -21,7 +21,8 @@
   import {State} from '@/utils/storeHolder';
   import {Component, Prop, Vue, Watch} from "vue-property-decorator";
   import MediaCapture from '@/utils/MediaCapture';
-  import {isChrome, isMobile, platformUtil} from '@/utils/singletons';
+  import {platformUtil} from '@/utils/singletons';
+  import {isChrome, isMobile} from '@/utils/runtimeConsts';
 
 
   @Component

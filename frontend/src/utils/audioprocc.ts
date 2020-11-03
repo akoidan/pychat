@@ -1,7 +1,8 @@
 import {JsAudioAnalyzer} from '@/types/types';
 import {extractError} from '@/utils/utils';
-import {globalLogger, isMobile} from '@/utils/singletons';
+import {globalLogger} from '@/utils/singletons';
 import {IS_DEBUG} from '@/utils/consts';
+import {isMobile} from '@/utils/runtimeConsts';
 
 let audioContext: AudioContext;
 const audioProcesssors: JsAudioAnalyzer[] = [];

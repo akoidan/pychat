@@ -300,6 +300,21 @@ export default class ChannelsPage extends Vue {
   }
 
   public checkAndSendMessage(event: KeyboardEvent) {
+    if (this.activeRoom.p2p) {
+      if (event.keyCode === 13 && !event.shiftKey) {
+        const md: MessageDataEncode = getMessageData(this.userMessage);
+        if (md.files.length > 0 ) {
+          this.store.growlError("Sending files is only available in non p2p channel");
+          return;
+        }
+        if (!md.messageContent) {
+          return;
+        }
+        const {id, now} = this.addMessageToStore(md);
+        webrtcApi.getMessageHandler(this.activeRoomId).sendMessage(md.messageContent!)
+      }
+      return;
+    }
     if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
       event.preventDefault();
       this.logger.debug('Checking sending message')();
@@ -309,7 +324,12 @@ export default class ChannelsPage extends Vue {
         this.editMessageWs(md.messageContent, md.files, this.editedMessage.messageId, this.activeRoomId, md.currSymbol, md.fileModels);
       } else {
         const md: MessageDataEncode = getMessageData(this.userMessage);
-        this.sendNewMessage(md);
+        if (!md.messageContent && !md.files.length) {
+          return;
+        }
+        const {id, now} = this.addMessageToStore(md);
+        webrtcApi.startCall(this.activeRoomId);
+        channelsHandler.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
       }
     } else if (event.keyCode === 27) { // 27 = escape
       this.showSmileys = false;
@@ -332,10 +352,7 @@ export default class ChannelsPage extends Vue {
     }
   }
 
-  private sendNewMessage(md: MessageDataEncode) {
-    if (!md.messageContent && !md.files.length) {
-      return;
-    }
+  private addMessageToStore(md: MessageDataEncode) {
     const now = Date.now();
     const id = -this.$ws.getMessageId();
     const mm: MessageModel = {
@@ -355,7 +372,7 @@ export default class ChannelsPage extends Vue {
       }
     };
     this.store.addMessage(mm);
-    channelsHandler.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
+    return {id, now}
   }
 
   private editMessageWs(

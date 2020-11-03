@@ -1,9 +1,10 @@
 import {IS_ANDROID} from '@/utils/consts';
-import {globalLogger, isMobile} from '@/utils/singletons';
+import {globalLogger} from '@/utils/singletons';
 import Vue, {ComponentOptions} from 'vue';
 import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
 import {VNode} from 'vue/types/vnode'
+import {isMobile} from '@/utils/runtimeConsts';
 const HOLD_TIMEOUT = 300;
 
 
