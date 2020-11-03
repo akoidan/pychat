@@ -29,7 +29,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected abstract connectedToRemote: boolean;
   private readonly pc_config = {
     iceServers: [{
-      url: this.webRtcUrl
+      urls: this.webRtcUrl
     }]
   };
   private readonly pc_constraints: unknown = {
@@ -195,7 +195,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected onsendRtcData(message: OnSendRtcDataMessage) {
     if (!this.connectedToRemote) {
       this.logger.log('Connection is not accepted yet, pushing data to queue')();
-      this.sendRtcDataQueue.push(message); 
+      this.sendRtcDataQueue.push(message);
       return;
     } else {
       const data: RTCSessionDescriptionInit | RTCIceCandidateInit | { message: unknown } = message.content;
