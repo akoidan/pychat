@@ -113,8 +113,8 @@ export default class CallHandler extends BaseTransferHandler {
     }
   }
 
-  public async captureInput(): Promise<MediaStream> {
-    let endStream;
+  public async captureInput(): Promise<MediaStream|null> {
+    let endStream = null;
     this.logger.debug('capturing input')();
     if (this.callInfo.showMic || this.callInfo.showVideo) {
       let audio: any = this.callInfo.showMic;
@@ -133,7 +133,7 @@ export default class CallHandler extends BaseTransferHandler {
       }
     }
     if (this.callInfo.shareScreen) {
-      let stream;
+      let stream = null;
       const chromeVersion = getChromeVersion();
       if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
         this.logger.debug('Getting shareScreen from  navigator.getDisplayMedia')();
@@ -167,7 +167,7 @@ export default class CallHandler extends BaseTransferHandler {
         endStream = stream;
       }
     }
-    if (!endStream) {
+    if (!endStream && (this.callInfo.shareScreen || this.callInfo.showMic || this.callInfo.showVideo)) {
       throw new Error('Unable to capture stream');
     }
 
@@ -219,7 +219,9 @@ export default class CallHandler extends BaseTransferHandler {
   public async updateConnection() {
     this.logger.log('updateConnection')();
     let stream: MediaStream|null = null;
-    if (this.localStream && this.localStream.active) {
+    // TODO I removed this if below because otherwise if we created a connection w/o stream (no audio/ web/ share screen) we won't be able to add it in future
+    // find out why this was necessary
+    // if (this.localStream?.active) {
       try {
         stream = await this.captureInput();
         this.stopLocalStream();
@@ -237,7 +239,7 @@ export default class CallHandler extends BaseTransferHandler {
       } catch (e) {
         this.handleStream(e, stream);
       }
-    }
+    // }
   }
 
   public getTrack(kind: VideoType) {
@@ -486,7 +488,7 @@ export default class CallHandler extends BaseTransferHandler {
     }
   }
 
-  private attachLocalStream(stream: MediaStream) {
+  private attachLocalStream(stream: MediaStream|null) {
     this.logger.log('Local stream has been attached');
     if (stream) {
       this.localStream = stream;

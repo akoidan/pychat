@@ -25,6 +25,11 @@ export function createMicrophoneLevelVoice (
     }
     const audioTrack: MediaStreamTrack = audioTracks[0];
     if (!audioContext) {
+      // Safari still in 2020q3 doesn't support AudioContext.
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) {
+        throw Error("AUdio context is not supported on this browse")
+      }
       audioContext = new AudioContext();
     }
     const analyser = audioContext.createAnalyser();
