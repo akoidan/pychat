@@ -33,7 +33,6 @@ export interface IMessageHandler {
 
 export interface ChangeStreamMessage extends DefaultMessage {
   newStream: MediaStream;
-  oldStream: MediaStream;
 }
 
 export interface MessageDataEncode {

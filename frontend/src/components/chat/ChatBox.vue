@@ -22,7 +22,7 @@
           :is-went-online="message.isWentOnline"
         />
         <chat-change-name-message
-          v-if="message.isChangeName"
+          v-else-if="message.isChangeName"
           :key="message.time"
           :time="message.time"
           :old-name="message.oldName"
