@@ -2,7 +2,7 @@ import {DefaultMessage} from '@/types/messages';
 import {Logger} from 'lines-logger';
 import {IMessageHandler} from '@/types/types';
 
-export type HandlerType = (a: DefaultMessage) => void;
+export type HandlerType = (a: DefaultMessage) => void|Promise<void>;
 
 export interface HandlerTypes {
  [id: string]: HandlerType;

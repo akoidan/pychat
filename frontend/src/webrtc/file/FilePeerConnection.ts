@@ -4,7 +4,10 @@ import {DefaultMessage} from '@/types/messages';
 export default abstract class FilePeerConnection extends AbstractPeerConnection {
 
   public oniceconnectionstatechange() {
-    if (this.pc!.iceConnectionState === 'disconnected') {
+    this.logger.log(`iceconnectionstate has been changed to ${this.pc!.iceConnectionState}`)
+    if (this.pc!.iceConnectionState === 'disconnected' ||
+        this.pc!.iceConnectionState === 'failed' ||
+        this.pc!.iceConnectionState === 'closed') {
       this.closeEvents('Connection has been lost');
     }
   }

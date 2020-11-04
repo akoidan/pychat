@@ -332,12 +332,25 @@ The successful connection produces logs below in console
 
 Sender:
 ```
+ws:in {"action": "offerCall", "content": {"browser": "Chrome 86"}, "userId": 2, "handler": "webrtc", "connId": "YZnbgKIL", "opponentWsId": "0002:UFBW", "roomId": 1, "time": 1604446797449}
+WRTC Setting call status to  received_offer    
+WRTC CallHandler initialized
+ws:out  {"action":"replyCall","connId":"YZnbgKIL","content":{"browser":"Chrome 86"},"messageId":1} 
 rsok33GN CallHandler initialized
 rsok33GN:0005:EJAd Created CallSenderPeerConnection
+WRTC Setting call status to  accepted
+WRTC capturing input
+WRTC navigator.mediaDevices.getUserMedia({audio, video})
+ws:out  {"action":"acceptCall","connId":"YZnbgKIL","messageId":2}
+YZnbgKIL:0002:UFBW Connect to remote  
 rsok33GN:0005:EJAd Creating RTCPeerConnection
+YZnbgKIL:0002:UFBW Sending local stream to remote
 rsok33GN:0005:EJAd Creating offer...
 rsok33GN:0005:EJAd Created offer, setting local description
 rsok33GN:0005:EJAd Sending offer to remote
+YZnbgKIL:0002:UFBW onicecandidate
+...
+YZnbgKIL:0002:UFBW onicecandidate
 rsok33GN:0005:EJAd onsendRtcData
 rsok33GN:0005:EJAd answer received
 rsok33GN:0005:EJAd onaddstream
@@ -346,9 +359,17 @@ rsok33GN:0005:EJAd onsendRtcData
 
 Receiver:
 ```
+WRTC capturing input
+WRTC navigator.mediaDevices.getUserMedia({audio, video})
+WRTC got local stream  MediaStream {id: "0IeyYT9LxHRidUZaw7XSVnXEPWYimm4KDmJB", active: true, onaddtrack: null, onremovetrack: null, onactive: null, …}
+WRTC Setting call status to  sent_offer
+ws:out  {"action":"offerCall","roomId":1,"content":{"browser":"Chrome 86"},"messageId":1}
+ws:in {"action": "setConnectionId", "handler": "void", "connId": "YZnbgKIL", "messageId": 1, "time": 1604446797449}   
 rsok33GN CallHandler initialized
 rsok33GN:0004:oIc5 Created CallReceiverPeerConnection
+YZnbgKIL:0001:qobF Connect to remote
 rsok33GN:0004:oIc5 Creating RTCPeerConnection
+YZnbgKIL:0001:qobF Sending local stream to remote
 rsok33GN:0004:oIc5 onsendRtcData
 rsok33GN:0004:oIc5 Creating answer
 rsok33GN:0004:oIc5 onaddstream
@@ -426,6 +447,7 @@ development.json and production.json have the following format:
 ```
 
 # TODO
+* opening devtools causing div $('.chatBoxHolder.holder') to have horizontal scroll. by disabling and enabling 'flex: 1' css on it, scroll dissappears 
 * download files with backgroun fetch https://developers.google.com/web/updates/2018/12/background-fetch
 * use native filesystemAPI to send files, so after refreshing the page we still have access https://www.youtube.com/watch?v=GNuG-5m4Ud0&ab_channel=GoogleChromeDevelopers
 * ctrl+c on builder leaves the process in foreground
