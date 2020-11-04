@@ -1,11 +1,10 @@
 import BaseTransferHandler from '@/webrtc/BaseTransferHandler';
 import {
-  AcceptCallMessage, CallStatus,
+  AcceptCallMessage,
+  CallStatus,
   ConnectToRemoteMessage,
-  DefaultMessage,
   OfferCall,
-  ReplyCallMessage, ScreenShareData,
-  WebRtcSetConnectionIdMessage
+  ReplyCallMessage
 } from '@/types/messages';
 import {browserVersion, isChrome, isMobile} from '@/utils/singletons';
 import {sub} from '@/utils/sub';
@@ -14,21 +13,22 @@ import {CallsInfoModel, IncomingCallModel} from '@/types/model';
 import {
   BooleanIdentifier,
   ChangeStreamMessage,
-  JsAudioAnalyzer, MediaIdentifier,
+  JsAudioAnalyzer,
+  MediaIdentifier,
   NumberIdentifier,
   SetDevices,
-  StringIdentifier, VideoType
+  VideoType
 } from '@/types/types';
 import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from '@/utils/consts';
 import {extractError, getChromeVersion} from '@/utils/utils';
 import {
   createMicrophoneLevelVoice,
-  getAverageAudioLevel
+  getAverageAudioLevel,
+  removeAudioProcesssor
 } from '@/utils/audioprocc';
 import CallSenderPeerConnection from '@/webrtc/CallSenderPeerConnection';
 import CallReceiverPeerConnection from '@/webrtc/CallReceiverPeerConnection';
 import router from '@/utils/router';
-import {forEach} from '@/utils/htmlApi';
 import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class CallHandler extends BaseTransferHandler {
@@ -114,64 +114,19 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   public async captureInput(): Promise<MediaStream|null> {
-    let endStream = null;
     this.logger.debug('capturing input')();
-    if (this.callInfo.showMic || this.callInfo.showVideo) {
-      let audio: any = this.callInfo.showMic;
-      if (this.callInfo.currentMic && audio) {
-        audio = {deviceId: this.callInfo.currentMic};
-      }
-      let video: any = this.callInfo.showVideo; // convert null to bolean, if we pass null to getUserMedia it tries to capture
-      if (this.callInfo.currentWebcam && video) {
-        video = {deviceId: this.callInfo.currentWebcam};
-      }
-      endStream = await navigator.mediaDevices.getUserMedia({audio, video});
-      this.logger.debug('navigator.mediaDevices.getUserMedia({audio, video})')();
-      if (navigator.mediaDevices.enumerateDevices) {
-        const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
-        this.inflateDevices(devices);
-      }
-    }
-    if (this.callInfo.shareScreen) {
-      let stream = null;
-      const chromeVersion = getChromeVersion();
-      if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-        this.logger.debug('Getting shareScreen from  navigator.getDisplayMedia')();
-        stream = await navigator.mediaDevices.getDisplayMedia({video: true});
-      } else {
-        if (chromeVersion && chromeVersion > 70) {
-          this.store.growlInfo('You can now use chrome://flags/#enable-experimental-web-platform-features to share your screen');
-        }
-        const streamId: string = await this.getDesktopShareFromExtension();
-        this.logger.debug('Resolving userMedia from dekstopShare')();
-        stream = await navigator.mediaDevices.getUserMedia(<MediaStreamConstraints><unknown>{ // TODO update ts to support this
-          audio: false,
-          video: {
-            mandatory: {
-              chromeMediaSource: 'desktop',
-              chromeMediaSourceId: streamId,
-              maxWidth: window.screen.width,
-              maxHeight: window.screen.height
-            }
-          }
-        });
-      }
-      const tracks: any[] = stream.getVideoTracks();
-      if (!(tracks && tracks.length > 0)) {
-        throw Error('No video tracks from captured screen');
-      }
-      tracks[0].isShare = true;
-      if (endStream) {
-        endStream.addTrack(tracks[0]);
-      } else {
-        endStream = stream;
-      }
-    }
-    if (!endStream && (this.callInfo.shareScreen || this.callInfo.showMic || this.callInfo.showVideo)) {
-      throw new Error('Unable to capture stream');
-    }
 
-    return endStream;
+    // start
+    // we can't await promise one by one
+    // because 2nd promise would be called after some period of time
+    // which would destroy user gesture Event.
+    // and browsers like safari won't let capture userMedia w/o existing user gesture
+    let micPromise = this.captureMic();
+    let shareScreenPromise = this.captureScreenShare();
+    // end
+    let streams: (MediaStream|null)[] = await Promise.all([micPromise, shareScreenPromise]);
+    let stream = this.combineStreams(...streams)
+    return stream;
   }
 
   public processAudio(audioProc: JsAudioAnalyzer) {
@@ -232,7 +187,6 @@ export default class CallHandler extends BaseTransferHandler {
             handler: Subscription.getPeerConnectionId(this.connectionId!, pcName),
             action: 'streamChanged',
             newStream: stream!,
-            oldStream: this.localStream!
           };
           sub.notify(message);
         });
@@ -390,9 +344,8 @@ export default class CallHandler extends BaseTransferHandler {
   }
 
   public destroyAudioProcessor() {
-    if (this.audioProcessor && this.audioProcessor.javascriptNode && this.audioProcessor.javascriptNode.onaudioprocess) {
-      this.logger.debug('Removing local audioproc')();
-      this.audioProcessor.javascriptNode.onaudioprocess = null;
+    if (this.audioProcessor ) {
+      removeAudioProcesssor(this.audioProcessor!);
     }
   }
 
@@ -460,6 +413,80 @@ export default class CallHandler extends BaseTransferHandler {
       }
     });
 
+  }
+
+  private async captureMic(): Promise<MediaStream|null> {
+    let stream: MediaStream|null = null;
+    if (this.callInfo.showMic || this.callInfo.showVideo) {
+      let audio: any = this.callInfo.showMic;
+      if (this.callInfo.currentMic && audio) {
+        audio = {deviceId: this.callInfo.currentMic};
+      }
+      let video: any = this.callInfo.showVideo; // convert null to bolean, if we pass null to getUserMedia it tries to capture
+      if (this.callInfo.currentWebcam && video) {
+        video = {deviceId: this.callInfo.currentWebcam};
+      }
+      stream = await navigator.mediaDevices.getUserMedia({audio, video});
+      this.logger.debug('navigator.mediaDevices.getUserMedia({audio, video})')();
+      if (navigator.mediaDevices.enumerateDevices) {
+        const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
+        this.inflateDevices(devices);
+      }
+      if (!stream) {
+        throw new Error('Unable to capture stream');
+      }
+    }
+    return stream;
+  }
+
+  private async captureScreenShare(): Promise<MediaStream|null> {
+    let stream: MediaStream|null = null;
+    if (this.callInfo.shareScreen) {
+      const chromeVersion = getChromeVersion();
+      if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+        this.logger.debug('Getting shareScreen from  navigator.getDisplayMedia')();
+        stream = await navigator.mediaDevices.getDisplayMedia({video: true});
+      } else {
+        if (chromeVersion && chromeVersion > 70) {
+          this.store.growlInfo('You can now use chrome://flags/#enable-experimental-web-platform-features to share your screen');
+        }
+        const streamId: string = await this.getDesktopShareFromExtension();
+        this.logger.debug('Resolving userMedia from dekstopShare')();
+        stream = await navigator.mediaDevices.getUserMedia(<MediaStreamConstraints><unknown>{ // TODO update ts to support this
+          audio: false,
+          video: {
+            mandatory: {
+              chromeMediaSource: 'desktop',
+              chromeMediaSourceId: streamId,
+              maxWidth: window.screen.width,
+              maxHeight: window.screen.height
+            }
+          }
+        });
+      }
+      const tracks: any[] = stream.getVideoTracks();
+      if (!(tracks && tracks.length > 0)) {
+        throw Error('No video tracks from captured screen');
+      }
+      tracks[0].isShare = true;
+    }
+    return stream;
+  }
+
+  private combineStreams (...streams: (MediaStream|null)[]): MediaStream|null {
+    let stream: MediaStream|null = null;
+    streams.forEach(s => {
+      if (s) {
+        if (!stream) {
+          stream = s;
+        } else {
+          for (let t of s.getTracks()) {
+            stream.addTrack(t);
+          }
+        }
+      }
+    });
+    return stream;
   }
 
   private handleStream(e: string, endStream: MediaStream|null) {

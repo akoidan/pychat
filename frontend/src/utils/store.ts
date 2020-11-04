@@ -312,9 +312,17 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public setOpponentAnchor(payload: SetOpponentAnchor) {
-    const key: string = mediaLinkIdGetter();
-    this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
-    Vue.set(this.mediaObjects, key, payload.anchor);
+    let key = null;
+    for (let k in this.mediaObjects) {
+      if (this.mediaObjects[k] === payload.anchor) {
+        key = k;
+      }
+    }
+    if (!key) {
+      key = mediaLinkIdGetter();
+      this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
+      Vue.set(this.mediaObjects, key, payload.anchor);
+    }
   }
 
   @Mutation

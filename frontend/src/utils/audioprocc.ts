@@ -21,7 +21,8 @@ export function createMicrophoneLevelVoice (
     }
     const audioTracks: MediaStreamTrack[] = stream && stream.getAudioTracks();
     if (audioTracks.length === 0) {
-      throw Error('Stream has no audio tracks');
+      globalLogger.log('Skipping audioproc, since current stream doest have audio tracks')();
+      return null;
     }
     const audioTrack: MediaStreamTrack = audioTracks[0];
     if (!audioContext) {
@@ -57,6 +58,21 @@ export function createMicrophoneLevelVoice (
     globalLogger.error('Unable to use microphone level because {}', extractError(err))();
 
     return null;
+  }
+}
+
+export function removeAudioProcesssor(audioProcessor: JsAudioAnalyzer) {
+  if (audioProcessor) {
+    let index = audioProcesssors.indexOf(audioProcessor);
+    if (index < 0) {
+      globalLogger.error('Unknown audioproc {}', audioProcessor)();
+    } else {
+      audioProcesssors.splice(index, 1)
+    }
+  }
+  if (audioProcessor?.javascriptNode?.onaudioprocess) {
+    globalLogger.log('Removing audioprod')();
+    audioProcessor.javascriptNode.onaudioprocess = null;
   }
 }
 

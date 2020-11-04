@@ -30,11 +30,11 @@ export default class CallSenderPeerConnection extends CallPeerConnection {
     this.logger.log('Opened a new chanel')();
   }
 
-  public connectToRemote(stream: ConnectToRemoteMessage) {
+  public async connectToRemote(stream: ConnectToRemoteMessage) {
     this.logger.log('Connect to remote')();
     this.connectedToRemote = true;
     this.createPeerConnection(stream);
-    this.createOffer();
+    await this.createOffer();
   }
 
   public ondatachannelclose(text: string): void {

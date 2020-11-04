@@ -25,7 +25,8 @@ export default class VideoObject extends Vue {
       this.video.srcObject = stream;
       this.video.play();
     } else {
-      this.video.src = '';
+      // we should not use src like below, since on safari this would throw en exception by aborting promise in current operation
+      // this.video.src = '';
       this.video.srcObject = null;
       this.video.pause();
     }
