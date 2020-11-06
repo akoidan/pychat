@@ -1,5 +1,5 @@
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat.svg?label=docker%3Aprod)](https://hub.docker.com/r/deathangel908/pychat)
-[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat-test.svg?label=docker%3Atest)](https://hub.docker.com/r/deathangel908/pychat-test) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)[![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master)
+[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat-test.svg?label=docker%3Atest)](https://hub.docker.com/r/deathangel908/pychat-test) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)[![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master)![Continious deployment pychat.org](https://github.com/akoidan/pychat/workflows/Update%20pychat.org/badge.svg)
 
 # Live demo: [pychat.org](https://pychat.org/), [video](https://www.youtube.com/watch?v=m6sJ-blTidg)
 
@@ -30,6 +30,7 @@
      * [WebRTC connection establishment](#webrtc-connection-establishment)
      * [Frontend stack](#frontend-stack)
      * [Frontend config](#frontend-config)
+  * [Github actions](#github-actions)   
   * [TODO](#todo)
   
   
@@ -138,7 +139,7 @@ If you don't or unable to run docker you can alway do the setup w/o it. You defi
 
 ## Frontend
  - `cd frontend; nvm use`. Apply `nvm install` before it if node of specified version is not installed
- - `yarn install`
+ - `yarn install --frozen-lockfile`
  - Create production.json based on [Frontend config](#frontend-config). Also you can use and modify `cp docker/pychat.org/production.json ./frontend/`
  - Run `yarn run prod`. This generates static files in `frotnend/dist` directory.
 
@@ -445,6 +446,21 @@ development.json and production.json have the following format:
   "FLAGS": "if true, a user name will contain a country icon on the right. User names are shown on the right section of the screen"
 }
 ```
+
+# Github actions
+In order to setup continuous delivery via github:
+- Generate a new pair of ssh keys `mkdir /tmp/sshkey; ssh-keygen -t rsa -b 4096 -C "github actions" -f  /tmp/sshkey/id_rsa`
+- put `/tmp/sshkey/id_rsa.pub` to server `~/.ssh/authorized_keys` where `~` is the home for ssh user to use ( I used `http`) 
+- Create ssh variables at https://github.com/akoidan/pychat/settings/secrets/actions (where akoidan/pychat is your repo) :
+   - `HOST` -ssh host (your domain)
+   - `PORT` - ssh port (22)
+   - `SSH_USER` - ssh user, if you used my setup it's `http`
+   - `ID_RSA` - what ssh-keygen has generated in step above to`/tmp/sshkey/id_rsa`
+- I used alias to give http user to access tornado systemd service like in [this](https://serverfault.com/a/841104/304770) example. So append `/etc/sudoers` with
+ ```
+Cmnd_Alias RESTART_TORNADO = /usr/bin/systemctl restart tornado
+http ALL=(ALL) NOPASSWD: RESTART_TORNADO
+``` 
 
 # TODO
 * if users joins a room that already has call in progress, he should be able to join this call
