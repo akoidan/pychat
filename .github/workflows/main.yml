@@ -25,7 +25,10 @@ jobs:
         with:
           node-version: '12.10'
       - run: cd frontend && yarn install --frozen-lockfile
-      - name: copy dist to pychat
+        name: install npm dependencies
+      - run: cd frontend && mv pychat.org.json production.json && yarn run prod
+        name: build static files
+      - name: copy static files to destination server
         uses: garygrossgarten/github-action-scp@release
         with:
           local: frontend/dist
