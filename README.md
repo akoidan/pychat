@@ -447,6 +447,7 @@ development.json and production.json have the following format:
 ```
 
 # TODO
+* if users joins a room that already has call in progress, he should be able to join this call
 * opening devtools causing div $('.chatBoxHolder.holder') to have horizontal scroll. by disabling and enabling 'flex: 1' css on it, scroll dissappears 
 * download files with backgroun fetch https://developers.google.com/web/updates/2018/12/background-fetch
 * use native filesystemAPI to send files, so after refreshing the page we still have access https://www.youtube.com/watch?v=GNuG-5m4Ud0&ab_channel=GoogleChromeDevelopers
