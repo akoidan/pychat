@@ -13,7 +13,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  frontend:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -33,6 +33,40 @@ jobs:
         with:
           local: frontend/dist
           remote: /srv/http/pychat/frontend/dist
+          host: ${{ secrets.HOST }}
+          port: ${{ secrets.PORT }}
+          username: ${{ secrets.SSH_USER }}
+          privateKey : ${{ secrets.ID_RSA }}
+  backend:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Update master
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: cd /srv/http/pychat/backend && git pull
+          host: ${{ secrets.HOST }}
+          port: ${{ secrets.PORT }}
+          username: ${{ secrets.SSH_USER }}
+          privateKey : ${{ secrets.ID_RSA }}
+      - name: Update database
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: cd /srv/http/pychat/backend && ./.venv/bin/python ./manage.py makemigrations && ./.venv/bin/python ./manage.py migrate
+          host: ${{ secrets.HOST }}
+          port: ${{ secrets.PORT }}
+          username: ${{ secrets.SSH_USER }}
+          privateKey : ${{ secrets.ID_RSA }}
+      - name: Restart tornado service
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          # these lines should be in /etc/sudoers in order sudo not to ask a password
+          # Cmnd_Alias RESTART_TORNADO = /usr/bin/systemctl restart tornado
+          # http ALL=(ALL) NOPASSWD: RESTART_TORNADO
+          command: sudo /usr/bin/systemctl restart tornado
           host: ${{ secrets.HOST }}
           port: ${{ secrets.PORT }}
           username: ${{ secrets.SSH_USER }}
