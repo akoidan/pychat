@@ -13,7 +13,10 @@ import {
   convertNumberToSex,
   convertSexToNumber,
   convertSexToString,
-  convertStringSexToNumber, convertToBoolean, getChannelDict, getRoomsBaseDict
+  convertStringSexToNumber,
+  convertToBoolean,
+  getChannelDict,
+  getRoomsBaseDict
 } from '@/types/converters';
 import {
   ChannelDB,

@@ -237,7 +237,7 @@ export default class ChannelsHandler extends MessageHandler {
   public init(m: PubSetRooms) {
 
     const {rooms, channels, users} = m;
-    this.store.setOnline([...m.online]);
+    this.store.setOnline(m.online);
 
     this.logger.debug('set users {}', users)();
     const um: UserDictModel = {};
@@ -335,12 +335,17 @@ export default class ChannelsHandler extends MessageHandler {
       const newVar: UserModel = convertUser(message);
       this.store.addUser(newVar);
     }
-    this.addChangeOnlineEntry(message.userId, message.time, true);
-    this.store.setOnline([...message.content]);
+    if (message.content[message.userId].length === 1) {
+      // exactly 1 device is now offline, so that new that appeared is the first one
+      this.addChangeOnlineEntry(message.userId, message.time, true);
+    }
+    this.store.setOnline(message.content);
   }
 
   private removeOnlineUser(message: RemoveOnlineUserMessage) {
-    this.addChangeOnlineEntry(message.userId, message.time, false);
+    if (message.content[message.userId].length === 0) {
+      this.addChangeOnlineEntry(message.userId, message.time, false);
+    }
     this.store.setOnline(message.content);
   }
 

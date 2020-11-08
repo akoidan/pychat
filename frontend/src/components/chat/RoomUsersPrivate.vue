@@ -1,18 +1,9 @@
 <template>
-  <li :class="onlineActiveClass">
+  <li :class="onlineActiveClass" class="li">
     <router-link :to="`/chat/${room.id}`">
       <i :class="userSexClass" />{{ user.user }}
     </router-link>
-    <router-link
-      v-if="!room.newMessagesCount"
-      :to="`/room-settings/${room.id}`"
-    >
-      <span class="icon-cog" />
-    </router-link>
-    <span
-      v-if="room.newMessagesCount"
-      class="newMessagesCount"
-    >{{ room.newMessagesCount }}</span>
+    <room-right-icon :room="room" />
   </li>
 </template>
 <script lang="ts">
@@ -21,8 +12,10 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
 import {getUserSexClass} from '@/utils/htmlApi';
 import {PrivateRoomsIds} from '@/types/types';
-
-@Component
+import RoomRightIcon from '@/components/chat/RoomRightIcon.vue';
+@Component({
+  components: {RoomRightIcon}
+})
 export default class RoomUsersPrivate extends Vue {
 
   @Prop() public room!: RoomModel;
@@ -57,4 +50,6 @@ export default class RoomUsersPrivate extends Vue {
 </script>
 
 <style lang="sass" scoped>
+  .li
+    display: flex
 </style>

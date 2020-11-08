@@ -32,11 +32,13 @@ class Actions(object):
 	SET_WEBRTC_ERROR = 'setError'
 	OFFER_FILE_CONNECTION = 'offerFile'
 	OFFER_CALL_CONNECTION = 'offerCall'
+	OFFER_P2P_CONNECTION = 'offerMessage'
 	REPLY_FILE_CONNECTION = 'replyFile'
 	RETRY_FILE_CONNECTION = 'retryFile'
 	REPLY_CALL_CONNECTION = 'replyCall'
 	PING = 'ping'
 	PONG = 'pong'
+	REQUEST_CHANNEL = 'requestChannel'
 	CHECK_PING = 'check_ping'
 	SAVE_CHANNEL_SETTINGS = 'saveChannelSettings'
 	SAVE_ROOM_SETTINGS = 'saveRoomSettings'
@@ -141,6 +143,8 @@ class RedisPrefix:
 	USER_ID_CHANNEL_PREFIX = 'u'
 	PARSABLE_PREFIX = 'p'
 	ONLINE_VAR = 'online'
+	P2P_MESSAGE_VAR = 'p2p'
+	WEBRTC_CONNECTION = 'webrtc_conn'
 	CONNECTION_ID_LENGTH = 8  # should be secure
 
 	@classmethod

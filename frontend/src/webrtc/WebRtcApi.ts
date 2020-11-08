@@ -9,7 +9,7 @@ import {
 } from '@/types/messages';
 import WsHandler from '@/utils/WsHandler';
 import {FileTransferStatus, ReceivingFile} from '@/types/model';
-import FileSender from '@/webrtc/file/FileSender';
+import FileHandler from '@/webrtc/file/FileHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
 import MessageHandler, {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 import {sub} from '@/utils/sub';
@@ -22,7 +22,7 @@ import CallHandler from '@/webrtc/call/CallHandler';
 import faviconUrl from '@/assets/img/favicon.ico';
 import {DefaultStore} from '@/utils/store';
 import {browserVersion} from '@/utils/runtimeConsts';
-import P2pMessageHandler from '@/webrtc/message/P2pMessageHandler';
+import MessageTransferHandler from '@/webrtc/message/MessageTransferHandler';
 
 export default class WebRtcApi extends MessageHandler {
 
@@ -37,7 +37,7 @@ export default class WebRtcApi extends MessageHandler {
   private readonly store: DefaultStore;
   private readonly notifier: NotifierHandler;
   private readonly callHandlers: {[id: number]: CallHandler} = {};
-  private readonly messageHandlers: {[id: number]: P2pMessageHandler} = {};
+  private readonly messageHandlers: {[id: number]: MessageTransferHandler} = {};
 
   constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler) {
     super();
@@ -68,7 +68,7 @@ export default class WebRtcApi extends MessageHandler {
   public async offerFile(file: File, channel: number) {
     if (file.size > 0) {
       const e = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size);
-      new FileSender(channel, e.connId, this.wsHandler, this.notifier, this.store, file, e.time);
+      new FileHandler(channel, e.connId, this.wsHandler, this.notifier, this.store, file, e.time);
     } else {
       this.store.growlError(`File ${file.name} size is 0. Skipping sending it...`);
     }
@@ -87,9 +87,9 @@ export default class WebRtcApi extends MessageHandler {
     return this.callHandlers[roomId];
   }
 
-  public getMessageHandler(roomId: number): P2pMessageHandler {
+  public getMessageHandler(roomId: number): MessageTransferHandler {
     if (!this.messageHandlers[roomId]) {
-      this.messageHandlers[roomId] = new P2pMessageHandler(roomId, this.wsHandler, this.notifier, this.store);
+      this.messageHandlers[roomId] = new MessageTransferHandler(roomId, this.wsHandler, this.notifier, this.store);
     }
 
     return this.messageHandlers[roomId];

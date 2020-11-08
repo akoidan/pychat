@@ -23,7 +23,8 @@ import {
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage,
-  UserProfileChangedMessage, WebRtcSetConnectionIdMessage
+  UserProfileChangedMessage,
+  WebRtcSetConnectionIdMessage
 } from '@/types/messages';
 import {
   convertUser,
@@ -319,6 +320,13 @@ export default class WsHandler extends MessageHandler {
       content: 'decline',
       action: 'destroyCallConnection',
       connId
+    });
+  }
+
+  public async offerMessageConnection(roomId: number): Promise<WebRtcSetConnectionIdMessage> {
+    return this.sendToServerAndAwait({
+      action: 'offerMessage',
+      roomId: roomId
     });
   }
 

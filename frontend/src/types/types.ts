@@ -232,7 +232,7 @@ export interface PubSetRooms extends DefaultMessage {
   rooms:  RoomDto[];
   channels: ChannelDto[];
   users: UserDto[];
-  online: number[];
+  online: Record<string, string[]>;
 }
 
 export interface SetMessageProgress extends RemoveMessageProgress {

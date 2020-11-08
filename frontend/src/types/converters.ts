@@ -86,15 +86,18 @@ export function getRoomsBaseDict(
       name,
       users
     }: RoomDto,
-    oldRoom: RoomModel|null = null
+    databaseRestoredRoom: RoomModel|null = null
 ): RoomModel {
   return {
     id: roomId,
-    receivingFiles: oldRoom ? oldRoom.receivingFiles : {},
-    sendingFiles: oldRoom ? oldRoom.sendingFiles : {},
+    receivingFiles: databaseRestoredRoom ? databaseRestoredRoom.receivingFiles : {},
+    sendingFiles: databaseRestoredRoom ? databaseRestoredRoom.sendingFiles : {},
     channelId,
     volume,
     p2p,
+    p2pInfo: {
+      amountOfActiveConnections: 0
+    },
     callInfo: {
       calls: {},
       mediaStreamLink: null,
@@ -111,12 +114,12 @@ export function getRoomsBaseDict(
     notifications,
     name,
     creator: roomCreatorId,
-    messages: oldRoom ? oldRoom.messages : {},
-    newMessagesCount: oldRoom ? oldRoom.newMessagesCount : 0,
-    changeOnline: oldRoom ? oldRoom.changeOnline : [],
-    changeName: oldRoom ? oldRoom.changeName : [],
-    allLoaded: oldRoom ? oldRoom.allLoaded : false,
-    search: oldRoom ? oldRoom.search : {
+    messages: databaseRestoredRoom ? databaseRestoredRoom.messages : {},
+    newMessagesCount: databaseRestoredRoom ? databaseRestoredRoom.newMessagesCount : 0,
+    changeOnline: databaseRestoredRoom ? databaseRestoredRoom.changeOnline : [],
+    changeName: databaseRestoredRoom ? databaseRestoredRoom.changeName : [],
+    allLoaded: databaseRestoredRoom ? databaseRestoredRoom.allLoaded : false,
+    search: databaseRestoredRoom ? databaseRestoredRoom.search : {
       searchActive: false,
       searchText: '',
       searchedIds: [],
@@ -137,7 +140,7 @@ export function convertNumberToSex(m: SexDB): SexModelString {
 }
 
 export function convertSexToString(m: SexDB): SexModelString {
-  const newVar: { [id: number]: SexModelString } = {
+  const newVar: Record<SexDB, SexModelString> = {
     0: 'Secret',
     1: 'Male',
     2: 'Female'
@@ -150,12 +153,13 @@ export function convertToBoolean(value: BooleanDB): boolean {
   return value === 1;
 }
 
-export function convertStringSexToNumber(m: SexModelString): number {
-  return {
+export function convertStringSexToNumber(m: SexModelString): SexDB {
+  const newVar: Record<SexModelString, SexDB> =  {
     Secret: 0,
     Male: 1,
     Female: 2
-  }[m];
+  };
+  return newVar[m];
 }
 
 export function convertFile(dto: FileModelDto): FileModel {

@@ -111,7 +111,7 @@ export class DefaultStore extends VuexModule {
   public userImage: string | null = null;
   public allUsersDict: UserDictModel = {};
   public regHeader: string | null = null;
-  public online: number[] = [];
+  public onlineDict: Record<string, string[]> = {};
   public roomsDict: RoomDictModel = {};
   public channelsDict: ChannelsDictModel = {};
   public mediaObjects: { [id: string]: MediaStream } = {};
@@ -125,6 +125,10 @@ export class DefaultStore extends VuexModule {
     logger.debug('privateRooms {} ', roomModels)();
 
     return roomModels;
+  }
+
+  get online(): number[] {
+    return Object.keys(this.onlineDict).map(a => parseInt(a, 10));
   }
 
   get channelsDictUI(): ChannelsDictUIModel {
@@ -606,8 +610,8 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setOnline(ids: number[]) {
-    this.online = ids;
+  public setOnline(ids: Record<string, string[]>) {
+    this.onlineDict = ids;
   }
 
   @Mutation
@@ -684,7 +688,7 @@ export class DefaultStore extends VuexModule {
     this.roomsDict = {};
     this.allUsersDict = {};
     this.activeUserId = null;
-    this.online = [];
+    this.onlineDict = {};
     this.activeRoomId = null;
     this.editedMessage = null;
     this.storage.clearStorage();

@@ -517,7 +517,7 @@
     {
       "uid": "8b80d36d4ef43889db10bc1f0dc9a862",
       "css": "user",
-      "code": 59440,
+      "code": 59449,
       "src": "fontawesome"
     },
     {
@@ -657,7 +657,7 @@
     {
       "uid": "1bafeeb1808a5fe24484c7890096901a",
       "css": "user-plus",
-      "code": 59449,
+      "code": 59468,
       "src": "fontawesome"
     },
     {
@@ -963,6 +963,24 @@
       "css": "comment",
       "code": 62636,
       "src": "mfglabs"
+    },
+    {
+      "uid": "72109d2fb3088d0e66ea6a9204297651",
+      "css": "spin1",
+      "code": 59440,
+      "src": "fontelico"
+    },
+    {
+      "uid": "cd4bfdae4dc89b175ff49330ce29611a",
+      "css": "wifi",
+      "code": 61931,
+      "src": "fontawesome"
+    },
+    {
+      "uid": "db112402805d9dadc01ce009fbfdb914",
+      "css": "paper-plane",
+      "code": 59291,
+      "src": "entypo"
     },
     {
       "uid": "918bda80304f8b29c37dbd7322fef131",

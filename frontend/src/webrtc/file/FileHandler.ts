@@ -9,7 +9,7 @@ import Subscription from '@/utils/Subscription';
 import {DefaultStore} from '@/utils/store';
 import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
-export default class FileSender extends BaseTransferHandler {
+export default class FileHandler extends BaseTransferHandler {
 
   protected readonly handlers: HandlerTypes = {
     replyFile: <HandlerType>this.replyFile,

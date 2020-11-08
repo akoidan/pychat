@@ -48,7 +48,6 @@ export default abstract class BaseTransferHandler extends MessageHandler {
   protected closeAllPeerConnections() { // calls on destroy
     if (!this.connectionId) {
       this.logger.error(`Can't close connections since it's null`)();
-
       return;
     }
     this.webrtcConnnectionsIds.forEach(id => {

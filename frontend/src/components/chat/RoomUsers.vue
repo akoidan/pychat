@@ -55,6 +55,7 @@
         @click="onlineMinified = !onlineMinified"
       />
       <span
+        :title="titleOnlineText"
         class="usersStateText"
         @click="switchUserState"
       >{{ onlineText }}</span>
@@ -115,6 +116,10 @@ export default class RoomUsers extends Vue {
     return this.onlineShowOnlyOnline ? 'Room Users' : 'Room Online';
   }
 
+  get titleOnlineText() {
+    return this.onlineShowOnlyOnline ? 'Click to display only online users' : 'Click to display all users';
+  }
+
   get directClass() {
     return this.directMinified ? 'icon-angle-circled-up' : 'icon-angle-circled-down';
   }
@@ -173,6 +178,8 @@ export default class RoomUsers extends Vue {
           padding-right: 25px
           .icon-cog
             display: inline
+          .icon-no-cog
+            display: none
 
     /deep/ .rooms li
       padding-left: 7px

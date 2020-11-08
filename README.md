@@ -447,6 +447,8 @@ development.json and production.json have the following format:
 ```
 
 # TODO
+* create npm package for fontello instead of download_content.sh . move config with files location to package.json or fontello.json https://stackoverflow.com/questions/46725374/how-to-run-a-script-before-installing-any-npm-module
+* Call icon is missing if call in some room is in progress
 * opening devtools causing div $('.chatBoxHolder.holder') to have horizontal scroll. by disabling and enabling 'flex: 1' css on it, scroll dissappears 
 * download files with backgroun fetch https://developers.google.com/web/updates/2018/12/background-fetch
 * use native filesystemAPI to send files, so after refreshing the page we still have access https://www.youtube.com/watch?v=GNuG-5m4Ud0&ab_channel=GoogleChromeDevelopers

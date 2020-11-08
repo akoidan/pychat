@@ -178,6 +178,10 @@ export interface CallInfoModel {
   opponentCurrentVoice: number;
 }
 
+export interface P2pMessageModel {
+  amountOfActiveConnections: number;
+}
+
 export interface CallsInfoModel {
   calls: { [id: string]: CallInfoModel };
   callContainer: boolean;
@@ -206,6 +210,7 @@ export interface ChannelUIModel extends ChannelModel {
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
   callInfo: CallsInfoModel;
+  p2pInfo: P2pMessageModel;
   sendingFiles:  { [id: string]: SendingFile };
   receivingFiles:  { [id: string]: ReceivingFile };
   messages: { [id: number]: MessageModel };

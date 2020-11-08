@@ -54,7 +54,7 @@ export interface SetWsIdMessage extends DefaultMessage, OpponentWsId {
   rooms:  RoomDto[];
   channels: ChannelDto[];
   users: UserDto[];
-  online: number[];
+  online: Record<number, string[]>;
   time: number;
   userImage: string;
   userInfo: UserProfileDto;
@@ -137,7 +137,7 @@ export interface SetProfileImageMessage extends DefaultMessage {
 }
 
 interface ChangeUserOnline extends DefaultMessage, UserDto {
-  content: number[];
+  content: Record<number, string[]>;
   time: number;
 }
 

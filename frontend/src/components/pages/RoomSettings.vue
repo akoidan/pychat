@@ -111,7 +111,6 @@ import {
   CurrentUserInfoModel,
   RoomDictModel,
   RoomModel,
-  RoomSettingsModel,
   UserDictModel, UserModel
 } from '@/types/model';
 import {ApplyGrowlErr} from '@/utils/utils';

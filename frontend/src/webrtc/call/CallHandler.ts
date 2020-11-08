@@ -36,7 +36,7 @@ export default class CallHandler extends BaseTransferHandler {
   private get callInfo(): CallsInfoModel {
     return this.store.roomsDict[this.roomId].callInfo;
   }
-  protected readonly handlers: HandlerTypes = {
+  protected readonly handlers: Record<string, HandlerType> = {
     answerCall: this.answerCall,
     videoAnswerCall: this.videoAnswerCall,
     declineCall: this.declineCall,

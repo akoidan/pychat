@@ -311,7 +311,7 @@ export default class ChannelsPage extends Vue {
           return;
         }
         const {id, now} = this.addMessageToStore(md);
-        webrtcApi.getMessageHandler(this.activeRoomId).sendMessage(md.messageContent!)
+        webrtcApi.getMessageHandler(this.activeRoomId).sendP2pMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
       }
       return;
     }
@@ -328,7 +328,6 @@ export default class ChannelsPage extends Vue {
           return;
         }
         const {id, now} = this.addMessageToStore(md);
-        webrtcApi.startCall(this.activeRoomId);
         channelsHandler.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
       }
     } else if (event.keyCode === 27) { // 27 = escape
