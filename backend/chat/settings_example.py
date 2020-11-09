@@ -5,7 +5,7 @@
 ########################################################################################################################
 ############################################# START REQUIRED SECTION ###################################################
 
-
+### Uncomment a SINGLE import from 3 below
 # from chat.settings_docker import * # If you run pychat inside of docker container uncomment this
 # from chat.settings_local import * # If you run development server on your local machine uncomment this one
 # from chat.settings_prod import * # if you run this in production without docker uncomment this
