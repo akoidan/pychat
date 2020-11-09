@@ -38,7 +38,6 @@ class Actions(object):
 	REPLY_CALL_CONNECTION = 'replyCall'
 	PING = 'ping'
 	PONG = 'pong'
-	REQUEST_CHANNEL = 'requestChannel'
 	CHECK_PING = 'check_ping'
 	SAVE_CHANNEL_SETTINGS = 'saveChannelSettings'
 	SAVE_ROOM_SETTINGS = 'saveRoomSettings'

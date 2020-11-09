@@ -1,5 +1,5 @@
 <template>
-  <div class="right-div">
+  <div>
     <router-link :to="`/room-settings/${room.id}`">
       <span
         v-if="!room.newMessagesCount"
@@ -13,7 +13,6 @@
     >
       {{ room.newMessagesCount }}
     </span>
-<!--    TODO does icon-phone work-->
     <span
       v-else-if="room.callInfo.callActive"
       class="icon-phone icon-no-cog"
@@ -22,7 +21,7 @@
       <span
         v-if="room.p2pInfo.amountOfActiveConnections > 0"
         :title="`This room has opened ${room.p2pInfo.amountOfActiveConnections} connection with other devices`"
-        class="icon-spin1 icon-no-cog"
+        class="icon-spin1 icon-no-cog animate-spin"
       />
       <span
         v-else
@@ -44,13 +43,31 @@
   }
 </script>
 <!-- eslint-disable -->
-<style
-    lang="sass"
-    scoped
->
+<style lang="sass" scoped>
+  @import "~@/assets/sass/partials/mixins.sass"
+  @import "~@/assets/sass/partials/room_users_table.sass"
 
-  .right-div
-    display: flex
+  .icon-phone
+    @include hover-click(#3aa130)
+  .icon-wifi
+    @include hover-click(#c72727)
+
+  .icon-wifi, .icon-phone, .icon-spin1
+    @extend %right-icon
+  .icon-cog
+    @extend %icon-cog
+
+  .newMessagesCount
+    color: white
+    border-radius: 5px
+    display: inline-block
+    padding: 2px 10px 2px 10px
+    right: 10px
+    top: 5px
+    font-size: 12px
+    position: absolute
+  .color-reg .newMessagesCount
+    background-color: #891313
 
   /*.icon-cog*/
   /*  z-index: 22 // otherwise cog won't be clickable, becase we wrapped it in a div, that has 0x0 width height*/

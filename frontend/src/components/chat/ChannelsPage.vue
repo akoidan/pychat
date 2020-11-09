@@ -52,7 +52,7 @@
         </div>
         <span v-show="!recordingNow">Starting recording...</span>
       </div>
-      <room-users />
+      <chat-right-section />
       <smiley-holder
         v-show="showSmileys"
         @add-smiley="addSmiley"
@@ -97,7 +97,7 @@
 <script lang='ts'>
 import {Component, Vue, Watch, Ref} from 'vue-property-decorator';
 import {ALL_ROOM_ID} from '@/utils/consts';
-import RoomUsers from '@/components/chat/RoomUsers';
+import ChatRightSection from '@/components/chat/ChatRightSection';
 import ChatBox from '@/components/chat/ChatBox';
 import SmileyHolder from '@/components/chat/SmileyHolder';
 import {
@@ -128,7 +128,7 @@ import {Route, RawLocation} from 'vue-router';
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-@Component({components: {MediaRecorder, RoomUsers, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
+@Component({components: {MediaRecorder, ChatRightSection, ChatBox, SmileyHolder, NavEditMessage, NavUserShow}})
 export default class ChannelsPage extends Vue {
 
   @State

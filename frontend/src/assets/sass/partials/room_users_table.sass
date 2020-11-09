@@ -1,0 +1,101 @@
+@import "~@/assets/sass/partials/variables"
+@import "~@/assets/sass/partials/mixins"
+@import "~@/assets/sass/partials/abstract_classes"
+
+%header
+  display: block
+  font-size: 13px
+  font-weight: bold
+  @extend %user-select-none
+  text-transform: uppercase
+  vertical-align: middle
+  padding: 5px
+
+.color-reg
+  %link
+    color: $color-lor-main
+  %header
+    background-color: #171717
+  %active-room
+    background-color: rgba(33, 158, 147, 0.45)
+  %header-left-icon
+    @include hover-click(#e3e3e3)
+  %icon-cog
+    @include hover-click(#59b2c1)
+
+.color-lor
+  %header
+    background-color: #221f1f
+    color: #8f8f8f
+  %active-room
+    background-color: #375a70
+  %icon-cog
+    color: #59b2c1
+
+.color-white
+  %link
+    color: $color-white-main
+  %header
+    background-color: #414141
+    color: white
+  %active-room
+    background-color: #656888
+  %header-left-icon
+    color: #cccccc
+  %icon-cog
+    color: #59b2c1
+
+%online-first
+  display: flex
+  flex-direction: column
+
+%link
+  display: flex
+  flex-grow: 1
+
+%ul
+  margin: 5px 2px
+  padding-left: 0
+  display: flex
+  flex-direction: column
+
+%li
+  @include fix-user-icon-top-position
+  @include ellipsis
+  width: 100%
+  border-radius: 3px
+  position: relative
+  height: 30px
+  padding-left: 7px
+  .online
+    order: 1
+  .offline
+    order: 2
+  &:not(.active-room)
+    @extend %hovered-user-room
+  &:hover
+    padding-right: 25px
+    /deep/ .icon-cog // this is located in room-right icon and other places
+      display: inline
+    /deep/ .icon-no-cog
+      display: none
+
+
+
+%header-left-icon
+  cursor: pointer
+  font-size: 15px
+
+%header-right-icon
+  float: right
+  @extend %header-left-icon
+
+%right-icon
+  position: absolute
+  top: 2px
+  right: 0
+
+%icon-cog
+  @extend %right-icon
+  display: none
+  background: transparent

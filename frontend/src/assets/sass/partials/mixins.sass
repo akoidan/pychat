@@ -1,5 +1,9 @@
 @import "~@/assets/sass/partials/variables"
 
+@mixin fix-user-icon-top-position()
+	i:before
+		transform: translate(0, 3px)
+
 @mixin border-radius($radius...)
 	-webkit-border-radius: $radius
 	-moz-border-radius: $radius

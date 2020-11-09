@@ -74,8 +74,7 @@ class MessagesHandler(MessagesCreator):
 			Actions.SET_SETTINGS: self.profile_save_settings,
 			Actions.INVITE_USER: self.invite_user,
 			Actions.PING: self.respond_ping,
-			Actions.PONG: self.process_pong_message,
-			Actions.REQUEST_CHANNEL: self.request_channel,
+			Actions.PONG: self.process_pong_message
 		}
 		# Handlers for redis messages, if handler returns true - message won't be sent to client
 		# The handler is determined by @VarNames.EVENT

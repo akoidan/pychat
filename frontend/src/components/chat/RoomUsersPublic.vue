@@ -1,6 +1,6 @@
 <template>
-  <li :class="activeClass" class="li">
-    <router-link :to="`/chat/${room.id}`">
+  <li :class="activeClass">
+    <router-link :to="`/chat/${room.id}`" class="link">
       {{ room.name }}
     </router-link>
     <room-right-icon :room="room" />
@@ -27,6 +27,13 @@ export default class RoomUsersPublic extends Vue {
 </script>
 
 <style lang="sass" scoped>
-  .li
-    display: flex
+
+  @import "~@/assets/sass/partials/room_users_table.sass"
+
+  li
+    @extend %li
+  .active-room
+    @extend %active-room
+  .link
+    @extend %link
 </style>

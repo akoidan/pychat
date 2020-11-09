@@ -1,6 +1,6 @@
 <template>
   <div>
-    <li @click="expandChannel(channel.id)" class="channel">
+    <li @click="expandChannel(channel.id)">
       {{ channel.name }}
 
       <router-link :to="`/channel-settings/${channel.id}`">
@@ -34,8 +34,13 @@
   }
 </script>
 <!-- eslint-disable -->
-<style
-    lang="sass"
-    scoped
->
+<style lang="sass" scoped>
+
+  @import "~@/assets/sass/partials/room_users_table.sass"
+
+  li
+    @extend %li
+    color: #b89e00
+  .icon-cog
+    @extend %icon-cog
 </style>

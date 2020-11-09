@@ -194,9 +194,10 @@ download_fontello() {
     safeRunCommand unzip "$TMP_DIR/fonts.zip" -d "$TMP_DIR/fontello"
     dir=$(ls "$TMP_DIR/fontello")
     cat "$TMP_DIR/fontello/$dir/css/fontello.css" | grep ^.icon >  "$SASS_DIR/partials/fontello.scss"
-    cp -v "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
-    cp -v "$TMP_DIR/fontello"/$dir/demo.html "$ASSETS_DIR/demo.html"
-    cp -v "$TMP_DIR/fontello"/$dir/config.json "$FE_DIRECTORY/font-config.json"
+    safeRunCommand cp -v "$TMP_DIR/fontello/$dir/css/animation.css" "$SASS_DIR/partials/animation.scss"
+    safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
+    safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/demo.html "$ASSETS_DIR/demo.html"
+    safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/config.json "$FE_DIRECTORY/font-config.json"
 
     if type "sed" &> /dev/null; then
         sed -i '1i\@charset "UTF-8";' "$SASS_DIR/partials/fontello.scss"
