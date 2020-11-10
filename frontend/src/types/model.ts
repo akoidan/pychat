@@ -126,9 +126,9 @@ export interface SearchModel {
   locked: boolean;
 }
 
-export interface ChangeOnline {
+export interface RoomLog {
   userId: number;
-  isWentOnline: boolean;
+  action: 'appeared online' | 'gone offline' | 'joined this room' | 'left this room' | 'been invited to this room';
   time: number;
 }
 
@@ -217,7 +217,7 @@ export interface RoomModel extends RoomSettingsModel {
   allLoaded: boolean;
   search: SearchModel;
   newMessagesCount: number;
-  changeOnline: ChangeOnline[];
+  roomLog: RoomLog[];
   changeName: ChangeRoomName[];
 }
 

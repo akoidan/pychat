@@ -35,7 +35,7 @@ export class SecurityValidator {
   }
 
   validate(data: DefaultMessage) {
-    this.validators[data.handler][data.action]();
+    this.validators[data.handler][data.action].apply(this, data);
   }
 
 }

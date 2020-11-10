@@ -6,7 +6,7 @@ import {checkAndPlay, incoming, login, logout, outgoing} from '@/utils/audio';
 import faviconUrl from '@/assets/img/favicon.ico';
 
 import {
-  ChangeOnlineEntry,
+  RoomLogEntry,
   PubSetRooms,
   RemoveMessageProgress,
   RemoveSendingMessage,
@@ -421,6 +421,14 @@ export default class ChannelsHandler extends MessageHandler {
         users: message.users
       };
       this.store.setRoomsUsers(m);
+      this.store.addRoomLog({
+        roomLog: {
+          userId: message.userId,
+          time: Date.now(), // TODO
+          action: 'left this room'
+        },
+        roomIds: [message.roomId]
+      })
     } else {
       this.logger.error('Unable to find room {} to kick user', message.roomId)();
     }
@@ -462,6 +470,13 @@ export default class ChannelsHandler extends MessageHandler {
       roomId: message.roomId,
       users: message.users
     } as SetRoomsUsers);
+    message.inviteeUserId.forEach(i => {
+      this.store.addRoomLog({roomIds: [message.roomId], roomLog: {
+        action: 'joined this room',
+        time: message.time,
+        userId: i
+      }});
+    })
   }
 
   private deleteChannel(message: DeleteChannel) {
@@ -479,10 +494,10 @@ export default class ChannelsHandler extends MessageHandler {
         roomIds.push(r.id);
       }
     });
-    const entry: ChangeOnlineEntry = {
+    const entry: RoomLogEntry = {
       roomIds,
-      changeOnline: {
-        isWentOnline,
+      roomLog: {
+        action: isWentOnline ? 'appeared online' : 'gone offline',
         time,
         userId
       }
@@ -492,7 +507,7 @@ export default class ChannelsHandler extends MessageHandler {
     if (this.store.userSettings!.onlineChangeSound && this.store.myId !== userId) {
       checkAndPlay(isWentOnline ? login : logout, 50);
     }
-    this.store.addChangeOnlineEntry(entry);
+    this.store.addRoomLog(entry);
   }
 
   private async uploadAndSend(
@@ -526,6 +541,14 @@ export default class ChannelsHandler extends MessageHandler {
   private mutateRoomAddition(message: AddRoomBase) {
     const r: RoomModel = getRoomsBaseDict(message);
     this.store.addRoom(r);
+    this.store.addRoomLog({
+      roomIds: [r.id],
+      roomLog: {
+        action: 'been invited to this room',
+        time: message.time,
+        userId: this.store.myId!
+      }
+    });
   }
 
   private getMessage(message: MessageModelDto): MessageModel {

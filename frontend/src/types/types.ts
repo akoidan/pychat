@@ -1,6 +1,6 @@
 import {
   FileTransferStatus,
-  ChangeOnline,
+  RoomLog,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   FileModel,
@@ -118,8 +118,8 @@ export interface RemovePeerConnection extends DefaultMessage {
   opponentWsId: string;
 }
 
-export interface ChangeOnlineEntry {
-  changeOnline: ChangeOnline;
+export interface RoomLogEntry {
+  roomLog: RoomLog;
   roomIds: number[];
 }
 

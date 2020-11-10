@@ -26,7 +26,7 @@ import {
 import {
   AddSendingFileTransfer,
   BooleanIdentifier,
-  ChangeOnlineEntry,
+  RoomLogEntry,
   IStorage,
   MediaIdentifier,
   MessagesLocation,
@@ -603,9 +603,9 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public addChangeOnlineEntry(payload: ChangeOnlineEntry) {
+  public addRoomLog(payload: RoomLogEntry) {
     payload.roomIds.forEach(r => {
-      this.roomsDict[r].changeOnline.push(payload.changeOnline);
+      this.roomsDict[r].roomLog.push(payload.roomLog);
     });
   }
 

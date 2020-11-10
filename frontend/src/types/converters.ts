@@ -116,7 +116,7 @@ export function getRoomsBaseDict(
     creator: roomCreatorId,
     messages: databaseRestoredRoom ? databaseRestoredRoom.messages : {},
     newMessagesCount: databaseRestoredRoom ? databaseRestoredRoom.newMessagesCount : 0,
-    changeOnline: databaseRestoredRoom ? databaseRestoredRoom.changeOnline : [],
+    roomLog: databaseRestoredRoom ? databaseRestoredRoom.roomLog : [],
     changeName: databaseRestoredRoom ? databaseRestoredRoom.changeName : [],
     allLoaded: databaseRestoredRoom ? databaseRestoredRoom.allLoaded : false,
     search: databaseRestoredRoom ? databaseRestoredRoom.search : {
