@@ -26,13 +26,14 @@ import AppProgressBar from '@/components/ui/AppProgressBar';
 import {FileTransferStatus, SendingFileTransfer, UserModel} from '@/types/model';
 import {webrtcApi} from '@/utils/singletons';
 
-const fileStatusDict: { [id: number]: string } = {};
-fileStatusDict[FileTransferStatus.NOT_DECIDED_YET] = 'Waiting to accept';
-fileStatusDict[FileTransferStatus.IN_PROGRESS] = 'Sending...';
-fileStatusDict[FileTransferStatus.FINISHED] = 'Successfully sent';
-fileStatusDict[FileTransferStatus.DECLINED_BY_OPPONENT] = 'Declined by opponent';
-fileStatusDict[FileTransferStatus.DECLINED_BY_YOU] = 'Declined by you';
-fileStatusDict[FileTransferStatus.ERROR] = 'Error';
+const fileStatusDict: Record<FileTransferStatus, string> = {
+  [FileTransferStatus.NOT_DECIDED_YET]: 'Waiting to accept',
+  [FileTransferStatus.IN_PROGRESS]: 'Sending...',
+  [FileTransferStatus.FINISHED]: 'Successfully sent',
+  [FileTransferStatus.DECLINED_BY_OPPONENT]: 'Declined by opponent',
+  [FileTransferStatus.DECLINED_BY_YOU]: 'Declined by you',
+  [FileTransferStatus.ERROR]: 'Error'
+};
 
 @Component({
   components: {AppProgressBar}

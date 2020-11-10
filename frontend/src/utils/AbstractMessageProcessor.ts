@@ -4,11 +4,11 @@ import {
   GrowlMessage
 } from '@/types/messages';
 import { Logger } from 'lines-logger';
-import {sub} from '@/utils/sub';
 import loggerFactory from '@/utils/loggerFactory';
 import {MessageSupplier} from '@/types/types';
-import {DefaultStore} from '@/utils/store';
+import type {DefaultStore} from '@/utils/store';
 import {getUniqueId} from '@/utils/pureFunctions';
+import {sub} from '@/utils/sub';
 
 export default class AbstractMessageProcessor {
 
@@ -45,7 +45,7 @@ export default class AbstractMessageProcessor {
     }
   }
 
-  public onMessage(jsonData: string) {
+  public parseMessage(jsonData: string): DefaultMessage|null {
     let data: DefaultMessage;
     try {
       data = JSON.parse(jsonData);
@@ -53,17 +53,17 @@ export default class AbstractMessageProcessor {
     } catch (e) {
       this.logger.error('Unable to parse incomming message {}', jsonData)();
 
-      return;
+      return null;
     }
     if (!data.handler || !data.action) {
       this.logger.error('Invalid message structure')();
 
-      return;
+      return null;
     }
-    this.handleMessage(data);
+    return data;
   }
 
-  private handleMessage(data: DefaultMessage) {
+  public handleMessage(data: DefaultMessage) {
     if (data.handler !== 'void' && data.action !== 'growlError') {
       sub.notify(data);
     }

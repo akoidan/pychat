@@ -5,17 +5,20 @@ import {DefaultStore} from '@/utils/store';
 import {sub} from '@/utils/sub';
 import {MessageSupplier} from '@/types/types';
 import AbstractMessageProcessor from '@/utils/AbstractMessageProcessor';
+import {SecurityValidator} from '@/webrtc/message/SecurityValidator';
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
   private opponentUserId: number;
   private sendingQueue: DefaultMessage[] = [];
   protected status: 'inited' | 'not_inited' = 'not_inited';
   private readonly messageProc: AbstractMessageProcessor;
+  private readonly securityValidator: SecurityValidator;
 
 
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, userId: number) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.opponentUserId = userId;
+    this.securityValidator = new SecurityValidator(this.roomId, this.opponentUserId, store);
     this.messageProc = new AbstractMessageProcessor(this, store, `p2p-${opponentWsId}`);
   }
 
@@ -45,7 +48,11 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
   }
 
   protected onChannelMessage(event: MessageEvent) {
-    this.messageProc.onMessage(event.data);
+    let data = this.messageProc.parseMessage(event.data);
+    if (data) {
+      this.securityValidator.validate(data);
+      this.messageProc.handleMessage(data);
+    }
   }
 
   public setupEvents() {

@@ -428,7 +428,10 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   private onWsMessage(message: MessageEvent) {
-    this.messageProc.onMessage(message.data);
+    let data = this.messageProc.parseMessage(message.data);
+    if (data) {
+      this.messageProc.handleMessage(data);
+    }
   }
 
 
