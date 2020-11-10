@@ -1,13 +1,22 @@
 import AbstractPeerConnection from '@/webrtc/AbstractPeerConnection';
-import {DefaultMessage} from '@/types/messages';
+import {AppendQueue, DefaultMessage} from '@/types/messages';
 import WsHandler from '@/utils/WsHandler';
 import {DefaultStore} from '@/utils/store';
 import {sub} from '@/utils/sub';
-import {MessageSupplier} from '@/types/types';
+import {MessageSupplier, RemovePeerConnection} from '@/types/types';
 import AbstractMessageProcessor from '@/utils/AbstractMessageProcessor';
 import {SecurityValidator} from '@/webrtc/message/SecurityValidator';
+import Subscription from '@/utils/Subscription';
+import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
+
+  protected readonly handlers: HandlerTypes = {
+    sendRtcData: <HandlerType>this.onsendRtcData,
+    appendQueue: <HandlerType>this.appendQueue,
+    checkDestroy: <HandlerType>this.checkDestroy,
+  };
+
   private opponentUserId: number;
   private sendingQueue: DefaultMessage[] = [];
   protected status: 'inited' | 'not_inited' = 'not_inited';
@@ -18,8 +27,18 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
   constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, userId: number) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.opponentUserId = userId;
+    sub.subscribe(Subscription.allPeerConnectionsForTransfer(connId), this);
     this.securityValidator = new SecurityValidator(this.roomId, this.opponentUserId, store);
     this.messageProc = new AbstractMessageProcessor(this, store, `p2p-${opponentWsId}`);
+  }
+
+  public getOpponentUserId() {
+    return this.opponentUserId;
+  }
+
+  public onDestroy(reason?: string) {
+    super.onDestroy(reason);
+    sub.unsubscribe(Subscription.allPeerConnectionsForTransfer(this.connectionId), this);
   }
 
   abstract makeConnection(): void;
@@ -33,13 +52,21 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     }
   }
 
-  public appendQueue(...messages: DefaultMessage[]) {
+  checkDestroy() {
+    //destroy only if user has left this room, if he's offline but connections is stil in progress,
+    // maybe he has jost connection to server but not to us
+    if (this.store.roomsDict[this.roomId].users.indexOf(this.opponentUserId) < 0) {
+      this.onDestroy("User has left this room")
+    }
+  }
+
+  public appendQueue(message: AppendQueue) {
     if (this.isChannelOpened) {
-      messages.forEach(message => {
+      message.messages.forEach(message => {
         this.messageProc.sendToServer(message);
       })
     } else {
-      this.sendingQueue.push(...messages);
+      this.sendingQueue.push(...message.messages);
     }
   }
 

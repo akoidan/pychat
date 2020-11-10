@@ -4,10 +4,6 @@ import MessagePeerConnection from '@/webrtc/message/MessagePeerConnection';
 export default class MessageSenderPeerConnection extends MessagePeerConnection {
   protected connectedToRemote: boolean = true;
 
-  protected readonly handlers: HandlerTypes = {
-    sendRtcData: <HandlerType>this.onsendRtcData
-  };
-
   public makeConnection() {
     if (this.status !== 'not_inited') {
       return;

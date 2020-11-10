@@ -15,11 +15,17 @@ export interface DefaultSentMessage {
   messageId?: number;
 }
 
+
+export type HandlerName = 'channels' | 'lan' | 'message' | 'webrtc' | 'ws'| 'void';
+
 export interface DefaultMessage extends DefaultSentMessage {
-  handler: string;
+  handler: HandlerName;
   cbBySender?: string;
 }
 
+export interface AppendQueue extends DefaultMessage {
+  messages: DefaultMessage[];
+}
 export interface SaveChannelSettings extends DefaultMessage, ChannelDto {
 }
 

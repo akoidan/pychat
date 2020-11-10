@@ -29,7 +29,7 @@ export default abstract class BaseTransferHandler extends MessageHandler {
 
   protected onDestroy() {
     if (this.connectionId) {
-      sub.unsubscribe(Subscription.getTransferId(this.connectionId));
+      sub.unsubscribe(Subscription.getTransferId(this.connectionId), this);
     }
   }
 

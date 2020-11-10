@@ -25,17 +25,25 @@ export class SecurityValidator {
     channels: {
       printMessage: (message: PrintMessage) => {
         if (message.roomId != this.roomId) {
-          throw Error(`Can process message. Because user ${this.opponentUseId} doesn't have access to room ${message.roomId} `);
+          throw Error(`Security Error: Can process message. Because user ${this.opponentUseId} doesn't have access to room ${message.roomId} `);
         }
         if (message.userId != this.opponentUseId) {
-          throw Error(`Can process message, because user ${message.userId} is not who he is ${this.opponentUseId}`);
+          throw Error(`Security Error: Can process message, because user ${message.userId} is not who he is ${this.opponentUseId}`);
         }
       }
     }
   }
 
   validate(data: DefaultMessage) {
-    this.validators[data.handler][data.action].apply(this, data);
+    let validator = this.validators[data.handler];
+    if (!validator) {
+      throw Error(`Security Error: Unknown validator for this message ${data.handler}`)
+    }
+    let action = validator[data.action];
+    if (!action) {
+      throw Error(`Security Error: Unknown action for this message [${data.handler}][${data.action}]`)
+    }
+    action.bind(this)(data);
   }
 
 }

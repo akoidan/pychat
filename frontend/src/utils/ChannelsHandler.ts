@@ -340,6 +340,15 @@ export default class ChannelsHandler extends MessageHandler {
       this.addChangeOnlineEntry(message.userId, message.time, true);
     }
     this.store.setOnline(message.content);
+
+
+  }
+
+  private notifyDevicesChanged() {
+    sub.notify({
+      handler: 'message',
+      action: 'changeDevices'
+    });
   }
 
   private removeOnlineUser(message: RemoveOnlineUserMessage) {
@@ -347,13 +356,14 @@ export default class ChannelsHandler extends MessageHandler {
       this.addChangeOnlineEntry(message.userId, message.time, false);
     }
     this.store.setOnline(message.content);
+    this.notifyDevicesChanged()
   }
 
   private printMessage(inMessage: EditMessage) {
     if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
       this.removeSendingMessage(inMessage.messageId);
       if (!inMessage.messageId) {
-        throw Error(`Unkown messageId ${inMessage}`);
+        throw Error(`Unknown messageId ${inMessage}`);
       }
       const rmMes: RemoveSendingMessage = {
         messageId: inMessage.messageId,
@@ -412,6 +422,7 @@ export default class ChannelsHandler extends MessageHandler {
     } else {
       this.logger.error('Unable to find room {} to delete', message.roomId)();
     }
+    this.notifyDevicesChanged();
   }
 
   private leaveUser(message: LeaveUserMessage) {
@@ -428,7 +439,8 @@ export default class ChannelsHandler extends MessageHandler {
           action: 'left this room'
         },
         roomIds: [message.roomId]
-      })
+      });
+      this.notifyDevicesChanged();
     } else {
       this.logger.error('Unable to find room {} to kick user', message.roomId)();
     }
@@ -477,6 +489,7 @@ export default class ChannelsHandler extends MessageHandler {
         userId: i
       }});
     })
+    this.notifyDevicesChanged();
   }
 
   private deleteChannel(message: DeleteChannel) {
@@ -549,6 +562,7 @@ export default class ChannelsHandler extends MessageHandler {
         userId: this.store.myId!
       }
     });
+    this.notifyDevicesChanged()
   }
 
   private getMessage(message: MessageModelDto): MessageModel {

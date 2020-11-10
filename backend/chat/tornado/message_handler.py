@@ -747,13 +747,11 @@ class MessagesHandler(MessagesCreator):
 			self.ws_write(channels)
 		else:
 			self.ws_write({
-				{
-					VarNames.EVENT: Actions.USER_LEAVES_ROOM,
-					VarNames.ROOM_ID: room_id,
-					VarNames.USER_ID: message[VarNames.USER_ID],
-					VarNames.ROOM_USERS: message[VarNames.ROOM_USERS],
-					VarNames.HANDLER_NAME: HandlerNames.CHANNELS
-				}
+				VarNames.EVENT: Actions.USER_LEAVES_ROOM,
+				VarNames.ROOM_ID: room_id,
+				VarNames.USER_ID: message[VarNames.USER_ID],
+				VarNames.ROOM_USERS: message[VarNames.ROOM_USERS],
+				VarNames.HANDLER_NAME: HandlerNames.CHANNELS
 			})
 		return True
 

@@ -68,7 +68,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       opponentWsId: this.opponentWsId
     };
     sub.notify(message);
-    sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId));
+    sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
   }
 
   public print(message: string) {

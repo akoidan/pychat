@@ -8,24 +8,43 @@ import MessageSenderPeerConnection
 import MessageReceiverPeerConnection
   from '@/webrtc/message/MessageReceiverPeerConnection';
 import {
+  AppendQueue,
   DefaultMessage,
   EditMessage,
   OfferCall,
   PrintMessage
 } from '@/types/messages';
+import WsHandler from '@/utils/WsHandler';
+import NotifierHandler from '@/utils/NotificationHandler';
+import {DefaultStore} from '@/utils/store';
+import {sub} from '@/utils/sub';
+import Subscription from '@/utils/Subscription';
 
 export default class MessageTransferHandler extends BaseTransferHandler {
 
   protected readonly handlers: HandlerTypes = {
-    removePeerConnection: <HandlerType>this.removePeerConnection
+    removePeerConnection: <HandlerType>this.removePeerConnection,
+    changeDevices: <HandlerType>this.changeDevices
   };
+
+  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore) {
+    super(roomId, wsHandler, notifier, store);
+    sub.subscribe('message', this);
+  }
 
   private sendingQueue: DefaultMessage[] = [];
 
-  private peerConnections: Record<string, MessagePeerConnection> = {};
 
   get room(): RoomModel {
     return this.store.roomsDict[this.roomId];
+  }
+
+  protected onDestroy() {
+    sub.unsubscribe('message', this);
+  }
+
+  private changeDevices(): void {
+
   }
 
   private state: 'not_inited' |'initing' | 'waiting' | 'ready' = 'not_inited';
@@ -46,34 +65,47 @@ export default class MessageTransferHandler extends BaseTransferHandler {
     return connections;
   }
 
-  async acceptConnection(message: OfferCall) {
-    let connectionIds = this.connectionIds;
+  public async acceptConnection(message: OfferCall) {
     this.state = 'initing';
-    this.initConnection(connectionIds, message.connId);
+    this.connectionId = message.connId;
+    this.initConnection();
   }
 
-   initConnection(connections: UserIdConn[], connId: string) {
+  private initConnection() {
     let myConnectionId = this.wsHandler.getWsConnectionId();
-    connections.forEach(connectionIdWithUser => {
+    let newConnectionIdsWithUser = this.connectionIds;
+    newConnectionIdsWithUser.forEach(connectionIdWithUser => {
       let opponentWsId = connectionIdWithUser.connectionId;
-      if (!this.peerConnections[opponentWsId]) {
+      if (this.webrtcConnnectionsIds.indexOf(opponentWsId) < 0) {
+        let mpc;
         if (opponentWsId > myConnectionId) {
-          this.peerConnections[opponentWsId]= new MessageSenderPeerConnection(this.roomId, connId, opponentWsId, this.wsHandler, this.store,  connectionIdWithUser.userId);
+          mpc = new MessageSenderPeerConnection(this.roomId, this.connectionId!, opponentWsId, this.wsHandler, this.store,  connectionIdWithUser.userId);
 
         } else {
-          this.peerConnections[opponentWsId] = new MessageReceiverPeerConnection(this.roomId, connId, opponentWsId, this.wsHandler, this.store, connectionIdWithUser.userId);
+          mpc = new MessageReceiverPeerConnection(this.roomId, this.connectionId!, opponentWsId, this.wsHandler, this.store, connectionIdWithUser.userId);
         }
+        this.webrtcConnnectionsIds.push(opponentWsId);
+        mpc.makeConnection();
       }
-      this.peerConnections[opponentWsId].makeConnection();
-
     });
-   this.flushQueue();
+    let newConnectionIds: string[] = newConnectionIdsWithUser.map(a => a.connectionId);
+
+    let connectionsToRemove = this.webrtcConnnectionsIds.filter(oldC => newConnectionIds.indexOf(oldC) < 0);
+    sub.notify({
+      action: 'checkDestroy',
+      handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
+    });
+    this.flushQueue();
   }
 
-  flushQueue() {
-    Object.values(this.peerConnections).forEach(pc => {
-      pc.appendQueue(...this.sendingQueue);
-    })
+  private flushQueue() {
+    let message: AppendQueue = {
+      handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
+      action: 'appendQueue',
+      messages: this.sendingQueue
+    };
+    sub.notify(message);
+
     this.sendingQueue = [];
   }
 
@@ -97,12 +129,12 @@ export default class MessageTransferHandler extends BaseTransferHandler {
       handler: 'channels'
     }
     this.sendingQueue.push(em);
-    let connectionIds = this.connectionIds;
     if (this.state === 'not_inited') {
       this.state = 'initing';
       if (this.connectionIds.length > 0) {
         let {connId} =  await this.wsHandler.offerMessageConnection(this.roomId);
-        this.initConnection(connectionIds, connId);
+        this.connectionId = connId;
+        this.initConnection();
       } else {
         this.state = 'waiting';
       }
