@@ -2,12 +2,10 @@ import {
   ChannelsDictModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
-  FileModel,
   RoomDictModel,
   SexModelString,
   UserModel
 } from '@/types/model';
-import {DefaultMessage} from '@/types/messages';
 
 export type SexModelDto = 'Male' | 'Female' |'Secret';
 
@@ -96,11 +94,11 @@ export interface FileModelDto {
 export interface MessageModelDto {
   id: number;
   time: number;
-  files: {[id: number]: FileModelDto};
+  files?: {[id: number]: FileModelDto};
   content: string;
-  symbol: string;
-  deleted: boolean;
-  giphy: string;
+  symbol?: string;
+  deleted?: boolean;
+  giphy?: string;
   edited: number;
   roomId: number;
   userId: number;

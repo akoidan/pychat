@@ -172,7 +172,7 @@ export class DefaultStore extends VuexModule {
   }
 
   get myId(): number | null {
-    return this.userInfo && this.userInfo.userId;
+    return this.userInfo?.userId ?? null;
   }
 
   get privateRoomsUsersIds(): PrivateRoomsIds {

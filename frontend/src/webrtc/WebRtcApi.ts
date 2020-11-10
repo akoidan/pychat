@@ -30,7 +30,8 @@ export default class WebRtcApi extends MessageHandler {
 
   protected readonly handlers: HandlerTypes  = {
     offerFile: <HandlerType>this.onofferFile,
-    offerCall: <HandlerType>this.offerCall
+    offerCall: <HandlerType>this.offerCall,
+    offerMessage: <HandlerType>this.offerMessage
   };
 
   private readonly wsHandler: WsHandler;
@@ -50,6 +51,11 @@ export default class WebRtcApi extends MessageHandler {
 
   public offerCall(message: OfferCall) {
     this.getCallHandler(message.roomId).initAndDisplayOffer(message);
+  }
+
+
+  public offerMessage(message: OfferCall) {
+    this.getMessageHandler(message.roomId).acceptConnection(message);
   }
 
   public acceptFile(connId: string, webRtcOpponentId: string) {

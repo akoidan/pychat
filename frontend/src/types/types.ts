@@ -15,7 +15,7 @@ import {
   ChannelModel
 } from '@/types/model';
 import {ChannelDto, RoomDto, SetStateFromStorage, UserDto} from '@/types/dto';
-import {DefaultMessage} from '@/types/messages';
+import {DefaultMessage, DefaultSentMessage} from '@/types/messages';
 
 export interface UploadFile {
    type: string;
@@ -29,6 +29,12 @@ export type ValueFilterForKey<T extends object, U> = {
 
 export interface IMessageHandler {
   handle(message: DefaultMessage): void;
+}
+
+
+export interface UserIdConn {
+  connectionId: string;
+  userId: number;
 }
 
 export interface ChangeStreamMessage extends DefaultMessage {
@@ -126,6 +132,11 @@ export interface SetMessageProgressError {
 export interface RemoveSendingMessage {
   messageId: number;
   roomId: number;
+}
+
+export interface MessageSupplier {
+  sendRawTextToServer(message: string): boolean;
+  getWsConnectionId(): string;
 }
 
 export  interface IStorage {

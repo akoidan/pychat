@@ -125,6 +125,7 @@ import {channelsHandler, globalLogger, messageBus, webrtcApi} from '@/utils/sing
 import {State} from '@/utils/storeHolder';
 import MediaRecorder from '@/components/chat/MediaRecorder';
 import {Route, RawLocation} from 'vue-router';
+import {getUniqueId} from '@/utils/pureFunctions';
 
 const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
@@ -353,7 +354,7 @@ export default class ChannelsPage extends Vue {
 
   private addMessageToStore(md: MessageDataEncode) {
     const now = Date.now();
-    const id = -this.$ws.getMessageId();
+    const id = -getUniqueId();
     const mm: MessageModel = {
       roomId: this.activeRoomId,
       deleted: false,
@@ -403,7 +404,7 @@ export default class ChannelsPage extends Vue {
     } else if (messageId > 0 && messageContent) {
       channelsHandler.sendEditMessage(messageContent, roomId, messageId, uploadFiles);
     } else if (!messageContent && messageId > 0) {
-      channelsHandler.sendDeleteMessage(messageId, -this.$ws.getMessageId());
+      channelsHandler.sendDeleteMessage(messageId, -getUniqueId());
     } else if (!messageContent && messageId < 0) {
       channelsHandler.removeSendingMessage(messageId);
     }

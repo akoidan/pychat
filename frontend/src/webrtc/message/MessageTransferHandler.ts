@@ -1,33 +1,26 @@
 import BaseTransferHandler from '@/webrtc/BaseTransferHandler';
 import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 import {RoomModel} from '@/types/model';
-import {UploadFile} from '@/types/types';
+import { UploadFile, UserIdConn} from '@/types/types';
 import MessagePeerConnection from '@/webrtc/message/MessagePeerConnection';
 import MessageSenderPeerConnection
   from '@/webrtc/message/MessageSenderPeerConnection';
 import MessageReceiverPeerConnection
   from '@/webrtc/message/MessageReceiverPeerConnection';
+import {
+  DefaultMessage,
+  EditMessage,
+  OfferCall,
+  PrintMessage
+} from '@/types/messages';
 
-// TODO move this to model
-interface Message {
-  content: string;
-  roomId: number;
-  uploadfiles: UploadFile[];
-  originId: number;
-  originTime: number;
-}
-
-interface UserIdConn {
-  connectionId: string;
-  userId: number;
-}
 export default class MessageTransferHandler extends BaseTransferHandler {
 
   protected readonly handlers: HandlerTypes = {
     removePeerConnection: <HandlerType>this.removePeerConnection
   };
 
-  private sendingQueue: Message[] = [];
+  private sendingQueue: DefaultMessage[] = [];
 
   private peerConnections: Record<string, MessagePeerConnection> = {};
 
@@ -35,13 +28,13 @@ export default class MessageTransferHandler extends BaseTransferHandler {
     return this.store.roomsDict[this.roomId];
   }
 
-  private state: 'not_inited' | 'waiting' = 'not_inited';
+  private state: 'not_inited' |'initing' | 'waiting' | 'ready' = 'not_inited';
 
   get connectionIds(): UserIdConn[] {
     let usersIds = this.room.users;
     let myConnectionId = this.wsHandler.getWsConnectionId();
     let connections = usersIds.reduce((connectionIdsWithUser, userId) => {
-      let connectionIds: string[] = this.store.onlineDict[userId];
+      let connectionIds: string[] = this.store.onlineDict[userId] ?? [];
       connectionIds.forEach(connectionId => {
         if (connectionId !== myConnectionId) {
           connectionIdsWithUser.push({userId, connectionId});
@@ -53,21 +46,35 @@ export default class MessageTransferHandler extends BaseTransferHandler {
     return connections;
   }
 
-  async initConnection(connections: UserIdConn[]) {
+  async acceptConnection(message: OfferCall) {
+    let connectionIds = this.connectionIds;
+    this.state = 'initing';
+    this.initConnection(connectionIds, message.connId);
+  }
+
+   initConnection(connections: UserIdConn[], connId: string) {
     let myConnectionId = this.wsHandler.getWsConnectionId();
-    let {connId} =  await this.wsHandler.offerMessageConnection(this.roomId);
     connections.forEach(connectionIdWithUser => {
       let opponentWsId = connectionIdWithUser.connectionId;
-      if (opponentWsId > myConnectionId) {
-        let messageSenderPeerConnection = new MessageSenderPeerConnection(this.roomId, connId, opponentWsId, this.wsHandler, this.store,  connectionIdWithUser.userId);
-        this.peerConnections[opponentWsId] = messageSenderPeerConnection;
-        messageSenderPeerConnection.makeConnection();
-      } else {
-        let messageReceiverPeerConnection = new MessageReceiverPeerConnection(this.roomId, connId, opponentWsId, this.wsHandler, this.store, connectionIdWithUser.userId);
-        this.peerConnections[opponentWsId] = messageReceiverPeerConnection;
-        messageReceiverPeerConnection.waitForAnswer();
+      if (!this.peerConnections[opponentWsId]) {
+        if (opponentWsId > myConnectionId) {
+          this.peerConnections[opponentWsId]= new MessageSenderPeerConnection(this.roomId, connId, opponentWsId, this.wsHandler, this.store,  connectionIdWithUser.userId);
+
+        } else {
+          this.peerConnections[opponentWsId] = new MessageReceiverPeerConnection(this.roomId, connId, opponentWsId, this.wsHandler, this.store, connectionIdWithUser.userId);
+        }
       }
+      this.peerConnections[opponentWsId].makeConnection();
+
     });
+   this.flushQueue();
+  }
+
+  flushQueue() {
+    Object.values(this.peerConnections).forEach(pc => {
+      pc.appendQueue(...this.sendingQueue);
+    })
+    this.sendingQueue = [];
   }
 
   public async sendP2pMessage(
@@ -75,18 +82,30 @@ export default class MessageTransferHandler extends BaseTransferHandler {
       roomId: number,
       uploadfiles: UploadFile[],
       originId: number,
-      originTime: number
+      time: number
   ) {
+    // uploadfiles TODO
+    const em: PrintMessage = {
+      action: 'printMessage',
+      content,
+      edited: 0,
+      roomId,
+      time,
+      messageId: originId, // should be -
+      id: Date.now(),
+      userId: this.store.myId!,
+      handler: 'channels'
+    }
+    this.sendingQueue.push(em);
     let connectionIds = this.connectionIds;
     if (this.state === 'not_inited') {
-      if (this.connectionIds.length > 1) { // 1 is me, more = someone is present
-        this.initConnection(connectionIds);
+      this.state = 'initing';
+      if (this.connectionIds.length > 0) {
+        let {connId} =  await this.wsHandler.offerMessageConnection(this.roomId);
+        this.initConnection(connectionIds, connId);
       } else {
         this.state = 'waiting';
       }
-    }
-    if (this.state === 'waiting') {
-      this.sendingQueue.push({content, roomId, uploadfiles, originId, originTime});
     }
   }
 

@@ -219,6 +219,7 @@ export default class AppNav extends Vue {
 
   [class^='icon-']
     cursor: pointer
+    margin: 0 0.2em
 
   .color-lor
     .onlineStatus

@@ -149,8 +149,8 @@ class MessagesHandler(MessagesCreator):
 		"""
 		result = {}
 		for decoded in online:  # py2 iteritems
-			(user_id, connection_id) = decoded.split(':')
-			result.setdefault(int(user_id), []).append(connection_id)
+			user_id = decoded.split(':')[0]
+			result.setdefault(int(user_id), []).append(decoded)
 		return result
 
 	def get_online_and_status_from_redis(self):
@@ -635,23 +635,6 @@ class MessagesHandler(MessagesCreator):
 	def process_pong_message(self, message):
 		self.last_client_ping = message[VarNames.TIME]
 
-	def offer_message_connection(self, message):
-		users = self.get_dict_users_from_redis()
-		RoomUsers.objects.filter()
-		room = Room.objects.get(id=message[VarNames.ROOM_ID]).prefe
-		r
-
-		message = {
-			VarNames.EVENT: Actions.REQUEST_CHANNEL,
-			VarNames.CHANNEL_ID: channel_id,
-			VarNames.HANDLER_NAME: HandlerNames.CHANNELS,
-			VarNames.TIME: get_milliseconds(),
-			VarNames.CB_BY_SENDER: self.id,
-			VarNames.JS_MESSAGE_ID: message[VarNames.JS_MESSAGE_ID]
-		}
-		self.publish(message, self.channel)
-		print(message)
-
 	def process_ping_message(self, message):
 		def call_check():
 			if message[VarNames.TIME] != self.last_client_ping:
@@ -804,14 +787,15 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 			Actions.ACCEPT_FILE: self.accept_file,
 			Actions.OFFER_FILE_CONNECTION: self.offer_webrtc_connection,
 			Actions.OFFER_CALL_CONNECTION: self.offer_webrtc_connection,
-			Actions.OFFER_P2P_CONNECTION: self.offer_message_connection,
+			Actions.OFFER_P2P_CONNECTION: self.offer_webrtc_connection,
 			Actions.REPLY_FILE_CONNECTION: self.reply_file_connection,
 			Actions.RETRY_FILE_CONNECTION: self.retry_file_connection,
 			Actions.REPLY_CALL_CONNECTION: self.reply_call_connection,
 		})
 		self.process_pubsub_message.update({
 			Actions.OFFER_FILE_CONNECTION: self.set_opponent_call_channel,
-			Actions.OFFER_CALL_CONNECTION: self.set_opponent_call_channel
+			Actions.OFFER_CALL_CONNECTION: self.set_opponent_call_channel,
+			Actions.OFFER_P2P_CONNECTION: self.set_opponent_p2p_channel
 		})
 
 	def set_opponent_call_channel(self, message):
@@ -819,6 +803,12 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		if message[VarNames.WEBRTC_OPPONENT_ID] == self.id:
 			return True
 		self.sync_redis.hset(connection_id, self.id, WebRtcRedisStates.OFFERED)
+
+	def set_opponent_p2p_channel(self, message):
+		connection_id = message[VarNames.CONNECTION_ID]
+		if message[VarNames.WEBRTC_OPPONENT_ID] == self.id:
+			return True
+		self.sync_redis.hset(connection_id, self.id, WebRtcRedisStates.READY)
 
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.ROOM_ID]

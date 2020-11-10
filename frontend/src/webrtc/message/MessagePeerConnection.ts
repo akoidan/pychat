@@ -2,14 +2,24 @@ import AbstractPeerConnection from '@/webrtc/AbstractPeerConnection';
 import {DefaultMessage} from '@/types/messages';
 import WsHandler from '@/utils/WsHandler';
 import {DefaultStore} from '@/utils/store';
+import {sub} from '@/utils/sub';
+import {MessageSupplier} from '@/types/types';
+import AbstractMessageProcessor from '@/utils/AbstractMessageProcessor';
 
-export default abstract class MessagePeerConnection extends AbstractPeerConnection {
+export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
   private opponentUserId: number;
+  private sendingQueue: DefaultMessage[] = [];
+  protected status: 'inited' | 'not_inited' = 'not_inited';
+  private readonly messageProc: AbstractMessageProcessor;
 
-  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore,userId: number) {
+
+  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, userId: number) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.opponentUserId = userId;
+    this.messageProc = new AbstractMessageProcessor(this, store, `p2p-${opponentWsId}`);
   }
+
+  abstract makeConnection(): void;
 
   public oniceconnectionstatechange() {
     this.logger.log(`iceconnectionstate has been changed to ${this.pc!.iceConnectionState}`)
@@ -20,7 +30,38 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     }
   }
 
+  public appendQueue(...messages: DefaultMessage[]) {
+    if (this.isChannelOpened) {
+      messages.forEach(message => {
+        this.messageProc.sendToServer(message);
+      })
+    } else {
+      this.sendingQueue.push(...messages);
+    }
+  }
+
+  get isChannelOpened(): boolean {
+    return this.sendChannel?.readyState === 'open';
+  }
+
+  protected onChannelMessage(event: MessageEvent) {
+    this.messageProc.onMessage(event.data);
+  }
+
+  public setupEvents() {
+
+    this.sendChannel!.onmessage = this.onChannelMessage.bind(this);
+    this.sendChannel!.onopen = () => {
+      while (this.sendingQueue.length > 0) {
+        this.messageProc.sendToServer(this.sendingQueue.pop()!);
+      }
+      this.logger.debug('Channel opened')();
+    };
+    this.sendChannel!.onclose = () => this.logger.log('Closed channel ')();
+  }
+
   public closeEvents (text?: string|DefaultMessage) {
+    this.messageProc.onDropConnection('data channel lost')
     if (text) {
       this.ondatachannelclose(<string>text); // TODO
     }
@@ -34,17 +75,17 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     }
   }
 
-  private sendData(message: string): void {
-    try {
-      if (this.sendChannel!.readyState === 'open') {
-        this.sendChannel!.send(message);
-      } else {
-        throw Error(`Can't write data into ${this.sendChannel!.readyState} channel`);
-      }
-    } catch (error) {
-      // this.commitErrorIntoStore('Connection has been lost'); TODO
-      this.closeEvents(String(error));
-      this.logger.error('sendData {}', error)();
+
+  getWsConnectionId(): string {
+    return this.wsHandler.getWsConnectionId();
+  }
+
+  sendRawTextToServer(message: string): boolean {
+    if (this.isChannelOpened) {
+      this.sendChannel!.send(message);
+      return true;
+    } else {
+      return false;
     }
   }
 }

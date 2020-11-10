@@ -206,12 +206,8 @@ export interface DeleteMessage extends DefaultMessage {
   edited: number;
 }
 
-export interface EditMessage extends DeleteMessage {
-  userId: number;
-  content: string;
-  time: number;
-  files: {[id: number]: FileModelDto};
-  symbol: string;
-  giphy: string;
-  deleted: boolean;
+export interface PrintMessage extends DefaultMessage, MessageModelDto {
+}
+
+export interface EditMessage extends DefaultMessage, MessageModelDto  {
 }

@@ -78,12 +78,6 @@ export function getFlagPath(countryCode: string) {
   return getFlag(countryCode);
 }
 
-let uniqueId = 1;
-
-export function getUniqueId() {
-  return uniqueId++;
-}
-
 
 export function getSmileyHtml(symbol: string) {
   let smile: Smile | undefined;
