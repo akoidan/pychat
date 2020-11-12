@@ -15,7 +15,7 @@
     "electronProd": "PLATFORM=electron BUILD_MODE=production node ./builder.js",
     "android:dev": "PLATFORM=android BUILD_MODE=development node ./builder.js",
     "android:prod": "PLATFORM=android BUILD_MODE=production node ./builder.js",
-    "cp-prod-files": "tar c dist/ | ssh http@pychat.org -p 8886 \"rm -rf /srv/http/pychat/frontend/dist && tar x -C /srv/http/pychat/frontend/\"",
+    "cp-prod-files": "tar c dist/ | ssh ubuntu@ec2-54-255-252-100.ap-southeast-1.compute.amazonaws.com \"rm -rf /home/ubuntu/pychat/frontend/dist && tar x -C /home/ubuntu/pychat/frontend/\"",
     "publish": "yarn run prod && yarn run cp-prod-files",
     "test": "mocha test/index.ts",
     "clean": "rm -rf ./node_modules/.cache",
