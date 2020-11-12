@@ -159,6 +159,10 @@ export default class NotifierHandler {
     });
   }
 
+  public getIsCurrentWindowActive(): boolean {
+    return this.isCurrentTabActive;
+  }
+
   public onFocusOut() {
     this.isCurrentTabActive = false;
     this.logger.trace('Deactivating current tab')();

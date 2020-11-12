@@ -301,6 +301,7 @@ export default class ChannelsHandler extends MessageHandler {
         files: message.files,
         content: message.content || null,
         symbol: message.symbol || null,
+        isHighlighted: false,
         edited: inMessage.edited,
         roomId: message.roomId,
         userId: message.userId,
@@ -373,12 +374,15 @@ export default class ChannelsHandler extends MessageHandler {
     }
     const message: MessageModel = this.getMessage(inMessage);
     this.logger.debug('Adding message to storage {}', message)();
-    this.store.addMessage(message);
     const activeRoom: RoomModel | null = this.store.activeRoom;
     const activeRoomId = activeRoom && activeRoom.id; // if no channels page first
     const room = this.store.roomsDict[inMessage.roomId];
     const userInfo: CurrentUserInfoModel = this.store.userInfo!;
     const isSelf = inMessage.userId === userInfo.userId;
+    if (!isSelf && (!this.notifier.getIsCurrentWindowActive() || activeRoomId !== inMessage.roomId)) {
+      message.isHighlighted = true;
+    }
+    this.store.addMessage(message);
     if (activeRoomId !== inMessage.roomId && !isSelf) {
       this.store.incNewMessagesCount(inMessage.roomId);
     }
@@ -569,6 +573,7 @@ export default class ChannelsHandler extends MessageHandler {
     return {
       id: message.id,
       time: message.time,
+      isHighlighted: false,
       files: message.files ? convertFiles(message.files) : null,
       content: message.content || null,
       symbol: message.symbol || null,

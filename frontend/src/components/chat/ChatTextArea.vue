@@ -212,6 +212,7 @@
         roomId: this.activeRoomId,
         deleted: false,
         id,
+        isHighlighted: false,
         time: now - this.$ws.timeDiff,
         content: md.messageContent,
         symbol: md.currSymbol,
@@ -240,6 +241,7 @@
         roomId,
         deleted: !messageContent,
         id: messageId,
+        isHighlighted: false,
         transfer: !!messageContent || messageId > 0 ? {
           error: null,
           upload: null

@@ -76,6 +76,11 @@ export interface SetCallOpponent {
   callInfoModel: CallInfoModel|null;
 }
 
+export interface MarkMessageAsRead {
+  roomId: number;
+  messageId: number;
+}
+
 export interface SetOpponentVolume {
   roomId: number;
   opponentWsId: string;

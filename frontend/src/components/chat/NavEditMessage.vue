@@ -54,6 +54,9 @@ export default class NavEditMessage extends Vue {
     > *
       cursor: pointer
 
+  i
+    margin: 0 0.2em
+
   .icon-cancel
     margin-left: auto
 
