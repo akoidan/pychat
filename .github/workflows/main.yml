@@ -16,12 +16,8 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - run: mkdir test; touch test/lol; cd test
 
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: copy static files to destination server
-        run: echo "${{ secrets.ID_RSA }}" > /tmp/id_rsa 
-      - run: cat /tmp/id_rsa |base64     
+      - run: echo "${{ secrets.ID_RSA }}" > /tmp/id_rsa ; chmod 400 /tmp/id_rsa
       - run: ssh -i /tmp/id_rsa http@pychat.org -p 8886 "echo 3"
         env: 
           SSH_USER: ${{ secrets.SSH_USER }}
