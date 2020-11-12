@@ -46,11 +46,8 @@
   }
 </script>
 <!-- eslint-disable -->
-<style
-    lang="sass"
-    scoped
->
-
+<style lang="sass" scoped>
+  @import "~@/assets/sass/partials/mixins"
   .videoHolder
     z-index: 2
     +wrapper-inner

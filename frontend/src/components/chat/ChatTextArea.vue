@@ -36,12 +36,19 @@
   import {Component, Prop, Vue, Watch, Ref, Emit} from 'vue-property-decorator';
   import {
     encodeHTML,
-    encodeP, getMessageData, getSmileyHtml,
-    pasteBlobAudioToTextArea, pasteBlobToContentEditable,
-    pasteBlobVideoToTextArea, pasteHtmlAtCaret,
-    pasteImgToTextArea, placeCaretAtEnd, timeToString
+    encodeP,
+    getMessageData,
+    getSmileyHtml,
+    pasteBlobAudioToTextArea,
+    pasteBlobToContentEditable,
+    pasteBlobVideoToTextArea,
+    pasteHtmlAtCaret,
+    pasteImgToTextArea,
+    placeCaretAtEnd,
+    timeToString
   } from '@/utils/htmlApi';
   import {
+    CurrentUserInfoModel,
     EditingMessage,
     FileModel,
     MessageModel, RoomModel,
@@ -52,12 +59,16 @@
   import {MessageDataEncode, UploadFile} from '@/types/types';
   import {sem} from '@/utils/utils';
   import {getUniqueId} from '@/utils/pureFunctions';
+  import MediaRecorder from '@/components/chat/MediaRecorder.vue';
 
 
   const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
-  @Component
+  @Component({components: {MediaRecorder}})
   export default class ChatTextArea extends Vue {
+
+    @State
+    public readonly userInfo!: CurrentUserInfoModel;
 
     @State
     public readonly showSmileys!: boolean;

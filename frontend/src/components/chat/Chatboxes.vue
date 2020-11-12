@@ -74,11 +74,6 @@
       &:hover
         text-decoration: underline
 
-  =wrapper-inner
-    @include display-flex
-    flex: 1
-    width: 100%
-
   .chatBoxHolder
     +wrapper-inner
     overflow-y: auto
