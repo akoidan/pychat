@@ -21,7 +21,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: copy static files to destination server
         run: echo "${{ secrets.ID_RSA }}" > /tmp/id_rsa        
-      - run: set -x; ssh -i /tmp/id_rsa $SSH_USER@$SSH_HOST -p $SSH_PORT "echo 3"
+      - run: ssh -i /tmp/id_rsa http@pychat.org -p 8886 "echo 3"
         env: 
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_HOST: ${{ secrets.HOST }}
