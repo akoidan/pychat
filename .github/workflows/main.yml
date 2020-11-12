@@ -22,9 +22,19 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '12.10'
+      - name: Cache multiple paths
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            ~/.cache/Cypress
+            yarn-cache
+          key: ${{ runner.os }}-${{ hashFiles('yarn.lock') }}
       - name: Install npm dependencies
-        run: cd frontend && yarn install --frozen-lockfile
-
+        run: |
+          cd frontend 
+          yarn config set cache-folder `pwd`/yarn-cache
+          yarn install --frozen-lockfile
       - name: Build static files
         run: cd frontend && mv pychat.org.json production.json && yarn run prod
 
