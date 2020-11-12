@@ -145,6 +145,11 @@
 	background-image: linear-gradient($s1, $s2), linear-gradient($f1, $f2)
 	background-image: -ms-linear-gradient($s1, $s2), -ms-linear-gradient($f1, $f2)
 
+=wrapper-inner
+	@include display-flex
+	flex: 1
+	width: 100%
+
 @mixin placeholder
 	\::-webkit-input-placeholder
 		@content

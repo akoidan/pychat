@@ -1,5 +1,5 @@
 <template>
-  <nav>
+  <nav v-if="activeUser">
     <router-link :to="`/user/${activeUser.id}`">
       <i class="icon-user"> <span
         class="activeUserName"
@@ -48,7 +48,9 @@ import {ApplyGrowlErr} from '@/utils/utils';
 @Component
 export default class NavUserShow extends Vue {
 
-  @Prop() public activeUser!: UserModel;
+
+  @State
+  public readonly activeUser!: UserModel;
   @Prop() public privateRooms!: UserModel;
   public running: boolean = false;
   @State
