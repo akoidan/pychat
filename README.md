@@ -221,17 +221,17 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
 ## Build frontend
 Change to frontend directory `cd frontend` I would recommend to use node version specified in nvm, so  `nvm install; nvm use`.
  - To get started install dependencies first: `yarn install --frozen-lock` # or use npm if you're old and cranky
- - Take a look at copy [development.json](frontend/development.json]. The description is at [Frontend config](#frontend-config)
- - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. Take a look at [frontend/development.json](frontend/development.json). To run dev-server use `yarn run dev`. You can navigate to http://localhost:8080. If requests don't work, apply self-signed certificate by navigating to http://localhost:8888
+ - Take a look at copy [development.json](frontend/development.json). The description is at [Frontend config](#frontend-config)
+ - Webpack-dev-server is used for development purposes with hot reloading, every time you save the file it will automatically apply. This doesn't affect node running files, only watching files. So files like builder.js or development.json aren't affected. To run dev-server use `yarn run dev`. You can navigate to http://localhost:8080. If requests don't work, apply self-signed certificate by navigating to http://localhost:8888
  - To build android use `yarn run android -- 192.168.1.55` where 55 is your bridge ip address
  - To run electron use `yarn run electronDev`. This will start electron dev. and generate `/tmp/electron.html` and `/tmp/electron.js` 
 
 ## Configure IDEs if you use it:
 
 ### Pycharm
- 1. I recommend open backend as root directory for pycharm.
- 1. Enable django support. Go to Settings -> Django -> Enable django support. 
-   - Django project root: root directory of your project. Where .git asides.
+ 1. I recommend open `backend` as root directory for pycharm.
+ 1. Django support should be enabled by default when you open this project. If it doesn't happen go to Settings -> Languages and Framework -> Django -> Enable django support. 
+   - Django project root: `backend`
    - Put `Settings:` to `chat/settings.py`
  1. If pycharm didn't configure virtualenv itself. Go to `Settings` -> `Project backend` -> `Project Interpreter` -> `Cogs in right top` -> 'Add' -> `Virtual Environment` -> `Existing environment` -> `Interpereter` = `pychatdir/.venv/bin/python`. Click ok. In previous menu on top 'Project interpreter` select the interpriter you just added.
  1. `Settings` -> `Project backend` -> `Project structure`
