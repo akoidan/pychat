@@ -44,7 +44,7 @@ export default class SmileyHolder extends Vue {
   public activeTab: string = Object.keys(smileys)[0];
 
   addSmiley(code: string) {
-    messageBus.$emit('add-smiley', code);
+    messageBus.$emit('add-smile', code);
   }
 
 }

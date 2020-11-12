@@ -108,15 +108,21 @@
       }
     }
 
+    onEmitScroll() {
+      this.$nextTick(function () {
+        if (this.chatbox && this.scrollBottom) {
+          this.chatbox.scrollTop = this.chatbox.scrollHeight;
+          this.logger.trace("Scrolling to bottom")();
+        }
+      });
+    }
+
     created() {
-      messageBus.$on('scroll', () => {
-        this.$nextTick(function () {
-          if (this.chatbox && this.scrollBottom) {
-            this.chatbox.scrollTop = this.chatbox.scrollHeight;
-            this.logger.trace("Scrolling to bottom")();
-          }
-        });
-      })
+      messageBus.$on('scroll',this.onEmitScroll);
+    }
+
+    destroyed() {
+      messageBus.$off('scroll',this.onEmitScroll);
     }
 
     get id() {
