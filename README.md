@@ -187,7 +187,7 @@ The flow is the following
 This section depends on the OS you use. I tested full install on Windows/Ubuntu/CentOs/MacOS/Archlinux/Archlinux(rpi3 armv7). [pychat.org](https://pychat.org) currently runs on Archlinux Raspberry Pi 3.
 
 ### [Windows](https://www.microsoft.com/en-us/download/windows.aspx):
- 1. Install [python](https://www.python.org/downloads/) with pip. only **Python 3.6-3.8** is supported.
+ 1. Install [python](https://www.python.org/downloads/) with pip. only **Python 3.6**+ is **required**
  2. Add **pip** and **python** to `PATH` variable.
  3. Install [redis](https://github.com/MSOpenTech/redis/releases). Get the newest version or at least 2.8.
  5. Install [mysql](http://dev.mysql.com/downloads/mysql/). You basically need mysql server and python connector.
@@ -196,7 +196,7 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  1. Install [nvm](https://github.com/coreybutler/nvm-windows). 
 
 ### [Ubuntu](http://www.ubuntu.com/):
- 1. Install required packages: `apt-get install python pip mysql-server libmysqlclient-dev` (python should be 3.5-3.8) If pip is missing check `python-pip`.
+ 1. Install required packages: `apt-get install python pip mysql-server libmysqlclient-dev` (python should be 3.6-3.8) If pip is missing check `python-pip`. For old versions of Ubuntu you can use this ppa: `sudo add-apt-repository ppa:deadsnakes/ppa; sudo apt-get update; sudo apt-get install python3.8 python3.8-dev python3.8-venv python3.8-apt; curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py; python3.8 get-pip.py` 
  1. Install **redis** database: `add-apt-repository -y ppa:rwky/redis; apt-get install -y redis-server`
  1. Install mysqlclient `pip install mysqlclient==1.3.13`
  1. Install [nvm](https://qiita.com/shaching/items/6e398140432d4133c866)
