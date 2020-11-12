@@ -18,7 +18,7 @@ jobs:
     steps:
 
       - run: echo "${{ secrets.ID_RSA }}" > /tmp/id_rsa ; chmod 400 /tmp/id_rsa
-      - run: ssh -i /tmp/id_rsa http@pychat.org -p 8886 "echo 3"
+      - run: ssh -i /tmp/id_r2sa http@pychat.org -p 8886 "echo 3"
         env: 
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_HOST: ${{ secrets.HOST }}
