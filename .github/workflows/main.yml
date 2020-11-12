@@ -20,7 +20,10 @@ jobs:
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - name: copy static files to destination server
-        run: echo "${{ secrets.ID_RSA }}" > /tmp/id_rsa
-      - run: cat /tmp/id_rsa
-      - run: ssh -i /tmp/id_rsa "${{ secrets.SSH_USER }}"@$"{{ secrets.HOST }}" -p "${{ secrets.PORT }}" "echo 3"
+        run: echo "${{ secrets.ID_RSA }}" > /tmp/id_rsa        
+      - run: ssh -i /tmp/id_rsa $SSH_USER@$SSH_HOST -p $SSH_PORT "echo 3"
+        env: 
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_HOST: ${{ secrets.HOST }}
+          SSH_PORT: ${{ secrets.PORT }} 
  
