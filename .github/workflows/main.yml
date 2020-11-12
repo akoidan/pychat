@@ -16,11 +16,11 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-
-      - run: echo "${{ secrets.ID_RSA }}" > /tmp/id_rsa && chmod 400 /tmp/id_rsa && ssh -i /tmp/id_rsa http@pychat.org -p 8886 "echo 3"
-        env:
-          SSH_RSA: ${{ secrets.ID_RSA }}
-          SSH_USER: ${{ secrets.SSH_USER }}
-          SSH_HOST: ${{ secrets.HOST }}
-          SSH_PORT: ${{ secrets.PORT }} 
- 
+    - name: "Prepare SSH key and known hosts"
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.ID_RSA }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan github.com >> ~/.ssh/known_hosts
+        ssh-keyscan git.eu.s5y.io >> ~/.ssh/known_hosts
+    - run: ssh -i /tmp/id_rsa http@pychat.org -p 8886 "echo 3"
