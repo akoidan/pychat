@@ -113,6 +113,7 @@ export class DefaultStore extends VuexModule {
   public regHeader: string | null = null;
   public onlineDict: Record<string, string[]> = {};
   public roomsDict: RoomDictModel = {};
+  public showSmileys: boolean = false;
   public channelsDict: ChannelsDictModel = {};
   public mediaObjects: { [id: string]: MediaStream } = {};
 
@@ -672,6 +673,11 @@ export class DefaultStore extends VuexModule {
   public addChannel(channel: ChannelModel) {
     Vue.set(this.channelsDict, String(channel.id), channel);
     this.storage.saveChannel(channel);
+  }
+
+  @Mutation
+  public setShowSmileys(value: boolean) {
+    this.showSmileys = value;
   }
 
   @Mutation
