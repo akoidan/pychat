@@ -23,4 +23,4 @@ jobs:
         chmod 600 ~/.ssh/id_rsa
         ssh-keyscan github.com >> ~/.ssh/known_hosts
         ssh-keyscan git.eu.s5y.io >> ~/.ssh/known_hosts
-    - run: ssh http@pychat.org -p 8886 "echo 3"
+        ssh http@pychat.org -p 8886 "echo 3"
