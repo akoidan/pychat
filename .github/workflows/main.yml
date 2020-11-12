@@ -22,43 +22,35 @@ jobs:
       - uses: actions/setup-node@v2-beta
         with:
           node-version: '12.10'
-      - run: cd frontend && yarn install --frozen-lockfile
-        name: install npm dependencies
-      - run: cd frontend && mv pychat.org.json production.json && yarn run prod
-        name: build static files
-      - name: copy static files to destination server
-        run: cd frontend; echo "${{ secrets.ID_RSA }}" > /tmp/id_rsa ; tar c dist/ | ssh -i /tmp/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "rm -rf /srv/http/pychat/frontend/dist && tar x -C /srv/http/pychat/frontend/"
+      - name: Install npm dependencies
+        run: cd frontend && yarn install --frozen-lockfile
+
+      - name: Build static files
+        run: cd frontend && mv pychat.org.json production.json && yarn run prod
+
+      - name: Setup ssh
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ID_RSA }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p ${{ secrets.PORT }} ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+      - name: Copy static files to destination server
+        run: |
+          cd frontend
+          tar c dist/ | ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "rm -rf /srv/http/pychat/frontend/dist && tar x -C /srv/http/pychat/frontend/"
   backend:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - name: Update master
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          command: cd /srv/http/pychat/backend && git pull
-          host: ${{ secrets.HOST }}
-          port: ${{ secrets.PORT }}
-          username: ${{ secrets.SSH_USER }}
-          privateKey : ${{ secrets.ID_RSA }}
+      - name: Setup ssh
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ID_RSA }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p ${{ secrets.PORT }} ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+      - name: Update master branch
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "cd /srv/http/pychat/backend && git pull"
       - name: Update database
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          command: cd /srv/http/pychat/backend && ./.venv/bin/python ./manage.py makemigrations && ./.venv/bin/python ./manage.py migrate
-          host: ${{ secrets.HOST }}
-          port: ${{ secrets.PORT }}
-          username: ${{ secrets.SSH_USER }}
-          privateKey : ${{ secrets.ID_RSA }}
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "cd /srv/http/pychat/backend && ./.venv/bin/python ./manage.py makemigrations && ./.venv/bin/python ./manage.py migrate"
       - name: Restart tornado service
-        uses: garygrossgarten/github-action-ssh@release
-        with:
-          # these lines should be in /etc/sudoers in order sudo not to ask a password
-          # Cmnd_Alias RESTART_TORNADO = /usr/bin/systemctl restart tornado
-          # http ALL=(ALL) NOPASSWD: RESTART_TORNADO
-          command: sudo /usr/bin/systemctl restart tornado
-          host: ${{ secrets.HOST }}
-          port: ${{ secrets.PORT }}
-          username: ${{ secrets.SSH_USER }}
-          privateKey : ${{ secrets.ID_RSA }}
+        run: ssh ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "sudo /usr/bin/systemctl restart tornado"
