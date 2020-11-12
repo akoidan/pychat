@@ -27,7 +27,7 @@ jobs:
       - run: cd frontend && mv pychat.org.json production.json && yarn run prod
         name: build static files
       - name: copy static files to destination server
-        run: cd frontend; echo "${{ secrets.ID_RSA }}" > /tmp/id_rsa ; tar c dist/ | ssh -i /tmp/id_rra ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "rm -rf /srv/http/pychat/frontend/dist && tar x -C /srv/http/pychat/frontend/"
+        run: cd frontend; echo "${{ secrets.ID_RSA }}" > /tmp/id_rsa ; tar c dist/ | ssh -i /tmp/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.HOST }} -p ${{ secrets.PORT }} "rm -rf /srv/http/pychat/frontend/dist && tar x -C /srv/http/pychat/frontend/"
   backend:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
