@@ -32,8 +32,7 @@
   * [Frontend config](#frontend-config)
 - [Github actions](#github-actions)
 - [TODO](#todo)
-  
-  
+
 # About
 This is free web (browser) chat, that features:
  - Sending instant text messages via websockets.
