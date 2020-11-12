@@ -229,6 +229,8 @@
 
   .holder
     height: 100%
+    display: flex
+    flex-direction: column // otherwise chat-call is not full width
     /deep/ p
       margin-top: 0.8em
       margin-bottom: 0.8em
