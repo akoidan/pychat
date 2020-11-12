@@ -126,9 +126,9 @@ export interface SearchModel {
   locked: boolean;
 }
 
-export interface ChangeOnline {
+export interface RoomLog {
   userId: number;
-  isWentOnline: boolean;
+  action: 'appeared online' | 'gone offline' | 'joined this room' | 'left this room' | 'been invited to this room';
   time: number;
 }
 
@@ -178,6 +178,10 @@ export interface CallInfoModel {
   opponentCurrentVoice: number;
 }
 
+export interface P2pMessageModel {
+  amountOfActiveConnections: number;
+}
+
 export interface CallsInfoModel {
   calls: { [id: string]: CallInfoModel };
   callContainer: boolean;
@@ -206,13 +210,14 @@ export interface ChannelUIModel extends ChannelModel {
 export interface RoomModel extends RoomSettingsModel {
   users: number[];
   callInfo: CallsInfoModel;
+  p2pInfo: P2pMessageModel;
   sendingFiles:  { [id: string]: SendingFile };
   receivingFiles:  { [id: string]: ReceivingFile };
   messages: { [id: number]: MessageModel };
   allLoaded: boolean;
   search: SearchModel;
   newMessagesCount: number;
-  changeOnline: ChangeOnline[];
+  roomLog: RoomLog[];
   changeName: ChangeRoomName[];
 }
 

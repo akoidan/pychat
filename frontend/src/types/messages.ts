@@ -15,11 +15,17 @@ export interface DefaultSentMessage {
   messageId?: number;
 }
 
+
+export type HandlerName = 'channels' | 'lan' | 'message' | 'webrtc' | 'ws'| 'void';
+
 export interface DefaultMessage extends DefaultSentMessage {
-  handler: string;
+  handler: HandlerName;
   cbBySender?: string;
 }
 
+export interface AppendQueue extends DefaultMessage {
+  messages: DefaultMessage[];
+}
 export interface SaveChannelSettings extends DefaultMessage, ChannelDto {
 }
 
@@ -54,7 +60,7 @@ export interface SetWsIdMessage extends DefaultMessage, OpponentWsId {
   rooms:  RoomDto[];
   channels: ChannelDto[];
   users: UserDto[];
-  online: number[];
+  online: Record<number, string[]>;
   time: number;
   userImage: string;
   userInfo: UserProfileDto;
@@ -137,7 +143,7 @@ export interface SetProfileImageMessage extends DefaultMessage {
 }
 
 interface ChangeUserOnline extends DefaultMessage, UserDto {
-  content: number[];
+  content: Record<number, string[]>;
   time: number;
 }
 
@@ -206,12 +212,8 @@ export interface DeleteMessage extends DefaultMessage {
   edited: number;
 }
 
-export interface EditMessage extends DeleteMessage {
-  userId: number;
-  content: string;
-  time: number;
-  files: {[id: number]: FileModelDto};
-  symbol: string;
-  giphy: string;
-  deleted: boolean;
+export interface PrintMessage extends DefaultMessage, MessageModelDto {
+}
+
+export interface EditMessage extends DefaultMessage, MessageModelDto  {
 }

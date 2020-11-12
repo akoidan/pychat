@@ -24,12 +24,12 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     this.notifier = notifier;
     this.wsHandler = wsHandler;
     this.store = store;
-    this.logger = loggerFactory.getLogger('WRTC', 'color: #960055');
+    this.logger = loggerFactory.getLoggerColor('WRTC', '#960055');
   }
 
   protected onDestroy() {
     if (this.connectionId) {
-      sub.unsubscribe(Subscription.getTransferId(this.connectionId));
+      sub.unsubscribe(Subscription.getTransferId(this.connectionId), this);
     }
   }
 
@@ -48,7 +48,6 @@ export default abstract class BaseTransferHandler extends MessageHandler {
   protected closeAllPeerConnections() { // calls on destroy
     if (!this.connectionId) {
       this.logger.error(`Can't close connections since it's null`)();
-
       return;
     }
     this.webrtcConnnectionsIds.forEach(id => {

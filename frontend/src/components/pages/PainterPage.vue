@@ -38,12 +38,25 @@ export default class PainterPage extends Vue {
     });
   }
 
+  onEmitMainJoin() {
+    this.logger.log("Emitting back {}", this.blob)();
+    if (this.blob) {
+      messageBus.$emit('blob', this.blob);
+      this.blob = null;
+    }
+  }
   public created() {
-    messageBus.$on('main-join', () => {
-      if (this.blob) {
-        messageBus.$emit('blob', this.blob);
-        this.blob = null;
-      }
+    messageBus.$on('main-join', this.onEmitMainJoin);
+  }
+
+  destroyed() {
+    // 1. this component is destroyed
+    // 2. channelsPage is emitting event
+    // 3. this component don't listed for event already
+    // so since operation above is synchronous, scheduling even to eventloop helps
+    // TODO this should be resolved in a better way
+    window.setTimeout(() => {
+      messageBus.$off('main-join', this.onEmitMainJoin);
     });
   }
 

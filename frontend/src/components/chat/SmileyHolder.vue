@@ -1,5 +1,5 @@
 <template>
-  <div class="smileParentHolder">
+  <div class="smileParentHolder" v-show="showSmileys">
     <ul class="tabNames">
       <li
         v-for="(_, tabName) in smileys"
@@ -21,7 +21,7 @@
           :src="smiley.src"
           :alt="smiley.alt"
           :code="code"
-          @click="$emit('add-smiley', code)"
+          @click="addSmiley(code)"
         >
       </div>
     </template>
@@ -31,11 +31,21 @@
 import {Component, Vue} from 'vue-property-decorator';
 import {smileys} from '@/utils/smileys';
 import {SmileyStructure} from '@/types/types';
+import {messageBus} from '@/utils/singletons';
+import {State} from '@/utils/storeHolder';
 
 @Component
 export default class SmileyHolder extends Vue {
+
+  @State
+  public readonly showSmileys!: boolean;
+
   public smileys = smileys;
   public activeTab: string = Object.keys(smileys)[0];
+
+  addSmiley(code: string) {
+    messageBus.$emit('add-smile', code);
+  }
 
 }
 </script>

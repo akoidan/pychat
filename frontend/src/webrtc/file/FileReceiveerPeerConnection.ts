@@ -5,7 +5,7 @@ import {bytesToSize} from '@/utils/utils';
 import WsHandler from '@/utils/WsHandler';
 import {requestFileSystem} from '@/utils/htmlApi';
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API, MAX_BUFFER_SIZE} from '@/utils/consts';
-import FilePeerConnection from '@/webrtc/FilePeerConnection';
+import FilePeerConnection from '@/webrtc/file/FilePeerConnection';
 import {DefaultStore} from '@/utils/store';
 import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 

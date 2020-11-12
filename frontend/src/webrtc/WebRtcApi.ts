@@ -9,19 +9,20 @@ import {
 } from '@/types/messages';
 import WsHandler from '@/utils/WsHandler';
 import {FileTransferStatus, ReceivingFile} from '@/types/model';
-import FileSender from '@/webrtc/FileSender';
+import FileHandler from '@/webrtc/file/FileHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
-import {browserVersion} from '@/utils/singletons';
 import MessageHandler, {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 import {sub} from '@/utils/sub';
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from '@/utils/consts';
 import {requestFileSystem} from '@/utils/htmlApi';
 import {bytesToSize} from '@/utils/utils';
-import FileReceiverPeerConnection from '@/webrtc/FileReceiveerPeerConnection';
+import FileReceiverPeerConnection from '@/webrtc/file/FileReceiveerPeerConnection';
 import Subscription from '@/utils/Subscription';
-import CallHandler from '@/webrtc/CallHandler';
+import CallHandler from '@/webrtc/call/CallHandler';
 import faviconUrl from '@/assets/img/favicon.ico';
 import {DefaultStore} from '@/utils/store';
+import {browserVersion} from '@/utils/runtimeConsts';
+import MessageTransferHandler from '@/webrtc/message/MessageTransferHandler';
 
 export default class WebRtcApi extends MessageHandler {
 
@@ -29,13 +30,15 @@ export default class WebRtcApi extends MessageHandler {
 
   protected readonly handlers: HandlerTypes  = {
     offerFile: <HandlerType>this.onofferFile,
-    offerCall: <HandlerType>this.offerCall
+    offerCall: <HandlerType>this.offerCall,
+    offerMessage: <HandlerType>this.offerMessage
   };
 
   private readonly wsHandler: WsHandler;
   private readonly store: DefaultStore;
   private readonly notifier: NotifierHandler;
   private readonly callHandlers: {[id: number]: CallHandler} = {};
+  private readonly messageHandlers: {[id: number]: MessageTransferHandler} = {};
 
   constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler) {
     super();
@@ -48,6 +51,11 @@ export default class WebRtcApi extends MessageHandler {
 
   public offerCall(message: OfferCall) {
     this.getCallHandler(message.roomId).initAndDisplayOffer(message);
+  }
+
+
+  public offerMessage(message: OfferCall) {
+    this.getMessageHandler(message.roomId).acceptConnection(message);
   }
 
   public acceptFile(connId: string, webRtcOpponentId: string) {
@@ -66,7 +74,7 @@ export default class WebRtcApi extends MessageHandler {
   public async offerFile(file: File, channel: number) {
     if (file.size > 0) {
       const e = await this.wsHandler.offerFile(channel, browserVersion, file.name, file.size);
-      new FileSender(channel, e.connId, this.wsHandler, this.notifier, this.store, file, e.time);
+      new FileHandler(channel, e.connId, this.wsHandler, this.notifier, this.store, file, e.time);
     } else {
       this.store.growlError(`File ${file.name} size is 0. Skipping sending it...`);
     }
@@ -83,6 +91,14 @@ export default class WebRtcApi extends MessageHandler {
     }
 
     return this.callHandlers[roomId];
+  }
+
+  public getMessageHandler(roomId: number): MessageTransferHandler {
+    if (!this.messageHandlers[roomId]) {
+      this.messageHandlers[roomId] = new MessageTransferHandler(roomId, this.wsHandler, this.notifier, this.store);
+    }
+
+    return this.messageHandlers[roomId];
   }
 
   public startCall(roomId: number) {

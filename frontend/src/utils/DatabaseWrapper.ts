@@ -13,9 +13,11 @@ import {
   convertNumberToSex,
   convertSexToNumber,
   convertSexToString,
-  convertStringSexToNumber, convertToBoolean, getChannelDict, getRoomsBaseDict
+  convertStringSexToNumber,
+  convertToBoolean,
+  getChannelDict,
+  getRoomsBaseDict
 } from '@/types/converters';
-import {browserVersion} from '@/utils/singletons';
 import {
   ChannelDB,
   FileDB, MessageDB,
@@ -25,6 +27,7 @@ import {
   SettingsDB, TransactionType,
   UserDB
 } from '@/types/db';
+import {browserVersion} from '@/utils/runtimeConsts';
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 

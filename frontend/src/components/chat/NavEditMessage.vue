@@ -1,5 +1,5 @@
 <template>
-  <nav>
+  <nav v-if="editedMessage">
     <i
       v-if="!editedMessage.isEditingNow"
       class="icon-pencil"
@@ -24,22 +24,25 @@
 import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {EditingMessage} from '@/types/model';
-import {channelsHandler} from '@/utils/singletons';
+import {channelsHandler, messageBus} from '@/utils/singletons';
 
 @Component
 export default class NavEditMessage extends Vue {
-  @Prop() public editedMessage! : EditingMessage;
+
+  @State
+  public readonly editedMessage!: EditingMessage;
+
 
   public m2DeleteMessage() {
-    this.$emit('delete-message');
+    messageBus.$emit('delete-message');
   }
 
   public m2EditMessage() {
-    this.$emit('edit-message');
+    this.store.setEditedMessage({...this.editedMessage, isEditingNow: true});
   }
 
   public m2Close() {
-    this.$emit('close');
+    this.store.setEditedMessage(null);
   }
 }
 </script>

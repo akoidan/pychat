@@ -6,7 +6,7 @@ import {checkAndPlay, incoming, login, logout, outgoing} from '@/utils/audio';
 import faviconUrl from '@/assets/img/favicon.ico';
 
 import {
-  ChangeOnlineEntry,
+  RoomLogEntry,
   PubSetRooms,
   RemoveMessageProgress,
   RemoveSendingMessage,
@@ -237,7 +237,7 @@ export default class ChannelsHandler extends MessageHandler {
   public init(m: PubSetRooms) {
 
     const {rooms, channels, users} = m;
-    this.store.setOnline([...m.online]);
+    this.store.setOnline(m.online);
 
     this.logger.debug('set users {}', users)();
     const um: UserDictModel = {};
@@ -335,20 +335,35 @@ export default class ChannelsHandler extends MessageHandler {
       const newVar: UserModel = convertUser(message);
       this.store.addUser(newVar);
     }
-    this.addChangeOnlineEntry(message.userId, message.time, true);
-    this.store.setOnline([...message.content]);
+    if (message.content[message.userId].length === 1) {
+      // exactly 1 device is now offline, so that new that appeared is the first one
+      this.addChangeOnlineEntry(message.userId, message.time, true);
+    }
+    this.store.setOnline(message.content);
+
+
+  }
+
+  private notifyDevicesChanged() {
+    sub.notify({
+      handler: 'message',
+      action: 'changeDevices'
+    });
   }
 
   private removeOnlineUser(message: RemoveOnlineUserMessage) {
-    this.addChangeOnlineEntry(message.userId, message.time, false);
+    if (message.content[message.userId].length === 0) {
+      this.addChangeOnlineEntry(message.userId, message.time, false);
+    }
     this.store.setOnline(message.content);
+    this.notifyDevicesChanged()
   }
 
   private printMessage(inMessage: EditMessage) {
     if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
       this.removeSendingMessage(inMessage.messageId);
       if (!inMessage.messageId) {
-        throw Error(`Unkown messageId ${inMessage}`);
+        throw Error(`Unknown messageId ${inMessage}`);
       }
       const rmMes: RemoveSendingMessage = {
         messageId: inMessage.messageId,
@@ -407,6 +422,7 @@ export default class ChannelsHandler extends MessageHandler {
     } else {
       this.logger.error('Unable to find room {} to delete', message.roomId)();
     }
+    this.notifyDevicesChanged();
   }
 
   private leaveUser(message: LeaveUserMessage) {
@@ -416,6 +432,15 @@ export default class ChannelsHandler extends MessageHandler {
         users: message.users
       };
       this.store.setRoomsUsers(m);
+      this.store.addRoomLog({
+        roomLog: {
+          userId: message.userId,
+          time: Date.now(), // TODO
+          action: 'left this room'
+        },
+        roomIds: [message.roomId]
+      });
+      this.notifyDevicesChanged();
     } else {
       this.logger.error('Unable to find room {} to kick user', message.roomId)();
     }
@@ -457,6 +482,14 @@ export default class ChannelsHandler extends MessageHandler {
       roomId: message.roomId,
       users: message.users
     } as SetRoomsUsers);
+    message.inviteeUserId.forEach(i => {
+      this.store.addRoomLog({roomIds: [message.roomId], roomLog: {
+        action: 'joined this room',
+        time: message.time,
+        userId: i
+      }});
+    })
+    this.notifyDevicesChanged();
   }
 
   private deleteChannel(message: DeleteChannel) {
@@ -474,10 +507,10 @@ export default class ChannelsHandler extends MessageHandler {
         roomIds.push(r.id);
       }
     });
-    const entry: ChangeOnlineEntry = {
+    const entry: RoomLogEntry = {
       roomIds,
-      changeOnline: {
-        isWentOnline,
+      roomLog: {
+        action: isWentOnline ? 'appeared online' : 'gone offline',
         time,
         userId
       }
@@ -487,7 +520,7 @@ export default class ChannelsHandler extends MessageHandler {
     if (this.store.userSettings!.onlineChangeSound && this.store.myId !== userId) {
       checkAndPlay(isWentOnline ? login : logout, 50);
     }
-    this.store.addChangeOnlineEntry(entry);
+    this.store.addRoomLog(entry);
   }
 
   private async uploadAndSend(
@@ -521,6 +554,15 @@ export default class ChannelsHandler extends MessageHandler {
   private mutateRoomAddition(message: AddRoomBase) {
     const r: RoomModel = getRoomsBaseDict(message);
     this.store.addRoom(r);
+    this.store.addRoomLog({
+      roomIds: [r.id],
+      roomLog: {
+        action: 'been invited to this room',
+        time: message.time,
+        userId: this.store.myId!
+      }
+    });
+    this.notifyDevicesChanged()
   }
 
   private getMessage(message: MessageModelDto): MessageModel {

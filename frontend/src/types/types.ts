@@ -1,6 +1,6 @@
 import {
   FileTransferStatus,
-  ChangeOnline,
+  RoomLog,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   FileModel,
@@ -15,7 +15,7 @@ import {
   ChannelModel
 } from '@/types/model';
 import {ChannelDto, RoomDto, SetStateFromStorage, UserDto} from '@/types/dto';
-import {DefaultMessage} from '@/types/messages';
+import {DefaultMessage, DefaultSentMessage} from '@/types/messages';
 
 export interface UploadFile {
    type: string;
@@ -31,9 +31,14 @@ export interface IMessageHandler {
   handle(message: DefaultMessage): void;
 }
 
+
+export interface UserIdConn {
+  connectionId: string;
+  userId: number;
+}
+
 export interface ChangeStreamMessage extends DefaultMessage {
   newStream: MediaStream;
-  oldStream: MediaStream;
 }
 
 export interface MessageDataEncode {
@@ -113,8 +118,8 @@ export interface RemovePeerConnection extends DefaultMessage {
   opponentWsId: string;
 }
 
-export interface ChangeOnlineEntry {
-  changeOnline: ChangeOnline;
+export interface RoomLogEntry {
+  roomLog: RoomLog;
   roomIds: number[];
 }
 
@@ -127,6 +132,11 @@ export interface SetMessageProgressError {
 export interface RemoveSendingMessage {
   messageId: number;
   roomId: number;
+}
+
+export interface MessageSupplier {
+  sendRawTextToServer(message: string): boolean;
+  getWsConnectionId(): string;
 }
 
 export  interface IStorage {
@@ -233,7 +243,7 @@ export interface PubSetRooms extends DefaultMessage {
   rooms:  RoomDto[];
   channels: ChannelDto[];
   users: UserDto[];
-  online: number[];
+  online: Record<string, string[]>;
 }
 
 export interface SetMessageProgress extends RemoveMessageProgress {

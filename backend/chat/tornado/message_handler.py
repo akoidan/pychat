@@ -16,7 +16,7 @@ from chat.log_filters import id_generator
 from chat.models import Message, Room, RoomUsers, Subscription, SubscriptionMessages, MessageHistory, \
 	UploadedFile, Image, get_milliseconds, UserProfile, Channel, User
 from chat.py2_3 import str_type, quote
-from chat.settings import ALL_ROOM_ID, REDIS_PORT, WEBRTC_CONNECTION, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST, \
+from chat.settings import ALL_ROOM_ID, REDIS_PORT, GIPHY_URL, GIPHY_REGEX, FIREBASE_URL, REDIS_HOST, \
 	REDIS_DB
 from chat.tornado.constants import VarNames, HandlerNames, Actions, RedisPrefix, WebRtcRedisStates, \
 	UserSettingsVarNames, UserProfileVarNames
@@ -74,7 +74,7 @@ class MessagesHandler(MessagesCreator):
 			Actions.SET_SETTINGS: self.profile_save_settings,
 			Actions.INVITE_USER: self.invite_user,
 			Actions.PING: self.respond_ping,
-			Actions.PONG: self.process_pong_message,
+			Actions.PONG: self.process_pong_message
 		}
 		# Handlers for redis messages, if handler returns true - message won't be sent to client
 		# The handler is determined by @VarNames.EVENT
@@ -135,6 +135,23 @@ class MessagesHandler(MessagesCreator):
 
 	def get_online_from_redis(self):
 		return self.get_online_and_status_from_redis()[1]
+
+	def get_dict_users_from_redis(self):
+		online = self.sync_redis.ssmembers(RedisPrefix.ONLINE_VAR)
+		self.logger.debug('!! redis online: %s', online)
+		result = self.parse_redis_online_into_dict_set(online) if online else {}
+		return result
+
+	@staticmethod
+	def parse_redis_online_into_dict_set(online):
+		"""
+		:rtype : Dict[int, set]
+		"""
+		result = {}
+		for decoded in online:  # py2 iteritems
+			user_id = decoded.split(':')[0]
+			result.setdefault(int(user_id), []).append(decoded)
+		return result
 
 	def get_online_and_status_from_redis(self):
 		"""
@@ -730,13 +747,11 @@ class MessagesHandler(MessagesCreator):
 			self.ws_write(channels)
 		else:
 			self.ws_write({
-				{
-					VarNames.EVENT: Actions.USER_LEAVES_ROOM,
-					VarNames.ROOM_ID: room_id,
-					VarNames.USER_ID: message[VarNames.USER_ID],
-					VarNames.ROOM_USERS: message[VarNames.ROOM_USERS],
-					VarNames.HANDLER_NAME: HandlerNames.CHANNELS
-				}
+				VarNames.EVENT: Actions.USER_LEAVES_ROOM,
+				VarNames.ROOM_ID: room_id,
+				VarNames.USER_ID: message[VarNames.USER_ID],
+				VarNames.ROOM_USERS: message[VarNames.ROOM_USERS],
+				VarNames.HANDLER_NAME: HandlerNames.CHANNELS
 			})
 		return True
 
@@ -770,13 +785,15 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 			Actions.ACCEPT_FILE: self.accept_file,
 			Actions.OFFER_FILE_CONNECTION: self.offer_webrtc_connection,
 			Actions.OFFER_CALL_CONNECTION: self.offer_webrtc_connection,
+			Actions.OFFER_P2P_CONNECTION: self.offer_webrtc_connection,
 			Actions.REPLY_FILE_CONNECTION: self.reply_file_connection,
 			Actions.RETRY_FILE_CONNECTION: self.retry_file_connection,
 			Actions.REPLY_CALL_CONNECTION: self.reply_call_connection,
 		})
 		self.process_pubsub_message.update({
 			Actions.OFFER_FILE_CONNECTION: self.set_opponent_call_channel,
-			Actions.OFFER_CALL_CONNECTION: self.set_opponent_call_channel
+			Actions.OFFER_CALL_CONNECTION: self.set_opponent_call_channel,
+			Actions.OFFER_P2P_CONNECTION: self.set_opponent_p2p_channel
 		})
 
 	def set_opponent_call_channel(self, message):
@@ -785,13 +802,19 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 			return True
 		self.sync_redis.hset(connection_id, self.id, WebRtcRedisStates.OFFERED)
 
+	def set_opponent_p2p_channel(self, message):
+		connection_id = message[VarNames.CONNECTION_ID]
+		if message[VarNames.WEBRTC_OPPONENT_ID] == self.id:
+			return True
+		self.sync_redis.hset(connection_id, self.id, WebRtcRedisStates.READY)
+
 	def offer_webrtc_connection(self, in_message):
 		room_id = in_message[VarNames.ROOM_ID]
 		content = in_message.get(VarNames.CONTENT)
 		js_id = in_message[VarNames.JS_MESSAGE_ID]
 		connection_id = id_generator(RedisPrefix.CONNECTION_ID_LENGTH)
 		# use list because sets dont have 1st element which is offerer
-		self.async_redis_publisher.hset(WEBRTC_CONNECTION, connection_id, self.id)
+		self.async_redis_publisher.hset(RedisPrefix.WEBRTC_CONNECTION, connection_id, self.id)
 		self.async_redis_publisher.hset(connection_id, self.id, WebRtcRedisStates.READY)
 		opponents_message = self.offer_webrtc(content, connection_id, room_id, in_message[VarNames.EVENT])
 		self_message = self.set_connection_id(js_id, connection_id)
@@ -802,7 +825,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 	def retry_file_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
 		opponent_ws_id = in_message[VarNames.WEBRTC_OPPONENT_ID]
-		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
+		sender_ws_id = self.sync_redis.shget(RedisPrefix.WEBRTC_CONNECTION, connection_id)
 		if sender_ws_id == self.id:
 			self.publish(self.retry_file(connection_id), opponent_ws_id)
 		else:
@@ -810,7 +833,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 
 	def reply_file_connection(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
-		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
+		sender_ws_id = self.sync_redis.shget(RedisPrefix.WEBRTC_CONNECTION, connection_id)
 		sender_ws_status = self.sync_redis.shget(connection_id, sender_ws_id)
 		self_ws_status = self.sync_redis.shget(connection_id, self.id)
 		if sender_ws_status == WebRtcRedisStates.READY and self_ws_status == WebRtcRedisStates.OFFERED:
@@ -863,7 +886,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 		if not self_channel_status:
 			raise Exception("Access Denied")
 		if self_channel_status != WebRtcRedisStates.CLOSED:
-			sender_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
+			sender_id = self.sync_redis.shget(RedisPrefix.WEBRTC_CONNECTION, connection_id)
 			if sender_id == self.id:
 				message = self.get_close_file_sender_message(connection_id)
 				self.async_redis_publisher.hset(connection_id, opponent_id, WebRtcRedisStates.CLOSED)
@@ -904,7 +927,7 @@ class WebRtcMessageHandler(MessagesHandler, WebRtcMessageCreator):
 	def accept_file(self, in_message):
 		connection_id = in_message[VarNames.CONNECTION_ID]
 		content = in_message[VarNames.CONTENT]
-		sender_ws_id = self.sync_redis.shget(WEBRTC_CONNECTION, connection_id)
+		sender_ws_id = self.sync_redis.shget(RedisPrefix.WEBRTC_CONNECTION, connection_id)
 		sender_ws_status = self.sync_redis.shget(connection_id, sender_ws_id)
 		self_ws_status = self.sync_redis.shget(connection_id, self.id)
 		if sender_ws_status == WebRtcRedisStates.READY \

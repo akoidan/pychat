@@ -171,15 +171,15 @@ chp(){
 
 post_fontello_conf() {
     printOut "Creating fontello config"
-    safeRunCommand curl --silent --show-error --fail --form "config=@./frontend/font-config.json" --output $FE_DIRECTORY/.fontello http://fontello.com
+    safeRunCommand curl --silent --show-error --fail --form "config=@./frontend/font-config.json" --output $FE_DIRECTORY/.fontello https://fontello.com
     fontello_session=$(cat $FE_DIRECTORY/.fontello)
-    url="http://fontello.com/`cat $FE_DIRECTORY/.fontello`"
+    url="https://fontello.com/`cat $FE_DIRECTORY/.fontello`"
     echo "Genereted fontello url: $url"
 }
 
 show_fontello_session() {
     fontello_session=$(cat $FE_DIRECTORY/.fontello)
-    url="http://fontello.com/`cat $FE_DIRECTORY/.fontello`"
+    url="https://fontello.com/`cat $FE_DIRECTORY/.fontello`"
     printOut "Fonts url is: $url"
     echo "It has been opened in new browser tab"
     python -mwebbrowser $url
@@ -190,13 +190,14 @@ download_fontello() {
     fontello_session=$(cat $FE_DIRECTORY/.fontello)
     printOut "Downloading fontello using fontello session '$fontello_session'"
     mkdir -p "$TMP_DIR/fontello"
-    safeRunCommand curl -X GET "http://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
+    safeRunCommand curl -X GET "https://fontello.com/$fontello_session/get" -o "$TMP_DIR/fonts.zip"
     safeRunCommand unzip "$TMP_DIR/fonts.zip" -d "$TMP_DIR/fontello"
     dir=$(ls "$TMP_DIR/fontello")
     cat "$TMP_DIR/fontello/$dir/css/fontello.css" | grep ^.icon >  "$SASS_DIR/partials/fontello.scss"
-    cp -v "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
-    cp -v "$TMP_DIR/fontello"/$dir/demo.html "$ASSETS_DIR/demo.html"
-    cp -v "$TMP_DIR/fontello"/$dir/config.json "$FE_DIRECTORY/font-config.json"
+    safeRunCommand cp -v "$TMP_DIR/fontello/$dir/css/animation.css" "$SASS_DIR/partials/animation.scss"
+    safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/font/* "$FONT_DIR"
+    safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/demo.html "$ASSETS_DIR/demo.html"
+    safeRunCommand cp -v "$TMP_DIR/fontello"/$dir/config.json "$FE_DIRECTORY/font-config.json"
 
     if type "sed" &> /dev/null; then
         sed -i '1i\@charset "UTF-8";' "$SASS_DIR/partials/fontello.scss"
@@ -419,7 +420,7 @@ generate_secret_key() {
 
 if [ "$1" = "post_fontello_conf" ]; then
     post_fontello_conf
-    python -mwebbrowser "http://fontello.com/`cat .fontello`"
+    python -mwebbrowser "https://fontello.com/`cat $FE_DIRECTORY/.fontello`"
 elif [ "$1" = "check_files" ]; then
     check_files
 elif [ "$1" = "create_django_tables" ]; then

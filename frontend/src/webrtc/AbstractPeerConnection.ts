@@ -1,4 +1,3 @@
-import {WEBRTC_STUNT_URL} from '@/utils/singletons';
 import {Logger} from 'lines-logger';
 import loggerFactory from '@/utils/loggerFactory';
 import WsHandler from '@/utils/WsHandler';
@@ -10,6 +9,7 @@ import Subscription from '@/utils/Subscription';
 import {ConnectionStatus, RemovePeerConnection} from '@/types/types';
 import {DefaultStore} from '@/utils/store';
 import {ConnectToRemoteMessage, OnSendRtcDataMessage} from '@/types/messages';
+import {WEBRTC_STUNT_URL} from '@/utils/runtimeConsts';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean = false;
@@ -29,7 +29,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected abstract connectedToRemote: boolean;
   private readonly pc_config = {
     iceServers: [{
-      url: this.webRtcUrl
+      urls: this.webRtcUrl
     }]
   };
   private readonly pc_constraints: unknown = {
@@ -68,7 +68,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       opponentWsId: this.opponentWsId
     };
     sub.notify(message);
-    sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId));
+    sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
   }
 
   public print(message: string) {
@@ -109,43 +109,32 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.wsHandler.sendRtcData(message, this.connectionId, this.opponentWsId);
   }
 
-  public failWebRtc(parent: string) {
-    return (...args: unknown[]) => {
-      const message = `An error occurred while ${parent}: ${extractError(args)}`;
-      this.store.growlError(message);
-      this.logger.error('failWebRtc {}', message)();
-    };
-  }
-
-  public createOffer() { // each peer should be able to createOffer in case of microphone change
+  public async createOffer() { // each peer should be able to createOffer in case of microphone change
     this.logger.log('Creating offer...')();
     this.offerCreator = true;
-    this.pc!.createOffer((offer: RTCSessionDescriptionInit) => {
-      if (offer.sdp) {
-        offer.sdp = this.setMediaBitrate(offer.sdp!, 1638400);
-      }
-      this.logger.log('Created offer, setting local description')();
-      this.pc!.setLocalDescription(offer, () => {
-        this.logger.log('Sending offer to remote')();
-        this.sendWebRtcEvent(offer);
-      },                           this.failWebRtc('setLocalDescription'));
-    },                   this.failWebRtc('createOffer'), this.sdpConstraints);
+    const offer: RTCSessionDescriptionInit = await this.pc!.createOffer(this.sdpConstraints);
+    if (offer.sdp) {
+      offer.sdp = this.setMediaBitrate(offer.sdp!, 1638400);
+    }
+    this.logger.log('Created offer, setting local description')();
+    await this.pc!.setLocalDescription(offer);
+    this.logger.log('Sending offer to remote')();
+    this.sendWebRtcEvent(offer);
   }
 
-  public respondeOffer() {
+  public async respondOffer() {
     this.logger.log('Responding to offer')();
     this.offerCreator = false;
-    this.pc!.createAnswer((answer: RTCSessionDescriptionInit) => {
-      if (answer.sdp) {
-        answer.sdp = this.setMediaBitrate(answer.sdp, 1638400);
-      }
-      this.logger.log('Sending answer')();
-      this.pc!.setLocalDescription(answer, () => {
-        this.sendWebRtcEvent(answer);
-      }, this.failWebRtc('setLocalDescription'));
-    }, this.failWebRtc('createAnswer') /*,this.sdpConstraints*/); // TODO wtf it that?
+    const answer: RTCSessionDescriptionInit = await this.pc!.createAnswer();
+    if (answer.sdp) {
+      answer.sdp = this.setMediaBitrate(answer.sdp, 1638400);
+    }
+    this.logger.log('Sending answer')();
+    await this.pc!.setLocalDescription(answer);
+    this.sendWebRtcEvent(answer);
   }
 
+  // TODO is this required in 2020?
   public setMediaBitrate(sdp: string, bitrate: number) {
     const lines = sdp.split('\n');
     let line = -1;
@@ -180,37 +169,30 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     }
   }
 
-  public handleAnswer() {
-    this.logger.log('Creating answer')();
-    if (!this.offerCreator) {
-      this.respondeOffer();
-    }
-    this.offerCreator = false;
-  }
-
   protected onChannelMessage(event: MessageEvent) {
     this.logger.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();
   }
 
-  protected onsendRtcData(message: OnSendRtcDataMessage) {
+  protected async onsendRtcData(message: OnSendRtcDataMessage) {
     if (!this.connectedToRemote) {
       this.logger.log('Connection is not accepted yet, pushing data to queue')();
-      this.sendRtcDataQueue.push(message); 
+      this.sendRtcDataQueue.push(message);
       return;
     } else {
       const data: RTCSessionDescriptionInit | RTCIceCandidateInit | { message: unknown } = message.content;
       this.logger.log('onsendRtcData')();
       if (this.pc!.iceConnectionState && this.pc!.iceConnectionState !== 'closed') {
         if ((<RTCSessionDescriptionInit>data).sdp) {
-          this.pc!.setRemoteDescription(
-              new RTCSessionDescription(<RTCSessionDescriptionInit>data),
-              this.handleAnswer.bind(this),
-              this.failWebRtc('setRemoteDescription')
-          );
+          await this.pc!.setRemoteDescription(new RTCSessionDescription(<RTCSessionDescriptionInit>data));
+          this.logger.log('Creating answer')();
+          if (!this.offerCreator) {
+            await this.respondOffer();
+          }
+          this.offerCreator = false;
         } else if ((<RTCIceCandidateInit>data).candidate) {
-          this.pc!.addIceCandidate(new RTCIceCandidate(<RTCIceCandidateInit>data));
+          await this.pc!.addIceCandidate(new RTCIceCandidate(<RTCIceCandidateInit>data));
         } else if ((<{ message: unknown }>data).message) {
-          this.logger.warn('Got unknow message {}', (<{ message: unknown }>data).message);
+          this.logger.error('Got unknown message {}', (<{ message: unknown }>data).message);
         }
       } else {
         this.logger.error('Skipping ws message for closed connection')();

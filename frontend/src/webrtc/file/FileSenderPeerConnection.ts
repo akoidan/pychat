@@ -12,7 +12,7 @@ import {FileTransferStatus} from '@/types/model';
 import WsHandler from '@/utils/WsHandler';
 import {bytesToSize, getDay} from '@/utils/utils';
 import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE} from '@/utils/consts';
-import FilePeerConnection from '@/webrtc/FilePeerConnection';
+import FilePeerConnection from '@/webrtc/file/FilePeerConnection';
 import {DefaultStore} from '@/utils/store';
 import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 

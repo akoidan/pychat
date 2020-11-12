@@ -1,5 +1,5 @@
 [![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat.svg?label=docker%3Aprod)](https://hub.docker.com/r/deathangel908/pychat)
-[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat-test.svg?label=docker%3Atest)](https://hub.docker.com/r/deathangel908/pychat-test) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)[![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master)
+[![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/deathangel908/pychat-test.svg?label=docker%3Atest)](https://hub.docker.com/r/deathangel908/pychat-test) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/Deathangel908/pychat/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/Deathangel908/pychat/?branch=master) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b508fef8efba4a5f8b5e8411c0803af5)](https://www.codacy.com/app/nightmarequake/pychat?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Deathangel908/pychat&amp;utm_campaign=Badge_Grade)[![Code Health](https://landscape.io/github/akoidan/pychat/master/landscape.svg?style=flat&v=1)](https://landscape.io/github/akoidan/pychat/master) [![Continious deployment pychat.org](https://github.com/akoidan/pychat/workflows/Update%20pychat.org/badge.svg)](https://github.com/akoidan/pychat/actions)
 
 # Live demo: [pychat.org](https://pychat.org/), [video](https://www.youtube.com/watch?v=m6sJ-blTidg)
 
@@ -30,6 +30,7 @@
      * [WebRTC connection establishment](#webrtc-connection-establishment)
      * [Frontend stack](#frontend-stack)
      * [Frontend config](#frontend-config)
+  * [Github actions](#github-actions)   
   * [TODO](#todo)
   
   
@@ -138,7 +139,7 @@ If you don't or unable to run docker you can alway do the setup w/o it. You defi
 
 ## Frontend
  - `cd frontend; nvm use`. Apply `nvm install` before it if node of specified version is not installed
- - `yarn install`
+ - `yarn install --frozen-lockfile`
  - Create production.json based on [Frontend config](#frontend-config). Also you can use and modify `cp docker/pychat.org/production.json ./frontend/`
  - Run `yarn run prod`. This generates static files in `frotnend/dist` directory.
 
@@ -211,9 +212,9 @@ This section depends on the OS you use. I tested full install on Windows/Ubuntu/
  1. I use 2 git repos in 2 project directory. So you probably need to rename `excludeMAIN`file to `.gitignore`or create link to exclude. `ln -rsf .excludeMAIN .git/info/exclude`
  2. Rename [backend/chat/settings_example.py](backend/chat/settings_example.py) to `backend/chat/settings.py`. **Modify file according to the comments in it.** 
  3. From backend dir (`cd backend`). Create virtualEnv `python3 -m venv --system-site-packages .venv`. For ubuntu you can omit `--system-site-packages `. Activate it: `source .venv/bin/activate`
- 4. Install python packages with `pip install -r requirements.txt`.
- 5. From **root** user create the database: `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL PRIVILEGES ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
- 6. Fill database with tables: `bash ../download_content.sh create_django_tables`
+ 4. Install python packages with `pip install -r requirements.txt`. (Remember you're still in `backend` dir)
+ 5. From **root** (sudo) user create the database (from shell environment): `echo "create database pychat CHARACTER SET utf8 COLLATE utf8_general_ci; CREATE USER 'pychat'@'localhost' identified by 'pypass'; GRANT ALL ON pychat.* TO 'pychat'@'localhost';" | mysql -u root`. You will need mysql running for that (e.g. `systemctl start mysql` on archlinux) If you also need remote access do the same with `'192.168.1.0/255.255.255.0';`
+ 6. Fill database with tables: `bash ../download_content.sh create_django_tables`. (Remember you're still in `backend` dir)
 
 ## Follow the [Frontend](#frontend) steps
 
@@ -332,12 +333,25 @@ The successful connection produces logs below in console
 
 Sender:
 ```
+ws:in {"action": "offerCall", "content": {"browser": "Chrome 86"}, "userId": 2, "handler": "webrtc", "connId": "YZnbgKIL", "opponentWsId": "0002:UFBW", "roomId": 1, "time": 1604446797449}
+WRTC Setting call status to  received_offer    
+WRTC CallHandler initialized
+ws:out  {"action":"replyCall","connId":"YZnbgKIL","content":{"browser":"Chrome 86"},"messageId":1} 
 rsok33GN CallHandler initialized
 rsok33GN:0005:EJAd Created CallSenderPeerConnection
+WRTC Setting call status to  accepted
+WRTC capturing input
+WRTC navigator.mediaDevices.getUserMedia({audio, video})
+ws:out  {"action":"acceptCall","connId":"YZnbgKIL","messageId":2}
+YZnbgKIL:0002:UFBW Connect to remote  
 rsok33GN:0005:EJAd Creating RTCPeerConnection
+YZnbgKIL:0002:UFBW Sending local stream to remote
 rsok33GN:0005:EJAd Creating offer...
 rsok33GN:0005:EJAd Created offer, setting local description
 rsok33GN:0005:EJAd Sending offer to remote
+YZnbgKIL:0002:UFBW onicecandidate
+...
+YZnbgKIL:0002:UFBW onicecandidate
 rsok33GN:0005:EJAd onsendRtcData
 rsok33GN:0005:EJAd answer received
 rsok33GN:0005:EJAd onaddstream
@@ -346,9 +360,17 @@ rsok33GN:0005:EJAd onsendRtcData
 
 Receiver:
 ```
+WRTC capturing input
+WRTC navigator.mediaDevices.getUserMedia({audio, video})
+WRTC got local stream  MediaStream {id: "0IeyYT9LxHRidUZaw7XSVnXEPWYimm4KDmJB", active: true, onaddtrack: null, onremovetrack: null, onactive: null, …}
+WRTC Setting call status to  sent_offer
+ws:out  {"action":"offerCall","roomId":1,"content":{"browser":"Chrome 86"},"messageId":1}
+ws:in {"action": "setConnectionId", "handler": "void", "connId": "YZnbgKIL", "messageId": 1, "time": 1604446797449}   
 rsok33GN CallHandler initialized
 rsok33GN:0004:oIc5 Created CallReceiverPeerConnection
+YZnbgKIL:0001:qobF Connect to remote
 rsok33GN:0004:oIc5 Creating RTCPeerConnection
+YZnbgKIL:0001:qobF Sending local stream to remote
 rsok33GN:0004:oIc5 onsendRtcData
 rsok33GN:0004:oIc5 Creating answer
 rsok33GN:0004:oIc5 onaddstream
@@ -425,7 +447,26 @@ development.json and production.json have the following format:
 }
 ```
 
+# Github actions
+In order to setup continuous delivery via github:
+- Generate a new pair of ssh keys `mkdir /tmp/sshkey; ssh-keygen -t rsa -b 4096 -C "github actions" -f  /tmp/sshkey/id_rsa`
+- put `/tmp/sshkey/id_rsa.pub` to server `~/.ssh/authorized_keys` where `~` is the home for ssh user to use ( I used `http`) 
+- Create ssh variables at https://github.com/akoidan/pychat/settings/secrets/actions (where akoidan/pychat is your repo) :
+   - `HOST` -ssh host (your domain)
+   - `PORT` - ssh port (22)
+   - `SSH_USER` - ssh user, if you used my setup it's `http`
+   - `ID_RSA` - what ssh-keygen has generated in step above to`/tmp/sshkey/id_rsa`
+- I used alias to give http user to access tornado systemd service like in [this](https://serverfault.com/a/841104/304770) example. So append `/etc/sudoers` with
+ ```
+Cmnd_Alias RESTART_TORNADO = /usr/bin/systemctl restart tornado
+http ALL=(ALL) NOPASSWD: RESTART_TORNADO
+``` 
+
 # TODO
+* if users joins a room that already has call in progress, he should be able to join this call
+* create npm package for fontello instead of download_content.sh . move config with files location to package.json or fontello.json https://stackoverflow.com/questions/46725374/how-to-run-a-script-before-installing-any-npm-module
+* Call icon is missing if call in some room is in progress
+* opening devtools causing div $('.chatBoxHolder.holder') to have horizontal scroll. by disabling and enabling 'flex: 1' css on it, scroll dissappears 
 * download files with backgroun fetch https://developers.google.com/web/updates/2018/12/background-fetch
 * use native filesystemAPI to send files, so after refreshing the page we still have access https://www.youtube.com/watch?v=GNuG-5m4Ud0&ab_channel=GoogleChromeDevelopers
 * ctrl+c on builder leaves the process in foreground

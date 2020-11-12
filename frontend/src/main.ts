@@ -6,7 +6,6 @@ import {
   globalLogger,
   storage,
   webrtcApi,
-  isMobile,
   ws,
   xhr
 } from '@/utils/singletons';
@@ -18,6 +17,8 @@ import App from '@/components/App.vue'; // should be after initStore
 import {sub} from '@/utils/sub';
 import Vue from 'vue';
 import {declareDirectives, declareMixins} from '@/utils/vuehelpers';
+import {store} from '@/utils/storeHolder';
+import {browserVersion} from '@/utils/runtimeConsts';
 
 Vue.prototype.$api = api;
 Vue.prototype.$ws = ws;
@@ -35,6 +36,18 @@ export function init() {
   document.body.addEventListener('dragover', e => e.preventDefault());
   const vue: Vue = new Vue({router, render: (h: Function): typeof Vue.prototype.$createElement => h(App)});
   vue.$mount('#app');
+
+
+  window.onerror = function (msg, url, linenumber, column, errorObj) {
+    const message = `Error occurred in ${url}:${linenumber}\n${msg}`;
+    if (store?.userSettings?.sendLogs && api) {
+      api.sendLogs(`${url}:${linenumber}:${column || '?'}\n${msg}\n\nOBJ:  ${errorObj || '?'}`, browserVersion, GIT_HASH);
+    }
+    store.growlError(message);
+
+    return false;
+  };
+
 
   window.GIT_VERSION = GIT_HASH;
   if (IS_DEBUG) {

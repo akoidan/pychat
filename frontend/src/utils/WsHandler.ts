@@ -12,7 +12,12 @@ import {
   CurrentUserSettingsModel,
   UserModel
 } from '@/types/model';
-import {PubSetRooms, SessionHolder, UploadFile} from '@/types/types';
+import {
+  MessageSupplier,
+  PubSetRooms,
+  SessionHolder,
+  UploadFile
+} from '@/types/types';
 import {
   AddChannelMessage, AddInviteMessage, AddRoomMessage,
   DefaultMessage,
@@ -23,7 +28,8 @@ import {
   SetSettingsMessage,
   SetUserProfileMessage,
   SetWsIdMessage,
-  UserProfileChangedMessage, WebRtcSetConnectionIdMessage
+  UserProfileChangedMessage,
+  WebRtcSetConnectionIdMessage
 } from '@/types/messages';
 import {
   convertUser,
@@ -37,12 +43,14 @@ import {
 } from '@/types/dto';
 import {sub} from '@/utils/sub';
 import {DefaultStore} from '@/utils/store';
+import AbstractPeerConnection from '@/webrtc/AbstractPeerConnection';
+import AbstractMessageProcessor from '@/utils/AbstractMessageProcessor';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
 }
 
-export default class WsHandler extends MessageHandler {
+export default class WsHandler extends MessageHandler implements MessageSupplier{
   public timeDiff: number = 0;
 
   protected readonly logger: Logger;
@@ -56,8 +64,6 @@ export default class WsHandler extends MessageHandler {
     ping: <HandlerType>this.ping,
     pong: this.pong
   };
-  private readonly loggerIn: Logger;
-  private readonly loggerOut: Logger;
   private pingTimeoutFunction: number|null = null;
   private ws: WebSocket | null = null;
   private noServerPingTimeout: any;
@@ -66,9 +72,7 @@ export default class WsHandler extends MessageHandler {
   private readonly sessionHolder: SessionHolder;
   private listenWsTimeout: number|null = null;
   private readonly API_URL: string;
-  private readonly callBacks: { [id: number]: {resolve: Function; reject: Function} } = {};
-
-  private messageId: number = 0;
+  private readonly messageProc: AbstractMessageProcessor;
   private wsState: WsState = WsState.NOT_INITED;
 
   // this.dom = {
@@ -83,11 +87,19 @@ export default class WsHandler extends MessageHandler {
     super();
     sub.subscribe('ws', this);
     this.API_URL = API_URL;
+    this.messageProc = new AbstractMessageProcessor(this, store, 'ws');
     this.logger = loggerFactory.getLoggerColor('ws', '#2e631e');
-    this.loggerIn = loggerFactory.getLoggerColor('ws:in', '#2e631e');
-    this.loggerOut = loggerFactory.getLoggerColor('ws:out', '#2e631e');
     this.sessionHolder = sessionHolder;
     this.store = store;
+  }
+
+  sendRawTextToServer(message: string): boolean {
+    if (this.isWsOpen()) {
+      this.ws!.send(message);
+      return true;
+    } else {
+      return false;
+    }
   }
 
   public getWsConnectionId () {
@@ -95,7 +107,7 @@ export default class WsHandler extends MessageHandler {
   }
 
   public async offerFile(roomId: number, browser: string, name: string, size: number): Promise<WebRtcSetConnectionIdMessage> {
-    return this.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait({
       action: 'offerFile',
       roomId: roomId,
       content: {browser, name, size}
@@ -103,7 +115,7 @@ export default class WsHandler extends MessageHandler {
   }
 
   public async offerCall(roomId: number, browser: string): Promise<WebRtcSetConnectionIdMessage> {
-    return this.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait({
       action: 'offerCall',
       roomId: roomId,
       content: {browser}
@@ -169,21 +181,21 @@ export default class WsHandler extends MessageHandler {
   }
 
   public async saveSettings(content: UserSettingsDto): Promise<SetSettingsMessage|unknown> {
-    return this.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait({
       action: 'setSettings',
       content
     });
   }
 
   public async saveUser(content: UserProfileDto): Promise<SetUserProfileMessage|unknown> {
-    return this.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait({
       action: 'setUserProfile',
       content
     });
   }
 
   public async sendAddRoom(name: string|null, p2p: boolean, volume: number, notifications: boolean, users: number[], channelId: number|null): Promise<AddRoomMessage> {
-    return this.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait({
       users,
       name,
       p2p,
@@ -195,28 +207,28 @@ export default class WsHandler extends MessageHandler {
   }
 
   public async sendAddChannel(channelName: string): Promise<AddChannelMessage> {
-    return this.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait({
       channelName,
       action: 'addChannel'
     });
   }
 
   public async sendRoomSettings(message: RoomNoUsersDto): Promise<void> {
-    return this.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait({
       ...message,
       action: 'saveRoomSettings'
     });
   }
 
   public async sendDeleteChannel(channelId: number): Promise<unknown> {
-    return this.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait({
       channelId,
       action: 'deleteChannel'
     });
   }
 
   public async saveChannelSettings(channelName: string, channelId: number, channelCreatorId: number): Promise<SaveChannelSettings> {
-    return this.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait({
       action: 'saveChannelSettings',
       channelId,
       channelCreatorId,
@@ -225,7 +237,7 @@ export default class WsHandler extends MessageHandler {
   }
 
   public async inviteUser(roomId: number, users: number[]): Promise<AddInviteMessage> {
-    return this.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait({
       roomId,
       users,
       action: 'inviteUser'
@@ -266,14 +278,14 @@ export default class WsHandler extends MessageHandler {
   }
 
   public async sendLeaveRoom(roomId: number) {
-    return this.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait({
       roomId,
       action: 'deleteRoom'
     });
   }
 
   public async sendLoadMessages(roomId: number, headerId: number|undefined, count: number) {
-    return this.sendToServerAndAwait({
+    return this.messageProc.sendToServerAndAwait({
       headerId,
       count,
       action: 'loadMessages',
@@ -282,7 +294,7 @@ export default class WsHandler extends MessageHandler {
   }
 
   public isWsOpen() {
-    return this.ws && this.ws.readyState === WebSocket.OPEN;
+    return this.ws?.readyState === WebSocket.OPEN;
   }
 
   public sendRtcData(content: RTCSessionDescriptionInit| RTCIceCandidate, connId: string, opponentWsId: string) {
@@ -298,11 +310,6 @@ export default class WsHandler extends MessageHandler {
     this.sendToServer({action: 'retryFile',  connId, opponentWsId});
   }
 
-  public getMessageId () {
-    this.messageId++;
-
-    return this.messageId;
-  }
 
   public replyCall(connId: string, browser: string) {
     this.sendToServer({
@@ -322,6 +329,13 @@ export default class WsHandler extends MessageHandler {
     });
   }
 
+  public async offerMessageConnection(roomId: number): Promise<WebRtcSetConnectionIdMessage> {
+    return this.messageProc.sendToServerAndAwait({
+      action: 'offerMessage',
+      roomId: roomId
+    });
+  }
+
   public acceptCall(connId: string) {
     this.sendToServer({
       action: 'acceptCall',
@@ -330,11 +344,10 @@ export default class WsHandler extends MessageHandler {
   }
 
   private sendToServer<T extends DefaultSentMessage>(messageRequest: T, skipGrowl = false): void {
-    if (!messageRequest.messageId) {
-      messageRequest.messageId = this.getMessageId();
+    const isSent = this.messageProc.sendToServer(messageRequest);
+    if (!isSent && !skipGrowl) {
+      this.store.growlError('Can\'t send message, because connection is lost :(');
     }
-    const jsonRequest = JSON.stringify(messageRequest);
-    this.sendRawTextToServer(jsonRequest, skipGrowl, messageRequest);
   }
 
   private setSettings(m: SetSettingsMessage) {
@@ -415,53 +428,12 @@ export default class WsHandler extends MessageHandler {
   }
 
   private onWsMessage(message: MessageEvent) {
-    const jsonData = message.data;
-    let data: DefaultMessage;
-    try {
-      data = JSON.parse(jsonData);
-      this.logData(this.loggerIn, jsonData, data);
-    } catch (e) {
-      this.logger.error('Unable to parse incomming message {}', jsonData)();
-
-      return;
-    }
-    if (!data.handler || !data.action) {
-      this.logger.error('Invalid message structure')();
-
-      return;
-    }
-    this.handleMessage(data);
-  }
-
-  private logData(logger: Logger, jsonData: string, message: DefaultSentMessage) {
-    let raw = jsonData;
-    if (raw.length > 1000) {
-      raw = '';
-    }
-    if (message.action === 'ping' || message.action === 'pong') {
-      logger.debug('{} {}', raw, message)();
-    } else {
-      logger.log('{} {}', raw, message)();
+    let data = this.messageProc.parseMessage(message.data);
+    if (data) {
+      this.messageProc.handleMessage(data);
     }
   }
 
-  private handleMessage(data: DefaultMessage) {
-    if (data.handler !== 'void' && data.action !== 'growlError') {
-      sub.notify(data);
-    }
-    if (data.messageId && this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.wsConnectionId)) {
-      this.logger.debug('resolving cb')();
-      if (data.action === 'growlError') {
-        this.callBacks[data.messageId].reject(Error((data as GrowlMessage).content));
-      } else {
-        this.callBacks[data.messageId].resolve(data);
-      }
-      delete this.callBacks[data.messageId];
-    } else if (data.action === 'growlError') {
-      // growlError is used only in case above, so this is just a fallback that will never happen
-      this.store.growlError((data as GrowlMessage).content);
-    }
-  }
 
   // private hideGrowlProgress(key: number) {
   //   let progInter = this.progressInterval[key];
@@ -475,16 +447,6 @@ export default class WsHandler extends MessageHandler {
   //   }
   // }
 
-  private sendRawTextToServer(jsonRequest: string, skipGrowl: boolean, objData: DefaultSentMessage): void {
-    if (!this.isWsOpen() || !this.ws) {
-      if (!skipGrowl) {
-        this.store.growlError('Can\'t send message, because connection is lost :(');
-      }
-    } else {
-      this.logData(this.loggerOut, jsonRequest, objData);
-      this.ws.send(jsonRequest);
-    }
-  }
 
   // sendPreventDuplicates(data, skipGrowl) {
   //   this.messageId++;
@@ -514,34 +476,12 @@ export default class WsHandler extends MessageHandler {
     }
   }
 
-  private sendToServerAndAwait<T extends DefaultSentMessage> (messageRequest: T): Promise<any> {
-    return new Promise((resolve, reject) => {
-      messageRequest.messageId = this.getMessageId();
-      this.sendToServer(messageRequest);
-      this.callBacks[messageRequest.messageId] = {resolve, reject}
-    })
-
-  }
 
   private onWsClose(e: CloseEvent) {
     this.ws = null;
     this.setStatus(false);
-    for (const cb in this.callBacks) {
-      try {
-        this.logger.debug('Resolving cb {}', cb)();
-        const cbFn = this.callBacks[cb];
-        delete this.callBacks[cb];
-        if (e.code === 1006) {
-          // tornado drops connection if exception occurs during processing an event we send from WsHandler
-          cbFn.reject('Server error');
-        } else {
-          cbFn.reject('Connection to server is lost')
-        }
-        this.logger.debug('Cb {} has been resolved', cb)();
-      } catch (e) {
-        this.logger.debug('Error {} during resolving cb {}', e, cb)();
-      }
-    }
+    // tornado drops connection if exception occurs during processing an event we send from WsHandler
+    this.messageProc.onDropConnection(e.code === 1006 ? 'Server error' : 'Connection to server is lost')
     // for (let k in this.progressInterval) {
     //   this.hideGrowlProgress(k);
     // }

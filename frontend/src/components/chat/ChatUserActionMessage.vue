@@ -13,10 +13,10 @@ import {CurrentUserInfoModel, UserModel} from '@/types/model';
 import {timeToString} from '@/utils/htmlApi';
 
 @Component
-export default class ChatChangeOnlineMessage extends Vue {
+export default class ChatUserActionMessage extends Vue {
   @Prop() public time!: number;
   @Prop() public userId!: number;
-  @Prop() public isWentOnline!: boolean;
+  @Prop() public action!: string;
 
   @State
   public readonly allUsersDict!: {[id: number]: UserModel} ;
@@ -24,9 +24,7 @@ export default class ChatChangeOnlineMessage extends Vue {
   public readonly myId!: number;
 
   get where () {
-    const has = this.isMe ? 'have ' : 'has ';
-
-    return has + (this.isWentOnline ?  'appeared online' : 'gone offline');
+    return `${this.isMe ? 'have' : 'has'} ${this.action}`;
   }
 
   public setActiveUser() {

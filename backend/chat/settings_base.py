@@ -154,7 +154,6 @@ JS_CONSOLE_LOGS = True
 IP_API_URL = 'http://ip-api.com/json/%s'
 
 ALL_REDIS_ROOM = 'all'
-WEBRTC_CONNECTION = 'webrtc_conn'
 ALL_ROOM_ID = 1
 
 PING_CLOSE_JS_DELAY = 10000  # milliseconds

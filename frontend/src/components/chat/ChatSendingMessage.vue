@@ -7,7 +7,7 @@
         :upload="message.transfer.upload"
       />
       <i
-        v-else-if="message.files.length"
+        v-else-if="filesExist"
         class="icon-repeat"
         @click="retry"
       >{{ message.transfer.error }}</i>
@@ -40,6 +40,10 @@ export default class ChatSendingMessage extends Vue {
 
   get searchedIds() {
     return this.roomsDict[this.message.roomId].search.searchedIds;
+  }
+
+  get filesExist() {
+    return this.message.files && Object.keys(this.message.files).length > 0;
   }
 
   get id() {

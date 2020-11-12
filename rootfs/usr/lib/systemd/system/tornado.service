@@ -1,5 +1,6 @@
 [Unit]
     Description=Tornado supervisor
+    After=redis.service mysql.service
 [Service]
     Type=oneshot
     ExecStart=/srv/http/pychat/backend/.venv/bin/python /srv/http/pychat/backend/manage.py flush_online

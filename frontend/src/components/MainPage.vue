@@ -30,7 +30,8 @@ import {
   UserModel
 } from '@/types/model';
 import NotifierHandler from '@/utils/NotificationHandler';
-import {browserVersion, isChrome, isMobile, notifier} from '@/utils/singletons';
+import {notifier} from '@/utils/singletons';
+import {browserVersion, isChrome, isMobile} from '@/utils/runtimeConsts'
 import {State} from '@/utils/storeHolder';
 import IncomingCall from '@/components/chat/IncomingCall';
 

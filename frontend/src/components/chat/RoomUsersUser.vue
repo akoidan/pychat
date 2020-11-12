@@ -3,7 +3,7 @@
     v-show="userIsInActiveRoom"
     :class="onlineClass"
   >
-    <div><i :class="userSexClass" />{{ user.user }}</div>
+    <user-name-sex :user="user" :online="isOnline"/>
     <img
       v-if="consts.FLAGS && user.location.countryCode"
       class="country"
@@ -18,21 +18,18 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import {RoomModel, UserModel} from '@/types/model';
 import {
   getFlagPath,
-  getUserSexClass
 } from '@/utils/htmlApi';
 import {FLAGS} from '@/utils/consts';
-
-@Component
+import UserNameSex from '@/components/chat/UserNameSex.vue';
+@Component({
+  components: {UserNameSex}
+})
 export default class RoomUsersUser extends Vue {
   @Prop() public user!: UserModel;
   @State
   public readonly activeRoom!: RoomModel;
   @State
   public readonly online!: number[];
-
-  get userSexClass () {
-    return getUserSexClass(this.user);
-  }
 
   public get consts(): object {
     return {
@@ -65,16 +62,20 @@ export default class RoomUsersUser extends Vue {
   }
 
   get onlineClass () {
-    return this.online.indexOf(this.user.id) < 0 ? 'offline' : 'online';
+    return this.isOnline ? 'offline' : 'online';
   }
 
+  private get isOnline() {
+    return this.online.indexOf(this.user.id) < 0;
+  }
 }
 </script>
 
 <style lang="sass" scoped>
+  @import "~@/assets/sass/partials/room_users_table.sass"
+
   li
-    display: flex
-    justify-content: space-between
+    @extend %li
   div
     text-overflow: ellipsis
     word-break: break-all

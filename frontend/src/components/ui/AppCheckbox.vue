@@ -12,7 +12,7 @@
 </template>
 <script lang="ts">
 import {Component, Prop, Vue, Ref, Emit} from 'vue-property-decorator';
-import {getUniqueId} from '@/utils/htmlApi';
+import {getUniqueId} from '@/utils/pureFunctions';
 
 @Component
 export default class AppCheckbox extends Vue {

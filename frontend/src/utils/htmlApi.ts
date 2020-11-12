@@ -78,23 +78,6 @@ export function getFlagPath(countryCode: string) {
   return getFlag(countryCode);
 }
 
-let uniqueId = 1;
-
-export function getUniqueId() {
-  return uniqueId++;
-}
-
-export function getUserSexClass(user: UserModel) {
-  if (user.sex === 'Male') {
-    return 'icon-man';
-  } else if (user.sex === 'Female') {
-    return 'icon-girl';
-  } else if (user.sex === 'Secret') {
-    return 'icon-user-secret';
-  } else {
-    throw Error(`Invalid sex ${user.sex}`);
-  }
-}
 
 export function getSmileyHtml(symbol: string) {
   let smile: Smile | undefined;

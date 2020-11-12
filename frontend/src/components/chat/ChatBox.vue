@@ -14,15 +14,15 @@
       @mousewheel="onScroll"
     >
       <template v-for="message in messages">
-        <chat-change-online-message
-          v-if="message.isChangeOnline"
+        <chat-user-action-message
+          v-if="message.isUserAction"
           :key="message.time"
           :time="message.time"
           :user-id="message.userId"
-          :is-went-online="message.isWentOnline"
+          :action="message.action"
         />
         <chat-change-name-message
-          v-if="message.isChangeName"
+          v-else-if="message.isChangeName"
           :key="message.time"
           :time="message.time"
           :old-name="message.oldName"
@@ -68,7 +68,7 @@
   import {MESSAGES_PER_SEARCH} from "@/utils/consts";
   import AppProgressBar from "@/components/ui/AppProgressBar";
   import ChatSendingMessage from "@/components/chat/ChatSendingMessage";
-  import ChatChangeOnlineMessage from "@/components/chat/ChatChangeOnlineMessage";
+  import ChatUserActionMessage from "@/components/chat/ChatUserActionMessage";
   import ChatSendingFile from "@/components/chat/ChatSendingFile";
   import ChatReceivingFile from '@/components/chat/ChatReceivingFile';
   import ChatCall from '@/components/chat/ChatCall';
@@ -82,7 +82,7 @@
       ChatCall,
       ChatReceivingFile,
       ChatSendingFile,
-      ChatChangeOnlineMessage,
+      ChatUserActionMessage,
       ChatSendingMessage,
       AppProgressBar,
       ChatMessage,
@@ -108,15 +108,21 @@
       }
     }
 
+    onEmitScroll() {
+      this.$nextTick(function () {
+        if (this.chatbox && this.scrollBottom) {
+          this.chatbox.scrollTop = this.chatbox.scrollHeight;
+          this.logger.trace("Scrolling to bottom")();
+        }
+      });
+    }
+
     created() {
-      messageBus.$on('scroll', () => {
-        this.$nextTick(function () {
-          if (this.chatbox && this.scrollBottom) {
-            this.chatbox.scrollTop = this.chatbox.scrollHeight;
-            this.logger.trace("Scrolling to bottom")();
-          }
-        });
-      })
+      messageBus.$on('scroll',this.onEmitScroll);
+    }
+
+    destroyed() {
+      messageBus.$off('scroll',this.onEmitScroll);
     }
 
     get id() {
@@ -124,7 +130,10 @@
     }
 
     get messages() {
-      let newArray: any[] = this.room.changeOnline.map(value => ({isChangeOnline: true, ...value}));
+      let newArray: any[] = this.room.roomLog.map(value => ({
+        isUserAction: true,
+        ...value
+      }));
       newArray.push(...this.room.changeName.map(value => ({isChangeName: true, ...value})));
       let dates: {[id: string]: boolean} = {};
       for (let m in this.room.sendingFiles) {
@@ -226,6 +235,8 @@
 
   .holder
     height: 100%
+    display: flex
+    flex-direction: column // otherwise chat-call is not full width
     /deep/ p
       margin-top: 0.8em
       margin-bottom: 0.8em

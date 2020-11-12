@@ -1,26 +1,19 @@
 <template>
   <li :class="activeClass">
-    <router-link :to="`/chat/${room.id}`">
+    <router-link :to="`/chat/${room.id}`" class="link">
       {{ room.name }}
     </router-link>
-    <router-link :to="`/room-settings/${room.id}`">
-      <span
-        v-if="!room.newMessagesCount"
-        class="icon-cog"
-      />
-    </router-link>
-    <span
-      v-if="room.newMessagesCount"
-      class="newMessagesCount"
-    >{{ room.newMessagesCount }}</span>
+    <room-right-icon :room="room" />
   </li>
 </template>
 <script lang="ts">
 import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {RoomModel} from '@/types/model';
-
-@Component
+import RoomRightIcon from '@/components/chat/RoomRightIcon.vue';
+@Component({
+  components: {RoomRightIcon}
+})
 export default class RoomUsersPublic extends Vue {
   @Prop() public room!: RoomModel;
   @State
@@ -34,4 +27,13 @@ export default class RoomUsersPublic extends Vue {
 </script>
 
 <style lang="sass" scoped>
+
+  @import "~@/assets/sass/partials/room_users_table.sass"
+
+  li
+    @extend %li
+  .active-room
+    @extend %active-room
+  .link
+    @extend %link
 </style>

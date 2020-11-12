@@ -1,7 +1,8 @@
 import {JsAudioAnalyzer} from '@/types/types';
 import {extractError} from '@/utils/utils';
-import {globalLogger, isMobile} from '@/utils/singletons';
+import {globalLogger} from '@/utils/singletons';
 import {IS_DEBUG} from '@/utils/consts';
+import {isMobile} from '@/utils/runtimeConsts';
 
 let audioContext: AudioContext;
 const audioProcesssors: JsAudioAnalyzer[] = [];
@@ -21,10 +22,16 @@ export function createMicrophoneLevelVoice (
     }
     const audioTracks: MediaStreamTrack[] = stream && stream.getAudioTracks();
     if (audioTracks.length === 0) {
-      throw Error('Stream has no audio tracks');
+      globalLogger.log('Skipping audioproc, since current stream doest have audio tracks')();
+      return null;
     }
     const audioTrack: MediaStreamTrack = audioTracks[0];
     if (!audioContext) {
+      // Safari still in 2020q3 doesn't support AudioContext.
+      const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+      if (!AudioContext) {
+        throw Error("AUdio context is not supported on this browse")
+      }
       audioContext = new AudioContext();
     }
     const analyser = audioContext.createAnalyser();
@@ -52,6 +59,21 @@ export function createMicrophoneLevelVoice (
     globalLogger.error('Unable to use microphone level because {}', extractError(err))();
 
     return null;
+  }
+}
+
+export function removeAudioProcesssor(audioProcessor: JsAudioAnalyzer) {
+  if (audioProcessor) {
+    let index = audioProcesssors.indexOf(audioProcessor);
+    if (index < 0) {
+      globalLogger.error('Unknown audioproc {}', audioProcessor)();
+    } else {
+      audioProcesssors.splice(index, 1)
+    }
+  }
+  if (audioProcessor?.javascriptNode?.onaudioprocess) {
+    globalLogger.log('Removing audioprod')();
+    audioProcessor.javascriptNode.onaudioprocess = null;
   }
 }
 

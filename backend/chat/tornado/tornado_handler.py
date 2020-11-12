@@ -73,11 +73,13 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		else:
 			self.logger.info("Close event, not subscribed, channels: %s", self.channels)
 		self.async_redis_publisher.srem(RedisPrefix.ONLINE_VAR, self.id)
-		is_online, online = self.get_online_and_status_from_redis()
+		online = self.get_dict_users_from_redis()
+		my_online = online.setdefault(self.user_id, [])
+		if self.id in my_online:
+			my_online.remove(self.id)
 		if self.connected:
-			if not is_online:
-				message = self.room_online_logout(online)
-				self.publish(message, settings.ALL_ROOM_ID)
+			message = self.room_online_logout(online)
+			self.publish(message, settings.ALL_ROOM_ID)
 			res = execute_query(settings.UPDATE_LAST_READ_MESSAGE, [self.user_id, ])
 			self.logger.info("Updated %s last read message", res)
 		self.disconnect()
@@ -128,7 +130,14 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 		self.async_redis.connect()
 		self.async_redis_publisher.sadd(RedisPrefix.ONLINE_VAR, self.id)
 		# since we add user to online first, latest trigger will always show correct online
-		was_online, online = self.get_online_and_status_from_redis()
+
+		online = self.get_dict_users_from_redis()
+		# current user is already online
+		my_online = online.setdefault(self.user_id, [])
+		if self.id not in my_online:
+			my_online.append(self.id)
+
+		was_online = len(online.get(self.user_id)) > 1 # if other tabs are opened
 		user_rooms_query = Room.objects.filter(users__id=self.user_id, disabled=False) \
 			.values('id', 'name', 'creator_id', 'channel_id', 'p2p', 'roomusers__notifications', 'roomusers__volume')
 		room_users = [{
@@ -186,14 +195,11 @@ class TornadoHandler(WebSocketHandler, WebRtcMessageHandler):
 				user['username'],
 				user['sex']
 			) for user in fetched_users]
-		if self.user_id not in online:
-			online.append(self.user_id)
 
 		self.ws_write(self.set_room(room_users, user_dict, online, user_db, channels))
-		if not was_online:  # if a new tab has been opened
-			online_user_names_mes = self.room_online_login(online, user_db.username, user_db.sex_str)
-			self.logger.info('!! First tab, sending refresh online for all')
-			self.publish(online_user_names_mes, settings.ALL_ROOM_ID)
+		online_user_names_mes = self.room_online_login(online, user_db.username, user_db.sex_str)
+		self.logger.info('!! First tab, sending refresh online for all')
+		self.publish(online_user_names_mes, settings.ALL_ROOM_ID)
 		self.logger.info("!! User %s subscribes for %s", self.user_id, self.channels)
 		self.connected = True
 

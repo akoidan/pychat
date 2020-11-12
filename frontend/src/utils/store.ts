@@ -26,7 +26,7 @@ import {
 import {
   AddSendingFileTransfer,
   BooleanIdentifier,
-  ChangeOnlineEntry,
+  RoomLogEntry,
   IStorage,
   MediaIdentifier,
   MessagesLocation,
@@ -111,8 +111,9 @@ export class DefaultStore extends VuexModule {
   public userImage: string | null = null;
   public allUsersDict: UserDictModel = {};
   public regHeader: string | null = null;
-  public online: number[] = [];
+  public onlineDict: Record<string, string[]> = {};
   public roomsDict: RoomDictModel = {};
+  public showSmileys: boolean = false;
   public channelsDict: ChannelsDictModel = {};
   public mediaObjects: { [id: string]: MediaStream } = {};
 
@@ -125,6 +126,10 @@ export class DefaultStore extends VuexModule {
     logger.debug('privateRooms {} ', roomModels)();
 
     return roomModels;
+  }
+
+  get online(): number[] {
+    return Object.keys(this.onlineDict).map(a => parseInt(a, 10));
   }
 
   get channelsDictUI(): ChannelsDictUIModel {
@@ -168,7 +173,7 @@ export class DefaultStore extends VuexModule {
   }
 
   get myId(): number | null {
-    return this.userInfo && this.userInfo.userId;
+    return this.userInfo?.userId ?? null;
   }
 
   get privateRoomsUsersIds(): PrivateRoomsIds {
@@ -312,9 +317,17 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public setOpponentAnchor(payload: SetOpponentAnchor) {
-    const key: string = mediaLinkIdGetter();
-    this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
-    Vue.set(this.mediaObjects, key, payload.anchor);
+    let key = null;
+    for (let k in this.mediaObjects) {
+      if (this.mediaObjects[k] === payload.anchor) {
+        key = k;
+      }
+    }
+    if (!key) {
+      key = mediaLinkIdGetter();
+      this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
+      Vue.set(this.mediaObjects, key, payload.anchor);
+    }
   }
 
   @Mutation
@@ -591,15 +604,15 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public addChangeOnlineEntry(payload: ChangeOnlineEntry) {
+  public addRoomLog(payload: RoomLogEntry) {
     payload.roomIds.forEach(r => {
-      this.roomsDict[r].changeOnline.push(payload.changeOnline);
+      this.roomsDict[r].roomLog.push(payload.roomLog);
     });
   }
 
   @Mutation
-  public setOnline(ids: number[]) {
-    this.online = ids;
+  public setOnline(ids: Record<string, string[]>) {
+    this.onlineDict = ids;
   }
 
   @Mutation
@@ -663,6 +676,11 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  public setShowSmileys(value: boolean) {
+    this.showSmileys = value;
+  }
+
+  @Mutation
   public deleteChannel(channelId: number) {
     Vue.delete(this.channelsDict, String(channelId));
     this.storage.deleteChannel(channelId);
@@ -676,7 +694,7 @@ export class DefaultStore extends VuexModule {
     this.roomsDict = {};
     this.allUsersDict = {};
     this.activeUserId = null;
-    this.online = [];
+    this.onlineDict = {};
     this.activeRoomId = null;
     this.editedMessage = null;
     this.storage.clearStorage();

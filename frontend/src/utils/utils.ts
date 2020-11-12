@@ -10,6 +10,7 @@ import {
   GOOGLE_OAUTH_2_CLIENT_ID
 } from '@/utils/consts';
 import {StorageData} from '@/types/types';
+import {getUniqueId} from '@/utils/pureFunctions';
 
 const logger = loggerFactory.getLoggerColor('utils', '#007a70');
 
@@ -81,9 +82,9 @@ export async function initStore() {
           if (m.content && m.id > 0) {
             channelsHandler.sendEditMessage(m.content, m.roomId, m.id, []);
           } else if (m.content) {
-            channelsHandler.sendSendMessage(m.content, m.roomId, [], ws.getMessageId(), m.time);
+            channelsHandler.sendSendMessage(m.content, m.roomId, [], getUniqueId(), m.time);
           } else if (m.id > 0) {
-            channelsHandler.sendDeleteMessage(m.id, ws.getMessageId());
+            channelsHandler.sendDeleteMessage(m.id, getUniqueId());
           }
         });
       } else {
