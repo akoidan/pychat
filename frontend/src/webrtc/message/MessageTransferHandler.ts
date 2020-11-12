@@ -12,7 +12,7 @@ import {
   DefaultMessage,
   EditMessage,
   OfferCall,
-  PrintMessage
+  PrintMessage, PrintWebRtcMessage
 } from '@/types/messages';
 import WsHandler from '@/utils/WsHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
@@ -98,6 +98,11 @@ export default class MessageTransferHandler extends BaseTransferHandler {
     this.flushQueue();
   }
 
+
+  printMessage(message: PrintWebRtcMessage) {
+    if (user)
+  }
+
   private flushQueue() {
     let message: AppendQueue = {
       handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
@@ -117,16 +122,14 @@ export default class MessageTransferHandler extends BaseTransferHandler {
       time: number
   ) {
     // uploadfiles TODO
-    const em: PrintMessage = {
+    const em: PrintWebRtcMessage = {
       action: 'printMessage',
       content,
       edited: 0,
-      roomId,
       time,
       messageId: originId, // should be -
       id: Date.now(),
-      userId: this.store.myId!,
-      handler: 'channels'
+      handler: 'this'
     }
     this.sendingQueue.push(em);
     if (this.state === 'not_inited') {

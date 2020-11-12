@@ -29,7 +29,7 @@ export default class Subscription {
       this.channels[channel] = [];
     }
     if (this.channels[channel]!.indexOf(messageHandler) < 0) {
-      this.logger.debug('subscribing to {}, subscribeer {}', channel, messageHandler)();
+      this.logger.debug('subscribing to {}, subscriber {}', channel, messageHandler)();
       this.channels[channel]!.push(messageHandler);
     }
   }
@@ -56,7 +56,9 @@ export default class Subscription {
 
       return true;
     } else {
-      this.logger.error('Can\'t handle message {} because no channels found, available channels {}', message, this.channels)();
+      if (!message.allowZeroSubscribers) {
+        this.logger.error('Can\'t handle message {} because no channels found, available channels {}', message, this.channels)();
+      }
 
       return false;
     }

@@ -78,6 +78,9 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     let data = this.messageProc.parseMessage(event.data);
     if (data) {
       this.securityValidator.validate(data);
+      if (data.handler === 'this') {
+        data.handler = this.mySubscriberId;
+      }
       this.messageProc.handleMessage(data);
     }
   }

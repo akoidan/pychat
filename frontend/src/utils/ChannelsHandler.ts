@@ -90,7 +90,7 @@ export default class ChannelsHandler extends MessageHandler {
   private readonly store: DefaultStore;
   private readonly api: Api;
   private readonly ws: WsHandler;
-  private readonly sendingMessage: { [id: number]: { cb(): void; files: UploadFile[] }; cb?(ids: number[]): void } = {};
+  private readonly sendingMessage: Record<string, Function> ={}
   private readonly notifier: NotifierHandler;
   private readonly messageBus:  Vue;
 
@@ -130,7 +130,7 @@ export default class ChannelsHandler extends MessageHandler {
 
   public resendMessage(id: number) {
     this.logger.log('resending message {} ', id)();
-    const cb = this.sendingMessage[id].cb;
+    const cb = this.sendingMessage[id]();
     cb();
   }
 
@@ -151,30 +151,40 @@ export default class ChannelsHandler extends MessageHandler {
   }
 
   public sendEditMessage(content: string, roomId: number, id: number, uploadfiles: UploadFile[]): void {
-    this.uploadAndSend(id, (filesIds: number[]) => {
-      return () => this.ws.sendEditMessage(content, id, filesIds, id); // TODO
-    },                 () => {
-      this.sendEditMessage(content, roomId, id, uploadfiles);
-    },                 uploadfiles, roomId);
-  }
-
-  public sendSendMessage(
-      content: string,
-      roomId: number,
-      uploadfiles: UploadFile[],
-      originId: number,
-      originTime: number
-  ): void {
     this.uploadAndSend(
-        originId,
-        (filesIds) => {
-          return () => this.ws.sendSendMessage(content, roomId, filesIds, originId, Date.now() - originTime);
-        }, () => {
-          this.sendSendMessage(content, roomId, uploadfiles, originId, originTime);
+        id,
+        (filesIds: number[]) => {
+          return () => this.ws.sendEditMessage(content, id, filesIds, id); // TODO
+        },
+        () => {
+          this.sendEditMessage(content, roomId, id, uploadfiles);
         },
         uploadfiles,
         roomId
     );
+  }
+
+  public async sendSendMessage(
+      content: string,
+      roomId: number,
+      uploadFiles: UploadFile[],
+      originId: number,
+      originTime: number
+  ):  Promise<void> {
+
+    let fileIds: number[] = [];
+    if (uploadFiles.length) {
+      try {
+        fileIds = await this.uploadFiles(originId, roomId, uploadFiles);
+      } catch (e) {
+        this.logger.error('Uploading error, scheduling cb')();
+        // @ts-expect-error
+        //TODO
+        this.sendingMessage[originId] = this.sendSendMessage.bind(this, content, roomId, uploadFiles, originId, originTime);
+        throw e;
+      }
+    }
+    this.ws.sendSendMessage(content, roomId, fileIds, originId, Date.now() - originTime);
   }
 
   public async uploadFiles(
@@ -347,7 +357,8 @@ export default class ChannelsHandler extends MessageHandler {
   private notifyDevicesChanged() {
     sub.notify({
       handler: 'message',
-      action: 'changeDevices'
+      action: 'changeDevices',
+      allowZeroSubscribers: true,
     });
   }
 
@@ -521,34 +532,6 @@ export default class ChannelsHandler extends MessageHandler {
       checkAndPlay(isWentOnline ? login : logout, 50);
     }
     this.store.addRoomLog(entry);
-  }
-
-  private async uploadAndSend(
-      originId: number,
-      getSendFilesToWsCB: (args: number[]) => () => void,
-      repeatWithoutFiles: () => void,
-      uploadFiles: UploadFile[],
-      roomId: number
-  ): Promise<void> {
-    let fileIds: number[] = [];
-    if (uploadFiles.length) {
-      try {
-        fileIds = await this.uploadFiles(originId, roomId, uploadFiles);
-      } catch (e) {
-        this.logger.error('Uploading error, scheduling cb')();
-        this.sendingMessage[originId] = {
-          cb: repeatWithoutFiles, // TODO
-          files: uploadFiles
-        };
-        throw e;
-      }
-    }
-    this.sendingMessage[originId] = {
-      cb: getSendFilesToWsCB(fileIds),
-      files: uploadFiles
-    };
-    this.sendingMessage[originId].cb();
-
   }
 
   private mutateRoomAddition(message: AddRoomBase) {

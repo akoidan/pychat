@@ -24,12 +24,7 @@ export class SecurityValidator {
 
     channels: {
       printMessage: (message: PrintMessage) => {
-        if (message.roomId != this.roomId) {
-          throw Error(`Security Error: Can process message. Because user ${this.opponentUseId} doesn't have access to room ${message.roomId} `);
-        }
-        if (message.userId != this.opponentUseId) {
-          throw Error(`Security Error: Can process message, because user ${message.userId} is not who he is ${this.opponentUseId}`);
-        }
+
       }
     }
   }

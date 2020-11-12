@@ -103,3 +103,7 @@ export interface MessageModelDto {
   roomId: number;
   userId: number;
 }
+
+export interface WebRtcMessageModelDto extends Omit<MessageModelDto, 'userId'| 'roomId'| 'time'> {
+  timeDiff: number;
+}

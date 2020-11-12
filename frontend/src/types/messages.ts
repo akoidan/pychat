@@ -7,7 +7,7 @@ import {
   SexModelDto,
   UserDto,
   UserProfileDto,
-  UserSettingsDto
+  UserSettingsDto, WebRtcMessageModelDto
 } from '@/types/dto';
 
 export interface DefaultSentMessage {
@@ -16,11 +16,12 @@ export interface DefaultSentMessage {
 }
 
 
-export type HandlerName = 'channels' | 'lan' | 'message' | 'webrtc' | 'ws'| 'void';
+export type HandlerName = 'channels' | 'lan' | 'message' | 'webrtc' | 'ws'| 'void' |'this';
 
 export interface DefaultMessage extends DefaultSentMessage {
   handler: HandlerName;
   cbBySender?: string;
+  allowZeroSubscribers?: boolean; // if true, no errors should be present on handeling this message by sucrcription if nothing was notified
 }
 
 export interface AppendQueue extends DefaultMessage {
@@ -210,6 +211,10 @@ export interface DeleteMessage extends DefaultMessage {
   roomId: number;
   id: number;
   edited: number;
+}
+
+export interface PrintWebRtcMessage extends DefaultMessage, WebRtcMessageModelDto {
+
 }
 
 export interface PrintMessage extends DefaultMessage, MessageModelDto {

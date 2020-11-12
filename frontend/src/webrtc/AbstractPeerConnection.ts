@@ -8,7 +8,11 @@ import MessageHandler from '@/utils/MesageHandler';
 import Subscription from '@/utils/Subscription';
 import {ConnectionStatus, RemovePeerConnection} from '@/types/types';
 import {DefaultStore} from '@/utils/store';
-import {ConnectToRemoteMessage, OnSendRtcDataMessage} from '@/types/messages';
+import {
+  ConnectToRemoteMessage,
+  HandlerName,
+  OnSendRtcDataMessage
+} from '@/types/messages';
 import {WEBRTC_STUNT_URL} from '@/utils/runtimeConsts';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
@@ -44,11 +48,15 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.roomId = roomId;
     this.connectionId = connectionId;
     this.opponentWsId = opponentWsId;
-    sub.subscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
+    sub.subscribe(this.mySubscriberId, this);
     this.wsHandler = ws;
     this.store = store;
     this.logger = loggerFactory.getLogger(this.connectionId + ':' + this.opponentWsId, 'color: #960055');
     this.logger.debug('Created {}', this.constructor.name)();
+  }
+
+  get mySubscriberId(): HandlerName {
+    return Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId);
   }
 
   public setConnectionStatus(newStatus: ConnectionStatus) {
