@@ -26,11 +26,13 @@ export default class MediaCapture {
     this.stream = await navigator.mediaDevices.getUserMedia({video: this.isRecordingVideo, audio: true});
     this.logger.debug('Permissions are granted')();
     // await new Promise(resolve => {
-    //   this.timeout = window.setTimeout(resolve, 500); // wait until videocam opens
+    //   this.timeout = window.setTimeout(resolve, 2500); // wait until videocam opens
+    //   // this thing allows to skip 0.5second of black video,
+    //   // and preview of file would be of real video instead of black
+    //   // to find out what it means, capture video and send it to chat.
+    //   // until you hit played, you should see image preview which should not be black
+    //   // I COmmented this because it doesn't work anyway
     // });
-    // if (this.stopped) {
-    //   return null;
-    // }
     let options = {mimeType: 'video/webm;codecs=vp9'};
     if (!MediaRecorder.isTypeSupported(options.mimeType)) {
       this.logger.debug('{} is not Supported', options.mimeType)();

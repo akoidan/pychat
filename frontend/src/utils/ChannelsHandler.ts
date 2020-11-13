@@ -131,53 +131,48 @@ export default class ChannelsHandler extends MessageHandler {
 
   public resendMessage(id: number) {
     this.logger.log('resending message {} ', id)();
-    const cb = this.sendingMessage[id]();
-    cb();
-  }
-
-  public getMessageFiles(messageId: number): UploadFile[] {
-    // savedFiles[messageId].
-    if (this.sendingMessage[messageId]) { // TODO
-      return  [];// return this.sendingMessage[messageId].files;
-    } else {
-      return [];
-    }
+    this.sendingMessage[id]();
   }
 
   public sendDeleteMessage(id: number, originId: number): void {
-    this.sendingMessage[originId] =  () => this.ws.sendEditMessage(null, id, null, originId);
-    this.sendingMessage[originId]();
+    this.asyncExecuteAndPutInCallback(
+        originId,
+        () => this.ws.sendEditMessage(null, id, null, originId)
+    );
   }
 
-  public async sendEditMessage(content: string, roomId: number, id: number, uploadFiles: UploadFile[]): void {
+  public asyncExecuteAndPutInCallback(id: number, fn: () => void) {
+    this.sendingMessage[id] = fn;
+    this.sendingMessage[id]();
+  }
+
+  public async uploadFilesOrRetry(
+      id: number,
+      roomId: number,
+      uploadFiles: UploadFile[],
+      retry: () => Promise<void>
+  ): Promise<number[]> {
     let fileIds: number[] = [];
     if (uploadFiles.length) {
       try {
-        fileIds = await this.uploadFiles(id, roomId, uploadFiles);
+        fileIds =  await this.uploadFiles(id, roomId, uploadFiles);
       } catch (e) {
         this.logger.error('Uploading error, scheduling cb')();
-        this.sendingMessage[id] = () => {
-          this.sendEditMessage(content, roomId, id, uploadFiles);
-        }
+        this.sendingMessage[id] = retry;
         throw e;
       }
     }
-    this.sendingMessage[id] = () => {
-      this.ws.sendEditMessage(content, id, fileIds, id);
-    };
-    this.sendingMessage[id]();
+    return fileIds;
+  }
 
-    // this.uploadAndSend(
-    //     id,
-    //     (filesIds: number[]) => {
-    //       return () => this.ws.sendEditMessage(content, id, filesIds, id); // TODO
-    //     },
-    //     () => {
-    //       this.sendEditMessage(content, roomId, id, uploadfiles);
-    //     },
-    //     uploadfiles,
-    //     roomId
-    // );
+  public async sendEditMessage(content: string, roomId: number, id: number, uploadFiles: UploadFile[]): Promise<void> {
+    const fileIds: number[] = await this.uploadFilesOrRetry(
+        id,
+        roomId,
+        uploadFiles,
+        () => this.sendEditMessage(content, roomId, id, uploadFiles)
+    );
+    this.asyncExecuteAndPutInCallback(id, () => this.ws.sendEditMessage(content, id, fileIds, id));
   }
 
   public async sendSendMessage(
@@ -187,23 +182,16 @@ export default class ChannelsHandler extends MessageHandler {
       originId: number,
       originTime: number
   ):  Promise<void> {
-
-    let fileIds: number[] = [];
-    if (uploadFiles.length) {
-      try {
-        fileIds = await this.uploadFiles(originId, roomId, uploadFiles);
-      } catch (e) {
-        this.logger.error('Uploading error, scheduling cb')();
-        this.sendingMessage[originId] = () => {
-          this.sendSendMessage(content, roomId, uploadFiles, originId, originTime);
-        }
-        throw e;
-      }
-    }
-    this.sendingMessage[originId] = () => {
-      this.ws.sendSendMessage(content, roomId, fileIds, originId, Date.now() - originTime);
-    };
-    this.sendingMessage[originId]();
+    const fileIds: number[] = await this.uploadFilesOrRetry(
+      originId,
+      roomId,
+      uploadFiles,
+      () => this.sendSendMessage(content, roomId, uploadFiles, originId, originTime)
+    );
+    this.asyncExecuteAndPutInCallback(
+      originId,
+      () => this.ws.sendSendMessage(content, roomId, fileIds, originId, Date.now() - originTime)
+    );
   }
 
   public async uploadFiles(

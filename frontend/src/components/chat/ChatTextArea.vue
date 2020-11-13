@@ -174,7 +174,6 @@
         this.logger.debug('Checking sending message')();
         if (this.editedMessage && this.editedMessage.isEditingNow) {
           const md: MessageDataEncode = getMessageData(this.userMessage, this.editingMessageModel.symbol!);
-          this.appendPreviousMessagesFiles(md, this.editedMessage.messageId);
           this.editMessageWs(md.messageContent, md.files, this.editedMessage.messageId, this.activeRoomId, md.currSymbol, md.fileModels);
         } else {
           const md: MessageDataEncode = getMessageData(this.userMessage);
@@ -267,24 +266,6 @@
       this.store.setEditedMessage(null);
     }
 
-    private appendPreviousMessagesFiles(md: MessageDataEncode, messageId: number) {
-      if (!md.messageContent) {
-        return;
-      }
-      if (this.editingMessageModel.files) {
-        for (const f in this.editingMessageModel.files) {
-          if (md.messageContent.indexOf(f) >= 0) {
-            md.fileModels[f] = this.editingMessageModel.files[f];
-          }
-        }
-      }
-      const messageFiles: UploadFile[] = channelsHandler.getMessageFiles(messageId);
-      messageFiles.forEach(f => {
-        if (md.messageContent!.indexOf(f.symbol) >= 0) {
-          md.files.push(f);
-        }
-      });
-    }
 
     @Watch('editedMessage')
     public onActiveRoomIdChange(val: EditingMessage) {

@@ -7,15 +7,13 @@ import {getFlag} from '@/utils/flags';
 import {Smile, smileys, SmileysStructure} from '@/utils/smileys';
 import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import {globalLogger} from '@/utils/singletons';
+import {channelsHandler, globalLogger} from '@/utils/singletons';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
 const logger: Logger = loggerFactory.getLoggerColor('htmlApi', '#007a70');
 
 export const savedFiles: { [id: string]: Blob } = {};
-// @ts-expect-error
-window['savedFiles'] = savedFiles;
 
 export const requestFileSystem: (type: number, size: number, successCallback: FileSystemCallback, errorCallback?: ErrorCallback) => void = window.webkitRequestFileSystem || window.mozRequestFileSystem || window.requestFileSystem;
 const escapeMap: { [id: string]: string } = {
@@ -364,23 +362,28 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
       tmpCanvasContext.canvas.width = video.videoWidth;
       tmpCanvasContext.canvas.height = video.videoHeight;
       tmpCanvasContext.drawImage(video, 0, 0);
-      tmpCanvasContext.canvas.toBlob(function (blob) {
-        if (!blob) {
-          errCb(`Blob for file ${file.name} is not null`);
+      tmpCanvasContext.canvas.toBlob(
+        function (blob) {
+          if (!blob) {
+            errCb(`Blob for file ${file.name} is not null`);
 
-          return;
-        }
-        const url = URL.createObjectURL(blob);
-        const img = document.createElement('img');
-        img.className = PASTED_IMG_CLASS;
-        img.src = url;
-        img.setAttribute('videoType', videoType);
-        blob.name = '.jpg';
-        img.setAttribute('associatedVideo', src);
-        savedFiles[src] = file;
-        savedFiles[url] = blob;
-        pasteNodeAtCaret(img, textArea);
-      },                             'image/jpeg', 0.95);
+            return;
+          }
+          debugger
+          const url = URL.createObjectURL(blob);
+          const img = document.createElement('img');
+          img.className = PASTED_IMG_CLASS;
+          img.src = url;
+          img.setAttribute('videoType', videoType);
+          blob.name = '.jpg';
+          img.setAttribute('associatedVideo', src);
+          savedFiles[src] = file;
+          savedFiles[url] = blob;
+          pasteNodeAtCaret(img, textArea);
+        },
+        'image/jpeg',
+        0.95
+      );
     },                     false);
     video.src = src;
   } else {
@@ -427,75 +430,74 @@ function nextChar(c: string): string {
 
 export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\u3500'): MessageDataEncode {
   const files: UploadFile[] = []; // return array from nodeList
-  const images = userMessage.querySelectorAll('.' + PASTED_IMG_CLASS);
+  const images = userMessage.querySelectorAll(`.${PASTED_IMG_CLASS}`);
   const fileModels: { [id: string]: FileModel } = {};
   forEach(images, img => {
-    let elSymbol = img.getAttribute('symbol');
+    let oldSymbol = img.getAttribute('symbol');
+    let elSymbol = oldSymbol;
     if (!elSymbol) {
       currSymbol = nextChar(currSymbol);
       elSymbol = currSymbol;
     }
     const textNode = document.createTextNode(elSymbol);
     img.parentNode!.replaceChild(textNode, img);
-    if (!img.getAttribute('symbol')) { // don't send image again, it's already in server
-      const assVideo = img.getAttribute('associatedVideo');
-      const assAudio = img.getAttribute('associatedAudio');
-      const type: string = img.getAttribute('videoType')!;
-      if (assVideo) {
+    let src = img.getAttribute('src');
+    // TODO is `blob:` only works in chrome or the same in all browsers?
+    // TODO if not blob, load external images with Xhr, otherwise current version is bugged
+    // only if symbols is not created yet and it's not in cache
+    let imageIsInCacheButNotInServer = src?.startsWith('blob:') && savedFiles[src];
+    const assVideo = img.getAttribute('associatedVideo');
+    const assAudio = img.getAttribute('associatedAudio');
+    const type: string = img.getAttribute('videoType')!;
+    if (assVideo) {
+      if (imageIsInCacheButNotInServer) {
         files.push({
           file: savedFiles[assVideo],
           type: type,
           symbol: elSymbol
         });
         files.push({
-          file: savedFiles[img.getAttribute('src')!],
+          file: savedFiles[src!],
           type: 'p',
           symbol: elSymbol
         });
-        const fileModel: FileModel = {
-          id: null,
-          preview: img.getAttribute('src'),
-          url: assVideo,
-          type: 'v'
-        };
-        fileModels[elSymbol] = fileModel;
-      } else if (assAudio) {
+      }
+      fileModels[elSymbol] = {
+        id: null,
+        preview: src,
+        url: assVideo,
+        type: 'v',
+      };;
+    } else if (assAudio) {
+      if (imageIsInCacheButNotInServer) {
         files.push({
           file: savedFiles[assAudio],
           type: 'a',
           symbol: elSymbol
         });
-        const fileModel: FileModel = {
-          id: null,
-          preview: null,
-          url: assAudio,
-          type: 'a'
-        };
-        fileModels[elSymbol] = fileModel;
-      } else {
+      }
+      fileModels[elSymbol] =  {
+        id: null,
+        preview: null,
+        url: assAudio,
+        type: 'a'
+      };;
+    } else {
+      if (imageIsInCacheButNotInServer) {
         files.push({
-          file: savedFiles[img.getAttribute('src')!],
+          file: savedFiles[src!],
           type: 'i',
           symbol: elSymbol
         });
-        const fileModel: FileModel = {
-          id: null,
-          preview: null,
-          url: img.getAttribute('src'),
-          type: 'i'
-        };
-        fileModels[elSymbol] = fileModel;
       }
+      fileModels[elSymbol] = {
+        id: null,
+        preview: null,
+        url: src,
+        type: 'i'
+      };
     }
   });
-  // let urls = [savedFiles, savedFiles, savedFiles];
-  // urls.forEach((url) => {
-  //   for (let k in url) {
-  //     logger.log('Revoking url {}', k)();
-  //     URL.revokeObjectURL(k);
-  //     delete urls[k];
-  //   }
-  // }); TODO
   userMessage.innerHTML = userMessage.innerHTML.replace(/<img[^>]*symbol="([^"]+)"[^>]*>/g, '$1');
   let messageContent: string | null = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
   messageContent = !messageContent || /^\s*$/.test(messageContent) ? null : messageContent;
