@@ -88,59 +88,70 @@
     @State
     public readonly allUsersDict!: UserDictModel;
 
-
-    public created() {
-      // TODO what happens when component destroys, or recreates
-      //test logout and login, see if messages gets proceeded 2 times
-      messageBus.$on('drop-photo', (evt: DragEvent) => {
-
-        const files: FileList = (evt.dataTransfer && evt.dataTransfer!.files) as FileList;
-        this.logger.debug('Drop photo {} ', files)();
-        if (files) {
-          for (let i = 0; i < files.length; i++) {
-            this.logger.debug('loop')();
-            const file = files[i];
-            if (file.type.indexOf('image') >= 0) {
-              pasteImgToTextArea(file, this.userMessage, (err: string) => {
-                this.store.growlError(err);
-              });
-            } else {
-              webrtcApi.offerFile(file, this.activeRoomId);
-            }
-          }
-        }
-      });
-      messageBus.$on('add-smile', (code: string) => {
-        this.logger.log('Adding smiley {}', code)();
-        pasteHtmlAtCaret(getSmileyHtml(code), this.userMessage);
-      })
-      messageBus.$on('delete-message', () => {
-        this.editMessageWs(null, [], this.editedMessage.messageId, this.editedMessage.roomId, null, null);
-      })
-      messageBus.$on('quote', (message: MessageModel) => {
-        this.userMessage.focus();
-        let oldValue = this.userMessage.innerHTML;
-        const match = oldValue.match(timePattern);
-        const user = this.allUsersDict[message.userId];
-        oldValue = match ? oldValue.substr(match[0].length + 1) : oldValue;
-        this.userMessage.innerHTML = encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message) + encodeHTML(' >>>') + String.fromCharCode(13) + ' ' + oldValue;
-        placeCaretAtEnd(this.userMessage);
-      });
-      messageBus.$on('blob', (e: Blob) => {
-        this.logger.log('Pasting blob {}', e)();
-        this.$nextTick(function () {
-          pasteBlobToContentEditable(e, this.userMessage);
-        });
-      });
-    }
-
-
-
     @State
     public readonly activeRoomId!: number;
 
     @State
     public readonly activeRoom!: RoomModel;
+
+
+    public created() {
+      messageBus.$on('drop-photo', this.onEmitDropPhoto);
+      messageBus.$on('add-smile', this.onEmitAddSmile);
+      messageBus.$on('delete-message', this.onEmitDeleteMessage);
+      messageBus.$on('quote', this.onEmitQuote);
+      messageBus.$on('blob', this.onEmitBlob);
+    }
+
+    public destroyed() {
+      messageBus.$off('drop-photo', this.onEmitDropPhoto);
+      messageBus.$off('add-smile', this.onEmitAddSmile);
+      messageBus.$off('delete-message', this.onEmitDeleteMessage);
+      messageBus.$off('quote', this.onEmitQuote);
+      messageBus.$off('blob', this.onEmitBlob);
+    }
+
+
+
+    onEmitDropPhoto(files: FileList) {
+      for (let i = 0; i < files.length; i++) {
+        this.logger.debug('loop')();
+        const file = files[i];
+        if (file.type.indexOf('image') >= 0) {
+          pasteImgToTextArea(file, this.userMessage, (err: string) => {
+            this.store.growlError(err);
+          });
+        } else {
+          webrtcApi.offerFile(file, this.activeRoomId);
+        }
+      }
+    }
+
+    onEmitAddSmile(code:string) {
+      this.logger.log('Adding smiley {}', code)();
+      pasteHtmlAtCaret(getSmileyHtml(code), this.userMessage);
+    }
+
+    onEmitDeleteMessage(message: MessageModel) {
+      this.editMessageWs(null, [], this.editedMessage.messageId, this.editedMessage.roomId, null, null);
+    }
+
+    onEmitQuote(message: MessageModel) {
+      this.userMessage.focus();
+      let oldValue = this.userMessage.innerHTML;
+      const match = oldValue.match(timePattern);
+      const user = this.allUsersDict[message.userId];
+      oldValue = match ? oldValue.substr(match[0].length + 1) : oldValue;
+      this.userMessage.innerHTML = encodeHTML(`(${timeToString(message.time)}) ${user.user}: `) + encodeP(message) + encodeHTML(' >>>') + String.fromCharCode(13) + ' ' + oldValue;
+      placeCaretAtEnd(this.userMessage);
+    }
+
+    onEmitBlob(e: Blob)  {
+      this.logger.log('Pasting blob {}', e)();
+      this.$nextTick(function () {
+        pasteBlobToContentEditable(e, this.userMessage);
+      });
+    }
 
     public checkAndSendMessage(event: KeyboardEvent) {
       if (this.activeRoom.p2p) {
@@ -201,6 +212,7 @@
         roomId: this.activeRoomId,
         deleted: false,
         id,
+        isHighlighted: false,
         time: now - this.$ws.timeDiff,
         content: md.messageContent,
         symbol: md.currSymbol,
@@ -229,6 +241,7 @@
         roomId,
         deleted: !messageContent,
         id: messageId,
+        isHighlighted: false,
         transfer: !!messageContent || messageId > 0 ? {
           error: null,
           upload: null

@@ -1,5 +1,5 @@
 <template>
-  <div :class="cls">
+  <div :class="cls" @mouseover.passive="removeUnread">
     <chat-message :message="message" />
     <template v-if="message.transfer">
       <app-progress-bar
@@ -7,7 +7,7 @@
         :upload="message.transfer.upload"
       />
       <i
-        v-else-if="message.files.length"
+        v-else-if="filesExist"
         class="icon-repeat"
         @click="retry"
       >{{ message.transfer.error }}</i>
@@ -42,8 +42,18 @@ export default class ChatSendingMessage extends Vue {
     return this.roomsDict[this.message.roomId].search.searchedIds;
   }
 
+  get filesExist() {
+    return this.message.files && Object.keys(this.message.files).length > 0;
+  }
+
   get id() {
     return this.message.id;
+  }
+
+  removeUnread() {
+    if (this.message.isHighlighted) {
+      this.store.markMessageAsRead({messageId: this.message.id, roomId: this.message.roomId})
+    }
   }
 
   get cls() {
@@ -53,7 +63,8 @@ export default class ChatSendingMessage extends Vue {
       'filter-search': this.searchedIds.indexOf(this.message.id) >= 0,
       'message-self': this.isSelf,
       'message-others': !this.isSelf,
-      'removed-message': this.message.deleted
+      'removed-message': this.message.deleted,
+      'unread-message': this.message.isHighlighted,
     };
   }
 
@@ -83,6 +94,15 @@ export default class ChatSendingMessage extends Vue {
     > p
       padding-right: 30px
 
+  .unread-message:before
+    content: ""
+    background-color: #444444 !important
+    border-radius: 5px
+    position: absolute
+    width: 100%
+    height: 100%
+    z-index: -1
+    padding: 4px 0
 
   .spinner
     position: absolute

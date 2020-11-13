@@ -47,7 +47,8 @@ import {
   SetSendingFileStatus,
   SetSendingFileUploaded,
   SetUploadProgress,
-  StringIdentifier
+  StringIdentifier,
+  MarkMessageAsRead
 } from '@/types/types';
 import {SetStateFromStorage, SetStateFromWS} from '@/types/dto';
 import {encodeHTML} from '@/utils/htmlApi';
@@ -277,6 +278,11 @@ export class DefaultStore extends VuexModule {
       throw Error(`Transfer upload doesn't exist ${JSON.stringify(this.state)} ${JSON.stringify(payload)}`);
     }
 
+  }
+
+  @Mutation
+  public markMessageAsRead(payload: MarkMessageAsRead) {
+    this.roomsDict[payload.roomId].messages[payload.messageId].isHighlighted = false;
   }
 
   @Mutation

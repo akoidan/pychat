@@ -272,7 +272,7 @@ class="input" @focus="userFoc = false" @blur="userFoc = true"
     }
 
 
-    destroy(): void {
+    destroyed(): void {
       if(this.currentValidateEmailRequest) {
         this.currentValidateEmailRequest.abort();
         this.currentValidateEmailRequest = null;

@@ -1,5 +1,5 @@
 <template>
-  <div v-show="!dim" class="chatBoxHolder" @drop.native.prevent="dropPhoto">
+  <div v-show="!dim" class="chatBoxHolder" @drop.prevent="dropPhoto">
     <template v-for="room in roomsArray">
       <chat-box
         v-show="activeRoomId === room.id"
@@ -42,8 +42,12 @@
       return ALL_ROOM_ID;
     }
 
-    dropPhoto(e: Event) {
-      messageBus.$emit('drop-photo', e);
+    dropPhoto(evt: DragEvent) {
+      const files: FileList = (evt.dataTransfer?.files) as FileList;
+      this.logger.debug('Drop photo {} ', files)();
+      if (files) {
+        messageBus.$emit('drop-photo', files);
+      }
     }
 
     @State

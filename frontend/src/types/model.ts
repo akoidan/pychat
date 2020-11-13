@@ -84,6 +84,7 @@ export  interface MessageModel {
   time: number;
   files: {[id: string]: FileModel}| null; // THIS IS STRING, not number!!
   content: string|null;
+  isHighlighted: boolean;
   symbol: string|null;
   deleted: boolean;
   giphy: string|null;

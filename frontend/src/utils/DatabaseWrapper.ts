@@ -168,6 +168,7 @@ export default class DatabaseWrapper implements IStorage {
         const message: MessageModel = {
           id: m.id,
           roomId: m.roomId,
+          isHighlighted: false,
           time: m.time,
           deleted: convertToBoolean(m.deleted),
           transfer: m.sending ? {
