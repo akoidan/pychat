@@ -33,6 +33,7 @@
   i
     position: relative
     top: 3px
+    margin-right: 3px
   .color-lor
     .online
       .icon-man, .icon-girl, .icon-user-secret
