@@ -22,20 +22,21 @@ import Subscription from '@/utils/Subscription';
 
 export default class MessageTransferHandler extends BaseTransferHandler {
 
+
+
   protected readonly handlers: HandlerTypes = {
     removePeerConnection: <HandlerType>this.removePeerConnection,
     changeDevices: <HandlerType>this.changeDevices
   };
+
+  private sendingQueue: DefaultMessage[] = [];
 
   constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore) {
     super(roomId, wsHandler, notifier, store);
     sub.subscribe('message', this);
   }
 
-  private sendingQueue: DefaultMessage[] = [];
-
-
-  get room(): RoomModel {
+  private get room(): RoomModel {
     return this.store.roomsDict[this.roomId];
   }
 
@@ -100,7 +101,7 @@ export default class MessageTransferHandler extends BaseTransferHandler {
 
 
   printMessage(message: PrintWebRtcMessage) {
-    if (user)
+
   }
 
   private flushQueue() {
@@ -126,7 +127,7 @@ export default class MessageTransferHandler extends BaseTransferHandler {
       action: 'printMessage',
       content,
       edited: 0,
-      time,
+      timeDiff: Date.now() - time,
       messageId: originId, // should be -
       id: Date.now(),
       handler: 'this'

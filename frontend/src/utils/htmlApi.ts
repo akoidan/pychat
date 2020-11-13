@@ -13,7 +13,9 @@ const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canva
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
 const logger: Logger = loggerFactory.getLoggerColor('htmlApi', '#007a70');
 
-const savedFiles: { [id: string]: Blob } = {};
+export const savedFiles: { [id: string]: Blob } = {};
+// @ts-expect-error
+window['savedFiles'] = savedFiles;
 
 export const requestFileSystem: (type: number, size: number, successCallback: FileSystemCallback, errorCallback?: ErrorCallback) => void = window.webkitRequestFileSystem || window.mozRequestFileSystem || window.requestFileSystem;
 const escapeMap: { [id: string]: string } = {

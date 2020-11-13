@@ -64,6 +64,7 @@ import WsHandler from '@/utils/WsHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
 import {sub} from '@/utils/sub';
 import {DefaultStore} from '@/utils/store';
+import {savedFiles} from "@/utils/htmlApi";
 
 export default class ChannelsHandler extends MessageHandler {
   protected readonly logger: Logger;
@@ -90,7 +91,7 @@ export default class ChannelsHandler extends MessageHandler {
   private readonly store: DefaultStore;
   private readonly api: Api;
   private readonly ws: WsHandler;
-  private readonly sendingMessage: Record<string, Function> ={}
+  private readonly sendingMessage: Record<string, Function> = {};
   private readonly notifier: NotifierHandler;
   private readonly messageBus:  Vue;
 
@@ -135,33 +136,48 @@ export default class ChannelsHandler extends MessageHandler {
   }
 
   public getMessageFiles(messageId: number): UploadFile[] {
-    if (this.sendingMessage[messageId]) {
-      return this.sendingMessage[messageId].files;
+    // savedFiles[messageId].
+    if (this.sendingMessage[messageId]) { // TODO
+      return  [];// return this.sendingMessage[messageId].files;
     } else {
       return [];
     }
   }
 
   public sendDeleteMessage(id: number, originId: number): void {
-    this.sendingMessage[originId] = {
-      cb: () => this.ws.sendEditMessage(null, id, null, originId),
-      files: []
-    };
-    this.sendingMessage[originId].cb();
+    this.sendingMessage[originId] =  () => this.ws.sendEditMessage(null, id, null, originId);
+    this.sendingMessage[originId]();
   }
 
-  public sendEditMessage(content: string, roomId: number, id: number, uploadfiles: UploadFile[]): void {
-    this.uploadAndSend(
-        id,
-        (filesIds: number[]) => {
-          return () => this.ws.sendEditMessage(content, id, filesIds, id); // TODO
-        },
-        () => {
-          this.sendEditMessage(content, roomId, id, uploadfiles);
-        },
-        uploadfiles,
-        roomId
-    );
+  public async sendEditMessage(content: string, roomId: number, id: number, uploadFiles: UploadFile[]): void {
+    let fileIds: number[] = [];
+    if (uploadFiles.length) {
+      try {
+        fileIds = await this.uploadFiles(id, roomId, uploadFiles);
+      } catch (e) {
+        this.logger.error('Uploading error, scheduling cb')();
+        this.sendingMessage[id] = () => {
+          this.sendEditMessage(content, roomId, id, uploadFiles);
+        }
+        throw e;
+      }
+    }
+    this.sendingMessage[id] = () => {
+      this.ws.sendEditMessage(content, id, fileIds, id);
+    };
+    this.sendingMessage[id]();
+
+    // this.uploadAndSend(
+    //     id,
+    //     (filesIds: number[]) => {
+    //       return () => this.ws.sendEditMessage(content, id, filesIds, id); // TODO
+    //     },
+    //     () => {
+    //       this.sendEditMessage(content, roomId, id, uploadfiles);
+    //     },
+    //     uploadfiles,
+    //     roomId
+    // );
   }
 
   public async sendSendMessage(
@@ -178,13 +194,16 @@ export default class ChannelsHandler extends MessageHandler {
         fileIds = await this.uploadFiles(originId, roomId, uploadFiles);
       } catch (e) {
         this.logger.error('Uploading error, scheduling cb')();
-        // @ts-expect-error
-        //TODO
-        this.sendingMessage[originId] = this.sendSendMessage.bind(this, content, roomId, uploadFiles, originId, originTime);
+        this.sendingMessage[originId] = () => {
+          this.sendSendMessage(content, roomId, uploadFiles, originId, originTime);
+        }
         throw e;
       }
     }
-    this.ws.sendSendMessage(content, roomId, fileIds, originId, Date.now() - originTime);
+    this.sendingMessage[originId] = () => {
+      this.ws.sendSendMessage(content, roomId, fileIds, originId, Date.now() - originTime);
+    };
+    this.sendingMessage[originId]();
   }
 
   public async uploadFiles(
@@ -234,15 +253,12 @@ export default class ChannelsHandler extends MessageHandler {
     }
 
   }
-
   public addMessages(roomId: number, inMessages: MessageModelDto[]) {
     const oldMessages: { [id: number]: MessageModel } = this.store.roomsDict[roomId].messages;
     const newMesages: MessageModelDto[] = inMessages.filter(i => !oldMessages[i.id]);
     const messages: MessageModel[] = newMesages.map(this.getMessage.bind(this));
     this.store.addMessages({messages, roomId: roomId});
   }
-
-
 
   public init(m: PubSetRooms) {
 
