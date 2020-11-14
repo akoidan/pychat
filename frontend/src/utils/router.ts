@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
 import sessionHolder from '@/utils/sessionHolder';
-import {store} from '@/utils/storeHolder';
+import { store } from '@/utils/storeHolder';
 import MainPage from '@/components/MainPage.vue';
 import ChannelsPage from '@/components/chat/ChannelsPage.vue';
 import AuthPage from '@/components/singup/AuthPage.vue';
@@ -20,18 +20,29 @@ import CreatePublicRoom from '@/components/pages/CreatePublicRoom.vue';
 import ViewProfilePage from '@/components/pages/ViewProfilePage.vue';
 import RoomSettings from '@/components/pages/RoomSettings.vue';
 import ApplyResetPassword from '@/components/singup/ApplyResetPassword.vue';
-import {ALL_ROOM_ID, PAINTER, STATISTICS} from '@/utils/consts';
+import {
+  ALL_ROOM_ID,
+  PAINTER,
+  STATISTICS
+} from '@/utils/consts';
 import ConfirmMail from '@/components/email/ConfirmMail.vue';
 import UserProfileChangeEmail from '@/components/pages/UserProfileChangeEmail.vue';
-import {Route} from 'vue-router/types';
+import { Route } from 'vue-router/types';
 import CreateRoomChannel from '@/components/pages/CreateRoomChannel.vue';
 import CreateChannel from '@/components/pages/CreateChannel.vue';
 import ChannelSettings from '@/components/pages/ChannelSettings.vue';
-import {sub} from "@/utils/sub";
+import { sub } from "@/utils/sub";
 import MessageHandler from "@/utils/MesageHandler";
-import {HandlerType, HandlerTypes} from "@/types/types";
-import {Logger} from "lines-logger";
-import {DefaultMessage, LoginMessage, LogoutMessage, RouterNavigateMessage} from "@/types/messages";
+import {
+  HandlerType,
+  HandlerTypes
+} from "@/types/types";
+import { Logger } from "lines-logger";
+import {
+  LoginMessage,
+  LogoutMessage,
+  RouterNavigateMessage
+} from "@/types/messages";
 import loggerFactory from "@/utils/loggerFactory";
 
 Vue.use(VueRouter);

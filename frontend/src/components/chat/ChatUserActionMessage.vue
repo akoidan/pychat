@@ -7,10 +7,15 @@
   </p>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {CurrentUserInfoModel, UserModel} from '@/types/model';
-import {timeToString} from '@/utils/htmlApi';
+import { State } from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { UserModel } from '@/types/model';
+import {timeToString} from "@/utils/htmlApi";
+
 
 @Component
 export default class ChatUserActionMessage extends Vue {
@@ -28,7 +33,7 @@ export default class ChatUserActionMessage extends Vue {
   }
 
   public setActiveUser() {
-    this.store.setActiveUserId(this.userId);
+    this.$store.setActiveUserId(this.userId);
   }
 
   get isUser() {

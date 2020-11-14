@@ -23,9 +23,12 @@
 </template>
 
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {State} from '@/utils/storeHolder';
-import {ApplyGrowlErr} from '@/utils/storeHolder';
+import {
+  Component,
+  Vue
+} from 'vue-property-decorator';
+import { ApplyGrowlErr } from '@/utils/storeHolder';
+
 @Component
 export default class ConfirmMail extends Vue {
 

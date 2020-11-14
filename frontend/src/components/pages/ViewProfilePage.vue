@@ -58,11 +58,10 @@
 </template>
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import { State} from '@/utils/storeHolder';
+import {ApplyGrowlErr, State} from '@/utils/storeHolder';
 import {ViewUserProfileDto} from '@/types/messages';
 import {resolveMediaUrl} from '@/utils/htmlApi';
 import {UserModel} from '@/types/model';
-import {ApplyGrowlErr} from '@/utils/storeHolder';
 
 @Component
 export default class ViewProfilePage extends Vue {

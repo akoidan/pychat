@@ -1,8 +1,4 @@
-import loggerFactory from '@/utils/loggerFactory';
-import {PostData, SessionHolder} from '@/types/types';
-import {Logger} from 'lines-logger';
-import {CONNECTION_ERROR} from '@/utils/consts';
-import Http from '@/utils/Http';
+import { SessionHolder } from '@/types/types';
 
 /**
  * @param params : object dict of params or DOM form

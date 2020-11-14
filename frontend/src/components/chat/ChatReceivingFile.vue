@@ -71,13 +71,20 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {State} from '@/utils/storeHolder';
-import {ReceivingFile, FileTransferStatus} from '@/types/model';
-import {bytesToSize} from '@/utils/pureFunctions';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { State } from '@/utils/storeHolder';
+import {
+  FileTransferStatus,
+  ReceivingFile
+} from '@/types/model';
+import { bytesToSize } from '@/utils/pureFunctions';
 import AppProgressBar from '@/components/ui/AppProgressBar';
 import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
-import {webrtcApi} from '@/utils/singletons';
+
 
 @Component({
   components: {ChatMessageHeader, AppProgressBar}
@@ -129,15 +136,15 @@ export default class ChatReceivingFile extends Vue {
   }
 
   public retry() {
-    webrtcApi.retryFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
+    this.$webrtcApi.retryFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
   }
 
   public accept() {
-    webrtcApi.acceptFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
+    this.$webrtcApi.acceptFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
   }
 
   public decline() {
-    webrtcApi.declineFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
+    this.$webrtcApi.declineFile(this.receivingFile.connId, this.receivingFile.opponentWsId);
   }
 
 }

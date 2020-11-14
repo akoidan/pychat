@@ -1,8 +1,7 @@
-import {getModule} from 'vuex-module-decorators';
-import {stateDecoratorFactory} from 'vuex-module-decorators-state';
-import {DefaultStore} from '@/utils/store';
-import {IS_DEBUG} from '@/utils/consts';
-import Vue from 'vue';
+import { getModule } from 'vuex-module-decorators';
+import { stateDecoratorFactory } from 'vuex-module-decorators-state';
+import { DefaultStore } from '@/utils/store';
+import { IS_DEBUG } from '@/utils/consts';
 
 export const store: DefaultStore = getModule(DefaultStore);
 export const State = stateDecoratorFactory(store);
@@ -71,8 +70,6 @@ export function ApplyGrowlErr<T extends InstanceType<ClassType>>(
     };
   };
 }
-
-Vue.prototype.store = store;
 
 if (IS_DEBUG) {
   window.store = store;

@@ -32,10 +32,14 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-  import {RoomModel} from '@/types/model';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { RoomModel } from '@/types/model';
 
-  @Component
+@Component
   export default class RoomRightIcon extends Vue {
 
     @Prop() public room!: RoomModel;

@@ -1,13 +1,16 @@
 import BaseTransferHandler from '@/webrtc/BaseTransferHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
-import {SendingFile} from '@/types/model';
+import { SendingFile } from '@/types/model';
 import WsHandler from '@/utils/WsHandler';
-import {DefaultMessage, ReplyFileMessage} from '@/types/messages';
+import { ReplyFileMessage } from '@/types/messages';
 import FileSenderPeerConnection from '@/webrtc/file/FileSenderPeerConnection';
-import {sub} from '@/utils/sub';
+import { sub } from '@/utils/sub';
 import Subscription from '@/utils/Subscription';
-import {DefaultStore} from '@/utils/store';
-import {HandlerType, HandlerTypes} from '@/types/types';
+import { DefaultStore } from '@/utils/store';
+import {
+  HandlerType,
+  HandlerTypes
+} from '@/types/types';
 
 export default class FileHandler extends BaseTransferHandler {
 

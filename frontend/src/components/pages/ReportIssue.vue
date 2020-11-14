@@ -50,12 +50,12 @@
   </form>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
+import {ApplyGrowlErr} from '@/utils/storeHolder';
+import {Component, Ref, Vue, Watch} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
 import {GIT_HASH} from '@/utils/consts';
-import {ApplyGrowlErr} from '@/utils/storeHolder';
 import {browserVersion} from '@/utils/runtimeConsts';
+
 @Component({components: {AppSubmit}})
 export default class ReportIssue extends Vue {
 
@@ -81,7 +81,7 @@ export default class ReportIssue extends Vue {
   @ApplyGrowlErr({runningProp: 'running', message: 'Unable to submit issue'})
   public async submit() {
     await this.$api.sendLogs(this.issue, this.browser, this.git);
-    this.store.growlSuccess('Your issue has ben submitted');
+    this.$store.growlSuccess('Your issue has ben submitted');
     this.$router.go(-1);
   }
 }

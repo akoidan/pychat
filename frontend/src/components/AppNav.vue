@@ -107,7 +107,6 @@ import {State} from '@/utils/storeHolder';
 import {Component, Vue, Ref} from 'vue-property-decorator';
 import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
 import {ISSUES, GITHUB_LINK, PAINTER, STATISTICS} from '@/utils/consts';
-import {webrtcApi} from '@/utils/singletons';
 import {sub} from "@/utils/sub";
 import {LogoutMessage} from "@/types/messages";
 
@@ -141,7 +140,7 @@ export default class AppNav extends Vue {
   public expanded: boolean = false;
 
   public toggleContainer(roomd: number) {
-    this.store.toggleContainer(roomd);
+    this.$store.toggleContainer(roomd);
   }
 
   public sendFileClick() {
@@ -150,11 +149,11 @@ export default class AppNav extends Vue {
   }
 
   public sendFile(event: FileList) {
-    webrtcApi.offerFile(this.inputFile.files![0], this.activeRoom.id);
+    this.$webrtcApi.offerFile(this.inputFile.files![0], this.activeRoom.id);
   }
 
   public invertSearch() {
-    this.store.setSearchTo({
+    this.$store.setSearchTo({
       roomId: this.activeRoom.id,
       search: { ...this.activeRoom.search, searchActive: !this.activeRoom.search.searchActive}
       });

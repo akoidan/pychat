@@ -18,15 +18,19 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-  import ChatBox from '@/components/chat/ChatBox.vue';
-  import {State} from '@/utils/storeHolder';
+import {
+  Component,
+  Vue
+} from 'vue-property-decorator';
+import ChatBox from '@/components/chat/ChatBox.vue';
+import { State } from '@/utils/storeHolder';
 
-  import {ALL_ROOM_ID} from '@/utils/consts';
+import { ALL_ROOM_ID } from '@/utils/consts';
 
-  import {RoomModel} from '@/types/model';
-  import {messageBus} from '@/utils/singletons';
-  @Component({
+import { RoomModel } from '@/types/model';
+
+
+@Component({
     components: {ChatBox}
   })
   export default class Chatboxes extends Vue {
@@ -46,7 +50,7 @@
       const files: FileList = (evt.dataTransfer?.files) as FileList;
       this.$logger.debug('Drop photo {} ', files)();
       if (files) {
-        messageBus.$emit('drop-photo', files);
+        this.$messageBus.$emit('drop-photo', files);
       }
     }
 

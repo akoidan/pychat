@@ -17,11 +17,17 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-import {CallInfoModel} from '@/types/model';
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue,
+  Watch
+} from 'vue-property-decorator';
+import { CallInfoModel } from '@/types/model';
 import AppInputRange from '@/components/ui/AppInputRange';
 import VideoObject from '@/components/chat/VideoObject';
+
 @Component({
   components: {VideoObject, AppInputRange}
 })
@@ -33,7 +39,7 @@ export default class ChatRemotePeer extends Vue {
   @Prop() public callInfo!: CallInfoModel;
 
   get userNameValue(): string {
-    return this.store.userName(this.callInfo.userId);
+    return this.$store.userName(this.callInfo.userId);
   }
 
   get volLevelClass() {

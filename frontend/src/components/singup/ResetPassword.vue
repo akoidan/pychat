@@ -46,13 +46,13 @@ export default class ResetPassword extends Vue {
   public running: boolean = false;
 
   public created() {
-    this.store.setRegHeader('Restore password');
+    this.$store.setRegHeader('Restore password');
   }
 
   @ApplyGrowlErr({runningProp: 'running', message: `Can't reset password`})
   public async restorePassword(event: Event) {
     await this.$api.sendRestorePassword(this.form);
-    this.store.growlSuccess('A reset email has been sent to your email address, please follow the instruction in it');
+    this.$store.growlSuccess('A reset email has been sent to your email address, please follow the instruction in it');
   }
 
 }

@@ -42,11 +42,11 @@
   </div>
 </template>
 <script lang="ts">
-import {State, ApplyGrowlErr} from '@/utils/storeHolder';
+import {ApplyGrowlErr, State} from '@/utils/storeHolder';
 import {Component, Ref, Vue, Watch} from 'vue-property-decorator';
 import {canvasContext, resolveMediaUrl, stopVideo} from '@/utils/htmlApi';
 import AppSubmit from '@/components/ui/AppSubmit';
-import {platformUtil} from '@/utils/singletons';
+
 
 @Component({
   components: {AppSubmit}
@@ -81,7 +81,7 @@ export default class UserProfileImage extends Vue {
   @Watch('userImage')
   public onUserImageChange(value: string) {
     this.srcImg = resolveMediaUrl(value);
-    this.store.growlInfo('New image has been set');
+    this.$store.growlInfo('New image has been set');
   }
 
   public created() {
@@ -98,7 +98,7 @@ export default class UserProfileImage extends Vue {
         this.inputFile.value = '';
       }
     } else {
-      this.store.growlError('No files found in draggable object');
+      this.$store.growlError('No files found in draggable object');
     }
   }
 
@@ -122,13 +122,13 @@ export default class UserProfileImage extends Vue {
       const reader = new FileReader();
       reader.onload = (e) => {
         this.srcImg = reader.result as string;
-        this.store.growlSuccess('Photo has been rendered, click save to apply it');
+        this.$store.growlSuccess('Photo has been rendered, click save to apply it');
       };
       reader.readAsDataURL(file);
 
       return true;
     } else {
-      this.store.growlError('Invalid file type ' + file.type);
+      this.$store.growlError('Invalid file type ' + file.type);
 
       return false;
     }
@@ -164,7 +164,7 @@ export default class UserProfileImage extends Vue {
         this.blob = blob;
       },                          'image/jpeg', 0.95);
       this.inputFile.value = '';
-      this.store.growlInfo('Image has been set. Click on "Finish" to hide video');
+      this.$store.growlInfo('Image has been set. Click on "Finish" to hide video');
     }
   }
 
@@ -177,20 +177,20 @@ export default class UserProfileImage extends Vue {
     if (this.isStopped) {
       try {
         this.$logger.debug("checking perms")();
-        await platformUtil.askPermissions('video');
+        await this.$platformUtil.askPermissions('video');
         this.$logger.debug("Capturing media")();
-        await platformUtil.askPermissions();
+        await this.$platformUtil.askPermissions();
         this.srcVideo = await navigator.mediaDevices.getUserMedia({audio: true, video: true});
         this.showVideo = true;
         this.isStopped = false;
-        this.store.growlInfo('Click on your video to take a photo');
+        this.$store.growlInfo('Click on your video to take a photo');
       } catch (e) {
         this.$logger.error('Error while trying to capture a picture "{}"', e.message || e.name)();
-        this.store.growlError(`Unable to use your webcam because ${e.message || e.name}`);
+        this.$store.growlError(`Unable to use your webcam because ${e.message || e.name}`);
       }
     } else {
       this.stopVideo();
-      this.store.growlInfo('To apply photo click on save');
+      this.$store.growlInfo('To apply photo click on save');
       this.showVideo = false;
       this.isStopped = true;
     }
@@ -199,10 +199,10 @@ export default class UserProfileImage extends Vue {
   @ApplyGrowlErr({ message: 'Unable to upload event', runningProp: 'running'})
   public async upload() {
     if (!this.blob) {
-      this.store.growlError('Please select image first');
+      this.$store.growlError('Please select image first');
     } else {
       await this.$api.uploadProfileImage(this.blob);
-      this.store.growlSuccess('Image uploaded');
+      this.$store.growlSuccess('Image uploaded');
     }
   }
 

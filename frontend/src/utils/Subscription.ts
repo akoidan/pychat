@@ -1,7 +1,10 @@
-import {DefaultMessage, HandlerName} from '@/types/messages';
-import {IMessageHandler} from '@/types/types';
+import {
+  DefaultMessage,
+  HandlerName
+} from '@/types/messages';
+import { IMessageHandler } from '@/types/types';
 import loggerFactory from '@/utils/loggerFactory';
-import {Logger} from 'lines-logger';
+import { Logger } from 'lines-logger';
 
 export default class Subscription {
 

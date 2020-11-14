@@ -1,21 +1,26 @@
 import {
-  FileTransferStatus,
-  RoomLog,
+  CallInfoModel,
+  ChannelModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   FileModel,
+  FileTransferStatus,
   MessageModel,
+  RoomLog,
   RoomModel,
   RoomSettingsModel,
   SearchModel,
-  UploadProgressModel,
-  UserModel,
   SendingFileTransfer,
-  CallInfoModel,
-  ChannelModel
+  UploadProgressModel,
+  UserModel
 } from '@/types/model';
-import {ChannelDto, RoomDto, SetStateFromStorage, UserDto} from '@/types/dto';
-import {DefaultMessage, DefaultSentMessage} from '@/types/messages';
+import {
+  ChannelDto,
+  RoomDto,
+  SetStateFromStorage,
+  UserDto
+} from '@/types/dto';
+import { DefaultMessage } from '@/types/messages';
 import MessageRetrier from "@/utils/MessageRetrier";
 
 export interface UploadFile {

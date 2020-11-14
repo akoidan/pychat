@@ -1,8 +1,11 @@
-import {ConnectToRemoteMessage, DefaultMessage} from '@/types/messages';
+import { ConnectToRemoteMessage } from '@/types/messages';
 import WsHandler from '@/utils/WsHandler';
 import CallPeerConnection from '@/webrtc/call/CallPeerConnection';
-import {DefaultStore} from '@/utils/store';
-import {HandlerType, HandlerTypes} from '@/types/types';
+import { DefaultStore } from '@/utils/store';
+import {
+  HandlerType,
+  HandlerTypes
+} from '@/types/types';
 
 export default class CallSenderPeerConnection extends CallPeerConnection {
 

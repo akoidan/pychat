@@ -11,11 +11,16 @@
   </select>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref, Emit} from 'vue-property-decorator';
-  import {State} from '@/utils/storeHolder';
-  import {ChannelUIModel} from '@/types/model';
+import {
+  Component,
+  Emit,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { State } from '@/utils/storeHolder';
+import { ChannelUIModel } from '@/types/model';
 
-  @Component
+@Component
   export default class ParentChannel extends Vue {
     @State
     public readonly channels!: ChannelUIModel[];

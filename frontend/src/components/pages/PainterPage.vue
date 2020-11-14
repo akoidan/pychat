@@ -4,14 +4,14 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
+import {Component, Ref, Vue} from 'vue-property-decorator';
 import Painter from 'spainter';
 import {ALL_ROOM_ID} from '@/utils/consts';
-import {messageBus} from '@/utils/singletons';
+
 import loggerFactory from '@/utils/loggerFactory';
 import AppInputRange from '@/components/ui/AppInputRange';
-import {Route, RawLocation} from 'vue-router';
+import {RawLocation, Route} from 'vue-router';
+
 @Component
 export default class PainterPage extends Vue {
 
@@ -41,12 +41,12 @@ export default class PainterPage extends Vue {
   onEmitMainJoin() {
     this.$logger.log("Emitting back {}", this.blob)();
     if (this.blob) {
-      messageBus.$emit('blob', this.blob);
+      this.$messageBus.$emit('blob', this.blob);
       this.blob = null;
     }
   }
   public created() {
-    messageBus.$on('main-join', this.onEmitMainJoin);
+    this.$messageBus.$on('main-join', this.onEmitMainJoin);
   }
 
   destroyed() {
@@ -56,7 +56,7 @@ export default class PainterPage extends Vue {
     // so since operation above is synchronous, scheduling even to eventloop helps
     // TODO this should be resolved in a better way
     window.setTimeout(() => {
-      messageBus.$off('main-join', this.onEmitMainJoin);
+      this.$messageBus.$off('main-join', this.onEmitMainJoin);
     });
   }
 

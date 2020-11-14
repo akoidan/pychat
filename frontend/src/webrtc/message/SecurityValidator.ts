@@ -1,6 +1,8 @@
-import {HandlerType, HandlerTypes} from '@/types/types';
-import {DefaultMessage, PrintMessage} from '@/types/messages';
-import {DefaultStore} from '@/utils/store';
+import {
+  DefaultMessage,
+  PrintMessage
+} from '@/types/messages';
+import { DefaultStore } from '@/utils/store';
 
 /** The message that are sent directly from another user is not trusted
  * That's why this class lead to eliminate OWASP broken access control

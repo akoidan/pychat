@@ -92,10 +92,10 @@ export default class UserProfileChangePassword extends Vue {
   @ApplyGrowlErr({ message: 'Error changing pass:', runningProp: 'running'})
   public async saveProfile() {
     if (this.newPassword != this.confirmPassword) {
-      this.store.growlError('Passwords don\'t match');
+      this.$store.growlError('Passwords don\'t match');
     } else {
       await this.$api.changePassword(this.oldPassword, this.newPassword);
-      this.store.growlSuccess('Password has been changed');
+      this.$store.growlSuccess('Password has been changed');
     }
   }
 }

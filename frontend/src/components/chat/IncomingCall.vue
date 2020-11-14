@@ -40,10 +40,18 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {IncomingCallModel, RoomDictModel, UserModel} from '@/types/model';
-import {webrtcApi} from '@/utils/singletons';
+import { State } from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import {
+  IncomingCallModel,
+  RoomDictModel,
+  UserModel
+} from '@/types/model';
+
 
 @Component
 export default class IncomingCall extends Vue {
@@ -64,15 +72,15 @@ export default class IncomingCall extends Vue {
   }
 
   public answer() {
-    webrtcApi.answerCall(this.call.connId);
+    this.$webrtcApi.answerCall(this.call.connId);
   }
 
   public hangUp() {
-    webrtcApi.declineCall(this.call.connId);
+    this.$webrtcApi.declineCall(this.call.connId);
   }
 
   public videoAnswer() {
-    webrtcApi.videoAnswerCall(this.call.connId);
+    this.$webrtcApi.videoAnswerCall(this.call.connId);
   }
 
 }

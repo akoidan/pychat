@@ -1,11 +1,13 @@
 import {
+  ChannelModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   FileModel,
-  RoomModel,
-  UserModel,
   Location,
-  SexModelString, ChannelModel, RoomSettingsModel
+  RoomModel,
+  RoomSettingsModel,
+  SexModelString,
+  UserModel
 } from '@/types/model';
 import {
   ChannelDto,
@@ -18,7 +20,10 @@ import {
   UserProfileDto,
   UserSettingsDto
 } from '@/types/dto';
-import {BooleanDB, SexDB} from '@/types/db';
+import {
+  BooleanDB,
+  SexDB
+} from '@/types/db';
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDto): CurrentUserInfoModel {
   return {...userInfo};

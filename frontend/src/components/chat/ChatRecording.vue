@@ -17,10 +17,16 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-  import {State} from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue,
+  Watch
+} from 'vue-property-decorator';
+import { State } from '@/utils/storeHolder';
 
-  @Component
+@Component
   export default class ChatRecording extends Vue {
 
 

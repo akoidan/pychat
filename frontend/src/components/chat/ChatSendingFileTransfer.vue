@@ -20,11 +20,19 @@
 </template>
 <script lang="ts">
 
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import { State } from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
 import AppProgressBar from '@/components/ui/AppProgressBar';
-import {FileTransferStatus, SendingFileTransfer, UserModel} from '@/types/model';
-import {webrtcApi} from '@/utils/singletons';
+import {
+  FileTransferStatus,
+  SendingFileTransfer,
+  UserModel
+} from '@/types/model';
+
 
 const fileStatusDict: Record<FileTransferStatus, string> = {
   [FileTransferStatus.NOT_DECIDED_YET]: 'Waiting to accept',
@@ -56,7 +64,7 @@ export default class ChatSendingFileTransfer extends Vue {
   }
 
   public declineSending() {
-    webrtcApi.declineSending(this.connId, this.opponentId);
+    this.$webrtcApi.declineSending(this.connId, this.opponentId);
   }
 
   get cls() {

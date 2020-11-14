@@ -20,14 +20,22 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
 import debounce from 'lodash.debounce';
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-import {RoomModel, SearchModel} from '@/types/model';
-import {MessageModelDto} from '@/types/dto';
-import {channelsHandler} from '@/utils/singletons';
-import {SetSearchTo} from '@/types/types';
-import {MESSAGES_PER_SEARCH} from '@/utils/consts';
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue,
+  Watch
+} from 'vue-property-decorator';
+import {
+  RoomModel,
+  SearchModel
+} from '@/types/model';
+import { MessageModelDto } from '@/types/dto';
+
+import { SetSearchTo } from '@/types/types';
+import { MESSAGES_PER_SEARCH } from '@/utils/consts';
 
 const START_TYPING = 'Start typing and messages will appear';
 
@@ -84,7 +92,7 @@ export default class SearchMessages extends Vue {
        this.$logger.debug('http response {} {}', a)();
        this.currentRequest = null;
        if (a.length) {
-          channelsHandler.addMessages(this.room.id, a); // TODO this should be separate messages, otherwise we would have history with holes
+          this.$channelsHandler.addMessages(this.room.id, a); // TODO this should be separate messages, otherwise we would have history with holes
           const ids = this.room.search.searchedIds.concat([]);
           this.mutateSearchedIds(a.map(a => a.id), search);
           this.searchResult = '';
@@ -118,7 +126,7 @@ export default class SearchMessages extends Vue {
       searchText,
       locked: searchedIds.length < MESSAGES_PER_SEARCH
     };
-    this.store.setSearchTo({
+    this.$store.setSearchTo({
       roomId: this.room.id,
       search
     } as SetSearchTo);

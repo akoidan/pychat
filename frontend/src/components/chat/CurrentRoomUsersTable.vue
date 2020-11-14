@@ -26,9 +26,12 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-import {State} from '@/utils/storeHolder';
-import {UserModel} from '@/types/model';
+import {
+  Component,
+  Vue
+} from 'vue-property-decorator';
+import { State } from '@/utils/storeHolder';
+import { UserModel } from '@/types/model';
 import RoomUsersUser from '@/components/chat/RoomUsersUser.vue';
 
 @Component({

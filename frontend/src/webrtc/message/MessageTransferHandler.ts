@@ -1,23 +1,23 @@
 import BaseTransferHandler from '@/webrtc/BaseTransferHandler';
-import {HandlerType, HandlerTypes} from '@/types/types';
-import {RoomModel} from '@/types/model';
-import { UploadFile, UserIdConn} from '@/types/types';
-import MessagePeerConnection from '@/webrtc/message/MessagePeerConnection';
-import MessageSenderPeerConnection
-  from '@/webrtc/message/MessageSenderPeerConnection';
-import MessageReceiverPeerConnection
-  from '@/webrtc/message/MessageReceiverPeerConnection';
+import {
+  HandlerType,
+  HandlerTypes,
+  UploadFile,
+  UserIdConn
+} from '@/types/types';
+import { RoomModel } from '@/types/model';
+import MessageSenderPeerConnection from '@/webrtc/message/MessageSenderPeerConnection';
+import MessageReceiverPeerConnection from '@/webrtc/message/MessageReceiverPeerConnection';
 import {
   AppendQueue,
   DefaultMessage,
-  EditMessage,
   OfferCall,
-  PrintMessage, PrintWebRtcMessage
+  PrintWebRtcMessage
 } from '@/types/messages';
 import WsHandler from '@/utils/WsHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
-import {DefaultStore} from '@/utils/store';
-import {sub} from '@/utils/sub';
+import { DefaultStore } from '@/utils/store';
+import { sub } from '@/utils/sub';
 import Subscription from '@/utils/Subscription';
 
 export default class MessageTransferHandler extends BaseTransferHandler {

@@ -1,11 +1,19 @@
-import {IStorage, SetRoomsUsers, StorageData} from '@/types/types';
-import loggerFactory from '@/utils/loggerFactory';
-import {Logger} from 'lines-logger';
 import {
-  ChannelModel, ChannelsDictModel,
+  IStorage,
+  SetRoomsUsers,
+  StorageData
+} from '@/types/types';
+import loggerFactory from '@/utils/loggerFactory';
+import { Logger } from 'lines-logger';
+import {
+  ChannelModel,
+  ChannelsDictModel,
   CurrentUserInfoModel,
-  CurrentUserSettingsModel, FileModel,
-  MessageModel, RoomDictModel, RoomModel,
+  CurrentUserSettingsModel,
+  FileModel,
+  MessageModel,
+  RoomDictModel,
+  RoomModel,
   RoomSettingsModel,
   UserModel
 } from '@/types/model';
@@ -20,14 +28,16 @@ import {
 } from '@/types/converters';
 import {
   ChannelDB,
-  FileDB, MessageDB,
+  FileDB,
+  MessageDB,
   ProfileDB,
   RoomDB,
   RoomUsersDB,
-  SettingsDB, TransactionType,
+  SettingsDB,
+  TransactionType,
   UserDB
 } from '@/types/db';
-import {browserVersion} from '@/utils/runtimeConsts';
+import { browserVersion } from '@/utils/runtimeConsts';
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 

@@ -15,10 +15,14 @@
   >
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue, Emit} from 'vue-property-decorator';
-import {isDateMissing} from '@/utils/htmlApi';
-import {ELECTRON_MAIN_FILE} from '@/utils/consts';
+import {
+  Component,
+  Emit,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { isDateMissing } from '@/utils/htmlApi';
+import { ELECTRON_MAIN_FILE } from '@/utils/consts';
 
 let Datepicker: unknown;
 if (!ELECTRON_MAIN_FILE) {

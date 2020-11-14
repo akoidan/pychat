@@ -67,22 +67,13 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-  import {
-    ChannelModel,
-    ChannelsDictModel,
-    ChannelsDictUIModel,
-    ChannelUIModel,
-    CurrentUserInfoModel,
-    RoomDictModel,
-    RoomModel, UserModel
-  } from '@/types/model';
-  import {State} from '@/utils/storeHolder';
-  import AppSubmit from '@/components/ui/AppSubmit.vue';
-  import {ApplyGrowlErr} from '@/utils/storeHolder';
-  import PickUser from '@/components/pages/parts/PickUser.vue';
+import {Component, Vue} from 'vue-property-decorator';
+import {ChannelsDictUIModel, ChannelUIModel, CurrentUserInfoModel, UserModel} from '@/types/model';
+import {ApplyGrowlErr, State} from '@/utils/storeHolder';
+import AppSubmit from '@/components/ui/AppSubmit.vue';
+import PickUser from '@/components/pages/parts/PickUser.vue';
 
-  @Component({
+@Component({
     components: {PickUser, AppSubmit}
   })
   export default class ChannelSettings extends Vue {
@@ -142,7 +133,7 @@
         throw Error("Pick an admin");
       }
       await this.$ws.saveChannelSettings(this.channelName, this.channelId, this.singleAdmin);
-      this.store.growlSuccess('Settings has been saved');
+      this.$store.growlSuccess('Settings has been saved');
       this.$router.go(-1);
     }
 
@@ -157,7 +148,7 @@
     @ApplyGrowlErr({runningProp: 'running'})
     public async deleteChannel(): Promise<void> {
       await this.$ws.sendDeleteChannel(this.channelId);
-      this.store.growlSuccess('Channel has been deleted');
+      this.$store.growlSuccess('Channel has been deleted');
       this.$router.go(-1);
     }
 

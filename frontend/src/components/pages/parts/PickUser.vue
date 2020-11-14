@@ -34,9 +34,13 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {CurrentUserInfoModel, UserModel} from '@/types/model';
-import {State} from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { UserModel } from '@/types/model';
+import { State } from '@/utils/storeHolder';
 
 @Component
 export default class PickUser extends Vue {

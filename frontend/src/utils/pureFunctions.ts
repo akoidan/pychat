@@ -1,4 +1,8 @@
-import {CurrentUserInfoModel, EditingMessage, MessageModel} from "@/types/model";
+import {
+  CurrentUserInfoModel,
+  EditingMessage,
+  MessageModel
+} from "@/types/model";
 
 let uniqueId = 1;
 

@@ -187,14 +187,25 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-import {CallInfoModel, CallsInfoModel} from '@/types/model';
-import {BooleanIdentifier, StringIdentifier, VideoType} from '@/types/types';
-import {webrtcApi} from '@/utils/singletons';
+import { State } from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue,
+  Watch
+} from 'vue-property-decorator';
+import { CallsInfoModel } from '@/types/model';
+import {
+  BooleanIdentifier,
+  StringIdentifier,
+  VideoType
+} from '@/types/types';
+
 import ChatRemotePeer from '@/components/chat/ChatRemotePeer';
-import {file} from '@/utils/audio';
+import { file } from '@/utils/audio';
 import VideoObject from '@/components/chat/VideoObject';
+
 @Component({
   components: {VideoObject, ChatRemotePeer}
 })
@@ -294,7 +305,7 @@ export default class ChatCall extends Vue {
     } else if (elem.webkitRequestFullscreen) {
       elem.webkitRequestFullscreen();
     } else {
-      this.store.growlError('Can\'t enter fullscreen');
+      this.$store.growlError('Can\'t enter fullscreen');
 
       return;
     }
@@ -318,9 +329,9 @@ export default class ChatCall extends Vue {
       id: this.roomId,
       state: (event.target as HTMLInputElement).value
     };
-    this.store.setCurrentMic(payload);
+    this.$store.setCurrentMic(payload);
     if (this.callInfo.callActive) {
-      webrtcApi.updateConnection(this.roomId);
+      this.$webrtcApi.updateConnection(this.roomId);
     }
   }
   public setCurrentWebcamProxy(event: Event) {
@@ -328,9 +339,9 @@ export default class ChatCall extends Vue {
       id: this.roomId,
       state: (event.target as HTMLInputElement).value
     };
-    this.store.setCurrentWebcam(payload);
+    this.$store.setCurrentWebcam(payload);
     if (this.callInfo.callActive) {
-      webrtcApi.updateConnection(this.roomId);
+      this.$webrtcApi.updateConnection(this.roomId);
     }
   }
 
@@ -344,7 +355,7 @@ export default class ChatCall extends Vue {
       prom && prom.catch(function (e) {
       });
     } else {
-      this.store.growlError('Your browser doesn\'t support changing output channel');
+      this.$store.growlError('Your browser doesn\'t support changing output channel');
     }
   }
 
@@ -353,18 +364,18 @@ export default class ChatCall extends Vue {
       id: this.roomId,
       state: (event.target as HTMLInputElement).value
     };
-    this.store.setCurrentSpeaker(payload);
+    this.$store.setCurrentSpeaker(payload);
     if (this.callInfo.callActive) {
-      webrtcApi.updateConnection(this.roomId);
+      this.$webrtcApi.updateConnection(this.roomId);
     }
   }
 
   public startCall() {
-    webrtcApi.startCall(this.roomId);
+    this.$webrtcApi.startCall(this.roomId);
   }
 
   public hangUpCall() {
-    webrtcApi.hangCall(this.roomId);
+    this.$webrtcApi.hangCall(this.roomId);
     this.fullscreen = false;
     this.exitFullscreen();
   }
@@ -374,9 +385,9 @@ export default class ChatCall extends Vue {
       state: !this.callInfo.shareScreen,
       id: this.roomId
     };
-    this.store.setShareScreenToState(payload);
+    this.$store.setShareScreenToState(payload);
     if (this.callInfo.callActive) {
-      webrtcApi.toggleDevice(this.roomId, VideoType.SHARE);
+      this.$webrtcApi.toggleDevice(this.roomId, VideoType.SHARE);
     }
   }
 
@@ -385,9 +396,9 @@ export default class ChatCall extends Vue {
       state: !this.callInfo.showVideo,
       id: this.roomId
     };
-    this.store.setVideoToState(payload);
+    this.$store.setVideoToState(payload);
     if (this.callInfo.callActive) {
-      webrtcApi.toggleDevice(this.roomId, VideoType.VIDEO);
+      this.$webrtcApi.toggleDevice(this.roomId, VideoType.VIDEO);
     }
   }
 
@@ -396,9 +407,9 @@ export default class ChatCall extends Vue {
       state: !this.callInfo.showMic,
       id: this.roomId
     };
-    this.store.setMicToState(payload);
+    this.$store.setMicToState(payload);
     if (this.callInfo.callActive) {
-      webrtcApi.toggleDevice(this.roomId, VideoType.AUDIO);
+      this.$webrtcApi.toggleDevice(this.roomId, VideoType.AUDIO);
     }
   }
 

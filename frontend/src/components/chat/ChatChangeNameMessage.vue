@@ -2,13 +2,21 @@
   <p class="message-system">
     <span class="message-header">
       <span class="timeMess">({{ getTime }})</span>
-      <span>System</span>: </span>
-      <span class="message-text-style">This room has been renamed from <b>{{ oldName }}</b> to <b>{{ newName }}</b></span>
+      <span>System</span>:
+    </span>
+    <span class="message-text-style">
+      This room has been renamed from <b>{{ oldName }}</b> to <b>{{ newName }}</b>
+    </span>
   </p>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {timeToString} from '@/utils/htmlApi';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { timeToString } from "@/utils/htmlApi";
+
 
 @Component
 export default class ChatChangeNameMessage extends Vue {

@@ -1,6 +1,9 @@
-
 import loggerFactory from '@/utils/loggerFactory';
-import {IStorage, SetRoomsUsers, StorageData} from '@/types/types';
+import {
+  IStorage,
+  SetRoomsUsers,
+  StorageData
+} from '@/types/types';
 import {
   ChannelModel,
   CurrentUserInfoModel,
@@ -9,7 +12,7 @@ import {
   RoomSettingsModel,
   UserModel
 } from '@/types/model';
-import {Logger} from 'lines-logger';
+import { Logger } from 'lines-logger';
 
 interface LocalStorageMessage {
   f: number;

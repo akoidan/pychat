@@ -107,7 +107,6 @@ import AppCheckbox from '@/components/ui/AppCheckbox';
 import {CurrentUserInfoModel, CurrentUserSettingsModel} from '@/types/model';
 import {currentUserInfoDtoToModel, currentUserInfoModelToDto, userSettingsDtoToModel} from '@/types/converters';
 import {UserSettingsDto} from '@/types/dto';
-import {storage} from '@/utils/singletons';
 import {ApplyGrowlErr} from '@/utils/storeHolder';
 import {SetSettingsMessage} from '@/types/messages';
 
@@ -131,7 +130,7 @@ export default class UserProfileSettings extends Vue {
   }
 
   public clearHistory() {
-    this.store.clearMessages();
+    this.$store.clearMessages();
   }
 
   @ApplyGrowlErr({ message: 'Error saving settings', runningProp: 'running'})
@@ -139,7 +138,7 @@ export default class UserProfileSettings extends Vue {
     this.$logger.debug('Saving userSettings')();
     const cui: UserSettingsDto = {...this.model};
     const e: SetSettingsMessage|unknown = await this.$ws.saveSettings(cui);
-    this.store.growlSuccess('Settings have been saved');
+    this.$store.growlSuccess('Settings have been saved');
   }
 }
 </script>

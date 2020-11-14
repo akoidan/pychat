@@ -9,7 +9,7 @@
         :recording-now="recordingNow"
       />
       <chat-right-section />
-      <smiley-holder/>
+      <smiley-holder />
     </div>
     <chat-text-area
       :src-video.sync="srcVideo"
@@ -19,14 +19,20 @@
 </template>
 
 <script lang='ts'>
-import {Component, Vue} from 'vue-property-decorator';
+import {
+  Component,
+  Vue
+} from 'vue-property-decorator';
 
 import ChatRightSection from '@/components/chat/ChatRightSection';
 import SmileyHolder from '@/components/chat/SmileyHolder';
 import NavEditMessage from '@/components/chat/NavEditMessage';
 import NavUserShow from '@/components/chat/NavUserShow';
-import {messageBus} from '@/utils/singletons';
-import {RawLocation, Route} from 'vue-router';
+
+import {
+  RawLocation,
+  Route
+} from 'vue-router';
 import ChatRecording from '@/components/chat/ChatRecording';
 import ChatTextArea from '@/components/chat/ChatTextArea';
 import Chatboxes from '@/components/chat/Chatboxes';
@@ -46,10 +52,15 @@ export default class ChannelsPage extends Vue {
   public recordingNow: boolean = false;
   public srcVideo: string|null = null;
 
+  created() {
+    console.error('test');
+  }
+
   public beforeRouteEnter(to: Route, frm: Route, next: (to?: RawLocation | false | ((vm: Vue) => any) | void) => void) {
-    next(vm => {
-      messageBus.$emit('main-join');
-    });
+    // let $messageBus = this.$messageBus;
+    // next(vm => {
+    //   $messageBus.$emit('main-join');
+    // });
   }
 
 }

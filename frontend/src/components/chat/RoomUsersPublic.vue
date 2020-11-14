@@ -7,10 +7,15 @@
   </li>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {RoomModel} from '@/types/model';
+import { State } from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { RoomModel } from '@/types/model';
 import RoomRightIcon from '@/components/chat/RoomRightIcon.vue';
+
 @Component({
   components: {RoomRightIcon}
 })

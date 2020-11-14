@@ -69,7 +69,7 @@ export default class UserProfileChangeEmail extends Vue {
   @ApplyGrowlErr({ message: 'Unable to change email', runningProp: 'running'})
   public async saveProfile() {
     await this.$api.changeEmailLogin(this.email, this.password);
-    this.store.growlSuccess('Email has been changed');
+    this.$store.growlSuccess('Email has been changed');
   }
 }
 </script>

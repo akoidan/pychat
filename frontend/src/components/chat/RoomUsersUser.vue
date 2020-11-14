@@ -13,14 +13,20 @@
   </li>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {RoomModel, UserModel} from '@/types/model';
+import { State } from '@/utils/storeHolder';
 import {
-  getFlagPath,
-} from '@/utils/htmlApi';
-import {FLAGS} from '@/utils/consts';
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import {
+  RoomModel,
+  UserModel
+} from '@/types/model';
+import { getFlagPath, } from '@/utils/htmlApi';
+import { FLAGS } from '@/utils/consts';
 import UserNameSex from '@/components/chat/UserNameSex.vue';
+
 @Component({
   components: {UserNameSex}
 })

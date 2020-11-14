@@ -1,6 +1,7 @@
-import {Logger, LoggerFactory, LogStrict} from 'lines-logger';
-import {XHR_API_URL} from '@/utils/consts';
+import { Logger } from 'lines-logger';
+import { XHR_API_URL } from '@/utils/consts';
 import loggerFactory from '@/utils/loggerFactory';
+
 declare var clients: any;
 
 const logger: Logger = loggerFactory.getLoggerColor('SW_S', '#a76f00');

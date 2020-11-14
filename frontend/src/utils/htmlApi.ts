@@ -1,12 +1,26 @@
 import Vue from 'vue';
-import {IS_DEBUG, MEDIA_API_URL, PASTED_IMG_CLASS} from '@/utils/consts';
-import {MessageDataEncode, UploadFile} from '@/types/types';
-import {FileModel, MessageModel, UserModel} from '@/types/model';
+import {
+  IS_DEBUG,
+  MEDIA_API_URL,
+  PASTED_IMG_CLASS
+} from '@/utils/consts';
+import {
+  MessageDataEncode,
+  UploadFile
+} from '@/types/types';
+import {
+  FileModel,
+  MessageModel
+} from '@/types/model';
 import recordIcon from '@/assets/img/audio.svg';
-import {getFlag} from '@/utils/flags';
-import {Smile, smileys, SmileysStructure} from '@/utils/smileys';
+import { getFlag } from '@/utils/flags';
+import {
+  Smile,
+  smileys,
+  SmileysStructure
+} from '@/utils/smileys';
 import loggerFactory from '@/utils/loggerFactory';
-import {Logger} from 'lines-logger';
+import { Logger } from 'lines-logger';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;

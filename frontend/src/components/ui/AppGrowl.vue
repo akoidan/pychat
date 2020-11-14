@@ -11,16 +11,19 @@
 </template>
 
 <script lang='ts'>
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {GrowlModel} from '@/types/model';
-import {getModule} from 'vuex-module-decorators';
-import {State} from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { GrowlModel } from '@/types/model';
+
 @Component
 export default class AppGrowl extends Vue {
   @Prop() public readonly growl!: GrowlModel;
 
   public close() {
-    this.store.removeGrowl(this.growl);
+    this.$store.removeGrowl(this.growl);
   }
 }
 </script>

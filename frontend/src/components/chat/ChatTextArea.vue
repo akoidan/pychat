@@ -33,36 +33,51 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref, Emit} from 'vue-property-decorator';
-  import {
-    encodeHTML,
-    encodeP,
-    getMessageData,
-    getSmileyHtml,
-    pasteBlobAudioToTextArea,
-    pasteBlobToContentEditable,
-    pasteBlobVideoToTextArea,
-    pasteHtmlAtCaret,
-    pasteImgToTextArea,
-    placeCaretAtEnd,
-    timeToString
-  } from '@/utils/htmlApi';
-  import {
-    CurrentUserInfoModel,
-    EditingMessage,
-    FileModel,
-    MessageModel, RoomModel,
-    UserDictModel
-  } from '@/types/model';
-  import {State} from '@/utils/storeHolder';
-  import {channelsHandler, messageBus, webrtcApi} from '@/utils/singletons';
-  import {MessageDataEncode, UploadFile} from '@/types/types';
-  import {sem} from '@/utils/pureFunctions';
-  import {getUniqueId} from '@/utils/pureFunctions';
-  import MediaRecorder from '@/components/chat/MediaRecorder.vue';
+import {
+  Component,
+  Ref,
+  Vue,
+  Watch
+} from 'vue-property-decorator';
+import {
+  encodeHTML,
+  encodeP,
+  getMessageData,
+  getSmileyHtml,
+  pasteBlobAudioToTextArea,
+  pasteBlobToContentEditable,
+  pasteBlobVideoToTextArea,
+  pasteHtmlAtCaret,
+  pasteImgToTextArea,
+  placeCaretAtEnd,
+  timeToString
+} from '@/utils/htmlApi';
+import {
+  CurrentUserInfoModel,
+  EditingMessage,
+  FileModel,
+  MessageModel,
+  RoomModel,
+  UserDictModel
+} from '@/types/model';
+import { State } from '@/utils/storeHolder';
+
+import {
+  MessageDataEncode,
+  UploadFile
+} from '@/types/types';
+import {
+  getUniqueId,
+  sem
+} from '@/utils/pureFunctions';
+import MediaRecorder from '@/components/chat/MediaRecorder.vue';
+import {
+  RawLocation,
+  Route
+} from "vue-router";
 
 
-  const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
+const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
 
   @Component({components: {MediaRecorder}})
   export default class ChatTextArea extends Vue {
@@ -96,19 +111,19 @@
 
 
     public created() {
-      messageBus.$on('drop-photo', this.onEmitDropPhoto);
-      messageBus.$on('add-smile', this.onEmitAddSmile);
-      messageBus.$on('delete-message', this.onEmitDeleteMessage);
-      messageBus.$on('quote', this.onEmitQuote);
-      messageBus.$on('blob', this.onEmitBlob);
+      this.$messageBus.$on('drop-photo', this.onEmitDropPhoto);
+      this.$messageBus.$on('add-smile', this.onEmitAddSmile);
+      this.$messageBus.$on('delete-message', this.onEmitDeleteMessage);
+      this.$messageBus.$on('quote', this.onEmitQuote);
+      this.$messageBus.$on('blob', this.onEmitBlob);
     }
 
     public destroyed() {
-      messageBus.$off('drop-photo', this.onEmitDropPhoto);
-      messageBus.$off('add-smile', this.onEmitAddSmile);
-      messageBus.$off('delete-message', this.onEmitDeleteMessage);
-      messageBus.$off('quote', this.onEmitQuote);
-      messageBus.$off('blob', this.onEmitBlob);
+      this.$messageBus.$off('drop-photo', this.onEmitDropPhoto);
+      this.$messageBus.$off('add-smile', this.onEmitAddSmile);
+      this.$messageBus.$off('delete-message', this.onEmitDeleteMessage);
+      this.$messageBus.$off('quote', this.onEmitQuote);
+      this.$messageBus.$off('blob', this.onEmitBlob);
     }
 
 
@@ -119,10 +134,10 @@
         const file = files[i];
         if (file.type.indexOf('image') >= 0) {
           pasteImgToTextArea(file, this.userMessage, (err: string) => {
-            this.store.growlError(err);
+            this.$store.growlError(err);
           });
         } else {
-          webrtcApi.offerFile(file, this.activeRoomId);
+          this.$webrtcApi.offerFile(file, this.activeRoomId);
         }
       }
     }
@@ -158,14 +173,14 @@
         if (event.keyCode === 13 && !event.shiftKey) {
           const md: MessageDataEncode = getMessageData(this.userMessage);
           if (md.files.length > 0 ) {
-            this.store.growlError("Sending files is only available in non p2p channel");
+            this.$store.growlError("Sending files is only available in non p2p channel");
             return;
           }
           if (!md.messageContent) {
             return;
           }
           const {id, now} = this.addMessageToStore(md);
-          webrtcApi.getMessageHandler(this.activeRoomId).sendP2pMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
+          this.$webrtcApi.getMessageHandler(this.activeRoomId).sendP2pMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
         }
         return;
       }
@@ -181,13 +196,13 @@
             return;
           }
           const {id, now} = this.addMessageToStore(md);
-          channelsHandler.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
+          this.$channelsHandler.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
         }
       } else if (event.keyCode === 27) { // 27 = escape
-        this.store.setShowSmileys(false);
+        this.$store.setShowSmileys(false);
         if (this.editedMessage) {
           this.userMessage.innerHTML = '';
-          this.store.setEditedMessage(null);
+          this.$store.setEditedMessage(null);
 
         }
       } else if (event.keyCode === 38 && this.userMessage.innerHTML == '') { // up arrow
@@ -199,7 +214,7 @@
               maxTime = messages[m];
             }
           }
-          sem(event, maxTime!, true, this.userInfo, this.store.setEditedMessage);
+          sem(event, maxTime!, true, this.userInfo, this.$store.setEditedMessage);
         }
       }
     }
@@ -224,7 +239,7 @@
           error: null
         }
       };
-      this.store.addMessage(mm);
+      this.$store.addMessage(mm);
       return {id, now}
     }
 
@@ -253,17 +268,17 @@
         files,
         userId: this.userInfo.userId
       };
-      this.store.addMessage(mm);
+      this.$store.addMessage(mm);
       if (messageId < 0 && messageContent) {
-        channelsHandler.sendSendMessage(messageContent, roomId, uploadFiles, messageId, this.editingMessageModel.time);
+        this.$channelsHandler.sendSendMessage(messageContent, roomId, uploadFiles, messageId, this.editingMessageModel.time);
       } else if (messageId > 0 && messageContent) {
-        channelsHandler.sendEditMessage(messageContent, roomId, messageId, uploadFiles);
+        this.$channelsHandler.sendEditMessage(messageContent, roomId, messageId, uploadFiles);
       } else if (!messageContent && messageId > 0) {
-        channelsHandler.sendDeleteMessage(messageId, -getUniqueId());
+        this.$channelsHandler.sendDeleteMessage(messageId, -getUniqueId());
       } else if (!messageContent && messageId < 0) {
-        channelsHandler.getMessageRetrier().removeSendingMessage(messageId);
+        this.$channelsHandler.getMessageRetrier().removeSendingMessage(messageId);
       }
-      this.store.setEditedMessage(null);
+      this.$store.setEditedMessage(null);
     }
 
 
@@ -292,7 +307,7 @@
       const files: FileList = (evt.target as HTMLInputElement).files!;
       for (let i = 0; i < files.length; i++) {
         pasteImgToTextArea(files[i], this.userMessage, (err: string) => {
-          this.store.growlError(err);
+          this.$store.growlError(err);
         });
       }
       this.imgInput.value = '';
@@ -307,7 +322,7 @@
           this.$logger.debug('loop {}', file)();
           if (file.type.indexOf('image') >= 0) {
             pasteImgToTextArea(file, this.userMessage, (err: string) => {
-              this.store.growlError(err);
+              this.$store.growlError(err);
             });
           }
         }
@@ -322,7 +337,7 @@
     }
 
     showSmileysChange() {
-      this.store.setShowSmileys(!this.showSmileys)
+      this.$store.setShowSmileys(!this.showSmileys)
     }
 
     public handleAddVideo(file: Blob) {
@@ -331,7 +346,7 @@
       this.$emit('pause-video');
       if (file) {
         pasteBlobVideoToTextArea(file, this.userMessage, 'm', (e: string) => {
-          this.store.growlError(e);
+          this.$store.growlError(e);
         });
       }
     }

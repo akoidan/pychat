@@ -17,11 +17,15 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-  import {ChannelUIModel, RoomModel} from '@/types/model';
-  import {State} from '@/utils/storeHolder';
-  import RoomUsersPublic from '@/components/chat/RoomUsersPublic.vue';
-  @Component({
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { ChannelUIModel } from '@/types/model';
+import RoomUsersPublic from '@/components/chat/RoomUsersPublic.vue';
+
+@Component({
     components: {RoomUsersPublic}
   })
   export default class ChannelLi extends Vue {
@@ -29,7 +33,7 @@
     @Prop() public channel!: ChannelUIModel;
 
     public expandChannel(id: number) {
-      this.store.expandChannel(id);
+      this.$store.expandChannel(id);
     }
   }
 </script>

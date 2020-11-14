@@ -1,20 +1,26 @@
 import {
   AcceptFileMessage,
-  DefaultMessage,
   DestroyFileConnectionMessage
 } from '@/types/messages';
 import {
   AddSendingFileTransfer,
+  HandlerType,
+  HandlerTypes,
   SetSendingFileStatus,
   SetSendingFileUploaded
 } from '@/types/types';
-import {FileTransferStatus} from '@/types/model';
+import { FileTransferStatus } from '@/types/model';
 import WsHandler from '@/utils/WsHandler';
-import {bytesToSize, getDay} from '@/utils/pureFunctions';
-import {READ_CHUNK_SIZE, SEND_CHUNK_SIZE} from '@/utils/consts';
+import {
+  bytesToSize,
+  getDay
+} from '@/utils/pureFunctions';
+import {
+  READ_CHUNK_SIZE,
+  SEND_CHUNK_SIZE
+} from '@/utils/consts';
 import FilePeerConnection from '@/webrtc/file/FilePeerConnection';
-import {DefaultStore} from '@/utils/store';
-import {HandlerType, HandlerTypes} from '@/types/types';
+import { DefaultStore } from '@/utils/store';
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
   protected connectedToRemote: boolean = true;

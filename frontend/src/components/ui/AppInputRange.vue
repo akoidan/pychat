@@ -8,8 +8,13 @@
   >
 </template>
 <script lang="ts">
-import {Component, Vue, Prop, Ref} from 'vue-property-decorator';
-import {getUniqueId} from '@/utils/pureFunctions';
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue
+} from 'vue-property-decorator';
+import { getUniqueId } from '@/utils/pureFunctions';
 
 @Component
 export default class AppInputRange extends Vue {

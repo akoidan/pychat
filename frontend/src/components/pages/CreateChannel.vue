@@ -27,13 +27,12 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-  import {AddChannelMessage, AddRoomMessage} from '@/types/messages';
-  import AppSubmit from '@/components/ui/AppSubmit.vue';
-  import {ALL_ROOM_ID} from '@/utils/consts';
-  import {ApplyGrowlErr} from '@/utils/storeHolder';
+import {Component, Vue} from 'vue-property-decorator';
+import AppSubmit from '@/components/ui/AppSubmit.vue';
+import {ALL_ROOM_ID} from '@/utils/consts';
+import {ApplyGrowlErr} from '@/utils/storeHolder';
 
-  @Component({components: {AppSubmit}})
+@Component({components: {AppSubmit}})
   export default class CreateChannel extends Vue {
     public channelName: string = '';
     public running: boolean = false;
@@ -45,7 +44,7 @@
         throw Error('Please specify a channel name');
       }
       let e = await this.$ws.sendAddChannel(this.channelName);
-      this.store.growlSuccess(`Channel '${this.channelName}' has been created`);
+      this.$store.growlSuccess(`Channel '${this.channelName}' has been created`);
       this.$router.replace(`/chat/${ALL_ROOM_ID}`);
     }
   }

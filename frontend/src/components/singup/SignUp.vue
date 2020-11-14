@@ -142,7 +142,7 @@ class="input" @focus="userFoc = false" @blur="userFoc = true"
     private form!: HTMLFormElement;
 
     created() {
-      this.store.setRegHeader('Create new account');
+      this.$store.setRegHeader('Create new account');
       this.debouncedValidateUserName = debounce(this.checkUserName, 500);
       this.debouncedValidateEmail = debounce(this.checkEmail, 500);
     }

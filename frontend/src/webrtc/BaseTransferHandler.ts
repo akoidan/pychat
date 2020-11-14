@@ -1,12 +1,12 @@
 import loggerFactory from '@/utils/loggerFactory';
-import {Logger} from 'lines-logger';
+import { Logger } from 'lines-logger';
 import WsHandler from '@/utils/WsHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
 import MessageHandler from '@/utils/MesageHandler';
-import {sub} from '@/utils/sub';
+import { sub } from '@/utils/sub';
 import Subscription from '@/utils/Subscription';
-import {RemovePeerConnection} from '@/types/types';
-import {DefaultStore} from '@/utils/store';
+import { RemovePeerConnection } from '@/types/types';
+import { DefaultStore } from '@/utils/store';
 
 export default abstract class BaseTransferHandler extends MessageHandler {
 

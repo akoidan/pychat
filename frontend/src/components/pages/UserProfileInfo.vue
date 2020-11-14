@@ -102,14 +102,13 @@
   </form>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import {ApplyGrowlErr, State} from '@/utils/storeHolder';
+import {Component, Vue} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
 import {CurrentUserInfoModel, SexModelString} from '@/types/model';
 import {UserProfileDto} from '@/types/dto';
-import {currentUserInfoModelToDto, userSettingsDtoToModel} from '@/types/converters';
+import {currentUserInfoModelToDto} from '@/types/converters';
 import AppInputDate from '@/components/ui/AppInputDate';
-import {ApplyGrowlErr} from '@/utils/storeHolder';
 import {SetUserProfileMessage} from '@/types/messages';
 
 @Component({
@@ -124,7 +123,7 @@ export default class UserProfileInfo extends Vue {
   private model!: UserProfileDto;
 
   public created() {
-    this.store.setActiveUserId(0);
+    this.$store.setActiveUserId(0);
     this.model = currentUserInfoModelToDto(this.userInfo);
   }
 
@@ -133,7 +132,7 @@ export default class UserProfileInfo extends Vue {
     this.$logger.debug('Saving userProfile')();
     const cui: UserProfileDto = {...this.model};
     const e: SetUserProfileMessage | unknown = await this.$ws.saveUser(cui);
-    this.store.growlSuccess('User profile has been saved');
+    this.$store.growlSuccess('User profile has been saved');
   }
 }
 </script>

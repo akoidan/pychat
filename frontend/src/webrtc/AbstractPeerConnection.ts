@@ -1,19 +1,22 @@
-import {Logger} from 'lines-logger';
+import { Logger } from 'lines-logger';
 import loggerFactory from '@/utils/loggerFactory';
 import WsHandler from '@/utils/WsHandler';
-import {bytesToSize} from '@/utils/pureFunctions';
+import { bytesToSize } from '@/utils/pureFunctions';
 
-import {sub} from '@/utils/sub';
+import { sub } from '@/utils/sub';
 import MessageHandler from '@/utils/MesageHandler';
 import Subscription from '@/utils/Subscription';
-import {ConnectionStatus, RemovePeerConnection} from '@/types/types';
-import {DefaultStore} from '@/utils/store';
+import {
+  ConnectionStatus,
+  RemovePeerConnection
+} from '@/types/types';
+import { DefaultStore } from '@/utils/store';
 import {
   ConnectToRemoteMessage,
   HandlerName,
   OnSendRtcDataMessage
 } from '@/types/messages';
-import {WEBRTC_STUNT_URL} from '@/utils/runtimeConsts';
+import { WEBRTC_STUNT_URL } from '@/utils/runtimeConsts';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean = false;

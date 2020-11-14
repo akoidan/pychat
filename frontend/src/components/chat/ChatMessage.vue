@@ -16,27 +16,32 @@
   </p>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
+import { State } from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue
+} from 'vue-property-decorator';
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
   EditingMessage,
-  MessageModel,
-  UserDictModel,
-  UserModel
+  MessageModel
 } from '@/types/model';
 import {
   encodeHTML,
   encodeMessage,
-  highlightCode, setAudioEvent,
+  highlightCode,
+  setAudioEvent,
   setImageFailEvents,
   setVideoEvent,
-  setYoutubeEvent, timeToString
+  setYoutubeEvent
 } from '@/utils/htmlApi';
-import {sem} from '@/utils/pureFunctions';
-import {messageBus} from '@/utils/singletons';
+import { sem } from '@/utils/pureFunctions';
+
 import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
+
 @Component({
   components: {ChatMessageHeader}
 })
@@ -73,11 +78,11 @@ export default class ChatMessage extends Vue {
   public content!: HTMLElement;
 
   public quote() {
-    messageBus.$emit('quote', this.message);
+    this.$messageBus.$emit('quote', this.message);
   }
 
   public contextmenu(event: Event) {
-    sem(event, this.message, false, this.userInfo, this.store.setEditedMessage);
+    sem(event, this.message, false, this.userInfo, this.$store.setEditedMessage);
   }
 
   public updated() {
@@ -107,7 +112,7 @@ export default class ChatMessage extends Vue {
       setYoutubeEvent(this.content);
     }
     setVideoEvent(this.content);
-    setImageFailEvents(this.content, messageBus);
+    setImageFailEvents(this.content, this.$messageBus);
     setAudioEvent(this.content);
   }
 

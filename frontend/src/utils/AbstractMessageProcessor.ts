@@ -5,10 +5,10 @@ import {
 } from '@/types/messages';
 import { Logger } from 'lines-logger';
 import loggerFactory from '@/utils/loggerFactory';
-import {MessageSupplier} from '@/types/types';
-import type {DefaultStore} from '@/utils/store';
-import {getUniqueId} from '@/utils/pureFunctions';
-import {sub} from '@/utils/sub';
+import { MessageSupplier } from '@/types/types';
+import type { DefaultStore } from '@/utils/store';
+import { getUniqueId } from '@/utils/pureFunctions';
+import { sub } from '@/utils/sub';
 
 export default class AbstractMessageProcessor {
 

@@ -1,7 +1,10 @@
 import loggerFactory from '@/utils/loggerFactory';
-import {Logger} from 'lines-logger';
-import {stopVideo} from '@/utils/htmlApi';
-import {permissions_type, PlatformUtil} from '@/types/model';
+import { Logger } from 'lines-logger';
+import { stopVideo } from '@/utils/htmlApi';
+import {
+  permissions_type,
+  PlatformUtil
+} from '@/types/model';
 
 export default class MediaCapture {
   private readonly isRecordingVideo: boolean;

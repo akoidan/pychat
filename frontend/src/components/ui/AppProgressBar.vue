@@ -12,9 +12,13 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {bytesToSize} from '@/utils/pureFunctions';
-import {UploadProgressModel} from '@/types/model';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { bytesToSize } from '@/utils/pureFunctions';
+import { UploadProgressModel } from '@/types/model';
 
 @Component
 export default class AppProgressBar extends Vue {

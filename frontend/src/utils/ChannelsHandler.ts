@@ -2,21 +2,28 @@ import loggerFactory from '@/utils/loggerFactory';
 import Api from '@/utils/api';
 import Vue from 'vue';
 import MessageHandler from '@/utils/MesageHandler';
-import {HandlerType, HandlerTypes, MessageRetrierProxy} from '@/types/types'
-import {AudioPlayer, incoming, login, logout, outgoing} from '@/utils/audio';
-import faviconUrl from '@/assets/img/favicon.ico';
-
 import {
-  RoomLogEntry,
+  HandlerType,
+  HandlerTypes,
+  MessageRetrierProxy,
   PubSetRooms,
   RemoveMessageProgress,
   RemoveSendingMessage,
+  RoomLogEntry,
   SetMessageProgress,
   SetMessageProgressError,
   SetRoomsUsers,
   SetUploadProgress,
   UploadFile
-} from '@/types/types';
+} from '@/types/types'
+import {
+  AudioPlayer,
+  incoming,
+  login,
+  logout,
+  outgoing
+} from '@/utils/audio';
+import faviconUrl from '@/assets/img/favicon.ico';
 import {
   ChannelModel,
   ChannelsDictModel,
@@ -28,21 +35,21 @@ import {
   UserDictModel,
   UserModel
 } from '@/types/model';
-import {Logger} from 'lines-logger';
+import { Logger } from 'lines-logger';
 import {
   AddChannelMessage,
   AddInviteMessage,
   AddOnlineUserMessage,
   AddRoomBase,
   AddRoomMessage,
-  DefaultMessage,
   DeleteChannel,
   DeleteMessage,
   DeleteRoomMessage,
   EditMessage,
   InviteUserMessage,
   LeaveUserMessage,
-  LoadMessages, LogoutMessage,
+  LoadMessages,
+  LogoutMessage,
   RemoveOnlineUserMessage,
   SaveChannelSettings,
   SaveRoomSettings
@@ -52,21 +59,20 @@ import {
   FileModelDto,
   MessageModelDto,
   RoomDto,
-  SetStateFromWS,
-  UserDto
+  SetStateFromWS
 } from '@/types/dto';
 import {
   convertFiles,
   convertUser,
-  getChannelDict, getRoom,
+  getChannelDict,
+  getRoom,
   getRoomsBaseDict
 } from '@/types/converters';
 import WsHandler from '@/utils/WsHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
-import {sub} from '@/utils/sub';
-import {DefaultStore} from '@/utils/store';
+import { sub } from '@/utils/sub';
+import { DefaultStore } from '@/utils/store';
 import MessageRetrier from "@/utils/MessageRetrier";
-import router from "@/utils/router";
 
 export default class ChannelsHandler extends MessageHandler implements MessageRetrierProxy {
   protected readonly logger: Logger;

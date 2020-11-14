@@ -1,6 +1,9 @@
 import loggerFactory from '@/utils/loggerFactory';
-import {PostData, SessionHolder} from '@/types/types';
-import {Logger} from 'lines-logger';
+import {
+  PostData,
+  SessionHolder
+} from '@/types/types';
+import { Logger } from 'lines-logger';
 
 export default abstract class Http {
 

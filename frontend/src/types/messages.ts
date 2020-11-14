@@ -1,13 +1,12 @@
 import {
   ChannelDto,
-  FileModelDto,
   MessageModelDto,
   RoomDto,
   RoomNoUsersDto,
-  SexModelDto,
   UserDto,
   UserProfileDto,
-  UserSettingsDto, WebRtcMessageModelDto
+  UserSettingsDto,
+  WebRtcMessageModelDto
 } from '@/types/dto';
 
 export interface DefaultSentMessage {

@@ -26,14 +26,15 @@ import {
 import {
   AddSendingFileTransfer,
   BooleanIdentifier,
-  RoomLogEntry,
   IStorage,
+  MarkMessageAsRead,
   MediaIdentifier,
   MessagesLocation,
   NumberIdentifier,
   PrivateRoomsIds,
   RemoveMessageProgress,
   RemoveSendingMessage,
+  RoomLogEntry,
   SetCallOpponent,
   SetDevices,
   SetMessageProgress,
@@ -47,13 +48,20 @@ import {
   SetSendingFileStatus,
   SetSendingFileUploaded,
   SetUploadProgress,
-  StringIdentifier,
-  MarkMessageAsRead
+  StringIdentifier
 } from '@/types/types';
-import {SetStateFromStorage, SetStateFromWS} from '@/types/dto';
-import {encodeHTML} from '@/utils/htmlApi';
-import {ALL_ROOM_ID} from '@/utils/consts';
-import {Action, Module, Mutation, VuexModule} from 'vuex-module-decorators';
+import {
+  SetStateFromStorage,
+  SetStateFromWS
+} from '@/types/dto';
+import { encodeHTML } from '@/utils/htmlApi';
+import { ALL_ROOM_ID } from '@/utils/consts';
+import {
+  Action,
+  Module,
+  Mutation,
+  VuexModule
+} from 'vuex-module-decorators';
 
 const logger = loggerFactory.getLoggerColor('store', '#6a6400');
 

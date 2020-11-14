@@ -57,26 +57,33 @@
 </template>
 <script lang="ts">
 
-  import {Component, Prop, Vue, Ref} from "vue-property-decorator";
-  import {State} from '@/utils/storeHolder';
-  import ChatMessage from "@/components/chat/ChatMessage";
-  import SearchMessages from "@/components/chat/SearchMessages";
-  import {ReceivingFile, RoomModel, SearchModel, SendingFile} from "@/types/model";
-  import {MessageModelDto} from "@/types/dto";
-  import {channelsHandler, messageBus} from "@/utils/singletons";
-  import {SetSearchTo} from "@/types/types";
-  import {MESSAGES_PER_SEARCH} from "@/utils/consts";
-  import AppProgressBar from "@/components/ui/AppProgressBar";
-  import ChatSendingMessage from "@/components/chat/ChatSendingMessage";
-  import ChatUserActionMessage from "@/components/chat/ChatUserActionMessage";
-  import ChatSendingFile from "@/components/chat/ChatSendingFile";
-  import ChatReceivingFile from '@/components/chat/ChatReceivingFile';
-  import ChatCall from '@/components/chat/ChatCall';
-  import {ApplyGrowlErr} from '@/utils/storeHolder';
-  import ChatChangeNameMessage
-    from '@/components/chat/ChatChangeNameMessage.vue';
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue
+} from "vue-property-decorator";
+import { ApplyGrowlErr } from '@/utils/storeHolder';
+import ChatMessage from "@/components/chat/ChatMessage";
+import SearchMessages from "@/components/chat/SearchMessages";
+import {
+  ReceivingFile,
+  RoomModel,
+  SearchModel,
+  SendingFile
+} from "@/types/model";
+import { MessageModelDto } from "@/types/dto";
 
-  @Component({
+import { MESSAGES_PER_SEARCH } from "@/utils/consts";
+import AppProgressBar from "@/components/ui/AppProgressBar";
+import ChatSendingMessage from "@/components/chat/ChatSendingMessage";
+import ChatUserActionMessage from "@/components/chat/ChatUserActionMessage";
+import ChatSendingFile from "@/components/chat/ChatSendingFile";
+import ChatReceivingFile from '@/components/chat/ChatReceivingFile';
+import ChatCall from '@/components/chat/ChatCall';
+import ChatChangeNameMessage from '@/components/chat/ChatChangeNameMessage.vue';
+
+@Component({
     components: {
       ChatChangeNameMessage,
       ChatCall,
@@ -118,11 +125,11 @@
     }
 
     created() {
-      messageBus.$on('scroll',this.onEmitScroll);
+      this.$messageBus.$on('scroll',this.onEmitScroll);
     }
 
     destroyed() {
-      messageBus.$off('scroll',this.onEmitScroll);
+      this.$messageBus.$off('scroll',this.onEmitScroll);
     }
 
     get id() {
@@ -167,7 +174,7 @@
         this.loadUpHistory(35);
       } else if (e.shiftKey && e.ctrlKey && e.keyCode === 70) {
         let s = this.room.search;
-        this.store.setSearchTo({
+        this.$store.setSearchTo({
           roomId: this.room.id,
           search: {
             searchActive: !s.searchActive,
@@ -180,7 +187,7 @@
     };
 
     get minIdCalc(): number|undefined {
-      return this.store.minId(this.room.id);
+      return this.$store.minId(this.room.id);
     }
 
     @ApplyGrowlErr({runningProp: 'loading', message: 'Unable to load history'})
@@ -192,9 +199,9 @@
       if (s.searchActive && !s.locked) {
         let a: MessageModelDto[] = await this.$api.search(s.searchText, this.room.id, s.searchedIds.length);
         if (a.length) {
-          channelsHandler.addMessages(this.room.id, a);
+          this.$channelsHandler.addMessages(this.room.id, a);
           let searchedIds = this.room.search.searchedIds.concat(a.map(a => a.id));
-          this.store.setSearchTo({
+          this.$store.setSearchTo({
             roomId: this.room.id,
             search: {
               searchActive: s.searchActive,
@@ -204,7 +211,7 @@
             } as SearchModel
           });
         } else {
-          this.store.setSearchTo({
+          this.$store.setSearchTo({
             roomId: this.room.id,
             search: {
               searchActive: s.searchActive,

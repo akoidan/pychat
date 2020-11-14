@@ -1,28 +1,34 @@
 import loggerFactory from '@/utils/loggerFactory';
-import {Logger} from 'lines-logger';
-import {VideoType, HandlerType, HandlerTypes} from '@/types/types';
+import { Logger } from 'lines-logger';
 import {
-  DefaultMessage, LogoutMessage,
+  HandlerType,
+  HandlerTypes,
+  VideoType
+} from '@/types/types';
+import {
+  LogoutMessage,
   OfferCall,
-  OfferFile,
-  WebRtcSetConnectionIdMessage
+  OfferFile
 } from '@/types/messages';
 import WsHandler from '@/utils/WsHandler';
-import {FileTransferStatus, ReceivingFile} from '@/types/model';
+import {
+  FileTransferStatus,
+  ReceivingFile
+} from '@/types/model';
 import FileHandler from '@/webrtc/file/FileHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
 import MessageHandler from '@/utils/MesageHandler';
-import {sub} from '@/utils/sub';
-import {MAX_ACCEPT_FILE_SIZE_WO_FS_API} from '@/utils/consts';
-import {requestFileSystem} from '@/utils/htmlApi';
+import { sub } from '@/utils/sub';
+import { MAX_ACCEPT_FILE_SIZE_WO_FS_API } from '@/utils/consts';
+import { requestFileSystem } from '@/utils/htmlApi';
 import FileReceiverPeerConnection from '@/webrtc/file/FileReceiveerPeerConnection';
 import Subscription from '@/utils/Subscription';
 import CallHandler from '@/webrtc/call/CallHandler';
 import faviconUrl from '@/assets/img/favicon.ico';
-import {DefaultStore} from '@/utils/store';
-import {browserVersion} from '@/utils/runtimeConsts';
+import { DefaultStore } from '@/utils/store';
+import { browserVersion } from '@/utils/runtimeConsts';
 import MessageTransferHandler from '@/webrtc/message/MessageTransferHandler';
-import {bytesToSize} from "@/utils/pureFunctions";
+import { bytesToSize } from "@/utils/pureFunctions";
 
 export default class WebRtcApi extends MessageHandler {
 

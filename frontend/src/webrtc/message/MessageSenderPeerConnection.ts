@@ -1,4 +1,3 @@
-import {HandlerType, HandlerTypes} from '@/types/types';
 import MessagePeerConnection from '@/webrtc/message/MessagePeerConnection';
 
 export default class MessageSenderPeerConnection extends MessagePeerConnection {

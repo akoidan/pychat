@@ -1,8 +1,10 @@
-import {Logger} from "lines-logger";
+import { Logger } from "lines-logger";
 import loggerFactory from "@/utils/loggerFactory";
-import id = chrome.runtime.id;
 import MessageHandler from "@/utils/MesageHandler";
-import {HandlerType, HandlerTypes} from "@/types/types";
+import {
+  HandlerType,
+  HandlerTypes
+} from "@/types/types";
 
 export default class MessageRetrier extends MessageHandler {
   protected handlers: HandlerTypes = {

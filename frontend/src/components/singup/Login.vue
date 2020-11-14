@@ -63,7 +63,7 @@ export default class Login extends Vue {
   public running: boolean = false;
 
   public created() {
-    this.store.setRegHeader('Welcome back!');
+    this.$store.setRegHeader('Welcome back!');
   }
 
   @ApplyGrowlErr({runningProp: 'running', message: `Can't log in`})

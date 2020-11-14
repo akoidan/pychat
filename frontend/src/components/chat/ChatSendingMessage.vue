@@ -16,17 +16,22 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import { State } from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
 import ChatMessage from '@/components/chat/ChatMessage';
 import AppProgressBar from '@/components/ui/AppProgressBar';
-import {channelsHandler} from '@/utils/singletons';
-import {SetMessageProgressError} from '@/types/types';
+
+import { SetMessageProgressError } from '@/types/types';
 import {
   CurrentUserInfoModel,
   MessageModel,
   RoomDictModel
 } from '@/types/model';
+
 @Component({
   components: {AppProgressBar, ChatMessage}
 })
@@ -52,7 +57,7 @@ export default class ChatSendingMessage extends Vue {
 
   removeUnread() {
     if (this.message.isHighlighted) {
-      this.store.markMessageAsRead({messageId: this.message.id, roomId: this.message.roomId})
+      this.$store.markMessageAsRead({messageId: this.message.id, roomId: this.message.roomId})
     }
   }
 
@@ -78,9 +83,9 @@ export default class ChatSendingMessage extends Vue {
       roomId: this.message.roomId,
       error: null
     };
-    this.store.setMessageProgressError(newVar);
-    channelsHandler.getMessageRetrier().resendMessage(this.message.id);
-    this.store.growlInfo('Trying to upload files again');
+    this.$store.setMessageProgressError(newVar);
+    this.$channelsHandler.getMessageRetrier().resendMessage(this.message.id);
+    this.$store.growlInfo('Trying to upload files again');
   }
 }
 </script>

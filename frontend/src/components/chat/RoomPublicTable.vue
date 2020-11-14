@@ -27,12 +27,19 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-  import ChannelLi from '@/components/chat/ChannelLi.vue';
-  import RoomUsersPublic from '@/components/chat/RoomUsersPublic.vue';
-  import {State} from '@/utils/storeHolder';
-  import {ChannelUIModel, RoomModel} from '@/types/model';
-  @Component({
+import {
+  Component,
+  Vue
+} from 'vue-property-decorator';
+import ChannelLi from '@/components/chat/ChannelLi.vue';
+import RoomUsersPublic from '@/components/chat/RoomUsersPublic.vue';
+import { State } from '@/utils/storeHolder';
+import {
+  ChannelUIModel,
+  RoomModel
+} from '@/types/model';
+
+@Component({
     components: {RoomUsersPublic, ChannelLi}
   })
   export default class RoomPublicTable extends Vue {

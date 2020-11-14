@@ -1,12 +1,21 @@
-import {CONNECTION_ERROR, RESPONSE_SUCCESS} from '@/utils/consts';
-import {UploadFile, HandlerTypes} from '@/types/types';
-import {MessageModelDto} from '@/types/dto';
-import {DefaultMessage, ViewUserProfileDto} from '@/types/messages';
+import {
+  CONNECTION_ERROR,
+  RESPONSE_SUCCESS
+} from '@/utils/consts';
+import {
+  HandlerTypes,
+  UploadFile
+} from '@/types/types';
+import { MessageModelDto } from '@/types/dto';
+import {
+  DefaultMessage,
+  ViewUserProfileDto
+} from '@/types/messages';
 import MessageHandler from '@/utils/MesageHandler';
 import loggerFactory from '@/utils/loggerFactory';
-import {Logger} from 'lines-logger';
+import { Logger } from 'lines-logger';
 import Http from '@/utils/Http';
-import {sub} from '@/utils/sub';
+import { sub } from '@/utils/sub';
 
 export default class Api extends MessageHandler {
   protected readonly handlers: HandlerTypes = {

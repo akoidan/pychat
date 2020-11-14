@@ -6,7 +6,7 @@ import ChatOutgoing from '@/assets/sounds/ChatOutgoing.wav';
 import ChatFile from '@/assets/sounds/File.mp3';
 import NotifierHandler from "@/utils/NotificationHandler";
 import loggerFactory from "@/utils/loggerFactory";
-import {Logger} from "lines-logger";
+import { Logger } from "lines-logger";
 
 export const call = new Audio(<any>ChatCall);
 export const incoming = new Audio(<any>ChatIncoming);

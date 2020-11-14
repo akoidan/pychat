@@ -22,11 +22,15 @@
   </div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-  import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate.vue';
-  import {State} from '@/utils/storeHolder';
-  import {RoomModel} from '@/types/model';
-  @Component({
+import {
+  Component,
+  Vue
+} from 'vue-property-decorator';
+import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate.vue';
+import { State } from '@/utils/storeHolder';
+import { RoomModel } from '@/types/model';
+
+@Component({
     components: {RoomUsersPrivate}
   })
   export default class RoomDirectUsersTable extends Vue {

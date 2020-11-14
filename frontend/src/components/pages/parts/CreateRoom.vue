@@ -67,21 +67,21 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import {
+  ApplyGrowlErr,
+  State
+} from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
 import AppInputRange from '@/components/ui/AppInputRange';
 import AppSubmit from '@/components/ui/AppSubmit';
 import PickUser from '@/components/pages/parts/PickUser';
-import {
-  ChannelUIModel,
-  CurrentUserInfoModel,
-  RoomModel,
-  UserModel
-} from '@/types/model';
-import {AddRoomMessage} from '@/types/messages';
+import { CurrentUserInfoModel } from '@/types/model';
 import AppCheckbox from '@/components/ui/AppCheckbox';
-import {PrivateRoomsIds} from '@/types/types';
-import {ApplyGrowlErr} from '@/utils/storeHolder';
+import { PrivateRoomsIds } from '@/types/types';
 import ParentChannel from '@/components/pages/parts/ParentChannel.vue';
 
 @Component({components: {
@@ -124,7 +124,7 @@ export default class CreateRoom extends Vue {
     uids.push(this.userInfo.userId);
 
     const users: number[] = [];
-    this.store.usersArray.forEach(a => {
+    this.$store.usersArray.forEach(a => {
       if (uids.indexOf(a.id) < 0) {
         users.push(a.id);
       }

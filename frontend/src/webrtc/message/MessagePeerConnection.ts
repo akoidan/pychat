@@ -1,13 +1,19 @@
 import AbstractPeerConnection from '@/webrtc/AbstractPeerConnection';
-import {AppendQueue, DefaultMessage} from '@/types/messages';
+import {
+  AppendQueue,
+  DefaultMessage
+} from '@/types/messages';
 import WsHandler from '@/utils/WsHandler';
-import {DefaultStore} from '@/utils/store';
-import {sub} from '@/utils/sub';
-import {MessageSupplier, RemovePeerConnection} from '@/types/types';
+import { DefaultStore } from '@/utils/store';
+import { sub } from '@/utils/sub';
+import {
+  HandlerType,
+  HandlerTypes,
+  MessageSupplier
+} from '@/types/types';
 import AbstractMessageProcessor from '@/utils/AbstractMessageProcessor';
-import {SecurityValidator} from '@/webrtc/message/SecurityValidator';
+import { SecurityValidator } from '@/webrtc/message/SecurityValidator';
 import Subscription from '@/utils/Subscription';
-import {HandlerType, HandlerTypes} from '@/types/types';
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
 

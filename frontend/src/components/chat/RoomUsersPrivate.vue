@@ -7,12 +7,21 @@
   </li>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
-import {PrivateRoomsIds} from '@/types/types';
+import { State } from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import {
+  CurrentUserInfoModel,
+  RoomModel,
+  UserModel
+} from '@/types/model';
+import { PrivateRoomsIds } from '@/types/types';
 import RoomRightIcon from '@/components/chat/RoomRightIcon.vue';
 import UserNameSex from '@/components/chat/UserNameSex.vue';
+
 @Component({
   components: {UserNameSex, RoomRightIcon}
 })

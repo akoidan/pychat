@@ -8,11 +8,15 @@
   </span>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {messageBus} from '@/utils/singletons';
-import {UserDictModel} from '@/types/model';
-import {timeToString} from '@/utils/htmlApi';
+import { State } from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { UserDictModel } from '@/types/model';
+import { timeToString } from "@/utils/htmlApi";
+
 
 @Component
 export default class ChatMessageHeader extends Vue {
@@ -24,7 +28,7 @@ export default class ChatMessageHeader extends Vue {
   public readonly allUsersDict!: UserDictModel;
 
   public setActiveUser() {
-    this.store.setActiveUserId(this.userId);
+    this.$store.setActiveUserId(this.userId);
   }
 
   get username() {

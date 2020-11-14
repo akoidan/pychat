@@ -2,11 +2,14 @@
   <div><i :class="userSexClass" />{{ user.user }}</div>
 </template>
 <script lang="ts">
-  import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
-  import {UserModel} from '@/types/model';
-  import {State} from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { UserModel } from '@/types/model';
 
-  @Component
+@Component
   export default class UserNameSex extends Vue {
 
     @Prop()

@@ -13,11 +13,11 @@
 <!--TODO m2TransferFile undefied-->
       <i
         class="icon-phone-circled"
-        onclick="channelsHandler.m2Call()"
+        onclick="this.$channelsHandler.m2Call()"
       ><span class="mText">Call</span></i>
       <i
         class="icon-doc-inv"
-        onclick="channelsHandler.m2TransferFile()"
+        onclick="this.$channelsHandler.m2TransferFile()"
       ><span class="mText">Transfer file</span></i>
     </template>
     <template v-else>
@@ -39,12 +39,18 @@
   </nav>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
-import {UserModel} from '@/types/model';
-import {PrivateRoomsIds} from '@/types/types';
-import {AddRoomMessage} from '@/types/messages';
-import {ApplyGrowlErr} from '@/utils/storeHolder';
+import {
+  ApplyGrowlErr,
+  State
+} from '@/utils/storeHolder';
+import {
+  Component,
+  Prop,
+  Vue
+} from 'vue-property-decorator';
+import { UserModel } from '@/types/model';
+import { PrivateRoomsIds } from '@/types/types';
+
 @Component
 export default class NavUserShow extends Vue {
 
@@ -64,11 +70,11 @@ export default class NavUserShow extends Vue {
   public async writeMessage() {
     let e = await this.$ws.sendAddRoom(null, false,50, true, [this.activeUser.id], null);
     this.$router.replace(`/chat/${e.roomId}`);
-    this.store.setActiveUserId(0);
+    this.$store.setActiveUserId(0);
   }
 
   public closeActiveUser() {
-    this.store.setActiveUserId(0);
+    this.$store.setActiveUserId(0);
   }
 
 }

@@ -1,8 +1,8 @@
-import {JsAudioAnalyzer} from '@/types/types';
-import {extractError} from '@/utils/pureFunctions';
-import {IS_DEBUG} from '@/utils/consts';
-import {isMobile} from '@/utils/runtimeConsts';
-import {Logger} from "lines-logger";
+import { JsAudioAnalyzer } from '@/types/types';
+import { extractError } from '@/utils/pureFunctions';
+import { IS_DEBUG } from '@/utils/consts';
+import { isMobile } from '@/utils/runtimeConsts';
+import { Logger } from "lines-logger";
 import loggerFactory from "@/utils/loggerFactory";
 
 let audioContext: AudioContext;

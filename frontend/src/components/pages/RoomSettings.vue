@@ -102,18 +102,12 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue} from 'vue-property-decorator';
+import {ApplyGrowlErr, State} from '@/utils/storeHolder';
+import {Component, Vue} from 'vue-property-decorator';
 import AppInputRange from '@/components/ui/AppInputRange';
 import AppSubmit from '@/components/ui/AppSubmit';
 import AppCheckbox from '@/components/ui/AppCheckbox';
-import {
-  CurrentUserInfoModel,
-  RoomDictModel,
-  RoomModel,
-  UserDictModel, UserModel
-} from '@/types/model';
-import {ApplyGrowlErr} from '@/utils/storeHolder';
+import {CurrentUserInfoModel, RoomDictModel, RoomModel, UserDictModel, UserModel} from '@/types/model';
 import {ALL_ROOM_ID} from '@/utils/consts';
 import ParentChannel from '@/components/pages/parts/ParentChannel.vue';
 import PickUser from '@/components/pages/parts/PickUser.vue';
@@ -212,7 +206,7 @@ export default class RoomSettings extends Vue {
       p2p: this.p2p,
       channelId: this.channelId
     });
-    this.store.growlSuccess('Settings has been saved');
+    this.$store.growlSuccess('Settings has been saved');
     this.$router.replace(`/chat/${this.roomId}`);
   }
 

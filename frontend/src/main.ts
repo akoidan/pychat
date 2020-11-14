@@ -1,29 +1,50 @@
 import '@/utils/classComponentHooks.ts';
 import '@/assets/sass/common.sass';
-import {
-  api,
-  channelsHandler,
-  storage,
-  webrtcApi,
-  ws,
-  xhr
-} from '@/utils/singletons';
-import router from '@/utils/router';
 import * as constants from '@/utils/consts';
-import {GIT_HASH, IS_ANDROID, IS_DEBUG} from '@/utils/consts';
+import {
+  GIT_HASH,
+  IS_ANDROID,
+  IS_DEBUG,
+  WS_API_URL
+} from '@/utils/consts';
 import App from '@/components/App.vue'; // should be after initStore
-import {sub} from '@/utils/sub';
-import Vue, {ComponentOptions} from 'vue';
-import {store} from '@/utils/storeHolder';
-import {browserVersion, isMobile} from '@/utils/runtimeConsts';
-import {Logger} from "lines-logger";
+import { sub } from '@/utils/sub';
+import Vue, { ComponentOptions } from 'vue';
+import { store } from '@/utils/storeHolder';
+import {
+  browserVersion,
+  isChrome,
+  isMobile
+} from '@/utils/runtimeConsts';
+import { Logger } from "lines-logger";
 import loggerFactory from "@/utils/loggerFactory";
-import {StorageData} from "@/types/types";
+import {
+  IStorage,
+  StorageData
+} from "@/types/types";
 import sessionHolder from "@/utils/sessionHolder";
-import {MessageModel, RoomModel} from "@/types/model";
-import {getUniqueId} from "@/utils/pureFunctions";
-import {VNode} from "vue/types/vnode";
-
+import {
+  MessageModel,
+  PlatformUtil,
+  RoomModel
+} from "@/types/model";
+import { getUniqueId } from "@/utils/pureFunctions";
+import { VNode } from "vue/types/vnode";
+import Xhr from '@/utils/Xhr';
+import WsHandler from '@/utils/WsHandler';
+import ChannelsHandler from '@/utils/ChannelsHandler';
+import DatabaseWrapper from '@/utils/DatabaseWrapper';
+import LocalStorage from '@/utils/LocalStorage';
+import Api from '@/utils/api';
+import NotifierHandler from '@/utils/NotificationHandler';
+import Http from '@/utils/Http';
+import WebRtcApi from '@/webrtc/WebRtcApi';
+import {
+  AndroidPlatformUtil,
+  NullPlatformUtil
+} from '@/utils/nativeUtils';
+import { AudioPlayer } from "@/utils/audio";
+import router from '@/utils/router';
 
 function declareDirectives() {
   Vue.directive('validity', function (el: HTMLElement, binding) {
@@ -121,7 +142,7 @@ function declareMixins() {
 }
 
 
-async function initStore(logger: Logger) {
+async function initStore(logger: Logger, storage: IStorage, channelsHandler: ChannelsHandler) {
   store.setStorage(storage); // TODO mvoe to main
   const isNew = await storage.connect();
   if (!isNew) {
@@ -165,11 +186,32 @@ async function initStore(logger: Logger) {
 function init() {
   declareMixins();
   declareDirectives();
+
+  const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
+  const api: Api = new Api(xhr);
+  const messageBus = new Vue();
+  const storage: IStorage = window.openDatabase! ? new DatabaseWrapper('v132') : new LocalStorage();
+  const WS_URL = WS_API_URL.replace('{}', window.location.host);
+  const ws: WsHandler = new WsHandler(WS_URL, sessionHolder, store);
+  const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
+  const audioPlayer: AudioPlayer = new AudioPlayer(notifier);
+  const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier, messageBus, audioPlayer);
+  const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier);
+  const platformUtil: PlatformUtil = IS_ANDROID ? new AndroidPlatformUtil() : new NullPlatformUtil();
+
   Vue.prototype.$api = api;
   Vue.prototype.$ws = ws;
+  Vue.prototype.$store = store;
+  Vue.prototype.$messageBus = messageBus;
+  Vue.prototype.$notifier = notifier;
+  Vue.prototype.$channelsHandler = channelsHandler;
+  Vue.prototype.$webrtcApi = webrtcApi;
+  Vue.prototype.$platformUtil = platformUtil;
+
   const logger: Logger = loggerFactory.getLoggerColor('main', '#007a70');
   document.body.addEventListener('drop', e => e.preventDefault());
   document.body.addEventListener('dragover', e => e.preventDefault());
+  debugger
   const vue: Vue = new Vue({router, render: (h: Function): typeof Vue.prototype.$createElement => h(App)});
   vue.$mount('#app');
 
@@ -182,7 +224,6 @@ function init() {
 
     return false;
   };
-
 
   window.GIT_VERSION = GIT_HASH;
   if (IS_DEBUG) {
@@ -198,7 +239,7 @@ function init() {
     logger.log('Constants {}', constants)();
   }
 
-  initStore(logger).then(value => {
+  initStore(logger, storage, channelsHandler).then(value => {
     logger.debug('Exiting from initing store')();
   }).catch(e => {
     logger.error('Unable to init store from db, because of', e)();

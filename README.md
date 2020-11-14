@@ -461,6 +461,7 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* remove builder.js cause it leaves daemons on process exit. use vue-webpack-typescript structure
 * when we store blobs, we should use URL.revokeObjectURL(this.src); (it's usually when we do URL.createObjectURL)
 * if users joins a room that already has call in progress, he should be able to join this call
 * create npm package for fontello instead of download_content.sh . move config with files location to package.json or fontello.json https://stackoverflow.com/questions/46725374/how-to-run-a-script-before-installing-any-npm-module

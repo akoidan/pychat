@@ -6,8 +6,13 @@
 </template>
 
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
-import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
+import {
+  Component,
+  Prop,
+  Ref,
+  Vue,
+  Watch
+} from 'vue-property-decorator';
 
 @Component
 export default class VideoObject extends Vue {
@@ -19,7 +24,7 @@ export default class VideoObject extends Vue {
 
   @Watch('mediaStreamLink')
   public onMediaStreamChanged(newValue: string) {
-    const stream: MediaStream = this.store.mediaObjects[newValue];
+    const stream: MediaStream = this.$store.mediaObjects[newValue];
     this.$logger.log('Media stream changed {} {}', newValue, stream)();
     if (stream) {
       this.video.srcObject = stream;

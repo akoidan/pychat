@@ -1,11 +1,14 @@
 import loggerFactory from '@/utils/loggerFactory';
-import {Logger} from 'lines-logger';
-import {extractError} from '@/utils/pureFunctions';
+import { Logger } from 'lines-logger';
+import { extractError } from '@/utils/pureFunctions';
 import Api from '@/utils/api';
 import WsHandler from '@/utils/WsHandler';
-import {DefaultStore} from '@/utils/store';
-import {IS_DEBUG, MANIFEST, SERVICE_WORKER_URL} from '@/utils/consts';
-import {forEach} from '@/utils/htmlApi';
+import { DefaultStore } from '@/utils/store';
+import {
+  IS_DEBUG,
+  MANIFEST,
+  SERVICE_WORKER_URL
+} from '@/utils/consts';
 
 const LAST_TAB_ID_VARNAME = 'lastTabId';
 

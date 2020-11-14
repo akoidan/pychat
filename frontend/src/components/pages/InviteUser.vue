@@ -16,15 +16,22 @@
 </template>
 <script lang="ts">
 
-  import {Component, Vue} from "vue-property-decorator";
-  import {State} from '@/utils/storeHolder';
-  import AppSubmit from "@/components/ui/AppSubmit";
-  import PickUser from "@/components/pages/parts/PickUser";
-  import {RoomDictModel, RoomModel, UserModel} from "@/types/model";
-  import {AddInviteMessage} from "@/types/messages";
-  import {ApplyGrowlErr} from '@/utils/storeHolder';
+import {
+  Component,
+  Vue
+} from "vue-property-decorator";
+import {
+  ApplyGrowlErr,
+  State
+} from '@/utils/storeHolder';
+import AppSubmit from "@/components/ui/AppSubmit";
+import PickUser from "@/components/pages/parts/PickUser";
+import {
+  RoomDictModel,
+  RoomModel
+} from "@/types/model";
 
-  @Component({components: { AppSubmit, PickUser}})
+@Component({components: { AppSubmit, PickUser}})
   export default class InviteUser extends Vue {
 
     @State
@@ -43,7 +50,7 @@
 
     get userIds(): number[] {
       const users: number[] = [];
-      this.store.usersArray.forEach(a => {
+      this.$store.usersArray.forEach(a => {
         if (this.currentRoom.users.indexOf(a.id) < 0) {
           users.push(a.id);
         }
@@ -57,7 +64,7 @@
         const e = await this.$ws.inviteUser(this.currentRoomId, this.currentUsers);
         this.$router.replace(`/chat/${e.roomId}`);
       } else {
-        this.store.growlError("Please select at least one user");
+        this.$store.growlError("Please select at least one user");
       }
     }
   }

@@ -133,7 +133,7 @@ export default class SocialAuth extends Vue {
     this.$logger.debug('fbStatusChangeIfReAuth {}', response)();
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
-      this.store.growlInfo('Successfully logged in into facebook, proceeding...');
+      this.$store.growlInfo('Successfully logged in into facebook, proceeding...');
       // TODO
       // @ts-ignore: next-line
       const s = await this.$api.facebookAuth(response.authResponse.accessToken);
@@ -143,7 +143,7 @@ export default class SocialAuth extends Vue {
       return false;
     } else if (response.status === 'not_authorized') {
       this.frunning = false;
-      this.store.growlInfo('Allow facebook application to use your data');
+      this.$store.growlInfo('Allow facebook application to use your data');
 
       return false;
     } else {

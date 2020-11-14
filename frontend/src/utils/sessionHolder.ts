@@ -1,4 +1,4 @@
-import {SessionHolder} from '@/types/types';
+import { SessionHolder } from '@/types/types';
 
 class SessionHolderImpl {
 

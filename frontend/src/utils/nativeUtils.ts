@@ -1,8 +1,11 @@
-import {IS_ANDROID} from '@/utils/consts';
-import type cordova from 'cordova'
-import {PlatformUtil, permissions_type} from '@/types/model'
+import { IS_ANDROID } from '@/utils/consts';
+import {
+  permissions_type,
+  PlatformUtil
+} from '@/types/model';
+import type cordova from 'cordova';
 import loggerFactory from '@/utils/loggerFactory';
-import {Logger} from 'lines-logger';
+import { Logger } from 'lines-logger';
 
 export class AndroidPlatformUtil implements PlatformUtil {
 

@@ -28,11 +28,13 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
-import {smileys} from '@/utils/smileys';
-import {SmileyStructure} from '@/types/types';
-import {messageBus} from '@/utils/singletons';
-import {State} from '@/utils/storeHolder';
+import {
+  Component,
+  Vue
+} from 'vue-property-decorator';
+import { smileys } from '@/utils/smileys';
+
+import { State } from '@/utils/storeHolder';
 
 @Component
 export default class SmileyHolder extends Vue {
@@ -44,7 +46,7 @@ export default class SmileyHolder extends Vue {
   public activeTab: string = Object.keys(smileys)[0];
 
   addSmiley(code: string) {
-    messageBus.$emit('add-smile', code);
+    this.$messageBus.$emit('add-smile', code);
   }
 
 }

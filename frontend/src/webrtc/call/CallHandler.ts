@@ -7,10 +7,17 @@ import {
   ReplyCallMessage,
   RouterNavigateMessage
 } from '@/types/messages';
-import {browserVersion, isChrome, isMobile} from '@/utils/runtimeConsts';
-import {sub} from '@/utils/sub';
+import {
+  browserVersion,
+  isChrome,
+  isMobile
+} from '@/utils/runtimeConsts';
+import { sub } from '@/utils/sub';
 import Subscription from '@/utils/Subscription';
-import {CallsInfoModel, IncomingCallModel} from '@/types/model';
+import {
+  CallsInfoModel,
+  IncomingCallModel
+} from '@/types/model';
 import {
   BooleanIdentifier,
   ChangeStreamMessage,
@@ -21,9 +28,19 @@ import {
   SetDevices,
   VideoType
 } from '@/types/types';
-import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from '@/utils/consts';
-import {extractError, getChromeVersion} from '@/utils/pureFunctions';
-import {createMicrophoneLevelVoice, getAverageAudioLevel, removeAudioProcesssor} from '@/utils/audioprocc';
+import {
+  CHROME_EXTENSION_ID,
+  CHROME_EXTENSION_URL
+} from '@/utils/consts';
+import {
+  extractError,
+  getChromeVersion
+} from '@/utils/pureFunctions';
+import {
+  createMicrophoneLevelVoice,
+  getAverageAudioLevel,
+  removeAudioProcesssor
+} from '@/utils/audioprocc';
 import CallSenderPeerConnection from '@/webrtc/call/CallSenderPeerConnection';
 import CallReceiverPeerConnection from '@/webrtc/call/CallReceiverPeerConnection';
 

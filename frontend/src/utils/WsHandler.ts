@@ -3,7 +3,10 @@ import {
   CONNECTION_RETRY_TIME,
   IS_DEBUG
 } from '@/utils/consts';
-import {Logger, LogStrict} from 'lines-logger';
+import {
+  Logger,
+  LogStrict
+} from 'lines-logger';
 import loggerFactory from '@/utils/loggerFactory';
 import MessageHandler from '@/utils/MesageHandler';
 import {
@@ -12,18 +15,21 @@ import {
   UserModel
 } from '@/types/model';
 import {
+  HandlerType,
+  HandlerTypes,
   MessageSupplier,
   PubSetRooms,
-  SessionHolder,
-  HandlerType,
-  HandlerTypes
+  SessionHolder
 } from '@/types/types';
 import {
-  AddChannelMessage, AddInviteMessage, AddRoomMessage,
+  AddChannelMessage,
+  AddInviteMessage,
+  AddRoomMessage,
   DefaultMessage,
   DefaultSentMessage,
-  GrowlMessage, LogoutMessage,
-  PingMessage, SaveChannelSettings,
+  LogoutMessage,
+  PingMessage,
+  SaveChannelSettings,
   SetProfileImageMessage,
   SetSettingsMessage,
   SetUserProfileMessage,
@@ -41,8 +47,8 @@ import {
   UserProfileDto,
   UserSettingsDto
 } from '@/types/dto';
-import {sub} from '@/utils/sub';
-import {DefaultStore} from '@/utils/store';
+import { sub } from '@/utils/sub';
+import { DefaultStore } from '@/utils/store';
 import AbstractMessageProcessor from '@/utils/AbstractMessageProcessor';
 
 enum WsState {

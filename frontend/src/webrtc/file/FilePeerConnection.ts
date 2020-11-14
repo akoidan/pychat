@@ -1,5 +1,5 @@
 import AbstractPeerConnection from '@/webrtc/AbstractPeerConnection';
-import {DefaultMessage} from '@/types/messages';
+import { DefaultMessage } from '@/types/messages';
 
 export default abstract class FilePeerConnection extends AbstractPeerConnection {
 

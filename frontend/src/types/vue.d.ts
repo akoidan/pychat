@@ -1,16 +1,23 @@
 import WsHandler from '@/utils/WsHandler';
 import Api from '@/utils/api';
-import {Logger} from 'lines-logger';
-import VueRouter, {Route} from 'vue-router';
-import {DefaultStore} from '@/utils/store';
-import {GoogleCaptcha} from '@/types/model';
+import { Logger } from 'lines-logger';
+import VueRouter, { Route } from 'vue-router';
+import { DefaultStore } from '@/utils/store';
+import {
+  GoogleCaptcha,
+  PlatformUtil
+} from '@/types/model';
 import ChannelsHandler from '@/utils/ChannelsHandler';
-import {IStorage, JsAudioAnalyzer} from '@/types/types';
+import {
+  IStorage,
+  JsAudioAnalyzer
+} from '@/types/types';
 import WebRtcApi from '@/webrtc/WebRtcApi';
 import Subscription from '@/utils/Subscription';
 import Http from '@/utils/Http';
 import Vue, { Component } from 'vue';
 import { ExtendedVue } from 'vue/types/vue';
+import NotifierHandler from "@/utils/NotificationHandler";
 
 declare global {
   interface Window {
@@ -57,9 +64,14 @@ declare module 'vue/types/vue' {
   interface Vue {
     $ws: WsHandler;
     $api: Api;
-    store: DefaultStore; // if $store conflicts with node_modules/vuex/types/vue.d.ts if
+    $store: DefaultStore; // if $store conflicts with node_modules/vuex/types/vue.d.ts if
     $logger: Logger;
     $router: VueRouter;
     $route: Route;
+    $platformUtil: PlatformUtil;
+    $messageBus: Vue;
+    $channelsHandler: ChannelsHandler;
+    $notifier: NotifierHandler;
+    $webrtcApi: WebRtcApi;
   }
 }

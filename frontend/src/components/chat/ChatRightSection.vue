@@ -6,7 +6,10 @@
   </div>
 </template>
 <script lang="ts">
-import {Component, Vue} from 'vue-property-decorator';
+import {
+  Component,
+  Vue
+} from 'vue-property-decorator';
 import RoomDirectUsersTable from '@/components/chat/RoomDirectUsersTable';
 import RoomPublicTable from '@/components/chat/RoomPublicTable';
 import CurrentRoomUsersTable from '@/components/chat/CurrentRoomUsersTable';
