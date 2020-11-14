@@ -4,7 +4,8 @@ import {
   CallStatus,
   ConnectToRemoteMessage,
   OfferCall,
-  ReplyCallMessage
+  ReplyCallMessage,
+  RouterNavigateMessage
 } from '@/types/messages';
 import {browserVersion, isChrome, isMobile} from '@/utils/runtimeConsts';
 import {sub} from '@/utils/sub';
@@ -13,6 +14,7 @@ import {CallsInfoModel, IncomingCallModel} from '@/types/model';
 import {
   BooleanIdentifier,
   ChangeStreamMessage,
+  HandlerType,
   JsAudioAnalyzer,
   MediaIdentifier,
   NumberIdentifier,
@@ -20,16 +22,10 @@ import {
   VideoType
 } from '@/types/types';
 import {CHROME_EXTENSION_ID, CHROME_EXTENSION_URL} from '@/utils/consts';
-import {extractError, getChromeVersion} from '@/utils/utils';
-import {
-  createMicrophoneLevelVoice,
-  getAverageAudioLevel,
-  removeAudioProcesssor
-} from '@/utils/audioprocc';
+import {extractError, getChromeVersion} from '@/utils/pureFunctions';
+import {createMicrophoneLevelVoice, getAverageAudioLevel, removeAudioProcesssor} from '@/utils/audioprocc';
 import CallSenderPeerConnection from '@/webrtc/call/CallSenderPeerConnection';
 import CallReceiverPeerConnection from '@/webrtc/call/CallReceiverPeerConnection';
-import router from '@/utils/router';
-import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
 
 export default class CallHandler extends BaseTransferHandler {
 
@@ -336,7 +332,12 @@ export default class CallHandler extends BaseTransferHandler {
       };
       sub.notify(message);
     });
-    router.replace(`/chat/${this.roomId}`);
+    let message1: RouterNavigateMessage = {
+      handler: 'router',
+      action: 'navigate',
+      to: `/chat/${this.roomId}`
+    };
+    sub.notify(message1);
   }
 
   public videoAnswerCall() {

@@ -71,7 +71,7 @@ import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
 import {CurrentUserInfoModel} from '@/types/model';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {ApplyGrowlErr} from '@/utils/storeHolder';
 @Component({
   components: {AppSubmit}
 })

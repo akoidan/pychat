@@ -1,13 +1,13 @@
 import {SetReceivingFileStatus, SetReceivingFileUploaded} from '@/types/types';
 import {FileTransferStatus} from '@/types/model';
 import {DefaultMessage} from '@/types/messages';
-import {bytesToSize} from '@/utils/utils';
+import {bytesToSize} from '@/utils/pureFunctions';
 import WsHandler from '@/utils/WsHandler';
 import {requestFileSystem} from '@/utils/htmlApi';
 import {MAX_ACCEPT_FILE_SIZE_WO_FS_API, MAX_BUFFER_SIZE} from '@/utils/consts';
 import FilePeerConnection from '@/webrtc/file/FilePeerConnection';
 import {DefaultStore} from '@/utils/store';
-import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
+import {HandlerType, HandlerTypes} from '@/types/types';
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {
   protected connectedToRemote: boolean = true;

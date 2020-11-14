@@ -29,7 +29,7 @@
 import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import {SendingFile, UserModel} from '@/types/model';
-import {bytesToSize} from '@/utils/utils';
+import {bytesToSize} from '@/utils/pureFunctions';
 import AppProgressBar from '@/components/ui/AppProgressBar';
 import ChatSendingFileTransfer from '@/components/chat/ChatSendingFileTransfer';
 import ChatMessageHeader from '@/components/chat/ChatMessageHeader';

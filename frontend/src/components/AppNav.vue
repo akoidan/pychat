@@ -106,10 +106,10 @@
 import {State} from '@/utils/storeHolder';
 import {Component, Vue, Ref} from 'vue-property-decorator';
 import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
-import {logout} from '@/utils/utils';
-import {SetSearchTo} from '@/types/types';
 import {ISSUES, GITHUB_LINK, PAINTER, STATISTICS} from '@/utils/consts';
 import {webrtcApi} from '@/utils/singletons';
+import {sub} from "@/utils/sub";
+import {LogoutMessage} from "@/types/messages";
 
 @Component
 export default class AppNav extends Vue {
@@ -161,17 +161,17 @@ export default class AppNav extends Vue {
   }
 
   public toggle() {
-    this.logger.log('Toggle nav')();
+    this.$logger.log('Toggle nav')();
     this.expanded = !this.expanded;
   }
 
   public async signOut() {
-    try {
-      await this.$api.logout();
-      logout();
-    } catch (e) {
-      logout(e);
-    }
+    this.$api.logout(); // do not make user wait, logout instantly
+    let message: LogoutMessage = {
+      action: 'logout',
+      handler: 'any'
+    };
+    sub.notify(message);
   }
 }
 </script>

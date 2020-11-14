@@ -1,4 +1,4 @@
-import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
+import {HandlerType, HandlerTypes} from '@/types/types';
 import {DefaultMessage, PrintMessage} from '@/types/messages';
 import {DefaultStore} from '@/utils/store';
 

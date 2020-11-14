@@ -72,7 +72,7 @@
   import ChatSendingFile from "@/components/chat/ChatSendingFile";
   import ChatReceivingFile from '@/components/chat/ChatReceivingFile';
   import ChatCall from '@/components/chat/ChatCall';
-  import {ApplyGrowlErr} from '@/utils/utils';
+  import {ApplyGrowlErr} from '@/utils/storeHolder';
   import ChatChangeNameMessage
     from '@/components/chat/ChatChangeNameMessage.vue';
 
@@ -112,7 +112,7 @@
       this.$nextTick(function () {
         if (this.chatbox && this.scrollBottom) {
           this.chatbox.scrollTop = this.chatbox.scrollHeight;
-          this.logger.trace("Scrolling to bottom")();
+          this.$logger.trace("Scrolling to bottom")();
         }
       });
     }
@@ -154,7 +154,7 @@
         newArray.push(message);
       }
       newArray.sort((a, b) => a.time > b.time ? 1 : a.time < b.time ? -1 : 0);
-      this.logger.debug("Reevaluating messages in room #{}: {}", this.room.id, newArray)();
+      this.$logger.debug("Reevaluating messages in room #{}: {}", this.room.id, newArray)();
       return newArray;
     }
 

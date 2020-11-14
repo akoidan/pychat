@@ -42,11 +42,10 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
+import {State, ApplyGrowlErr} from '@/utils/storeHolder';
 import {Component, Ref, Vue, Watch} from 'vue-property-decorator';
 import {canvasContext, resolveMediaUrl, stopVideo} from '@/utils/htmlApi';
 import AppSubmit from '@/components/ui/AppSubmit';
-import {ApplyGrowlErr, getUserMedia} from '@/utils/utils';
 import {platformUtil} from '@/utils/singletons';
 
 @Component({
@@ -90,7 +89,7 @@ export default class UserProfileImage extends Vue {
   }
 
   public dropPhoto(e: DragEvent) {
-    this.logger.debug('Drop photo')();
+    this.$logger.debug('Drop photo')();
     const file = e.dataTransfer!.files[0];
     this.blob = file;
     if (file) {
@@ -104,7 +103,7 @@ export default class UserProfileImage extends Vue {
   }
 
   public selectFile() {
-    this.logger.debug('Selecting file')();
+    this.$logger.debug('Selecting file')();
     this.inputFile.click();
   }
 
@@ -148,7 +147,7 @@ export default class UserProfileImage extends Vue {
   //     this.srcVideo = localMediaStream;
   //     this.changeProfileVideo.play();
   //   },                     (error) => {
-  //     this.logger.log('navigator.getUserMedia error: {}', error)();
+  //     this.$logger.log('navigator.getUserMedia error: {}', error)();
   //   });
   // }
 
@@ -177,15 +176,16 @@ export default class UserProfileImage extends Vue {
     // Not showing vendor prefixes or code that works cross-browser.
     if (this.isStopped) {
       try {
-        this.logger.debug("checking perms")();
+        this.$logger.debug("checking perms")();
         await platformUtil.askPermissions('video');
-        this.logger.debug("Capturing media")();
-        this.srcVideo = await getUserMedia({video: true, audio: false});
+        this.$logger.debug("Capturing media")();
+        await platformUtil.askPermissions();
+        this.srcVideo = await navigator.mediaDevices.getUserMedia({audio: true, video: true});
         this.showVideo = true;
         this.isStopped = false;
         this.store.growlInfo('Click on your video to take a photo');
       } catch (e) {
-        this.logger.error('Error while trying to capture a picture "{}"', e.message || e.name)();
+        this.$logger.error('Error while trying to capture a picture "{}"', e.message || e.name)();
         this.store.growlError(`Unable to use your webcam because ${e.message || e.name}`);
       }
     } else {

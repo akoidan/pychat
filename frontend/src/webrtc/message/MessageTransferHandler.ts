@@ -1,5 +1,5 @@
 import BaseTransferHandler from '@/webrtc/BaseTransferHandler';
-import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
+import {HandlerType, HandlerTypes} from '@/types/types';
 import {RoomModel} from '@/types/model';
 import { UploadFile, UserIdConn} from '@/types/types';
 import MessagePeerConnection from '@/webrtc/message/MessagePeerConnection';

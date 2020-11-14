@@ -49,7 +49,16 @@ export default class Subscription {
   }
 
   public notify<T extends DefaultMessage>(message: T): boolean {
-    if (this.channels[message.handler]?.length) {
+    if (message.handler === 'any') {
+      Object.values(this.channels).forEach(channel => {
+        channel!.forEach((h: IMessageHandler) => {
+          if (h.getHandler(message)) {
+            h.handle(message);
+          }
+        });
+      });
+      return true;
+    } else if (this.channels[message.handler]?.length) {
       this.channels[message.handler]!.forEach((h: IMessageHandler) => {
         h.handle(message);
       });

@@ -7,7 +7,7 @@ import FileSenderPeerConnection from '@/webrtc/file/FileSenderPeerConnection';
 import {sub} from '@/utils/sub';
 import Subscription from '@/utils/Subscription';
 import {DefaultStore} from '@/utils/store';
-import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
+import {HandlerType, HandlerTypes} from '@/types/types';
 
 export default class FileHandler extends BaseTransferHandler {
 

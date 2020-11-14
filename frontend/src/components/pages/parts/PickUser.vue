@@ -68,7 +68,7 @@ export default class PickUser extends Vue {
   }
 
   get filteredUsers(): UserModel[] {
-    this.logger.debug('Reeval filter CreatePrivateRoom')();
+    this.$logger.debug('Reeval filter CreatePrivateRoom')();
     const s = this.search.toLowerCase();
 
     return this.displayedUsers.filter(u => u.user.toLowerCase().indexOf(s) >= 0);

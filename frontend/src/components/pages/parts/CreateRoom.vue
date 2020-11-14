@@ -81,7 +81,7 @@ import {
 import {AddRoomMessage} from '@/types/messages';
 import AppCheckbox from '@/components/ui/AppCheckbox';
 import {PrivateRoomsIds} from '@/types/types';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {ApplyGrowlErr} from '@/utils/storeHolder';
 import ParentChannel from '@/components/pages/parts/ParentChannel.vue';
 
 @Component({components: {

@@ -4,7 +4,7 @@ import sessionHolder from '@/utils/sessionHolder';
 import {store} from '@/utils/storeHolder';
 import MainPage from '@/components/MainPage.vue';
 import ChannelsPage from '@/components/chat/ChannelsPage.vue';
-import SignupPage from '@/components/singup/MainPage.vue';
+import AuthPage from '@/components/singup/AuthPage.vue';
 import ResetPassword from '@/components/singup/ResetPassword.vue';
 import Login from '@/components/singup/Login.vue';
 import SignUp from '@/components/singup/SignUp.vue';
@@ -20,7 +20,6 @@ import CreatePublicRoom from '@/components/pages/CreatePublicRoom.vue';
 import ViewProfilePage from '@/components/pages/ViewProfilePage.vue';
 import RoomSettings from '@/components/pages/RoomSettings.vue';
 import ApplyResetPassword from '@/components/singup/ApplyResetPassword.vue';
-import {globalLogger} from '@/utils/singletons';
 import {ALL_ROOM_ID, PAINTER, STATISTICS} from '@/utils/consts';
 import ConfirmMail from '@/components/email/ConfirmMail.vue';
 import UserProfileChangeEmail from '@/components/pages/UserProfileChangeEmail.vue';
@@ -28,8 +27,16 @@ import {Route} from 'vue-router/types';
 import CreateRoomChannel from '@/components/pages/CreateRoomChannel.vue';
 import CreateChannel from '@/components/pages/CreateChannel.vue';
 import ChannelSettings from '@/components/pages/ChannelSettings.vue';
+import {sub} from "@/utils/sub";
+import MessageHandler from "@/utils/MesageHandler";
+import {HandlerType, HandlerTypes} from "@/types/types";
+import {Logger} from "lines-logger";
+import {DefaultMessage, LoginMessage, LogoutMessage, RouterNavigateMessage} from "@/types/messages";
+import loggerFactory from "@/utils/loggerFactory";
 
 Vue.use(VueRouter);
+
+const logger: Logger = loggerFactory.getLoggerColor('router', '#057f59');
 
 const router = new VueRouter({
   routes: [
@@ -48,7 +55,7 @@ const router = new VueRouter({
           component: ChannelsPage,
           meta: {
             beforeEnter: (to: Route, from: Route, next: Function) => {
-              globalLogger.debug('setActiveRoomId {}', to.params.id)();
+              logger.debug('setActiveRoomId {}', to.params.id)();
               store.setActiveRoomId(parseInt(to.params.id));
               next();
             }
@@ -139,7 +146,7 @@ const router = new VueRouter({
       ]
     }, {
       path: '/auth',
-      component: SignupPage,
+      component: AuthPage,
       meta: {
         loginRequired: false
       },
@@ -184,4 +191,34 @@ router.beforeEach((to, from, next) => {
     next();
   }
 });
+
+
+sub.subscribe('router', new class extends MessageHandler {
+
+  protected readonly logger: Logger = logger;
+
+  protected readonly handlers: HandlerTypes = {
+    login: <HandlerType>this.login,
+    logout: <HandlerType>this.logout,
+    navigate: <HandlerType>this.navigate
+  }
+
+  logout(a: LogoutMessage) {
+    router.replace('/auth/login');
+  }
+
+  navigate(a: RouterNavigateMessage) {
+    router.replace(a.to);
+  }
+
+  login(a: LoginMessage) {
+    if (!/\w{32}/.exec(a.session)) {
+      throw a.session;
+    }
+    sessionHolder.session = a.session;
+    router.replace(`/chat/${ALL_ROOM_ID}`);
+  }
+
+}());
+
 export default router;

@@ -57,7 +57,7 @@
   import {State} from '@/utils/storeHolder';
   import {channelsHandler, messageBus, webrtcApi} from '@/utils/singletons';
   import {MessageDataEncode, UploadFile} from '@/types/types';
-  import {sem} from '@/utils/utils';
+  import {sem} from '@/utils/pureFunctions';
   import {getUniqueId} from '@/utils/pureFunctions';
   import MediaRecorder from '@/components/chat/MediaRecorder.vue';
 
@@ -115,7 +115,7 @@
 
     onEmitDropPhoto(files: FileList) {
       for (let i = 0; i < files.length; i++) {
-        this.logger.debug('loop')();
+        this.$logger.debug('loop')();
         const file = files[i];
         if (file.type.indexOf('image') >= 0) {
           pasteImgToTextArea(file, this.userMessage, (err: string) => {
@@ -128,7 +128,7 @@
     }
 
     onEmitAddSmile(code:string) {
-      this.logger.log('Adding smiley {}', code)();
+      this.$logger.log('Adding smiley {}', code)();
       pasteHtmlAtCaret(getSmileyHtml(code), this.userMessage);
     }
 
@@ -147,7 +147,7 @@
     }
 
     onEmitBlob(e: Blob)  {
-      this.logger.log('Pasting blob {}', e)();
+      this.$logger.log('Pasting blob {}', e)();
       this.$nextTick(function () {
         pasteBlobToContentEditable(e, this.userMessage);
       });
@@ -171,7 +171,7 @@
       }
       if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
         event.preventDefault();
-        this.logger.debug('Checking sending message')();
+        this.$logger.debug('Checking sending message')();
         if (this.editedMessage && this.editedMessage.isEditingNow) {
           const md: MessageDataEncode = getMessageData(this.userMessage, this.editingMessageModel.symbol!);
           this.editMessageWs(md.messageContent, md.files, this.editedMessage.messageId, this.activeRoomId, md.currSymbol, md.fileModels);
@@ -261,7 +261,7 @@
       } else if (!messageContent && messageId > 0) {
         channelsHandler.sendDeleteMessage(messageId, -getUniqueId());
       } else if (!messageContent && messageId < 0) {
-        channelsHandler.removeSendingMessage(messageId);
+        channelsHandler.getMessageRetrier().removeSendingMessage(messageId);
       }
       this.store.setEditedMessage(null);
     }
@@ -269,7 +269,7 @@
 
     @Watch('editedMessage')
     public onActiveRoomIdChange(val: EditingMessage) {
-      this.logger.log('editedMessage changed')();
+      this.$logger.log('editedMessage changed')();
       if (val && val.isEditingNow) {
         this.userMessage.innerHTML = encodeP(this.editingMessageModel);
         placeCaretAtEnd(this.userMessage);
@@ -301,10 +301,10 @@
 
     public onImagePaste(evt: ClipboardEvent) {
       if (evt.clipboardData && evt.clipboardData.files && evt.clipboardData.files.length) {
-        this.logger.debug('Clipboard has {} files', evt.clipboardData!.files.length)();
+        this.$logger.debug('Clipboard has {} files', evt.clipboardData!.files.length)();
         for (let i = 0; i < evt.clipboardData!.files.length; i++) {
           const file = evt.clipboardData!.files[i];
-          this.logger.debug('loop {}', file)();
+          this.$logger.debug('loop {}', file)();
           if (file.type.indexOf('image') >= 0) {
             pasteImgToTextArea(file, this.userMessage, (err: string) => {
               this.store.growlError(err);

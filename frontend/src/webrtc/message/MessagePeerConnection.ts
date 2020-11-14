@@ -7,7 +7,7 @@ import {MessageSupplier, RemovePeerConnection} from '@/types/types';
 import AbstractMessageProcessor from '@/utils/AbstractMessageProcessor';
 import {SecurityValidator} from '@/webrtc/message/SecurityValidator';
 import Subscription from '@/utils/Subscription';
-import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
+import {HandlerType, HandlerTypes} from '@/types/types';
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
 

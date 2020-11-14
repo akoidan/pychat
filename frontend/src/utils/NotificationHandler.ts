@@ -1,6 +1,6 @@
 import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import {extractError} from '@/utils/utils';
+import {extractError} from '@/utils/pureFunctions';
 import Api from '@/utils/api';
 import WsHandler from '@/utils/WsHandler';
 import {DefaultStore} from '@/utils/store';

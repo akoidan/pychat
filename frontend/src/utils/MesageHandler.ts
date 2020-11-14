@@ -1,12 +1,7 @@
 import {DefaultMessage} from '@/types/messages';
 import {Logger} from 'lines-logger';
-import {IMessageHandler} from '@/types/types';
+import {HandlerType, HandlerTypes, IMessageHandler} from '@/types/types';
 
-export type HandlerType = (a: DefaultMessage) => void|Promise<void>;
-
-export interface HandlerTypes {
- [id: string]: HandlerType;
-}
 
 export default abstract class MessageHandler implements IMessageHandler {
 
@@ -24,5 +19,9 @@ export default abstract class MessageHandler implements IMessageHandler {
     } else {
       this.logger.error(`{} can't find handler for {}, available handlers {}. Message: {}`, this.constructor.name, message.action, Object.keys(this.handlers), message)();
     }
+  }
+
+  getHandler(message: DefaultMessage): HandlerType|undefined {
+    return this.handlers[message.action];
   }
 }

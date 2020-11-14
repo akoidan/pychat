@@ -109,7 +109,7 @@ import {CurrentUserInfoModel, SexModelString} from '@/types/model';
 import {UserProfileDto} from '@/types/dto';
 import {currentUserInfoModelToDto, userSettingsDtoToModel} from '@/types/converters';
 import AppInputDate from '@/components/ui/AppInputDate';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {ApplyGrowlErr} from '@/utils/storeHolder';
 import {SetUserProfileMessage} from '@/types/messages';
 
 @Component({
@@ -130,7 +130,7 @@ export default class UserProfileInfo extends Vue {
 
   @ApplyGrowlErr({ message: 'Error saving profile', runningProp: 'running'})
   public async save() {
-    this.logger.debug('Saving userProfile')();
+    this.$logger.debug('Saving userProfile')();
     const cui: UserProfileDto = {...this.model};
     const e: SetUserProfileMessage | unknown = await this.$ws.saveUser(cui);
     this.store.growlSuccess('User profile has been saved');

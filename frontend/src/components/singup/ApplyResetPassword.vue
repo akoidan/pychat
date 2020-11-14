@@ -45,7 +45,7 @@
   import Vue from 'vue';
   import {State} from '@/utils/storeHolder';
   import AppSubmit from '@/components/ui/AppSubmit';
-  import {ApplyGrowlErr} from '@/utils/utils';
+  import {ApplyGrowlErr} from '@/utils/storeHolder';
 
   @Component({components: {AppSubmit}})
   export default class ApplyResetPassword extends Vue {

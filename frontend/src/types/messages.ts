@@ -16,13 +16,29 @@ export interface DefaultSentMessage {
 }
 
 
-export type HandlerName = 'channels' | 'lan' | 'message' | 'webrtc' | 'ws'| 'void' |'this';
+// any means that every every registered subscriber will be called with this handler if it exists
+// this means, that handler that registered this event will be called
+// void means that no handlers should process this signal
+
+export type HandlerName = 'router' | 'channels' | 'lan' | 'message' | 'webrtc' | 'ws'| 'void' |'this' | 'any';
 
 export interface DefaultMessage extends DefaultSentMessage {
   handler: HandlerName;
   cbBySender?: string;
   allowZeroSubscribers?: boolean; // if true, no errors should be present on handeling this message by sucrcription if nothing was notified
 }
+
+export interface LoginMessage extends DefaultMessage {
+  session: string;
+}
+
+export interface LogoutMessage extends DefaultMessage {
+}
+
+export interface RouterNavigateMessage extends DefaultMessage {
+  to: string;
+}
+
 
 export interface AppendQueue extends DefaultMessage {
   messages: DefaultMessage[];

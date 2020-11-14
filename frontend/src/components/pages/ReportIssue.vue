@@ -54,7 +54,7 @@ import {State} from '@/utils/storeHolder';
 import {Component, Prop, Vue, Watch, Ref} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
 import {GIT_HASH} from '@/utils/consts';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {ApplyGrowlErr} from '@/utils/storeHolder';
 import {browserVersion} from '@/utils/runtimeConsts';
 @Component({components: {AppSubmit}})
 export default class ReportIssue extends Vue {

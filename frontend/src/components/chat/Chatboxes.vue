@@ -44,7 +44,7 @@
 
     dropPhoto(evt: DragEvent) {
       const files: FileList = (evt.dataTransfer?.files) as FileList;
-      this.logger.debug('Drop photo {} ', files)();
+      this.$logger.debug('Drop photo {} ', files)();
       if (files) {
         messageBus.$emit('drop-photo', files);
       }

@@ -1,7 +1,7 @@
 import {Logger} from 'lines-logger';
 import loggerFactory from '@/utils/loggerFactory';
 import WsHandler from '@/utils/WsHandler';
-import {bytesToSize, extractError} from '@/utils/utils';
+import {bytesToSize} from '@/utils/pureFunctions';
 
 import {sub} from '@/utils/sub';
 import MessageHandler from '@/utils/MesageHandler';

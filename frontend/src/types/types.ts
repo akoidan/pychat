@@ -16,6 +16,7 @@ import {
 } from '@/types/model';
 import {ChannelDto, RoomDto, SetStateFromStorage, UserDto} from '@/types/dto';
 import {DefaultMessage, DefaultSentMessage} from '@/types/messages';
+import MessageRetrier from "@/utils/MessageRetrier";
 
 export interface UploadFile {
    type: string;
@@ -27,10 +28,20 @@ export type ValueFilterForKey<T extends object, U> = {
   [K in keyof T]: U extends T[K] ? K : never;
 }[keyof T];
 
-export interface IMessageHandler {
-  handle(message: DefaultMessage): void;
+export type HandlerType = (a: DefaultMessage) => void|Promise<void>;
+
+export interface HandlerTypes {
+  [id: string]: HandlerType;
 }
 
+export interface IMessageHandler {
+  handle(message: DefaultMessage): void;
+  getHandler(message: DefaultMessage): HandlerType|undefined;
+}
+
+export interface MessageRetrierProxy {
+  getMessageRetrier(): MessageRetrier;
+}
 
 export interface UserIdConn {
   connectionId: string;

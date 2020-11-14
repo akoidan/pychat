@@ -1,11 +1,13 @@
 import {JsAudioAnalyzer} from '@/types/types';
-import {extractError} from '@/utils/utils';
-import {globalLogger} from '@/utils/singletons';
+import {extractError} from '@/utils/pureFunctions';
 import {IS_DEBUG} from '@/utils/consts';
 import {isMobile} from '@/utils/runtimeConsts';
+import {Logger} from "lines-logger";
+import loggerFactory from "@/utils/loggerFactory";
 
 let audioContext: AudioContext;
 const audioProcesssors: JsAudioAnalyzer[] = [];
+const logger: Logger = loggerFactory.getLoggerColor('audio', 'yellow');
 if (IS_DEBUG) {
   window.audioProcesssors = audioProcesssors;
 }
@@ -16,13 +18,13 @@ export function createMicrophoneLevelVoice (
 ): JsAudioAnalyzer|null {
   try {
     if (isMobile) {
-      globalLogger.log('Current phone is mobile, audio processor won\'t be created')();
+      logger.log('Current phone is mobile, audio processor won\'t be created')();
 
       return null;
     }
     const audioTracks: MediaStreamTrack[] = stream && stream.getAudioTracks();
     if (audioTracks.length === 0) {
-      globalLogger.log('Skipping audioproc, since current stream doest have audio tracks')();
+      logger.log('Skipping audioproc, since current stream doest have audio tracks')();
       return null;
     }
     const audioTrack: MediaStreamTrack = audioTracks[0];
@@ -52,11 +54,11 @@ export function createMicrophoneLevelVoice (
     };
     javascriptNode.onaudioprocess = onaudioprocess(res);
     audioProcesssors.push(res);
-    globalLogger.log('Created new audioProcessor')();
+    logger.log('Created new audioProcessor')();
 
     return res;
   } catch (err) {
-    globalLogger.error('Unable to use microphone level because {}', extractError(err))();
+    logger.error('Unable to use microphone level because {}', extractError(err))();
 
     return null;
   }
@@ -66,13 +68,13 @@ export function removeAudioProcesssor(audioProcessor: JsAudioAnalyzer) {
   if (audioProcessor) {
     let index = audioProcesssors.indexOf(audioProcessor);
     if (index < 0) {
-      globalLogger.error('Unknown audioproc {}', audioProcessor)();
+      logger.error('Unknown audioproc {}', audioProcessor)();
     } else {
       audioProcesssors.splice(index, 1)
     }
   }
   if (audioProcessor?.javascriptNode?.onaudioprocess) {
-    globalLogger.log('Removing audioprod')();
+    logger.log('Removing audioprod')();
     audioProcessor.javascriptNode.onaudioprocess = null;
   }
 }

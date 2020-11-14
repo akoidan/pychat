@@ -1,8 +1,9 @@
 import loggerFactory from '@/utils/loggerFactory';
 import Api from '@/utils/api';
 import Vue from 'vue';
-import MessageHandler, {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
-import {checkAndPlay, incoming, login, logout, outgoing} from '@/utils/audio';
+import MessageHandler from '@/utils/MesageHandler';
+import {HandlerType, HandlerTypes, MessageRetrierProxy} from '@/types/types'
+import {AudioPlayer, incoming, login, logout, outgoing} from '@/utils/audio';
 import faviconUrl from '@/assets/img/favicon.ico';
 
 import {
@@ -41,7 +42,7 @@ import {
   EditMessage,
   InviteUserMessage,
   LeaveUserMessage,
-  LoadMessages,
+  LoadMessages, LogoutMessage,
   RemoveOnlineUserMessage,
   SaveChannelSettings,
   SaveRoomSettings
@@ -64,9 +65,10 @@ import WsHandler from '@/utils/WsHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
 import {sub} from '@/utils/sub';
 import {DefaultStore} from '@/utils/store';
-import {savedFiles} from "@/utils/htmlApi";
+import MessageRetrier from "@/utils/MessageRetrier";
+import router from "@/utils/router";
 
-export default class ChannelsHandler extends MessageHandler {
+export default class ChannelsHandler extends MessageHandler implements MessageRetrierProxy {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes = {
@@ -86,16 +88,19 @@ export default class ChannelsHandler extends MessageHandler {
     addInvite: <HandlerType>this.addInvite,
     saveChannelSettings: <HandlerType>this.saveChannelSettings,
     deleteChannel: <HandlerType>this.deleteChannel,
-    saveRoomSettings: <HandlerType>this.saveRoomSettings
+    saveRoomSettings: <HandlerType>this.saveRoomSettings,
+    logout: <HandlerType>this.logout
   };
+
+  private readonly messageRetrier: MessageRetrier;
   private readonly store: DefaultStore;
   private readonly api: Api;
   private readonly ws: WsHandler;
-  private readonly sendingMessage: Record<string, Function> = {};
   private readonly notifier: NotifierHandler;
   private readonly messageBus:  Vue;
+  private readonly audioPlayer: AudioPlayer;
 
-  constructor(store: DefaultStore, api: Api, ws: WsHandler, notifier: NotifierHandler, messageBus: Vue) {
+  constructor(store: DefaultStore, api: Api, ws: WsHandler, notifier: NotifierHandler, messageBus: Vue, audioPlayer: AudioPlayer) {
     super();
     this.store = store;
     this.api = api;
@@ -103,47 +108,25 @@ export default class ChannelsHandler extends MessageHandler {
     sub.subscribe('lan', this);
     this.logger = loggerFactory.getLoggerColor('chat', '#940500');
     this.ws = ws;
+    this.audioPlayer = audioPlayer;
+    this.messageRetrier = new MessageRetrier();
     this.messageBus = messageBus;
     this.notifier = notifier;
   }
 
-  public removeSendingMessage(messageId: number | undefined) {
-    if (messageId && this.sendingMessage[messageId]) {
-      delete this.sendingMessage[messageId];
-
-      return true;
-    } else if (!messageId) {
-      this.logger.warn('Got unknown message {}', messageId)();
-
-      return false;
-    } else {
-      throw Error(`Unknown message ${messageId}`);
-    }
+  getMessageRetrier(): MessageRetrier {
+     return this.messageRetrier;
   }
 
-  public removeAllSendingMessages() {
-    const length = Object.keys(this.sendingMessage).length;
-    for (const k in this.sendingMessage) {
-      this.removeSendingMessage(parseInt(k));
-    }
-    this.logger.log('Flushed {} sending messages', length);
-  }
-
-  public resendMessage(id: number) {
-    this.logger.log('resending message {} ', id)();
-    this.sendingMessage[id]();
+  logout(m: LogoutMessage) {
+    this.store.logout();
   }
 
   public sendDeleteMessage(id: number, originId: number): void {
-    this.asyncExecuteAndPutInCallback(
+    this.messageRetrier.asyncExecuteAndPutInCallback(
         originId,
         () => this.ws.sendEditMessage(null, id, null, originId)
     );
-  }
-
-  public asyncExecuteAndPutInCallback(id: number, fn: () => void) {
-    this.sendingMessage[id] = fn;
-    this.sendingMessage[id]();
   }
 
   public async uploadFilesOrRetry(
@@ -158,7 +141,7 @@ export default class ChannelsHandler extends MessageHandler {
         fileIds =  await this.uploadFiles(id, roomId, uploadFiles);
       } catch (e) {
         this.logger.error('Uploading error, scheduling cb')();
-        this.sendingMessage[id] = retry;
+        this.messageRetrier.putCallBack(id, retry);
         throw e;
       }
     }
@@ -172,7 +155,7 @@ export default class ChannelsHandler extends MessageHandler {
         uploadFiles,
         () => this.sendEditMessage(content, roomId, id, uploadFiles)
     );
-    this.asyncExecuteAndPutInCallback(id, () => this.ws.sendEditMessage(content, id, fileIds, id));
+    this.messageRetrier.asyncExecuteAndPutInCallback(id, () => this.ws.sendEditMessage(content, id, fileIds, id));
   }
 
   public async sendSendMessage(
@@ -188,7 +171,7 @@ export default class ChannelsHandler extends MessageHandler {
       uploadFiles,
       () => this.sendSendMessage(content, roomId, uploadFiles, originId, originTime)
     );
-    this.asyncExecuteAndPutInCallback(
+    this.messageRetrier.asyncExecuteAndPutInCallback(
       originId,
       () => this.ws.sendSendMessage(content, roomId, fileIds, originId, Date.now() - originTime)
     );
@@ -291,9 +274,7 @@ export default class ChannelsHandler extends MessageHandler {
   }
 
   private internetAppear() {
-    for (const k in this.sendingMessage) {
-      this.resendMessage(parseInt(k));
-    }
+    this.messageRetrier.resendAllMessages();
   }
 
   private loadMessages(lm: LoadMessages) {
@@ -326,7 +307,7 @@ export default class ChannelsHandler extends MessageHandler {
       this.logger.debug('Adding message to storage {}', message)();
       this.store.addMessage(message);
       if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-        const removed = this.removeSendingMessage(inMessage.messageId);
+        const removed = this.messageRetrier.removeSendingMessage(inMessage.messageId);
       }
     }
   }
@@ -340,7 +321,7 @@ export default class ChannelsHandler extends MessageHandler {
       this.logger.debug('Adding message to storage {}', message)();
       this.store.addMessage(message);
       if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-        const removed = this.removeSendingMessage(inMessage.messageId);
+        this.messageRetrier.removeSendingMessage(inMessage.messageId);
       }
     }
   }
@@ -377,7 +358,7 @@ export default class ChannelsHandler extends MessageHandler {
 
   private printMessage(inMessage: EditMessage) {
     if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-      this.removeSendingMessage(inMessage.messageId);
+      this.messageRetrier.removeSendingMessage(inMessage.messageId);
       if (!inMessage.messageId) {
         throw Error(`Unknown messageId ${inMessage}`);
       }
@@ -426,9 +407,9 @@ export default class ChannelsHandler extends MessageHandler {
 
     if (this.store.userSettings!.messageSound) {
       if (message.userId === userInfo.userId) {
-        checkAndPlay(outgoing, room.volume);
+        this.audioPlayer.checkAndPlay(outgoing, room.volume);
       } else {
-        checkAndPlay(incoming, room.volume);
+        this.audioPlayer.checkAndPlay(incoming, room.volume);
       }
     }
 
@@ -537,7 +518,7 @@ export default class ChannelsHandler extends MessageHandler {
 
     // TODO Uncaught TypeError: Cannot read property 'onlineChangeSound' of null
     if (this.store.userSettings!.onlineChangeSound && this.store.myId !== userId) {
-      checkAndPlay(isWentOnline ? login : logout, 50);
+      this.audioPlayer.checkAndPlay(isWentOnline ? login : logout, 50);
     }
     this.store.addRoomLog(entry);
   }

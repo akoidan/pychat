@@ -119,15 +119,15 @@ class="input" @focus="userFoc = false" @blur="userFoc = true"
 <script lang='ts'>
 
   import {Vue, Component, Prop, Watch, Ref} from "vue-property-decorator";
-  import {State} from '@/utils/storeHolder';
+  import {State, ApplyGrowlErr} from '@/utils/storeHolder';
   import AppSubmit from "@/components/ui/AppSubmit"
   import RegisterFieldSet from '@/components/singup/RegisterFieldSet.vue'
   import debounce from 'lodash.debounce';
   import {IconColor} from '@/types/types';
-  import sessionHolder from '@/utils/sessionHolder';
-  import {ApplyGrowlErr, login} from '@/utils/utils';
   import SocialAuth from '@/components/singup/SocialAuth';
   import {SexModelString} from '@/types/model';
+  import {sub} from "@/utils/sub";
+  import {LoginMessage} from "@/types/messages";
 
   @Component({components: {SocialAuth, AppSubmit, RegisterFieldSet}})
   export default class SignUp extends Vue {
@@ -316,8 +316,9 @@ class="input" @focus="userFoc = false" @blur="userFoc = true"
 
     @ApplyGrowlErr({runningProp: 'running', message: `Can't sign up`})
     async register() {
-      let s: string = await this.$api.register(this.form);
-      login(s);
+      let session: string = await this.$api.register(this.form);
+      let message: LoginMessage = {action: 'login', handler: 'router', session};
+      sub.notify(message)
     }
 
   }

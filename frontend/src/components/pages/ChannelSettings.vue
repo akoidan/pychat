@@ -79,7 +79,7 @@
   } from '@/types/model';
   import {State} from '@/utils/storeHolder';
   import AppSubmit from '@/components/ui/AppSubmit.vue';
-  import {ApplyGrowlErr} from '@/utils/utils';
+  import {ApplyGrowlErr} from '@/utils/storeHolder';
   import PickUser from '@/components/pages/parts/PickUser.vue';
 
   @Component({
@@ -148,7 +148,7 @@
 
     get channelId(): number {
       const id = this.$route.params.id;
-      this.logger.log('Rending channel settings for {}', id)();
+      this.$logger.log('Rending channel settings for {}', id)();
 
       return parseInt(id);
     }
@@ -162,7 +162,7 @@
     }
 
     created() {
-      this.logger.log('Updated for channel settings {} ', this.channel)();
+      this.$logger.log('Updated for channel settings {} ', this.channel)();
       this.channelName = this.channel.name;
       this.admin = [this.channel.creator];
     }

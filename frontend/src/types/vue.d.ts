@@ -26,6 +26,7 @@ declare global {
     webrtcApi: WebRtcApi;
     grecaptcha: GoogleCaptcha;
     audioProcesssors: JsAudioAnalyzer[];
+    savedFiles: { [id: string]: Blob };
     sub: Subscription;
     consts: {};
   }
@@ -56,8 +57,8 @@ declare module 'vue/types/vue' {
   interface Vue {
     $ws: WsHandler;
     $api: Api;
-    store: DefaultStore;
-    logger: Logger;
+    store: DefaultStore; // if $store conflicts with node_modules/vuex/types/vue.d.ts if
+    $logger: Logger;
     $router: VueRouter;
     $route: Route;
   }

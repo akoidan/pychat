@@ -5,8 +5,7 @@ import {
 } from '@/utils/consts';
 import {Logger, LogStrict} from 'lines-logger';
 import loggerFactory from '@/utils/loggerFactory';
-import MessageHandler, {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
-import {logout} from '@/utils/utils';
+import MessageHandler from '@/utils/MesageHandler';
 import {
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
@@ -16,13 +15,14 @@ import {
   MessageSupplier,
   PubSetRooms,
   SessionHolder,
-  UploadFile
+  HandlerType,
+  HandlerTypes
 } from '@/types/types';
 import {
   AddChannelMessage, AddInviteMessage, AddRoomMessage,
   DefaultMessage,
   DefaultSentMessage,
-  GrowlMessage,
+  GrowlMessage, LogoutMessage,
   PingMessage, SaveChannelSettings,
   SetProfileImageMessage,
   SetSettingsMessage,
@@ -43,7 +43,6 @@ import {
 } from '@/types/dto';
 import {sub} from '@/utils/sub';
 import {DefaultStore} from '@/utils/store';
-import AbstractPeerConnection from '@/webrtc/AbstractPeerConnection';
 import AbstractMessageProcessor from '@/utils/AbstractMessageProcessor';
 
 enum WsState {
@@ -60,6 +59,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     setUserProfile: <HandlerType>this.setUserProfile,
     setProfileImage: <HandlerType>this.setProfileImage,
     setWsId: <HandlerType>this.setWsId,
+    logout: <HandlerType>this.logout,
     userProfileChanged: <HandlerType>this.userProfileChanged,
     ping: <HandlerType>this.ping,
     pong: this.pong
@@ -262,7 +262,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     //
   }
 
-  public stopListening() {
+  public logout(a: LogoutMessage) {
+    this.sessionHolder.session = '';
     const info = [];
     if (this.listenWsTimeout) {
       this.listenWsTimeout = null;
@@ -493,8 +494,12 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     if (e.code === 403) {
       const message = `Server has forbidden request because '${reason}'. Logging out...`;
       this.logger.error('onWsClose {}', message)();
-      logout(message);
-
+      this.store.growlError(message);
+      let message1: LogoutMessage = {
+        action: 'logout',
+        handler: 'any'
+      };
+      sub.notify(message1);
       return;
     } else if (this.wsState === WsState.NOT_INITED) {
       // this.store.growlError( 'Can\'t establish connection with server');

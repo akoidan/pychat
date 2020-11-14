@@ -40,7 +40,7 @@
     }
 
     async startRecord() {
-      this.logger.debug("Starting recording... {}")();
+      this.$logger.debug("Starting recording... {}")();
       this.store.setDim(true);
       this.navigatorRecord = new MediaCapture(this.isRecordingVideo, platformUtil);
       try {
@@ -58,7 +58,7 @@
         } else {
           this.store.growlError("Unable to capture input device because " + error.message);
         }
-        this.logger.error("Error during capturing media {} {}", error, error.message)();
+        this.$logger.error("Error during capturing media {} {}", error, error.message)();
         this.navigatorRecord.stopRecording();
         throw error;
       }
@@ -75,7 +75,7 @@
     async releaseRecord() {
       this.store.setDim(false);
       let data: Blob|null = await this.navigatorRecord!.stopRecording();
-      this.logger.debug("Finishing recording... {}", data)();
+      this.$logger.debug("Finishing recording... {}", data)();
       if (data) {
         this.emitData(data);
       }

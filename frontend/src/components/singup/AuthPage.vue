@@ -15,13 +15,13 @@
 
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
-import {State} from '@/utils/storeHolder';
+import {State, ApplyGrowlErr} from '@/utils/storeHolder';
 import {AUTO_REGISTRATION} from '@/utils/consts';
-import {api} from '@/utils/singletons';
-import {ApplyGrowlErr, login} from '@/utils/utils';
+import {sub} from "@/utils/sub";
+import {LoginMessage} from "@/types/messages";
 
 @Component
-export default class MainPage extends Vue {
+export default class AuthPage extends Vue {
   @State
   public readonly regHeader!: string;
 
@@ -33,7 +33,8 @@ export default class MainPage extends Vue {
   public async created() {
     if (AUTO_REGISTRATION) {
       const s: string = await this.$api.registerDict(this.getRandom(), this.getRandom());
-      login(s);
+      let message: LoginMessage = {action: 'login', handler: 'router', session: s};
+      sub.notify(message)
     }
   }
 

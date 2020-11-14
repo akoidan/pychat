@@ -33,7 +33,7 @@ if (!ELECTRON_MAIN_FILE) {
 export default class AppInputDate extends Vue {
 
   get datePickerValue() {
-    this.logger.debug('generating date for datepicker {}', this.value)();
+    this.$logger.debug('generating date for datepicker {}', this.value)();
     if (!this.value) {
       return new Date();
     } else {
@@ -57,7 +57,7 @@ export default class AppInputDate extends Vue {
     return (e.target as HTMLInputElement).value;
   }
   public oninput(value: Date) {
-    this.logger.debug('generating date for datepicker {}', this.value)();
+    this.$logger.debug('generating date for datepicker {}', this.value)();
     this.$emit('input', `${value.getFullYear()}-${value.getMonth() + 1}-${value.getDate()}`);
   }
 }

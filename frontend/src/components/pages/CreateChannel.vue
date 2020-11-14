@@ -31,7 +31,7 @@
   import {AddChannelMessage, AddRoomMessage} from '@/types/messages';
   import AppSubmit from '@/components/ui/AppSubmit.vue';
   import {ALL_ROOM_ID} from '@/utils/consts';
-  import {ApplyGrowlErr} from '@/utils/utils';
+  import {ApplyGrowlErr} from '@/utils/storeHolder';
 
   @Component({components: {AppSubmit}})
   export default class CreateChannel extends Vue {

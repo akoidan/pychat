@@ -22,7 +22,7 @@
   import PickUser from "@/components/pages/parts/PickUser";
   import {RoomDictModel, RoomModel, UserModel} from "@/types/model";
   import {AddInviteMessage} from "@/types/messages";
-  import {ApplyGrowlErr} from '@/utils/utils';
+  import {ApplyGrowlErr} from '@/utils/storeHolder';
 
   @Component({components: { AppSubmit, PickUser}})
   export default class InviteUser extends Vue {

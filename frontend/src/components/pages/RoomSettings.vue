@@ -113,7 +113,7 @@ import {
   RoomModel,
   UserDictModel, UserModel
 } from '@/types/model';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {ApplyGrowlErr} from '@/utils/storeHolder';
 import {ALL_ROOM_ID} from '@/utils/consts';
 import ParentChannel from '@/components/pages/parts/ParentChannel.vue';
 import PickUser from '@/components/pages/parts/PickUser.vue';
@@ -135,7 +135,7 @@ export default class RoomSettings extends Vue {
 
   get roomId(): number {
     const id = this.$route.params.id;
-    this.logger.log('Rending room settings for {}', id)();
+    this.$logger.log('Rending room settings for {}', id)();
 
     return parseInt(id);
   }
@@ -159,7 +159,7 @@ export default class RoomSettings extends Vue {
 
   @ApplyGrowlErr({runningProp: 'running'})
   public async leave() {
-    this.logger.log('Leaving room {}', this.roomId)();
+    this.$logger.log('Leaving room {}', this.roomId)();
     await this.$ws.sendLeaveRoom(this.roomId);
     this.$router.replace(`/chat/${ALL_ROOM_ID}`);
   }
@@ -202,7 +202,7 @@ export default class RoomSettings extends Vue {
 
   @ApplyGrowlErr({runningProp: 'running', message: `Can't set room settings`})
   public async apply() {
-    this.logger.log('Applying room {} settings', this.roomId)();
+    this.$logger.log('Applying room {} settings', this.roomId)();
     await this.$ws.sendRoomSettings({
       roomCreatorId: this.singleAdmin,
       volume: this.sound,
@@ -217,7 +217,7 @@ export default class RoomSettings extends Vue {
   }
 
   private setVars() {
-    this.logger.log('Updated for room settings {} ', this.room)();
+    this.$logger.log('Updated for room settings {} ', this.room)();
     if (this.room) {
       this.roomName = this.room.name;
       this.isPublic = !!this.roomName;

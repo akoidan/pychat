@@ -1,4 +1,4 @@
-import {HandlerType, HandlerTypes} from '@/utils/MesageHandler';
+import {HandlerType, HandlerTypes} from '@/types/types';
 import MessagePeerConnection from '@/webrtc/message/MessagePeerConnection';
 
 

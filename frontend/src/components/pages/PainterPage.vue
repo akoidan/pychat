@@ -33,13 +33,13 @@ export default class PainterPage extends Vue {
         vm.prevPage = `/chat/${ALL_ROOM_ID}`;
       }
       // @ts-ignore: next-line
-      vm.logger.debug('Painter prev is set to {}, we came from {}', vm.prevPage, frm.path)();
+      vm.$logger.debug('Painter prev is set to {}, we came from {}', vm.prevPage, frm.path)();
       next();
     });
   }
 
   onEmitMainJoin() {
-    this.logger.log("Emitting back {}", this.blob)();
+    this.$logger.log("Emitting back {}", this.blob)();
     if (this.blob) {
       messageBus.$emit('blob', this.blob);
       this.blob = null;

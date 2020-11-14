@@ -63,7 +63,7 @@ export default class CaptchaComponent extends Vue {
     if (!newValue && newValue != oldValue) {
       if (this.resettingAllowed) {
         if (this.isIframe && this.iframe) {
-          this.logger.log('Resetting captcha')();
+          this.$logger.log('Resetting captcha')();
           this.iframe.contentWindow!.postMessage('reset-captcha', '*');
         } else {
           this.grecaptcha.reset && this.grecaptcha.reset();
@@ -92,19 +92,19 @@ export default class CaptchaComponent extends Vue {
 
   public destroyed(): void {
     if (this.event) {
-      this.logger.log('Removing message listener {}', this.event)();
+      this.$logger.log('Removing message listener {}', this.event)();
       window.removeEventListener('message', this.event);
       this.event = null;
     }
   }
 
   public async created() {
-    this.logger.debug('initing captcha with key {}', RECAPTCHA_PUBLIC_KEY)();
+    this.$logger.debug('initing captcha with key {}', RECAPTCHA_PUBLIC_KEY)();
     if (this.captcha_key) {
       if (this.isIframe) {
-        this.logger.log('Adding message listener')();
+        this.$logger.log('Adding message listener')();
         this.event =  (event: MessageEvent) => {
-          this.logger.log('On message {}', event)();
+          this.$logger.log('On message {}', event)();
           if (event.data && event.data['g-recaptcha-response']) {
             this.captchaInited = true;
             this.value = event.data['g-recaptcha-response']; // TODO emitting prop

@@ -34,7 +34,7 @@ import {
   setVideoEvent,
   setYoutubeEvent, timeToString
 } from '@/utils/htmlApi';
-import {sem} from '@/utils/utils';
+import {sem} from '@/utils/pureFunctions';
 import {messageBus} from '@/utils/singletons';
 import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
 @Component({
@@ -85,7 +85,7 @@ export default class ChatMessage extends Vue {
       if (this.content) {
         this.seEvents();
       } else {
-        this.logger.debug('Skipping event settings, because node is gone')();
+        this.$logger.debug('Skipping event settings, because node is gone')();
       }
     });
   }
@@ -99,7 +99,7 @@ export default class ChatMessage extends Vue {
   }
 
   private seEvents() {
-    this.logger.debug('Setting events')();
+    this.$logger.debug('Setting events')();
     if (this.userSettings.highlightCode) {
       highlightCode(this.content);
     }

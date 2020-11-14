@@ -20,7 +20,7 @@ export default class VideoObject extends Vue {
   @Watch('mediaStreamLink')
   public onMediaStreamChanged(newValue: string) {
     const stream: MediaStream = this.store.mediaObjects[newValue];
-    this.logger.log('Media stream changed {} {}', newValue, stream)();
+    this.$logger.log('Media stream changed {} {}', newValue, stream)();
     if (stream) {
       this.video.srcObject = stream;
       this.video.play();

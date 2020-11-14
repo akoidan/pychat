@@ -22,14 +22,19 @@
   </div>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
+import {ApplyGrowlErr, State} from '@/utils/storeHolder';
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
 import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from '@/utils/consts';
-import {ApplyGrowlErr, initFaceBook, initGoogle, login} from '@/utils/utils';
+import {sub} from "@/utils/sub";
+import {LoginMessage} from "@/types/messages";
+import Login from "@/components/singup/Login.vue";
 
 declare const gapi: any;
 declare const FB: any;
+
+let fbInited = false; // this is a global variable
+let googleInited = false; // this is a global variable
 
 @Component({
   components: {AppSubmit}
@@ -53,13 +58,36 @@ export default class SocialAuth extends Vue {
 
   @ApplyGrowlErr({ message: 'Unable to load google'})
   public async loadGoogle(): Promise<void> {
-    await initGoogle();
+
+    if (!googleInited && GOOGLE_OAUTH_2_CLIENT_ID) {
+      this.$logger.log('Initializing google sdk')();
+      await this.$api.loadGoogle();
+      if (typeof gapi.load !== 'function') { // TODO
+        throw Error(`Gapi doesnt have load function ${JSON.stringify(Object.keys(gapi))}`);
+      }
+      await new Promise(r => gapi.load('client:auth2', r));
+      this.$logger.log('gapi 2 is ready')();
+      await gapi.auth2.init({client_id: GOOGLE_OAUTH_2_CLIENT_ID});
+      this.$logger.log('gauth 2 is ready')();
+      googleInited = true;
+    }
+
     this.googleApiLoaded = true;
   }
 
   @ApplyGrowlErr({ message: 'Unable to load facebook'})
   public async loadFaceBook(): Promise<void> {
-    await initFaceBook();
+    if (!fbInited && FACEBOOK_APP_ID) {
+      await this.$api.loadFacebook();
+      this.$logger.log('Initing facebook sdk...')();
+      FB.init({
+        appId: FACEBOOK_APP_ID,
+        xfbml: true,
+        version: 'v2.7'
+      });
+      fbInited = true;
+    }
+
     this.facebookApiLoaded = true;
   }
 
@@ -71,11 +99,12 @@ export default class SocialAuth extends Vue {
     // @ts-ignore: next-line
     const googleUser = auth2.currentUser.get();
     const profile = googleUser.getBasicProfile();
-    this.logger.log('Signed as {} with id {} and email {}  ',
+    this.$logger.log('Signed as {} with id {} and email {}  ',
                     profile.getName(), profile.getId(), profile.getEmail())();
     this.googleToken = googleUser.getAuthResponse().id_token;
-    const s: string = await this.$api.googleAuth(this.googleToken!);
-    login(s);
+    const session: string = await this.$api.googleAuth(this.googleToken!);
+    let message: LoginMessage = {action: 'login', handler: 'router', session};
+    sub.notify(message);
   }
 
   @ApplyGrowlErr({ message: 'Unable to login in with google', runningProp: 'grunning'})
@@ -101,14 +130,15 @@ export default class SocialAuth extends Vue {
 
   @ApplyGrowlErr({ message: 'Unable to login in with facebook', runningProp: 'frunning'})
   public async fbStatusChangeIfReAuth(response: {status: string}) {
-    this.logger.debug('fbStatusChangeIfReAuth {}', response)();
+    this.$logger.debug('fbStatusChangeIfReAuth {}', response)();
     if (response.status === 'connected') {
       // Logged into your app and Facebook.
       this.store.growlInfo('Successfully logged in into facebook, proceeding...');
       // TODO
       // @ts-ignore: next-line
       const s = await this.$api.facebookAuth(response.authResponse.accessToken);
-      login(s);
+      let message: LoginMessage = {action: 'login', handler: 'router', session: s};
+      sub.notify(message)
 
       return false;
     } else if (response.status === 'not_authorized') {
@@ -128,9 +158,9 @@ export default class SocialAuth extends Vue {
       FB.getLoginStatus(resolve);
     });
 
-    this.logger.log('fbStatusChange {}', response)();
+    this.$logger.log('fbStatusChange {}', response)();
     if (await this.fbStatusChangeIfReAuth(response)) {
-      this.logger.log('Fblogin')();
+      this.$logger.log('Fblogin')();
       const response: {status: string} = await new Promise((resolve, reject) => {
         FB.login(resolve, {
           auth_type: 'reauthenticate',

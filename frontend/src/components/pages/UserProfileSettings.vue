@@ -108,7 +108,7 @@ import {CurrentUserInfoModel, CurrentUserSettingsModel} from '@/types/model';
 import {currentUserInfoDtoToModel, currentUserInfoModelToDto, userSettingsDtoToModel} from '@/types/converters';
 import {UserSettingsDto} from '@/types/dto';
 import {storage} from '@/utils/singletons';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {ApplyGrowlErr} from '@/utils/storeHolder';
 import {SetSettingsMessage} from '@/types/messages';
 
 @Component({
@@ -136,7 +136,7 @@ export default class UserProfileSettings extends Vue {
 
   @ApplyGrowlErr({ message: 'Error saving settings', runningProp: 'running'})
   public async save() {
-    this.logger.debug('Saving userSettings')();
+    this.$logger.debug('Saving userSettings')();
     const cui: UserSettingsDto = {...this.model};
     const e: SetSettingsMessage|unknown = await this.$ws.saveSettings(cui);
     this.store.growlSuccess('Settings have been saved');

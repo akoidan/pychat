@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import {MEDIA_API_URL, PASTED_IMG_CLASS} from '@/utils/consts';
+import {IS_DEBUG, MEDIA_API_URL, PASTED_IMG_CLASS} from '@/utils/consts';
 import {MessageDataEncode, UploadFile} from '@/types/types';
 import {FileModel, MessageModel, UserModel} from '@/types/model';
 import recordIcon from '@/assets/img/audio.svg';
@@ -7,13 +7,16 @@ import {getFlag} from '@/utils/flags';
 import {Smile, smileys, SmileysStructure} from '@/utils/smileys';
 import loggerFactory from '@/utils/loggerFactory';
 import {Logger} from 'lines-logger';
-import {channelsHandler, globalLogger} from '@/utils/singletons';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
 const logger: Logger = loggerFactory.getLoggerColor('htmlApi', '#007a70');
 
 export const savedFiles: { [id: string]: Blob } = {};
+
+if (IS_DEBUG) {
+  window.savedFiles = savedFiles;
+}
 
 export const requestFileSystem: (type: number, size: number, successCallback: FileSystemCallback, errorCallback?: ErrorCallback) => void = window.webkitRequestFileSystem || window.mozRequestFileSystem || window.requestFileSystem;
 const escapeMap: { [id: string]: string } = {
@@ -132,7 +135,7 @@ export function placeCaretAtEnd(userMessage: HTMLElement) {
     sel.removeAllRanges();
     sel.addRange(range);
   } else {
-    globalLogger.warn(`Can't place selection`)();
+    logger.warn(`Can't place selection`)();
   }
 
 }
@@ -207,7 +210,7 @@ export function pasteNodeAtCaret(img: Node, div: HTMLElement) {
     sel.addRange(range);
   } else {
     div.appendChild(img);
-    globalLogger.warn(`Can't handle selection`)();
+    logger.warn(`Can't handle selection`)();
   }
 }
 

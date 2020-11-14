@@ -47,10 +47,12 @@
 <script lang='ts'>
 import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
-import {State} from '@/utils/storeHolder';
-import {ApplyGrowlErr, login} from '@/utils/utils';
+import {ApplyGrowlErr, State} from '@/utils/storeHolder';
+
 import SocialAuth from '@/components/singup/SocialAuth';
 import CaptchaComponent from '@/components/singup/CaptchaComponent';
+import {sub} from "@/utils/sub";
+import {LoginMessage} from "@/types/messages";
 
 @Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
 export default class Login extends Vue {
@@ -66,8 +68,9 @@ export default class Login extends Vue {
 
   @ApplyGrowlErr({runningProp: 'running', message: `Can't log in`})
   public async login() {
-    const ses: string = await this.$api.login(this.form);
-    login(ses);
+    const session: string = await this.$api.login(this.form);
+    let message: LoginMessage = {action: 'login', handler: 'router', session};
+    sub.notify(message)
   }
 
 }

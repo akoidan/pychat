@@ -10,7 +10,7 @@
       <router-link :to="`/chat/${oppositeRoomId}`">
         <i class="icon-comment"><span class="mText">Write message</span></i>
       </router-link>
-
+<!--TODO m2TransferFile undefied-->
       <i
         class="icon-phone-circled"
         onclick="channelsHandler.m2Call()"
@@ -44,7 +44,7 @@ import {Component, Prop, Vue} from 'vue-property-decorator';
 import {UserModel} from '@/types/model';
 import {PrivateRoomsIds} from '@/types/types';
 import {AddRoomMessage} from '@/types/messages';
-import {ApplyGrowlErr} from '@/utils/utils';
+import {ApplyGrowlErr} from '@/utils/storeHolder';
 @Component
 export default class NavUserShow extends Vue {
 

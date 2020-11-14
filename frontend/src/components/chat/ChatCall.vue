@@ -252,7 +252,7 @@ export default class ChatCall extends Vue {
   }
 
   public fullScreenChange() {
-    this.logger.log('fs change')();
+    this.$logger.log('fs change')();
     if (!(document.fullscreenElement || document.webkitFullscreenElement || document.mozFullscreenElement || document.msFullscreenElement)) {
       this.fullscreen = false;
     }
@@ -308,7 +308,7 @@ export default class ChatCall extends Vue {
       if (video.setSinkId) {
         video.setSinkId(newValue);
       } else  {
-        this.logger.error('SetSinkId doesn\'t exist')();
+        this.$logger.error('SetSinkId doesn\'t exist')();
       }
     });
   }

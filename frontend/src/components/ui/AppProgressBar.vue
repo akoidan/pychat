@@ -13,7 +13,7 @@
 </template>
 <script lang="ts">
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import {bytesToSize} from '@/utils/utils';
+import {bytesToSize} from '@/utils/pureFunctions';
 import {UploadProgressModel} from '@/types/model';
 
 @Component
