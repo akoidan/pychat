@@ -23,7 +23,7 @@ import {
 import {
   ApplyGrowlErr,
   State
-} from '@/utils/storeHolder';
+} from '@/instances/storeInstance';
 import AppSubmit from "@/components/ui/AppSubmit";
 import PickUser from "@/components/pages/parts/PickUser";
 import {

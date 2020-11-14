@@ -12,7 +12,7 @@ import {
   isChrome,
   isMobile
 } from '@/utils/runtimeConsts';
-import { sub } from '@/utils/sub';
+import { sub } from '@/instances/subInstance';
 import Subscription from '@/utils/Subscription';
 import {
   CallsInfoModel,

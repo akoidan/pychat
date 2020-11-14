@@ -63,7 +63,7 @@ import {
   Ref,
   Vue
 } from "vue-property-decorator";
-import { ApplyGrowlErr } from '@/utils/storeHolder';
+import { ApplyGrowlErr } from '@/instances/storeInstance';
 import ChatMessage from "@/components/chat/ChatMessage";
 import SearchMessages from "@/components/chat/SearchMessages";
 import {

@@ -1,4 +1,4 @@
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from '@/instances/loggerFactory';
 import {
   IStorage,
   SetRoomsUsers,

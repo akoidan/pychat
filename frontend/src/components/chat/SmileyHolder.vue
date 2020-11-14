@@ -34,7 +34,7 @@ import {
 } from 'vue-property-decorator';
 import { smileys } from '@/utils/smileys';
 
-import { State } from '@/utils/storeHolder';
+import { State } from '@/instances/storeInstance';
 
 @Component
 export default class SmileyHolder extends Vue {

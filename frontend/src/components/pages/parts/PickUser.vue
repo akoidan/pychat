@@ -40,7 +40,7 @@ import {
   Vue
 } from 'vue-property-decorator';
 import { UserModel } from '@/types/model';
-import { State } from '@/utils/storeHolder';
+import { State } from '@/instances/storeInstance';
 
 @Component
 export default class PickUser extends Vue {

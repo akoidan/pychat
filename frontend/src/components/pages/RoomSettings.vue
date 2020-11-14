@@ -102,7 +102,7 @@
   </div>
 </template>
 <script lang="ts">
-import {ApplyGrowlErr, State} from '@/utils/storeHolder';
+import {ApplyGrowlErr, State} from '@/instances/storeInstance';
 import {Component, Vue} from 'vue-property-decorator';
 import AppInputRange from '@/components/ui/AppInputRange';
 import AppSubmit from '@/components/ui/AppSubmit';

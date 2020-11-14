@@ -17,7 +17,7 @@ import {
 import WsHandler from '@/utils/WsHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
 import { DefaultStore } from '@/utils/store';
-import { sub } from '@/utils/sub';
+import { sub } from '@/instances/subInstance';
 import Subscription from '@/utils/Subscription';
 
 export default class MessageTransferHandler extends BaseTransferHandler {

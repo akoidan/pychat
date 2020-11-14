@@ -1,4 +1,4 @@
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from '@/instances/loggerFactory';
 import Api from '@/utils/api';
 import Vue from 'vue';
 import MessageHandler from '@/utils/MesageHandler';
@@ -70,7 +70,7 @@ import {
 } from '@/types/converters';
 import WsHandler from '@/utils/WsHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
-import { sub } from '@/utils/sub';
+import { sub } from '@/instances/subInstance';
 import { DefaultStore } from '@/utils/store';
 import MessageRetrier from "@/utils/MessageRetrier";
 

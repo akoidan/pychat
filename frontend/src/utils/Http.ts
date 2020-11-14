@@ -1,4 +1,4 @@
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from '@/instances/loggerFactory';
 import {
   PostData,
   SessionHolder
@@ -32,5 +32,4 @@ export default abstract class Http {
     });
 
   }
-
 }

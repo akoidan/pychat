@@ -58,7 +58,7 @@
 </template>
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
-import {ApplyGrowlErr, State} from '@/utils/storeHolder';
+import {ApplyGrowlErr, State} from '@/instances/storeInstance';
 import {ViewUserProfileDto} from '@/types/messages';
 import {resolveMediaUrl} from '@/utils/htmlApi';
 import {UserModel} from '@/types/model';

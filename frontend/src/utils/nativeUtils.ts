@@ -4,7 +4,7 @@ import {
   PlatformUtil
 } from '@/types/model';
 import type cordova from 'cordova';
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from '@/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 
 export class AndroidPlatformUtil implements PlatformUtil {

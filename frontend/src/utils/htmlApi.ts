@@ -19,7 +19,7 @@ import {
   smileys,
   SmileysStructure
 } from '@/utils/smileys';
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from '@/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?

@@ -3,7 +3,7 @@ import { extractError } from '@/utils/pureFunctions';
 import { IS_DEBUG } from '@/utils/consts';
 import { isMobile } from '@/utils/runtimeConsts';
 import { Logger } from "lines-logger";
-import loggerFactory from "@/utils/loggerFactory";
+import loggerFactory from "@/instances/loggerFactory";
 
 let audioContext: AudioContext;
 const audioProcesssors: JsAudioAnalyzer[] = [];

@@ -60,7 +60,7 @@ import {
   RoomModel,
   UserDictModel
 } from '@/types/model';
-import { State } from '@/utils/storeHolder';
+import { State } from '@/instances/storeInstance';
 
 import {
   MessageDataEncode,

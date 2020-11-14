@@ -30,7 +30,7 @@
 import {Component, Vue} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit.vue';
 import {ALL_ROOM_ID} from '@/utils/consts';
-import {ApplyGrowlErr} from '@/utils/storeHolder';
+import {ApplyGrowlErr} from '@/instances/storeInstance';
 
 @Component({components: {AppSubmit}})
   export default class CreateChannel extends Vue {

@@ -3,7 +3,7 @@ import {
   SetRoomsUsers,
   StorageData
 } from '@/types/types';
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from '@/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 import {
   ChannelModel,

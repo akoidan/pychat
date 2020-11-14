@@ -7,7 +7,7 @@ import {
   Logger,
   LogStrict
 } from 'lines-logger';
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from '@/instances/loggerFactory';
 import MessageHandler from '@/utils/MesageHandler';
 import {
   CurrentUserInfoModel,
@@ -47,7 +47,7 @@ import {
   UserProfileDto,
   UserSettingsDto
 } from '@/types/dto';
-import { sub } from '@/utils/sub';
+import { sub } from '@/instances/subInstance';
 import { DefaultStore } from '@/utils/store';
 import AbstractMessageProcessor from '@/utils/AbstractMessageProcessor';
 

@@ -1,6 +1,6 @@
 import { SessionHolder } from '@/types/types';
 
-class SessionHolderImpl {
+export class SessionHolderImpl implements SessionHolder {
 
   private static readonly SESSION_KEY = 'session_id';
 
@@ -17,5 +17,3 @@ class SessionHolderImpl {
   }
 
 }
-
-export default new SessionHolderImpl() as SessionHolder;

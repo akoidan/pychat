@@ -8,21 +8,21 @@ import {
   WS_API_URL
 } from '@/utils/consts';
 import App from '@/components/App.vue'; // should be after initStore
-import { sub } from '@/utils/sub';
+import { sub } from '@/instances/subInstance';
 import Vue, { ComponentOptions } from 'vue';
-import { store } from '@/utils/storeHolder';
+import { store } from '@/instances/storeInstance';
 import {
   browserVersion,
   isChrome,
   isMobile
 } from '@/utils/runtimeConsts';
 import { Logger } from "lines-logger";
-import loggerFactory from "@/utils/loggerFactory";
+import loggerFactory from "@/instances/loggerFactory";
 import {
   IStorage,
   StorageData
 } from "@/types/types";
-import sessionHolder from "@/utils/sessionHolder";
+import sessionHolder from "@/instances/sessionInstance";
 import {
   MessageModel,
   PlatformUtil,
@@ -45,6 +45,7 @@ import {
 } from '@/utils/nativeUtils';
 import { AudioPlayer } from "@/utils/audio";
 import router from '@/utils/router';
+import { messageBus } from "@/instances/messageBusInstance";
 
 function declareDirectives() {
   Vue.directive('validity', function (el: HTMLElement, binding) {
@@ -189,7 +190,7 @@ function init() {
 
   const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
   const api: Api = new Api(xhr);
-  const messageBus = new Vue();
+
   const storage: IStorage = window.openDatabase! ? new DatabaseWrapper('v132') : new LocalStorage();
   const WS_URL = WS_API_URL.replace('{}', window.location.host);
   const ws: WsHandler = new WsHandler(WS_URL, sessionHolder, store);
@@ -211,7 +212,6 @@ function init() {
   const logger: Logger = loggerFactory.getLoggerColor('main', '#007a70');
   document.body.addEventListener('drop', e => e.preventDefault());
   document.body.addEventListener('dragover', e => e.preventDefault());
-  debugger
   const vue: Vue = new Vue({router, render: (h: Function): typeof Vue.prototype.$createElement => h(App)});
   vue.$mount('#app');
 

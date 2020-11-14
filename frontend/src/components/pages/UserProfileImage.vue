@@ -42,7 +42,7 @@
   </div>
 </template>
 <script lang="ts">
-import {ApplyGrowlErr, State} from '@/utils/storeHolder';
+import {ApplyGrowlErr, State} from '@/instances/storeInstance';
 import {Component, Ref, Vue, Watch} from 'vue-property-decorator';
 import {canvasContext, resolveMediaUrl, stopVideo} from '@/utils/htmlApi';
 import AppSubmit from '@/components/ui/AppSubmit';

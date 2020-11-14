@@ -103,11 +103,11 @@
   </nav>
 </template>
 <script lang="ts">
-import {State} from '@/utils/storeHolder';
+import {State} from '@/instances/storeInstance';
 import {Component, Vue, Ref} from 'vue-property-decorator';
 import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
 import {ISSUES, GITHUB_LINK, PAINTER, STATISTICS} from '@/utils/consts';
-import {sub} from "@/utils/sub";
+import {sub} from '@/instances/subInstance'
 import {LogoutMessage} from "@/types/messages";
 
 @Component

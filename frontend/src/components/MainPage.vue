@@ -32,7 +32,7 @@ import {
 import NotifierHandler from '@/utils/NotificationHandler';
 
 import {browserVersion, isChrome, isMobile} from '@/utils/runtimeConsts'
-import {State} from '@/utils/storeHolder';
+import {State} from '@/instances/storeInstance';
 import IncomingCall from '@/components/chat/IncomingCall';
 
 @Component({

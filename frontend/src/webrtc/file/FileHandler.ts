@@ -4,7 +4,7 @@ import { SendingFile } from '@/types/model';
 import WsHandler from '@/utils/WsHandler';
 import { ReplyFileMessage } from '@/types/messages';
 import FileSenderPeerConnection from '@/webrtc/file/FileSenderPeerConnection';
-import { sub } from '@/utils/sub';
+import { sub } from '@/instances/subInstance';
 import Subscription from '@/utils/Subscription';
 import { DefaultStore } from '@/utils/store';
 import {

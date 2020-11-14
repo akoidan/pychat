@@ -1,9 +1,9 @@
 import { Logger } from 'lines-logger';
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from '@/instances/loggerFactory';
 import WsHandler from '@/utils/WsHandler';
 import { bytesToSize } from '@/utils/pureFunctions';
 
-import { sub } from '@/utils/sub';
+import { sub } from '@/instances/subInstance';
 import MessageHandler from '@/utils/MesageHandler';
 import Subscription from '@/utils/Subscription';
 import {

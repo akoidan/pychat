@@ -16,7 +16,7 @@
   </p>
 </template>
 <script lang="ts">
-import { State } from '@/utils/storeHolder';
+import { State } from '@/instances/storeInstance';
 import {
   Component,
   Prop,

@@ -98,7 +98,7 @@ export default class Xhr extends Http {
           }
         }
       }
-      r.setRequestHeader('session_id', this.sessionHolder.session);
+      r.setRequestHeader('session_id', this.sessionHolder.session!);
 
       this.httpLogger.log('POST out {} ::: {} ::: {}', url, d.params, logOut)();
       if (d.process) {

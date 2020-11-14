@@ -17,7 +17,7 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { State } from '@/utils/storeHolder';
+import { State } from '@/instances/storeInstance';
 import { ChannelUIModel } from '@/types/model';
 
 @Component

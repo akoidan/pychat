@@ -3,7 +3,7 @@
     <nav-edit-message/>
     <nav-user-show/>
     <div class="wrapper">
-      <chatboxes />
+      <chat-boxes />
       <chat-recording
         :src-video="srcVideo"
         :recording-now="recordingNow"
@@ -35,11 +35,12 @@ import {
 } from 'vue-router';
 import ChatRecording from '@/components/chat/ChatRecording';
 import ChatTextArea from '@/components/chat/ChatTextArea';
-import Chatboxes from '@/components/chat/Chatboxes';
+import ChatBoxes from '@/components/chat/ChatBoxes';
+import { messageBus } from "@/instances/messageBusInstance";
 
 
 @Component({components: {
-  Chatboxes,
+  ChatBoxes,
   ChatTextArea,
   ChatRecording,
   ChatRightSection,
@@ -57,10 +58,9 @@ export default class ChannelsPage extends Vue {
   }
 
   public beforeRouteEnter(to: Route, frm: Route, next: (to?: RawLocation | false | ((vm: Vue) => any) | void) => void) {
-    // let $messageBus = this.$messageBus;
-    // next(vm => {
-    //   $messageBus.$emit('main-join');
-    // });
+    next(vm => {
+      messageBus.$emit('main-join'); // this doesn't exists in router hooks yet, can't use this.$messageBus
+    });
   }
 
 }

@@ -69,7 +69,7 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import {ChannelsDictUIModel, ChannelUIModel, CurrentUserInfoModel, UserModel} from '@/types/model';
-import {ApplyGrowlErr, State} from '@/utils/storeHolder';
+import {ApplyGrowlErr, State} from '@/instances/storeInstance';
 import AppSubmit from '@/components/ui/AppSubmit.vue';
 import PickUser from '@/components/pages/parts/PickUser.vue';
 

@@ -291,5 +291,5 @@ export interface SmileyStructure {
 }
 
 export interface SessionHolder {
-  session: string;
+  session: string|null;
 }

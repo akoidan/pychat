@@ -1,6 +1,6 @@
 import { Logger } from 'lines-logger';
 import { XHR_API_URL } from '@/utils/consts';
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from '@/instances/loggerFactory';
 
 declare var clients: any;
 

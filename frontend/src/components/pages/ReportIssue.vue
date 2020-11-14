@@ -50,7 +50,7 @@
   </form>
 </template>
 <script lang="ts">
-import {ApplyGrowlErr} from '@/utils/storeHolder';
+import {ApplyGrowlErr} from '@/instances/storeInstance';
 import {Component, Ref, Vue, Watch} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
 import {GIT_HASH} from '@/utils/consts';

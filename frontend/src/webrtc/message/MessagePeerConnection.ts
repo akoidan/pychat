@@ -5,7 +5,7 @@ import {
 } from '@/types/messages';
 import WsHandler from '@/utils/WsHandler';
 import { DefaultStore } from '@/utils/store';
-import { sub } from '@/utils/sub';
+import { sub } from '@/instances/subInstance';
 import {
   HandlerType,
   HandlerTypes,

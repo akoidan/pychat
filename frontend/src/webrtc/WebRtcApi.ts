@@ -1,4 +1,4 @@
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from '@/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 import {
   HandlerType,
@@ -18,7 +18,7 @@ import {
 import FileHandler from '@/webrtc/file/FileHandler';
 import NotifierHandler from '@/utils/NotificationHandler';
 import MessageHandler from '@/utils/MesageHandler';
-import { sub } from '@/utils/sub';
+import { sub } from '@/instances/subInstance';
 import { MAX_ACCEPT_FILE_SIZE_WO_FS_API } from '@/utils/consts';
 import { requestFileSystem } from '@/utils/htmlApi';
 import FileReceiverPeerConnection from '@/webrtc/file/FileReceiveerPeerConnection';

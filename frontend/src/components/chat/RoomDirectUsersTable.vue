@@ -27,7 +27,7 @@ import {
   Vue
 } from 'vue-property-decorator';
 import RoomUsersPrivate from '@/components/chat/RoomUsersPrivate.vue';
-import { State } from '@/utils/storeHolder';
+import { State } from '@/instances/storeInstance';
 import { RoomModel } from '@/types/model';
 
 @Component({

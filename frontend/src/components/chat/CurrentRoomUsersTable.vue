@@ -30,7 +30,7 @@ import {
   Component,
   Vue
 } from 'vue-property-decorator';
-import { State } from '@/utils/storeHolder';
+import { State } from '@/instances/storeInstance';
 import { UserModel } from '@/types/model';
 import RoomUsersUser from '@/components/chat/RoomUsersUser.vue';
 

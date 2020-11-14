@@ -1,5 +1,5 @@
 import { Logger } from "lines-logger";
-import loggerFactory from "@/utils/loggerFactory";
+import loggerFactory from "@/instances/loggerFactory";
 import MessageHandler from "@/utils/MesageHandler";
 import {
   HandlerType,

@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import sessionHolder from '@/utils/sessionHolder';
-import { store } from '@/utils/storeHolder';
+import sessionHolder from '@/instances/sessionInstance';
+import { store } from '@/instances/storeInstance';
 import MainPage from '@/components/MainPage.vue';
 import ChannelsPage from '@/components/chat/ChannelsPage.vue';
 import AuthPage from '@/components/singup/AuthPage.vue';
@@ -31,7 +31,7 @@ import { Route } from 'vue-router/types';
 import CreateRoomChannel from '@/components/pages/CreateRoomChannel.vue';
 import CreateChannel from '@/components/pages/CreateChannel.vue';
 import ChannelSettings from '@/components/pages/ChannelSettings.vue';
-import { sub } from "@/utils/sub";
+import { sub } from '@/instances/subInstance';
 import MessageHandler from "@/utils/MesageHandler";
 import {
   HandlerType,
@@ -43,7 +43,7 @@ import {
   LogoutMessage,
   RouterNavigateMessage
 } from "@/types/messages";
-import loggerFactory from "@/utils/loggerFactory";
+import loggerFactory from "@/instances/loggerFactory";
 
 Vue.use(VueRouter);
 

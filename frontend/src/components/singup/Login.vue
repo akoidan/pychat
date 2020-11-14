@@ -47,11 +47,11 @@
 <script lang='ts'>
 import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
-import {ApplyGrowlErr, State} from '@/utils/storeHolder';
+import {ApplyGrowlErr, State} from '@/instances/storeInstance';
 
 import SocialAuth from '@/components/singup/SocialAuth';
 import CaptchaComponent from '@/components/singup/CaptchaComponent';
-import {sub} from "@/utils/sub";
+import {sub} from '@/instances/subInstance'
 import {LoginMessage} from "@/types/messages";
 
 @Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})

@@ -4,11 +4,11 @@ import {
   GrowlMessage
 } from '@/types/messages';
 import { Logger } from 'lines-logger';
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from '@/instances/loggerFactory';
 import { MessageSupplier } from '@/types/types';
 import type { DefaultStore } from '@/utils/store';
 import { getUniqueId } from '@/utils/pureFunctions';
-import { sub } from '@/utils/sub';
+import { sub } from '@/instances/subInstance';
 
 export default class AbstractMessageProcessor {
 

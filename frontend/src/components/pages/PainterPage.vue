@@ -8,7 +8,7 @@ import {Component, Ref, Vue} from 'vue-property-decorator';
 import Painter from 'spainter';
 import {ALL_ROOM_ID} from '@/utils/consts';
 
-import loggerFactory from '@/utils/loggerFactory';
+import loggerFactory from '@/instances/loggerFactory';
 import AppInputRange from '@/components/ui/AppInputRange';
 import {RawLocation, Route} from 'vue-router';
 

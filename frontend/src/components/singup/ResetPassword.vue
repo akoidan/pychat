@@ -30,9 +30,9 @@
 <script lang='ts'>
 import {Vue, Component, Prop, Ref} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
-import {State} from '@/utils/storeHolder';
+import {State} from '@/instances/storeInstance';
 import CaptchaComponent from '@/components/singup/CaptchaComponent';
-import {ApplyGrowlErr} from '@/utils/storeHolder';
+import {ApplyGrowlErr} from '@/instances/storeInstance';
 
 @Component({components: {CaptchaComponent, AppSubmit}})
 export default class ResetPassword extends Vue {

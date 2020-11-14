@@ -15,9 +15,9 @@
 
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
-import {State, ApplyGrowlErr} from '@/utils/storeHolder';
+import {State, ApplyGrowlErr} from '@/instances/storeInstance';
 import {AUTO_REGISTRATION} from '@/utils/consts';
-import {sub} from "@/utils/sub";
+import {sub} from '@/instances/subInstance'
 import {LoginMessage} from "@/types/messages";
 
 @Component

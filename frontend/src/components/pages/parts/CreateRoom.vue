@@ -70,7 +70,7 @@
 import {
   ApplyGrowlErr,
   State
-} from '@/utils/storeHolder';
+} from '@/instances/storeInstance';
 import {
   Component,
   Prop,

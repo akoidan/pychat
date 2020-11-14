@@ -23,7 +23,7 @@ import {
   Vue
 } from 'vue-property-decorator';
 import ChatBox from '@/components/chat/ChatBox.vue';
-import { State } from '@/utils/storeHolder';
+import { State } from '@/instances/storeInstance';
 
 import { ALL_ROOM_ID } from '@/utils/consts';
 
@@ -33,7 +33,7 @@ import { RoomModel } from '@/types/model';
 @Component({
     components: {ChatBox}
   })
-  export default class Chatboxes extends Vue {
+  export default class ChatBoxes extends Vue {
 
 
     @State

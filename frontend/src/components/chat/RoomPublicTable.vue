@@ -33,7 +33,7 @@ import {
 } from 'vue-property-decorator';
 import ChannelLi from '@/components/chat/ChannelLi.vue';
 import RoomUsersPublic from '@/components/chat/RoomUsersPublic.vue';
-import { State } from '@/utils/storeHolder';
+import { State } from '@/instances/storeInstance';
 import {
   ChannelUIModel,
   RoomModel
