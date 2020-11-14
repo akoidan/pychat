@@ -7,7 +7,7 @@ import {
   IS_DEBUG,
   WS_API_URL
 } from '@/ts/utils/consts';
-import App from '@/components/App.vue'; // should be after initStore
+import App from '@/vue/App.vue'; // should be after initStore
 import { sub } from '@/ts/instances/subInstance';
 import Vue, { ComponentOptions } from 'vue';
 import { store } from '@/ts/instances/storeInstance';

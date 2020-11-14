@@ -2,35 +2,35 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import sessionHolder from '@/ts/instances/sessionInstance';
 import { store } from '@/ts/instances/storeInstance';
-import MainPage from '@/components/MainPage.vue';
-import ChannelsPage from '@/components/chat/ChannelsPage.vue';
-import AuthPage from '@/components/singup/AuthPage.vue';
-import ResetPassword from '@/components/singup/ResetPassword.vue';
-import Login from '@/components/singup/Login.vue';
-import SignUp from '@/components/singup/SignUp.vue';
-import UserProfile from '@/components/pages/UserProfile.vue';
-import InviteUser from '@/components/pages/InviteUser.vue';
-import ReportIssue from '@/components/pages/ReportIssue.vue';
-import UserProfileChangePassword from '@/components/pages/UserProfileChangePassword.vue';
-import UserProfileImage from '@/components/pages/UserProfileImage.vue';
-import UserProfileInfo from '@/components/pages/UserProfileInfo.vue';
-import UserProfileSettings from '@/components/pages/UserProfileSettings.vue';
-import CreatePrivateRoom from '@/components/pages/CreatePrivateRoom.vue';
-import CreatePublicRoom from '@/components/pages/CreatePublicRoom.vue';
-import ViewProfilePage from '@/components/pages/ViewProfilePage.vue';
-import RoomSettings from '@/components/pages/RoomSettings.vue';
-import ApplyResetPassword from '@/components/singup/ApplyResetPassword.vue';
+import MainPage from '@/vue/MainPage.vue';
+import ChannelsPage from '@/vue/chat/ChannelsPage.vue';
+import AuthPage from '@/vue/singup/AuthPage.vue';
+import ResetPassword from '@/vue/singup/ResetPassword.vue';
+import Login from '@/vue/singup/Login.vue';
+import SignUp from '@/vue/singup/SignUp.vue';
+import UserProfile from '@/vue/pages/UserProfile.vue';
+import InviteUser from '@/vue/pages/InviteUser.vue';
+import ReportIssue from '@/vue/pages/ReportIssue.vue';
+import UserProfileChangePassword from '@/vue/pages/UserProfileChangePassword.vue';
+import UserProfileImage from '@/vue/pages/UserProfileImage.vue';
+import UserProfileInfo from '@/vue/pages/UserProfileInfo.vue';
+import UserProfileSettings from '@/vue/pages/UserProfileSettings.vue';
+import CreatePrivateRoom from '@/vue/pages/CreatePrivateRoom.vue';
+import CreatePublicRoom from '@/vue/pages/CreatePublicRoom.vue';
+import ViewProfilePage from '@/vue/pages/ViewProfilePage.vue';
+import RoomSettings from '@/vue/pages/RoomSettings.vue';
+import ApplyResetPassword from '@/vue/singup/ApplyResetPassword.vue';
 import {
   ALL_ROOM_ID,
   PAINTER,
   STATISTICS
 } from '@/ts/utils/consts';
-import ConfirmMail from '@/components/email/ConfirmMail.vue';
-import UserProfileChangeEmail from '@/components/pages/UserProfileChangeEmail.vue';
+import ConfirmMail from '@/vue/email/ConfirmMail.vue';
+import UserProfileChangeEmail from '@/vue/pages/UserProfileChangeEmail.vue';
 import { Route } from 'vue-router/types';
-import CreateRoomChannel from '@/components/pages/CreateRoomChannel.vue';
-import CreateChannel from '@/components/pages/CreateChannel.vue';
-import ChannelSettings from '@/components/pages/ChannelSettings.vue';
+import CreateRoomChannel from '@/vue/pages/CreateRoomChannel.vue';
+import CreateChannel from '@/vue/pages/CreateChannel.vue';
+import ChannelSettings from '@/vue/pages/ChannelSettings.vue';
 import { sub } from '@/ts/instances/subInstance';
 import MessageHandler from "@/ts/message_handlers/MesageHandler";
 import {
@@ -75,11 +75,11 @@ export const router = new VueRouter({
           path: '/chat/:id'
         },
         ...PAINTER ? [{
-          component: () => import(/* webpackChunkName: "spainter" */'@/components/pages/PainterPage.vue'),
+          component: () => import(/* webpackChunkName: "spainter" */'@/vue/pages/PainterPage.vue'),
           path: '/painter'
         }]: [],
         ...STATISTICS ? [{
-          component: () => import(/* webpackChunkName: "amchart" */ '@/components/pages/AmChart.vue'),
+          component: () => import(/* webpackChunkName: "amchart" */ '@/vue/pages/AmChart.vue'),
           path: '/statistics'
         }]: [],
         {
