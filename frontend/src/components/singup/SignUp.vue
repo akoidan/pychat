@@ -20,7 +20,9 @@
         required
         placeholder="Username"
         name="username"
-class="input" @focus="userFoc = false" @blur="userFoc = true"
+        class="input"
+        @focus="userFoc = false"
+        @blur="userFoc = true"
       >
     </register-field-set>
     <register-field-set
