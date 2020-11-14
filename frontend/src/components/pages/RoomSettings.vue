@@ -102,13 +102,13 @@
   </div>
 </template>
 <script lang="ts">
-import {ApplyGrowlErr, State} from '@/instances/storeInstance';
+import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import {Component, Vue} from 'vue-property-decorator';
 import AppInputRange from '@/components/ui/AppInputRange';
 import AppSubmit from '@/components/ui/AppSubmit';
 import AppCheckbox from '@/components/ui/AppCheckbox';
-import {CurrentUserInfoModel, RoomDictModel, RoomModel, UserDictModel, UserModel} from '@/types/model';
-import {ALL_ROOM_ID} from '@/utils/consts';
+import {CurrentUserInfoModel, RoomDictModel, RoomModel, UserDictModel, UserModel} from '@/ts/types/model';
+import {ALL_ROOM_ID} from '@/ts/utils/consts';
 import ParentChannel from '@/components/pages/parts/ParentChannel.vue';
 import PickUser from '@/components/pages/parts/PickUser.vue';
 

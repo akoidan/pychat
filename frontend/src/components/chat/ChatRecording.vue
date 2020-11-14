@@ -24,7 +24,7 @@ import {
   Vue,
   Watch
 } from 'vue-property-decorator';
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 
 @Component
   export default class ChatRecording extends Vue {

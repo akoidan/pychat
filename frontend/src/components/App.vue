@@ -14,8 +14,8 @@
 <script lang='ts'>
 import Growl from '@/components/ui/AppGrowl';
 import {Component, Vue, Watch} from 'vue-property-decorator';
-import {CurrentUserSettingsModel, GrowlModel} from '@/types/model';
-import {State} from '@/instances/storeInstance';
+import {CurrentUserSettingsModel, GrowlModel} from '@/ts/types/model';
+import {State} from '@/ts/instances/storeInstance';
 
 @Component({
   components: {Growl}

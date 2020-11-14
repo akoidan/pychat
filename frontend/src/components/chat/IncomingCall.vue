@@ -40,7 +40,7 @@
   </div>
 </template>
 <script lang="ts">
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
   Prop,
@@ -50,7 +50,7 @@ import {
   IncomingCallModel,
   RoomDictModel,
   UserModel
-} from '@/types/model';
+} from '@/ts/types/model';
 
 
 @Component

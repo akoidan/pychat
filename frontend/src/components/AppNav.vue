@@ -103,12 +103,12 @@
   </nav>
 </template>
 <script lang="ts">
-import {State} from '@/instances/storeInstance';
+import {State} from '@/ts/instances/storeInstance';
 import {Component, Vue, Ref} from 'vue-property-decorator';
-import {CurrentUserInfoModel, RoomModel, UserModel} from '@/types/model';
-import {ISSUES, GITHUB_LINK, PAINTER, STATISTICS} from '@/utils/consts';
-import {sub} from '@/instances/subInstance'
-import {LogoutMessage} from "@/types/messages";
+import {CurrentUserInfoModel, RoomModel, UserModel} from '@/ts/types/model';
+import {ISSUES, GITHUB_LINK, PAINTER, STATISTICS} from '@/ts/utils/consts';
+import {sub} from '@/ts/instances/subInstance'
+import {LogoutMessage} from "@/ts/types/messages";
 
 @Component
 export default class AppNav extends Vue {

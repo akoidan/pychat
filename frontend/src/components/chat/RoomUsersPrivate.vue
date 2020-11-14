@@ -7,7 +7,7 @@
   </li>
 </template>
 <script lang="ts">
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
   Prop,
@@ -17,8 +17,8 @@ import {
   CurrentUserInfoModel,
   RoomModel,
   UserModel
-} from '@/types/model';
-import { PrivateRoomsIds } from '@/types/types';
+} from '@/ts/types/model';
+import { PrivateRoomsIds } from '@/ts/types/types';
 import RoomRightIcon from '@/components/chat/RoomRightIcon.vue';
 import UserNameSex from '@/components/chat/UserNameSex.vue';
 

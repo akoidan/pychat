@@ -22,12 +22,12 @@
   </div>
 </template>
 <script lang="ts">
-import {ApplyGrowlErr, State} from '@/instances/storeInstance';
+import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
-import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from '@/utils/consts';
-import {sub} from '@/instances/subInstance'
-import {LoginMessage} from "@/types/messages";
+import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from '@/ts/utils/consts';
+import {sub} from '@/ts/instances/subInstance'
+import {LoginMessage} from "@/ts/types/messages";
 import Login from "@/components/singup/Login.vue";
 
 declare const gapi: any;

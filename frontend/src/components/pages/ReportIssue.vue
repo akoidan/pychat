@@ -50,11 +50,11 @@
   </form>
 </template>
 <script lang="ts">
-import {ApplyGrowlErr} from '@/instances/storeInstance';
+import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 import {Component, Ref, Vue, Watch} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
-import {GIT_HASH} from '@/utils/consts';
-import {browserVersion} from '@/utils/runtimeConsts';
+import {GIT_HASH} from '@/ts/utils/consts';
+import {browserVersion} from '@/ts/utils/runtimeConsts';
 
 @Component({components: {AppSubmit}})
 export default class ReportIssue extends Vue {

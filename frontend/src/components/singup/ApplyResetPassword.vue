@@ -43,9 +43,9 @@
 
   import {Prop, Component} from "vue-property-decorator";
   import Vue from 'vue';
-  import {State} from '@/instances/storeInstance';
+  import {State} from '@/ts/instances/storeInstance';
   import AppSubmit from '@/components/ui/AppSubmit';
-  import {ApplyGrowlErr} from '@/instances/storeInstance';
+  import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 
   @Component({components: {AppSubmit}})
   export default class ApplyResetPassword extends Vue {

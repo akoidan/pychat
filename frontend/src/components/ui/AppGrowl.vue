@@ -16,7 +16,7 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { GrowlModel } from '@/types/model';
+import { GrowlModel } from '@/ts/types/model';
 
 @Component
 export default class AppGrowl extends Vue {

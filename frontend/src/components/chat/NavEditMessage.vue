@@ -21,12 +21,12 @@
   </nav>
 </template>
 <script lang="ts">
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
   Vue
 } from 'vue-property-decorator';
-import { EditingMessage } from '@/types/model';
+import { EditingMessage } from '@/ts/types/model';
 
 
 @Component

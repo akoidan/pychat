@@ -29,8 +29,8 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit.vue';
-import {ALL_ROOM_ID} from '@/utils/consts';
-import {ApplyGrowlErr} from '@/instances/storeInstance';
+import {ALL_ROOM_ID} from '@/ts/utils/consts';
+import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 
 @Component({components: {AppSubmit}})
   export default class CreateChannel extends Vue {

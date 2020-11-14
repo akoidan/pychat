@@ -33,11 +33,11 @@ import {
 } from 'vue-property-decorator';
 import ChannelLi from '@/components/chat/ChannelLi.vue';
 import RoomUsersPublic from '@/components/chat/RoomUsersPublic.vue';
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 import {
   ChannelUIModel,
   RoomModel
-} from '@/types/model';
+} from '@/ts/types/model';
 
 @Component({
     components: {RoomUsersPublic, ChannelLi}

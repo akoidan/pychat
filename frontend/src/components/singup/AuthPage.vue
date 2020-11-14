@@ -15,10 +15,10 @@
 
 <script lang='ts'>
 import {Component, Vue} from 'vue-property-decorator';
-import {State, ApplyGrowlErr} from '@/instances/storeInstance';
-import {AUTO_REGISTRATION} from '@/utils/consts';
-import {sub} from '@/instances/subInstance'
-import {LoginMessage} from "@/types/messages";
+import {State, ApplyGrowlErr} from '@/ts/instances/storeInstance';
+import {AUTO_REGISTRATION} from '@/ts/utils/consts';
+import {sub} from '@/ts/instances/subInstance'
+import {LoginMessage} from "@/ts/types/messages";
 
 @Component
 export default class AuthPage extends Vue {

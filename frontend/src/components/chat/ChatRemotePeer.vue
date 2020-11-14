@@ -24,7 +24,7 @@ import {
   Vue,
   Watch
 } from 'vue-property-decorator';
-import { CallInfoModel } from '@/types/model';
+import { CallInfoModel } from '@/ts/types/model';
 import AppInputRange from '@/components/ui/AppInputRange';
 import VideoObject from '@/components/chat/VideoObject';
 

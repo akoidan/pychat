@@ -22,7 +22,7 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { ChannelUIModel } from '@/types/model';
+import { ChannelUIModel } from '@/ts/types/model';
 import RoomUsersPublic from '@/components/chat/RoomUsersPublic.vue';
 
 @Component({

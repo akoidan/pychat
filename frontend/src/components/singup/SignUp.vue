@@ -121,15 +121,15 @@
 <script lang='ts'>
 
   import {Vue, Component, Prop, Watch, Ref} from "vue-property-decorator";
-  import {State, ApplyGrowlErr} from '@/instances/storeInstance';
+  import {State, ApplyGrowlErr} from '@/ts/instances/storeInstance';
   import AppSubmit from "@/components/ui/AppSubmit"
   import RegisterFieldSet from '@/components/singup/RegisterFieldSet.vue'
   import debounce from 'lodash.debounce';
-  import {IconColor} from '@/types/types';
+  import {IconColor} from '@/ts/types/types';
   import SocialAuth from '@/components/singup/SocialAuth';
-  import {SexModelString} from '@/types/model';
-  import {sub} from '@/instances/subInstance'
-  import {LoginMessage} from "@/types/messages";
+  import {SexModelString} from '@/ts/types/model';
+  import {sub} from '@/ts/instances/subInstance'
+  import {LoginMessage} from "@/ts/types/messages";
 
   @Component({components: {SocialAuth, AppSubmit, RegisterFieldSet}})
   export default class SignUp extends Vue {

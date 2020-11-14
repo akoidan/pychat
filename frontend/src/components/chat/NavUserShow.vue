@@ -42,14 +42,14 @@
 import {
   ApplyGrowlErr,
   State
-} from '@/instances/storeInstance';
+} from '@/ts/instances/storeInstance';
 import {
   Component,
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { UserModel } from '@/types/model';
-import { PrivateRoomsIds } from '@/types/types';
+import { UserModel } from '@/ts/types/model';
+import { PrivateRoomsIds } from '@/ts/types/types';
 
 @Component
 export default class NavUserShow extends Vue {

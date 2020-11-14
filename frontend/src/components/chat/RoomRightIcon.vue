@@ -37,7 +37,7 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { RoomModel } from '@/types/model';
+import { RoomModel } from '@/ts/types/model';
 
 @Component
   export default class RoomRightIcon extends Vue {

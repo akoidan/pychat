@@ -13,7 +13,7 @@
   </li>
 </template>
 <script lang="ts">
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
   Prop,
@@ -22,9 +22,9 @@ import {
 import {
   RoomModel,
   UserModel
-} from '@/types/model';
-import { getFlagPath, } from '@/utils/htmlApi';
-import { FLAGS } from '@/utils/consts';
+} from '@/ts/types/model';
+import { getFlagPath, } from '@/ts/utils/htmlApi';
+import { FLAGS } from '@/ts/utils/consts';
 import UserNameSex from '@/components/chat/UserNameSex.vue';
 
 @Component({

@@ -36,7 +36,7 @@ import {
 import ChatRecording from '@/components/chat/ChatRecording';
 import ChatTextArea from '@/components/chat/ChatTextArea';
 import ChatBoxes from '@/components/chat/ChatBoxes';
-import { messageBus } from "@/instances/messageBusInstance";
+import { messageBus } from "@/ts/instances/messageBusInstance";
 
 
 @Component({components: {

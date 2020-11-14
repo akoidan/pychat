@@ -18,17 +18,17 @@
 </template>
 <script lang="ts">
 
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
   Vue
 } from "vue-property-decorator";
-import MediaCapture from '@/utils/MediaCapture';
+import MediaCapture from '@/ts/classes/MediaCapture';
 
 import {
   isChrome,
   isMobile
-} from '@/utils/runtimeConsts';
+} from '@/ts/utils/runtimeConsts';
 
 
 @Component

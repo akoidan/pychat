@@ -51,7 +51,7 @@ import {
   pasteImgToTextArea,
   placeCaretAtEnd,
   timeToString
-} from '@/utils/htmlApi';
+} from '@/ts/utils/htmlApi';
 import {
   CurrentUserInfoModel,
   EditingMessage,
@@ -59,17 +59,17 @@ import {
   MessageModel,
   RoomModel,
   UserDictModel
-} from '@/types/model';
-import { State } from '@/instances/storeInstance';
+} from '@/ts/types/model';
+import { State } from '@/ts/instances/storeInstance';
 
 import {
   MessageDataEncode,
   UploadFile
-} from '@/types/types';
+} from '@/ts/types/types';
 import {
   getUniqueId,
   sem
-} from '@/utils/pureFunctions';
+} from '@/ts/utils/pureFunctions';
 import MediaRecorder from '@/components/chat/MediaRecorder.vue';
 import {
   RawLocation,

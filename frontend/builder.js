@@ -165,13 +165,13 @@ const getConfig = async () => {
     }
     return res;
   }
-  const entry = ['reflect-metadata', './src/main.ts'];
+  const entry = ['reflect-metadata', './src/ts/main.ts'];
 
 
   let webpackOptions = {
     hash: true,
     favicon: 'src/assets/img/favicon.ico',
-    template: 'src/index.ejs',
+    template: 'src/assets/index.ejs',
     inject: false
   };
   if (options.MANIFEST && options.IS_WEB) {
@@ -220,7 +220,7 @@ const getConfig = async () => {
     plugins.push(new SaveHtmlToFile('/tmp/electron.html'));
   }
   if (!options.IS_DEBUG && options.IS_WEB) {
-    entry.unshift('./src/polyfills/inputEvent.ts')
+    entry.unshift('./src/ts/polyfills/inputEvent.ts')
   }
   if (options.IS_PROD) {
     const SriPlugin = require('webpack-subresource-integrity');
@@ -570,7 +570,7 @@ async function setup() {
     let config = getSimpleConfig(
       'electron.js',
       options.IS_PROD ? getDist() : '/tmp/',
-      ['./src/electron.ts'],
+      ['./src/devices/electron.ts'],
       'electron-main',
     );
     await runWebpack(config);
@@ -588,7 +588,7 @@ async function setup() {
     let config = getSimpleConfig(
       'sw.js',
       options.IS_PROD ? getDist() : '/tmp/',
-      ['./src/sw.ts']
+      ['./src/ts/sw.ts']
     );
     await runWebpack(config);
   }

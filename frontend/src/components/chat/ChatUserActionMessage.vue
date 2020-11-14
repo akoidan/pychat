@@ -7,14 +7,14 @@
   </p>
 </template>
 <script lang="ts">
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { UserModel } from '@/types/model';
-import {timeToString} from "@/utils/htmlApi";
+import { UserModel } from '@/ts/types/model';
+import {timeToString} from "@/ts/utils/htmlApi";
 
 
 @Component

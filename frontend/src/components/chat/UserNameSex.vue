@@ -7,7 +7,7 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { UserModel } from '@/types/model';
+import { UserModel } from '@/ts/types/model';
 
 @Component
   export default class UserNameSex extends Vue {

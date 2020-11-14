@@ -16,7 +16,7 @@
   </div>
 </template>
 <script lang="ts">
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
   Prop,
@@ -25,12 +25,12 @@ import {
 import ChatMessage from '@/components/chat/ChatMessage';
 import AppProgressBar from '@/components/ui/AppProgressBar';
 
-import { SetMessageProgressError } from '@/types/types';
+import { SetMessageProgressError } from '@/ts/types/types';
 import {
   CurrentUserInfoModel,
   MessageModel,
   RoomDictModel
-} from '@/types/model';
+} from '@/ts/types/model';
 
 @Component({
   components: {AppProgressBar, ChatMessage}

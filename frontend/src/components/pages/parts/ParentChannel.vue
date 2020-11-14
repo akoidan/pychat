@@ -17,8 +17,8 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { State } from '@/instances/storeInstance';
-import { ChannelUIModel } from '@/types/model';
+import { State } from '@/ts/instances/storeInstance';
+import { ChannelUIModel } from '@/ts/types/model';
 
 @Component
   export default class ParentChannel extends Vue {

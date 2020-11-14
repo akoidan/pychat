@@ -39,8 +39,8 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { UserModel } from '@/types/model';
-import { State } from '@/instances/storeInstance';
+import { UserModel } from '@/ts/types/model';
+import { State } from '@/ts/instances/storeInstance';
 
 @Component
 export default class PickUser extends Vue {

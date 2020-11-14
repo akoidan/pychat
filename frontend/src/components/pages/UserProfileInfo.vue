@@ -102,14 +102,14 @@
   </form>
 </template>
 <script lang="ts">
-import {ApplyGrowlErr, State} from '@/instances/storeInstance';
+import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import {Component, Vue} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
-import {CurrentUserInfoModel, SexModelString} from '@/types/model';
-import {UserProfileDto} from '@/types/dto';
-import {currentUserInfoModelToDto} from '@/types/converters';
+import {CurrentUserInfoModel, SexModelString} from '@/ts/types/model';
+import {UserProfileDto} from '@/ts/types/dto';
+import {currentUserInfoModelToDto} from '@/ts/types/converters';
 import AppInputDate from '@/components/ui/AppInputDate';
-import {SetUserProfileMessage} from '@/types/messages';
+import {SetUserProfileMessage} from '@/ts/types/messages';
 
 @Component({
   components: {AppInputDate, AppSubmit}

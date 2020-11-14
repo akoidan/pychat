@@ -187,7 +187,7 @@
   </div>
 </template>
 <script lang="ts">
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
   Prop,
@@ -195,15 +195,15 @@ import {
   Vue,
   Watch
 } from 'vue-property-decorator';
-import { CallsInfoModel } from '@/types/model';
+import { CallsInfoModel } from '@/ts/types/model';
 import {
   BooleanIdentifier,
   StringIdentifier,
   VideoType
-} from '@/types/types';
+} from '@/ts/types/types';
 
 import ChatRemotePeer from '@/components/chat/ChatRemotePeer';
-import { file } from '@/utils/audio';
+import { file } from '@/ts/utils/audio';
 import VideoObject from '@/components/chat/VideoObject';
 
 @Component({

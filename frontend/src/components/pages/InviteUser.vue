@@ -23,13 +23,13 @@ import {
 import {
   ApplyGrowlErr,
   State
-} from '@/instances/storeInstance';
+} from '@/ts/instances/storeInstance';
 import AppSubmit from "@/components/ui/AppSubmit";
 import PickUser from "@/components/pages/parts/PickUser";
 import {
   RoomDictModel,
   RoomModel
-} from "@/types/model";
+} from "@/ts/types/model";
 
 @Component({components: { AppSubmit, PickUser}})
   export default class InviteUser extends Vue {

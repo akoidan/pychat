@@ -31,11 +31,11 @@ import {
 import {
   RoomModel,
   SearchModel
-} from '@/types/model';
-import { MessageModelDto } from '@/types/dto';
+} from '@/ts/types/model';
+import { MessageModelDto } from '@/ts/types/dto';
 
-import { SetSearchTo } from '@/types/types';
-import { MESSAGES_PER_SEARCH } from '@/utils/consts';
+import { SetSearchTo } from '@/ts/types/types';
+import { MESSAGES_PER_SEARCH } from '@/ts/utils/consts';
 
 const START_TYPING = 'Start typing and messages will appear';
 

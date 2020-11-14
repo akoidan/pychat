@@ -21,8 +21,8 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { isDateMissing } from '@/utils/htmlApi';
-import { ELECTRON_MAIN_FILE } from '@/utils/consts';
+import { isDateMissing } from '@/ts/utils/htmlApi';
+import { ELECTRON_MAIN_FILE } from '@/ts/utils/consts';
 
 let Datepicker: unknown;
 if (!ELECTRON_MAIN_FILE) {

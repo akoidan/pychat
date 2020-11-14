@@ -16,7 +16,7 @@
   </p>
 </template>
 <script lang="ts">
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
   Prop,
@@ -28,7 +28,7 @@ import {
   CurrentUserSettingsModel,
   EditingMessage,
   MessageModel
-} from '@/types/model';
+} from '@/ts/types/model';
 import {
   encodeHTML,
   encodeMessage,
@@ -37,8 +37,8 @@ import {
   setImageFailEvents,
   setVideoEvent,
   setYoutubeEvent
-} from '@/utils/htmlApi';
-import { sem } from '@/utils/pureFunctions';
+} from '@/ts/utils/htmlApi';
+import { sem } from '@/ts/utils/pureFunctions';
 
 import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
 

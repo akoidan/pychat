@@ -76,12 +76,12 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 import {
   FileTransferStatus,
   ReceivingFile
-} from '@/types/model';
-import { bytesToSize } from '@/utils/pureFunctions';
+} from '@/ts/types/model';
+import { bytesToSize } from '@/ts/utils/pureFunctions';
 import AppProgressBar from '@/components/ui/AppProgressBar';
 import ChatMessageHeader from '@/components/chat/ChatMessageHeader';
 

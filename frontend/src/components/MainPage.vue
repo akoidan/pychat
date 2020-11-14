@@ -28,11 +28,11 @@ import {
   CurrentUserInfoModel,
   IncomingCallModel,
   UserModel
-} from '@/types/model';
-import NotifierHandler from '@/utils/NotificationHandler';
+} from '@/ts/types/model';
+import NotifierHandler from '@/ts/classes/NotificationHandler';
 
-import {browserVersion, isChrome, isMobile} from '@/utils/runtimeConsts'
-import {State} from '@/instances/storeInstance';
+import {browserVersion, isChrome, isMobile} from '@/ts/utils/runtimeConsts'
+import {State} from '@/ts/instances/storeInstance';
 import IncomingCall from '@/components/chat/IncomingCall';
 
 @Component({

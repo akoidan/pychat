@@ -15,7 +15,7 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { timeToString } from "@/utils/htmlApi";
+import { timeToString } from "@/ts/utils/htmlApi";
 
 
 @Component

@@ -63,7 +63,7 @@ import {
   Ref,
   Vue
 } from "vue-property-decorator";
-import { ApplyGrowlErr } from '@/instances/storeInstance';
+import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
 import ChatMessage from "@/components/chat/ChatMessage";
 import SearchMessages from "@/components/chat/SearchMessages";
 import {
@@ -71,10 +71,10 @@ import {
   RoomModel,
   SearchModel,
   SendingFile
-} from "@/types/model";
-import { MessageModelDto } from "@/types/dto";
+} from "@/ts/types/model";
+import { MessageModelDto } from "@/ts/types/dto";
 
-import { MESSAGES_PER_SEARCH } from "@/utils/consts";
+import { MESSAGES_PER_SEARCH } from "@/ts/utils/consts";
 import AppProgressBar from "@/components/ui/AppProgressBar";
 import ChatSendingMessage from "@/components/chat/ChatSendingMessage";
 import ChatUserActionMessage from "@/components/chat/ChatUserActionMessage";

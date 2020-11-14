@@ -13,7 +13,7 @@
 <script lang="ts">
 import Vue from 'vue';
 import {Prop, Component} from 'vue-property-decorator';
-import {IconColor} from '@/types/types';
+import {IconColor} from '@/ts/types/types';
 
 @Component
 export default class FieldSet extends Vue {

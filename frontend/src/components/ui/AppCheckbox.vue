@@ -18,7 +18,7 @@ import {
   Ref,
   Vue
 } from 'vue-property-decorator';
-import { getUniqueId } from '@/utils/pureFunctions';
+import { getUniqueId } from '@/ts/utils/pureFunctions';
 
 @Component
 export default class AppCheckbox extends Vue {

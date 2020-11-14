@@ -17,8 +17,8 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import { bytesToSize } from '@/utils/pureFunctions';
-import { UploadProgressModel } from '@/types/model';
+import { bytesToSize } from '@/ts/utils/pureFunctions';
+import { UploadProgressModel } from '@/ts/types/model';
 
 @Component
 export default class AppProgressBar extends Vue {

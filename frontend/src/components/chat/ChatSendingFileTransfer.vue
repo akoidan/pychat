@@ -20,7 +20,7 @@
 </template>
 <script lang="ts">
 
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 import {
   Component,
   Prop,
@@ -31,7 +31,7 @@ import {
   FileTransferStatus,
   SendingFileTransfer,
   UserModel
-} from '@/types/model';
+} from '@/ts/types/model';
 
 
 const fileStatusDict: Record<FileTransferStatus, string> = {

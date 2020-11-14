@@ -23,11 +23,11 @@ import {
   Vue
 } from 'vue-property-decorator';
 import ChatBox from '@/components/chat/ChatBox.vue';
-import { State } from '@/instances/storeInstance';
+import { State } from '@/ts/instances/storeInstance';
 
-import { ALL_ROOM_ID } from '@/utils/consts';
+import { ALL_ROOM_ID } from '@/ts/utils/consts';
 
-import { RoomModel } from '@/types/model';
+import { RoomModel } from '@/ts/types/model';
 
 
 @Component({

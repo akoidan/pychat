@@ -67,11 +67,11 @@
   </form>
 </template>
 <script lang="ts">
-import {State} from '@/instances/storeInstance';
+import {State} from '@/ts/instances/storeInstance';
 import {Component, Prop, Vue} from 'vue-property-decorator';
 import AppSubmit from '@/components/ui/AppSubmit';
-import {CurrentUserInfoModel} from '@/types/model';
-import {ApplyGrowlErr} from '@/instances/storeInstance';
+import {CurrentUserInfoModel} from '@/ts/types/model';
+import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 @Component({
   components: {AppSubmit}
 })

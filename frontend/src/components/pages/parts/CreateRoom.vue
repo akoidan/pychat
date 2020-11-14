@@ -70,7 +70,7 @@
 import {
   ApplyGrowlErr,
   State
-} from '@/instances/storeInstance';
+} from '@/ts/instances/storeInstance';
 import {
   Component,
   Prop,
@@ -79,9 +79,9 @@ import {
 import AppInputRange from '@/components/ui/AppInputRange';
 import AppSubmit from '@/components/ui/AppSubmit';
 import PickUser from '@/components/pages/parts/PickUser';
-import { CurrentUserInfoModel } from '@/types/model';
+import { CurrentUserInfoModel } from '@/ts/types/model';
 import AppCheckbox from '@/components/ui/AppCheckbox';
-import { PrivateRoomsIds } from '@/types/types';
+import { PrivateRoomsIds } from '@/ts/types/types';
 import ParentChannel from '@/components/pages/parts/ParentChannel.vue';
 
 @Component({components: {

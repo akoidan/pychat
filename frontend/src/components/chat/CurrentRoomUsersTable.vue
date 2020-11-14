@@ -30,8 +30,8 @@ import {
   Component,
   Vue
 } from 'vue-property-decorator';
-import { State } from '@/instances/storeInstance';
-import { UserModel } from '@/types/model';
+import { State } from '@/ts/instances/storeInstance';
+import { UserModel } from '@/ts/types/model';
 import RoomUsersUser from '@/components/chat/RoomUsersUser.vue';
 
 @Component({
