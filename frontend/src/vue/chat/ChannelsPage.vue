@@ -36,7 +36,6 @@ import {
 import ChatRecording from '@/vue/chat/ChatRecording';
 import ChatTextArea from '@/vue/chat/ChatTextArea';
 import ChatBoxes from '@/vue/chat/ChatBoxes';
-import { messageBus } from "@/ts/instances/messageBusInstance";
 
 
 @Component({components: {
@@ -52,16 +51,6 @@ export default class ChannelsPage extends Vue {
 
   public recordingNow: boolean = false;
   public srcVideo: string|null = null;
-
-  created() {
-    console.error('test');
-  }
-
-  public beforeRouteEnter(to: Route, frm: Route, next: (to?: RawLocation | false | ((vm: Vue) => any) | void) => void) {
-    next(vm => {
-      messageBus.$emit('main-join'); // this doesn't exists in router hooks yet, can't use this.$messageBus
-    });
-  }
 
 }
 </script>

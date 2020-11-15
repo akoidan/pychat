@@ -50,6 +50,7 @@ import {
   pasteHtmlAtCaret,
   pasteImgToTextArea,
   placeCaretAtEnd,
+  savedFiles,
   timeToString
 } from '@/ts/utils/htmlApi';
 import {
@@ -108,6 +109,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     public readonly activeRoomId!: number;
 
     @State
+    public readonly pastingImagesQueue!: number[];
+
+    @State
     public readonly activeRoom!: RoomModel;
 
 
@@ -116,7 +120,6 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       this.$messageBus.$on('add-smile', this.onEmitAddSmile);
       this.$messageBus.$on('delete-message', this.onEmitDeleteMessage);
       this.$messageBus.$on('quote', this.onEmitQuote);
-      this.$messageBus.$on('blob', this.onEmitBlob);
     }
 
     public destroyed() {
@@ -124,9 +127,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       this.$messageBus.$off('add-smile', this.onEmitAddSmile);
       this.$messageBus.$off('delete-message', this.onEmitDeleteMessage);
       this.$messageBus.$off('quote', this.onEmitQuote);
-      this.$messageBus.$off('blob', this.onEmitBlob);
     }
-
 
 
     onEmitDropPhoto(files: FileList) {
@@ -162,11 +163,18 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       placeCaretAtEnd(this.userMessage);
     }
 
-    onEmitBlob(e: Blob)  {
-      this.$logger.log('Pasting blob {}', e)();
-      this.$nextTick(function () {
-        pasteBlobToContentEditable(e, this.userMessage);
-      });
+
+    @Watch('pastingImagesQueue')
+    onBlob()  {
+      if (this.pastingImagesQueue.length > 0) {
+        this.$logger.log('Pasting blob {}', this.pastingImagesQueue)();
+        this.pastingImagesQueue.forEach(id => {
+          pasteBlobToContentEditable(savedFiles[id], this.userMessage);
+          delete savedFiles[id]
+        })
+        placeCaretAtEnd(this.userMessage);
+        this.$store.setPastingQueue([]);
+      }
     }
 
     get messageSender(): MessageSender { // todo does vuew cache this?

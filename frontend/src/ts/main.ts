@@ -40,7 +40,6 @@ import NotifierHandler from '@/ts/classes/NotificationHandler';
 import Http from '@/ts/classes/Http';
 import WebRtcApi from '@/ts/webrtc/WebRtcApi';
 import  {router} from '@/ts/instances/routerInstance';
-import { messageBus } from "@/ts/instances/messageBusInstance";
 import { AudioPlayer } from "@/ts/classes/AudioPlayer";
 import { AndroidPlatformUtil } from "@/ts/devices/AndroidPlatformUtils";
 import { WebPlatformUtils } from "@/ts/devices/WebPlatformUtils";
@@ -195,6 +194,7 @@ function init() {
   const ws: WsHandler = new WsHandler(WS_URL, sessionHolder, store);
   const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
   const audioPlayer: AudioPlayer = new AudioPlayer(notifier);
+  const messageBus = new Vue();
   const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier, messageBus, audioPlayer);
   const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier);
   const platformUtil: PlatformUtil = IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();

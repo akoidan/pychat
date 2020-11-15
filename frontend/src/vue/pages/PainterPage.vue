@@ -11,6 +11,8 @@ import {ALL_ROOM_ID} from '@/ts/utils/consts';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import AppInputRange from '@/vue/ui/AppInputRange';
 import {RawLocation, Route} from 'vue-router';
+import { getUniqueId } from "@/ts/utils/pureFunctions";
+import { savedFiles } from "@/ts/utils/htmlApi";
 
 @Component
 export default class PainterPage extends Vue {
@@ -19,7 +21,6 @@ export default class PainterPage extends Vue {
   public div!: HTMLElement;
 
   public prevPage: string|null = null;
-  public blob: Blob|null = null;
 
   public painter!: Painter;
 
@@ -38,32 +39,12 @@ export default class PainterPage extends Vue {
     });
   }
 
-  onEmitMainJoin() {
-    this.$logger.log("Emitting back {}", this.blob)();
-    if (this.blob) {
-      this.$messageBus.$emit('blob', this.blob);
-      this.blob = null;
-    }
-  }
-  public created() {
-    this.$messageBus.$on('main-join', this.onEmitMainJoin);
-  }
-
-  destroyed() {
-    // 1. this component is destroyed
-    // 2. channelsPage is emitting event
-    // 3. this component don't listed for event already
-    // so since operation above is synchronous, scheduling even to eventloop helps
-    // TODO this should be resolved in a better way
-    window.setTimeout(() => {
-      this.$messageBus.$off('main-join', this.onEmitMainJoin);
-    });
-  }
-
   public mounted() {
     this.painter = new Painter(this.div, {
       onBlobPaste: (e: Blob) => {
-        this.blob = e;
+        let id: number= getUniqueId()
+        savedFiles[id] = e;
+        this.$store.setPastingQueue([id]);
         this.$router.replace(this.prevPage!);
       },
       textClass: 'input',

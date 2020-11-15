@@ -108,6 +108,7 @@ export class DefaultStore extends VuexModule {
   public isOnline: boolean = false;
   public growls: GrowlModel[] = [];
   public dim: boolean = false;
+  public pastingImagesQueue: number[] = [];
   public incomingCall: IncomingCallModel | null = null;
   public microphones: { [id: string]: string } = {};
   public speakers: { [id: string]: string } = {};
@@ -646,6 +647,11 @@ export class DefaultStore extends VuexModule {
   public setUserSettings(userInfo: CurrentUserSettingsModel) {
     this.userSettings = userInfo;
     this.storage.setUserSettings(userInfo);
+  }
+
+  @Mutation
+  public setPastingQueue(ids: number[]) {
+    this.pastingImagesQueue = ids;
   }
 
   @Mutation
