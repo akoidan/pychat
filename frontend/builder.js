@@ -144,6 +144,11 @@ const {options, definePlugin, optimization, configFile, startCordova, linting} =
     usedExports: true,
     sideEffects: true
   };
+  if (!isProd) {
+    // otherwise in webpack-dev-server we always have the error:  Uncaught ReferenceError: webpackHotUpdate is not defined
+    // if this error is not present on startup, we can remove this option
+    optimization.runtimeChunk= true; // https://github.com/webpack/webpack/issues/6693
+  }
 
   const configFile = options.IS_WEB && !options.IS_DEBUG ? 'tsconfig.json' : 'tsconfig.esnext.json' ;
   let definePlugin = new webpack.DefinePlugin({PYCHAT_CONSTS: JSON.stringify(options)});

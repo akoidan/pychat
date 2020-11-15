@@ -60,7 +60,6 @@ export default class WebRtcApi extends MessageHandler {
     this.getCallHandler(message.roomId).initAndDisplayOffer(message);
   }
 
-
   public offerMessage(message: OfferCall) {
     this.getMessageHandler(message.roomId).acceptConnection(message);
   }

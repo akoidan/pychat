@@ -22,9 +22,7 @@ export class SecurityValidator {
     this.opponentUseId = opponentUseId;
   }
   protected readonly validators: Record<string, Record<string, Function>> = {
-
-
-    channels: {
+    'this': {
       printMessage: (message: PrintMessage) => {
 
       }

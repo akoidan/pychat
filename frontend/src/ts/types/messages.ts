@@ -8,6 +8,7 @@ import {
   UserSettingsDto,
   WebRtcMessageModelDto
 } from '@/ts/types/dto';
+import { UploadFile } from "@/ts/types/types";
 
 export interface DefaultSentMessage {
   action: string;
@@ -38,10 +39,6 @@ export interface RouterNavigateMessage extends DefaultMessage {
   to: string;
 }
 
-
-export interface AppendQueue extends DefaultMessage {
-  messages: DefaultMessage[];
-}
 export interface SaveChannelSettings extends DefaultMessage, ChannelDto {
 }
 
@@ -82,6 +79,15 @@ export interface SetWsIdMessage extends DefaultMessage, OpponentWsId {
   userInfo: UserProfileDto;
   userSettings: UserSettingsDto;
 }
+
+export interface InnerSendMessage extends DefaultMessage {
+  content: string;
+  id: number;
+  uploadFiles: UploadFile[];
+  originId: number;
+  originTime: number;
+}
+
 export interface ConnectToRemoteMessage extends DefaultMessage  {
   stream: MediaStream|null;
 }

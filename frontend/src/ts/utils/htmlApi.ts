@@ -386,7 +386,6 @@ export function pasteBlobVideoToTextArea(file: Blob, textArea: HTMLElement, vide
 
             return;
           }
-          debugger
           const url = URL.createObjectURL(blob);
           const img = document.createElement('img');
           img.className = PASTED_IMG_CLASS;

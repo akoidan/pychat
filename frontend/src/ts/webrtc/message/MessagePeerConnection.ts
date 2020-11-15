@@ -1,7 +1,9 @@
 import AbstractPeerConnection from '@/ts/webrtc/AbstractPeerConnection';
 import {
-  AppendQueue,
-  DefaultMessage
+  DefaultMessage,
+  EditMessage,
+  InnerSendMessage,
+  PrintWebRtcMessage
 } from '@/ts/types/messages';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
@@ -9,22 +11,26 @@ import { sub } from '@/ts/instances/subInstance';
 import {
   HandlerType,
   HandlerTypes,
-  MessageSupplier
+  MessageSupplier,
+  UploadFile
 } from '@/ts/types/types';
 import AbstractMessageProcessor from '@/ts/message_handlers/AbstractMessageProcessor';
 import { SecurityValidator } from '@/ts/webrtc/message/SecurityValidator';
 import Subscription from '@/ts/classes/Subscription';
+import MessageRetrier from "@/ts/message_handlers/MessageRetrier";
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
 
   protected readonly handlers: HandlerTypes = {
     sendRtcData: <HandlerType>this.onsendRtcData,
-    appendQueue: <HandlerType>this.appendQueue,
     checkDestroy: <HandlerType>this.checkDestroy,
+    sendSendMessage: <HandlerType>this.sendSendMessage,
+    printMessage: <HandlerType>this.printMessage,
   };
 
+
+  private readonly messageRetrier: MessageRetrier;
   private opponentUserId: number;
-  private sendingQueue: DefaultMessage[] = [];
   protected status: 'inited' | 'not_inited' = 'not_inited';
   private readonly messageProc: AbstractMessageProcessor;
   private readonly securityValidator: SecurityValidator;
@@ -34,8 +40,42 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.opponentUserId = userId;
     sub.subscribe(Subscription.allPeerConnectionsForTransfer(connId), this);
+    this.messageRetrier = new MessageRetrier();
     this.securityValidator = new SecurityValidator(this.roomId, this.opponentUserId, store);
     this.messageProc = new AbstractMessageProcessor(this, store, `p2p-${opponentWsId}`);
+  }
+
+  private printMessage(m: PrintWebRtcMessage) {
+    let em: EditMessage = {
+      action: 'printMessage',
+      content: m.content,
+      edited: 0,
+      handler: 'channels',
+      id: m.id,
+      messageId: m.messageId,
+      roomId: this.roomId,
+      time: Date.now() - m.timeDiff,
+      userId: this.opponentUserId,
+    }
+    sub.notify(em)
+  }
+
+  private sendSendMessage({content, originId, uploadFiles, originTime, id}: InnerSendMessage) {
+    this.messageRetrier.asyncExecuteAndPutInCallback(
+        originId,
+        () => {
+          const message: PrintWebRtcMessage = {
+            action: 'printMessage',
+            content,
+            edited: 0,
+            timeDiff: Date.now() - originTime,
+            messageId: originId,
+            id,
+            handler: 'this'
+          };
+          this.messageProc.sendToServer(message);
+        }
+    );
   }
 
   public getOpponentUserId() {
@@ -66,15 +106,15 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     }
   }
 
-  public appendQueue(message: AppendQueue) {
-    if (this.isChannelOpened) {
-      message.messages.forEach(message => {
-        this.messageProc.sendToServer(message);
-      })
-    } else {
-      this.sendingQueue.push(...message.messages);
-    }
-  }
+  // public appendQueue(message: AppendQueue) {
+  //   if (this.isChannelOpened) {
+  //     message.messages.forEach(message => {
+  //       this.messageProc.sendToServer(message);
+  //     })
+  //   } else {
+  //     this.sendingQueue.push(...message.messages);
+  //   }
+  // }
 
   get isChannelOpened(): boolean {
     return this.sendChannel?.readyState === 'open';
@@ -95,9 +135,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
     this.sendChannel!.onmessage = this.onChannelMessage.bind(this);
     this.sendChannel!.onopen = () => {
-      while (this.sendingQueue.length > 0) {
-        this.messageProc.sendToServer(this.sendingQueue.pop()!);
-      }
+      this.messageRetrier.resendAllMessages();
       this.logger.debug('Channel opened')();
     };
     this.sendChannel!.onclose = () => this.logger.log('Closed channel ')();
@@ -116,6 +154,10 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     } else {
       this.logger.log('No channels to close')();
     }
+  }
+
+  printSuccess() {
+
   }
 
 

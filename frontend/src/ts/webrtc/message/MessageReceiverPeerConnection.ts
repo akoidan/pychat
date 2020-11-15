@@ -7,7 +7,7 @@ export default class MessageReceiverPeerConnection extends MessagePeerConnection
 
 
   public ondatachannelclose(text: string): void {
-   debugger
+   // TODO
   }
 
 

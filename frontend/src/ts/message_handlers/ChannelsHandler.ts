@@ -343,7 +343,6 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     }
     this.store.setOnline(message.content);
 
-
   }
 
   private notifyDevicesChanged() {
