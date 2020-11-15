@@ -10,6 +10,7 @@ import { RoomModel } from '@/ts/types/model';
 import MessageSenderPeerConnection from '@/ts/webrtc/message/MessageSenderPeerConnection';
 import MessageReceiverPeerConnection from '@/ts/webrtc/message/MessageReceiverPeerConnection';
 import {
+  ChangeDevicesMessage,
   DefaultMessage,
   InnerSendMessage,
   OfferCall
@@ -140,8 +141,17 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     return connections;
   }
 
-  private changeDevices(): void {
-
+  private changeDevices(m: ChangeDevicesMessage): void {
+    if (m.roomId != null && this.roomId !== m.roomId) {
+      return;
+    } else if (m.userId != null) {
+      if (this.room.users.indexOf(m.userId) < 0) {
+        return;
+      }
+    } else {
+      throw Error('WTF is this message');
+    }
+    this.refreshPeerConnections();
   }
 
   addMessages(roomId: number, messages: MessageModelDto[]): void {

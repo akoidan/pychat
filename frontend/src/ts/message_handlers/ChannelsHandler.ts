@@ -42,6 +42,7 @@ import {
   AddOnlineUserMessage,
   AddRoomBase,
   AddRoomMessage,
+  ChangeDevicesMessage,
   DeleteChannel,
   DeleteMessage,
   DeleteRoomMessage,
@@ -344,26 +345,30 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     }
     if (message.content[message.userId].length === 1) {
       // exactly 1 device is now offline, so that new that appeared is the first one
-      this.addChangeOnlineEntry(message.userId, message.time, true);
+      this.addChangeOnlineEntry(message.userId, message.time, 'appeared online');
     }
     this.store.setOnline(message.content);
+    this.notifyDevicesChanged(message.userId, null);
 
   }
 
-  private notifyDevicesChanged() {
-    sub.notify({
+  private notifyDevicesChanged(userId: number|null, roomId: number|null) {
+    let message: ChangeDevicesMessage = {
       handler: 'message',
       action: 'changeDevices',
       allowZeroSubscribers: true,
-    });
+      roomId,
+      userId
+    };
+    sub.notify(message);
   }
 
   private removeOnlineUser(message: RemoveOnlineUserMessage) {
     if (message.content[message.userId].length === 0) {
-      this.addChangeOnlineEntry(message.userId, message.time, false);
+      this.addChangeOnlineEntry(message.userId, message.time, 'gone offline');
     }
     this.store.setOnline(message.content);
-    this.notifyDevicesChanged()
+    this.notifyDevicesChanged(message.userId, null);
   }
 
   private printMessage(inMessage: EditMessage) {
@@ -432,7 +437,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     } else {
       this.logger.error('Unable to find room {} to delete', message.roomId)();
     }
-    this.notifyDevicesChanged();
+    this.notifyDevicesChanged(null, message.roomId);
   }
 
   private leaveUser(message: LeaveUserMessage) {
@@ -450,7 +455,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
         },
         roomIds: [message.roomId]
       });
-      this.notifyDevicesChanged();
+      this.notifyDevicesChanged(null, message.roomId);
     } else {
       this.logger.error('Unable to find room {} to kick user', message.roomId)();
     }
@@ -499,7 +504,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
         userId: i
       }});
     })
-    this.notifyDevicesChanged();
+    this.notifyDevicesChanged(null, message.roomId);
   }
 
   private deleteChannel(message: DeleteChannel) {
@@ -510,7 +515,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     this.mutateRoomAddition(message);
   }
 
-  private addChangeOnlineEntry(userId: number, time: number, isWentOnline: boolean) {
+  private addChangeOnlineEntry(userId: number, time: number, action: 'appeared online' | 'gone offline') {
     const roomIds: number[] = [];
     this.store.roomsArray.forEach(r => {
       if (r.users.indexOf(userId)) {
@@ -520,7 +525,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     const entry: RoomLogEntry = {
       roomIds,
       roomLog: {
-        action: isWentOnline ? 'appeared online' : 'gone offline',
+        action,
         time,
         userId
       }
@@ -528,7 +533,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
 
     // TODO Uncaught TypeError: Cannot read property 'onlineChangeSound' of null
     if (this.store.userSettings!.onlineChangeSound && this.store.myId !== userId) {
-      this.audioPlayer.checkAndPlay(isWentOnline ? login : logout, 50);
+      this.audioPlayer.checkAndPlay(action === 'appeared online' ? login : logout, 50);
     }
     this.store.addRoomLog(entry);
   }
@@ -544,7 +549,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
         userId: this.store.myId!
       }
     });
-    this.notifyDevicesChanged()
+    this.notifyDevicesChanged(null, r.id) // TODO messageTransferhandler should be created or should id?
   }
 
   private getMessage(message: MessageModelDto): MessageModel {

@@ -20,6 +20,7 @@ import { Logger } from "lines-logger";
 import loggerFactory from "@/ts/instances/loggerFactory";
 import {
   IStorage,
+  MessageSender,
   StorageData
 } from "@/ts/types/types";
 import sessionHolder from "@/ts/instances/sessionInstance";
@@ -141,7 +142,7 @@ function declareMixins() {
 }
 
 
-async function initStore(logger: Logger, storage: IStorage, channelsHandler: ChannelsHandler) {
+async function initStore(logger: Logger, storage: IStorage, messageSenderProxy: MessageSenderProxy) {
   store.setStorage(storage); // TODO mvoe to main
   const isNew = await storage.connect();
   if (!isNew) {
@@ -167,12 +168,13 @@ async function initStore(logger: Logger, storage: IStorage, channelsHandler: Cha
       if (session) {
         logger.debug('Appending sending messages {}', data.sendingMessages)();
         data.sendingMessages.forEach((m: MessageModel) => {
+          let messageSender: MessageSender = messageSenderProxy.getMessageSender(m.roomId);
           if (m.content && m.id > 0) {
-            channelsHandler.sendEditMessage(m.content, m.roomId, m.id, []);
+            messageSender.sendEditMessage(m.content, m.roomId, m.id, []);
           } else if (m.content) {
-            channelsHandler.sendSendMessage(m.content, m.roomId, [], getUniqueId(), m.time);
+            messageSender.sendSendMessage(m.content, m.roomId, [], getUniqueId(), m.time);
           } else if (m.id > 0) {
-            channelsHandler.sendDeleteMessage(m.id, getUniqueId());
+            messageSender.sendDeleteMessage(m.id, getUniqueId());
           }
         });
       } else {
@@ -239,7 +241,7 @@ function init() {
     logger.log('Constants {}', constants)();
   }
 
-  initStore(logger, storage, channelsHandler).then(value => {
+  initStore(logger, storage, messageSenderProxy).then(value => {
     logger.debug('Exiting from initing store')();
   }).catch(e => {
     logger.error('Unable to init store from db, because of', e)();

@@ -219,6 +219,16 @@ export interface LeaveUserMessage extends DefaultMessage {
   users: number[];
 }
 
+export interface ChangeDevicesMessage extends DefaultMessage {
+  // This structre should have every event, not just this
+  // TODO (overriden action and handler
+  action: 'changeDevices';
+  allowZeroSubscribers: true;
+  handler: 'message';
+  roomId: number|null;
+  userId: number|null;
+}
+
 export interface LoadMessages extends DefaultMessage {
   content: MessageModelDto[];
   roomId: number;
