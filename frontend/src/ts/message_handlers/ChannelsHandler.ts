@@ -245,8 +245,11 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
 
   public init(m: PubSetRooms) {
 
-    const {rooms, channels, users} = m;
-    this.store.setOnline(m.online);
+    const {rooms, channels, users, online} = m;
+    // otherwise, we will modify value from ws, which will make observable in logs
+    // other values from "m" are converted with convertable
+    let ids: PubSetRooms['online'] = JSON.parse(JSON.stringify(online));
+    this.store.setOnline(ids);
 
     this.logger.debug('set users {}', users)();
     const um: UserDictModel = {};

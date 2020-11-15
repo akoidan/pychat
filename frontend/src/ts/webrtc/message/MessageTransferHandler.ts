@@ -124,7 +124,6 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     return this.store.roomsDict[this.roomId];
   }
 
-
   private get connectionIds(): UserIdConn[] {
     let usersIds = this.room.users;
     let myConnectionId = this.wsHandler.getWsConnectionId();
@@ -137,7 +136,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
       });
       return connectionIdsWithUser;
     } , [] as UserIdConn[]);
-
+    this.logger.debug('Evaluated {} connectionIds', connections)();
     return connections;
   }
 

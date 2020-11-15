@@ -173,8 +173,14 @@ export interface DeleteRoomMessage extends DefaultMessage {
   roomId: number;
 }
 
-export interface AddOnlineUserMessage extends ChangeUserOnline {}
-export interface RemoveOnlineUserMessage extends ChangeUserOnline {}
+export interface AddOnlineUserMessage extends ChangeUserOnline {
+  action: 'addOnlineUser';
+  handler: 'channels';
+}
+export interface RemoveOnlineUserMessage extends ChangeUserOnline {
+  action: 'removeOnlineUser',
+  handler: 'channels';
+}
 
 interface RoomExistedBefore {
   inviteeUserId: number[];

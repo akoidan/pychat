@@ -99,12 +99,8 @@ export default class ChatMessage extends Vue {
     this.seEvents();
   }
 
-  public encodeMessage(message: MessageModel) {
-    return encodeMessage(message);
-  }
-
   private seEvents() {
-    this.$logger.debug('Setting events')();
+    this.$logger.trace('Setting events')();
     if (this.userSettings.highlightCode) {
       highlightCode(this.content);
     }
