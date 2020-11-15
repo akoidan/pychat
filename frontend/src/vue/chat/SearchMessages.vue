@@ -92,7 +92,7 @@ export default class SearchMessages extends Vue {
        this.$logger.debug('http response {} {}', a)();
        this.currentRequest = null;
        if (a.length) {
-          this.$channelsHandler.addMessages(this.room.id, a); // TODO this should be separate messages, otherwise we would have history with holes
+          this.$messageSenderProxy.getMessageSender(this.room.id).addMessages(this.room.id, a); // TODO this should be separate messages, otherwise we would have history with holes
           const ids = this.room.search.searchedIds.concat([]);
           this.mutateSearchedIds(a.map(a => a.id), search);
           this.searchResult = '';

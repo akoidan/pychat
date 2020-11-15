@@ -16,6 +16,7 @@ import {
 } from '@/ts/types/model';
 import {
   ChannelDto,
+  MessageModelDto,
   RoomDto,
   SetStateFromStorage,
   UserDto
@@ -72,6 +73,13 @@ export interface SetDevices {
   microphones: { [id: string]: string };
   speakers: { [id: string]: string };
   webcams: { [id: string]: string };
+}
+
+export interface MessageSender extends MessageRetrierProxy {
+  sendSendMessage(content: string, roomId: number, uploadFiles: UploadFile[], originId: number, originTime: number):  Promise<void>;
+  sendEditMessage(content: string, roomId: number, id: number, uploadFiles: UploadFile[]): Promise<void>;
+  sendDeleteMessage(id: number, originId: number): void;
+  addMessages(roomId: number, messages: MessageModelDto[]): void;
 }
 
 export interface JsAudioAnalyzer {

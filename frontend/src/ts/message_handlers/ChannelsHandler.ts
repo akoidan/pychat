@@ -6,6 +6,7 @@ import {
   HandlerType,
   HandlerTypes,
   MessageRetrierProxy,
+  MessageSender,
   PubSetRooms,
   RemoveMessageProgress,
   RemoveSendingMessage,
@@ -74,7 +75,11 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 import MessageRetrier from "@/ts/message_handlers/MessageRetrier";
 import { AudioPlayer } from "@/ts/classes/AudioPlayer";
 
-export default class ChannelsHandler extends MessageHandler implements MessageRetrierProxy {
+// TODO split this class into 2 separate:
+// 1st one for message handling that's related to MessageSender and MessageTrasnferHandler (webrtc one)
+// 2nd one that's responsible for user Online, room management and etc
+
+export default class ChannelsHandler extends MessageHandler implements MessageRetrierProxy , MessageSender {
   protected readonly logger: Logger;
 
   protected readonly handlers: HandlerTypes = {

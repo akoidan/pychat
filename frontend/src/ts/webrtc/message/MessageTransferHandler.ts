@@ -2,6 +2,7 @@ import BaseTransferHandler from '@/ts/webrtc/BaseTransferHandler';
 import {
   HandlerType,
   HandlerTypes,
+  MessageSender,
   UploadFile,
   UserIdConn
 } from '@/ts/types/types';
@@ -19,8 +20,9 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { sub } from '@/ts/instances/subInstance';
 import Subscription from '@/ts/classes/Subscription';
 import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
+import { MessageModelDto } from "@/ts/types/dto";
 
-export default class MessageTransferHandler extends BaseTransferHandler {
+export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
 
 
   protected readonly handlers: HandlerTypes = {
@@ -41,6 +43,7 @@ export default class MessageTransferHandler extends BaseTransferHandler {
     this.state = 'initing';
     this.connectionId = message.connId;
     this.refreshPeerConnections();
+    this.state = 'ready';
     this.messageRetrier.resendAllMessages();
   }
 
@@ -103,13 +106,8 @@ export default class MessageTransferHandler extends BaseTransferHandler {
     }
   }
 
-  public async sendP2pMessage(
-      content: string,
-      roomId: number,
-      uploadFiles: UploadFile[],
-      originId: number,
-      originTime: number
-  ) {
+
+  async sendSendMessage(content: string, roomId: number, uploadFiles: UploadFile[], originId: number, originTime: number): Promise<void> {
     const em: Omit<InnerSendMessage, 'handler'> = {
       content,
       originTime,
@@ -145,6 +143,28 @@ export default class MessageTransferHandler extends BaseTransferHandler {
   private changeDevices(): void {
 
   }
+
+  addMessages(roomId: number, messages: MessageModelDto[]): void {
+    this.store.growlError("The operation you're trying to do is not supported on p2p channel yet");
+    throw Error("unsupported");
+  }
+
+  getMessageRetrier(): MessageRetrier {
+    this.store.growlError("The operation you're trying to do is not supported on p2p channel yet");
+    throw Error("unsupported");
+  }
+
+  sendDeleteMessage(id: number, originId: number): void {
+    this.store.growlError("The operation you're trying to do is not supported on p2p channel yet");
+    throw Error("unsupported");
+  }
+
+  sendEditMessage(content: string, roomId: number, id: number, uploadFiles: UploadFile[]): Promise<void> {
+    this.store.growlError("The operation you're trying to do is not supported on p2p channel yet");
+    throw Error("unsupported");
+  }
+
+
 
 
 }

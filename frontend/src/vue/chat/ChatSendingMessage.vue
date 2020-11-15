@@ -84,7 +84,7 @@ export default class ChatSendingMessage extends Vue {
       error: null
     };
     this.$store.setMessageProgressError(newVar);
-    this.$channelsHandler.getMessageRetrier().resendMessage(this.message.id);
+    this.$messageSenderProxy.getMessageSender(this.message.roomId).getMessageRetrier().resendMessage(this.message.id);
     this.$store.growlInfo('Trying to upload files again');
   }
 }

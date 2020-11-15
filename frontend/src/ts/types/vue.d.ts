@@ -18,6 +18,7 @@ import Http from '@/ts/classes/Http';
 import Vue, { Component } from 'vue';
 import { ExtendedVue } from 'vue/types/vue';
 import NotifierHandler from "@/ts/classes/NotificationHandler";
+import { MessageSenderProxy } from "@/ts/message_handlers/MessageSenderProxy";
 
 declare global {
   interface Window {
@@ -69,8 +70,8 @@ declare module 'vue/types/vue' {
     $router: VueRouter;
     $route: Route;
     $platformUtil: PlatformUtil;
+    $messageSenderProxy: MessageSenderProxy;
     $messageBus: Vue;
-    $channelsHandler: ChannelsHandler;
     $notifier: NotifierHandler;
     $webrtcApi: WebRtcApi;
   }

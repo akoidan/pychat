@@ -64,6 +64,7 @@ import { State } from '@/ts/instances/storeInstance';
 
 import {
   MessageDataEncode,
+  MessageSender,
   UploadFile
 } from '@/ts/types/types';
 import {
@@ -168,22 +169,11 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       });
     }
 
+    get messageSender(): MessageSender { // todo does vuew cache this?
+      return this.$messageSenderProxy.getMessageSender(this.activeRoomId);
+    }
+
     public checkAndSendMessage(event: KeyboardEvent) {
-      if (this.activeRoom.p2p) {
-        if (event.keyCode === 13 && !event.shiftKey) {
-          const md: MessageDataEncode = getMessageData(this.userMessage);
-          if (md.files.length > 0 ) {
-            this.$store.growlError("Sending files is only available in non p2p channel");
-            return;
-          }
-          if (!md.messageContent) {
-            return;
-          }
-          const {id, now} = this.addMessageToStore(md);
-          this.$webrtcApi.getMessageHandler(this.activeRoomId).sendP2pMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
-        }
-        return;
-      }
       if (event.keyCode === 13 && !event.shiftKey) { // 13 = enter
         event.preventDefault();
         this.$logger.debug('Checking sending message')();
@@ -196,7 +186,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             return;
           }
           const {id, now} = this.addMessageToStore(md);
-          this.$channelsHandler.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
+          this.messageSender.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
         }
       } else if (event.keyCode === 27) { // 27 = escape
         this.$store.setShowSmileys(false);
@@ -243,7 +233,6 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       return {id, now}
     }
 
-
     private editMessageWs(
         messageContent: string|null,
         uploadFiles: UploadFile[],
@@ -270,13 +259,13 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       };
       this.$store.addMessage(mm);
       if (messageId < 0 && messageContent) {
-        this.$channelsHandler.sendSendMessage(messageContent, roomId, uploadFiles, messageId, this.editingMessageModel.time);
+        this.messageSender.sendSendMessage(messageContent, roomId, uploadFiles, messageId, this.editingMessageModel.time);
       } else if (messageId > 0 && messageContent) {
-        this.$channelsHandler.sendEditMessage(messageContent, roomId, messageId, uploadFiles);
+        this.messageSender.sendEditMessage(messageContent, roomId, messageId, uploadFiles);
       } else if (!messageContent && messageId > 0) {
-        this.$channelsHandler.sendDeleteMessage(messageId, -getUniqueId());
+        this.messageSender.sendDeleteMessage(messageId, -getUniqueId());
       } else if (!messageContent && messageId < 0) {
-        this.$channelsHandler.getMessageRetrier().removeSendingMessage(messageId);
+        this.messageSender.getMessageRetrier().removeSendingMessage(messageId);
       }
       this.$store.setEditedMessage(null);
     }

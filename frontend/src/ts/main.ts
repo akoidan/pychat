@@ -44,6 +44,7 @@ import { messageBus } from "@/ts/instances/messageBusInstance";
 import { AudioPlayer } from "@/ts/classes/AudioPlayer";
 import { AndroidPlatformUtil } from "@/ts/devices/AndroidPlatformUtils";
 import { WebPlatformUtils } from "@/ts/devices/WebPlatformUtils";
+import { MessageSenderProxy } from "@/ts/message_handlers/MessageSenderProxy";
 
 function declareDirectives() {
   Vue.directive('validity', function (el: HTMLElement, binding) {
@@ -197,15 +198,16 @@ function init() {
   const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier, messageBus, audioPlayer);
   const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier);
   const platformUtil: PlatformUtil = IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
+  const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, channelsHandler);
 
   Vue.prototype.$api = api;
   Vue.prototype.$ws = ws;
   Vue.prototype.$store = store;
   Vue.prototype.$messageBus = messageBus;
   Vue.prototype.$notifier = notifier;
-  Vue.prototype.$channelsHandler = channelsHandler;
   Vue.prototype.$webrtcApi = webrtcApi;
   Vue.prototype.$platformUtil = platformUtil;
+  Vue.prototype.$messageSenderProxy = messageSenderProxy;
 
   const logger: Logger = loggerFactory.getLoggerColor('main', '#007a70');
   document.body.addEventListener('drop', e => e.preventDefault());

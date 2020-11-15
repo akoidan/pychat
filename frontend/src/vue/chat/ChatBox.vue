@@ -199,7 +199,7 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
       if (s.searchActive && !s.locked) {
         let a: MessageModelDto[] = await this.$api.search(s.searchText, this.room.id, s.searchedIds.length);
         if (a.length) {
-          this.$channelsHandler.addMessages(this.room.id, a);
+          this.$messageSenderProxy.getMessageSender(this.room.id).addMessages(this.room.id, a);
           let searchedIds = this.room.search.searchedIds.concat(a.map(a => a.id));
           this.$store.setSearchTo({
             roomId: this.room.id,
