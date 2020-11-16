@@ -69,7 +69,6 @@ import {
   UploadFile
 } from '@/ts/types/types';
 import {
-  getUniqueId,
   sem
 } from '@/ts/utils/pureFunctions';
 import MediaRecorder from '@/vue/chat/MediaRecorder.vue';
@@ -109,7 +108,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
     public readonly activeRoomId!: number;
 
     @State
-    public readonly pastingImagesQueue!: number[];
+    public readonly pastingImagesQueue!: string[];
 
     @State
     public readonly activeRoom!: RoomModel;
@@ -193,8 +192,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
           if (!md.messageContent && !md.files.length) {
             return;
           }
-          const {id, now} = this.addMessageToStore(md);
-          this.messageSender.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
+          this.sendFirstMessage(md);
         }
       } else if (event.keyCode === 27) { // 27 = escape
         this.$store.setShowSmileys(false);
@@ -217,9 +215,10 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       }
     }
 
-    private addMessageToStore(md: MessageDataEncode) {
+
+    private sendFirstMessage(md: MessageDataEncode) {
       const now = Date.now();
-      const id = -getUniqueId();
+      const id = this.$messageSenderProxy.getUniqueNegativeMessageId();
       const mm: MessageModel = {
         roomId: this.activeRoomId,
         deleted: false,
@@ -238,7 +237,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
         }
       };
       this.$store.addMessage(mm);
-      return {id, now}
+      this.messageSender.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
     }
 
     private editMessageWs(
@@ -271,7 +270,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       } else if (messageId > 0 && messageContent) {
         this.messageSender.sendEditMessage(messageContent, roomId, messageId, uploadFiles);
       } else if (!messageContent && messageId > 0) {
-        this.messageSender.sendDeleteMessage(messageId, -getUniqueId());
+        this.messageSender.sendDeleteMessage(messageId);
       } else if (!messageContent && messageId < 0) {
         this.messageSender.getMessageRetrier().removeSendingMessage(messageId);
       }

@@ -84,7 +84,7 @@ export interface InnerSendMessage extends DefaultMessage {
   content: string;
   id: number;
   uploadFiles: UploadFile[];
-  originId: number;
+  cbId: number;
   originTime: number;
 }
 

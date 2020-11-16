@@ -96,28 +96,28 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     return false;
   }
 
-  public async tryToSend(originId: number, m: Omit<DefaultMessage, 'handler'>) {
-    this.messageRetrier.putCallBack(originId, () => {
+  public async tryToSend(cbId: number, m: Omit<DefaultMessage, 'handler'>) {
+    this.messageRetrier.putCallBack(cbId, () => {
       let message: DefaultMessage = {...m, handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!)}
       sub.notify(message);
     })
     await this.initConnectionIfRequired();
     if (this.state === 'ready') {
-      this.messageRetrier.resendMessage(originId);
+      this.messageRetrier.resendMessage(cbId);
     }
   }
 
 
-  async sendSendMessage(content: string, roomId: number, uploadFiles: UploadFile[], originId: number, originTime: number): Promise<void> {
+  async sendSendMessage(content: string, roomId: number, uploadFiles: UploadFile[], cbId: number, originTime: number): Promise<void> {
     const em: Omit<InnerSendMessage, 'handler'> = {
       content,
       originTime,
-      originId,
+      cbId,
       id: Date.now(),
       action: 'sendSendMessage',
       uploadFiles,
     }
-    await this.tryToSend(originId, em);
+    await this.tryToSend(cbId, em);
   }
 
   private get room(): RoomModel {
@@ -159,11 +159,10 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   }
 
   getMessageRetrier(): MessageRetrier {
-    this.store.growlError("The operation you're trying to do is not supported on p2p channel yet");
-    throw Error("unsupported");
+    return this.messageRetrier;
   }
 
-  sendDeleteMessage(id: number, originId: number): void {
+  sendDeleteMessage(id: number) : void {
     this.store.growlError("The operation you're trying to do is not supported on p2p channel yet");
     throw Error("unsupported");
   }

@@ -14,7 +14,12 @@ import {
   Ref,
   Vue
 } from 'vue-property-decorator';
-import { getUniqueId } from '@/ts/utils/pureFunctions';
+
+let uniqueId = 1;
+
+function getUniqueId() {
+  return uniqueId++;
+}
 
 @Component
 export default class AppInputRange extends Vue {

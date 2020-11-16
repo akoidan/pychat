@@ -76,9 +76,9 @@ export interface SetDevices {
 }
 
 export interface MessageSender extends MessageRetrierProxy {
-  sendSendMessage(content: string, roomId: number, uploadFiles: UploadFile[], originId: number, originTime: number):  Promise<void>;
+  sendSendMessage(content: string, roomId: number, uploadFiles: UploadFile[], cbId: number, originTime: number):  Promise<void>;
   sendEditMessage(content: string, roomId: number, id: number, uploadFiles: UploadFile[]): Promise<void>;
-  sendDeleteMessage(id: number, originId: number): void;
+  sendDeleteMessage(cbIdEqualsToMessageId: number): void;
   addMessages(roomId: number, messages: MessageModelDto[]): void;
 }
 
@@ -184,7 +184,7 @@ export  interface IStorage {
   setUserSettings(settings: CurrentUserSettingsModel): void;
   saveRoomUsers(ru: SetRoomsUsers): void;
   setUsers(users: UserModel[]): void;
-
+  getMinMessageId(): number;
   getAllTree(): Promise<StorageData|null>;
   saveUser(users: UserModel): void;
   clearStorage(): void;

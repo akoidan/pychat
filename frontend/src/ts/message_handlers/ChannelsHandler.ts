@@ -104,6 +104,8 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     logout: <HandlerType>this.logout
   };
 
+  // messageRetrier uses MessageModel.id as unique identifier, do NOT use it with any types but
+  // Send message, delete message, edit message, as it will have the sameId which could erase some callback
   private readonly messageRetrier: MessageRetrier;
   private readonly store: DefaultStore;
   private readonly api: Api;
@@ -134,10 +136,10 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     this.store.logout();
   }
 
-  public sendDeleteMessage(id: number, originId: number): void {
+  public sendDeleteMessage(id: number): void {
     this.messageRetrier.asyncExecuteAndPutInCallback(
-        originId,
-        () => this.ws.sendEditMessage(null, id, null, originId)
+        id,
+        () => this.ws.sendEditMessage(null, id, null, id)
     );
   }
 
@@ -174,18 +176,18 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
       content: string,
       roomId: number,
       uploadFiles: UploadFile[],
-      originId: number,
+      cbId: number,
       originTime: number
   ):  Promise<void> {
     const fileIds: number[] = await this.uploadFilesOrRetry(
-      originId,
+      cbId,
       roomId,
       uploadFiles,
-      () => this.sendSendMessage(content, roomId, uploadFiles, originId, originTime)
+      () => this.sendSendMessage(content, roomId, uploadFiles, cbId, originTime)
     );
     this.messageRetrier.asyncExecuteAndPutInCallback(
-      originId,
-      () => this.ws.sendSendMessage(content, roomId, fileIds, originId, Date.now() - originTime)
+      cbId,
+      () => this.ws.sendSendMessage(content, roomId, fileIds, cbId, Date.now() - originTime)
     );
   }
 

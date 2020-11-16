@@ -104,11 +104,11 @@ function Validate(target: unknown, propertyKey: string, descriptor: PropertyDesc
 })
 export class DefaultStore extends VuexModule {
 
-  public storage: IStorage = null as unknown as IStorage; // We proxy this as soon as we created Storage
+  public storage!: IStorage; // We proxy this as soon as we created Storage
   public isOnline: boolean = false;
   public growls: GrowlModel[] = [];
   public dim: boolean = false;
-  public pastingImagesQueue: number[] = [];
+  public pastingImagesQueue: string[] = [];
   public incomingCall: IncomingCallModel | null = null;
   public microphones: { [id: string]: string } = {};
   public speakers: { [id: string]: string } = {};
@@ -650,7 +650,7 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public setPastingQueue(ids: number[]) {
+  public setPastingQueue(ids: string[]) {
     this.pastingImagesQueue = ids;
   }
 

@@ -7,12 +7,9 @@ import { Logger } from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { MessageSupplier } from '@/ts/types/types';
 import type { DefaultStore } from '@/ts/classes/DefaultStore';
-import { getUniqueId } from '@/ts/utils/pureFunctions';
 import { sub } from '@/ts/instances/subInstance';
 
 export default class AbstractMessageProcessor {
-
-  private messageId: number = 0;
 
   private readonly target: MessageSupplier;
 
@@ -21,6 +18,11 @@ export default class AbstractMessageProcessor {
   private readonly callBacks: { [id: number]: {resolve: Function; reject: Function} } = {};
   protected readonly logger: Logger;
 
+
+  // also uniqueMessageId is used on sendingMessage, in storage.getUniqueMessageId.
+  // the difference is that this is positive integers
+  // and another one uses negatives
+  private uniquePositiveMessageId: number = 1;
   private readonly loggerIn: Logger;
   private readonly loggerOut: Logger;
 
@@ -30,7 +32,6 @@ export default class AbstractMessageProcessor {
     this.loggerIn = loggerFactory.getLoggerColor(`${label}:in`, '#2e631e');
     this.loggerOut = loggerFactory.getLoggerColor(`${label}:out`, '#2e631e');
     this.logger = loggerFactory.getLoggerColor('mes-proc', '#2e631e');
-
   }
 
   private logData(logger: Logger, jsonData: string, message: DefaultSentMessage) {
@@ -105,9 +106,10 @@ export default class AbstractMessageProcessor {
 
   public getJsonMessage(message: DefaultSentMessage) {
     if (!message.messageId) {
-      message.messageId = getUniqueId();
+      this.uniquePositiveMessageId++;
+      message.messageId = this.uniquePositiveMessageId;
     }
-    return  JSON.stringify(message);
+    return JSON.stringify(message);
   }
 
   public onDropConnection(reasong: string) {

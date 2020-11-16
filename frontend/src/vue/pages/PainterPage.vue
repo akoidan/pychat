@@ -11,8 +11,13 @@ import {ALL_ROOM_ID} from '@/ts/utils/consts';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import AppInputRange from '@/vue/ui/AppInputRange';
 import {RawLocation, Route} from 'vue-router';
-import { getUniqueId } from "@/ts/utils/pureFunctions";
 import { savedFiles } from "@/ts/utils/htmlApi";
+
+let uniqueId = 1;
+
+function getUniqueId() {
+  return uniqueId++;
+}
 
 @Component
 export default class PainterPage extends Vue {
@@ -42,7 +47,7 @@ export default class PainterPage extends Vue {
   public mounted() {
     this.painter = new Painter(this.div, {
       onBlobPaste: (e: Blob) => {
-        let id: number= getUniqueId()
+        let id: string = `paintBlob-${getUniqueId()}`;
         savedFiles[id] = e;
         this.$store.setPastingQueue([id]);
         this.$router.replace(this.prevPage!);

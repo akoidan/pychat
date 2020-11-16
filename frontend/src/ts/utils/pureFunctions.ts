@@ -4,12 +4,6 @@ import {
   MessageModel
 } from "@/ts/types/model";
 
-let uniqueId = 1;
-
-export function getUniqueId() {
-  return uniqueId++;
-}
-
 export function bytesToSize(bytes: number): string {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
   if (bytes < 1) { return '0 Byte'; }

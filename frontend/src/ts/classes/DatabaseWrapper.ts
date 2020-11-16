@@ -46,6 +46,7 @@ export default class DatabaseWrapper implements IStorage {
   private readonly dbName: String;
   private db: Database|null = null;
   private readonly cache: { [id: number]: number } = {};
+  private minMessageIdCache: number = 0;
 
   constructor(dbName: String) {
     this.logger = loggerFactory.getLoggerColor('db', '#753e01');
@@ -198,8 +199,15 @@ export default class DatabaseWrapper implements IStorage {
         if (roomsDict[m.roomId]) {
           roomsDict[m.roomId].messages[m.id] = message;
         }
+        if (m.id < this.minMessageIdCache) {
+          // this seems to be the first place
+          this.minMessageIdCache = m.id;
+        }
         am[m.id] = message;
       });
+      // if database didn't have negative number, mark that this field initialize,
+      // so we can compare it with 0 when decreasing and get
+      this.minMessageIdCache --;
       dbFiles.forEach(f => {
         const amElement: MessageModel = am[f.message_id];
         if (amElement) {
@@ -290,6 +298,16 @@ export default class DatabaseWrapper implements IStorage {
   //   })();
   //   return cb;
   // }
+
+
+  getMinMessageId(): number {
+    if (this.minMessageIdCache === 0) {
+      throw Error("Can't use minMessageIdCache before initialization of store")
+    }
+    this.logger.log('Decreasing minMessageId from {}', this.minMessageIdCache)();
+    this.minMessageIdCache--;
+    return this.minMessageIdCache;
+  }
 
   public insertMessage(t: SQLTransaction, message: MessageModel) {
     this.setRoomHeaderId(message.roomId, message.id);

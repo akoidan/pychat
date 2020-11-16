@@ -29,7 +29,6 @@ import {
   PlatformUtil,
   RoomModel
 } from "@/ts/types/model";
-import { getUniqueId } from "@/ts/utils/pureFunctions";
 import { VNode } from "vue/types/vnode";
 import Xhr from '@/ts/classes/Xhr';
 import WsHandler from '@/ts/message_handlers/WsHandler';
@@ -172,9 +171,9 @@ async function initStore(logger: Logger, storage: IStorage, messageSenderProxy: 
           if (m.content && m.id > 0) {
             messageSender.sendEditMessage(m.content, m.roomId, m.id, []);
           } else if (m.content) {
-            messageSender.sendSendMessage(m.content, m.roomId, [], getUniqueId(), m.time);
+            messageSender.sendSendMessage(m.content, m.roomId, [], m.id, m.time);
           } else if (m.id > 0) {
-            messageSender.sendDeleteMessage(m.id, getUniqueId());
+            messageSender.sendDeleteMessage(m.id);
           }
         });
       } else {
@@ -200,7 +199,7 @@ function init() {
   const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier, messageBus, audioPlayer);
   const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier);
   const platformUtil: PlatformUtil = IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
-  const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, channelsHandler);
+  const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, channelsHandler, storage);
 
   Vue.prototype.$api = api;
   Vue.prototype.$ws = ws;

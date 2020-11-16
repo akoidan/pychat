@@ -18,7 +18,13 @@ import {
   Ref,
   Vue
 } from 'vue-property-decorator';
-import { getUniqueId } from '@/ts/utils/pureFunctions';
+
+
+let uniqueId = 1;
+// this one is global for all checkboxes, so don't move it into this
+function getUniqueId() {
+  return uniqueId++;
+}
 
 @Component
 export default class AppCheckbox extends Vue {

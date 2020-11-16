@@ -60,16 +60,16 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     sub.notify(em)
   }
 
-  private sendSendMessage({content, originId, uploadFiles, originTime, id}: InnerSendMessage) {
+  private sendSendMessage({content, cbId, uploadFiles, originTime, id}: InnerSendMessage) {
     this.messageRetrier.asyncExecuteAndPutInCallback(
-        originId,
+        cbId,
         () => {
           const message: PrintWebRtcMessage = {
             action: 'printMessage',
             content,
             edited: 0,
             timeDiff: Date.now() - originTime,
-            messageId: originId,
+            messageId: cbId,
             id,
             handler: 'this'
           };
