@@ -47,6 +47,7 @@ export default class SocialAuth extends Vue {
   public googleToken: string|null = null;
   public oauth_token: string = GOOGLE_OAUTH_2_CLIENT_ID;
   public fb_app_id: string = FACEBOOK_APP_ID;
+  public email: string|null = null;
 
   get googleRunning() {
     return this.grunning || !this.googleApiLoaded;
@@ -167,6 +168,11 @@ export default class SocialAuth extends Vue {
           scope: 'email'
         });
       });
+      let emailResponse = await new Promise((resolve, reject) => {
+        FB.api('/me?scope=email', resolve, reject)
+      });
+      // TODO
+      debugger
       await this.fbStatusChangeIfReAuth(response);
     }
   }

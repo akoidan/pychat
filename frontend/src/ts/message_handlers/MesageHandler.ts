@@ -1,23 +1,26 @@
-import { DefaultMessage } from '@/ts/types/messages';
 import { Logger } from 'lines-logger';
 import {
-  HandlerType,
-  HandlerTypes,
   IMessageHandler
 } from '@/ts/types/types';
+import {
+  DefaultInMessage,
+  HandlerName,
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/messages/baseMessagesInterfaces";
 
 
 export default abstract class MessageHandler implements IMessageHandler {
 
   protected abstract readonly logger: Logger;
 
-  protected abstract readonly handlers: HandlerTypes;
+  protected abstract readonly handlers: HandlerTypes<any, any>;
 
-  public handle(message: DefaultMessage) {
+  public handle(message: DefaultInMessage<string, HandlerName>) {
     if (!this.handlers) {
       throw Error(`${this.constructor.name} has empty handlers`);
     }
-    const handler: HandlerType = this.handlers[message.action];
+    const handler: HandlerType<string, HandlerName> | undefined = this.handlers[message.action];
     if (handler) {
       handler.bind(this)(message);
     } else {
@@ -25,7 +28,7 @@ export default abstract class MessageHandler implements IMessageHandler {
     }
   }
 
-  getHandler(message: DefaultMessage): HandlerType|undefined {
+  getHandler(message: DefaultInMessage<string, HandlerName>): HandlerType<string, HandlerName>|undefined {
     return this.handlers[message.action];
   }
 }

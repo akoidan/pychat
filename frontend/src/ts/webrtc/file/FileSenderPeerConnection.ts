@@ -1,11 +1,5 @@
 import {
-  AcceptFileMessage,
-  DestroyFileConnectionMessage
-} from '@/ts/types/messages';
-import {
   AddSendingFileTransfer,
-  HandlerType,
-  HandlerTypes,
   SetSendingFileStatus,
   SetSendingFileUploaded
 } from '@/ts/types/types';
@@ -21,16 +15,21 @@ import {
 } from '@/ts/utils/consts';
 import FilePeerConnection from '@/ts/webrtc/file/FilePeerConnection';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
+import {
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/messages/baseMessagesInterfaces";
+import { DestroyFileConnectionMessage } from "@/ts/types/messages/innerMessages";
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
   protected connectedToRemote: boolean = true;
 
-  protected readonly handlers: HandlerTypes = {
-    destroyFileConnection: <HandlerType>this.destroyFileConnection,
-    acceptFile: <HandlerType>this.acceptFile,
-    sendRtcData: <HandlerType>this.onsendRtcData,
-    destroy: <HandlerType>this.closeEvents,
-    declineSending: <HandlerType>this.declineSending
+  protected readonly handlers:  HandlerTypes<keyof FileSenderPeerConnection, 'peerConnection:*'> = {
+    destroyFileConnection: <HandlerType<'destroyFileConnection', 'peerConnection:*'>>this.destroyFileConnection,
+    acceptFile: <HandlerType<'acceptFile', 'peerConnection:*'>>this.acceptFile,
+    sendRtcData: <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData,
+    destroy: <HandlerType<'destroy', 'peerConnection:*'>>this.closeEvents,
+    declineSending: <HandlerType<'declineSending', 'peerConnection:*'>>this.declineSending
   };
 
   private readonly file: File;
@@ -136,10 +135,10 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     let status;
     if (isDecline) {
       status = FileTransferStatus.DECLINED_BY_OPPONENT;
-      this.onDestroy();
+      this.destroy();
     } else if (isSuccess) {
       status = FileTransferStatus.FINISHED;
-      this.onDestroy();
+      this.destroy();
     } else {
       status = FileTransferStatus.ERROR;
       isError = true;
@@ -161,8 +160,8 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     }
   }
 
-  private declineSending() {
-    this.onDestroy();
+  public declineSending() {
+    this.destroy();
     const ssfs: SetSendingFileStatus = {
       status: FileTransferStatus.DECLINED_BY_YOU,
       roomId: this.roomId,

@@ -3,23 +3,27 @@ import {
   RESPONSE_SUCCESS
 } from '@/ts/utils/consts';
 import {
-  HandlerTypes,
   UploadFile
 } from '@/ts/types/types';
-import { MessageModelDto } from '@/ts/types/dto';
 import {
-  DefaultMessage,
+  MessageModelDto,
   ViewUserProfileDto
-} from '@/ts/types/messages';
+} from '@/ts/types/dto';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 import Http from '@/ts/classes/Http';
 import { sub } from '@/ts/instances/subInstance';
+import {
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/messages/baseMessagesInterfaces";
+import { InternetAppearMessage } from "@/ts/types/messages/innerMessages";
+
 
 export default class Api extends MessageHandler {
-  protected readonly handlers: HandlerTypes = {
-    internetAppear: this.internetAppear
+  protected readonly handlers:  HandlerTypes<keyof Api, 'lan'> = {
+    internetAppear: <HandlerType<'internetAppear', 'lan'>>this.internetAppear
   };
 
   protected readonly logger: Logger;
@@ -242,7 +246,7 @@ export default class Api extends MessageHandler {
     });
   }
 
-  private internetAppear(m: DefaultMessage): void {
+  public internetAppear(m: InternetAppearMessage): void {
     if (this.retryFcb) {
       this.retryFcb();
     }

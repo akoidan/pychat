@@ -1,13 +1,18 @@
-import {
-  DefaultMessage,
-  DefaultSentMessage,
-  GrowlMessage
-} from '@/ts/types/messages';
 import { Logger } from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { MessageSupplier } from '@/ts/types/types';
 import type { DefaultStore } from '@/ts/classes/DefaultStore';
 import { sub } from '@/ts/instances/subInstance';
+import { DefaultWsOutMessage } from "@/ts/types/messages/wsOutMessages";
+import {
+  DefaultWsInMessage,
+  GrowlMessage
+} from "@/ts/types/messages/wsInMessages";
+import {
+  DefaultInMessage,
+  DefaultMessage,
+  HandlerName
+} from "@/ts/types/messages/baseMessagesInterfaces";
 
 export default class AbstractMessageProcessor {
 
@@ -22,7 +27,7 @@ export default class AbstractMessageProcessor {
   // also uniqueMessageId is used on sendingMessage, in storage.getUniqueMessageId.
   // the difference is that this is positive integers
   // and another one uses negatives
-  private uniquePositiveMessageId: number = 1;
+  private uniquePositiveMessageId: number = 100_000_000; // 100_000_000 - 200_000_000
   private readonly loggerIn: Logger;
   private readonly loggerOut: Logger;
 
@@ -34,7 +39,7 @@ export default class AbstractMessageProcessor {
     this.logger = loggerFactory.getLoggerColor('mes-proc', '#2e631e');
   }
 
-  private logData(logger: Logger, jsonData: string, message: DefaultSentMessage) {
+  private logData(logger: Logger, jsonData: string, message: DefaultMessage<string>) {
     let raw = jsonData;
     if (raw.length > 1000) {
       raw = '';
@@ -46,17 +51,17 @@ export default class AbstractMessageProcessor {
     }
   }
 
-  public parseMessage(jsonData: string): DefaultMessage|null {
-    let data: DefaultMessage;
+  public parseMessage(jsonData: string): DefaultWsInMessage<string, HandlerName>|null {
+    let data: DefaultWsInMessage<string, HandlerName>|null = null;
     try {
       data = JSON.parse(jsonData);
-      this.logData(this.loggerIn, jsonData, data);
+      this.logData(this.loggerIn, jsonData, data!);
     } catch (e) {
       this.logger.error('Unable to parse incomming message {}', jsonData)();
 
       return null;
     }
-    if (!data.handler || !data.action) {
+    if (!data?.handler || !data.action) {
       this.logger.error('Invalid message structure')();
 
       return null;
@@ -64,28 +69,31 @@ export default class AbstractMessageProcessor {
     return data;
   }
 
-  public handleMessage(data: DefaultMessage) {
+  public handleMessage(data: DefaultWsInMessage<string, HandlerName>) {
     if (data.handler !== 'void' && data.action !== 'growlError') {
       sub.notify(data);
     }
-    if (data.messageId && this.callBacks[data.messageId] && (!data.cbBySender || data.cbBySender === this.target.getWsConnectionId())) {
+    if (data.cbId && this.callBacks[data.cbId] && (!data.cbBySender || data.cbBySender === this.target.getWsConnectionId())) {
       this.logger.debug('resolving cb')();
       if (data.action === 'growlError') {
-        this.callBacks[data.messageId].reject(Error((data as GrowlMessage).content));
+        this.callBacks[data.cbId].reject(Error((data as unknown as GrowlMessage).content));
       } else {
-        this.callBacks[data.messageId].resolve(data);
+        this.callBacks[data.cbId].resolve(data);
       }
-      delete this.callBacks[data.messageId];
+      delete this.callBacks[data.cbId];
     } else if (data.action === 'growlError') {
       // growlError is used only in case above, so this is just a fallback that will never happen
-      this.store.growlError((data as GrowlMessage).content);
+      this.store.growlError((data as unknown as GrowlMessage).content);
     }
   }
 
-  public sendToServerAndAwait<T extends DefaultSentMessage> (message: T): Promise<any> {
+  public sendToServerAndAwait<T extends DefaultWsOutMessage<K>, K extends string> (message: T): Promise<any> {
     return new Promise((resolve, reject) => {
+      if (!message.cbId) {
+        message.cbId = this.uniquePositiveMessageId++;
+      }
       const jsonMessage = this.getJsonMessage(message);
-      this.callBacks[message.messageId!] = {resolve, reject}
+      this.callBacks[message.cbId!] = {resolve, reject}
       let isSent = this.target.sendRawTextToServer(jsonMessage);
       if (isSent) {
         this.logData(this.loggerOut, jsonMessage, message);
@@ -95,7 +103,7 @@ export default class AbstractMessageProcessor {
 
   }
 
-  sendToServer(message: DefaultSentMessage): boolean {
+  sendToServer(message: DefaultWsOutMessage<string>): boolean {
     let jsonMessage = this.getJsonMessage(message);
     let isSent = this.target.sendRawTextToServer(jsonMessage);
     if (isSent) {
@@ -104,11 +112,7 @@ export default class AbstractMessageProcessor {
     return isSent;
   }
 
-  public getJsonMessage(message: DefaultSentMessage) {
-    if (!message.messageId) {
-      this.uniquePositiveMessageId++;
-      message.messageId = this.uniquePositiveMessageId;
-    }
+  public getJsonMessage(message: DefaultWsOutMessage<string>) {
     return JSON.stringify(message);
   }
 

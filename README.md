@@ -461,6 +461,8 @@ http ALL=(ALL) NOPASSWD: RESTART_TORNADO
 ``` 
 
 # TODO
+* RUN git-diff to check if I need to deploy Frontend and backend separately.
+* FB login doesn't return email refactor for google_id and fb_id in user_profile . It only returns email for me
 * remove builder.js cause it leaves daemons on process exit. use vue-webpack-typescript structure
 * when we store blobs, we should use URL.revokeObjectURL(this.src); (it's usually when we do URL.createObjectURL)
 * if users joins a room that already has call in progress, he should be able to join this call

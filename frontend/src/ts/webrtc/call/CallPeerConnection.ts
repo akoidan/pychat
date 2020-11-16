@@ -5,7 +5,6 @@ import {
 } from '@/ts/utils/audioprocc';
 import AbstractPeerConnection from '@/ts/webrtc/AbstractPeerConnection';
 import {
-  ChangeStreamMessage,
   JsAudioAnalyzer,
   SetCallOpponent,
   SetOpponentAnchor,
@@ -14,9 +13,10 @@ import {
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import {
-  ConnectToRemoteMessage,
-  DefaultMessage
-} from '@/ts/types/messages';
+  ChangeStreamMessage,
+  ConnectToRemoteMessage
+} from "@/ts/types/messages/innerMessages";
+import { DefaultWsInMessage } from "@/ts/types/messages/wsInMessages";
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
   private audioProcessor: any;
@@ -83,7 +83,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
           this.logger.log('Connection accepted, consuming sendRtcDataQueue')();
           const queue = this.sendRtcDataQueue;
           this.sendRtcDataQueue = [];
-          queue.forEach(message => this.onsendRtcData(message));
+          queue.forEach(message => this.sendRtcData(message));
         }
         //
         // if (p) { //firefox video.play doesn't return promise
@@ -117,7 +117,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     }
   }
 
-  public onStreamChanged(payload: ChangeStreamMessage) {
+  public streamChanged(payload: ChangeStreamMessage) {
     this.logger.log('onStreamChanged {}', payload)();
     if (this.pc) {
       this.changeStreams(payload.newStream);
@@ -164,12 +164,12 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     removeAudioProcesssor(this.audioProcessor);
   }
 
-  public onDestroy(reason?: DefaultMessage|string) {
+  public destroy(reason?: DefaultWsInMessage|string) {
     this.logger.log('Destroying {}, because', this.constructor.name, reason)();
     this.remoteStream = null;
     this.closePeerConnection();
     this.removeAudioProcessor();
-    super.onDestroy();
+    super.destroy();
     const payload:  SetCallOpponent = {
       opponentWsId: this.opponentWsId,
       roomId: this.roomId,

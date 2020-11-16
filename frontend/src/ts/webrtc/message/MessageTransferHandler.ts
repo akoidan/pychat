@@ -9,12 +9,6 @@ import {
 import { RoomModel } from '@/ts/types/model';
 import MessageSenderPeerConnection from '@/ts/webrtc/message/MessageSenderPeerConnection';
 import MessageReceiverPeerConnection from '@/ts/webrtc/message/MessageReceiverPeerConnection';
-import {
-  ChangeDevicesMessage,
-  DefaultMessage,
-  InnerSendMessage,
-  OfferCall
-} from '@/ts/types/messages';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import NotifierHandler from '@/ts/classes/NotificationHandler';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
@@ -22,6 +16,12 @@ import { sub } from '@/ts/instances/subInstance';
 import Subscription from '@/ts/classes/Subscription';
 import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
 import { MessageModelDto } from '@/ts/types/dto';
+import {
+  DefaultWsInMessage,
+  OfferCall
+} from "@/ts/types/messages/wsInMessages";
+import { InnerSendMessage } from "@/ts/types/messages/p2pMessages";
+import { ChangeDevicesMessage } from "@/ts/types/messages/innerMessages";
 
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
 
@@ -96,9 +96,9 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     return false;
   }
 
-  public async tryToSend(cbId: number, m: Omit<DefaultMessage, 'handler'>) {
+  public async tryToSend(cbId: number, m: Omit<DefaultWsInMessage, 'handler'>) {
     this.messageRetrier.putCallBack(cbId, () => {
-      let message: DefaultMessage = {...m, handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!)}
+      let message: DefaultWsInMessage = {...m, handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!)}
       sub.notify(message);
     })
     await this.initConnectionIfRequired();

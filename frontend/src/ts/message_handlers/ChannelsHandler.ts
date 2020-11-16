@@ -3,11 +3,8 @@ import Api from '@/ts/message_handlers/Api';
 import Vue from 'vue';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import {
-  HandlerType,
-  HandlerTypes,
   MessageRetrierProxy,
   MessageSender,
-  PubSetRooms,
   RemoveMessageProgress,
   RemoveSendingMessage,
   RoomLogEntry,
@@ -36,25 +33,7 @@ import {
   UserModel
 } from '@/ts/types/model';
 import { Logger } from 'lines-logger';
-import {
-  AddChannelMessage,
-  AddInviteMessage,
-  AddOnlineUserMessage,
-  AddRoomBase,
-  AddRoomMessage,
-  ChangeDevicesMessage,
-  DeleteChannel,
-  DeleteMessage,
-  DeleteRoomMessage,
-  EditMessage,
-  InviteUserMessage,
-  LeaveUserMessage,
-  LoadMessages,
-  LogoutMessage,
-  RemoveOnlineUserMessage,
-  SaveChannelSettings,
-  SaveRoomSettings
-} from '@/ts/types/messages';
+
 import {
   ChannelDto,
   FileModelDto,
@@ -75,33 +54,61 @@ import { sub } from '@/ts/instances/subInstance';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
 import { AudioPlayer } from '@/ts/classes/AudioPlayer';
+import {
+  ChangeDevicesMessage,
+  LogoutMessage,
+  PubSetRooms
+} from "@/ts/types/messages/innerMessages";
+import {
+  AddRoomBase,
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/messages/baseMessagesInterfaces";
+import {
+  AddChannelMessage,
+  AddInviteMessage,
+  AddOnlineUserMessage,
+  AddRoomMessage,
+  DeleteChannelMessage,
+  DeleteMessage,
+  DeleteRoomMessage,
+  EditMessage,
+  InviteUserMessage,
+  LeaveUserMessage,
+  LoadMessages,
+  PrintMessage,
+  RemoveOnlineUserMessage,
+  SaveChannelSettingsMessage,
+  SaveRoomSettingsMessage
+} from "@/ts/types/messages/wsInMessages";
 
 // TODO split this class into 2 separate:
 // 1st one for message handling that's related to MessageSender and MessageTrasnferHandler (webrtc one)
 // 2nd one that's responsible for user Online, room management and etc
 
 export default class ChannelsHandler extends MessageHandler implements MessageRetrierProxy , MessageSender {
+
   protected readonly logger: Logger;
 
-  protected readonly handlers: HandlerTypes = {
-    init: <HandlerType>this.init,
-    internetAppear: <HandlerType>this.internetAppear,
-    loadMessages: <HandlerType>this.loadMessages,
-    deleteMessage: <HandlerType>this.deleteMessage,
-    editMessage: <HandlerType>this.editMessage,
-    addOnlineUser: <HandlerType>this.addOnlineUser,
-    removeOnlineUser: <HandlerType>this.removeOnlineUser,
-    printMessage: <HandlerType>this.printMessage,
-    deleteRoom: <HandlerType>this.deleteRoom,
-    leaveUser: <HandlerType>this.leaveUser,
-    addRoom: <HandlerType>this.addRoom,
-    addChannel: <HandlerType>this.addChannel,
-    inviteUser: <HandlerType>this.inviteUser,
-    addInvite: <HandlerType>this.addInvite,
-    saveChannelSettings: <HandlerType>this.saveChannelSettings,
-    deleteChannel: <HandlerType>this.deleteChannel,
-    saveRoomSettings: <HandlerType>this.saveRoomSettings,
-    logout: <HandlerType>this.logout
+  protected readonly handlers: HandlerTypes<keyof ChannelsHandler, 'channels'> = {
+    init:  <HandlerType<'init', 'channels'>>this.init,
+    internetAppear:  <HandlerType<'internetAppear', 'channels'>>this.internetAppear,
+    loadMessages:  <HandlerType<'loadMessages', 'channels'>>this.loadMessages,
+    deleteMessage:  <HandlerType<'deleteMessage', 'channels'>>this.deleteMessage,
+    editMessage:  <HandlerType<'editMessage', 'channels'>>this.editMessage,
+    addOnlineUser:  <HandlerType<'addOnlineUser', 'channels'>>this.addOnlineUser,
+    removeOnlineUser:  <HandlerType<'removeOnlineUser', 'channels'>>this.removeOnlineUser,
+    printMessage:  <HandlerType<'printMessage', 'channels'>>this.printMessage,
+    deleteRoom:  <HandlerType<'deleteRoom', 'channels'>>this.deleteRoom,
+    leaveUser:  <HandlerType<'leaveUser', 'channels'>>this.leaveUser,
+    addRoom:  <HandlerType<'addRoom', 'channels'>>this.addRoom,
+    addChannel:  <HandlerType<'addChannel', 'channels'>>this.addChannel,
+    inviteUser:  <HandlerType<'inviteUser', 'channels'>>this.inviteUser,
+    addInvite:  <HandlerType<'addInvite', 'channels'>>this.addInvite,
+    saveChannelSettings:  <HandlerType<'saveChannelSettings', 'channels'>>this.saveChannelSettings,
+    deleteChannel:  <HandlerType<'deleteChannel', 'channels'>>this.deleteChannel,
+    saveRoomSettings:  <HandlerType<'saveRoomSettings', 'channels'>>this.saveRoomSettings,
+    logout:  <HandlerType<'logout', 'channels'>>this.logout
   };
 
   // messageRetrier uses MessageModel.id as unique identifier, do NOT use it with any types but
@@ -290,11 +297,11 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     return this.handlers;
   }
 
-  private internetAppear() {
+  public internetAppear() {
     this.messageRetrier.resendAllMessages();
   }
 
-  private loadMessages(lm: LoadMessages) {
+  public loadMessages(lm: LoadMessages) {
     if (lm.content.length > 0) {
       this.addMessages(lm.roomId, lm.content);
     } else {
@@ -302,7 +309,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     }
   }
 
-  private deleteMessage(inMessage: DeleteMessage) {
+  public deleteMessage(inMessage: DeleteMessage) {
     let message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
       this.logger.debug('Unable to find message {} to delete it', inMessage)();
@@ -329,7 +336,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     }
   }
 
-  private editMessage(inMessage: EditMessage) {
+  public editMessage(inMessage: EditMessage) {
     const message: MessageModel = this.store.roomsDict[inMessage.roomId].messages[inMessage.id];
     if (!message) {
       this.logger.debug('Unable to find message {} to edit it', inMessage)();
@@ -343,7 +350,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     }
   }
 
-  private addOnlineUser(message: AddOnlineUserMessage) {
+  public addOnlineUser(message: AddOnlineUserMessage) {
     if (!this.store.allUsersDict[message.userId]) {
       const newVar: UserModel = convertUser(message);
       this.store.addUser(newVar);
@@ -368,7 +375,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     sub.notify(message);
   }
 
-  private removeOnlineUser(message: RemoveOnlineUserMessage) {
+  public removeOnlineUser(message: RemoveOnlineUserMessage) {
     if (message.content[message.userId].length === 0) {
       this.addChangeOnlineEntry(message.userId, message.time, 'gone offline');
     }
@@ -376,7 +383,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     this.notifyDevicesChanged(message.userId, null);
   }
 
-  private printMessage(inMessage: EditMessage) {
+  public printMessage(inMessage: PrintMessage) {
     if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
       this.messageRetrier.removeSendingMessage(inMessage.messageId);
       if (!inMessage.messageId) {
@@ -436,7 +443,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     this.messageBus.$emit('scroll');
   }
 
-  private deleteRoom(message: DeleteRoomMessage) {
+  public deleteRoom(message: DeleteRoomMessage) {
     if (this.store.roomsDict[message.roomId]) {
       this.store.deleteRoom(message.roomId);
     } else {
@@ -445,7 +452,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     this.notifyDevicesChanged(null, message.roomId);
   }
 
-  private leaveUser(message: LeaveUserMessage) {
+  public leaveUser(message: LeaveUserMessage) {
     if (this.store.roomsDict[message.roomId]) {
       const m: SetRoomsUsers = {
         roomId: message.roomId,
@@ -466,7 +473,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     }
   }
 
-  private addRoom(message: AddRoomMessage) {
+  public addRoom(message: AddRoomMessage) {
     this.mutateRoomAddition(message);
     if (message.channelId) {
       let channelDict: ChannelModel = getChannelDict(message as  Omit<AddRoomMessage, 'channelId'> & { channelId: number; });
@@ -474,7 +481,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     }
   }
 
-  private saveChannelSettings(message: SaveChannelSettings) {
+  public saveChannelSettings(message: SaveChannelSettingsMessage) {
     if (!this.store.channelsDict[message.channelId]) {
       this.logger.error('Unable to find channel to edit {} to kick user, available are {}', message.channelId, Object.keys(this.store.channelsDict))();
     } else {
@@ -483,7 +490,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     }
   }
 
-  private saveRoomSettings(message: SaveRoomSettings) {
+  public saveRoomSettings(message: SaveRoomSettingsMessage) {
     if (!this.store.roomsDict[message.roomId]) {
       this.logger.error('Unable to find channel to edit {} to kick user, available are {}', message.roomId, Object.keys(this.store.roomsDict))();
     } else {
@@ -492,12 +499,12 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     }
   }
 
-  private addChannel(message: AddChannelMessage) {
+  public addChannel(message: AddChannelMessage) {
     let channelDict: ChannelModel = getChannelDict(message);
     this.store.addChannel(channelDict);
   }
 
-  private inviteUser(message: InviteUserMessage) {
+  public inviteUser(message: InviteUserMessage) {
     this.store.setRoomsUsers({
       roomId: message.roomId,
       users: message.users
@@ -512,11 +519,11 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     this.notifyDevicesChanged(null, message.roomId);
   }
 
-  private deleteChannel(message: DeleteChannel) {
+  public deleteChannel(message: DeleteChannelMessage) {
     this.store.deleteChannel(message.channelId);
   }
 
-  private addInvite(message: AddInviteMessage) {
+  public addInvite(message: AddInviteMessage) {
     this.mutateRoomAddition(message);
   }
 

@@ -2,7 +2,6 @@ import BaseTransferHandler from '@/ts/webrtc/BaseTransferHandler';
 import NotifierHandler from '@/ts/classes/NotificationHandler';
 import { SendingFile } from '@/ts/types/model';
 import WsHandler from '@/ts/message_handlers/WsHandler';
-import { ReplyFileMessage } from '@/ts/types/messages';
 import FileSenderPeerConnection from '@/ts/webrtc/file/FileSenderPeerConnection';
 import { sub } from '@/ts/instances/subInstance';
 import Subscription from '@/ts/classes/Subscription';
@@ -10,13 +9,15 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 import {
   HandlerType,
   HandlerTypes
-} from '@/ts/types/types';
+} from "@/ts/types/messages/baseMessagesInterfaces";
+import { ReplyFileMessage } from "@/ts/types/messages/wsInMessages";
+
 
 export default class FileHandler extends BaseTransferHandler {
 
-  protected readonly handlers: HandlerTypes = {
-    replyFile: <HandlerType>this.replyFile,
-    removePeerConnection: <HandlerType>this.removePeerConnection
+  protected readonly handlers: HandlerTypes<keyof FileHandler, 'webrtcTransfer:*'> = {
+    replyFile: <HandlerType<'replyFile', 'webrtcTransfer:*'>>this.replyFile,
+    removePeerConnection: <HandlerType<'removePeerConnection', 'webrtcTransfer:*'>>this.removePeerConnection
   };
   private readonly file: File;
 

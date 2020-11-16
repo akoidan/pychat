@@ -56,7 +56,7 @@ class VarNames(object):
 	FILE_URL = 'url'
 	FILE_TYPE = 'type'
 	EVENT = 'action'
-	JS_MESSAGE_ID = 'messageId'
+	JS_MESSAGE_ID = 'cbId'
 	MESSAGE_ID = 'id'
 	IMAGE_ID = 'id'
 	GENDER = 'sex'

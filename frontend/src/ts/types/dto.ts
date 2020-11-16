@@ -24,6 +24,10 @@ export interface RoomDto  extends  RoomNoUsersDto {
   users: number[];
 }
 
+export interface ViewUserProfileDto extends UserProfileDto {
+  image: string;
+}
+
 export interface ChannelDto {
   channelName: string;
   channelId: number;

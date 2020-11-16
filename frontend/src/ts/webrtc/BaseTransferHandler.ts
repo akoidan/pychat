@@ -5,8 +5,9 @@ import NotifierHandler from '@/ts/classes/NotificationHandler';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import { sub } from '@/ts/instances/subInstance';
 import Subscription from '@/ts/classes/Subscription';
-import { RemovePeerConnection } from '@/ts/types/types';
+
 import { DefaultStore } from '@/ts/classes/DefaultStore';
+import { RemovePeerConnectionMessage } from "@/ts/types/messages/innerMessages";
 
 export default abstract class BaseTransferHandler extends MessageHandler {
 
@@ -34,7 +35,7 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     }
   }
 
-  protected removePeerConnection(payload: RemovePeerConnection) {
+  public removePeerConnection(payload: RemovePeerConnectionMessage) {
     this.logger.log('Removing pc {}', payload);
     const start = this.webrtcConnnectionsIds.indexOf(payload.opponentWsId);
     if (start < 0) {

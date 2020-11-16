@@ -21,8 +21,11 @@ import {
   SetStateFromStorage,
   UserDto
 } from '@/ts/types/dto';
-import { DefaultMessage } from '@/ts/types/messages';
+
 import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
+import { DefaultWsInMessage } from "@/ts/types/messages/wsInMessages";
+import { HandlerName } from "@/ts/types/messages/baseMessagesInterfaces";
+
 
 export interface UploadFile {
    type: string;
@@ -34,15 +37,20 @@ export type ValueFilterForKey<T extends object, U> = {
   [K in keyof T]: U extends T[K] ? K : never;
 }[keyof T];
 
-export type HandlerType = (a: DefaultMessage) => void|Promise<void>;
 
-export interface HandlerTypes {
-  [id: string]: HandlerType;
+
+
+
+type StuctureMappedType<K extends string> = Record<K, K>;
+
+const sample: StuctureMappedType<string> = {
+  'any3': "andy3"
 }
 
+
 export interface IMessageHandler {
-  handle(message: DefaultMessage): void;
-  getHandler(message: DefaultMessage): HandlerType|undefined;
+  handle(message: DefaultWsInMessage): void;
+  getHandler(message: DefaultWsInMessage): HandlerType|undefined;
 }
 
 export interface MessageRetrierProxy {
@@ -54,9 +62,7 @@ export interface UserIdConn {
   userId: number;
 }
 
-export interface ChangeStreamMessage extends DefaultMessage {
-  newStream: MediaStream;
-}
+
 
 export interface MessageDataEncode {
   messageContent: string|null;
@@ -141,10 +147,6 @@ export interface StringIdentifier {
 export interface MediaIdentifier {
   id: number;
   media: MediaStream|null;
-}
-
-export interface RemovePeerConnection extends DefaultMessage {
-  opponentWsId: string;
 }
 
 export interface RoomLogEntry {
@@ -268,12 +270,7 @@ export interface RemoveMessageProgress {
   roomId: number;
 }
 
-export interface PubSetRooms extends DefaultMessage {
-  rooms:  RoomDto[];
-  channels: ChannelDto[];
-  users: UserDto[];
-  online: Record<string, string[]>;
-}
+
 
 export interface SetMessageProgress extends RemoveMessageProgress {
   uploaded: number;
@@ -284,18 +281,8 @@ export interface SetSearchTo {
   search: SearchModel;
 }
 
-export interface AddMessagePayload {
-  index: number;
-  message: MessageModel;
-}
-
 export enum IconColor {
   SUCCESS = 'success', ERROR = 'error', WARN = 'warn', NOT_SET = ''
-}
-
-export interface SmileyStructure {
-  alt: string;
-  src: string;
 }
 
 export interface SessionHolder {

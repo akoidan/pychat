@@ -1,15 +1,5 @@
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
-import {
-  HandlerType,
-  HandlerTypes,
-  VideoType
-} from '@/ts/types/types';
-import {
-  LogoutMessage,
-  OfferCall,
-  OfferFile
-} from '@/ts/types/messages';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import {
   FileTransferStatus,
@@ -29,16 +19,27 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { browserVersion } from '@/ts/utils/runtimeConsts';
 import MessageTransferHandler from '@/ts/webrtc/message/MessageTransferHandler';
 import { bytesToSize } from '@/ts/utils/pureFunctions';
+import {
+  OfferCall,
+  OfferFile,
+  OfferMessage
+} from "@/ts/types/messages/wsInMessages";
+import {
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/messages/baseMessagesInterfaces";
+import { VideoType } from "@/ts/types/types";
+import { LogoutMessage } from "@/ts/types/messages/innerMessages";
 
 export default class WebRtcApi extends MessageHandler {
 
   protected logger: Logger;
 
-  protected readonly handlers: HandlerTypes  = {
-    offerFile: <HandlerType>this.onofferFile,
-    offerCall: <HandlerType>this.offerCall,
-    offerMessage: <HandlerType>this.offerMessage,
-    logout: <HandlerType>this.logout
+  protected readonly handlers: HandlerTypes<keyof WebRtcApi, 'webrtc'>  = {
+    offerFile: <HandlerType<'offerFile', 'webrtc'>>this.onofferFile,
+    offerCall: <HandlerType<'offerCall', 'webrtc'>>this.offerCall,
+    offerMessage: <HandlerType<'offerMessage', 'webrtc'>>this.offerMessage,
+    logout: <HandlerType<'logout', 'webrtc'>>this.logout
   };
 
   private readonly wsHandler: WsHandler;
@@ -61,7 +62,7 @@ export default class WebRtcApi extends MessageHandler {
   }
 
 
-  public offerMessage(message: OfferCall) {
+  public offerMessage(message: OfferMessage) {
     this.getMessageHandler(message.roomId).acceptConnection(message);
   }
 

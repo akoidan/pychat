@@ -8,19 +8,19 @@ import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import Subscription from '@/ts/classes/Subscription';
 import {
   ConnectionStatus,
-  RemovePeerConnection
 } from '@/ts/types/types';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
+import { WEBRTC_STUNT_URL } from '@/ts/utils/runtimeConsts';
+import { HandlerName } from "@/ts/types/messages/baseMessagesInterfaces";
 import {
   ConnectToRemoteMessage,
-  HandlerName,
-  OnSendRtcDataMessage
-} from '@/ts/types/messages';
-import { WEBRTC_STUNT_URL } from '@/ts/utils/runtimeConsts';
+  RemovePeerConnectionMessage,
+} from "@/ts/types/messages/innerMessages";
+import { SendRtcDataMessage } from "@/ts/types/messages/wsInMessages";
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean = false;
-  protected sendRtcDataQueue: OnSendRtcDataMessage[] = [];
+  protected sendRtcDataQueue: SendRtcDataMessage[] = [];
   protected readonly opponentWsId: string;
   protected readonly connectionId: string;
   protected readonly logger: Logger;
@@ -71,9 +71,9 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     return this.connectionStatus;
   }
 
-  public onDestroy(reason?: string) {
+  public destroy(reason?: string) {
     this.logger.log('Destroying {}, because {}', this.constructor.name, reason)();
-    const message: RemovePeerConnection = {
+    const message: RemovePeerConnectionMessage = {
       handler: Subscription.getTransferId(this.connectionId),
       action: 'removePeerConnection',
       opponentWsId: this.opponentWsId
@@ -184,7 +184,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.logger.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();
   }
 
-  protected async onsendRtcData(message: OnSendRtcDataMessage) {
+  public async sendRtcData(message: SendRtcDataMessage) {
     if (!this.connectedToRemote) {
       this.logger.log('Connection is not accepted yet, pushing data to queue')();
       this.sendRtcDataQueue.push(message);

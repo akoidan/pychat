@@ -33,17 +33,17 @@ import CreateChannel from '@/vue/pages/CreateChannel.vue';
 import ChannelSettings from '@/vue/pages/ChannelSettings.vue';
 import { sub } from '@/ts/instances/subInstance';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
+import { Logger } from 'lines-logger';
+import loggerFactory from '@/ts/instances/loggerFactory';
 import {
   HandlerType,
   HandlerTypes
-} from '@/ts/types/types';
-import { Logger } from 'lines-logger';
+} from "@/ts/types/messages/baseMessagesInterfaces";
 import {
   LoginMessage,
   LogoutMessage,
   RouterNavigateMessage
-} from '@/ts/types/messages';
-import loggerFactory from '@/ts/instances/loggerFactory';
+} from "@/ts/types/messages/innerMessages";
 
 Vue.use(VueRouter);
 
@@ -204,14 +204,14 @@ router.beforeEach((to, from, next) => {
 });
 
 
-sub.subscribe('router', new class extends MessageHandler {
+sub.subscribe('router', new class RouterProcesssor extends MessageHandler {
 
   protected readonly logger: Logger = logger;
 
-  protected readonly handlers: HandlerTypes = {
-    login: <HandlerType>this.login,
-    logout: <HandlerType>this.logout,
-    navigate: <HandlerType>this.navigate
+  protected readonly handlers: HandlerTypes<keyof RouterProcesssor, 'router'> = {
+    login: <HandlerType<'login', 'router'>>this.login,
+    logout: <HandlerType<'logout', 'router'>>this.logout,
+    navigate:<HandlerType<'navigate', 'router'>>this.navigate
   }
 
   logout(a: LogoutMessage) {
@@ -219,7 +219,9 @@ sub.subscribe('router', new class extends MessageHandler {
   }
 
   navigate(a: RouterNavigateMessage) {
-    router.replace(a.to);
+    if (router.currentRoute.path !== a.to) {
+      router.replace(a.to);
+    }
   }
 
   login(a: LoginMessage) {

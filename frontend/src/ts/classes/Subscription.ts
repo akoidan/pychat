@@ -1,10 +1,11 @@
-import {
-  DefaultMessage,
-  HandlerName
-} from '@/ts/types/messages';
 import { IMessageHandler } from '@/ts/types/types';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
+import {
+  DefaultInMessage,
+  HandlerName
+} from "@/ts/types/messages/baseMessagesInterfaces";
+import { DefaultInnerSystemMessage } from "@/ts/types/messages/innerMessages";
 
 export default class Subscription {
 
@@ -15,16 +16,16 @@ export default class Subscription {
     this.logger = loggerFactory.getLoggerColor('sub', '#3a7a7a');
   }
 
-  public static getPeerConnectionId(connectionId: string, opponentWsId: string): HandlerName {
-    return `peerConnection:${connectionId}:${opponentWsId}` as HandlerName;
+  public static getPeerConnectionId(connectionId: string, opponentWsId: string): 'peerConnection:*' {
+    return `peerConnection:${connectionId}:${opponentWsId}` as 'peerConnection:*';
   }
 
-  public static allPeerConnectionsForTransfer(connectionId: string): HandlerName {
-    return `peerConnection:${connectionId}:ALL_OPPONENTS` as HandlerName;
+  public static allPeerConnectionsForTransfer(connectionId: string): 'peerConnection:*' {
+    return `peerConnection:${connectionId}:ALL_OPPONENTS` as 'peerConnection:*';
   }
 
-  public static getTransferId(connectionId: string): HandlerName {
-    return `webrtcTransfer:${connectionId}` as HandlerName;
+  public static getTransferId(connectionId: string): 'webrtcTransfer:*' {
+    return `webrtcTransfer:${connectionId}` as 'webrtcTransfer:*';
   }
 
   public subscribe(channel: HandlerName, messageHandler: IMessageHandler) {
@@ -51,7 +52,7 @@ export default class Subscription {
     this.logger.error('Unable to find channel to delete {}', channel)();
   }
 
-  public notify<T extends DefaultMessage>(message: T): boolean {
+  public notify<T extends DefaultInMessage<string, HandlerName>>(message: T): boolean {
     this.logger.debug('notifing {}', message)();
     if (message.handler === 'any') {
       Object.values(this.channels).forEach(channel => {
@@ -69,7 +70,7 @@ export default class Subscription {
 
       return true;
     } else {
-      if (!message.allowZeroSubscribers) {
+      if (!(message as DefaultInnerSystemMessage<string, HandlerName>).allowZeroSubscribers) {
         this.logger.error('Can\'t handle message {} because no channels found, available channels {}', message, this.channels)();
       }
 

@@ -1,16 +1,8 @@
 import AbstractPeerConnection from '@/ts/webrtc/AbstractPeerConnection';
-import {
-  DefaultMessage,
-  EditMessage,
-  InnerSendMessage,
-  PrintWebRtcMessage
-} from '@/ts/types/messages';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { sub } from '@/ts/instances/subInstance';
 import {
-  HandlerType,
-  HandlerTypes,
   MessageSupplier,
   UploadFile
 } from '@/ts/types/types';
@@ -18,14 +10,28 @@ import AbstractMessageProcessor from '@/ts/message_handlers/AbstractMessageProce
 import { SecurityValidator } from '@/ts/webrtc/message/SecurityValidator';
 import Subscription from '@/ts/classes/Subscription';
 import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
+import {
+  HandlerName,
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/messages/baseMessagesInterfaces";
+import {
+  InnerSendMessage,
+  PrintWebRtcMessage
+} from "@/ts/types/messages/p2pMessages";
+import {
+  DefaultWsInMessage,
+  EditMessage
+} from "@/ts/types/messages/wsInMessages";
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
 
-  protected readonly handlers: HandlerTypes = {
-    sendRtcData: <HandlerType>this.onsendRtcData,
-    checkDestroy: <HandlerType>this.checkDestroy,
-    sendSendMessage: <HandlerType>this.sendSendMessage,
-    printMessage: <HandlerType>this.printMessage,
+
+  protected readonly handlers: HandlerTypes<keyof MessagePeerConnection, 'peerConnection:*'> = {
+    sendRtcData:  <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData,
+    checkDestroy:  <HandlerType<'checkDestroy', 'peerConnection:*'>>this.checkDestroy,
+    sendSendMessage:  <HandlerType<'sendSendMessage', 'peerConnection:*'>>this.sendSendMessage,
+    printMessage:  <HandlerType<'printMessage', 'peerConnection:*'>>this.printMessage
   };
 
 
@@ -45,22 +51,22 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     this.messageProc = new AbstractMessageProcessor(this, store, `p2p-${opponentWsId}`);
   }
 
-  private printMessage(m: PrintWebRtcMessage) {
+  public printMessage(m: PrintWebRtcMessage) {
     let em: EditMessage = {
       action: 'printMessage',
       content: m.content,
       edited: 0,
       handler: 'channels',
       id: m.id,
-      messageId: m.messageId,
+      cbId: m.cbId,
       roomId: this.roomId,
       time: Date.now() - m.timeDiff,
-      userId: this.opponentUserId,
-    }
-    sub.notify(em)
+      userId: this.opponentUserId
+    };
+    sub.notify(em);
   }
 
-  private sendSendMessage({content, cbId, uploadFiles, originTime, id}: InnerSendMessage) {
+  public sendSendMessage({content, cbId, uploadFiles, originTime, id}: InnerSendMessage) {
     this.messageRetrier.asyncExecuteAndPutInCallback(
         cbId,
         () => {
@@ -82,8 +88,8 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     return this.opponentUserId;
   }
 
-  public onDestroy(reason?: string) {
-    super.onDestroy(reason);
+  public destroy(reason?: string) {
+    super.destroy(reason);
     sub.unsubscribe(Subscription.allPeerConnectionsForTransfer(this.connectionId), this);
   }
 
@@ -102,7 +108,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     //destroy only if user has left this room, if he's offline but connections is stil in progress,
     // maybe he has jost connection to server but not to us
     if (this.store.roomsDict[this.roomId].users.indexOf(this.opponentUserId) < 0) {
-      this.onDestroy('User has left this room')
+      this.destroy('User has left this room')
     }
   }
 
@@ -141,7 +147,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     this.sendChannel!.onclose = () => this.logger.log('Closed channel ')();
   }
 
-  public closeEvents (text?: string|DefaultMessage) {
+  public closeEvents (text?: string|DefaultWsInMessage<string, HandlerName>) {
     this.messageProc.onDropConnection('data channel lost')
     if (text) {
       this.ondatachannelclose(<string>text); // TODO
