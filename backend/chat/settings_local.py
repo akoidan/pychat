@@ -1,5 +1,4 @@
 from chat.settings_base import *
-import logging.config
 
 DEBUG = True
 TEMPLATE_DEBUG = True
@@ -46,7 +45,6 @@ LOGGING['loggers'] = {
 # Don't close socket if we're in debug
 PING_CLOSE_JS_DELAY = 100000
 
-logging.config.dictConfig(LOGGING)
 
 
 

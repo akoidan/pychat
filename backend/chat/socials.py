@@ -125,10 +125,12 @@ class FacebookAuth(SocialAuth):
 
 	def get_facebook_user_id(self, token):
 
-		r = http_client.fetch(HTTPRequest(url_concat(
+		url_result = url_concat(
 			'https://graph.facebook.com/debug_token',
 			{'input_token': token, 'access_token': FACEBOOK_ACCESS_TOKEN}
-		)))
+		)
+		r = http_client.fetch(HTTPRequest(url_result))
+		self.logger.info("get_facebook_user_id(%s) = %s ", url_result, r.body)
 		response = json.loads(r.body)
 		data = response.get('data')
 		if data is None:
@@ -145,10 +147,9 @@ class FacebookAuth(SocialAuth):
 		return user_id
 
 	def get_facebook_user(self, user_id):
-		r = http_client.fetch(HTTPRequest(url_concat(
-			"https://graph.facebook.com/{}".format(user_id),
-			self.PARAMS
-		)))
+		url_result = url_concat("https://graph.facebook.com/{}".format(user_id), self.PARAMS)
+		r = http_client.fetch(HTTPRequest(url_result))
+		self.logger.info("get_facebook_user(%s) = %s ", url_result, r.body)
 		user_info = json.loads(r.body)
 		if user_info.get('email') is None:
 			raise ValidationError("Email for this user not found")

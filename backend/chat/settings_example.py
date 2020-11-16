@@ -1,3 +1,4 @@
+import logging.config
 ### Rename this file to chat/settings.py
 ### 3 hashtag in this file tells you want to do, while single hastag is required to uncomment
 
@@ -98,3 +99,5 @@ GIPHY_API_KEY = 'thZMTtWsaBQAPDIAY461GzYTctuYIeIj'
 # FACEBOOK_ACCESS_TOKEN = '************************************************************************************************************************************************************************************' # USER TOKEN from  https://developers.facebook.com/tools/access_token/
 # FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
 ### Pay attention! Access token is only valid for some period of time. So every ~year you need to get a new value from the link above and put it into settings.py. There's no way to autogenerate it.
+
+logging.config.dictConfig(LOGGING)
