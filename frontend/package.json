@@ -55,6 +55,7 @@
     "@types/node": "12.12.3",
     "@types/webrtc": "0.0.25",
     "@types/websql": "0.0.27",
+    "@types/wicg-native-file-system": "^2020.6.0",
     "@typescript-eslint/parser": "2.6.0",
     "chai": "4.2.0",
     "clean-webpack-plugin": "3.0.0",

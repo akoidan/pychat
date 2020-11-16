@@ -295,20 +295,40 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       }
     }
 
-    public addImage() {
-      this.imgInput.click();
+    public async addImage() {
+      if (window.showOpenFilePicker) {
+        let filesHandles: FileSystemFileHandle[] = await window.showOpenFilePicker({
+          multiple: true,
+          types: [
+            {
+              description: 'Images',
+              accept: {
+                'image/*': ['.png', '.gif', '.jpeg', '.jpg']
+              }
+            }
+          ]
+        })
+        let files = await Promise.all(filesHandles.map(a => a.getFile()))
+        this.pasteFilesToTextArea(files);
+      } else {
+        this.imgInput.click();
+      }
     }
 
-    public handleFileSelect (evt: Event) {
+    public  handleFileSelect (evt: Event) {
       const files: FileList = (evt.target as HTMLInputElement).files!;
+      this.pasteFilesToTextArea(files);
+      this.imgInput.value = '';
+    }
+
+
+    private pasteFilesToTextArea(files: FileList| File[]) {
       for (let i = 0; i < files.length; i++) {
         pasteImgToTextArea(files[i], this.userMessage, (err: string) => {
           this.$store.growlError(err);
         });
       }
-      this.imgInput.value = '';
     }
-
 
     public onImagePaste(evt: ClipboardEvent) {
       if (evt.clipboardData && evt.clipboardData.files && evt.clipboardData.files.length) {

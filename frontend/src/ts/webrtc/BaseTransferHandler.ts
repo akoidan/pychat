@@ -54,7 +54,10 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     this.webrtcConnnectionsIds.forEach(id => {
       sub.notify({
         action: 'destroy',
-        handler: Subscription.getPeerConnectionId(this.connectionId!, id)
+        handler: Subscription.getPeerConnectionId(this.connectionId!, id),
+        allowZeroSubscribers: true // TODO this is weird that this connection is desrtoyed already, should nto be destroyed twice
+        // applying hotfix , this should be fixed in another way
+        // Can't handle message  {action: "destroy", handler: "peerConnection:fzELFAhC:0001:AVmb"}  because no channels found, available channels
       });
     });
   }
