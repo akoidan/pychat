@@ -19,9 +19,14 @@ LOGGING['handlers'] = {
 	'default': {
 		'level': 'DEBUG',
 		'class': 'logging.StreamHandler',
+		'stream': sys.stdout,
 		'filters': ['id', ],
 		'formatter': 'django',
 	},
+	'mail_admins': {
+		'level': 'ERROR',
+		'class': 'django.utils.log.AdminEmailHandler',
+	}
 }
 
 LOGGING['loggers'] = {
