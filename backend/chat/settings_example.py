@@ -1,3 +1,4 @@
+import logging.config
 ### Rename this file to chat/settings.py
 ### 3 hashtag in this file tells you want to do, while single hastag is required to uncomment
 
@@ -97,3 +98,5 @@ GIPHY_API_KEY = 'thZMTtWsaBQAPDIAY461GzYTctuYIeIj'
 ### For facebook auth:
 # FACEBOOK_ACCESS_TOKEN = '************************************************************************************************************************************************************************************' # USER TOKEN from  https://developers.facebook.com/tools/access_token/
 # FACEBOOK_APP_ID = '16_NUMBER_APP_ID' # https://developers.facebook.com/apps/
+
+logging.config.dictConfig(LOGGING)
