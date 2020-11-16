@@ -22,7 +22,7 @@ import {
   UserDto
 } from '@/ts/types/dto';
 import { DefaultMessage } from '@/ts/types/messages';
-import MessageRetrier from "@/ts/message_handlers/MessageRetrier";
+import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
 
 export interface UploadFile {
    type: string;

@@ -1,10 +1,10 @@
-import { Logger } from "lines-logger";
-import loggerFactory from "@/ts/instances/loggerFactory";
-import MessageHandler from "@/ts/message_handlers/MesageHandler";
+import { Logger } from 'lines-logger';
+import loggerFactory from '@/ts/instances/loggerFactory';
+import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import {
   HandlerType,
   HandlerTypes
-} from "@/ts/types/types";
+} from '@/ts/types/types';
 
 export default class MessageRetrier extends MessageHandler {
   protected handlers: HandlerTypes = {

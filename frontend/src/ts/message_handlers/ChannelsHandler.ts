@@ -73,8 +73,8 @@ import WsHandler from '@/ts/message_handlers/WsHandler';
 import NotifierHandler from '@/ts/classes/NotificationHandler';
 import { sub } from '@/ts/instances/subInstance';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
-import MessageRetrier from "@/ts/message_handlers/MessageRetrier";
-import { AudioPlayer } from "@/ts/classes/AudioPlayer";
+import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
+import { AudioPlayer } from '@/ts/classes/AudioPlayer';
 
 // TODO split this class into 2 separate:
 // 1st one for message handling that's related to MessageSender and MessageTrasnferHandler (webrtc one)
@@ -249,7 +249,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
 
     const {rooms, channels, users, online} = m;
     // otherwise, we will modify value from ws, which will make observable in logs
-    // other values from "m" are converted with convertable
+    // other values from 'm' are converted with convertable
     let ids: PubSetRooms['online'] = JSON.parse(JSON.stringify(online));
     this.store.setOnline(ids);
 

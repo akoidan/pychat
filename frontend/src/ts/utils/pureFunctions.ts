@@ -2,7 +2,7 @@ import {
   CurrentUserInfoModel,
   EditingMessage,
   MessageModel
-} from "@/ts/types/model";
+} from '@/ts/types/model';
 
 export function bytesToSize(bytes: number): string {
   const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];

@@ -17,7 +17,7 @@ import {
 import AbstractMessageProcessor from '@/ts/message_handlers/AbstractMessageProcessor';
 import { SecurityValidator } from '@/ts/webrtc/message/SecurityValidator';
 import Subscription from '@/ts/classes/Subscription';
-import MessageRetrier from "@/ts/message_handlers/MessageRetrier";
+import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
 
@@ -102,7 +102,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     //destroy only if user has left this room, if he's offline but connections is stil in progress,
     // maybe he has jost connection to server but not to us
     if (this.store.roomsDict[this.roomId].users.indexOf(this.opponentUserId) < 0) {
-      this.onDestroy("User has left this room")
+      this.onDestroy('User has left this room')
     }
   }
 

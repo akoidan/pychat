@@ -302,7 +302,7 @@ export default class DatabaseWrapper implements IStorage {
 
   getMinMessageId(): number {
     if (this.minMessageIdCache === 0) {
-      throw Error("Can't use minMessageIdCache before initialization of store")
+      throw Error('Can\'t use minMessageIdCache before initialization of store');
     }
     this.logger.log('Decreasing minMessageId from {}', this.minMessageIdCache)();
     this.minMessageIdCache--;

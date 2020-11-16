@@ -8,7 +8,7 @@ import {
   UserSettingsDto,
   WebRtcMessageModelDto
 } from '@/ts/types/dto';
-import { UploadFile } from "@/ts/types/types";
+import { UploadFile } from '@/ts/types/types';
 
 export interface DefaultSentMessage {
   action: string;

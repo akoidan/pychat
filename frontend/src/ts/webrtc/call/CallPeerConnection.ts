@@ -52,7 +52,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
         this.pc!.iceConnectionState === 'closed') {
       // this.logger.log('disconnecting...')();
       // TODO, nope, if state has been changed to disconnected we should NOT close a connection
-      // since on chaning streams connection is also dropping and then goes by the chain "checking" "connected" "completed"
+      // since on chaning streams connection is also dropping and then goes by the chain 'checking' 'connected' 'completed'
       // at least this is on safari, on chrome it usually doesn't go to disconnected,
       // this.onDestroy('Connection has been lost');
     }
@@ -64,10 +64,10 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     // onaddstream property has been removed from the specification; you should now use RTCPeerConnection.ontrack to watch for track events instead.
     this.pc!.ontrack = (event: RTCTrackEvent) => {
       if (event.streams.length > 1) {
-        throw Error("Unexpected multiple streams. Should be exactly 1 stream and multiple tracks");
+        throw Error('Unexpected multiple streams. Should be exactly 1 stream and multiple tracks');
       }
       if (event.streams.length === 0) {
-        throw Error("Oops, expected tracks to be attached at least to one stream");
+        throw Error('Oops, expected tracks to be attached at least to one stream');
       }
       this.logger.log('onaddstream video tracks: {} audio tracks: {}', event.streams[0].getVideoTracks(), event.streams[0].getAudioTracks())();
       if (this.remoteStream !== event.streams[0]) {
@@ -94,7 +94,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
         this.removeAudioProcessor();
         this.audioProcessor = createMicrophoneLevelVoice(this.remoteStream, this.processAudio.bind(this));
       } else {
-        this.logger.log("onaddtrack has been called already for this stream. So skipping this cb")()
+        this.logger.log('onaddtrack has been called already for this stream. So skipping this cb')()
       }
     };
     this.logger.log('Sending local stream to remote')();

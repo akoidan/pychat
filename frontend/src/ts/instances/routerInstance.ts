@@ -32,18 +32,18 @@ import CreateRoomChannel from '@/vue/pages/CreateRoomChannel.vue';
 import CreateChannel from '@/vue/pages/CreateChannel.vue';
 import ChannelSettings from '@/vue/pages/ChannelSettings.vue';
 import { sub } from '@/ts/instances/subInstance';
-import MessageHandler from "@/ts/message_handlers/MesageHandler";
+import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import {
   HandlerType,
   HandlerTypes
-} from "@/ts/types/types";
-import { Logger } from "lines-logger";
+} from '@/ts/types/types';
+import { Logger } from 'lines-logger';
 import {
   LoginMessage,
   LogoutMessage,
   RouterNavigateMessage
-} from "@/ts/types/messages";
-import loggerFactory from "@/ts/instances/loggerFactory";
+} from '@/ts/types/messages';
+import loggerFactory from '@/ts/instances/loggerFactory';
 
 Vue.use(VueRouter);
 
@@ -75,11 +75,11 @@ export const router = new VueRouter({
           path: '/chat/:id'
         },
         ...PAINTER ? [{
-          component: () => import(/* webpackChunkName: "spainter" */'@/vue/pages/PainterPage.vue'),
+          component: () => import(/* webpackChunkName: 'spainter' */'@/vue/pages/PainterPage.vue'),
           path: '/painter'
         }]: [],
         ...STATISTICS ? [{
-          component: () => import(/* webpackChunkName: "amchart" */ '@/vue/pages/AmChart.vue'),
+          component: () => import(/* webpackChunkName: 'amchart' */ '@/vue/pages/AmChart.vue'),
           path: '/statistics'
         }]: [],
         {

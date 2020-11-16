@@ -1,10 +1,10 @@
-import { DefaultStore } from "@/ts/classes/DefaultStore";
-import WebRtcApi from "@/ts/webrtc/WebRtcApi";
+import { DefaultStore } from '@/ts/classes/DefaultStore';
+import WebRtcApi from '@/ts/webrtc/WebRtcApi';
 import {
   IStorage,
   MessageSender
-} from "@/ts/types/types";
-import ChannelsHandler from "@/ts/message_handlers/ChannelsHandler";
+} from '@/ts/types/types';
+import ChannelsHandler from '@/ts/message_handlers/ChannelsHandler';
 
 export class MessageSenderProxy {
 

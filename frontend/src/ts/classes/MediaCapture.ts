@@ -25,7 +25,7 @@ export default class MediaCapture {
   public async record(): Promise<MediaStream|null> {
     const requiredPerms : permissions_type = this.isRecordingVideo ? ['audio', 'video'] : ['audio'];
     await this.platformUtil.askPermissions(...requiredPerms);
-    this.logger.debug("Capturing media")();
+    this.logger.debug('Capturing media')();
     this.stream = await navigator.mediaDevices.getUserMedia({video: this.isRecordingVideo, audio: true});
     this.logger.debug('Permissions are granted')();
     // await new Promise(resolve => {

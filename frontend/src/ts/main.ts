@@ -16,20 +16,20 @@ import {
   isChrome,
   isMobile
 } from '@/ts/utils/runtimeConsts';
-import { Logger } from "lines-logger";
-import loggerFactory from "@/ts/instances/loggerFactory";
+import { Logger } from 'lines-logger';
+import loggerFactory from '@/ts/instances/loggerFactory';
 import {
   IStorage,
   MessageSender,
   StorageData
-} from "@/ts/types/types";
-import sessionHolder from "@/ts/instances/sessionInstance";
+} from '@/ts/types/types';
+import sessionHolder from '@/ts/instances/sessionInstance';
 import {
   MessageModel,
   PlatformUtil,
   RoomModel
-} from "@/ts/types/model";
-import { VNode } from "vue/types/vnode";
+} from '@/ts/types/model';
+import { VNode } from 'vue/types/vnode';
 import Xhr from '@/ts/classes/Xhr';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import ChannelsHandler from '@/ts/message_handlers/ChannelsHandler';
@@ -39,11 +39,11 @@ import Api from '@/ts/message_handlers/Api';
 import NotifierHandler from '@/ts/classes/NotificationHandler';
 import Http from '@/ts/classes/Http';
 import WebRtcApi from '@/ts/webrtc/WebRtcApi';
-import  {router} from '@/ts/instances/routerInstance';
-import { AudioPlayer } from "@/ts/classes/AudioPlayer";
-import { AndroidPlatformUtil } from "@/ts/devices/AndroidPlatformUtils";
-import { WebPlatformUtils } from "@/ts/devices/WebPlatformUtils";
-import { MessageSenderProxy } from "@/ts/message_handlers/MessageSenderProxy";
+import { router } from '@/ts/instances/routerInstance';
+import { AudioPlayer } from '@/ts/classes/AudioPlayer';
+import { AndroidPlatformUtil } from '@/ts/devices/AndroidPlatformUtils';
+import { WebPlatformUtils } from '@/ts/devices/WebPlatformUtils';
+import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
 
 function declareDirectives() {
   Vue.directive('validity', function (el: HTMLElement, binding) {
@@ -56,7 +56,7 @@ function declareDirectives() {
     switcherFinish?: () => Promise<void>;
   }
 
-  function getEventName(eventType: 'start' | 'end') : string[] {
+  function getEventName(eventType: 'start' | 'end'): string[] {
     if (IS_ANDROID || isMobile) {
       return eventType === 'start' ? ['touchstart'] : ['touchend'];
     } else {
@@ -68,34 +68,34 @@ function declareDirectives() {
 
   Vue.directive('switcher', {
 
-    bind: function(el, binding, vnode: MyVNode) {
+    bind: function (el, binding, vnode: MyVNode) {
 
       vnode.switcherTimeout = 0;
-      vnode.switcherStart = async function() {
-        vnode.context!.$logger.debug("Triggered onMouseDown, waiting {}ms for the next event...", HOLD_TIMEOUT)();
+      vnode.switcherStart = async function () {
+        vnode.context!.$logger.debug('Triggered onMouseDown, waiting {}ms for the next event...', HOLD_TIMEOUT)();
         getEventName('end').forEach(eventName => el.addEventListener(eventName, vnode.switcherFinish!))
         await new Promise((resolve) => vnode.switcherTimeout = window.setTimeout(resolve, HOLD_TIMEOUT));
         vnode.switcherTimeout = 0;
-        vnode.context!.$logger.debug("Timeout expired, firing enable record action")();
+        vnode.context!.$logger.debug('Timeout expired, firing enable record action')();
         await binding.value.start();
 
       };
       // @ts-ignore: next-line
-      vnode.switcherFinish = async function(e: Event) {
+      vnode.switcherFinish = async function (e: Event) {
         getEventName('end').forEach(eventName => el.removeEventListener(eventName, vnode.switcherFinish!))
         if (vnode.switcherTimeout) {
-          vnode.context!.$logger.debug("Click event detected, firing switch recrod action")();
+          vnode.context!.$logger.debug('Click event detected, firing switch recrod action')();
           clearTimeout(vnode.switcherTimeout);
           vnode.switcherTimeout = 0;
           binding.value.switch();
         } else {
-          vnode.context!.$logger.debug("Release event detected, firing stop record action")();
+          vnode.context!.$logger.debug('Release event detected, firing stop record action')();
           binding.value.stop()
         }
       }
       getEventName('start').forEach(eventName => el.addEventListener(eventName, vnode.switcherStart!))
     },
-    unbind: function(el, binding, vnode: MyVNode) {
+    unbind: function (el, binding, vnode: MyVNode) {
       getEventName('start').forEach(eventName => el.removeEventListener(eventName, vnode.switcherStart!))
       getEventName('end').forEach(eventName => el.removeEventListener(eventName, vnode.switcherFinish!))
     }
@@ -107,7 +107,7 @@ declare module 'vue/types/vue' {
 
   interface Vue {
     __logger: Logger;
-    id?: number|string;
+    id?: number | string;
   }
 }
 
@@ -115,7 +115,7 @@ declare module 'vue/types/vue' {
 function declareMixins() {
   const mixin = {
     computed: {
-      $logger(this: Vue): Logger  {
+      $logger(this: Vue): Logger {
         if (!this.__logger && this.$options._componentTag !== 'router-link') {
           let name = this.$options._componentTag || 'vue-comp';
           if (!this.$options._componentTag) {
@@ -133,8 +133,8 @@ function declareMixins() {
     updated: function (this: Vue): void {
       this.$logger && this.$logger.trace('Updated')();
     },
-    created: function(this: Vue) {
-      this.$logger &&  this.$logger.trace('Created')();
+    created: function (this: Vue) {
+      this.$logger && this.$logger.trace('Created')();
     }
   };
   Vue.mixin(<ComponentOptions<Vue>><unknown>mixin);
@@ -154,7 +154,7 @@ async function initStore(logger: Logger, storage: IStorage, messageSenderProxy: 
       } else {
         store.roomsArray.forEach((storeRoom: RoomModel) => {
           if (data.setRooms.roomsDict[storeRoom.id]) {
-            const dbMessages: {[id: number]: MessageModel} = data.setRooms.roomsDict[storeRoom.id].messages;
+            const dbMessages: { [id: number]: MessageModel } = data.setRooms.roomsDict[storeRoom.id].messages;
             for (const dbMessagesKey in dbMessages) {
               if (!storeRoom.messages[dbMessagesKey]) {
                 store.addMessage(dbMessages[dbMessagesKey]);

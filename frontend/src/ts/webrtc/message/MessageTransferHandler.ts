@@ -21,7 +21,7 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { sub } from '@/ts/instances/subInstance';
 import Subscription from '@/ts/classes/Subscription';
 import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
-import { MessageModelDto } from "@/ts/types/dto";
+import { MessageModelDto } from '@/ts/types/dto';
 
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
 
@@ -154,8 +154,8 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   }
 
   addMessages(roomId: number, messages: MessageModelDto[]): void {
-    this.store.growlError("The operation you're trying to do is not supported on p2p channel yet");
-    throw Error("unsupported");
+    this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
+    throw Error('unsupported');
   }
 
   getMessageRetrier(): MessageRetrier {
@@ -163,13 +163,13 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   }
 
   sendDeleteMessage(id: number) : void {
-    this.store.growlError("The operation you're trying to do is not supported on p2p channel yet");
-    throw Error("unsupported");
+    this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
+    throw Error('unsupported');
   }
 
   sendEditMessage(content: string, roomId: number, id: number, uploadFiles: UploadFile[]): Promise<void> {
-    this.store.growlError("The operation you're trying to do is not supported on p2p channel yet");
-    throw Error("unsupported");
+    this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
+    throw Error('unsupported');
   }
 
 

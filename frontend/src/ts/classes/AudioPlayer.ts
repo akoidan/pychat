@@ -1,6 +1,6 @@
-import NotifierHandler from "@/ts/classes/NotificationHandler";
-import loggerFactory from "@/ts/instances/loggerFactory";
-import { Logger } from "lines-logger";
+import NotifierHandler from '@/ts/classes/NotificationHandler';
+import loggerFactory from '@/ts/instances/loggerFactory';
+import { Logger } from 'lines-logger';
 
 
 export class AudioPlayer {

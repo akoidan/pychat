@@ -28,7 +28,7 @@ import faviconUrl from '@/assets/img/favicon.ico';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { browserVersion } from '@/ts/utils/runtimeConsts';
 import MessageTransferHandler from '@/ts/webrtc/message/MessageTransferHandler';
-import { bytesToSize } from "@/ts/utils/pureFunctions";
+import { bytesToSize } from '@/ts/utils/pureFunctions';
 
 export default class WebRtcApi extends MessageHandler {
 

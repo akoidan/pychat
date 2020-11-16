@@ -17,8 +17,8 @@ import Subscription from '@/ts/classes/Subscription';
 import Http from '@/ts/classes/Http';
 import Vue, { Component } from 'vue';
 import { ExtendedVue } from 'vue/types/vue';
-import NotifierHandler from "@/ts/classes/NotificationHandler";
-import { MessageSenderProxy } from "@/ts/message_handlers/MessageSenderProxy";
+import NotifierHandler from '@/ts/classes/NotificationHandler';
+import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
 
 declare global {
   interface Window {
