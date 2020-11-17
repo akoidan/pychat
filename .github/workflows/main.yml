@@ -5,7 +5,10 @@ name: Update pychat.org
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
-  push
+  push:
+    paths: 
+     - 'frontend/**'
+
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -16,10 +19,5 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - name: "Prepare SSH key and known hosts"
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.ID_RSA }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -p 8886 pychat.org >> ~/.ssh/known_hosts
-        ssh http@pychat.org -p 8886 "echo 3"
+      - run: echo 'works'
+        
