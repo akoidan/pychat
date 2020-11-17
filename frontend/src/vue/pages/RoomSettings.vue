@@ -104,9 +104,9 @@
 <script lang="ts">
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import {Component, Vue} from 'vue-property-decorator';
-import AppInputRange from '@/vue/ui/AppInputRange';
-import AppSubmit from '@/vue/ui/AppSubmit';
-import AppCheckbox from '@/vue/ui/AppCheckbox';
+import AppInputRange from '@/vue/ui/AppInputRange.vue';
+import AppSubmit from '@/vue/ui/AppSubmit.vue';
+import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
 import {CurrentUserInfoModel, RoomDictModel, RoomModel, UserDictModel, UserModel} from '@/ts/types/model';
 import {ALL_ROOM_ID} from '@/ts/utils/consts';
 import ParentChannel from '@/vue/pages/parts/ParentChannel.vue';

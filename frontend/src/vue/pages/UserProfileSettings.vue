@@ -102,13 +102,13 @@
 <script lang="ts">
 import {Component, Vue, Watch} from 'vue-property-decorator';
 import {State} from '@/ts/instances/storeInstance';
-import AppSubmit from '@/vue/ui/AppSubmit';
-import AppCheckbox from '@/vue/ui/AppCheckbox';
+import AppSubmit from '@/vue/ui/AppSubmit.vue';
+import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
 import {CurrentUserInfoModel, CurrentUserSettingsModel} from '@/ts/types/model';
 import {currentUserInfoDtoToModel, currentUserInfoModelToDto, userSettingsDtoToModel} from '@/ts/types/converters';
 import {UserSettingsDto} from '@/ts/types/dto';
 import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
-import {SetSettingsMessage} from '@/ts/types/messages';
+import { SetSettingsMessage } from '@/ts/types/messages/wsInMessages';
 
 @Component({
   components: {AppSubmit, AppCheckbox}

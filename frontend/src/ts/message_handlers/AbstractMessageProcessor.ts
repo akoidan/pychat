@@ -3,16 +3,16 @@ import loggerFactory from '@/ts/instances/loggerFactory';
 import { MessageSupplier } from '@/ts/types/types';
 import type { DefaultStore } from '@/ts/classes/DefaultStore';
 import { sub } from '@/ts/instances/subInstance';
-import { DefaultWsOutMessage } from "@/ts/types/messages/wsOutMessages";
+import { DefaultWsOutMessage } from '@/ts/types/messages/wsOutMessages';
 import {
   DefaultWsInMessage,
   GrowlMessage
-} from "@/ts/types/messages/wsInMessages";
+} from '@/ts/types/messages/wsInMessages';
 import {
   DefaultInMessage,
   DefaultMessage,
   HandlerName
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from '@/ts/types/messages/baseMessagesInterfaces';
 
 export default class AbstractMessageProcessor {
 

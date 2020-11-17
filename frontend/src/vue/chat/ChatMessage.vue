@@ -40,7 +40,7 @@ import {
 } from '@/ts/utils/htmlApi';
 import { sem } from '@/ts/utils/pureFunctions';
 
-import ChatMessageHeader from '@/vue/chat/ChatMessageHeader';
+import ChatMessageHeader from '@/vue/chat/ChatMessageHeader.vue';
 
 @Component({
   components: {ChatMessageHeader}

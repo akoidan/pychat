@@ -64,23 +64,23 @@ import {
   Vue
 } from "vue-property-decorator";
 import { ApplyGrowlErr } from '@/ts/instances/storeInstance';
-import ChatMessage from "@/vue/chat/ChatMessage";
-import SearchMessages from "@/vue/chat/SearchMessages";
+import ChatMessage from '@/vue/chat/ChatMessage.vue';
+import SearchMessages from '@/vue/chat/SearchMessages.vue';
 import {
   ReceivingFile,
   RoomModel,
   SearchModel,
   SendingFile
-} from "@/ts/types/model";
-import { MessageModelDto } from "@/ts/types/dto";
+} from '@/ts/types/model';
+import { MessageModelDto } from '@/ts/types/dto';
 
-import { MESSAGES_PER_SEARCH } from "@/ts/utils/consts";
-import AppProgressBar from "@/vue/ui/AppProgressBar";
-import ChatSendingMessage from "@/vue/chat/ChatSendingMessage";
-import ChatUserActionMessage from "@/vue/chat/ChatUserActionMessage";
-import ChatSendingFile from "@/vue/chat/ChatSendingFile";
-import ChatReceivingFile from '@/vue/chat/ChatReceivingFile';
-import ChatCall from '@/vue/chat/ChatCall';
+import { MESSAGES_PER_SEARCH } from '@/ts/utils/consts';
+import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
+import ChatSendingMessage from '@/vue/chat/ChatSendingMessage.vue';
+import ChatUserActionMessage from '@/vue/chat/ChatUserActionMessage.vue';
+import ChatSendingFile from '@/vue/chat/ChatSendingFile.vue';
+import ChatReceivingFile from '@/vue/chat/ChatReceivingFile.vue';
+import ChatCall from '@/vue/chat/ChatCall.vue';
 import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
 
 @Component({

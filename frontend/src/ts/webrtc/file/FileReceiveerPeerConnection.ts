@@ -1,6 +1,4 @@
 import {
-  HandlerType,
-  HandlerTypes,
   SetReceivingFileStatus,
   SetReceivingFileUploaded
 } from '@/ts/types/types';
@@ -14,17 +12,25 @@ import {
 } from '@/ts/utils/consts';
 import FilePeerConnection from '@/ts/webrtc/file/FilePeerConnection';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
+import {
+  HandlerType,
+  HandlerTypes
+} from "@/ts/types/messages/baseMessagesInterfaces";
+import {
+  DestroyFileConnectionMessage,
+  RetryFileMessage
+} from "@/ts/types/messages/wsInMessages";
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {
   protected connectedToRemote: boolean = true;
 
-  protected readonly handlers: HandlerTypes = {
-    sendRtcData: <HandlerType>this.sendRtcData,
-    retryFile: this.retryFileAccepted,
-    retryFileReply: this.retryFileReply,
-    acceptFileReply: this.acceptFileReply,
-    declineFileReply: this.declineFileReply,
-    destroyFileConnection: this.destroyFileConnection
+  protected readonly handlers:  HandlerTypes<keyof FileReceiverPeerConnection, 'peerConnection:*'> = {
+    sendRtcData: <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData,
+    retryFile: <HandlerType<'retryFile', 'peerConnection:*'>>this.retryFile,
+    retryFileReply:<HandlerType<'retryFileReply', 'peerConnection:*'>> this.retryFileReply,
+    acceptFileReply: <HandlerType<'acceptFileReply', 'peerConnection:*'>>this.acceptFileReply,
+    declineFileReply:<HandlerType<'declineFileReply', 'peerConnection:*'>> this.declineFileReply,
+    destroyFileConnection: <HandlerType<'destroyFileConnection', 'peerConnection:*'>>this.destroyFileConnection
   };
   private readonly fileSize: number;
   private fileEntry: FileEntry |null = null;
@@ -58,7 +64,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
       status: FileTransferStatus.DECLINED_BY_YOU
     };
     this.store.setReceivingFileStatus(rf);
-    this.destroy();
+    this.unsubscribeAndRemoveFromParent();
   }
 
   public async acceptFileReply() {
@@ -68,7 +74,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
         if (this.fileSize > MAX_ACCEPT_FILE_SIZE_WO_FS_API) {
           const content = `Browser doesn't support accepting file sizes over ${bytesToSize(MAX_ACCEPT_FILE_SIZE_WO_FS_API)}`;
           this.wsHandler.destroyFileConnection(this.connectionId, content);
-          this.destroy();
+          this.unsubscribeAndRemoveFromParent();
           throw e;
         }
     }
@@ -107,7 +113,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     this.assembleFileIfDone();
   }
 
-  private destroyFileConnection() {
+  public destroyFileConnection(message: DestroyFileConnectionMessage) {
     const payload: SetReceivingFileStatus = {
       error: null,
       status: FileTransferStatus.DECLINED_BY_OPPONENT,
@@ -115,7 +121,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
       roomId: this.roomId
     };
     this.store.setReceivingFileStatus(payload);
-    this.destroy();
+    this.unsubscribeAndRemoveFromParent();
   }
 
   private async initFileSystemApi() {
@@ -156,7 +162,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
     }
   }
 
-  private retryFileAccepted() {
+  public retryFile(message: RetryFileMessage) {
     const payload: SetReceivingFileStatus = {
       error: null,
       status: FileTransferStatus.IN_PROGRESS,
@@ -206,7 +212,7 @@ export default class FileReceiverPeerConnection extends FilePeerConnection {
       };
       this.store.setReceivingFileStatus(payload);
       this.closeEvents();
-      this.destroy();
+      this.unsubscribeAndRemoveFromParent();
     }
   }
 

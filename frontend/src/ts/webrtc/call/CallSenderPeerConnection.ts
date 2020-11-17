@@ -4,15 +4,15 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 import {
   HandlerType,
   HandlerTypes
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import { ConnectToRemoteMessage } from "@/ts/types/messages/innerMessages";
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { ConnectToRemoteMessage } from '@/ts/types/messages/innerMessages';
 
 export default class CallSenderPeerConnection extends CallPeerConnection {
 
   protected connectedToRemote: boolean = false;
 
   protected readonly handlers: HandlerTypes<keyof CallSenderPeerConnection, 'peerConnection:*'> = {
-    destroy: this.destroy,
+    destroy: <HandlerType<'destroy', 'peerConnection:*'>>this.destroy,
     streamChanged:  <HandlerType<'streamChanged', 'peerConnection:*'>>this.streamChanged,
     connectToRemote:  <HandlerType<'connectToRemote', 'peerConnection:*'>>this.connectToRemote,
     sendRtcData:  <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData

@@ -11,12 +11,12 @@ import {
 } from '@/ts/types/types';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { WEBRTC_STUNT_URL } from '@/ts/utils/runtimeConsts';
-import { HandlerName } from "@/ts/types/messages/baseMessagesInterfaces";
+import { HandlerName } from '@/ts/types/messages/baseMessagesInterfaces';
 import {
   ConnectToRemoteMessage,
   RemovePeerConnectionMessage,
-} from "@/ts/types/messages/innerMessages";
-import { SendRtcDataMessage } from "@/ts/types/messages/wsInMessages";
+} from '@/ts/types/messages/innerMessages';
+import { SendRtcDataMessage } from '@/ts/types/messages/wsInMessages';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean = false;
@@ -71,7 +71,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     return this.connectionStatus;
   }
 
-  public destroy(reason?: string) {
+  public unsubscribeAndRemoveFromParent(reason?: string) {
     this.logger.log('Destroying {}, because {}', this.constructor.name, reason)();
     const message: RemovePeerConnectionMessage = {
       handler: Subscription.getTransferId(this.connectionId),
@@ -179,6 +179,8 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       return newLines.join('\n');
     }
   }
+
+  // destroy(Des)
 
   protected onChannelMessage(event: MessageEvent) {
     this.logger.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();

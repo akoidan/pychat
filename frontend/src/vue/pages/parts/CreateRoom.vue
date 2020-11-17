@@ -76,11 +76,11 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import AppInputRange from '@/vue/ui/AppInputRange';
-import AppSubmit from '@/vue/ui/AppSubmit';
-import PickUser from '@/vue/pages/parts/PickUser';
+import AppInputRange from '@/vue/ui/AppInputRange.vue';
+import AppSubmit from '@/vue/ui/AppSubmit.vue';
+import PickUser from '@/vue/pages/parts/PickUser.vue';
 import { CurrentUserInfoModel } from '@/ts/types/model';
-import AppCheckbox from '@/vue/ui/AppCheckbox';
+import AppCheckbox from '@/vue/ui/AppCheckbox.vue';
 import { PrivateRoomsIds } from '@/ts/types/types';
 import ParentChannel from '@/vue/pages/parts/ParentChannel.vue';
 

@@ -9,7 +9,7 @@
       />
       <img
         v-show="!srcVideo"
-        src="@/assets/img/audio.svg"
+        src='@/assets/img/audio.svg'
         class="audio-recording-now"
       >
     </div>

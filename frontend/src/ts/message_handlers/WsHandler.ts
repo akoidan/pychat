@@ -45,17 +45,17 @@ import {
   SetWsIdMessage,
   UserProfileChangedMessage,
   WebRtcSetConnectionIdMessage
-} from "@/ts/types/messages/wsInMessages";
+} from '@/ts/types/messages/wsInMessages';
 import {
   InternetAppearMessage,
   LogoutMessage,
   PubSetRooms
-} from "@/ts/types/messages/innerMessages";
+} from '@/ts/types/messages/innerMessages';
 import {
   HandlerType,
   HandlerTypes
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import { DefaultWsOutMessage } from "@/ts/types/messages/wsOutMessages";
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { DefaultWsOutMessage } from '@/ts/types/messages/wsOutMessages';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED

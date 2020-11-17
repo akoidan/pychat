@@ -1,5 +1,5 @@
 import { DefaultStore } from '@/ts/classes/DefaultStore';
-import { DefaultP2pMessage } from "@/ts/types/messages/p2pMessages";
+import { DefaultP2pMessage } from '@/ts/types/messages/p2pMessages';
 
 /** The message that are sent directly from another user is not trusted
  * That's why this class lead to eliminate OWASP broken access control

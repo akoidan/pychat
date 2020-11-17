@@ -7,14 +7,11 @@ import {
   ChannelDto,
   RoomDto,
   UserDto
-} from "@/ts/types/dto";
+} from '@/ts/types/dto';
 import {
   DefaultInMessage,
-  HandlerName,
-  OpponentWsId,
-  WebRtcDefaultMessage
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import { DefaultWsInMessage } from "@/ts/types/messages/wsInMessages";
+  HandlerName
+} from '@/ts/types/messages/baseMessagesInterfaces';
 
 
 export interface DefaultInnerSystemMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H> {
@@ -61,8 +58,6 @@ export interface ChangeStreamMessage extends DefaultInnerSystemMessage<'streamCh
   newStream: MediaStream;
 }
 
-export interface DestroyFileConnectionMessage extends DefaultInnerSystemMessage<'destroyFileConnection', 'peerConnection:*'> {
-  content: string;
+export interface DestroyPeerConnectionMessage extends DefaultInnerSystemMessage<'destroy', 'peerConnection:*'> {
 }
-
 

@@ -18,8 +18,11 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 import {
   HandlerType,
   HandlerTypes
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import { DestroyFileConnectionMessage } from "@/ts/types/messages/innerMessages";
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import {
+  AcceptFileMessage,
+  DestroyFileConnectionMessage
+} from "@/ts/types/messages/wsInMessages";
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
   protected connectedToRemote: boolean = true;
@@ -28,7 +31,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     destroyFileConnection: <HandlerType<'destroyFileConnection', 'peerConnection:*'>>this.destroyFileConnection,
     acceptFile: <HandlerType<'acceptFile', 'peerConnection:*'>>this.acceptFile,
     sendRtcData: <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData,
-    destroy: <HandlerType<'destroy', 'peerConnection:*'>>this.closeEvents,
+    destroy: <HandlerType<'destroy', 'peerConnection:*'>>this.destroy,
     declineSending: <HandlerType<'declineSending', 'peerConnection:*'>>this.declineSending
   };
 
@@ -135,10 +138,10 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
     let status;
     if (isDecline) {
       status = FileTransferStatus.DECLINED_BY_OPPONENT;
-      this.destroy();
+      this.unsubscribeAndRemoveFromParent();
     } else if (isSuccess) {
       status = FileTransferStatus.FINISHED;
-      this.destroy();
+      this.unsubscribeAndRemoveFromParent();
     } else {
       status = FileTransferStatus.ERROR;
       isError = true;
@@ -161,7 +164,7 @@ export default class FileSenderPeerConnection extends FilePeerConnection {
   }
 
   public declineSending() {
-    this.destroy();
+    this.unsubscribeAndRemoveFromParent();
     const ssfs: SetSendingFileStatus = {
       status: FileTransferStatus.DECLINED_BY_YOU,
       roomId: this.roomId,

@@ -23,8 +23,8 @@ import {
 } from '@/ts/types/dto';
 
 import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
-import { DefaultWsInMessage } from "@/ts/types/messages/wsInMessages";
-import { HandlerName } from "@/ts/types/messages/baseMessagesInterfaces";
+import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
+import { HandlerName } from '@/ts/types/messages/baseMessagesInterfaces';
 
 
 export interface UploadFile {
@@ -48,10 +48,7 @@ const sample: StuctureMappedType<string> = {
 }
 
 
-export interface IMessageHandler {
-  handle(message: DefaultWsInMessage): void;
-  getHandler(message: DefaultWsInMessage): HandlerType|undefined;
-}
+
 
 export interface MessageRetrierProxy {
   getMessageRetrier(): MessageRetrier;

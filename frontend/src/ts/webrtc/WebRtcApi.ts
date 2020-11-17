@@ -23,13 +23,13 @@ import {
   OfferCall,
   OfferFile,
   OfferMessage
-} from "@/ts/types/messages/wsInMessages";
+} from '@/ts/types/messages/wsInMessages';
 import {
   HandlerType,
   HandlerTypes
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import { VideoType } from "@/ts/types/types";
-import { LogoutMessage } from "@/ts/types/messages/innerMessages";
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { VideoType } from '@/ts/types/types';
+import { LogoutMessage } from '@/ts/types/messages/innerMessages';
 
 export default class WebRtcApi extends MessageHandler {
 
@@ -39,7 +39,7 @@ export default class WebRtcApi extends MessageHandler {
     offerFile: <HandlerType<'offerFile', 'webrtc'>>this.onofferFile,
     offerCall: <HandlerType<'offerCall', 'webrtc'>>this.offerCall,
     offerMessage: <HandlerType<'offerMessage', 'webrtc'>>this.offerMessage,
-    logout: <HandlerType<'logout', 'webrtc'>>this.logout
+    logout: <HandlerType<'logout', 'webrtc'>>this.logout // TODO should be any
   };
 
   private readonly wsHandler: WsHandler;

@@ -38,12 +38,12 @@ import loggerFactory from '@/ts/instances/loggerFactory';
 import {
   HandlerType,
   HandlerTypes
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from '@/ts/types/messages/baseMessagesInterfaces';
 import {
   LoginMessage,
   LogoutMessage,
   RouterNavigateMessage
-} from "@/ts/types/messages/innerMessages";
+} from '@/ts/types/messages/innerMessages';
 
 Vue.use(VueRouter);
 

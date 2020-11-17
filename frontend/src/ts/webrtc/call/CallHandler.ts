@@ -39,18 +39,18 @@ import {
   HandlerName,
   HandlerType,
   HandlerTypes
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from '@/ts/types/messages/baseMessagesInterfaces';
 
 import {
   AcceptCallMessage,
   OfferCall,
   ReplyCallMessage
-} from "@/ts/types/messages/wsInMessages";
+} from '@/ts/types/messages/wsInMessages';
 import {
   ChangeStreamMessage,
   ConnectToRemoteMessage,
   RouterNavigateMessage
-} from "@/ts/types/messages/innerMessages";
+} from '@/ts/types/messages/innerMessages';
 
 
 export default class CallHandler extends BaseTransferHandler {

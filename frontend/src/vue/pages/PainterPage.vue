@@ -9,9 +9,9 @@ import Painter from 'spainter';
 import {ALL_ROOM_ID} from '@/ts/utils/consts';
 
 import loggerFactory from '@/ts/instances/loggerFactory';
-import AppInputRange from '@/vue/ui/AppInputRange';
+import AppInputRange from '@/vue/ui/AppInputRange.vue';
 import {RawLocation, Route} from 'vue-router';
-import { savedFiles } from "@/ts/utils/htmlApi";
+import { savedFiles } from '@/ts/utils/htmlApi';
 
 let uniqueId = 1;
 

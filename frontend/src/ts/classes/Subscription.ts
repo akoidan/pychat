@@ -1,11 +1,11 @@
-import { IMessageHandler } from '@/ts/types/types';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 import {
   DefaultInMessage,
-  HandlerName
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import { DefaultInnerSystemMessage } from "@/ts/types/messages/innerMessages";
+  HandlerName,
+  IMessageHandler
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { DefaultInnerSystemMessage } from '@/ts/types/messages/innerMessages';
 
 export default class Subscription {
 

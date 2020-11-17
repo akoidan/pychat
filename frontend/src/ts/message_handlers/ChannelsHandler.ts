@@ -58,12 +58,12 @@ import {
   ChangeDevicesMessage,
   LogoutMessage,
   PubSetRooms
-} from "@/ts/types/messages/innerMessages";
+} from '@/ts/types/messages/innerMessages';
 import {
   AddRoomBase,
   HandlerType,
   HandlerTypes
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from '@/ts/types/messages/baseMessagesInterfaces';
 import {
   AddChannelMessage,
   AddInviteMessage,
@@ -80,7 +80,7 @@ import {
   RemoveOnlineUserMessage,
   SaveChannelSettingsMessage,
   SaveRoomSettingsMessage
-} from "@/ts/types/messages/wsInMessages";
+} from '@/ts/types/messages/wsInMessages';
 
 // TODO split this class into 2 separate:
 // 1st one for message handling that's related to MessageSender and MessageTrasnferHandler (webrtc one)

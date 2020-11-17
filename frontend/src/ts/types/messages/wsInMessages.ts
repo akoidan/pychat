@@ -11,7 +11,7 @@ import {
   UserDto,
   UserProfileDto,
   UserSettingsDto
-} from "@/ts/types/dto";
+} from '@/ts/types/dto';
 
 import {
   AcceptFileContent,
@@ -26,7 +26,7 @@ import {
   ReplyWebRtc,
   RoomExistedBefore,
   WebRtcDefaultMessage
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from '@/ts/types/messages/baseMessagesInterfaces';
 
 export interface DefaultWsInMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H> {
   cbBySender?: string;
@@ -98,7 +98,7 @@ export interface SetWsIdMessage extends DefaultWsInMessage<'setWsId', 'ws'>, Opp
   userSettings: UserSettingsDto;
 }
 
-export interface WebRtcSetConnectionIdMessage extends DefaultWsInMessage<'setConnectionId', 'void'> {
+export interface WebRtcSetConnectionIdMessage extends WebRtcDefaultMessage, DefaultWsInMessage<'setConnectionId', 'void'> {
   time: number;
 }
 
@@ -167,10 +167,17 @@ export interface ReplyFileMessage extends ReplyWebRtc, DefaultWsInMessage<'reply
 
 export interface AcceptCallMessage extends WebRtcDefaultMessage, OpponentWsId, DefaultWsInMessage<'acceptCall', 'webrtcTransfer:*'> {
 }
-export interface AcceptFileMessage extends DefaultWsInMessage<'peerConnection', 'peerConnection:*'> {
+export interface AcceptFileMessage extends DefaultWsInMessage<'acceptFile', 'peerConnection:*'> {
   content: AcceptFileContent;
 }
 
 export interface SendRtcDataMessage extends WebRtcDefaultMessage, OpponentWsId, DefaultWsInMessage<'sendRtcData', 'peerConnection:*'> {
   content: RTCSessionDescriptionInit | RTCIceCandidateInit| {message: unknown};
+}
+
+export interface RetryFileMessage extends DefaultWsInMessage<'retryFile', 'peerConnection:*'> {
+}
+
+export interface DestroyFileConnectionMessage extends DefaultWsInMessage<'destroyFileConnection', 'peerConnection:*'> {
+  content: 'decline'|'success';
 }

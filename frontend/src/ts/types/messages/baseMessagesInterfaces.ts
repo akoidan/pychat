@@ -5,7 +5,8 @@ import {
   ChannelDto,
   RoomDto,
   UserDto
-} from "@/ts/types/dto";
+} from '@/ts/types/dto';
+import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
 
 
 export interface ChangeUserOnlineBase extends UserDto {
@@ -69,5 +70,10 @@ export interface DefaultMessage<A extends string> {
 
 export interface DefaultInMessage<A extends string, H extends HandlerName> extends DefaultMessage <A> {
   handler: H;
+}
+
+export interface IMessageHandler {
+  handle(message: DefaultInMessage<string, HandlerName>): void;
+  getHandler<H extends HandlerName, A extends string>(message: DefaultInMessage<A, H>): HandlerType<A, H>|undefined;
 }
 export type CallStatus = 'not_inited'|'sent_offer'| 'received_offer' | 'accepted';

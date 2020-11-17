@@ -22,8 +22,8 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import ChatMessage from '@/vue/chat/ChatMessage';
-import AppProgressBar from '@/vue/ui/AppProgressBar';
+import ChatMessage from '@/vue/chat/ChatMessage.vue';
+import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
 
 import { SetMessageProgressError } from '@/ts/types/types';
 import {

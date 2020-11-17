@@ -4,7 +4,7 @@
 
 import {
   DefaultMessage
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from '@/ts/types/messages/baseMessagesInterfaces';
 
 export interface DefaultWsOutMessage<A extends string> extends DefaultMessage<A> {
   cbId?: number;

@@ -9,8 +9,8 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 import {
   HandlerType,
   HandlerTypes
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import { ReplyFileMessage } from "@/ts/types/messages/wsInMessages";
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { ReplyFileMessage } from '@/ts/types/messages/wsInMessages';
 
 
 export default class FileHandler extends BaseTransferHandler {

@@ -1,13 +1,11 @@
 import { Logger } from 'lines-logger';
 import {
-  IMessageHandler
-} from '@/ts/types/types';
-import {
   DefaultInMessage,
   HandlerName,
   HandlerType,
-  HandlerTypes
-} from "@/ts/types/messages/baseMessagesInterfaces";
+  HandlerTypes,
+  IMessageHandler
+} from '@/ts/types/messages/baseMessagesInterfaces';
 
 
 export default abstract class MessageHandler implements IMessageHandler {

@@ -17,8 +17,8 @@ import { sub } from '@/ts/instances/subInstance';
 import {
   HandlerType,
   HandlerTypes
-} from "@/ts/types/messages/baseMessagesInterfaces";
-import { InternetAppearMessage } from "@/ts/types/messages/innerMessages";
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { InternetAppearMessage } from '@/ts/types/messages/innerMessages';
 
 
 export default class Api extends MessageHandler {

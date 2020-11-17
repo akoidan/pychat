@@ -14,9 +14,10 @@ import WsHandler from '@/ts/message_handlers/WsHandler';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import {
   ChangeStreamMessage,
-  ConnectToRemoteMessage
-} from "@/ts/types/messages/innerMessages";
-import { DefaultWsInMessage } from "@/ts/types/messages/wsInMessages";
+  ConnectToRemoteMessage,
+  DestroyPeerConnectionMessage
+} from '@/ts/types/messages/innerMessages';
+import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
   private audioProcessor: any;
@@ -164,12 +165,16 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     removeAudioProcesssor(this.audioProcessor);
   }
 
-  public destroy(reason?: DefaultWsInMessage|string) {
+  public destroy(message: DestroyPeerConnectionMessage) {
+    this.unsubscribeAndRemoveFromParent();
+  }
+
+  public unsubscribeAndRemoveFromParent(reason?: string) {
     this.logger.log('Destroying {}, because', this.constructor.name, reason)();
     this.remoteStream = null;
     this.closePeerConnection();
     this.removeAudioProcessor();
-    super.destroy();
+    super.unsubscribeAndRemoveFromParent();
     const payload:  SetCallOpponent = {
       opponentWsId: this.opponentWsId,
       roomId: this.roomId,

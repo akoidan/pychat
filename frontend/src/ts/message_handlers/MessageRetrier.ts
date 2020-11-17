@@ -4,17 +4,21 @@ import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import {
   HandlerType,
   HandlerTypes
-} from '@/ts/types/types';
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { LogoutMessage } from '@/ts/types/messages/innerMessages';
+import { sub } from '@/ts/instances/subInstance';
 
 export default class MessageRetrier extends MessageHandler {
-  protected handlers: HandlerTypes = {
-    logout: <HandlerType>this.removeAllSendingMessages
-  }
+  protected handlers: HandlerTypes<keyof MessageRetrier, 'any'> = {
+    logout: <HandlerType<'logout', 'any'>>this.removeAllSendingMessages
+  };
+
   protected readonly logger: Logger;
   private readonly sendingQueue: Record<string, Function> = {};
 
   constructor() {
     super()
+    sub.subscribe('any', this)
     this.logger = loggerFactory.getLoggerColor('retrier', '#cd0459')
   }
 
@@ -22,6 +26,9 @@ export default class MessageRetrier extends MessageHandler {
     this.sendingQueue[id] = fn;
   }
 
+  public logout(m: LogoutMessage) {
+    this.removeAllSendingMessages();
+}
   public removeAllSendingMessages(): void {
     let ids: string[] = Object.keys(this.sendingQueue);
     ids.forEach((id: string) => this.removeSendingMessage(parseInt(id, 10)));

@@ -14,15 +14,16 @@ import {
   HandlerName,
   HandlerType,
   HandlerTypes
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from '@/ts/types/messages/baseMessagesInterfaces';
 import {
   InnerSendMessage,
   PrintWebRtcMessage
-} from "@/ts/types/messages/p2pMessages";
+} from '@/ts/types/messages/p2pMessages';
 import {
   DefaultWsInMessage,
-  EditMessage
-} from "@/ts/types/messages/wsInMessages";
+  EditMessage,
+  PrintMessage
+} from '@/ts/types/messages/wsInMessages';
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
 
@@ -30,7 +31,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
   protected readonly handlers: HandlerTypes<keyof MessagePeerConnection, 'peerConnection:*'> = {
     sendRtcData:  <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData,
     checkDestroy:  <HandlerType<'checkDestroy', 'peerConnection:*'>>this.checkDestroy,
-    sendSendMessage:  <HandlerType<'sendSendMessage', 'peerConnection:*'>>this.sendSendMessage,
+    // sendSendMessage:  <HandlerType<'sendSendMessage', 'peerConnection:*'>>this.sendSendMessage, TODO
     printMessage:  <HandlerType<'printMessage', 'peerConnection:*'>>this.printMessage
   };
 
@@ -52,7 +53,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
   }
 
   public printMessage(m: PrintWebRtcMessage) {
-    let em: EditMessage = {
+    let em: PrintMessage = {
       action: 'printMessage',
       content: m.content,
       edited: 0,
@@ -88,8 +89,8 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     return this.opponentUserId;
   }
 
-  public destroy(reason?: string) {
-    super.destroy(reason);
+  public unsubscribeAndRemoveFromParent(reason?: string) {
+    super.unsubscribeAndRemoveFromParent(reason);
     sub.unsubscribe(Subscription.allPeerConnectionsForTransfer(this.connectionId), this);
   }
 
@@ -108,7 +109,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     //destroy only if user has left this room, if he's offline but connections is stil in progress,
     // maybe he has jost connection to server but not to us
     if (this.store.roomsDict[this.roomId].users.indexOf(this.opponentUserId) < 0) {
-      this.destroy('User has left this room')
+      this.unsubscribeAndRemoveFromParent('User has left this room')
     }
   }
 

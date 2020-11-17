@@ -14,7 +14,7 @@ import {
   Vue
 } from 'vue-property-decorator';
 import { UserModel } from '@/ts/types/model';
-import {timeToString} from "@/ts/utils/htmlApi";
+import {timeToString} from '@/ts/utils/htmlApi';
 
 
 @Component

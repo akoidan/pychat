@@ -19,9 +19,9 @@ import { MessageModelDto } from '@/ts/types/dto';
 import {
   DefaultWsInMessage,
   OfferCall
-} from "@/ts/types/messages/wsInMessages";
-import { InnerSendMessage } from "@/ts/types/messages/p2pMessages";
-import { ChangeDevicesMessage } from "@/ts/types/messages/innerMessages";
+} from '@/ts/types/messages/wsInMessages';
+import { InnerSendMessage } from '@/ts/types/messages/p2pMessages';
+import { ChangeDevicesMessage } from '@/ts/types/messages/innerMessages';
 
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
 
@@ -40,7 +40,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     this.messageRetrier = new MessageRetrier();
   }
 
-  public async acceptConnection(message: OfferCall) {
+  public async acceptConnection(message: { connId: string }) {
     this.state = 'initing';
     this.connectionId = message.connId;
     this.refreshPeerConnections();

@@ -1,6 +1,7 @@
 import AbstractPeerConnection from '@/ts/webrtc/AbstractPeerConnection';
-import { DefaultWsInMessage } from "@/ts/types/messages/wsInMessages";
-import { HandlerName } from "@/ts/types/messages/baseMessagesInterfaces";
+import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
+import { HandlerName } from '@/ts/types/messages/baseMessagesInterfaces';
+import { DestroyPeerConnectionMessage } from "@/ts/types/messages/innerMessages";
 
 export default abstract class FilePeerConnection extends AbstractPeerConnection {
 
@@ -13,7 +14,11 @@ export default abstract class FilePeerConnection extends AbstractPeerConnection 
     }
   }
 
-  public closeEvents (text?: string|DefaultWsInMessage<string, HandlerName>) {
+  public destroy(message: DestroyPeerConnectionMessage) {
+    this.closeEvents()
+  }
+
+  public closeEvents (text?: string) {
     if (text) {
       this.ondatachannelclose(<string>text); // TODO
     }

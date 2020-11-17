@@ -4,7 +4,8 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 import {
   HandlerType,
   HandlerTypes
-} from "@/ts/types/messages/baseMessagesInterfaces";
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { ConnectToRemoteMessage } from '@/ts/types/messages/innerMessages';
 
 export default class CallReceiverPeerConnection extends CallPeerConnection {
 
