@@ -15,21 +15,13 @@ import {
   UserModel
 } from '@/ts/types/model';
 import {
-  ChannelDto,
   MessageModelDto,
-  RoomDto,
-  SetStateFromStorage,
-  UserDto
+  SetStateFromStorage
 } from '@/ts/types/dto';
-
-import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
-import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
-import { HandlerName } from '@/ts/types/messages/baseMessagesInterfaces';
 
 
 export interface UploadFile {
-   type: string;
-   symbol: string;
+   key: string;
    file: File|Blob;
 }
 
@@ -48,12 +40,6 @@ const sample: StuctureMappedType<string> = {
 }
 
 
-
-
-export interface MessageRetrierProxy {
-  getMessageRetrier(): MessageRetrier;
-}
-
 export interface UserIdConn {
   connectionId: string;
   userId: number;
@@ -63,8 +49,7 @@ export interface UserIdConn {
 
 export interface MessageDataEncode {
   messageContent: string|null;
-  files: UploadFile[];
-  fileModels: { [id: string]: FileModel };
+  files:  Record<string, FileModel>| null;
   currSymbol: string;
 }
 
@@ -78,10 +63,8 @@ export interface SetDevices {
   webcams: { [id: string]: string };
 }
 
-export interface MessageSender extends MessageRetrierProxy {
-  sendSendMessage(content: string, roomId: number, uploadFiles: UploadFile[], cbId: number, originTime: number):  Promise<void>;
-  sendEditMessage(content: string, roomId: number, id: number, uploadFiles: UploadFile[]): Promise<void>;
-  sendDeleteMessage(cbIdEqualsToMessageId: number): void;
+export interface MessageSender {
+  syncMessage(roomId: number, messageId: number):  Promise<void>;
   addMessages(roomId: number, messages: MessageModelDto[]): void;
 }
 
@@ -155,6 +138,12 @@ export interface SetMessageProgressError {
   messageId: number;
   roomId: number;
   error: string|null;
+}
+
+export interface SetFileIdsForMessage {
+  messageId: number;
+  roomId: number;
+  fileIds: {symbol: string; id: number}[];
 }
 
 export interface RemoveSendingMessage {

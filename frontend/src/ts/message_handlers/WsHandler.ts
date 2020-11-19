@@ -36,8 +36,11 @@ import {
   AddInviteMessage,
   AddRoomMessage,
   DefaultWsInMessage,
+  DeleteMessage,
+  EditMessage,
   PingMessage,
   PongMessage,
+  PrintMessage,
   SaveChannelSettingsMessage,
   SetProfileImageMessage,
   SetSettingsMessage,
@@ -170,27 +173,26 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public sendEditMessage(content: string|null, id: number, files: number[] | null, messageId: number) {
+  public sendEditMessage(content: string|null, id: number, files: number[] | null) {
     const newVar = {
       id,
       action: 'editMessage',
       files,
-      messageId,
       content
     };
     this.sendToServer(newVar, true);
   }
 
-  public sendSendMessage(content: string, roomId: number, files: number[], messageId: number, timeDiff: number) {
+  public async sendPrintMessage(content: string, roomId: number, files: number[], id: number, timeDiff: number): Promise<PrintMessage> {
     const newVar = {
       files,
-      messageId,
+      id,
       timeDiff,
-      action: 'sendMessage',
+      action: 'printMessage',
       content,
       roomId
     };
-    this.sendToServer(newVar, true);
+    return this.messageProc.sendToServerAndAwait(newVar);
   }
 
   public async saveSettings(content: UserSettingsDto): Promise<SetSettingsMessage|unknown> {
@@ -357,11 +359,12 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  private sendToServer<T extends DefaultWsOutMessage<string>>(messageRequest: T, skipGrowl = false): void {
+  private sendToServer<T extends DefaultWsOutMessage<string>>(messageRequest: T, skipGrowl = false): boolean {
     const isSent = this.messageProc.sendToServer(messageRequest);
     if (!isSent && !skipGrowl) {
       this.store.growlError('Can\'t send message, because connection is lost :(');
     }
+    return isSent;
   }
 
   public setSettings(m: SetSettingsMessage) {

@@ -1,7 +1,5 @@
 import BaseTransferHandler from '@/ts/webrtc/BaseTransferHandler';
 import {
-  HandlerType,
-  HandlerTypes,
   MessageSender,
   UploadFile,
   UserIdConn
@@ -14,30 +12,30 @@ import NotifierHandler from '@/ts/classes/NotificationHandler';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { sub } from '@/ts/instances/subInstance';
 import Subscription from '@/ts/classes/Subscription';
-import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
 import { MessageModelDto } from '@/ts/types/dto';
-import {
-  DefaultWsInMessage,
-  OfferCall
-} from '@/ts/types/messages/wsInMessages';
+import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
 import { InnerSendMessage } from '@/ts/types/messages/p2pMessages';
 import { ChangeDevicesMessage } from '@/ts/types/messages/innerMessages';
+import { HandlerTypes } from '@/ts/types/messages/baseMessagesInterfaces';
+
 
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
 
-
-  protected readonly handlers: HandlerTypes = {
-    removePeerConnection: <HandlerType>this.removePeerConnection,
-    changeDevices: <HandlerType>this.changeDevices
+  protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, 'webrtcTransfer:*' | 'message'> = {
+    // changeDevices: <HandlerType<'changeDevices', 'message'>>this.changeDevices,
+    // removePeerConnection: <HandlerType<'removePeerConnection', 'webrtcTransfer:*'>>this.removePeerConnection,
   };
 
-  private messageRetrier: MessageRetrier;
+
   private state: 'not_inited' |'initing' | 'waiting' | 'ready' = 'not_inited';
 
   constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore) {
     super(roomId, wsHandler, notifier, store);
     sub.subscribe('message', this);
-    this.messageRetrier = new MessageRetrier();
+  }
+
+  syncMessage(roomId: number, messageId: number): Promise<void> {
+    throw new Error('Method not implemented.');
   }
 
   public async acceptConnection(message: { connId: string }) {
@@ -45,7 +43,8 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     this.connectionId = message.connId;
     this.refreshPeerConnections();
     this.state = 'ready';
-    this.messageRetrier.resendAllMessages();
+    debugger
+    this.syncMessage(1,2,);//TODO
   }
 
   protected onDestroy() {
@@ -96,29 +95,29 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     return false;
   }
 
-  public async tryToSend(cbId: number, m: Omit<DefaultWsInMessage, 'handler'>) {
-    this.messageRetrier.putCallBack(cbId, () => {
-      let message: DefaultWsInMessage = {...m, handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!)}
-      sub.notify(message);
-    })
-    await this.initConnectionIfRequired();
-    if (this.state === 'ready') {
-      this.messageRetrier.resendMessage(cbId);
-    }
-  }
-
-
-  async sendSendMessage(content: string, roomId: number, uploadFiles: UploadFile[], cbId: number, originTime: number): Promise<void> {
-    const em: Omit<InnerSendMessage, 'handler'> = {
-      content,
-      originTime,
-      cbId,
-      id: Date.now(),
-      action: 'sendSendMessage',
-      uploadFiles,
-    }
-    await this.tryToSend(cbId, em);
-  }
+  // public async tryToSend(cbId: number, m: Omit<DefaultWsInMessage, 'handler'>) {
+  //   this.messageRetrier.putCallBack(cbId, () => {
+  //     let message: DefaultWsInMessage = {...m, handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!)}
+  //     sub.notify(message);
+  //   })
+  //   await this.initConnectionIfRequired();
+  //   if (this.state === 'ready') {
+  //     this.messageRetrier.resendMessage(cbId);
+  //   }
+  // }
+  //
+  //
+  // async sendPrintMessage(content: string, roomId: number, uploadFiles: UploadFile[], cbId: number, originTime: number): Promise<void> {
+  //   const em: Omit<InnerSendMessage, 'handler'> = {
+  //     content,
+  //     originTime,
+  //     cbId,
+  //     id: Date.now(),
+  //     action: 'sendPrintMessage',
+  //     uploadFiles,
+  //   }
+  //   await this.tryToSend(cbId, em);
+  // }
 
   private get room(): RoomModel {
     return this.store.roomsDict[this.roomId];
@@ -158,19 +157,6 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     throw Error('unsupported');
   }
 
-  getMessageRetrier(): MessageRetrier {
-    return this.messageRetrier;
-  }
-
-  sendDeleteMessage(id: number) : void {
-    this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
-    throw Error('unsupported');
-  }
-
-  sendEditMessage(content: string, roomId: number, id: number, uploadFiles: UploadFile[]): Promise<void> {
-    this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
-    throw Error('unsupported');
-  }
 
 
 

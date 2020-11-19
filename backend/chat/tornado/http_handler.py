@@ -594,5 +594,5 @@ class HttpHandler(MethodDispatcher):
 				type_enum=UploadedFile.UploadedFileChoices(name[0])
 			)
 			up.save()
-			ufs.append(up.id)
+			ufs.append({'symbol': name[1], 'id': up.id})
 		return ufs

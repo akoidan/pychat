@@ -14,6 +14,7 @@ const webpack = require('webpack');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const name = '[name].[ext]?[sha512:hash:base64:6]';
 const child_process = require('child_process');
+const CleanTerminalPlugin = require('clean-terminal-webpack-plugin');
 const PreloadWebpackPlugin = require('preload-webpack-plugin')
 const ELECTRON_DIST_DIRNAME = 'electron_dist';
 const MAIN_DIST_DIRNAME = 'dist';
@@ -202,6 +203,7 @@ const getConfig = async () => {
   plugins = [
     definePlugin,
     new VueLoaderPlugin(),
+    new CleanTerminalPlugin(),
     new CopyWebpackPlugin([
       {from: './src/assets/manifest.json', to: ''},
       {from: './src/assets/recaptcha.html', to: ''},

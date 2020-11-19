@@ -167,13 +167,8 @@ async function initStore(logger: Logger, storage: IStorage, messageSenderProxy: 
       if (session) {
         logger.debug('Appending sending messages {}', data.sendingMessages)();
         data.sendingMessages.forEach((m: MessageModel) => {
-          let messageSender: MessageSender = messageSenderProxy.getMessageSender(m.roomId);
-          if (m.content && m.id > 0) {
-            messageSender.sendEditMessage(m.content, m.roomId, m.id, []);
-          } else if (m.content) {
-            messageSender.sendSendMessage(m.content, m.roomId, [], m.id, m.time);
-          } else if (m.id > 0) {
-            messageSender.sendDeleteMessage(m.id);
+          if (m.sending) {
+            messageSenderProxy.getMessageSender(m.roomId).syncMessage(m.roomId, m.id) ;
           }
         });
       } else {
@@ -190,7 +185,7 @@ function init() {
   const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
   const api: Api = new Api(xhr);
 
-  const storage: IStorage = window.openDatabase! ? new DatabaseWrapper('v132') : new LocalStorage();
+  const storage: IStorage = window.openDatabase! ? new DatabaseWrapper('v133') : new LocalStorage();
   const WS_URL = WS_API_URL.replace('{}', window.location.host);
   const ws: WsHandler = new WsHandler(WS_URL, sessionHolder, store);
   const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);

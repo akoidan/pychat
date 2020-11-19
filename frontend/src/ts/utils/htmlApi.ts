@@ -9,6 +9,7 @@ import {
   UploadFile
 } from '@/ts/types/types';
 import {
+  BlobType,
   FileModel,
   MessageModel
 } from '@/ts/types/model';
@@ -444,80 +445,51 @@ function nextChar(c: string): string {
   return String.fromCharCode(c.charCodeAt(0) + 1);
 }
 
-export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\u3500'): MessageDataEncode {
-  const files: UploadFile[] = []; // return array from nodeList
+export function getMessageData(userMessage: HTMLElement, messageModel?: MessageModel): MessageDataEncode {
+  let currSymbol: string =  messageModel?.symbol ?? '\u3500';
+  const files: Record<string, FileModel>| null = {}; // return array from nodeList
   const images = userMessage.querySelectorAll(`.${PASTED_IMG_CLASS}`);
-  const fileModels: { [id: string]: FileModel } = {};
   forEach(images, img => {
     let oldSymbol = img.getAttribute('symbol');
+    let src = img.getAttribute('src');
+    const assVideo = img.getAttribute('associatedVideo');
+    const assAudio = img.getAttribute('associatedAudio');
+    const videoType: BlobType = img.getAttribute('videoType')! as BlobType;
+
     let elSymbol = oldSymbol;
     if (!elSymbol) {
       currSymbol = nextChar(currSymbol);
       elSymbol = currSymbol;
     }
+
     const textNode = document.createTextNode(elSymbol);
     img.parentNode!.replaceChild(textNode, img);
-    let src = img.getAttribute('src');
-    // TODO is `blob:` only works in chrome or the same in all browsers?
-    // TODO if not blob, load external images with Xhr, otherwise current version is bugged
-    // only if symbols is not created yet and it's not in cache
-    let imageIsInCacheButNotInServer = src?.startsWith('blob:') && savedFiles[src];
-    const assVideo = img.getAttribute('associatedVideo');
-    const assAudio = img.getAttribute('associatedAudio');
-    const type: string = img.getAttribute('videoType')!;
-    if (assVideo) {
-      if (imageIsInCacheButNotInServer) {
-        files.push({
-          file: savedFiles[assVideo],
-          type: type,
-          symbol: elSymbol
-        });
-        files.push({
-          file: savedFiles[src!],
-          type: 'p',
-          symbol: elSymbol
-        });
+
+    if (messageModel?.files) {
+      let fm: FileModel = messageModel.files[elSymbol];
+      if (fm.id && fm.id > 0) {
+        files[elSymbol] = fm;
+        return;
       }
-      fileModels[elSymbol] = {
-        id: null,
-        preview: src,
-        url: assVideo,
-        type: 'v',
-      };;
-    } else if (assAudio) {
-      if (imageIsInCacheButNotInServer) {
-        files.push({
-          file: savedFiles[assAudio],
-          type: 'a',
-          symbol: elSymbol
-        });
-      }
-      fileModels[elSymbol] =  {
-        id: null,
-        preview: null,
-        url: assAudio,
-        type: 'a'
-      };;
-    } else {
-      if (imageIsInCacheButNotInServer) {
-        files.push({
-          file: savedFiles[src!],
-          type: 'i',
-          symbol: elSymbol
-        });
-      }
-      fileModels[elSymbol] = {
-        id: null,
-        preview: null,
-        url: src,
-        type: 'i'
-      };
     }
+
+    let preview = assVideo ? assVideo : assVideo;
+    let previewId;
+    let url;
+    let id;
+    files[elSymbol] = {
+      type: videoType ?? assAudio ? 'a' : 'i',
+      preview: src,
+      previewId: null,
+      url: assVideo,
+      id: null
+    }
+
   });
   userMessage.innerHTML = userMessage.innerHTML.replace(/<img[^>]*symbol="([^"]+)"[^>]*>/g, '$1');
   let messageContent: string | null = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
   messageContent = !messageContent || /^\s*$/.test(messageContent) ? null : messageContent;
   userMessage.innerHTML = '';
 
-  return {files, messageContent, currSymbol, fileModels};
+  return {files, messageContent, currSymbol};
 }

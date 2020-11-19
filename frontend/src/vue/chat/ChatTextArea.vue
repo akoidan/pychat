@@ -148,8 +148,9 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       pasteHtmlAtCaret(getSmileyHtml(code), this.userMessage);
     }
 
-    onEmitDeleteMessage(message: MessageModel) {
-      this.editMessageWs(null, [], this.editedMessage.messageId, this.editedMessage.roomId, null, null);
+    onEmitDeleteMessage() {
+      this.editMessageWs(null, this.editedMessage.messageId, this.editedMessage.roomId, null, null, Date.now(), this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1);
+      this.$store.setEditedMessage(null);
     }
 
     onEmitQuote(message: MessageModel) {
@@ -185,14 +186,31 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
         event.preventDefault();
         this.$logger.debug('Checking sending message')();
         if (this.editedMessage && this.editedMessage.isEditingNow) {
-          const md: MessageDataEncode = getMessageData(this.userMessage, this.editingMessageModel.symbol!);
-          this.editMessageWs(md.messageContent, md.files, this.editedMessage.messageId, this.activeRoomId, md.currSymbol, md.fileModels);
+          const md: MessageDataEncode = getMessageData(this.userMessage, this.editingMessageModel);
+          this.editMessageWs(
+            md.messageContent,
+            this.editedMessage.messageId,
+            this.activeRoomId,
+            md.currSymbol,
+            md.files,
+            this.editingMessageModel.time,
+            this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1
+          );
+          this.$store.setEditedMessage(null);
         } else {
-          const md: MessageDataEncode = getMessageData(this.userMessage);
-          if (!md.messageContent && !md.files.length) {
+          const md: MessageDataEncode = getMessageData(this.userMessage, undefined);
+          if (!md.messageContent) { // && !md.files.length // but file content is emppty is symbols are not present
             return;
           }
-          this.sendFirstMessage(md);
+          this.editMessageWs(
+            md.messageContent,
+            this.$messageSenderProxy.getUniqueNegativeMessageId(),
+            this.activeRoomId,
+            md.currSymbol,
+            md.files,
+            Date.now() - this.$ws.timeDiff,
+            0
+          );
         }
       } else if (event.keyCode === 27) { // 27 = escape
         this.$store.setShowSmileys(false);
@@ -215,38 +233,15 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       }
     }
 
-
-    private sendFirstMessage(md: MessageDataEncode) {
-      const now = Date.now();
-      const id = this.$messageSenderProxy.getUniqueNegativeMessageId();
-      const mm: MessageModel = {
-        roomId: this.activeRoomId,
-        deleted: false,
-        id,
-        isHighlighted: false,
-        time: now - this.$ws.timeDiff,
-        content: md.messageContent,
-        symbol: md.currSymbol,
-        giphy: null,
-        edited: 0,
-        files: md.fileModels,
-        userId: this.userInfo.userId,
-        transfer: {
-          upload: null,
-          error: null
-        }
-      };
-      this.$store.addMessage(mm);
-      this.messageSender.sendSendMessage(md.messageContent!, this.activeRoomId, md.files, id, now);
-    }
-
     private editMessageWs(
         messageContent: string|null,
-        uploadFiles: UploadFile[],
         messageId: number,
         roomId: number,
         symbol: string|null,
-        files: {[id: number]: FileModel}|null): void {
+        files: {[id: number]: FileModel}|null,
+        time: number,
+        edited: number
+    ): void {
       const mm: MessageModel = {
         roomId,
         deleted: !messageContent,
@@ -256,27 +251,18 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
           error: null,
           upload: null
         } : null,
-        time: this.editingMessageModel.time,
+        time,
+        sending: true,
         content: messageContent,
         symbol: symbol,
         giphy: null,
-        edited: this.editingMessageModel.edited ? this.editingMessageModel.edited + 1 : 1,
+        edited,
         files,
         userId: this.userInfo.userId
       };
       this.$store.addMessage(mm);
-      if (messageId < 0 && messageContent) {
-        this.messageSender.sendSendMessage(messageContent, roomId, uploadFiles, messageId, this.editingMessageModel.time);
-      } else if (messageId > 0 && messageContent) {
-        this.messageSender.sendEditMessage(messageContent, roomId, messageId, uploadFiles);
-      } else if (!messageContent && messageId > 0) {
-        this.messageSender.sendDeleteMessage(messageId);
-      } else if (!messageContent && messageId < 0) {
-        this.messageSender.getMessageRetrier().removeSendingMessage(messageId);
-      }
-      this.$store.setEditedMessage(null);
+      this.messageSender.syncMessage(roomId, messageId);
     }
-
 
     @Watch('editedMessage')
     public onActiveRoomIdChange(val: EditingMessage) {

@@ -1,4 +1,5 @@
 import {
+  BlobType,
   ChannelsDictModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
@@ -27,6 +28,8 @@ export interface RoomDto  extends  RoomNoUsersDto {
 export interface ViewUserProfileDto extends UserProfileDto {
   image: string;
 }
+
+export type SaveFileResponse = {symbol: string; id: number}[];
 
 export interface ChannelDto {
   channelName: string;
@@ -90,8 +93,9 @@ export interface UserProfileDto {
 
 export interface FileModelDto {
   id: number;
+  previewId: number;
   url: string;
-  type: string;
+  type: BlobType;
   preview: string;
 }
 

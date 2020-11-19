@@ -44,6 +44,7 @@ export  interface MessageDB {
 
 export  interface FileDB {
   id: number;
+  preview_id: number;
   symbol: string;
   url: string;
   message_id: number;

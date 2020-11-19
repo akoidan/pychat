@@ -61,11 +61,13 @@ export interface Location {
   countryCode: string|null;
   region: string|null;
 }
+export type BlobType = 'v' | 'm' | 'a' | 'i';
 
-export  interface FileModel {
+export interface FileModel {
   id: number|null;
   url: string|null;
-  type: string;
+  type: BlobType;
+  previewId: number|null;
   preview: string|null;
 }
 
@@ -82,11 +84,12 @@ export interface MessageTransferInfo {
 export  interface MessageModel {
   id: number;
   time: number;
-  files: {[id: string]: FileModel}| null; // THIS IS STRING, not number!!
+  files: Record<string, FileModel>| null; // THIS IS STRING, not number!!
   content: string|null;
   isHighlighted: boolean;
   symbol: string|null;
   deleted: boolean;
+  sending: boolean;
   giphy: string|null;
   edited: number|null;
   roomId: number;

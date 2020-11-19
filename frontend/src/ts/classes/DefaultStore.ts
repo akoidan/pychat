@@ -37,6 +37,7 @@ import {
   RoomLogEntry,
   SetCallOpponent,
   SetDevices,
+  SetFileIdsForMessage,
   SetMessageProgress,
   SetMessageProgressError,
   SetOpponentAnchor,
@@ -493,6 +494,17 @@ export class DefaultStore extends VuexModule {
   public setMessageProgressError(payload: SetMessageProgressError) {
     const mm: MessageModel = this.roomsDict[payload.roomId].messages[payload.messageId];
     mm.transfer!.error = payload.error;
+  }
+
+  @Mutation
+  public setMessageFileIds(payload: SetFileIdsForMessage) {
+    const mm: MessageModel = this.roomsDict[payload.roomId].messages[payload.messageId];
+    if (!mm.files) {
+      throw Error(`Message ${payload.messageId} in room ${payload.roomId} doesn't have files`);
+    }
+    payload.fileIds.forEach(fId => {
+      mm.files![fId.symbol].id = fId.id;
+    });
   }
 
   @Mutation

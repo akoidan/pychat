@@ -3,7 +3,6 @@ import Api from '@/ts/message_handlers/Api';
 import Vue from 'vue';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import {
-  MessageRetrierProxy,
   MessageSender,
   RemoveMessageProgress,
   RemoveSendingMessage,
@@ -25,6 +24,7 @@ import {
   ChannelModel,
   ChannelsDictModel,
   CurrentUserInfoModel,
+  FileModel,
   MessageModel,
   RoomDictModel,
   RoomModel,
@@ -39,6 +39,7 @@ import {
   FileModelDto,
   MessageModelDto,
   RoomDto,
+  SaveFileResponse,
   SetStateFromWS
 } from '@/ts/types/dto';
 import {
@@ -52,7 +53,6 @@ import WsHandler from '@/ts/message_handlers/WsHandler';
 import NotifierHandler from '@/ts/classes/NotificationHandler';
 import { sub } from '@/ts/instances/subInstance';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
-import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
 import { AudioPlayer } from '@/ts/classes/AudioPlayer';
 import {
   ChangeDevicesMessage,
@@ -81,12 +81,13 @@ import {
   SaveChannelSettingsMessage,
   SaveRoomSettingsMessage
 } from '@/ts/types/messages/wsInMessages';
+import { savedFiles } from '@/ts/utils/htmlApi';
 
 // TODO split this class into 2 separate:
 // 1st one for message handling that's related to MessageSender and MessageTrasnferHandler (webrtc one)
 // 2nd one that's responsible for user Online, room management and etc
 
-export default class ChannelsHandler extends MessageHandler implements MessageRetrierProxy , MessageSender {
+export default class ChannelsHandler extends MessageHandler implements  MessageSender {
 
   protected readonly logger: Logger;
 
@@ -113,7 +114,6 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
 
   // messageRetrier uses MessageModel.id as unique identifier, do NOT use it with any types but
   // Send message, delete message, edit message, as it will have the sameId which could erase some callback
-  private readonly messageRetrier: MessageRetrier;
   private readonly store: DefaultStore;
   private readonly api: Api;
   private readonly ws: WsHandler;
@@ -130,79 +130,42 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     this.logger = loggerFactory.getLoggerColor('chat', '#940500');
     this.ws = ws;
     this.audioPlayer = audioPlayer;
-    this.messageRetrier = new MessageRetrier();
     this.messageBus = messageBus;
     this.notifier = notifier;
-  }
-
-  getMessageRetrier(): MessageRetrier {
-     return this.messageRetrier;
   }
 
   logout(m: LogoutMessage) {
     this.store.logout();
   }
 
-  public sendDeleteMessage(id: number): void {
-    this.messageRetrier.asyncExecuteAndPutInCallback(
-        id,
-        () => this.ws.sendEditMessage(null, id, null, id)
-    );
-  }
-
-  public async uploadFilesOrRetry(
-      id: number,
-      roomId: number,
-      uploadFiles: UploadFile[],
-      retry: () => Promise<void>
-  ): Promise<number[]> {
-    let fileIds: number[] = [];
-    if (uploadFiles.length) {
-      try {
-        fileIds =  await this.uploadFiles(id, roomId, uploadFiles);
-      } catch (e) {
-        this.logger.error('Uploading error, scheduling cb')();
-        this.messageRetrier.putCallBack(id, retry);
-        throw e;
-      }
+  public async syncMessage(roomId: number, messageId: number): Promise<void> {
+    let storeMessage = this.store.roomsDict[roomId].messages[messageId];
+    if (!storeMessage.content && storeMessage.id < 0) {
+      // should not be here;
+      throw Error("why we are here?");
     }
-    return fileIds;
-  }
-
-  public async sendEditMessage(content: string, roomId: number, id: number, uploadFiles: UploadFile[]): Promise<void> {
-    const fileIds: number[] = await this.uploadFilesOrRetry(
-        id,
-        roomId,
-        uploadFiles,
-        () => this.sendEditMessage(content, roomId, id, uploadFiles)
-    );
-    this.messageRetrier.asyncExecuteAndPutInCallback(id, () => this.ws.sendEditMessage(content, id, fileIds, id));
-  }
-
-  public async sendSendMessage(
-      content: string,
-      roomId: number,
-      uploadFiles: UploadFile[],
-      cbId: number,
-      originTime: number
-  ):  Promise<void> {
-    const fileIds: number[] = await this.uploadFilesOrRetry(
-      cbId,
-      roomId,
-      uploadFiles,
-      () => this.sendSendMessage(content, roomId, uploadFiles, cbId, originTime)
-    );
-    this.messageRetrier.asyncExecuteAndPutInCallback(
-      cbId,
-      () => this.ws.sendSendMessage(content, roomId, fileIds, cbId, Date.now() - originTime)
-    );
+    await this.uploadFilesForMessages(storeMessage);
+    storeMessage = this.store.roomsDict[roomId].messages[messageId];
+    let fileIds: number[] = this.getFileIdsFromMessage(storeMessage);
+    if (storeMessage.id < 0 && storeMessage.content) {
+      await this.ws.sendPrintMessage(storeMessage.content, roomId, fileIds, storeMessage.id, Date.now() - storeMessage.time);
+      const rmMes: RemoveSendingMessage = {
+        messageId: storeMessage.id,
+        roomId: storeMessage.roomId
+      };
+      this.store.deleteMessage(rmMes);
+    } else if (storeMessage.id > 0) {
+      this.ws.sendEditMessage(storeMessage.content, storeMessage.id, fileIds);
+    } else if (!storeMessage.content && storeMessage.id < 0) {
+      throw Error("SHould not be here"); // this messages should be removed
+    }
   }
 
   public async uploadFiles(
       messageId: number,
       roomId: number,
       files: UploadFile[]
-  ): Promise<number[]> {
+  ): Promise<SaveFileResponse> {
     let size: number = 0;
     files.forEach(f => size += f.file.size);
     const sup: SetUploadProgress = {
@@ -215,7 +178,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     };
     this.store.setUploadProgress(sup);
     try {
-      const res: number[] = await this.api.uploadFiles(files, evt => {
+      const res: SaveFileResponse = await this.api.uploadFiles(files, evt => {
         if (evt.lengthComputable) {
           const payload: SetMessageProgress = {
             messageId,
@@ -298,7 +261,9 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
   }
 
   public internetAppear() {
-    this.messageRetrier.resendAllMessages();
+    console.error("INTERNETAPPEAR")
+    // debugger
+    // this.messageRetrier.resendAllMessages(); TODO
   }
 
   public loadMessages(lm: LoadMessages) {
@@ -321,6 +286,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
         content: message.content || null,
         symbol: message.symbol || null,
         isHighlighted: false,
+        sending: false,
         edited: inMessage.edited,
         roomId: message.roomId,
         userId: message.userId,
@@ -330,9 +296,6 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
       };
       this.logger.debug('Adding message to storage {}', message)();
       this.store.addMessage(message);
-      if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-        const removed = this.messageRetrier.removeSendingMessage(inMessage.messageId);
-      }
     }
   }
 
@@ -344,9 +307,6 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
       const message: MessageModel = this.getMessage(inMessage);
       this.logger.debug('Adding message to storage {}', message)();
       this.store.addMessage(message);
-      if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-        this.messageRetrier.removeSendingMessage(inMessage.messageId);
-      }
     }
   }
 
@@ -384,17 +344,6 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
   }
 
   public printMessage(inMessage: PrintMessage) {
-    if (inMessage.cbBySender === this.ws.getWsConnectionId()) {
-      this.messageRetrier.removeSendingMessage(inMessage.messageId);
-      if (!inMessage.messageId) {
-        throw Error(`Unknown messageId ${inMessage}`);
-      }
-      const rmMes: RemoveSendingMessage = {
-        messageId: inMessage.messageId,
-        roomId: inMessage.roomId
-      };
-      this.store.deleteMessage(rmMes);
-    }
     const message: MessageModel = this.getMessage(inMessage);
     this.logger.debug('Adding message to storage {}', message)();
     const activeRoom: RoomModel | null = this.store.activeRoom;
@@ -564,6 +513,44 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
     this.notifyDevicesChanged(null, r.id) // TODO messageTransferhandler should be created or should id?
   }
 
+
+  private getFileIdsFromMessage(storeMessage: MessageModel): number[] {
+    let files: number[] = []
+    if (storeMessage.files) {
+      let fileValues = Object.values(storeMessage.files);
+      if (fileValues.find(f => !f.id)) {
+        throw Error('New files were added during upload') // TODO
+      }
+      files = fileValues.map(a => a.id!);
+    }
+    return files;
+  }
+
+  private async uploadFilesForMessages(storeMessage: MessageModel) {
+    if (storeMessage.files) {
+      let uploadFiles: UploadFile[] = [];
+      Object.keys(storeMessage.files)
+          .filter(k => storeMessage.files![k].id)
+          .forEach(k => {
+            let file: FileModel = storeMessage.files![k];
+            uploadFiles.push({
+              file: savedFiles[file.url!], // TODO why null?
+              key: file.type + k
+            });
+            if (file.preview) {
+              uploadFiles.push({
+                file: savedFiles[file.preview],
+                key: `p${k}`
+              });
+            }
+          });
+      if (uploadFiles.length > 0) {
+        let fileIds = await this.uploadFiles(storeMessage.id, storeMessage.roomId, uploadFiles);
+        this.store.setMessageFileIds({roomId: storeMessage.roomId, messageId: storeMessage.id, fileIds});
+      }
+    }
+  }
+
   private getMessage(message: MessageModelDto): MessageModel {
     return {
       id: message.id,
@@ -576,6 +563,7 @@ export default class ChannelsHandler extends MessageHandler implements MessageRe
       roomId: message.roomId,
       userId: message.userId,
       transfer: null,
+      sending: false, // this code is only called from WsInMessagew which means it's synced
       giphy: message.giphy || null,
       deleted: message.deleted || false
     };

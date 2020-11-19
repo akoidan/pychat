@@ -9,7 +9,7 @@ import {
 import AbstractMessageProcessor from '@/ts/message_handlers/AbstractMessageProcessor';
 import { SecurityValidator } from '@/ts/webrtc/message/SecurityValidator';
 import Subscription from '@/ts/classes/Subscription';
-import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
+
 import {
   HandlerName,
   HandlerType,
@@ -31,12 +31,11 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
   protected readonly handlers: HandlerTypes<keyof MessagePeerConnection, 'peerConnection:*'> = {
     sendRtcData:  <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData,
     checkDestroy:  <HandlerType<'checkDestroy', 'peerConnection:*'>>this.checkDestroy,
-    // sendSendMessage:  <HandlerType<'sendSendMessage', 'peerConnection:*'>>this.sendSendMessage, TODO
+    // sendPrintMessage:  <HandlerType<'sendPrintMessage', 'peerConnection:*'>>this.sendPrintMessage, TODO
     printMessage:  <HandlerType<'printMessage', 'peerConnection:*'>>this.printMessage
   };
 
 
-  private readonly messageRetrier: MessageRetrier;
   private opponentUserId: number;
   protected status: 'inited' | 'not_inited' = 'not_inited';
   private readonly messageProc: AbstractMessageProcessor;
@@ -47,7 +46,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.opponentUserId = userId;
     sub.subscribe(Subscription.allPeerConnectionsForTransfer(connId), this);
-    this.messageRetrier = new MessageRetrier();
+
     this.securityValidator = new SecurityValidator(this.roomId, this.opponentUserId, store);
     this.messageProc = new AbstractMessageProcessor(this, store, `p2p-${opponentWsId}`);
   }
@@ -59,31 +58,31 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
       edited: 0,
       handler: 'channels',
       id: m.id,
-      cbId: m.cbId,
+      // cbId: m.cbId,
       roomId: this.roomId,
       time: Date.now() - m.timeDiff,
       userId: this.opponentUserId
     };
     sub.notify(em);
   }
-
-  public sendSendMessage({content, cbId, uploadFiles, originTime, id}: InnerSendMessage) {
-    this.messageRetrier.asyncExecuteAndPutInCallback(
-        cbId,
-        () => {
-          const message: PrintWebRtcMessage = {
-            action: 'printMessage',
-            content,
-            edited: 0,
-            timeDiff: Date.now() - originTime,
-            messageId: cbId,
-            id,
-            handler: 'this'
-          };
-          this.messageProc.sendToServer(message);
-        }
-    );
-  }
+  //
+  // public sendPrintMessage({content, cbId, uploadFiles, originTime, id}: InnerSendMessage) {
+  //   this.messageRetrier.asyncExecuteAndPutInCallback(
+  //       cbId,
+  //       () => {
+  //         const message: PrintWebRtcMessage = {
+  //           action: 'printMessage',
+  //           content,
+  //           edited: 0,
+  //           timeDiff: Date.now() - originTime,
+  //           // messageId: cbId,
+  //           id,
+  //           handler: 'this'
+  //         };
+  //         this.messageProc.sendToServer(message);
+  //       }
+  //   );
+  // }
 
   public getOpponentUserId() {
     return this.opponentUserId;
@@ -142,7 +141,9 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
     this.sendChannel!.onmessage = this.onChannelMessage.bind(this);
     this.sendChannel!.onopen = () => {
-      this.messageRetrier.resendAllMessages();
+      // this.messageRetrier.resendAllMessages();
+      debugger
+      // TODO
       this.logger.debug('Channel opened')();
     };
     this.sendChannel!.onclose = () => this.logger.log('Closed channel ')();
