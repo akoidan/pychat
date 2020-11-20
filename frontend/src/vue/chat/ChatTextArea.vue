@@ -409,7 +409,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
       &.failed
         min-width: 200px
         min-height: 100px
-    /deep/ .recorded-audio
+    /deep/ .audio-record
       height: 50px
 
     /deep/ *

@@ -412,7 +412,7 @@ export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
   const img = document.createElement('img');
   const associatedAudio = URL.createObjectURL(file);
   img.setAttribute('associatedAudio', associatedAudio);
-  img.className = `recorded-audio ${PASTED_IMG_CLASS}`;
+  img.className = `audio-record ${PASTED_IMG_CLASS}`;
   setBlobName(file);
   savedFiles[associatedAudio] = file;
   img.src = recordIcon as string;
@@ -477,7 +477,7 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
     files[elSymbol] = {
       type: videoType ?? (assAudio ? 'a' : 'i'),
       preview: assVideo ? src : assVideo,
-      url: assVideo ?? src,
+      url: assAudio ?? (assVideo ?? src),
       sending: true,
       fileId: null,
       previewFileId: null,
