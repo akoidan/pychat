@@ -20,7 +20,7 @@ jobs:
     - name: test fork
       uses: akoidan/github-action-ssh@latest
       with:
-        command: echo 1
+        command: exit 1
         host: ${{ secrets.HOST }}
         port: ${{ secrets.PORT }}
         username: ${{ secrets.SSH_USER }}
