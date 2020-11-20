@@ -5,9 +5,7 @@ name: Update pychat.org
 # Controls when the action will run. Triggers the workflow on push or pull request
 # events but only for the master branch
 on:
-  push:
-    paths: 
-     - 'frontend/**'
+  push
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -19,5 +17,11 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - run: echo 'works'
-        
+    - name: test fork
+      uses: akoidan/github-action-ssh=
+      with:
+        command: echo 1
+        host: ${{ secrets.HOST }}
+        port: ${{ secrets.PORT }}
+        username: ${{ secrets.SSH_USER }}
+        privateKey : ${{ secrets.ID_RSA }}
