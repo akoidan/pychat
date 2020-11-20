@@ -167,18 +167,6 @@ export function convertStringSexToNumber(m: SexModelString): SexDB {
   return newVar[m];
 }
 
-export function convertFile(dto: FileModelDto): FileModel {
-  return {...dto};
-}
-
-export function convertFiles(dto: {[id: number]: FileModelDto}): {[id: number]: FileModel} {
-  const res: {[id: number]: FileModel} = {};
-  for (const k in dto) {
-    res[k] = convertFile(dto[k]);
-  }
-
-  return res;
-}
 
 export function convertUser(u: UserDto): UserModel {
   const location: Location = u.location ? convertLocation(u.location) : {

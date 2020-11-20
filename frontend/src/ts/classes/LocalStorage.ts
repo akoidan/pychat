@@ -1,6 +1,7 @@
 import loggerFactory from '@/ts/instances/loggerFactory';
 import {
   IStorage,
+  SetFileIdsForMessage,
   SetRoomsUsers,
   StorageData
 } from '@/ts/types/types';
@@ -61,7 +62,7 @@ export default class LocalStorage implements IStorage {
     }
     localStorage.setItem(this.STORAGE_NAME, JSON.stringify(lm));
   }
-
+  public updateFileIds(m: SetFileIdsForMessage) {}
   public deleteMessage(id: number) {}
   public deleteRoom(id: number) {}
   public deleteChannel(id: number) {}

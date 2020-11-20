@@ -64,11 +64,12 @@ export interface Location {
 export type BlobType = 'v' | 'm' | 'a' | 'i';
 
 export interface FileModel {
-  id: number|null;
   url: string|null;
   type: BlobType;
-  previewId: number|null;
+  previewFileId: number|null;
+  fileId: number|null;
   preview: string|null;
+  sending: boolean;
 }
 
 export interface UploadProgressModel {

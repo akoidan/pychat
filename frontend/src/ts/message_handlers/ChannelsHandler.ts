@@ -43,7 +43,6 @@ import {
   SetStateFromWS
 } from '@/ts/types/dto';
 import {
-  convertFiles,
   convertUser,
   getChannelDict,
   getRoom,
@@ -192,7 +191,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
         messageId, roomId
       };
       this.store.removeMessageProgress(newVar);
-      if (!res || !res.length) {
+      if (!res || Object.keys(res).length  === 0) {
         throw Error('Missing files uploads');
       }
 
@@ -518,10 +517,15 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     let files: number[] = []
     if (storeMessage.files) {
       let fileValues = Object.values(storeMessage.files);
-      if (fileValues.find(f => !f.id)) {
+      if (fileValues.find(f => !f.fileId && f.sending)) {
         throw Error('New files were added during upload') // TODO
       }
-      files = fileValues.map(a => a.id!);
+      fileValues.forEach(fv => {
+        files.push(fv.fileId!)
+        if (fv.previewFileId) {
+          files.push(fv.previewFileId)
+        }
+      });
     }
     return files;
   }
@@ -530,7 +534,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     if (storeMessage.files) {
       let uploadFiles: UploadFile[] = [];
       Object.keys(storeMessage.files)
-          .filter(k => storeMessage.files![k].id)
+          .filter(k => !storeMessage.files![k].fileId && storeMessage.files![k].sending)
           .forEach(k => {
             let file: FileModel = storeMessage.files![k];
             uploadFiles.push({
@@ -552,6 +556,22 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
   }
 
   private getMessage(message: MessageModelDto): MessageModel {
+    function convertFiles(dtos: {[id: number]: FileModelDto}): {[id: number]: FileModel} {
+      const res: {[id: number]: FileModel} = {};
+      for (const k in dtos) {
+        let dto = dtos[k];
+        res[k] = {
+          fileId: null,
+          sending: false,
+          previewFileId: null,
+          preview: dto.preview,
+          type: dto.type,
+          url: dto.url
+        }
+      }
+      return res;
+    }
+
     return {
       id: message.id,
       time: message.time,

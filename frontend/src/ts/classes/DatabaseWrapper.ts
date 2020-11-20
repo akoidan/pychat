@@ -1,5 +1,6 @@
 import {
   IStorage,
+  SetFileIdsForMessage,
   SetRoomsUsers,
   StorageData
 } from '@/ts/types/types';
@@ -64,8 +65,8 @@ export default class DatabaseWrapper implements IStorage {
       t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text)');
       t = await this.runSql(t, 'CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), creator INTEGER REFERENCES user(id))');
       t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, p2p boolean NOT NULL CHECK (p2p IN (0,1)), notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id), creator INTEGER REFERENCES user(id))');
-      t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (deleted IN (0,1)))');
-      t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, preview_id integer, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
+      t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (sending IN (0,1)))');
+      t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, sending boolean NOT NULL CHECK (sending IN (0,1)), preview_file_id integer, file_id integer, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
       t = await this.runSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))');
       t = await this.runSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2)))');
       t = await this.runSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))');
@@ -215,10 +216,12 @@ export default class DatabaseWrapper implements IStorage {
         if (amElement) {
           const file: FileModel = {
             url: f.url,
-            previewId: f.preview_id,
+            fileId: f.file_id,
+            previewFileId: f.preview_file_id,
+            sending: convertToBoolean(f.sending),
             type: f.type as BlobType,
-            preview: f.preview,
-            id: f.id
+            preview: f.preview
+
           };
           amElement.files![f.symbol] = file;
         }
@@ -307,7 +310,7 @@ export default class DatabaseWrapper implements IStorage {
     if (this.minMessageIdCache === 0) {
       throw Error('Can\'t use minMessageIdCache before initialization of store');
     }
-    this.logger.log('Decreasing minMessageId from {}', this.minMessageIdCache)();
+    this.logger.debug('Decreasing minMessageId from {}', this.minMessageIdCache)();
     this.minMessageIdCache--;
     return this.minMessageIdCache;
   }
@@ -321,7 +324,10 @@ export default class DatabaseWrapper implements IStorage {
         (t, d) => {
           for (const k in message.files) {
             const f = message.files[k];
-            this.executeSql(t, 'insert or replace into file (id, preview_id, symbol, url, message_id, type, preview) values (?, ?, ?, ?, ?, ?, ?)', [f.id, f.previewId, k, f.url, message.id, f.type, f.preview])();
+            this.executeSql(t, 'insert into file (file_id, preview_file_id, symbol, url, message_id, type, preview, sending) values ( ?, ?, ?, ?, ?, ?, ?, ?)', [ f.fileId, f.previewFileId, k, f.url, message.id, f.type, f.preview, f.sending ? 1 : 0])();
+            // this.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
+
+            // })();
           }
         }
     )();
@@ -437,6 +443,14 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
+  public updateFileIds(m: SetFileIdsForMessage): void {
+    this.write(t => {
+      Object.keys(m.fileIds).forEach(symb => {
+        this.executeSql(t, 'update file set file_id = ?, preview_file_id = ? where symbol = ? and message_id = ?', [m.fileIds[symb].fileId, m.fileIds[symb].previewFileId ?? null, symb, m.messageId])();
+      });
+    });
+  }
+
   public setRoomHeaderId(roomId: number, headerId: number) {
     if (!this.cache[roomId] || this.cache[roomId] < headerId) {
       this.cache[roomId] = headerId;
@@ -457,7 +471,7 @@ export default class DatabaseWrapper implements IStorage {
     };
     t.executeSql(sql, args, cb, err);
 
-    return this.logger.trace('{} {}', sql, args);
+    return this.logger.debug('{} {}', sql, args);
   }
 
   private async runSql(t: SQLTransaction, sql: string): Promise<SQLTransaction> {
@@ -480,11 +494,14 @@ export default class DatabaseWrapper implements IStorage {
     if (!this.db) { // TODO TypeError: undefined is not an object (evaluating 'this.db[transactionType]')
       throw Error(`${browserVersion} failed to get db`);
     }
-    this.db[transactionType](t => {
-      cb(t);
-    },                       (e) => {
-      this.logger.error('Error during saving message {}', e)();
-    });
+    this.db[transactionType](
+        t => {
+          cb(t);
+        },
+        (e) => {
+          this.logger.error('Error during saving message {}', e)();
+        }
+    );
   }
 
   private write(cb: TransactionCb) {

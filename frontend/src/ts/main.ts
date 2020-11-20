@@ -157,7 +157,8 @@ async function initStore(logger: Logger, storage: IStorage, messageSenderProxy: 
             const dbMessages: { [id: number]: MessageModel } = data.setRooms.roomsDict[storeRoom.id].messages;
             for (const dbMessagesKey in dbMessages) {
               if (!storeRoom.messages[dbMessagesKey]) {
-                store.addMessage(dbMessages[dbMessagesKey]);
+                console.error("// do we put into database again what we loada");
+                store.addMessage(dbMessages[dbMessagesKey]); // do we put into database again what we loada
               }
             }
           }
@@ -185,7 +186,7 @@ function init() {
   const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
   const api: Api = new Api(xhr);
 
-  const storage: IStorage = window.openDatabase! ? new DatabaseWrapper('v133') : new LocalStorage();
+  const storage: IStorage = window.openDatabase! ? new DatabaseWrapper('v135') : new LocalStorage();
   const WS_URL = WS_API_URL.replace('{}', window.location.host);
   const ws: WsHandler = new WsHandler(WS_URL, sessionHolder, store);
   const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);

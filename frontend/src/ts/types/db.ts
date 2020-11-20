@@ -44,8 +44,10 @@ export  interface MessageDB {
 
 export  interface FileDB {
   id: number;
-  preview_id: number;
+  preview_file_id: number; //  so this is UploadFile.id for "preview" File
+  file_id: number;  // so this is UploadFile.id for "url" File
   symbol: string;
+  sending: BooleanDB;
   url: string;
   message_id: number;
   type: string;

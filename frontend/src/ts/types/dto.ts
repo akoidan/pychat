@@ -29,7 +29,7 @@ export interface ViewUserProfileDto extends UserProfileDto {
   image: string;
 }
 
-export type SaveFileResponse = {symbol: string; id: number}[];
+export type SaveFileResponse = Record<string, { fileId: number; previewFileId?: number}>;
 
 export interface ChannelDto {
   channelName: string;
@@ -92,8 +92,6 @@ export interface UserProfileDto {
 }
 
 export interface FileModelDto {
-  id: number;
-  previewId: number;
   url: string;
   type: BlobType;
   preview: string;

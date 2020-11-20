@@ -585,7 +585,7 @@ class HttpHandler(MethodDispatcher):
 		"""
 		POST only, validates email during registration
 		"""
-		ufs = []
+		ufs = {}
 		for name, value in files.items():
 			up = UploadedFile(
 				symbol=name[1],
@@ -594,5 +594,9 @@ class HttpHandler(MethodDispatcher):
 				type_enum=UploadedFile.UploadedFileChoices(name[0])
 			)
 			up.save()
-			ufs.append({'symbol': name[1], 'id': up.id})
+			res = ufs.setdefault(name[1], {})
+			if name[0] == 'p':
+				res['previewFileId'] = up.id
+			else:
+				res['fileId'] = up.id
 		return ufs

@@ -187,13 +187,13 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
       const v = files[s];
       if (v) {
         if (v.type === 'i') {
-          return `<img src='${resolveMediaUrl(v.url!)}' imageId='${v.id}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
+          return `<img src='${resolveMediaUrl(v.url!)}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
         } else if (v.type === 'v' || v.type === 'm') {
           const className = v.type === 'v' ? 'video-player' : 'video-player video-record';
 
-          return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview!)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
+          return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview!)}' symbol='${s}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
         } else if (v.type === 'a') {
-          return `<img src='${recordIcon}' imageId='${v.id}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
+          return `<img src='${recordIcon}'  symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
         } else {
           logger.error('Invalid type {}', v.type)();
         }
@@ -450,10 +450,11 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
   const files: Record<string, FileModel>| null = {}; // return array from nodeList
   const images = userMessage.querySelectorAll(`.${PASTED_IMG_CLASS}`);
   forEach(images, img => {
+    debugger
     let oldSymbol = img.getAttribute('symbol');
     let src = img.getAttribute('src');
-    const assVideo = img.getAttribute('associatedVideo');
-    const assAudio = img.getAttribute('associatedAudio');
+    const assVideo = img.getAttribute('associatedVideo') ?? null;
+    const assAudio = img.getAttribute('associatedAudio')  ?? null;
     const videoType: BlobType = img.getAttribute('videoType')! as BlobType;
 
     let elSymbol = oldSymbol;
@@ -467,22 +468,19 @@ export function getMessageData(userMessage: HTMLElement, messageModel?: MessageM
 
     if (messageModel?.files) {
       let fm: FileModel = messageModel.files[elSymbol];
-      if (fm.id && fm.id > 0) {
+      if (fm && !fm.sending) {
         files[elSymbol] = fm;
         return;
       }
     }
 
-    let preview = assVideo ? assVideo : assVideo;
-    let previewId;
-    let url;
-    let id;
     files[elSymbol] = {
-      type: videoType ?? assAudio ? 'a' : 'i',
-      preview: src,
-      previewId: null,
-      url: assVideo,
-      id: null
+      type: videoType ?? (assAudio ? 'a' : 'i'),
+      preview: assVideo ? src : assVideo,
+      url: assVideo ?? src,
+      sending: true,
+      fileId: null,
+      previewFileId: null,
     }
 
   });

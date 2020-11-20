@@ -16,6 +16,7 @@ import {
 } from '@/ts/types/model';
 import {
   MessageModelDto,
+  SaveFileResponse,
   SetStateFromStorage
 } from '@/ts/types/dto';
 
@@ -143,7 +144,7 @@ export interface SetMessageProgressError {
 export interface SetFileIdsForMessage {
   messageId: number;
   roomId: number;
-  fileIds: {symbol: string; id: number}[];
+  fileIds: SaveFileResponse;
 }
 
 export interface RemoveSendingMessage {
@@ -164,6 +165,7 @@ export  interface IStorage {
   deleteChannel(id: number): void;
   saveMessage(m: MessageModel): void;
   updateRoom(m: RoomSettingsModel): void;
+  updateFileIds(m: SetFileIdsForMessage): void;
   setRooms(rooms: RoomSettingsModel[]): void;
   setChannels(channels: ChannelModel[]): void;
   saveRoom(room: RoomModel): void;
