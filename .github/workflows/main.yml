@@ -18,7 +18,7 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
     - name: test fork
-      uses: akoidan/github-action-ssh@v0.5.4
+      uses: akoidan/github-action-ssh@test-v4
       with:
         command: exit 1
         host: ${{ secrets.HOST }}
