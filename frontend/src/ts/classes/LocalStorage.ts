@@ -76,6 +76,7 @@ export default class LocalStorage implements IStorage {
   public saveRoomUsers(ru: SetRoomsUsers)  {}
   public setUsers(users: UserModel[])  {}
   public saveUser(users: UserModel)  {}
+  public markMessageAsSent(m: number) {}
 
   public async getAllTree(): Promise<SetStateFromStorage|null> {
     return null;

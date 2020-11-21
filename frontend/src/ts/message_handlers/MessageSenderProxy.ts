@@ -13,7 +13,12 @@ export class MessageSenderProxy {
   private readonly channelsHandler: ChannelsHandler;
   private readonly storage: IStorage; // only for minId
 
-  constructor(store: DefaultStore, webrtcApi: WebRtcApi, channelsHandler: ChannelsHandler, storage: IStorage) {
+  constructor(
+      store: DefaultStore,
+      webrtcApi: WebRtcApi,
+      channelsHandler: ChannelsHandler,
+      storage: IStorage
+  ) {
     this.store = store;
     this.webrtcApi = webrtcApi;
     this.channelsHandler = channelsHandler;

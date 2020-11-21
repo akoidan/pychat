@@ -67,14 +67,8 @@ export default class AbstractMessageProcessor {
 
       return null;
     }
-    if (!data?.handler || !data.action) {
-      this.logger.error('Invalid message structure')();
-
-      return null;
-    }
     return data;
   }
-
 
 
   public sendToServerAndAwait<T extends DefaultWsOutMessage<K>, K extends string> (message: T): Promise<any> {

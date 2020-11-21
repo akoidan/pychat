@@ -35,6 +35,7 @@ import {
   p2pMessageToModel
 } from '@/ts/types/converters';
 import { SyncP2PMessage } from '@/ts/types/messages/innerMessages';
+import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
 
@@ -54,14 +55,24 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
   private readonly messageProc: P2PMessageProcessor;
   private readonly opponentUserId: number;
+  private readonly messageHelper: MessageHelper;
   private syncMessageLock: boolean = false;
 
-  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, userId: number) {
+  constructor(
+      roomId: number,
+      connId: string,
+      opponentWsId: string,
+      wsHandler: WsHandler,
+      store: DefaultStore,
+      userId: number,
+      messageHelper: MessageHelper
+  ) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.opponentUserId = userId;
     sub.subscribe(Subscription.allPeerConnectionsForTransfer(connId), this);
 
     this.messageProc = new P2PMessageProcessor(this, store, `p2p-${opponentWsId}`);
+    this.messageHelper = messageHelper;
   }
 
   public getOpponentUserId() {
@@ -85,7 +96,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
   }
 
   public async sendNewP2PMessage(payload: SendNewP2PMessage) {
-    this.store.addMessage(p2pMessageToModel(payload.message, this.roomId));
+    this.messageHelper.onNewMessage(p2pMessageToModel(payload.message, this.roomId))
     let response: ResponseToSendNewP2pMessage = {
       action: 'responseToSendNewP2pMessage',
       resolveCbId: payload.cbId
@@ -95,12 +106,20 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
   public async syncP2pMessage(payload: SyncP2PMessage) {
     if (this.isChannelOpened) {
+      this.logger.debug("Syncing message {}", payload.id)()
       let message: SendNewP2PMessage = {
         message: messageModelToP2p(this.room.messages[payload.id]),
         action: 'sendNewP2PMessage',
       }
       await this.messageProc.sendToServerAndAwait(message);
+      if (!this.isConnectedToMyAnotherDevices) {
+        this.store.markMessageAsSent({messageId: payload.id, roomId: this.roomId})
+      }
     }
+  }
+
+  get isConnectedToMyAnotherDevices(): boolean {
+    return this.opponentUserId === this.store.myId;
   }
 
   checkDestroy() {

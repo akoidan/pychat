@@ -33,7 +33,7 @@ import {
   NumberIdentifier,
   PrivateRoomsIds,
   RemoveMessageProgress,
-  RemoveSendingMessage,
+  RoomMessageIds,
   RoomLogEntry,
   SetCallOpponent,
   SetDevices,
@@ -63,6 +63,7 @@ import {
   Mutation,
   VuexModule
 } from 'vuex-module-decorators';
+import { AddRoomMessage } from '@/ts/types/messages/wsInMessages';
 
 const logger = loggerFactory.getLoggerColor('store', '#6a6400');
 
@@ -517,7 +518,16 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public deleteMessage(rm: RemoveSendingMessage) {
+  public markMessageAsSent(m: RoomMessageIds) {
+    let message = this.roomsDict[m.roomId].messages[m.messageId];
+    if (message.sending) {
+      message.sending = false;
+      this.storage.markMessageAsSent(m.messageId);
+    }
+  }
+
+  @Mutation
+  public deleteMessage(rm: RoomMessageIds) {
     Vue.delete(this.roomsDict[rm.roomId].messages, String(rm.messageId));
     this.storage.deleteMessage(rm.messageId);
   }

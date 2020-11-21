@@ -25,6 +25,7 @@ import {
   HandlerType,
   HandlerTypes
 } from '@/ts/types/messages/baseMessagesInterfaces';
+import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 
 
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
@@ -35,9 +36,11 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   };
 
   private state: 'not_inited' |'initing' | 'waiting' | 'ready' = 'not_inited';
+  private readonly messageHelper: MessageHelper;
 
-  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore) {
+  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper) {
     super(roomId, wsHandler, notifier, store);
+    this.messageHelper = messageHelper;
     sub.subscribe('message', this);
   }
 
@@ -76,10 +79,26 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
       if (this.webrtcConnnectionsIds.indexOf(opponentWsId) < 0) {
         let mpc;
         if (opponentWsId > myConnectionId) {
-          mpc = new MessageSenderPeerConnection(this.roomId, this.connectionId!, opponentWsId, this.wsHandler, this.store,  connectionIdWithUser.userId);
+          mpc = new MessageSenderPeerConnection(
+              this.roomId,
+              this.connectionId!,
+              opponentWsId,
+              this.wsHandler,
+              this.store,
+              connectionIdWithUser.userId,
+              this.messageHelper
+          );
 
         } else {
-          mpc = new MessageReceiverPeerConnection(this.roomId, this.connectionId!, opponentWsId, this.wsHandler, this.store, connectionIdWithUser.userId);
+          mpc = new MessageReceiverPeerConnection(
+              this.roomId,
+              this.connectionId!,
+              opponentWsId,
+              this.wsHandler,
+              this.store,
+              connectionIdWithUser.userId,
+              this.messageHelper
+          );
         }
         this.webrtcConnnectionsIds.push(opponentWsId);
         mpc.makeConnection();

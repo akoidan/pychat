@@ -11,8 +11,8 @@
         class="icon-repeat"
         @click="retry"
       >{{ message.transfer.error }}</i>
-      <div class="spinner" />
     </template>
+    <div class="spinner" v-if="message.sending" />
   </div>
 </template>
 <script lang="ts">

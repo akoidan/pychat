@@ -148,7 +148,7 @@ export interface SetFileIdsForMessage {
   fileIds: SaveFileResponse;
 }
 
-export interface RemoveSendingMessage {
+export interface RoomMessageIds {
   messageId: number;
   roomId: number;
 }
@@ -183,6 +183,7 @@ export  interface IStorage {
   connect(): Promise<boolean>;
   // getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
   setRoomHeaderId(roomId: number, value: number): void;
+  markMessageAsSent(messageId: number): void;
 }
 
 export interface  PostData<T> {

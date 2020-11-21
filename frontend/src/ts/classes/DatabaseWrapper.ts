@@ -280,6 +280,12 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
+  public markMessageAsSent(messageId: number) {
+    this.write(t => {
+      this.executeSql(t, 'update message set sending = 0 where id = ?', [messageId]);
+    });
+  }
+
   // private getMessages (t, cb) {
   //   this.executeSql(t, 'SELECT * FROM message', [], (t, m) => {
   //     this.executeSql(t, 'SELECT * from file', [],  (t, i) => {

@@ -43,6 +43,7 @@ import { AndroidPlatformUtil } from '@/ts/devices/AndroidPlatformUtils';
 import { WebPlatformUtils } from '@/ts/devices/WebPlatformUtils';
 import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
 import { SetStateFromStorage } from '@/ts/types/dto';
+import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 
 function declareDirectives() {
   Vue.directive('validity', function (el: HTMLElement, binding) {
@@ -186,8 +187,9 @@ async function init() {
   const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
   const audioPlayer: AudioPlayer = new AudioPlayer(notifier);
   const messageBus = new Vue();
-  const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier, messageBus, audioPlayer);
-  const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier);
+  const messageHelper: MessageHelper = new MessageHelper(store, notifier, messageBus, audioPlayer);
+  const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, audioPlayer, messageHelper);
+  const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper);
   const platformUtil: PlatformUtil = IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
   const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, channelsHandler, storage);
 

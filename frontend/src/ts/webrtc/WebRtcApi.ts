@@ -30,6 +30,7 @@ import {
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import { VideoType } from '@/ts/types/types';
 import { LogoutMessage } from '@/ts/types/messages/innerMessages';
+import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 
 export default class WebRtcApi extends MessageHandler {
 
@@ -47,14 +48,16 @@ export default class WebRtcApi extends MessageHandler {
   private readonly notifier: NotifierHandler;
   private readonly callHandlers: {[id: number]: CallHandler} = {};
   private readonly messageHandlers: {[id: number]: MessageTransferHandler} = {};
+  private readonly messageHelper: MessageHelper;
 
-  constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler) {
+  constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper) {
     super();
     sub.subscribe('webrtc', this);
     this.wsHandler = ws;
     this.notifier = notifier;
     this.logger = loggerFactory.getLogger('WEBRTC', 'color: #960055');
     this.store = store;
+    this.messageHelper = messageHelper;
   }
 
   public offerCall(message: OfferCall) {
@@ -103,7 +106,7 @@ export default class WebRtcApi extends MessageHandler {
 
   public getMessageHandler(roomId: number): MessageTransferHandler {
     if (!this.messageHandlers[roomId]) {
-      this.messageHandlers[roomId] = new MessageTransferHandler(roomId, this.wsHandler, this.notifier, this.store);
+      this.messageHandlers[roomId] = new MessageTransferHandler(roomId, this.wsHandler, this.notifier, this.store, this.messageHelper);
     }
 
     return this.messageHandlers[roomId];

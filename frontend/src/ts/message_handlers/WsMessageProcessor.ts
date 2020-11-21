@@ -26,5 +26,14 @@ export class WsMessageProcessor extends AbstractMessageProcessor {
       this.store.growlError((data as unknown as GrowlMessage).content);
     }
   }
+  public parseMessage(jsonData: string): DefaultWsInMessage<string, HandlerName>|null {
+    let data: DefaultWsInMessage<string, HandlerName>|null =  super.parseMessage(jsonData)
+    if (!data?.handler || !data.action) {
+      this.logger.error('Invalid message structure')();
+
+      return null;
+    }
+    return data;
+  }
 
 }

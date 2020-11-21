@@ -5,7 +5,7 @@ import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import {
   MessageSender,
   RemoveMessageProgress,
-  RemoveSendingMessage,
+  RoomMessageIds,
   RoomLogEntry,
   SetMessageProgress,
   SetMessageProgressError,
@@ -81,6 +81,7 @@ import {
   SaveRoomSettingsMessage
 } from '@/ts/types/messages/wsInMessages';
 import { savedFiles } from '@/ts/utils/htmlApi';
+import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 
 // TODO split this class into 2 separate:
 // 1st one for message handling that's related to MessageSender and MessageTrasnferHandler (webrtc one)
@@ -116,12 +117,17 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
   private readonly store: DefaultStore;
   private readonly api: Api;
   private readonly ws: WsHandler;
-  private readonly notifier: NotifierHandler;
-  private readonly messageBus:  Vue;
   private readonly audioPlayer: AudioPlayer;
   private syncMessageLock: boolean = false;
+  private readonly messageHelper: MessageHelper;
 
-  constructor(store: DefaultStore, api: Api, ws: WsHandler, notifier: NotifierHandler, messageBus: Vue, audioPlayer: AudioPlayer) {
+  constructor(
+      store: DefaultStore,
+      api: Api,
+      ws: WsHandler,
+      audioPlayer: AudioPlayer,
+      messageHelper: MessageHelper,
+  ) {
     super();
     this.store = store;
     this.api = api;
@@ -130,8 +136,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     this.logger = loggerFactory.getLoggerColor('chat', '#940500');
     this.ws = ws;
     this.audioPlayer = audioPlayer;
-    this.messageBus = messageBus;
-    this.notifier = notifier;
+    this.messageHelper = messageHelper;
   }
 
   logout(m: LogoutMessage) {
@@ -173,7 +178,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     let fileIds: number[] = this.getFileIdsFromMessage(storeMessage);
     if (storeMessage.id < 0 && storeMessage.content) {
       await this.ws.sendPrintMessage(storeMessage.content, roomId, fileIds, storeMessage.id, Date.now() - storeMessage.time);
-      const rmMes: RemoveSendingMessage = {
+      const rmMes: RoomMessageIds = {
         messageId: storeMessage.id,
         roomId: storeMessage.roomId
       };
@@ -369,51 +374,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
 
   public printMessage(inMessage: PrintMessage) {
     const message: MessageModel = this.getMessage(inMessage);
-    this.logger.debug('Adding message to storage {}', message)();
-    const activeRoom: RoomModel | null = this.store.activeRoom;
-    const activeRoomId = activeRoom && activeRoom.id; // if no channels page first
-    const room = this.store.roomsDict[inMessage.roomId];
-    const userInfo: CurrentUserInfoModel = this.store.userInfo!;
-    const isSelf = inMessage.userId === userInfo.userId;
-    if (!isSelf && (!this.notifier.getIsCurrentWindowActive() || activeRoomId !== inMessage.roomId)) {
-      message.isHighlighted = true;
-    }
-    this.store.addMessage(message);
-    if (activeRoomId !== inMessage.roomId && !isSelf) {
-      this.store.incNewMessagesCount(inMessage.roomId);
-    }
-    if (room.notifications && !isSelf) {
-      const title = this.store.allUsersDict[inMessage.userId].user;
 
-      let icon: string = <string>faviconUrl;
-      if (inMessage.files) {
-        const fff: FileModelDto = Object.values(inMessage.files)[0];
-        if (fff.url) {
-          icon = fff.url;
-        }
-      }
-      this.notifier.showNotification(title, {
-        body: inMessage.content || 'Image',
-        replaced: 1,
-        data: {
-          replaced: 1,
-          title,
-          roomId: inMessage.roomId
-        },
-        requireInteraction: true,
-        icon
-      });
-    }
-
-    if (this.store.userSettings!.messageSound) {
-      if (message.userId === userInfo.userId) {
-        this.audioPlayer.checkAndPlay(outgoing, room.volume);
-      } else {
-        this.audioPlayer.checkAndPlay(incoming, room.volume);
-      }
-    }
-
-    this.messageBus.$emit('scroll');
   }
 
   public deleteRoom(message: DeleteRoomMessage) {
