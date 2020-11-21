@@ -43,5 +43,5 @@ export interface SendNewP2PMessage extends DefaultP2pMessage<'sendNewP2PMessage'
   message: MessageP2pDto;
 }
 
-export interface ResponseToSendNewP2pMessage extends DefaultP2pMessage<'responseToSendNewP2pMessage'> {
+export interface ConfirmReceivedP2pMessage extends DefaultP2pMessage<'confirmReceivedP2pMessage'> {
 }

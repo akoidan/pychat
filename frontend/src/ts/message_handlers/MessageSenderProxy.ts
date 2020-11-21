@@ -11,24 +11,31 @@ export class MessageSenderProxy {
   private readonly store: DefaultStore;
   private readonly webrtcApi: WebRtcApi;
   private readonly channelsHandler: ChannelsHandler;
-  private readonly storage: IStorage; // only for minId
+
 
   constructor(
       store: DefaultStore,
       webrtcApi: WebRtcApi,
-      channelsHandler: ChannelsHandler,
-      storage: IStorage
+      channelsHandler: ChannelsHandler
   ) {
     this.store = store;
     this.webrtcApi = webrtcApi;
     this.channelsHandler = channelsHandler;
-    this.storage = storage;
+  }
+
+  private getRandomInt(max: number) {
+    return Math.floor(Math.random() * max);
   }
 
   // uniqueMessages is also used in abstract Processsor, but here it's negative numbers only
   // and in another place is positive, so they don't intersect
   getUniqueNegativeMessageId(): number {
-    return this.storage.getMinMessageId();
+    const ID_RANGE = 1_000_000_000;
+    let myId: number = this.store.myId! ?? this.getRandomInt(1000);
+    if (myId > 1000) {
+      myId = myId % 1000;
+    }
+    return - (this.getRandomInt(ID_RANGE)  + myId * ID_RANGE);
   }
 
   syncMessages() {

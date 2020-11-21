@@ -48,7 +48,6 @@ export default class DatabaseWrapper implements IStorage {
   private readonly dbName: String;
   private db: Database|null = null;
   private readonly cache: { [id: number]: number } = {};
-  private minMessageIdCache: number = 0;
 
   constructor(dbName: String) {
     this.logger = loggerFactory.getLoggerColor('db', '#753e01');
@@ -71,7 +70,6 @@ export default class DatabaseWrapper implements IStorage {
       t = await this.runSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2)))');
       t = await this.runSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))');
       this.logger.log('DatabaseWrapper has been initialized')();
-      this.minMessageIdCache = -1 ;
       return true;
     } else if (this.db.version === '1.0') {
       this.logger.log('Created new db connection')();
@@ -198,15 +196,10 @@ export default class DatabaseWrapper implements IStorage {
         if (roomsDict[m.roomId]) {
           roomsDict[m.roomId].messages[m.id] = message;
         }
-        if (m.id < this.minMessageIdCache) {
-          // this seems to be the first place
-          this.minMessageIdCache = m.id;
-        }
         am[m.id] = message;
       });
       // if database didn't have negative number, mark that this field initialize,
       // so we can compare it with 0 when decreasing and get
-      this.minMessageIdCache --;
       dbFiles.forEach(f => {
         const amElement: MessageModel = am[f.message_id];
         if (amElement) {
@@ -306,16 +299,6 @@ export default class DatabaseWrapper implements IStorage {
   //   })();
   //   return cb;
   // }
-
-
-  getMinMessageId(): number {
-    if (this.minMessageIdCache === 0) {
-      throw Error('Can\'t use minMessageIdCache before initialization of store');
-    }
-    this.logger.debug('Decreasing minMessageId from {}', this.minMessageIdCache)();
-    this.minMessageIdCache--;
-    return this.minMessageIdCache;
-  }
 
   public insertMessage(t: SQLTransaction, message: MessageModel) {
     this.setRoomHeaderId(message.roomId, message.id);

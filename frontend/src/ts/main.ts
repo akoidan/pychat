@@ -191,7 +191,7 @@ async function init() {
   const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, audioPlayer, messageHelper);
   const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper);
   const platformUtil: PlatformUtil = IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
-  const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, channelsHandler, storage);
+  const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, channelsHandler);
 
   Vue.prototype.$api = api;
   Vue.prototype.$ws = ws;

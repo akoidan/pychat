@@ -21,7 +21,7 @@ export class MessageHelper {
   private readonly logger: Logger;
   private readonly store: DefaultStore;
   private readonly notifier: NotifierHandler;
-  private readonly messageBus:  Vue;
+  private readonly messageBus: Vue;
   private readonly audioPlayer: AudioPlayer;
 
   constructor(store: DefaultStore, notifier: NotifierHandler, messageBus: Vue, audioPlayer: AudioPlayer) {
@@ -31,22 +31,12 @@ export class MessageHelper {
     this.messageBus = messageBus;
     this.notifier = notifier;
   }
-  
-  onNewMessage(message: MessageModel) {
-    this.logger.debug('Adding message to storage {}', message)();
-    const activeRoom: RoomModel | null = this.store.activeRoom;
+
+  private processOpponentMessage(message: MessageModel) {
+    const activeRoomId: number = this.store.activeRoom?.id!;
     const room = this.store.roomsDict[message.roomId];
-    const myUserId: number = this.store.myId!;
-    const isSelf = message.userId === myUserId;
-    const activeRoomId = activeRoom && activeRoom.id; // if no channels page first
-    if (!isSelf && (!this.notifier.getIsCurrentWindowActive() || activeRoomId !== message.roomId)) {
-      message.isHighlighted = true;
-    }
-    this.store.addMessage(message);
-    if (activeRoomId !== message.roomId && !isSelf) {
-      this.store.incNewMessagesCount(message.roomId);
-    }
-    if (room.notifications && !isSelf) {
+
+    if (room.notifications) {
       const title = this.store.allUsersDict[message.userId].user;
 
       let icon: string = <string>faviconUrl;
@@ -68,15 +58,29 @@ export class MessageHelper {
         icon
       });
     }
-
-    if (this.store.userSettings!.messageSound) {
-      if (isSelf && this.notifier.getIsCurrentWindowActive() || activeRoomId === message.roomId) {
-        this.audioPlayer.checkAndPlay(outgoing, room.volume);
-      } else {
-        this.audioPlayer.checkAndPlay(incoming, room.volume);
-      }
+    if (!this.notifier.getIsCurrentWindowActive() || activeRoomId !== message.roomId) {
+      message.isHighlighted = true;
+    }
+    if (activeRoomId !== message.roomId) {
+      this.store.incNewMessagesCount(message.roomId);
     }
 
+    if (this.store.userSettings!.messageSound) {
+      this.audioPlayer.checkAndPlay(incoming, room.volume);
+    }
+
+  }
+
+  public processUnkownP2pMessage(message: MessageModel) {
+    if (message.userId !== this.store.myId) {
+      this.processOpponentMessage(message);
+    }
+    this.store.addMessage(message);
+    this.processAnyMessage();
+  }
+
+  public processAnyMessage() {
     this.messageBus.$emit('scroll');
   }
+
 }

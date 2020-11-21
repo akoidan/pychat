@@ -35,7 +35,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     removePeerConnection: <HandlerType<'removePeerConnection', HandlerName>>this.removePeerConnection
   };
 
-  private state: 'not_inited' |'initing' | 'waiting' | 'ready' = 'not_inited';
+  private state: 'not_inited' |'initing' | 'no_opponents' | 'ready' = 'not_inited';
   private readonly messageHelper: MessageHelper;
 
   constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper) {
@@ -45,22 +45,26 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   }
 
   async syncMessage(roomId: number, messageId: number): Promise<void> {
+    this.messageHelper.processAnyMessage()
     if (await this.initConnectionIfRequired()) {
       let payload : SyncP2PMessage  = {
         action: 'syncP2pMessage',
         handler:  Subscription.allPeerConnectionsForTransfer(this.connectionId!),
-        id: messageId
+        id: messageId,
+        allowZeroSubscribers: true
       }
       sub.notify(payload);
     }
   }
 
   public async acceptConnection(message: { connId: string }) {
+    if (this.state === 'initing') {
+      return
+    }
     this.state = 'initing';
     this.connectionId = message.connId;
     this.refreshPeerConnections();
     this.state = 'ready';
-    await this.syncMessages();
   }
 
   public async syncMessages() {
@@ -114,46 +118,19 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   }
 
   private async initConnectionIfRequired() {
-    if (this.state === 'not_inited') {
-      this.state = 'initing';
+    if (this.state === 'not_inited' || this.state === 'no_opponents') {
       if (this.connectionIds.length > 0) {
+        this.state = 'initing';
         let {connId} =  await this.wsHandler.offerMessageConnection(this.roomId);
         this.connectionId = connId;
-        this.state = 'ready'
         this.refreshPeerConnections();
-        return true;
+        this.state = 'ready';
       } else {
-        this.state = 'waiting';
+        this.state = 'no_opponents';
       }
-    } else if (this.state === 'ready') {
-      return true;
     }
-    return false;
+    return this.state === 'ready';
   }
-
-  // public async tryToSend(cbId: number, m: Omit<DefaultWsInMessage, 'handler'>) {
-  //   this.messageRetrier.putCallBack(cbId, () => {
-  //     let message: DefaultWsInMessage = {...m, handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!)}
-  //     sub.notify(message);
-  //   })
-  //   await this.initConnectionIfRequired();
-  //   if (this.state === 'ready') {
-  //     this.messageRetrier.resendMessage(cbId);
-  //   }
-  // }
-  //
-  //
-  // async sendPrintMessage(content: string, roomId: number, uploadFiles: UploadFile[], cbId: number, originTime: number): Promise<void> {
-  //   const em: Omit<InnerSendMessage, 'handler'> = {
-  //     content,
-  //     originTime,
-  //     cbId,
-  //     id: Date.now(),
-  //     action: 'sendPrintMessage',
-  //     uploadFiles,
-  //   }
-  //   await this.tryToSend(cbId, em);
-  // }
 
   private get room(): RoomModel {
     return this.store.roomsDict[this.roomId];
@@ -185,16 +162,17 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     } else {
       throw Error('WTF is this message');
     }
-    this.refreshPeerConnections();
+    if (this.state === 'not_inited') {
+      this.initConnectionIfRequired()
+    } else if (this.state !== 'initing') {
+      this.refreshPeerConnections();
+    }
   }
 
   addMessages(roomId: number, messages: MessageModelDto[]): void {
     this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
     throw Error('unsupported');
   }
-
-
-
 
 
 }

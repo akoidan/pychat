@@ -55,7 +55,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.wsHandler = ws;
     this.store = store;
     this.logger = loggerFactory.getLogger(this.connectionId + ':' + this.opponentWsId, 'color: #960055');
-    this.logger.debug('Created {}', this.constructor.name)();
+    this.logger.log('Created {}', this.constructor.name)();
   }
 
   get mySubscriberId(): HandlerName {

@@ -158,7 +158,7 @@ export interface MessageSupplier {
   getWsConnectionId(): string;
 }
 
-export  interface IStorage {
+export interface IStorage {
   // getIds(cb: SingleParamCB<object>);
   saveMessages(messages: MessageModel[]): void;
   deleteMessage(id: number): void;
@@ -175,7 +175,6 @@ export  interface IStorage {
   setUserSettings(settings: CurrentUserSettingsModel): void;
   saveRoomUsers(ru: SetRoomsUsers): void;
   setUsers(users: UserModel[]): void;
-  getMinMessageId(): number;
   getAllTree(): Promise<SetStateFromStorage|null>;
   saveUser(users: UserModel): void;
   clearStorage(): void;

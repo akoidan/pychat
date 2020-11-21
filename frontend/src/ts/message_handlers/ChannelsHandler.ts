@@ -361,7 +361,8 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
       roomId,
       userId
     };
-    sub.notify(message);
+    console.error("TODO")
+    // sub.notify(message);
   }
 
   public removeOnlineUser(message: RemoveOnlineUserMessage) {
@@ -374,6 +375,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
 
   public printMessage(inMessage: PrintMessage) {
     const message: MessageModel = this.getMessage(inMessage);
+    this.messageHelper.processUnkownP2pMessage(message);
 
   }
 

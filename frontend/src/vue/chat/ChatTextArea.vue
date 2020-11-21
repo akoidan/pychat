@@ -247,7 +247,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
         deleted: !messageContent,
         id: messageId,
         isHighlighted: false,
-        transfer: !!messageContent || messageId > 0 ? {
+        transfer: !!messageContent || messageId > 0 ? { // TODO can this be simplified?
           error: null,
           upload: null
         } : null,

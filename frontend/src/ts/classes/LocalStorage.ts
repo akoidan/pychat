@@ -24,7 +24,6 @@ export default class LocalStorage implements IStorage {
   private readonly logger: Logger;
   private readonly STORAGE_NAME = 'wsHeaderIds';
   private cache: { [id: number]: LocalStorageMessage } = {};
-  private minMessageId = -1;
 
   constructor() {
     this.logger = loggerFactory.getLoggerColor('ls', '#006263');
@@ -133,8 +132,4 @@ export default class LocalStorage implements IStorage {
     }
   }
 
-  getMinMessageId(): number {
-    this.minMessageId --;
-    return this.minMessageId;
-  }
 }
