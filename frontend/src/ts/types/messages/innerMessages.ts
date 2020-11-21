@@ -61,3 +61,6 @@ export interface ChangeStreamMessage extends DefaultInnerSystemMessage<'streamCh
 export interface DestroyPeerConnectionMessage extends DefaultInnerSystemMessage<'destroy', 'peerConnection:*'> {
 }
 
+export interface SyncP2PMessage extends DefaultInnerSystemMessage<'syncP2pMessage', 'peerConnection:*'> {
+  id: number;
+}

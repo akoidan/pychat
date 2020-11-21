@@ -20,8 +20,6 @@ import { Logger } from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import {
   IStorage,
-  MessageSender,
-  StorageData
 } from '@/ts/types/types';
 import sessionHolder from '@/ts/instances/sessionInstance';
 import {
@@ -44,6 +42,7 @@ import { AudioPlayer } from '@/ts/classes/AudioPlayer';
 import { AndroidPlatformUtil } from '@/ts/devices/AndroidPlatformUtils';
 import { WebPlatformUtils } from '@/ts/devices/WebPlatformUtils';
 import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
+import { SetStateFromStorage } from '@/ts/types/dto';
 
 function declareDirectives() {
   Vue.directive('validity', function (el: HTMLElement, binding) {
@@ -141,45 +140,40 @@ function declareMixins() {
 }
 
 
-async function initStore(logger: Logger, storage: IStorage, messageSenderProxy: MessageSenderProxy) {
+async function initStore(logger: Logger, storage: IStorage):Promise<boolean> {
   store.setStorage(storage); // TODO mvoe to main
   const isNew = await storage.connect();
   if (!isNew) {
-    const data: StorageData | null = await storage.getAllTree();
+    const data: SetStateFromStorage | null = await storage.getAllTree();
     const session = sessionHolder.session;
     logger.log('restored state from db {}, userId: {}, session {}', data, store.userInfo && store.userInfo.userId, session)();
     if (data) {
       if (!store.userInfo && session) {
-        store.setStateFromStorage(data.setRooms);
+        store.setStateFromStorage(data);
       } else {
         store.roomsArray.forEach((storeRoom: RoomModel) => {
-          if (data.setRooms.roomsDict[storeRoom.id]) {
-            const dbMessages: { [id: number]: MessageModel } = data.setRooms.roomsDict[storeRoom.id].messages;
+          if (data.roomsDict[storeRoom.id]) {
+            const dbMessages: { [id: number]: MessageModel } = data.roomsDict[storeRoom.id].messages;
             for (const dbMessagesKey in dbMessages) {
               if (!storeRoom.messages[dbMessagesKey]) {
                 console.error("// do we put into database again what we loada");
-                store.addMessage(dbMessages[dbMessagesKey]); // do we put into database again what we loada
+                // we're saving it to database, we restored this message from.
+                // seems like we can't split 2 methods, since 1 should be in actions
+                // and one in mutation, but storage is not available in actions
+                store.addMessage(dbMessages[dbMessagesKey]);
               }
             }
           }
         });
-        logger.debug('Skipping settings state {}', data.setRooms)();
-      }
-      if (session) {
-        logger.debug('Appending sending messages {}', data.sendingMessages)();
-        data.sendingMessages.forEach((m: MessageModel) => {
-          if (m.sending) {
-            messageSenderProxy.getMessageSender(m.roomId).syncMessage(m.roomId, m.id) ;
-          }
-        });
-      } else {
-        logger.debug('No pending messages found')();
+        logger.debug('Skipping settings state {}', data)();
       }
     }
   }
+  logger.log('Store has been successfully inited')();
+  return isNew;
 }
 
-function init() {
+async function init() {
   declareMixins();
   declareDirectives();
 
@@ -236,8 +230,8 @@ function init() {
     logger.log('Constants {}', constants)();
   }
 
-  initStore(logger, storage, messageSenderProxy).then(value => {
-    logger.debug('Exiting from initing store')();
+  initStore(logger, storage).then(value => {
+    messageSenderProxy.syncMessages();
   }).catch(e => {
     logger.error('Unable to init store from db, because of', e)();
   });

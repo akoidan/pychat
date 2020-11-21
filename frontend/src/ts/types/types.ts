@@ -66,6 +66,7 @@ export interface SetDevices {
 
 export interface MessageSender {
   syncMessage(roomId: number, messageId: number):  Promise<void>;
+  syncMessages(): Promise<void>;
   addMessages(roomId: number, messages: MessageModelDto[]): void;
 }
 
@@ -175,7 +176,7 @@ export  interface IStorage {
   saveRoomUsers(ru: SetRoomsUsers): void;
   setUsers(users: UserModel[]): void;
   getMinMessageId(): number;
-  getAllTree(): Promise<StorageData|null>;
+  getAllTree(): Promise<SetStateFromStorage|null>;
   saveUser(users: UserModel): void;
   clearStorage(): void;
   clearMessages(): void;
@@ -232,11 +233,6 @@ export interface SetReceivingFileUploaded {
 export interface SetSendingFileStatus extends SetSendingFileBase {
   status: FileTransferStatus;
   error: string|null;
-}
-
-export interface StorageData {
-  setRooms: SetStateFromStorage;
-  sendingMessages: MessageModel[];
 }
 
 export interface MessagesLocation {

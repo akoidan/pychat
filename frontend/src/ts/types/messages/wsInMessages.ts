@@ -17,6 +17,7 @@ import {
   AcceptFileContent,
   AddRoomBase,
   BrowserBase,
+  CallBackMessage,
   ChangeUserOnlineBase,
   DefaultInMessage,
   HandlerName,
@@ -28,7 +29,7 @@ import {
   WebRtcDefaultMessage
 } from '@/ts/types/messages/baseMessagesInterfaces';
 
-export interface DefaultWsInMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H> {
+export interface DefaultWsInMessage<A extends string, H extends HandlerName> extends DefaultInMessage<A, H>, CallBackMessage {
   cbBySender?: string;
   cbId?: number;
 }

@@ -119,6 +119,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
   private readonly notifier: NotifierHandler;
   private readonly messageBus:  Vue;
   private readonly audioPlayer: AudioPlayer;
+  private syncMessageLock: boolean = false;
 
   constructor(store: DefaultStore, api: Api, ws: WsHandler, notifier: NotifierHandler, messageBus: Vue, audioPlayer: AudioPlayer) {
     super();
@@ -135,6 +136,30 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
 
   logout(m: LogoutMessage) {
     this.store.logout();
+  }
+
+  public async syncMessages() {
+    if (this.syncMessageLock) {
+      this.logger.warn('Exiting from sync message because, the lock is already acquired')();
+      return;
+    }
+    try {
+      this.syncMessageLock = true;
+      for (const room of this.store.roomsArray) {
+        if (room.p2p) {
+          continue;
+        }
+        for (const message of  Object.values(room.messages)) {
+          if (message.sending) {
+              await this.syncMessage(room.id, message.id);
+          }
+        }
+      }
+    } catch (e) {
+      this.logger.error('Can\'t send messages because {}', e)();
+    } finally {
+      this.syncMessageLock = false;
+    }
   }
 
   public async syncMessage(roomId: number, messageId: number): Promise<void> {
@@ -156,7 +181,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     } else if (storeMessage.id > 0) {
       this.ws.sendEditMessage(storeMessage.content, storeMessage.id, fileIds);
     } else if (!storeMessage.content && storeMessage.id < 0) {
-      throw Error("SHould not be here"); // this messages should be removed
+      throw Error("Should not be here"); // this messages should be removed
     }
   }
 

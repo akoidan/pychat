@@ -2,7 +2,6 @@ import {
   IStorage,
   SetFileIdsForMessage,
   SetRoomsUsers,
-  StorageData
 } from '@/ts/types/types';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
@@ -40,6 +39,7 @@ import {
   UserDB
 } from '@/ts/types/db';
 import { browserVersion } from '@/ts/utils/runtimeConsts';
+import { SetStateFromStorage } from '@/ts/types/dto';
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 
@@ -82,7 +82,7 @@ export default class DatabaseWrapper implements IStorage {
     return false;
   }
 
-  public async getAllTree(): Promise<StorageData|null> {
+  public async getAllTree(): Promise<SetStateFromStorage|null> {
     const t: SQLTransaction = await this.asyncWrite();
     const f: unknown[][] = await Promise.all<unknown[]>([
       'select * from file',
@@ -176,7 +176,6 @@ export default class DatabaseWrapper implements IStorage {
       });
 
       const am: { [id: string]: MessageModel } = {};
-      const sendingMessages: MessageModel[] = [];
       dbMessages.forEach(m => {
         const message: MessageModel = {
           id: m.id,
@@ -196,9 +195,6 @@ export default class DatabaseWrapper implements IStorage {
           userId: m.userId,
           giphy: m.giphy
         };
-        if (m.sending) {
-          sendingMessages.push(message);
-        }
         if (roomsDict[m.roomId]) {
           roomsDict[m.roomId].messages[m.id] = message;
         }
@@ -236,7 +232,7 @@ export default class DatabaseWrapper implements IStorage {
         });
         channelsDict[c.id] = chm;
       });
-      return {sendingMessages, setRooms: {roomsDict, settings, profile, channelsDict, allUsersDict}};
+      return {roomsDict, settings, profile, channelsDict, allUsersDict};
     } else {
       return null;
     }

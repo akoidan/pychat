@@ -4,7 +4,10 @@ import {
   UploadFile,
   UserIdConn
 } from '@/ts/types/types';
-import { RoomModel } from '@/ts/types/model';
+import {
+  MessageModel,
+  RoomModel
+} from '@/ts/types/model';
 import MessageSenderPeerConnection from '@/ts/webrtc/message/MessageSenderPeerConnection';
 import MessageReceiverPeerConnection from '@/ts/webrtc/message/MessageReceiverPeerConnection';
 import WsHandler from '@/ts/message_handlers/WsHandler';
@@ -13,19 +16,23 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { sub } from '@/ts/instances/subInstance';
 import Subscription from '@/ts/classes/Subscription';
 import { MessageModelDto } from '@/ts/types/dto';
-import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
-import { InnerSendMessage } from '@/ts/types/messages/p2pMessages';
-import { ChangeDevicesMessage } from '@/ts/types/messages/innerMessages';
-import { HandlerTypes } from '@/ts/types/messages/baseMessagesInterfaces';
+import {
+  ChangeDevicesMessage,
+  SyncP2PMessage
+} from '@/ts/types/messages/innerMessages';
+import {
+  HandlerName,
+  HandlerType,
+  HandlerTypes
+} from '@/ts/types/messages/baseMessagesInterfaces';
 
 
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
 
-  protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, 'webrtcTransfer:*' | 'message'> = {
-    // changeDevices: <HandlerType<'changeDevices', 'message'>>this.changeDevices,
-    // removePeerConnection: <HandlerType<'removePeerConnection', 'webrtcTransfer:*'>>this.removePeerConnection,
+  protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, 'message'> = {
+    changeDevices: <HandlerType<'changeDevices', HandlerName>>this.changeDevices,
+    removePeerConnection: <HandlerType<'removePeerConnection', HandlerName>>this.removePeerConnection
   };
-
 
   private state: 'not_inited' |'initing' | 'waiting' | 'ready' = 'not_inited';
 
@@ -34,8 +41,15 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     sub.subscribe('message', this);
   }
 
-  syncMessage(roomId: number, messageId: number): Promise<void> {
-    throw new Error('Method not implemented.');
+  async syncMessage(roomId: number, messageId: number): Promise<void> {
+    if (await this.initConnectionIfRequired()) {
+      let payload : SyncP2PMessage  = {
+        action: 'syncP2pMessage',
+        handler:  Subscription.allPeerConnectionsForTransfer(this.connectionId!),
+        id: messageId
+      }
+      sub.notify(payload);
+    }
   }
 
   public async acceptConnection(message: { connId: string }) {
@@ -43,8 +57,11 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     this.connectionId = message.connId;
     this.refreshPeerConnections();
     this.state = 'ready';
-    debugger
-    this.syncMessage(1,2,);//TODO
+    await this.syncMessages();
+  }
+
+  public async syncMessages() {
+    await this.initConnectionIfRequired();
   }
 
   protected onDestroy() {
@@ -139,7 +156,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     return connections;
   }
 
-  private changeDevices(m: ChangeDevicesMessage): void {
+  public changeDevices(m: ChangeDevicesMessage): void {
     if (m.roomId != null && this.roomId !== m.roomId) {
       return;
     } else if (m.userId != null) {

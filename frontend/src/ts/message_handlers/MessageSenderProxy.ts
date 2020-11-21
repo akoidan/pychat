@@ -26,6 +26,15 @@ export class MessageSenderProxy {
     return this.storage.getMinMessageId();
   }
 
+  syncMessages() {
+    this.channelsHandler.syncMessages();
+    this.store.roomsArray.forEach(room => {
+      if (room.p2p) {
+        this.webrtcApi.getMessageHandler(room.id).syncMessages();
+      }
+    });
+  }
+
   getMessageSender(roomId: number): MessageSender {
     if (this.store.roomsDict[roomId].p2p) {
       return this.webrtcApi.getMessageHandler(roomId);

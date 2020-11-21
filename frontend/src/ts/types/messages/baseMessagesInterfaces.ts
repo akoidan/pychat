@@ -17,7 +17,7 @@ export interface ChangeUserOnlineBase extends UserDto {
 // any means that every every registered subscriber will be called with this handler if it exists
 // this means, that handler that registered this event will be called
 // void means that no handlers should process this signal
-export type HandlerName = 'router' | 'channels' | 'lan' | 'message' | 'webrtc' | 'ws'| 'void' |'this' | 'any' | 'call' | 'webrtcTransfer:*' | 'peerConnection:*';
+export type HandlerName = 'router' | 'channels' | 'lan' | 'message' | 'webrtc' | 'ws'| 'void' | 'any' | 'call' | 'webrtcTransfer:*' | 'peerConnection:*';
 export type CallHandlerName = HandlerName | 'dummyCall';
 
 export type HandlerType<A extends string, H extends HandlerName> = (a: DefaultInMessage<A, H | 'any'>) => void|Promise<void>;
@@ -62,6 +62,10 @@ export interface OfferFileContent extends BrowserBase {
 
 export interface BrowserBase {
   browser: string;
+}
+
+export interface CallBackMessage {
+  cbId?: number;
 }
 
 export interface DefaultMessage<A extends string> {

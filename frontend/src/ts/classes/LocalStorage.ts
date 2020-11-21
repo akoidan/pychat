@@ -3,7 +3,6 @@ import {
   IStorage,
   SetFileIdsForMessage,
   SetRoomsUsers,
-  StorageData
 } from '@/ts/types/types';
 import {
   ChannelModel,
@@ -14,6 +13,7 @@ import {
   UserModel
 } from '@/ts/types/model';
 import { Logger } from 'lines-logger';
+import { SetStateFromStorage } from '@/ts/types/dto';
 
 interface LocalStorageMessage {
   f: number;
@@ -77,7 +77,7 @@ export default class LocalStorage implements IStorage {
   public setUsers(users: UserModel[])  {}
   public saveUser(users: UserModel)  {}
 
-  public async getAllTree(): Promise<StorageData|null> {
+  public async getAllTree(): Promise<SetStateFromStorage|null> {
     return null;
   }
 

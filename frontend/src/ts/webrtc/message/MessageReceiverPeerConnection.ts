@@ -5,16 +5,8 @@ import MessagePeerConnection from '@/ts/webrtc/message/MessagePeerConnection';
 export default class MessageReceiverPeerConnection extends MessagePeerConnection {
   protected connectedToRemote: boolean = true;
 
-
   public ondatachannelclose(text: string): void {
    // TODO
-  }
-
-
-  private gotReceiveChannel(event: RTCDataChannelEvent) {
-    this.logger.debug('Received new channel')();
-    this.sendChannel = event.channel;
-    this.setupEvents();
   }
 
   public makeConnection() {
@@ -24,6 +16,12 @@ export default class MessageReceiverPeerConnection extends MessagePeerConnection
     this.status = 'inited';
     this.createPeerConnection();
     this.pc!.ondatachannel = this.gotReceiveChannel.bind(this);
+  }
+
+  private gotReceiveChannel(event: RTCDataChannelEvent) {
+    this.logger.debug('Received new channel')();
+    this.sendChannel = event.channel;
+    this.setupEvents();
   }
 
 }

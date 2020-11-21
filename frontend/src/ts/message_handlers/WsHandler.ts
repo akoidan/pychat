@@ -30,7 +30,7 @@ import {
 } from '@/ts/types/dto';
 import { sub } from '@/ts/instances/subInstance';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
-import AbstractMessageProcessor from '@/ts/message_handlers/AbstractMessageProcessor';
+import {WsMessageProcessor }from '@/ts/message_handlers/WsMessageProcessor';
 import {
   AddChannelMessage,
   AddInviteMessage,
@@ -88,7 +88,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   private readonly sessionHolder: SessionHolder;
   private listenWsTimeout: number|null = null;
   private readonly API_URL: string;
-  private readonly messageProc: AbstractMessageProcessor;
+  private readonly messageProc: WsMessageProcessor;
   private wsState: WsState = WsState.NOT_INITED;
 
   // this.dom = {
@@ -103,7 +103,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     super();
     sub.subscribe('ws', this);
     this.API_URL = API_URL;
-    this.messageProc = new AbstractMessageProcessor(this, store, 'ws');
+    this.messageProc = new WsMessageProcessor(this, store, 'ws');
     this.logger = loggerFactory.getLoggerColor('ws', '#2e631e');
     this.sessionHolder = sessionHolder;
     this.store = store;
