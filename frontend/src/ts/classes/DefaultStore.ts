@@ -49,7 +49,9 @@ import {
   SetSendingFileStatus,
   SetSendingFileUploaded,
   SetUploadProgress,
-  StringIdentifier
+  StringIdentifier,
+  LiveConnectionLocation,
+  RoomMessagesIds
 } from '@/ts/types/types';
 import {
   SetStateFromStorage,
@@ -518,12 +520,34 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public markMessageAsSent(m: RoomMessageIds) {
-    let message = this.roomsDict[m.roomId].messages[m.messageId];
-    if (message.sending) {
-      message.sending = false;
-      this.storage.markMessageAsSent(m.messageId);
+  public addLiveConnectionToRoom(m: LiveConnectionLocation) {
+    if (this.roomsDict[m.roomId].p2pInfo.liveConnections.indexOf(m.connection) >= 0) {
+      throw Error('This connection is already here');
     }
+    this.roomsDict[m.roomId].p2pInfo.liveConnections.push(m.connection);
+  }
+
+  @Mutation
+  public removeLiveConnectionToRoom(m: LiveConnectionLocation) {
+    let indexOf = this.roomsDict[m.roomId].p2pInfo.liveConnections.indexOf(m.connection);
+    if (indexOf < 0) {
+      throw Error('This connection is not present');
+    }
+    this.roomsDict[m.roomId].p2pInfo.liveConnections.splice(indexOf, 1);
+  }
+
+  @Mutation
+  public markMessageAsSent(m: RoomMessagesIds) {
+    let markSendingIds: number[] = []
+    m.messagesId.forEach(messageId => {
+      let message = this.roomsDict[m.roomId].messages[messageId];
+      if (message.sending) {
+        message.sending = false;
+        markSendingIds.push(messageId);
+      }
+    });
+    this.storage.markMessageAsSent(markSendingIds);
+
   }
 
   @Mutation
@@ -651,6 +675,11 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public setOnline(ids: Record<string, string[]>) {
+    Object.keys(ids).forEach(k => {
+      if (ids[k].length === 0) {
+        delete ids[k];
+      }
+    });
     this.onlineDict = ids;
   }
 

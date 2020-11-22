@@ -208,7 +208,7 @@ const timePattern = /^\(\d\d:\d\d:\d\d\)\s\w+:.*&gt;&gt;&gt;\s/;
             this.activeRoomId,
             md.currSymbol,
             md.files,
-            Date.now() - this.$ws.timeDiff,
+            this.activeRoom.p2p ? Date.now(): Date.now() - this.$ws.timeDiff,
             0
           );
         }

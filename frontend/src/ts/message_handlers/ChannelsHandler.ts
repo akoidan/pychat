@@ -55,11 +55,14 @@ import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { AudioPlayer } from '@/ts/classes/AudioPlayer';
 import {
   ChangeDevicesMessage,
+  InternetAppearMessage,
   LogoutMessage,
   PubSetRooms
 } from '@/ts/types/messages/innerMessages';
 import {
   AddRoomBase,
+  ChangeDeviceType,
+  HandlerName,
   HandlerType,
   HandlerTypes
 } from '@/ts/types/messages/baseMessagesInterfaces';
@@ -93,7 +96,6 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
 
   protected readonly handlers: HandlerTypes<keyof ChannelsHandler, 'channels'> = {
     init:  <HandlerType<'init', 'channels'>>this.init,
-    internetAppear:  <HandlerType<'internetAppear', 'channels'>>this.internetAppear,
     loadMessages:  <HandlerType<'loadMessages', 'channels'>>this.loadMessages,
     deleteMessage:  <HandlerType<'deleteMessage', 'channels'>>this.deleteMessage,
     editMessage:  <HandlerType<'editMessage', 'channels'>>this.editMessage,
@@ -109,7 +111,8 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     saveChannelSettings:  <HandlerType<'saveChannelSettings', 'channels'>>this.saveChannelSettings,
     deleteChannel:  <HandlerType<'deleteChannel', 'channels'>>this.deleteChannel,
     saveRoomSettings:  <HandlerType<'saveRoomSettings', 'channels'>>this.saveRoomSettings,
-    logout:  <HandlerType<'logout', 'channels'>>this.logout
+    logout:  <HandlerType<'logout', 'channels'>>this.logout,
+    internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear
   };
 
   // messageRetrier uses MessageModel.id as unique identifier, do NOT use it with any types but
@@ -289,12 +292,6 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     return this.handlers;
   }
 
-  public internetAppear() {
-    console.error("INTERNETAPPEAR")
-    // debugger
-    // this.messageRetrier.resendAllMessages(); TODO
-  }
-
   public loadMessages(lm: LoadMessages) {
     if (lm.content.length > 0) {
       this.addMessages(lm.roomId, lm.content);
@@ -343,26 +340,27 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     if (!this.store.allUsersDict[message.userId]) {
       const newVar: UserModel = convertUser(message);
       this.store.addUser(newVar);
+      // this is a new user, so there's no p2p rooms with him
+      // this.notifyDevicesChanged(message.userId, null);
     }
     if (message.content[message.userId].length === 1) {
       // exactly 1 device is now offline, so that new that appeared is the first one
       this.addChangeOnlineEntry(message.userId, message.time, 'appeared online');
     }
     this.store.setOnline(message.content);
-    this.notifyDevicesChanged(message.userId, null);
 
   }
 
-  private notifyDevicesChanged(userId: number|null, roomId: number|null) {
+  private notifyDevicesChanged(userId: number|null, roomId: number|null, type: ChangeDeviceType) {
     let message: ChangeDevicesMessage = {
       handler: 'message',
       action: 'changeDevices',
+      changeType: type,
       allowZeroSubscribers: true,
       roomId,
       userId
     };
-    console.error("TODO")
-    // sub.notify(message);
+    sub.notify(message);
   }
 
   public removeOnlineUser(message: RemoveOnlineUserMessage) {
@@ -370,7 +368,6 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
       this.addChangeOnlineEntry(message.userId, message.time, 'gone offline');
     }
     this.store.setOnline(message.content);
-    this.notifyDevicesChanged(message.userId, null);
   }
 
   public printMessage(inMessage: PrintMessage) {
@@ -385,7 +382,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     } else {
       this.logger.error('Unable to find room {} to delete', message.roomId)();
     }
-    this.notifyDevicesChanged(null, message.roomId);
+    this.notifyDevicesChanged(null, message.roomId, 'deleted');
   }
 
   public leaveUser(message: LeaveUserMessage) {
@@ -403,7 +400,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
         },
         roomIds: [message.roomId]
       });
-      this.notifyDevicesChanged(null, message.roomId);
+      this.notifyDevicesChanged(message.userId, message.roomId, 'left');
     } else {
       this.logger.error('Unable to find room {} to kick user', message.roomId)();
     }
@@ -452,7 +449,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
         userId: i
       }});
     })
-    this.notifyDevicesChanged(null, message.roomId);
+    this.notifyDevicesChanged(null, message.roomId, 'users_were_invited');
   }
 
   public deleteChannel(message: DeleteChannelMessage) {
@@ -497,7 +494,8 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
         userId: this.store.myId!
       }
     });
-    this.notifyDevicesChanged(null, r.id) // TODO messageTransferhandler should be created or should id?
+    // eiher I created this room, either I was invited to this room
+    this.notifyDevicesChanged(null, message.roomId, 'created') // TODO messageTransferhandler should be created or should id?
   }
 
 
@@ -577,4 +575,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     };
   }
 
+  public async internetAppear(m : InternetAppearMessage) {
+    this.syncMessages();
+  }
 }

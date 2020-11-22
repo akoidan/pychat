@@ -184,7 +184,7 @@ export interface CallInfoModel {
 }
 
 export interface P2pMessageModel {
-  amountOfActiveConnections: number;
+  liveConnections: string[];
 }
 
 export interface CallsInfoModel {

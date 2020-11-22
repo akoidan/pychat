@@ -7,6 +7,7 @@ import { WebRtcMessageModelDto } from '@/ts/types/dto';
 import {
   CallBackMessage,
   DefaultMessage,
+  ResolveCallbackId,
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import {
   MessageP2pDto,
@@ -20,26 +21,28 @@ export type P2PHandlerTypes<K extends string> = {
   [Key in K]?: P2PHandlerType<Key>
 };
 
-export interface DefaultP2pMessage<A extends string> extends DefaultMessage<A>  {
-  cbId?: number; // request to send response with this callback id
-  resolveCbId?: number; // if this callback id is present, resolve it
+export interface DefaultP2pMessage<A extends string> extends DefaultMessage<A>, ResolveCallbackId {
+
 }
 
 
-export interface ExchangeMessageInfoResponse extends DefaultP2pMessage<'exchangeMessageInfoRequest'>, CallBackMessage {
+export interface ExchangeMessageInfoResponse3 extends DefaultP2pMessage<'exchangeMessageInfoResponse3'>, CallBackMessage {
+}
+
+export interface ExchangeMessageInfoResponse extends DefaultP2pMessage<'exchangeMessageInfoResponse'>, CallBackMessage {
   messages: MessageP2pDto[];
   requestMessages: number[];
 }
 
-export interface ExchangeMessageInfoResponseToResponse extends DefaultP2pMessage<'exchangeMessageInfoResponseToResponse'>, CallBackMessage {
+export interface ExchangeMessageInfoResponse2 extends DefaultP2pMessage<'exchangeMessageInfoResponse2'>, CallBackMessage {
   messages: MessageP2pDto[];
 }
 
-export interface ExchangeMessageInfoRequest extends DefaultP2pMessage<'exchangeMessageInfoRequest'> {
+export interface ExchangeMessageInfoRequest extends DefaultP2pMessage<'exchangeMessageInfoRequest'>, CallBackMessage {
   messagesInfo: MessagesInfo;
 }
 
-export interface SendNewP2PMessage extends DefaultP2pMessage<'sendNewP2PMessage'> {
+export interface SendNewP2PMessage extends DefaultP2pMessage<'sendNewP2PMessage'>, CallBackMessage {
   message: MessageP2pDto;
 }
 

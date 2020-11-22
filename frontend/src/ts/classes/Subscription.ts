@@ -8,6 +8,7 @@ import {
 import { DefaultInnerSystemMessage } from '@/ts/types/messages/innerMessages';
 
 export default class Subscription {
+  // TODO sub should unsubscribe from some events on logout
 
   public channels: Partial<Record<HandlerName, IMessageHandler[]>> = {};
   private readonly logger: Logger;

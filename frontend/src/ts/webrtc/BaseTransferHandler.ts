@@ -9,6 +9,7 @@ import Subscription from '@/ts/classes/Subscription';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import {
   DestroyPeerConnectionMessage,
+  InternetAppearMessage,
   RemovePeerConnectionMessage
 } from '@/ts/types/messages/innerMessages';
 

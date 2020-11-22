@@ -25,11 +25,16 @@ import {
   OfferMessage
 } from '@/ts/types/messages/wsInMessages';
 import {
+  HandlerName,
   HandlerType,
   HandlerTypes
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import { VideoType } from '@/ts/types/types';
-import { LogoutMessage } from '@/ts/types/messages/innerMessages';
+import {
+  ChangeDevicesMessage,
+  InternetAppearMessage,
+  LogoutMessage
+} from '@/ts/types/messages/innerMessages';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 
 export default class WebRtcApi extends MessageHandler {
@@ -38,16 +43,18 @@ export default class WebRtcApi extends MessageHandler {
 
   protected readonly handlers: HandlerTypes<keyof WebRtcApi, 'webrtc'>  = {
     offerFile: <HandlerType<'offerFile', 'webrtc'>>this.onofferFile,
+    changeDevices: <HandlerType<'changeDevices', HandlerName>>this.changeDevices,
     offerCall: <HandlerType<'offerCall', 'webrtc'>>this.offerCall,
     offerMessage: <HandlerType<'offerMessage', 'webrtc'>>this.offerMessage,
-    logout: <HandlerType<'logout', 'webrtc'>>this.logout // TODO should be any
+    logout: <HandlerType<'logout', HandlerName>>this.logout,
+    internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear
   };
 
   private readonly wsHandler: WsHandler;
   private readonly store: DefaultStore;
   private readonly notifier: NotifierHandler;
   private readonly callHandlers: {[id: number]: CallHandler} = {};
-  private readonly messageHandlers: {[id: number]: MessageTransferHandler} = {};
+  private readonly messageHandlers: Record<number, MessageTransferHandler> = {};
   private readonly messageHelper: MessageHelper;
 
   constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper) {
@@ -64,6 +71,39 @@ export default class WebRtcApi extends MessageHandler {
     this.getCallHandler(message.roomId).initAndDisplayOffer(message);
   }
 
+  public async changeDevices(m: ChangeDevicesMessage): Promise<void> {
+
+    let isP2PandExists: boolean = this.store.roomsDict[m.roomId!]?.p2p;
+    if (m.changeType === 'joined' && isP2PandExists) {
+      this.getMessageHandler(m.roomId!)
+    } else if (m.changeType === 'deleted') {
+      let mh: MessageTransferHandler = this.messageHandlers[m.roomId!];
+      if (mh) {
+        mh.destroyThisTransferHandler();
+      }
+      delete this.messageHandlers[m.roomId!];
+      // 'left'| 'joined'| 'created' | 'deleted' | 'users_were_invited'
+    } else if (m.changeType === 'created' && isP2PandExists) {
+      this.getMessageHandler(m.roomId!);
+    } else if (m.changeType === 'users_were_invited') {
+      // TODO
+    } else if (m.changeType === 'left' && isP2PandExists) {
+      // sync
+    }
+
+  }
+
+  initAndSyncMessages() {
+    this.store.roomsArray.forEach(room => {
+      if (room.p2p) {
+        this.getMessageHandler(room.id).init();
+      }
+    });
+  }
+
+  public internetAppear(m :InternetAppearMessage) {
+    this.initAndSyncMessages();
+  }
 
   public offerMessage(message: OfferMessage) {
     this.getMessageHandler(message.roomId).acceptConnection(message);
@@ -175,4 +215,6 @@ export default class WebRtcApi extends MessageHandler {
       new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, message.content.size);
     }
   }
+
+
 }

@@ -103,7 +103,7 @@ export function getRoomsBaseDict(
     volume,
     p2p,
     p2pInfo: {
-      amountOfActiveConnections: 0
+      liveConnections: []
     },
     callInfo: {
       calls: {},
@@ -193,7 +193,7 @@ export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageMode
     giphy: m.giphy,
     id: m.id,
     symbol: m.symbol,
-    time: Date.now() + m.timeAgo,
+    time: Date.now() - m.timeAgo,
     userId: m.userId,
     sending: false,
     roomId,

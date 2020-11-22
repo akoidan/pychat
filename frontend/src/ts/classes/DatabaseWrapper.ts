@@ -273,9 +273,9 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
-  public markMessageAsSent(messageId: number) {
+  public markMessageAsSent(messageIds: number[]) {
     this.write(t => {
-      this.executeSql(t, 'update message set sending = 0 where id = ?', [messageId]);
+      this.executeSql(t, 'update message set sending = 0 where id in (?)', [messageIds]);
     });
   }
 

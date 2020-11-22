@@ -38,14 +38,6 @@ export class MessageSenderProxy {
     return - (this.getRandomInt(ID_RANGE)  + myId * ID_RANGE);
   }
 
-  syncMessages() {
-    this.channelsHandler.syncMessages();
-    this.store.roomsArray.forEach(room => {
-      if (room.p2p) {
-        this.webrtcApi.getMessageHandler(room.id).syncMessages();
-      }
-    });
-  }
 
   getMessageSender(roomId: number): MessageSender {
     if (this.store.roomsDict[roomId].p2p) {

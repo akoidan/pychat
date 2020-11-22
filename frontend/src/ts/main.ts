@@ -233,7 +233,10 @@ async function init() {
   }
 
   initStore(logger, storage).then(value => {
-    messageSenderProxy.syncMessages();
+    if (ws.isWsOpen()) { // don't sync twice, if ws is closed, this will sync on interneat appear message
+      channelsHandler.syncMessages();
+      webrtcApi.initAndSyncMessages()
+    }
   }).catch(e => {
     logger.error('Unable to init store from db, because of', e)();
   });

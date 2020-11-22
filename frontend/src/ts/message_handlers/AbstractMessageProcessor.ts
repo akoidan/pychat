@@ -38,15 +38,15 @@ export default class AbstractMessageProcessor {
     this.logger = loggerFactory.getLoggerColor('mes-proc', '#2e631e');
   }
 
-  private logData(logger: Logger, jsonData: string, message: DefaultMessage<string>) {
+  private logData(logger: Logger, jsonData: string, message: DefaultMessage<string>): () => void {
     let raw = jsonData;
     if (raw.length > 1000) {
       raw = '';
     }
     if (message.action === 'ping' || message.action === 'pong') {
-      logger.debug('{} {}', raw, message)();
+      return logger.debug('{} {}', raw, message);
     } else {
-      logger.log('{} {}', raw, message)();
+      return logger.log('{} {}', raw, message);
     }
   }
 
@@ -78,7 +78,7 @@ export default class AbstractMessageProcessor {
       this.callBacks[message.cbId!] = {resolve, reject}
       let isSent = this.target.sendRawTextToServer(jsonMessage);
       if (isSent) {
-        this.logData(this.loggerOut, jsonMessage, message);
+        this.logData(this.loggerOut, jsonMessage, message)();
       }
     })
 
@@ -88,7 +88,7 @@ export default class AbstractMessageProcessor {
     let jsonMessage = this.getJsonMessage(message);
     let isSent = this.target.sendRawTextToServer(jsonMessage);
     if (isSent) {
-      this.logData(this.loggerOut, jsonMessage, message);
+      this.logData(this.loggerOut, jsonMessage, message)();
     }
     return isSent;
   }

@@ -59,12 +59,14 @@ export interface OfferFileContent extends BrowserBase {
   size: number;
   name: string;
 }
+export type ChangeDeviceType = 'left'| 'joined'| 'created' | 'deleted' | 'users_were_invited';
 
 export interface BrowserBase {
   browser: string;
 }
 
 export interface CallBackMessage {
+  // request to send response with this callback id
   cbId?: number;
 }
 
@@ -74,6 +76,10 @@ export interface DefaultMessage<A extends string> {
 
 export interface DefaultInMessage<A extends string, H extends HandlerName> extends DefaultMessage <A> {
   handler: H;
+}
+
+export interface  ResolveCallbackId {
+  resolveCbId?: number; // if this callback id is present, resolve it
 }
 
 export interface IMessageHandler {

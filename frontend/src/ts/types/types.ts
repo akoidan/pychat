@@ -66,7 +66,6 @@ export interface SetDevices {
 
 export interface MessageSender {
   syncMessage(roomId: number, messageId: number):  Promise<void>;
-  syncMessages(): Promise<void>;
   addMessages(roomId: number, messages: MessageModelDto[]): void;
 }
 
@@ -152,6 +151,10 @@ export interface RoomMessageIds {
   messageId: number;
   roomId: number;
 }
+export interface RoomMessagesIds {
+  messagesId: number[];
+  roomId: number;
+}
 
 export interface MessageSupplier {
   sendRawTextToServer(message: string): boolean;
@@ -182,7 +185,7 @@ export interface IStorage {
   connect(): Promise<boolean>;
   // getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
   setRoomHeaderId(roomId: number, value: number): void;
-  markMessageAsSent(messageId: number): void;
+  markMessageAsSent(messagesId: number[]): void;
 }
 
 export interface  PostData<T> {
@@ -238,6 +241,11 @@ export interface SetSendingFileStatus extends SetSendingFileBase {
 export interface MessagesLocation {
   roomId: number;
   messages: MessageModel[];
+}
+
+export interface LiveConnectionLocation {
+  roomId: number;
+  connection: string;
 }
 
 export interface PrivateRoomsIds {

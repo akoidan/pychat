@@ -9,6 +9,7 @@ import {
   UserDto
 } from '@/ts/types/dto';
 import {
+  ChangeDeviceType,
   DefaultInMessage,
   HandlerName
 } from '@/ts/types/messages/baseMessagesInterfaces';
@@ -42,6 +43,7 @@ export interface RouterNavigateMessage extends DefaultInnerSystemMessage<'naviga
 
 export interface ChangeDevicesMessage extends DefaultInnerSystemMessage<'changeDevices', 'message'>  {
   allowZeroSubscribers: true;
+  changeType: ChangeDeviceType;
   roomId: number|null;
   userId: number|null;
 }

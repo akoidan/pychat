@@ -18,6 +18,7 @@ import Subscription from '@/ts/classes/Subscription';
 import { MessageModelDto } from '@/ts/types/dto';
 import {
   ChangeDevicesMessage,
+  InternetAppearMessage,
   SyncP2PMessage
 } from '@/ts/types/messages/innerMessages';
 import {
@@ -31,22 +32,23 @@ import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
 
   protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, 'message'> = {
-    changeDevices: <HandlerType<'changeDevices', HandlerName>>this.changeDevices,
-    removePeerConnection: <HandlerType<'removePeerConnection', HandlerName>>this.removePeerConnection
+    removePeerConnection: <HandlerType<'removePeerConnection', HandlerName>>this.removePeerConnection,
+    internetAppear: <HandlerType<'internetAppear', HandlerName>>this.internetAppear,
   };
 
-  private state: 'not_inited' |'initing' | 'no_opponents' | 'ready' = 'not_inited';
+  private state: 'not_inited' |'initing' | 'ready' = 'not_inited';
   private readonly messageHelper: MessageHelper;
 
   constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper) {
     super(roomId, wsHandler, notifier, store);
     this.messageHelper = messageHelper;
     sub.subscribe('message', this);
+    sub.subscribe('lan', this);
   }
 
   async syncMessage(roomId: number, messageId: number): Promise<void> {
     this.messageHelper.processAnyMessage()
-    if (await this.initConnectionIfRequired()) {
+    if (this.state === 'ready') {
       let payload : SyncP2PMessage  = {
         action: 'syncP2pMessage',
         handler:  Subscription.allPeerConnectionsForTransfer(this.connectionId!),
@@ -57,22 +59,57 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     }
   }
 
-  public async acceptConnection(message: { connId: string }) {
-    if (this.state === 'initing') {
-      return
-    }
-    this.state = 'initing';
-    this.connectionId = message.connId;
-    this.refreshPeerConnections();
-    this.state = 'ready';
+
+  public destroyThisTransferHandler() {
+    sub.notify({
+      action: 'checkDestroy',
+      handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
+    });
   }
 
-  public async syncMessages() {
-    await this.initConnectionIfRequired();
+  public async init() {
+    if (this.state === 'not_inited') {
+      this.state = 'initing';
+      try {
+        let {connId} =  await this.wsHandler.offerMessageConnection(this.roomId);
+        if (!connId) {
+          throw Error('Error during setting connection ID');
+        }
+        // @ts-ignore: next-line
+        if (this.state !== 'ready') { // already inited in another place, like in accept connection
+          this.connectionId = connId;
+          this.state = 'ready';
+          await this.refreshPeerConnections();
+        }
+      } catch (e) {
+        this.state = 'not_inited';
+      }
+    }
+  }
+
+  public async internetAppear(payload: InternetAppearMessage) {
+    // if state is initing, refresh connection will be triggered when it finishes
+    if (this.state === 'not_inited') { // if it's not inited , refresh connection wil trigger inside this init()
+      await this.init();
+    } else if (this.state === 'ready') { // if it's ready, we should check if new devices appeard while we were offline
+      this.refreshPeerConnections();
+    }
+  }
+
+  public async acceptConnection(message: { connId: string }) {
+    // if connection is initing, we make it ready, so init would not refresh connection again
+    // if connection is not_inited, this assignments initializes it.
+    // if connection is ready already, we should refresh the connection to create a new PeerConnection for opponent device
+    this.connectionId = message.connId;
+    this.state = 'ready';
+    // this means user probably appears online, we should refresh connections
+    this.refreshPeerConnections();
   }
 
   protected onDestroy() {
+    super.onDestroy();
     sub.unsubscribe('message', this);
+    sub.unsubscribe('lan', this);
   }
 
   private refreshPeerConnections() {
@@ -108,35 +145,25 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
         mpc.makeConnection();
       }
     });
-    let newConnectionIds: string[] = newConnectionIdsWithUser.map(a => a.connectionId);
+    // let newConnectionIds: string[] = newConnectionIdsWithUser.map(a => a.connectionId);
 
-    let connectionsToRemove = this.webrtcConnnectionsIds.filter(oldC => newConnectionIds.indexOf(oldC) < 0);
+    // let connectionsToRemove = this.webrtcConnnectionsIds.filter(oldC => newConnectionIds.indexOf(oldC) < 0);
     sub.notify({
       action: 'checkDestroy',
       handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
     });
   }
 
-  private async initConnectionIfRequired() {
-    if (this.state === 'not_inited' || this.state === 'no_opponents') {
-      if (this.connectionIds.length > 0) {
-        this.state = 'initing';
-        let {connId} =  await this.wsHandler.offerMessageConnection(this.roomId);
-        this.connectionId = connId;
-        this.refreshPeerConnections();
-        this.state = 'ready';
-      } else {
-        this.state = 'no_opponents';
-      }
-    }
-    return this.state === 'ready';
-  }
+
 
   private get room(): RoomModel {
     return this.store.roomsDict[this.roomId];
   }
 
   private get connectionIds(): UserIdConn[] {
+    if (!this.room) {
+      return []
+    }
     let usersIds = this.room.users;
     let myConnectionId = this.wsHandler.getWsConnectionId();
     let connections = usersIds.reduce((connectionIdsWithUser, userId) => {
@@ -152,22 +179,6 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     return connections;
   }
 
-  public changeDevices(m: ChangeDevicesMessage): void {
-    if (m.roomId != null && this.roomId !== m.roomId) {
-      return;
-    } else if (m.userId != null) {
-      if (this.room.users.indexOf(m.userId) < 0) {
-        return;
-      }
-    } else {
-      throw Error('WTF is this message');
-    }
-    if (this.state === 'not_inited') {
-      this.initConnectionIfRequired()
-    } else if (this.state !== 'initing') {
-      this.refreshPeerConnections();
-    }
-  }
 
   addMessages(roomId: number, messages: MessageModelDto[]): void {
     this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
