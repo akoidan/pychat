@@ -275,7 +275,7 @@ export default class DatabaseWrapper implements IStorage {
 
   public markMessageAsSent(messageIds: number[]) {
     this.write(t => {
-      this.executeSql(t, 'update message set sending = 0 where id in (?)', [messageIds]);
+      this.executeSql(t, `update message set sending = 0 where id in (${messageIds.join(', ')})`, [])();
     });
   }
 
@@ -385,7 +385,7 @@ export default class DatabaseWrapper implements IStorage {
     this.write(t => {
       this.executeSql(t, 'delete from file where message_id = ?', [id], (t) => {
         this.executeSql(t, 'delete from message where id = ? ', [id])();
-      });
+      })();
     });
   }
 
@@ -465,7 +465,7 @@ export default class DatabaseWrapper implements IStorage {
         reject({sql, e});
 
         return false;
-      });
+      })();
     });
   }
 

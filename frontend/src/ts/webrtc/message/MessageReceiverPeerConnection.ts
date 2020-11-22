@@ -18,7 +18,7 @@ export default class MessageReceiverPeerConnection extends MessagePeerConnection
   }
 
   private gotReceiveChannel(event: RTCDataChannelEvent) {
-    this.logger.debug('Received new channel')();
+    this.logger.log('Received new channel')();
     this.sendChannel = event.channel;
     this.setupEvents();
   }

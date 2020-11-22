@@ -141,39 +141,6 @@ function declareMixins() {
 }
 
 
-async function initStore(logger: Logger, storage: IStorage):Promise<boolean> {
-  store.setStorage(storage); // TODO mvoe to main
-  const isNew = await storage.connect();
-  if (!isNew) {
-    const data: SetStateFromStorage | null = await storage.getAllTree();
-    const session = sessionHolder.session;
-    logger.log('restored state from db {}, userId: {}, session {}', data, store.userInfo && store.userInfo.userId, session)();
-    if (data) {
-      if (!store.userInfo && session) {
-        store.setStateFromStorage(data);
-      } else {
-        store.roomsArray.forEach((storeRoom: RoomModel) => {
-          if (data.roomsDict[storeRoom.id]) {
-            const dbMessages: { [id: number]: MessageModel } = data.roomsDict[storeRoom.id].messages;
-            for (const dbMessagesKey in dbMessages) {
-              if (!storeRoom.messages[dbMessagesKey]) {
-                // TODO we put it into db again :(
-                // we're saving it to database, we restored this message from.
-                // seems like we can't split 2 methods, since 1 should be in actions
-                // and one in mutation, but storage is not available in actions
-                store.addMessage(dbMessages[dbMessagesKey]);
-              }
-            }
-          }
-        });
-        logger.debug('Skipping settings state {}', data)();
-      }
-    }
-  }
-  logger.log('Store has been successfully inited')();
-  return isNew;
-}
-
 async function init() {
   declareMixins();
   declareDirectives();
@@ -232,14 +199,43 @@ async function init() {
     logger.log('Constants {}', constants)();
   }
 
-  initStore(logger, storage).then(value => {
-    if (ws.isWsOpen()) { // don't sync twice, if ws is closed, this will sync on interneat appear message
-      channelsHandler.syncMessages();
-      webrtcApi.initAndSyncMessages()
+  store.setStorage(storage);
+
+  const isNew = await storage.connect();
+
+  if (!isNew) {
+    const data: SetStateFromStorage | null = await storage.getAllTree();
+    const session = sessionHolder.session;
+    logger.log('restored state from db {}, userId: {}, session {}', data, store.myId, session)();
+    if (data) {
+      if (!store.userInfo && session) {
+        store.setStateFromStorage(data);
+      } else {
+        store.roomsArray.forEach((storeRoom: RoomModel) => {
+          if (data.roomsDict[storeRoom.id]) {
+            const dbMessages: { [id: number]: MessageModel } = data.roomsDict[storeRoom.id].messages;
+            for (const dbMessagesKey in dbMessages) {
+              if (!storeRoom.messages[dbMessagesKey]) {
+                // TODO we put it into db again :(
+                // we're saving it to database, we restored this message from.
+                // seems like we can't split 2 methods, since 1 should be in actions
+                // and one in mutation, but storage is not available in actions
+                store.addMessage(dbMessages[dbMessagesKey]);
+              }
+            }
+          }
+        });
+        logger.debug('Skipping settings state {}', data)();
+      }
     }
-  }).catch(e => {
-    logger.error('Unable to init store from db, because of', e)();
-  });
+    // sync is not required here, I tested every time this code branch is executed messages sync even if we don't use it here.
+    // weird ha? they could be not in the storage ...
+    // if (ws.isWsOpen()) {
+    //   logger.error("Init ws open")();
+    //   // channelsHandler.syncMessages();
+    //   // webrtcApi.initAndSyncMessages()
+    // }
+  }
 
 }
 

@@ -242,7 +242,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
     this.sendChannel!.onmessage = this.onChannelMessage.bind(this);
     this.sendChannel!.onopen = () => {
-      this.logger.debug('Channel opened')();
+      this.logger.log('Channel opened')();
       if (this.getWsConnectionId() > this.opponentWsId) {
         this.syncMessages();
       }

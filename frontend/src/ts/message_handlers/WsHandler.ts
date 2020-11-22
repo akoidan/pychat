@@ -259,7 +259,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public startListening() {
-    this.logger.debug('Starting webSocket')();
+    this.logger.log('Starting webSocket')();
     if (!this.listenWsTimeout && !this.ws) {
       this.listenWS();
     }

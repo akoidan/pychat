@@ -80,19 +80,12 @@ export default class WebRtcApi extends MessageHandler {
       }
       delete this.messageHandlers[m.roomId!];
       return;
-    }
-    if (!this.store.roomsDict[m.roomId!]?.p2p) {
-      return ;
-    }
-    if (m.changeType === 'someone_left') {
-      // destroy peer connection in this room
-      this.getMessageHandler(m.roomId!).refreshPeerConnections()
-    } else {
-      //  'room_created' -- send to everyone when new room is created
+    } else if (this.store.roomsDict[m.roomId!]?.p2p) {
+      //  'someone_left' - destroy peer connection in this room
+      //  'room_created' - send to everyone when new room is created
       //  'someone_joined' - send to everyone when someone joins the room, but the member who joins receives 'invited'
-      this.getMessageHandler(m.roomId!).init()
+      await this.getMessageHandler(m.roomId!).initOrSync();
     }
-
   }
 
   initAndSyncMessages() {
