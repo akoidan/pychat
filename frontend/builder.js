@@ -568,7 +568,8 @@ async function setup() {
 
     ['SIGINT', 'SIGTERM'].forEach(signal => {
       process.on(signal, () => {
-        server.close()
+        server.close();
+        process.exit(); // otherwise `yarn run dev is killed but` `node ./builder.js` is still there
       });
     });
 

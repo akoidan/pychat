@@ -24,7 +24,7 @@ export default class FileHandler extends BaseTransferHandler {
   constructor(roomId: number, connId: string, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, file: File, time: number) {
     super(roomId, wsHandler, notifier, store);
     this.file = file;
-    this.connectionId = connId;
+    this.setConnectionId(connId);
     sub.subscribe(Subscription.getTransferId(connId), this);
     const payload: SendingFile = {
       roomId,

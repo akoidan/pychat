@@ -47,7 +47,7 @@ import {
 
 Vue.use(VueRouter);
 
-const logger: Logger = loggerFactory.getLoggerColor('router', '#057f59');
+const logger: Logger = loggerFactory.getLogger('router');
 
 export const router = new VueRouter({
   routes: [

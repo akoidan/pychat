@@ -28,12 +28,14 @@ import {
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 
-
+/**
+ *
+ * https://drive.google.com/file/d/1BCtFNNWprfobqQlG4n2lPyWEqroi7nJh/view
+ */
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
 
   protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, 'message'> = {
     removePeerConnection: <HandlerType<'removePeerConnection', HandlerName>>this.removePeerConnection,
-    internetAppear: <HandlerType<'internetAppear', HandlerName>>this.internetAppear,
   };
 
   private state: 'not_inited' |'initing' | 'ready' = 'not_inited';
@@ -43,7 +45,6 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     super(roomId, wsHandler, notifier, store);
     this.messageHelper = messageHelper;
     sub.subscribe('message', this);
-    sub.subscribe('lan', this);
   }
 
   async syncMessage(roomId: number, messageId: number): Promise<void> {
@@ -77,7 +78,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
         }
         // @ts-ignore: next-line
         if (this.state !== 'ready') { // already inited in another place, like in accept connection
-          this.connectionId = connId;
+          this.setConnectionId(connId);
           this.state = 'ready';
           await this.refreshPeerConnections();
         }
@@ -87,7 +88,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     }
   }
 
-  public async internetAppear(payload: InternetAppearMessage) {
+  public async initOrSync() {
     // if state is initing, refresh connection will be triggered when it finishes
     if (this.state === 'not_inited') { // if it's not inited , refresh connection wil trigger inside this init()
       await this.init();
@@ -96,11 +97,11 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     }
   }
 
-  public async acceptConnection(message: { connId: string }) {
+  public async acceptConnection({ connId }: {connId: string}) {
     // if connection is initing, we make it ready, so init would not refresh connection again
     // if connection is not_inited, this assignments initializes it.
     // if connection is ready already, we should refresh the connection to create a new PeerConnection for opponent device
-    this.connectionId = message.connId;
+    this.setConnectionId(connId);
     this.state = 'ready';
     // this means user probably appears online, we should refresh connections
     this.refreshPeerConnections();
@@ -109,10 +110,9 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   protected onDestroy() {
     super.onDestroy();
     sub.unsubscribe('message', this);
-    sub.unsubscribe('lan', this);
   }
 
-  private refreshPeerConnections() {
+  public refreshPeerConnections() {
     let myConnectionId = this.wsHandler.getWsConnectionId();
     let newConnectionIdsWithUser = this.connectionIds;
     newConnectionIdsWithUser.forEach(connectionIdWithUser => {
@@ -151,6 +151,7 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     sub.notify({
       action: 'checkDestroy',
       handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
+      allowZeroSubscribers: true
     });
   }
 

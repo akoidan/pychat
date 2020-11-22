@@ -26,7 +26,7 @@ export class MessageHelper {
 
   constructor(store: DefaultStore, notifier: NotifierHandler, messageBus: Vue, audioPlayer: AudioPlayer) {
     this.store = store;
-    this.logger = loggerFactory.getLoggerColor('messageHelper', '#942f00');
+    this.logger = loggerFactory.getLogger('messageHelper');
     this.audioPlayer = audioPlayer;
     this.messageBus = messageBus;
     this.notifier = notifier;

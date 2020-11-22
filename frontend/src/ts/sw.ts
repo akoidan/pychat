@@ -4,7 +4,7 @@ import loggerFactory from '@/ts/instances/loggerFactory';
 
 declare var clients: any;
 
-const logger: Logger = loggerFactory.getLoggerColor('SW_S', '#a76f00');
+const logger: Logger = loggerFactory.getLogger('SW_S');
 
 //
 const SW_VERSION = '1.5';

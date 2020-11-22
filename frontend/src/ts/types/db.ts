@@ -1,3 +1,5 @@
+import { LogLevel } from 'lines-logger';
+
 export interface UserDB {
   id: number;
   user: string;
@@ -64,7 +66,7 @@ export interface SettingsDB {
   sendLogs: BooleanDB;
   suggestions: BooleanDB;
   theme: string;
-  logs: BooleanDB;
+  logs: LogLevel;
 }
 
 export interface ProfileDB {

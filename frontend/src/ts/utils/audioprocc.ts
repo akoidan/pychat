@@ -7,7 +7,7 @@ import loggerFactory from '@/ts/instances/loggerFactory';
 
 let audioContext: AudioContext;
 const audioProcesssors: JsAudioAnalyzer[] = [];
-const logger: Logger = loggerFactory.getLoggerColor('audio', 'yellow');
+const logger: Logger = loggerFactory.getLogger('audio');
 if (IS_DEBUG) {
   window.audioProcesssors = audioProcesssors;
 }

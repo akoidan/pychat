@@ -9,7 +9,7 @@ export class AudioPlayer {
 
   constructor(notifier: NotifierHandler) {
     this.notifier = notifier;
-    this.logger = loggerFactory.getLoggerColor('audio', 'green');
+    this.logger = loggerFactory.getLogger('audio');
   }
 
   checkAndPlay(element: HTMLAudioElement, volume: number) {

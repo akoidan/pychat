@@ -25,7 +25,7 @@ import { Logger } from 'lines-logger';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
-const logger: Logger = loggerFactory.getLoggerColor('htmlApi', '#007a70');
+const logger: Logger = loggerFactory.getLogger('htmlApi');
 
 export const savedFiles: { [id: string]: Blob } = {};
 
@@ -156,7 +156,7 @@ export function placeCaretAtEnd(userMessage: HTMLElement) {
 }
 
 export function encodeMessage(data: MessageModel) {
-  logger.trace('Encoding message {}: {}', data.id, data)();
+  logger.debug('Encoding message {}: {}', data.id, data)();
   if (data.giphy) {
     return `<div class="giphy"><img src='${data.giphy}' /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>`;
   } else {

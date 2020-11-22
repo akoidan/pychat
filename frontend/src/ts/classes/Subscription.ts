@@ -14,7 +14,7 @@ export default class Subscription {
   private readonly logger: Logger;
 
   constructor() {
-    this.logger = loggerFactory.getLoggerColor('sub', '#3a7a7a');
+    this.logger = loggerFactory.getLogger('sub');
   }
 
   public static getPeerConnectionId(connectionId: string, opponentWsId: string): 'peerConnection:*' {

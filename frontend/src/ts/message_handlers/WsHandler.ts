@@ -5,7 +5,6 @@ import {
 } from '@/ts/utils/consts';
 import {
   Logger,
-  LogStrict
 } from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
@@ -104,7 +103,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     sub.subscribe('ws', this);
     this.API_URL = API_URL;
     this.messageProc = new WsMessageProcessor(this, store, 'ws');
-    this.logger = loggerFactory.getLoggerColor('ws', '#2e631e');
+    this.logger = loggerFactory.getLoggerColor('ws', '#4c002b');
     this.sessionHolder = sessionHolder;
     this.store = store;
   }
@@ -359,13 +358,6 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  private sendToServer<T extends DefaultWsOutMessage<string>>(messageRequest: T, skipGrowl = false): boolean {
-    const isSent = this.messageProc.sendToServer(messageRequest);
-    if (!isSent && !skipGrowl) {
-      this.store.growlError('Can\'t send message, because connection is lost :(');
-    }
-    return isSent;
-  }
 
   public setSettings(m: SetSettingsMessage) {
     const a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
@@ -399,7 +391,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     sub.notify(pubSetRooms);
     const inetAppear: InternetAppearMessage = {
       action: 'internetAppear',
-      handler: 'lan'
+      handler: 'any'
     };
     sub.notify(inetAppear);
     this.logger.debug('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
@@ -433,7 +425,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   private setUserSettings(userInfo: UserSettingsDto) {
     const um: UserSettingsDto = userSettingsDtoToModel(userInfo);
     if (!IS_DEBUG) {
-      loggerFactory.setLogWarnings(userInfo.logs ? LogStrict.TRACE : LogStrict.DISABLE_LOGS);
+      loggerFactory.setLogWarnings(userInfo.logs ?? 'debug');
     }
     this.store.setUserSettings(um);
   }
@@ -566,6 +558,15 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       this.logger.debug('Connection has been established')();
     };
   }
+
+  private sendToServer<T extends DefaultWsOutMessage<string>>(messageRequest: T, skipGrowl = false): boolean {
+    const isSent = this.messageProc.sendToServer(messageRequest);
+    if (!isSent && !skipGrowl) {
+      this.store.growlError('Can\'t send message, because connection is lost :(');
+    }
+    return isSent;
+  }
+
 
   private startNoPingTimeout() {
     if (this.noServerPingTimeout) {

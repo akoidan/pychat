@@ -157,7 +157,7 @@ async function initStore(logger: Logger, storage: IStorage):Promise<boolean> {
             const dbMessages: { [id: number]: MessageModel } = data.roomsDict[storeRoom.id].messages;
             for (const dbMessagesKey in dbMessages) {
               if (!storeRoom.messages[dbMessagesKey]) {
-                console.error("// do we put into database again what we loada");
+                // TODO we put it into db again :(
                 // we're saving it to database, we restored this message from.
                 // seems like we can't split 2 methods, since 1 should be in actions
                 // and one in mutation, but storage is not available in actions
@@ -181,7 +181,7 @@ async function init() {
   const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
   const api: Api = new Api(xhr);
 
-  const storage: IStorage = window.openDatabase! ? new DatabaseWrapper('v135') : new LocalStorage();
+  const storage: IStorage = window.openDatabase! ? new DatabaseWrapper() : new LocalStorage();
   const WS_URL = WS_API_URL.replace('{}', window.location.host);
   const ws: WsHandler = new WsHandler(WS_URL, sessionHolder, store);
   const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
@@ -202,7 +202,7 @@ async function init() {
   Vue.prototype.$platformUtil = platformUtil;
   Vue.prototype.$messageSenderProxy = messageSenderProxy;
 
-  const logger: Logger = loggerFactory.getLoggerColor('main', '#007a70');
+  const logger: Logger = loggerFactory.getLoggerColor(`main:${GIT_HASH ?? ''}`, '#007a70');
   document.body.addEventListener('drop', e => e.preventDefault());
   document.body.addEventListener('dragover', e => e.preventDefault());
   const vue: Vue = new Vue({router, render: (h: Function): typeof Vue.prototype.$createElement => h(App)});

@@ -119,7 +119,7 @@ import ChatChangeNameMessage from '@/vue/chat/ChatChangeNameMessage.vue';
       this.$nextTick(function () {
         if (this.chatbox && this.scrollBottom) {
           this.chatbox.scrollTop = this.chatbox.scrollHeight;
-          this.$logger.trace("Scrolling to bottom")();
+          this.$logger.debug("Scrolling to bottom")();
         }
       });
     }

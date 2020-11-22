@@ -154,7 +154,7 @@ class UserProfile(User):
 	suggestions = BooleanField(null=False, default=True)
 	embedded_youtube = BooleanField(null=False, default=True)
 	highlight_code = BooleanField(null=False, default=False)
-	logs = BooleanField(null=False, default=JS_CONSOLE_LOGS)
+	logs = CharField(max_length=16, null=False, blank=False, default=JS_CONSOLE_LOGS)
 	theme = CharField(max_length=16, null=False, default='color-reg')
 	online_change_sound = BooleanField(null=False, default=True)
 	incoming_file_call_sound = BooleanField(null=False, default=True)

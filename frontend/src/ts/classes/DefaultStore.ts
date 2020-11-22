@@ -67,7 +67,7 @@ import {
 } from 'vuex-module-decorators';
 import { AddRoomMessage } from '@/ts/types/messages/wsInMessages';
 
-const logger = loggerFactory.getLoggerColor('store', '#6a6400');
+const logger = loggerFactory.getLogger('store');
 
 Vue.use(Vuex);
 

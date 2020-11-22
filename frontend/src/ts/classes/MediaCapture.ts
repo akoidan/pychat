@@ -13,7 +13,7 @@ export default class MediaCapture {
   // private stopped: boolean = false;
   private readonly platformUtil: PlatformUtil;
 
-  private readonly logger: Logger = loggerFactory.getLoggerColor('nav-record', 'brown');
+  private readonly logger: Logger = loggerFactory.getLogger('nav-record');
   private readonly recordedBlobs: any[] = [];
   private stream: MediaStream|null = null;
 
@@ -94,7 +94,7 @@ export default class MediaCapture {
 
   private handleDataAvailable(event: MediaRecorderDataAvailableEvent) {
     if (event.data && event.data.size > 0) {
-      this.logger.trace('Appending blob: {}', event.data)();
+      this.logger.debug('Appending blob: {}', event.data)();
       this.recordedBlobs.push(event.data);
     }
   }

@@ -1,7 +1,6 @@
 import MessagePeerConnection from '@/ts/webrtc/message/MessagePeerConnection';
 
 export default class MessageSenderPeerConnection extends MessagePeerConnection {
-  protected connectedToRemote: boolean = true;
 
   public makeConnection() {
     if (this.status !== 'not_inited') {

@@ -33,9 +33,9 @@ export default class AbstractMessageProcessor {
   constructor(target: MessageSupplier, store: DefaultStore, label: string) {
     this.target = target;
     this.store = store;
-    this.loggerIn = loggerFactory.getLoggerColor(`${label}:in`, '#2e631e');
-    this.loggerOut = loggerFactory.getLoggerColor(`${label}:out`, '#2e631e');
-    this.logger = loggerFactory.getLoggerColor('mes-proc', '#2e631e');
+    this.loggerIn = loggerFactory.getLoggerColor(`${label}:in`, '#4c002b');
+    this.loggerOut = loggerFactory.getLoggerColor(`${label}:out`, '#4c002b');
+    this.logger = loggerFactory.getLoggerColor('mes-proc', '#4c002b');
   }
 
   private logData(logger: Logger, jsonData: string, message: DefaultMessage<string>): () => void {
@@ -61,7 +61,7 @@ export default class AbstractMessageProcessor {
     let data: DefaultWsInMessage<string, HandlerName>|null = null;
     try {
       data = JSON.parse(jsonData);
-      this.logData(this.loggerIn, jsonData, data!);
+      this.logData(this.loggerIn, jsonData, data!)();
     } catch (e) {
       this.logger.error('Unable to parse incomming message {}', jsonData)();
 

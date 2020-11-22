@@ -21,6 +21,7 @@ export default abstract class MessageHandler implements IMessageHandler {
     const handler: HandlerType<string, HandlerName> | undefined = this.handlers[message.action];
     if (handler) {
       handler.bind(this)(message);
+      this.logger.debug('Notified {}.{} => message', this.constructor.name, message.action, message)
     } else {
       this.logger.error(`{} can't find handler for {}, available handlers {}. Message: {}`, this.constructor.name, message.action, Object.keys(this.handlers), message)();
     }

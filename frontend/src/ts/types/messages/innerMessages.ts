@@ -26,7 +26,7 @@ export interface PubSetRooms extends DefaultInnerSystemMessage<'init', 'channels
   online: Record<string, string[]>;
 }
 
-export interface InternetAppearMessage extends DefaultInnerSystemMessage<'internetAppear', 'lan'> {
+export interface InternetAppearMessage extends DefaultInnerSystemMessage<'internetAppear', 'any'> {
 
 }
 
@@ -44,7 +44,7 @@ export interface RouterNavigateMessage extends DefaultInnerSystemMessage<'naviga
 export interface ChangeDevicesMessage extends DefaultInnerSystemMessage<'changeDevices', 'message'>  {
   allowZeroSubscribers: true;
   changeType: ChangeDeviceType;
-  roomId: number|null;
+  roomId: number;
   userId: number|null;
 }
 

@@ -7,7 +7,7 @@ import {
   SexModelString,
   UserModel
 } from '@/ts/types/model';
-
+import {LogLevel} from 'lines-logger';
 export type SexModelDto = 'Male' | 'Female' |'Secret';
 
 
@@ -59,7 +59,7 @@ export interface UserSettingsDto {
   onlineChangeSound: boolean;
   sendLogs: boolean;
   suggestions: boolean;
-  logs: boolean;
+  logs: LogLevel;
   theme: string;
 }
 

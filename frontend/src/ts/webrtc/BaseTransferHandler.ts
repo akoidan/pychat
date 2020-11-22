@@ -18,7 +18,7 @@ export default abstract class BaseTransferHandler extends MessageHandler {
   protected connectionId: string | null = null;
   protected readonly wsHandler: WsHandler;
   protected readonly notifier: NotifierHandler;
-  protected readonly logger: Logger;
+  protected logger: Logger;
   protected readonly store: DefaultStore;
   protected readonly roomId: number;
   protected webrtcConnnectionsIds: string[] = [];
@@ -29,8 +29,16 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     this.notifier = notifier;
     this.wsHandler = wsHandler;
     this.store = store;
-    this.logger = loggerFactory.getLoggerColor('WRTC', '#960055');
+    this.logger = loggerFactory.getLoggerColor(`transfer:r${roomId}`, '#960055');
     this.logger.log(`${this.constructor.name} has been created`)();
+  }
+
+
+  protected setConnectionId(connId: string|null) {
+    this.connectionId = connId;
+    if (connId != null) {
+      this.logger = loggerFactory.getLoggerColor(`transfer:${this.connectionId}`, '#960055');
+    }
   }
 
   protected onDestroy() {

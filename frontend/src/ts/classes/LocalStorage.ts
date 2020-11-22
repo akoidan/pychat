@@ -26,7 +26,7 @@ export default class LocalStorage implements IStorage {
   private cache: { [id: number]: LocalStorageMessage } = {};
 
   constructor() {
-    this.logger = loggerFactory.getLoggerColor('ls', '#006263');
+    this.logger = loggerFactory.getLogger('localStor');
     const ms = localStorage.getItem(this.STORAGE_NAME);
     if (ms) {
       const loaded = JSON.parse(ms);

@@ -1,3 +1,5 @@
+import { LogLevel } from 'lines-logger';
+
 export enum GrowlType {
   SUCCESS = 'col-success', INFO = 'col-info', ERROR = 'col-error'
 }
@@ -26,7 +28,7 @@ export interface CurrentUserSettingsModel {
   sendLogs: boolean;
   suggestions: boolean;
   theme: string;
-  logs: boolean;
+  logs: LogLevel;
 }
 
 export interface GoogleCaptcha {

@@ -42,7 +42,11 @@
         <tr>
           <th>Devtools logs:</th>
           <td>
-            <app-checkbox v-model="model.logs" />
+            <select v-model="model.logs" class="input">
+              <option v-for="level in logLevels" :value="level">
+                {{ level }}
+              </option>
+            </select>
           </td>
         </tr>
         <tr>
@@ -109,6 +113,7 @@ import {currentUserInfoDtoToModel, currentUserInfoModelToDto, userSettingsDtoToM
 import {UserSettingsDto} from '@/ts/types/dto';
 import {ApplyGrowlErr} from '@/ts/instances/storeInstance';
 import { SetSettingsMessage } from '@/ts/types/messages/wsInMessages';
+import { LogLevel, logLevels } from 'lines-logger';
 
 @Component({
   components: {AppSubmit, AppCheckbox}
@@ -119,6 +124,8 @@ export default class UserProfileSettings extends Vue {
   public readonly userSettings!: CurrentUserSettingsModel;
 
   private model!: UserSettingsDto;
+
+  private readonly logLevels: LogLevel[] = Object.keys(logLevels) as LogLevel[];
 
   public created() {
     this.model = userSettingsDtoToModel(this.userSettings);

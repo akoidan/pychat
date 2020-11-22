@@ -135,8 +135,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     this.store = store;
     this.api = api;
     sub.subscribe('channels', this);
-    sub.subscribe('lan', this);
-    this.logger = loggerFactory.getLoggerColor('chat', '#940500');
+    this.logger = loggerFactory.getLogger('channelsHandler');
     this.ws = ws;
     this.audioPlayer = audioPlayer;
     this.messageHelper = messageHelper;
@@ -351,7 +350,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
 
   }
 
-  private notifyDevicesChanged(userId: number|null, roomId: number|null, type: ChangeDeviceType) {
+  private notifyDevicesChanged(userId: number|null, roomId: number, type: ChangeDeviceType) {
     let message: ChangeDevicesMessage = {
       handler: 'message',
       action: 'changeDevices',
@@ -382,7 +381,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     } else {
       this.logger.error('Unable to find room {} to delete', message.roomId)();
     }
-    this.notifyDevicesChanged(null, message.roomId, 'deleted');
+    this.notifyDevicesChanged(null, message.roomId, 'i_deleted');
   }
 
   public leaveUser(message: LeaveUserMessage) {
@@ -400,14 +399,14 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
         },
         roomIds: [message.roomId]
       });
-      this.notifyDevicesChanged(message.userId, message.roomId, 'left');
+      this.notifyDevicesChanged(message.userId, message.roomId, 'someone_left');
     } else {
       this.logger.error('Unable to find room {} to kick user', message.roomId)();
     }
   }
 
   public addRoom(message: AddRoomMessage) {
-    this.mutateRoomAddition(message);
+    this.mutateRoomAddition(message, 'room_created');
     if (message.channelId) {
       let channelDict: ChannelModel = getChannelDict(message as  Omit<AddRoomMessage, 'channelId'> & { channelId: number; });
       this.store.addChannel(channelDict);
@@ -449,7 +448,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
         userId: i
       }});
     })
-    this.notifyDevicesChanged(null, message.roomId, 'users_were_invited');
+    this.notifyDevicesChanged(null, message.roomId, 'someone_joined');
   }
 
   public deleteChannel(message: DeleteChannelMessage) {
@@ -457,7 +456,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
   }
 
   public addInvite(message: AddInviteMessage) {
-    this.mutateRoomAddition(message);
+    this.mutateRoomAddition(message, 'invited');
   }
 
   private addChangeOnlineEntry(userId: number, time: number, action: 'appeared online' | 'gone offline') {
@@ -483,7 +482,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
     this.store.addRoomLog(entry);
   }
 
-  private mutateRoomAddition(message: AddRoomBase) {
+  private mutateRoomAddition(message: AddRoomBase, type: 'room_created' | 'invited') {
     const r: RoomModel = getRoomsBaseDict(message);
     this.store.addRoom(r);
     this.store.addRoomLog({
@@ -495,7 +494,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
       }
     });
     // eiher I created this room, either I was invited to this room
-    this.notifyDevicesChanged(null, message.roomId, 'created') // TODO messageTransferhandler should be created or should id?
+    this.notifyDevicesChanged(null, message.roomId, type) // TODO messageTransferhandler should be created or should id?
   }
 
 

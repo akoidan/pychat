@@ -289,7 +289,7 @@ export default class CallHandler extends BaseTransferHandler {
       this.setCallStatus('sent_offer');
       this.store.setCallActiveToState(payload);
       let e = await this.wsHandler.offerCall(this.roomId, browserVersion);
-      this.connectionId = e.connId;
+      this.setConnectionId(e.connId);
       sub.subscribe(Subscription.getTransferId(e.connId), this);
     } catch (e) {
       this.handleStream(e, stream);
@@ -314,7 +314,7 @@ export default class CallHandler extends BaseTransferHandler {
     if (this.connectionId) {
       this.logger.error('Old connId still exists {}', this.connectionId)();
     }
-    this.connectionId = message.connId;
+    this.setConnectionId(message.connId);
     sub.subscribe(Subscription.getTransferId(message.connId), this);
     this.logger.log('CallHandler initialized')();
     this.wsHandler.replyCall(message.connId, browserVersion);
@@ -388,7 +388,7 @@ export default class CallHandler extends BaseTransferHandler {
       media: null
     };
     this.store.setLocalStreamSrc(payload2);
-    this.connectionId = null;
+    this.setConnectionId(null);
     const payload: BooleanIdentifier = {
       state: false,
       id: this.roomId

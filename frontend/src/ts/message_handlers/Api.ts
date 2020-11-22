@@ -24,8 +24,8 @@ import { FileModel } from '@/ts/types/model';
 
 
 export default class Api extends MessageHandler {
-  protected readonly handlers:  HandlerTypes<keyof Api, 'lan'> = {
-    internetAppear: <HandlerType<'internetAppear', 'lan'>>this.internetAppear
+  protected readonly handlers:  HandlerTypes<keyof Api, 'any'> = {
+    internetAppear: <HandlerType<'internetAppear', 'any'>>this.internetAppear
   };
 
   protected readonly logger: Logger;
@@ -35,8 +35,8 @@ export default class Api extends MessageHandler {
 
   constructor(xhr: Http) {
     super();
-    sub.subscribe('lan', this);
-    this.logger = loggerFactory.getLoggerColor('api', 'red');
+    sub.subscribe('any', this);
+    this.logger = loggerFactory.getLogger('api');
     this.xhr = xhr;
   }
 

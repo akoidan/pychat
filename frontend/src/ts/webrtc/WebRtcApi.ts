@@ -62,7 +62,7 @@ export default class WebRtcApi extends MessageHandler {
     sub.subscribe('webrtc', this);
     this.wsHandler = ws;
     this.notifier = notifier;
-    this.logger = loggerFactory.getLogger('WEBRTC', 'color: #960055');
+    this.logger = loggerFactory.getLogger('WEBRTC');
     this.store = store;
     this.messageHelper = messageHelper;
   }
@@ -72,23 +72,25 @@ export default class WebRtcApi extends MessageHandler {
   }
 
   public async changeDevices(m: ChangeDevicesMessage): Promise<void> {
-
-    let isP2PandExists: boolean = this.store.roomsDict[m.roomId!]?.p2p;
-    if (m.changeType === 'joined' && isP2PandExists) {
-      this.getMessageHandler(m.roomId!)
-    } else if (m.changeType === 'deleted') {
+    this.logger.log('change devices {}', m)();
+    if (m.changeType === 'i_deleted') { // destroy my room
       let mh: MessageTransferHandler = this.messageHandlers[m.roomId!];
       if (mh) {
         mh.destroyThisTransferHandler();
       }
       delete this.messageHandlers[m.roomId!];
-      // 'left'| 'joined'| 'created' | 'deleted' | 'users_were_invited'
-    } else if (m.changeType === 'created' && isP2PandExists) {
-      this.getMessageHandler(m.roomId!);
-    } else if (m.changeType === 'users_were_invited') {
-      // TODO
-    } else if (m.changeType === 'left' && isP2PandExists) {
-      // sync
+      return;
+    }
+    if (!this.store.roomsDict[m.roomId!]?.p2p) {
+      return ;
+    }
+    if (m.changeType === 'someone_left') {
+      // destroy peer connection in this room
+      this.getMessageHandler(m.roomId!).refreshPeerConnections()
+    } else {
+      //  'room_created' -- send to everyone when new room is created
+      //  'someone_joined' - send to everyone when someone joins the room, but the member who joins receives 'invited'
+      this.getMessageHandler(m.roomId!).init()
     }
 
   }
@@ -96,12 +98,12 @@ export default class WebRtcApi extends MessageHandler {
   initAndSyncMessages() {
     this.store.roomsArray.forEach(room => {
       if (room.p2p) {
-        this.getMessageHandler(room.id).init();
+        this.getMessageHandler(room.id).initOrSync();
       }
     });
   }
 
-  public internetAppear(m :InternetAppearMessage) {
+  public internetAppear(m: InternetAppearMessage) {
     this.initAndSyncMessages();
   }
 

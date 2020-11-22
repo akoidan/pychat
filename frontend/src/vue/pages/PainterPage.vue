@@ -54,7 +54,7 @@ export default class PainterPage extends Vue {
       },
       textClass: 'input',
       buttonClass: 'lor-btn',
-      logger: loggerFactory.getLoggerColor('painter', '#d507bd'),
+      logger: loggerFactory.getLogger('painter'),
       rangeFactory: (): HTMLInputElement => {
         let ComponentClass = Vue.extend(AppInputRange);
         let instance = new ComponentClass();

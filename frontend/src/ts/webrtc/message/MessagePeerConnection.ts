@@ -37,6 +37,7 @@ import {
 } from '@/ts/types/converters';
 import { SyncP2PMessage } from '@/ts/types/messages/innerMessages';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
+import loggerFactory from '@/ts/instances/loggerFactory';
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
 
@@ -45,6 +46,8 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     checkDestroy: <HandlerType<'checkDestroy', 'peerConnection:*'>>this.checkDestroy,
     syncP2pMessage: <HandlerType<'syncP2pMessage', 'peerConnection:*'>>this.syncP2pMessage
   };
+
+  protected connectedToRemote: boolean = true;
 
   protected status: 'inited' | 'not_inited' = 'not_inited';
 
@@ -70,8 +73,8 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.opponentUserId = userId;
     sub.subscribe(Subscription.allPeerConnectionsForTransfer(connId), this);
-
-    this.messageProc = new P2PMessageProcessor(this, store, `p2p-${opponentWsId}`);
+    this.logger = loggerFactory.getLoggerColor(`peer:${this.connectionId}:${this.opponentWsId}`, '#4c002b');
+    this.messageProc = new P2PMessageProcessor(this, store, `peer:${connId}:${opponentWsId}`);
     this.messageHelper = messageHelper;
   }
 
@@ -91,7 +94,10 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     if (this.pc!.iceConnectionState === 'disconnected' ||
         this.pc!.iceConnectionState === 'failed' ||
         this.pc!.iceConnectionState === 'closed') {
-      this.closeEvents('Connection has been lost');
+      this.logger.error('Connection has changed to state {}', this.pc!.iceConnectionState)();
+      // this.closeEvents('Connection has been lost');
+    } else {
+      this.logger.debug('ice connection -> ', this.pc!.iceConnectionState)();
     }
   }
 
@@ -246,7 +252,10 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
       this.logger.log('Closed channel ')();
       //this.syncMessageLock = false; // just for the case, not nessesary
       this.messageProc.onDropConnection('Data channel closed');
-      this.store.removeLiveConnectionToRoom({connection:  this.opponentWsId, roomId: this.roomId});
+      if (this.store.userInfo) {
+        // otherwise we logged out
+        this.store.removeLiveConnectionToRoom({connection:  this.opponentWsId, roomId: this.roomId});
+      }
     }
   }
 

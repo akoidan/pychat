@@ -12,7 +12,7 @@ export class AndroidPlatformUtil implements PlatformUtil {
   private logger: Logger;
 
   constructor() {
-    this.logger = loggerFactory.getLoggerColor('native', 'red');
+    this.logger = loggerFactory.getLogger('native');
   }
 
   public async askPermissions(...askedPermissions: permissions_type): Promise<void> {
