@@ -443,7 +443,7 @@ class MessagesHandler(MessagesCreator):
 		"""
 		room_id = message[VarNames.ROOM_ID]
 		room_name = message[VarNames.ROOM_NAME]
-		creator_id = message[VarNames.ROOM_CREATOR_ID]
+		creator_id = message.get(VarNames.ROOM_CREATOR_ID) # will be none for private room
 		updated = RoomUsers.objects.filter(room_id=room_id, user_id=self.user_id).update(
 			volume=message[VarNames.VOLUME],
 			notifications=message[VarNames.NOTIFICATIONS]
@@ -474,7 +474,7 @@ class MessagesHandler(MessagesCreator):
 					raise ValidationError("You can only change admin to one of the users in this channels room")
 				room.creator_id = creator_id
 				update_all = True
-		if message[VarNames.CHANNEL_ID]:
+		if message.get(VarNames.CHANNEL_ID): # will be nOne for private room
 			channel = Channel.objects.get(id=message[VarNames.CHANNEL_ID])
 			channel_name = channel.name
 			channel_creator_id = channel.creator_id

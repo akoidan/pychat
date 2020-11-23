@@ -135,12 +135,10 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     // maybe he has jost connection to server but not to us
     if (!this.room) {
       this.unsubscribeAndRemoveFromParent('Room has been removed')
-    }
-    if (this.room.users.indexOf(this.opponentUserId) < 0) {
+    } else if (this.room.users.indexOf(this.opponentUserId) < 0) {
       this.unsubscribeAndRemoveFromParent('User has left this room')
     }
   }
-
 
   public async exchangeMessageInfoRequest(payload: ExchangeMessageInfoRequest) {
     if (this.syncMessageLock) {

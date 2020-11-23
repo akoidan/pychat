@@ -43,7 +43,7 @@ export default class WebRtcApi extends MessageHandler {
 
   protected readonly handlers: HandlerTypes<keyof WebRtcApi, 'webrtc'>  = {
     offerFile: <HandlerType<'offerFile', 'webrtc'>>this.onofferFile,
-    changeDevices: <HandlerType<'changeDevices', HandlerName>>this.changeDevices,
+    changeDevices: <HandlerType<'changeDevices', 'webrtc'>>this.changeDevices,
     offerCall: <HandlerType<'offerCall', 'webrtc'>>this.offerCall,
     offerMessage: <HandlerType<'offerMessage', 'webrtc'>>this.offerMessage,
     logout: <HandlerType<'logout', HandlerName>>this.logout,
