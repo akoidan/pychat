@@ -35,7 +35,6 @@ import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
 
   protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, 'message'> = {
-    removePeerConnection: <HandlerType<'removePeerConnection', HandlerName>>this.removePeerConnection,
   };
 
   private state: 'not_inited' |'initing' | 'ready' = 'not_inited';
@@ -44,7 +43,6 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
   constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper) {
     super(roomId, wsHandler, notifier, store);
     this.messageHelper = messageHelper;
-    sub.subscribe('message', this);
   }
 
   async syncMessage(roomId: number, messageId: number): Promise<void> {
@@ -107,17 +105,12 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     this.refreshPeerConnections();
   }
 
-  protected onDestroy() {
-    super.onDestroy();
-    sub.unsubscribe('message', this);
-  }
-
   public refreshPeerConnections() {
     let myConnectionId = this.wsHandler.getWsConnectionId();
     let newConnectionIdsWithUser = this.connectionIds;
     newConnectionIdsWithUser.forEach(connectionIdWithUser => {
       let opponentWsId = connectionIdWithUser.connectionId;
-      if (this.webrtcConnnectionsIds.indexOf(opponentWsId) < 0) {
+      if (sub.getNumberOfSubscribers(Subscription.getPeerConnectionId(this.connectionId!, opponentWsId)) == 0) {
         let mpc;
         if (opponentWsId > myConnectionId) {
           mpc = new MessageSenderPeerConnection(
@@ -141,7 +134,6 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
               this.messageHelper
           );
         }
-        this.webrtcConnnectionsIds.push(opponentWsId);
         mpc.makeConnection();
       }
     });

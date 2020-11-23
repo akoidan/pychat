@@ -35,7 +35,10 @@ import {
   messageModelToP2p,
   p2pMessageToModel
 } from '@/ts/types/converters';
-import { SyncP2PMessage } from '@/ts/types/messages/innerMessages';
+import {
+  CheckTransferDestroy,
+  SyncP2PMessage
+} from '@/ts/types/messages/innerMessages';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 import loggerFactory from '@/ts/instances/loggerFactory';
 
@@ -72,7 +75,6 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
   ) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.opponentUserId = userId;
-    sub.subscribe(Subscription.allPeerConnectionsForTransfer(connId), this);
     this.logger = loggerFactory.getLoggerColor(`peer:${this.connectionId}:${this.opponentWsId}`, '#4c002b');
     this.messageProc = new P2PMessageProcessor(this, store, `peer:${connId}:${opponentWsId}`);
     this.messageHelper = messageHelper;
@@ -80,11 +82,6 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
 
   public getOpponentUserId() {
     return this.opponentUserId;
-  }
-
-  public unsubscribeAndRemoveFromParent(reason?: string) {
-    super.unsubscribeAndRemoveFromParent(reason);
-    sub.unsubscribe(Subscription.allPeerConnectionsForTransfer(this.connectionId), this);
   }
 
   abstract makeConnection(): void;

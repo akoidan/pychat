@@ -14,7 +14,7 @@ import { WEBRTC_STUNT_URL } from '@/ts/utils/runtimeConsts';
 import { HandlerName } from '@/ts/types/messages/baseMessagesInterfaces';
 import {
   ConnectToRemoteMessage,
-  RemovePeerConnectionMessage,
+  CheckTransferDestroy,
 } from '@/ts/types/messages/innerMessages';
 import { SendRtcDataMessage } from '@/ts/types/messages/wsInMessages';
 
@@ -51,6 +51,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.roomId = roomId;
     this.connectionId = connectionId;
     this.opponentWsId = opponentWsId;
+    sub.subscribe(Subscription.allPeerConnectionsForTransfer(connectionId), this);
     sub.subscribe(this.mySubscriberId, this);
     this.wsHandler = ws;
     this.store = store;
@@ -73,13 +74,14 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
 
   public unsubscribeAndRemoveFromParent(reason?: string) {
     this.logger.log('Destroying {}, because {}', this.constructor.name, reason)();
-    const message: RemovePeerConnectionMessage = {
+    sub.unsubscribe(Subscription.allPeerConnectionsForTransfer(this.connectionId), this);
+    sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
+    const message: CheckTransferDestroy = {
       handler: Subscription.getTransferId(this.connectionId),
-      action: 'removePeerConnection',
-      opponentWsId: this.opponentWsId
+      action: 'checkTransferDestroy',
+      allowZeroSubscribers: true,
     };
     sub.notify(message);
-    sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
   }
 
   public print(message: string) {

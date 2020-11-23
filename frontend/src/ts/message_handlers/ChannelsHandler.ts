@@ -57,7 +57,8 @@ import {
   ChangeDevicesMessage,
   InternetAppearMessage,
   LogoutMessage,
-  PubSetRooms
+  PubSetRooms,
+  RouterNavigateMessage
 } from '@/ts/types/messages/innerMessages';
 import {
   AddRoomBase,
@@ -85,6 +86,7 @@ import {
 } from '@/ts/types/messages/wsInMessages';
 import { savedFiles } from '@/ts/utils/htmlApi';
 import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
+import { ALL_ROOM_ID } from '@/ts/utils/consts';
 
 // TODO split this class into 2 separate:
 // 1st one for message handling that's related to MessageSender and MessageTrasnferHandler (webrtc one)
@@ -352,7 +354,7 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
 
   private notifyDevicesChanged(userId: number|null, roomId: number, type: ChangeDeviceType) {
     let message: ChangeDevicesMessage = {
-      handler: 'message',
+      handler: 'webrtc',
       action: 'changeDevices',
       changeType: type,
       allowZeroSubscribers: true,
@@ -377,6 +379,15 @@ export default class ChannelsHandler extends MessageHandler implements  MessageS
 
   public deleteRoom(message: DeleteRoomMessage) {
     if (this.store.roomsDict[message.roomId]) {
+      if (this.store.activeRoomId === message.roomId) {
+        let m : RouterNavigateMessage = {
+          action: 'navigate',
+          handler: 'router',
+          to: `/chat/${ALL_ROOM_ID}`,
+        }
+        this.store.growlInfo(`Room #${message.roomId} has been deleted. Navigating to main room`)
+        sub.notify(m);
+      }
       this.store.deleteRoom(message.roomId);
     } else {
       this.logger.error('Unable to find room {} to delete', message.roomId)();

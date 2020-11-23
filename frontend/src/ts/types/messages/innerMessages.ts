@@ -41,7 +41,7 @@ export interface RouterNavigateMessage extends DefaultInnerSystemMessage<'naviga
   to: string;
 }
 
-export interface ChangeDevicesMessage extends DefaultInnerSystemMessage<'changeDevices', 'message'>  {
+export interface ChangeDevicesMessage extends DefaultInnerSystemMessage<'changeDevices', 'webrtc'>  {
   allowZeroSubscribers: true;
   changeType: ChangeDeviceType;
   roomId: number;
@@ -52,8 +52,7 @@ export interface ConnectToRemoteMessage extends DefaultInnerSystemMessage<'conne
   stream: MediaStream|null;
 }
 
-export interface RemovePeerConnectionMessage extends DefaultInnerSystemMessage<'removePeerConnection', 'webrtcTransfer:*'> {
-  opponentWsId: string;
+export interface CheckTransferDestroy extends DefaultInnerSystemMessage<'checkTransferDestroy', 'webrtcTransfer:*'> {
 }
 
 export interface ChangeStreamMessage extends DefaultInnerSystemMessage<'streamChanged', 'peerConnection:*'> {

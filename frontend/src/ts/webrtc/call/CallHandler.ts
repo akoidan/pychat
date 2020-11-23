@@ -34,9 +34,7 @@ import {
 import CallSenderPeerConnection from '@/ts/webrtc/call/CallSenderPeerConnection';
 import CallReceiverPeerConnection from '@/ts/webrtc/call/CallReceiverPeerConnection';
 import {
-  CallHandlerName,
   CallStatus,
-  HandlerName,
   HandlerType,
   HandlerTypes
 } from '@/ts/types/messages/baseMessagesInterfaces';
@@ -51,9 +49,10 @@ import {
   ConnectToRemoteMessage,
   RouterNavigateMessage
 } from '@/ts/types/messages/innerMessages';
+import { FileAndCallTransfer } from '@/ts/webrtc/FileAndCallTransfer';
 
 
-export default class CallHandler extends BaseTransferHandler {
+export default class CallHandler extends FileAndCallTransfer {
 
   private get callInfo(): CallsInfoModel {
     return this.store.roomsDict[this.roomId].callInfo;
@@ -64,7 +63,7 @@ export default class CallHandler extends BaseTransferHandler {
     declineCall: this.declineCall,
     replyCall: <HandlerType<'replyCall', 'webrtcTransfer:*'>>this.replyCall,
     acceptCall: <HandlerType<'acceptCall', 'webrtcTransfer:*'>>this.acceptCall,
-    removePeerConnection: <HandlerType<'removePeerConnection', 'webrtcTransfer:*'>>this.removePeerConnection
+    checkTransferDestroy: <HandlerType<'checkTransferDestroy', 'webrtcTransfer:*'>>this.checkTransferDestroy
   };
   private localStream: MediaStream | null = null;
   private audioProcessor: JsAudioAnalyzer | null = null;
@@ -203,15 +202,13 @@ export default class CallHandler extends BaseTransferHandler {
         stream = await this.captureInput();
         this.stopLocalStream();
         this.attachLocalStream(stream);
-
-        this.webrtcConnnectionsIds.forEach(pcName => {
-          const message: ChangeStreamMessage = {
-            handler: Subscription.getPeerConnectionId(this.connectionId!, pcName),
-            action: 'streamChanged',
-            newStream: stream!,
-          };
-          sub.notify(message);
-        });
+        const message: ChangeStreamMessage = {
+          handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
+          action: 'streamChanged',
+          allowZeroSubscribers: true,
+          newStream: stream!,
+        };
+        sub.notify(message)
       } catch (e) {
         this.handleStream(e, stream);
       }
@@ -302,7 +299,6 @@ export default class CallHandler extends BaseTransferHandler {
     } else {
       new CallReceiverPeerConnection(this.roomId, this.connectionId!, opponentWsId, userId, this.wsHandler, this.store);
     }
-    this.webrtcConnnectionsIds.push(opponentWsId);
   }
 
   public replyCall(message: ReplyCallMessage) {
@@ -404,7 +400,7 @@ export default class CallHandler extends BaseTransferHandler {
 
   public hangCall() {
     this.logger.debug('on hangCall called')();
-    const hadConnections = this.webrtcConnnectionsIds.length > 0;
+    const hadConnections = this.connectionId && sub.getNumberOfSubscribers(Subscription.allPeerConnectionsForTransfer(this.connectionId!)) > 0;
     if (hadConnections) {
       this.closeAllPeerConnections();
     } else {

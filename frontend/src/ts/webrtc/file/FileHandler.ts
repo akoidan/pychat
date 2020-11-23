@@ -11,13 +11,14 @@ import {
   HandlerTypes
 } from '@/ts/types/messages/baseMessagesInterfaces';
 import { ReplyFileMessage } from '@/ts/types/messages/wsInMessages';
+import { FileAndCallTransfer } from '@/ts/webrtc/FileAndCallTransfer';
 
 
-export default class FileHandler extends BaseTransferHandler {
+export default class FileHandler extends FileAndCallTransfer {
 
   protected readonly handlers: HandlerTypes<keyof FileHandler, 'webrtcTransfer:*'> = {
     replyFile: <HandlerType<'replyFile', 'webrtcTransfer:*'>>this.replyFile,
-    removePeerConnection: <HandlerType<'removePeerConnection', 'webrtcTransfer:*'>>this.removePeerConnection
+    checkTransferDestroy: <HandlerType<'checkTransferDestroy', 'webrtcTransfer:*'>>this.checkTransferDestroy
   };
   private readonly file: File;
 
@@ -40,7 +41,6 @@ export default class FileHandler extends BaseTransferHandler {
   public replyFile(message: ReplyFileMessage) {
     this.logger.debug('got mes {}', message)();
     new FileSenderPeerConnection(this.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, this.file, message.userId);
-    this.webrtcConnnectionsIds.push(message.opponentWsId);
 
   }
 }

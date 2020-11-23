@@ -155,7 +155,6 @@ export default class RoomSettings extends Vue {
   public async leave() {
     this.$logger.log('Leaving room {}', this.roomId)();
     await this.$ws.sendLeaveRoom(this.roomId);
-    this.$router.replace(`/chat/${ALL_ROOM_ID}`);
   }
 
   get showInviteUsers() {
