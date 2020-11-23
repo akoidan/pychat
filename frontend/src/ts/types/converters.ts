@@ -4,6 +4,7 @@ import {
   CurrentUserSettingsModel,
   FileModel,
   Location,
+  MessageModel,
   RoomModel,
   RoomSettingsModel,
   SexModelString,
@@ -24,6 +25,7 @@ import {
   BooleanDB,
   SexDB
 } from '@/ts/types/db';
+import { MessageP2pDto } from '@/ts/types/messages/p2pDto';
 
 export function currentUserInfoDtoToModel(userInfo: UserProfileDto): CurrentUserInfoModel {
   return {...userInfo};
@@ -101,7 +103,7 @@ export function getRoomsBaseDict(
     volume,
     p2p,
     p2pInfo: {
-      amountOfActiveConnections: 0
+      liveConnections: []
     },
     callInfo: {
       calls: {},
@@ -167,17 +169,37 @@ export function convertStringSexToNumber(m: SexModelString): SexDB {
   return newVar[m];
 }
 
-export function convertFile(dto: FileModelDto): FileModel {
-  return {...dto};
+
+export function messageModelToP2p(m: MessageModel): MessageP2pDto {
+  return  {
+    content: m.content,
+    deleted: m.deleted,
+    edited: m.edited ?? 0,
+    files: {},
+    giphy: m.giphy,
+    id: m.id,
+    symbol: m.symbol,
+    timeAgo: Date.now() - m.time,
+    userId: m.userId
+  }
 }
 
-export function convertFiles(dto: {[id: number]: FileModelDto}): {[id: number]: FileModel} {
-  const res: {[id: number]: FileModel} = {};
-  for (const k in dto) {
-    res[k] = convertFile(dto[k]);
+export function p2pMessageToModel(m: MessageP2pDto, roomId: number): MessageModel {
+  return {
+    content: m.content,
+    deleted: m.deleted,
+    edited: m.edited,
+    files: {},
+    giphy: m.giphy,
+    id: m.id,
+    symbol: m.symbol,
+    time: Date.now() - m.timeAgo,
+    userId: m.userId,
+    sending: false,
+    roomId,
+    isHighlighted: false,
+    transfer: null
   }
-
-  return res;
 }
 
 export function convertUser(u: UserDto): UserModel {

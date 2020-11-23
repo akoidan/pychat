@@ -1,90 +1,87 @@
 import AbstractPeerConnection from '@/ts/webrtc/AbstractPeerConnection';
-import {
-  DefaultMessage,
-  EditMessage,
-  InnerSendMessage,
-  PrintWebRtcMessage
-} from '@/ts/types/messages';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { sub } from '@/ts/instances/subInstance';
-import {
-  HandlerType,
-  HandlerTypes,
-  MessageSupplier,
-  UploadFile
-} from '@/ts/types/types';
-import AbstractMessageProcessor from '@/ts/message_handlers/AbstractMessageProcessor';
-import { SecurityValidator } from '@/ts/webrtc/message/SecurityValidator';
+import { MessageSupplier } from '@/ts/types/types';
+import { P2PMessageProcessor } from '@/ts/message_handlers/P2PMessageProcessor';
 import Subscription from '@/ts/classes/Subscription';
-import MessageRetrier from "@/ts/message_handlers/MessageRetrier";
+
+import {
+  HandlerName,
+  HandlerType,
+  HandlerTypes
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import {
+  DefaultP2pMessage,
+  ExchangeMessageInfoRequest,
+  ExchangeMessageInfoResponse,
+  P2PHandlerType,
+  P2PHandlerTypes,
+  ConfirmReceivedP2pMessage,
+  SendNewP2PMessage,
+  ExchangeMessageInfoResponse2,
+  ExchangeMessageInfoResponse3,
+} from '@/ts/types/messages/p2pMessages';
+import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
+import {
+  MessageModel,
+  RoomModel
+} from '@/ts/types/model';
+import {
+  MessageP2pDto,
+  MessagesInfo
+} from '@/ts/types/messages/p2pDto';
+import {
+  messageModelToP2p,
+  p2pMessageToModel
+} from '@/ts/types/converters';
+import {
+  CheckTransferDestroy,
+  SyncP2PMessage
+} from '@/ts/types/messages/innerMessages';
+import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
+import loggerFactory from '@/ts/instances/loggerFactory';
 
 export default abstract class MessagePeerConnection extends AbstractPeerConnection implements MessageSupplier {
 
-  protected readonly handlers: HandlerTypes = {
-    sendRtcData: <HandlerType>this.onsendRtcData,
-    checkDestroy: <HandlerType>this.checkDestroy,
-    sendSendMessage: <HandlerType>this.sendSendMessage,
-    printMessage: <HandlerType>this.printMessage,
+  protected readonly handlers: HandlerTypes<keyof MessagePeerConnection, 'peerConnection:*'> = {
+    sendRtcData: <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData,
+    checkDestroy: <HandlerType<'checkDestroy', 'peerConnection:*'>>this.checkDestroy,
+    syncP2pMessage: <HandlerType<'syncP2pMessage', 'peerConnection:*'>>this.syncP2pMessage
   };
 
+  protected connectedToRemote: boolean = true;
 
-  private readonly messageRetrier: MessageRetrier;
-  private opponentUserId: number;
   protected status: 'inited' | 'not_inited' = 'not_inited';
-  private readonly messageProc: AbstractMessageProcessor;
-  private readonly securityValidator: SecurityValidator;
 
+  private readonly p2pHandlers: P2PHandlerTypes<keyof MessagePeerConnection> = {
+    exchangeMessageInfoRequest: <P2PHandlerType<'exchangeMessageInfoRequest'>>this.exchangeMessageInfoRequest,
+    sendNewP2PMessage: <P2PHandlerType<'sendNewP2PMessage'>>this.sendNewP2PMessage
+  };
 
-  constructor(roomId: number, connId: string, opponentWsId: string, wsHandler: WsHandler, store: DefaultStore, userId: number) {
+  private readonly messageProc: P2PMessageProcessor;
+  private readonly opponentUserId: number;
+  private readonly messageHelper: MessageHelper;
+  private syncMessageLock: boolean = false;
+
+  constructor(
+      roomId: number,
+      connId: string,
+      opponentWsId: string,
+      wsHandler: WsHandler,
+      store: DefaultStore,
+      userId: number,
+      messageHelper: MessageHelper
+  ) {
     super(roomId, connId, opponentWsId, wsHandler, store);
     this.opponentUserId = userId;
-    sub.subscribe(Subscription.allPeerConnectionsForTransfer(connId), this);
-    this.messageRetrier = new MessageRetrier();
-    this.securityValidator = new SecurityValidator(this.roomId, this.opponentUserId, store);
-    this.messageProc = new AbstractMessageProcessor(this, store, `p2p-${opponentWsId}`);
-  }
-
-  private printMessage(m: PrintWebRtcMessage) {
-    let em: EditMessage = {
-      action: 'printMessage',
-      content: m.content,
-      edited: 0,
-      handler: 'channels',
-      id: m.id,
-      messageId: m.messageId,
-      roomId: this.roomId,
-      time: Date.now() - m.timeDiff,
-      userId: this.opponentUserId,
-    }
-    sub.notify(em)
-  }
-
-  private sendSendMessage({content, cbId, uploadFiles, originTime, id}: InnerSendMessage) {
-    this.messageRetrier.asyncExecuteAndPutInCallback(
-        cbId,
-        () => {
-          const message: PrintWebRtcMessage = {
-            action: 'printMessage',
-            content,
-            edited: 0,
-            timeDiff: Date.now() - originTime,
-            messageId: cbId,
-            id,
-            handler: 'this'
-          };
-          this.messageProc.sendToServer(message);
-        }
-    );
+    this.logger = loggerFactory.getLoggerColor(`peer:${this.connectionId}:${this.opponentWsId}`, '#4c002b');
+    this.messageProc = new P2PMessageProcessor(this, store, `peer:${connId}:${opponentWsId}`);
+    this.messageHelper = messageHelper;
   }
 
   public getOpponentUserId() {
     return this.opponentUserId;
-  }
-
-  public onDestroy(reason?: string) {
-    super.onDestroy(reason);
-    sub.unsubscribe(Subscription.allPeerConnectionsForTransfer(this.connectionId), this);
   }
 
   abstract makeConnection(): void;
@@ -94,54 +91,119 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     if (this.pc!.iceConnectionState === 'disconnected' ||
         this.pc!.iceConnectionState === 'failed' ||
         this.pc!.iceConnectionState === 'closed') {
-      this.closeEvents('Connection has been lost');
+      this.logger.error('Connection has changed to state {}', this.pc!.iceConnectionState)();
+      // this.closeEvents('Connection has been lost');
+    } else {
+      this.logger.debug('ice connection -> ', this.pc!.iceConnectionState)();
     }
   }
 
-  checkDestroy() {
+  public async sendNewP2PMessage(payload: SendNewP2PMessage) {
+    let message: MessageModel = p2pMessageToModel(payload.message, this.roomId);
+    this.messageHelper.processUnkownP2pMessage(message);
+
+    let response: ConfirmReceivedP2pMessage = {
+      action: 'confirmReceivedP2pMessage',
+      resolveCbId: payload.cbId
+    };
+    this.messageProc.sendToServer(response);
+  }
+
+  public async syncP2pMessage(payload: SyncP2PMessage) {
+    if (this.isChannelOpened) {
+      this.logger.debug("Syncing message {}", payload.id)()
+      let message: SendNewP2PMessage = {
+        message: messageModelToP2p(this.room.messages[payload.id]),
+        action: 'sendNewP2PMessage',
+      }
+      await this.messageProc.sendToServerAndAwait(message);
+      if (!this.isConnectedToMyAnotherDevices) {
+        this.store.markMessageAsSent({messagesId: [payload.id], roomId: this.roomId});
+      }
+    }
+  }
+
+  get isConnectedToMyAnotherDevices(): boolean {
+    return this.opponentUserId === this.store.myId;
+  }
+
+  public checkDestroy() {
     //destroy only if user has left this room, if he's offline but connections is stil in progress,
     // maybe he has jost connection to server but not to us
-    if (this.store.roomsDict[this.roomId].users.indexOf(this.opponentUserId) < 0) {
-      this.onDestroy("User has left this room")
+    if (!this.room) {
+      this.unsubscribeAndRemoveFromParent('Room has been removed')
+    } else if (this.room.users.indexOf(this.opponentUserId) < 0) {
+      this.unsubscribeAndRemoveFromParent('User has left this room')
     }
   }
 
-  // public appendQueue(message: AppendQueue) {
-  //   if (this.isChannelOpened) {
-  //     message.messages.forEach(message => {
-  //       this.messageProc.sendToServer(message);
-  //     })
-  //   } else {
-  //     this.sendingQueue.push(...message.messages);
-  //   }
-  // }
+  public async exchangeMessageInfoRequest(payload: ExchangeMessageInfoRequest) {
+    if (this.syncMessageLock) {
+      this.logger.error("oops we already acquired lock, going to syncanyway")
+    }
+    this.logger.debug("Processing exchangeMessageInfoRequest")();
+    try {
+      this.syncMessageLock = true;
 
-  get isChannelOpened(): boolean {
-    return this.sendChannel?.readyState === 'open';
-  }
+      let missingIdsFromRemote: number[] = [];
+      let responseMessages: MessageP2pDto[] = []
 
-  protected onChannelMessage(event: MessageEvent) {
-    let data = this.messageProc.parseMessage(event.data);
-    if (data) {
-      this.securityValidator.validate(data);
-      if (data.handler === 'this') {
-        data.handler = this.mySubscriberId;
+      this.messages.forEach(message => {
+        let opponentEditedCount: number = payload.messagesInfo[message.id] ?? 0;
+        if (payload.messagesInfo[message.id] !== undefined) {
+          let myEditedCount: number = message.edited ?? 0;
+          if (myEditedCount > opponentEditedCount) {
+            responseMessages.push(messageModelToP2p(message))
+          } else if (myEditedCount < opponentEditedCount) {
+            missingIdsFromRemote.push(message.id)
+          } // else message are synced
+        } else {
+          responseMessages.push(messageModelToP2p(message))
+        }
+      })
+      Object.keys(payload.messagesInfo).forEach(remoteMId => {
+        if (!this.room.messages[remoteMId as unknown as number]) { // convertion is automatic for js
+          missingIdsFromRemote.push(parseInt(remoteMId))
+        }
+      })
+      let response: ExchangeMessageInfoResponse = {
+        action: 'exchangeMessageInfoResponse',
+        resolveCbId: payload.cbId,
+        messages: responseMessages,
+        requestMessages: missingIdsFromRemote,
       }
-      this.messageProc.handleMessage(data);
+      let a: ExchangeMessageInfoResponse2 = await this.messageProc.sendToServerAndAwait(response);
+      // got exchangeMessageInfoResponse2
+      this.saveMessagesDtoToStore(a.messages);
+      this.markAsReadSentMessages(responseMessages);
+      let confirmationThatReceived: ExchangeMessageInfoResponse3 = {
+        action: 'exchangeMessageInfoResponse3',
+        resolveCbId: a.cbId
+      }
+      this.messageProc.sendToServer(confirmationThatReceived);
+    } finally {
+      this.syncMessageLock = false;
+    }
+
+  }
+
+
+  public async syncMessages() {
+    if (this.syncMessageLock) {
+      this.logger.warn('Exiting from sync message because, the lock is already acquired')();
+      return;
+    }
+    try {
+      this.syncMessageLock = true;
+      await this.exchangeMessageInfo();
+    } catch (e) {
+      this.logger.error('Can\'t send messages because {}', e)();
+    } finally {
+      this.syncMessageLock = false;
     }
   }
 
-  public setupEvents() {
-
-    this.sendChannel!.onmessage = this.onChannelMessage.bind(this);
-    this.sendChannel!.onopen = () => {
-      this.messageRetrier.resendAllMessages();
-      this.logger.debug('Channel opened')();
-    };
-    this.sendChannel!.onclose = () => this.logger.log('Closed channel ')();
-  }
-
-  public closeEvents (text?: string|DefaultMessage) {
+  public closeEvents(text?: string | DefaultWsInMessage<string, HandlerName>) {
     this.messageProc.onDropConnection('data channel lost')
     if (text) {
       this.ondatachannelclose(<string>text); // TODO
@@ -156,21 +218,114 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     }
   }
 
-  printSuccess() {
 
-  }
-
-
-  getWsConnectionId(): string {
+  public getWsConnectionId(): string {
     return this.wsHandler.getWsConnectionId();
   }
 
-  sendRawTextToServer(message: string): boolean {
+  public sendRawTextToServer(message: string): boolean {
     if (this.isChannelOpened) {
       this.sendChannel!.send(message);
       return true;
     } else {
       return false;
     }
+  }
+
+
+  protected setupEvents() {
+
+    this.sendChannel!.onmessage = this.onChannelMessage.bind(this);
+    this.sendChannel!.onopen = () => {
+      this.logger.log('Channel opened')();
+      if (this.getWsConnectionId() > this.opponentWsId) {
+        this.syncMessages();
+      }
+      this.store.addLiveConnectionToRoom({connection:  this.opponentWsId, roomId: this.roomId});
+    };
+    this.sendChannel!.onclose = () => {
+      this.logger.log('Closed channel ')();
+      //this.syncMessageLock = false; // just for the case, not nessesary
+      this.messageProc.onDropConnection('Data channel closed');
+      if (this.store.userInfo) {
+        // otherwise we logged out
+        this.store.removeLiveConnectionToRoom({connection:  this.opponentWsId, roomId: this.roomId});
+      }
+    }
+  }
+
+  protected onChannelMessage(event: MessageEvent) {
+    let data: DefaultP2pMessage<keyof MessagePeerConnection> = this.messageProc.parseMessage(event.data) as unknown as DefaultP2pMessage<keyof MessagePeerConnection>;
+    if (data) {
+      let cb = this.messageProc.resolveCBifItsThere(data);
+      if (!cb) {
+        const handler: P2PHandlerType<keyof MessagePeerConnection> = this.p2pHandlers[data.action] as P2PHandlerType<keyof MessagePeerConnection>;
+        if (handler) {
+          handler.bind(this)(data);
+        } else {
+          this.logger.error(`{} can't find handler for {}, available handlers {}. Message: {}`, this.constructor.name, data.action, Object.keys(this.p2pHandlers), data)();
+        }
+      }
+    }
+  }
+
+
+  private async exchangeMessageInfo() {
+    if (this.isChannelOpened) {
+      let mI: MessagesInfo = this.messages.reduce((p, c) => {
+        p[c.id!] = c.edited ?? 0; // (undefied|null) ?? 0 === 0
+        return p;
+      }, {} as MessagesInfo);
+      let message: ExchangeMessageInfoRequest = {
+        action: 'exchangeMessageInfoRequest',
+        messagesInfo: mI
+      };
+      let response: ExchangeMessageInfoResponse = await this.messageProc.sendToServerAndAwait(message);
+      // got exchangeMessageInfoResponse
+      this.saveMessagesDtoToStore(response.messages);
+      let responseMessages: MessageP2pDto[] = response.requestMessages.map(
+          id => messageModelToP2p(this.room.messages[id])
+      );
+      let responseToRequest: ExchangeMessageInfoResponse2 = {
+        resolveCbId: response.cbId,
+        messages: responseMessages, // we need to resolve callback even if messages are empty
+        action: 'exchangeMessageInfoResponse2'
+      }
+      await this.messageProc.sendToServerAndAwait(responseToRequest);
+      this.markAsReadSentMessages(responseMessages);
+    } else {
+      throw Error("No connection");
+    }
+  }
+
+  private markAsReadSentMessages(responseMessages: MessageP2pDto[]) {
+    if (!this.isConnectedToMyAnotherDevices) {
+      let isNotRead: number[] = responseMessages.map(m => m.id).filter(id => this.room.messages[id].sending);
+      if (isNotRead.length > 0) {
+        this.store.markMessageAsSent({messagesId: isNotRead, roomId: this.roomId});
+      }
+    }
+  }
+
+  private saveMessagesDtoToStore(messageP2pDtos: MessageP2pDto[]) {
+    let messageModels: MessageModel[] = messageP2pDtos.map(rp => p2pMessageToModel(rp, this.roomId));
+    if (messageModels.length > 0) {
+      this.store.addMessages({
+        messages: messageModels,
+        roomId: this.roomId
+      });
+    }
+  }
+
+  private get isChannelOpened(): boolean {
+    return this.sendChannel?.readyState === 'open';
+  }
+
+  private get messages(): MessageModel[] {
+    return Object.values(this.room.messages);
+  }
+
+  private get room(): RoomModel {
+    return this.store.roomsDict[this.roomId];
   }
 }

@@ -5,7 +5,6 @@ import {
 } from '@/ts/utils/consts';
 import {
   Logger,
-  LogStrict
 } from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
@@ -15,28 +14,9 @@ import {
   UserModel
 } from '@/ts/types/model';
 import {
-  HandlerType,
-  HandlerTypes,
   MessageSupplier,
-  PubSetRooms,
   SessionHolder
 } from '@/ts/types/types';
-import {
-  AddChannelMessage,
-  AddInviteMessage,
-  AddRoomMessage,
-  DefaultMessage,
-  DefaultSentMessage,
-  LogoutMessage,
-  PingMessage,
-  SaveChannelSettings,
-  SetProfileImageMessage,
-  SetSettingsMessage,
-  SetUserProfileMessage,
-  SetWsIdMessage,
-  UserProfileChangedMessage,
-  WebRtcSetConnectionIdMessage
-} from '@/ts/types/messages';
 import {
   convertUser,
   currentUserInfoDtoToModel,
@@ -49,7 +29,35 @@ import {
 } from '@/ts/types/dto';
 import { sub } from '@/ts/instances/subInstance';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
-import AbstractMessageProcessor from '@/ts/message_handlers/AbstractMessageProcessor';
+import {WsMessageProcessor }from '@/ts/message_handlers/WsMessageProcessor';
+import {
+  AddChannelMessage,
+  AddInviteMessage,
+  AddRoomMessage,
+  DefaultWsInMessage,
+  DeleteMessage,
+  EditMessage,
+  PingMessage,
+  PongMessage,
+  PrintMessage,
+  SaveChannelSettingsMessage,
+  SetProfileImageMessage,
+  SetSettingsMessage,
+  SetUserProfileMessage,
+  SetWsIdMessage,
+  UserProfileChangedMessage,
+  WebRtcSetConnectionIdMessage
+} from '@/ts/types/messages/wsInMessages';
+import {
+  InternetAppearMessage,
+  LogoutMessage,
+  PubSetRooms
+} from '@/ts/types/messages/innerMessages';
+import {
+  HandlerType,
+  HandlerTypes
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { DefaultWsOutMessage } from '@/ts/types/messages/wsOutMessages';
 
 enum WsState {
   NOT_INITED, TRIED_TO_CONNECT, CONNECTION_IS_LOST, CONNECTED
@@ -60,16 +68,17 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
 
   protected readonly logger: Logger;
 
-  protected readonly handlers: HandlerTypes = {
-    setSettings: <HandlerType>this.setSettings,
-    setUserProfile: <HandlerType>this.setUserProfile,
-    setProfileImage: <HandlerType>this.setProfileImage,
-    setWsId: <HandlerType>this.setWsId,
-    logout: <HandlerType>this.logout,
-    userProfileChanged: <HandlerType>this.userProfileChanged,
-    ping: <HandlerType>this.ping,
-    pong: this.pong
+  protected readonly handlers: HandlerTypes<keyof WsHandler, 'ws'> = {
+    setSettings: <HandlerType<'setSettings', 'ws'>>this.setSettings,
+    setUserProfile: <HandlerType<'setUserProfile', 'ws'>>this.setUserProfile,
+    setProfileImage: <HandlerType<'setProfileImage', 'ws'>>this.setProfileImage,
+    setWsId: <HandlerType<'setWsId', 'ws'>>this.setWsId,
+    logout: <HandlerType<'logout', 'ws'>>this.logout,
+    userProfileChanged: <HandlerType<'userProfileChanged', 'ws'>>this.userProfileChanged,
+    ping: <HandlerType<'ping', 'ws'>>this.ping,
+    pong: <HandlerType<'pong', 'ws'>> this.pong
   };
+
   private pingTimeoutFunction: number|null = null;
   private ws: WebSocket | null = null;
   private noServerPingTimeout: any;
@@ -78,7 +87,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   private readonly sessionHolder: SessionHolder;
   private listenWsTimeout: number|null = null;
   private readonly API_URL: string;
-  private readonly messageProc: AbstractMessageProcessor;
+  private readonly messageProc: WsMessageProcessor;
   private wsState: WsState = WsState.NOT_INITED;
 
   // this.dom = {
@@ -93,8 +102,8 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     super();
     sub.subscribe('ws', this);
     this.API_URL = API_URL;
-    this.messageProc = new AbstractMessageProcessor(this, store, 'ws');
-    this.logger = loggerFactory.getLoggerColor('ws', '#2e631e');
+    this.messageProc = new WsMessageProcessor(this, store, 'ws');
+    this.logger = loggerFactory.getLoggerColor('ws', '#4c002b');
     this.sessionHolder = sessionHolder;
     this.store = store;
   }
@@ -163,27 +172,26 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public sendEditMessage(content: string|null, id: number, files: number[] | null, messageId: number) {
+  public sendEditMessage(content: string|null, id: number, files: number[] | null) {
     const newVar = {
       id,
       action: 'editMessage',
       files,
-      messageId,
       content
     };
     this.sendToServer(newVar, true);
   }
 
-  public sendSendMessage(content: string, roomId: number, files: number[], messageId: number, timeDiff: number) {
+  public async sendPrintMessage(content: string, roomId: number, files: number[], id: number, timeDiff: number): Promise<PrintMessage> {
     const newVar = {
       files,
-      messageId,
+      id,
       timeDiff,
-      action: 'sendMessage',
+      action: 'printMessage',
       content,
       roomId
     };
-    this.sendToServer(newVar, true);
+    return this.messageProc.sendToServerAndAwait(newVar);
   }
 
   public async saveSettings(content: UserSettingsDto): Promise<SetSettingsMessage|unknown> {
@@ -233,7 +241,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  public async saveChannelSettings(channelName: string, channelId: number, channelCreatorId: number): Promise<SaveChannelSettings> {
+  public async saveChannelSettings(channelName: string, channelId: number, channelCreatorId: number): Promise<SaveChannelSettingsMessage> {
     return this.messageProc.sendToServerAndAwait({
       action: 'saveChannelSettings',
       channelId,
@@ -251,7 +259,7 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   }
 
   public startListening() {
-    this.logger.debug('Starting webSocket')();
+    this.logger.log('Starting webSocket')();
     if (!this.listenWsTimeout && !this.ws) {
       this.listenWS();
     }
@@ -350,29 +358,23 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
     });
   }
 
-  private sendToServer<T extends DefaultSentMessage>(messageRequest: T, skipGrowl = false): void {
-    const isSent = this.messageProc.sendToServer(messageRequest);
-    if (!isSent && !skipGrowl) {
-      this.store.growlError('Can\'t send message, because connection is lost :(');
-    }
-  }
 
-  private setSettings(m: SetSettingsMessage) {
+  public setSettings(m: SetSettingsMessage) {
     const a: CurrentUserSettingsModel = userSettingsDtoToModel(m.content);
     this.setUserSettings(a);
   }
 
-  private setUserProfile(m: SetUserProfileMessage) {
+  public setUserProfile(m: SetUserProfileMessage) {
     const a: CurrentUserInfoModel = currentUserInfoDtoToModel(m.content);
     a.userId = this.store.userInfo!.userId; // this could came only when we logged in
     this.store.setUserInfo(a);
   }
 
-  private setProfileImage(m: SetProfileImageMessage) {
+  public setProfileImage(m: SetProfileImageMessage) {
     this.setUserImage(m.content);
   }
 
-  private setWsId(message: SetWsIdMessage) {
+  public setWsId(message: SetWsIdMessage) {
     this.wsConnectionId = message.opponentWsId;
     this.setUserInfo(message.userInfo);
     this.setUserSettings(message.userSettings);
@@ -387,26 +389,32 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       users: message.users
     };
     sub.notify(pubSetRooms);
-    const inetAppear: DefaultMessage = {
+    const inetAppear: InternetAppearMessage = {
       action: 'internetAppear',
-      handler: 'lan'
+      handler: 'any'
     };
     sub.notify(inetAppear);
     this.logger.debug('CONNECTION ID HAS BEEN SET TO {})', this.wsConnectionId)();
   }
 
-  private userProfileChanged(message: UserProfileChangedMessage) {
+  public userProfileChanged(message: UserProfileChangedMessage) {
     const user: UserModel = convertUser(message);
     this.store.setUser(user);
   }
 
-  private ping(message: PingMessage) {
+  public ping(message: PingMessage) {
     this.startNoPingTimeout();
     this.sendToServer({action: 'pong', time: message.time});
   }
 
-  private pong() {
-    this.answerPong();
+  public pong(message: PongMessage) {
+  // private answerPong() {
+    if (this.pingTimeoutFunction) {
+      this.logger.debug('Clearing pingTimeoutFunction')();
+      clearTimeout(this.pingTimeoutFunction);
+      this.pingTimeoutFunction = null;
+    }
+    // }
   }
 
   private setUserInfo(userInfo: UserProfileDto) {
@@ -417,21 +425,13 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
   private setUserSettings(userInfo: UserSettingsDto) {
     const um: UserSettingsDto = userSettingsDtoToModel(userInfo);
     if (!IS_DEBUG) {
-      loggerFactory.setLogWarnings(userInfo.logs ? LogStrict.TRACE : LogStrict.DISABLE_LOGS);
+      loggerFactory.setLogWarnings(userInfo.logs ?? 'debug');
     }
     this.store.setUserSettings(um);
   }
 
   private setUserImage(image: string) {
     this.store.setUserImage(image);
-  }
-
-  private answerPong() {
-    if (this.pingTimeoutFunction) {
-      this.logger.debug('Clearing pingTimeoutFunction')();
-      clearTimeout(this.pingTimeoutFunction);
-      this.pingTimeoutFunction = null;
-    }
   }
 
   private onWsMessage(message: MessageEvent) {
@@ -558,6 +558,15 @@ export default class WsHandler extends MessageHandler implements MessageSupplier
       this.logger.debug('Connection has been established')();
     };
   }
+
+  private sendToServer<T extends DefaultWsOutMessage<string>>(messageRequest: T, skipGrowl = false): boolean {
+    const isSent = this.messageProc.sendToServer(messageRequest);
+    if (!isSent && !skipGrowl) {
+      this.store.growlError('Can\'t send message, because connection is lost :(');
+    }
+    return isSent;
+  }
+
 
   private startNoPingTimeout() {
     if (this.noServerPingTimeout) {

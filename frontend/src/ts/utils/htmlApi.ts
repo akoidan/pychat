@@ -9,6 +9,7 @@ import {
   UploadFile
 } from '@/ts/types/types';
 import {
+  BlobType,
   FileModel,
   MessageModel
 } from '@/ts/types/model';
@@ -24,7 +25,7 @@ import { Logger } from 'lines-logger';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
-const logger: Logger = loggerFactory.getLoggerColor('htmlApi', '#007a70');
+const logger: Logger = loggerFactory.getLogger('htmlApi');
 
 export const savedFiles: { [id: string]: Blob } = {};
 
@@ -155,7 +156,7 @@ export function placeCaretAtEnd(userMessage: HTMLElement) {
 }
 
 export function encodeMessage(data: MessageModel) {
-  logger.trace('Encoding message {}: {}', data.id, data)();
+  logger.debug('Encoding message {}: {}', data.id, data)();
   if (data.giphy) {
     return `<div class="giphy"><img src='${data.giphy}' /><a class="giphy_hover" href="https://giphy.com/" target="_blank"/></div>`;
   } else {
@@ -186,13 +187,13 @@ function encodeFiles(html: string, files: { [id: string]: FileModel } | null) {
       const v = files[s];
       if (v) {
         if (v.type === 'i') {
-          return `<img src='${resolveMediaUrl(v.url!)}' imageId='${v.id}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
+          return `<img src='${resolveMediaUrl(v.url!)}' symbol='${s}' class='${PASTED_IMG_CLASS}'/>`;
         } else if (v.type === 'v' || v.type === 'm') {
           const className = v.type === 'v' ? 'video-player' : 'video-player video-record';
 
-          return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview!)}' symbol='${s}' imageId='${v.id}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
+          return `<div class='${className}' associatedVideo='${v.url}'><div><img src='${resolveMediaUrl(v.preview!)}' symbol='${s}' class='${PASTED_IMG_CLASS}'/><div class="icon-youtube-play"></div></div></div>`;
         } else if (v.type === 'a') {
-          return `<img src='${recordIcon}' imageId='${v.id}' symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
+          return `<img src='${recordIcon}'  symbol='${s}' associatedAudio='${v.url}' class='audio-record'/>`;
         } else {
           logger.error('Invalid type {}', v.type)();
         }
@@ -411,7 +412,7 @@ export function pasteBlobAudioToTextArea(file: Blob, textArea: HTMLElement) {
   const img = document.createElement('img');
   const associatedAudio = URL.createObjectURL(file);
   img.setAttribute('associatedAudio', associatedAudio);
-  img.className = `recorded-audio ${PASTED_IMG_CLASS}`;
+  img.className = `audio-record ${PASTED_IMG_CLASS}`;
   setBlobName(file);
   savedFiles[associatedAudio] = file;
   img.src = recordIcon as string;
@@ -444,80 +445,49 @@ function nextChar(c: string): string {
   return String.fromCharCode(c.charCodeAt(0) + 1);
 }
 
-export function getMessageData(userMessage: HTMLElement, currSymbol: string = '\u3500'): MessageDataEncode {
-  const files: UploadFile[] = []; // return array from nodeList
+export function getMessageData(userMessage: HTMLElement, messageModel?: MessageModel): MessageDataEncode {
+  let currSymbol: string =  messageModel?.symbol ?? '\u3500';
+  const files: Record<string, FileModel>| null = {}; // return array from nodeList
   const images = userMessage.querySelectorAll(`.${PASTED_IMG_CLASS}`);
-  const fileModels: { [id: string]: FileModel } = {};
   forEach(images, img => {
+    debugger
     let oldSymbol = img.getAttribute('symbol');
+    let src = img.getAttribute('src');
+    const assVideo = img.getAttribute('associatedVideo') ?? null;
+    const assAudio = img.getAttribute('associatedAudio')  ?? null;
+    const videoType: BlobType = img.getAttribute('videoType')! as BlobType;
+
     let elSymbol = oldSymbol;
     if (!elSymbol) {
       currSymbol = nextChar(currSymbol);
       elSymbol = currSymbol;
     }
+
     const textNode = document.createTextNode(elSymbol);
     img.parentNode!.replaceChild(textNode, img);
-    let src = img.getAttribute('src');
-    // TODO is `blob:` only works in chrome or the same in all browsers?
-    // TODO if not blob, load external images with Xhr, otherwise current version is bugged
-    // only if symbols is not created yet and it's not in cache
-    let imageIsInCacheButNotInServer = src?.startsWith('blob:') && savedFiles[src];
-    const assVideo = img.getAttribute('associatedVideo');
-    const assAudio = img.getAttribute('associatedAudio');
-    const type: string = img.getAttribute('videoType')!;
-    if (assVideo) {
-      if (imageIsInCacheButNotInServer) {
-        files.push({
-          file: savedFiles[assVideo],
-          type: type,
-          symbol: elSymbol
-        });
-        files.push({
-          file: savedFiles[src!],
-          type: 'p',
-          symbol: elSymbol
-        });
+
+    if (messageModel?.files) {
+      let fm: FileModel = messageModel.files[elSymbol];
+      if (fm && !fm.sending) {
+        files[elSymbol] = fm;
+        return;
       }
-      fileModels[elSymbol] = {
-        id: null,
-        preview: src,
-        url: assVideo,
-        type: 'v',
-      };;
-    } else if (assAudio) {
-      if (imageIsInCacheButNotInServer) {
-        files.push({
-          file: savedFiles[assAudio],
-          type: 'a',
-          symbol: elSymbol
-        });
-      }
-      fileModels[elSymbol] =  {
-        id: null,
-        preview: null,
-        url: assAudio,
-        type: 'a'
-      };;
-    } else {
-      if (imageIsInCacheButNotInServer) {
-        files.push({
-          file: savedFiles[src!],
-          type: 'i',
-          symbol: elSymbol
-        });
-      }
-      fileModels[elSymbol] = {
-        id: null,
-        preview: null,
-        url: src,
-        type: 'i'
-      };
     }
+
+    files[elSymbol] = {
+      type: videoType ?? (assAudio ? 'a' : 'i'),
+      preview: assVideo ? src : assVideo,
+      url: assAudio ?? (assVideo ?? src),
+      sending: true,
+      fileId: null,
+      previewFileId: null,
+    }
+
   });
   userMessage.innerHTML = userMessage.innerHTML.replace(/<img[^>]*symbol="([^"]+)"[^>]*>/g, '$1');
   let messageContent: string | null = typeof userMessage.innerText !== 'undefined' ? userMessage.innerText : userMessage.textContent;
   messageContent = !messageContent || /^\s*$/.test(messageContent) ? null : messageContent;
   userMessage.innerHTML = '';
 
-  return {files, messageContent, currSymbol, fileModels};
+  return {files, messageContent, currSymbol};
 }

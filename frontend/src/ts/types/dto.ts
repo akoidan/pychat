@@ -1,4 +1,5 @@
 import {
+  BlobType,
   ChannelsDictModel,
   CurrentUserInfoModel,
   CurrentUserSettingsModel,
@@ -6,7 +7,7 @@ import {
   SexModelString,
   UserModel
 } from '@/ts/types/model';
-
+import {LogLevel} from 'lines-logger';
 export type SexModelDto = 'Male' | 'Female' |'Secret';
 
 
@@ -23,6 +24,12 @@ export interface RoomNoUsersDto {
 export interface RoomDto  extends  RoomNoUsersDto {
   users: number[];
 }
+
+export interface ViewUserProfileDto extends UserProfileDto {
+  image: string;
+}
+
+export type SaveFileResponse = Record<string, { fileId: number; previewFileId?: number}>;
 
 export interface ChannelDto {
   channelName: string;
@@ -52,7 +59,7 @@ export interface UserSettingsDto {
   onlineChangeSound: boolean;
   sendLogs: boolean;
   suggestions: boolean;
-  logs: boolean;
+  logs: LogLevel;
   theme: string;
 }
 
@@ -85,9 +92,8 @@ export interface UserProfileDto {
 }
 
 export interface FileModelDto {
-  id: number;
   url: string;
-  type: string;
+  type: BlobType;
   preview: string;
 }
 

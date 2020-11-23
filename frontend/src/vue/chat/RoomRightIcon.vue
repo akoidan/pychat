@@ -19,8 +19,8 @@
     />
     <template v-else-if="room.p2p">
       <span
-        v-if="room.p2pInfo.amountOfActiveConnections > 0"
-        :title="`This room has opened ${room.p2pInfo.amountOfActiveConnections} connection with other devices`"
+        v-if="room.p2pInfo.liveConnections.length > 0"
+        :title="`This room has opened ${room.p2pInfo.liveConnections} connection with other devices`"
         class="icon-spin1 icon-no-cog animate-spin"
       />
       <span
@@ -58,6 +58,10 @@ import { RoomModel } from '@/ts/types/model';
 
   .icon-wifi, .icon-phone, .icon-spin1
     @extend %right-icon
+
+  .icon-spin1
+    padding: 0px //overrite @extend %right-icon padding-right 2px
+    color: #53a045
   .icon-cog
     @extend %icon-cog
 

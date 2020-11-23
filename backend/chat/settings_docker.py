@@ -1,4 +1,3 @@
-import logging.config
 import sys
 
 from chat.settings_base import *
@@ -35,5 +34,3 @@ LOGGING['loggers'] = {
 		'propagate': False,
 	},
 }
-
-logging.config.dictConfig(LOGGING)

@@ -59,9 +59,9 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-property-decorator';
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
-import {ViewUserProfileDto} from '@/ts/types/messages';
 import {resolveMediaUrl} from '@/ts/utils/htmlApi';
 import {UserModel} from '@/ts/types/model';
+import { ViewUserProfileDto } from "@/ts/types/dto";
 
 @Component
 export default class ViewProfilePage extends Vue {

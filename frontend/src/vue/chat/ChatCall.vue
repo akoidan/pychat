@@ -202,9 +202,9 @@ import {
   VideoType
 } from '@/ts/types/types';
 
-import ChatRemotePeer from '@/vue/chat/ChatRemotePeer';
+import ChatRemotePeer from '@/vue/chat/ChatRemotePeer.vue';
 import { file } from '@/ts/utils/audio';
-import VideoObject from '@/vue/chat/VideoObject';
+import VideoObject from '@/vue/chat/VideoObject.vue';
 
 @Component({
   components: {VideoObject, ChatRemotePeer}
@@ -282,14 +282,16 @@ export default class ChatCall extends Vue {
   }
 
   public exitFullscreen() {
-    if (document.cancelFullScreen) {
-      document.cancelFullScreen();
-    } else if (document.msCancelFullScreen) {
-      document.msCancelFullScreen();
-    } else if (document.mozCancelFullScreen) {
-      document.mozCancelFullScreen();
-    } else if (document.webkitCancelFullScreen) {
-      document.webkitCancelFullScreen();
+    if (typeof screen != 'undefined' && screen.height === window.innerHeight) {
+      if (document.cancelFullScreen) {
+        document.cancelFullScreen();
+      } else if (document.msCancelFullScreen) {
+        document.msCancelFullScreen();
+      } else if (document.mozCancelFullScreen) {
+        document.mozCancelFullScreen();
+      } else if (document.webkitCancelFullScreen) {
+        document.webkitCancelFullScreen();
+      }
     }
     this.fullscreen = false;
   }

@@ -24,11 +24,10 @@
 <script lang="ts">
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import {Component, Prop, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit';
+import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import {FACEBOOK_APP_ID, GOOGLE_OAUTH_2_CLIENT_ID} from '@/ts/utils/consts';
 import {sub} from '@/ts/instances/subInstance'
-import {LoginMessage} from "@/ts/types/messages";
-import Login from "@/vue/singup/Login.vue";
+import { LoginMessage } from '@/ts/types/messages/innerMessages';
 
 declare const gapi: any;
 declare const FB: any;
@@ -47,6 +46,7 @@ export default class SocialAuth extends Vue {
   public googleToken: string|null = null;
   public oauth_token: string = GOOGLE_OAUTH_2_CLIENT_ID;
   public fb_app_id: string = FACEBOOK_APP_ID;
+  public email: string|null = null;
 
   get googleRunning() {
     return this.grunning || !this.googleApiLoaded;
@@ -167,6 +167,11 @@ export default class SocialAuth extends Vue {
           scope: 'email'
         });
       });
+      let emailResponse = await new Promise((resolve, reject) => {
+        FB.api('/me?scope=email', resolve, reject)
+      });
+      // TODO
+      debugger
       await this.fbStatusChangeIfReAuth(response);
     }
   }

@@ -62,7 +62,7 @@ class MessagesHandler(MessagesCreator):
 		# The handler is determined by @VarNames.EVENT
 		self.process_ws_message = {
 			Actions.GET_MESSAGES: self.process_get_messages,
-			Actions.SEND_MESSAGE: self.process_send_message,
+			Actions.PRINT_MESSAGE: self.process_send_message,
 			Actions.DELETE_ROOM: self.delete_room,
 			Actions.EDIT_MESSAGE: self.edit_message,
 			Actions.CREATE_ROOM: self.create_new_room,
@@ -296,8 +296,8 @@ class MessagesHandler(MessagesCreator):
 				message_db,
 				Actions.PRINT_MESSAGE,
 				res_files,
-				js_id
 			)
+			prepared_message[VarNames.JS_MESSAGE_ID] = js_id
 			self.publish(prepared_message, channel)
 			self.notify_offline(channel, message_db.id)
 		if giphy_match is not None:
@@ -443,7 +443,7 @@ class MessagesHandler(MessagesCreator):
 		"""
 		room_id = message[VarNames.ROOM_ID]
 		room_name = message[VarNames.ROOM_NAME]
-		creator_id = message[VarNames.ROOM_CREATOR_ID]
+		creator_id = message.get(VarNames.ROOM_CREATOR_ID) # will be none for private room
 		updated = RoomUsers.objects.filter(room_id=room_id, user_id=self.user_id).update(
 			volume=message[VarNames.VOLUME],
 			notifications=message[VarNames.NOTIFICATIONS]
@@ -474,7 +474,7 @@ class MessagesHandler(MessagesCreator):
 					raise ValidationError("You can only change admin to one of the users in this channels room")
 				room.creator_id = creator_id
 				update_all = True
-		if message[VarNames.CHANNEL_ID]:
+		if message.get(VarNames.CHANNEL_ID): # will be nOne for private room
 			channel = Channel.objects.get(id=message[VarNames.CHANNEL_ID])
 			channel_name = channel.name
 			channel_creator_id = channel.creator_id
@@ -682,7 +682,6 @@ class MessagesHandler(MessagesCreator):
 		self.publish(message, room_id, True)
 
 	def edit_message(self, data):
-		js_id = data[VarNames.JS_MESSAGE_ID]
 		message = Message.objects.get(id=data[VarNames.MESSAGE_ID])
 		validate_edit_message(self.user_id, message)
 		message.content = data[VarNames.CONTENT]
@@ -695,13 +694,13 @@ class MessagesHandler(MessagesCreator):
 				edited_times=message.edited_times,
 				content=None
 			)
-			self.publish(self.create_send_message(message, Actions.DELETE_MESSAGE, None, js_id), message.room_id)
+			self.publish(self.create_send_message(message, Actions.DELETE_MESSAGE, None), message.room_id)
 		elif giphy_match is not None:
-			self.edit_message_giphy(giphy_match, message, js_id)
+			self.edit_message_giphy(giphy_match, message)
 		else:
-			self.edit_message_edit(data, message, js_id)
+			self.edit_message_edit(data, message)
 
-	def edit_message_giphy(self, giphy_match, message, js_id):
+	def edit_message_giphy(self, giphy_match, message):
 		def edit_glyphy(message, giphy):
 			Message.objects.filter(id=message.id).update(
 				content=message.content,
@@ -710,11 +709,11 @@ class MessagesHandler(MessagesCreator):
 				edited_times=message.edited_times
 			)
 			message.giphy = giphy
-			self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None, js_id), message.room_id)
+			self.publish(self.create_send_message(message, Actions.EDIT_MESSAGE, None), message.room_id)
 
 		self.search_giphy(message, giphy_match, edit_glyphy)
 
-	def edit_message_edit(self, data, message, js_id):
+	def edit_message_edit(self, data, message):
 		action = Actions.EDIT_MESSAGE
 		message.giphy = None
 		files = UploadedFile.objects.filter(id__in=data.get(VarNames.FILES), user_id=self.user_id)
@@ -727,7 +726,7 @@ class MessagesHandler(MessagesCreator):
 		else:
 			prep_files = None
 		Message.objects.filter(id=message.id).update(content=message.content, symbol=message.symbol, giphy=None, edited_times=message.edited_times)
-		self.publish(self.create_send_message(message, action, prep_files, js_id), message.room_id)
+		self.publish(self.create_send_message(message, action, prep_files), message.room_id)
 
 	def send_client_new_channel(self, message):
 		room_id = message[VarNames.ROOM_ID]

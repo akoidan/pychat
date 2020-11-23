@@ -3,23 +3,29 @@ import {
   RESPONSE_SUCCESS
 } from '@/ts/utils/consts';
 import {
-  HandlerTypes,
   UploadFile
 } from '@/ts/types/types';
-import { MessageModelDto } from '@/ts/types/dto';
 import {
-  DefaultMessage,
+  MessageModelDto,
+  SaveFileResponse,
   ViewUserProfileDto
-} from '@/ts/types/messages';
+} from '@/ts/types/dto';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 import Http from '@/ts/classes/Http';
 import { sub } from '@/ts/instances/subInstance';
+import {
+  HandlerType,
+  HandlerTypes
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { InternetAppearMessage } from '@/ts/types/messages/innerMessages';
+import { FileModel } from '@/ts/types/model';
+
 
 export default class Api extends MessageHandler {
-  protected readonly handlers: HandlerTypes = {
-    internetAppear: this.internetAppear
+  protected readonly handlers:  HandlerTypes<keyof Api, 'any'> = {
+    internetAppear: <HandlerType<'internetAppear', 'any'>>this.internetAppear
   };
 
   protected readonly logger: Logger;
@@ -29,8 +35,8 @@ export default class Api extends MessageHandler {
 
   constructor(xhr: Http) {
     super();
-    sub.subscribe('lan', this);
-    this.logger = loggerFactory.getLoggerColor('api', 'red');
+    sub.subscribe('any', this);
+    this.logger = loggerFactory.getLogger('api');
     this.xhr = xhr;
   }
 
@@ -198,11 +204,11 @@ export default class Api extends MessageHandler {
     return this.xhr.doGet<string>(`/confirm_email?token=${token}`, false, true);
   }
 
-  public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void): Promise<number[]> {
+  public async uploadFiles(files: UploadFile[], progress: (e: ProgressEvent) => void): Promise<SaveFileResponse> {
     const fd = new FormData();
-    files.forEach(sd => fd.append(sd.type + sd.symbol, sd.file, sd.file.name));
+    files.forEach(sd => fd.append(sd.key, sd.file, sd.file.name));
 
-    return this.xhr.doPost<number[]>({
+    return this.xhr.doPost<SaveFileResponse>({
       url: '/upload_file',
       isJsonDecoded: true,
       formData: fd,
@@ -242,7 +248,7 @@ export default class Api extends MessageHandler {
     });
   }
 
-  private internetAppear(m: DefaultMessage): void {
+  public internetAppear(m: InternetAppearMessage): void {
     if (this.retryFcb) {
       this.retryFcb();
     }

@@ -16,20 +16,18 @@ import {
   isChrome,
   isMobile
 } from '@/ts/utils/runtimeConsts';
-import { Logger } from "lines-logger";
-import loggerFactory from "@/ts/instances/loggerFactory";
+import { Logger } from 'lines-logger';
+import loggerFactory from '@/ts/instances/loggerFactory';
 import {
   IStorage,
-  MessageSender,
-  StorageData
-} from "@/ts/types/types";
-import sessionHolder from "@/ts/instances/sessionInstance";
+} from '@/ts/types/types';
+import sessionHolder from '@/ts/instances/sessionInstance';
 import {
   MessageModel,
   PlatformUtil,
   RoomModel
-} from "@/ts/types/model";
-import { VNode } from "vue/types/vnode";
+} from '@/ts/types/model';
+import { VNode } from 'vue/types/vnode';
 import Xhr from '@/ts/classes/Xhr';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import ChannelsHandler from '@/ts/message_handlers/ChannelsHandler';
@@ -39,11 +37,13 @@ import Api from '@/ts/message_handlers/Api';
 import NotifierHandler from '@/ts/classes/NotificationHandler';
 import Http from '@/ts/classes/Http';
 import WebRtcApi from '@/ts/webrtc/WebRtcApi';
-import  {router} from '@/ts/instances/routerInstance';
-import { AudioPlayer } from "@/ts/classes/AudioPlayer";
-import { AndroidPlatformUtil } from "@/ts/devices/AndroidPlatformUtils";
-import { WebPlatformUtils } from "@/ts/devices/WebPlatformUtils";
-import { MessageSenderProxy } from "@/ts/message_handlers/MessageSenderProxy";
+import { router } from '@/ts/instances/routerInstance';
+import { AudioPlayer } from '@/ts/classes/AudioPlayer';
+import { AndroidPlatformUtil } from '@/ts/devices/AndroidPlatformUtils';
+import { WebPlatformUtils } from '@/ts/devices/WebPlatformUtils';
+import { MessageSenderProxy } from '@/ts/message_handlers/MessageSenderProxy';
+import { SetStateFromStorage } from '@/ts/types/dto';
+import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 
 function declareDirectives() {
   Vue.directive('validity', function (el: HTMLElement, binding) {
@@ -56,7 +56,7 @@ function declareDirectives() {
     switcherFinish?: () => Promise<void>;
   }
 
-  function getEventName(eventType: 'start' | 'end') : string[] {
+  function getEventName(eventType: 'start' | 'end'): string[] {
     if (IS_ANDROID || isMobile) {
       return eventType === 'start' ? ['touchstart'] : ['touchend'];
     } else {
@@ -68,34 +68,34 @@ function declareDirectives() {
 
   Vue.directive('switcher', {
 
-    bind: function(el, binding, vnode: MyVNode) {
+    bind: function (el, binding, vnode: MyVNode) {
 
       vnode.switcherTimeout = 0;
-      vnode.switcherStart = async function() {
-        vnode.context!.$logger.debug("Triggered onMouseDown, waiting {}ms for the next event...", HOLD_TIMEOUT)();
+      vnode.switcherStart = async function () {
+        vnode.context!.$logger.debug('Triggered onMouseDown, waiting {}ms for the next event...', HOLD_TIMEOUT)();
         getEventName('end').forEach(eventName => el.addEventListener(eventName, vnode.switcherFinish!))
         await new Promise((resolve) => vnode.switcherTimeout = window.setTimeout(resolve, HOLD_TIMEOUT));
         vnode.switcherTimeout = 0;
-        vnode.context!.$logger.debug("Timeout expired, firing enable record action")();
+        vnode.context!.$logger.debug('Timeout expired, firing enable record action')();
         await binding.value.start();
 
       };
       // @ts-ignore: next-line
-      vnode.switcherFinish = async function(e: Event) {
+      vnode.switcherFinish = async function (e: Event) {
         getEventName('end').forEach(eventName => el.removeEventListener(eventName, vnode.switcherFinish!))
         if (vnode.switcherTimeout) {
-          vnode.context!.$logger.debug("Click event detected, firing switch recrod action")();
+          vnode.context!.$logger.debug('Click event detected, firing switch recrod action')();
           clearTimeout(vnode.switcherTimeout);
           vnode.switcherTimeout = 0;
           binding.value.switch();
         } else {
-          vnode.context!.$logger.debug("Release event detected, firing stop record action")();
+          vnode.context!.$logger.debug('Release event detected, firing stop record action')();
           binding.value.stop()
         }
       }
       getEventName('start').forEach(eventName => el.addEventListener(eventName, vnode.switcherStart!))
     },
-    unbind: function(el, binding, vnode: MyVNode) {
+    unbind: function (el, binding, vnode: MyVNode) {
       getEventName('start').forEach(eventName => el.removeEventListener(eventName, vnode.switcherStart!))
       getEventName('end').forEach(eventName => el.removeEventListener(eventName, vnode.switcherFinish!))
     }
@@ -107,7 +107,7 @@ declare module 'vue/types/vue' {
 
   interface Vue {
     __logger: Logger;
-    id?: number|string;
+    id?: number | string;
   }
 }
 
@@ -115,7 +115,7 @@ declare module 'vue/types/vue' {
 function declareMixins() {
   const mixin = {
     computed: {
-      $logger(this: Vue): Logger  {
+      $logger(this: Vue): Logger {
         if (!this.__logger && this.$options._componentTag !== 'router-link') {
           let name = this.$options._componentTag || 'vue-comp';
           if (!this.$options._componentTag) {
@@ -133,73 +133,32 @@ function declareMixins() {
     updated: function (this: Vue): void {
       this.$logger && this.$logger.trace('Updated')();
     },
-    created: function(this: Vue) {
-      this.$logger &&  this.$logger.trace('Created')();
+    created: function (this: Vue) {
+      this.$logger && this.$logger.trace('Created')();
     }
   };
   Vue.mixin(<ComponentOptions<Vue>><unknown>mixin);
 }
 
 
-async function initStore(logger: Logger, storage: IStorage, messageSenderProxy: MessageSenderProxy) {
-  store.setStorage(storage); // TODO mvoe to main
-  const isNew = await storage.connect();
-  if (!isNew) {
-    const data: StorageData | null = await storage.getAllTree();
-    const session = sessionHolder.session;
-    logger.log('restored state from db {}, userId: {}, session {}', data, store.userInfo && store.userInfo.userId, session)();
-    if (data) {
-      if (!store.userInfo && session) {
-        store.setStateFromStorage(data.setRooms);
-      } else {
-        store.roomsArray.forEach((storeRoom: RoomModel) => {
-          if (data.setRooms.roomsDict[storeRoom.id]) {
-            const dbMessages: {[id: number]: MessageModel} = data.setRooms.roomsDict[storeRoom.id].messages;
-            for (const dbMessagesKey in dbMessages) {
-              if (!storeRoom.messages[dbMessagesKey]) {
-                store.addMessage(dbMessages[dbMessagesKey]);
-              }
-            }
-          }
-        });
-        logger.debug('Skipping settings state {}', data.setRooms)();
-      }
-      if (session) {
-        logger.debug('Appending sending messages {}', data.sendingMessages)();
-        data.sendingMessages.forEach((m: MessageModel) => {
-          let messageSender: MessageSender = messageSenderProxy.getMessageSender(m.roomId);
-          if (m.content && m.id > 0) {
-            messageSender.sendEditMessage(m.content, m.roomId, m.id, []);
-          } else if (m.content) {
-            messageSender.sendSendMessage(m.content, m.roomId, [], m.id, m.time);
-          } else if (m.id > 0) {
-            messageSender.sendDeleteMessage(m.id);
-          }
-        });
-      } else {
-        logger.debug('No pending messages found')();
-      }
-    }
-  }
-}
-
-function init() {
+async function init() {
   declareMixins();
   declareDirectives();
 
   const xhr: Http = /* window.fetch ? new Fetch(XHR_API_URL, sessionHolder) :*/ new Xhr(sessionHolder);
   const api: Api = new Api(xhr);
 
-  const storage: IStorage = window.openDatabase! ? new DatabaseWrapper('v132') : new LocalStorage();
+  const storage: IStorage = window.openDatabase! ? new DatabaseWrapper() : new LocalStorage();
   const WS_URL = WS_API_URL.replace('{}', window.location.host);
   const ws: WsHandler = new WsHandler(WS_URL, sessionHolder, store);
   const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
   const audioPlayer: AudioPlayer = new AudioPlayer(notifier);
   const messageBus = new Vue();
-  const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, notifier, messageBus, audioPlayer);
-  const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier);
+  const messageHelper: MessageHelper = new MessageHelper(store, notifier, messageBus, audioPlayer);
+  const channelsHandler: ChannelsHandler = new ChannelsHandler(store, api, ws, audioPlayer, messageHelper);
+  const webrtcApi: WebRtcApi = new WebRtcApi(ws, store, notifier, messageHelper);
   const platformUtil: PlatformUtil = IS_ANDROID ? new AndroidPlatformUtil() : new WebPlatformUtils();
-  const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, channelsHandler, storage);
+  const messageSenderProxy: MessageSenderProxy = new MessageSenderProxy(store, webrtcApi, channelsHandler);
 
   Vue.prototype.$api = api;
   Vue.prototype.$ws = ws;
@@ -210,7 +169,7 @@ function init() {
   Vue.prototype.$platformUtil = platformUtil;
   Vue.prototype.$messageSenderProxy = messageSenderProxy;
 
-  const logger: Logger = loggerFactory.getLoggerColor('main', '#007a70');
+  const logger: Logger = loggerFactory.getLoggerColor(`main:${GIT_HASH ?? ''}`, '#007a70');
   document.body.addEventListener('drop', e => e.preventDefault());
   document.body.addEventListener('dragover', e => e.preventDefault());
   const vue: Vue = new Vue({router, render: (h: Function): typeof Vue.prototype.$createElement => h(App)});
@@ -240,11 +199,43 @@ function init() {
     logger.log('Constants {}', constants)();
   }
 
-  initStore(logger, storage, messageSenderProxy).then(value => {
-    logger.debug('Exiting from initing store')();
-  }).catch(e => {
-    logger.error('Unable to init store from db, because of', e)();
-  });
+  store.setStorage(storage);
+
+  const isNew = await storage.connect();
+
+  if (!isNew) {
+    const data: SetStateFromStorage | null = await storage.getAllTree();
+    const session = sessionHolder.session;
+    logger.log('restored state from db {}, userId: {}, session {}', data, store.myId, session)();
+    if (data) {
+      if (!store.userInfo && session) {
+        store.setStateFromStorage(data);
+      } else {
+        store.roomsArray.forEach((storeRoom: RoomModel) => {
+          if (data.roomsDict[storeRoom.id]) {
+            const dbMessages: { [id: number]: MessageModel } = data.roomsDict[storeRoom.id].messages;
+            for (const dbMessagesKey in dbMessages) {
+              if (!storeRoom.messages[dbMessagesKey]) {
+                // TODO we put it into db again :(
+                // we're saving it to database, we restored this message from.
+                // seems like we can't split 2 methods, since 1 should be in actions
+                // and one in mutation, but storage is not available in actions
+                store.addMessage(dbMessages[dbMessagesKey]);
+              }
+            }
+          }
+        });
+        logger.debug('Skipping settings state {}', data)();
+      }
+    }
+    // sync is not required here, I tested every time this code branch is executed messages sync even if we don't use it here.
+    // weird ha? they could be not in the storage ...
+    // if (ws.isWsOpen()) {
+    //   logger.error("Init ws open")();
+    //   // channelsHandler.syncMessages();
+    //   // webrtcApi.initAndSyncMessages()
+    // }
+  }
 
 }
 

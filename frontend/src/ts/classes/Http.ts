@@ -12,7 +12,7 @@ export default abstract class Http {
 
   constructor(sessionHolder: SessionHolder) {
     this.sessionHolder = sessionHolder;
-    this.httpLogger = loggerFactory.getLoggerColor('http', '#680061');
+    this.httpLogger = loggerFactory.getLogger('http');
   }
 
   public abstract async doGet<T>(fileUrl: string, isJsonDecoded: boolean, checkOk?: boolean): Promise<T>;

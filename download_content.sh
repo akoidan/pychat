@@ -467,6 +467,18 @@ elif [ "$1" = "copy_root_fs" ]; then
 elif [ "$1" = "redirect" ]; then
     safeRunCommand sudo iptables -t nat -A PREROUTING -p tcp --dport 443 -j REDIRECT --to-port 8080
     safeRunCommand sudo iptables -t nat -I OUTPUT -p tcp -d 127.0.0.1 --dport 443 -j REDIRECT --to-ports 8080
+elif [ "$1" = "delete_redirect" ]; then
+    sudo iptables -t nat -v -L PREROUTING -n --line-number |grep 8080
+    lines_prerouting=`sudo iptables -t nat -v -L PREROUTING -n --line-number |grep 8080 | awk '{print $1;}'`
+    sudo iptables -t nat -v -L OUTPUT -n --line-number |grep 8080
+    lines_postrouting=`sudo iptables -t nat -v -L OUTPUT -n --line-number |grep 8080 | awk '{print $1;}'`
+    for value in $lines_prerouting; do
+       safeRunCommand sudo iptables -t nat -D PREROUTING $value
+    done
+
+     for value2 in $lines_postrouting; do
+       safeRunCommand  sudo iptables -t nat -D OUTPUT $value2
+    done
 elif [ "$1" = "download_fontello" ]; then
     download_fontello
     delete_tmp_dir
@@ -491,6 +503,7 @@ else
     chp create_db "Creates database pychat to mysql, the following environment variable should be defined \e[94mDB_ROOT_PASS DB_USER DB_PASS DB_DATA_PATH"
     chp update_docker "Builds docker images for deathangel908/pychat"
     chp redirect "Redirects port 443 to port 8080, so you can use \e[96mhttps://pychat.org\e[0;33;40m for localhost if you have it in \e[96m/etc/hosts\e[0;33;40m"
+    chp delete_redirect "Removes redirection above"
     chp compile_js "Compiles frontend SPA javascript if $DIST_DIRECTORY is empty"
     chp create_venv "removes .venv and creates a new one with dependencies"
     chp copy_root_fs "Creates soft links from \e[96m$PROJECT_ROOT/rootfs\e[0;33;40m to \e[96m/\e[0;33;40m"

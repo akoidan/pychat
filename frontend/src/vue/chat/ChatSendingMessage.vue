@@ -11,8 +11,8 @@
         class="icon-repeat"
         @click="retry"
       >{{ message.transfer.error }}</i>
-      <div class="spinner" />
     </template>
+    <div class="spinner" v-if="message.sending" />
   </div>
 </template>
 <script lang="ts">
@@ -22,8 +22,8 @@ import {
   Prop,
   Vue
 } from 'vue-property-decorator';
-import ChatMessage from '@/vue/chat/ChatMessage';
-import AppProgressBar from '@/vue/ui/AppProgressBar';
+import ChatMessage from '@/vue/chat/ChatMessage.vue';
+import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
 
 import { SetMessageProgressError } from '@/ts/types/types';
 import {
@@ -84,7 +84,7 @@ export default class ChatSendingMessage extends Vue {
       error: null
     };
     this.$store.setMessageProgressError(newVar);
-    this.$messageSenderProxy.getMessageSender(this.message.roomId).getMessageRetrier().resendMessage(this.message.id);
+    this.$messageSenderProxy.getMessageSender(this.message.roomId).syncMessage(this.message.roomId, this.id);
     this.$store.growlInfo('Trying to upload files again');
   }
 }

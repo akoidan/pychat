@@ -10,9 +10,9 @@ import {
   Component,
   Vue
 } from 'vue-property-decorator';
-import RoomDirectUsersTable from '@/vue/chat/RoomDirectUsersTable';
-import RoomPublicTable from '@/vue/chat/RoomPublicTable';
-import CurrentRoomUsersTable from '@/vue/chat/CurrentRoomUsersTable';
+import RoomDirectUsersTable from '@/vue/chat/RoomDirectUsersTable.vue';
+import RoomPublicTable from '@/vue/chat/RoomPublicTable.vue';
+import CurrentRoomUsersTable from '@/vue/chat/CurrentRoomUsersTable.vue';
 
 @Component({
   components: {CurrentRoomUsersTable, RoomPublicTable, RoomDirectUsersTable}

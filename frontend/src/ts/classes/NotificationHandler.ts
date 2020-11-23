@@ -39,7 +39,7 @@ export default class NotifierHandler {
     this.ws = ws;
     this.documentTitle = document.title;
     this.store = store;
-    this.logger = loggerFactory.getLoggerColor('notify', '#e39800');
+    this.logger = loggerFactory.getLogger('notify');
     this.currentTabId = Date.now().toString();
     window.addEventListener('blur', this.onFocusOut.bind(this));
     window.addEventListener('focus', this.onFocus.bind(this));
@@ -98,7 +98,7 @@ export default class NotifierHandler {
         await this.registerWorker();
       }
     } catch (e) {
-      this.logger.error('Error registering service worker {}', extractError(e))();
+      this.logger.warn('Error registering service worker {}', extractError(e))();
     } finally {
       this.serviceWorkedTried = true;
     }
@@ -147,12 +147,12 @@ export default class NotifierHandler {
   public onFocus(e: Event|null) {
     localStorage.setItem(LAST_TAB_ID_VARNAME, this.currentTabId);
     if (e) {
-      this.logger.trace('Marking current tab as active, pinging server')();
+      this.logger.debug('Marking current tab as active, pinging server')();
       if (this.store.userInfo && this.ws.isWsOpen() && !IS_DEBUG) {
         this.ws.pingServer(); // if no event = call from init();
       }
     } else {
-      this.logger.trace('Marking current tab as active')();
+      this.logger.debug('Marking current tab as active')();
     }
     this.isCurrentTabActive = true;
     this.newMessagesCount = 0;
@@ -168,7 +168,7 @@ export default class NotifierHandler {
 
   public onFocusOut() {
     this.isCurrentTabActive = false;
-    this.logger.trace('Deactivating current tab')();
+    this.logger.debug('Deactivating current tab')();
   }
 
 // Permissions are granted here!

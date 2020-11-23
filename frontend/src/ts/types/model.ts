@@ -1,3 +1,5 @@
+import { LogLevel } from 'lines-logger';
+
 export enum GrowlType {
   SUCCESS = 'col-success', INFO = 'col-info', ERROR = 'col-error'
 }
@@ -26,7 +28,7 @@ export interface CurrentUserSettingsModel {
   sendLogs: boolean;
   suggestions: boolean;
   theme: string;
-  logs: boolean;
+  logs: LogLevel;
 }
 
 export interface GoogleCaptcha {
@@ -61,12 +63,15 @@ export interface Location {
   countryCode: string|null;
   region: string|null;
 }
+export type BlobType = 'v' | 'm' | 'a' | 'i';
 
-export  interface FileModel {
-  id: number|null;
+export interface FileModel {
   url: string|null;
-  type: string;
+  type: BlobType;
+  previewFileId: number|null;
+  fileId: number|null;
   preview: string|null;
+  sending: boolean;
 }
 
 export interface UploadProgressModel {
@@ -82,11 +87,12 @@ export interface MessageTransferInfo {
 export  interface MessageModel {
   id: number;
   time: number;
-  files: {[id: string]: FileModel}| null; // THIS IS STRING, not number!!
+  files: Record<string, FileModel>| null; // THIS IS STRING, not number!!
   content: string|null;
   isHighlighted: boolean;
   symbol: string|null;
   deleted: boolean;
+  sending: boolean;
   giphy: string|null;
   edited: number|null;
   roomId: number;
@@ -180,7 +186,7 @@ export interface CallInfoModel {
 }
 
 export interface P2pMessageModel {
-  amountOfActiveConnections: number;
+  liveConnections: string[];
 }
 
 export interface CallsInfoModel {

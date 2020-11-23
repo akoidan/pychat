@@ -104,12 +104,12 @@
 <script lang="ts">
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import {Component, Vue} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit';
+import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import {CurrentUserInfoModel, SexModelString} from '@/ts/types/model';
 import {UserProfileDto} from '@/ts/types/dto';
 import {currentUserInfoModelToDto} from '@/ts/types/converters';
-import AppInputDate from '@/vue/ui/AppInputDate';
-import {SetUserProfileMessage} from '@/ts/types/messages';
+import AppInputDate from '@/vue/ui/AppInputDate.vue';
+import { SetUserProfileMessage } from '@/ts/types/messages/wsInMessages';
 
 @Component({
   components: {AppInputDate, AppSubmit}

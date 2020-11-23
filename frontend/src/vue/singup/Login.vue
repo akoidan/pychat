@@ -46,13 +46,13 @@
 
 <script lang='ts'>
 import {Component, Prop, Vue, Ref} from 'vue-property-decorator';
-import AppSubmit from '@/vue/ui/AppSubmit';
+import AppSubmit from '@/vue/ui/AppSubmit.vue';
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 
-import SocialAuth from '@/vue/singup/SocialAuth';
-import CaptchaComponent from '@/vue/singup/CaptchaComponent';
+import SocialAuth from '@/vue/singup/SocialAuth.vue';
+import CaptchaComponent from '@/vue/singup/CaptchaComponent.vue';
 import {sub} from '@/ts/instances/subInstance'
-import {LoginMessage} from "@/ts/types/messages";
+import { LoginMessage } from '@/ts/types/messages/innerMessages';
 
 @Component({components: {CaptchaComponent, SocialAuth, AppSubmit}})
 export default class Login extends Vue {

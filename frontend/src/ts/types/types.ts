@@ -15,18 +15,14 @@ import {
   UserModel
 } from '@/ts/types/model';
 import {
-  ChannelDto,
   MessageModelDto,
-  RoomDto,
-  SetStateFromStorage,
-  UserDto
+  SaveFileResponse,
+  SetStateFromStorage
 } from '@/ts/types/dto';
-import { DefaultMessage } from '@/ts/types/messages';
-import MessageRetrier from "@/ts/message_handlers/MessageRetrier";
+
 
 export interface UploadFile {
-   type: string;
-   symbol: string;
+   key: string;
    file: File|Blob;
 }
 
@@ -34,34 +30,27 @@ export type ValueFilterForKey<T extends object, U> = {
   [K in keyof T]: U extends T[K] ? K : never;
 }[keyof T];
 
-export type HandlerType = (a: DefaultMessage) => void|Promise<void>;
 
-export interface HandlerTypes {
-  [id: string]: HandlerType;
+
+
+
+type StuctureMappedType<K extends string> = Record<K, K>;
+
+const sample: StuctureMappedType<string> = {
+  'any3': "andy3"
 }
 
-export interface IMessageHandler {
-  handle(message: DefaultMessage): void;
-  getHandler(message: DefaultMessage): HandlerType|undefined;
-}
-
-export interface MessageRetrierProxy {
-  getMessageRetrier(): MessageRetrier;
-}
 
 export interface UserIdConn {
   connectionId: string;
   userId: number;
 }
 
-export interface ChangeStreamMessage extends DefaultMessage {
-  newStream: MediaStream;
-}
+
 
 export interface MessageDataEncode {
   messageContent: string|null;
-  files: UploadFile[];
-  fileModels: { [id: string]: FileModel };
+  files:  Record<string, FileModel>| null;
   currSymbol: string;
 }
 
@@ -75,10 +64,8 @@ export interface SetDevices {
   webcams: { [id: string]: string };
 }
 
-export interface MessageSender extends MessageRetrierProxy {
-  sendSendMessage(content: string, roomId: number, uploadFiles: UploadFile[], cbId: number, originTime: number):  Promise<void>;
-  sendEditMessage(content: string, roomId: number, id: number, uploadFiles: UploadFile[]): Promise<void>;
-  sendDeleteMessage(cbIdEqualsToMessageId: number): void;
+export interface MessageSender {
+  syncMessage(roomId: number, messageId: number):  Promise<void>;
   addMessages(roomId: number, messages: MessageModelDto[]): void;
 }
 
@@ -143,10 +130,6 @@ export interface MediaIdentifier {
   media: MediaStream|null;
 }
 
-export interface RemovePeerConnection extends DefaultMessage {
-  opponentWsId: string;
-}
-
 export interface RoomLogEntry {
   roomLog: RoomLog;
   roomIds: number[];
@@ -158,8 +141,18 @@ export interface SetMessageProgressError {
   error: string|null;
 }
 
-export interface RemoveSendingMessage {
+export interface SetFileIdsForMessage {
   messageId: number;
+  roomId: number;
+  fileIds: SaveFileResponse;
+}
+
+export interface RoomMessageIds {
+  messageId: number;
+  roomId: number;
+}
+export interface RoomMessagesIds {
+  messagesId: number[];
   roomId: number;
 }
 
@@ -168,7 +161,7 @@ export interface MessageSupplier {
   getWsConnectionId(): string;
 }
 
-export  interface IStorage {
+export interface IStorage {
   // getIds(cb: SingleParamCB<object>);
   saveMessages(messages: MessageModel[]): void;
   deleteMessage(id: number): void;
@@ -176,6 +169,7 @@ export  interface IStorage {
   deleteChannel(id: number): void;
   saveMessage(m: MessageModel): void;
   updateRoom(m: RoomSettingsModel): void;
+  updateFileIds(m: SetFileIdsForMessage): void;
   setRooms(rooms: RoomSettingsModel[]): void;
   setChannels(channels: ChannelModel[]): void;
   saveRoom(room: RoomModel): void;
@@ -184,14 +178,14 @@ export  interface IStorage {
   setUserSettings(settings: CurrentUserSettingsModel): void;
   saveRoomUsers(ru: SetRoomsUsers): void;
   setUsers(users: UserModel[]): void;
-  getMinMessageId(): number;
-  getAllTree(): Promise<StorageData|null>;
+  getAllTree(): Promise<SetStateFromStorage|null>;
   saveUser(users: UserModel): void;
   clearStorage(): void;
   clearMessages(): void;
   connect(): Promise<boolean>;
   // getRoomHeaderId(roomId: number, cb: SingleParamCB<number>);
   setRoomHeaderId(roomId: number, value: number): void;
+  markMessageAsSent(messagesId: number[]): void;
 }
 
 export interface  PostData<T> {
@@ -244,14 +238,14 @@ export interface SetSendingFileStatus extends SetSendingFileBase {
   error: string|null;
 }
 
-export interface StorageData {
-  setRooms: SetStateFromStorage;
-  sendingMessages: MessageModel[];
-}
-
 export interface MessagesLocation {
   roomId: number;
   messages: MessageModel[];
+}
+
+export interface LiveConnectionLocation {
+  roomId: number;
+  connection: string;
 }
 
 export interface PrivateRoomsIds {
@@ -268,12 +262,7 @@ export interface RemoveMessageProgress {
   roomId: number;
 }
 
-export interface PubSetRooms extends DefaultMessage {
-  rooms:  RoomDto[];
-  channels: ChannelDto[];
-  users: UserDto[];
-  online: Record<string, string[]>;
-}
+
 
 export interface SetMessageProgress extends RemoveMessageProgress {
   uploaded: number;
@@ -284,18 +273,8 @@ export interface SetSearchTo {
   search: SearchModel;
 }
 
-export interface AddMessagePayload {
-  index: number;
-  message: MessageModel;
-}
-
 export enum IconColor {
   SUCCESS = 'success', ERROR = 'error', WARN = 'warn', NOT_SET = ''
-}
-
-export interface SmileyStructure {
-  alt: string;
-  src: string;
 }
 
 export interface SessionHolder {

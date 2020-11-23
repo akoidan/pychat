@@ -12,7 +12,7 @@ export class AndroidPlatformUtil implements PlatformUtil {
   private logger: Logger;
 
   constructor() {
-    this.logger = loggerFactory.getLoggerColor('native', 'red');
+    this.logger = loggerFactory.getLogger('native');
   }
 
   public async askPermissions(...askedPermissions: permissions_type): Promise<void> {
@@ -26,12 +26,12 @@ export class AndroidPlatformUtil implements PlatformUtil {
         requiredPermissions.push(permissions.CAMERA)
       }
       if (!askedPermissions.length) {
-        throw Error("no persmissins asked")
+        throw Error('no persmissins asked')
       }
-      this.logger.debug("Checking if user already has permissions for {}", permissions)();
+      this.logger.debug('Checking if user already has permissions for {}', permissions)();
       await requiredPermissions.map(permission => new Promise((resolve, reject) => {
         permissions.checkPermission(permission, (status: any)=> {
-          this.logger.debug("permission {} status {}", permission, status)();
+          this.logger.debug('permission {} status {}', permission, status)();
           if (status.hasPermission) {
             requiredPermissions = requiredPermissions.filter(a => a === permission);
           }
@@ -40,9 +40,9 @@ export class AndroidPlatformUtil implements PlatformUtil {
       }));
 
       if (!requiredPermissions.length) {
-        this.logger.debug("Permissions {} are already acquired", permissions)();
+        this.logger.debug('Permissions {} are already acquired', permissions)();
       } else {
-        this.logger.debug("Asking  {} permissions", permissions)();
+        this.logger.debug('Asking  {} permissions', permissions)();
         await new Promise((resolve, reject) => {
           permissions.requestPermissions(requiredPermissions, (status: any) => {
             if( !status.hasPermission ) {
@@ -52,7 +52,7 @@ export class AndroidPlatformUtil implements PlatformUtil {
             }
           }, () => reject('Internal error, cannot get user permissions'));
         });
-        this.logger.debug("Permissions {} granted", permissions)();
+        this.logger.debug('Permissions {} granted', permissions)();
       }
     }
   }

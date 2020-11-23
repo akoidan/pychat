@@ -1,13 +1,5 @@
 import BaseTransferHandler from '@/ts/webrtc/BaseTransferHandler';
 import {
-  AcceptCallMessage,
-  CallStatus,
-  ConnectToRemoteMessage,
-  OfferCall,
-  ReplyCallMessage,
-  RouterNavigateMessage
-} from '@/ts/types/messages';
-import {
   browserVersion,
   isChrome,
   isMobile
@@ -20,8 +12,6 @@ import {
 } from '@/ts/types/model';
 import {
   BooleanIdentifier,
-  ChangeStreamMessage,
-  HandlerType,
   JsAudioAnalyzer,
   MediaIdentifier,
   NumberIdentifier,
@@ -43,19 +33,37 @@ import {
 } from '@/ts/utils/audioprocc';
 import CallSenderPeerConnection from '@/ts/webrtc/call/CallSenderPeerConnection';
 import CallReceiverPeerConnection from '@/ts/webrtc/call/CallReceiverPeerConnection';
+import {
+  CallStatus,
+  HandlerType,
+  HandlerTypes
+} from '@/ts/types/messages/baseMessagesInterfaces';
 
-export default class CallHandler extends BaseTransferHandler {
+import {
+  AcceptCallMessage,
+  OfferCall,
+  ReplyCallMessage
+} from '@/ts/types/messages/wsInMessages';
+import {
+  ChangeStreamMessage,
+  ConnectToRemoteMessage,
+  RouterNavigateMessage
+} from '@/ts/types/messages/innerMessages';
+import { FileAndCallTransfer } from '@/ts/webrtc/FileAndCallTransfer';
+
+
+export default class CallHandler extends FileAndCallTransfer {
 
   private get callInfo(): CallsInfoModel {
     return this.store.roomsDict[this.roomId].callInfo;
   }
-  protected readonly handlers: Record<string, HandlerType> = {
+  protected readonly handlers: HandlerTypes<keyof CallHandler, 'webrtcTransfer:*'> = {
     answerCall: this.answerCall,
     videoAnswerCall: this.videoAnswerCall,
     declineCall: this.declineCall,
-    replyCall: <HandlerType>this.replyCall,
-    acceptCall: <HandlerType>this.onacceptCall,
-    removePeerConnection: <HandlerType>this.removePeerConnection
+    replyCall: <HandlerType<'replyCall', 'webrtcTransfer:*'>>this.replyCall,
+    acceptCall: <HandlerType<'acceptCall', 'webrtcTransfer:*'>>this.acceptCall,
+    checkTransferDestroy: <HandlerType<'checkTransferDestroy', 'webrtcTransfer:*'>>this.checkTransferDestroy
   };
   private localStream: MediaStream | null = null;
   private audioProcessor: JsAudioAnalyzer | null = null;
@@ -89,7 +97,7 @@ export default class CallHandler extends BaseTransferHandler {
     this.store.setDevices(payload);
   }
 
-  public onacceptCall(message: AcceptCallMessage) {
+  public acceptCall(message: AcceptCallMessage) {
     if (this.callStatus !== 'received_offer') { // if we're call initiator
       if (!this.connectionId) {
         throw Error('Conn is is null');
@@ -194,15 +202,13 @@ export default class CallHandler extends BaseTransferHandler {
         stream = await this.captureInput();
         this.stopLocalStream();
         this.attachLocalStream(stream);
-
-        this.webrtcConnnectionsIds.forEach(pcName => {
-          const message: ChangeStreamMessage = {
-            handler: Subscription.getPeerConnectionId(this.connectionId!, pcName),
-            action: 'streamChanged',
-            newStream: stream!,
-          };
-          sub.notify(message);
-        });
+        const message: ChangeStreamMessage = {
+          handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
+          action: 'streamChanged',
+          allowZeroSubscribers: true,
+          newStream: stream!,
+        };
+        sub.notify(message)
       } catch (e) {
         this.handleStream(e, stream);
       }
@@ -280,20 +286,19 @@ export default class CallHandler extends BaseTransferHandler {
       this.setCallStatus('sent_offer');
       this.store.setCallActiveToState(payload);
       let e = await this.wsHandler.offerCall(this.roomId, browserVersion);
-      this.connectionId = e.connId;
+      this.setConnectionId(e.connId);
       sub.subscribe(Subscription.getTransferId(e.connId), this);
     } catch (e) {
       this.handleStream(e, stream);
     }
   }
 
-  public createCallPeerConnection(message: ReplyCallMessage) {
-    if (message.opponentWsId > this.wsHandler.getWsConnectionId()) {
-      new CallSenderPeerConnection(this.roomId, this.connectionId!, message.opponentWsId, message.userId, this.wsHandler, this.store);
+  public createCallPeerConnection({ opponentWsId, userId }: { opponentWsId: string; userId: number }) {
+    if (opponentWsId > this.wsHandler.getWsConnectionId()) {
+      new CallSenderPeerConnection(this.roomId, this.connectionId!, opponentWsId, userId, this.wsHandler, this.store);
     } else {
-      new CallReceiverPeerConnection(this.roomId, this.connectionId!, message.opponentWsId, message.userId, this.wsHandler, this.store);
+      new CallReceiverPeerConnection(this.roomId, this.connectionId!, opponentWsId, userId, this.wsHandler, this.store);
     }
-    this.webrtcConnnectionsIds.push(message.opponentWsId);
   }
 
   public replyCall(message: ReplyCallMessage) {
@@ -305,7 +310,7 @@ export default class CallHandler extends BaseTransferHandler {
     if (this.connectionId) {
       this.logger.error('Old connId still exists {}', this.connectionId)();
     }
-    this.connectionId = message.connId;
+    this.setConnectionId(message.connId);
     sub.subscribe(Subscription.getTransferId(message.connId), this);
     this.logger.log('CallHandler initialized')();
     this.wsHandler.replyCall(message.connId, browserVersion);
@@ -379,7 +384,7 @@ export default class CallHandler extends BaseTransferHandler {
       media: null
     };
     this.store.setLocalStreamSrc(payload2);
-    this.connectionId = null;
+    this.setConnectionId(null);
     const payload: BooleanIdentifier = {
       state: false,
       id: this.roomId
@@ -395,7 +400,7 @@ export default class CallHandler extends BaseTransferHandler {
 
   public hangCall() {
     this.logger.debug('on hangCall called')();
-    const hadConnections = this.webrtcConnnectionsIds.length > 0;
+    const hadConnections = this.connectionId && sub.getNumberOfSubscribers(Subscription.allPeerConnectionsForTransfer(this.connectionId!)) > 0;
     if (hadConnections) {
       this.closeAllPeerConnections();
     } else {

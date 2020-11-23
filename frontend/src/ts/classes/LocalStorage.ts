@@ -1,8 +1,8 @@
 import loggerFactory from '@/ts/instances/loggerFactory';
 import {
   IStorage,
+  SetFileIdsForMessage,
   SetRoomsUsers,
-  StorageData
 } from '@/ts/types/types';
 import {
   ChannelModel,
@@ -13,6 +13,7 @@ import {
   UserModel
 } from '@/ts/types/model';
 import { Logger } from 'lines-logger';
+import { SetStateFromStorage } from '@/ts/types/dto';
 
 interface LocalStorageMessage {
   f: number;
@@ -23,10 +24,9 @@ export default class LocalStorage implements IStorage {
   private readonly logger: Logger;
   private readonly STORAGE_NAME = 'wsHeaderIds';
   private cache: { [id: number]: LocalStorageMessage } = {};
-  private minMessageId = -1;
 
   constructor() {
-    this.logger = loggerFactory.getLoggerColor('ls', '#006263');
+    this.logger = loggerFactory.getLogger('localStor');
     const ms = localStorage.getItem(this.STORAGE_NAME);
     if (ms) {
       const loaded = JSON.parse(ms);
@@ -61,7 +61,7 @@ export default class LocalStorage implements IStorage {
     }
     localStorage.setItem(this.STORAGE_NAME, JSON.stringify(lm));
   }
-
+  public updateFileIds(m: SetFileIdsForMessage) {}
   public deleteMessage(id: number) {}
   public deleteRoom(id: number) {}
   public deleteChannel(id: number) {}
@@ -75,8 +75,9 @@ export default class LocalStorage implements IStorage {
   public saveRoomUsers(ru: SetRoomsUsers)  {}
   public setUsers(users: UserModel[])  {}
   public saveUser(users: UserModel)  {}
+  public markMessageAsSent(m: number[]) {}
 
-  public async getAllTree(): Promise<StorageData|null> {
+  public async getAllTree(): Promise<SetStateFromStorage|null> {
     return null;
   }
 
@@ -131,8 +132,4 @@ export default class LocalStorage implements IStorage {
     }
   }
 
-  getMinMessageId(): number {
-    this.minMessageId --;
-    return this.minMessageId;
-  }
 }

@@ -82,8 +82,8 @@ import {
   ReceivingFile
 } from '@/ts/types/model';
 import { bytesToSize } from '@/ts/utils/pureFunctions';
-import AppProgressBar from '@/vue/ui/AppProgressBar';
-import ChatMessageHeader from '@/vue/chat/ChatMessageHeader';
+import AppProgressBar from '@/vue/ui/AppProgressBar.vue';
+import ChatMessageHeader from '@/vue/chat/ChatMessageHeader.vue';
 
 
 @Component({

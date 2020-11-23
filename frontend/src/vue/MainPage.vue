@@ -22,18 +22,17 @@
   </div>
 </template>
 <script lang="ts">
-import AppNav from '@/vue/AppNav';
-import {Component, Vue} from 'vue-property-decorator';
+import AppNav from '@/vue/AppNav.vue';
+import {
+  Component,
+  Vue
+} from 'vue-property-decorator';
 import {
   CurrentUserInfoModel,
-  IncomingCallModel,
-  UserModel
+  IncomingCallModel
 } from '@/ts/types/model';
-import NotifierHandler from '@/ts/classes/NotificationHandler';
-
-import {browserVersion, isChrome, isMobile} from '@/ts/utils/runtimeConsts'
-import {State} from '@/ts/instances/storeInstance';
-import IncomingCall from '@/vue/chat/IncomingCall';
+import { State } from '@/ts/instances/storeInstance';
+import IncomingCall from '@/vue/chat/IncomingCall.vue';
 
 @Component({
   components: {IncomingCall, AppNav}
@@ -54,7 +53,8 @@ export default class MainPage extends Vue {
   }
 
   public created() {
-    this.$notifier.tryAgainRegisterServiceWorker();
+    this.$logger.log('Main page has been created, fire listening ws, and register notification')();
+    this.$notifier.tryAgainRegisterServiceWorker(); // should be async, do no wait here
     this.$ws.startListening();
   }
 

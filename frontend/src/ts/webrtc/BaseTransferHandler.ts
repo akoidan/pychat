@@ -5,18 +5,22 @@ import NotifierHandler from '@/ts/classes/NotificationHandler';
 import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import { sub } from '@/ts/instances/subInstance';
 import Subscription from '@/ts/classes/Subscription';
-import { RemovePeerConnection } from '@/ts/types/types';
+
 import { DefaultStore } from '@/ts/classes/DefaultStore';
+import {
+  DestroyPeerConnectionMessage,
+  InternetAppearMessage,
+  CheckTransferDestroy
+} from '@/ts/types/messages/innerMessages';
 
 export default abstract class BaseTransferHandler extends MessageHandler {
 
   protected connectionId: string | null = null;
   protected readonly wsHandler: WsHandler;
   protected readonly notifier: NotifierHandler;
-  protected readonly logger: Logger;
+  protected logger: Logger;
   protected readonly store: DefaultStore;
   protected readonly roomId: number;
-  protected webrtcConnnectionsIds: string[] = [];
 
   constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore) {
     super();
@@ -24,24 +28,12 @@ export default abstract class BaseTransferHandler extends MessageHandler {
     this.notifier = notifier;
     this.wsHandler = wsHandler;
     this.store = store;
-    this.logger = loggerFactory.getLoggerColor('WRTC', '#960055');
+    this.logger = loggerFactory.getLoggerColor(`transfer:r${roomId}`, '#960055');
     this.logger.log(`${this.constructor.name} has been created`)();
   }
 
-  protected onDestroy() {
-    if (this.connectionId) {
-      sub.unsubscribe(Subscription.getTransferId(this.connectionId), this);
-    }
-  }
-
-  protected removePeerConnection(payload: RemovePeerConnection) {
-    this.logger.log('Removing pc {}', payload);
-    const start = this.webrtcConnnectionsIds.indexOf(payload.opponentWsId);
-    if (start < 0) {
-      throw Error('Can\'t remove unexisting payload ' + payload.opponentWsId);
-    }
-    this.webrtcConnnectionsIds.splice(start, 1);
-    if (this.webrtcConnnectionsIds.length === 0) {
+  public checkDestroy() {
+    if (this.connectionId && sub.getNumberOfSubscribers(Subscription.allPeerConnectionsForTransfer(this.connectionId)) === 0) {
       this.onDestroy();
     }
   }
@@ -51,12 +43,27 @@ export default abstract class BaseTransferHandler extends MessageHandler {
       this.logger.error(`Can't close connections since it's null`)();
       return;
     }
-    this.webrtcConnnectionsIds.forEach(id => {
-      sub.notify({
-        action: 'destroy',
-        handler: Subscription.getPeerConnectionId(this.connectionId!, id)
-      });
-    });
+    let message: DestroyPeerConnectionMessage = {
+      action: 'destroy',
+      handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
+      allowZeroSubscribers: true // TODO this is weird that this connection is desrtoyed already, should nto be destroyed twice
+      // applying hotfix , this should be fixed in another way
+      // Can't handle message  {action: "destroy", handler: "peerConnection:fzELFAhC:0001:AVmb"}  because no channels found, available channels
+    };
+    sub.notify(message);
+  }
+
+  protected setConnectionId(connId: string|null) {
+    this.connectionId = connId;
+    if (connId != null) {
+      this.logger = loggerFactory.getLoggerColor(`transfer:${this.connectionId}`, '#960055');
+    }
+  }
+
+  protected onDestroy() {
+    if (this.connectionId) {
+      sub.unsubscribe(Subscription.getTransferId(this.connectionId), this);
+    }
   }
 
 }

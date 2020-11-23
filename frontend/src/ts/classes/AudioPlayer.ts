@@ -1,6 +1,6 @@
-import NotifierHandler from "@/ts/classes/NotificationHandler";
-import loggerFactory from "@/ts/instances/loggerFactory";
-import { Logger } from "lines-logger";
+import NotifierHandler from '@/ts/classes/NotificationHandler';
+import loggerFactory from '@/ts/instances/loggerFactory';
+import { Logger } from 'lines-logger';
 
 
 export class AudioPlayer {
@@ -9,7 +9,7 @@ export class AudioPlayer {
 
   constructor(notifier: NotifierHandler) {
     this.notifier = notifier;
-    this.logger = loggerFactory.getLoggerColor('audio', 'green');
+    this.logger = loggerFactory.getLogger('audio');
   }
 
   checkAndPlay(element: HTMLAudioElement, volume: number) {

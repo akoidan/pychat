@@ -496,6 +496,11 @@
   resolved "https://registry.yarnpkg.com/@types/websql/-/websql-0.0.27.tgz#621a666a7f02018e7cbb4abab956a25736c27d71"
   integrity sha1-Yhpman8CAY58u0q6uVaiVzbCfXE=
 
+"@types/wicg-native-file-system@^2020.6.0":
+  version "2020.6.0"
+  resolved "https://registry.yarnpkg.com/@types/wicg-native-file-system/-/wicg-native-file-system-2020.6.0.tgz#63cbb7bac47bdb9eae4b0d66e63134b33e47e05d"
+  integrity sha512-M7n6jvHfUzUXDtf6UGpL6rVIddV7UzEYrvwZPORApeHvDGQnZJ79fXorLlDj8xJKyUemnEBohRd8yx09k9NBUw==
+
 "@typescript-eslint/experimental-utils@2.6.0":
   version "2.6.0"
   resolved "https://registry.yarnpkg.com/@typescript-eslint/experimental-utils/-/experimental-utils-2.6.0.tgz#ed70bef72822bff54031ff0615fc888b9e2b6e8a"
@@ -1794,6 +1799,11 @@ clean-css@^4.2.1:
   integrity sha512-4ZxI6dy4lrY6FHzfiy1aEOXgu4LIsW2MhwG0VBKdcoGoH/XLFgaHSdLTGr4O8Be6A8r3MOphEiI8Gc1n0ecf3g==
   dependencies:
     source-map "~0.6.0"
+
+clean-terminal-webpack-plugin@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/clean-terminal-webpack-plugin/-/clean-terminal-webpack-plugin-3.0.0.tgz#e042ebcf05b0bf90f7d7923ea1dc5685c819228f"
+  integrity sha512-wcgkQZmwEWYYjHblXc0+UGFDtx37S+1qgUQl4EOhhinzSHbZpixWBiasQ91RoCMf5lAm67j1XOt9z+HN+sWkWA==
 
 clean-webpack-plugin@3.0.0:
   version "3.0.0"
@@ -5875,10 +5885,10 @@ levn@^0.3.0, levn@~0.3.0:
     prelude-ls "~1.1.2"
     type-check "~0.3.2"
 
-lines-logger@1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/lines-logger/-/lines-logger-1.3.0.tgz#d2f955759d3c9c7f58b239f7bad66616f6054f88"
-  integrity sha512-206MoZiVTKeZJbfRjXz0BTp9+gz1ZAVsSX/8rdG/8EWNfFRjXJcJMvlCbo0mx71V4cd2k5QA+bB5ghtxV7cbuA==
+lines-logger@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/lines-logger/-/lines-logger-2.0.2.tgz#781c9f731451b88cf8fcbe8d2d8c7984e6f82a98"
+  integrity sha512-N7G4lZZboT4v/TzmthzXU9HowlgoXRDkl3iZJ6V6dpKF/7B14wbTlJaLBfywzssTz+KgVVpHtw6FlOTujPrZAQ==
 
 load-json-file@^1.0.0:
   version "1.1.0"

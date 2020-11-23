@@ -24,18 +24,18 @@ import {
   Vue
 } from 'vue-property-decorator';
 
-import ChatRightSection from '@/vue/chat/ChatRightSection';
-import SmileyHolder from '@/vue/chat/SmileyHolder';
-import NavEditMessage from '@/vue/chat/NavEditMessage';
-import NavUserShow from '@/vue/chat/NavUserShow';
+import ChatRightSection from '@/vue/chat/ChatRightSection.vue';
+import SmileyHolder from '@/vue/chat/SmileyHolder.vue';
+import NavEditMessage from '@/vue/chat/NavEditMessage.vue';
+import NavUserShow from '@/vue/chat/NavUserShow.vue';
 
 import {
   RawLocation,
   Route
 } from 'vue-router';
-import ChatRecording from '@/vue/chat/ChatRecording';
-import ChatTextArea from '@/vue/chat/ChatTextArea';
-import ChatBoxes from '@/vue/chat/ChatBoxes';
+import ChatRecording from '@/vue/chat/ChatRecording.vue';
+import ChatTextArea from '@/vue/chat/ChatTextArea.vue';
+import ChatBoxes from '@/vue/chat/ChatBoxes.vue';
 
 
 @Component({components: {

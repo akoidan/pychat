@@ -45,7 +45,7 @@
 import {ApplyGrowlErr, State} from '@/ts/instances/storeInstance';
 import {Component, Ref, Vue, Watch} from 'vue-property-decorator';
 import {canvasContext, resolveMediaUrl, stopVideo} from '@/ts/utils/htmlApi';
-import AppSubmit from '@/vue/ui/AppSubmit';
+import AppSubmit from '@/vue/ui/AppSubmit.vue';
 
 
 @Component({

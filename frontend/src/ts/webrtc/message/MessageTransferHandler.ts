@@ -1,130 +1,162 @@
 import BaseTransferHandler from '@/ts/webrtc/BaseTransferHandler';
 import {
-  HandlerType,
-  HandlerTypes,
   MessageSender,
   UploadFile,
   UserIdConn
 } from '@/ts/types/types';
-import { RoomModel } from '@/ts/types/model';
+import {
+  MessageModel,
+  RoomModel
+} from '@/ts/types/model';
 import MessageSenderPeerConnection from '@/ts/webrtc/message/MessageSenderPeerConnection';
 import MessageReceiverPeerConnection from '@/ts/webrtc/message/MessageReceiverPeerConnection';
-import {
-  ChangeDevicesMessage,
-  DefaultMessage,
-  InnerSendMessage,
-  OfferCall
-} from '@/ts/types/messages';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import NotifierHandler from '@/ts/classes/NotificationHandler';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { sub } from '@/ts/instances/subInstance';
 import Subscription from '@/ts/classes/Subscription';
-import MessageRetrier from '@/ts/message_handlers/MessageRetrier';
-import { MessageModelDto } from "@/ts/types/dto";
+import { MessageModelDto } from '@/ts/types/dto';
+import {
+  ChangeDevicesMessage,
+  InternetAppearMessage,
+  SyncP2PMessage
+} from '@/ts/types/messages/innerMessages';
+import {
+  HandlerName,
+  HandlerType,
+  HandlerTypes
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 
+/**
+ *
+ * https://drive.google.com/file/d/1BCtFNNWprfobqQlG4n2lPyWEqroi7nJh/view
+ */
 export default class MessageTransferHandler extends BaseTransferHandler implements MessageSender {
 
-
-  protected readonly handlers: HandlerTypes = {
-    removePeerConnection: <HandlerType>this.removePeerConnection,
-    changeDevices: <HandlerType>this.changeDevices
+  protected readonly handlers: HandlerTypes<keyof MessageTransferHandler, 'message'> = {
   };
 
-  private messageRetrier: MessageRetrier;
-  private state: 'not_inited' |'initing' | 'waiting' | 'ready' = 'not_inited';
+  private state: 'not_inited' |'initing' | 'ready' = 'not_inited';
+  private readonly messageHelper: MessageHelper;
 
-  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore) {
+  constructor(roomId: number, wsHandler: WsHandler, notifier: NotifierHandler, store: DefaultStore, messageHelper: MessageHelper) {
     super(roomId, wsHandler, notifier, store);
-    sub.subscribe('message', this);
-    this.messageRetrier = new MessageRetrier();
+    this.messageHelper = messageHelper;
   }
 
-  public async acceptConnection(message: OfferCall) {
-    this.state = 'initing';
-    this.connectionId = message.connId;
-    this.refreshPeerConnections();
-    this.state = 'ready';
-    this.messageRetrier.resendAllMessages();
-  }
-
-  protected onDestroy() {
-    sub.unsubscribe('message', this);
-  }
-
-  private refreshPeerConnections() {
-    let myConnectionId = this.wsHandler.getWsConnectionId();
-    let newConnectionIdsWithUser = this.connectionIds;
-    newConnectionIdsWithUser.forEach(connectionIdWithUser => {
-      let opponentWsId = connectionIdWithUser.connectionId;
-      if (this.webrtcConnnectionsIds.indexOf(opponentWsId) < 0) {
-        let mpc;
-        if (opponentWsId > myConnectionId) {
-          mpc = new MessageSenderPeerConnection(this.roomId, this.connectionId!, opponentWsId, this.wsHandler, this.store,  connectionIdWithUser.userId);
-
-        } else {
-          mpc = new MessageReceiverPeerConnection(this.roomId, this.connectionId!, opponentWsId, this.wsHandler, this.store, connectionIdWithUser.userId);
-        }
-        this.webrtcConnnectionsIds.push(opponentWsId);
-        mpc.makeConnection();
+  async syncMessage(roomId: number, messageId: number): Promise<void> {
+    this.messageHelper.processAnyMessage()
+    if (this.state === 'ready') {
+      let payload : SyncP2PMessage  = {
+        action: 'syncP2pMessage',
+        handler:  Subscription.allPeerConnectionsForTransfer(this.connectionId!),
+        id: messageId,
+        allowZeroSubscribers: true
       }
-    });
-    let newConnectionIds: string[] = newConnectionIdsWithUser.map(a => a.connectionId);
+      sub.notify(payload);
+    }
+  }
 
-    let connectionsToRemove = this.webrtcConnnectionsIds.filter(oldC => newConnectionIds.indexOf(oldC) < 0);
+
+  public destroyThisTransferHandler() {
     sub.notify({
       action: 'checkDestroy',
       handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
     });
   }
 
-  private async initConnectionIfRequired() {
+  public async init() {
     if (this.state === 'not_inited') {
       this.state = 'initing';
-      if (this.connectionIds.length > 0) {
+      try {
         let {connId} =  await this.wsHandler.offerMessageConnection(this.roomId);
-        this.connectionId = connId;
-        this.state = 'ready'
-        this.refreshPeerConnections();
-        return true;
-      } else {
-        this.state = 'waiting';
+        if (!connId) {
+          throw Error('Error during setting connection ID');
+        }
+        // @ts-ignore: next-line
+        if (this.state !== 'ready') { // already inited in another place, like in accept connection
+          this.setConnectionId(connId);
+          this.state = 'ready';
+          await this.refreshPeerConnections();
+        }
+      } catch (e) {
+        this.state = 'not_inited';
       }
-    } else if (this.state === 'ready') {
-      return true;
-    }
-    return false;
-  }
-
-  public async tryToSend(cbId: number, m: Omit<DefaultMessage, 'handler'>) {
-    this.messageRetrier.putCallBack(cbId, () => {
-      let message: DefaultMessage = {...m, handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!)}
-      sub.notify(message);
-    })
-    await this.initConnectionIfRequired();
-    if (this.state === 'ready') {
-      this.messageRetrier.resendMessage(cbId);
     }
   }
 
-
-  async sendSendMessage(content: string, roomId: number, uploadFiles: UploadFile[], cbId: number, originTime: number): Promise<void> {
-    const em: Omit<InnerSendMessage, 'handler'> = {
-      content,
-      originTime,
-      cbId,
-      id: Date.now(),
-      action: 'sendSendMessage',
-      uploadFiles,
+  public async initOrSync() {
+    // if state is initing, refresh connection will be triggered when it finishes
+    if (this.state === 'not_inited') { // if it's not inited , refresh connection wil trigger inside this init()
+      await this.init();
+    } else if (this.state === 'ready') { // if it's ready, we should check if new devices appeard while we were offline
+      this.refreshPeerConnections();
     }
-    await this.tryToSend(cbId, em);
   }
+
+  public async acceptConnection({ connId }: {connId: string}) {
+    // if connection is initing, we make it ready, so init would not refresh connection again
+    // if connection is not_inited, this assignments initializes it.
+    // if connection is ready already, we should refresh the connection to create a new PeerConnection for opponent device
+    this.setConnectionId(connId);
+    this.state = 'ready';
+    // this means user probably appears online, we should refresh connections
+    this.refreshPeerConnections();
+  }
+
+  public refreshPeerConnections() {
+    let myConnectionId = this.wsHandler.getWsConnectionId();
+    let newConnectionIdsWithUser = this.connectionIds;
+    newConnectionIdsWithUser.forEach(connectionIdWithUser => {
+      let opponentWsId = connectionIdWithUser.connectionId;
+      if (sub.getNumberOfSubscribers(Subscription.getPeerConnectionId(this.connectionId!, opponentWsId)) == 0) {
+        let mpc;
+        if (opponentWsId > myConnectionId) {
+          mpc = new MessageSenderPeerConnection(
+              this.roomId,
+              this.connectionId!,
+              opponentWsId,
+              this.wsHandler,
+              this.store,
+              connectionIdWithUser.userId,
+              this.messageHelper
+          );
+
+        } else {
+          mpc = new MessageReceiverPeerConnection(
+              this.roomId,
+              this.connectionId!,
+              opponentWsId,
+              this.wsHandler,
+              this.store,
+              connectionIdWithUser.userId,
+              this.messageHelper
+          );
+        }
+        mpc.makeConnection();
+      }
+    });
+    // let newConnectionIds: string[] = newConnectionIdsWithUser.map(a => a.connectionId);
+
+    // let connectionsToRemove = this.webrtcConnnectionsIds.filter(oldC => newConnectionIds.indexOf(oldC) < 0);
+    sub.notify({
+      action: 'checkDestroy',
+      handler: Subscription.allPeerConnectionsForTransfer(this.connectionId!),
+      allowZeroSubscribers: true
+    });
+  }
+
+
 
   private get room(): RoomModel {
     return this.store.roomsDict[this.roomId];
   }
 
   private get connectionIds(): UserIdConn[] {
+    if (!this.room) {
+      return []
+    }
     let usersIds = this.room.users;
     let myConnectionId = this.wsHandler.getWsConnectionId();
     let connections = usersIds.reduce((connectionIdsWithUser, userId) => {
@@ -140,39 +172,11 @@ export default class MessageTransferHandler extends BaseTransferHandler implemen
     return connections;
   }
 
-  private changeDevices(m: ChangeDevicesMessage): void {
-    if (m.roomId != null && this.roomId !== m.roomId) {
-      return;
-    } else if (m.userId != null) {
-      if (this.room.users.indexOf(m.userId) < 0) {
-        return;
-      }
-    } else {
-      throw Error('WTF is this message');
-    }
-    this.refreshPeerConnections();
-  }
 
   addMessages(roomId: number, messages: MessageModelDto[]): void {
-    this.store.growlError("The operation you're trying to do is not supported on p2p channel yet");
-    throw Error("unsupported");
+    this.store.growlError('The operation you\'re trying to do is not supported on p2p channel yet');
+    throw Error('unsupported');
   }
-
-  getMessageRetrier(): MessageRetrier {
-    return this.messageRetrier;
-  }
-
-  sendDeleteMessage(id: number) : void {
-    this.store.growlError("The operation you're trying to do is not supported on p2p channel yet");
-    throw Error("unsupported");
-  }
-
-  sendEditMessage(content: string, roomId: number, id: number, uploadFiles: UploadFile[]): Promise<void> {
-    this.store.growlError("The operation you're trying to do is not supported on p2p channel yet");
-    throw Error("unsupported");
-  }
-
-
 
 
 }

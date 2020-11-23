@@ -24,12 +24,12 @@ import {
   ApplyGrowlErr,
   State
 } from '@/ts/instances/storeInstance';
-import AppSubmit from "@/vue/ui/AppSubmit";
-import PickUser from "@/vue/pages/parts/PickUser";
+import AppSubmit from '@/vue/ui/AppSubmit.vue';
+import PickUser from '@/vue/pages/parts/PickUser.vue';
 import {
   RoomDictModel,
   RoomModel
-} from "@/ts/types/model";
+} from '@/ts/types/model';
 
 @Component({components: { AppSubmit, PickUser}})
   export default class InviteUser extends Vue {

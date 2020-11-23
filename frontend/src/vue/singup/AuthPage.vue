@@ -18,7 +18,7 @@ import {Component, Vue} from 'vue-property-decorator';
 import {State, ApplyGrowlErr} from '@/ts/instances/storeInstance';
 import {AUTO_REGISTRATION} from '@/ts/utils/consts';
 import {sub} from '@/ts/instances/subInstance'
-import {LoginMessage} from "@/ts/types/messages";
+import { LoginMessage } from '@/ts/types/messages/innerMessages';
 
 @Component
 export default class AuthPage extends Vue {

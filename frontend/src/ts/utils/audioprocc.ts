@@ -2,12 +2,12 @@ import { JsAudioAnalyzer } from '@/ts/types/types';
 import { extractError } from '@/ts/utils/pureFunctions';
 import { IS_DEBUG } from '@/ts/utils/consts';
 import { isMobile } from '@/ts/utils/runtimeConsts';
-import { Logger } from "lines-logger";
-import loggerFactory from "@/ts/instances/loggerFactory";
+import { Logger } from 'lines-logger';
+import loggerFactory from '@/ts/instances/loggerFactory';
 
 let audioContext: AudioContext;
 const audioProcesssors: JsAudioAnalyzer[] = [];
-const logger: Logger = loggerFactory.getLoggerColor('audio', 'yellow');
+const logger: Logger = loggerFactory.getLogger('audio');
 if (IS_DEBUG) {
   window.audioProcesssors = audioProcesssors;
 }
@@ -32,7 +32,7 @@ export function createMicrophoneLevelVoice (
       // Safari still in 2020q3 doesn't support AudioContext.
       const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
       if (!AudioContext) {
-        throw Error("AUdio context is not supported on this browse")
+        throw Error('AUdio context is not supported on this browse')
       }
       audioContext = new AudioContext();
     }

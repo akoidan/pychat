@@ -13,7 +13,7 @@ export default class MediaCapture {
   // private stopped: boolean = false;
   private readonly platformUtil: PlatformUtil;
 
-  private readonly logger: Logger = loggerFactory.getLoggerColor('nav-record', 'brown');
+  private readonly logger: Logger = loggerFactory.getLogger('nav-record');
   private readonly recordedBlobs: any[] = [];
   private stream: MediaStream|null = null;
 
@@ -25,7 +25,7 @@ export default class MediaCapture {
   public async record(): Promise<MediaStream|null> {
     const requiredPerms : permissions_type = this.isRecordingVideo ? ['audio', 'video'] : ['audio'];
     await this.platformUtil.askPermissions(...requiredPerms);
-    this.logger.debug("Capturing media")();
+    this.logger.debug('Capturing media')();
     this.stream = await navigator.mediaDevices.getUserMedia({video: this.isRecordingVideo, audio: true});
     this.logger.debug('Permissions are granted')();
     // await new Promise(resolve => {
@@ -94,7 +94,7 @@ export default class MediaCapture {
 
   private handleDataAvailable(event: MediaRecorderDataAvailableEvent) {
     if (event.data && event.data.size > 0) {
-      this.logger.trace('Appending blob: {}', event.data)();
+      this.logger.debug('Appending blob: {}', event.data)();
       this.recordedBlobs.push(event.data);
     }
   }

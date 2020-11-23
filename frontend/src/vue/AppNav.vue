@@ -108,7 +108,7 @@ import {Component, Vue, Ref} from 'vue-property-decorator';
 import {CurrentUserInfoModel, RoomModel, UserModel} from '@/ts/types/model';
 import {ISSUES, GITHUB_LINK, PAINTER, STATISTICS} from '@/ts/utils/consts';
 import {sub} from '@/ts/instances/subInstance'
-import {LogoutMessage} from "@/ts/types/messages";
+import { LogoutMessage } from '@/ts/types/messages/innerMessages';
 
 @Component
 export default class AppNav extends Vue {

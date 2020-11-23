@@ -1,15 +1,5 @@
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
-import {
-  HandlerType,
-  HandlerTypes,
-  VideoType
-} from '@/ts/types/types';
-import {
-  LogoutMessage,
-  OfferCall,
-  OfferFile
-} from '@/ts/types/messages';
 import WsHandler from '@/ts/message_handlers/WsHandler';
 import {
   FileTransferStatus,
@@ -28,40 +18,89 @@ import faviconUrl from '@/assets/img/favicon.ico';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
 import { browserVersion } from '@/ts/utils/runtimeConsts';
 import MessageTransferHandler from '@/ts/webrtc/message/MessageTransferHandler';
-import { bytesToSize } from "@/ts/utils/pureFunctions";
+import { bytesToSize } from '@/ts/utils/pureFunctions';
+import {
+  OfferCall,
+  OfferFile,
+  OfferMessage
+} from '@/ts/types/messages/wsInMessages';
+import {
+  HandlerName,
+  HandlerType,
+  HandlerTypes
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { VideoType } from '@/ts/types/types';
+import {
+  ChangeDevicesMessage,
+  InternetAppearMessage,
+  LogoutMessage
+} from '@/ts/types/messages/innerMessages';
+import { MessageHelper } from '@/ts/message_handlers/MessageHelper';
 
 export default class WebRtcApi extends MessageHandler {
 
   protected logger: Logger;
 
-  protected readonly handlers: HandlerTypes  = {
-    offerFile: <HandlerType>this.onofferFile,
-    offerCall: <HandlerType>this.offerCall,
-    offerMessage: <HandlerType>this.offerMessage,
-    logout: <HandlerType>this.logout
+  protected readonly handlers: HandlerTypes<keyof WebRtcApi, 'webrtc'>  = {
+    offerFile: <HandlerType<'offerFile', 'webrtc'>>this.onofferFile,
+    changeDevices: <HandlerType<'changeDevices', 'webrtc'>>this.changeDevices,
+    offerCall: <HandlerType<'offerCall', 'webrtc'>>this.offerCall,
+    offerMessage: <HandlerType<'offerMessage', 'webrtc'>>this.offerMessage,
+    logout: <HandlerType<'logout', HandlerName>>this.logout,
+    internetAppear:  <HandlerType<'internetAppear', HandlerName>>this.internetAppear
   };
 
   private readonly wsHandler: WsHandler;
   private readonly store: DefaultStore;
   private readonly notifier: NotifierHandler;
   private readonly callHandlers: {[id: number]: CallHandler} = {};
-  private readonly messageHandlers: {[id: number]: MessageTransferHandler} = {};
+  private readonly messageHandlers: Record<number, MessageTransferHandler> = {};
+  private readonly messageHelper: MessageHelper;
 
-  constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler) {
+  constructor(ws: WsHandler, store: DefaultStore, notifier: NotifierHandler, messageHelper: MessageHelper) {
     super();
     sub.subscribe('webrtc', this);
     this.wsHandler = ws;
     this.notifier = notifier;
-    this.logger = loggerFactory.getLogger('WEBRTC', 'color: #960055');
+    this.logger = loggerFactory.getLogger('WEBRTC');
     this.store = store;
+    this.messageHelper = messageHelper;
   }
 
   public offerCall(message: OfferCall) {
     this.getCallHandler(message.roomId).initAndDisplayOffer(message);
   }
 
+  public async changeDevices(m: ChangeDevicesMessage): Promise<void> {
+    this.logger.log('change devices {}', m)();
+    if (m.changeType === 'i_deleted') { // destroy my room
+      let mh: MessageTransferHandler = this.messageHandlers[m.roomId!];
+      if (mh) {
+        mh.destroyThisTransferHandler();
+      }
+      delete this.messageHandlers[m.roomId!];
+      return;
+    } else if (this.store.roomsDict[m.roomId!]?.p2p) {
+      //  'someone_left' - destroy peer connection in this room
+      //  'room_created' - send to everyone when new room is created
+      //  'someone_joined' - send to everyone when someone joins the room, but the member who joins receives 'invited'
+      await this.getMessageHandler(m.roomId!).initOrSync();
+    }
+  }
 
-  public offerMessage(message: OfferCall) {
+  initAndSyncMessages() {
+    this.store.roomsArray.forEach(room => {
+      if (room.p2p) {
+        this.getMessageHandler(room.id).initOrSync();
+      }
+    });
+  }
+
+  public internetAppear(m: InternetAppearMessage) {
+    this.initAndSyncMessages();
+  }
+
+  public offerMessage(message: OfferMessage) {
     this.getMessageHandler(message.roomId).acceptConnection(message);
   }
 
@@ -102,7 +141,7 @@ export default class WebRtcApi extends MessageHandler {
 
   public getMessageHandler(roomId: number): MessageTransferHandler {
     if (!this.messageHandlers[roomId]) {
-      this.messageHandlers[roomId] = new MessageTransferHandler(roomId, this.wsHandler, this.notifier, this.store);
+      this.messageHandlers[roomId] = new MessageTransferHandler(roomId, this.wsHandler, this.notifier, this.store, this.messageHelper);
     }
 
     return this.messageHandlers[roomId];
@@ -171,4 +210,6 @@ export default class WebRtcApi extends MessageHandler {
       new FileReceiverPeerConnection(message.roomId, message.connId, message.opponentWsId, this.wsHandler, this.store, message.content.size);
     }
   }
+
+
 }

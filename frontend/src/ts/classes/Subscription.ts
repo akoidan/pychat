@@ -1,44 +1,50 @@
-import {
-  DefaultMessage,
-  HandlerName
-} from '@/ts/types/messages';
-import { IMessageHandler } from '@/ts/types/types';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
+import {
+  DefaultInMessage,
+  HandlerName,
+  IMessageHandler
+} from '@/ts/types/messages/baseMessagesInterfaces';
+import { DefaultInnerSystemMessage } from '@/ts/types/messages/innerMessages';
 
 export default class Subscription {
+  // TODO sub should unsubscribe from some events on logout
 
-  public channels: Partial<Record<HandlerName, IMessageHandler[]>> = {};
+  private suscribers: Partial<Record<HandlerName, IMessageHandler[]>> = {};
   private readonly logger: Logger;
 
   constructor() {
-    this.logger = loggerFactory.getLoggerColor('sub', '#3a7a7a');
+    this.logger = loggerFactory.getLogger('sub');
   }
 
-  public static getPeerConnectionId(connectionId: string, opponentWsId: string): HandlerName {
-    return `peerConnection:${connectionId}:${opponentWsId}` as HandlerName;
+  public static getPeerConnectionId(connectionId: string, opponentWsId: string): 'peerConnection:*' {
+    return `peerConnection:${connectionId}:${opponentWsId}` as 'peerConnection:*';
   }
 
-  public static allPeerConnectionsForTransfer(connectionId: string): HandlerName {
-    return `peerConnection:${connectionId}:ALL_OPPONENTS` as HandlerName;
+  public static allPeerConnectionsForTransfer(connectionId: string): 'peerConnection:*' {
+    return `peerConnection:${connectionId}:ALL_OPPONENTS` as 'peerConnection:*';
   }
 
-  public static getTransferId(connectionId: string): HandlerName {
-    return `webrtcTransfer:${connectionId}` as HandlerName;
+  public static getTransferId(connectionId: string): 'webrtcTransfer:*' {
+    return `webrtcTransfer:${connectionId}` as 'webrtcTransfer:*';
+  }
+  
+  public getNumberOfSubscribers(channel: HandlerName): number {
+    return this.suscribers[channel]?.length ?? 0;
   }
 
   public subscribe(channel: HandlerName, messageHandler: IMessageHandler) {
-    if (!this.channels[channel]) {
-      this.channels[channel] = [];
+    if (!this.suscribers[channel]) {
+      this.suscribers[channel] = [];
     }
-    if (this.channels[channel]!.indexOf(messageHandler) < 0) {
+    if (this.suscribers[channel]!.indexOf(messageHandler) < 0) {
       this.logger.debug('subscribing to {}, subscriber {}', channel, messageHandler)();
-      this.channels[channel]!.push(messageHandler);
+      this.suscribers[channel]!.push(messageHandler);
     }
   }
 
   public unsubscribe(channel: HandlerName, handler: IMessageHandler) {
-    const c = this.channels[channel];
+    const c = this.suscribers[channel];
 
     if (c) {
       let index = c.indexOf(handler);
@@ -51,10 +57,10 @@ export default class Subscription {
     this.logger.error('Unable to find channel to delete {}', channel)();
   }
 
-  public notify<T extends DefaultMessage>(message: T): boolean {
+  public notify<T extends DefaultInMessage<string, HandlerName>>(message: T): boolean {
     this.logger.debug('notifing {}', message)();
     if (message.handler === 'any') {
-      Object.values(this.channels).forEach(channel => {
+      Object.values(this.suscribers).forEach(channel => {
         channel!.forEach((h: IMessageHandler) => {
           if (h.getHandler(message)) {
             h.handle(message);
@@ -62,15 +68,15 @@ export default class Subscription {
         });
       });
       return true;
-    } else if (this.channels[message.handler]?.length) {
-      this.channels[message.handler]!.forEach((h: IMessageHandler) => {
+    } else if (this.suscribers[message.handler]?.length) {
+      this.suscribers[message.handler]!.forEach((h: IMessageHandler) => {
         h.handle(message);
       });
 
       return true;
     } else {
-      if (!message.allowZeroSubscribers) {
-        this.logger.error('Can\'t handle message {} because no channels found, available channels {}', message, this.channels)();
+      if (!(message as DefaultInnerSystemMessage<string, HandlerName>).allowZeroSubscribers) {
+        this.logger.error('Can\'t handle message {} because no suscribers found, available suscribers {}', message, this.suscribers)();
       }
 
       return false;

@@ -12,7 +12,7 @@
 </template>
 
 <script lang='ts'>
-import Growl from '@/vue/ui/AppGrowl';
+import Growl from '@/vue/ui/AppGrowl.vue';
 import {Component, Vue, Watch} from 'vue-property-decorator';
 import {CurrentUserSettingsModel, GrowlModel} from '@/ts/types/model';
 import {State} from '@/ts/instances/storeInstance';

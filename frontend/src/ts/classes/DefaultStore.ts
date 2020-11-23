@@ -33,10 +33,11 @@ import {
   NumberIdentifier,
   PrivateRoomsIds,
   RemoveMessageProgress,
-  RemoveSendingMessage,
+  RoomMessageIds,
   RoomLogEntry,
   SetCallOpponent,
   SetDevices,
+  SetFileIdsForMessage,
   SetMessageProgress,
   SetMessageProgressError,
   SetOpponentAnchor,
@@ -48,7 +49,9 @@ import {
   SetSendingFileStatus,
   SetSendingFileUploaded,
   SetUploadProgress,
-  StringIdentifier
+  StringIdentifier,
+  LiveConnectionLocation,
+  RoomMessagesIds
 } from '@/ts/types/types';
 import {
   SetStateFromStorage,
@@ -62,8 +65,9 @@ import {
   Mutation,
   VuexModule
 } from 'vuex-module-decorators';
+import { AddRoomMessage } from '@/ts/types/messages/wsInMessages';
 
-const logger = loggerFactory.getLoggerColor('store', '#6a6400');
+const logger = loggerFactory.getLogger('store');
 
 Vue.use(Vuex);
 
@@ -496,6 +500,19 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
+  public setMessageFileIds(payload: SetFileIdsForMessage) {
+    const mm: MessageModel = this.roomsDict[payload.roomId].messages[payload.messageId];
+    if (!mm.files) {
+      throw Error(`Message ${payload.messageId} in room ${payload.roomId} doesn't have files`);
+    }
+    Object.keys(payload.fileIds).forEach(symb => {
+      mm.files![symb].fileId = payload.fileIds[symb].fileId || null;
+      mm.files![symb].previewFileId = payload.fileIds[symb].previewFileId || null;
+    });
+    this.storage.updateFileIds(payload);
+  }
+
+  @Mutation
   public addMessage(m: MessageModel) {
     const om: { [id: number]: MessageModel } = this.roomsDict[m.roomId].messages;
     Vue.set(om, String(m.id), m);
@@ -503,7 +520,38 @@ export class DefaultStore extends VuexModule {
   }
 
   @Mutation
-  public deleteMessage(rm: RemoveSendingMessage) {
+  public addLiveConnectionToRoom(m: LiveConnectionLocation) {
+    if (this.roomsDict[m.roomId].p2pInfo.liveConnections.indexOf(m.connection) >= 0) {
+      throw Error('This connection is already here');
+    }
+    this.roomsDict[m.roomId].p2pInfo.liveConnections.push(m.connection);
+  }
+
+  @Mutation
+  public removeLiveConnectionToRoom(m: LiveConnectionLocation) {
+    let indexOf = this.roomsDict[m.roomId].p2pInfo.liveConnections.indexOf(m.connection);
+    if (indexOf < 0) {
+      throw Error('This connection is not present');
+    }
+    this.roomsDict[m.roomId].p2pInfo.liveConnections.splice(indexOf, 1);
+  }
+
+  @Mutation
+  public markMessageAsSent(m: RoomMessagesIds) {
+    let markSendingIds: number[] = []
+    m.messagesId.forEach(messageId => {
+      let message = this.roomsDict[m.roomId].messages[messageId];
+      if (message.sending) {
+        message.sending = false;
+        markSendingIds.push(messageId);
+      }
+    });
+    this.storage.markMessageAsSent(markSendingIds);
+
+  }
+
+  @Mutation
+  public deleteMessage(rm: RoomMessageIds) {
     Vue.delete(this.roomsDict[rm.roomId].messages, String(rm.messageId));
     this.storage.deleteMessage(rm.messageId);
   }
@@ -627,6 +675,11 @@ export class DefaultStore extends VuexModule {
 
   @Mutation
   public setOnline(ids: Record<string, string[]>) {
+    Object.keys(ids).forEach(k => {
+      if (ids[k].length === 0) {
+        delete ids[k];
+      }
+    });
     this.onlineDict = ids;
   }
 

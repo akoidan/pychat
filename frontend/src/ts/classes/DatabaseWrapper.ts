@@ -1,11 +1,12 @@
 import {
   IStorage,
+  SetFileIdsForMessage,
   SetRoomsUsers,
-  StorageData
 } from '@/ts/types/types';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
 import {
+  BlobType,
   ChannelModel,
   ChannelsDictModel,
   CurrentUserInfoModel,
@@ -38,6 +39,7 @@ import {
   UserDB
 } from '@/ts/types/db';
 import { browserVersion } from '@/ts/utils/runtimeConsts';
+import { SetStateFromStorage } from '@/ts/types/dto';
 
 type TransactionCb = (t: SQLTransaction, ...rest: unknown[]) => void;
 
@@ -46,11 +48,10 @@ export default class DatabaseWrapper implements IStorage {
   private readonly dbName: String;
   private db: Database|null = null;
   private readonly cache: { [id: number]: number } = {};
-  private minMessageIdCache: number = 0;
 
-  constructor(dbName: String) {
-    this.logger = loggerFactory.getLoggerColor('db', '#753e01');
-    this.dbName = dbName;
+  constructor() {
+    this.dbName = 'v138';
+    this.logger = loggerFactory.getLoggerColor(`db:${this.dbName}`, '#753e01');
   }
 
   public async connect(): Promise<boolean> {
@@ -63,13 +64,12 @@ export default class DatabaseWrapper implements IStorage {
       t = await this.runSql(t, 'CREATE TABLE user (id integer primary key, user text, sex integer NOT NULL CHECK (sex IN (0,1,2)), deleted boolean NOT NULL CHECK (deleted IN (0,1)), country_code text, country text, region text, city text)');
       t = await this.runSql(t, 'CREATE TABLE channel (id integer primary key, name text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), creator INTEGER REFERENCES user(id))');
       t = await this.runSql(t, 'CREATE TABLE room (id integer primary key, name text, p2p boolean NOT NULL CHECK (p2p IN (0,1)), notifications boolean NOT NULL CHECK (notifications IN (0,1)), volume integer, deleted boolean NOT NULL CHECK (deleted IN (0,1)), channel_id INTEGER REFERENCES channel(id), creator INTEGER REFERENCES user(id))');
-      t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (deleted IN (0,1)))');
-      t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
-      t = await this.runSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs boolean NOT NULL CHECK (logs IN (0,1)))');
+      t = await this.runSql(t, 'CREATE TABLE message (id integer primary key, time integer, content text, symbol text, deleted boolean NOT NULL CHECK (deleted IN (0,1)), giphy text, edited integer, roomId integer REFERENCES room(id), userId integer REFERENCES user(id), sending boolean NOT NULL CHECK (sending IN (0,1)))');
+      t = await this.runSql(t, 'CREATE TABLE file (id integer primary key, sending boolean NOT NULL CHECK (sending IN (0,1)), preview_file_id integer, file_id integer, symbol text, url text, message_id INTEGER REFERENCES message(id) ON UPDATE CASCADE , type text, preview text)');
+      t = await this.runSql(t, 'CREATE TABLE settings (userId integer primary key, embeddedYoutube boolean NOT NULL CHECK (embeddedYoutube IN (0,1)), highlightCode boolean NOT NULL CHECK (highlightCode IN (0,1)), incomingFileCallSound boolean NOT NULL CHECK (incomingFileCallSound IN (0,1)), messageSound boolean NOT NULL CHECK (messageSound IN (0,1)), onlineChangeSound boolean NOT NULL CHECK (onlineChangeSound IN (0,1)), sendLogs boolean NOT NULL CHECK (sendLogs IN (0,1)), suggestions boolean NOT NULL CHECK (suggestions IN (0,1)), theme text, logs text)');
       t = await this.runSql(t, 'CREATE TABLE profile (userId integer primary key, user text, name text, city text, surname text, email text, birthday text, contacts text, sex integer NOT NULL CHECK (sex IN (0,1,2)))');
       t = await this.runSql(t, 'CREATE TABLE room_users (room_id INTEGER REFERENCES room(id), user_id INTEGER REFERENCES user(id))');
       this.logger.log('DatabaseWrapper has been initialized')();
-
       return true;
     } else if (this.db.version === '1.0') {
       this.logger.log('Created new db connection')();
@@ -80,7 +80,7 @@ export default class DatabaseWrapper implements IStorage {
     return false;
   }
 
-  public async getAllTree(): Promise<StorageData|null> {
+  public async getAllTree(): Promise<SetStateFromStorage|null> {
     const t: SQLTransaction = await this.asyncWrite();
     const f: unknown[][] = await Promise.all<unknown[]>([
       'select * from file',
@@ -93,7 +93,7 @@ export default class DatabaseWrapper implements IStorage {
       'select * from channel'
     ].map(sql => new Promise((resolve, reject) => {
       this.executeSql(t, sql, [], (t: SQLTransaction, d: SQLResultSet) => {
-        this.logger.trace('sql {} fetched {} ', sql, d)();
+        this.logger.debug('sql {} fetched {} ', sql, d)();
         const res: unknown[] = [];
         for (let i = 0; i < d.rows.length; i++) {
           const rows: SQLResultSetRowList = d.rows;
@@ -138,7 +138,7 @@ export default class DatabaseWrapper implements IStorage {
         sendLogs: convertToBoolean(dbSettings[0].sendLogs),
         suggestions: convertToBoolean(dbSettings[0].suggestions),
         theme: dbSettings[0].theme,
-        logs: convertToBoolean(dbSettings[0].logs)
+        logs: dbSettings[0].logs,
       };
       const roomsDict: RoomDictModel = {};
       dbRooms.forEach((r: RoomDB) => {
@@ -174,7 +174,6 @@ export default class DatabaseWrapper implements IStorage {
       });
 
       const am: { [id: string]: MessageModel } = {};
-      const sendingMessages: MessageModel[] = [];
       dbMessages.forEach(m => {
         const message: MessageModel = {
           id: m.id,
@@ -187,35 +186,31 @@ export default class DatabaseWrapper implements IStorage {
             upload: null
           } : null,
           files: {},
+          sending: convertToBoolean(m.sending),
           edited: m.edited,
           symbol: m.symbol,
           content: m.content,
           userId: m.userId,
           giphy: m.giphy
         };
-        if (m.sending) {
-          sendingMessages.push(message);
-        }
         if (roomsDict[m.roomId]) {
           roomsDict[m.roomId].messages[m.id] = message;
-        }
-        if (m.id < this.minMessageIdCache) {
-          // this seems to be the first place
-          this.minMessageIdCache = m.id;
         }
         am[m.id] = message;
       });
       // if database didn't have negative number, mark that this field initialize,
       // so we can compare it with 0 when decreasing and get
-      this.minMessageIdCache --;
       dbFiles.forEach(f => {
         const amElement: MessageModel = am[f.message_id];
         if (amElement) {
           const file: FileModel = {
             url: f.url,
-            type: f.type,
-            preview: f.preview,
-            id: f.id
+            fileId: f.file_id,
+            previewFileId: f.preview_file_id,
+            sending: convertToBoolean(f.sending),
+            type: f.type as BlobType,
+            preview: f.preview
+
           };
           amElement.files![f.symbol] = file;
         }
@@ -230,7 +225,7 @@ export default class DatabaseWrapper implements IStorage {
         });
         channelsDict[c.id] = chm;
       });
-      return {sendingMessages, setRooms: {roomsDict, settings, profile, channelsDict, allUsersDict}};
+      return {roomsDict, settings, profile, channelsDict, allUsersDict};
     } else {
       return null;
     }
@@ -278,6 +273,12 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
+  public markMessageAsSent(messageIds: number[]) {
+    this.write(t => {
+      this.executeSql(t, `update message set sending = 0 where id in (${messageIds.join(', ')})`, [])();
+    });
+  }
+
   // private getMessages (t, cb) {
   //   this.executeSql(t, 'SELECT * FROM message', [], (t, m) => {
   //     this.executeSql(t, 'SELECT * from file', [],  (t, i) => {
@@ -299,25 +300,22 @@ export default class DatabaseWrapper implements IStorage {
   //   return cb;
   // }
 
-
-  getMinMessageId(): number {
-    if (this.minMessageIdCache === 0) {
-      throw Error("Can't use minMessageIdCache before initialization of store")
-    }
-    this.logger.log('Decreasing minMessageId from {}', this.minMessageIdCache)();
-    this.minMessageIdCache--;
-    return this.minMessageIdCache;
-  }
-
   public insertMessage(t: SQLTransaction, message: MessageModel) {
     this.setRoomHeaderId(message.roomId, message.id);
-    this.executeSql(t, 'insert or replace into message (id, time, content, symbol, deleted, giphy, edited, roomId, userId, sending) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                    [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId, message.transfer ? 1 : 0], (t, d) => {
+    this.executeSql(
+        t,
+        'insert or replace into message (id, time, content, symbol, deleted, giphy, edited, roomId, userId, sending) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [message.id, message.time, message.content, message.symbol || null, message.deleted ? 1 : 0, message.giphy || null, message.edited, message.roomId, message.userId, message.sending ? 1 : 0],
+        (t, d) => {
           for (const k in message.files) {
             const f = message.files[k];
-            this.executeSql(t, 'insert or replace into file (id, symbol, url, message_id, type, preview) values (?, ?, ?, ?, ?, ?)', [f.id, k, f.url, message.id, f.type, f.preview])();
+            this.executeSql(t, 'insert into file (file_id, preview_file_id, symbol, url, message_id, type, preview, sending) values ( ?, ?, ?, ?, ?, ?, ?, ?)', [ f.fileId, f.previewFileId, k, f.url, message.id, f.type, f.preview, f.sending ? 1 : 0])();
+            // this.executeSql(t, 'delete from file where message_id = ? and symbol = ? ', [message.id, k], (t) => {
+
+            // })();
           }
-        })();
+        }
+    )();
   }
 
   public saveRoom(room: RoomModel) {
@@ -379,7 +377,7 @@ export default class DatabaseWrapper implements IStorage {
 
   public setUserSettings(settings: CurrentUserSettingsModel) {
     this.write(t => {
-      this.executeSql(t, 'insert or replace into settings (userId, embeddedYoutube, highlightCode, incomingFileCallSound, messageSound, onlineChangeSound, sendLogs, suggestions, theme, logs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [1, settings.embeddedYoutube ? 1 : 0, settings.highlightCode ? 1 : 0, settings.incomingFileCallSound ? 1 : 0, settings.messageSound ? 1 : 0, settings.onlineChangeSound ? 1 : 0, settings.sendLogs ? 1 : 0, settings.suggestions ? 1 : 0, settings.theme, settings.logs ? 1 : 0])();
+      this.executeSql(t, 'insert or replace into settings (userId, embeddedYoutube, highlightCode, incomingFileCallSound, messageSound, onlineChangeSound, sendLogs, suggestions, theme, logs) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [1, settings.embeddedYoutube ? 1 : 0, settings.highlightCode ? 1 : 0, settings.incomingFileCallSound ? 1 : 0, settings.messageSound ? 1 : 0, settings.onlineChangeSound ? 1 : 0, settings.sendLogs ? 1 : 0, settings.suggestions ? 1 : 0, settings.theme, settings.logs])();
     });
   }
 
@@ -387,7 +385,7 @@ export default class DatabaseWrapper implements IStorage {
     this.write(t => {
       this.executeSql(t, 'delete from file where message_id = ?', [id], (t) => {
         this.executeSql(t, 'delete from message where id = ? ', [id])();
-      });
+      })();
     });
   }
 
@@ -430,6 +428,14 @@ export default class DatabaseWrapper implements IStorage {
     });
   }
 
+  public updateFileIds(m: SetFileIdsForMessage): void {
+    this.write(t => {
+      Object.keys(m.fileIds).forEach(symb => {
+        this.executeSql(t, 'update file set file_id = ?, preview_file_id = ? where symbol = ? and message_id = ?', [m.fileIds[symb].fileId, m.fileIds[symb].previewFileId ?? null, symb, m.messageId])();
+      });
+    });
+  }
+
   public setRoomHeaderId(roomId: number, headerId: number) {
     if (!this.cache[roomId] || this.cache[roomId] < headerId) {
       this.cache[roomId] = headerId;
@@ -450,7 +456,7 @@ export default class DatabaseWrapper implements IStorage {
     };
     t.executeSql(sql, args, cb, err);
 
-    return this.logger.trace('{} {}', sql, args);
+    return this.logger.debug('{} {}', sql, args);
   }
 
   private async runSql(t: SQLTransaction, sql: string): Promise<SQLTransaction> {
@@ -459,7 +465,7 @@ export default class DatabaseWrapper implements IStorage {
         reject({sql, e});
 
         return false;
-      });
+      })();
     });
   }
 
@@ -473,11 +479,14 @@ export default class DatabaseWrapper implements IStorage {
     if (!this.db) { // TODO TypeError: undefined is not an object (evaluating 'this.db[transactionType]')
       throw Error(`${browserVersion} failed to get db`);
     }
-    this.db[transactionType](t => {
-      cb(t);
-    },                       (e) => {
-      this.logger.error('Error during saving message {}', e)();
-    });
+    this.db[transactionType](
+        t => {
+          cb(t);
+        },
+        (e) => {
+          this.logger.error('Error during saving message {}', e)();
+        }
+    );
   }
 
   private write(cb: TransactionCb) {

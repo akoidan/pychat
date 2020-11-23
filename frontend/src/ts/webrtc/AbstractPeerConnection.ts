@@ -8,22 +8,22 @@ import MessageHandler from '@/ts/message_handlers/MesageHandler';
 import Subscription from '@/ts/classes/Subscription';
 import {
   ConnectionStatus,
-  RemovePeerConnection
 } from '@/ts/types/types';
 import { DefaultStore } from '@/ts/classes/DefaultStore';
+import { WEBRTC_STUNT_URL } from '@/ts/utils/runtimeConsts';
+import { HandlerName } from '@/ts/types/messages/baseMessagesInterfaces';
 import {
   ConnectToRemoteMessage,
-  HandlerName,
-  OnSendRtcDataMessage
-} from '@/ts/types/messages';
-import { WEBRTC_STUNT_URL } from '@/ts/utils/runtimeConsts';
+  CheckTransferDestroy,
+} from '@/ts/types/messages/innerMessages';
+import { SendRtcDataMessage } from '@/ts/types/messages/wsInMessages';
 
 export default abstract class AbstractPeerConnection extends MessageHandler {
   protected offerCreator: boolean = false;
-  protected sendRtcDataQueue: OnSendRtcDataMessage[] = [];
+  protected sendRtcDataQueue: SendRtcDataMessage[] = [];
   protected readonly opponentWsId: string;
   protected readonly connectionId: string;
-  protected readonly logger: Logger;
+  protected logger: Logger;
   protected pc: RTCPeerConnection | null = null;
   protected connectionStatus: ConnectionStatus = 'new';
   protected webRtcUrl = WEBRTC_STUNT_URL;
@@ -51,11 +51,12 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.roomId = roomId;
     this.connectionId = connectionId;
     this.opponentWsId = opponentWsId;
+    sub.subscribe(Subscription.allPeerConnectionsForTransfer(connectionId), this);
     sub.subscribe(this.mySubscriberId, this);
     this.wsHandler = ws;
     this.store = store;
-    this.logger = loggerFactory.getLogger(this.connectionId + ':' + this.opponentWsId, 'color: #960055');
-    this.logger.debug('Created {}', this.constructor.name)();
+    this.logger = loggerFactory.getLoggerColor(`peer:${this.connectionId}:${this.opponentWsId}`, '#960055');
+    this.logger.log('Created {}', this.constructor.name)();
   }
 
   get mySubscriberId(): HandlerName {
@@ -71,15 +72,16 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     return this.connectionStatus;
   }
 
-  public onDestroy(reason?: string) {
+  public unsubscribeAndRemoveFromParent(reason?: string) {
     this.logger.log('Destroying {}, because {}', this.constructor.name, reason)();
-    const message: RemovePeerConnection = {
+    sub.unsubscribe(Subscription.allPeerConnectionsForTransfer(this.connectionId), this);
+    sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
+    const message: CheckTransferDestroy = {
       handler: Subscription.getTransferId(this.connectionId),
-      action: 'removePeerConnection',
-      opponentWsId: this.opponentWsId
+      action: 'checkTransferDestroy',
+      allowZeroSubscribers: true,
     };
     sub.notify(message);
-    sub.unsubscribe(Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId), this);
   }
 
   public print(message: string) {
@@ -95,7 +97,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.pc = new (<any>RTCPeerConnection)(this.pc_config, this.pc_constraints);
     this.pc!.oniceconnectionstatechange = this.oniceconnectionstatechange.bind(this);
     this.pc!.onicecandidate = (event: RTCPeerConnectionIceEvent) => {
-      this.logger.log('onicecandidate')();
+      this.logger.debug('onicecandidate')();
       if (event.candidate) {
         this.sendWebRtcEvent(event.candidate);
       }
@@ -156,7 +158,7 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       }
     }
     if (line === -1) {
-      this.logger.log('Could not find the m line for {}', sdp)();
+      this.logger.debug('Could not find the m line for {}', sdp)();
 
       return sdp;
     }
@@ -165,13 +167,13 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
       line++;
     }
     if (lines[line].indexOf('b') === 0) {
-      this.logger.log('Replaced b line at line {}', line)();
+      this.logger.debug('Replaced b line at line {}', line)();
       lines[line] = 'b=AS:' + bitrate;
 
       return lines.join('\n');
     } else {
       // Add a new b line
-      this.logger.log('Adding new b line before line {}', line)();
+      this.logger.debug('Adding new b line before line {}', line)();
       let newLines = lines.slice(0, line);
       newLines.push('b=AS:' + bitrate);
       newLines = newLines.concat(lines.slice(line, lines.length));
@@ -180,33 +182,35 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     }
   }
 
+  // destroy(Des)
+
   protected onChannelMessage(event: MessageEvent) {
     this.logger.log('Received {} from webrtc data channel', bytesToSize(event.data.byteLength))();
   }
 
-  protected async onsendRtcData(message: OnSendRtcDataMessage) {
+  public async sendRtcData(message: SendRtcDataMessage) {
     if (!this.connectedToRemote) {
-      this.logger.log('Connection is not accepted yet, pushing data to queue')();
+      this.logger.warn('Putting sendrtc data event to the queue')();
       this.sendRtcDataQueue.push(message);
       return;
     } else {
       const data: RTCSessionDescriptionInit | RTCIceCandidateInit | { message: unknown } = message.content;
-      this.logger.log('onsendRtcData')();
       if (this.pc!.iceConnectionState && this.pc!.iceConnectionState !== 'closed') {
         if ((<RTCSessionDescriptionInit>data).sdp) {
-          await this.pc!.setRemoteDescription(new RTCSessionDescription(<RTCSessionDescriptionInit>data));
           this.logger.log('Creating answer')();
+          await this.pc!.setRemoteDescription(new RTCSessionDescription(<RTCSessionDescriptionInit>data));
           if (!this.offerCreator) {
             await this.respondOffer();
           }
           this.offerCreator = false;
         } else if ((<RTCIceCandidateInit>data).candidate) {
+          this.logger.log('Adding ice candidate {} ', (<RTCIceCandidateInit>data).candidate)();
           await this.pc!.addIceCandidate(new RTCIceCandidate(<RTCIceCandidateInit>data));
         } else if ((<{ message: unknown }>data).message) {
           this.logger.error('Got unknown message {}', (<{ message: unknown }>data).message);
         }
       } else {
-        this.logger.error('Skipping ws message for closed connection')();
+        this.logger.error('Skipping onsendRtcData message for closed connection')();
       }
     }
   }
