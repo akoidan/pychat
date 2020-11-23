@@ -18,11 +18,25 @@ import {
   DestroyPeerConnectionMessage
 } from '@/ts/types/messages/innerMessages';
 import { DefaultWsInMessage } from '@/ts/types/messages/wsInMessages';
+import {
+  HandlerType,
+  HandlerTypes
+} from '@/ts/types/messages/baseMessagesInterfaces';
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
+
+  protected connectedToRemote: boolean = false;
   private audioProcessor: any;
   // ontrack can be triggered multiple time, so call this in order to prevent updaing store multiple time
   private remoteStream: MediaStream|null = null;
+
+
+  protected readonly handlers: HandlerTypes<keyof CallPeerConnection, 'peerConnection:*'> = {
+    destroy: <HandlerType<'destroy', 'peerConnection:*'>>this.destroy,
+    streamChanged:  <HandlerType<'streamChanged', 'peerConnection:*'>>this.streamChanged,
+    connectToRemote:  <HandlerType<'connectToRemote', 'peerConnection:*'>>this.connectToRemote,
+    sendRtcData:  <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData
+  };
 
   constructor(
       roomId: number,
@@ -43,8 +57,27 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
         opponentCurrentVoice: 0
       }
     };
+    this.connectedToRemote = false;
+    this.sdpConstraints = {
+      mandatory: {
+        OfferToReceiveAudio: true,
+        OfferToReceiveVideo: true
+      }
+    };
     this.store.setCallOpponent(payload);
   }
+
+
+
+  public connectToRemote(stream: ConnectToRemoteMessage) {
+    this.logger.log('Connect to remote')();
+    this.connectedToRemote = true;
+    this.createPeerConnection(stream);
+  }
+
+  public ondatachannelclose(text: string): void {
+  }
+
 
   public oniceconnectionstatechange() {
     this.logger.log(`iceconnectionstate has been changed to ${this.pc!.iceConnectionState}`)();
