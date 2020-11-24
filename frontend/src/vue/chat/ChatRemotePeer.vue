@@ -2,6 +2,7 @@
   <div class="micVideoWrapper">
     <video-object
       :muted="null"
+      :user-id="callInfo.userId"
       :media-stream-link="callInfo.mediaStreamLink"
     />
     <div>
@@ -71,12 +72,6 @@ export default class ChatRemotePeer extends Vue {
       box-shadow: 0 0 6px 6px $color
       border-radius: 6px
       display: none
-    video
-      max-height: calc(60vh - 120px)
-      max-width: 100%
-      background-color: #630000
-      &.connected
-        background-color: #165620
     > div
       @extend %asbolute
       bottom: 5px

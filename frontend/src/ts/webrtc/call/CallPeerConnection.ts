@@ -22,6 +22,10 @@ import {
   HandlerType,
   HandlerTypes
 } from '@/ts/types/messages/baseMessagesInterfaces';
+import {
+  getStreamLog,
+  getTrackLog
+} from '@/ts/utils/pureFunctions';
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
 
@@ -103,7 +107,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       if (event.streams.length === 0) {
         throw Error('Oops, expected tracks to be attached at least to one stream');
       }
-      this.logger.log('onaddstream video tracks: {} audio tracks: {}', event.streams[0].getVideoTracks(), event.streams[0].getAudioTracks())();
+      this.logger.log('onaddstream {}', getStreamLog(event.streams[0]))();
       if (this.remoteStream !== event.streams[0]) {
         this.remoteStream = event.streams[0]
         const payload: SetOpponentAnchor = {
@@ -131,14 +135,15 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
         this.logger.log('onaddtrack has been called already for this stream. So skipping this cb')()
       }
     };
-    this.logger.log('Sending local stream to remote')();
 
     this.changeStreams(event?.stream);
   }
 
   private changeStreams(stream: MediaStream|null) {
+    this.logger.log('Sending local stream to remote {}', getStreamLog(stream))();
     const senders = this.pc!.getSenders();
     for (let sender of senders) {
+      this.logger.debug('Remove track from sender {}', sender)();
       this.pc!.removeTrack(sender);
     }
     if (stream) {
@@ -146,6 +151,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
         // https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addTrack
         // check usage notes, if I don't specify a stream as a second arguments
         // onaddtracks in r3d71 would be w/o a stream and I would need to create a stream and assemble them manually
+        this.logger.debug('Adding track {} to sender, of stream {}', getTrackLog(track), getStreamLog(stream))();
         this.pc!.addTrack(track, stream);
       }
     }
