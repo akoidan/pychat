@@ -26,10 +26,6 @@ export const {
   CAPTCHA_IFRAME
 } = allConsts;
 
-export const WS_API_URL = `ws${IS_SSL ? 's' : ''}://${BACKEND_ADDRESS}/ws`;
-export const XHR_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_ADDRESS}/api`;
-export const MEDIA_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_ADDRESS}`;
-
 export const PING_CLOSE_JS_DELAY = 5000;
 export const CONNECTION_RETRY_TIME = 5000;
 export const CLIENT_NO_SERVER_PING_CLOSE_TIMEOUT = 313000;

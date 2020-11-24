@@ -1,6 +1,6 @@
 import { Logger } from 'lines-logger';
-import { XHR_API_URL } from '@/ts/utils/consts';
 import loggerFactory from '@/ts/instances/loggerFactory';
+import { XHR_API_URL } from '@/ts/utils/runtimeConsts';
 
 declare var clients: any;
 

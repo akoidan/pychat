@@ -1,4 +1,8 @@
 import mobile from 'is-mobile';
+import {
+  BACKEND_ADDRESS,
+  IS_SSL
+} from '@/ts/utils/consts';
 
 export const isMobile: boolean = mobile.isMobile();
 
@@ -22,3 +26,7 @@ export const browserVersion: string = (function () {
 export const isFirefox = browserVersion.indexOf('Firefox') >= 0;
 export const WEBRTC_STUNT_URL = isFirefox ? 'stun:23.21.150.121' : 'stun:stun.l.google.com:19302';
 export const isChrome = browserVersion.indexOf('Chrome') >= 0;
+const BACKEND_CURRENT_ADDRESS = BACKEND_ADDRESS.replace('{}', window.location.hostname)
+export const WS_API_URL = `ws${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}/ws`;
+export const XHR_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}/api`;
+export const MEDIA_API_URL = `http${IS_SSL ? 's' : ''}://${BACKEND_CURRENT_ADDRESS}`;

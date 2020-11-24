@@ -190,7 +190,7 @@ export interface P2pMessageModel {
 }
 
 export interface CallsInfoModel {
-  calls: { [id: string]: CallInfoModel };
+  calls: Record<string, CallInfoModel>;
   callContainer: boolean;
   showMic: boolean;
   currentMicLevel: number; // voice

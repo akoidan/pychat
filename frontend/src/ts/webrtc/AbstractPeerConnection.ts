@@ -33,7 +33,6 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
   protected readonly roomId: number;
   protected sendChannel: RTCDataChannel | null = null;
 
-  protected abstract connectedToRemote: boolean;
   private readonly pc_config = {
     iceServers: [{
       urls: this.webRtcUrl
@@ -58,6 +57,9 @@ export default abstract class AbstractPeerConnection extends MessageHandler {
     this.logger = loggerFactory.getLoggerColor(`peer:${this.connectionId}:${this.opponentWsId}`, '#960055');
     this.logger.log('Created {}', this.constructor.name)();
   }
+
+  abstract get connectedToRemote(): boolean;
+  abstract set connectedToRemote(v: boolean);
 
   get mySubscriberId(): HandlerName {
     return Subscription.getPeerConnectionId(this.connectionId, this.opponentWsId);

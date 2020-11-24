@@ -2,6 +2,7 @@
   <video
     ref="video"
     :muted="muted"
+    :class="{connected}"
   />
 </template>
 
@@ -20,6 +21,7 @@ export default class VideoObject extends Vue {
   @Prop() public mediaStreamLink!: string;
   @Prop() public muted!: string;
   @Prop() public userId!: number;
+  @Prop() public connected!: boolean;
 
   @Ref()
   public video!: HTMLVideoElement
@@ -44,10 +46,20 @@ export default class VideoObject extends Vue {
 
   }*/
 
+  @Watch('connected')
+  public onConnectedChanged(newValue: boolean) {
+    this.$logger.debug('Changed connected to {}', newValue)();
+    if (!newValue) {
+      this.video.srcObject = null
+    } else {
+      this.video.srcObject = this.$store.mediaObjects[this.mediaStreamLink];
+    }
+  }
+
   @Watch('mediaStreamLink')
   public onMediaStreamChanged(newValue: string) {
     const stream: MediaStream = this.$store.mediaObjects[newValue];
-    this.$logger.log('Video #{} scheduling stream update-> {} {}', this.userId, newValue, getStreamLog(stream))();
+    this.$logger.debug('Video #{} scheduling stream update-> {} {}', this.userId, newValue, getStreamLog(stream))();
     if (stream) {
         this.video.srcObject = stream;
         this.video.play();

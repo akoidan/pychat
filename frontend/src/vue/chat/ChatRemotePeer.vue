@@ -4,6 +4,7 @@
       :muted="null"
       :user-id="callInfo.userId"
       :media-stream-link="callInfo.mediaStreamLink"
+      :connected="callInfo.connected"
     />
     <div>
       <app-input-range

@@ -5,7 +5,6 @@ import {
   GIT_HASH,
   IS_ANDROID,
   IS_DEBUG,
-  WS_API_URL
 } from '@/ts/utils/consts';
 import App from '@/vue/App.vue'; // should be after initStore
 import { sub } from '@/ts/instances/subInstance';
@@ -14,7 +13,8 @@ import { store } from '@/ts/instances/storeInstance';
 import {
   browserVersion,
   isChrome,
-  isMobile
+  isMobile,
+  WS_API_URL
 } from '@/ts/utils/runtimeConsts';
 import { Logger } from 'lines-logger';
 import loggerFactory from '@/ts/instances/loggerFactory';
@@ -149,8 +149,7 @@ async function init() {
   const api: Api = new Api(xhr);
 
   const storage: IStorage = window.openDatabase! ? new DatabaseWrapper() : new LocalStorage();
-  const WS_URL = WS_API_URL.replace('{}', window.location.host);
-  const ws: WsHandler = new WsHandler(WS_URL, sessionHolder, store);
+  const ws: WsHandler = new WsHandler(WS_API_URL, sessionHolder, store);
   const notifier: NotifierHandler = new NotifierHandler(api, browserVersion, isChrome, isMobile, ws, store);
   const audioPlayer: AudioPlayer = new AudioPlayer(notifier);
   const messageBus = new Vue();

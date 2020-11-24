@@ -4,10 +4,10 @@ import {
 } from '@/ts/types/types';
 import {
   CONNECTION_ERROR,
-  RESPONSE_SUCCESS,
-  XHR_API_URL
+  RESPONSE_SUCCESS
 } from '@/ts/utils/consts';
 import Http from '@/ts/classes/Http';
+import { XHR_API_URL } from '@/ts/utils/runtimeConsts';
 
 /**
  * @param params : object dict of params or DOM form
@@ -23,7 +23,7 @@ export default class Xhr extends Http {
   }
 
   public getApiUrl(url: string) {
-    return `${XHR_API_URL}${url}`.replace('{}', window.location.host);
+    return `${XHR_API_URL}${url}`;
   }
 
   /**
@@ -68,7 +68,6 @@ export default class Xhr extends Http {
       );
 
       const url = this.getApiUrl(d.url);
-
       r.open('POST', url, true);
       let data;
       let logOut: String = '';

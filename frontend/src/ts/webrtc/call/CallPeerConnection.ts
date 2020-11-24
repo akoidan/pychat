@@ -26,10 +26,15 @@ import {
   getStreamLog,
   getTrackLog
 } from '@/ts/utils/pureFunctions';
+import {
+  CallInfoModel,
+  RoomModel
+} from '@/ts/types/model';
 
 export default abstract class CallPeerConnection extends AbstractPeerConnection {
 
-  protected connectedToRemote: boolean = false;
+
+  protected _connectedToRemote: boolean = false;
   private audioProcessor: any;
   // ontrack can be triggered multiple time, so call this in order to prevent updaing store multiple time
   private remoteStream: MediaStream|null = null;
@@ -71,10 +76,32 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     this.store.setCallOpponent(payload);
   }
 
+  get connectedToRemote() {
+    return this._connectedToRemote;
+  }
+
+  set connectedToRemote(v: boolean) {
+    this._connectedToRemote = v;
+    if (this.callInfo) {
+      this.callInfo.connected = v;
+    } else {
+      // opponent dropped
+      this.logger.warn('Can\'t set connected to remote to {} because callInfo doesn\'t exists', v)();
+    }
+  }
+
+  get callInfo(): CallInfoModel|null {
+    return this.room?.callInfo?.calls[this.opponentWsId] ?? null;
+  }
+
+  get room(): RoomModel {
+    return this.store.roomsDict[this.roomId];
+  }
 
 
   public connectToRemote(stream: ConnectToRemoteMessage) {
     this.logger.log('Connect to remote')();
+    this.store.roomsDict[this.roomId].callInfo.calls[this.opponentWsId].connected = true;
     this.connectedToRemote = true;
     this.createPeerConnection(stream);
   }
@@ -88,11 +115,14 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     if (this.pc!.iceConnectionState === 'disconnected' ||
         this.pc!.iceConnectionState === 'failed' ||
         this.pc!.iceConnectionState === 'closed') {
+      this.connectedToRemote = false;
       // this.logger.log('disconnecting...')();
       // TODO, nope, if state has been changed to disconnected we should NOT close a connection
       // since on chaning streams connection is also dropping and then goes by the chain 'checking' 'connected' 'completed'
       // at least this is on safari, on chrome it usually doesn't go to disconnected,
       // this.onDestroy('Connection has been lost');
+    } else {
+      this.connectedToRemote = true;
     }
   }
 
