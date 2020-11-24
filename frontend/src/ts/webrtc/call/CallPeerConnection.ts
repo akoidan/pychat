@@ -38,6 +38,8 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   private audioProcessor: any;
   // ontrack can be triggered multiple time, so call this in order to prevent updaing store multiple time
   private remoteStream: MediaStream|null = null;
+  private localStream: MediaStream|null = null;
+  private streamTrackApi : 'stream' | 'track' = 'stream';
 
 
   protected readonly handlers: HandlerTypes<keyof CallPeerConnection, 'peerConnection:*'> = {
@@ -56,6 +58,8 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       store: DefaultStore
   ) {
     super(roomId, connId, opponentWsId, wsHandler, store);
+    // @ts-expect-error
+    window.callPeerConnection = this;
     const payload:  SetCallOpponent = {
       opponentWsId: this.opponentWsId,
       roomId: this.roomId,
@@ -69,8 +73,8 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
     this.connectedToRemote = false;
     this.sdpConstraints = {
       mandatory: {
-        OfferToReceiveAudio: true,
-        OfferToReceiveVideo: true
+        offerToReceiveAudio: 1,
+        offerToReceiveVideo: 1
       }
     };
     this.store.setCallOpponent(payload);
@@ -129,60 +133,81 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   public createPeerConnection (event: ConnectToRemoteMessage) {
     super.createPeerConnection();
 
-    // onaddstream property has been removed from the specification; you should now use RTCPeerConnection.ontrack to watch for track events instead.
-    this.pc!.ontrack = (event: RTCTrackEvent) => {
-      if (event.streams.length > 1) {
-        throw Error('Unexpected multiple streams. Should be exactly 1 stream and multiple tracks');
-      }
-      if (event.streams.length === 0) {
-        throw Error('Oops, expected tracks to be attached at least to one stream');
-      }
-      this.logger.log('onaddstream {}', getStreamLog(event.streams[0]))();
-      if (this.remoteStream !== event.streams[0]) {
-        this.remoteStream = event.streams[0]
-        const payload: SetOpponentAnchor = {
-          anchor: this.remoteStream, // r3d71 search bottom
-          opponentWsId: this.opponentWsId,
-          roomId: this.roomId
-        };
-        this.store.setOpponentAnchor(payload);
-
-        if (this.sendRtcDataQueue.length > 0) {
-          this.logger.log('Connection accepted, consuming sendRtcDataQueue')();
-          const queue = this.sendRtcDataQueue;
-          this.sendRtcDataQueue = [];
-          queue.forEach(message => this.sendRtcData(message));
+    if (this.streamTrackApi === 'stream') {
+      this.pc!.onaddstream = ((event: MediaStreamEvent) => {
+        this.logger.log('onaddstream {}', getStreamLog(event.stream))();
+        if (event.stream) {
+          this.addStream(event.stream);
+        } else {
+          this.logger.error('Got null stream')();
         }
-        //
-        // if (p) { //firefox video.play doesn't return promise
-        //   // chrome returns promise, if it's on mobile devices video sound would be muted
-        //   // coz it initialized from network instead of user gesture
-        //   p.catch(Utils.clickToPlay(this.dom.remote))
-        // }
-        this.removeAudioProcessor();
-        this.audioProcessor = createMicrophoneLevelVoice(this.remoteStream, this.processAudio.bind(this));
-      } else {
-        this.logger.log('onaddtrack has been called already for this stream. So skipping this cb')()
-      }
-    };
+      });
 
-    this.changeStreams(event?.stream);
+    } else {
+      // onaddstream property has been removed from the specification; you should now use RTCPeerConnection.ontrack to watch for track events instead.
+      this.pc!.ontrack = (event: RTCTrackEvent) => {
+        this.logger.log('ontrack {}', getStreamLog(event.streams[0]))();
+        if (event.streams.length === 0) {
+          this.logger.error('Oops, expected tracks to be attached at least to one stream')();
+        } else if (event.streams.length > 1) {
+          this.logger.error('Unexpected multiple streams. Should be exactly 1 stream and multiple tracks')();
+        } else {
+          this.addStream(event.streams[0]);
+        }
+      };
+    }
+    this.changeStreams(event.stream);
+  }
+
+  private addStream(stream: MediaStream) {
+    if (this.remoteStream !== stream) {
+      this.remoteStream = stream;
+      const payload: SetOpponentAnchor = {
+        anchor: this.remoteStream!, // r3d71 search bottom
+        opponentWsId: this.opponentWsId,
+        roomId: this.roomId
+      };
+      this.store.setOpponentAnchor(payload);
+
+      if (this.sendRtcDataQueue.length > 0) {
+        this.logger.log('Connection accepted, consuming sendRtcDataQueue')();
+        const queue = this.sendRtcDataQueue;
+        this.sendRtcDataQueue = [];
+        queue.forEach(message => this.sendRtcData(message));
+      }
+      //
+      // if (p) { //firefox video.play doesn't return promise
+      //   // chrome returns promise, if it's on mobile devices video sound would be muted
+      //   // coz it initialized from network instead of user gesture
+      //   p.catch(Utils.clickToPlay(this.dom.remote))
+      // }
+      this.removeAudioProcessor();
+      this.audioProcessor = createMicrophoneLevelVoice(this.remoteStream!, this.processAudio.bind(this));
+    } else {
+      this.logger.log('onstream has been called already for this stream. So skipping this cb')()
+    }
   }
 
   private changeStreams(stream: MediaStream|null) {
-    this.logger.log('Sending local stream to remote {}', getStreamLog(stream))();
-    const senders = this.pc!.getSenders();
-    for (let sender of senders) {
-      this.logger.debug('Remove track from sender {}', sender)();
-      this.pc!.removeTrack(sender);
-    }
-    if (stream) {
-      for (const track of stream?.getTracks()) {
-        // https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addTrack
-        // check usage notes, if I don't specify a stream as a second arguments
-        // onaddtracks in r3d71 would be w/o a stream and I would need to create a stream and assemble them manually
-        this.logger.debug('Adding track {} to sender, of stream {}', getTrackLog(track), getStreamLog(stream))();
-        this.pc!.addTrack(track, stream);
+    this.localStream = stream;
+    if (this.streamTrackApi === 'stream') {
+      this.logger.log('Adding local stream {} to remote', getStreamLog(stream))();
+      this.pc!.addStream(stream!);
+    } else {
+      this.logger.log('Rewriting tracks to remote for stream {}', getStreamLog(stream))();
+      const senders = this.pc!.getSenders();
+      for (let sender of senders) {
+        this.logger.debug('Remove track from sender {}', sender)();
+        this.pc!.removeTrack(sender);
+      }
+      if (stream) {
+        for (const track of stream!.getTracks()) {
+          // https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/addTrack
+          // check usage notes, if I don't specify a stream as a second arguments
+          // onaddtracks in r3d71 would be w/o a stream and I would need to create a stream and assemble them manually
+          this.logger.debug('Adding track {} to sender, of stream {}', getTrackLog(track), getStreamLog(stream))();
+          this.pc!.addTrack(track, stream!);
+        }
       }
     }
   }

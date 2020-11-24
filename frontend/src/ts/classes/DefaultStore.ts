@@ -343,7 +343,8 @@ export class DefaultStore extends VuexModule {
       }
     }
     if (!key) {
-      key = mediaLinkIdGetter();
+    // TODO do we need to fire watch if track added but stream hasn't changed?
+      let key = mediaLinkIdGetter();
       this.roomsDict[payload.roomId].callInfo.calls[payload.opponentWsId].mediaStreamLink = key;
       Vue.set(this.mediaObjects, key, payload.anchor);
     }
