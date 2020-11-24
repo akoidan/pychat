@@ -25,7 +25,6 @@ import {
 } from "@/ts/types/messages/wsInMessages";
 
 export default class FileSenderPeerConnection extends FilePeerConnection {
-  protected connectedToRemote: boolean = true;
 
   protected readonly handlers:  HandlerTypes<keyof FileSenderPeerConnection, 'peerConnection:*'> = {
     destroyFileConnection: <HandlerType<'destroyFileConnection', 'peerConnection:*'>>this.destroyFileConnection,

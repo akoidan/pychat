@@ -50,7 +50,7 @@ export default abstract class MessagePeerConnection extends AbstractPeerConnecti
     syncP2pMessage: <HandlerType<'syncP2pMessage', 'peerConnection:*'>>this.syncP2pMessage
   };
 
-  protected connectedToRemote: boolean = true;
+  connectedToRemote: boolean = true;
 
   protected status: 'inited' | 'not_inited' = 'not_inited';
 

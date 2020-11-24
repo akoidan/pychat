@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import {
   IS_DEBUG,
-  MEDIA_API_URL,
   PASTED_IMG_CLASS
 } from '@/ts/utils/consts';
 import {
@@ -22,6 +21,7 @@ import {
 } from '@/ts/utils/smileys';
 import loggerFactory from '@/ts/instances/loggerFactory';
 import { Logger } from 'lines-logger';
+import { MEDIA_API_URL } from '@/ts/utils/runtimeConsts';
 
 const tmpCanvasContext: CanvasRenderingContext2D = document.createElement('canvas').getContext('2d')!; // TODO why is it not safe?
 const yotubeTimeRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(\d)?/;
@@ -121,8 +121,7 @@ export const isDateMissing = (function () {
 })();
 
 export function resolveMediaUrl(src: string): string {
-  return src.indexOf('blob:http') === 0 ? src :
-      `${MEDIA_API_URL}${src}`.replace('{}', window.location.host);
+  return src.indexOf('blob:http') === 0 ? src : `${MEDIA_API_URL}${src}`;
 }
 
 export function encodeSmileys(html: string): string {

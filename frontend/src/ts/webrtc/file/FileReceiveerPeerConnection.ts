@@ -22,7 +22,6 @@ import {
 } from "@/ts/types/messages/wsInMessages";
 
 export default class FileReceiverPeerConnection extends FilePeerConnection {
-  protected connectedToRemote: boolean = true;
 
   protected readonly handlers:  HandlerTypes<keyof FileReceiverPeerConnection, 'peerConnection:*'> = {
     sendRtcData: <HandlerType<'sendRtcData', 'peerConnection:*'>>this.sendRtcData,

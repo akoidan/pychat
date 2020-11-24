@@ -5,6 +5,8 @@ import { DestroyPeerConnectionMessage } from "@/ts/types/messages/innerMessages"
 
 export default abstract class FilePeerConnection extends AbstractPeerConnection {
 
+  public connectedToRemote: boolean = true;
+
   public oniceconnectionstatechange() {
     this.logger.log(`iceconnectionstate has been changed to ${this.pc!.iceConnectionState}`)
     if (this.pc!.iceConnectionState === 'disconnected' ||

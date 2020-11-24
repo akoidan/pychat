@@ -18,6 +18,26 @@ export function getChromeVersion () {
   return raw ? parseInt(raw[2], 10) : false;
 }
 
+export function getStreamLog(m: MediaStream|null): MediaStream | string | null{
+  if (!m) {
+    return null;
+  }
+  if (!m.id) {
+    return m;
+  }
+  return `sream:${m.id};${m.active? 'active' : 'inactive'};audio=${m.getAudioTracks().length};video=${m.getVideoTracks().length}`;
+}
+
+export function getTrackLog(m: MediaStreamTrack|null): MediaStreamTrack | string | null{
+  if (!m) {
+    return null;
+  }
+  if (!m.id) {
+    return m;
+  }
+  return `track:${m.id};${(m as any).active ? 'active' : 'inactive'}`;
+}
+
 export function  extractError (args: unknown |unknown[]| {name: string}) {
   try {
     let value: { name: string; message: string; rawError: string } = args as { name: string; message: string; rawError: string };
