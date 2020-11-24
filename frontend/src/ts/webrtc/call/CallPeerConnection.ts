@@ -39,7 +39,7 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
   // ontrack can be triggered multiple time, so call this in order to prevent updaing store multiple time
   private remoteStream: MediaStream|null = null;
   private localStream: MediaStream|null = null;
-  private streamTrackApi : 'stream' | 'track' = 'stream';
+  private streamTrackApi : 'stream' | 'track' = 'track';
 
 
   protected readonly handlers: HandlerTypes<keyof CallPeerConnection, 'peerConnection:*'> = {
@@ -71,11 +71,12 @@ export default abstract class CallPeerConnection extends AbstractPeerConnection 
       }
     };
     this.connectedToRemote = false;
+    // https://stackoverflow.com/a/45567799/3872976
+    // https://www.w3.org/TR/webrtc/#webidl-1352513424
+    // otherwise response with video won't be available
     this.sdpConstraints = {
-      mandatory: {
-        offerToReceiveAudio: 1,
-        offerToReceiveVideo: 1
-      }
+      offerToReceiveAudio: true,
+      offerToReceiveVideo: true
     };
     this.store.setCallOpponent(payload);
   }
