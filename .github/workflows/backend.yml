@@ -2,7 +2,13 @@ name: BE:pychat.org
 
 on:
   push:
-    branches: [ master ]
+    branches: 
+      - master
+    paths: 
+      - 'backend/**'
+  pull_request:
+    branches:
+      - master
     paths: 
       - 'backend/**'
 
